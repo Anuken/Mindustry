@@ -257,17 +257,15 @@ public class PowerGraph{
             //there's something to update, add the entity
             entity.add();
 
-            if(build.block.consPower != null){
-                if(build.block.outputsPower && build.block.consumesPower && !build.block.consPower.buffered){
-                    producers.add(build);
-                    consumers.add(build);
-                }else if(build.block.outputsPower && build.block.consumesPower){
-                    batteries.add(build);
-                }else if(build.block.outputsPower){
-                    producers.add(build);
-                }else if(build.block.consumesPower){
-                    consumers.add(build);
-                }
+            if(build.block.outputsPower && build.block.consumesPower && !build.block.consPower.buffered){
+                producers.add(build);
+                consumers.add(build);
+            }else if(build.block.outputsPower && build.block.consumesPower){
+                batteries.add(build);
+            }else if(build.block.outputsPower){
+                producers.add(build);
+            }else if(build.block.consumesPower){
+                consumers.add(build);
             }
         }
     }

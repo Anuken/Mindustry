@@ -54,7 +54,7 @@ public class BaseTurret extends Block{
         super.init();
 
         if(acceptCoolant){
-            coolantConsumer = findConsumer(c -> c instanceof ConsumeLiquidBase && c.booster);
+            coolantConsumer = findConsumer(c -> c instanceof ConsumeLiquidBase);
         }
     }
 

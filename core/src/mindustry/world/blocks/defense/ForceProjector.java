@@ -20,6 +20,7 @@ import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
+@Deprecated
 public class ForceProjector extends Block{
     public final int timerUse = timers++;
     public float phaseUseTime = 350f;

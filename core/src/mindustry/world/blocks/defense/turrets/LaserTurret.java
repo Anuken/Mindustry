@@ -5,7 +5,6 @@ import arc.util.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.type.*;
-import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -19,7 +18,6 @@ public class LaserTurret extends PowerTurret{
     public LaserTurret(String name){
         super(name);
 
-        consume(new ConsumeCoolant(0.01f)).update(false);
         coolantMultiplier = 1f;
     }
 
