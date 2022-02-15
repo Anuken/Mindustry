@@ -118,7 +118,7 @@ public class ErekirTechTree{
 
                     node(regenProjector, () -> {
                         //TODO more tiers of build tower or "support" structures like overdrive projectors
-                        node(buildTower, Seq.with(new OnSector(four)), () -> {
+                        node(buildTower, Seq.with(new OnSector(five)), () -> {
 
                         });
                     });
