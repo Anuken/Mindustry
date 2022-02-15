@@ -465,7 +465,7 @@ public class UnitTypes implements ContentList{
                     despawnEffect = Fx.smokeCloud;
                     smokeEffect = Fx.none;
 
-                    shootEffect = Fx.greenLaserChargeSmall;
+                    chargeEffect = Fx.greenLaserChargeSmall;
 
                     incendChance = 0.1f;
                     incendSpread = 5f;
@@ -554,7 +554,7 @@ public class UnitTypes implements ContentList{
                     largeHit = true;
                     lightColor = lightningColor = Pal.heal;
 
-                    shootEffect = Fx.greenLaserCharge;
+                    chargeEffect = Fx.greenLaserCharge;
 
                     healPercent = 25f;
                     collidesTeam = true;

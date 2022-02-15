@@ -347,6 +347,7 @@ public class Weapon implements Cloneable{
         boolean parentize = ammo.keepVelocity || parentizeEffects;
 
         if(delay){
+            ammo.chargeEffect.at(shootX, shootY, rotation, parentize ? unit : null);
             Time.run(firstShotDelay, () -> {
                 if(!unit.isAdded()) return;
 
@@ -357,18 +358,21 @@ public class Weapon implements Cloneable{
                 if(!continuous){
                     shootSound.at(shootX, shootY, Mathf.random(soundPitchMin, soundPitchMax));
                 }
-                ammo.chargeShootEffect.at(shootX + unit.x - baseX, shootY + unit.y - baseY, rotation, parentize ? unit : null);
+                ammo.shootEffect.at(shootX + unit.x - baseX, shootY + unit.y - baseY, rotation, parentize ? unit : null);
+                ammo.smokeEffect.at(shootX, shootY, rotation, parentize ? unit : null);
+                ejectEffect.at(mountX, mountY, rotation * side);
             });
         }else{
             unit.vel.add(Tmp.v1.trns(rotation + 180f, ammo.recoil));
             Effect.shake(shake, shake, shootX, shootY);
             mount.recoil = recoil;
             mount.heat = 1f;
+
+            ammo.shootEffect.at(shootX, shootY, rotation, parentize ? unit : null);
+            ammo.smokeEffect.at(shootX, shootY, rotation, parentize ? unit : null);
+            ejectEffect.at(mountX, mountY, rotation * side);
         }
 
-        ejectEffect.at(mountX, mountY, rotation * side);
-        ammo.shootEffect.at(shootX, shootY, rotation, parentize ? unit : null);
-        ammo.smokeEffect.at(shootX, shootY, rotation, parentize ? unit : null);
         unit.apply(shootStatus, shootStatusDuration);
     }
 
