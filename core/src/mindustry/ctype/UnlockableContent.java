@@ -2,13 +2,16 @@ package mindustry.ctype;
 
 import arc.*;
 import arc.func.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.graphics.g2d.TextureAtlas.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.TechTree.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
+import mindustry.graphics.MultiPacker.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.meta.*;
@@ -89,6 +92,20 @@ public abstract class UnlockableContent extends MappableContent{
     @CallSuper
     public void createIcons(MultiPacker packer){
 
+    }
+
+    protected void makeOutline(PageType page, MultiPacker packer, TextureRegion region, boolean makeNew, Color outlineColor, int outlineRadius){
+        if(region instanceof AtlasRegion at && region.found()){
+            String name = at.name;
+            if(!makeNew || !packer.has(name + "-outline")){
+                PixmapRegion base = Core.atlas.getPixmap(region);
+                var result = Pixmaps.outline(base, outlineColor, outlineRadius);
+                if(Core.settings.getBool("linear", true)){
+                    Pixmaps.bleed(result);
+                }
+                packer.add(page, name + (makeNew ? "-outline" : ""), result);
+            }
+        }
     }
 
     /** @return items needed to research this content */

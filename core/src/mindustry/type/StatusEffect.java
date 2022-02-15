@@ -10,6 +10,8 @@ import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
+import mindustry.graphics.MultiPacker.*;
 import mindustry.world.meta.*;
 
 public class StatusEffect extends UnlockableContent{
@@ -47,6 +49,8 @@ public class StatusEffect extends UnlockableContent{
     public Effect effect = Fx.none;
     /** Affinity & opposite values for stat displays. */
     public ObjectSet<StatusEffect> affinities = new ObjectSet<>(), opposites = new ObjectSet<>();
+    /** Set to false to disable outline generation. */
+    public boolean outline = true;
     /** Transition handler map. */
     protected ObjectMap<StatusEffect, TransitionHandler> transitions = new ObjectMap<>();
     /** Called on init. */
@@ -179,6 +183,15 @@ public class StatusEffect extends UnlockableContent{
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void createIcons(MultiPacker packer){
+        super.createIcons(packer);
+
+        if(outline){
+            makeOutline(PageType.ui, packer, uiIcon, true, Pal.gray, 3);
+        }
     }
 
     @Override

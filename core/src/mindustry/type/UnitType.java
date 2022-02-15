@@ -13,6 +13,8 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.ai.*;
+import mindustry.ai.Pathfinder.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -180,6 +182,8 @@ public class UnitType extends UnlockableContent{
     public boolean forceMultiTarget = false;
     public boolean hidden = false;
     public boolean internal = false;
+    /** Function used for calculating cost of moving with ControlPathfinder. Does not affect "normal" flow field pathfinding. */
+    public @Nullable PathCost pathCost;
     /** A sample of the unit that this type creates. Do not modify! */
     public @Nullable Unit sample;
 
@@ -417,6 +421,13 @@ public class UnitType extends UnlockableContent{
             }
         }
 
+        if(pathCost == null){
+            pathCost =
+                example instanceof WaterMovec ? ControlPathfinder.costNaval :
+                allowLegStep ? ControlPathfinder.costLegs :
+                ControlPathfinder.costGround;
+        }
+
         if(flying){
             envEnabled |= Env.space;
         }
@@ -589,20 +600,6 @@ public class UnitType extends UnlockableContent{
         clipSize = Math.max(region.width * 2f, clipSize);
     }
 
-    private void makeOutline(MultiPacker packer, TextureRegion region, boolean makeNew){
-        if(region instanceof AtlasRegion at && region.found()){
-            String name = at.name;
-            if(!makeNew || !packer.has(name + "-outline")){
-                PixmapRegion base = Core.atlas.getPixmap(region);
-                var result = Pixmaps.outline(base, outlineColor, outlineRadius);
-                if(Core.settings.getBool("linear", true)){
-                    Pixmaps.bleed(result);
-                }
-                packer.add(PageType.main, name + (makeNew ? "-outline" : ""), result);
-            }
-        }
-    }
-
     public void getRegionsToOutline(Seq<TextureRegion> out){
         for(Weapon weapon : weapons){
             for(var part : weapon.parts){
@@ -640,11 +637,11 @@ public class UnitType extends UnlockableContent{
         if(outlines){
 
             //outlines only created when forced at the moment
-            makeOutline(packer, region, alwaysCreateOutline);
+            makeOutline(PageType.main, packer, region, alwaysCreateOutline, outlineColor, outlineRadius);
 
             for(Weapon weapon : weapons){
                 if(!weapon.name.isEmpty()){
-                    makeOutline(packer, weapon.region, true);
+                    makeOutline(PageType.main, packer, weapon.region, true, outlineColor, outlineRadius);
                 }
             }
         }
