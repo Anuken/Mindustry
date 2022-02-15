@@ -2257,6 +2257,7 @@ public class UnitTypes{
                     backColor = Pal.heal;
                     frontColor = Color.white;
                     width = height = 12f;
+                    shrinkY = 0f;
                     speed = 5f;
                     trailLength = 20;
                     trailWidth = 6f;
