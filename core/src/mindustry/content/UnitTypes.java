@@ -2833,7 +2833,7 @@ public class UnitTypes{
                 velocityRnd = 0.1f;
                 heatColor = Color.red;
 
-                for(int i = 0; i < 3; i++){
+                for(int i = 0; i < 6; i++){
                     int fi = i;
                     parts.add(new RegionPart("-blade"){{
                         under = true;

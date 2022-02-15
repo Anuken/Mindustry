@@ -3260,7 +3260,7 @@ public class Blocks{
 
             ammo(
             //TODO 1 more ammo type, decide on base type
-            Items.carbide, new ArtilleryBulletType(2.5f, 300, "shell"){{
+            Items.thorium, new ArtilleryBulletType(2.5f, 300, "shell"){{
                 hitEffect = new MultiEffect(Fx.titanExplosion, Fx.titanSmoke);
                 despawnEffect = Fx.none;
                 knockback = 2f;
@@ -3292,6 +3292,8 @@ public class Blocks{
             }}
             );
 
+            ammoPerShot = 8;
+            maxAmmo = ammoPerShot * 3;
             targetAir = false;
             shootShake = 4f;
             recoilAmount = 1f;
@@ -3612,12 +3614,13 @@ public class Blocks{
 
         //TODO requirements
         mechAssembler = new UnitAssembler("mech-assembler"){{
-            requirements(Category.units, with(Items.graphite, 500, Items.carbide, 600, Items.oxide, 200, Items.tungsten, 500, Items.silicon, 900));
+            requirements(Category.units, with(Items.graphite, 500, Items.thorium, 600, Items.oxide, 200, Items.tungsten, 500, Items.silicon, 900));
             size = 5;
             //TODO different reqs
             plans.add(new AssemblerUnitPlan(UnitTypes.bulwark, 60f * 60f, BlockStack.list(Blocks.tungstenWallLarge, 12, Blocks.primeControlCore, 2)));
             consumes.power(3f);
             areaSize = 13;
+            researchCostMultiplier = 0.4f;
 
             consumes.liquid(Liquids.nitrogen, 24f / 60f);
         }};
