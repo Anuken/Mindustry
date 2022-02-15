@@ -5,6 +5,8 @@ import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
+import static mindustry.Vars.*;
+
 public class MemoryBlock extends Block{
     public int memoryCapacity = 32;
 
@@ -24,6 +26,15 @@ public class MemoryBlock extends Block{
         stats.add(Stat.memoryCapacity, memoryCapacity, StatUnit.none);
     }
 
+    public boolean accessible(){
+        return !privileged || state.rules.editor;
+    }
+
+    @Override
+    public boolean canBreak(Tile tile){
+        return accessible();
+    }
+
     public class MemoryBuild extends Building{
         public double[] memory = new double[memoryCapacity];
 
@@ -40,7 +51,7 @@ public class MemoryBlock extends Block{
 
         @Override
         public boolean displayable(){
-            return !privileged;
+            return accessible();
         }
 
         @Override

@@ -72,8 +72,7 @@ public class Teams{
 
     /** Returns team data by type. */
     public TeamData get(Team team){
-        if(map[team.id] == null) map[team.id] = new TeamData(team);
-        return map[team.id];
+        return map[team.id] == null ? (map[team.id] = new TeamData(team)) : map[team.id];
     }
 
     public Seq<CoreBuild> playerCores(){

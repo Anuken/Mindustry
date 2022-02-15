@@ -2471,7 +2471,7 @@ public class Blocks{
             requirements(Category.production, with(Items.graphite, 20, Items.beryllium, 30));
             consumes.power(0.15f);
             drillTime = 160f;
-            tier = 4;
+            tier = 3;
             size = 2;
             range = 4;
             researchCostMultiplier = 0.18f;
@@ -2485,7 +2485,7 @@ public class Blocks{
             requirements(Category.production, with(Items.silicon, 100, Items.oxide, 30, Items.beryllium, 100, Items.tungsten, 70));
             consumes.power(0.8f);
             drillTime = 120f;
-            tier = 5;
+            tier = 4;
             size = 3;
             range = 6;
             laserWidth = 0.7f;
@@ -3719,7 +3719,7 @@ public class Blocks{
             consumes.power(2f);
             size = 3;
             //TODO expand this list
-            filter = Seq.with(Blocks.primeControlCore, Blocks.tungstenWallLarge, Blocks.berylliumWallLarge, Blocks.reinforcedLiquidContainer);
+            filter = Seq.with(Blocks.primeControlCore, Blocks.tungstenWallLarge, Blocks.berylliumWallLarge, Blocks.reinforcedLiquidContainer, Blocks.beamNode);
         }};
 
         //yes this block is pretty much useless

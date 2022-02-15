@@ -256,7 +256,7 @@ public class UnitTypes{
                 ejectEffect = Fx.casing4;
                 shootSound = Sounds.bang;
 
-                bullet = new BasicBulletType(13f, 70){{
+                bullet = new BasicBulletType(13f, 80){{
                     pierce = true;
                     pierceCap = 10;
                     width = 14f;
@@ -266,14 +266,14 @@ public class UnitTypes{
                     fragVelocityMin = 0.4f;
 
                     hitEffect = Fx.blastExplosion;
-                    splashDamage = 16f;
+                    splashDamage = 18f;
                     splashDamageRadius = 13f;
 
                     fragBullets = 3;
                     fragLifeMin = 0f;
                     fragCone = 30f;
 
-                    fragBullet = new BasicBulletType(9f, 18){{
+                    fragBullet = new BasicBulletType(9f, 20){{
                         width = 10f;
                         height = 10f;
                         pierce = true;
