@@ -1765,6 +1765,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     //TODO atrocious method and should be squished
     @Final
+    @Replace
     @Override
     public void update(){
         //TODO should just avoid updating buildings instead
