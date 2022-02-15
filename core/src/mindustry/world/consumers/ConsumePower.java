@@ -1,8 +1,8 @@
 package mindustry.world.consumers;
 
 import arc.math.*;
-import arc.scene.ui.layout.*;
 import mindustry.gen.*;
+import mindustry.world.*;
 import mindustry.world.meta.*;
 
 /** Consumer class for blocks which consume power while being connected to a power graph. */
@@ -25,8 +25,9 @@ public class ConsumePower extends Consume{
     }
 
     @Override
-    public ConsumeType type(){
-        return ConsumeType.power;
+    public void apply(Block block){
+        block.hasPower = true;
+        block.consPower = this;
     }
 
     @Override

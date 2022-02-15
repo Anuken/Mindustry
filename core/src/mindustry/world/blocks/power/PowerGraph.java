@@ -95,12 +95,9 @@ public class PowerGraph{
     public float getPowerNeeded(){
         float powerNeeded = 0f;
         for(Building consumer : consumers){
-            Consumers consumes = consumer.block.consumes;
-            if(consumes.hasPower()){
-                ConsumePower consumePower = consumes.getPower();
-                if(otherConsumersAreValid(consumer, consumePower)){
-                    powerNeeded += consumePower.requestedPower(consumer) * consumer.delta();
-                }
+            ConsumePower consumePower = consumer.block.consPower;
+            if(otherConsumersAreValid(consumer, consumePower)){
+                powerNeeded += consumePower.requestedPower(consumer) * consumer.delta();
             }
         }
         return powerNeeded;
@@ -109,9 +106,8 @@ public class PowerGraph{
     public float getBatteryStored(){
         float totalAccumulator = 0f;
         for(Building battery : batteries){
-            Consumers consumes = battery.block.consumes;
-            if(battery.enabled && consumes.hasPower()){
-                totalAccumulator += battery.power.status * consumes.getPower().capacity;
+            if(battery.enabled){
+                totalAccumulator += battery.power.status * battery.block.consPower.capacity;
             }
         }
         return totalAccumulator;
@@ -120,9 +116,8 @@ public class PowerGraph{
     public float getBatteryCapacity(){
         float totalCapacity = 0f;
         for(Building battery : batteries){
-            if(battery.enabled && battery.block.consumes.hasPower()){
-                ConsumePower power = battery.block.consumes.getPower();
-                totalCapacity += (1f - battery.power.status) * power.capacity;
+            if(battery.enabled){
+                totalCapacity += (1f - battery.power.status) * battery.block.consPower.capacity;
             }
         }
         return totalCapacity;
@@ -131,8 +126,8 @@ public class PowerGraph{
     public float getTotalBatteryCapacity(){
         float totalCapacity = 0f;
         for(Building battery : batteries){
-            if(battery.enabled && battery.block.consumes.hasPower()){
-                totalCapacity += battery.block.consumes.getPower().capacity;
+            if(battery.enabled){
+                totalCapacity += battery.block.consPower.capacity;
             }
         }
         return totalCapacity;
@@ -145,8 +140,7 @@ public class PowerGraph{
         float used = Math.min(stored, needed);
         float consumedPowerPercentage = Math.min(1.0f, needed / stored);
         for(Building battery : batteries){
-            Consumers consumes = battery.block.consumes;
-            if(battery.enabled && consumes.hasPower()){
+            if(battery.enabled){
                 battery.power.status *= (1f-consumedPowerPercentage);
             }
         }
@@ -160,12 +154,9 @@ public class PowerGraph{
         if(Mathf.equal(capacity, 0f)) return 0f;
 
         for(Building battery : batteries){
-            Consumers consumes = battery.block.consumes;
-            if(battery.enabled && consumes.hasPower()){
-                ConsumePower consumePower = consumes.getPower();
-                if(consumePower.capacity > 0f){
-                    battery.power.status += (1f- battery.power.status) * chargedPercent;
-                }
+            //TODO why would it be 0
+            if(battery.enabled && battery.block.consPower.capacity > 0f){
+                battery.power.status += (1f - battery.power.status) * chargedPercent;
             }
         }
         return Math.min(excess, capacity);
@@ -175,25 +166,23 @@ public class PowerGraph{
         //distribute even if not needed. this is because some might be requiring power but not using it; it updates consumers
         float coverage = Mathf.zero(needed) && Mathf.zero(produced) && !charged && Mathf.zero(lastPowerStored) ? 0f : Mathf.zero(needed) ? 1f : Math.min(1, produced / needed);
         for(Building consumer : consumers){
-            Consumers consumes = consumer.block.consumes;
-            if(consumes.hasPower()){
-                ConsumePower consumePower = consumes.getPower();
-                if(consumePower.buffered){
-                    if(!Mathf.zero(consumePower.capacity)){
-                        // Add an equal percentage of power to all buffers, based on the global power coverage in this graph
-                        float maximumRate = consumePower.requestedPower(consumer) * coverage * consumer.delta();
-                        consumer.power.status = Mathf.clamp(consumer.power.status + maximumRate / consumePower.capacity);
-                    }
-                }else{
-                    //valid consumers get power as usual
-                    if(otherConsumersAreValid(consumer, consumePower)){
-                        consumer.power.status = coverage;
-                    }else{ //invalid consumers get an estimate, if they were to activate
-                        consumer.power.status = Math.min(1, produced / (needed + consumePower.usage * consumer.delta()));
-                        //just in case
-                        if(Float.isNaN(consumer.power.status)){
-                            consumer.power.status = 0f;
-                        }
+            //TODO how would it even be null
+            ConsumePower cons = consumer.block.consPower;
+            if(cons.buffered){
+                if(!Mathf.zero(cons.capacity)){
+                    // Add an equal percentage of power to all buffers, based on the global power coverage in this graph
+                    float maximumRate = cons.requestedPower(consumer) * coverage * consumer.delta();
+                    consumer.power.status = Mathf.clamp(consumer.power.status + maximumRate / cons.capacity);
+                }
+            }else{
+                //valid consumers get power as usual
+                if(otherConsumersAreValid(consumer, cons)){
+                    consumer.power.status = coverage;
+                }else{ //invalid consumers get an estimate, if they were to activate
+                    consumer.power.status = Math.min(1, produced / (needed + cons.usage * consumer.delta()));
+                    //just in case
+                    if(Float.isNaN(consumer.power.status)){
+                        consumer.power.status = 0f;
                     }
                 }
             }
@@ -268,15 +257,17 @@ public class PowerGraph{
             //there's something to update, add the entity
             entity.add();
 
-            if(build.block.outputsPower && build.block.consumesPower && !build.block.consumes.getPower().buffered){
-                producers.add(build);
-                consumers.add(build);
-            }else if(build.block.outputsPower && build.block.consumesPower){
-                batteries.add(build);
-            }else if(build.block.outputsPower){
-                producers.add(build);
-            }else if(build.block.consumesPower){
-                consumers.add(build);
+            if(build.block.consPower != null){
+                if(build.block.outputsPower && build.block.consumesPower && !build.block.consPower.buffered){
+                    producers.add(build);
+                    consumers.add(build);
+                }else if(build.block.outputsPower && build.block.consumesPower){
+                    batteries.add(build);
+                }else if(build.block.outputsPower){
+                    producers.add(build);
+                }else if(build.block.consumesPower){
+                    consumers.add(build);
+                }
             }
         }
     }
@@ -352,8 +343,8 @@ public class PowerGraph{
     }
 
     private boolean otherConsumersAreValid(Building build, Consume consumePower){
-        for(Consume cons : build.block.consumes.all){
-            if(cons != consumePower && !cons.isOptional() && !cons.valid(build)){
+        for(Consume cons : build.block.consumers){
+            if(cons != consumePower && !cons.optional && !cons.valid(build)){
                 return false;
             }
         }

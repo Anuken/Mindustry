@@ -21,7 +21,7 @@ public class LiquidJunction extends LiquidBlock{
     @Override
     public void setBars(){
         super.setBars();
-        bars.remove("liquid");
+        removeBar("liquid");
     }
 
     @Override

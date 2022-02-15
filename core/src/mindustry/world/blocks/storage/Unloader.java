@@ -54,7 +54,7 @@ public class Unloader extends Block{
     @Override
     public void setBars(){
         super.setBars();
-        bars.remove("items");
+        removeBar("items");
     }
 
     public static class ContainerStat{

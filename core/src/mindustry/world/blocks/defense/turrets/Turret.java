@@ -138,7 +138,7 @@ public class Turret extends ReloadTurret{
         super.setBars();
 
         if(heatRequirement > 0){
-            bars.add("heat", (TurretBuild entity) ->
+            addBar("heat", (TurretBuild entity) ->
             new Bar(() ->
             Core.bundle.format("bar.heatpercent", (int)entity.heatReq, (int)(Math.min(entity.heatReq / heatRequirement, maxHeatEfficiency) * 100)),
             () -> Pal.lightOrange,

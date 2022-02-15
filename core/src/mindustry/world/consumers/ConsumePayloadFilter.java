@@ -61,9 +61,4 @@ public class ConsumePayloadFilter extends Consume{
 
         table.add(image).size(8 * 4);
     }
-
-    @Override
-    public ConsumeType type(){
-        return ConsumeType.payload;
-    }
 }

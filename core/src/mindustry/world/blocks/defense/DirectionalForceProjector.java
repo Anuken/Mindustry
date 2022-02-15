@@ -20,6 +20,7 @@ import static mindustry.Vars.*;
 
 //TODO use completely different layer
 //TODO consume heat
+//TODO broken class!!!!!
 public class DirectionalForceProjector extends Block{
     protected static final Vec2 intersectOut = new Vec2(), p1 = new Vec2(), p2 = new Vec2();
     protected static DirectionalForceProjectorBuild paramEntity;
@@ -82,7 +83,7 @@ public class DirectionalForceProjector extends Block{
     @Override
     public void setBars(){
         super.setBars();
-        bars.add("shield", (DirectionalForceProjectorBuild entity) -> new Bar("stat.shieldhealth", Pal.accent, () -> entity.broken ? 0f : 1f - entity.buildup / (shieldHealth)).blink(Color.white));
+        addBar("shield", (DirectionalForceProjectorBuild entity) -> new Bar("stat.shieldhealth", Pal.accent, () -> entity.broken ? 0f : 1f - entity.buildup / (shieldHealth)).blink(Color.white));
     }
 
     @Override
@@ -138,9 +139,10 @@ public class DirectionalForceProjector extends Block{
 
             warmup = Mathf.lerpDelta(warmup, efficiency(), 0.1f);
 
-            if(buildup > 0 && consumes.has(ConsumeType.liquid)){
+            //TODO aaaaaaaaaaaaAAAAAAAAAAAAAAaa
+            if(buildup > 0 && false){
                 float scale = !broken ? cooldownNormal : cooldownBrokenBase;
-                Consume cons = consumes.get(ConsumeType.liquid);
+                Consume cons = null;
                 if(cons.valid(this)){
                     cons.update(this);
                     scale *= (cooldownLiquid * (1f + (liquids.current().heatCapacity - 0.4f) * 0.9f));

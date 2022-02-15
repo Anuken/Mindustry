@@ -5,7 +5,6 @@ import mindustry.ai.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.world.*;
-import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -25,7 +24,7 @@ public class GroundAI extends AIController{
             }
         }
 
-        if((core == null || !unit.within(core, unit.type.range * 0.5f)) && command() == UnitCommand.attack){
+        if((core == null || !unit.within(core, unit.type.range * 0.5f))){
             boolean move = true;
 
             if(state.rules.waves && unit.team == state.rules.defaultTeam){
@@ -40,14 +39,6 @@ public class GroundAI extends AIController{
             }
 
             if(move) pathfind(Pathfinder.fieldCore);
-        }
-
-        if(command() == UnitCommand.rally){
-            Teamc target = targetFlag(unit.x, unit.y, BlockFlag.rally, false);
-
-            if(target != null && !unit.within(target, 70f)){
-                pathfind(Pathfinder.fieldRally);
-            }
         }
 
         if(unit.type.canBoost && unit.elevation > 0.001f && !unit.onSolid()){

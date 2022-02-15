@@ -69,10 +69,6 @@ public class AIController implements UnitController{
         return false;
     }
 
-    public UnitCommand command(){
-        return unit.team.data().command;
-    }
-
     public void updateVisuals(){
         if(unit.isFlying()){
             unit.wobble();

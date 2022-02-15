@@ -50,8 +50,8 @@ public class Reconstructor extends UnitBlock{
     public void setBars(){
         super.setBars();
 
-        bars.add("progress", (ReconstructorBuild entity) -> new Bar("bar.progress", Pal.ammo, entity::fraction));
-        bars.add("units", (ReconstructorBuild e) ->
+        addBar("progress", (ReconstructorBuild entity) -> new Bar("bar.progress", Pal.ammo, entity::fraction));
+        addBar("units", (ReconstructorBuild e) ->
         new Bar(
             () -> e.unit() == null ? "[lightgray]" + Iconc.cancel :
                 Core.bundle.format("bar.unitcap",
@@ -91,8 +91,10 @@ public class Reconstructor extends UnitBlock{
     @Override
     public void init(){
         capacities = new int[Vars.content.items().size];
-        if(consumes.has(ConsumeType.item) && consumes.get(ConsumeType.item) instanceof ConsumeItems){
-            for(ItemStack stack : consumes.<ConsumeItems>get(ConsumeType.item).items){
+
+        ConsumeItems cons = findConsumer(c -> c instanceof ConsumeItems);
+        if(cons != null){
+            for(ItemStack stack : cons.items){
                 capacities[stack.item.id] = Math.max(capacities[stack.item.id], stack.amount * 2);
                 itemCapacity = Math.max(itemCapacity, stack.amount * 2);
             }

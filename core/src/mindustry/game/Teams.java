@@ -8,7 +8,6 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.ai.*;
-import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.blocks.payloads.*;
@@ -231,8 +230,6 @@ public class Teams{
         public Team[] coreEnemies = {};
         /** Planned blocks for drones. This is usually only blocks that have been broken. */
         public Queue<BlockPlan> blocks = new Queue<>();
-        /** The current command for units to follow. */
-        public UnitCommand command = UnitCommand.attack;
 
         /** Quadtree for all buildings of this team. Null if not active. */
         public @Nullable QuadTree<Building> buildings;

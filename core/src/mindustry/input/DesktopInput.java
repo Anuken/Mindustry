@@ -278,7 +278,7 @@ public class DesktopInput extends InputHandler{
 
         shouldShoot = !scene.hasMouse() && !locked;
 
-        if(!locked && state.rules.unitCommand && block == null && !scene.hasField()){
+        if(!locked && block == null && !scene.hasField()){
             commandMode = input.keyDown(Binding.commandMode);
         }else{
             commandMode = false;
@@ -805,11 +805,6 @@ public class DesktopInput extends InputHandler{
             if(Core.input.keyTap(Binding.dropCargo)){
                 tryDropPayload();
             }
-        }
-
-        //update commander unit
-        if(Core.input.keyTap(Binding.command) && unit.type.commandLimit > 0){
-            Call.unitCommand(player);
         }
     }
 }

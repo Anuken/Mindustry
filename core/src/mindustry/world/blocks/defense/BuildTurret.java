@@ -57,7 +57,6 @@ public class BuildTurret extends BaseTurret{
             hitSize = 0f;
             health = 1;
             itemCapacity = 0;
-            commandLimit = 0;
             rotateSpeed = BuildTurret.this.rotateSpeed;
             buildBeamOffset = BuildTurret.this.buildBeamOffset;
             buildRange = BuildTurret.this.range;

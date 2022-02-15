@@ -73,7 +73,7 @@ public class BeamDrill extends Block{
     public void setBars(){
         super.setBars();
 
-        bars.add("drillspeed", (BeamDrillBuild e) ->
+        addBar("drillspeed", (BeamDrillBuild e) ->
             new Bar(() -> Core.bundle.format("bar.drillspeed", Strings.fixed(e.lastDrillSpeed * 60, 2)), () -> Pal.ammo, () -> e.warmup));
     }
 

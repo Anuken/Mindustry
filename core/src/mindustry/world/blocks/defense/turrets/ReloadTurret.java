@@ -3,7 +3,6 @@ package mindustry.world.blocks.defense.turrets;
 import arc.math.*;
 import arc.util.*;
 import mindustry.type.*;
-import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -19,8 +18,8 @@ public class ReloadTurret extends BaseTurret{
     public void setStats(){
         super.setStats();
 
-        if(acceptCoolant){
-            stats.add(Stat.booster, StatValues.boosters(reloadTime, consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount, coolantMultiplier, true, l -> l.coolant && consumes.liquidfilters.get(l.id)));
+        if(acceptCoolant && coolantConsumer != null){
+            stats.add(Stat.booster, StatValues.boosters(reloadTime, coolantConsumer.amount, coolantMultiplier, true, l -> l.coolant && consumesLiquid(l)));
         }
     }
 
@@ -36,7 +35,7 @@ public class ReloadTurret extends BaseTurret{
 
         protected void updateCooling(){
             if(reload < reloadTime && acceptCoolant){
-                float maxUsed = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount;
+                float maxUsed = coolantConsumer.amount;
                 Liquid liquid = liquids.current();
 
                 float used = Math.min(liquids.get(liquid), maxUsed * Time.delta) * baseReloadSpeed();

@@ -70,7 +70,7 @@ public class RepairPoint extends Block{
         stats.add(Stat.repairSpeed, repairSpeed * 60f, StatUnit.perSecond);
 
         if(acceptCoolant){
-            stats.add(Stat.booster, StatValues.strengthBoosters(coolantMultiplier, l -> consumes.liquidfilters.get(l.id)));
+            stats.add(Stat.booster, StatValues.strengthBoosters(coolantMultiplier, this::consumesLiquid));
         }
     }
 
@@ -78,10 +78,10 @@ public class RepairPoint extends Block{
     public void init(){
         if(acceptCoolant){
             hasLiquids = true;
-            consumes.add(new ConsumeCoolant(coolantUse)).optional(true, true);
+            consume(new ConsumeCoolant(coolantUse)).optional(true, true);
         }
 
-        consumes.powerCond(powerUse, (RepairPointBuild entity) -> entity.target != null);
+        consumePowerCond(powerUse, (RepairPointBuild entity) -> entity.target != null);
         clipSize = Math.max(clipSize, (repairRadius + tilesize) * 2);
         super.init();
     }
@@ -172,8 +172,7 @@ public class RepairPoint extends Block{
         public void updateTile(){
             float multiplier = 1f;
             if(acceptCoolant){
-                var liq = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid);
-                multiplier = liq.valid(this) ? 1f + liquids.current().heatCapacity * coolantMultiplier : 1f;
+                multiplier = consOptionalValid() ? 1f + liquids.current().heatCapacity * coolantMultiplier : 1f;
             }
 
             if(target != null && (target.dead() || target.dst(this) - target.hitSize/2f > repairRadius || target.health() >= target.maxHealth())){

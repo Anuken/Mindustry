@@ -57,7 +57,7 @@ public class ItemTurret extends Turret{
 
     @Override
     public void init(){
-        consumes.add(new ConsumeItemFilter(i -> ammoTypes.containsKey(i)){
+        consume(new ConsumeItemFilter(i -> ammoTypes.containsKey(i)){
             @Override
             public void build(Building build, Table table){
                 MultiReqImage image = new MultiReqImage();

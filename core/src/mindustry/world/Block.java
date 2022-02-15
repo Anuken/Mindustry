@@ -59,9 +59,6 @@ public class Block extends UnlockableContent implements Senseable{
     public float liquidCapacity = 10f;
     public float liquidPressure = 1f;
 
-    public final BlockBars bars = new BlockBars();
-    public final Consumers consumes = new Consumers();
-
     /** If true, this block outputs to its facing direction, when applicable.
      * Used for blending calculations. */
     public boolean outputFacing = true;
@@ -288,10 +285,25 @@ public class Block extends UnlockableContent implements Senseable{
     public @Nullable Class<?> subclass;
     /** Determines if this block gets a higher unloader priority. */
     public boolean highUnloadPriority = false;
-
-    public float selectScroll; //scroll position for certain blocks
-    public Prov<Building> buildType = null; //initialized later
+    /** Scroll position for certain blocks. */
+    public float selectScroll;
+    /** Building that is created for this block. Initialized in init() via reflection. Set manually if modded. */
+    public Prov<Building> buildType = null;
+    /** Configuration handlers by type. */
     public ObjectMap<Class<?>, Cons2> configurations = new ObjectMap<>();
+    /** Consumption filters. */
+    public boolean[] itemFilter, liquidFilter;
+    /** Array of consumers used by this block. Only populated after init(). */
+    public Consume[] consumers = {}, optionalConsumers = {};
+    /** Set to true if this block has any consumers in its array. */
+    public boolean hasConsumers;
+    /** The single power consumer, if applicable. */
+    public @Nullable ConsumePower consPower;
+
+    /** Map of bars by name. */
+    protected OrderedMap<String, Func<Building, Bar>> barMap = new OrderedMap<>();
+    /** List for building up consumption before init(). */
+    protected Seq<Consume> consumeBuilder = new Seq<>();
 
     protected TextureRegion[] generatedIcons;
     protected TextureRegion[] editorVariantRegions;
@@ -304,7 +316,7 @@ public class Block extends UnlockableContent implements Senseable{
     public TextureRegion[] teamRegions, variantRegions, variantShadowRegions;
 
     protected static final Seq<Tile> tempTiles = new Seq<>();
-    protected static final Seq<Building> tempTileEnts = new Seq<>();
+    protected static final Seq<Building> tempBuilds = new Seq<>();
 
     /** Dump timer ID.*/
     protected final int timerDump = timers++;
@@ -469,15 +481,29 @@ public class Block extends UnlockableContent implements Senseable{
             stats.add(Stat.maxConsecutive, 2, StatUnit.none);
         }
 
-        consumes.display(stats);
+        for(var c : consumers){
+            c.display(stats);
+        }
 
         //Note: Power stats are added by the consumers.
         if(hasLiquids) stats.add(Stat.liquidCapacity, liquidCapacity, StatUnit.liquidUnits);
         if(hasItems && itemCapacity > 0) stats.add(Stat.itemCapacity, itemCapacity, StatUnit.items);
     }
 
+    public <T extends Building> void addBar(String name, Func<T, Bar> sup){
+        barMap.put(name, (Func<Building, Bar>)sup);
+    }
+
+    public void removeBar(String name){
+        barMap.remove(name);
+    }
+
+    public Iterable<Func<Building, Bar>> listBars(){
+        return barMap.values();
+    }
+
     public void addLiquidBar(Liquid liq){
-        bars.add("liquid-" + liq.name, entity -> new Bar(
+        addBar("liquid-" + liq.name, entity -> new Bar(
             () -> liq.localizedName,
             liq::barColor,
             () -> entity.liquids.get(liq) / liquidCapacity)
@@ -486,7 +512,7 @@ public class Block extends UnlockableContent implements Senseable{
 
     /** Adds a liquid bar that dynamically displays a liquid type. */
     public <T extends Building> void addLiquidBar(Func<T, Liquid> current){
-        bars.add("liquid", entity -> new Bar(
+        addBar("liquid", entity -> new Bar(
             () -> current.get((T)entity) == null || entity.liquids.get(current.get((T)entity)) <= 0.001f ? Core.bundle.get("bar.liquid") : current.get((T)entity).localizedName,
             () -> current.get((T)entity) == null ? Color.clear : current.get((T)entity).barColor(),
             () -> current.get((T)entity) == null ? 0f : entity.liquids.get(current.get((T)entity)) / liquidCapacity)
@@ -494,23 +520,22 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     public void setBars(){
-        bars.add("health", entity -> new Bar("stat.health", Pal.health, entity::healthf).blink(Color.white));
+        addBar("health", entity -> new Bar("stat.health", Pal.health, entity::healthf).blink(Color.white));
 
-        if(hasPower && consumes.hasPower()){
-            ConsumePower cons = consumes.getPower();
-            boolean buffered = cons.buffered;
-            float capacity = cons.capacity;
+        if(consPower != null){
+            boolean buffered = consPower.buffered;
+            float capacity = consPower.capacity;
 
-            bars.add("power", entity -> new Bar(
+            addBar("power", entity -> new Bar(
                 () -> buffered ? Core.bundle.format("bar.poweramount", Float.isNaN(entity.power.status * capacity) ? "<ERROR>" : UI.formatAmount((int)(entity.power.status * capacity))) :
                 Core.bundle.get("bar.power"),
                 () -> Pal.powerBar,
-                () -> Mathf.zero(cons.requestedPower(entity)) && entity.power.graph.getPowerProduced() + entity.power.graph.getBatteryStored() > 0f ? 1f : entity.power.status)
+                () -> Mathf.zero(consPower.requestedPower(entity)) && entity.power.graph.getPowerProduced() + entity.power.graph.getBatteryStored() > 0f ? 1f : entity.power.status)
             );
         }
 
         if(hasItems && configurable){
-            bars.add("items", entity -> new Bar(
+            addBar("items", entity -> new Bar(
                 () -> Core.bundle.format("bar.items", entity.items.total()),
                 () -> Pal.items,
                 () -> (float)entity.items.total() / itemCapacity)
@@ -533,9 +558,9 @@ public class Block extends UnlockableContent implements Senseable{
 
             boolean added = false;
 
+            //TODO handle in consumer
             //add bars for *specific* consumed liquids
-            if(consumes.has(ConsumeType.liquid)){
-                var consl = consumes.get(ConsumeType.liquid);
+            for(var consl : consumers){
                 if(consl instanceof ConsumeLiquid liq){
                     added = true;
                     addLiquidBar(liq.liquid);
@@ -552,6 +577,14 @@ public class Block extends UnlockableContent implements Senseable{
                 addLiquidBar(build -> build.liquids.current());
             }
         }
+    }
+
+    public boolean consumesItem(Item item){
+        return itemFilter[item.id];
+    }
+
+    public boolean consumesLiquid(Liquid liq){
+        return liquidFilter[liq.id];
     }
 
     public boolean canReplace(Block other){
@@ -818,6 +851,67 @@ public class Block extends UnlockableContent implements Senseable{
         return cacheLayer == CacheLayer.walls;
     }
 
+    public <T extends Consume> T findConsumer(Boolf<Consume> filter){
+        return consumers.length == 0 ? (T)consumeBuilder.find(filter) : (T)Structs.find(consumers, filter);
+    }
+
+    public ConsumeLiquid consumeLiquid(Liquid liquid, float amount){
+        return consume(new ConsumeLiquid(liquid, amount));
+    }
+
+    public ConsumeLiquids consumeLiquids(LiquidStack... stacks){
+        return consume(new ConsumeLiquids(stacks));
+    }
+
+    /**
+     * Creates a consumer which directly uses power without buffering it.
+     * @param powerPerTick The amount of power which is required each tick for 100% efficiency.
+     * @return the created consumer object.
+     */
+    public ConsumePower consumePower(float powerPerTick){
+        return consume(new ConsumePower(powerPerTick, 0.0f, false));
+    }
+
+    /** Creates a consumer which only consumes power when the condition is met. */
+    public <T extends Building> ConsumePower consumePowerCond(float usage, Boolf<T> cons){
+        return consume(new ConsumePowerCondition(usage, (Boolf<Building>)cons));
+    }
+
+    /** Creates a consumer that consumes a dynamic amount of power. */
+    public <T extends Building> ConsumePower consumePowerDynamic(Floatf<T> usage){
+        return consume(new ConsumePowerDynamic((Floatf<Building>)usage));
+    }
+
+    /**
+     * Creates a consumer which stores power.
+     * @param powerCapacity The maximum capacity in power units.
+     */
+    public ConsumePower consumePowerBuffered(float powerCapacity){
+        return consume(new ConsumePower(0f, powerCapacity, true));
+    }
+
+    public ConsumeItems consumeItem(Item item){
+        return consumeItem(item, 1);
+    }
+
+    public ConsumeItems consumeItem(Item item, int amount){
+        return consume(new ConsumeItems(new ItemStack[]{new ItemStack(item, amount)}));
+    }
+
+    public ConsumeItems consumeItems(ItemStack... items){
+        return consume(new ConsumeItems(items));
+    }
+
+    public <T extends Consume> T consume(T consume){
+        if(consume instanceof ConsumePower){
+            //there can only be one power consumer
+            consumeBuilder.removeAll(b -> b instanceof ConsumePower);
+            consPower = (ConsumePower)consume;
+        }
+        consumeBuilder.add(consume);
+        return consume;
+    }
+
     public void setupRequirements(Category cat, ItemStack[] stacks){
         requirements(cat, stacks);
     }
@@ -904,8 +998,8 @@ public class Block extends UnlockableContent implements Senseable{
         }
 
         //also requires inputs
-        consumes.each(c -> {
-            if(c.isOptional()) return;
+        for(var c : consumeBuilder){
+            if(c.optional) continue;
 
             if(c instanceof ConsumeItems i){
                 for(ItemStack stack : i.items){
@@ -918,7 +1012,7 @@ public class Block extends UnlockableContent implements Senseable{
                     cons.get(stack.liquid);
                 }
             }
-        });
+        }
     }
 
     @Override
@@ -966,7 +1060,7 @@ public class Block extends UnlockableContent implements Senseable{
             clipSize = Math.max(clipSize, lightRadius * 2f);
         }
 
-        if(group == BlockGroup.transportation || consumes.has(ConsumeType.item) || category == Category.distribution){
+        if(group == BlockGroup.transportation || category == Category.distribution){
             acceptsItems = true;
         }
 
@@ -981,15 +1075,21 @@ public class Block extends UnlockableContent implements Senseable{
 
         buildCost *= buildCostMultiplier;
 
-        if(consumes.has(ConsumeType.power)) hasPower = true;
-        if(consumes.has(ConsumeType.item)) hasItems = true;
-        if(consumes.has(ConsumeType.liquid)) hasLiquids = true;
+        consumers = consumeBuilder.toArray(Consume.class);
+        optionalConsumers = consumeBuilder.filter(consume -> consume.optional).toArray(Consume.class);
+        hasConsumers = consumers.length > 0;
+        itemFilter = new boolean[content.items().size];
+        liquidFilter = new boolean[content.liquids().size];
+
+        for(Consume cons : consumers){
+            cons.apply(this);
+        }
 
         setBars();
 
         stats.useCategories = true;
 
-        consumes.init();
+        //TODO check for double power consumption
 
         if(!logicConfigurable){
             configurations.each((key, val) -> {
@@ -999,9 +1099,9 @@ public class Block extends UnlockableContent implements Senseable{
             });
         }
 
-        if(!outputsPower && consumes.hasPower() && consumes.getPower().buffered){
+        if(!outputsPower && consPower != null && consPower.buffered){
             Log.warn("Consumer using buffered power: @. Disabling buffered power.", name);
-            consumes.getPower().buffered = false;
+            consPower.buffered = false;
         }
 
         if(buildVisibility == BuildVisibility.sandboxOnly){
@@ -1156,7 +1256,7 @@ public class Block extends UnlockableContent implements Senseable{
             case size -> size * tilesize;
             case itemCapacity -> itemCapacity;
             case liquidCapacity -> liquidCapacity;
-            case powerCapacity -> consumes.hasPower() && consumes.getPower().buffered ? consumes.getPower().capacity : 0f;
+            case powerCapacity -> consPower != null && consPower.buffered ? consPower.capacity : 0f;
             default -> Double.NaN;
         };
     }

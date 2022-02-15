@@ -92,7 +92,7 @@ public class CoreBlock extends StorageBlock{
     public void setBars(){
         super.setBars();
 
-        bars.add("capacity", (CoreBuild e) -> new Bar(
+        addBar("capacity", (CoreBuild e) -> new Bar(
             () -> Core.bundle.format("bar.capacity", UI.formatAmount(e.storageCapacity)),
             () -> Pal.items,
             () -> e.items.total() / ((float)e.storageCapacity * content.items().count(i -> i.unlockedNow()))

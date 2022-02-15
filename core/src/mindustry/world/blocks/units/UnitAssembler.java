@@ -39,6 +39,8 @@ public class UnitAssembler extends PayloadBlock{
 
     public Seq<AssemblerUnitPlan> plans = new Seq<>(4);
 
+    protected @Nullable ConsumePayloadDynamic consPayload;
+
     public UnitAssembler(String name){
         super(name);
         update = solid = true;
@@ -85,9 +87,9 @@ public class UnitAssembler extends PayloadBlock{
     public void setBars(){
         super.setBars();
 
-        bars.add("progress", (UnitAssemblerBuild e) -> new Bar("bar.progress", Pal.ammo, () -> e.progress));
+        addBar("progress", (UnitAssemblerBuild e) -> new Bar("bar.progress", Pal.ammo, () -> e.progress));
 
-        bars.add("units", (UnitAssemblerBuild e) ->
+        addBar("units", (UnitAssemblerBuild e) ->
             new Bar(() ->
             Core.bundle.format("bar.unitcap",
                 Fonts.getUnicodeStr(e.unit().name),
@@ -114,7 +116,7 @@ public class UnitAssembler extends PayloadBlock{
     @Override
     public void init(){
         clipSize = Math.max(clipSize, (areaSize + size) * tilesize * 2);
-        consumes.add(new ConsumePayloadDynamic((UnitAssemblerBuild build) -> build.plan().requirements));
+        consume(consPayload = new ConsumePayloadDynamic((UnitAssemblerBuild build) -> build.plan().requirements));
 
         super.init();
     }
@@ -254,7 +256,7 @@ public class UnitAssembler extends PayloadBlock{
         @Override
         public boolean shouldConsume(){
             //liquid is only consumed when building is being done
-            return enabled && !wasOccupied && Units.canCreate(team, plan().unit) && consumes.get(ConsumeType.payload).valid(this);
+            return enabled && !wasOccupied && Units.canCreate(team, plan().unit) && consPayload.valid(this);
         }
 
         @Override

@@ -1,11 +1,11 @@
 package mindustry.world.consumers;
 
 import arc.scene.ui.layout.*;
-import arc.struct.*;
 import mindustry.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
+import mindustry.world.*;
 import mindustry.world.meta.*;
 
 //TODO test!
@@ -22,15 +22,11 @@ public class ConsumeLiquids extends Consume{
     }
 
     @Override
-    public void applyLiquidFilter(Bits filter){
+    public void apply(Block block){
+        block.hasLiquids = true;
         for(var stack : liquids){
-            filter.set(stack.liquid.id);
+            block.itemFilter[stack.liquid.id] = true;
         }
-    }
-
-    @Override
-    public ConsumeType type(){
-        return ConsumeType.liquid;
     }
 
     @Override

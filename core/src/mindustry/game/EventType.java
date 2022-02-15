@@ -3,7 +3,6 @@ package mindustry.game;
 import arc.util.*;
 import mindustry.core.GameState.*;
 import mindustry.ctype.*;
-import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.net.*;
 import mindustry.net.Packets.*;
@@ -118,16 +117,6 @@ public class EventType{
 
         public SchematicCreateEvent(Schematic schematic){
             this.schematic = schematic;
-        }
-    }
-
-    public static class CommandIssueEvent{
-        public final Building tile;
-        public final UnitCommand command;
-
-        public CommandIssueEvent(Building tile, UnitCommand command){
-            this.tile = tile;
-            this.command = command;
         }
     }
 

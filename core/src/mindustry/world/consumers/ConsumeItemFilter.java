@@ -2,10 +2,10 @@ package mindustry.world.consumers;
 
 import arc.func.*;
 import arc.scene.ui.layout.*;
-import arc.struct.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
+import mindustry.world.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -18,13 +18,10 @@ public class ConsumeItemFilter extends Consume{
     }
 
     @Override
-    public void applyItemFilter(Bits arr){
-        content.items().each(filter, item -> arr.set(item.id));
-    }
-
-    @Override
-    public ConsumeType type(){
-        return ConsumeType.item;
+    public void apply(Block block){
+        block.hasItems = true;
+        block.acceptsItems = true;
+        content.items().each(filter, item -> block.itemFilter[item.id] = true);
     }
 
     @Override

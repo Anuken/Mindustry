@@ -100,10 +100,10 @@ public class PowerNode extends PowerBlock{
     @Override
     public void setBars(){
         super.setBars();
-        bars.add("power", makePowerBalance());
-        bars.add("batteries", makeBatteryBalance());
+        addBar("power", makePowerBalance());
+        addBar("batteries", makeBatteryBalance());
 
-        bars.add("connections", entity -> new Bar(() ->
+        addBar("connections", entity -> new Bar(() ->
         Core.bundle.format("bar.powerlines", entity.power.links.size, maxNodes),
             () -> Pal.items,
             () -> (float)entity.power.links.size / (float)maxNodes
@@ -217,7 +217,7 @@ public class PowerNode extends PowerBlock{
                 return t != null && t.build == other;
             });
 
-        tempTileEnts.clear();
+        tempBuilds.clear();
         graphs.clear();
 
         //add conducting graphs to prevent double link
@@ -234,12 +234,12 @@ public class PowerNode extends PowerBlock{
 
         Geometry.circle(tile.x, tile.y, (int)(laserRange + 2), (x, y) -> {
             Building other = world.build(x, y);
-            if(valid.get(other) && !tempTileEnts.contains(other)){
-                tempTileEnts.add(other);
+            if(valid.get(other) && !tempBuilds.contains(other)){
+                tempBuilds.add(other);
             }
         });
 
-        tempTileEnts.sort((a, b) -> {
+        tempBuilds.sort((a, b) -> {
             int type = -Boolean.compare(a.block instanceof PowerNode, b.block instanceof PowerNode);
             if(type != 0) return type;
             return Float.compare(a.dst2(tile), b.dst2(tile));
@@ -247,7 +247,7 @@ public class PowerNode extends PowerBlock{
 
         returnInt = 0;
 
-        tempTileEnts.each(valid, t -> {
+        tempBuilds.each(valid, t -> {
             if(returnInt ++ < maxNodes){
                 graphs.add(t.power.graph);
                 others.get(t);
@@ -269,7 +269,7 @@ public class PowerNode extends PowerBlock{
             return t != null && t.build == other;
         });
 
-        tempTileEnts.clear();
+        tempBuilds.clear();
         graphs.clear();
 
         //add conducting graphs to prevent double link
@@ -287,18 +287,18 @@ public class PowerNode extends PowerBlock{
 
         Geometry.circle(tile.x, tile.y, 13, (x, y) -> {
             Building other = world.build(x, y);
-            if(valid.get(other) && !tempTileEnts.contains(other)){
-                tempTileEnts.add(other);
+            if(valid.get(other) && !tempBuilds.contains(other)){
+                tempBuilds.add(other);
             }
         });
 
-        tempTileEnts.sort((a, b) -> {
+        tempBuilds.sort((a, b) -> {
             int type = -Boolean.compare(a.block instanceof PowerNode, b.block instanceof PowerNode);
             if(type != 0) return type;
             return Float.compare(a.dst2(tile), b.dst2(tile));
         });
 
-        tempTileEnts.each(valid, t -> {
+        tempBuilds.each(valid, t -> {
             graphs.add(t.power.graph);
             others.get(t);
         });

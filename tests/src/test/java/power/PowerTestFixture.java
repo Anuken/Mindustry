@@ -58,14 +58,14 @@ public class PowerTestFixture{
     protected static Battery createFakeBattery(float capacity){
         return new Battery("fakebattery" + System.nanoTime()){{
             buildType = () -> new BatteryBuild();
-            consumes.powerBuffered(capacity);
+            consumePowerBuffered(capacity);
         }};
     }
 
     protected static Block createFakeDirectConsumer(float powerPerTick){
         return new PowerBlock("fakedirectconsumer" + System.nanoTime()){{
             buildType = Building::create;
-            consumes.power(powerPerTick);
+            consumePower(powerPerTick);
         }};
     }
 
@@ -81,8 +81,8 @@ public class PowerTestFixture{
             Tile tile = new Tile(x, y);
 
             //workaround since init() is not called for custom blocks
-            if(block.consumes.all == null || block.consumes.all.length == 0){
-                block.consumes.init();
+            if(block.consumers.length == 0){
+                block.init();
             }
 
             // Using the Tile(int, int, byte, byte) constructor would require us to register any fake block or tile we create

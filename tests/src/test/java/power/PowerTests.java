@@ -7,7 +7,6 @@ import mindustry.core.*;
 import mindustry.world.*;
 import mindustry.world.blocks.power.PowerGenerator.*;
 import mindustry.world.blocks.power.*;
-import mindustry.world.consumers.*;
 import org.junit.jupiter.api.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -133,9 +132,8 @@ public class PowerTests extends PowerTestFixture{
             powerGraph.update();
 
             assertEquals(0.0f, consumerTile.build.power.status, Mathf.FLOAT_ROUNDING_ERROR);
-            if(consumerTile.block().consumes.hasPower()){
-                ConsumePower consumePower = consumerTile.block().consumes.getPower();
-                assertFalse(consumePower.valid(consumerTile.build));
+            if(consumerTile.block().consPower != null){
+                assertFalse(consumerTile.block().consPower.valid(consumerTile.build));
             }
         }
     }

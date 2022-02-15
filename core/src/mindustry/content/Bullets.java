@@ -186,7 +186,7 @@ public class Bullets{
             despawnEffect = Fx.none;
         }};
 
-        fragPlasticFrag = new BasicBulletType(2.5f, 10, "bullet"){{
+        fragPlasticFrag = new BasicBulletType(2.5f, 12, "bullet"){{
             width = 10f;
             height = 12f;
             shrinkY = 1f;
@@ -196,15 +196,15 @@ public class Bullets{
             despawnEffect = Fx.none;
         }};
 
-        fragGlass = new FlakBulletType(4f, 3){{
+        fragGlass = new FlakBulletType(4f, 9){{
             ammoMultiplier = 3f;
             shootEffect = Fx.shootSmall;
             reloadMultiplier = 0.8f;
             width = 6f;
             height = 8f;
             hitEffect = Fx.flakExplosion;
-            splashDamage = 18f * 1.5f;
-            splashDamageRadius = 16f;
+            splashDamage = 28f * 1.5f;
+            splashDamageRadius = 22f;
             fragBullet = fragGlassFrag;
             fragBullets = 4;
             explodeRange = 20f;

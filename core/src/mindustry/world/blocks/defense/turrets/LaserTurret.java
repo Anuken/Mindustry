@@ -11,6 +11,7 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 /** A turret that fires a continuous beam with a delay between shots. Liquid coolant is required. Yes, this class name is awful. */
+@Deprecated
 public class LaserTurret extends PowerTurret{
     public float firingMoveFract = 0.25f;
     public float shootDuration = 100f;
@@ -18,7 +19,7 @@ public class LaserTurret extends PowerTurret{
     public LaserTurret(String name){
         super(name);
 
-        consumes.add(new ConsumeCoolant(0.01f)).update(false);
+        consume(new ConsumeCoolant(0.01f)).update(false);
         coolantMultiplier = 1f;
     }
 
@@ -27,7 +28,8 @@ public class LaserTurret extends PowerTurret{
         super.setStats();
 
         stats.remove(Stat.booster);
-        stats.add(Stat.input, StatValues.boosters(reloadTime, consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount, coolantMultiplier, false, l -> consumes.liquidfilters.get(l.id)));
+        //TODO bad
+        stats.add(Stat.input, StatValues.boosters(reloadTime, coolantConsumer.amount, coolantMultiplier, false, l -> consumesLiquid(l)));
     }
 
     public class LaserTurretBuild extends PowerTurretBuild{
@@ -67,7 +69,7 @@ public class LaserTurret extends PowerTurret{
             }else if(reload > 0){
                 wasShooting = true;
                 Liquid liquid = liquids.current();
-                float maxUsed = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount;
+                float maxUsed = coolantConsumer.amount;
 
                 float used = (cheating() ? maxUsed : Math.min(liquids.get(liquid), maxUsed)) * delta();
                 reload -= used * liquid.heatCapacity * coolantMultiplier;

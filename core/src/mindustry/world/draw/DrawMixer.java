@@ -2,14 +2,15 @@ package mindustry.world.draw;
 
 import arc.*;
 import arc.graphics.g2d.*;
+import arc.util.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.production.*;
-import mindustry.world.consumers.*;
 
 public class DrawMixer extends DrawBlock{
+    public @Nullable Liquid liquidDrawn;
     public TextureRegion inLiquid, liquid, top, bottom;
     public boolean useOutputSprite;
 
@@ -26,11 +27,10 @@ public class DrawMixer extends DrawBlock{
         float rotation = build.block.rotate ? build.rotdeg() : 0;
         Draw.rect(bottom, build.x, build.y, rotation);
 
-        if((inLiquid.found() || useOutputSprite) && build.block.consumes.has(ConsumeType.liquid)){
-            Liquid input = build.block.consumes.<ConsumeLiquid>get(ConsumeType.liquid).liquid;
+        if((inLiquid.found() || useOutputSprite) && liquidDrawn != null){
             Drawf.liquid(useOutputSprite ? liquid : inLiquid, build.x, build.y,
-                build.liquids.get(input) / build.block.liquidCapacity,
-                input.color
+                build.liquids.get(liquidDrawn) / build.block.liquidCapacity,
+                liquidDrawn.color
             );
         }
 

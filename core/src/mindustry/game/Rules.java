@@ -47,8 +47,6 @@ public class Rules{
     public boolean damageExplosions = true;
     /** Whether fire is enabled. */
     public boolean fire = true;
-    /** Erekir-specific: If true, unit RTS controls can be used. */
-    public boolean unitCommand = false;
     /** Whether units use and require ammo. */
     public boolean unitAmmo = false;
     /** EXPERIMENTAL! If true, blocks will update in units and share power. */

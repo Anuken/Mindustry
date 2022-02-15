@@ -40,8 +40,8 @@ public class BeamNode extends PowerBlock{
     public void setBars(){
         super.setBars();
 
-        bars.add("power", PowerNode.makePowerBalance());
-        bars.add("batteries", PowerNode.makeBatteryBalance());
+        addBar("power", PowerNode.makePowerBalance());
+        addBar("batteries", PowerNode.makeBatteryBalance());
     }
 
     @Override

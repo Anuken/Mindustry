@@ -77,7 +77,7 @@ public class GenericCrafter extends Block{
         //set up liquid bars for liquid outputs
         if(outputLiquids != null && outputLiquids.length > 0){
             //no need for dynamic liquid bar
-            bars.remove("liquid");
+            removeBar("liquid");
 
             //then display output buffer
             for(var stack : outputLiquids){

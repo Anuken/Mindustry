@@ -35,7 +35,7 @@ public class ItemSource extends Block{
     @Override
     public void setBars(){
         super.setBars();
-        bars.remove("items");
+        removeBar("items");
     }
 
     @Override

@@ -1,14 +1,13 @@
-package mindustry.world.blocks.power;
+package mindustry.world.consumers;
 
 import arc.func.*;
 import mindustry.gen.*;
-import mindustry.world.consumers.*;
 
 /** A power consumer that uses a dynamic amount of power. */
-public class DynamicConsumePower extends ConsumePower{
+public class ConsumePowerDynamic extends ConsumePower{
     private final Floatf<Building> usage;
 
-    public DynamicConsumePower(Floatf<Building> usage){
+    public ConsumePowerDynamic(Floatf<Building> usage){
         super(0, 0, false);
         this.usage = usage;
     }

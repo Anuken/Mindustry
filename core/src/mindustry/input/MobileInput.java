@@ -620,20 +620,16 @@ public class MobileInput extends InputHandler implements GestureListener{
             if(count == 2){
                 //reset payload target
                 payloadTarget = null;
-                //apply command on double tap when own unit is tapped
-                if(!player.dead() && Mathf.within(worldx, worldy, player.unit().x, player.unit().y, player.unit().hitSize * 0.6f + 8f) && player.unit().type.commandLimit > 0){
-                    Call.unitCommand(player);
-                }else{
-                    //control a unit/block detected on first tap of double-tap
-                    if(unitTapped != null){
-                        Call.unitControl(player, unitTapped);
-                        recentRespawnTimer = 1f;
-                    }else if(buildingTapped != null){
-                        Call.buildingControlSelect(player, buildingTapped);
-                        recentRespawnTimer = 1f;
-                    }else if(!tryBeginMine(cursor)){
-                        tileTapped(linked.build);
-                    }
+
+                //control a unit/block detected on first tap of double-tap
+                if(unitTapped != null){
+                    Call.unitControl(player, unitTapped);
+                    recentRespawnTimer = 1f;
+                }else if(buildingTapped != null){
+                    Call.buildingControlSelect(player, buildingTapped);
+                    recentRespawnTimer = 1f;
+                }else if(!tryBeginMine(cursor)){
+                    tileTapped(linked.build);
                 }
                 return false;
             }

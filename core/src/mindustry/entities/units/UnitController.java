@@ -10,10 +10,6 @@ public interface UnitController{
         return true;
     }
 
-    default void command(UnitCommand command){
-
-    }
-
     default void updateUnit(){
 
     }

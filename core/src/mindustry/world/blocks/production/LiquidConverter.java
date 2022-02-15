@@ -1,10 +1,12 @@
 package mindustry.world.blocks.production;
 
 import arc.math.*;
+import arc.util.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
 public class LiquidConverter extends GenericCrafter{
+    protected @Nullable ConsumeLiquid consumer;
 
     public LiquidConverter(String name){
         super(name);
@@ -18,13 +20,11 @@ public class LiquidConverter extends GenericCrafter{
 
     @Override
     public void init(){
-        if(!consumes.has(ConsumeType.liquid) || !(consumes.get(ConsumeType.liquid) instanceof ConsumeLiquid)){
-            throw new RuntimeException("LiquidsConverters must have a ConsumeLiquid. Note that filters are not supported.");
-        }
-
-        ConsumeLiquid cl = consumes.get(ConsumeType.liquid);
-        cl.update(false);
         super.init();
+
+        consumer = findConsumer(b -> b instanceof ConsumeLiquid);
+        if(consumer == null) throw new RuntimeException("LiquidConverters must have a ConsumeLiquid.");
+        consumer.update = false;
     }
 
     @Override
@@ -44,20 +44,18 @@ public class LiquidConverter extends GenericCrafter{
 
         @Override
         public void updateTile(){
-            ConsumeLiquid cl = consumes.get(ConsumeType.liquid);
-
             if(consValid()){
                 if(Mathf.chanceDelta(updateEffectChance)){
                     updateEffect.at(x + Mathf.range(size * 4f), y + Mathf.range(size * 4));
                 }
 
                 warmup = Mathf.lerpDelta(warmup, 1f, 0.02f);
-                float use = Math.min(cl.amount * edelta(), liquidCapacity - liquids.get(outputLiquid.liquid));
-                float ratio = outputLiquid.amount / cl.amount;
+                float use = Math.min(consumer.amount * edelta(), liquidCapacity - liquids.get(outputLiquid.liquid));
+                float ratio = outputLiquid.amount / consumer.amount;
 
-                liquids.remove(cl.liquid, Math.min(use, liquids.get(cl.liquid)));
+                liquids.remove(consumer.liquid, Math.min(use, liquids.get(consumer.liquid)));
 
-                progress += use / cl.amount;
+                progress += use / consumer.amount;
                 liquids.add(outputLiquid.liquid, use * ratio);
                 if(progress >= craftTime){
                     consume();

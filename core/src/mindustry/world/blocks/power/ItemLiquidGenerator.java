@@ -18,6 +18,8 @@ import static mindustry.Vars.*;
  * Power generation block which can use items, liquids or both as input sources for power production.
  * Liquids will take priority over items.
  */
+//TODO remove
+@Deprecated
 public class ItemLiquidGenerator extends PowerGenerator{
     public float minItemEfficiency = 0.2f;
     /** The time in number of ticks during which a single item will produce power. */
@@ -49,11 +51,11 @@ public class ItemLiquidGenerator extends PowerGenerator{
 
     protected void setDefaults(){
         if(hasItems){
-            consumes.add(new ConsumeItemFilter(item -> getItemEfficiency(item) >= minItemEfficiency)).update(false).optional(true, false);
+            consume(new ConsumeItemFilter(item -> getItemEfficiency(item) >= minItemEfficiency)).update(false).optional(true, false);
         }
 
         if(hasLiquids){
-            consumes.add(new ConsumeLiquidFilter(liquid -> getLiquidEfficiency(liquid) >= minLiquidEfficiency, maxLiquidGenerate)).update(false).optional(true, false);
+            consume(new ConsumeLiquidFilter(liquid -> getLiquidEfficiency(liquid) >= minLiquidEfficiency, maxLiquidGenerate)).update(false).optional(true, false);
         }
 
         defaults = true;

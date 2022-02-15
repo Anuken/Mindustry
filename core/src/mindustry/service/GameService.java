@@ -6,7 +6,6 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
-import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.SectorInfo.*;
 import mindustry.gen.*;
@@ -112,12 +111,6 @@ public class GameService{
                 drop10kitems.complete();
             }
         }));
-
-        Events.on(CommandIssueEvent.class, e -> {
-            if(campaign() && e.command == UnitCommand.attack){
-                issueAttackCommand.complete();
-            }
-        });
 
         Events.on(BlockBuildEndEvent.class, e -> {
             if(campaign() && e.unit != null && e.unit.isLocal() && !e.breaking){

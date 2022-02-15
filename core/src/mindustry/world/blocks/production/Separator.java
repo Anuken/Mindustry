@@ -18,6 +18,8 @@ import mindustry.world.meta.*;
  * Extracts a random list of items from an input item and an input liquid.
  */
 public class Separator extends Block{
+    protected @Nullable ConsumeItems consItems;
+
     public ItemStack[] results;
     public float craftTime;
 
@@ -43,6 +45,12 @@ public class Separator extends Block{
         stats.add(Stat.productionTime, craftTime / 60f, StatUnit.seconds);
     }
 
+    @Override
+    public void init(){
+        super.init();
+        consItems = findConsumer(c -> c instanceof ConsumeItems);
+    }
+
     public class SeparatorBuild extends Building{
         public float progress;
         public float totalProgress;
@@ -63,9 +71,8 @@ public class Separator extends Block{
         public boolean shouldConsume(){
             int total = items.total();
             //very inefficient way of allowing separators to ignore input buffer storage
-            if(consumes.has(ConsumeType.item) && consumes.get(ConsumeType.item) instanceof ConsumeItems){
-                ConsumeItems c = consumes.get(ConsumeType.item);
-                for(ItemStack stack : c.items){
+            if(consItems != null){
+                for(ItemStack stack : consItems.items){
                     total -= items.get(stack.item);
                 }
             }
@@ -132,7 +139,7 @@ public class Separator extends Block{
 
         @Override
         public boolean canDump(Building to, Item item){
-            return !consumes.consumesItem(item);
+            return !consumesItem(item);
         }
 
         @Override

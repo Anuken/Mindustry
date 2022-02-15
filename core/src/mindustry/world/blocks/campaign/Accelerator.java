@@ -41,7 +41,7 @@ public class Accelerator extends Block{
             capacities[stack.item.id] = stack.amount;
             itemCapacity += stack.amount;
         }
-        consumes.items(launching.requirements);
+        consumeItems(launching.requirements);
         super.init();
     }
 

@@ -14,7 +14,7 @@ public class FlyingAI extends AIController{
     public void updateMovement(){
         unloadPayloads();
 
-        if(target != null && unit.hasWeapons() && command() == UnitCommand.attack){
+        if(target != null && unit.hasWeapons()){
             if(!unit.type.circleTarget){
                 moveTo(target, unit.type.range * 0.8f);
                 unit.lookAt(target);
@@ -23,12 +23,8 @@ public class FlyingAI extends AIController{
             }
         }
 
-        if(target == null && command() == UnitCommand.attack && state.rules.waves && unit.team == state.rules.defaultTeam){
+        if(target == null && state.rules.waves && unit.team == state.rules.defaultTeam){
             moveTo(getClosestSpawner(), state.rules.dropZoneRadius + 130f);
-        }
-
-        if(command() == UnitCommand.rally){
-            moveTo(targetFlag(unit.x, unit.y, BlockFlag.rally, false), 60f);
         }
     }
 

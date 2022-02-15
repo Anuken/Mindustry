@@ -333,9 +333,6 @@ public class SerpuloTechTree{
             });
 
             node(groundFactory, () -> {
-                node(commandCenter, () -> {
-
-                });
 
                 node(dagger, () -> {
                     node(mace, () -> {
@@ -514,7 +511,6 @@ public class SerpuloTechTree{
 
                                 node(saltFlats, Seq.with(
                                 new SectorComplete(windsweptIslands),
-                                new Research(commandCenter),
                                 new Research(groundFactory),
                                 new Research(additiveReconstructor),
                                 new Research(airFactory),

@@ -30,8 +30,8 @@ public class PowerDiode extends Block{
     public void setBars(){
         super.setBars();
 
-        bars.add("back", entity -> new Bar("bar.input", Pal.powerBar, () -> bar(entity.back())));
-        bars.add("front", entity -> new Bar("bar.output", Pal.powerBar, () -> bar(entity.front())));
+        addBar("back", entity -> new Bar("bar.input", Pal.powerBar, () -> bar(entity.back())));
+        addBar("front", entity -> new Bar("bar.output", Pal.powerBar, () -> bar(entity.front())));
     }
 
     @Override

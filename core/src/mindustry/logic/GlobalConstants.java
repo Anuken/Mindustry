@@ -8,7 +8,6 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
-import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.logic.LExecutor.*;
 import mindustry.type.*;
@@ -20,7 +19,7 @@ import static mindustry.Vars.*;
 
 /** Stores global constants for logic processors. */
 public class GlobalConstants{
-    public static final int ctrlProcessor = 1, ctrlPlayer = 2, ctrlFormation = 3;
+    public static final int ctrlProcessor = 1, ctrlPlayer = 2;
     public static final ContentType[] lookableContent = {ContentType.block, ContentType.unit, ContentType.item, ContentType.liquid};
     /** Global random state. */
     public static final Rand rand = new Rand();
@@ -50,7 +49,6 @@ public class GlobalConstants{
 
         put("@ctrlProcessor", ctrlProcessor);
         put("@ctrlPlayer", ctrlPlayer);
-        put("@ctrlFormation", ctrlFormation);
 
         //store base content
 
@@ -81,10 +79,6 @@ public class GlobalConstants{
         //store sensor constants
         for(LAccess sensor : LAccess.all){
             put("@" + sensor.name(), sensor);
-        }
-
-        for(UnitCommand cmd : UnitCommand.all){
-            put("@command" + Strings.capitalize(cmd.name()), cmd);
         }
 
         logicIdToContent = new UnlockableContent[ContentType.all.length][];

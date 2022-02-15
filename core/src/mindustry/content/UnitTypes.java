@@ -302,7 +302,6 @@ public class UnitTypes{
             health = 120f;
             buildSpeed = 0.8f;
             armor = 1f;
-            commandLimit = 8;
 
             abilities.add(new RepairFieldAbility(10f, 60f * 4, 60f));
             ammoType = new PowerAmmoType(1000);
@@ -339,7 +338,6 @@ public class UnitTypes{
 
             mineTier = 2;
             mineSpeed = 5f;
-            commandLimit = 9;
 
             abilities.add(new ShieldRegenFieldAbility(20f, 40f, 60f * 5, 60f));
             ammoType = new PowerAmmoType(1300);
@@ -393,7 +391,6 @@ public class UnitTypes{
             landShake = 2f;
             riseSpeed = 0.05f;
 
-            commandLimit = 10;
             mechFrontSway = 0.55f;
             ammoType = new PowerAmmoType(1500);
 
@@ -453,7 +450,6 @@ public class UnitTypes{
             landShake = 4f;
             immunities = ObjectSet.with(StatusEffects.burning);
 
-            commandLimit = 8;
             singleTarget = true;
 
             weapons.add(new Weapon("vela-weapon"){{
@@ -520,8 +516,6 @@ public class UnitTypes{
             landShake = 1.5f;
             rotateSpeed = 1.5f;
             drownTimeMultiplier = 6f;
-
-            commandLimit = 8;
 
             legCount = 4;
             legLength = 14f;
@@ -975,7 +969,6 @@ public class UnitTypes{
             //as default AI, flares are not very useful in core rushes, they attack nothing in the way
             playerTargetFlags = new BlockFlag[]{null};
             targetFlags = new BlockFlag[]{BlockFlag.generator, null};
-            commandLimit = 4;
             circleTarget = true;
             hitSize = 7;
             itemCapacity = 15;
@@ -1012,7 +1005,6 @@ public class UnitTypes{
             //do not rush core, attack closest
             playerTargetFlags = new BlockFlag[]{null};
             targetFlags = new BlockFlag[]{BlockFlag.factory, null};
-            commandLimit = 5;
             circleTarget = true;
             ammoType = new ItemAmmoType(Items.graphite);
 
@@ -1458,7 +1450,6 @@ public class UnitTypes{
             payloadCapacity = (5.5f * 5.5f) * tilePayload;
             buildSpeed = 4f;
             drawShields = false;
-            commandLimit = 6;
             lowAltitude = true;
             buildBeamOffset = 43;
             ammoCapacity = 1;
@@ -2325,7 +2316,6 @@ public class UnitTypes{
             health = 150f;
             engineOffset = 6f;
             hitSize = 8f;
-            commandLimit = 3;
             alwaysUnlocked = true;
 
             weapons.add(new Weapon("small-basic-weapon"){{
@@ -2364,7 +2354,6 @@ public class UnitTypes{
             hitSize = 9f;
             rotateShooting = false;
             lowAltitude = true;
-            commandLimit = 4;
 
             weapons.add(new Weapon("small-mount-weapon"){{
                 top = false;
@@ -2405,7 +2394,6 @@ public class UnitTypes{
             health = 220f;
             engineOffset = 6f;
             hitSize = 11f;
-            commandLimit = 5;
 
             weapons.add(new Weapon("small-mount-weapon"){{
                 top = false;
@@ -3321,7 +3309,6 @@ public class UnitTypes{
             health = 1;
             rotateSpeed = 360f;
             itemCapacity = 0;
-            commandLimit = 0;
             hidden = true;
             internal = true;
         }};

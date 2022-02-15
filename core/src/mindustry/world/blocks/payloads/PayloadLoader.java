@@ -54,7 +54,7 @@ public class PayloadLoader extends PayloadBlock{
     public void setBars(){
         super.setBars();
 
-        bars.add("progress", (PayloadLoaderBuild build) -> new Bar(() ->
+        addBar("progress", (PayloadLoaderBuild build) -> new Bar(() ->
             Core.bundle.format(build.payload != null && build.payload.block().hasItems ? "bar.items" : "bar.loadprogress",
                 build.payload == null || !build.payload.block().hasItems ? 0 : build.payload.build.items.total()), () -> Pal.items, build::fraction));
     }
@@ -70,8 +70,8 @@ public class PayloadLoader extends PayloadBlock{
     @Override
     public void init(){
         if(loadPowerDynamic){
-            basePowerUse = consumes.hasPower() ? consumes.getPower().usage : 0f;
-            consumes.powerDynamic((PayloadLoaderBuild loader) -> loader.hasBattery() && !loader.exporting ? maxPowerConsumption + basePowerUse : basePowerUse);
+            basePowerUse = consPower != null ? consPower.usage : 0f;
+            consumePowerDynamic((PayloadLoaderBuild loader) -> loader.hasBattery() && !loader.exporting ? maxPowerConsumption + basePowerUse : basePowerUse);
         }
 
         super.init();
@@ -90,7 +90,7 @@ public class PayloadLoader extends PayloadBlock{
                 //liquid container
                 (build.build.block().hasLiquids && build.block().liquidCapacity >= 10f) ||
                 //battery
-                (build.build.block.consumes.hasPower() && build.build.block.consumes.getPower().buffered)
+                (build.build.block.consPower != null && build.build.block.consPower.buffered)
             );
         }
 
@@ -153,7 +153,7 @@ public class PayloadLoader extends PayloadBlock{
                                         payload.build.handleItem(payload.build, item);
                                         items.remove(item, 1);
                                         break;
-                                    }else if(payload.block().separateItemCapacity || payload.block().consumes.consumesItem(item)){
+                                    }else if(payload.block().separateItemCapacity || payload.block().consumesItem(item)){
                                         exporting = true;
                                         break;
                                     }
@@ -183,7 +183,7 @@ public class PayloadLoader extends PayloadBlock{
                     float availableInput = Math.max(powerInput - basePowerUse, 0f);
 
                     //charge the battery
-                    float cap = payload.block().consumes.getPower().capacity;
+                    float cap = payload.block().consPower.capacity;
                     payload.build.power.status += availableInput / cap * edelta();
 
                     //export if full
@@ -212,7 +212,7 @@ public class PayloadLoader extends PayloadBlock{
         }
 
         public boolean hasBattery(){
-            return payload != null && payload.block().hasPower && payload.block().consumes.getPower().buffered;
+            return payload != null && payload.block().consPower != null && payload.block().consPower.buffered;
         }
 
         @Override

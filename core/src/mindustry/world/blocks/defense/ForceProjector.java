@@ -37,6 +37,9 @@ public class ForceProjector extends Block{
     public Effect shieldBreakEffect = Fx.shieldBreak;
     public @Load("@-top") TextureRegion topRegion;
 
+    //TODO json support
+    public @Nullable Consume boostConsumer;
+
     protected static ForceBuild paramEntity;
     protected static Effect paramEffect;
     protected static final Cons<Bullet> shieldConsumer = bullet -> {
@@ -61,7 +64,7 @@ public class ForceProjector extends Block{
         ambientSoundVolume = 0.08f;
 
         if(consumeCoolant){
-            consumes.add(new ConsumeCoolant(coolantConsumption)).boost().update(false);
+            consume(new ConsumeCoolant(coolantConsumption)).boost().update(false);
         }
     }
 
@@ -74,7 +77,7 @@ public class ForceProjector extends Block{
     @Override
     public void setBars(){
         super.setBars();
-        bars.add("shield", (ForceBuild entity) -> new Bar("stat.shieldhealth", Pal.accent, () -> entity.broken ? 0f : 1f - entity.buildup / (shieldHealth + phaseShieldBoost * entity.phaseHeat)).blink(Color.white));
+        addBar("shield", (ForceBuild entity) -> new Bar("stat.shieldhealth", Pal.accent, () -> entity.broken ? 0f : 1f - entity.buildup / (shieldHealth + phaseShieldBoost * entity.phaseHeat)).blink(Color.white));
     }
 
     @Override
@@ -84,7 +87,7 @@ public class ForceProjector extends Block{
 
     @Override
     public void setStats(){
-        boolean consItems = consumes.has(ConsumeType.item);
+        boolean consItems = boostConsumer != null;
 
         if(consItems) stats.timePeriod = phaseUseTime;
         super.setStats();
@@ -139,7 +142,7 @@ public class ForceProjector extends Block{
 
         @Override
         public void updateTile(){
-            boolean phaseValid = consumes.has(ConsumeType.item) && consumes.get(ConsumeType.item).valid(this);
+            boolean phaseValid = boostConsumer != null && boostConsumer.valid(this);
 
             phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(phaseValid), 0.1f);
 
@@ -158,13 +161,15 @@ public class ForceProjector extends Block{
             if(buildup > 0){
                 float scale = !broken ? cooldownNormal : cooldownBrokenBase;
 
+                //TODO I hate this system
+                /*
                 if(consumes.has(ConsumeType.liquid)){
                     Consume cons = consumes.get(ConsumeType.liquid);
                     if(cons.valid(this)){
                         cons.update(this);
                         scale *= (cooldownLiquid * (1f + (liquids.current().heatCapacity - 0.4f) * 0.9f));
                     }
-                }
+                }*/
 
                 buildup -= delta() * scale;
             }

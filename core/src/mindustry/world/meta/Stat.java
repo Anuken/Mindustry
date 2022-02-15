@@ -26,7 +26,6 @@ public enum Stat{
     mineSpeed,
     mineTier,
     payloadCapacity,
-    commandLimit,
     baseDeflectChance,
     lightningChance, 
     lightningDamage,

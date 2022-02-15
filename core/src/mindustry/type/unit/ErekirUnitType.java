@@ -10,7 +10,6 @@ public class ErekirUnitType extends UnitType{
 
     public ErekirUnitType(String name){
         super(name);
-        commandLimit = 0;
         outlineColor = Pal.darkOutline;
         envDisabled = Env.space;
         unitBasedDefaultController = u -> !playerControllable || u.team.isAI() ? defaultController.get() : new CommandAI();

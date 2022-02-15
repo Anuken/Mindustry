@@ -382,19 +382,19 @@ public class ContentParser{
                 if(value.has("consumes") && value.get("consumes").isObject()){
                     for(JsonValue child : value.get("consumes")){
                         switch(child.name){
-                            case "item" -> block.consumes.item(find(ContentType.item, child.asString()));
-                            case "items" -> block.consumes.add((Consume)parser.readValue(ConsumeItems.class, child));
-                            case "liquid" -> block.consumes.add((Consume)parser.readValue(ConsumeLiquid.class, child));
-                            case "liquids" -> block.consumes.add((Consume)parser.readValue(ConsumeLiquids.class, child));
-                            case "coolant" -> block.consumes.add((Consume)parser.readValue(ConsumeCoolant.class, child));
+                            case "item" -> block.consumeItem(find(ContentType.item, child.asString()));
+                            case "items" -> block.consume((Consume)parser.readValue(ConsumeItems.class, child));
+                            case "liquid" -> block.consume((Consume)parser.readValue(ConsumeLiquid.class, child));
+                            case "liquids" -> block.consume((Consume)parser.readValue(ConsumeLiquids.class, child));
+                            case "coolant" -> block.consume((Consume)parser.readValue(ConsumeCoolant.class, child));
                             case "power" -> {
                                 if(child.isNumber()){
-                                    block.consumes.power(child.asFloat());
+                                    block.consumePower(child.asFloat());
                                 }else{
-                                    block.consumes.add((Consume)parser.readValue(ConsumePower.class, child));
+                                    block.consume((Consume)parser.readValue(ConsumePower.class, child));
                                 }
                             }
-                            case "powerBuffered" -> block.consumes.powerBuffered(child.asFloat());
+                            case "powerBuffered" -> block.consumePowerBuffered(child.asFloat());
                             default -> throw new IllegalArgumentException("Unknown consumption type: '" + child.name + "' for block '" + block.name + "'.");
                         }
                     }

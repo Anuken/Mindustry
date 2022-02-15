@@ -5,6 +5,7 @@ import arc.scene.ui.layout.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
+import mindustry.world.*;
 
 public class ConsumeItemDynamic extends Consume{
     public final Func<Building, ItemStack[]> items;
@@ -15,8 +16,9 @@ public class ConsumeItemDynamic extends Consume{
     }
 
     @Override
-    public ConsumeType type(){
-        return ConsumeType.item;
+    public void apply(Block block){
+        block.hasItems = true;
+        block.acceptsItems = true;
     }
 
     @Override

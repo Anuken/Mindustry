@@ -175,7 +175,6 @@ const SectorCaptureEvent = Packages.mindustry.game.EventType.SectorCaptureEvent
 const PlayerChatEvent = Packages.mindustry.game.EventType.PlayerChatEvent
 const MenuOptionChooseEvent = Packages.mindustry.game.EventType.MenuOptionChooseEvent
 const ClientPreConnectEvent = Packages.mindustry.game.EventType.ClientPreConnectEvent
-const CommandIssueEvent = Packages.mindustry.game.EventType.CommandIssueEvent
 const SchematicCreateEvent = Packages.mindustry.game.EventType.SchematicCreateEvent
 const SectorLaunchEvent = Packages.mindustry.game.EventType.SectorLaunchEvent
 const LaunchItemEvent = Packages.mindustry.game.EventType.LaunchItemEvent

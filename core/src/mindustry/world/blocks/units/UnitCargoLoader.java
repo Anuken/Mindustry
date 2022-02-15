@@ -38,7 +38,7 @@ public class UnitCargoLoader extends Block{
     public void setBars(){
         super.setBars();
 
-        bars.add("units", (UnitTransportSourceBuild e) ->
+        addBar("units", (UnitTransportSourceBuild e) ->
             new Bar(
             () ->
             Core.bundle.format("bar.unitcap",

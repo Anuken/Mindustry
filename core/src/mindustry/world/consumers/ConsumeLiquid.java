@@ -1,10 +1,10 @@
 package mindustry.world.consumers;
 
 import arc.scene.ui.layout.*;
-import arc.struct.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
+import mindustry.world.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -23,8 +23,9 @@ public class ConsumeLiquid extends ConsumeLiquidBase{
     }
 
     @Override
-    public void applyLiquidFilter(Bits filter){
-        filter.set(liquid.id);
+    public void apply(Block block){
+        super.apply(block);
+        block.liquidFilter[liquid.id] = true;
     }
 
     @Override

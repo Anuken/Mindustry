@@ -33,8 +33,8 @@ public class DirectConsumerTests extends PowerTestFixture{
         Tile ct = createFakeTile(0, 0, new GenericCrafter("fakefactory"){{
             hasPower = true;
             hasItems = true;
-            consumes.power(requestedPower);
-            consumes.items(new ItemStack(Items.silicon, 30), new ItemStack(Items.lead, 30));
+            consumePower(requestedPower);
+            consumeItems(new ItemStack(Items.silicon, 30), new ItemStack(Items.lead, 30));
         }});
         ct.block().init();
         ct.build.items.add(Items.silicon, siliconAmount);

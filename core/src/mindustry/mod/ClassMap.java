@@ -1,6 +1,9 @@
 package mindustry.mod;
 
 import arc.struct.*;
+import mindustry.world.blocks.legacy.*;
+import mindustry.world.consumers.*;
+
 /** Generated class. Maps simple class names to concrete classes. For use in JSON mods. */
 @SuppressWarnings("deprecation")
 public class ClassMap{
@@ -14,7 +17,6 @@ public class ClassMap{
         classes.put("DefenderAI", mindustry.ai.types.DefenderAI.class);
         classes.put("FlyingAI", mindustry.ai.types.FlyingAI.class);
         classes.put("FlyingFollowAI", mindustry.ai.types.FlyingFollowAI.class);
-        classes.put("FormationAI", mindustry.ai.types.FormationAI.class);
         classes.put("GroundAI", mindustry.ai.types.GroundAI.class);
         classes.put("HugAI", mindustry.ai.types.HugAI.class);
         classes.put("LogicAI", mindustry.ai.types.LogicAI.class);
@@ -296,11 +298,11 @@ public class ClassMap{
         classes.put("BeamNodeBuild", mindustry.world.blocks.power.BeamNode.BeamNodeBuild.class);
         classes.put("BurnerGenerator", mindustry.world.blocks.power.BurnerGenerator.class);
         classes.put("BurnerGeneratorBuild", mindustry.world.blocks.power.BurnerGenerator.BurnerGeneratorBuild.class);
-        classes.put("ConditionalConsumePower", mindustry.world.blocks.power.ConditionalConsumePower.class);
+        classes.put("ConditionalConsumePower", ConsumePowerCondition.class);
         classes.put("ConsumeGenerator", mindustry.world.blocks.power.ConsumeGenerator.class);
         classes.put("ConsumeGeneratorBuild", mindustry.world.blocks.power.ConsumeGenerator.ConsumeGeneratorBuild.class);
         classes.put("DecayGenerator", mindustry.world.blocks.power.DecayGenerator.class);
-        classes.put("DynamicConsumePower", mindustry.world.blocks.power.DynamicConsumePower.class);
+        classes.put("DynamicConsumePower", ConsumePowerDynamic.class);
         classes.put("ImpactReactor", mindustry.world.blocks.power.ImpactReactor.class);
         classes.put("ImpactReactorBuild", mindustry.world.blocks.power.ImpactReactor.ImpactReactorBuild.class);
         classes.put("ItemLiquidGenerator", mindustry.world.blocks.power.ItemLiquidGenerator.class);
@@ -372,8 +374,8 @@ public class ClassMap{
         classes.put("Unloader", mindustry.world.blocks.storage.Unloader.class);
         classes.put("ContainerStat", mindustry.world.blocks.storage.Unloader.ContainerStat.class);
         classes.put("UnloaderBuild", mindustry.world.blocks.storage.Unloader.UnloaderBuild.class);
-        classes.put("CommandCenter", mindustry.world.blocks.units.CommandCenter.class);
-        classes.put("CommandBuild", mindustry.world.blocks.units.CommandCenter.CommandBuild.class);
+        classes.put("CommandCenter", LegacyCommandCenter.class);
+        classes.put("CommandBuild", LegacyCommandCenter.CommandBuild.class);
         classes.put("ControlCore", mindustry.world.blocks.units.ControlCore.class);
         classes.put("DroneCenter", mindustry.world.blocks.units.DroneCenter.class);
         classes.put("DroneCenterBuild", mindustry.world.blocks.units.DroneCenter.DroneCenterBuild.class);

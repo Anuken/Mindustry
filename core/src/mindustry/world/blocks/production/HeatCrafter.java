@@ -24,7 +24,7 @@ public class HeatCrafter extends GenericCrafter{
     public void setBars(){
         super.setBars();
 
-        bars.add("heat", (HeatCrafterBuild entity) ->
+        addBar("heat", (HeatCrafterBuild entity) ->
             new Bar(() ->
             Core.bundle.format("bar.heatpercent", (int)entity.heat, (int)(entity.efficiencyScale() * 100)),
             () -> Pal.lightOrange,

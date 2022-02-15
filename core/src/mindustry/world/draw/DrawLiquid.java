@@ -2,14 +2,15 @@ package mindustry.world.draw;
 
 import arc.*;
 import arc.graphics.g2d.*;
+import arc.util.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.production.*;
-import mindustry.world.consumers.*;
 
 public class DrawLiquid extends DrawBlock{
+    public @Nullable Liquid liquidDrawn;
     public TextureRegion inLiquid, liquid, top;
     public boolean useOutputSprite = false;
 
@@ -25,11 +26,10 @@ public class DrawLiquid extends DrawBlock{
         Draw.rect(build.block.region, build.x, build.y);
         GenericCrafter type = (GenericCrafter)build.block;
 
-        if((inLiquid.found() || useOutputSprite) && type.consumes.has(ConsumeType.liquid)){
-            Liquid input = type.consumes.<ConsumeLiquid>get(ConsumeType.liquid).liquid;
+        if((inLiquid.found() || useOutputSprite) && liquidDrawn != null){
             Drawf.liquid(useOutputSprite ? liquid : inLiquid, build.x, build.y,
-                build.liquids.get(input) / type.liquidCapacity,
-                input.color
+                build.liquids.get(liquidDrawn) / type.liquidCapacity,
+                liquidDrawn.color
             );
         }
 

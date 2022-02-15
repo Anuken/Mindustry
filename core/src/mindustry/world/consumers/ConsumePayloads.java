@@ -49,9 +49,4 @@ public class ConsumePayloads extends Consume{
             }
         }).left();
     }
-
-    @Override
-    public ConsumeType type(){
-        return ConsumeType.payload;
-    }
 }

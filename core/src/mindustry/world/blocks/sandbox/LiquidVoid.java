@@ -19,7 +19,7 @@ public class LiquidVoid extends Block{
     @Override
     public void setBars(){
         super.setBars();
-        bars.remove("liquid");
+        removeBar("liquid");
     }
 
     public class LiquidVoidBuild extends Building{

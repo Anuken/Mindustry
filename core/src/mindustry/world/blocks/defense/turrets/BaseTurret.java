@@ -20,6 +20,7 @@ public class BaseTurret extends Block{
     public float rotateSpeed = 5;
 
     public float coolantUsage = 0.2f;
+    @Deprecated
     public boolean acceptCoolant = true;
     /** Effect displayed when coolant is used. */
     public Effect coolEffect = Fx.fuelburn;
@@ -27,6 +28,8 @@ public class BaseTurret extends Block{
     public float coolantMultiplier = 5f;
     /** Liquid that is used by coolant; null to use default. */
     public @Nullable Liquid coolantOverride;
+
+    protected @Nullable ConsumeLiquidBase coolantConsumer;
 
     public BaseTurret(String name){
         super(name);
@@ -41,13 +44,18 @@ public class BaseTurret extends Block{
 
     @Override
     public void init(){
-        if(acceptCoolant && !consumes.has(ConsumeType.liquid)){
+        //TODO fundamentally flawed
+        if(acceptCoolant && findConsumer(f -> f instanceof ConsumeLiquidBase) == null){
             hasLiquids = true;
-            consumes.add(coolantOverride != null ? new ConsumeLiquid(coolantOverride, coolantUsage) : new ConsumeCoolant(coolantUsage)).update(false).boost();
+            consume(coolantOverride != null ? new ConsumeLiquid(coolantOverride, coolantUsage) : new ConsumeCoolant(coolantUsage)).update(false).boost();
         }
 
         placeOverlapRange = Math.max(placeOverlapRange, range + placeOverlapMargin);
         super.init();
+
+        if(acceptCoolant){
+            coolantConsumer = findConsumer(c -> c instanceof ConsumeLiquidBase && c.booster);
+        }
     }
 
     @Override

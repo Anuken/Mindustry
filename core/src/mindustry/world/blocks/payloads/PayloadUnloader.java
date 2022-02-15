@@ -92,7 +92,7 @@ public class PayloadUnloader extends PayloadLoader{
                 }
 
                 if(hasBattery()){
-                    float cap = payload.block().consumes.getPower().capacity;
+                    float cap = payload.block().consPower.capacity;
                     float total = payload.build.power.status * cap;
                     float unloaded = Math.min(maxPowerUnload * edelta(), total);
                     lastOutputPower = unloaded;

@@ -1,6 +1,7 @@
 package mindustry.world.consumers;
 
 import mindustry.gen.*;
+import mindustry.world.*;
 
 public abstract class ConsumeLiquidBase extends Consume{
     /** amount used per frame */
@@ -13,8 +14,8 @@ public abstract class ConsumeLiquidBase extends Consume{
     public ConsumeLiquidBase(){}
 
     @Override
-    public ConsumeType type(){
-        return ConsumeType.liquid;
+    public void apply(Block block){
+        block.hasLiquids = true;
     }
 
     protected float use(Building entity){

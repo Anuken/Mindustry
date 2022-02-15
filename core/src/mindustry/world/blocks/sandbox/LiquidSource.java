@@ -42,7 +42,7 @@ public class LiquidSource extends Block{
     public void setBars(){
         super.setBars();
 
-        bars.remove("liquid");
+        removeBar("liquid");
     }
 
     @Override

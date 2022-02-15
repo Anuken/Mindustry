@@ -442,7 +442,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public void consume(){
-        for(Consume cons : block.consumes.all){
+        for(Consume cons : block.consumers){
             cons.trigger(self());
         }
     }
@@ -465,7 +465,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public float efficiency(){
         //disabled -> 0 efficiency
         if(!enabled) return 0;
-        return power != null && (block.consumes.has(ConsumeType.power) && !block.consumes.getPower().buffered) ? power.status : 1f;
+        return power != null && (block.consPower != null && !block.consPower.buffered) ? power.status : 1f;
     }
 
     /**
@@ -702,11 +702,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public boolean acceptItem(Building source, Item item){
-        return block.consumes.consumesItem(item) && items.get(item) < getMaximumAccepted(item);
+        return block.consumesItem(item) && items.get(item) < getMaximumAccepted(item);
     }
 
     public boolean acceptLiquid(Building source, Liquid liquid){
-        return block.hasLiquids && block.consumes.liquidfilters.get(liquid.id);
+        return block.hasLiquids && block.consumesLiquid(liquid);
     }
 
     public void handleLiquid(Building source, Liquid liquid, float amount){
@@ -791,7 +791,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                 liquids.remove(liquid, flow);
                 return flow;
                 //handle reactions between different liquid types ▼
-            }else if(!next.block.consumes.consumesLiquid(liquid) && next.liquids.currentAmount() / next.block.liquidCapacity > 0.1f && fract > 0.1f){
+            }else if(!next.block.consumesLiquid(liquid) && next.liquids.currentAmount() / next.block.liquidCapacity > 0.1f && fract > 0.1f){
                 //TODO !IMPORTANT! uses current(), which is 1) wrong for multi-liquid blocks and 2) causes unwanted reactions, e.g. hydrogen + slag in pump
                 //TODO these are incorrect effect positions
                 float fx = (x + next.x) / 2f, fy = (y + next.y) / 2f;
@@ -1043,7 +1043,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public void drawStatus(){
-        if(block.enableDrawStatus && block.consumes.any()){
+        if(block.enableDrawStatus && block.consumers.length > 0){
             float multiplier = block.size > 1 ? 1 : 0.64f;
             float brcx = x + (block.size * tilesize / 2f) - (tilesize * multiplier / 2f);
             float brcy = y - (block.size * tilesize / 2f) + (tilesize * multiplier / 2f);
@@ -1249,8 +1249,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             explosiveness += liquids.sum((liquid, amount) -> liquid.explosiveness * amount / 2f);
         }
 
-        if(block.consumes.hasPower() && block.consumes.getPower().buffered){
-            power += this.power.status * block.consumes.getPower().capacity;
+        if(block.consPower != null && block.consPower.buffered){
+            power += this.power.status * block.consPower.capacity;
         }
 
         if(block.hasLiquids && state.rules.damageExplosions){
@@ -1397,14 +1397,14 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     public void displayConsumption(Table table){
         table.left();
-        for(Consume cons : block.consumes.all){
-            if(cons.isOptional() && cons.isBoost()) continue;
+        for(Consume cons : block.consumers){
+            if(cons.optional && cons.booster) continue;
             cons.build(self(), table);
         }
     }
 
     public void displayBars(Table table){
-        for(Func<Building, Bar> bar : block.bars.list()){
+        for(Func<Building, Bar> bar : block.listBars()){
             table.add(bar.get(self())).growX();
             table.row();
         }
@@ -1521,7 +1521,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             //TODO can lead to ghost graphs?
             power.graph = new PowerGraph();
             power.links.clear();
-            if(block.consumes.hasPower() && !block.consumes.getPower().buffered){
+            if(block.consPower != null && !block.consPower.buffered){
                 power.status = 0f;
             }
         }
@@ -1590,18 +1590,18 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         consOptionalValid = true;
         boolean docons = shouldConsume() && productionValid();
 
-        for(Consume cons : block.consumes.all){
-            if(cons.isOptional()) continue;
+        for(Consume cons : block.consumers){
+            if(cons.optional) continue;
 
-            if(docons && cons.isUpdate() && prevValid && cons.valid(self())){
+            if(docons && cons.update && prevValid && cons.valid(self())){
                 cons.update(self());
             }
 
             consValid &= cons.valid(self());
         }
 
-        for(Consume cons : block.consumes.optionals){
-            if(docons && cons.isUpdate() && prevValid && cons.valid(self())){
+        for(Consume cons : block.optionalConsumers){
+            if(docons && cons.update && prevValid && cons.valid(self())){
                 cons.update(self());
             }
 
@@ -1693,10 +1693,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             case totalItems -> items == null ? 0 : items.total();
             //TODO will give wildly fluctuating amounts due to switching of current() for multi-liquid blocks. totalLiquids is inherently bad design, but unfortunately it is useful for conduits/tanks
             case totalLiquids -> liquids == null ? 0 : liquids.currentAmount();
-            case totalPower -> power == null || !block.consumes.hasPower() ? 0 : power.status * (block.consumes.getPower().buffered ? block.consumes.getPower().capacity : 1f);
+            case totalPower -> power == null || block.consPower == null ? 0 : power.status * (block.consPower.buffered ? block.consPower.capacity : 1f);
             case itemCapacity -> block.hasItems ? block.itemCapacity : 0;
             case liquidCapacity -> block.hasLiquids ? block.liquidCapacity : 0;
-            case powerCapacity -> block.consumes.hasPower() ? block.consumes.getPower().capacity : 0f;
+            case powerCapacity -> block.consPower != null ? block.consPower.capacity : 0f;
             case powerNetIn -> power == null ? 0 : power.graph.getLastScaledPowerIn() * 60;
             case powerNetOut -> power == null ? 0 : power.graph.getLastScaledPowerOut() * 60;
             case powerNetStored -> power == null ? 0 : power.graph.getLastPowerStored();

@@ -12,7 +12,6 @@ import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
-import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -88,7 +87,7 @@ public class TractorBeamTurret extends BaseTurret{
 
             //consume coolant
             if(target != null && acceptCoolant){
-                float maxUsed = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount;
+                float maxUsed = coolantConsumer.amount;
 
                 Liquid liquid = liquids.current();
 

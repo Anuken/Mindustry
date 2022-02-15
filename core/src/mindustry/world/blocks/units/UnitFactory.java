@@ -53,7 +53,7 @@ public class UnitFactory extends UnitBlock{
             tile.progress = 0;
         });
 
-        consumes.add(new ConsumeItemDynamic((UnitFactoryBuild e) -> e.currentPlan != -1 ? plans.get(e.currentPlan).requirements : ItemStack.empty));
+        consume(new ConsumeItemDynamic((UnitFactoryBuild e) -> e.currentPlan != -1 ? plans.get(e.currentPlan).requirements : ItemStack.empty));
     }
 
     @Override
@@ -72,9 +72,9 @@ public class UnitFactory extends UnitBlock{
     @Override
     public void setBars(){
         super.setBars();
-        bars.add("progress", (UnitFactoryBuild e) -> new Bar("bar.progress", Pal.ammo, e::fraction));
+        addBar("progress", (UnitFactoryBuild e) -> new Bar("bar.progress", Pal.ammo, e::fraction));
 
-        bars.add("units", (UnitFactoryBuild e) ->
+        addBar("units", (UnitFactoryBuild e) ->
         new Bar(
             () -> e.unit() == null ? "[lightgray]" + Iconc.cancel :
                 Core.bundle.format("bar.unitcap",

@@ -13,7 +13,6 @@ import arc.scene.event.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.ai.formations.patterns.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -241,14 +240,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             throw new ValidateException(player, "Player cannot request items.");
         }
 
-        //remove item for every controlling unit
-        player.unit().eachGroup(unit -> {
-            Call.takeItems(build, item, Math.min(unit.maxAccepted(item), amount), unit);
-
-            if(unit == player.unit()){
-                Events.fire(new WithdrawEvent(build, player, item, amount));
-            }
-        });
+        Call.takeItems(build, item, Math.min(player.unit().maxAccepted(item), amount), player.unit());
+        Events.fire(new WithdrawEvent(build, player, item, amount));
     }
 
     @Remote(targets = Loc.both, forward = true, called = Loc.server)
@@ -264,16 +257,13 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         //deposit for every controlling unit
-        player.unit().eachGroup(unit -> {
-            Item item = unit.item();
-            int accepted = build.acceptStack(item, unit.stack.amount, unit);
+        var unit = player.unit();
+        Item item = unit.item();
+        int accepted = build.acceptStack(item, unit.stack.amount, unit);
 
-            Call.transferItemTo(unit, item, accepted, unit.x, unit.y, build);
+        Call.transferItemTo(unit, item, accepted, unit.x, unit.y, build);
 
-            if(unit == player.unit()){
-                Events.fire(new DepositEvent(build, player, item, accepted));
-            }
-        });
+        Events.fire(new DepositEvent(build, player, item, accepted));
     }
 
     @Remote(variants = Variant.one)
@@ -369,11 +359,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             pay.set(x, y);
             pay.dropLastPayload();
             pay.set(prevx, prevy);
-            pay.controlling().each(u -> {
-                if(u instanceof Payloadc){
-                    Call.payloadDropped(u, u.x, u.y);
-                }
-            });
         }
     }
 
@@ -385,10 +370,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             throw new ValidateException(player, "Player cannot drop an item.");
         }
 
-        player.unit().eachGroup(unit -> {
-            Fx.dropItem.at(unit.x, unit.y, angle, Color.white, unit.item());
-            unit.clearItem();
-        });
+        var unit = player.unit();
+        Fx.dropItem.at(unit.x, unit.y, angle, Color.white, unit.item());
+        unit.clearItem();
     }
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true, unreliable = true)
@@ -543,24 +527,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         player.clearUnit();
         player.checkSpawn();
         player.deathTimer = Player.deathDelay + 1f; //for instant respawn
-    }
-
-    @Remote(targets = Loc.both, called = Loc.server, forward = true)
-    public static void unitCommand(Player player){
-        if(player == null || player.dead() || (player.unit() == null)) return;
-
-        //make sure player is allowed to make the command
-        if(net.server() && !netServer.admins.allowAction(player, ActionType.command, action -> {})){
-            throw new ValidateException(player, "Player cannot command a unit.");
-        }
-
-        if(player.unit().isCommanding()){
-            player.unit().clearCommand();
-        }else if(player.unit().type.commandLimit > 0){
-
-            player.unit().commandNearby(new CircleFormation());
-            Fx.commandSend.at(player, player.unit().type.commandRadius);
-        }
     }
 
     /** Adds an input lock; if this function returns true, input is locked. Used for mod 'cutscenes' or custom camera panning. */

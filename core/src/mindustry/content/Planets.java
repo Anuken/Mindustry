@@ -63,7 +63,6 @@ public class Planets{
             clearSectorOnLose = true;
             hiddenItems.addAll(Items.serpuloItems).removeAll(Items.erekirItems);
             ruleSetter = r -> {
-                r.unitCommand = true;
                 r.placeRangeCheck = true;
             };
 

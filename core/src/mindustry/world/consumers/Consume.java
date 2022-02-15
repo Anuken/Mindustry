@@ -1,8 +1,8 @@
 package mindustry.world.consumers;
 
 import arc.scene.ui.layout.*;
-import arc.struct.*;
 import mindustry.gen.*;
+import mindustry.world.*;
 import mindustry.world.meta.*;
 
 /** An abstract class that defines a type of resource that a block can consume. */
@@ -11,21 +11,15 @@ public abstract class Consume{
     public boolean optional;
     /** If true, this consumer will be displayed as a boost input. */
     public boolean booster;
+
+    //TODO bad.
+    @Deprecated
     public boolean update = true;
 
     /**
-     * Apply a filter to items accepted.
-     * This should set all item IDs that are present in the filter to true.
+     * Apply extra filters to a block.
      */
-    public void applyItemFilter(Bits filter){
-
-    }
-
-    /**
-     * Apply a filter to liquids accepted.
-     * This should set all liquid IDs that are present in the filter to true.
-     */
-    public void applyLiquidFilter(Bits filter){
+    public void apply(Block block){
 
     }
 
@@ -39,24 +33,11 @@ public abstract class Consume{
         return optional(true, true);
     }
 
+    @Deprecated
     public Consume update(boolean update){
         this.update = update;
         return this;
     }
-
-    public boolean isOptional(){
-        return optional;
-    }
-
-    public boolean isBoost(){
-        return booster;
-    }
-
-    public boolean isUpdate(){
-        return update;
-    }
-
-    public abstract ConsumeType type();
 
     public void build(Building build, Table table){}
 

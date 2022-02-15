@@ -4,7 +4,6 @@ import arc.math.geom.*;
 import mindustry.*;
 import mindustry.ai.*;
 import mindustry.entities.*;
-import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.blocks.distribution.*;
@@ -77,26 +76,18 @@ public class SuicideAI extends GroundAI{
         }
 
         if(!moveToTarget){
-            if(command() == UnitCommand.rally){
-                Teamc target = targetFlag(unit.x, unit.y, BlockFlag.rally, false);
+            boolean move = true;
 
-                if(target != null && !unit.within(target, 70f)){
-                    pathfind(Pathfinder.fieldRally);
+            //stop moving toward the drop zone if applicable
+            if(core == null && state.rules.waves && unit.team == state.rules.defaultTeam){
+                Tile spawner = getClosestSpawner();
+                if(spawner != null && unit.within(spawner, state.rules.dropZoneRadius + 120f)){
+                    move = false;
                 }
-            }else if(command() == UnitCommand.attack){
-                boolean move = true;
+            }
 
-                //stop moving toward the drop zone if applicable
-                if(core == null && state.rules.waves && unit.team == state.rules.defaultTeam){
-                    Tile spawner = getClosestSpawner();
-                    if(spawner != null && unit.within(spawner, state.rules.dropZoneRadius + 120f)){
-                        move = false;
-                    }
-                }
-
-                if(move){
-                    pathfind(Pathfinder.fieldCore);
-                }
+            if(move){
+                pathfind(Pathfinder.fieldCore);
             }
         }
 

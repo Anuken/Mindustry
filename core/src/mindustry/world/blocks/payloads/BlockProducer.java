@@ -33,7 +33,7 @@ public abstract class BlockProducer extends PayloadBlock{
         rotate = true;
         regionRotated1 = 1;
 
-        consumes.add(new ConsumeItemDynamic((BlockProducerBuild e) -> e.recipe() != null ? e.recipe().requirements : ItemStack.empty));
+        consume(new ConsumeItemDynamic((BlockProducerBuild e) -> e.recipe() != null ? e.recipe().requirements : ItemStack.empty));
     }
 
     @Override
@@ -52,7 +52,7 @@ public abstract class BlockProducer extends PayloadBlock{
     public void setBars(){
         super.setBars();
 
-        bars.add("progress", (BlockProducerBuild entity) -> new Bar("bar.progress", Pal.ammo, () -> entity.recipe() == null ? 0f : (entity.progress / entity.recipe().buildCost)));
+        addBar("progress", (BlockProducerBuild entity) -> new Bar("bar.progress", Pal.ammo, () -> entity.recipe() == null ? 0f : (entity.progress / entity.recipe().buildCost)));
     }
     
     public abstract class BlockProducerBuild extends PayloadBlockBuild<BuildPayload>{

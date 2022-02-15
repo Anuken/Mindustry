@@ -41,7 +41,7 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
     @Override
     public void init(){
         //TODO display ammoMultiplier.
-        consumes.add(new ConsumeLiquidFilter(i -> ammoTypes.containsKey(i), liquidConsumed){
+        consume(new ConsumeLiquidFilter(i -> ammoTypes.containsKey(i), liquidConsumed){
             @Override
             public boolean valid(Building build){
                 return build.liquids.currentAmount() >= use(build);

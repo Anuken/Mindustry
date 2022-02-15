@@ -6,6 +6,7 @@ import arc.struct.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
+import mindustry.world.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -23,8 +24,9 @@ public class ConsumeLiquidFilter extends ConsumeLiquidBase{
     }
 
     @Override
-    public void applyLiquidFilter(Bits arr){
-        content.liquids().each(filter, item -> arr.set(item.id));
+    public void apply(Block block){
+        block.hasLiquids = true;
+        content.liquids().each(filter, item -> block.liquidFilter[item.id] = true);
     }
 
     @Override

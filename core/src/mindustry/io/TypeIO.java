@@ -92,9 +92,6 @@ public class TypeIO{
             write.b((byte)14);
             write.i(b.length);
             write.b(b);
-        }else if(object instanceof UnitCommand c){
-            write.b((byte)15);
-            write.b(c.ordinal());
         }else if(object instanceof boolean[] b){
             write.b(16);
             write.i(b.length);
@@ -165,7 +162,6 @@ public class TypeIO{
                 read.b(bytes);
                 yield bytes;
             }
-            case 15 -> UnitCommand.all[read.b()];
             case 16 -> {
                 int boollen = read.i();
                 boolean[] bools = new boolean[boollen];
@@ -385,9 +381,6 @@ public class TypeIO{
         if(control instanceof Player p){
             write.b(0);
             write.i(p.id);
-        }else if(control instanceof FormationAI form && form.leader != null){
-            write.b(1);
-            write.i(form.leader.id);
         }else if(control instanceof LogicAI logic && logic.controller != null){
             write.b(3);
             write.i(logic.controller.pos());
@@ -423,13 +416,6 @@ public class TypeIO{
             //make sure player exists
             if(player == null) return prev;
             return player;
-        }else if(type == 1){ //formation controller
-            int id = read.i();
-            if(prev instanceof FormationAI f){
-                f.leader = Groups.unit.getByID(id);
-                return f;
-            }
-            return new FormationAI(Groups.unit.getByID(id), null);
         }else if(type == 3){
             int pos = read.i();
             if(prev instanceof LogicAI pai){
@@ -475,7 +461,7 @@ public class TypeIO{
             //2: prev controller was a player, so replace this controller with *anything else*
             //...since AI doesn't update clientside it doesn't matter
             //TODO I hate this
-            return (!(prev instanceof AIController) || (prev instanceof FormationAI) || (prev instanceof LogicAI)) ? new GroundAI() : prev;
+            return (!(prev instanceof AIController) || (prev instanceof LogicAI)) ? new GroundAI() : prev;
         }
     }
 
@@ -546,14 +532,6 @@ public class TypeIO{
 
     public static Team readTeam(Reads read){
         return Team.get(read.b());
-    }
-
-    public static void writeUnitCommand(Writes write, UnitCommand reason){
-        write.b((byte)reason.ordinal());
-    }
-
-    public static UnitCommand readUnitCommand(Reads read){
-        return UnitCommand.all[read.b()];
     }
 
     public static void writeAction(Writes write, AdminAction reason){

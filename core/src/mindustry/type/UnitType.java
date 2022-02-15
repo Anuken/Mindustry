@@ -91,7 +91,6 @@ public class UnitType extends UnlockableContent{
     public boolean targetable = true;
     public boolean drawBuildBeam = true;
     public boolean rotateToBuilding = true;
-    public int commandLimit = 8;
     public float commandRadius = 150f;
     public float visualElevation = -1f;
     /** If true and this is a legged unit, this unit can walk over blocks. */
@@ -350,7 +349,6 @@ public class UnitType extends UnlockableContent{
         stats.add(Stat.size, StatValues.squared(hitSize / tilesize, StatUnit.blocksSquared));
         stats.add(Stat.itemCapacity, itemCapacity);
         stats.add(Stat.range, (int)(maxRange / tilesize), StatUnit.blocks);
-        stats.add(Stat.commandLimit, commandLimit);
 
         if(abilities.any()){
             var unique = new ObjectSet<String>();
@@ -685,7 +683,7 @@ public class UnitType extends UnlockableContent{
         //find reconstructor
         var rec = (Reconstructor)content.blocks().find(b -> b instanceof Reconstructor re && re.upgrades.contains(u -> u[1] == this));
 
-        if(rec != null && rec.consumes.has(ConsumeType.item) && rec.consumes.get(ConsumeType.item) instanceof ConsumeItems ci){
+        if(rec != null && Structs.find(rec.consumers, i -> i instanceof ConsumeItems) instanceof ConsumeItems ci){
             if(prevReturn != null){
                 prevReturn[0] = rec.upgrades.find(u -> u[1] == this)[0];
             }
