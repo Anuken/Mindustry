@@ -92,7 +92,8 @@ public class ControlPathfinder{
             for(var req : requests.values()){
                 //skipped N update -> drop it
                 if(req.lastUpdateId <= state.updateId - 10){
-                    requests.remove(req.unit);
+                    //concurrent modification!
+                    Core.app.post(() -> requests.remove(req.unit));
                     req.thread.queue.post(() -> req.thread.requests.remove(req));
                 }
             }
