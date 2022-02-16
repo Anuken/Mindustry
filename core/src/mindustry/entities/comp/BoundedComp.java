@@ -20,7 +20,7 @@ abstract class BoundedComp implements Velc, Posc, Healthc, Flyingc{
         float bot = 0f, left = 0f, top = world.unitHeight(), right = world.unitWidth();
 
         //TODO hidden map rules only apply to player teams? should they?
-        if(state.rules.borderDarkness && !team.isAI()){
+        if(state.rules.limitMapArea && !team.isAI()){
             bot = state.rules.limitY * tilesize;
             left = state.rules.limitX * tilesize;
             top = state.rules.limitHeight * tilesize + bot;
