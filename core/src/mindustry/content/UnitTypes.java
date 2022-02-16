@@ -1236,7 +1236,7 @@ public class UnitTypes{
         //region air support
 
         mono = new UnitType("mono"){{
-            defaultController = MinerAI::new;
+            unitBasedDefaultController = u -> new MinerAI();
 
             flying = true;
             drag = 0.06f;
@@ -1255,7 +1255,7 @@ public class UnitTypes{
         }};
 
         poly = new UnitType("poly"){{
-            defaultController = BuilderAI::new;
+            unitBasedDefaultController = u -> new BuilderAI();
 
             flying = true;
             drag = 0.05f;
@@ -1310,6 +1310,7 @@ public class UnitTypes{
         }};
 
         mega = new UnitType("mega"){{
+            //TODO control?
             defaultController = RepairAI::new;
 
             mineTier = 3;
@@ -3318,6 +3319,7 @@ public class UnitTypes{
             isCounted = false;
             allowedInPayloads = false;
             logicControllable = false;
+            playerControllable = false;
             envDisabled = 0;
             payloadCapacity = 0f;
 

@@ -51,6 +51,7 @@ public class Liquids{
             viscosity = 0.85f;
             flammability = 0.1f;
             capPuddles = false;
+            hidden = true;
 
             colorFrom = Color.valueOf("f98f4a");
             colorTo = Color.valueOf("9e172c");

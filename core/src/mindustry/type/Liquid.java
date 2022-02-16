@@ -57,6 +57,8 @@ public class Liquid extends UnlockableContent implements Senseable{
     public boolean capPuddles = true;
     /** Effect when this liquid vaporizes. */
     public Effect vaporEffect = Fx.vapor;
+    /** If true, this liquid is hidden in most UI. */
+    public boolean hidden;
 
     public Liquid(String name, Color color){
         super(name);
@@ -87,6 +89,11 @@ public class Liquid extends UnlockableContent implements Senseable{
                 barColor = color.cpy().a(1f);
             }
         }
+    }
+
+    @Override
+    public boolean isHidden(){
+        return hidden;
     }
 
     public int getAnimationFrame(){
