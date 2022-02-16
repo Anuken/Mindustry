@@ -1365,7 +1365,7 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            if(headless) return;
+            if(headless && type != MessageType.mission) return;
 
             //skip back to self until possible
             //TODO this is guaranteed desync on servers - I don't see a good solution
@@ -1383,6 +1383,8 @@ public class LExecutor{
                 case notify -> ui.hudfrag.showToast(Icon.info, text);
                 case announce -> ui.announce(text, exec.numf(duration));
                 case toast -> ui.showInfoToast(text, exec.numf(duration));
+                //TODO desync?
+                case mission -> state.rules.mission = text;
             }
 
             exec.textBuffer.setLength(0);

@@ -596,13 +596,14 @@ public class HudFragment extends Fragment{
 
         StringBuilder ibuild = new StringBuilder();
 
-        IntFormat wavef = new IntFormat("wave");
-        IntFormat wavefc = new IntFormat("wave.cap");
-        IntFormat enemyf = new IntFormat("wave.enemy");
-        IntFormat enemiesf = new IntFormat("wave.enemies");
-        IntFormat enemycf = new IntFormat("wave.enemycore");
-        IntFormat enemycsf = new IntFormat("wave.enemycores");
-        IntFormat waitingf = new IntFormat("wave.waiting", i -> {
+        IntFormat
+        wavef = new IntFormat("wave"),
+        wavefc = new IntFormat("wave.cap"),
+        enemyf = new IntFormat("wave.enemy"),
+        enemiesf = new IntFormat("wave.enemies"),
+        enemycf = new IntFormat("wave.enemycore"),
+        enemycsf = new IntFormat("wave.enemycores"),
+        waitingf = new IntFormat("wave.waiting", i -> {
             ibuild.setLength(0);
             int m = i/60;
             int s = i % 60;
@@ -736,6 +737,12 @@ public class HudFragment extends Fragment{
 
         table.labelWrap(() -> {
             builder.setLength(0);
+
+            //mission overrides everything
+            if(state.rules.mission != null){
+                builder.append(state.rules.mission);
+                return builder;
+            }
 
             if(!state.rules.waves && state.rules.attackMode){
                 int sum = Math.max(state.teams.present.sum(t -> t.team != player.team() ? t.cores.size : 0), 1);

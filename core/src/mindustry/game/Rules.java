@@ -130,6 +130,8 @@ public class Rules{
     public Color cloudColor = new Color(0f, 0f, 0f, 0f);
     /** name of the custom mode that this ruleset describes, or null. */
     public @Nullable String modeName;
+    /** Mission string displayed instead of wave/core counter. Null to disable. */
+    public @Nullable String mission;
     /** Whether cores incinerate items when full, just like in the campaign. */
     public boolean coreIncinerates = false;
     /** If false, borders fade out into darkness. Only use with custom backgrounds!*/

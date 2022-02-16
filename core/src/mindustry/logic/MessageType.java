@@ -3,7 +3,8 @@ package mindustry.logic;
 public enum MessageType{
     notify,
     announce,
-    toast;
+    toast,
+    mission;
 
     public static final MessageType[] all = values();
 }
