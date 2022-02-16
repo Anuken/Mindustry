@@ -71,6 +71,8 @@ public class Floor extends Block{
     public boolean canShadow = true;
     /** Whether this overlay needs a surface to be on. False for floating blocks, like spawns. */
     public boolean needsSurface = true;
+    /** If true, cores can be placed on this floor. */
+    public boolean allowCorePlacement = false;
     /** If true, this ore is allowed on walls. */
     public boolean wallOre = false;
     /** Actual ID used for blend groups. Internal. */

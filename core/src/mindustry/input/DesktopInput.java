@@ -278,7 +278,9 @@ public class DesktopInput extends InputHandler{
 
         shouldShoot = !scene.hasMouse() && !locked;
 
-        if(!locked && block == null && !scene.hasField()){
+        if(!locked && block == null && !scene.hasField() &&
+                //disable command mode when player unit can boost and command mode binding is the same
+                !(!player.dead() && player.unit().type.canBoost && keybinds.get(Binding.commandMode).key == keybinds.get(Binding.boost).key)){
             commandMode = input.keyDown(Binding.commandMode);
         }else{
             commandMode = false;
@@ -691,7 +693,6 @@ public class DesktopInput extends InputHandler{
     public boolean tap(float x, float y, int count, KeyCode button){
         if(scene.hasMouse() || !commandMode) return false;
 
-        //TODO doesn't work properly
         tappedOne = true;
 
         //click: select a single unit

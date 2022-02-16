@@ -32,6 +32,7 @@ public class CoreBlock extends StorageBlock{
     public @Load(value = "@-thruster1", fallback = "clear-effect") TextureRegion thruster1; //top right
     public @Load(value = "@-thruster2", fallback = "clear-effect") TextureRegion thruster2; //bot left
     public float thrusterLength = 14f/4f;
+    public boolean isFirstTier;
 
     public UnitType unitType = UnitTypes.alpha;
 
@@ -124,6 +125,13 @@ public class CoreBlock extends StorageBlock{
         if(tile == null) return false;
         //in the editor, you can place them anywhere for convenience
         if(state.isEditor()) return true;
+
+        //special floor upon which cores can be placed
+        tile.getLinkedTiles(tempTiles);
+        if(!tempTiles.contains(o -> !o.floor().allowCorePlacement)){
+            return true;
+        }
+
         CoreBuild core = team.core();
         //must have all requirements
         if(core == null || (!state.rules.infiniteResources && !core.items.has(requirements, state.rules.buildCostMultiplier))) return false;
@@ -171,9 +179,12 @@ public class CoreBlock extends StorageBlock{
         if(!canPlaceOn(world.tile(x, y), player.team(), rotation)){
 
             drawPlaceText(Core.bundle.get(
-                (player.team().core() != null && player.team().core().items.has(requirements, state.rules.buildCostMultiplier)) || state.rules.infiniteResources ?
-                "bar.corereq" :
-                "bar.noresources"
+                isFirstTier ?
+                    //TODO better message
+                    "bar.corefloor" :
+                    (player.team().core() != null && player.team().core().items.has(requirements, state.rules.buildCostMultiplier)) || state.rules.infiniteResources ?
+                    "bar.corereq" :
+                    "bar.noresources"
             ), x, y, valid);
         }
     }

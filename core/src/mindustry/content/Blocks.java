@@ -50,6 +50,7 @@ public class Blocks{
     regolithWall, yellowStoneWall, rhyoliteWall, carbonWall, redIceWall, ferricStoneWall, beryllicStoneWall, arkyicWall, crystallineStoneWall, redStoneWall, redDiamondWall,
     ferricStone, ferricCraters, carbonStone, beryllicStone, crystallineStone, crystalFloor, yellowStonePlates,
     iceSnow, sandWater, darksandWater, duneWall, sandWall, moss, sporeMoss, shale, shaleWall, grass, salt,
+    coreZone,
     //boulders
     shaleBoulder, sandBoulder, daciteBoulder, boulder, snowBoulder, basaltBoulder, carbonBoulder, ferricBoulder, beryllicBoulder, yellowStoneBoulder,
     arkyicBoulder, crystalCluster, vibrantCrystalCluster, crystalBlocks, crystalOrbs, crystallineBoulder, redIceBoulder, rhyoliteBoulder, redStoneBoulder,
@@ -526,6 +527,11 @@ public class Blocks{
         moss = new Floor("moss"){{
             variants = 3;
             attributes.set(Attribute.spores, 0.15f);
+        }};
+
+        coreZone = new Floor("core-zone"){{
+            variants = 0;
+            allowCorePlacement = true;
         }};
 
         sporeMoss = new Floor("spore-moss"){{
@@ -2546,6 +2552,7 @@ public class Blocks{
             requirements(Category.effect, BuildVisibility.editorOnly, with(Items.copper, 1000, Items.lead, 800));
             alwaysUnlocked = true;
 
+            isFirstTier = true;
             unitType = UnitTypes.alpha;
             health = 1100;
             itemCapacity = 4000;
@@ -2582,14 +2589,18 @@ public class Blocks{
 
         coreBastion = new CoreBlock("core-bastion"){{
             //TODO cost
-            requirements(Category.effect, BuildVisibility.editorOnly, with(Items.graphite, 1000, Items.silicon, 2000, Items.beryllium, 800));
+            requirements(Category.effect, with(Items.graphite, 1000, Items.silicon, 2000, Items.beryllium, 800));
 
+            isFirstTier = true;
             unitType = UnitTypes.evoke;
             health = 7000;
             itemCapacity = 8000;
             size = 4;
             thrusterLength = 34/4f;
             armor = 5f;
+
+            //TODO should this be higher?
+            buildCostMultiplier = 0.75f;
 
             unitCapModifier = 2;
             researchCostMultiplier = 0.07f;
