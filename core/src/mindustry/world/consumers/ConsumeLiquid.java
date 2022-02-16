@@ -9,7 +9,7 @@ import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
-//TODO replace with ConsumeLiquids
+//TODO replace with ConsumeLiquids?
 public class ConsumeLiquid extends ConsumeLiquidBase{
     public final Liquid liquid;
 

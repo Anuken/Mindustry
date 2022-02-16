@@ -38,8 +38,6 @@ public class PointDefenseTurret extends ReloadTurret{
         reloadTime = 30f;
 
         coolantMultiplier = 2f;
-        //disabled due to version mismatch problems
-        acceptCoolant = false;
     }
 
     @Override
@@ -70,7 +68,7 @@ public class PointDefenseTurret extends ReloadTurret{
                 target = null;
             }
 
-            if(acceptCoolant){
+            if(coolant != null){
                 updateCooling();
             }
 
@@ -97,6 +95,11 @@ public class PointDefenseTurret extends ReloadTurret{
                     reload = 0;
                 }
             }
+        }
+
+        @Override
+        public boolean shouldConsume(){
+            return super.shouldConsume() && target != null;
         }
 
         @Override

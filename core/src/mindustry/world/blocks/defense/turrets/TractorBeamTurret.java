@@ -45,9 +45,6 @@ public class TractorBeamTurret extends BaseTurret{
         rotateSpeed = 10f;
         coolantMultiplier = 1f;
         envEnabled |= Env.space;
-
-        //disabled due to version mismatch problems
-        acceptCoolant = false;
     }
 
     @Override
@@ -75,7 +72,7 @@ public class TractorBeamTurret extends BaseTurret{
         public @Nullable Unit target;
         public float lastX, lastY, strength;
         public boolean any;
-        public float coolant = 1f;
+        public float coolantMultiplier = 1f;
 
         @Override
         public void updateTile(){
@@ -86,8 +83,8 @@ public class TractorBeamTurret extends BaseTurret{
             }
 
             //consume coolant
-            if(target != null && acceptCoolant){
-                float maxUsed = coolantConsumer.amount;
+            if(target != null && coolant != null){
+                float maxUsed = coolant.amount;
 
                 Liquid liquid = liquids.current();
 
@@ -99,7 +96,7 @@ public class TractorBeamTurret extends BaseTurret{
                     coolEffect.at(x + Mathf.range(size * tilesize / 2f), y + Mathf.range(size * tilesize / 2f));
                 }
 
-                coolant = 1f + (used * liquid.heatCapacity * coolantMultiplier);
+                coolantMultiplier = 1f + (used * liquid.heatCapacity * coolantMultiplier);
             }
 
             any = false;
@@ -135,8 +132,13 @@ public class TractorBeamTurret extends BaseTurret{
         }
 
         @Override
+        public boolean shouldConsume(){
+            return super.shouldConsume() && target != null;
+        }
+
+        @Override
         public float efficiency(){
-            return super.efficiency() * coolant;
+            return super.efficiency() * coolantMultiplier;
         }
 
         @Override

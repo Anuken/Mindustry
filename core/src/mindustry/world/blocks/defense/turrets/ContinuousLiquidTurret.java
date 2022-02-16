@@ -14,7 +14,6 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
 
     public ContinuousLiquidTurret(String name){
         super(name);
-        acceptCoolant = false;
         hasLiquids = true;
         //TODO
         loopSound = Sounds.minebeam;

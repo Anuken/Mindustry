@@ -43,6 +43,7 @@ public class ConsumeItemFilter extends Consume{
             Item item = content.item(i);
             if(build.items != null && build.items.has(item) && this.filter.get(item)){
                 build.items.remove(item, 1);
+                build.filterConsItem = item;
                 break;
             }
         }

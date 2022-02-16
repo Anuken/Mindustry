@@ -26,7 +26,7 @@ public class LaserTurret extends PowerTurret{
         super.setStats();
 
         stats.remove(Stat.booster);
-        stats.add(Stat.input, StatValues.boosters(reloadTime, coolantConsumer.amount, coolantMultiplier, false, this::consumesLiquid));
+        stats.add(Stat.input, StatValues.boosters(reloadTime, coolant.amount, coolantMultiplier, false, this::consumesLiquid));
     }
 
     public class LaserTurretBuild extends PowerTurretBuild{
@@ -65,9 +65,9 @@ public class LaserTurret extends PowerTurret{
                 }
             }else if(reload > 0){
                 wasShooting = true;
+                //TODO does not handle multi liquid req?
                 Liquid liquid = liquids.current();
-                float maxUsed = coolantConsumer.amount;
-
+                float maxUsed = coolant.amount;
                 float used = (cheating() ? maxUsed : Math.min(liquids.get(liquid), maxUsed)) * delta();
                 reload -= used * liquid.heatCapacity * coolantMultiplier;
                 liquids.remove(liquid, used);

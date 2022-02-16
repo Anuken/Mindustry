@@ -29,7 +29,7 @@ public class ErekirTechTree{
         //TODO gate behind capture
 
         Planets.erekir.techTree = nodeRoot("erekir", coreBastion, true, () -> {
-            context().researchCostMultipliers = costMultipliers;
+            //context().researchCostMultipliers = costMultipliers;
 
             node(duct, erekirSector, () -> {
                 node(ductRouter, () -> {

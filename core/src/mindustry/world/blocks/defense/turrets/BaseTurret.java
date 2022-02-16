@@ -7,7 +7,6 @@ import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
-import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
@@ -19,17 +18,12 @@ public class BaseTurret extends Block{
     public float placeOverlapMargin = 8 * 7f;
     public float rotateSpeed = 5;
 
-    public float coolantUsage = 0.2f;
-    //TODO
-    public boolean acceptCoolant = true;
     /** Effect displayed when coolant is used. */
     public Effect coolEffect = Fx.fuelburn;
     /** How much reload is lowered by for each unit of liquid of heat capacity. */
     public float coolantMultiplier = 5f;
-    /** Liquid that is used by coolant; null to use default. */
-    public @Nullable Liquid coolantOverride;
-
-    protected @Nullable ConsumeLiquidBase coolantConsumer;
+    /** If not null, this consumer will be used for coolant. */
+    public @Nullable ConsumeLiquidBase coolant;
 
     public BaseTurret(String name){
         super(name);
@@ -44,18 +38,14 @@ public class BaseTurret extends Block{
 
     @Override
     public void init(){
-        //TODO bad
-        if(acceptCoolant && findConsumer(f -> f instanceof ConsumeLiquidBase) == null){
-            hasLiquids = true;
-            consume(coolantOverride != null ? new ConsumeLiquid(coolantOverride, coolantUsage) : new ConsumeCoolant(coolantUsage)).update(false).boost();
+        //just makes things a little more convenient
+        if(coolant != null){
+            coolant.update = false;
+            coolant.booster = true;
         }
 
         placeOverlapRange = Math.max(placeOverlapRange, range + placeOverlapMargin);
         super.init();
-
-        if(acceptCoolant){
-            coolantConsumer = findConsumer(c -> c instanceof ConsumeLiquidBase);
-        }
     }
 
     @Override

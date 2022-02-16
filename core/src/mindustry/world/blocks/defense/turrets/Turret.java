@@ -381,14 +381,14 @@ public class Turret extends ReloadTurret{
                 }
             }
 
-            if(acceptCoolant){
+            if(coolant != null){
                 updateCooling();
             }
         }
 
         @Override
         public void handleLiquid(Building source, Liquid liquid, float amount){
-            if(acceptCoolant && liquids.currentAmount() <= 0.001f){
+            if(coolant != null && liquids.currentAmount() <= 0.001f){
                 Events.fire(Trigger.turretCool);
             }
 

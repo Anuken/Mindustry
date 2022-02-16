@@ -2685,6 +2685,7 @@ public class Blocks{
             health = 250;
             inaccuracy = 2f;
             rotateSpeed = 10f;
+            coolant = consume(new ConsumeCoolant(0.1f));
 
             limitRange();
         }};
@@ -2710,6 +2711,7 @@ public class Blocks{
 
             scaledHealth = 200;
             shootSound = Sounds.shootSnap;
+            coolant = consume(new ConsumeCoolant(0.2f));
 
             limitRange(2);
         }};
@@ -2729,6 +2731,7 @@ public class Blocks{
             ammoUseEffect = Fx.none;
             health = 400;
             shootSound = Sounds.flame;
+            coolant = consume(new ConsumeCoolant(0.1f));
         }};
 
         hail = new ItemTurret("hail"){{
@@ -2746,6 +2749,7 @@ public class Blocks{
             shootCone = 10f;
             health = 260;
             shootSound = Sounds.bang;
+            coolant = consume(new ConsumeCoolant(0.1f));
             limitRange(0f);
         }};
 
@@ -2789,6 +2793,7 @@ public class Blocks{
             scaledHealth = 280;
             targetAir = false;
             shootSound = Sounds.laser;
+            coolant = consume(new ConsumeCoolant(0.2f));
 
             consumePower(6f);
 
@@ -2815,7 +2820,6 @@ public class Blocks{
             reloadTime = 35f;
             shootCone = 40f;
             rotateSpeed = 8f;
-            consumePower(3.3f);
             targetAir = false;
             range = 90f;
             shootEffect = Fx.lightningShoot;
@@ -2824,6 +2828,8 @@ public class Blocks{
             size = 1;
             health = 260;
             shootSound = Sounds.spark;
+            consumePower(3.3f);
+            coolant = consume(new ConsumeCoolant(0.1f));
         }};
 
         parallax = new TractorBeamTurret("parallax"){{
@@ -2838,7 +2844,7 @@ public class Blocks{
             scaledHealth = 160;
             rotateSpeed = 10;
 
-            consumePowerCond(3f, (TractorBeamBuild e) -> e.target != null);
+            consumePower(3f);
         }};
 
         swarmer = new ItemTurret("swarmer"){{
@@ -2860,6 +2866,7 @@ public class Blocks{
             envEnabled |= Env.space;
 
             limitRange(5f);
+            coolant = consume(new ConsumeCoolant(0.3f));
         }};
 
         salvo = new ItemTurret("salvo"){{
@@ -2888,6 +2895,7 @@ public class Blocks{
             shootSound = Sounds.shootBig;
 
             limitRange();
+            coolant = consume(new ConsumeCoolant(0.2f));
         }};
 
         segment = new PointDefenseTurret("segment"){{
@@ -2896,7 +2904,7 @@ public class Blocks{
             scaledHealth = 250;
             range = 180f;
             hasPower = true;
-            consumePowerCond(8f, (PointDefenseBuild b) -> b.target != null);
+            consumePower(8f);
             size = 2;
             shootLength = 5f;
             bulletDamage = 30f;
@@ -2943,6 +2951,7 @@ public class Blocks{
 
             scaledHealth = 220;
             shootSound = Sounds.shotgun;
+            coolant = consume(new ConsumeCoolant(0.3f));
 
             float brange = range + 10f;
 
@@ -2989,6 +2998,7 @@ public class Blocks{
             shootShake = 2f;
             range = 290f;
             minRange = 50f;
+            coolant = consume(new ConsumeCoolant(0.3f));
 
             scaledHealth = 130;
             shootSound = Sounds.artillery;
@@ -3011,6 +3021,7 @@ public class Blocks{
             inaccuracy = 10f;
             shootCone = 30f;
             shootSound = Sounds.shootSnap;
+            coolant = consume(new ConsumeCoolant(0.3f));
 
             scaledHealth = 145;
             limitRange();
@@ -3053,11 +3064,10 @@ public class Blocks{
             envEnabled |= Env.space;
 
             coolantMultiplier = 0.4f;
-
             scaledHealth = 150;
-            coolantUsage = 1f;
 
-            consumePowerCond(10f, TurretBuild::isActive);
+            coolant = consume(new ConsumeCoolant(1f));
+            consumePower(10f);
         }};
 
         spectre = new ItemTurret("spectre"){{
@@ -3083,7 +3093,7 @@ public class Blocks{
             shootSound = Sounds.shootBig;
 
             scaledHealth = 160;
-            coolantUsage = 1f;
+            coolant = consume(new ConsumeCoolant(1f));
 
             limitRange();
         }};
@@ -3099,7 +3109,6 @@ public class Blocks{
             reloadTime = 90f;
             firingMoveFract = 0.5f;
             shootDuration = 230f;
-            consumePower(17f);
             shootSound = Sounds.laserbig;
             loopSound = Sounds.beam;
             loopSoundVolume = 2f;
@@ -3119,7 +3128,8 @@ public class Blocks{
             }};
 
             scaledHealth = 200;
-            consume(new ConsumeCoolant(0.5f)).update(false);
+            coolant = consume(new ConsumeCoolant(0.5f));
+            consumePower(17f);
         }};
 
         breach = new ItemTurret("breach"){{
@@ -3160,8 +3170,6 @@ public class Blocks{
             }}
             );
 
-            coolantUsage = 15f / 60f;
-            coolantOverride = Liquids.water;
             coolantMultiplier = 6f;
 
             unitFilter = u -> !u.spawnedByCore;
@@ -3180,6 +3188,7 @@ public class Blocks{
             scaledHealth = 280;
             rotateSpeed = 1.6f;
 
+            coolant = consume(new ConsumeLiquid(Liquids.water, 15f / 60f));
             limitRange();
         }};
 
@@ -3250,7 +3259,6 @@ public class Blocks{
             }}
             );
 
-            acceptCoolant = false;
             scaledHealth = 330;
             shootLength = 7f;
             size = 3;
@@ -3304,8 +3312,7 @@ public class Blocks{
             minWarmup = 0.85f;
             shootWarmupSpeed = 0.07f;
 
-            coolantUsage = 30f / 60f;
-            coolantOverride = Liquids.water;
+            coolant = consume(new ConsumeLiquid(Liquids.water, 30f / 60f));
 
             draw = new DrawTurret("reinforced-"){{
                 parts.addAll(
@@ -3331,7 +3338,6 @@ public class Blocks{
             shootWarmupSpeed = 0.08f;
 
             outlineColor = Pal.darkOutline;
-            acceptCoolant = false;
 
             consumeLiquid(Liquids.hydrogen, 5f / 60f);
 
@@ -3377,8 +3383,7 @@ public class Blocks{
             rotateSpeed = 5f;
             shootCone = 30f;
 
-            coolantUsage = 30f / 60f;
-            coolantOverride = Liquids.water;
+            coolant = consume(new ConsumeLiquid(Liquids.water, 30f / 60f));
 
             draw = new DrawTurret("reinforced-"){{
                 parts.add(new RegionPart("-side"){{
@@ -3422,7 +3427,6 @@ public class Blocks{
             shootWarmupSpeed = 0.08f;
 
             outlineColor = Pal.darkOutline;
-            acceptCoolant = false;
 
             scaledHealth = 420;
             range = 270f;
@@ -3826,7 +3830,7 @@ public class Blocks{
         }};
 
         interplanetaryAccelerator = new Accelerator("interplanetary-accelerator"){{
-            requirements(Category.effect, BuildVisibility.campaignOnly, with(Items.copper, 16000, Items.silicon, 11000, Items.thorium, 13000, Items.titanium, 12000, Items.surgeAlloy, 6000, Items.phaseFabric, 5000));
+            requirements(Category.effect, BuildVisibility.hidden, with(Items.copper, 16000, Items.silicon, 11000, Items.thorium, 13000, Items.titanium, 12000, Items.surgeAlloy, 6000, Items.phaseFabric, 5000));
             researchCostMultiplier = 0.1f;
             size = 7;
             hasPower = true;

@@ -3,6 +3,7 @@ package mindustry.world.consumers;
 import arc.func.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -34,19 +35,38 @@ public class ConsumeLiquidFilter extends ConsumeLiquidBase{
         Seq<Liquid> list = content.liquids().select(l -> !l.isHidden() && filter.get(l));
         MultiReqImage image = new MultiReqImage();
         list.each(liquid -> image.add(new ReqImage(liquid.uiIcon, () ->
-            build.liquids != null && build.liquids.current() == liquid && build.liquids.get(liquid) >= Math.max(use(build), amount * build.delta()))));
+            build.liquids != null && build.liquids.get(liquid) >= Math.max(use(build), amount * build.delta()))));
 
         table.add(image).size(8 * 4);
     }
 
     @Override
     public void update(Building build){
-        build.liquids.remove(build.liquids.current(), use(build));
+        Liquid liq = match(build);
+        build.liquids.remove(liq, use(build));
+        build.filterConsLiquid = liq;
     }
 
     @Override
     public boolean valid(Building build){
-        return build != null && build.liquids != null && filter.get(build.liquids.current()) && build.liquids.currentAmount() >= use(build);
+        var liq = match(build);
+        return liq != null && build.liquids.get(liq) >= use(build);
+    }
+    
+    @Nullable Liquid match(Building build){
+        if(filter.get(build.liquids.current())){
+            return build.liquids.current();
+        }
+
+        var liqs = content.liquids();
+
+        for(int i = 0; i < liqs.size; i++){
+            var liq = liqs.get(i);
+            if(filter.get(liq) && build.liquids.get(liq) > 0){
+                return liq;
+            }
+        }
+        return null;
     }
 
     @Override
