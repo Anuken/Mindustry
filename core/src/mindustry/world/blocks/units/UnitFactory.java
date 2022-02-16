@@ -41,12 +41,16 @@ public class UnitFactory extends UnitBlock{
         regionRotated1 = 1;
 
         config(Integer.class, (UnitFactoryBuild tile, Integer i) -> {
+            if(!configurable) return;
+
             if(tile.currentPlan == i) return;
             tile.currentPlan = i < 0 || i >= plans.size ? -1 : i;
             tile.progress = 0;
         });
 
         config(UnitType.class, (UnitFactoryBuild tile, UnitType val) -> {
+            if(!configurable) return;
+
             int next = plans.indexOf(p -> p.unit == val);
             if(tile.currentPlan == next) return;
             tile.currentPlan = next;
@@ -218,6 +222,10 @@ public class UnitFactory extends UnitBlock{
 
         @Override
         public void updateTile(){
+            if(!configurable){
+                currentPlan = 0;
+            }
+
             if(currentPlan < 0 || currentPlan >= plans.size){
                 currentPlan = -1;
             }

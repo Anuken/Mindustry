@@ -136,6 +136,7 @@ public class Blocks{
     repairPoint, repairTurret,
 
     //unit - erekir
+    fabricator,
     tankAssembler, shipAssembler, mechAssembler,
     //TODO maybe making it 5x5 would be more appropriate, seems kinda cheap.
     basicAssemblerModule,
@@ -3598,6 +3599,14 @@ public class Blocks{
             researchCostMultiplier = 0f;
         }};
 
+        fabricator = new UnitFactory("fabricator"){{
+            requirements(Category.units, with(Items.silicon, 230, Items.oxide, 50, Items.beryllium, 230));
+            size = 3;
+            configurable = false;
+            plans.add(new UnitPlan(UnitTypes.dagger, 60f * 60f, with(Items.oxide, 15f, Items.silicon, 50f)));
+            consumePower(2f);
+        }};
+
         tankAssembler = new UnitAssembler("tank-assembler"){{
             requirements(Category.units, with(Items.graphite, 600, Items.beryllium, 600, Items.oxide, 250, Items.tungsten, 400, Items.silicon, 500));
             size = 5;
@@ -3635,7 +3644,8 @@ public class Blocks{
             consumeLiquid(Liquids.nitrogen, 24f / 60f);
         }};
 
-        //TODO requirements
+        //TODO 5x5
+        if(false)
         basicAssemblerModule = new UnitAssemblerModule("basic-assembler-module"){{
             requirements(Category.units, with(Items.graphite, 10));
             consumePower(0.5f);

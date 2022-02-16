@@ -264,7 +264,7 @@ public class PowerGraph{
                 batteries.add(build);
             }else if(build.block.outputsPower){
                 producers.add(build);
-            }else if(build.block.consumesPower){
+            }else if(build.block.consumesPower && build.block.consPower != null){
                 consumers.add(build);
             }
         }

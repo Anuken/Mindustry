@@ -296,40 +296,17 @@ public class Maps{
     public Seq<GenerateFilter> readFilters(String str){
         if(str == null || str.isEmpty()){
             //create default filters list
-            Seq<GenerateFilter> filters =  Seq.with(
-                new ScatterFilter(){{
-                    flooronto = Blocks.snow;
-                    block = Blocks.snowBoulder;
-                }},
-                new ScatterFilter(){{
-                    flooronto = Blocks.ice;
-                    block = Blocks.snowBoulder;
-                }},
-                new ScatterFilter(){{
-                    flooronto = Blocks.sand;
-                    block = Blocks.sandBoulder;
-                }},
-                new ScatterFilter(){{
-                    flooronto = Blocks.darksand;
-                    block = Blocks.basaltBoulder;
-                }},
-                new ScatterFilter(){{
-                    flooronto = Blocks.basalt;
-                    block = Blocks.basaltBoulder;
-                }},
-                new ScatterFilter(){{
-                    flooronto = Blocks.dacite;
-                    block = Blocks.daciteBoulder;
-                }},
-                new ScatterFilter(){{
-                    flooronto = Blocks.stone;
-                    block = Blocks.boulder;
-                }},
-                new ScatterFilter(){{
-                    flooronto = Blocks.shale;
-                    block = Blocks.shaleBoulder;
-                }}
-            );
+
+            Seq<GenerateFilter> filters = new Seq<>();
+
+            for(Block block : content.blocks()){
+                if(block.isFloor() && block.inEditor && block.asFloor().decoration != Blocks.air){
+                    var filter = new ScatterFilter();
+                    filter.flooronto = block.asFloor();
+                    filter.block = block.asFloor().decoration;
+                    filters.add(filter);
+                }
+            }
 
             addDefaultOres(filters);
 
