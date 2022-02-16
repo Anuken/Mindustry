@@ -223,6 +223,11 @@ public class Renderer implements ApplicationListener{
         }
     }
 
+    public void updateAllDarkness(){
+        blocks.updateDarkness();
+        minimap.updateAll();
+    }
+
     /** @return whether a launch/land cutscene is playing. */
     public boolean isCutscene(){
         return landTime > 0;

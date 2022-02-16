@@ -231,7 +231,7 @@ public class World{
     }
 
     public Rect getQuadBounds(Rect in){
-        return in.set(-finalWorldBounds, -finalWorldBounds, world.width() * tilesize + finalWorldBounds * 2, world.height() * tilesize + finalWorldBounds * 2);
+        return in.set(-finalWorldBounds, -finalWorldBounds, width() * tilesize + finalWorldBounds * 2, height() * tilesize + finalWorldBounds * 2);
     }
 
     public void setGenerating(boolean gen){
@@ -295,8 +295,8 @@ public class World{
         ObjectSet<UnlockableContent> content = new ObjectSet<>();
 
         //TODO duplicate code?
-        for(Tile tile : world.tiles){
-            if(world.getDarkness(tile.x, tile.y) >= 3){
+        for(Tile tile : tiles){
+            if(getDarkness(tile.x, tile.y) >= 3){
                 continue;
             }
 
@@ -499,7 +499,17 @@ public class World{
 
         if(Vars.state.rules.borderDarkness){
             int edgeBlend = 2;
-            int edgeDst = Math.min(x, Math.min(y, Math.min(Math.abs(x - (tiles.width - 1)), Math.abs(y - (tiles.height - 1)))));
+            int edgeDst;
+
+            if(!state.rules.limitMapArea){
+                edgeDst = Math.min(x, Math.min(y, Math.min(-(x - (tiles.width - 1)), -(y - (tiles.height - 1)))));
+            }else{
+                edgeDst =
+                    Math.min(x - state.rules.limitX,
+                    Math.min(y - state.rules.limitY,
+                    Math.min(-(x - (state.rules.limitX + state.rules.limitWidth - 1)), -(y - (state.rules.limitY + state.rules.limitHeight - 1)))));
+            }
+
             if(edgeDst <= edgeBlend){
                 dark = Math.max((edgeBlend - edgeDst) * (4f / edgeBlend), dark);
             }
@@ -529,7 +539,7 @@ public class World{
             }
         }
 
-        Tile tile = world.tile(x, y);
+        Tile tile = tile(x, y);
         if(tile != null && tile.isDarkened()){
             dark = Math.max(dark, tile.data);
         }

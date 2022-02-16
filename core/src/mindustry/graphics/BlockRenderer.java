@@ -63,6 +63,7 @@ public class BlockRenderer{
             blockTree = new BlockQuadtree(new Rect(0, 0, world.unitWidth(), world.unitHeight()));
             floorTree = new FloorQuadtree(new Rect(0, 0, world.unitWidth(), world.unitHeight()));
             shadowEvents.clear();
+            updateFloors.clear();
             lastCamY = lastCamX = -99; //invalidate camera position so blocks get updated
 
             shadows.getTexture().setFilter(TextureFilter.linear, TextureFilter.linear);
@@ -74,6 +75,12 @@ public class BlockRenderer{
             Draw.color(blendShadowColor);
 
             for(Tile tile : world.tiles){
+                recordIndex(tile);
+
+                if(tile.floor().updateRender(tile)){
+                    updateFloors.add(new UpdateRenderState(tile, tile.floor()));
+                }
+
                 if(tile.block().hasShadow){
                     Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
                 }
@@ -83,31 +90,7 @@ public class BlockRenderer{
             Draw.color();
             shadows.end();
 
-            updateFloors.clear();
-            dark.getTexture().setFilter(TextureFilter.linear);
-            dark.resize(world.width(), world.height());
-            dark.begin();
-            Core.graphics.clear(Color.white);
-            Draw.proj().setOrtho(0, 0, dark.getWidth(), dark.getHeight());
-
-            for(Tile tile : world.tiles){
-                recordIndex(tile);
-
-                if(tile.floor().updateRender(tile)){
-                    updateFloors.add(new UpdateRenderState(tile, tile.floor()));
-                }
-
-                float darkness = world.getDarkness(tile.x, tile.y);
-
-                if(darkness > 0){
-                    Draw.colorl(1f - Math.min((darkness + 0.5f) / 4f, 1f));
-                    Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
-                }
-            }
-
-            Draw.flush();
-            Draw.color();
-            dark.end();
+            updateDarkness();
         });
 
         Events.on(TilePreChangeEvent.class, event -> {
@@ -130,6 +113,42 @@ public class BlockRenderer{
             invalidateTile(event.tile);
             recordIndex(event.tile);
         });
+    }
+
+    public void updateDarkness(){
+        darkEvents.clear();
+        dark.getTexture().setFilter(TextureFilter.linear);
+        dark.resize(world.width(), world.height());
+        dark.begin();
+
+        //fill darkness with black when map area is limited
+        Core.graphics.clear(state.rules.limitMapArea ? Color.black : Color.white);
+        Draw.proj().setOrtho(0, 0, dark.getWidth(), dark.getHeight());
+
+        //clear out initial starting area
+        if(state.rules.limitMapArea){
+            Draw.color(Color.white);
+            Fill.crect(state.rules.limitX, state.rules.limitY, state.rules.limitWidth, state.rules.limitHeight);
+        }
+
+        for(Tile tile : world.tiles){
+            //skip lighting outside rect
+            if(state.rules.limitMapArea && !Rect.contains(state.rules.limitX, state.rules.limitY, state.rules.limitWidth - 1, state.rules.limitHeight - 1, tile.x, tile.y)){
+                continue;
+            }
+
+            float darkness = world.getDarkness(tile.x, tile.y);
+
+            if(darkness > 0){
+                float dark = 1f - Math.min((darkness + 0.5f) / 4f, 1f);
+                Draw.colorl(dark);
+                Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
+            }
+        }
+
+        Draw.flush();
+        Draw.color();
+        dark.end();
     }
 
     public void invalidateTile(Tile tile){

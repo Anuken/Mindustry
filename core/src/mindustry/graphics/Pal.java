@@ -132,5 +132,6 @@ public class Pal{
     slagOrange = Color.valueOf("ffa166"),
     techBlue = Color.valueOf("8ca9e8"),
 
-    vent = Color.valueOf("6b4e4e");
+    vent = Color.valueOf("6b4e4e"),
+    vent2 = Color.valueOf("261d1d");
 }

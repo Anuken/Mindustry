@@ -1237,18 +1237,38 @@ public class LStatements{
     @RegisterStatement("setrule")
     public static class SetRuleStatement extends LStatement{
         public LogicRule rule = LogicRule.waveSpacing;
-        public String value = "100";
+        public String value = "100", p1 = "0", p2 = "0", p3 = "100", p4 = "100";
 
         @Override
         public void build(Table table){
+            rebuild(table);
+        }
+
+        void rebuild(Table table){
+            table.clearChildren();
+
             table.button(b -> {
                 b.label(() -> rule.name()).growX().wrap().labelAlign(Align.center);
-                b.clicked(() -> showSelect(b, LogicRule.all, rule, o -> rule = o, 2, c -> c.width(150f)));
+                b.clicked(() -> showSelect(b, LogicRule.all, rule, o -> {
+                    rule = o;
+                    rebuild(table);
+                }, 2, c -> c.width(150f)));
             }, Styles.logict, () -> {}).size(160f, 40f).pad(4f).color(table.color);
 
             table.add(" = ");
 
-            field(table, value, s -> value = s);
+            switch(rule){
+                case mapArea -> {
+                    fields(table, "x", p1, s -> p1 = s);
+                    fields(table, "y", p2, s -> p2 = s);
+                    row(table);
+                    fields(table, "w", p3, s -> p3 = s);
+                    fields(table, "h", p4, s -> p4 = s);
+                }
+                default -> {
+                    field(table, value, s -> value = s);
+                }
+            }
         }
 
         @Override
@@ -1263,7 +1283,7 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new SetRuleI(rule, builder.var(value));
+            return new SetRuleI(rule, builder.var(value), builder.var(p1), builder.var(p2), builder.var(p3), builder.var(p4));
         }
     }
 

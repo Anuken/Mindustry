@@ -1079,7 +1079,9 @@ public class Fx{
     }),
 
     ventSteam = new Effect(140f, e -> {
-        color(e.color, e.fslope() * 0.85f);
+        color(e.color, Pal.vent2, e.fin());
+
+        alpha(e.fslope() * 0.78f);
 
         float length = 3f + e.finpow() * 10f;
         rand.setSeed(e.id);
@@ -1087,7 +1089,7 @@ public class Fx{
             v.trns(rand.random(360f), rand.random(length));
             Fill.circle(e.x + v.x, e.y + v.y, rand.random(1.2f, 3.5f) + e.fslope() * 1.1f);
         }
-    }),
+    }).layer(Layer.darkness - 1),
 
     drillSteam = new Effect(220f, e -> {
 

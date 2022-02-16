@@ -173,7 +173,7 @@ public class CustomRulesDialog extends BaseDialog{
         title("@rules.title.unit");
         check("@rules.unitammo", b -> rules.unitAmmo = b, () -> rules.unitAmmo);
         check("@rules.unitcapvariable", b -> rules.unitCapVariable = b, () -> rules.unitCapVariable);
-        number("@rules.unitcap", true, f -> rules.unitCap = f, () -> rules.unitCap, -999, 999);
+        numberi("@rules.unitcap", f -> rules.unitCap = f, () -> rules.unitCap, -999, 999);
         number("@rules.unitdamagemultiplier", f -> rules.unitDamageMultiplier = f, () -> rules.unitDamageMultiplier);
         number("@rules.unitbuildspeedmultiplier", f -> rules.unitBuildSpeedMultiplier = f, () -> rules.unitBuildSpeedMultiplier, 0.001f, 50f);
 
@@ -193,6 +193,14 @@ public class CustomRulesDialog extends BaseDialog{
         check("@rules.fire", b -> rules.fire = b, () -> rules.fire);
         check("@rules.lighting", b -> rules.lighting = b, () -> rules.lighting);
         check("@rules.enemyLights", b -> rules.enemyLights = b, () -> rules.enemyLights);
+
+        if(experimental){
+            check("@rules.limitarea", b -> rules.limitMapArea = b, () -> rules.limitMapArea);
+            numberi("x", x -> state.rules.limitX = x, () -> state.rules.limitX, () -> state.rules.limitMapArea, 0, 10000);
+            numberi("y", y -> state.rules.limitY = y, () -> state.rules.limitY, () -> state.rules.limitMapArea, 0, 10000);
+            numberi("w", w -> state.rules.limitWidth = w, () -> state.rules.limitWidth, () -> state.rules.limitMapArea, 0, 10000);
+            numberi("h", h -> state.rules.limitHeight = h, () -> state.rules.limitHeight, () -> state.rules.limitMapArea, 0, 10000);
+        }
 
         main.button(b -> {
             b.left();
@@ -270,14 +278,19 @@ public class CustomRulesDialog extends BaseDialog{
         number(text, false, cons, prov, condition, 0, Float.MAX_VALUE);
     }
 
-    //TODO integer param unused
-    void number(String text, boolean integer, Intc cons, Intp prov, int min, int max){
+    void numberi(String text, Intc cons, Intp prov, int min, int max){
+        numberi(text, cons, prov, () -> true, min, max);
+    }
+
+    void numberi(String text, Intc cons, Intp prov, Boolp condition, int min, int max){
         main.table(t -> {
             t.left();
-            t.add(text).left().padRight(5);
+            t.add(text).left().padRight(5)
+                .update(a -> a.setColor(condition.get() ? Color.white : Color.gray));
             t.field((prov.get()) + "", s -> cons.get(Strings.parseInt(s)))
-                    .padRight(100f)
-                    .valid(f -> Strings.parseInt(f) >= min && Strings.parseInt(f) <= max).width(120f).left();
+                .update(a -> a.setDisabled(!condition.get()))
+                .padRight(100f)
+                .valid(f -> Strings.parseInt(f) >= min && Strings.parseInt(f) <= max).width(120f).left();
         }).padTop(0).row();
     }
 

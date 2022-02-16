@@ -9,6 +9,7 @@ public enum LogicRule{
     enemyCoreBuildRadius,
     dropZoneRadius,
     unitCap,
+    mapArea,
     lighting,
     ambientLight;
 

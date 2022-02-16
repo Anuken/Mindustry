@@ -134,6 +134,10 @@ public class Rules{
     public boolean coreIncinerates = false;
     /** If false, borders fade out into darkness. Only use with custom backgrounds!*/
     public boolean borderDarkness = true;
+    /** If true, the map play area is cropped based on the rectangle below. */
+    public boolean limitMapArea = false;
+    /** Map area limit rectangle. */
+    public int limitX, limitY, limitWidth = 1, limitHeight = 1;
     /** special tags for additional info. */
     public StringMap tags = new StringMap();
     /** Name of callback to call for background rendering in mods; see Renderer#addCustomBackground. Runs last. */

@@ -1269,11 +1269,15 @@ public class LExecutor{
 
     public static class SetRuleI implements LInstruction{
         public LogicRule rule = LogicRule.waveSpacing;
-        public int value;
+        public int value, p1, p2, p3, p4;
 
-        public SetRuleI(LogicRule rule, int value){
+        public SetRuleI(LogicRule rule, int value, int p1, int p2, int p3, int p4){
             this.rule = rule;
             this.value = value;
+            this.p1 = p1;
+            this.p2 = p2;
+            this.p3 = p3;
+            this.p4 = p4;
         }
 
         public SetRuleI(){
@@ -1291,9 +1295,60 @@ public class LExecutor{
                 case dropZoneRadius -> state.rules.dropZoneRadius = exec.numf(value) * 8f;
                 case unitCap -> state.rules.unitCap = exec.numi(value);
                 case lighting -> state.rules.lighting = exec.bool(value);
+                case mapArea -> {
+                    int x = exec.numi(p1), y = exec.numi(p2), w = exec.numi(p3), h = exec.numi(p4);
+                    if(!checkMapArea(x, y, w, h, false)){
+                        Call.setMapArea(x, y, w, h);
+                    }
+                }
                 case ambientLight -> state.rules.ambientLight.fromDouble(exec.num(value));
             }
         }
+    }
+
+    /** @return whether the map area is already set to this value. */
+    static boolean checkMapArea(int x, int y, int w, int h, boolean set){
+        x = Math.max(x, 0);
+        y = Math.max(y, 0);
+        w = Math.min(world.width(), w);
+        h = Math.min(world.height(), h);
+        boolean full = x == 0 && y == 0 && w == world.width() && h == world.height();
+
+        if(state.rules.limitMapArea){
+            if(state.rules.limitX == x && state.rules.limitY == y && state.rules.limitWidth == w && state.rules.limitHeight == h){
+                return true;
+            }else if(full){
+                //disable the rule, covers the whole map
+                if(set){
+                    state.rules.limitMapArea = false;
+                    if(!headless){
+                        renderer.updateAllDarkness();
+                    }
+                    return false;
+                }
+            }
+        }else if(full){ //was already disabled, no need to change anything
+            return true;
+        }
+
+        if(set){
+            state.rules.limitMapArea = true;
+            state.rules.limitX = x;
+            state.rules.limitY = y;
+            state.rules.limitWidth = w;
+            state.rules.limitHeight = h;
+
+            if(!headless){
+                renderer.updateAllDarkness();
+            }
+        }
+
+        return false;
+    }
+
+    @Remote(called = Loc.server)
+    public static void setMapArea(int x, int y, int w, int h){
+        checkMapArea(x, y, w, h, true);
     }
 
     public static class FlushMessageI implements LInstruction{
