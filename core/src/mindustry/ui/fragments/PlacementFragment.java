@@ -427,7 +427,19 @@ public class PlacementFragment extends Fragment{
                                 for(int i = 0; i < counts.length; i++){
                                     if(counts[i] > 0){
                                         var type = content.unit(i);
-                                        u.add(new ItemImage(type.uiIcon, counts[i])).tooltip(type.localizedName).pad(4);
+                                        u.add(new ItemImage(type.uiIcon, counts[i])).tooltip(type.localizedName).pad(4).with(b -> {
+                                            ClickListener listener = new ClickListener();
+
+                                            //left click -> select
+                                            b.clicked(KeyCode.mouseLeft, () -> control.input.selectedUnits.removeAll(unit -> unit.type != type));
+                                            //right click -> remove
+                                            b.clicked(KeyCode.mouseRight, () -> control.input.selectedUnits.removeAll(unit -> unit.type == type));
+
+                                            b.addListener(listener);
+                                            b.addListener(new HandCursorListener());
+                                            //gray on hover
+                                            b.update(() -> ((Group)b.getChildren().first()).getChildren().first().setColor(listener.isOver() ? Color.lightGray : Color.white));
+                                        });
 
                                         if(++col % 7 == 0){
                                             u.row();

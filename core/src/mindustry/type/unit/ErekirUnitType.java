@@ -1,6 +1,5 @@
 package mindustry.type.unit;
 
-import mindustry.ai.types.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.meta.*;
@@ -12,7 +11,6 @@ public class ErekirUnitType extends UnitType{
         super(name);
         outlineColor = Pal.darkOutline;
         envDisabled = Env.space;
-        unitBasedDefaultController = u -> !playerControllable || u.team.isAI() ? defaultController.get() : new CommandAI();
         researchCostMultiplier = 10f;
     }
 }

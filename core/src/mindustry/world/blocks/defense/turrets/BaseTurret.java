@@ -23,6 +23,7 @@ public class BaseTurret extends Block{
     /** How much reload is lowered by for each unit of liquid of heat capacity. */
     public float coolantMultiplier = 5f;
     /** If not null, this consumer will be used for coolant. */
+    //TODO make automatic for mods?
     public @Nullable ConsumeLiquidBase coolant;
 
     public BaseTurret(String name){

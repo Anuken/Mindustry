@@ -71,10 +71,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     transient boolean wasDamaged; //used only by the indexer
     transient float visualLiquid;
 
-    //TODO bad system
-    transient @Nullable Liquid filterConsLiquid;
-    transient @Nullable Item filterConsItem;
-
     @Nullable PowerModule power;
     @Nullable ItemModule items;
     @Nullable LiquidModule liquids;

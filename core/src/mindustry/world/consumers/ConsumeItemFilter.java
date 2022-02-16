@@ -2,6 +2,7 @@ package mindustry.world.consumers;
 
 import arc.func.*;
 import arc.scene.ui.layout.*;
+import arc.util.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -28,7 +29,7 @@ public class ConsumeItemFilter extends Consume{
     public void build(Building build, Table table){
         MultiReqImage image = new MultiReqImage();
         content.items().each(i -> filter.get(i) && i.unlockedNow(), item -> image.add(new ReqImage(new ItemImage(item.uiIcon, 1),
-            () -> build.items != null && build.items.has(item))));
+            () -> build.items.has(item))));
 
         table.add(image).size(8 * 4);
     }
@@ -39,27 +40,27 @@ public class ConsumeItemFilter extends Consume{
 
     @Override
     public void trigger(Building build){
+        Item item = getConsumed(build);
+        if(item != null){
+            build.items.remove(item, 1);
+        }
+    }
+
+    public @Nullable Item getConsumed(Building build){
         for(int i = 0; i < content.items().size; i++){
             Item item = content.item(i);
-            if(build.items != null && build.items.has(item) && this.filter.get(item)){
-                build.items.remove(item, 1);
-                build.filterConsItem = item;
-                break;
+            if(build.items.has(item) && this.filter.get(item)){
+                return item;
             }
         }
+        return null;
     }
 
     @Override
     public boolean valid(Building build){
         if(build.consumeTriggerValid()) return true;
 
-        for(int i = 0; i < content.items().size; i++){
-            Item item = content.item(i);
-            if(this.filter.get(item) && build.items.has(item)){
-                return true;
-            }
-        }
-        return false;
+        return getConsumed(build) != null;
     }
 
     @Override

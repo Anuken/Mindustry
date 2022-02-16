@@ -49,10 +49,6 @@ public class UnitType extends UnlockableContent{
     public boolean flying;
     /** Creates a new instance of this unit class. */
     public Prov<? extends Unit> constructor;
-    /** The default AI controller to assign on creation. */
-    public Prov<? extends UnitController> defaultController = () -> !flying ? new GroundAI() : new FlyingAI();
-    /** Function that chooses AI controller based on unit entity. */
-    public Func<Unit, ? extends UnitController> unitBasedDefaultController = u -> defaultController.get();
 
     /** Environmental flags that are *all* required for this unit to function. 0 = any environment */
     public int envRequired = 0;
@@ -115,6 +111,11 @@ public class UnitType extends UnlockableContent{
     public BlockFlag[] playerTargetFlags = {BlockFlag.core, null};
     /** Target items to mine. Used in MinerAI */
     public Seq<Item> mineItems = Seq.with(Items.copper, Items.lead, Items.titanium, Items.thorium);
+
+    /** The default AI controller to assign on creation. */
+    public Prov<? extends UnitController> defaultController = () -> !flying ? new GroundAI() : new FlyingAI();
+    /** Function that chooses AI controller based on unit entity. */
+    public Func<Unit, ? extends UnitController> unitBasedDefaultController = u -> !playerControllable || u.team.isAI() ? defaultController.get() : new CommandAI();
 
     public Color outlineColor = Pal.darkerMetal;
     public int outlineRadius = 3;

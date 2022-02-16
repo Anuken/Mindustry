@@ -1,6 +1,7 @@
 package mindustry.world.blocks.defense.turrets;
 
 import arc.math.*;
+import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -33,8 +34,9 @@ public class ReloadTurret extends BaseTurret{
 
         protected void updateCooling(){
             if(reload < reloadTime && coolant != null && coolant.valid(this)){
+                float capacity = coolant instanceof ConsumeLiquidFilter filter ? filter.getConsumed(this).heatCapacity : 1f;
                 coolant.update(this);
-                reload += coolant.amount * edelta() * (filterConsLiquid == null ? 1f : filterConsLiquid.heatCapacity) * coolantMultiplier;
+                reload += coolant.amount * edelta() * capacity * coolantMultiplier;
 
                 if(Mathf.chance(0.06 * coolant.amount)){
                     coolEffect.at(x + Mathf.range(size * tilesize / 2f), y + Mathf.range(size * tilesize / 2f));

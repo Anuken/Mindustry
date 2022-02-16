@@ -42,19 +42,19 @@ public class ConsumeLiquidFilter extends ConsumeLiquidBase{
 
     @Override
     public void update(Building build){
-        Liquid liq = match(build);
+        Liquid liq = getConsumed(build);
         build.liquids.remove(liq, use(build));
-        build.filterConsLiquid = liq;
     }
 
     @Override
     public boolean valid(Building build){
-        var liq = match(build);
+        var liq = getConsumed(build);
         return liq != null && build.liquids.get(liq) >= use(build);
     }
     
-    @Nullable Liquid match(Building build){
-        if(filter.get(build.liquids.current())){
+    public @Nullable Liquid getConsumed(Building build){
+        float u = use(build);
+        if(filter.get(build.liquids.current()) && build.liquids.currentAmount() >= u){
             return build.liquids.current();
         }
 
@@ -62,7 +62,7 @@ public class ConsumeLiquidFilter extends ConsumeLiquidBase{
 
         for(int i = 0; i < liqs.size; i++){
             var liq = liqs.get(i);
-            if(filter.get(liq) && build.liquids.get(liq) > 0){
+            if(filter.get(liq) && build.liquids.get(liq) >= u){
                 return liq;
             }
         }

@@ -691,21 +691,18 @@ public class DesktopInput extends InputHandler{
     public boolean tap(float x, float y, int count, KeyCode button){
         if(scene.hasMouse() || !commandMode) return false;
 
+        //TODO doesn't work properly
         tappedOne = true;
 
         //click: select a single unit
         if(button == KeyCode.mouseLeft){
             Unit unit = selectedCommandUnit(input.mouseWorldX(), input.mouseWorldY());
             if(unit != null){
-                if(!multiSelect()){
+                if(selectedUnits.contains(unit)){
+                    selectedUnits.remove(unit);
+                }else{
                     selectedUnits.clear();
                     selectedUnits.add(unit);
-                }else{
-                    if(selectedUnits.contains(unit)){
-                        selectedUnits.remove(unit);
-                    }else{
-                        selectedUnits.add(unit);
-                    }
                 }
             }else{
                 //deselect
