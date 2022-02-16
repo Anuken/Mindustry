@@ -127,7 +127,7 @@ public class CoreBlock extends StorageBlock{
         if(state.isEditor()) return true;
 
         //special floor upon which cores can be placed
-        tile.getLinkedTiles(tempTiles);
+        tile.getLinkedTilesAs(this, tempTiles);
         if(!tempTiles.contains(o -> !o.floor().allowCorePlacement)){
             return true;
         }
