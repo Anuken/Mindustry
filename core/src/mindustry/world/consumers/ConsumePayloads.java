@@ -26,7 +26,6 @@ public class ConsumePayloads extends Consume{
 
     @Override
     public void display(Stats stats){
-        //TODO
 
         for(var stack : payloads){
             stats.add(Stat.input, t -> {

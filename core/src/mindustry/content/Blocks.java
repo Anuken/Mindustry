@@ -3603,7 +3603,7 @@ public class Blocks{
             requirements(Category.units, with(Items.graphite, 600, Items.beryllium, 600, Items.oxide, 250, Items.tungsten, 400, Items.silicon, 500));
             size = 5;
             //TODO remove ducts and crushers, replace with 2-3 high cost special blocks with silicon requirements
-            plans.add(new AssemblerUnitPlan(UnitTypes.vanquish, 60f * 50f, PayloadStack.list(UnitTypes.stell, 4, Blocks.tungstenWallLarge, 12)));
+            plans.add(new AssemblerUnitPlan(UnitTypes.vanquish, 60f * 50f, PayloadStack.list(UnitTypes.stell, 4, Blocks.tungstenWallLarge, 10)));
             consumePower(3f);
             areaSize = 13;
             researchCostMultiplier = 0.4f;

@@ -286,23 +286,21 @@ public class ControlPathfinder{
         requests.clear();
     }
 
-    private static boolean raycast(PathCost cost, int x1, int y1, int x2, int y2){
+    private static boolean raycast(PathCost type, int x1, int y1, int x2, int y2){
         int ww = world.width(), wh = world.height();
         int x = x1, dx = Math.abs(x2 - x), sx = x < x2 ? 1 : -1;
         int y = y1, dy = Math.abs(y2 - y), sy = y < y2 ? 1 : -1;
         int e2, err = dx - dy;
 
         while(x >= 0 && y >= 0 && x < ww && y < wh){
-            if(avoid(cost, x + y * wwidth)) return true;
+            if(avoid(type, x + y * wwidth)) return true;
             if(x == x2 && y == y2) return false;
 
-            e2 = 2 * err;
-            if(e2 > -dy){
+            //no diagonals
+            if(2 * err + dy > dx - 2 * err){
                 err -= dy;
                 x += sx;
-            }
-
-            if(e2 < dx){
+            }else{
                 err += dx;
                 y += sy;
             }
