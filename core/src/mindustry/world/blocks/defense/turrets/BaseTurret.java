@@ -43,6 +43,7 @@ public class BaseTurret extends Block{
         if(coolant != null){
             coolant.update = false;
             coolant.booster = true;
+            coolant.optional = true;
         }
 
         placeOverlapRange = Math.max(placeOverlapRange, range + placeOverlapMargin);

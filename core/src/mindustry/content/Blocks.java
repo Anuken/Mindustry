@@ -2603,7 +2603,7 @@ public class Blocks{
             //TODO should this be higher?
             buildCostMultiplier = 0.75f;
 
-            unitCapModifier = 2;
+            unitCapModifier = 4;
             researchCostMultiplier = 0.07f;
         }};
 
@@ -2617,7 +2617,7 @@ public class Blocks{
             thrusterLength = 40/4f;
             armor = 10f;
 
-            unitCapModifier = 4;
+            unitCapModifier = 6;
             researchCostMultipliers.put(Items.silicon, 0.4f);
             researchCostMultiplier = 0.14f;
         }};
@@ -2633,7 +2633,7 @@ public class Blocks{
             thrusterLength = 48/4f;
             armor = 15f;
 
-            unitCapModifier = 6;
+            unitCapModifier = 8;
             researchCostMultipliers.put(Items.silicon, 0.3f);
             researchCostMultiplier = 0.2f;
         }};
@@ -3603,7 +3603,7 @@ public class Blocks{
             requirements(Category.units, with(Items.silicon, 230, Items.oxide, 50, Items.beryllium, 230));
             size = 3;
             configurable = false;
-            plans.add(new UnitPlan(UnitTypes.dagger, 60f * 60f, with(Items.oxide, 15f, Items.silicon, 50f)));
+            plans.add(new UnitPlan(UnitTypes.stell, 60f * 60f, with(Items.oxide, 15f, Items.silicon, 50f)));
             consumePower(2f);
         }};
 

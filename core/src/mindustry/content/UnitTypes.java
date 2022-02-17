@@ -73,7 +73,7 @@ public class UnitTypes{
     public static @EntityDef({Unitc.class, BuildingTetherc.class, Payloadc.class}) UnitType manifold, assemblyDrone, effectDrone;
 
     //tank
-    public static @EntityDef({Unitc.class, Tankc.class}) UnitType vanquish, conquer;
+    public static @EntityDef({Unitc.class, Tankc.class}) UnitType stell, vanquish, conquer;
 
     //endregion
 
@@ -2421,6 +2421,46 @@ public class UnitTypes{
 
         //endregion
         //region erekir - tank
+
+        stell = new TankUnitType("stell"){{
+            hitSize = 11f;
+            treadPullOffset = 3;
+            speed = 0.75f;
+            rotateSpeed = 3.5f;
+            health = 800;
+            armor = 5f;
+            areaDamage = 5f;
+            treadRects = new Rect[]{new Rect(12, 7, 14, 51)};
+
+            weapons.add(new Weapon("stell-weapon"){{
+                layerOffset = 0.0001f;
+                reload = 50f;
+                shootY = 4.5f;
+                recoil = 1f;
+                rotate = true;
+                rotateSpeed = 1.7f;
+                mirror = false;
+                x = 0f;
+                y = -0.75f;
+                heatColor = Color.valueOf("f9350f");
+                cooldownTime = 30f;
+
+                bullet = new BasicBulletType(4f, 40){{
+                    sprite = "missile-large";
+                    smokeEffect = Fx.shootBigSmoke;
+                    shootEffect = Fx.shootBigColor;
+                    width = 5f;
+                    height = 7f;
+                    lifetime = 40f;
+                    hitSize = 4f;
+                    hitColor = backColor = trailColor = Color.valueOf("feb380");
+                    frontColor = Color.white;
+                    trailWidth = 1.7f;
+                    trailLength = 5;
+                    despawnEffect = hitEffect = Fx.hitBulletColor;
+                }};
+            }});
+        }};
 
         vanquish = new TankUnitType("vanquish"){{
             hitSize = 28f;
