@@ -34,7 +34,7 @@ public class ItemLiquidGenerator extends PowerGenerator{
     public Color heatColor = Color.valueOf("ff9b59");
     public @Load("@-top") TextureRegion topRegion;
     public @Load("@-liquid") TextureRegion liquidRegion;
-    public boolean randomlyExplode = true;
+    public float explodeThreshold = 0.5f;
     public boolean defaults = false;
 
     public ItemLiquidGenerator(boolean hasItems, boolean hasLiquids, String name){
@@ -145,7 +145,7 @@ public class ItemLiquidGenerator extends PowerGenerator{
                 if(generateTime > 0f){
                     generateTime -= Math.min(1f / itemDuration * delta() * power.graph.getUsageFraction(), generateTime);
 
-                    if(randomlyExplode && state.rules.reactorExplosions && Mathf.chance(delta() * 0.06 * Mathf.clamp(explosiveness - 0.5f))){
+                    if(state.rules.reactorExplosions && Mathf.chance(delta() * 0.06 * Mathf.clamp(explosiveness - (1f - explodeThreshold)))){
                         //this block is run last so that in the event of a block destruction, no code relies on the block type
                         Core.app.post(() -> {
                             damage(Mathf.random(11f));
