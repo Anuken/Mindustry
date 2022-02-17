@@ -3,6 +3,7 @@ package mindustry.core;
 import arc.*;
 import arc.math.*;
 import arc.util.*;
+import mindustry.ai.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.core.GameState.*;
 import mindustry.ctype.*;
@@ -415,7 +416,13 @@ public class Logic implements ApplicationListener{
 
                     for(TeamData data : state.teams.getActive()){
                         if(data.hasAI()){
-                            data.ai.update();
+                            if(data.baseAi == null) data.baseAi = new BaseAI(data);
+                            data.baseAi.update();
+                        }
+
+                        if(data.team.rules().rtsAi){
+                            if(data.rtsAi == null) data.rtsAi = new RtsAI(data);
+                            data.rtsAi.update();
                         }
                     }
                 }

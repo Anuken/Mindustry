@@ -201,7 +201,7 @@ public class Rules{
 
     /** A team-specific ruleset. */
     public static class TeamRule{
-        /** Whether to use building AI. */
+        /** Whether to use building AI. TODO remove, it is terrible. */
         public boolean ai;
         /** TODO Tier of blocks/designs that the AI uses for building. [0, 1] */
         public float aiTier = 1f;
@@ -213,6 +213,9 @@ public class Rules{
         public boolean infiniteResources;
         /** If true, this team has infinite unit ammo. */
         public boolean infiniteAmmo;
+
+        /** Enables "RTS" unit AI. TODO wip */
+        public boolean rtsAi;
 
         /** How fast unit factories build units. */
         public float unitBuildSpeedMultiplier = 1f;

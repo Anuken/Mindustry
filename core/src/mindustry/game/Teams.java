@@ -222,7 +222,11 @@ public class Teams{
     public static class TeamData{
         public final Seq<CoreBuild> cores = new Seq<>();
         public final Team team;
-        public final BaseAI ai;
+
+        /** Handles building ""bases"". */
+        public @Nullable BaseAI baseAi;
+        /** Handles RTS unit control. */
+        public @Nullable RtsAI rtsAi;
 
         private boolean presentFlag;
 
@@ -248,7 +252,6 @@ public class Teams{
 
         public TeamData(Team team){
             this.team = team;
-            this.ai = new BaseAI(this);
         }
 
         /** Destroys this team's presence on the map, killing part of its buildings and converting everything to 'derelict'. */

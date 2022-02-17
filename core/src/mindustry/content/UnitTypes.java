@@ -583,7 +583,7 @@ public class UnitTypes{
         //region ground legs
 
         crawler = new UnitType("crawler"){{
-            defaultController = SuicideAI::new;
+            aiController = SuicideAI::new;
 
             speed = 1f;
             hitSize = 8f;
@@ -1236,7 +1236,7 @@ public class UnitTypes{
         //region air support
 
         mono = new UnitType("mono"){{
-            unitBasedDefaultController = u -> new MinerAI();
+            defaultController = u -> new MinerAI();
 
             flying = true;
             drag = 0.06f;
@@ -1255,7 +1255,7 @@ public class UnitTypes{
         }};
 
         poly = new UnitType("poly"){{
-            unitBasedDefaultController = u -> new BuilderAI();
+            defaultController = u -> new BuilderAI();
 
             flying = true;
             drag = 0.05f;
@@ -1311,7 +1311,7 @@ public class UnitTypes{
 
         mega = new UnitType("mega"){{
             //TODO control?
-            defaultController = RepairAI::new;
+            aiController = RepairAI::new;
 
             mineTier = 3;
             mineSpeed = 4f;
@@ -1435,7 +1435,7 @@ public class UnitTypes{
         }};
 
         oct = new UnitType("oct"){{
-            defaultController = DefenderAI::new;
+            aiController = DefenderAI::new;
 
             armor = 16f;
             health = 24000;
@@ -2301,7 +2301,7 @@ public class UnitTypes{
         //region core
 
         alpha = new UnitType("alpha"){{
-            defaultController = BuilderAI::new;
+            aiController = BuilderAI::new;
             isCounted = false;
 
             lowAltitude = true;
@@ -2338,7 +2338,7 @@ public class UnitTypes{
         }};
 
         beta = new UnitType("beta"){{
-            defaultController = BuilderAI::new;
+            aiController = BuilderAI::new;
             isCounted = false;
 
             flying = true;
@@ -2379,7 +2379,7 @@ public class UnitTypes{
         }};
 
         gamma = new UnitType("gamma"){{
-            defaultController = BuilderAI::new;
+            aiController = BuilderAI::new;
             isCounted = false;
 
             lowAltitude = true;
@@ -2922,7 +2922,7 @@ public class UnitTypes{
         //region erekir - flying
 
         quell = new ErekirUnitType("quell"){{
-            defaultController = FlyingFollowAI::new;
+            aiController = FlyingFollowAI::new;
             envDisabled = 0;
 
             lowAltitude = false;
@@ -2988,7 +2988,7 @@ public class UnitTypes{
         }};
 
         disrupt = new ErekirUnitType("disrupt"){{
-            defaultController = FlyingFollowAI::new;
+            aiController = FlyingFollowAI::new;
             envDisabled = 0;
 
             lowAltitude = false;
@@ -3157,7 +3157,7 @@ public class UnitTypes{
         //TODO bad name
         evoke = new ErekirUnitType("evoke"){{
             coreUnitDock = true;
-            defaultController = BuilderAI::new;
+            aiController = BuilderAI::new;
             isCounted = false;
             envDisabled = 0;
 
@@ -3214,7 +3214,7 @@ public class UnitTypes{
 
         incite = new ErekirUnitType("incite"){{
             coreUnitDock = true;
-            defaultController = BuilderAI::new;
+            aiController = BuilderAI::new;
             isCounted = false;
             envDisabled = 0;
 
@@ -3283,7 +3283,7 @@ public class UnitTypes{
 
         emanate = new ErekirUnitType("emanate"){{
             coreUnitDock = true;
-            defaultController = BuilderAI::new;
+            aiController = BuilderAI::new;
             isCounted = false;
             envDisabled = 0;
 
@@ -3355,7 +3355,7 @@ public class UnitTypes{
         }};
 
         manifold = new ErekirUnitType("manifold"){{
-            defaultController = CargoAI::new;
+            aiController = CargoAI::new;
             isCounted = false;
             allowedInPayloads = false;
             logicControllable = false;
@@ -3382,7 +3382,7 @@ public class UnitTypes{
         }};
 
         assemblyDrone = new ErekirUnitType("assembly-drone"){{
-            defaultController = AssemblerAI::new;
+            aiController = AssemblerAI::new;
 
             flying = true;
             drag = 0.06f;

@@ -36,8 +36,8 @@ public class BaseAI{
     private int lastX, lastY, lastW, lastH;
     private boolean triedWalls, foundPath;
 
-    TeamData data;
-    Interval timer = new Interval(4);
+    final TeamData data;
+    final Interval timer = new Interval(4);
 
     IntSet path = new IntSet();
     IntSet calcPath = new IntSet();

@@ -34,7 +34,7 @@ public class DroneCenter extends Block{
     public void init(){
         super.init();
 
-        droneType.defaultController = EffectDroneAI::new;
+        droneType.aiController = EffectDroneAI::new;
     }
 
     public class DroneCenterBuild extends Building{

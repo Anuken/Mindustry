@@ -19,7 +19,7 @@ public class MissileUnitType extends UnitType{
         isCounted = false;
         useUnitCap = false;
         allowedInPayloads = false;
-        defaultController = MissileAI::new;
+        aiController = MissileAI::new;
         flying = true;
         constructor = TimedKillUnit::create;
         envEnabled = Env.any;

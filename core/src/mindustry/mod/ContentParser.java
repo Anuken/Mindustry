@@ -454,13 +454,13 @@ public class ContentParser{
                 }
 
                 if(value.has("controller")){
-                    unit.defaultController = supply(resolve(value.getString("controller"), FlyingAI.class));
+                    unit.aiController = supply(resolve(value.getString("controller"), FlyingAI.class));
                     value.remove("controller");
                 }
 
-                if(value.has("unitBasedController")){
-                    unit.unitBasedDefaultController = u -> supply(resolve(value.getString("unitBasedController"), FlyingAI.class)).get();
-                    value.remove("unitBasedController");
+                if(value.has("defaultController")){
+                    unit.defaultController = u -> supply(resolve(value.getString("defaultController"), FlyingAI.class)).get();
+                    value.remove("defaultController");
                 }
 
                 //read extra default waves

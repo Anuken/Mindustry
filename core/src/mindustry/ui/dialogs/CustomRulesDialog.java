@@ -235,6 +235,8 @@ public class CustomRulesDialog extends BaseDialog{
                 number("@rules.blockhealthmultiplier", f -> teams.blockHealthMultiplier = f, () -> teams.blockHealthMultiplier);
                 number("@rules.blockdamagemultiplier", f -> teams.blockDamageMultiplier = f, () -> teams.blockDamageMultiplier);
 
+                check("@rules.rtsai", b -> teams.rtsAi = b, () -> teams.rtsAi, () -> team != rules.defaultTeam);
+
                 check("@rules.buildai", b -> teams.ai = b, () -> teams.ai, () -> team != rules.defaultTeam);
                 number("@rules.aitier", false, f -> teams.aiTier = f, () -> teams.aiTier, () -> teams.ai, 0, 1);
 

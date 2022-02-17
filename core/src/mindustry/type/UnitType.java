@@ -114,10 +114,10 @@ public class UnitType extends UnlockableContent{
 
     //TODO different names for these fields.
     /** The default AI controller to assign on creation. */
-    public Prov<? extends UnitController> defaultController = () -> !flying ? new GroundAI() : new FlyingAI();
+    public Prov<? extends UnitController> aiController = () -> !flying ? new GroundAI() : new FlyingAI();
     /** Function that chooses AI controller based on unit entity. */
     //TODO -name is too long
-    public Func<Unit, ? extends UnitController> unitBasedDefaultController = u -> !playerControllable || u.team.isAI() ? defaultController.get() : new CommandAI();
+    public Func<Unit, ? extends UnitController> defaultController = u -> !playerControllable || (u.team.isAI() && !u.team.rules().rtsAi) ? aiController.get() : new CommandAI();
 
     public Color outlineColor = Pal.darkerMetal;
     public int outlineRadius = 3;
@@ -218,7 +218,7 @@ public class UnitType extends UnlockableContent{
     }
 
     public UnitController createController(Unit unit){
-        return unitBasedDefaultController.get(unit);
+        return defaultController.get(unit);
     }
 
     public Unit create(Team team){
