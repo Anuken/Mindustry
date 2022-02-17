@@ -253,6 +253,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
                             if(other != null){
                                 if(pass == 0){
                                     //first pass: delete existing blocks - this should automatically trigger removal if overlap exists
+                                    //TODO pointless setting air to air?
                                     other.setBlock(Blocks.air);
                                 }else{
                                     //second pass: assign changed data

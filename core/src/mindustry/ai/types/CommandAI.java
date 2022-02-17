@@ -70,7 +70,7 @@ public class CommandAI extends AIController{
                 faceTarget();
             }
 
-            if(attackTarget == null && unit.within(targetPos, Math.max(5f, unit.hitSize) / 2.5f)){
+            if(attackTarget == null && unit.within(targetPos, Math.max(5f, unit.hitSize / 2.5f))){
                 targetPos = null;
             }
         }else if(target != null){

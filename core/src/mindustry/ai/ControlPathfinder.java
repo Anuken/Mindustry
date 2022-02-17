@@ -298,11 +298,25 @@ public class ControlPathfinder{
             if(avoid(type, x + y * wwidth)) return true;
             if(x == x2 && y == y2) return false;
 
-            //no diagonals
+            //TODO no diagonals???? is this a good idea?
+            /*
+            //no diagonal ver
             if(2 * err + dy > dx - 2 * err){
                 err -= dy;
                 x += sx;
             }else{
+                err += dx;
+                y += sy;
+            }*/
+
+            //diagonal ver
+            e2 = 2 * err;
+            if(e2 > -dy){
+                err -= dy;
+                x += sx;
+            }
+
+            if(e2 < dx){
                 err += dx;
                 y += sy;
             }

@@ -92,7 +92,7 @@ public class Pathfinder implements Runnable{
 
             for(int i = 0; i < tiles.length; i++){
                 Tile tile = world.tiles.geti(i);
-                tiles[i] = packTile(tile);
+                tiles[i] = packTile(tile, 0);
             }
 
             preloadPath(getField(state.rules.waveTeam, costGround, fieldCore));
@@ -108,6 +108,34 @@ public class Pathfinder implements Runnable{
         Events.on(ResetEvent.class, event -> stop());
 
         Events.on(TileChangeEvent.class, event -> updateTile(event.tile));
+
+        //remove nearSolid flag for tiles
+        Events.on(TilePreChangeEvent.class, event -> {
+            Tile tile = event.tile;
+
+            if(tile.solid()){
+                for(int i = 0; i < 4; i++){
+                    Tile other = tile.nearby(i);
+                    if(other != null){
+                        //other tile needs to update its nearSolid to be false if it's not solid and this tile just got un-solidified
+                        if(!other.solid()){
+                            boolean otherNearSolid = false;
+                            for(int j = 0; j < 4; j++){
+                                Tile othernear = other.nearby(i);
+                                if(othernear != null && othernear.solid()){
+                                    otherNearSolid = true;
+                                    break;
+                                }
+                            }
+                            //the other tile is no longer near solid, remove the solid bit
+                            if(!otherNearSolid){
+                                tiles[other.array()] &= ~(PathTile.bitMaskNearSolid);
+                            }
+                        }
+                    }
+                }
+            }
+        });
     }
 
     private void clearCache(){
@@ -115,17 +143,23 @@ public class Pathfinder implements Runnable{
     }
 
     /** Packs a tile into its internal representation. */
-    private int packTile(Tile tile){
+    private int packTile(Tile tile, int prev){
         boolean nearLiquid = false, nearSolid = false, nearGround = false, solid = tile.solid(), allDeep = tile.floor().isDeep();
 
         for(int i = 0; i < 4; i++){
             Tile other = tile.nearby(i);
             if(other != null){
                 Floor floor = other.floor();
+                boolean osolid = other.solid();
                 if(floor.isLiquid) nearLiquid = true;
-                if(other.solid()) nearSolid = true;
+                if(osolid) nearSolid = true;
                 if(!floor.isLiquid) nearGround = true;
                 if(!floor.isDeep()) allDeep = false;
+
+                //other tile is now near solid
+                if(solid){
+                    tiles[other.array()] |= PathTile.bitMaskNearSolid;
+                }
             }
         }
 
@@ -173,7 +207,7 @@ public class Pathfinder implements Runnable{
         tile.getLinkedTiles(t -> {
             int pos = t.array();
             if(pos < tiles.length){
-                tiles[pos] = packTile(t);
+                tiles[pos] = packTile(t, tiles[pos]);
             }
         });
 
