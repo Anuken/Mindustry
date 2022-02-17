@@ -3603,7 +3603,7 @@ public class Blocks{
             requirements(Category.units, with(Items.silicon, 200, Items.beryllium, 250));
             size = 3;
             configurable = false;
-            plans.add(new UnitPlan(UnitTypes.stell, 60f * 60f, with(Items.graphite, 20f, Items.silicon, 30f)));
+            plans.add(new UnitPlan(UnitTypes.stell, 60f * 60f, with(Items.graphite, 20f, Items.silicon, 40f)));
             consumePower(2f);
         }};
 

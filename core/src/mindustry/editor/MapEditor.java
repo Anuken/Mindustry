@@ -160,7 +160,9 @@ public class MapEditor{
                     if(forceOverlay){
                         tile.setOverlay(drawBlock.asFloor());
                     }else{
-                        tile.setFloor(drawBlock.asFloor());
+                        if(!(drawBlock.asFloor().wallOre && !tile.block().solid)){
+                            tile.setFloor(drawBlock.asFloor());
+                        }
                     }
                 }else if(!(tile.block().isMultiblock() && !drawBlock.isMultiblock())){
                     if(drawBlock.rotate && tile.build != null && tile.build.rotation != rotation){
