@@ -31,7 +31,7 @@ public class ContentInfoDialog extends BaseDialog{
 
         table.table(title1 -> {
             title1.image(content.uiIcon).size(iconXLarge).scaling(Scaling.fit);
-            title1.add("[accent]" + content.localizedName + (enableConsole ? "\n[gray]" + content.name : "")).padLeft(5);
+            title1.add("[accent]" + content.localizedName + "\n[gray]" + (enableConsole ? content.name + " ": "") + (constants.lookupLogicId(content) != -1 ? "#" + constants.lookupLogicId(content) : "")).padLeft(5);
         });
 
         table.row();
