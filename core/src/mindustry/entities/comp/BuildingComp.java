@@ -545,6 +545,16 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     }
 
+    /** Called when this building receives a position command. Requires a commandable block. */
+    public void onCommand(Vec2 target){
+
+    }
+
+    /** @return the position that this block points to for commands, or null. */
+    public @Nullable Vec2 getCommandPosition(){
+        return null;
+    }
+
     public void handleUnitPayload(Unit unit, Cons<Payload> grabber){
         Fx.spawn.at(unit);
 

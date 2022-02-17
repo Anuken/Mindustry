@@ -4,6 +4,7 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.scene.style.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
@@ -15,6 +16,7 @@ import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -39,6 +41,7 @@ public class UnitFactory extends UnitBlock{
         outputsPayload = true;
         rotate = true;
         regionRotated1 = 1;
+        commandable = true;
 
         config(Integer.class, (UnitFactoryBuild tile, Integer i) -> {
             if(!configurable) return;
@@ -143,10 +146,21 @@ public class UnitFactory extends UnitBlock{
     }
 
     public class UnitFactoryBuild extends UnitBuild{
+        public @Nullable Vec2 commandPos;
         public int currentPlan = -1;
 
         public float fraction(){
             return currentPlan == -1 ? 0 : progress / plans.get(currentPlan).time;
+        }
+
+        @Override
+        public Vec2 getCommandPosition(){
+            return commandPos;
+        }
+
+        @Override
+        public void onCommand(Vec2 target){
+            commandPos = target;
         }
 
         @Override
@@ -252,7 +266,11 @@ public class UnitFactory extends UnitBlock{
                 if(progress >= plan.time && consValid()){
                     progress %= 1f;
 
-                    payload = new UnitPayload(plan.unit.create(team));
+                    Unit unit = plan.unit.create(team);
+                    if(commandPos != null && unit.isCommandable()){
+                        unit.command().commandPosition(commandPos);
+                    }
+                    payload = new UnitPayload(unit);
                     payVector.setZero();
                     consume();
                     Events.fire(new UnitCreateEvent(payload.unit, this));
@@ -287,7 +305,7 @@ public class UnitFactory extends UnitBlock{
 
         @Override
         public byte version(){
-            return 1;
+            return 2;
         }
 
         @Override
@@ -295,6 +313,7 @@ public class UnitFactory extends UnitBlock{
             super.write(write);
             write.f(progress);
             write.s(currentPlan);
+            TypeIO.writeVecNullable(write, commandPos);
         }
 
         @Override
@@ -302,6 +321,9 @@ public class UnitFactory extends UnitBlock{
             super.read(read, revision);
             progress = read.f();
             currentPlan = read.s();
+            if(revision >= 2){
+                commandPos = TypeIO.readVecNullable(read);
+            }
         }
     }
 }

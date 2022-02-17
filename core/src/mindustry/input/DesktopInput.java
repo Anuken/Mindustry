@@ -117,17 +117,12 @@ public class DesktopInput extends InputHandler{
         if(commandMode){
 
             //draw command overlay UI
-
             for(Unit unit : selectedUnits){
-                CommandAI ai = (CommandAI)unit.controller();
+                CommandAI ai = unit.command();
                 //draw target line
                 if(ai.targetPos != null){
                     Position lineDest = ai.attackTarget != null ? ai.attackTarget : ai.targetPos;
-
-                    Tmp.v1.set(lineDest).sub(unit).setLength(unit.hitSize / 2f);
-                    Tmp.v2.set(Tmp.v1).scl(-1f).setLength(3.5f);
-
-                    Drawf.line(Pal.accent, unit.x + Tmp.v1.x, unit.y + Tmp.v1.y, lineDest.getX() + Tmp.v2.x, lineDest.getY() + Tmp.v2.y);
+                    Drawf.limitLine(unit, lineDest, unit.hitSize / 2f, 3.5f);
 
                     if(ai.attackTarget == null){
                         Drawf.square(lineDest.getX(), lineDest.getY(), 3.5f);
@@ -138,6 +133,16 @@ public class DesktopInput extends InputHandler{
 
                 if(ai.attackTarget != null){
                     Drawf.target(ai.attackTarget.getX(), ai.attackTarget.getY(), 6f, Pal.remove);
+                }
+            }
+
+            if(commandBuild != null){
+                Drawf.square(commandBuild.x, commandBuild.y, commandBuild.hitSize() / 1.4f + 1f);
+                var cpos = commandBuild.getCommandPosition();
+
+                if(cpos != null){
+                    Drawf.limitLine(commandBuild, cpos, commandBuild.hitSize() / 2f, 3.5f);
+                    Drawf.square(cpos.x, cpos.y, 3.5f);
                 }
             }
 
@@ -564,6 +569,7 @@ public class DesktopInput extends InputHandler{
                     selectedUnits.clear();
                 }
                 selectedUnits.addAll(units);
+                commandBuild = null;
             }
             commandRect = false;
         }
@@ -698,6 +704,7 @@ public class DesktopInput extends InputHandler{
         //click: select a single unit
         if(button == KeyCode.mouseLeft){
             Unit unit = selectedCommandUnit(input.mouseWorldX(), input.mouseWorldY());
+            Building build = world.buildWorld(input.mouseWorldX(), input.mouseWorldY());
             if(unit != null){
                 if(selectedUnits.contains(unit)){
                     selectedUnits.remove(unit);
@@ -705,16 +712,24 @@ public class DesktopInput extends InputHandler{
                     selectedUnits.clear();
                     selectedUnits.add(unit);
                 }
+                commandBuild = null;
             }else{
                 //deselect
                 selectedUnits.clear();
+
+                if(build != null && build.team == player.team() && build.block.commandable){
+                    commandBuild = (commandBuild == build ? null : build);
+                }else{
+                    commandBuild = null;
+                }
             }
         }else if(button == KeyCode.mouseRight){
             //right click: move to position
 
+            //move to location - TODO right click instead?
+            Vec2 target = input.mouseWorld().cpy();
+
             if(selectedUnits.size > 0){
-                //move to location - TODO right click instead?
-                Vec2 target = input.mouseWorld().cpy();
 
                 Teamc attack = world.buildWorld(target.x, target.y);
 
@@ -728,6 +743,10 @@ public class DesktopInput extends InputHandler{
                 }
 
                 Call.commandUnits(player, ids, attack instanceof Building b ? b : null, attack instanceof Unit u ? u : null, target);
+            }
+
+            if(commandBuild != null){
+                Call.commandBuilding(player, commandBuild, target);
             }
         }
 

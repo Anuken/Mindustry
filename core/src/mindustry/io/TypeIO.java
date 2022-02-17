@@ -486,6 +486,21 @@ public class TypeIO{
         return JsonIO.read(Rules.class, string);
     }
 
+    public static void writeVecNullable(Writes write, @Nullable Vec2 v){
+        if(v == null){
+            write.f(Float.NaN);
+            write.f(Float.NaN);
+        }else{
+            write.f(v.x);
+            write.f(v.y);
+        }
+    }
+
+    public static @Nullable Vec2 readVecNullable(Reads read){
+        float x = read.f(), y = read.f();
+        return Float.isNaN(x) || Float.isNaN(y) ? null : new Vec2(x, y);
+    }
+
     public static void writeVec2(Writes write, Vec2 v){
         if(v == null){
             write.f(0);

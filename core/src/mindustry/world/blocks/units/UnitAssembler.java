@@ -18,6 +18,7 @@ import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -52,6 +53,7 @@ public class UnitAssembler extends PayloadBlock{
         regionRotated1 = 1;
         sync = true;
         group = BlockGroup.units;
+        commandable = true;
     }
 
     public Rect getRect(Rect rect, float x, float y, int rotation){
@@ -190,6 +192,7 @@ public class UnitAssembler extends PayloadBlock{
         //holds drone IDs that have been sent, but not synced yet - add to list as soon as possible
         protected IntSeq whenSyncedUnits = new IntSeq();
 
+        public @Nullable Vec2 commandPos;
         public Seq<Unit> units = new Seq<>();
         public Seq<UnitAssemblerModuleBuild> modules = new Seq<>();
         public PayloadSeq blocks = new PayloadSeq();
@@ -398,6 +401,9 @@ public class UnitAssembler extends PayloadBlock{
 
             if(!net.client()){
                 var unit = plan.unit.create(team);
+                if(unit != null && unit.isCommandable()){
+                    unit.command().commandPosition(commandPos);
+                }
                 unit.set(spawn.x + Mathf.range(0.001f), spawn.y + Mathf.range(0.001f));
                 unit.rotation = 90f;
                 unit.add();
@@ -547,6 +553,21 @@ public class UnitAssembler extends PayloadBlock{
         }
 
         @Override
+        public Vec2 getCommandPosition(){
+            return commandPos;
+        }
+
+        @Override
+        public void onCommand(Vec2 target){
+            commandPos = target;
+        }
+
+        @Override
+        public byte version(){
+            return 1;
+        }
+
+        @Override
         public void write(Writes write){
             super.write(write);
 
@@ -557,6 +578,7 @@ public class UnitAssembler extends PayloadBlock{
             }
 
             blocks.write(write);
+            TypeIO.writeVecNullable(write, commandPos);
         }
 
         @Override
@@ -571,6 +593,9 @@ public class UnitAssembler extends PayloadBlock{
             whenSyncedUnits.clear();
 
             blocks.read(read);
+            if(revision >= 1){
+                commandPos = TypeIO.readVecNullable(read);
+            }
         }
     }
 }

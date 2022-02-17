@@ -3,6 +3,7 @@ package mindustry.world.blocks.units;
 import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
@@ -13,6 +14,7 @@ import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -31,6 +33,7 @@ public class Reconstructor extends UnitBlock{
         super(name);
         regionRotated1 = 1;
         regionRotated2 = 2;
+        commandable = true;
     }
 
     @Override
@@ -108,9 +111,20 @@ public class Reconstructor extends UnitBlock{
     }
 
     public class ReconstructorBuild extends UnitBuild{
+        public @Nullable Vec2 commandPos;
 
         public float fraction(){
             return progress / constructTime;
+        }
+
+        @Override
+        public Vec2 getCommandPosition(){
+            return commandPos;
+        }
+
+        @Override
+        public void onCommand(Vec2 target){
+            commandPos = target;
         }
 
         @Override
@@ -213,6 +227,9 @@ public class Reconstructor extends UnitBlock{
                         //upgrade the unit
                         if(progress >= constructTime){
                             payload.unit = upgrade(payload.unit.type).create(payload.unit.team());
+                            if(commandPos != null && payload.unit.isCommandable()){
+                                payload.unit.command().commandPosition(commandPos);
+                            }
                             progress %= 1f;
                             Effect.shake(2f, 3f, this);
                             Fx.producesmoke.at(this);
@@ -261,7 +278,7 @@ public class Reconstructor extends UnitBlock{
 
         @Override
         public byte version(){
-            return 1;
+            return 2;
         }
 
         @Override
@@ -269,16 +286,20 @@ public class Reconstructor extends UnitBlock{
             super.write(write);
 
             write.f(progress);
+            TypeIO.writeVecNullable(write, commandPos);
         }
 
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
 
-            if(revision == 1){
+            if(revision >= 1){
                 progress = read.f();
             }
 
+            if(revision >= 2){
+                commandPos = TypeIO.readVecNullable(read);
+            }
         }
 
     }

@@ -281,6 +281,14 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         return controller instanceof CommandAI;
     }
 
+    public CommandAI command(){
+        if(controller instanceof CommandAI ai){
+            return ai;
+        }else{
+            throw new IllegalArgumentException("Unit cannot be commanded - check isCommandable() first.");
+        }
+    }
+
     public int count(){
         return team.data().countType(type);
     }

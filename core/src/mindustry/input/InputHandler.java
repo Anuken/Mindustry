@@ -80,6 +80,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     //for RTS controls
     public Seq<Unit> selectedUnits = new Seq<>();
+    public @Nullable Building commandBuild;
     public boolean commandMode = false;
     public boolean commandRect = false;
     public boolean tappedOne = false;
@@ -226,6 +227,20 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 Fx.moveCommand.at(posTarget);
             }
         }
+    }
+
+    @Remote(called = Loc.server, targets = Loc.both, forward = true)
+    public static void commandBuilding(Player player, Building build, Vec2 target){
+        if(player == null || build == null || build.team != player.team() || !build.block.commandable || target == null) return;
+
+        if(net.server() && !netServer.admins.allowAction(player, ActionType.commandBuilding, event -> {
+            event.tile = build.tile;
+        })){
+            throw new ValidateException(player, "Player cannot command building.");
+        }
+
+        build.onCommand(target);
+        Fx.moveCommand.at(target);
     }
 
     @Remote(called = Loc.server, targets = Loc.both, forward = true)
@@ -1062,12 +1077,16 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(build == null){
             frag.inv.hide();
             frag.config.hideConfig();
+            commandBuild = null;
             return false;
         }
         boolean consumed = false, showedInventory = false;
 
-        //check if tapped block is configurable
-        if(build.block.configurable && build.interactable(player.team())){
+        //select building for commanding
+        if(build.block.commandable && commandMode){
+            //TODO handled in tap.
+            consumed = true;
+        }else if(build.block.configurable && build.interactable(player.team())){ //check if tapped block is configurable
             consumed = true;
             if((!frag.config.isShown() && build.shouldShowConfigure(player)) //if the config fragment is hidden, show
             //alternatively, the current selected block can 'agree' to switch config tiles

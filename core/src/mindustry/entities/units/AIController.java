@@ -17,11 +17,13 @@ import static mindustry.Vars.*;
 
 public class AIController implements UnitController{
     protected static final Vec2 vec = new Vec2();
+    protected static final float rotateBackTimer = 60f * 5f;
     protected static final int timerTarget = 0, timerTarget2 = 1, timerTarget3 = 2, timerTarget4 = 3;
 
     protected Unit unit;
     protected Interval timer = new Interval(4);
     protected AIController fallback;
+    protected float noTargetTime;
 
     /** main target that is being faced */
     protected Teamc target;
@@ -128,8 +130,12 @@ public class AIController implements UnitController{
             target = findMainTarget(unit.x, unit.y, unit.range(), unit.type.targetAir, unit.type.targetGround);
         }
 
+        noTargetTime += Time.delta;
+
         if(invalid(target)){
             target = null;
+        }else{
+            noTargetTime = 0f;
         }
 
         unit.isShooting = false;
@@ -167,6 +173,13 @@ public class AIController implements UnitController{
             }
 
             unit.isShooting |= (mount.shoot = mount.rotate = shoot);
+
+            if(mount.target == null && !shoot && !Angles.within(mount.rotation, 0f, 0.01f) && noTargetTime >= rotateBackTimer){
+                mount.rotate = true;
+                Tmp.v1.trns(unit.rotation, 5f);
+                mount.aimX = mountX + Tmp.v1.x;
+                mount.aimY = mountY + Tmp.v1.y;
+            }
 
             if(shoot){
                 unit.aimX = mount.aimX;
