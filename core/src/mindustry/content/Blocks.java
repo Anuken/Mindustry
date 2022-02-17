@@ -3600,10 +3600,10 @@ public class Blocks{
         }};
 
         fabricator = new UnitFactory("fabricator"){{
-            requirements(Category.units, with(Items.silicon, 230, Items.oxide, 50, Items.beryllium, 230));
+            requirements(Category.units, with(Items.silicon, 200, Items.beryllium, 250));
             size = 3;
             configurable = false;
-            plans.add(new UnitPlan(UnitTypes.stell, 60f * 60f, with(Items.oxide, 15f, Items.silicon, 50f)));
+            plans.add(new UnitPlan(UnitTypes.stell, 60f * 60f, with(Items.graphite, 20f, Items.silicon, 30f)));
             consumePower(2f);
         }};
 
