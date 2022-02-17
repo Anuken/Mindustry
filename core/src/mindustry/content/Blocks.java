@@ -2603,7 +2603,7 @@ public class Blocks{
             //TODO should this be higher?
             buildCostMultiplier = 0.75f;
 
-            unitCapModifier = 4;
+            unitCapModifier = 5;
             researchCostMultiplier = 0.07f;
         }};
 
@@ -2617,7 +2617,7 @@ public class Blocks{
             thrusterLength = 40/4f;
             armor = 10f;
 
-            unitCapModifier = 6;
+            unitCapModifier = 10;
             researchCostMultipliers.put(Items.silicon, 0.4f);
             researchCostMultiplier = 0.14f;
         }};
@@ -2633,7 +2633,7 @@ public class Blocks{
             thrusterLength = 48/4f;
             armor = 15f;
 
-            unitCapModifier = 8;
+            unitCapModifier = 15;
             researchCostMultipliers.put(Items.silicon, 0.3f);
             researchCostMultiplier = 0.2f;
         }};
