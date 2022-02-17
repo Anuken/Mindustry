@@ -18,12 +18,12 @@ public class ConsumePayloadDynamic extends Consume{
 
     @Override
     public boolean valid(Building build){
-        return build.getBlockPayloads().contains(payloads.get(build));
+        return build.getPayloads().contains(payloads.get(build));
     }
 
     @Override
     public void trigger(Building build){
-        build.getBlockPayloads().remove(payloads.get(build));
+        build.getPayloads().remove(payloads.get(build));
     }
 
     @Override
@@ -48,7 +48,7 @@ public class ConsumePayloadDynamic extends Consume{
     }
 
     private void rebuild(Building build, Table table){
-        var inv = build.getBlockPayloads();
+        var inv = build.getPayloads();
         var pay = payloads.get(build);
 
         table.table(c -> {

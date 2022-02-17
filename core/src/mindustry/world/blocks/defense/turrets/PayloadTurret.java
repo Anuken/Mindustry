@@ -135,7 +135,7 @@ public class PayloadTurret extends Turret{
         }
 
         @Override
-        public PayloadSeq getBlockPayloads(){
+        public PayloadSeq getPayloads(){
             return payloads;
         }
 

@@ -535,7 +535,7 @@ public class UnitAssembler extends PayloadBlock{
         }
 
         @Override
-        public PayloadSeq getBlockPayloads(){
+        public PayloadSeq getPayloads(){
             return blocks;
         }
 

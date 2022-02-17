@@ -16,12 +16,12 @@ public class ConsumePayloads extends Consume{
 
     @Override
     public boolean valid(Building build){
-        return build.getBlockPayloads().contains(payloads);
+        return build.getPayloads().contains(payloads);
     }
 
     @Override
     public void trigger(Building build){
-        build.getBlockPayloads().remove(payloads);
+        build.getPayloads().remove(payloads);
     }
 
     @Override
@@ -38,7 +38,7 @@ public class ConsumePayloads extends Consume{
 
     @Override
     public void build(Building build, Table table){
-        var inv = build.getBlockPayloads();
+        var inv = build.getPayloads();
 
         table.table(c -> {
             int i = 0;

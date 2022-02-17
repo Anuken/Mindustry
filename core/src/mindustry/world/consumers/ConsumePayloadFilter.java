@@ -25,7 +25,7 @@ public class ConsumePayloadFilter extends Consume{
 
     @Override
     public boolean valid(Building build){
-        var payloads = build.getBlockPayloads();
+        var payloads = build.getPayloads();
         for(var block : fitting){
             if(payloads.contains(block, 1)){
                 return true;
@@ -36,7 +36,7 @@ public class ConsumePayloadFilter extends Consume{
 
     @Override
     public void trigger(Building build){
-        var payloads = build.getBlockPayloads();
+        var payloads = build.getPayloads();
         for(var block : fitting){
             if(payloads.contains(block, 1)){
                 payloads.remove(block);
@@ -52,7 +52,7 @@ public class ConsumePayloadFilter extends Consume{
 
     @Override
     public void build(Building build, Table table){
-        var inv = build.getBlockPayloads();
+        var inv = build.getPayloads();
 
         MultiReqImage image = new MultiReqImage();
 
