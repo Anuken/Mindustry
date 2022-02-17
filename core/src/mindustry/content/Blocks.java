@@ -146,8 +146,7 @@ public class Blocks{
 
     //payloads
     payloadConveyor, payloadRouter, reinforcedPayloadConveyor, reinforcedPayloadRouter, payloadMassDriver, payloadPropulsionTower, smallDeconstructor, deconstructor, constructor, largeConstructor, payloadLoader, payloadUnloader,
-
-
+    
     //logic
     message, switchBlock, microProcessor, logicProcessor, hyperProcessor, largeLogicDisplay, logicDisplay, memoryCell, memoryBank,
     worldProcessor, worldCell,
@@ -1238,6 +1237,7 @@ public class Blocks{
             drawer.iconOverride = new String[]{""};
             size = 2;
             heatOutput = 3f;
+            regionRotated1 = 1;
             consumePower(50f / 60f);
         }};
 
@@ -1260,6 +1260,7 @@ public class Blocks{
 
             size = 3;
             drawer = new DrawMulti(new DrawHeatOutput(true), new DrawHeatInput("-heat"));
+            regionRotated1 = 1;
         }};
 
         slagIncinerator = new ItemIncinerator("slag-incinerator"){{
@@ -1869,32 +1870,37 @@ public class Blocks{
             requirements(Category.distribution, with(Items.graphite, 1));
             //TODO bad idea? should this just require 1 beryllium?
             buildVisibility = BuildVisibility.berylliumOnly;
+            health = 90;
             speed = 4f;
         }};
 
         ductRouter = new DuctRouter("duct-router"){{
             requirements(Category.distribution, with(Items.graphite, 8, Items.beryllium, 4));
+            health = 90;
             speed = 4f;
         }};
 
         overflowDuct = new OverflowDuct("overflow-duct"){{
             requirements(Category.distribution, with(Items.graphite, 8, Items.beryllium, 8));
+            health = 90;
             speed = 4f;
         }};
 
         ductBridge = new DuctBridge("duct-bridge"){{
             requirements(Category.distribution, with(Items.graphite, 15, Items.beryllium, 10));
+            health = 90;
             speed = 4f;
         }};
 
         ductUnloader = new DirectionalUnloader("duct-unloader"){{
             requirements(Category.distribution, with(Items.graphite, 20, Items.silicon, 20, Items.tungsten, 10));
+            health = 90;
             speed = 4f;
         }};
 
         surgeConveyor = new StackConveyor("surge-conveyor"){{
             requirements(Category.distribution, with(Items.surgeAlloy, 3, Items.oxide, 5));
-            health = 90;
+            health = 130;
             //TODO different base speed/item capacity?
             speed = 5f / 60f;
             itemCapacity = 10;
@@ -1909,6 +1915,7 @@ public class Blocks{
 
         surgeRouter = new StackRouter("surge-router"){{
             requirements(Category.distribution, with(Items.oxide, 10, Items.surgeAlloy, 10));
+            health = 130;
 
             speed = 6f;
 
@@ -2138,6 +2145,7 @@ public class Blocks{
         beamNode = new BeamNode("beam-node"){{
             requirements(Category.power, with(Items.graphite, 5, Items.beryllium, 3));
             consumesPower = outputsPower = true;
+            health = 90;
             consumePowerBuffered(1000f);
             range = 10;
             researchCostMultiplier = 0.8f;
@@ -2150,6 +2158,7 @@ public class Blocks{
             consumesPower = outputsPower = true;
             consumePowerBuffered(40000f);
             range = 23;
+            scaledHealth = 90;
         }};
 
         beamLink = new LongPowerNode("beam-link"){{
@@ -2160,6 +2169,7 @@ public class Blocks{
             autolink = false;
             laserColor2 = Color.valueOf("ffd9c2");
             laserScale = 0.8f;
+            scaledHealth = 130;
         }};
 
         combustionGenerator = new BurnerGenerator("combustion-generator"){{
@@ -2602,7 +2612,7 @@ public class Blocks{
             //TODO should this be higher?
             buildCostMultiplier = 0.75f;
 
-            unitCapModifier = 5;
+            unitCapModifier = 30;
             researchCostMultiplier = 0.07f;
         }};
 
@@ -2616,7 +2626,7 @@ public class Blocks{
             thrusterLength = 40/4f;
             armor = 10f;
 
-            unitCapModifier = 10;
+            unitCapModifier = 30;
             researchCostMultipliers.put(Items.silicon, 0.4f);
             researchCostMultiplier = 0.14f;
         }};
@@ -2632,7 +2642,7 @@ public class Blocks{
             thrusterLength = 48/4f;
             armor = 15f;
 
-            unitCapModifier = 15;
+            unitCapModifier = 30;
             researchCostMultipliers.put(Items.silicon, 0.3f);
             researchCostMultiplier = 0.2f;
         }};
@@ -3696,7 +3706,7 @@ public class Blocks{
             //TODO 500 or 400? does it need to be better than the standard mass driver?
             range = 450f;
             maxPayloadSize = 2.5f;
-            consumePower(2f);
+            consumePower(0.5f);
         }};
 
         payloadPropulsionTower = new PayloadMassDriver("payload-propulsion-tower"){{

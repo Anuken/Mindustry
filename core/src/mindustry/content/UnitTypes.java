@@ -3369,7 +3369,7 @@ public class UnitTypes{
             speed = 2f;
             rotateSpeed = 9f;
             accel = 0.1f;
-            itemCapacity = 60;
+            itemCapacity = 50;
             health = 200f;
             hitSize = 11f;
             engineSize = 2.3f;

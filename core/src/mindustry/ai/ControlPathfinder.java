@@ -266,6 +266,8 @@ public class ControlPathfinder{
     private void start(){
         stop();
 
+        if(net.client()) return;
+
         //TODO currently capped at 6 threads, might be a good idea to make it more?
         threads = new PathfindThread[Mathf.clamp(Runtime.getRuntime().availableProcessors() - 2, 1, 6)];
         for(int i = 0; i < threads.length; i ++){

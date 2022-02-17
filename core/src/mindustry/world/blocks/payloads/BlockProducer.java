@@ -80,6 +80,11 @@ public abstract class BlockProducer extends PayloadBlock{
         }
 
         @Override
+        public boolean shouldConsume(){
+            return super.shouldConsume() && recipe() != null;
+        }
+
+        @Override
         public void updateTile(){
             super.updateTile();
             var recipe = recipe();
