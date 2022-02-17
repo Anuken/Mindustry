@@ -2,23 +2,25 @@ package mindustry.world.consumers;
 
 import arc.func.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import mindustry.*;
+import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.ui.*;
-import mindustry.world.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
 public class ConsumePayloadFilter extends Consume{
     //cache fitting blocks to prevent search over all blocks later
-    protected final Block[] fitting;
+    protected final UnlockableContent[] fitting;
 
-    public Boolf<Block> filter;
+    public Boolf<UnlockableContent> filter;
 
-    public ConsumePayloadFilter(Boolf<Block> filter){
+    public ConsumePayloadFilter(Boolf<UnlockableContent> filter){
         this.filter = filter;
-        this.fitting = Vars.content.blocks().select(filter).toArray(Block.class);
+        this.fitting = Vars.content.blocks().copy().<UnlockableContent>as().and(content.units().as())
+            .select(filter).toArray(UnlockableContent.class);
     }
 
     @Override
@@ -45,7 +47,7 @@ public class ConsumePayloadFilter extends Consume{
 
     @Override
     public void display(Stats stats){
-        stats.add(booster ? Stat.booster : Stat.input, StatValues.blocks(filter));
+        stats.add(booster ? Stat.booster : Stat.input, StatValues.content(new Seq<>(fitting)));
     }
 
     @Override

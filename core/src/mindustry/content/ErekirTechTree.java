@@ -220,11 +220,6 @@ public class ErekirTechTree{
             });
 
             node(tankAssembler, Seq.with(new OnSector(four), new Research(constructor), new Research(atmosphericConcentrator)), () -> {
-                //auto-unlock?
-                node(primeControlCore, () -> {
-
-                });
-
                 node(UnitTypes.vanquish, () -> {
                     node(UnitTypes.conquer, Seq.with(tmpNever), () -> {
 

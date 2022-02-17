@@ -197,16 +197,12 @@ public class StatValues{
         });
     }
 
-    public static StatValue blocks(Boolf<Block> pred){
-        return blocks(content.blocks().select(pred));
-    }
-
-    public static StatValue blocks(Seq<Block> list){
+    public static StatValue content(Seq<UnlockableContent> list){
         return table -> table.table(l -> {
             l.left();
 
             for(int i = 0; i < list.size; i++){
-                Block item = list.get(i);
+                var item = list.get(i);
 
                 l.image(item.uiIcon).size(iconSmall).padRight(2).padLeft(2).padTop(3).padBottom(3);
                 l.add(item.localizedName).left().padLeft(1).padRight(4);
@@ -215,6 +211,14 @@ public class StatValues{
                 }
             }
         });
+    }
+
+    public static StatValue blocks(Boolf<Block> pred){
+        return blocks(content.blocks().select(pred));
+    }
+
+    public static StatValue blocks(Seq<Block> list){
+        return content(list.as());
     }
 
     public static StatValue boosters(float reload, float maxUsed, float multiplier, boolean baseReload, Boolf<Liquid> filter){

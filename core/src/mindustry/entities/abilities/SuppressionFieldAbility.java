@@ -73,6 +73,10 @@ public class SuppressionFieldAbility extends Ability{
         Draw.color(color);
         Fill.circle(rx, ry, rad * orbMidScl);
 
+        if(active){
+            //TODO draw range when selected?
+        }
+
         Draw.reset();
     }
 }

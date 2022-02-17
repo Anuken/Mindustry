@@ -1,6 +1,7 @@
 package mindustry.mod;
 
 import arc.struct.*;
+import mindustry.type.*;
 import mindustry.world.blocks.legacy.*;
 import mindustry.world.consumers.*;
 
@@ -75,8 +76,8 @@ public class ClassMap{
         classes.put("Research", mindustry.game.Objectives.Research.class);
         classes.put("SectorComplete", mindustry.game.Objectives.SectorComplete.class);
         classes.put("AmmoType", mindustry.type.AmmoType.class);
-        classes.put("BlockSeq", mindustry.type.BlockSeq.class);
-        classes.put("BlockStack", mindustry.type.BlockStack.class);
+        classes.put("BlockSeq", PayloadSeq.class);
+        classes.put("BlockStack", PayloadStack.class);
         classes.put("Category", mindustry.type.Category.class);
         classes.put("CellLiquid", mindustry.type.CellLiquid.class);
         classes.put("ErrorContent", mindustry.type.ErrorContent.class);

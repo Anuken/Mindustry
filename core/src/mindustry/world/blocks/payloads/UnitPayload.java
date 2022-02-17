@@ -9,6 +9,7 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
 import mindustry.core.*;
+import mindustry.ctype.*;
 import mindustry.entities.EntityCollisions.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
@@ -38,6 +39,11 @@ public class UnitPayload implements Payload{
     public void showOverlay(TextureRegionDrawable icon){
         if(icon == null || headless) return;
         showOverlay(icon.getRegion());
+    }
+
+    @Override
+    public UnlockableContent content(){
+        return unit.type;
     }
 
     @Override

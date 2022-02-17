@@ -9,11 +9,11 @@ import mindustry.ui.*;
 import mindustry.world.meta.*;
 
 public class ConsumePayloadDynamic extends Consume{
-    public final Func<Building, Seq<BlockStack>> payloads;
+    public final Func<Building, Seq<PayloadStack>> payloads;
 
     @SuppressWarnings("unchecked")
-    public <T extends Building>  ConsumePayloadDynamic(Func<T, Seq<BlockStack>> payloads){
-        this.payloads = (Func<Building, Seq<BlockStack>>)payloads;
+    public <T extends Building>  ConsumePayloadDynamic(Func<T, Seq<PayloadStack>> payloads){
+        this.payloads = (Func<Building, Seq<PayloadStack>>)payloads;
     }
 
     @Override
@@ -54,8 +54,8 @@ public class ConsumePayloadDynamic extends Consume{
         table.table(c -> {
             int i = 0;
             for(var stack : pay){
-                c.add(new ReqImage(new ItemImage(stack.block.uiIcon, stack.amount),
-                () -> inv.contains(stack.block, stack.amount))).padRight(8);
+                c.add(new ReqImage(new ItemImage(stack.item.uiIcon, stack.amount),
+                () -> inv.contains(stack.item, stack.amount))).padRight(8);
                 if(++i % 4 == 0) c.row();
             }
         }).left();

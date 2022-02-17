@@ -253,9 +253,14 @@ public class Fx{
         float x = Tmp.v1.x, y = Tmp.v1.y;
 
         scl(e.fout(Interp.pow3Out) * 1.05f);
-        Drawf.squareShadow(x, y, data.block.size * tilesize * 1.85f, 1f);
+        if(data.item instanceof Block block){
+            Drawf.squareShadow(x, y, block.size * tilesize * 1.85f, 1f);
+        }else if(data.item instanceof UnitType unit){
+            unit.drawSoftShadow(e.x, e.y, e.rotation, 1f);
+        }
+
         mixcol(Pal.accent, e.fin());
-        rect(data.block.fullIcon, x, y);
+        rect(data.item.fullIcon, x, y, data.item instanceof Block ? 0f : e.rotation - 90f);
     }).layer(Layer.flyingUnitLow - 5f),
 
     select = new Effect(23, e -> {

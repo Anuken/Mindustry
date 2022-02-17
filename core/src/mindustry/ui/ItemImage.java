@@ -38,7 +38,7 @@ public class ItemImage extends Stack{
         }
     }
 
-    public ItemImage(BlockStack stack){
-        this(stack.block.uiIcon, stack.amount);
+    public ItemImage(PayloadStack stack){
+        this(stack.item.uiIcon, stack.amount);
     }
 }

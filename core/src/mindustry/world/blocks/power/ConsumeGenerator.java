@@ -17,7 +17,7 @@ public class ConsumeGenerator extends PowerGenerator{
     public float itemDuration = 120f;
 
     public float effectChance = 0.01f;
-    public Effect generateEffect = Fx.none;
+    public Effect generateEffect = Fx.none, consumeEffect = Fx.none;
     public float generateEffectRange = 3f;
 
     public @Nullable LiquidStack liquidOutput;
@@ -79,6 +79,7 @@ public class ConsumeGenerator extends PowerGenerator{
             //take in items periodically
             if(hasItems && valid && generateTime <= 0f && items.any()){
                 consume();
+                consumeEffect.at(x + Mathf.range(generateEffectRange), y + Mathf.range(generateEffectRange));
                 generateTime = 1f;
             }
 
@@ -90,6 +91,10 @@ public class ConsumeGenerator extends PowerGenerator{
 
             //generation time always goes down, but only at the end so consumeTriggerValid doesn't assume fake items
             generateTime -= Math.min(1f / itemDuration * delta(), generateTime);
+        }
+
+        public float getEfficiencyMultiplier(){
+            return 1f;
         }
 
         @Override

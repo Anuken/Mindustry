@@ -4,6 +4,7 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.io.*;
+import mindustry.ctype.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -18,9 +19,9 @@ import static mindustry.Vars.*;
 
 //TODO visuals!
 public class PayloadTurret extends Turret{
-    public ObjectMap<Block, BulletType> ammoTypes = new ObjectMap<>();
+    public ObjectMap<UnlockableContent, BulletType> ammoTypes = new ObjectMap<>();
 
-    protected Block[] ammoKeys;
+    protected UnlockableContent[] ammoKeys;
 
     public PayloadTurret(String name){
         super(name);
@@ -62,7 +63,7 @@ public class PayloadTurret extends Turret{
             public void build(Building build, Table table){
                 MultiReqImage image = new MultiReqImage();
                 content.blocks().each(i -> filter.get(i) && i.unlockedNow(), block -> image.add(new ReqImage(new Image(block.uiIcon),
-                () -> build instanceof PayloadTurretBuild it && !it.blocks.isEmpty() && it.currentBlock() == block)));
+                () -> build instanceof PayloadTurretBuild it && !it.payloads.isEmpty() && it.currentBlock() == block)));
 
                 table.add(image).size(8 * 4);
             }
@@ -70,7 +71,7 @@ public class PayloadTurret extends Turret{
             @Override
             public boolean valid(Building build){
                 //valid when there's any ammo in the turret
-                return build instanceof PayloadTurretBuild it && it.blocks.any();
+                return build instanceof PayloadTurretBuild it && it.payloads.any();
             }
 
             @Override
@@ -85,11 +86,11 @@ public class PayloadTurret extends Turret{
     }
 
     public class PayloadTurretBuild extends TurretBuild{
-        public BlockSeq blocks = new BlockSeq();
+        public PayloadSeq payloads = new PayloadSeq();
 
-        public Block currentBlock(){
-            for(Block block : ammoKeys){
-                if(blocks.contains(block)){
+        public UnlockableContent currentBlock(){
+            for(var block : ammoKeys){
+                if(payloads.contains(block)){
                     return block;
                 }
             }
@@ -98,25 +99,25 @@ public class PayloadTurret extends Turret{
 
         @Override
         public boolean acceptPayload(Building source, Payload payload){
-            return payload instanceof BuildPayload build && blocks.total() < maxAmmo && ammoTypes.containsKey(build.block());
+            return payload instanceof BuildPayload build && payloads.total() < maxAmmo && ammoTypes.containsKey(build.block());
         }
 
         @Override
         public void handlePayload(Building source, Payload payload){
-            blocks.add(((BuildPayload)payload).block());
+            payloads.add(((BuildPayload)payload).block());
         }
 
         @Override
         public boolean hasAmmo(){
-            return blocks.total() > 0;
+            return payloads.total() > 0;
         }
 
         @Override
         public BulletType useAmmo(){
             ejectEffects();
-            for(Block block : ammoKeys){
-                if(blocks.contains(block)){
-                    blocks.remove(block);
+            for(var block : ammoKeys){
+                if(payloads.contains(block)){
+                    payloads.remove(block);
                     return ammoTypes.get(block);
                 }
             }
@@ -125,8 +126,8 @@ public class PayloadTurret extends Turret{
 
         @Override
         public BulletType peekAmmo(){
-            for(Block block : ammoKeys){
-                if(blocks.contains(block)){
+            for(var block : ammoKeys){
+                if(payloads.contains(block)){
                     return ammoTypes.get(block);
                 }
             }
@@ -134,13 +135,13 @@ public class PayloadTurret extends Turret{
         }
 
         @Override
-        public BlockSeq getBlockPayloads(){
-            return blocks;
+        public PayloadSeq getBlockPayloads(){
+            return payloads;
         }
 
         @Override
         public void updateTile(){
-            totalAmmo = blocks.total();
+            totalAmmo = payloads.total();
             unit.ammo((float)unit.type().ammoCapacity * totalAmmo / maxAmmo);
 
             super.updateTile();
@@ -157,13 +158,13 @@ public class PayloadTurret extends Turret{
         @Override
         public void write(Writes write){
             super.write(write);
-            blocks.write(write);
+            payloads.write(write);
         }
 
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
-            blocks.read(read);
+            payloads.read(read);
             //TODO remove invalid ammo
         }
     }

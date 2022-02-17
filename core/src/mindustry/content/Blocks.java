@@ -140,7 +140,6 @@ public class Blocks{
     tankAssembler, shipAssembler, mechAssembler,
     //TODO maybe making it 5x5 would be more appropriate, seems kinda cheap.
     basicAssemblerModule,
-    primeControlCore,
 
     //TODO remove
     droneCenter,
@@ -3592,13 +3591,6 @@ public class Blocks{
         //endregion
         //region units - erekir
 
-        primeControlCore = new ControlCore("prime-control-core"){{
-            requirements(Category.units, with(Items.silicon, 120, Items.oxide, 30));
-            size = 2;
-            placeablePlayer = false;
-            researchCostMultiplier = 0f;
-        }};
-
         fabricator = new UnitFactory("fabricator"){{
             requirements(Category.units, with(Items.silicon, 200, Items.beryllium, 250));
             size = 3;
@@ -3611,7 +3603,7 @@ public class Blocks{
             requirements(Category.units, with(Items.graphite, 600, Items.beryllium, 600, Items.oxide, 250, Items.tungsten, 400, Items.silicon, 500));
             size = 5;
             //TODO remove ducts and crushers, replace with 2-3 high cost special blocks with silicon requirements
-            plans.add(new AssemblerUnitPlan(UnitTypes.vanquish, 60f * 50f, BlockStack.list(Blocks.tungstenWallLarge, 10, Blocks.primeControlCore, 2)));
+            plans.add(new AssemblerUnitPlan(UnitTypes.vanquish, 60f * 50f, PayloadStack.list(UnitTypes.stell, 4, Blocks.tungstenWallLarge, 12)));
             consumePower(3f);
             areaSize = 13;
             researchCostMultiplier = 0.4f;
@@ -3623,7 +3615,8 @@ public class Blocks{
         shipAssembler = new UnitAssembler("ship-assembler"){{
             requirements(Category.units, with(Items.beryllium, 700, Items.oxide, 300, Items.tungsten, 500, Items.silicon, 800));
             size = 5;
-            plans.add(new AssemblerUnitPlan(UnitTypes.quell, 60f * 60f, BlockStack.list(Blocks.berylliumWallLarge, 20, Blocks.primeControlCore, 2)));
+            //TODO not stell
+            plans.add(new AssemblerUnitPlan(UnitTypes.quell, 60f * 60f, PayloadStack.list(Blocks.berylliumWallLarge, 20, UnitTypes.stell, 2)));
             consumePower(3f);
             areaSize = 13;
             researchCostMultiplier = 0.4f;
@@ -3636,7 +3629,8 @@ public class Blocks{
             requirements(Category.units, with(Items.graphite, 500, Items.thorium, 600, Items.oxide, 200, Items.tungsten, 500, Items.silicon, 900));
             size = 5;
             //TODO different reqs
-            plans.add(new AssemblerUnitPlan(UnitTypes.bulwark, 60f * 60f, BlockStack.list(Blocks.tungstenWallLarge, 12, Blocks.primeControlCore, 2)));
+            //TODO not stell
+            plans.add(new AssemblerUnitPlan(UnitTypes.bulwark, 60f * 60f, PayloadStack.list(Blocks.tungstenWallLarge, 12, UnitTypes.stell, 2)));
             consumePower(3f);
             areaSize = 13;
             researchCostMultiplier = 0.4f;
@@ -3739,7 +3733,7 @@ public class Blocks{
             consumePower(2f);
             size = 3;
             //TODO expand this list
-            filter = Seq.with(Blocks.primeControlCore, Blocks.tungstenWallLarge, Blocks.berylliumWallLarge, Blocks.reinforcedLiquidContainer, Blocks.beamNode);
+            filter = Seq.with(Blocks.tungstenWallLarge, Blocks.berylliumWallLarge, Blocks.reinforcedLiquidContainer, Blocks.beamNode);
         }};
 
         //yes this block is pretty much useless

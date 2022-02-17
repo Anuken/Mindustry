@@ -458,6 +458,11 @@ public class ContentParser{
                     value.remove("controller");
                 }
 
+                if(value.has("unitBasedController")){
+                    unit.unitBasedDefaultController = u -> supply(resolve(value.getString("unitBasedController"), FlyingAI.class)).get();
+                    value.remove("unitBasedController");
+                }
+
                 //read extra default waves
                 if(value.has("waves")){
                     JsonValue waves = value.remove("waves");

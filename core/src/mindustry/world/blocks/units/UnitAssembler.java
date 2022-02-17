@@ -12,6 +12,7 @@ import arc.util.io.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
@@ -50,6 +51,7 @@ public class UnitAssembler extends PayloadBlock{
         flags = EnumSet.of(BlockFlag.unitAssembler);
         regionRotated1 = 1;
         sync = true;
+        group = BlockGroup.units;
     }
 
     public Rect getRect(Rect rect, float x, float y, int rotation){
@@ -148,10 +150,10 @@ public class UnitAssembler extends PayloadBlock{
 
     public static class AssemblerUnitPlan{
         public UnitType unit;
-        public Seq<BlockStack> requirements;
+        public Seq<PayloadStack> requirements;
         public float time;
 
-        public AssemblerUnitPlan(UnitType unit, float time, Seq<BlockStack> requirements){
+        public AssemblerUnitPlan(UnitType unit, float time, Seq<PayloadStack> requirements){
             this.unit = unit;
             this.time = time;
             this.requirements = requirements;
@@ -163,11 +165,11 @@ public class UnitAssembler extends PayloadBlock{
     /** hbgwerjhbagjegwg */
     public static class YeetData{
         public Vec2 target;
-        public Block block;
+        public UnlockableContent item;
 
-        public YeetData(Vec2 target, Block block){
+        public YeetData(Vec2 target, UnlockableContent item){
             this.target = target;
-            this.block = block;
+            this.item = item;
         }
     }
 
@@ -183,14 +185,14 @@ public class UnitAssembler extends PayloadBlock{
         build.droneSpawned(id);
     }
 
-    public class UnitAssemblerBuild extends PayloadBlockBuild<BuildPayload>{
+    public class UnitAssemblerBuild extends PayloadBlockBuild<Payload>{
         protected IntSeq readUnits = new IntSeq();
         //holds drone IDs that have been sent, but not synced yet - add to list as soon as possible
         protected IntSeq whenSyncedUnits = new IntSeq();
 
         public Seq<Unit> units = new Seq<>();
         public Seq<UnitAssemblerModuleBuild> modules = new Seq<>();
-        public BlockSeq blocks = new BlockSeq();
+        public PayloadSeq blocks = new PayloadSeq();
         public float progress, warmup, droneWarmup, powerWarmup, sameTypeWarmup;
         public float invalidWarmup = 0f;
         public int currentTier = 0;
@@ -518,12 +520,12 @@ public class UnitAssembler extends PayloadBlock{
             return consValid() && !wasOccupied;
         }
 
-        public void yeetPayload(BuildPayload payload){
+        public void yeetPayload(Payload payload){
             var spawn = getUnitSpawn();
-            blocks.add(payload.block(), 1);
+            blocks.add(payload.content(), 1);
             float rot = payload.angleTo(spawn);
             Fx.shootPayloadDriver.at(payload.x(), payload.y(), rot);
-            Fx.payloadDeposit.at(payload.x(), payload.y(), rot, new YeetData(spawn.cpy(), payload.block()));
+            Fx.payloadDeposit.at(payload.x(), payload.y(), rot, new YeetData(spawn.cpy(), payload.content()));
         }
 
         @Override
@@ -533,7 +535,7 @@ public class UnitAssembler extends PayloadBlock{
         }
 
         @Override
-        public BlockSeq getBlockPayloads(){
+        public PayloadSeq getBlockPayloads(){
             return blocks;
         }
 
@@ -541,7 +543,7 @@ public class UnitAssembler extends PayloadBlock{
         public boolean acceptPayload(Building source, Payload payload){
             var plan = plan();
             return (this.payload == null || source instanceof UnitAssemblerModuleBuild) &&
-                    payload instanceof BuildPayload bp && plan.requirements.contains(b -> b.block == bp.block() && blocks.get(bp.block()) < b.amount);
+                    plan.requirements.contains(b -> b.item == payload.content() && blocks.get(payload.content()) < b.amount);
         }
 
         @Override

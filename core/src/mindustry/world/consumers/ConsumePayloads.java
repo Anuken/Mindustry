@@ -8,9 +8,9 @@ import mindustry.ui.*;
 import mindustry.world.meta.*;
 
 public class ConsumePayloads extends Consume{
-    public Seq<BlockStack> payloads;
+    public Seq<PayloadStack> payloads;
 
-    public ConsumePayloads(Seq<BlockStack> payloads){
+    public ConsumePayloads(Seq<PayloadStack> payloads){
         this.payloads = payloads;
     }
 
@@ -31,7 +31,7 @@ public class ConsumePayloads extends Consume{
         for(var stack : payloads){
             stats.add(Stat.input, t -> {
                 t.add(new ItemImage(stack));
-                t.add(stack.block.localizedName).padLeft(4).padRight(4);
+                t.add(stack.item.localizedName).padLeft(4).padRight(4);
             });
         }
     }
@@ -43,8 +43,8 @@ public class ConsumePayloads extends Consume{
         table.table(c -> {
             int i = 0;
             for(var stack : payloads){
-                c.add(new ReqImage(new ItemImage(stack.block.uiIcon, stack.amount),
-                () -> inv.contains(stack.block, stack.amount))).padRight(8);
+                c.add(new ReqImage(new ItemImage(stack.item.uiIcon, stack.amount),
+                () -> inv.contains(stack.item, stack.amount))).padRight(8);
                 if(++i % 4 == 0) c.row();
             }
         }).left();

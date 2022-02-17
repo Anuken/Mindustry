@@ -61,7 +61,7 @@ public class UnitAssemblerModule extends PayloadBlock{
         return results.find(b -> b.moduleFits(this, x * tilesize + offset, y * tilesize + offset, rotation));
     }
 
-    public class UnitAssemblerModuleBuild extends PayloadBlockBuild<BuildPayload>{
+    public class UnitAssemblerModuleBuild extends PayloadBlockBuild<Payload>{
         public UnitAssemblerBuild link;
         public int lastChange = -2;
 

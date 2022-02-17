@@ -112,9 +112,11 @@ public class UnitType extends UnlockableContent{
     /** Target items to mine. Used in MinerAI */
     public Seq<Item> mineItems = Seq.with(Items.copper, Items.lead, Items.titanium, Items.thorium);
 
+    //TODO different names for these fields.
     /** The default AI controller to assign on creation. */
     public Prov<? extends UnitController> defaultController = () -> !flying ? new GroundAI() : new FlyingAI();
     /** Function that chooses AI controller based on unit entity. */
+    //TODO -name is too long
     public Func<Unit, ? extends UnitController> unitBasedDefaultController = u -> !playerControllable || u.team.isAI() ? defaultController.get() : new CommandAI();
 
     public Color outlineColor = Pal.darkerMetal;
@@ -713,8 +715,14 @@ public class UnitType extends UnlockableContent{
                     }
                     ItemSeq reqs = new ItemSeq();
                     for(var bstack : plan.requirements){
-                        for(var stack : bstack.block.requirements){
-                            reqs.add(stack.item, stack.amount * bstack.amount);
+                        if(bstack.item instanceof Block block){
+                            for(var stack : block.requirements){
+                                reqs.add(stack.item, stack.amount * bstack.amount);
+                            }
+                        }else if(bstack.item instanceof UnitType unit){
+                            for(var stack : unit.getTotalRequirements()){
+                                reqs.add(stack.item, stack.amount * bstack.amount);
+                            }
                         }
                     }
                     return reqs.toArray();
@@ -911,10 +919,14 @@ public class UnitType extends UnlockableContent{
     }
 
     public void drawSoftShadow(Unit unit, float alpha){
+        drawSoftShadow(unit.x, unit.y, unit.rotation, alpha);
+    }
+
+    public void drawSoftShadow(float x, float y, float rotation, float alpha){
         Draw.color(0, 0, 0, 0.4f * alpha);
         float rad = 1.6f;
         float size = Math.max(region.width, region.height) * Draw.scl;
-        Draw.rect(softShadowRegion, unit, size * rad * Draw.xscl, size * rad * Draw.yscl, unit.rotation - 90);
+        Draw.rect(softShadowRegion, x, y, size * rad * Draw.xscl, size * rad * Draw.yscl, rotation - 90);
         Draw.color();
     }
 

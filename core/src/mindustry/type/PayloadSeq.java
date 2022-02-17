@@ -3,10 +3,10 @@ package mindustry.type;
 import arc.struct.*;
 import arc.util.io.*;
 import mindustry.*;
-import mindustry.world.*;
+import mindustry.ctype.*;
 
-public class BlockSeq{
-    private ObjectIntMap<Block> blocks = new ObjectIntMap<>();
+public class PayloadSeq{
+    private ObjectIntMap<UnlockableContent> blocks = new ObjectIntMap<>();
     private int total;
 
     public boolean isEmpty(){
@@ -21,25 +21,25 @@ public class BlockSeq{
         return total;
     }
 
-    public void add(Block block){
+    public void add(UnlockableContent block){
         add(block, 1);
     }
 
-    public void add(Block block, int amount){
+    public void add(UnlockableContent block, int amount){
         blocks.increment(block, amount);
         total += amount;
     }
 
-    public void remove(Block block){
+    public void remove(UnlockableContent block){
         add(block, -1);
     }
 
-    public void remove(Block block, int amount){
+    public void remove(UnlockableContent block, int amount){
         add(block, -amount);
     }
 
-    public void remove(Seq<BlockStack> stacks){
-        stacks.each(b -> remove(b.block, b.amount));
+    public void remove(Seq<PayloadStack> stacks){
+        stacks.each(b -> remove(b.item, b.amount));
     }
 
     public void clear(){
@@ -47,24 +47,24 @@ public class BlockSeq{
         total = 0;
     }
 
-    public int get(Block block){
+    public int get(UnlockableContent block){
         return blocks.get(block);
     }
 
-    public boolean contains(Seq<BlockStack> stacks){
-        return !stacks.contains(b -> get(b.block) < b.amount);
+    public boolean contains(Seq<PayloadStack> stacks){
+        return !stacks.contains(b -> get(b.item) < b.amount);
     }
 
-    public boolean contains(Block block, int amount){
+    public boolean contains(UnlockableContent block, int amount){
         return get(block) >= amount;
     }
 
-    public boolean contains(Block block){
+    public boolean contains(UnlockableContent block){
         return get(block) >= 1;
     }
 
-    public boolean contains(BlockStack stack){
-        return get(stack.block) >= stack.amount;
+    public boolean contains(PayloadStack stack){
+        return get(stack.item) >= stack.amount;
     }
 
     public void write(Writes write){
