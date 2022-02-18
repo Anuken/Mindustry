@@ -13,14 +13,25 @@ import mindustry.world.blocks.ConstructBlock.*;
 import static mindustry.Vars.*;
 
 public class BuilderAI extends AIController{
-    public static float buildRadius = 1500, retreatDst = 110f, fleeRange = 370f, retreatDelay = Time.toSeconds * 2f;
+    public static float buildRadius = 1500, retreatDst = 110f, retreatDelay = Time.toSeconds * 2f;
 
     public @Nullable Unit following;
     public @Nullable Teamc enemy;
     public @Nullable BlockPlan lastPlan;
 
+    public float fleeRange = 370f;
+    public boolean alwaysFlee;
+
     boolean found = false;
     float retreatTimer;
+
+    public BuilderAI(boolean alwaysFlee, float fleeRange){
+        this.alwaysFlee = alwaysFlee;
+        this.fleeRange = fleeRange;
+    }
+
+    public BuilderAI(){
+    }
 
     @Override
     public void updateMovement(){
@@ -46,15 +57,16 @@ public class BuilderAI extends AIController{
             unit.plans.clear();
             unit.plans.addFirst(following.buildPlan());
             lastPlan = null;
-        }else if(unit.buildPlan() == null){
+        }else if(unit.buildPlan() == null || alwaysFlee){
             //not following anyone or building
             if(timer.get(timerTarget4, 40)){
                 enemy = target(unit.x, unit.y, fleeRange, true, true);
             }
 
             //fly away from enemy when not doing anything, but only after a delay
-            if((retreatTimer += Time.delta) >= retreatDelay){
+            if((retreatTimer += Time.delta) >= retreatDelay || alwaysFlee){
                 if(enemy != null){
+                    unit.clearBuilding();
                     var core = unit.closestCore();
                     if(core != null && !unit.within(core, retreatDst)){
                         moveTo(core, retreatDst);
@@ -64,7 +76,7 @@ public class BuilderAI extends AIController{
         }
 
         if(unit.buildPlan() != null){
-            retreatTimer = 0f;
+            if(!alwaysFlee) retreatTimer = 0f;
             //approach request if building
             BuildPlan req = unit.buildPlan();
 
@@ -131,7 +143,7 @@ public class BuilderAI extends AIController{
                 //check if it's already been placed
                 if(world.tile(block.x, block.y) != null && world.tile(block.x, block.y).block().id == block.block){
                     blocks.removeFirst();
-                }else if(Build.validPlace(content.block(block.block), unit.team(), block.x, block.y, block.rotation)){ //it's valid
+                }else if(Build.validPlace(content.block(block.block), unit.team(), block.x, block.y, block.rotation) && (!alwaysFlee || !nearEnemy(block.x, block.y))){ //it's valid
                     lastPlan = block;
                     //add build request
                     unit.addBuild(new BuildPlan(block.x, block.y, block.rotation, content.block(block.block), block.config));
@@ -145,6 +157,10 @@ public class BuilderAI extends AIController{
         }
     }
 
+    protected boolean nearEnemy(int x, int y){
+        return Units.nearEnemy(unit.team, x * tilesize - fleeRange/2f, y * tilesize - fleeRange/2f, fleeRange, fleeRange);
+    }
+
     @Override
     public AIController fallback(){
         return unit.type.flying ? new FlyingAI() : new GroundAI();
@@ -152,7 +168,7 @@ public class BuilderAI extends AIController{
 
     @Override
     public boolean useFallback(){
-        return state.rules.waves && unit.team == state.rules.waveTeam && !unit.team.rules().ai;
+        return state.rules.waves && unit.team == state.rules.waveTeam && !unit.team.rules().ai && !unit.team.rules().rtsAi;
     }
 
     @Override

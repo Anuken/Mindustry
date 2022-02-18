@@ -57,9 +57,9 @@ public class BaseAI{
             wallType = BaseGenerator.getDifficultyWall(1, data.team.rules().aiTier / 0.8f);
         }
 
-        if(data.team.rules().aiCoreSpawn && timer.get(timerSpawn, 60 * 2.5f) && data.hasCore()){
+        if(data.team.rules().aiCoreSpawn && timer.get(timerSpawn, 60 * 6f) && data.hasCore()){
             CoreBlock block = (CoreBlock)data.core().block;
-            int coreUnits = Groups.unit.count(u -> u.team == data.team && u.type == block.unitType);
+            int coreUnits = data.countType(block.unitType);
 
             //create AI core unit(s)
             if(!state.isEditor() && coreUnits < data.cores.size){

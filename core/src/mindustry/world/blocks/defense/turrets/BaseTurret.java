@@ -32,6 +32,7 @@ public class BaseTurret extends Block{
         update = true;
         solid = true;
         outlineIcon = true;
+        attacks = true;
         priority = TargetPriority.turret;
         group = BlockGroup.turrets;
         flags = EnumSet.of(BlockFlag.turret);

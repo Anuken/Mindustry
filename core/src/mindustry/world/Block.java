@@ -210,6 +210,8 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean hasColor = false;
     /** Whether units target this block. */
     public boolean targetable = true;
+    /** If true, this block attacks and is considered a turret in the indexer. Building must implement Ranged. */
+    public boolean attacks = false;
     /** If true, this block is mending-related and can be suppressed with special units/missiles. */
     public boolean suppressable = false;
     /** Whether the overdrive core has any effect on this block. */

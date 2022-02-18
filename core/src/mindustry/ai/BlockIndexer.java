@@ -11,6 +11,7 @@ import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
@@ -38,9 +39,6 @@ public class BlockIndexer{
     private Seq<Building>[][] flagMap = new Seq[Team.all.length][BlockFlag.all.length];
     /** Counts whether a certain floor is present in the world upon load. */
     private boolean[] blocksPresent;
-
-    /** Array used for returning and reusing. */
-    private Seq<Tile> returnArray = new Seq<>();
     /** Array used for returning and reusing. */
     private Seq<Building> breturnArray = new Seq<>(Building.class);
 
@@ -112,6 +110,11 @@ public class BlockIndexer{
             //unregister building from building quadtree
             if(data.buildings != null){
                 data.buildings.remove(build);
+            }
+
+            //remove indexed turret
+            if(data.turrets != null && build.block.attacks){
+                data.turrets.remove(build);
             }
 
             //is no longer registered
@@ -442,6 +445,14 @@ public class BlockIndexer{
             }
             data.buildings.insert(tile.build);
 
+            if(tile.block().attacks && tile.build instanceof Ranged){
+                if(data.turrets == null){
+                    data.turrets = new TurretQuadtree(new Rect(0, 0, world.unitWidth(), world.unitHeight()));
+                }
+
+                data.turrets.insert(tile.build);
+            }
+
             notifyBuildDamaged(tile.build);
         }
 
@@ -451,5 +462,22 @@ public class BlockIndexer{
         }
         //bounds checks only needed in very specific scenarios
         if(tile.blockID() < blocksPresent.length) blocksPresent[tile.blockID()] = true;
+    }
+
+    static class TurretQuadtree extends QuadTree<Building>{
+
+        public TurretQuadtree(Rect bounds){
+            super(bounds);
+        }
+
+        @Override
+        public void hitbox(Building build){
+            tmp.setCentered(build.x, build.y, ((Ranged)build).range() * 2f);
+        }
+
+        @Override
+        protected QuadTree<Building> newChild(Rect rect){
+            return new TurretQuadtree(rect);
+        }
     }
 }

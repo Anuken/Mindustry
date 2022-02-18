@@ -457,6 +457,23 @@ public class Units{
         nearbyEnemies(team, rect.x, rect.y, rect.width, rect.height, cons);
     }
 
+    /** @return whether there is an enemy in this rectangle. */
+    public static boolean nearEnemy(Team team, float x, float y, float width, float height){
+        Seq<TeamData> data = state.teams.present;
+        for(int i = 0; i < data.size; i++){
+            var other = data.items[i];
+            if(other.team != team){
+                if(other.tree().any(x, y, width, height)){
+                    return true;
+                }
+                if(other.turrets != null && other.turrets.any(x, y, width, height)){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     public interface Sortf{
         float cost(Unit unit, float x, float y);
     }

@@ -3156,10 +3156,12 @@ public class UnitTypes{
         //endregion
         //region erekir - core
 
+        float coreFleeRange = 500f;
+
         //TODO bad name
         evoke = new ErekirUnitType("evoke"){{
             coreUnitDock = true;
-            aiController = BuilderAI::new;
+            defaultController = u -> new BuilderAI(true, coreFleeRange);
             isCounted = false;
             envDisabled = 0;
 
@@ -3216,7 +3218,7 @@ public class UnitTypes{
 
         incite = new ErekirUnitType("incite"){{
             coreUnitDock = true;
-            aiController = BuilderAI::new;
+            defaultController = u -> new BuilderAI(true, coreFleeRange);
             isCounted = false;
             envDisabled = 0;
 
@@ -3285,7 +3287,7 @@ public class UnitTypes{
 
         emanate = new ErekirUnitType("emanate"){{
             coreUnitDock = true;
-            aiController = BuilderAI::new;
+            defaultController = u -> new BuilderAI(true, coreFleeRange);
             isCounted = false;
             envDisabled = 0;
 

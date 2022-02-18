@@ -237,6 +237,8 @@ public class Teams{
 
         /** Quadtree for all buildings of this team. Null if not active. */
         public @Nullable QuadTree<Building> buildings;
+        /** Turrets by range. Null if not active. */
+        public @Nullable QuadTree<Building> turrets;
         /** Current unit cap. Do not modify externally. */
         public int unitCap;
         /** Total unit count. */

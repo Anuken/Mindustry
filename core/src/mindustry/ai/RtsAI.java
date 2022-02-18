@@ -7,6 +7,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.Teams.*;
@@ -15,6 +16,7 @@ import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.defense.turrets.Turret.*;
+import mindustry.world.blocks.storage.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 import mindustry.world.meta.*;
 
@@ -24,7 +26,7 @@ public class RtsAI{
     static final IntSet used = new IntSet();
     static final IntSet assignedTargets = new IntSet();
     static final float squadRadius = 120f;
-    static final int timeUpdate = 0;
+    static final int timeUpdate = 0, timerSpawn = 1;
     static final float minWeight = 0.9f;
 
     //in order of priority??
@@ -32,7 +34,7 @@ public class RtsAI{
     static final ObjectFloatMap<Building> weights = new ObjectFloatMap<>();
     static final int minSquadSize = 4;
     //TODO max squad size
-    static final boolean debug = true;
+    static final boolean debug = OS.hasProp("mindustry.debug");
 
     final Interval timer = new Interval(10);
     final TeamData data;
@@ -77,6 +79,22 @@ public class RtsAI{
     public void update(){
         if(timer.get(timeUpdate, 60f * 2f)){
             assignSquads();
+            checkBuilding();
+        }
+    }
+
+    void checkBuilding(){
+        if(data.team.rules().aiCoreSpawn && timer.get(timerSpawn, 60 * 7f) && data.hasCore()){
+            CoreBlock block = (CoreBlock)data.core().block;
+            int coreUnits = data.countType(block.unitType);
+
+            //create AI core unit(s) at random cores
+            if(coreUnits < data.cores.size){
+                Unit unit = block.unitType.create(data.team);
+                unit.set(data.cores.random());
+                unit.add();
+                Fx.spawn.at(unit);
+            }
         }
     }
 
