@@ -233,6 +233,7 @@ public class Vars implements Loadable{
     public static BlockIndexer indexer;
     public static Pathfinder pathfinder;
     public static ControlPathfinder controlPath;
+    public static FogControl fogControl;
 
     public static Control control;
     public static Logic logic;
@@ -300,6 +301,7 @@ public class Vars implements Loadable{
         indexer = new BlockIndexer();
         pathfinder = new Pathfinder();
         controlPath = new ControlPathfinder();
+        fogControl = new FogControl();
         bases = new BaseRegistry();
         constants = new GlobalConstants();
         javaPath =

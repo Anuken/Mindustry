@@ -172,6 +172,7 @@ public class UnitType extends UnlockableContent{
     public float hitSize = 6f;
     public float itemOffsetY = 3f;
     public float lightRadius = -1f, lightOpacity = 0.6f;
+    public float fogRadius = -1f;
     public Color lightColor = Pal.powerLight;
     public boolean drawCell = true, drawItems = true, drawShields = true, drawBody = true;
     public int trailLength = 0;
@@ -435,6 +436,10 @@ public class UnitType extends UnlockableContent{
 
         if(lightRadius == -1){
             lightRadius = Math.max(60f, hitSize * 2.3f);
+        }
+
+        if(fogRadius < 0){
+            fogRadius = lightRadius * 1.5f / 8f;
         }
 
         clipSize = Math.max(clipSize, lightRadius * 1.1f);

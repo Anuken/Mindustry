@@ -399,6 +399,10 @@ public class Logic implements ApplicationListener{
                 state.updateId ++;
                 state.teams.updateTeamStats();
 
+                if(state.rules.fog){
+                    fogControl.update();
+                }
+
                 if(state.isCampaign()){
                     state.rules.sector.info.update();
                 }

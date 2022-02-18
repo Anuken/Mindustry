@@ -84,11 +84,11 @@ public abstract class SaveVersion extends SaveFileReader{
         region("content", stream, this::writeContentHeader);
         region("map", stream, this::writeMap);
         region("entities", stream, this::writeEntities);
-        region("custom", stream, this::writeCustomChunks);
+        region("custom", stream, s -> writeCustomChunks(s, false));
     }
 
-    public void writeCustomChunks(DataOutput stream) throws IOException{
-        var chunks = customChunks.orderedKeys().select(s -> customChunks.get(s).shouldWrite());
+    public void writeCustomChunks(DataOutput stream, boolean net) throws IOException{
+        var chunks = customChunks.orderedKeys().select(s -> customChunks.get(s).shouldWrite() && (!net || customChunks.get(s).writeNet()));
         stream.writeInt(chunks.size);
         for(var chunkName : chunks){
             var chunk = customChunks.get(chunkName);

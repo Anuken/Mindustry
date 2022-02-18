@@ -203,7 +203,14 @@ public abstract class SaveFileReader{
     public interface CustomChunk{
         void write(DataOutput stream) throws IOException;
         void read(DataInput stream) throws IOException;
+
+        /** @return whether this chunk is enabled at all */
         default boolean shouldWrite(){
+            return true;
+        }
+
+        /** @return whether this chunk should be written to connecting clients (default true) */
+        default boolean writeNet(){
             return true;
         }
     }
