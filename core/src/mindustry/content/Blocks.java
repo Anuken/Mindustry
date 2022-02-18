@@ -2510,7 +2510,7 @@ public class Blocks{
             laserWidth = 0.7f;
             itemCapacity = 20;
 
-            consumeLiquid(Liquids.hydrogen, 1f / 60f).boost();
+            consumeLiquid(Liquids.hydrogen, 0.5f / 60f);
             consumeLiquid(Liquids.nitrogen, 4f / 60f).boost();
         }};
 
