@@ -277,7 +277,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
                     if(block == Blocks.carbonWall && noise(x + 78, y, 4, 0.7f, 33f, 1f) > 0.52f){
                         block = Blocks.graphiticWall;
                     }else if(block != Blocks.carbonWall && noise(x + 782, y, 4, 0.8f, 38f, 1f) > 0.665f){
-                        ore = Blocks.wallOreBeryl;
+                        ore = Blocks.wallOreBeryllium;
                     }
 
                 }

@@ -1,6 +1,8 @@
 package mindustry.ai.types;
 
+import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.ai.*;
@@ -9,12 +11,14 @@ import mindustry.gen.*;
 import mindustry.world.*;
 
 public class CommandAI extends AIController{
-    static Vec2 vecOut = new Vec2();
+    private static final float localInterval = 30f;
+    private static final Vec2 vecOut = new Vec2();
 
     public @Nullable Vec2 targetPos;
     public @Nullable Teamc attackTarget;
 
     private int pathId = -1;
+    private Seq<Unit> local = new Seq<>(false);
 
     @Override
     public void updateUnit(){
@@ -24,6 +28,17 @@ public class CommandAI extends AIController{
         if(attackTarget != null && invalid(attackTarget)){
             attackTarget = null;
             targetPos = null;
+        }
+
+        if(targetPos != null){
+            if(timer.get(timerTarget3, localInterval)){
+                local.clear();
+                float size = unit.hitSize * 3f;
+                unit.team.data().tree().intersect(unit.x - size / 2f, unit.y - size/2f, size, size, local);
+            }
+        }else{
+            //make sure updates are staggered randomly
+            timer.reset(timerTarget3, Mathf.random(localInterval));
         }
 
         if(attackTarget != null){

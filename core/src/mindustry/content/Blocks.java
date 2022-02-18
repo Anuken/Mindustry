@@ -60,10 +60,10 @@ public class Blocks{
 
     //ores
     oreCopper, oreLead, oreScrap, oreCoal, oreTitanium, oreThorium,
-    oreTungsten, oreCrystalThorium, wallOreThorium,
+    oreBeryllium, oreTungsten, oreCrystalThorium, wallOreThorium,
 
     //wall ores
-    wallOreBeryl, graphiticWall, wallOreTungsten,
+    wallOreBeryllium, graphiticWall, wallOreTungsten,
 
     //crafting
     siliconSmelter, siliconCrucible, kiln, graphitePress, plastaniumCompressor, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
@@ -823,6 +823,8 @@ public class Blocks{
             oreScale = 25.380953f;
         }};
 
+        oreBeryllium = new OreBlock(Items.beryllium);
+
         oreTungsten = new OreBlock(Items.tungsten);
 
         oreCrystalThorium = new OreBlock("ore-crystal-thorium", Items.thorium);
@@ -831,7 +833,7 @@ public class Blocks{
             wallOre = true;
         }};
 
-        wallOreBeryl = new OreBlock("ore-wall-beryllium", Items.beryllium){{
+        wallOreBeryllium = new OreBlock("ore-wall-beryllium", Items.beryllium){{
             wallOre = true;
         }};
 

@@ -116,7 +116,7 @@ public class AsteroidGenerator extends BlankPlanetGenerator{
 
         wallOre(Blocks.carbonWall, Blocks.graphiticWall, 35f, 0.57f * graphiteScale);
 
-        wallOre(Blocks.beryllicStoneWall, Blocks.wallOreBeryl, 50f, 0.62f * berylliumScale);
+        wallOre(Blocks.beryllicStoneWall, Blocks.wallOreBeryllium, 50f, 0.62f * berylliumScale);
 
         //titanium
         pass((x, y) -> {
