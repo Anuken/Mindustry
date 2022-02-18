@@ -237,8 +237,7 @@ public class Rules{
 
         public TeamRule get(Team team){
             TeamRule out = values[team.id];
-            if(out == null) values[team.id] = (out = new TeamRule());
-            return out;
+            return out == null ? (values[team.id] = new TeamRule()) : out;
         }
 
         @Override

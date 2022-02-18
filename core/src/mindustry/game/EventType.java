@@ -250,6 +250,21 @@ public class EventType{
     }
 
     /**
+     * Called when a bullet damages a building. May not be called for all damage events!
+     * This event is re-used! Never do anything to re-raise this event in the listener.
+     * */
+    public static class BuildDamageEvent{
+        public Building build;
+        public Bullet source;
+
+        public BuildDamageEvent set(Building build, Bullet source){
+            this.build = build;
+            this.source = source;
+            return this;
+        }
+    }
+
+    /**
      * Called *before* a tile has changed.
      * WARNING! This event is special: its instance is reused! Do not cache or use with a timer.
      * Do not modify any tiles inside listeners that use this tile.

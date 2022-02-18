@@ -54,6 +54,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     static final ObjectSet<Building> tmpTiles = new ObjectSet<>();
     static final Seq<Building> tempBuilds = new Seq<>();
     static final BuildTeamChangeEvent teamChangeEvent = new BuildTeamChangeEvent();
+    static final BuildDamageEvent bulletDamageEvent = new BuildDamageEvent();
     static int sleepingEntities = 0;
     
     @Import float x, y, health, maxHealth;
@@ -260,6 +261,19 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         }
 
         data.blocks.addFirst(new BlockPlan(tile.x, tile.y, (short)rotation, block.id, overrideConfig == null ? config() : overrideConfig));
+    }
+
+    public @Nullable Tile findClosestEdge(Position to, Boolf<Tile> solid){
+        Tile best = null;
+        float mindst = 0f;
+        for(var point : Edges.getEdges(block.size)){
+            Tile other = Vars.world.tile(tile.x + point.x, tile.y + point.y);
+            if(other != null && !solid.get(other) && (best == null || to.dst2(other) < mindst)){
+                best = other;
+                mindst = other.dst2(other);
+            }
+        }
+        return best;
     }
 
     /** Configure with the current, local player. */
@@ -1498,6 +1512,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
      * @return whether the bullet should be removed. */
     public boolean collision(Bullet other){
         damage(other.team, other.damage() * other.type().buildingDamageMultiplier);
+        Events.fire(bulletDamageEvent.set(self(), other));
 
         return true;
     }
@@ -1505,6 +1520,12 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     /** Used to handle damage from splash damage for certain types of blocks. */
     public void damage(@Nullable Team source, float damage){
         damage(damage);
+    }
+
+    /** Handles splash damage with a bullet source. */
+    public void damage(Bullet bullet, Team source, float damage){
+        damage(source, damage);
+        Events.fire(bulletDamageEvent.set(self(), bullet));
     }
 
     /** Changes this building's team in a safe manner. */

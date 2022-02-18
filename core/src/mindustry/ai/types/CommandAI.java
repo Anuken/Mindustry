@@ -31,15 +31,7 @@ public class CommandAI extends AIController{
             targetPos.set(attackTarget);
 
             if(unit.isGrounded() && attackTarget instanceof Building build && build.tile.solid() && unit.pathType() != Pathfinder.costLegs){
-                Tile best = null;
-                float mindst = 0f;
-                for(var point : Edges.getEdges(build.block.size)){
-                    Tile tile = Vars.world.tile(build.tile.x + point.x, build.tile.y + point.y);
-                    if(tile != null && !tile.solid() && (best == null || unit.dst2(tile) < mindst)){
-                        best = tile;
-                        mindst = unit.dst2(tile);
-                    }
-                }
+                Tile best = build.findClosestEdge(unit, Tile::solid);
                 if(best != null){
                     targetPos.set(best);
                 }

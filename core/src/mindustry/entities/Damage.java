@@ -415,11 +415,11 @@ public class Damage{
 
     /** Damages all entities and blocks in a radius that are enemies of the team. */
     public static void damage(Team team, float x, float y, float radius, float damage, boolean complete, boolean air, boolean ground){
-        damage(team, x, y, radius, damage, complete, air, ground, false);
+        damage(team, x, y, radius, damage, complete, air, ground, false, null);
     }
 
     /** Damages all entities and blocks in a radius that are enemies of the team. */
-    public static void damage(Team team, float x, float y, float radius, float damage, boolean complete, boolean air, boolean ground, boolean scaled){
+    public static void damage(Team team, float x, float y, float radius, float damage, boolean complete, boolean air, boolean ground, boolean scaled, Bullet source){
         Cons<Unit> cons = entity -> {
             if(entity.team == team || !entity.within(x, y, radius + (scaled ? entity.hitSize / 2f : 0f)) || (entity.isFlying() && !air) || (entity.isGrounded() && !ground)){
                 return;
@@ -445,7 +445,7 @@ public class Damage{
 
         if(ground){
             if(!complete){
-                tileDamage(team, World.toTile(x), World.toTile(y), radius / tilesize, damage);
+                tileDamage(team, World.toTile(x), World.toTile(y), radius / tilesize, damage, source);
             }else{
                 completeDamage(team, x, y, radius, damage);
             }
@@ -453,6 +453,10 @@ public class Damage{
     }
 
     public static void tileDamage(Team team, int x, int y, float baseRadius, float damage){
+        tileDamage(team, x, y, baseRadius, damage, null);
+    }
+
+    public static void tileDamage(Team team, int x, int y, float baseRadius, float damage, @Nullable Bullet source){
 
         Core.app.post(() -> {
 
@@ -519,7 +523,11 @@ public class Damage{
                 int cx = Point2.x(e.key), cy = Point2.y(e.key);
                 var build = world.build(cx, cy);
                 if(build != null){
-                    build.damage(team, e.value);
+                    if(source != null){
+                        build.damage(source, team, e.value);
+                    }else{
+                        build.damage(team, e.value);
+                    }
                 }
             }
         });
