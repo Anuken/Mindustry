@@ -142,7 +142,7 @@ public class AsteroidGenerator extends BlankPlanetGenerator{
 
         state.rules.dragMultiplier = 0.7f; //yes, space actually has 0 drag but true 0% drag is very annoying
         state.rules.borderDarkness = false;
-        state.rules.environment = Env.space;
+        state.rules.env = Env.space;
         state.rules.waves = true;
 
         //TODO ???

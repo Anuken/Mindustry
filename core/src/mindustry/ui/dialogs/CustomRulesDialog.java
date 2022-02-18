@@ -214,6 +214,26 @@ public class CustomRulesDialog extends BaseDialog{
 
         main.button("@rules.weather", this::weatherDialog).width(250f).left().row();
 
+        title("@rules.title.planet");
+
+        main.table(Tex.button, t -> {
+            t.margin(10f);
+            var group = new ButtonGroup<>();
+            var style = Styles.clearTogglet;
+
+            t.defaults().size(140f, 50f);
+
+            //TODO dynamic selection
+            for(Planet planet : new Planet[]{Planets.serpulo, Planets.erekir}){
+                t.button(planet.localizedName, style, () -> {
+                    rules.env = planet.defaultEnv;
+                    rules.hiddenBuildItems.clear();
+                    rules.hiddenBuildItems.addAll(planet.hiddenItems);
+                    planet.ruleSetter.get(rules);
+                }).group(group).checked(rules.env == planet.defaultEnv);
+            }
+        }).left().fill(false).expand(false, false).row();
+
         title("@rules.title.teams");
 
         team("@rules.playerteam", t -> rules.defaultTeam = t, () -> rules.defaultTeam);

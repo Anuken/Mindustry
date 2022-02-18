@@ -308,7 +308,7 @@ public class World{
         }
 
         state.rules.cloudColor = sector.planet.landCloudColor;
-        state.rules.environment = sector.planet.defaultEnv;
+        state.rules.env = sector.planet.defaultEnv;
         state.rules.hiddenBuildItems.clear();
         state.rules.hiddenBuildItems.addAll(sector.planet.hiddenItems);
         sector.planet.ruleSetter.get(state.rules);

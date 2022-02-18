@@ -276,7 +276,7 @@ public class CoreBlock extends StorageBlock{
 
         public void requestSpawn(Player player){
             //do not try to respawn in unsupported environments at all
-            if(!unitType.supportsEnv(state.rules.environment)) return;
+            if(!unitType.supportsEnv(state.rules.env)) return;
 
             Call.playerSpawn(tile, player);
         }

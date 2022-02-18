@@ -443,7 +443,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
 
         //it is very hot
         state.rules.attributes.set(Attribute.heat, 0.8f);
-        state.rules.environment = sector.planet.defaultEnv;
+        state.rules.env = sector.planet.defaultEnv;
         state.rules.placeRangeCheck = true;
 
         //TODO remove slag and arkycite around core.

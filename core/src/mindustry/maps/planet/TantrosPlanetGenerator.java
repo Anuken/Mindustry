@@ -87,7 +87,7 @@ public class TantrosPlanetGenerator extends PlanetGenerator{
 
         Schematics.placeLaunchLoadout(width / 2, height / 2);
 
-        Vars.state.rules.environment = Env.underwater;
+        Vars.state.rules.env = Env.underwater;
 
         state.rules.canGameOver = false;
     }

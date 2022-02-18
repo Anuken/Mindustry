@@ -92,7 +92,7 @@ public class Rules{
     /** Environment drag multiplier. */
     public float dragMultiplier = 1f;
     /** Environmental flags that dictate visuals & how blocks function. */
-    public int environment = Env.terrestrial | Env.spores | Env.groundOil | Env.groundWater | Env.oxygen;
+    public int env = Env.terrestrial | Env.spores | Env.groundOil | Env.groundWater | Env.oxygen;
     /** Attributes of the environment. */
     public Attributes attributes = new Attributes();
     /** Sector for saves that have them. */
@@ -176,7 +176,7 @@ public class Rules{
     }
 
     public boolean hasEnv(int env){
-        return (environment & env) != 0;
+        return (this.env & env) != 0;
     }
 
     public float unitBuildSpeed(Team team){

@@ -382,7 +382,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         wasHealed = false;
 
         //check if environment is unsupported
-        if(!type.supportsEnv(state.rules.environment) && !dead){
+        if(!type.supportsEnv(state.rules.env) && !dead){
             Call.unitEnvDeath(self());
             team.data().updateCount(type, -1);
         }

@@ -319,7 +319,7 @@ public class Renderer implements ApplicationListener{
 
         //render all matching environments
         for(var renderer : envRenderers){
-            if((renderer.env & state.rules.environment) == renderer.env){
+            if((renderer.env & state.rules.env) == renderer.env){
                 renderer.renderer.run();
             }
         }

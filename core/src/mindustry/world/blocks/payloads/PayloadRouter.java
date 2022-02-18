@@ -48,7 +48,7 @@ public class PayloadRouter extends PayloadConveyor{
     }
 
     public boolean canSort(UnitType t){
-        return !t.isHidden() && !t.isBanned() && t.supportsEnv(state.rules.environment);
+        return !t.isHidden() && !t.isBanned() && t.supportsEnv(state.rules.env);
     }
 
     public class PayloadRouterBuild extends PayloadConveyorBuild{

@@ -373,7 +373,7 @@ public class PlacementFragment extends Fragment{
                                 topTable.row();
                                 topTable.table(b -> {
                                     b.image(Icon.cancel).padRight(2).color(Color.scarlet);
-                                    b.add(!player.isBuilder() ? "@unit.nobuild" : !displayBlock.supportsEnv(state.rules.environment) ? "@unsupported.environment" : "@banned").width(190f).wrap();
+                                    b.add(!player.isBuilder() ? "@unit.nobuild" : !displayBlock.supportsEnv(state.rules.env) ? "@unsupported.environment" : "@banned").width(190f).wrap();
                                     b.left();
                                 }).padTop(2).left();
                             }
@@ -552,7 +552,7 @@ public class PlacementFragment extends Fragment{
 
     boolean unlocked(Block block){
         return block.unlockedNow() && block.placeablePlayer && block.environmentBuildable() &&
-            block.supportsEnv(state.rules.environment); //TODO this hides env unsupported blocks, not always a good thing
+            block.supportsEnv(state.rules.env); //TODO this hides env unsupported blocks, not always a good thing
     }
 
     boolean hasInfoBox(){
