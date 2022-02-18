@@ -16,7 +16,7 @@ import static mindustry.Vars.*;
 
 public class FogControl implements CustomChunk{
     private static volatile int ww, wh;
-    private static final int buildLight = 1;
+    private static final int buildLight = 0;
 
     private final Object sync = new Object();
     /** indexed by [team] [packed array tile pos] */
@@ -42,7 +42,7 @@ public class FogControl implements CustomChunk{
             if(state.rules.fog && read){
                 for(var build : Groups.build){
                     synchronized(events){
-                        events.add(FogEvent.get(build.tile.x, build.tile.y, buildLight, build.team.id));
+                        events.add(FogEvent.get(build.tile.x, build.tile.y, buildLight + build.block.size, build.team.id));
                     }
                 }
 

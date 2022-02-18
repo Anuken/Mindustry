@@ -11,12 +11,12 @@ import arc.util.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.world.*;
 
 import static mindustry.Vars.*;
 
 /** Highly experimental fog-of-war renderer. */
 public class FogRenderer{
-    private static final float fogSpeed = 1f;
     private FrameBuffer buffer = new FrameBuffer();
     private LongSeq events = new LongSeq();
     private Rect rect = new Rect();
@@ -27,9 +27,6 @@ public class FogRenderer{
             lastTeam = null;
             events.clear();
         });
-
-        //TODO draw fog when tile is placed?
-
     }
 
     public void handleEvent(long event){
@@ -72,7 +69,13 @@ public class FogRenderer{
             //process new fog events
             for(int i = 0; i < events.size; i++){
                 long e = events.items[i];
-                Fill.poly(FogEvent.x(e) + 0.5f, FogEvent.y(e) + 0.5f, 20, FogEvent.radius(e) + 0.3f);
+                Tile tile = world.tile(FogEvent.x(e), FogEvent.y(e));
+                float o = 0f;
+                //visual offset for uneven blocks; this is not reflected on the CPU, but it doesn't really matter
+                if(tile != null && tile.block().size % 2 == 0 && tile.isCenter()){
+                    o = 0.5f;
+                }
+                Fill.poly(FogEvent.x(e) + 0.5f + o, FogEvent.y(e) + 0.5f + o, 20, FogEvent.radius(e) + 0.3f);
             }
 
             events.clear();

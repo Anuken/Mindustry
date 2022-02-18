@@ -61,7 +61,7 @@ public class UnitCargoLoader extends Block{
         super.drawPlace(x, y, rotation, valid);
 
         if(!Units.canCreate(Vars.player.team(), unitType)){
-            drawPlaceText(Core.bundle.get("@bar.cargounitcap"), x, y, valid);
+            drawPlaceText(Core.bundle.get("bar.cargounitcap"), x, y, valid);
         }
     }
 

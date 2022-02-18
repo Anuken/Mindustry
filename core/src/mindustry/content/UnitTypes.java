@@ -2486,7 +2486,7 @@ public class UnitTypes{
                 heatColor = Color.valueOf("f9350f");
                 cooldownTime = 80f;
 
-                bullet = new BasicBulletType(8f, 140){{
+                bullet = new BasicBulletType(8f, 130){{
                     sprite = "missile-large";
                     width = 9.5f;
                     height = 15f;
@@ -2502,6 +2502,8 @@ public class UnitTypes{
                     trailWidth = 3.1f;
                     trailLength = 8;
                     hitEffect = despawnEffect = Fx.blastExplosion;
+                    splashDamageRadius = 20f;
+                    splashDamage = 50f;
                 }};
             }});
 
