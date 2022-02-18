@@ -2504,7 +2504,7 @@ public class Blocks{
             requirements(Category.production, with(Items.silicon, 100, Items.oxide, 30, Items.beryllium, 100, Items.tungsten, 70));
             consumePower(0.8f);
             drillTime = 120f;
-            tier = 4;
+            tier = 5;
             size = 3;
             range = 6;
             laserWidth = 0.7f;
