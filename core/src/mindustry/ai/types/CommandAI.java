@@ -94,6 +94,10 @@ public class CommandAI extends AIController{
         return attackTarget != null || timer.get(timerTarget, 20);
     }
 
+    public boolean hasCommand(){
+        return targetPos != null;
+    }
+
     public void commandPosition(Vec2 pos){
         targetPos = pos;
         attackTarget = null;

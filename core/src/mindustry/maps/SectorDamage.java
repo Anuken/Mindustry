@@ -285,8 +285,8 @@ public class SectorDamage{
             if(e > 0.08f){
                 if(build.team == state.rules.defaultTeam && build instanceof Ranged ranged && sparse.contains(t -> t.within(build, ranged.range() + 4*tilesize))){
                     //TODO make sure power turret network supports the turrets?
-                    if(build.block instanceof Turret t && build instanceof TurretBuild b && b.hasAmmo()){
-                        sumDps += t.shots / t.reloadTime * 60f * b.peekAmmo().estimateDPS() * e * build.timeScale;
+                    if(build instanceof TurretBuild b && b.hasAmmo()){
+                        sumDps += b.estimateDps();
                     }
 
                     if(build.block instanceof MendProjector m){

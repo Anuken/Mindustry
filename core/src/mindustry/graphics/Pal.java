@@ -133,5 +133,5 @@ public class Pal{
     techBlue = Color.valueOf("8ca9e8"),
 
     vent = Color.valueOf("6b4e4e"),
-    vent2 = Color.valueOf("261d1d");
+    vent2 = Color.valueOf("3b2a2a");
 }

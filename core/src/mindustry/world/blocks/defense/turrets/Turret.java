@@ -198,6 +198,11 @@ public class Turret extends ReloadTurret{
         public float heatReq;
         public float[] sideHeat = new float[4];
 
+        public float estimateDps(){
+            if(!hasAmmo()) return 0f;
+            return shots / reloadTime * 60f * peekAmmo().estimateDPS() * efficiency() * timeScale;
+        }
+
         @Override
         public float range(){
             if(hasAmmo()){
