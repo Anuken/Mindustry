@@ -256,10 +256,10 @@ public class AIController implements UnitController{
     }
 
     public void moveTo(Position target, float circleLength, float smooth){
-        moveTo(target, circleLength, smooth, unit.isFlying());
+        moveTo(target, circleLength, smooth, unit.isFlying(), null);
     }
 
-    public void moveTo(Position target, float circleLength, float smooth, boolean keepDistance){
+    public void moveTo(Position target, float circleLength, float smooth, boolean keepDistance, @Nullable Vec2 offset){
         if(target == null) return;
 
         vec.set(target).sub(unit);
@@ -267,6 +267,7 @@ public class AIController implements UnitController{
         float length = circleLength <= 0.001f ? 1f : Mathf.clamp((unit.dst(target) - circleLength) / smooth, -1f, 1f);
 
         vec.setLength(unit.speed() * length);
+
         if(length < -0.5f){
             if(keepDistance){
                 vec.rotate(180f);
@@ -275,6 +276,11 @@ public class AIController implements UnitController{
             }
         }else if(length < 0){
             vec.setZero();
+        }
+
+        if(offset != null){
+            vec.add(offset);
+            vec.setLength(unit.speed() * length);
         }
 
         //do not move when infinite vectors are used.
