@@ -925,7 +925,7 @@ public class Blocks{
             envDisabled = Env.none;
             itemCapacity = 30;
             drawer = new DrawArcSmelter();
-            researchCostMultiplier = 0.3f;
+            researchCostMultiplier = 1f / 10f;
 
             consumeItems(with(Items.graphite, 1, Items.sand, 4));
             consumePower(6f);
@@ -1875,7 +1875,7 @@ public class Blocks{
             buildVisibility = BuildVisibility.berylliumOnly;
             health = 90;
             speed = 4f;
-            researchCostMultiplier = 1f / 12f;
+            researchCostMultiplier = 1f / 6f;
         }};
 
         ductRouter = new DuctRouter("duct-router"){{
@@ -2154,7 +2154,7 @@ public class Blocks{
             health = 90;
             consumePowerBuffered(1000f);
             range = 10;
-            researchCostMultiplier = 0.8f;
+            researchCostMultiplier = 0.2f;
         }};
 
         //TODO requirements
@@ -2291,7 +2291,7 @@ public class Blocks{
             hasLiquids = true;
             outputLiquid = new LiquidStack(Liquids.water, 5f / 60f / 9f);
             liquidCapacity = 20f;
-            researchCostMultiplier = 0.18f / 13f;
+            researchCostMultiplier = 1f / 18f;
         }};
 
         //TODO rename
@@ -2488,6 +2488,7 @@ public class Blocks{
             size = 2;
             attribute = Attribute.sand;
             output = Items.sand;
+            researchCostMultiplier = 1f / 8f;
         }};
 
         plasmaBore = new BeamDrill("plasma-bore"){{
@@ -2497,7 +2498,7 @@ public class Blocks{
             tier = 3;
             size = 2;
             range = 4;
-            researchCostMultiplier = 0.18f / 12f;
+            researchCostMultiplier = 1f / 30f;
 
             consumeLiquid(Liquids.hydrogen, 0.25f / 60f).boost();
         }};

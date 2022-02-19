@@ -989,7 +989,7 @@ public class Block extends UnlockableContent implements Senseable{
         if(researchCostMultiplier <= 0f) return ItemStack.empty;
         ItemStack[] out = new ItemStack[requirements.length];
         for(int i = 0; i < out.length; i++){
-            int quantity = 60 + Mathf.round(Mathf.pow(requirements[i].amount, 1.11f) * 20 * researchCostMultiplier * researchCostMultipliers.get(requirements[i].item, 1f), 10);
+            int quantity = Mathf.round(60 * researchCostMultiplier + Mathf.pow(requirements[i].amount, 1.11f) * 20 * researchCostMultiplier * researchCostMultipliers.get(requirements[i].item, 1f), 10);
 
             out[i] = new ItemStack(requirements[i].item, UI.roundAmount(quantity));
         }
