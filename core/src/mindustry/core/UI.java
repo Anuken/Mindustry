@@ -73,7 +73,7 @@ public class UI implements ApplicationListener, Loadable{
     public ColorPicker picker;
     public LogicDialog logic;
 
-    public Cursor drillCursor, unloadCursor;
+    public Cursor drillCursor, unloadCursor, targetCursor;
 
     private @Nullable Element lastAnnouncement;
 
@@ -128,6 +128,7 @@ public class UI implements ApplicationListener, Loadable{
 
         drillCursor = Core.graphics.newCursor("drill", Fonts.cursorScale());
         unloadCursor = Core.graphics.newCursor("unload", Fonts.cursorScale());
+        targetCursor = Core.graphics.newCursor("target", Fonts.cursorScale());
     }
 
     @Override

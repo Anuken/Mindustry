@@ -190,7 +190,6 @@ public class Placement{
             (plan.tile() != null && plan.tile().block() == plan.block)); //don't count the same block as inaccessible
 
         var result = plans1.clear();
-        var team = player.team();
 
         outer:
         for(int i = 0; i < plans.size;){

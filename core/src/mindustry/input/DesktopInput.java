@@ -399,6 +399,10 @@ public class DesktopInput extends InputHandler{
                 cursorType = ui.drillCursor;
             }
 
+            if(commandMode && selectedUnits.any() && ((cursor.build != null && cursor.build.team != player.team()) || (selectedEnemyUnit(input.mouseWorldX(), input.mouseWorldY()) != null))){
+                cursorType = ui.targetCursor;
+            }
+
             if(getRequest(cursor.x, cursor.y) != null && mode == none){
                 cursorType = SystemCursor.hand;
             }
@@ -406,6 +410,7 @@ public class DesktopInput extends InputHandler{
             if(canTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y)){
                 cursorType = ui.unloadCursor;
             }
+
 
             if(cursor.build != null && cursor.interactable(player.team()) && !isPlacing() && Math.abs(Core.input.axisTap(Binding.rotate)) > 0 && Core.input.keyDown(Binding.rotateplaced) && cursor.block().rotate && cursor.block().quickRotate){
                 Call.rotateBlock(player, cursor.build, Core.input.axisTap(Binding.rotate) > 0);
