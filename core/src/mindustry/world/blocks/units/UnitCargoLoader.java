@@ -7,6 +7,7 @@ import arc.math.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.game.*;
@@ -15,6 +16,8 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+
+import static mindustry.Vars.*;
 
 public class UnitCargoLoader extends Block{
     public UnitType unitType = UnitTypes.manifold;
@@ -65,6 +68,12 @@ public class UnitCargoLoader extends Block{
         }
     }
 
+    @Remote(called = Loc.server)
+    public static void cargoLoaderDroneSpawned(Tile tile, int id){
+        if(tile == null || !(tile.build instanceof UnitTransportSourceBuild build)) return;
+        build.spawned(id);
+    }
+
     public class UnitTransportSourceBuild extends Building{
         //needs to be "unboxed" after reading, since units are read after buildings.
         public int readUnitId = -1;
@@ -92,18 +101,25 @@ public class UnitCargoLoader extends Block{
                 totalProgress += edelta();
 
                 if(buildProgress >= 1f){
-                    unit = unitType.create(team);
-                    if(unit instanceof BuildingTetherc bt){
-                        bt.building(this);
+                    if(!net.client()){
+                        unit = unitType.create(team);
+                        if(unit instanceof BuildingTetherc bt){
+                            bt.building(this);
+                        }
+                        unit.set(x, y);
+                        unit.rotation = 90f;
+                        unit.add();
+                        Call.cargoLoaderDroneSpawned(tile, unit.id);
                     }
-                    unit.set(x, y);
-                    unit.rotation = 90f;
-                    unit.add();
-
-                    Fx.spawn.at(unit);
-
-                    buildProgress = 0f;
                 }
+            }
+        }
+
+        public void spawned(int id){
+            Fx.spawn.at(x, y);
+            buildProgress = 0f;
+            if(net.client()){
+                readUnitId = id;
             }
         }
 

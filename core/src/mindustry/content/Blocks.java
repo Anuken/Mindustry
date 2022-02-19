@@ -1880,6 +1880,7 @@ public class Blocks{
             requirements(Category.distribution, with(Items.graphite, 8, Items.beryllium, 4));
             health = 90;
             speed = 4f;
+            regionRotated1 = 1;
         }};
 
         overflowDuct = new OverflowDuct("overflow-duct"){{

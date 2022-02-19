@@ -6,6 +6,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.ai.*;
+import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.world.*;
@@ -167,13 +168,13 @@ public class CommandAI extends AIController{
 
     @Override
     public Teamc findTarget(float x, float y, float range, boolean air, boolean ground){
-        return attackTarget == null ? super.findTarget(x, y, range, air, ground) : attackTarget;
+        return attackTarget == null || !attackTarget.within(x, y, range + (attackTarget instanceof Sized s ? s.hitSize()/2f : 0f)) ? super.findTarget(x, y, range, air, ground) : attackTarget;
     }
 
     @Override
     public boolean retarget(){
-        //retarget instantly when there is an explicit target, there is no performance cost
-        return attackTarget != null || timer.get(timerTarget, 20);
+        //retarget faster when there is an explicit target
+        return attackTarget != null ? timer.get(timerTarget, 10) : timer.get(timerTarget, 20);
     }
 
     public boolean hasCommand(){

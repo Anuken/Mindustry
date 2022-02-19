@@ -439,7 +439,7 @@ public class UnitType extends UnlockableContent{
         }
 
         if(fogRadius < 0){
-            fogRadius = lightRadius * 1.5f / 8f;
+            fogRadius = lightRadius * 2f / 8f;
         }
 
         clipSize = Math.max(clipSize, lightRadius * 1.1f);
