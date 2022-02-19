@@ -2,8 +2,8 @@ package mindustry.ai.types;
 
 import arc.math.*;
 import arc.math.geom.*;
-import mindustry.*;
 import mindustry.ai.*;
+import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -35,7 +35,7 @@ public class HugAI extends AIController{
         }
 
         //raycast for target
-        if(target != null && unit.within(target, unit.type.range) && !Vars.world.raycast(unit.tileX(), unit.tileY(), target.tileX(), target.tileY(), (x, y) -> {
+        if(target != null && unit.within(target, unit.type.range) && !World.raycast(unit.tileX(), unit.tileY(), target.tileX(), target.tileY(), (x, y) -> {
             for(Point2 p : Geometry.d4c){
                 if(!unit.canPass(x + p.x, y + p.y)){
                     return true;

@@ -9,6 +9,7 @@ import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -125,7 +126,7 @@ public class RepairBeamWeapon extends Weapon{
 
             if(targetBuildings){
                 //snap to closest building
-                Vars.world.raycastEachWorld(wx, wy, heal.lastEnd.x, heal.lastEnd.y, (x, y) -> {
+                World.raycastEachWorld(wx, wy, heal.lastEnd.x, heal.lastEnd.y, (x, y) -> {
                     var build = Vars.world.build(x, y);
                     if(build != null && build.team == unit.team && build.damaged()){
                         heal.target = build;

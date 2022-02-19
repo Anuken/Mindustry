@@ -125,7 +125,7 @@ public class Damage{
     public static @Nullable Building findAbsorber(Team team, float x1, float y1, float x2, float y2){
         tmpBuilding = null;
 
-        boolean found = world.raycast(World.toTile(x1), World.toTile(y1), World.toTile(x2), World.toTile(y2),
+        boolean found = World.raycast(World.toTile(x1), World.toTile(y1), World.toTile(x2), World.toTile(y2),
         (x, y) -> (tmpBuilding = world.build(x, y)) != null && tmpBuilding.team != team && tmpBuilding.block.absorbLasers);
 
         return found ? tmpBuilding : null;
@@ -136,7 +136,7 @@ public class Damage{
 
         furthest = null;
 
-        boolean found = world.raycast(b.tileX(), b.tileY(), World.toTile(b.x + Tmp.v1.x), World.toTile(b.y + Tmp.v1.y),
+        boolean found = World.raycast(b.tileX(), b.tileY(), World.toTile(b.x + Tmp.v1.x), World.toTile(b.y + Tmp.v1.y),
         (x, y) -> (furthest = world.tile(x, y)) != null && furthest.team() != b.team && (furthest.build != null && furthest.build.absorbLasers()));
 
         return found && furthest != null ? Math.max(6f, b.dst(furthest.worldx(), furthest.worldy())) : length;
@@ -148,7 +148,7 @@ public class Damage{
         furthest = null;
         pierceCount = 0;
 
-        boolean found = world.raycast(b.tileX(), b.tileY(), World.toTile(b.x + Tmp.v1.x), World.toTile(b.y + Tmp.v1.y),
+        boolean found = World.raycast(b.tileX(), b.tileY(), World.toTile(b.x + Tmp.v1.x), World.toTile(b.y + Tmp.v1.y),
         (x, y) -> (furthest = world.tile(x, y)) != null && furthest.build != null && furthest.team() != b.team && ++pierceCount >= pierceCap);
 
         return found && furthest != null ? Math.max(6f, b.dst(furthest.worldx(), furthest.worldy())) : length;
@@ -222,7 +222,7 @@ public class Damage{
         if(hitter.type.collidesGround){
             seg1.set(x, y);
             seg2.set(seg1).add(tr);
-            world.raycastEachWorld(x, y, seg2.x, seg2.y, (cx, cy) -> {
+            World.raycastEachWorld(x, y, seg2.x, seg2.y, (cx, cy) -> {
                 collider.get(cx, cy);
 
                 for(Point2 p : Geometry.d4){
@@ -294,7 +294,7 @@ public class Damage{
         tmpBuilding = null;
 
         if(hitter.type.collidesGround){
-            world.raycastEachWorld(x, y, x + tr.x, y + tr.y, (cx, cy) -> {
+            World.raycastEachWorld(x, y, x + tr.x, y + tr.y, (cx, cy) -> {
                 Building tile = world.build(cx, cy);
                 if(tile != null && tile.team != hitter.team){
                     tmpBuilding = tile;

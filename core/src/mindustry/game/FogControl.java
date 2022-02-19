@@ -6,6 +6,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.core.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.io.SaveFileReader.*;
@@ -63,7 +64,7 @@ public class FogControl implements CustomChunk{
             if(state.rules.fog && event.tile.build != null && event.tile.isCenter() && !event.tile.build.team.isAI() && event.tile.block().flags.contains(BlockFlag.hasFogRadius)){
                 var data = data(event.tile.team());
                 if(data != null){
-                    data.dynamicUpdated = data.dynamicUpdatedClient = true;
+                    data.dynamicUpdated = true;
                 }
 
                 synchronized(staticEvents){
@@ -78,7 +79,7 @@ public class FogControl implements CustomChunk{
             if(state.rules.fog && e.tile.build != null && !e.tile.build.team.isAI() && e.tile.block().flags.contains(BlockFlag.hasFogRadius)){
                 var data = data(e.tile.team());
                 if(data != null){
-                    data.dynamicUpdated = data.dynamicUpdatedClient = true;
+                    data.dynamicUpdated = true;
                 }
             }
         });
@@ -90,11 +91,16 @@ public class FogControl implements CustomChunk{
         return fog == null || fog[team.id] == null ? null : fog[team.id].staticData;
     }
 
-    public boolean isVisible(Team team, int x, int y){
+    public boolean isVisible(Team team, float x, float y){
+        return isVisibleTile(team, World.toTile(x), World.toTile(y));
+    }
+
+    public boolean isVisibleTile(Team team, int x, int y){
         if(!state.rules.fog) return true;
 
         var data = data(team);
-        if(data == null || x < 0 || y < 0 || x >= ww || y >= wh) return false;
+        if(data == null) return true;
+        if(x < 0 || y < 0 || x >= ww || y >= wh) return false;
         return data.read.get(x + y * ww);
     }
 
@@ -161,7 +167,7 @@ public class FogControl implements CustomChunk{
 
                 if(data == null){
                     data = fog[team.team.id] = new FogData();
-                    data.dynamicUpdated = data.dynamicUpdatedClient = true;
+                    data.dynamicUpdated = true;
                 }
 
                 synchronized(staticEvents){
@@ -176,26 +182,20 @@ public class FogControl implements CustomChunk{
                         if(unit.lastFogPos != pos){
                             pushEvent(event);
                             unit.lastFogPos = pos;
-                            data.dynamicUpdated = data.dynamicUpdatedClient = true;
+                            data.dynamicUpdated = true;
                         }
                     }
-                }
-
-                //add building updates (TODO this can run in the if-check, but the renderer needs it...)
-                for(var build : indexer.getFlagged(team.team, BlockFlag.hasFogRadius)){
-                    unitEventQueue.add(FogEvent.get(build.tile.x, build.tile.y, build.block.fogRadius, 0));
-                }
-
-                //on the client, let the renderer know of all the fog sources
-                if(data.dynamicUpdatedClient && !headless && team.team == Vars.player.team()){
-                    renderer.fog.flushDynamic(unitEventQueue);
-                    data.dynamicUpdatedClient = false;
                 }
 
                 //if it's time for an update, flush *everything* onto the update queue
                 if(data.dynamicUpdated && Time.timeSinceMillis(data.lastDynamicMs) > staticUpdateInterval){
                     data.dynamicUpdated = false;
                     data.lastDynamicMs = Time.millis();
+
+                    //add building updates
+                    for(var build : indexer.getFlagged(team.team, BlockFlag.hasFogRadius)){
+                        dynamicEventQueue.add(FogEvent.get(build.tile.x, build.tile.y, build.block.fogRadius, 0));
+                    }
 
                     //add unit updates
                     dynamicEventQueue.addAll(unitEventQueue);
@@ -405,8 +405,7 @@ public class FogControl implements CustomChunk{
                 int consec = data & 0b0111_1111;
 
                 if(sign){
-                    //TODO disabled for testing?
-                    //bools.set(pos, pos + consec);
+                    bools.set(pos, pos + consec);
                     pos += consec;
                 }else{
                     pos += consec;
@@ -479,8 +478,6 @@ public class FogControl implements CustomChunk{
         long lastDynamicMs = 0;
         /** if true, a dynamic fog update must be scheduled. */
         boolean dynamicUpdated;
-
-        boolean dynamicUpdatedClient;
 
         FogData(){
             int len = ww * wh;

@@ -6,6 +6,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.ai.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.entities.abilities.*;
 import mindustry.game.*;
@@ -191,7 +192,7 @@ public class SectorDamage{
 
         //TODO would be nice if this worked in a more generic way, with two different calculations and paths
         if(airOnly){
-            world.raycastEach(start.x, start.y, core.tileX(), core.tileY(), (x, y) -> {
+            World.raycastEach(start.x, start.y, core.tileX(), core.tileY(), (x, y) -> {
                 path.add(world.rawTile(x, y));
                 return false;
             });

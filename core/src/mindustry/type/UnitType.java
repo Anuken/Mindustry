@@ -438,10 +438,6 @@ public class UnitType extends UnlockableContent{
             lightRadius = Math.max(60f, hitSize * 2.3f);
         }
 
-        if(fogRadius < 0){
-            fogRadius = lightRadius * 2f / 8f;
-        }
-
         clipSize = Math.max(clipSize, lightRadius * 1.1f);
         singleTarget = weapons.size <= 1 && !forceMultiTarget;
 
@@ -467,6 +463,10 @@ public class UnitType extends UnlockableContent{
             for(Weapon weapon : weapons){
                 maxRange = Math.max(maxRange, weapon.range() - margin);
             }
+        }
+
+        if(fogRadius < 0){
+            fogRadius = Math.max(lightRadius * 2.5f, 1f) / 8f;
         }
 
         if(weapons.isEmpty()){
@@ -787,6 +787,8 @@ public class UnitType extends UnlockableContent{
     //region drawing
 
     public void draw(Unit unit){
+        if(unit.inFogTo(Vars.player.team())) return;
+
         Mechc mech = unit instanceof Mechc ? (Mechc)unit : null;
         float z = unit.elevation > 0.5f ? (lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit) : groundLayer + Mathf.clamp(hitSize / 4000f, 0, 0.01f);
 

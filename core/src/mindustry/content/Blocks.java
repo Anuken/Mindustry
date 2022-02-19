@@ -925,6 +925,7 @@ public class Blocks{
             envDisabled = Env.none;
             itemCapacity = 30;
             drawer = new DrawArcSmelter();
+            researchCostMultiplier = 0.3f;
 
             consumeItems(with(Items.graphite, 1, Items.sand, 4));
             consumePower(6f);
@@ -2481,7 +2482,7 @@ public class Blocks{
         cliffCrusher = new WallCrafter("cliff-crusher"){{
             requirements(Category.production, with(Items.graphite, 25, Items.beryllium, 20));
 
-            consumePower(0.8f);
+            consumePower(11 / 60f);
 
             drillTime = 110f;
             size = 2;

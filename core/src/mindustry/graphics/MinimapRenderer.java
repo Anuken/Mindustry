@@ -100,7 +100,7 @@ public class MinimapRenderer{
             updateUnitArray();
         }else{
             units.clear();
-            Groups.unit.each(units::add);
+            Groups.unit.copy(units);
         }
 
         float sz = baseSize * zoom;
@@ -112,10 +112,12 @@ public class MinimapRenderer{
         rect.set((dx - sz) * tilesize, (dy - sz) * tilesize, sz * 2 * tilesize, sz * 2 * tilesize);
 
         for(Unit unit : units){
+            if(unit.inFogTo(player.team())) continue;
+
             float rx = !withLabels ? (unit.x - rect.x) / rect.width * w : unit.x / (world.width() * tilesize) * w;
             float ry = !withLabels ? (unit.y - rect.y) / rect.width * h : unit.y / (world.height() * tilesize) * h;
 
-            Draw.mixcol(unit.team().color, 1f);
+            Draw.mixcol(unit.team.color, 1f);
             float scale = Scl.scl(1f) / 2f * scaling * 32f;
             var region = unit.icon();
             Draw.rect(region, x + rx, y + ry, scale, scale * (float)region.height / region.width, unit.rotation() - 90);
@@ -144,11 +146,23 @@ public class MinimapRenderer{
                 zoom = z;
             }
             Draw.shader(Shaders.fog);
-            renderer.fog.getStaticTexture().setFilter(TextureFilter.nearest);
+            Texture staticTex = renderer.fog.getStaticTexture(), dynamicTex = renderer.fog.getDynamicTexture();
+
             //crisp pixels
-            Tmp.tr1.set(renderer.fog.getStaticTexture());
+            staticTex.setFilter(TextureFilter.nearest);
+            dynamicTex.setFilter(TextureFilter.nearest);
+
+            Tmp.tr1.set(dynamicTex);
             Tmp.tr1.set(region.u, 1f - region.v, region.u2, 1f - region.v2);
+
+            Draw.color(FogRenderer.dynamicColor);
             Draw.rect(Tmp.tr1, x + w/2f, y + h/2f, w, h);
+
+            Tmp.tr1.texture = staticTex;
+            Draw.color(FogRenderer.staticColor);
+            Draw.rect(Tmp.tr1, x + w/2f, y + h/2f, w, h);
+
+            Draw.color();
             Draw.shader();
         }
 

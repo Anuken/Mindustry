@@ -3,6 +3,7 @@ package mindustry.ai.types;
 import arc.math.geom.*;
 import mindustry.*;
 import mindustry.ai.*;
+import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.world.*;
@@ -48,7 +49,7 @@ public class SuicideAI extends GroundAI{
                 blockedByBlock = false;
 
                 //raycast for target
-                boolean blocked = Vars.world.raycast(unit.tileX(), unit.tileY(), target.tileX(), target.tileY(), (x, y) -> {
+                boolean blocked = World.raycast(unit.tileX(), unit.tileY(), target.tileX(), target.tileY(), (x, y) -> {
                     for(Point2 p : Geometry.d4c){
                         Tile tile = Vars.world.tile(x + p.x, y + p.y);
                         if(tile != null && tile.build == target) return false;

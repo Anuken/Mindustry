@@ -1,5 +1,6 @@
 package mindustry.world.blocks.defense.turrets;
 
+import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
@@ -48,6 +49,7 @@ public class BaseTurret extends Block{
         }
 
         placeOverlapRange = Math.max(placeOverlapRange, range + placeOverlapMargin);
+        fogRadius = Math.max(Mathf.round(range / tilesize), fogRadius);
         super.init();
     }
 
