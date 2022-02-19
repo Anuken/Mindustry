@@ -213,7 +213,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         for(int id : unitIds){
             Unit unit = Groups.unit.getByID(id);
-            if(unit.team == player.team() && unit.controller() instanceof CommandAI ai){
+            if(unit != null && unit.team == player.team() && unit.controller() instanceof CommandAI ai){
                 if(teamTarget != null && teamTarget.team() != player.team()){
                     ai.commandTarget(teamTarget);
                 }else if(posTarget != null){

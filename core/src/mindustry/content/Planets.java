@@ -65,6 +65,8 @@ public class Planets{
             hiddenItems.addAll(Items.serpuloItems).removeAll(Items.erekirItems);
             ruleSetter = r -> {
                 r.placeRangeCheck = true;
+                r.attributes.set(Attribute.heat, 0.8f);
+                r.showSpawns = true;
             };
 
             unlockedOnLand.add(Blocks.coreBastion);
@@ -107,6 +109,11 @@ public class Planets{
             allowWaveSimulation = true;
             allowSectorInvasion = true;
             allowLaunchSchematics = true;
+            ruleSetter = r -> {
+                r.placeRangeCheck = false;
+                r.attributes.clear();
+                r.showSpawns = false;
+            };
             defaultAI = true;
             atmosphereColor = Color.valueOf("3c1b8f");
             atmosphereRadIn = 0.02f;

@@ -1897,7 +1897,7 @@ public class Blocks{
 
         ductUnloader = new DirectionalUnloader("duct-unloader"){{
             requirements(Category.distribution, with(Items.graphite, 20, Items.silicon, 20, Items.tungsten, 10));
-            health = 90;
+            health = 120;
             speed = 4f;
             regionRotated1 = 1;
         }};
