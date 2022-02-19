@@ -2291,7 +2291,7 @@ public class Blocks{
             hasLiquids = true;
             outputLiquid = new LiquidStack(Liquids.water, 5f / 60f / 9f);
             liquidCapacity = 20f;
-            researchCostMultiplier = 1f / 18f;
+            researchCostMultiplier = 1f / 40f;
         }};
 
         //TODO rename
