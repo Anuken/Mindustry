@@ -2612,6 +2612,7 @@ public class Blocks{
             size = 4;
             thrusterLength = 34/4f;
             armor = 5f;
+            alwaysUnlocked = true;
 
             //TODO should this be higher?
             buildCostMultiplier = 0.75f;

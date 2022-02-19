@@ -73,6 +73,16 @@ public class FogControl implements CustomChunk{
             }
         });
 
+        //on tile removed, dynamic fog goes away
+        Events.on(TilePreChangeEvent.class, e -> {
+            if(state.rules.fog && e.tile.build != null && !e.tile.build.team.isAI() && e.tile.block().flags.contains(BlockFlag.hasFogRadius)){
+                var data = data(e.tile.team());
+                if(data != null){
+                    data.dynamicUpdated = true;
+                }
+            }
+        });
+
         SaveVersion.addCustomChunk("fogdata", this);
     }
 
@@ -171,21 +181,21 @@ public class FogControl implements CustomChunk{
                     }
                 }
 
+                //add building updates (TODO this can run in the if-check, but the renderer needs it...)
+                for(var build : indexer.getFlagged(team.team, BlockFlag.hasFogRadius)){
+                    unitEventQueue.add(FogEvent.get(build.tile.x, build.tile.y, build.block.fogRadius, 0));
+                }
+
+                //on the client, let the renderer know of all the fog sources
+                //TODO this runs at a lower FPS and hence may look bad...?
+                if(data.dynamicUpdated && !headless && team.team == Vars.player.team()){
+                    renderer.fog.flushDynamic(unitEventQueue);
+                }
+
                 //if it's time for an update, flush *everything* onto the update queue
                 if(data.dynamicUpdated && Time.timeSinceMillis(data.lastDynamicMs) > staticUpdateInterval){
                     data.dynamicUpdated = false;
                     data.lastDynamicMs = Time.millis();
-
-                    //add building updates
-                    for(var build : indexer.getFlagged(team.team, BlockFlag.hasFogRadius)){
-                        unitEventQueue.add(FogEvent.get(build.tileX(), build.tileY(), build.block.fogRadius, 0));
-                    }
-
-                    //on the client, let the renderer know of all the fog sources
-                    //TODO this runs at a lower FPS and hence may look bad...?
-                    if(!headless && team.team == Vars.player.team()){
-                        renderer.fog.flushDynamic(unitEventQueue);
-                    }
 
                     //add unit updates
                     dynamicEventQueue.addAll(unitEventQueue);
