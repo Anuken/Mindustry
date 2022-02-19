@@ -144,9 +144,9 @@ public class MinimapRenderer{
                 zoom = z;
             }
             Draw.shader(Shaders.fog);
-            renderer.fog.getTexture().setFilter(TextureFilter.nearest);
+            renderer.fog.getStaticTexture().setFilter(TextureFilter.nearest);
             //crisp pixels
-            Tmp.tr1.set(renderer.fog.getTexture());
+            Tmp.tr1.set(renderer.fog.getStaticTexture());
             Tmp.tr1.set(region.u, 1f - region.v, region.u2, 1f - region.v2);
             Draw.rect(Tmp.tr1, x + w/2f, y + h/2f, w, h);
             Draw.shader();

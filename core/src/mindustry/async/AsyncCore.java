@@ -2,7 +2,7 @@ package mindustry.async;
 
 import arc.*;
 import arc.struct.*;
-import arc.util.async.*;
+import arc.util.*;
 import mindustry.game.EventType.*;
 
 import java.util.concurrent.*;

@@ -6,7 +6,6 @@ import arc.files.*;
 import arc.graphics.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.async.*;
 import mindustry.*;
 import mindustry.core.GameState.*;
 import mindustry.game.EventType.*;
@@ -18,6 +17,7 @@ import mindustry.type.*;
 import java.io.*;
 import java.text.*;
 import java.util.*;
+import java.util.concurrent.*;
 
 import static mindustry.Vars.*;
 
@@ -25,7 +25,7 @@ public class Saves{
     Seq<SaveSlot> saves = new Seq<>();
     @Nullable SaveSlot current;
     private @Nullable SaveSlot lastSectorSave;
-    AsyncExecutor previewExecutor = new AsyncExecutor(1);
+    ExecutorService previewExecutor = Threads.executor(1);
     private boolean saving;
     private float time;
 

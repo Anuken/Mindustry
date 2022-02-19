@@ -10,7 +10,6 @@ import arc.scene.ui.ImageButton.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.async.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -22,6 +21,8 @@ import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
+
+import java.util.concurrent.*;
 
 import static mindustry.Vars.*;
 
@@ -36,8 +37,8 @@ public class MapGenerateDialog extends BaseDialog{
     int scaling = mobile ? 3 : 1;
     Table filterTable;
 
-    AsyncExecutor executor = new AsyncExecutor(1);
-    AsyncResult<Void> result;
+    ExecutorService executor = Threads.executor(1);
+    Future<?> result;
     boolean generating;
 
     long[] buffer1, buffer2;
@@ -369,7 +370,10 @@ public class MapGenerateDialog extends BaseDialog{
 
     void apply(){
         if(result != null){
-            result.get();
+            //ignore errors yay
+            try{
+                result.get();
+            }catch(Exception e){}
         }
 
         buffer1 = null;

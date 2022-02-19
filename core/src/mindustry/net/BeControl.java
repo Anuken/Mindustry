@@ -4,7 +4,6 @@ import arc.*;
 import arc.files.*;
 import arc.func.*;
 import arc.util.*;
-import arc.util.async.*;
 import arc.util.serialization.*;
 import mindustry.*;
 import mindustry.core.*;
@@ -18,6 +17,7 @@ import mindustry.ui.dialogs.*;
 
 import java.io.*;
 import java.net.*;
+import java.util.concurrent.*;
 
 import static mindustry.Vars.*;
 
@@ -25,7 +25,7 @@ import static mindustry.Vars.*;
 public class BeControl{
     private static final int updateInterval = 60;
 
-    private AsyncExecutor executor = new AsyncExecutor(1);
+    private ExecutorService executor = Threads.executor(1);
     private boolean checkUpdates = true;
     private boolean updateAvailable;
     private String updateUrl;

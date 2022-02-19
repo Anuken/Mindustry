@@ -23,10 +23,11 @@ public enum BlockFlag{
     /** Blocks that extinguishes fires. */
     extinguisher,
 
-    //single-block identifiers
+    //special, internal identifiers
     launchPad,
     unitCargoUnloadPoint,
-    unitAssembler;
+    unitAssembler,
+    hasFogRadius;
 
     public final static BlockFlag[] all = values();
 

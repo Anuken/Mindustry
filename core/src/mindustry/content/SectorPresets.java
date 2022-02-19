@@ -110,6 +110,7 @@ public class SectorPresets{
 
         onset = new SectorPreset("onset", erekir, 10){{
             addStartingItems = true;
+            alwaysUnlocked = true;
             captureWave = 3;
             difficulty = 1;
         }};

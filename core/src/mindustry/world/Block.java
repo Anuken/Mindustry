@@ -249,6 +249,9 @@ public class Block extends UnlockableContent implements Senseable{
     /** Radius of the light emitted by this block. */
     public float lightRadius = 60f;
 
+    /** How much fog this block uncovers, in tiles. Cannot be dynamic. <= 0 to disable. */
+    public int fogRadius = -1;
+
     /** The sound that this block makes while active. One sound loop. Do not overuse. */
     public Sound loopSound = Sounds.none;
     /** Active sound base volume. */
@@ -1036,6 +1039,10 @@ public class Block extends UnlockableContent implements Senseable{
         //disable standard shadow
         if(customShadow){
             hasShadow = false;
+        }
+
+        if(fogRadius > 0){
+            flags = flags.with(BlockFlag.hasFogRadius);
         }
 
         //initialize default health based on size

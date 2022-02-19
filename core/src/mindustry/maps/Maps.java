@@ -9,7 +9,6 @@ import arc.graphics.*;
 import arc.struct.IntSet.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.async.*;
 import arc.util.io.*;
 import arc.util.serialization.*;
 import mindustry.*;

@@ -17,7 +17,7 @@ import static mindustry.Vars.*;
 
 /** Highly experimental fog-of-war renderer. */
 public class FogRenderer{
-    private FrameBuffer buffer = new FrameBuffer();
+    private FrameBuffer staticFog = new FrameBuffer();
     private LongSeq events = new LongSeq();
     private Rect rect = new Rect();
     private @Nullable Team lastTeam;
@@ -33,16 +33,16 @@ public class FogRenderer{
         events.add(event);
     }
 
-    public Texture getTexture(){
-        return buffer.getTexture();
+    public Texture getStaticTexture(){
+        return staticFog.getTexture();
     }
 
     public void drawFog(){
         //there is no fog.
-        if(fogControl.getData(player.team()) == null) return;
+        if(fogControl.getDiscovered(player.team()) == null) return;
 
         //resize if world size changes
-        boolean clear = buffer.resizeCheck(world.width(), world.height());
+        boolean clear = staticFog.resizeCheck(world.width(), world.height());
 
         if(player.team() != lastTeam){
             copyFromCpu();
@@ -53,16 +53,16 @@ public class FogRenderer{
         //grab events
         if(clear || events.size > 0){
             //set projection to whole map
-            Draw.proj(0, 0, buffer.getWidth(), buffer.getHeight());
+            Draw.proj(0, 0, staticFog.getWidth(), staticFog.getHeight());
 
             //if the buffer resized, it contains garbage now, clear it.
             if(clear){
-                buffer.begin(Color.black);
+                staticFog.begin(Color.black);
             }else{
-                buffer.begin();
+                staticFog.begin();
             }
 
-            ScissorStack.push(rect.set(1, 1, buffer.getWidth() - 2, buffer.getHeight() - 2));
+            ScissorStack.push(rect.set(1, 1, staticFog.getWidth() - 2, staticFog.getHeight() - 2));
 
             Draw.color(Color.white);
 
@@ -80,29 +80,30 @@ public class FogRenderer{
 
             events.clear();
 
-            buffer.end();
+            staticFog.end();
             ScissorStack.pop();
             Draw.proj(Core.camera);
         }
 
-        buffer.getTexture().setFilter(TextureFilter.linear);
+        staticFog.getTexture().setFilter(TextureFilter.linear);
 
         Draw.shader(Shaders.fog);
-        Draw.fbo(buffer.getTexture(), world.width(), world.height(), tilesize);
+        Draw.fbo(staticFog.getTexture(), world.width(), world.height(), tilesize);
         Draw.shader();
     }
 
     public void copyFromCpu(){
-        buffer.resize(world.width(), world.height());
-        buffer.begin(Color.black);
-        Draw.proj(0, 0, buffer.getWidth(), buffer.getHeight());
+        staticFog.resize(world.width(), world.height());
+        staticFog.begin(Color.black);
+        Draw.proj(0, 0, staticFog.getWidth(), staticFog.getHeight());
         Draw.color();
         int ww = world.width(), wh = world.height();
 
-        boolean[] data = fogControl.getData(player.team());
+        var data = fogControl.getDiscovered(player.team());
+        int len = world.width() * world.height();
         if(data != null){
-            for(int i = 0; i < data.length; i++){
-                if(data[i]){
+            for(int i = 0; i < len; i++){
+                if(data.get(i)){
                     //TODO slow, could do scanlines instead at the very least.
                     int x = i % ww, y = i / ww;
 
@@ -114,7 +115,7 @@ public class FogRenderer{
             }
         }
 
-        buffer.end();
+        staticFog.end();
         Draw.proj(Core.camera);
     }
 

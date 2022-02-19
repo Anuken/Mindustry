@@ -11,7 +11,6 @@ import arc.graphics.g2d.TextureAtlas.*;
 import arc.scene.ui.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.async.*;
 import arc.util.io.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Jval.*;
@@ -27,13 +26,14 @@ import mindustry.ui.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.*;
 
 import static mindustry.Vars.*;
 
 public class Mods implements Loadable{
     private static final String[] metaFiles = {"mod.json", "mod.hjson", "plugin.json", "plugin.hjson"};
 
-    private AsyncExecutor async = new AsyncExecutor();
+    private ExecutorService async = Threads.executor();
     private Json json = new Json();
     private @Nullable Scripts scripts;
     private ContentParser parser = new ContentParser();
@@ -128,7 +128,7 @@ public class Mods implements Loadable{
 
         packer = new MultiPacker();
         //all packing tasks to await
-        var tasks = new Seq<AsyncResult<Runnable>>();
+        var tasks = new Seq<Future<Runnable>>();
 
         eachEnabled(mod -> {
             Seq<Fi> sprites = mod.root.child("sprites").findAll(f -> f.extension().equals("png"));
@@ -179,7 +179,7 @@ public class Mods implements Loadable{
         }
     }
 
-    private void packSprites(Seq<Fi> sprites, LoadedMod mod, boolean prefix, Seq<AsyncResult<Runnable>> tasks){
+    private void packSprites(Seq<Fi> sprites, LoadedMod mod, boolean prefix, Seq<Future<Runnable>> tasks){
         boolean linear = Core.settings.getBool("linear", true);
 
         for(Fi file : sprites){

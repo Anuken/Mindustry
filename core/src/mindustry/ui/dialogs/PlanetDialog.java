@@ -562,6 +562,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                                 selected = null;
                                 launchSector = null;
                                 if(state.planet != planet){
+                                    newPresets.clear();
                                     state.planet = planet;
                                     rebuildList();
                                 }
