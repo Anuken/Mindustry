@@ -77,6 +77,7 @@ public class PayloadSeq{
 
     public void read(Reads read){
         total = 0;
+        blocks.clear();
         short amount = read.s();
         for(int i = 0; i < amount; i++){
             add(Vars.content.block(read.s()), read.i());

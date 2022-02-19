@@ -1899,6 +1899,7 @@ public class Blocks{
             requirements(Category.distribution, with(Items.graphite, 20, Items.silicon, 20, Items.tungsten, 10));
             health = 90;
             speed = 4f;
+            regionRotated1 = 1;
         }};
 
         surgeConveyor = new StackConveyor("surge-conveyor"){{
