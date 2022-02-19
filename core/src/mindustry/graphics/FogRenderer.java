@@ -17,8 +17,10 @@ import static mindustry.Vars.*;
 
 /** Highly experimental fog-of-war renderer. */
 public class FogRenderer{
-    private FrameBuffer staticFog = new FrameBuffer();
+    private FrameBuffer staticFog = new FrameBuffer(), dynamicFog = new FrameBuffer();
     private LongSeq events = new LongSeq();
+    private LongSeq dynamics = new LongSeq();
+    private boolean dynamicUpdate = false;
     private Rect rect = new Rect();
     private @Nullable Team lastTeam;
 
@@ -33,8 +35,18 @@ public class FogRenderer{
         events.add(event);
     }
 
+    public void flushDynamic(LongSeq seq){
+        dynamics.clear();
+        dynamics.addAll(seq);
+        dynamicUpdate = true;
+    }
+
     public Texture getStaticTexture(){
         return staticFog.getTexture();
+    }
+
+    public Texture getDynamicTexture(){
+        return dynamicFog.getTexture();
     }
 
     public void drawFog(){
@@ -42,21 +54,37 @@ public class FogRenderer{
         if(fogControl.getDiscovered(player.team()) == null) return;
 
         //resize if world size changes
-        boolean clear = staticFog.resizeCheck(world.width(), world.height());
+        boolean
+            clearStatic = staticFog.resizeCheck(world.width(), world.height()),
+            clearDynamic = dynamicFog.resizeCheck(world.width(), world.height());
 
         if(player.team() != lastTeam){
             copyFromCpu();
             lastTeam = player.team();
-            clear = false;
+            clearStatic = false;
+            dynamicUpdate = true;
         }
 
-        //grab events
-        if(clear || events.size > 0){
+        if(clearDynamic || dynamicUpdate){
+            dynamicUpdate = false;
+
+            Draw.proj(0, 0, staticFog.getWidth(), staticFog.getHeight());
+            dynamicFog.begin(Color.black);
+            ScissorStack.push(rect.set(1, 1, staticFog.getWidth() - 2, staticFog.getHeight() - 2));
+
+            //TODO render all (clipped) view circles
+
+            ScissorStack.pop();
+            Draw.proj(Core.camera);
+        }
+
+        //grab static events
+        if(clearStatic || events.size > 0){
             //set projection to whole map
             Draw.proj(0, 0, staticFog.getWidth(), staticFog.getHeight());
 
-            //if the buffer resized, it contains garbage now, clear it.
-            if(clear){
+            //if the buffer resized, it contains garbage now, clearStatic it.
+            if(clearStatic){
                 staticFog.begin(Color.black);
             }else{
                 staticFog.begin();

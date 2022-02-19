@@ -14,7 +14,7 @@ import arc.struct.Seq
 import arc.util.Http
 import arc.util.Log
 import arc.util.OS
-import arc.util.async.Threads
+import arc.util.Threads
 import arc.util.io.PropertiesUtils
 import arc.util.io.Streams
 

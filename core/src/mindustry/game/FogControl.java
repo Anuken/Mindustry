@@ -178,7 +178,13 @@ public class FogControl implements CustomChunk{
 
                     //add building updates
                     for(var build : indexer.getFlagged(team.team, BlockFlag.hasFogRadius)){
-                        dynamicEventQueue.add(FogEvent.get(build.tileX(), build.tileY(), build.block.fogRadius, 0));
+                        unitEventQueue.add(FogEvent.get(build.tileX(), build.tileY(), build.block.fogRadius, 0));
+                    }
+
+                    //on the client, let the renderer know of all the fog sources
+                    //TODO this runs at a lower FPS and hence may look bad...?
+                    if(!headless && team.team == Vars.player.team()){
+                        renderer.fog.flushDynamic(unitEventQueue);
                     }
 
                     //add unit updates
