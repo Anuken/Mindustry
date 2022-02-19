@@ -114,7 +114,6 @@ public class Planets{
                 r.attributes.clear();
                 r.showSpawns = false;
             };
-            defaultAI = true;
             atmosphereColor = Color.valueOf("3c1b8f");
             atmosphereRadIn = 0.02f;
             atmosphereRadOut = 0.3f;

@@ -91,8 +91,6 @@ public class Planet extends UnlockableContent{
     public boolean allowWaveSimulation = false;
     /** Whether to simulate sector invasions from enemy bases. */
     public boolean allowSectorInvasion = false;
-    /** If true, builder AI is turned on for all sectors on this planet by default. */
-    public boolean defaultAI = false;
     /** If true, sectors saves are cleared when lost. */
     public boolean clearSectorOnLose = false;
     /** Sets up rules on game load for any sector on this planet. */

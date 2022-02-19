@@ -1,6 +1,5 @@
 package mindustry.ai.types;
 
-import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.entities.*;
@@ -133,7 +132,8 @@ public class BuilderAI extends AIController{
                 });
             }
 
-            float rebuildTime = (unit.team.rules().ai ? Mathf.lerp(15f, 2f, unit.team.rules().aiTier) : 2f) * 60f;
+            //TODO this is bad, rebuild time should not depend on AI here
+            float rebuildTime = (unit.team.rules().rtsAi ? 12f : 2f) * 60f;
 
             //find new request
             if(!unit.team.data().blocks.isEmpty() && following == null && timer.get(timerTarget3, rebuildTime)){
@@ -168,7 +168,7 @@ public class BuilderAI extends AIController{
 
     @Override
     public boolean useFallback(){
-        return state.rules.waves && unit.team == state.rules.waveTeam && !unit.team.rules().ai && !unit.team.rules().rtsAi;
+        return state.rules.waves && unit.team == state.rules.waveTeam && !unit.team.rules().rtsAi;
     }
 
     @Override

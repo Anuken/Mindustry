@@ -28,7 +28,6 @@ public class SectorPresets{
 
         saltFlats = new SectorPreset("saltFlats", serpulo, 101){{
             difficulty = 5;
-            useAI = false;
         }};
 
         frozenForest = new SectorPreset("frozenForest", serpulo, 86){{
@@ -63,7 +62,6 @@ public class SectorPresets{
 
         extractionOutpost = new SectorPreset("extractionOutpost", serpulo, 165){{
             difficulty = 5;
-            useAI = false;
         }};
 
         coastline = new SectorPreset("coastline", serpulo, 108){{
@@ -77,12 +75,10 @@ public class SectorPresets{
 
         fungalPass = new SectorPreset("fungalPass", serpulo, 21){{
             difficulty = 4;
-            useAI = false;
         }};
 
         overgrowth = new SectorPreset("overgrowth", serpulo, 134){{
             difficulty = 5;
-            useAI = false;
         }};
 
         tarFields = new SectorPreset("tarFields", serpulo, 23){{

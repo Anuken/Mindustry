@@ -223,8 +223,6 @@ public class Teams{
         public final Seq<CoreBuild> cores = new Seq<>();
         public final Team team;
 
-        /** Handles building ""bases"". */
-        public @Nullable BaseAI baseAi;
         /** Handles RTS unit control. */
         public @Nullable RtsAI rtsAi;
 
@@ -330,7 +328,7 @@ public class Teams{
 
         /** @return whether this team is controlled by the AI and builds bases. */
         public boolean hasAI(){
-            return team.rules().ai;
+            return team.rules().rtsAi;
         }
 
         @Override

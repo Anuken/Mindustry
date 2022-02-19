@@ -83,6 +83,7 @@ public class RtsAI{
         }
     }
 
+    //TODO atrocious implementation
     void checkBuilding(){
         if(data.team.rules().aiCoreSpawn && timer.get(timerSpawn, 60 * 7f) && data.hasCore()){
             CoreBlock block = (CoreBlock)data.core().block;

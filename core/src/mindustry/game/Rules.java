@@ -201,11 +201,7 @@ public class Rules{
 
     /** A team-specific ruleset. */
     public static class TeamRule{
-        /** Whether to use building AI. TODO remove, it is terrible. */
-        public boolean ai;
-        /** TODO Tier of blocks/designs that the AI uses for building. [0, 1] */
-        public float aiTier = 1f;
-        /** Whether, when AI is enabled, ships should be spawned from the core. */
+        /** Whether, when AI is enabled, ships should be spawned from the core. TODO remove / unnecessary? */
         public boolean aiCoreSpawn = true;
         /** If true, blocks don't require power or resources. */
         public boolean cheat;

@@ -119,13 +119,8 @@ public class Logic implements ApplicationListener{
 
             if(state.isCampaign()){
                 //enable building AI on campaign unless the preset disables it
-                //TODO should be (more) configurable, I don't want building AI everywhere.
-                if(state.getSector().planet.defaultAI && !(state.getSector().preset != null && !state.getSector().preset.useAI)){
-                    state.rules.waveTeam.rules().ai = true;
-                }
 
                 state.rules.coreIncinerates = true;
-                state.rules.waveTeam.rules().aiTier = state.getSector().threat * 0.8f;
                 state.rules.waveTeam.rules().infiniteResources = true;
 
                 //fill enemy cores by default.
@@ -419,11 +414,6 @@ public class Logic implements ApplicationListener{
                     updateWeather();
 
                     for(TeamData data : state.teams.getActive()){
-                        if(data.hasAI()){
-                            if(data.baseAi == null) data.baseAi = new BaseAI(data);
-                            data.baseAi.update();
-                        }
-
                         if(data.team.rules().rtsAi){
                             if(data.rtsAi == null) data.rtsAi = new RtsAI(data);
                             data.rtsAi.update();

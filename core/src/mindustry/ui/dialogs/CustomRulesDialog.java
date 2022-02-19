@@ -182,7 +182,6 @@ public class CustomRulesDialog extends BaseDialog{
 
         title("@rules.title.enemy");
         check("@rules.attack", b -> rules.attackMode = b, () -> rules.attackMode);
-        check("@rules.buildai", b -> rules.teams.get(rules.waveTeam).ai = rules.teams.get(rules.waveTeam).infiniteResources = b, () -> rules.teams.get(rules.waveTeam).ai);
         check("@rules.corecapture", b -> rules.coreCapture = b, () -> rules.coreCapture);
         check("@rules.placerangecheck", b -> rules.placeRangeCheck = b, () -> rules.placeRangeCheck);
         check("@rules.polygoncoreprotection", b -> rules.polygonCoreProtection = b, () -> rules.polygonCoreProtection);
@@ -256,9 +255,6 @@ public class CustomRulesDialog extends BaseDialog{
                 number("@rules.blockdamagemultiplier", f -> teams.blockDamageMultiplier = f, () -> teams.blockDamageMultiplier);
 
                 check("@rules.rtsai", b -> teams.rtsAi = b, () -> teams.rtsAi, () -> team != rules.defaultTeam);
-
-                check("@rules.buildai", b -> teams.ai = b, () -> teams.ai, () -> team != rules.defaultTeam);
-                number("@rules.aitier", false, f -> teams.aiTier = f, () -> teams.aiTier, () -> teams.ai, 0, 1);
 
                 check("@rules.infiniteresources", b -> teams.infiniteResources = b, () -> teams.infiniteResources);
                 number("@rules.buildspeedmultiplier", f -> teams.buildSpeedMultiplier = f, () -> teams.buildSpeedMultiplier, 0.001f, 50f);
