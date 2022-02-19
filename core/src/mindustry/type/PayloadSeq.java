@@ -68,8 +68,11 @@ public class PayloadSeq{
     }
 
     public void write(Writes write){
-        write.s(blocks.size);
+        //IMPORTANT NOTICE: size is negated here because I changed the format of this class at some point
+        //negated = new format
+        write.s(-blocks.size);
         for(var entry : blocks.entries()){
+            write.b(entry.key.getContentType().ordinal());
             write.s(entry.key.id);
             write.i(entry.value);
         }
@@ -79,8 +82,17 @@ public class PayloadSeq{
         total = 0;
         blocks.clear();
         short amount = read.s();
-        for(int i = 0; i < amount; i++){
-            add(Vars.content.block(read.s()), read.i());
+        if(amount >= 0){
+            //old format, block only - can safely ignore, really
+            for(int i = 0; i < amount; i++){
+                add(Vars.content.block(read.s()), read.i());
+            }
+        }else{
+            //new format
+            for(int i = 0; i < -amount; i++){
+                add((UnlockableContent)Vars.content.getBy(ContentType.all[read.ub()]).get(read.s()), read.i());
+            }
         }
+
     }
 }
