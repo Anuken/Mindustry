@@ -1874,6 +1874,7 @@ public class Blocks{
             buildVisibility = BuildVisibility.berylliumOnly;
             health = 90;
             speed = 4f;
+            researchCostMultiplier = 1f / 12f;
         }};
 
         ductRouter = new DuctRouter("duct-router"){{
@@ -2289,7 +2290,7 @@ public class Blocks{
             hasLiquids = true;
             outputLiquid = new LiquidStack(Liquids.water, 5f / 60f / 9f);
             liquidCapacity = 20f;
-            researchCostMultiplier = 0.18f;
+            researchCostMultiplier = 0.18f / 13f;
         }};
 
         //TODO rename
@@ -2495,7 +2496,7 @@ public class Blocks{
             tier = 3;
             size = 2;
             range = 4;
-            researchCostMultiplier = 0.18f;
+            researchCostMultiplier = 0.18f / 12f;
 
             consumeLiquid(Liquids.hydrogen, 0.25f / 60f).boost();
         }};
@@ -3213,6 +3214,7 @@ public class Blocks{
             shootCone = 3f;
             scaledHealth = 280;
             rotateSpeed = 1.6f;
+            researchCostMultiplier = 0.3f;
 
             coolant = consume(new ConsumeLiquid(Liquids.water, 15f / 60f));
             limitRange();

@@ -63,7 +63,7 @@ public class FogControl implements CustomChunk{
             if(state.rules.fog && event.tile.build != null && event.tile.isCenter() && !event.tile.build.team.isAI() && event.tile.block().flags.contains(BlockFlag.hasFogRadius)){
                 var data = data(event.tile.team());
                 if(data != null){
-                    data.dynamicUpdated = true;
+                    data.dynamicUpdated = data.dynamicUpdatedClient = true;
                 }
 
                 synchronized(staticEvents){
@@ -78,7 +78,7 @@ public class FogControl implements CustomChunk{
             if(state.rules.fog && e.tile.build != null && !e.tile.build.team.isAI() && e.tile.block().flags.contains(BlockFlag.hasFogRadius)){
                 var data = data(e.tile.team());
                 if(data != null){
-                    data.dynamicUpdated = true;
+                    data.dynamicUpdated = data.dynamicUpdatedClient = true;
                 }
             }
         });
@@ -161,7 +161,7 @@ public class FogControl implements CustomChunk{
 
                 if(data == null){
                     data = fog[team.team.id] = new FogData();
-                    data.dynamicUpdated = true;
+                    data.dynamicUpdated = data.dynamicUpdatedClient = true;
                 }
 
                 synchronized(staticEvents){
@@ -176,7 +176,7 @@ public class FogControl implements CustomChunk{
                         if(unit.lastFogPos != pos){
                             pushEvent(event);
                             unit.lastFogPos = pos;
-                            data.dynamicUpdated = true;
+                            data.dynamicUpdated = data.dynamicUpdatedClient = true;
                         }
                     }
                 }
@@ -187,9 +187,9 @@ public class FogControl implements CustomChunk{
                 }
 
                 //on the client, let the renderer know of all the fog sources
-                //TODO this runs at a lower FPS and hence may look bad...?
-                if(data.dynamicUpdated && !headless && team.team == Vars.player.team()){
+                if(data.dynamicUpdatedClient && !headless && team.team == Vars.player.team()){
                     renderer.fog.flushDynamic(unitEventQueue);
+                    data.dynamicUpdatedClient = false;
                 }
 
                 //if it's time for an update, flush *everything* onto the update queue
@@ -479,6 +479,8 @@ public class FogControl implements CustomChunk{
         long lastDynamicMs = 0;
         /** if true, a dynamic fog update must be scheduled. */
         boolean dynamicUpdated;
+
+        boolean dynamicUpdatedClient;
 
         FogData(){
             int len = ww * wh;

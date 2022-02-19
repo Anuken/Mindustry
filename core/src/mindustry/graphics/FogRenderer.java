@@ -74,6 +74,7 @@ public class FogRenderer{
 
             //TODO render all (clipped) view circles
 
+            dynamicFog.end();
             ScissorStack.pop();
             Draw.proj(Core.camera);
         }
