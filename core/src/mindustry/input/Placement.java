@@ -212,7 +212,7 @@ public class Placement{
                         }
                         i = j;
                         continue outer;
-                    }else if(other.placeable(team)){
+                    }else if(placeable.get(other)){
                         //found a link, assign bridges
                         cur.block = bridge;
                         other.block = bridge;
