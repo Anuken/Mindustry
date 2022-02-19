@@ -122,7 +122,7 @@ public class FogRenderer{
     }
 
     void poly(Rect check, float x, float y, float rad){
-        if(check.overlaps(x - rad / 2f, y - rad / 2f, rad * 2f, rad * 2f)){
+        if(check.overlaps(x - rad, y - rad, rad * 2f, rad * 2f)){
             Fill.poly(x, y, 20, rad);
         }
     }

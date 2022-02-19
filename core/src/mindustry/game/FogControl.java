@@ -17,7 +17,6 @@ import java.io.*;
 
 import static mindustry.Vars.*;
 
-//TODO bitset + dynamic FoW
 public class FogControl implements CustomChunk{
     private static volatile int ww, wh;
     private static final int staticUpdateInterval = 1000 / 25; //25 FPS
@@ -34,7 +33,7 @@ public class FogControl implements CustomChunk{
     private @Nullable Thread staticFogThread;
     private @Nullable Thread dynamicFogThread;
 
-    private boolean read = false, justLoaded = false;
+    private boolean justLoaded = false;
 
     public FogControl(){
         Events.on(ResetEvent.class, e -> {
@@ -49,14 +48,14 @@ public class FogControl implements CustomChunk{
             wh = world.height();
 
             //all old buildings have static light scheduled around them
-            if(state.rules.fog && read){
-                for(var build : Groups.build){
-                    synchronized(staticEvents){
-                        staticEvents.add(FogEvent.get(build.tile.x, build.tile.y, build.block.size, build.team.id));
+            if(state.rules.fog){
+                synchronized(staticEvents){
+                    for(var build : Groups.build){
+                        if(build.block.flags.contains(BlockFlag.hasFogRadius)){
+                            staticEvents.add(FogEvent.get(build.tile.x, build.tile.y, build.block.fogRadius, build.team.id));
+                        }
                     }
                 }
-
-                read = false;
             }
         });
 
@@ -121,7 +120,6 @@ public class FogControl implements CustomChunk{
         if(dynamicFogThread != null){
             dynamicFogThread.interrupt();
             dynamicFogThread = null;
-            Log.info("end dynamic fog");
         }
     }
 
@@ -137,7 +135,7 @@ public class FogControl implements CustomChunk{
             fog = new FogData[256];
         }
 
-        //TODO should it be clientside...?
+        //not run clientside, the CPU side isn't needed here.
         if(staticFogThread == null && !net.client()){
             staticFogThread = new StaticFogThread();
             staticFogThread.setDaemon(true);
@@ -149,10 +147,6 @@ public class FogControl implements CustomChunk{
             dynamicFogThread.setDaemon(true);
             dynamicFogThread.start();
         }
-
-        //TODO force update all fog on world load
-
-        //TODO dynamic fog initialization
 
         //clear to prepare for queuing fog radius from units and buildings
         dynamicEventQueue.clear();
@@ -194,7 +188,7 @@ public class FogControl implements CustomChunk{
 
                     //add building updates
                     for(var build : indexer.getFlagged(team.team, BlockFlag.hasFogRadius)){
-                        dynamicEventQueue.add(FogEvent.get(build.tile.x, build.tile.y, build.block.fogRadius, 0));
+                        dynamicEventQueue.add(FogEvent.get(build.tile.x, build.tile.y, build.block.fogRadius, build.team.id));
                     }
 
                     //add unit updates
@@ -412,8 +406,6 @@ public class FogControl implements CustomChunk{
                 }
             }
         }
-
-        read = true;
 
     }
 
