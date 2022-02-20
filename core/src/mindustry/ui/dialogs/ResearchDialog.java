@@ -325,15 +325,16 @@ public class ResearchDialog extends BaseDialog{
 
     void checkNodes(TechTreeNode node){
         boolean locked = locked(node.node);
-        if(!locked) node.visible = true;
+        if(!locked && (node.parent == null || node.parent.visible)) node.visible = true;
         node.selectable = selectable(node.node);
         for(TechTreeNode l : node.children){
-            l.visible = !locked;
+            l.visible = !locked && l.parent.visible;
             checkNodes(l);
         }
 
         itemDisplay.rebuild(items);
     }
+
 
     boolean selectable(TechNode node){
         return node.content.unlocked() || !node.objectives.contains(i -> !i.complete());

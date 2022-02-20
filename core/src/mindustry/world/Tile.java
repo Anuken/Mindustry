@@ -21,8 +21,6 @@ import mindustry.world.blocks.environment.*;
 import static mindustry.Vars.*;
 
 public class Tile implements Position, QuadTreeObject, Displayable{
-    private static boolean tileChangeLock = false;
-    private static boolean tilePreChangeLock = false;
     private static final TileChangeEvent tileChange = new TileChangeEvent();
     private static final TilePreChangeEvent preChange = new TilePreChangeEvent();
     private static final ObjectSet<Building> tileSet = new ObjectSet<>();
@@ -632,34 +630,13 @@ public class Tile implements Position, QuadTreeObject, Displayable{
 
     protected void fireChanged(){
         if(!world.isGenerating()){
-
-            //A TileChangeEvent may cause other TileChangeEvents to occur, and if that happens, allocate a new instance.
-            boolean wasLocked = tileChangeLock;
-            var eventInst = wasLocked ? new TileChangeEvent() : tileChange;
-            tileChangeLock = true;
-
-            Events.fire(eventInst.set(this));
-
-            //unlock after it's done
-            if(!wasLocked){
-                tileChangeLock = false;
-            }
+            Events.fire(tileChange.set(this));
         }
     }
 
     protected void firePreChanged(){
         if(!world.isGenerating()){
-
-            //same as above
-            boolean wasLocked = tilePreChangeLock;
-            var eventInst = wasLocked ? new TilePreChangeEvent() : preChange;
-            tilePreChangeLock = true;
-
-            Events.fire(eventInst.set(this));
-
-            if(!wasLocked){
-                tilePreChangeLock = false;
-            }
+            Events.fire(preChange.set(this));
         }
     }
 

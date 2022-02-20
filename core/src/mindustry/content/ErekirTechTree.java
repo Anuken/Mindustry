@@ -197,6 +197,12 @@ public class ErekirTechTree{
                         node(tungstenWallLarge, () -> {
 
                         });
+
+                        node(carbideWall, () -> {
+                            node(carbideWallLarge, () -> {
+
+                            });
+                        });
                     });
                 });
 
@@ -219,24 +225,30 @@ public class ErekirTechTree{
                 });
             });
 
-            node(tankAssembler, Seq.with(new OnSector(four), new Research(constructor), new Research(atmosphericConcentrator)), () -> {
-                node(UnitTypes.vanquish, () -> {
-                    node(UnitTypes.conquer, Seq.with(tmpNever), () -> {
+            node(fabricator, () -> {
+                node(UnitTypes.stell, Seq.with(new Research(siliconArcFurnace), new Research(plasmaBore), new Research(turbineCondenser)), () -> {
 
-                    });
                 });
 
-                node(shipAssembler, Seq.with(new OnSector(five)), () -> {
-                    node(UnitTypes.quell, () -> {
-                        node(UnitTypes.disrupt, Seq.with(tmpNever), () -> {
+                node(tankAssembler, Seq.with(new OnSector(four), new Research(constructor), new Research(atmosphericConcentrator)), () -> {
+                    node(UnitTypes.vanquish, () -> {
+                        node(UnitTypes.conquer, Seq.with(tmpNever), () -> {
 
                         });
                     });
 
-                    node(mechAssembler, Seq.with(tmpNever), () -> {
-                        node(UnitTypes.bulwark, () -> {
-                            node(UnitTypes.krepost, Seq.with(tmpNever), () -> {
+                    node(shipAssembler, Seq.with(new OnSector(five)), () -> {
+                        node(UnitTypes.quell, () -> {
+                            node(UnitTypes.disrupt, Seq.with(tmpNever), () -> {
 
+                            });
+                        });
+
+                        node(mechAssembler, Seq.with(tmpNever), () -> {
+                            node(UnitTypes.bulwark, () -> {
+                                node(UnitTypes.krepost, Seq.with(tmpNever), () -> {
+
+                                });
                             });
                         });
                     });
@@ -258,26 +270,48 @@ public class ErekirTechTree{
             });
 
             nodeProduce(Items.beryllium, () -> {
-                nodeProduce(Items.oxide, () -> {
-                    nodeProduce(Items.fissileMatter, () -> {
+                nodeProduce(Items.graphite, () -> {
+                    nodeProduce(Items.sand, () -> {
+                        nodeProduce(Items.silicon, () -> {
+                            nodeProduce(Items.oxide, () -> {
+                                nodeProduce(Items.fissileMatter, () -> {
 
-                    });
-                });
-
-                nodeProduce(Liquids.ozone, () -> {
-                    nodeProduce(Liquids.hydrogen, () -> {
-                        nodeProduce(Liquids.nitrogen, () -> {
-                            nodeProduce(Liquids.cyanogen, () -> {
-
+                                });
                             });
                         });
                     });
-                });
 
-                nodeProduce(Items.tungsten, () -> {
-                    nodeProduce(Items.carbide, () -> {
-                        nodeProduce(Liquids.gallium, () -> {
+                    nodeProduce(Liquids.water, () -> {
+                        nodeProduce(Liquids.ozone, () -> {
+                            nodeProduce(Liquids.hydrogen, () -> {
+                                nodeProduce(Liquids.nitrogen, () -> {
+                                    nodeProduce(Liquids.cyanogen, () -> {
 
+                                    });
+                                });
+                            });
+                        });
+                    });
+
+                    nodeProduce(Items.tungsten, () -> {
+                        nodeProduce(Liquids.slag, () -> {
+
+                        });
+
+                        nodeProduce(Items.thorium, () -> {
+                            nodeProduce(Items.carbide, () -> {
+                                nodeProduce(Items.surgeAlloy, () -> {
+                                    nodeProduce(Items.phaseFabric, () -> {
+
+                                    });
+                                });
+
+                                nodeProduce(Liquids.gallium, () -> {
+                                    nodeProduce(Items.scrap, () -> {
+
+                                    });
+                                });
+                            });
                         });
                     });
                 });

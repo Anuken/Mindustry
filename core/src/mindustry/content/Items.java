@@ -35,7 +35,6 @@ public class Items{
         }};
 
         sand = new Item("sand", Color.valueOf("f7cba4")){{
-            alwaysUnlocked = true;
             lowPriority = true;
         }};
 

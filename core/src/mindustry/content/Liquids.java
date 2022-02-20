@@ -12,7 +12,6 @@ public class Liquids{
 
         water = new Liquid("water", Color.valueOf("596ab8")){{
             heatCapacity = 0.4f;
-            alwaysUnlocked = true;
             effect = StatusEffects.wet;
             boilPoint = 0.5f;
             gasColor = Color.grays(0.9f);

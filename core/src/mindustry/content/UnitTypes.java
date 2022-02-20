@@ -2425,6 +2425,7 @@ public class UnitTypes{
             armor = 5f;
             areaDamage = 5f;
             treadRects = new Rect[]{new Rect(12, 7, 14, 51)};
+            researchCostMultiplier = 0f;
 
             weapons.add(new Weapon("stell-weapon"){{
                 layerOffset = 0.0001f;

@@ -281,7 +281,7 @@ public class EventType{
     /**
      * Called *after* a tile has changed.
      * WARNING! This event is special: its instance is reused! Do not cache or use with a timer.
-     * Do not modify any tiles inside listeners that use this tile.
+     * Do not modify any tiles inside listener code.
      * */
     public static class TileChangeEvent{
         public Tile tile;
