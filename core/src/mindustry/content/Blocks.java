@@ -3623,7 +3623,7 @@ public class Blocks{
             size = 3;
             configurable = false;
             plans.add(new UnitPlan(UnitTypes.stell, 60f * 60f, with(Items.graphite, 20f, Items.silicon, 40f)));
-            researchCostMultiplier = 1f / 12f;
+            researchCostMultiplier = 1f / 20f;
             consumePower(2f);
         }};
 
