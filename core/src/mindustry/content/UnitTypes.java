@@ -2917,7 +2917,6 @@ public class UnitTypes{
         //endregion
         //region erekir - flying
 
-        /*
         avert = new ErekirUnitType("avert"){{
             lowAltitude = false;
             flying = true;
@@ -2935,8 +2934,6 @@ public class UnitTypes{
             new UnitEngine(23 / 4f, -22 / 4f, 2.2f, 315f)
             );
         }};
-
-         */
 
         quell = new ErekirUnitType("quell"){{
             aiController = FlyingFollowAI::new;

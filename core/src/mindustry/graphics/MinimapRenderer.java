@@ -36,16 +36,17 @@ public class MinimapRenderer{
         });
 
         Events.on(TileChangeEvent.class, event -> {
-            //TODO don't update when the minimap is off?
             if(!ui.editor.isShown()){
                 update(event.tile);
 
                 //update floor below block.
-                if(event.tile.block().solid && event.tile.y > 0){
-                    Tile tile = world.tile(event.tile.x, event.tile.y - 1);
-                    if(tile.block() == Blocks.air){
-                        update(tile);
-                    }
+                if(event.tile.block().solid && event.tile.y > 0 && event.tile.isCenter()){
+                    event.tile.getLinkedTiles(t -> {
+                        Tile tile = world.tile(t.x, t.y - 1);
+                        if(tile.block() == Blocks.air){
+                            update(tile);
+                        }
+                    });
                 }
             }
         });

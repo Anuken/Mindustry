@@ -236,8 +236,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
 
         //set up multiblock
         if(block.isMultiblock()){
-            int offsetx = -(block.size - 1) / 2;
-            int offsety = -(block.size - 1) / 2;
+            int offset = -(block.size - 1) / 2;
             Building entity = this.build;
             Block block = this.block;
 
@@ -245,8 +244,8 @@ public class Tile implements Position, QuadTreeObject, Displayable{
             for(int pass = 0; pass < 2; pass++){
                 for(int dx = 0; dx < block.size; dx++){
                     for(int dy = 0; dy < block.size; dy++){
-                        int worldx = dx + offsetx + x;
-                        int worldy = dy + offsety + y;
+                        int worldx = dx + offset + x;
+                        int worldy = dy + offset + y;
                         if(!(worldx == x && worldy == y)){
                             Tile other = world.tile(worldx, worldy);
 
@@ -434,12 +433,10 @@ public class Tile implements Position, QuadTreeObject, Displayable{
      */
     public void getLinkedTiles(Cons<Tile> cons){
         if(block.isMultiblock()){
-            int size = block.size;
-            int offsetx = -(size - 1) / 2;
-            int offsety = -(size - 1) / 2;
+            int size = block.size, o = block.sizeOffset;
             for(int dx = 0; dx < size; dx++){
                 for(int dy = 0; dy < size; dy++){
-                    Tile other = world.tile(x + dx + offsetx, y + dy + offsety);
+                    Tile other = world.tile(x + dx + o, y + dy + o);
                     if(other != null) cons.get(other);
                 }
             }
@@ -474,11 +471,10 @@ public class Tile implements Position, QuadTreeObject, Displayable{
      */
     public void getLinkedTilesAs(Block block, Cons<Tile> tmpArray){
         if(block.isMultiblock()){
-            int offsetx = -(block.size - 1) / 2;
-            int offsety = -(block.size - 1) / 2;
-            for(int dx = 0; dx < block.size; dx++){
-                for(int dy = 0; dy < block.size; dy++){
-                    Tile other = world.tile(x + dx + offsetx, y + dy + offsety);
+            int size = block.size, o = block.sizeOffset;
+            for(int dx = 0; dx < size; dx++){
+                for(int dy = 0; dy < size; dy++){
+                    Tile other = world.tile(x + dx + o, y + dy + o);
                     if(other != null) tmpArray.get(other);
                 }
             }
