@@ -392,9 +392,6 @@ public class LExecutor{
                     case within -> {
                         exec.setnum(p4, unit.within(x1, y1, d1) ? 1 : 0);
                     }
-                    case pathfind -> {
-                        ai.control = type;
-                    }
                     case target -> {
                         ai.posTarget.set(x1, y1);
                         ai.aimControl = type;

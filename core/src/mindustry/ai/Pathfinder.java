@@ -94,11 +94,14 @@ public class Pathfinder implements Runnable{
                 tiles[i] = packTile(tile, 0);
             }
 
-            preloadPath(getField(state.rules.waveTeam, costGround, fieldCore));
+            if(state.rules.waveTeam.needsFlowField()){
+                preloadPath(getField(state.rules.waveTeam, costGround, fieldCore));
 
-            //preload water on naval maps
-            if(spawner.getSpawns().contains(t -> t.floor().isLiquid)){
-                preloadPath(getField(state.rules.waveTeam, costNaval, fieldCore));
+                //preload water on naval maps
+                if(spawner.getSpawns().contains(t -> t.floor().isLiquid)){
+                    preloadPath(getField(state.rules.waveTeam, costNaval, fieldCore));
+                }
+
             }
 
             start();

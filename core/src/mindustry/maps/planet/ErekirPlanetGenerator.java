@@ -449,7 +449,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         Schematics.placeLaunchLoadout(spawnX, spawnY);
 
         //all sectors are wave sectors
-        state.rules.waves = true;
+        state.rules.waves = false;
         state.rules.showSpawns = true;
     }
 }

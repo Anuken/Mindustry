@@ -110,6 +110,11 @@ public class Team implements Comparable<Team>{
         return (state.rules.waves || state.rules.attackMode) && this == state.rules.waveTeam;
     }
 
+    /** @return whether this team needs a flow field for "dumb" wave pathfinding. */
+    public boolean needsFlowField(){
+        return isAI() && !rules().rtsAi;
+    }
+
     public boolean isEnemy(Team other){
         return this != other;
     }

@@ -3,13 +3,9 @@ package mindustry.ai.types;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.ai.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.logic.*;
-import mindustry.world.*;
-
-import static mindustry.Vars.*;
 
 public class LogicAI extends AIController{
     /** Minimum delay between item transfers. */
@@ -67,20 +63,6 @@ public class LogicAI extends AIController{
             }
             case approach -> {
                 moveTo(Tmp.v1.set(moveX, moveY), moveRad - 7f, 7);
-            }
-            case pathfind -> {
-                Building core = unit.closestEnemyCore();
-
-                if((core == null || !unit.within(core, unit.range() * 0.5f))){
-                    boolean move = true;
-
-                    if(state.rules.waves && unit.team == state.rules.defaultTeam){
-                        Tile spawner = getClosestSpawner();
-                        if(spawner != null && unit.within(spawner, state.rules.dropZoneRadius + 120f)) move = false;
-                    }
-
-                    if(move) pathfind(Pathfinder.fieldCore);
-                }
             }
             case stop -> {
                 unit.clearBuilding();
