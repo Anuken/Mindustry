@@ -273,7 +273,13 @@ public class MapEditorDialog extends Dialog implements Disposable{
             world.endMapLoad();
             player.set(world.width() * tilesize/2f, world.height() * tilesize/2f);
             player.clearUnit();
-            Groups.unit.clear();
+
+            for(var unit : Groups.unit){
+                if(unit.spawnedByCore){
+                    unit.remove();
+                }
+            }
+
             Groups.build.clear();
             Groups.weather.clear();
             logic.play();

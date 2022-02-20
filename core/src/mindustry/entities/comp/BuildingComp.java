@@ -346,6 +346,14 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         timeScale = Math.max(timeScale, intensity);
     }
 
+    public void applySlowdown(float intensity, float duration){
+        //do not refresh time scale when getting a weaker intensity
+        if(intensity <= this.timeScale - 0.001f){
+            timeScaleDuration = Math.max(timeScaleDuration, duration);
+        }
+        timeScale = Math.min(timeScale, intensity);
+    }
+
     public void applyHealSuppression(float amount){
         healSuppressionTime = Math.max(healSuppressionTime, Time.time + amount);
     }

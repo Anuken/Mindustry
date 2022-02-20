@@ -336,7 +336,7 @@ public class EntityProcess extends BaseProcessor{
                             fbuilder.initializer(varInitializers.get(f.descString()));
                         }
 
-                        fbuilder.addModifiers(f.has(ReadOnly.class) ? Modifier.PROTECTED : Modifier.PUBLIC);
+                        fbuilder.addModifiers(f.has(ReadOnly.class) || f.is(Modifier.PRIVATE) ? Modifier.PROTECTED : Modifier.PUBLIC);
                         fbuilder.addAnnotations(f.annotations().map(AnnotationSpec::get));
                         FieldSpec spec = fbuilder.build();
 

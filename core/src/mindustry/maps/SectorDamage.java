@@ -291,16 +291,16 @@ public class SectorDamage{
                     }
 
                     if(build.block instanceof MendProjector m){
-                        sumRps += m.healPercent / m.reload * avgHealth * 60f / 100f * e * build.timeScale;
+                        sumRps += m.healPercent / m.reload * avgHealth * 60f / 100f * e * build.timeScale();
                     }
 
                     //point defense turrets act as flat health right now
                     if(build.block instanceof PointDefenseTurret && build.consValid()){
-                        sumHealth += 150f * build.timeScale;
+                        sumHealth += 150f * build.timeScale();
                     }
 
                     if(build.block instanceof ForceProjector f){
-                        sumHealth += f.shieldHealth * e * build.timeScale;
+                        sumHealth += f.shieldHealth * e * build.timeScale();
                         sumRps += e;
                     }
                 }
