@@ -42,7 +42,7 @@ public class UnitTypes{
 
     //air
     public static @EntityDef({Unitc.class}) UnitType flare, eclipse, horizon, zenith, antumbra,
-    evoke;
+    evoke, avert;
 
     //air, legacy
     public static @EntityDef(value = {Unitc.class}, legacy = true) UnitType mono;
@@ -2916,6 +2916,27 @@ public class UnitTypes{
 
         //endregion
         //region erekir - flying
+
+        /*
+        avert = new ErekirUnitType("avert"){{
+            lowAltitude = false;
+            flying = true;
+            drag = 0.08f;
+            speed = 2.5f;
+            rotateSpeed = 5f;
+            accel = 0.09f;
+            health = 600f;
+            armor = 2f;
+            hitSize = 12f;
+            engineSize = 0;
+
+            setEnginesMirror(
+            new UnitEngine(21 / 4f, 19 / 4f, 2.2f, 45f),
+            new UnitEngine(23 / 4f, -22 / 4f, 2.2f, 315f)
+            );
+        }};
+
+         */
 
         quell = new ErekirUnitType("quell"){{
             aiController = FlyingFollowAI::new;

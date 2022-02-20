@@ -3733,14 +3733,13 @@ public class Blocks{
         }};
 
         smallDeconstructor = new PayloadDeconstructor("small-deconstructor"){{
-            requirements(Category.units, with(Items.beryllium, 100, Items.silicon, 100, Items.oxide, 50, Items.graphite, 80));
+            requirements(Category.units, with(Items.beryllium, 100, Items.silicon, 100, Items.oxide, 40, Items.graphite, 80));
             itemCapacity = 100;
             consumePower(1f);
             size = 3;
             deconstructSpeed = 1f;
         }};
 
-        //TODO consider usefulness and applicability to serpulo... or anything really
         deconstructor = new PayloadDeconstructor("deconstructor"){{
             requirements(Category.units, with(Items.beryllium, 250, Items.oxide, 100, Items.silicon, 250, Items.carbide, 250));
             itemCapacity = 250;
@@ -3756,7 +3755,7 @@ public class Blocks{
             consumePower(2f);
             size = 3;
             //TODO expand this list
-            filter = Seq.with(Blocks.tungstenWallLarge, Blocks.berylliumWallLarge, Blocks.reinforcedLiquidContainer, Blocks.beamNode);
+            filter = Seq.with(Blocks.tungstenWallLarge, Blocks.berylliumWallLarge, Blocks.reinforcedLiquidContainer, Blocks.reinforcedContainer, Blocks.beamNode);
         }};
 
         //yes this block is pretty much useless

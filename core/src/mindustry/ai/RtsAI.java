@@ -27,7 +27,8 @@ public class RtsAI{
     static final IntSet assignedTargets = new IntSet();
     static final float squadRadius = 120f;
     static final int timeUpdate = 0, timerSpawn = 1;
-    static final float minWeight = 0.9f;
+    //TODO make configurable
+    static final float minWeight = 1.1f;
 
     //in order of priority??
     static final BlockFlag[] flags = {BlockFlag.generator, BlockFlag.factory, BlockFlag.core, BlockFlag.battery};

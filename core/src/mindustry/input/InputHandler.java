@@ -1266,7 +1266,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
         }
 
-        return tmpUnits.min(u -> u.dst(x, y) - u.hitSize/2f);
+        return tmpUnits.min(u -> !u.inFogTo(player.team()), u -> u.dst(x, y) - u.hitSize/2f);
     }
 
     public Seq<Unit> selectedCommandUnits(float x, float y, float w, float h){
