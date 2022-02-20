@@ -97,7 +97,8 @@ public class EnvRenderers{
                 tex.setWrap(TextureWrap.repeat);
             }
 
-            Draw.z(Layer.weather - 1);
+            //TODO layer looks better? should not be conditional
+            Draw.z(state.rules.fog ? Layer.fogOfWar + 1 : Layer.weather - 1);
             Weather.drawNoiseLayers(tex, Color.scarlet, 1000f, 0.23f, 0.4f, 1f, 1f, 0f,
             4, -1.3f, 0.7f, 0.8f, 0.9f);
             Draw.reset();

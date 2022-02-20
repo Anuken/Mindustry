@@ -320,7 +320,8 @@ public class FogControl implements CustomChunk{
                         data.write.clear();
                     }
 
-                    circle(data.write, x, y, rad);
+                    //radius is always +1 to keep up with visuals
+                    circle(data.write, x, y, rad + 1);
                 }
             }
             dynamicEvents.clear();

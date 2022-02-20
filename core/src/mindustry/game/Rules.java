@@ -115,6 +115,10 @@ public class Rules{
     public ObjectSet<Item> hiddenBuildItems = new ObjectSet<>();
     /** HIGHLY UNSTABLE/EXPERIMENTAL. DO NOT USE THIS. */
     public boolean fog = false;
+    /** Color for static, undiscovered fog of war areas. */
+    public Color staticColor = new Color(0f, 0f, 0f, 1f);
+    /** Color for discovered but un-monitored fog of war areas. */
+    public Color dynamicColor = new Color(0f, 0f, 0f, 0.5f);
     /** Whether ambient lighting is enabled. */
     public boolean lighting = false;
     /** Whether enemy lighting is visible.

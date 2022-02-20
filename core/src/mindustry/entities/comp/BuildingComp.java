@@ -70,6 +70,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     transient float enabledControlTime;
     transient String lastAccessed;
     transient boolean wasDamaged; //used only by the indexer
+    transient boolean wasVisible; //used only by the block renderer when fog is on
     transient float visualLiquid;
 
     @Nullable PowerModule power;
@@ -1773,6 +1774,24 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             //change config only if it's new
             configured(null, p1);
         }
+    }
+
+    @Replace
+    @Override
+    public boolean inFogTo(Team viewer){
+        if(team == viewer || !state.rules.fog) return false;
+
+        int size = block.size, of = block.sizeOffset, tx = tile.x, ty = tile.y;
+
+        for(int x = 0; x < size; x++){
+            for(int y = 0; y < size; y++){
+                if(fogControl.isVisibleTile(viewer, tx + x + of, ty + y + of)){
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     @Override

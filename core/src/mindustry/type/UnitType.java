@@ -466,7 +466,7 @@ public class UnitType extends UnlockableContent{
         }
 
         if(fogRadius < 0){
-            fogRadius = Math.max(lightRadius * 2.5f, 1f) / 8f;
+            fogRadius = Math.max(lightRadius * 3.1f, 1f) / 8f;
         }
 
         if(weapons.isEmpty()){

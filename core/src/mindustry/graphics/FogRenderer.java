@@ -18,9 +18,6 @@ import static mindustry.Vars.*;
 
 /** Highly experimental fog-of-war renderer. */
 public class FogRenderer{
-    public static final Color
-        staticColor = new Color(0f, 0f, 0f, 1f),
-        dynamicColor = new Color(0f, 0f, 0f, 0.5f);
     private FrameBuffer staticFog = new FrameBuffer(), dynamicFog = new FrameBuffer();
     private LongSeq events = new LongSeq();
     private Rect rect = new Rect();
@@ -114,17 +111,18 @@ public class FogRenderer{
         dynamicFog.getTexture().setFilter(TextureFilter.linear);
 
         Draw.shader(Shaders.fog);
-        Draw.color(dynamicColor);
+        Draw.color(state.rules.dynamicColor);
         Draw.fbo(dynamicFog.getTexture(), world.width(), world.height(), tilesize);
-        Draw.color(staticColor);
+        Draw.color(state.rules.staticColor);
         Draw.fbo(staticFog.getTexture(), world.width(), world.height(), tilesize);
         Draw.shader();
     }
 
     void poly(Rect check, float x, float y, float rad){
-        if(check.overlaps(x - rad, y - rad, rad * 2f, rad * 2f)){
-            Fill.poly(x, y, 20, rad);
-        }
+        //todo clipping messes up the minimap
+        //if(check.overlaps(x - rad, y - rad, rad * 2f, rad * 2f)){
+        Fill.poly(x, y, 20, rad);
+        //}
     }
 
     void renderEvent(long e){

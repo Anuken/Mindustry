@@ -150,6 +150,8 @@ public class Block extends UnlockableContent implements Senseable{
     public int size = 1;
     /** multiblock offset */
     public float offset = 0f;
+    /** offset for iteration (internal use only) */
+    public int sizeOffset = 0;
     /** Clipping size of this block. Should be as large as the block will draw. */
     public float clipSize = -1f;
     /** When placeRangeCheck is enabled, this is the range checked for enemy blocks. */
@@ -1076,6 +1078,7 @@ public class Block extends UnlockableContent implements Senseable{
         }
 
         offset = ((size + 1) % 2) * tilesize / 2f;
+        sizeOffset = -((size - 1) / 2);
 
         if(requirements.length > 0){
             buildCost = 0f;

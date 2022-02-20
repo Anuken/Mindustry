@@ -9,8 +9,10 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.game.EventType.*;
+import mindustry.game.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.world.*;
@@ -81,7 +83,11 @@ public class BlockRenderer{
                     updateFloors.add(new UpdateRenderState(tile, tile.floor()));
                 }
 
-                if(tile.block().hasShadow){
+                if(tile.build != null && (tile.team() == player.team() || !state.rules.fog)){
+                    tile.build.wasVisible = true;
+                }
+
+                if(tile.block().hasShadow && (tile.build == null || tile.build.wasVisible)){
                     Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
                 }
             }
@@ -99,7 +105,14 @@ public class BlockRenderer{
         });
 
         Events.on(TileChangeEvent.class, event -> {
-            shadowEvents.add(event.tile);
+            boolean visible = event.tile.build == null || event.tile.build.inFogTo(Vars.player.team());
+            if(event.tile.build != null){
+                event.tile.build.wasVisible = visible;
+            }
+
+            if(visible){
+                shadowEvents.add(event.tile);
+            }
 
             int avgx = (int)(camera.position.x / tilesize);
             int avgy = (int)(camera.position.y / tilesize);
@@ -265,7 +278,7 @@ public class BlockRenderer{
 
             for(Tile tile : shadowEvents){
                 //draw white/shadow color depending on blend
-                Draw.color(!tile.block().hasShadow ? Color.white : blendShadowColor);
+                Draw.color((!tile.block().hasShadow || (state.rules.fog && tile.build != null && !tile.build.wasVisible)) ? Color.white : blendShadowColor);
                 Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
             }
 
@@ -371,6 +384,7 @@ public class BlockRenderer{
     }
 
     public void drawBlocks(){
+        Team pteam = player.team();
 
         drawDestroyed();
 
@@ -382,7 +396,9 @@ public class BlockRenderer{
 
             Draw.z(Layer.block);
 
-            if(block != Blocks.air){
+            boolean visible = (build == null || !build.inFogTo(pteam)/* || build.wasVisible*/);
+
+            if(block != Blocks.air && visible){
                 block.drawBase(tile);
                 Draw.reset();
                 Draw.z(Layer.block);
@@ -394,6 +410,8 @@ public class BlockRenderer{
                 }
 
                 if(build != null){
+                    if(!build.wasVisible) updateShadow(build);
+                    build.wasVisible = true;
 
                     if(build.damaged()){
                         Draw.z(Layer.blockCracks);
@@ -411,6 +429,11 @@ public class BlockRenderer{
                     }
                 }
                 Draw.reset();
+            }else if(!visible){
+                //TODO here is the question: should buildings you lost sight of remain rendered? if so, how should this information be stored?
+                //comment lines below for buggy persistence
+                if(build.wasVisible) updateShadow(build);
+                build.wasVisible = false;
             }
         }
 
@@ -440,6 +463,16 @@ public class BlockRenderer{
             });
 
             Draw.reset();
+        }
+    }
+
+    void updateShadow(Building build){
+        int size = build.block.size, of = build.block.sizeOffset, tx = build.tile.x, ty = build.tile.y;
+
+        for(int x = 0; x < size; x++){
+            for(int y = 0; y < size; y++){
+                shadowEvents.add(world.tile(x + tx + of, y + ty + of));
+            }
         }
     }
 

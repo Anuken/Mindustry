@@ -155,11 +155,12 @@ public class MinimapRenderer{
             Tmp.tr1.set(dynamicTex);
             Tmp.tr1.set(region.u, 1f - region.v, region.u2, 1f - region.v2);
 
-            Draw.color(FogRenderer.dynamicColor);
+            Draw.color(state.rules.dynamicColor);
             Draw.rect(Tmp.tr1, x + w/2f, y + h/2f, w, h);
 
             Tmp.tr1.texture = staticTex;
-            Draw.color(FogRenderer.staticColor);
+            //must be black to fit with borders
+            Draw.color(0f, 0f, 0f, state.rules.staticColor.a);
             Draw.rect(Tmp.tr1, x + w/2f, y + h/2f, w, h);
 
             Draw.color();

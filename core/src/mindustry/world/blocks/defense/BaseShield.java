@@ -7,6 +7,7 @@ import arc.math.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
@@ -108,6 +109,12 @@ public class BaseShield extends Block{
             super.draw();
 
             drawShield();
+        }
+
+        //always visible due to their shield nature
+        @Override
+        public boolean inFogTo(Team viewer){
+            return false;
         }
 
         public void drawShield(){

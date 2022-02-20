@@ -10,6 +10,7 @@ import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
@@ -138,6 +139,11 @@ public class ForceProjector extends Block{
         public void pickedUp(){
             super.pickedUp();
             radscl = warmup = 0f;
+        }
+
+        @Override
+        public boolean inFogTo(Team viewer){
+            return false;
         }
 
         @Override
