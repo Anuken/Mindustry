@@ -1,5 +1,9 @@
 [
   {
+    "name": "Sectorized",
+    "address": ["vps14989714.delta-networks.de"]
+  },
+  {
     "name": "{AA}",
     "address": ["recessive.net"]
   },
