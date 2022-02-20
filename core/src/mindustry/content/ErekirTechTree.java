@@ -32,7 +32,7 @@ public class ErekirTechTree{
             //context().researchCostMultipliers = costMultipliers;
 
             node(duct, erekirSector, () -> {
-                node(ductRouter, () -> {
+                node(ductRouter, Seq.with(new SectorComplete(onset)), () -> {
                     node(ductBridge, () -> {
                         node(surgeConveyor, () -> {
                             node(surgeRouter);
@@ -61,7 +61,6 @@ public class ErekirTechTree{
                 node(reinforcedPayloadConveyor, Seq.with(new OnSector(four)), () -> {
                     //TODO should only be unlocked in unit sector
                     node(constructor, Seq.with(new Research(siliconArcFurnace), new OnSector(four)), () -> {
-
                         node(payloadMassDriver, Seq.with(new OnSector(five)), () -> {
                             //TODO further limitations
                             node(payloadLoader, () -> {
@@ -257,7 +256,7 @@ public class ErekirTechTree{
 
             //TODO more sectors
             node(onset, () -> {
-                node(two, Seq.with(new SectorComplete(onset), new Research(ductRouter)), () -> {
+                node(two, Seq.with(new SectorComplete(onset)), () -> {
                     node(three, Seq.with(new SectorComplete(two), new Research(reinforcedContainer), new Research(ductUnloader), new Research(ventCondenser)), () -> {
                         node(four, Seq.with(new SectorComplete(three), new Research(electrolyzer), new Research(oxidationChamber), new Research(chemicalCombustionChamber)), () -> {
                             //TODO research reqs?

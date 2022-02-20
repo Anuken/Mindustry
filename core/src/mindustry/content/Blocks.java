@@ -2295,7 +2295,7 @@ public class Blocks{
             hasLiquids = true;
             outputLiquid = new LiquidStack(Liquids.water, 5f / 60f / 9f);
             liquidCapacity = 20f;
-            researchCostMultiplier = 1f / 40f;
+            researchCostMultiplier = 1f / 50f;
         }};
 
         //TODO rename
@@ -2492,7 +2492,7 @@ public class Blocks{
             size = 2;
             attribute = Attribute.sand;
             output = Items.sand;
-            researchCostMultiplier = 1f / 8f;
+            researchCostMultiplier = 1f / 10f;
         }};
 
         plasmaBore = new BeamDrill("plasma-bore"){{
@@ -2502,7 +2502,7 @@ public class Blocks{
             tier = 3;
             size = 2;
             range = 4;
-            researchCostMultiplier = 1f / 30f;
+            researchCostMultiplier = 1f / 40f;
 
             consumeLiquid(Liquids.hydrogen, 0.25f / 60f).boost();
         }};
