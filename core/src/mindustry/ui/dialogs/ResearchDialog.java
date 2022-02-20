@@ -335,7 +335,6 @@ public class ResearchDialog extends BaseDialog{
         itemDisplay.rebuild(items);
     }
 
-
     boolean selectable(TechNode node){
         return node.content.unlocked() || !node.objectives.contains(i -> !i.complete());
     }

@@ -92,7 +92,7 @@ public class ErekirTechTree{
 
             //TODO move into turbine condenser?
             node(plasmaBore, () -> {
-                node(impactDrill, Seq.with(new OnSector(aware)), () -> {
+                node(impactDrill, Seq.with(new OnSector(two)), () -> {
                     node(largePlasmaBore, Seq.with(new OnSector(five)), () -> {
                         node(eruptionDrill, () -> {
 
@@ -103,7 +103,7 @@ public class ErekirTechTree{
 
             node(turbineCondenser, () -> {
                 node(beamNode, () -> {
-                    node(ventCondenser, Seq.with(new OnSector(aware)), () -> {
+                    node(ventCondenser, Seq.with(new OnSector(two)), () -> {
                         node(chemicalCombustionChamber, Seq.with(new OnSector(three)), () -> {
                             node(pyrolysisGenerator, () -> {
 
@@ -124,7 +124,7 @@ public class ErekirTechTree{
                     });
                 });
 
-                node(reinforcedConduit, () -> {
+                node(reinforcedConduit, Seq.with(new OnSector(two)), () -> {
                     //TODO maybe should be even later
                     node(reinforcedPump, Seq.with(new OnSector(three)), () -> {
                         //TODO T2 pump, consume cyanogen or similar
@@ -257,8 +257,8 @@ public class ErekirTechTree{
 
             //TODO more sectors
             node(onset, () -> {
-                node(aware, Seq.with(new SectorComplete(onset), new Research(ductRouter)), () -> {
-                    node(three, Seq.with(new SectorComplete(aware), new Research(reinforcedContainer), new Research(ductUnloader), new Research(ventCondenser)), () -> {
+                node(two, Seq.with(new SectorComplete(onset), new Research(ductRouter)), () -> {
+                    node(three, Seq.with(new SectorComplete(two), new Research(reinforcedContainer), new Research(ductUnloader), new Research(ventCondenser)), () -> {
                         node(four, Seq.with(new SectorComplete(three), new Research(electrolyzer), new Research(oxidationChamber), new Research(chemicalCombustionChamber)), () -> {
                             //TODO research reqs?
                             node(five, Seq.with(new SectorComplete(four)), () -> {
