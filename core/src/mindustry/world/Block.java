@@ -207,7 +207,7 @@ public class Block extends UnlockableContent{
     public boolean outlineIcon = false;
     /** Outline icon radius. */
     public int outlineRadius = 4;
-    /** Which of the icon regions gets the outline added. Uses last icon if <= 0. */
+    /** Which of the icon regions gets the outline added. Uses last icon if &lt;= 0. */
     public int outlinedIcon = -1;
     /** Whether this block has a shadow under it. */
     public boolean hasShadow = true;

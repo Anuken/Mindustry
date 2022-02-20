@@ -29,7 +29,7 @@ public class PlanetParams{
 
     /** Handles drawing details. */
     public @Nullable transient PlanetInterfaceRenderer renderer;
-    /** Viewport size. <=0 to use screen size. Do not change in rules. */
+    /** Viewport size. &lt;=0 to use screen size. Do not change in rules. */
     public transient int viewW = -1, viewH = -1;
     /** If true, atmosphere will be drawn regardless of player options. */
     public transient boolean alwaysDrawAtmosphere = false;

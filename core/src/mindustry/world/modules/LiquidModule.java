@@ -44,7 +44,7 @@ public class LiquidModule extends BlockModule{
         }
     }
 
-    /** @return current liquid's flow rate in u/s; any value < 0 means 'not ready'. */
+    /** @return current liquid's flow rate in u/s; any value &lt; 0 means 'not ready'. */
     public float getFlowRate(){
         return currentFlowRate * 60;
     }

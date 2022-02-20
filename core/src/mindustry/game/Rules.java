@@ -71,17 +71,17 @@ public class Rules{
     public float enemyCoreBuildRadius = 400f;
     /** If true, no-build zones are calculated based on the closest core. */
     public boolean polygonCoreProtection = false;
-    /** If true, dead teams in PvP automatically have their blocks & units converted to derelict upon death. */
+    /** If true, dead teams in PvP automatically have their blocks &amp; units converted to derelict upon death. */
     public boolean cleanupDeadTeams = true;
     /** Radius around enemy wave drop zones.*/
     public float dropZoneRadius = 300f;
     /** Time between waves in ticks. */
     public float waveSpacing = 2 * Time.toMinutes;
-    /** Wave after which the player 'wins'. Used in sectors. Use a value <= 0 to disable. */
+    /** Wave after which the player 'wins'. Used in sectors. Use a value &lt;= 0 to disable. */
     public int winWave = 0;
     /** Base unit cap. Can still be increased by blocks. */
     public int unitCap = 0;
-    /** Environmental flags that dictate visuals & how blocks function. */
+    /** Environmental flags that dictate visuals &amp; how blocks function. */
     public int environment = Env.terrestrial | Env.spores | Env.groundOil | Env.groundWater;
     /** Attributes of the environment. */
     public Attributes attributes = new Attributes();

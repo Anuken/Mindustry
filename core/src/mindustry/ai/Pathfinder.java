@@ -435,7 +435,7 @@ public class Pathfinder implements Runnable{
      * Concrete subclasses must specify a way to fetch costs and destinations.
      */
     public static abstract class Flowfield{
-        /** Refresh rate in milliseconds. Return any number <= 0 to disable. */
+        /** Refresh rate in milliseconds. Return any number &lt;= 0 to disable. */
         protected int refreshRate;
         /** Team this path is for. Set before using. */
         protected Team team = Team.derelict;

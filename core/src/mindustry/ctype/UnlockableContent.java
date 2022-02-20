@@ -21,7 +21,7 @@ public abstract class UnlockableContent extends MappableContent{
     public Stats stats = new Stats();
     /** Localized, formal name. Never null. Set to internal name if not found in bundle. */
     public String localizedName;
-    /** Localized description & details. May be null. */
+    /** Localized description &amp; details. May be null. */
     public @Nullable String description, details;
     /** Whether this content is always unlocked in the tech tree. */
     public boolean alwaysUnlocked = false;

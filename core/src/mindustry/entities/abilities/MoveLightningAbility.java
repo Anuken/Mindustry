@@ -16,7 +16,7 @@ public class MoveLightningAbility extends Ability{
     public float damage = 35f;
     /** Chance of firing every tick. Set >= 1 to always fire lightning every tick at max speed */
     public float chance = 0.15f;
-    /** Length of the lightning. <= 0 to disable */
+    /** Length of the lightning. &lt;= 0 to disable */
     public int length = 12;
     /** Speeds for when to start lightninging and when to stop getting faster */
     public float minSpeed = 0.8f, maxSpeed = 1.2f;

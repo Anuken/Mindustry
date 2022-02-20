@@ -54,7 +54,7 @@ public class SectorInfo{
     public boolean hasSpawns = true;
     /** Wave # from state */
     public int wave = 1, winWave = -1;
-    /** Waves this sector can survive if under attack. Based on wave in info. <0 means uncalculated. */
+    /** Waves this sector can survive if under attack. Based on wave in info. &lt;0 means uncalculated. */
     public int wavesSurvived = -1;
     /** Time between waves. */
     public float waveSpacing = 2 * Time.toMinutes;

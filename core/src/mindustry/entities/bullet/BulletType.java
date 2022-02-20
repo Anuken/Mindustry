@@ -138,7 +138,7 @@ public class BulletType extends Content implements Cloneable{
     public float trailParam =  2f;
     public boolean trailRotation = false;
     public Interp trailInterp = Interp.one;
-    /** Any value <= 0 disables the trail. */
+    /** Any value &lt;= 0 disables the trail. */
     public int trailLength = -1;
     public float trailWidth = 2f;
 
