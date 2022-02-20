@@ -396,9 +396,10 @@ public class BlockRenderer{
 
             Draw.z(Layer.block);
 
-            boolean visible = (build == null || !build.inFogTo(pteam)/* || build.wasVisible*/);
+            boolean visible = (build == null || !build.inFogTo(pteam));
 
-            if(block != Blocks.air && visible){
+            //comment wasWasible part for hiding?
+            if(block != Blocks.air && (visible || build.wasVisible)){
                 block.drawBase(tile);
                 Draw.reset();
                 Draw.z(Layer.block);
@@ -410,8 +411,10 @@ public class BlockRenderer{
                 }
 
                 if(build != null){
-                    if(!build.wasVisible) updateShadow(build);
-                    build.wasVisible = true;
+                    if(visible){
+                        if(!build.wasVisible) updateShadow(build);
+                        build.wasVisible = true;
+                    }
 
                     if(build.damaged()){
                         Draw.z(Layer.blockCracks);
@@ -432,8 +435,8 @@ public class BlockRenderer{
             }else if(!visible){
                 //TODO here is the question: should buildings you lost sight of remain rendered? if so, how should this information be stored?
                 //comment lines below for buggy persistence
-                if(build.wasVisible) updateShadow(build);
-                build.wasVisible = false;
+                //if(build.wasVisible) updateShadow(build);
+                //build.wasVisible = false;
             }
         }
 
