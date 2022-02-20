@@ -1936,8 +1936,12 @@ public class Blocks{
             requirements(Category.distribution, with(Items.silicon, 80, Items.phaseFabric, 60, Items.carbide, 50, Items.oxide, 40));
 
             size = 3;
+            buildTime = 60f * 8f;
 
-            consumePower(4f / 60f);
+            consumePower(8f / 60f);
+
+            //intentionally set absurdly high to make this block not overpowered
+            consumeLiquid(Liquids.gallium, 20f / 60f);
 
             itemCapacity = 200;
         }};

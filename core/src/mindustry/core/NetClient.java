@@ -417,6 +417,17 @@ public class NetClient implements ApplicationListener{
         }
     }
 
+    @Remote(variants = Variant.one, priority = PacketPriority.low, unreliable = true)
+    public static void hiddenSnapshot(IntSeq ids){
+        for(int i = 0; i < ids.size; i++){
+            int id = ids.items[i];
+            var entity = Groups.sync.getByID(id);
+            if(entity != null){
+                entity.handleSyncHidden();
+            }
+        }
+    }
+
     @Remote(variants = Variant.both, priority = PacketPriority.low, unreliable = true)
     public static void blockSnapshot(short amount, byte[] data){
         try{

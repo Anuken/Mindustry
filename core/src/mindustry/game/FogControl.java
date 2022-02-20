@@ -17,7 +17,7 @@ import java.io.*;
 
 import static mindustry.Vars.*;
 
-public class FogControl implements CustomChunk{
+public final class FogControl implements CustomChunk{
     private static volatile int ww, wh;
     private static final int staticUpdateInterval = 1000 / 25; //25 FPS
     private static final Object notifyStatic = new Object(), notifyDynamic = new Object();

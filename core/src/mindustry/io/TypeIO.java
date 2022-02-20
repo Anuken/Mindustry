@@ -585,6 +585,23 @@ public class TypeIO{
         return color.set(read.i());
     }
 
+    public static void writeIntSeq(Writes write, IntSeq seq){
+        write.i(seq.size);
+        for(int i = 0; i < seq.size; i++){
+            write.i(seq.items[i]);
+        }
+    }
+
+    public static IntSeq readIntSeq(Reads read){
+        int size = read.i();
+        IntSeq result = new IntSeq(size);
+        for(int i = 0; i < size; i++){
+            result.items[i] = read.i();
+        }
+        result.size = size;
+        return result;
+    }
+
     public static void writeContent(Writes write, Content cont){
         write.b(cont.getContentType().ordinal());
         write.s(cont.id);

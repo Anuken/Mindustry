@@ -35,10 +35,12 @@ import static mindustry.Vars.*;
 
 public class NetServer implements ApplicationListener{
     /** note that snapshots are compressed, so the max snapshot size here is above the typical UDP safe limit */
-    private static final int maxSnapshotSize = 800, timerBlockSync = 0, serverSyncTime = 200;
+    private static final int maxSnapshotSize = 800;
+    private static final int timerBlockSync = 0;
     private static final float blockSyncTime = 60 * 6;
     private static final FloatBuffer fbuffer = FloatBuffer.allocate(20);
     private static final Writes dataWrites = new Writes(null);
+    private static final IntSeq hiddenIds = new IntSeq();
     private static final Vec2 vector = new Vec2();
     /** If a player goes away of their server-side coordinates by this distance, they get teleported back. */
     private static final float correctDist = tilesize * 14f;
@@ -935,9 +937,16 @@ public class NetServer implements ApplicationListener{
 
         syncStream.reset();
 
+        hiddenIds.clear();
         int sent = 0;
 
         for(Syncc entity : Groups.sync){
+            //TODO write to special list
+            if(entity.isSyncHidden(player)){
+                hiddenIds.add(entity.id());
+                continue;
+            }
+
             //write all entities now
             dataStream.writeInt(entity.id()); //write id
             dataStream.writeByte(entity.classId()); //write type ID
@@ -957,6 +966,10 @@ public class NetServer implements ApplicationListener{
             dataStream.close();
 
             Call.entitySnapshot(player.con, (short)sent, syncStream.toByteArray());
+        }
+
+        if(hiddenIds.size > 0){
+            Call.hiddenSnapshot(player.con, hiddenIds);
         }
 
         player.con.snapshotsSent ++;
@@ -1013,6 +1026,7 @@ public class NetServer implements ApplicationListener{
 
     void sync(){
         try{
+            int interval = Config.snapshotInterval.num();
             Groups.player.each(p -> !p.isLocal(), player -> {
                 if(player.con == null || !player.con.isConnected()){
                     onDisconnect(player, "disappeared");
@@ -1021,7 +1035,7 @@ public class NetServer implements ApplicationListener{
 
                 var connection = player.con;
 
-                if(Time.timeSinceMillis(connection.syncTime) < serverSyncTime || !connection.hasConnected) return;
+                if(Time.timeSinceMillis(connection.syncTime) < interval || !connection.hasConnected) return;
 
                 connection.syncTime = Time.millis();
 

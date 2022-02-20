@@ -393,6 +393,7 @@ public class Logic implements ApplicationListener{
                 state.tick += Float.isNaN(delta) || Float.isInfinite(delta) ? 0f : delta * 60f;
                 state.updateId ++;
                 state.teams.updateTeamStats();
+                MapPreviewLoader.checkPreviews();
 
                 if(state.rules.fog){
                     fogControl.update();

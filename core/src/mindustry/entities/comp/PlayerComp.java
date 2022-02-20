@@ -7,6 +7,7 @@ import arc.math.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.pooling.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.units.*;
@@ -254,10 +255,12 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
     @Override
     public void draw(){
+        if(unit != null && unit.inFogTo(Vars.player.team())) return;
+
         Draw.z(Layer.playerName);
         float z = Drawf.text();
 
-        Font font = Fonts.def;
+        Font font = Fonts.outline;
         GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
         final float nameHeight = 11;
         final float textHeight = 15;

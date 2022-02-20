@@ -99,7 +99,7 @@ public class OverlayRenderer{
                 }
             }
 
-            if(Core.settings.getBool("indicators")){
+            if(Core.settings.getBool("indicators") && !state.rules.fog){
                 Groups.unit.each(unit -> {
                     if(!unit.isLocal() && unit.team != player.team() && !rect.setSize(Core.camera.width * 0.9f, Core.camera.height * 0.9f)
                     .setCenter(Core.camera.position.x, Core.camera.position.y).contains(unit.x, unit.y)){

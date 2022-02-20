@@ -51,8 +51,6 @@ public class Vars implements Loadable{
     public static final int darkRadius = 4;
     /** Maximum extra padding around deployment schematics. TODO 4, or 5?*/
     public static final int maxLoadoutSchematicPad = 4;
-    /** Maximum schematic size.*/
-    public static final int maxSchematicSize = 32;
     /** All schematic base64 starts with this string.*/
     public static final String schematicBaseStart ="bXNjaA";
     /** IO buffer size. */
@@ -145,6 +143,8 @@ public class Vars implements Loadable{
     public static boolean clientLoaded = false;
     /** max GL texture size */
     public static int maxTextureSize = 2048;
+    /** Maximum schematic size.*/
+    public static int maxSchematicSize = 32;
     /** Whether to show sector info upon landing. */
     public static boolean showSectorLandInfo = true;
     /** Whether to check for memory use before taking screenshots. */

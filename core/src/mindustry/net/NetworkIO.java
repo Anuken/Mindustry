@@ -49,13 +49,17 @@ public class NetworkIO{
             stream.writeInt(player.id);
             player.write(write);
 
-            stream.writeInt(Groups.sync.size());
+            boolean any = !state.rules.fog;
 
-            //write all synced entities *immediately*
-            for(Syncc entity : Groups.sync){
-                stream.writeInt(entity.id());
-                stream.writeByte(entity.classId());
-                entity.writeSync(write);
+            stream.writeInt(any ? Groups.sync.size() : 0);
+
+            if(any){
+                //write all synced entities *immediately*
+                for(Syncc entity : Groups.sync){
+                    stream.writeInt(entity.id());
+                    stream.writeByte(entity.classId());
+                    entity.writeSync(write);
+                }
             }
 
             SaveIO.getSaveWriter().writeContentHeader(stream);

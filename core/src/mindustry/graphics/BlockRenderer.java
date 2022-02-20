@@ -105,7 +105,7 @@ public class BlockRenderer{
         });
 
         Events.on(TileChangeEvent.class, event -> {
-            boolean visible = event.tile.build == null || event.tile.build.inFogTo(Vars.player.team());
+            boolean visible = event.tile.build == null || !event.tile.build.inFogTo(Vars.player.team());
             if(event.tile.build != null){
                 event.tile.build.wasVisible = visible;
             }

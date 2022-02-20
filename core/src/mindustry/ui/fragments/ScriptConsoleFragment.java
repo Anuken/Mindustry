@@ -49,6 +49,9 @@ public class ScriptConsoleFragment extends Table{
                 if(shown && !open && enableConsole){
                     toggle();
                 }
+                if(shown){
+                    chatfield.requestKeyboard();
+                }
                 clearChatInput();
             }
 

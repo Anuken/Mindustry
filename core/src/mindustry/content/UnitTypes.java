@@ -958,25 +958,23 @@ public class UnitTypes{
         //region air attack
 
         flare = new UnitType("flare"){{
-            speed = 3f;
+            speed = 2.7f;
             accel = 0.08f;
-            drag = 0.01f;
+            drag = 0.04f;
             flying = true;
-            health = 75;
-            engineOffset = 5.5f;
-            range = 140f;
+            health = 70;
+            engineOffset = 5.75f;
             targetAir = false;
             //as default AI, flares are not very useful in core rushes, they attack nothing in the way
             playerTargetFlags = new BlockFlag[]{null};
             targetFlags = new BlockFlag[]{BlockFlag.generator, null};
-            circleTarget = true;
             hitSize = 7;
             itemCapacity = 15;
 
             weapons.add(new Weapon(){{
                 y = 0f;
                 x = 2f;
-                reload = 13f;
+                reload = 20f;
                 ejectEffect = Fx.casing1;
                 bullet = new BasicBulletType(2.5f, 9){{
                     width = 7f;
