@@ -36,6 +36,7 @@ public class Items{
 
         sand = new Item("sand", Color.valueOf("f7cba4")){{
             lowPriority = true;
+            alwaysUnlocked = true;
         }};
 
         coal = new Item("coal", Color.valueOf("272727")){{
