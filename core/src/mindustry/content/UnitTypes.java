@@ -965,8 +965,6 @@ public class UnitTypes{
             health = 70;
             engineOffset = 5.75f;
             targetAir = false;
-            //as default AI, flares are not very useful in core rushes, they attack nothing in the way
-            playerTargetFlags = new BlockFlag[]{null};
             targetFlags = new BlockFlag[]{BlockFlag.generator, null};
             hitSize = 7;
             itemCapacity = 15;
@@ -1000,8 +998,6 @@ public class UnitTypes{
             range = 140f;
             faceTarget = false;
             armor = 3f;
-            //do not rush core, attack closest
-            playerTargetFlags = new BlockFlag[]{null};
             targetFlags = new BlockFlag[]{BlockFlag.factory, null};
             circleTarget = true;
             ammoType = new ItemAmmoType(Items.graphite);

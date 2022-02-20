@@ -44,7 +44,7 @@ public class FlyingAI extends AIController{
             return core;
         }
 
-        for(var flag : unit.team.isAI() ? unit.type.targetFlags : unit.type.playerTargetFlags){
+        for(var flag : unit.type.targetFlags){
             if(flag == null){
                 Teamc result = target(x, y, range, air, ground);
                 if(result != null) return result;

@@ -107,8 +107,6 @@ public class UnitType extends UnlockableContent{
     public Seq<Ability> abilities = new Seq<>();
     /** Flags to target based on priority. Null indicates that the closest target should be found. The closest enemy core is used as a fallback. */
     public BlockFlag[] targetFlags = {null};
-    /** targetFlags, as an override for "non-AI" teams. By default, units of this type will rush the core. */
-    public BlockFlag[] playerTargetFlags = {BlockFlag.core, null};
     /** Target items to mine. Used in MinerAI */
     public Seq<Item> mineItems = Seq.with(Items.copper, Items.lead, Items.titanium, Items.thorium);
 
@@ -116,7 +114,6 @@ public class UnitType extends UnlockableContent{
     /** The default AI controller to assign on creation. */
     public Prov<? extends UnitController> aiController = () -> !flying ? new GroundAI() : new FlyingAI();
     /** Function that chooses AI controller based on unit entity. */
-    //TODO -name is too long
     public Func<Unit, ? extends UnitController> defaultController = u -> !playerControllable || (u.team.isAI() && !u.team.rules().rtsAi) ? aiController.get() : new CommandAI();
 
     public Color outlineColor = Pal.darkerMetal;

@@ -110,7 +110,6 @@ public class PayloadLoader extends PayloadBlock{
             return liquids.current() == liquid || liquids.currentAmount() < 0.2f;
         }
 
-
         @Override
         public void draw(){
             Draw.rect(region, x, y);
