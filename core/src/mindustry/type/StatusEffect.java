@@ -82,7 +82,7 @@ public class StatusEffect extends UnlockableContent{
 
         boolean reacts = false;
 
-        for(var e : opposites.asArray().sort()){
+        for(var e : opposites.toSeq().sort()){
             stats.add(Stat.opposites, e.emoji() + "" + e);
         }
 
@@ -96,7 +96,7 @@ public class StatusEffect extends UnlockableContent{
 
         //don't list affinities *and* reactions, as that would be redundant
         if(!reacts){
-            for(var e : affinities.asArray().sort()){
+            for(var e : affinities.toSeq().sort()){
                 stats.add(Stat.affinities, e.emoji() + "" + e);
             }
 

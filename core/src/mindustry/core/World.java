@@ -291,7 +291,7 @@ public class World{
         }
 
         state.rules.cloudColor = sector.planet.landCloudColor;
-        sector.info.resources = content.asArray();
+        sector.info.resources = content.toSeq();
         sector.info.resources.sort(Structs.comps(Structs.comparing(Content::getContentType), Structs.comparingInt(c -> c.id)));
         sector.saveInfo();
     }

@@ -56,7 +56,7 @@ public class CustomRulesDialog extends BaseDialog{
                     t.add("@empty");
                 }
 
-                Seq<T> array = set.asArray();
+                Seq<T> array = set.toSeq();
                 array.sort();
 
                 int cols = mobile && Core.graphics.isPortrait() ? 1 : mobile ? 2 : 3;
