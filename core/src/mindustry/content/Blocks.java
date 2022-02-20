@@ -1883,18 +1883,21 @@ public class Blocks{
             health = 90;
             speed = 4f;
             regionRotated1 = 1;
+            researchCostMultiplier = 0.3f;
         }};
 
         overflowDuct = new OverflowDuct("overflow-duct"){{
             requirements(Category.distribution, with(Items.graphite, 8, Items.beryllium, 8));
             health = 90;
             speed = 4f;
+            researchCostMultiplier = 1.5f;
         }};
 
         ductBridge = new DuctBridge("duct-bridge"){{
             requirements(Category.distribution, with(Items.graphite, 15, Items.beryllium, 10));
             health = 90;
             speed = 4f;
+            researchCostMultiplier = 0.3f;
         }};
 
         ductUnloader = new DirectionalUnloader("duct-unloader"){{

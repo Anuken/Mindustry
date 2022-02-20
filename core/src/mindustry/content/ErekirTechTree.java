@@ -32,7 +32,7 @@ public class ErekirTechTree{
             //context().researchCostMultipliers = costMultipliers;
 
             node(duct, erekirSector, () -> {
-                node(ductRouter, Seq.with(new SectorComplete(onset)), () -> {
+                node(ductRouter, () -> {
                     node(ductBridge, () -> {
                         node(surgeConveyor, () -> {
                             node(surgeRouter);
@@ -45,7 +45,7 @@ public class ErekirTechTree{
                         });
                     });
 
-                    node(overflowDuct, () -> {
+                    node(overflowDuct, Seq.with(new OnSector(two)), () -> {
                         node(reinforcedContainer, () -> {
                             node(ductUnloader, () -> {
 
@@ -256,7 +256,7 @@ public class ErekirTechTree{
 
             //TODO more sectors
             node(onset, () -> {
-                node(two, Seq.with(new SectorComplete(onset)), () -> {
+                node(two, Seq.with(new SectorComplete(onset), new Research(ductRouter), new Research(ductBridge)), () -> {
                     node(three, Seq.with(new SectorComplete(two), new Research(reinforcedContainer), new Research(ductUnloader), new Research(ventCondenser)), () -> {
                         node(four, Seq.with(new SectorComplete(three), new Research(electrolyzer), new Research(oxidationChamber), new Research(chemicalCombustionChamber)), () -> {
                             //TODO research reqs?
