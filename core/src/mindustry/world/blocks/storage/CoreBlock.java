@@ -104,7 +104,7 @@ public class CoreBlock extends StorageBlock{
     public void init(){
         //assign to update clipSize internally
         lightRadius = 30f + 20f * size;
-        fogRadius = Math.max(fogRadius, (int)(lightRadius / 8f * 2.5f));
+        fogRadius = Math.max(fogRadius, (int)(lightRadius / 8f * 2f));
         emitLight = true;
 
         super.init();
@@ -434,7 +434,7 @@ public class CoreBlock extends StorageBlock{
         }
 
         public boolean owns(Building core, Building tile){
-            return tile instanceof StorageBuild b && (b.linkedCore == core || b.linkedCore == null);
+            return tile instanceof StorageBuild b && ((StorageBlock)b.block).coreMerge && (b.linkedCore == core || b.linkedCore == null);
         }
 
         @Override

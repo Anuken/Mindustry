@@ -2611,7 +2611,7 @@ public class Blocks{
             isFirstTier = true;
             unitType = UnitTypes.evoke;
             health = 7000;
-            itemCapacity = 8000;
+            itemCapacity = 2000;
             size = 4;
             thrusterLength = 34/4f;
             armor = 5f;
@@ -2629,7 +2629,7 @@ public class Blocks{
 
             unitType = UnitTypes.incite;
             health = 18000;
-            itemCapacity = 11000;
+            itemCapacity = 3000;
             size = 5;
             thrusterLength = 40/4f;
             armor = 10f;
@@ -2645,7 +2645,7 @@ public class Blocks{
 
             unitType = UnitTypes.emanate;
             health = 30000;
-            itemCapacity = 16000;
+            itemCapacity = 4000;
             size = 6;
             thrusterLength = 48/4f;
             armor = 15f;
@@ -2677,18 +2677,19 @@ public class Blocks{
         }};
 
         reinforcedContainer = new StorageBlock("reinforced-container"){{
-            requirements(Category.effect, with(Items.tungsten, 100, Items.graphite, 50, Items.beryllium, 50));
-            size = 3;
-            //TODO should it really be kept the same, at 1000?
-            itemCapacity = 1200;
+            requirements(Category.effect, with(Items.tungsten, 80, Items.graphite, 80));
+            size = 2;
+            itemCapacity = 250;
             scaledHealth = 120;
+            coreMerge = false;
         }};
 
         reinforcedVault = new StorageBlock("reinforced-vault"){{
-            requirements(Category.effect, with(Items.tungsten, 250, Items.carbide, 125, Items.beryllium, 100));
-            size = 4;
-            itemCapacity = 2500;
+            requirements(Category.effect, with(Items.tungsten, 125, Items.thorium, 70, Items.beryllium, 100));
+            size = 3;
+            itemCapacity = 900;
             scaledHealth = 120;
+            coreMerge = false;
         }};
 
         //endregion

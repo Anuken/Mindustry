@@ -13,6 +13,7 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class StorageBlock extends Block{
+    public boolean coreMerge = true;
 
     public StorageBlock(String name){
         super(name);
