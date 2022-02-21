@@ -7,6 +7,7 @@ import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
 /**
@@ -21,6 +22,9 @@ public class ConsumeGenerator extends PowerGenerator{
     public float generateEffectRange = 3f;
 
     public @Nullable LiquidStack liquidOutput;
+
+    public @Nullable ConsumeItemFilter filterItem;
+    public @Nullable ConsumeLiquidFilter filterLiquid;
 
     public ConsumeGenerator(String name){
         super(name);
@@ -37,10 +41,15 @@ public class ConsumeGenerator extends PowerGenerator{
 
     @Override
     public void init(){
+        filterItem = findConsumer(c -> c instanceof ConsumeItemFilter);
+        filterLiquid = findConsumer(c -> c instanceof ConsumeLiquidFilter);
+
         if(liquidOutput != null){
             outputsLiquid = true;
             hasLiquids = true;
         }
+
+        //TODO hardcoded
         emitLight = true;
         lightRadius = 65f * size;
         super.init();
@@ -61,6 +70,7 @@ public class ConsumeGenerator extends PowerGenerator{
 
     public class ConsumeGeneratorBuild extends GeneratorBuild{
         public float warmup, totalTime;
+        public float itemMultiplier = 1f;
 
         @Override
         public void updateTile(){
@@ -68,7 +78,17 @@ public class ConsumeGenerator extends PowerGenerator{
 
             warmup = Mathf.lerpDelta(warmup, enabled && valid ? 1f : 0f, 0.05f);
 
-            productionEfficiency = valid ? 1f : 0f;
+            float multiplier = 1f;
+            if(valid){
+                if(filterItem != null && filterItem.getConsumed(this) != null){
+                    itemMultiplier = filterItem.getEfficiency(this);
+                }
+
+                //efficiency is added together
+                multiplier *= itemMultiplier + (filterLiquid == null ? 0f : filterLiquid.getEfficiency(this));
+            }
+
+            productionEfficiency = (valid ? 1f : 0f) * multiplier;
             totalTime += warmup * Time.delta;
 
             //randomly produce the effect
@@ -93,10 +113,6 @@ public class ConsumeGenerator extends PowerGenerator{
             generateTime -= Math.min(1f / itemDuration * delta(), generateTime);
         }
 
-        public float getEfficiencyMultiplier(){
-            return 1f;
-        }
-
         @Override
         public boolean consumeTriggerValid(){
             return generateTime > 0;
@@ -114,7 +130,9 @@ public class ConsumeGenerator extends PowerGenerator{
 
         @Override
         public void drawLight(){
-            //TODO
+            //???
+            drawer.drawLight(this);
+            //TODO hard coded
             Drawf.light(team, x, y, (60f + Mathf.absin(10f, 5f)) * size, Color.orange, 0.5f * warmup);
         }
     }

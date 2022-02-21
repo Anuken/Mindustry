@@ -31,8 +31,8 @@ public class GenericCrafter extends Block{
     /** if true, crafters with multiple liquid outputs will dump excess when there's still space for at least one liquid type */
     public boolean dumpExtraLiquid = true;
     public boolean ignoreLiquidFullness = false;
-    /** if true, liquid will be outputted continuously regardless of craft time */
-    public boolean continuousLiquidOutput = false;
+
+    //TODO should be seconds?
     public float craftTime = 80;
     public Effect craftEffect = Fx.none;
     public Effect updateEffect = Fx.none;
@@ -66,7 +66,7 @@ public class GenericCrafter extends Block{
         }
 
         if(outputLiquids != null){
-            stats.add(Stat.output, StatValues.liquids(continuousLiquidOutput ? 1f : craftTime, outputLiquids));
+            stats.add(Stat.output, StatValues.liquids(1f, outputLiquids));
         }
     }
 
@@ -145,13 +145,13 @@ public class GenericCrafter extends Block{
 
         @Override
         public void draw(){
-            drawer.drawBase(this);
+            drawer.draw(this);
         }
 
         @Override
         public void drawLight(){
             super.drawLight();
-            drawer.drawLights(this);
+            drawer.drawLight(this);
         }
 
         @Override
@@ -193,7 +193,7 @@ public class GenericCrafter extends Block{
                 warmup = Mathf.approachDelta(warmup, warmupTarget(), warmupSpeed);
 
                 //continuously output based on efficiency
-                if(outputLiquids != null && continuousLiquidOutput){
+                if(outputLiquids != null){
                     float inc = getProgressIncrease(1f);
                     for(var output : outputLiquids){
                         handleLiquid(this, output.liquid, Math.min(output.amount * inc, liquidCapacity - liquids.get(output.liquid)));
@@ -239,12 +239,6 @@ public class GenericCrafter extends Block{
                     for(int i = 0; i < output.amount; i++){
                         offload(output.item);
                     }
-                }
-            }
-
-            if(outputLiquids != null && !continuousLiquidOutput){
-                for(var output : outputLiquids){
-                    handleLiquid(this, output.liquid, output.amount);
                 }
             }
 

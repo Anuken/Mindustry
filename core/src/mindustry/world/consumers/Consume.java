@@ -7,11 +7,14 @@ import mindustry.world.meta.*;
 
 /** An abstract class that defines a type of resource that a block can consume. */
 public abstract class Consume{
+
+    //TODO maybe remove these and make it an interface if possible?
     /** If true, this consumer will not influence consumer validity. */
     public boolean optional;
     /** If true, this consumer will be displayed as a boost input. */
     public boolean booster;
     //TODO bad. I don't like it.
+    @Deprecated
     public boolean update = true;
 
     /**
@@ -31,6 +34,7 @@ public abstract class Consume{
         return optional(true, true);
     }
 
+    @Deprecated
     public Consume update(boolean update){
         this.update = update;
         return this;

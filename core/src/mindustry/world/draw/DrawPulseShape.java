@@ -25,7 +25,7 @@ public class DrawPulseShape extends DrawPartial{
     }
 
     @Override
-    public void drawBase(Building build){
+    public void draw(Building build){
         float pz = Draw.z();
         if(layer > 0) Draw.z(layer);
 

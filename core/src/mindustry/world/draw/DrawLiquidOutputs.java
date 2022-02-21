@@ -13,7 +13,7 @@ public class DrawLiquidOutputs extends DrawBlock{
     public TextureRegion[][] liquidOutputRegions;
 
     @Override
-    public void drawBase(Building build){
+    public void draw(Building build){
         GenericCrafter crafter = (GenericCrafter)build.block;
         if(crafter.outputLiquids == null) return;
 

@@ -18,9 +18,7 @@ public class DrawTurbines extends DrawBlock{
     }
 
     @Override
-    public void drawBase(Building build){
-        if(!turbines[0].found()) return;
-
+    public void draw(Building build){
         float totalTime = build.totalProgress();
         Draw.rect(turbines[0], build.x, build.y, totalTime * turbineSpeed);
         Draw.rect(turbines[1], build.x, build.y, -totalTime * turbineSpeed);

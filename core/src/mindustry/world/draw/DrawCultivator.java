@@ -21,7 +21,7 @@ public class DrawCultivator extends DrawBlock{
     public TextureRegion top;
 
     @Override
-    public void drawBase(Building build){
+    public void draw(Building build){
         Draw.rect(build.block.region, build.x, build.y);
 
         Drawf.liquid(middle, build.x, build.y, build.warmup(), plantColor);

@@ -51,6 +51,11 @@ public class ConsumeLiquidFilter extends ConsumeLiquidBase{
         var liq = getConsumed(build);
         return liq != null && build.liquids.get(liq) >= use(build);
     }
+
+    /** @return efficiency multiplier based on current item to be consumed; overridden in subclasses. Returns 0 if not valid in subclasses. */
+    public float getEfficiency(Building build){
+        return 1f;
+    }
     
     public @Nullable Liquid getConsumed(Building build){
         float u = use(build);

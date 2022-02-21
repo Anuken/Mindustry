@@ -23,7 +23,7 @@ public class DrawLiquidRegion extends DrawPartial{
     }
 
     @Override
-    public void drawBase(Building build){
+    public void draw(Building build){
         if(!build.block.hasLiquids) return;
 
         Liquid drawn = drawLiquid != null ? drawLiquid : build.liquids.current();

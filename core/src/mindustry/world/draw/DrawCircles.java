@@ -22,7 +22,7 @@ public class DrawCircles extends DrawPartial{
     }
 
     @Override
-    public void drawBase(Building build){
+    public void draw(Building build){
         if(build.warmup() <= 0.001f) return;
 
         Draw.color(color, build.warmup() * color.a);

@@ -15,7 +15,7 @@ public class DrawMultiWeave extends DrawBlock{
     public float pulse = 0.3f, pulseScl = 10f;
 
     @Override
-    public void drawBase(Building build){
+    public void draw(Building build){
         Draw.rect(weave, build.x, build.y, build.totalProgress() * rotateSpeed);
         Draw.rect(weave, build.x, build.y, build.totalProgress() * rotateSpeed * rotateSpeed2);
 

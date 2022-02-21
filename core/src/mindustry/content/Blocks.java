@@ -996,10 +996,9 @@ public class Blocks{
             consumeItems(with(Items.copper, 3, Items.lead, 4, Items.titanium, 2, Items.silicon, 3));
         }};
 
-        cryofluidMixer = new LiquidConverter("cryofluid-mixer"){{
+        cryofluidMixer = new GenericCrafter("cryofluid-mixer"){{
             requirements(Category.crafting, with(Items.lead, 65, Items.silicon, 40, Items.titanium, 60));
-            outputLiquid = new LiquidStack(Liquids.cryofluid, 0.2f);
-            craftTime = 120f;
+            outputLiquid = new LiquidStack(Liquids.cryofluid, 12f / 60f);
             size = 2;
             hasPower = true;
             hasItems = true;
@@ -1012,7 +1011,7 @@ public class Blocks{
 
             consumePower(1f);
             consumeItem(Items.titanium);
-            consumeLiquid(Liquids.water, 0.2f);
+            consumeLiquid(Liquids.water, 12f / 60f);
         }};
 
         pyratiteMixer = new GenericCrafter("pyratite-mixer"){{
@@ -1043,8 +1042,8 @@ public class Blocks{
         melter = new GenericCrafter("melter"){{
             requirements(Category.crafting, with(Items.copper, 30, Items.lead, 35, Items.graphite, 45));
             health = 200;
-            outputLiquid = new LiquidStack(Liquids.slag, 2f);
-            craftTime = 10f;
+            outputLiquid = new LiquidStack(Liquids.slag, 12f / 60f);
+            craftTime = 1f;
             hasLiquids = hasPower = true;
             drawer = new DrawLiquid(){{
                 liquidDrawn = Liquids.slag;
@@ -1091,8 +1090,7 @@ public class Blocks{
         sporePress = new GenericCrafter("spore-press"){{
             requirements(Category.crafting, with(Items.lead, 35, Items.silicon, 30));
             liquidCapacity = 60f;
-            craftTime = 20f;
-            outputLiquid = new LiquidStack(Liquids.oil, 6f);
+            outputLiquid = new LiquidStack(Liquids.oil, 18f / 60f);
             size = 2;
             health = 320;
             hasLiquids = true;
@@ -1177,7 +1175,6 @@ public class Blocks{
 
             drawer.iconOverride = new String[]{"-bottom", ""};
             regionRotated1 = 3;
-            continuousLiquidOutput = true;
             outputLiquids = LiquidStack.with(Liquids.ozone, 4f / 60, Liquids.hydrogen, 6f / 60);
             liquidOutputDirections = new int[]{1, 3};
         }};
@@ -1185,7 +1182,6 @@ public class Blocks{
         atmosphericConcentrator = new HeatCrafter("atmospheric-concentrator"){{
             requirements(Category.crafting, with(Items.oxide, 60, Items.beryllium, 180, Items.silicon, 150));
             size = 3;
-            continuousLiquidOutput = true;
             hasLiquids = true;
 
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(Liquids.nitrogen, 4.1f), new DrawBlock(), new DrawHeatInput(),
@@ -1318,7 +1314,6 @@ public class Blocks{
 
             craftTime = 60f * 2f;
 
-            continuousLiquidOutput = true;
             outputLiquid = new LiquidStack(Liquids.gallium, 1f / 60f);
             outputItem = new ItemStack(Items.scrap, 1);
         }};
@@ -1385,8 +1380,7 @@ public class Blocks{
             size = 3;
 
             liquidCapacity = 40f;
-            outputLiquid = new LiquidStack(Liquids.cyanogen, 3f);
-            craftTime = 60f * 1f;
+            outputLiquid = new LiquidStack(Liquids.cyanogen, 3f / 60f);
 
             consumeLiquids(LiquidStack.with(Liquids.hydrogen, 3f / 60f, Liquids.nitrogen, 2f / 60f));
             consumeItem(Items.graphite);
@@ -2185,13 +2179,18 @@ public class Blocks{
             scaledHealth = 130;
         }};
 
-        combustionGenerator = new BurnerGenerator("combustion-generator"){{
+        combustionGenerator = new ConsumeGenerator("combustion-generator"){{
             requirements(Category.power, with(Items.copper, 25, Items.lead, 15));
             powerProduction = 1f;
             itemDuration = 120f;
 
             ambientSound = Sounds.smelter;
             ambientSoundVolume = 0.03f;
+
+            consume(new ConsumeItemFlammable());
+            consume(new ConsumeItemExplode());
+
+            drawer = new DrawMulti(new DrawBlock(), new DrawWarmupRegion());
         }};
 
         thermalGenerator = new ThermalGenerator("thermal-generator"){{
@@ -2205,7 +2204,7 @@ public class Blocks{
             ambientSoundVolume = 0.06f;
         }};
 
-        steamGenerator = new BurnerGenerator("steam-generator"){{
+        steamGenerator = new ConsumeGenerator("steam-generator"){{
             requirements(Category.power, with(Items.copper, 35, Items.graphite, 25, Items.lead, 40, Items.silicon, 30));
             powerProduction = 5.5f;
             itemDuration = 90f;
@@ -2216,6 +2215,11 @@ public class Blocks{
 
             ambientSound = Sounds.smelter;
             ambientSoundVolume = 0.06f;
+
+            consume(new ConsumeItemFlammable());
+            consume(new ConsumeItemExplode());
+
+            drawer = new DrawMulti(new DrawBlock(), new DrawWarmupRegion(), new DrawTurbines());
         }};
 
         differentialGenerator = new ConsumeGenerator("differential-generator"){{
@@ -2234,11 +2238,15 @@ public class Blocks{
             consumeLiquid(Liquids.cryofluid, 0.1f);
         }};
 
-        rtgGenerator = new DecayGenerator("rtg-generator"){{
+        rtgGenerator = new ConsumeGenerator("rtg-generator"){{
             requirements(Category.power, with(Items.lead, 100, Items.silicon, 75, Items.phaseFabric, 25, Items.plastanium, 75, Items.thorium, 50));
             size = 2;
             powerProduction = 4.5f;
             itemDuration = 60 * 14f;
+            envEnabled = Env.any;
+
+            drawer = new DrawMulti(new DrawBlock(), new DrawWarmupRegion());
+            consume(new ConsumeItemRadioactive());
         }};
 
         solarPanel = new SolarGenerator("solar-panel"){{
@@ -2260,8 +2268,10 @@ public class Blocks{
             health = 700;
             itemDuration = 360f;
             powerProduction = 15f;
-            consumeItem(Items.thorium);
             heating = 0.02f;
+
+            consumeItem(Items.thorium);
+            //TODO how to non update
             consumeLiquid(Liquids.cryofluid, heating / coolantPower).update(false);
         }};
 
@@ -2479,7 +2489,6 @@ public class Blocks{
             ambientSound = Sounds.hum;
             ambientSoundVolume = 0.06f;
             hasLiquids = true;
-            continuousLiquidOutput = true;
             boostScale = 1f / 9f;
             outputLiquid = new LiquidStack(Liquids.water, 30f / 60f);
             consumePower(0.5f);

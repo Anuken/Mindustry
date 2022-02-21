@@ -32,9 +32,9 @@ public class DrawMulti extends DrawBlock{
     }
 
     @Override
-    public void drawBase(Building build){
+    public void draw(Building build){
         for(var draw : drawers){
-            draw.drawBase(build);
+            draw.draw(build);
         }
     }
 
@@ -46,9 +46,9 @@ public class DrawMulti extends DrawBlock{
     }
 
     @Override
-    public void drawLights(Building build){
+    public void drawLight(Building build){
         for(var draw : drawers){
-            draw.drawLights(build);
+            draw.drawLight(build);
         }
     }
 

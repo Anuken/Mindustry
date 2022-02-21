@@ -80,7 +80,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public transient float healSuppressionTime = -1f;
     public transient float lastHealTime = -120f * 10f;
 
-    private transient boolean consValid, consOptionalValid;
+    private transient boolean consValid;
     private transient float timeScale = 1f, timeScaleDuration;
     private transient float dumpAccum;
 
@@ -458,10 +458,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     public boolean consValid(){
         return consValid && enabled && shouldConsume();
-    }
-
-    public boolean consOptionalValid(){
-        return consValid() && consOptionalValid;
     }
 
     public void consume(){
@@ -1621,18 +1617,15 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public void updateConsumption(){
         //everything is valid when cheating
         if(cheating()){
-            consValid = consOptionalValid = true;
+            consValid  = true;
             return;
         }
 
         boolean prevValid = consValid();
         consValid = true;
-        consOptionalValid = true;
         boolean docons = shouldConsume() && productionValid();
 
-        for(Consume cons : block.consumers){
-            if(cons.optional) continue;
-
+        for(Consume cons : block.nonOptionalConsumers){
             if(docons && cons.update && prevValid && cons.valid(self())){
                 cons.update(self());
             }
@@ -1644,8 +1637,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             if(docons && cons.update && prevValid && cons.valid(self())){
                 cons.update(self());
             }
-
-            consOptionalValid &= cons.valid(self());
         }
     }
 

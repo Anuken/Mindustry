@@ -44,7 +44,7 @@ public class DrawTurret extends DrawBlock{
     }
 
     @Override
-    public void drawBase(Building build){
+    public void draw(Building build){
         Turret turret = (Turret)build.block;
         TurretBuild tb = (TurretBuild)build;
 

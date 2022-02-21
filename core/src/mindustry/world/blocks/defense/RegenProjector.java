@@ -187,13 +187,13 @@ public class RegenProjector extends Block{
 
         @Override
         public void draw(){
-            drawer.drawBase(this);
+            drawer.draw(this);
         }
 
         @Override
         public void drawLight(){
             super.drawLight();
-            drawer.drawLights(this);
+            drawer.drawLight(this);
         }
     }
 }

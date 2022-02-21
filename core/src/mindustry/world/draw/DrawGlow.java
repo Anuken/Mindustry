@@ -12,7 +12,7 @@ public class DrawGlow extends DrawBlock{
     public TextureRegion top;
 
     @Override
-    public void drawBase(Building build){
+    public void draw(Building build){
         Draw.rect(build.block.region, build.x, build.y);
         Draw.alpha(Mathf.absin(build.totalProgress(), glowScale, glowAmount) * build.warmup());
         Draw.rect(top, build.x, build.y);

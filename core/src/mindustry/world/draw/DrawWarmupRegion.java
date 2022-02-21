@@ -20,7 +20,7 @@ public class DrawWarmupRegion extends DrawBlock{
     }
 
     @Override
-    public void drawBase(Building build){
+    public void draw(Building build){
         Draw.color(color);
         Draw.alpha(build.warmup() * (1f - sinMag) + Mathf.absin(Time.time, sinScl, sinMag) * build.warmup());
         Draw.rect(region, build.x, build.y);

@@ -642,6 +642,12 @@ public class Generators{
                     Pixmap wepReg = weapon.top ? outline.get(reg) : reg;
 
                     drawWeapon.get(weapon, wepReg);
+
+                    if(weapon.cellRegion.found()){
+                        Pixmap weaponCell = get(weapon.cellRegion);
+                        weaponCell.replace(in -> in == 0xffffffff ? 0xffa664ff : in == 0xdcc6c6ff || in == 0xdcc5c5ff ? 0xd06b53ff : 0);
+                        drawWeapon.get(weapon, weaponCell);
+                    }
                 }
 
                 //TODO I can save a LOT of space by not creating a full icon.

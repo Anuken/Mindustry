@@ -315,7 +315,7 @@ public class Turret extends ReloadTurret{
 
         @Override
         public void draw(){
-            draw.drawBase(this);
+            draw.draw(this);
         }
 
         @Override

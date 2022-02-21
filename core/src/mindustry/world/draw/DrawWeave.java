@@ -12,7 +12,7 @@ public class DrawWeave extends DrawBlock{
     public TextureRegion weave, bottom;
 
     @Override
-    public void drawBase(Building build){
+    public void draw(Building build){
         Draw.rect(bottom, build.x, build.y);
         Draw.rect(weave, build.x, build.y, build.totalProgress());
 

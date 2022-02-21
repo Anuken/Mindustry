@@ -43,6 +43,7 @@ public class BaseTurret extends Block{
     public void init(){
         //just makes things a little more convenient
         if(coolant != null){
+            //TODO coolant fix
             coolant.update = false;
             coolant.booster = true;
             coolant.optional = true;

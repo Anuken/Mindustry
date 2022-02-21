@@ -22,7 +22,7 @@ public class DrawArcSmelter extends DrawBlock{
     public Blending blending = Blending.additive;
 
     @Override
-    public void drawBase(Building build){
+    public void draw(Building build){
         if(drawBottom) Draw.rect(bottom, build.x, build.y);
 
         if(build.warmup() > 0f && flameColor.a > 0.001f){

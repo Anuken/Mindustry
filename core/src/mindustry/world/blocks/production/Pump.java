@@ -110,13 +110,13 @@ public class Pump extends LiquidBlock{
 
         @Override
         public void draw(){
-            draw.drawBase(this);
+            draw.draw(this);
         }
 
         @Override
         public void drawLight(){
             super.drawLight();
-            draw.drawLights(this);
+            draw.drawLight(this);
         }
 
         @Override

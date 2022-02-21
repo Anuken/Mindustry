@@ -22,7 +22,7 @@ public class DrawLiquid extends DrawBlock{
     }
 
     @Override
-    public void drawBase(Building build){
+    public void draw(Building build){
         Draw.rect(build.block.region, build.x, build.y);
         GenericCrafter type = (GenericCrafter)build.block;
 

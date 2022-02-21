@@ -26,7 +26,7 @@ public class DrawRegion extends DrawBlock{
     }
 
     @Override
-    public void drawBase(Building build){
+    public void draw(Building build){
         float z = Draw.z();
         if(layer > 0) Draw.z(layer);
         if(spinSprite){

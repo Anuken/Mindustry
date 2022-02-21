@@ -119,6 +119,8 @@ public class Weapon implements Cloneable{
     public TextureRegion region;
     /** heat region, must be same size as region (optional) */
     public TextureRegion heatRegion;
+    /** cell region, must be same size as region (optional) */
+    public TextureRegion cellRegion;
     /** outline region to display if top is false */
     public TextureRegion outlineRegion;
     /** heat region tint */
@@ -208,6 +210,12 @@ public class Weapon implements Cloneable{
         Draw.xscl = -Mathf.sign(flipSprite);
 
         Draw.rect(region, wx, wy, weaponRotation);
+
+        if(cellRegion.found()){
+            Draw.color(unit.type.cellColor(unit));
+            Draw.rect(cellRegion, wx, wy, weaponRotation);
+            Draw.color();
+        }
 
         if(heatRegion.found() && mount.heat > 0){
             Draw.color(heatColor, mount.heat);
@@ -475,6 +483,7 @@ public class Weapon implements Cloneable{
     public void load(){
         region = Core.atlas.find(name);
         heatRegion = Core.atlas.find(name + "-heat");
+        cellRegion = Core.atlas.find(name + "-cell");
         outlineRegion = Core.atlas.find(name + "-outline");
 
         //TODO outlinedRegions

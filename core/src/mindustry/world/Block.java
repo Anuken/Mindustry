@@ -303,7 +303,7 @@ public class Block extends UnlockableContent implements Senseable{
     /** Consumption filters. */
     public boolean[] itemFilter, liquidFilter;
     /** Array of consumers used by this block. Only populated after init(). */
-    public Consume[] consumers = {}, optionalConsumers = {};
+    public Consume[] consumers = {}, optionalConsumers = {}, nonOptionalConsumers = {};
     /** Set to true if this block has any consumers in its array. */
     public boolean hasConsumers;
     /** The single power consumer, if applicable. */
@@ -1090,7 +1090,8 @@ public class Block extends UnlockableContent implements Senseable{
         buildCost *= buildCostMultiplier;
 
         consumers = consumeBuilder.toArray(Consume.class);
-        optionalConsumers = consumeBuilder.filter(consume -> consume.optional).toArray(Consume.class);
+        optionalConsumers = consumeBuilder.select(consume -> consume.optional).toArray(Consume.class);
+        nonOptionalConsumers = consumeBuilder.select(consume -> !consume.optional).toArray(Consume.class);
         hasConsumers = consumers.length > 0;
         itemFilter = new boolean[content.items().size];
         liquidFilter = new boolean[content.liquids().size];

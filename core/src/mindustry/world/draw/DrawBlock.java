@@ -23,12 +23,12 @@ public class DrawBlock{
     }
 
     /** Draws the block itself. */
-    public void drawBase(Building build){
+    public void draw(Building build){
         Draw.rect(build.block.region, build.x, build.y, build.drawrot());
     }
 
     /** Draws any extra light for the block. */
-    public void drawLights(Building build){
+    public void drawLight(Building build){
 
     }
 

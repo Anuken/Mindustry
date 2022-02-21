@@ -19,7 +19,7 @@ public class DrawSideRegion extends DrawBlock{
     }
 
     @Override
-    public void drawBase(Building build){
+    public void draw(Building build){
         if(drawRegion) Draw.rect(build.block.region, build.x, build.y);
 
         Draw.rect(build.rotation > 1 ? top2 : top1, build.x, build.y, build.rotdeg());

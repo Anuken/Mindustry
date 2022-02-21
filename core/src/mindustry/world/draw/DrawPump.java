@@ -11,7 +11,7 @@ public class DrawPump extends DrawBlock{
     public TextureRegion liquid;
 
     @Override
-    public void drawBase(Building build){
+    public void draw(Building build){
         Draw.rect(build.block.region, build.x, build.y);
 
         if(!(build instanceof PumpBuild pump) || pump.liquidDrop == null) return;

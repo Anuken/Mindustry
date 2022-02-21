@@ -20,7 +20,7 @@ public class DrawParticles extends DrawBlock{
     public Blending blending = Blending.normal;
 
     @Override
-    public void drawBase(Building build){
+    public void draw(Building build){
 
         if(build.warmup() > 0f){
 

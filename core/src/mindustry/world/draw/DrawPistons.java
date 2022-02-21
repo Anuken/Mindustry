@@ -19,7 +19,7 @@ public class DrawPistons extends DrawBlock{
     }
 
     @Override
-    public void drawBase(Building build){
+    public void draw(Building build){
         for(int i = 0; i < sides; i++){
             float len = Mathf.absin(build.totalProgress() + sinOffset + sideOffset * sinScl * i, sinScl, sinMag) + lenOffset;
             float angle = i * 360f / sides;

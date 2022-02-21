@@ -22,7 +22,7 @@ public class DrawMixer extends DrawBlock{
     }
 
     @Override
-    public void drawBase(Building build){
+    public void draw(Building build){
         GenericCrafter crafter = (GenericCrafter)build.block;
         float rotation = build.block.rotate ? build.rotdeg() : 0;
         Draw.rect(bottom, build.x, build.y, rotation);

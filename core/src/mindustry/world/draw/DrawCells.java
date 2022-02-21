@@ -16,7 +16,7 @@ public class DrawCells extends DrawBlock{
     public float range = 4f, recurrence = 6f, radius = 3f, lifetime = 60f;
 
     @Override
-    public void drawBase(Building build){
+    public void draw(Building build){
 
         Draw.rect(bottom, build.x, build.y);
 

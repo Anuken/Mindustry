@@ -297,17 +297,12 @@ public class ClassMap{
         classes.put("BatteryBuild", mindustry.world.blocks.power.Battery.BatteryBuild.class);
         classes.put("BeamNode", mindustry.world.blocks.power.BeamNode.class);
         classes.put("BeamNodeBuild", mindustry.world.blocks.power.BeamNode.BeamNodeBuild.class);
-        classes.put("BurnerGenerator", mindustry.world.blocks.power.BurnerGenerator.class);
-        classes.put("BurnerGeneratorBuild", mindustry.world.blocks.power.BurnerGenerator.BurnerGeneratorBuild.class);
         classes.put("ConditionalConsumePower", ConsumePowerCondition.class);
         classes.put("ConsumeGenerator", mindustry.world.blocks.power.ConsumeGenerator.class);
         classes.put("ConsumeGeneratorBuild", mindustry.world.blocks.power.ConsumeGenerator.ConsumeGeneratorBuild.class);
-        classes.put("DecayGenerator", mindustry.world.blocks.power.DecayGenerator.class);
         classes.put("DynamicConsumePower", ConsumePowerDynamic.class);
         classes.put("ImpactReactor", mindustry.world.blocks.power.ImpactReactor.class);
         classes.put("ImpactReactorBuild", mindustry.world.blocks.power.ImpactReactor.ImpactReactorBuild.class);
-        classes.put("ItemLiquidGenerator", mindustry.world.blocks.power.ItemLiquidGenerator.class);
-        classes.put("ItemLiquidGeneratorBuild", mindustry.world.blocks.power.ItemLiquidGenerator.ItemLiquidGeneratorBuild.class);
         classes.put("LightBlock", mindustry.world.blocks.power.LightBlock.class);
         classes.put("LightBuild", mindustry.world.blocks.power.LightBlock.LightBuild.class);
         classes.put("LongPowerNode", mindustry.world.blocks.power.LongPowerNode.class);

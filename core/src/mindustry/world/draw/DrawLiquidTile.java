@@ -23,7 +23,7 @@ public class DrawLiquidTile extends DrawPartial{
     }
 
     @Override
-    public void drawBase(Building build){
+    public void draw(Building build){
         Liquid drawn = drawLiquid != null ? drawLiquid : build.liquids.current();
         LiquidBlock.drawTiledFrames(build.block.size, build.x, build.y, padding, drawn, build.liquids.get(drawn) / build.block.liquidCapacity * alpha);
     }

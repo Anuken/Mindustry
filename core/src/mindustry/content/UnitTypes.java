@@ -73,7 +73,7 @@ public class UnitTypes{
     public static @EntityDef({Unitc.class, BuildingTetherc.class, Payloadc.class}) UnitType manifold, assemblyDrone, effectDrone;
 
     //tank
-    public static @EntityDef({Unitc.class, Tankc.class}) UnitType stell, vanquish, conquer;
+    public static @EntityDef({Unitc.class, Tankc.class}) UnitType stell, locus, vanquish, conquer;
 
     //endregion
 
@@ -2441,6 +2441,47 @@ public class UnitTypes{
                 cooldownTime = 30f;
 
                 bullet = new BasicBulletType(4f, 40){{
+                    sprite = "missile-large";
+                    smokeEffect = Fx.shootBigSmoke;
+                    shootEffect = Fx.shootBigColor;
+                    width = 5f;
+                    height = 7f;
+                    lifetime = 40f;
+                    hitSize = 4f;
+                    hitColor = backColor = trailColor = Color.valueOf("feb380");
+                    frontColor = Color.white;
+                    trailWidth = 1.7f;
+                    trailLength = 5;
+                    despawnEffect = hitEffect = Fx.hitBulletColor;
+                }};
+            }});
+        }};
+
+        locus = new TankUnitType("locus"){{
+            hitSize = 18f;
+            treadPullOffset = 5;
+            speed = 0.7f;
+            rotateSpeed = 3f;
+            health = 800;
+            armor = 7f;
+            areaDamage = 8f;
+            treadRects = new Rect[]{new Rect(17, 10, 19, 76)};
+            researchCostMultiplier = 0f;
+
+            weapons.add(new Weapon("locus-weapon"){{
+                layerOffset = 0.0001f;
+                reload = 70f;
+                shootY = 8f;
+                recoil = 1f;
+                rotate = true;
+                rotateSpeed = 1.4f;
+                mirror = false;
+                x = 0f;
+                y = 0f;
+                heatColor = Color.valueOf("f9350f");
+                cooldownTime = 30f;
+
+                bullet = new BasicBulletType(5f, 50){{
                     sprite = "missile-large";
                     smokeEffect = Fx.shootBigSmoke;
                     shootEffect = Fx.shootBigColor;

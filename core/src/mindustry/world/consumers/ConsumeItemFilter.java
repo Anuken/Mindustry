@@ -46,6 +46,11 @@ public class ConsumeItemFilter extends Consume{
         }
     }
 
+    /** @return efficiency multiplier based on current item to be consumed; overridden in subclasses. Returns 0 if not valid in subclasses. */
+    public float getEfficiency(Building build){
+        return 1f;
+    }
+
     public @Nullable Item getConsumed(Building build){
         for(int i = 0; i < content.items().size; i++){
             Item item = content.item(i);
