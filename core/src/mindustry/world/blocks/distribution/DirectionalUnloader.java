@@ -10,6 +10,7 @@ import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -20,6 +21,7 @@ public class DirectionalUnloader extends Block{
     public @Load("@-arrow") TextureRegion arrowRegion;
 
     public float speed = 1f;
+    public boolean allowCoreUnload = false;
 
     public DirectionalUnloader(String name){
         super(name);
@@ -79,7 +81,7 @@ public class DirectionalUnloader extends Block{
             if((unloadTimer += edelta()) >= speed){
                 Building front = front(), back = back();
 
-                if(front != null && back != null && back.items != null && front.team == team && back.team == team && back.canUnload()){
+                if(front != null && back != null && back.items != null && front.team == team && back.team == team && back.canUnload() && (allowCoreUnload || !(back instanceof CoreBuild))){
                     if(unloadItem == null){
                         var itemseq = content.items();
                         int itemc = itemseq.size;
