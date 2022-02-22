@@ -81,11 +81,11 @@ public class ConsumeGenerator extends PowerGenerator{
             float multiplier = 1f;
             if(valid){
                 if(filterItem != null && filterItem.getConsumed(this) != null){
-                    itemMultiplier = filterItem.getEfficiency(this);
+                    itemMultiplier = filterItem.efficiency(this);
                 }
 
                 //efficiency is added together
-                multiplier *= itemMultiplier + (filterLiquid == null ? 0f : filterLiquid.getEfficiency(this));
+                multiplier *= (itemMultiplier + (filterLiquid == null ? 0f : filterLiquid.efficiency(this)));
             }
 
             productionEfficiency = (valid ? 1f : 0f) * multiplier;

@@ -30,17 +30,18 @@ public class ConsumeLiquid extends ConsumeLiquidBase{
 
     @Override
     public void build(Building build, Table table){
-        table.add(new ReqImage(liquid.uiIcon, () -> valid(build))).size(iconMed).top().left();
+        table.add(new ReqImage(liquid.uiIcon, () -> build.liquids.get(liquid) > 0)).size(iconMed).top().left();
     }
 
     @Override
     public void update(Building build){
-        build.liquids.remove(liquid, Math.min(use(build), build.liquids.get(liquid)));
+        build.liquids.remove(liquid, amount * build.edelta());
     }
 
     @Override
-    public boolean valid(Building build){
-        return build.liquids != null && build.liquids.get(liquid) >= amount * build.delta();
+    public float efficiency(Building build){
+        //there can be more liquid than necessary, so cap at 1
+        return Math.min(build.liquids.get(liquid) / (amount * build.edelta()), 1f);
     }
 
     @Override

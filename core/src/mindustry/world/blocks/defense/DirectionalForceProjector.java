@@ -143,10 +143,10 @@ public class DirectionalForceProjector extends Block{
             if(buildup > 0 && false){
                 float scale = !broken ? cooldownNormal : cooldownBrokenBase;
                 Consume cons = null;
-                if(cons.valid(this)){
-                    cons.update(this);
-                    scale *= (cooldownLiquid * (1f + (liquids.current().heatCapacity - 0.4f) * 0.9f));
-                }
+                //if(cons.valid(this)){
+                //    cons.update(this);
+                //    scale *= (cooldownLiquid * (1f + (liquids.current().heatCapacity - 0.4f) * 0.9f));
+                //}
 
                 buildup -= delta() * scale;
             }

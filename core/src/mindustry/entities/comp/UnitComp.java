@@ -148,6 +148,26 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     }
 
     @Override
+    @Replace
+    public boolean inFogTo(Team viewer){
+        if(this.team == viewer || !state.rules.fog) return false;
+
+        if(hitSize <= 14f){
+            return !fogControl.isVisible(viewer, x, y);
+        }else{
+            //for large hitsizes, check around the unit instead
+            float trns = hitSize / 2f;
+            for(var p : Geometry.d8){
+                if(fogControl.isVisible(team, x + p.x * trns, y + p.y * trns)){
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    @Override
     public float range(){
         return type.maxRange;
     }

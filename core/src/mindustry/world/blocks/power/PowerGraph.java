@@ -340,9 +340,11 @@ public class PowerGraph{
         entity.remove();
     }
 
+    @Deprecated
     private boolean otherConsumersAreValid(Building build, Consume consumePower){
-        for(Consume cons : build.block.consumers){
-            if(cons != consumePower && !cons.optional && !cons.valid(build)){
+        for(Consume cons : build.block.nonOptionalConsumers){
+            //TODO fix this properly
+            if(cons != consumePower && cons.efficiency(build) <= 0.0000001f){
                 return false;
             }
         }

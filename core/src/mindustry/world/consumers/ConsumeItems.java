@@ -48,8 +48,8 @@ public class ConsumeItems extends Consume{
     }
 
     @Override
-    public boolean valid(Building build){
-        return build.consumeTriggerValid() || build.items.has(items);
+    public float efficiency(Building build){
+        return build.consumeTriggerValid() || build.items.has(items) ? 1f : 0f;
     }
 
     @Override

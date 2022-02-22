@@ -1090,8 +1090,8 @@ public class Block extends UnlockableContent implements Senseable{
         buildCost *= buildCostMultiplier;
 
         consumers = consumeBuilder.toArray(Consume.class);
-        optionalConsumers = consumeBuilder.select(consume -> consume.optional).toArray(Consume.class);
-        nonOptionalConsumers = consumeBuilder.select(consume -> !consume.optional).toArray(Consume.class);
+        optionalConsumers = consumeBuilder.select(consume -> consume.optional && !consume.ignore()).toArray(Consume.class);
+        nonOptionalConsumers = consumeBuilder.select(consume -> !consume.optional && !consume.ignore()).toArray(Consume.class);
         hasConsumers = consumers.length > 0;
         itemFilter = new boolean[content.items().size];
         liquidFilter = new boolean[content.liquids().size];

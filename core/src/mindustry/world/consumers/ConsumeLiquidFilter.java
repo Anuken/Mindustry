@@ -35,7 +35,7 @@ public class ConsumeLiquidFilter extends ConsumeLiquidBase{
         Seq<Liquid> list = content.liquids().select(l -> !l.isHidden() && filter.get(l));
         MultiReqImage image = new MultiReqImage();
         list.each(liquid -> image.add(new ReqImage(liquid.uiIcon, () ->
-            build.liquids != null && build.liquids.get(liquid) >= Math.max(use(build), amount * build.delta()))));
+            build.liquids != null && build.liquids.get(liquid) > 0)));
 
         table.add(image).size(8 * 4);
     }
@@ -43,23 +43,17 @@ public class ConsumeLiquidFilter extends ConsumeLiquidBase{
     @Override
     public void update(Building build){
         Liquid liq = getConsumed(build);
-        build.liquids.remove(liq, use(build));
+        build.liquids.remove(liq, amount * build.edelta());
     }
 
     @Override
-    public boolean valid(Building build){
+    public float efficiency(Building build){
         var liq = getConsumed(build);
-        return liq != null && build.liquids.get(liq) >= use(build);
-    }
-
-    /** @return efficiency multiplier based on current item to be consumed; overridden in subclasses. Returns 0 if not valid in subclasses. */
-    public float getEfficiency(Building build){
-        return 1f;
+        return liq != null ? Math.min(build.liquids.get(liq) / (amount * build.edelta()), 1f) : 0f;
     }
     
     public @Nullable Liquid getConsumed(Building build){
-        float u = use(build);
-        if(filter.get(build.liquids.current()) && build.liquids.currentAmount() >= u){
+        if(filter.get(build.liquids.current()) && build.liquids.currentAmount() > 0){
             return build.liquids.current();
         }
 
@@ -67,7 +61,7 @@ public class ConsumeLiquidFilter extends ConsumeLiquidBase{
 
         for(int i = 0; i < liqs.size; i++){
             var liq = liqs.get(i);
-            if(filter.get(liq) && build.liquids.get(liq) >= u){
+            if(filter.get(liq) && build.liquids.get(liq) > 0){
                 return liq;
             }
         }

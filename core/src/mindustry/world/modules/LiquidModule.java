@@ -120,7 +120,8 @@ public class LiquidModule extends BlockModule{
     }
 
     public void remove(Liquid liquid, float amount){
-        add(liquid, -amount);
+        //cap to prevent negative removal
+        add(liquid, Math.max(-amount, -liquids[liquid.id]));
     }
 
     public void each(LiquidConsumer cons){

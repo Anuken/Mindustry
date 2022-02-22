@@ -15,8 +15,8 @@ public class ConsumePayloads extends Consume{
     }
 
     @Override
-    public boolean valid(Building build){
-        return build.getPayloads().contains(payloads);
+    public float efficiency(Building build){
+        return build.getPayloads().contains(payloads) ? 1f : 0f;
     }
 
     @Override

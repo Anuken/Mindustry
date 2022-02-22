@@ -56,7 +56,7 @@ public class ConsumeItemDynamic extends Consume{
     }
 
     @Override
-    public boolean valid(Building build){
-        return build.consumeTriggerValid() || build.items.has(items.get(build));
+    public float efficiency(Building build){
+        return build.consumeTriggerValid() || build.items.has(items.get(build)) ? 1f : 0f;
     }
 }

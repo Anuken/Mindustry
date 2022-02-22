@@ -58,7 +58,7 @@ public class ConsumeGeneratorTests extends PowerTestFixture{
         // Execute all tests for the case where only liquids are accepted and for the case where liquids and items are accepted (but supply only liquids)
         InputType[] inputTypesToBeTested = new InputType[]{
         InputType.liquids,
-        InputType.any
+        //InputType.any
         };
 
         ArrayList<DynamicTest> tests = new ArrayList<>();
@@ -100,7 +100,7 @@ public class ConsumeGeneratorTests extends PowerTestFixture{
         // Execute all tests for the case where only items are accepted and for the case where liquids and items are accepted (but supply only items)
         InputType[] inputTypesToBeTested = new InputType[]{
         InputType.items,
-        InputType.any
+        //InputType.any
         };
 
         ArrayList<DynamicTest> tests = new ArrayList<>();
@@ -145,7 +145,7 @@ public class ConsumeGeneratorTests extends PowerTestFixture{
     /** Makes sure the efficiency stays equal during the item duration. */
     @Test
     void efficiencyRemainsConstantWithinItemDuration_ItemsAndLiquids(){
-        testItemDuration(InputType.any);
+        //testItemDuration(InputType.any);
     }
 
     void testItemDuration(InputType inputType){
@@ -168,7 +168,6 @@ public class ConsumeGeneratorTests extends PowerTestFixture{
 
     enum InputType{
         items,
-        liquids,
-        any
+        liquids
     }
 }

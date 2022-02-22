@@ -340,8 +340,6 @@ public class ClassMap{
         classes.put("IncineratorBuild", mindustry.world.blocks.production.Incinerator.IncineratorBuild.class);
         classes.put("ItemIncinerator", mindustry.world.blocks.production.ItemIncinerator.class);
         classes.put("ItemIncineratorBuild", mindustry.world.blocks.production.ItemIncinerator.ItemIncineratorBuild.class);
-        classes.put("LiquidConverter", mindustry.world.blocks.production.LiquidConverter.class);
-        classes.put("LiquidConverterBuild", mindustry.world.blocks.production.LiquidConverter.LiquidConverterBuild.class);
         classes.put("Pump", mindustry.world.blocks.production.Pump.class);
         classes.put("PumpBuild", mindustry.world.blocks.production.Pump.PumpBuild.class);
         classes.put("Separator", mindustry.world.blocks.production.Separator.class);

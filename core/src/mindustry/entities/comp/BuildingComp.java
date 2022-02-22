@@ -456,37 +456,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return timeScale;
     }
 
-    public boolean consValid(){
-        return consValid && enabled && shouldConsume();
-    }
-
-    public void consume(){
-        for(Consume cons : block.consumers){
-            cons.trigger(self());
-        }
-    }
-
-    public boolean canConsume(){
-        return consValid && enabled;
-    }
-
-    /** Scaled delta. */
-    public float delta(){
-        return Time.delta * timeScale;
-    }
-
-    /** Efficiency * delta. */
-    public float edelta(){
-        return efficiency() * delta();
-    }
-
-    /** Base efficiency. If this entity has non-buffered power, returns the power %, otherwise returns 1. */
-    public float efficiency(){
-        //disabled -> 0 efficiency
-        if(!enabled) return 0;
-        return power != null && (block.consPower != null && !block.consPower.buffered) ? power.status : 1f;
-    }
-
     /**
      * @return the building's 'warmup', a smooth value from 0 to 1.
      * usually used for crafters and things that need to spin up before reaching full efficiency.
@@ -1614,30 +1583,161 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         }
     }
 
+    //TODO
+
+    public float efficiency(){
+        return efficiency;
+    }
+
+    //TODO probably should not have a shouldConsume() check?
+    public boolean consValid(){
+        return consValid && shouldConsume();
+    }
+
+    public void consume(){
+        for(Consume cons : block.consumers){
+            cons.trigger(self());
+        }
+    }
+
+    public boolean canConsume(){
+        return consValid && enabled;
+    }
+
+    /** Scaled delta. */
+    public float delta(){
+        return Time.delta * timeScale;
+    }
+
+    /** Efficiency * delta. */
+    public float edelta(){
+        return efficiency * delta();
+    }
+
+    //TODO save/load this, new building version
+    /** Base efficiency. If this entity has non-buffered power, returns the power %, otherwise returns 1. */
+    private transient float efficiency = 1f;
+
+    //TODO remove?
+    @Deprecated
+    private transient boolean consOptionalValid = false;
+
+    @Deprecated
+    public boolean consOptionalValid(){
+        return consValid && consOptionalValid;
+    }
+
+    //TODO unit tests:
+    //- 50% power efficiency -> 50% liquid consumption
+    //- 50% liquid consumption -> other liquid or item consumer runs at 50% efficiency
+    //- same as above but with overdrive and timeScale = 2 and differing delta values
+
+    /*
+    SCENARIOS:
+
+    1.
+    - liquid at 50% satisfied
+    - liquid at 100% satisfied
+    - item at 100% satisfied
+    result:
+    - efficiency = 50%
+    - all consumers should consume at 50%
+
+    2.
+    - liquid at 50% satisfied
+    - power at 100% satisfied
+    result:
+    - efficiency = 50%
+    - power will still consume 100% - SHOULD IT?
+
+    3.
+    - liquid at 50% satisfied
+    - item at 200% satisfied (boosted)
+    result: ???
+
+    4.
+    - item at 200% satisfied
+    - liquid at 200% satisfied
+    result:
+    - 200% efficiency (why?)
+    - will consume at *normal rate*
+
+    5.
+    - item at 200% satisfied
+    - liquid at 100% satisfied (required, no boost)
+    result:
+    - averaging efficiency would lead to 150%, but this is WRONG. it should be 200% - how?
+
+    6.
+    - item at 200%
+    - liquid at 50%
+    result:
+    - 100% efficiency (2 * 0.5)
+    - consumption of liquid at 50% (how?)
+    - ...but consumption of item at 100% rate (how?)
+
+     */
+
+    //TODO test with overdraw, e.g. requesting 20/frame on a block with only 10 capacity
+    //- should lead to 50% efficiency, for example - make sure all blocks have, at minimum, 10x their capacity per frame - should last for a second at least
+
     public void updateConsumption(){
         //everything is valid when cheating
         if(cheating()){
-            consValid  = true;
+            consValid = true;
+            consOptionalValid = true;
             return;
         }
 
-        boolean prevValid = consValid();
-        consValid = true;
-        boolean docons = shouldConsume() && productionValid();
-
-        for(Consume cons : block.nonOptionalConsumers){
-            if(docons && cons.update && prevValid && cons.valid(self())){
-                cons.update(self());
-            }
-
-            consValid &= cons.valid(self());
+        //disabled -> nothing works
+        if(!enabled){
+            efficiency = 0f;
+            consValid = consOptionalValid = false;
+            return;
         }
 
+        boolean prevValid = consValid;
+        consValid = true;
+        //consOptionalValid = true;
+        boolean docons = shouldConsume() && productionValid();
+
+        float minEfficiency = 1f;
+        var nonOptional = block.nonOptionalConsumers;
+
+        //assume efficiency is 1 for the calculations below
+        efficiency = 1f;
+
+        //first pass: get the minimum efficiency of any consumer
+        for(var cons : nonOptional){
+            minEfficiency = Math.min(minEfficiency, cons.efficiency(self()));
+            //consValid &= cons.valid(self());
+        }
+
+        //efficiency is now this minimum value
+        efficiency = minEfficiency;
+
+        //second pass: update every consumer based on efficiency
+
+        //TODO item consumption fraction array
+
+        if(docons && prevValid && minEfficiency > 0){
+            for(var cons : nonOptional){
+                //TODO different array for update = true?
+                if(cons.update){
+                    cons.update(self());
+                }
+            }
+        }
+
+        //TODO optionals
+        /*
         for(Consume cons : block.optionalConsumers){
             if(docons && cons.update && prevValid && cons.valid(self())){
                 cons.update(self());
             }
-        }
+
+            consOptionalValid &= cons.valid(self());
+        }*/
     }
 
     public void updateTile(){

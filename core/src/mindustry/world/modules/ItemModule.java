@@ -316,7 +316,7 @@ public class ItemModule extends BlockModule{
             if(item > 0) amount++;
         }
 
-        write.s(amount); //amount of items
+        write.s(amount);
 
         for(int i = 0; i < items.length; i++){
             if(items[i] > 0){

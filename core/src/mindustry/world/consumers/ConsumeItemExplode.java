@@ -53,12 +53,7 @@ public class ConsumeItemExplode extends ConsumeItemFilter{
     public void apply(Block block){}
 
     @Override
-    public float getEfficiency(Building build){
+    public float efficiency(Building build){
         return 1f;
-    }
-
-    @Override
-    public boolean valid(Building build){
-        return true;
     }
 }

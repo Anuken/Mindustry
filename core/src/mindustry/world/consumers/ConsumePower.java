@@ -1,6 +1,5 @@
 package mindustry.world.consumers;
 
-import arc.math.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
@@ -31,12 +30,13 @@ public class ConsumePower extends Consume{
     }
 
     @Override
-    public boolean valid(Building build){
-        if(buffered){
-            return true;
-        }else{
-            return build.power.status > 0f;
-        }
+    public boolean ignore(){
+        return buffered;
+    }
+
+    @Override
+    public float efficiency(Building build){
+        return build.power.status;
     }
 
     @Override
@@ -54,18 +54,9 @@ public class ConsumePower extends Consume{
      * @return The amount of power which is requested per tick.
      */
     public float requestedPower(Building entity){
-        if(entity == null) return 0f;
-
-        if(buffered){
-            return (1f-entity.power.status)*capacity;
-        }else{
-            try{
-                return usage * Mathf.num(entity.shouldConsume());
-            }catch(Exception e){
-                //HACK an error will only happen with a bar that is checking its requested power, and the entity is null/a different class
-                return 0;
-            }
-        }
+        return buffered ?
+            (1f - entity.power.status) * capacity :
+            usage * (entity.shouldConsume() ? 1f : 0f);
     }
 
 

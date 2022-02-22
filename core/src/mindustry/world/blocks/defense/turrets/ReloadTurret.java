@@ -33,7 +33,7 @@ public class ReloadTurret extends BaseTurret{
         }
 
         protected void updateCooling(){
-            if(reload < reloadTime && coolant != null && coolant.valid(this)){
+            if(reload < reloadTime && coolant != null && coolant.efficiency(this) > 0){
                 float capacity = coolant instanceof ConsumeLiquidFilter filter ? filter.getConsumed(this).heatCapacity : 1f;
                 coolant.update(this);
                 reload += coolant.amount * edelta() * capacity * coolantMultiplier;

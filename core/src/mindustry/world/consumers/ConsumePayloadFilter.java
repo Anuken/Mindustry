@@ -24,14 +24,14 @@ public class ConsumePayloadFilter extends Consume{
     }
 
     @Override
-    public boolean valid(Building build){
+    public float efficiency(Building build){
         var payloads = build.getPayloads();
         for(var block : fitting){
             if(payloads.contains(block, 1)){
-                return true;
+                return 1f;
             }
         }
-        return false;
+        return 0f;
     }
 
     @Override

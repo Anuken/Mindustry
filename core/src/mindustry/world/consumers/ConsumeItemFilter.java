@@ -46,9 +46,9 @@ public class ConsumeItemFilter extends Consume{
         }
     }
 
-    /** @return efficiency multiplier based on current item to be consumed; overridden in subclasses. Returns 0 if not valid in subclasses. */
-    public float getEfficiency(Building build){
-        return 1f;
+    @Override
+    public float efficiency(Building build){
+        return build.consumeTriggerValid() || getConsumed(build) != null ? 1f : 0f;
     }
 
     public @Nullable Item getConsumed(Building build){
@@ -59,13 +59,6 @@ public class ConsumeItemFilter extends Consume{
             }
         }
         return null;
-    }
-
-    @Override
-    public boolean valid(Building build){
-        if(build.consumeTriggerValid()) return true;
-
-        return getConsumed(build) != null;
     }
 
     @Override

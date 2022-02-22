@@ -49,13 +49,13 @@ public class ConsumeLiquids extends Consume{
     }
 
     @Override
-    public boolean valid(Building build){
+    public float efficiency(Building build){
+        //TODO delta or edelta
+        float min = 1f, delta = build.edelta();
         for(var stack : liquids){
-            if(build.liquids.get(stack.liquid) < stack.amount * build.delta()){
-                return false;
-            }
+            min = Math.min(build.liquids.get(stack.liquid) / (stack.amount * delta), min);
         }
-        return true;
+        return min;
     }
 
     @Override

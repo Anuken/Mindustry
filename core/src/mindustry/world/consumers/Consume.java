@@ -40,6 +40,11 @@ public abstract class Consume{
         return this;
     }
 
+    /** @return if true, this consumer will be ignored in the consumer list (no updates or valid() checks) */
+    public boolean ignore(){
+        return false;
+    }
+
     public void build(Building build, Table table){}
 
     /** Called when a consumption is triggered manually. */
@@ -47,7 +52,13 @@ public abstract class Consume{
 
     public void update(Building build){}
 
+    /** @return efficiency multiplier based on input; overridden in subclasses. Returns 0 if not valid in subclasses. Should return fraction if needs are partially met. */
+    public float efficiency(Building build){
+        return 1f;
+    }
+
     public void display(Stats stats){}
 
-    public abstract boolean valid(Building build);
+    //TODO this should use efficiency instead - remove or deprecate
+    //public abstract boolean valid(Building build);
 }
