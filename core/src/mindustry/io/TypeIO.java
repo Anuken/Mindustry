@@ -310,18 +310,63 @@ public class TypeIO{
         return content.block(read.s());
     }
 
-    public static void writeRequest(Writes write, BuildPlan request){
-        write.b(request.breaking ? (byte)1 : 0);
-        write.i(Point2.pack(request.x, request.y));
-        if(!request.breaking){
-            write.s(request.block.id);
-            write.b((byte)request.rotation);
-            write.b(1); //always has config
-            writeObject(write, request.config);
+    /** @return the maximum acceptable amount of plans to send over the network */
+    public static int getMaxPlans(Queue<BuildPlan> plans){
+        //limit to 10 to prevent buffer overflows
+        int usedRequests = Math.min(plans.size, 10);
+        int totalLength = 0;
+
+        //prevent buffer overflow by checking config length
+        for(int i = 0; i < usedRequests; i++){
+            BuildPlan plan = plans.get(i);
+            if(plan.config instanceof byte[] b){
+                totalLength += b.length;
+            }
+
+            if(plan.config instanceof String b){
+                totalLength += b.length();
+            }
+
+            if(totalLength > 500){
+                usedRequests = i + 1;
+                break;
+            }
+        }
+
+        return usedRequests;
+    }
+
+    //on the network, plans must be capped by size
+    public static void writePlansQueueNet(Writes write, Queue<BuildPlan> plans){
+        int used = getMaxPlans(plans);
+
+        write.i(used);
+        for(int i = 0; i < used; i++){
+            writePlan(write, plans.get(i));
         }
     }
 
-    public static BuildPlan readRequest(Reads read){
+    public static Queue<BuildPlan> readPlansQueue(Reads read){
+        int used = read.i();
+        var out = new Queue<BuildPlan>();
+        for(int i = 0; i < used; i++){
+            out.add(readPlan(read));
+        }
+        return out;
+    }
+
+    public static void writePlan(Writes write, BuildPlan plan){
+        write.b(plan.breaking ? (byte)1 : 0);
+        write.i(Point2.pack(plan.x, plan.y));
+        if(!plan.breaking){
+            write.s(plan.block.id);
+            write.b((byte)plan.rotation);
+            write.b(1); //always has config
+            writeObject(write, plan.config);
+        }
+    }
+
+    public static BuildPlan readPlan(Reads read){
         BuildPlan currentRequest;
 
         byte type = read.b();
@@ -348,18 +393,18 @@ public class TypeIO{
         return currentRequest;
     }
 
-    public static void writeRequests(Writes write, BuildPlan[] requests){
-        if(requests == null){
+    public static void writePlans(Writes write, BuildPlan[] plans){
+        if(plans == null){
             write.s(-1);
             return;
         }
-        write.s((short)requests.length);
-        for(BuildPlan request : requests){
-            writeRequest(write, request);
+        write.s((short)plans.length);
+        for(BuildPlan request : plans){
+            writePlan(write, request);
         }
     }
 
-    public static BuildPlan[] readRequests(Reads read){
+    public static BuildPlan[] readPlans(Reads read){
         short reqamount = read.s();
         if(reqamount == -1){
             return null;
@@ -367,7 +412,7 @@ public class TypeIO{
 
         BuildPlan[] reqs = new BuildPlan[reqamount];
         for(int i = 0; i < reqamount; i++){
-            BuildPlan request = readRequest(read);
+            BuildPlan request = readPlan(read);
             if(request != null){
                 reqs[i] = request;
             }

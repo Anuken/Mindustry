@@ -50,7 +50,7 @@ public class Duct extends Block implements Autotiler{
     }
 
     @Override
-    public void drawRequestRegion(BuildPlan plan, Eachable<BuildPlan> list){
+    public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
         int[] bits = getTiling(plan, list);
 
         if(bits == null) return;

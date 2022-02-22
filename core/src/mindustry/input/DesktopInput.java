@@ -202,10 +202,10 @@ public class DesktopInput extends InputHandler{
         //draw schematic requests
         selectRequests.each(req -> {
             req.animScale = 1f;
-            drawRequest(req);
+            drawPlan(req);
         });
 
-        selectRequests.each(this::drawOverRequest);
+        selectRequests.each(this::drawOverPlan);
 
         if(player.isBuilder()){
             //draw things that may be placed soon
@@ -215,23 +215,23 @@ public class DesktopInput extends InputHandler{
                     if(i == lineRequests.size - 1 && req.block.rotate){
                         drawArrow(block, req.x, req.y, req.rotation);
                     }
-                    drawRequest(lineRequests.get(i));
+                    drawPlan(lineRequests.get(i));
                 }
-                lineRequests.each(this::drawOverRequest);
+                lineRequests.each(this::drawOverPlan);
             }else if(isPlacing()){
                 if(block.rotate && block.drawArrow){
                     drawArrow(block, cursorX, cursorY, rotation);
                 }
                 Draw.color();
                 boolean valid = validPlace(cursorX, cursorY, block, rotation);
-                drawRequest(cursorX, cursorY, block, rotation);
+                drawPlan(cursorX, cursorY, block, rotation);
                 block.drawPlace(cursorX, cursorY, rotation, valid);
 
                 if(block.saveConfig){
                     Draw.mixcol(!valid ? Pal.breakInvalid : Color.white, (!valid ? 0.4f : 0.24f) + Mathf.absin(Time.globalTime, 6f, 0.28f));
                     brequest.set(cursorX, cursorY, rotation, block);
                     brequest.config = block.lastConfig;
-                    block.drawRequestConfig(brequest, allRequests());
+                    block.drawPlanConfig(brequest, allRequests());
                     brequest.config = null;
                     Draw.reset();
                 }

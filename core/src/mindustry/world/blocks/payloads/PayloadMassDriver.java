@@ -88,7 +88,7 @@ public class PayloadMassDriver extends PayloadBlock{
     }
 
     @Override
-    public void drawRequestRegion(BuildPlan plan, Eachable<BuildPlan> list){
+    public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
         Draw.rect(baseRegion, plan.drawx(), plan.drawy());
         Draw.rect(topRegion, plan.drawx(), plan.drawy());
         Draw.rect(outRegion, plan.drawx(), plan.drawy(), plan.rotation * 90);
@@ -188,7 +188,7 @@ public class PayloadMassDriver extends PayloadBlock{
                 !(
                     current instanceof PayloadDriverBuild entity &&
                     current.isValid() &&
-                    entity.consValid() && entity.block == block &&
+                    entity.consValid && entity.block == block &&
                     entity.link == pos() && within(current, range)
                 )){
                 waitingShooters.removeFirst();
@@ -219,7 +219,7 @@ public class PayloadMassDriver extends PayloadBlock{
             }
 
             //skip when there's no power
-            if(!consValid()){
+            if(!consValid){
                 return;
             }
 

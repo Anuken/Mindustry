@@ -13,8 +13,7 @@ public abstract class Consume{
     public boolean optional;
     /** If true, this consumer will be displayed as a boost input. */
     public boolean booster;
-    //TODO bad. I don't like it.
-    @Deprecated
+    /** If false, this consumer will still be checked, but it will need to updated manually. */
     public boolean update = true;
 
     /**
@@ -34,7 +33,6 @@ public abstract class Consume{
         return optional(true, true);
     }
 
-    @Deprecated
     public Consume update(boolean update){
         this.update = update;
         return this;
@@ -52,8 +50,13 @@ public abstract class Consume{
 
     public void update(Building build){}
 
-    /** @return efficiency multiplier based on input; overridden in subclasses. Returns 0 if not valid in subclasses. Should return fraction if needs are partially met. */
+    /** @return [0, 1] efficiency multiplier based on input. Returns 0 if not valid in subclasses. Should return fraction if needs are partially met. */
     public float efficiency(Building build){
+        return 1f;
+    }
+
+    /** @return multiplier for efficiency - this can be above 1. Will not influence a building's base efficiency value. */
+    public float efficiencyMultiplier(Building build){
         return 1f;
     }
 

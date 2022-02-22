@@ -42,7 +42,7 @@ public abstract class BlockProducer extends PayloadBlock{
     }
 
     @Override
-    public void drawRequestRegion(BuildPlan plan, Eachable<BuildPlan> list){
+    public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
         Draw.rect(region, plan.drawx(), plan.drawy());
         Draw.rect(outRegion, plan.drawx(), plan.drawy(), plan.rotation * 90);
         Draw.rect(topRegion, plan.drawx(), plan.drawy());
@@ -88,7 +88,7 @@ public abstract class BlockProducer extends PayloadBlock{
         public void updateTile(){
             super.updateTile();
             var recipe = recipe();
-            boolean produce = recipe != null && consValid() && payload == null;
+            boolean produce = recipe != null && consValid && payload == null;
 
             if(produce){
                 progress += buildSpeed * edelta();

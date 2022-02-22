@@ -183,7 +183,7 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
             Draw.reset();
             Draw.mixcol(Color.white, 0.24f + Mathf.absin(Time.globalTime, 6f, 0.28f));
             Draw.alpha(alpha);
-            request.block.drawRequestConfigTop(request, plans);
+            request.block.drawPlanConfigTop(request, plans);
         }
     }
 

@@ -34,7 +34,7 @@ public class DrawBlock{
 
     /** Draws the planned version of this block. */
     public void drawPlan(Block block, BuildPlan plan, Eachable<BuildPlan> list){
-        block.drawDefaultRequestRegion(plan, list);
+        block.drawDefaultPlanRegion(plan, list);
     }
 
     /** Load any relevant texture regions. */

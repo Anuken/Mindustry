@@ -98,7 +98,7 @@ public class OverdriveProjector extends Block{
         @Override
         public void updateTile(){
             smoothEfficiency = Mathf.lerpDelta(smoothEfficiency, efficiency(), 0.08f);
-            heat = Mathf.lerpDelta(heat, consValid() ? 1f : 0f, 0.08f);
+            heat = Mathf.lerpDelta(heat, consValid ? 1f : 0f, 0.08f);
             charge += heat * Time.delta;
 
             if(hasBoost){
@@ -112,13 +112,13 @@ public class OverdriveProjector extends Block{
                 indexer.eachBlock(this, realRange, other -> other.block.canOverdrive, other -> other.applyBoost(realBoost(), reload + 1f));
             }
 
-            if(timer(timerUse, useTime) && efficiency() > 0 && consValid()){
+            if(timer(timerUse, useTime) && efficiency() > 0 && consValid){
                 consume();
             }
         }
 
         public float realBoost(){
-            return consValid() ? (speedBoost + phaseHeat * speedBoostPhase) * efficiency() : 0f;
+            return consValid ? (speedBoost + phaseHeat * speedBoostPhase) * efficiency() : 0f;
         }
 
         @Override

@@ -86,7 +86,7 @@ public class Drill extends Block{
     }
 
     @Override
-    public void drawRequestConfigTop(BuildPlan plan, Eachable<BuildPlan> list){
+    public void drawPlanConfigTop(BuildPlan plan, Eachable<BuildPlan> list){
         if(!plan.worldContext) return;
         Tile tile = plan.tile();
         if(tile == null) return;
@@ -273,7 +273,7 @@ public class Drill extends Block{
 
             timeDrilled += warmup * delta();
 
-            if(items.total() < itemCapacity && dominantItems > 0 && consValid()){
+            if(items.total() < itemCapacity && dominantItems > 0 && consValid){
 
                 float speed = 1f;
 

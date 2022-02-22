@@ -76,7 +76,7 @@ public class ImpactReactor extends PowerGenerator{
 
         @Override
         public void updateTile(){
-            if(consValid() && power.status >= 0.99f){
+            if(consValid && power.status >= 0.99f){
                 boolean prevOut = getPowerProduction() <= consPower.requestedPower(this);
 
                 warmup = Mathf.lerpDelta(warmup, 1f, warmupSpeed * timeScale);

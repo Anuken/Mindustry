@@ -48,13 +48,13 @@ public class DirectionBridge extends Block{
     }
 
     @Override
-    public void drawRequestRegion(BuildPlan plan, Eachable<BuildPlan> list){
+    public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
         Draw.rect(region, plan.drawx(), plan.drawy());
         Draw.rect(dirRegion, plan.drawx(), plan.drawy(), plan.rotation * 90);
     }
 
     @Override
-    public void drawRequestConfigTop(BuildPlan plan, Eachable<BuildPlan> list){
+    public void drawPlanConfigTop(BuildPlan plan, Eachable<BuildPlan> list){
         otherReq = null;
         otherDst = range;
         Point2 d = Geometry.d4(plan.rotation);

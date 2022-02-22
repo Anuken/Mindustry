@@ -62,7 +62,7 @@ public class RegenProjector extends Block{
     }
 
     @Override
-    public void drawRequestRegion(BuildPlan plan, Eachable<BuildPlan> list){
+    public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
         drawer.drawPlan(this, plan, list);
     }
 
@@ -112,7 +112,7 @@ public class RegenProjector extends Block{
             }
 
             //TODO should warmup depend on didRegen?
-            warmup = Mathf.approachDelta(warmup, consValid() && didRegen ? 1f : 0f, 1f / 70f);
+            warmup = Mathf.approachDelta(warmup, consValid && didRegen ? 1f : 0f, 1f / 70f);
             totalTime += warmup * Time.delta;
             didRegen = false;
 
@@ -121,7 +121,7 @@ public class RegenProjector extends Block{
                 return;
             }
 
-            if(consValid()){
+            if(consValid){
                 if(consOptionalValid() && (optionalTimer += Time.delta) >= optionalUseTime){
                     consume();
                     optionalUseTime = 0f;

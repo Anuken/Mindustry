@@ -120,7 +120,7 @@ public class CallGenerator{
                 builder.addStatement("WRITE.$L($L)", typeName.equals("boolean") ? "bool" : typeName.charAt(0) + "", varName);
             }else{
                 //else, try and find a serializer
-                String ser = serializer.writers.get(typeName.replace("mindustry.gen.", ""), SerializerResolver.locate(ent.element.e, var.mirror(), true));
+                String ser = serializer.getNetWriter(typeName.replace("mindustry.gen.", ""), SerializerResolver.locate(ent.element.e, var.mirror(), true));
 
                 if(ser == null){ //make sure a serializer exists!
                     BaseProcessor.err("No method to write class type: '" + typeName + "'", var);

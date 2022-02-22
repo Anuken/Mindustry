@@ -14,8 +14,8 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.entities.units.*;
-import mindustry.game.EventType.*;
 import mindustry.game.*;
+import mindustry.game.EventType.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -628,7 +628,7 @@ public class NetServer implements ApplicationListener{
         float xVelocity, float yVelocity,
         Tile mining,
         boolean boosting, boolean shooting, boolean chatting, boolean building,
-        @Nullable BuildPlan[] requests,
+        @Nullable Queue<BuildPlan> plans,
         float viewX, float viewY, float viewWidth, float viewHeight
     ){
         NetConnection con = player.con;
@@ -675,8 +675,8 @@ public class NetServer implements ApplicationListener{
             player.unit().clearBuilding();
             player.unit().updateBuilding(building);
 
-            if(requests != null){
-                for(BuildPlan req : requests){
+            if(plans != null){
+                for(BuildPlan req : plans){
                     if(req == null) continue;
                     Tile tile = world.tile(req.x, req.y);
                     if(tile == null || (!req.breaking && req.block == null)) continue;
@@ -1049,7 +1049,6 @@ public class NetServer implements ApplicationListener{
             if(Groups.player.size() > 0 && Core.settings.getBool("blocksync") && timer.get(timerBlockSync, blockSyncTime)){
                 writeBlockSnapshots();
             }
-
         }catch(IOException e){
             Log.err(e);
         }

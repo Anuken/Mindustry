@@ -13,7 +13,9 @@ public class ConsumeItemFlammable extends ConsumeItemFilter{
     }
 
     @Override
-    public float efficiency(Building build){
+    public float efficiencyMultiplier(Building build){
+        //TODO ugh
+        if(build.consumeTriggerValid()) return 1f;
         var item = getConsumed(build);
         return item == null ? 0f : item.flammability;
     }

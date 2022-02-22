@@ -305,7 +305,7 @@ public class PowerNode extends PowerBlock{
     }
 
     @Override
-    public void drawRequestConfigTop(BuildPlan plan, Eachable<BuildPlan> list){
+    public void drawPlanConfigTop(BuildPlan plan, Eachable<BuildPlan> list){
         if(plan.config instanceof Point2[] ps){
             setupColor(1f);
             for(Point2 point : ps){

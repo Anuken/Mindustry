@@ -952,22 +952,22 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
     }
 
-    protected void drawOverRequest(BuildPlan request){
+    protected void drawOverPlan(BuildPlan request){
         boolean valid = validPlace(request.x, request.y, request.block, request.rotation);
 
         Draw.reset();
         Draw.mixcol(!valid ? Pal.breakInvalid : Color.white, (!valid ? 0.4f : 0.24f) + Mathf.absin(Time.globalTime, 6f, 0.28f));
         Draw.alpha(1f);
-        request.block.drawRequestConfigTop(request, allSelectLines);
+        request.block.drawPlanConfigTop(request, allSelectLines);
         Draw.reset();
     }
 
-    protected void drawRequest(BuildPlan request){
+    protected void drawPlan(BuildPlan request){
         request.block.drawPlan(request, allRequests(), validPlace(request.x, request.y, request.block, request.rotation));
     }
 
     /** Draws a placement icon for a specific block. */
-    protected void drawRequest(int x, int y, Block block, int rotation){
+    protected void drawPlan(int x, int y, Block block, int rotation){
         brequest.set(x, y, rotation, block);
         brequest.animScale = 1f;
         block.drawPlan(brequest, allRequests(), validPlace(x, y, block, rotation));

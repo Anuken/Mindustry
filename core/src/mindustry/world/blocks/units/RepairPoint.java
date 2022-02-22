@@ -185,7 +185,7 @@ public class RepairPoint extends Block{
 
             boolean healed = false;
 
-            if(target != null && consValid()){
+            if(target != null && consValid){
                 float angle = Angles.angle(x, y, target.x + offset.x, target.y + offset.y);
                 if(Angles.angleDist(angle, rotation) < 30f){
                     healed = true;

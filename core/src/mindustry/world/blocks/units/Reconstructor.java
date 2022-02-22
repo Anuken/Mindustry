@@ -37,7 +37,7 @@ public class Reconstructor extends UnitBlock{
     }
 
     @Override
-    public void drawRequestRegion(BuildPlan plan, Eachable<BuildPlan> list){
+    public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
         Draw.rect(region, plan.drawx(), plan.drawy());
         Draw.rect(inRegion, plan.drawx(), plan.drawy(), plan.rotation * 90);
         Draw.rect(outRegion, plan.drawx(), plan.drawy(), plan.rotation * 90);
@@ -219,7 +219,7 @@ public class Reconstructor extends UnitBlock{
                     moveOutPayload();
                 }else{ //update progress
                     if(moveInPayload()){
-                        if(consValid()){
+                        if(consValid){
                             valid = true;
                             progress += edelta() * state.rules.unitBuildSpeed(team);
                         }

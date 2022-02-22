@@ -241,7 +241,7 @@ public class BuildTurret extends BaseTurret{
             super.write(write);
             write.f(rotation);
             //TODO queue can be very large due to logic?
-            TypeIO.writeRequests(write, unit.plans().toArray(BuildPlan.class));
+            TypeIO.writePlans(write, unit.plans().toArray(BuildPlan.class));
         }
 
         @Override
@@ -250,7 +250,7 @@ public class BuildTurret extends BaseTurret{
             rotation = read.f();
             unit.rotation(rotation);
             unit.plans().clear();
-            var reqs = TypeIO.readRequests(read);
+            var reqs = TypeIO.readPlans(read);
             if(reqs != null){
                 for(var req : reqs){
                     unit.plans().add(req);

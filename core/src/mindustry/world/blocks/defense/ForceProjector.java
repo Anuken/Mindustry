@@ -148,7 +148,7 @@ public class ForceProjector extends Block{
 
         @Override
         public void updateTile(){
-            boolean phaseValid = itemConsumer != null && itemConsumer.valid(this);
+            boolean phaseValid = itemConsumer != null && itemConsumer.efficiency(this) > 0;
 
             phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(phaseValid), 0.1f);
 
@@ -169,7 +169,7 @@ public class ForceProjector extends Block{
 
                 //TODO I hate this system
                 if(coolantConsumer != null){
-                    if(coolantConsumer.valid(this)){
+                    if(coolantConsumer.efficiency(this) > 0){
                         coolantConsumer.update(this);
                         scale *= (cooldownLiquid * (1f + (liquids.current().heatCapacity - 0.4f) * 0.9f));
                     }

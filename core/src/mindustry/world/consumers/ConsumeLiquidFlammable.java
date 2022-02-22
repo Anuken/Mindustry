@@ -13,8 +13,8 @@ public class ConsumeLiquidFlammable extends ConsumeLiquidFilter{
     }
 
     @Override
-    public float efficiency(Building build){
-        var item = getConsumed(build);
-        return item == null ? 0f : item.flammability * super.efficiency(build);
+    public float efficiencyMultiplier(Building build){
+        var liq = getConsumed(build);
+        return liq == null ? 0f : liq.flammability;
     }
 }

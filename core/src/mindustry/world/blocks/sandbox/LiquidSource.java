@@ -46,8 +46,8 @@ public class LiquidSource extends Block{
     }
 
     @Override
-    public void drawRequestConfig(BuildPlan plan, Eachable<BuildPlan> list){
-        drawRequestConfigCenter(plan, plan.config, "center", true);
+    public void drawPlanConfig(BuildPlan plan, Eachable<BuildPlan> list){
+        drawPlanConfigCenter(plan, plan.config, "center", true);
     }
 
     @Override

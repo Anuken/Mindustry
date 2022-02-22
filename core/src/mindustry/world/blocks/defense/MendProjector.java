@@ -79,7 +79,7 @@ public class MendProjector extends Block{
             boolean canHeal = !checkSuppression();
 
             smoothEfficiency = Mathf.lerpDelta(smoothEfficiency, efficiency(), 0.08f);
-            heat = Mathf.lerpDelta(heat, consValid() && canHeal ? 1f : 0f, 0.08f);
+            heat = Mathf.lerpDelta(heat, consValid && canHeal ? 1f : 0f, 0.08f);
             charge += heat * delta();
 
             phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(consOptionalValid()), 0.1f);

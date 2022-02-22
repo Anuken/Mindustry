@@ -64,7 +64,7 @@ public class Separator extends Block{
 
         @Override
         public boolean shouldAmbientSound(){
-            return consValid();
+            return consValid;
         }
 
         @Override
@@ -94,7 +94,7 @@ public class Separator extends Block{
         public void updateTile(){
             totalProgress += warmup * delta();
 
-            if(consValid()){
+            if(consValid){
                 progress += getProgressIncrease(craftTime);
                 warmup = Mathf.lerpDelta(warmup, 1f, 0.02f);
             }else{

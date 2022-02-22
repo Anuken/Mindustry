@@ -69,9 +69,9 @@ public class ItemTurret extends Turret{
             }
 
             @Override
-            public boolean valid(Building build){
+            public float efficiency(Building build){
                 //valid when there's any ammo in the turret
-                return build instanceof ItemTurretBuild it && !it.ammo.isEmpty();
+                return build instanceof ItemTurretBuild it && !it.ammo.isEmpty() ? 1f : 0f;
             }
 
             @Override

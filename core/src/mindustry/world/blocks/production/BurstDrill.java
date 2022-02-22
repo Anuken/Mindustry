@@ -58,7 +58,7 @@ public class BurstDrill extends Drill{
 
             smoothProgress = Mathf.lerpDelta(smoothProgress, progress / (drillTime - 20f), 0.1f);
 
-            if(items.total() <= itemCapacity - dominantItems && dominantItems > 0 && consValid()){
+            if(items.total() <= itemCapacity - dominantItems && dominantItems > 0 && consValid){
                 warmup = Mathf.approachDelta(warmup, progress / drillTime, 0.01f);
 
                 float speed = efficiency();

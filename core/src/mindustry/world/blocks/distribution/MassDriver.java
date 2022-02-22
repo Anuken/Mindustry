@@ -153,7 +153,7 @@ public class MassDriver extends Block{
             }
 
             //skip when there's no power
-            if(!consValid()){
+            if(!consValid){
                 return;
             }
 
@@ -326,7 +326,7 @@ public class MassDriver extends Block{
         }
 
         protected boolean shooterValid(Building other){
-            return other instanceof MassDriverBuild entity && other.isValid() && other.consValid() && entity.block == block && entity.link == pos() && within(other, range);
+            return other instanceof MassDriverBuild entity && other.isValid() && other.consValid && entity.block == block && entity.link == pos() && within(other, range);
         }
 
         protected boolean linkValid(){

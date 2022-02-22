@@ -196,7 +196,7 @@ public class SectorInfo{
         var pads = indexer.getFlagged(state.rules.defaultTeam, BlockFlag.launchPad);
 
         //disable export when launch pads are disabled, or there aren't any active ones
-        if(pads.size == 0 || !pads.contains(t -> t.consValid())){
+        if(pads.size == 0 || !pads.contains(t -> t.consValid)){
             export.clear();
         }
 

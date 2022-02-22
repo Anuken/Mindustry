@@ -119,7 +119,7 @@ public class GenericCrafter extends Block{
     }
 
     @Override
-    public void drawRequestRegion(BuildPlan plan, Eachable<BuildPlan> list){
+    public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
         drawer.drawPlan(this, plan, list);
     }
 
@@ -187,7 +187,7 @@ public class GenericCrafter extends Block{
 
         @Override
         public void updateTile(){
-            if(consValid()){
+            if(consValid){
 
                 progress += getProgressIncrease(craftTime);
                 warmup = Mathf.approachDelta(warmup, warmupTarget(), warmupSpeed);
@@ -282,7 +282,7 @@ public class GenericCrafter extends Block{
 
         @Override
         public boolean shouldAmbientSound(){
-            return consValid();
+            return consValid;
         }
 
         @Override

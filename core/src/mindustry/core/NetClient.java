@@ -14,7 +14,6 @@ import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.core.GameState.*;
 import mindustry.entities.*;
-import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
@@ -588,36 +587,6 @@ public class NetClient implements ApplicationListener{
 
     void sync(){
         if(timer.get(0, playerSyncTime)){
-            BuildPlan[] requests = null;
-            if(player.isBuilder()){
-                //limit to 10 to prevent buffer overflows
-                int usedRequests = Math.min(player.unit().plans().size, 10);
-
-                int totalLength = 0;
-
-                //prevent buffer overflow by checking config length
-                for(int i = 0; i < usedRequests; i++){
-                    BuildPlan plan = player.unit().plans().get(i);
-                    if(plan.config instanceof byte[] b){
-                        totalLength += b.length;
-                    }
-
-                    if(plan.config instanceof String b){
-                        totalLength += b.length();
-                    }
-
-                    if(totalLength > 500){
-                        usedRequests = i + 1;
-                        break;
-                    }
-                }
-
-                requests = new BuildPlan[usedRequests];
-                for(int i = 0; i < usedRequests; i++){
-                    requests[i] = player.unit().plans().get(i);
-                }
-            }
-
             Unit unit = player.dead() ? Nulls.unit : player.unit();
             int uid = player.dead() ? -1 : unit.id;
 
@@ -632,7 +601,7 @@ public class NetClient implements ApplicationListener{
             unit.vel.x, unit.vel.y,
             player.unit().mineTile,
             player.boosting, player.shooting, ui.chatfrag.shown(), control.input.isBuilding,
-            requests,
+            player.isBuilder() ? player.unit().plans : null,
             Core.camera.position.x, Core.camera.position.y,
             Core.camera.width, Core.camera.height
             );

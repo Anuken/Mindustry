@@ -643,18 +643,18 @@ public class Block extends UnlockableContent implements Senseable{
         Draw.alpha(alpha);
         float prevScale = Draw.scl;
         Draw.scl *= plan.animScale;
-        drawRequestRegion(plan, list);
+        drawPlanRegion(plan, list);
         Draw.scl = prevScale;
         Draw.reset();
     }
 
-    public void drawRequestRegion(BuildPlan plan, Eachable<BuildPlan> list){
-        drawDefaultRequestRegion(plan, list);
+    public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
+        drawDefaultPlanRegion(plan, list);
     }
 
     /** this is a different method so subclasses can call it even after overriding the base */
-    public void drawDefaultRequestRegion(BuildPlan plan, Eachable<BuildPlan> list){
-        TextureRegion reg = getRequestRegion(plan, list);
+    public void drawDefaultPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
+        TextureRegion reg = getPlanRegion(plan, list);
         Draw.rect(reg, plan.drawx(), plan.drawy(), !rotate || !rotateDraw ? 0 : plan.rotation * 90);
 
         if(plan.worldContext && player != null && teamRegion != null && teamRegion.found()){
@@ -663,18 +663,18 @@ public class Block extends UnlockableContent implements Senseable{
             Draw.color();
         }
 
-        drawRequestConfig(plan, list);
+        drawPlanConfig(plan, list);
     }
 
-    public TextureRegion getRequestRegion(BuildPlan plan, Eachable<BuildPlan> list){
+    public TextureRegion getPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
         return fullIcon;
     }
 
-    public void drawRequestConfig(BuildPlan plan, Eachable<BuildPlan> list){
+    public void drawPlanConfig(BuildPlan plan, Eachable<BuildPlan> list){
 
     }
 
-    public void drawRequestConfigCenter(BuildPlan plan, Object content, String region, boolean cross){
+    public void drawPlanConfigCenter(BuildPlan plan, Object content, String region, boolean cross){
         if(content == null){
             if(cross){
                 Draw.rect("cross", plan.drawx(), plan.drawy());
@@ -689,11 +689,11 @@ public class Block extends UnlockableContent implements Senseable{
         Draw.color();
     }
 
-    public void drawRequestConfigCenter(BuildPlan plan, Object content, String region){
-        drawRequestConfigCenter(plan, content, region, false);
+    public void drawPlanConfigCenter(BuildPlan plan, Object content, String region){
+        drawPlanConfigCenter(plan, content, region, false);
     }
 
-    public void drawRequestConfigTop(BuildPlan plan, Eachable<BuildPlan> list){
+    public void drawPlanConfigTop(BuildPlan plan, Eachable<BuildPlan> list){
 
     }
 

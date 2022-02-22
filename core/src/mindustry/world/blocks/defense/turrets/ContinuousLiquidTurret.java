@@ -41,21 +41,18 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
     public void init(){
         //TODO display ammoMultiplier.
         consume(new ConsumeLiquidFilter(i -> ammoTypes.containsKey(i), liquidConsumed){
-            @Override
-            public boolean valid(Building build){
-                return build.liquids.currentAmount() >= use(build);
-            }
 
             @Override
             public void display(Stats stats){
 
             }
 
-            @Override
-            protected float use(Building entity){
-                BulletType type = ammoTypes.get(entity.liquids.current());
-                return Math.min(amount * entity.edelta(), entity.block.liquidCapacity) / (type == null ? 1f : type.ammoMultiplier);
-            }
+            //TODO
+            //@Override
+            //protected float use(Building entity){
+            //    BulletType type = ammoTypes.get(entity.liquids.current());
+            //    return Math.min(amount * entity.edelta(), entity.block.liquidCapacity) / (type == null ? 1f : type.ammoMultiplier);
+            //}
         });
 
         super.init();

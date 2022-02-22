@@ -133,7 +133,7 @@ public class PowerTests extends PowerTestFixture{
 
             assertEquals(0.0f, consumerTile.build.power.status, Mathf.FLOAT_ROUNDING_ERROR);
             if(consumerTile.block().consPower != null){
-                assertFalse(consumerTile.block().consPower.valid(consumerTile.build));
+                assertEquals(0f, consumerTile.block().consPower.efficiency(consumerTile.build));
             }
         }
     }

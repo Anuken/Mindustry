@@ -28,7 +28,7 @@ public class Fracker extends SolidPump{
 
         @Override
         public void updateTile(){
-            if(consValid()){
+            if(consValid){
                 if(accumulator >= itemUseTime){
                     consume();
                     accumulator -= itemUseTime;

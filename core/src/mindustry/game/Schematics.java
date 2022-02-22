@@ -244,20 +244,20 @@ public class Schematics implements Loadable{
             Draw.rect(Tmp.tr1, buffer.getWidth()/2f, buffer.getHeight()/2f, buffer.getWidth(), -buffer.getHeight());
             Draw.color();
 
-            Seq<BuildPlan> requests = schematic.tiles.map(t -> new BuildPlan(t.x, t.y, t.rotation, t.block, t.config));
+            Seq<BuildPlan> plans = schematic.tiles.map(t -> new BuildPlan(t.x, t.y, t.rotation, t.block, t.config));
 
             Draw.flush();
             //scale each request to fit schematic
             Draw.trans().scale(resolution / tilesize, resolution / tilesize).translate(tilesize*1.5f, tilesize*1.5f);
 
             //draw requests
-            requests.each(req -> {
+            plans.each(req -> {
                 req.animScale = 1f;
                 req.worldContext = false;
-                req.block.drawRequestRegion(req, requests);
+                req.block.drawPlanRegion(req, plans);
             });
 
-            requests.each(req -> req.block.drawRequestConfigTop(req, requests));
+            plans.each(req -> req.block.drawPlanConfigTop(req, plans));
 
             Draw.flush();
             Draw.trans().idt();

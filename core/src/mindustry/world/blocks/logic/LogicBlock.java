@@ -484,7 +484,7 @@ public class LogicBlock extends Block{
             }
 
             if(enabled && executor.initialized()){
-                accumulator += edelta() * ipt * (consValid() ? 1 : 0);
+                accumulator += edelta() * ipt * (consValid ? 1 : 0);
 
                 if(accumulator > maxInstructionScale * ipt) accumulator = maxInstructionScale * ipt;
 

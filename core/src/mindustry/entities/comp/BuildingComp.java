@@ -73,6 +73,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     transient boolean wasVisible; //used only by the block renderer when fog is on
     transient float visualLiquid;
 
+    //TODO save efficiency too!
+    transient boolean consValid;
+
     @Nullable PowerModule power;
     @Nullable ItemModule items;
     @Nullable LiquidModule liquids;
@@ -80,7 +83,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public transient float healSuppressionTime = -1f;
     public transient float lastHealTime = -120f * 10f;
 
-    private transient boolean consValid;
     private transient float timeScale = 1f, timeScaleDuration;
     private transient float dumpAccum;
 
@@ -488,7 +490,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             return BlockStatus.noOutput;
         }
 
-        if(!consValid() || !productionValid()){
+        if(!consValid || !productionValid()){
             return BlockStatus.noInput;
         }
 
@@ -1583,16 +1585,12 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         }
     }
 
-    //TODO
-
+    //TODO remove
     public float efficiency(){
         return efficiency;
     }
 
-    //TODO probably should not have a shouldConsume() check?
-    public boolean consValid(){
-        return consValid && shouldConsume();
-    }
+    //TODO probably should not have a shouldConsume() check? should you even *use* consValid?
 
     public void consume(){
         for(Consume cons : block.consumers){
@@ -1617,6 +1615,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     //TODO save/load this, new building version
     /** Base efficiency. If this entity has non-buffered power, returns the power %, otherwise returns 1. */
     private transient float efficiency = 1f;
+
+    //why?
+    transient float efficiencyMultiplier = 1f;
 
     //TODO remove?
     @Deprecated
@@ -1681,9 +1682,13 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     //TODO test with overdraw, e.g. requesting 20/frame on a block with only 10 capacity
     //- should lead to 50% efficiency, for example - make sure all blocks have, at minimum, 10x their capacity per frame - should last for a second at least
 
+    public void updateEfficiencyMultiplier(){
+
+    }
+
     public void updateConsumption(){
         //everything is valid when cheating
-        if(cheating()){
+        if(cheating() || !block.hasConsumers){
             consValid = true;
             consOptionalValid = true;
             return;
@@ -1706,6 +1711,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         //assume efficiency is 1 for the calculations below
         efficiency = 1f;
+        //average
 
         //first pass: get the minimum efficiency of any consumer
         for(var cons : nonOptional){
@@ -1713,8 +1719,13 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             //consValid &= cons.valid(self());
         }
 
+        efficiencyMultiplier = 1f;
+
+        updateEfficiencyMultiplier();
+
         //efficiency is now this minimum value
         efficiency = minEfficiency;
+        consValid = efficiency > 0;
 
         //second pass: update every consumer based on efficiency
 

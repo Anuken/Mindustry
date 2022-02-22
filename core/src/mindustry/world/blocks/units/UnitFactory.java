@@ -125,7 +125,7 @@ public class UnitFactory extends UnitBlock{
     }
 
     @Override
-    public void drawRequestRegion(BuildPlan plan, Eachable<BuildPlan> list){
+    public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
         Draw.rect(region, plan.drawx(), plan.drawy());
         Draw.rect(outRegion, plan.drawx(), plan.drawy(), plan.rotation * 90);
         Draw.rect(topRegion, plan.drawx(), plan.drawy());
@@ -244,7 +244,7 @@ public class UnitFactory extends UnitBlock{
                 currentPlan = -1;
             }
 
-            if(consValid() && currentPlan != -1){
+            if(consValid && currentPlan != -1){
                 time += edelta() * speedScl * Vars.state.rules.unitBuildSpeed(team);
                 progress += edelta() * Vars.state.rules.unitBuildSpeed(team);
                 speedScl = Mathf.lerpDelta(speedScl, 1f, 0.05f);
@@ -263,7 +263,7 @@ public class UnitFactory extends UnitBlock{
                     return;
                 }
 
-                if(progress >= plan.time && consValid()){
+                if(progress >= plan.time && consValid){
                     progress %= 1f;
 
                     Unit unit = plan.unit.create(team);

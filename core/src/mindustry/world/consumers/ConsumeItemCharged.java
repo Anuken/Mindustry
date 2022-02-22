@@ -14,7 +14,8 @@ public class ConsumeItemCharged extends ConsumeItemFilter{
     }
 
     @Override
-    public float efficiency(Building build){
+    public float efficiencyMultiplier(Building build){
+        if(build.consumeTriggerValid()) return 1f;
         var item = getConsumed(build);
         return item == null ? 0f : item.charge;
     }

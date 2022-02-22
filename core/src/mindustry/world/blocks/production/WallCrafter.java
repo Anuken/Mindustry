@@ -82,7 +82,7 @@ public class WallCrafter extends Block{
     }
 
     @Override
-    public void drawRequestRegion(BuildPlan plan, Eachable<BuildPlan> list){
+    public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
         Draw.rect(region, plan.drawx(), plan.drawy());
         Draw.rect(topRegion, plan.drawx(), plan.drawy(), plan.rotation * 90);
     }
@@ -149,7 +149,7 @@ public class WallCrafter extends Block{
 
             boolean cons = shouldConsume();
 
-            warmup = Mathf.approachDelta(warmup, Mathf.num(consValid()), 1f / 40f);
+            warmup = Mathf.approachDelta(warmup, Mathf.num(consValid), 1f / 40f);
             float dx = Geometry.d4x(rotation) * 0.5f, dy = Geometry.d4y(rotation) * 0.5f;
 
             float eff = getEfficiency(tile.x, tile.y, rotation, dest -> {

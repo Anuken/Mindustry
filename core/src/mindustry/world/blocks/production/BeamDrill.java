@@ -93,7 +93,7 @@ public class BeamDrill extends Block{
     }
 
     @Override
-    public void drawRequestRegion(BuildPlan plan, Eachable<BuildPlan> list){
+    public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
         Draw.rect(region, plan.drawx(), plan.drawy());
         Draw.rect(topRegion, plan.drawx(), plan.drawy(), plan.rotation * 90);
     }
@@ -213,7 +213,7 @@ public class BeamDrill extends Block{
 
             if(lasers[0] == null) updateLasers();
 
-            warmup = Mathf.approachDelta(warmup, Mathf.num(consValid()), 1f / 60f);
+            warmup = Mathf.approachDelta(warmup, Mathf.num(consValid), 1f / 60f);
             lastItem = null;
             boolean multiple = false;
             int dx = Geometry.d4x(rotation), dy = Geometry.d4y(rotation), facingAmount = 0;

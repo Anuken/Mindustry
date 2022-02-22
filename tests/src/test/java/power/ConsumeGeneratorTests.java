@@ -1,5 +1,6 @@
 package power;
 
+import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
@@ -27,7 +28,7 @@ public class ConsumeGeneratorTests extends PowerTestFixture{
     private Tile tile;
     private ConsumeGeneratorBuild build;
     private final float fakeItemDuration = 60f; //ticks
-    private final float maximumLiquidUsage = 0.5f;
+    private final float maximumLiquidUsage = 1f;
 
     public void createGenerator(InputType inputType){
         Vars.state = new GameState();
@@ -36,6 +37,7 @@ public class ConsumeGeneratorTests extends PowerTestFixture{
             powerProduction = 0.1f;
             itemDuration = fakeItemDuration;
             buildType = ConsumeGeneratorBuild::new;
+            liquidCapacity = 100f;
 
             if(inputType != InputType.liquids){
                 consume(new ConsumeItemFlammable());
@@ -51,6 +53,20 @@ public class ConsumeGeneratorTests extends PowerTestFixture{
         build = (ConsumeGeneratorBuild)tile.build;
     }
 
+    //require = 1
+    //provided = 0.25
+    //delta = 0.5 (half speed)
+    //scaled requirement = 1 * 0.5 = 0.5
+    //efficiency = provided / required = 0.25 / 0.5 = 0.5
+    //-> ???
+
+    //require = 1
+    //provided = 0.25
+    //delta = 1 (full speed)
+    //scaled requirement = 1 * 1 = 1
+    //efficiency = provided / required = 0.25
+    //-> makes sense, you're running at double speed without doubling input
+
     /** Tests the consumption and efficiency when being supplied with liquids. */
     @TestFactory
     DynamicTest[] generatorWorksProperlyWithLiquidInput(){
@@ -61,36 +77,54 @@ public class ConsumeGeneratorTests extends PowerTestFixture{
         //InputType.any
         };
 
-        ArrayList<DynamicTest> tests = new ArrayList<>();
-        for(InputType inputType : inputTypesToBeTested){
-            tests.add(dynamicTest("01", () -> simulateLiquidConsumption(inputType, Liquids.oil, 0.0f, "No liquids provided")));
-            tests.add(dynamicTest("02", () -> simulateLiquidConsumption(inputType, Liquids.oil, maximumLiquidUsage / 4.0f, "Low oil provided")));
-            tests.add(dynamicTest("03", () -> simulateLiquidConsumption(inputType, Liquids.oil, maximumLiquidUsage * 1.0f, "Sufficient oil provided")));
-            tests.add(dynamicTest("04", () -> simulateLiquidConsumption(inputType, Liquids.oil, maximumLiquidUsage * 2.0f, "Excess oil provided")));
-            // Note: The generator will decline any other liquid since it's not flammable
+        //TODO test with different delta values.
+        Seq<DynamicTest> tests = new Seq<>();
+        float[] deltas = {2f, 1f, 0.5f};
+
+        for(float d : deltas){
+            for(InputType inputType : inputTypesToBeTested){
+                tests.add(dynamicTest("01-delta" + d, () -> simulateLiquidConsumption(d, inputType, Liquids.oil, 0.0f, "No liquids provided")));
+                tests.add(dynamicTest("02-delta" + d, () -> simulateLiquidConsumption(d, inputType, Liquids.oil, maximumLiquidUsage / 4.0f, "Low oil provided")));
+                tests.add(dynamicTest("03-delta" + d, () -> simulateLiquidConsumption(d, inputType, Liquids.oil, maximumLiquidUsage * 1.0f, "Sufficient oil provided")));
+                tests.add(dynamicTest("04-delta" + d, () -> simulateLiquidConsumption(d, inputType, Liquids.oil, maximumLiquidUsage * 2.0f, "Excess oil provided")));
+                // Note: The generator will decline any other liquid since it's not flammable
+            }
         }
-        DynamicTest[] testArray = new DynamicTest[tests.size()];
-        testArray = tests.toArray(testArray);
-        return testArray;
+
+        return tests.toArray(DynamicTest.class);
     }
 
-    void simulateLiquidConsumption(InputType inputType, Liquid liquid, float availableLiquidAmount, String parameterDescription){
-        final float baseEfficiency = liquid.flammability;
-        final float expectedEfficiency = Math.min(1.0f, availableLiquidAmount / maximumLiquidUsage) * baseEfficiency;
-        final float expectedConsumptionPerTick = Math.min(maximumLiquidUsage, availableLiquidAmount);
-        final float expectedRemainingLiquidAmount = Math.max(0.0f, availableLiquidAmount - expectedConsumptionPerTick * Time.delta);
+    void simulateLiquidConsumption(float delta, InputType inputType, Liquid liquid, float availableLiquidAmount, String parameterDescription){
+        Time.setDeltaProvider(() -> delta);
+
+        float expectedConsumptionPerTick = Math.min(maximumLiquidUsage * Time.delta, availableLiquidAmount);
+        float expectedEfficiency = expectedConsumptionPerTick / (maximumLiquidUsage * Time.delta);
+        float expectedOutputEfficiency = expectedEfficiency * liquid.flammability;
+        //it should either consume:
+        //- the maximum amount used (maximumLiquidUsage) multiplied by speed (delta), or
+        //- the maximum available amount (availableLiquidAmount), since that's a hard cap
+        float expectedRemainingLiquidAmount = Math.max(0.0f, availableLiquidAmount - expectedConsumptionPerTick);
 
         createGenerator(inputType);
         assertTrue(build.acceptLiquid(null, liquid), inputType + " | " + parameterDescription + ": Liquids which will be declined by the generator don't need to be tested - The code won't be called for those cases.");
 
         build.liquids.add(liquid, availableLiquidAmount);
+        //Placed:
+        //frame 0: run generator code, multiplier is set but nothing is valid so this is used
+        //- consumption code runs and consumes
+        //frame 1: efficiency is now 1, but the liquid filter consumer isn't valid anymore.
+
         build.updateConsumption();
 
         // Perform an update on the generator once - This should use up any resource up to the maximum liquid usage
-        build.updateTile();
+        build.update();
 
+        //reset
+        Time.setDeltaProvider(() -> 0.5f);
+
+        assertEquals(expectedEfficiency, build.efficiency(), inputType + " | " + parameterDescription + ": Base input efficiency mismatch.");
         assertEquals(expectedRemainingLiquidAmount, build.liquids.get(liquid), inputType + " | " + parameterDescription + ": Remaining liquid amount mismatch.");
-        assertEquals(expectedEfficiency, build.productionEfficiency, inputType + " | " + parameterDescription + ": Efficiency mismatch.");
+        assertEquals(expectedOutputEfficiency, build.productionEfficiency, inputType + " | " + parameterDescription + ": Output production efficiency mismatch.");
     }
 
     /** Tests the consumption and efficiency when being supplied with items. */
@@ -153,6 +187,7 @@ public class ConsumeGeneratorTests extends PowerTestFixture{
 
         // Burn a single coal and test for the duration
         build.items.add(Items.coal, 1);
+        //first frame update for some setup (consume checking is delayed)
         build.update();
 
         float expectedEfficiency = build.productionEfficiency;

@@ -152,7 +152,7 @@ public class Pump extends LiquidBlock{
 
         @Override
         public void updateTile(){
-            if(consValid() && liquidDrop != null){
+            if(consValid && liquidDrop != null){
                 float maxPump = Math.min(liquidCapacity - liquids.get(liquidDrop), amount * pumpAmount * edelta());
                 liquids.add(liquidDrop, maxPump);
 

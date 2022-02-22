@@ -327,7 +327,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                     request.block.drawPlan(request, allRequests(), validPlace(request.x, request.y, request.block, request.rotation) && getRequest(request.x, request.y, request.block.size, null) == null);
                     drawSelected(request.x, request.y, request.block, Pal.accent);
                 }
-                lineRequests.each(this::drawOverRequest);
+                lineRequests.each(this::drawOverPlan);
             }else if(mode == breaking){
                 drawBreakSelection(lineStartX, lineStartY, tileX, tileY);
             }
@@ -367,9 +367,9 @@ public class MobileInput extends InputHandler implements GestureListener{
             }
 
             Draw.reset();
-            drawRequest(request);
+            drawPlan(request);
             if(!request.breaking){
-                drawOverRequest(request);
+                drawOverPlan(request);
             }
 
             //draw last placed request
@@ -399,7 +399,7 @@ public class MobileInput extends InputHandler implements GestureListener{
     }
 
     @Override
-    protected void drawRequest(BuildPlan request){
+    protected void drawPlan(BuildPlan request){
         if(request.tile() == null) return;
         brequest.animScale = request.animScale = Mathf.lerpDelta(request.animScale, 1f, 0.1f);
 

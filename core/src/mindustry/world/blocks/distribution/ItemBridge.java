@@ -61,7 +61,7 @@ public class ItemBridge extends Block{
     }
 
     @Override
-    public void drawRequestConfigTop(BuildPlan plan, Eachable<BuildPlan> list){
+    public void drawPlanConfigTop(BuildPlan plan, Eachable<BuildPlan> list){
         otherReq = null;
         list.each(other -> {
             if(other.block == this && plan != other && plan.config instanceof Point2 p && p.equals(other.x - plan.x, other.y - plan.y)){

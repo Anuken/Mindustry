@@ -106,7 +106,7 @@ public class UnitAssembler extends PayloadBlock{
     }
 
     @Override
-    public void drawRequestRegion(BuildPlan plan, Eachable<BuildPlan> list){
+    public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
         Draw.rect(region, plan.drawx(), plan.drawy());
         Draw.rect(plan.rotation >= 2 ? sideRegion2 : sideRegion1, plan.drawx(), plan.drawy(), plan.rotation * 90);
         Draw.rect(topRegion, plan.drawx(), plan.drawy());
@@ -261,7 +261,7 @@ public class UnitAssembler extends PayloadBlock{
         @Override
         public boolean shouldConsume(){
             //liquid is only consumed when building is being done
-            return enabled && !wasOccupied && Units.canCreate(team, plan().unit) && consPayload.valid(this);
+            return enabled && !wasOccupied && Units.canCreate(team, plan().unit) && consPayload.efficiency(this) > 0;
         }
 
         @Override
@@ -375,7 +375,7 @@ public class UnitAssembler extends PayloadBlock{
             var plan = plan();
 
             //check if all requirements are met
-            if(!wasOccupied && consValid() && Units.canCreate(team, plan.unit)){
+            if(!wasOccupied && consValid && Units.canCreate(team, plan.unit)){
                 warmup = Mathf.lerpDelta(warmup, efficiency(), 0.1f);
 
                 if((progress += edelta() * eff / plan.time) >= 1f){
@@ -523,7 +523,7 @@ public class UnitAssembler extends PayloadBlock{
 
         /** @return true if this block is ready to produce units, e.g. requirements met */
         public boolean ready(){
-            return consValid() && !wasOccupied;
+            return consValid && !wasOccupied;
         }
 
         public void yeetPayload(Payload payload){

@@ -70,25 +70,25 @@ public class ConsumeGenerator extends PowerGenerator{
 
     public class ConsumeGeneratorBuild extends GeneratorBuild{
         public float warmup, totalTime;
-        public float itemMultiplier = 1f;
+
+        @Override
+        public void updateEfficiencyMultiplier(){
+            if(filterItem != null){
+                float m = filterItem.efficiencyMultiplier(this);
+                if(m > 0) efficiencyMultiplier = m;
+            }else if(filterLiquid != null){
+                float m = filterLiquid.efficiencyMultiplier(this);
+                if(m > 0) efficiencyMultiplier = m;
+            }
+        }
 
         @Override
         public void updateTile(){
-            boolean valid = consValid();
+            boolean valid = consValid;
 
-            warmup = Mathf.lerpDelta(warmup, enabled && valid ? 1f : 0f, 0.05f);
+            warmup = Mathf.lerpDelta(warmup, valid ? 1f : 0f, 0.05f);
 
-            float multiplier = 1f;
-            if(valid){
-                if(filterItem != null && filterItem.getConsumed(this) != null){
-                    itemMultiplier = filterItem.efficiency(this);
-                }
-
-                //efficiency is added together
-                multiplier *= (itemMultiplier + (filterLiquid == null ? 0f : filterLiquid.efficiency(this)));
-            }
-
-            productionEfficiency = (valid ? 1f : 0f) * multiplier;
+            productionEfficiency = efficiency * efficiencyMultiplier;
             totalTime += warmup * Time.delta;
 
             //randomly produce the effect
@@ -97,7 +97,7 @@ public class ConsumeGenerator extends PowerGenerator{
             }
 
             //take in items periodically
-            if(hasItems && valid && generateTime <= 0f && items.any()){
+            if(hasItems && valid && generateTime <= 0f){
                 consume();
                 consumeEffect.at(x + Mathf.range(generateEffectRange), y + Mathf.range(generateEffectRange));
                 generateTime = 1f;
@@ -110,7 +110,7 @@ public class ConsumeGenerator extends PowerGenerator{
             }
 
             //generation time always goes down, but only at the end so consumeTriggerValid doesn't assume fake items
-            generateTime -= Math.min(1f / itemDuration * delta(), generateTime);
+            generateTime -= delta() / itemDuration;
         }
 
         @Override
