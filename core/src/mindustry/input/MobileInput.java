@@ -47,10 +47,10 @@ public class MobileInput extends InputHandler implements GestureListener{
     /** Animation data for crosshair. */
     public float crosshairScale;
     public Teamc lastTarget;
-    /** Used for shifting build requests. */
+    /** Used for shifting build plans. */
     public float shiftDeltaX, shiftDeltaY;
 
-    /** Place requests to be removed. */
+    /** Place plans to be removed. */
     public Seq<BuildPlan> removals = new Seq<>();
     /** Whether the player is currently shifting all placed tiles. */
     public boolean selecting;
@@ -60,7 +60,7 @@ public class MobileInput extends InputHandler implements GestureListener{
     public PlaceMode mode = none;
     /** Whether no recipe was available when switching to break mode. */
     public @Nullable Block lastBlock;
-    /** Last placed request. Used for drawing block overlay. */
+    /** Last placed plan. Used for drawing block overlay. */
     public @Nullable BuildPlan lastPlaced;
     /** Down tracking for panning. */
     public boolean down = false;
@@ -103,17 +103,17 @@ public class MobileInput extends InputHandler implements GestureListener{
         }
     }
 
-    /** Returns whether this tile is in the list of requests, or at least colliding with one. */
-    boolean hasRequest(Tile tile){
-        return getRequest(tile) != null;
+    /** Returns whether this tile is in the list of plans, or at least colliding with one. */
+    boolean hasPlan(Tile tile){
+        return getPlan(tile) != null;
     }
 
-    /** Returns whether this block overlaps any selection requests. */
+    /** Returns whether this block overlaps any selection plans. */
     boolean checkOverlapPlacement(int x, int y, Block block){
         r2.setSize(block.size * tilesize);
         r2.setCenter(x * tilesize + block.offset, y * tilesize + block.offset);
 
-        for(BuildPlan req : selectRequests){
+        for(BuildPlan req : selectPlans){
             Tile other = req.tile();
 
             if(other == null || req.breaking) continue;
@@ -141,12 +141,12 @@ public class MobileInput extends InputHandler implements GestureListener{
         return false;
     }
 
-    /** Returns the selection request that overlaps this tile, or null. */
-    BuildPlan getRequest(Tile tile){
+    /** Returns the selection plan that overlaps this tile, or null. */
+    BuildPlan getPlan(Tile tile){
         r2.setSize(tilesize);
         r2.setCenter(tile.worldx(), tile.worldy());
 
-        for(BuildPlan req : selectRequests){
+        for(BuildPlan req : selectPlans){
             Tile other = req.tile();
 
             if(other == null) continue;
@@ -165,10 +165,10 @@ public class MobileInput extends InputHandler implements GestureListener{
         return null;
     }
 
-    void removeRequest(BuildPlan request){
-        selectRequests.remove(request, true);
-        if(!request.breaking){
-            removals.add(request);
+    void removePlan(BuildPlan plan){
+        selectPlans.remove(plan, true);
+        if(!plan.breaking){
+            removals.add(plan);
         }
     }
 
@@ -220,48 +220,48 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         //confirm button
         table.button(Icon.ok, Styles.clearPartiali, () -> {
-            for(BuildPlan request : selectRequests){
-                Tile tile = request.tile();
+            for(BuildPlan plan : selectPlans){
+                Tile tile = plan.tile();
 
                 //actually place/break all selected blocks
                 if(tile != null){
-                    if(!request.breaking){
-                        if(validPlace(request.x, request.y, request.block, request.rotation)){
-                            BuildPlan other = getRequest(request.x, request.y, request.block.size, null);
-                            BuildPlan copy = request.copy();
+                    if(!plan.breaking){
+                        if(validPlace(plan.x, plan.y, plan.block, plan.rotation)){
+                            BuildPlan other = getPlan(plan.x, plan.y, plan.block.size, null);
+                            BuildPlan copy = plan.copy();
 
                             if(other == null){
                                 player.unit().addBuild(copy);
-                            }else if(!other.breaking && other.x == request.x && other.y == request.y && other.block.size == request.block.size){
+                            }else if(!other.breaking && other.x == plan.x && other.y == plan.y && other.block.size == plan.block.size){
                                 player.unit().plans().remove(other);
                                 player.unit().addBuild(copy);
                             }
                         }
 
-                        rotation = request.rotation;
+                        rotation = plan.rotation;
                     }else{
                         tryBreakBlock(tile.x, tile.y);
                     }
                 }
             }
 
-            //move all current requests to removal array so they fade out
-            removals.addAll(selectRequests.select(r -> !r.breaking));
-            selectRequests.clear();
+            //move all current plans to removal array so they fade out
+            removals.addAll(selectPlans.select(r -> !r.breaking));
+            selectPlans.clear();
             selecting = false;
-        }).visible(() -> !selectRequests.isEmpty()).name("confirmplace");
+        }).visible(() -> !selectPlans.isEmpty()).name("confirmplace");
     }
 
     @Override
     public void buildUI(Group group){
-        Boolp schem = () -> lastSchematic != null && !selectRequests.isEmpty();
+        Boolp schem = () -> lastSchematic != null && !selectPlans.isEmpty();
 
         group.fill(t -> {
-            t.visible(() -> (player.unit().isBuilding() || block != null || mode == breaking || !selectRequests.isEmpty()) && !schem.get());
+            t.visible(() -> (player.unit().isBuilding() || block != null || mode == breaking || !selectPlans.isEmpty()) && !schem.get());
             t.bottom().left();
             t.button("@cancel", Icon.cancel, () -> {
                 player.unit().clearBuilding();
-                selectRequests.clear();
+                selectPlans.clear();
                 mode = none;
                 block = null;
             }).width(155f).height(50f).margin(12f);
@@ -277,14 +277,14 @@ public class MobileInput extends InputHandler implements GestureListener{
 
                 b.button(Icon.save, style, this::showSchematicSave).disabled(f -> lastSchematic == null || lastSchematic.file != null);
                 b.button(Icon.cancel, style, () -> {
-                    selectRequests.clear();
+                    selectPlans.clear();
                     lastSchematic = null;
                 });
                 b.row();
-                b.button(Icon.flipX, style, () -> flipRequests(selectRequests, true));
-                b.button(Icon.flipY, style, () -> flipRequests(selectRequests, false));
+                b.button(Icon.flipX, style, () -> flipPlans(selectPlans, true));
+                b.button(Icon.flipY, style, () -> flipPlans(selectPlans, false));
                 b.row();
-                b.button(Icon.rotate, style, () -> rotateRequests(selectRequests, 1));
+                b.button(Icon.rotate, style, () -> rotatePlans(selectPlans, 1));
 
             }).margin(4f);
         });
@@ -294,18 +294,18 @@ public class MobileInput extends InputHandler implements GestureListener{
     public void drawBottom(){
         Lines.stroke(1f);
 
-        //draw requests about to be removed
-        for(BuildPlan request : removals){
-            Tile tile = request.tile();
+        //draw plans about to be removed
+        for(BuildPlan plan : removals){
+            Tile tile = plan.tile();
 
             if(tile == null) continue;
 
-            request.animScale = Mathf.lerpDelta(request.animScale, 0f, 0.2f);
+            plan.animScale = Mathf.lerpDelta(plan.animScale, 0f, 0.2f);
 
-            if(request.breaking){
-                drawSelected(request.x, request.y, tile.block(), Pal.remove);
+            if(plan.breaking){
+                drawSelected(plan.x, plan.y, tile.block(), Pal.remove);
             }else{
-                request.block.drawPlan(request, allRequests(), true);
+                plan.block.drawPlan(plan, allPlans(), true);
             }
         }
 
@@ -319,15 +319,15 @@ public class MobileInput extends InputHandler implements GestureListener{
 
             if(mode == placing && block != null){
                 //draw placing
-                for(int i = 0; i < lineRequests.size; i++){
-                    BuildPlan request = lineRequests.get(i);
-                    if(i == lineRequests.size - 1 && request.block.rotate){
-                        drawArrow(block, request.x, request.y, request.rotation);
+                for(int i = 0; i < linePlans.size; i++){
+                    BuildPlan plan = linePlans.get(i);
+                    if(i == linePlans.size - 1 && plan.block.rotate){
+                        drawArrow(block, plan.x, plan.y, plan.rotation);
                     }
-                    request.block.drawPlan(request, allRequests(), validPlace(request.x, request.y, request.block, request.rotation) && getRequest(request.x, request.y, request.block.size, null) == null);
-                    drawSelected(request.x, request.y, request.block, Pal.accent);
+                    plan.block.drawPlan(plan, allPlans(), validPlace(plan.x, plan.y, plan.block, plan.rotation) && getPlan(plan.x, plan.y, plan.block.size, null) == null);
+                    drawSelected(plan.x, plan.y, plan.block, Pal.accent);
                 }
-                lineRequests.each(this::drawOverPlan);
+                linePlans.each(this::drawOverPlan);
             }else if(mode == breaking){
                 drawBreakSelection(lineStartX, lineStartY, tileX, tileY);
             }
@@ -346,39 +346,39 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public void drawOverSelect(){
-        //draw list of requests
-        for(BuildPlan request : selectRequests){
-            Tile tile = request.tile();
+        //draw list of plans
+        for(BuildPlan plan : selectPlans){
+            Tile tile = plan.tile();
 
             if(tile == null) continue;
 
-            if((!request.breaking && validPlace(tile.x, tile.y, request.block, request.rotation))
-            || (request.breaking && validBreak(tile.x, tile.y))){
-                request.animScale = Mathf.lerpDelta(request.animScale, 1f, 0.2f);
+            if((!plan.breaking && validPlace(tile.x, tile.y, plan.block, plan.rotation))
+            || (plan.breaking && validBreak(tile.x, tile.y))){
+                plan.animScale = Mathf.lerpDelta(plan.animScale, 1f, 0.2f);
             }else{
-                request.animScale = Mathf.lerpDelta(request.animScale, 0.6f, 0.1f);
+                plan.animScale = Mathf.lerpDelta(plan.animScale, 0.6f, 0.1f);
             }
 
             Tmp.c1.set(Draw.getMixColor());
 
-            if(!request.breaking && request == lastPlaced && request.block != null){
+            if(!plan.breaking && plan == lastPlaced && plan.block != null){
                 Draw.mixcol();
-                if(request.block.rotate) drawArrow(request.block, tile.x, tile.y, request.rotation);
+                if(plan.block.rotate) drawArrow(plan.block, tile.x, tile.y, plan.rotation);
             }
 
             Draw.reset();
-            drawPlan(request);
-            if(!request.breaking){
-                drawOverPlan(request);
+            drawPlan(plan);
+            if(!plan.breaking){
+                drawOverPlan(plan);
             }
 
-            //draw last placed request
-            if(!request.breaking && request == lastPlaced && request.block != null && request.block.drawArrow){
-                boolean valid = validPlace(tile.x, tile.y, request.block, rotation);
+            //draw last placed plan
+            if(!plan.breaking && plan == lastPlaced && plan.block != null && plan.block.drawArrow){
+                boolean valid = validPlace(tile.x, tile.y, plan.block, rotation);
                 Draw.mixcol();
-                request.block.drawPlace(tile.x, tile.y, rotation, valid);
+                plan.block.drawPlace(tile.x, tile.y, rotation, valid);
 
-                drawOverlapCheck(request.block, tile.x, tile.y, valid);
+                drawOverlapCheck(plan.block, tile.x, tile.y, valid);
 
             }
         }
@@ -399,15 +399,15 @@ public class MobileInput extends InputHandler implements GestureListener{
     }
 
     @Override
-    protected void drawPlan(BuildPlan request){
-        if(request.tile() == null) return;
-        brequest.animScale = request.animScale = Mathf.lerpDelta(request.animScale, 1f, 0.1f);
+    protected void drawPlan(BuildPlan plan){
+        if(plan.tile() == null) return;
+        bplan.animScale = plan.animScale = Mathf.lerpDelta(plan.animScale, 1f, 0.1f);
 
-        if(request.breaking){
-            drawSelected(request.x, request.y, request.tile().block(), Pal.remove);
+        if(plan.breaking){
+            drawSelected(plan.x, plan.y, plan.tile().block(), Pal.remove);
         }else{
-            request.block.drawPlan(request, allRequests(), validPlace(request.x, request.y, request.block, request.rotation));
-            drawSelected(request.x, request.y, request.block, Pal.accent);
+            plan.block.drawPlan(plan, allPlans(), validPlace(plan.x, plan.y, plan.block, plan.rotation));
+            drawSelected(plan.x, plan.y, plan.block, Pal.accent);
         }
     }
 
@@ -417,15 +417,15 @@ public class MobileInput extends InputHandler implements GestureListener{
     @Override
     protected int schemOriginX(){
         Tmp.v1.setZero();
-        selectRequests.each(r -> Tmp.v1.add(r.drawx(), r.drawy()));
-        return World.toTile(Tmp.v1.scl(1f / selectRequests.size).x);
+        selectPlans.each(r -> Tmp.v1.add(r.drawx(), r.drawy()));
+        return World.toTile(Tmp.v1.scl(1f / selectPlans.size).x);
     }
 
     @Override
     protected int schemOriginY(){
         Tmp.v1.setZero();
-        selectRequests.each(r -> Tmp.v1.add(r.drawx(), r.drawy()));
-        return World.toTile(Tmp.v1.scl(1f / selectRequests.size).y);
+        selectPlans.each(r -> Tmp.v1.add(r.drawx(), r.drawy()));
+        return World.toTile(Tmp.v1.scl(1f / selectPlans.size).y);
     }
 
     @Override
@@ -440,8 +440,8 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public void useSchematic(Schematic schem){
-        selectRequests.clear();
-        selectRequests.addAll(schematics.toRequests(schem, World.toTile(Core.camera.position.x), World.toTile(Core.camera.position.y)));
+        selectPlans.clear();
+        selectPlans.addAll(schematics.toPlans(schem, World.toTile(Core.camera.position.x), World.toTile(Core.camera.position.y)));
         lastSchematic = schem;
     }
 
@@ -461,8 +461,8 @@ public class MobileInput extends InputHandler implements GestureListener{
         //ignore off-screen taps
         if(cursor == null || Core.scene.hasMouse(screenX, screenY)) return false;
 
-        //only begin selecting if the tapped block is a request
-        selecting = hasRequest(cursor);
+        //only begin selecting if the tapped block is a plan
+        selecting = hasPlan(cursor);
 
         //call tap events
         if(pointer == 0 && !selecting){
@@ -501,7 +501,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             int tileY = tileY(screenY);
 
             if(mode == placing && isPlacing()){
-                flushSelectRequests(lineRequests);
+                flushSelectPlans(linePlans);
                 Events.fire(new LineConfirmEvent());
             }else if(mode == breaking){
                 removeSelection(lineStartX, lineStartY, tileX, tileY, true);
@@ -509,10 +509,10 @@ public class MobileInput extends InputHandler implements GestureListener{
 
             lineMode = false;
         }else if(mode == schematicSelect){
-            selectRequests.clear();
+            selectPlans.clear();
             lastSchematic = schematics.create(lineStartX, lineStartY, lastLineX, lastLineY);
             useSchematic(lastSchematic);
-            if(selectRequests.isEmpty()){
+            if(selectPlans.isEmpty()){
                 lastSchematic = null;
             }
             schematicMode = false;
@@ -566,7 +566,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             //ignore off-screen taps
             if(cursor == null) return false;
 
-            //remove request if it's there
+            //remove plan if it's there
             //long pressing enables line mode otherwise
             lineStartX = cursor.x;
             lineStartY = cursor.y;
@@ -605,16 +605,16 @@ public class MobileInput extends InputHandler implements GestureListener{
             checkTargets(worldx, worldy);
         }
 
-        //remove if request present
-        if(hasRequest(cursor)){
-            removeRequest(getRequest(cursor));
+        //remove if plan present
+        if(hasPlan(cursor)){
+            removePlan(getPlan(cursor));
         }else if(mode == placing && isPlacing() && validPlace(cursor.x, cursor.y, block, rotation) && !checkOverlapPlacement(cursor.x, cursor.y, block)){
             //add to selection queue if it's a valid place position
-            selectRequests.add(lastPlaced = new BuildPlan(cursor.x, cursor.y, rotation, block, block.nextConfig()));
+            selectPlans.add(lastPlaced = new BuildPlan(cursor.x, cursor.y, rotation, block, block.nextConfig()));
             block.onNewPlan(lastPlaced);
-        }else if(mode == breaking && validBreak(linked.x,linked.y) && !hasRequest(linked)){
+        }else if(mode == breaking && validBreak(linked.x,linked.y) && !hasPlan(linked)){
             //add to selection queue if it's a valid BREAK position
-            selectRequests.add(new BuildPlan(linked.x, linked.y));
+            selectPlans.add(new BuildPlan(linked.x, linked.y));
         }else{
             //control units
             if(count == 2){
@@ -650,7 +650,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         super.updateState();
 
         if(state.isMenu()){
-            selectRequests.clear();
+            selectPlans.clear();
             removals.clear();
             mode = none;
             manualShooting = false;
@@ -671,7 +671,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }
 
         //zoom camera
-        if(!locked && Math.abs(Core.input.axisTap(Binding.zoom)) > 0 && !Core.input.keyDown(Binding.rotateplaced) && (Core.input.keyDown(Binding.diagonal_placement) || ((!player.isBuilder() || !isPlacing() || !block.rotate) && selectRequests.isEmpty()))){
+        if(!locked && Math.abs(Core.input.axisTap(Binding.zoom)) > 0 && !Core.input.keyDown(Binding.rotateplaced) && (Core.input.keyDown(Binding.diagonal_placement) || ((!player.isBuilder() || !isPlacing() || !block.rotate) && selectPlans.isEmpty()))){
             renderer.scaleCamera(Core.input.axisTap(Binding.zoom));
         }
 
@@ -751,15 +751,14 @@ public class MobileInput extends InputHandler implements GestureListener{
                 updateLine(lineStartX, lineStartY, lx, ly);
             }
         }else{
-            lineRequests.clear();
+            linePlans.clear();
             lineScale = 0f;
         }
 
-        //remove place requests that have disappeared
+        //remove place plans that have disappeared
         for(int i = removals.size - 1; i >= 0; i--){
-            BuildPlan request = removals.get(i);
 
-            if(request.animScale <= 0.0001f){
+            if(removals.get(i).animScale <= 0.0001f){
                 removals.remove(i);
                 i--;
             }
@@ -815,7 +814,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         //do not pan with manual shooting enabled
         if(!down || manualShooting) return false;
 
-        if(selecting){ //pan all requests
+        if(selecting){ //pan all plans
             shiftDeltaX += deltaX;
             shiftDeltaY += deltaY;
 
@@ -823,8 +822,8 @@ public class MobileInput extends InputHandler implements GestureListener{
             int shiftedY = (int)(shiftDeltaY / tilesize);
 
             if(Math.abs(shiftedX) > 0 || Math.abs(shiftedY) > 0){
-                for(BuildPlan req : selectRequests){
-                    if(req.breaking) continue; //don't shift removal requests
+                for(BuildPlan req : selectPlans){
+                    if(req.breaking) continue; //don't shift removal plans
                     req.x += shiftedX;
                     req.y += shiftedY;
                 }

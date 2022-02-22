@@ -76,7 +76,7 @@ public class BuilderAI extends AIController{
 
         if(unit.buildPlan() != null){
             if(!alwaysFlee) retreatTimer = 0f;
-            //approach request if building
+            //approach plan if building
             BuildPlan req = unit.buildPlan();
 
             //clear break plan if another player is breaking something
@@ -99,10 +99,10 @@ public class BuilderAI extends AIController{
                         Build.validPlace(req.block, unit.team(), req.x, req.y, req.rotation)));
 
             if(valid){
-                //move toward the request
+                //move toward the plan
                 moveTo(req.tile(), buildingRange - 20f);
             }else{
-                //discard invalid request
+                //discard invalid plan
                 unit.plans.removeFirst();
                 lastPlan = null;
             }
@@ -122,7 +122,7 @@ public class BuilderAI extends AIController{
                         if(build instanceof ConstructBuild cons){
                             float dist = Math.min(cons.dst(unit) - buildingRange, 0);
 
-                            //make sure you can reach the request in time
+                            //make sure you can reach the plan in time
                             if(dist / unit.speed() < cons.buildCost * 0.9f){
                                 following = u;
                                 found = true;
@@ -135,7 +135,7 @@ public class BuilderAI extends AIController{
             //TODO this is bad, rebuild time should not depend on AI here
             float rebuildTime = (unit.team.rules().rtsAi ? 12f : 2f) * 60f;
 
-            //find new request
+            //find new plan
             if(!unit.team.data().blocks.isEmpty() && following == null && timer.get(timerTarget3, rebuildTime)){
                 Queue<BlockPlan> blocks = unit.team.data().blocks;
                 BlockPlan block = blocks.first();
@@ -145,7 +145,7 @@ public class BuilderAI extends AIController{
                     blocks.removeFirst();
                 }else if(Build.validPlace(content.block(block.block), unit.team(), block.x, block.y, block.rotation) && (!alwaysFlee || !nearEnemy(block.x, block.y))){ //it's valid
                     lastPlan = block;
-                    //add build request
+                    //add build plan
                     unit.addBuild(new BuildPlan(block.x, block.y, block.rotation, content.block(block.block), block.config));
                     //shift build plan to tail so next unit builds something else
                     blocks.addLast(blocks.removeFirst());

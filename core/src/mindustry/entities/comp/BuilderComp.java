@@ -69,9 +69,9 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
 
             Iterator<BuildPlan> it = plans.iterator();
             while(it.hasNext()){
-                BuildPlan req = it.next();
-                Tile tile = world.tile(req.x, req.y);
-                if(tile == null || (req.breaking && tile.block() == Blocks.air) || (!req.breaking && ((tile.build != null && tile.build.rotation == req.rotation) || !req.block.rotate) && tile.block() == req.block)){
+                BuildPlan plan = it.next();
+                Tile tile = world.tile(plan.x, plan.y);
+                if(tile == null || (plan.breaking && tile.block() == Blocks.air) || (!plan.breaking && ((tile.build != null && tile.build.rotation == plan.rotation) || !plan.block.rotate) && tile.block() == plan.block)){
                     it.remove();
                 }
             }
@@ -81,13 +81,13 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
             //nothing to build.
             if(buildPlan() == null) continue;
 
-            //find the next build request
+            //find the next build plan
             if(plans.size > 1){
                 int total = 0;
-                BuildPlan req;
-                while((!within((req = buildPlan()).tile(), finalPlaceDst) || shouldSkip(req, core)) && total < plans.size){
+                BuildPlan plan;
+                while((!within((plan = buildPlan()).tile(), finalPlaceDst) || shouldSkip(plan, core)) && total < plans.size){
                     plans.removeFirst();
-                    plans.addLast(req);
+                    plans.addLast(plan);
                     total++;
                 }
             }
@@ -167,36 +167,36 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
         Draw.reset();
     }
 
-    void drawPlan(BuildPlan request, float alpha){
-        request.animScale = 1f;
-        if(request.breaking){
-            control.input.drawBreaking(request);
+    void drawPlan(BuildPlan plan, float alpha){
+        plan.animScale = 1f;
+        if(plan.breaking){
+            control.input.drawBreaking(plan);
         }else{
-            request.block.drawPlan(request, control.input.allRequests(),
-            Build.validPlace(request.block, team, request.x, request.y, request.rotation) || control.input.requestMatches(request),
+            plan.block.drawPlan(plan, control.input.allPlans(),
+            Build.validPlace(plan.block, team, plan.x, plan.y, plan.rotation) || control.input.planMatches(plan),
             alpha);
         }
     }
 
-    void drawPlanTop(BuildPlan request, float alpha){
-        if(!request.breaking){
+    void drawPlanTop(BuildPlan plan, float alpha){
+        if(!plan.breaking){
             Draw.reset();
             Draw.mixcol(Color.white, 0.24f + Mathf.absin(Time.globalTime, 6f, 0.28f));
             Draw.alpha(alpha);
-            request.block.drawPlanConfigTop(request, plans);
+            plan.block.drawPlanConfigTop(plan, plans);
         }
     }
 
-    /** @return whether this request should be skipped, in favor of the next one. */
-    boolean shouldSkip(BuildPlan request, @Nullable Building core){
-        //requests that you have at least *started* are considered
-        if(state.rules.infiniteResources || team.rules().infiniteResources || request.breaking || core == null || request.isRotation(team) || (isBuilding() && !within(plans.last(), type.buildRange))) return false;
+    /** @return whether this plan should be skipped, in favor of the next one. */
+    boolean shouldSkip(BuildPlan plan, @Nullable Building core){
+        //plans that you have at least *started* are considered
+        if(state.rules.infiniteResources || team.rules().infiniteResources || plan.breaking || core == null || plan.isRotation(team) || (isBuilding() && !within(plans.last(), type.buildRange))) return false;
 
-        return (request.stuck && !core.items.has(request.block.requirements)) || (Structs.contains(request.block.requirements, i -> !core.items.has(i.item, Math.min(i.amount, 15)) && Mathf.round(i.amount * state.rules.buildCostMultiplier) > 0) && !request.initialized);
+        return (plan.stuck && !core.items.has(plan.block.requirements)) || (Structs.contains(plan.block.requirements, i -> !core.items.has(i.item, Math.min(i.amount, 15)) && Mathf.round(i.amount * state.rules.buildCostMultiplier) > 0) && !plan.initialized);
     }
 
     void removeBuild(int x, int y, boolean breaking){
-        //remove matching request
+        //remove matching plan
         int idx = plans.indexOf(req -> req.breaking == breaking && req.x == x && req.y == y);
         if(idx != -1){
             plans.removeIndex(idx);
@@ -213,19 +213,19 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
         plans.clear();
     }
 
-    /** Add another build requests to the tail of the queue, if it doesn't exist there yet. */
+    /** Add another build plans to the tail of the queue, if it doesn't exist there yet. */
     void addBuild(BuildPlan place){
         addBuild(place, true);
     }
 
-    /** Add another build requests to the queue, if it doesn't exist there yet. */
+    /** Add another build plans to the queue, if it doesn't exist there yet. */
     void addBuild(BuildPlan place, boolean tail){
         if(!canBuild()) return;
 
         BuildPlan replace = null;
-        for(BuildPlan request : plans){
-            if(request.x == place.x && request.y == place.y){
-                replace = request;
+        for(BuildPlan plan : plans){
+            if(plan.x == place.x && plan.y == place.y){
+                replace = plan;
                 break;
             }
         }
@@ -253,9 +253,8 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
         return isBuilding() && updateBuilding;
     }
 
-    /** Return the build request currently active, or the one at the top of the queue.*/
-    @Nullable
-    BuildPlan buildPlan(){
+    /** @return  the build plan currently active, or the one at the top of the queue.*/
+    @Nullable BuildPlan buildPlan(){
         return plans.size == 0 ? null : plans.first();
     }
 

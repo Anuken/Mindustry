@@ -247,10 +247,10 @@ public class Schematics implements Loadable{
             Seq<BuildPlan> plans = schematic.tiles.map(t -> new BuildPlan(t.x, t.y, t.rotation, t.block, t.config));
 
             Draw.flush();
-            //scale each request to fit schematic
+            //scale each plan to fit schematic
             Draw.trans().scale(resolution / tilesize, resolution / tilesize).translate(tilesize*1.5f, tilesize*1.5f);
 
-            //draw requests
+            //draw plans
             plans.each(req -> {
                 req.animScale = 1f;
                 req.worldContext = false;
@@ -273,8 +273,8 @@ public class Schematics implements Loadable{
         return previews.get(schematic);
     }
 
-    /** Creates an array of build requests from a schematic's data, centered on the provided x+y coordinates. */
-    public Seq<BuildPlan> toRequests(Schematic schem, int x, int y){
+    /** Creates an array of build plans from a schematic's data, centered on the provided x+y coordinates. */
+    public Seq<BuildPlan> toPlans(Schematic schem, int x, int y){
         return schem.tiles.map(t -> new BuildPlan(t.x + x - schem.width/2, t.y + y - schem.height/2, t.rotation, t.block, t.config).original(t.x, t.y, schem.width, schem.height))
             .removeAll(s -> (!s.block.isVisible() && !(s.block instanceof CoreBlock)) || !s.block.unlockedNow()).sort(Structs.comparingInt(s -> -s.block.schematicPriority));
     }
@@ -655,7 +655,7 @@ public class Schematics implements Loadable{
                 p.set(cx, cy);
             });
 
-            //rotate actual request, centered on its multiblock position
+            //rotate actual plan, centered on its multiblock position
             float wx = (req.x - ox) * tilesize + req.block.offset, wy = (req.y - oy) * tilesize + req.block.offset;
             float x = wx;
             if(direction >= 0){

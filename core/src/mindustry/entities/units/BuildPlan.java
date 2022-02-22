@@ -10,13 +10,13 @@ import mindustry.world.*;
 
 import static mindustry.Vars.*;
 
-/** Class for storing build requests. Can be either a place or remove request. */
+/** Class for storing build plans. Can be either a place or remove plan. */
 public class BuildPlan implements Position, QuadTreeObject{
-    /** Position and rotation of this request. */
+    /** Position and rotation of this plan. */
     public int x, y, rotation;
-    /** Block being placed. If null, this is a breaking request.*/
+    /** Block being placed. If null, this is a breaking plan.*/
     public @Nullable Block block;
-    /** Whether this is a break request.*/
+    /** Whether this is a break plan.*/
     public boolean breaking;
     /** Config int. Not used unless hasConfig is true.*/
     public Object config;
@@ -25,13 +25,13 @@ public class BuildPlan implements Position, QuadTreeObject{
 
     /** Last progress.*/
     public float progress;
-    /** Whether construction has started for this request, and other special variables.*/
+    /** Whether construction has started for this plan, and other special variables.*/
     public boolean initialized, worldContext = true, stuck;
 
     /** Visual scale. Used only for rendering.*/
     public float animScale = 0f;
 
-    /** This creates a build request. */
+    /** This creates a build plan. */
     public BuildPlan(int x, int y, int rotation, Block block){
         this.x = x;
         this.y = y;
@@ -40,7 +40,7 @@ public class BuildPlan implements Position, QuadTreeObject{
         this.breaking = false;
     }
 
-    /** This creates a build request with a config. */
+    /** This creates a build plan with a config. */
     public BuildPlan(int x, int y, int rotation, Block block, Object config){
         this.x = x;
         this.y = y;
@@ -50,7 +50,7 @@ public class BuildPlan implements Position, QuadTreeObject{
         this.config = config;
     }
 
-    /** This creates a remove request. */
+    /** This creates a remove plan. */
     public BuildPlan(int x, int y){
         this.x = x;
         this.y = y;

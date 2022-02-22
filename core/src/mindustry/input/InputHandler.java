@@ -74,9 +74,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public GestureDetector detector;
     public PlaceLine line = new PlaceLine();
     public BuildPlan resultreq;
-    public BuildPlan brequest = new BuildPlan();
-    public Seq<BuildPlan> lineRequests = new Seq<>();
-    public Seq<BuildPlan> selectRequests = new Seq<>();
+    public BuildPlan bplan = new BuildPlan();
+    public Seq<BuildPlan> linePlans = new Seq<>();
+    public Seq<BuildPlan> selectPlans = new Seq<>();
 
     //for RTS controls
     public Seq<Unit> selectedUnits = new Seq<>();
@@ -89,15 +89,15 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     private Seq<BuildPlan> plansOut = new Seq<>(BuildPlan.class);
     private QuadTree<BuildPlan> playerPlanTree = new QuadTree<>(new Rect());
 
-    private final Eachable<BuildPlan> allRequests = cons -> {
+    private final Eachable<BuildPlan> allPlans = cons -> {
         player.unit().plans().each(cons);
-        selectRequests.each(cons);
-        lineRequests.each(cons);
+        selectPlans.each(cons);
+        linePlans.each(cons);
     };
 
     private final Eachable<BuildPlan> allSelectLines = cons -> {
-        selectRequests.each(cons);
-        lineRequests.each(cons);
+        selectPlans.each(cons);
+        linePlans.each(cons);
     };
 
     public InputHandler(){
@@ -554,12 +554,12 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         return inputLocks.contains(Boolp::get);
     }
 
-    public Eachable<BuildPlan> allRequests(){
-        return allRequests;
+    public Eachable<BuildPlan> allPlans(){
+        return allPlans;
     }
 
     public boolean isUsingSchematic(){
-        return !selectRequests.isEmpty();
+        return !selectPlans.isEmpty();
     }
 
     public void update(){
@@ -692,11 +692,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Drawf.selected(x, y, block, color);
     }
 
-    public void drawBreaking(BuildPlan request){
-        if(request.breaking){
-            drawBreaking(request.x, request.y);
+    public void drawBreaking(BuildPlan plan){
+        if(plan.breaking){
+            drawBreaking(plan.x, plan.y);
         }else{
-            drawSelected(request.x, request.y, request.block, Pal.remove);
+            drawSelected(plan.x, plan.y, plan.block, Pal.remove);
         }
     }
 
@@ -716,9 +716,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
     }
 
-    public boolean requestMatches(BuildPlan request){
-        Tile tile = world.tile(request.x, request.y);
-        return tile != null && tile.build instanceof ConstructBuild cons && cons.current == request.block;
+    public boolean planMatches(BuildPlan plan){
+        Tile tile = world.tile(plan.x, plan.y);
+        return tile != null && tile.build instanceof ConstructBuild cons && cons.current == plan.block;
     }
 
     public void drawBreaking(int x, int y){
@@ -730,7 +730,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void useSchematic(Schematic schem){
-        selectRequests.addAll(schematics.toRequests(schem, player.tileX(), player.tileY()));
+        selectPlans.addAll(schematics.toPlans(schem, player.tileX(), player.tileY()));
     }
 
     protected void showSchematicSave(){
@@ -755,10 +755,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         });
     }
 
-    public void rotateRequests(Seq<BuildPlan> requests, int direction){
+    public void rotatePlans(Seq<BuildPlan> plans, int direction){
         int ox = schemOriginX(), oy = schemOriginY();
 
-        requests.each(req -> {
+        plans.each(req -> {
             if(req.breaking) return;
 
             req.pointConfig(p -> {
@@ -775,7 +775,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 p.set(cx, cy);
             });
 
-            //rotate actual request, centered on its multiblock position
+            //rotate actual plan, centered on its multiblock position
             float wx = (req.x - ox) * tilesize + req.block.offset, wy = (req.y - oy) * tilesize + req.block.offset;
             float x = wx;
             if(direction >= 0){
@@ -791,10 +791,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         });
     }
 
-    public void flipRequests(Seq<BuildPlan> requests, boolean x){
+    public void flipPlans(Seq<BuildPlan> plans, boolean x){
         int origin = (x ? schemOriginX() : schemOriginY()) * tilesize;
 
-        requests.each(req -> {
+        plans.each(req -> {
             if(req.breaking) return;
 
             float value = -((x ? req.x : req.y) * tilesize - origin + req.block.offset) + origin;
@@ -830,13 +830,13 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         return rawTileY();
     }
 
-    /** Returns the selection request that overlaps this position, or null. */
-    protected BuildPlan getRequest(int x, int y){
-        return getRequest(x, y, 1, null);
+    /** @return the selection plan that overlaps this position, or null. */
+    protected @Nullable BuildPlan getPlan(int x, int y){
+        return getPlan(x, y, 1, null);
     }
 
-    /** Returns the selection request that overlaps this position, or null. */
-    protected BuildPlan getRequest(int x, int y, int size, BuildPlan skip){
+    /** Returns the selection plan that overlaps this position, or null. */
+    protected @Nullable BuildPlan getPlan(int x, int y, int size, BuildPlan skip){
         float offset = ((size + 1) % 2) * tilesize / 2f;
         r2.setSize(tilesize * size);
         r2.setCenter(x * tilesize + offset, y * tilesize + offset);
@@ -863,7 +863,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             if(test.get(req)) return req;
         }
 
-        return selectRequests.find(test);
+        return selectPlans.find(test);
     }
 
     protected void drawBreakSelection(int x1, int y1, int x2, int y2, int maxLength){
@@ -891,7 +891,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
         }
 
-        for(BuildPlan req : selectRequests){
+        for(BuildPlan req : selectPlans){
             if(req.breaking) continue;
             if(req.bounds(Tmp.r2).overlaps(Tmp.r1)){
                 drawBreaking(req);
@@ -928,22 +928,22 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Lines.rect(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
     }
 
-    protected void flushSelectRequests(Seq<BuildPlan> requests){
-        for(BuildPlan req : requests){
+    protected void flushSelectPlans(Seq<BuildPlan> plans){
+        for(BuildPlan req : plans){
             if(req.block != null && validPlace(req.x, req.y, req.block, req.rotation)){
-                BuildPlan other = getRequest(req.x, req.y, req.block.size, null);
+                BuildPlan other = getPlan(req.x, req.y, req.block.size, null);
                 if(other == null){
-                    selectRequests.add(req.copy());
+                    selectPlans.add(req.copy());
                 }else if(!other.breaking && other.x == req.x && other.y == req.y && other.block.size == req.block.size){
-                    selectRequests.remove(other);
-                    selectRequests.add(req.copy());
+                    selectPlans.remove(other);
+                    selectPlans.add(req.copy());
                 }
             }
         }
     }
 
-    protected void flushRequests(Seq<BuildPlan> requests){
-        for(BuildPlan req : requests){
+    protected void flushPlans(Seq<BuildPlan> plans){
+        for(BuildPlan req : plans){
             if(req.block != null && validPlace(req.x, req.y, req.block, req.rotation)){
                 BuildPlan copy = req.copy();
                 req.block.onNewPlan(copy);
@@ -952,25 +952,25 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
     }
 
-    protected void drawOverPlan(BuildPlan request){
-        boolean valid = validPlace(request.x, request.y, request.block, request.rotation);
+    protected void drawOverPlan(BuildPlan plan){
+        boolean valid = validPlace(plan.x, plan.y, plan.block, plan.rotation);
 
         Draw.reset();
         Draw.mixcol(!valid ? Pal.breakInvalid : Color.white, (!valid ? 0.4f : 0.24f) + Mathf.absin(Time.globalTime, 6f, 0.28f));
         Draw.alpha(1f);
-        request.block.drawPlanConfigTop(request, allSelectLines);
+        plan.block.drawPlanConfigTop(plan, allSelectLines);
         Draw.reset();
     }
 
-    protected void drawPlan(BuildPlan request){
-        request.block.drawPlan(request, allRequests(), validPlace(request.x, request.y, request.block, request.rotation));
+    protected void drawPlan(BuildPlan plan){
+        plan.block.drawPlan(plan, allPlans(), validPlace(plan.x, plan.y, plan.block, plan.rotation));
     }
 
     /** Draws a placement icon for a specific block. */
     protected void drawPlan(int x, int y, Block block, int rotation){
-        brequest.set(x, y, rotation, block);
-        brequest.animScale = 1f;
-        block.drawPlan(brequest, allRequests(), validPlace(x, y, block, rotation));
+        bplan.set(x, y, rotation, block);
+        bplan.animScale = 1f;
+        block.drawPlan(bplan, allPlans(), validPlace(x, y, block, rotation));
     }
 
     /** Remove everything from the queue in a selection. */
@@ -1002,13 +1002,13 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
                 if(!flush){
                     tryBreakBlock(wx, wy);
-                }else if(validBreak(tile.x, tile.y) && !selectRequests.contains(r -> r.tile() != null && r.tile() == tile)){
-                    selectRequests.add(new BuildPlan(tile.x, tile.y));
+                }else if(validBreak(tile.x, tile.y) && !selectPlans.contains(r -> r.tile() != null && r.tile() == tile)){
+                    selectPlans.add(new BuildPlan(tile.x, tile.y));
                 }
             }
         }
 
-        //remove build requests
+        //remove build plans
         Tmp.r1.set(result.x * tilesize, result.y * tilesize, (result.x2 - result.x) * tilesize, (result.y2 - result.y) * tilesize);
 
         Iterator<BuildPlan> it = player.unit().plans().iterator();
@@ -1019,7 +1019,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
         }
 
-        it = selectRequests.iterator();
+        it = selectPlans.iterator();
         while(it.hasNext()){
             BuildPlan req = it.next();
             if(!req.breaking && req.bounds(Tmp.r2).overlaps(Tmp.r1)){
@@ -1048,23 +1048,23 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     protected void updateLine(int x1, int y1, int x2, int y2){
-        lineRequests.clear();
+        linePlans.clear();
         iterateLine(x1, y1, x2, y2, l -> {
             rotation = l.rotation;
             BuildPlan req = new BuildPlan(l.x, l.y, l.rotation, block, block.nextConfig());
             req.animScale = 1f;
-            lineRequests.add(req);
+            linePlans.add(req);
         });
 
         if(Core.settings.getBool("blockreplace")){
-            lineRequests.each(req -> {
-                Block replace = req.block.getReplacement(req, lineRequests);
+            linePlans.each(req -> {
+                Block replace = req.block.getReplacement(req, linePlans);
                 if(replace.unlockedNow()){
                     req.block = replace;
                 }
             });
 
-            block.handlePlacementLine(lineRequests);
+            block.handlePlacementLine(linePlans);
         }
     }
 

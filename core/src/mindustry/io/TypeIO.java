@@ -313,11 +313,11 @@ public class TypeIO{
     /** @return the maximum acceptable amount of plans to send over the network */
     public static int getMaxPlans(Queue<BuildPlan> plans){
         //limit to 10 to prevent buffer overflows
-        int usedRequests = Math.min(plans.size, 10);
+        int used = Math.min(plans.size, 10);
         int totalLength = 0;
 
         //prevent buffer overflow by checking config length
-        for(int i = 0; i < usedRequests; i++){
+        for(int i = 0; i < used; i++){
             BuildPlan plan = plans.get(i);
             if(plan.config instanceof byte[] b){
                 totalLength += b.length;
@@ -328,12 +328,12 @@ public class TypeIO{
             }
 
             if(totalLength > 500){
-                usedRequests = i + 1;
+                used = i + 1;
                 break;
             }
         }
 
-        return usedRequests;
+        return used;
     }
 
     //on the network, plans must be capped by size
@@ -367,7 +367,7 @@ public class TypeIO{
     }
 
     public static BuildPlan readPlan(Reads read){
-        BuildPlan currentRequest;
+        BuildPlan current;
 
         byte type = read.b();
         int position = read.i();
@@ -377,20 +377,20 @@ public class TypeIO{
         }
 
         if(type == 1){ //remove
-            currentRequest = new BuildPlan(Point2.x(position), Point2.y(position));
+            current = new BuildPlan(Point2.x(position), Point2.y(position));
         }else{ //place
             short block = read.s();
             byte rotation = read.b();
             boolean hasConfig = read.b() == 1;
             Object config = readObject(read);
-            currentRequest = new BuildPlan(Point2.x(position), Point2.y(position), rotation, content.block(block));
+            current = new BuildPlan(Point2.x(position), Point2.y(position), rotation, content.block(block));
             //should always happen, but is kept for legacy reasons just in case
             if(hasConfig){
-                currentRequest.config = config;
+                current.config = config;
             }
         }
 
-        return currentRequest;
+        return current;
     }
 
     public static void writePlans(Writes write, BuildPlan[] plans){
@@ -399,8 +399,8 @@ public class TypeIO{
             return;
         }
         write.s((short)plans.length);
-        for(BuildPlan request : plans){
-            writePlan(write, request);
+        for(BuildPlan plan : plans){
+            writePlan(write, plan);
         }
     }
 
@@ -412,9 +412,9 @@ public class TypeIO{
 
         BuildPlan[] reqs = new BuildPlan[reqamount];
         for(int i = 0; i < reqamount; i++){
-            BuildPlan request = readPlan(read);
-            if(request != null){
-                reqs[i] = request;
+            BuildPlan plan = readPlan(read);
+            if(plan != null){
+                reqs[i] = plan;
             }
         }
 

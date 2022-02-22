@@ -38,9 +38,9 @@ public class DesktopInput extends InputHandler{
     public PlaceMode mode;
     /** Animation scale for line. */
     public float selectScale;
-    /** Selected build request for movement. */
+    /** Selected build plan for movement. */
     public @Nullable BuildPlan sreq;
-    /** Whether player is currently deleting removal requests. */
+    /** Whether player is currently deleting removal plans. */
     public boolean deleting = false, shouldShoot = false, panning = false;
     /** Mouse pan speed. */
     public float panScale = 0.005f, panSpeed = 4.5f, panBoostSpeed = 15f;
@@ -50,7 +50,7 @@ public class DesktopInput extends InputHandler{
     public Tile prevSelected;
 
     boolean showHint(){
-        return ui.hudfrag.shown && Core.settings.getBool("hints") && selectRequests.isEmpty() &&
+        return ui.hudfrag.shown && Core.settings.getBool("hints") && selectPlans.isEmpty() &&
             (!isBuilding && !Core.settings.getBool("buildautopause") || player.unit().isBuilding() || !player.dead() && !player.unit().spawnedByCore());
     }
 
@@ -84,7 +84,7 @@ public class DesktopInput extends InputHandler{
 
         //schematic controls
         group.fill(t -> {
-            t.visible(() -> ui.hudfrag.shown && lastSchematic != null && !selectRequests.isEmpty());
+            t.visible(() -> ui.hudfrag.shown && lastSchematic != null && !selectPlans.isEmpty());
             t.bottom();
             t.table(Styles.black6, b -> {
                 b.defaults().left();
@@ -186,38 +186,38 @@ public class DesktopInput extends InputHandler{
                 drawArrow(sreq.block, sreq.x, sreq.y, sreq.rotation, valid);
             }
 
-            sreq.block.drawPlan(sreq, allRequests(), valid);
+            sreq.block.drawPlan(sreq, allPlans(), valid);
 
-            drawSelected(sreq.x, sreq.y, sreq.block, getRequest(sreq.x, sreq.y, sreq.block.size, sreq) != null ? Pal.remove : Pal.accent);
+            drawSelected(sreq.x, sreq.y, sreq.block, getPlan(sreq.x, sreq.y, sreq.block.size, sreq) != null ? Pal.remove : Pal.accent);
         }
 
-        //draw hover request
+        //draw hover plans
         if(mode == none && !isPlacing()){
-            BuildPlan req = getRequest(cursorX, cursorY);
+            BuildPlan req = getPlan(cursorX, cursorY);
             if(req != null){
                 drawSelected(req.x, req.y, req.breaking ? req.tile().block() : req.block, Pal.accent);
             }
         }
 
-        //draw schematic requests
-        selectRequests.each(req -> {
+        //draw schematic plans
+        selectPlans.each(req -> {
             req.animScale = 1f;
             drawPlan(req);
         });
 
-        selectRequests.each(this::drawOverPlan);
+        selectPlans.each(this::drawOverPlan);
 
         if(player.isBuilder()){
             //draw things that may be placed soon
             if(mode == placing && block != null){
-                for(int i = 0; i < lineRequests.size; i++){
-                    BuildPlan req = lineRequests.get(i);
-                    if(i == lineRequests.size - 1 && req.block.rotate){
+                for(int i = 0; i < linePlans.size; i++){
+                    BuildPlan req = linePlans.get(i);
+                    if(i == linePlans.size - 1 && req.block.rotate){
                         drawArrow(block, req.x, req.y, req.rotation);
                     }
-                    drawPlan(lineRequests.get(i));
+                    drawPlan(linePlans.get(i));
                 }
-                lineRequests.each(this::drawOverPlan);
+                linePlans.each(this::drawOverPlan);
             }else if(isPlacing()){
                 if(block.rotate && block.drawArrow){
                     drawArrow(block, cursorX, cursorY, rotation);
@@ -229,10 +229,10 @@ public class DesktopInput extends InputHandler{
 
                 if(block.saveConfig){
                     Draw.mixcol(!valid ? Pal.breakInvalid : Color.white, (!valid ? 0.4f : 0.24f) + Mathf.absin(Time.globalTime, 6f, 0.28f));
-                    brequest.set(cursorX, cursorY, rotation, block);
-                    brequest.config = block.lastConfig;
-                    block.drawPlanConfig(brequest, allRequests());
-                    brequest.config = null;
+                    bplan.set(cursorX, cursorY, rotation, block);
+                    bplan.config = block.lastConfig;
+                    block.drawPlanConfig(bplan, allPlans());
+                    bplan.config = null;
                     Draw.reset();
                 }
 
@@ -333,7 +333,7 @@ public class DesktopInput extends InputHandler{
 
         //zoom camera
         if((!Core.scene.hasScroll() || Core.input.keyDown(Binding.diagonal_placement)) && !ui.chatfrag.shown() && Math.abs(Core.input.axisTap(Binding.zoom)) > 0
-            && !Core.input.keyDown(Binding.rotateplaced) && (Core.input.keyDown(Binding.diagonal_placement) || ((!player.isBuilder() || !isPlacing() || !block.rotate) && selectRequests.isEmpty()))){
+            && !Core.input.keyDown(Binding.rotateplaced) && (Core.input.keyDown(Binding.diagonal_placement) || ((!player.isBuilder() || !isPlacing() || !block.rotate) && selectPlans.isEmpty()))){
             renderer.scaleCamera(Core.input.axisTap(Binding.zoom));
         }
 
@@ -379,8 +379,8 @@ public class DesktopInput extends InputHandler{
 
             if(isPlacing() && mode == placing){
                 updateLine(selectX, selectY);
-            }else if(!selectRequests.isEmpty() && !ui.chatfrag.shown()){
-                rotateRequests(selectRequests, Mathf.sign(Core.input.axisTap(Binding.rotate)));
+            }else if(!selectPlans.isEmpty() && !ui.chatfrag.shown()){
+                rotatePlans(selectPlans, Mathf.sign(Core.input.axisTap(Binding.rotate)));
             }
         }
 
@@ -391,7 +391,7 @@ public class DesktopInput extends InputHandler{
                 cursorType = cursor.build.getCursor();
             }
 
-            if((isPlacing() && player.isBuilder()) || !selectRequests.isEmpty()){
+            if((isPlacing() && player.isBuilder()) || !selectPlans.isEmpty()){
                 cursorType = SystemCursor.hand;
             }
 
@@ -403,7 +403,7 @@ public class DesktopInput extends InputHandler{
                 cursorType = ui.targetCursor;
             }
 
-            if(getRequest(cursor.x, cursor.y) != null && mode == none){
+            if(getPlan(cursor.x, cursor.y) != null && mode == none){
                 cursorType = SystemCursor.hand;
             }
 
@@ -430,8 +430,8 @@ public class DesktopInput extends InputHandler{
         schematicX = tileX(getMouseX());
         schematicY = tileY(getMouseY());
 
-        selectRequests.clear();
-        selectRequests.addAll(schematics.toRequests(schem, schematicX, schematicY));
+        selectPlans.clear();
+        selectPlans.addAll(schematics.toPlans(schem, schematicX, schematicY));
         mode = none;
     }
 
@@ -477,10 +477,10 @@ public class DesktopInput extends InputHandler{
             buildWasAutoPaused = true;
         }
 
-        if(!selectRequests.isEmpty()){
+        if(!selectPlans.isEmpty()){
             int shiftX = rawCursorX - schematicX, shiftY = rawCursorY - schematicY;
 
-            selectRequests.each(s -> {
+            selectPlans.each(s -> {
                 s.x += shiftX;
                 s.y += shiftY;
             });
@@ -512,26 +512,26 @@ public class DesktopInput extends InputHandler{
 
         if(Core.input.keyTap(Binding.clear_building) || isPlacing()){
             lastSchematic = null;
-            selectRequests.clear();
+            selectPlans.clear();
         }
 
         if(Core.input.keyRelease(Binding.schematic_select) && !Core.scene.hasKeyboard() && selectX == -1 && selectY == -1 && schemX != -1 && schemY != -1){
             lastSchematic = schematics.create(schemX, schemY, rawCursorX, rawCursorY);
             useSchematic(lastSchematic);
-            if(selectRequests.isEmpty()){
+            if(selectPlans.isEmpty()){
                 lastSchematic = null;
             }
             schemX = -1;
             schemY = -1;
         }
 
-        if(!selectRequests.isEmpty()){
+        if(!selectPlans.isEmpty()){
             if(Core.input.keyTap(Binding.schematic_flip_x)){
-                flipRequests(selectRequests, true);
+                flipPlans(selectPlans, true);
             }
 
             if(Core.input.keyTap(Binding.schematic_flip_y)){
-                flipRequests(selectRequests, false);
+                flipPlans(selectPlans, false);
             }
         }
 
@@ -544,7 +544,7 @@ public class DesktopInput extends InputHandler{
         }
 
         if(block == null || mode != placing){
-            lineRequests.clear();
+            linePlans.clear();
         }
 
         if(Core.input.keyTap(Binding.pause_building)){
@@ -581,12 +581,12 @@ public class DesktopInput extends InputHandler{
 
         if(Core.input.keyTap(Binding.select) && !Core.scene.hasMouse()){
             tappedOne = false;
-            BuildPlan req = getRequest(cursorX, cursorY);
+            BuildPlan req = getPlan(cursorX, cursorY);
 
             if(Core.input.keyDown(Binding.break_block)){
                 mode = none;
-            }else if(!selectRequests.isEmpty()){
-                flushRequests(selectRequests);
+            }else if(!selectPlans.isEmpty()){
+                flushPlans(selectPlans);
             }else if(isPlacing()){
                 selectX = cursorX;
                 selectY = cursorY;
@@ -616,8 +616,8 @@ public class DesktopInput extends InputHandler{
         }else if(Core.input.keyTap(Binding.deselect) && isPlacing()){
             block = null;
             mode = none;
-        }else if(Core.input.keyTap(Binding.deselect) && !selectRequests.isEmpty()){
-            selectRequests.clear();
+        }else if(Core.input.keyTap(Binding.deselect) && !selectPlans.isEmpty()){
+            selectPlans.clear();
             lastSchematic = null;
         }else if(Core.input.keyTap(Binding.break_block) && !Core.scene.hasMouse() && player.isBuilder() && !commandMode){
             //is recalculated because setting the mode to breaking removes potential multiblock cursor offset
@@ -630,7 +630,7 @@ public class DesktopInput extends InputHandler{
         }
 
         if(Core.input.keyDown(Binding.select) && mode == none && !isPlacing() && deleting){
-            BuildPlan req = getRequest(cursorX, cursorY);
+            BuildPlan req = getPlan(cursorX, cursorY);
             if(req != null && req.breaking){
                 player.unit().plans().remove(req);
             }
@@ -656,8 +656,8 @@ public class DesktopInput extends InputHandler{
         if(Core.input.keyRelease(Binding.break_block) || Core.input.keyRelease(Binding.select)){
 
             if(mode == placing && block != null){ //touch up while placing, place everything in selection
-                flushRequests(lineRequests);
-                lineRequests.clear();
+                flushPlans(linePlans);
+                linePlans.clear();
                 Events.fire(new LineConfirmEvent());
             }else if(mode == breaking){ //touch up while breaking, break everything in selection
                 removeSelection(selectX, selectY, cursorX, cursorY, !Core.input.keyDown(Binding.schematic_select) ? maxLength : Vars.maxSchematicSize);
@@ -672,7 +672,7 @@ public class DesktopInput extends InputHandler{
             tryDropItems(selected == null ? null : selected.build, Core.input.mouseWorld().x, Core.input.mouseWorld().y);
 
             if(sreq != null){
-                if(getRequest(sreq.x, sreq.y, sreq.block.size, sreq) != null){
+                if(getPlan(sreq.x, sreq.y, sreq.block.size, sreq) != null){
                     player.unit().plans().remove(sreq, true);
                 }
                 sreq = null;
@@ -783,7 +783,7 @@ public class DesktopInput extends InputHandler{
             mode = none;
             block = null;
             sreq = null;
-            selectRequests.clear();
+            selectPlans.clear();
         }
     }
 

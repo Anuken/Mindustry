@@ -603,7 +603,7 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     /** @return a possible replacement for this block when placed in a line by the player. */
-    public Block getReplacement(BuildPlan req, Seq<BuildPlan> requests){
+    public Block getReplacement(BuildPlan req, Seq<BuildPlan> plans){
         return this;
     }
 
@@ -612,7 +612,7 @@ public class Block extends UnlockableContent implements Senseable{
 
     }
 
-    /** Mutates the given list of requests used during line placement. */
+    /** Mutates the given list of plans used during line placement. */
     public void handlePlacementLine(Seq<BuildPlan> plans){
 
     }
