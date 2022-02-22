@@ -73,10 +73,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public @Nullable Schematic lastSchematic;
     public GestureDetector detector;
     public PlaceLine line = new PlaceLine();
-    public BuildPlan resultreq;
+    public BuildPlan resultplan;
     public BuildPlan bplan = new BuildPlan();
     public Seq<BuildPlan> linePlans = new Seq<>();
-    public Seq<BuildPlan> selectPlans = new Seq<>();
+    public Seq<BuildPlan> selectPlans = new Seq<>(BuildPlan.class);
 
     //for RTS controls
     public Seq<Unit> selectedUnits = new Seq<>();
@@ -177,11 +177,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         //O(n^2) search here; no way around it
         outer:
         while(it.hasNext()){
-            BlockPlan req = it.next();
+            var plan = it.next();
 
             for(int pos : positions){
-                if(req.x == Point2.x(pos) && req.y == Point2.y(pos)){
-                    req.removed = true;
+                if(plan.x == Point2.x(pos) && plan.y == Point2.y(pos)){
+                    plan.removed = true;
                     it.remove();
                     continue outer;
                 }
@@ -758,10 +758,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public void rotatePlans(Seq<BuildPlan> plans, int direction){
         int ox = schemOriginX(), oy = schemOriginY();
 
-        plans.each(req -> {
-            if(req.breaking) return;
+        plans.each(plan -> {
+            if(plan.breaking) return;
 
-            req.pointConfig(p -> {
+            plan.pointConfig(p -> {
                 int cx = p.x, cy = p.y;
                 int lx = cx;
 
@@ -776,7 +776,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             });
 
             //rotate actual plan, centered on its multiblock position
-            float wx = (req.x - ox) * tilesize + req.block.offset, wy = (req.y - oy) * tilesize + req.block.offset;
+            float wx = (plan.x - ox) * tilesize + plan.block.offset, wy = (plan.y - oy) * tilesize + plan.block.offset;
             float x = wx;
             if(direction >= 0){
                 wx = -wy;
@@ -785,40 +785,40 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 wx = wy;
                 wy = -x;
             }
-            req.x = World.toTile(wx - req.block.offset) + ox;
-            req.y = World.toTile(wy - req.block.offset) + oy;
-            req.rotation = Mathf.mod(req.rotation + direction, 4);
+            plan.x = World.toTile(wx - plan.block.offset) + ox;
+            plan.y = World.toTile(wy - plan.block.offset) + oy;
+            plan.rotation = Mathf.mod(plan.rotation + direction, 4);
         });
     }
 
     public void flipPlans(Seq<BuildPlan> plans, boolean x){
         int origin = (x ? schemOriginX() : schemOriginY()) * tilesize;
 
-        plans.each(req -> {
-            if(req.breaking) return;
+        plans.each(plan -> {
+            if(plan.breaking) return;
 
-            float value = -((x ? req.x : req.y) * tilesize - origin + req.block.offset) + origin;
+            float value = -((x ? plan.x : plan.y) * tilesize - origin + plan.block.offset) + origin;
 
             if(x){
-                req.x = (int)((value - req.block.offset) / tilesize);
+                plan.x = (int)((value - plan.block.offset) / tilesize);
             }else{
-                req.y = (int)((value - req.block.offset) / tilesize);
+                plan.y = (int)((value - plan.block.offset) / tilesize);
             }
 
-            req.pointConfig(p -> {
-                int corigin = x ? req.originalWidth/2 : req.originalHeight/2;
+            plan.pointConfig(p -> {
+                int corigin = x ? plan.originalWidth/2 : plan.originalHeight/2;
                 int nvalue = -(x ? p.x : p.y);
                 if(x){
-                    req.originalX = -(req.originalX - corigin) + corigin;
+                    plan.originalX = -(plan.originalX - corigin) + corigin;
                     p.x = nvalue;
                 }else{
-                    req.originalY = -(req.originalY - corigin) + corigin;
+                    plan.originalY = -(plan.originalY - corigin) + corigin;
                     p.y = nvalue;
                 }
             });
 
             //flip rotation
-            req.block.flipRotation(req, x);
+            plan.block.flipRotation(plan, x);
         });
     }
 
@@ -840,17 +840,17 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         float offset = ((size + 1) % 2) * tilesize / 2f;
         r2.setSize(tilesize * size);
         r2.setCenter(x * tilesize + offset, y * tilesize + offset);
-        resultreq = null;
+        resultplan = null;
 
-        Boolf<BuildPlan> test = req -> {
-            if(req == skip) return false;
-            Tile other = req.tile();
+        Boolf<BuildPlan> test = plan -> {
+            if(plan == skip) return false;
+            Tile other = plan.tile();
 
             if(other == null) return false;
 
-            if(!req.breaking){
-                r1.setSize(req.block.size * tilesize);
-                r1.setCenter(other.worldx() + req.block.offset, other.worldy() + req.block.offset);
+            if(!plan.breaking){
+                r1.setSize(plan.block.size * tilesize);
+                r1.setCenter(other.worldx() + plan.block.offset, other.worldy() + plan.block.offset);
             }else{
                 r1.setSize(other.block().size * tilesize);
                 r1.setCenter(other.worldx() + other.block().offset, other.worldy() + other.block().offset);
@@ -859,8 +859,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             return r2.overlaps(r1);
         };
 
-        for(BuildPlan req : player.unit().plans()){
-            if(test.get(req)) return req;
+        for(var plan : player.unit().plans()){
+            if(test.get(plan)) return plan;
         }
 
         return selectPlans.find(test);
@@ -884,24 +884,24 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Draw.color(Pal.remove);
         Lines.stroke(1f);
 
-        for(BuildPlan req : player.unit().plans()){
-            if(req.breaking) continue;
-            if(req.bounds(Tmp.r2).overlaps(Tmp.r1)){
-                drawBreaking(req);
+        for(var plan : player.unit().plans()){
+            if(plan.breaking) continue;
+            if(plan.bounds(Tmp.r2).overlaps(Tmp.r1)){
+                drawBreaking(plan);
             }
         }
 
-        for(BuildPlan req : selectPlans){
-            if(req.breaking) continue;
-            if(req.bounds(Tmp.r2).overlaps(Tmp.r1)){
-                drawBreaking(req);
+        for(var plan : selectPlans){
+            if(plan.breaking) continue;
+            if(plan.bounds(Tmp.r2).overlaps(Tmp.r1)){
+                drawBreaking(plan);
             }
         }
 
-        for(BlockPlan req : player.team().data().blocks){
-            Block block = content.block(req.block);
-            if(block.bounds(req.x, req.y, Tmp.r2).overlaps(Tmp.r1)){
-                drawSelected(req.x, req.y, content.block(req.block), Pal.remove);
+        for(BlockPlan plan : player.team().data().blocks){
+            Block block = content.block(plan.block);
+            if(block.bounds(plan.x, plan.y, Tmp.r2).overlaps(Tmp.r1)){
+                drawSelected(plan.x, plan.y, content.block(plan.block), Pal.remove);
             }
         }
 
@@ -929,32 +929,34 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     protected void flushSelectPlans(Seq<BuildPlan> plans){
-        for(BuildPlan req : plans){
-            if(req.block != null && validPlace(req.x, req.y, req.block, req.rotation)){
-                BuildPlan other = getPlan(req.x, req.y, req.block.size, null);
+        for(BuildPlan plan : plans){
+            if(plan.block != null && validPlace(plan.x, plan.y, plan.block, plan.rotation)){
+                BuildPlan other = getPlan(plan.x, plan.y, plan.block.size, null);
                 if(other == null){
-                    selectPlans.add(req.copy());
-                }else if(!other.breaking && other.x == req.x && other.y == req.y && other.block.size == req.block.size){
+                    selectPlans.add(plan.copy());
+                }else if(!other.breaking && other.x == plan.x && other.y == plan.y && other.block.size == plan.block.size){
                     selectPlans.remove(other);
-                    selectPlans.add(req.copy());
+                    selectPlans.add(plan.copy());
                 }
             }
         }
     }
 
     protected void flushPlans(Seq<BuildPlan> plans){
-        for(BuildPlan req : plans){
-            if(req.block != null && validPlace(req.x, req.y, req.block, req.rotation)){
-                BuildPlan copy = req.copy();
-                req.block.onNewPlan(copy);
+        for(var plan : plans){
+            if(plan.block != null && validPlace(plan.x, plan.y, plan.block, plan.rotation)){
+                BuildPlan copy = plan.copy();
+                plan.block.onNewPlan(copy);
                 player.unit().addBuild(copy);
             }
         }
     }
 
     protected void drawOverPlan(BuildPlan plan){
-        boolean valid = validPlace(plan.x, plan.y, plan.block, plan.rotation);
+        drawOverPlan(plan, validPlace(plan.x, plan.y, plan.block, plan.rotation));
+    }
 
+    protected void drawOverPlan(BuildPlan plan, boolean valid){
         Draw.reset();
         Draw.mixcol(!valid ? Pal.breakInvalid : Color.white, (!valid ? 0.4f : 0.24f) + Mathf.absin(Time.globalTime, 6f, 0.28f));
         Draw.alpha(1f);
@@ -963,7 +965,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     protected void drawPlan(BuildPlan plan){
-        plan.block.drawPlan(plan, allPlans(), validPlace(plan.x, plan.y, plan.block, plan.rotation));
+        drawPlan(plan, plan.cachedValid = validPlace(plan.x, plan.y, plan.block, plan.rotation));
+    }
+
+    protected void drawPlan(BuildPlan plan, boolean valid){
+        plan.block.drawPlan(plan, allPlans(), valid);
     }
 
     /** Draws a placement icon for a specific block. */
@@ -1013,16 +1019,16 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         Iterator<BuildPlan> it = player.unit().plans().iterator();
         while(it.hasNext()){
-            BuildPlan req = it.next();
-            if(!req.breaking && req.bounds(Tmp.r2).overlaps(Tmp.r1)){
+            var plan = it.next();
+            if(!plan.breaking && plan.bounds(Tmp.r2).overlaps(Tmp.r1)){
                 it.remove();
             }
         }
 
         it = selectPlans.iterator();
         while(it.hasNext()){
-            BuildPlan req = it.next();
-            if(!req.breaking && req.bounds(Tmp.r2).overlaps(Tmp.r1)){
+            var plan = it.next();
+            if(!plan.breaking && plan.bounds(Tmp.r2).overlaps(Tmp.r1)){
                 it.remove();
             }
         }
@@ -1032,11 +1038,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         //remove blocks to rebuild
         Iterator<BlockPlan> broken = player.team().data().blocks.iterator();
         while(broken.hasNext()){
-            BlockPlan req = broken.next();
-            Block block = content.block(req.block);
-            if(block.bounds(req.x, req.y, Tmp.r2).overlaps(Tmp.r1)){
-                removed.add(Point2.pack(req.x, req.y));
-                req.removed = true;
+            BlockPlan plan = broken.next();
+            Block block = content.block(plan.block);
+            if(block.bounds(plan.x, plan.y, Tmp.r2).overlaps(Tmp.r1)){
+                removed.add(Point2.pack(plan.x, plan.y));
+                plan.removed = true;
                 broken.remove();
             }
         }
@@ -1051,16 +1057,16 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         linePlans.clear();
         iterateLine(x1, y1, x2, y2, l -> {
             rotation = l.rotation;
-            BuildPlan req = new BuildPlan(l.x, l.y, l.rotation, block, block.nextConfig());
-            req.animScale = 1f;
-            linePlans.add(req);
+            var plan = new BuildPlan(l.x, l.y, l.rotation, block, block.nextConfig());
+            plan.animScale = 1f;
+            linePlans.add(plan);
         });
 
         if(Core.settings.getBool("blockreplace")){
-            linePlans.each(req -> {
-                Block replace = req.block.getReplacement(req, linePlans);
+            linePlans.each(plan -> {
+                Block replace = plan.block.getReplacement(plan, linePlans);
                 if(replace.unlockedNow()){
-                    req.block = replace;
+                    plan.block = replace;
                 }
             });
 
@@ -1369,11 +1375,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             playerPlanTree.intersect(Tmp.r1, plansOut);
 
             for(int i = 0; i < plansOut.size; i++){
-                var req = plansOut.items[i];
-                if(req != ignore
-                && !req.breaking
-                && req.block.bounds(req.x, req.y, Tmp.r1).overlaps(type.bounds(x, y, Tmp.r2))
-                && !(type.canReplace(req.block) && Tmp.r1.equals(Tmp.r2))){
+                var plan = plansOut.items[i];
+                if(plan != ignore
+                && !plan.breaking
+                && plan.block.bounds(plan.x, plan.y, Tmp.r1).overlaps(type.bounds(x, y, Tmp.r2))
+                && !(type.canReplace(plan.block) && Tmp.r1.equals(Tmp.r2))){
                     return false;
                 }
             }

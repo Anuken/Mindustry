@@ -26,7 +26,7 @@ public class BuildPlan implements Position, QuadTreeObject{
     /** Last progress.*/
     public float progress;
     /** Whether construction has started for this plan, and other special variables.*/
-    public boolean initialized, worldContext = true, stuck;
+    public boolean initialized, worldContext = true, stuck, cachedValid;
 
     /** Visual scale. Used only for rendering.*/
     public float animScale = 0f;
@@ -81,7 +81,7 @@ public class BuildPlan implements Position, QuadTreeObject{
     public static Object pointConfig(Block block, Object config, Cons<Point2> cons){
         if(config instanceof Point2 point){
             config = point.cpy();
-            cons.get(point);
+            cons.get((Point2)config);
         }else if(config instanceof Point2[] points){
             Point2[] result = new Point2[points.length];
             int i = 0;

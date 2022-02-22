@@ -113,26 +113,26 @@ public class MobileInput extends InputHandler implements GestureListener{
         r2.setSize(block.size * tilesize);
         r2.setCenter(x * tilesize + block.offset, y * tilesize + block.offset);
 
-        for(BuildPlan req : selectPlans){
-            Tile other = req.tile();
+        for(var plan : selectPlans){
+            Tile other = plan.tile();
 
-            if(other == null || req.breaking) continue;
+            if(other == null || plan.breaking) continue;
 
-            r1.setSize(req.block.size * tilesize);
-            r1.setCenter(other.worldx() + req.block.offset, other.worldy() + req.block.offset);
+            r1.setSize(plan.block.size * tilesize);
+            r1.setCenter(other.worldx() + plan.block.offset, other.worldy() + plan.block.offset);
 
             if(r2.overlaps(r1)){
                 return true;
             }
         }
 
-        for(BuildPlan req : player.unit().plans()){
-            Tile other = world.tile(req.x, req.y);
+        for(var plan : player.unit().plans()){
+            Tile other = world.tile(plan.x, plan.y);
 
-            if(other == null || req.breaking) continue;
+            if(other == null || plan.breaking) continue;
 
-            r1.setSize(req.block.size * tilesize);
-            r1.setCenter(other.worldx() + req.block.offset, other.worldy() + req.block.offset);
+            r1.setSize(plan.block.size * tilesize);
+            r1.setCenter(other.worldx() + plan.block.offset, other.worldy() + plan.block.offset);
 
             if(r2.overlaps(r1)){
                 return true;
@@ -146,21 +146,21 @@ public class MobileInput extends InputHandler implements GestureListener{
         r2.setSize(tilesize);
         r2.setCenter(tile.worldx(), tile.worldy());
 
-        for(BuildPlan req : selectPlans){
-            Tile other = req.tile();
+        for(var plan : selectPlans){
+            Tile other = plan.tile();
 
             if(other == null) continue;
 
-            if(!req.breaking){
-                r1.setSize(req.block.size * tilesize);
-                r1.setCenter(other.worldx() + req.block.offset, other.worldy() + req.block.offset);
+            if(!plan.breaking){
+                r1.setSize(plan.block.size * tilesize);
+                r1.setCenter(other.worldx() + plan.block.offset, other.worldy() + plan.block.offset);
 
             }else{
                 r1.setSize(other.block().size * tilesize);
                 r1.setCenter(other.worldx() + other.block().offset, other.worldy() + other.block().offset);
             }
 
-            if(r2.overlaps(r1)) return req;
+            if(r2.overlaps(r1)) return plan;
         }
         return null;
     }
@@ -822,10 +822,10 @@ public class MobileInput extends InputHandler implements GestureListener{
             int shiftedY = (int)(shiftDeltaY / tilesize);
 
             if(Math.abs(shiftedX) > 0 || Math.abs(shiftedY) > 0){
-                for(BuildPlan req : selectPlans){
-                    if(req.breaking) continue; //don't shift removal plans
-                    req.x += shiftedX;
-                    req.y += shiftedY;
+                for(var plan : selectPlans){
+                    if(plan.breaking) continue; //don't shift removal plans
+                    plan.x += shiftedX;
+                    plan.y += shiftedY;
                 }
 
                 shiftDeltaX %= tilesize;
