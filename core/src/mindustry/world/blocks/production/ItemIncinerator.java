@@ -38,7 +38,7 @@ public class ItemIncinerator extends Block{
 
         @Override
         public BlockStatus status(){
-            return consValid ? BlockStatus.active : BlockStatus.noInput;
+            return efficiency > 0 ? BlockStatus.active : BlockStatus.noInput;
         }
 
         @Override
@@ -62,7 +62,7 @@ public class ItemIncinerator extends Block{
 
         @Override
         public boolean acceptItem(Building source, Item item){
-            return consValid;
+            return efficiency > 0;
         }
     }
 }

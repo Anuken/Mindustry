@@ -45,7 +45,7 @@ public class ReloadTurret extends BaseTurret{
         }
 
         protected float baseReloadSpeed(){
-            return efficiency();
+            return efficiency;
         }
     }
 }

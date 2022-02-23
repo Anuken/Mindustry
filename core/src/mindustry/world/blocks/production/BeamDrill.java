@@ -213,7 +213,7 @@ public class BeamDrill extends Block{
 
             if(lasers[0] == null) updateLasers();
 
-            warmup = Mathf.approachDelta(warmup, Mathf.num(consValid), 1f / 60f);
+            warmup = Mathf.approachDelta(warmup, Mathf.num(efficiency > 0), 1f / 60f);
             lastItem = null;
             boolean multiple = false;
             int dx = Geometry.d4x(rotation), dy = Geometry.d4y(rotation), facingAmount = 0;
@@ -249,15 +249,8 @@ public class BeamDrill extends Block{
                 lastItem = null;
             }
 
-            float multiplier = 1f;
-
-            if(consOptionalValid()){
-                boostWarmup = Mathf.lerpDelta(boostWarmup, 1f, 0.1f);
-                multiplier *= optionalBoostIntensity;
-            }else{
-                boostWarmup = Mathf.lerpDelta(boostWarmup, 0f, 0.1f);
-            }
-
+            float multiplier = Mathf.lerp(1f, optionalBoostIntensity, optionalEfficiency);
+            boostWarmup = Mathf.lerpDelta(boostWarmup, optionalEfficiency, 0.1f);
             lastDrillSpeed = (facingAmount * multiplier * timeScale) / drillTime;
 
             time += edelta() * multiplier;

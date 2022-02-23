@@ -88,7 +88,7 @@ public abstract class BlockProducer extends PayloadBlock{
         public void updateTile(){
             super.updateTile();
             var recipe = recipe();
-            boolean produce = recipe != null && consValid && payload == null;
+            boolean produce = recipe != null && efficiency > 0 && payload == null;
 
             if(produce){
                 progress += buildSpeed * edelta();

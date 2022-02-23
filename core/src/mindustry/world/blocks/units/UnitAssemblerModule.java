@@ -128,7 +128,7 @@ public class UnitAssemblerModule extends PayloadBlock{
                 findLink();
             }
 
-            if(moveInPayload() && link != null && link.moduleFits(block, x, y, rotation) && !link.wasOccupied && link.acceptPayload(this, payload) && consValid){
+            if(moveInPayload() && link != null && link.moduleFits(block, x, y, rotation) && !link.wasOccupied && link.acceptPayload(this, payload) && efficiency > 0){
                 link.yeetPayload(payload);
                 payload = null;
             }

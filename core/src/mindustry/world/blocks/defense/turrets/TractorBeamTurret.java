@@ -76,6 +76,7 @@ public class TractorBeamTurret extends BaseTurret{
 
         @Override
         public void updateTile(){
+            float eff = efficiency * coolantMultiplier, edelta = eff * delta();
 
             //retarget
             if(timer(timerTarget, retargetTime)){
@@ -102,13 +103,13 @@ public class TractorBeamTurret extends BaseTurret{
             any = false;
 
             //look at target
-            if(target != null && target.within(this, range + target.hitSize/2f) && target.team() != team && target.checkTarget(targetAir, targetGround) && efficiency() > 0.02f){
+            if(target != null && target.within(this, range + target.hitSize/2f) && target.team() != team && target.checkTarget(targetAir, targetGround) && efficiency > 0.02f){
                 if(!headless){
                     control.sound.loop(shootSound, this, shootSoundVolume);
                 }
 
                 float dest = angleTo(target);
-                rotation = Angles.moveToward(rotation, dest, rotateSpeed * edelta());
+                rotation = Angles.moveToward(rotation, dest, rotateSpeed * edelta);
                 lastX = target.x;
                 lastY = target.y;
                 strength = Mathf.lerpDelta(strength, 1f, 0.1f);
@@ -116,7 +117,7 @@ public class TractorBeamTurret extends BaseTurret{
                 //shoot when possible
                 if(Angles.within(rotation, dest, shootCone)){
                     if(damage > 0){
-                        target.damageContinuous(damage * efficiency());
+                        target.damageContinuous(damage * eff);
                     }
 
                     if(status != StatusEffects.none){
@@ -124,7 +125,7 @@ public class TractorBeamTurret extends BaseTurret{
                     }
 
                     any = true;
-                    target.impulseNet(Tmp.v1.set(this).sub(target).limit((force + (1f - target.dst(this) / range) * scaledForce) * edelta()));
+                    target.impulseNet(Tmp.v1.set(this).sub(target).limit((force + (1f - target.dst(this) / range) * scaledForce) * edelta));
                 }
             }else{
                 strength = Mathf.lerpDelta(strength, 0, 0.1f);
@@ -134,11 +135,6 @@ public class TractorBeamTurret extends BaseTurret{
         @Override
         public boolean shouldConsume(){
             return super.shouldConsume() && target != null;
-        }
-
-        @Override
-        public float efficiency(){
-            return super.efficiency() * coolantMultiplier;
         }
 
         @Override
@@ -156,7 +152,7 @@ public class TractorBeamTurret extends BaseTurret{
 
                 Drawf.laser(team, laser, laserStart, laserEnd,
                 x + Angles.trnsx(ang, shootLength), y + Angles.trnsy(ang, shootLength),
-                lastX, lastY, strength * efficiency() * laserWidth);
+                lastX, lastY, strength * efficiency * laserWidth);
 
                 Draw.mixcol();
             }

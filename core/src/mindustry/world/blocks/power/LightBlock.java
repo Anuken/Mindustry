@@ -73,7 +73,7 @@ public class LightBlock extends Block{
         public void draw(){
             super.draw();
             Draw.blend(Blending.additive);
-            Draw.color(Tmp.c1.set(color), efficiency() * 0.3f);
+            Draw.color(Tmp.c1.set(color), efficiency * 0.3f);
             Draw.rect(topRegion, x, y);
             Draw.color();
             Draw.blend();
@@ -94,7 +94,7 @@ public class LightBlock extends Block{
 
         @Override
         public void drawLight(){
-            Drawf.light(team, x, y, lightRadius * Math.min(smoothTime, 2f), Tmp.c1.set(color), brightness * efficiency());
+            Drawf.light(team, x, y, lightRadius * Math.min(smoothTime, 2f), Tmp.c1.set(color), brightness * efficiency);
         }
 
         @Override

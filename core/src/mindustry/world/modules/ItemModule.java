@@ -25,9 +25,6 @@ public class ItemModule extends BlockModule{
     protected int total;
     protected int takeRotation;
 
-    /** A value >0 in an index array indicates that a corresponding item is currently being consumed. 1 indicates an entire item. */
-    public float[] itemConsumption = new float[items.length];
-
     private @Nullable WindowedMean[] flow;
 
     public ItemModule copy(){

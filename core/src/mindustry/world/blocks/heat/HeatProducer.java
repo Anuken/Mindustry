@@ -44,7 +44,7 @@ public class HeatProducer extends GenericCrafter{
             super.updateTile();
 
             //heat approaches target at the same speed regardless of efficiency
-            heat = Mathf.approachDelta(heat, heatOutput * efficiency() * Mathf.num(consValid), warmupRate * delta());
+            heat = Mathf.approachDelta(heat, heatOutput * efficiency, warmupRate * delta());
         }
 
         @Override

@@ -142,7 +142,7 @@ public class PayloadLoader extends PayloadBlock{
 
                 //load up items
                 if(payload.block().hasItems && items.any()){
-                    if(efficiency() > 0.01f && timer(timerLoad, loadTime / efficiency())){
+                    if(efficiency > 0.01f && timer(timerLoad, loadTime / efficiency)){
                         //load up items a set amount of times
                         for(int j = 0; j < itemsLoaded && items.any(); j++){
 

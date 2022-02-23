@@ -78,13 +78,13 @@ public class MendProjector extends Block{
         public void updateTile(){
             boolean canHeal = !checkSuppression();
 
-            smoothEfficiency = Mathf.lerpDelta(smoothEfficiency, efficiency(), 0.08f);
-            heat = Mathf.lerpDelta(heat, consValid && canHeal ? 1f : 0f, 0.08f);
+            smoothEfficiency = Mathf.lerpDelta(smoothEfficiency, efficiency, 0.08f);
+            heat = Mathf.lerpDelta(heat, efficiency > 0 && canHeal ? 1f : 0f, 0.08f);
             charge += heat * delta();
 
-            phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(consOptionalValid()), 0.1f);
+            phaseHeat = Mathf.lerpDelta(phaseHeat, optionalEfficiency, 0.1f);
 
-            if(consOptionalValid() && timer(timerUse, useTime) && efficiency() > 0 && canHeal){
+            if(optionalEfficiency > 0 && timer(timerUse, useTime) && canHeal){
                 consume();
             }
 
@@ -93,7 +93,7 @@ public class MendProjector extends Block{
                 charge = 0f;
 
                 indexer.eachBlock(this, realRange, b -> b.damaged() && !b.isHealSuppressed(), other -> {
-                    other.heal(other.maxHealth() * (healPercent + phaseHeat * phaseBoost) / 100f * efficiency());
+                    other.heal(other.maxHealth() * (healPercent + phaseHeat * phaseBoost) / 100f * efficiency);
                     other.recentlyHealed();
                     Fx.healBlockFull.at(other.x, other.y, other.block.size, baseColor);
                 });

@@ -137,7 +137,7 @@ public class DirectionalForceProjector extends Block{
                 Fx.reactorsmoke.at(x + Mathf.range(tilesize / 2f), y + Mathf.range(tilesize / 2f));
             }
 
-            warmup = Mathf.lerpDelta(warmup, efficiency(), 0.1f);
+            warmup = Mathf.lerpDelta(warmup, efficiency, 0.1f);
 
             //TODO aaaaaaaaaaaaAAAAAAAAAAAAAAaa
             if(buildup > 0 && false){

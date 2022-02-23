@@ -327,8 +327,8 @@ public class UnitAssembler extends PayloadBlock{
                 units.clear();
             }
 
-            powerWarmup = Mathf.lerpDelta(powerWarmup, efficiency() > 0.0001f ? 1f : 0f, 0.1f);
-            droneWarmup = Mathf.lerpDelta(droneWarmup, units.size < dronesCreated ? efficiency() : 0f, 0.1f);
+            powerWarmup = Mathf.lerpDelta(powerWarmup, efficiency > 0.0001f ? 1f : 0f, 0.1f);
+            droneWarmup = Mathf.lerpDelta(droneWarmup, units.size < dronesCreated ? efficiency : 0f, 0.1f);
             totalDroneProgress += droneWarmup * delta();
 
             if(units.size < dronesCreated && (droneProgress += edelta() / droneConstructTime) >= 1f){
@@ -375,8 +375,8 @@ public class UnitAssembler extends PayloadBlock{
             var plan = plan();
 
             //check if all requirements are met
-            if(!wasOccupied && consValid && Units.canCreate(team, plan.unit)){
-                warmup = Mathf.lerpDelta(warmup, efficiency(), 0.1f);
+            if(!wasOccupied && efficiency > 0 && Units.canCreate(team, plan.unit)){
+                warmup = Mathf.lerpDelta(warmup, efficiency, 0.1f);
 
                 if((progress += edelta() * eff / plan.time) >= 1f){
                     Call.assemblerUnitSpawned(tile);
@@ -523,7 +523,7 @@ public class UnitAssembler extends PayloadBlock{
 
         /** @return true if this block is ready to produce units, e.g. requirements met */
         public boolean ready(){
-            return consValid && !wasOccupied;
+            return efficiency > 0 && !wasOccupied;
         }
 
         public void yeetPayload(Payload payload){

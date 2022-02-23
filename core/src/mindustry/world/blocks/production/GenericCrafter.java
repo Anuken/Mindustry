@@ -187,7 +187,7 @@ public class GenericCrafter extends Block{
 
         @Override
         public void updateTile(){
-            if(consValid){
+            if(efficiency > 0){
 
                 progress += getProgressIncrease(craftTime);
                 warmup = Mathf.approachDelta(warmup, warmupTarget(), warmupSpeed);
@@ -282,7 +282,7 @@ public class GenericCrafter extends Block{
 
         @Override
         public boolean shouldAmbientSound(){
-            return consValid;
+            return efficiency > 0;
         }
 
         @Override

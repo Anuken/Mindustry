@@ -188,7 +188,7 @@ public class PayloadMassDriver extends PayloadBlock{
                 !(
                     current instanceof PayloadDriverBuild entity &&
                     current.isValid() &&
-                    entity.consValid && entity.block == block &&
+                    entity.efficiency > 0 && entity.block == block &&
                     entity.link == pos() && within(current, range)
                 )){
                 waitingShooters.removeFirst();
@@ -219,7 +219,7 @@ public class PayloadMassDriver extends PayloadBlock{
             }
 
             //skip when there's no power
-            if(!consValid){
+            if(efficiency <= 0f){
                 return;
             }
 
@@ -235,7 +235,7 @@ public class PayloadMassDriver extends PayloadBlock{
                 }
 
                 //align to shooter rotation
-                turretRotation = Angles.moveToward(turretRotation, angleTo(currentShooter()), rotateSpeed * efficiency());
+                turretRotation = Angles.moveToward(turretRotation, angleTo(currentShooter()), rotateSpeed * efficiency);
             }else if(state == shooting){
                 //if there's nothing to shoot at OR someone wants to shoot at this thing, bail
                 if(!hasLink || (!waitingShooters.isEmpty() && payload == null)){
@@ -269,7 +269,7 @@ public class PayloadMassDriver extends PayloadBlock{
 
                     if(reload <= 0){
                         //align to target location
-                        turretRotation = Angles.moveToward(turretRotation, targetRotation, rotateSpeed * efficiency());
+                        turretRotation = Angles.moveToward(turretRotation, targetRotation, rotateSpeed * efficiency);
 
                         //fire when it's the first in the queue and angles are ready.
                         if(other.currentShooter() == this &&

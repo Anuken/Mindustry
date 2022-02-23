@@ -200,7 +200,7 @@ public class Turret extends ReloadTurret{
 
         public float estimateDps(){
             if(!hasAmmo()) return 0f;
-            return shots / reloadTime * 60f * peekAmmo().estimateDPS() * efficiency() * timeScale;
+            return shots / reloadTime * 60f * peekAmmo().estimateDPS() * efficiency * timeScale;
         }
 
         @Override
@@ -431,11 +431,10 @@ public class Turret extends ReloadTurret{
         }
 
         @Override
-        public float efficiency(){
+        public void updateEfficiencyMultiplier(){
             if(heatRequirement > 0){
-                return Math.min(heatReq / heatRequirement, maxHeatEfficiency) * super.efficiency();
+                efficiency *= Math.min(heatReq / heatRequirement, maxHeatEfficiency);
             }
-            return super.efficiency();
         }
 
         /** Consume ammo and return a type. */

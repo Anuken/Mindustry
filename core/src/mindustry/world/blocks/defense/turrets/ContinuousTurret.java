@@ -60,7 +60,7 @@ public class ContinuousTurret extends Turret{
             super.updateTile();
 
             //TODO unclean way of calculating ammo fraction to display
-            float ammoFract = efficiency();
+            float ammoFract = efficiency;
             if(findConsumer(f -> f instanceof ConsumeLiquidBase) instanceof ConsumeLiquid cons){
                 ammoFract = Math.min(ammoFract, liquids.get(cons.liquid) / liquidCapacity);
             }
@@ -110,7 +110,7 @@ public class ContinuousTurret extends Turret{
 
         @Override
         protected void turnToTarget(float targetRot){
-            rotation = Angles.moveToward(rotation, targetRot, efficiency() * rotateSpeed * delta());
+            rotation = Angles.moveToward(rotation, targetRot, efficiency * rotateSpeed * delta());
         }
 
         @Override

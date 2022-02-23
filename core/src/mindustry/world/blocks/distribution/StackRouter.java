@@ -25,12 +25,13 @@ public class StackRouter extends DuctRouter{
 
         @Override
         public void updateTile(){
+            float eff = enabled ? (efficiency + baseEfficiency) : 0f;
             float cap = speed;
 
             if(!unloading && current != null && items.total() >= itemCapacity){
                 if(progress < cap){
                     //when items are full, begin offload timer
-                    progress += edelta();
+                    progress += eff;
                 }
 
                 if(progress >= cap){
@@ -76,12 +77,6 @@ public class StackRouter extends DuctRouter{
                 Draw.blend();
                 Draw.color();
             }
-        }
-
-        @Override
-        public float efficiency(){
-            if(!enabled) return 0;
-            return baseEfficiency + (power == null ? 0 : power.status);
         }
 
         @Override

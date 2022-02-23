@@ -295,8 +295,8 @@ public class SectorDamage{
                     }
 
                     //point defense turrets act as flat health right now
-                    if(build.block instanceof PointDefenseTurret && build.consValid){
-                        sumHealth += 150f * build.timeScale();
+                    if(build.block instanceof PointDefenseTurret){
+                        sumHealth += 150f * build.timeScale() * build.efficiency;
                     }
 
                     if(build.block instanceof ForceProjector f){

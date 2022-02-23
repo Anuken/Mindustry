@@ -228,12 +228,12 @@ public class Drill extends Block{
 
         @Override
         public boolean shouldAmbientSound(){
-            return efficiency() > 0.01f && items.total() < itemCapacity;
+            return efficiency > 0.01f && items.total() < itemCapacity;
         }
 
         @Override
         public float ambientVolume(){
-            return efficiency() * (size * size) / 4f;
+            return efficiency * (size * size) / 4f;
         }
 
         @Override
@@ -273,15 +273,8 @@ public class Drill extends Block{
 
             timeDrilled += warmup * delta();
 
-            if(items.total() < itemCapacity && dominantItems > 0 && consValid){
-
-                float speed = 1f;
-
-                if(consOptionalValid()){
-                    speed = liquidBoostIntensity;
-                }
-
-                speed *= efficiency(); // Drill slower when not at full power
+            if(items.total() < itemCapacity && dominantItems > 0 && efficiency > 0){
+                float speed = Mathf.lerp(1f, liquidBoostIntensity, optionalEfficiency) * efficiency;
 
                 lastDrillSpeed = (speed * dominantItems * warmup) / (drillTime + hardnessDrillMultiplier * dominantItem.hardness);
                 warmup = Mathf.approachDelta(warmup, speed, warmupSpeed);

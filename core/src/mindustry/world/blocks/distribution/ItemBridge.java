@@ -320,7 +320,7 @@ public class ItemBridge extends Block{
                     inc.add(pos);
                 }
 
-                warmup = Mathf.approachDelta(warmup, efficiency(), 1f / 30f);
+                warmup = Mathf.approachDelta(warmup, efficiency, 1f / 30f);
                 updateTransport(other.build);
             }
         }

@@ -81,7 +81,7 @@ public class BaseShield extends Block{
 
         @Override
         public void updateTile(){
-            smoothRadius = Mathf.lerpDelta(smoothRadius, radius * efficiency(), 0.05f);
+            smoothRadius = Mathf.lerpDelta(smoothRadius, radius * efficiency, 0.05f);
 
             float rad = radius();
 

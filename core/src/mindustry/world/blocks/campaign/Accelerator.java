@@ -56,7 +56,7 @@ public class Accelerator extends Block{
         @Override
         public void updateTile(){
             super.updateTile();
-            heat = Mathf.lerpDelta(heat, consValid ? 1f : 0f, 0.05f);
+            heat = Mathf.lerpDelta(heat, efficiency, 0.05f);
             statusLerp = Mathf.lerpDelta(statusLerp, power.status, 0.05f);
         }
 
@@ -101,14 +101,14 @@ public class Accelerator extends Block{
 
         @Override
         public Cursor getCursor(){
-            return !state.isCampaign() || !consValid ? SystemCursor.arrow : super.getCursor();
+            return !state.isCampaign() || efficiency <= 0f ? SystemCursor.arrow : super.getCursor();
         }
 
         @Override
         public void buildConfiguration(Table table){
             deselect();
 
-            if(!state.isCampaign() || !consValid) return;
+            if(!state.isCampaign() || efficiency <= 0f) return;
 
             ui.planet.showPlanetLaunch(state.rules.sector, sector -> {
                 //TODO cutscene, etc...

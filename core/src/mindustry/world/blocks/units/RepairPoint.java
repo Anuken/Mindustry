@@ -172,7 +172,7 @@ public class RepairPoint extends Block{
         public void updateTile(){
             float multiplier = 1f;
             if(acceptCoolant){
-                multiplier = consOptionalValid() ? 1f + liquids.current().heatCapacity * coolantMultiplier : 1f;
+                multiplier = 1f + liquids.current().heatCapacity * coolantMultiplier * optionalEfficiency;
             }
 
             if(target != null && (target.dead() || target.dst(this) - target.hitSize/2f > repairRadius || target.health() >= target.maxHealth())){
@@ -185,13 +185,13 @@ public class RepairPoint extends Block{
 
             boolean healed = false;
 
-            if(target != null && consValid){
+            if(target != null && efficiency > 0){
                 float angle = Angles.angle(x, y, target.x + offset.x, target.y + offset.y);
                 if(Angles.angleDist(angle, rotation) < 30f){
                     healed = true;
                     target.heal(repairSpeed * strength * edelta() * multiplier);
                 }
-                rotation = Mathf.slerpDelta(rotation, angle, 0.5f * efficiency() * timeScale);
+                rotation = Mathf.slerpDelta(rotation, angle, 0.5f * efficiency * timeScale);
             }
 
             strength = Mathf.lerpDelta(strength, healed ? 1f : 0f, 0.08f * Time.delta);
@@ -209,7 +209,7 @@ public class RepairPoint extends Block{
 
         @Override
         public BlockStatus status(){
-            return Mathf.equal(efficiency(), 0f, 0.01f) ? BlockStatus.noInput : super.status();
+            return Mathf.equal(efficiency, 0f, 0.01f) ? BlockStatus.noInput : super.status();
         }
 
         @Override

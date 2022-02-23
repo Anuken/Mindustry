@@ -126,7 +126,7 @@ public class LaunchPad extends Block{
             if(!state.isCampaign()) return;
 
             //increment launchCounter then launch when full and base conditions are met
-            if((launchCounter += edelta()) >= launchTime && consValid && items.total() >= itemCapacity){
+            if((launchCounter += edelta()) >= launchTime && items.total() >= itemCapacity){
                 //if there are item requirements, use those.
                 consume();
                 launchSound.at(x, y);

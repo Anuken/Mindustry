@@ -219,7 +219,7 @@ public class Reconstructor extends UnitBlock{
                     moveOutPayload();
                 }else{ //update progress
                     if(moveInPayload()){
-                        if(consValid){
+                        if(efficiency > 0){
                             valid = true;
                             progress += edelta() * state.rules.unitBuildSpeed(team);
                         }

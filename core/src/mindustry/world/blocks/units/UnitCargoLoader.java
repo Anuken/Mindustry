@@ -93,7 +93,7 @@ public class UnitCargoLoader extends Block{
                 readUnitId = -1;
             }
 
-            warmup = Mathf.approachDelta(warmup, efficiency(), 1f / 60f);
+            warmup = Mathf.approachDelta(warmup, efficiency, 1f / 60f);
             readyness = Mathf.approachDelta(readyness, unit != null ? 1f : 0f, 1f / 60f);
 
             if(unit == null && Units.canCreate(team, unitType)){

@@ -69,7 +69,7 @@ public class ConsumeGenerator extends PowerGenerator{
     }
 
     public class ConsumeGeneratorBuild extends GeneratorBuild{
-        public float warmup, totalTime;
+        public float warmup, totalTime, efficiencyMultiplier = 1f;
 
         @Override
         public void updateEfficiencyMultiplier(){
@@ -84,7 +84,7 @@ public class ConsumeGenerator extends PowerGenerator{
 
         @Override
         public void updateTile(){
-            boolean valid = consValid;
+            boolean valid = efficiency > 0;
 
             warmup = Mathf.lerpDelta(warmup, valid ? 1f : 0f, 0.05f);
 

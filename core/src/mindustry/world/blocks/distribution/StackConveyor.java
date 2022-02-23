@@ -34,7 +34,7 @@ public class StackConveyor extends Block implements Autotiler{
     public float glowAlpha = 1f;
     public Color glowColor = Pal.redLight;
 
-    public float baseEfficiency = 1f;
+    public float baseEfficiency = 0f;
     public float speed = 0f;
     public boolean outputRouter = true;
     /** (minimum) amount of loading docks needed to fill a line. */
@@ -249,14 +249,11 @@ public class StackConveyor extends Block implements Autotiler{
         }
 
         @Override
-        public float efficiency(){
-            return baseEfficiency + (power == null ? 0f : power.status);
-        }
-
-        @Override
         public void updateTile(){
+            float eff = enabled ? (efficiency + baseEfficiency) : 0f;
+
             //reel in crater
-            if(cooldown > 0f) cooldown = Mathf.clamp(cooldown - speed * edelta(), 0f, recharge);
+            if(cooldown > 0f) cooldown = Mathf.clamp(cooldown - speed * eff * delta(), 0f, recharge);
 
             //indicates empty state
             if(link == -1) return;

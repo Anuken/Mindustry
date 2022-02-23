@@ -58,7 +58,7 @@ public class LaserTurret extends PowerTurret{
                 bullet.time = bullet.type.lifetime * bullet.type.optimalLifeFract;
                 heat = 1f;
                 recoil = recoilAmount;
-                bulletLife -= Time.delta / Math.max(efficiency(), 0.00001f);
+                bulletLife -= Time.delta / Math.max(efficiency, 0.00001f);
                 if(bulletLife <= 0f){
                     bullet = null;
                 }
@@ -93,7 +93,7 @@ public class LaserTurret extends PowerTurret{
                 return;
             }
 
-            if(reload <= 0 && (consValid || cheating()) && !charging && shootWarmup >= minWarmup){
+            if(reload <= 0 && efficiency > 0 && !charging && shootWarmup >= minWarmup){
                 BulletType type = peekAmmo();
 
                 shoot(type);
@@ -104,7 +104,7 @@ public class LaserTurret extends PowerTurret{
 
         @Override
         protected void turnToTarget(float targetRot){
-            rotation = Angles.moveToward(rotation, targetRot, efficiency() * rotateSpeed * delta() * (bulletLife > 0f ? firingMoveFract : 1f));
+            rotation = Angles.moveToward(rotation, targetRot, efficiency * rotateSpeed * delta() * (bulletLife > 0f ? firingMoveFract : 1f));
         }
 
         @Override

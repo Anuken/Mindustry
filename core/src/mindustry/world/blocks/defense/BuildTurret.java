@@ -107,8 +107,8 @@ public class BuildTurret extends BaseTurret{
 
             checkSuppression();
 
-            unit.buildSpeedMultiplier(efficiency() * timeScale);
-            unit.speedMultiplier(efficiency() * timeScale);
+            unit.buildSpeedMultiplier(efficiency * timeScale);
+            unit.speedMultiplier(efficiency * timeScale);
 
             warmup = Mathf.lerpDelta(warmup, unit.activelyBuilding() ? 1f : 0f, 0.1f);
 
@@ -203,13 +203,8 @@ public class BuildTurret extends BaseTurret{
         }
 
         @Override
-        public float efficiency(){
-            return super.efficiency() * (isHealSuppressed() ? 0f : 1f);
-        }
-
-        @Override
         public boolean shouldConsume(){
-            return super.shouldConsume() && unit.activelyBuilding();
+            return super.shouldConsume() && unit.activelyBuilding() && !isHealSuppressed();
         }
 
         @Override
