@@ -45,7 +45,7 @@ public class PointDefenseWeapon extends Weapon{
     }
 
     @Override
-    protected void shoot(Unit unit, WeaponMount mount, float shootX, float shootY, float aimX, float aimY, float mountX, float mountY, float rotation, int side){
+    protected void shoot(Unit unit, WeaponMount mount, float shootX, float shootY, float rotation){
         if(!(mount.target instanceof Bullet target)) return;
 
         if(target.damage() > bullet.damage){

@@ -369,12 +369,11 @@ public class Weapon implements Cloneable{
     }
 
     protected void shoot(Unit unit, WeaponMount mount, float shootX, float shootY, float rotation){
-        boolean delay = firstShotDelay + shotDelay > 0f;
-        Unit parent = bullet.keepVelocity || parentizeEffects ? unit : null;
+        unit.apply(shootStatus, shootStatusDuration);
 
         if(firstShotDelay > 0){
             chargeSound.at(shootX, shootY, Mathf.random(soundPitchMin, soundPitchMax));
-            bullet.chargeEffect.at(shootX, shootY, rotation, parent);
+            bullet.chargeEffect.at(shootX, shootY, rotation, bullet.keepVelocity || parentizeEffects ? unit : null);
         }
 
         //shot patterns should be able to customize:
@@ -384,14 +383,12 @@ public class Weapon implements Cloneable{
         //TODO merge with Turret behavior if possible
         for(int i = 0; i < shots; i++){
             float angleOffset = i * spacing - (shots - 1) * spacing / 2f;
-            if(delay){
+            if(firstShotDelay + shotDelay > 0f){
                 Time.run(i * shotDelay + firstShotDelay, () -> shoot(unit, mount, angleOffset));
             }else{
                 shoot(unit, mount, angleOffset);
             }
         }
-
-        unit.apply(shootStatus, shootStatusDuration);
     }
 
     protected void shoot(Unit unit, WeaponMount mount, float angleOffset){
@@ -404,18 +401,16 @@ public class Weapon implements Cloneable{
         shootAngle = bulletRotation(unit, mount, bulletX, bulletY),
         lifeScl = bullet.scaleVelocity ? Mathf.clamp(Mathf.dst(shootX, shootY, mount.aimX, mount.aimY) / bullet.range) : 1f;
 
-        mount.bullet = bullet(mount, unit, shootX, shootY, angleOffset + shootAngle + Mathf.range(inaccuracy), lifeScl, shootAngle, mountX, mountY);
+        bullet(mount, unit, shootX, shootY, angleOffset + shootAngle + Mathf.range(inaccuracy), lifeScl, shootAngle, mountX, mountY);
     }
 
-    protected @Nullable Bullet bullet(WeaponMount mount, Unit unit, float shootX, float shootY, float angle, float lifescl, float mountRotation, float mountX, float mountY){
-        if(!unit.isAdded()) return null;
+    protected void bullet(WeaponMount mount, Unit unit, float shootX, float shootY, float angle, float lifescl, float mountRotation, float mountX, float mountY){
+        if(!unit.isAdded()) return;
 
-        float
-        xr = Mathf.range(xRand),
-        x = shootX + Angles.trnsx(angle, 0, xr),
-        y = shootY + Angles.trnsy(angle, 0, xr);
+        //TODO should be part of shoot pattern.
+        float xr = Mathf.range(xRand), x = shootX + Angles.trnsx(angle, 0, xr), y = shootY + Angles.trnsy(angle, 0, xr);
 
-        Bullet result = bullet.create(unit, unit.team, x, y, angle, (1f - velocityRnd) + Mathf.random(velocityRnd), lifescl);
+        mount.bullet = bullet.create(unit, unit.team, x, y, angle, (1f - velocityRnd) + Mathf.random(velocityRnd), lifescl);
 
         if(!continuous){
             shootSound.at(shootX, shootY, Mathf.random(soundPitchMin, soundPitchMax));
@@ -429,8 +424,6 @@ public class Weapon implements Cloneable{
         Effect.shake(shake, shake, shootX, shootY);
         mount.recoil = recoil;
         mount.heat = 1f;
-
-        return result;
     }
 
     public Weapon copy(){
