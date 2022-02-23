@@ -925,7 +925,7 @@ public class Blocks{
             envDisabled = Env.none;
             itemCapacity = 30;
             drawer = new DrawArcSmelter();
-            researchCostMultiplier = 1f / 10f;
+            researchCost = with(Items.beryllium, 150, Items.graphite, 50);
 
             consumeItems(with(Items.graphite, 1, Items.sand, 4));
             consumePower(6f);
@@ -1869,7 +1869,7 @@ public class Blocks{
             //TODO bad idea? should this just require 1 beryllium?
             health = 90;
             speed = 4f;
-            researchCostMultiplier = 1f / 6f;
+            researchCost = with(Items.beryllium, 5);
         }};
 
         ductRouter = new DuctRouter("duct-router"){{
@@ -1877,7 +1877,7 @@ public class Blocks{
             health = 90;
             speed = 4f;
             regionRotated1 = 1;
-            researchCostMultiplier = 0.3f;
+            researchCost = with(Items.beryllium, 30);
         }};
 
         overflowDuct = new OverflowDuct("overflow-duct"){{
@@ -2268,7 +2268,7 @@ public class Blocks{
             health = 90;
             consumePowerBuffered(1000f);
             range = 10;
-            researchCostMultiplier = 0.2f;
+            researchCost = with(Items.beryllium, 5);
         }};
 
         //TODO requirements
@@ -2309,7 +2309,7 @@ public class Blocks{
             hasLiquids = true;
             outputLiquid = new LiquidStack(Liquids.water, 5f / 60f / 9f);
             liquidCapacity = 20f;
-            researchCostMultiplier = 1f / 50f;
+            researchCost = with(Items.beryllium, 15);
         }};
 
         //TODO rename
@@ -2505,7 +2505,7 @@ public class Blocks{
             size = 2;
             attribute = Attribute.sand;
             output = Items.sand;
-            researchCostMultiplier = 1f / 10f;
+            researchCost = with(Items.beryllium, 100, Items.graphite, 40);
         }};
 
         plasmaBore = new BeamDrill("plasma-bore"){{
@@ -2515,7 +2515,7 @@ public class Blocks{
             tier = 3;
             size = 2;
             range = 4;
-            researchCostMultiplier = 1f / 40f;
+            researchCost = with(Items.beryllium, 10);
 
             consumeLiquid(Liquids.hydrogen, 0.25f / 60f).boost();
         }};
@@ -3633,8 +3633,8 @@ public class Blocks{
             requirements(Category.units, with(Items.silicon, 200, Items.beryllium, 250));
             size = 3;
             configurable = false;
-            plans.add(new UnitPlan(UnitTypes.stell, 60f * 60f, with(Items.graphite, 20f, Items.silicon, 40f)));
-            researchCostMultiplier = 1f / 20f;
+            plans.add(new UnitPlan(UnitTypes.stell, 60f * 60f, with(Items.beryllium, 100f, Items.silicon, 60f)));
+            researchCost = with(Items.beryllium, 200, Items.graphite, 80, Items.silicon, 80);
             consumePower(2f);
         }};
 

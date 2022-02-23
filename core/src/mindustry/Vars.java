@@ -42,7 +42,7 @@ public class Vars implements Loadable{
     /** Whether the logger is loaded. */
     public static boolean loadedLogger = false, loadedFileLogger = false;
     /** Whether to enable various experimental features (e.g. spawn positions for spawn groups) */
-    public static boolean experimental = false;
+    public static boolean experimental = true;
     /** Name of current Steam player. */
     public static String steamPlayerName = "";
     /** Default accessible content types used for player-selectable icons. */
