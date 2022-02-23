@@ -29,7 +29,7 @@ public class LaserTurret extends PowerTurret{
     }
 
     public class LaserTurretBuild extends PowerTurretBuild{
-        public Bullet bullet;
+        public @Nullable Bullet bullet;
         public float bulletLife;
 
         @Override

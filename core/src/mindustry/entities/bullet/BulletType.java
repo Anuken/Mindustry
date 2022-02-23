@@ -9,6 +9,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
@@ -122,6 +123,8 @@ public class BulletType extends Content implements Cloneable{
     public float rangeOverride = -1f;
     /** When used in a turret with multiple ammo types, this can be set to a non-zero value to influence range. */
     public float rangeChange = 0f;
+    /** Range initialized in init(). */
+    public float range = 0f;
     /** % of block health healed **/
     public float healPercent = 0f;
     /** flat amount of block health healed */
@@ -148,6 +151,8 @@ public class BulletType extends Content implements Cloneable{
     public Effect healEffect = Fx.healBlockFull;
     /** Bullets spawned when this bullet is created. Rarely necessary, used for visuals. */
     public Seq<BulletType> spawnBullets = new Seq<>();
+    /** Unit spawned _instead of_ this bullet. Useful for missiles. */
+    public @Nullable UnitType spawnUnit;
 
     public Color trailColor = Pal.missileYellowBack;
     public float trailChance = -0.0001f;
@@ -228,9 +233,10 @@ public class BulletType extends Content implements Cloneable{
         return sum;
     }
 
-    /** Returns maximum distance the bullet this bullet type has can travel. */
-    public float range(){
+    /** @return maximum distance the bullet this bullet type has can travel. */
+    protected float calculateRange(){
         if(rangeOverride > 0) return rangeOverride;
+        if(spawnUnit != null) return spawnUnit.lifetime * spawnUnit.speed;
         return Math.max(Mathf.zero(drag) ? speed * lifetime : speed * (1f - Mathf.pow(1f - drag, lifetime)) / drag, maxRange);
     }
 
@@ -471,6 +477,7 @@ public class BulletType extends Content implements Cloneable{
         }
         
         drawSize = Math.max(drawSize, trailLength * speed * 2f);
+        range = calculateRange();
     }
 
     @Override
@@ -478,35 +485,54 @@ public class BulletType extends Content implements Cloneable{
         return ContentType.bullet;
     }
 
-    public Bullet create(Teamc owner, float x, float y, float angle){
+    public @Nullable Bullet create(Teamc owner, float x, float y, float angle){
         return create(owner, owner.team(), x, y, angle);
     }
 
-    public Bullet create(Entityc owner, Team team, float x, float y, float angle){
+    public @Nullable Bullet create(Entityc owner, Team team, float x, float y, float angle){
         return create(owner, team, x, y, angle, 1f);
     }
 
-    public Bullet create(Entityc owner, Team team, float x, float y, float angle, float velocityScl){
+    public @Nullable Bullet create(Entityc owner, Team team, float x, float y, float angle, float velocityScl){
         return create(owner, team, x, y, angle, -1, velocityScl, 1f, null);
     }
 
-    public Bullet create(Entityc owner, Team team, float x, float y, float angle, float velocityScl, float lifetimeScl){
+    public @Nullable Bullet create(Entityc owner, Team team, float x, float y, float angle, float velocityScl, float lifetimeScl){
         return create(owner, team, x, y, angle, -1, velocityScl, lifetimeScl, null);
     }
 
-    public Bullet create(Bullet parent, float x, float y, float angle){
+    public @Nullable Bullet create(Bullet parent, float x, float y, float angle){
         return create(parent.owner, parent.team, x, y, angle);
     }
 
-    public Bullet create(Bullet parent, float x, float y, float angle, float velocityScl, float lifeScale){
+    public @Nullable Bullet create(Bullet parent, float x, float y, float angle, float velocityScl, float lifeScale){
         return create(parent.owner, parent.team, x, y, angle, velocityScl, lifeScale);
     }
 
-    public Bullet create(Bullet parent, float x, float y, float angle, float velocityScl){
+    public @Nullable Bullet create(Bullet parent, float x, float y, float angle, float velocityScl){
         return create(parent.owner(), parent.team, x, y, angle, velocityScl);
     }
 
-    public Bullet create(@Nullable Entityc owner, Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl, Object data){
+    public @Nullable Bullet create(@Nullable Entityc owner, Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl, Object data){
+        if(spawnUnit != null){
+            //don't spawn units clientside!
+            if(!net.client()){
+                Unit spawned = spawnUnit.create(team);
+                spawned.set(x, y);
+                spawned.rotation = angle;
+                //immediately spawn at top speed, since it was launched
+                spawned.vel.trns(angle, spawnUnit.speed);
+                //assign unit owner
+                if(spawned.controller() instanceof MissileAI ai && owner instanceof Unit unit){
+                    ai.shooter = unit;
+                }
+                spawned.add();
+            }
+
+            //no bullet returned
+            return null;
+        }
+
         Bullet bullet = Bullet.create();
         bullet.type = this;
         bullet.owner = owner;

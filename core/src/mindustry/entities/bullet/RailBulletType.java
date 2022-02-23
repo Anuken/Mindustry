@@ -30,7 +30,7 @@ public class RailBulletType extends BulletType{
     }
 
     @Override
-    public float range(){
+    protected float calculateRange(){
         return length;
     }
 

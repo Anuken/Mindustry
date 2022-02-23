@@ -2,6 +2,7 @@ package mindustry.world.blocks.defense.turrets;
 
 import arc.math.*;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
@@ -31,7 +32,7 @@ public class ContinuousTurret extends Turret{
     }
 
     public class ContinuousTurretBuild extends TurretBuild{
-        public Bullet bullet;
+        public @Nullable Bullet bullet;
 
         @Override
         protected void updateCooling(){
