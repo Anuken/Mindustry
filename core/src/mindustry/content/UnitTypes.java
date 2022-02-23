@@ -1270,10 +1270,10 @@ public class UnitTypes{
 
             abilities.add(new RepairFieldAbility(5f, 60f * 8, 50f));
 
-            weapons.add(new Weapon("heal-weapon-mount"){{
+            weapons.add(new Weapon("poly-weapon"){{
                 top = false;
                 y = -2.5f;
-                x = 3.5f;
+                x = 3.75f;
                 reload = 30f;
                 ejectEffect = Fx.none;
                 recoil = 2f;
@@ -2461,7 +2461,7 @@ public class UnitTypes{
             hitSize = 18f;
             treadPullOffset = 5;
             speed = 0.7f;
-            rotateSpeed = 3f;
+            rotateSpeed = 2.6f;
             health = 800;
             armor = 7f;
             areaDamage = 8f;

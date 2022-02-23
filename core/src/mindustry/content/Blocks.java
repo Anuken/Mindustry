@@ -1865,16 +1865,15 @@ public class Blocks{
         //erekir transport blocks
 
         duct = new Duct("duct"){{
-            requirements(Category.distribution, with(Items.graphite, 1));
+            requirements(Category.distribution, with(Items.beryllium, 1));
             //TODO bad idea? should this just require 1 beryllium?
-            buildVisibility = BuildVisibility.berylliumOnly;
             health = 90;
             speed = 4f;
             researchCostMultiplier = 1f / 6f;
         }};
 
         ductRouter = new DuctRouter("duct-router"){{
-            requirements(Category.distribution, with(Items.graphite, 8, Items.beryllium, 4));
+            requirements(Category.distribution, with(Items.beryllium, 10));
             health = 90;
             speed = 4f;
             regionRotated1 = 1;
@@ -1882,6 +1881,7 @@ public class Blocks{
         }};
 
         overflowDuct = new OverflowDuct("overflow-duct"){{
+            //TODO should it use beryllium?
             requirements(Category.distribution, with(Items.graphite, 8, Items.beryllium, 8));
             health = 90;
             speed = 4f;
@@ -1889,7 +1889,7 @@ public class Blocks{
         }};
 
         ductBridge = new DuctBridge("duct-bridge"){{
-            requirements(Category.distribution, with(Items.graphite, 15, Items.beryllium, 10));
+            requirements(Category.distribution, with(Items.beryllium, 20));
             health = 90;
             speed = 4f;
             researchCostMultiplier = 0.3f;
@@ -2150,36 +2150,6 @@ public class Blocks{
             baseExplosiveness = 5f;
         }};
 
-        beamNode = new BeamNode("beam-node"){{
-            requirements(Category.power, with(Items.graphite, 5, Items.beryllium, 3));
-            consumesPower = outputsPower = true;
-            health = 90;
-            consumePowerBuffered(1000f);
-            range = 10;
-            researchCostMultiplier = 0.2f;
-        }};
-
-        //TODO requirements
-        beamTower = new BeamNode("beam-tower"){{
-            requirements(Category.power, with(Items.beryllium, 30, Items.oxide, 20, Items.silicon, 10));
-            size = 3;
-            consumesPower = outputsPower = true;
-            consumePowerBuffered(40000f);
-            range = 23;
-            scaledHealth = 90;
-        }};
-
-        beamLink = new LongPowerNode("beam-link"){{
-            requirements(Category.power, BuildVisibility.editorOnly, with());
-            size = 3;
-            maxNodes = 1;
-            laserRange = 1000f;
-            autolink = false;
-            laserColor2 = Color.valueOf("ffd9c2");
-            laserScale = 0.8f;
-            scaledHealth = 130;
-        }};
-
         combustionGenerator = new ConsumeGenerator("combustion-generator"){{
             requirements(Category.power, with(Items.copper, 25, Items.lead, 15));
             powerProduction = 1f;
@@ -2292,8 +2262,38 @@ public class Blocks{
 
         //erekir
 
+        beamNode = new BeamNode("beam-node"){{
+            requirements(Category.power, with(Items.beryllium, 8));
+            consumesPower = outputsPower = true;
+            health = 90;
+            consumePowerBuffered(1000f);
+            range = 10;
+            researchCostMultiplier = 0.2f;
+        }};
+
+        //TODO requirements
+        beamTower = new BeamNode("beam-tower"){{
+            requirements(Category.power, with(Items.beryllium, 30, Items.oxide, 20, Items.silicon, 10));
+            size = 3;
+            consumesPower = outputsPower = true;
+            consumePowerBuffered(40000f);
+            range = 23;
+            scaledHealth = 90;
+        }};
+
+        beamLink = new LongPowerNode("beam-link"){{
+            requirements(Category.power, BuildVisibility.editorOnly, with());
+            size = 3;
+            maxNodes = 1;
+            laserRange = 1000f;
+            autolink = false;
+            laserColor2 = Color.valueOf("ffd9c2");
+            laserScale = 0.8f;
+            scaledHealth = 130;
+        }};
+
         turbineCondenser = new ThermalGenerator("turbine-condenser"){{
-            requirements(Category.power, with(Items.graphite, 40, Items.beryllium, 40));
+            requirements(Category.power, with(Items.beryllium, 60));
             attribute = Attribute.steam;
             displayEfficiencyScale = 1f / 9f;
             minEfficiency = 9f - 0.0001f;
@@ -2509,7 +2509,7 @@ public class Blocks{
         }};
 
         plasmaBore = new BeamDrill("plasma-bore"){{
-            requirements(Category.production, with(Items.graphite, 20, Items.beryllium, 30));
+            requirements(Category.production, with(Items.beryllium, 40));
             consumePower(0.15f);
             drillTime = 160f;
             tier = 3;

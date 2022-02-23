@@ -486,7 +486,6 @@ public class Weapon implements Cloneable{
         cellRegion = Core.atlas.find(name + "-cell");
         outlineRegion = Core.atlas.find(name + "-outline");
 
-        //TODO outlinedRegions
         for(var part : parts){
             part.turretShading = false;
             part.load(name);

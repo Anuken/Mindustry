@@ -13,10 +13,10 @@ public class PowerGraph{
     private static final IntSet closedSet = new IntSet();
 
     //do not modify any of these unless you know what you're doing!
-    public final Seq<Building> producers = new Seq<>(false);
-    public final Seq<Building> consumers = new Seq<>(false);
-    public final Seq<Building> batteries = new Seq<>(false);
-    public final Seq<Building> all = new Seq<>(false);
+    public final Seq<Building> producers = new Seq<>(false, 16, Building.class);
+    public final Seq<Building> consumers = new Seq<>(false, 16, Building.class);
+    public final Seq<Building> batteries = new Seq<>(false, 16, Building.class);
+    public final Seq<Building> all = new Seq<>(false, 16, Building.class);
 
     private final PowerGraphUpdater entity;
     private final WindowedMean powerBalance = new WindowedMean(60);
@@ -86,7 +86,9 @@ public class PowerGraph{
 
     public float getPowerProduced(){
         float powerProduced = 0f;
-        for(Building producer : producers){
+        var items = producers.items;
+        for(int i = 0; i < producers.size; i++){
+            var producer = items[i];
             powerProduced += producer.getPowerProduction() * producer.delta();
         }
         return powerProduced;
@@ -94,8 +96,10 @@ public class PowerGraph{
 
     public float getPowerNeeded(){
         float powerNeeded = 0f;
-        for(Building consumer : consumers){
-            ConsumePower consumePower = consumer.block.consPower;
+        var items = consumers.items;
+        for(int i = 0; i < consumers.size; i++){
+            var consumer = items[i];
+            var consumePower = consumer.block.consPower;
             if(otherConsumersAreValid(consumer, consumePower)){
                 powerNeeded += consumePower.requestedPower(consumer) * consumer.delta();
             }
@@ -105,7 +109,9 @@ public class PowerGraph{
 
     public float getBatteryStored(){
         float totalAccumulator = 0f;
-        for(Building battery : batteries){
+        var items = batteries.items;
+        for(int i = 0; i < batteries.size; i++){
+            var battery = items[i];
             if(battery.enabled){
                 totalAccumulator += battery.power.status * battery.block.consPower.capacity;
             }
@@ -115,7 +121,9 @@ public class PowerGraph{
 
     public float getBatteryCapacity(){
         float totalCapacity = 0f;
-        for(Building battery : batteries){
+        var items = batteries.items;
+        for(int i = 0; i < batteries.size; i++){
+            var battery = items[i];
             if(battery.enabled){
                 totalCapacity += (1f - battery.power.status) * battery.block.consPower.capacity;
             }
@@ -125,7 +133,9 @@ public class PowerGraph{
 
     public float getTotalBatteryCapacity(){
         float totalCapacity = 0f;
-        for(Building battery : batteries){
+        var items = batteries.items;
+        for(int i = 0; i < batteries.size; i++){
+            var battery = items[i];
             if(battery.enabled){
                 totalCapacity += battery.block.consPower.capacity;
             }
@@ -139,7 +149,9 @@ public class PowerGraph{
 
         float used = Math.min(stored, needed);
         float consumedPowerPercentage = Math.min(1.0f, needed / stored);
-        for(Building battery : batteries){
+        var items = batteries.items;
+        for(int i = 0; i < batteries.size; i++){
+            var battery = items[i];
             if(battery.enabled){
                 battery.power.status *= (1f-consumedPowerPercentage);
             }
@@ -153,7 +165,9 @@ public class PowerGraph{
         float chargedPercent = Math.min(excess/capacity, 1f);
         if(Mathf.equal(capacity, 0f)) return 0f;
 
-        for(Building battery : batteries){
+        var items = batteries.items;
+        for(int i = 0; i < batteries.size; i++){
+            var battery = items[i];
             //TODO why would it be 0
             if(battery.enabled && battery.block.consPower.capacity > 0f){
                 battery.power.status += (1f - battery.power.status) * chargedPercent;
@@ -165,9 +179,11 @@ public class PowerGraph{
     public void distributePower(float needed, float produced, boolean charged){
         //distribute even if not needed. this is because some might be requiring power but not using it; it updates consumers
         float coverage = Mathf.zero(needed) && Mathf.zero(produced) && !charged && Mathf.zero(lastPowerStored) ? 0f : Mathf.zero(needed) ? 1f : Math.min(1, produced / needed);
-        for(Building consumer : consumers){
+        var items = consumers.items;
+        for(int i = 0; i < consumers.size; i++){
+            var consumer = items[i];
             //TODO how would it even be null
-            ConsumePower cons = consumer.block.consPower;
+            var cons = consumer.block.consPower;
             if(cons.buffered){
                 if(!Mathf.zero(cons.capacity)){
                     // Add an equal percentage of power to all buffers, based on the global power coverage in this graph
