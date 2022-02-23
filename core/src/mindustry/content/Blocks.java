@@ -3354,14 +3354,14 @@ public class Blocks{
             targetAir = false;
             shootShake = 4f;
             recoilAmount = 1f;
-            reloadTime = 60f * 2f;
+            reloadTime = 60f * 2.3f;
             shootLength = 7f;
             rotateSpeed = 1.4f;
             minWarmup = 0.85f;
             shootWarmupSpeed = 0.07f;
 
             coolant = consume(new ConsumeLiquid(Liquids.water, 30f / 60f));
-            coolantMultiplier = 2.5f;
+            coolantMultiplier = 1.5f;
 
             draw = new DrawTurret("reinforced-"){{
                 parts.addAll(

@@ -479,7 +479,7 @@ public class UnitTypes{
                     despawnEffect = Fx.smokeCloud;
                     smokeEffect = Fx.none;
 
-                    shootEffect = Fx.greenLaserChargeSmall;
+                    chargeEffect = Fx.greenLaserChargeSmall;
 
                     incendChance = 0.1f;
                     incendSpread = 5f;
@@ -566,7 +566,7 @@ public class UnitTypes{
                     largeHit = true;
                     lightColor = lightningColor = Pal.heal;
 
-                    shootEffect = Fx.greenLaserCharge;
+                    chargeEffect = Fx.greenLaserCharge;
 
                     healPercent = 25f;
                     collidesTeam = true;
@@ -1209,7 +1209,7 @@ public class UnitTypes{
                 shadow = 7f;
                 rotate = true;
                 recoil = 0.5f;
-
+                shootY = 7.25f;
                 bullet = fragBullet;
             }},
             new Weapon("large-artillery"){{
@@ -1222,6 +1222,7 @@ public class UnitTypes{
                 shootSound = Sounds.shoot;
                 rotate = true;
                 shadow = 12f;
+                shootY = 7.25f;
                 bullet = fragBullet;
             }});
         }};
@@ -2481,6 +2482,8 @@ public class UnitTypes{
                 heatColor = Color.valueOf("f9350f");
                 cooldownTime = 30f;
 
+                shots = 2;
+
                 bullet = new BasicBulletType(5f, 50){{
                     sprite = "missile-large";
                     smokeEffect = Fx.shootBigSmoke;
@@ -2887,11 +2890,11 @@ public class UnitTypes{
 
                 x = 43 / 4f;
                 y = -20f / 4f;
-                shootY = 39 / 4f;
+                shootY = 37 / 4f;
                 shootX = -5f / 4f;
                 recoil = 3f;
                 reload = 30f;
-                shake = 3f;
+                shake = 2f;
                 cooldownTime = 20f;
                 layerOffset = 0.02f;
 

@@ -24,9 +24,6 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class Weapon implements Cloneable{
-    /** temporary weapon sequence number */
-    static int sequenceNum = 0;
-
     /** displayed weapon region */
     public String name;
     /** bullet shot */
@@ -276,7 +273,7 @@ public class Weapon implements Cloneable{
         mountY = unit.y + Angles.trnsy(unit.rotation - 90, x, y),
         bulletX = mountX + Angles.trnsx(weaponRotation, this.shootX, this.shootY),
         bulletY = mountY + Angles.trnsy(weaponRotation, this.shootX, this.shootY),
-        shootAngle = rotate ? unit.rotation + mount.rotation : Angles.angle(bulletX, bulletY, mount.aimX, mount.aimY) + (unit.rotation - unit.angleTo(mount.aimX, mount.aimY));
+        shootAngle = bulletRotation(unit, mount, bulletX, bulletY);
 
         //find a new target
         if(!controllable && autoTarget){
@@ -370,86 +367,62 @@ public class Weapon implements Cloneable{
         return Units.invalidateTarget(target, unit.team, x, y, range + Math.abs(shootY));
     }
 
-    protected Vec2 getShootPos(Unit unit, WeaponMount mount, Vec2 out){
-        float weaponRot = unit.rotation - 90 + (rotate ? mount.rotation : 0);
-        return out.set(unit.x, unit.y)
-        .add(Angles.trnsx(unit.rotation - 90, x, y), Angles.trnsy(unit.rotation - 90, x, y))
-        .add(Angles.trnsx(weaponRot, this.shootX, this.shootY), Angles.trnsx(weaponRot, this.shootX, this.shootY));
+    protected float bulletRotation(Unit unit, WeaponMount mount, float bulletX, float bulletY){
+        return rotate ? unit.rotation + mount.rotation : Angles.angle(bulletX, bulletY, mount.aimX, mount.aimY) + (unit.rotation - unit.angleTo(mount.aimX, mount.aimY));
     }
 
     protected void shoot(Unit unit, WeaponMount mount, float shootX, float shootY, float aimX, float aimY, float mountX, float mountY, float rotation, int side){
-        Vec2 offset = getShootPos(unit, mount, Tmp.v1);
-        float baseX = offset.x, baseY = offset.y, baseRot = unit.rotation + mount.rotation;
         boolean delay = firstShotDelay + shotDelay > 0f;
 
         float lifeScl = bullet.scaleVelocity ? Mathf.clamp(Mathf.dst(shootX, shootY, aimX, aimY) / bullet.range()) : 1f;
         Unit parent = bullet.keepVelocity || parentizeEffects ? unit : null;
 
-        //TODO far too complicated and similar to Turret
+        //TODO merge with Turret behavior
 
-        sequenceNum = 0;
+        //UnitTypes.eclipse.weapons.get(2).shotDelay = 4
+
         if(delay){
-            Angles.shotgun(shots, spacing, rotation, f -> {
-                Time.run(sequenceNum * shotDelay + firstShotDelay, () -> {
-                    if(!unit.isAdded()) return;
+            chargeSound.at(shootX, shootY, Mathf.random(soundPitchMin, soundPitchMax));
+            bullet.chargeEffect.at(shootX, shootY, rotation, parent);
 
-                    //TODO this is a flawed system, recalculate everything instead.
-                    getShootPos(unit, mount, offset).sub(baseX, baseY);
+            for(int i = 0; i < shots; i++){
+                float angleOffset = i * spacing - (shots - 1) * spacing / 2f;
 
-                    float rotOffset = unit.rotation + mount.rotation - baseRot;
-                    mount.bullet = bullet(unit, shootX + offset.x, shootY + offset.y, f + Mathf.range(inaccuracy) + rotOffset, lifeScl);
-                    if(!continuous){
-                        shootSound.at(shootX, shootY, Mathf.random(soundPitchMin, soundPitchMax));
-                    }
+                Time.run(i * shotDelay + firstShotDelay, () -> {
+                    //everything needs to be re-calculated again
+                    float
+                    rweaponRotation = unit.rotation - 90 + (rotate ? mount.rotation : 0),
+                    rmountX = unit.x + Angles.trnsx(unit.rotation - 90, x, y),
+                    rmountY = unit.y + Angles.trnsy(unit.rotation - 90, x, y),
+                    rbulletX = rmountX + Angles.trnsx(rweaponRotation, this.shootX, this.shootY),
+                    rbulletY = rmountY + Angles.trnsy(rweaponRotation, this.shootX, this.shootY),
+                    shootAngle = bulletRotation(unit, mount, rbulletX, rbulletY);
+
+                    mount.bullet = bullet(mount, unit, rbulletX, rbulletY, angleOffset + Mathf.range(inaccuracy) + shootAngle, lifeScl, side, rotation, rmountX, rmountY);
                 });
-                sequenceNum++;
-            });
+            }
         }else{
-            Angles.shotgun(shots, spacing, rotation, f -> mount.bullet = bullet(unit, shootX, shootY, f + Mathf.range(inaccuracy), lifeScl));
+            for(int i = 0; i < shots; i++){
+                float angleOffset = i * spacing - (shots - 1) * spacing / 2f;
+                mount.bullet = bullet(mount, unit, shootX, shootY, angleOffset + rotation + Mathf.range(inaccuracy), lifeScl, side, rotation, mountX, mountY);
+            }
         }
 
-        if(delay){
-            Time.run(firstShotDelay, () -> {
-                if(!unit.isAdded()) return;
-
-                unit.vel.add(Tmp.v1.trns(rotation + 180f, bullet.recoil));
-                Effect.shake(shake, shake, shootX, shootY);
-                mount.recoil = recoil;
-                mount.heat = 1f;
-                if(!continuous){
-                    shootSound.at(shootX, shootY, Mathf.random(soundPitchMin, soundPitchMax));
-                }
-
-                getShootPos(unit, mount, offset).sub(baseX, baseY);
-
-                bullet.chargeShootEffect.at(shootX + offset.x, shootY + offset.y, rotation, parent);
-            });
-        }else{
-            unit.vel.add(Tmp.v1.trns(rotation + 180f, bullet.recoil));
-            Effect.shake(shake, shake, shootX, shootY);
-            mount.recoil = recoil;
-            mount.heat = 1f;
-        }
-
-        (delay ? chargeSound : continuous ? Sounds.none : shootSound).at(shootX, shootY, Mathf.random(soundPitchMin, soundPitchMax));
-        effects(parent, mountX, mountY, shootX, shootY, rotation, side);
         unit.apply(shootStatus, shootStatusDuration);
     }
 
-    protected void effects(Unit parent, float mountX, float mountY, float shootX, float shootY, float rotation, int side){
-        ejectEffect.at(mountX, mountY, rotation * side);
-        bullet.shootEffect.at(shootX, shootY, rotation, bullet.hitColor, parent);
-        bullet.smokeEffect.at(shootX, shootY, rotation, bullet.hitColor, parent);
-    }
+    protected @Nullable Bullet bullet(WeaponMount mount, Unit unit, float shootX, float shootY, float angle, float lifescl, int side, float mountRotation, float mountX, float mountY){
+        if(!unit.isAdded()) return null;
 
-    protected @Nullable Bullet bullet(Unit unit, float shootX, float shootY, float angle, float lifescl){
         float
         xr = Mathf.range(xRand),
         x = shootX + Angles.trnsx(angle, 0, xr),
         y = shootY + Angles.trnsy(angle, 0, xr);
 
+        Bullet result = null;
+
         if(unitSpawned == null){
-            return bullet.create(unit, unit.team, x, y, angle, (1f - velocityRnd) + Mathf.random(velocityRnd), lifescl);
+            result =  bullet.create(unit, unit.team, x, y, angle, (1f - velocityRnd) + Mathf.random(velocityRnd), lifescl);
         }else{
             //don't spawn units clientside!
             if(!net.client()){
@@ -463,9 +436,23 @@ public class Weapon implements Cloneable{
                 }
                 spawned.add();
             }
-            //TODO assign AI target here?
-            return null;
         }
+
+        if(!continuous){
+            shootSound.at(shootX, shootY, Mathf.random(soundPitchMin, soundPitchMax));
+        }
+
+        //TODO mount pos is wrong
+        ejectEffect.at(mountX, mountY, angle * side);
+        bullet.shootEffect.at(shootX, shootY, angle, bullet.hitColor, unit);
+        bullet.smokeEffect.at(shootX, shootY, angle, bullet.hitColor, unit);
+
+        unit.vel.add(Tmp.v1.trns(mountRotation + 180f, bullet.recoil));
+        Effect.shake(shake, shake, shootX, shootY);
+        mount.recoil = recoil;
+        mount.heat = 1f;
+
+        return result;
     }
 
     public Weapon copy(){

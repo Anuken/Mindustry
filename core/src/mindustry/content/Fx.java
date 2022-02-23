@@ -1515,7 +1515,7 @@ public class Fx{
         color(Color.white, e.color, e.fin());
 
         rand.setSeed(e.id);
-        for(int i = 0; i < 10; i++){
+        for(int i = 0; i < 8; i++){
             float rot = e.rotation + rand.range(22f);
             v.trns(rot, rand.random(e.finpow() * 24f));
             Fill.poly(e.x + v.x, e.y + v.y, 4, e.fout() * 3.8f + 0.2f, rand.random(360f));
