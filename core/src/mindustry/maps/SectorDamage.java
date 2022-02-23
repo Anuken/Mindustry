@@ -282,7 +282,7 @@ public class SectorDamage{
 
         //block dps + regen + extra health/shields
         for(Building build : Groups.build){
-            float e = build.efficiency();
+            float e = build.efficiency;
             if(e > 0.08f){
                 if(build.team == state.rules.defaultTeam && build instanceof Ranged ranged && sparse.contains(t -> t.within(build, ranged.range() + 4*tilesize))){
                     //TODO make sure power turret network supports the turrets?

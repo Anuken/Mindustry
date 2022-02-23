@@ -73,9 +73,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     transient boolean wasVisible; //used only by the block renderer when fog is on
     transient float visualLiquid;
 
-    //TODO save efficiency too!
-    //transient boolean consValid;
-
     @Nullable PowerModule power;
     @Nullable ItemModule items;
     @Nullable LiquidModule liquids;
@@ -167,14 +164,17 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         write.f(health);
         write.b(rotation | 0b10000000);
         write.b(team.id);
-        write.b(2); //version
+        write.b(3); //version
         write.b(enabled ? 1 : 0);
         //write presence of items/power/liquids/cons, so removing/adding them does not corrupt future saves.
         write.b(moduleBitmask());
         if(items != null) items.write(write);
         if(power != null) power.write(write);
         if(liquids != null) liquids.write(write);
-        write.bool(false);
+
+        //efficiency is written as two bytes to save space
+        write.b((byte)(Mathf.clamp(efficiency) * 255f));
+        write.b((byte)(Mathf.clamp(optionalEfficiency) * 255f));
     }
 
     public final void readBase(Reads read){
@@ -187,13 +187,14 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         int moduleBits = moduleBitmask();
         boolean legacy = true;
+        byte version = 0;
 
         //TODO new version with efficiency instead of consValid
 
         //new version
         if((rot & 0b10000000) != 0){
-            byte ver = read.b(); //version of entity save
-            if(ver >= 1){
+            version = read.b(); //version of entity save
+            if(version >= 1){
                 byte on = read.b();
                 this.enabled = on == 1;
                 if(!this.enabled){
@@ -202,7 +203,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             }
 
             //get which modules should actually be read; this was added in version 2
-            if(ver >= 2){
+            if(version >= 2){
                 moduleBits = read.b();
             }
             legacy = false;
@@ -211,7 +212,15 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if((moduleBits & 1) != 0) (items == null ? new ItemModule() : items).read(read, legacy);
         if((moduleBits & 2) != 0) (power == null ? new PowerModule() : power).read(read, legacy);
         if((moduleBits & 4) != 0) (liquids == null ? new LiquidModule() : liquids).read(read, legacy);
-        if((moduleBits & 8) != 0) read.bool();
+
+        //unnecessary consume module read in version 2
+        if(version == 2) read.bool();
+
+        //version 3 has efficiency numbers instead of bools
+        if(version >= 3){
+            efficiency = read.ub() / 255f;
+            optionalEfficiency = read.ub() / 255f;
+        }
     }
 
     public int moduleBitmask(){
@@ -1680,7 +1689,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     /** @return ambient sound volume scale. */
     public float ambientVolume(){
-        return efficiency();
+        return efficiency;
     }
 
     //endregion
@@ -1751,7 +1760,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             case team -> team.id;
             case health -> health;
             case maxHealth -> maxHealth;
-            case efficiency -> efficiency();
+            case efficiency -> efficiency;
             case timescale -> timeScale;
             case range -> this instanceof Ranged r ? r.range() / tilesize : 0;
             case rotation -> rotation;
