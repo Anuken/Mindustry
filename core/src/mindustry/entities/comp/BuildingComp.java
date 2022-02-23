@@ -70,7 +70,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     transient float enabledControlTime;
     transient String lastAccessed;
     transient boolean wasDamaged; //used only by the indexer
-    transient boolean wasVisible; //used only by the block renderer when fog is on
+    transient boolean wasVisible; //used only by the block renderer when fog is on (TODO replace with discovered check?)
     transient float visualLiquid;
 
     @Nullable PowerModule power;
@@ -78,9 +78,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     @Nullable LiquidModule liquids;
 
     /** Base efficiency. Takes the minimum value of all consumers. */
-    transient float efficiency = 1f;
+    transient float efficiency;
     /** Same as efficiency, but for optional consumers only. */
-    transient float optionalEfficiency = 1f;
+    transient float optionalEfficiency;
 
     public transient float healSuppressionTime = -1f;
     public transient float lastHealTime = -120f * 10f;
@@ -189,8 +189,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         boolean legacy = true;
         byte version = 0;
 
-        //TODO new version with efficiency instead of consValid
-
         //new version
         if((rot & 0b10000000) != 0){
             version = read.b(); //version of entity save
@@ -213,8 +211,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if((moduleBits & 2) != 0) (power == null ? new PowerModule() : power).read(read, legacy);
         if((moduleBits & 4) != 0) (liquids == null ? new LiquidModule() : liquids).read(read, legacy);
 
-        //unnecessary consume module read in version 2
-        if(version == 2) read.bool();
+        //unnecessary consume module read in version 2 and below
+        if(version <= 2) read.bool();
 
         //version 3 has efficiency numbers instead of bools
         if(version >= 3){
@@ -1765,7 +1763,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             case range -> this instanceof Ranged r ? r.range() / tilesize : 0;
             case rotation -> rotation;
             case totalItems -> items == null ? 0 : items.total();
-            //TODO will give wildly fluctuating amounts due to switching of current() for multi-liquid blocks. totalLiquids is inherently bad design, but unfortunately it is useful for conduits/tanks
+            //totalLiquids is inherently bad design, but unfortunately it is useful for conduits/tanks
             case totalLiquids -> liquids == null ? 0 : liquids.currentAmount();
             case totalPower -> power == null || block.consPower == null ? 0 : power.status * (block.consPower.buffered ? block.consPower.capacity : 1f);
             case itemCapacity -> block.hasItems ? block.itemCapacity : 0;
@@ -1893,7 +1891,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             }
         }
 
-        //TODO updating consumption is not necessary for every building, e.g. conveyors should not have it
         updateConsumption();
 
         //TODO just handle per-block instead

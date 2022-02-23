@@ -3360,6 +3360,7 @@ public class Blocks{
             shootWarmupSpeed = 0.07f;
 
             coolant = consume(new ConsumeLiquid(Liquids.water, 30f / 60f));
+            coolantMultiplier = 2.5f;
 
             draw = new DrawTurret("reinforced-"){{
                 parts.addAll(
