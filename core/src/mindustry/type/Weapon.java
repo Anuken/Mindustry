@@ -377,9 +377,7 @@ public class Weapon implements Cloneable{
         float lifeScl = bullet.scaleVelocity ? Mathf.clamp(Mathf.dst(shootX, shootY, aimX, aimY) / bullet.range()) : 1f;
         Unit parent = bullet.keepVelocity || parentizeEffects ? unit : null;
 
-        //TODO merge with Turret behavior
-
-        //UnitTypes.eclipse.weapons.get(2).shotDelay = 4
+        //TODO merge with Turret behavior if possible
 
         if(delay){
             chargeSound.at(shootX, shootY, Mathf.random(soundPitchMin, soundPitchMax));
@@ -422,7 +420,7 @@ public class Weapon implements Cloneable{
         Bullet result = null;
 
         if(unitSpawned == null){
-            result =  bullet.create(unit, unit.team, x, y, angle, (1f - velocityRnd) + Mathf.random(velocityRnd), lifescl);
+            result = bullet.create(unit, unit.team, x, y, angle, (1f - velocityRnd) + Mathf.random(velocityRnd), lifescl);
         }else{
             //don't spawn units clientside!
             if(!net.client()){
@@ -442,7 +440,6 @@ public class Weapon implements Cloneable{
             shootSound.at(shootX, shootY, Mathf.random(soundPitchMin, soundPitchMax));
         }
 
-        //TODO mount pos is wrong
         ejectEffect.at(mountX, mountY, angle * side);
         bullet.shootEffect.at(shootX, shootY, angle, bullet.hitColor, unit);
         bullet.smokeEffect.at(shootX, shootY, angle, bullet.hitColor, unit);

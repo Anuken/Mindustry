@@ -286,6 +286,8 @@ public class Block extends UnlockableContent implements Senseable{
     public float researchCostMultiplier = 1;
     /** Cost multipliers per-item. */
     public ObjectFloatMap<Item> researchCostMultipliers = new ObjectFloatMap<>();
+    /** Override for research cost. Uses multipliers above and building requirements if not set. */
+    public @Nullable ItemStack[] researchCost;
     /** Whether this block has instant transfer.*/
     public boolean instantTransfer = false;
     /** Whether you can rotate this block after it is placed. */
@@ -988,6 +990,7 @@ public class Block extends UnlockableContent implements Senseable{
 
     @Override
     public ItemStack[] researchRequirements(){
+        if(researchCost != null) return researchCost;
         if(researchCostMultiplier <= 0f) return ItemStack.empty;
         ItemStack[] out = new ItemStack[requirements.length];
         for(int i = 0; i < out.length; i++){
