@@ -24,7 +24,7 @@ public class LightningBulletType extends BulletType{
     }
 
     @Override
-    public float range(){
+    protected float calculateRange(){
         return (lightningLength + lightningLengthRand/2f) * 6f;
     }
 

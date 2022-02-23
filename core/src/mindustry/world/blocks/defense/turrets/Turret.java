@@ -512,7 +512,6 @@ public class Turret extends ReloadTurret{
                     recoil = recoilAmount;
                     heat = 1f;
                     bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy));
-                    effects();
                     charging = false;
                 });
 
@@ -525,7 +524,6 @@ public class Turret extends ReloadTurret{
 
                         bulletOffset.trns(rotation, shootLength, Mathf.range(xRand));
                         bullet(peekAmmo(), rotation + Mathf.range(inaccuracy + peekAmmo().inaccuracy) + (ii - (int)(shots / 2f)) * spread);
-                        effects();
                         useAmmo();
                         recoil = recoilAmount;
                         heat = 1f;
@@ -544,7 +542,6 @@ public class Turret extends ReloadTurret{
                         bulletOffset.trns(rotation - 90, (spread) * i + Mathf.range(xRand), shootLength);
                         bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy));
                         shotCounter ++;
-                        effects();
                     }
                 }else{
                     bulletOffset.trns(rotation, shootLength, Mathf.range(xRand));
@@ -553,7 +550,6 @@ public class Turret extends ReloadTurret{
                         bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy) + (i - (int)(shots / 2f)) * spread);
                         shotCounter ++;
                     }
-                    effects();
                 }
 
                 recoil = recoilAmount;
@@ -563,9 +559,10 @@ public class Turret extends ReloadTurret{
         }
 
         protected void bullet(BulletType type, float angle){
-            float lifeScl = type.scaleVelocity ? Mathf.clamp(Mathf.dst(x + bulletOffset.x, y + bulletOffset.y, targetPos.x, targetPos.y) / type.range(), minRange / type.range(), range() / type.range()) : 1f;
+            float lifeScl = type.scaleVelocity ? Mathf.clamp(Mathf.dst(x + bulletOffset.x, y + bulletOffset.y, targetPos.x, targetPos.y) / type.range, minRange / type.range, range() / type.range) : 1f;
 
             type.create(this, team, x + bulletOffset.x, y + bulletOffset.y, angle, 1f + Mathf.range(velocityInaccuracy), lifeScl);
+            effects();
         }
 
         protected void effects(){

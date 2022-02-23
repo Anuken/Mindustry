@@ -3019,24 +3019,24 @@ public class UnitTypes{
                     shake = 1f;
                     speed = 0f;
                     keepVelocity = false;
-                }};
 
-                unitSpawned = new MissileUnitType("quell-missile"){{
-                    speed = 3.8f;
-                    maxRange = 6f;
-                    lifetime = 60f * 1.2f;
-                    outlineColor = Pal.darkOutline;
-                    health = 45;
+                    spawnUnit = new MissileUnitType("quell-missile"){{
+                        speed = 3.8f;
+                        maxRange = 6f;
+                        lifetime = 60f * 1.2f;
+                        outlineColor = Pal.darkOutline;
+                        health = 45;
 
-                    weapons.add(new Weapon(){{
-                        shootCone = 360f;
-                        mirror = false;
-                        reload = 1f;
-                        shootOnDeath = true;
-                        bullet = new ExplosionBulletType(100f, 22f){{
-                            shootEffect = Fx.massiveExplosion;
-                        }};
-                    }});
+                        weapons.add(new Weapon(){{
+                            shootCone = 360f;
+                            mirror = false;
+                            reload = 1f;
+                            shootOnDeath = true;
+                            bullet = new ExplosionBulletType(100f, 22f){{
+                                shootEffect = Fx.massiveExplosion;
+                            }};
+                        }});
+                    }};
                 }};
             }});
 
@@ -3124,62 +3124,62 @@ public class UnitTypes{
                     shake = 1f;
                     speed = 0f;
                     keepVelocity = false;
-                }};
 
-                unitSpawned = new MissileUnitType("disrupt-missile"){{
-                    speed = 4.5f;
-                    maxRange = 5f;
-                    outlineColor = Pal.darkOutline;
-                    health = 70;
-                    homingDelay = 10f;
-                    lowAltitude = true;
-                    engineSize = 3f;
-                    deathExplosionEffect = Fx.none;
+                    spawnUnit = new MissileUnitType("disrupt-missile"){{
+                        speed = 4.5f;
+                        maxRange = 5f;
+                        outlineColor = Pal.darkOutline;
+                        health = 70;
+                        homingDelay = 10f;
+                        lowAltitude = true;
+                        engineSize = 3f;
+                        deathExplosionEffect = Fx.none;
 
-                    parts.add(new ShapePart(){{
-                        layer = Layer.effect;
-                        circle = true;
-                        y = -0.25f;
-                        radius = 1.5f;
-                        color = Pal.suppress;
-                        colorTo = Color.white;
-                        progress = PartProgress.life.curve(Interp.pow5In);
-                    }});
+                        parts.add(new ShapePart(){{
+                            layer = Layer.effect;
+                            circle = true;
+                            y = -0.25f;
+                            radius = 1.5f;
+                            color = Pal.suppress;
+                            colorTo = Color.white;
+                            progress = PartProgress.life.curve(Interp.pow5In);
+                        }});
 
-                    parts.add(new RegionPart("-fin"){{
-                        mirror = true;
-                        progress = PartProgress.life.mul(3f).curve(Interp.pow5In);
-                        moveRot = 32f;
-                        rotation = -6f;
-                        moveY = 1.5f;
-                        x = 3f / 4f;
-                        y = -6f / 4f;
-                    }});
+                        parts.add(new RegionPart("-fin"){{
+                            mirror = true;
+                            progress = PartProgress.life.mul(3f).curve(Interp.pow5In);
+                            moveRot = 32f;
+                            rotation = -6f;
+                            moveY = 1.5f;
+                            x = 3f / 4f;
+                            y = -6f / 4f;
+                        }});
 
-                    weapons.add(new Weapon(){{
-                        shootCone = 360f;
-                        mirror = false;
-                        reload = 1f;
-                        shootOnDeath = true;
-                        bullet = new ExplosionBulletType(120f, 25f){{
-                            suppressionRange = 140f;
-                            shootEffect = new ExplosionEffect(){{
-                                lifetime = 50f;
-                                waveStroke = 5f;
-                                waveLife = 8f;
-                                waveColor = Color.white;
-                                sparkColor = smokeColor = Pal.suppress;
-                                waveRad = 40f;
-                                smokeSize = 4f;
-                                smokes = 7;
-                                smokeSizeBase = 0f;
-                                sparks = 10;
-                                sparkRad = 40f;
-                                sparkLen = 6f;
-                                sparkStroke = 2f;
+                        weapons.add(new Weapon(){{
+                            shootCone = 360f;
+                            mirror = false;
+                            reload = 1f;
+                            shootOnDeath = true;
+                            bullet = new ExplosionBulletType(120f, 25f){{
+                                suppressionRange = 140f;
+                                shootEffect = new ExplosionEffect(){{
+                                    lifetime = 50f;
+                                    waveStroke = 5f;
+                                    waveLife = 8f;
+                                    waveColor = Color.white;
+                                    sparkColor = smokeColor = Pal.suppress;
+                                    waveRad = 40f;
+                                    smokeSize = 4f;
+                                    smokes = 7;
+                                    smokeSizeBase = 0f;
+                                    sparks = 10;
+                                    sparkRad = 40f;
+                                    sparkLen = 6f;
+                                    sparkStroke = 2f;
+                                }};
                             }};
-                        }};
-                    }});
+                        }});
+                    }};
                 }};
             }});
 
