@@ -19,7 +19,8 @@ public class Sorter extends Block{
 
     public Sorter(String name){
         super(name);
-        update = true;
+        update = false;
+        destructible = true;
         solid = true;
         instantTransfer = true;
         group = BlockGroup.transportation;

@@ -16,7 +16,8 @@ public class OverflowGate extends Block{
         super(name);
         hasItems = true;
         solid = true;
-        update = true;
+        update = false;
+        destructible = true;
         group = BlockGroup.transportation;
         instantTransfer = true;
         unloadable = false;

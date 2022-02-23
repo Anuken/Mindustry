@@ -24,6 +24,9 @@ public class Battery extends PowerDistributor{
         flags = EnumSet.of(BlockFlag.battery);
         //TODO could be supported everywhere...
         envEnabled |= Env.space;
+        destructible = true;
+        //batteries don't need to update
+        update = false;
     }
 
     public class BatteryBuild extends Building{

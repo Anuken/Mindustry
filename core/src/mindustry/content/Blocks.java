@@ -1008,6 +1008,7 @@ public class Blocks{
             outputsLiquid = true;
             envEnabled = Env.any;
             drawer = new DrawMixer(true);
+            liquidCapacity = 24f;
 
             consumePower(1f);
             consumeItem(Items.titanium);
@@ -2018,7 +2019,7 @@ public class Blocks{
         }};
 
         liquidJunction = new LiquidJunction("liquid-junction"){{
-            requirements(Category.liquid, with(Items.graphite, 2, Items.metaglass, 2));
+            requirements(Category.liquid, with(Items.graphite, 4, Items.metaglass, 8));
         }};
 
         bridgeConduit = new LiquidBridge("bridge-conduit"){{

@@ -46,6 +46,10 @@ public class PowerNode extends PowerBlock{
         schematicPriority = -10;
         drawDisabled = false;
         envEnabled |= Env.space;
+        destructible = true;
+
+        //nodes do not even need to update
+        update = false;
 
         config(Integer.class, (entity, value) -> {
             PowerModule power = entity.power;
