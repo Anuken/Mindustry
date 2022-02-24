@@ -11,7 +11,14 @@ public enum LogicRule{
     unitCap,
     mapArea,
     lighting,
-    ambientLight;
+    ambientLight,
+
+    //team specific
+    buildSpeed,
+    unitBuildSpeed,
+    unitDamage,
+    blockHealth,
+    blockDamage;
 
     public static final LogicRule[] all = values();
 }

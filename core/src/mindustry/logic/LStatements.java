@@ -1237,12 +1237,19 @@ public class LStatements{
     @RegisterStatement("setrule")
     public static class SetRuleStatement extends LStatement{
         public LogicRule rule = LogicRule.waveSpacing;
-        public String value = "100", p1 = "0", p2 = "0", p3 = "100", p4 = "100";
+        public String value = "10", p1 = "0", p2 = "0", p3 = "100", p4 = "100";
 
         @Override
         public void build(Table table){
             rebuild(table);
         }
+
+        /*
+        unitBuildSpeed,
+    unitDamage,
+    blockHealth,
+    blockDamage
+         */
 
         void rebuild(Table table){
             table.clearChildren();
@@ -1253,19 +1260,31 @@ public class LStatements{
                     rule = o;
                     rebuild(table);
                 }, 2, c -> c.width(150f)));
-            }, Styles.logict, () -> {}).size(160f, 40f).pad(4f).color(table.color);
-
-            table.add(" = ");
+            }, Styles.logict, () -> {}).size(160f, 40f).margin(5f).pad(4f).color(table.color);
 
             switch(rule){
                 case mapArea -> {
+                    table.add(" = ");
+
                     fields(table, "x", p1, s -> p1 = s);
                     fields(table, "y", p2, s -> p2 = s);
                     row(table);
                     fields(table, "w", p3, s -> p3 = s);
                     fields(table, "h", p4, s -> p4 = s);
                 }
+                case buildSpeed, unitBuildSpeed, unitDamage, blockHealth, blockDamage -> {
+                    if(p1.equals("0")){
+                        p1 = "@sharded";
+                    }
+
+                    fields(table, "of", p1, s -> p1 = s);
+                    table.add(" = ");
+                    row(table);
+                    field(table, value, s -> value = s);
+                }
                 default -> {
+                    table.add(" = ");
+
                     field(table, value, s -> value = s);
                 }
             }

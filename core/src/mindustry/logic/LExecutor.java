@@ -1299,6 +1299,18 @@ public class LExecutor{
                     }
                 }
                 case ambientLight -> state.rules.ambientLight.fromDouble(exec.num(value));
+                case unitBuildSpeed, unitDamage, blockHealth, blockDamage, buildSpeed -> {
+                    if(exec.obj(p1) instanceof Team team){
+                        float num = exec.numf(value);
+                        switch(rule){
+                            case buildSpeed -> team.rules().buildSpeedMultiplier = Mathf.clamp(num, 0.001f, 50f);
+                            case unitBuildSpeed -> team.rules().unitBuildSpeedMultiplier = Mathf.clamp(num, 0f, 50f);
+                            case unitDamage -> team.rules().unitDamageMultiplier = Math.max(num, 0f);
+                            case blockHealth -> team.rules().blockHealthMultiplier = Math.max(num, 0.001f);
+                            case blockDamage -> team.rules().blockDamageMultiplier = Math.max(num, 0f);
+                        }
+                    }
+                }
             }
         }
     }

@@ -150,14 +150,17 @@ public class PhysicsProcess implements AsyncProcess{
                 trees[i].clear();
             }
 
-            for(int i = 0; i < bodies.size; i++){
-                PhysicsBody body = bodies.items[i];
+            var bodyItems = bodies.items;
+            int bodySize = bodies.size;
+
+            for(int i = 0; i < bodySize; i++){
+                PhysicsBody body = bodyItems[i];
                 body.collided = false;
                 trees[body.layer].insert(body);
             }
 
-            for(int i = 0; i < bodies.size; i++){
-                PhysicsBody body = bodies.items[i];
+            for(int i = 0; i < bodySize; i++){
+                PhysicsBody body = bodyItems[i];
 
                 //for clients, the only body that collides is the local one; all other physics simulations are handled by the server.
                 if(!body.local) continue;
@@ -166,9 +169,11 @@ public class PhysicsProcess implements AsyncProcess{
 
                 seq.size = 0;
                 trees[body.layer].intersect(rect, seq);
+                int size = seq.size;
+                var items = seq.items;
 
-                for(int j = 0; j < seq.size; j++){
-                    PhysicsBody other = seq.items[j];
+                for(int j = 0; j < size; j++){
+                    PhysicsBody other = items[j];
 
                     if(other == body || other.collided) continue;
 

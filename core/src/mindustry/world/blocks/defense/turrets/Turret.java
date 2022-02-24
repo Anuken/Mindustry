@@ -178,7 +178,7 @@ public class Turret extends ReloadTurret{
     }
 
     public class TurretBuild extends ReloadTurretBuild implements ControlBlock{
-        //TODO storing these as instance variables is bad design, but it's probably too late to change everything
+        //TODO storing these as instance variables is horrible design
         /** Turret sprite offset, based on recoil. Updated every frame. */
         public Vec2 recoilOffset = new Vec2();
         /** Turret bullet position offset. Updated every frame. */
@@ -559,27 +559,28 @@ public class Turret extends ReloadTurret{
         }
 
         protected void bullet(BulletType type, float angle){
-            float lifeScl = type.scaleVelocity ? Mathf.clamp(Mathf.dst(x + bulletOffset.x, y + bulletOffset.y, targetPos.x, targetPos.y) / type.range, minRange / type.range, range() / type.range) : 1f;
+            float bulletX = x + bulletOffset.x, bulletY = y + bulletOffset.y;
+            float lifeScl = type.scaleVelocity ? Mathf.clamp(Mathf.dst(bulletX, bulletY, targetPos.x, targetPos.y) / type.range, minRange / type.range, range() / type.range) : 1f;
 
-            type.create(this, team, x + bulletOffset.x, y + bulletOffset.y, angle, 1f + Mathf.range(velocityInaccuracy), lifeScl);
-            effects();
-        }
+            handleBullet(type.create(this, team, bulletX, bulletY, angle, 1f + Mathf.range(velocityInaccuracy), lifeScl));
 
-        protected void effects(){
-            var bullet = peekAmmo();
             //TODO "shoot" and "smoke" should just be MultiEffects there's no reason to have them separate
-            Effect fshootEffect = shootEffect == Fx.none ? bullet.shootEffect : shootEffect;
-            Effect fsmokeEffect = smokeEffect == Fx.none ? bullet.smokeEffect : smokeEffect;
+            Effect fshootEffect = shootEffect == Fx.none ? type.shootEffect : shootEffect;
+            Effect fsmokeEffect = smokeEffect == Fx.none ? type.smokeEffect : smokeEffect;
 
-            fshootEffect.at(x + bulletOffset.x, y + bulletOffset.y, rotation, bullet.hitColor);
-            fsmokeEffect.at(x + bulletOffset.x, y + bulletOffset.y, rotation, bullet.hitColor);
-            shootSound.at(x + bulletOffset.x, y + bulletOffset.y, Mathf.random(0.9f, 1.1f));
+            fshootEffect.at(bulletX, bulletY, rotation, type.hitColor);
+            fsmokeEffect.at(bulletX, bulletY, rotation, type.hitColor);
+            shootSound.at(bulletX, bulletY, Mathf.random(0.9f, 1.1f));
 
             if(shootShake > 0){
                 Effect.shake(shootShake, shootShake, this);
             }
 
             recoil = recoilAmount;
+        }
+
+        protected void handleBullet(@Nullable Bullet bullet){
+
         }
 
         protected void ejectEffects(){
