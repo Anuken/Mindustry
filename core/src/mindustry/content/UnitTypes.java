@@ -967,7 +967,7 @@ public class UnitTypes{
             targetAir = false;
             targetFlags = new BlockFlag[]{BlockFlag.generator, null};
             hitSize = 7;
-            itemCapacity = 15;
+            itemCapacity = 0;
 
             weapons.add(new Weapon(){{
                 y = 0f;

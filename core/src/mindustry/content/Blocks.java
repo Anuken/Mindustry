@@ -2157,6 +2157,7 @@ public class Blocks{
 
             ambientSound = Sounds.smelter;
             ambientSoundVolume = 0.03f;
+            generateEffect = Fx.generatespark;
 
             consume(new ConsumeItemFlammable());
             consume(new ConsumeItemExplode());
@@ -2183,6 +2184,7 @@ public class Blocks{
             hasLiquids = true;
             size = 2;
             drawer.iconOverride = new String[]{"", "-turbine0", "-turbine1"};
+            generateEffect = Fx.generatespark;
 
             ambientSound = Sounds.smelter;
             ambientSoundVolume = 0.06f;
@@ -2201,6 +2203,7 @@ public class Blocks{
             hasItems = true;
             size = 3;
             ambientSound = Sounds.steam;
+            generateEffect = Fx.generatespark;
             ambientSoundVolume = 0.03f;
 
             drawer = new DrawMulti(new DrawBlock(), new DrawWarmupRegion());
@@ -2215,6 +2218,7 @@ public class Blocks{
             powerProduction = 4.5f;
             itemDuration = 60 * 14f;
             envEnabled = Env.any;
+            generateEffect = Fx.generatespark;
 
             drawer = new DrawMulti(new DrawBlock(), new DrawWarmupRegion());
             consume(new ConsumeItemRadioactive());

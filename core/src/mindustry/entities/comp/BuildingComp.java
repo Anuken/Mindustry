@@ -66,12 +66,13 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     transient byte cdump;
     transient int rotation;
     transient float payloadRotation;
-    transient boolean enabled = true;
-    transient float enabledControlTime;
     transient String lastAccessed;
     transient boolean wasDamaged; //used only by the indexer
     transient boolean wasVisible; //used only by the block renderer when fog is on (TODO replace with discovered check?)
     transient float visualLiquid;
+
+    transient boolean enabled = true;
+    transient @Nullable Building lastDisabler;
 
     @Nullable PowerModule power;
     @Nullable ItemModule items;
@@ -82,8 +83,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     /** Same as efficiency, but for optional consumers only. */
     transient float optionalEfficiency;
 
-    public transient float healSuppressionTime = -1f;
-    public transient float lastHealTime = -120f * 10f;
+    transient float healSuppressionTime = -1f;
+    transient float lastHealTime = -120f * 10f;
 
     private transient float timeScale = 1f, timeScaleDuration;
     private transient float dumpAccum;
@@ -195,9 +196,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             if(version >= 1){
                 byte on = read.b();
                 this.enabled = on == 1;
-                if(!this.enabled){
-                    enabledControlTime = timeToUncontrol;
-                }
             }
 
             //get which modules should actually be read; this was added in version 2
@@ -497,7 +495,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public BlockStatus status(){
-        if(enabledControlTime > 0 && !enabled){
+        if(!enabled){
             return BlockStatus.logicDisable;
         }
 
@@ -1803,7 +1801,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public void control(LAccess type, double p1, double p2, double p3, double p4){
         if(type == LAccess.enabled){
             enabled = !Mathf.zero((float)p1);
-            enabledControlTime = timeToUncontrol;
         }
     }
 
@@ -1864,16 +1861,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         //TODO refactor to timestamp-based system?
         if((timeScaleDuration -= Time.delta) <= 0f || !block.canOverdrive){
             timeScale = 1f;
-        }
-
-        //TODO unacceptable overhead?
-        if(!enabled && block.autoResetEnabled){
-            noSleep();
-            enabledControlTime -= Time.delta;
-
-            if(enabledControlTime <= 0){
-                enabled = true;
-            }
         }
 
         if(!allowUpdate()){

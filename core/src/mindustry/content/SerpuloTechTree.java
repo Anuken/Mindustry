@@ -166,6 +166,12 @@ public class SerpuloTechTree{
                             });
                         });
 
+                        node(message, () -> {
+
+                        });
+
+                        //logic disabled until further notice
+                        /*
                         node(microProcessor, () -> {
                             node(switchBlock, () -> {
                                 node(message, () -> {
@@ -188,7 +194,7 @@ public class SerpuloTechTree{
                                     });
                                 });
                             });
-                        });
+                        });*/
 
                         node(illuminator, () -> {
 

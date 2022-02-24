@@ -28,7 +28,8 @@ def enableAA = true
 //it's not compiled for other platforms so they don't get it
 def useFastAA = project.hasProperty("fastAA") || System.getProperty("user.name") == "anuke"
 
-def antialias = { File file ->
+@groovy.transform.CompileStatic
+private def antialias(File file, boolean doAntialias, boolean useFastAA){
     if(!doAntialias) return
 
     if(useFastAA){
@@ -168,7 +169,7 @@ task pack(dependsOn: [classes, configurations.runtimeClasspath]){
                 if(file.isDirectory() || (file.toString().replace("\\", "/").contains("/ui/") && file.toString().startsWith("icon-")) || file.toString().contains(".9.png")) return
 
                 executor.submit{
-                    antialias(file.file)
+                    antialias(file.file, doAntialias, useFastAA)
                 }
             }
 

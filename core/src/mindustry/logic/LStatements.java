@@ -1244,13 +1244,6 @@ public class LStatements{
             rebuild(table);
         }
 
-        /*
-        unitBuildSpeed,
-    unitDamage,
-    blockHealth,
-    blockDamage
-         */
-
         void rebuild(Table table){
             table.clearChildren();
 

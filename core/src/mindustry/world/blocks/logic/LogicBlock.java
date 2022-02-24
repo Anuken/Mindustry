@@ -398,6 +398,17 @@ public class LogicBlock extends Block{
         }
 
         @Override
+        public void removeFromProximity(){
+            super.removeFromProximity();
+
+            for(var link : executor.links){
+                if(!link.enabled && link.lastDisabler == this){
+                    link.enabled = true;
+                }
+            }
+        }
+
+        @Override
         public Cursor getCursor(){
             return !accessible() ? SystemCursor.arrow : super.getCursor();
         }

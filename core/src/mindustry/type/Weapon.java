@@ -401,7 +401,7 @@ public class Weapon implements Cloneable{
         shootAngle = bulletRotation(unit, mount, bulletX, bulletY),
         lifeScl = bullet.scaleVelocity ? Mathf.clamp(Mathf.dst(shootX, shootY, mount.aimX, mount.aimY) / bullet.range) : 1f;
 
-        bullet(mount, unit, shootX, shootY, angleOffset + shootAngle + Mathf.range(inaccuracy), lifeScl, shootAngle, mountX, mountY);
+        bullet(mount, unit, bulletX, bulletY, angleOffset + shootAngle + Mathf.range(inaccuracy), lifeScl, shootAngle, mountX, mountY);
     }
 
     protected void bullet(WeaponMount mount, Unit unit, float shootX, float shootY, float angle, float lifescl, float mountRotation, float mountX, float mountY){
