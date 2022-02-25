@@ -8,7 +8,7 @@ import mindustry.world.*;
 
 /** Selects X spawns from the spawn pool.*/
 public class EnemySpawnFilter extends GenerateFilter{
-    int amount = 1;
+    public int amount = 1;
 
     @Override
     public FilterOption[] options(){

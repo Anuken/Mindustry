@@ -1,10 +1,6 @@
 package mindustry.mod;
 
 import arc.struct.*;
-import mindustry.type.*;
-import mindustry.world.blocks.legacy.*;
-import mindustry.world.consumers.*;
-
 /** Generated class. Maps simple class names to concrete classes. For use in JSON mods. */
 @SuppressWarnings("deprecation")
 public class ClassMap{
@@ -68,6 +64,12 @@ public class ClassMap{
         classes.put("SeqEffect", mindustry.entities.effect.SeqEffect.class);
         classes.put("WaveEffect", mindustry.entities.effect.WaveEffect.class);
         classes.put("WrapEffect", mindustry.entities.effect.WrapEffect.class);
+        classes.put("AlternatePattern", mindustry.entities.pattern.AlternatePattern.class);
+        classes.put("MultiPattern", mindustry.entities.pattern.MultiPattern.class);
+        classes.put("ShotPattern", mindustry.entities.pattern.ShotPattern.class);
+        classes.put("BulletHandler", mindustry.entities.pattern.ShotPattern.BulletHandler.class);
+        classes.put("SinePattern", mindustry.entities.pattern.SinePattern.class);
+        classes.put("SpreadPattern", mindustry.entities.pattern.SpreadPattern.class);
         classes.put("Objectives", mindustry.game.Objectives.class);
         classes.put("Objective", mindustry.game.Objectives.Objective.class);
         classes.put("OnPlanet", mindustry.game.Objectives.OnPlanet.class);
@@ -76,8 +78,6 @@ public class ClassMap{
         classes.put("Research", mindustry.game.Objectives.Research.class);
         classes.put("SectorComplete", mindustry.game.Objectives.SectorComplete.class);
         classes.put("AmmoType", mindustry.type.AmmoType.class);
-        classes.put("BlockSeq", PayloadSeq.class);
-        classes.put("BlockStack", PayloadStack.class);
         classes.put("Category", mindustry.type.Category.class);
         classes.put("CellLiquid", mindustry.type.CellLiquid.class);
         classes.put("ErrorContent", mindustry.type.ErrorContent.class);
@@ -86,6 +86,8 @@ public class ClassMap{
         classes.put("ItemStack", mindustry.type.ItemStack.class);
         classes.put("Liquid", mindustry.type.Liquid.class);
         classes.put("LiquidStack", mindustry.type.LiquidStack.class);
+        classes.put("PayloadSeq", mindustry.type.PayloadSeq.class);
+        classes.put("PayloadStack", mindustry.type.PayloadStack.class);
         classes.put("Planet", mindustry.type.Planet.class);
         classes.put("Publishable", mindustry.type.Publishable.class);
         classes.put("Satellite", mindustry.type.Satellite.class);
@@ -238,6 +240,8 @@ public class ClassMap{
         classes.put("HeatProducer", mindustry.world.blocks.heat.HeatProducer.class);
         classes.put("HeatProducerBuild", mindustry.world.blocks.heat.HeatProducer.HeatProducerBuild.class);
         classes.put("LegacyBlock", mindustry.world.blocks.legacy.LegacyBlock.class);
+        classes.put("LegacyCommandCenter", mindustry.world.blocks.legacy.LegacyCommandCenter.class);
+        classes.put("CommandBuild", mindustry.world.blocks.legacy.LegacyCommandCenter.CommandBuild.class);
         classes.put("LegacyMechPad", mindustry.world.blocks.legacy.LegacyMechPad.class);
         classes.put("LegacyMechPadBuild", mindustry.world.blocks.legacy.LegacyMechPad.LegacyMechPadBuild.class);
         classes.put("LegacyUnitFactory", mindustry.world.blocks.legacy.LegacyUnitFactory.class);
@@ -297,10 +301,8 @@ public class ClassMap{
         classes.put("BatteryBuild", mindustry.world.blocks.power.Battery.BatteryBuild.class);
         classes.put("BeamNode", mindustry.world.blocks.power.BeamNode.class);
         classes.put("BeamNodeBuild", mindustry.world.blocks.power.BeamNode.BeamNodeBuild.class);
-        classes.put("ConditionalConsumePower", ConsumePowerCondition.class);
         classes.put("ConsumeGenerator", mindustry.world.blocks.power.ConsumeGenerator.class);
         classes.put("ConsumeGeneratorBuild", mindustry.world.blocks.power.ConsumeGenerator.ConsumeGeneratorBuild.class);
-        classes.put("DynamicConsumePower", ConsumePowerDynamic.class);
         classes.put("ImpactReactor", mindustry.world.blocks.power.ImpactReactor.class);
         classes.put("ImpactReactorBuild", mindustry.world.blocks.power.ImpactReactor.ImpactReactorBuild.class);
         classes.put("LightBlock", mindustry.world.blocks.power.LightBlock.class);
@@ -368,8 +370,6 @@ public class ClassMap{
         classes.put("Unloader", mindustry.world.blocks.storage.Unloader.class);
         classes.put("ContainerStat", mindustry.world.blocks.storage.Unloader.ContainerStat.class);
         classes.put("UnloaderBuild", mindustry.world.blocks.storage.Unloader.UnloaderBuild.class);
-        classes.put("CommandCenter", LegacyCommandCenter.class);
-        classes.put("CommandBuild", LegacyCommandCenter.CommandBuild.class);
         classes.put("ControlCore", mindustry.world.blocks.units.ControlCore.class);
         classes.put("DroneCenter", mindustry.world.blocks.units.DroneCenter.class);
         classes.put("DroneCenterBuild", mindustry.world.blocks.units.DroneCenter.DroneCenterBuild.class);

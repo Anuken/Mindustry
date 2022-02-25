@@ -53,33 +53,13 @@ function extend(/*Base, ..., def*/){
 const extendContent = extend;
 
 importPackage(Packages.arc)
-importPackage(Packages.arc.audio)
-importPackage(Packages.arc.func)
 importPackage(Packages.arc.graphics)
 importPackage(Packages.arc.graphics.g2d)
 importPackage(Packages.arc.graphics.gl)
-importPackage(Packages.arc.input)
 importPackage(Packages.arc.math)
-importPackage(Packages.arc.math.geom)
-importPackage(Packages.arc.scene)
-importPackage(Packages.arc.scene.actions)
-importPackage(Packages.arc.scene.event)
-importPackage(Packages.arc.scene.style)
-importPackage(Packages.arc.scene.ui)
-importPackage(Packages.arc.scene.ui.layout)
-importPackage(Packages.arc.scene.utils)
-importPackage(Packages.arc.struct)
 importPackage(Packages.arc.util)
-importPackage(Packages.arc.util.async)
-importPackage(Packages.arc.util.io)
-importPackage(Packages.arc.util.noise)
-importPackage(Packages.arc.util.pooling)
-importPackage(Packages.arc.util.serialization)
-importPackage(Packages.arc.util.viewport)
 importPackage(Packages.mindustry)
 importPackage(Packages.mindustry.ai)
-importPackage(Packages.mindustry.ai.formations)
-importPackage(Packages.mindustry.ai.formations.patterns)
 importPackage(Packages.mindustry.ai.types)
 importPackage(Packages.mindustry.async)
 importPackage(Packages.mindustry.audio)
@@ -91,6 +71,8 @@ importPackage(Packages.mindustry.entities)
 importPackage(Packages.mindustry.entities.abilities)
 importPackage(Packages.mindustry.entities.bullet)
 importPackage(Packages.mindustry.entities.effect)
+importPackage(Packages.mindustry.entities.part)
+importPackage(Packages.mindustry.entities.pattern)
 importPackage(Packages.mindustry.entities.units)
 importPackage(Packages.mindustry.game)
 importPackage(Packages.mindustry.gen)
@@ -121,7 +103,6 @@ importPackage(Packages.mindustry.world.blocks.defense)
 importPackage(Packages.mindustry.world.blocks.defense.turrets)
 importPackage(Packages.mindustry.world.blocks.distribution)
 importPackage(Packages.mindustry.world.blocks.environment)
-importPackage(Packages.mindustry.world.blocks.experimental)
 importPackage(Packages.mindustry.world.blocks.heat)
 importPackage(Packages.mindustry.world.blocks.legacy)
 importPackage(Packages.mindustry.world.blocks.liquid)
@@ -164,6 +145,7 @@ const CoreChangeEvent = Packages.mindustry.game.EventType.CoreChangeEvent
 const BuildTeamChangeEvent = Packages.mindustry.game.EventType.BuildTeamChangeEvent
 const TileChangeEvent = Packages.mindustry.game.EventType.TileChangeEvent
 const TilePreChangeEvent = Packages.mindustry.game.EventType.TilePreChangeEvent
+const BuildDamageEvent = Packages.mindustry.game.EventType.BuildDamageEvent
 const GameOverEvent = Packages.mindustry.game.EventType.GameOverEvent
 const UnitControlEvent = Packages.mindustry.game.EventType.UnitControlEvent
 const PickupEvent = Packages.mindustry.game.EventType.PickupEvent

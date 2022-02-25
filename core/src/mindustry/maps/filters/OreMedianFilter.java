@@ -9,10 +9,10 @@ import mindustry.maps.filters.FilterOption.*;
 import mindustry.world.*;
 
 public class OreMedianFilter extends GenerateFilter{
+    private static IntSeq blocks = new IntSeq();
+
     public float radius = 2;
     public float percentile = 0.5f;
-
-    private IntSeq blocks = new IntSeq();
 
     @Override
     public FilterOption[] options(){

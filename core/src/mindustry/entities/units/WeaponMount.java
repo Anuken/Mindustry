@@ -30,6 +30,8 @@ public class WeaponMount{
     public boolean rotate = false;
     /** extra state for alternating weapons */
     public boolean side;
+    /** total bullets fired from this mount; used for alternating patterns */
+    public int totalShots;
     /** current bullet for continuous weapons */
     public @Nullable Bullet bullet;
     /** sound loop for continuous weapons */

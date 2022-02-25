@@ -10,7 +10,8 @@ import static mindustry.Vars.*;
 public class CacheLayer{
     public static CacheLayer
 
-    water, mud, cryofluid, tar, slag, arkycite, space, normal, walls;
+    water, mud, cryofluid, tar, slag, arkycite,
+    space, normal, walls;
 
     public static CacheLayer[] all = {};
 

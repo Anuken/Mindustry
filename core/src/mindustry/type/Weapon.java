@@ -15,6 +15,7 @@ import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.part.*;
+import mindustry.entities.pattern.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -55,10 +56,7 @@ public class Weapon implements Cloneable{
     public float rotateSpeed = 20f;
     /** weapon reload in frames */
     public float reload;
-    /** amount of shots per fire */
-    public int shots = 1;
-    /** spacing in degrees between multiple shots, if applicable */
-    public float spacing = 0;
+
     /** inaccuracy of degrees of each shot */
     public float inaccuracy = 0f;
     /** intensity and duration of each shot's screen shake */
@@ -71,16 +69,12 @@ public class Weapon implements Cloneable{
     public float shootX = 0f, shootY = 3f;
     /** offsets of weapon position on unit */
     public float x = 5f, y = 0f;
-    /** random spread on the X axis */
-    public float xRand = 0f;
+    /** pattern used for bullets */
+    public ShotPattern shoot = new ShotPattern();
     /** radius of shadow drawn under the weapon; <0 to disable */
     public float shadow = -1f;
     /** fraction of velocity that is random */
     public float velocityRnd = 0f;
-    /** delay in ticks between shots */
-    public float firstShotDelay = 0;
-    /** delay in ticks between shots */
-    public float shotDelay = 0;
     /** The half-radius of the cone in which shooting will start. */
     public float shootCone = 5f;
     /** Cone in which the weapon can rotate relative to its mount. */
@@ -144,13 +138,13 @@ public class Weapon implements Cloneable{
             t.add("[lightgray]" + Stat.inaccuracy.localized() + ": [white]" + (int)inaccuracy + " " + StatUnit.degrees.localized());
         }
         t.row();
-        t.add("[lightgray]" + Stat.reload.localized() + ": " + (mirror ? "2x " : "") + "[white]" + Strings.autoFixed(60f / reload * shots, 2) + " " + StatUnit.perSecond.localized());
+        t.add("[lightgray]" + Stat.reload.localized() + ": " + (mirror ? "2x " : "") + "[white]" + Strings.autoFixed(60f / reload * shoot.shots, 2) + " " + StatUnit.perSecond.localized());
 
         StatValues.ammo(ObjectMap.of(u, bullet)).display(t);
     }
 
     public float dps(){
-        return (bullet.estimateDPS() / reload) * shots * 60f;
+        return (bullet.estimateDPS() / reload) * shoot.shots * 60f;
     }
 
     //TODO copy-pasted code
@@ -371,34 +365,29 @@ public class Weapon implements Cloneable{
     protected void shoot(Unit unit, WeaponMount mount, float shootX, float shootY, float rotation){
         unit.apply(shootStatus, shootStatusDuration);
 
-        if(firstShotDelay > 0){
+        if(shoot.firstShotDelay > 0){
             chargeSound.at(shootX, shootY, Mathf.random(soundPitchMin, soundPitchMax));
             bullet.chargeEffect.at(shootX, shootY, rotation, bullet.keepVelocity || parentizeEffects ? unit : null);
         }
 
-        //shot patterns should be able to customize:
-        //- the position of a specific bullet index
-        //- the delay of a specific bullet index
-
-        //TODO merge with Turret behavior if possible
-        for(int i = 0; i < shots; i++){
-            float angleOffset = i * spacing - (shots - 1) * spacing / 2f;
-            if(firstShotDelay + shotDelay > 0f){
-                Time.run(i * shotDelay + firstShotDelay, () -> shoot(unit, mount, angleOffset));
+        shoot.shoot(mount.totalShots, (xOffset, yOffset, angle, delay) -> {
+            if(delay > 0f){
+                Time.run(delay, () -> setupBullet(unit, mount, xOffset, yOffset, angle));
             }else{
-                shoot(unit, mount, angleOffset);
+                setupBullet(unit, mount, xOffset, yOffset, angle);
             }
-        }
+            mount.totalShots ++;
+        });
     }
 
-    protected void shoot(Unit unit, WeaponMount mount, float angleOffset){
+    protected void setupBullet(Unit unit, WeaponMount mount, float xOffset, float yOffset, float angleOffset){
         float
         weaponRotation = unit.rotation - 90 + (rotate ? mount.rotation : 0),
         mountX = unit.x + Angles.trnsx(unit.rotation - 90, x, y),
         mountY = unit.y + Angles.trnsy(unit.rotation - 90, x, y),
-        bulletX = mountX + Angles.trnsx(weaponRotation, this.shootX, this.shootY),
-        bulletY = mountY + Angles.trnsy(weaponRotation, this.shootX, this.shootY),
-        shootAngle = bulletRotation(unit, mount, bulletX, bulletY),
+        bulletX = mountX + Angles.trnsx(weaponRotation, this.shootX, this.shootY) + Angles.trnsx(weaponRotation, xOffset, yOffset),
+        bulletY = mountY + Angles.trnsy(weaponRotation, this.shootX, this.shootY) + Angles.trnsy(weaponRotation, xOffset, yOffset),
+        shootAngle = bulletRotation(unit, mount, bulletX, bulletY) + angleOffset,
         lifeScl = bullet.scaleVelocity ? Mathf.clamp(Mathf.dst(shootX, shootY, mount.aimX, mount.aimY) / bullet.range) : 1f;
 
         bullet(mount, unit, bulletX, bulletY, angleOffset + shootAngle + Mathf.range(inaccuracy), lifeScl, shootAngle, mountX, mountY);
@@ -407,10 +396,7 @@ public class Weapon implements Cloneable{
     protected void bullet(WeaponMount mount, Unit unit, float shootX, float shootY, float angle, float lifescl, float mountRotation, float mountX, float mountY){
         if(!unit.isAdded()) return;
 
-        //TODO should be part of shoot pattern.
-        float xr = Mathf.range(xRand), x = shootX + Angles.trnsx(angle, 0, xr), y = shootY + Angles.trnsy(angle, 0, xr);
-
-        mount.bullet = bullet.create(unit, unit.team, x, y, angle, (1f - velocityRnd) + Mathf.random(velocityRnd), lifescl);
+        mount.bullet = bullet.create(unit, unit.team, shootX, shootY, angle, (1f - velocityRnd) + Mathf.random(velocityRnd), lifescl);
 
         if(!continuous){
             shootSound.at(shootX, shootY, Mathf.random(soundPitchMin, soundPitchMax));

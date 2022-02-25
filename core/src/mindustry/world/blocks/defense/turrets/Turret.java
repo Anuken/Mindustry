@@ -538,8 +538,8 @@ public class Turret extends ReloadTurret{
 
                     for(int c = 0; c < count; c++){
                         float i = (shotCounter % shots) - (shots-1)/2f;
-
                         bulletOffset.trns(rotation - 90, (spread) * i + Mathf.range(xRand), shootLength);
+
                         bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy));
                         shotCounter ++;
                     }

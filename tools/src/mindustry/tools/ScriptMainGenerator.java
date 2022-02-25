@@ -84,7 +84,8 @@ public class ScriptMainGenerator{
         "mindustry.game.Objectives",
         "mindustry.world.blocks",
         "mindustry.world.draw",
-        "mindustry.type"
+        "mindustry.type",
+        "mindustry.entities.pattern"
         );
 
         String classTemplate = "package mindustry.mod;\n" +

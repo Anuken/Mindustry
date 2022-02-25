@@ -12,6 +12,7 @@ import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.*;
 import mindustry.entities.part.*;
+import mindustry.entities.pattern.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -194,9 +195,10 @@ public class UnitTypes{
                 shake = 2f;
                 ejectEffect = Fx.casing3;
                 shootSound = Sounds.bang;
-                shots = 3;
                 inaccuracy = 3f;
-                shotDelay = 4f;
+
+                shoot.shots = 3;
+                shoot.shotDelay = 4f;
 
                 bullet = new BasicBulletType(7f, 50){{
                     width = 11f;
@@ -350,10 +352,11 @@ public class UnitTypes{
                 shootY = 2.5f;
 
                 reload = 36f;
-                shots = 3;
                 inaccuracy = 35;
-                shotDelay = 0.5f;
-                spacing = 0f;
+
+                shoot.shots = 3;
+                shoot.shotDelay = 0.5f;
+
                 ejectEffect = Fx.none;
                 recoil = 2.5f;
                 shootSound = Sounds.spark;
@@ -459,7 +462,7 @@ public class UnitTypes{
                 shootY = 13f;
                 x = y = 0f;
 
-                firstShotDelay = Fx.greenLaserChargeSmall.lifetime - 1f;
+                shoot.firstShotDelay = Fx.greenLaserChargeSmall.lifetime - 1f;
                 parentizeEffects = true;
 
                 reload = 155f;
@@ -493,7 +496,7 @@ public class UnitTypes{
                 }};
 
                 shootStatus = StatusEffects.slow;
-                shootStatusDuration = bullet.lifetime + firstShotDelay;
+                shootStatusDuration = bullet.lifetime + shoot.firstShotDelay;
             }});
 
             weapons.add(new RepairBeamWeapon("repair-beam-weapon-center-large"){{
@@ -547,7 +550,7 @@ public class UnitTypes{
 
                 shootStatusDuration = 60f * 2f;
                 shootStatus = StatusEffects.unmoving;
-                firstShotDelay = Fx.greenLaserCharge.lifetime;
+                shoot.firstShotDelay = Fx.greenLaserCharge.lifetime;
                 parentizeEffects = true;
 
                 bullet = new LaserBulletType(){{
@@ -870,8 +873,11 @@ public class UnitTypes{
                 rotate = true;
                 shadow = 12f;
                 recoil = 3f;
-                shots = 2;
-                spacing = 17f;
+
+                shoot = new SpreadPattern(){{
+                    shots = 2;
+                    spread = 17f;
+                }};
 
                 bullet = new ShrapnelBulletType(){{
                     length = 90f;
@@ -998,6 +1004,7 @@ public class UnitTypes{
             range = 140f;
             faceTarget = false;
             armor = 3f;
+            itemCapacity = 0;
             targetFlags = new BlockFlag[]{BlockFlag.factory, null};
             circleTarget = true;
             ammoType = new ItemAmmoType(Items.graphite);
@@ -1036,6 +1043,7 @@ public class UnitTypes{
             lowAltitude = true;
             forceMultiTarget = true;
             armor = 5f;
+            itemCapacity = 0;
 
             targetFlags = new BlockFlag[]{BlockFlag.launchPad, BlockFlag.storage, BlockFlag.battery, null};
             engineOffset = 12f;
@@ -1047,7 +1055,7 @@ public class UnitTypes{
                 x = 7f;
                 rotate = true;
                 shake = 1f;
-                shots = 2;
+                shoot.shots = 2;
                 inaccuracy = 5f;
                 velocityRnd = 0.2f;
                 shootSound = Sounds.missile;
@@ -1279,7 +1287,6 @@ public class UnitTypes{
                 ejectEffect = Fx.none;
                 recoil = 2f;
                 shootSound = Sounds.missile;
-                shots = 1;
                 velocityRnd = 0.5f;
                 inaccuracy = 15f;
                 alternate = true;
@@ -1586,7 +1593,6 @@ public class UnitTypes{
                 recoil = 4f;
                 shadow = 12f;
 
-                shots = 1;
                 inaccuracy = 3f;
                 ejectEffect = Fx.casing3;
                 shootSound = Sounds.artillery;
@@ -1623,8 +1629,9 @@ public class UnitTypes{
 
                 rotateSpeed = 4f;
                 rotate = true;
-                shots = 2;
-                shotDelay = 3f;
+                shoot.shots = 2;
+                shoot.shotDelay = 3f;
+
                 inaccuracy = 5f;
                 velocityRnd = 0.1f;
                 shootSound = Sounds.missile;
@@ -1679,18 +1686,21 @@ public class UnitTypes{
 
                 shadow = 20f;
 
-                shootY = 2f;
+                shootY = 4.5f;
                 recoil = 4f;
                 reload = 45f;
-                shots = 6;
-                spacing = 10f;
                 velocityRnd = 0.4f;
                 inaccuracy = 7f;
                 ejectEffect = Fx.none;
-                shake = 3f;
+                shake = 1f;
                 shootSound = Sounds.missile;
-                xRand = 8f;
-                shotDelay = 1f;
+
+                shoot = new AlternatePattern(){{
+                    shots = 6;
+                    shotDelay = 1.5f;
+                    spread = 4f;
+                    barrels = 3;
+                }};
 
                 bullet = new MissileBulletType(4.2f, 42){{
                     homingPower = 0.12f;
@@ -1727,8 +1737,9 @@ public class UnitTypes{
                 ejectEffect = Fx.casing3;
                 shootSound = Sounds.shootBig;
 
-                shots = 3;
-                shotDelay = 4f;
+                shoot.shots = 3;
+                shoot.shotDelay = 4f;
+
                 inaccuracy = 1f;
                 bullet = new BasicBulletType(7f, 57){{
                     width = 13f;
@@ -1773,7 +1784,6 @@ public class UnitTypes{
                 shadow = 50f;
                 shootSound = Sounds.railgun;
 
-                shots = 1;
                 ejectEffect = Fx.none;
 
                 bullet = new RailBulletType(){{
@@ -1828,12 +1838,13 @@ public class UnitTypes{
                 mirror = false;
                 rotate = true;
                 reload = 90f;
-                shots = 3;
-                shotDelay = 7f;
                 x = y = shootX = shootY = 0f;
                 shootSound = Sounds.mineDeploy;
                 rotateSpeed = 180f;
                 targetAir = false;
+
+                shoot.shots = 3;
+                shoot.shotDelay = 7f;
 
                 bullet = new BasicBulletType(){{
                     sprite = "mine-bullet";
@@ -2357,9 +2368,8 @@ public class UnitTypes{
                 x = 3f;
                 y = 0.5f;
                 rotate = true;
-                shots = 2;
-                shotDelay = 4f;
-                spacing = 0f;
+                shoot.shots = 2;
+                shoot.shotDelay = 4f;
                 ejectEffect = Fx.casing1;
 
                 bullet = new BasicBulletType(3f, 11){{
@@ -2396,10 +2406,13 @@ public class UnitTypes{
                 reload = 15f;
                 x = 1f;
                 y = 2f;
-                shots = 2;
-                spacing = 2f;
+                shoot = new SpreadPattern(){{
+                    shots = 2;
+                    shotDelay = 3f;
+                    spread = 2f;
+                }};
+
                 inaccuracy = 3f;
-                shotDelay = 3f;
                 ejectEffect = Fx.casing1;
 
                 bullet = new BasicBulletType(3.5f, 11){{
@@ -2482,7 +2495,8 @@ public class UnitTypes{
                 heatColor = Color.valueOf("f9350f");
                 cooldownTime = 30f;
 
-                shots = 2;
+                //TODO alternating double pattern
+                shoot.shots = 2;
 
                 bullet = new BasicBulletType(5f, 50){{
                     sprite = "missile-large";
@@ -2804,7 +2818,7 @@ public class UnitTypes{
                 shake = 3f;
                 cooldownTime = 40f;
 
-                shots = 3;
+                shoot.shots = 3;
                 inaccuracy = 3f;
                 velocityRnd = 0.33f;
                 heatColor = Color.red;
@@ -2898,8 +2912,8 @@ public class UnitTypes{
                 cooldownTime = 20f;
                 layerOffset = 0.02f;
 
-                shots = 3;
-                shotDelay = 3f;
+                shoot.shots = 3;
+                shoot.shotDelay = 3f;
                 inaccuracy = 2f;
                 velocityRnd = 0.1f;
                 heatColor = Color.red;
@@ -3100,8 +3114,8 @@ public class UnitTypes{
                 shootWarmupSpeed = 0.1f;
                 shootY = 2f;
                 shootCone = 40f;
-                shots = 3;
-                shotDelay = 5f;
+                shoot.shots = 3;
+                shoot.shotDelay = 5f;
                 inaccuracy = 28f;
 
                 parts.add(new RegionPart("-blade"){{
