@@ -2845,6 +2845,7 @@ public class Blocks{
             size = 2;
             scaledHealth = 280;
             targetAir = false;
+            moveWhileCharging = false;
             shootSound = Sounds.laser;
             coolant = consume(new ConsumeCoolant(0.2f));
 
@@ -2913,10 +2914,12 @@ public class Blocks{
 
             shoot = new ShootAlternate(){{
                 shots = 4;
+                barrels = 3;
                 spread = 3.5f;
                 shotDelay = 5f;
             }};
 
+            shootY = 7f;
             reloadTime = 30f;
             inaccuracy = 10f;
             range = 240f;
@@ -3183,11 +3186,6 @@ public class Blocks{
             loopSound = Sounds.beam;
             loopSoundVolume = 2f;
             envEnabled |= Env.space;
-
-            shoot = new ShootSpread(){{
-                shots = 3;
-                spread = 10f;
-            }};
 
             shootType = new ContinuousLaserBulletType(78){{
                 length = 200f;
