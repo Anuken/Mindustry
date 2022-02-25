@@ -331,13 +331,6 @@ public class Fx{
         Lines.poly(e.x, e.y, 4, 5f + e.fin() * 60f);
     }),
 
-    vtolHover = new Effect(40f, e -> {
-        float len = e.finpow() * 10f;
-        float ang = e.rotation + Mathf.randomSeedRange(e.id, 30f);
-        color(Pal.lightFlame, Pal.lightOrange, e.fin());
-        Fill.circle(e.x + trnsx(ang, len), e.y + trnsy(ang, len), 2f * e.fout());
-    }),
-
     breakProp = new Effect(23, e -> {
         float scl = Math.max(e.rotation, 1);
         color(Tmp.c1.set(e.color).mul(1.1f));

@@ -503,8 +503,6 @@ public class Turret extends ReloadTurret{
 
             handleBullet(type.create(this, team, bulletX, bulletY, shootAngle, 1f + Mathf.range(velocityInaccuracy), lifeScl), xOffset, yOffset, angleOffset);
 
-            //TODO "shoot" and "smoke" should just be MultiEffects there's no reason to have them separate
-
             (shootEffect == Fx.none ? type.shootEffect : shootEffect).at(bulletX, bulletY, rotation, type.hitColor);
             (smokeEffect == Fx.none ? type.smokeEffect : smokeEffect).at(bulletX, bulletY, rotation, type.hitColor);
             shootSound.at(bulletX, bulletY, Mathf.random(soundPitchMin, soundPitchMax));
@@ -512,7 +510,7 @@ public class Turret extends ReloadTurret{
             ammoUseEffect.at(
                 x - Angles.trnsx(rotation, ammoEjectBack),
                 y - Angles.trnsy(rotation, ammoEjectBack),
-                rotation * (shoot.shots == 1 && shoot instanceof ShootAlternate && totalShots % 2 == 1 ? -1f : 1f)
+                rotation * Mathf.sign(xOffset)
             );
 
             if(shootShake > 0){

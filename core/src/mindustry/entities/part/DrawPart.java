@@ -92,6 +92,10 @@ public abstract class DrawPart{
             return p -> (get(p) - amount) / (1f - amount);
         }
 
+        default PartProgress curve(float offset, float duration){
+            return p -> (get(p) - offset) / duration;
+        }
+
         default PartProgress shorten(float amount){
             return p -> get(p) / (1f - amount);
         }

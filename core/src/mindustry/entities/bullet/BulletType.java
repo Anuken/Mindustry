@@ -255,12 +255,12 @@ public class BulletType extends Content implements Cloneable{
 
     /** If direct is false, this is an indirect hit and the tile was already damaged.
      * TODO this is a mess. */
-    public void hitTile(Bullet b, Building build, float initialHealth, boolean direct){
+    public void hitTile(Bullet b, Building build, float x, float y, float initialHealth, boolean direct){
         if(makeFire && build.team != b.team){
             Fires.create(build.tile);
         }
 
-        if(heals()&& build.team == b.team && !(build.block instanceof ConstructBlock)){
+        if(heals() && build.team == b.team && !(build.block instanceof ConstructBlock)){
             healEffect.at(build.x, build.y, build.block.size, healColor);
             build.heal(healPercent / 100f * build.maxHealth + healAmount);
         }else if(build.team != b.team && direct){

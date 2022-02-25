@@ -132,9 +132,9 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
 
     //copy-paste of World#raycastEach, inlined for lambda capture performance.
     @Override
-    public void tileRaycast(int x0f, int y0f, int x1, int y1){
-        int x = x0f, dx = Math.abs(x1 - x), sx = x < x1 ? 1 : -1;
-        int y = y0f, dy = Math.abs(y1 - y), sy = y < y1 ? 1 : -1;
+    public void tileRaycast(int x1, int y1, int x2, int y2){
+        int x = x1, dx = Math.abs(x2 - x), sx = x < x2 ? 1 : -1;
+        int y = y1, dy = Math.abs(y2 - y), sy = y < y2 ? 1 : -1;
         int e2, err = dx - dy;
         int ww = world.width(), wh = world.height();
 
@@ -173,13 +173,13 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
                     }
                 }
 
-                type.hitTile(self(), build, health, true);
+                type.hitTile(self(), build, x * tilesize, y * tilesize, health, true);
 
                 //stop raycasting when building is hit
                 if(type.pierceBuilding) return;
             }
 
-            if(x == x1 && y == y1) break;
+            if(x == x2 && y == y2) break;
 
             e2 = 2 * err;
             if(e2 > -dy){

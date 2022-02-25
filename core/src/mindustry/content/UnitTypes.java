@@ -1789,9 +1789,9 @@ public class UnitTypes{
                 bullet = new RailBulletType(){{
                     shootEffect = Fx.railShoot;
                     length = 500;
-                    updateEffectSeg = 60f;
+                    pointEffectSpace = 60f;
                     pierceEffect = Fx.railHit;
-                    updateEffect = Fx.railTrail;
+                    pointEffect = Fx.railTrail;
                     hitEffect = Fx.massiveExplosion;
                     smokeEffect = Fx.shootBig2;
                     damage = 1250;
@@ -2484,8 +2484,8 @@ public class UnitTypes{
 
             weapons.add(new Weapon("locus-weapon"){{
                 layerOffset = 0.0001f;
-                reload = 30f;
-                shootY = 9.3f;
+                reload = 12f;
+                shootY = 10f;
                 recoil = 1f;
                 rotate = true;
                 rotateSpeed = 1.4f;
@@ -2499,19 +2499,29 @@ public class UnitTypes{
                     spread = 3.5f;
                 }};
 
-                bullet = new BasicBulletType(5f, 50){{
-                    sprite = "missile-large";
+                bullet = new RailBulletType(){{
+                    length = 140f;
+                    damage = 40f;
+                    hitColor = Color.valueOf("feb380");
+                    hitEffect = endEffect = Fx.hitBulletColor;
+                    shootEffect = Fx.shootBig;
                     smokeEffect = Fx.shootBigSmoke;
-                    shootEffect = Fx.shootBigColor;
-                    width = 5f;
-                    height = 7f;
-                    lifetime = 40f;
-                    hitSize = 4f;
-                    hitColor = backColor = trailColor = Color.valueOf("feb380");
-                    frontColor = Color.white;
-                    trailWidth = 1.7f;
-                    trailLength = 5;
-                    despawnEffect = hitEffect = Fx.hitBulletColor;
+                    pierceDamageFactor = 0.8f;
+
+                    lineEffect = new Effect(14f, e -> {
+                        if(!(e.data instanceof Vec2 v)) return;
+
+                        stroke(e.fout() * 1.5f);
+                        color(e.color);
+                        Lines.line(e.x, e.y, v.x, v.y);
+                    });
+
+                    pointEffectSpace = 8f;
+                    if(false)
+                    pointEffect = new Effect(20, e -> {
+                        color(e.color);
+                        Fill.poly(e.x, e.y, 3, 4f * e.fout(), e.rotation);
+                    }).layer(Layer.bullet - 0.001f);
                 }};
             }});
         }};
@@ -2926,12 +2936,14 @@ public class UnitTypes{
                         layerOffset = -0.001f;
                         heatColor = Pal.techBlue;
                         heatProgress = PartProgress.heat.add(0.2f).min(PartProgress.warmup);
-                        progress = PartProgress.warmup.blend(PartProgress.reload, 0.2f);
-                        x = 11 / 4f;
-                        y = 10f / 4f;
-                        moveY = 1f - fi * 3f;
-                        moveX = fi * 0.5f;
-                        moveRot = -30f - fi * 15f;
+                        progress = PartProgress.warmup.blend(PartProgress.reload, 0.1f);
+                        x = 13.5f / 4f;
+                        y = 10f / 4f - fi * 2f;
+                        moveY = 1f - fi * 1f;
+                        moveX = fi * 0.3f;
+                        moveRot = -45f - fi * 17f;
+
+                        moves.add(new PartMove(PartProgress.reload.inv().mul(1.8f).inv().curve(fi / 5f, 0.2f), 0f, 0f, 40f));
                     }});
                 }
 
