@@ -1,7 +1,7 @@
 package mindustry.entities.pattern;
 
 /** Handles different types of bullet patterns for shooting. */
-public class ShotPattern{
+public class ShootPattern{
     /** amount of shots per "trigger pull" */
     public int shots = 1;
     /** delay in ticks before first shot */

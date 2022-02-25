@@ -8,6 +8,7 @@ import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.*;
 import mindustry.entities.part.*;
+import mindustry.entities.pattern.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -2725,9 +2726,11 @@ public class Blocks{
                 Items.silicon, Bullets.standardHoming
             );
 
-            spread = 4f;
-            shots = 2;
-            alternate = true;
+            shoot = new ShootAlternate(){{
+                spread = 3.5f;
+            }};
+
+            shootY = 3f;
             reloadTime = 20f;
             restitution = 0.03f;
             range = 110;
@@ -2751,9 +2754,10 @@ public class Blocks{
             reloadTime = 18f;
             range = 220f;
             size = 2;
-            burstSpacing = 5f;
-            shots = 2;
             targetGround = false;
+
+            shoot.shotDelay = 5f;
+            shoot.shots = 2;
 
             recoilAmount = 2f;
             rotateSpeed = 15f;
@@ -2828,17 +2832,15 @@ public class Blocks{
         lancer = new PowerTurret("lancer"){{
             requirements(Category.turret, with(Items.copper, 60, Items.lead, 70, Items.silicon, 50));
             range = 165f;
-            chargeTime = 40f;
-            chargeMaxDelay = 30f;
-            chargeEffects = 7;
+
+            shoot.firstShotDelay = 40f;
+
             recoilAmount = 2f;
             reloadTime = 80f;
             cooldown = 0.03f;
             shootShake = 2f;
             shootEffect = Fx.lancerLaserShoot;
             smokeEffect = Fx.none;
-            chargeEffect = Fx.lancerLaserCharge;
-            chargeBeginEffect = Fx.lancerLaserChargeBegin;
             heatColor = Color.red;
             size = 2;
             scaledHealth = 280;
@@ -2850,6 +2852,9 @@ public class Blocks{
 
             shootType = new LaserBulletType(140){{
                 colors = new Color[]{Pal.lancerLaser.cpy().a(0.4f), Pal.lancerLaser, Color.white};
+                //TODO merge
+                chargeEffect = new MultiEffect(Fx.lancerLaserCharge, Fx.lancerLaserChargeBegin);
+
                 hitEffect = Fx.hitLancer;
                 hitSize = 4;
                 lifetime = 16f;
@@ -2905,12 +2910,16 @@ public class Blocks{
                 Items.pyratite, Bullets.missileIncendiary,
                 Items.surgeAlloy, Bullets.missileSurge
             );
+
+            shoot = new ShootAlternate(){{
+                shots = 4;
+                spread = 3.5f;
+                shotDelay = 5f;
+            }};
+
             reloadTime = 30f;
-            shots = 4;
-            burstSpacing = 5;
             inaccuracy = 10f;
             range = 240f;
-            xRand = 6f;
             size = 2;
             scaledHealth = 300;
             shootSound = Sounds.missile;
@@ -2938,9 +2947,9 @@ public class Blocks{
             cooldown = 0.03f;
             recoilAmount = 3f;
             shootShake = 1f;
-            burstSpacing = 3f;
-            spread = 0f;
-            shots = 4;
+            shoot.shots = 4;
+            shoot.shotDelay = 3f;
+
             ammoUseEffect = Fx.casing2;
             scaledHealth = 240;
             shootSound = Sounds.shootBig;
@@ -2973,7 +2982,7 @@ public class Blocks{
             );
             size = 3;
             reloadTime = 3f;
-            shots = 2;
+            shoot.shots = 2;
             velocityInaccuracy = 0.1f;
             inaccuracy = 4f;
             recoilAmount = 1f;
@@ -2993,8 +3002,12 @@ public class Blocks{
             shootShake = 4f;
             range = 90f;
             recoilAmount = 5f;
-            shots = 3;
-            spread = 20f;
+
+            shoot = new ShootSpread(){{
+                shots = 3;
+                spread = 20f;
+            }};
+
             restitution = 0.1f;
             shootCone = 30;
             size = 3;
@@ -3036,7 +3049,7 @@ public class Blocks{
 
             targetAir = false;
             size = 3;
-            shots = 4;
+            shoot.shots = 4;
             inaccuracy = 12f;
             reloadTime = 60f;
             ammoEjectBack = 5f;
@@ -3063,7 +3076,14 @@ public class Blocks{
                 Items.plastanium, Bullets.fragPlastic,
                 Items.surgeAlloy, Bullets.fragSurge
             );
-            xRand = 4f;
+            shootY = 8.75f;
+            shoot = new ShootBarrel(){{
+                barrels = new float[]{
+                0f, 1f, 0f,
+                3f, 0f, 0f,
+                -3f, 0f, 0f,
+                };
+            }};
             reloadTime = 8f;
             range = 200f;
             size = 3;
@@ -3107,7 +3127,6 @@ public class Blocks{
             restitution = 0.009f;
             cooldown = 0.009f;
             shootShake = 4f;
-            shots = 1;
             size = 4;
             shootCone = 2f;
             shootSound = Sounds.railgun;
@@ -3135,10 +3154,10 @@ public class Blocks{
             range = 260f;
             inaccuracy = 3f;
             recoilAmount = 3f;
-            spread = 8f;
-            alternate = true;
+            shoot = new ShootAlternate(){{
+                spread = 8f;
+            }};
             shootShake = 2f;
-            shots = 2;
             size = 4;
             shootCone = 24f;
             shootSound = Sounds.shootBig;
@@ -3164,6 +3183,11 @@ public class Blocks{
             loopSound = Sounds.beam;
             loopSoundVolume = 2f;
             envEnabled |= Env.space;
+
+            shoot = new ShootSpread(){{
+                shots = 3;
+                spread = 10f;
+            }};
 
             shootType = new ContinuousLaserBulletType(78){{
                 length = 200f;
@@ -3227,7 +3251,7 @@ public class Blocks{
             shootShake = 1f;
             ammoPerShot = 5;
             draw = new DrawTurret("reinforced-");
-            shootLength = -2;
+            shootY = -2;
             outlineColor = Pal.darkOutline;
             size = 3;
             envEnabled |= Env.space;
@@ -3287,13 +3311,13 @@ public class Blocks{
 
             liquidConsumed = 4f / 60f;
 
-            range = 130f;
+            float r = range = 130f;
 
             //TODO balance, set up, where is liquid/sec displayed? status effects maybe?
             ammo(
             Liquids.ozone, new ContinuousFlameBulletType(){{
                 damage = 90f;
-                length = range;
+                length = r;
                 knockback = 1f;
 
                 colors = new Color[]{Color.valueOf("eb7abe").a(0.55f), Color.valueOf("e189f5").a(0.7f), Color.valueOf("907ef7").a(0.8f), Color.valueOf("91a4ff"), Color.white};
@@ -3301,7 +3325,7 @@ public class Blocks{
             Liquids.cyanogen, new ContinuousFlameBulletType(){{
                 damage = 200f;
                 rangeChange = 70f;
-                length = range + rangeChange;
+                length = r + rangeChange;
                 knockback = 2f;
 
                 colors = new Color[]{Color.valueOf("465ab8").a(0.55f), Color.valueOf("66a6d2").a(0.7f), Color.valueOf("89e8b6").a(0.8f), Color.valueOf("cafcbe"), Color.white};
@@ -3312,7 +3336,7 @@ public class Blocks{
             );
 
             scaledHealth = 330;
-            shootLength = 7f;
+            shootY = 7f;
             size = 3;
         }};
 
@@ -3359,7 +3383,7 @@ public class Blocks{
             shootShake = 4f;
             recoilAmount = 1f;
             reloadTime = 60f * 2.3f;
-            shootLength = 7f;
+            shootY = 7f;
             rotateSpeed = 1.4f;
             minWarmup = 0.85f;
             shootWarmupSpeed = 0.07f;
@@ -3432,7 +3456,7 @@ public class Blocks{
 
 
             reloadTime = 9f;
-            shootLength = 15f;
+            shootY = 15f;
             rotateSpeed = 5f;
             shootCone = 30f;
 
@@ -3469,11 +3493,14 @@ public class Blocks{
             }};
 
             unitFilter = u -> !u.spawnedByCore;
-            shots = 4;
-            alternate = true;
-            widthSpread = true;
+
+            shoot = new ShootAlternate(){{
+                spread = 4.7f;
+                shots = 4;
+                barrels = 4;
+            }};
+
             targetGround = false;
-            spread = 4.7f;
             inaccuracy = 8f;
 
             restitution = 0.11f;

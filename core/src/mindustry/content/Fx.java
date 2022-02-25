@@ -1820,7 +1820,7 @@ public class Fx{
     lancerLaserCharge = new Effect(38f, e -> {
         color(Pal.lancerLaser);
 
-        randLenVectors(e.id, 2, 1f + 20f * e.fout(), e.rotation, 120f, (x, y) -> {
+        randLenVectors(e.id, 14, 1f + 20f * e.fout(), e.rotation, 120f, (x, y) -> {
             lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fslope() * 3f + 1f);
         });
     }),

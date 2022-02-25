@@ -70,7 +70,7 @@ public class Weapon implements Cloneable{
     /** offsets of weapon position on unit */
     public float x = 5f, y = 0f;
     /** pattern used for bullets */
-    public ShotPattern shoot = new ShotPattern();
+    public ShootPattern shoot = new ShootPattern();
     /** radius of shadow drawn under the weapon; <0 to disable */
     public float shadow = -1f;
     /** fraction of velocity that is random */
@@ -385,8 +385,8 @@ public class Weapon implements Cloneable{
         weaponRotation = unit.rotation - 90 + (rotate ? mount.rotation : 0),
         mountX = unit.x + Angles.trnsx(unit.rotation - 90, x, y),
         mountY = unit.y + Angles.trnsy(unit.rotation - 90, x, y),
-        bulletX = mountX + Angles.trnsx(weaponRotation, this.shootX, this.shootY) + Angles.trnsx(weaponRotation, xOffset, yOffset),
-        bulletY = mountY + Angles.trnsy(weaponRotation, this.shootX, this.shootY) + Angles.trnsy(weaponRotation, xOffset, yOffset),
+        bulletX = mountX + Angles.trnsx(weaponRotation, this.shootX + xOffset, this.shootY + yOffset),
+        bulletY = mountY + Angles.trnsy(weaponRotation, this.shootX + xOffset, this.shootY + yOffset),
         shootAngle = bulletRotation(unit, mount, bulletX, bulletY) + angleOffset,
         lifeScl = bullet.scaleVelocity ? Mathf.clamp(Mathf.dst(shootX, shootY, mount.aimX, mount.aimY) / bullet.range) : 1f;
 

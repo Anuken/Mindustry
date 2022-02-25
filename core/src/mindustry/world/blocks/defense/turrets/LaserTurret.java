@@ -1,6 +1,7 @@
 package mindustry.world.blocks.defense.turrets;
 
 import arc.math.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
@@ -29,8 +30,7 @@ public class LaserTurret extends PowerTurret{
     }
 
     public class LaserTurretBuild extends PowerTurretBuild{
-        public @Nullable Bullet bullet;
-        public float bulletLife;
+        public Seq<BulletEntry> bullets = new Seq<>();
 
         @Override
         protected void updateCooling(){
@@ -40,28 +40,32 @@ public class LaserTurret extends PowerTurret{
         @Override
         public boolean shouldConsume(){
             //still consumes power when bullet is around
-            return bullet != null || isActive();
+            return bullets.any() || isActive();
         }
 
         @Override
         public void updateTile(){
             super.updateTile();
 
-            if(bullet != null && (!bullet.isAdded() || bullet.type == null)){
-                bullet = null;
-            }
+            bullets.removeAll(b -> !b.bullet.isAdded() || b.bullet.type == null || b.life <= 0f || b.bullet.owner != this);
 
-            if(bulletLife > 0 && bullet != null){
+            if(bullets.any()){
+
+                for(var entry : bullets){
+                    float
+                    bulletX = x + Angles.trnsx(rotation - 90, shootX + entry.x, shootY + entry.y),
+                    bulletY = y + Angles.trnsy(rotation - 90, shootX + entry.x, shootY + entry.y),
+                    angle = rotation + entry.rotation;
+
+                    entry.bullet.rotation(angle);
+                    entry.bullet.set(bulletX, bulletY);
+                    entry.bullet.time = entry.bullet.type.lifetime * entry.bullet.type.optimalLifeFract;
+                    entry.life -= Time.delta / Math.max(efficiency, 0.00001f);
+                }
+
                 wasShooting = true;
-                bullet.rotation(rotation);
-                bullet.set(x + bulletOffset.x, y + bulletOffset.y);
-                bullet.time = bullet.type.lifetime * bullet.type.optimalLifeFract;
                 heat = 1f;
                 recoil = recoilAmount;
-                bulletLife -= Time.delta / Math.max(efficiency, 0.00001f);
-                if(bulletLife <= 0f){
-                    bullet = null;
-                }
             }else if(reload > 0){
                 wasShooting = true;
                 //TODO does not handle multi liquid req?
@@ -89,11 +93,11 @@ public class LaserTurret extends PowerTurret{
 
         @Override
         protected void updateShooting(){
-            if(bulletLife > 0 && bullet != null){
+            if(bullets.any()){
                 return;
             }
 
-            if(reload <= 0 && efficiency > 0 && !charging && shootWarmup >= minWarmup){
+            if(reload <= 0 && efficiency > 0 && !charging() && shootWarmup >= minWarmup){
                 BulletType type = peekAmmo();
 
                 shoot(type);
@@ -104,18 +108,19 @@ public class LaserTurret extends PowerTurret{
 
         @Override
         protected void turnToTarget(float targetRot){
-            rotation = Angles.moveToward(rotation, targetRot, efficiency * rotateSpeed * delta() * (bulletLife > 0f ? firingMoveFract : 1f));
+            rotation = Angles.moveToward(rotation, targetRot, efficiency * rotateSpeed * delta() * (bullets.any() ? firingMoveFract : 1f));
         }
 
         @Override
-        protected void handleBullet(@Nullable Bullet bullet){
-            this.bullet = bullet;
-            bulletLife = shootDuration;
+        protected void handleBullet(@Nullable Bullet bullet, float offsetX, float offsetY, float angleOffset){
+            if(bullet != null){
+                bullets.add(new BulletEntry(bullet, offsetX, offsetY, angleOffset, shootDuration));
+            }
         }
 
         @Override
         public boolean shouldActiveSound(){
-            return bulletLife > 0 && bullet != null;
+            return bullets.any();
         }
     }
 }

@@ -114,7 +114,6 @@ public class PayloadTurret extends Turret{
 
         @Override
         public BulletType useAmmo(){
-            ejectEffects();
             for(var block : ammoKeys){
                 if(payloads.contains(block)){
                     payloads.remove(block);

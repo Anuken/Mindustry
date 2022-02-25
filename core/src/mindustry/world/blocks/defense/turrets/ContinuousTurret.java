@@ -6,7 +6,6 @@ import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
-import mindustry.logic.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
@@ -31,8 +30,9 @@ public class ContinuousTurret extends Turret{
         stats.remove(Stat.inaccuracy);
     }
 
+    //TODO LaserTurret shared code
     public class ContinuousTurretBuild extends TurretBuild{
-        public @Nullable Bullet bullet;
+        public Seq<BulletEntry> bullets = new Seq<>();
 
         @Override
         protected void updateCooling(){
@@ -68,29 +68,27 @@ public class ContinuousTurret extends Turret{
 
             unit.ammo(unit.type().ammoCapacity * ammoFract);
 
-            if(bullet != null){
-                //check to see if bullet despawned
-                if(bullet.owner != this || !bullet.isAdded() || bullet.type == null){
-                    bullet = null;
-                }else{
-                    wasShooting = true;
-                    bullet.rotation(rotation);
-                    bullet.set(x + bulletOffset.x, y + bulletOffset.y);
-                    heat = 1f;
-                    recoil = recoilAmount;
+            bullets.removeAll(b -> !b.bullet.isAdded() || b.bullet.type == null || b.bullet.owner != this);
+
+            if(bullets.any()){
+                for(var entry : bullets){
+                    float
+                    bulletX = x + Angles.trnsx(rotation - 90, shootX + entry.x, shootY + entry.y),
+                    bulletY = y + Angles.trnsy(rotation - 90, shootX + entry.x, shootY + entry.y),
+                    angle = rotation + entry.rotation;
+
+                    entry.bullet.rotation(angle);
+                    entry.bullet.set(bulletX, bulletY);
 
                     if(isShooting() && hasAmmo()){
-                        bullet.time = bullet.lifetime * bullet.type.optimalLifeFract * shootWarmup;
+                        entry.bullet.time = entry.bullet.lifetime * entry.bullet.type.optimalLifeFract * shootWarmup;
                     }
                 }
-            }
-        }
 
-        @Override
-        public double sense(LAccess sensor){
-            //no concept of reload here
-            if(sensor == LAccess.progress) return bullet == null ? 0f : 1f;
-            return super.sense(sensor);
+                wasShooting = true;
+                heat = 1f;
+                recoil = recoilAmount;
+            }
         }
 
         @Override
@@ -100,11 +98,11 @@ public class ContinuousTurret extends Turret{
 
         @Override
         protected void updateShooting(){
-            if(bullet != null){
+            if(bullets.any()){
                 return;
             }
 
-            if(canConsume() && !charging && shootWarmup >= minWarmup){
+            if(canConsume() && !charging() && shootWarmup >= minWarmup){
                 shoot(peekAmmo());
             }
         }
@@ -115,13 +113,15 @@ public class ContinuousTurret extends Turret{
         }
 
         @Override
-        protected void handleBullet(@Nullable Bullet bullet){
-            this.bullet = bullet;
+        protected void handleBullet(@Nullable Bullet bullet, float offsetX, float offsetY, float angleOffset){
+            if(bullet != null){
+                bullets.add(new BulletEntry(bullet, offsetX, offsetY, angleOffset, 0f));
+            }
         }
 
         @Override
         public boolean shouldActiveSound(){
-            return bullet != null;
+            return bullets.any();
         }
     }
 }

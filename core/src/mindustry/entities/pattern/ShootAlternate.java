@@ -1,6 +1,6 @@
 package mindustry.entities.pattern;
 
-public class AlternatePattern extends ShotPattern{
+public class ShootAlternate extends ShootPattern{
     /** number of barrels used for shooting. */
     public int barrels = 2;
     /** spread between barrels, in world units - not degrees. */

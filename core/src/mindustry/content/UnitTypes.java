@@ -874,7 +874,7 @@ public class UnitTypes{
                 shadow = 12f;
                 recoil = 3f;
 
-                shoot = new SpreadPattern(){{
+                shoot = new ShootSpread(){{
                     shots = 2;
                     spread = 17f;
                 }};
@@ -1695,7 +1695,7 @@ public class UnitTypes{
                 shake = 1f;
                 shootSound = Sounds.missile;
 
-                shoot = new AlternatePattern(){{
+                shoot = new ShootAlternate(){{
                     shots = 6;
                     shotDelay = 1.5f;
                     spread = 4f;
@@ -2406,7 +2406,7 @@ public class UnitTypes{
                 reload = 15f;
                 x = 1f;
                 y = 2f;
-                shoot = new SpreadPattern(){{
+                shoot = new ShootSpread(){{
                     shots = 2;
                     shotDelay = 3f;
                     spread = 2f;
@@ -2484,8 +2484,8 @@ public class UnitTypes{
 
             weapons.add(new Weapon("locus-weapon"){{
                 layerOffset = 0.0001f;
-                reload = 70f;
-                shootY = 8f;
+                reload = 30f;
+                shootY = 9.3f;
                 recoil = 1f;
                 rotate = true;
                 rotateSpeed = 1.4f;
@@ -2495,8 +2495,9 @@ public class UnitTypes{
                 heatColor = Color.valueOf("f9350f");
                 cooldownTime = 30f;
 
-                //TODO alternating double pattern
-                shoot.shots = 2;
+                shoot = new ShootAlternate(){{
+                    spread = 3.5f;
+                }};
 
                 bullet = new BasicBulletType(5f, 50){{
                     sprite = "missile-large";

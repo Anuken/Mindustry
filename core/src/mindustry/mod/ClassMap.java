@@ -64,12 +64,13 @@ public class ClassMap{
         classes.put("SeqEffect", mindustry.entities.effect.SeqEffect.class);
         classes.put("WaveEffect", mindustry.entities.effect.WaveEffect.class);
         classes.put("WrapEffect", mindustry.entities.effect.WrapEffect.class);
-        classes.put("AlternatePattern", mindustry.entities.pattern.AlternatePattern.class);
-        classes.put("MultiPattern", mindustry.entities.pattern.MultiPattern.class);
-        classes.put("ShotPattern", mindustry.entities.pattern.ShotPattern.class);
-        classes.put("BulletHandler", mindustry.entities.pattern.ShotPattern.BulletHandler.class);
-        classes.put("SinePattern", mindustry.entities.pattern.SinePattern.class);
-        classes.put("SpreadPattern", mindustry.entities.pattern.SpreadPattern.class);
+        classes.put("ShootAlternate", mindustry.entities.pattern.ShootAlternate.class);
+        classes.put("ShootBarrel", mindustry.entities.pattern.ShootBarrel.class);
+        classes.put("ShootMulti", mindustry.entities.pattern.ShootMulti.class);
+        classes.put("ShootPattern", mindustry.entities.pattern.ShootPattern.class);
+        classes.put("BulletHandler", mindustry.entities.pattern.ShootPattern.BulletHandler.class);
+        classes.put("ShootSine", mindustry.entities.pattern.ShootSine.class);
+        classes.put("ShootSpread", mindustry.entities.pattern.ShootSpread.class);
         classes.put("Objectives", mindustry.game.Objectives.class);
         classes.put("Objective", mindustry.game.Objectives.Objective.class);
         classes.put("OnPlanet", mindustry.game.Objectives.OnPlanet.class);
@@ -175,6 +176,7 @@ public class ClassMap{
         classes.put("TractorBeamBuild", mindustry.world.blocks.defense.turrets.TractorBeamTurret.TractorBeamBuild.class);
         classes.put("Turret", mindustry.world.blocks.defense.turrets.Turret.class);
         classes.put("AmmoEntry", mindustry.world.blocks.defense.turrets.Turret.AmmoEntry.class);
+        classes.put("BulletEntry", mindustry.world.blocks.defense.turrets.Turret.BulletEntry.class);
         classes.put("TurretBuild", mindustry.world.blocks.defense.turrets.Turret.TurretBuild.class);
         classes.put("ArmoredConveyor", mindustry.world.blocks.distribution.ArmoredConveyor.class);
         classes.put("ArmoredConveyorBuild", mindustry.world.blocks.distribution.ArmoredConveyor.ArmoredConveyorBuild.class);

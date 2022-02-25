@@ -1,6 +1,6 @@
 package mindustry.entities.pattern;
 
-public class SpreadPattern extends ShotPattern{
+public class ShootSpread extends ShootPattern{
     /** spread between bullets, in degrees. */
     public float spread = 5f;
 

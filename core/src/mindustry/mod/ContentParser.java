@@ -137,8 +137,8 @@ public class ContentParser{
             readFields(result, data);
             return result;
         });
-        put(ShotPattern.class, (type, data) -> {
-            var bc = resolve(data.getString("type", ""), ShotPattern.class);
+        put(ShootPattern.class, (type, data) -> {
+            var bc = resolve(data.getString("type", ""), ShootPattern.class);
             data.remove("type");
             var result = make(bc);
             readFields(result, data);

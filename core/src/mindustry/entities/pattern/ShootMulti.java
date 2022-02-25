@@ -1,15 +1,15 @@
 package mindustry.entities.pattern;
 
-public class MultiPattern extends ShotPattern{
-    public ShotPattern source;
-    public ShotPattern[] dest = {};
+public class ShootMulti extends ShootPattern{
+    public ShootPattern source;
+    public ShootPattern[] dest = {};
 
-    public MultiPattern(ShotPattern source, ShotPattern... dest){
+    public ShootMulti(ShootPattern source, ShootPattern... dest){
         this.source = source;
         this.dest = dest;
     }
 
-    public MultiPattern(){
+    public ShootMulti(){
     }
 
     @Override

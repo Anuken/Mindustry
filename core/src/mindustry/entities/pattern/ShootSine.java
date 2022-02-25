@@ -2,18 +2,18 @@ package mindustry.entities.pattern;
 
 import arc.math.*;
 
-public class SinePattern extends ShotPattern{
+public class ShootSine extends ShootPattern{
     /** scaling applied to bullet index */
     public float scl = 4f;
     /** magnitude of sine curve for position displacement */
     public float mag = 20f;
 
-    public SinePattern(float scl, float mag){
+    public ShootSine(float scl, float mag){
         this.scl = scl;
         this.mag = mag;
     }
 
-    public SinePattern(){
+    public ShootSine(){
     }
 
     @Override
