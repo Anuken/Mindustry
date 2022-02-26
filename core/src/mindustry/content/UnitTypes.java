@@ -2478,7 +2478,7 @@ public class UnitTypes{
             speed = 0.7f;
             rotateSpeed = 2.6f;
             health = 2000;
-            armor = 7f;
+            armor = 8f;
             areaDamage = 8f;
             treadRects = new Rect[]{new Rect(17, 10, 19, 76)};
             researchCostMultiplier = 0f;
@@ -2503,7 +2503,7 @@ public class UnitTypes{
                 //TODO make this look nice
                 bullet = new RailBulletType(){{
                     length = 140f;
-                    damage = 40f;
+                    damage = 50f;
                     hitColor = Color.valueOf("feb380");
                     hitEffect = endEffect = Fx.hitBulletColor;
                     shootEffect = Fx.shootBig;
@@ -2827,7 +2827,7 @@ public class UnitTypes{
                     frontColor = Color.white;
                     width = 7.5f;
                     height = 10f;
-                    lifetime = 55f;
+                    lifetime = 40f;
                     trailWidth = 2f;
                     trailLength = 4;
                     shake = 0.5f;
