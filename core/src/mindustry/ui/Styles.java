@@ -18,7 +18,6 @@ import arc.scene.ui.TreeElement.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.ui.dialogs.*;
 
 import static mindustry.gen.Tex.*;
 
@@ -26,11 +25,12 @@ import static mindustry.gen.Tex.*;
 public class Styles{
     //TODO all these names are inconsistent and not descriptive
     public static Drawable black, black9, black8, black6, black3, black5, none, flatDown, flatOver, accentDrawable;
-    public static ButtonStyle defaultb, waveb, modsb, underlineb;
-    public static TextButtonStyle defaultt, squaret, nodet, cleart, discordt, nonet, infot, clearPartialt, clearTogglet, logicTogglet, clearToggleMenut, togglet, transt, fullTogglet, squareTogglet, logict;
-    public static ImageButtonStyle defaulti, nodei, righti, emptyi, emptytogglei, selecti, logici, geni, colori, accenti, cleari, clearFulli, clearPartiali, clearPartial2i, clearTogglei, clearTransi, clearToggleTransi, clearTogglePartiali;
+
+    public static ButtonStyle defaultb, underlineb;
+
+    public static TextButtonStyle defaultt, nodet, cleart, nonet, clearPartialt, clearTogglet, logicTogglet, clearToggleMenut, togglet, transt, fullTogglet, squareTogglet, logict;
+    public static ImageButtonStyle defaulti, nodei, emptyi, emptytogglei, selecti, logici, geni, colori, accenti, cleari, clearFulli, clearPartiali, clearTogglei, clearTransi, clearToggleTransi, clearTogglePartiali;
     public static ScrollPaneStyle defaultPane, horizontalPane, smallPane, nonePane;
-    public static KeybindDialog.KeybindDialogStyle defaultKeybindDialog;
     public static SliderStyle defaultSlider;
     public static LabelStyle defaultLabel, outlineLabel, techLabel;
     public static TextFieldStyle defaultField, nodeField, areaField, nodeArea;
@@ -59,23 +59,11 @@ public class Styles{
             disabled = buttonDisabled;
         }};
 
-        modsb = new ButtonStyle(){{
-            down = flatOver;
-            up = underline;
-            over = underline2;
-        }};
-
         underlineb = new ButtonStyle(){{
             down = flatOver;
             up = sideline;
             over = sidelineOver;
             checked = flatOver;
-        }};
-        
-        waveb = new ButtonStyle(){{
-            up = wavepane;
-            over = wavepane; //TODO wrong
-            disabled = wavepane;
         }};
 
         defaultt = new TextButtonStyle(){{
@@ -86,15 +74,6 @@ public class Styles{
             disabledFontColor = Color.gray;
             down = buttonDown;
             up = button;
-        }};
-        squaret = new TextButtonStyle(){{
-            font = Fonts.def;
-            fontColor = Color.white;
-            disabledFontColor = Color.gray;
-            over = buttonSquareOver;
-            disabled = buttonDisabled;
-            down = buttonSquareDown;
-            up = buttonSquare;
         }};
         nodet = new TextButtonStyle(){{
             disabled = button;
@@ -126,16 +105,6 @@ public class Styles{
             disabledFontColor = Color.gray;
             down = flatOver;
             up = underlineWhite;
-        }};
-        discordt = new TextButtonStyle(){{
-            font = Fonts.def;
-            fontColor = Color.white;
-            up = discordBanner;
-        }};
-        infot = new TextButtonStyle(){{
-            font = Fonts.def;
-            fontColor = Color.white;
-            up = infoBanner;
         }};
         clearPartialt = new TextButtonStyle(){{
             down = flatOver;
@@ -225,14 +194,6 @@ public class Styles{
             up = buttonOver;
             over = buttonDown;
         }};
-        righti = new ImageButtonStyle(){{
-            over = buttonRightOver;
-            down = buttonRightDown;
-            up = buttonRight;
-            disabled = buttonRightDisabled;
-            imageDisabledColor = Color.clear;
-            imageUpColor = Color.white;
-        }};
         emptyi = new ImageButtonStyle(){{
             imageDownColor = Pal.accent;
             imageOverColor = Color.lightGray;
@@ -282,11 +243,6 @@ public class Styles{
             imageDisabledColor = Color.gray;
             imageUpColor = Color.white;
         }};
-        clearPartial2i = new ImageButtonStyle(){{
-            down = whiteui;
-            up = pane;
-            over = flatDown;
-        }};
         clearTogglei = new ImageButtonStyle(){{
             down = flatDown;
             checked = flatDown;
@@ -329,12 +285,6 @@ public class Styles{
             vScrollKnob = scrollKnobVerticalThin;
         }};
         nonePane = new ScrollPaneStyle();
-
-        defaultKeybindDialog = new KeybindDialog.KeybindDialogStyle(){{
-            keyColor = Pal.accent;
-            keyNameColor = Color.white;
-            controllerColor = Color.lightGray;
-        }};
 
         defaultSlider = new SliderStyle(){{
             background = sliderBack;

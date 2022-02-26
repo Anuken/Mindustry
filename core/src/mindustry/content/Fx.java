@@ -1234,18 +1234,6 @@ public class Fx{
         Lines.circle(e.x, e.y, e.fin() * 50f);
     }),
 
-    nuclearShockwave = new Effect(10f, 200f, e -> {
-        color(Color.white, Color.lightGray, e.fin());
-        stroke(e.fout() * 3f + 0.2f);
-        Lines.circle(e.x, e.y, e.fin() * 140f);
-    }),
-
-    impactShockwave = new Effect(13f, 300f, e -> {
-        color(Pal.lighterOrange, Color.lightGray, e.fin());
-        stroke(e.fout() * 4f + 0.2f);
-        Lines.circle(e.x, e.y, e.fin() * 200f);
-    }),
-
     spawnShockwave = new Effect(20f, 400f, e -> {
         color(Color.white, Color.lightGray, e.fin());
         stroke(e.fout() * 3f + 0.5f);
@@ -1390,27 +1378,6 @@ public class Fx{
                 lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1f + out * 4 * (4f + intensity));
                 Drawf.light(e.x + x, e.y + y, (out * 4 * (3f + intensity)) * 3.5f, Draw.getColor(), 0.8f);
             });
-        });
-    }),
-
-    blockExplosion = new Effect(30, e -> {
-        e.scaled(7, i -> {
-            stroke(3.1f * i.fout());
-            Lines.circle(e.x, e.y, 3f + i.fin() * 14f);
-        });
-
-        color(Color.gray);
-
-        randLenVectors(e.id, 6, 2f + 19f * e.finpow(), (x, y) -> {
-            Fill.circle(e.x + x, e.y + y, e.fout() * 3f + 0.5f);
-            Fill.circle(e.x + x / 2f, e.y + y / 2f, e.fout());
-        });
-
-        color(Pal.lighterOrange, Pal.lightOrange, Color.gray, e.fin());
-        stroke(1.7f * e.fout());
-
-        randLenVectors(e.id + 1, 9, 1f + 23f * e.finpow(), (x, y) -> {
-            lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1f + e.fout() * 3f);
         });
     }),
 
@@ -1872,47 +1839,6 @@ public class Fx{
         });
     }),
 
-    nuclearsmoke = new Effect(40, e -> {
-        randLenVectors(e.id, 4, e.fin() * 13f, (x, y) -> {
-            float size = e.fslope() * 4f;
-            color(Color.lightGray, Color.gray, e.fin());
-            Fill.circle(e.x + x, e.y + y, size/2f);
-        });
-    }),
-
-    cloudsmoke = new Effect(70, e -> {
-        randLenVectors(e.id, 12, 15f + e.fin() * 45f, (x, y) -> {
-            float size = e.fslope() * 2f;
-            color(Color.gray);
-            alpha(e.fslope());
-            Fill.circle(e.x + x, e.y + y, size);
-        });
-    }),
-
-    nuclearcloud = new Effect(90, 200f, e -> {
-        randLenVectors(e.id, 10, e.finpow() * 90f, (x, y) -> {
-            float size = e.fout() * 14f;
-            color(Color.lime, Color.gray, e.fin());
-            Fill.circle(e.x + x, e.y + y, size/2f);
-        });
-    }),
-
-    impactsmoke = new Effect(60, e -> {
-        randLenVectors(e.id, 7, e.fin() * 20f, (x, y) -> {
-            float size = e.fslope() * 4f;
-            color(Color.lightGray, Color.gray, e.fin());
-            Fill.circle(e.x + x, e.y + y, size/2f);
-        });
-    }),
-
-    impactcloud = new Effect(140, 400f, e -> {
-        randLenVectors(e.id, 20, e.finpow() * 160f, (x, y) -> {
-            float size = e.fout() * 15f;
-            color(Pal.lighterOrange, Color.lightGray, e.fin());
-            Fill.circle(e.x + x, e.y + y, size/2f);
-        });
-    }),
-
     redgeneratespark = new Effect(90, e -> {
         color(Pal.redSpark);
         alpha(e.fslope());
@@ -1932,17 +1858,6 @@ public class Fx{
         for(int i = 0; i < 3; i++){
             v.trns(rand.random(360f), rand.random(e.finpow() * 14f)).add(e.x, e.y);
             Fill.circle(v.x, v.y, rand.random(1.4f, 3.4f));
-        }
-    }).layer(Layer.bullet - 1f),
-
-    crucibleSmoke = new Effect(100, e -> {
-        color(Pal.redLight);
-        alpha(e.fslope() * 0.8f);
-
-        rand.setSeed(e.id);
-        for(int i = 0; i < 5; i++){
-            v.trns(rand.random(360f), rand.random(e.finpow() * 14f)).add(e.x, e.y);
-            Fill.circle(v.x, v.y, rand.random(1.4f, 2.8f));
         }
     }).layer(Layer.bullet - 1f),
 
@@ -2000,13 +1915,6 @@ public class Fx{
         randLenVectors(e.id, 5, 3f + e.fin() * 8f, (x, y) -> {
             color(Pal.redDust, Pal.stoneGray, e.fin());
             Fill.square(e.x + x, e.y + y, e.fout() * 2f + 0.5f, 45);
-        });
-    }),
-
-    pulverizeRedder = new Effect(40, e -> {
-        randLenVectors(e.id, 5, 3f + e.fin() * 9f, (x, y) -> {
-            color(Pal.redderDust, Pal.stoneGray, e.fin());
-            Fill.square(e.x + x, e.y + y, e.fout() * 2.5f + 0.5f, 45);
         });
     }),
 
@@ -2096,24 +2004,6 @@ public class Fx{
         Lines.square(e.x, e.y, tilesize + e.fout() * 2f);
     }),
 
-    purify = new Effect(10, e -> {
-        color(Color.royal, Color.gray, e.fin());
-        stroke(2f);
-        Lines.spikes(e.x, e.y, e.fin() * 4f, 2, 6);
-    }),
-
-    purifyoil = new Effect(10, e -> {
-        color(Color.black, Color.gray, e.fin());
-        stroke(2f);
-        Lines.spikes(e.x, e.y, e.fin() * 4f, 2, 6);
-    }),
-
-    purifystone = new Effect(10, e -> {
-        color(Color.orange, Color.gray, e.fin());
-        stroke(2f);
-        Lines.spikes(e.x, e.y, e.fin() * 4f, 2, 6);
-    }),
-
     generate = new Effect(11, e -> {
         color(Color.orange, Color.yellow, e.fin());
         stroke(1f);
@@ -2181,13 +2071,6 @@ public class Fx{
         color(Color.white, Pal.accent, e.fin());
         randLenVectors(e.id, 12, 7f + e.fin() * 13f, (x, y) -> {
             Fill.square(e.x + x, e.y + y, e.fout() * 2.1f + 0.5f, 45);
-        });
-    }),
-
-    smelt = new Effect(20, e -> {
-        color(Color.white, e.color, e.fin());
-        randLenVectors(e.id, 6, 2f + e.fin() * 5f, (x, y) -> {
-            Fill.square(e.x + x, e.y + y, 0.5f + e.fout() * 2f, 45);
         });
     }),
 

@@ -147,8 +147,8 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
             Leg l = legs[i];
 
             //TODO is limiting twice necessary?
-            l.joint.sub(baseOffset).limit(type.maxStretch * legLength/2f).add(baseOffset);
-            l.base.sub(baseOffset).limit(type.maxStretch * legLength).add(baseOffset);
+            l.joint.sub(baseOffset).clampLength(type.maxCompress * legLength/2f, type.maxStretch * legLength/2f).add(baseOffset);
+            l.base.sub(baseOffset).clampLength(type.maxCompress * legLength, type.maxStretch * legLength).add(baseOffset);
 
             float stageF = (totalLength + i*type.legPairOffset) / moveSpace;
             int stage = (int)stageF;
@@ -212,8 +212,8 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
             l.joint.lerpDelta(jointDest, moveSpeed / 4f);
 
             //limit again after updating
-            l.joint.sub(baseOffset).limit(type.maxStretch * legLength/2f).add(baseOffset);
-            l.base.sub(baseOffset).limit(type.maxStretch * legLength).add(baseOffset);
+            l.joint.sub(baseOffset).clampLength(type.maxCompress * legLength/2f, type.maxStretch * legLength/2f).add(baseOffset);
+            l.base.sub(baseOffset).clampLength(type.maxCompress * legLength, type.maxStretch * legLength).add(baseOffset);
         }
 
         //when at least 1 leg is touching land, it can't drown

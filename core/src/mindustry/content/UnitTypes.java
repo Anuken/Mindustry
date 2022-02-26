@@ -36,7 +36,8 @@ public class UnitTypes{
     public static @EntityDef(value = {Unitc.class, Mechc.class}, legacy = true) UnitType nova, pulsar, quasar;
 
     //legs
-    public static @EntityDef({Unitc.class, Legsc.class}) UnitType corvus, atrax, bulwark, krepost;
+    public static @EntityDef({Unitc.class, Legsc.class}) UnitType corvus, atrax,
+    latum, bulwark, krepost;
 
     //legs, legacy
     public static @EntityDef(value = {Unitc.class, Legsc.class}, legacy = true) UnitType spiroct, arkyid, toxopid;
@@ -641,7 +642,7 @@ public class UnitTypes{
             visualElevation = 0.2f;
             groundLayer = Layer.legUnit - 1f;
 
-            weapons.add(new Weapon("eruption"){{
+            weapons.add(new Weapon("atrax-weapon"){{
                 top = false;
                 shootY = 3f;
                 reload = 9f;
@@ -2499,6 +2500,7 @@ public class UnitTypes{
                     spread = 3.5f;
                 }};
 
+                //TODO make this look nice
                 bullet = new RailBulletType(){{
                     length = 140f;
                     damage = 40f;
@@ -2770,6 +2772,52 @@ public class UnitTypes{
 
         //endregion
         //region erekir - mech
+
+        latum = new ErekirUnitType("latum"){{
+            speed = 0.7f;
+            drag = 0.1f;
+            hitSize = 14f;
+            rotateSpeed = 3f;
+            health = 700;
+
+            legCount = 4;
+            legLength = 14f;
+            lockLegBase = true;
+            legContinuousMove = true;
+            legExtension = -3f;
+            legBaseOffset = 5f;
+            maxStretch = 1.1f;
+            maxCompress = 0.2f;
+            legLengthScl = 0.95f;
+            legTrns = 0.7f;
+
+            legMoveSpace = 1f;
+            hovering = true;
+            armor = 5f;
+
+            visualElevation = 0.2f;
+            groundLayer = Layer.legUnit - 1f;
+
+            if(false)
+            weapons.add(new Weapon("eruption"){{
+                top = false;
+                shootY = 3f;
+                reload = 9f;
+                ejectEffect = Fx.none;
+                recoil = 1f;
+                x = 7f;
+                shootSound = Sounds.flame;
+
+                bullet = new LiquidBulletType(Liquids.slag){{
+                    damage = 13;
+                    speed = 2.5f;
+                    drag = 0.009f;
+                    shootEffect = Fx.shootSmall;
+                    lifetime = 57f;
+                    collidesAir = false;
+                }};
+            }});
+        }};
 
         bulwark = new ErekirUnitType("bulwark"){{
             drag = 0.1f;

@@ -9,6 +9,7 @@ import arc.scene.actions.*;
 import arc.scene.event.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
+import arc.scene.ui.TextButton.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.core.*;
@@ -18,6 +19,7 @@ import mindustry.graphics.*;
 import mindustry.ui.*;
 
 import static mindustry.Vars.*;
+import static mindustry.gen.Tex.*;
 
 public class MenuFragment extends Fragment{
     private Table container, submenu;
@@ -52,8 +54,17 @@ public class MenuFragment extends Fragment{
 
         //info icon
         if(mobile){
-            parent.fill(c -> c.bottom().left().button("", Styles.infot, ui.about::show).size(84, 45).name("info"));
-            parent.fill(c -> c.bottom().right().button("", Styles.discordt, ui.discord::show).size(84, 45).name("discord"));
+            parent.fill(c -> c.bottom().left().button("", new TextButtonStyle(){{
+                font = Fonts.def;
+                fontColor = Color.white;
+                up = infoBanner;
+            }}, ui.about::show).size(84, 45).name("info"));
+
+            parent.fill(c -> c.bottom().right().button("", new TextButtonStyle(){{
+                font = Fonts.def;
+                fontColor = Color.white;
+                up = discordBanner;
+            }}, ui.discord::show).size(84, 45).name("discord"));
         }else if(becontrol.active()){
             parent.fill(c -> c.bottom().right().button("@be.check", Icon.refresh, () -> {
                 ui.loadfrag.show();

@@ -6,7 +6,6 @@ import arc.graphics.*;
 import arc.input.*;
 import arc.input.InputDevice.*;
 import arc.scene.event.*;
-import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
@@ -18,7 +17,6 @@ import mindustry.ui.*;
 import static arc.Core.*;
 
 public class KeybindDialog extends Dialog{
-    protected KeybindDialogStyle style;
     protected Section section;
     protected KeyBind rebindKey = null;
     protected boolean rebindAxis = false;
@@ -30,7 +28,6 @@ public class KeybindDialog extends Dialog{
 
     public KeybindDialog(){
         super(bundle.get("keybind.title", "Rebind Keys"));
-        style = scene.getStyle(KeybindDialogStyle.class);
         setup();
         addCloseButton();
         setFillParent(true);
@@ -46,11 +43,6 @@ public class KeybindDialog extends Dialog{
         keyDown(key -> {
             if(key == KeyCode.escape || key == KeyCode.back) hide();
         });
-    }
-
-    public void setStyle(KeybindDialogStyle style){
-        this.style = style;
-        setup();
     }
 
     private void setup(){
@@ -124,7 +116,7 @@ public class KeybindDialog extends Dialog{
             table.add().height(10);
             table.row();
             if(section.device.type() == DeviceType.controller){
-                table.table(info -> info.add("Controller Type: [#" + style.controllerColor.toString().toUpperCase() + "]" +
+                table.table(info -> info.add("Controller Type: [lightGray]" +
                 Strings.capitalize(section.device.name())).left());
             }
             table.row();
@@ -140,12 +132,12 @@ public class KeybindDialog extends Dialog{
                 }
 
                 if(keybind.defaultValue(section.device.type()) instanceof Axis){
-                    table.add(bundle.get("keybind." + keybind.name() + ".name", Strings.capitalize(keybind.name())), style.keyNameColor).left().padRight(40).padLeft(8);
+                    table.add(bundle.get("keybind." + keybind.name() + ".name", Strings.capitalize(keybind.name())), Color.white).left().padRight(40).padLeft(8);
 
                     table.labelWrap(() -> {
                         Axis axis = keybinds.get(section, keybind);
                         return axis.key != null ? axis.key.toString() : axis.min + " [red]/[] " + axis.max;
-                    }).color(style.keyColor).left().minWidth(90).fillX().padRight(20);
+                    }).color(Pal.accent).left().minWidth(90).fillX().padRight(20);
 
                     table.button("@settings.rebind", tstyle, () -> {
                         rebindAxis = true;
@@ -153,8 +145,8 @@ public class KeybindDialog extends Dialog{
                         openDialog(section, keybind);
                     }).width(130f);
                 }else{
-                    table.add(bundle.get("keybind." + keybind.name() + ".name", Strings.capitalize(keybind.name())), style.keyNameColor).left().padRight(40).padLeft(8);
-                    table.label(() -> keybinds.get(section, keybind).key.toString()).color(style.keyColor).left().minWidth(90).padRight(20);
+                    table.add(bundle.get("keybind." + keybind.name() + ".name", Strings.capitalize(keybind.name())), Color.white).left().padRight(40).padLeft(8);
+                    table.label(() -> keybinds.get(section, keybind).key.toString()).color(Pal.accent).left().minWidth(90).padRight(20);
 
                     table.button("@settings.rebind", tstyle, () -> {
                         rebindAxis = false;
@@ -238,11 +230,5 @@ public class KeybindDialog extends Dialog{
 
         rebindDialog.show();
         Time.runTask(1f, () -> getScene().setScrollFocus(rebindDialog));
-    }
-
-    public static class KeybindDialogStyle extends Style{
-        public Color keyColor = Color.white;
-        public Color keyNameColor = Color.white;
-        public Color controllerColor = Color.white;
     }
 }

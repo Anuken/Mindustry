@@ -29,6 +29,7 @@ import mindustry.type.*;
 import mindustry.ui.*;
 
 import static mindustry.Vars.*;
+import static mindustry.gen.Tex.*;
 
 public class HudFragment extends Fragment{
     private static final float dsize = 65f, pauseHeight = 36f;
@@ -199,8 +200,17 @@ public class HudFragment extends Fragment{
                 //wave info button with text
                 s.add(makeStatusTable()).grow().name("status");
 
+                var rightStyle = new ImageButtonStyle(){{
+                    over = buttonRightOver;
+                    down = buttonRightDown;
+                    up = buttonRight;
+                    disabled = buttonRightDisabled;
+                    imageDisabledColor = Color.clear;
+                    imageUpColor = Color.white;
+                }};
+
                 //table with button to skip wave
-                s.button(Icon.play, Styles.righti, 30f, () -> {
+                s.button(Icon.play, rightStyle, 30f, () -> {
                     if(net.client() && player.admin){
                         Call.adminRequest(player, AdminAction.wave);
                     }else{
