@@ -107,7 +107,7 @@ public class Turret extends ReloadTurret{
         super.setStats();
 
         stats.add(Stat.inaccuracy, (int)inaccuracy, StatUnit.degrees);
-        stats.add(Stat.reload, 60f / (reloadTime) * shoot.shots, StatUnit.perSecond);
+        stats.add(Stat.reload, 60f / (reload) * shoot.shots, StatUnit.perSecond);
         stats.add(Stat.targetsAir, targetAir);
         stats.add(Stat.targetsGround, targetGround);
         if(ammoPerShot != 1) stats.add(Stat.ammoUse, ammoPerShot, StatUnit.perShot);
@@ -180,7 +180,7 @@ public class Turret extends ReloadTurret{
 
         public float estimateDps(){
             if(!hasAmmo()) return 0f;
-            return shoot.shots / reloadTime * 60f * peekAmmo().estimateDPS() * efficiency * timeScale;
+            return shoot.shots / reload * 60f * peekAmmo().estimateDPS() * efficiency * timeScale;
         }
 
         @Override
@@ -252,7 +252,7 @@ public class Turret extends ReloadTurret{
 
         @Override
         public float progress(){
-            return Mathf.clamp(reload / reloadTime);
+            return Mathf.clamp(reloadCounter / reload);
         }
 
         public boolean isShooting(){
@@ -332,7 +332,7 @@ public class Turret extends ReloadTurret{
             updateReload();
 
             if(hasAmmo()){
-                if(Float.isNaN(reload)) reload = 0;
+                if(Float.isNaN(reloadCounter)) reloadCounter = 0;
 
                 if(timer(timerTarget, targetInterval)){
                     findTarget();
@@ -451,20 +451,20 @@ public class Turret extends ReloadTurret{
 
         protected void updateReload(){
             float multiplier = hasAmmo() ? peekAmmo().reloadMultiplier : 1f;
-            reload += delta() * multiplier * baseReloadSpeed();
+            reloadCounter += delta() * multiplier * baseReloadSpeed();
 
             //cap reload for visual reasons
-            reload = Math.min(reload, reloadTime);
+            reloadCounter = Math.min(reloadCounter, reload);
         }
 
         protected void updateShooting(){
 
-            if(reload >= reloadTime && !charging() && shootWarmup >= minWarmup){
+            if(reloadCounter >= reload && !charging() && shootWarmup >= minWarmup){
                 BulletType type = peekAmmo();
 
                 shoot(type);
 
-                reload %= reloadTime;
+                reloadCounter %= reload;
             }
         }
 
@@ -530,7 +530,7 @@ public class Turret extends ReloadTurret{
         @Override
         public void write(Writes write){
             super.write(write);
-            write.f(reload);
+            write.f(reloadCounter);
             write.f(rotation);
         }
 
@@ -539,7 +539,7 @@ public class Turret extends ReloadTurret{
             super.read(read, revision);
 
             if(revision >= 1){
-                reload = read.f();
+                reloadCounter = read.f();
                 rotation = read.f();
             }
         }

@@ -26,7 +26,7 @@ public class LaserTurret extends PowerTurret{
         super.setStats();
 
         stats.remove(Stat.booster);
-        stats.add(Stat.input, StatValues.boosters(reloadTime, coolant.amount, coolantMultiplier, false, this::consumesLiquid));
+        stats.add(Stat.input, StatValues.boosters(reload, coolant.amount, coolantMultiplier, false, this::consumesLiquid));
     }
 
     public class LaserTurretBuild extends PowerTurretBuild{
@@ -66,13 +66,13 @@ public class LaserTurret extends PowerTurret{
                 wasShooting = true;
                 heat = 1f;
                 recoil = recoilAmount;
-            }else if(reload > 0){
+            }else if(reloadCounter > 0){
                 wasShooting = true;
                 //TODO does not handle multi liquid req?
                 Liquid liquid = liquids.current();
                 float maxUsed = coolant.amount;
                 float used = (cheating() ? maxUsed : Math.min(liquids.get(liquid), maxUsed)) * delta();
-                reload -= used * liquid.heatCapacity * coolantMultiplier;
+                reloadCounter -= used * liquid.heatCapacity * coolantMultiplier;
                 liquids.remove(liquid, used);
 
                 if(Mathf.chance(0.06 * used)){
@@ -83,7 +83,7 @@ public class LaserTurret extends PowerTurret{
 
         @Override
         public float progress(){
-            return 1f - Mathf.clamp(reload / reloadTime);
+            return 1f - Mathf.clamp(reloadCounter / reload);
         }
 
         @Override
@@ -97,12 +97,12 @@ public class LaserTurret extends PowerTurret{
                 return;
             }
 
-            if(reload <= 0 && efficiency > 0 && !charging() && shootWarmup >= minWarmup){
+            if(reloadCounter <= 0 && efficiency > 0 && !charging() && shootWarmup >= minWarmup){
                 BulletType type = peekAmmo();
 
                 shoot(type);
 
-                reload = reloadTime;
+                reloadCounter = reload;
             }
         }
 

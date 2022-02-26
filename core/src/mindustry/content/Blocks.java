@@ -2731,7 +2731,7 @@ public class Blocks{
             }};
 
             shootY = 3f;
-            reloadTime = 20f;
+            reload = 20f;
             restitution = 0.03f;
             range = 110;
             shootCone = 15f;
@@ -2751,7 +2751,7 @@ public class Blocks{
                 Items.lead, Bullets.flakLead,
                 Items.metaglass, Bullets.flakGlass
             );
-            reloadTime = 18f;
+            reload = 18f;
             range = 220f;
             size = 2;
             targetGround = false;
@@ -2778,7 +2778,7 @@ public class Blocks{
                 Items.pyratite, Bullets.pyraFlame
             );
             recoilAmount = 0f;
-            reloadTime = 6f;
+            reload = 6f;
             coolantMultiplier = 1.5f;
             range = 60f;
             shootCone = 50f;
@@ -2797,7 +2797,7 @@ public class Blocks{
                 Items.pyratite, Bullets.artilleryIncendiary
             );
             targetAir = false;
-            reloadTime = 60f;
+            reload = 60f;
             recoilAmount = 2f;
             range = 235f;
             inaccuracy = 1f;
@@ -2818,7 +2818,7 @@ public class Blocks{
             );
             size = 2;
             recoilAmount = 0f;
-            reloadTime = 3f;
+            reload = 3f;
             inaccuracy = 5f;
             shootCone = 50f;
             liquidCapacity = 10f;
@@ -2836,7 +2836,7 @@ public class Blocks{
             shoot.firstShotDelay = 40f;
 
             recoilAmount = 2f;
-            reloadTime = 80f;
+            reload = 80f;
             cooldown = 0.03f;
             shootShake = 2f;
             shootEffect = Fx.lancerLaserShoot;
@@ -2874,7 +2874,7 @@ public class Blocks{
                 collidesAir = false;
                 ammoMultiplier = 1f;
             }};
-            reloadTime = 35f;
+            reload = 35f;
             shootCone = 40f;
             rotateSpeed = 8f;
             targetAir = false;
@@ -2920,7 +2920,7 @@ public class Blocks{
             }};
 
             shootY = 7f;
-            reloadTime = 30f;
+            reload = 30f;
             inaccuracy = 10f;
             range = 240f;
             size = 2;
@@ -2944,7 +2944,7 @@ public class Blocks{
 
             size = 2;
             range = 190f;
-            reloadTime = 31f;
+            reload = 31f;
             restitution = 0.03f;
             ammoEjectBack = 3f;
             cooldown = 0.03f;
@@ -2971,7 +2971,7 @@ public class Blocks{
             size = 2;
             shootLength = 5f;
             bulletDamage = 30f;
-            reloadTime = 8f;
+            reload = 8f;
             envEnabled |= Env.space;
         }};
 
@@ -2984,7 +2984,7 @@ public class Blocks{
                 Liquids.oil, Bullets.heavyOilShot
             );
             size = 3;
-            reloadTime = 3f;
+            reload = 3f;
             shoot.shots = 2;
             velocityInaccuracy = 0.1f;
             inaccuracy = 4f;
@@ -3001,7 +3001,7 @@ public class Blocks{
         fuse = new ItemTurret("fuse"){{
             requirements(Category.turret, with(Items.copper, 225, Items.graphite, 225, Items.thorium, 100));
 
-            reloadTime = 35f;
+            reload = 35f;
             shootShake = 4f;
             range = 90f;
             recoilAmount = 5f;
@@ -3054,7 +3054,7 @@ public class Blocks{
             size = 3;
             shoot.shots = 4;
             inaccuracy = 12f;
-            reloadTime = 60f;
+            reload = 60f;
             ammoEjectBack = 5f;
             ammoUseEffect = Fx.casing3Double;
             ammoPerShot = 2;
@@ -3087,7 +3087,7 @@ public class Blocks{
                 -3f, 0f, 0f,
                 };
             }};
-            reloadTime = 8f;
+            reload = 8f;
             range = 200f;
             size = 3;
             recoilAmount = 3f;
@@ -3124,7 +3124,7 @@ public class Blocks{
             maxAmmo = 40;
             ammoPerShot = 5;
             rotateSpeed = 2f;
-            reloadTime = 200f;
+            reload = 200f;
             ammoUseEffect = Fx.casing3Double;
             recoilAmount = 5f;
             restitution = 0.009f;
@@ -3150,7 +3150,7 @@ public class Blocks{
                 Items.pyratite, Bullets.standardIncendiaryBig,
                 Items.thorium, Bullets.standardThoriumBig
             );
-            reloadTime = 7f;
+            reload = 7f;
             coolantMultiplier = 0.5f;
             restitution = 0.1f;
             ammoUseEffect = Fx.casing3;
@@ -3179,7 +3179,7 @@ public class Blocks{
             size = 4;
             shootShake = 2f;
             range = 195f;
-            reloadTime = 90f;
+            reload = 90f;
             firingMoveFract = 0.5f;
             shootDuration = 230f;
             shootSound = Sounds.laserbig;
@@ -3253,7 +3253,7 @@ public class Blocks{
             outlineColor = Pal.darkOutline;
             size = 3;
             envEnabled |= Env.space;
-            reloadTime = 40f;
+            reload = 40f;
             recoilAmount = 2f;
             restitution = 0.03f;
             range = 190;
@@ -3380,7 +3380,7 @@ public class Blocks{
             targetAir = false;
             shootShake = 4f;
             recoilAmount = 1f;
-            reloadTime = 60f * 2.3f;
+            reload = 60f * 2.3f;
             shootY = 7f;
             rotateSpeed = 1.4f;
             minWarmup = 0.85f;
@@ -3453,7 +3453,7 @@ public class Blocks{
             }});
 
 
-            reloadTime = 9f;
+            reload = 9f;
             shootY = 15f;
             rotateSpeed = 5f;
             shootCone = 30f;

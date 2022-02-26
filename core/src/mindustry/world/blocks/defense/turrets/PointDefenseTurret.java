@@ -35,7 +35,7 @@ public class PointDefenseTurret extends ReloadTurret{
         super(name);
 
         rotateSpeed = 20f;
-        reloadTime = 30f;
+        reload = 30f;
 
         coolantMultiplier = 2f;
     }
@@ -49,7 +49,7 @@ public class PointDefenseTurret extends ReloadTurret{
     public void setStats(){
         super.setStats();
 
-        stats.add(Stat.reload, 60f / reloadTime, StatUnit.perSecond);
+        stats.add(Stat.reload, 60f / reload, StatUnit.perSecond);
     }
 
     public class PointDefenseBuild extends ReloadTurretBuild{
@@ -76,10 +76,10 @@ public class PointDefenseTurret extends ReloadTurret{
             if(target != null && target.within(this, range) && target.team != team && target.type() != null && target.type().hittable){
                 float dest = angleTo(target);
                 rotation = Angles.moveToward(rotation, dest, rotateSpeed * edelta());
-                reload += edelta();
+                reloadCounter += edelta();
 
                 //shoot when possible
-                if(Angles.within(rotation, dest, shootCone) && reload >= reloadTime){
+                if(Angles.within(rotation, dest, shootCone) && reloadCounter >= reload){
                     if(target.damage() > bulletDamage){
                         target.damage(target.damage() - bulletDamage);
                     }else{
@@ -92,7 +92,7 @@ public class PointDefenseTurret extends ReloadTurret{
                     shootEffect.at(x + Tmp.v1.x, y + Tmp.v1.y, rotation, color);
                     hitEffect.at(target.x, target.y, color);
                     shootSound.at(x + Tmp.v1.x, y + Tmp.v1.y, Mathf.random(0.9f, 1.1f));
-                    reload = 0;
+                    reloadCounter = 0;
                 }
             }
         }

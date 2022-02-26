@@ -2477,7 +2477,7 @@ public class UnitTypes{
             treadPullOffset = 5;
             speed = 0.7f;
             rotateSpeed = 2.6f;
-            health = 800;
+            health = 2000;
             armor = 7f;
             areaDamage = 8f;
             treadRects = new Rect[]{new Rect(17, 10, 19, 76)};
@@ -2778,7 +2778,8 @@ public class UnitTypes{
             drag = 0.1f;
             hitSize = 14f;
             rotateSpeed = 3f;
-            health = 700;
+            health = 1100;
+            armor = 5f;
 
             legCount = 4;
             legLength = 14f;
@@ -2793,28 +2794,70 @@ public class UnitTypes{
 
             legMoveSpace = 1f;
             hovering = true;
-            armor = 5f;
 
             visualElevation = 0.2f;
             groundLayer = Layer.legUnit - 1f;
 
-            if(false)
-            weapons.add(new Weapon("eruption"){{
-                top = false;
-                shootY = 3f;
-                reload = 9f;
-                ejectEffect = Fx.none;
-                recoil = 1f;
-                x = 7f;
-                shootSound = Sounds.flame;
+            for(int i = 0; i < 5; i++){
+                int fi = i;
+                parts.add(new RegionPart("-spine"){{
+                    y = 21f / 4f - 45f / 4f * fi / 4f;
+                    moveX = 21f / 4f + Mathf.slope(fi / 4f) * 1.25f;
+                    moveRot = 10f - fi * 14f;
+                    float fin = fi  / 4f;
+                    progress = PartProgress.reload.inv().mul(1.3f).add(0.1f).sustain(fin * 0.34f, 0.14f, 0.14f);
+                    layerOffset = -0.001f;
+                    mirror = true;
+                }});
+            }
 
-                bullet = new LiquidBulletType(Liquids.slag){{
-                    damage = 13;
-                    speed = 2.5f;
-                    drag = 0.009f;
-                    shootEffect = Fx.shootSmall;
-                    lifetime = 57f;
-                    collidesAir = false;
+            weapons.add(new Weapon("latum-weapon"){{
+                x = 14f / 4f;
+                y = 33f / 4f;
+                reload = 30f;
+                layerOffset = -0.002f;
+                alternate = false;
+                heatColor = Color.red;
+                cooldownTime = 25f;
+                smoothReloadSpeed = 0.15f;
+                recoil = 2f;
+
+                bullet = new BasicBulletType(3.5f, 40){{
+                    backColor = trailColor = hitColor = Pal.techBlue;
+                    frontColor = Color.white;
+                    width = 7.5f;
+                    height = 10f;
+                    lifetime = 55f;
+                    trailWidth = 2f;
+                    trailLength = 4;
+                    shake = 0.5f;
+                    recoil = 0.1f;
+
+                    trailEffect = Fx.missileTrail;
+                    trailParam = 1.8f;
+                    trailInterval = 8f;
+
+                    hitEffect = despawnEffect = Fx.hitBulletColor;
+                    shootEffect = new MultiEffect(Fx.shootBigColor, Fx.hitLaserColor);
+                    smokeEffect = Fx.shootSmallSmoke;
+                    ammoMultiplier = 2;
+                }};
+            }});
+
+            weapons.add(new PointDefenseWeapon("latum-point-defense"){{
+                x = 16f / 4f;
+                y = -20f / 4f;
+                reload = 10f;
+
+                targetInterval = 9f;
+                targetSwitchInterval = 12f;
+                recoil = 0.5f;
+
+                bullet = new BulletType(){{
+                    shootEffect = Fx.sparkShoot;
+                    hitEffect = Fx.pointHit;
+                    maxRange = 100f;
+                    damage = 30f;
                 }};
             }});
         }};

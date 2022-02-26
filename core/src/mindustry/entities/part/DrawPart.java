@@ -3,6 +3,7 @@ package mindustry.entities.part;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
+import arc.util.*;
 
 public abstract class DrawPart{
     public static final PartParams params = new PartParams();
@@ -88,12 +89,23 @@ public abstract class DrawPart{
             return p -> get(p) + amount;
         }
 
+        default PartProgress add(PartProgress other){
+            return p -> get(p) + other.get(p);
+        }
+
         default PartProgress delay(float amount){
             return p -> (get(p) - amount) / (1f - amount);
         }
 
         default PartProgress curve(float offset, float duration){
             return p -> (get(p) - offset) / duration;
+        }
+
+        default PartProgress sustain(float offset, float grow, float sustain){
+            return p -> {
+                float val = get(p) - offset;
+                return Math.min(Math.max(val, 0f) / grow, (grow + sustain + grow - val) / grow);
+            };
         }
 
         default PartProgress shorten(float amount){
@@ -114,6 +126,10 @@ public abstract class DrawPart{
 
         default PartProgress min(PartProgress other){
             return p -> Math.min(get(p), other.get(p));
+        }
+
+        default PartProgress sin(float offset, float scl, float mag){
+            return p -> get(p) + Mathf.sin(Time.time + offset, scl, mag);
         }
 
         default PartProgress sin(float scl, float mag){
