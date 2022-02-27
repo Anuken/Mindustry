@@ -1471,7 +1471,18 @@ public class Fx{
         });
     }),
 
-    shootSmokeTris = new Effect(30f, e -> {
+    shootSmokeSquare = new Effect(20f, e -> {
+        color(Color.white, e.color, e.fin());
+
+        rand.setSeed(e.id);
+        for(int i = 0; i < 6; i++){
+            float rot = e.rotation + rand.range(22f);
+            v.trns(rot, rand.random(e.finpow() * 21f));
+            Fill.poly(e.x + v.x, e.y + v.y, 4, e.fout() * 2f + 0.2f, rand.random(360f));
+        }
+    }),
+
+    shootSmokeSquareBig = new Effect(30f, e -> {
         color(Color.white, e.color, e.fin());
 
         rand.setSeed(e.id);

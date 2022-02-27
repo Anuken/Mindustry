@@ -135,7 +135,7 @@ public class Items{
         );
 
         erekirItems.addAll(
-        scrap, graphite, thorium, silicon, phaseFabric, surgeAlloy, sand,
+        graphite, thorium, silicon, phaseFabric, surgeAlloy, sand,
         beryllium, tungsten, oxide, carbide, fissileMatter, dormantCyst
         );
     }

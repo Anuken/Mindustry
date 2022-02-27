@@ -136,8 +136,9 @@ public class Blocks{
     additiveReconstructor, multiplicativeReconstructor, exponentialReconstructor, tetrativeReconstructor,
     repairPoint, repairTurret,
 
-    //unit - erekir
+    //units - erekir
     fabricator,
+    tankReconstructor, shipReconstructor, mechReconstructor,
     tankAssembler, shipAssembler, mechAssembler,
     //TODO maybe making it 5x5 would be more appropriate, seems kinda cheap.
     basicAssemblerModule,
@@ -3664,11 +3665,45 @@ public class Blocks{
             configurable = false;
             plans.add(new UnitPlan(UnitTypes.stell, 60f * 60f, with(Items.beryllium, 100f, Items.silicon, 60f)));
             researchCost = with(Items.beryllium, 200, Items.graphite, 80, Items.silicon, 80);
+            regionSuffix = "-dark";
             consumePower(2f);
+        }};
+
+        tankReconstructor = new Reconstructor("tank-reconstructor"){{
+            requirements(Category.units, with(Items.graphite, 250, Items.tungsten, 120, Items.silicon, 200));
+            regionSuffix = "-dark";
+
+            size = 3;
+            consumePower(3f);
+            consumeLiquid(Liquids.hydrogen, 3f / 60f);
+            consumeItems(with(Items.silicon, 100, Items.tungsten, 100));
+
+            constructTime = 60f * 20f;
+
+            upgrades.addAll(
+            new UnitType[]{UnitTypes.stell, UnitTypes.locus}
+            );
+        }};
+
+        mechReconstructor = new Reconstructor("mech-reconstructor"){{
+            requirements(Category.units, with(Items.graphite, 250, Items.tungsten, 120, Items.silicon, 200));
+            regionSuffix = "-dark";
+
+            size = 3;
+            consumePower(3f);
+            consumeLiquid(Liquids.hydrogen, 3f / 60f);
+            consumeItems(with(Items.silicon, 100, Items.tungsten, 100));
+
+            constructTime = 60f * 20f;
+
+            upgrades.addAll(
+            new UnitType[]{UnitTypes.stell, UnitTypes.latum}
+            );
         }};
 
         tankAssembler = new UnitAssembler("tank-assembler"){{
             requirements(Category.units, with(Items.graphite, 600, Items.beryllium, 600, Items.oxide, 250, Items.tungsten, 400, Items.silicon, 500));
+            regionSuffix = "-dark";
             size = 5;
             //TODO remove ducts and crushers, replace with 2-3 high cost special blocks with silicon requirements
             plans.add(new AssemblerUnitPlan(UnitTypes.vanquish, 60f * 50f, PayloadStack.list(UnitTypes.stell, 4, Blocks.tungstenWallLarge, 10)));
@@ -3682,6 +3717,7 @@ public class Blocks{
         //TODO requirements
         shipAssembler = new UnitAssembler("ship-assembler"){{
             requirements(Category.units, with(Items.beryllium, 700, Items.oxide, 300, Items.tungsten, 500, Items.silicon, 800));
+            regionSuffix = "-dark";
             size = 5;
             //TODO not stell
             plans.add(new AssemblerUnitPlan(UnitTypes.quell, 60f * 60f, PayloadStack.list(Blocks.berylliumWallLarge, 20, UnitTypes.stell, 2)));
@@ -3695,6 +3731,7 @@ public class Blocks{
         //TODO requirements
         mechAssembler = new UnitAssembler("mech-assembler"){{
             requirements(Category.units, with(Items.graphite, 500, Items.thorium, 600, Items.oxide, 200, Items.tungsten, 500, Items.silicon, 900));
+            regionSuffix = "-dark";
             size = 5;
             //TODO different reqs
             //TODO not stell
@@ -3711,6 +3748,7 @@ public class Blocks{
         basicAssemblerModule = new UnitAssemblerModule("basic-assembler-module"){{
             requirements(Category.units, with(Items.graphite, 10));
             consumePower(0.5f);
+            regionSuffix = "-dark";
 
             size = 3;
         }};
@@ -3758,6 +3796,7 @@ public class Blocks{
 
         payloadMassDriver = new PayloadMassDriver("payload-mass-driver"){{
             requirements(Category.units, with(Items.tungsten, 120, Items.silicon, 120, Items.oxide, 70));
+            regionSuffix = "-dark";
             size = 3;
             reloadTime = 130f;
             chargeTime = 90f;
@@ -3768,6 +3807,7 @@ public class Blocks{
 
         payloadPropulsionTower = new PayloadMassDriver("payload-propulsion-tower"){{
             requirements(Category.units, with(Items.thorium, 300, Items.silicon, 200, Items.plastanium, 200, Items.phaseFabric, 50));
+            regionSuffix = "-dark";
             size = 5;
             reloadTime = 130f;
             chargeTime = 100f;
@@ -3778,6 +3818,7 @@ public class Blocks{
 
         smallDeconstructor = new PayloadDeconstructor("small-deconstructor"){{
             requirements(Category.units, with(Items.beryllium, 100, Items.silicon, 100, Items.oxide, 40, Items.graphite, 80));
+            regionSuffix = "-dark";
             itemCapacity = 100;
             consumePower(1f);
             size = 3;
@@ -3786,6 +3827,7 @@ public class Blocks{
 
         deconstructor = new PayloadDeconstructor("deconstructor"){{
             requirements(Category.units, with(Items.beryllium, 250, Items.oxide, 100, Items.silicon, 250, Items.carbide, 250));
+            regionSuffix = "-dark";
             itemCapacity = 250;
             consumePower(3f);
             size = 5;
@@ -3794,6 +3836,7 @@ public class Blocks{
 
         constructor = new Constructor("constructor"){{
             requirements(Category.units, with(Items.silicon, 100, Items.beryllium, 150, Items.tungsten, 80));
+            regionSuffix = "-dark";
             hasPower = true;
             buildSpeed = 0.3f;
             consumePower(2f);
@@ -3805,16 +3848,19 @@ public class Blocks{
         //yes this block is pretty much useless
         largeConstructor = new Constructor("large-constructor"){{
             requirements(Category.units, with(Items.silicon, 150, Items.oxide, 150, Items.tungsten, 200, Items.phaseFabric, 40));
+            regionSuffix = "-dark";
             hasPower = true;
-            consumePower(2f);
             buildSpeed = 0.3f;
             maxBlockSize = 4;
             minBlockSize = 3;
             size = 5;
+
+            consumePower(2f);
         }};
 
         payloadLoader = new PayloadLoader("payload-loader"){{
             requirements(Category.units, with(Items.graphite, 50, Items.silicon, 50, Items.tungsten, 80));
+            regionSuffix = "-dark";
             hasPower = true;
             consumePower(2f);
             size = 3;
@@ -3822,6 +3868,7 @@ public class Blocks{
 
         payloadUnloader = new PayloadUnloader("payload-unloader"){{
             requirements(Category.units, with(Items.graphite, 50, Items.silicon, 50, Items.oxide, 30));
+            regionSuffix = "-dark";
             hasPower = true;
             consumePower(2f);
             size = 3;

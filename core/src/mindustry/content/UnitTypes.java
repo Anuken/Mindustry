@@ -2830,16 +2830,22 @@ public class UnitTypes{
                     lifetime = 40f;
                     trailWidth = 2f;
                     trailLength = 4;
-                    shake = 0.5f;
+                    shake = 1f;
                     recoil = 0.1f;
 
                     trailEffect = Fx.missileTrail;
                     trailParam = 1.8f;
-                    trailInterval = 8f;
+                    trailInterval = 6f;
 
                     hitEffect = despawnEffect = Fx.hitBulletColor;
-                    shootEffect = new MultiEffect(Fx.shootBigColor, Fx.hitLaserColor);
-                    smokeEffect = Fx.shootSmallSmoke;
+                    shootEffect = new MultiEffect(Fx.shootBigColor, new Effect(9, e -> {
+                        color(Color.white, e.color, e.fin());
+                        stroke(0.7f + e.fout());
+                        Lines.square(e.x, e.y, e.fin() * 5f, e.rotation + 45f);
+
+                        Drawf.light(e.x, e.y, 23f, e.color, e.fout() * 0.7f);
+                    }));
+                    smokeEffect = Fx.shootSmokeSquare;
                     ammoMultiplier = 2;
                 }};
             }});
@@ -2857,7 +2863,7 @@ public class UnitTypes{
                     shootEffect = Fx.sparkShoot;
                     hitEffect = Fx.pointHit;
                     maxRange = 100f;
-                    damage = 30f;
+                    damage = 35f;
                 }};
             }});
         }};
@@ -3034,7 +3040,7 @@ public class UnitTypes{
                         moveX = fi * 0.3f;
                         moveRot = -45f - fi * 17f;
 
-                        moves.add(new PartMove(PartProgress.reload.inv().mul(1.8f).inv().curve(fi / 5f, 0.2f), 0f, 0f, 40f));
+                        moves.add(new PartMove(PartProgress.reload.inv().mul(1.8f).inv().curve(fi / 5f, 0.2f), 0f, 0f, 36f));
                     }});
                 }
 
@@ -3044,7 +3050,7 @@ public class UnitTypes{
 
                     lifetime = 30f;
                     shootEffect = Fx.shootBigColor;
-                    smokeEffect = Fx.shootSmokeTris;
+                    smokeEffect = Fx.shootSmokeSquareBig;
                     frontColor = Color.white;
                     hitSound = Sounds.none;
                     width = 12f;
@@ -3093,8 +3099,8 @@ public class UnitTypes{
             engineSize = 0;
 
             setEnginesMirror(
-            new UnitEngine(21 / 4f, 19 / 4f, 2.2f, 45f),
-            new UnitEngine(23 / 4f, -22 / 4f, 2.2f, 315f)
+            new UnitEngine(34 / 4f, 31 / 4f, 3f, 45f),
+            new UnitEngine(35 / 4f, -38 / 4f, 3f, 315f)
             );
         }};
 
