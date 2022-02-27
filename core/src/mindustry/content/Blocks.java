@@ -3425,7 +3425,7 @@ public class Blocks{
         disperse = new ItemTurret("disperse"){{
             requirements(Category.turret, with(Items.carbide, 50, Items.oxide, 150, Items.silicon, 200, Items.beryllium, 350));
 
-            ammo(Items.scrap, new BasicBulletType(){{
+            ammo(Items.tungsten, new BasicBulletType(){{
                 damage = 40;
                 speed = 8.5f;
                 width = height = 16;
@@ -3437,8 +3437,8 @@ public class Blocks{
                 collidesTiles = false;
                 shootEffect = Fx.shootBig2;
                 smokeEffect = Fx.shootSmokeDisperse;
-                frontColor = trailColor = Color.white;
-                backColor = Color.valueOf("869cbe");
+                frontColor = Color.white;
+                backColor = trailColor = hitColor = Color.sky;
                 trailChance = 0.44f;
 
                 lifetime = 34f;
@@ -3447,10 +3447,6 @@ public class Blocks{
                 trailEffect = Fx.disperseTrail;
 
                 hitEffect = despawnEffect = Fx.hitBulletColor;
-
-                //controversial
-                //homingDelay = 10f;
-                //homingPower = 0.01f;
             }});
 
 
@@ -3984,7 +3980,7 @@ public class Blocks{
         //region logic
 
         message = new MessageBlock("message"){{
-            requirements(Category.logic, with(Items.graphite, 5));
+            requirements(Category.logic, with(Items.graphite, 5, Items.copper, 5));
         }};
 
         switchBlock = new SwitchBlock("switch"){{

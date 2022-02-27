@@ -2500,28 +2500,15 @@ public class UnitTypes{
                     spread = 3.5f;
                 }};
 
-                //TODO make this look nice
+                //TODO make this look nicer
                 bullet = new RailBulletType(){{
                     length = 140f;
-                    damage = 50f;
+                    damage = 45f;
                     hitColor = Color.valueOf("feb380");
                     hitEffect = endEffect = Fx.hitBulletColor;
                     pierceDamageFactor = 0.8f;
 
                     smokeEffect = Fx.colorSpark;
-
-                    //lines - messy
-                    if(false)
-                    smokeEffect = new Effect(22f, e -> {
-                        color(e.color);
-                        stroke(e.fout() * 0.9f + 0.6f);
-
-                        Fx.rand.setSeed(e.id);
-                        for(int i = 0; i < 7; i++){
-                            Fx.v.trns(e.rotation, Fx.rand.random(8f, length - 8f));
-                            Lines.lineAngleCenter(e.x + Fx.v.x, e.y + Fx.v.y, e.rotation + e.finpow(), e.foutpowdown() * 20f * Fx.rand.random(0.5f, 1f) + 0.3f);
-                        }
-                    });
 
                     endEffect = new Effect(14f, e-> {
                         color(e.color);
@@ -2542,12 +2529,23 @@ public class UnitTypes{
                         Drawf.tri(e.x, e.y, w, 4f * e.fout(), e.rotation + 180f);
                     });
 
-                    lineEffect = new Effect(14f, e -> {
+                    lineEffect = new Effect(20f, e -> {
                         if(!(e.data instanceof Vec2 v)) return;
 
-                        stroke(e.fout() * 1.5f);
                         color(e.color);
-                        Lines.line(e.x, e.y, v.x, v.y);
+                        stroke(e.fout() * 0.9f + 0.6f);
+
+                        Fx.rand.setSeed(e.id);
+                        for(int i = 0; i < 7; i++){
+                            Fx.v.trns(e.rotation, Fx.rand.random(8f, v.dst(e.x, e.y) - 8f));
+                            Lines.lineAngleCenter(e.x + Fx.v.x, e.y + Fx.v.y, e.rotation + e.finpow(), e.foutpowdown() * 20f * Fx.rand.random(0.5f, 1f) + 0.3f);
+                        }
+
+                        e.scaled(14f, b -> {
+                            stroke(b.fout() * 1.5f);
+                            color(e.color);
+                            Lines.line(e.x, e.y, v.x, v.y);
+                        });
                     });
 
                     pointEffectSpace = 8f;
