@@ -2506,9 +2506,41 @@ public class UnitTypes{
                     damage = 50f;
                     hitColor = Color.valueOf("feb380");
                     hitEffect = endEffect = Fx.hitBulletColor;
-                    shootEffect = Fx.shootBig;
-                    smokeEffect = Fx.shootBigSmoke;
                     pierceDamageFactor = 0.8f;
+
+                    smokeEffect = Fx.colorSpark;
+
+                    //lines - messy
+                    if(false)
+                    smokeEffect = new Effect(22f, e -> {
+                        color(e.color);
+                        stroke(e.fout() * 0.9f + 0.6f);
+
+                        Fx.rand.setSeed(e.id);
+                        for(int i = 0; i < 7; i++){
+                            Fx.v.trns(e.rotation, Fx.rand.random(8f, length - 8f));
+                            Lines.lineAngleCenter(e.x + Fx.v.x, e.y + Fx.v.y, e.rotation + e.finpow(), e.foutpowdown() * 20f * Fx.rand.random(0.5f, 1f) + 0.3f);
+                        }
+                    });
+
+                    endEffect = new Effect(14f, e-> {
+                        color(e.color);
+                        Drawf.tri(e.x, e.y, e.fout() * 1.5f, 5f, e.rotation);
+                    });
+
+                    shootEffect = new Effect(10, e -> {
+                        color(e.color);
+                        float w = 1.2f + 7 * e.fout();
+
+                        Drawf.tri(e.x, e.y, w, 30f * e.fout(), e.rotation);
+                        color(e.color);
+
+                        for(int i : Mathf.signs){
+                            Drawf.tri(e.x, e.y, w * 0.9f, 18f * e.fout(), e.rotation + i * 90f);
+                        }
+
+                        Drawf.tri(e.x, e.y, w, 4f * e.fout(), e.rotation + 180f);
+                    });
 
                     lineEffect = new Effect(14f, e -> {
                         if(!(e.data instanceof Vec2 v)) return;
@@ -2519,6 +2551,7 @@ public class UnitTypes{
                     });
 
                     pointEffectSpace = 8f;
+
                     if(false)
                     pointEffect = new Effect(20, e -> {
                         color(e.color);
@@ -2822,7 +2855,7 @@ public class UnitTypes{
                 smoothReloadSpeed = 0.15f;
                 recoil = 2f;
 
-                bullet = new BasicBulletType(3.5f, 40){{
+                bullet = new BasicBulletType(3.5f, 50){{
                     backColor = trailColor = hitColor = Pal.techBlue;
                     frontColor = Color.white;
                     width = 7.5f;
@@ -2853,7 +2886,7 @@ public class UnitTypes{
             weapons.add(new PointDefenseWeapon("latum-point-defense"){{
                 x = 16f / 4f;
                 y = -20f / 4f;
-                reload = 10f;
+                reload = 9f;
 
                 targetInterval = 9f;
                 targetSwitchInterval = 12f;
@@ -2863,7 +2896,7 @@ public class UnitTypes{
                     shootEffect = Fx.sparkShoot;
                     hitEffect = Fx.pointHit;
                     maxRange = 100f;
-                    damage = 35f;
+                    damage = 38f;
                 }};
             }});
         }};

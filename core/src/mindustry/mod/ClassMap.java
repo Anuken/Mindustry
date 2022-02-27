@@ -91,7 +91,6 @@ public class ClassMap{
         classes.put("PayloadStack", mindustry.type.PayloadStack.class);
         classes.put("Planet", mindustry.type.Planet.class);
         classes.put("Publishable", mindustry.type.Publishable.class);
-        classes.put("Satellite", mindustry.type.Satellite.class);
         classes.put("Sector", mindustry.type.Sector.class);
         classes.put("SectorRect", mindustry.type.Sector.SectorRect.class);
         classes.put("SectorPreset", mindustry.type.SectorPreset.class);

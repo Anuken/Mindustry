@@ -79,7 +79,7 @@ public class SchematicsDialog extends BaseDialog{
             in.add("@schematic.tags").padRight(4);
 
             //tags (no scroll pane visible)
-            in.pane(Styles.nonePane, t -> {
+            in.pane(Styles.noBarPane, t -> {
                 rebuildTags = () -> {
                     t.clearChildren();
                     t.left();

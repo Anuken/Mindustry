@@ -1,6 +1,5 @@
 package mindustry.graphics;
 
-import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -393,8 +392,16 @@ public class Drawf{
     }
 
     public static void tri(float x, float y, float width, float length, float rotation){
-        float oy = 17f / 63f * length;
-        Draw.rect(Core.atlas.find("shape-3"), x, y - oy + length / 2f, width, length, width / 2f, oy, rotation - 90);
+        float
+            fx = Angles.trnsx(rotation, length),
+            fy = Angles.trnsy(rotation, length),
+            rx = Angles.trnsx(rotation - 90f, width / 2f),
+            ry = Angles.trnsy(rotation - 90f, width / 2f);
+        Fill.tri(
+            x + rx, y + ry,
+            x + fx, y + fy,
+            x - rx, y - ry
+        );
     }
 
     public static void construct(Building t, UnlockableContent content, float rotation, float progress, float speed, float time){

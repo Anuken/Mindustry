@@ -3701,11 +3701,26 @@ public class Blocks{
             );
         }};
 
+        shipReconstructor = new Reconstructor("ship-reconstructor"){{
+            requirements(Category.units, with(Items.graphite, 250, Items.tungsten, 120, Items.silicon, 200));
+            regionSuffix = "-dark";
+
+            size = 3;
+            consumePower(3f);
+            consumeLiquid(Liquids.hydrogen, 3f / 60f);
+            consumeItems(with(Items.silicon, 100, Items.tungsten, 100));
+
+            constructTime = 60f * 20f;
+
+            upgrades.addAll(
+            new UnitType[]{UnitTypes.stell, UnitTypes.avert}
+            );
+        }};
+
         tankAssembler = new UnitAssembler("tank-assembler"){{
             requirements(Category.units, with(Items.graphite, 600, Items.beryllium, 600, Items.oxide, 250, Items.tungsten, 400, Items.silicon, 500));
             regionSuffix = "-dark";
             size = 5;
-            //TODO remove ducts and crushers, replace with 2-3 high cost special blocks with silicon requirements
             plans.add(new AssemblerUnitPlan(UnitTypes.vanquish, 60f * 50f, PayloadStack.list(UnitTypes.stell, 4, Blocks.tungstenWallLarge, 10)));
             consumePower(3f);
             areaSize = 13;
@@ -3719,8 +3734,7 @@ public class Blocks{
             requirements(Category.units, with(Items.beryllium, 700, Items.oxide, 300, Items.tungsten, 500, Items.silicon, 800));
             regionSuffix = "-dark";
             size = 5;
-            //TODO not stell
-            plans.add(new AssemblerUnitPlan(UnitTypes.quell, 60f * 60f, PayloadStack.list(Blocks.berylliumWallLarge, 20, UnitTypes.stell, 2)));
+            plans.add(new AssemblerUnitPlan(UnitTypes.quell, 60f * 60f, PayloadStack.list(UnitTypes.avert, 2, Blocks.berylliumWallLarge, 8)));
             consumePower(3f);
             areaSize = 13;
             researchCostMultiplier = 0.4f;
@@ -3734,8 +3748,7 @@ public class Blocks{
             regionSuffix = "-dark";
             size = 5;
             //TODO different reqs
-            //TODO not stell
-            plans.add(new AssemblerUnitPlan(UnitTypes.bulwark, 60f * 60f, PayloadStack.list(Blocks.tungstenWallLarge, 12, UnitTypes.stell, 2)));
+            plans.add(new AssemblerUnitPlan(UnitTypes.bulwark, 60f * 60f, PayloadStack.list(UnitTypes.latum, 2, Blocks.tungstenWallLarge, 10)));
             consumePower(3f);
             areaSize = 13;
             researchCostMultiplier = 0.4f;

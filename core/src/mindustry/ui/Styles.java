@@ -30,7 +30,7 @@ public class Styles{
 
     public static TextButtonStyle defaultt, nodet, cleart, nonet, clearPartialt, clearTogglet, logicTogglet, clearToggleMenut, togglet, transt, fullTogglet, squareTogglet, logict;
     public static ImageButtonStyle defaulti, nodei, emptyi, emptytogglei, selecti, logici, geni, colori, accenti, cleari, clearFulli, clearPartiali, clearTogglei, clearTransi, clearToggleTransi, clearTogglePartiali;
-    public static ScrollPaneStyle defaultPane, horizontalPane, smallPane, nonePane;
+    public static ScrollPaneStyle defaultPane, horizontalPane, smallPane, noBarPane;
     public static SliderStyle defaultSlider;
     public static LabelStyle defaultLabel, outlineLabel, techLabel;
     public static TextFieldStyle defaultField, nodeField, areaField, nodeArea;
@@ -284,7 +284,7 @@ public class Styles{
             vScroll = clear;
             vScrollKnob = scrollKnobVerticalThin;
         }};
-        nonePane = new ScrollPaneStyle();
+        noBarPane = new ScrollPaneStyle();
 
         defaultSlider = new SliderStyle(){{
             background = sliderBack;
