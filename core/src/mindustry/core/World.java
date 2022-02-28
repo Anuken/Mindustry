@@ -445,6 +445,15 @@ public class World{
         return 0;
     }
 
+    public void checkMapArea(){
+        for(var build : Groups.build){
+            //reset map-area-based disabled blocks.
+            if(build.allowUpdate() && !build.enabled){
+                build.enabled = true;
+            }
+        }
+    }
+
     //TODO optimize; this is very slow and called too often!
     public float getDarkness(int x, int y){
         float dark = 0;

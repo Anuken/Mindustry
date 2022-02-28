@@ -1338,6 +1338,7 @@ public class LExecutor{
                     if(!headless){
                         renderer.updateAllDarkness();
                     }
+                    world.checkMapArea();
                     return false;
                 }
             }
@@ -1351,6 +1352,7 @@ public class LExecutor{
             state.rules.limitY = y;
             state.rules.limitWidth = w;
             state.rules.limitHeight = h;
+            world.checkMapArea();
 
             if(!headless){
                 renderer.updateAllDarkness();
