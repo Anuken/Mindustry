@@ -115,6 +115,8 @@ public class DesktopInput extends InputHandler{
         }
 
         if(commandMode){
+            //happens sometimes
+            selectedUnits.removeAll(u -> !u.isCommandable());
 
             //draw command overlay UI
             for(Unit unit : selectedUnits){

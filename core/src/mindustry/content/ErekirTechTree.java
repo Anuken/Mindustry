@@ -1,16 +1,55 @@
 package mindustry.content;
 
 import arc.struct.*;
+import arc.util.*;
+import mindustry.entities.bullet.*;
 import mindustry.game.Objectives.*;
 import mindustry.type.*;
+import mindustry.type.unit.*;
+import mindustry.world.blocks.defense.turrets.*;
 
+import static mindustry.Vars.*;
 import static mindustry.content.Blocks.*;
 import static mindustry.content.SectorPresets.*;
 import static mindustry.content.TechTree.*;
 
 public class ErekirTechTree{
+    static IntSet balanced = new IntSet();
+
+    static void rebalanceBullet(BulletType bullet){
+        if(balanced.add(bullet.id)){
+            bullet.damage *= 0.7f;
+        }
+    }
+
+    //TODO remove this
+    public static void rebalance(){
+        for(var unit : content.units().select(u -> u instanceof ErekirUnitType)){
+            for(var weapon : unit.weapons){
+                rebalanceBullet(weapon.bullet);
+            }
+        }
+
+        for(var block : content.blocks()){
+            if(block instanceof Turret turret && Structs.contains(block.requirements, i -> !Items.serpuloItems.contains(i.item))){
+                if(turret instanceof ItemTurret item){
+                    for(var bullet : item.ammoTypes.values()){
+                        rebalanceBullet(bullet);
+                    }
+                }else if(turret instanceof ContinuousTurret cont){
+                    rebalanceBullet(cont.shootType);
+                }else if(turret instanceof ContinuousLiquidTurret cont){
+                    for(var bullet : cont.ammoTypes.values()){
+                        rebalanceBullet(bullet);
+                    }
+                }
+            }
+        }
+    }
 
     public static void load(){
+        rebalance();
+
         //TODO might be unnecessary with no asteroids
         Seq<Objective> erekirSector = Seq.with(new OnPlanet(Planets.erekir));
 

@@ -28,7 +28,7 @@ public class RtsAI{
     static final float squadRadius = 120f;
     static final int timeUpdate = 0, timerSpawn = 1;
     //TODO make configurable
-    static final float minWeight = 1.1f;
+    static final float minWeight = 1f;
 
     //in order of priority??
     static final BlockFlag[] flags = {BlockFlag.generator, BlockFlag.factory, BlockFlag.core, BlockFlag.battery};
@@ -232,7 +232,7 @@ public class RtsAI{
         weights.clear();
 
         for(var target : targets){
-            weights.put(target, estimateStats(target.x, target.y, dps, health));
+            weights.put(target, estimateStats(x, y, target.x, target.y, dps, health));
         }
 
         var result = targets.min(
@@ -253,21 +253,22 @@ public class RtsAI{
         return result;
     }
 
-    float estimateStats(float x, float y, float selfDps, float selfHealth){
+    float estimateStats(float fromX, float fromY, float x, float y, float selfDps, float selfHealth){
         float[] health = {0f}, dps = {0f};
-        float extraRadius = 15f;
+        float extraRadius = 30f;
 
-        //TODO this does not take into account the path to this object
         for(var turret : Vars.indexer.getEnemy(data.team, BlockFlag.turret)){
-            if(turret.within(x, y, ((TurretBuild)turret).range() + extraRadius)){
+            if(Intersector.distanceSegmentPoint(fromX, fromY,  x, y, turret.x, turret.y) <= ((TurretBuild)turret).range() + extraRadius){
                 health[0] += turret.health;
                 dps[0] += ((TurretBuild)turret).estimateDps();
             }
         }
 
+        Tmp.r1.set(fromX, fromY, x - fromX, y - fromY).normalize().grow(140f * 2f);
+
         //add on extra radius, assume unit range is below that...?
-        Units.nearbyEnemies(data.team, x, y, extraRadius + 140f, other -> {
-            if(other.within(x, y, other.range() + extraRadius)){
+        Units.nearbyEnemies(data.team, Tmp.r1, other -> {
+            if(Intersector.distanceSegmentPoint(fromX, fromY, x, y, other.x, other.y) <= other.range() + extraRadius){
                 health[0] += other.health;
                 dps[0] += other.type.dpsEstimate;
             }
