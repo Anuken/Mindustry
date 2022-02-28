@@ -491,7 +491,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     /** @return whether this block is allowed to update based on team/environment */
     public boolean allowUpdate(){
-        return team != Team.derelict && block.supportsEnv(state.rules.env);
+        return team != Team.derelict && block.supportsEnv(state.rules.env) &&
+            //check if outside map limit
+            (!state.rules.limitMapArea || !state.rules.disableOutsideArea || Rect.contains(state.rules.limitX, state.rules.limitY, state.rules.limitWidth, state.rules.limitHeight, tile.x, tile.y));
     }
 
     public BlockStatus status(){

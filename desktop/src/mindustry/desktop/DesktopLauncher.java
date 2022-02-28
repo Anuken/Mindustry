@@ -45,6 +45,9 @@ public class DesktopLauncher extends ClientLauncher{
                 if(Structs.contains(arg, "-gl3")){
                     gl30 = true;
                 }
+                if(Structs.contains(arg, "-antialias")){
+                    samples = 16;
+                }
                 if(Structs.contains(arg, "-debug")){
                     Log.level = LogLevel.debug;
                 }
@@ -357,12 +360,5 @@ public class DesktopLauncher extends ClientLauncher{
 
     private static void message(String message){
         SDL.SDL_ShowSimpleMessageBox(SDL.SDL_MESSAGEBOX_ERROR, "oh no", message);
-    }
-
-    private boolean validAddress(byte[] bytes){
-        if(bytes == null) return false;
-        byte[] result = new byte[8];
-        System.arraycopy(bytes, 0, result, 0, bytes.length);
-        return !new String(Base64Coder.encode(result)).equals("AAAAAAAAAOA=") && !new String(Base64Coder.encode(result)).equals("AAAAAAAAAAA=");
     }
 }

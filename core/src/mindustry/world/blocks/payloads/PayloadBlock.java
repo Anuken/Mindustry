@@ -172,7 +172,7 @@ public class PayloadBlock extends Block{
             updatePayload();
 
             if(rotate){
-                payRotation = Angles.moveToward(payRotation, rotate ? rotdeg() : 90f, payloadRotateSpeed * delta());
+                payRotation = Angles.moveToward(payRotation, block.rotate ? rotdeg() : 90f, payloadRotateSpeed * delta());
             }
             payVector.approach(Vec2.ZERO, payloadSpeed * delta());
 

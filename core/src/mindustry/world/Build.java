@@ -201,7 +201,7 @@ public class Build{
             }
         }
 
-        if(state.rules.placeRangeCheck && getEnemyOverlap(type, team, x, y) != null){
+        if(state.rules.placeRangeCheck && !state.isEditor() && getEnemyOverlap(type, team, x, y) != null){
             return false;
         }
 

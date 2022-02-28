@@ -144,6 +144,8 @@ public class Rules{
     public boolean limitMapArea = false;
     /** Map area limit rectangle. */
     public int limitX, limitY, limitWidth = 1, limitHeight = 1;
+    /** If true, blocks outside the map area are disabled. */
+    public boolean disableOutsideArea = true;
     /** special tags for additional info. */
     public StringMap tags = new StringMap();
     /** Name of callback to call for background rendering in mods; see Renderer#addCustomBackground. Runs last. */

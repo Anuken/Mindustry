@@ -1322,6 +1322,7 @@ public class Blocks{
         }};
 
         //TODO should have a useful turret ammo byproduct? scrap?
+        //TODO surge being removed I think
         surgeCrucible = new HeatCrafter("surge-crucible"){{
             requirements(Category.crafting, with(Items.silicon, 100, Items.graphite, 80, Items.carbide, 60, Items.thorium, 90));
 
