@@ -2630,7 +2630,7 @@ public class Blocks{
 
         coreBastion = new CoreBlock("core-bastion"){{
             //TODO cost
-            requirements(Category.effect, with(Items.graphite, 1000, Items.silicon, 2000, Items.beryllium, 800));
+            requirements(Category.effect, with(Items.graphite, 1000, Items.silicon, 1000, Items.beryllium, 800));
 
             isFirstTier = true;
             unitType = UnitTypes.evoke;
@@ -3208,7 +3208,7 @@ public class Blocks{
         }};
 
         breach = new ItemTurret("breach"){{
-            requirements(Category.turret, with(Items.beryllium, 300, Items.silicon, 150, Items.graphite, 150));
+            requirements(Category.turret, with(Items.beryllium, 150, Items.silicon, 150, Items.graphite, 300));
 
             Effect sfe = new MultiEffect(Fx.shootBigColor, Fx.colorSparkBig);
 
