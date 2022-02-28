@@ -999,20 +999,20 @@ public class NetServer implements ApplicationListener{
         return result.toString();
     }
 
-    String checkColor(String str){
+    static String checkColor(String str){
         for(int i = 1; i < str.length(); i++){
             if(str.charAt(i) == ']'){
                 String color = str.substring(1, i);
 
                 if(Colors.get(color.toUpperCase()) != null || Colors.get(color.toLowerCase()) != null){
                     Color result = (Colors.get(color.toLowerCase()) == null ? Colors.get(color.toUpperCase()) : Colors.get(color.toLowerCase()));
-                    if(result.a <= 0.8f){
+                    if(result.a < 1f){
                         return str.substring(i + 1);
                     }
                 }else{
                     try{
                         Color result = Color.valueOf(color);
-                        if(result.a <= 0.8f){
+                        if(result.a < 1f){
                             return str.substring(i + 1);
                         }
                     }catch(Exception e){

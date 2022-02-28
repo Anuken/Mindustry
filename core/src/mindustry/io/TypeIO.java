@@ -338,6 +338,11 @@ public class TypeIO{
 
     //on the network, plans must be capped by size
     public static void writePlansQueueNet(Writes write, Queue<BuildPlan> plans){
+        if(plans == null){
+            write.i(-1);
+            return;
+        }
+
         int used = getMaxPlans(plans);
 
         write.i(used);
@@ -348,6 +353,7 @@ public class TypeIO{
 
     public static Queue<BuildPlan> readPlansQueue(Reads read){
         int used = read.i();
+        if(used == -1) return null;
         var out = new Queue<BuildPlan>();
         for(int i = 0; i < used; i++){
             out.add(readPlan(read));
