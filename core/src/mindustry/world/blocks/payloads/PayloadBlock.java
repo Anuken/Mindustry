@@ -186,8 +186,8 @@ public class PayloadBlock extends Block{
 
             Vec2 dest = Tmp.v1.trns(rotdeg(), size * tilesize/2f);
 
-            payRotation = Angles.moveToward(payRotation, rotdeg(), payloadRotateSpeed * edelta());
-            payVector.approach(dest, payloadSpeed * edelta());
+            payRotation = Angles.moveToward(payRotation, rotdeg(), payloadRotateSpeed * delta());
+            payVector.approach(dest, payloadSpeed * delta());
 
             Building front = front();
             boolean canDump = front == null || !front.tile().solid();
