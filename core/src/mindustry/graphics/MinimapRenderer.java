@@ -256,8 +256,8 @@ public class MinimapRenderer{
     }
 
     private Block realBlock(Tile tile){
-        //TODO dynamically update on visibility change; right now it's just entirely hidden
-        return tile.build == null ? tile.block() : state.rules.fog && tile.build.team != player.team() ? Blocks.air : tile.block();
+        //TODO doesn't work properly until player goes and looks at block
+        return tile.build == null ? tile.block() : state.rules.fog && tile.build.inFogTo(player.team()) ? Blocks.air : tile.block();
     }
 
     private int colorFor(Tile tile){
