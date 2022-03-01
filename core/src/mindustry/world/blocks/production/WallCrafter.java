@@ -154,7 +154,7 @@ public class WallCrafter extends Block{
 
             float eff = getEfficiency(tile.x, tile.y, rotation, dest -> {
                 //TODO make not chance based?
-                if(cons && Mathf.chanceDelta(updateEffectChance * warmup)){
+                if(wasVisible && cons && Mathf.chanceDelta(updateEffectChance * warmup)){
                     updateEffect.at(
                         dest.worldx() + Mathf.range(3f) - dx * tilesize,
                         dest.worldy() + Mathf.range(3f) - dy * tilesize,
