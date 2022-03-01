@@ -78,5 +78,9 @@
   {
     "name": "Beyond Anarchy",
     "address": ["45.156.25.49"]
+  },
+  {
+    "name": "M-DE",
+    "address": ["mindustry.inc.li:6569", "mindustry.inc.li:6560"]
   }
 ]
