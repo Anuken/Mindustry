@@ -119,6 +119,12 @@ public class PlacementFragment extends Fragment{
 
         if(Core.input.keyTap(Binding.pick) && player.isBuilder() && !Core.scene.hasDialog()){ //mouse eyedropper select
             var build = world.buildWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
+
+            //can't middle click buildings in fog
+            if(build != null && build.inFogTo(player.team())){
+                build = null;
+            }
+
             Block tryRecipe = build == null ? null : build instanceof ConstructBuild c ? c.current : build.block;
             Object tryConfig = build == null || !build.block.copyConfig ? null : build.config();
 
@@ -577,7 +583,7 @@ public class PlacementFragment extends Fragment{
         Tile hoverTile = world.tileWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
         if(hoverTile != null){
             //if the tile has a building, display it
-            if(hoverTile.build != null && hoverTile.build.displayable()){
+            if(hoverTile.build != null && hoverTile.build.displayable() && !hoverTile.build.inFogTo(player.team())){
                 return nextFlowBuild = hoverTile.build;
             }
 

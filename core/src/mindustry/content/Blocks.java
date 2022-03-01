@@ -85,6 +85,7 @@ public class Blocks{
     scrapWall, scrapWallLarge, scrapWallHuge, scrapWallGigantic, thruster, //ok, these names are getting ridiculous, but at least I don't have humongous walls yet
 
     //defense - erekir
+    radar,
     buildTower,
     regenProjector, barrierProjector,
     //campaign only
@@ -1693,6 +1694,14 @@ public class Blocks{
             tendrils = 4;
         }};
 
+        radar = new Radar("radar"){{
+            requirements(Category.effect, BuildVisibility.fogOnly, with(Items.silicon, 30, Items.graphite, 30));
+            outlineColor = Color.valueOf("4a4b53");
+            fogRadius = 27;
+
+            consumePower(0.2f);
+        }};
+
         buildTower = new BuildTurret("build-tower"){{
             requirements(Category.effect, with(Items.silicon, 80, Items.carbide, 30, Items.oxide, 40, Items.thorium, 30));
             outlineColor = Pal.darkOutline;
@@ -3247,7 +3256,6 @@ public class Blocks{
 
             coolantMultiplier = 6f;
 
-            unitFilter = u -> !u.spawnedByCore;
             shootShake = 1f;
             ammoPerShot = 5;
             draw = new DrawTurret("reinforced-");
@@ -3487,8 +3495,6 @@ public class Blocks{
                     moveRot = 8;
                 }});
             }};
-
-            unitFilter = u -> !u.spawnedByCore;
 
             shoot = new ShootAlternate(){{
                 spread = 4.7f;

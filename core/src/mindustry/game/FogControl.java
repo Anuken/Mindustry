@@ -1,6 +1,7 @@
 package mindustry.game;
 
 import arc.*;
+import arc.math.*;
 import arc.struct.Bits;
 import arc.struct.*;
 import arc.util.*;
@@ -19,7 +20,7 @@ import static mindustry.Vars.*;
 
 public final class FogControl implements CustomChunk{
     private static volatile int ww, wh;
-    private static final int staticUpdateInterval = 1000 / 25; //25 FPS
+    private static final int dynamicUpdateInterval = 1000 / 25; //25 FPS
     private static final Object notifyStatic = new Object(), notifyDynamic = new Object();
 
     /** indexed by team */
@@ -48,11 +49,11 @@ public final class FogControl implements CustomChunk{
             wh = world.height();
 
             //all old buildings have static light scheduled around them
-            if(state.rules.fog){
+            if(state.rules.fog && state.rules.staticFog){
                 synchronized(staticEvents){
                     for(var build : Groups.build){
                         if(build.block.flags.contains(BlockFlag.hasFogRadius)){
-                            staticEvents.add(FogEvent.get(build.tile.x, build.tile.y, build.block.fogRadius, build.team.id));
+                            staticEvents.add(FogEvent.get(build.tile.x, build.tile.y, Mathf.round(build.fogRadius()), build.team.id));
                         }
                     }
                 }
@@ -66,9 +67,11 @@ public final class FogControl implements CustomChunk{
                     data.dynamicUpdated = true;
                 }
 
-                synchronized(staticEvents){
-                    //TODO event per team?
-                    pushEvent(FogEvent.get(event.tile.x, event.tile.y, event.tile.block().fogRadius, event.tile.build.team.id));
+                if(state.rules.staticFog){
+                    synchronized(staticEvents){
+                        //TODO event per team?
+                        pushEvent(FogEvent.get(event.tile.x, event.tile.y, Mathf.round(event.tile.build.fogRadius()), event.tile.build.team.id));
+                    }
                 }
             }
         });
@@ -83,7 +86,7 @@ public final class FogControl implements CustomChunk{
             }
         });
 
-        SaveVersion.addCustomChunk("fogdata", this);
+        SaveVersion.addCustomChunk("static-fog-data", this);
     }
 
     public @Nullable Bits getDiscovered(Team team){
@@ -124,9 +127,23 @@ public final class FogControl implements CustomChunk{
     }
 
     void pushEvent(long event){
+        if(!state.rules.staticFog) return;
+
         staticEvents.add(event);
         if(!headless && FogEvent.team(event) == Vars.player.team().id){
             renderer.fog.handleEvent(event);
+        }
+    }
+
+    public void forceUpdate(Team team, Building build){
+        if(state.rules.fog && fog[team.id] != null){
+            fog[team.id].dynamicUpdated = true;
+
+            if(state.rules.staticFog){
+                synchronized(staticEvents){
+                    pushEvent(FogEvent.get(build.tile.x, build.tile.y, Mathf.round(build.fogRadius()), build.team.id));
+                }
+            }
         }
     }
 
@@ -168,6 +185,7 @@ public final class FogControl implements CustomChunk{
                     //TODO slow?
                     for(var unit : team.units){
                         int tx = unit.tileX(), ty = unit.tileY(), pos = tx + ty * ww;
+                        if(unit.type.fogRadius <= 0f) continue;
                         long event = FogEvent.get(tx, ty, (int)unit.type.fogRadius, team.team.id);
 
                         //always update the dynamic events, but only *flush* the results when necessary?
@@ -182,13 +200,13 @@ public final class FogControl implements CustomChunk{
                 }
 
                 //if it's time for an update, flush *everything* onto the update queue
-                if(data.dynamicUpdated && Time.timeSinceMillis(data.lastDynamicMs) > staticUpdateInterval){
+                if(data.dynamicUpdated && Time.timeSinceMillis(data.lastDynamicMs) > dynamicUpdateInterval){
                     data.dynamicUpdated = false;
                     data.lastDynamicMs = Time.millis();
 
                     //add building updates
                     for(var build : indexer.getFlagged(team.team, BlockFlag.hasFogRadius)){
-                        dynamicEventQueue.add(FogEvent.get(build.tile.x, build.tile.y, build.block.fogRadius, build.team.id));
+                        dynamicEventQueue.add(FogEvent.get(build.tile.x, build.tile.y, Mathf.round(build.fogRadius()), build.team.id));
                     }
 
                     //add unit updates
@@ -219,7 +237,7 @@ public final class FogControl implements CustomChunk{
         }
 
         //wake up, it's time to draw some circles
-        if(staticEvents.size > 0 && staticFogThread != null){
+        if(state.rules.staticFog && staticEvents.size > 0 && staticFogThread != null){
             synchronized(notifyStatic){
                 notifyStatic.notify();
             }
@@ -309,6 +327,8 @@ public final class FogControl implements CustomChunk{
             for(int i = 0; i < size; i++){
                 long event = dynamicEvents.items[i];
                 int x = FogEvent.x(event), y = FogEvent.y(event), rad = FogEvent.radius(event), team = FogEvent.team(event);
+
+                if(rad <= 0) continue;
 
                 var data = fog[team];
                 if(data != null){
@@ -412,7 +432,7 @@ public final class FogControl implements CustomChunk{
 
     @Override
     public boolean shouldWrite(){
-        return state.rules.fog && fog != null;
+        return state.rules.fog && state.rules.staticFog && fog != null;
     }
 
     static void circle(Bits arr, int x, int y, int radius){

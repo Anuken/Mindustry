@@ -150,7 +150,6 @@ public class MinimapRenderer{
             Texture staticTex = renderer.fog.getStaticTexture(), dynamicTex = renderer.fog.getDynamicTexture();
 
             //crisp pixels
-            staticTex.setFilter(TextureFilter.nearest);
             dynamicTex.setFilter(TextureFilter.nearest);
 
             Tmp.tr1.set(dynamicTex);
@@ -159,10 +158,14 @@ public class MinimapRenderer{
             Draw.color(state.rules.dynamicColor);
             Draw.rect(Tmp.tr1, x + w/2f, y + h/2f, w, h);
 
-            Tmp.tr1.texture = staticTex;
-            //must be black to fit with borders
-            Draw.color(0f, 0f, 0f, state.rules.staticColor.a);
-            Draw.rect(Tmp.tr1, x + w/2f, y + h/2f, w, h);
+            if(state.rules.staticFog){
+                staticTex.setFilter(TextureFilter.nearest);
+
+                Tmp.tr1.texture = staticTex;
+                //must be black to fit with borders
+                Draw.color(0f, 0f, 0f, state.rules.staticColor.a);
+                Draw.rect(Tmp.tr1, x + w/2f, y + h/2f, w, h);
+            }
 
             Draw.color();
             Draw.shader();
@@ -252,13 +255,20 @@ public class MinimapRenderer{
         Units.nearby((dx - sz) * tilesize, (dy - sz) * tilesize, sz * 2 * tilesize, sz * 2 * tilesize, units::add);
     }
 
+    private Block realBlock(Tile tile){
+        //TODO dynamically update on visibility change; right now it's just entirely hidden
+        return tile.build == null ? tile.block() : state.rules.fog && tile.build.team != player.team() ? Blocks.air : tile.block();
+    }
+
     private int colorFor(Tile tile){
         if(tile == null) return 0;
-        int bc = tile.block().minimapColor(tile);
-        Color color = Tmp.c1.set(bc == 0 ? MapIO.colorFor(tile.block(), tile.floor(), tile.overlay(), tile.team()) : bc);
+        Block real = realBlock(tile);
+        int bc = real.minimapColor(tile);
+
+        Color color = Tmp.c1.set(bc == 0 ? MapIO.colorFor(real, tile.floor(), tile.overlay(), tile.team()) : bc);
         color.mul(1f - Mathf.clamp(world.getDarkness(tile.x, tile.y) / 4f));
 
-        if(tile.block() == Blocks.air && tile.y < world.height() - 1 && world.tile(tile.x, tile.y + 1).block().solid){
+        if(real == Blocks.air && tile.y < world.height() - 1 && realBlock(world.tile(tile.x, tile.y + 1)).solid){
             color.mul(0.7f);
         }else if(tile.floor().isLiquid && (tile.y >= world.height() - 1 || !world.tile(tile.x, tile.y + 1).floor().isLiquid)){
             color.mul(0.84f, 0.84f, 0.9f, 1f);

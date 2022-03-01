@@ -104,7 +104,7 @@ public class CoreBlock extends StorageBlock{
     public void init(){
         //assign to update clipSize internally
         lightRadius = 30f + 20f * size;
-        fogRadius = Math.max(fogRadius, (int)(lightRadius / 8f * 2f));
+        fogRadius = Math.max(fogRadius, (int)(lightRadius / 8f * 3f));
         emitLight = true;
 
         super.init();

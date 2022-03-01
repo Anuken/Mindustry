@@ -51,7 +51,7 @@ public final class FogRenderer{
 
         dynamicFog.resize(world.width(), world.height());
 
-        if(player.team() != lastTeam){
+        if(state.rules.staticFog && player.team() != lastTeam){
             copyFromCpu();
             lastTeam = player.team();
             clearStatic = false;
@@ -59,8 +59,6 @@ public final class FogRenderer{
 
         //draw dynamic fog every frame
         {
-
-            Core.camera.bounds(Tmp.r1);
             Draw.proj(0, 0, staticFog.getWidth() * tilesize, staticFog.getHeight() * tilesize);
             dynamicFog.begin(Color.black);
             ScissorStack.push(rect.set(1, 1, staticFog.getWidth() - 2, staticFog.getHeight() - 2));
@@ -68,11 +66,11 @@ public final class FogRenderer{
             Team team = player.team();
 
             for(var build : indexer.getFlagged(team, BlockFlag.hasFogRadius)){
-                poly(Tmp.r1, build.x, build.y, build.block.fogRadius * tilesize);
+                poly(build.x, build.y, build.fogRadius() * tilesize);
             }
 
             for(var unit : team.data().units){
-                poly(Tmp.r1, unit.x, unit.y, unit.type.fogRadius * tilesize);
+                poly(unit.x, unit.y, unit.type.fogRadius * tilesize);
             }
 
             dynamicFog.end();
@@ -81,7 +79,7 @@ public final class FogRenderer{
         }
 
         //grab static events
-        if(clearStatic || events.size > 0){
+        if(state.rules.staticFog && (clearStatic || events.size > 0)){
             //set projection to whole map
             Draw.proj(0, 0, staticFog.getWidth(), staticFog.getHeight());
 
@@ -107,22 +105,23 @@ public final class FogRenderer{
             Draw.proj(Core.camera);
         }
 
-        staticFog.getTexture().setFilter(TextureFilter.linear);
+        if(state.rules.staticFog){
+            staticFog.getTexture().setFilter(TextureFilter.linear);
+        }
         dynamicFog.getTexture().setFilter(TextureFilter.linear);
 
         Draw.shader(Shaders.fog);
         Draw.color(state.rules.dynamicColor);
         Draw.fbo(dynamicFog.getTexture(), world.width(), world.height(), tilesize);
-        Draw.color(state.rules.staticColor);
-        Draw.fbo(staticFog.getTexture(), world.width(), world.height(), tilesize);
+        if(state.rules.staticFog){
+            Draw.color(state.rules.staticColor);
+            Draw.fbo(staticFog.getTexture(), world.width(), world.height(), tilesize);
+        }
         Draw.shader();
     }
 
-    void poly(Rect check, float x, float y, float rad){
-        //todo clipping messes up the minimap
-        //if(check.overlaps(x - rad, y - rad, rad * 2f, rad * 2f)){
+    void poly(float x, float y, float rad){
         Fill.poly(x, y, 20, rad);
-        //}
     }
 
     void renderEvent(long e){

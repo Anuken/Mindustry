@@ -13,7 +13,8 @@ public enum BuildVisibility{
     campaignOnly(() -> Vars.state == null || Vars.state.isCampaign()),
     lightingOnly(() -> Vars.state == null || Vars.state.rules.lighting || Vars.state.isCampaign()),
     berylliumOnly(() -> !Vars.state.rules.hiddenBuildItems.contains(Items.beryllium)),
-    ammoOnly(() -> Vars.state == null || Vars.state.rules.unitAmmo);
+    ammoOnly(() -> Vars.state == null || Vars.state.rules.unitAmmo),
+    fogOnly(() -> Vars.state == null || Vars.state.rules.fog);
 
     private final Boolp visible;
 

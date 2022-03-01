@@ -412,7 +412,10 @@ public class BlockRenderer{
 
                 if(build != null){
                     if(visible){
-                        if(!build.wasVisible) updateShadow(build);
+                        if(!build.wasVisible){
+                            updateShadow(build);
+                            renderer.minimap.update(tile);
+                        }
                         build.wasVisible = true;
                     }
 

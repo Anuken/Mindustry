@@ -446,6 +446,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return nearby(Geometry.d4(rotation + 3).x * trns, Geometry.d4(rotation + 3).y * trns);
     }
 
+    /** Any class that overrides this method and changes the value must call Vars.fogControl.forceUpdate(team). */
+    public float fogRadius(){
+        return block.fogRadius;
+    }
+
     public int pos(){
         return tile.pos();
     }

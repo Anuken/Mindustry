@@ -3396,6 +3396,9 @@ public class UnitTypes{
             hitSize = 9f;
             engineSize = 0;
 
+            fogRadius = 0f;
+            targetable = false;
+
             setEnginesMirror(
             new UnitEngine(21 / 4f, 19 / 4f, 2.2f, 45f),
             new UnitEngine(23 / 4f, -22 / 4f, 2.2f, 315f)
@@ -3451,6 +3454,9 @@ public class UnitTypes{
             health = 500f;
             armor = 2f;
             hitSize = 11f;
+
+            fogRadius = 0f;
+            targetable = false;
 
             engineOffset = 7.2f;
             engineSize = 3.1f;
@@ -3521,6 +3527,9 @@ public class UnitTypes{
             armor = 3f;
             hitSize = 12f;
             buildBeamOffset = 8f;
+
+            fogRadius = 0f;
+            targetable = false;
 
             engineOffset = 7.5f;
             engineSize = 3.4f;

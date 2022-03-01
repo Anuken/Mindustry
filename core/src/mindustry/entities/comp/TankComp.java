@@ -30,7 +30,7 @@ abstract class TankComp implements Posc, Flyingc, Hitboxc, Unitc, ElevationMovec
     @Override
     public void update(){
         //dust
-        if(walked && !headless){
+        if(walked && !headless && !inFogTo(player.team())){
             treadEffectTime += Time.delta;
             if(treadEffectTime >= 6f && type.treadRects.length > 0){
                 var treadRegion = type.treadRegion;

@@ -169,6 +169,7 @@ public class UnitType extends UnlockableContent{
     public float hitSize = 6f;
     public float itemOffsetY = 3f;
     public float lightRadius = -1f, lightOpacity = 0.6f;
+    /** Fog view radius in tiles. <0 for automatic radius. */
     public float fogRadius = -1f;
     public Color lightColor = Pal.powerLight;
     public boolean drawCell = true, drawItems = true, drawShields = true, drawBody = true;

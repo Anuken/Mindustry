@@ -624,7 +624,7 @@ public class SettingsMenuDialog extends BaseDialog{
             button(bundle.get("settings.reset", "Reset to Defaults"), () -> {
                 for(Setting setting : list){
                     if(setting.name == null || setting.title == null) continue;
-                    settings.put(setting.name, settings.getDefault(setting.name));
+                    settings.remove(setting.name);
                 }
                 rebuild();
             }).margin(14).width(240f).pad(6);
