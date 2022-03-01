@@ -928,6 +928,7 @@ public class Blocks{
             envDisabled = Env.none;
             itemCapacity = 30;
             drawer = new DrawArcSmelter();
+            fogRadius = 3;
             researchCost = with(Items.beryllium, 150, Items.graphite, 50);
 
             consumeItems(with(Items.graphite, 1, Items.sand, 4));
@@ -1882,6 +1883,7 @@ public class Blocks{
             //TODO bad idea? should this just require 1 beryllium?
             health = 90;
             speed = 4f;
+            fogRadius = 1;
             researchCost = with(Items.beryllium, 5);
         }};
 
@@ -1890,6 +1892,7 @@ public class Blocks{
             health = 90;
             speed = 4f;
             regionRotated1 = 1;
+            fogRadius = 1;
             researchCost = with(Items.beryllium, 30);
         }};
 
@@ -1898,6 +1901,7 @@ public class Blocks{
             requirements(Category.distribution, with(Items.graphite, 8, Items.beryllium, 8));
             health = 90;
             speed = 4f;
+            fogRadius = 1;
             researchCostMultiplier = 1.5f;
         }};
 
@@ -1905,6 +1909,7 @@ public class Blocks{
             requirements(Category.distribution, with(Items.beryllium, 20));
             health = 90;
             speed = 4f;
+            fogRadius = 1;
             researchCostMultiplier = 0.3f;
         }};
 
@@ -1913,6 +1918,7 @@ public class Blocks{
             health = 120;
             speed = 4f;
             regionRotated1 = 1;
+            fogRadius = 1;
         }};
 
         surgeConveyor = new StackConveyor("surge-conveyor"){{
@@ -2285,6 +2291,7 @@ public class Blocks{
             health = 90;
             consumePowerBuffered(1000f);
             range = 10;
+            fogRadius = 1;
             researchCost = with(Items.beryllium, 5);
         }};
 
@@ -2326,6 +2333,7 @@ public class Blocks{
             hasLiquids = true;
             outputLiquid = new LiquidStack(Liquids.water, 5f / 60f / 9f);
             liquidCapacity = 20f;
+            fogRadius = 3;
             researchCost = with(Items.beryllium, 15);
         }};
 
@@ -2522,6 +2530,7 @@ public class Blocks{
             size = 2;
             attribute = Attribute.sand;
             output = Items.sand;
+            fogRadius = 2;
             researchCost = with(Items.beryllium, 100, Items.graphite, 40);
         }};
 
@@ -2532,6 +2541,7 @@ public class Blocks{
             tier = 3;
             size = 2;
             range = 4;
+            fogRadius = 2;
             researchCost = with(Items.beryllium, 10);
 
             consumeLiquid(Liquids.hydrogen, 0.25f / 60f).boost();
@@ -3670,6 +3680,7 @@ public class Blocks{
             plans.add(new UnitPlan(UnitTypes.stell, 60f * 60f * 1.5f, with(Items.beryllium, 100f, Items.silicon, 60f)));
             researchCost = with(Items.beryllium, 200, Items.graphite, 80, Items.silicon, 80);
             regionSuffix = "-dark";
+            fogRadius = 3;
             consumePower(2f);
         }};
 
