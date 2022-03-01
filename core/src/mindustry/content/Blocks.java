@@ -1698,6 +1698,7 @@ public class Blocks{
             requirements(Category.effect, BuildVisibility.fogOnly, with(Items.silicon, 30, Items.graphite, 30));
             outlineColor = Color.valueOf("4a4b53");
             fogRadius = 27;
+            researchCost = with(Items.silicon, 50, Items.graphite, 50);
 
             consumePower(0.2f);
         }};

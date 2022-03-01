@@ -67,6 +67,8 @@ public class Planets{
                 r.placeRangeCheck = true;
                 r.attributes.set(Attribute.heat, 0.8f);
                 r.showSpawns = true;
+                r.fog = true;
+                r.staticFog = false;
             };
 
             unlockedOnLand.add(Blocks.coreBastion);

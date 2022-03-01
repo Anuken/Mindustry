@@ -225,34 +225,36 @@ public class ErekirTechTree{
                 });
             });
 
-            node(breach, Seq.with(new Research(siliconArcFurnace), new OnSector(two)), () -> {
-                node(berylliumWall, () -> {
-                    node(berylliumWallLarge, () -> {
-
-                    });
-
-                    node(tungstenWall, () -> {
-                        node(tungstenWallLarge, () -> {
+            node(radar, Seq.with(new Research(beamNode), new Research(turbineCondenser)), () -> {
+                node(breach, Seq.with(new Research(siliconArcFurnace), new OnSector(two)), () -> {
+                    node(berylliumWall, () -> {
+                        node(berylliumWallLarge, () -> {
 
                         });
 
-                        node(carbideWall, () -> {
-                            node(carbideWallLarge, () -> {
+                        node(tungstenWall, () -> {
+                            node(tungstenWallLarge, () -> {
 
+                            });
+
+                            node(carbideWall, () -> {
+                                node(carbideWallLarge, () -> {
+
+                                });
                             });
                         });
                     });
-                });
 
 
-                node(sublimate, () -> {
-                    //TODO implement
-                    node(titan, Seq.with(new OnSector(five)), () -> {
+                    node(sublimate, () -> {
+                        //TODO implement
+                        node(titan, Seq.with(new OnSector(five)), () -> {
 
-                    });
+                        });
 
-                    node(disperse, Seq.with(new OnSector(five)), () -> {
+                        node(disperse, Seq.with(new OnSector(five)), () -> {
 
+                        });
                     });
                 });
             });
