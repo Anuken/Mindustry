@@ -37,7 +37,12 @@ public class FileMapGenerator implements WorldGenerator{
         Sector sector = state.rules.sector;
 
         world.setGenerating(false);
-        SaveIO.load(map.file, world.filterContext(map));
+        SaveIO.load(map.file, world.new FilterContext(map){
+            @Override
+            public Sector getSector(){
+                return sector;
+            }
+        });
         world.setGenerating(true);
 
         //make sure sector is maintained - don't reset it after map load.

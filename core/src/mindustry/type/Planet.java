@@ -47,7 +47,7 @@ public class Planet extends UnlockableContent{
     public boolean drawOrbit = true;
     /** Atmosphere radius adjustment parameters. */
     public float atmosphereRadIn = 0, atmosphereRadOut = 0.3f;
-    /** Frustrum sphere clip radius. */
+    /** Frustum sphere clip radius. */
     public float clipRadius = -1f;
     /** Orbital radius around the sun. Do not change unless you know exactly what you are doing.*/
     public float orbitRadius;

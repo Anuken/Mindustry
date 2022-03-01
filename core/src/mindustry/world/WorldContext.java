@@ -1,5 +1,8 @@
 package mindustry.world;
 
+import arc.util.*;
+import mindustry.type.*;
+
 public interface WorldContext{
 
     /** Return a tile in the tile array.*/
@@ -22,5 +25,9 @@ public interface WorldContext{
 
     /** Called when a building is finished reading. */
     default void onReadBuilding(){}
+
+    default @Nullable Sector getSector(){
+        return null;
+    }
 
 }

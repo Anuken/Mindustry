@@ -67,7 +67,7 @@ public abstract class SaveVersion extends SaveFileReader{
 
     @Override
     public void read(DataInputStream stream, CounterInputStream counter, WorldContext context) throws IOException{
-        region("meta", stream, counter, this::readMeta);
+        region("meta", stream, counter, in -> readMeta(in, context));
         region("content", stream, counter, this::readContentHeader);
 
         try{
@@ -143,7 +143,7 @@ public abstract class SaveVersion extends SaveFileReader{
         ).merge(tags));
     }
 
-    public void readMeta(DataInput stream) throws IOException{
+    public void readMeta(DataInput stream, WorldContext context) throws IOException{
         StringMap map = readStringMap(stream);
 
         state.wave = map.getInt("wave");
@@ -153,6 +153,11 @@ public abstract class SaveVersion extends SaveFileReader{
         state.rules = JsonIO.read(Rules.class, map.get("rules", "{}"));
         if(state.rules.spawns.isEmpty()) state.rules.spawns = waves.get();
         lastReadBuild = map.getInt("build", -1);
+
+        state.rules.sector = context.getSector();
+        if(state.rules.sector != null){
+            state.rules.sector.planet.ruleSetter.get(state.rules);
+        }
 
         if(!headless){
             Tmp.v1.tryFromString(map.get("viewpos"));

@@ -594,10 +594,10 @@ public class World{
     }
 
     /** World context that applies filters after generation end. */
-    private class FilterContext extends Context{
+    public class FilterContext extends Context{
         final Map map;
 
-        FilterContext(Map map){
+        public FilterContext(Map map){
             this.map = map;
         }
 

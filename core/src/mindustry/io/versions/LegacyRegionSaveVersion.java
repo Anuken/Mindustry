@@ -17,7 +17,7 @@ public class LegacyRegionSaveVersion extends SaveVersion{
 
     @Override
     public void read(DataInputStream stream, CounterInputStream counter, WorldContext context) throws IOException{
-        region("meta", stream, counter, this::readMeta);
+        region("meta", stream, counter, in -> readMeta(in, context));
         region("content", stream, counter, this::readContentHeader);
 
         try{

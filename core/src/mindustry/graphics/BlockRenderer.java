@@ -398,7 +398,7 @@ public class BlockRenderer{
 
             boolean visible = (build == null || !build.inFogTo(pteam));
 
-            //comment wasWasible part for hiding?
+            //comment wasVisible part for hiding?
             if(block != Blocks.air && (visible || build.wasVisible)){
                 block.drawBase(tile);
                 Draw.reset();
