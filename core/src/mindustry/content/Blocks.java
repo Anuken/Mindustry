@@ -3667,7 +3667,7 @@ public class Blocks{
             requirements(Category.units, with(Items.silicon, 200, Items.beryllium, 250));
             size = 3;
             configurable = false;
-            plans.add(new UnitPlan(UnitTypes.stell, 60f * 60f, with(Items.beryllium, 100f, Items.silicon, 60f)));
+            plans.add(new UnitPlan(UnitTypes.stell, 60f * 60f * 1.5f, with(Items.beryllium, 100f, Items.silicon, 60f)));
             researchCost = with(Items.beryllium, 200, Items.graphite, 80, Items.silicon, 80);
             regionSuffix = "-dark";
             consumePower(2f);
