@@ -242,18 +242,18 @@ public class EventType{
         }
     }
 
-    public static class DropDownEvent{
+    public static class PayloadDropEvent{
         public final Unit carrier;
         public final @Nullable Unit unit;
         public final @Nullable Building build;
 
-        public DropDownEvent(Unit carrier, Unit unit){
+        public PayloadDropEvent(Unit carrier, Unit unit){
             this.carrier = carrier;
             this.unit = unit;
             this.build = null;
         }
 
-        public DropDownEvent(Unit carrier, Building build){
+        public PayloadDropEvent(Unit carrier, Building build){
             this.carrier = carrier;
             this.build = build;
             this.unit = null;
