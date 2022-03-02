@@ -1657,24 +1657,30 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         //TODO why check for old state?
         boolean prevValid = efficiency > 0, update = shouldConsume() && productionValid();
-        float minEfficiency = 1f;
 
-        //assume efficiency is 1 for the calculations below
-        efficiency = optionalEfficiency = 1f;
+        if(update){
+            float minEfficiency = 1f;
 
-        //first pass: get the minimum efficiency of any consumer
-        for(var cons : block.nonOptionalConsumers){
-            minEfficiency = Math.min(minEfficiency, cons.efficiency(self()));
+            //assume efficiency is 1 for the calculations below
+            efficiency = optionalEfficiency = 1f;
+
+            //first pass: get the minimum efficiency of any consumer
+            for(var cons : block.nonOptionalConsumers){
+                minEfficiency = Math.min(minEfficiency, cons.efficiency(self()));
+            }
+
+            //same for optionals
+            for(var cons : block.optionalConsumers){
+                optionalEfficiency = Math.min(optionalEfficiency, cons.efficiency(self()));
+            }
+
+            //efficiency is now this minimum value
+            efficiency = minEfficiency;
+            optionalEfficiency = Math.min(optionalEfficiency, minEfficiency);
+        }else{
+            //should not consume, efficiency now zero
+            efficiency = optionalEfficiency = 0f;
         }
-
-        //same for optionals
-        for(var cons : block.optionalConsumers){
-            optionalEfficiency = Math.min(optionalEfficiency, cons.efficiency(self()));
-        }
-
-        //efficiency is now this minimum value
-        efficiency = minEfficiency;
-        optionalEfficiency = Math.min(optionalEfficiency, minEfficiency);
 
         updateEfficiencyMultiplier();
 
