@@ -70,7 +70,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     transient boolean wasDamaged; //used only by the indexer
     transient float visualLiquid;
 
-    /** TODO Each bit corresponds to a team ID. Only 64 are supported. */
+    /** TODO Each bit corresponds to a team ID. Only 64 are supported. Does not work on servers. */
     transient long visibleFlags;
     transient boolean wasVisible; //used only by the block renderer when fog is on (TODO replace with discovered check?)
 
@@ -165,10 +165,12 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     //region io
 
     public final void writeBase(Writes write){
+        boolean writeVisibility = state.rules.fog && visibleFlags != 0;
+
         write.f(health);
         write.b(rotation | 0b10000000);
         write.b(team.id);
-        write.b(3); //version
+        write.b(writeVisibility ? 4 : 3); //version
         write.b(enabled ? 1 : 0);
         //write presence of items/power/liquids/cons, so removing/adding them does not corrupt future saves.
         write.b(moduleBitmask());
@@ -179,6 +181,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         //efficiency is written as two bytes to save space
         write.b((byte)(Mathf.clamp(efficiency) * 255f));
         write.b((byte)(Mathf.clamp(optionalEfficiency) * 255f));
+
+        //only write visibility when necessary, saving 8 bytes - implies new version
+        if(writeVisibility){
+            write.l(visibleFlags);
+        }
     }
 
     public final void readBase(Reads read){
@@ -219,6 +226,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if(version >= 3){
             efficiency = read.ub() / 255f;
             optionalEfficiency = read.ub() / 255f;
+        }
+
+        //version 4 (and only 4 at the moment) has visibility flags
+        if(version == 4){
+            visibleFlags = read.l();
         }
     }
 

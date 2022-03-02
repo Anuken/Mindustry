@@ -83,7 +83,7 @@ public class BlockRenderer{
                     updateFloors.add(new UpdateRenderState(tile, tile.floor()));
                 }
 
-                if(tile.build != null && (tile.team() == player.team() || !state.rules.fog)){
+                if(tile.build != null && (tile.team() == player.team() || !state.rules.fog || (tile.build.visibleFlags & (1L << player.team().id)) != 0)){
                     tile.build.wasVisible = true;
                 }
 
@@ -416,6 +416,7 @@ public class BlockRenderer{
                             updateShadow(build);
                             renderer.minimap.update(tile);
                         }
+                        build.visibleFlags |= (1L << player.team().id);
                         build.wasVisible = true;
                     }
 

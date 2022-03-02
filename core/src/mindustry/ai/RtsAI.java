@@ -33,6 +33,7 @@ public class RtsAI{
     //in order of priority??
     static final BlockFlag[] flags = {BlockFlag.generator, BlockFlag.factory, BlockFlag.core, BlockFlag.battery};
     static final ObjectFloatMap<Building> weights = new ObjectFloatMap<>();
+    //TODO configurable, perhaps
     static final int minSquadSize = 4;
     //TODO max squad size
     static final boolean debug = OS.hasProp("mindustry.debug");
