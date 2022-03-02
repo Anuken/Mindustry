@@ -30,4 +30,9 @@ public interface WorldContext{
         return null;
     }
 
+    /** @return whether the SaveLoadEvent fired after the end should be counted as a new map load. */
+    default boolean isMap(){
+        return false;
+    }
+
 }

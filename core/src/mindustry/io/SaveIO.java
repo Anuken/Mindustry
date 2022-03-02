@@ -165,7 +165,7 @@ public class SaveIO{
             if(ver == null) throw new IOException("Unknown save version: " + version + ". Are you trying to load a save from a newer version?");
 
             ver.read(stream, counter, context);
-            Events.fire(new SaveLoadEvent());
+            Events.fire(new SaveLoadEvent(context.isMap()));
         }catch(Throwable e){
             throw new SaveException(e);
         }finally{

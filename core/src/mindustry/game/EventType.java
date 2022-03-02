@@ -51,7 +51,6 @@ public class EventType{
     public static class MapMakeEvent{}
     public static class MapPublishEvent{}
     public static class SaveWriteEvent{}
-    public static class SaveLoadEvent{}
     public static class ClientCreateEvent{}
     public static class ServerLoadEvent{}
     public static class DisposeEvent{}
@@ -77,6 +76,14 @@ public class EventType{
     public static class FileTreeInitEvent{}
     /** Called when a game begins and the world is loaded. */
     public static class WorldLoadEvent{}
+
+    public static class SaveLoadEvent{
+        public final boolean isMap;
+
+        public SaveLoadEvent(boolean isMap){
+            this.isMap = isMap;
+        }
+    }
 
     /** Called when a sector is destroyed by waves when you're not there. */
     public static class SectorLoseEvent{

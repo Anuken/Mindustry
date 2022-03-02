@@ -157,7 +157,7 @@ public abstract class SaveVersion extends SaveFileReader{
         if(context.getSector() != null){
             state.rules.sector = context.getSector();
             if(state.rules.sector != null){
-                state.rules.sector.planet.ruleSetter.get(state.rules);
+                state.rules.sector.planet.applyRules(state.rules);
             }
         }
 

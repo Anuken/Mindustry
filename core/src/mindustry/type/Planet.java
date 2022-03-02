@@ -153,6 +153,14 @@ public class Planet extends UnlockableContent{
         }
     }
 
+    public void applyRules(Rules rules){
+        ruleSetter.get(rules);
+
+        rules.env = defaultEnv;
+        rules.hiddenBuildItems.clear();
+        rules.hiddenBuildItems.addAll(hiddenItems);
+    }
+
     public @Nullable Sector getLastSector(){
         if(sectors.isEmpty()){
             return null;

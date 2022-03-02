@@ -311,7 +311,7 @@ public class World{
         state.rules.env = sector.planet.defaultEnv;
         state.rules.hiddenBuildItems.clear();
         state.rules.hiddenBuildItems.addAll(sector.planet.hiddenItems);
-        sector.planet.ruleSetter.get(state.rules);
+        sector.planet.applyRules(state.rules);
         sector.info.resources = content.toSeq();
         sector.info.resources.sort(Structs.comps(Structs.comparing(Content::getContentType), Structs.comparingInt(c -> c.id)));
         sector.saveInfo();
