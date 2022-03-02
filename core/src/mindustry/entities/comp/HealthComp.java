@@ -54,7 +54,7 @@ abstract class HealthComp implements Entityc, Posc{
      * Damage and pierce armor.
      * @deprecated use function with source
      */
-    @Deprecated(forRemoval = true)
+    @Deprecated()
     void damagePierce(float amount, boolean withEffect){
         damagePierce(amount, withEffect, DamageSource.Unknown);
     }
@@ -63,31 +63,31 @@ abstract class HealthComp implements Entityc, Posc{
      * Damage and pierce armor.
      * @deprecated use function with source
      */
-    @Deprecated(forRemoval = true)
+    @Deprecated()
     void damagePierce(float amount){
         damagePierce(amount, DamageSource.Unknown);
     }
 
     /** @deprecated use function with source */
-    @Deprecated(forRemoval = true)
+    @Deprecated()
     void damage(float amount){
         damage(amount, DamageSource.Unknown);
     }
 
     /** @deprecated use function with source */
-    @Deprecated(forRemoval = true)
+    @Deprecated()
     void damage(float amount, boolean withEffect){
         damage(amount, withEffect, DamageSource.Unknown);
     }
 
     /** @deprecated use function with source */
-    @Deprecated(forRemoval = true)
+    @Deprecated()
     void damageContinuous(float amount){
         damageContinuous(amount, DamageSource.Unknown);
     }
 
     /** @deprecated use function with source */
-    @Deprecated(forRemoval = true)
+    @Deprecated()
     void damageContinuousPierce(float amount){
         damageContinuousPierce(amount, DamageSource.Unknown);
     }
