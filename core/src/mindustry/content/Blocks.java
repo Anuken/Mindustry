@@ -2575,6 +2575,7 @@ public class Blocks{
             itemCapacity = 40;
             //can't mine thorium for balance reasons, needs better drill
             blockedItem = Items.thorium;
+            researchCostMultiplier = 0.5f;
 
             consumePower(160f / 60f);
             consumeLiquid(Liquids.water, 0.2f);
