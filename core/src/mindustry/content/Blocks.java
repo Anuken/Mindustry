@@ -2080,7 +2080,7 @@ public class Blocks{
             liquidCapacity = 20f;
             liquidPressure = 1.03f;
             health = 250;
-            researchCostMultiplier = 6;
+            researchCostMultiplier = 3;
         }};
 
         //TODO is this necessary? junctions are not good design
@@ -2090,14 +2090,14 @@ public class Blocks{
             buildCostMultiplier = 3f;
             health = 260;
             ((Conduit)reinforcedConduit).junctionReplacement = this;
-            researchCostMultiplier = 6;
+            researchCostMultiplier = 1;
         }};
 
         reinforcedBridgeConduit = new DirectionLiquidBridge("reinforced-bridge-conduit"){{
             requirements(Category.liquid, with(Items.graphite, 6, Items.beryllium, 10));
             range = 4;
             hasPower = false;
-            researchCostMultiplier = 6;
+            researchCostMultiplier = 1;
 
             ((Conduit)reinforcedConduit).rotBridgeReplacement = this;
         }};
