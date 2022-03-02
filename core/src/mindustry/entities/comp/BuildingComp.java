@@ -1527,10 +1527,16 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     /** Changes this building's team in a safe manner. */
     public void changeTeam(Team next){
         Team last = this.team;
-        indexer.removeIndex(tile);
+        boolean was = isValid();
+
+        if(was) indexer.removeIndex(tile);
+
         this.team = next;
-        indexer.addIndex(tile);
-        Events.fire(teamChangeEvent.set(last, self()));
+
+        if(was){
+            indexer.addIndex(tile);
+            Events.fire(teamChangeEvent.set(last, self()));
+        }
     }
 
     public boolean canPickup(){
