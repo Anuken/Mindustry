@@ -8,6 +8,7 @@ import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.*;
+import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
@@ -20,7 +21,7 @@ import static mindustry.Vars.*;
 
 @EntityDef(value = {Bulletc.class}, pooled = true, serialize = false)
 @Component(base = true)
-abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Drawc, Shielderc, Ownerc, Velc, Bulletc, Timerc{
+abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Drawc, Shielderc, Ownerc, Velc, Bulletc, Timerc, DamageSource{
     @Import Team team;
     @Import Entityc owner;
     @Import float x, y, damage;

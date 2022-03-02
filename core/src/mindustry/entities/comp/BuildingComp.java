@@ -44,7 +44,7 @@ import static mindustry.Vars.*;
 
 @EntityDef(value = {Buildingc.class}, isFinal = false, genio = false, serialize = false)
 @Component(base = true)
-abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, QuadTreeObject, Displayable, Senseable, Controllable, Sized{
+abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, QuadTreeObject, Displayable, Senseable, Controllable, Sized, DamageSource{
     //region vars and initialization
     static final float timeToSleep = 60f * 1, timeToUncontrol = 60f * 6;
     static final ObjectSet<Building> tmpTiles = new ObjectSet<>();
@@ -652,8 +652,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
                 Liquid other = next.liquids.current();
                 if((other.flammability > 0.3f && liquid.temperature > 0.7f) || (liquid.flammability > 0.3f && other.temperature > 0.7f)){
-                    damage(1 * Time.delta);
-                    next.damage(1 * Time.delta);
+                    damage(1 * Time.delta, DamageSource.LiquidReaction);
+                    next.damage(1 * Time.delta, DamageSource.LiquidReaction);
                     if(Mathf.chance(0.1 * Time.delta)){
                         Fx.fire.at(fx, fy);
                     }
@@ -1099,7 +1099,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             });
         }
 
-        Damage.dynamicExplosion(x, y, flammability, explosiveness * 3.5f, power, tilesize * block.size / 2f, state.rules.damageExplosions, block.destroyEffect);
+        Damage.dynamicExplosion(x, y, flammability, explosiveness * 3.5f, power, tilesize * block.size / 2f, state.rules.damageExplosions, true, null, block.destroyEffect, self());
 
         if(!floor().solid && !floor().isLiquid){
             Effect.rubble(x, y, block.size);
@@ -1289,14 +1289,18 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     /** Handle a bullet collision.
      * @return whether the bullet should be removed. */
     public boolean collision(Bullet other){
-        damage(other.team, other.damage() * other.type().buildingDamageMultiplier);
+        damage(other.damage() * other.type().buildingDamageMultiplier, other);
 
         return true;
     }
 
-    /** Used to handle damage from splash damage for certain types of blocks. */
+    /**
+     * Used to handle damage from splash damage for certain types of blocks.
+     * @deprecated use {@code damage(float , Teamc)}
+     */
+    @Deprecated
     public void damage(@Nullable Team source, float damage){
-        damage(damage);
+        damage(damage, DamageSource.Unknown);
     }
 
     /** Changes this building's team in a safe manner. */
@@ -1426,8 +1430,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     @Replace
     @Override
-    public void damage(float damage){
+    public void damage(float damage, DamageSource source){
         if(dead()) return;
+        //TODO damageEvent
 
         float dm = state.rules.blockHealth(team);
 

@@ -143,7 +143,7 @@ public class ImpactReactor extends PowerGenerator{
 
             Sounds.explosionbig.at(this);
 
-            Damage.damage(x, y, explosionRadius * tilesize, explosionDamage * 4);
+            Damage.damage(x, y, explosionRadius * tilesize, explosionDamage * 4, new Explosion(this));
 
             Effect.shake(6f, 16f, x, y);
             explodeEffect.at(x, y);

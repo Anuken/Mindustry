@@ -2,6 +2,7 @@ package mindustry.entities.comp;
 
 import arc.graphics.g2d.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.entities.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 
@@ -42,8 +43,8 @@ abstract class BlockUnitComp implements Unitc{
     }
 
     @Replace
-    public void damage(float v, boolean b){
-        tile.damage(v, b);
+    public void damage(float v, boolean b, DamageSource source){
+        tile.damage(v, b, source);
     }
 
     @Replace

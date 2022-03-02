@@ -18,7 +18,7 @@ import mindustry.world.*;
 
 import static mindustry.Vars.*;
 
-public class Floor extends Block{
+public class Floor extends Block implements DamageSource{
     /** edge fallback, used mainly for ores */
     public String edge = "stone";
     /** Multiplies unit velocity by this when walked on. */

@@ -31,7 +31,7 @@ import static mindustry.Vars.*;
 import static mindustry.logic.GlobalConstants.*;
 
 @Component(base = true)
-abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Boundedc, Syncc, Shieldc, Commanderc, Displayable, Senseable, Ranged, Minerc, Builderc{
+abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Boundedc, Syncc, Shieldc, Commanderc, Displayable, Senseable, Ranged, Minerc, Builderc, DamageSource{
 
     @Import boolean hovering, dead, disarmed;
     @Import float x, y, rotation, elevation, maxHealth, drag, armor, hitSize, health, ammo, minFormationSpeed, dragMultiplier;
@@ -443,7 +443,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
             //apply damage
             if(floor.damageTaken > 0f){
-                damageContinuous(floor.damageTaken);
+                damageContinuous(floor.damageTaken, floor);
             }
         }
 
@@ -487,7 +487,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         float power = item().charge * Mathf.pow(stack().amount, 1.11f) * 160f;
 
         if(!spawnedByCore){
-            Damage.dynamicExplosion(x, y, flammability, explosiveness, power, bounds() / 2f, state.rules.damageExplosions, item().flammability > 1, team, type.deathExplosionEffect);
+            Damage.dynamicExplosion(x, y, flammability, explosiveness, power, bounds() / 2f, state.rules.damageExplosions, item().flammability > 1, team, type.deathExplosionEffect, self());
         }else{
             type.deathExplosionEffect.at(x, y, bounds() / 2f / 8f);
         }
@@ -514,7 +514,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
         //if this unit crash landed (was flying), damage stuff in a radius
         if(type.flying && !spawnedByCore){
-            Damage.damage(team, x, y, Mathf.pow(hitSize, 0.94f) * 1.25f, Mathf.pow(hitSize, 0.75f) * type.crashDamageMultiplier * 5f, true, false, true);
+            Damage.damage(team, x, y, Mathf.pow(hitSize, 0.94f) * 1.25f, Mathf.pow(hitSize, 0.75f) * type.crashDamageMultiplier * 5f, true, false, true, new UnitCrash(self()));
         }
 
         if(!headless){

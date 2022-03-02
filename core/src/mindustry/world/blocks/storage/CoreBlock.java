@@ -211,13 +211,23 @@ public class CoreBlock extends StorageBlock{
         }
 
         @Override
-        public void damage(@Nullable Team source, float damage){
+        @Deprecated(forRemoval = true)
+        public void damage(Team source, float damage){
             if(iframes > 0) return;
-
             if(source != null && source != team){
                 lastDamage = source;
             }
-            super.damage(source, damage);
+            super.damage(damage, DamageSource.Unknown);
+        }
+
+        @Override
+        public void damage(float amount, DamageSource source){
+            if(iframes > 0) return;
+
+            if(source instanceof Teamc){
+                lastDamage = ((Teamc)source).team();
+            }
+            super.damage(amount, source);
         }
 
         @Override
@@ -283,7 +293,7 @@ public class CoreBlock extends StorageBlock{
         public void onDestroyed(){
             if(state.rules.coreCapture){
                 //just create an explosion, no fire. this prevents immediate recapture
-                Damage.dynamicExplosion(x, y, 0, 0, 0, tilesize * block.size / 2f, state.rules.damageExplosions);
+                Damage.dynamicExplosion(x, y, 0, 0, 0, tilesize * block.size / 2f, state.rules.damageExplosions, true, null, Fx.dynamicExplosion, this);
                 Fx.commandSend.at(x, y, 140f);
             }else{
                 super.onDestroyed();

@@ -2,6 +2,7 @@ package mindustry.entities.comp;
 
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.entities.*;
 import mindustry.gen.*;
 
 @Component
@@ -48,17 +49,60 @@ abstract class HealthComp implements Entityc, Posc{
         return health < maxHealth - 0.001f;
     }
 
-    /** Damage and pierce armor. */
+    /**
+     * Damage and pierce armor.
+     * @deprecated use function with source
+     */
+    @Deprecated(forRemoval = true)
     void damagePierce(float amount, boolean withEffect){
-        damage(amount, withEffect);
+        damagePierce(amount, withEffect, DamageSource.Unknown);
+    }
+
+    /**
+     * Damage and pierce armor.
+     * @deprecated use function with source
+     */
+    @Deprecated(forRemoval = true)
+    void damagePierce(float amount){
+        damagePierce(amount, DamageSource.Unknown);
+    }
+
+    /** @deprecated use function with source */
+    @Deprecated(forRemoval = true)
+    void damage(float amount){
+        damage(amount, DamageSource.Unknown);
+    }
+
+    /** @deprecated use function with source */
+    @Deprecated(forRemoval = true)
+    void damage(float amount, boolean withEffect){
+        damage(amount, withEffect, DamageSource.Unknown);
+    }
+
+    /** @deprecated use function with source */
+    @Deprecated(forRemoval = true)
+    void damageContinuous(float amount){
+        damageContinuous(amount, DamageSource.Unknown);
+    }
+
+    /** @deprecated use function with source */
+    @Deprecated(forRemoval = true)
+    void damageContinuousPierce(float amount){
+        damageContinuousPierce(amount, DamageSource.Unknown);
     }
 
     /** Damage and pierce armor. */
-    void damagePierce(float amount){
-        damagePierce(amount, true);
+    void damagePierce(float amount, boolean withEffect, DamageSource source){
+        damage(amount, withEffect, source);
     }
 
-    void damage(float amount){
+    /** Damage and pierce armor. */
+    void damagePierce(float amount, DamageSource source){
+        damagePierce(amount, true, source);
+    }
+
+    void damage(float amount, DamageSource source){
+        //TODO damageEvent
         health -= amount;
         hitTime = 1f;
         if(health <= 0 && !dead){
@@ -66,22 +110,22 @@ abstract class HealthComp implements Entityc, Posc{
         }
     }
 
-    void damage(float amount, boolean withEffect){
+    void damage(float amount, boolean withEffect, DamageSource source){
         float pre = hitTime;
 
-        damage(amount);
+        damage(amount, source);
 
         if(!withEffect){
             hitTime = pre;
         }
     }
 
-    void damageContinuous(float amount){
-        damage(amount * Time.delta, hitTime <= -10 + hitDuration);
+    void damageContinuous(float amount, DamageSource source){
+        damage(amount * Time.delta, hitTime <= -10 + hitDuration, source);
     }
 
-    void damageContinuousPierce(float amount){
-        damagePierce(amount * Time.delta, hitTime <= -20 + hitDuration);
+    void damageContinuousPierce(float amount, DamageSource source){
+        damagePierce(amount * Time.delta, hitTime <= -20 + hitDuration, source);
     }
 
     void clampHealth(){

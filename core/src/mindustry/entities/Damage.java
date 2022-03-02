@@ -30,23 +30,31 @@ public class Damage{
     private static IntFloatMap damages = new IntFloatMap();
 
     /** Creates a dynamic explosion based on specified parameters. */
+    @Deprecated
     public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, boolean damage){
         dynamicExplosion(x, y, flammability, explosiveness, power, radius, damage, true, null, Fx.dynamicExplosion);
     }
 
     /** Creates a dynamic explosion based on specified parameters. */
+    @Deprecated
     public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, boolean damage, Effect explosionFx){
         dynamicExplosion(x, y, flammability, explosiveness, power, radius, damage, true, null, explosionFx);
     }
 
     /** Creates a dynamic explosion based on specified parameters. */
+    @Deprecated
     public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, boolean damage, boolean fire, @Nullable Team ignoreTeam){
         dynamicExplosion(x, y, flammability, explosiveness, power, radius, damage, fire, ignoreTeam, Fx.dynamicExplosion);
     }
 
     /** Creates a dynamic explosion based on specified parameters. */
+    @Deprecated
     public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, boolean damage, boolean fire, @Nullable Team ignoreTeam, Effect explosionFx){
+        dynamicExplosion(x, y, flammability, explosiveness, power, radius, damage, fire, ignoreTeam, explosionFx, DamageSource.Unknown);
+    }
+    public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, boolean damage, boolean fire, @Nullable Team ignoreTeam, Effect explosionFx, DamageSource source){
         if(damage){
+            final DamageSource source2 = new DamageSource.Explosion(source);
             for(int i = 0; i < Mathf.clamp(power / 700, 0, 8); i++){
                 int length = 5 + Mathf.clamp((int)(Mathf.pow(power, 0.98f) / 500), 1, 18);
                 Time.run(i * 0.8f + Mathf.random(4f), () -> Lightning.create(Team.derelict, Pal.power, 3 + Mathf.pow(power, 0.35f), x, y, Mathf.random(360f), length + Mathf.range(2)));
@@ -63,7 +71,7 @@ public class Damage{
             for(int i = 0; i < waves; i++){
                 int f = i;
                 Time.run(i * 2f, () -> {
-                    damage(ignoreTeam, x, y, Mathf.clamp(radius + explosiveness, 0, 50f) * ((f + 1f) / waves), explosiveness / 2f, false);
+                    damage(ignoreTeam, x, y, Mathf.clamp(radius + explosiveness, 0, 50f) * ((f + 1f) / waves), explosiveness / 2f, false, true, true, source2);
                     Fx.blockExplosionSmoke.at(x + Mathf.range(radius), y + Mathf.range(radius));
                 });
             }
@@ -296,7 +304,12 @@ public class Damage{
     }
 
     /** Damages all entities and blocks in a radius that are enemies of the team. */
+    @Deprecated
     public static void damageUnits(Team team, float x, float y, float size, float damage, Boolf<Unit> predicate, Cons<Unit> acceptor){
+        damageUnits(team, x, y, size, damage, predicate, acceptor, DamageSource.Unknown);
+    }
+    /** Damages all entities and blocks in a radius that are enemies of the team. */
+    public static void damageUnits(Team team, float x, float y, float size, float damage, Boolf<Unit> predicate, Cons<Unit> acceptor, DamageSource source){
         Cons<Unit> cons = entity -> {
             if(!predicate.get(entity)) return;
 
@@ -304,7 +317,7 @@ public class Damage{
             if(!hitrect.overlaps(rect)){
                 return;
             }
-            entity.damage(damage);
+            entity.damage(damage, source);
             acceptor.get(entity);
         };
 
@@ -317,18 +330,35 @@ public class Damage{
     }
 
     /** Damages everything in a radius. */
+    @Deprecated
     public static void damage(float x, float y, float radius, float damage){
-        damage(null, x, y, radius, damage, false);
+        damage(x, y, radius, damage, DamageSource.Unknown);
+    }
+    /** Damages everything in a radius. */
+    public static void damage(float x, float y, float radius, float damage, DamageSource source){
+        damage(null, x, y, radius, damage, false, source);
     }
 
     /** Damages all entities and blocks in a radius that are enemies of the team. */
+    @Deprecated
     public static void damage(Team team, float x, float y, float radius, float damage){
-        damage(team, x, y, radius, damage, false);
+        damage(team, x, y, radius, damage, DamageSource.Unknown);
     }
 
     /** Damages all entities and blocks in a radius that are enemies of the team. */
+    public static void damage(Team team, float x, float y, float radius, float damage, DamageSource source){
+        damage(team, x, y, radius, damage, false, source);
+    }
+
+    /** Damages all entities and blocks in a radius that are enemies of the team. */
+    @Deprecated
     public static void damage(Team team, float x, float y, float radius, float damage, boolean air, boolean ground){
-        damage(team, x, y, radius, damage, false, air, ground);
+        damage(team, x, y, radius, damage, air, ground, DamageSource.Unknown);
+    }
+
+    /** Damages all entities and blocks in a radius that are enemies of the team. */
+    public static void damage(Team team, float x, float y, float radius, float damage, boolean air, boolean ground, DamageSource source){
+        damage(team, x, y, radius, damage, false, air, ground, source);
     }
 
     /** Applies a status effect to all enemy units in a range. */
@@ -350,18 +380,29 @@ public class Damage{
     }
 
     /** Damages all entities and blocks in a radius that are enemies of the team. */
+    @Deprecated
     public static void damage(Team team, float x, float y, float radius, float damage, boolean complete){
-        damage(team, x, y, radius, damage, complete, true, true);
+        damage(team, x, y, radius, damage, complete, DamageSource.Unknown);
+    }
+    /** Damages all entities and blocks in a radius that are enemies of the team. */
+    public static void damage(Team team, float x, float y, float radius, float damage, boolean complete, DamageSource source){
+        damage(team, x, y, radius, damage, complete, true, true, source);
     }
 
     /** Damages all entities and blocks in a radius that are enemies of the team. */
+    @Deprecated()
     public static void damage(Team team, float x, float y, float radius, float damage, boolean complete, boolean air, boolean ground){
+        damage(team, x, y, radius, damage, complete, air, ground, DamageSource.Unknown);
+    }
+
+    /** Damages all entities and blocks in a radius that are enemies of the team. */
+    public static void damage(Team team, float x, float y, float radius, float damage, boolean complete, boolean air, boolean ground, DamageSource source){
         Cons<Unit> cons = entity -> {
             if(entity.team == team || !entity.within(x, y, radius) || (entity.isFlying() && !air) || (entity.isGrounded() && !ground)){
                 return;
             }
             float amount = calculateDamage(x, y, entity.getX(), entity.getY(), radius, damage);
-            entity.damage(amount);
+            entity.damage(amount, source);
             //TODO better velocity displacement
             float dst = tr.set(entity.getX() - x, entity.getY() - y).len();
             entity.vel.add(tr.setLength((1f - dst / radius) * 2f / entity.mass()));
@@ -380,15 +421,18 @@ public class Damage{
 
         if(ground){
             if(!complete){
-                tileDamage(team, World.toTile(x), World.toTile(y), radius / tilesize, damage);
+                tileDamage(team, World.toTile(x), World.toTile(y), radius / tilesize, damage, source);
             }else{
-                completeDamage(team, x, y, radius, damage);
+                completeDamage(team, x, y, radius, damage, source);
             }
         }
     }
 
+    @Deprecated
     public static void tileDamage(Team team, int x, int y, float baseRadius, float damage){
-
+        tileDamage(team, x, y, baseRadius, damage, DamageSource.Unknown);
+    }
+    public static void tileDamage(Team team, int x, int y, float baseRadius, float damage, DamageSource source){
         Core.app.post(() -> {
 
             var in = world.build(x, y);
@@ -397,7 +441,7 @@ public class Damage{
             //this needs to be compensated
             if(in != null && in.team != team && in.block.size > 1 && in.health > damage){
                 //deal the damage of an entire side, to be equivalent with maximum 'standard' damage
-                in.damage(team, damage * Math.min((in.block.size), baseRadius * 0.4f));
+                in.damage(damage * Math.min((in.block.size), baseRadius * 0.4f), source);
                 //no need to continue with the explosion
                 return;
             }
@@ -454,20 +498,20 @@ public class Damage{
                 int cx = Point2.x(e.key), cy = Point2.y(e.key);
                 var build = world.build(cx, cy);
                 if(build != null){
-                    build.damage(team, e.value);
+                    build.damage(e.value, source);
                 }
             }
         });
     }
 
-    private static void completeDamage(Team team, float x, float y, float radius, float damage){
+    private static void completeDamage(Team team, float x, float y, float radius, float damage, DamageSource source){
 
         int trad = (int)(radius / tilesize);
         for(int dx = -trad; dx <= trad; dx++){
             for(int dy = -trad; dy <= trad; dy++){
                 Tile tile = world.tile(Math.round(x / tilesize) + dx, Math.round(y / tilesize) + dy);
                 if(tile != null && tile.build != null && (team == null ||team.isEnemy(tile.team())) && dx*dx + dy*dy <= trad*trad){
-                    tile.build.damage(team, damage);
+                    tile.build.damage(damage, source);
                 }
             }
         }

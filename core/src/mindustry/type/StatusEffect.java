@@ -12,7 +12,19 @@ import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.world.meta.*;
 
-public class StatusEffect extends UnlockableContent{
+public class StatusEffect extends UnlockableContent implements DamageSource{
+    public static class AffinityDamage implements DamageSource{
+        public final StatusEffect a, b;
+
+        public AffinityDamage(StatusEffect a, StatusEffect b){
+            this.a = a;
+            this.b = b;
+        }
+
+        public boolean about(StatusEffect s){
+            return a == s || b == s;
+        }
+    }
     /** Damage dealt by the unit with the effect. */
     public float damageMultiplier = 1f;
     /** Unit health multiplier. */
@@ -115,7 +127,7 @@ public class StatusEffect extends UnlockableContent{
     /** Runs every tick on the affected unit while time is greater than 0. */
     public void update(Unit unit, float time){
         if(damage > 0){
-            unit.damageContinuousPierce(damage);
+            unit.damageContinuousPierce(damage, this);
         }else if(damage < 0){ //heal unit
             unit.heal(-1f * damage * Time.delta);
         }

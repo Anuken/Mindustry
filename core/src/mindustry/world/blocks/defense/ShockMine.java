@@ -58,7 +58,7 @@ public class ShockMine extends Block{
         public void unitOn(Unit unit){
             if(enabled && unit.team != team && timer(timerDamage, cooldown)){
                 triggered();
-                damage(tileDamage);
+                damage(tileDamage, this);
             }
         }
 

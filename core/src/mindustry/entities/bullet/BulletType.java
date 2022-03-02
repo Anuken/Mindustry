@@ -234,7 +234,7 @@ public class BulletType extends Content implements Cloneable{
 
     public void hitEntity(Bullet b, Hitboxc entity, float health){
         if(entity instanceof Healthc h){
-            h.damage(b.damage);
+            h.damage(b.damage, b);
         }
 
         if(entity instanceof Unit unit){
@@ -280,7 +280,7 @@ public class BulletType extends Content implements Cloneable{
         }
 
         if(splashDamageRadius > 0 && !b.absorbed){
-            Damage.damage(b.team, x, y, splashDamageRadius, splashDamage * b.damageMultiplier(), collidesAir, collidesGround);
+            Damage.damage(b.team, x, y, splashDamageRadius, splashDamage * b.damageMultiplier(), collidesAir, collidesGround, b);
 
             if(status != StatusEffects.none){
                 Damage.status(b.team, x, y, splashDamageRadius, status, statusDuration, collidesAir, collidesGround);

@@ -3,6 +3,7 @@ package mindustry.entities.comp;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.entities.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 
@@ -23,27 +24,28 @@ abstract class ShieldComp implements Healthc, Posc{
 
     @Replace
     @Override
-    public void damage(float amount){
+    public void damage(float amount, DamageSource source){
         //apply armor
         amount = Math.max(amount - armor, minArmorDamage * amount);
         amount /= healthMultiplier;
 
-        rawDamage(amount);
+        rawDamage(amount, source);
     }
 
     @Replace
     @Override
-    public void damagePierce(float amount, boolean withEffect){
+    public void damagePierce(float amount, boolean withEffect, DamageSource source){
         float pre = hitTime;
 
-        rawDamage(amount);
+        rawDamage(amount, source);
 
         if(!withEffect){
             hitTime = pre;
         }
     }
 
-    private void rawDamage(float amount){
+    private void rawDamage(float amount, DamageSource source){
+        //TODO damageEvent
         boolean hadShields = shield > 0.0001f;
 
         if(hadShields){

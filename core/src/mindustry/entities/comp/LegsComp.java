@@ -148,7 +148,7 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
                     }
 
                     if(type.legSplashDamage > 0){
-                        Damage.damage(team, l.base.x, l.base.y, type.legSplashRange, type.legSplashDamage, false, true);
+                        Damage.damage(team, l.base.x, l.base.y, type.legSplashRange, type.legSplashDamage, false, true, self());
                     }
                 }
 

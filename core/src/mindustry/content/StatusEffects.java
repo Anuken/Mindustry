@@ -4,13 +4,12 @@ import arc.*;
 import arc.graphics.*;
 import arc.math.*;
 import mindustry.ctype.*;
-import mindustry.game.*;
 import mindustry.game.EventType.*;
-import mindustry.type.*;
+import mindustry.game.*;
 import mindustry.graphics.*;
+import mindustry.type.*;
 
-
-import static mindustry.Vars.*;
+import static mindustry.Vars.state;
 
 public class StatusEffects implements ContentList{
     public static StatusEffect none, burning, freezing, unmoving, slow, wet, muddy, melting, sapped, tarred, overdrive, overclock, shielded, shocked, blasted, corroded, boss, sporeSlowed, disarmed, electrified, invincible;
@@ -28,8 +27,9 @@ public class StatusEffects implements ContentList{
 
             init(() -> {
                 opposite(wet, freezing);
+                final AffinityDamage source = new AffinityDamage(this, tarred);
                 affinity(tarred, (unit, result, time) -> {
-                    unit.damagePierce(transitionDamage);
+                    unit.damagePierce(transitionDamage, source);
                     Fx.burning.at(unit.x + Mathf.range(unit.bounds() / 2f), unit.y + Mathf.range(unit.bounds() / 2f));
                     result.set(burning, Math.min(time + result.time, 300f));
                 });
@@ -46,8 +46,9 @@ public class StatusEffects implements ContentList{
             init(() -> {
                 opposite(melting, burning);
 
+                final AffinityDamage source = new AffinityDamage(this, tarred);
                 affinity(blasted, (unit, result, time) -> {
-                    unit.damagePierce(transitionDamage);
+                    unit.damagePierce(transitionDamage, source);
                 });
             });
         }};
@@ -70,8 +71,9 @@ public class StatusEffects implements ContentList{
             transitionDamage = 14;
 
             init(() -> {
+                final AffinityDamage source = new AffinityDamage(this, shocked);
                 affinity(shocked, (unit, result, time) -> {
-                    unit.damagePierce(transitionDamage);
+                    unit.damagePierce(transitionDamage, source);
                     if(unit.team == state.rules.waveTeam){
                         Events.fire(Trigger.shock);
                     }
@@ -97,8 +99,9 @@ public class StatusEffects implements ContentList{
 
             init(() -> {
                 opposite(wet, freezing);
+                final AffinityDamage source = new AffinityDamage(this, tarred);
                 affinity(tarred, (unit, result, time) -> {
-                    unit.damagePierce(8f);
+                    unit.damagePierce(8f, source);
                     Fx.burning.at(unit.x + Mathf.range(unit.bounds() / 2f), unit.y + Mathf.range(unit.bounds() / 2f));
                     result.set(melting, Math.min(time + result.time, 200f));
                 });
