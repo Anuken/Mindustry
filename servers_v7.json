@@ -53,7 +53,7 @@
   },
   {
     "name": "Phoenix Network",
-    "address": ["172.104.253.198"]
+    "address": ["172.104.253.198", "172.104.253.198:6464"]
   },
   {
     "name": "Xpdustry",
