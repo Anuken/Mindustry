@@ -1,8 +1,10 @@
 package mindustry.game;
 
+import arc.*;
 import arc.util.*;
 import mindustry.core.GameState.*;
 import mindustry.ctype.*;
+import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.net.*;
@@ -565,6 +567,38 @@ public class EventType{
             this.player = player;
             this.other = other;
             this.action = action;
+        }
+    }
+
+    /**
+     * WARNING! This event's instance is reused!
+     * To cache it or use with a timer or nest damage, call {@code noReuse}
+     * Can only modify {@code damage}
+     */
+    public static class DamageEvent{
+        public Healthc unitOrBuilding;
+        public DamageSource source;
+        /** <=0, this damage will be cancelled */
+        public float damage;
+
+        private boolean reusable = true;
+
+        public void noReuse(){
+            reusable = false;
+        }
+
+        private static DamageEvent inst = new DamageEvent();
+
+        /** @return damage after handle */
+        public static float fire(Healthc unitOrBuilding, float damage, DamageSource source){
+            if(!inst.reusable)
+                inst = new DamageEvent();
+            DamageEvent inst = DamageEvent.inst;//may change nest damage
+            inst.unitOrBuilding = unitOrBuilding;
+            inst.damage = damage;
+            inst.source = source;
+            Events.fire(inst);
+            return inst.damage;
         }
     }
 }

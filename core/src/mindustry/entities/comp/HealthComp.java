@@ -3,6 +3,7 @@ package mindustry.entities.comp;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.entities.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 
 @Component
@@ -102,7 +103,9 @@ abstract class HealthComp implements Entityc, Posc{
     }
 
     void damage(float amount, DamageSource source){
-        //TODO damageEvent
+        amount = DamageEvent.fire(self(), amount, source);
+        if(amount <= 0) return;
+
         health -= amount;
         hitTime = 1f;
         if(health <= 0 && !dead){

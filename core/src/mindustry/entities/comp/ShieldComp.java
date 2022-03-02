@@ -4,10 +4,11 @@ import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.minArmorDamage;
 
 @Component
 abstract class ShieldComp implements Healthc, Posc{
@@ -45,7 +46,9 @@ abstract class ShieldComp implements Healthc, Posc{
     }
 
     private void rawDamage(float amount, DamageSource source){
-        //TODO damageEvent
+        amount = DamageEvent.fire(self(), amount, source);
+        if(amount <= 0) return;
+
         boolean hadShields = shield > 0.0001f;
 
         if(hadShields){

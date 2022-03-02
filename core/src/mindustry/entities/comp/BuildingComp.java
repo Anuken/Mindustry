@@ -1432,7 +1432,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     @Override
     public void damage(float damage, DamageSource source){
         if(dead()) return;
-        //TODO damageEvent
+
+        damage = DamageEvent.fire(self(), damage, source);
+        if(damage <= 0) return;
 
         float dm = state.rules.blockHealth(team);
 
