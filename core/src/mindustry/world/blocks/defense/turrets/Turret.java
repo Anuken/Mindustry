@@ -331,12 +331,12 @@ public class Turret extends ReloadTurret{
             //turret always reloads regardless of whether it's targeting something
             updateReload();
 
+            if(timer(timerTarget, targetInterval)){
+                findTarget();
+            }
+
             if(hasAmmo()){
                 if(Float.isNaN(reloadCounter)) reloadCounter = 0;
-
-                if(timer(timerTarget, targetInterval)){
-                    findTarget();
-                }
 
                 if(validateTarget()){
                     boolean canShoot = true;

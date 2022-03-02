@@ -77,7 +77,7 @@ public class LaunchPad extends Block{
         @Override
         public boolean shouldConsume(){
             //TODO add launch costs, maybe legacy version
-            return launchCounter < launchTime && enabled;
+            return launchCounter < launchTime;
         }
 
         @Override
