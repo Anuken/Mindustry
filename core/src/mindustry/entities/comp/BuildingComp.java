@@ -68,8 +68,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     transient float payloadRotation;
     transient String lastAccessed;
     transient boolean wasDamaged; //used only by the indexer
-    transient boolean wasVisible; //used only by the block renderer when fog is on (TODO replace with discovered check?)
     transient float visualLiquid;
+
+    /** TODO Each bit corresponds to a team ID. Only 64 are supported. */
+    transient long visibleFlags;
+    transient boolean wasVisible; //used only by the block renderer when fog is on (TODO replace with discovered check?)
 
     transient boolean enabled = true;
     transient @Nullable Building lastDisabler;

@@ -3694,7 +3694,7 @@ public class Blocks{
             consumeLiquid(Liquids.hydrogen, 3f / 60f);
             consumeItems(with(Items.silicon, 100, Items.tungsten, 100));
 
-            constructTime = 60f * 20f;
+            constructTime = 60f * 50f;
 
             upgrades.addAll(
             new UnitType[]{UnitTypes.stell, UnitTypes.locus}
@@ -3710,7 +3710,7 @@ public class Blocks{
             consumeLiquid(Liquids.hydrogen, 3f / 60f);
             consumeItems(with(Items.silicon, 100, Items.tungsten, 100));
 
-            constructTime = 60f * 20f;
+            constructTime = 60f * 50f;
 
             upgrades.addAll(
             new UnitType[]{UnitTypes.stell, UnitTypes.latum}
@@ -3726,7 +3726,7 @@ public class Blocks{
             consumeLiquid(Liquids.hydrogen, 3f / 60f);
             consumeItems(with(Items.silicon, 100, Items.tungsten, 100));
 
-            constructTime = 60f * 20f;
+            constructTime = 60f * 50f;
 
             upgrades.addAll(
             new UnitType[]{UnitTypes.stell, UnitTypes.avert}
