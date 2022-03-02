@@ -196,7 +196,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     public boolean isCenter(){
-        return build == null || build.tile() == this;
+        return build == null || build.tile == this;
     }
 
     public int centerX(){

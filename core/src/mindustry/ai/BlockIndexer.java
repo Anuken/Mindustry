@@ -66,6 +66,15 @@ public class BlockIndexer{
             quadHeight = Mathf.ceil(world.height() / (float)quadrantSize);
             blocksPresent = new boolean[content.blocks().size];
 
+            //so WorldLoadEvent gets called twice sometimes... ugh
+            for(Team team : Team.all){
+                var data = state.teams.get(team);
+                if(data != null){
+                    if(data.buildings != null) data.buildings.clear();
+                    if(data.turrets != null) data.turrets.clear();
+                }
+            }
+
             for(Tile tile : world.tiles){
                 process(tile);
 

@@ -603,6 +603,12 @@ public class World{
 
         @Override
         public void end(){
+            applyFilters();
+
+            super.end();
+        }
+
+        public void applyFilters(){
             Seq<GenerateFilter> filters = map.filters();
 
             if(!filters.isEmpty()){
@@ -615,8 +621,6 @@ public class World{
                     filter.apply(tiles, input);
                 }
             }
-
-            super.end();
         }
     }
 }

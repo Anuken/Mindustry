@@ -74,6 +74,10 @@ public class Teams{
         return map[team.id] == null ? (map[team.id] = new TeamData(team)) : map[team.id];
     }
 
+    public @Nullable TeamData getOrNull(Team team){
+        return map[team.id];
+    }
+
     public Seq<CoreBuild> playerCores(){
         return get(state.rules.defaultTeam).cores;
     }

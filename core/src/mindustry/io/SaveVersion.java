@@ -154,9 +154,11 @@ public abstract class SaveVersion extends SaveFileReader{
         if(state.rules.spawns.isEmpty()) state.rules.spawns = waves.get();
         lastReadBuild = map.getInt("build", -1);
 
-        state.rules.sector = context.getSector();
-        if(state.rules.sector != null){
-            state.rules.sector.planet.ruleSetter.get(state.rules);
+        if(context.getSector() != null){
+            state.rules.sector = context.getSector();
+            if(state.rules.sector != null){
+                state.rules.sector.planet.ruleSetter.get(state.rules);
+            }
         }
 
         if(!headless){

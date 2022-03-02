@@ -42,6 +42,12 @@ public class FileMapGenerator implements WorldGenerator{
             public Sector getSector(){
                 return sector;
             }
+
+            @Override
+            public void end(){
+                applyFilters();
+                //no super.end(), don't call world load event twice
+            }
         });
         world.setGenerating(true);
 
