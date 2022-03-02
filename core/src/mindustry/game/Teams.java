@@ -272,12 +272,7 @@ public class Teams{
 
             //convert all team tiles to neutral, randomly killing them
             for(var b : builds){
-                //TODO this may cause a lot of packet spam, optimize?
-                Call.setTeam(b, Team.derelict);
-
-                if(Mathf.chance(0.25)){
-                    Time.run(Mathf.random(0f, 60f * 6f), b::kill);
-                }
+                scheduleDerelict(b);
             }
 
             //kill all units randomly
@@ -287,6 +282,29 @@ public class Teams{
                     u.kill();
                 }
             }));
+        }
+
+        /** Make all buildings within this range derelict / explode. */
+        public void makeDerelict(float x, float y, float range){
+            var builds = new Seq<Building>();
+            if(buildings != null){
+                buildings.intersect(x - range, y - range, range * 2f, range * 2f, builds);
+            }
+
+            for(var build : builds){
+                if(build.within(x, y, range)){
+                    scheduleDerelict(build);
+                }
+            }
+        }
+
+        private void scheduleDerelict(Building build){
+            //TODO this may cause a lot of packet spam, optimize?
+            Call.setTeam(build, Team.derelict);
+
+            if(Mathf.chance(0.25)){
+                Time.run(Mathf.random(0f, 60f * 6f), build::kill);
+            }
         }
 
         @Nullable

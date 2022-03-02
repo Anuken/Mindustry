@@ -152,6 +152,14 @@ public class Logic implements ApplicationListener{
             }
         });
 
+        Events.on(BlockDestroyEvent.class, e -> {
+            //TODO maybe make it a separate rule?
+            //makes cores go derelict in RTS mode, helps clean things up
+            if(e.tile.build instanceof CoreBuild core && core.team.isAI() && core.team.rules().rtsAi){
+                core.team.data().makeDerelict(core.x, core.y, state.rules.enemyCoreBuildRadius);
+            }
+        });
+
         //send out items to each client
         Events.on(TurnEvent.class, e -> {
             if(net.server() && state.isCampaign()){
@@ -167,7 +175,9 @@ public class Logic implements ApplicationListener{
         //listen to core changes; if all cores have been destroyed, set to derelict.
         Events.on(CoreChangeEvent.class, e -> Core.app.post(() -> {
             if(state.rules.cleanupDeadTeams && state.rules.pvp && !e.core.isAdded() && e.core.team != Team.derelict && e.core.team.cores().isEmpty()){
-                e.core.team.data().destroyToDerelict();
+                Core.app.post(() -> {
+                    e.core.team.data().destroyToDerelict();
+                });
             }
         }));
     }
