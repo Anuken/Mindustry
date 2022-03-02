@@ -63,7 +63,9 @@ public class CoreBlock extends StorageBlock{
         if(player == null || tile == null || !(tile.build instanceof CoreBuild entity)) return;
 
         CoreBlock block = (CoreBlock)tile.block();
-        Fx.spawn.at(entity);
+        if(entity.wasVisible){
+            Fx.spawn.at(entity);
+        }
 
         player.set(entity);
 
@@ -392,7 +394,7 @@ public class CoreBlock extends StorageBlock{
             if(team == state.rules.defaultTeam && state.isCampaign()){
                 state.rules.sector.info.handleCoreItem(item, amount);
 
-                if(realAmount == 0){
+                if(realAmount == 0 && wasVisible){
                     Fx.coreBurn.at(x, y);
                 }
             }

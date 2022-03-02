@@ -86,6 +86,13 @@ public final class FogControl implements CustomChunk{
             }
         });
 
+        //unit dead -> fog updates
+        Events.on(UnitDestroyEvent.class, e -> {
+            if(state.rules.fog && fog[e.unit.team.id] != null){
+                fog[e.unit.team.id].dynamicUpdated = true;
+            }
+        });
+
         SaveVersion.addCustomChunk("static-fog-data", this);
     }
 

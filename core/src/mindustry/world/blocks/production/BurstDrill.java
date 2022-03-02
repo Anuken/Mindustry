@@ -79,9 +79,12 @@ public class BurstDrill extends Drill{
                 }
 
                 invertTime = 1f;
-                Effect.shake(shake, shake, this);
                 progress %= drillTime;
-                drillEffect.at(x + Mathf.range(drillEffectRnd), y + Mathf.range(drillEffectRnd), dominantItem.color);
+
+                if(wasVisible){
+                    Effect.shake(shake, shake, this);
+                    drillEffect.at(x + Mathf.range(drillEffectRnd), y + Mathf.range(drillEffectRnd), dominantItem.color);
+                }
             }
         }
 
