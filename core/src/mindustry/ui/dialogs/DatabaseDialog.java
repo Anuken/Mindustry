@@ -112,10 +112,6 @@ public class DatabaseDialog extends BaseDialog{
         if(all.getChildren().isEmpty()){
             all.add("@none.found");
         }
-
-        Core.app.post(() -> {
-            invalidateHierarchy();
-        });
     }
 
     boolean unlocked(UnlockableContent content){
