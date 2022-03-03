@@ -26,12 +26,10 @@ public class Pathfinder implements Runnable{
     static final int impassable = -1;
 
     public static final int
-        fieldCore = 0,
-        fieldRally = 1;
+        fieldCore = 0;
 
     public static final Seq<Prov<Flowfield>> fieldTypes = Seq.with(
-        EnemyCoreField::new,
-        RallyField::new
+        EnemyCoreField::new
     );
 
     public static final int
@@ -461,15 +459,6 @@ public class Pathfinder implements Runnable{
                 for(Tile other : spawner.getSpawns()){
                     out.add(other.array());
                 }
-            }
-        }
-    }
-
-    public static class RallyField extends Flowfield{
-        @Override
-        protected void getPositions(IntSeq out){
-            for(Building other : indexer.getFlagged(team, BlockFlag.rally)){
-                out.add(other.tile.array());
             }
         }
     }
