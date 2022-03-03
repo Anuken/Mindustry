@@ -3412,10 +3412,10 @@ public class UnitTypes{
                 rotate = false;
                 shootY = 0f;
                 beamWidth = 0.7f;
-                repairSpeed = 0.25f;
+                repairSpeed = 2.2f;
+                fractionRepairSpeed = 0.04f;
                 aimDst = 0f;
                 shootCone = 15f;
-                fractionRepair = true;
                 mirror = false;
 
                 targetUnits = false;
@@ -3473,11 +3473,12 @@ public class UnitTypes{
                 rotate = false;
                 shootY = 0f;
                 beamWidth = 0.7f;
-                repairSpeed = 0.3f;
                 aimDst = 0f;
                 shootCone = 15f;
-                fractionRepair = true;
                 mirror = false;
+
+                repairSpeed = 2.5f;
+                fractionRepairSpeed = 0.04f;
 
                 targetUnits = false;
                 targetBuildings = true;
@@ -3547,11 +3548,12 @@ public class UnitTypes{
                 rotate = false;
                 shootY = 0f;
                 beamWidth = 0.7f;
-                repairSpeed = 0.2f;
                 aimDst = 0f;
                 shootCone = 40f;
-                fractionRepair = true;
                 mirror = true;
+
+                repairSpeed = 1.3f;
+                fractionRepairSpeed = 0.02f;
 
                 targetUnits = false;
                 targetBuildings = true;

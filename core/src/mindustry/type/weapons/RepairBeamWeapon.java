@@ -26,10 +26,9 @@ import static mindustry.Vars.*;
  * */
 public class RepairBeamWeapon extends Weapon{
     public boolean targetBuildings = false, targetUnits = true;
-    //TODO leads to wrong stats
-    public boolean fractionRepair = false;
 
     public float repairSpeed = 0.3f;
+    public float fractionRepairSpeed = 0f;
     public float beamWidth = 1f;
     public float pulseRadius = 6f;
     public float pulseStroke = 2f;
@@ -150,7 +149,7 @@ public class RepairBeamWeapon extends Weapon{
         }
 
         if(canShoot && mount.target instanceof Healthc u){
-            u.heal(repairSpeed * heal.strength * Time.delta * (fractionRepair ? u.maxHealth() / 100f : 1f));
+            u.heal(repairSpeed * heal.strength * Time.delta + fractionRepairSpeed * heal.strength * Time.delta * u.maxHealth() / 100f);
         }
     }
 
@@ -174,9 +173,7 @@ public class RepairBeamWeapon extends Weapon{
 
     @Override
     public void init(){
-        if(fractionRepair){
-            bullet.healPercent = repairSpeed;
-        }
+        bullet.healPercent = fractionRepairSpeed;
     }
 
     public static class HealBeamMount extends WeaponMount{
