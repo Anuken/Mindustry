@@ -39,7 +39,7 @@ public class DatabaseDialog extends BaseDialog{
             search.setMessageText("@players.search");
         }).fillX().padBottom(4).row();
 
-        cont.pane(all);
+        cont.pane(all).scrollX(false);
     }
 
     void rebuild(){
@@ -112,6 +112,10 @@ public class DatabaseDialog extends BaseDialog{
         if(all.getChildren().isEmpty()){
             all.add("@none.found");
         }
+
+        Core.app.post(() -> {
+            invalidateHierarchy();
+        });
     }
 
     boolean unlocked(UnlockableContent content){
