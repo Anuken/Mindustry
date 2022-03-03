@@ -1698,7 +1698,7 @@ public class Blocks{
         radar = new Radar("radar"){{
             requirements(Category.effect, BuildVisibility.fogOnly, with(Items.silicon, 30, Items.graphite, 30));
             outlineColor = Color.valueOf("4a4b53");
-            fogRadius = 27;
+            fogRadius = 30;
             researchCost = with(Items.silicon, 50, Items.graphite, 50);
 
             consumePower(0.1f);
@@ -2670,7 +2670,7 @@ public class Blocks{
             //TODO should this be higher?
             buildCostMultiplier = 0.75f;
 
-            unitCapModifier = 30;
+            unitCapModifier = 20;
             researchCostMultiplier = 0.07f;
         }};
 
@@ -2685,7 +2685,7 @@ public class Blocks{
             armor = 10f;
             incinerateNonBuildable = true;
 
-            unitCapModifier = 30;
+            unitCapModifier = 20;
             researchCostMultipliers.put(Items.silicon, 0.4f);
             researchCostMultiplier = 0.14f;
         }};
@@ -2702,7 +2702,7 @@ public class Blocks{
             armor = 15f;
             incinerateNonBuildable = true;
 
-            unitCapModifier = 30;
+            unitCapModifier = 20;
             researchCostMultipliers.put(Items.silicon, 0.3f);
             researchCostMultiplier = 0.2f;
         }};
