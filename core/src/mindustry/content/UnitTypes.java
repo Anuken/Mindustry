@@ -2502,7 +2502,7 @@ public class UnitTypes{
 
                 //TODO make this look nicer
                 bullet = new RailBulletType(){{
-                    length = 140f;
+                    length = 160f;
                     damage = 45f;
                     hitColor = Color.valueOf("feb380");
                     hitEffect = endEffect = Fx.hitBulletColor;

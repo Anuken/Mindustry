@@ -144,7 +144,7 @@ public class Reconstructor extends UnitBlock{
             var upgrade = upgrade(pay.unit.type);
 
             if(upgrade != null){
-                if(!upgrade.unlockedNowHost()){
+                if(!upgrade.unlockedNowHost() && !team.isAI()){
                     //flash "not researched"
                     pay.showOverlay(Icon.tree);
                 }
@@ -155,7 +155,7 @@ public class Reconstructor extends UnitBlock{
                 }
             }
 
-            return upgrade != null && upgrade.unlockedNowHost() && !upgrade.isBanned();
+            return upgrade != null && (team.isAI() || upgrade.unlockedNowHost()) && !upgrade.isBanned();
         }
 
         @Override
@@ -259,7 +259,7 @@ public class Reconstructor extends UnitBlock{
             if(payload == null) return null;
 
             UnitType t = upgrade(payload.unit.type);
-            return t != null && t.unlockedNowHost() ? t : null;
+            return t != null && (t.unlockedNowHost() || team.isAI()) ? t : null;
         }
 
         public boolean constructing(){
@@ -268,7 +268,7 @@ public class Reconstructor extends UnitBlock{
 
         public boolean hasUpgrade(UnitType type){
             UnitType t = upgrade(type);
-            return t != null && t.unlockedNowHost() && !type.isBanned();
+            return t != null && (t.unlockedNowHost() || team.isAI()) && !type.isBanned();
         }
 
         public UnitType upgrade(UnitType type){

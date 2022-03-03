@@ -116,7 +116,7 @@ public class Rules{
     /** HIGHLY UNSTABLE/EXPERIMENTAL. DO NOT USE THIS. */
     public boolean fog = false;
     /** If fog = true, this is whether static (black) fog is enabled. */
-    public boolean staticFog = true;
+    public boolean staticFog = false;
     /** Color for static, undiscovered fog of war areas. */
     public Color staticColor = new Color(0f, 0f, 0f, 1f);
     /** Color for discovered but un-monitored fog of war areas. */

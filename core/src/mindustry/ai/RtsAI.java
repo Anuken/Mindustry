@@ -256,7 +256,7 @@ public class RtsAI{
 
     float estimateStats(float fromX, float fromY, float x, float y, float selfDps, float selfHealth){
         float[] health = {0f}, dps = {0f};
-        float extraRadius = 30f;
+        float extraRadius = 50f;
 
         for(var turret : Vars.indexer.getEnemy(data.team, BlockFlag.turret)){
             if(Intersector.distanceSegmentPoint(fromX, fromY,  x, y, turret.x, turret.y) <= ((TurretBuild)turret).range() + extraRadius){

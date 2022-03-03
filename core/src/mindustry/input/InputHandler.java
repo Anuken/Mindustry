@@ -736,21 +736,23 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     protected void showSchematicSave(){
         if(lastSchematic == null) return;
 
+        var last = lastSchematic;
+
         ui.showTextInput("@schematic.add", "@name", "", text -> {
             Schematic replacement = schematics.all().find(s -> s.name().equals(text));
             if(replacement != null){
                 ui.showConfirm("@confirm", "@schematic.replace", () -> {
-                    schematics.overwrite(replacement, lastSchematic);
+                    schematics.overwrite(replacement, last);
                     ui.showInfoFade("@schematic.saved");
                     ui.schematics.showInfo(replacement);
                 });
             }else{
-                lastSchematic.tags.put("name", text);
-                lastSchematic.tags.put("description", "");
-                schematics.add(lastSchematic);
+                last.tags.put("name", text);
+                last.tags.put("description", "");
+                schematics.add(last);
                 ui.showInfoFade("@schematic.saved");
-                ui.schematics.showInfo(lastSchematic);
-                Events.fire(new SchematicCreateEvent(lastSchematic));
+                ui.schematics.showInfo(last);
+                Events.fire(new SchematicCreateEvent(last));
             }
         });
     }
@@ -938,6 +940,18 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                     selectPlans.remove(other);
                     selectPlans.add(plan.copy());
                 }
+            }
+        }
+    }
+
+    protected void flushPlansReverse(Seq<BuildPlan> plans){
+        //reversed iteration.
+        for(int i = plans.size - 1; i >= 0; i--){
+            var plan = plans.get(i);
+            if(plan.block != null && validPlace(plan.x, plan.y, plan.block, plan.rotation)){
+                BuildPlan copy = plan.copy();
+                plan.block.onNewPlan(copy);
+                player.unit().addBuild(copy, false);
             }
         }
     }

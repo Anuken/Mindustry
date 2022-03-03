@@ -756,6 +756,9 @@ public class UnitType extends UnlockableContent{
                 out[i] = new ItemStack(stacks[i].item, UI.roundAmount((int)(Math.pow(stacks[i].amount, 1.1) * researchCostMultiplier)));
             }
 
+            //remove zero-requirements for automatic unlocks
+            out = Structs.filter(ItemStack.class, out, stack -> stack.amount > 0);
+
             cachedRequirements = out;
 
             return out;

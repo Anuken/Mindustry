@@ -1701,7 +1701,7 @@ public class Blocks{
             fogRadius = 27;
             researchCost = with(Items.silicon, 50, Items.graphite, 50);
 
-            consumePower(0.2f);
+            consumePower(0.1f);
         }};
 
         buildTower = new BuildTurret("build-tower"){{
@@ -2541,7 +2541,7 @@ public class Blocks{
             tier = 3;
             size = 2;
             range = 4;
-            fogRadius = 2;
+            fogRadius = 3;
             researchCost = with(Items.beryllium, 10);
 
             consumeLiquid(Liquids.hydrogen, 0.25f / 60f).boost();
@@ -2556,6 +2556,7 @@ public class Blocks{
             tier = 5;
             size = 3;
             range = 6;
+            fogRadius = 4;
             laserWidth = 0.7f;
             itemCapacity = 20;
 
@@ -2576,6 +2577,8 @@ public class Blocks{
             //can't mine thorium for balance reasons, needs better drill
             blockedItem = Items.thorium;
             researchCostMultiplier = 0.5f;
+
+            fogRadius = 4;
 
             consumePower(160f / 60f);
             consumeLiquid(Liquids.water, 0.2f);
@@ -2601,6 +2604,7 @@ public class Blocks{
             arrowSpacing = 5f;
             arrows = 2;
             glowColor.a = 0.6f;
+            fogRadius = 5;
 
             //TODO different requirements
             consumePower(6f);
@@ -2661,6 +2665,7 @@ public class Blocks{
             thrusterLength = 34/4f;
             armor = 5f;
             alwaysUnlocked = true;
+            incinerateNonBuildable = true;
 
             //TODO should this be higher?
             buildCostMultiplier = 0.75f;
@@ -2678,6 +2683,7 @@ public class Blocks{
             size = 5;
             thrusterLength = 40/4f;
             armor = 10f;
+            incinerateNonBuildable = true;
 
             unitCapModifier = 30;
             researchCostMultipliers.put(Items.silicon, 0.4f);
@@ -2694,6 +2700,7 @@ public class Blocks{
             size = 6;
             thrusterLength = 48/4f;
             armor = 15f;
+            incinerateNonBuildable = true;
 
             unitCapModifier = 30;
             researchCostMultipliers.put(Items.silicon, 0.3f);

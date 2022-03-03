@@ -114,8 +114,9 @@ public final class FogRenderer{
         Draw.color(state.rules.dynamicColor);
         Draw.fbo(dynamicFog.getTexture(), world.width(), world.height(), tilesize);
         if(state.rules.staticFog){
+            //TODO why does this require a half-tile offset while dynamic does not
             Draw.color(state.rules.staticColor);
-            Draw.fbo(staticFog.getTexture(), world.width(), world.height(), tilesize);
+            Draw.fbo(staticFog.getTexture(), world.width(), world.height(), tilesize, tilesize/2f);
         }
         Draw.shader();
     }

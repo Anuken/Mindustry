@@ -667,7 +667,12 @@ public class DesktopInput extends InputHandler{
         if(Core.input.keyRelease(Binding.break_block) || Core.input.keyRelease(Binding.select)){
 
             if(mode == placing && block != null){ //touch up while placing, place everything in selection
-                flushPlans(linePlans);
+                if(input.keyDown(Binding.boost)){
+                    flushPlansReverse(linePlans);
+                }else{
+                    flushPlans(linePlans);
+                }
+
                 linePlans.clear();
                 Events.fire(new LineConfirmEvent());
             }else if(mode == breaking){ //touch up while breaking, break everything in selection

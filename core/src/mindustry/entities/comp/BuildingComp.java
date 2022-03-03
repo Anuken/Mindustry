@@ -874,7 +874,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public void offload(Item item){
         produced(item, 1);
         int dump = this.cdump;
-        if(!net.client() && state.isCampaign() && team == state.rules.defaultTeam) item.unlock();
 
         for(int i = 0; i < proximity.size; i++){
             incrementDump(proximity.size);
@@ -911,7 +910,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public void produced(Item item, int amount){
-        if(Vars.state.rules.sector != null && team == state.rules.defaultTeam) Vars.state.rules.sector.info.handleProduction(item, amount);
+        if(Vars.state.rules.sector != null && team == state.rules.defaultTeam){
+            Vars.state.rules.sector.info.handleProduction(item, amount);
+
+            if(!net.client()) item.unlock();
+        }
     }
 
     /** Dumps any item with an accumulator. May dump multiple times per frame. Use with care. */
@@ -1541,6 +1544,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     /** Changes this building's team in a safe manner. */
     public void changeTeam(Team next){
+        if(this.team == next) return;
+
         Team last = this.team;
         boolean was = isValid();
 

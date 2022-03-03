@@ -109,8 +109,8 @@ public class Sector{
     }
 
     public boolean isAttacked(){
-        if(isBeingPlayed()) return state.rules.waves;
-        return save != null && info.waves && info.hasCore;
+        if(isBeingPlayed()) return state.rules.waves || state.rules.attackMode;
+        return save != null && (info.waves || info.attack) && info.hasCore;
     }
 
     /** @return whether the player has a base here. */
@@ -155,7 +155,8 @@ public class Sector{
     }
 
     public boolean isCaptured(){
-        return save != null && !info.waves;
+        if(isBeingPlayed()) return !info.waves && !info.attack;
+        return save != null && !info.waves && !info.attack;
     }
 
     public boolean hasSave(){

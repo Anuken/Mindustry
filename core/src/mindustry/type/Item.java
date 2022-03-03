@@ -44,6 +44,8 @@ public class Item extends UnlockableContent implements Senseable{
     public int transitionFrames = 0;
     /** Ticks in-between animation frames. */
     public float frameTime = 5f;
+    /** If true, this material is used by buildings. If false, this material will be incinerated in certain cores. */
+    public boolean buildable = true;
 
     public Item(String name, Color color){
         super(name);

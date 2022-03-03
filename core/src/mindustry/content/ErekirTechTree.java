@@ -310,29 +310,29 @@ public class ErekirTechTree{
             });
 
             nodeProduce(Items.beryllium, () -> {
+                nodeProduce(Items.sand, () -> {
+                    nodeProduce(Items.silicon, () -> {
+                        nodeProduce(Items.oxide, () -> {
+                            nodeProduce(Items.fissileMatter, () -> {
+
+                            });
+                        });
+                    });
+                });
+
+                nodeProduce(Liquids.water, () -> {
+                    nodeProduce(Liquids.ozone, () -> {
+                        nodeProduce(Liquids.hydrogen, () -> {
+                            nodeProduce(Liquids.nitrogen, () -> {
+                                nodeProduce(Liquids.cyanogen, () -> {
+
+                                });
+                            });
+                        });
+                    });
+                });
+
                 nodeProduce(Items.graphite, () -> {
-                    nodeProduce(Items.sand, () -> {
-                        nodeProduce(Items.silicon, () -> {
-                            nodeProduce(Items.oxide, () -> {
-                                nodeProduce(Items.fissileMatter, () -> {
-
-                                });
-                            });
-                        });
-                    });
-
-                    nodeProduce(Liquids.water, () -> {
-                        nodeProduce(Liquids.ozone, () -> {
-                            nodeProduce(Liquids.hydrogen, () -> {
-                                nodeProduce(Liquids.nitrogen, () -> {
-                                    nodeProduce(Liquids.cyanogen, () -> {
-
-                                    });
-                                });
-                            });
-                        });
-                    });
-
                     nodeProduce(Items.tungsten, () -> {
                         nodeProduce(Liquids.slag, () -> {
 

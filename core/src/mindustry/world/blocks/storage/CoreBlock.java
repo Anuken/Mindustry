@@ -33,6 +33,7 @@ public class CoreBlock extends StorageBlock{
     public @Load(value = "@-thruster2", fallback = "clear-effect") TextureRegion thruster2; //bot left
     public float thrusterLength = 14f/4f;
     public boolean isFirstTier;
+    public boolean incinerateNonBuildable = false;
 
     public UnitType unitType = UnitTypes.alpha;
 
@@ -388,11 +389,14 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public void handleStack(Item item, int amount, Teamc source){
-            int realAmount = Math.min(amount, storageCapacity - items.get(item));
+            boolean incinerate = incinerateNonBuildable && !item.buildable;
+            int realAmount = incinerate ? 0 : Math.min(amount, storageCapacity - items.get(item));
             super.handleStack(item, realAmount, source);
 
             if(team == state.rules.defaultTeam && state.isCampaign()){
-                state.rules.sector.info.handleCoreItem(item, amount);
+                if(!incinerate){
+                    state.rules.sector.info.handleCoreItem(item, amount);
+                }
 
                 if(realAmount == 0 && wasVisible){
                     Fx.coreBurn.at(x, y);
@@ -489,12 +493,14 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public void handleItem(Building source, Item item){
+            boolean incinerate = incinerateNonBuildable && !item.buildable;
+
             if(net.server() || !net.active()){
-                if(team == state.rules.defaultTeam && state.isCampaign()){
+                if(team == state.rules.defaultTeam && state.isCampaign() && !incinerate){
                     state.rules.sector.info.handleCoreItem(item, 1);
                 }
 
-                if(items.get(item) >= storageCapacity){
+                if(items.get(item) >= storageCapacity || incinerate){
                     //create item incineration effect at random intervals
                     if(!noEffect){
                         incinerateEffect(this, source);
@@ -503,7 +509,7 @@ public class CoreBlock extends StorageBlock{
                 }else{
                     super.handleItem(source, item);
                 }
-            }else if(state.rules.coreIncinerates && items.get(item) >= storageCapacity && !noEffect){
+            }else if(((state.rules.coreIncinerates && items.get(item) >= storageCapacity) || incinerate) && !noEffect){
                 //create item incineration effect at random intervals
                 incinerateEffect(this, source);
                 noEffect = false;

@@ -37,12 +37,14 @@ public class Items{
         sand = new Item("sand", Color.valueOf("f7cba4")){{
             lowPriority = true;
             alwaysUnlocked = true;
+            buildable = false;
         }};
 
         coal = new Item("coal", Color.valueOf("272727")){{
             explosiveness = 0.2f;
             flammability = 1f;
             hardness = 2;
+            buildable = false;
         }};
 
         titanium = new Item("titanium", Color.valueOf("8da1e3")){{
@@ -87,16 +89,19 @@ public class Items{
 
         sporePod = new Item("spore-pod", Color.valueOf("7457ce")){{
             flammability = 1.15f;
+            buildable = false;
         }};
 
         blastCompound = new Item("blast-compound", Color.valueOf("ff795e")){{
             flammability = 0.4f;
             explosiveness = 1.2f;
+            buildable = false;
         }};
 
         pyratite = new Item("pyratite", Color.valueOf("ffaa5f")){{
             flammability = 1.4f;
             explosiveness = 0.4f;
+            buildable = false;
         }};
 
         beryllium = new Item("beryllium", Color.valueOf("3a8f64")){{
