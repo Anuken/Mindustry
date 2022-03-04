@@ -194,8 +194,8 @@ public class UnitType extends UnlockableContent{
     public float segmentScl = 4f, segmentPhase = 5f;
     public float segmentRotSpeed = 1f, segmentMaxRot = 30f;
     public float crawlSlowdown = 0.5f;
-    //used for tanks too
-    public float areaDamage = 0.5f;
+    /** Damage dealt to blocks under this tank/crawler every frame. */
+    public float crushDamage = 0f;
     public float crawlSlowdownFrac = 0.55f;
 
     public ObjectSet<StatusEffect> immunities = new ObjectSet<>();

@@ -2438,7 +2438,6 @@ public class UnitTypes{
             rotateSpeed = 3.5f;
             health = 800;
             armor = 5f;
-            areaDamage = 5f;
             treadRects = new Rect[]{new Rect(12, 7, 14, 51)};
             researchCostMultiplier = 0f;
 
@@ -2479,7 +2478,6 @@ public class UnitTypes{
             rotateSpeed = 2.6f;
             health = 2000;
             armor = 8f;
-            areaDamage = 8f;
             treadRects = new Rect[]{new Rect(17, 10, 19, 76)};
             researchCostMultiplier = 0f;
 
@@ -2565,7 +2563,7 @@ public class UnitTypes{
             speed = 0.63f;
             health = 9000;
             armor = 20f;
-            areaDamage = 13f;
+            crushDamage = 13f / 5f;
             treadRects = new Rect[]{new Rect(22, 16, 28, 130)};
 
             weapons.add(new Weapon("vanquish-weapon"){{
@@ -2637,7 +2635,7 @@ public class UnitTypes{
             speed = 0.48f;
             health = 20000;
             armor = 25f;
-            areaDamage = 30f;
+            crushDamage = 25f / 5f;
             rotateSpeed = 0.8f;
             treadRects = new Rect[]{new Rect(27, 152, 56, 73), new Rect(24, 51 - 9, 29, 17), new Rect(59, 18 - 9, 39, 19)};
 
@@ -3358,7 +3356,7 @@ public class UnitTypes{
                 drawCell = false;
                 segments = 4;
                 drawBody = false;
-                areaDamage = 2f;
+                crushDamage = 2f;
 
                 segmentScl = 4f;
                 segmentPhase = 5f;
