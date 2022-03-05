@@ -134,9 +134,15 @@ public final class FogControl implements CustomChunk{
     }
 
     void pushStaticBlocks(){
+        if(fog == null) fog = new FogData[256];
+
         synchronized(staticEvents){
             for(var build : Groups.build){
                 if(build.block.flags.contains(BlockFlag.hasFogRadius)){
+                    if(fog[build.team.id] == null){
+                        fog[build.team.id] = new FogData();
+                    }
+
                     pushEvent(FogEvent.get(build.tile.x, build.tile.y, Mathf.round(build.fogRadius()), build.team.id));
                 }
             }
@@ -202,7 +208,6 @@ public final class FogControl implements CustomChunk{
 
                 if(data == null){
                     data = fog[team.team.id] = new FogData();
-                    data.dynamicUpdated = true;
                 }
 
                 synchronized(staticEvents){
@@ -296,6 +301,7 @@ public final class FogControl implements CustomChunk{
     }
 
     void updateStatic(){
+
         //I really don't like synchronizing here, but there should be *some* performance benefit at least
         synchronized(staticEvents){
             int size = staticEvents.size;
@@ -518,7 +524,7 @@ public final class FogControl implements CustomChunk{
         /** last dynamic update timestamp. */
         long lastDynamicMs = 0;
         /** if true, a dynamic fog update must be scheduled. */
-        boolean dynamicUpdated;
+        boolean dynamicUpdated = true;
 
         FogData(){
             int len = ww * wh;
