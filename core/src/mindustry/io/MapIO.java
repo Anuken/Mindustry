@@ -197,16 +197,6 @@ public class MapIO{
 
         //guess at floors by grabbing a random adjacent floor
         for(Tile tile : tiles){
-            if(tile.floor() == Blocks.air && tile.block() != Blocks.air){
-                for(Point2 p : Geometry.d4){
-                    Tile other = tiles.get(tile.x + p.x, tile.y + p.y);
-                    if(other != null && other.floor() != Blocks.air){
-                        tile.setFloorUnder(other.floor());
-                        break;
-                    }
-                }
-            }
-
             //default to stone floor
             if(tile.floor() == Blocks.air){
                 tile.setFloorUnder((Floor)Blocks.stone);
