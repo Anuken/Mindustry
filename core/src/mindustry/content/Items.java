@@ -7,7 +7,8 @@ import mindustry.type.*;
 public class Items implements ContentList{
     public static Item
     scrap, copper, lead, graphite, coal, titanium, thorium, silicon, plastanium,
-    phaseFabric, surgeAlloy, sporePod, sand, blastCompound, pyratite, metaglass;
+    phaseFabric, surgeAlloy, sporePod, sand, blastCompound, pyratite, metaglass,
+    among;
 
     @Override
     public void load(){
@@ -90,6 +91,12 @@ public class Items implements ContentList{
         pyratite = new Item("pyratite", Color.valueOf("ffaa5f")){{
             flammability = 1.4f;
             explosiveness = 0.4f;
+        }};
+
+        //among
+        among = new Item("among", Color.valueOf("d1544d")){{
+            alwaysUnlocked = true;
+            explosiveness = 4.20f;
         }};
     }
 }
