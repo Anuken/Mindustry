@@ -184,7 +184,9 @@ public class MapIO{
             int color = pixmap.get(tile.x, pixmap.height - 1 - tile.y);
             Block block = ColorMapper.get(color);
 
-            if(block.isFloor()){
+            if(block.isOverlay()){
+                tile.setOverlay(block.asFloor());
+            }else if(block.isFloor()){
                 tile.setFloor(block.asFloor());
             }else if(block.isMultiblock()){
                 tile.setBlock(block, Team.derelict, 0);
