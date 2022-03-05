@@ -89,6 +89,8 @@ public class Weapon implements Cloneable{
     public float soundPitchMin = 0.8f, soundPitchMax = 1f;
     /** whether shooter rotation is ignored when shooting. */
     public boolean ignoreRotation = false;
+    /** If true, this weapon cannot be used to attack targets. */
+    public boolean noAttack = false;
     /** min velocity required for this weapon to shoot */
     public float minShootVelocity = -1f;
     /** should the shoot effects follow the unit (effects need followParent set to true for this to work) */

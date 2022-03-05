@@ -181,6 +181,8 @@ public class UnitType extends UnlockableContent{
     /** If true, all weapons will attack the same target. */
     public boolean singleTarget = false;
     public boolean forceMultiTarget = false;
+    /** If false, this unit has no weapons that can attack. */
+    public boolean canAttack = true;
     public boolean hidden = false;
     public boolean internal = false;
     /** Function used for calculating cost of moving with ControlPathfinder. Does not affect "normal" flow field pathfinding. */
@@ -464,7 +466,7 @@ public class UnitType extends UnlockableContent{
         }
 
         if(fogRadius < 0){
-            fogRadius = Math.max(lightRadius * 3.1f, 1f) / 8f;
+            fogRadius = Math.max(11f * 2.3f * 3f, hitSize * 2f) / 8f;
         }
 
         if(weapons.isEmpty()){
@@ -528,6 +530,8 @@ public class UnitType extends UnlockableContent{
         this.weapons = mapped;
 
         weapons.each(Weapon::init);
+
+        canAttack = weapons.contains(w -> !w.noAttack);
 
         //dynamically create ammo capacity based on firing rate
         if(ammoCapacity < 0){

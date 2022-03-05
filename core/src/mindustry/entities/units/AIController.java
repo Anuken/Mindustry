@@ -145,7 +145,7 @@ public class AIController implements UnitController{
             float wrange = weapon.range();
 
             //let uncontrollable weapons do their own thing
-            if(!weapon.controllable) continue;
+            if(!weapon.controllable || weapon.noAttack) continue;
 
             float mountX = unit.x + Angles.trnsx(rotation, weapon.x, weapon.y),
                 mountY = unit.y + Angles.trnsy(rotation, weapon.x, weapon.y);

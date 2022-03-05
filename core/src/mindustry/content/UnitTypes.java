@@ -3119,18 +3119,44 @@ public class UnitTypes{
             lowAltitude = false;
             flying = true;
             drag = 0.08f;
-            speed = 2.5f;
-            rotateSpeed = 5f;
+            speed = 2f;
+            rotateSpeed = 4f;
             accel = 0.09f;
-            health = 600f;
+            health = 800f;
             armor = 2f;
             hitSize = 12f;
             engineSize = 0;
+            fogRadius = 25;
 
             setEnginesMirror(
             new UnitEngine(34 / 4f, 31 / 4f, 3f, 45f),
             new UnitEngine(35 / 4f, -38 / 4f, 3f, 315f)
             );
+
+            weapons.add(new Weapon("avert-weapon"){{
+                reload = 35f;
+                x = 4f;
+                y = 6.25f;
+                shootY = 5.75f;
+                recoil = 1.5f;
+                top = false;
+                layerOffset = -0.01f;
+                rotate = false;
+
+                //TODO cooler + balancing
+                bullet = new BasicBulletType(5f, 15){{
+                    width = 7f;
+                    height = 12f;
+                    lifetime = 25f;
+                    shootEffect = Fx.sparkShoot;
+                    smokeEffect = Fx.shootBigSmoke;
+                    hitColor = backColor = trailColor = Pal.suppress;
+                    frontColor = Color.white;
+                    trailWidth = 1.5f;
+                    trailLength = 5;
+                    hitEffect = despawnEffect = Fx.hitBulletColor;
+                }};
+            }});
         }};
 
         quell = new ErekirUnitType("quell"){{

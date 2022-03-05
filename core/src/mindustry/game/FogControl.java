@@ -35,6 +35,7 @@ public final class FogControl implements CustomChunk{
     private @Nullable Thread dynamicFogThread;
 
     private boolean justLoaded = false;
+    private boolean loadedStatic = false;
 
     public FogControl(){
         Events.on(ResetEvent.class, e -> {
@@ -44,19 +45,18 @@ public final class FogControl implements CustomChunk{
         Events.on(WorldLoadEvent.class, e -> {
             stop();
 
+            loadedStatic = false;
             justLoaded = true;
             ww = world.width();
             wh = world.height();
 
             //all old buildings have static light scheduled around them
             if(state.rules.fog && state.rules.staticFog){
-                synchronized(staticEvents){
-                    for(var build : Groups.build){
-                        if(build.block.flags.contains(BlockFlag.hasFogRadius)){
-                            staticEvents.add(FogEvent.get(build.tile.x, build.tile.y, Mathf.round(build.fogRadius()), build.team.id));
-                        }
-                    }
-                }
+                pushStaticBlocks();
+                //force draw all static stuff immediately
+                updateStatic();
+
+                loadedStatic = true;
             }
         });
 
@@ -133,6 +133,16 @@ public final class FogControl implements CustomChunk{
         }
     }
 
+    void pushStaticBlocks(){
+        synchronized(staticEvents){
+            for(var build : Groups.build){
+                if(build.block.flags.contains(BlockFlag.hasFogRadius)){
+                    pushEvent(FogEvent.get(build.tile.x, build.tile.y, Mathf.round(build.fogRadius()), build.team.id));
+                }
+            }
+        }
+    }
+
     void pushEvent(long event){
         if(!state.rules.staticFog) return;
 
@@ -157,6 +167,13 @@ public final class FogControl implements CustomChunk{
     public void update(){
         if(fog == null){
             fog = new FogData[256];
+        }
+
+        //force update static
+        if(state.rules.staticFog && !loadedStatic){
+            pushStaticBlocks();
+            updateStatic();
+            loadedStatic = true;
         }
 
         //not run clientside, the CPU side isn't needed here.
@@ -271,22 +288,26 @@ public final class FogControl implements CustomChunk{
                         }
                     }
 
-                    //I really don't like synchronizing here, but there should be *some* performance benefit at least
-                    synchronized(staticEvents){
-                        int size = staticEvents.size;
-                        for(int i = 0; i < size; i++){
-                            long event = staticEvents.items[i];
-                            int x = FogEvent.x(event), y = FogEvent.y(event), rad = FogEvent.radius(event), team = FogEvent.team(event);
-                            var data = fog[team];
-                            if(data != null){
-                                circle(data.staticData, x, y, rad);
-                            }
-                        }
-                        staticEvents.clear();
-                    }
+                    updateStatic();
                     //ignore, don't want to crash this thread
                 }catch(Exception e){}
             }
+        }
+    }
+
+    void updateStatic(){
+        //I really don't like synchronizing here, but there should be *some* performance benefit at least
+        synchronized(staticEvents){
+            int size = staticEvents.size;
+            for(int i = 0; i < size; i++){
+                long event = staticEvents.items[i];
+                int x = FogEvent.x(event), y = FogEvent.y(event), rad = FogEvent.radius(event), team = FogEvent.team(event);
+                var data = fog[team];
+                if(data != null){
+                    circle(data.staticData, x, y, rad);
+                }
+            }
+            staticEvents.clear();
         }
     }
 

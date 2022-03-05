@@ -173,6 +173,6 @@ public class BuilderAI extends AIController{
 
     @Override
     public boolean shouldShoot(){
-        return !unit.isBuilding();
+        return !unit.isBuilding() && unit.type.canAttack;
     }
 }
