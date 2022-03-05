@@ -501,6 +501,11 @@ public class BulletType extends Content implements Cloneable{
         return create(owner, team, x, y, angle, -1, velocityScl, lifetimeScl, null);
     }
 
+
+    public @Nullable Bullet create(Entityc owner, Team team, float x, float y, float angle, float velocityScl, float lifetimeScl, Mover mover){
+        return create(owner, team, x, y, angle, -1, velocityScl, lifetimeScl, null, mover);
+    }
+
     public @Nullable Bullet create(Bullet parent, float x, float y, float angle){
         return create(parent.owner, parent.team, x, y, angle);
     }
@@ -514,6 +519,10 @@ public class BulletType extends Content implements Cloneable{
     }
 
     public @Nullable Bullet create(@Nullable Entityc owner, Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl, Object data){
+        return create(owner, team, x, y, angle, damage, velocityScl, lifetimeScl, data, null);
+    }
+
+    public @Nullable Bullet create(@Nullable Entityc owner, Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl, Object data, @Nullable Mover mover){
         if(spawnUnit != null){
             //don't spawn units clientside!
             if(!net.client()){
@@ -548,6 +557,7 @@ public class BulletType extends Content implements Cloneable{
         bullet.data = data;
         bullet.drag = drag;
         bullet.hitSize = hitSize;
+        bullet.mover = mover;
         bullet.damage = (damage < 0 ? this.damage : damage) * bullet.damageMultiplier();
         //reset trail
         if(bullet.trail != null){

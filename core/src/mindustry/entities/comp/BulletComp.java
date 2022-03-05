@@ -2,12 +2,14 @@ package mindustry.entities.comp;
 
 import arc.func.*;
 import arc.graphics.g2d.*;
+import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.*;
+import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
@@ -35,6 +37,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     @ReadOnly
     private float rotation;
 
+    transient @Nullable Mover mover;
     transient boolean absorbed, hit;
     transient @Nullable Trail trail;
 
@@ -119,6 +122,12 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
 
     @Override
     public void update(){
+        if(mover != null){
+            float v = mover.move(self()) * Time.delta;
+            float ang = vel.angle();
+            vel.add(Angles.trnsx(ang, 0f, v), Angles.trnsy(ang, 0f, v)).limit(type.speed);
+        }
+
         type.update(self());
 
         if(type.collidesTiles && type.collides && type.collidesGround){
