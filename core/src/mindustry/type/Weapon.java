@@ -374,15 +374,15 @@ public class Weapon implements Cloneable{
 
         shoot.shoot(mount.totalShots, (xOffset, yOffset, angle, delay, mover) -> {
             if(delay > 0f){
-                Time.run(delay, () -> setupBullet(unit, mount, xOffset, yOffset, angle, mover));
+                Time.run(delay, () -> bullet(unit, mount, xOffset, yOffset, angle, mover));
             }else{
-                setupBullet(unit, mount, xOffset, yOffset, angle, mover);
+                bullet(unit, mount, xOffset, yOffset, angle, mover);
             }
             mount.totalShots ++;
         });
     }
 
-    protected void setupBullet(Unit unit, WeaponMount mount, float xOffset, float yOffset, float angleOffset, Mover mover){
+    protected void bullet(Unit unit, WeaponMount mount, float xOffset, float yOffset, float angleOffset, Mover mover){
         if(!unit.isAdded()) return;
 
         float

@@ -123,9 +123,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     @Override
     public void update(){
         if(mover != null){
-            float v = mover.move(self()) * Time.delta;
-            float ang = vel.angle();
-            vel.add(Angles.trnsx(ang, 0f, v), Angles.trnsy(ang, 0f, v)).limit(type.speed);
+            mover.move(self());
         }
 
         type.update(self());
@@ -138,6 +136,17 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
             hit = true;
             remove();
         }
+    }
+
+    public void moveRelative(float x, float y){
+        float rot = rotation();
+        this.x += Angles.trnsx(rot, x * Time.delta, y * Time.delta);
+        this.y += Angles.trnsy(rot, x * Time.delta, y * Time.delta);
+    }
+
+    public void turn(float x, float y){
+        float ang = vel.angle();
+        vel.add(Angles.trnsx(ang, x * Time.delta, y * Time.delta), Angles.trnsy(ang, x * Time.delta, y * Time.delta)).limit(type.speed);
     }
 
     //copy-paste of World#raycastEach, inlined for lambda capture performance.
