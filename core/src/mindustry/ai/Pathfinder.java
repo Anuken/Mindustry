@@ -39,7 +39,8 @@ public class Pathfinder implements Runnable{
 
     public static final Seq<PathCost> costTypes = Seq.with(
         //ground
-        (team, tile) -> (PathTile.allDeep(tile) || (PathTile.team(tile) == team || PathTile.team(tile) == 0) && PathTile.solid(tile)) ? impassable : 1 +
+        (team, tile) ->
+            (PathTile.allDeep(tile) || (PathTile.team(tile) == team || PathTile.team(tile) == 0) && PathTile.solid(tile)) ? impassable : 1 +
             PathTile.health(tile) * 5 +
             (PathTile.nearSolid(tile) ? 2 : 0) +
             (PathTile.nearLiquid(tile) ? 6 : 0) +
@@ -47,12 +48,14 @@ public class Pathfinder implements Runnable{
             (PathTile.damages(tile) ? 30 : 0),
 
         //legs
-        (team, tile) -> PathTile.legSolid(tile) ? impassable : 1 +
+        (team, tile) ->
+            PathTile.legSolid(tile) ? impassable : 1 +
             (PathTile.deep(tile) ? 6000 : 0) + //leg units can now drown
             (PathTile.solid(tile) ? 5 : 0),
 
         //water
-        (team, tile) -> (PathTile.solid(tile) || !PathTile.liquid(tile) ? 6000 : 1) +
+        (team, tile) ->
+            (PathTile.solid(tile) || !PathTile.liquid(tile) ? 6000 : 1) +
             (PathTile.nearGround(tile) || PathTile.nearSolid(tile) ? 14 : 0) +
             (PathTile.deep(tile) ? 0 : 1) +
             (PathTile.damages(tile) ? 35 : 0)

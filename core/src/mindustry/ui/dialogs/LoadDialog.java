@@ -27,7 +27,6 @@ public class LoadDialog extends BaseDialog{
     Gamemode filteredMode;
     TextField searchField;
     ScrollPane pane;
-    BaseDialog dialog;
 
     public LoadDialog(){
         this("@loadgame");
@@ -37,7 +36,10 @@ public class LoadDialog extends BaseDialog{
         super(title);
         setup();
 
-        shown(this::setup);
+        shown(() -> {
+            searchString = "";
+            setup();
+        });
         onResize(this::setup);
 
         addCloseButton();
