@@ -895,6 +895,7 @@ public class UnitTypes implements ContentList{
                     ammoMultiplier = 4f;
                     splashDamageRadius = 80f;
                     splashDamage = 75f;
+                    keepVelocity = false;
                     backColor = Pal.sapBulletBack;
                     frontColor = lightningColor = Pal.sapBullet;
                     lightning = 5;
