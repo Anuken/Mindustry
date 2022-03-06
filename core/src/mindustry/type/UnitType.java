@@ -512,9 +512,7 @@ public class UnitType extends UnlockableContent{
             //mirrors are copies with X values negated
             if(w.mirror){
                 Weapon copy = w.copy();
-                copy.x *= -1;
-                copy.shootX *= -1;
-                copy.flipSprite = !copy.flipSprite;
+                copy.flip();
                 mapped.add(copy);
 
                 //since there are now two weapons, the reload and recoil time must be doubled

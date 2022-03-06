@@ -3,7 +3,7 @@ package mindustry.entities.pattern;
 import mindustry.entities.*;
 
 /** Handles different types of bullet patterns for shooting. */
-public class ShootPattern{
+public class ShootPattern implements Cloneable{
     /** amount of shots per "trigger pull" */
     public int shots = 1;
     /** delay in ticks before first shot */
@@ -15,6 +15,19 @@ public class ShootPattern{
     public void shoot(int totalShots, BulletHandler handler){
         for(int i = 0; i < shots; i++){
             handler.shoot(0, 0, 0, firstShotDelay + shotDelay * i);
+        }
+    }
+
+    /** Subclasses should override this to flip its sides. */
+    public void flip(){
+
+    }
+
+    public ShootPattern copy(){
+        try{
+            return (ShootPattern)clone();
+        }catch(CloneNotSupportedException absurd){
+            throw new RuntimeException("impending doom", absurd);
         }
     }
 

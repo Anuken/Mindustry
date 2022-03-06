@@ -411,6 +411,14 @@ public class Weapon implements Cloneable{
         mount.heat = 1f;
     }
 
+    public void flip(){
+        x *= -1;
+        shootX *= -1;
+        flipSprite = !flipSprite;
+        shoot = shoot.copy();
+        shoot.flip();
+    }
+
     public Weapon copy(){
         try{
             return (Weapon)clone();

@@ -7,6 +7,14 @@ public class ShootBarrel extends ShootPattern{
     public int barrelOffset = 0;
 
     @Override
+    public void flip(){
+        barrels = barrels.clone();
+        for(int i = 0; i < barrels.length; i += 3){
+            barrels[i] *= -1;
+        }
+    }
+
+    @Override
     public void shoot(int totalShots, BulletHandler handler){
         for(int i = 0; i < shots; i++){
             int index = ((i + totalShots + barrelOffset) % (barrels.length / 3)) * 3;

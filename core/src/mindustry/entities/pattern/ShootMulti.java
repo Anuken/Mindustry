@@ -12,6 +12,18 @@ public class ShootMulti extends ShootPattern{
     public ShootMulti(){
     }
 
+    //deep copy needed for flips
+    @Override
+    public void flip(){
+        source = source.copy();
+        source.flip();
+        dest = dest.clone();
+        for(int i = 0; i < dest.length; i++){
+            dest[i] = dest[i].copy();
+            dest[i].flip();
+        }
+    }
+
     @Override
     public void shoot(int totalShots, BulletHandler handler){
         source.shoot(totalShots, (x, y, rotation, delay, move) -> {
