@@ -5,6 +5,7 @@ import arc.audio.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
@@ -452,19 +453,23 @@ public class BulletType extends Content implements Cloneable{
         return create(owner, team, x, y, angle, -1, velocityScl, lifetimeScl, null);
     }
 
-    public Bullet create(Bullet parent, float x, float y, float angle){
-        return create(parent.owner, parent.team, x, y, angle);
-    }
-
     public Bullet create(Bullet parent, float x, float y, float angle, float velocityScl, float lifeScale){
-        return create(parent.owner, parent.team, x, y, angle, velocityScl, lifeScale);
+        return create(parent.owner, parent.team, x, y, angle, parent.vel(), -1f, velocityScl, lifeScale, null);
     }
 
     public Bullet create(Bullet parent, float x, float y, float angle, float velocityScl){
-        return create(parent.owner(), parent.team, x, y, angle, velocityScl);
+        return create(parent, x, y, angle, velocityScl, 1f);
+    }
+
+    public Bullet create(Bullet parent, float x, float y, float angle){
+        return create(parent, x, y, angle, 1f);
     }
 
     public Bullet create(@Nullable Entityc owner, Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl, Object data){
+        return create(owner, team, x, y, angle, owner instanceof Velc v ? v.vel() : null, damage, velocityScl, lifetimeScl, data);
+    }
+
+    public Bullet create(@Nullable Entityc owner, Team team, float x, float y, float angle, @Nullable Vec2 vel, float damage, float velocityScl, float lifetimeScl, Object data){
         Bullet bullet = Bullet.create();
         bullet.type = this;
         bullet.owner = owner;
@@ -487,7 +492,7 @@ public class BulletType extends Content implements Cloneable{
         }
         bullet.add();
 
-        if(keepVelocity && owner instanceof Velc v) bullet.vel.add(v.vel());
+        if(keepVelocity && vel != null) bullet.vel.add(vel);
         return bullet;
     }
 
