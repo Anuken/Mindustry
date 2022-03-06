@@ -545,7 +545,7 @@ public class Control implements ApplicationListener, Loadable{
             if(full){
                 graphics.setWindowedMode(graphics.getWidth(), graphics.getHeight());
             }else{
-                graphics.setFullscreenMode(graphics.getDisplayMode());
+                graphics.setFullscreen();
             }
             settings.put("fullscreen", !full);
         }

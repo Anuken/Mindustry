@@ -363,7 +363,7 @@ public class SettingsMenuDialog extends BaseDialog{
                 }
 
                 if(b){
-                    Core.graphics.setFullscreenMode(Core.graphics.getDisplayMode());
+                    Core.graphics.setFullscreen();
                 }else{
                     Core.graphics.setWindowedMode(Core.graphics.getWidth(), Core.graphics.getHeight());
                 }
@@ -381,7 +381,7 @@ public class SettingsMenuDialog extends BaseDialog{
             Core.graphics.setVSync(Core.settings.getBool("vsync"));
 
             if(Core.settings.getBool("fullscreen")){
-                Core.app.post(() -> Core.graphics.setFullscreenMode(Core.graphics.getDisplayMode()));
+                Core.app.post(() -> Core.graphics.setFullscreen());
             }
 
             if(Core.settings.getBool("borderlesswindow")){
