@@ -3142,6 +3142,7 @@ public class UnitTypes{
                 top = false;
                 layerOffset = -0.01f;
                 rotate = false;
+                shoot = new ShootHelix();
 
                 //TODO cooler + balancing
                 bullet = new BasicBulletType(5f, 15){{

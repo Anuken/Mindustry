@@ -1,5 +1,7 @@
 package mindustry.entities.pattern;
 
+import mindustry.entities.*;
+
 /** Handles different types of bullet patterns for shooting. */
 public class ShootPattern{
     /** amount of shots per "trigger pull" */
@@ -23,6 +25,10 @@ public class ShootPattern{
          * @param rotation rotation offset relative to weapon
          * @param delay bullet delay in ticks
          * */
-        void shoot(float x, float y, float rotation, float delay);
+        default void shoot(float x, float y, float rotation, float delay){
+            shoot(x, y, rotation, delay, null);
+        }
+
+        void shoot(float x, float y, float rotation, float delay, Mover move);
     }
 }

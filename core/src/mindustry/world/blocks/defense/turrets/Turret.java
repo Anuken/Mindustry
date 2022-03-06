@@ -478,18 +478,18 @@ public class Turret extends ReloadTurret{
                 type.chargeEffect.at(bulletX, bulletY, rotation);
             }
 
-            shoot.shoot(totalShots, (xOffset, yOffset, angle, delay) -> {
+            shoot.shoot(totalShots, (xOffset, yOffset, angle, delay, mover) -> {
                 queuedBullets ++;
                 if(delay > 0f){
-                    Time.run(delay, () -> bullet(type, xOffset, yOffset, angle));
+                    Time.run(delay, () -> bullet(type, xOffset, yOffset, angle, mover));
                 }else{
-                    bullet(type, xOffset, yOffset, angle);
+                    bullet(type, xOffset, yOffset, angle, mover);
                 }
                 totalShots ++;
             });
         }
 
-        protected void bullet(BulletType type, float xOffset, float yOffset, float angleOffset){
+        protected void bullet(BulletType type, float xOffset, float yOffset, float angleOffset, Mover mover){
             queuedBullets --;
 
             if(dead || !hasAmmo()) return;
@@ -501,7 +501,7 @@ public class Turret extends ReloadTurret{
 
             float lifeScl = type.scaleVelocity ? Mathf.clamp(Mathf.dst(bulletX, bulletY, targetPos.x, targetPos.y) / type.range, minRange / type.range, range() / type.range) : 1f;
 
-            handleBullet(type.create(this, team, bulletX, bulletY, shootAngle, 1f + Mathf.range(velocityInaccuracy), lifeScl), xOffset, yOffset, angleOffset);
+            handleBullet(type.create(this, team, bulletX, bulletY, shootAngle, 1f + Mathf.range(velocityInaccuracy), lifeScl, mover), xOffset, yOffset, angleOffset);
 
             (shootEffect == Fx.none ? type.shootEffect : shootEffect).at(bulletX, bulletY, rotation, type.hitColor);
             (smokeEffect == Fx.none ? type.smokeEffect : smokeEffect).at(bulletX, bulletY, rotation, type.hitColor);

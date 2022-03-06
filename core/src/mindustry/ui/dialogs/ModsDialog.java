@@ -249,7 +249,7 @@ public class ModsDialog extends BaseDialog{
                                     text.row();
 
                                     if(item.isOutdated()){
-                                        text.labelWrap("@mod.outdated").growX();
+                                        text.labelWrap("@mod.outdatedv7").growX();
                                         text.row();
                                     }else if(!item.isSupported()){
                                         text.labelWrap(Core.bundle.format("mod.requiresversion", item.meta.minGameVersion)).growX();

@@ -14,10 +14,10 @@ public class ShootMulti extends ShootPattern{
 
     @Override
     public void shoot(int totalShots, BulletHandler handler){
-        source.shoot(totalShots, (x, y, rotation, delay) -> {
+        source.shoot(totalShots, (x, y, rotation, delay, move) -> {
             for(var pattern : dest){
-                pattern.shoot(totalShots, (x2, y2, rot2, delay2) -> {
-                    handler.shoot(x + x2, y + y2, rotation + rot2, delay + delay2);
+                pattern.shoot(totalShots, (x2, y2, rot2, delay2, mover) -> {
+                    handler.shoot(x + x2, y + y2, rotation + rot2, delay + delay2, mover);
                 });
             }
         });

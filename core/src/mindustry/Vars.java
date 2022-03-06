@@ -41,7 +41,7 @@ public class Vars implements Loadable{
     public static boolean loadLocales = true;
     /** Whether the logger is loaded. */
     public static boolean loadedLogger = false, loadedFileLogger = false;
-    /** Whether to enable various experimental features (e.g. spawn positions for spawn groups) */
+    /** Whether to enable various experimental features (e.g. spawn positions for spawn groups) TODO change */
     public static boolean experimental = true;
     /** Name of current Steam player. */
     public static String steamPlayerName = "";
@@ -165,8 +165,8 @@ public class Vars implements Loadable{
     public static boolean headless;
     /** whether steam is enabled for this game */
     public static boolean steam;
-    /** whether typing into the console is enabled - developers only */
-    public static boolean enableConsole = false;
+    /** whether typing into the console is enabled - developers only TODO change */
+    public static boolean enableConsole = true;
     /** whether to clear sector saves when landing */
     public static boolean clearSectors = false;
     /** whether any light rendering is enabled */
