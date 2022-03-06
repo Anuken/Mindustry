@@ -36,12 +36,12 @@ public class ErekirTechTree{
                     for(var bullet : item.ammoTypes.values()){
                         rebalanceBullet(bullet);
                     }
-                }else if(turret instanceof ContinuousTurret cont){
-                    rebalanceBullet(cont.shootType);
                 }else if(turret instanceof ContinuousLiquidTurret cont){
                     for(var bullet : cont.ammoTypes.values()){
                         rebalanceBullet(bullet);
                     }
+                }else if(turret instanceof ContinuousTurret cont){
+                    rebalanceBullet(cont.shootType);
                 }
             }
         }

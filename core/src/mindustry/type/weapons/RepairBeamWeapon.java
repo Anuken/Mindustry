@@ -174,6 +174,7 @@ public class RepairBeamWeapon extends Weapon{
 
     @Override
     public void init(){
+        super.init();
         bullet.healPercent = fractionRepairSpeed;
     }
 

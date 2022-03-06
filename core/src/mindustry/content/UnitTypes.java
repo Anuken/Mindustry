@@ -101,7 +101,11 @@ public class UnitTypes{
                 y = 2f;
                 top = false;
                 ejectEffect = Fx.casing1;
-                bullet = Bullets.standardCopper;
+                bullet = new BasicBulletType(2.5f, 9){{
+                    width = 7f;
+                    height = 9f;
+                    lifetime = 60f;
+                }};
             }});
         }};
 
@@ -185,6 +189,12 @@ public class UnitTypes{
             singleTarget = true;
             drownTimeMultiplier = 4f;
 
+            BulletType smallBullet = new BasicBulletType(3f, 10){{
+                width = 7f;
+                height = 9f;
+                lifetime = 50f;
+            }};
+
             weapons.add(
             new Weapon("scepter-weapon"){{
                 top = false;
@@ -220,7 +230,7 @@ public class UnitTypes{
                 y = 6f;
                 rotate = true;
                 ejectEffect = Fx.casing1;
-                bullet = Bullets.standardCopper;
+                bullet = smallBullet;
             }},
             new Weapon("mount-weapon"){{
                 reload = 16f;
@@ -228,9 +238,8 @@ public class UnitTypes{
                 y = -7f;
                 rotate = true;
                 ejectEffect = Fx.casing1;
-                bullet = Bullets.standardCopper;
+                bullet = smallBullet;
             }}
-
             );
         }};
 
@@ -1482,7 +1491,12 @@ public class UnitTypes{
                 y = 1.5f;
                 rotate = true;
                 ejectEffect = Fx.casing1;
-                bullet = Bullets.standardCopper;
+                bullet = new BasicBulletType(2.5f, 9){{
+                    width = 7f;
+                    height = 9f;
+                    lifetime = 60f;
+                    ammoMultiplier = 2;
+                }};
             }});
 
             weapons.add(new Weapon("missiles-mount"){{
@@ -1539,7 +1553,16 @@ public class UnitTypes{
                 inaccuracy = 8f;
                 ejectEffect = Fx.casing1;
                 shootSound = Sounds.shoot;
-                bullet = Bullets.flakLead;
+                bullet = new FlakBulletType(4.2f, 3){{
+                    lifetime = 60f;
+                    ammoMultiplier = 4f;
+                    shootEffect = Fx.shootSmall;
+                    width = 6f;
+                    height = 8f;
+                    hitEffect = Fx.flakExplosion;
+                    splashDamage = 27f * 1.5f;
+                    splashDamageRadius = 15f;
+                }};
             }});
 
             weapons.add(new Weapon("artillery-mount"){{

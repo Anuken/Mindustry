@@ -10,6 +10,7 @@ import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.audio.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -27,7 +28,7 @@ public class Weapon implements Cloneable{
     /** displayed weapon region */
     public String name;
     /** bullet shot */
-    public BulletType bullet = Bullets.standardCopper;
+    public BulletType bullet = Bullets.placeholder;
     /** shell ejection effect */
     public Effect ejectEffect = Fx.none;
     /** whether to consume ammo when ammo is enabled in rules */
@@ -427,6 +428,7 @@ public class Weapon implements Cloneable{
         }
     }
 
+    @CallSuper
     public void init(){
 
     }

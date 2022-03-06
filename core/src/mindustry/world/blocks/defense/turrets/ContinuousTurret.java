@@ -11,7 +11,7 @@ import mindustry.world.meta.*;
 
 /** A turret that fires a continuous beam bullet with no reload or coolant necessary. The bullet only disappears when the turret stops shooting. */
 public class ContinuousTurret extends Turret{
-    public BulletType shootType = Bullets.standardCopper;
+    public BulletType shootType = Bullets.placeholder;
 
     public ContinuousTurret(String name){
         super(name);
