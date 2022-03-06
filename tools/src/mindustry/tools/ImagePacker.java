@@ -6,6 +6,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g2d.TextureAtlas.*;
 import arc.math.geom.*;
+import arc.mock.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
@@ -27,9 +28,11 @@ public class ImagePacker{
         //makes PNG loading slightly faster
         ArcNativesLoader.load();
 
+        Core.settings = new MockSettings();
         Log.logger = new NoopLogHandler();
         Vars.content = new ContentLoader();
         Vars.content.createBaseContent();
+        Vars.content.init();
         Log.logger = new DefaultLogHandler();
 
         Fi.get("../../../assets-raw/sprites_out").walk(path -> {

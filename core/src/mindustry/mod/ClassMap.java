@@ -1,6 +1,8 @@
 package mindustry.mod;
 
 import arc.struct.*;
+import mindustry.world.draw.*;
+
 /** Generated class. Maps simple class names to concrete classes. For use in JSON mods. */
 @SuppressWarnings("deprecation")
 public class ClassMap{
@@ -394,8 +396,8 @@ public class ClassMap{
         classes.put("UnitFactory", mindustry.world.blocks.units.UnitFactory.class);
         classes.put("UnitFactoryBuild", mindustry.world.blocks.units.UnitFactory.UnitFactoryBuild.class);
         classes.put("UnitPlan", mindustry.world.blocks.units.UnitFactory.UnitPlan.class);
-        classes.put("DrawAnimation", mindustry.world.draw.DrawAnimation.class);
-        classes.put("DrawArcSmelter", mindustry.world.draw.DrawArcSmelter.class);
+        classes.put("DrawAnimation", DrawFrames.class);
+        classes.put("DrawArcSmelter", DrawArcSmelt.class);
         classes.put("DrawBlock", mindustry.world.draw.DrawBlock.class);
         classes.put("DrawBlurSpin", mindustry.world.draw.DrawBlurSpin.class);
         classes.put("DrawBubbles", mindustry.world.draw.DrawBubbles.class);
@@ -403,16 +405,14 @@ public class ClassMap{
         classes.put("DrawCircles", mindustry.world.draw.DrawCircles.class);
         classes.put("DrawCrucibleFlame", mindustry.world.draw.DrawCrucibleFlame.class);
         classes.put("DrawCultivator", mindustry.world.draw.DrawCultivator.class);
-        classes.put("DrawGlow", mindustry.world.draw.DrawGlow.class);
+        classes.put("DrawGlow", DrawFade.class);
         classes.put("DrawGlowRegion", mindustry.world.draw.DrawGlowRegion.class);
         classes.put("DrawHeatInput", mindustry.world.draw.DrawHeatInput.class);
         classes.put("DrawHeatOutput", mindustry.world.draw.DrawHeatOutput.class);
         classes.put("DrawHeatRegion", mindustry.world.draw.DrawHeatRegion.class);
-        classes.put("DrawLiquid", mindustry.world.draw.DrawLiquid.class);
         classes.put("DrawLiquidOutputs", mindustry.world.draw.DrawLiquidOutputs.class);
         classes.put("DrawLiquidRegion", mindustry.world.draw.DrawLiquidRegion.class);
         classes.put("DrawLiquidTile", mindustry.world.draw.DrawLiquidTile.class);
-        classes.put("DrawMixer", mindustry.world.draw.DrawMixer.class);
         classes.put("DrawMulti", mindustry.world.draw.DrawMulti.class);
         classes.put("DrawMultiWeave", mindustry.world.draw.DrawMultiWeave.class);
         classes.put("DrawPartial", mindustry.world.draw.DrawPartial.class);
@@ -421,10 +421,9 @@ public class ClassMap{
         classes.put("DrawPulseShape", mindustry.world.draw.DrawPulseShape.class);
         classes.put("DrawPump", mindustry.world.draw.DrawPump.class);
         classes.put("DrawRegion", mindustry.world.draw.DrawRegion.class);
-        classes.put("DrawRotator", mindustry.world.draw.DrawRotator.class);
         classes.put("DrawShape", mindustry.world.draw.DrawShape.class);
         classes.put("DrawSideRegion", mindustry.world.draw.DrawSideRegion.class);
-        classes.put("DrawSmelter", mindustry.world.draw.DrawSmelter.class);
+        classes.put("DrawSmelter", DrawFlame.class);
         classes.put("DrawSpikes", mindustry.world.draw.DrawSpikes.class);
         classes.put("DrawTurbines", mindustry.world.draw.DrawTurbines.class);
         classes.put("DrawTurret", mindustry.world.draw.DrawTurret.class);

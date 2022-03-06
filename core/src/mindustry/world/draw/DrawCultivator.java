@@ -8,7 +8,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 
-public class DrawCultivator extends DrawBlock{
+public class DrawCultivator extends DrawPartial{
     public Color plantColor = Color.valueOf("5541b1");
     public Color plantColorLight = Color.valueOf("7457ce");
     public Color bottomColor = Color.valueOf("474747");
@@ -18,12 +18,9 @@ public class DrawCultivator extends DrawBlock{
     public float recurrence = 6f, radius = 3f;
 
     public TextureRegion middle;
-    public TextureRegion top;
 
     @Override
     public void draw(Building build){
-        Draw.rect(build.block.region, build.x, build.y);
-
         Drawf.liquid(middle, build.x, build.y, build.warmup(), plantColor);
 
         Draw.color(bottomColor, plantColorLight, build.warmup());
@@ -40,17 +37,10 @@ public class DrawCultivator extends DrawBlock{
         }
 
         Draw.color();
-        Draw.rect(top, build.x, build.y);
     }
 
     @Override
     public void load(Block block){
         middle = Core.atlas.find(block.name + "-middle");
-        top = Core.atlas.find(block.name + "-top");
-    }
-
-    @Override
-    public TextureRegion[] icons(Block block){
-        return new TextureRegion[]{block.region, top};
     }
 }

@@ -24,17 +24,18 @@ public class DrawLiquidRegion extends DrawPartial{
 
     @Override
     public void draw(Building build){
-        if(!build.block.hasLiquids) return;
-
         Liquid drawn = drawLiquid != null ? drawLiquid : build.liquids.current();
         Drawf.liquid(liquid, build.x, build.y,
-            build.liquids.get(drawn) / build.block.liquidCapacity,
-            Tmp.c1.set(drawn.color).a(drawn.color.a * alpha)
+            build.liquids.get(drawn) / build.block.liquidCapacity * alpha,
+            drawn.color
         );
     }
 
-    @Override
     public void load(Block block){
+        if(!block.hasLiquids){
+            throw new RuntimeException("Block '" + block + "' has a DrawLiquidRegion, but hasLiquids is false! Make sure it is true.");
+        }
+
         liquid = Core.atlas.find(block.name + suffix);
     }
 }

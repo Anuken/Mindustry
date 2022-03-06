@@ -7,15 +7,10 @@ import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 
-public class DrawTurbines extends DrawBlock{
+public class DrawTurbines extends DrawPartial{
     public TextureRegion[] turbines = new TextureRegion[2];
     public TextureRegion cap;
     public float turbineSpeed = 2f;
-
-    @Override
-    public void drawPlan(Block block, BuildPlan plan, Eachable<BuildPlan> list){
-
-    }
 
     @Override
     public void draw(Building build){

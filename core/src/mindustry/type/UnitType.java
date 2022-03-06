@@ -423,13 +423,12 @@ public class UnitType extends UnlockableContent{
             }
         }
 
-        /*
         for(int i = 0; i < weapons.size; i++){
             var wep = weapons.get(i);
             if(wep.bullet == Bullets.placeholder || wep.bullet == null){
                 throw new RuntimeException("Unit: " + name + ": weapon #" + i + " ('" + wep.name + "') does not have a bullet defined. Make sure you have a bullet: (JSON) or `bullet = ` field in your unit definition.");
             }
-        }*/
+        }
 
         if(pathCost == null){
             pathCost =

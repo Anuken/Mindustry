@@ -9,16 +9,17 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 
-public class DrawSmelter extends DrawBlock{
+//TODO remake/remove
+public class DrawFlame extends DrawPartial{
     public Color flameColor = Color.valueOf("ffc999");
     public TextureRegion top;
     public float lightRadius = 60f, lightAlpha = 0.65f, lightSinScl = 10f, lightSinMag = 5;
     public float flameRadius = 3f, flameRadiusIn = 1.9f, flameRadiusScl = 5f, flameRadiusMag = 2f, flameRadiusInMag = 1f;
 
-    public DrawSmelter(){
+    public DrawFlame(){
     }
 
-    public DrawSmelter(Color flameColor){
+    public DrawFlame(Color flameColor){
         this.flameColor = flameColor;
     }
 
@@ -30,8 +31,6 @@ public class DrawSmelter extends DrawBlock{
 
     @Override
     public void draw(Building build){
-        Draw.rect(build.block.region, build.x, build.y, build.block.rotate ? build.rotdeg() : 0);
-
         if(build.warmup() > 0f && flameColor.a > 0.001f){
             float g = 0.3f;
             float r = 0.06f;

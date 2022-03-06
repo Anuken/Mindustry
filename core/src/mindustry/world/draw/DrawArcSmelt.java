@@ -1,16 +1,12 @@
 package mindustry.world.draw;
 
-import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import mindustry.gen.*;
-import mindustry.world.*;
 
-//TODO make non-standalone?
-public class DrawArcSmelter extends DrawBlock{
-    public TextureRegion bottom;
+public class DrawArcSmelt extends DrawPartial{
     public Color flameColor = Color.valueOf("f58349"), midColor = Color.valueOf("f2d585");
     public float flameRad = 1f, circleSpace = 2f, flameRadiusScl = 3f, flameRadiusMag = 0.3f, circleStroke = 1.5f;
 
@@ -18,13 +14,10 @@ public class DrawArcSmelter extends DrawBlock{
     public int particles = 25;
     public float particleLife = 40f, particleRad = 7f, particleStroke = 1.1f, particleLen = 3f;
     public boolean drawCenter = true;
-    public boolean drawBottom = true, drawRegion = true;
     public Blending blending = Blending.additive;
 
     @Override
     public void draw(Building build){
-        if(drawBottom) Draw.rect(bottom, build.x, build.y);
-
         if(build.warmup() > 0f && flameColor.a > 0.001f){
             Lines.stroke(circleStroke * build.warmup());
 
@@ -52,17 +45,5 @@ public class DrawArcSmelter extends DrawBlock{
             Draw.blend();
             Draw.reset();
         }
-
-        if(drawRegion) Draw.rect(build.block.region, build.x, build.y);
-    }
-
-    @Override
-    public void load(Block block){
-        bottom = Core.atlas.find(block.name + "-bottom");
-    }
-
-    @Override
-    public TextureRegion[] icons(Block block){
-        return new TextureRegion[]{bottom, block.region};
     }
 }

@@ -131,6 +131,10 @@ public class ContentParser{
                 //try to instantiate
                 return make(resolve(data.asString()));
             }
+            //array is shorthand for DrawMulti
+            if(data.isArray()){
+                return new DrawMulti(parser.readValue(DrawBlock[].class, data));
+            }
             var bc = resolve(data.getString("type", ""), DrawBlock.class);
             data.remove("type");
             var result = make(bc);

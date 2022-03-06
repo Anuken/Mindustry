@@ -5,6 +5,10 @@ import mindustry.entities.bullet.*;
 import mindustry.entities.effect.*;
 import mindustry.graphics.*;
 
+/**
+ * Class for holding special internal bullets.
+ * Formerly used to define preset bullets for turrets; as of v7, these have been inlined at the source.
+ * */
 public class Bullets{
     public static BulletType
 
@@ -12,6 +16,7 @@ public class Bullets{
 
     public static void load(){
 
+        //not allowed in weapons - used only to prevent NullPointerExceptions
         placeholder = new BasicBulletType(2.5f, 9, "ohno"){{
             width = 7f;
             height = 9f;

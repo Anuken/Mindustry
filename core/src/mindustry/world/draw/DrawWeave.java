@@ -8,12 +8,11 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 
-public class DrawWeave extends DrawBlock{
-    public TextureRegion weave, bottom;
+public class DrawWeave extends DrawPartial{
+    public TextureRegion weave;
 
     @Override
     public void draw(Building build){
-        Draw.rect(bottom, build.x, build.y);
         Draw.rect(weave, build.x, build.y, build.totalProgress());
 
         Draw.color(Pal.accent);
@@ -26,18 +25,10 @@ public class DrawWeave extends DrawBlock{
         build.block.size * Vars.tilesize / 2f);
 
         Draw.reset();
-
-        Draw.rect(build.block.region, build.x, build.y);
     }
 
     @Override
     public void load(Block block){
         weave = Core.atlas.find(block.name + "-weave");
-        bottom = Core.atlas.find(block.name + "-bottom");
-    }
-
-    @Override
-    public TextureRegion[] icons(Block block){
-        return new TextureRegion[]{bottom, weave, block.region};
     }
 }

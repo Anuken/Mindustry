@@ -890,7 +890,7 @@ public class Blocks{
             size = 2;
             hasPower = true;
             hasLiquids = false;
-            drawer = new DrawSmelter(Color.valueOf("ffef99"));
+            drawer = new DrawMulti(new DrawBlock(), new DrawFlame(Color.valueOf("ffef99")));
             ambientSound = Sounds.smelter;
             ambientSoundVolume = 0.07f;
 
@@ -908,7 +908,7 @@ public class Blocks{
             hasLiquids = false;
             itemCapacity = 30;
             boostScale = 0.15f;
-            drawer = new DrawSmelter(Color.valueOf("ffef99"));
+            drawer = new DrawMulti(new DrawBlock(), new DrawFlame(Color.valueOf("ffef99")));
             ambientSound = Sounds.smelter;
             ambientSoundVolume = 0.07f;
 
@@ -927,7 +927,8 @@ public class Blocks{
             envEnabled |= Env.space | Env.underwater;
             envDisabled = Env.none;
             itemCapacity = 30;
-            drawer = new DrawArcSmelter();
+            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawArcSmelt(), new DrawBlock());
+            drawer.iconOverride = new String[]{"-bottom", ""};
             fogRadius = 3;
             researchCost = with(Items.beryllium, 150, Items.graphite, 50);
 
@@ -942,7 +943,7 @@ public class Blocks{
             craftTime = 30f;
             size = 2;
             hasPower = hasItems = true;
-            drawer = new DrawSmelter(Color.valueOf("ffc099"));
+            drawer = new DrawMulti(new DrawBlock(), new DrawFlame(Color.valueOf("ffc099")));
             ambientSound = Sounds.smelter;
             ambientSoundVolume = 0.07f;
 
@@ -961,7 +962,7 @@ public class Blocks{
             hasPower = hasLiquids = true;
             craftEffect = Fx.formsmoke;
             updateEffect = Fx.plasticburn;
-            drawer = new DrawGlow();
+            drawer = new DrawMulti(new DrawBlock(), new DrawFade());
 
             consumeLiquid(Liquids.oil, 0.25f);
             consumePower(3f);
@@ -975,7 +976,8 @@ public class Blocks{
             craftTime = 120f;
             size = 2;
             hasPower = true;
-            drawer = new DrawWeave();
+            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawWeave(), new DrawBlock());
+            drawer.iconOverride = new String[]{"-bottom", "-weave", ""};
             envEnabled |= Env.space;
 
             ambientSound = Sounds.techloop;
@@ -994,7 +996,7 @@ public class Blocks{
             size = 3;
             hasPower = true;
             itemCapacity = 20;
-            drawer = new DrawSmelter();
+            drawer = new DrawMulti(new DrawBlock(), new DrawFlame());
 
             consumePower(4f);
             consumeItems(with(Items.copper, 3, Items.lead, 4, Items.titanium, 2, Items.silicon, 3));
@@ -1011,7 +1013,8 @@ public class Blocks{
             solid = true;
             outputsLiquid = true;
             envEnabled = Env.any;
-            drawer = new DrawMixer(true);
+            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(Liquids.cryofluid), new DrawBlock());
+            drawer.iconOverride = new String[]{"-bottom", ""};
             liquidCapacity = 24f;
 
             consumePower(1f);
@@ -1050,9 +1053,7 @@ public class Blocks{
             outputLiquid = new LiquidStack(Liquids.slag, 12f / 60f);
             craftTime = 1f;
             hasLiquids = hasPower = true;
-            drawer = new DrawLiquid(){{
-                liquidDrawn = Liquids.slag;
-            }};
+            drawer = new DrawMulti(new DrawBlock(), new DrawLiquidRegion());
 
             consumePower(1f);
             consumeItem(Items.scrap, 1);
@@ -1101,7 +1102,14 @@ public class Blocks{
             hasLiquids = true;
             hasPower = true;
             craftEffect = Fx.none;
-            drawer = new DrawAnimation();
+            drawer = new DrawMulti(
+            new DrawBlock(),
+            new DrawFrames(),
+            new DrawLiquidRegion(),
+            new DrawRegion("-top")
+            );
+
+            drawer.iconOverride = new String[]{"", "-top"};
 
             consumeItem(Items.sporePod, 1);
             consumePower(0.7f);
@@ -1114,9 +1122,11 @@ public class Blocks{
             craftTime = 40f;
             updateEffect = Fx.pulverizeSmall;
             hasItems = hasPower = true;
-            drawer = new DrawRotator(){{
-                drawSpinSprite = true;
-            }};
+            drawer = new DrawMulti(new DrawBlock(), new DrawRegion("-rotator"){{
+                spinSprite = true;
+                rotateSpeed = 2f;
+            }}, new DrawRegion("-top"));
+            drawer.iconOverride = new String[]{"", "-rotator", "-top"};
             ambientSound = Sounds.grinding;
             ambientSoundVolume = 0.025f;
 
@@ -2476,7 +2486,12 @@ public class Blocks{
             attribute = Attribute.spores;
 
             legacyReadWarmup = true;
-            drawer = new DrawCultivator();
+            drawer = new DrawMulti(
+            new DrawBlock(),
+            new DrawCultivator(),
+            new DrawRegion("-top")
+            );
+            drawer.iconOverride = new String[]{"", "-top"};
             maxBoost = 2f;
 
             consumePower(80f / 60f);

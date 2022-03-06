@@ -42,9 +42,7 @@ public class PayloadTurret extends Turret{
     /** Makes copies of all bullets and limits their range. */
     public void limitRange(float margin){
         for(var entry : ammoTypes.copy().entries()){
-            var copy = entry.value.copy();
-            copy.lifetime = (range + margin) / copy.speed;
-            ammoTypes.put(entry.key, copy);
+            entry.value.lifetime = (range + margin) / entry.value.speed;
         }
     }
 

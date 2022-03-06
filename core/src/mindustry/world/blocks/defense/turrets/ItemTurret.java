@@ -39,11 +39,10 @@ public class ItemTurret extends Turret{
     /** Makes copies of all bullets and limits their range. */
     public void limitRange(float margin){
         for(var entry : ammoTypes.copy().entries()){
-            var copy = entry.value.copy();
-            float realRange = copy.rangeChange + range;
+            var bullet = entry.value;
+            float realRange = bullet.rangeChange + range;
             //doesn't handle drag
-            copy.lifetime = (realRange + margin) / copy.speed;
-            ammoTypes.put(entry.key, copy);
+            bullet.lifetime = (realRange + margin) / bullet.speed;
         }
     }
 
