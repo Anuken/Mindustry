@@ -9,7 +9,7 @@ import mindustry.graphics.*;
 import mindustry.world.*;
 
 /** Not standalone. */
-public class DrawGlowRegion extends DrawPartial{
+public class DrawGlowRegion extends DrawBlock{
     public Blending blending = Blending.additive;
     public String suffix = "-glow";
     public float alpha = 0.9f, glowScale = 10f, glowIntensity = 0.5f;

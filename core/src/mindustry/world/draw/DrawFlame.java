@@ -10,7 +10,7 @@ import mindustry.graphics.*;
 import mindustry.world.*;
 
 //TODO remake/remove
-public class DrawFlame extends DrawPartial{
+public class DrawFlame extends DrawBlock{
     public Color flameColor = Color.valueOf("ffc999");
     public TextureRegion top;
     public float lightRadius = 60f, lightAlpha = 0.65f, lightSinScl = 10f, lightSinMag = 5;

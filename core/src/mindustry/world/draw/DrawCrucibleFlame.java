@@ -7,7 +7,7 @@ import arc.math.Interp.*;
 import arc.util.*;
 import mindustry.gen.*;
 
-public class DrawCrucibleFlame extends DrawPartial{
+public class DrawCrucibleFlame extends DrawBlock{
     public Color flameColor = Color.valueOf("f58349"), midColor = Color.valueOf("f2d585");
     public float flameRad = 1f, circleSpace = 2f, flameRadiusScl = 10f, flameRadiusMag = 0.6f, circleStroke = 1.5f;
 

@@ -31,6 +31,11 @@ public class DrawMultiWeave extends DrawBlock{
     }
 
     @Override
+    public TextureRegion[] icons(Block block){
+        return new TextureRegion[]{weave};
+    }
+
+    @Override
     public void load(Block block){
         weave = Core.atlas.find(block.name + "-weave");
         glow = Core.atlas.find(block.name + "-weave-glow");

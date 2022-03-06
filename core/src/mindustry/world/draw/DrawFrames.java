@@ -6,7 +6,7 @@ import arc.math.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 
-public class DrawFrames extends DrawPartial{
+public class DrawFrames extends DrawBlock{
     /** Number of frames to draw. */
     public int frames = 3;
     /** Ticks between frames. */
@@ -22,6 +22,11 @@ public class DrawFrames extends DrawPartial{
                 regions[(int)Mathf.absin(build.totalProgress(), interval, frames - 0.001f)] :
                 regions[(int)((build.totalProgress() / interval) % frames)],
             build.x, build.y);
+    }
+
+    @Override
+    public TextureRegion[] icons(Block block){
+        return new TextureRegion[]{regions[0]};
     }
 
     @Override

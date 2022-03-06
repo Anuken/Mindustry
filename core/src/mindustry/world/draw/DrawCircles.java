@@ -6,7 +6,7 @@ import arc.math.*;
 import arc.util.*;
 import mindustry.gen.*;
 
-public class DrawCircles extends DrawPartial{
+public class DrawCircles extends DrawBlock{
     public Color color = Color.valueOf("7457ce");
 
     public int amount = 5, sides = 15;

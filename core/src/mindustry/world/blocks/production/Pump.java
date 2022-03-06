@@ -19,7 +19,7 @@ public class Pump extends LiquidBlock{
     public float pumpAmount = 0.2f;
     /** Interval in-between item consumptions, if applicable. */
     public float consumeTime = 60f * 5f;
-    public DrawBlock draw = new DrawPump();
+    public DrawBlock draw = new DrawMulti(new DrawDefault(), new DrawPumpLiquid());
 
     public Pump(String name){
         super(name);

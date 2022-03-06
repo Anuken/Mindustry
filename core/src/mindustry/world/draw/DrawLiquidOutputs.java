@@ -54,9 +54,9 @@ public class DrawLiquidOutputs extends DrawBlock{
         }
     }
 
-    //TODO
+    //can't display these properly
     @Override
     public TextureRegion[] icons(Block block){
-        return super.icons(block);
+        return new TextureRegion[]{};
     }
 }

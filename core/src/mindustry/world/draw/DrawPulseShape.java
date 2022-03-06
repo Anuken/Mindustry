@@ -10,7 +10,7 @@ import mindustry.graphics.*;
 
 import static mindustry.Vars.*;
 
-public class DrawPulseShape extends DrawPartial{
+public class DrawPulseShape extends DrawBlock{
     public Color color = Pal.accent.cpy();
     public float stroke = 2f, timeScl = 100f, minStroke = 0.2f;
     public float radiusScl = 1f;

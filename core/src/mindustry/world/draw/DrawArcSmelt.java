@@ -6,7 +6,7 @@ import arc.math.*;
 import arc.util.*;
 import mindustry.gen.*;
 
-public class DrawArcSmelt extends DrawPartial{
+public class DrawArcSmelt extends DrawBlock{
     public Color flameColor = Color.valueOf("f58349"), midColor = Color.valueOf("f2d585");
     public float flameRad = 1f, circleSpace = 2f, flameRadiusScl = 3f, flameRadiusMag = 0.3f, circleStroke = 1.5f;
 

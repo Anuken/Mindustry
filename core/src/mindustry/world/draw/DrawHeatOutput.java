@@ -16,19 +16,9 @@ public class DrawHeatOutput extends DrawBlock{
 
     public Color heatColor = new Color(1f, 0.22f, 0.22f, 0.8f);
     public float heatPulse = 0.3f, heatPulseScl = 10f, glowMult = 1.2f;
-    public boolean drawRegion = false;
-
-    public DrawHeatOutput(){
-    }
-
-    public DrawHeatOutput(boolean drawRegion){
-        this.drawRegion = drawRegion;
-    }
 
     @Override
     public void draw(Building build){
-        if(drawRegion) Draw.rect(build.block.region, build.x, build.y);
-
         Draw.rect(build.rotation > 1 ? top2 : top1, build.x, build.y, build.rotdeg());
 
         if(build instanceof HeatBlock heater && heater.heat() > 0){
@@ -45,7 +35,6 @@ public class DrawHeatOutput extends DrawBlock{
 
     @Override
     public void drawPlan(Block block, BuildPlan plan, Eachable<BuildPlan> list){
-        if(drawRegion) Draw.rect(block.region, plan.drawx(), plan.drawy());
         Draw.rect(plan.rotation > 1 ? top2 : top1, plan.drawx(), plan.drawy(), plan.rotation * 90);
     }
 
@@ -57,9 +46,6 @@ public class DrawHeatOutput extends DrawBlock{
         top2 = Core.atlas.find(block.name + "-top2");
     }
 
-    @Override
-    public TextureRegion[] icons(Block block){
-        return new TextureRegion[]{block.region, top1};
-    }
+    //TODO currently no icons due to concerns with rotation
 
 }

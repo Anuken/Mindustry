@@ -2,12 +2,10 @@ package mindustry.world.draw;
 
 import arc.*;
 import arc.graphics.g2d.*;
-import arc.util.*;
-import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 
-public class DrawTurbines extends DrawPartial{
+public class DrawTurbines extends DrawBlock{
     public TextureRegion[] turbines = new TextureRegion[2];
     public TextureRegion cap;
     public float turbineSpeed = 2f;
@@ -32,5 +30,10 @@ public class DrawTurbines extends DrawPartial{
         for(int i = 0; i < 2; i++){
             turbines[i] = Core.atlas.find(block.name + "-turbine" + i);
         }
+    }
+
+    @Override
+    public TextureRegion[] icons(Block block){
+        return new TextureRegion[]{turbines[0], turbines[1]};
     }
 }

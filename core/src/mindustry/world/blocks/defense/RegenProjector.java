@@ -29,7 +29,7 @@ public class RegenProjector extends Block{
     public float optionalMultiplier = 2f;
     public float optionalUseTime = 60f * 8f;
 
-    public DrawBlock drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawSideRegion(true));
+    public DrawBlock drawer = new DrawDefault();
 
     public float effectChance = 0.003f;
     public Color baseColor = Pal.accent;

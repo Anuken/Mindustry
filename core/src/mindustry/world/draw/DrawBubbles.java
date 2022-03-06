@@ -5,7 +5,7 @@ import arc.graphics.g2d.*;
 import arc.util.*;
 import mindustry.gen.*;
 
-public class DrawBubbles extends DrawPartial{
+public class DrawBubbles extends DrawBlock{
     public Color color = Color.valueOf("7457ce");
 
     public int amount = 12, sides = 8;

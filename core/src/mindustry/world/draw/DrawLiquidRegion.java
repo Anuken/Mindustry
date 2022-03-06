@@ -2,14 +2,13 @@ package mindustry.world.draw;
 
 import arc.*;
 import arc.graphics.g2d.*;
-import arc.util.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
 /** Not standalone. */
-public class DrawLiquidRegion extends DrawPartial{
+public class DrawLiquidRegion extends DrawBlock{
     public Liquid drawLiquid;
     public TextureRegion liquid;
     public String suffix = "-liquid";
@@ -31,6 +30,7 @@ public class DrawLiquidRegion extends DrawPartial{
         );
     }
 
+    @Override
     public void load(Block block){
         if(!block.hasLiquids){
             throw new RuntimeException("Block '" + block + "' has a DrawLiquidRegion, but hasLiquids is false! Make sure it is true.");

@@ -44,6 +44,11 @@ public class DrawRegion extends DrawBlock{
     }
 
     @Override
+    public TextureRegion[] icons(Block block){
+        return new TextureRegion[]{region};
+    }
+
+    @Override
     public void load(Block block){
         region = Core.atlas.find(block.name + suffix);
     }

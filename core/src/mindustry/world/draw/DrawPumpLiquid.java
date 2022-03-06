@@ -7,13 +7,11 @@ import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.blocks.production.Pump.*;
 
-public class DrawPump extends DrawBlock{
+public class DrawPumpLiquid extends DrawBlock{
     public TextureRegion liquid;
 
     @Override
     public void draw(Building build){
-        Draw.rect(build.block.region, build.x, build.y);
-
         if(!(build instanceof PumpBuild pump) || pump.liquidDrop == null) return;
 
         Drawf.liquid(liquid, build.x, build.y, build.liquids.get(pump.liquidDrop) / build.block.liquidCapacity, pump.liquidDrop.color);

@@ -2,8 +2,6 @@ package mindustry.world.draw;
 
 import arc.*;
 import arc.graphics.g2d.*;
-import arc.util.*;
-import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
@@ -28,8 +26,8 @@ public class DrawBlurSpin extends DrawBlock{
     }
 
     @Override
-    public void drawPlan(Block block, BuildPlan plan, Eachable<BuildPlan> list){
-        Draw.rect(region, plan.drawx(), plan.drawy());
+    public TextureRegion[] icons(Block block){
+        return new TextureRegion[]{region};
     }
 
     @Override

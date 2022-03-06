@@ -10,8 +10,6 @@ import mindustry.world.*;
 /** combined several DrawBlocks into one */
 public class DrawMulti extends DrawBlock{
     public DrawBlock[] drawers = {};
-    /** specifies the drawer index that sources the icon (since there can only be one icon source) */
-    public int iconIndex = 0;
 
     public DrawMulti(){
     }
@@ -61,6 +59,10 @@ public class DrawMulti extends DrawBlock{
 
     @Override
     public TextureRegion[] icons(Block block){
-        return drawers.length <= iconIndex ? super.icons(block) : drawers[iconIndex].icons(block);
+        var result = new Seq<TextureRegion>();
+        for(var draw : drawers){
+            result.addAll(draw.icons(block));
+        }
+        return result.toArray(TextureRegion.class);
     }
 }

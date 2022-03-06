@@ -415,11 +415,10 @@ public class ClassMap{
         classes.put("DrawLiquidTile", mindustry.world.draw.DrawLiquidTile.class);
         classes.put("DrawMulti", mindustry.world.draw.DrawMulti.class);
         classes.put("DrawMultiWeave", mindustry.world.draw.DrawMultiWeave.class);
-        classes.put("DrawPartial", mindustry.world.draw.DrawPartial.class);
         classes.put("DrawParticles", mindustry.world.draw.DrawParticles.class);
         classes.put("DrawPistons", mindustry.world.draw.DrawPistons.class);
         classes.put("DrawPulseShape", mindustry.world.draw.DrawPulseShape.class);
-        classes.put("DrawPump", mindustry.world.draw.DrawPump.class);
+        classes.put("DrawPump", DrawPumpLiquid.class);
         classes.put("DrawRegion", mindustry.world.draw.DrawRegion.class);
         classes.put("DrawShape", mindustry.world.draw.DrawShape.class);
         classes.put("DrawSideRegion", mindustry.world.draw.DrawSideRegion.class);

@@ -5,7 +5,7 @@ import arc.graphics.g2d.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 
-public class DrawShape extends DrawPartial{
+public class DrawShape extends DrawBlock{
     public Color color = Pal.accent.cpy();
     public int sides = 4;
     public float radius = 2f, timeScl = 1f, layer = -1f, x, y;

@@ -135,7 +135,7 @@ public class ContentParser{
             if(data.isArray()){
                 return new DrawMulti(parser.readValue(DrawBlock[].class, data));
             }
-            var bc = resolve(data.getString("type", ""), DrawBlock.class);
+            var bc = resolve(data.getString("type", ""), DrawDefault.class);
             data.remove("type");
             var result = make(bc);
             readFields(result, data);

@@ -4,7 +4,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import mindustry.gen.*;
 
-public class DrawSpikes extends DrawPartial{
+public class DrawSpikes extends DrawBlock{
     public Color color = Color.valueOf("7457ce");
 
     public int amount = 10, layers = 1;

@@ -41,7 +41,7 @@ public class GenericCrafter extends Block{
     /** Only used for legacy cultivator blocks. */
     public boolean legacyReadWarmup = false;
 
-    public DrawBlock drawer = new DrawBlock();
+    public DrawBlock drawer = new DrawDefault();
 
     public GenericCrafter(String name){
         super(name);

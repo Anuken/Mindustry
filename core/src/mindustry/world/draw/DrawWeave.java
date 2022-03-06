@@ -8,7 +8,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 
-public class DrawWeave extends DrawPartial{
+public class DrawWeave extends DrawBlock{
     public TextureRegion weave;
 
     @Override

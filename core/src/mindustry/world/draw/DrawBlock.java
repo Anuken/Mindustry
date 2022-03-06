@@ -12,7 +12,7 @@ import mindustry.world.blocks.production.*;
 
 /** An implementation of custom rendering behavior for a crafter block.
  * This is used mostly for mods. */
-public class DrawBlock{
+public abstract class DrawBlock{
     protected static final Rand rand = new Rand();
 
     /** If set, the icon is overridden to be these strings, in order. Each string is a suffix. */
@@ -24,7 +24,7 @@ public class DrawBlock{
 
     /** Draws the block itself. */
     public void draw(Building build){
-        Draw.rect(build.block.region, build.x, build.y, build.drawrot());
+
     }
 
     /** Draws any extra light for the block. */
@@ -34,7 +34,7 @@ public class DrawBlock{
 
     /** Draws the planned version of this block. */
     public void drawPlan(Block block, BuildPlan plan, Eachable<BuildPlan> list){
-        block.drawDefaultPlanRegion(plan, list);
+
     }
 
     /** Load any relevant texture regions. */

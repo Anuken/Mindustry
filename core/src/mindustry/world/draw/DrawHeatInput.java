@@ -47,7 +47,6 @@ public class DrawHeatInput extends DrawBlock{
             }
         }
         Draw.z(Layer.block);
-
     }
 
     @Override

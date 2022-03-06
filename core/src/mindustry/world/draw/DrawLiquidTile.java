@@ -5,7 +5,7 @@ import mindustry.type.*;
 import mindustry.world.blocks.liquid.*;
 
 /** Not standalone. */
-public class DrawLiquidTile extends DrawPartial{
+public class DrawLiquidTile extends DrawBlock{
     public Liquid drawLiquid;
     public float padding;
     public float alpha = 1f;

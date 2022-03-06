@@ -26,7 +26,6 @@ public class DrawHeatRegion extends DrawBlock{
 
     @Override
     public void draw(Building build){
-
         Draw.z(Layer.blockAdditive);
         if(build instanceof HeatCrafterBuild hc && hc.heat > 0){
             Draw.blend(Blending.additive);
@@ -36,7 +35,6 @@ public class DrawHeatRegion extends DrawBlock{
             Draw.color();
         }
         Draw.z(Layer.block);
-
     }
 
     @Override

@@ -13,7 +13,7 @@ import mindustry.world.draw.*;
 
 public class HeatConductor extends Block{
     public float visualMaxHeat = 15f;
-    public DrawBlock drawer = new DrawBlock();
+    public DrawBlock drawer = new DrawDefault();
 
     public HeatConductor(String name){
         super(name);

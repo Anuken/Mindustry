@@ -17,7 +17,7 @@ public class PowerGenerator extends PowerDistributor{
     /** The amount of power produced per tick in case of an efficiency of 1.0, which represents 100%. */
     public float powerProduction;
     public Stat generationType = Stat.basePowerGeneration;
-    public DrawBlock drawer = new DrawBlock();
+    public DrawBlock drawer = new DrawDefault();
 
     public PowerGenerator(String name){
         super(name);

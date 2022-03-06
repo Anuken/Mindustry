@@ -8,7 +8,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 
-public class DrawCultivator extends DrawPartial{
+public class DrawCultivator extends DrawBlock{
     public Color plantColor = Color.valueOf("5541b1");
     public Color plantColorLight = Color.valueOf("7457ce");
     public Color bottomColor = Color.valueOf("474747");
