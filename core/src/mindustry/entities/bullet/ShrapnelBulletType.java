@@ -24,7 +24,7 @@ public class ShrapnelBulletType extends BulletType{
         shootEffect = smokeEffect = Fx.lightningShoot;
         lifetime = 10f;
         despawnEffect = Fx.none;
-        keepVelocity = false;
+        velocityInheritance = 0f;
         collides = false;
         pierce = true;
         hittable = false;

@@ -17,7 +17,7 @@ public class LightningBulletType extends BulletType{
         lifetime = 1;
         despawnEffect = Fx.none;
         hitEffect = Fx.hitLancer;
-        keepVelocity = false;
+        velocityInheritance = 0f;
         hittable = false;
         //for stats
         status = StatusEffects.shocked;

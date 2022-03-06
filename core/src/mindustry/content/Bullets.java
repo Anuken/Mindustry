@@ -393,7 +393,7 @@ public class Bullets implements ContentList{
             hitEffect = Fx.hitFlameSmall;
             despawnEffect = Fx.none;
             status = StatusEffects.burning;
-            keepVelocity = false;
+            velocityInheritance = 0f;
             hittable = false;
         }};
 

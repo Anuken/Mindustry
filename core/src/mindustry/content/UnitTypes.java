@@ -111,7 +111,7 @@ public class UnitTypes implements ContentList{
                     hitEffect = Fx.hitFlameSmall;
                     despawnEffect = Fx.none;
                     status = StatusEffects.burning;
-                    keepVelocity = false;
+                    velocityInheritance = 0f;
                     hittable = false;
                 }};
             }});
@@ -1048,7 +1048,7 @@ public class UnitTypes implements ContentList{
                     shrinkY = 0f;
                     drag = -0.003f;
                     homingRange = 60f;
-                    keepVelocity = false;
+                    velocityInheritance = 0f;
                     splashDamageRadius = 25f;
                     splashDamage = 15f;
                     lifetime = 50f;
@@ -1278,7 +1278,7 @@ public class UnitTypes implements ContentList{
                     weaveMag = 4;
                     weaveScale = 4;
                     lifetime = 50f;
-                    keepVelocity = false;
+                    velocityInheritance = 0f;
                     shootEffect = Fx.shootHeal;
                     smokeEffect = Fx.hitLaser;
                     hitEffect = despawnEffect = Fx.hitLaser;
@@ -1402,7 +1402,7 @@ public class UnitTypes implements ContentList{
 
                     despawnEffect = Fx.greenBomb;
                     hitEffect = Fx.massiveExplosion;
-                    keepVelocity = false;
+                    velocityInheritance = 0f;
                     spin = 2f;
 
                     shrinkX = shrinkY = 0.7f;
@@ -1476,7 +1476,6 @@ public class UnitTypes implements ContentList{
                 ejectEffect = Fx.casing1;
                 shootSound = Sounds.missile;
                 bullet = new MissileBulletType(2.7f, 12, "missile"){{
-                    keepVelocity = true;
                     width = 8f;
                     height = 8f;
                     shrinkY = 0f;
@@ -1627,7 +1626,7 @@ public class UnitTypes implements ContentList{
                     shrinkY = 0f;
                     drag = -0.003f;
                     homingRange = 60f;
-                    keepVelocity = false;
+                    velocityInheritance = 0f;
                     splashDamageRadius = 25f;
                     splashDamage = 10f;
                     lifetime = 70f;
@@ -1689,7 +1688,7 @@ public class UnitTypes implements ContentList{
                     shrinkX = shrinkY = 0f;
                     drag = -0.003f;
                     homingRange = 80f;
-                    keepVelocity = false;
+                    velocityInheritance = 0f;
                     splashDamageRadius = 35f;
                     splashDamage = 45f;
                     lifetime = 62f;
@@ -1848,7 +1847,7 @@ public class UnitTypes implements ContentList{
                     lifetime = 87f;
 
                     hitEffect = new MultiEffect(Fx.blastExplosion, Fx.greenCloud);
-                    keepVelocity = false;
+                    velocityInheritance = 0f;
 
                     shrinkX = shrinkY = 0f;
 
@@ -1914,7 +1913,7 @@ public class UnitTypes implements ContentList{
                     ejectEffect = Fx.none;
                     despawnEffect = Fx.none;
                     status = StatusEffects.burning;
-                    keepVelocity = false;
+                    velocityInheritance = 0f;
                     hittable = false;
                     shootEffect = new Effect(32f, 80f, e -> {
                         color(Color.white, Pal.heal, Color.gray, e.fin());
@@ -1998,7 +1997,7 @@ public class UnitTypes implements ContentList{
                     shrinkY = 0f;
                     drag = -0.003f;
                     homingRange = 60f;
-                    keepVelocity = false;
+                    velocityInheritance = 0f;
                     lightRadius = 60f;
                     lightOpacity = 0.7f;
                     lightColor = Pal.heal;
@@ -2041,7 +2040,7 @@ public class UnitTypes implements ContentList{
                         weaveMag = 4;
                         weaveScale = 4;
                         lifetime = 60f;
-                        keepVelocity = false;
+                        velocityInheritance = 0f;
                         shootEffect = Fx.shootHeal;
                         smokeEffect = Fx.hitLaser;
                         splashDamage = 13f;

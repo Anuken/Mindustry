@@ -13,7 +13,7 @@ public class BombBulletType extends BasicBulletType{
         shrinkY = 0.7f;
         lifetime = 30f;
         drag = 0.05f;
-        keepVelocity = false;
+        velocityInheritance = 0f;
         collidesAir = false;
         hitSound = Sounds.explosion;
     }

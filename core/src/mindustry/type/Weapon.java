@@ -344,7 +344,7 @@ public class Weapon implements Cloneable{
             Angles.shotgun(shots, spacing, rotation, f -> mount.bullet = bullet(unit, shootX, shootY, f + Mathf.range(inaccuracy), lifeScl));
         }
 
-        boolean parentize = ammo.keepVelocity && ammo.velocityInheritance != 0f || parentizeEffects;
+        boolean parentize = ammo.velocityInheritance != 0f || parentizeEffects;
 
         if(delay){
             Time.run(firstShotDelay, () -> {
