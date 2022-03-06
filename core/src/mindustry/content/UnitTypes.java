@@ -261,6 +261,7 @@ public class UnitTypes implements ContentList{
                         pierce = true;
                         pierceBuilding = true;
                         pierceCap = 3;
+                        keepVelocity = false;
 
                         lifetime = 20f;
                         hitEffect = Fx.flakExplosion;
@@ -895,7 +896,6 @@ public class UnitTypes implements ContentList{
                     ammoMultiplier = 4f;
                     splashDamageRadius = 80f;
                     splashDamage = 75f;
-                    keepVelocity = false;
                     backColor = Pal.sapBulletBack;
                     frontColor = lightningColor = Pal.sapBullet;
                     lightning = 5;
@@ -920,6 +920,7 @@ public class UnitTypes implements ContentList{
                         collidesTiles = false;
                         splashDamageRadius = 70f;
                         splashDamage = 40f;
+                        keepVelocity = false;
                         backColor = Pal.sapBulletBack;
                         frontColor = lightningColor = Pal.sapBullet;
                         lightning = 2;
@@ -1154,7 +1155,7 @@ public class UnitTypes implements ContentList{
             targetFlags = new BlockFlag[]{BlockFlag.reactor, BlockFlag.battery, BlockFlag.core, null};
             ammoType = new ItemAmmoType(Items.thorium);
 
-            BulletType fragBullet = new FlakBulletType(4f, 15){{
+            BulletType flakBullet = new FlakBulletType(4f, 15){{
                 shootEffect = Fx.shootBig;
                 ammoMultiplier = 4f;
                 splashDamage = 65f;
@@ -1200,7 +1201,7 @@ public class UnitTypes implements ContentList{
                 rotate = true;
                 recoil = 0.5f;
 
-                bullet = fragBullet;
+                bullet = flakBullet;
             }},
             new Weapon("large-artillery"){{
                 y = -13f;
@@ -1212,7 +1213,7 @@ public class UnitTypes implements ContentList{
                 shootSound = Sounds.shoot;
                 rotate = true;
                 shadow = 12f;
-                bullet = fragBullet;
+                bullet = flakBullet;
             }});
         }};
 
@@ -2046,6 +2047,7 @@ public class UnitTypes implements ContentList{
                         smokeEffect = Fx.hitLaser;
                         splashDamage = 13f;
                         splashDamageRadius = 20f;
+                        keepVelocity = false;
                         frontColor = Color.white;
                         hitSound = Sounds.none;
 
