@@ -468,6 +468,10 @@ public class BulletType extends Content implements Cloneable{
             }
         }
 
+        if(fragBullet != null){
+            fragBullet.keepVelocity = false;
+        }
+
         if(lightningType == null){
             lightningType = !collidesAir ? Bullets.damageLightningGround : Bullets.damageLightning;
         }
