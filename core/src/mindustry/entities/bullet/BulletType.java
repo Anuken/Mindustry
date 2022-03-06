@@ -100,6 +100,8 @@ public class BulletType extends Content implements Cloneable{
     public boolean collideTerrain = false;
     /** Whether velocity is inherited from the shooter. */
     public boolean keepVelocity = true;
+    /** How much velocity is inherited from the shooter. */
+    public float velocityInheritance = 1f;
     /** Whether to scale lifetime (not actually velocity!) to disappear at the target position. Used for artillery. */
     public boolean scaleVelocity;
     /** Whether this bullet can be hit by point defense. */
@@ -492,7 +494,7 @@ public class BulletType extends Content implements Cloneable{
         }
         bullet.add();
 
-        if(keepVelocity && vel != null) bullet.vel.add(vel);
+        if(keepVelocity && velocityInheritance != 0f && vel != null) bullet.vel.add(Tmp.v1.set(vel).scl(velocityInheritance));
         return bullet;
     }
 

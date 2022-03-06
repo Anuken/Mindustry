@@ -919,6 +919,7 @@ public class UnitTypes implements ContentList{
                         collidesTiles = false;
                         splashDamageRadius = 70f;
                         splashDamage = 40f;
+                        velocityInheritance = 0.25f;
                         backColor = Pal.sapBulletBack;
                         frontColor = lightningColor = Pal.sapBullet;
                         lightning = 2;
