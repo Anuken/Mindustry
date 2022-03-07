@@ -85,6 +85,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     transient float efficiency;
     /** Same as efficiency, but for optional consumers only. */
     transient float optionalEfficiency;
+    /** The efficiency this block would have if consValid() / productionValid() returned true. */
+    transient float potentialEfficiency;
 
     transient float healSuppressionTime = -1f;
     transient float lastHealTime = -120f * 10f;
@@ -224,7 +226,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         //version 3 has efficiency numbers instead of bools
         if(version >= 3){
-            efficiency = read.ub() / 255f;
+            efficiency = potentialEfficiency = read.ub() / 255f;
             optionalEfficiency = read.ub() / 255f;
         }
 
@@ -1640,7 +1642,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public boolean canConsume(){
-        return efficiency > 0;
+        return potentialEfficiency > 0;
     }
 
     /** Scaled delta. */
@@ -1671,40 +1673,43 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public void updateConsumption(){
         //everything is valid when cheating
         if(!block.hasConsumers || cheating()){
-            efficiency = optionalEfficiency = 1f;
+            potentialEfficiency = efficiency = optionalEfficiency = 1f;
             return;
         }
 
         //disabled -> nothing works
         if(!enabled){
-            efficiency = optionalEfficiency = 0f;
+            potentialEfficiency = efficiency = optionalEfficiency = 0f;
             return;
         }
 
         //TODO why check for old state?
         boolean prevValid = efficiency > 0, update = shouldConsume() && productionValid();
 
-        if(update){
-            float minEfficiency = 1f;
+        float minEfficiency = 1f;
 
-            //assume efficiency is 1 for the calculations below
-            efficiency = optionalEfficiency = 1f;
+        //assume efficiency is 1 for the calculations below
+        efficiency = optionalEfficiency = 1f;
 
-            //first pass: get the minimum efficiency of any consumer
-            for(var cons : block.nonOptionalConsumers){
-                minEfficiency = Math.min(minEfficiency, cons.efficiency(self()));
-            }
+        //first pass: get the minimum efficiency of any consumer
+        for(var cons : block.nonOptionalConsumers){
+            minEfficiency = Math.min(minEfficiency, cons.efficiency(self()));
+        }
 
-            //same for optionals
-            for(var cons : block.optionalConsumers){
-                optionalEfficiency = Math.min(optionalEfficiency, cons.efficiency(self()));
-            }
+        //same for optionals
+        for(var cons : block.optionalConsumers){
+            optionalEfficiency = Math.min(optionalEfficiency, cons.efficiency(self()));
+        }
 
-            //efficiency is now this minimum value
-            efficiency = minEfficiency;
-            optionalEfficiency = Math.min(optionalEfficiency, minEfficiency);
-        }else{
-            //should not consume, efficiency now zero
+        //efficiency is now this minimum value
+        efficiency = minEfficiency;
+        optionalEfficiency = Math.min(optionalEfficiency, minEfficiency);
+
+        //assign "potential"
+        potentialEfficiency = efficiency;
+
+        //no updating means zero efficiency
+        if(!update){
             efficiency = optionalEfficiency = 0f;
         }
 
