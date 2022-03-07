@@ -214,6 +214,7 @@ public class LoadDialog extends BaseDialog{
                     state.rules.editor = false;
                     state.rules.sector = null;
                     state.set(State.playing);
+                    Events.fire(new WorldLoadEvent());
                 }catch(SaveException e){
                     Log.err(e);
                     logic.reset();
