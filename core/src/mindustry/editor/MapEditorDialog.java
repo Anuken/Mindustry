@@ -266,6 +266,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
             state.rules = Gamemode.editor.apply(lastSavedRules.copy());
             state.rules.limitMapArea = false;
             state.rules.sector = null;
+            state.rules.fog = false;
             state.map = new Map(StringMap.of(
                 "name", "Editor Playtesting",
                 "width", editor.width(),
