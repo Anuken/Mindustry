@@ -57,8 +57,9 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         if(maxTextureSize < 4096) Log.warn("[GL] Your maximum texture size is below the recommended minimum of 4096. This will cause severe performance issues.");
         Log.info("[JAVA] Version: @", OS.javaVersion);
         long ram = Runtime.getRuntime().maxMemory();
-        boolean gb = ram >= 1024 * 1024 * 1024;
-        Log.info("[RAM] Available: @ @", Strings.fixed(gb ? ram / 1024f / 1024 / 1024f : ram / 1024f / 1024f, 1), gb ? "GB" : "MB");
+        boolean gib = ram >= 1024 * 1024 * 1024;
+        boolean gb = ram >= 1000 * 1000 * 1000;
+        Log.info("[RAM] Available: @ @ (@ @)", Strings.fixed(gib ? ram / 1024f / 1024 / 1024f : ram / 1024f / 1024f, 1), gib ? "GiB" : "MiB", Strings.fixed(gb ? ram / 1000f / 1000 / 1000f : ram / 1000f / 1000f, 1), gb ? "GB" : "MB");
 
         Time.setDeltaProvider(() -> {
             float result = Core.graphics.getDeltaTime() * 60f;
