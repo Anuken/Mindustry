@@ -573,6 +573,9 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     @Override
     public void killed(){
         wasPlayer = isLocal();
+        if(wasPlayer){
+             player.unitOnDeath = player.unit();
+        }
         health = Math.min(health, 0);
         dead = true;
 
