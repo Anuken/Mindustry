@@ -4213,6 +4213,7 @@ public class Blocks{
             canOverdrive = false;
             health = 800;
             researchCostMultiplier = 4f;
+            fogRadius = 1;
         }};
 
         reinforcedPayloadRouter = new PayloadRouter("reinforced-payload-router"){{
@@ -4220,6 +4221,7 @@ public class Blocks{
             moveTime = 35f;
             health = 800;
             canOverdrive = false;
+            fogRadius = 2;
             researchCostMultiplier = 4f;
         }};
 
@@ -4231,6 +4233,7 @@ public class Blocks{
             chargeTime = 90f;
             range = 500f;
             maxPayloadSize = 2.5f;
+            fogRadius = 5;
             consumePower(0.5f);
         }};
 
@@ -4293,6 +4296,7 @@ public class Blocks{
             hasPower = true;
             consumePower(2f);
             size = 3;
+            fogRadius = 5;
         }};
 
         payloadUnloader = new PayloadUnloader("payload-unloader"){{
@@ -4301,6 +4305,7 @@ public class Blocks{
             hasPower = true;
             consumePower(2f);
             size = 3;
+            fogRadius = 5;
         }};
 
         //endregion
