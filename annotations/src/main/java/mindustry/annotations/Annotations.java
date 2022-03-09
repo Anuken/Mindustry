@@ -196,9 +196,7 @@ public class Annotations{
         /** Neither server nor client. */
         none(false, false);
 
-        /** If true, this method can be invoked ON clients FROM servers. */
         public final boolean isServer;
-        /** If true, this method can be invoked ON servers FROM clients. */
         public final boolean isClient;
 
         Loc(boolean server, boolean client){
