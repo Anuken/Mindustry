@@ -40,6 +40,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     Color color = new Color();
     transient String locale = "en";
     transient float deathTimer;
+    transient @Nullable Unit unitOnDeath;
     transient String lastText = "";
     transient float textFadeTime;
 
