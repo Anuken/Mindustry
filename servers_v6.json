@@ -1,11 +1,15 @@
 [
   {
+    "name": "Sectorized",
+    "address": ["sectorized.ddns.net"]
+  },
+  {
     "name": "{AA}",
     "address": ["recessive.net"]
   },
   {
     "name": "Yeet Hosting",
-    "address": ["omegam.mindustry.me:5004", "omegav.mindustry.me:25574", "omegav.mindustry.me:25568"]
+    "address": ["omegam.mindustry.me:5004", "omegav.mindustry.me:25575", "omegav.mindustry.me:25568"]
   },
   {
     "name": "RCM",
@@ -77,7 +81,7 @@
   },
   {
     "name": "TSR", 
-    "address": ["ult4.falix.gg:26904"]
+    "address": ["us01.optik.host:26194", "uk01.optik.host:26164"]
   },
   {
     "name": "Sakura", 
@@ -93,7 +97,7 @@
   },
   {
     "name": "Hungarian",
-    "address": ["hudustry.ddns.net"]
+    "address": ["vajdasimon.ddns.net"]
   },
   {
     "name": "Xpdustry",
@@ -105,7 +109,7 @@
   },
   {
     "name": "Mindustry Español",
-    "address": ["n4.mindustry.me:6578", "n4.mindustry.me:6573", "n4.mindustry.me:6577", "n4.mindustry.me:6576"]
+    "address": ["xpdustry.fr:9000"]
   },
   {
     "name": "CreateDustry",
