@@ -36,7 +36,7 @@ import static mindustry.Vars.*;
 
 public class ServerControl implements ApplicationListener{
     private static final int roundExtraTime = 12;
-    private static final int maxLogLength = 1024 * 512;
+    private static final int maxLogLength = 1024 * 1024 * 5;
 
     protected static String[] tags = {"&lc&fb[D]&fr", "&lb&fb[I]&fr", "&ly&fb[W]&fr", "&lr&fb[E]", ""};
     protected static DateTimeFormatter dateTime = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss"),

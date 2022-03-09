@@ -74,7 +74,7 @@ public class EventType{
     public static class MusicRegisterEvent{}
     /** Called *after* all the modded files have been added into Vars.tree */
     public static class FileTreeInitEvent{}
-    /** Called when a game begins and the world is loaded. */
+    /** Called when a game begins and the world tiles are loaded. Entities are not yet loaded at this stage.  */
     public static class WorldLoadEvent{}
 
     public static class SaveLoadEvent{

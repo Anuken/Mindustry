@@ -1655,16 +1655,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return efficiency * delta();
     }
 
-    //TODO save/load this, new building version
-
-    //TODO unit tests:
-    //- 50% power efficiency -> 50% liquid consumption
-    //- 50% liquid consumption -> other liquid or item consumer runs at 50% efficiency
-    //- same as above but with overdrive and timeScale = 2 and differing delta values
-
-    //TODO test with overdraw, e.g. requesting 20/frame on a block with only 10 capacity
-    //- should lead to 50% efficiency, for example - make sure all blocks have, at minimum, 10x their capacity per frame - should last for a second at least
-
     /** Called after efficiency is updated but before consumers are updated. Use to apply your own multiplier. */
     public void updateEfficiencyMultiplier(){
 
