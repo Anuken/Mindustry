@@ -761,9 +761,6 @@ public class SettingsMenuDialog extends BaseDialog{
         }
 
         public static class AreaTextSetting extends TextSetting{
-            String def;
-            Cons<String> changed;
-    
             public AreaTextSetting(String name, String def, Cons<String> changed){
                 super(name, def, changed);
             }
