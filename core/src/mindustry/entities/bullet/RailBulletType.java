@@ -28,6 +28,7 @@ public class RailBulletType extends BulletType{
         hitEffect = Fx.none;
         despawnEffect = Fx.none;
         collides = false;
+        keepVelocity = false;
         lifetime = 1f;
     }
 

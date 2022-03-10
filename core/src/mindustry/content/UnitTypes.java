@@ -687,8 +687,6 @@ public class UnitTypes{
             armor = 5f;
             ammoType = new PowerAmmoType(1000);
 
-            buildSpeed = 0.75f;
-
             visualElevation = 0.3f;
             groundLayer = Layer.legUnit;
 
@@ -757,7 +755,6 @@ public class UnitTypes{
             rippleScale = 2f;
             legSpeed = 0.2f;
             ammoType = new PowerAmmoType(2000);
-            buildSpeed = 1f;
 
             legSplashDamage = 32;
             legSplashRange = 30;
@@ -861,7 +858,6 @@ public class UnitTypes{
             rippleScale = 3f;
             legSpeed = 0.19f;
             ammoType = new ItemAmmoType(Items.graphite, 8);
-            buildSpeed = 1f;
 
             legSplashDamage = 80;
             legSplashRange = 60;
@@ -1840,7 +1836,6 @@ public class UnitTypes{
             rotateShooting = false;
             range = 100f;
             ammoType = new PowerAmmoType(900);
-
             armor = 3f;
 
             buildSpeed = 1.5f;
@@ -2512,6 +2507,7 @@ public class UnitTypes{
                 rotate = true;
                 rotateSpeed = 1.4f;
                 mirror = false;
+                shootCone = 2f;
                 x = 0f;
                 y = 0f;
                 heatColor = Color.valueOf("f9350f");

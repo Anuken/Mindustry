@@ -88,7 +88,7 @@ public class Turret extends ReloadTurret{
     public Sortf unitSort = UnitSorts.closest;
     public Boolf<Unit> unitFilter = u -> true;
 
-    public DrawBlock draw = new DrawTurret();
+    public DrawBlock drawer = new DrawTurret();
 
     public Turret(String name){
         super(name);
@@ -139,17 +139,17 @@ public class Turret extends ReloadTurret{
     public void load(){
         super.load();
 
-        draw.load(this);
+        drawer.load(this);
     }
 
     @Override
     public TextureRegion[] icons(){
-        return draw.finalIcons(this);
+        return drawer.finalIcons(this);
     }
 
     @Override
     public void getRegionsToOutline(Seq<TextureRegion> out){
-        draw.getRegionsToOutline(this, out);
+        drawer.getRegionsToOutline(this, out);
     }
 
     public static abstract class AmmoEntry{
@@ -295,7 +295,7 @@ public class Turret extends ReloadTurret{
 
         @Override
         public void draw(){
-            draw.draw(this);
+            drawer.draw(this);
         }
 
         @Override

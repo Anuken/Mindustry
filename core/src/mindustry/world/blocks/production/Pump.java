@@ -19,7 +19,7 @@ public class Pump extends LiquidBlock{
     public float pumpAmount = 0.2f;
     /** Interval in-between item consumptions, if applicable. */
     public float consumeTime = 60f * 5f;
-    public DrawBlock draw = new DrawMulti(new DrawDefault(), new DrawPumpLiquid());
+    public DrawBlock drawer = new DrawMulti(new DrawDefault(), new DrawPumpLiquid());
 
     public Pump(String name){
         super(name);
@@ -68,12 +68,12 @@ public class Pump extends LiquidBlock{
     @Override
     public void load(){
         super.load();
-        draw.load(this);
+        drawer.load(this);
     }
 
     @Override
     public TextureRegion[] icons(){
-        return draw.finalIcons(this);
+        return drawer.finalIcons(this);
     }
 
     @Override
@@ -110,13 +110,13 @@ public class Pump extends LiquidBlock{
 
         @Override
         public void draw(){
-            draw.draw(this);
+            drawer.draw(this);
         }
 
         @Override
         public void drawLight(){
             super.drawLight();
-            draw.drawLight(this);
+            drawer.drawLight(this);
         }
 
         @Override

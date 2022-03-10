@@ -265,29 +265,41 @@ public class ErekirTechTree{
                 });
             });
 
-            node(fabricator, () -> {
-                node(UnitTypes.stell, Seq.with(new Research(siliconArcFurnace), new Research(plasmaBore), new Research(turbineCondenser)), () -> {
+            node(fabricator, Seq.with(new Research(siliconArcFurnace), new Research(plasmaBore), new Research(turbineCondenser)), () -> {
+                node(UnitTypes.stell, () -> {
 
                 });
 
-                node(tankAssembler, Seq.with(new OnSector(four), new Research(constructor), new Research(atmosphericConcentrator)), () -> {
-                    node(UnitTypes.vanquish, () -> {
-                        node(UnitTypes.conquer, Seq.with(tmpNever), () -> {
+                node(tankReconstructor, () -> {
+                    node(UnitTypes.locus);
 
-                        });
-                    });
+                    node(shipReconstructor, () -> {
+                        node(UnitTypes.avert);
 
-                    node(shipAssembler, Seq.with(new OnSector(five)), () -> {
-                        node(UnitTypes.quell, () -> {
-                            node(UnitTypes.disrupt, Seq.with(tmpNever), () -> {
+                        node(mechReconstructor, () -> {
+                            node(UnitTypes.latum);
 
-                            });
-                        });
+                            node(tankAssembler, Seq.with(new OnSector(four), new Research(constructor), new Research(atmosphericConcentrator)), () -> {
+                                node(UnitTypes.vanquish, () -> {
+                                    node(UnitTypes.conquer, Seq.with(tmpNever), () -> {
 
-                        node(mechAssembler, Seq.with(tmpNever), () -> {
-                            node(UnitTypes.bulwark, () -> {
-                                node(UnitTypes.krepost, Seq.with(tmpNever), () -> {
+                                    });
+                                });
 
+                                node(shipAssembler, Seq.with(new OnSector(five)), () -> {
+                                    node(UnitTypes.quell, () -> {
+                                        node(UnitTypes.disrupt, Seq.with(tmpNever), () -> {
+
+                                        });
+                                    });
+
+                                    node(mechAssembler, Seq.with(tmpNever), () -> {
+                                        node(UnitTypes.bulwark, () -> {
+                                            node(UnitTypes.krepost, Seq.with(tmpNever), () -> {
+
+                                            });
+                                        });
+                                    });
                                 });
                             });
                         });

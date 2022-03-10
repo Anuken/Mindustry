@@ -3670,7 +3670,7 @@ public class Blocks{
 
             shootShake = 1f;
             ammoPerShot = 5;
-            draw = new DrawTurret("reinforced-");
+            drawer = new DrawTurret("reinforced-");
             shootY = -2;
             outlineColor = Pal.darkOutline;
             size = 3;
@@ -3693,7 +3693,7 @@ public class Blocks{
             //TODO requirements
             requirements(Category.turret, with(Items.tungsten, 150, Items.silicon, 200, Items.oxide, 40, Items.beryllium, 400));
 
-            draw = new DrawTurret("reinforced-"){{
+            drawer = new DrawTurret("reinforced-"){{
 
                 Color heatc = Color.valueOf("fa2859");
                 heatColor = heatc;
@@ -3811,7 +3811,7 @@ public class Blocks{
             coolant = consume(new ConsumeLiquid(Liquids.water, 30f / 60f));
             coolantMultiplier = 1.5f;
 
-            draw = new DrawTurret("reinforced-"){{
+            drawer = new DrawTurret("reinforced-"){{
                 parts.addAll(
                 new RegionPart("-barrel"){{
                     progress = PartProgress.reload.curve(Interp.pow2In);
@@ -3878,7 +3878,7 @@ public class Blocks{
 
             coolant = consume(new ConsumeLiquid(Liquids.water, 30f / 60f));
 
-            draw = new DrawTurret("reinforced-"){{
+            drawer = new DrawTurret("reinforced-"){{
                 parts.add(new RegionPart("-side"){{
                     mirror = true;
                     under = true;
