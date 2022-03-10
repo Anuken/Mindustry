@@ -473,7 +473,8 @@ public class UnitType extends UnlockableContent{
         }
 
         if(fogRadius < 0){
-            fogRadius = Math.max(11f * 2.3f * 3f, hitSize * 2f) / 8f;
+            //TODO depend on range?
+            fogRadius = Math.max(58f * 3f, hitSize * 2f) / 8f;
         }
 
         if(weapons.isEmpty()){
