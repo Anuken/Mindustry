@@ -3158,17 +3158,18 @@ public class UnitTypes{
 
             weapons.add(new Weapon("avert-weapon"){{
                 reload = 35f;
-                x = 4f;
-                y = 6.25f;
-                shootY = 5.75f;
-                recoil = 1.5f;
+                x = 0f;
+                y = 6.5f;
+                shootY = 5f;
+                recoil = 1f;
                 top = false;
                 layerOffset = -0.01f;
                 rotate = false;
+                mirror = false;
                 shoot = new ShootHelix();
 
                 //TODO cooler + balancing
-                bullet = new BasicBulletType(5f, 15){{
+                bullet = new BasicBulletType(5f, 20){{
                     width = 7f;
                     height = 12f;
                     lifetime = 25f;
