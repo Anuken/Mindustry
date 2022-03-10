@@ -113,7 +113,8 @@ public final class FogRenderer{
         Draw.shader(Shaders.fog);
         Draw.color(state.rules.dynamicColor);
         Draw.fbo(dynamicFog.getTexture(), world.width(), world.height(), tilesize);
-        if(state.rules.staticFog){
+        //TODO ai check?
+        if(state.rules.staticFog && !player.team().isAI()){
             //TODO why does this require a half-tile offset while dynamic does not
             Draw.color(state.rules.staticColor);
             Draw.fbo(staticFog.getTexture(), world.width(), world.height(), tilesize, tilesize/2f);
