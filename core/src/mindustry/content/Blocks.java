@@ -2101,7 +2101,7 @@ public class Blocks{
             liquidCapacity = 30f;
             newDrawing = true;
             liquidPadding = 3f/4f;
-            researchCostMultiplier = 6;
+            researchCostMultiplier = 3;
         }};
 
         //TODO is there a need for a container if unloaders can unload 3x3s?
