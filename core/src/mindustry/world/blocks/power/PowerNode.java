@@ -384,7 +384,7 @@ public class PowerNode extends PowerBlock{
         }
 
         @Override
-        public boolean onConfigureTileTapped(Building other){
+        public boolean onConfigureBuildTapped(Building other){
             if(linkValid(this, other)){
                 configure(other.pos());
                 return false;

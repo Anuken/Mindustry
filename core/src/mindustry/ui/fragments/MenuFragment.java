@@ -21,12 +21,11 @@ import mindustry.ui.*;
 import static mindustry.Vars.*;
 import static mindustry.gen.Tex.*;
 
-public class MenuFragment extends Fragment{
+public class MenuFragment{
     private Table container, submenu;
     private Button currentMenu;
     private MenuRenderer renderer;
 
-    @Override
     public void build(Group parent){
         renderer = new MenuRenderer();
 

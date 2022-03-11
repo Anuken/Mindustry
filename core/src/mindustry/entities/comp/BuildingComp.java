@@ -323,8 +323,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     /** Deselect this tile from configuration. */
     public void deselect(){
-        if(!headless && control.input.frag.config.getSelectedTile() == self()){
-            control.input.frag.config.hideConfig();
+        if(!headless && control.input.config.getSelected() == self()){
+            control.input.config.hideConfig();
         }
     }
 
@@ -1470,7 +1470,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
      * Called when another tile is tapped while this block is selected.
      * @return whether this block should be deselected.
      */
-    public boolean onConfigureTileTapped(Building other){
+    public boolean onConfigureBuildTapped(Building other){
         if(block.clearOnDoubleTap){
             if(self() == other){
                 deselect();
@@ -1480,6 +1480,15 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             return true;
         }
         return self() != other;
+    }
+
+    /**
+     * Called when a position is tapped when this building is selected.
+     *
+     * @return whether the tap event is consumed - if true, the player will not start shooting or interact with things under the cursor.
+     * */
+    public boolean onConfigureTapped(float x, float y){
+        return false;
     }
 
     /**

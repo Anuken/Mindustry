@@ -635,8 +635,8 @@ public class Renderer implements ApplicationListener{
 
     public void showLaunch(CoreBlock coreType){
         Vars.ui.hudfrag.showLaunch();
-        Vars.control.input.frag.config.hideConfig();
-        Vars.control.input.frag.inv.hide();
+        Vars.control.input.config.hideConfig();
+        Vars.control.input.inv.hide();
         launchCoreType = coreType;
         launching = true;
         landCore = player.team().core();

@@ -263,7 +263,7 @@ public class ItemBridge extends Block{
         }
 
         @Override
-        public boolean onConfigureTileTapped(Building other){
+        public boolean onConfigureBuildTapped(Building other){
             //reverse connection
             if(other instanceof ItemBridgeBuild b && b.link == pos()){
                 configure(other.pos());

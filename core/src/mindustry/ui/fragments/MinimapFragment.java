@@ -14,13 +14,12 @@ import mindustry.ui.*;
 
 import static mindustry.Vars.*;
 
-public class MinimapFragment extends Fragment{
+public class MinimapFragment{
     private boolean shown;
     float panx, pany, zoom = 1f, lastZoom = -1;
     private float baseSize = Scl.scl(5f);
     public Element elem;
 
-    @Override
     public void build(Group parent){
         elem = parent.fill((x, y, w, h) -> {
             w = Core.graphics.getWidth();

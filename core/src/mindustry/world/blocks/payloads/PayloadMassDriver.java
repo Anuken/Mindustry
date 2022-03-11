@@ -102,8 +102,8 @@ public class PayloadMassDriver extends PayloadBlock{
         Drawf.dashCircle(x * tilesize, y * tilesize, range, Pal.accent);
 
         //check if a mass driver is selected while placing this driver
-        if(!control.input.frag.config.isShown()) return;
-        Building selected = control.input.frag.config.getSelectedTile();
+        if(!control.input.config.isShown()) return;
+        Building selected = control.input.config.getSelected();
         if(selected == null || selected.block != this || !selected.within(x * tilesize, y * tilesize, range)) return;
 
         //if so, draw a dotted line towards it while it is in range
@@ -431,7 +431,7 @@ public class PayloadMassDriver extends PayloadBlock{
         }
 
         @Override
-        public boolean onConfigureTileTapped(Building other){
+        public boolean onConfigureBuildTapped(Building other){
             if(this == other){
                 if(link == -1) deselect();
                 configure(-1);

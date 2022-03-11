@@ -31,7 +31,7 @@ import mindustry.ui.*;
 import static mindustry.Vars.*;
 import static mindustry.gen.Tex.*;
 
-public class HudFragment extends Fragment{
+public class HudFragment{
     private static final float dsize = 65f, pauseHeight = 36f;
 
     public final PlacementFragment blockfrag = new PlacementFragment();
@@ -47,7 +47,6 @@ public class HudFragment extends Fragment{
     private Table lastUnlockLayout;
     private long lastToast;
 
-    @Override
     public void build(Group parent){
 
         //warn about guardian/boss waves

@@ -27,7 +27,7 @@ import mindustry.world.blocks.ConstructBlock.*;
 
 import static mindustry.Vars.*;
 
-public class PlacementFragment extends Fragment{
+public class PlacementFragment{
     final int rowWidth = 4;
 
     public Category currentCategory = Category.distribution;
@@ -229,7 +229,6 @@ public class PlacementFragment extends Fragment{
         return false;
     }
 
-    @Override
     public void build(Group parent){
         parent.fill(full -> {
             toggler = full;

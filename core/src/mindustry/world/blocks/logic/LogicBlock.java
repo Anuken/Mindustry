@@ -571,7 +571,7 @@ public class LogicBlock extends Block{
         }
 
         @Override
-        public boolean onConfigureTileTapped(Building other){
+        public boolean onConfigureBuildTapped(Building other){
             if(this == other || !accessible()){
                 deselect();
                 return false;
@@ -582,7 +582,7 @@ public class LogicBlock extends Block{
                 return false;
             }
 
-            return super.onConfigureTileTapped(other);
+            return super.onConfigureBuildTapped(other);
         }
 
         @Override

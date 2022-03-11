@@ -23,7 +23,7 @@ import java.util.*;
 
 import static mindustry.Vars.*;
 
-public class BlockInventoryFragment extends Fragment{
+public class BlockInventoryFragment{
     private static final float holdWithdraw = 20f;
     private static final float holdShrink = 120f;
 
@@ -38,7 +38,6 @@ public class BlockInventoryFragment extends Fragment{
         Events.on(WorldLoadEvent.class, e -> hide());
     }
 
-    @Override
     public void build(Group parent){
         table.name = "inventory";
         table.setTransform(true);

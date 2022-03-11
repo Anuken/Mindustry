@@ -13,6 +13,7 @@ import arc.scene.event.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -39,6 +40,7 @@ import mindustry.world.meta.*;
 
 import java.util.*;
 
+import static arc.Core.*;
 import static mindustry.Vars.*;
 
 public abstract class InputHandler implements InputProcessor, GestureListener{
@@ -49,8 +51,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     final static int maxLength = 100;
     final static Rect r1 = new Rect(), r2 = new Rect();
     final static Seq<Unit> tmpUnits = new Seq<>(false);
-
-    public final OverlayFragment frag = new OverlayFragment();
 
     /** If true, there is a cutscene currently occurring in logic. */
     public boolean logicCutscene;
@@ -89,6 +89,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     private Seq<BuildPlan> plansOut = new Seq<>(BuildPlan.class);
     private QuadTree<BuildPlan> playerPlanTree = new QuadTree<>(new Rect());
 
+    public final BlockInventoryFragment inv;
+    public final BlockConfigFragment config;
+
+    private WidgetGroup group = new WidgetGroup();
+
     private final Eachable<BuildPlan> allPlans = cons -> {
         player.unit().plans().each(cons);
         selectPlans.each(cons);
@@ -101,6 +106,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     };
 
     public InputHandler(){
+        group.touchable = Touchable.childrenOnly;
+        inv = new BlockInventoryFragment();
+        config = new BlockConfigFragment();
+
         Events.on(UnitDestroyEvent.class, e -> {
             if(e.unit != null && e.unit.isPlayer() && e.unit.getPlayer().isLocal() && e.unit.type.weapons.contains(w -> w.bullet.killShooter)){
                 player.shooting = false;
@@ -673,6 +682,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(state.isMenu()){
             controlledType = null;
             logicCutscene = false;
+            config.forceHide();
         }
     }
 
@@ -1092,11 +1102,15 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         updateLine(x1, y1, tileX(getMouseX()), tileY(getMouseY()));
     }
 
+    boolean checkConfigTap(){
+        return config.isShown() && config.getSelected().onConfigureTapped(input.mouseWorldX(), input.mouseWorldY());
+    }
+
     /** Handles tile tap events that are not platform specific. */
     boolean tileTapped(@Nullable Building build){
         if(build == null){
-            frag.inv.hide();
-            frag.config.hideConfig();
+            inv.hide();
+            config.hideConfig();
             commandBuild = null;
             return false;
         }
@@ -1108,21 +1122,21 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             consumed = true;
         }else if(build.block.configurable && build.interactable(player.team())){ //check if tapped block is configurable
             consumed = true;
-            if((!frag.config.isShown() && build.shouldShowConfigure(player)) //if the config fragment is hidden, show
+            if((!config.isShown() && build.shouldShowConfigure(player)) //if the config fragment is hidden, show
             //alternatively, the current selected block can 'agree' to switch config tiles
-            || (frag.config.isShown() && frag.config.getSelectedTile().onConfigureTileTapped(build))){
+            || (config.isShown() && config.getSelected().onConfigureBuildTapped(build))){
                 Sounds.click.at(build);
-                frag.config.showConfig(build);
+                config.showConfig(build);
             }
             //otherwise...
-        }else if(!frag.config.hasConfigMouse()){ //make sure a configuration fragment isn't on the cursor
+        }else if(!config.hasConfigMouse()){ //make sure a configuration fragment isn't on the cursor
             //then, if it's shown and the current block 'agrees' to hide, hide it.
-            if(frag.config.isShown() && frag.config.getSelectedTile().onConfigureTileTapped(build)){
+            if(config.isShown() && config.getSelected().onConfigureBuildTapped(build)){
                 consumed = true;
-                frag.config.hideConfig();
+                config.hideConfig();
             }
 
-            if(frag.config.isShown()){
+            if(config.isShown()){
                 consumed = true;
             }
         }
@@ -1137,14 +1151,14 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             consumed = true;
         }else if(build.interactable(player.team()) && build.block.synthetic() && (!consumed || build.block.allowConfigInventory)){
             if(build.block.hasItems && build.items.total() > 0){
-                frag.inv.showFor(build);
+                inv.showFor(build);
                 consumed = true;
                 showedInventory = true;
             }
         }
 
         if(!showedInventory){
-            frag.inv.hide();
+            inv.hide();
         }
 
         return consumed;
@@ -1300,7 +1314,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public void remove(){
         Core.input.removeProcessor(this);
-        frag.remove();
+        group.remove();
         if(Core.scene != null){
             Table table = (Table)Core.scene.find("inputTable");
             if(table != null){
@@ -1334,7 +1348,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             uiGroup.toBack();
             buildUI(uiGroup);
 
-            frag.add();
+            group.setFillParent(true);
+            Vars.ui.hudGroup.addChildBefore(Core.scene.find("overlaymarker"), group);
+
+            inv.build(group);
+            config.build(group);
         }
     }
 

@@ -41,7 +41,7 @@ public class ItemSelection{
             if(!item.unlockedNow() || (item instanceof Item checkVisible && state.rules.hiddenBuildItems.contains(checkVisible))) continue;
 
             ImageButton button = cont.button(Tex.whiteui, Styles.clearToggleTransi, 24, () -> {
-                if(closeSelect) control.input.frag.config.hideConfig();
+                if(closeSelect) control.input.config.hideConfig();
             }).group(group).tooltip(item.localizedName).get();
             button.changed(() -> consumer.get(button.isChecked() ? item : null));
             button.getStyle().imageUp = new TextureRegionDrawable(item.uiIcon);

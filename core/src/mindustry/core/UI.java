@@ -212,10 +212,10 @@ public class UI implements ApplicationListener, Loadable{
 
         hudfrag.build(hudGroup);
         menufrag.build(menuGroup);
-        chatfrag.container().build(hudGroup);
+        chatfrag.build(hudGroup);
         minimapfrag.build(hudGroup);
         listfrag.build(hudGroup);
-        scriptfrag.container().build(hudGroup);
+        scriptfrag.build(hudGroup);
         loadfrag.build(group);
         new FadeInFragment().build(group);
     }

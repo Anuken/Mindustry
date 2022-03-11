@@ -628,7 +628,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 }else if(buildingTapped != null){
                     Call.buildingControlSelect(player, buildingTapped);
                     recentRespawnTimer = 1f;
-                }else if(!tryBeginMine(cursor)){
+                }else if(!checkConfigTap() && !tryBeginMine(cursor)){
                     tileTapped(linked.build);
                 }
                 return false;
@@ -636,8 +636,9 @@ public class MobileInput extends InputHandler implements GestureListener{
 
             unitTapped = selectedUnit();
             buildingTapped = selectedControlBuild();
+
             //prevent mining if placing/breaking blocks
-            if(!tryStopMine() && !canTapPlayer(worldx, worldy) && !tileTapped(linked.build) && mode == none && !Core.settings.getBool("doubletapmine")){
+            if(!tryStopMine() && !canTapPlayer(worldx, worldy) && !checkConfigTap() && !tileTapped(linked.build) && mode == none && !Core.settings.getBool("doubletapmine")){
                 tryBeginMine(cursor);
             }
         }

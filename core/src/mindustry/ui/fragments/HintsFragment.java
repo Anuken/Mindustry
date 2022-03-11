@@ -22,7 +22,7 @@ import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
-public class HintsFragment extends Fragment{
+public class HintsFragment{
     private static final Boolp isTutorial = () -> Vars.state.rules.sector == SectorPresets.groundZero.sector;
     private static final float foutTime = 0.6f;
 
@@ -35,7 +35,6 @@ public class HintsFragment extends Fragment{
     ObjectSet<Block> placedBlocks = new ObjectSet<>();
     Table last;
 
-    @Override
     public void build(Group parent){
         group.setFillParent(true);
         group.touchable = Touchable.childrenOnly;

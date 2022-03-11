@@ -144,8 +144,8 @@ public class OverlayRenderer{
         }
 
         //draw config selected block
-        if(input.frag.config.isShown()){
-            Building tile = input.frag.config.getSelectedTile();
+        if(input.config.isShown()){
+            Building tile = input.config.getSelected();
             tile.drawConfigure();
         }
 

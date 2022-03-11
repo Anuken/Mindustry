@@ -32,12 +32,6 @@ public class ScriptConsoleFragment extends Table{
     private Seq<String> history = new Seq<>();
     private int historyPos = 0;
     private int scrollPos = 0;
-    private Fragment container = new Fragment(){
-        @Override
-        public void build(Group parent){
-            scene.add(ScriptConsoleFragment.this);
-        }
-    };
 
     public ScriptConsoleFragment(){
         setFillParent(true);
@@ -82,8 +76,8 @@ public class ScriptConsoleFragment extends Table{
         setup();
     }
 
-    public Fragment container(){
-        return container;
+    public void build(Group parent){
+        scene.add(this);
     }
 
     public void clearMessages(){
