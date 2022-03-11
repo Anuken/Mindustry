@@ -1467,7 +1467,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     /**
-     * Called when another tile is tapped while this block is selected.
+     * Called when another tile is tapped while this building is selected.
      * @return whether this block should be deselected.
      */
     public boolean onConfigureBuildTapped(Building other){
@@ -1483,7 +1483,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     /**
-     * Called when a position is tapped when this building is selected.
+     * Called when a position is tapped while this building is selected.
      *
      * @return whether the tap event is consumed - if true, the player will not start shooting or interact with things under the cursor.
      * */
@@ -1492,7 +1492,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     /**
-     * Called when this block's config menu is closed
+     * Called when this block's config menu is closed.
      */
     public void onConfigureClosed(){}
 

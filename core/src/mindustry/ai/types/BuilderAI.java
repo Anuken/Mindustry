@@ -100,7 +100,7 @@ public class BuilderAI extends AIController{
 
             if(valid){
                 //move toward the plan
-                moveTo(req.tile(), buildingRange - 20f);
+                moveTo(req.tile(), unit.type.buildRange - 20f);
             }else{
                 //discard invalid plan
                 unit.plans.removeFirst();
@@ -120,7 +120,7 @@ public class BuilderAI extends AIController{
 
                         Building build = world.build(plan.x, plan.y);
                         if(build instanceof ConstructBuild cons){
-                            float dist = Math.min(cons.dst(unit) - buildingRange, 0);
+                            float dist = Math.min(cons.dst(unit) - unit.type.buildRange, 0);
 
                             //make sure you can reach the plan in time
                             if(dist / unit.speed() < cons.buildCost * 0.9f){

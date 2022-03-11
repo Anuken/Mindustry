@@ -254,7 +254,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(called = Loc.server, targets = Loc.both, forward = true)
     public static void requestItem(Player player, Building build, Item item, int amount){
-        if(player == null || build == null || !build.interactable(player.team()) || !player.within(build, buildingRange) || player.dead()) return;
+        if(player == null || build == null || !build.interactable(player.team()) || !player.within(build, itemTransferRange) || player.dead()) return;
 
         if(net.server() && (!Units.canInteract(player, build) ||
         !netServer.admins.allowAction(player, ActionType.withdrawItem, build.tile(), action -> {
@@ -270,7 +270,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(targets = Loc.both, forward = true, called = Loc.server)
     public static void transferInventory(Player player, Building build){
-        if(player == null || build == null || !player.within(build, buildingRange) || build.items == null || player.dead()) return;
+        if(player == null || build == null || !player.within(build, itemTransferRange) || build.items == null || player.dead()) return;
 
         if(net.server() && (player.unit().stack.amount <= 0 || !Units.canInteract(player, build) ||
         !netServer.admins.allowAction(player, ActionType.depositItem, build.tile, action -> {

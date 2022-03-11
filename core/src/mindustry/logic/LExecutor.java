@@ -483,7 +483,7 @@ public class LExecutor{
                         }
                     }
                     case getBlock -> {
-                        float range = Math.max(unit.range(), buildingRange);
+                        float range = Math.max(unit.range(), unit.type.buildRange);
                         if(!unit.within(x1, y1, range)){
                             exec.setobj(p3, null);
                             exec.setobj(p4, null);

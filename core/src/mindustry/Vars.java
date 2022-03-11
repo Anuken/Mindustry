@@ -86,7 +86,7 @@ public class Vars implements Loadable{
     public static final float itemSize = 5f;
     /** units outside this bound will die instantly */
     public static final float finalWorldBounds = 250;
-    /** range for building */
+    /** default range for building */
     public static final float buildingRange = 220f;
     /** range for moving items */
     public static final float itemTransferRange = 220f;
