@@ -313,7 +313,7 @@ public class TypeIO{
     /** @return the maximum acceptable amount of plans to send over the network */
     public static int getMaxPlans(Queue<BuildPlan> plans){
         //limit to prevent buffer overflows
-        int used = Math.min(plans.size, 15);
+        int used = Math.min(plans.size, 20);
         int totalLength = 0;
 
         //prevent buffer overflow by checking config length

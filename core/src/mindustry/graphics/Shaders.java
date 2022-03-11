@@ -359,20 +359,14 @@ public class Shaders{
     public static class ShockwaveShader extends LoadShader{
         static final int max = 64;
         static final int size = 5;
-        static final String[] uniformNames = new String[max];
 
         //x y radius life[1-0] lifetime
         protected FloatSeq data = new FloatSeq();
+        protected FloatSeq uniforms = new FloatSeq();
         protected boolean hadAny = false;
         protected FrameBuffer buffer = new FrameBuffer();
 
         public float lifetime = 20f;
-
-        static{
-            for(int i = 0; i < max; i++){
-                uniformNames[i] = "u_shockwaves[" + i + "]";
-            }
-        }
 
         public ShockwaveShader(){
             super("shockwave", "screenspace");
@@ -429,17 +423,21 @@ public class Shaders{
                 setUniformf("u_resolution", Core.camera.width, Core.camera.height);
                 setUniformf("u_campos", Core.camera.position.x - Core.camera.width/2f, Core.camera.position.y - Core.camera.height/2f);
 
+                uniforms.clear();
+
                 var items = data.items;
                 for(int i = 0; i < count; i++){
                     int offset = i * size;
 
-                    setUniformf(uniformNames[i],
-                        items[offset], items[offset + 1], //xy
-                        items[offset + 2] * (1f - items[offset + 3]), //radius * time
-                        items[offset + 3] //time
-                        //lifetime ignored
+                    uniforms.add(
+                    items[offset], items[offset + 1], //xy
+                    items[offset + 2] * (1f - items[offset + 3]), //radius * time
+                    items[offset + 3] //time
+                    //lifetime ignored
                     );
                 }
+
+                setUniform4fv("u_shockwaves", uniforms.items, 0, uniforms.size);
             }
         }
 

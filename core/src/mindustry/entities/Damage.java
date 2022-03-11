@@ -472,7 +472,7 @@ public class Damage{
             }
 
             //cap radius to prevent lag
-            float radius = Math.min(baseRadius, 30), rad2 = radius * radius;
+            float radius = Math.min(baseRadius, 100), rad2 = radius * radius;
             int rays = Mathf.ceil(radius * 2 * Mathf.pi);
             double spacing = Math.PI * 2.0 / rays;
             damages.clear();
