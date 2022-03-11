@@ -471,7 +471,7 @@ public class ContentParser{
                 }
 
                 if(value.has("defaultController")){
-                    unit.defaultController = u -> supply(resolve(value.getString("defaultController"), FlyingAI.class)).get();
+                    unit.controller = u -> supply(resolve(value.getString("defaultController"), FlyingAI.class)).get();
                     value.remove("defaultController");
                 }
 

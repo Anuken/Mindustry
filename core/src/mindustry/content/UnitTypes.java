@@ -1245,7 +1245,7 @@ public class UnitTypes{
         //region air support
 
         mono = new UnitType("mono"){{
-            defaultController = u -> new MinerAI();
+            controller = u -> new MinerAI();
 
             flying = true;
             drag = 0.06f;
@@ -1264,7 +1264,7 @@ public class UnitTypes{
         }};
 
         poly = new UnitType("poly"){{
-            defaultController = u -> new BuilderAI();
+            controller = u -> new BuilderAI();
 
             flying = true;
             drag = 0.05f;
@@ -3418,7 +3418,7 @@ public class UnitTypes{
         //TODO bad name
         evoke = new ErekirUnitType("evoke"){{
             coreUnitDock = true;
-            defaultController = u -> new BuilderAI(true, coreFleeRange);
+            controller = u -> new BuilderAI(true, coreFleeRange);
             isCounted = false;
             envDisabled = 0;
 
@@ -3478,7 +3478,7 @@ public class UnitTypes{
 
         incite = new ErekirUnitType("incite"){{
             coreUnitDock = true;
-            defaultController = u -> new BuilderAI(true, coreFleeRange);
+            controller = u -> new BuilderAI(true, coreFleeRange);
             isCounted = false;
             envDisabled = 0;
 
@@ -3551,7 +3551,7 @@ public class UnitTypes{
 
         emanate = new ErekirUnitType("emanate"){{
             coreUnitDock = true;
-            defaultController = u -> new BuilderAI(true, coreFleeRange);
+            controller = u -> new BuilderAI(true, coreFleeRange);
             isCounted = false;
             envDisabled = 0;
 

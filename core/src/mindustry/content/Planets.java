@@ -146,6 +146,7 @@ public class Planets{
             minZoom = 0.6f;
             drawOrbit = false;
             clipRadius = 2f;
+            defaultEnv = Env.space;
 
             generator = new AsteroidGenerator();
             cgen.get((AsteroidGenerator)generator);

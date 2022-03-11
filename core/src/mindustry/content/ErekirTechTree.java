@@ -270,10 +270,10 @@ public class ErekirTechTree{
 
                 });
 
-                node(tankReconstructor, () -> {
+                node(tankReconstructor, Seq.with(new OnSector(three)), () -> {
                     node(UnitTypes.locus);
 
-                    node(shipReconstructor, () -> {
+                    node(shipReconstructor, Seq.with(new OnSector(four)), () -> {
                         node(UnitTypes.avert);
 
                         node(mechReconstructor, () -> {
