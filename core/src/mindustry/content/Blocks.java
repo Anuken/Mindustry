@@ -1874,7 +1874,6 @@ public class Blocks{
 
         duct = new Duct("duct"){{
             requirements(Category.distribution, with(Items.beryllium, 1));
-            //TODO bad idea? should this just require 1 beryllium?
             health = 90;
             speed = 4f;
             fogRadius = 1;
@@ -1891,7 +1890,6 @@ public class Blocks{
         }};
 
         overflowDuct = new OverflowDuct("overflow-duct"){{
-            //TODO should it use beryllium?
             requirements(Category.distribution, with(Items.graphite, 8, Items.beryllium, 8));
             health = 90;
             speed = 4f;
