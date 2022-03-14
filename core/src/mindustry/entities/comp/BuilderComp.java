@@ -48,6 +48,8 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
     }
 
     public void updateBuildLogic(){
+        if(type.buildSpeed <= 0f) return;
+
         if(!headless){
             //visual activity update
             if(lastActive != null && buildAlpha <= 0.01f){

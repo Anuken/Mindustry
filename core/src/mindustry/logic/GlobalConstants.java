@@ -25,7 +25,7 @@ public class GlobalConstants{
     public static final Rand rand = new Rand();
 
     //non-constants that depend on state
-    private static int varTime, varTick, varWave, varWaveTime;
+    private static int varTime, varTick, varSecond, varMinute, varWave, varWaveTime;
 
     private ObjectIntMap<String> namesToIds = new ObjectIntMap<>();
     private Seq<Var> vars = new Seq<>(Var.class);
@@ -42,6 +42,8 @@ public class GlobalConstants{
         //time
         varTime = put("@time", 0);
         varTick = put("@tick", 0);
+        varSecond = put("@second", 0);
+        varMinute = put("@minute", 0);
         varWave = put("@waveNumber", 0);
         varWaveTime = put("@waveTime", 0);
 
@@ -119,6 +121,10 @@ public class GlobalConstants{
         //having time be based off of user system time was a very bad idea.
         vars.items[varTime].numval = state.tick / 60.0 * 1000.0;
         vars.items[varTick].numval = state.tick;
+
+        //shorthands for seconds/minutes spent in save
+        vars.items[varSecond].numval = state.tick / 60f;
+        vars.items[varMinute].numval = state.tick / 60f / 60f;
 
         //wave state
         vars.items[varWave].numval = state.wave;

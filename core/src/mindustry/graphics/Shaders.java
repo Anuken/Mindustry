@@ -416,7 +416,7 @@ public class Shaders{
 
         @Override
         public void apply(){
-            int count = data.size / 4;
+            int count = data.size / size;
 
             setUniformi("u_shockwave_count", count);
             if(count > 0){

@@ -6,7 +6,7 @@ import mindustry.*;
 import mindustry.ctype.*;
 
 public class PayloadSeq{
-    private ObjectIntMap<UnlockableContent> blocks = new ObjectIntMap<>();
+    private ObjectIntMap<UnlockableContent> payloads = new ObjectIntMap<>();
     private int total;
 
     public boolean isEmpty(){
@@ -26,7 +26,7 @@ public class PayloadSeq{
     }
 
     public void add(UnlockableContent block, int amount){
-        blocks.increment(block, amount);
+        payloads.increment(block, amount);
         total += amount;
     }
 
@@ -43,12 +43,12 @@ public class PayloadSeq{
     }
 
     public void clear(){
-        blocks.clear();
+        payloads.clear();
         total = 0;
     }
 
     public int get(UnlockableContent block){
-        return blocks.get(block);
+        return payloads.get(block);
     }
 
     public boolean contains(Seq<PayloadStack> stacks){
@@ -70,8 +70,8 @@ public class PayloadSeq{
     public void write(Writes write){
         //IMPORTANT NOTICE: size is negated here because I changed the format of this class at some point
         //negated = new format
-        write.s(-blocks.size);
-        for(var entry : blocks.entries()){
+        write.s(-payloads.size);
+        for(var entry : payloads.entries()){
             write.b(entry.key.getContentType().ordinal());
             write.s(entry.key.id);
             write.i(entry.value);
@@ -80,7 +80,7 @@ public class PayloadSeq{
 
     public void read(Reads read){
         total = 0;
-        blocks.clear();
+        payloads.clear();
         short amount = read.s();
         if(amount >= 0){
             //old format, block only - can safely ignore, really

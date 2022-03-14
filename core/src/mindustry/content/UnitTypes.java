@@ -387,7 +387,7 @@ public class UnitTypes{
                         status = StatusEffects.shocked;
                         statusDuration = 10f;
                         hittable = false;
-                        healPercent = 2f;
+                        healPercent = 1.6f;
                         collidesTeam = true;
                     }};
                 }};
@@ -632,7 +632,7 @@ public class UnitTypes{
         }};
 
         atrax = new UnitType("atrax"){{
-            speed = 0.57f;
+            speed = 0.6f;
             drag = 0.4f;
             hitSize = 13f;
             rotateSpeed = 3f;
@@ -672,11 +672,11 @@ public class UnitTypes{
         }};
 
         spiroct = new UnitType("spiroct"){{
-            speed = 0.52f;
+            speed = 0.54f;
             drag = 0.4f;
             hitSize = 15f;
             rotateSpeed = 3f;
-            health = 940;
+            health = 1000;
             immunities = ObjectSet.with(StatusEffects.burning, StatusEffects.melting);
             legCount = 6;
             legLength = 13f;
@@ -979,7 +979,7 @@ public class UnitTypes{
             targetAir = false;
             targetFlags = new BlockFlag[]{BlockFlag.generator, null};
             hitSize = 7;
-            itemCapacity = 0;
+            itemCapacity = 10;
 
             weapons.add(new Weapon(){{
                 y = 0f;

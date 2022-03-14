@@ -1,6 +1,6 @@
 #define MAX_SHOCKWAVES 64
-#define WAVE_RADIUS 4.0
-#define DIFF_SCL 1
+#define WAVE_RADIUS 5.0
+#define DIFF_SCL 1.5
 #define WAVE_POW 0.8
 
 varying vec2 v_texCoords;
@@ -19,12 +19,12 @@ void main(){
     for(int i = 0; i < MAX_SHOCKWAVES; i ++){
         vec4 wave = u_shockwaves[i];
         float radius = wave.z;
-        float strength = wave.w;
         float dst = distance(worldCoords, wave.xy);
-        float realStrength = 1.0 - pow(1.0 - strength, 5.0);
+        float strength = wave.w * (1.0 - abs(dst - radius) / WAVE_RADIUS);
 
         if(abs(dst - radius) <= WAVE_RADIUS){
-            float diff = dst - radius;
+            float diff = (dst - radius);
+
             float pdiff = 1.0 - pow(abs(diff * DIFF_SCL), WAVE_POW);
             float diffTime = diff  * pdiff;
             vec2 relative = normalize(worldCoords - wave.xy);
