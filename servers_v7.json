@@ -82,5 +82,9 @@
   {
     "name": "M-DE",
     "address": ["mindustry.inc.li:6569", "mindustry.inc.li:6560"]
+  },
+  {
+    "name": "Surrealment V7",
+    "address": ["md.surrealment.com:6567"]
   }
 ]
