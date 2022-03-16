@@ -141,7 +141,7 @@ public class CustomRulesDialog extends BaseDialog{
         check("@rules.waves", b -> rules.waves = b, () -> rules.waves);
         check("@rules.wavetimer", b -> rules.waveTimer = b, () -> rules.waveTimer);
         check("@rules.waitForWaveToEnd", b -> rules.waitEnemies = b, () -> rules.waitEnemies);
-        numberFlt("@rules.wavespacing", false, f -> rules.waveSpacing = f * 60f, () -> rules.waveSpacing / 60f, () -> true, 1, Float.MAX_VALUE);
+        numberFlt("@rules.wavespacing", f -> rules.waveSpacing = f * 60f, () -> rules.waveSpacing / 60f, () -> true, 1, Float.MAX_VALUE);
         number("@rules.dropzoneradius", f -> rules.dropZoneRadius = f * tilesize, () -> rules.dropZoneRadius / tilesize, () -> true);
 
         title("@rules.title.resourcesbuilding");
@@ -224,7 +224,7 @@ public class CustomRulesDialog extends BaseDialog{
                 number("@rules.blockdamagemultiplier", f -> teams.blockDamageMultiplier = f, () -> teams.blockDamageMultiplier);
 
                 check("@rules.buildai", b -> teams.ai = b, () -> teams.ai, () -> team != rules.defaultTeam);
-                numberFlt("@rules.aitier", false, f -> teams.aiTier = f, () -> teams.aiTier, () -> teams.ai, 0, 1);
+                numberFlt("@rules.aitier", f -> teams.aiTier = f, () -> teams.aiTier, () -> teams.ai, 0, 1);
 
                 check("@rules.infiniteresources", b -> teams.infiniteResources = b, () -> teams.infiniteResources);
                 number("@rules.buildspeedmultiplier", f -> teams.buildSpeedMultiplier = f, () -> teams.buildSpeedMultiplier, 0.001f, 50f);
@@ -251,15 +251,15 @@ public class CustomRulesDialog extends BaseDialog{
     }
 
     void number(String text, Floatc cons, Floatp prov){
-        numberFlt(text, false, cons, prov, () -> true, 0, Float.MAX_VALUE);
+        numberFlt(text, cons, prov, () -> true, 0, Float.MAX_VALUE);
     }
 
     void number(String text, Floatc cons, Floatp prov, float min, float max){
-        numberFlt(text, false, cons, prov, () -> true, min, max);
+        numberFlt(text, cons, prov, () -> true, min, max);
     }
 
     void number(String text, Floatc cons, Floatp prov, Boolp condition){
-        numberFlt(text, false, cons, prov, condition, 0, Float.MAX_VALUE);
+        numberFlt(text, cons, prov, condition, 0, Float.MAX_VALUE);
     }
 
     void numberInt(String text, Intc cons, Intp prov, int min, int max){
@@ -272,8 +272,7 @@ public class CustomRulesDialog extends BaseDialog{
         }).padTop(0).row();
     }
 
-    //TODO integer param unused
-    void numberFlt(String text, boolean integer, Floatc cons, Floatp prov, Boolp condition, float min, float max){
+    void numberFlt(String text, Floatc cons, Floatp prov, Boolp condition, float min, float max){
         main.table(t -> {
             t.left();
             t.add(text).left().padRight(5)
