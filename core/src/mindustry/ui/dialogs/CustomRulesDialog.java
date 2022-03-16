@@ -141,8 +141,8 @@ public class CustomRulesDialog extends BaseDialog{
         check("@rules.waves", b -> rules.waves = b, () -> rules.waves);
         check("@rules.wavetimer", b -> rules.waveTimer = b, () -> rules.waveTimer);
         check("@rules.waitForWaveToEnd", b -> rules.waitEnemies = b, () -> rules.waitEnemies);
-        number("@rules.wavespacing", false, f -> rules.waveSpacing = f * 60f, () -> rules.waveSpacing / 60f, () -> true, 1, Float.MAX_VALUE);
-        number("@rules.dropzoneradius", false, f -> rules.dropZoneRadius = f * tilesize, () -> rules.dropZoneRadius / tilesize, () -> true);
+        numberFlt("@rules.wavespacing", false, f -> rules.waveSpacing = f * 60f, () -> rules.waveSpacing / 60f, () -> true, 1, Float.MAX_VALUE);
+        number("@rules.dropzoneradius", f -> rules.dropZoneRadius = f * tilesize, () -> rules.dropZoneRadius / tilesize, () -> true);
 
         title("@rules.title.resourcesbuilding");
         check("@rules.infiniteresources", b -> rules.infiniteResources = b, () -> rules.infiniteResources);
@@ -150,9 +150,9 @@ public class CustomRulesDialog extends BaseDialog{
         check("@rules.schematic", b -> rules.schematicsAllowed = b, () -> rules.schematicsAllowed);
         check("@rules.coreincinerates", b -> rules.coreIncinerates = b, () -> rules.coreIncinerates);
         check("@rules.cleanupdeadteams", b -> rules.cleanupDeadTeams = b, () -> rules.cleanupDeadTeams, () -> rules.pvp);
-        number("@rules.buildcostmultiplier", false, f -> rules.buildCostMultiplier = f, () -> rules.buildCostMultiplier, () -> !rules.infiniteResources);
+        number("@rules.buildcostmultiplier", f -> rules.buildCostMultiplier = f, () -> rules.buildCostMultiplier, () -> !rules.infiniteResources);
         number("@rules.buildspeedmultiplier", f -> rules.buildSpeedMultiplier = f, () -> rules.buildSpeedMultiplier, 0.001f, 50f);
-        number("@rules.deconstructrefundmultiplier", false, f -> rules.deconstructRefundMultiplier = f, () -> rules.deconstructRefundMultiplier, () -> !rules.infiniteResources);
+        number("@rules.deconstructrefundmultiplier", f -> rules.deconstructRefundMultiplier = f, () -> rules.deconstructRefundMultiplier, () -> !rules.infiniteResources);
         number("@rules.blockhealthmultiplier", f -> rules.blockHealthMultiplier = f, () -> rules.blockHealthMultiplier);
         number("@rules.blockdamagemultiplier", f -> rules.blockDamageMultiplier = f, () -> rules.blockDamageMultiplier);
 
@@ -170,7 +170,7 @@ public class CustomRulesDialog extends BaseDialog{
         title("@rules.title.unit");
         check("@rules.unitammo", b -> rules.unitAmmo = b, () -> rules.unitAmmo);
         check("@rules.unitcapvariable", b -> rules.unitCapVariable = b, () -> rules.unitCapVariable);
-        number("@rules.unitcap", true, f -> rules.unitCap = f, () -> rules.unitCap, -999, 999);
+        numberInt("@rules.unitcap", f -> rules.unitCap = f, () -> rules.unitCap, -999, 999);
         number("@rules.unitdamagemultiplier", f -> rules.unitDamageMultiplier = f, () -> rules.unitDamageMultiplier);
         number("@rules.unitbuildspeedmultiplier", f -> rules.unitBuildSpeedMultiplier = f, () -> rules.unitBuildSpeedMultiplier, 0.001f, 50f);
 
@@ -224,7 +224,7 @@ public class CustomRulesDialog extends BaseDialog{
                 number("@rules.blockdamagemultiplier", f -> teams.blockDamageMultiplier = f, () -> teams.blockDamageMultiplier);
 
                 check("@rules.buildai", b -> teams.ai = b, () -> teams.ai, () -> team != rules.defaultTeam);
-                number("@rules.aitier", false, f -> teams.aiTier = f, () -> teams.aiTier, () -> teams.ai, 0, 1);
+                numberFlt("@rules.aitier", false, f -> teams.aiTier = f, () -> teams.aiTier, () -> teams.ai, 0, 1);
 
                 check("@rules.infiniteresources", b -> teams.infiniteResources = b, () -> teams.infiniteResources);
                 number("@rules.buildspeedmultiplier", f -> teams.buildSpeedMultiplier = f, () -> teams.buildSpeedMultiplier, 0.001f, 50f);
@@ -251,23 +251,18 @@ public class CustomRulesDialog extends BaseDialog{
     }
 
     void number(String text, Floatc cons, Floatp prov){
-        number(text, false, cons, prov, () -> true, 0, Float.MAX_VALUE);
+        numberFlt(text, false, cons, prov, () -> true, 0, Float.MAX_VALUE);
     }
 
     void number(String text, Floatc cons, Floatp prov, float min, float max){
-        number(text, false, cons, prov, () -> true, min, max);
-    }
-
-    void number(String text, boolean integer, Floatc cons, Floatp prov, Boolp condition){
-        number(text, integer, cons, prov, condition, 0, Float.MAX_VALUE);
+        numberFlt(text, false, cons, prov, () -> true, min, max);
     }
 
     void number(String text, Floatc cons, Floatp prov, Boolp condition){
-        number(text, false, cons, prov, condition, 0, Float.MAX_VALUE);
+        numberFlt(text, false, cons, prov, condition, 0, Float.MAX_VALUE);
     }
 
-    //TODO integer param unused
-    void number(String text, boolean integer, Intc cons, Intp prov, int min, int max){
+    void numberInt(String text, Intc cons, Intp prov, int min, int max){
         main.table(t -> {
             t.left();
             t.add(text).left().padRight(5);
@@ -277,12 +272,13 @@ public class CustomRulesDialog extends BaseDialog{
         }).padTop(0).row();
     }
 
-    void number(String text, boolean integer, Floatc cons, Floatp prov, Boolp condition, float min, float max){
+    //TODO integer param unused
+    void numberFlt(String text, boolean integer, Floatc cons, Floatp prov, Boolp condition, float min, float max){
         main.table(t -> {
             t.left();
             t.add(text).left().padRight(5)
             .update(a -> a.setColor(condition.get() ? Color.white : Color.gray));
-            t.field((integer ? (int)prov.get() : prov.get()) + "", s -> cons.get(Strings.parseFloat(s)))
+            t.field(((int)prov.get()) + "", s -> cons.get(Strings.parseFloat(s)))
             .padRight(100f)
             .update(a -> a.setDisabled(!condition.get()))
             .valid(f -> Strings.canParsePositiveFloat(f) && Strings.parseFloat(f) >= min && Strings.parseFloat(f) <= max).width(120f).left();
