@@ -200,12 +200,13 @@ public class PowerNode extends PowerBlock{
     }
 
     //shared code from getPotentialLinks and getNodeLinks
-    private static void getLinksSharedCode(int linkRadius, Tile tile, Boolf<Building> valid, Cons consumer, int count){
+    private static void getLinksSharedCode(int linkRadius, Tile tile, Boolf<Building> valid, Cons<Tile> consumer, int count){
         tempTileEnts.clear();
         graphs.clear();
 
         for (var p: Edges.getEdges(count)) {
-            consumer.get(p);
+            Tile other = tile.nearby(p);
+            consumer.get(other);
         }
 
         if (tile.build != null && tile.build.power != null) {
@@ -238,8 +239,7 @@ public class PowerNode extends PowerBlock{
                     return t != null && t.build == other;
                 });
 
-        getLinksSharedCode((int)(laserRange + 2), tile, valid, p -> {
-            Tile other = tile.nearby((Point2)p);
+        getLinksSharedCode((int)(laserRange + 2), tile, valid, other -> {
             if(other != null && other.team() == team && other.build != null && other.build.power != null){
                 graphs.add(other.build.power.graph);
             }
@@ -267,8 +267,7 @@ public class PowerNode extends PowerBlock{
                     return t != null && t.build == other;
                 });
 
-        getLinksSharedCode(13, tile, valid, p -> {
-            Tile other = tile.nearby((Point2) p);
+        getLinksSharedCode(13, tile, valid, other -> {
             if (other != null && other.team() == team && other.build != null && other.build.power != null
                     && !(block.consumesPower && other.block().consumesPower && !block.outputsPower && !other.block().outputsPower)){
                 graphs.add(other.build.power.graph);
