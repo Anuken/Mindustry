@@ -63,6 +63,17 @@ public class Unloader extends Block{
         boolean canLoad;
         boolean canUnload;
         int index;
+
+        @Override
+        public String toString(){
+            return "ContainerStat{" +
+            "building=" + building.block + "#" + building.id +
+            ", loadFactor=" + loadFactor +
+            ", canLoad=" + canLoad +
+            ", canUnload=" + canUnload +
+            ", index=" + index +
+            '}';
+        }
     }
 
     public class UnloaderBuild extends Building{
@@ -76,7 +87,7 @@ public class Unloader extends Block{
         protected final Comparator<ContainerStat> comparator = Structs.comps(
             Structs.comps(
                 Structs.comparingBool(e -> e.building.block.highUnloadPriority && !e.canLoad),
-                Structs.comparingBool(e -> e.canUnload && !e.canLoad)
+                Structs.comparingBool(e -> e.canUnload) // && !e.canLoad
             ),
             Structs.comps(
                 Structs.comparingFloat(e -> e.loadFactor),
@@ -171,7 +182,7 @@ public class Unloader extends Block{
                     }
                 }
 
-                //choose the building to give the item
+                //choose the building to take the item from
                 for(int i = possibleBlocks.size - 1; i >= 0; i--){
                     if(possibleBlocks.get(i).canUnload){
                         dumpingFrom = possibleBlocks.get(i);
@@ -181,10 +192,11 @@ public class Unloader extends Block{
 
                 //increment the priority if not used
                 for(int i = 0; i < possibleBlocks.size; i++){
-                    lastUsed[i] = (lastUsed[i] + 1 ) % 2147483647;
+                    lastUsed[i] = (lastUsed[i] + 1) % 2147483647;
                 }
 
                 //trade the items
+                //TODO  && dumpingTo != dumpingFrom ?
                 if(dumpingFrom != null && dumpingTo != null && (dumpingFrom.loadFactor != dumpingTo.loadFactor || !dumpingFrom.canLoad)){
                     dumpingTo.building.handleItem(this, item);
                     dumpingFrom.building.removeStack(item, 1);
