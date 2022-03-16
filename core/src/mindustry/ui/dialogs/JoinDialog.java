@@ -24,8 +24,6 @@ import mindustry.ui.*;
 import static mindustry.Vars.*;
 
 public class JoinDialog extends BaseDialog{
-    //TODO unused
-    Seq<Host> commmunityHosts = new Seq<>();
     Seq<Server> servers = new Seq<>();
     Dialog add;
     Server renaming;
@@ -360,7 +358,6 @@ public class JoinDialog extends BaseDialog{
     }
 
     void refreshCommunity(){
-        commmunityHosts.clear();
         int cur = refreshes;
 
         global.clear();
@@ -381,8 +378,6 @@ public class JoinDialog extends BaseDialog{
                 net.pingHost(resaddress, resport, res -> {
                     if(refreshes != cur) return;
                     res.port = resport;
-
-                    commmunityHosts.add(res);
 
                     //add header
                     if(groupTable[0] == null){
