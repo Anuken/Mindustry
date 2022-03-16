@@ -1,5 +1,6 @@
 package mindustry.maps.planet;
 
+import arc.func.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -150,6 +151,23 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
     protected float noise(float x, float y, double octaves, double falloff, double scl, double mag){
         Vec3 v = sector.rect.project(x, y).scl(5f);
         return Simplex.noise3d(seed, octaves, falloff, 1f / scl, v.x, v.y, v.z) * (float)mag;
+    }
+
+    private boolean LoopedGenerator(int deepRadius, Boolf<Tile> provider, int x, int y) {
+        for(int cx = -deepRadius; cx <= deepRadius; cx++){
+            for(int cy = -deepRadius; cy <= deepRadius; cy++){
+                if((cx) * (cx) + (cy) * (cy) <= deepRadius * deepRadius){
+                    int wx = cx + x, wy = cy + y;
+
+                    Tile tile = tiles.get(wx, wy);
+                    if(tile != null && provider.get(tile)){
+                        //found something, skip replacing anything
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     @Override
@@ -368,19 +386,10 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
 
             if(floor.asFloor().isLiquid && floor.asFloor().shallow){
 
-                for(int cx = -deepRadius; cx <= deepRadius; cx++){
-                    for(int cy = -deepRadius; cy <= deepRadius; cy++){
-                        if((cx) * (cx) + (cy) * (cy) <= deepRadius * deepRadius){
-                            int wx = cx + x, wy = cy + y;
-
-                            Tile tile = tiles.get(wx, wy);
-                            if(tile != null && (!tile.floor().isLiquid || tile.block() != Blocks.air)){
-                                //found something solid, skip replacing anything
-                                return;
-                            }
-                        }
-                    }
-                }
+                //call extracted private function instead
+                if (LoopedGenerator(deepRadius, (tile) -> {
+                    return (!tile.floor().isLiquid || tile.block() != Blocks.air);
+                    }, x, y)) return;
 
                 floor = floor == Blocks.darksandTaintedWater ? Blocks.taintedWater : Blocks.water;
             }
@@ -389,23 +398,13 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
         if(naval){
             int deepRadius = 2;
 
-            //TODO code is very similar, but annoying to extract into a separate function
             pass((x, y) -> {
                 if(floor.asFloor().isLiquid && !floor.asFloor().isDeep() && !floor.asFloor().shallow){
 
-                    for(int cx = -deepRadius; cx <= deepRadius; cx++){
-                        for(int cy = -deepRadius; cy <= deepRadius; cy++){
-                            if((cx) * (cx) + (cy) * (cy) <= deepRadius * deepRadius){
-                                int wx = cx + x, wy = cy + y;
-
-                                Tile tile = tiles.get(wx, wy);
-                                if(tile != null && (tile.floor().shallow || !tile.floor().isLiquid)){
-                                    //found something shallow, skip replacing anything
-                                    return;
-                                }
-                            }
-                        }
-                    }
+                    //call extracted private function
+                    if (LoopedGenerator(deepRadius, (tile) -> {
+                        return (tile.floor().shallow || !tile.floor().isLiquid);
+                    }, x, y)) return;
 
                     floor = floor == Blocks.water ? Blocks.deepwater : Blocks.taintedWater;
                 }
