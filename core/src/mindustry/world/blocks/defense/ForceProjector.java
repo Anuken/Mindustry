@@ -130,7 +130,7 @@ public class ForceProjector extends Block{
 
         @Override
         public void updateTile(){
-            boolean phaseValid = consumes.get(ConsumeType.item).valid(this);
+            boolean phaseValid = consumes.has(ConsumeType.item) && consumes.getItem().valid(this);
 
             phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(phaseValid), 0.1f);
 
