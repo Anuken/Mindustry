@@ -156,6 +156,16 @@ public class KeybindDialog extends Dialog{
                         rebindMin = true;
                         openDialog(section, keybind);
                     }).width(130f);
+
+                    if(keybind.defaultValue(section.device.type()) != keybinds.get(section, keybind)){
+                        table.button("@settings.resetKey", tstyle, () -> {
+                            keybinds.resetToDefault(section, keybind);
+                            setup();
+                        }).width(130f);
+                    }else{
+                        /** Adds a space in case keybind is not a modified key */
+                        table.add().width(130f);
+                    }
                 }else{
                     table.add(bundle.get("keybind." + keybind.name() + ".name", Strings.capitalize(keybind.name())),
                     style.keyNameColor).left().padRight(40).padLeft(8);
@@ -167,11 +177,17 @@ public class KeybindDialog extends Dialog{
                         rebindMin = false;
                         openDialog(section, keybind);
                     }).width(130f);
+
+                    if(keybind.defaultValue(section.device.type()) != keybinds.get(section, keybind).key){
+                        table.button("@settings.resetKey", tstyle, () -> {
+                            keybinds.resetToDefault(section, keybind);
+                            setup();
+                        }).width(130f);
+                    }else{
+                        /** Adds a space in case keybind is not a modified key */
+                        table.add().width(130f);
+                    }
                 }
-                table.button("@settings.resetKey", tstyle, () -> {
-                    keybinds.resetToDefault(section, keybind);
-                    setup();
-                }).width(130f);
                 table.row();
             }
 
