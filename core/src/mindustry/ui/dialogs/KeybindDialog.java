@@ -129,6 +129,7 @@ public class KeybindDialog extends Dialog{
 
             String lastCategory = null;
             var tstyle = Styles.defaultt;
+            boolean allDefaultKeys = true;
 
             for(KeyBind keybind : keybinds.getKeybinds()){
                 if(lastCategory != keybind.category() && keybind.category() != null){
@@ -158,6 +159,7 @@ public class KeybindDialog extends Dialog{
                     }).width(130f);
 
                     if(keybind.defaultValue(section.device.type()) != keybinds.get(section, keybind)){
+                        allDefaultKeys = false;
                         table.button("@settings.resetKey", tstyle, () -> {
                             keybinds.resetToDefault(section, keybind);
                             setup();
@@ -179,6 +181,7 @@ public class KeybindDialog extends Dialog{
                     }).width(130f);
 
                     if(keybind.defaultValue(section.device.type()) != keybinds.get(section, keybind).key){
+                        allDefaultKeys = false;
                         table.button("@settings.resetKey", tstyle, () -> {
                             keybinds.resetToDefault(section, keybind);
                             setup();
@@ -193,11 +196,12 @@ public class KeybindDialog extends Dialog{
 
             table.visible(() -> this.section.equals(section));
 
-            table.button("@settings.reset", () -> {
-                keybinds.resetToDefaults();
-                setup();
-            }).colspan(4).padTop(4).fill();
-
+            if(!allDefaultKeys){
+                table.button("@settings.reset", () -> {
+                    keybinds.resetToDefaults();
+                    setup();
+                }).colspan(4).padTop(4).fill();
+            }
             stack.add(table);
         }
 
