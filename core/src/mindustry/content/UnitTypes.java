@@ -39,7 +39,7 @@ public class UnitTypes implements ContentList{
     public static @EntityDef(value = {Unitc.class, Legsc.class}, legacy = true) UnitType spiroct, arkyid, toxopid;
 
     //air
-    public static @EntityDef({Unitc.class}) UnitType flare, eclipse, horizon, zenith, antumbra;
+    public static @EntityDef({Unitc.class}) UnitType flare, eclipse, horizon, zenith, antumbra, flarogus;
 
     //air, legacy
     public static @EntityDef(value = {Unitc.class}, legacy = true) UnitType mono;
@@ -1212,6 +1212,38 @@ public class UnitTypes implements ContentList{
                 rotate = true;
                 shadow = 12f;
                 bullet = fragBullet;
+            }});
+        }};
+
+        flarogus = new UnitType("flarogus"){{
+            speed = 3f;
+            accel = 0.08f;
+            drag = 0.01f;
+            flying = true;
+            health = 75;
+            engineOffset = 5.5f;
+            range = 140f;
+            targetAir = false;
+            playerTargetFlags = new BlockFlag[]{null};
+            targetFlags = new BlockFlag[]{BlockFlag.generator, null};
+            commandLimit = 4;
+            circleTarget = true;
+            hitSize = 7;
+
+            weapons.add(new Weapon(){{
+                y = 0f;
+                x = 2f;
+                reload = 13f;
+                ejectEffect = Fx.casing1;
+                bullet = new BasicBulletType(2.5f, 9){{
+                    width = 7f;
+                    height = 9f;
+                    lifetime = 45f;
+                    shootEffect = Fx.shootSmall;
+                    smokeEffect = Fx.shootSmallSmoke;
+                    ammoMultiplier = 2;
+                }};
+                shootSound = Sounds.pew;
             }});
         }};
 
