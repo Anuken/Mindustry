@@ -6,7 +6,6 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.gen.*;
 import mindustry.type.*;
-import mindustry.world.blocks.power.*;
 import mindustry.world.meta.*;
 
 public class Consumers{
@@ -73,7 +72,7 @@ public class Consumers{
 
     /** Creates a consumer which only consumes power when the condition is met. */
     public <T extends Building> ConsumePower powerCond(float usage, Boolf<T> cons){
-        return add(new ConditionalConsumePower(usage, (Boolf<Building>)cons));
+        return add(new ConsumePowerConditional(usage, (Boolf<Building>)cons));
     }
 
     /** Creates a consumer that consumes a dynamic amount of power. */

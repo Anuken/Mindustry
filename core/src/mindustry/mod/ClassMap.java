@@ -249,7 +249,6 @@ public class ClassMap{
         classes.put("BatteryBuild", mindustry.world.blocks.power.Battery.BatteryBuild.class);
         classes.put("BurnerGenerator", mindustry.world.blocks.power.BurnerGenerator.class);
         classes.put("BurnerGeneratorBuild", mindustry.world.blocks.power.BurnerGenerator.BurnerGeneratorBuild.class);
-        classes.put("ConditionalConsumePower", mindustry.world.blocks.power.ConditionalConsumePower.class);
         classes.put("DecayGenerator", mindustry.world.blocks.power.DecayGenerator.class);
         classes.put("ImpactReactor", mindustry.world.blocks.power.ImpactReactor.class);
         classes.put("ImpactReactorBuild", mindustry.world.blocks.power.ImpactReactor.ImpactReactorBuild.class);
