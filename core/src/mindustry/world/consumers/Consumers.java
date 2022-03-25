@@ -78,7 +78,7 @@ public class Consumers{
 
     /** Creates a consumer that consumes a dynamic amount of power. */
     public <T extends Building> ConsumePower powerDynamic(Floatf<T> usage){
-        return add(new DynamicConsumePower((Floatf<Building>)usage));
+        return add(new ConsumePowerDynamic((Floatf<Building>)usage));
     }
 
     /**

@@ -1,6 +1,7 @@
 package mindustry.mod;
 
 import arc.struct.*;
+
 /** Generated class. Maps simple class names to concrete classes. For use in JSON mods. */
 @SuppressWarnings("deprecation")
 public class ClassMap{
@@ -250,7 +251,6 @@ public class ClassMap{
         classes.put("BurnerGeneratorBuild", mindustry.world.blocks.power.BurnerGenerator.BurnerGeneratorBuild.class);
         classes.put("ConditionalConsumePower", mindustry.world.blocks.power.ConditionalConsumePower.class);
         classes.put("DecayGenerator", mindustry.world.blocks.power.DecayGenerator.class);
-        classes.put("DynamicConsumePower", mindustry.world.blocks.power.DynamicConsumePower.class);
         classes.put("ImpactReactor", mindustry.world.blocks.power.ImpactReactor.class);
         classes.put("ImpactReactorBuild", mindustry.world.blocks.power.ImpactReactor.ImpactReactorBuild.class);
         classes.put("ItemLiquidGenerator", mindustry.world.blocks.power.ItemLiquidGenerator.class);
