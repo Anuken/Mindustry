@@ -944,6 +944,7 @@ public class UnitTypes implements ContentList{
             accel = 0.08f;
             drag = 0.01f;
             flying = true;
+            lowAltitude = true;
             health = 75;
             engineOffset = 5.5f;
             range = 140f;
@@ -955,20 +956,33 @@ public class UnitTypes implements ContentList{
             circleTarget = true;
             hitSize = 7;
 
-            weapons.add(new Weapon(){{
-                y = 0f;
-                x = 2f;
-                reload = 13f;
-                ejectEffect = Fx.casing1;
-                bullet = new BasicBulletType(2.5f, 9){{
-                    width = 7f;
-                    height = 9f;
-                    lifetime = 45f;
-                    shootEffect = Fx.shootSmall;
-                    smokeEffect = Fx.shootSmallSmoke;
-                    ammoMultiplier = 2;
+            weapons.add(new Weapon(){{ //This is completely normal, definitely absolutely nothing has changed
+                x = 5.5f / 4f;
+                y = 8.5f / 4f;
+                reload = 10f;
+                mirror = false;
+                bullet = new LaserBulletType(){{
+                    length = 460f;
+                    damage = 560f;
+                    width = 75f;
+
+                    lifetime = 20f;
+
+                    lightningSpacing = 35f;
+                    lightningLength = 5;
+                    lightningDelay = 1.1f;
+                    lightningLengthRand = 15;
+                    lightningDamage = 50;
+                    lightningAngleRand = 40f;
+                    largeHit = true;
+                    lightColor = lightningColor = Color.red;
+
+                    sideAngle = 15f;
+                    sideWidth = 0f;
+                    sideLength = 0f;
+                    colors = new Color[]{Color.red.cpy().a(0.4f), Color.red, Color.white};
                 }};
-                shootSound = Sounds.pew;
+                shootSound = Sounds.wind3;
             }});
         }};
 
