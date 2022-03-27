@@ -3146,6 +3146,7 @@ public class UnitTypes{
             hitSize = 12f;
             engineSize = 0;
             fogRadius = 25;
+            itemCapacity = 0;
 
             setEnginesMirror(
             new UnitEngine(34 / 4f, 31 / 4f, 3f, 45f),

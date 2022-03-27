@@ -4229,7 +4229,7 @@ public class Blocks{
             size = 3;
             reloadTime = 130f;
             chargeTime = 90f;
-            range = 500f;
+            range = 600f;
             maxPayloadSize = 2.5f;
             fogRadius = 5;
             consumePower(0.5f);

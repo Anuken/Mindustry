@@ -2,6 +2,7 @@ package mindustry.world.consumers;
 
 import arc.func.*;
 import mindustry.gen.*;
+import mindustry.world.meta.*;
 
 /** A power consumer that uses a dynamic amount of power. */
 public class ConsumePowerDynamic extends ConsumePower{
@@ -15,5 +16,10 @@ public class ConsumePowerDynamic extends ConsumePower{
     @Override
     public float requestedPower(Building entity){
         return usage.get(entity);
+    }
+
+    @Override
+    public void display(Stats stats){
+
     }
 }

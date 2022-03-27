@@ -123,9 +123,15 @@ public abstract class BaseProcessor extends AbstractProcessor{
     }
 
     public static void write(TypeSpec.Builder builder, Seq<String> imports) throws Exception{
+        builder.superinterfaces.sort(Structs.comparing(t -> t.toString()));
+        builder.methodSpecs.sort(Structs.comparing(m -> m.toString()));
+        builder.fieldSpecs.sort(Structs.comparing(f -> f.name));
+
         JavaFile file = JavaFile.builder(packageName, builder.build()).skipJavaLangImports(true).build();
 
         if(imports != null){
+            imports = imports.map(m -> Seq.with(m.split("\n")).sort().toString("\n"));
+            imports.sort();
             String rawSource = file.toString();
             Seq<String> result = new Seq<>();
             for(String s : rawSource.split("\n", -1)){
