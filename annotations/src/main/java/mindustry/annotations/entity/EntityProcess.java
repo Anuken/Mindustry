@@ -853,6 +853,10 @@ public class EntityProcess extends BaseProcessor{
 
                     Stype compType = interfaceToComp(method.type());
                     MethodSpec.Builder builder = MethodSpec.overriding(method.e).addModifiers(Modifier.PUBLIC, Modifier.FINAL);
+                    int index = 0;
+                    for(ParameterSpec spec : builder.parameters){
+                        Reflect.set(spec, "name",  "arg" + index++);
+                    }
                     builder.addAnnotation(OverrideCallSuper.class); //just in case
 
                     if(!method.isVoid()){
