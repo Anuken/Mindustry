@@ -416,7 +416,7 @@ public class ServerControl implements ApplicationListener{
                 if(Groups.player.size() > 0){
                     info("  Players: @", Groups.player.size());
                     for(Player p : Groups.player){
-                        info("    @ / @", p.name, p.uuid());
+                        info("    @ / @", p.plainName(), p.uuid());
                     }
                 }else{
                     info("  No players connected.");
@@ -803,7 +803,7 @@ public class ServerControl implements ApplicationListener{
             boolean add = arg[0].equals("add");
 
             PlayerInfo target;
-            Player playert = Groups.player.find(p -> p.name.equalsIgnoreCase(arg[1]));
+            Player playert = Groups.player.find(p -> p.plainName().equalsIgnoreCase(Strings.stripColors(arg[1])));
             if(playert != null){
                 target = playert.getInfo();
             }else{
