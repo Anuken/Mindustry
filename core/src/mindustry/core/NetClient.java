@@ -233,7 +233,7 @@ public class NetClient implements ApplicationListener{
         //log commands before they are handled
         if(message.startsWith(netServer.clientCommands.getPrefix())){
             //log with brackets
-            Log.info("<&fi@: @&fr>", "&lk" + player.name, "&lw" + message);
+            Log.info("<&fi@: @&fr>", "&lk" + player.plainName(), "&lw" + message);
         }
 
         //check if it's a command
@@ -251,7 +251,7 @@ public class NetClient implements ApplicationListener{
             }
 
             //server console logging
-            Log.info("&fi@: @", "&lc" + player.name, "&lw" + message);
+            Log.info("&fi@: @", "&lc" + player.plainName(), "&lw" + message);
 
             //invoke event for all clients but also locally
             //this is required so other clients get the correct name even if they don't know who's sending it yet

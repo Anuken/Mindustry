@@ -569,6 +569,10 @@ public class Administration{
 
         public PlayerInfo(){
         }
+
+        public String plainLastName(){
+            return Strings.stripColors(lastName);
+        }
     }
 
     /** Handles chat messages from players and changes their contents. */

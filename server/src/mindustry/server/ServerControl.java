@@ -416,7 +416,7 @@ public class ServerControl implements ApplicationListener{
                 if(Groups.player.size() > 0){
                     info("  Players: @", Groups.player.size());
                     for(Player p : Groups.player){
-                        info("    @ / @", p.name, p.uuid());
+                        info("    @ @ / @", p.admin() ? "&r[A]&c" : "&b[P]&c", p.plainName(), p.uuid());
                     }
                 }else{
                     info("  No players connected.");
@@ -646,7 +646,7 @@ public class ServerControl implements ApplicationListener{
                     info("No whitelisted players found.");
                 }else{
                     info("Whitelist:");
-                    whitelist.each(p -> info("- Name: @ / UUID: @", p.lastName, p.id));
+                    whitelist.each(p -> info("- Name: @ / UUID: @", p.plainLastName(), p.id));
                 }
             }else{
                 if(arg.length == 2){
@@ -657,10 +657,10 @@ public class ServerControl implements ApplicationListener{
                     }else{
                         if(arg[0].equals("add")){
                             netServer.admins.whitelist(arg[1]);
-                            info("Player '@' has been whitelisted.", info.lastName);
+                            info("Player '@' has been whitelisted.", info.plainLastName());
                         }else if(arg[0].equals("remove")){
                             netServer.admins.unwhitelist(arg[1]);
-                            info("Player '@' has been un-whitelisted.", info.lastName);
+                            info("Player '@' has been un-whitelisted.", info.plainLastName());
                         }else{
                             err("Incorrect usage. Provide add/remove as the second argument.");
                         }
@@ -749,7 +749,7 @@ public class ServerControl implements ApplicationListener{
             }else{
                 info("Banned players [ID]:");
                 for(PlayerInfo info : bans){
-                    info(" @ / Last known name: '@'", info.id, info.lastName);
+                    info(" @ / Last known name: '@'", info.id, info.plainLastName());
                 }
             }
 
@@ -762,7 +762,7 @@ public class ServerControl implements ApplicationListener{
                 for(String string : ipbans){
                     PlayerInfo info = netServer.admins.findByIP(string);
                     if(info != null){
-                        info("  '@' / Last known name: '@' / ID: '@'", string, info.lastName, info.id);
+                        info("  '@' / Last known name: '@' / ID: '@'", string, info.plainLastName(), info.id);
                     }else{
                         info("  '@' (No known name or info)", string);
                     }
@@ -783,7 +783,7 @@ public class ServerControl implements ApplicationListener{
 
             if(info != null){
                 info.lastKicked = 0;
-                info("Pardoned player: @", info.lastName);
+                info("Pardoned player: @", info.plainLastName());
             }else{
                 err("That ID can't be found.");
             }
@@ -803,7 +803,7 @@ public class ServerControl implements ApplicationListener{
             boolean add = arg[0].equals("add");
 
             PlayerInfo target;
-            Player playert = Groups.player.find(p -> p.name.equalsIgnoreCase(arg[1]));
+            Player playert = Groups.player.find(p -> p.plainName().equalsIgnoreCase(Strings.stripColors(arg[1])));
             if(playert != null){
                 target = playert.getInfo();
             }else{
@@ -818,7 +818,7 @@ public class ServerControl implements ApplicationListener{
                     netServer.admins.unAdminPlayer(target.id);
                 }
                 if(playert != null) playert.admin = add;
-                info("Changed admin status of player: @", target.lastName);
+                info("Changed admin status of player: @", target.plainLastName());
             }else{
                 err("Nobody with that name or ID could be found. If adding an admin by name, make sure they're online; otherwise, use their UUID.");
             }
@@ -832,7 +832,7 @@ public class ServerControl implements ApplicationListener{
             }else{
                 info("Admins:");
                 for(PlayerInfo info : admins){
-                    info(" &lm @ /  ID: '@' / IP: '@'", info.lastName, info.id, info.lastIP);
+                    info(" &lm @ /  ID: '@' / IP: '@'", info.plainLastName(), info.id, info.lastIP);
                 }
             }
         });
@@ -844,7 +844,7 @@ public class ServerControl implements ApplicationListener{
                 info("Players: @", Groups.player.size());
                 for(Player user : Groups.player){
                     PlayerInfo userInfo = user.getInfo();
-                    info(" &lm @ /  ID: @ / IP: @ / Admin: @", userInfo.lastName, userInfo.id, userInfo.lastIP, userInfo.admin);
+                    info(" @&lm @ / ID: @ / IP: @", userInfo.admin ? "&r[A]&c" : "&b[P]&c", userInfo.plainLastName(), userInfo.id, userInfo.lastIP, userInfo.admin);
                 }
             }
         });
@@ -926,7 +926,7 @@ public class ServerControl implements ApplicationListener{
 
                 int i = 0;
                 for(PlayerInfo info : infos){
-                    info("[@] Trace info for player '@' / UUID @", i++, info.lastName, info.id);
+                    info("[@] Trace info for player '@' / UUID @ / RAW @", i++, info.plainLastName(), info.id, info.lastName);
                     info("  all names used: @", info.names);
                     info("  IP: @", info.lastIP);
                     info("  all IPs used: @", info.ips);
@@ -946,7 +946,7 @@ public class ServerControl implements ApplicationListener{
 
                 int i = 0;
                 for(PlayerInfo info : infos){
-                    info("- [@] '@' / @", i++, info.lastName, info.id);
+                    info("- [@] '@' / @", i++, info.plainLastName(), info.id);
                 }
             }else{
                 info("Nobody with that name could be found.");
