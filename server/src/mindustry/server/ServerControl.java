@@ -926,7 +926,7 @@ public class ServerControl implements ApplicationListener{
 
                 int i = 0;
                 for(PlayerInfo info : infos){
-                    info("[@] Trace info for player '@' / UUID @", i++, info.lastName, info.id);
+                    info("[@] Trace info for player '@' / UUID @ / RAW @", i++, info.plainLastName(), info.id, info.lastName);
                     info("  all names used: @", info.names);
                     info("  IP: @", info.lastIP);
                     info("  all IPs used: @", info.ips);
