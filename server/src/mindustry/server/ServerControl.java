@@ -416,7 +416,7 @@ public class ServerControl implements ApplicationListener{
                 if(Groups.player.size() > 0){
                     info("  Players: @", Groups.player.size());
                     for(Player p : Groups.player){
-                        info("    @ / @", p.plainName(), p.uuid());
+                        info("    @ @ / @", p.admin() ? "&r[A]&c" : "&b[P]&c", p.plainName(), p.uuid());
                     }
                 }else{
                     info("  No players connected.");
@@ -584,7 +584,7 @@ public class ServerControl implements ApplicationListener{
                 if(arg.length == 1){
                     info("'@' is currently @.", c.name(), c.get());
                 }else{
-                    if (arg[1].equals("default")){
+                    if(arg[1].equals("default")){
                         c.set(c.defaultValue);
                     }else if(c.isBool()){
                         c.set(arg[1].equals("on") || arg[1].equals("true"));
@@ -844,7 +844,7 @@ public class ServerControl implements ApplicationListener{
                 info("Players: @", Groups.player.size());
                 for(Player user : Groups.player){
                     PlayerInfo userInfo = user.getInfo();
-                    info(" &lm @ /  ID: @ / IP: @ / Admin: @", userInfo.plainLastName(), userInfo.id, userInfo.lastIP, userInfo.admin);
+                    info(" @ &lm @ / ID: @ / IP: @", userInfo.admin ? "&r[A]&c" : "&b[P]&c", userInfo.plainLastName(), userInfo.id, userInfo.lastIP, userInfo.admin);
                 }
             }
         });
