@@ -144,10 +144,11 @@ public abstract class BaseProcessor extends AbstractProcessor{
                 }
             }
 
+            Time.mark();
             String out = result.toString("\n");
             JavaFileObject object = filer.createSourceFile(file.packageName + "." + file.typeSpec.name, file.typeSpec.originatingElements.toArray(new Element[0]));
-            OutputStream stream = object.openOutputStream();
-            stream.write(out.getBytes());
+            Writer stream = object.openWriter();
+            stream.write(out);
             stream.close();
         }else{
             file.writeTo(filer);
