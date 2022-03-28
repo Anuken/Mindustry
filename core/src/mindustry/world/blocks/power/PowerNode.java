@@ -384,7 +384,7 @@ public class PowerNode extends PowerBlock{
                 return false;
             }
 
-            if(this == other){
+            if(this == other){ //double tapped
                 if(other.power.links.size == 0 || Core.input.shift()){ //find links
                     int[] total = {0};
                     getPotentialLinks(tile, team, link -> {
@@ -393,8 +393,8 @@ public class PowerNode extends PowerBlock{
                         }
                     });
                 }else{ //clear links
-                    for(int link = power.links.size - 1; link >= 0; link--){
-                        configure(power.links.get(link));
+                    while(power.links.size > 0){
+                        configure(power.links.get(0));
                     }
                 }
                 deselect();
