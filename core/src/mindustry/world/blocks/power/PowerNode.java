@@ -355,7 +355,7 @@ public class PowerNode extends PowerBlock{
 
         @Override
         public void placed(){
-            if(net.client()) return;
+            if(net.client() || power.links.size > 0) return;
 
             getPotentialLinks(tile, team, other -> {
                 if(!power.links.contains(other.pos())){
