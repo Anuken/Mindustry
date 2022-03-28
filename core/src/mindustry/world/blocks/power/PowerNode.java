@@ -357,9 +357,10 @@ public class PowerNode extends PowerBlock{
         public void placed(){
             if(net.client() || power.links.size > 0) return;
 
+            var player = Groups.player.find(p -> p.name.equals(lastAccessed)); //player who built this block
             getPotentialLinks(tile, team, other -> {
                 if(!power.links.contains(other.pos())){
-                    configureAny(other.pos());
+                    Call.tileConfig(player, this, other.pos());
                 }
             });
 
