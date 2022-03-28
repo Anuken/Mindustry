@@ -385,16 +385,16 @@ public class PowerNode extends PowerBlock{
             }
 
             if(this == other){
-                if(other.power.links.size == 0){
+                if(other.power.links.size == 0 || Core.input.shift()){ //find links
                     int[] total = {0};
                     getPotentialLinks(tile, team, link -> {
                         if(!insulated(this, link) && total[0]++ < maxNodes){
                             configure(link.pos());
                         }
                     });
-                }else{
-                    while(power.links.size > 0){
-                        configure(power.links.get(0));
+                }else{ //clear links
+                    for(int link = power.links.size - 1; link >= 0; link--){
+                        configure(power.links.get(link));
                     }
                 }
                 deselect();
