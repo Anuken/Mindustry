@@ -481,7 +481,7 @@ public class NetServer implements ApplicationListener{
                 }
 
                 int sign = switch(arg[0].toLowerCase()){
-                    case "y", "yes" ->  1;
+                    case "y", "yes" -> 1;
                     case "n", "no" -> -1;
                     default -> 0;
                 };
@@ -895,7 +895,7 @@ public class NetServer implements ApplicationListener{
         short sent = 0;
         for(Building entity : Groups.build){
             if(!entity.block.sync) continue;
-            sent ++;
+            sent++;
 
             dataStream.writeInt(entity.pos());
             dataStream.writeShort(entity.block.id);
@@ -935,7 +935,7 @@ public class NetServer implements ApplicationListener{
 
         //write basic state data.
         Call.stateSnapshot(player.con, state.wavetime, state.wave, state.enemies, state.serverPaused, state.gameOver,
-            universe.seconds(), tps, GlobalConstants.rand.seed0, GlobalConstants.rand.seed1, syncStream.toByteArray());
+        universe.seconds(), tps, GlobalConstants.rand.seed0, GlobalConstants.rand.seed1, syncStream.toByteArray());
 
         syncStream.reset();
 
@@ -963,7 +963,7 @@ public class NetServer implements ApplicationListener{
             Call.entitySnapshot(player.con, (short)sent, syncStream.toByteArray());
         }
 
-        player.con.snapshotsSent ++;
+        player.con.snapshotsSent++;
     }
 
     String fixName(String name){
