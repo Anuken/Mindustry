@@ -128,6 +128,7 @@ public abstract class BaseProcessor extends AbstractProcessor{
         builder.fieldSpecs.sort(Structs.comparing(f -> f.name));
 
         JavaFile file = JavaFile.builder(packageName, builder.build()).skipJavaLangImports(true).build();
+        String writeString;
 
         if(imports != null){
             imports = imports.map(m -> Seq.with(m.split("\n")).sort().toString("\n"));
@@ -144,15 +145,15 @@ public abstract class BaseProcessor extends AbstractProcessor{
                 }
             }
 
-            Time.mark();
-            String out = result.toString("\n");
-            JavaFileObject object = filer.createSourceFile(file.packageName + "." + file.typeSpec.name, file.typeSpec.originatingElements.toArray(new Element[0]));
-            Writer stream = object.openWriter();
-            stream.write(out);
-            stream.close();
+            writeString = result.toString("\n");
         }else{
-            file.writeTo(filer);
+            writeString = file.toString();
         }
+
+        JavaFileObject object = filer.createSourceFile(file.packageName + "." + file.typeSpec.name, file.typeSpec.originatingElements.toArray(new Element[0]));
+        Writer stream = object.openWriter();
+        stream.write(writeString);
+        stream.close();
     }
 
     public Seq<Selement> elements(Class<? extends Annotation> type){
