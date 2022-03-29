@@ -86,5 +86,9 @@
   {
     "name": "Surrealment v7",
     "address": ["md.surrealment.com:6567"]
+  },
+  {
+    "name": "TinyLake",
+    "address": ["mdt.wayzer.cf"]
   }
 ]
