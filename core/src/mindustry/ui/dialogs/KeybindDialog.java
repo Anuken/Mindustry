@@ -152,12 +152,6 @@ public class KeybindDialog extends Dialog{
                         table.add(axt).left().minWidth(90).padRight(20);
                     }
 
-                    table.button("@settings.rebind", tstyle, () -> {
-                        rebindAxis = true;
-                        rebindMin = true;
-                        openDialog(section, keybind);
-                    }).width(130f);
-
                     if(keybind.defaultValue(section.device.type()) != keybinds.get(section, keybind)){
                         allDefaultKeys = false;
                         table.button("@settings.resetKey", tstyle, () -> {
@@ -168,17 +162,17 @@ public class KeybindDialog extends Dialog{
                         /** Adds a space in case keybind is not a modified key */
                         table.add().width(130f);
                     }
+
+                    table.button("@settings.rebind", tstyle, () -> {
+                        rebindAxis = true;
+                        rebindMin = true;
+                        openDialog(section, keybind);
+                    }).width(130f);
                 }else{
                     table.add(bundle.get("keybind." + keybind.name() + ".name", Strings.capitalize(keybind.name())),
                     style.keyNameColor).left().padRight(40).padLeft(8);
                     table.add(keybinds.get(section, keybind).key.toString(),
                     style.keyColor).left().minWidth(90).padRight(20);
-
-                    table.button("@settings.rebind", tstyle, () -> {
-                        rebindAxis = false;
-                        rebindMin = false;
-                        openDialog(section, keybind);
-                    }).width(130f);
 
                     if(keybind.defaultValue(section.device.type()) != keybinds.get(section, keybind).key){
                         allDefaultKeys = false;
@@ -190,6 +184,12 @@ public class KeybindDialog extends Dialog{
                         /** Adds a space in case keybind is not a modified key */
                         table.add().width(130f);
                     }
+
+                    table.button("@settings.rebind", tstyle, () -> {
+                        rebindAxis = false;
+                        rebindMin = false;
+                        openDialog(section, keybind);
+                    }).width(130f);
                 }
                 table.row();
             }
