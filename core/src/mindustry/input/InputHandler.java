@@ -410,8 +410,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 player.unit(unit);
             }
 
-            player.unit(unit);
-
             Time.run(Fx.unitSpirit.lifetime, () -> Fx.unitControl.at(unit.x, unit.y, 0f, unit));
             if(!player.dead()){
                 Fx.unitSpirit.at(player.x, player.y, 0f, unit);
