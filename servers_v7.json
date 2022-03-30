@@ -17,7 +17,7 @@
   },
   {
     "name": "Omega",
-    "address": ["omegam.mindustry.me:25577", "omegam.mindustry.me", "omegam.mindustry.me:25586"]
+    "address": ["omegam.mindustry.me:25577", "omegam.mindustry.me", "omegam.mindustry.me:25586", "omegam.mindustry.me:25565"]
   },
   {
     "name": "MeowLand",
@@ -86,5 +86,9 @@
   {
     "name": "Surrealment v7",
     "address": ["md.surrealment.com:6567"]
+  },
+  {
+    "name": "TinyLake",
+    "address": ["mdt.wayzer.cf"]
   }
 ]
