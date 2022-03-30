@@ -195,7 +195,10 @@ public class BlockIndexer{
             return damagedTiles[team.id] = new Seq<>(false);
         }
 
-        return damagedTiles[team.id];
+        var tiles = damagedTiles[team.id];
+        tiles.removeAll(b -> !b.damaged());
+
+        return tiles;
     }
 
     /** Get all allied blocks with a flag. */
