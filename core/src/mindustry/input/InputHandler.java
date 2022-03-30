@@ -406,7 +406,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             if(net.client() && player.isLocal()){
                 player.justSwitchFrom = player.unit();
                 player.justSwitchTo = unit;
-            }
+            } else player.unit(unit);
 
             player.unit(unit);
 
