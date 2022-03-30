@@ -454,8 +454,8 @@ public class CoreBlock extends StorageBlock{
         }
 
         @Override
-        public void placed(){
-            super.placed();
+        public void placed(Player player){
+            super.placed(player);
             state.teams.registerCore(this);
         }
 

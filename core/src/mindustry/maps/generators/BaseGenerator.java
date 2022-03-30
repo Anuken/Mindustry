@@ -170,7 +170,7 @@ public class BaseGenerator{
 
         for(Tile tile : tiles){
             if(tile.isCenter() && tile.block() instanceof PowerNode && tile.team() == state.rules.waveTeam){
-                tile.build.placed();
+                tile.build.placed(null);
             }
         }
     }

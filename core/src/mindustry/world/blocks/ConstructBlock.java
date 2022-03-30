@@ -129,7 +129,7 @@ public class ConstructBlock extends Block{
     public static void constructed(Tile tile, Block block, Unit builder, byte rotation, Team team, Object config){
         Call.constructFinish(tile, block, builder, rotation, team, config);
         if(tile.build != null){
-            tile.build.placed();
+            tile.build.placed(builder.getPlayer());
         }
     }
 

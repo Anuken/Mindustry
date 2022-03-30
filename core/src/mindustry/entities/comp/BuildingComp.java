@@ -980,7 +980,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     /** Called after the block is placed by anyone. */
     @CallSuper
-    public void placed(){
+    public void placed(@Nullable Player player){
         if(net.client()) return;
 
         if((block.consumesPower || block.outputsPower) && block.hasPower){

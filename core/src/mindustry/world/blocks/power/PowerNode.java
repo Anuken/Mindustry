@@ -26,6 +26,8 @@ public class PowerNode extends PowerBlock{
     protected static BuildPlan otherReq;
     protected static int returnInt = 0;
     protected final static ObjectSet<PowerGraph> graphs = new ObjectSet<>();
+    /** The maximum range of all power nodes on the map */
+    public static float maxRange;
 
     public @Load("laser") TextureRegion laser;
     public @Load("laser-end") TextureRegion laserEnd;
@@ -250,7 +252,7 @@ public class PowerNode extends PowerBlock{
     }
 
     //TODO code duplication w/ method above?
-    /** Iterates through linked nodes of a block at a tile. All returned buildings are power nodes. */
+    /** Iterates through linkable nodes of a block at a tile. All returned buildings are power nodes. */
     public static void getNodeLinks(Tile tile, Block block, Team team, Cons<Building> others){
         Boolf<Building> valid = other -> other != null && other.tile() != tile && other.block instanceof PowerNode node &&
         other.power.links.size < node.maxNodes &&
@@ -278,18 +280,9 @@ public class PowerNode extends PowerBlock{
             graphs.add(tile.build.power.graph);
         }
 
-        Geometry.circle(tile.x, tile.y, 13, (x, y) -> {
-            Building other = world.build(x, y);
-            if(valid.get(other) && !tempTileEnts.contains(other)){
-                tempTileEnts.add(other);
-            }
-        });
+        indexer.eachBlock(team, tile.worldx(), tile.worldy(), maxRange * tilesize, valid, tempTileEnts::add);
 
-        tempTileEnts.sort((a, b) -> {
-            int type = -Boolean.compare(a.block instanceof PowerNode, b.block instanceof PowerNode);
-            if(type != 0) return type;
-            return Float.compare(a.dst2(tile), b.dst2(tile));
-        });
+        tempTileEnts.sort(a -> a.dst2(tile));
 
         tempTileEnts.each(valid, t -> {
             graphs.add(t.power.graph);
@@ -352,18 +345,24 @@ public class PowerNode extends PowerBlock{
     }
 
     public class PowerNodeBuild extends Building{
-
         @Override
-        public void placed(){
+        public void placed(Player player){
             if(net.client() || power.links.size > 0) return;
 
             getPotentialLinks(tile, team, other -> {
                 if(!power.links.contains(other.pos())){
-                    configureAny(other.pos());
+                    Call.tileConfig(player, this, other.pos());
                 }
             });
 
-            super.placed();
+            super.placed(player);
+        }
+
+        @Override
+        public void onProximityAdded() {
+            super.onProximityAdded();
+
+            if(laserRange > maxRange) maxRange = laserRange;
         }
 
         @Override
