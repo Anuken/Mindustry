@@ -351,7 +351,7 @@ public class PowerNode extends PowerBlock{
 
             getPotentialLinks(tile, team, other -> {
                 if(!power.links.contains(other.pos())){
-                    configureAny(other.pos());
+                    Call.tileConfig(player, this, other.pos());
                 }
             });
 
