@@ -36,11 +36,19 @@ public class Teams{
 
     @Nullable
     public CoreBuild closestEnemyCore(float x, float y, Team team){
+        CoreBuild closest = null;
+        float closestDst = Float.MAX_VALUE;
+        
         for(Team enemy : team.data().coreEnemies){
-            CoreBuild tile = Geometry.findClosest(x, y, enemy.cores());
-            if(tile != null) return tile;
+            for(CoreBuild core : enemy.cores()){
+                float dst = Mathf.dst2(x, y, core.getX(), core.getY());
+                if(closestDst > dst){
+                    closest = core;
+                    closestDst = dst;
+                }
+            }
         }
-        return null;
+        return closest;
     }
 
     @Nullable

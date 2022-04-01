@@ -9,7 +9,7 @@
   },
   {
     "name": "SMokeOfAnarchy",
-    "address": "SMokeOfAnarchy.duckdns.org"
+    "address": "SMokeOfAnarchy.ru"
   },
   {
     "name": "hexpvp.ml",
@@ -17,7 +17,7 @@
   },
   {
     "name": "Omega",
-    "address": ["n3.mindustry.me:5002", "n3.mindustry.me:5003", "n3.mindustry.me:5005", "n3.mindustry.me:5006", "n3.mindustry.me:5007", "n3.mindustry.me", "n3.mindustry.me:4006"]
+    "address": ["omegam.mindustry.me:25577", "omegam.mindustry.me", "omegam.mindustry.me:25586", "omegam.mindustry.me:25565"]
   },
   {
     "name": "MeowLand",
@@ -33,7 +33,7 @@
   },
   {
     "name": "XCore",
-    "address": ["node.procord.vip:2707", "de14.halexnodes.net:40036"]
+    "address": ["sandbox.xcore.tk:2707", "attack.xcore.tk:8141"]
   },
   {
     "name": "Obvilion Network",
@@ -53,7 +53,7 @@
   },
   {
     "name": "Phoenix Network",
-    "address": ["172.104.253.198"]
+    "address": ["172.104.253.198", "172.104.253.198:6464"]
   },
   {
     "name": "Xpdustry",
@@ -65,18 +65,30 @@
   },
   {
     "name": "MindustryBR",
-    "address": ["n2.mindustry.me:4003", "n2.mindustry.me:4005", "n2.mindustry.me:4008", "panel.mindustry.me:2005", "n2.mindustry.me:4010"]
+    "address": ["mindustryptbr.myddns.me"]
   },
   {
     "name": "LostDustry",
     "address": ["lostdustry.northeurope.cloudapp.azure.com:6568", "lostdustry.northeurope.cloudapp.azure.com:6569", "lostdustry.northeurope.cloudapp.azure.com:6570"]
   },
   {
-    "name": "ALEX",
-    "address": ["dogemindustry.ddns.net:25588"]
+    "name": "Doge Multiverse",
+    "address": ["v7.servegame.com:25578"]
   },
   {
     "name": "Beyond Anarchy",
     "address": ["45.156.25.49"]
+  },
+  {
+    "name": "M-DE",
+    "address": ["mindustry.inc.li:6569", "mindustry.inc.li:6560"]
+  },
+  {
+    "name": "Surrealment v7",
+    "address": ["md.surrealment.com:6567"]
+  },
+  {
+    "name": "TinyLake",
+    "address": ["mdt.wayzer.cf"]
   }
 ]

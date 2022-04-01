@@ -120,6 +120,9 @@ public class BulletType extends Content implements Cloneable{
     public boolean despawnHit = false;
 
     //additional effects
+    
+    /** Whether status and despawnHit should automatically be set. */
+    public boolean setDefaults = true;
 
     public float fragCone = 360f;
     public float fragAngle = 0f;
@@ -405,9 +408,15 @@ public class BulletType extends Content implements Cloneable{
             //pierceBuilding is not enabled by default, because a bullet may want to *not* pierce buildings
         }
 
-        if(lightning > 0){
-            if(status == StatusEffects.none){
-                status = StatusEffects.shocked;
+        if(setDefaults){
+            if(lightning > 0){
+                if(status == StatusEffects.none){
+                    status = StatusEffects.shocked;
+                }
+            }
+
+            if(fragBullet != null || splashDamageRadius > 0 || lightning > 0){
+                despawnHit = true;
             }
         }
 
@@ -415,13 +424,10 @@ public class BulletType extends Content implements Cloneable{
             lightningType = !collidesAir ? Bullets.damageLightningGround : Bullets.damageLightning;
         }
 
-        if(fragBullet != null || splashDamageRadius > 0 || lightning > 0){
-            despawnHit = true;
-        }
-
-        if(lightRadius == -1){
+        if(lightRadius <= -1){
             lightRadius = Math.max(18, hitSize * 5f);
         }
+        
         drawSize = Math.max(drawSize, trailLength * speed * 2f);
     }
 

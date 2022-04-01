@@ -355,7 +355,7 @@ public class PowerNode extends PowerBlock{
 
         @Override
         public void placed(){
-            if(net.client()) return;
+            if(net.client() || power.links.size > 0) return;
 
             getPotentialLinks(tile, team, other -> {
                 if(!power.links.contains(other.pos())){
@@ -384,15 +384,15 @@ public class PowerNode extends PowerBlock{
                 return false;
             }
 
-            if(this == other){
-                if(other.power.links.size == 0){
+            if(this == other){ //double tapped
+                if(other.power.links.size == 0 || Core.input.shift()){ //find links
                     int[] total = {0};
                     getPotentialLinks(tile, team, link -> {
                         if(!insulated(this, link) && total[0]++ < maxNodes){
                             configure(link.pos());
                         }
                     });
-                }else{
+                }else{ //clear links
                     while(power.links.size > 0){
                         configure(power.links.get(0));
                     }

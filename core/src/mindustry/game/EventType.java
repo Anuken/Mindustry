@@ -242,6 +242,24 @@ public class EventType{
         }
     }
 
+    public static class PayloadDropEvent{
+        public final Unit carrier;
+        public final @Nullable Unit unit;
+        public final @Nullable Building build;
+
+        public PayloadDropEvent(Unit carrier, Unit unit){
+            this.carrier = carrier;
+            this.unit = unit;
+            this.build = null;
+        }
+
+        public PayloadDropEvent(Unit carrier, Building build){
+            this.carrier = carrier;
+            this.build = build;
+            this.unit = null;
+        }
+    }
+
     public static class UnitControlEvent{
         public final Player player;
         public final @Nullable Unit unit;

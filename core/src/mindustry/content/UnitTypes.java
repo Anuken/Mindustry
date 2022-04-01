@@ -2232,6 +2232,7 @@ public class UnitTypes implements ContentList{
                     backColor = Pal.heal;
                     frontColor = Color.white;
                     width = height = 12f;
+                    shrinkY = 0f;
                     speed = 5f;
                     trailLength = 20;
                     trailWidth = 6f;

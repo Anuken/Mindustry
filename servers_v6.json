@@ -1,11 +1,15 @@
 [
   {
+    "name": "Sectorized",
+    "address": ["sectorized.ddns.net"]
+  },
+  {
     "name": "{AA}",
-    "address": ["aamindustry.play.ai", "aamindustry.play.ai:6571", "aamindustry.play.ai:6572", "aamindustry.play.ai:6573", "aamindustry.play.ai:6574"]
+    "address": ["recessive.net"]
   },
   {
     "name": "Yeet Hosting",
-    "address": ["n3.mindustry.me:5004"]
+    "address": ["omegam.mindustry.me:5004", "omegav.mindustry.me:25575", "omegav.mindustry.me:25568"]
   },
   {
     "name": "RCM",
@@ -44,8 +48,8 @@
     "address": ["mindustry.ddns.net", "mindustry.ddns.net:1000", "mindustry.ddns.net:2000", "mindustry.ddns.net:3000", "mindustry.ddns.net:4000"]
   },
   {
-    "name": "Surrealment",
-    "address": ["md.surrealment.com"]
+    "name": "Surrealment v6",
+    "address": ["md.surrealment.com:6566"]
   },
   {
     "name": "ALEX",
@@ -61,7 +65,7 @@
   },
   {
     "name": "Omega",
-    "address": ["yeeth.mindustry.me:6568","yeeth.mindustry.me:5002"] 
+    "address": ["omegav.mindustry.me:6572"] 
   },
   {
     "name": "Obvilion Network",
@@ -77,7 +81,7 @@
   },
   {
     "name": "TSR", 
-    "address": ["ult4.falix.gg:26904"]
+    "address": ["us01.optik.host:26194", "uk01.optik.host:26164"]
   },
   {
     "name": "Sakura", 
@@ -93,7 +97,7 @@
   },
   {
     "name": "Hungarian",
-    "address": ["hudustry.ddns.net"]
+    "address": ["play.hudustry.tk"]
   },
   {
     "name": "Xpdustry",
@@ -105,7 +109,7 @@
   },
   {
     "name": "Mindustry Español",
-    "address": ["yeeth.mindustry.me:6578", "yeeth.mindustry.me:6573", "yeeth.mindustry.me:6577", "yeeth.mindustry.me:6576"]
+    "address": ["xpdustry.fr:9000"]
   },
   {
     "name": "CreateDustry",
@@ -117,7 +121,7 @@
   },
   {
     "name": "MindustryBR",
-    "address": ["mindustryptbr.ddns.net", "mindustryptbr.myddns.me", "n2.mindustry.me:4002", "n2.mindustry.me:4007"]
+    "address": ["mindustryptbr.ddns.net:25579"]
   },
   {
     "name": "Conservatory",
@@ -130,5 +134,9 @@
   {
     "name": "OMNIDUSTRY",
     "address": ["109.94.209.233"]
-  } 
+  },
+  {
+    "name": "Fish",
+    "address": ["170.187.144.235"]
+  }
 ]

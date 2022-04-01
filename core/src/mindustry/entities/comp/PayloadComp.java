@@ -156,6 +156,7 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         if(!u.isAdded()) u.team.data().updateCount(u.type, -1);
         u.add();
         u.unloaded();
+        Events.fire(new PayloadDropEvent(self(), u));
 
         return true;
     }
@@ -168,6 +169,7 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         if(on != null && Build.validPlace(tile.block, tile.team, tx, ty, tile.rotation, false)){
             int rot = (int)((rotation + 45f) / 90f) % 4;
             payload.place(on, rot);
+            Events.fire(new PayloadDropEvent(self(), tile));
 
             if(getControllerName() != null){
                 payload.build.lastAccessed = getControllerName();
