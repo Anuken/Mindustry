@@ -1,7 +1,5 @@
 sourceSets.main.java.srcDirs = ["src/"]
 
-
-
 import arc.files.Fi
 import arc.files.ZipFi
 import arc.func.Func2

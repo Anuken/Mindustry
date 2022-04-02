@@ -243,7 +243,7 @@ public class BlockRenderer{
         }
 
         Draw.shader(Shaders.darkness);
-        Draw.fbo(dark, world.width(), world.height(), tilesize);
+        Draw.fbo(dark.getTexture(), world.width(), world.height(), tilesize, tilesize/2f);
         Draw.shader();
     }
 
