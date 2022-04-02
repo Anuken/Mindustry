@@ -24,7 +24,7 @@ import static mindustry.Vars.*;
 public class ArcNetProvider implements NetProvider{
     final Client client;
     final Prov<DatagramPacket> packetSupplier = () -> new DatagramPacket(new byte[512], 512);
-    final ExecutorService executor = Threads.executor(Math.max(Runtime.getRuntime().availableProcessors(), 6));
+    final ExecutorService executor = Threads.executor(1);
 
     final Server server;
     final CopyOnWriteArrayList<ArcConnection> connections = new CopyOnWriteArrayList<>();

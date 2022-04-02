@@ -3166,7 +3166,7 @@ public class UnitTypes{
                 shoot = new ShootHelix();
 
                 //TODO cooler + balancing
-                bullet = new BasicBulletType(5f, 20){{
+                bullet = new BasicBulletType(5f, 25){{
                     width = 7f;
                     height = 12f;
                     lifetime = 25f;

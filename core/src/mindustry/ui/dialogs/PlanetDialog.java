@@ -849,7 +849,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
             //export
             displayItems(c, sector.getProductionScale(), sector.info.export, "@sectors.export", t -> {
-                if(sector.info.destination != null){
+                if(sector.info.destination != null && sector.info.destination.hasBase()){
                     String ic = sector.info.destination.iconChar();
                     t.add(Iconc.rightOpen + " " + (ic == null || ic.isEmpty() ? "" : ic + " ") + sector.info.destination.name()).padLeft(10f).row();
                 }
