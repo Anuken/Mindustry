@@ -333,7 +333,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             throw new ValidateException(player, "Player cannot rotate a block.");
         }
 
-        if(player != null) build.lastAccessed = player.name;
+        if(player != null) build.lastAccessed = player.coloredName();
         build.rotation = Mathf.mod(build.rotation + Mathf.sign(direction), 4);
         build.updateProximity();
         build.noSleep();
