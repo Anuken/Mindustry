@@ -161,16 +161,16 @@ public class NetClient implements ApplicationListener{
         clientPacketReliable(type, contents);
     }
 
-    @Remote(variants = Variant.both, unreliable = true)
+    @Remote(variants = Variant.both, unreliable = true, called = Loc.server)
     public static void sound(Sound sound, float volume, float pitch, float pan){
-        if(sound == null) return;
+        if(sound == null || headless) return;
 
-        sound.play(Mathf.clamp(volume, 0, 4f) * Core.settings.getInt("sfxvol") / 100f, pitch, pan);
+        sound.play(Mathf.clamp(volume, 0, 8f) * Core.settings.getInt("sfxvol") / 100f, pitch, pan, false, false);
     }
 
-    @Remote(variants = Variant.both, unreliable = true)
+    @Remote(variants = Variant.both, unreliable = true, called = Loc.server)
     public static void soundAt(Sound sound, float x, float y, float volume, float pitch){
-        if(sound == null) return;
+        if(sound == null || headless) return;
 
         sound.at(x, y, pitch, Mathf.clamp(volume, 0, 4f));
     }

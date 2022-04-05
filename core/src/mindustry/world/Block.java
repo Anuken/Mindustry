@@ -458,8 +458,7 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean canPlaceOn(Tile tile, Team team){
         return true;
     }
-
-
+    
     public boolean canBreak(Tile tile){
         return true;
     }
