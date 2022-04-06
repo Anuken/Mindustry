@@ -518,8 +518,8 @@ public class Block extends UnlockableContent implements Senseable{
         addBar("liquid-" + liq.name, entity -> new Bar(
             () -> liq.localizedName,
             liq::barColor,
-            () -> entity.liquids.get(liq) / liquidCapacity)
-        );
+            () -> entity.liquids.get(liq) / liquidCapacity
+        ));
     }
 
     /** Adds a liquid bar that dynamically displays a liquid type. */

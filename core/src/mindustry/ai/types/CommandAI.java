@@ -98,8 +98,8 @@ public class CommandAI extends AIController{
                 }else if(local.size > 1){
                     int count = 0;
                     for(var near : local){
-                        //has arrived
-                        if(near.isCommandable() && !near.command().hasCommand() && targetPos.equals(near.command().lastTargetPos)){
+                        //has arrived - no current command, but last one is equal
+                        if(near.isCommandable() && !near.command().hasCommand() && targetPos.epsilonEquals(near.command().lastTargetPos, 0.001f)){
                             count ++;
                         }
                     }
@@ -179,6 +179,11 @@ public class CommandAI extends AIController{
 
     public boolean hasCommand(){
         return targetPos != null;
+    }
+
+    public void setupLastPos(){
+        lastTargetPos = targetPos;
+
     }
 
     public void commandPosition(Vec2 pos){

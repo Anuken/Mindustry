@@ -490,6 +490,7 @@ public class TypeIO{
             }else{
                 ai.targetPos = null;
             }
+            ai.setupLastPos();
 
             if(hasAttack){
                 byte entityType = read.b();
