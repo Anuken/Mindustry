@@ -66,6 +66,6 @@ public class ShrapnelBulletType extends BulletType{
         Drawf.tri(b.x, b.y, width * b.fout(), 10f, b.rotation() + 180f);
         Draw.reset();
 
-        Drawf.light(b.team, b.x, b.y, b.x + Angles.trnsx(rot, realLength), b.y + Angles.trnsy(rot, realLength), width * 2.5f * b.fout(), toColor, lightOpacity);
+        Drawf.light(b.x, b.y, b.x + Angles.trnsx(rot, realLength), b.y + Angles.trnsy(rot, realLength), width * 2.5f * b.fout(), toColor, lightOpacity);
     }
 }

@@ -128,10 +128,12 @@ public class Items{
 
         fissileMatter = new Item("fissile-matter", Color.valueOf("5e988d")){{
             radioactivity = 1.5f;
+            hidden = true;
         }};
 
         dormantCyst = new Item("dormant-cyst", Color.valueOf("df824d")){{
             flammability = 0.1f;
+            hidden = true;
         }};
 
         serpuloItems.addAll(

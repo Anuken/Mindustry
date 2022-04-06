@@ -46,6 +46,7 @@ public class Item extends UnlockableContent implements Senseable{
     public float frameTime = 5f;
     /** If true, this material is used by buildings. If false, this material will be incinerated in certain cores. */
     public boolean buildable = true;
+    public boolean hidden = false;
 
     public Item(String name, Color color){
         super(name);
@@ -54,6 +55,11 @@ public class Item extends UnlockableContent implements Senseable{
 
     public Item(String name){
         this(name, new Color(Color.black));
+    }
+
+    @Override
+    public boolean isHidden(){
+        return hidden;
     }
 
     @Override

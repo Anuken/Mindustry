@@ -8,7 +8,6 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.entities.*;
-import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -155,7 +154,7 @@ public class Fx{
         Draw.color(e.color, e.fout());
         Lines.stroke(1.5f);
         Lines.line(e.x, e.y, pos.getX(), pos.getY());
-        Drawf.light(null, e.x, e.y, pos.getX(), pos.getY(), 20f, e.color, 0.6f * e.fout());
+        Drawf.light(e.x, e.y, pos.getX(), pos.getY(), 20f, e.color, 0.6f * e.fout());
     }),
 
     pointHit = new Effect(8f, e -> {
@@ -1038,7 +1037,7 @@ public class Fx{
 
         color();
 
-        Drawf.light(Team.derelict, e.x, e.y, 20f * e.fslope(), Pal.lightFlame, 0.5f);
+        Drawf.light(e.x, e.y, 20f * e.fslope(), Pal.lightFlame, 0.5f);
     }),
 
     fireHit = new Effect(35f, e -> {

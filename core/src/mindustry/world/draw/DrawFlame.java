@@ -54,6 +54,6 @@ public class DrawFlame extends DrawBlock{
 
     @Override
     public void drawLight(Building build){
-        Drawf.light(build.team, build.x, build.y, (lightRadius + Mathf.absin(lightSinScl, lightSinMag)) * build.warmup() * build.block.size, flameColor, lightAlpha);
+        Drawf.light(build.x, build.y, (lightRadius + Mathf.absin(lightSinScl, lightSinMag)) * build.warmup() * build.block.size, flameColor, lightAlpha);
     }
 }

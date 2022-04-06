@@ -137,10 +137,10 @@ public class RepairPoint extends Block{
             Lines.circle(lastEnd.x, lastEnd.y, 1f + f * pulseRadius);
 
             Draw.color(laserColor);
-            Drawf.laser(team, laser, laserEnd, originX, originY, lastEnd.x, lastEnd.y, strength * beamWidth);
+            Drawf.laser(laser, laserEnd, originX, originY, lastEnd.x, lastEnd.y, strength * beamWidth);
             Draw.z(Layer.flyingUnit + 1.1f);
             Draw.color(laserTopColor);
-            Drawf.laser(team, laserTop, laserTopEnd, originX, originY, lastEnd.x, lastEnd.y, strength * beamWidth);
+            Drawf.laser(laserTop, laserTopEnd, originX, originY, lastEnd.x, lastEnd.y, strength * beamWidth);
             Draw.color();
         }
     }

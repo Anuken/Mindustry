@@ -191,7 +191,6 @@ public class CustomRulesDialog extends BaseDialog{
         check("@rules.explosions", b -> rules.damageExplosions = b, () -> rules.damageExplosions);
         check("@rules.fire", b -> rules.fire = b, () -> rules.fire);
         check("@rules.lighting", b -> rules.lighting = b, () -> rules.lighting);
-        check("@rules.enemyLights", b -> rules.enemyLights = b, () -> rules.enemyLights);
 
         if(experimental){
             check("@rules.limitarea", b -> rules.limitMapArea = b, () -> rules.limitMapArea);

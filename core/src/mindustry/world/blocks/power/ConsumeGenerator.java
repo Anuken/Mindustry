@@ -133,7 +133,7 @@ public class ConsumeGenerator extends PowerGenerator{
             //???
             drawer.drawLight(this);
             //TODO hard coded
-            Drawf.light(team, x, y, (60f + Mathf.absin(10f, 5f)) * size, Color.orange, 0.5f * warmup);
+            Drawf.light(x, y, (60f + Mathf.absin(10f, 5f)) * size, Color.orange, 0.5f * warmup);
         }
     }
 }

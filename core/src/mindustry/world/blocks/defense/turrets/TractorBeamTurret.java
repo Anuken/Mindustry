@@ -150,7 +150,7 @@ public class TractorBeamTurret extends BaseTurret{
 
                 Draw.mixcol(laserColor, Mathf.absin(4f, 0.6f));
 
-                Drawf.laser(team, laser, laserStart, laserEnd,
+                Drawf.laser(laser, laserStart, laserEnd,
                 x + Angles.trnsx(ang, shootLength), y + Angles.trnsy(ang, shootLength),
                 lastX, lastY, strength * efficiency * laserWidth);
 

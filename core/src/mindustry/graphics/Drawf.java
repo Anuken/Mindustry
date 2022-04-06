@@ -6,9 +6,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.*;
 import mindustry.ctype.*;
-import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 
@@ -210,28 +208,20 @@ public class Drawf{
         renderer.lights.add(x, y, radius, color, opacity);
     }
 
-    public static void light(Team team, float x, float y, float radius, Color color, float opacity){
-        if(allowLight(team)) renderer.lights.add(x, y, radius, color, opacity);
+    public static void light(Position pos, float radius, Color color, float opacity){
+       light(pos.getX(), pos.getY(), radius, color, opacity);
     }
 
-    public static void light(Team team, Position pos, float radius, Color color, float opacity){
-       light(team, pos.getX(), pos.getY(), radius, color, opacity);
+    public static void light(float x, float y, TextureRegion region, Color color, float opacity){
+        renderer.lights.add(x, y, region, color, opacity);
     }
 
-    public static void light(Team team, float x, float y, TextureRegion region, Color color, float opacity){
-        if(allowLight(team)) renderer.lights.add(x, y, region, color, opacity);
+    public static void light(float x, float y, float x2, float y2){
+        renderer.lights.line(x, y, x2, y2, 30, Color.orange, 0.3f);
     }
 
-    public static void light(Team team, float x, float y, float x2, float y2){
-        if(allowLight(team)) renderer.lights.line(x, y, x2, y2, 30, Color.orange, 0.3f);
-    }
-
-    public static void light(Team team, float x, float y, float x2, float y2, float stroke, Color tint, float alpha){
-        if(allowLight(team)) renderer.lights.line(x, y, x2, y2, stroke, tint, alpha);
-    }
-
-    private static boolean allowLight(Team team){
-        return renderer != null && (team == Team.derelict || team == Vars.player.team() || state.rules.enemyLights);
+    public static void light(float x, float y, float x2, float y2, float stroke, Color tint, float alpha){
+        renderer.lights.line(x, y, x2, y2, stroke, tint, alpha);
     }
 
     public static void selected(Building tile, Color color){
@@ -365,19 +355,19 @@ public class Drawf{
         Draw.color();
     }
 
-    public static void laser(Team team, TextureRegion line, TextureRegion edge, float x, float y, float x2, float y2){
-        laser(team, line, edge, edge, x, y, x2, y2, 1f);
+    public static void laser(TextureRegion line, TextureRegion edge, float x, float y, float x2, float y2){
+        laser(line, edge, edge, x, y, x2, y2, 1f);
     }
 
-    public static void laser(Team team, TextureRegion line, TextureRegion start, TextureRegion end, float x, float y, float x2, float y2){
-        laser(team, line, start, end, x, y, x2, y2, 1f);
+    public static void laser(TextureRegion line, TextureRegion start, TextureRegion end, float x, float y, float x2, float y2){
+        laser(line, start, end, x, y, x2, y2, 1f);
     }
 
-    public static void laser(Team team, TextureRegion line, TextureRegion edge, float x, float y, float x2, float y2, float scale){
-        laser(team, line, edge, edge, x, y, x2, y2, scale);
+    public static void laser(TextureRegion line, TextureRegion edge, float x, float y, float x2, float y2, float scale){
+        laser(line, edge, edge, x, y, x2, y2, scale);
     }
 
-    public static void laser(Team team, TextureRegion line, TextureRegion start, TextureRegion end, float x, float y, float x2, float y2, float scale){
+    public static void laser(TextureRegion line, TextureRegion start, TextureRegion end, float x, float y, float x2, float y2, float scale){
         float scl = 8f * scale * Draw.scl, rot = Mathf.angle(x2 - x, y2 - y);
         float vx = Mathf.cosDeg(rot) * scl, vy = Mathf.sinDeg(rot) * scl;
 
@@ -388,7 +378,7 @@ public class Drawf{
         Lines.line(line, x + vx, y + vy, x2 - vx, y2 - vy, false);
         Lines.stroke(1f);
 
-        light(team, x, y, x2, y2);
+        light(x, y, x2, y2);
     }
 
     public static void tri(float x, float y, float width, float length, float rotation){

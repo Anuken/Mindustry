@@ -382,7 +382,7 @@ public class BulletType extends Content implements Cloneable{
 
     public void drawLight(Bullet b){
         if(lightOpacity <= 0f || lightRadius <= 0f) return;
-        Drawf.light(b.team, b, lightRadius, lightColor, lightOpacity);
+        Drawf.light(b, lightRadius, lightColor, lightOpacity);
     }
 
     public void init(Bullet b){

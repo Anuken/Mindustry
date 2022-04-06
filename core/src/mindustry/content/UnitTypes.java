@@ -3149,7 +3149,6 @@ public class UnitTypes{
             itemCapacity = 0;
 
             setEnginesMirror(
-            //new UnitEngine(34 / 4f, 31 / 4f, 3f, 45f),
             new UnitEngine(35 / 4f, -38 / 4f, 3f, 315f),
             new UnitEngine(39 / 4f, -16 / 4f, 3f, 315f)
             );

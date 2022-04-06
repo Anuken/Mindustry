@@ -313,12 +313,12 @@ public class BeamDrill extends Block{
 
                         if(boostWarmup < 0.99f){
                             Draw.alpha(1f - boostWarmup);
-                            Drawf.laser(team, laser, laserEnd, lsx, lsy, lx, ly, width);
+                            Drawf.laser(laser, laserEnd, lsx, lsy, lx, ly, width);
                         }
 
                         if(boostWarmup > 0.001f){
                             Draw.alpha(boostWarmup);
-                            Drawf.laser(team, laserBoost, laserEndBoost, lsx, lsy, lx, ly, width);
+                            Drawf.laser(laserBoost, laserEndBoost, lsx, lsy, lx, ly, width);
                         }
                     }
                     Draw.color();

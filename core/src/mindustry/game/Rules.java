@@ -123,9 +123,6 @@ public class Rules{
     public Color dynamicColor = new Color(0f, 0f, 0f, 0.5f);
     /** Whether ambient lighting is enabled. */
     public boolean lighting = false;
-    /** Whether enemy lighting is visible.
-     * If lighting is enabled and this is false, a fog-of-war effect is partially achieved. */
-    public boolean enemyLights = true;
     /** Ambient light color, used when lighting is enabled. */
     public Color ambientLight = new Color(0.01f, 0.01f, 0.04f, 0.99f);
     /** team of the player by default. */

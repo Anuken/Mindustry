@@ -7,7 +7,6 @@ import arc.util.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
-import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
@@ -137,7 +136,7 @@ public class Liquid extends UnlockableContent implements Senseable{
         Draw.color();
 
         if(lightColor.a > 0.001f && f > 0){
-            Drawf.light(Team.derelict, x, y, 30f * f, lightColor, color.a * f * 0.8f);
+            Drawf.light(x, y, 30f * f, lightColor, color.a * f * 0.8f);
         }
     }
 
