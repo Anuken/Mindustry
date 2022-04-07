@@ -328,7 +328,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         //preset sectors can only be selected once unlocked
         if(sector.preset != null){
             TechNode node = sector.preset.techNode;
-            return node == null || node.parent == null || node.parent.content.unlocked();
+            return node == null || node.parent == null || (node.parent.content.unlocked() && (!(node.parent.content instanceof SectorPreset preset) || preset.sector.hasBase()));
         }
 
         return sector.planet.generator != null ?

@@ -2,6 +2,7 @@ package mindustry.ui.dialogs;
 
 import arc.*;
 import arc.func.*;
+import arc.math.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
@@ -66,6 +67,15 @@ public class LaunchLoadoutDialog extends BaseDialog{
 
             ItemSeq schems = selected.requirements();
             ItemSeq launches = universe.getLaunchResources();
+            int capacity = lastCapacity;
+
+            if(getMax()){
+                for(Item item : content.items()){
+                    launches.set(item, Mathf.clamp(sitems.get(item) - launches.get(item), 0, capacity));
+                }
+
+                universe.updateLaunchResources(launches);
+            }
 
             for(ItemStack s : total){
                 table.image(s.item.uiIcon).left().size(iconSmall);
@@ -87,7 +97,13 @@ public class LaunchLoadoutDialog extends BaseDialog{
 
         Runnable rebuildItems = () -> rebuild.get(items);
 
-        buttons.button("@resources", Icon.terrain, () -> {
+        buttons.button("@resources.max", Icon.add, Styles.togglet, () -> {
+            setMax(!getMax());
+            update.run();
+            rebuildItems.run();
+        }).checked(b -> getMax());
+
+        buttons.button("@resources", Icon.edit, () -> {
             ItemSeq stacks = universe.getLaunchResources();
             Seq<ItemStack> out = stacks.toSeq();
 
@@ -99,7 +115,7 @@ public class LaunchLoadoutDialog extends BaseDialog{
                 update.run();
                 rebuildItems.run();
             });
-        }).width(204);
+        }).disabled(b -> getMax());
 
         boolean rows = Core.graphics.isPortrait() && mobile;
 
@@ -112,7 +128,7 @@ public class LaunchLoadoutDialog extends BaseDialog{
         }).disabled(b -> !valid);
 
         if(rows){
-            cell.colspan(2).size(160f + 204f + 4f, 64f);
+            cell.colspan(2).size(160f + 160f + 4f, 64f);
         }
 
         int cols = Math.max((int)(Core.graphics.getWidth() / Scl.scl(230)), 1);
@@ -168,5 +184,13 @@ public class LaunchLoadoutDialog extends BaseDialog{
         rebuildItems.run();
 
         show();
+    }
+
+    void setMax(boolean max){
+        Core.settings.put("maxresources", max);
+    }
+
+    boolean getMax(){
+        return Core.settings.getBool("maxresources", true);
     }
 }
