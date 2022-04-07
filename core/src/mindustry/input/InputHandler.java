@@ -1475,7 +1475,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         int endRotation = -1;
         var start = world.build(startX, startY);
         var end = world.build(endX, endY);
-        if(diagonal){
+        if(diagonal && (block == null || block.allowDiagonal)){
             if(block != null && start instanceof ChainedBuilding && end instanceof ChainedBuilding
                     && block.canReplace(end.block) && block.canReplace(start.block)){
                 points = Placement.upgradeLine(startX, startY, endX, endY);
@@ -1493,7 +1493,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         if(block != null){
-            block.changePlacementPath(points, rotation);
+            block.changePlacementPath(points, rotation, diagonal);
         }
 
         float angle = Angles.angle(startX, startY, endX, endY);

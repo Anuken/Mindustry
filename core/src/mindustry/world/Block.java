@@ -201,6 +201,8 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean sync;
     /** Whether this block uses conveyor-type placement mode. */
     public boolean conveyorPlacement;
+    /** If false, diagonal placement (ctrl) for this block is not allowed. */
+    public boolean allowDiagonal = true;
     /** Whether to swap the diagonal placement modes. */
     public boolean swapDiagonalPlacement;
     /** Build queue priority in schematics. */
@@ -608,6 +610,11 @@ public class Block extends UnlockableContent implements Senseable{
     /** @return a possible replacement for this block when placed in a line by the player. */
     public Block getReplacement(BuildPlan req, Seq<BuildPlan> plans){
         return this;
+    }
+
+    /** Mutates the given list of points used during line placement. */
+    public void changePlacementPath(Seq<Point2> points, int rotation, boolean diagonalOn){
+        changePlacementPath(points, rotation);
     }
 
     /** Mutates the given list of points used during line placement. */

@@ -34,6 +34,7 @@ public class BeamNode extends PowerBlock{
         consumesPower = outputsPower = false;
         drawDisabled = false;
         envEnabled |= Env.space;
+        allowDiagonal = false;
     }
 
     @Override
@@ -82,8 +83,10 @@ public class BeamNode extends PowerBlock{
     }
 
     @Override
-    public void changePlacementPath(Seq<Point2> points, int rotation){
-        Placement.calculateNodes(points, this, rotation, (point, other) -> Math.max(Math.abs(point.x - other.x), Math.abs(point.y - other.y)) <= range);
+    public void changePlacementPath(Seq<Point2> points, int rotation, boolean diagonal){
+        if(!diagonal){
+            Placement.calculateNodes(points, this, rotation, (point, other) -> Math.max(Math.abs(point.x - other.x), Math.abs(point.y - other.y)) <= range);
+        }
     }
 
     public class BeamNodeBuild extends Building{
