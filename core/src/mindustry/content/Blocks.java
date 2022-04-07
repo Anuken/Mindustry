@@ -2651,7 +2651,7 @@ public class Blocks{
 
             isFirstTier = true;
             unitType = UnitTypes.evoke;
-            health = 7000;
+            health = 4500;
             itemCapacity = 2000;
             size = 4;
             thrusterLength = 34/4f;
@@ -2670,7 +2670,7 @@ public class Blocks{
             requirements(Category.effect, with(Items.silicon, 7000, Items.beryllium, 7000, Items.tungsten, 4000, Items.oxide, 2500));
 
             unitType = UnitTypes.incite;
-            health = 18000;
+            health = 16000;
             itemCapacity = 3000;
             size = 5;
             thrusterLength = 40/4f;
