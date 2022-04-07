@@ -33,7 +33,7 @@ public class ItemTurret extends Turret{
 
     /** Makes copies of all bullets and limits their range. */
     public void limitRange(){
-        limitRange(2f);
+        limitRange(5f);
     }
 
     /** Makes copies of all bullets and limits their range. */

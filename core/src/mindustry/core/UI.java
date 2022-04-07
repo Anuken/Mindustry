@@ -480,8 +480,8 @@ public class UI implements ApplicationListener, Loadable{
         dialog.cont.add(text).width(mobile ? 400f : 500f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);
         dialog.buttons.defaults().size(200f, 54f).pad(2f);
         dialog.setFillParent(false);
-        dialog.buttons.button("@cancel", dialog::hide);
-        dialog.buttons.button("@ok", () -> {
+        dialog.buttons.button("@cancel", Icon.cancel, dialog::hide);
+        dialog.buttons.button("@ok", Icon.ok, () -> {
             dialog.hide();
             confirmed.run();
         });
