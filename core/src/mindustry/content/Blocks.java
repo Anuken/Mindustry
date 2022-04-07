@@ -3634,6 +3634,7 @@ public class Blocks{
             ammo(
             Items.beryllium, new BasicBulletType(7.5f, 95){{
                 width = 12f;
+                hitSize = 7f;
                 height = 20f;
                 shootEffect = sfe;
                 smokeEffect = Fx.shootBigSmoke;
@@ -3649,6 +3650,7 @@ public class Blocks{
             Items.tungsten, new BasicBulletType(8f, 185){{
                 width = 13f;
                 height = 19f;
+                hitSize = 7f;
                 shootEffect = sfe;
                 smokeEffect = Fx.shootBigSmoke;
                 ammoMultiplier = 1;

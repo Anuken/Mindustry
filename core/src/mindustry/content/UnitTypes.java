@@ -2450,7 +2450,7 @@ public class UnitTypes{
         //region erekir - tank
 
         stell = new TankUnitType("stell"){{
-            hitSize = 11f;
+            hitSize = 12f;
             treadPullOffset = 3;
             speed = 0.75f;
             rotateSpeed = 3.5f;
