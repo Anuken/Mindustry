@@ -48,7 +48,7 @@ public class ControlPathfinder{
     (PathTile.nearGround(tile) || PathTile.nearSolid(tile) ? 2 : 0) +
     (PathTile.deep(tile) ? 0 : 1);
 
-    public static boolean showDebug = false;
+    public static boolean showDebug = true;
 
     //static access probably faster than object access
     static int wwidth, wheight;
@@ -199,10 +199,10 @@ public class ControlPathfinder{
             req.curId = pathId;
 
             //check for the unit getting stuck every N seconds
-            if((req.stuckTimer += Time.delta) >= 60f * 5f){
+            if((req.stuckTimer += Time.delta) >= 60f * 2.5f){
                 req.stuckTimer = 0f;
                 //force recalculate
-                if(req.lastPos.within(unit, 1f)){
+                if(req.lastPos.within(unit, 1.5f)){
                     req.lastWorldUpdate = -1;
                 }
                 req.lastPos.set(unit);

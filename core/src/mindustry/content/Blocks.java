@@ -3632,7 +3632,7 @@ public class Blocks{
             Effect sfe = new MultiEffect(Fx.shootBigColor, Fx.colorSparkBig);
 
             ammo(
-            Items.beryllium, new BasicBulletType(7.5f, 90){{
+            Items.beryllium, new BasicBulletType(7.5f, 95){{
                 width = 12f;
                 height = 20f;
                 shootEffect = sfe;
@@ -3646,7 +3646,7 @@ public class Blocks{
                 trailLength = 10;
                 hitEffect = despawnEffect = Fx.hitBulletColor;
             }},
-            Items.tungsten, new BasicBulletType(8f, 180){{
+            Items.tungsten, new BasicBulletType(8f, 185){{
                 width = 13f;
                 height = 19f;
                 shootEffect = sfe;
@@ -3667,7 +3667,7 @@ public class Blocks{
             coolantMultiplier = 6f;
 
             shootShake = 1f;
-            ammoPerShot = 5;
+            ammoPerShot = 4;
             drawer = new DrawTurret("reinforced-");
             shootY = -2;
             outlineColor = Pal.darkOutline;
