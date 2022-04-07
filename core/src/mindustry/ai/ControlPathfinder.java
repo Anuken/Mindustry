@@ -48,7 +48,7 @@ public class ControlPathfinder{
     (PathTile.nearGround(tile) || PathTile.nearSolid(tile) ? 2 : 0) +
     (PathTile.deep(tile) ? 0 : 1);
 
-    public static boolean showDebug = true;
+    public static boolean showDebug = false;
 
     //static access probably faster than object access
     static int wwidth, wheight;
