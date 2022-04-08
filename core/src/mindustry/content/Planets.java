@@ -63,12 +63,17 @@ public class Planets{
             lightDstFrom = 0.2f;
             clearSectorOnLose = true;
             hiddenItems.addAll(Items.serpuloItems).removeAll(Items.erekirItems);
+
+            //TODO SHOULD there be lighting?
+            updateLighting = false;
+
             ruleSetter = r -> {
-                r.placeRangeCheck = true;
+                r.placeRangeCheck = false;
                 r.attributes.set(Attribute.heat, 0.8f);
                 r.showSpawns = true;
                 r.fog = true;
                 r.staticFog = true; //TODO decide, is this a good idea?
+                r.lighting = false;
             };
 
             unlockedOnLand.add(Blocks.coreBastion);

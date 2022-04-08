@@ -114,7 +114,7 @@ public class SectorPresets{
             difficulty = 1;
         }};
 
-        two = new SectorPreset("aware", erekir, 88){{
+        two = new SectorPreset("two", erekir, 88){{
             difficulty = 3;
         }};
 

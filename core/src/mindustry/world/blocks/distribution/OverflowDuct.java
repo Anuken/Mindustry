@@ -28,6 +28,7 @@ public class OverflowDuct extends Block{
         noUpdateDisabled = true;
         rotate = true;
         envEnabled = Env.space | Env.terrestrial | Env.underwater;
+        regionRotated1 = 1;
     }
 
     @Override
