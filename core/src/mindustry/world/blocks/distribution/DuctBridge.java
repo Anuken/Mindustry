@@ -49,6 +49,9 @@ public class DuctBridge extends DirectionBridge{
 
         @Override
         public boolean acceptItem(Building source, Item item){
+            //only accept if there's an output point.
+            if(findLink() == null) return false;
+
             int rel = this.relativeToEdge(source.tile);
             return items.total() < itemCapacity && rel != rotation && occupied[(rel + 2) % 4] == null;
         }
