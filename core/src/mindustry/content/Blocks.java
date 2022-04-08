@@ -1318,6 +1318,7 @@ public class Blocks{
             craftTime = 60f * 2f;
 
             outputLiquid = new LiquidStack(Liquids.gallium, 1f / 60f);
+            //TODO NOT scrap
             outputItem = new ItemStack(Items.scrap, 1);
         }};
 
