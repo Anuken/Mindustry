@@ -40,7 +40,7 @@ public class Pathfinder implements Runnable{
     public static final Seq<PathCost> costTypes = Seq.with(
         //ground
         (team, tile) ->
-            (PathTile.allDeep(tile) || (PathTile.team(tile) == team || PathTile.team(tile) == 0) && PathTile.solid(tile)) ? impassable : 1 +
+            (PathTile.allDeep(tile) || ((PathTile.team(tile) == team && !PathTile.teamPassable(tile)) || PathTile.team(tile) == 0) && PathTile.solid(tile)) ? impassable : 1 +
             PathTile.health(tile) * 5 +
             (PathTile.nearSolid(tile) ? 2 : 0) +
             (PathTile.nearLiquid(tile) ? 6 : 0) +
@@ -146,21 +146,22 @@ public class Pathfinder implements Runnable{
     }
 
     /** Packs a tile into its internal representation. */
-    private int packTile(Tile tile, int prev){
+    public int packTile(Tile tile, int prev){
         boolean nearLiquid = false, nearSolid = false, nearGround = false, solid = tile.solid(), allDeep = tile.floor().isDeep();
 
         for(int i = 0; i < 4; i++){
             Tile other = tile.nearby(i);
-            if(other != null){
+            if(other != null)   {
                 Floor floor = other.floor();
                 boolean osolid = other.solid();
                 if(floor.isLiquid) nearLiquid = true;
-                if(osolid) nearSolid = true;
+                //TODO potentially strange behavior when teamPassable is false for other teams?
+                if(osolid && !other.block().teamPassable) nearSolid = true;
                 if(!floor.isLiquid) nearGround = true;
                 if(!floor.isDeep()) allDeep = false;
 
                 //other tile is now near solid
-                if(solid){
+                if(solid && !tile.block().teamPassable){
                     tiles[other.array()] |= PathTile.bitMaskNearSolid;
                 }
             }
@@ -179,8 +180,13 @@ public class Pathfinder implements Runnable{
             nearSolid,
             tile.floor().isDeep(),
             tile.floor().damageTaken > 0.00001f,
-            allDeep
+            allDeep,
+            tile.block().teamPassable
         );
+    }
+
+    public int get(int x, int y){
+        return tiles[x + y * wwidth];
     }
 
     /** Starts or restarts the pathfinding thread. */
@@ -551,5 +557,7 @@ public class Pathfinder implements Runnable{
         boolean damages;
         //whether all tiles nearby are deep
         boolean allDeep;
+        //block teamPassable is true
+        boolean teamPassable;
     }
 }

@@ -29,7 +29,7 @@ public class ControlPathfinder{
     //deep is impassable
     PathTile.allDeep(tile) ? impassable :
     //impassable same-team or neutral block
-    PathTile.solid(tile) && (PathTile.team(tile) == team || PathTile.team(tile) == 0) ? impassable :
+    PathTile.solid(tile) && ((PathTile.team(tile) == team && !PathTile.teamPassable(tile)) || PathTile.team(tile) == 0) ? impassable :
     //impassable synthetic enemy block
     ((PathTile.team(tile) != team && PathTile.team(tile) != 0) && PathTile.solid(tile) ? wallImpassableCap : 0) +
     1 +
@@ -152,15 +152,16 @@ public class ControlPathfinder{
         if(threads == null) return false;
 
         PathCost costType = unit.type.pathCost;
+        int team = unit.team.id;
 
         //if the destination can be trivially reached in a straight line, do that.
-        if((!requests.containsKey(unit) || requests.get(unit).curId != pathId) && !raycast(costType, unit.tileX(), unit.tileY(), World.toTile(destination.x), World.toTile(destination.y))){
+        if((!requests.containsKey(unit) || requests.get(unit).curId != pathId) && !raycast(team, costType, unit.tileX(), unit.tileY(), World.toTile(destination.x), World.toTile(destination.y))){
             out.set(destination);
             return true;
         }
 
         //destination is impassable, can't go there.
-        if(solid(costType, world.packArray(World.toTile(destination.x), World.toTile(destination.y)))){
+        if(solid(team, costType, world.packArray(World.toTile(destination.x), World.toTile(destination.y)))){
             return false;
         }
 
@@ -173,7 +174,7 @@ public class ControlPathfinder{
             req.cost = costType;
             req.destination.set(destination);
             req.curId = pathId;
-            req.team = unit.team.id;
+            req.team = team;
             req.lastUpdateId = state.updateId;
             req.lastPos.set(unit);
             req.lastWorldUpdate = worldUpdateId;
@@ -222,7 +223,7 @@ public class ControlPathfinder{
                     Tile tile = tile(items[i]);
                     float dst = unit.dst2(tile);
                     //TODO maybe put this on a timer since raycasts can be expensive?
-                    if(dst < minDst && !permissiveRaycast(costType, tileX, tileY, tile.x, tile.y)){
+                    if(dst < minDst && !permissiveRaycast(team, costType, tileX, tileY, tile.x, tile.y)){
                         req.pathIndex = Math.max(dst <= range * range ? i + 1 : i, req.pathIndex);
                         minDst = Math.min(dst, minDst);
                     }
@@ -235,7 +236,7 @@ public class ControlPathfinder{
                 if((req.raycastTimer += Time.delta) >= 50f){
                     for(int i = len - 1; i > req.pathIndex; i--){
                         int val = items[i];
-                        if(!raycast(costType, tileX, tileY, val % wwidth, val / wwidth)){
+                        if(!raycast(team, costType, tileX, tileY, val % wwidth, val / wwidth)){
                             req.rayPathIndex = i;
                             break;
                         }
@@ -288,14 +289,14 @@ public class ControlPathfinder{
         requests.clear();
     }
 
-    private static boolean raycast(PathCost type, int x1, int y1, int x2, int y2){
+    private static boolean raycast(int team, PathCost type, int x1, int y1, int x2, int y2){
         int ww = world.width(), wh = world.height();
         int x = x1, dx = Math.abs(x2 - x), sx = x < x2 ? 1 : -1;
         int y = y1, dy = Math.abs(y2 - y), sy = y < y2 ? 1 : -1;
         int e2, err = dx - dy;
 
         while(x >= 0 && y >= 0 && x < ww && y < wh){
-            if(avoid(type, x + y * wwidth)) return true;
+            if(avoid(team, type, x + y * wwidth)) return true;
             if(x == x2 && y == y2) return false;
 
             //TODO no diagonals???? is this a good idea?
@@ -326,14 +327,14 @@ public class ControlPathfinder{
         return true;
     }
 
-    private static boolean permissiveRaycast(PathCost type, int x1, int y1, int x2, int y2){
+    private static boolean permissiveRaycast(int team, PathCost type, int x1, int y1, int x2, int y2){
         int ww = world.width(), wh = world.height();
         int x = x1, dx = Math.abs(x2 - x), sx = x < x2 ? 1 : -1;
         int y = y1, dy = Math.abs(y2 - y), sy = y < y2 ? 1 : -1;
         int err = dx - dy;
 
         while(x >= 0 && y >= 0 && x < ww && y < wh){
-            if(solid(type, x + y * wwidth)) return true;
+            if(solid(team, type, x + y * wwidth)) return true;
             if(x == x2 && y == y2) return false;
 
             //no diagonals
@@ -349,8 +350,8 @@ public class ControlPathfinder{
         return true;
     }
 
-    static boolean cast(PathCost cost, int from, int to){
-        return raycast(cost, from % wwidth, from / wwidth, to % wwidth, to / wwidth);
+    static boolean cast(int team, PathCost cost, int from, int to){
+        return raycast(team, cost, from % wwidth, from / wwidth, to % wwidth, to / wwidth);
     }
 
     private Tile tile(int pos){
@@ -367,23 +368,23 @@ public class ControlPathfinder{
         return cost.getCost(team, pathfinder.tiles[tilePos]);
     }
 
-    private static int cost(PathCost cost, int tilePos){
-        return cost.getCost(-1, pathfinder.tiles[tilePos]);
+    private static int cost(int team, PathCost cost, int tilePos){
+        return cost.getCost(team, pathfinder.tiles[tilePos]);
     }
 
-    private static boolean avoid(PathCost type, int tilePos){
-        int cost = cost(type, tilePos);
+    private static boolean avoid(int team, PathCost type, int tilePos){
+        int cost = cost(team, type, tilePos);
         return cost == impassable || cost >= 2;
     }
 
-    private static boolean solid(PathCost type, int tilePos){
-        int cost = cost(type, tilePos);
+    private static boolean solid(int team, PathCost type, int tilePos){
+        int cost = cost(team, type, tilePos);
         return cost == impassable || cost >= 6000;
     }
 
-    private static float tileCost(PathCost type, int a, int b){
+    private static float tileCost(int team, PathCost type, int a, int b){
         //currently flat cost
-        return cost(type, b);
+        return cost(team, type, b);
     }
 
     static class PathfindThread extends Thread{
@@ -506,7 +507,7 @@ public class ControlPathfinder{
                     //in fallback mode, enemy walls are passable
                     if(tcost(team, cost, next) == impassable) continue;
 
-                    float add = tileCost(cost, current, next);
+                    float add = tileCost(team, cost, current, next);
                     float currentCost = costs.get(current);
 
                     //the cost can include an impassable enemy wall, so cap the cost if so and add the base cost instead
@@ -564,7 +565,7 @@ public class ControlPathfinder{
             int output = 1, input = 2;
 
             while(input < len){
-                if(cast(cost, result.get(output - 1), result.get(input))){
+                if(cast(team, cost, result.get(output - 1), result.get(input))){
                     result.swap(output, input - 1);
                     output++;
                 }

@@ -1996,12 +1996,12 @@ public class Fx{
 
     dooropen = new Effect(10, e -> {
         stroke(e.fout() * 1.6f);
-        Lines.square(e.x, e.y, tilesize / 2f + e.fin() * 2f);
+        Lines.square(e.x, e.y, e.rotation * tilesize / 2f + e.fin() * 2f);
     }),
 
     doorclose = new Effect(10, e -> {
         stroke(e.fout() * 1.6f);
-        Lines.square(e.x, e.y, tilesize / 2f + e.fout() * 2f);
+        Lines.square(e.x, e.y, e.rotation * tilesize / 2f + e.fout() * 2f);
     }),
 
     dooropenlarge = new Effect(10, e -> {

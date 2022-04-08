@@ -80,7 +80,7 @@ public class Blocks{
     //defense
     copperWall, copperWallLarge, titaniumWall, titaniumWallLarge, plastaniumWall, plastaniumWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge,
     phaseWall, phaseWallLarge, surgeWall, surgeWallLarge,
-    berylliumWall, berylliumWallLarge, tungstenWall, tungstenWallLarge, carbideWall, carbideWallLarge,
+    berylliumWall, berylliumWallLarge, tungstenWall, tungstenWallLarge, blastDoor, carbideWall, carbideWallLarge,
     mender, mendProjector, overdriveProjector, overdriveDome, forceProjector, shockMine,
     scrapWall, scrapWallLarge, scrapWallHuge, scrapWallGigantic, thruster, //ok, these names are getting ridiculous, but at least I don't have humongous walls yet
 
@@ -1606,6 +1606,13 @@ public class Blocks{
         tungstenWallLarge = new Wall("tungsten-wall-large"){{
             requirements(Category.defense, ItemStack.mult(tungstenWall.requirements, 4));
             health = 180 * wallHealthMultiplier * 4;
+            armor = 14f;
+            size = 2;
+        }};
+
+        blastDoor = new AutoDoor("blast-door"){{
+            requirements(Category.defense, with(Items.tungsten, 24, Items.silicon, 24));
+            health = 175 * wallHealthMultiplier * 4;
             armor = 14f;
             size = 2;
         }};

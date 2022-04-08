@@ -234,7 +234,9 @@ public class ErekirTechTree{
 
                         node(tungstenWall, () -> {
                             node(tungstenWallLarge, () -> {
+                                node(blastDoor, () -> {
 
+                                });
                             });
 
                             node(carbideWall, () -> {

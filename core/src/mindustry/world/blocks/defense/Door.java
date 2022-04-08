@@ -100,7 +100,7 @@ public class Door extends Wall{
         }
 
         public void effect(){
-            (open ? closefx : openfx).at(this);
+            (open ? closefx : openfx).at(this, size);
         }
 
         public void updateChained(){
