@@ -112,7 +112,7 @@ public class Rules{
     /** Unlocked content names. Only used in multiplayer when the campaign is enabled. */
     public ObjectSet<String> researched = new ObjectSet<>();
     /** Block containing these items as requirements are hidden. */
-    public ObjectSet<Item> hiddenBuildItems = new ObjectSet<>();
+    public ObjectSet<Item> hiddenBuildItems = Items.erekirOnlyItems.asSet();
     /** HIGHLY UNSTABLE/EXPERIMENTAL. DO NOT USE THIS. */
     public boolean fog = false;
     /** If fog = true, this is whether static (black) fog is enabled. */

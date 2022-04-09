@@ -1624,7 +1624,7 @@ public class Blocks{
         }};
 
         carbideWallLarge = new Wall("carbide-wall-large"){{
-            requirements(Category.defense, ItemStack.mult(thoriumWall.requirements, 4));
+            requirements(Category.defense, ItemStack.mult(carbideWall.requirements, 4));
             health = 240 * wallHealthMultiplier * 4;
             armor = 16f;
             size = 2;
@@ -1950,7 +1950,7 @@ public class Blocks{
         }};
 
         unitCargoLoader = new UnitCargoLoader("unit-cargo-loader"){{
-            requirements(Category.distribution, with(Items.silicon, 80, Items.phaseFabric, 60, Items.carbide, 50, Items.oxide, 40));
+            requirements(Category.distribution, with(Items.silicon, 80, Items.carbide, 50, Items.oxide, 50));
 
             size = 3;
             buildTime = 60f * 8f;
@@ -1964,7 +1964,7 @@ public class Blocks{
         }};
 
         unitCargoUnloadPoint = new UnitCargoUnloadPoint("unit-cargo-unload-point"){{
-            requirements(Category.distribution, with(Items.silicon, 60, Items.thorium, 80));
+            requirements(Category.distribution, with(Items.silicon, 60, Items.tungsten, 60));
 
             size = 2;
 

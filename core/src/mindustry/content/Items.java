@@ -11,7 +11,7 @@ public class Items{
     beryllium, tungsten, oxide, carbide, fissileMatter, dormantCyst;
 
     //TODO remove, these are for debugging only
-    public static final Seq<Item> serpuloItems = new Seq<>(), erekirItems = new Seq<>();
+    public static final Seq<Item> serpuloItems = new Seq<>(), erekirItems = new Seq<>(), erekirOnlyItems = new Seq<>();
 
     public static void load(){
         copper = new Item("copper", Color.valueOf("d99d73")){{
@@ -145,5 +145,8 @@ public class Items{
         graphite, thorium, silicon, phaseFabric, surgeAlloy, sand,
         beryllium, tungsten, oxide, carbide, fissileMatter, dormantCyst
         );
+
+        erekirOnlyItems.addAll(erekirItems).removeAll(serpuloItems);
+
     }
 }
