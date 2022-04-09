@@ -1445,7 +1445,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     public void displayBars(Table table){
         for(Func<Building, Bar> bar : block.listBars()){
-            table.add(bar.get(self())).growX();
+            var result = bar.get(self());
+            if(result == null) continue;
+            table.add(result).growX();
             table.row();
         }
     }

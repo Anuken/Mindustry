@@ -744,7 +744,14 @@ public class DesktopInput extends InputHandler{
                     commandBuild = null;
                 }
             }
-        }else if(button == KeyCode.mouseRight){
+        }
+
+        return super.tap(x, y, count, button);
+    }
+
+    @Override
+    public boolean touchDown(float x, float y, int pointer, KeyCode button){
+        if(button == KeyCode.mouseRight){
             //right click: move to position
 
             //move to location - TODO right click instead?
@@ -771,7 +778,7 @@ public class DesktopInput extends InputHandler{
             }
         }
 
-        return super.tap(x, y, count, button);
+        return super.touchDown(x, y, pointer, button);
     }
 
     @Override

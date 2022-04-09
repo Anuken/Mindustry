@@ -24,7 +24,9 @@ public class Objectives{
 
         @Override
         public String display(){
-            return Core.bundle.format("requirement.research", content.emoji() + " " + content.localizedName);
+            return Core.bundle.format("requirement.research",
+                (content.techNode == null || content.techNode.parent == null || content.techNode.parent.content.unlocked()) && !(content instanceof Item) ?
+                    (content.emoji() + " " + content.localizedName) : "???");
         }
     }
 
@@ -44,7 +46,8 @@ public class Objectives{
 
         @Override
         public String display(){
-            return Core.bundle.format("requirement.produce", content.emoji() + " " + content.localizedName);
+            return Core.bundle.format("requirement.produce",
+                content.unlocked() ? (content.emoji() + " " + content.localizedName) : "???");
         }
     }
 

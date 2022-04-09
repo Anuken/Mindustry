@@ -105,6 +105,13 @@ public class BeamNode extends PowerBlock{
         }
 
         @Override
+        public BlockStatus status(){
+            if(Mathf.equal(power.status, 0f, 0.001f)) return BlockStatus.noInput;
+            if(Mathf.equal(power.status, 1f, 0.001f)) return BlockStatus.active;
+            return BlockStatus.noOutput;
+        }
+
+        @Override
         public void draw(){
             super.draw();
 

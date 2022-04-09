@@ -145,7 +145,7 @@ public class StatValues{
         return table -> table.stack(
             new Image(floor.uiIcon).setScaling(Scaling.fit),
             new Table(t -> t.top().right().add((multiplier < 0 ? "[scarlet]" : startZero ? "[accent]" : "[accent]+") + (int)((multiplier) * 100) + "%").style(Styles.outlineLabel))
-        );
+        ).maxSize(64f);
     }
 
     public static StatValue blocks(Attribute attr, boolean floating, float scale, boolean startZero){
@@ -203,6 +203,8 @@ public class StatValues{
 
             for(int i = 0; i < list.size; i++){
                 var item = list.get(i);
+
+                if(item instanceof Block block && block.itemDrop != null && !block.itemDrop.unlocked()) continue;
 
                 l.image(item.uiIcon).size(iconSmall).padRight(2).padLeft(2).padTop(3).padBottom(3);
                 l.add(item.localizedName).left().padLeft(1).padRight(4);

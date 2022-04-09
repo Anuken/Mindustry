@@ -134,6 +134,8 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean useColor = true;
     /** item that drops from this block, used for drills */
     public @Nullable Item itemDrop = null;
+    /** if true, this block cannot be mined by players. useful for annoying things like sand. */
+    public boolean playerUnmineable = false;
     /** Array of affinities to certain things. */
     public Attributes attributes = new Attributes();
     /** Health per square tile that this block occupies; essentially, this is multiplied by size * size. Overridden if health is > 0. If <0, the default is 40. */
@@ -519,7 +521,7 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     public void addLiquidBar(Liquid liq){
-        addBar("liquid-" + liq.name, entity -> new Bar(
+        addBar("liquid-" + liq.name, entity -> !liq.unlocked() ? null : new Bar(
             () -> liq.localizedName,
             liq::barColor,
             () -> entity.liquids.get(liq) / liquidCapacity
