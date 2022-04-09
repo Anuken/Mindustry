@@ -12,7 +12,7 @@ public class RailBulletType extends BulletType{
     static boolean any = false;
 
     public Effect pierceEffect = Fx.hitBulletSmall, pointEffect = Fx.none, lineEffect = Fx.none;
-    public Effect endEffect;
+    public Effect endEffect = Fx.none;
     /** Multiplier of damage decreased per health pierced. */
     public float pierceDamageFactor = 1f;
 
@@ -79,7 +79,7 @@ public class RailBulletType extends BulletType{
             }
         }
 
-        if(!any){
+        if(!any && endEffect != Fx.none){
             endEffect.at(b.x + nor.x * resultLen, b.y + nor.y * resultLen, b.rotation(), hitColor);
         }
 
