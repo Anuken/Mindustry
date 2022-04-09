@@ -66,7 +66,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     public boolean showed = false, sectorsShown;
     public String searchText = "";
 
-    public Table sectorTop = new Table(), notifs = new Table();
+    public Table sectorTop = new Table(), notifs = new Table(), expandTable = new Table();
     public Label hoverLabel = new Label("");
 
     public PlanetDialog(){
@@ -281,6 +281,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             }
             selected = destSec;
             updateSelected();
+            rebuildExpand();
         }
 
         //TODO pan over to correct planet
@@ -564,7 +565,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                                 if(state.planet != planet){
                                     newPresets.clear();
                                     state.planet = planet;
-                                    rebuildList();
+                                    rebuildExpand();
                                 }
                                 settings.put("lastplanet", planet.name);
                             }).width(200).height(40).growX().update(bb -> bb.setChecked(state.planet == planet));
@@ -576,31 +577,39 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         }),
 
         new Table(c -> {
-            c.visible(() -> !(graphics.isPortrait() && mobile));
-            if(state.planet.sectors.contains(Sector::hasBase)){
-                int attacked = state.planet.sectors.count(Sector::isAttacked);
-
-                //sector notifications & search
-                c.top().right();
-                c.defaults().width(290f);
-
-                c.button(bundle.get("sectorlist") +
-                    (attacked == 0 ? "" : "\n[red]⚠[lightgray] " + bundle.format("sectorlist.attacked", "[red]" + attacked + "[]")),
-                    Icon.downOpen, Styles.squareTogglet, () -> sectorsShown = !sectorsShown)
-                .height(60f).checked(b -> {
-                    Image image = (Image)b.getCells().first().get();
-                    image.setDrawable(sectorsShown ? Icon.upOpen : Icon.downOpen);
-                    return sectorsShown;
-                }).with(t -> t.left().margin(7f)).with(t -> t.getLabelCell().grow().left()).row();
-
-                c.collapser(t -> {
-                    t.background(Styles.black8);
-
-                    notifs = t;
-                    rebuildList();
-                }, false, () -> sectorsShown).padBottom(64f).row();
-            }
+            expandTable = c;
         })).grow();
+
+        rebuildExpand();
+    }
+
+    void rebuildExpand(){
+        Table c = expandTable;
+        c.clear();
+        c.visible(() -> !(graphics.isPortrait() && mobile));
+        if(state.planet.sectors.contains(Sector::hasBase)){
+            int attacked = state.planet.sectors.count(Sector::isAttacked);
+
+            //sector notifications & search
+            c.top().right();
+            c.defaults().width(290f);
+
+            c.button(bundle.get("sectorlist") +
+            (attacked == 0 ? "" : "\n[red]⚠[lightgray] " + bundle.format("sectorlist.attacked", "[red]" + attacked + "[]")),
+            Icon.downOpen, Styles.squareTogglet, () -> sectorsShown = !sectorsShown)
+            .height(60f).checked(b -> {
+                Image image = (Image)b.getCells().first().get();
+                image.setDrawable(sectorsShown ? Icon.upOpen : Icon.downOpen);
+                return sectorsShown;
+            }).with(t -> t.left().margin(7f)).with(t -> t.getLabelCell().grow().left()).row();
+
+            c.collapser(t -> {
+                t.background(Styles.black8);
+
+                notifs = t;
+                rebuildList();
+            }, false, () -> sectorsShown).padBottom(64f).row();
+        }
     }
 
     void rebuildList(){
@@ -1108,25 +1117,21 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         //make sure there are no under-attack sectors (other than this one)
         for(Planet planet : content.planets()){
             if(!planet.allowWaveSimulation && !debugSelect){
-                int attackedCount = planet.sectors.count(s -> s.isAttacked() && s != sector);
-
                 //if there are two or more attacked sectors... something went wrong, don't show the dialog to prevent softlock
-                if(attackedCount < 2){
-                    Sector attacked = planet.sectors.find(s -> s.isAttacked() && s != sector);
-                    if(attacked != null){
-                        BaseDialog dialog = new BaseDialog("@sector.noswitch.title");
-                        dialog.cont.add(bundle.format("sector.noswitch", attacked.name(), attacked.planet.localizedName)).maxWidth(400f).labelAlign(Align.center).center().wrap();
-                        dialog.addCloseButton();
-                        dialog.buttons.button("@sector.view", Icon.eyeSmall, () -> {
-                            dialog.hide();
-                            lookAt(attacked);
-                            selected = attacked;
-                            updateSelected();
-                        });
-                        dialog.show();
+                Sector attacked = planet.sectors.find(s -> s.isAttacked() && s != sector);
+                if(attacked != null &&  planet.sectors.count(s -> s.isAttacked()) < 2){
+                    BaseDialog dialog = new BaseDialog("@sector.noswitch.title");
+                    dialog.cont.add(bundle.format("sector.noswitch", attacked.name(), attacked.planet.localizedName)).maxWidth(400f).labelAlign(Align.center).center().wrap();
+                    dialog.addCloseButton();
+                    dialog.buttons.button("@sector.view", Icon.eyeSmall, () -> {
+                        dialog.hide();
+                        lookAt(attacked);
+                        selected = attacked;
+                        updateSelected();
+                    });
+                    dialog.show();
 
-                        return;
-                    }
+                    return;
                 }
             }
         }

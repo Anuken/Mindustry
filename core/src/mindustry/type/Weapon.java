@@ -140,8 +140,10 @@ public class Weapon implements Cloneable{
             t.row();
             t.add("[lightgray]" + Stat.inaccuracy.localized() + ": [white]" + (int)inaccuracy + " " + StatUnit.degrees.localized());
         }
-        t.row();
-        t.add("[lightgray]" + Stat.reload.localized() + ": " + (mirror ? "2x " : "") + "[white]" + Strings.autoFixed(60f / reload * shoot.shots, 2) + " " + StatUnit.perSecond.localized());
+        if(reload > 0){
+            t.row();
+            t.add("[lightgray]" + Stat.reload.localized() + ": " + (mirror ? "2x " : "") + "[white]" + Strings.autoFixed(60f / reload * shoot.shots, 2) + " " + StatUnit.perSecond.localized());
+        }
 
         StatValues.ammo(ObjectMap.of(u, bullet)).display(t);
     }

@@ -102,6 +102,10 @@ public class Planets{
             startSector = 10;
             atmosphereRadIn = -0.01f;
             atmosphereRadOut = 0.3f;
+            defaultEnv = Env.underwater | Env.terrestrial;
+            ruleSetter = r -> {
+
+            };
         }};
 
         //TODO hide beryllium and others on load in rules
