@@ -382,11 +382,13 @@ public class Control implements ApplicationListener, Loadable{
                         state.wavetime = state.rules.initialWaveSpacing <= 0f ? (state.rules.waveSpacing * (sector.preset == null ? 2f : sector.preset.startWaveTimeMultiplier)) : state.rules.initialWaveSpacing;
                         //reset captured state
                         sector.info.wasCaptured = false;
-                        //re-enable waves
-                        state.rules.waves = true;
 
-                        //reset win wave??
-                        state.rules.winWave = state.rules.attackMode ? -1 : sector.preset != null && sector.preset.captureWave > 0 ? sector.preset.captureWave : state.rules.winWave > state.wave ? state.rules.winWave : 30;
+                        if(state.rules.sector.planet.allowWaves){
+                            //re-enable waves
+                            state.rules.waves = true;
+                            //reset win wave??
+                            state.rules.winWave = state.rules.attackMode ? -1 : sector.preset != null && sector.preset.captureWave > 0 ? sector.preset.captureWave : state.rules.winWave > state.wave ? state.rules.winWave : 30;
+                        }
 
                         //if there's still an enemy base left, fix it
                         if(state.rules.attackMode){

@@ -93,6 +93,8 @@ public class Planet extends UnlockableContent{
     public boolean allowSectorInvasion = false;
     /** If true, sectors saves are cleared when lost. */
     public boolean clearSectorOnLose = false;
+    /** If true, waves are created on sector loss. TODO remove. */
+    public boolean allowWaves = false;
     /** Sets up rules on game load for any sector on this planet. */
     public Cons<Rules> ruleSetter = r -> {};
     /** Parent body that this planet orbits around. If null, this planet is considered to be in the middle of the solar system.*/

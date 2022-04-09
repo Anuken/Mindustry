@@ -751,6 +751,8 @@ public class DesktopInput extends InputHandler{
 
     @Override
     public boolean touchDown(float x, float y, int pointer, KeyCode button){
+        if(scene.hasMouse() || !commandMode) return false;
+
         if(button == KeyCode.mouseRight){
             //right click: move to position
 

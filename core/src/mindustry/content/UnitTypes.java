@@ -2456,6 +2456,7 @@ public class UnitTypes{
             rotateSpeed = 3.5f;
             health = 800;
             armor = 5f;
+            itemCapacity = 0;
             treadRects = new Rect[]{new Rect(12, 7, 14, 51)};
             researchCostMultiplier = 0f;
 
@@ -2496,6 +2497,7 @@ public class UnitTypes{
             rotateSpeed = 2.6f;
             health = 2000;
             armor = 8f;
+            itemCapacity = 0;
             treadRects = new Rect[]{new Rect(17, 10, 19, 76)};
             researchCostMultiplier = 0f;
 
@@ -2582,6 +2584,7 @@ public class UnitTypes{
             speed = 0.63f;
             health = 9000;
             armor = 20f;
+            itemCapacity = 0;
             crushDamage = 13f / 5f;
             treadRects = new Rect[]{new Rect(22, 16, 28, 130)};
 
