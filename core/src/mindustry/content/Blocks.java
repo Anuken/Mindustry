@@ -1884,7 +1884,6 @@ public class Blocks{
             requirements(Category.distribution, with(Items.beryllium, 1));
             health = 90;
             speed = 4f;
-            fogRadius = 1;
             researchCost = with(Items.beryllium, 5);
         }};
 
@@ -1893,7 +1892,6 @@ public class Blocks{
             health = 90;
             speed = 4f;
             regionRotated1 = 1;
-            fogRadius = 1;
             researchCost = with(Items.beryllium, 30);
         }};
 
@@ -1901,7 +1899,6 @@ public class Blocks{
             requirements(Category.distribution, with(Items.graphite, 8, Items.beryllium, 8));
             health = 90;
             speed = 4f;
-            fogRadius = 1;
             researchCostMultiplier = 1.5f;
         }};
 
@@ -1909,7 +1906,6 @@ public class Blocks{
             requirements(Category.distribution, with(Items.beryllium, 20));
             health = 90;
             speed = 4f;
-            fogRadius = 1;
             researchCostMultiplier = 0.3f;
         }};
 
@@ -1918,7 +1914,6 @@ public class Blocks{
             health = 120;
             speed = 4f;
             regionRotated1 = 1;
-            fogRadius = 1;
         }};
 
         surgeConveyor = new StackConveyor("surge-conveyor"){{
@@ -4221,7 +4216,6 @@ public class Blocks{
             canOverdrive = false;
             health = 800;
             researchCostMultiplier = 4f;
-            fogRadius = 1;
         }};
 
         reinforcedPayloadRouter = new PayloadRouter("reinforced-payload-router"){{
@@ -4229,7 +4223,6 @@ public class Blocks{
             moveTime = 35f;
             health = 800;
             canOverdrive = false;
-            fogRadius = 2;
             researchCostMultiplier = 4f;
         }};
 

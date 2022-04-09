@@ -184,6 +184,7 @@ public class Build{
 
                 if(
                 check == null || //nothing there
+                (state.rules.staticFog && !fogControl.isDiscovered(team, wx, wy)) ||
                 (check.floor().isDeep() && !type.floating && !type.requiresWater && !type.placeableLiquid) || //deep water
                 (type == check.block() && check.build != null && rotation == check.build.rotation && type.rotate) || //same block, same rotation
                 !check.interactable(team) || //cannot interact

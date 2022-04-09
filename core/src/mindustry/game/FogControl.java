@@ -100,6 +100,15 @@ public final class FogControl implements CustomChunk{
         return fog == null || fog[team.id] == null ? null : fog[team.id].staticData;
     }
 
+    public boolean isDiscovered(Team team, int x, int y){
+        if(!state.rules.staticFog || team.isAI()) return true;
+
+        var data = getDiscovered(team);
+        if(data == null) return false;
+        if(x < 0 || y < 0 || x >= ww || y >= wh) return false;
+        return data.get(x + y * ww);
+    }
+
     public boolean isVisible(Team team, float x, float y){
         return isVisibleTile(team, World.toTile(x), World.toTile(y));
     }
