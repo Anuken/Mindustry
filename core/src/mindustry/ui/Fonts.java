@@ -116,10 +116,7 @@ public class Fonts{
                 TextureRegion region = Core.atlas.find(texture);
 
                 if(region.texture != uitex){
-                    Log.info("not found: " + nametex[0]);
                     continue;
-                }else{
-                    Log.info("found: " + nametex[0]);
                 }
 
                 unicodeIcons.put(nametex[0], ch);
