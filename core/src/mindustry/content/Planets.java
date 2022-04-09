@@ -68,7 +68,7 @@ public class Planets{
             updateLighting = false;
 
             ruleSetter = r -> {
-                r.placeRangeCheck = false;
+                r.placeRangeCheck = true;
                 r.attributes.set(Attribute.heat, 0.8f);
                 r.showSpawns = true;
                 r.fog = true;

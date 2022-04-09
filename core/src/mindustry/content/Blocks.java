@@ -1588,6 +1588,7 @@ public class Blocks{
             requirements(Category.defense, with(Items.beryllium, 6));
             health = 130 * wallHealthMultiplier;
             armor = 2f;
+            buildCostMultiplier = 4f;
         }};
 
         berylliumWallLarge = new Wall("beryllium-wall-large"){{
@@ -1595,12 +1596,14 @@ public class Blocks{
             health = 130 * wallHealthMultiplier * 4;
             armor = 2f;
             size = 2;
+            buildCostMultiplier = 4f;
         }};
 
         tungstenWall = new Wall("tungsten-wall"){{
             requirements(Category.defense, with(Items.tungsten, 6));
             health = 180 * wallHealthMultiplier;
             armor = 14f;
+            buildCostMultiplier = 4f;
         }};
 
         tungstenWallLarge = new Wall("tungsten-wall-large"){{
@@ -1608,6 +1611,7 @@ public class Blocks{
             health = 180 * wallHealthMultiplier * 4;
             armor = 14f;
             size = 2;
+            buildCostMultiplier = 4f;
         }};
 
         blastDoor = new AutoDoor("blast-door"){{
@@ -1615,12 +1619,14 @@ public class Blocks{
             health = 175 * wallHealthMultiplier * 4;
             armor = 14f;
             size = 2;
+            buildCostMultiplier = 4f;
         }};
 
         carbideWall = new Wall("carbide-wall"){{
             requirements(Category.defense, with(Items.thorium, 6, Items.carbide, 6));
             health = 240 * wallHealthMultiplier;
             armor = 16f;
+            buildCostMultiplier = 4f;
         }};
 
         carbideWallLarge = new Wall("carbide-wall-large"){{
@@ -1628,6 +1634,7 @@ public class Blocks{
             health = 240 * wallHealthMultiplier * 4;
             armor = 16f;
             size = 2;
+            buildCostMultiplier = 4f;
         }};
 
         mender = new MendProjector("mender"){{
@@ -3642,6 +3649,7 @@ public class Blocks{
                 shootEffect = sfe;
                 smokeEffect = Fx.shootBigSmoke;
                 ammoMultiplier = 1;
+                pierceCap = 2;
                 pierce = true;
                 pierceBuilding = true;
                 hitColor = backColor = trailColor = Pal.berylShot;
@@ -3658,6 +3666,7 @@ public class Blocks{
                 smokeEffect = Fx.shootBigSmoke;
                 ammoMultiplier = 1;
                 reloadMultiplier = 1f;
+                pierceCap = 2;
                 pierce = true;
                 pierceBuilding = true;
                 hitColor = backColor = trailColor = Pal.tungstenShot;
