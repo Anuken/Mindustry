@@ -92,7 +92,7 @@ public class Pathfinder implements Runnable{
 
             for(int i = 0; i < tiles.length; i++){
                 Tile tile = world.tiles.geti(i);
-                tiles[i] = packTile(tile, 0);
+                tiles[i] = packTile(tile);
             }
 
             if(state.rules.waveTeam.needsFlowField()){
@@ -146,7 +146,7 @@ public class Pathfinder implements Runnable{
     }
 
     /** Packs a tile into its internal representation. */
-    public int packTile(Tile tile, int prev){
+    public int packTile(Tile tile){
         boolean nearLiquid = false, nearSolid = false, nearGround = false, solid = tile.solid(), allDeep = tile.floor().isDeep();
 
         for(int i = 0; i < 4; i++){
@@ -216,7 +216,7 @@ public class Pathfinder implements Runnable{
         tile.getLinkedTiles(t -> {
             int pos = t.array();
             if(pos < tiles.length){
-                tiles[pos] = packTile(t, tiles[pos]);
+                tiles[pos] = packTile(t);
             }
         });
 
