@@ -19,7 +19,7 @@ import static mindustry.Vars.*;
 
 /** Stores global constants for logic processors. */
 public class GlobalConstants{
-    public static final int ctrlProcessor = 1, ctrlPlayer = 2;
+    public static final int ctrlProcessor = 1, ctrlPlayer = 2, ctrlCommand = 3;
     public static final ContentType[] lookableContent = {ContentType.block, ContentType.unit, ContentType.item, ContentType.liquid};
     /** Global random state. */
     public static final Rand rand = new Rand();
@@ -51,6 +51,7 @@ public class GlobalConstants{
 
         put("@ctrlProcessor", ctrlProcessor);
         put("@ctrlPlayer", ctrlPlayer);
+        put("@ctrlCommand", ctrlCommand);
 
         //store base content
 
