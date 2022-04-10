@@ -275,12 +275,12 @@ public class StatValues{
             for(int i = 0; i < weapons.size;i ++){
                 Weapon weapon = weapons.get(i);
 
-                if(weapon.flipSprite){
+                if(weapon.flipSprite || !weapon.hasStats(unit)){
                     //flipped weapons are not given stats
                     continue;
                 }
 
-                TextureRegion region = !weapon.name.equals("") && weapon.outlineRegion.found() ? weapon.outlineRegion : unit.fullIcon;
+                TextureRegion region = !weapon.name.equals("") && weapon.region.found() ? weapon.region : Core.atlas.find("clear");
 
                 table.image(region).size(60).scaling(Scaling.bounded).right().top();
 

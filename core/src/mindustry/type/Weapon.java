@@ -135,6 +135,10 @@ public class Weapon implements Cloneable{
         this("");
     }
 
+    public boolean hasStats(UnitType u){
+        return true;
+    }
+
     public void addStats(UnitType u, Table t){
         if(inaccuracy > 0){
             t.row();

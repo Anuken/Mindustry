@@ -1,7 +1,6 @@
 package mindustry.type.weapons;
 
 import arc.math.*;
-import arc.scene.ui.layout.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -24,8 +23,8 @@ public class BuildWeapon extends Weapon{
     }
 
     @Override
-    public void addStats(UnitType u, Table t){
-        //no.
+    public boolean hasStats(UnitType u){
+        return false;
     }
 
     @Override

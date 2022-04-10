@@ -2825,7 +2825,7 @@ public class Blocks{
                     width = 6f;
                     height = 8f;
                     hitEffect = Fx.flakExplosion;
-                    splashDamage = 25f * 1.5f;
+                    splashDamage = 30f * 1.5f;
                     splashDamageRadius = 20f;
                     fragBullets = 6;
                     fragBullet = new BasicBulletType(3f, 5){{
@@ -3422,9 +3422,9 @@ public class Blocks{
                     width = 6f;
                     height = 8f;
                     hitEffect = Fx.flakExplosion;
-                    splashDamage = 28f * 1.5f;
-                    splashDamageRadius = 22f;
-                    fragBullet = new BasicBulletType(3f, 5, "bullet"){{
+                    splashDamage = 32f * 1.5f;
+                    splashDamageRadius = 25f;
+                    fragBullet = new BasicBulletType(3f, 8, "bullet"){{
                         width = 5f;
                         height = 12f;
                         shrinkY = 1f;
@@ -3666,7 +3666,7 @@ public class Blocks{
                 smokeEffect = Fx.shootBigSmoke;
                 ammoMultiplier = 1;
                 reloadMultiplier = 1f;
-                pierceCap = 2;
+                pierceCap = 3;
                 pierce = true;
                 pierceBuilding = true;
                 hitColor = backColor = trailColor = Pal.tungstenShot;
@@ -4488,7 +4488,7 @@ public class Blocks{
             forceDark = true;
             privileged = true;
             size = 1;
-            maxInstructionsPerTick = 30;
+            maxInstructionsPerTick = 50;
         }};
 
         worldCell = new MemoryBlock("world-cell"){{
