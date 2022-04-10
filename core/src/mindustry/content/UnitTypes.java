@@ -976,7 +976,8 @@ public class UnitTypes{
             flying = true;
             health = 70;
             engineOffset = 5.75f;
-            targetAir = false;
+            //TODO balance
+            //targetAir = false;
             targetFlags = new BlockFlag[]{BlockFlag.generator, null};
             hitSize = 7;
             itemCapacity = 10;

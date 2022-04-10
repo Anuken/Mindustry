@@ -150,6 +150,7 @@ public class Teams{
             data.presentFlag = false;
             data.unitCount = 0;
             data.units.clear();
+            data.players.clear();
             if(data.tree != null){
                 data.tree.clear();
             }
@@ -193,6 +194,10 @@ public class Teams{
             data.unitsByType[unit.type.id].add(unit);
 
             count(unit);
+        }
+
+        for(var player : Groups.player){
+            player.team().data().players.add(player);
         }
 
         //update presence of each team.
@@ -251,6 +256,8 @@ public class Teams{
         public @Nullable QuadTree<Unit> tree;
         /** Units of this team. Updated each frame. */
         public Seq<Unit> units = new Seq<>();
+        /** Same as units, but players. */
+        public Seq<Player> players = new Seq<>();
         /** Units of this team by type. Updated each frame. */
         public @Nullable Seq<Unit>[] unitsByType;
 

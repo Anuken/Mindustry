@@ -1164,6 +1164,37 @@ public class LExecutor{
         }
     }
 
+    public static class FetchI implements LInstruction{
+        public FetchType type = FetchType.unit;
+        public int result, team, index;
+
+        public FetchI(FetchType type, int result, int team, int index){
+            this.type = type;
+            this.result = result;
+            this.team = team;
+            this.index = index;
+        }
+
+        public FetchI(){
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            int i = exec.numi(index);
+            if(!(exec.obj(team) instanceof Team t)) return;
+            TeamData data = t.data();
+
+            switch(type){
+                case unit -> exec.setobj(result, i < 0 || i >= data.units.size ? null : data.units.get(i));
+                case player -> exec.setobj(result, i < 0 || i >= data.players.size || data.players.get(i).unit().isNull() ? null : data.players.get(i).unit());
+                case core -> exec.setobj(result, i < 0 || i >= data.cores.size ? null : data.cores.get(i));
+                case unitCount -> exec.setnum(result, data.units.size);
+                case coreCount -> exec.setnum(result, data.cores.size);
+                case playerCount -> exec.setnum(result, data.players.size);
+            }
+        }
+    }
+
     //endregion
     //region privileged / world instructions
 
@@ -1225,14 +1256,16 @@ public class LExecutor{
                 //TODO this can be quite laggy...
                 switch(layer){
                     case ore -> {
-                        if(b instanceof OverlayFloor o) tile.setOverlayNet(o);
+                        if(b instanceof OverlayFloor o && tile.overlay() != o) tile.setOverlayNet(o);
                     }
                     case floor -> {
-                        if(b instanceof Floor f) tile.setFloorNet(f);
+                        if(b instanceof Floor f && tile.floor() != f) tile.setFloorNet(f);
                     }
                     case block -> {
                         Team t = exec.obj(team) instanceof Team steam ? steam : Team.derelict;
-                        tile.setNet(b, t, Mathf.clamp(exec.numi(rotation), 0, 3));
+                        if(tile.block() != b || tile.team() != t){
+                            tile.setNet(b, t, Mathf.clamp(exec.numi(rotation), 0, 3));
+                        }
                     }
                     //building case not allowed
                 }

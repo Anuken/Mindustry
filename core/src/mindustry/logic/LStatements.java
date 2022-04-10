@@ -1460,4 +1460,58 @@ public class LStatements{
             return new SetRateI(builder.var(amount));
         }
     }
+
+    @RegisterStatement("fetch")
+    public static class FetchStatement extends LStatement{
+        public FetchType type = FetchType.unit;
+        public String result = "result", team = "@sharded", index = "0";
+
+        @Override
+        public void build(Table table){
+            rebuild(table);
+        }
+
+        void rebuild(Table table){
+            table.clearChildren();
+
+            fields(table, result, r -> result = r);
+
+            table.add(" = ");
+
+            table.button(b -> {
+                b.label(() -> type.name()).growX().wrap().labelAlign(Align.center);
+                b.clicked(() -> showSelect(b, FetchType.all, type, o -> {
+                    type = o;
+                    rebuild(table);
+                }, 2, c -> c.width(150f)));
+            }, Styles.logict, () -> {}).size(160f, 40f).margin(5f).pad(4f).color(table.color);
+
+            row(table);
+
+            fields(table, "team", team, s -> team = s);
+
+            if(type != FetchType.coreCount && type != FetchType.playerCount && type != FetchType.unitCount){
+                table.add(" # ");
+
+                row(table);
+
+                fields(table, index, i -> index = i);
+            }
+        }
+
+        @Override
+        public boolean privileged(){
+            return true;
+        }
+
+        @Override
+        public Color color(){
+            return Pal.logicWorld;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new FetchI(type, builder.var(result), builder.var(team), builder.var(index));
+        }
+    }
 }
