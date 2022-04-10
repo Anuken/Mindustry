@@ -2987,7 +2987,7 @@ public class Blocks{
 
         //TODO these may work in space, but what's the point?
         lancer = new PowerTurret("lancer"){{
-            requirements(Category.turret, with(Items.copper, 60, Items.lead, 70, Items.silicon, 50));
+            requirements(Category.turret, with(Items.copper, 70, Items.lead, 70, Items.silicon, 70));
             range = 165f;
 
             shoot.firstShotDelay = 40f;
@@ -3020,6 +3020,8 @@ public class Blocks{
                 collidesAir = false;
                 length = 173f;
                 ammoMultiplier = 1f;
+
+                pierceCap = 4;
             }};
         }};
 
@@ -3751,6 +3753,7 @@ public class Blocks{
                 damage = 90f;
                 length = r;
                 knockback = 1f;
+                pierceCap = 3;
 
                 colors = new Color[]{Color.valueOf("eb7abe").a(0.55f), Color.valueOf("e189f5").a(0.7f), Color.valueOf("907ef7").a(0.8f), Color.valueOf("91a4ff"), Color.white};
             }},
@@ -3759,6 +3762,7 @@ public class Blocks{
                 rangeChange = 70f;
                 length = r + rangeChange;
                 knockback = 2f;
+                pierceCap = 4;
 
                 colors = new Color[]{Color.valueOf("465ab8").a(0.55f), Color.valueOf("66a6d2").a(0.7f), Color.valueOf("89e8b6").a(0.8f), Color.valueOf("cafcbe"), Color.white};
                 flareColor = Color.valueOf("89e8b6");

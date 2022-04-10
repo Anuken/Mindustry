@@ -57,7 +57,7 @@ public class ContinuousFlameBulletType extends ContinuousBulletType{
     @Override
     public void draw(Bullet b){
         float mult = b.fin(lengthInterp);
-        float realLength = (pierceMax <= 0 ? length : Damage.findPierceLength(b, pierceMax, length)) * mult;
+        float realLength = (pierceCap <= 0 ? length : Damage.findPierceLength(b, pierceCap, length)) * mult;
 
         float sin = Mathf.sin(Time.time, oscScl, oscMag);
 

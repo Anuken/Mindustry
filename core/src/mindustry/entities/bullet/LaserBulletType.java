@@ -63,7 +63,7 @@ public class LaserBulletType extends BulletType{
 
     @Override
     public void init(Bullet b){
-        float resultLength = Damage.collideLaser(b, length, largeHit), rot = b.rotation();
+        float resultLength = Damage.collideLaser(b, length, largeHit, laserAbsorb, pierceCap), rot = b.rotation();
 
         laserEffect.at(b.x, b.y, rot, resultLength * 0.75f);
 

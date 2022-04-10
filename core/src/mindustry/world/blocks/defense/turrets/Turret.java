@@ -74,7 +74,7 @@ public class Turret extends ReloadTurret{
     /** Minimum warmup needed to fire. */
     public float minWarmup = 0f;
     /** If true, this turret will accurately target moving targets with respect to charge time. */
-    public boolean accurateDelay = false;
+    public boolean accurateDelay = true;
     /** If false, this turret can't move while charging. */
     public boolean moveWhileCharging = true;
     /** pattern used for bullets */

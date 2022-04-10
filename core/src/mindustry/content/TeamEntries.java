@@ -8,6 +8,7 @@ public class TeamEntries{
         //TODO
         //new TeamEntry(Team.derelict);
         //new TeamEntry(Team.sharded);
+        //new TeamEntry(Team.malis);
         //new TeamEntry(Team.crux);
     }
 }

@@ -132,7 +132,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
             tileRaycast(World.toTile(lastX()), World.toTile(lastY()), tileX(), tileY());
         }
 
-        if(type.pierceCap != -1 && collided.size >= type.pierceCap){
+        if(type.removeAfterPierce && type.pierceCap != -1 && collided.size >= type.pierceCap){
             hit = true;
             remove();
         }

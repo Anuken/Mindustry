@@ -19,17 +19,20 @@ import static mindustry.Vars.*;
 
 /** Utility class for damaging in an area. */
 public class Damage{
+    private static final Rect rect = new Rect();
+    private static final Rect hitrect = new Rect();
+    private static final Vec2 vec = new Vec2(), seg1 = new Vec2(), seg2 = new Vec2();
+    private static final Seq<Unit> units = new Seq<>();
+    private static final IntSet collidedBlocks = new IntSet();
+    private static final IntFloatMap damages = new IntFloatMap();
+    private static final Seq<Building> builds = new Seq<>();
+    private static final FloatSeq distances = new FloatSeq();
+
     private static Tile furthest;
-    private static Rect rect = new Rect();
-    private static Rect hitrect = new Rect();
-    private static Vec2 tr = new Vec2(), seg1 = new Vec2(), seg2 = new Vec2();
-    private static Seq<Unit> units = new Seq<>();
+    private static float maxDst = 0f;
     private static int pierceCount = 0;
-    private static IntSet collidedBlocks = new IntSet();
     private static Building tmpBuilding;
     private static Unit tmpUnit;
-    private static IntFloatMap damages = new IntFloatMap();
-    private static Seq<Building> builds = new Seq<>();
 
     public static void applySuppression(Team team, float x, float y, float range, float reload, float maxDelay, float applyParticleChance, @Nullable Position source){
         builds.clear();
@@ -132,33 +135,59 @@ public class Damage{
     }
 
     public static float findLaserLength(Bullet b, float length){
-        Tmp.v1.trnsExact(b.rotation(), length);
+        vec.trnsExact(b.rotation(), length);
 
         furthest = null;
 
-        boolean found = World.raycast(b.tileX(), b.tileY(), World.toTile(b.x + Tmp.v1.x), World.toTile(b.y + Tmp.v1.y),
+        boolean found = World.raycast(b.tileX(), b.tileY(), World.toTile(b.x + vec.x), World.toTile(b.y + vec.y),
         (x, y) -> (furthest = world.tile(x, y)) != null && furthest.team() != b.team && (furthest.build != null && furthest.build.absorbLasers()));
 
         return found && furthest != null ? Math.max(6f, b.dst(furthest.worldx(), furthest.worldy())) : length;
     }
 
     public static float findPierceLength(Bullet b, int pierceCap, float length){
-        Tmp.v1.trnsExact(b.rotation(), length);
+        vec.trnsExact(b.rotation(), length);
+        rect.setPosition(b.x, b.y).setSize(vec.x, vec.y).normalize().grow(3f);
 
-        furthest = null;
         pierceCount = 0;
+        maxDst = Float.POSITIVE_INFINITY;
 
-        boolean found = World.raycast(b.tileX(), b.tileY(), World.toTile(b.x + Tmp.v1.x), World.toTile(b.y + Tmp.v1.y),
-        (x, y) -> (furthest = world.tile(x, y)) != null && furthest.build != null && furthest.team() != b.team && ++pierceCount >= pierceCap);
+        distances.clear();
 
-        return found && furthest != null ? Math.max(6f, b.dst(furthest.worldx(), furthest.worldy())) : length;
+        World.raycast(b.tileX(), b.tileY(), World.toTile(b.x + vec.x), World.toTile(b.y + vec.y), (x, y) -> {
+            //add distance to list so it can be processed
+            var build = world.build(x, y);
+
+            if(build != null && build.team != b.team){
+                distances.add(b.dst(build));
+
+                if(b.type.laserAbsorb && build.absorbLasers()){
+                    maxDst = Math.min(maxDst, b.dst(build));
+                    return true;
+                }
+            }
+
+            return false;
+        });
+
+        Units.nearbyEnemies(b.team, rect, u -> {
+            if(u.checkTarget(b.type.collidesAir, b.type.collidesGround)){
+                distances.add(u.dst(b));
+            }
+        });
+
+        distances.sort();
+
+        //return either the length when not enough things were pierced,
+        //or the last pierced object if there were enough blockages
+        return Math.min(distances.size < pierceCap || pierceCap < 0 ? length : Math.max(6f, distances.get(pierceCap - 1)), maxDst);
     }
 
-    /** Collides a bullet with blocks in a laser, taking into account absorption blocks. Resulting length is stored in the bullet's fdata. */
-    public static float collideLaser(Bullet b, float length, boolean large){
-        float resultLength = findLaserLength(b, length);
+    /** TODO Collides a bullet with blocks in a laser, taking into account absorption blocks. Resulting length is stored in the bullet's fdata. */
+    public static float collideLaser(Bullet b, float length, boolean large, boolean laser, int pierceCap){
+        float resultLength = findPierceLength(b, pierceCap, length);
 
-        collideLine(b, b.team, b.type.hitEffect, b.x, b.y, b.rotation(), resultLength, large);
+        collideLine(b, b.team, b.type.hitEffect, b.x, b.y, b.rotation(), resultLength, large, laser, pierceCap);
 
         b.fdata = resultLength;
 
@@ -197,8 +226,10 @@ public class Damage{
             length = findPierceLength(hitter, pierceCap, length);
         }
 
+        //TODO pierceCount ++ should happen in blocks AND units!
+
         collidedBlocks.clear();
-        tr.trnsExact(angle, length);
+        vec.trnsExact(angle, length);
 
         Intc2 collider = (cx, cy) -> {
             Building tile = world.build(cx, cy);
@@ -221,7 +252,7 @@ public class Damage{
 
         if(hitter.type.collidesGround){
             seg1.set(x, y);
-            seg2.set(seg1).add(tr);
+            seg2.set(seg1).add(vec);
             World.raycastEachWorld(x, y, seg2.x, seg2.y, (cx, cy) -> {
                 collider.get(cx, cy);
 
@@ -235,25 +266,10 @@ public class Damage{
             });
         }
 
-        rect.setPosition(x, y).setSize(tr.x, tr.y);
-        float x2 = tr.x + x, y2 = tr.y + y;
-
-        if(rect.width < 0){
-            rect.x += rect.width;
-            rect.width *= -1;
-        }
-
-        if(rect.height < 0){
-            rect.y += rect.height;
-            rect.height *= -1;
-        }
-
         float expand = 3f;
 
-        rect.y -= expand;
-        rect.x -= expand;
-        rect.width += expand * 2;
-        rect.height += expand * 2;
+        rect.setPosition(x, y).setSize(vec.x, vec.y).normalize().grow(expand * 2f);
+        float x2 = vec.x + x, y2 = vec.y + y;
 
         Cons<Unit> cons = e -> {
             //the peirce cap works for units, but really terribly, I'm just disabling it for now.
@@ -289,12 +305,12 @@ public class Damage{
      * @return the first encountered object.
      */
     public static Healthc linecast(Bullet hitter, float x, float y, float angle, float length){
-        tr.trns(angle, length);
+        vec.trns(angle, length);
         
         tmpBuilding = null;
 
         if(hitter.type.collidesGround){
-            World.raycastEachWorld(x, y, x + tr.x, y + tr.y, (cx, cy) -> {
+            World.raycastEachWorld(x, y, x + vec.x, y + vec.y, (cx, cy) -> {
                 Building tile = world.build(cx, cy);
                 if(tile != null && tile.team != hitter.team){
                     tmpBuilding = tile;
@@ -304,8 +320,8 @@ public class Damage{
             });
         }
 
-        rect.setPosition(x, y).setSize(tr.x, tr.y);
-        float x2 = tr.x + x, y2 = tr.y + y;
+        rect.setPosition(x, y).setSize(vec.x, vec.y);
+        float x2 = vec.x + x, y2 = vec.y + y;
 
         if(rect.width < 0){
             rect.x += rect.width;
@@ -428,8 +444,8 @@ public class Damage{
             float amount = calculateDamage(scaled ? Math.max(0, entity.dst(x, y) - entity.type.hitSize/2) : entity.dst(x, y), radius, damage);
             entity.damage(amount);
             //TODO better velocity displacement
-            float dst = tr.set(entity.x - x, entity.y - y).len();
-            entity.vel.add(tr.setLength((1f - dst / radius) * 2f / entity.mass()));
+            float dst = vec.set(entity.x - x, entity.y - y).len();
+            entity.vel.add(vec.setLength((1f - dst / radius) * 2f / entity.mass()));
 
             if(complete && damage >= 9999999f && entity.isPlayer()){
                 Events.fire(Trigger.exclusionDeath);

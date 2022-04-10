@@ -915,7 +915,7 @@ public class ServerControl implements ApplicationListener{
 
             info("Core destroyed.");
             inExtraRound = false;
-            Events.fire(new GameOverEvent(Team.crux));
+            Events.fire(new GameOverEvent(state.rules.waveTeam));
         });
 
         handler.register("info", "<IP/UUID/name...>", "Find player info(s). Can optionally check for all names or IPs a player has had.", arg -> {

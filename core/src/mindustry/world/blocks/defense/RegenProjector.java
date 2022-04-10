@@ -96,6 +96,7 @@ public class RegenProjector extends Block{
         public Seq<Building> targets = new Seq<>();
         public int lastChange = -2;
         public float warmup, totalTime, optionalTimer;
+        public boolean anyTargets = false;
         public boolean didRegen = false;
 
         public void updateTargets(){
@@ -115,11 +116,14 @@ public class RegenProjector extends Block{
             warmup = Mathf.approachDelta(warmup, didRegen ? 1f : 0f, 1f / 70f);
             totalTime += warmup * Time.delta;
             didRegen = false;
+            anyTargets = false;
 
             //no healing when suppressed
             if(checkSuppression()){
                 return;
             }
+
+            anyTargets = targets.contains(b -> b.damaged());
 
             if(efficiency > 0){
                 if((optionalTimer += Time.delta * optionalEfficiency) >= optionalUseTime){
@@ -161,8 +165,8 @@ public class RegenProjector extends Block{
         }
 
         @Override
-        public boolean productionValid(){
-            return didRegen;
+        public boolean shouldConsume(){
+            return anyTargets;
         }
 
         @Override

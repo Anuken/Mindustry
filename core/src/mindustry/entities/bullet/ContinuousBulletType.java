@@ -11,11 +11,10 @@ public class ContinuousBulletType extends BulletType{
     public float damageInterval = 5f;
     public boolean largeHit = false;
     public boolean continuous = true;
-    public boolean laserAbsorb = true;
-    /** can't use pierceCap here for... many reasons. DO NOT USE, BUGGY */
-    public int pierceMax = -1;
 
     {
+        removeAfterPierce = false;
+        pierceCap = -1;
         speed = 0f;
         despawnEffect = Fx.none;
         shootEffect = Fx.none;
@@ -78,7 +77,7 @@ public class ContinuousBulletType extends BulletType{
     }
 
     public void applyDamage(Bullet b){
-        Damage.collideLine(b, b.team, hitEffect, b.x, b.y, b.rotation(), currentLength(b), largeHit, laserAbsorb, pierceMax);
+        Damage.collideLine(b, b.team, hitEffect, b.x, b.y, b.rotation(), currentLength(b), largeHit, laserAbsorb, pierceCap);
     }
 
     public float currentLength(Bullet b){

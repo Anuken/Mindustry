@@ -161,7 +161,7 @@ public class StatusEffects{
         }};
 
         boss = new StatusEffect("boss"){{
-            color = Team.crux.color;
+            color = Team.malis.color;
             permanent = true;
             damageMultiplier = 1.3f;
             healthMultiplier = 1.5f;

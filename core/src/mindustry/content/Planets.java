@@ -122,6 +122,8 @@ public class Planets{
             allowSectorInvasion = true;
             allowLaunchSchematics = true;
             ruleSetter = r -> {
+                //TODO this planet is crux, need to update all maps.
+                //r.waveTeam = Team.crux;
                 r.placeRangeCheck = false;
                 r.attributes.clear();
                 r.showSpawns = false;

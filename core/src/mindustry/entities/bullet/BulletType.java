@@ -44,6 +44,10 @@ public class BulletType extends Content implements Cloneable{
     public boolean pierceBuilding;
     /** Maximum # of pierced objects. */
     public int pierceCap = -1;
+    /** If false, this bullet isn't removed after pierceCap is exceeded. Expert usage only. */
+    public boolean removeAfterPierce = true;
+    /** For piercing lasers, setting this to true makes it get absorbed by plastanium walls. */
+    public boolean laserAbsorb = true;
     /** Life fraction at which this bullet has the best range/damage/etc. Used for lasers and continuous turrets. */
     public float optimalLifeFract = 0f;
     /** Z layer to drawn on. */

@@ -110,9 +110,9 @@ public class UnitTypes{
         }};
 
         mace = new UnitType("mace"){{
-            speed = 0.45f;
+            speed = 0.5f;
             hitSize = 10f;
-            health = 540;
+            health = 550;
             armor = 4f;
             ammoType = new ItemAmmoType(Items.coal);
 
@@ -125,11 +125,13 @@ public class UnitTypes{
                 reload = 11f;
                 recoil = 1f;
                 ejectEffect = Fx.none;
-                bullet = new BulletType(4.1f, 35f){{
+                bullet = new BulletType(4.2f, 37f){{
                     ammoMultiplier = 3f;
                     hitSize = 7f;
                     lifetime = 13f;
                     pierce = true;
+                    pierceBuilding = true;
+                    pierceCap = 2;
                     statusDuration = 60f * 4;
                     shootEffect = Fx.shootSmallFlame;
                     hitEffect = Fx.hitFlameSmall;
