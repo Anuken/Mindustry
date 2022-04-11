@@ -87,7 +87,7 @@ public class MessageBlock extends Block{
 
         @Override
         public void buildConfiguration(Table table){
-            table.button(Icon.pencil, () -> {
+            table.button(Icon.pencil, Styles.clearTransi, () -> {
                 if(mobile){
                     Core.input.getTextInput(new TextInput(){{
                         text = message.toString();

@@ -85,6 +85,8 @@ public class UnitType extends UnlockableContent{
     public float targetPriority = 0f;
     /** If false, this unit is not targeted by anything. */
     public boolean targetable = true;
+    /** If true, this unit can be hit with bullets/splash damage.  */
+    public boolean hittable = true;
     public boolean drawBuildBeam = true;
     public boolean rotateToBuilding = true;
     public float commandRadius = 150f;

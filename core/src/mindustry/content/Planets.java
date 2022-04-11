@@ -74,6 +74,7 @@ public class Planets{
                 r.fog = true;
                 r.staticFog = true; //TODO decide, is this a good idea?
                 r.lighting = false;
+                r.onlyDepositCore = true;
             };
 
             unlockedOnLand.add(Blocks.coreBastion);

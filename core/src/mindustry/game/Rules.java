@@ -79,6 +79,8 @@ public class Rules{
     public boolean placeRangeCheck = false;
     /** If true, dead teams in PvP automatically have their blocks & units converted to derelict upon death. */
     public boolean cleanupDeadTeams = true;
+    /** If true, items can only be deposited in the core. */
+    public boolean onlyDepositCore = false;
     /** Radius around enemy wave drop zones.*/
     public float dropZoneRadius = 300f;
     /** Time between waves in ticks. */

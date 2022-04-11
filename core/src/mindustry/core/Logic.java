@@ -160,7 +160,7 @@ public class Logic implements ApplicationListener{
             //makes cores go derelict in RTS mode, helps clean things up
             if(e.tile.build instanceof CoreBuild core && core.team.isAI() && core.team.rules().rtsAi){
                 Core.app.post(() -> {
-                    core.team.data().makeDerelict(core.x, core.y, state.rules.enemyCoreBuildRadius);
+                    core.team.data().timeDestroy(core.x, core.y, state.rules.enemyCoreBuildRadius);
                 });
             }
         });

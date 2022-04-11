@@ -305,6 +305,20 @@ public class Teams{
             }
         }
 
+        /** Make all buildings within this range explode. */
+        public void timeDestroy(float x, float y, float range){
+            var builds = new Seq<Building>();
+            if(buildings != null){
+                buildings.intersect(x - range, y - range, range * 2f, range * 2f, builds);
+            }
+
+            for(var build : builds){
+                if(build.within(x, y, range)){
+                    Time.run(Mathf.random(0f, 60f * 6f), build::kill);
+                }
+            }
+        }
+
         private void scheduleDerelict(Building build){
             //TODO this may cause a lot of packet spam, optimize?
             Call.setTeam(build, Team.derelict);

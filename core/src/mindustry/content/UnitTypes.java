@@ -3450,6 +3450,7 @@ public class UnitTypes{
 
             fogRadius = 0f;
             targetable = false;
+            hittable = false;
 
             setEnginesMirror(
             new UnitEngine(21 / 4f, 19 / 4f, 2.2f, 45f),
@@ -3509,6 +3510,7 @@ public class UnitTypes{
 
             fogRadius = 0f;
             targetable = false;
+            hittable = false;
 
             engineOffset = 7.2f;
             engineSize = 3.1f;
@@ -3583,6 +3585,7 @@ public class UnitTypes{
 
             fogRadius = 0f;
             targetable = false;
+            hittable = false;
 
             engineOffset = 7.5f;
             engineSize = 3.4f;

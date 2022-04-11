@@ -171,7 +171,7 @@ public class Damage{
         });
 
         Units.nearbyEnemies(b.team, rect, u -> {
-            if(u.checkTarget(b.type.collidesAir, b.type.collidesGround)){
+            if(u.checkTarget(b.type.collidesAir, b.type.collidesGround) && u.type.hittable){
                 distances.add(u.dst(b));
             }
         });
@@ -272,6 +272,7 @@ public class Damage{
         float x2 = vec.x + x, y2 = vec.y + y;
 
         Cons<Unit> cons = e -> {
+            if(!e.type.hittable) return;
             //the peirce cap works for units, but really terribly, I'm just disabling it for now.
             //if(pierceCap > 0 && pierceCount > pierceCap) return;
 
@@ -373,7 +374,7 @@ public class Damage{
     /** Damages all entities and blocks in a radius that are enemies of the team. */
     public static void damageUnits(Team team, float x, float y, float size, float damage, Boolf<Unit> predicate, Cons<Unit> acceptor){
         Cons<Unit> cons = entity -> {
-            if(!predicate.get(entity)) return;
+            if(!predicate.get(entity) || !entity.type.hittable) return;
 
             entity.hitbox(hitrect);
             if(!hitrect.overlaps(rect)){
@@ -437,7 +438,7 @@ public class Damage{
     /** Damages all entities and blocks in a radius that are enemies of the team. */
     public static void damage(Team team, float x, float y, float radius, float damage, boolean complete, boolean air, boolean ground, boolean scaled, Bullet source){
         Cons<Unit> cons = entity -> {
-            if(entity.team == team || !entity.within(x, y, radius + (scaled ? entity.hitSize / 2f : 0f)) || (entity.isFlying() && !air) || (entity.isGrounded() && !ground)){
+            if(entity.team == team  || !entity.type.hittable || !entity.within(x, y, radius + (scaled ? entity.hitSize / 2f : 0f)) || (entity.isFlying() && !air) || (entity.isGrounded() && !ground)){
                 return;
             }
 

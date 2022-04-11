@@ -225,7 +225,7 @@ public class ErekirTechTree{
                 });
             });
 
-            node(radar, Seq.with(new Research(beamNode), new Research(turbineCondenser), new Research(fabricator)), () -> {
+            node(radar, Seq.with(new Research(beamNode), new Research(turbineCondenser), new Research(fabricator), new OnSector(SectorPresets.two)), () -> {
                 node(breach, Seq.with(new Research(siliconArcFurnace), new OnSector(two)), () -> {
                     node(berylliumWall, () -> {
                         node(berylliumWallLarge, () -> {

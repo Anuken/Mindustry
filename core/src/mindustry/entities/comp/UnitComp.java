@@ -258,6 +258,12 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     }
 
     @Override
+    @Replace
+    public boolean collides(Hitboxc other){
+        return type.hittable;
+    }
+
+    @Override
     public int itemCapacity(){
         return type.itemCapacity;
     }

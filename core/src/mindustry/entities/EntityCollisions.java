@@ -159,7 +159,7 @@ public class EntityCollisions{
         float vbx = b.getX() - b.lastX();
         float vby = b.getY() - b.lastY();
 
-        if(a != b && a.collides(b)){
+        if(a != b && a.collides(b) && b.collides(a)){
             l1.set(a.getX(), a.getY());
             boolean collide = r1.overlaps(r2) || collide(r1.x, r1.y, r1.width, r1.height, vax, vay,
             r2.x, r2.y, r2.width, r2.height, vbx, vby, l1);

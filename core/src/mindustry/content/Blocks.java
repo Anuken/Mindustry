@@ -152,6 +152,7 @@ public class Blocks{
     
     //logic
     message, switchBlock, microProcessor, logicProcessor, hyperProcessor, largeLogicDisplay, logicDisplay, memoryCell, memoryBank,
+    canvas,
     worldProcessor, worldCell,
 
     //campaign
@@ -1588,7 +1589,6 @@ public class Blocks{
             requirements(Category.defense, with(Items.beryllium, 6));
             health = 130 * wallHealthMultiplier;
             armor = 2f;
-            buildCostMultiplier = 4f;
         }};
 
         berylliumWallLarge = new Wall("beryllium-wall-large"){{
@@ -1596,14 +1596,12 @@ public class Blocks{
             health = 130 * wallHealthMultiplier * 4;
             armor = 2f;
             size = 2;
-            buildCostMultiplier = 4f;
         }};
 
         tungstenWall = new Wall("tungsten-wall"){{
             requirements(Category.defense, with(Items.tungsten, 6));
             health = 180 * wallHealthMultiplier;
             armor = 14f;
-            buildCostMultiplier = 4f;
         }};
 
         tungstenWallLarge = new Wall("tungsten-wall-large"){{
@@ -1611,7 +1609,6 @@ public class Blocks{
             health = 180 * wallHealthMultiplier * 4;
             armor = 14f;
             size = 2;
-            buildCostMultiplier = 4f;
         }};
 
         blastDoor = new AutoDoor("blast-door"){{
@@ -1619,14 +1616,12 @@ public class Blocks{
             health = 175 * wallHealthMultiplier * 4;
             armor = 14f;
             size = 2;
-            buildCostMultiplier = 4f;
         }};
 
         carbideWall = new Wall("carbide-wall"){{
             requirements(Category.defense, with(Items.thorium, 6, Items.carbide, 6));
             health = 240 * wallHealthMultiplier;
             armor = 16f;
-            buildCostMultiplier = 4f;
         }};
 
         carbideWallLarge = new Wall("carbide-wall-large"){{
@@ -1634,7 +1629,6 @@ public class Blocks{
             health = 240 * wallHealthMultiplier * 4;
             armor = 16f;
             size = 2;
-            buildCostMultiplier = 4f;
         }};
 
         mender = new MendProjector("mender"){{
@@ -2987,7 +2981,7 @@ public class Blocks{
 
         //TODO these may work in space, but what's the point?
         lancer = new PowerTurret("lancer"){{
-            requirements(Category.turret, with(Items.copper, 70, Items.lead, 70, Items.silicon, 70));
+            requirements(Category.turret, with(Items.copper, 60, Items.lead, 70, Items.silicon, 60, Items.titanium, 30));
             range = 165f;
 
             shoot.firstShotDelay = 40f;
@@ -3003,6 +2997,7 @@ public class Blocks{
             scaledHealth = 280;
             targetAir = false;
             moveWhileCharging = false;
+            accurateDelay = false;
             shootSound = Sounds.laser;
             coolant = consume(new ConsumeCoolant(0.2f));
 
@@ -3683,7 +3678,7 @@ public class Blocks{
             coolantMultiplier = 6f;
 
             shootShake = 1f;
-            ammoPerShot = 4;
+            ammoPerShot = 2;
             drawer = new DrawTurret("reinforced-");
             shootY = -2;
             outlineColor = Pal.darkOutline;
@@ -4482,6 +4477,15 @@ public class Blocks{
             displaySize = 176;
 
             size = 6;
+        }};
+
+        canvas = new CanvasBlock("canvas"){{
+            requirements(Category.logic, with(Items.silicon, 40));
+
+            canvasSize = 12;
+            padding = 7f / 4f * 2f;
+
+            size = 2;
         }};
 
         worldProcessor = new LogicBlock("world-processor"){{
