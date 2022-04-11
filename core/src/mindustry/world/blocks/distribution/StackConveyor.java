@@ -52,6 +52,7 @@ public class StackConveyor extends Block implements Autotiler{
         itemCapacity = 10;
         conveyorPlacement = true;
         highUnloadPriority = true;
+        priority = TargetPriority.transport;
 
         ambientSound = Sounds.conveyor;
         ambientSoundVolume = 0.004f;

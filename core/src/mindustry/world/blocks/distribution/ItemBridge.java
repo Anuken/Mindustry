@@ -9,6 +9,7 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.core.*;
+import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -53,6 +54,7 @@ public class ItemBridge extends Block{
         copyConfig = false;
         //disabled as to not be annoying
         allowConfigInventory = false;
+        priority = TargetPriority.transport;
 
         //point2 config is relative
         config(Point2.class, (ItemBridgeBuild tile, Point2 i) -> tile.link = Point2.pack(i.x + tile.tileX(), i.y + tile.tileY()));

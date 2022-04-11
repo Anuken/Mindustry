@@ -38,6 +38,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     private float rotation;
 
     transient @Nullable Tile aimTile;
+    transient float originX, originY;
     transient @Nullable Mover mover;
     transient boolean absorbed, hit;
     transient @Nullable Trail trail;
@@ -177,7 +178,12 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
             if(build != null && isAdded() &&
                 //should underBullet detection be disabled for piercing bullets?
                 //|| type.pierceBuilding
-                (!build.block.underBullets || (aimTile != null && aimTile.build == build))
+                (!build.block.underBullets ||
+                    //direct hit on correct tile
+                    (aimTile != null && aimTile.build == build) ||
+                    //a piercing bullet overshot the aim tile, it's fine to hit things now
+                    (type.pierce && aimTile != null && dst(originX, originY) > aimTile.dst(originX, originY) + 2f))
+
                 && build.collide(self()) && type.testCollision(self(), build)
                 && !build.dead() && (type.collidesTeam || build.team != team) && !(type.pierceBuilding && hasCollided(build.id))){
 

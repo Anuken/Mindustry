@@ -10,6 +10,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -48,6 +49,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
         conveyorPlacement = true;
         noUpdateDisabled = true;
         canOverdrive = false;
+        priority = TargetPriority.transport;
     }
 
     @Override

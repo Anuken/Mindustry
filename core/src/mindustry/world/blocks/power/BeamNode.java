@@ -8,6 +8,7 @@ import arc.struct.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.core.*;
+import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
@@ -35,6 +36,8 @@ public class BeamNode extends PowerBlock{
         drawDisabled = false;
         envEnabled |= Env.space;
         allowDiagonal = false;
+        underBullets = true;
+        priority = TargetPriority.transport;
     }
 
     @Override

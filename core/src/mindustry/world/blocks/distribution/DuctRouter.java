@@ -6,6 +6,7 @@ import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -34,6 +35,8 @@ public class DuctRouter extends Block{
         saveConfig = true;
         rotate = true;
         clearOnDoubleTap = true;
+        underBullets = true;
+        priority = TargetPriority.transport;
         envEnabled = Env.space | Env.terrestrial | Env.underwater;
 
         config(Item.class, (DuctRouterBuild tile, Item item) -> tile.sortItem = item);

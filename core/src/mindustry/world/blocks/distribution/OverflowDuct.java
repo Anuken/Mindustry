@@ -4,6 +4,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -27,6 +28,8 @@ public class OverflowDuct extends Block{
         itemCapacity = 1;
         noUpdateDisabled = true;
         rotate = true;
+        underBullets = true;
+        priority = TargetPriority.transport;
         envEnabled = Env.space | Env.terrestrial | Env.underwater;
         regionRotated1 = 1;
     }

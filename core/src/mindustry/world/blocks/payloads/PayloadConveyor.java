@@ -7,6 +7,7 @@ import arc.math.geom.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
@@ -29,6 +30,7 @@ public class PayloadConveyor extends Block{
         update = true;
         outputsPayload = true;
         noUpdateDisabled = true;
+        priority = TargetPriority.transport;
         envEnabled |= Env.space | Env.underwater;
         sync = true;
     }

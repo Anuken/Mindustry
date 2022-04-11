@@ -559,6 +559,8 @@ public class BulletType extends Content implements Cloneable{
         bullet.owner = owner;
         bullet.team = team;
         bullet.time = 0f;
+        bullet.originX = x;
+        bullet.originY = y;
         bullet.aimTile = world.tileWorld(aimX, aimY);
         bullet.initVel(angle, speed * velocityScl);
         if(backMove){

@@ -1888,7 +1888,6 @@ public class Blocks{
             requirements(Category.distribution, with(Items.beryllium, 1));
             health = 90;
             speed = 4f;
-            underBullets = true;
             researchCost = with(Items.beryllium, 5);
         }};
 
@@ -1897,7 +1896,6 @@ public class Blocks{
             health = 140;
             speed = 4f;
             armored = true;
-            underBullets = true;
             researchCost = with(Items.beryllium, 300, Items.tungsten, 100);
         }};
 
@@ -1907,7 +1905,6 @@ public class Blocks{
             speed = 4f;
             regionRotated1 = 1;
             solid = false;
-            underBullets = true;
             researchCost = with(Items.beryllium, 30);
         }};
 
@@ -1916,7 +1913,6 @@ public class Blocks{
             health = 90;
             speed = 4f;
             solid = false;
-            underBullets = true;
             researchCostMultiplier = 1.5f;
         }};
 
@@ -1925,7 +1921,6 @@ public class Blocks{
             health = 90;
             speed = 4f;
             buildCostMultiplier = 2f;
-            underBullets = true;
             researchCostMultiplier = 0.3f;
         }};
 

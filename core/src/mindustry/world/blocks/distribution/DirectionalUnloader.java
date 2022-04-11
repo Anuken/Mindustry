@@ -5,6 +5,7 @@ import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -37,6 +38,7 @@ public class DirectionalUnloader extends Block{
         unloadable = false;
         envDisabled = Env.none;
         clearOnDoubleTap = true;
+        priority = TargetPriority.transport;
 
         config(Item.class, (DirectionalUnloaderBuild tile, Item item) -> tile.unloadItem = item);
         configClear((DirectionalUnloaderBuild tile) -> tile.unloadItem = null);

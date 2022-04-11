@@ -8,6 +8,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.core.*;
+import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -36,6 +37,7 @@ public class DirectionBridge extends Block{
         rotate = true;
         group = BlockGroup.transportation;
         noUpdateDisabled = true;
+        priority = TargetPriority.transport;
         envEnabled = Env.space | Env.terrestrial | Env.underwater;
         drawArrow = false;
         regionRotated1 = 1;

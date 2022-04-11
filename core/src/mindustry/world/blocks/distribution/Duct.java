@@ -9,6 +9,7 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -38,8 +39,10 @@ public class Duct extends Block implements Autotiler{
         unloadable = false;
         itemCapacity = 1;
         noUpdateDisabled = true;
+        underBullets = true;
         rotate = true;
         noSideBlend = true;
+        priority = TargetPriority.transport;
         envEnabled = Env.space | Env.terrestrial | Env.underwater;
     }
 
