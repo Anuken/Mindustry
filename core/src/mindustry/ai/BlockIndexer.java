@@ -356,9 +356,9 @@ public class BlockIndexer{
             float dist = candidate.dst(x, y) - candidate.hitSize() / 2f;
             if(target == null ||
             //if its closer and is at least equal priority
-            (dist < targetDist && candidate.block.priority.ordinal() >= target.block.priority.ordinal()) ||
+            (dist < targetDist && candidate.block.priority >= target.block.priority) ||
             // block has higher priority (so range doesnt matter)
-            (candidate.block.priority.ordinal() > target.block.priority.ordinal())){
+            (candidate.block.priority > target.block.priority)){
                 target = candidate;
                 targetDist = dist;
             }
@@ -388,9 +388,9 @@ public class BlockIndexer{
             float bdst = next.dst(x, y) - next.hitSize() / 2f;
             if(bdst < range && (closest == null ||
             //this one is closer, and it is at least of equal priority
-            (bdst < dst && (!usePriority || closest.block.priority.ordinal() <= next.block.priority.ordinal())) ||
+            (bdst < dst && (!usePriority || closest.block.priority <= next.block.priority)) ||
             //priority is used, and new block has higher priority regardless of range
-            (usePriority && closest.block.priority.ordinal() < next.block.priority.ordinal()))){
+            (usePriority && closest.block.priority < next.block.priority))){
                 dst = bdst;
                 closest = next;
             }

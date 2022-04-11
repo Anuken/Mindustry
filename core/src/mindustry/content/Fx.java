@@ -182,6 +182,22 @@ public class Fx{
         }
     }),
 
+    coreBuildShockwave = new Effect(120, 500f, e -> {
+        e.lifetime = e.rotation;
+
+        color(Pal.command);
+        stroke(e.fout(Interp.pow5Out) * 4f);
+        Lines.circle(e.x, e.y, e.fin() * e.rotation);
+    }),
+
+    coreBuildBlock = new Effect(80f, e -> {
+        if(!(e.data instanceof Block block)) return;
+
+        mixcol(Pal.accent, 1f);
+        alpha(e.fout());
+        rect(block.fullIcon, e.x, e.y);
+    }).layer(Layer.turret - 5f),
+
     moveCommand = new Effect(20, e -> {
         color(Pal.command);
         stroke(e.fout() * 5f);

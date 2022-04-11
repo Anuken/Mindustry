@@ -30,6 +30,7 @@ import mindustry.net.*;
 import mindustry.type.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
 
 import java.io.*;
 import java.text.*;
@@ -207,7 +208,10 @@ public class Control implements ApplicationListener, Loadable{
             camera.position.set(core);
             player.set(core);
 
+            float coreDelay = 0f;
+
             if(!settings.getBool("skipcoreanimation")){
+                coreDelay = coreLandDuration;
                 //delay player respawn so animation can play.
                 player.deathTimer = -80f;
                 //TODO this sounds pretty bad due to conflict
@@ -231,6 +235,47 @@ public class Control implements ApplicationListener, Loadable{
                         state.rules.sector.info.resources.toString(" ", u -> u.emoji()) : ""), 5);
                     }
                 });
+            }
+
+            if(state.isCampaign()){
+
+                //TODO add a delay for landing.
+                if(state.rules.sector.planet.prebuildBase){
+                    float unitsPerTick = 1f;
+
+                    boolean anyBuilds = false;
+                    for(Tile tile : world.tiles){
+                        var build = tile.build;
+                        if(!(build instanceof CoreBuild) && build != null && build.team == state.rules.defaultTeam){
+                            var ccore = build.closestCore();
+
+                            if(ccore != null && build.within(ccore, state.rules.enemyCoreBuildRadius)){
+                                build.pickedUp();
+                                build.tile.remove();
+                                anyBuilds = true;
+
+                                Time.run(build.dst(ccore) * unitsPerTick + coreDelay, () -> {
+                                    //TODO instance reuse bad?
+                                    build.tile.setBlock(build.block, build.team, build.rotation, () -> build);
+
+                                    //TODO dropped bad?
+                                    build.dropped();
+
+                                    Fx.coreBuildBlock.at(build.x, build.y, 0f, build.block);
+                                    Fx.placeBlock.at(build.x, build.y, build.block.size);
+                                });
+                            }
+                        }
+                    }
+
+                    if(anyBuilds){
+                        for(var ccore : state.rules.defaultTeam.data().cores){
+                            Time.run(coreDelay, () -> {
+                                Fx.coreBuildShockwave.at(ccore.x, ccore.y, state.rules.enemyCoreBuildRadius);
+                            });
+                        }
+                    }
+                }
             }
         });
 

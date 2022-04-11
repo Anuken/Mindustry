@@ -95,6 +95,8 @@ public class Planet extends UnlockableContent{
     public boolean allowSectorInvasion = false;
     /** If true, sectors saves are cleared when lost. */
     public boolean clearSectorOnLose = false;
+    /** If true, blocks in the radius of the core will be removed and "built up" in a shockwave upon landing. */
+    public boolean prebuildBase = true;
     /** If true, waves are created on sector loss. TODO remove. */
     public boolean allowWaves = false;
     /** Sets up rules on game load for any sector on this planet. */

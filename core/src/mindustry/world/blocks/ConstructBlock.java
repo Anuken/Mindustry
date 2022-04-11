@@ -44,6 +44,7 @@ public class ConstructBlock extends Block{
         inEditor = false;
         consBlocks[size - 1] = this;
         sync = true;
+        priority = TargetPriority.constructing;
     }
 
     /** Returns a ConstructBlock by size. */

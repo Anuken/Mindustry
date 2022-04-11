@@ -72,9 +72,9 @@ public class Planets{
                 r.attributes.set(Attribute.heat, 0.8f);
                 r.showSpawns = true;
                 r.fog = true;
-                r.staticFog = true; //TODO decide, is this a good idea?
+                r.staticFog = true;
                 r.lighting = false;
-                r.onlyDepositCore = true;
+                r.onlyDepositCore = true; //TODO not sure
             };
 
             unlockedOnLand.add(Blocks.coreBastion);

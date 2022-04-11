@@ -178,8 +178,8 @@ public class Block extends UnlockableContent implements Senseable{
     public BlockGroup group = BlockGroup.none;
     /** List of block flags. Used for AI indexing. */
     public EnumSet<BlockFlag> flags = EnumSet.of();
-    /** Targeting priority of this block, as seen by enemies .*/
-    public TargetPriority priority = TargetPriority.base;
+    /** Targeting priority of this block, as seen by enemies. */
+    public float priority = TargetPriority.base;
     /** How much this block affects the unit cap by.
      * The block flags must contain unitModifier in order for this to work. */
     public int unitCapModifier = 0;
