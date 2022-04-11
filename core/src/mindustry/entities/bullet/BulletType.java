@@ -265,7 +265,7 @@ public class BulletType extends Content implements Cloneable{
         }
 
         if(heals() && build.team == b.team && !(build.block instanceof ConstructBlock)){
-            healEffect.at(build.x, build.y, build.block.size, healColor);
+            healEffect.at(build.x, build.y, 0f, healColor, build.block);
             build.heal(healPercent / 100f * build.maxHealth + healAmount);
         }else if(build.team != b.team && direct){
             hit(b);
@@ -337,7 +337,7 @@ public class BulletType extends Content implements Cloneable{
 
             if(heals()){
                 indexer.eachBlock(b.team, x, y, splashDamageRadius, Building::damaged, other -> {
-                    healEffect.at(other.x, other.y, other.block.size, healColor);
+                    healEffect.at(other.x, other.y, 0f, healColor, other.block);
                     other.heal(healPercent / 100f * other.maxHealth() + healAmount);
                 });
             }

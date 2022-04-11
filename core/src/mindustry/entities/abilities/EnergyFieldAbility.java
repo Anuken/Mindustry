@@ -135,7 +135,7 @@ public class EnergyFieldAbility extends Ability{
                         hitEffect.at(rx, ry, unit.angleTo(other), color);
 
                         if(other instanceof Building b){
-                            Fx.healBlockFull.at(b.x, b.y, b.block.size, color);
+                            Fx.healBlockFull.at(b.x, b.y, 0f, color, b.block);
                         }
                     }
                 }else{

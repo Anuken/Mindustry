@@ -1589,12 +1589,14 @@ public class Blocks{
             requirements(Category.defense, with(Items.beryllium, 6));
             health = 130 * wallHealthMultiplier;
             armor = 2f;
+            buildCostMultiplier = 6.5f;
         }};
 
         berylliumWallLarge = new Wall("beryllium-wall-large"){{
             requirements(Category.defense, ItemStack.mult(berylliumWall.requirements, 4));
             health = 130 * wallHealthMultiplier * 4;
             armor = 2f;
+            buildCostMultiplier = 5f;
             size = 2;
         }};
 
@@ -1602,12 +1604,14 @@ public class Blocks{
             requirements(Category.defense, with(Items.tungsten, 6));
             health = 180 * wallHealthMultiplier;
             armor = 14f;
+            buildCostMultiplier = 6.5f;
         }};
 
         tungstenWallLarge = new Wall("tungsten-wall-large"){{
             requirements(Category.defense, ItemStack.mult(tungstenWall.requirements, 4));
             health = 180 * wallHealthMultiplier * 4;
             armor = 14f;
+            buildCostMultiplier = 5f;
             size = 2;
         }};
 

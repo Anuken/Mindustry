@@ -2192,9 +2192,11 @@ public class Fx{
     }),
 
     healBlockFull = new Effect(20, e -> {
-        color(e.color);
+        if(!(e.data instanceof Block block)) return;
+
+        mixcol(e.color, 1f);
         alpha(e.fout());
-        Fill.square(e.x, e.y, e.rotation * tilesize / 2f);
+        Draw.rect(block.fullIcon, e.x, e.y);
     }),
 
     rotateBlock = new Effect(30, e -> {

@@ -146,7 +146,7 @@ public class RepairBeamWeapon extends Weapon{
 
         //create heal effect periodically
         if(canShoot && mount.target instanceof Building b && b.damaged() && (heal.effectTimer += Time.delta) >= reload){
-            healEffect.at(b.x, b.y, b.block.size, healColor);
+            healEffect.at(b.x, b.y, 0f, healColor, b.block);
             heal.effectTimer = 0f;
         }
 
