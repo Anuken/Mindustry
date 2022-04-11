@@ -13,6 +13,7 @@ import mindustry.game.EventType.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.defense.turrets.Turret.*;
@@ -170,7 +171,8 @@ public class RtsAI{
             });
 
             //defend when close, or this is the only squad defending
-            if(best instanceof CoreBuild || (units.size >= minSquadSize && (noDefenders || best.within(ax, ay, 400f)))){
+            //TODO will always rush to defense no matter what
+            if(best instanceof CoreBuild || (/*(units.size >= minSquadSize || best.within(ax, ay, 300f)) && */(noDefenders || best.within(ax, ay, 400f)))){
                 defend = best;
 
                 if(debug){
@@ -183,8 +185,10 @@ public class RtsAI{
         Vec2 defendPos = null;
         Teamc defendTarget = null;
         if(defend != null){
+            float checkRange = 260f;
+
             //TODO could be made faster by storing bullet shooter
-            Unit aggressor = Units.closestEnemy(data.team, defend.x, defend.y, 250f, u -> true);
+            Unit aggressor = Units.closestEnemy(data.team, defend.x, defend.y, checkRange, u -> true);
             if(aggressor != null){
                 defendTarget = aggressor;
             }else if(false){ //TODO currently ignored, no use defending against nothing
@@ -192,6 +196,24 @@ public class RtsAI{
                 Tile closest = defend.findClosestEdge(units.first(), Tile::solid);
                 if(closest != null){
                     defendPos = new Vec2(closest.worldx(), closest.worldy());
+                }
+            }else{
+                float mindst = Float.MAX_VALUE;
+                Building build = null;
+
+                //find closest turret to attack.
+                for(var turret : Vars.indexer.getEnemy(data.team, BlockFlag.turret)){
+                    if(turret.within(defend, ((Ranged)turret).range())){
+                        float dst = turret.dst2(defend);
+                        if(dst < mindst){
+                            mindst = dst;
+                            build = turret;
+                        }
+                    }
+                }
+
+                if(build != null){
+                    defendTarget = build;
                 }
             }
         }
