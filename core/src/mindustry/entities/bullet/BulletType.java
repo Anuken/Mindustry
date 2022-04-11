@@ -531,6 +531,10 @@ public class BulletType extends Content implements Cloneable{
     }
 
     public @Nullable Bullet create(@Nullable Entityc owner, Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl, Object data, @Nullable Mover mover){
+        return create(owner, team, x, y, angle, damage, velocityScl, lifetimeScl, data, mover, -1f, -1f);
+    }
+
+    public @Nullable Bullet create(@Nullable Entityc owner, Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl, Object data, @Nullable Mover mover, float aimX, float aimY){
         if(spawnUnit != null){
             //don't spawn units clientside!
             if(!net.client()){
@@ -555,6 +559,7 @@ public class BulletType extends Content implements Cloneable{
         bullet.owner = owner;
         bullet.team = team;
         bullet.time = 0f;
+        bullet.aimTile = world.tileWorld(aimX, aimY);
         bullet.initVel(angle, speed * velocityScl);
         if(backMove){
             bullet.set(x - bullet.vel.x * Time.delta, y - bullet.vel.y * Time.delta);

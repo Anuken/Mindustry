@@ -50,7 +50,7 @@ import static mindustry.Vars.*;
 @Component(base = true)
 abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, QuadTreeObject, Displayable, Senseable, Controllable, Sized{
     //region vars and initialization
-    static final float timeToSleep = 60f * 1, timeToUncontrol = 60f * 6;
+    static final float timeToSleep = 60f * 1, recentDamageTime = 60f * 5f;
     static final ObjectSet<Building> tmpTiles = new ObjectSet<>();
     static final Seq<Building> tempBuilds = new Seq<>();
     static final BuildTeamChangeEvent teamChangeEvent = new BuildTeamChangeEvent();
@@ -91,6 +91,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     transient float healSuppressionTime = -1f;
     transient float lastHealTime = -120f * 10f;
 
+    private transient float lastDamageTime = -recentDamageTime;
     private transient float timeScale = 1f, timeScaleDuration;
     private transient float dumpAccum;
 
@@ -404,6 +405,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     public boolean wasRecentlyHealed(float duration){
         return lastHealTime + duration >= Time.time;
+    }
+
+    public boolean wasRecentlyDamaged(){
+        return lastDamageTime + recentDamageTime >= Time.time;
     }
 
     public Building nearby(int dx, int dy){
@@ -1781,6 +1786,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if(dead()) return;
 
         float dm = state.rules.blockHealth(team);
+        lastDamageTime = Time.time;
 
         if(Mathf.zero(dm)){
             damage = health + 1;

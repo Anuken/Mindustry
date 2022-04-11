@@ -38,7 +38,7 @@ public class ConstructBlock extends Block{
         super("build" + size);
         this.size = size;
         update = true;
-        health = 20;
+        health = 10;
         consumesTap = true;
         solidifes = true;
         inEditor = false;

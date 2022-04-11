@@ -98,7 +98,7 @@ public class PayloadRouter extends PayloadConveyor{
             if(type == LAccess.config){
                 rotation = (int)p1;
                 //when manually controlled, routers do not turn automatically for a while, same as turrets
-                controlTime = Building.timeToUncontrol;
+                controlTime = 60f * 6f;
             }
         }
 

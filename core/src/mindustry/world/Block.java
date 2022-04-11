@@ -90,6 +90,8 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean solidifes;
     /** if true, this counts as a non-solid block to this team. */
     public boolean teamPassable;
+    /** if true, this block cannot be hit by bullets unless explicitly targeted. */
+    public boolean underBullets;
     /** whether this is rotatable */
     public boolean rotate;
     /** if rotate is true and this is false, the region won't rotate when drawing */

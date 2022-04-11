@@ -402,7 +402,7 @@ public class Weapon implements Cloneable{
         lifeScl = bullet.scaleVelocity ? Mathf.clamp(Mathf.dst(shootX, shootY, mount.aimX, mount.aimY) / bullet.range) : 1f,
         angle = angleOffset + shootAngle + Mathf.range(inaccuracy);
 
-        mount.bullet = bullet.create(unit, unit.team, bulletX, bulletY, angle, (1f - velocityRnd) + Mathf.random(velocityRnd), lifeScl, mover);
+        mount.bullet = bullet.create(unit, unit.team, bulletX, bulletY, angle, -1f, (1f - velocityRnd) + Mathf.random(velocityRnd), lifeScl, null, mover, mount.aimX, mount.aimY);
 
         if(!continuous){
             shootSound.at(bulletX, bulletY, Mathf.random(soundPitchMin, soundPitchMax));

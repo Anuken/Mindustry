@@ -33,6 +33,7 @@ public class RepairBeamWeapon extends Weapon{
     public float pulseRadius = 6f;
     public float pulseStroke = 2f;
     public float widthSinMag = 0f, widthSinScl = 4f;
+    public float recentDamageMultiplier = 0.1f;
 
     public TextureRegion laser, laserEnd, laserTop, laserTopEnd;
 
@@ -150,7 +151,8 @@ public class RepairBeamWeapon extends Weapon{
         }
 
         if(canShoot && mount.target instanceof Healthc u){
-            u.heal(repairSpeed * heal.strength * Time.delta + fractionRepairSpeed * heal.strength * Time.delta * u.maxHealth() / 100f);
+            float baseAmount = repairSpeed * heal.strength * Time.delta + fractionRepairSpeed * heal.strength * Time.delta * u.maxHealth() / 100f;
+            u.heal((u instanceof Building b && b.wasRecentlyDamaged() ? recentDamageMultiplier : 1f) * baseAmount);
         }
     }
 

@@ -1884,6 +1884,7 @@ public class Blocks{
             requirements(Category.distribution, with(Items.beryllium, 1));
             health = 90;
             speed = 4f;
+            underBullets = true;
             researchCost = with(Items.beryllium, 5);
         }};
 
@@ -1892,6 +1893,7 @@ public class Blocks{
             health = 140;
             speed = 4f;
             armored = true;
+            underBullets = true;
             researchCost = with(Items.beryllium, 300, Items.tungsten, 100);
         }};
 
@@ -1900,6 +1902,8 @@ public class Blocks{
             health = 90;
             speed = 4f;
             regionRotated1 = 1;
+            solid = false;
+            underBullets = true;
             researchCost = with(Items.beryllium, 30);
         }};
 
@@ -1907,6 +1911,8 @@ public class Blocks{
             requirements(Category.distribution, with(Items.graphite, 8, Items.beryllium, 8));
             health = 90;
             speed = 4f;
+            solid = false;
+            underBullets = true;
             researchCostMultiplier = 1.5f;
         }};
 
@@ -1914,6 +1920,8 @@ public class Blocks{
             requirements(Category.distribution, with(Items.beryllium, 20));
             health = 90;
             speed = 4f;
+            buildCostMultiplier = 2f;
+            underBullets = true;
             researchCostMultiplier = 0.3f;
         }};
 
@@ -1921,6 +1929,8 @@ public class Blocks{
             requirements(Category.distribution, with(Items.graphite, 20, Items.silicon, 20, Items.tungsten, 10));
             health = 120;
             speed = 4f;
+            solid = false;
+            underBullets = true;
             regionRotated1 = 1;
         }};
 
@@ -1935,6 +1945,7 @@ public class Blocks{
             hasPower = true;
             consumesPower = true;
             conductivePower = true;
+            underBullets = true;
             baseEfficiency = 1f;
             consumePower(1f / 60f);
         }};
@@ -1949,6 +1960,8 @@ public class Blocks{
             consumesPower = true;
             conductivePower = true;
             baseEfficiency = 1f;
+            underBullets = true;
+            solid = false;
             consumePower(3f / 60f);
         }};
 
@@ -2084,6 +2097,7 @@ public class Blocks{
             liquidPressure = 1.03f;
             health = 250;
             researchCostMultiplier = 3;
+            underBullets = true;
         }};
 
         //TODO is this necessary? junctions are not good design
@@ -2094,13 +2108,16 @@ public class Blocks{
             health = 260;
             ((Conduit)reinforcedConduit).junctionReplacement = this;
             researchCostMultiplier = 1;
+            solid = false;
+            underBullets = true;
         }};
 
         reinforcedBridgeConduit = new DirectionLiquidBridge("reinforced-bridge-conduit"){{
-            requirements(Category.liquid, with(Items.graphite, 6, Items.beryllium, 10));
+            requirements(Category.liquid, with(Items.graphite, 8, Items.beryllium, 20));
             range = 4;
             hasPower = false;
             researchCostMultiplier = 1;
+            underBullets = true;
 
             ((Conduit)reinforcedConduit).rotBridgeReplacement = this;
         }};
@@ -2111,9 +2128,9 @@ public class Blocks{
             newDrawing = true;
             liquidPadding = 3f/4f;
             researchCostMultiplier = 3;
+            underBullets = true;
         }};
 
-        //TODO is there a need for a container if unloaders can unload 3x3s?
         reinforcedLiquidContainer = new LiquidRouter("reinforced-liquid-container"){{
             requirements(Category.liquid, with(Items.tungsten, 10, Items.beryllium, 16));
             liquidCapacity = 1000f;
@@ -2121,6 +2138,7 @@ public class Blocks{
             newDrawing = true;
             liquidPadding = 6f/4f;
             researchCostMultiplier = 4;
+            underBullets = true;
         }};
 
         reinforcedLiquidTank = new LiquidRouter("reinforced-liquid-tank"){{
@@ -2129,6 +2147,7 @@ public class Blocks{
             liquidCapacity = 2700f;
             newDrawing = true;
             liquidPadding = 2f;
+            underBullets = true;
         }};
 
         //endregion
@@ -4116,7 +4135,7 @@ public class Blocks{
             requirements(Category.units, with(Items.silicon, 200, Items.beryllium, 250));
             size = 3;
             configurable = false;
-            plans.add(new UnitPlan(UnitTypes.stell, 60f * 60f * 1f, with(Items.beryllium, 50f, Items.silicon, 70f)));
+            plans.add(new UnitPlan(UnitTypes.stell, 60f * 60f * 1f, with(Items.beryllium, 50f, Items.silicon, 60f)));
             researchCost = with(Items.beryllium, 200, Items.graphite, 80, Items.silicon, 80);
             regionSuffix = "-dark";
             fogRadius = 3;
@@ -4251,6 +4270,7 @@ public class Blocks{
             canOverdrive = false;
             health = 800;
             researchCostMultiplier = 4f;
+            underBullets = true;
         }};
 
         reinforcedPayloadRouter = new PayloadRouter("reinforced-payload-router"){{
@@ -4259,6 +4279,7 @@ public class Blocks{
             health = 800;
             canOverdrive = false;
             researchCostMultiplier = 4f;
+            underBullets = true;
         }};
 
         payloadMassDriver = new PayloadMassDriver("payload-mass-driver"){{
