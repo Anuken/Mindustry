@@ -158,7 +158,7 @@ public class Damage{
             //add distance to list so it can be processed
             var build = world.build(x, y);
 
-            if(build != null && build.team != b.team){
+            if(build != null && build.team != b.team && b.checkUnderBuild(build, x * tilesize, y * tilesize)){
                 distances.add(b.dst(build));
 
                 if(b.type.laserAbsorb && build.absorbLasers()){
@@ -233,7 +233,7 @@ public class Damage{
 
         Intc2 collider = (cx, cy) -> {
             Building tile = world.build(cx, cy);
-            boolean collide = tile != null && collidedBlocks.add(tile.pos());
+            boolean collide = tile != null && hitter.checkUnderBuild(tile, cx * tilesize, cy * tilesize) && collidedBlocks.add(tile.pos());
 
             if(hitter.damage > 0){
                 float health = !collide ? 0 : tile.health;
