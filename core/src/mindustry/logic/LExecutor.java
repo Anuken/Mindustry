@@ -297,7 +297,8 @@ public class LExecutor{
                         exec.setnum(outFound, 0);
                     }
                     
-                    if(res != null && res.build != null && unit.within(res.build.x, res.build.y, Math.max(unit.range(), buildingRange))){
+                    if(res != null && res.build != null && 
+                        (unit.within(res.build.x, res.build.y, Math.max(unit.range(), buildingRange)) || res.build.team == exec.team)){
                         cache.build = res.build;
                         exec.setobj(outBuild, res.build);
                     }else{
