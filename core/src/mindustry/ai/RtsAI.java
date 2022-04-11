@@ -172,7 +172,7 @@ public class RtsAI{
 
             //defend when close, or this is the only squad defending
             //TODO will always rush to defense no matter what
-            if(best instanceof CoreBuild || (/*(units.size >= minSquadSize || best.within(ax, ay, 300f)) && */(noDefenders || best.within(ax, ay, 400f)))){
+            if(best instanceof CoreBuild || units.size >= minSquadSize || best.within(ax, ay, 500f)){
                 defend = best;
 
                 if(debug){

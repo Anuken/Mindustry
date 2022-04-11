@@ -1699,9 +1699,9 @@ public class Blocks{
         }};
 
         radar = new Radar("radar"){{
-            requirements(Category.effect, BuildVisibility.fogOnly, with(Items.silicon, 50, Items.graphite, 50));
+            requirements(Category.effect, BuildVisibility.fogOnly, with(Items.silicon, 60, Items.graphite, 50));
             outlineColor = Color.valueOf("4a4b53");
-            fogRadius = 33;
+            fogRadius = 34;
             researchCost = with(Items.silicon, 70, Items.graphite, 70);
 
             consumePower(0.6f);
@@ -3676,7 +3676,7 @@ public class Blocks{
                 trailWidth = 2.1f;
                 trailLength = 10;
                 hitEffect = despawnEffect = Fx.hitBulletColor;
-                buildingDamageMultiplier = 0.5f;
+                buildingDamageMultiplier = 0.4f;
             }},
             Items.tungsten, new BasicBulletType(8f, 185){{
                 width = 13f;
@@ -3695,7 +3695,7 @@ public class Blocks{
                 trailLength = 11;
                 hitEffect = despawnEffect = Fx.hitBulletColor;
                 rangeChange = 40f;
-                buildingDamageMultiplier = 0.5f;
+                buildingDamageMultiplier = 0.4f;
             }}
             );
 

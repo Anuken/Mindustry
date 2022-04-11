@@ -18,7 +18,7 @@ public class ErekirTechTree{
 
     static void rebalanceBullet(BulletType bullet){
         if(balanced.add(bullet.id)){
-            bullet.damage *= 0.7f;
+            bullet.damage *= 0.75f;
         }
     }
 
