@@ -1159,7 +1159,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             }else{
                 CoreBlock block = from.info.bestCoreType instanceof CoreBlock b ? b : (CoreBlock)Blocks.coreShard;
 
-                loadouts.show(block, from, () -> {
+                loadouts.show(block, from, sector, () -> {
                     var schemCore = universe.getLastLoadout().findCore();
                     from.removeItems(universe.getLastLoadout().requirements());
                     from.removeItems(universe.getLaunchResources());

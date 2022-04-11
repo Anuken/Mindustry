@@ -1699,12 +1699,12 @@ public class Blocks{
         }};
 
         radar = new Radar("radar"){{
-            requirements(Category.effect, BuildVisibility.fogOnly, with(Items.silicon, 30, Items.graphite, 30));
+            requirements(Category.effect, BuildVisibility.fogOnly, with(Items.silicon, 40, Items.graphite, 40));
             outlineColor = Color.valueOf("4a4b53");
-            fogRadius = 30;
-            researchCost = with(Items.silicon, 50, Items.graphite, 50);
+            fogRadius = 28;
+            researchCost = with(Items.silicon, 70, Items.graphite, 70);
 
-            consumePower(0.1f);
+            consumePower(0.15f);
         }};
 
         buildTower = new BuildTurret("build-tower"){{
@@ -1719,12 +1719,11 @@ public class Blocks{
         regenProjector = new RegenProjector("regen-projector"){{
             requirements(Category.effect, with(Items.silicon, 80, Items.tungsten, 60, Items.oxide, 40, Items.beryllium, 80));
             size = 3;
-            consumePower(1f);
             range = 28;
             baseColor = Pal.regen;
 
+            consumePower(1f);
             consumeLiquid(Liquids.hydrogen, 1f / 60f);
-
             consumeItem(Items.phaseFabric).boost();
 
             healPercent = 4f / 60f;
@@ -2536,7 +2535,7 @@ public class Blocks{
             drillTime = 160f;
             tier = 3;
             size = 2;
-            range = 4;
+            range = 5;
             fogRadius = 3;
             researchCost = with(Items.beryllium, 10);
 
@@ -2666,7 +2665,7 @@ public class Blocks{
             //TODO should this be higher?
             buildCostMultiplier = 0.75f;
 
-            unitCapModifier = 20;
+            unitCapModifier = 15;
             researchCostMultiplier = 0.07f;
         }};
 
@@ -2681,7 +2680,7 @@ public class Blocks{
             armor = 10f;
             incinerateNonBuildable = true;
 
-            unitCapModifier = 20;
+            unitCapModifier = 15;
             researchCostMultipliers.put(Items.silicon, 0.4f);
             researchCostMultiplier = 0.14f;
         }};
@@ -2698,7 +2697,7 @@ public class Blocks{
             armor = 15f;
             incinerateNonBuildable = true;
 
-            unitCapModifier = 20;
+            unitCapModifier = 15;
             researchCostMultipliers.put(Items.silicon, 0.3f);
             researchCostMultiplier = 0.2f;
         }};
@@ -4089,7 +4088,7 @@ public class Blocks{
             requirements(Category.units, with(Items.silicon, 200, Items.beryllium, 250));
             size = 3;
             configurable = false;
-            plans.add(new UnitPlan(UnitTypes.stell, 60f * 60f * 1.5f, with(Items.beryllium, 100f, Items.silicon, 60f)));
+            plans.add(new UnitPlan(UnitTypes.stell, 60f * 60f * 1f, with(Items.beryllium, 50f, Items.silicon, 70f)));
             researchCost = with(Items.beryllium, 200, Items.graphite, 80, Items.silicon, 80);
             regionSuffix = "-dark";
             fogRadius = 3;
@@ -4480,7 +4479,7 @@ public class Blocks{
         }};
 
         canvas = new CanvasBlock("canvas"){{
-            requirements(Category.logic, with(Items.silicon, 40));
+            requirements(Category.logic, BuildVisibility.debugOnly, with(Items.silicon, 50));
 
             canvasSize = 12;
             padding = 7f / 4f * 2f;

@@ -35,7 +35,7 @@ public class LaunchLoadoutDialog extends BaseDialog{
         super("@configure");
     }
 
-    public void show(CoreBlock core, Sector sector, Runnable confirm){
+    public void show(CoreBlock core, Sector sector, Sector destination, Runnable confirm){
         cont.clear();
         buttons.clear();
 
@@ -69,7 +69,20 @@ public class LaunchLoadoutDialog extends BaseDialog{
             ItemSeq launches = universe.getLaunchResources();
             int capacity = lastCapacity;
 
-            if(getMax()){
+            if(!sector.planet.allowLaunchLoadout){
+                launches.clear();
+                //TODO this should be set to a proper loadout based on sector.
+                if(destination.preset != null){
+                    var rules = destination.preset.generator.map.rules();
+                    for(var stack : rules.loadout){
+                        if(!sector.planet.hiddenItems.contains(stack.item)){
+                            launches.add(stack.item, stack.amount);
+                        }
+                    }
+                }
+
+                universe.updateLaunchResources(launches);
+            }else if(getMax()){
                 for(Item item : content.items()){
                     launches.set(item, Mathf.clamp(sitems.get(item) - launches.get(item), 0, capacity));
                 }
@@ -78,10 +91,13 @@ public class LaunchLoadoutDialog extends BaseDialog{
             }
 
             for(ItemStack s : total){
-                table.image(s.item.uiIcon).left().size(iconSmall);
                 int as = schems.get(s.item), al = launches.get(s.item);
 
-                String amountStr = (al + as) + "[gray] (" + (al + " + " + as + ")");
+                if(as + al == 0) continue;
+
+                table.image(s.item.uiIcon).left().size(iconSmall);
+
+                String amountStr = (al + as) + (sector.planet.allowLaunchLoadout ? "[gray] (" + (al + " + " + as + ")") : "");
 
                 table.add(
                     sitems.has(s.item, s.amount) ? amountStr :
@@ -97,25 +113,27 @@ public class LaunchLoadoutDialog extends BaseDialog{
 
         Runnable rebuildItems = () -> rebuild.get(items);
 
-        buttons.button("@resources.max", Icon.add, Styles.togglet, () -> {
-            setMax(!getMax());
-            update.run();
-            rebuildItems.run();
-        }).checked(b -> getMax());
-
-        buttons.button("@resources", Icon.edit, () -> {
-            ItemSeq stacks = universe.getLaunchResources();
-            Seq<ItemStack> out = stacks.toSeq();
-
-            ItemSeq realItems = sitems.copy();
-            selected.requirements().each(realItems::remove);
-
-            loadout.show(lastCapacity, realItems, out, UnlockableContent::unlocked, out::clear, () -> {}, () -> {
-                universe.updateLaunchResources(new ItemSeq(out));
+        if(sector.planet.allowLaunchLoadout){
+            buttons.button("@resources.max", Icon.add, Styles.togglet, () -> {
+                setMax(!getMax());
                 update.run();
                 rebuildItems.run();
-            });
-        }).disabled(b -> getMax());
+            }).checked(b -> getMax());
+
+            buttons.button("@resources", Icon.edit, () -> {
+                ItemSeq stacks = universe.getLaunchResources();
+                Seq<ItemStack> out = stacks.toSeq();
+
+                ItemSeq realItems = sitems.copy();
+                selected.requirements().each(realItems::remove);
+
+                loadout.show(lastCapacity, realItems, out, UnlockableContent::unlocked, out::clear, () -> {}, () -> {
+                    universe.updateLaunchResources(new ItemSeq(out));
+                    update.run();
+                    rebuildItems.run();
+                });
+            }).disabled(b -> getMax());
+        }
 
         boolean rows = Core.graphics.isPortrait() && mobile;
 
@@ -138,44 +156,48 @@ public class LaunchLoadoutDialog extends BaseDialog{
 
         cont.add(Core.bundle.format("launch.from", sector.name())).row();
 
-        cont.pane(t -> {
-            int[] i = {0};
+        if(sector.planet.allowLaunchSchematics){
+            cont.pane(t -> {
+                int[] i = {0};
 
-            Cons<Schematic> handler = s -> {
-                if(s.tiles.contains(tile -> !tile.block.supportsEnv(sector.planet.defaultEnv) ||
-                //make sure block can be built here.
-                (!state.rules.hiddenBuildItems.isEmpty() && Structs.contains(tile.block.requirements, stack -> state.rules.hiddenBuildItems.contains(stack.item))))){
-                    return;
-                }
+                Cons<Schematic> handler = s -> {
+                    if(s.tiles.contains(tile -> !tile.block.supportsEnv(sector.planet.defaultEnv) ||
+                    //make sure block can be built here.
+                    (!sector.planet.hiddenItems.isEmpty() && Structs.contains(tile.block.requirements, stack -> sector.planet.hiddenItems.contains(stack.item))))){
+                        return;
+                    }
 
-                t.button(b -> b.add(new SchematicImage(s)), Styles.togglet, () -> {
-                    selected = s;
-                    update.run();
-                    rebuildItems.run();
-                }).group(group).pad(4).checked(s == selected).size(200f);
+                    t.button(b -> b.add(new SchematicImage(s)), Styles.togglet, () -> {
+                        selected = s;
+                        update.run();
+                        rebuildItems.run();
+                    }).group(group).pad(4).checked(s == selected).size(200f);
 
-                if(++i[0] % cols == 0){
-                    t.row();
-                }
-            };
+                    if(++i[0] % cols == 0){
+                        t.row();
+                    }
+                };
 
-            if(sector.planet.allowLaunchSchematics || schematics.getDefaultLoadout(core) == null){
-                for(var entry : schematics.getLoadouts()){
-                    if(entry.key.size <= core.size){
-                        for(Schematic s : entry.value){
-                            handler.get(s);
+                if(sector.planet.allowLaunchSchematics || schematics.getDefaultLoadout(core) == null){
+                    for(var entry : schematics.getLoadouts()){
+                        if(entry.key.size <= core.size){
+                            for(Schematic s : entry.value){
+                                handler.get(s);
+                            }
                         }
                     }
+                }else{
+                    //only allow launching with the standard loadout schematic
+                    handler.get(schematics.getDefaultLoadout(core));
                 }
-            }else{
-                //only allow launching with the standard loadout schematic
-                handler.get(schematics.getDefaultLoadout(core));
-            }
-        }).growX().scrollX(false);
+            }).growX().scrollX(false);
 
-        cont.row();
-        cont.label(() -> Core.bundle.format("launch.capacity", lastCapacity)).row();
-        cont.row();
+            cont.row();
+
+            cont.label(() -> Core.bundle.format("launch.capacity", lastCapacity)).row();
+            cont.row();
+        }
+
         cont.pane(items);
         cont.row();
         cont.add("@sector.missingresources").visible(() -> !valid);

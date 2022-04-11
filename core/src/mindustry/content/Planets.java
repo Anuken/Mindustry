@@ -122,6 +122,7 @@ public class Planets{
             allowWaveSimulation = true;
             allowSectorInvasion = true;
             allowLaunchSchematics = true;
+            allowLaunchLoadout = true;
             ruleSetter = r -> {
                 //TODO this planet is crux, need to update all maps.
                 //r.waveTeam = Team.crux;

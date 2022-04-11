@@ -87,6 +87,8 @@ public class Planet extends UnlockableContent{
     public boolean hasAtmosphere = true;
     /** Whether to allow users to specify a custom launch schematic for this map. */
     public boolean allowLaunchSchematics = false;
+    /** Whether to allow users to specify the resources they take to this map. */
+    public boolean allowLaunchLoadout = false;
     /** Whether to allow sectors to simulate waves in the background. */
     public boolean allowWaveSimulation = false;
     /** Whether to simulate sector invasions from enemy bases. */
