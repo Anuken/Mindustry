@@ -97,7 +97,7 @@ public class Blocks{
     overflowGate, underflowGate, massDriver,
 
     //transport - alternate
-    duct, ductRouter, overflowDuct, ductBridge, ductUnloader,
+    duct, armoredDuct, ductRouter, overflowDuct, ductBridge, ductUnloader,
     surgeConveyor, surgeRouter,
 
     unitCargoLoader, unitCargoUnloadPoint,
@@ -1699,12 +1699,12 @@ public class Blocks{
         }};
 
         radar = new Radar("radar"){{
-            requirements(Category.effect, BuildVisibility.fogOnly, with(Items.silicon, 40, Items.graphite, 40));
+            requirements(Category.effect, BuildVisibility.fogOnly, with(Items.silicon, 50, Items.graphite, 50));
             outlineColor = Color.valueOf("4a4b53");
-            fogRadius = 28;
+            fogRadius = 33;
             researchCost = with(Items.silicon, 70, Items.graphite, 70);
 
-            consumePower(0.15f);
+            consumePower(0.6f);
         }};
 
         buildTower = new BuildTurret("build-tower"){{
@@ -1885,6 +1885,14 @@ public class Blocks{
             health = 90;
             speed = 4f;
             researchCost = with(Items.beryllium, 5);
+        }};
+
+        armoredDuct = new Duct("armored-duct"){{
+            requirements(Category.distribution, with(Items.beryllium, 2, Items.tungsten, 1));
+            health = 140;
+            speed = 4f;
+            armored = true;
+            researchCost = with(Items.beryllium, 300, Items.tungsten, 100);
         }};
 
         ductRouter = new DuctRouter("duct-router"){{
@@ -3007,6 +3015,7 @@ public class Blocks{
                 //TODO merge
                 chargeEffect = new MultiEffect(Fx.lancerLaserCharge, Fx.lancerLaserChargeBegin);
 
+                buildingDamageMultiplier = 0.25f;
                 hitEffect = Fx.hitLancer;
                 hitSize = 4;
                 lifetime = 16f;
@@ -3014,7 +3023,6 @@ public class Blocks{
                 collidesAir = false;
                 length = 173f;
                 ammoMultiplier = 1f;
-
                 pierceCap = 4;
             }};
         }};
@@ -3026,6 +3034,21 @@ public class Blocks{
                 lightningLength = 25;
                 collidesAir = false;
                 ammoMultiplier = 1f;
+
+                //for visual stats only.
+                buildingDamageMultiplier = 0.25f;
+
+                lightningType = new BulletType(0.0001f, 0f){{
+                    lifetime = Fx.lightning.lifetime;
+                    hitEffect = Fx.hitLancer;
+                    despawnEffect = Fx.none;
+                    status = StatusEffects.shocked;
+                    statusDuration = 10f;
+                    hittable = false;
+                    lightColor = Color.white;
+                    collidesGround = false;
+                    buildingDamageMultiplier = 0.25f;
+                }};
             }};
             reload = 35f;
             shootCone = 40f;
@@ -3653,6 +3676,7 @@ public class Blocks{
                 trailWidth = 2.1f;
                 trailLength = 10;
                 hitEffect = despawnEffect = Fx.hitBulletColor;
+                buildingDamageMultiplier = 0.5f;
             }},
             Items.tungsten, new BasicBulletType(8f, 185){{
                 width = 13f;
@@ -3671,6 +3695,7 @@ public class Blocks{
                 trailLength = 11;
                 hitEffect = despawnEffect = Fx.hitBulletColor;
                 rangeChange = 40f;
+                buildingDamageMultiplier = 0.5f;
             }}
             );
 
@@ -3748,6 +3773,7 @@ public class Blocks{
                 length = r;
                 knockback = 1f;
                 pierceCap = 3;
+                buildingDamageMultiplier = 0.5f;
 
                 colors = new Color[]{Color.valueOf("eb7abe").a(0.55f), Color.valueOf("e189f5").a(0.7f), Color.valueOf("907ef7").a(0.8f), Color.valueOf("91a4ff"), Color.white};
             }},
@@ -3757,6 +3783,7 @@ public class Blocks{
                 length = r + rangeChange;
                 knockback = 2f;
                 pierceCap = 4;
+                buildingDamageMultiplier = 0.5f;
 
                 colors = new Color[]{Color.valueOf("465ab8").a(0.55f), Color.valueOf("66a6d2").a(0.7f), Color.valueOf("89e8b6").a(0.8f), Color.valueOf("cafcbe"), Color.white};
                 flareColor = Color.valueOf("89e8b6");
@@ -3804,6 +3831,7 @@ public class Blocks{
                 trailInterp = v -> Math.max(Mathf.slope(v), 0.8f);
                 shrinkX = 0.2f;
                 shrinkY = 0.1f;
+                buildingDamageMultiplier = 0.25f;
             }}
             );
 

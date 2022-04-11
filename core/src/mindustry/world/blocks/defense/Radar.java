@@ -15,7 +15,7 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class Radar extends Block{
-    public float discoveryTime = 60f * 7f;
+    public float discoveryTime = 60f * 10f;
     public float rotateSpeed = 2f;
 
     public @Load("@-base") TextureRegion baseRegion;

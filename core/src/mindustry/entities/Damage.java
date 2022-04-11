@@ -462,7 +462,7 @@ public class Damage{
 
         if(ground){
             if(!complete){
-                tileDamage(team, World.toTile(x), World.toTile(y), radius / tilesize, damage, source);
+                tileDamage(team, World.toTile(x), World.toTile(y), radius / tilesize, damage * (source == null ? 1f : source.type.buildingDamageMultiplier), source);
             }else{
                 completeDamage(team, x, y, radius, damage);
             }

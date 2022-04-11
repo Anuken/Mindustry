@@ -73,8 +73,10 @@ public class ErekirTechTree{
             node(duct, erekirSector, () -> {
                 node(ductRouter, () -> {
                     node(ductBridge, () -> {
-                        node(surgeConveyor, () -> {
-                            node(surgeRouter);
+                        node(armoredDuct, () -> {
+                            node(surgeConveyor, () -> {
+                                node(surgeRouter);
+                            });
                         });
 
                         node(unitCargoLoader, () -> {

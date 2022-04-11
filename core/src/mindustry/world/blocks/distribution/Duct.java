@@ -22,6 +22,7 @@ import static mindustry.Vars.*;
 
 public class Duct extends Block implements Autotiler{
     public float speed = 5f;
+    public boolean armored = false;
 
     public @Load(value = "@-top-#", length = 5) TextureRegion[] topRegions;
     public @Load(value = "@-bottom-#", length = 5, fallback = "duct-bottom-#") TextureRegion[] botRegions;
@@ -74,7 +75,12 @@ public class Duct extends Block implements Autotiler{
 
     @Override
     public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
-        return (otherblock.outputsItems() && blendsArmored(tile, rotation, otherx, othery, otherrot, otherblock)) || (lookingAt(tile, rotation, otherx, othery, otherblock) && otherblock.hasItems);
+        if(!armored){
+            return (otherblock.outputsItems() || (lookingAt(tile, rotation, otherx, othery, otherblock) && otherblock.hasItems))
+            && lookingAtEither(tile, rotation, otherx, othery, otherrot, otherblock);
+        }else{
+            return (otherblock.outputsItems() && blendsArmored(tile, rotation, otherx, othery, otherrot, otherblock)) || (lookingAt(tile, rotation, otherx, othery, otherblock) && otherblock.hasItems);
+        }
     }
 
     @Override
@@ -162,7 +168,12 @@ public class Duct extends Block implements Autotiler{
         @Override
         public boolean acceptItem(Building source, Item item){
             return current == null && items.total() == 0 &&
-                ((source.block.rotate && source.front() == this && source.block.hasItems) || Edges.getFacingEdge(source.tile(), tile).relativeTo(tile) == rotation);
+                (armored ?
+                    //armored acceptance
+                    ((source.block.rotate && source.front() == this && source.block.hasItems) || Edges.getFacingEdge(source.tile(), tile).relativeTo(tile) == rotation) :
+                    //standard acceptance - do not accept from front
+                    !(source.block.rotate && next == source) && Math.abs(Edges.getFacingEdge(source.tile, tile).relativeTo(tile.x, tile.y) - rotation) != 2
+                );
         }
 
         @Override
