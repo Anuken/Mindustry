@@ -300,7 +300,7 @@ public class LExecutor{
                     if(res != null && res.build != null && unit.within(res.build.x, res.build.y, Math.max(unit.range(), buildingRange))){
                         cache.build = res.build;
                         exec.setobj(outBuild, res.build);
-                    } else {
+                    }else{
                         exec.setobj(outBuild, null);
                     }
                 }else{
