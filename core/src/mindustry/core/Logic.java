@@ -313,6 +313,7 @@ public class Logic implements ApplicationListener{
 
             if(!net.client() && first.complete()){
                 state.rules.objectives.remove(0);
+                first.completed();
                 if(!headless){
                     //delete markers
                     for(var marker : first.markers){

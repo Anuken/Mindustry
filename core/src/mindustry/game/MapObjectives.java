@@ -5,10 +5,12 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.type.*;
 
 public class MapObjectives{
     public static Prov<MapObjective>[] allObjectiveTypes = new Prov[]{
@@ -45,11 +47,39 @@ public class MapObjectives{
         }
     }
 
+    public static class ItemObjective extends MapObjective{
+        public Item item = Items.copper;
+        public int amount = 1;
+
+        public ItemObjective(Item item, int amount){
+            this.item = item;
+            this.amount = amount;
+        }
+
+        public ItemObjective(){
+        }
+
+        @Override
+        public String text(){
+            return Core.bundle.format("objective.item", Vars.state.rules.defaultTeam.items().get(item), amount, item.emoji(), item.localizedName);
+        }
+
+        @Override
+        public boolean complete(){
+            return Vars.state.rules.defaultTeam.items().has(item, amount);
+        }
+    }
+
     public static abstract class MapObjective{
         public ObjectiveMarker[] markers = {};
 
         public boolean complete(){
             return false;
+        }
+
+        /** Called immediately after this objective is completed and removed from the rules. */
+        public void completed(){
+
         }
 
         public void update(){
@@ -61,10 +91,12 @@ public class MapObjectives{
 
         }
 
+        /** Basic mission display text. */
         public @Nullable String text(){
             return null;
         }
 
+        /** Details that appear upon click. */
         public @Nullable String details(){
             return null;
         }

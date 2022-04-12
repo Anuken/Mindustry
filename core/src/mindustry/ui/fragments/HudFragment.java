@@ -215,7 +215,7 @@ public class HudFragment{
                     }else{
                         logic.skipWave();
                     }
-                }).growY().fillX().right().width(40f).disabled(b -> !canSkipWave()).name("skip");
+                }).growY().fillX().right().width(40f).disabled(b -> !canSkipWave()).name("skip").get().toBack();
             }).width(dsize * 5 + 4f).name("statustable");
 
             wavesMain.row();
@@ -744,7 +744,24 @@ public class HudFragment{
             t.getChildren().get(1).toFront();
         })).size(120f, 80).padRight(4);
 
-        table.labelWrap(() -> {
+        Cell[] lcell = {null};
+        boolean[] couldSkip = {true};
+
+        lcell[0] = table.labelWrap(() -> {
+
+            //update padding depend on whether the button to the right is there
+            boolean can = canSkipWave();
+            if(can != couldSkip[0]){
+                if(canSkipWave()){
+                    lcell[0].padRight(8f);
+                }else{
+                    lcell[0].padRight(-42f);
+                }
+                table.invalidateHierarchy();
+                table.pack();
+                couldSkip[0] = can;
+            }
+
             builder.setLength(0);
 
             //objectives override mission?
