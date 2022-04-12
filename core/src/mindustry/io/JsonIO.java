@@ -242,6 +242,12 @@ public class JsonIO{
             var i = filter.get();
             json.addClassTag(Strings.camelize(i.getClass().getSimpleName().replace("Filter", "")), i.getClass());
         }
+
+        //use short names for all objective types
+        for(var obj : MapObjectives.allObjectiveTypes){
+            var i = obj.get();
+            json.addClassTag(Strings.camelize(i.getClass().getSimpleName().replace("Objective", "")), i.getClass());
+        }
     }
 
     static class CustomJson extends Json{

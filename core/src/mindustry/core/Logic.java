@@ -435,6 +435,22 @@ public class Logic implements ApplicationListener{
                     }
                 }
 
+                //TODO objectives clientside???
+
+                //update objectives; do not get completed clientside
+                if(state.rules.objectives.size > 0){
+                    var first = state.rules.objectives.first();
+                    first.update();
+                    if(!net.client() && first.complete()){
+                        state.rules.objectives.remove(0);
+
+                        //TODO call packet for this?
+                        if(net.server()){
+                            Call.setRules(state.rules);
+                        }
+                    }
+                }
+
                 if(state.rules.waves && state.rules.waveTimer && !state.gameOver){
                     if(!isWaitingWave()){
                         state.wavetime = Math.max(state.wavetime - Time.delta, 0);

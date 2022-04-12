@@ -6,6 +6,7 @@ import arc.util.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
 import mindustry.content.*;
+import mindustry.game.MapObjectives.*;
 import mindustry.graphics.g3d.*;
 import mindustry.io.*;
 import mindustry.type.*;
@@ -115,6 +116,8 @@ public class Rules{
     public ObjectSet<String> researched = new ObjectSet<>();
     /** Block containing these items as requirements are hidden. */
     public ObjectSet<Item> hiddenBuildItems = Items.erekirOnlyItems.asSet();
+    /** Campaign-only map objectives. */
+    public Seq<MapObjective> objectives = new Seq<>();
     /** HIGHLY UNSTABLE/EXPERIMENTAL. DO NOT USE THIS. */
     public boolean fog = false;
     /** If fog = true, this is whether static (black) fog is enabled. */
