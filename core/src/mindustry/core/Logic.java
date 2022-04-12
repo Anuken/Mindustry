@@ -280,7 +280,7 @@ public class Logic implements ApplicationListener{
         }
     }
 
-    private void updateWeather(){
+    protected void updateWeather(){
         state.rules.weather.removeAll(w -> w.weather == null);
 
         for(WeatherEntry entry : state.rules.weather){
@@ -293,6 +293,40 @@ public class Logic implements ApplicationListener{
                 entry.cooldown = duration + Mathf.random(entry.minFrequency, entry.maxFrequency);
                 Tmp.v1.setToRandomDirection();
                 Call.createWeather(entry.weather, entry.intensity, duration, Tmp.v1.x, Tmp.v1.y);
+            }
+        }
+    }
+
+    protected void updateObjectives(){
+        //update objectives; do not get completed clientside
+        if(state.rules.objectives.size > 0){
+            var first = state.rules.objectives.first();
+            first.update();
+
+            //initialize markers
+            for(var marker : first.markers){
+                if(!marker.wasAdded){
+                    marker.wasAdded = true;
+                    marker.added();
+                }
+            }
+
+            if(!net.client() && first.complete()){
+                state.rules.objectives.remove(0);
+                if(!headless){
+                    //delete markers
+                    for(var marker : first.markers){
+                        if(marker.wasAdded){
+                            marker.removed();
+                            marker.wasAdded = false;
+                        }
+                    }
+                }
+
+                //TODO call packet for this?
+                if(net.server()){
+                    Call.setRules(state.rules);
+                }
             }
         }
     }
@@ -436,20 +470,7 @@ public class Logic implements ApplicationListener{
                 }
 
                 //TODO objectives clientside???
-
-                //update objectives; do not get completed clientside
-                if(state.rules.objectives.size > 0){
-                    var first = state.rules.objectives.first();
-                    first.update();
-                    if(!net.client() && first.complete()){
-                        state.rules.objectives.remove(0);
-
-                        //TODO call packet for this?
-                        if(net.server()){
-                            Call.setRules(state.rules);
-                        }
-                    }
-                }
+                updateObjectives();
 
                 if(state.rules.waves && state.rules.waveTimer && !state.gameOver){
                     if(!isWaitingWave()){

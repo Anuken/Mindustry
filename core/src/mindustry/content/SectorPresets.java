@@ -1,5 +1,6 @@
 package mindustry.content;
 
+import mindustry.game.MapObjectives.*;
 import mindustry.type.*;
 
 import static mindustry.content.Planets.*;
@@ -112,6 +113,15 @@ public class SectorPresets{
             addStartingItems = true;
             alwaysUnlocked = true;
             difficulty = 1;
+
+            rules = r -> {
+                r.objectives.addAll(new ResearchObjective(Items.beryllium){{
+                    markers = new ObjectiveMarker[]{
+                        new TextMarker("Units can mine [accent]resources[] from walls.", 1984f, 2240f + 16f),
+                        new ShapeMarker(1984f, 2240f),
+                    };
+                }});
+            };
         }};
 
         two = new SectorPreset("two", erekir, 88){{

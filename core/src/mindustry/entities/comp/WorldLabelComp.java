@@ -31,7 +31,11 @@ public abstract class WorldLabelComp implements Posc, Drawc, Syncc{
 
     @Override
     public void draw(){
-        Draw.z(z);
+        drawAt(text, x, y, z, flags, fontSize);
+    }
+
+    public static void drawAt(String text, float x, float y, float layer, int flags, float fontSize){
+        Draw.z(layer);
         float z = Drawf.text();
 
         Font font = (flags & flagOutline) != 0 ? Fonts.outline : Fonts.def;

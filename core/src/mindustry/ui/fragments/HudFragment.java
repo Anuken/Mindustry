@@ -747,6 +747,16 @@ public class HudFragment{
         table.labelWrap(() -> {
             builder.setLength(0);
 
+            //objectives override mission?
+            if(state.rules.objectives.size > 0){
+                var first = state.rules.objectives.first();
+                String text = first.text();
+                if(text != null){
+                    builder.append(text);
+                    return builder;
+                }
+            }
+
             //mission overrides everything
             if(state.rules.mission != null){
                 builder.append(state.rules.mission);
