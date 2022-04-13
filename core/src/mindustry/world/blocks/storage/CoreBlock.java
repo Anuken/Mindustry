@@ -500,6 +500,10 @@ public class CoreBlock extends StorageBlock{
                     state.rules.sector.info.handleCoreItem(item, 1);
                 }
 
+                if(team == state.rules.defaultTeam){
+                    state.stats.coreItemCount.increment(item);
+                }
+
                 if(items.get(item) >= storageCapacity || incinerate){
                     //create item incineration effect at random intervals
                     if(!noEffect){

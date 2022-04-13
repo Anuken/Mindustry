@@ -5,7 +5,6 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.util.*;
-import mindustry.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.gen.*;
@@ -13,15 +12,19 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
+import static mindustry.Vars.*;
+
 public class MapObjectives{
     public static Prov<MapObjective>[] allObjectiveTypes = new Prov[]{
-        ResearchObjective::new, BuildCountObjective::new, ItemObjective::new
+        ResearchObjective::new, BuildCountObjective::new, UnitCountObjective::new, ItemObjective::new,
+        CommandModeObjective::new, CoreItemObjective::new, DestroyCoreObjective::new
     };
 
     public static Prov<ObjectiveMarker>[] allMarkerTypes = new Prov[]{
         TextMarker::new, ShapeMarker::new, ShapeTextMarker::new
     };
 
+    /** Research a specific piece of content in the tech tree. */
     public static class ResearchObjective extends MapObjective{
         public UnlockableContent content = Items.copper;
 
@@ -41,13 +44,9 @@ public class MapObjectives{
         public boolean complete(){
             return content.unlocked();
         }
-
-        @Override
-        public @Nullable String details(){
-            return super.details();
-        }
     }
 
+    /** Have a certain amount of item in your core. */
     public static class ItemObjective extends MapObjective{
         public Item item = Items.copper;
         public int amount = 1;
@@ -62,22 +61,49 @@ public class MapObjectives{
 
         @Override
         public String text(){
-            return Core.bundle.format("objective.item", Vars.state.rules.defaultTeam.items().get(item), amount, item.emoji(), item.localizedName);
+            return Core.bundle.format("objective.item", state.rules.defaultTeam.items().get(item), amount, item.emoji(), item.localizedName);
         }
 
         @Override
         public boolean complete(){
-            return Vars.state.rules.defaultTeam.items().has(item, amount);
+            return state.rules.defaultTeam.items().has(item, amount);
         }
     }
 
+    /** Get a certain item in your core (through a block, not manually.) */
+    public static class CoreItemObjective extends MapObjective{
+        public Item item = Items.copper;
+        public int amount = 2;
+
+        public CoreItemObjective(Item item, int amount){
+            this.item = item;
+            this.amount = amount;
+        }
+
+        public CoreItemObjective(){
+        }
+
+
+
+        @Override
+        public String text(){
+            return Core.bundle.format("objective.coreitem", state.stats.coreItemCount.get(item), amount, item.emoji(), item.localizedName);
+        }
+
+        @Override
+        public boolean complete(){
+            return state.stats.coreItemCount.get(item) >= amount;
+        }
+    }
+
+    /** Build a certain amount of a block. */
     public static class BuildCountObjective extends MapObjective{
         public Block block = Blocks.conveyor;
-        public int placeCount = 1;
+        public int count = 1;
 
-        public BuildCountObjective(Block block, int placeCount){
+        public BuildCountObjective(Block block, int count){
             this.block = block;
-            this.placeCount = placeCount;
+            this.count = count;
         }
 
         public BuildCountObjective(){
@@ -85,20 +111,79 @@ public class MapObjectives{
 
         @Override
         public String text(){
-            return Core.bundle.format("objective.build", placeCount, block.emoji(), block.localizedName);
+            return Core.bundle.format("objective.build", count, block.emoji(), block.localizedName);
         }
 
         @Override
         public boolean complete(){
-            return Vars.state.stats.placedBlockCount.get(block, 0) >= placeCount;
+            return state.stats.placedBlockCount.get(block, 0) >= count;
         }
     }
 
+    /** Produce a certain amount of a unit. */
+    public static class UnitCountObjective extends MapObjective{
+        public UnitType unit = UnitTypes.dagger;
+        public int count = 1;
+
+        public UnitCountObjective(UnitType unit, int count){
+            this.unit = unit;
+            this.count = count;
+        }
+
+        public UnitCountObjective(){
+        }
+
+        @Override
+        public String text(){
+            return Core.bundle.format("objective.buildunit", unit, unit.emoji(), unit.localizedName);
+        }
+
+        @Override
+        public boolean complete(){
+            return state.rules.defaultTeam.data().countType(unit) >= count;
+        }
+    }
+
+    /** Command any unit to do anything. Always compete in headless mode. */
+    public static class CommandModeObjective extends MapObjective{
+
+        @Override
+        public String text(){
+            return Core.bundle.get("objective.command");
+        }
+
+        @Override
+        public boolean complete(){
+            return headless || control.input.selectedUnits.contains(u -> u.isCommandable() && u.command().hasCommand());
+        }
+    }
+
+    /** Destroy all enemy core(s). */
+    public static class DestroyCoreObjective extends MapObjective{
+
+        @Override
+        public String text(){
+            return Core.bundle.get("objective.destroycore");
+        }
+
+        @Override
+        public boolean complete(){
+            return state.rules.waveTeam.cores().size == 0;
+        }
+    }
+
+    /** Base abstract class for any in-map objective. */
     public static abstract class MapObjective{
         public ObjectiveMarker[] markers = {};
+        public @Nullable String details;
 
         public MapObjective withMarkers(ObjectiveMarker... markers){
             this.markers = markers;
+            return this;
+        }
+
+        public MapObjective withDetails(String details){
+            this.details = details;
             return this;
         }
 
@@ -127,12 +212,13 @@ public class MapObjectives{
 
         /** Details that appear upon click. */
         public @Nullable String details(){
-            return null;
+            return details;
         }
     }
 
+    /** Displays text above a shape. */
     public static class ShapeTextMarker extends ObjectiveMarker{
-        public String text = "sample text";
+        public String text = "frog";
         public float x, y, fontSize = 1f, textHeight = 7f;
         public byte flags = WorldLabel.flagBackground | WorldLabel.flagOutline;
 
@@ -186,6 +272,7 @@ public class MapObjectives{
         }
     }
 
+    /** Displays a shape with an outline and color. */
     public static class ShapeMarker extends ObjectiveMarker{
         public float x, y, radius = 6f, rotation = 0f;
         public int sides = 4;
@@ -216,6 +303,7 @@ public class MapObjectives{
         }
     }
 
+    /** Displays text at a location. */
     public static class TextMarker extends ObjectiveMarker{
         public String text = "uwu";
         public float x, y, fontSize = 1f;
