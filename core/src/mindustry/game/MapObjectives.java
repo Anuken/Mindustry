@@ -11,10 +11,11 @@ import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.world.*;
 
 public class MapObjectives{
     public static Prov<MapObjective>[] allObjectiveTypes = new Prov[]{
-        ResearchObjective::new
+        ResearchObjective::new, PlaceCountObjective::new, ItemObjective::new
     };
 
     public static Prov<ObjectiveMarker>[] allMarkerTypes = new Prov[]{
@@ -67,6 +68,29 @@ public class MapObjectives{
         @Override
         public boolean complete(){
             return Vars.state.rules.defaultTeam.items().has(item, amount);
+        }
+    }
+
+    public static class PlaceCountObjective extends MapObjective{
+        public Block block = Blocks.conveyor;
+        public int placeCount = 1;
+
+        public PlaceCountObjective(Block block, int placeCount){
+            this.block = block;
+            this.placeCount = placeCount;
+        }
+
+        public PlaceCountObjective(){
+        }
+
+        @Override
+        public String text(){
+            return Core.bundle.format("objective.place", placeCount, block.emoji(), block.localizedName);
+        }
+
+        @Override
+        public boolean complete(){
+            return Vars.state.stats.placedBlockCount.get(block, 0) >= placeCount;
         }
     }
 

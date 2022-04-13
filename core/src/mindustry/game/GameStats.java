@@ -1,5 +1,8 @@
 package mindustry.game;
 
+import arc.struct.*;
+import mindustry.world.*;
+
 public class GameStats{
     /** Enemy (red team) units destroyed. */
     public int enemyUnitsDestroyed;
@@ -13,4 +16,6 @@ public class GameStats{
     public int buildingsDestroyed;
     /** Total units created by any means. */
     public int unitsCreated;
+    /** Record of blocks that have been placed by count. Used for objectives only. */
+    public ObjectIntMap<Block> placedBlockCount = new ObjectIntMap<>();
 }

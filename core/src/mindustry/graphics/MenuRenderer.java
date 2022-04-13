@@ -46,24 +46,24 @@ public class MenuRenderer implements Disposable{
         shadows = new FrameBuffer(width, height);
         int offset = Mathf.random(100000);
         int s1 = offset, s2 = offset + 1, s3 = offset + 2;
-        Block[] selected = Structs.select(
-            new Block[]{Blocks.sand, Blocks.sandWall},
-            new Block[]{Blocks.shale, Blocks.shaleWall},
-            new Block[]{Blocks.ice, Blocks.iceWall},
-            new Block[]{Blocks.sand, Blocks.sandWall},
-            new Block[]{Blocks.shale, Blocks.shaleWall},
-            new Block[]{Blocks.ice, Blocks.iceWall},
-            new Block[]{Blocks.moss, Blocks.sporePine},
-            new Block[]{Blocks.dirt, Blocks.dirtWall},
-            new Block[]{Blocks.dacite, Blocks.daciteWall}
+        Block[] selected = Structs.random(
+        new Block[]{Blocks.sand, Blocks.sandWall},
+        new Block[]{Blocks.shale, Blocks.shaleWall},
+        new Block[]{Blocks.ice, Blocks.iceWall},
+        new Block[]{Blocks.sand, Blocks.sandWall},
+        new Block[]{Blocks.shale, Blocks.shaleWall},
+        new Block[]{Blocks.ice, Blocks.iceWall},
+        new Block[]{Blocks.moss, Blocks.sporePine},
+        new Block[]{Blocks.dirt, Blocks.dirtWall},
+        new Block[]{Blocks.dacite, Blocks.daciteWall}
         );
-        Block[] selected2 = Structs.select(
-            new Block[]{Blocks.basalt, Blocks.duneWall},
-            new Block[]{Blocks.basalt, Blocks.duneWall},
-            new Block[]{Blocks.stone, Blocks.stoneWall},
-            new Block[]{Blocks.stone, Blocks.stoneWall},
-            new Block[]{Blocks.moss, Blocks.sporeWall},
-            new Block[]{Blocks.salt, Blocks.saltWall}
+        Block[] selected2 = Structs.random(
+        new Block[]{Blocks.basalt, Blocks.duneWall},
+        new Block[]{Blocks.basalt, Blocks.duneWall},
+        new Block[]{Blocks.stone, Blocks.stoneWall},
+        new Block[]{Blocks.stone, Blocks.stoneWall},
+        new Block[]{Blocks.moss, Blocks.sporeWall},
+        new Block[]{Blocks.salt, Blocks.saltWall}
         );
 
         Block ore1 = ores.random();

@@ -54,6 +54,10 @@ public class Logic implements ApplicationListener{
                         it.remove();
                     }
                 }
+
+                if(event.team == state.rules.defaultTeam){
+                    state.stats.placedBlockCount.increment(event.tile.block());
+                }
             }
         });
 
