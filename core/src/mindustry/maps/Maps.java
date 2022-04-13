@@ -23,7 +23,6 @@ import mindustry.world.*;
 import mindustry.world.blocks.storage.*;
 
 import java.io.*;
-import java.util.concurrent.*;
 
 import static mindustry.Vars.*;
 
@@ -46,7 +45,6 @@ public class Maps{
     private ShuffleMode shuffleMode = ShuffleMode.all;
     private @Nullable MapProvider shuffler;
 
-    private ExecutorService executor = Threads.executor(3);
     private ObjectSet<Map> previewList = new ObjectSet<>();
 
     public ShuffleMode getShuffleMode(){
@@ -223,7 +221,7 @@ public class Maps{
                 }
 
                 Pixmap pix = MapIO.generatePreview(world.tiles);
-                executor.submit(() -> map.previewFile().writePng(pix));
+                mainExecutor.submit(() -> map.previewFile().writePng(pix));
                 writeCache(map);
 
                 map.texture = new Texture(pix);
@@ -390,7 +388,7 @@ public class Maps{
             //this has to be done synchronously!
             Pixmap pix = MapIO.generatePreview(map);
             map.texture = new Texture(pix);
-            executor.submit(() -> {
+            mainExecutor.submit(() -> {
                 try{
                     map.previewFile().writePng(pix);
                     writeCache(map);

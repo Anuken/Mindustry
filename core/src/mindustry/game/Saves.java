@@ -17,7 +17,6 @@ import mindustry.type.*;
 import java.io.*;
 import java.text.*;
 import java.util.*;
-import java.util.concurrent.*;
 
 import static mindustry.Vars.*;
 
@@ -25,7 +24,6 @@ public class Saves{
     Seq<SaveSlot> saves = new Seq<>();
     @Nullable SaveSlot current;
     private @Nullable SaveSlot lastSectorSave;
-    ExecutorService previewExecutor = Threads.executor(1);
     private boolean saving;
     private float time;
 
@@ -223,7 +221,7 @@ public class Saves{
             if(Core.assets.isLoaded(loadPreviewFile().path())){
                 Core.assets.unload(loadPreviewFile().path());
             }
-            previewExecutor.submit(() -> {
+            mainExecutor.submit(() -> {
                 try{
                     previewFile().writePng(renderer.minimap.getPixmap());
                     requestedPreview = false;

@@ -31,6 +31,7 @@ import mindustry.world.*;
 import java.io.*;
 import java.nio.charset.*;
 import java.util.*;
+import java.util.concurrent.*;
 
 import static arc.Core.*;
 
@@ -209,6 +210,9 @@ public class Vars implements Loadable{
 
     /** list of all locales that can be switched to */
     public static Locale[] locales;
+
+    //the main executor will only have at most [cores] number of threads active
+    public static ExecutorService mainExecutor = Threads.cachedExecutor(1, OS.cores, true);
 
     public static FileTree tree = new FileTree();
     public static Net net;

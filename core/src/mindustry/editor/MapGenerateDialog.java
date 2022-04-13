@@ -37,7 +37,6 @@ public class MapGenerateDialog extends BaseDialog{
     int scaling = mobile ? 3 : 1;
     Table filterTable;
 
-    ExecutorService executor = Threads.executor(1);
     Future<?> result;
     boolean generating;
 
@@ -397,7 +396,7 @@ public class MapGenerateDialog extends BaseDialog{
 
         var copy = filters.copy();
 
-        result = executor.submit(() -> {
+        result = mainExecutor.submit(() -> {
             try{
                 int w = pixmap.width;
                 world.setGenerating(true);

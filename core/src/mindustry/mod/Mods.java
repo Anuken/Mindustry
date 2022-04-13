@@ -33,7 +33,6 @@ import static mindustry.Vars.*;
 public class Mods implements Loadable{
     private static final String[] metaFiles = {"mod.json", "mod.hjson", "plugin.json", "plugin.hjson"};
 
-    private ExecutorService async = Threads.executor();
     private Json json = new Json();
     private @Nullable Scripts scripts;
     private ContentParser parser = new ContentParser();
@@ -184,7 +183,7 @@ public class Mods implements Loadable{
 
         for(Fi file : sprites){
             //read and bleed pixmaps in parallel
-            tasks.add(async.submit(() -> {
+            tasks.add(mainExecutor.submit(() -> {
                 try{
                     Pixmap pix = new Pixmap(file.readBytes());
                     //only bleeds when linear filtering is on at startup
