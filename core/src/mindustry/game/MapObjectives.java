@@ -15,11 +15,11 @@ import mindustry.world.*;
 
 public class MapObjectives{
     public static Prov<MapObjective>[] allObjectiveTypes = new Prov[]{
-        ResearchObjective::new, PlaceCountObjective::new, ItemObjective::new
+        ResearchObjective::new, BuildCountObjective::new, ItemObjective::new
     };
 
     public static Prov<ObjectiveMarker>[] allMarkerTypes = new Prov[]{
-        TextMarker::new, ShapeMarker::new
+        TextMarker::new, ShapeMarker::new, ShapeTextMarker::new
     };
 
     public static class ResearchObjective extends MapObjective{
@@ -71,21 +71,21 @@ public class MapObjectives{
         }
     }
 
-    public static class PlaceCountObjective extends MapObjective{
+    public static class BuildCountObjective extends MapObjective{
         public Block block = Blocks.conveyor;
         public int placeCount = 1;
 
-        public PlaceCountObjective(Block block, int placeCount){
+        public BuildCountObjective(Block block, int placeCount){
             this.block = block;
             this.placeCount = placeCount;
         }
 
-        public PlaceCountObjective(){
+        public BuildCountObjective(){
         }
 
         @Override
         public String text(){
-            return Core.bundle.format("objective.place", placeCount, block.emoji(), block.localizedName);
+            return Core.bundle.format("objective.build", placeCount, block.emoji(), block.localizedName);
         }
 
         @Override
@@ -131,6 +131,61 @@ public class MapObjectives{
         }
     }
 
+    public static class ShapeTextMarker extends ObjectiveMarker{
+        public String text = "sample text";
+        public float x, y, fontSize = 1f, textHeight = 7f;
+        public byte flags = WorldLabel.flagBackground | WorldLabel.flagOutline;
+
+        public float radius = 6f, rotation = 0f;
+        public int sides = 4;
+        public Color color = Pal.accent;
+
+        public ShapeTextMarker(String text, float x, float y){
+            this.text = text;
+            this.x = x;
+            this.y = y;
+        }
+
+        public ShapeTextMarker(String text, float x, float y, float radius){
+            this.text = text;
+            this.x = x;
+            this.y = y;
+            this.radius = radius;
+        }
+
+        public ShapeTextMarker(String text, float x, float y, float radius, float rotation){
+            this.text = text;
+            this.x = x;
+            this.y = y;
+            this.radius = radius;
+            this.rotation = rotation;
+        }
+
+        public ShapeTextMarker(String text, float x, float y, float radius, float rotation, float textHeight){
+            this.text = text;
+            this.x = x;
+            this.y = y;
+            this.radius = radius;
+            this.rotation = rotation;
+            this.textHeight = textHeight;
+        }
+
+        public ShapeTextMarker(){
+
+        }
+
+        @Override
+        public void draw(){
+            Lines.stroke(3f, Pal.gray);
+            Lines.poly(x, y, sides, radius + 1f, rotation);
+            Lines.stroke(1f, color);
+            Lines.poly(x, y, sides, radius + 1f, rotation);
+            Draw.reset();
+
+            WorldLabel.drawAt(text, x, y + radius + textHeight, Draw.z(), flags, fontSize);
+        }
+    }
+
     public static class ShapeMarker extends ObjectiveMarker{
         public float x, y, radius = 6f, rotation = 0f;
         public int sides = 4;
@@ -139,6 +194,13 @@ public class MapObjectives{
         public ShapeMarker(float x, float y){
             this.x = x;
             this.y = y;
+        }
+
+        public ShapeMarker(float x, float y, float radius, float rotation){
+            this.x = x;
+            this.y = y;
+            this.radius = radius;
+            this.rotation = rotation;
         }
 
         public ShapeMarker(){
@@ -155,7 +217,7 @@ public class MapObjectives{
     }
 
     public static class TextMarker extends ObjectiveMarker{
-        public String text = "sample text";
+        public String text = "uwu";
         public float x, y, fontSize = 1f;
         public byte flags = WorldLabel.flagBackground | WorldLabel.flagOutline;
 

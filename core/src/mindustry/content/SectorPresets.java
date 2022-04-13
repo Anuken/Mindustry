@@ -115,9 +115,13 @@ public class SectorPresets{
             difficulty = 1;
 
             rules = r -> {
-                r.objectives.addAll(new ItemObjective(Items.beryllium, 20).withMarkers(
-                    new TextMarker("Use the unit to mine [accent]resources[] from walls.", 1984f, 2240f + 16f),
-                    new ShapeMarker(1984f, 2240f)
+                r.objectives.addAll(
+                new ItemObjective(Items.beryllium, 10).withMarkers(
+                    new ShapeTextMarker("Use the unit to mine [accent]resources[] from walls.", 1984f, 2240f)
+                ),
+                new ResearchObjective(Blocks.turbineCondenser),
+                new BuildCountObjective(Blocks.turbineCondenser, 1).withMarkers(
+                    new ShapeTextMarker("Place a [accent]turbine condenser[] on the vent.\nThis will generate [accent]power[].", 253f * 8f, 258f * 8f, 8f * 2.6f, 0f, 9f)
                 ));
             };
         }};

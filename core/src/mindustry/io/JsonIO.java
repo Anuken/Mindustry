@@ -248,6 +248,12 @@ public class JsonIO{
             var i = obj.get();
             json.addClassTag(Strings.camelize(i.getClass().getSimpleName().replace("Objective", "")), i.getClass());
         }
+
+        //use short names for all marker types
+        for(var obj : MapObjectives.allMarkerTypes){
+            var i = obj.get();
+            json.addClassTag(Strings.camelize(i.getClass().getSimpleName().replace("Marker", "")), i.getClass());
+        }
     }
 
     static class CustomJson extends Json{
