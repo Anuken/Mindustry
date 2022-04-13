@@ -83,8 +83,6 @@ public class MapObjectives{
         public CoreItemObjective(){
         }
 
-
-
         @Override
         public String text(){
             return Core.bundle.format("objective.coreitem", state.stats.coreItemCount.get(item), amount, item.emoji(), item.localizedName);

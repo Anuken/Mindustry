@@ -821,6 +821,16 @@ public class HudFragment{
 
         table.row();
 
+        table.clicked(() -> {
+            if(state.rules.objectives.size > 0){
+                var first = state.rules.objectives.first();
+                if(first.details() != null){
+                    //TODO this could be much better.
+                    ui.showInfo(first.details);
+                }
+            }
+        });
+
         return table;
     }
 
