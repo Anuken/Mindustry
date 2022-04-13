@@ -115,12 +115,10 @@ public class SectorPresets{
             difficulty = 1;
 
             rules = r -> {
-                r.objectives.addAll(new ItemObjective(Items.beryllium, 20){{
-                    markers = new ObjectiveMarker[]{
-                        new TextMarker("Units can mine [accent]resources[] from walls.", 1984f, 2240f + 16f),
-                        new ShapeMarker(1984f, 2240f),
-                    };
-                }});
+                r.objectives.addAll(new ItemObjective(Items.beryllium, 20).withMarkers(
+                    new TextMarker("Use the unit to mine [accent]resources[] from walls.", 1984f, 2240f + 16f),
+                    new ShapeMarker(1984f, 2240f)
+                ));
             };
         }};
 

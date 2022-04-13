@@ -73,6 +73,11 @@ public class MapObjectives{
     public static abstract class MapObjective{
         public ObjectiveMarker[] markers = {};
 
+        public MapObjective withMarkers(ObjectiveMarker... markers){
+            this.markers = markers;
+            return this;
+        }
+
         public boolean complete(){
             return false;
         }
