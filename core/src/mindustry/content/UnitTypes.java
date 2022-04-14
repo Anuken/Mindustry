@@ -3436,7 +3436,7 @@ public class UnitTypes{
             mineHardnessScaling = false;
             flying = true;
             mineSpeed = 4f;
-            mineTier = 4;
+            mineTier = 3;
             buildSpeed = 0.8f;
             drag = 0.08f;
             speed = 5.6f;
@@ -3497,7 +3497,7 @@ public class UnitTypes{
             mineHardnessScaling = false;
             flying = true;
             mineSpeed = 4.5f;
-            mineTier = 4;
+            mineTier = 3;
             buildSpeed = 1.1f;
             drag = 0.08f;
             speed = 7f;
@@ -3571,7 +3571,7 @@ public class UnitTypes{
             mineHardnessScaling = false;
             flying = true;
             mineSpeed = 5f;
-            mineTier = 4;
+            mineTier = 3;
             buildSpeed = 1.4f;
             drag = 0.08f;
             speed = 7.5f;
