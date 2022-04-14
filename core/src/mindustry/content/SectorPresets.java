@@ -160,6 +160,13 @@ public class SectorPresets{
                     ),
                     new CommandModeObjective().withMarkers(
                             new TextMarker("Hold [accent]shift[] to enter [accent]command mode[].\n[accent]Left-click and drag[] to select units.\n[accent]Right-click[] to order your selected units to move or attack.", 250f * 8f, 250f * 8f)
+                    ),
+                    new DestroyCoreObjective().withMarkers(
+                            new TextMarker("You are here for a reason.\n[accent]Find and destroy the enemy core[].", 250f * 8f, 250f * 8f),
+                            new TextMarker("Units will reveal more of the map as they explore undiscovered areas", 281f * 8f, 256f * 8f),
+                            new TextMarker("[accent]The enemy[] will defend itself.", 336f * 8f, 211f * 8f),
+                            new TextMarker("[accent]The enemy[] will defend itself.", 292f * 8f, 163f * 8f),
+                            new TextMarker("Once all enemy cores are destroyed, you will [accent]capture the sector[].", 324f * 8f, 154f * 8f)
                     )
                 );
             };
