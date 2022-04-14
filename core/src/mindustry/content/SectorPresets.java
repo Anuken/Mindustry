@@ -1,7 +1,9 @@
 package mindustry.content;
 
 import mindustry.game.MapObjectives.*;
+import mindustry.gen.Unit;
 import mindustry.type.*;
+import mindustry.world.Block;
 
 import static mindustry.content.Planets.*;
 
@@ -148,7 +150,16 @@ public class SectorPresets{
                     ),
                     new CoreItemObjective(Items.silicon, 50).withMarkers(
                             new TextMarker("The arc furnace needs both [accent]sand[] and [accent]graphite[] to create [accent]silicon[].\nIt takes [accent]power[], too.", 250f * 8f, 250f * 8f),
-                            new TextMarker("Use [accent]cliff crushers[] to mine sand.", 250f * 8f, 250f * 8f)
+                            new TextMarker("Use [accent]cliff crushers[] to mine sand.", 222f * 8f, 247f * 8f)
+                    ),
+                    new BuildCountObjective(Blocks.fabricator, 1).withMarkers(
+                            new TextMarker("Use [accent]units[] to explore the map, defend your buildings, and go on the offensive.\n Research and place the [accent]fabricator[]", 250f * 8f, 250f * 8f)
+                    ),
+                    new UnitCountObjective(UnitTypes.stell, 1).withMarkers(
+                            new TextMarker("Produce a unit.\nUse the \"?\" button to see selected factory requirements.", 250f * 8f, 250f * 8f)
+                    ),
+                    new CommandModeObjective().withMarkers(
+                            new TextMarker("Hold [accent]shift[] to enter [accent]command mode[].\n[accent]Left-click and drag[] to select units.\n[accent]Right-click[] to order your selected units to move or attack.", 250f * 8f, 250f * 8f)
                     )
                 );
             };
