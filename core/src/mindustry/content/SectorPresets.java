@@ -121,7 +121,7 @@ public class SectorPresets{
                             new ShapeTextMarker("Move your unit with WASD.", 235.5f * 8f, 272.5f * 8f, 6f, 0f, 40f)
                     ),
                     new ResearchObjective(Blocks.turbineCondenser).withMarkers(
-                            new ShapeTextMarker("Open the [accent]research tree[] and research the [accent]turbine condenser[].\nThis will allow you to build it.", 249 * 8f, 269f * 8f, 0f, 0f, 9f)
+                            new TextMarker("Open the [accent]research tree[] and research the [accent]turbine condenser[].\nThis will allow you to build it.", 249 * 8f, 269f * 8f)
                     ),
                     new BuildCountObjective(Blocks.turbineCondenser, 1).withMarkers(
                             new ShapeTextMarker("Place a [accent]turbine condenser[] on the vent.\nThis will generate [accent]power[].", 253f * 8f, 258f * 8f, 8f * 2.6f, 0f, 9f)
@@ -133,13 +133,23 @@ public class SectorPresets{
                             new ShapeTextMarker("To [accent]power[] the plasma bore, research and place a [accent]beam node[].\nConnect the turbine condenser to the plasma bore.", 254f * 8f, 267f * 8f)
                     ),
                     new CoreItemObjective(Items.beryllium, 5).withMarkers(
-                            new ShapeTextMarker("Once the plasma bore is powered, the next step is to route the resources to the core.\nUnlock and place [accent]ducts[] to move the mined resources to the core", 244f * 8f, 274f * 8f, 1f, 0f, 75f)
+                            new TextMarker("Once the plasma bore is powered, the next step is to route the resources to the core.\nUnlock and place [accent]ducts[] to move the mined resources to the core", 236f * 8f, 278f * 8f)
                     ),
                     new CoreItemObjective(Items.beryllium, 200).withMarkers(
-                            new ShapeTextMarker("Expand your mining operation!\nPlace more plasma bores and use beam nodes and ducts to support them.", 253f * 8f, 282f * 8f, 0f, 0f, 30f),
-                            new ShapeTextMarker("Try to collect 200 beryllium.", 236f * 8f, 276 * 8f, 0f, 0f, 9f)
+                            new TextMarker("Expand your mining operation!\nPlace more plasma bores and use beam nodes and ducts to support them.", 253f * 8f, 282f * 8f),
+                            new TextMarker("Try to collect 200 beryllium.", 236f * 8f, 276 * 8f)
                     ),
-                    new CoreItemObjective(Items.graphite, 100)
+                    new CoreItemObjective(Items.graphite, 100).withMarkers(
+                            new TextMarker("More complex blocks require [accent]graphite[].", 232f * 8f, 255f * 8f),
+                            new TextMarker("Try setting up mining for graphite.", 239f * 8f, 225f * 8f)
+                    ),
+                    new ResearchObjective(Blocks.siliconArcFurnace).withMarkers(
+                            new TextMarker("Time to expand into [accent]factories[]!\nResearch [accent]cliff crusher[] and [accent]silicon arc furnace[].", 250f * 8f, 250f * 8f)
+                    ),
+                    new CoreItemObjective(Items.silicon, 50).withMarkers(
+                            new TextMarker("The arc furnace needs both [accent]sand[] and [accent]graphite[] to create [accent]silicon[].\nIt takes [accent]power[], too.", 250f * 8f, 250f * 8f),
+                            new TextMarker("Use [accent]cliff crushers[] to mine sand.", 250f * 8f, 250f * 8f)
+                    )
                 );
             };
         }};
