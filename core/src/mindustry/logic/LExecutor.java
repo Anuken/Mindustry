@@ -1498,5 +1498,26 @@ public class LExecutor{
         }
     }
 
+    public static class GetFlagI implements LInstruction{
+        public int result, flag;
+
+        public GetFlagI(int result, int flag){
+            this.result = result;
+            this.flag = flag;
+        }
+
+        public GetFlagI(){
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            if(exec.obj(flag) instanceof String str){
+                exec.setbool(result, state.rules.objectiveFlags.contains(str));
+            }else{
+                exec.setobj(result, null);
+            }
+        }
+    }
+
     //endregion
 }

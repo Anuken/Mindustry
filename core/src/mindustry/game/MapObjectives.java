@@ -172,8 +172,20 @@ public class MapObjectives{
 
     /** Base abstract class for any in-map objective. */
     public static abstract class MapObjective{
+        public String[] flagsAdded = {};
+        public String[] flagsRemoved = {};
         public ObjectiveMarker[] markers = {};
         public @Nullable String details;
+
+        public MapObjective withFlags(String... flags){
+            this.flagsAdded = flags;
+            return this;
+        }
+
+        public MapObjective withFlagsRemoved(String... flags){
+            this.flagsRemoved = flags;
+            return this;
+        }
 
         public MapObjective withMarkers(ObjectiveMarker... markers){
             this.markers = markers;
