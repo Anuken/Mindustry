@@ -118,8 +118,7 @@ public class SectorPresets{
                 r.objectives.addAll(
                     new ItemObjective(Items.beryllium, 15).withMarkers(
                         new ShapeTextMarker("Click to mine [accent]resources[] from walls.", 1984f, 2240f),
-                        //TODO weird shape on unit?
-                        new ShapeTextMarker("Move your unit with WASD.", 235.5f * 8f, 272.5f * 8f, 6f, 0f, 40f)
+                        new TextMarker("Move your unit with WASD.", 235.5f * 8f, 272.5f * 8f + 40f)
                     ),
                     new ResearchObjective(Blocks.turbineCondenser).withMarkers(
                         new TextMarker("Open the [accent]research tree[] and research the [accent]turbine condenser[].\nThis will allow you to build it.", 249 * 8f, 269f * 8f)
