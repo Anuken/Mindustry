@@ -1514,4 +1514,33 @@ public class LStatements{
             return new FetchI(type, builder.var(result), builder.var(team), builder.var(index));
         }
     }
+
+    @RegisterStatement("getflag")
+    public static class GetFlagStatement extends LStatement{
+        public String result = "result", flag = "\"flag\"";
+
+        @Override
+        public void build(Table table){
+            fields(table, result, str -> result = str);
+
+            table.add(" = flag ");
+
+            fields(table, flag, str -> flag = str);
+        }
+
+        @Override
+        public boolean privileged(){
+            return true;
+        }
+
+        @Override
+        public Color color(){
+            return Pal.logicWorld;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new GetFlagI(builder.var(result), builder.var(flag));
+        }
+    }
 }
