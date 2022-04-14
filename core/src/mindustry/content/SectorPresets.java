@@ -1,9 +1,7 @@
 package mindustry.content;
 
 import mindustry.game.MapObjectives.*;
-import mindustry.gen.Unit;
 import mindustry.type.*;
-import mindustry.world.Block;
 
 import static mindustry.content.Planets.*;
 
@@ -119,54 +117,55 @@ public class SectorPresets{
             rules = r -> {
                 r.objectives.addAll(
                     new ItemObjective(Items.beryllium, 15).withMarkers(
-                            new ShapeTextMarker("Click to mine [accent]resources[] from walls.", 1984f, 2240f),
-                            new ShapeTextMarker("Move your unit with WASD.", 235.5f * 8f, 272.5f * 8f, 6f, 0f, 40f)
+                        new ShapeTextMarker("Click to mine [accent]resources[] from walls.", 1984f, 2240f),
+                        //TODO weird shape on unit?
+                        new ShapeTextMarker("Move your unit with WASD.", 235.5f * 8f, 272.5f * 8f, 6f, 0f, 40f)
                     ),
                     new ResearchObjective(Blocks.turbineCondenser).withMarkers(
-                            new TextMarker("Open the [accent]research tree[] and research the [accent]turbine condenser[].\nThis will allow you to build it.", 249 * 8f, 269f * 8f)
+                        new TextMarker("Open the [accent]research tree[] and research the [accent]turbine condenser[].\nThis will allow you to build it.", 249 * 8f, 269f * 8f)
                     ),
                     new BuildCountObjective(Blocks.turbineCondenser, 1).withMarkers(
-                            new ShapeTextMarker("Place a [accent]turbine condenser[] on the vent.\nThis will generate [accent]power[].", 253f * 8f, 258f * 8f, 8f * 2.6f, 0f, 9f)
+                        new ShapeTextMarker("Place a [accent]turbine condenser[] on the vent.\nThis will generate [accent]power[].", 253f * 8f, 258f * 8f, 8f * 2.6f, 0f, 9f)
                     ),
                     new BuildCountObjective(Blocks.plasmaBore, 1).withMarkers(
-                            new ShapeTextMarker("Research and place a [accent]plasma bore[]. \nIt automatically mines resources from walls.", 253.5f * 8f, 275.5f * 8f, 4f * 2.6f, 45f, 60f)
+                        new ShapeTextMarker("Research and place a [accent]plasma bore[]. \nIt automatically mines resources from walls.", 253.5f * 8f, 275.5f * 8f, 4f * 2.6f, 45f, 60f)
                     ),
                     new BuildCountObjective(Blocks.beamNode, 1).withMarkers(
-                            new ShapeTextMarker("To [accent]power[] the plasma bore, research and place a [accent]beam node[].\nConnect the turbine condenser to the plasma bore.", 254f * 8f, 267f * 8f)
+                        new ShapeTextMarker("To [accent]power[] the plasma bore, research and place a [accent]beam node[].\nConnect the turbine condenser to the plasma bore.", 254f * 8f, 267f * 8f)
                     ),
                     new CoreItemObjective(Items.beryllium, 5).withMarkers(
-                            new TextMarker("Once the plasma bore is powered, the next step is to route the resources to the core.\nUnlock and place [accent]ducts[] to move the mined resources to the core", 236f * 8f, 278f * 8f)
+                        new TextMarker("Once the plasma bore is powered, the next step is to route the resources to the core.\nUnlock and place [accent]ducts[] to move the mined resources to the core", 236f * 8f, 278f * 8f)
                     ),
                     new CoreItemObjective(Items.beryllium, 200).withMarkers(
-                            new TextMarker("Expand your mining operation!\nPlace more plasma bores and use beam nodes and ducts to support them.", 253f * 8f, 282f * 8f),
-                            new TextMarker("Try to collect 200 beryllium.", 236f * 8f, 276 * 8f)
+                        new TextMarker("Expand your mining operation!\nPlace more plasma bores and use beam nodes and ducts to support them.", 253f * 8f, 282f * 8f),
+                        new TextMarker("Try to collect 200 beryllium.", 236f * 8f, 276 * 8f)
                     ),
                     new CoreItemObjective(Items.graphite, 100).withMarkers(
-                            new TextMarker("More complex blocks require [accent]graphite[].", 232f * 8f, 255f * 8f),
-                            new TextMarker("Try setting up mining for graphite.", 239f * 8f, 225f * 8f)
+                        new TextMarker("More complex blocks require [accent]graphite[].", 232f * 8f, 255f * 8f),
+                        new TextMarker("Try setting up mining for graphite.", 239f * 8f, 225f * 8f)
                     ),
                     new ResearchObjective(Blocks.siliconArcFurnace).withMarkers(
-                            new TextMarker("Time to expand into [accent]factories[]!\nResearch [accent]cliff crusher[] and [accent]silicon arc furnace[].", 250f * 8f, 250f * 8f)
+                        new TextMarker("Time to expand into [accent]factories[]!\nResearch [accent]cliff crusher[] and [accent]silicon arc furnace[].", 250f * 8f, 250f * 8f)
                     ),
                     new CoreItemObjective(Items.silicon, 50).withMarkers(
-                            new TextMarker("The arc furnace needs both [accent]sand[] and [accent]graphite[] to create [accent]silicon[].\nIt takes [accent]power[], too.", 250f * 8f, 250f * 8f),
-                            new TextMarker("Use [accent]cliff crushers[] to mine sand.", 222f * 8f, 247f * 8f)
+                        new TextMarker("The arc furnace needs both [accent]sand[] and [accent]graphite[] to create [accent]silicon[].\nIt takes [accent]power[], too.", 250f * 8f, 250f * 8f),
+                        new TextMarker("Use [accent]cliff crushers[] to mine sand.", 222f * 8f, 247f * 8f)
                     ),
                     new BuildCountObjective(Blocks.fabricator, 1).withMarkers(
-                            new TextMarker("Use [accent]units[] to explore the map, defend your buildings, and go on the offensive.\n Research and place the [accent]fabricator[]", 250f * 8f, 250f * 8f)
+                        new TextMarker("Use [accent]units[] to explore the map, defend your buildings, and go on the offensive.\n Research and place the [accent]fabricator[]", 250f * 8f, 250f * 8f)
                     ),
                     new UnitCountObjective(UnitTypes.stell, 1).withMarkers(
-                            new TextMarker("Produce a unit.\nUse the \"?\" button to see selected factory requirements.", 250f * 8f, 250f * 8f)
+                        new TextMarker("Produce a unit.\nUse the \"?\" button to see selected factory requirements.", 250f * 8f, 250f * 8f)
                     ),
                     new CommandModeObjective().withMarkers(
-                            new TextMarker("Hold [accent]shift[] to enter [accent]command mode[].\n[accent]Left-click and drag[] to select units.\n[accent]Right-click[] to order your selected units to move or attack.", 250f * 8f, 250f * 8f)
+                        new TextMarker("Hold [accent]shift[] to enter [accent]command mode[].\n[accent]Left-click and drag[] to select units.\n[accent]Right-click[] to order your selected units to move or attack.", 250f * 8f, 250f * 8f)
                     ),
                     new DestroyCoreObjective().withMarkers(
-                            new TextMarker("You are here for a reason.\n[accent]Find and destroy the enemy core[].", 250f * 8f, 250f * 8f),
-                            new TextMarker("Units will reveal more of the map as they explore undiscovered areas", 281f * 8f, 256f * 8f),
-                            new TextMarker("[accent]The enemy[] will defend itself.", 336f * 8f, 211f * 8f),
-                            new TextMarker("[accent]The enemy[] will defend itself.", 292f * 8f, 163f * 8f),
-                            new TextMarker("Once all enemy cores are destroyed, you will [accent]capture the sector[].", 324f * 8f, 154f * 8f)
+                        new TextMarker("You are here for a reason.\n[accent]Find and destroy the enemy core[].", 250f * 8f, 250f * 8f),
+                        new TextMarker("Units will reveal more of the map as they explore undiscovered areas", 281f * 8f, 256f * 8f),
+                        new TextMarker("[accent]The enemy[] will defend itself.", 336f * 8f, 211f * 8f),
+                        new TextMarker("[accent]The enemy[] will defend itself.", 292f * 8f, 163f * 8f),
+                        new TextMarker("Once all enemy cores are destroyed, you will [accent]capture the sector[].", 324f * 8f, 154f * 8f)
                     )
                 );
             };
