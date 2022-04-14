@@ -236,6 +236,9 @@ public class MapObjectives{
         public int sides = 4;
         public Color color = Pal.accent;
 
+        //cached localized text
+        private transient String fetchedText;
+
         public ShapeTextMarker(String text, float x, float y){
             this.text = text;
             this.x = x;
@@ -278,6 +281,10 @@ public class MapObjectives{
             Lines.poly(x, y, sides, radius + 1f, rotation);
             Draw.reset();
 
+            if(fetchedText == null){
+                fetchedText = text.startsWith("@") ? Core.bundle.get(text.substring(1)) : text;
+            }
+
             WorldLabel.drawAt(text, x, y + radius + textHeight, Draw.z(), flags, fontSize);
         }
     }
@@ -318,6 +325,8 @@ public class MapObjectives{
         public String text = "uwu";
         public float x, y, fontSize = 1f;
         public byte flags = WorldLabel.flagBackground | WorldLabel.flagOutline;
+        //cached localized text
+        private transient String fetchedText;
 
         public TextMarker(String text, float x, float y, float fontSize, byte flags){
             this.text = text;
@@ -338,7 +347,11 @@ public class MapObjectives{
 
         @Override
         public void draw(){
-            WorldLabel.drawAt(text, x, y, Draw.z(), flags, fontSize);
+            if(fetchedText == null){
+                fetchedText = text.startsWith("@") ? Core.bundle.get(text.substring(1)) : text;
+            }
+
+            WorldLabel.drawAt(fetchedText, x, y, Draw.z(), flags, fontSize);
         }
     }
 
