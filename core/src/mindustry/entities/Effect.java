@@ -138,8 +138,12 @@ public class Effect{
         create(x, y, rotation, Color.white, data);
     }
 
-    protected void create(float x, float y, float rotation, Color color, Object data){
-        if(headless || this == Fx.none || !Vars.renderer.enableEffects) return;
+    public boolean shouldCreate(){
+        return !headless && this != Fx.none && Vars.renderer.enableEffects;
+    }
+
+    public void create(float x, float y, float rotation, Color color, Object data){
+        if(!shouldCreate()) return;
 
         if(Core.camera.bounds(Tmp.r1).overlaps(Tmp.r2.setCentered(x, y, clip))){
             if(!initialized){
@@ -150,7 +154,7 @@ public class Effect{
             if(startDelay <= 0f){
                 add(x, y, rotation, color, data);
             }else{
-                Time.runTask(startDelay, () -> add(x, y, rotation, color, data));
+                Time.run(startDelay, () -> add(x, y, rotation, color, data));
             }
         }
     }
