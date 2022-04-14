@@ -19,6 +19,7 @@ import mindustry.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.game.*;
+import mindustry.game.MapObjectives.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.io.*;
@@ -325,6 +326,8 @@ public class MapEditorDialog extends Dialog implements Disposable{
     public @Nullable Map save(){
         boolean isEditor = state.rules.editor;
         state.rules.editor = false;
+        state.rules.objectiveFlags.clear();
+        state.rules.objectives.each(MapObjective::reset);
         String name = editor.tags.get("name", "").trim();
         editor.tags.put("rules", JsonIO.write(state.rules));
         editor.tags.remove("width");

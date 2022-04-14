@@ -478,7 +478,9 @@ public class Logic implements ApplicationListener{
                 }
 
                 //TODO objectives clientside???
-                updateObjectives();
+                if(!state.isEditor()){
+                    updateObjectives();
+                }
 
                 if(state.rules.waves && state.rules.waveTimer && !state.gameOver){
                     if(!isWaitingWave()){

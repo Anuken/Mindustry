@@ -118,7 +118,7 @@ public class Rules{
     public ObjectSet<Item> hiddenBuildItems = Items.erekirOnlyItems.asSet();
     /** Campaign-only map objectives. */
     public Seq<MapObjective> objectives = new Seq<>();
-    /** Flags set by objectives. Used in world processors. */
+    /** Flags set by objectives. Used in world processors. n*/
     public ObjectSet<String> objectiveFlags = new ObjectSet<>();
     /** HIGHLY UNSTABLE/EXPERIMENTAL. DO NOT USE THIS. */
     public boolean fog = false;
