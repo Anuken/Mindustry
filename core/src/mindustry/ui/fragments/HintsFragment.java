@@ -38,7 +38,8 @@ public class HintsFragment{
     public void build(Group parent){
         group.setFillParent(true);
         group.touchable = Touchable.childrenOnly;
-        group.visibility = () -> Core.settings.getBool("hints", true) && ui.hudfrag.shown;
+        //TODO hints off for now.
+        group.visibility = () -> !state.isCampaign() && Core.settings.getBool("hints", true) && ui.hudfrag.shown;
         group.update(() -> {
             if(current != null){
                 //current got completed

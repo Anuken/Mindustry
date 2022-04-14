@@ -278,8 +278,8 @@ public class FloorRenderer{
     private void cacheChunk(int cx, int cy){
         used.clear();
 
-        for(int tilex = cx * chunksize; tilex < (cx + 1) * chunksize && tilex < world.width(); tilex++){
-            for(int tiley = cy * chunksize; tiley < (cy + 1) * chunksize && tiley < world.height(); tiley++){
+        for(int tilex = Math.max(cx * chunksize - 1, 0); tilex < (cx + 1) * chunksize + 1 && tilex < world.width(); tilex++){
+            for(int tiley = Math.max(cy * chunksize - 1, 0); tiley < (cy + 1) * chunksize + 1 && tiley < world.height(); tiley++){
                 Tile tile = world.rawTile(tilex, tiley);
                 boolean wall = tile.block().cacheLayer != CacheLayer.normal;
 
