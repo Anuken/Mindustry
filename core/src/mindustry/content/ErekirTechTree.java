@@ -227,39 +227,42 @@ public class ErekirTechTree{
                 });
             });
 
-            node(radar, Seq.with(new Research(beamNode), new Research(turbineCondenser), new Research(fabricator), new OnSector(SectorPresets.two)), () -> {
-                node(breach, Seq.with(new Research(siliconArcFurnace), new OnSector(two)), () -> {
-                    node(berylliumWall, () -> {
-                        node(berylliumWallLarge, () -> {
 
+            node(breach, Seq.with(new Research(siliconArcFurnace), new OnSector(two)), () -> {
+                node(berylliumWall, () -> {
+                    node(berylliumWallLarge, () -> {
+
+                    });
+
+                    node(tungstenWall, () -> {
+                        node(tungstenWallLarge, () -> {
+                            node(blastDoor, () -> {
+
+                            });
                         });
 
-                        node(tungstenWall, () -> {
-                            node(tungstenWallLarge, () -> {
-                                node(blastDoor, () -> {
+                        node(carbideWall, () -> {
+                            node(carbideWallLarge, () -> {
 
-                                });
-                            });
-
-                            node(carbideWall, () -> {
-                                node(carbideWallLarge, () -> {
-
-                                });
                             });
                         });
                     });
+                });
 
 
-                    node(sublimate, () -> {
-                        //TODO implement
-                        node(titan, Seq.with(new OnSector(five)), () -> {
+                node(sublimate, () -> {
+                    //TODO implement
+                    node(titan, Seq.with(new OnSector(five)), () -> {
 
-                        });
-
-                        node(disperse, Seq.with(new OnSector(five)), () -> {
-
-                        });
                     });
+
+                    node(disperse, Seq.with(new OnSector(five)), () -> {
+
+                    });
+                });
+
+                node(radar, Seq.with(new Research(beamNode), new Research(turbineCondenser), new Research(fabricator), new OnSector(SectorPresets.two)), () -> {
+
                 });
             });
 

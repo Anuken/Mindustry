@@ -133,7 +133,7 @@ public class MapObjectives{
 
         @Override
         public String text(){
-            return Core.bundle.format("objective.buildunit", unit, unit.emoji(), unit.localizedName);
+            return Core.bundle.format("objective.buildunit", count, unit.emoji(), unit.localizedName);
         }
 
         @Override
