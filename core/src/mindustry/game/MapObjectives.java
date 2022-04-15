@@ -156,6 +156,29 @@ public class MapObjectives{
         }
     }
 
+    /** Wait until a logic flag is set. */
+    public static class FlagObjective extends MapObjective{
+        public String flag = "flag", text = "Wait for flag";
+
+        public FlagObjective(String flag, String text){
+            this.flag = flag;
+            this.text = text;
+        }
+
+        public FlagObjective(){
+        }
+
+        @Override
+        public String text(){
+            return text;
+        }
+
+        @Override
+        public boolean complete(){
+            return state.rules.objectiveFlags.contains(flag);
+        }
+    }
+
     /** Destroy all enemy core(s). */
     public static class DestroyCoreObjective extends MapObjective{
 
