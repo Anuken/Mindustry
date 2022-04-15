@@ -39,7 +39,9 @@ public class MenuRenderer implements Disposable{
     }
 
     private void generate(){
-        world.beginMapLoad();
+        //suppress tile change events.
+        world.setGenerating(true);
+
         Tiles tiles = world.resize(width, height);
         //only uses base game ores now, mod ones usually contrast too much with the floor
         Seq<Block> ores = Seq.with(Blocks.oreCopper, Blocks.oreLead, Blocks.oreScrap, Blocks.oreCoal, Blocks.oreTitanium, Blocks.oreThorium);
@@ -160,7 +162,8 @@ public class MenuRenderer implements Disposable{
             }
         }
 
-        world.endMapLoad();
+        //don't fire a world load event, it just causes lag and confusion
+        world.setGenerating(false);
     }
 
     private void cache(){

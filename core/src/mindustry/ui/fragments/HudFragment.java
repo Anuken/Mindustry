@@ -104,8 +104,10 @@ public class HudFragment{
             t.add(new Minimap()).name("minimap");
             t.row();
             //position
+            // + (mobile ? "" : "\n[lightgray]" + World.toTile(Core.input.mouseWorldX()) + "," + World.toTile(Core.input.mouseWorldY()))
             t.label(() -> player.tileX() + "," + player.tileY())
             .visible(() -> Core.settings.getBool("position"))
+            //.right().labelAlign(Align.right)
             .touchable(Touchable.disabled)
             .name("position");
             t.top().right();
