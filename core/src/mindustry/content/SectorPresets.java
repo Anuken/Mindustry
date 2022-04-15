@@ -172,6 +172,21 @@ public class SectorPresets{
 
         two = new SectorPreset("two", erekir, 88){{
             difficulty = 3;
+
+            rules = r -> {
+                r.objectives.addAll(
+                        new UnitCountObjective(UnitTypes.stell, 2).withMarkers(
+                                new TextMarker("The enemy will attack soon.\n Build units to defend your core.", 276f * 8f, 133f * 8f)
+                        ),
+                        new BuildCountObjective(Blocks.breach, 1).withMarkers(
+                                new TextMarker("Units are effective, but [accent]turrets[] provide better defensive capabilities if used effectively.\n Place a [accent]Breach[] turret.\nTurrets require [accent]ammo[].", 276f * 8f, 133f * 8f)
+                        ).withFlags("defDone"),
+                        new BuildCountObjective(Blocks.coreBastion, 2).withMarkers(
+                                new TextMarker("You must expand.\nBuild more units and go on the offensive", 276f * 8f, 133f * 8f),
+                                new TextMarker("Cores can only be placed in special zone tiles.", 287 * 8f, 201 * 8f)
+                        ).withFlags("def2Done")
+                );
+            };
         }};
 
         three = new SectorPreset("three", erekir, 36){{
