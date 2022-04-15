@@ -1519,5 +1519,28 @@ public class LExecutor{
         }
     }
 
+    public static class SetFlagI implements LInstruction{
+        public int flag, value;
+
+        public SetFlagI(int flag, int value){
+            this.flag = flag;
+            this.value = value;
+        }
+
+        public SetFlagI(){
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            if(exec.obj(flag) instanceof String str){
+                if(exec.bool(value)){
+                    state.rules.objectiveFlags.remove(str);
+                }else{
+                    state.rules.objectiveFlags.add(str);
+                }
+            }
+        }
+    }
+
     //endregion
 }

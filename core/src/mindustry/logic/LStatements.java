@@ -1543,4 +1543,33 @@ public class LStatements{
             return new GetFlagI(builder.var(result), builder.var(flag));
         }
     }
+
+    @RegisterStatement("setflag")
+    public static class SetFlagStatement extends LStatement{
+        public String flag = "\"flag\"", value = "true";
+
+        @Override
+        public void build(Table table){
+            fields(table, flag, str -> flag = str);
+
+            table.add(" = ");
+
+            fields(table, value, str -> value = str);
+        }
+
+        @Override
+        public boolean privileged(){
+            return true;
+        }
+
+        @Override
+        public Color color(){
+            return Pal.logicWorld;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new SetFlagI(builder.var(flag), builder.var(value));
+        }
+    }
 }
