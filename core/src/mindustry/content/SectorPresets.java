@@ -181,7 +181,10 @@ public class SectorPresets{
                         new BuildCountObjective(Blocks.breach, 1).withMarkers(
                                 new TextMarker("Units are effective, but [accent]turrets[] provide better defensive capabilities if used effectively.\n Place a [accent]Breach[] turret.\nTurrets require [accent]ammo[].", 276f * 8f, 133f * 8f)
                         ).withFlags("defDone"),
-                        new BuildCountObjective(Blocks.coreBastion, 2).withMarkers(
+                        new BuildCountObjective(Blocks.berylliumWall, 6).withMarkers(
+                                new TextMarker("[accent]Walls[] can prevent oncoming damage from reaching your buildings\nPlace some [accent]beryllium walls[] around the turret.", 276f * 8f, 133f * 8f)
+                        ),
+                        new BuildCountObjective(Blocks.coreBastion, 1).withMarkers(
                                 new TextMarker("You must expand.\nBuild more units and go on the offensive", 276f * 8f, 133f * 8f),
                                 new TextMarker("Cores can only be placed in special zone tiles.", 287 * 8f, 201 * 8f)
                         ).withFlags("def2Done")
