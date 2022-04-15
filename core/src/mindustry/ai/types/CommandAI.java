@@ -18,6 +18,7 @@ public class CommandAI extends AIController{
     public @Nullable Vec2 targetPos;
     public @Nullable Teamc attackTarget;
 
+    private boolean stopAtTarget;
     private Vec2 lastTargetPos;
     private int pathId = -1;
     private Seq<Unit> local = new Seq<>(false);
@@ -84,6 +85,11 @@ public class CommandAI extends AIController{
                     0f, 100f, false, null);
 
                 //calculateFlock().limit(unit.speed() * flockMult)
+            }
+
+            //if stopAtTarget is set, stop trying to move to the target once it is reached - used for defending
+            if(attackTarget != null && stopAtTarget && unit.within(attackTarget, engageRange - 1f)){
+                attackTarget = null;
             }
 
             if(unit.isFlying()){
@@ -194,8 +200,12 @@ public class CommandAI extends AIController{
     }
 
     public void commandTarget(Teamc moveTo){
-        //TODO
+        commandTarget(moveTo, false);
+    }
+
+    public void commandTarget(Teamc moveTo, boolean stopAtTarget){
         attackTarget = moveTo;
+        this.stopAtTarget = stopAtTarget;
         pathId = Vars.controlPath.nextTargetId();
     }
 }

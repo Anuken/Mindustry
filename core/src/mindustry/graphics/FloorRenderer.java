@@ -19,7 +19,7 @@ import static mindustry.Vars.*;
  * general implementation:
  *
  * caching:
- * 1. create fixed-size float array fpr rendering into
+ * 1. create fixed-size float array for rendering into
  * 2. for each chunk, cache each layer into buffer; record layer boundary indices (alternatively, create mesh per layer for fast recache)
  * 3. create mesh for this chunk based on buffer size, copy buffer into mesh
  *
