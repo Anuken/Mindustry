@@ -20,6 +20,7 @@ public class Pump extends LiquidBlock{
         super(name);
         group = BlockGroup.liquids;
         floating = true;
+        envEnabled = Env.terrestrial;
     }
 
     @Override
@@ -61,7 +62,7 @@ public class Pump extends LiquidBlock{
     }
 
     @Override
-    public boolean canPlaceOn(Tile tile, Team team){
+    public boolean canPlaceOn(Tile tile, Team team, int rotation){
         if(isMultiblock()){
             Liquid last = null;
             for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
@@ -87,7 +88,12 @@ public class Pump extends LiquidBlock{
         public void draw(){
             Draw.rect(name, x, y);
 
-            Drawf.liquid(liquidRegion, x, y, liquids.total() / liquidCapacity, liquids.current().color);
+            Drawf.liquid(liquidRegion, x, y, liquids.currentAmount() / liquidCapacity, liquids.current().color);
+        }
+
+        @Override
+        public void pickedUp(){
+            amount = 0f;
         }
 
         @Override

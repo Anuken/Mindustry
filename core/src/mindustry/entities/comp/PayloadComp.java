@@ -13,7 +13,6 @@ import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.type.*;
-import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.payloads.*;
 
@@ -24,6 +23,38 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
     @Import UnitType type;
 
     Seq<Payload> payloads = new Seq<>();
+
+    //uncomment for insanity
+
+    /*
+
+    private transient @Nullable PowerGraph payloadPower;
+
+    @Override
+    public void update(){
+        if(payloadPower != null){
+            payloadPower.clear();
+        }
+
+        //update power graph first, resolve everything
+        for(Payload pay : payloads){
+            if(pay instanceof BuildPayload pb && pb.build.power != null){
+                if(payloadPower == null) payloadPower = new PowerGraph();
+
+                pb.build.power.graph = null;
+                payloadPower.add(pb.build);
+            }
+        }
+
+        if(payloadPower != null){
+            payloadPower.update();
+        }
+
+        for(Payload pay : payloads){
+            pay.set(x, y, rotation);
+            pay.update(true);
+        }
+    }*/
 
     float payloadUsed(){
         return payloads.sumf(p -> p.size() * p.size());
@@ -51,7 +82,7 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
 
     void pickup(Unit unit){
         unit.remove();
-        payloads.add(new UnitPayload(unit));
+        addPayload(new UnitPayload(unit));
         Fx.unitPickup.at(unit);
         if(Vars.net.client()){
             Vars.netClient.clearRemovedEntity(unit.id);
@@ -62,7 +93,8 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
     void pickup(Building tile){
         tile.pickedUp();
         tile.tile.remove();
-        payloads.add(new BuildPayload(tile));
+        tile.afterPickedUp();
+        addPayload(new BuildPayload(tile));
         Fx.unitPickup.at(tile);
         Events.fire(new PickupEvent(self(), tile));
     }
@@ -123,6 +155,8 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         //decrement count to prevent double increment
         if(!u.isAdded()) u.team.data().updateCount(u.type, -1);
         u.add();
+        u.unloaded();
+        Events.fire(new PayloadDropEvent(self(), u));
 
         return true;
     }
@@ -135,6 +169,7 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         if(on != null && Build.validPlace(tile.block, tile.team, tx, ty, tile.rotation, false)){
             int rot = (int)((rotation + 45f) / 90f) % 4;
             payload.place(on, rot);
+            Events.fire(new PayloadDropEvent(self(), tile));
 
             if(getControllerName() != null){
                 payload.build.lastAccessed = getControllerName();

@@ -36,11 +36,19 @@ public class Teams{
 
     @Nullable
     public CoreBuild closestEnemyCore(float x, float y, Team team){
+        CoreBuild closest = null;
+        float closestDst = Float.MAX_VALUE;
+        
         for(Team enemy : team.data().coreEnemies){
-            CoreBuild tile = Geometry.findClosest(x, y, enemy.cores());
-            if(tile != null) return tile;
+            for(CoreBuild core : enemy.cores()){
+                float dst = Mathf.dst2(x, y, core.getX(), core.getY());
+                if(closestDst > dst){
+                    closest = core;
+                    closestDst = dst;
+                }
+            }
         }
-        return null;
+        return closest;
     }
 
     @Nullable
@@ -48,11 +56,11 @@ public class Teams{
         return Geometry.findClosest(x, y, get(team).cores);
     }
 
-    public boolean eachEnemyCore(Team team, Boolf<CoreBuild> ret){
+    public boolean anyEnemyCoresWithin(Team team, float x, float y, float radius){
         for(TeamData data : active){
             if(team != data.team){
                 for(CoreBuild tile : data.cores){
-                    if(ret.get(tile)){
+                    if(tile.within(x, y, radius)){
                         return true;
                     }
                 }
@@ -234,8 +242,6 @@ public class Teams{
         public Queue<BlockPlan> blocks = new Queue<>();
         /** The current command for units to follow. */
         public UnitCommand command = UnitCommand.attack;
-        /** Target items to mine. */
-        public Seq<Item> mineItems = Seq.with(Items.copper, Items.lead, Items.titanium, Items.thorium);
 
         /** Quadtree for all buildings of this team. Null if not active. */
         @Nullable

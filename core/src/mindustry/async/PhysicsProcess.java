@@ -38,14 +38,14 @@ public class PhysicsProcess implements AsyncProcess{
 
         //find Unit without bodies and assign them
         for(Unit entity : group){
-            if(entity.type == null) continue;
+            if(entity == null || entity.type == null) continue;
 
             if(entity.physref == null){
                 PhysicsBody body = new PhysicsBody();
-                body.x = entity.x();
-                body.y = entity.y();
+                body.x = entity.x;
+                body.y = entity.y;
                 body.mass = entity.mass();
-                body.radius = entity.hitSize() / 2f;
+                body.radius = entity.hitSize / 2f;
 
                 PhysicRef ref = new PhysicRef(entity, body);
                 refs.add(ref);

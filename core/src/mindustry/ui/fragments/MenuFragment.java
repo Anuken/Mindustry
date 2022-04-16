@@ -120,7 +120,6 @@ public class MenuFragment extends Fragment{
                 table.add(tools);
 
                 table.add(mods);
-                //if(platform.canDonate()) table.add(donate);
                 if(!ios) table.add(exit);
             }).colspan(4);
         }else{
@@ -139,7 +138,6 @@ public class MenuFragment extends Fragment{
                 table.defaults().set(container.defaults());
 
                 table.add(mods);
-                //if(platform.canDonate()) table.add(donate);
                 if(!ios) table.add(exit);
             }).colspan(2);
         }
@@ -165,12 +163,14 @@ public class MenuFragment extends Fragment{
                     new Buttoni("@customgame", Icon.terrain, () -> checkPlay(ui.custom::show)),
                     new Buttoni("@loadgame", Icon.download, () -> checkPlay(ui.load::show))
                 ),
+                new Buttoni("@database.button", Icon.menu,
+                    new Buttoni("@schematics", Icon.paste, ui.schematics::show),
+                    new Buttoni("@database", Icon.book, ui.database::show),
+                    new Buttoni("@about.button", Icon.info, ui.about::show)
+                ),
                 new Buttoni("@editor", Icon.terrain, () -> checkPlay(ui.maps::show)), steam ? new Buttoni("@workshop", Icon.steam, platform::openWorkshop) : null,
                 new Buttoni("@mods", Icon.book, ui.mods::show),
-                //not enough space for this button
-                //new Buttoni("@schematics", Icon.paste, ui.schematics::show),
                 new Buttoni("@settings", Icon.settings, ui.settings::show),
-                new Buttoni("@about.button", Icon.info, ui.about::show),
                 new Buttoni("@quit", Icon.exit, Core.app::exit)
             );
 

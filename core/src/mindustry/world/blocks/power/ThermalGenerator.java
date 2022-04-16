@@ -12,6 +12,7 @@ import mindustry.world.meta.*;
 
 public class ThermalGenerator extends PowerGenerator{
     public Effect generateEffect = Fx.none;
+    public float effectChance = 0.05f;
     public Attribute attribute = Attribute.heat;
 
     public ThermalGenerator(String name){
@@ -29,7 +30,7 @@ public class ThermalGenerator extends PowerGenerator{
     public void setStats(){
         super.setStats();
 
-        stats.add(Stat.tiles, attribute, floating);
+        stats.add(Stat.tiles, attribute, floating, size * size, false);
     }
 
     @Override
@@ -40,7 +41,7 @@ public class ThermalGenerator extends PowerGenerator{
     }
 
     @Override
-    public boolean canPlaceOn(Tile tile, Team team){
+    public boolean canPlaceOn(Tile tile, Team team, int rotation){
         //make sure there's heat at this location
         return tile.getLinkedTilesAs(this, tempTiles).sumf(other -> other.floor().attributes.get(attribute)) > 0.01f;
     }
@@ -52,7 +53,7 @@ public class ThermalGenerator extends PowerGenerator{
         public void updateTile(){
             productionEfficiency = sum + attribute.env();
 
-            if(productionEfficiency > 0.1f && Mathf.chance(0.05 * delta())){
+            if(productionEfficiency > 0.1f && Mathf.chanceDelta(effectChance)){
                 generateEffect.at(x + Mathf.range(3f), y + Mathf.range(3f));
             }
         }

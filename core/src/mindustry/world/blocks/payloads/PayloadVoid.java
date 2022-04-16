@@ -49,7 +49,13 @@ public class PayloadVoid extends PayloadBlock{
         }
 
         @Override
+        public boolean acceptUnitPayload(Unit unit){
+            return true;
+        }
+
+        @Override
         public void updateTile(){
+            super.updateTile();
             if(moveInPayload(false) && cons.valid()){
                 payload = null;
                 incinerateEffect.at(this);

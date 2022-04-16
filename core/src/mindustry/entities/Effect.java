@@ -19,7 +19,8 @@ import static mindustry.Vars.*;
 public class Effect{
     private static final float shakeFalloff = 10000f;
     private static final EffectContainer container = new EffectContainer();
-    private static final Seq<Effect> all = new Seq<>();
+
+    public static final Seq<Effect> all = new Seq<>();
 
     private boolean initialized;
 
@@ -29,8 +30,14 @@ public class Effect{
     public float lifetime = 50f;
     /** Clip size. */
     public float clip;
+    /** Time delay before the effect starts */
+    public float startDelay;
+    /** Amount added to rotation */
+    public float baseRotation;
     /** If true, parent unit is data are followed. */
-    public boolean followParent;
+    public boolean followParent = true;
+    /** If this and followParent are true, the effect will offset and rotate with the parent's rotation. */
+    public boolean rotWithParent;
 
     public float layer = Layer.effect;
     public float layerDuration;
@@ -53,6 +60,11 @@ public class Effect{
         all.add(this);
     }
 
+    public Effect startDelay(float d){
+        startDelay = d;
+        return this;
+    }
+
     public void init(){}
 
     public Effect followParent(boolean follow){
@@ -60,8 +72,18 @@ public class Effect{
         return this;
     }
 
+    public Effect rotWithParent(boolean follow){
+        rotWithParent = follow;
+        return this;
+    }
+
     public Effect layer(float l){
         layer = l;
+        return this;
+    }
+
+    public Effect baseRotation(float d){
+        baseRotation = d;
         return this;
     }
 
@@ -73,6 +95,10 @@ public class Effect{
 
     public void at(Position pos){
         create(this, pos.getX(), pos.getY(), 0, Color.white, null);
+    }
+
+    public void at(Position pos, boolean parentize){
+        create(this, pos.getX(), pos.getY(), 0, Color.white, parentize ? pos : null);
     }
 
     public void at(Position pos, float rotation){
@@ -149,16 +175,27 @@ public class Effect{
                 effect.init();
             }
 
-            EffectState entity = EffectState.create();
-            entity.effect = effect;
-            entity.rotation = rotation;
-            entity.data = data;
-            entity.lifetime = effect.lifetime;
-            entity.set(x, y);
-            entity.color.set(color);
-            if(effect.followParent && data instanceof Posc p) entity.parent = p;
-            entity.add();
+            if(effect.startDelay <= 0f){
+                inst(effect, x, y, rotation, color, data);
+            }else{
+                Time.runTask(effect.startDelay, () -> inst(effect, x, y, rotation, color, data));
+            }
         }
+    }
+
+    private static void inst(Effect effect, float x, float y, float rotation, Color color, Object data){
+        EffectState entity = EffectState.create();
+        entity.effect = effect;
+        entity.rotation = effect.baseRotation + rotation;
+        entity.data = data;
+        entity.lifetime = effect.lifetime;
+        entity.set(x, y);
+        entity.color.set(color);
+        if(effect.followParent && data instanceof Posc p){
+            entity.parent = p;
+            entity.rotWithParent = effect.rotWithParent;
+        }
+        entity.add();
     }
 
     public static void decal(TextureRegion region, float x, float y, float rotation){

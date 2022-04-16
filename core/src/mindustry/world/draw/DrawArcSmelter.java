@@ -22,8 +22,6 @@ public class DrawArcSmelter extends DrawBlock{
         Draw.rect(bottom, build.x, build.y);
 
         if(build.warmup > 0f && flameColor.a > 0.001f){
-
-
             Lines.stroke(circleStroke * build.warmup);
 
             float si = Mathf.absin(flameRadiusScl, flameRadiusMag);

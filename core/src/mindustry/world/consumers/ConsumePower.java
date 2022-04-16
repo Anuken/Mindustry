@@ -8,11 +8,11 @@ import mindustry.world.meta.*;
 /** Consumer class for blocks which consume power while being connected to a power graph. */
 public class ConsumePower extends Consume{
     /** The maximum amount of power which can be processed per tick. This might influence efficiency or load a buffer. */
-    public final float usage;
+    public float usage;
     /** The maximum power capacity in power units. */
-    public final float capacity;
+    public float capacity;
     /** True if the module can store power. */
-    public final boolean buffered;
+    public boolean buffered;
 
     public ConsumePower(float usage, float capacity, boolean buffered){
         this.usage = usage;
@@ -68,7 +68,8 @@ public class ConsumePower extends Consume{
      * @return The amount of power which is requested per tick.
      */
     public float requestedPower(Building entity){
-        if(entity.tile().build == null) return 0f;
+        if(entity == null) return 0f;
+
         if(buffered){
             return (1f-entity.power.status)*capacity;
         }else{

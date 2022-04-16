@@ -22,7 +22,7 @@ import static mindustry.Vars.*;
 
 public class Conveyor extends Block implements Autotiler{
     private static final float itemSpace = 0.4f;
-    private static final int capacity = 4;
+    private static final int capacity = 3;
 
     final Vec2 tr1 = new Vec2();
     final Vec2 tr2 = new Vec2();
@@ -32,13 +32,15 @@ public class Conveyor extends Block implements Autotiler{
     public float speed = 0f;
     public float displayedSpeed = 0f;
 
+    public @Nullable Block junctionReplacement, bridgeReplacement;
+
     public Conveyor(String name){
         super(name);
         rotate = true;
         update = true;
         group = BlockGroup.transportation;
         hasItems = true;
-        itemCapacity = 4;
+        itemCapacity = capacity;
         conveyorPlacement = true;
 
         ambientSound = Sounds.conveyor;
@@ -53,6 +55,14 @@ public class Conveyor extends Block implements Autotiler{
         
         //have to add a custom calculated speed, since the actual movement speed is apparently not linear
         stats.add(Stat.itemsMoved, displayedSpeed, StatUnit.itemsSecond);
+    }
+
+    @Override
+    public void init(){
+        super.init();
+
+        if(junctionReplacement == null) junctionReplacement = Blocks.junction;
+        if(bridgeReplacement == null || !(bridgeReplacement instanceof ItemBridge)) bridgeReplacement = Blocks.itemBridge;
     }
 
     @Override
@@ -79,7 +89,9 @@ public class Conveyor extends Block implements Autotiler{
 
     @Override
     public void handlePlacementLine(Seq<BuildPlan> plans){
-        Placement.calculateBridges(plans, (ItemBridge)Blocks.itemBridge);
+        if(bridgeReplacement == null) return;
+
+        Placement.calculateBridges(plans, (ItemBridge)bridgeReplacement);
     }
 
     @Override
@@ -94,12 +106,14 @@ public class Conveyor extends Block implements Autotiler{
 
     @Override
     public Block getReplacement(BuildPlan req, Seq<BuildPlan> requests){
+        if(junctionReplacement == null) return this;
+
         Boolf<Point2> cont = p -> requests.contains(o -> o.x == req.x + p.x && o.y == req.y + p.y && (req.block instanceof Conveyor || req.block instanceof Junction));
         return cont.get(Geometry.d4(req.rotation)) &&
             cont.get(Geometry.d4(req.rotation - 2)) &&
             req.tile() != null &&
             req.tile().block() instanceof Conveyor &&
-            Mathf.mod(req.tile().build.rotation - req.rotation, 2) == 1 ? Blocks.junction : this;
+            Mathf.mod(req.tile().build.rotation - req.rotation, 2) == 1 ? junctionReplacement : this;
     }
 
     public class ConveyorBuild extends Building implements ChainedBuilding{
@@ -118,7 +132,7 @@ public class Conveyor extends Block implements Autotiler{
         public float minitem = 1;
 
         public int blendbits, blending;
-        public int blendsclx, blendscly;
+        public int blendsclx = 1, blendscly = 1;
 
         public float clogHeat = 0f;
 
@@ -149,10 +163,15 @@ public class Conveyor extends Block implements Autotiler{
                 tr2.trns(rotation * 90, -tilesize / 2f, xs[i] * tilesize / 2f);
 
                 Draw.rect(item.fullIcon,
-                    (tile.x * tilesize + tr1.x * ys[i] + tr2.x),
-                    (tile.y * tilesize + tr1.y * ys[i] + tr2.y),
+                    (x + tr1.x * ys[i] + tr2.x),
+                    (y + tr1.y * ys[i] + tr2.y),
                     itemSize, itemSize);
             }
+        }
+
+        @Override
+        public void payloadDraw(){
+            Draw.rect(block.fullIcon,x, y);
         }
 
         @Override
@@ -309,7 +328,7 @@ public class Conveyor extends Block implements Autotiler{
 
         @Override
         public void handleStack(Item item, int amount, Teamc source){
-            amount = Math.min(amount, itemCapacity - len);
+            amount = Math.min(amount, capacity - len);
 
             for(int i = amount - 1; i >= 0; i--){
                 add(0);

@@ -44,6 +44,12 @@ public class DuctBridge extends Block{
     }
 
     @Override
+    public void init(){
+        clipSize = Math.max(clipSize, (range + 0.5f) * 2 * tilesize);
+        super.init();
+    }
+
+    @Override
     public void drawRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
         Draw.rect(region, req.drawx(), req.drawy());
         Draw.rect(dirRegion, req.drawx(), req.drawy(), req.rotation * 90);
@@ -205,7 +211,7 @@ public class DuctBridge extends Block{
         public DuctBridgeBuild findLink(){
             for(int i = 1; i <= range; i++){
                 Tile other = tile.nearby(Geometry.d4x(rotation) * i, Geometry.d4y(rotation) * i);
-                if(other.build instanceof DuctBridgeBuild build && build.team == team){
+                if(other != null && other.build instanceof DuctBridgeBuild build && build.team == team){
                     return build;
                 }
             }

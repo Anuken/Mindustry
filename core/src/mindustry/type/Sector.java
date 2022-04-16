@@ -11,6 +11,7 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.game.Saves.*;
 import mindustry.game.*;
+import mindustry.gen.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
 import mindustry.ui.*;
 import mindustry.world.modules.*;
@@ -39,7 +40,12 @@ public class Sector{
         this.planet = planet;
         this.tile = tile;
         this.plane = new Plane();
-        this.rect = makeRect();
+        //empty sector tile needs a special rect
+        if(tile.corners.length == 0){
+            rect = new SectorRect(1f, Vec3.Zero.cpy(), Vec3.Y.cpy(), Vec3.X.cpy(), 0f);
+        }else{
+            this.rect = makeRect();
+        }
         this.id = tile.id;
     }
 
@@ -126,6 +132,13 @@ public class Sector{
         return info.contentIcon != null ? info.contentIcon.uiIcon : info.icon == null ? null : Fonts.getLargeIcon(info.icon);
     }
 
+    @Nullable
+    public String iconChar(){
+        if(info.contentIcon != null) return info.contentIcon.emoji();
+        if(info.icon != null) return (char)Iconc.codes.get(info.icon) + "";
+        return null;
+    }
+
     public boolean isCaptured(){
         return save != null && !info.waves;
     }
@@ -148,9 +161,7 @@ public class Sector{
 
     /** @return the sector size, in tiles */
     public int getSize(){
-        if(planet.generator == null) return 1;
-        int res = (int)(rect.radius * planet.generator.getSizeScl());
-        return res % 2 == 0 ? res : res + 1;
+        return planet.generator == null ? 1 : planet.generator.getSectorSize(this);
     }
 
     public void removeItems(ItemSeq items){

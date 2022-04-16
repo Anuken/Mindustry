@@ -17,7 +17,6 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.content.*;
 import mindustry.content.TechTree.*;
-import mindustry.core.GameState.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
@@ -32,7 +31,7 @@ import java.util.zip.*;
 import static arc.Core.*;
 import static mindustry.Vars.*;
 
-public class SettingsMenuDialog extends Dialog{
+public class SettingsMenuDialog extends BaseDialog{
     public SettingsTable graphics;
     public SettingsTable game;
     public SettingsTable sound;
@@ -48,38 +47,19 @@ public class SettingsMenuDialog extends Dialog{
         addCloseButton();
 
         cont.add(main = new SettingsTable());
-
-        hidden(() -> {
-            Sounds.back.play();
-            if(state.isGame()){
-                if(!wasPaused || net.active())
-                    state.set(State.playing);
-            }
-        });
+        shouldPause = true;
 
         shown(() -> {
             back();
-            if(state.isGame()){
-                wasPaused = state.is(State.paused);
-                state.set(State.paused);
-            }
-
             rebuildMenu();
         });
 
-        Events.on(ResizeEvent.class, event -> {
-            if(isShown() && Core.scene.getDialog() == this){
-                graphics.rebuild();
-                sound.rebuild();
-                game.rebuild();
-                updateScrollFocus();
-            }
+        onResize(() -> {
+            graphics.rebuild();
+            sound.rebuild();
+            game.rebuild();
+            updateScrollFocus();
         });
-
-        setFillParent(true);
-        title.setAlignment(Align.center);
-        titleTable.row();
-        titleTable.add(new Image()).growX().height(3f).pad(4f).get().setColor(Pal.accent);
 
         cont.clearChildren();
         cont.remove();
@@ -230,8 +210,12 @@ public class SettingsMenuDialog extends Dialog{
                         platform.shareFile(logs);
                     }else{
                         platform.showFileChooser(false, "txt", file -> {
-                            file.writeString(getLogs());
-                            app.post(() -> ui.showInfo("@crash.exported"));
+                            try{
+                                file.writeBytes(getLogs().getBytes(Strings.utf8));
+                                app.post(() -> ui.showInfo("@crash.exported"));
+                            }catch(Throwable e){
+                                ui.showException(e);
+                            }
                         });
                     }
                 }
@@ -292,13 +276,17 @@ public class SettingsMenuDialog extends Dialog{
 
         if(mobile){
             game.checkPref("autotarget", true);
-            game.checkPref("keyboard", false, val -> {
-                control.setInput(val ? new DesktopInput() : new MobileInput());
-                input.setUseKeyboard(val);
-            });
-            if(Core.settings.getBool("keyboard")){
-                control.setInput(new DesktopInput());
-                input.setUseKeyboard(true);
+            if(!ios){
+                game.checkPref("keyboard", false, val -> {
+                    control.setInput(val ? new DesktopInput() : new MobileInput());
+                    input.setUseKeyboard(val);
+                });
+                if(Core.settings.getBool("keyboard")){
+                    control.setInput(new DesktopInput());
+                    input.setUseKeyboard(true);
+                }
+            }else{
+                Core.settings.put("keyboard", false);
             }
         }
         //the issue with touchscreen support on desktop is that:
@@ -354,7 +342,7 @@ public class SettingsMenuDialog extends Dialog{
         });
 
         graphics.sliderPref("screenshake", 4, 0, 8, i -> (i / 4f) + "x");
-        graphics.sliderPref("fpscap", 240, 15, 245, 5, s -> (s > 240 ? Core.bundle.get("setting.fpscap.none") : Core.bundle.format("setting.fpscap.text", s)));
+        graphics.sliderPref("fpscap", 240, 10, 245, 5, s -> (s > 240 ? Core.bundle.get("setting.fpscap.none") : Core.bundle.format("setting.fpscap.text", s)));
         graphics.sliderPref("chatopacity", 100, 0, 100, 5, s -> s + "%");
         graphics.sliderPref("lasersopacity", 100, 0, 100, 5, s -> {
             if(ui.settings != null){
@@ -367,6 +355,12 @@ public class SettingsMenuDialog extends Dialog{
         if(!mobile){
             graphics.checkPref("vsync", true, b -> Core.graphics.setVSync(b));
             graphics.checkPref("fullscreen", false, b -> {
+                if(b && settings.getBool("borderlesswindow")){
+                    Core.graphics.setWindowedMode(Core.graphics.getWidth(), Core.graphics.getHeight());
+                    settings.put("borderlesswindow", false);
+                    graphics.rebuild();
+                }
+
                 if(b){
                     Core.graphics.setFullscreenMode(Core.graphics.getDisplayMode());
                 }else{
@@ -374,15 +368,23 @@ public class SettingsMenuDialog extends Dialog{
                 }
             });
 
-            graphics.checkPref("borderlesswindow", false, b -> Core.graphics.setUndecorated(b));
+            graphics.checkPref("borderlesswindow", false, b -> {
+                if(b && settings.getBool("fullscreen")){
+                    Core.graphics.setWindowedMode(Core.graphics.getWidth(), Core.graphics.getHeight());
+                    settings.put("fullscreen", false);
+                    graphics.rebuild();
+                }
+                Core.graphics.setBorderless(b);
+            });
 
             Core.graphics.setVSync(Core.settings.getBool("vsync"));
+
             if(Core.settings.getBool("fullscreen")){
                 Core.app.post(() -> Core.graphics.setFullscreenMode(Core.graphics.getDisplayMode()));
             }
 
             if(Core.settings.getBool("borderlesswindow")){
-                Core.app.post(() -> Core.graphics.setUndecorated(true));
+                Core.app.post(() -> Core.graphics.setBorderless(true));
             }
         }else if(!ios){
             graphics.checkPref("landscape", false, b -> {
@@ -446,11 +448,11 @@ public class SettingsMenuDialog extends Dialog{
             }
         }
 
+        graphics.checkPref("skipcoreanimation", false);
+
         if(!mobile){
             Core.settings.put("swapdiagonal", false);
         }
-
-        graphics.checkPref("flow", true);
     }
 
     public void exportData(Fi file) throws IOException{
@@ -587,7 +589,31 @@ public class SettingsMenuDialog extends Dialog{
             rebuild();
         }
 
-        void rebuild(){
+        public void textPref(String name, String def){
+            list.add(new TextSetting(name, def, null));
+            settings.defaults(name, def);
+            rebuild();
+        }
+
+        public void textPref(String name, String def, Cons<String> changed){
+            list.add(new TextSetting(name, def, changed));
+            settings.defaults(name, def);
+            rebuild();
+        }
+
+        public void areaTextPref(String name, String def){
+            list.add(new AreaTextSetting(name, def, null));
+            settings.defaults(name, def);
+            rebuild();
+        }
+
+        public void areaTextPref(String name, String def, Cons<String> changed){
+            list.add(new AreaTextSetting(name, def, changed));
+            settings.defaults(name, def);
+            rebuild();
+        }
+
+        public void rebuild(){
             clearChildren();
 
             for(Setting setting : list){
@@ -608,9 +634,10 @@ public class SettingsMenuDialog extends Dialog{
             public String title;
             public @Nullable String description;
 
-            Setting(String name){
+            public Setting(String name){
                 this.name = name;
-                title = bundle.get("setting." + name + ".name");
+                String winkey = "setting." + name + ".name.windows";
+                title = OS.isWindows && bundle.has(winkey) ? bundle.get(winkey) : bundle.get("setting." + name + ".name");
                 description = bundle.getOrNull("setting." + name + ".description");
             }
 
@@ -639,7 +666,7 @@ public class SettingsMenuDialog extends Dialog{
             boolean def;
             Boolc changed;
 
-            CheckSetting(String name, boolean def, Boolc changed){
+            public CheckSetting(String name, boolean def, Boolc changed){
                 super(name);
                 this.def = def;
                 this.changed = changed;
@@ -668,7 +695,7 @@ public class SettingsMenuDialog extends Dialog{
             int def, min, max, step;
             StringProcessor sp;
 
-            SliderSetting(String name, int def, int min, int max, int step, StringProcessor s){
+            public SliderSetting(String name, int def, int min, int max, int step, StringProcessor s){
                 super(name);
                 this.def = def;
                 this.min = min;
@@ -701,6 +728,64 @@ public class SettingsMenuDialog extends Dialog{
                 table.row();
             }
         }
+        
+        public static class TextSetting extends Setting{
+            String def;
+            Cons<String> changed;
 
+            public TextSetting(String name, String def, Cons<String> changed){
+                super(name);
+                this.def = def;
+                this.changed = changed;
+            }
+
+            @Override
+            public void add(SettingsTable table){
+                TextField field = new TextField();
+
+                field.update(() -> field.setText(settings.getString(name)));
+
+                field.changed(() -> {
+                    settings.put(name, field.getText());
+                    if(changed != null){
+                        changed.get(field.getText());
+                    }
+                });
+
+                Table prefTable = table.table().left().padTop(3f).get();
+                prefTable.add(field);
+                prefTable.label(() -> title);
+                addDesc(prefTable);
+                table.row();
+            }
+        }
+
+        public static class AreaTextSetting extends TextSetting{
+            public AreaTextSetting(String name, String def, Cons<String> changed){
+                super(name, def, changed);
+            }
+
+            @Override
+            public void add(SettingsTable table){
+                TextArea area = new TextArea("");
+                area.setPrefRows(5);
+
+                area.update(() -> {
+                    area.setText(settings.getString(name));
+                    area.setWidth(table.getWidth());
+                });
+
+                area.changed(() -> {
+                    settings.put(name, area.getText());
+                    if(changed != null){
+                        changed.get(area.getText());
+                    }
+                });
+
+                addDesc(table.label(() -> title).left().padTop(3f).get());
+                table.row().add(area).left();
+                table.row();
+            }
+        }
     }
 }

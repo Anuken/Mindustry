@@ -42,7 +42,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
     private BaseDialog menu;
     private Table blockSelection;
     private Rules lastSavedRules;
-    private boolean saved = false;
+    private boolean saved = false; //currently never read
     private boolean shownWithMap = false;
     private Seq<Block> blocksOut = new Seq<>();
 
@@ -560,10 +560,12 @@ public class MapEditorDialog extends Dialog implements Disposable{
                         }
                     }
 
-                    t.top();
-                    t.add("@editor.brush");
+                    var label = new Label("@editor.brush");
+                    label.setAlignment(Align.center);
+                    label.touchable = Touchable.disabled;
+
+                    t.top().stack(slider, label).width(size * 3f - 20).padTop(4f);
                     t.row();
-                    t.add(slider).width(size * 3f - 20).padTop(4f);
                 }).padTop(5).growX().top();
 
                 mid.row();
@@ -574,13 +576,11 @@ public class MapEditorDialog extends Dialog implements Disposable{
                     }).growX().top();
                 }
 
-                if(experimental){
-                    mid.row();
+                mid.row();
 
-                    mid.table(t -> {
-                        t.button("Cliffs", Icon.terrain, Styles.cleart, editor::addCliffs).growX().margin(9f);
-                    }).growX().top();
-                }
+                mid.table(t -> {
+                    t.button("@editor.cliffs", Icon.terrain, Styles.cleart, editor::addCliffs).growX().margin(9f);
+                }).growX().top();
             }).margin(0).left().growY();
 
 

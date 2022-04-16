@@ -1,17 +1,25 @@
 [
   {
-    "name": "RCM",
-    "address": ["185.104.248.61", "easyplay.su"]
-  },
-  {
-    "name": "SMokeOfAnarchy.duckdns.org",
-    "address": ["smokeofanarchy.duckdns.org:6853"]
+    "name": "Sectorized",
+    "address": ["sectorized.ddns.net"]
   },
   {
     "name": "{AA}",
-    "address": ["aamindustry.play.ai", "aamindustry.play.ai:6571", "aamindustry.play.ai:6572", "aamindustry.play.ai:6573", "aamindustry.play.ai:6574"]
+    "address": ["recessive.net"]
   },
-   {
+  {
+    "name": "Yeet Hosting",
+    "address": ["omegam.mindustry.me:5004", "omegav.mindustry.me:25575", "omegav.mindustry.me:25588"]
+  },
+  {
+    "name": "RCM",
+    "address": ["185.104.248.61", "easyplay.su"]
+  },
+    {
+    "name": "Tendhost",
+    "address": ["tendhost.ddns.net"]
+  },
+  {
     "name": "Atanner",
     "address": ["atannergaming.com:13000"]
   },
@@ -25,27 +33,27 @@
   },
   {
     "name": "Chaotic Neutral",
-    "address": ["Chaotic-Neutral.ddns.net:1111", "Chaotic-Neutral.ddns.net:2222", "Chaotic-Neutral.ddns.net:7777"]
+    "address": ["c-n.ddns.net:1111", "c-n.ddns.net:2222", "c-n.ddns.net:3333", "c-n.ddns.net:4444"]
   },
   {
     "name": "Ranked",
-    "address": ["mindustryranked.ddns.net:16567"]
+    "address": ["mindustryranked.ddns.net:16567", "mindustryranked.ddns.net:16568", "mindustryranked.ddns.net:16569"]
   },
   {
     "name": "TWS",
-    "address": ["twsmindustry.24x7.hk:6701", "twsmindustry.24x7.hk:6702"]
+    "address": ["twsmindustry.24x7.hk:6701", "twsmindustry.24x7.hk:6702", "twsmindustry.24x7.hk:6969"]
   },
   {
     "name": "mindustry.ddns.net",
-    "address": ["mindustry.ddns.net:1000", "mindustry.ddns.net:2000", "mindustry.ddns.net:3000", "mindustry.ddns.net:4000"]
+    "address": ["mindustry.ddns.net", "mindustry.ddns.net:1000", "mindustry.ddns.net:2000", "mindustry.ddns.net:3000", "mindustry.ddns.net:4000"]
   },
   {
-    "name": "Surrealment",
-    "address": ["md.surrealment.com"]
+    "name": "Surrealment v6",
+    "address": ["md.surrealment.com:6566"]
   },
   {
     "name": "ALEX",
-    "address": ["alexmindustryhub.ddns.net:6568", "alexmindustry.ddns.net:25586", "alexmindustry.ddns.net:25587", "alexmindustryattac.ddns.net:25800","alexmindustryturbo.ddns.net:25581","alexmindustryhex.ddns.net:25583"]
+    "address": ["alexmindustryhub.ddns.net:6568", "dogemindustry.ddns.net:25586", "alexmindustry.ddns.net:25587", "alexmindustryattac.ddns.net:25800","alexmindustryturbo.ddns.net:25581","alexmindustryhex.ddns.net:25583"]
   },
   {
     "name": "Minty [subzero]",
@@ -57,15 +65,11 @@
   },
   {
     "name": "Omega",
-    "address": ["178.170.47.34:20204", "157.90.213.2:30308", "157.90.180.53:25738", "185.86.230.61:25578"] 
+    "address": ["omegav.mindustry.me:6572"] 
   },
   {
-    "name": "md.obvilionnetwork.ru",
-    "address": ["obvilionnetwork.ru", "obvilionnetwork.ru:7001", "obvilionnetwork.ru:7002"]
-  },
-  {
-    "name": "Mindustry PLAY",
-    "address": ["92.63.100.160"]
+    "name": "Obvilion Network",
+    "address": ["obvilion.ru", "obvilion.ru:7001", "obvilion.ru:7002", "obvilion.ru:7003"]
   },
   {
     "name": "Nydus",
@@ -77,7 +81,7 @@
   },
   {
     "name": "TSR", 
-    "address": ["de15-3.falix.gg:27422"]
+    "address": ["us01.optik.host:26194", "uk01.optik.host:26164"]
   },
   {
     "name": "Sakura", 
@@ -93,6 +97,46 @@
   },
   {
     "name": "Hungarian",
-    "address": ["magyarmindustry.tk"]
+    "address": ["play.hudustry.tk"]
+  },
+  {
+    "name": "Xpdustry",
+    "address": ["xpdustry.fr"]
+  },
+  {
+    "name": "CxZx",
+    "address": ["usfr2.forcehost.net:25578"]
+  },
+  {
+    "name": "Mindustry Español",
+    "address": ["xpdustry.fr:9000"]
+  },
+  {
+    "name": "CreateDustry",
+    "address": ["129.151.66.139:26032"]
+  },
+  {
+    "name": "NukeDustry",
+    "address": ["nukedustry.tk:7777", "nukedustry.tk:8888"]
+  },
+  {
+    "name": "MindustryBR",
+    "address": ["mindustryptbr.ddns.net:25579"]
+  },
+  {
+    "name": "Conservatory",
+    "address": ["143.198.71.232"]
+  },
+  {
+    "name": "Shard",
+    "address": ["59.12.120.171"]
+  },
+  {
+    "name": "OMNIDUSTRY",
+    "address": ["109.94.209.233"]
+  },
+  {
+    "name": "Fish",
+    "address": ["170.187.144.235"]
   }
 ]

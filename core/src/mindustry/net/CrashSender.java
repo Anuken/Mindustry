@@ -6,19 +6,15 @@ import arc.func.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
-import arc.util.serialization.*;
-import arc.util.serialization.JsonValue.*;
-import arc.util.serialization.JsonWriter.*;
 import mindustry.*;
 import mindustry.core.*;
-import mindustry.gen.*;
+import mindustry.mod.Mods.*;
 
 import java.io.*;
 import java.text.*;
 import java.util.*;
 
 import static arc.Core.*;
-import static mindustry.Vars.net;
 import static mindustry.Vars.*;
 
 public class CrashSender{
@@ -32,7 +28,7 @@ public class CrashSender{
         + "Version: " + Version.combined() + (Vars.headless ? " (Server)" : "") + "\n"
         + "OS: " + OS.osName + " x" + (OS.osArchBits) + " (" + OS.osArch + ")\n"
         + "Java Version: " + OS.javaVersion + "\n"
-        + (mods == null ? "<no mod init>" : mods.list().size + " Mods" + (mods.list().isEmpty() ? "" : ": " + mods.list().toString(", ", mod -> mod.name + ":" + mod.meta.version)))
+        + (mods == null ? "<no mod init>" : "Mods: " + (!mods.list().contains(LoadedMod::shouldBeEnabled) ? "none (vanilla)" : mods.list().select(LoadedMod::shouldBeEnabled).toString(", ", mod -> mod.name + ":" + mod.meta.version)))
         + "\n\n" + error;
     }
 
@@ -126,6 +122,9 @@ public class CrashSender{
             }catch(Throwable ignored){
             }
 
+            //disabled until further notice.
+            /*
+
             JsonValue value = new JsonValue(ValueType.object);
 
             boolean fn = netActive, fs = netServer;
@@ -144,7 +143,7 @@ public class CrashSender{
             ex(() -> value.addChild("trace", new JsonValue(parseException(exception))));
             ex(() -> value.addChild("javaVersion", new JsonValue(OS.javaVersion)));
             ex(() -> value.addChild("javaArch", new JsonValue(OS.osArchBits)));
-
+            
             Log.info("Sending crash report.");
 
             //post to crash report URL, exit code indicates send success
@@ -154,7 +153,7 @@ public class CrashSender{
             }).block(r -> {
                 Log.info("Crash sent successfully.");
                 System.exit(1);
-            });
+            });*/
 
             ret();
         }catch(Throwable death){

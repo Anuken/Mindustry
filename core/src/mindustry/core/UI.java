@@ -130,7 +130,7 @@ public class UI implements ApplicationListener, Loadable{
 
     @Override
     public Seq<AssetDescriptor> getDependencies(){
-        return Seq.with(new AssetDescriptor<>(Control.class), new AssetDescriptor<>("outline", Font.class), new AssetDescriptor<>("default", Font.class), new AssetDescriptor<>("chat", Font.class));
+        return Seq.with(new AssetDescriptor<>(Control.class), new AssetDescriptor<>("outline", Font.class), new AssetDescriptor<>("default", Font.class));
     }
 
     @Override
@@ -261,6 +261,7 @@ public class UI implements ApplicationListener, Loadable{
                 this.numeric = inumeric;
                 this.maxLength = textLength;
                 this.accepted = confirmed;
+                this.allowEmpty = false;
             }});
         }else{
             new Dialog(titleText){{
@@ -302,6 +303,7 @@ public class UI implements ApplicationListener, Loadable{
         Table table = new Table();
         table.touchable = Touchable.disabled;
         table.setFillParent(true);
+        table.marginTop(Core.scene.find("coreinfo").getPrefHeight() / Scl.scl() / 2);
         table.actions(Actions.fadeOut(7f, Interp.fade), Actions.remove());
         table.top().add(info).style(Styles.outlineLabel).padTop(10);
         Core.scene.add(table);
@@ -310,8 +312,9 @@ public class UI implements ApplicationListener, Loadable{
     /** Shows a fading label at the top of the screen. */
     public void showInfoToast(String info, float duration){
         Table table = new Table();
-        table.setFillParent(true);
         table.touchable = Touchable.disabled;
+        table.setFillParent(true);
+        table.marginTop(Core.scene.find("coreinfo").getPrefHeight() / Scl.scl() / 2);
         table.update(() -> {
             if(state.isMenu()) table.remove();
         });
@@ -587,7 +590,7 @@ public class UI implements ApplicationListener, Loadable{
         if(mag >= 1_000_000_000){
             return sign + Strings.fixed(mag / 1_000_000_000f, 1) + "[gray]" + billions+ "[]";
         }else if(mag >= 1_000_000){
-            return sign + Strings.fixed(mag / 1_000_000f, 1) + "[gray]" +millions + "[]";
+            return sign + Strings.fixed(mag / 1_000_000f, 1) + "[gray]" + millions + "[]";
         }else if(mag >= 10_000){
             return number / 1000 + "[gray]" + thousands + "[]";
         }else if(mag >= 1000){

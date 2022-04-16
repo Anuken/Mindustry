@@ -1,5 +1,6 @@
 package mindustry.game;
 
+import arc.struct.*;
 import arc.util.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
@@ -18,7 +19,7 @@ import static mindustry.Vars.*;
  * weapon equipped, ammo used, and status effects.
  * Each spawn group can have multiple sub-groups spawned in different areas of the map.
  */
-public class SpawnGroup implements JsonSerializable{
+public class SpawnGroup implements JsonSerializable, Cloneable{
     public static final int never = Integer.MAX_VALUE;
 
     /** The unit type spawned */
@@ -35,16 +36,18 @@ public class SpawnGroup implements JsonSerializable{
     public float unitScaling = never;
     /** Shield points that this unit has. */
     public float shields = 0f;
-    /** How much shields get increased per wave. */
+    /** How much shields get increased by per wave. */
     public float shieldScaling = 0f;
     /** Amount of enemies spawned initially, with no scaling */
     public int unitAmount = 1;
+    /** If not -1, the unit will only spawn in spawnpoints with these packed coordinates. */
+    public int spawn = -1;
+    /** Seq of payloads that this unit will spawn with. */
+    public @Nullable Seq<UnitType> payloads;
     /** Status effect applied to the spawned unit. Null to disable. */
-    @Nullable
-    public StatusEffect effect;
+    public @Nullable StatusEffect effect;
     /** Items this unit spawns with. Null to disable. */
-    @Nullable
-    public ItemStack items;
+    public @Nullable ItemStack items;
 
     public SpawnGroup(UnitType type){
         this.type = type;
@@ -52,6 +55,10 @@ public class SpawnGroup implements JsonSerializable{
 
     public SpawnGroup(){
         //serialization use only
+    }
+
+    public boolean canSpawn(int position){
+        return spawn == -1 || spawn == position;
     }
 
     /** @return amount of units spawned on a specific wave. */
@@ -85,6 +92,15 @@ public class SpawnGroup implements JsonSerializable{
 
         unit.shield = getShield(wave);
 
+        //load up spawn payloads
+        if(payloads != null && unit instanceof Payloadc pay){
+            for(var type : payloads){
+                if(type == null) continue;
+                Unit payload = type.create(unit.team);
+                pay.pickup(payload);
+            }
+        }
+
         return unit;
     }
 
@@ -101,6 +117,10 @@ public class SpawnGroup implements JsonSerializable{
         if(shieldScaling != 0) json.writeValue("shieldScaling", shieldScaling);
         if(unitAmount != 1) json.writeValue("amount", unitAmount);
         if(effect != null) json.writeValue("effect", effect.name);
+        if(spawn != -1) json.writeValue("spawn", spawn);
+        if(payloads != null && payloads.size > 0){
+            json.writeValue("payloads", payloads.map(u -> u.name).toArray(String.class));
+        }
     }
 
     @Override
@@ -117,6 +137,10 @@ public class SpawnGroup implements JsonSerializable{
         shields = data.getFloat("shields", 0);
         shieldScaling = data.getFloat("shieldScaling", 0);
         unitAmount = data.getInt("amount", 1);
+        spawn = data.getInt("spawn", -1);
+        if(data.has("payloads")){
+            payloads = Seq.with(json.readValue(String[].class, data.get("payloads"))).map(s -> content.getByName(ContentType.unit, s));
+        }
 
         //old boss effect ID
         if(data.has("effect") && data.get("effect").isNumber() && data.getInt("effect", -1) == 8){
@@ -139,6 +163,14 @@ public class SpawnGroup implements JsonSerializable{
         ", effect=" + effect +
         ", items=" + items +
         '}';
+    }
+
+    public SpawnGroup copy(){
+        try{
+            return (SpawnGroup)clone();
+        }catch(CloneNotSupportedException how){
+            throw new RuntimeException("If you see this, what did you even do?", how);
+        }
     }
 
     @Override

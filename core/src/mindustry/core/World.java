@@ -8,6 +8,7 @@ import arc.math.geom.Geometry.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.noise.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.ctype.*;
@@ -246,15 +247,17 @@ public class World{
             if(sector.preset != null){
                 sector.preset.generator.generate(tiles);
                 sector.preset.rules.get(state.rules); //apply extra rules
-            }else{
+            }else if(sector.planet.generator != null){
                 sector.planet.generator.generate(tiles, sector);
+            }else{
+                throw new RuntimeException("Sector " + sector.id + " on planet " + sector.planet.name + " has no generator or preset defined. Provide a planet generator or preset map.");
             }
             //just in case
             state.rules.sector = sector;
         });
 
         //postgenerate for bases
-        if(sector.preset == null){
+        if(sector.preset == null && sector.planet.generator != null){
             sector.planet.generator.postGenerate(tiles);
         }
 
@@ -287,6 +290,7 @@ public class World{
             if(liquid != null) content.add(liquid);
         }
 
+        state.rules.cloudColor = sector.planet.landCloudColor;
         sector.info.resources = content.asArray();
         sector.info.resources.sort(Structs.comps(Structs.comparing(Content::getContentType), Structs.comparingInt(c -> c.id)));
         sector.saveInfo();
@@ -325,8 +329,8 @@ public class World{
         invalidMap = false;
 
         if(!headless){
-            if(state.teams.playerCores().size == 0 && !checkRules.pvp){
-                ui.showErrorMessage("@map.nospawn");
+            if(state.teams.cores(checkRules.defaultTeam).size == 0 && !checkRules.pvp){
+                ui.showErrorMessage(Core.bundle.format("map.nospawn", checkRules.defaultTeam.color, checkRules.defaultTeam.localized()));
                 invalidMap = true;
             }else if(checkRules.pvp){ //pvp maps need two cores to be valid
                 if(state.teams.getActive().count(TeamData::hasCore) < 2){
@@ -336,7 +340,7 @@ public class World{
             }else if(checkRules.attackMode){ //attack maps need two cores to be valid
                 invalidMap = state.rules.waveTeam.data().noCores();
                 if(invalidMap){
-                    ui.showErrorMessage("@map.nospawn.attack");
+                    ui.showErrorMessage(Core.bundle.format("map.nospawn.attack", checkRules.waveTeam.color, checkRules.waveTeam.localized()));
                 }
             }
         }else{
@@ -355,30 +359,23 @@ public class World{
     }
 
     public void raycastEach(int x0f, int y0f, int x1, int y1, Raycaster cons){
-        int x0 = x0f;
-        int y0 = y0f;
-        int dx = Math.abs(x1 - x0);
-        int dy = Math.abs(y1 - y0);
+        int x0 = x0f, dx = Math.abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
+        int y0 = y0f, dy = Math.abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
+        int e2, err = dx - dy;
 
-        int sx = x0 < x1 ? 1 : -1;
-        int sy = y0 < y1 ? 1 : -1;
-
-        int err = dx - dy;
-        int e2;
         while(true){
-
             if(cons.accept(x0, y0)) break;
             if(x0 == x1 && y0 == y1) break;
 
             e2 = 2 * err;
             if(e2 > -dy){
-                err = err - dy;
-                x0 = x0 + sx;
+                err -= dy;
+                x0 += sx;
             }
 
             if(e2 < dx){
-                err = err + dx;
-                y0 = y0 + sy;
+                err += dx;
+                y0 += sy;
             }
         }
     }
@@ -483,12 +480,14 @@ public class World{
 
     //TODO optimize; this is very slow and called too often!
     public float getDarkness(int x, int y){
-        int edgeBlend = 2;
-
         float dark = 0;
-        int edgeDst = Math.min(x, Math.min(y, Math.min(Math.abs(x - (tiles.width - 1)), Math.abs(y - (tiles.height - 1)))));
-        if(edgeDst <= edgeBlend){
-            dark = Math.max((edgeBlend - edgeDst) * (4f / edgeBlend), dark);
+
+        if(Vars.state.rules.borderDarkness){
+            int edgeBlend = 2;
+            int edgeDst = Math.min(x, Math.min(y, Math.min(Math.abs(x - (tiles.width - 1)), Math.abs(y - (tiles.height - 1)))));
+            if(edgeDst <= edgeBlend){
+                dark = Math.max((edgeBlend - edgeDst) * (4f / edgeBlend), dark);
+            }
         }
 
         if(state.hasSector() && state.getSector().preset == null){

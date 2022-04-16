@@ -45,6 +45,14 @@ public class ServerControl implements ApplicationListener{
     public final CommandHandler handler = new CommandHandler("");
     public final Fi logFolder = Core.settings.getDataDirectory().child("logs/");
 
+    public Runnable serverInput = () -> {
+        Scanner scan = new Scanner(System.in);
+        while(scan.hasNext()){
+            String line = scan.nextLine();
+            Core.app.post(() -> handleCommandString(line));
+        }
+    };
+
     private Fi currentLogFile;
     private boolean inExtraRound;
     private Task lastTask;
@@ -79,6 +87,9 @@ public class ServerControl implements ApplicationListener{
         }
 
         logger = (level1, text) -> {
+            //err has red text instead of reset.
+            if(level1 == LogLevel.err) text = text.replace(reset, lightRed + bold);
+
             String result = bold + lightBlack + "[" + dateTime.format(LocalDateTime.now()) + "] " + reset + format(tags[level1.ordinal()] + " " + text + "&fr");
             System.out.println(result);
 
@@ -143,10 +154,6 @@ public class ServerControl implements ApplicationListener{
         });
 
         customMapDirectory.mkdirs();
-
-        Thread thread = new Thread(this::readCommands, "Server Controls");
-        thread.setDaemon(true);
-        thread.start();
 
         if(Version.build == -1){
             warn("&lyYour server is running a custom build, which means that client checking is disabled.");
@@ -255,7 +262,13 @@ public class ServerControl implements ApplicationListener{
 
         toggleSocket(Config.socketInput.bool());
 
-        info("Server loaded. Type @ for help.", "'help'");
+        Events.on(ServerLoadEvent.class, e -> {
+            Thread thread = new Thread(serverInput, "Server Controls");
+            thread.setDaemon(true);
+            thread.start();
+
+            info("Server loaded. Type @ for help.", "'help'");
+        });
     }
 
     protected void registerCommands(){
@@ -286,7 +299,6 @@ public class ServerControl implements ApplicationListener{
             net.dispose();
             Core.app.exit();
         });
-
 
         handler.register("stop", "Stop hosting the server.", arg -> {
             net.closeServer();
@@ -380,6 +392,8 @@ public class ServerControl implements ApplicationListener{
             maps.reload();
             if(maps.all().size > beforeMaps){
                 info("@ new map(s) found and reloaded.", maps.all().size - beforeMaps);
+            }else if(maps.all().size < beforeMaps){
+                info("@ old map(s) deleted.", beforeMaps - maps.all().size);
             }else{
                 info("Maps reloaded.");
             }
@@ -393,17 +407,16 @@ public class ServerControl implements ApplicationListener{
                 info("  Playing on map &fi@ / Wave @", Strings.capitalize(Strings.stripColors(state.map.name())), state.wave);
 
                 if(state.rules.waves){
-                    info("  @ enemies.", state.enemies);
-                }else{
                     info("  @ seconds until next wave.", (int)(state.wavetime / 60));
                 }
+                info("  @ units / @ enemies", Groups.unit.size(), state.enemies);
 
                 info("  @ FPS, @ MB used.", Core.graphics.getFramesPerSecond(), Core.app.getJavaHeap() / 1024 / 1024);
 
                 if(Groups.player.size() > 0){
                     info("  Players: @", Groups.player.size());
                     for(Player p : Groups.player){
-                        info("    @ / @", p.name, p.uuid());
+                        info("    @ @ / @", p.admin() ? "&r[A]&c" : "&b[P]&c", p.plainName(), p.uuid());
                     }
                 }else{
                     info("  No players connected.");
@@ -451,7 +464,6 @@ public class ServerControl implements ApplicationListener{
 
             info("&fi&lcServer: &fr@", "&lw" + arg[0]);
         });
-
 
         handler.register("pause", "<on/off>", "Pause or unpause the game.", arg -> {
             boolean pause = arg[0].equals("on");
@@ -572,7 +584,9 @@ public class ServerControl implements ApplicationListener{
                 if(arg.length == 1){
                     info("'@' is currently @.", c.name(), c.get());
                 }else{
-                    if(c.isBool()){
+                    if(arg[1].equals("default")){
+                        c.set(c.defaultValue);
+                    }else if(c.isBool()){
                         c.set(arg[1].equals("on") || arg[1].equals("true"));
                     }else if(c.isNum()){
                         try{
@@ -632,7 +646,7 @@ public class ServerControl implements ApplicationListener{
                     info("No whitelisted players found.");
                 }else{
                     info("Whitelist:");
-                    whitelist.each(p -> info("- Name: @ / UUID: @", p.lastName, p.id));
+                    whitelist.each(p -> info("- Name: @ / UUID: @", p.plainLastName(), p.id));
                 }
             }else{
                 if(arg.length == 2){
@@ -643,10 +657,10 @@ public class ServerControl implements ApplicationListener{
                     }else{
                         if(arg[0].equals("add")){
                             netServer.admins.whitelist(arg[1]);
-                            info("Player '@' has been whitelisted.", info.lastName);
+                            info("Player '@' has been whitelisted.", info.plainLastName());
                         }else if(arg[0].equals("remove")){
                             netServer.admins.unwhitelist(arg[1]);
-                            info("Player '@' has been un-whitelisted.", info.lastName);
+                            info("Player '@' has been un-whitelisted.", info.plainLastName());
                         }else{
                             err("Incorrect usage. Provide add/remove as the second argument.");
                         }
@@ -735,7 +749,7 @@ public class ServerControl implements ApplicationListener{
             }else{
                 info("Banned players [ID]:");
                 for(PlayerInfo info : bans){
-                    info(" @ / Last known name: '@'", info.id, info.lastName);
+                    info(" @ / Last known name: '@'", info.id, info.plainLastName());
                 }
             }
 
@@ -748,7 +762,7 @@ public class ServerControl implements ApplicationListener{
                 for(String string : ipbans){
                     PlayerInfo info = netServer.admins.findByIP(string);
                     if(info != null){
-                        info("  '@' / Last known name: '@' / ID: '@'", string, info.lastName, info.id);
+                        info("  '@' / Last known name: '@' / ID: '@'", string, info.plainLastName(), info.id);
                     }else{
                         info("  '@' (No known name or info)", string);
                     }
@@ -769,7 +783,7 @@ public class ServerControl implements ApplicationListener{
 
             if(info != null){
                 info.lastKicked = 0;
-                info("Pardoned player: @", info.lastName);
+                info("Pardoned player: @", info.plainLastName());
             }else{
                 err("That ID can't be found.");
             }
@@ -789,7 +803,7 @@ public class ServerControl implements ApplicationListener{
             boolean add = arg[0].equals("add");
 
             PlayerInfo target;
-            Player playert = Groups.player.find(p -> p.name.equalsIgnoreCase(arg[1]));
+            Player playert = Groups.player.find(p -> p.plainName().equalsIgnoreCase(Strings.stripColors(arg[1])));
             if(playert != null){
                 target = playert.getInfo();
             }else{
@@ -804,7 +818,7 @@ public class ServerControl implements ApplicationListener{
                     netServer.admins.unAdminPlayer(target.id);
                 }
                 if(playert != null) playert.admin = add;
-                info("Changed admin status of player: @", target.lastName);
+                info("Changed admin status of player: @", target.plainLastName());
             }else{
                 err("Nobody with that name or ID could be found. If adding an admin by name, make sure they're online; otherwise, use their UUID.");
             }
@@ -818,7 +832,7 @@ public class ServerControl implements ApplicationListener{
             }else{
                 info("Admins:");
                 for(PlayerInfo info : admins){
-                    info(" &lm @ /  ID: '@' / IP: '@'", info.lastName, info.id, info.lastIP);
+                    info(" &lm @ /  ID: '@' / IP: '@'", info.plainLastName(), info.id, info.lastIP);
                 }
             }
         });
@@ -830,7 +844,7 @@ public class ServerControl implements ApplicationListener{
                 info("Players: @", Groups.player.size());
                 for(Player user : Groups.player){
                     PlayerInfo userInfo = user.getInfo();
-                    info(" &lm @ /  ID: @ / IP: @ / Admin: @", userInfo.lastName, userInfo.id, userInfo.lastIP, userInfo.admin);
+                    info(" @&lm @ / ID: @ / IP: @", userInfo.admin ? "&r[A]&c" : "&b[P]&c", userInfo.plainLastName(), userInfo.id, userInfo.lastIP, userInfo.admin);
                 }
             }
         });
@@ -912,7 +926,7 @@ public class ServerControl implements ApplicationListener{
 
                 int i = 0;
                 for(PlayerInfo info : infos){
-                    info("[@] Trace info for player '@' / UUID @", i++, info.lastName, info.id);
+                    info("[@] Trace info for player '@' / UUID @ / RAW @", i++, info.plainLastName(), info.id, info.lastName);
                     info("  all names used: @", info.names);
                     info("  IP: @", info.lastIP);
                     info("  all IPs used: @", info.ips);
@@ -932,7 +946,7 @@ public class ServerControl implements ApplicationListener{
 
                 int i = 0;
                 for(PlayerInfo info : infos){
-                    info("- [@] '@' / @", i++, info.lastName, info.id);
+                    info("- [@] '@' / @", i++, info.plainLastName(), info.id);
                 }
             }else{
                 info("Nobody with that name could be found.");
@@ -957,15 +971,7 @@ public class ServerControl implements ApplicationListener{
         mods.eachClass(p -> p.registerServerCommands(handler));
     }
 
-    private void readCommands(){
-        Scanner scan = new Scanner(System.in);
-        while(scan.hasNext()){
-            String line = scan.nextLine();
-            Core.app.post(() -> handleCommandString(line));
-        }
-    }
-
-    private void handleCommandString(String line){
+    public void handleCommandString(String line){
         CommandResponse response = handler.handleMessage(line);
 
         if(response.type == ResponseType.unknownCommand){

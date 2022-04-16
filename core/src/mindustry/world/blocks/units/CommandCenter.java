@@ -26,16 +26,18 @@ public class CommandCenter extends Block{
     public Color topColor = null, bottomColor = Color.valueOf("5e5e5e");
     public Effect effect = Fx.commandSend;
     public float effectSize = 150f;
+    public float forceRadius = 31f, forceStrength = 0.2f;
 
     public CommandCenter(String name){
         super(name);
 
         flags = EnumSet.of(BlockFlag.rally);
-        destructible = true;
+        update = true;
         solid = true;
         configurable = true;
         drawDisabled = false;
         logicConfigurable = true;
+        envEnabled = Env.any;
 
         config(UnitCommand.class, (CommandBuild build, UnitCommand command) -> {
             if(build.team.data().command != command){
@@ -73,15 +75,31 @@ public class CommandCenter extends Block{
         }
 
         @Override
+        public void updateTile(){
+            super.updateTile();
+
+            //push away allied units
+            team.data().tree().intersect(x - forceRadius/2f, y - forceRadius/2f, forceRadius, forceRadius, u -> {
+                if(!u.isPlayer()){
+                    float dst = dst(u);
+                    float rs = forceRadius + u.hitSize/2f;
+                    if(dst < rs){
+                        u.vel.add(Tmp.v1.set(u).sub(x, y).setLength(1f - dst / rs).scl(forceStrength));
+                    }
+                }
+            });
+        }
+
+        @Override
         public void draw(){
             super.draw();
 
             float size = 6f;
 
             Draw.color(bottomColor);
-            Draw.rect(commandRegions[team.data().command.ordinal()].getRegion(), tile.drawx(), tile.drawy() - 1, size, size);
+            Draw.rect(commandRegions[team.data().command.ordinal()].getRegion(), x, y - 1, size, size);
             Draw.color(topColor == null ? team.color : topColor);
-            Draw.rect(commandRegions[team.data().command.ordinal()].getRegion(), tile.drawx(), tile.drawy(), size, size);
+            Draw.rect(commandRegions[team.data().command.ordinal()].getRegion(), x, y, size, size);
             Draw.color();
         }
 
@@ -98,6 +116,16 @@ public class CommandCenter extends Block{
             table.add(buttons);
             table.row();
             table.label(() -> team.data().command.localized()).style(Styles.outlineLabel).center().growX().get().setAlignment(Align.center);
+        }
+
+        @Override
+        public boolean onConfigureTileTapped(Building other){
+            if(this == other){
+                deselect();
+                return false;
+            }
+
+            return true;
         }
 
         @Override

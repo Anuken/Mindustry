@@ -6,6 +6,7 @@ import arc.util.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
 import mindustry.content.*;
+import mindustry.graphics.g3d.*;
 import mindustry.io.*;
 import mindustry.type.*;
 import mindustry.type.Weather.*;
@@ -50,7 +51,7 @@ public class Rules{
     public boolean unitAmmo = false;
     /** Whether cores add to unit limit */
     public boolean unitCapVariable = true;
-    /** How fast unit pads build units. */
+    /** How fast unit factories build units. */
     public float unitBuildSpeedMultiplier = 1f;
     /** How much damage any other units deal. */
     public float unitDamageMultiplier = 1f;
@@ -94,10 +95,14 @@ public class Rules{
     public Seq<WeatherEntry> weather = new Seq<>(1);
     /** Blocks that cannot be placed. */
     public ObjectSet<Block> bannedBlocks = new ObjectSet<>();
+    /** Units that cannot be built. */
+    public ObjectSet<UnitType> bannedUnits = new ObjectSet<>();
     /** Reveals blocks normally hidden by build visibility. */
     public ObjectSet<Block> revealedBlocks = new ObjectSet<>();
     /** Unlocked content names. Only used in multiplayer when the campaign is enabled. */
     public ObjectSet<String> researched = new ObjectSet<>();
+    /** Block containing these items as requirements are hidden. */
+    public ObjectSet<Item> hiddenBuildItems = new ObjectSet<>();
     /** Whether ambient lighting is enabled. */
     public boolean lighting = false;
     /** Whether enemy lighting is visible.
@@ -109,12 +114,28 @@ public class Rules{
     public Team defaultTeam = Team.sharded;
     /** team of the enemy in waves/sectors. */
     public Team waveTeam = Team.crux;
+    /** color of clouds that is displayed when the player is landing */
+    public Color cloudColor = new Color(0f, 0f, 0f, 0f);
     /** name of the custom mode that this ruleset describes, or null. */
     public @Nullable String modeName;
     /** Whether cores incinerate items when full, just like in the campaign. */
     public boolean coreIncinerates = false;
+    /** If false, borders fade out into darkness. Only use with custom backgrounds!*/
+    public boolean borderDarkness = true;
     /** special tags for additional info. */
     public StringMap tags = new StringMap();
+    /** Name of callback to call for background rendering in mods; see Renderer#addCustomBackground. Runs last. */
+    public @Nullable String customBackgroundCallback;
+    /** path to background texture with extension (e.g. "sprites/space.png")*/
+    public @Nullable String backgroundTexture;
+    /** background texture move speed scaling - bigger numbers mean slower movement. 0 to disable. */
+    public float backgroundSpeed = 27000f;
+    /** background texture scaling factor */
+    public float backgroundScl = 1f;
+    /** background UV offsets */
+    public float backgroundOffsetX = 0.1f, backgroundOffsetY = 0.1f;
+    /** Parameters for planet rendered in the background. Cannot be changed once a map is loaded. */
+    public @Nullable PlanetParams planetBackground;
 
     /** Copies this ruleset exactly. Not efficient at all, do not use often. */
     public Rules copy(){
@@ -136,6 +157,30 @@ public class Rules{
         }
     }
 
+    public boolean hasEnv(int env){
+        return (environment & env) != 0;
+    }
+
+    public float unitBuildSpeed(Team team){
+        return unitBuildSpeedMultiplier * teams.get(team).unitBuildSpeedMultiplier;
+    }
+
+    public float unitDamage(Team team){
+        return unitDamageMultiplier * teams.get(team).unitDamageMultiplier;
+    }
+
+    public float blockHealth(Team team){
+        return blockHealthMultiplier * teams.get(team).blockHealthMultiplier;
+    }
+
+    public float blockDamage(Team team){
+        return blockDamageMultiplier * teams.get(team).blockDamageMultiplier;
+    }
+
+    public float buildSpeed(Team team){
+        return buildSpeedMultiplier * teams.get(team).buildSpeedMultiplier;
+    }
+
     /** A team-specific ruleset. */
     public static class TeamRule{
         /** Whether to use building AI. */
@@ -150,6 +195,19 @@ public class Rules{
         public boolean infiniteResources;
         /** If true, this team has infinite unit ammo. */
         public boolean infiniteAmmo;
+
+        /** How fast unit factories build units. */
+        public float unitBuildSpeedMultiplier = 1f;
+        /** How much damage any other units deal. */
+        public float unitDamageMultiplier = 1f;
+        /** How much health blocks start with. */
+        public float blockHealthMultiplier = 1f;
+        /** How much damage blocks (turrets) deal. */
+        public float blockDamageMultiplier = 1f;
+        /** Multiplier for building speed. */
+        public float buildSpeedMultiplier = 1f;
+
+        //build cost disabled due to technical complexity
     }
 
     /** A simple map for storing TeamRules in an efficient way without hashing. */

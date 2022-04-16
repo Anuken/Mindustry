@@ -59,6 +59,8 @@ public class RepairPoint extends Block{
         outlineIcon = true;
         //yeah, this isn't the same thing, but it's close enough
         group = BlockGroup.projectors;
+
+        envEnabled |= Env.space;
     }
 
     @Override
@@ -174,7 +176,7 @@ public class RepairPoint extends Block{
                 multiplier = liq.valid(this) ? 1f + liquids.current().heatCapacity * coolantMultiplier : 1f;
             }
 
-            if(target != null && (target.dead() || target.dst(tile) - target.hitSize/2f > repairRadius || target.health() >= target.maxHealth())){
+            if(target != null && (target.dead() || target.dst(this) - target.hitSize/2f > repairRadius || target.health() >= target.maxHealth())){
                 target = null;
             }
 

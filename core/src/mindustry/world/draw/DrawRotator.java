@@ -9,14 +9,15 @@ import mindustry.world.blocks.production.GenericCrafter.*;
 public class DrawRotator extends DrawBlock{
     public TextureRegion rotator, top;
     public boolean drawSpinSprite = false;
+    public float spinSpeed = 2f;
 
     @Override
     public void draw(GenericCrafterBuild build){
         Draw.rect(build.block.region, build.x, build.y);
         if(drawSpinSprite){
-            Drawf.spinSprite(rotator, build.x, build.y, build.totalProgress * 2f);
+            Drawf.spinSprite(rotator, build.x, build.y, build.totalProgress * spinSpeed);
         }else{
-            Draw.rect(rotator, build.x, build.y, build.totalProgress * 2f);
+            Draw.rect(rotator, build.x, build.y, build.totalProgress * spinSpeed);
         }
         if(top.found()) Draw.rect(top, build.x, build.y);
     }

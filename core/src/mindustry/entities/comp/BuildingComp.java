@@ -49,6 +49,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     static final float timeToSleep = 60f * 1, timeToUncontrol = 60f * 6;
     static final ObjectSet<Building> tmpTiles = new ObjectSet<>();
     static final Seq<Building> tempBuilds = new Seq<>();
+    static final BuildTeamChangeEvent teamChangeEvent = new BuildTeamChangeEvent();
     static int sleepingEntities = 0;
     
     @Import float x, y, health, maxHealth;
@@ -60,9 +61,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     transient boolean updateFlow;
     transient byte cdump;
     transient int rotation;
+    transient float payloadRotation;
     transient boolean enabled = true;
     transient float enabledControlTime;
     transient String lastAccessed;
+    transient boolean wasDamaged; //used only by the indexer
 
     PowerModule power;
     ItemModule items;
@@ -158,7 +161,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public final void readBase(Reads read){
-        health = read.f();
+        //cap health by block health in case of nerfs
+        health = Math.min(read.f(), block.health);
         byte rot = read.b();
         team = Team.get(read.b());
 
@@ -265,7 +269,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     public void applyBoost(float intensity, float duration){
         //do not refresh time scale when getting a weaker intensity
-        if(intensity >= this.timeScale){
+        if(intensity >= this.timeScale - 0.001f){
             timeScaleDuration = Math.max(timeScaleDuration, duration);
         }
         timeScale = Math.max(timeScale, intensity);
@@ -276,11 +280,13 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public Building nearby(int rotation){
-        if(rotation == 0) return world.build(tile.x + 1, tile.y);
-        if(rotation == 1) return world.build(tile.x, tile.y + 1);
-        if(rotation == 2) return world.build(tile.x - 1, tile.y);
-        if(rotation == 3) return world.build(tile.x, tile.y - 1);
-        return null;
+        return switch(rotation){
+            case 0 -> world.build(tile.x + 1, tile.y);
+            case 1 -> world.build(tile.x, tile.y + 1);
+            case 2 -> world.build(tile.x - 1, tile.y);
+            case 3 -> world.build(tile.x, tile.y - 1);
+            default -> null;
+        };
     }
 
     public byte relativeTo(Tile tile){
@@ -288,7 +294,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public byte relativeTo(Building tile){
-        return relativeTo(tile.tile());
+        return relativeTo(tile.tile);
     }
 
     public byte relativeToEdge(Tile other){
@@ -401,30 +407,46 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     //region handler methods
 
     /** @return whether the player can select (but not actually control) this building. */
-    public boolean canControlSelect(Player player){
+    public boolean canControlSelect(Unit player){
         return false;
     }
 
     /** Called when a player control-selects this building - not called for ControlBlock subclasses. */
-    public void onControlSelect(Player player){
+    public void onControlSelect(Unit player){
 
     }
 
-    public void acceptPlayerPayload(Player player, Cons<Payload> grabber){
-        Fx.spawn.at(player);
-        var unit = player.unit();
-        player.clearUnit();
-        //player.deathTimer = Player.deathDelay + 1f; //for instant respawn
+    public void handleUnitPayload(Unit unit, Cons<Payload> grabber){
+        Fx.spawn.at(unit);
+
+        if(unit.isPlayer()){
+            unit.getPlayer().clearUnit();
+        }
+
         unit.remove();
+
+        //needs new ID as it is now a payload
+        if(net.client()){
+            unit.id = EntityGroup.nextId();
+        }else{
+            //server-side, this needs to be delayed until next frame because otherwise the packets sent out right after this event would have the wrong unit ID, leading to ghosts
+            Core.app.post(() -> unit.id = EntityGroup.nextId());
+        }
+
         grabber.get(new UnitPayload(unit));
         Fx.unitDrop.at(unit);
-        if(Vars.net.client()){
-            Vars.netClient.clearRemovedEntity(unit.id);
-        }
     }
 
     public boolean canUnload(){
         return block.unloadable;
+    }
+
+    public boolean canResupply(){
+        return block.allowResupply;
+    }
+
+    public boolean payloadCheck(int conveyorRotation){
+        return block.rotate && (rotation + 2) % 4 == conveyorRotation;
     }
 
     /** Called when an unloader takes an item. */
@@ -915,6 +937,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         drawTeamTop();
     }
 
+    public void payloadDraw(){
+        draw();
+    }
+
     public void drawTeamTop(){
         if(block.teamRegion.found()){
             if(block.teamRegions[team.id] == block.teamRegion) Draw.color(team.color);
@@ -966,6 +992,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         }
     }
 
+    /** @return whether this building is in a payload */
+    public boolean isPayload(){
+        return tile == emptyTile;
+    }
+
     /**
      * Called when a block is placed over some other blocks. This seq will always have at least one item.
      * Should load some previous state, if necessary. */
@@ -1015,7 +1046,12 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     /** Called *after* the tile has been removed. */
     public void afterDestroyed(){
-
+        if(block.destroyBullet != null){
+            //I really do not like that the bullet will not destroy derelict
+            //but I can't do anything about it without using a random team
+            //which may or may not cause issues with servers and js
+            block.destroyBullet.create(this, Team.derelict, x, y, 0);
+        }
     }
 
     /** @return the cap for item amount calculations, used when this block explodes. */
@@ -1034,7 +1070,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                 int amount = Math.min(items.get(item), explosionItemCap());
                 explosiveness += item.explosiveness * amount;
                 flammability += item.flammability * amount;
-                power += item.charge * amount * 100f;
+                power += item.charge * Mathf.pow(amount, 1.1f) * 150f;
             }
         }
 
@@ -1054,7 +1090,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
                 for(int i = 0; i < Mathf.clamp(amount / 5, 0, 30); i++){
                     Time.run(i / 2f, () -> {
-                        Tile other = world.tile(tileX() + Mathf.range(block.size / 2), tileY() + Mathf.range(block.size / 2));
+                        Tile other = world.tileWorld(x + Mathf.range(block.size * tilesize / 2), y + Mathf.range(block.size * tilesize / 2));
                         if(other != null){
                             Puddles.deposit(other, liquid, splash);
                         }
@@ -1071,7 +1107,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public String getDisplayName(){
-        return block.localizedName;
+        //derelict team icon currently doesn't display
+        return team == Team.derelict ?
+            block.localizedName + "\n" + Core.bundle.get("block.derelict") :
+            block.localizedName + (team == player.team() || team.emoji.isEmpty() ? "" : " " + team.emoji);
     }
 
     public TextureRegion getDisplayIcon(){
@@ -1100,7 +1139,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             table.row();
             table.table(this::displayConsumption).growX();
 
-            boolean displayFlow = (block.category == Category.distribution || block.category == Category.liquid) && Core.settings.getBool("flow") && block.displayFlow;
+            boolean displayFlow = (block.category == Category.distribution || block.category == Category.liquid) && block.displayFlow;
 
             if(displayFlow){
                 String ps = " " + StatUnit.perSecond.localized();
@@ -1210,6 +1249,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return self() != other;
     }
 
+    /**
+     * Called when this block's config menu is closed
+     */
+    public void onConfigureClosed(){}
+
     /** Returns whether this config menu should show when the specified player taps it. */
     public boolean shouldShowConfigure(Player player){
         return true;
@@ -1235,6 +1279,14 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return amount;
     }
 
+    public boolean absorbLasers(){
+        return block.absorbLasers;
+    }
+
+    public boolean isInsulated(){
+        return block.insulated;
+    }
+
     public boolean collide(Bullet other){
         return true;
     }
@@ -1254,17 +1306,29 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     /** Changes this building's team in a safe manner. */
     public void changeTeam(Team next){
+        Team last = this.team;
         indexer.removeIndex(tile);
         this.team = next;
         indexer.addIndex(tile);
+        Events.fire(teamChangeEvent.set(last, self()));
     }
 
     public boolean canPickup(){
         return true;
     }
 
+    /** Called right before this building is picked up. */
     public void pickedUp(){
 
+    }
+
+    /** Called right after this building is picked up. */
+    public void afterPickedUp(){
+        if(power != null){
+            power.graph = new PowerGraph();
+            power.links.clear();
+            power.status = 0f;
+        }
     }
 
     public void removeFromProximity(){
@@ -1342,6 +1406,18 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return tile.build == self() && !dead();
     }
 
+    @MethodPriority(100)
+    @Override
+    public void heal(){
+        indexer.notifyBuildHealed(self());
+    }
+
+    @MethodPriority(100)
+    @Override
+    public void heal(float amount){
+        indexer.notifyBuildHealed(self());
+    }
+
     @Override
     public float hitSize(){
         return tile.block().size * tilesize;
@@ -1358,10 +1434,12 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public void damage(float damage){
         if(dead()) return;
 
-        if(Mathf.zero(state.rules.blockHealthMultiplier)){
+        float dm = state.rules.blockHealth(team);
+
+        if(Mathf.zero(dm)){
             damage = health + 1;
         }else{
-            damage /= state.rules.blockHealthMultiplier;
+            damage /= dm;
         }
 
         Call.tileDamage(self(), health - handleDamage(damage));
@@ -1487,6 +1565,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             }
         }
 
+        if(cons != null){
+            cons.update();
+        }
+
         if(enabled || !block.noUpdateDisabled){
             updateTile();
         }
@@ -1497,10 +1579,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         if(liquids != null){
             liquids.update(updateFlow);
-        }
-
-        if(cons != null){
-            cons.update();
         }
 
         if(power != null){

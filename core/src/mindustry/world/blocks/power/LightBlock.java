@@ -3,14 +3,18 @@ package mindustry.world.blocks.power;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.input.*;
 import mindustry.logic.*;
 import mindustry.world.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -25,15 +29,31 @@ public class LightBlock extends Block{
         update = true;
         configurable = true;
         saveConfig = true;
+        envEnabled |= Env.space;
+        swapDiagonalPlacement = true;
 
         config(Integer.class, (LightBuild tile, Integer value) -> tile.color = value);
     }
 
     @Override
     public void init(){
-        lightRadius = radius;
+        //double needed for some reason
+        lightRadius = radius*2f;
         emitLight = true;
         super.init();
+    }
+
+    @Override
+    public void drawPlace(int x, int y, int rotation, boolean valid){
+        super.drawPlace(x, y, rotation, valid);
+
+        Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, radius * 0.75f, Pal.placing);
+    }
+
+    @Override
+    public void changePlacementPath(Seq<Point2> points, int rotation){
+        var placeRadius2 = Mathf.pow(radius * 0.7f / tilesize, 2f) * 3;
+        Placement.calculateNodes(points, this, rotation, (point, other) -> point.dst2(other) <= placeRadius2);
     }
 
     public class LightBuild extends Building{
@@ -43,7 +63,7 @@ public class LightBlock extends Block{
         @Override
         public void control(LAccess type, double p1, double p2, double p3, double p4){
             if(type == LAccess.color){
-                color = Color.rgba8888((float)p1, (float)p2, (float)p3, 1f);
+                color = Color.rgba8888(Mathf.clamp((float)p1), Mathf.clamp((float)p2), Mathf.clamp((float)p3), 1f);
             }
 
             super.control(type, p1, p2, p3, p4);

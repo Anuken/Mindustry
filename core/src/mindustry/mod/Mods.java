@@ -21,6 +21,7 @@ import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
+import mindustry.mod.ContentParser.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 
@@ -177,7 +178,7 @@ public class Mods implements Loadable{
     }
 
     private void packSprites(Seq<Fi> sprites, LoadedMod mod, boolean prefix, Seq<AsyncResult<Runnable>> tasks){
-        boolean linear = Core.settings.getBool("linear");
+        boolean linear = Core.settings.getBool("linear", true);
 
         for(Fi file : sprites){
             //read and bleed pixmaps in parallel
@@ -186,7 +187,7 @@ public class Mods implements Loadable{
                     Pixmap pix = new Pixmap(file.readBytes());
                     //only bleeds when linear filtering is on at startup
                     if(linear){
-                        Pixmaps.bleed(pix);
+                        Pixmaps.bleed(pix, 2);
                     }
                     //this returns a *runnable* which actually packs the resulting pixmap; this has to be done synchronously outside the method
                     return () -> {
@@ -225,6 +226,10 @@ public class Mods implements Loadable{
             var shadow = Core.atlas;
             //dummy texture atlas that returns the 'shadow' regions; used for mod loading
             Core.atlas = new TextureAtlas(){
+                {
+                    //needed for the correct operation of the found() method in the TextureRegion
+                    error = shadow.find("error");
+                }
 
                 @Override
                 public AtlasRegion find(String name){
@@ -265,8 +270,9 @@ public class Mods implements Loadable{
                 }
             };
 
-            TextureFilter filter = Core.settings.getBool("linear") ? TextureFilter.linear : TextureFilter.nearest;
+            TextureFilter filter = Core.settings.getBool("linear", true) ? TextureFilter.linear : TextureFilter.nearest;
 
+            Time.mark();
             //generate new icons
             for(Seq<Content> arr : content.getContentMap()){
                 arr.each(c -> {
@@ -277,6 +283,7 @@ public class Mods implements Loadable{
                     }
                 });
             }
+            Log.debug("Time to generate icons: @", Time.elapsed());
 
             //dispose old atlas data
             Core.atlas = packer.flush(filter, new TextureAtlas());
@@ -287,7 +294,7 @@ public class Mods implements Loadable{
 
         packer.dispose();
         packer = null;
-        Log.debug("Time to update textures: @", Time.elapsed());
+        Log.debug("Total time to generate & flush textures synchronously: @", Time.elapsed());
     }
 
     private PageType getPage(AtlasRegion region){
@@ -348,10 +355,13 @@ public class Mods implements Loadable{
 
     /** Loads all mods from the folder, but does not call any methods on them.*/
     public void load(){
-        for(Fi file : modDirectory.list()){
-            if(!file.extension().equals("jar") && !file.extension().equals("zip") && !(file.isDirectory() && (file.child("mod.json").exists() || file.child("mod.hjson").exists()))) continue;
+        var files = resolveDependencies(Seq.with(modDirectory.list()).filter(f ->
+            f.extension().equals("jar") || f.extension().equals("zip") || (f.isDirectory() && (f.child("mod.json").exists() || f.child("mod.hjson").exists()))
+        ));
 
+        for(Fi file : files){
             Log.debug("[Mods] Loading mod @", file);
+
             try{
                 LoadedMod mod = loadMod(file);
                 mods.add(mod);
@@ -366,7 +376,7 @@ public class Mods implements Loadable{
         }
 
         //load workshop mods now
-        for(Fi file : platform.getWorkshopContent(LoadedMod.class)){
+        for(Fi file : resolveDependencies(platform.getWorkshopContent(LoadedMod.class))){
             try{
                 LoadedMod mod = loadMod(file);
                 mods.add(mod);
@@ -626,7 +636,7 @@ public class Mods implements Loadable{
             try{
                 //this binds the content but does not load it entirely
                 Content loaded = parser.parse(l.mod, l.file.nameWithoutExtension(), l.file.readString("UTF-8"), l.file, l.type);
-                Log.debug("[@] Loaded '@'.", l.mod.meta.name, (loaded instanceof UnlockableContent ? ((UnlockableContent)loaded).localizedName : loaded));
+                Log.debug("[@] Loaded '@'.", l.mod.meta.name, (loaded instanceof UnlockableContent u ? u.localizedName : loaded));
             }catch(Throwable e){
                 if(current != content.getLastAdded() && content.getLastAdded() != null){
                     parser.markError(content.getLastAdded(), l.mod, l.file, e);
@@ -643,6 +653,11 @@ public class Mods implements Loadable{
 
     public void handleContentError(Content content, Throwable error){
         parser.markError(content, error);
+    }
+
+    /** Adds a listener for parsed JSON objects. */
+    public void addParseListener(ParseListener hook){
+        parser.listeners.add(hook);
     }
 
     /** @return a list of mods and versions, in the format name:version. */
@@ -696,6 +711,86 @@ public class Mods implements Loadable{
         }
     }
 
+    /** Tries to find the config file of a mod/plugin. */
+    @Nullable
+    public ModMeta findMeta(Fi file){
+        Fi metaFile =
+            file.child("mod.json").exists() ?       file.child("mod.json") :
+            file.child("mod.hjson").exists() ?      file.child("mod.hjson") :
+            file.child("plugin.json").exists() ?    file.child("plugin.json") :
+            file.child("plugin.hjson");
+
+        if(!metaFile.exists()){
+            return null;
+        }
+
+        ModMeta meta = json.fromJson(ModMeta.class, Jval.read(metaFile.readString()).toString(Jformat.plain));
+        meta.cleanup();
+        return meta;
+    }
+
+    /** Resolves the loading order of a list mods/plugins using their internal names.
+     * It also skips non-mods files or folders. */
+    public Seq<Fi> resolveDependencies(Seq<Fi> files){
+        ObjectMap<String, Fi> fileMapping = new ObjectMap<>();
+        ObjectMap<String, Seq<String>> dependencies = new ObjectMap<>();
+
+        for(Fi file : files){
+            Fi zip = file.isDirectory() ? file : new ZipFi(file);
+
+            if(zip.list().length == 1 && zip.list()[0].isDirectory()){
+                zip = zip.list()[0];
+            }
+
+            ModMeta meta = null;
+            try{
+                meta = findMeta(zip);
+            }catch(Exception ignored){
+            }
+
+            if(meta == null) continue;
+            dependencies.put(meta.name, meta.dependencies);
+            fileMapping.put(meta.name, file);
+        }
+
+        ObjectSet<String> visited = new ObjectSet<>();
+        OrderedSet<String> ordered = new OrderedSet<>();
+
+        for(String modName : dependencies.keys()){
+            if(!ordered.contains(modName)){
+                // Adds the loaded mods at the beginning of the list
+                ordered.add(modName, 0);
+                resolveDependencies(modName, dependencies, ordered, visited);
+                visited.clear();
+            }
+        }
+
+        // Adds the invalid mods
+        for(String missingMod : dependencies.keys()){
+            if(!ordered.contains(missingMod)) ordered.add(missingMod, 0);
+        }
+
+        Seq<Fi> resolved = ordered.orderedItems().map(fileMapping::get);
+        // Since the resolver explores the dependencies from leaves to the root, reverse the seq
+        resolved.reverse();
+        return resolved;
+    }
+
+    /** Recursive search of dependencies */
+    public void resolveDependencies(String modName, ObjectMap<String, Seq<String>> dependencies, OrderedSet<String> ordered, ObjectSet<String> visited){
+        visited.add(modName);
+
+        for(String dependency : dependencies.get(modName)){
+            // Checks if the dependency tree isn't circular and that the dependency is not missing
+            if(!visited.contains(dependency) && dependencies.containsKey(dependency)){
+                // Skips if the dependency was already explored in a separate tree
+                if(ordered.contains(dependency)) continue;
+                ordered.add(dependency);
+                resolveDependencies(dependency, dependencies, ordered, visited);
+            }
+        }
+    }
+
     /** Loads a mod file+meta, but does not add it to the list.
      * Note that directories can be loaded as mods. */
     private LoadedMod loadMod(Fi sourceFile) throws Exception{
@@ -715,19 +810,13 @@ public class Mods implements Loadable{
                 zip = zip.list()[0];
             }
 
-            Fi metaf =
-                zip.child("mod.json").exists() ? zip.child("mod.json") :
-                zip.child("mod.hjson").exists() ? zip.child("mod.hjson") :
-                zip.child("plugin.json").exists() ? zip.child("plugin.json") :
-                zip.child("plugin.hjson");
+            ModMeta meta = findMeta(zip);
 
-            if(!metaf.exists()){
-                Log.warn("Mod @ doesn't have a '[mod/plugin].[h]json' file, skipping.", sourceFile);
-                throw new IllegalArgumentException("Invalid file: No mod.json found.");
+            if(meta == null){
+                Log.warn("Mod @ doesn't have a '[mod/plugin].[h]json' file, skipping.", zip);
+                throw new ModLoadException("Invalid file: No mod.json found.");
             }
 
-            ModMeta meta = json.fromJson(ModMeta.class, Jval.read(metaf.readString()).toString(Jformat.plain));
-            meta.cleanup();
             String camelized = meta.name.replace(" ", "");
             String mainClass = meta.main == null ? camelized.toLowerCase(Locale.ROOT) + "." + camelized + "Mod" : meta.main;
             String baseName = meta.name.toLowerCase(Locale.ROOT).replace(" ", "-");
@@ -750,7 +839,7 @@ public class Mods implements Loadable{
                     //unload
                     mods.remove(other);
                 }else{
-                    throw new IllegalArgumentException("A mod with the name '" + baseName + "' is already imported.");
+                    throw new ModLoadException("A mod with the name '" + baseName + "' is already imported.");
                 }
             }
 
@@ -779,12 +868,23 @@ public class Mods implements Loadable{
                 (meta.getMinMajor() >= 105 || headless)
             ){
                 if(ios){
-                    throw new IllegalArgumentException("Java class mods are not supported on iOS.");
+                    throw new ModLoadException("Java class mods are not supported on iOS.");
                 }
 
                 loader = platform.loadJar(sourceFile, mainLoader);
                 mainLoader.addChild(loader);
                 Class<?> main = Class.forName(mainClass, true, loader);
+
+                //detect mods that incorrectly package mindustry in the jar
+                if((main.getSuperclass().getName().equals("mindustry.mod.Plugin") || main.getSuperclass().getName().equals("mindustry.mod.Mod")) &&
+                    main.getSuperclass().getClassLoader() != Mod.class.getClassLoader()){
+                    throw new ModLoadException(
+                        "This mod/plugin has loaded Mindustry dependencies from its own class loader. " +
+                        "You are incorrectly including Mindustry dependencies in the mod JAR - " +
+                        "make sure Mindustry is declared as `compileOnly` in Gradle, and that the JAR is created with `runtimeClasspath`!"
+                    );
+                }
+
                 metas.put(main, meta);
                 mainMod = (Mod)main.getDeclaredConstructor().newInstance();
             }else{
@@ -1014,6 +1114,12 @@ public class Mods implements Loadable{
                     ", hidden=" + hidden +
                     ", repo=" + repo +
                     '}';
+        }
+    }
+
+    public static class ModLoadException extends RuntimeException{
+        public ModLoadException(String message){
+            super(message);
         }
     }
 

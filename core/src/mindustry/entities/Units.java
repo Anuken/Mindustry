@@ -22,6 +22,7 @@ public class Units{
     private static float cdist;
     private static boolean boolResult;
     private static int intResult;
+    private static Building buildResult;
 
     @Remote(called = Loc.server)
     public static void unitCapDeath(Unit unit){
@@ -80,6 +81,12 @@ public class Units{
         return Math.max(0, state.rules.unitCapVariable ? state.rules.unitCap + team.data().unitCap : state.rules.unitCap);
     }
 
+    /** @return unit cap as a string, substituting the infinity symbol instead of MAX_VALUE */
+    public static String getStringCap(Team team){
+        int cap = getCap(team);
+        return cap >= Integer.MAX_VALUE - 1 ? "∞" : cap + "";
+    }
+
     /** @return whether this player can interact with a specific tile. if either of these are null, returns true.*/
     public static boolean canInteract(Player player, Building tile){
         return player == null || tile == null || tile.interactable(player.team());
@@ -128,7 +135,7 @@ public class Units{
 
         nearby(x, y, width, height, unit -> {
             if(boolResult) return;
-            if((unit.isGrounded() && !unit.type.hovering) == ground){
+            if((unit.isGrounded() && !unit.hovering) == ground){
                 unit.hitboxTile(hitrect);
 
                 if(hitrect.overlaps(x, y, width, height)){
@@ -142,7 +149,7 @@ public class Units{
 
     /** Returns the nearest damaged tile. */
     public static Building findDamagedTile(Team team, float x, float y){
-        return Geometry.findClosest(x, y, indexer.getDamaged(team));
+        return indexer.getDamaged(team).min(b -> b.dst2(x, y));
     }
 
     /** Returns the nearest ally tile in a range. */
@@ -155,6 +162,26 @@ public class Units{
         if(team == Team.derelict) return null;
 
         return indexer.findEnemyTile(team, x, y, range, pred);
+    }
+
+    /** @return the closest building of the provided team that matches the predicate. */
+    public static @Nullable Building closestBuilding(Team team, float wx, float wy, float range, Boolf<Building> pred){
+        buildResult = null;
+        cdist = 0f;
+
+        var buildings = team.data().buildings;
+        if(buildings == null) return null;
+        buildings.intersect(wx - range, wy - range, range*2f, range*2f, b -> {
+            if(pred.get(b)){
+                float dst = b.dst(wx, wy) - b.hitSize()/2f;
+                if(dst <= range && (buildResult == null || dst <= cdist)){
+                    cdist = dst;
+                    buildResult = b;
+                }
+            }
+        });
+
+        return buildResult;
     }
 
     /** Iterates through all buildings in a range. */
@@ -184,7 +211,7 @@ public class Units{
         }
     }
 
-    /** Returns the closest target enemy. First, units are checked, then tile entities. */
+    /** Returns the closest target enemy. First, units are checked, then buildings. */
     public static Teamc bestTarget(Team team, float x, float y, float range, Boolf<Unit> unitPred, Boolf<Building> tilePred, Sortf sort){
         if(team == Team.derelict) return null;
 

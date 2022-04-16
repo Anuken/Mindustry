@@ -27,6 +27,7 @@ public class LiquidSource extends Block{
         noUpdateDisabled = true;
         displayFlow = false;
         group = BlockGroup.liquids;
+        envEnabled = Env.any;
 
         config(Liquid.class, (LiquidSourceBuild tile, Liquid l) -> tile.source = l);
         configClear((LiquidSourceBuild tile) -> tile.source = null);
@@ -72,7 +73,7 @@ public class LiquidSource extends Block{
 
         @Override
         public void buildConfiguration(Table table){
-            ItemSelection.buildTable(table, content.liquids(), () -> source, this::configure);
+            ItemSelection.buildTable(LiquidSource.this, table, content.liquids(), () -> source, this::configure);
         }
 
         @Override

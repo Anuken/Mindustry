@@ -30,6 +30,7 @@ public class MessageBlock extends Block{
         destructible = true;
         group = BlockGroup.logic;
         drawDisabled = false;
+        envEnabled = Env.any;
 
         config(String.class, (MessageBuild tile, String text) -> {
             if(text.length() > maxTextLength){
@@ -92,7 +93,9 @@ public class MessageBlock extends Block{
                         text = message.toString();
                         multiline = true;
                         maxLength = maxTextLength;
-                        accepted = str -> configure(str);
+                        accepted = str -> {
+                            if(!str.equals(text)) configure(str);
+                        };
                     }});
                 }else{
                     BaseDialog dialog = new BaseDialog("@editmessage");
@@ -112,11 +115,11 @@ public class MessageBlock extends Block{
                     });
                     a.setMaxLength(maxTextLength);
                     dialog.buttons.button("@ok", () -> {
-                        configure(a.getText());
+                        if(!a.getText().equals(message.toString())) configure(a.getText());
                         dialog.hide();
                     }).size(130f, 60f);
                     dialog.update(() -> {
-                        if(tile.block() != MessageBlock.this){
+                        if(tile.build != this){
                             dialog.hide();
                         }
                     });

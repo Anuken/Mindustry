@@ -4,7 +4,6 @@ import arc.*;
 import mindustry.core.GameState.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
-import mindustry.type.*;
 
 import static mindustry.Vars.*;
 
@@ -52,23 +51,13 @@ public class GameOverDialog extends BaseDialog{
                 t.margin(13f);
                 t.left().defaults().left();
                 t.add(Core.bundle.format("stat.wave", state.stats.wavesLasted)).row();
+                t.add(Core.bundle.format("stat.unitsCreated", state.stats.unitsCreated)).row();
                 t.add(Core.bundle.format("stat.enemiesDestroyed", state.stats.enemyUnitsDestroyed)).row();
                 t.add(Core.bundle.format("stat.built", state.stats.buildingsBuilt)).row();
                 t.add(Core.bundle.format("stat.destroyed", state.stats.buildingsDestroyed)).row();
                 t.add(Core.bundle.format("stat.deconstructed", state.stats.buildingsDeconstructed)).row();
                 if(control.saves.getCurrent() != null){
                     t.add(Core.bundle.format("stat.playtime", control.saves.getCurrent().getPlayTime())).row();
-                }
-                if(state.isCampaign() && !state.stats.itemsDelivered.isEmpty()){
-                    t.add("@stat.delivered").row();
-                    for(Item item : content.items()){
-                        if(state.stats.itemsDelivered.get(item, 0) > 0){
-                            t.table(items -> {
-                                items.add("    [lightgray]" + state.stats.itemsDelivered.get(item, 0));
-                                items.image(item.uiIcon).size(8 * 3).pad(4);
-                            }).left().row();
-                        }
-                    }
                 }
 
                 if(state.isCampaign() && net.client()){
