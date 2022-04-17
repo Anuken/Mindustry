@@ -161,34 +161,6 @@ public class Control implements ApplicationListener, Loadable{
             checkAutoUnlocks();
         });
 
-        Events.on(BlockBuildEndEvent.class, e -> {
-            if(e.team == player.team()){
-                if(e.breaking){
-                    state.stats.buildingsDeconstructed++;
-                }else{
-                    state.stats.buildingsBuilt++;
-                }
-            }
-        });
-
-        Events.on(BlockDestroyEvent.class, e -> {
-            if(e.tile.team() == player.team()){
-                state.stats.buildingsDestroyed ++;
-            }
-        });
-
-        Events.on(UnitDestroyEvent.class, e -> {
-            if(e.unit.team() != player.team()){
-                state.stats.enemyUnitsDestroyed ++;
-            }
-        });
-
-        Events.on(UnitCreateEvent.class, e -> {
-            if(e.unit.team == state.rules.defaultTeam){
-                state.stats.unitsCreated++;
-            }
-        });
-
         //delete save on campaign game over
         Events.on(GameOverEvent.class, e -> {
             if(state.isCampaign() && !net.client() && !headless){

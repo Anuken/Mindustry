@@ -17,7 +17,7 @@ import static mindustry.Vars.*;
 public class MapObjectives{
     public static Prov<MapObjective>[] allObjectiveTypes = new Prov[]{
         ResearchObjective::new, BuildCountObjective::new, UnitCountObjective::new, ItemObjective::new,
-        CommandModeObjective::new, CoreItemObjective::new, DestroyCoreObjective::new
+        CommandModeObjective::new, CoreItemObjective::new, DestroyCoreObjective::new, DestroyUnitsObjective::new
     };
 
     public static Prov<ObjectiveMarker>[] allMarkerTypes = new Prov[]{
@@ -139,6 +139,28 @@ public class MapObjectives{
         @Override
         public boolean complete(){
             return state.rules.defaultTeam.data().countType(unit) >= count;
+        }
+    }
+
+    /** Produce a certain amount of units. */
+    public static class DestroyUnitsObjective extends MapObjective{
+        public int count = 1;
+
+        public DestroyUnitsObjective(int count){
+            this.count = count;
+        }
+
+        public DestroyUnitsObjective(){
+        }
+
+        @Override
+        public String text(){
+            return Core.bundle.format("objective.destroyunits", count);
+        }
+
+        @Override
+        public boolean complete(){
+            return state.stats.enemyUnitsDestroyed >= count;
         }
     }
 

@@ -187,6 +187,34 @@ public class Logic implements ApplicationListener{
                 e.core.team.data().destroyToDerelict();
             }
         }));
+
+        Events.on(BlockBuildEndEvent.class, e -> {
+            if(e.team == state.rules.defaultTeam){
+                if(e.breaking){
+                    state.stats.buildingsDeconstructed++;
+                }else{
+                    state.stats.buildingsBuilt++;
+                }
+            }
+        });
+
+        Events.on(BlockDestroyEvent.class, e -> {
+            if(e.tile.team() == state.rules.defaultTeam){
+                state.stats.buildingsDestroyed ++;
+            }
+        });
+
+        Events.on(UnitDestroyEvent.class, e -> {
+            if(e.unit.team() != state.rules.defaultTeam){
+                state.stats.enemyUnitsDestroyed ++;
+            }
+        });
+
+        Events.on(UnitCreateEvent.class, e -> {
+            if(e.unit.team == state.rules.defaultTeam){
+                state.stats.unitsCreated++;
+            }
+        });
     }
 
     /** Adds starting items, resets wave time, and sets state to playing. */
