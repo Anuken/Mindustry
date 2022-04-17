@@ -178,9 +178,7 @@ public class Fonts{
         }
 
         for(Team team : Team.baseTeams){
-            if(Core.atlas.has("team-" + team.name)){
-                team.emoji = stringIcons.get(team.name, "");
-            }
+            team.emoji = stringIcons.get(team.name, "");
         }
     }
 
