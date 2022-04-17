@@ -11,6 +11,7 @@ import mindustry.mod.*;
 import mindustry.mod.Mods.*;
 import mindustry.net.Net;
 import mindustry.net.*;
+import mindustry.ui.*;
 
 import java.time.*;
 
@@ -40,7 +41,7 @@ public class ServerLauncher implements ApplicationListener{
     @Override
     public void init(){
         Core.settings.setDataDirectory(Core.files.local("config"));
-        loadLocales = false;
+//        loadLocales = false;
         headless = true;
 
         Vars.loadSettings();
@@ -49,6 +50,7 @@ public class ServerLauncher implements ApplicationListener{
         mods.loadScripts();
         content.createModContent();
         content.init();
+        Fonts.loadContentIconsHeadless();
         if(mods.hasContentErrors()){
             err("Error occurred loading mod content:");
             for(LoadedMod mod : mods.list()){
