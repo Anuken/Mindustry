@@ -95,7 +95,8 @@ public class Pathfinder implements Runnable{
                 tiles[i] = packTile(tile);
             }
 
-            if(state.rules.waveTeam.needsFlowField()){
+            //don't bother setting up paths unless necessary
+            if(state.rules.waveTeam.needsFlowField() && !net.client()){
                 preloadPath(getField(state.rules.waveTeam, costGround, fieldCore));
 
                 //preload water on naval maps
