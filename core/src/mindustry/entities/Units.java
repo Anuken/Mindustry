@@ -211,7 +211,7 @@ public class Units{
         buildResult = null;
         cdist = 0f;
 
-        var buildings = team.data().buildings;
+        var buildings = team.data().buildingTree;
         if(buildings == null) return null;
         buildings.intersect(wx - range, wy - range, range*2f, range*2f, b -> {
             if(pred.get(b)){
@@ -466,7 +466,7 @@ public class Units{
                 if(other.tree().any(x, y, width, height)){
                     return true;
                 }
-                if(other.turrets != null && other.turrets.any(x, y, width, height)){
+                if(other.turretTree != null && other.turretTree.any(x, y, width, height)){
                     return true;
                 }
             }

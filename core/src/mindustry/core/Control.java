@@ -216,9 +216,8 @@ public class Control implements ApplicationListener, Loadable{
                     float unitsPerTick = 1f;
 
                     boolean anyBuilds = false;
-                    for(Tile tile : world.tiles){
-                        var build = tile.build;
-                        if(!(build instanceof CoreBuild) && build != null && build.team == state.rules.defaultTeam){
+                    for(var build : state.rules.defaultTeam.data().buildings){
+                        if(!(build instanceof CoreBuild)){
                             var ccore = build.closestCore();
 
                             if(ccore != null && build.within(ccore, state.rules.enemyCoreBuildRadius)){

@@ -70,8 +70,8 @@ public class BlockIndexer{
             for(Team team : Team.all){
                 var data = state.teams.get(team);
                 if(data != null){
-                    if(data.buildings != null) data.buildings.clear();
-                    if(data.turrets != null) data.turrets.clear();
+                    if(data.buildingTree != null) data.buildingTree.clear();
+                    if(data.turretTree != null) data.turretTree.clear();
                 }
             }
 
@@ -113,17 +113,20 @@ public class BlockIndexer{
                 }
             }
 
+            //no longer part of the building list
+            data.buildings.remove(tile.build);
+
             //update the unit cap when building is removed
             data.unitCap -= tile.block().unitCapModifier;
 
             //unregister building from building quadtree
-            if(data.buildings != null){
-                data.buildings.remove(build);
+            if(data.buildingTree != null){
+                data.buildingTree.remove(build);
             }
 
             //remove indexed turret
-            if(data.turrets != null && build.block.attacks){
-                data.turrets.remove(build);
+            if(data.turretTree != null && build.block.attacks){
+                data.turretTree.remove(build);
             }
 
             //is no longer registered
@@ -230,7 +233,7 @@ public class BlockIndexer{
         }else{
             breturnArray.clear();
 
-            var buildings = team.data().buildings;
+            var buildings = team.data().buildingTree;
             if(buildings == null) return false;
             buildings.intersect(wx - range, wy - range, range*2f, range*2f, b -> {
                 if(b.within(wx, wy, range + b.hitSize() / 2f) && pred.get(b)){
@@ -256,7 +259,7 @@ public class BlockIndexer{
 
         breturnArray.clear();
 
-        var buildings = team.data().buildings;
+        var buildings = team.data().buildingTree;
         if(buildings == null) return false;
         buildings.intersect(rect, b -> {
             if(pred.get(b)){
@@ -324,7 +327,7 @@ public class BlockIndexer{
         breturnArray.clear();
         for(int i = 0; i < activeTeams.size; i++){
             Team team = activeTeams.items[i];
-            var buildings = team.data().buildings;
+            var buildings = team.data().buildingTree;
             if(buildings == null) continue;
             buildings.intersect(x - range, y - range, range*2f, range*2f, breturnArray);
         }
@@ -374,7 +377,7 @@ public class BlockIndexer{
     public Building findTile(Team team, float x, float y, float range, Boolf<Building> pred, boolean usePriority){
         Building closest = null;
         float dst = 0;
-        var buildings = team.data().buildings;
+        var buildings = team.data().buildingTree;
         if(buildings == null) return null;
 
         breturnArray.clear();
@@ -444,6 +447,9 @@ public class BlockIndexer{
                 }
             }
 
+            //record in list of buildings
+            data.buildings.add(tile.build);
+
             //update the unit cap when new tile is registered
             data.unitCap += tile.block().unitCapModifier;
 
@@ -452,17 +458,17 @@ public class BlockIndexer{
             }
 
             //insert the new tile into the quadtree for targeting
-            if(data.buildings == null){
-                data.buildings = new QuadTree<>(new Rect(0, 0, world.unitWidth(), world.unitHeight()));
+            if(data.buildingTree == null){
+                data.buildingTree = new QuadTree<>(new Rect(0, 0, world.unitWidth(), world.unitHeight()));
             }
-            data.buildings.insert(tile.build);
+            data.buildingTree.insert(tile.build);
 
             if(tile.block().attacks && tile.build instanceof Ranged){
-                if(data.turrets == null){
-                    data.turrets = new TurretQuadtree(new Rect(0, 0, world.unitWidth(), world.unitHeight()));
+                if(data.turretTree == null){
+                    data.turretTree = new TurretQuadtree(new Rect(0, 0, world.unitWidth(), world.unitHeight()));
                 }
 
-                data.turrets.insert(tile.build);
+                data.turretTree.insert(tile.build);
             }
 
             notifyBuildDamaged(tile.build);

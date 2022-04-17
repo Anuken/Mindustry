@@ -147,12 +147,12 @@ public class Teams{
         for(Team team : Team.all){
             TeamData data = team.data();
 
-            data.presentFlag = false;
+            data.presentFlag = data.buildings.size > 0;
             data.unitCount = 0;
             data.units.clear();
             data.players.clear();
-            if(data.tree != null){
-                data.tree.clear();
+            if(data.unitTree != null){
+                data.unitTree.clear();
             }
 
             if(data.typeCounts != null){
@@ -169,9 +169,7 @@ public class Teams{
             }
         }
 
-        //update presence flag.
-        Groups.build.each(b -> b.team.data().presentFlag = true);
-
+        //TODO this is slow and dumb
         for(Unit unit : Groups.unit){
             if(unit.type == null) continue;
             TeamData data = unit.team.data();
@@ -243,21 +241,23 @@ public class Teams{
         public Queue<BlockPlan> blocks = new Queue<>();
 
         /** Quadtree for all buildings of this team. Null if not active. */
-        public @Nullable QuadTree<Building> buildings;
+        public @Nullable QuadTree<Building> buildingTree;
         /** Turrets by range. Null if not active. */
-        public @Nullable QuadTree<Building> turrets;
+        public @Nullable QuadTree<Building> turretTree;
+        /** Quadtree for units of this team. Do not access directly. */
+        public @Nullable QuadTree<Unit> unitTree;
         /** Current unit cap. Do not modify externally. */
         public int unitCap;
         /** Total unit count. */
         public int unitCount;
         /** Counts for each type of unit. Do not access directly. */
         public @Nullable int[] typeCounts;
-        /** Quadtree for units of this team. Do not access directly. */
-        public @Nullable QuadTree<Unit> tree;
         /** Units of this team. Updated each frame. */
-        public Seq<Unit> units = new Seq<>();
+        public Seq<Unit> units = new Seq<>(false);
         /** Same as units, but players. */
-        public Seq<Player> players = new Seq<>();
+        public Seq<Player> players = new Seq<>(false);
+        /** All buildings. Updated on team change / building addition or removal. Includes even buildings that do not update(). */
+        public Seq<Building> buildings = new Seq<>(false);
         /** Units of this team by type. Updated each frame. */
         public @Nullable Seq<Unit>[] unitsByType;
 
@@ -270,8 +270,8 @@ public class Teams{
 
             //grab all buildings from quadtree.
             var builds = new Seq<Building>();
-            if(buildings != null){
-                buildings.getObjects(builds);
+            if(buildingTree != null){
+                buildingTree.getObjects(builds);
             }
 
             //no remaining blocks, cease building if applicable
@@ -294,8 +294,8 @@ public class Teams{
         /** Make all buildings within this range derelict / explode. */
         public void makeDerelict(float x, float y, float range){
             var builds = new Seq<Building>();
-            if(buildings != null){
-                buildings.intersect(x - range, y - range, range * 2f, range * 2f, builds);
+            if(buildingTree != null){
+                buildingTree.intersect(x - range, y - range, range * 2f, range * 2f, builds);
             }
 
             for(var build : builds){
@@ -308,8 +308,8 @@ public class Teams{
         /** Make all buildings within this range explode. */
         public void timeDestroy(float x, float y, float range){
             var builds = new Seq<Building>();
-            if(buildings != null){
-                buildings.intersect(x - range, y - range, range * 2f, range * 2f, builds);
+            if(buildingTree != null){
+                buildingTree.intersect(x - range, y - range, range * 2f, range * 2f, builds);
             }
 
             for(var build : builds){
@@ -344,8 +344,8 @@ public class Teams{
         }
 
         public QuadTree<Unit> tree(){
-            if(tree == null) tree = new QuadTree<>(Vars.world.getQuadBounds(new Rect()));
-            return tree;
+            if(unitTree == null) unitTree = new QuadTree<>(Vars.world.getQuadBounds(new Rect()));
+            return unitTree;
         }
 
         public int countType(UnitType type){
