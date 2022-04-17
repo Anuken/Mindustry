@@ -45,8 +45,7 @@ public class ControlPathfinder{
 
     costNaval = (team, tile) ->
     (PathTile.solid(tile) || !PathTile.liquid(tile) ? impassable : 1) +
-    (PathTile.nearGround(tile) || PathTile.nearSolid(tile) ? 2 : 0) +
-    (PathTile.deep(tile) ? 0 : 1);
+    (PathTile.nearGround(tile) || PathTile.nearSolid(tile) ? 6 : 0);
 
     public static boolean showDebug = false;
 
