@@ -164,11 +164,16 @@ public class CustomRulesDialog extends BaseDialog{
                 i -> true,
                 () -> rules.loadout.clear().add(new ItemStack(Items.copper, 100)),
                 () -> {}, () -> {}
-        )).left().width(300f);
-        main.row();
+        )).left().width(300f).row();
 
-        main.button("@bannedblocks", () -> showBanned("@bannedblocks", ContentType.block, rules.bannedBlocks, Block::canBeBuilt)).left().width(300f);
-        main.row();
+        main.button("@bannedblocks", () -> showBanned("@bannedblocks", ContentType.block, rules.bannedBlocks, Block::canBeBuilt)).left().width(300f).row();
+
+        //TODO objectives would be nice
+        if(experimental && false){
+            main.button("@objectives", () -> {
+
+            }).left().width(300f).row();
+        }
 
         title("@rules.title.unit");
         check("@rules.unitammo", b -> rules.unitAmmo = b, () -> rules.unitAmmo);
@@ -177,8 +182,7 @@ public class CustomRulesDialog extends BaseDialog{
         number("@rules.unitdamagemultiplier", f -> rules.unitDamageMultiplier = f, () -> rules.unitDamageMultiplier);
         number("@rules.unitbuildspeedmultiplier", f -> rules.unitBuildSpeedMultiplier = f, () -> rules.unitBuildSpeedMultiplier, 0f, 50f);
 
-        main.button("@bannedunits", () -> showBanned("@bannedunits", ContentType.unit, rules.bannedUnits, u -> !u.isHidden())).left().width(300f);
-        main.row();
+        main.button("@bannedunits", () -> showBanned("@bannedunits", ContentType.unit, rules.bannedUnits, u -> !u.isHidden())).left().width(300f).row();
 
         title("@rules.title.enemy");
         check("@rules.attack", b -> rules.attackMode = b, () -> rules.attackMode);
