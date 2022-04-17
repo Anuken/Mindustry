@@ -450,6 +450,7 @@ public class SettingsMenuDialog extends BaseDialog{
         }
 
         graphics.checkPref("skipcoreanimation", false);
+        graphics.checkPref("hidedisplays", false);
 
         if(!mobile){
             Core.settings.put("swapdiagonal", false);

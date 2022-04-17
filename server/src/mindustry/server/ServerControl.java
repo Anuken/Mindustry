@@ -54,7 +54,7 @@ public class ServerControl implements ApplicationListener{
     };
 
     private Fi currentLogFile;
-    private boolean inExtraRound;
+    private boolean inGameOverWait;
     private Task lastTask;
     private Gamemode lastMode;
     private @Nullable Map nextMapOverride;
@@ -168,7 +168,7 @@ public class ServerControl implements ApplicationListener{
         }
 
         Events.on(GameOverEvent.class, event -> {
-            if(inExtraRound) return;
+            if(inGameOverWait) return;
             if(state.rules.waves){
                 info("Game over! Reached wave @ with @ players online on map @.", state.wave, Groups.player.size(), Strings.capitalize(Strings.stripColors(state.map.name())));
             }else{
@@ -915,7 +915,7 @@ public class ServerControl implements ApplicationListener{
             }
 
             info("Core destroyed.");
-            inExtraRound = false;
+            inGameOverWait = false;
             Events.fire(new GameOverEvent(state.rules.waveTeam));
         });
 
@@ -1003,8 +1003,12 @@ public class ServerControl implements ApplicationListener{
         }
     }
 
+    public void setNextMap(Map map){
+        nextMapOverride = map;
+    }
+
     private void play(boolean wait, Runnable run){
-        inExtraRound = true;
+        inGameOverWait = true;
         Runnable r = () -> {
             WorldReloader reloader = new WorldReloader();
 
@@ -1016,7 +1020,7 @@ public class ServerControl implements ApplicationListener{
             logic.play();
 
             reloader.end();
-            inExtraRound = false;
+            inGameOverWait = false;
         };
 
         if(wait){

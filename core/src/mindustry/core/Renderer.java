@@ -46,7 +46,7 @@ public class Renderer implements ApplicationListener{
     public @Nullable Bloom bloom;
     public @Nullable FrameBuffer backgroundBuffer;
     public FrameBuffer effectBuffer = new FrameBuffer();
-    public boolean animateShields, drawWeather = true, drawStatus, enableEffects;
+    public boolean animateShields, drawWeather = true, drawStatus, enableEffects, drawDisplays = true;
     public float weatherAlpha;
     /** minZoom = zooming out, maxZoom = zooming in */
     public float minZoom = 1.5f, maxZoom = 6f;
@@ -171,6 +171,7 @@ public class Renderer implements ApplicationListener{
         animateShields = settings.getBool("animatedshields");
         drawStatus = Core.settings.getBool("blockstatus");
         enableEffects = settings.getBool("effects");
+        drawDisplays = !settings.getBool("hidedisplays");
 
         if(landTime > 0){
             if(!state.isPaused()){

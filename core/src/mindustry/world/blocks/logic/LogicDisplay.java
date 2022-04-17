@@ -6,6 +6,7 @@ import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -59,6 +60,9 @@ public class LogicDisplay extends Block{
         public void draw(){
             super.draw();
 
+            //don't even bother processing anything when displays are off.
+            if(!Vars.renderer.drawDisplays) return;
+
             Draw.draw(Draw.z(), () -> {
                 if(buffer == null){
                     buffer = new FrameBuffer(displaySize, displaySize);
@@ -68,6 +72,7 @@ public class LogicDisplay extends Block{
                 }
             });
 
+            //don't bother processing commands if displays are off
             if(!commands.isEmpty()){
                 Draw.draw(Draw.z(), () -> {
                     Tmp.m1.set(Draw.proj());

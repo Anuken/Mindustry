@@ -338,55 +338,60 @@ public class WaveInfoDialog extends BaseDialog{
                                     setColor(Color.white);
                                 }}).width(300f).height(44f);
                             }).row();
+                        }
 
-                            t.table(a -> {
-                                a.add("spawn: ");
+                        t.table(a -> {
+                            a.add("@waves.spawn").padRight(8);
 
-                                a.button("", () -> {
-                                    if(!checkedSpawns){
-                                        //recalculate waves when changed
-                                        Vars.spawner.reset();
-                                        checkedSpawns = true;
+                            a.button("", () -> {
+                                if(!checkedSpawns){
+                                    //recalculate waves when changed
+                                    Vars.spawner.reset();
+                                    checkedSpawns = true;
+                                }
+
+                                BaseDialog dialog = new BaseDialog("@waves.spawn.select");
+                                dialog.cont.pane(p -> {
+                                    p.background(Tex.button).margin(10f);
+                                    int i = 0;
+                                    int cols = 4;
+                                    int max = 20;
+
+                                    if(spawner.getSpawns().size >= max){
+                                        p.add("[lightgray](first " + max + ")").colspan(cols).padBottom(4).row();
                                     }
 
-                                    BaseDialog dialog = new BaseDialog("Spawn Select");
-                                    dialog.cont.pane(p -> {
-                                        p.background(Tex.button).margin(10f);
-                                        int i = 0;
-                                        int cols = 4;
-                                        int max = 20;
+                                    for(var spawn : spawner.getSpawns()){
+                                        p.button(spawn.x + ", " + spawn.y, Styles.clearTogglet, () -> {
+                                            group.spawn = Point2.pack(spawn.x, spawn.y);
+                                            dialog.hide();
+                                        }).size(110f, 45f).checked(spawn.pos() == group.spawn);
 
-                                        if(spawner.getSpawns().size >= max){
-                                            p.add("[lightgray](first " + max + ")").colspan(cols).padBottom(4).row();
+                                        if(++i % cols == 0){
+                                            p.row();
                                         }
 
-                                        for(var spawn : spawner.getSpawns()){
-                                            p.button(spawn.x + ", " + spawn.y, Styles.clearTogglet, () -> {
-                                                group.spawn = Point2.pack(spawn.x, spawn.y);
-                                                dialog.hide();
-                                            }).size(110f, 45f).checked(spawn.pos() == group.spawn);
-
-                                            if(++i % cols == 0){
-                                                p.row();
-                                            }
-
-                                            //only display first 20 spawns, you don't need to see more.
-                                            if(i >= 20){
-                                                break;
-                                            }
+                                        //only display first 20 spawns, you don't need to see more.
+                                        if(i >= 20){
+                                            break;
                                         }
+                                    }
 
-                                        if(spawner.getSpawns().isEmpty()){
-                                            p.add("[scarlet]no spawns found in map");
-                                        }
-                                    });
-                                    dialog.setFillParent(false);
-                                    dialog.addCloseButton();
-                                    dialog.show();
-                                }).width(160f).height(36f).get().getLabel().setText(() -> group.spawn == -1 ? "<all>" : Point2.x(group.spawn) + ", " + Point2.y(group.spawn));
+                                    p.button("@waves.spawn.all", Styles.clearTogglet, () -> {
+                                        group.spawn = -1;
+                                        dialog.hide();
+                                    }).size(110f, 45f).checked(-1 == group.spawn);
 
-                            }).padBottom(8f).row();
-                        }
+                                    if(spawner.getSpawns().isEmpty()){
+                                        p.add("@waves.spawn.none");
+                                    }
+                                });
+                                dialog.setFillParent(false);
+                                dialog.addCloseButton();
+                                dialog.show();
+                            }).width(160f).height(36f).get().getLabel().setText(() -> group.spawn == -1 ? "@waves.spawn.all" : Point2.x(group.spawn) + ", " + Point2.y(group.spawn));
+
+                        }).padBottom(8f).row();
                     }
                 }).width(340f).pad(8);
 
