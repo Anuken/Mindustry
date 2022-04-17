@@ -156,7 +156,13 @@ public class SectorPresets{
                     ),
                     new CommandModeObjective().withMarkers(
                         new TextMarker("Hold [accent]shift[] to enter [accent]command mode[].\n[accent]Left-click and drag[] to select units.\n[accent]Right-click[] to order your selected units to move or attack.", 258f * 8f, 116f * 8f)
-                    )
+                    ),
+                    new BuildCountObjective(Blocks.breach, 1).withMarkers(
+                            new TextMarker("Units are effective, but [accent]turrets[] provide better defensive capabilities if used effectively.\n Place a [accent]Breach[] turret.\nTurrets require [accent]ammo[].", 276f * 8f, 133f * 8f)
+                    ),
+                    new BuildCountObjective(Blocks.berylliumWall, 6).withMarkers(
+                            new TextMarker("[accent]Walls[] can prevent oncoming damage from reaching your buildings\nPlace some [accent]beryllium walls[] around the turret.", 276f * 8f, 133f * 8f)
+                    ).withFlags("defDone")
                 );
             };
         }};
