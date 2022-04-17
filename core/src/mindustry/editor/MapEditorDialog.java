@@ -348,10 +348,19 @@ public class MapEditorDialog extends Dialog implements Disposable{
             Core.app.post(() -> ui.showErrorMessage("@editor.save.noname"));
         }else{
             Map map = maps.all().find(m -> m.name().equals(name));
-            if(map != null && !map.custom){
+            if(map != null && !map.custom && !map.workshop){
                 handleSaveBuiltin(map);
             }else{
+                boolean workshop = false;
+                //try to preserve Steam ID
+                if(map != null && map.tags.containsKey("steamid")){
+                    editor.tags.put("steamid", map.tags.get("steamid"));
+                    workshop = true;
+                }
                 returned = maps.saveMap(editor.tags);
+                if(workshop){
+                    returned.workshop = workshop;
+                }
                 ui.showInfoFade("@editor.saved");
             }
         }

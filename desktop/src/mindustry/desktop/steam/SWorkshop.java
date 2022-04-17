@@ -69,14 +69,7 @@ public class SWorkshop implements SteamUGCCallback{
             return;
         }
 
-        showPublish(id -> update(p, id, null));
-    }
-
-    /** Update an existing item with a changelog. */
-    public void updateItem(Publishable p, String changelog){
-        String id = p.getSteamID();
-        long handle = Strings.parseLong(id, -1);
-        update(p, new SteamPublishedFileID(handle), changelog);
+        showPublish(id -> update(p, id, null, true));
     }
 
     /** Fetches info for an item, checking to make sure that it exists.*/
@@ -113,6 +106,12 @@ public class SWorkshop implements SteamUGCCallback{
                                 cont.row();
                                 TextArea field = cont.area("", t -> {}).size(500f, 160f).get();
                                 field.setMaxLength(400);
+                                cont.row();
+
+                                boolean[] updatedesc = {false};
+
+                                cont.check("@updatedesc", b -> updatedesc[0] = b).pad(4);
+
                                 buttons.defaults().size(120, 54).pad(4);
                                 buttons.button("@ok", () -> {
                                     if(!p.prePublish()){
@@ -121,7 +120,7 @@ public class SWorkshop implements SteamUGCCallback{
                                     }
 
                                     ui.loadfrag.show("@publishing");
-                                    updateItem(p, field.getText().replace("\r", "\n"));
+                                    SWorkshop.this.update(p, new SteamPublishedFileID(Strings.parseLong(p.getSteamID(), -1)), field.getText().replace("\r", "\n"), updatedesc[0]);
                                     dialog.hide();
                                     hide();
                                 });
@@ -149,19 +148,21 @@ public class SWorkshop implements SteamUGCCallback{
         SVars.net.friends.activateGameOverlayToWebPage("steam://url/CommunityFilePage/" + id.handle());
     }
 
-    void update(Publishable p, SteamPublishedFileID id, String changelog){
+    void update(Publishable p, SteamPublishedFileID id, String changelog, boolean updateDescription){
         Log.info("Calling update(@) @", p.steamTitle(), id.handle());
         String sid = id.handle() + "";
 
         updateItem(id, h -> {
-            if(p.steamDescription() != null){
-                ugc.setItemDescription(h, p.steamDescription());
+            if(updateDescription){
+                ugc.setItemTitle(h, p.steamTitle());
+                if(p.steamDescription() != null){
+                    ugc.setItemDescription(h, p.steamDescription());
+                }
             }
 
             Seq<String> tags = p.extraTags();
             tags.add(p.steamTag());
 
-            ugc.setItemTitle(h, p.steamTitle());
             ugc.setItemTags(h, tags.toArray(String.class));
             ugc.setItemPreview(h, p.createSteamPreview(sid).absolutePath());
             ugc.setItemContent(h, p.createSteamFolder(sid).absolutePath());
