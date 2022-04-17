@@ -412,6 +412,9 @@ public class SettingsMenuDialog extends BaseDialog{
         graphics.checkPref("minimap", !mobile);
         graphics.checkPref("smoothcamera", true);
         graphics.checkPref("position", false);
+        if(!mobile){
+            graphics.checkPref("mouseposition", false);
+        }
         graphics.checkPref("fps", false);
         graphics.checkPref("playerindicators", true);
         graphics.checkPref("indicators", true);

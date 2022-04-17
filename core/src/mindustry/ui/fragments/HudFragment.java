@@ -104,11 +104,12 @@ public class HudFragment{
             t.add(new Minimap()).name("minimap");
             t.row();
             //position
-            // + (mobile ? "" : "\n[lightgray]" + World.toTile(Core.input.mouseWorldX()) + "," + World.toTile(Core.input.mouseWorldY()))
-            t.label(() -> player.tileX() + "," + player.tileY())
-            .visible(() -> Core.settings.getBool("position"))
-            //.right().labelAlign(Align.right)
+            t.label(() ->
+                (Core.settings.getBool("position") ? player.tileX() + "," + player.tileY() + "\n" : "") +
+                (Core.settings.getBool("mouseposition") ? "[lightgray]" + World.toTile(Core.input.mouseWorldX()) + "," + World.toTile(Core.input.mouseWorldY()) : ""))
+            .visible(() -> Core.settings.getBool("position") || Core.settings.getBool("mouseposition"))
             .touchable(Touchable.disabled)
+            .style(Styles.outlineLabel)
             .name("position");
             t.top().right();
         });
