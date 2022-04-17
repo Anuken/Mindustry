@@ -133,7 +133,7 @@ public class SectorPresets{
                         new ShapeTextMarker("To [accent]power[] the plasma bore, research and place a [accent]beam node[].\nConnect the turbine condenser to the plasma bore.", 254f * 8f, 267f * 8f)
                     ),
                     new CoreItemObjective(Items.beryllium, 5).withMarkers(
-                        new TextMarker("Once the plasma bore is powered, the next step is to route the resources to the core.\nUnlock and place [accent]ducts[] to move the mined resources to the core", 236f * 8f, 278f * 8f)
+                        new TextMarker("Once the plasma bore is powered, the next step is to route the resources to the core.\nResearch and place [accent]ducts[] to move the mined resources to the core.", 236f * 8f, 278f * 8f)
                     ),
                     new CoreItemObjective(Items.beryllium, 200).withMarkers(
                         new TextMarker("Expand your mining operation!\nPlace more plasma bores and use beam nodes and ducts to support them.", 253f * 8f, 282f * 8f),

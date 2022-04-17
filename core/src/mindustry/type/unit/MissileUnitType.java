@@ -33,6 +33,7 @@ public class MissileUnitType extends UnitType{
         range = 6f;
         targetPriority = -1f;
         outlineColor = Pal.darkOutline;
+        fogRadius = 2f;
         //TODO weapon configs, etc?
     }
 }

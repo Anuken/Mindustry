@@ -572,17 +572,18 @@ public class ServerControl implements ApplicationListener{
             if(arg.length == 0){
                 info("All config values:");
                 for(Config c : Config.all){
-                    info("&lk| @: @", c.name(), "&lc&fi" + c.get());
+                    info("&lk| @: @", c.name, "&lc&fi" + c.get());
                     info("&lk| | &lw" + c.description);
                     info("&lk|");
                 }
                 return;
             }
 
-            try{
-                Config c = Config.valueOf(arg[0]);
+            Config c = Config.all.find(conf -> conf.name.equalsIgnoreCase(arg[0]));
+
+            if(c != null){
                 if(arg.length == 1){
-                    info("'@' is currently @.", c.name(), c.get());
+                    info("'@' is currently @.", c.name, c.get());
                 }else{
                     if(arg[1].equals("default")){
                         c.set(c.defaultValue);
@@ -599,10 +600,10 @@ public class ServerControl implements ApplicationListener{
                         c.set(arg[1].replace("\\n", "\n"));
                     }
 
-                    info("@ set to @.", c.name(), c.get());
+                    info("@ set to @.", c.name, c.get());
                     Core.settings.forceSave();
                 }
-            }catch(IllegalArgumentException e){
+            }else{
                 err("Unknown config: '@'. Run the command with no arguments to get a list of valid configs.", arg[0]);
             }
         });
