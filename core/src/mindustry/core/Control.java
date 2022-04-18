@@ -217,7 +217,7 @@ public class Control implements ApplicationListener, Loadable{
 
                     boolean anyBuilds = false;
                     for(var build : state.rules.defaultTeam.data().buildings){
-                        if(!(build instanceof CoreBuild)){
+                        if(!(build instanceof CoreBuild) && !build.block.privileged){
                             var ccore = build.closestCore();
 
                             if(ccore != null && build.within(ccore, state.rules.enemyCoreBuildRadius)){

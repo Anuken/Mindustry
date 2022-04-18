@@ -385,7 +385,7 @@ public class FloorRenderer{
                 }
             }
 
-            Log.debug("Time to cache: @", Time.elapsed());
+            Log.debug("Generated world mesh: @ms", Time.elapsed());
         }
     }
 

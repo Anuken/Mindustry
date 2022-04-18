@@ -98,10 +98,12 @@ public class Pathfinder implements Runnable{
             //don't bother setting up paths unless necessary
             if(state.rules.waveTeam.needsFlowField() && !net.client()){
                 preloadPath(getField(state.rules.waveTeam, costGround, fieldCore));
+                Log.debug("Preloading ground enemy flowfield.");
 
                 //preload water on naval maps
                 if(spawner.getSpawns().contains(t -> t.floor().isLiquid)){
                     preloadPath(getField(state.rules.waveTeam, costNaval, fieldCore));
+                    Log.debug("Preloading naval enemy flowfield.");
                 }
 
             }
