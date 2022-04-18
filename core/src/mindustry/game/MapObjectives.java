@@ -170,7 +170,8 @@ public class MapObjectives{
         public float countup;
         public float duration = 60f * 30f;
 
-        public TimerObjective(float duration){
+        public TimerObjective(String text, float duration){
+            this.text = text;
             this.duration = duration;
         }
 
