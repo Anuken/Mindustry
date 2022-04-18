@@ -313,7 +313,7 @@ public class Block extends UnlockableContent implements Senseable{
     /** Configuration handlers by type. */
     public ObjectMap<Class<?>, Cons2> configurations = new ObjectMap<>();
     /** Consumption filters. */
-    public boolean[] itemFilter, liquidFilter;
+    public boolean[] itemFilter = {}, liquidFilter = {};
     /** Array of consumers used by this block. Only populated after init(). */
     public Consume[] consumers = {}, optionalConsumers = {}, nonOptionalConsumers = {}, updateConsumers = {};
     /** Set to true if this block has any consumers in its array. */

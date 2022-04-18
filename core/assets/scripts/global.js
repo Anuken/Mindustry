@@ -49,9 +49,6 @@ function extend(/*Base, ..., def*/){
     return instance
 }
 
-//For backwards compatibility, use extend instead
-const extendContent = extend;
-
 importPackage(Packages.arc)
 importPackage(Packages.arc.audio)
 importPackage(Packages.arc.func)

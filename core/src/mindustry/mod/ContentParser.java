@@ -137,7 +137,7 @@ public class ContentParser{
             }
             var bc = resolve(data.getString("type", ""), DrawDefault.class);
             data.remove("type");
-            var result = make(bc);
+            DrawBlock result = make(bc);
             readFields(result, data);
             return result;
         });

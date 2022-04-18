@@ -8,4 +8,8 @@ public class ConsumeCoolant extends ConsumeLiquidFilter{
         this.filter = liquid -> liquid.coolant && liquid.temperature <= maxTemp && liquid.flammability < maxFlammability;
         this.amount = amount;
     }
+
+    public ConsumeCoolant(){
+        this(1f);
+    }
 }

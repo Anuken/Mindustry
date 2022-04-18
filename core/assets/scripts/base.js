@@ -46,6 +46,3 @@ function extend(/*Base, ..., def*/){
     }
     return instance
 }
-
-//For backwards compatibility, use extend instead
-const extendContent = extend;
