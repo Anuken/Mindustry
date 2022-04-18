@@ -17,7 +17,8 @@ import static mindustry.Vars.*;
 public class MapObjectives{
     public static Prov<MapObjective>[] allObjectiveTypes = new Prov[]{
         ResearchObjective::new, BuildCountObjective::new, UnitCountObjective::new, ItemObjective::new,
-        CommandModeObjective::new, CoreItemObjective::new, DestroyCoreObjective::new, DestroyUnitsObjective::new
+        CommandModeObjective::new, CoreItemObjective::new, DestroyCoreObjective::new, DestroyUnitsObjective::new,
+        TimerObjective::new
     };
 
     public static Prov<ObjectiveMarker>[] allMarkerTypes = new Prov[]{
@@ -161,6 +162,48 @@ public class MapObjectives{
         @Override
         public boolean complete(){
             return state.stats.enemyUnitsDestroyed >= count;
+        }
+    }
+
+    public static class TimerObjective extends MapObjective{
+        public String text;
+        public float countup;
+        public float duration = 60f * 30f;
+
+        public TimerObjective(float duration){
+            this.duration = duration;
+        }
+
+        public TimerObjective(){
+        }
+
+        @Override
+        public boolean complete(){
+            return countup >= duration;
+        }
+
+        @Override
+        public void update(){
+            countup += Time.delta;
+        }
+
+        @Override
+        public void reset(){
+            countup = 0f;
+        }
+
+        @Nullable
+        @Override
+        public String text(){
+            if(text != null){
+                int time = (int)((duration - countup) / 60f);
+                if(text.startsWith("@")){
+                    return Core.bundle.format(text.substring(1), time);
+                }else{
+                    return Core.bundle.formatString(text, time);
+                }
+            }
+            return text;
         }
     }
 
