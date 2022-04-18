@@ -22,41 +22,33 @@ import java.util.concurrent.Executors
 def genFolder = "../core/assets-raw/sprites_out/generated/"
 def doAntialias = !project.hasProperty("disableAntialias")
 def enableAA = true
-//on my machine, I have a native Nim AA implementation that is ~10x faster
-//it's not compiled for other platforms so they don't get it
-def useFastAA = project.hasProperty("fastAA") || System.getProperty("user.name") == "anuke"
 
 @groovy.transform.CompileStatic
-private def antialias(File file, boolean doAntialias, boolean useFastAA){
-    if(!doAntialias) return
+static int getRGB(Pixmap image, int ix, int iy) {
+    return image.getRaw(Math.max(Math.min(ix, image.width - 1), 0), Math.max(Math.min(iy, image.height - 1), 0))
+}
 
-    if(useFastAA){
-        "antialias ${file.absolutePath}".execute().waitFor()
-        return
-    }
+@groovy.transform.CompileStatic
+static void antialias(File file){
+    Pixmap image = new Pixmap(new Fi(file))
+    Pixmap out = image.copy()
 
-    def image = new Pixmap(new Fi(file))
-    def out = image.copy()
-    def getRGB = { int ix, int iy ->
-        return image.getRaw(Math.max(Math.min(ix, image.width - 1), 0), Math.max(Math.min(iy, image.height - 1), 0))
-    }
-
-    def color = new Color()
-    def sum = new Color()
-    def suma = new Color()
+    Color color = new Color()
+    Color sum = new Color()
+    Color suma = new Color()
     int[] p = new int[9]
 
     for(int x = 0; x < image.width; x++){
         for(int y = 0; y < image.height; y++){
-            int A = getRGB(x - 1, y + 1),
-                B = getRGB(x, y + 1),
-                C = getRGB(x + 1, y + 1),
-                D = getRGB(x - 1, y),
-                E = getRGB(x, y),
-                F = getRGB(x + 1, y),
-                G = getRGB(x - 1, y - 1),
-                H = getRGB(x, y - 1),
-                I = getRGB(x + 1, y - 1)
+            int A = getRGB(image, x - 1, y + 1),
+                B = getRGB(image, x, y + 1),
+                C = getRGB(image, x + 1, y + 1),
+                D = getRGB(image, x - 1, y),
+                E = getRGB(image, x, y),
+                F = getRGB(image, x + 1, y),
+                G = getRGB(image, x - 1, y - 1),
+                H = getRGB(image, x, y - 1),
+                I = getRGB(image, x + 1, y - 1)
 
             Arrays.fill(p, E)
 
@@ -73,10 +65,11 @@ private def antialias(File file, boolean doAntialias, boolean useFastAA){
 
             for(int val : p){
                 color.rgba8888(val)
-                suma.r += color.r * color.a
-                suma.g += color.g * color.a
-                suma.b += color.b * color.a
-                suma.a += color.a
+                color.premultiplyAlpha()
+                suma.r(suma.r + color.r)
+                suma.g(suma.g + color.g)
+                suma.b(suma.b + color.b)
+                suma.a(suma.a + color.a)
             }
 
             float fm = suma.a <= 0.001f ? 0f : (float)(1f / suma.a)
@@ -89,10 +82,10 @@ private def antialias(File file, boolean doAntialias, boolean useFastAA){
                 color.rgba8888(val)
                 float a = color.a
                 color.lerp(suma, (float) (1f - a))
-                sum.r += color.r
-                sum.g += color.g
-                sum.b += color.b
-                sum.a += a
+                sum.r(sum.r + color.r)
+                sum.g(sum.g + color.g)
+                sum.b(sum.b + color.b)
+                sum.a(sum.a + a)
                 total += 1f
             }
 
@@ -159,7 +152,7 @@ task pack(dependsOn: [classes, configurations.runtimeClasspath]){
         }
 
         if(enableAA){
-            ExecutorService executor = Executors.newFixedThreadPool(16)
+            ExecutorService executor = Executors.newFixedThreadPool(OS.cores)
             long ms = System.currentTimeMillis()
 
             //antialias everything except UI elements
@@ -167,13 +160,13 @@ task pack(dependsOn: [classes, configurations.runtimeClasspath]){
                 if(file.isDirectory() || (file.toString().replace("\\", "/").contains("/ui/") && file.toString().startsWith("icon-")) || file.toString().contains(".9.png") || file.toString().contains("aaaa")) return
 
                 executor.submit{
-                    antialias(file.file, doAntialias, useFastAA)
+                    antialias(file.file)
                 }
             }
 
             Threads.await(executor)
 
-            println "Time taken for AA: ${(System.currentTimeMillis() - ms) / 1000f}"
+            println "Time taken for AA: ${(System.currentTimeMillis() - ms) / 1000f} seconds"
         }
 
         println("\n\nPacking normal 4096 sprites...\n\n")

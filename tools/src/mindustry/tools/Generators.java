@@ -154,7 +154,7 @@ public class Generators{
         });
 
         generate("cliffs", () -> {
-            ExecutorService exec = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+            ExecutorService exec = Executors.newFixedThreadPool(OS.cores);
             int size = 64;
             int dark = new Color(0.5f, 0.5f, 0.6f, 1f).mul(0.98f).rgba();
             int mid = Color.lightGray.rgba();
