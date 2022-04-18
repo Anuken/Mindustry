@@ -37,7 +37,8 @@ public class UnitTypes{
 
     //legs
     public static @EntityDef({Unitc.class, Legsc.class}) UnitType corvus, atrax,
-    latum, bulwark, krepost;
+    latum, anthicus,
+    bulwark, krepost;
 
     //legs, legacy
     public static @EntityDef(value = {Unitc.class, Legsc.class}, legacy = true) UnitType spiroct, arkyid, toxopid;
@@ -2920,6 +2921,32 @@ public class UnitTypes{
                     damage = 38f;
                 }};
             }});
+        }};
+
+        anthicus = new ErekirUnitType("anthicus"){{
+            speed = 0.7f;
+            drag = 0.1f;
+            hitSize = 21f;
+            rotateSpeed = 3f;
+            health = 1100;
+            armor = 5f;
+
+            legCount = 6;
+            legLength = 18f;
+            lockLegBase = true;
+            legContinuousMove = true;
+            legExtension = -3f;
+            legBaseOffset = 7f;
+            maxStretch = 1.1f;
+            maxCompress = 0.2f;
+            legLengthScl = 0.95f;
+            legTrns = 0.7f;
+
+            legMoveSpace = 1f;
+            hovering = true;
+
+            visualElevation = 0.2f;
+            groundLayer = Layer.legUnit - 1f;
         }};
 
         bulwark = new ErekirUnitType("bulwark"){{

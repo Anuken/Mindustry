@@ -163,7 +163,9 @@ public class UnitType extends UnlockableContent{
     public float drownTimeMultiplier = 1f;
     public float engineOffset = 5f, engineSize = 2.5f;
     public @Nullable Color engineColor = null;
+    public @Nullable Color trailColor;
     public Color engineColorInner = Color.white;
+    public float engineLayer = -1f;
     public Seq<UnitEngine> engines = new Seq<>();
     public float strafePenalty = 0.5f;
     /** If false, this unit does not physically collide with others. */
@@ -856,8 +858,13 @@ public class UnitType extends UnlockableContent{
 
         if(drawBody) drawOutline(unit);
         drawWeaponOutlines(unit);
+        if(engineLayer > 0) Draw.z(engineLayer);
+        if(trailLength > 0 && !naval && unit.isFlying()){
+            drawTrail(unit);
+        }
         if(engineSize > 0) drawEngine(unit);
         if(engines.size > 0) drawEngines(unit);
+        Draw.z(z);
         if(drawBody) drawBody(unit);
         if(drawCell) drawCell(unit);
         drawWeapons(unit);
@@ -993,10 +1000,6 @@ public class UnitType extends UnlockableContent{
         float scale = unit.elevation;
         float offset = engineOffset/2f + engineOffset/2f*scale;
 
-        if(trailLength > 0 && !naval){
-            drawTrail(unit);
-        }
-
         Draw.color(engineColor == null ? unit.team.color : engineColor);
         Fill.circle(
             unit.x + Angles.trnsx(unit.rotation + 180, offset),
@@ -1017,7 +1020,7 @@ public class UnitType extends UnlockableContent{
             unit.trail = new Trail(trailLength);
         }
         Trail trail = unit.trail;
-        trail.draw(unit.team.color, (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f) * unit.elevation) * trailScl);
+        trail.draw(trailColor == null ? unit.team.color : trailColor, (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f) * unit.elevation) * trailScl);
     }
 
     public void drawEngines(Unit unit){
