@@ -127,7 +127,7 @@ public class SectorPresets{
                         new ShapeTextMarker("Place a [accent]turbine condenser[] on the vent.\nThis will generate [accent]power[].", 289f * 8f, 116f * 8f, 8f * 2.6f, 0f, 9f)
                     ),
                     new BuildCountObjective(Blocks.plasmaBore, 1).withMarkers(
-                        new ShapeTextMarker("Research and place a [accent]plasma bore[]. \nIt automatically mines resources from walls.", 293f * 8f, 113f * 8f, 4f * 2.6f, 45f, 60f)
+                        new ShapeTextMarker("Research and place a [accent]plasma bore[]. \nIt automatically mines resources from walls.", 293.5f * 8f, 113.5f * 8f, 4f * 2.6f, 45f, 60f)
                     ),
                     new BuildCountObjective(Blocks.beamNode, 1).withMarkers(
                         new ShapeTextMarker("To [accent]power[] the plasma bore, research and place a [accent]beam node[].\nConnect the turbine condenser to the plasma bore.", 294f * 8f, 116f * 8f)
@@ -158,11 +158,15 @@ public class SectorPresets{
                         new TextMarker("Hold [accent]shift[] to enter [accent]command mode[].\n[accent]Left-click and drag[] to select units.\n[accent]Right-click[] to order your selected units to move or attack.", 258f * 8f, 116f * 8f)
                     ),
                     new BuildCountObjective(Blocks.breach, 1).withMarkers(
-                            new TextMarker("Units are effective, but [accent]turrets[] provide better defensive capabilities if used effectively.\n Place a [accent]Breach[] turret.\nTurrets require [accent]ammo[].", 276f * 8f, 133f * 8f)
+                            new TextMarker("Units are effective, but [accent]turrets[] provide better defensive capabilities if used effectively.\n Place a [accent]Breach[] turret.\nTurrets require [accent]ammo[].", 258f * 8f, 114f * 8f)
                     ),
                     new BuildCountObjective(Blocks.berylliumWall, 6).withMarkers(
                             new TextMarker("[accent]Walls[] can prevent oncoming damage from reaching your buildings\nPlace some [accent]beryllium walls[] around the turret.", 276f * 8f, 133f * 8f)
-                    ).withFlags("defDone")
+                    ).withFlags("defStart"),
+                    new TimerObjective("@objective.enemiesapproaching",30 * 60).withMarkers(
+                            new TextMarker("Enemy incoming, prepare to defend.", 276f * 8f, 133f * 8f)
+                    ),
+                    new DestroyUnitsObjective(2).withFlags("defDone")
                 );
             };
         }};
