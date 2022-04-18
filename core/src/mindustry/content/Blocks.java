@@ -3733,7 +3733,7 @@ public class Blocks{
             shootCone = 3f;
             scaledHealth = 280;
             rotateSpeed = 1.6f;
-            researchCostMultiplier = 0.1f;
+            researchCostMultiplier = 0.05f;
 
             coolant = consume(new ConsumeLiquid(Liquids.water, 15f / 60f));
             limitRange();
