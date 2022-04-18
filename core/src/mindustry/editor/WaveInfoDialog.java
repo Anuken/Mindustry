@@ -324,22 +324,6 @@ public class WaveInfoDialog extends BaseDialog{
                             buildGroups();
                         }).padTop(4).update(b -> b.setChecked(group.effect == StatusEffects.boss)).padBottom(8f).row();
 
-                        //spawn positions are clunky and thus experimental for now
-                        if(experimental){
-                            //health fractions are generally not useful
-                            t.table(p -> {
-                                p.stack(new Slider(0f, 1f, 0.01f, false){{
-                                    setValue(group.healthFraction);
-                                    moved(val -> group.healthFraction = val);
-                                }}, new Label("", Styles.outlineLabel){{
-                                    update(() -> setText(Core.bundle.format("waves.health", (int)(group.healthFraction * 100))));
-                                    touchable = Touchable.disabled;
-                                    setAlignment(Align.center);
-                                    setColor(Color.white);
-                                }}).width(300f).height(44f);
-                            }).row();
-                        }
-
                         t.table(a -> {
                             a.add("@waves.spawn").padRight(8);
 

@@ -304,7 +304,7 @@ public class MapObjectives{
 
         }
 
-        /** Basic mission display text. */
+        /** Basic mission display text. If null, falls back to standard text. */
         public @Nullable String text(){
             return null;
         }
