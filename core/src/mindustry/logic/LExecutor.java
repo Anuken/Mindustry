@@ -1533,7 +1533,7 @@ public class LExecutor{
         @Override
         public void run(LExecutor exec){
             if(exec.obj(flag) instanceof String str){
-                if(exec.bool(value)){
+                if(!exec.bool(value)){
                     state.rules.objectiveFlags.remove(str);
                 }else{
                     state.rules.objectiveFlags.add(str);

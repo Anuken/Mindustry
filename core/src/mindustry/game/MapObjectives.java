@@ -18,7 +18,7 @@ public class MapObjectives{
     public static Prov<MapObjective>[] allObjectiveTypes = new Prov[]{
         ResearchObjective::new, BuildCountObjective::new, UnitCountObjective::new, ItemObjective::new,
         CommandModeObjective::new, CoreItemObjective::new, DestroyCoreObjective::new, DestroyUnitsObjective::new,
-        TimerObjective::new
+        TimerObjective::new, FlagObjective::new
     };
 
     public static Prov<ObjectiveMarker>[] allMarkerTypes = new Prov[]{
@@ -224,7 +224,7 @@ public class MapObjectives{
 
     /** Wait until a logic flag is set. */
     public static class FlagObjective extends MapObjective{
-        public String flag = "flag", text = "Wait for flag";
+        public String flag = "flag", text;
 
         public FlagObjective(String flag, String text){
             this.flag = flag;
@@ -236,7 +236,7 @@ public class MapObjectives{
 
         @Override
         public String text(){
-            return text;
+            return text != null && text.startsWith("@") ? Core.bundle.get(text.substring(1)) : text;
         }
 
         @Override
