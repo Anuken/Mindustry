@@ -1,6 +1,7 @@
 package mindustry.content;
 
 import mindustry.game.MapObjectives.*;
+import mindustry.game.Team;
 import mindustry.type.*;
 
 import static mindustry.content.Planets.*;
@@ -167,9 +168,15 @@ public class SectorPresets{
                             new TextMarker("Enemy incoming, prepare to defend.", 276f * 8f, 133f * 8f)
                     ).withFlags("defStart"),
                     new DestroyUnitsObjective(2).withFlags("defDone"),
-                    new BuildCountObjective(Blocks.coreBastion, 1).withMarkers(
+                    new DestroyBlockObjective(Blocks.coreBastion , 288, 198, Team.malis).withMarkers(
                             new TextMarker("The enemy is vulnerable, go on the offensive.", 276f * 8f, 133f * 8f)
-                    )
+                    ),
+                    new BuildCountObjective(Blocks.coreBastion, 1).withMarkers(
+                            new ShapeTextMarker("New cores can be placed on [accent]core tiles[].\nNew cores function as forward bases and share a resource inventory with other cores.\nPlace a core.", 288f * 8f, 198f * 8f, 9f * 2.6f, 0f, 12f)
+                    ),
+                    new TimerObjective("Set up defenses",120 * 60).withMarkers(
+                            new TextMarker("The enemy will be able to detect you in 2 minutes.\nSet up defenses, mining, and production.", 288f * 8f, 202f * 8f)
+                    ).withFlags("openMap")
                 );
             };
         }};
