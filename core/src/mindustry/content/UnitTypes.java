@@ -2925,7 +2925,7 @@ public class UnitTypes{
         }};
 
         anthicus = new ErekirUnitType("anthicus"){{
-            speed = 0.7f;
+            speed = 0.65f;
             drag = 0.1f;
             hitSize = 21f;
             rotateSpeed = 3f;
