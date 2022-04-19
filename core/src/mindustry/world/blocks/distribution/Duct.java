@@ -1,6 +1,7 @@
 package mindustry.world.blocks.distribution;
 
 import arc.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -24,6 +25,7 @@ import static mindustry.Vars.*;
 public class Duct extends Block implements Autotiler{
     public float speed = 5f;
     public boolean armored = false;
+    public Color transparentColor = new Color(0.4f, 0.4f, 0.4f, 0.1f);
 
     public @Load(value = "@-top-#", length = 5) TextureRegion[] topRegions;
     public @Load(value = "@-bottom-#", length = 5, fallback = "duct-bottom-#") TextureRegion[] botRegions;
@@ -143,7 +145,7 @@ public class Duct extends Block implements Autotiler{
             Draw.rect(sliced(botRegions[bits], slice), x, y, rotation);
 
             Draw.z(Layer.blockUnder + 0.2f);
-            Draw.color(0.4f, 0.4f, 0.4f, 0.4f);
+            Draw.color(transparentColor);
             Draw.rect(sliced(botRegions[bits], slice), x, y, rotation);
             Draw.color();
             Draw.rect(sliced(topRegions[bits], slice), x, y, rotation);
