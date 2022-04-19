@@ -26,6 +26,20 @@ public class MultiPacker implements Disposable{
         return null;
     }
 
+    public void printStats(){
+        for(PageType type : PageType.all){
+            var packer = packers[type.ordinal()];
+            Log.debug("[Atlas] [&ly@&fr]", type);
+            Log.debug("[Atlas] - " + (packer.getPages().size > 1 ? "&fb&lr" : "&lg") + "@ page@&r", packer.getPages().size, packer.getPages().size > 1 ? "s" : "");
+            int i = 0;
+            for(var page : packer.getPages()){
+                Log.debug("[Atlas] - [@] @x@", i, page.getPixmap().width, page.getPixmap().height);
+
+                i ++;
+            }
+        }
+    }
+
     public PixmapPacker getPacker(PageType type){
         return packers[type.ordinal()];
     }
@@ -78,10 +92,12 @@ public class MultiPacker implements Disposable{
     //rubble page - scorch textures for unit deaths & wrecks
     //ui page (sprites5.png) - content icons, white icons, fonts and UI elements
     public enum PageType{
-        main(4096),
+        //main page can be massive.
+        main(8192),
+
         environment(4096, 2048),
         editor(4096, 2048),
-        rubble,
+        rubble(4096, 2048),
         ui(4096);
 
         public static final PageType[] all = values();

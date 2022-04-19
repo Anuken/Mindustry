@@ -182,8 +182,15 @@ public class Mods implements Loadable{
         boolean linear = Core.settings.getBool("linear", true);
 
         for(Fi file : sprites){
+            String name = file.nameWithoutExtension();
+
+            //TODO !!! document this on the wiki !!!
+            //do not allow packing standard outline sprites for now, they are no longer necessary and waste space!
+            if(prefix && name.endsWith("-outline")) continue;
+
             //read and bleed pixmaps in parallel
             tasks.add(mainExecutor.submit(() -> {
+
                 try{
                     Pixmap pix = new Pixmap(file.readBytes());
                     //only bleeds when linear filtering is on at startup
@@ -192,7 +199,7 @@ public class Mods implements Loadable{
                     }
                     //this returns a *runnable* which actually packs the resulting pixmap; this has to be done synchronously outside the method
                     return () -> {
-                        packer.add(getPage(file), (prefix ? mod.name + "-" : "") + file.nameWithoutExtension(), new PixmapRegion(pix));
+                        packer.add(getPage(file), (prefix ? mod.name + "-" : "") + name, new PixmapRegion(pix));
                         pix.dispose();
                     };
                 }catch(Exception e){
@@ -213,11 +220,41 @@ public class Mods implements Loadable{
         //get textures packed
         if(totalSprites > 0){
 
+            class RegionEntry{
+                String name;
+                PixmapRegion region;
+                int[] splits, pads;
+
+                RegionEntry(String name, PixmapRegion region, int[] splits, int[] pads){
+                    this.name = name;
+                    this.region = region;
+                    this.splits = splits;
+                    this.pads = pads;
+                }
+            }
+
+            Seq<RegionEntry>[] entries = new Seq[PageType.all.length];
+            for(int i = 0; i < PageType.all.length; i++){
+                entries[i] = new Seq<>();
+            }
+
             for(AtlasRegion region : Core.atlas.getRegions()){
-                //TODO PageType completely breaks down with multiple pages.
                 PageType type = getPage(region);
+
                 if(!packer.has(type, region.name)){
-                    packer.add(type, region.name, Core.atlas.getPixmap(region), region.splits, region.pads);
+                    entries[type.ordinal()].add(new RegionEntry(region.name, Core.atlas.getPixmap(region), region.splits, region.pads));
+                }
+            }
+
+            //sort each page type by size first, for optimal packing
+            for(int i = 0; i < PageType.all.length; i++){
+                var rects = entries[i];
+                var type = PageType.all[i];
+                //TODO is this in reverse order?
+                rects.sort(Structs.comparingInt(o -> -Math.max(o.region.width, o.region.height)));
+
+                for(var entry : rects){
+                    packer.add(type, entry.name, entry.region, entry.splits, entry.pads);
                 }
             }
 
@@ -285,6 +322,8 @@ public class Mods implements Loadable{
                 });
             }
             Log.debug("Time to generate icons: @", Time.elapsed());
+
+            packer.printStats();
 
             //dispose old atlas data
             Core.atlas = packer.flush(filter, new TextureAtlas());
