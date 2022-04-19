@@ -29,7 +29,7 @@ public class RegionPart extends DrawPart{
     /** Progress function for heat alpha. */
     public PartProgress heatProgress = PartProgress.heat;
     public Blending blending = Blending.normal;
-    public float layer = -1, layerOffset = 0f;
+    public float layer = -1, layerOffset = 0f, heatLayerOffset = 1f;
     public float outlineLayerOffset = -0.001f;
     public float x, y, rotation;
     public float moveX, moveY, moveRot;
@@ -62,7 +62,7 @@ public class RegionPart extends DrawPart{
 
         float prevZ = Draw.z();
         float prog = progress.getClamp(params);
-        float mx = moveX * prog, my = moveY * prog, mr = moveRot * prog;
+        float mx = moveX * prog, my = moveY * prog, mr = moveRot * prog + rotation;
 
         if(moves.size > 0){
             for(int i = 0; i < moves.size; i++){
@@ -111,7 +111,7 @@ public class RegionPart extends DrawPart{
             }
 
             if(heat.found()){
-                Drawf.additive(heat, heatColor.write(Tmp.c1).a(heatProgress.getClamp(params) * heatColor.a), rx, ry, rot, turretShading ? Layer.turretHeat : z + 1f);
+                Drawf.additive(heat, heatColor.write(Tmp.c1).a(heatProgress.getClamp(params) * heatColor.a), rx, ry, rot, turretShading ? Layer.turretHeat : Draw.z() + heatLayerOffset);
             }
 
             Draw.xscl = 1f;

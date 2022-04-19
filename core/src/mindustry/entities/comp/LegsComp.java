@@ -21,7 +21,7 @@ import static mindustry.Vars.*;
 abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
     private static final Vec2 straightVec = new Vec2();
 
-    @Import float x, y, rotation;
+    @Import float x, y, rotation, speedMultiplier;
     @Import UnitType type;
     @Import Team team;
 
@@ -128,7 +128,7 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
         int div = Math.max(legs.length / type.legGroupSize, 2);
         moveSpace = legLength / 1.6f / (div / 2f) * type.legMoveSpace;
         //TODO should move legs even when still, based on speed. also, to prevent "slipping", make sure legs move when they are too far from their destination
-        totalLength += type.legContinuousMove ? type.speed : Mathf.dst(deltaX(), deltaY());
+        totalLength += type.legContinuousMove ? type.speed * speedMultiplier : Mathf.dst(deltaX(), deltaY());
 
         float trns = moveSpace * 0.85f * type.legTrns;
 

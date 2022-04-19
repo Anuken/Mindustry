@@ -5,6 +5,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.entities.*;
@@ -2933,6 +2934,7 @@ public class UnitTypes{
 
             legCount = 6;
             legLength = 18f;
+            legGroupSize = 3;
             lockLegBase = true;
             legContinuousMove = true;
             legExtension = -3f;
@@ -2940,13 +2942,134 @@ public class UnitTypes{
             maxStretch = 1.1f;
             maxCompress = 0.2f;
             legLengthScl = 0.95f;
-            legTrns = 0.7f;
+            legTrns = 0.9f;
 
             legMoveSpace = 1f;
             hovering = true;
 
             visualElevation = 0.2f;
             groundLayer = Layer.legUnit - 1f;
+
+            for(int j = 0; j < 3; j++){
+                int i = j;
+                parts.add(new RegionPart("-blade"){{
+                    layerOffset = -0.01f;
+                    heatLayerOffset = 0.005f;
+                    x = 2f;
+                    moveX = 6f + i * 1.9f;
+                    moveY = 8f + -4f * i;
+                    moveRot = 40f - i * 25f;
+                    mirror = true;
+                    progress = PartProgress.warmup.delay(i * 0.2f);
+                    heatProgress = p -> Mathf.absin(Time.time + i * 14f, 7f, 1f);
+
+                    heatColor = Pal.techBlue;
+                }});
+            }
+
+            weapons.add(new Weapon("anthicus-weapon"){{
+                x = 29f / 4f;
+                y = -11f / 4f;
+                shootY = 1.5f;
+                reload = 130f;
+                layerOffset = 0.01f;
+                heatColor = Color.red;
+                cooldownTime = 60f;
+                smoothReloadSpeed = 0.15f;
+                shootWarmupSpeed = 0.05f;
+                minWarmup = 0.9f;
+                shootStatus = StatusEffects.slow;
+                shootStatusDuration = reload + 1f;
+
+                rotateSpeed = 5f;
+                inaccuracy = 20f;
+
+                rotate = true;
+
+                shoot = new ShootPattern(){{
+                    shots = 2;
+                    shotDelay = 6f;
+                }};
+
+                parts.add(new RegionPart("-blade"){{
+                    mirror = true;
+                    moveRot = -25f;
+                    under = true;
+                    moves.add(new PartMove(PartProgress.reload, 1f, 0f, 0f));
+
+                    heatColor = Color.red;
+                    cooldownTime = 60f;
+                }});
+
+                parts.add(new RegionPart("-blade"){{
+                    mirror = true;
+                    moveRot = -50f;
+                    moveY = -2f;
+                    moves.add(new PartMove(PartProgress.reload.shorten(0.5f), 1f, 0f, -15f));
+                    under = true;
+
+                    heatColor = Color.red;
+                    cooldownTime = 60f;
+                }});
+
+                bullet = new BulletType(){{
+                    shootEffect = new MultiEffect(Fx.shootBigColor, new Effect(9, e -> {
+                        color(Color.white, e.color, e.fin());
+                        stroke(0.7f + e.fout());
+                        Lines.square(e.x, e.y, e.fin() * 5f, e.rotation + 45f);
+
+                        Drawf.light(e.x, e.y, 23f, e.color, e.fout() * 0.7f);
+                    }), new WaveEffect(){{
+                        colorFrom = colorTo = Pal.techBlue;
+                        sizeTo = 15f;
+                        lifetime = 12f;
+                        strokeFrom = 3f;
+                    }});
+
+                    smokeEffect = Fx.shootBigSmoke2;
+                    shake = 2f;
+                    speed = 0f;
+                    keepVelocity = false;
+                    inaccuracy = 2f;
+
+                    spawnUnit = new MissileUnitType("anthicus-missile"){{
+                        trailColor = engineColor = Pal.techBlue;
+                        engineSize = 1.75f;
+                        engineLayer = Layer.effect;
+                        speed = 3.7f;
+                        maxRange = 6f;
+                        lifetime = 60f * 1.63f;
+                        outlineColor = Pal.darkOutline;
+                        health = 40;
+                        lowAltitude = true;
+
+                        parts.add(new FlarePart(){{
+                            progress = PartProgress.life.slope().curve(Interp.pow2In);
+                            radius = 0f;
+                            radiusTo = 35f;
+                            stroke = 3f;
+                            rotation = 45f;
+                            y = -5f;
+                            followRotation = true;
+                        }});
+
+                        weapons.add(new Weapon(){{
+                            shootCone = 360f;
+                            mirror = false;
+                            reload = 1f;
+                            shootOnDeath = true;
+                            bullet = new ExplosionBulletType(100f, 22f){{
+                                shootEffect = new MultiEffect(Fx.massiveExplosion, new WaveEffect(){{
+                                    colorFrom = colorTo = Pal.techBlue;
+                                    sizeTo = 40f;
+                                    lifetime = 12f;
+                                    strokeFrom = 4f;
+                                }});
+                            }};
+                        }});
+                    }};
+                }};
+            }});
         }};
 
         bulwark = new ErekirUnitType("bulwark"){{

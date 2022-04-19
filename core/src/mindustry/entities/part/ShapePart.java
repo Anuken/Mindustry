@@ -47,7 +47,7 @@ public class ShapePart extends DrawPart{
             }
 
             if(!circle){
-                Fill.poly(rx, ry, sides, rad, moveRot * prog * sign + params.rotation - 90);
+                Fill.poly(rx, ry, sides, rad, moveRot * prog * sign + params.rotation - 90 * sign + rotation * sign);
             }else{
                 Fill.circle(rx, ry, rad);
             }

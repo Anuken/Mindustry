@@ -12,6 +12,8 @@ public abstract class DrawPart{
     public boolean turretShading;
     /** If true, the layer is overridden to be under the weapon/turret itself. */
     public boolean under = false;
+    /** For units, this is the index of the weapon this part gets its progress for. */
+    public int weaponIndex = 0;
 
     public abstract void draw(PartParams params);
     public abstract void load(String name);
@@ -80,6 +82,11 @@ public abstract class DrawPart{
         default PartProgress inv(){
             return p -> 1f - get(p);
         }
+
+        default PartProgress slope(){
+            return p -> Mathf.slope(get(p));
+        }
+
 
         default PartProgress clamp(){
             return p -> Mathf.clamp(get(p));

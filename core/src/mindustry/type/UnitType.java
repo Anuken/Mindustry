@@ -881,18 +881,20 @@ public class UnitType extends UnlockableContent{
 
         //TODO how/where do I draw under?
         if(parts.size > 0){
-            //TODO does it need an outline?
-            WeaponMount first = unit.mounts.length > 0 ? unit.mounts[0] : null;
-            if(unit.mounts.length > 0){
-                DrawPart.params.set(first.warmup, first.reload / weapons.first().reload, first.smoothReload, first.heat, unit.x, unit.y, unit.rotation);
-            }else{
-                DrawPart.params.set(0f, 0f, 0f, 0f, unit.x, unit.y, unit.rotation);
-            }
-            if(unit instanceof Scaled s){
-                DrawPart.params.life = s.fin();
-            }
             for(int i = 0; i < parts.size; i++){
                 var part = parts.items[i];
+
+                WeaponMount first = unit.mounts.length > part.weaponIndex ? unit.mounts[part.weaponIndex] : null;
+                if(first != null){
+                    DrawPart.params.set(first.warmup, first.reload / weapons.first().reload, first.smoothReload, first.heat, unit.x, unit.y, unit.rotation);
+                }else{
+                    DrawPart.params.set(0f, 0f, 0f, 0f, unit.x, unit.y, unit.rotation);
+                }
+
+                if(unit instanceof Scaled s){
+                    DrawPart.params.life = s.fin();
+                }
+
                 part.draw(DrawPart.params);
             }
         }

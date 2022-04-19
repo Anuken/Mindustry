@@ -31,6 +31,6 @@ public class MissileAI extends AIController{
     @Override
     public boolean retarget(){
         //more frequent retarget due to high speed. TODO won't this lag?
-        return timer.get(timerTarget, 10f);
+        return timer.get(timerTarget, 4f);
     }
 }

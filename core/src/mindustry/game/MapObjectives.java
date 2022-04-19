@@ -18,7 +18,7 @@ public class MapObjectives{
     public static Prov<MapObjective>[] allObjectiveTypes = new Prov[]{
         ResearchObjective::new, BuildCountObjective::new, UnitCountObjective::new, ItemObjective::new,
         CommandModeObjective::new, CoreItemObjective::new, DestroyCoreObjective::new, DestroyUnitsObjective::new,
-        TimerObjective::new, FlagObjective::new
+        TimerObjective::new, FlagObjective::new, DestroyBlockObjective::new
     };
 
     public static Prov<ObjectiveMarker>[] allMarkerTypes = new Prov[]{
@@ -206,6 +206,34 @@ public class MapObjectives{
             }
             return text;
         }
+    }
+
+    public static class DestroyBlockObjective extends MapObjective{
+        public int x, y;
+        public Team team = Team.malis;
+        public Block block = Blocks.router;
+
+        public DestroyBlockObjective(Block block, int x, int y, Team team){
+            this.block = block;
+            this.x = x;
+            this.y = y;
+            this.team = team;
+        }
+
+        public DestroyBlockObjective(){
+        }
+
+        @Override
+        public boolean complete(){
+            var build = world.build(x, y);
+            return build == null || build.team != team || build.block != block;
+        }
+
+        @Override
+        public String text(){
+            return Core.bundle.format("objective.destroyblock", block.emoji(), block.localizedName);
+        }
+
     }
 
     /** Command any unit to do anything. Always compete in headless mode. */
