@@ -72,6 +72,7 @@ public class UI implements ApplicationListener, Loadable{
     public ModsDialog mods;
     public ColorPicker picker;
     public LogicDialog logic;
+    public FullTextDialog fullText;
 
     public Cursor drillCursor, unloadCursor, targetCursor;
 
@@ -197,6 +198,7 @@ public class UI implements ApplicationListener, Loadable{
         mods = new ModsDialog();
         schematics = new SchematicsDialog();
         logic = new LogicDialog();
+        fullText = new FullTextDialog();
 
         Group group = Core.scene.root;
 

@@ -159,23 +159,23 @@ public class SectorPresets{
                         new TextMarker("Hold [accent]shift[] to enter [accent]command mode[].\n[accent]Left-click and drag[] to select units.\n[accent]Right-click[] to order selected units to move or attack.", 258f * 8f, 116f * 8f)
                     ),
                     new BuildCountObjective(Blocks.breach, 1).withMarkers(
-                            new TextMarker("Units are effective, but [accent]turrets[] provide better defensive capabilities if used effectively.\n Place a [accent]Breach[] turret.\nTurrets require [accent]ammo[].", 258f * 8f, 114f * 8f)
+                        new TextMarker("Units are effective, but [accent]turrets[] provide better defensive capabilities if used effectively.\n Place a [accent]Breach[] turret.\nTurrets require [accent]ammo[].", 258f * 8f, 114f * 8f)
                     ),
                     new BuildCountObjective(Blocks.berylliumWall, 6).withMarkers(
-                            new TextMarker("[accent]Walls[] can prevent oncoming damage from reaching buildings\nPlace some [accent]beryllium walls[] around the turret.", 276f * 8f, 133f * 8f)
+                        new TextMarker("[accent]Walls[] can prevent oncoming damage from reaching buildings\nPlace some [accent]beryllium walls[] around the turret.", 276f * 8f, 133f * 8f)
                     ),
                     new TimerObjective("@objective.enemiesapproaching",30 * 60).withMarkers(
-                            new TextMarker("Enemy incoming, prepare to defend.", 276f * 8f, 133f * 8f)
+                        new TextMarker("Enemy incoming, prepare to defend.", 276f * 8f, 133f * 8f)
                     ).withFlags("defStart"),
                     new DestroyUnitsObjective(2).withFlags("defDone"),
                     new DestroyBlockObjective(Blocks.coreBastion , 288, 198, Team.malis).withMarkers(
-                            new TextMarker("The enemy is vulnerable. Counter-attack.", 276f * 8f, 133f * 8f)
+                        new TextMarker("The enemy is vulnerable. Counter-attack.", 276f * 8f, 133f * 8f)
                     ),
                     new BuildCountObjective(Blocks.coreBastion, 1).withMarkers(
-                            new ShapeTextMarker("New cores can be placed on [accent]core tiles[].\nNew cores function as forward bases and share a resource inventory with other cores.\nPlace a core.", 287.5f * 8f, 197.5f * 8f, 9f * 2.6f, 0f, 12f)
+                        new ShapeTextMarker("New cores can be placed on [accent]core tiles[].\nNew cores function as forward bases and share a resource inventory with other cores.\nPlace a core.", 287.5f * 8f, 197.5f * 8f, 9f * 2.6f, 0f, 12f)
                     ),
                     new TimerObjective("Set up defenses", 120 * 60).withMarkers(
-                            new TextMarker("The enemy will be able to detect you in 2 minutes.\nSet up defenses, mining, and production.", 288f * 8f, 202f * 8f)
+                        new TextMarker("The enemy will be able to detect you in 2 minutes.\nSet up defenses, mining, and production.", 288f * 8f, 202f * 8f)
                     ).withFlags("openMap")
                 );
             };
@@ -186,19 +186,19 @@ public class SectorPresets{
 
             rules = r -> {
                 r.objectives.addAll(
-                        new UnitCountObjective(UnitTypes.stell, 2).withMarkers(
-                                new TextMarker("The enemy will attack soon.\n Build units to defend your core.", 276f * 8f, 133f * 8f)
-                        ),
-                        new BuildCountObjective(Blocks.breach, 1).withMarkers(
-                                new TextMarker("Units are effective, but [accent]turrets[] provide better defensive capabilities if used effectively.\n Place a [accent]Breach[] turret.\nTurrets require [accent]ammo[].", 276f * 8f, 133f * 8f)
-                        ).withFlags("defDone"),
-                        new BuildCountObjective(Blocks.berylliumWall, 6).withMarkers(
-                                new TextMarker("[accent]Walls[] can prevent oncoming damage from reaching your buildings\nPlace some [accent]beryllium walls[] around the turret.", 276f * 8f, 133f * 8f)
-                        ),
-                        new BuildCountObjective(Blocks.coreBastion, 1).withMarkers(
-                                new TextMarker("You must expand.\nBuild more units and go on the offensive", 276f * 8f, 133f * 8f),
-                                new TextMarker("Cores can only be placed in special zone tiles.", 287 * 8f, 201 * 8f)
-                        ).withFlags("def2Done")
+                    new UnitCountObjective(UnitTypes.stell, 2).withMarkers(
+                        new TextMarker("The enemy will attack soon.\n Build units to defend your core.", 276f * 8f, 133f * 8f)
+                    ),
+                    new BuildCountObjective(Blocks.breach, 1).withMarkers(
+                        new TextMarker("Units are effective, but [accent]turrets[] provide better defensive capabilities if used effectively.\n Place a [accent]Breach[] turret.\nTurrets require [accent]ammo[].", 276f * 8f, 133f * 8f)
+                    ).withFlags("defDone"),
+                    new BuildCountObjective(Blocks.berylliumWall, 6).withMarkers(
+                        new TextMarker("[accent]Walls[] can prevent oncoming damage from reaching your buildings\nPlace some [accent]beryllium walls[] around the turret.", 276f * 8f, 133f * 8f)
+                    ),
+                    new BuildCountObjective(Blocks.coreBastion, 1).withMarkers(
+                        new TextMarker("You must expand.\nBuild more units and go on the offensive", 276f * 8f, 133f * 8f),
+                        new TextMarker("Cores can only be placed in special zone tiles.", 287 * 8f, 201 * 8f)
+                    ).withFlags("def2Done")
                 );
             };
         }};
