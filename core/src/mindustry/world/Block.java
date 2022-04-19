@@ -96,6 +96,8 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean rotate;
     /** if rotate is true and this is false, the region won't rotate when drawing */
     public boolean rotateDraw = true;
+    /** if true, schematic flips with this block are inverted. */
+    public boolean invertFlip = false;
     /** number of different variant regions to use */
     public int variants = 0;
     /** whether to draw a rotation arrow - this does not apply to lines of blocks */
@@ -1276,7 +1278,7 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     public void flipRotation(BuildPlan req, boolean x){
-        if(x == (req.rotation % 2 == 0)){
+        if((x == (req.rotation % 2 == 0)) != invertFlip){
             req.rotation = Mathf.mod(req.rotation + 2, 4);
         }
     }

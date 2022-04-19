@@ -1157,6 +1157,7 @@ public class Blocks{
             researchCostMultiplier = 1.2f;
             craftTime = 10f;
             rotate = true;
+            invertFlip = true;
 
             liquidCapacity = 50f;
 
@@ -3591,7 +3592,7 @@ public class Blocks{
                     reloadMultiplier = 1.7f;
                     knockback = 0.3f;
                 }},
-                Items.pyratite, new BasicBulletType(8f, 80){{
+                Items.thorium, new BasicBulletType(8f, 80){{
                     hitSize = 5;
                     width = 16f;
                     height = 23f;
@@ -3600,7 +3601,7 @@ public class Blocks{
                     pierceBuilding = true;
                     knockback = 0.7f;
                 }},
-                Items.thorium, new BasicBulletType(7f, 70){{
+                Items.pyratite, new BasicBulletType(7f, 70){{
                     hitSize = 5;
                     width = 16f;
                     height = 21f;

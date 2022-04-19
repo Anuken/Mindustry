@@ -1,11 +1,12 @@
 package mindustry.entities.effect;
 
 import arc.graphics.*;
+import mindustry.content.*;
 import mindustry.entities.*;
 
 /** Wraps an effect with some parameters. */
 public class WrapEffect extends Effect{
-    public Effect effect;
+    public Effect effect = Fx.none;
     public Color color = Color.white.cpy();
     public float rotation = Float.NaN;
 
