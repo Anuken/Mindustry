@@ -119,7 +119,7 @@ public class SectorPresets{
                 r.objectives.addAll(
                     new ItemObjective(Items.beryllium, 15).withMarkers(
                         new ShapeTextMarker("Click to mine [accent]resources[] from walls.", 290f * 8f, 106f * 8f),
-                        new TextMarker("Move your unit with WASD.", 276.5f * 8f, 112.5f * 8f)
+                        new TextMarker("Move the unit with WASD.", 276.5f * 8f, 112.5f * 8f)
                     ),
                     new ResearchObjective(Blocks.turbineCondenser).withMarkers(
                         new TextMarker("Open the [accent]research tree[] and research the [accent]turbine condenser[].\nThis will allow you to build it.", 280f * 8f, 118f * 8f)
@@ -128,53 +128,53 @@ public class SectorPresets{
                         new ShapeTextMarker("Place a [accent]turbine condenser[] on the vent.\nThis will generate [accent]power[].", 289f * 8f, 116f * 8f, 8f * 2.6f, 0f, 9f)
                     ),
                     new BuildCountObjective(Blocks.plasmaBore, 1).withMarkers(
-                        new ShapeTextMarker("Research and place a [accent]plasma bore[]. \nIt automatically mines resources from walls.", 293.5f * 8f, 113.5f * 8f, 4f * 2.6f, 45f, 60f)
+                        new ShapeTextMarker("Research and place a [accent]plasma bore[]. \nThis automatically mines resources from walls.", 293.5f * 8f, 113.5f * 8f, 4f * 2.6f, 45f, 60f)
                     ),
                     new BuildCountObjective(Blocks.beamNode, 1).withMarkers(
                         new ShapeTextMarker("To [accent]power[] the plasma bore, research and place a [accent]beam node[].\nConnect the turbine condenser to the plasma bore.", 294f * 8f, 116f * 8f)
                     ),
                     new CoreItemObjective(Items.beryllium, 5).withMarkers(
-                        new TextMarker("Once the plasma bore is powered, the next step is to route the resources to the core.\nResearch and place [accent]ducts[] to move the mined resources to the core.", 285f * 8f, 108f * 8f)
+                        new TextMarker("Research and place [accent]ducts[] to move the mined resources\nfrom the plasma bore to the core.", 285f * 8f, 108f * 8f)
                     ),
                     new CoreItemObjective(Items.beryllium, 200).withMarkers(
-                        new TextMarker("Expand your mining operation!\nPlace more plasma bores and use beam nodes and ducts to support them.\nMine 200 beryllium.", 280f * 8f, 118f * 8f)
+                        new TextMarker("Expand the mining operation.\nPlace more Plasma Bores and use beam nodes and ducts to support them.\nMine 200 beryllium.", 280f * 8f, 118f * 8f)
                     ),
                     new CoreItemObjective(Items.graphite, 100).withMarkers(
-                        new TextMarker("More complex blocks require [accent]graphite[].]\nTry setting up mining for graphite.", 261f * 8f, 108f * 8f)
+                        new TextMarker("More complex blocks require [accent]graphite[].\nSet up plasma bores to mine graphite.", 261f * 8f, 108f * 8f)
                     ),
                     new ResearchObjective(Blocks.siliconArcFurnace).withMarkers(
-                        new TextMarker("Time to expand into [accent]factories[]!\nResearch [accent]cliff crusher[] and [accent]silicon arc furnace[].", 268f * 8f, 101f * 8f)
+                        new TextMarker("Begin researching [accent]factories[].\nResearch the [accent]cliff crusher[] and [accent]silicon arc furnace[].", 268f * 8f, 101f * 8f)
                     ),
                     new CoreItemObjective(Items.silicon, 50).withMarkers(
-                        new TextMarker("The arc furnace needs both [accent]sand[] and [accent]graphite[] to create [accent]silicon[].\nIt takes [accent]power[], too.", 268f * 8f, 101f * 8f),
+                        new TextMarker("The arc furnace needs [accent]sand[] and [accent]graphite[] to create [accent]silicon[].\n[accent]Power[] is also required.", 268f * 8f, 101f * 8f),
                         new TextMarker("Use [accent]cliff crushers[] to mine sand.", 262f * 8f, 88f * 8f)
                     ),
                     new BuildCountObjective(Blocks.fabricator, 1).withMarkers(
-                        new TextMarker("Use [accent]units[] to explore the map, defend your buildings, and go on the offensive.\n Research and place the [accent]fabricator[]", 258f * 8f, 116f * 8f)
+                        new TextMarker("Use [accent]units[] to explore the map, defend buildings, and go on the offensive.\n Research and place a [accent]fabricator[]", 258f * 8f, 116f * 8f)
                     ),
                     new UnitCountObjective(UnitTypes.stell, 1).withMarkers(
                         new TextMarker("Produce a unit.\nUse the \"?\" button to see selected factory requirements.", 258f * 8f, 116f * 8f)
                     ),
                     new CommandModeObjective().withMarkers(
-                        new TextMarker("Hold [accent]shift[] to enter [accent]command mode[].\n[accent]Left-click and drag[] to select units.\n[accent]Right-click[] to order your selected units to move or attack.", 258f * 8f, 116f * 8f)
+                        new TextMarker("Hold [accent]shift[] to enter [accent]command mode[].\n[accent]Left-click and drag[] to select units.\n[accent]Right-click[] to order selected units to move or attack.", 258f * 8f, 116f * 8f)
                     ),
                     new BuildCountObjective(Blocks.breach, 1).withMarkers(
                             new TextMarker("Units are effective, but [accent]turrets[] provide better defensive capabilities if used effectively.\n Place a [accent]Breach[] turret.\nTurrets require [accent]ammo[].", 258f * 8f, 114f * 8f)
                     ),
                     new BuildCountObjective(Blocks.berylliumWall, 6).withMarkers(
-                            new TextMarker("[accent]Walls[] can prevent oncoming damage from reaching your buildings\nPlace some [accent]beryllium walls[] around the turret.", 276f * 8f, 133f * 8f)
+                            new TextMarker("[accent]Walls[] can prevent oncoming damage from reaching buildings\nPlace some [accent]beryllium walls[] around the turret.", 276f * 8f, 133f * 8f)
                     ),
                     new TimerObjective("@objective.enemiesapproaching",30 * 60).withMarkers(
                             new TextMarker("Enemy incoming, prepare to defend.", 276f * 8f, 133f * 8f)
                     ).withFlags("defStart"),
                     new DestroyUnitsObjective(2).withFlags("defDone"),
                     new DestroyBlockObjective(Blocks.coreBastion , 288, 198, Team.malis).withMarkers(
-                            new TextMarker("The enemy is vulnerable, go on the offensive.", 276f * 8f, 133f * 8f)
+                            new TextMarker("The enemy is vulnerable. Counter-attack.", 276f * 8f, 133f * 8f)
                     ),
                     new BuildCountObjective(Blocks.coreBastion, 1).withMarkers(
                             new ShapeTextMarker("New cores can be placed on [accent]core tiles[].\nNew cores function as forward bases and share a resource inventory with other cores.\nPlace a core.", 287.5f * 8f, 197.5f * 8f, 9f * 2.6f, 0f, 12f)
                     ),
-                    new TimerObjective("Set up defenses",120 * 60).withMarkers(
+                    new TimerObjective("Set up defenses", 120 * 60).withMarkers(
                             new TextMarker("The enemy will be able to detect you in 2 minutes.\nSet up defenses, mining, and production.", 288f * 8f, 202f * 8f)
                     ).withFlags("openMap")
                 );
