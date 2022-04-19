@@ -2929,8 +2929,9 @@ public class UnitTypes{
             drag = 0.1f;
             hitSize = 21f;
             rotateSpeed = 3f;
-            health = 1100;
-            armor = 5f;
+            health = 2600;
+            armor = 7f;
+            fogRadius = 40f;
 
             legCount = 6;
             legLength = 18f;
@@ -2980,8 +2981,8 @@ public class UnitTypes{
                 minWarmup = 0.9f;
                 shootStatus = StatusEffects.slow;
                 shootStatusDuration = reload + 1f;
-
-                rotateSpeed = 5f;
+                rotationLimit = 70f;
+                rotateSpeed = 2f;
                 inaccuracy = 20f;
 
                 rotate = true;
@@ -3038,9 +3039,9 @@ public class UnitTypes{
                         engineLayer = Layer.effect;
                         speed = 3.7f;
                         maxRange = 6f;
-                        lifetime = 60f * 1.63f;
+                        lifetime = 60f * 1.7f;
                         outlineColor = Pal.darkOutline;
-                        health = 40;
+                        health = 45;
                         lowAltitude = true;
 
                         parts.add(new FlarePart(){{
@@ -3058,8 +3059,8 @@ public class UnitTypes{
                             mirror = false;
                             reload = 1f;
                             shootOnDeath = true;
-                            bullet = new ExplosionBulletType(100f, 22f){{
-                                shootEffect = new MultiEffect(Fx.massiveExplosion, new WaveEffect(){{
+                            bullet = new ExplosionBulletType(120f, 25f){{
+                                shootEffect = new MultiEffect(Fx.massiveExplosion, new WrapEffect(Fx.dynamicSpikes, Pal.techBlue, 24f), new WaveEffect(){{
                                     colorFrom = colorTo = Pal.techBlue;
                                     sizeTo = 40f;
                                     lifetime = 12f;

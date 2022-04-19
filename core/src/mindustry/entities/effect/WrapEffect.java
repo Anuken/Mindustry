@@ -32,9 +32,10 @@ public class WrapEffect extends Effect{
 
     @Override
     public void render(EffectContainer e){
-        e.color = color;
-        if(!Float.isNaN(rotation)) e.rotation = rotation;
-        effect.render(e);
-        clip = Math.max(clip, effect.clip);
+    }
+
+    @Override
+    public void create(float x, float y, float rotation, Color color, Object data){
+        effect.create(x, y, this.rotation, this.color, data);
     }
 }
