@@ -186,7 +186,8 @@ public class Mods implements Loadable{
 
             //TODO !!! document this on the wiki !!!
             //do not allow packing standard outline sprites for now, they are no longer necessary and waste space!
-            if(prefix && name.endsWith("-outline")) continue;
+            //TODO also full regions are bad:  || name.endsWith("-full")
+            if(prefix && (name.endsWith("-outline"))) continue;
 
             //read and bleed pixmaps in parallel
             tasks.add(mainExecutor.submit(() -> {
@@ -314,6 +315,7 @@ public class Mods implements Loadable{
             //generate new icons
             for(Seq<Content> arr : content.getContentMap()){
                 arr.each(c -> {
+                    //TODO this can be done in parallel
                     if(c instanceof UnlockableContent u && c.minfo.mod != null){
                         u.load();
                         u.loadIcon();

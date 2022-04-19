@@ -451,4 +451,9 @@ public class Weapon implements Cloneable{
         }
     }
 
+    @Override
+    public String toString(){
+        return name == null || name.isEmpty() ? "Weapon" : "Weapon: " + name;
+    }
+
 }
