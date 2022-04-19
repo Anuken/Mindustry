@@ -166,7 +166,10 @@ public class SectorPresets{
                     new TimerObjective("@objective.enemiesapproaching",30 * 60).withMarkers(
                             new TextMarker("Enemy incoming, prepare to defend.", 276f * 8f, 133f * 8f)
                     ).withFlags("defStart"),
-                    new DestroyUnitsObjective(2).withFlags("defDone")
+                    new DestroyUnitsObjective(2).withFlags("defDone"),
+                    new BuildCountObjective(Blocks.coreBastion, 1).withMarkers(
+                            new TextMarker("The enemy is vulnerable, go on the offensive.", 276f * 8f, 133f * 8f)
+                    )
                 );
             };
         }};
