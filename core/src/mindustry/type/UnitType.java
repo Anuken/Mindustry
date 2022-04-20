@@ -39,6 +39,7 @@ import static mindustry.Vars.*;
 public class UnitType extends UnlockableContent{
     public static final float shadowTX = -12, shadowTY = -13;
     private static final Vec2 legOffset = new Vec2();
+    private static TextureRegion itemCircleRegion;
 
     /** If true, the unit is always at elevation 1. */
     public boolean flying;
@@ -736,14 +737,16 @@ public class UnitType extends UnlockableContent{
             unit.x + Angles.trnsx(unit.rotation + 180f, itemOffsetY),
             unit.y + Angles.trnsy(unit.rotation + 180f, itemOffsetY),
             size, size, unit.rotation);
-
             Draw.mixcol();
 
-            Lines.stroke(1f, Pal.accent);
-            Lines.circle(
+            if(itemCircleRegion == null || itemCircleRegion.texture.isDisposed()){
+                itemCircleRegion = Core.atlas.find("ring-item");
+            }
+            size = (3f + Mathf.absin(Time.time, 5f, 1f)) * unit.itemTime + 0.5f;
+            Draw.color(Pal.accent);
+            Draw.rect(itemCircleRegion,
             unit.x + Angles.trnsx(unit.rotation + 180f, itemOffsetY),
-            unit.y + Angles.trnsy(unit.rotation + 180f, itemOffsetY),
-            (3f + Mathf.absin(Time.time, 5f, 1f)) * unit.itemTime);
+            unit.y + Angles.trnsy(unit.rotation + 180f, itemOffsetY), size * 2, size * 2);
 
             if(unit.isLocal() && !renderer.pixelator.enabled()){
                 Fonts.outline.draw(unit.stack.amount + "",
