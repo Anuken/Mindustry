@@ -87,6 +87,7 @@ public class Turret extends ReloadTurret{
     public boolean displayAmmoMultiplier = true;
     public Sortf unitSort = UnitSorts.closest;
     public Boolf<Unit> unitFilter = u -> true;
+    public Boolf<Building> buildingFilter = b -> !b.block.underBullets;
 
     public DrawBlock drawer = new DrawTurret();
 
@@ -393,7 +394,7 @@ public class Turret extends ReloadTurret{
             if(targetAir && !targetGround){
                 target = Units.bestEnemy(team, x, y, range, e -> !e.dead() && !e.isGrounded() && unitFilter.get(e), unitSort);
             }else{
-                target = Units.bestTarget(team, x, y, range, e -> !e.dead() && unitFilter.get(e) && (e.isGrounded() || targetAir) && (!e.isGrounded() || targetGround), b -> targetGround, unitSort);
+                target = Units.bestTarget(team, x, y, range, e -> !e.dead() && unitFilter.get(e) && (e.isGrounded() || targetAir) && (!e.isGrounded() || targetGround), b -> targetGround && buildingFilter.get(b), unitSort);
 
                 if(target == null && canHeal()){
                     target = Units.findAllyTile(team, x, y, range, b -> b.damaged() && b != this);

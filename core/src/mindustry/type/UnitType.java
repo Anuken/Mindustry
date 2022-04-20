@@ -989,6 +989,7 @@ public class UnitType extends UnlockableContent{
             if(itemCircleRegion == null || itemCircleRegion.texture.isDisposed()){
                 itemCircleRegion = Core.atlas.find("ring-item");
             }
+
             size = (3f + Mathf.absin(Time.time, 5f, 1f)) * unit.itemTime + 0.5f;
             Draw.color(Pal.accent);
             Draw.rect(itemCircleRegion,
