@@ -125,6 +125,7 @@ public class Mods implements Loadable{
         if(!mods.contains(LoadedMod::enabled)) return;
         Time.mark();
 
+        //TODO this should estimate sprite sizes per page
         packer = new MultiPacker();
         //all packing tasks to await
         var tasks = new Seq<Future<Runnable>>();

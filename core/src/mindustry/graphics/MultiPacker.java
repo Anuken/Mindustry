@@ -4,6 +4,7 @@ import arc.graphics.*;
 import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.util.*;
+import arc.util.Log.*;
 import mindustry.*;
 
 public class MultiPacker implements Disposable{
@@ -27,13 +28,20 @@ public class MultiPacker implements Disposable{
     }
 
     public void printStats(){
+        if(Log.level != LogLevel.debug) return;
+
         for(PageType type : PageType.all){
             var packer = packers[type.ordinal()];
             Log.debug("[Atlas] [&ly@&fr]", type);
             Log.debug("[Atlas] - " + (packer.getPages().size > 1 ? "&fb&lr" : "&lg") + "@ page@&r", packer.getPages().size, packer.getPages().size > 1 ? "s" : "");
             int i = 0;
             for(var page : packer.getPages()){
-                Log.debug("[Atlas] - [@] @x@", i, page.getPixmap().width, page.getPixmap().height);
+                float totalArea = 0;
+                for(var region : page.getRects().values()){
+                    totalArea += region.area();
+                }
+
+                Log.debug("[Atlas] - [@] @x@ (&lk@% used&fr)", i, page.getPixmap().width, page.getPixmap().height, (int)(totalArea / (page.getPixmap().width * page.getPixmap().height) * 100f));
 
                 i ++;
             }
