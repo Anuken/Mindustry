@@ -7,7 +7,11 @@ import arc.util.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.maps.*;
+import mindustry.maps.Map;
 import mindustry.ui.*;
+
+import java.text.*;
+import java.util.*;
 
 import static mindustry.Vars.*;
 
@@ -16,6 +20,7 @@ public class MapPlayDialog extends BaseDialog{
     Rules rules;
     Gamemode selectedGamemode = Gamemode.survival;
     Map lastMap;
+    String name;
 
     public MapPlayDialog(){
         super("");
@@ -34,6 +39,8 @@ public class MapPlayDialog extends BaseDialog{
         this.lastMap = map;
         title.setText(map.name());
         cont.clearChildren();
+
+        name = map.name() + " " + new SimpleDateFormat("MMM dd h:mm", Locale.getDefault()).format(new Date());
 
         //reset to any valid mode after switching to attack (one must exist)
         if(!selectedGamemode.valid(map)){
@@ -68,6 +75,10 @@ public class MapPlayDialog extends BaseDialog{
         cont.row();
         cont.button("@customize", Icon.settings, () -> dialog.show(rules, () -> rules = map.applyRules(selectedGamemode))).height(50f).width(230);
         cont.row();
+        cont.button("@save.rename", Icon.pencil, () -> {
+            ui.showTextInput("@save.rename", "@save.rename.text", name, text -> name = text);
+        }).height(50f).width(150f);
+        cont.row();
         cont.add(new BorderImage(map.safeTexture(), 3f)).size(mobile && !Core.graphics.isPortrait() ? 150f : 250f).get().setScaling(Scaling.fit);
         //only maps with survival are valid for high scores
         if(Gamemode.survival.valid(map)){
@@ -79,7 +90,7 @@ public class MapPlayDialog extends BaseDialog{
         addCloseButton();
 
         buttons.button("@play", Icon.play, () -> {
-            control.playMap(map, rules);
+            control.playMap(map, rules, name);
             hide();
             ui.custom.hide();
         }).size(210f, 64f);

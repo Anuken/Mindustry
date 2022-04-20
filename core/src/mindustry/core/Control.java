@@ -294,7 +294,7 @@ public class Control implements ApplicationListener, Loadable{
         }
     }
 
-    public void playMap(Map map, Rules rules){
+    public void playMap(Map map, Rules rules, String name){
         ui.loadAnd(() -> {
             logic.reset();
             world.loadMap(map, rules);
@@ -303,7 +303,7 @@ public class Control implements ApplicationListener, Loadable{
             state.rules.editor = false;
             logic.play();
             if(settings.getBool("savecreate") && !world.isInvalidMap()){
-                control.saves.addSave(map.name() + " " + new SimpleDateFormat("MMM dd h:mm", Locale.getDefault()).format(new Date()));
+                control.saves.addSave(name);
             }
             Events.fire(Trigger.newGame);
         });
