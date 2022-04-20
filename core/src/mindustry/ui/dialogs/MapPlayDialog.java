@@ -71,13 +71,16 @@ public class MapPlayDialog extends BaseDialog{
         selmode.add(modes);
         selmode.button("?", this::displayGameModeHelp).width(50f).fillY().padLeft(18f);
 
+        Table customize = new Table();
+
+        customize.button("@customize", Icon.settings, () -> dialog.show(rules, () -> rules = map.applyRules(selectedGamemode))).height(50f).width(230);
+        customize.button("@save.rename", Icon.pencil, () -> {
+            ui.showTextInput("@save.rename", "@save.rename.text", name, text -> name = text);
+        }).height(50f).width(150f).padLeft(5f);
+
         cont.add(selmode);
         cont.row();
-        cont.button("@customize", Icon.settings, () -> dialog.show(rules, () -> rules = map.applyRules(selectedGamemode))).height(50f).width(230);
-        cont.row();
-        cont.button("@save.rename", Icon.pencil, () -> {
-            ui.showTextInput("@save.rename", "@save.rename.text", name, text -> name = text);
-        }).height(50f).width(150f);
+        cont.add(customize);
         cont.row();
         cont.add(new BorderImage(map.safeTexture(), 3f)).size(mobile && !Core.graphics.isPortrait() ? 150f : 250f).get().setScaling(Scaling.fit);
         //only maps with survival are valid for high scores
