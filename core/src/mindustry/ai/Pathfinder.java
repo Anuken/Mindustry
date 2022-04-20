@@ -19,7 +19,7 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class Pathfinder implements Runnable{
-    private static final long maxUpdate = Time.millisToNanos(5);
+    private static final long maxUpdate = Time.millisToNanos(7);
     private static final int updateFPS = 60;
     private static final int updateInterval = 1000 / updateFPS;
 
@@ -197,7 +197,10 @@ public class Pathfinder implements Runnable{
         stop();
         if(net.client()) return;
 
-        thread = Threads.daemon("Pathfinder", this);
+        thread = new Thread(this, "Pathfinder");
+        thread.setPriority(Thread.MIN_PRIORITY);
+        thread.setDaemon(true);
+        thread.start();
     }
 
     /** Stops the pathfinding thread. */

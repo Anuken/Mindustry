@@ -194,12 +194,14 @@ public final class FogControl implements CustomChunk{
         //not run clientside, the CPU side isn't needed here.
         if(staticFogThread == null && !net.client()){
             staticFogThread = new StaticFogThread();
+            staticFogThread.setPriority(Thread.NORM_PRIORITY - 1);
             staticFogThread.setDaemon(true);
             staticFogThread.start();
         }
 
         if(dynamicFogThread == null){
             dynamicFogThread = new DynamicFogThread();
+            dynamicFogThread.setPriority(Thread.NORM_PRIORITY - 1);
             dynamicFogThread.setDaemon(true);
             dynamicFogThread.start();
         }

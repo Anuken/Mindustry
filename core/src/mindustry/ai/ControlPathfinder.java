@@ -18,7 +18,7 @@ import static mindustry.ai.Pathfinder.*;
 
 public class ControlPathfinder{
     //TODO this FPS-based update system could be flawed.
-    private static final long maxUpdate = Time.millisToNanos(20);
+    private static final long maxUpdate = Time.millisToNanos(30);
     private static final int updateFPS = 60;
     private static final int updateInterval = 1000 / updateFPS;
     private static final int wallImpassableCap = 100_000;
@@ -272,6 +272,7 @@ public class ControlPathfinder{
         threads = new PathfindThread[Mathf.clamp(Runtime.getRuntime().availableProcessors() - 2, 1, 6)];
         for(int i = 0; i < threads.length; i ++){
             threads[i] = new PathfindThread("ControlPathfindThread-" + i);
+            threads[i].setPriority(Thread.MIN_PRIORITY);
             threads[i].setDaemon(true);
             threads[i].start();
         }

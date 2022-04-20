@@ -91,7 +91,6 @@ public class MultiPacker implements Disposable{
         }
     }
 
-
     //There are several pages for sprites.
     //main page (sprites.png) - all sprites for units, weapons, placeable blocks, effects, bullets, etc
     //environment page (sprites2.png) - all sprites for things in the environmental cache layer
