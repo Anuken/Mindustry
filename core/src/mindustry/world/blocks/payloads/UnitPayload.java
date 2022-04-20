@@ -141,8 +141,8 @@ public class UnitPayload implements Payload{
         //TODO should not happen
         if(unit.type == null) return;
 
-        //TODO this would be more accurate but has all sorts of associated problems
-        if(false){
+        //TODO this would be more accurate but has all sorts of associated problems (?)
+        if(true){
             unit.elevation = 0f;
             //avoids drawing mining or building
             unit.type.draw(unit);

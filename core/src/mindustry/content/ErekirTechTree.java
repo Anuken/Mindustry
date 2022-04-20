@@ -228,7 +228,7 @@ public class ErekirTechTree{
             });
 
 
-            node(breach, Seq.with(new Research(siliconArcFurnace)), () -> {
+            node(breach, Seq.with(new Research(siliconArcFurnace), new Research(fabricator)), () -> {
                 node(berylliumWall, () -> {
                     node(berylliumWallLarge, () -> {
 

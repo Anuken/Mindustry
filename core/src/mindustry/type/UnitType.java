@@ -812,14 +812,16 @@ public class UnitType extends UnlockableContent{
     public void draw(Unit unit){
         if(unit.inFogTo(Vars.player.team())) return;
 
+        boolean isPayload = !unit.isAdded();
+
         Mechc mech = unit instanceof Mechc ? (Mechc)unit : null;
-        float z = unit.elevation > 0.5f ? (lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit) : groundLayer + Mathf.clamp(hitSize / 4000f, 0, 0.01f);
+        float z = isPayload ? Draw.z() : unit.elevation > 0.5f ? (lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit) : groundLayer + Mathf.clamp(hitSize / 4000f, 0, 0.01f);
 
         if(unit.controller().isBeingControlled(player.unit())){
             drawControl(unit);
         }
 
-        if(unit.isFlying() || visualElevation > 0){
+        if(!isPayload && (unit.isFlying() || visualElevation > 0)){
             Draw.z(Math.min(Layer.darkness, z - 1f));
             drawShadow(unit);
         }
@@ -842,7 +844,7 @@ public class UnitType extends UnlockableContent{
             drawTank((Unit & Tankc)unit);
         }
 
-        if(unit instanceof Legsc){
+        if(unit instanceof Legsc && !isPayload){
             drawLegs((Unit & Legsc)unit);
         }
 
@@ -903,9 +905,11 @@ public class UnitType extends UnlockableContent{
             }
         }
 
-        for(Ability a : unit.abilities){
-            Draw.reset();
-            a.draw(unit);
+        if(!isPayload){
+            for(Ability a : unit.abilities){
+                Draw.reset();
+                a.draw(unit);
+            }
         }
 
         Draw.reset();
