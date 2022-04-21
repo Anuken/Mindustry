@@ -39,9 +39,9 @@ public class EditorTile extends Tile{
     }
 
     @Override
-    public void setBlock(Block type, Team team, int rotation){
+    public void setBlock(Block type, Team team, int rotation, Prov<Building> entityprov){
         if(skip()){
-            super.setBlock(type, team, rotation);
+            super.setBlock(type, team, rotation, entityprov);
             return;
         }
 
@@ -63,7 +63,7 @@ public class EditorTile extends Tile{
 
         }
 
-        super.setBlock(type, team, rotation);
+        super.setBlock(type, team, rotation, entityprov);
     }
 
     @Override

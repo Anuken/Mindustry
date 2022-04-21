@@ -133,9 +133,10 @@ public class Pathfinder implements Runnable{
                                     break;
                                 }
                             }
+                            int arr = other.array();
                             //the other tile is no longer near solid, remove the solid bit
-                            if(!otherNearSolid && tiles.length > other.array()){
-                                tiles[other.array()] &= ~(PathTile.bitMaskNearSolid);
+                            if(!otherNearSolid && tiles.length > arr){
+                                tiles[arr] &= ~(PathTile.bitMaskNearSolid);
                             }
                         }
                     }
