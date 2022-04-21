@@ -1464,7 +1464,7 @@ public class LStatements{
     @RegisterStatement("fetch")
     public static class FetchStatement extends LStatement{
         public FetchType type = FetchType.unit;
-        public String result = "result", team = "@sharded", index = "0";
+        public String result = "result", team = "@sharded", index = "0", extra = "@conveyor";
 
         @Override
         public void build(Table table){
@@ -1497,6 +1497,12 @@ public class LStatements{
 
                 fields(table, index, i -> index = i);
             }
+
+            if(type == FetchType.buildCount || type == FetchType.build){
+                row(table);
+
+                fields(table, "block", extra, i -> extra = i);
+            }
         }
 
         @Override
@@ -1511,7 +1517,7 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new FetchI(type, builder.var(result), builder.var(team), builder.var(index));
+            return new FetchI(type, builder.var(result), builder.var(team), builder.var(extra), builder.var(index));
         }
     }
 

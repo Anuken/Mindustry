@@ -6,7 +6,9 @@ public enum FetchType{
     player,
     playerCount,
     core,
-    coreCount;
+    coreCount,
+    build,
+    buildCount;
 
     public static final FetchType[] all = values();
 }

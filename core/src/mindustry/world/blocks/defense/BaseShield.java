@@ -5,6 +5,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
+import arc.util.io.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.game.*;
@@ -139,6 +140,29 @@ public class BaseShield extends Block{
             }
 
             Draw.reset();
+        }
+
+        @Override
+        public byte version(){
+            return 1;
+        }
+
+        @Override
+        public void write(Writes write){
+            super.write(write);
+
+            write.f(smoothRadius);
+            write.bool(broken);
+        }
+
+        @Override
+        public void read(Reads read, byte revision){
+            super.read(read);
+
+            if(revision >= 1){
+                smoothRadius = read.f();
+                broken = read.bool();
+            }
         }
     }
 }

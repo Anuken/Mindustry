@@ -1166,12 +1166,13 @@ public class LExecutor{
 
     public static class FetchI implements LInstruction{
         public FetchType type = FetchType.unit;
-        public int result, team, index;
+        public int result, team, extra, index;
 
-        public FetchI(FetchType type, int result, int team, int index){
+        public FetchI(FetchType type, int result, int team, int extra, int index){
             this.type = type;
             this.result = result;
             this.team = team;
+            this.extra = extra;
             this.index = index;
         }
 
@@ -1188,9 +1189,26 @@ public class LExecutor{
                 case unit -> exec.setobj(result, i < 0 || i >= data.units.size ? null : data.units.get(i));
                 case player -> exec.setobj(result, i < 0 || i >= data.players.size || data.players.get(i).unit().isNull() ? null : data.players.get(i).unit());
                 case core -> exec.setobj(result, i < 0 || i >= data.cores.size ? null : data.cores.get(i));
+                case build -> {
+                    Block block = exec.obj(extra) instanceof Block b ? b : null;
+                    if(block == null){
+                        exec.setobj(result, null);
+                    }else{
+                        var builds = data.getBuildings(block);
+                        exec.setobj(result, i < 0 || i >= builds.size ? null : builds.get(i));
+                    }
+                }
                 case unitCount -> exec.setnum(result, data.units.size);
                 case coreCount -> exec.setnum(result, data.cores.size);
                 case playerCount -> exec.setnum(result, data.players.size);
+                case buildCount -> {
+                    Block block = exec.obj(extra) instanceof Block b ? b : null;
+                    if(block == null){
+                        exec.setobj(result, null);
+                    }else{
+                        exec.setnum(result, data.getBuildings(block).size);
+                    }
+                }
             }
         }
     }
