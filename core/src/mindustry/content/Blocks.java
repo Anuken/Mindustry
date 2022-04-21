@@ -1782,12 +1782,14 @@ public class Blocks{
             consumePower(5f);
         }};
 
-        shieldBreaker = new BaseShield("shield-breaker"){{
+        shieldBreaker = new ShieldBreaker("shield-breaker"){{
             requirements(Category.effect, BuildVisibility.editorOnly, with());
 
             size = 5;
+            toDestroy = new Block[]{Blocks.shieldProjector, Blocks.largeShieldProjector};
 
             consumeItem(Items.tungsten, 100);
+            itemCapacity = 100;
         }};
 
         //endregion
