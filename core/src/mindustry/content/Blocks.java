@@ -3695,7 +3695,7 @@ public class Blocks{
                 trailWidth = 2.1f;
                 trailLength = 10;
                 hitEffect = despawnEffect = Fx.hitBulletColor;
-                buildingDamageMultiplier = 0.4f;
+                buildingDamageMultiplier = 0.3f;
             }},
             Items.tungsten, new BasicBulletType(8f, 185){{
                 width = 13f;
@@ -3714,7 +3714,7 @@ public class Blocks{
                 trailLength = 11;
                 hitEffect = despawnEffect = Fx.hitBulletColor;
                 rangeChange = 40f;
-                buildingDamageMultiplier = 0.4f;
+                buildingDamageMultiplier = 0.3f;
             }}
             );
 
@@ -3792,7 +3792,7 @@ public class Blocks{
                 length = r;
                 knockback = 1f;
                 pierceCap = 3;
-                buildingDamageMultiplier = 0.5f;
+                buildingDamageMultiplier = 0.3f;
 
                 colors = new Color[]{Color.valueOf("eb7abe").a(0.55f), Color.valueOf("e189f5").a(0.7f), Color.valueOf("907ef7").a(0.8f), Color.valueOf("91a4ff"), Color.white};
             }},
@@ -3802,7 +3802,7 @@ public class Blocks{
                 length = r + rangeChange;
                 knockback = 2f;
                 pierceCap = 4;
-                buildingDamageMultiplier = 0.5f;
+                buildingDamageMultiplier = 0.3f;
 
                 colors = new Color[]{Color.valueOf("465ab8").a(0.55f), Color.valueOf("66a6d2").a(0.7f), Color.valueOf("89e8b6").a(0.8f), Color.valueOf("cafcbe"), Color.white};
                 flareColor = Color.valueOf("89e8b6");
@@ -3850,7 +3850,7 @@ public class Blocks{
                 trailInterp = v -> Math.max(Mathf.slope(v), 0.8f);
                 shrinkX = 0.2f;
                 shrinkY = 0.1f;
-                buildingDamageMultiplier = 0.25f;
+                buildingDamageMultiplier = 0.3f;
             }}
             );
 

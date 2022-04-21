@@ -240,8 +240,16 @@ public class Mods implements Loadable{
                 entries[i] = new Seq<>();
             }
 
+            ObjectMap<Texture, PageType> pageTypes = ObjectMap.of(
+            Core.atlas.find("white").texture, PageType.main,
+            Core.atlas.find("stone1").texture, PageType.environment,
+            Core.atlas.find("clear-editor").texture, PageType.editor,
+            Core.atlas.find("whiteui").texture, PageType.ui,
+            Core.atlas.find("rubble-1-0").texture, PageType.rubble
+            );
+
             for(AtlasRegion region : Core.atlas.getRegions()){
-                PageType type = getPage(region);
+                PageType type = pageTypes.get(region.texture, PageType.main);
 
                 if(!packer.has(type, region.name)){
                     entries[type.ordinal()].add(new RegionEntry(region.name, Core.atlas.getPixmap(region), region.splits, region.pads));

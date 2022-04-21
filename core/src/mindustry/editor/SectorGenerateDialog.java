@@ -61,7 +61,7 @@ public class SectorGenerateDialog extends BaseDialog{
 
         cont.field(sector + "", text -> {
             sector = Strings.parseInt(text);
-        }).width(200f).valid(text -> planet.sectors.size > Strings.parseInt(text, 99999));
+        }).width(200f).valid(text -> planet.sectors.size > Strings.parseInt(text, 99999) && Strings.parseInt(text, 9999) >= 0);
 
         cont.row();
 
