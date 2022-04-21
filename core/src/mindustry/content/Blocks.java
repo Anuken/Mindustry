@@ -91,6 +91,7 @@ public class Blocks{
     //campaign only
     shieldProjector,
     largeShieldProjector,
+    shieldBreaker,
 
     //transport
     conveyor, titaniumConveyor, plastaniumConveyor, armoredConveyor, distributor, junction, itemBridge, phaseConveyor, sorter, invertedSorter, router,
@@ -1779,6 +1780,14 @@ public class Blocks{
             radius = 400f;
 
             consumePower(5f);
+        }};
+
+        shieldBreaker = new BaseShield("shield-breaker"){{
+            requirements(Category.effect, BuildVisibility.editorOnly, with());
+
+            size = 5;
+
+            consumeItem(Items.tungsten, 100);
         }};
 
         //endregion

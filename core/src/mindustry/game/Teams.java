@@ -10,6 +10,7 @@ import mindustry.*;
 import mindustry.ai.*;
 import mindustry.gen.*;
 import mindustry.type.*;
+import mindustry.world.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
@@ -260,6 +261,8 @@ public class Teams{
         public int unitCount;
         /** Counts for each type of unit. Do not access directly. */
         public @Nullable int[] typeCounts;
+        /** Cached buildings by type. */
+        public ObjectMap<Block, Seq<Building>> buildingTypes = new ObjectMap<>();
         /** Units of this team. Updated each frame. */
         public Seq<Unit> units = new Seq<>(false);
         /** Same as units, but players. */
@@ -271,6 +274,10 @@ public class Teams{
 
         public TeamData(Team team){
             this.team = team;
+        }
+
+        public Seq<Building> getBuildings(Block block){
+            return buildingTypes.get(block, () -> new Seq<>(false));
         }
 
         /** Destroys this team's presence on the map, killing part of its buildings and converting everything to 'derelict'. */

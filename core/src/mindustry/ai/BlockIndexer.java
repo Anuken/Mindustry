@@ -114,7 +114,8 @@ public class BlockIndexer{
             }
 
             //no longer part of the building list
-            data.buildings.remove(tile.build);
+            data.buildings.remove(build);
+            data.buildingTypes.get(build.block, () -> new Seq<>(false)).remove(build);
 
             //update the unit cap when building is removed
             data.unitCap -= tile.block().unitCapModifier;
@@ -449,6 +450,7 @@ public class BlockIndexer{
 
             //record in list of buildings
             data.buildings.add(tile.build);
+            data.buildingTypes.get(tile.block(), () -> new Seq<>(false)).add(tile.build);
 
             //update the unit cap when new tile is registered
             data.unitCap += tile.block().unitCapModifier;
