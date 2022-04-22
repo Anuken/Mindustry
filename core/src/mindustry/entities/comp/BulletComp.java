@@ -25,7 +25,7 @@ import static mindustry.Vars.*;
 abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Drawc, Shielderc, Ownerc, Velc, Bulletc, Timerc{
     @Import Team team;
     @Import Entityc owner;
-    @Import float x, y, damage;
+    @Import float x, y, damage, lastX, lastY;
     @Import Vec2 vel;
 
     IntSeq collided = new IntSeq(6);
@@ -131,7 +131,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
         type.update(self());
 
         if(type.collidesTiles && type.collides && type.collidesGround){
-            tileRaycast(World.toTile(lastX()), World.toTile(lastY()), tileX(), tileY());
+            tileRaycast(World.toTile(lastX), World.toTile(lastY), tileX(), tileY());
         }
 
         if(type.removeAfterPierce && type.pierceCap != -1 && collided.size >= type.pierceCap){
@@ -197,6 +197,11 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
                 }
 
                 if(remove || type.collidesTeam){
+                    if(Mathf.dst2(lastX, lastY, x * tilesize, y * tilesize) < Mathf.dst2(lastX, lastY, this.x, this.y)){
+                        this.x = x * tilesize;
+                        this.y = y * tilesize;
+                    }
+
                     if(!type.pierceBuilding){
                         hit = true;
                         remove();
