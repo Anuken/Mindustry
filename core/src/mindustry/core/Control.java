@@ -182,7 +182,7 @@ public class Control implements ApplicationListener, Loadable{
 
             float coreDelay = 0f;
 
-            if(!settings.getBool("skipcoreanimation")){
+            if(!settings.getBool("skipcoreanimation") && !state.rules.pvp){
                 coreDelay = coreLandDuration;
                 //delay player respawn so animation can play.
                 player.deathTimer = -80f;
@@ -216,7 +216,7 @@ public class Control implements ApplicationListener, Loadable{
                     float unitsPerTick = 1f;
 
                     boolean anyBuilds = false;
-                    for(var build : state.rules.defaultTeam.data().buildings){
+                    for(var build : state.rules.defaultTeam.data().buildings.copy()){
                         if(!(build instanceof CoreBuild) && !build.block.privileged){
                             var ccore = build.closestCore();
 

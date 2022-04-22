@@ -26,6 +26,7 @@ import mindustry.maps.*;
 import mindustry.mod.*;
 import mindustry.net.*;
 import mindustry.service.*;
+import mindustry.ui.dialogs.*;
 import mindustry.world.*;
 
 import java.io.*;
@@ -270,7 +271,7 @@ public class Vars implements Loadable{
                 }
             }
 
-            Arrays.sort(locales, Structs.comparing(l -> l.getDisplayName(l), String.CASE_INSENSITIVE_ORDER));
+            Arrays.sort(locales, Structs.comparing(LanguageDialog::getDisplayName, String.CASE_INSENSITIVE_ORDER));
             locales = Seq.with(locales).and(new Locale("router")).toArray(Locale.class);
         }
 
@@ -462,7 +463,7 @@ public class Vars implements Loadable{
             Core.bundle = I18NBundle.createBundle(handle, locale);
 
             //router
-            if(locale.getDisplayName().equals("router")){
+            if(locale.toString().equals("router")){
                 bundle.debug("router");
             }
         }
