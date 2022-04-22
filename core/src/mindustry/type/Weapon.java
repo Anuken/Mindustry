@@ -156,8 +156,8 @@ public class Weapon implements Cloneable{
         if(outlineRegion.found()){
             Draw.rect(outlineRegion,
             wx, wy,
-            outlineRegion.width * Draw.scl * -Mathf.sign(flipSprite),
-            outlineRegion.height * Draw.scl,
+            outlineRegion.width * Draw.scl * -Mathf.sign(flipSprite) * outlineRegion.scale,
+            outlineRegion.height * Draw.scl * outlineRegion.scale,
             weaponRotation);
         }
     }
@@ -183,8 +183,8 @@ public class Weapon implements Cloneable{
 
         Draw.rect(region,
         wx, wy,
-        region.width * Draw.scl * -Mathf.sign(flipSprite),
-        region.height * Draw.scl,
+        region.width * Draw.scl * -Mathf.sign(flipSprite) * region.scale,
+        region.height * Draw.scl * region.scale,
         weaponRotation);
 
         if(heatRegion.found() && mount.heat > 0){
@@ -192,8 +192,8 @@ public class Weapon implements Cloneable{
             Draw.blend(Blending.additive);
             Draw.rect(heatRegion,
             wx, wy,
-            heatRegion.width * Draw.scl * -Mathf.sign(flipSprite),
-            heatRegion.height * Draw.scl,
+            heatRegion.width * Draw.scl * -Mathf.sign(flipSprite) * region.scale,
+            heatRegion.height * Draw.scl * region.scale,
             weaponRotation);
             Draw.blend();
             Draw.color();

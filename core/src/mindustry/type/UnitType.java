@@ -720,7 +720,7 @@ public class UnitType extends UnlockableContent{
     public void drawSoftShadow(Unit unit, float alpha){
         Draw.color(0, 0, 0, 0.4f * alpha);
         float rad = 1.6f;
-        float size = Math.max(region.width, region.height) * Draw.scl;
+        float size = Math.max(region.width, region.height) * Draw.scl * region.scale;
         Draw.rect(softShadowRegion, unit, size * rad * Draw.xscl, size * rad * Draw.yscl, unit.rotation - 90);
         Draw.color();
     }
@@ -742,11 +742,12 @@ public class UnitType extends UnlockableContent{
             if(itemCircleRegion == null || itemCircleRegion.texture.isDisposed()){
                 itemCircleRegion = Core.atlas.find("ring-item");
             }
-            size = (3f + Mathf.absin(Time.time, 5f, 1f)) * unit.itemTime + 0.5f;
+            size = ((3f + Mathf.absin(Time.time, 5f, 1f)) * unit.itemTime + 0.5f) * 2 * itemCircleRegion.scale;
             Draw.color(Pal.accent);
             Draw.rect(itemCircleRegion,
             unit.x + Angles.trnsx(unit.rotation + 180f, itemOffsetY),
-            unit.y + Angles.trnsy(unit.rotation + 180f, itemOffsetY), size * 2, size * 2);
+            unit.y + Angles.trnsy(unit.rotation + 180f, itemOffsetY),
+            size, size);
 
             if(unit.isLocal() && !renderer.pixelator.enabled()){
                 Fonts.outline.draw(unit.stack.amount + "",
