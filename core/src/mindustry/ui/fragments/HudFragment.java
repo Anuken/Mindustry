@@ -90,10 +90,17 @@ public class HudFragment{
         //paused table
         parent.fill(t -> {
             t.name = "paused";
-            t.top().visible(() -> state.isPaused() && shown).touchable = Touchable.disabled;
-            t.table(Styles.black6, top -> top.label(() -> netServer.isWaitingForPlayers() ? "@waiting.players" : state.gameOver && state.isCampaign() ? "@sector.curlost" : "@paused")
+            t.top().visible(() -> state.isPaused() && shown && !netServer.isWaitingForPlayers()).touchable = Touchable.disabled;
+            t.table(Styles.black6, top -> top.label(() -> state.gameOver && state.isCampaign() ? "@sector.curlost" : "@paused")
                 .style(Styles.outlineLabel).pad(8f)).height(pauseHeight).growX();
             //.padLeft(dsize * 5 + 4f) to prevent alpha overlap on left
+        });
+
+        //"waiting for players"
+        parent.fill(t -> {
+            t.name = "waiting";
+            t.visible(() -> netServer.isWaitingForPlayers()).touchable = Touchable.disabled;
+            t.table(Styles.black6, top -> top.add("@waiting.players").style(Styles.outlineLabel).pad(16f));
         });
 
         //minimap + position
@@ -283,7 +290,7 @@ public class HudFragment{
 
             t.name = "coreinfo";
 
-            t.collapser(v -> v.add().height(pauseHeight), () -> state.isPaused()).row();
+            t.collapser(v -> v.add().height(pauseHeight), () -> state.isPaused() && !netServer.isWaitingForPlayers()).row();
 
             t.table(c -> {
                 //core items
