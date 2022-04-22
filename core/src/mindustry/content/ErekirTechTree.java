@@ -277,7 +277,7 @@ public class ErekirTechTree{
 
                 });
 
-                node(tankReconstructor, Seq.with(new OnSector(three)), () -> {
+                node(tankReconstructor, Seq.with(new OnSector(two)), () -> {
                     node(UnitTypes.locus);
 
                     node(shipReconstructor, Seq.with(new OnSector(four)), () -> {
@@ -317,8 +317,8 @@ public class ErekirTechTree{
             //TODO more sectors
             node(onset, () -> {
                 node(two, Seq.with(new SectorComplete(onset), new Research(ductRouter), new Research(ductBridge)), () -> {
-                    node(three, Seq.with(new SectorComplete(two), new Research(reinforcedContainer), new Research(ductUnloader), new Research(ventCondenser)), () -> {
-                        node(four, Seq.with(new SectorComplete(three), new Research(electrolyzer), new Research(oxidationChamber), new Research(chemicalCombustionChamber)), () -> {
+                    node(three, Seq.with(new SectorComplete(two), new Research(reinforcedContainer), new Research(ductUnloader), new Research(ventCondenser), new Research(electrolyzer)), () -> {
+                        node(four, Seq.with(new SectorComplete(three), new Research(oxidationChamber), new Research(chemicalCombustionChamber)), () -> {
                             //TODO research reqs?
                             node(five, Seq.with(new SectorComplete(four)), () -> {
 

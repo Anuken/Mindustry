@@ -186,19 +186,13 @@ public class SectorPresets{
 
             rules = r -> {
                 r.objectives.addAll(
-                    new UnitCountObjective(UnitTypes.stell, 2).withMarkers(
-                        new TextMarker("The enemy will attack soon.\n Build units to defend your core.", 276f * 8f, 133f * 8f)
-                    ),
-                    new BuildCountObjective(Blocks.breach, 1).withMarkers(
-                        new TextMarker("Units are effective, but [accent]turrets[] provide better defensive capabilities if used effectively.\n Place a [accent]Breach[] turret.\nTurrets require [accent]ammo[].", 276f * 8f, 133f * 8f)
-                    ).withFlags("defDone"),
-                    new BuildCountObjective(Blocks.berylliumWall, 6).withMarkers(
-                        new TextMarker("[accent]Walls[] can prevent oncoming damage from reaching your buildings\nPlace some [accent]beryllium walls[] around the turret.", 276f * 8f, 133f * 8f)
-                    ),
-                    new BuildCountObjective(Blocks.coreBastion, 1).withMarkers(
-                        new TextMarker("You must expand.\nBuild more units and go on the offensive", 276f * 8f, 133f * 8f),
-                        new TextMarker("Cores can only be placed in special zone tiles.", 287 * 8f, 201 * 8f)
-                    ).withFlags("def2Done")
+                        new TimerObjective("Enemy detection", 5 * 60 * 60).withMarkers(
+                                new TextMarker("The enemy will begin constructing units in 5 minutes.", 276f * 8f, 164f * 8f)
+                        ).withFlags("beginBuilding"),
+                        new DestroyBlockObjective(Blocks.largeShieldProjector, 210, 278, Team.malis).withMarkers(
+                                new TextMarker("The enemy is protected by sheilds.\nA experimental shield breaker module has been detected in this sector.\nFind and activate it using tungsten.", 276f * 8f, 164f * 8f),
+                                new ShapeTextMarker("Tungsten can be mined using an [accent]impact drill[].\nIt requires water.", 220f * 8f, 181f * 8f)
+                        )
                 );
             };
         }};
