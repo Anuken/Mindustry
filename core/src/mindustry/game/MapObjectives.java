@@ -197,11 +197,24 @@ public class MapObjectives{
         @Override
         public String text(){
             if(text != null){
-                int time = (int)((duration - countup) / 60f);
+                int i = (int)((duration - countup) / 60f);
+                StringBuilder timeString = new StringBuilder();
+
+                int m = i / 60;
+                int s = i % 60;
+                if(m > 0){
+                    timeString.append(m);
+                    timeString.append(":");
+                    if(s < 10){
+                        timeString.append("0");
+                    }
+                }
+                timeString.append(s);
+
                 if(text.startsWith("@")){
-                    return Core.bundle.format(text.substring(1), time);
+                    return Core.bundle.format(text.substring(1), timeString.toString());
                 }else{
-                    return Core.bundle.formatString(text, time);
+                    return Core.bundle.formatString(text, timeString.toString());
                 }
             }
             return text;

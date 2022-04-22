@@ -100,7 +100,7 @@ public class HudFragment{
         parent.fill(t -> {
             t.name = "waiting";
             t.visible(() -> netServer.isWaitingForPlayers()).touchable = Touchable.disabled;
-            t.table(Styles.black6, top -> top.add("@waiting.players").style(Styles.outlineLabel).pad(16f));
+            t.table(Styles.black6, top -> top.add("@waiting.players").style(Styles.outlineLabel).pad(18f));
         });
 
         //minimap + position
