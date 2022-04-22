@@ -4,6 +4,8 @@ import arc.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.math.*;
+import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
@@ -22,7 +24,7 @@ public class MapObjectives{
     };
 
     public static Prov<ObjectiveMarker>[] allMarkerTypes = new Prov[]{
-        TextMarker::new, ShapeMarker::new, ShapeTextMarker::new
+        TextMarker::new, ShapeMarker::new, ShapeTextMarker::new, MinimapMarker::new
     };
 
     /** Research a specific piece of content in the tech tree. */
@@ -419,6 +421,33 @@ public class MapObjectives{
         }
     }
 
+    /** Displays a circle on the minimap. */
+    public static class MinimapMarker extends ObjectiveMarker{
+        //in tiles.
+        public float x, y, radius = 5f, stroke = 11f;
+        public Color color = Team.malis.color;
+
+        public MinimapMarker(float x, float y){
+            this.x = x;
+            this.y = y;
+        }
+
+        public MinimapMarker(){
+        }
+
+        @Override
+        public void drawMinimap(MinimapRenderer minimap){
+            minimap.transform(Tmp.v1.set(x * tilesize, y * tilesize));
+
+            float rad = minimap.scale(radius * tilesize);
+            float fin = Interp.pow2Out.apply((Time.globalTime / 100f) % 1f);
+
+            Lines.stroke(Scl.scl((1f - fin) * stroke + 0.1f), color);
+            Lines.circle(Tmp.v1.x, Tmp.v1.y, rad * fin);
+            Draw.reset();
+        }
+    }
+
     /** Displays a shape with an outline and color. */
     public static class ShapeMarker extends ObjectiveMarker{
         public float x, y, radius = 6f, rotation = 0f;
@@ -492,6 +521,8 @@ public class MapObjectives{
 
         /** Called in the overlay draw layer.*/
         public void draw(){}
+        /** Called in the small & large map. */
+        public void drawMinimap(MinimapRenderer minimap){}
         /** Add any UI elements necessary. */
         public void added(){}
         /** Remove any UI elements, if necessary. */

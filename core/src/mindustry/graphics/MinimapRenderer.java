@@ -29,6 +29,9 @@ public class MinimapRenderer{
     private Rect rect = new Rect();
     private float zoom = 4;
 
+    private float lastX, lastY, lastW, lastH, lastScl;
+    private boolean worldSpace;
+
     public MinimapRenderer(){
         Events.on(WorldLoadEvent.class, event -> {
             reset();
@@ -97,6 +100,13 @@ public class MinimapRenderer{
     }
 
     public void drawEntities(float x, float y, float w, float h, float scaling, boolean withLabels){
+        lastX = x;
+        lastY = y;
+        lastW = w;
+        lastH = h;
+        lastScl = scaling;
+        worldSpace = withLabels;
+
         if(!withLabels){
             updateUnitArray();
         }else{
@@ -175,6 +185,13 @@ public class MinimapRenderer{
         if(withLabels){
             drawSpawns(x, y, w, h, scaling);
         }
+
+        if(state.rules.objectives.size > 0){
+            var first = state.rules.objectives.first();
+            for(var marker : first.markers){
+                marker.drawMinimap(this);
+            }
+        }
     }
 
     public void drawSpawns(float x, float y, float w, float h, float scaling){
@@ -186,12 +203,12 @@ public class MinimapRenderer{
 
         Draw.color(state.rules.waveTeam.color, Tmp.c2.set(state.rules.waveTeam.color).value(1.2f), Mathf.absin(Time.time, 16f, 1f));
 
+        float rad = scale(state.rules.dropZoneRadius);
+        float curve = Mathf.curve(Time.time % 240f, 120f, 240f);
+
         for(Tile tile : spawner.getSpawns()){
             float tx = ((tile.x + 0.5f) / world.width()) * w;
             float ty = ((tile.y + 0.5f) / world.height()) * h;
-
-            float rad = (state.rules.dropZoneRadius / (baseSize / 2f)) * 5f * scaling;
-            float curve = Mathf.curve(Time.time % 240f, 120f, 240f);
 
             Draw.rect(icon, x + tx, y + ty, icon.width, icon.height);
             Lines.circle(x + tx, y + ty, rad);
@@ -201,8 +218,19 @@ public class MinimapRenderer{
         Draw.reset();
     }
 
-    public void drawEntities(float x, float y, float w, float h){
-        drawEntities(x, y, w, h, 1f, true);
+    //TODO horrible code, everywhere.
+    public Vec2 transform(Vec2 position){
+        if(!worldSpace){
+            position.sub(rect.x, rect.y).scl(lastW / rect.width, lastH / rect.height);
+        }else{
+            position.scl(1f / world.unitWidth(), 1f / world.unitHeight()).scl(lastW, lastH);
+        }
+
+        return position.add(lastX, lastY);
+    }
+
+    public float scale(float radius){
+        return (radius / (baseSize / 2f)) * 5f * lastScl;
     }
 
     public @Nullable TextureRegion getRegion(){
