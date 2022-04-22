@@ -46,7 +46,7 @@ public class UnitTypes{
 
     //air
     public static @EntityDef({Unitc.class}) UnitType flare, eclipse, horizon, zenith, antumbra,
-    evoke, avert;
+    evoke, avert, obviate;
 
     //air, legacy
     public static @EntityDef(value = {Unitc.class}, legacy = true) UnitType mono;
@@ -3336,6 +3336,26 @@ public class UnitTypes{
                     hitEffect = despawnEffect = Fx.hitBulletColor;
                 }};
             }});
+        }};
+
+        obviate = new ErekirUnitType("obviate"){{
+            lowAltitude = false;
+            flying = true;
+            drag = 0.08f;
+            speed = 1.9f;
+            rotateSpeed = 4f;
+            accel = 0.09f;
+            health = 2300f;
+            armor = 3f;
+            hitSize = 18f;
+            engineSize = 4.3f;
+            engineOffset = 54f / 4f;
+            fogRadius = 25;
+            itemCapacity = 0;
+
+            setEnginesMirror(
+            new UnitEngine(59 / 4f, -25 / 4f, 3.1f, 315f)
+            );
         }};
 
         quell = new ErekirUnitType("quell"){{
