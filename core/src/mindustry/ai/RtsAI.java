@@ -34,8 +34,6 @@ public class RtsAI{
     //in order of priority??
     static final BlockFlag[] flags = {BlockFlag.generator, BlockFlag.factory, BlockFlag.core, BlockFlag.battery};
     static final ObjectFloatMap<Building> weights = new ObjectFloatMap<>();
-    //TODO configurable, perhaps
-    static final int minSquadSize = 4;
     //TODO max squad size
     static final boolean debug = OS.hasProp("mindustry.debug");
 
@@ -172,7 +170,7 @@ public class RtsAI{
 
             //defend when close, or this is the only squad defending
             //TODO will always rush to defense no matter what
-            if(best instanceof CoreBuild || units.size >= minSquadSize || best.within(ax, ay, 500f)){
+            if(best instanceof CoreBuild || units.size >= data.team.rules().rtsAiMinSquadSize || best.within(ax, ay, 500f)){
                 defend = best;
 
                 if(debug){
@@ -239,7 +237,7 @@ public class RtsAI{
     }
 
     @Nullable Building findTarget(float x, float y, int total, float dps, float health){
-        if(total < minSquadSize) return null;
+        if(total < data.team.rules().rtsAiMinSquadSize) return null;
 
         //flag priority?
         //1. generator

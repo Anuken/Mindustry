@@ -224,6 +224,8 @@ public class Rules{
 
         /** Enables "RTS" unit AI. TODO wip */
         public boolean rtsAi;
+        /** Minimum size of attack squads. */
+        public int rtsAiMinSquadSize = 4;
 
         /** How fast unit factories build units. */
         public float unitBuildSpeedMultiplier = 1f;
