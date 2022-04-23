@@ -67,6 +67,8 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
 
     @Override
     public void remove(){
+        if(Groups.isClearing) return;
+
         //'despawned' only counts when the bullet is killed externally or reaches the end of life
         if(!hit){
             type.despawned(self());

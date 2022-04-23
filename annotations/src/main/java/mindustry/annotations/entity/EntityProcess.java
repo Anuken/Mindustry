@@ -596,10 +596,14 @@ public class EntityProcess extends BaseProcessor{
             //write the groups
             groupsBuilder.addMethod(groupInit.build());
 
+            groupsBuilder.addField(boolean.class, "isClearing", Modifier.PUBLIC, Modifier.STATIC);
+
             MethodSpec.Builder groupClear = MethodSpec.methodBuilder("clear").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+            groupClear.addStatement("isClearing = true");
             for(GroupDefinition group : groupDefs){
                 groupClear.addStatement("$L.clear()", group.name);
             }
+            groupClear.addStatement("isClearing = false");
 
             //write clear
             groupsBuilder.addMethod(groupClear.build());
