@@ -190,7 +190,7 @@ public class SectorPresets{
                                 new TextMarker("The enemy will begin constructing units in 5 minutes.", 276f * 8f, 164f * 8f)
                         ).withFlags("beginBuilding"),
                         new DestroyBlockObjective(Blocks.largeShieldProjector, 210, 278, Team.malis).withMarkers(
-                                new TextMarker("The enemy is protected by sheilds.\nA experimental shield breaker module has been detected in this sector.\nFind and activate it using tungsten.", 276f * 8f, 164f * 8f),
+                                new TextMarker("The enemy is protected by shields.\nAn experimental shield breaker module has been detected in this sector.\nFind and activate it using tungsten.", 276f * 8f, 164f * 8f),
                                 new ShapeTextMarker("Tungsten can be mined using an [accent]impact drill[].\nIt requires water.", 220f * 8f, 181f * 8f)
                         )
                 );
