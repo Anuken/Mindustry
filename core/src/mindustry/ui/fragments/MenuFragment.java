@@ -92,8 +92,8 @@ public class MenuFragment{
             Draw.color();
             Draw.rect(logo, fx, fy, logow, logoh);
 
-            Fonts.def.setColor(Color.white);
-            Fonts.def.draw(versionText, fx, fy - logoh/2f, Align.center);
+            Fonts.outline.setColor(Color.white);
+            Fonts.outline.draw(versionText, fx, fy - logoh/2f - Scl.scl(2f), Align.center);
         }).touchable = Touchable.disabled;
     }
 
