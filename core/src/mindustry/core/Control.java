@@ -211,16 +211,17 @@ public class Control implements ApplicationListener, Loadable{
 
             if(state.isCampaign()){
 
-                //TODO add a delay for landing.
                 if(state.rules.sector.planet.prebuildBase){
                     float unitsPerTick = 1f;
+                    float buildRadius = state.rules.enemyCoreBuildRadius * 1.5f;
 
+                    //TODO if the save is unloaded, these blocks do not get built.
                     boolean anyBuilds = false;
                     for(var build : state.rules.defaultTeam.data().buildings.copy()){
                         if(!(build instanceof CoreBuild) && !build.block.privileged){
                             var ccore = build.closestCore();
 
-                            if(ccore != null && build.within(ccore, state.rules.enemyCoreBuildRadius)){
+                            if(ccore != null && build.within(ccore, buildRadius)){
                                 build.pickedUp();
                                 build.tile.remove();
                                 anyBuilds = true;
@@ -242,7 +243,7 @@ public class Control implements ApplicationListener, Loadable{
                     if(anyBuilds){
                         for(var ccore : state.rules.defaultTeam.data().cores){
                             Time.run(coreDelay, () -> {
-                                Fx.coreBuildShockwave.at(ccore.x, ccore.y, state.rules.enemyCoreBuildRadius);
+                                Fx.coreBuildShockwave.at(ccore.x, ccore.y, buildRadius);
                             });
                         }
                     }

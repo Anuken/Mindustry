@@ -4143,10 +4143,10 @@ public class Blocks{
         //region units - erekir
 
         fabricator = new UnitFactory("fabricator"){{
-            requirements(Category.units, with(Items.silicon, 200, Items.beryllium, 250));
+            requirements(Category.units, with(Items.silicon, 200, Items.beryllium, 200));
             size = 3;
             configurable = false;
-            plans.add(new UnitPlan(UnitTypes.stell, 60f * 60f * 1f, with(Items.beryllium, 50f, Items.silicon, 60f)));
+            plans.add(new UnitPlan(UnitTypes.stell, 60f * 45f * 1f, with(Items.beryllium, 50f, Items.silicon, 60f)));
             researchCost = with(Items.beryllium, 200, Items.graphite, 80, Items.silicon, 80);
             regionSuffix = "-dark";
             fogRadius = 3;

@@ -20,7 +20,7 @@ public class MapObjectives{
     public static Prov<MapObjective>[] allObjectiveTypes = new Prov[]{
         ResearchObjective::new, BuildCountObjective::new, UnitCountObjective::new, ItemObjective::new,
         CommandModeObjective::new, CoreItemObjective::new, DestroyCoreObjective::new, DestroyUnitsObjective::new,
-        TimerObjective::new, FlagObjective::new, DestroyBlockObjective::new
+        TimerObjective::new, FlagObjective::new, DestroyBlockObjective::new, ProduceObjective::new
     };
 
     public static Prov<ObjectiveMarker>[] allMarkerTypes = new Prov[]{
@@ -41,6 +41,28 @@ public class MapObjectives{
         @Override
         public String text(){
             return Core.bundle.format("objective.research", content.emoji(), content.localizedName);
+        }
+
+        @Override
+        public boolean complete(){
+            return content.unlocked();
+        }
+    }
+
+    /** Produce a specific piece of content in the tech tree (essentially research with different text). */
+    public static class ProduceObjective extends MapObjective{
+        public UnlockableContent content = Items.copper;
+
+        public ProduceObjective(UnlockableContent content){
+            this.content = content;
+        }
+
+        public ProduceObjective(){
+        }
+
+        @Override
+        public String text(){
+            return Core.bundle.format("objective.produce", content.emoji(), content.localizedName);
         }
 
         @Override
@@ -430,6 +452,12 @@ public class MapObjectives{
         public MinimapMarker(float x, float y){
             this.x = x;
             this.y = y;
+        }
+
+        public MinimapMarker(float x, float y, Color color){
+            this.x = x;
+            this.y = y;
+            this.color = color;
         }
 
         public MinimapMarker(){

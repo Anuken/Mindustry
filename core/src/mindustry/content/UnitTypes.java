@@ -2878,7 +2878,7 @@ public class UnitTypes{
                 smoothReloadSpeed = 0.15f;
                 recoil = 2f;
 
-                bullet = new BasicBulletType(3.5f, 50){{
+                bullet = new BasicBulletType(3.5f, 55){{
                     backColor = trailColor = hitColor = Pal.techBlue;
                     frontColor = Color.white;
                     width = 7.5f;
@@ -3323,7 +3323,7 @@ public class UnitTypes{
                 shoot = new ShootHelix();
 
                 //TODO cooler + balancing
-                bullet = new BasicBulletType(5f, 25){{
+                bullet = new BasicBulletType(5f, 30){{
                     width = 7f;
                     height = 12f;
                     lifetime = 25f;

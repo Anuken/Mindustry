@@ -28,7 +28,7 @@ public class BlockInventoryFragment{
     private static final float holdShrink = 120f;
 
     Table table = new Table();
-    Building tile;
+    Building build;
     float holdTime = 0f, emptyTime;
     boolean holding, held;
     float[] shrinkHoldTimes = new float[content.items().size];
@@ -46,13 +46,14 @@ public class BlockInventoryFragment{
     }
 
     public void showFor(Building t){
-        if(this.tile == t){
+        if(this.build == t){
             hide();
             return;
         }
-        this.tile = t;
-        if(tile == null || !tile.block.isAccessible() || tile.items.total() == 0)
+        this.build = t;
+        if(build == null || !build.block.isAccessible() || build.items == null || build.items.total() == 0){
             return;
+        }
         rebuild(true);
     }
 
@@ -65,7 +66,7 @@ public class BlockInventoryFragment{
             table.update(null);
         }), Actions.visible(false));
         table.touchable = Touchable.disabled;
-        tile = null;
+        build = null;
     }
 
     private void takeItem(int requested){
@@ -73,12 +74,12 @@ public class BlockInventoryFragment{
         int amount = Math.min(requested, player.unit().maxAccepted(lastItem));
 
         if(amount > 0){
-            Call.requestItem(player, tile, lastItem, amount);
+            Call.requestItem(player, build, lastItem, amount);
             holding = false;
             holdTime = 0f;
             held = true;
 
-            if(net.client()) Events.fire(new WithdrawEvent(tile, player, lastItem, amount));
+            if(net.client()) Events.fire(new WithdrawEvent(build, player, lastItem, amount));
         }
     }
 
@@ -94,10 +95,10 @@ public class BlockInventoryFragment{
         table.touchable = Touchable.enabled;
         table.update(() -> {
 
-            if(state.isMenu() || tile == null || !tile.isValid() || !tile.block.isAccessible() || emptyTime >= holdShrink){
+            if(state.isMenu() || build == null || !build.isValid() || !build.block.isAccessible() || emptyTime >= holdShrink){
                 hide();
             }else{
-                if(tile.items.total() == 0){
+                if(build.items.total() == 0){
                     emptyTime += Time.delta;
                 }else{
                     emptyTime = 0f;
@@ -111,12 +112,12 @@ public class BlockInventoryFragment{
                 }
 
                 updateTablePosition();
-                if(tile.block.hasItems){
+                if(build.block.hasItems){
                     boolean dirty = false;
                     if(shrinkHoldTimes.length != content.items().size) shrinkHoldTimes = new float[content.items().size];
 
                     for(int i = 0; i < content.items().size; i++){
-                        boolean has = tile.items.has(content.item(i));
+                        boolean has = build.items.has(content.item(i));
                         boolean had = container.contains(i);
                         if(has){
                             shrinkHoldTimes[i] = 0f;
@@ -141,28 +142,28 @@ public class BlockInventoryFragment{
         table.margin(4f);
         table.defaults().size(8 * 5).pad(4f);
 
-        if(tile.block.hasItems){
+        if(build.block.hasItems){
 
             for(int i = 0; i < content.items().size; i++){
                 Item item = content.item(i);
-                if(!tile.items.has(item)) continue;
+                if(!build.items.has(item)) continue;
 
                 container.add(i);
 
-                Boolp canPick = () -> player.unit().acceptsItem(item) && !state.isPaused() && player.within(tile, itemTransferRange);
+                Boolp canPick = () -> player.unit().acceptsItem(item) && !state.isPaused() && player.within(build, itemTransferRange);
 
                 HandCursorListener l = new HandCursorListener();
                 l.enabled = canPick;
 
                 Element image = itemImage(item.uiIcon, () -> {
-                    if(tile == null || !tile.isValid()){
+                    if(build == null || !build.isValid()){
                         return "";
                     }
-                    return round(tile.items.get(item));
+                    return round(build.items.get(item));
                 });
                 image.addListener(l);
 
-                Boolp validClick = () -> !(!canPick.get() || tile == null || !tile.isValid() || tile.items == null || !tile.items.has(item));
+                Boolp validClick = () -> !(!canPick.get() || build == null || !build.isValid() || build.items == null || !build.items.has(item));
 
                 image.addListener(new ClickListener(){
 
@@ -182,7 +183,7 @@ public class BlockInventoryFragment{
                         if(!validClick.get() || held) return;
 
                         //take all
-                        takeItem(tile.items.get(lastItem = item));
+                        takeItem(build.items.get(lastItem = item));
                     }
 
                     @Override
@@ -227,7 +228,7 @@ public class BlockInventoryFragment{
     }
 
     private void updateTablePosition(){
-        Vec2 v = Core.input.mouseScreen(tile.x + tile.block.size * tilesize / 2f, tile.y + tile.block.size * tilesize / 2f);
+        Vec2 v = Core.input.mouseScreen(build.x + build.block.size * tilesize / 2f, build.y + build.block.size * tilesize / 2f);
         table.pack();
         table.setPosition(v.x, v.y, Align.topLeft);
     }
