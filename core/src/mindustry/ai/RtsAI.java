@@ -28,8 +28,6 @@ public class RtsAI{
     static final IntSet assignedTargets = new IntSet();
     static final float squadRadius = 120f;
     static final int timeUpdate = 0, timerSpawn = 1;
-    //TODO make configurable
-    static final float minWeight = 1f;
 
     //in order of priority??
     static final BlockFlag[] flags = {BlockFlag.generator, BlockFlag.factory, BlockFlag.core, BlockFlag.battery};
@@ -267,7 +265,7 @@ public class RtsAI{
         );
 
         float weight = weights.get(result, 0f);
-        if(weight < minWeight && total < Units.getCap(data.team)){
+        if(weight < data.team.rules().minAttackWeight && total < Units.getCap(data.team)){
             return null;
         }
 

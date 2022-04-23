@@ -226,6 +226,8 @@ public class Rules{
         public boolean rtsAi;
         /** Minimum size of attack squads. */
         public int rtsAiMinSquadSize = 4;
+        /** Minimum "advantage" needed for a squad to attack. Higher -> more cautious. */
+        public float minAttackWeight = 1.2f;
 
         /** How fast unit factories build units. */
         public float unitBuildSpeedMultiplier = 1f;
