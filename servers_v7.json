@@ -90,5 +90,9 @@
   {
     "name": "TinyLake",
     "address": ["mdt.wayzer.cf"]
+  },
+  {
+    "name": "[CIG]Potato",
+    "address": ["mindustry.vicp.io:6800", "mindustry.vicp.io:7000", "mindustry.vicp.io:6567"]
   }
 ]

@@ -133,8 +133,8 @@ public class Fx{
         float x = Tmp.v1.x, y = Tmp.v1.y;
         float size = 1f;
 
-        stroke(e.fslope() * 2f * size, Pal.accent);
-        Lines.circle(x, y, e.fslope() * 2f * size);
+        color(Pal.accent);
+        Fill.circle(x, y, e.fslope() * 3f * size);
 
         color(e.color);
         Fill.circle(x, y, e.fslope() * 1.5f * size);
