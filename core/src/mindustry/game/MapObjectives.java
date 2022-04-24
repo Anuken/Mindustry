@@ -247,7 +247,7 @@ public class MapObjectives{
 
     public static class DestroyBlockObjective extends MapObjective{
         public int x, y;
-        public Team team = Team.malis;
+        public Team team = Team.crux;
         public Block block = Blocks.router;
 
         public DestroyBlockObjective(Block block, int x, int y, Team team){
@@ -447,7 +447,7 @@ public class MapObjectives{
     public static class MinimapMarker extends ObjectiveMarker{
         //in tiles.
         public float x, y, radius = 5f, stroke = 11f;
-        public Color color = Team.malis.color;
+        public Color color = Team.crux.color;
 
         public MinimapMarker(float x, float y){
             this.x = x;

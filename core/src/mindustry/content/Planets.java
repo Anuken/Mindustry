@@ -6,6 +6,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.game.*;
 import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
@@ -68,6 +69,7 @@ public class Planets{
             updateLighting = false;
 
             ruleSetter = r -> {
+                r.waveTeam = Team.malis;
                 r.placeRangeCheck = false; //TODO true or false?
                 r.attributes.set(Attribute.heat, 0.8f);
                 r.showSpawns = true;

@@ -370,11 +370,11 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 if(canSelect(sec) || sec.unlocked() || debugSelect){
 
                     Color color =
-                    sec.hasBase() ? Tmp.c2.set(Team.sharded.color).lerp(Team.malis.color, sec.hasEnemyBase() ? 0.5f : 0f) :
+                    sec.hasBase() ? Tmp.c2.set(Team.sharded.color).lerp(Team.crux.color, sec.hasEnemyBase() ? 0.5f : 0f) :
                     sec.preset != null ?
                         sec.preset.unlocked() ? Tmp.c2.set(Team.derelict.color).lerp(Color.white, Mathf.absin(Time.time, 10f, 1f)) :
                         Color.gray :
-                    sec.hasEnemyBase() ? Team.malis.color :
+                    sec.hasEnemyBase() ? Team.crux.color :
                     null;
 
                     if(color != null){
@@ -419,7 +419,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                     if(planet.allowSectorInvasion){
                         for(Sector enemy : sec.near()){
                             if(enemy.hasEnemyBase()){
-                                planets.drawArc(planet, enemy.tile.v, sec.tile.v, Team.malis.color.write(Tmp.c2).a(state.uiAlpha), Color.clear, 0.24f, 110f, 25);
+                                planets.drawArc(planet, enemy.tile.v, sec.tile.v, Team.crux.color.write(Tmp.c2).a(state.uiAlpha), Color.clear, 0.24f, 110f, 25);
                             }
                         }
                     }

@@ -293,7 +293,7 @@ public class MapView extends Element implements GestureListener{
 
                 //pencil square outline
                 if(tool == EditorTool.pencil && tool.mode == 1){
-                    Lines.square(v.x + scaling/2f, v.y + scaling/2f, scaling * (editor.brushSize + 0.5f));
+                    Lines.square(v.x + scaling/2f, v.y + scaling/2f, scaling * ((editor.brushSize == 1.5f ? 1f : editor.brushSize) + 0.5f));
                 }else{
                     Lines.poly(brushPolygons[index], v.x, v.y, scaling);
                 }

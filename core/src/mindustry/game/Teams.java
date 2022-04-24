@@ -30,7 +30,7 @@ public class Teams{
     public Seq<Unit> bosses = new Seq<>();
 
     public Teams(){
-        active.add(get(Team.malis));
+        active.add(get(Team.crux));
     }
 
     @Nullable
