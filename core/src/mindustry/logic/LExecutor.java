@@ -1355,7 +1355,7 @@ public class LExecutor{
                     }
                 }
                 case ambientLight -> state.rules.ambientLight.fromDouble(exec.num(value));
-                case unitBuildSpeed, unitDamage, blockHealth, blockDamage, buildSpeed -> {
+                case unitBuildSpeed, unitDamage, blockHealth, blockDamage, buildSpeed, rtsMinSquad, rtsMinWeight -> {
                     if(exec.obj(p1) instanceof Team team){
                         float num = exec.numf(value);
                         switch(rule){
@@ -1364,6 +1364,8 @@ public class LExecutor{
                             case unitDamage -> team.rules().unitDamageMultiplier = Math.max(num, 0f);
                             case blockHealth -> team.rules().blockHealthMultiplier = Math.max(num, 0.001f);
                             case blockDamage -> team.rules().blockDamageMultiplier = Math.max(num, 0f);
+                            case rtsMinWeight -> team.rules().rtsMinWeight = num;
+                            case rtsMinSquad -> team.rules().rtsMinSquad = (int)num;
                         }
                     }
                 }

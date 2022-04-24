@@ -254,8 +254,8 @@ public class CustomRulesDialog extends BaseDialog{
                 number("@rules.blockdamagemultiplier", f -> teams.blockDamageMultiplier = f, () -> teams.blockDamageMultiplier);
 
                 check("@rules.rtsai", b -> teams.rtsAi = b, () -> teams.rtsAi, () -> team != rules.defaultTeam);
-                numberi("@rules.rtsminsquadsize", f -> teams.rtsAiMinSquadSize = f, () -> teams.rtsAiMinSquadSize, () -> teams.rtsAi, 0, 100);
-                number("@rules.rtsminattackweight", f -> teams.minAttackWeight = f, () -> teams.minAttackWeight, () -> teams.rtsAi);
+                numberi("@rules.rtsminsquadsize", f -> teams.rtsMinSquad = f, () -> teams.rtsMinSquad, () -> teams.rtsAi, 0, 100);
+                number("@rules.rtsminattackweight", f -> teams.rtsMinWeight = f, () -> teams.rtsMinWeight, () -> teams.rtsAi);
 
                 check("@rules.infiniteresources", b -> teams.infiniteResources = b, () -> teams.infiniteResources);
                 number("@rules.buildspeedmultiplier", f -> teams.buildSpeedMultiplier = f, () -> teams.buildSpeedMultiplier, 0.001f, 50f);

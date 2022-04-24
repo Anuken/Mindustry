@@ -18,7 +18,9 @@ public enum LogicRule{
     unitBuildSpeed,
     unitDamage,
     blockHealth,
-    blockDamage;
+    blockDamage,
+    rtsMinWeight,
+    rtsMinSquad;
 
     public static final LogicRule[] all = values();
 }

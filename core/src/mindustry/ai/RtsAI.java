@@ -167,7 +167,7 @@ public class RtsAI{
 
             //defend when close, or this is the only squad defending
             //TODO will always rush to defense no matter what
-            if(best instanceof CoreBuild || units.size >= data.team.rules().rtsAiMinSquadSize || best.within(ax, ay, 500f)){
+            if(best instanceof CoreBuild || units.size >= data.team.rules().rtsMinSquad || best.within(ax, ay, 500f)){
                 defend = best;
 
                 if(debug){
@@ -234,7 +234,7 @@ public class RtsAI{
     }
 
     @Nullable Building findTarget(float x, float y, int total, float dps, float health){
-        if(total < data.team.rules().rtsAiMinSquadSize) return null;
+        if(total < data.team.rules().rtsMinSquad) return null;
 
         //flag priority?
         //1. generator
@@ -264,7 +264,7 @@ public class RtsAI{
         );
 
         float weight = weights.get(result, 0f);
-        if(weight < data.team.rules().minAttackWeight && total < Units.getCap(data.team)){
+        if(weight < data.team.rules().rtsMinWeight && total < Units.getCap(data.team)){
             return null;
         }
 
