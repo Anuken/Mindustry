@@ -224,7 +224,7 @@ public class RtsAI{
                         unit.command().commandPosition(defendPos);
                     }else{
                         //TODO stopAtTarget parameter could be false, could be tweaked
-                        unit.command().commandTarget(defendTarget == null ? build : defendTarget, true);
+                        unit.command().commandTarget(defendTarget == null ? build : defendTarget, defendTarget != null);
                     }
                 }
             }
