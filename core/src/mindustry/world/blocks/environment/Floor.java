@@ -162,7 +162,7 @@ public class Floor extends Block{
         }
 
         PixmapRegion image = Core.atlas.getPixmap(icons()[0]);
-        PixmapRegion edge = Core.atlas.getPixmap("edge-stencil");
+        PixmapRegion edge = Core.atlas.getPixmap(Core.atlas.find(name + "-edge-stencil", "edge-stencil"));
         Pixmap result = new Pixmap(edge.width, edge.height);
 
         for(int x = 0; x < edge.width; x++){

@@ -1234,6 +1234,36 @@ public class LStatements{
         }
     }
 
+    @RegisterStatement("spawnwave")
+    public static class SpawnWaveStatement extends LStatement{
+        public String x = "10", y = "10";
+
+        @Override
+        public void build(Table table){
+
+            table.add("x ");
+            fields(table, x, str -> x = str);
+
+            table.add(" y ");
+            fields(table, y, str -> y = str);
+        }
+
+        @Override
+        public boolean privileged(){
+            return true;
+        }
+
+        @Override
+        public Color color(){
+            return Pal.logicWorld;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new SpawnWaveI(builder.var(x), builder.var(y));
+        }
+    }
+
     @RegisterStatement("setrule")
     public static class SetRuleStatement extends LStatement{
         public LogicRule rule = LogicRule.waveSpacing;

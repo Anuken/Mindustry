@@ -2781,8 +2781,8 @@ public class UnitTypes{
                             float life = lifetime / Mathf.lerp(fin, 1f, 0.5f);
                             spawnBullets.add(new BasicBulletType(spd * fin, 45){{
                                 drag = 0.002f;
-                                width = 8f;
-                                height = 10f;
+                                width = 12f;
+                                height = 11f;
                                 lifetime = life + 5f;
                                 weaveRandom = false;
                                 hitSize = 5f;

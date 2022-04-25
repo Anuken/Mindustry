@@ -1340,6 +1340,7 @@ public class LExecutor{
         public void run(LExecutor exec){
             switch(rule){
                 case waveTimer -> state.rules.waveTimer = exec.bool(value);
+                case wave -> state.wave = exec.numi(value);
                 case currentWaveTime -> state.wavetime = exec.numf(value) * 60f;
                 case waves -> state.rules.waves = exec.bool(value);
                 case attackMode -> state.rules.attackMode = exec.bool(value);
@@ -1557,6 +1558,41 @@ public class LExecutor{
                     state.rules.objectiveFlags.remove(str);
                 }else{
                     state.rules.objectiveFlags.add(str);
+                }
+            }
+        }
+    }
+
+    public static class SpawnWaveI implements LInstruction{
+        public int x, y;
+
+        public SpawnWaveI(){
+        }
+
+        public SpawnWaveI(int x, int y){
+            this.x = x;
+            this.y = y;
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            float
+            spawnX = World.unconv(exec.numf(x)),
+            spawnY = World.unconv(exec.numf(y));
+            int packed = Point2.pack(exec.numi(x), exec.numi(y));
+
+            for(SpawnGroup group : state.rules.spawns){
+                if(group.type == null || (group.spawn != -1 && group.spawn != packed)) continue;
+
+                int spawned = group.getSpawned(state.wave - 1);
+                float spread = tilesize * 2;
+
+                for(int i = 0; i < spawned; i++){
+                    Tmp.v1.rnd(spread);
+
+                    Unit unit = group.createUnit(state.rules.waveTeam, state.wave - 1);
+                    unit.set(spawnX + Tmp.v1.x, spawnY + Tmp.v1.y);
+                    Vars.spawner.spawnEffect(unit);
                 }
             }
         }

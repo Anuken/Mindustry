@@ -4,6 +4,7 @@ public enum LogicRule{
     currentWaveTime,
     waveTimer,
     waves,
+    wave,
     waveSpacing,
     attackMode,
     enemyCoreBuildRadius,

@@ -12,14 +12,14 @@ const float far = 0.0702702703;
 void main(){
     gl_FragColor = far * texture2D(u_texture, v_texCoords0)
 				+ close * texture2D(u_texture, v_texCoords1)
-				+ center * texture2D(u_texture, v_texCoords2) 
+				+ center * texture2D(u_texture, v_texCoords2)
 				+ close * texture2D(u_texture, v_texCoords3)
 				+ far * texture2D(u_texture, v_texCoords4);
 
 
-    //TODO this is broken.
-    /*
+    //TODO this is broken (too bright)
 
+/*
     vec4
     v1 = texture2D(u_texture, v_texCoords0),
     v2 = texture2D(u_texture, v_texCoords1),
@@ -34,14 +34,13 @@ void main(){
     a4 = v4.a * close,
     a5 = v5.a * far;
 
-    //far close center close far
-
-    //TODO figure this out
-    //RGB values should be weighted by their respective alpha values.
     gl_FragColor = vec4(
+        //RGB values are weighed by their alpha values and their base weight (less alpha -> less contribution)
         (v1.rgb * a1 + v2.rgb * a2 + v3.rgb * a3 + v4.rgb * a4 + v5.rgb * a5) /
-        max(a1 + a2 + a3 + a4 + a5, 0.0001), //RGB must be weighed by the sum of all alpha processed. if a pixel contributes less weight, the multiplication is higher
-        a1 + a2 + a3 + a4 + a5); //alpha is just the weighed sum
+        //RGB must then be weighed by the sum of all alpha processed. don't allow divide by zero
+        max(a1 + a2 + a3 + a4 + a5, 0.0001),
+        //alpha is just the weighed sum
+        a1 + a2 + a3 + a4 + a5);*/
 
-   */
+
 }	
