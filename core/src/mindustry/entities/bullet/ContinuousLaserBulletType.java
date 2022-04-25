@@ -12,7 +12,7 @@ import mindustry.graphics.*;
 public class ContinuousLaserBulletType extends ContinuousBulletType{
     public float fadeTime = 16f;
     public float lightStroke = 40f;
-    public int divisions = 11;
+    public int divisions = 13;
     public Color[] colors = {Color.valueOf("ec745855"), Color.valueOf("ec7458aa"), Color.valueOf("ff9c5a"), Color.white};
     public float strokeFrom = 2f, strokeTo = 0.5f, pointyScaling = 0.75f;
     public float backLength = 7f, frontLength = 35f;

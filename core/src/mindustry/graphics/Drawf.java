@@ -54,6 +54,7 @@ public class Drawf{
     }
 
     public static void flameFront(float x, float y, int divisions, float rotation, float length, float width){
+        //TODO I don't know why this is necessary yet. Does FIll.poly screw up with triangles?
         divisions = Mathf.round(divisions, 2) + 1;
 
         points.clear();
