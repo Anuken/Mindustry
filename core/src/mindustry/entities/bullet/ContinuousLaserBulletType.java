@@ -14,7 +14,7 @@ public class ContinuousLaserBulletType extends ContinuousBulletType{
     public float lightStroke = 40f;
     public int divisions = 11;
     public Color[] colors = {Color.valueOf("ec745855"), Color.valueOf("ec7458aa"), Color.valueOf("ff9c5a"), Color.white};
-    public float strokeFrom = 2f, strokeTo = 0.5f;
+    public float strokeFrom = 2f, strokeTo = 0.5f, pointyScaling = 0.75f;
     public float backLength = 7f, frontLength = 35f;
     public float width = 9f, oscScl = 0.8f, oscMag = 1.5f;
 
@@ -52,7 +52,7 @@ public class ContinuousLaserBulletType extends ContinuousBulletType{
             float colorFin = i / (float)(colors.length - 1);
             float baseStroke = Mathf.lerp(strokeFrom, strokeTo, colorFin);
             float stroke = (width + Mathf.absin(Time.time, oscScl, oscMag)) * fout * baseStroke;
-            float ellipseLenScl = Mathf.lerp(1 - i / (float)(colors.length), 1f, 0.75f);
+            float ellipseLenScl = Mathf.lerp(1 - i / (float)(colors.length), 1f, pointyScaling);
 
             Lines.stroke(stroke);
             Lines.lineAngle(b.x, b.y, rot, length - frontLength, false);

@@ -82,6 +82,7 @@ public class ContinuousTurret extends Turret{
 
                     if(isShooting() && hasAmmo()){
                         entry.bullet.time = entry.bullet.lifetime * entry.bullet.type.optimalLifeFract * shootWarmup;
+                        entry.bullet.keepAlive = true;
                     }
                 }
 

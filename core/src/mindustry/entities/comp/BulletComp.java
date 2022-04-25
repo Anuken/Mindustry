@@ -25,7 +25,7 @@ import static mindustry.Vars.*;
 abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Drawc, Shielderc, Ownerc, Velc, Bulletc, Timerc{
     @Import Team team;
     @Import Entityc owner;
-    @Import float x, y, damage, lastX, lastY;
+    @Import float x, y, damage, lastX, lastY, time, lifetime;
     @Import Vec2 vel;
 
     IntSeq collided = new IntSeq(6);
@@ -37,6 +37,8 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     @ReadOnly
     private float rotation;
 
+    //setting this variable to true prevents lifetime from decreasing for a frame.
+    transient boolean keepAlive;
     transient @Nullable Tile aimTile;
     transient float originX, originY;
     transient @Nullable Mover mover;
@@ -139,6 +141,11 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
         if(type.removeAfterPierce && type.pierceCap != -1 && collided.size >= type.pierceCap){
             hit = true;
             remove();
+        }
+
+        if(keepAlive){
+            time -= Time.delta;
+            keepAlive = false;
         }
     }
 
