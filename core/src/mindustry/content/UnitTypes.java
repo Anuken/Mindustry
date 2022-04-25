@@ -473,7 +473,7 @@ public class UnitTypes{
                 mirror = false;
                 top = false;
                 shake = 4f;
-                shootY = 13f;
+                shootY = 14f;
                 x = y = 0f;
 
                 shoot.firstShotDelay = Fx.greenLaserChargeSmall.lifetime - 1f;
@@ -3339,7 +3339,6 @@ public class UnitTypes{
         }};
 
         obviate = new ErekirUnitType("obviate"){{
-            lowAltitude = false;
             flying = true;
             drag = 0.08f;
             speed = 1.9f;
@@ -3352,10 +3351,50 @@ public class UnitTypes{
             engineOffset = 54f / 4f;
             fogRadius = 25;
             itemCapacity = 0;
+            lowAltitude = true;
 
             setEnginesMirror(
             new UnitEngine(59 / 4f, -25 / 4f, 3.1f, 315f)
             );
+
+            parts.add(new RegionPart("-heat"){{
+                blending = Blending.additive;
+                progress = PartProgress.heat;
+                outline = false;
+                colorTo = new Color(1f, 0.5f, 0.5f, 0.7f);
+                color = colorTo.cpy().a(0f);
+                layerOffset = 0.01f;
+            }});
+
+            //TODO this is really dumb.
+            weapons.add(new Weapon(){{
+                y = 2f;
+                shootY = 0f;
+                x = 0f;
+                reload = 140f;
+                mirror = false;
+                continuous = true;
+               // minWarmup = 0.5f;
+
+                bullet = new ContinuousLaserBulletType(140){{
+                    shake = 0f;
+                    lifetime = 120f;
+                    colors = new Color[]{Color.valueOf("bf92f9").a(0.4f), Color.valueOf("bf92f9"), Color.white};
+                    //TODO merge
+                    chargeEffect = new MultiEffect(Fx.lancerLaserCharge, Fx.lancerLaserChargeBegin);
+                    width = 20f;
+                    largeHit = false;
+
+                    buildingDamageMultiplier = 0.25f;
+                    hitEffect = Fx.hitLancer;
+                    hitSize = 4;
+                    drawSize = 400f;
+                    length = 173f;
+                    ammoMultiplier = 1f;
+                    pierceCap = 4;
+                    hitColor = colors[1];
+                }};
+            }});
         }};
 
         quell = new ErekirUnitType("quell"){{

@@ -18,12 +18,8 @@ public class Drawf{
     private static final Vec2[] vecs = new Vec2[]{new Vec2(), new Vec2(), new Vec2(), new Vec2()};
     private static final FloatSeq points = new FloatSeq();
 
-    public static void flame(float x, float y, int divisions, float rotation, float length, float width, float pan){
-        flame(x, y, divisions, rotation, length, width, pan, 0f);
-    }
-
     //TODO offset unused
-    public static void flame(float x, float y, int divisions, float rotation, float length, float width, float pan, float offset){
+    public static void flame(float x, float y, int divisions, float rotation, float length, float width, float pan){
         float len1 = length * pan, len2 = length * (1f - pan);
 
         points.clear();
@@ -48,6 +44,27 @@ public class Drawf{
 
             point(
             len1 + (Tmp.v1.x) / width * len2, //convert to 0..1, then multiply by desired length and offset relative to previous segment
+            Tmp.v1.y, //Y axis remains unchanged
+            x, y,
+            rotation
+            );
+        }
+
+        Fill.poly(points);
+    }
+
+    public static void flameFront(float x, float y, int divisions, float rotation, float length, float width){
+        divisions = Mathf.round(divisions, 2) + 1;
+
+        points.clear();
+
+        //right side; half arc beginning at -90 (270) and ending at 90
+        for(int i = 0; i <= divisions; i++){
+            float rot = -90f + 180f * i / (float)divisions;
+            Tmp.v1.trnsExact(rot, width);
+
+            point(
+            (Tmp.v1.x) / width * length, //convert to 0..1, then multiply by desired length and offset relative to previous segment
             Tmp.v1.y, //Y axis remains unchanged
             x, y,
             rotation

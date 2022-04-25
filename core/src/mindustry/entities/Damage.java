@@ -30,7 +30,6 @@ public class Damage{
 
     private static Tile furthest;
     private static float maxDst = 0f;
-    private static int pierceCount = 0;
     private static Building tmpBuilding;
     private static Unit tmpUnit;
 
@@ -149,7 +148,6 @@ public class Damage{
         vec.trnsExact(b.rotation(), length);
         rect.setPosition(b.x, b.y).setSize(vec.x, vec.y).normalize().grow(3f);
 
-        pierceCount = 0;
         maxDst = Float.POSITIVE_INFINITY;
 
         distances.clear();
@@ -219,7 +217,6 @@ public class Damage{
      * Only enemies of the specified team are damaged.
      */
     public static void collideLine(Bullet hitter, Team team, Effect effect, float x, float y, float angle, float length, boolean large, boolean laser, int pierceCap){
-        pierceCount = 0;
         if(laser){
             length = findLaserLength(hitter, length);
         }else if(pierceCap > 0){
@@ -284,8 +281,6 @@ public class Damage{
                 effect.at(vec.x, vec.y);
                 e.collision(hitter, vec.x, vec.y);
                 hitter.collision(e, vec.x, vec.y);
-
-                pierceCount ++;
             }
         };
 

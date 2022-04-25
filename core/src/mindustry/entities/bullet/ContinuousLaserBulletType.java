@@ -12,11 +12,11 @@ import mindustry.graphics.*;
 public class ContinuousLaserBulletType extends ContinuousBulletType{
     public float fadeTime = 16f;
     public float lightStroke = 40f;
-    public float spaceMag = 35f;
+    public int divisions = 11;
     public Color[] colors = {Color.valueOf("ec745855"), Color.valueOf("ec7458aa"), Color.valueOf("ff9c5a"), Color.white};
-    public float[] tscales = {1f, 0.7f, 0.5f, 0.2f};
-    public float[] strokes = {2f, 1.5f, 1f, 0.3f};
-    public float[] lenscales = {1f, 1.12f, 1.15f, 1.17f};
+    public float[] strokes = {2f, 1.5f, 1f, 0.5f};
+
+    public float backLength = 7f, frontLength = 35f;
     public float width = 9f, oscScl = 0.8f, oscMag = 1.5f;
 
     public ContinuousLaserBulletType(float damage){
@@ -45,15 +45,23 @@ public class ContinuousLaserBulletType extends ContinuousBulletType{
         float realLength = Damage.findLaserLength(b, length);
         float fout = Mathf.clamp(b.time > b.lifetime - fadeTime ? 1f - (b.time - (lifetime - fadeTime)) / fadeTime : 1f);
         float baseLen = realLength * fout;
+        float rot = b.rotation();
 
-        Lines.lineAngle(b.x, b.y, b.rotation(), baseLen);
-        for(int s = 0; s < colors.length; s++){
-            Draw.color(Tmp.c1.set(colors[s]).mul(1f + Mathf.absin(Time.time, 1f, 0.1f)));
-            for(int i = 0; i < tscales.length; i++){
-                Tmp.v1.trns(b.rotation() + 180f, (lenscales[i] - 1f) * spaceMag);
-                Lines.stroke((width + Mathf.absin(Time.time, oscScl, oscMag)) * fout * strokes[s] * tscales[i]);
-                Lines.lineAngle(b.x + Tmp.v1.x, b.y + Tmp.v1.y, b.rotation(), baseLen * lenscales[i], false);
-            }
+        for(int i = 0; i < colors.length; i++){
+            Draw.color(Tmp.c1.set(colors[i]).mul(1f + Mathf.absin(Time.time, 1f, 0.1f)));
+
+            float stroke = (width + Mathf.absin(Time.time, oscScl, oscMag)) * fout * strokes[i];
+            float ellipseLenScl = Mathf.lerp(strokes[i] / 2f, 1f, 0.75f);
+            Lines.stroke(stroke);
+
+            Lines.lineAngle(b.x, b.y, rot, length - frontLength, false);
+
+            //back ellipse
+            Drawf.flameFront(b.x, b.y, divisions, rot + 180f, backLength, stroke / 2f);
+
+            //front ellipse
+            Tmp.v1.trnsExact(rot, length - frontLength);
+            Drawf.flameFront(b.x + Tmp.v1.x, b.y + Tmp.v1.y, divisions, rot, frontLength * ellipseLenScl, stroke / 2f);
         }
 
         Tmp.v1.trns(b.rotation(), baseLen * 1.1f);
