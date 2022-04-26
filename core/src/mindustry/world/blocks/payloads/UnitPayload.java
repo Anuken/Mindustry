@@ -143,9 +143,11 @@ public class UnitPayload implements Payload{
 
         //TODO this would be more accurate but has all sorts of associated problems (?)
         if(true){
+            float e = unit.elevation;
             unit.elevation = 0f;
             //avoids drawing mining or building
             unit.type.draw(unit);
+            unit.elevation = e;
             return;
         }
 

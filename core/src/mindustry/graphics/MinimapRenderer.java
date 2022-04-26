@@ -261,11 +261,22 @@ public class MinimapRenderer{
         if(tile.build != null && tile.isCenter()){
             tile.getLinkedTiles(other -> {
                 if(!other.isCenter()){
-                    update(other);
+                    updatePixel(other);
+                }
+
+                if(tile.block().solid && other.y > 0){
+                    Tile low = world.tile(other.x, other.y - 1);
+                    if(!low.solid()){
+                        updatePixel(low);
+                    }
                 }
             });
         }
 
+        updatePixel(tile);
+    }
+
+    void updatePixel(Tile tile){
         int color = colorFor(tile);
         pixmap.set(tile.x, pixmap.height - 1 - tile.y, color);
 
@@ -285,7 +296,7 @@ public class MinimapRenderer{
 
     private Block realBlock(Tile tile){
         //TODO doesn't work properly until player goes and looks at block
-        return tile.build == null ? tile.block() : state.rules.fog && tile.build.inFogTo(player.team()) ? Blocks.air : tile.block();
+        return tile.build == null ? tile.block() : state.rules.fog && !tile.build.wasVisible ? Blocks.air : tile.block();
     }
 
     private int colorFor(Tile tile){
