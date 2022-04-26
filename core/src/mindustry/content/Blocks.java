@@ -2701,7 +2701,7 @@ public class Blocks{
             incinerateNonBuildable = true;
 
             //TODO should this be higher?
-            buildCostMultiplier = 0.75f;
+            buildCostMultiplier = 0.7f;
 
             unitCapModifier = 15;
             researchCostMultiplier = 0.07f;

@@ -329,7 +329,8 @@ public class Teams{
 
             for(var build : builds){
                 if(build.within(x, y, range) && !cores.contains(c -> c.within(x, y, range))){
-                    Time.run(Mathf.random(0f, 60f * 6f), build::kill);
+                    build.kill();
+                    //Time.run(Mathf.random(0f, 60f * 6f), build::kill);
                 }
             }
         }
