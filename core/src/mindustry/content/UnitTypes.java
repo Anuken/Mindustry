@@ -2261,7 +2261,7 @@ public class UnitTypes{
                 bullet = new EmpBulletType(){{
                     float rad = 100f;
 
-                    scaleVelocity = true;
+                    scaleLife = true;
                     lightOpacity = 0.7f;
                     unitDamageScl = 0.8f;
                     healPercent = 20f;
