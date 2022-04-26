@@ -185,6 +185,11 @@ public class Mods implements Loadable{
         for(Fi file : sprites){
             String name = file.nameWithoutExtension();
 
+            if(!prefix && !Core.atlas.has(name)){
+                Log.warn("Sprite '@' in mod '@' attempts to override a non-existent sprite. Ignoring.", name, mod.name);
+                continue;
+            }
+
             //TODO !!! document this on the wiki !!!
             //do not allow packing standard outline sprites for now, they are no longer necessary and waste space!
             //TODO also full regions are bad:  || name.endsWith("-full")
