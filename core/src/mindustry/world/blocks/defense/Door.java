@@ -36,6 +36,7 @@ public class Door extends Wall{
 
         config(Boolean.class, (DoorBuild base, Boolean open) -> {
             doorSound.at(base);
+            base.effect();
 
             for(DoorBuild entity : base.chained){
                 //skip doors with things in them
@@ -45,7 +46,6 @@ public class Door extends Wall{
 
                 entity.open = open;
                 pathfinder.updateTile(entity.tile());
-                entity.effect();
             }
         });
     }

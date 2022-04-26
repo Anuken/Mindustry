@@ -3382,7 +3382,7 @@ public class UnitTypes{
                     colors = new Color[]{Color.valueOf("bf92f9").a(0.4f), Color.valueOf("bf92f9"), Color.white};
                     //TODO merge
                     chargeEffect = new MultiEffect(Fx.lancerLaserCharge, Fx.lancerLaserChargeBegin);
-                    width = 20f;
+                    width = 4f;
                     largeHit = false;
 
                     buildingDamageMultiplier = 0.25f;
