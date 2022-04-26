@@ -55,7 +55,7 @@ public class ConstructBlock extends Block{
     @Remote(called = Loc.server)
     public static void deconstructFinish(Tile tile, Block block, Unit builder){
         Team team = tile.team();
-        if(fogControl.isVisibleTile(player.team(), tile.x, tile.y)){
+        if(fogControl.isVisibleTile(team, tile.x, tile.y)){
             block.breakEffect.at(tile.drawx(), tile.drawy(), block.size, block.mapColor);
             if(shouldPlay()) block.breakSound.at(tile, block.breakPitchChange ? calcPitch(false) : 1f);
         }
@@ -98,7 +98,7 @@ public class ConstructBlock extends Block{
             tile.build.playerPlaced(config);
         }
 
-        if(fogControl.isVisibleTile(player.team(), tile.x, tile.y)){
+        if(fogControl.isVisibleTile(team, tile.x, tile.y)){
             Fx.placeBlock.at(tile.drawx(), tile.drawy(), block.size);
             if(shouldPlay()) block.placeSound.at(tile, block.placePitchChange ? calcPitch(true) : 1f);
         }

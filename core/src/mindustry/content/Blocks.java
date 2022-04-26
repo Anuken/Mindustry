@@ -3792,27 +3792,27 @@ public class Blocks{
             }};
             outlineColor = Pal.darkOutline;
 
-            liquidConsumed = 4f / 60f;
+            liquidConsumed = 8f / 60f;
 
             float r = range = 130f;
 
             //TODO balance, set up, where is liquid/sec displayed? status effects maybe?
             ammo(
             Liquids.ozone, new ContinuousFlameBulletType(){{
-                damage = 90f;
+                damage = 70f;
                 length = r;
                 knockback = 1f;
-                pierceCap = 3;
+                pierceCap = 2;
                 buildingDamageMultiplier = 0.3f;
 
                 colors = new Color[]{Color.valueOf("eb7abe").a(0.55f), Color.valueOf("e189f5").a(0.7f), Color.valueOf("907ef7").a(0.8f), Color.valueOf("91a4ff"), Color.white};
             }},
             Liquids.cyanogen, new ContinuousFlameBulletType(){{
-                damage = 200f;
+                damage = 160f;
                 rangeChange = 70f;
                 length = r + rangeChange;
                 knockback = 2f;
-                pierceCap = 4;
+                pierceCap = 3;
                 buildingDamageMultiplier = 0.3f;
 
                 colors = new Color[]{Color.valueOf("465ab8").a(0.55f), Color.valueOf("66a6d2").a(0.7f), Color.valueOf("89e8b6").a(0.8f), Color.valueOf("cafcbe"), Color.white};

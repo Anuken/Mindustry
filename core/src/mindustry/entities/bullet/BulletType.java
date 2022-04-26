@@ -111,7 +111,7 @@ public class BulletType extends Content implements Cloneable{
     /** Whether velocity is inherited from the shooter. */
     public boolean keepVelocity = true;
     /** Whether to scale lifetime (not actually velocity!) to disappear at the target position. Used for artillery. */
-    public boolean scaleVelocity;
+    public boolean scaleLife;
     /** Whether this bullet can be hit by point defense. */
     public boolean hittable = true;
     /** Whether this bullet can be reflected. */

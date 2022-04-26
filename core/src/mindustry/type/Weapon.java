@@ -399,7 +399,7 @@ public class Weapon implements Cloneable{
         bulletX = mountX + Angles.trnsx(weaponRotation, this.shootX + xOffset, this.shootY + yOffset),
         bulletY = mountY + Angles.trnsy(weaponRotation, this.shootX + xOffset, this.shootY + yOffset),
         shootAngle = bulletRotation(unit, mount, bulletX, bulletY) + angleOffset,
-        lifeScl = bullet.scaleVelocity ? Mathf.clamp(Mathf.dst(shootX, shootY, mount.aimX, mount.aimY) / bullet.range) : 1f,
+        lifeScl = bullet.scaleLife ? Mathf.clamp(Mathf.dst(bulletX, bulletY, mount.aimX, mount.aimY) / bullet.range) : 1f,
         angle = angleOffset + shootAngle + Mathf.range(inaccuracy);
 
         mount.bullet = bullet.create(unit, unit.team, bulletX, bulletY, angle, -1f, (1f - velocityRnd) + Mathf.random(velocityRnd), lifeScl, null, mover, mount.aimX, mount.aimY);

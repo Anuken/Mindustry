@@ -500,7 +500,7 @@ public class Turret extends ReloadTurret{
             bulletY = y + Angles.trnsy(rotation - 90, shootX + xOffset, shootY + yOffset),
             shootAngle = rotation + angleOffset + Mathf.range(inaccuracy);
 
-            float lifeScl = type.scaleVelocity ? Mathf.clamp(Mathf.dst(bulletX, bulletY, targetPos.x, targetPos.y) / type.range, minRange / type.range, range() / type.range) : 1f;
+            float lifeScl = type.scaleLife ? Mathf.clamp(Mathf.dst(bulletX, bulletY, targetPos.x, targetPos.y) / type.range, minRange / type.range, range() / type.range) : 1f;
 
             //TODO aimX / aimY for multi shot turrets?
             handleBullet(type.create(this, team, bulletX, bulletY, shootAngle, -1f, 1f + Mathf.range(velocityInaccuracy), lifeScl, null, mover, targetPos.x, targetPos.y), xOffset, yOffset, angleOffset);
