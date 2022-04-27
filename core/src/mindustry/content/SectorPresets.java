@@ -1,7 +1,7 @@
 package mindustry.content;
 
 import mindustry.game.MapObjectives.*;
-import mindustry.game.Team;
+import mindustry.game.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 

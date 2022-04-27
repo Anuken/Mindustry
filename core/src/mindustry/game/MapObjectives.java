@@ -5,6 +5,7 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.content.*;
@@ -20,7 +21,8 @@ public class MapObjectives{
     public static Prov<MapObjective>[] allObjectiveTypes = new Prov[]{
         ResearchObjective::new, BuildCountObjective::new, UnitCountObjective::new, ItemObjective::new,
         CommandModeObjective::new, CoreItemObjective::new, DestroyCoreObjective::new, DestroyUnitsObjective::new,
-        TimerObjective::new, FlagObjective::new, DestroyBlockObjective::new, ProduceObjective::new
+        TimerObjective::new, FlagObjective::new, DestroyBlockObjective::new, ProduceObjective::new,
+        DestroyBlocksObjective::new
     };
 
     public static Prov<ObjectiveMarker>[] allMarkerTypes = new Prov[]{
@@ -270,7 +272,44 @@ public class MapObjectives{
         public String text(){
             return Core.bundle.format("objective.destroyblock", block.emoji(), block.localizedName);
         }
+    }
 
+    public static class DestroyBlocksObjective extends MapObjective{
+        public int[] positions = {};
+        public Team team = Team.crux;
+        public Block block = Blocks.router;
+
+        public DestroyBlocksObjective(Block block, Team team, int... positions){
+            this.block = block;
+            this.team = team;
+            this.positions = positions;
+        }
+
+        public DestroyBlocksObjective(){
+        }
+
+        public int progress(){
+            int count = 0;
+            for(var pos : positions){
+                int x = Point2.x(pos), y = Point2.y(pos);
+
+                var build = world.build(x, y);
+                if(build == null || build.team != team || build.block != block){
+                    count ++;
+                }
+            }
+            return count;
+        }
+
+        @Override
+        public boolean complete(){
+            return progress() >= positions.length;
+        }
+
+        @Override
+        public String text(){
+            return Core.bundle.format("objective.destroyblocks", positions, positions.length, block.emoji(), block.localizedName);
+        }
     }
 
     /** Command any unit to do anything. Always compete in headless mode. */
