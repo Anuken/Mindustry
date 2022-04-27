@@ -1790,6 +1790,7 @@ public class Blocks{
 
             consumeItem(Items.tungsten, 100);
             itemCapacity = 100;
+            scaledHealth = 120f;
         }};
 
         //endregion
