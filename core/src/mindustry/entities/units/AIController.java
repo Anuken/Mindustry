@@ -217,6 +217,7 @@ public class AIController implements UnitController{
         return target(x, y, range, air, ground);
     }
 
+    /** Called after this controller is assigned a unit. */
     public void init(){
 
     }

@@ -42,7 +42,10 @@ public class ConsumeLiquidFilter extends ConsumeLiquidBase{
 
     @Override
     public void update(Building build){
-        build.liquids.remove(getConsumed(build), amount * build.edelta());
+        Liquid liq = getConsumed(build);
+        if(liq != null){
+            build.liquids.remove(liq, amount * build.edelta());
+        }
     }
 
     @Override
