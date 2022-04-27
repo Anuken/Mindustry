@@ -6,12 +6,14 @@ import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.type.*;
 
 @Component
 abstract class ShieldComp implements Healthc, Posc{
     @Import float health, hitTime, x, y, healthMultiplier;
     @Import boolean dead;
     @Import Team team;
+    @Import UnitType type;
 
     /** Absorbs health damage. */
     float shield;
@@ -51,7 +53,7 @@ abstract class ShieldComp implements Healthc, Posc{
         hitTime = 1f;
         amount -= shieldDamage;
 
-        if(amount > 0){
+        if(amount > 0 && type.killable){
             health -= amount;
             if(health <= 0 && !dead){
                 kill();

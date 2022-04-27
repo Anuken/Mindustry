@@ -68,7 +68,9 @@ public class UnitType extends UnlockableContent{
     public boolean logicControllable = true;
     public boolean playerControllable = true;
     public boolean allowedInPayloads = true;
-    /** TODO If true, core units will re-appear on this unit when respawning. */
+    /** If false, this unit does not take damage and cannot be kill() / destroy()-ed. */
+    public boolean killable = true;
+    /** If true, this core unit will "dock" to other units, making it re-appear when "undocking". */
     public boolean coreUnitDock = false;
     public boolean createWreck = true;
     public boolean createScorch = true;

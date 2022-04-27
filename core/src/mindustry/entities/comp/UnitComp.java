@@ -541,7 +541,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     /** Actually destroys the unit, removing it and creating explosions. **/
     public void destroy(){
-        if(!isAdded()) return;
+        if(!isAdded() || !type.killable) return;
 
         float explosiveness = 2f + item().explosiveness * stack().amount * 1.53f;
         float flammability = item().flammability * stack().amount / 1.9f;
@@ -645,7 +645,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     @Override
     @Replace
     public void kill(){
-        if(dead || net.client()) return;
+        if(dead || net.client() || !type.killable) return;
 
         //deaths are synced; this calls killed()
         Call.unitDeath(id);
