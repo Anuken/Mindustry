@@ -138,5 +138,9 @@
   {
     "name": "Fish",
     "address": ["170.187.144.235"]
+  },
+  {
+    "name": "FortressPvP",
+    "address": ["130.61.226.9"]
   }
 ]
