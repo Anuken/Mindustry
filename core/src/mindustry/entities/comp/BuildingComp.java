@@ -272,11 +272,12 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if(!ignoreConditions && (!block.rebuildable || (team == state.rules.defaultTeam && state.isCampaign() && !block.isVisible()))) return;
 
         Object overrideConfig = null;
+        Block toAdd = this.block;
 
         if(self() instanceof ConstructBuild entity){
             //update block to reflect the fact that something was being constructed
             if(entity.current != null && entity.current.synthetic() && entity.wasConstructing){
-                block = entity.current;
+                toAdd = entity.current;
                 overrideConfig = entity.lastConfig;
             }else{
                 //otherwise this was a deconstruction that was interrupted, don't want to rebuild that
@@ -298,7 +299,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             }
         }
 
-        data.blocks.addFirst(new BlockPlan(tile.x, tile.y, (short)rotation, block.id, overrideConfig == null ? config() : overrideConfig));
+        data.blocks.addFirst(new BlockPlan(tile.x, tile.y, (short)rotation, toAdd.id, overrideConfig == null ? config() : overrideConfig));
     }
 
     public @Nullable Tile findClosestEdge(Position to, Boolf<Tile> solid){
