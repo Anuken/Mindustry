@@ -42,6 +42,7 @@ public class NuclearReactor extends PowerGenerator{
     public int explosionDamage = 1250;
     /** heat removed per unit of coolant */
     public float coolantPower = 0.5f;
+    public float smoothLight;
 
     public Item fuelItem = Items.thorium;
 
@@ -143,7 +144,8 @@ public class NuclearReactor extends PowerGenerator{
         @Override
         public void drawLight(){
             float fract = productionEfficiency;
-            Drawf.light(x, y, (90f + Mathf.absin(5, 5f)) * fract, Tmp.c1.set(lightColor).lerp(Color.scarlet, heat), 0.6f * fract);
+            smoothLight = Mathf.lerpDelta(smoothLight, fract, 0.08f);
+            Drawf.light(x, y, (90f + Mathf.absin(5, 5f)) * smoothLight, Tmp.c1.set(lightColor).lerp(Color.scarlet, heat), 0.6f * smoothLight);
         }
 
         @Override

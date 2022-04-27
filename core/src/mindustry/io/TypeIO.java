@@ -162,6 +162,11 @@ public class TypeIO{
                 read.b(bytes);
                 yield bytes;
             }
+            //unit command
+            case 15 -> {
+                read.b();
+                yield null;
+            }
             case 16 -> {
                 int boollen = read.i();
                 boolean[] bools = new boolean[boollen];
@@ -467,6 +472,9 @@ public class TypeIO{
             //make sure player exists
             if(player == null) return prev;
             return player;
+        }else if(type == 1){ //formation controller (ignored)
+            read.i();
+            return prev;
         }else if(type == 3){
             int pos = read.i();
             if(prev instanceof LogicAI pai){
