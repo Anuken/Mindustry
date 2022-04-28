@@ -139,6 +139,8 @@ public class Vars implements Loadable{
     public static final int port = 6567;
     /** multicast discovery port.*/
     public static final int multicastPort = 20151;
+    /** Maximum char length of mod subtitles in browser/viewer. */
+    public static final int maxModSubtitleLength = 40;
     /** multicast group for discovery.*/
     public static final String multicastGroup = "227.2.7.7";
     /** whether the graphical game client has loaded */

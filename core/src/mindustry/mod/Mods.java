@@ -1136,7 +1136,7 @@ public class Mods implements Loadable{
 
     /** Mod metadata information.*/
     public static class ModMeta{
-        public String name, displayName, author, description, version, main, minGameVersion = "0", repo;
+        public String name, displayName, author, description, subtitle, version, main, minGameVersion = "0", repo;
         public Seq<String> dependencies = Seq.with();
         /** Hidden mods are only server-side or client-side, and do not support adding new content. */
         public boolean hidden;
@@ -1147,11 +1147,16 @@ public class Mods implements Loadable{
             return displayName == null ? name : displayName;
         }
 
+        public String shortDescription(){
+            return Strings.truncate(subtitle == null ? (description == null || description.length() > maxModSubtitleLength ? "" : description) : subtitle, maxModSubtitleLength, "...");
+        }
+
         //removes all colors
         public void cleanup(){
             if(displayName != null) displayName = Strings.stripColors(displayName);
             if(author != null) author = Strings.stripColors(author);
             if(description != null) description = Strings.stripColors(description);
+            if(subtitle != null) subtitle = Strings.stripColors(subtitle).replace("\n", "");
         }
 
         public int getMinMajor(){

@@ -242,8 +242,13 @@ public class ModsDialog extends BaseDialog{
 
                                 title1.table(text -> {
                                     boolean hideDisabled = !item.isSupported() || item.hasUnmetDependencies() || item.hasContentErrors();
+                                    String shortDesc = item.meta.shortDescription();
 
-                                    text.add("[accent]" + Strings.stripColors(item.meta.displayName()) + "\n[lightgray]v" + Strings.stripColors(trimText(item.meta.version)) + (item.enabled() || hideDisabled ? "" : "\n" + Core.bundle.get("mod.disabled") + ""))
+                                    text.add("[accent]" + Strings.stripColors(item.meta.displayName()) + "\n" +
+                                        (shortDesc.length() > 0 ? "[lightgray]" + shortDesc + "\n" : "")
+                                        + "[gray]v" + Strings.stripColors(trimText(item.meta.version))
+                                        + (item.enabled() || hideDisabled ? "" : "\n" + Core.bundle.get("mod.disabled") + ""))
+
                                     .wrap().top().width(300f).growX().left();
 
                                     text.row();
@@ -472,9 +477,9 @@ public class ModsDialog extends BaseDialog{
                     con.add(
                     "[accent]" + mod.name.replace("\n", "") +
                     (installed.contains(mod.repo) ? "\n[lightgray]" + Core.bundle.get("mod.installed") : "") +
-                    //"[white]\n[lightgray]Author:[] " + trimText(mod.author) +
                     "\n[lightgray]\uE809 " + mod.stars +
-                    (Version.isAtLeast(mod.minGameVersion) ? "" : "\n" + Core.bundle.format("mod.requiresversion", mod.minGameVersion)))
+                    (Version.isAtLeast(mod.minGameVersion) ? mod.subtitle == null ? "" : "\n[lightgray]" + Strings.truncate(mod.subtitle, maxModSubtitleLength) :
+                    "\n" + Core.bundle.format("mod.requiresversion", mod.minGameVersion)))
                     .width(358f).wrap().grow().pad(4f, 2f, 4f, 6f).top().left().labelAlign(Align.topLeft);
 
                 }, Styles.clearPartialt, () -> {

@@ -7,15 +7,7 @@ let modName = "none"
 
 const log = (context, obj) => Vars.mods.scripts.log(context, String(obj))
 const print = text => log(modName + "/" + scriptName, text)
-const readString = path => Vars.mods.scripts.readString(path)
-const readBytes = path => Vars.mods.scripts.readBytes(path)
-const loadMusic = path => Vars.mods.scripts.loadMusic(path)
-const loadSound = path => Vars.mods.scripts.loadSound(path)
 
-const readFile = (purpose, ext, cons) => Vars.mods.scripts.readFile(purpose, ext, cons);
-const readBinFile = (purpose, ext, cons) => Vars.mods.scripts.readBinFile(purpose, ext, cons);
-const writeFile = (purpose, ext, str) => Vars.mods.scripts.writeFile(purpose, ext, str);
-const writeBinFile = (purpose, ext, bytes) => Vars.mods.scripts.writeBinFile(purpose, ext, bytes);
 const newFloats = cap => Vars.mods.getScripts().newFloats(cap);
 
 //these are not strictly necessary, but are kept for edge cases
@@ -48,6 +40,7 @@ function extend(/*Base, ..., def*/){
     }
     return instance
 }
+
 
 importPackage(Packages.arc)
 importPackage(Packages.arc.audio)
