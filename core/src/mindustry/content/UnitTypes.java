@@ -3307,7 +3307,7 @@ public class UnitTypes{
             speed = 2f;
             rotateSpeed = 4f;
             accel = 0.09f;
-            health = 900f;
+            health = 1000f;
             armor = 3f;
             hitSize = 12f;
             engineSize = 0;
