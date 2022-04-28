@@ -16,7 +16,8 @@ public class Junction extends Block{
     public Junction(String name){
         super(name);
         update = true;
-        solid = true;
+        solid = false;
+        underBullets = true;
         group = BlockGroup.transportation;
         unloadable = false;
         noUpdateDisabled = true;

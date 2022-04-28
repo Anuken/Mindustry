@@ -44,6 +44,7 @@ public class ItemBridge extends Block{
         super(name);
         update = true;
         solid = true;
+        underBullets = true;
         hasPower = true;
         itemCapacity = 10;
         configurable = true;

@@ -1,7 +1,6 @@
 package mindustry.content;
 
-import arc.graphics.Color;
-import arc.math.geom.Point2;
+import arc.math.geom.*;
 import mindustry.game.MapObjectives.*;
 import mindustry.game.*;
 import mindustry.graphics.*;
@@ -208,11 +207,11 @@ public class SectorPresets{
 
             rules = r -> {
                 r.objectives.addAll(
-                        new DestroyBlocksObjective(Blocks.coreBastion, Team.malis, Point2.pack(290,501), Point2.pack(158,496)),
-                        new TimerObjective("Nuclear launch detected", 4 * 60 * 60).withMarkers(
-                                new TextMarker("Evacuate base", 1, 1),
-                                new MinimapMarker(338,378, Color.red)
-                        ).withFlags("nuke1")
+                    new DestroyBlocksObjective(Blocks.coreBastion, Team.malis, Point2.pack(290,501), Point2.pack(158,496)),
+                    new TimerObjective("[accent]⚠ Nuclear launch detected:\n[lightgray]{0}", 4 * 60 * 60).withMarkers(
+                        new TextMarker("Evacuate base", 1, 1),
+                        new MinimapMarker(338,378, Pal.remove)
+                    ).withFlags("nuke1")
                 );
             };
         }};

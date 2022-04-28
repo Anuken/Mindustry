@@ -15,7 +15,7 @@ public class Router extends Block{
     public Router(String name){
         super(name);
         solid = true;
-        update = true;
+        underBullets = true;
         hasItems = true;
         itemCapacity = 1;
         group = BlockGroup.transportation;

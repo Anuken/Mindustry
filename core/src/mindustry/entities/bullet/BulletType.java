@@ -305,13 +305,7 @@ public class BulletType extends Content implements Cloneable{
         Effect.shake(hitShake, hitShake, b);
 
         createFrags(b, x, y);
-
-        if(puddleLiquid != null && puddles > 0){
-            for(int i = 0; i < puddles; i++){
-                Tile tile = world.tileWorld(x + Mathf.range(puddleRange), y + Mathf.range(puddleRange));
-                Puddles.deposit(tile, puddleLiquid, puddleAmount);
-            }
-        }
+        createPuddles(b, x, y);
 
         if(incendChance > 0 && Mathf.chance(incendChance)){
             Damage.createIncend(x, y, incendSpread, incendAmount);
@@ -326,6 +320,15 @@ public class BulletType extends Content implements Cloneable{
 
         for(int i = 0; i < lightning; i++){
             Lightning.create(b, lightningColor, lightningDamage < 0 ? damage : lightningDamage, b.x, b.y, b.rotation() + Mathf.range(lightningCone/2) + lightningAngle, lightningLength + Mathf.random(lightningLengthRand));
+        }
+    }
+
+    public void createPuddles(Bullet b, float x, float y){
+        if(puddleLiquid != null && puddles > 0){
+            for(int i = 0; i < puddles; i++){
+                Tile tile = world.tileWorld(x + Mathf.range(puddleRange), y + Mathf.range(puddleRange));
+                Puddles.deposit(tile, puddleLiquid, puddleAmount);
+            }
         }
     }
 
