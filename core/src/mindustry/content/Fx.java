@@ -187,7 +187,7 @@ public class Fx{
 
         color(Pal.command);
         stroke(e.fout(Interp.pow5Out) * 4f);
-        Lines.circle(e.x, e.y, e.fin() * e.rotation);
+        Lines.circle(e.x, e.y, e.fin() * e.rotation * 2f);
     }),
 
     coreBuildBlock = new Effect(80f, e -> {

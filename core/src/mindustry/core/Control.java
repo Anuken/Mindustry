@@ -53,6 +53,7 @@ public class Control implements ApplicationListener, Loadable{
     private Interval timer = new Interval(2);
     private boolean hiscore = false;
     private boolean wasPaused = false;
+    private Seq<Building> toBePlaced = new Seq<>(false);
 
     public Control(){
         saves = new Saves();
@@ -98,6 +99,7 @@ public class Control implements ApplicationListener, Loadable{
 
         Events.on(ResetEvent.class, event -> {
             player.reset();
+            toBePlaced.clear();
 
             hiscore = false;
             saves.resetSave();
@@ -212,6 +214,7 @@ public class Control implements ApplicationListener, Loadable{
             if(state.isCampaign()){
 
                 if(state.rules.sector.planet.prebuildBase){
+                    toBePlaced.clear();
                     float unitsPerTick = 2f;
                     float buildRadius = state.rules.enemyCoreBuildRadius * 1.5f;
 
@@ -226,15 +229,14 @@ public class Control implements ApplicationListener, Loadable{
                                 build.tile.remove();
                                 anyBuilds = true;
 
-                                Time.run(build.dst(ccore) * unitsPerTick + coreDelay, () -> {
-                                    //TODO instance reuse bad?
-                                    build.tile.setBlock(build.block, build.team, build.rotation, () -> build);
+                                toBePlaced.add(build);
 
-                                    //TODO dropped bad?
-                                    build.dropped();
+                                Time.run(build.dst(ccore) / unitsPerTick + coreDelay, () -> {
+                                    if(build.tile.build != build){
+                                        placeLandBuild(build);
 
-                                    Fx.coreBuildBlock.at(build.x, build.y, 0f, build.block);
-                                    Fx.placeBlock.at(build.x, build.y, build.block.size);
+                                        toBePlaced.remove(build);
+                                    }
                                 });
                             }
                         }
@@ -251,6 +253,27 @@ public class Control implements ApplicationListener, Loadable{
             }
         });
 
+        Events.on(SaveWriteEvent.class, e -> forcePlaceAll());
+        Events.on(HostEvent.class, e -> forcePlaceAll());
+    }
+
+    private void forcePlaceAll(){
+        //force set buildings when a save is done or map is hosted, to prevent desyncs
+        for(var build : toBePlaced){
+            placeLandBuild(build);
+        }
+
+        toBePlaced.clear();
+    }
+
+    private void placeLandBuild(Building build){
+        //TODO instance reuse bad?
+        build.tile.setBlock(build.block, build.team, build.rotation, () -> build);
+        //TODO dropped bad?
+        build.dropped();
+
+        Fx.coreBuildBlock.at(build.x, build.y, 0f, build.block);
+        Fx.placeBlock.at(build.x, build.y, build.block.size);
     }
 
     @Override

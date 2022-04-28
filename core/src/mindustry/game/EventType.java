@@ -56,6 +56,7 @@ public class EventType{
     public static class DisposeEvent{}
     public static class PlayEvent{}
     public static class ResetEvent{}
+    public static class HostEvent{}
     public static class WaveEvent{}
     public static class TurnEvent{}
     /** Called when the player places a line, mobile or desktop.*/

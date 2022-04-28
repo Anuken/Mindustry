@@ -1,5 +1,6 @@
 package mindustry.logic;
 
+import arc.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -1449,6 +1450,13 @@ public class LExecutor{
             }
 
             String text = exec.textBuffer.toString();
+            if(text.startsWith("@")){
+                String substr = text.substring(1);
+                if(Core.bundle.has(substr)){
+                    text = Core.bundle.get(substr);
+                }
+            }
+
             switch(type){
                 case notify -> ui.hudfrag.showToast(Icon.info, text);
                 case announce -> ui.announce(text, exec.numf(duration));

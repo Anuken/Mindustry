@@ -5,6 +5,7 @@ import arc.scene.ui.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.core.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.ui.*;
 
@@ -65,6 +66,7 @@ public class HostDialog extends BaseDialog{
             try{
                 net.host(Vars.port);
                 player.admin = true;
+                Events.fire(new HostEvent());
 
                 if(steam){
                     Core.app.post(() -> Core.settings.getBoolOnce("steampublic3", () -> {
