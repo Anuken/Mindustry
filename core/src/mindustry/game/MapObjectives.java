@@ -499,6 +499,14 @@ public class MapObjectives{
             this.color = color;
         }
 
+        public MinimapMarker(float x, float y, float radius, float stroke, Color color){
+            this.x = x;
+            this.y = y;
+            this.stroke = stroke;
+            this.radius = radius;
+            this.color = color;
+        }
+
         public MinimapMarker(){
         }
 

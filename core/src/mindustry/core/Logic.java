@@ -362,7 +362,7 @@ public class Logic implements ApplicationListener{
                     }
                 }
 
-                first = state.rules.objectives.first();
+                first = state.rules.objectives.firstOpt();
                 completed = true;
             }
 
