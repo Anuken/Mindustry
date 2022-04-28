@@ -212,10 +212,10 @@ public class Control implements ApplicationListener, Loadable{
             if(state.isCampaign()){
 
                 if(state.rules.sector.planet.prebuildBase){
-                    float unitsPerTick = 1f;
+                    float unitsPerTick = 2f;
                     float buildRadius = state.rules.enemyCoreBuildRadius * 1.5f;
 
-                    //TODO if the save is unloaded, these blocks do not get built.
+                    //TODO if the save is unloaded or map is hosted, these blocks do not get built.
                     boolean anyBuilds = false;
                     for(var build : state.rules.defaultTeam.data().buildings.copy()){
                         if(!(build instanceof CoreBuild) && !build.block.privileged){
