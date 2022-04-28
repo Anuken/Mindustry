@@ -3967,11 +3967,6 @@ public class Blocks{
                     mirror = true;
                     under = true;
                     moveY = 1f;
-
-                    //lame
-                    moveX = 0.5f;
-
-                    //wackier variant
                     moveX = 1.5f;
                     moveRot = 8;
                 }});
@@ -4163,7 +4158,7 @@ public class Blocks{
             consumeLiquid(Liquids.hydrogen, 3f / 60f);
             consumeItems(with(Items.silicon, 90, Items.tungsten, 70));
 
-            constructTime = 60f * 70f;
+            constructTime = 60f * 60f;
 
             upgrades.addAll(
             new UnitType[]{UnitTypes.stell, UnitTypes.locus}
@@ -4179,7 +4174,7 @@ public class Blocks{
             consumeLiquid(Liquids.hydrogen, 3f / 60f);
             consumeItems(with(Items.silicon, 50, Items.tungsten, 40));
 
-            constructTime = 60f * 50f;
+            constructTime = 60f * 40f;
 
             upgrades.addAll(
             new UnitType[]{UnitTypes.stell, UnitTypes.latum}
@@ -4195,7 +4190,7 @@ public class Blocks{
             consumeLiquid(Liquids.hydrogen, 3f / 60f);
             consumeItems(with(Items.silicon, 25, Items.tungsten, 25));
 
-            constructTime = 60f * 40f;
+            constructTime = 60f * 30f;
 
             upgrades.addAll(
             new UnitType[]{UnitTypes.stell, UnitTypes.avert}

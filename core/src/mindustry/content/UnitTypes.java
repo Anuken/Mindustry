@@ -3298,8 +3298,8 @@ public class UnitTypes{
             speed = 2f;
             rotateSpeed = 4f;
             accel = 0.09f;
-            health = 800f;
-            armor = 2f;
+            health = 900f;
+            armor = 3f;
             hitSize = 12f;
             engineSize = 0;
             fogRadius = 25;
