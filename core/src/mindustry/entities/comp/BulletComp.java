@@ -40,6 +40,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     //setting this variable to true prevents lifetime from decreasing for a frame.
     transient boolean keepAlive;
     transient @Nullable Tile aimTile;
+    transient float aimX, aimY;
     transient float originX, originY;
     transient @Nullable Mover mover;
     transient boolean absorbed, hit;

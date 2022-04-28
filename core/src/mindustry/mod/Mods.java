@@ -1136,7 +1136,8 @@ public class Mods implements Loadable{
 
     /** Mod metadata information.*/
     public static class ModMeta{
-        public String name, displayName, author, description, subtitle, version, main, minGameVersion = "0", repo;
+        public String name, minGameVersion = "0";
+        public @Nullable String displayName, author, description, subtitle, version, main, repo;
         public Seq<String> dependencies = Seq.with();
         /** Hidden mods are only server-side or client-side, and do not support adding new content. */
         public boolean hidden;
@@ -1166,7 +1167,7 @@ public class Mods implements Loadable{
         }
         
         @Override
-        public String toString() {
+        public String toString(){
             return "ModMeta{" +
                     "name='" + name + '\'' +
                     ", author='" + author + '\'' +

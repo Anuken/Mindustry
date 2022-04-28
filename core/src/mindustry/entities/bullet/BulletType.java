@@ -304,13 +304,7 @@ public class BulletType extends Content implements Cloneable{
 
         Effect.shake(hitShake, hitShake, b);
 
-        if(fragBullet != null){
-            for(int i = 0; i < fragBullets; i++){
-                float len = Mathf.random(1f, 7f);
-                float a = b.rotation() + Mathf.range(fragCone/2) + fragAngle;
-                fragBullet.create(b, x + Angles.trnsx(a, len), y + Angles.trnsy(a, len), a, Mathf.random(fragVelocityMin, fragVelocityMax), Mathf.random(fragLifeMin, fragLifeMax));
-            }
-        }
+        createFrags(b, x, y);
 
         if(puddleLiquid != null && puddles > 0){
             for(int i = 0; i < puddles; i++){
@@ -328,6 +322,14 @@ public class BulletType extends Content implements Cloneable{
             Damage.applySuppression(b.team, b.x, b.y, suppressionRange, suppressionDuration, 0f, suppressionEffectChance, new Vec2(b.x, b.y));
         }
 
+        createSplashDamage(b, x, y);
+
+        for(int i = 0; i < lightning; i++){
+            Lightning.create(b, lightningColor, lightningDamage < 0 ? damage : lightningDamage, b.x, b.y, b.rotation() + Mathf.range(lightningCone/2) + lightningAngle, lightningLength + Mathf.random(lightningLengthRand));
+        }
+    }
+
+    public void createSplashDamage(Bullet b, float x, float y){
         if(splashDamageRadius > 0 && !b.absorbed){
             Damage.damage(b.team, x, y, splashDamageRadius, splashDamage * b.damageMultiplier(), false, collidesAir, collidesGround, scaledSplashDamage, b);
 
@@ -346,11 +348,18 @@ public class BulletType extends Content implements Cloneable{
                 indexer.eachBlock(null, x, y, splashDamageRadius, other -> other.team != b.team, other -> Fires.create(other.tile));
             }
         }
+    }
 
-        for(int i = 0; i < lightning; i++){
-            Lightning.create(b, lightningColor, lightningDamage < 0 ? damage : lightningDamage, b.x, b.y, b.rotation() + Mathf.range(lightningCone/2) + lightningAngle, lightningLength + Mathf.random(lightningLengthRand));
+    public void createFrags(Bullet b, float x, float y){
+        if(fragBullet != null){
+            for(int i = 0; i < fragBullets; i++){
+                float len = Mathf.random(1f, 7f);
+                float a = b.rotation() + Mathf.range(fragCone / 2) + fragAngle;
+                fragBullet.create(b, x + Angles.trnsx(a, len), y + Angles.trnsy(a, len), a, Mathf.random(fragVelocityMin, fragVelocityMax), Mathf.random(fragLifeMin, fragLifeMax));
+            }
         }
     }
+
 
     /** Called when the bullet reaches the end of its lifetime or is destroyed by something external. */
     public void despawned(Bullet b){
@@ -408,28 +417,40 @@ public class BulletType extends Content implements Cloneable{
 
     public void update(Bullet b){
         updateTrail(b);
+        updateHoming(b);
+        updateWeaving(b);
+        updateTrailEffects(b);
+    }
 
+    public void updateHoming(Bullet b){
         if(homingPower > 0.0001f && b.time >= homingDelay){
+            float realAimX = b.aimX < 0 ? b.x : b.aimX;
+            float realAimY = b.aimY < 0 ? b.y : b.aimY;
+
             Teamc target;
             //home in on allies if possible
             if(heals()){
-                target = Units.closestTarget(null, b.x, b.y, homingRange,
-                    e -> e.checkTarget(collidesAir, collidesGround) && e.team != b.team && !b.hasCollided(e.id),
-                    t -> collidesGround && (t.team != b.team || t.damaged()) && !b.hasCollided(t.id)
+                target = Units.closestTarget(null, realAimX, realAimY, homingRange,
+                e -> e.checkTarget(collidesAir, collidesGround) && e.team != b.team && !b.hasCollided(e.id),
+                t -> collidesGround && (t.team != b.team || t.damaged()) && !b.hasCollided(t.id)
                 );
             }else{
-                target = Units.closestTarget(b.team, b.x, b.y, homingRange, e -> e.checkTarget(collidesAir, collidesGround) && !b.hasCollided(e.id), t -> collidesGround && !b.hasCollided(t.id));
+                target = Units.closestTarget(b.team, realAimX, realAimY, homingRange, e -> e.checkTarget(collidesAir, collidesGround) && !b.hasCollided(e.id), t -> collidesGround && !b.hasCollided(t.id));
             }
 
             if(target != null){
                 b.vel.setAngle(Angles.moveToward(b.rotation(), b.angleTo(target), homingPower * Time.delta * 50f));
             }
         }
+    }
 
+    public void updateWeaving(Bullet b){
         if(weaveMag != 0){
             b.vel.rotateRadExact((float)Math.sin((b.time + Math.PI * weaveScale/2f) / weaveScale) * weaveMag * (weaveRandom ? (Mathf.randomSeed(b.id, 0, 1) == 1 ? -1 : 1) : 1f) * Time.delta * Mathf.degRad);
         }
+    }
 
+    public void updateTrailEffects(Bullet b){
         if(trailChance > 0){
             if(Mathf.chanceDelta(trailChance)){
                 trailEffect.at(b.x, b.y, trailRotation ? b.rotation() : trailParam, trailColor);
@@ -562,6 +583,8 @@ public class BulletType extends Content implements Cloneable{
         bullet.originX = x;
         bullet.originY = y;
         bullet.aimTile = world.tileWorld(aimX, aimY);
+        bullet.aimX = aimX;
+        bullet.aimY = aimY;
         bullet.initVel(angle, speed * velocityScl);
         if(backMove){
             bullet.set(x - bullet.vel.x * Time.delta, y - bullet.vel.y * Time.delta);
