@@ -4175,7 +4175,7 @@ public class Blocks{
             regionSuffix = "-dark";
 
             size = 3;
-            consumePower(3f);
+            consumePower(2.5f);
             consumeLiquid(Liquids.hydrogen, 3f / 60f);
             consumeItems(with(Items.silicon, 50, Items.tungsten, 40));
 
@@ -4191,7 +4191,7 @@ public class Blocks{
             regionSuffix = "-dark";
 
             size = 3;
-            consumePower(3f);
+            consumePower(2f);
             consumeLiquid(Liquids.hydrogen, 3f / 60f);
             consumeItems(with(Items.silicon, 25, Items.tungsten, 25));
 
@@ -4207,10 +4207,10 @@ public class Blocks{
             regionSuffix = "-dark";
             size = 5;
             plans.add(new AssemblerUnitPlan(UnitTypes.vanquish, 60f * 50f, PayloadStack.list(UnitTypes.stell, 4, Blocks.tungstenWallLarge, 10)));
-            consumePower(3f);
             areaSize = 13;
             researchCostMultiplier = 0.4f;
 
+            consumePower(3f);
             consumeLiquid(Liquids.nitrogen, 24f / 60f);
         }};
 
@@ -4220,10 +4220,10 @@ public class Blocks{
             regionSuffix = "-dark";
             size = 5;
             plans.add(new AssemblerUnitPlan(UnitTypes.quell, 60f * 60f, PayloadStack.list(UnitTypes.avert, 2, Blocks.berylliumWallLarge, 8)));
-            consumePower(3f);
             areaSize = 13;
             researchCostMultiplier = 0.4f;
 
+            consumePower(3f);
             consumeLiquid(Liquids.nitrogen, 24f / 60f);
         }};
 
