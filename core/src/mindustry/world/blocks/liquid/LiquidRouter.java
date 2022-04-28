@@ -12,6 +12,8 @@ public class LiquidRouter extends LiquidBlock{
     public LiquidRouter(String name){
         super(name);
 
+        underBullets = true;
+        solid = false;
         noUpdateDisabled = true;
         canOverdrive = false;
     }

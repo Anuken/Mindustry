@@ -44,6 +44,7 @@ public class Conveyor extends Block implements Autotiler{
         itemCapacity = capacity;
         priority = TargetPriority.transport;
         conveyorPlacement = true;
+        underBullets = true;
 
         ambientSound = Sounds.conveyor;
         ambientSoundVolume = 0.0022f;

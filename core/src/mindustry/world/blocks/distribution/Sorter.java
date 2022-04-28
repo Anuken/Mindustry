@@ -21,7 +21,7 @@ public class Sorter extends Block{
         super(name);
         update = false;
         destructible = true;
-        solid = true;
+        underBullets = true;
         instantTransfer = true;
         group = BlockGroup.transportation;
         configurable = true;
