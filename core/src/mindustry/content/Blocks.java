@@ -3687,12 +3687,12 @@ public class Blocks{
         }};
 
         breach = new ItemTurret("breach"){{
-            requirements(Category.turret, with(Items.beryllium, 150, Items.silicon, 150, Items.graphite, 300));
+            requirements(Category.turret, with(Items.beryllium, 150, Items.silicon, 150, Items.graphite, 250));
 
             Effect sfe = new MultiEffect(Fx.shootBigColor, Fx.colorSparkBig);
 
             ammo(
-            Items.beryllium, new BasicBulletType(7.5f, 95){{
+            Items.beryllium, new BasicBulletType(7.5f, 85){{
                 width = 12f;
                 hitSize = 7f;
                 height = 20f;
@@ -3709,7 +3709,7 @@ public class Blocks{
                 hitEffect = despawnEffect = Fx.hitBulletColor;
                 buildingDamageMultiplier = 0.3f;
             }},
-            Items.tungsten, new BasicBulletType(8f, 185){{
+            Items.tungsten, new BasicBulletType(8f, 165){{
                 width = 13f;
                 height = 19f;
                 hitSize = 7f;
@@ -3793,14 +3793,14 @@ public class Blocks{
             }};
             outlineColor = Pal.darkOutline;
 
-            liquidConsumed = 8f / 60f;
+            liquidConsumed = 10f / 60f;
 
             float r = range = 130f;
 
             //TODO balance, set up, where is liquid/sec displayed? status effects maybe?
             ammo(
             Liquids.ozone, new ContinuousFlameBulletType(){{
-                damage = 70f;
+                damage = 60f;
                 length = r;
                 knockback = 1f;
                 pierceCap = 2;
@@ -3809,7 +3809,7 @@ public class Blocks{
                 colors = new Color[]{Color.valueOf("eb7abe").a(0.55f), Color.valueOf("e189f5").a(0.7f), Color.valueOf("907ef7").a(0.8f), Color.valueOf("91a4ff"), Color.white};
             }},
             Liquids.cyanogen, new ContinuousFlameBulletType(){{
-                damage = 160f;
+                damage = 140f;
                 rangeChange = 70f;
                 length = r + rangeChange;
                 knockback = 2f;
@@ -4149,28 +4149,12 @@ public class Blocks{
             consumePower(2f);
         }};
 
-        tankReconstructor = new Reconstructor("tank-reconstructor"){{
-            requirements(Category.units, with(Items.graphite, 150, Items.tungsten, 150, Items.silicon, 250, Items.oxide, 60));
-            regionSuffix = "-dark";
-
-            size = 3;
-            consumePower(3f);
-            consumeLiquid(Liquids.hydrogen, 3f / 60f);
-            consumeItems(with(Items.silicon, 90, Items.tungsten, 70));
-
-            constructTime = 60f * 60f;
-
-            upgrades.addAll(
-            new UnitType[]{UnitTypes.stell, UnitTypes.locus}
-            );
-        }};
-
         mechReconstructor = new Reconstructor("mech-reconstructor"){{
-            requirements(Category.units, with(Items.beryllium, 250, Items.tungsten, 120, Items.silicon, 150, Items.oxide, 50));
+            requirements(Category.units, with(Items.beryllium, 250, Items.tungsten, 120, Items.silicon, 150));
             regionSuffix = "-dark";
 
             size = 3;
-            consumePower(2.5f);
+            consumePower(2f);
             consumeLiquid(Liquids.hydrogen, 3f / 60f);
             consumeItems(with(Items.silicon, 50, Items.tungsten, 40));
 
@@ -4186,7 +4170,7 @@ public class Blocks{
             regionSuffix = "-dark";
 
             size = 3;
-            consumePower(2f);
+            consumePower(2.5f);
             consumeLiquid(Liquids.hydrogen, 3f / 60f);
             consumeItems(with(Items.silicon, 25, Items.tungsten, 25));
 
@@ -4194,6 +4178,22 @@ public class Blocks{
 
             upgrades.addAll(
             new UnitType[]{UnitTypes.stell, UnitTypes.avert}
+            );
+        }};
+
+        tankReconstructor = new Reconstructor("tank-reconstructor"){{
+            requirements(Category.units, with(Items.graphite, 150, Items.tungsten, 150, Items.silicon, 250, Items.oxide, 60));
+            regionSuffix = "-dark";
+
+            size = 3;
+            consumePower(3f);
+            consumeLiquid(Liquids.hydrogen, 3f / 60f);
+            consumeItems(with(Items.silicon, 90, Items.tungsten, 70));
+
+            constructTime = 60f * 60f;
+
+            upgrades.addAll(
+            new UnitType[]{UnitTypes.stell, UnitTypes.locus}
             );
         }};
 

@@ -2878,7 +2878,7 @@ public class UnitTypes{
                 smoothReloadSpeed = 0.15f;
                 recoil = 2f;
 
-                bullet = new BasicBulletType(3.5f, 55){{
+                bullet = new BasicBulletType(3.5f, 40){{
                     backColor = trailColor = hitColor = Pal.techBlue;
                     frontColor = Color.white;
                     width = 7.5f;
@@ -2893,7 +2893,16 @@ public class UnitTypes{
                     trailParam = 1.8f;
                     trailInterval = 6f;
 
-                    hitEffect = despawnEffect = Fx.hitBulletColor;
+                    splashDamageRadius = 23f;
+                    splashDamage = 36f;
+
+                    hitEffect = despawnEffect = new MultiEffect(Fx.hitBulletColor, new WaveEffect(){{
+                        colorFrom = colorTo = Pal.techBlue;
+                        sizeTo = splashDamageRadius + 3f;
+                        lifetime = 9f;
+                        strokeFrom = 3f;
+                    }});
+
                     shootEffect = new MultiEffect(Fx.shootBigColor, new Effect(9, e -> {
                         color(Color.white, e.color, e.fin());
                         stroke(0.7f + e.fout());

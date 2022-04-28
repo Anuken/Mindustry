@@ -188,7 +188,7 @@ public class ErekirTechTree{
                 node(cliffCrusher, () -> {
                     node(siliconArcFurnace, () -> {
                         node(electrolyzer, Seq.with(new OnSector(three)), () -> {
-                            node(oxidationChamber, () -> {
+                            node(oxidationChamber, Seq.with(new Research(mechReconstructor)), () -> {
                                 node(electricHeater, Seq.with(new OnSector(four)), () -> {
                                     node(heatRedirector, () -> {
 
@@ -277,11 +277,11 @@ public class ErekirTechTree{
 
                 });
 
-                node(shipReconstructor, Seq.with(new OnSector(three)), () -> {
-                    node(UnitTypes.avert);
+                node(mechReconstructor, Seq.with(new OnSector(three)), () -> {
+                    node(UnitTypes.latum);
 
-                    node(mechReconstructor, Seq.with(new OnSector(three)), () -> {
-                        node(UnitTypes.latum);
+                    node(shipReconstructor, Seq.with(new OnSector(three)), () -> {
+                        node(UnitTypes.avert);
 
                         node(tankReconstructor, () -> {
                             node(UnitTypes.locus);
