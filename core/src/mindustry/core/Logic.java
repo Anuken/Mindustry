@@ -343,7 +343,10 @@ public class Logic implements ApplicationListener{
                 }
             }
 
-            if(!net.client() && first.complete()){
+            boolean completed = false;
+
+            //multiple objectives can be updated in the same frame
+            while(!net.client() && first != null && first.complete()){
                 state.rules.objectives.remove(0);
                 first.completed();
                 //apply flags.
@@ -359,6 +362,11 @@ public class Logic implements ApplicationListener{
                     }
                 }
 
+                first = state.rules.objectives.first();
+                completed = true;
+            }
+
+            if(completed){
                 //TODO call packet for this?
                 if(net.server()){
                     Call.setRules(state.rules);
