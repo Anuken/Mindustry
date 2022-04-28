@@ -308,7 +308,7 @@ public class MapObjectives{
 
         @Override
         public String text(){
-            return Core.bundle.format("objective.destroyblocks", positions, positions.length, block.emoji(), block.localizedName);
+            return Core.bundle.format("objective.destroyblocks", progress(), positions.length, block.emoji(), block.localizedName);
         }
     }
 
