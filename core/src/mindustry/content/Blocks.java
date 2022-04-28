@@ -4155,7 +4155,7 @@ public class Blocks{
         }};
 
         tankReconstructor = new Reconstructor("tank-reconstructor"){{
-            requirements(Category.units, with(Items.graphite, 250, Items.tungsten, 120, Items.silicon, 200));
+            requirements(Category.units, with(Items.graphite, 150, Items.tungsten, 150, Items.silicon, 250, Items.oxide, 60));
             regionSuffix = "-dark";
 
             size = 3;
@@ -4171,7 +4171,7 @@ public class Blocks{
         }};
 
         mechReconstructor = new Reconstructor("mech-reconstructor"){{
-            requirements(Category.units, with(Items.graphite, 250, Items.tungsten, 120, Items.silicon, 200));
+            requirements(Category.units, with(Items.beryllium, 250, Items.tungsten, 120, Items.silicon, 150, Items.oxide, 50));
             regionSuffix = "-dark";
 
             size = 3;

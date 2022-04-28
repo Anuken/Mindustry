@@ -277,14 +277,14 @@ public class ErekirTechTree{
 
                 });
 
-                node(tankReconstructor, Seq.with(new OnSector(three)), () -> {
-                    node(UnitTypes.locus);
+                node(shipReconstructor, Seq.with(new OnSector(three)), () -> {
+                    node(UnitTypes.avert);
 
-                    node(shipReconstructor, Seq.with(new OnSector(three)), () -> {
-                        node(UnitTypes.avert);
+                    node(mechReconstructor, Seq.with(new OnSector(three)), () -> {
+                        node(UnitTypes.latum);
 
-                        node(mechReconstructor, () -> {
-                            node(UnitTypes.latum);
+                        node(tankReconstructor, () -> {
+                            node(UnitTypes.locus);
 
                             node(tankAssembler, Seq.with(new OnSector(three), new Research(constructor), new Research(atmosphericConcentrator)), () -> {
                                 node(UnitTypes.vanquish, () -> {
