@@ -207,9 +207,10 @@ public class SectorPresets{
 
             rules = r -> {
                 r.objectives.addAll(
-                    new DestroyBlocksObjective(Blocks.coreBastion, Team.malis, Point2.pack(290,501), Point2.pack(158,496)),
+                    new DestroyBlocksObjective(Blocks.coreBastion, Team.malis, Point2.pack(290,501), Point2.pack(158,496))
+                    .withFlags("nukeannounce"),
                     new TimerObjective("@objective.nuclearlaunch", 4 * 60 * 60).withMarkers(
-                        new TextMarker("Evacuate base", 1, 1),
+                        new TextMarker("[red]Evacuate immediately.", 338 * 8f, 378 * 8f),
                         new MinimapMarker(338, 378, 50f, 14f, Pal.remove)
                     ).withFlags("nuke1")
                 );

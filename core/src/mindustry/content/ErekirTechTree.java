@@ -188,7 +188,7 @@ public class ErekirTechTree{
                 node(cliffCrusher, () -> {
                     node(siliconArcFurnace, () -> {
                         node(electrolyzer, Seq.with(new OnSector(three)), () -> {
-                            node(oxidationChamber, Seq.with(new Research(mechReconstructor)), () -> {
+                            node(oxidationChamber, Seq.with(new Research(mechReconstructor), new OnSector(four)), () -> {
                                 node(electricHeater, Seq.with(new OnSector(four)), () -> {
                                     node(heatRedirector, () -> {
 

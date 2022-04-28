@@ -4159,6 +4159,7 @@ public class Blocks{
             consumeItems(with(Items.silicon, 50, Items.tungsten, 40));
 
             constructTime = 60f * 40f;
+            researchCostMultiplier = 0.75f;
 
             upgrades.addAll(
             new UnitType[]{UnitTypes.stell, UnitTypes.latum}
