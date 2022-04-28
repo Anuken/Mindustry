@@ -31,7 +31,7 @@ public class Team implements Comparable<Team>{
         derelict = new Team(0, "derelict", Color.valueOf("4d4e58")),
         sharded = new Team(1, "sharded", Pal.accent.cpy(), Color.valueOf("ffd37f"), Color.valueOf("eab678"), Color.valueOf("d4816b")),
         crux = new Team(2, "crux", Color.valueOf("f25555"), Color.valueOf("fc8e6c"), Color.valueOf("f25555"), Color.valueOf("a04553")),
-        malis = new Team(3, "malis", Color.valueOf("a27ce5"), Color.valueOf("484988"), Color.valueOf("665c9f"), Color.valueOf("bf92f9")),
+        malis = new Team(3, "malis", Color.valueOf("a27ce5"), Color.valueOf("c195fb"), Color.valueOf("665c9f"), Color.valueOf("484988")),
         green = new Team(4, "green", Color.valueOf("54d67d"), Color.valueOf("96f58c"), Color.valueOf("54d67d"), Color.valueOf("28785c")),
         blue = new Team(5, "blue", Color.valueOf("6c87fd"), Color.valueOf("85caf9"), Color.valueOf("6c87fd"), Color.valueOf("3b3392"));
 
