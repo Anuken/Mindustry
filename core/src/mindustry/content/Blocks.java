@@ -3744,7 +3744,7 @@ public class Blocks{
             restitution = 0.03f;
             range = 190;
             shootCone = 3f;
-            scaledHealth = 280;
+            scaledHealth = 180;
             rotateSpeed = 1.6f;
             researchCostMultiplier = 0.05f;
 
@@ -3823,7 +3823,7 @@ public class Blocks{
             }}
             );
 
-            scaledHealth = 330;
+            scaledHealth = 210;
             shootY = 7f;
             size = 3;
         }};
@@ -3907,7 +3907,7 @@ public class Blocks{
 
             consumeLiquid(Liquids.hydrogen, 5f / 60f);
 
-            scaledHealth = 300;
+            scaledHealth = 250;
             range = 390f;
             size = 4;
         }};
@@ -3991,7 +3991,7 @@ public class Blocks{
 
             outlineColor = Pal.darkOutline;
 
-            scaledHealth = 420;
+            scaledHealth = 280;
             range = 270f;
             size = 4;
 
