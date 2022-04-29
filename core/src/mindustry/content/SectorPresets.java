@@ -210,7 +210,7 @@ public class SectorPresets{
                 r.objectives.addAll(
                     new DestroyBlocksObjective(Blocks.coreBastion, Team.malis, Point2.pack(290,501), Point2.pack(158,496))
                     .withFlags("nukeannounce"),
-                    new TimerObjective("@objective.nuclearlaunch", 4 * 60 * 60).withMarkers(
+                    new TimerObjective("@objective.nuclearlaunch", 8 * 60 * 60).withMarkers(
                         new MinimapMarker(338, 377, rad, 14f, Pal.remove),
                         new ShapeMarker(338 * 8, 377 * 8f){{
                             radius = rad * 8f;
