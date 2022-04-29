@@ -126,8 +126,7 @@ public class Planets{
             allowLaunchSchematics = true;
             allowLaunchLoadout = true;
             ruleSetter = r -> {
-                //TODO this planet is crux, need to update all maps.
-                //r.waveTeam = Team.crux;
+                r.waveTeam = Team.crux;
                 r.placeRangeCheck = false;
                 r.attributes.clear();
                 r.showSpawns = false;

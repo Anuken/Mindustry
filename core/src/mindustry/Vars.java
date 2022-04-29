@@ -28,6 +28,7 @@ import mindustry.net.*;
 import mindustry.service.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
+import mindustry.world.meta.*;
 
 import java.io.*;
 import java.nio.charset.*;
@@ -49,6 +50,8 @@ public class Vars implements Loadable{
     public static String steamPlayerName = "";
     /** Default accessible content types used for player-selectable icons. */
     public static final ContentType[] defaultContentIcons = {ContentType.item, ContentType.liquid, ContentType.block, ContentType.unit};
+    /** Default rule environment. */
+    public static final int defaultEnv = Env.terrestrial | Env.spores | Env.groundOil | Env.groundWater | Env.oxygen;
     /** Wall darkness radius. */
     public static final int darkRadius = 4;
     /** Maximum extra padding around deployment schematics. TODO 4, or 5?*/

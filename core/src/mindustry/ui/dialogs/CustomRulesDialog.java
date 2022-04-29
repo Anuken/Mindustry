@@ -9,6 +9,7 @@ import arc.scene.ui.ImageButton.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
@@ -228,8 +229,17 @@ public class CustomRulesDialog extends BaseDialog{
 
             //TODO dynamic selection of planets
             for(Planet planet : new Planet[]{Planets.serpulo, Planets.erekir}){
-                t.button(planet.localizedName, style, () -> planet.applyRules(rules)).group(group).checked(rules.env == planet.defaultEnv);
+                t.button(planet.localizedName, style, () -> {
+                    rules.env = planet.defaultEnv;
+                    rules.hiddenBuildItems.clear();
+                    rules.hiddenBuildItems.addAll(planet.hiddenItems);
+                }).group(group).checked(rules.env == planet.defaultEnv);
             }
+
+            t.button("@rules.anyenv", style, () -> {
+                rules.env = Vars.defaultEnv;
+                rules.hiddenBuildItems.clear();
+            }).group(group).checked(rules.hiddenBuildItems.size == 0);
         }).left().fill(false).expand(false, false).row();
 
         title("@rules.title.teams");

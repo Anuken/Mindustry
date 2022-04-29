@@ -2500,7 +2500,7 @@ public class UnitTypes{
             treadPullOffset = 5;
             speed = 0.7f;
             rotateSpeed = 2.6f;
-            health = 2000;
+            health = 2100;
             armor = 8f;
             itemCapacity = 0;
             treadRects = new Rect[]{new Rect(17, 10, 19, 76)};
@@ -2527,7 +2527,7 @@ public class UnitTypes{
                 //TODO make this look nicer
                 bullet = new RailBulletType(){{
                     length = 160f;
-                    damage = 45f;
+                    damage = 48f;
                     hitColor = Color.valueOf("feb380");
                     hitEffect = endEffect = Fx.hitBulletColor;
                     pierceDamageFactor = 0.8f;
@@ -2878,7 +2878,7 @@ public class UnitTypes{
                 smoothReloadSpeed = 0.15f;
                 recoil = 2f;
 
-                bullet = new BasicBulletType(3.5f, 40){{
+                bullet = new BasicBulletType(3.5f, 27){{
                     backColor = trailColor = hitColor = Pal.techBlue;
                     frontColor = Color.white;
                     width = 7.5f;
@@ -2894,7 +2894,7 @@ public class UnitTypes{
                     trailInterval = 6f;
 
                     splashDamageRadius = 23f;
-                    splashDamage = 36f;
+                    splashDamage = 40f;
 
                     hitEffect = despawnEffect = new MultiEffect(Fx.hitBulletColor, new WaveEffect(){{
                         colorFrom = colorTo = Pal.techBlue;

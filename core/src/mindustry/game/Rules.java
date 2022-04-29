@@ -5,6 +5,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.game.MapObjectives.*;
 import mindustry.graphics.g3d.*;
@@ -13,7 +14,6 @@ import mindustry.type.*;
 import mindustry.type.Weather.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
-import mindustry.world.meta.*;
 
 /**
  * Defines current rules on how the game should function.
@@ -95,7 +95,7 @@ public class Rules{
     /** Environment drag multiplier. */
     public float dragMultiplier = 1f;
     /** Environmental flags that dictate visuals & how blocks function. */
-    public int env = Env.terrestrial | Env.spores | Env.groundOil | Env.groundWater | Env.oxygen;
+    public int env = Vars.defaultEnv;
     /** Attributes of the environment. */
     public Attributes attributes = new Attributes();
     /** Sector for saves that have them. */
