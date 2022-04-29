@@ -120,6 +120,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Events.on(WorldLoadEvent.class, e -> {
             playerPlanTree = new QuadTree<>(new Rect(0f, 0f, world.unitWidth(), world.unitHeight()));
         });
+
+        Events.on(ResetEvent.class, e -> {
+            logicCutscene = false;
+        });
     }
 
     //methods to override
