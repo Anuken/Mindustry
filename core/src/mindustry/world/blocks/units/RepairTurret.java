@@ -20,7 +20,7 @@ import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
-public class RepairPoint extends Block{
+public class RepairTurret extends Block{
     static final Rect rect = new Rect();
     static final Rand rand = new Rand();
 
@@ -50,7 +50,7 @@ public class RepairPoint extends Block{
 
     public Color laserColor = Color.valueOf("98ffa9"), laserTopColor = Color.white.cpy();
 
-    public RepairPoint(String name){
+    public RepairTurret(String name){
         super(name);
         update = true;
         solid = true;

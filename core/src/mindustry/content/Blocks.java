@@ -4112,7 +4112,7 @@ public class Blocks{
             );
         }};
 
-        repairPoint = new RepairPoint("repair-point"){{
+        repairPoint = new RepairTurret("repair-point"){{
             requirements(Category.units, with(Items.lead, 30, Items.copper, 30, Items.silicon, 20));
             repairSpeed = 0.45f;
             repairRadius = 60f;
@@ -4121,7 +4121,7 @@ public class Blocks{
             pulseRadius = 5f;
         }};
 
-        repairTurret = new RepairPoint("repair-turret"){{
+        repairTurret = new RepairTurret("repair-turret"){{
             requirements(Category.units, with(Items.silicon, 90, Items.thorium, 80, Items.plastanium, 60));
             size = 2;
             length = 6f;

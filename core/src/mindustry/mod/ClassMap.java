@@ -1,6 +1,7 @@
 package mindustry.mod;
 
 import arc.struct.*;
+import mindustry.world.blocks.units.*;
 import mindustry.world.draw.*;
 
 /** Generated class. Maps simple class names to concrete classes. For use in JSON mods. */
@@ -379,8 +380,8 @@ public class ClassMap{
         classes.put("EffectDroneAI", mindustry.world.blocks.units.DroneCenter.EffectDroneAI.class);
         classes.put("Reconstructor", mindustry.world.blocks.units.Reconstructor.class);
         classes.put("ReconstructorBuild", mindustry.world.blocks.units.Reconstructor.ReconstructorBuild.class);
-        classes.put("RepairPoint", mindustry.world.blocks.units.RepairPoint.class);
-        classes.put("RepairPointBuild", mindustry.world.blocks.units.RepairPoint.RepairPointBuild.class);
+        classes.put("RepairPoint", RepairTurret.class);
+        classes.put("RepairPointBuild", RepairTurret.RepairPointBuild.class);
         classes.put("UnitAssembler", mindustry.world.blocks.units.UnitAssembler.class);
         classes.put("AssemblerUnitPlan", mindustry.world.blocks.units.UnitAssembler.AssemblerUnitPlan.class);
         classes.put("UnitAssemblerBuild", mindustry.world.blocks.units.UnitAssembler.UnitAssemblerBuild.class);
