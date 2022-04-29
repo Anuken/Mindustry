@@ -3684,8 +3684,8 @@ public class UnitTypes{
                 rotate = false;
                 shootY = 0f;
                 beamWidth = 0.7f;
-                repairSpeed = 2.2f;
-                fractionRepairSpeed = 0.04f;
+                repairSpeed = 3.1f;
+                fractionRepairSpeed = 0.06f;
                 aimDst = 0f;
                 shootCone = 15f;
                 mirror = false;
@@ -3750,8 +3750,8 @@ public class UnitTypes{
                 shootCone = 15f;
                 mirror = false;
 
-                repairSpeed = 2.5f;
-                fractionRepairSpeed = 0.04f;
+                repairSpeed = 3.3f;
+                fractionRepairSpeed = 0.06f;
 
                 targetUnits = false;
                 targetBuildings = true;
@@ -3826,8 +3826,8 @@ public class UnitTypes{
                 shootCone = 40f;
                 mirror = true;
 
-                repairSpeed = 1.3f;
-                fractionRepairSpeed = 0.02f;
+                repairSpeed = 3.6f / 2f;
+                fractionRepairSpeed = 0.03f;
 
                 targetUnits = false;
                 targetBuildings = true;

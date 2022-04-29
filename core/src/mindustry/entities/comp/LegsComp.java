@@ -173,16 +173,18 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
 
                 //create effect when transitioning to a group it can't move in
                 if(!move && (moving || !type.legContinuousMove) && i % div == l.group){
-                    if(floor.isLiquid){
-                        floor.walkEffect.at(l.base.x, l.base.y, type.rippleScale, floor.mapColor);
-                        floor.walkSound.at(x, y, 1f, floor.walkSoundVolume);
-                    }else{
-                        Fx.unitLandSmall.at(l.base.x, l.base.y, type.rippleScale, floor.mapColor);
-                    }
+                    if(!headless && !inFogTo(player.team())){
+                        if(floor.isLiquid){
+                            floor.walkEffect.at(l.base.x, l.base.y, type.rippleScale, floor.mapColor);
+                            floor.walkSound.at(x, y, 1f, floor.walkSoundVolume);
+                        }else{
+                            Fx.unitLandSmall.at(l.base.x, l.base.y, type.rippleScale, floor.mapColor);
+                        }
 
-                    //shake when legs contact ground
-                    if(type.landShake > 0){
-                        Effect.shake(type.landShake, type.landShake, l.base);
+                        //shake when legs contact ground
+                        if(type.landShake > 0){
+                            Effect.shake(type.landShake, type.landShake, l.base);
+                        }
                     }
 
                     if(type.legSplashDamage > 0){
