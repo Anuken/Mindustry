@@ -78,7 +78,7 @@ public class UnitType extends UnlockableContent{
     public boolean destructibleWreck = true;
     /** If true, this modded unit always has a -outline region generated for its base. Normally, outlines are ignored if there are no top = false weapons. */
     public boolean alwaysCreateOutline = false;
-    /** If true, this unit has a square shadow. TODO physics? */
+    /** If true, this unit has a square shadow. */
     public boolean squareShape = false;
     public float groundLayer = Layer.groundUnit;
     public float payloadCapacity = 8;
