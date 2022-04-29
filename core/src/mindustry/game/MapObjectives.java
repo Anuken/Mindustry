@@ -525,7 +525,8 @@ public class MapObjectives{
 
     /** Displays a shape with an outline and color. */
     public static class ShapeMarker extends ObjectiveMarker{
-        public float x, y, radius = 6f, rotation = 0f;
+        public float x, y, radius = 6f, rotation = 0f, stroke = 1f;
+        public boolean fill = false, outline = true;
         public int sides = 4;
         public Color color = Pal.accent;
 
@@ -546,10 +547,19 @@ public class MapObjectives{
 
         @Override
         public void draw(){
-            Lines.stroke(3f, Pal.gray);
-            Lines.poly(x, y, sides, radius + 1f, rotation);
-            Lines.stroke(1f, color);
-            Lines.poly(x, y, sides, radius + 1f, rotation);
+            if(!fill){
+                if(outline){
+                    Lines.stroke(stroke + 2f, Pal.gray);
+                    Lines.poly(x, y, sides, radius + 1f, rotation);
+                }
+
+                Lines.stroke(stroke, color);
+                Lines.poly(x, y, sides, radius + 1f, rotation);
+            }else{
+                Draw.color(color);
+                Fill.poly(x, y, sides, radius);
+            }
+
             Draw.reset();
         }
     }

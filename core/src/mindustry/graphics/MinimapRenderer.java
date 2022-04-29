@@ -230,7 +230,7 @@ public class MinimapRenderer{
     }
 
     public float scale(float radius){
-        return (radius / (baseSize / 2f)) * 5f * lastScl;
+        return worldSpace ? (radius / (baseSize / 2f)) * 5f * lastScl : lastW / rect.width * radius;
     }
 
     public @Nullable TextureRegion getRegion(){

@@ -206,12 +206,23 @@ public class SectorPresets{
             difficulty = 5;
 
             rules = r -> {
+                float rad = 52f;
                 r.objectives.addAll(
                     new DestroyBlocksObjective(Blocks.coreBastion, Team.malis, Point2.pack(290,501), Point2.pack(158,496))
                     .withFlags("nukeannounce"),
                     new TimerObjective("@objective.nuclearlaunch", 4 * 60 * 60).withMarkers(
-                        new TextMarker("[red]Evacuate immediately.", 338 * 8f, 378 * 8f),
-                        new MinimapMarker(338, 378, 50f, 14f, Pal.remove)
+                        new MinimapMarker(338, 377, rad, 14f, Pal.remove),
+                        new ShapeMarker(338 * 8, 377 * 8f){{
+                            radius = rad * 8f;
+                            fill = true;
+                            color = Pal.remove.cpy().mul(0.8f).a(0.3f);
+                            sides = 90;
+                        }},
+                        new ShapeMarker(338 * 8, 377 * 8f){{
+                            radius = rad * 8f;
+                            color = Pal.remove;
+                            sides = 90;
+                        }}
                     ).withFlags("nuke1")
                 );
             };
