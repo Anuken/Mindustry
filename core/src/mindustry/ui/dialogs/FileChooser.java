@@ -218,7 +218,7 @@ public class FileChooser extends BaseDialog{
 
             String filename = file.name();
 
-            TextButton button = new TextButton(filename, Styles.clearTogglet);
+            TextButton button = new TextButton(filename.replace("[", "[["), Styles.clearTogglet);
             button.getLabel().setWrap(false);
             button.getLabel().setEllipsis(true);
             group.add(button);
