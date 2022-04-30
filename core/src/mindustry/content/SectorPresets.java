@@ -230,6 +230,13 @@ public class SectorPresets{
 
         four = new SectorPreset("four", erekir, 29){{
             difficulty = 6;
+
+            rules = r -> {
+                float rad = 52f;
+                r.objectives.addAll(
+
+                );
+            };
         }};
 
         five = new SectorPreset("five", erekir, 12){{
