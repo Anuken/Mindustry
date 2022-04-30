@@ -150,6 +150,9 @@ public class BulletType extends Content implements Cloneable{
     public int fragBullets = 9;
     public float fragVelocityMin = 0.2f, fragVelocityMax = 1f, fragLifeMin = 1f, fragLifeMax = 1f;
     public @Nullable BulletType fragBullet = null;
+    public float bulletInterval = 20f;
+    public int intervalBulletCount = 1;
+    public @Nullable BulletType intervalBullet;
     public Color hitColor = Color.white;
     public Color healColor = Pal.heal;
     public Effect healEffect = Fx.healBlockFull;
@@ -423,6 +426,15 @@ public class BulletType extends Content implements Cloneable{
         updateHoming(b);
         updateWeaving(b);
         updateTrailEffects(b);
+        updateBulletInterval(b);
+    }
+
+    public void updateBulletInterval(Bullet b){
+        if(intervalBullet != null && b.timer.get(2, bulletInterval)){
+            for(int i = 0; i < intervalBulletCount; i++){
+                intervalBullet.create(b, b.x, b.y, Mathf.random(360f));
+            }
+        }
     }
 
     public void updateHoming(Bullet b){

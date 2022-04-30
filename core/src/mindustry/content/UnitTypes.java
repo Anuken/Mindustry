@@ -38,7 +38,7 @@ public class UnitTypes{
 
     //legs
     public static @EntityDef({Unitc.class, Legsc.class}) UnitType corvus, atrax,
-    latum, anthicus,
+    merui, latum, anthicus,
     bulwark, krepost;
 
     //legs, legacy
@@ -46,7 +46,8 @@ public class UnitTypes{
 
     //air
     public static @EntityDef({Unitc.class}) UnitType flare, eclipse, horizon, zenith, antumbra,
-    evoke, avert, obviate;
+    evoke, avert, obviate,
+    osc;
 
     //air, legacy
     public static @EntityDef(value = {Unitc.class}, legacy = true) UnitType mono;
@@ -2829,6 +2830,35 @@ public class UnitTypes{
         //endregion
         //region erekir - mech
 
+        merui = new ErekirUnitType("merui"){{
+            speed = 0.75f;
+            drag = 0.1f;
+            hitSize = 9f;
+            rotateSpeed = 3.5f;
+            health = 700;
+            armor = 5f;
+
+            legCount = 6;
+            legLength = 8f;
+            lockLegBase = true;
+            legContinuousMove = true;
+            legExtension = -2f;
+            legBaseOffset = 3f;
+            maxStretch = 1.1f;
+            maxCompress = 0.2f;
+            legLengthScl = 0.96f;
+            legTrns = 1.1f;
+            legGroupSize = 3;
+            rippleScale = 0.2f;
+
+            legMoveSpace = 1f;
+            hovering = true;
+
+            visualElevation = 0.1f;
+            groundLayer = Layer.legUnit - 1f;
+
+        }};
+
         latum = new ErekirUnitType("latum"){{
             speed = 0.7f;
             drag = 0.1f;
@@ -3299,6 +3329,25 @@ public class UnitTypes{
 
         //endregion
         //region erekir - flying
+
+        osc = new ErekirUnitType("osc"){{
+            //TODO needs hover passability like legs - move into UnitType?
+            hovering = true;
+            visualElevation = 0.1f;
+
+            drag = 0.08f;
+            speed = 2f;
+            rotateSpeed = 6f;
+
+            accel = 0.09f;
+            health = 600f;
+            armor = 3f;
+            hitSize = 7f;
+            engineOffset = 7f;
+            engineSize = 2f;
+            itemCapacity = 0;
+            useEngineElevation = false;
+        }};
 
         avert = new ErekirUnitType("avert"){{
             lowAltitude = false;

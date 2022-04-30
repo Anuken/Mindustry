@@ -139,8 +139,11 @@ public class Blocks{
     repairPoint, repairTurret,
 
     //units - erekir
-    fabricator,
-    tankReconstructor, shipReconstructor, mechReconstructor,
+    tankFabricator, shipFabricator, mechFabricator,
+
+    basicReconstructor,
+    //tankReconstructor, shipReconstructor, mechReconstructor,
+
     tankAssembler, shipAssembler, mechAssembler,
     //TODO maybe making it 5x5 would be more appropriate, seems kinda cheap.
     basicAssemblerModule,
@@ -4141,7 +4144,7 @@ public class Blocks{
         //endregion
         //region units - erekir
 
-        fabricator = new UnitFactory("fabricator"){{
+        tankFabricator = new UnitFactory("tank-fabricator"){{
             requirements(Category.units, with(Items.silicon, 200, Items.beryllium, 150));
             size = 3;
             configurable = false;
@@ -4152,6 +4155,48 @@ public class Blocks{
             consumePower(2f);
         }};
 
+        mechFabricator = new UnitFactory("mech-fabricator"){{
+            requirements(Category.units, with(Items.silicon, 200, Items.beryllium, 150));
+            size = 3;
+            configurable = false;
+            plans.add(new UnitPlan(UnitTypes.merui, 60f * 35f, with(Items.beryllium, 40f, Items.silicon, 50f)));
+            researchCost = with(Items.beryllium, 200, Items.graphite, 80, Items.silicon, 80);
+            regionSuffix = "-dark";
+            fogRadius = 3;
+            consumePower(2f);
+        }};
+
+        shipFabricator = new UnitFactory("ship-fabricator"){{
+            requirements(Category.units, with(Items.silicon, 200, Items.beryllium, 150));
+            size = 3;
+            configurable = false;
+            plans.add(new UnitPlan(UnitTypes.osc, 60f * 35f, with(Items.beryllium, 40f, Items.silicon, 50f)));
+            researchCost = with(Items.beryllium, 200, Items.graphite, 80, Items.silicon, 80);
+            regionSuffix = "-dark";
+            fogRadius = 3;
+            consumePower(2f);
+        }};
+
+        basicReconstructor = new Reconstructor("basic-reconstructor"){{
+            requirements(Category.units, with(Items.beryllium, 250, Items.tungsten, 120, Items.silicon, 150));
+            regionSuffix = "-dark";
+
+            size = 3;
+            consumePower(2f);
+            consumeLiquid(Liquids.hydrogen, 3f / 60f);
+            consumeItems(with(Items.silicon, 50, Items.tungsten, 40));
+
+            constructTime = 60f * 40f;
+            researchCostMultiplier = 0.75f;
+
+            upgrades.addAll(
+            new UnitType[]{UnitTypes.stell, UnitTypes.locus},
+            new UnitType[]{UnitTypes.merui, UnitTypes.latum},
+            new UnitType[]{UnitTypes.osc, UnitTypes.avert}
+            );
+        }};
+
+        /*
         mechReconstructor = new Reconstructor("mech-reconstructor"){{
             requirements(Category.units, with(Items.beryllium, 250, Items.tungsten, 120, Items.silicon, 150));
             regionSuffix = "-dark";
@@ -4199,7 +4244,7 @@ public class Blocks{
             upgrades.addAll(
             new UnitType[]{UnitTypes.stell, UnitTypes.locus}
             );
-        }};
+        }};*/
 
         tankAssembler = new UnitAssembler("tank-assembler"){{
             requirements(Category.units, with(Items.graphite, 600, Items.beryllium, 600, Items.oxide, 250, Items.tungsten, 400, Items.silicon, 500));

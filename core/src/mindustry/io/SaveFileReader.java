@@ -62,7 +62,8 @@ public abstract class SaveFileReader{
     "block-loader", "payload-loader",
     "thermal-pump", "impulse-pump",
     "alloy-smelter", "surge-smelter",
-    "steam-vent", "rhyolite-vent"
+    "steam-vent", "rhyolite-vent",
+    "fabricator", "tank-fabricator"
     );
 
     public static final ObjectMap<String, String> modContentNameMap = ObjectMap.of(

@@ -188,7 +188,7 @@ public class ErekirTechTree{
                 node(cliffCrusher, () -> {
                     node(siliconArcFurnace, () -> {
                         node(electrolyzer, Seq.with(new OnSector(three)), () -> {
-                            node(oxidationChamber, Seq.with(new Research(mechReconstructor), new OnSector(four)), () -> {
+                            node(oxidationChamber, Seq.with(new Research(basicReconstructor), new OnSector(four)), () -> {
                                 node(electricHeater, Seq.with(new OnSector(four)), () -> {
                                     node(heatRedirector, () -> {
 
@@ -228,7 +228,7 @@ public class ErekirTechTree{
             });
 
 
-            node(breach, Seq.with(new Research(siliconArcFurnace), new Research(fabricator)), () -> {
+            node(breach, Seq.with(new Research(siliconArcFurnace), new Research(tankFabricator)), () -> {
                 node(berylliumWall, () -> {
                     node(berylliumWallLarge, () -> {
 
@@ -261,7 +261,7 @@ public class ErekirTechTree{
                     });
                 });
 
-                node(radar, Seq.with(new Research(beamNode), new Research(turbineCondenser), new Research(fabricator), new OnSector(SectorPresets.two)), () -> {
+                node(radar, Seq.with(new Research(beamNode), new Research(turbineCondenser), new Research(tankFabricator), new OnSector(SectorPresets.two)), () -> {
 
                 });
             });
@@ -272,44 +272,39 @@ public class ErekirTechTree{
                 });
             });
 
-            node(fabricator, Seq.with(new Research(siliconArcFurnace), new Research(plasmaBore), new Research(turbineCondenser)), () -> {
+            node(tankFabricator, Seq.with(new Research(siliconArcFurnace), new Research(plasmaBore), new Research(turbineCondenser)), () -> {
                 node(UnitTypes.stell, () -> {
 
                 });
 
-                node(mechReconstructor, Seq.with(new OnSector(three)), () -> {
+                node(basicReconstructor, Seq.with(new OnSector(three)), () -> {
                     node(UnitTypes.latum);
+                    node(UnitTypes.avert);
+                    node(UnitTypes.locus);
 
-                    node(shipReconstructor, Seq.with(new OnSector(three)), () -> {
-                        node(UnitTypes.avert);
+                    node(tankAssembler, Seq.with(new OnSector(three), new Research(constructor), new Research(atmosphericConcentrator)), () -> {
+                        node(UnitTypes.vanquish, () -> {
+                            node(UnitTypes.conquer, Seq.with(tmpNever), () -> {
 
-                        node(tankReconstructor, () -> {
-                            node(UnitTypes.locus);
+                            });
+                        });
 
-                            node(tankAssembler, Seq.with(new OnSector(three), new Research(constructor), new Research(atmosphericConcentrator)), () -> {
-                                node(UnitTypes.vanquish, () -> {
-                                    node(UnitTypes.conquer, Seq.with(tmpNever), () -> {
+                        node(shipAssembler, Seq.with(new OnSector(five)), () -> {
+                            node(UnitTypes.quell, () -> {
+                                node(UnitTypes.disrupt, Seq.with(tmpNever), () -> {
 
-                                    });
                                 });
+                            });
 
-                                node(shipAssembler, Seq.with(new OnSector(five)), () -> {
-                                    node(UnitTypes.quell, () -> {
-                                        node(UnitTypes.disrupt, Seq.with(tmpNever), () -> {
+                            node(mechAssembler, Seq.with(tmpNever), () -> {
+                                node(UnitTypes.bulwark, () -> {
+                                    node(UnitTypes.krepost, Seq.with(tmpNever), () -> {
 
-                                        });
-                                    });
-
-                                    node(mechAssembler, Seq.with(tmpNever), () -> {
-                                        node(UnitTypes.bulwark, () -> {
-                                            node(UnitTypes.krepost, Seq.with(tmpNever), () -> {
-
-                                            });
-                                        });
                                     });
                                 });
                             });
                         });
+
                     });
                 });
             });

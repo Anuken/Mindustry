@@ -165,6 +165,7 @@ public class UnitType extends UnlockableContent{
     public boolean canDrown = true, naval = false;
     public float drownTimeMultiplier = 1f;
     public float engineOffset = 5f, engineSize = 2.5f;
+    public boolean useEngineElevation = true;
     public @Nullable Color engineColor = null;
     public @Nullable Color trailColor;
     public Color engineColorInner = Color.white;
@@ -503,6 +504,10 @@ public class UnitType extends UnlockableContent{
         if(mechStepShake < 0){
             mechStepShake = Mathf.round((hitSize - 11f) / 9f);
             mechStepParticles = hitSize > 15f;
+        }
+
+        if(engineSize > 0){
+            engines.add(new UnitEngine(0f, -engineOffset, engineSize, -90f));
         }
 
         if(treadEffect == null){
@@ -871,7 +876,6 @@ public class UnitType extends UnlockableContent{
         if(trailLength > 0 && !naval && unit.isFlying()){
             drawTrail(unit);
         }
-        if(engineSize > 0) drawEngine(unit);
         if(engines.size > 0) drawEngines(unit);
         Draw.z(z);
         if(drawBody) drawBody(unit);
@@ -1010,27 +1014,6 @@ public class UnitType extends UnlockableContent{
         }
     }
 
-    public void drawEngine(Unit unit){
-        if(!unit.isFlying()) return;
-
-        float scale = unit.elevation;
-        float offset = engineOffset/2f + engineOffset/2f*scale;
-
-        Draw.color(engineColor == null ? unit.team.color : engineColor);
-        Fill.circle(
-            unit.x + Angles.trnsx(unit.rotation + 180, offset),
-            unit.y + Angles.trnsy(unit.rotation + 180, offset),
-            (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f)) * scale
-        );
-        Draw.color(engineColorInner);
-        Fill.circle(
-            unit.x + Angles.trnsx(unit.rotation + 180, offset - 1f),
-            unit.y + Angles.trnsy(unit.rotation + 180, offset - 1f),
-            (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f)) / 2f  * scale
-        );
-        Draw.color();
-    }
-
     public void drawTrail(Unit unit){
         if(unit.trail == null){
             unit.trail = new Trail(trailLength);
@@ -1040,16 +1023,18 @@ public class UnitType extends UnlockableContent{
     }
 
     public void drawEngines(Unit unit){
-        if(!unit.isFlying()) return;
+        float scale = useEngineElevation ? unit.elevation : 1f;
 
-        float scale = unit.elevation;
+        if(scale <= 0.0001f) return;
+
         float rot = unit.rotation - 90;
+        Color color = engineColor == null ? unit.team.color : engineColor;
 
         for(var engine : engines){
             Tmp.v1.set(engine.x, engine.y).rotate(rot);
             float ex = Tmp.v1.x, ey = Tmp.v1.y;
 
-            Draw.color(unit.team.color);
+            Draw.color(color);
             Fill.circle(
                 unit.x + ex,
                 unit.y + ey,

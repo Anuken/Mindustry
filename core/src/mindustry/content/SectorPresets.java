@@ -151,7 +151,7 @@ public class SectorPresets{
                         new TextMarker("The arc furnace needs [accent]sand[] and [accent]graphite[] to create [accent]silicon[].\n[accent]Power[] is also required.", 268f * 8f, 101f * 8f),
                         new TextMarker("Use [accent]cliff crushers[] to mine sand.", 262f * 8f, 88f * 8f)
                     ),
-                    new BuildCountObjective(Blocks.fabricator, 1).withMarkers(
+                    new BuildCountObjective(Blocks.tankFabricator, 1).withMarkers(
                         new TextMarker("Use [accent]units[] to explore the map, defend buildings, and go on the offensive.\n Research and place a [accent]fabricator[]", 258f * 8f, 116f * 8f)
                     ),
                     new UnitCountObjective(UnitTypes.stell, 1).withMarkers(
