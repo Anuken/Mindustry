@@ -145,6 +145,9 @@ public class Blocks{
     //TODO maybe making it 5x5 would be more appropriate, seems kinda cheap.
     basicAssemblerModule,
 
+    //TODO
+    unitRepairTower,
+
     //TODO remove
     droneCenter,
 
@@ -4258,6 +4261,14 @@ public class Blocks{
             droneType = UnitTypes.effectDrone;
         }};
 
+        unitRepairTower = new RepairTower("unit-repair-tower"){{
+            requirements(Category.units, with(Items.graphite, 90, Items.silicon, 90, Items.tungsten, 80));
+
+            size = 2;
+
+            consumePower(1f);
+            consumeLiquid(Liquids.hydrogen, 3f / 60f);
+        }};
 
         //endregion
         //region payloads

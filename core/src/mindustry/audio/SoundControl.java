@@ -65,7 +65,7 @@ public class SoundControl{
     protected void reload(){
         current = null;
         fade = 0f;
-        ambientMusic = Seq.with(Musics.game1, Musics.game3, Musics.game6, Musics.game8, Musics.game9);
+        ambientMusic = Seq.with(Musics.game1, Musics.game3, Musics.game6, Musics.game8, Musics.game9, Musics.fine);
         darkMusic = Seq.with(Musics.game2, Musics.game5, Musics.game7, Musics.game4);
         bossMusic = Seq.with(Musics.boss1, Musics.boss2, Musics.game2, Musics.game5);
 
