@@ -4265,6 +4265,7 @@ public class Blocks{
             requirements(Category.units, with(Items.graphite, 90, Items.silicon, 90, Items.tungsten, 80));
 
             size = 2;
+            range = 100f;
 
             consumePower(1f);
             consumeLiquid(Liquids.hydrogen, 3f / 60f);

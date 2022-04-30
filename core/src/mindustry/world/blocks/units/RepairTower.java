@@ -18,7 +18,7 @@ public class RepairTower extends Block{
 
     public float range = 80f;
     public Color circleColor = Pal.heal;
-    public float circleSpeed = 40f, circleStroke = 3f;
+    public float circleSpeed = 120f, circleStroke = 3f;
     public float healAmount = 1f;
 
     public RepairTower(String name){
@@ -46,7 +46,11 @@ public class RepairTower extends Block{
             if(potentialEfficiency > 0 && (refresh += Time.delta) >= refreshInterval){
                 targets.clear();
                 refresh = 0f;
-                Units.nearby(team, x, y, range, targets::add);
+                Units.nearby(team, x, y, range, u -> {
+                    if(u.damaged()){
+                        targets.add(u);
+                    }
+                });
             }
 
             boolean any = false;
@@ -59,7 +63,7 @@ public class RepairTower extends Block{
                 }
             }
 
-            warmup = Mathf.lerpDelta(warmup, any ? 1f : 0f, 0.1f);
+            warmup = Mathf.lerpDelta(warmup, any ? efficiency : 0f, 0.1f);
             totalProgress += Time.delta / circleSpeed;
         }
 
