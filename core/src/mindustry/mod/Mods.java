@@ -353,23 +353,13 @@ public class Mods implements Loadable{
         Log.debug("Total time to generate & flush textures synchronously: @", Time.elapsed());
     }
 
-    private PageType getPage(AtlasRegion region){
-        return
-            region.texture == Core.atlas.find("white").texture ? PageType.main :
-            region.texture == Core.atlas.find("stone1").texture ? PageType.environment :
-            region.texture == Core.atlas.find("clear-editor").texture ? PageType.editor :
-            region.texture == Core.atlas.find("whiteui").texture ? PageType.ui :
-            region.texture == Core.atlas.find("rubble-1-0").texture ? PageType.rubble :
-            PageType.main;
-    }
-
     private PageType getPage(Fi file){
         String path = file.path();
         return
-            path.contains("sprites/blocks/environment") ? PageType.environment :
-            path.contains("sprites/editor") ? PageType.editor :
-            path.contains("sprites/rubble") ? PageType.editor :
-            path.contains("sprites/ui") ? PageType.ui :
+            path.contains("sprites/blocks/environment") || path.contains("sprites-override/blocks/environment") ? PageType.environment :
+            path.contains("sprites/editor") || path.contains("sprites-override/editor") ? PageType.editor :
+            path.contains("sprites/rubble") || path.contains("sprites-override/rubble") ? PageType.rubble :
+            path.contains("sprites/ui") || path.contains("sprites-override/ui") ? PageType.ui :
             PageType.main;
     }
 

@@ -10,7 +10,7 @@ public class ShootHelix extends ShootPattern{
         for(int i = 0; i < shots; i++){
             for(int sign : Mathf.signs){
                 handler.shoot(0, 0, 0, firstShotDelay + shotDelay * i,
-                    b -> b.moveRelative(0f, Mathf.sin(b.time + offset, 2f, mag * sign)));
+                    b -> b.moveRelative(0f, Mathf.sin(b.time + offset, scl, mag * sign)));
             }
         }
     }

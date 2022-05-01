@@ -41,6 +41,8 @@ public class Weapon implements Cloneable{
     public boolean alternate = true;
     /** whether to rotate toward the target independently of unit */
     public boolean rotate = false;
+    /** rotation at which this weapon is locked to if rotate = false. TODO buggy!*/
+    public float baseRotation = 0f;
     /** whether to draw the outline on top. */
     public boolean top = true;
     /** whether to hold the bullet in place while firing */
@@ -180,7 +182,7 @@ public class Weapon implements Cloneable{
 
         float
         rotation = unit.rotation - 90,
-        weaponRotation  = rotation + (rotate ? mount.rotation : 0),
+        weaponRotation  = rotation + (rotate ? mount.rotation : baseRotation),
         wx = unit.x + Angles.trnsx(rotation, x, y) + Angles.trnsx(weaponRotation, 0, -mount.recoil),
         wy = unit.y + Angles.trnsy(rotation, x, y) + Angles.trnsy(weaponRotation, 0, -mount.recoil);
 
@@ -263,12 +265,12 @@ public class Weapon implements Cloneable{
                 }
             }
         }else if(!rotate){
-            mount.rotation = 0;
+            mount.rotation = baseRotation;
             mount.targetRotation = unit.angleTo(mount.aimX, mount.aimY);
         }
 
         float
-        weaponRotation = unit.rotation - 90 + (rotate ? mount.rotation : 0),
+        weaponRotation = unit.rotation - 90 + (rotate ? mount.rotation : baseRotation),
         mountX = unit.x + Angles.trnsx(unit.rotation - 90, x, y),
         mountY = unit.y + Angles.trnsy(unit.rotation - 90, x, y),
         bulletX = mountX + Angles.trnsx(weaponRotation, this.shootX, this.shootY),
@@ -346,7 +348,7 @@ public class Weapon implements Cloneable{
         mount.warmup >= minWarmup && //must be warmed up
         unit.vel.len() >= minShootVelocity && //check velocity requirements
         mount.reload <= 0.0001f && //reload has to be 0
-        Angles.within(rotate ? mount.rotation : unit.rotation, mount.targetRotation, shootCone) //has to be within the cone
+        Angles.within(rotate ? mount.rotation : unit.rotation + baseRotation, mount.targetRotation, shootCone) //has to be within the cone
         ){
             shoot(unit, mount, bulletX, bulletY, shootAngle);
 
@@ -368,7 +370,7 @@ public class Weapon implements Cloneable{
     }
 
     protected float bulletRotation(Unit unit, WeaponMount mount, float bulletX, float bulletY){
-        return rotate ? unit.rotation + mount.rotation : Angles.angle(bulletX, bulletY, mount.aimX, mount.aimY) + (unit.rotation - unit.angleTo(mount.aimX, mount.aimY));
+        return rotate ? unit.rotation + mount.rotation : Angles.angle(bulletX, bulletY, mount.aimX, mount.aimY) + (unit.rotation - unit.angleTo(mount.aimX, mount.aimY)) + baseRotation;
     }
 
     protected void shoot(Unit unit, WeaponMount mount, float shootX, float shootY, float rotation){
@@ -393,7 +395,7 @@ public class Weapon implements Cloneable{
         if(!unit.isAdded()) return;
 
         float
-        weaponRotation = unit.rotation - 90 + (rotate ? mount.rotation : 0),
+        weaponRotation = unit.rotation - 90 + (rotate ? mount.rotation : baseRotation),
         mountX = unit.x + Angles.trnsx(unit.rotation - 90, x, y),
         mountY = unit.y + Angles.trnsy(unit.rotation - 90, x, y),
         bulletX = mountX + Angles.trnsx(weaponRotation, this.shootX + xOffset, this.shootY + yOffset),
@@ -421,6 +423,7 @@ public class Weapon implements Cloneable{
     public void flip(){
         x *= -1;
         shootX *= -1;
+        baseRotation *= -1f;
         flipSprite = !flipSprite;
         shoot = shoot.copy();
         shoot.flip();

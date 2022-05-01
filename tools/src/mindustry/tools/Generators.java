@@ -557,7 +557,7 @@ public class Generators{
                 if(sample instanceof Legsc) outliner.get(type.legRegion);
                 if(sample instanceof Tankc) outliner.get(type.treadRegion);
 
-                Pixmap image = type.segments > 0 ? get(type.segmentRegions[0]) : outline.get(get(type.region));
+                Pixmap image = type.segments > 0 ? get(type.segmentRegions[0]) : outline.get(get(type.previewRegion));
 
                 Func<Weapon, Pixmap> weaponRegion = weapon -> Core.atlas.has(weapon.name + "-preview") ? get(weapon.name + "-preview") : get(weapon.region);
                 Cons2<Weapon, Pixmap> drawWeapon = (weapon, pixmap) ->
@@ -585,7 +585,7 @@ public class Generators{
                 if(type.needsBodyOutline()){
                     save(image, type.name + "-outline");
                 }else{
-                    replace(type.name, image);
+                    replace(type.name, type.segments > 0 ? get(type.segmentRegions[0]) : outline.get(get(type.region)));
                 }
 
                 //draw weapons that are under the base
@@ -596,13 +596,13 @@ public class Generators{
 
                 //draw over the weapons under the image
                 if(anyUnder){
-                    image.draw(outline.get(get(type.region)), true);
+                    image.draw(outline.get(get(type.previewRegion)), true);
                 }
 
                 //draw treads
                 if(sample instanceof Tankc){
                     image.draw(outline.get(get(type.treadRegion)), true);
-                    image.draw(get(type.region), true);
+                    image.draw(get(type.previewRegion), true);
                 }
 
                 //draw mech parts
@@ -610,7 +610,7 @@ public class Generators{
                     drawCenter(image, get(type.baseRegion));
                     drawCenter(image, get(type.legRegion));
                     drawCenter(image, get(type.legRegion).flipX());
-                    image.draw(get(type.region), true);
+                    image.draw(get(type.previewRegion), true);
                 }
 
                 //draw weapon outlines on base
@@ -622,7 +622,7 @@ public class Generators{
                 }
 
                 //draw base region on top to mask weapons
-                if(type.drawCell) image.draw(get(type.region), true);
+                if(type.drawCell) image.draw(get(type.previewRegion), true);
 
                 if(type.drawCell){
                     Pixmap baseCell = get(type.cellRegion);

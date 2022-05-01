@@ -3399,6 +3399,10 @@ public class UnitTypes{
             itemCapacity = 0;
             useEngineElevation = false;
 
+            engineColor = Pal.sapBullet;
+
+            abilities.add(new MoveEffectAbility(0f, -7f, Pal.sapBulletBack, Fx.missileTrailShort, 4f));
+
             for(float f : new float[]{-3f, 3f}){
                 parts.add(new HoverPart(){{
                     x = 3.9f;
@@ -3413,18 +3417,25 @@ public class UnitTypes{
             }
 
             weapons.add(new Weapon("osc-weapon"){{
-                y = 3f;
-                x = 3f;
+                y = -2f;
+                x = 4f;
+                top = true;
                 mirror = true;
-                layerOffset = -0.0001f;
                 reload = 40f;
+                baseRotation = -35f;
+                shootCone = 360f;
+
+                shoot = new ShootSpread(){{
+                    shots = 2;
+                    spread = 11f;
+                }};
 
                 bullet = new BasicBulletType(5f, 20){{
-                    pierceCap = 2;
-                    pierceBuilding = false;
+                    homingPower = 0.2f;
+                    homingDelay = 4f;
                     width = 7f;
                     height = 12f;
-                    lifetime = 25f;
+                    lifetime = 50f;
                     shootEffect = Fx.sparkShoot;
                     smokeEffect = Fx.shootBigSmoke;
                     hitColor = backColor = trailColor = Pal.suppress;
@@ -3486,8 +3497,8 @@ public class UnitTypes{
         obviate = new ErekirUnitType("obviate"){{
             flying = true;
             drag = 0.08f;
-            speed = 1.9f;
-            rotateSpeed = 4f;
+            speed = 1.8f;
+            rotateSpeed = 2.5f;
             accel = 0.09f;
             health = 2300f;
             armor = 3f;
@@ -3499,46 +3510,106 @@ public class UnitTypes{
             lowAltitude = true;
 
             setEnginesMirror(
-            new UnitEngine(59 / 4f, -25 / 4f, 3.1f, 315f)
+            new UnitEngine(38 / 4f, -46 / 4f, 3.1f, 315f)
             );
 
-            parts.add(new RegionPart("-heat"){{
-                blending = Blending.additive;
-                progress = PartProgress.heat;
-                outline = false;
-                colorTo = new Color(1f, 0.5f, 0.5f, 0.7f);
-                color = colorTo.cpy().a(0f);
-                layerOffset = 0.01f;
+            parts.add(
+            new RegionPart("-blade"){{
+                moveRot = -10f;
+                moveX = -1f;
+                moves.add(new PartMove(PartProgress.reload, 2f, 1f, -5f));
+                progress = PartProgress.warmup;
+                mirror = true;
+
+                children.add(new RegionPart("-side"){{
+                    moveX = 2f;
+                    moveY = -2f;
+                    progress = PartProgress.warmup;
+                    under = true;
+                    mirror = true;
+                    moves.add(new PartMove(PartProgress.reload, -2f, 2f, 0f));
+                }});
             }});
 
-            //TODO this is really dumb.
             weapons.add(new Weapon(){{
-                y = 2f;
-                shootY = 0f;
                 x = 0f;
+                y = -2f;
+                shootY = 0f;
                 reload = 140f;
                 mirror = false;
-                continuous = true;
-               // minWarmup = 0.5f;
+                minWarmup = 0.95f;
+                shake = 3f;
+                cooldownTime = reload - 10f;
 
-                bullet = new ContinuousLaserBulletType(140){{
-                    shake = 0f;
-                    lifetime = 120f;
-                    colors = new Color[]{Color.valueOf("bf92f9").a(0.4f), Color.valueOf("bf92f9"), Color.white};
-                    //TODO merge
-                    chargeEffect = new MultiEffect(Fx.lancerLaserCharge, Fx.lancerLaserChargeBegin);
-                    width = 4f;
-                    largeHit = false;
+                bullet = new BasicBulletType(){{
+                    shoot = new ShootHelix(){{
+                        mag = 1f;
+                        scl = 5f;
+                    }};
 
-                    buildingDamageMultiplier = 0.25f;
-                    hitEffect = Fx.hitLancer;
-                    hitSize = 4;
-                    drawSize = 400f;
-                    length = 173f;
-                    ammoMultiplier = 1f;
-                    pierceCap = 4;
-                    hitColor = colors[1];
+                    shootEffect = new MultiEffect(Fx.shootTitan, new WaveEffect(){{
+                        colorTo = Pal.sapBulletBack;
+                        sizeTo = 26f;
+                        lifetime = 14f;
+                        strokeFrom = 4f;
+                    }});
+                    smokeEffect = Fx.shootSmokeTitan;
+                    hitColor = Pal.sapBullet;
+
+                    sprite = "large-orb";
+                    trailEffect = Fx.missileTrail;
+                    trailInterval = 3f;
+                    trailParam = 4f;
+                    speed = 3f;
+                    damage = 80f;
+                    lifetime = 70f;
+                    width = height = 15f;
+                    backColor = Pal.sapBulletBack;
+                    frontColor = Pal.sapBullet;
+                    shrinkX = shrinkY = 0f;
+                    trailColor = Pal.sapBulletBack;
+                    trailLength = 12;
+                    trailWidth = 2.2f;
+                    despawnEffect = hitEffect = new ExplosionEffect(){{
+                        waveColor = Pal.sapBullet;
+                        smokeColor = Color.gray;
+                        sparkColor = Pal.sap;
+                        waveStroke = 4f;
+                        waveRad = 20f;
+                    }};
+
+                    intervalBullet = new LightningBulletType(){{
+                        damage = 15;
+                        collidesAir = false;
+                        ammoMultiplier = 1f;
+                        lightningColor = Pal.sapBullet;
+                        lightningLength = 2;
+                        lightningLengthRand = 6;
+
+                        //for visual stats only.
+                        buildingDamageMultiplier = 0.25f;
+
+                        lightningType = new BulletType(0.0001f, 0f){{
+                            lifetime = Fx.lightning.lifetime;
+                            hitEffect = Fx.hitLancer;
+                            despawnEffect = Fx.none;
+                            status = StatusEffects.shocked;
+                            statusDuration = 10f;
+                            hittable = false;
+                            lightColor = Color.white;
+                            buildingDamageMultiplier = 0.25f;
+                        }};
+                    }};
+
+                    bulletInterval = 4f;
+
+                    lightningColor = Pal.sapBullet;
+                    lightningDamage = 19;
+                    lightning = 8;
+                    lightningLength = 2;
+                    lightningLengthRand = 8;
                 }};
+
             }});
         }};
 

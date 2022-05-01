@@ -212,7 +212,7 @@ public class UnitType extends UnlockableContent{
     public Sound deathSound = Sounds.bang;
 
     public Seq<Weapon> weapons = new Seq<>();
-    public TextureRegion baseRegion, legRegion, region, shadowRegion, cellRegion,
+    public TextureRegion baseRegion, legRegion, region, previewRegion, shadowRegion, cellRegion,
         softShadowRegion, jointRegion, footRegion, legBaseRegion, baseJointRegion, outlineRegion, treadRegion;
     public TextureRegion[] wreckRegions, segmentRegions, segmentOutlineRegions;
     public TextureRegion[][] treadRegions;
@@ -590,6 +590,7 @@ public class UnitType extends UnlockableContent{
         }
         weapons.each(Weapon::load);
         region = Core.atlas.find(name);
+        previewRegion = Core.atlas.find(name + "-preview", name);
         legRegion = Core.atlas.find(name + "-leg");
         jointRegion = Core.atlas.find(name + "-joint");
         baseJointRegion = Core.atlas.find(name + "-joint-base");
