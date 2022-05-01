@@ -103,9 +103,14 @@ public class Team implements Comparable<Team>{
         return state.teams.isActive(this);
     }
 
-    /** @return whether this team is solely comprised of AI, with no players. */
+    /** @return whether this team is supposed to be AI-controlled. */
     public boolean isAI(){
         return (state.rules.waves || state.rules.attackMode) && this == state.rules.waveTeam;
+    }
+
+    /** @return whether this team is solely comprised of AI (with no players possible). */
+    public boolean isOnlyAI(){
+        return isAI() && data().players.size == 0;
     }
 
     /** @return whether this team needs a flow field for "dumb" wave pathfinding. */

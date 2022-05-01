@@ -61,7 +61,7 @@ public final class FogControl implements CustomChunk{
         });
 
         Events.on(TileChangeEvent.class, event -> {
-            if(state.rules.fog && event.tile.build != null && event.tile.isCenter() && !event.tile.build.team.isAI() && event.tile.block().flags.contains(BlockFlag.hasFogRadius)){
+            if(state.rules.fog && event.tile.build != null && event.tile.isCenter() && !event.tile.build.team.isOnlyAI() && event.tile.block().flags.contains(BlockFlag.hasFogRadius)){
                 var data = data(event.tile.team());
                 if(data != null){
                     data.dynamicUpdated = true;
@@ -78,7 +78,7 @@ public final class FogControl implements CustomChunk{
 
         //on tile removed, dynamic fog goes away
         Events.on(TilePreChangeEvent.class, e -> {
-            if(state.rules.fog && e.tile.build != null && !e.tile.build.team.isAI() && e.tile.block().flags.contains(BlockFlag.hasFogRadius)){
+            if(state.rules.fog && e.tile.build != null && !e.tile.build.team.isOnlyAI() && e.tile.block().flags.contains(BlockFlag.hasFogRadius)){
                 var data = data(e.tile.team());
                 if(data != null){
                     data.dynamicUpdated = true;
@@ -210,7 +210,7 @@ public final class FogControl implements CustomChunk{
 
         for(var team : state.teams.present){
             //AI teams do not have fog
-            if(!team.team.isAI()){
+            if(!team.team.isOnlyAI()){
                 //separate for each team
                 unitEventQueue.clear();
 

@@ -589,6 +589,24 @@ public class Fx{
         Drawf.light(e.x, e.y, 20f, e.color, 0.6f * e.fout());
     }),
 
+    hitSquaresColor = new Effect(14, e -> {
+        color(Color.white, e.color, e.fin());
+
+        e.scaled(7f, s -> {
+            stroke(0.5f + s.fout());
+            Lines.circle(e.x, e.y, s.fin() * 5f);
+        });
+
+        stroke(0.5f + e.fout());
+
+        randLenVectors(e.id, 5, e.fin() * 17f, (x, y) -> {
+            float ang = Mathf.angle(x, y);
+            Fill.square(e.x + x, e.y + y, e.fout() * 3.2f, ang);
+        });
+
+        Drawf.light(e.x, e.y, 20f, e.color, 0.6f * e.fout());
+    }),
+
     hitFuse = new Effect(14, e -> {
         color(Color.white, Pal.surge, e.fin());
 
@@ -1407,6 +1425,13 @@ public class Fx{
 
     shootSmall = new Effect(8, e -> {
         color(Pal.lighterOrange, Pal.lightOrange, e.fin());
+        float w = 1f + 5 * e.fout();
+        Drawf.tri(e.x, e.y, w, 15f * e.fout(), e.rotation);
+        Drawf.tri(e.x, e.y, w, 3f * e.fout(), e.rotation + 180f);
+    }),
+
+    shootSmallColor = new Effect(8, e -> {
+        color(e.color, Color.gray, e.fin());
         float w = 1f + 5 * e.fout();
         Drawf.tri(e.x, e.y, w, 15f * e.fout(), e.rotation);
         Drawf.tri(e.x, e.y, w, 3f * e.fout(), e.rotation + 180f);

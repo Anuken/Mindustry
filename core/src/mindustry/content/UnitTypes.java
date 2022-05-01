@@ -2831,12 +2831,13 @@ public class UnitTypes{
         //region erekir - mech
 
         merui = new ErekirUnitType("merui"){{
-            speed = 0.75f;
-            drag = 0.1f;
+            speed = 0.7f;
+            drag = 0.11f;
             hitSize = 9f;
-            rotateSpeed = 3.5f;
-            health = 700;
-            armor = 5f;
+            rotateSpeed = 3f;
+            health = 680;
+            armor = 4f;
+            legStraightness = 0.3f;
 
             legCount = 6;
             legLength = 8f;
@@ -2856,6 +2857,55 @@ public class UnitTypes{
 
             visualElevation = 0.1f;
             groundLayer = Layer.legUnit - 1f;
+            targetAir = false;
+
+            weapons.add(new Weapon("merui-weapon"){{
+                mirror = false;
+                x = 0f;
+                y = 1f;
+                shootY = 4f;
+                reload = 60f;
+                cooldownTime = 42f;
+                heatColor = Pal.turretHeat;
+
+                bullet = new ArtilleryBulletType(3f, 40){{
+                    shootEffect = new MultiEffect(Fx.shootSmallColor, new Effect(9, e -> {
+                        color(Color.white, e.color, e.fin());
+                        stroke(0.7f + e.fout());
+                        Lines.square(e.x, e.y, e.fin() * 5f, e.rotation + 45f);
+
+                        Drawf.light(e.x, e.y, 23f, e.color, e.fout() * 0.7f);
+                    }));
+
+                    collidesTiles = true;
+                    recoil = 0.5f;
+                    backColor = hitColor = Pal.techBlue;
+                    frontColor = Color.white;
+
+                    knockback = 0.8f;
+                    lifetime = 50f;
+                    width = height = 9f;
+                    splashDamageRadius = 19f;
+                    splashDamage = 30f;
+
+                    trailLength = 27;
+                    trailWidth = 2.5f;
+                    trailEffect = Fx.none;
+                    trailColor = backColor;
+
+                    trailInterp = Interp.slope;
+
+                    shrinkX = 0.6f;
+                    shrinkY = 0.2f;
+
+                    hitEffect = despawnEffect = new MultiEffect(Fx.hitSquaresColor, new WaveEffect(){{
+                        colorFrom = colorTo = Pal.techBlue;
+                        sizeTo = splashDamageRadius + 2f;
+                        lifetime = 9f;
+                        strokeFrom = 2f;
+                    }});
+                }};
+            }});
 
         }};
 
