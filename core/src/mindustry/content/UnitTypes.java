@@ -625,9 +625,9 @@ public class UnitTypes{
                     collides = false;
                     hitSound = Sounds.explosion;
 
+                    rangeOverride = 30f;
                     hitEffect = Fx.pulverize;
-                    lifetime = 10f;
-                    speed = 1f;
+                    speed = 0f;
                     splashDamageRadius = 55f;
                     instantDisappear = true;
                     splashDamage = 90f;
@@ -3399,9 +3399,12 @@ public class UnitTypes{
             itemCapacity = 0;
             useEngineElevation = false;
 
-            engineColor = Pal.sapBullet;
+            //does this look better?
+            //engineColor = Pal.sapBullet;
 
-            abilities.add(new MoveEffectAbility(0f, -7f, Pal.sapBulletBack, Fx.missileTrailShort, 4f));
+            abilities.add(new MoveEffectAbility(0f, -7f, Pal.sapBulletBack, Fx.missileTrailShort, 4f){{
+                teamColor = true;
+            }});
 
             for(float f : new float[]{-3f, 3f}){
                 parts.add(new HoverPart(){{
@@ -3430,12 +3433,12 @@ public class UnitTypes{
                     spread = 11f;
                 }};
 
-                bullet = new BasicBulletType(5f, 20){{
-                    homingPower = 0.2f;
+                bullet = new BasicBulletType(5f, 18){{
+                    homingPower = 0.19f;
                     homingDelay = 4f;
                     width = 7f;
                     height = 12f;
-                    lifetime = 50f;
+                    lifetime = 30f;
                     shootEffect = Fx.sparkShoot;
                     smokeEffect = Fx.shootBigSmoke;
                     hitColor = backColor = trailColor = Pal.suppress;
@@ -3501,7 +3504,7 @@ public class UnitTypes{
             rotateSpeed = 2.5f;
             accel = 0.09f;
             health = 2300f;
-            armor = 3f;
+            armor = 6f;
             hitSize = 18f;
             engineSize = 4.3f;
             engineOffset = 54f / 4f;
@@ -3562,7 +3565,7 @@ public class UnitTypes{
                     trailParam = 4f;
                     speed = 3f;
                     damage = 80f;
-                    lifetime = 70f;
+                    lifetime = 75f;
                     width = height = 15f;
                     backColor = Pal.sapBulletBack;
                     frontColor = Pal.sapBullet;
@@ -3575,15 +3578,15 @@ public class UnitTypes{
                         smokeColor = Color.gray;
                         sparkColor = Pal.sap;
                         waveStroke = 4f;
-                        waveRad = 20f;
+                        waveRad = 40f;
                     }};
 
                     intervalBullet = new LightningBulletType(){{
-                        damage = 15;
+                        damage = 18;
                         collidesAir = false;
                         ammoMultiplier = 1f;
                         lightningColor = Pal.sapBullet;
-                        lightningLength = 2;
+                        lightningLength = 3;
                         lightningLengthRand = 6;
 
                         //for visual stats only.
@@ -3604,7 +3607,7 @@ public class UnitTypes{
                     bulletInterval = 4f;
 
                     lightningColor = Pal.sapBullet;
-                    lightningDamage = 19;
+                    lightningDamage = 21;
                     lightning = 8;
                     lightningLength = 2;
                     lightningLengthRand = 8;
