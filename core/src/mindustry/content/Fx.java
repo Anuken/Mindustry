@@ -1004,6 +1004,11 @@ public class Fx{
         Fill.circle(e.x, e.y, e.rotation * e.fout());
     }).layer(Layer.bullet - 0.001f), //below bullets
 
+    missileTrailShort = new Effect(22, e -> {
+        color(e.color);
+        Fill.circle(e.x, e.y, e.rotation * e.fout());
+    }).layer(Layer.bullet - 0.001f),
+
     absorb = new Effect(12, e -> {
         color(Pal.accent);
         stroke(2f * e.fout());

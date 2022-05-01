@@ -11,6 +11,7 @@ public class ShootBarrel extends ShootPattern{
         barrels = barrels.clone();
         for(int i = 0; i < barrels.length; i += 3){
             barrels[i] *= -1;
+            barrels[i + 2] *= -1;
         }
     }
 

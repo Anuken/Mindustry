@@ -151,7 +151,7 @@ public class BulletType extends Content implements Cloneable{
     public float fragVelocityMin = 0.2f, fragVelocityMax = 1f, fragLifeMin = 1f, fragLifeMax = 1f;
     public @Nullable BulletType fragBullet = null;
     public float bulletInterval = 20f;
-    public int intervalBulletCount = 1;
+    public int intervalBullets = 1;
     public @Nullable BulletType intervalBullet;
     public Color hitColor = Color.white;
     public Color healColor = Pal.heal;
@@ -431,7 +431,7 @@ public class BulletType extends Content implements Cloneable{
 
     public void updateBulletInterval(Bullet b){
         if(intervalBullet != null && b.timer.get(2, bulletInterval)){
-            for(int i = 0; i < intervalBulletCount; i++){
+            for(int i = 0; i < intervalBullets; i++){
                 intervalBullet.create(b, b.x, b.y, Mathf.random(360f));
             }
         }
