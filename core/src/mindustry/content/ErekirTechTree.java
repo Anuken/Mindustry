@@ -277,6 +277,10 @@ public class ErekirTechTree{
 
                 });
 
+                node(unitRepairTower, Seq.with(new OnSector(two)), () -> {
+
+                });
+
                 node(basicReconstructor, Seq.with(new OnSector(three)), () -> {
                     node(UnitTypes.latum);
                     node(UnitTypes.avert);

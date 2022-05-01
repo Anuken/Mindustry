@@ -4311,7 +4311,7 @@ public class Blocks{
 
             size = 2;
             range = 100f;
-            healAmount = 2f;
+            healAmount = 1.5f;
 
             consumePower(1f);
             consumeLiquid(Liquids.ozone, 3f / 60f);

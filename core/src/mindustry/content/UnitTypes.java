@@ -3398,8 +3398,6 @@ public class UnitTypes{
             engineSize = 2f;
             itemCapacity = 0;
             useEngineElevation = false;
-            trailLength = 5;
-            trailScl = 1.1f;
 
             for(float f : new float[]{-3f, 3f}){
                 parts.add(new HoverPart(){{
@@ -3413,6 +3411,29 @@ public class UnitTypes{
                     color = Color.valueOf("bf92f9");
                 }});
             }
+
+            weapons.add(new Weapon("osc-weapon"){{
+                y = 3f;
+                x = 3f;
+                mirror = true;
+                layerOffset = -0.0001f;
+                reload = 40f;
+
+                bullet = new BasicBulletType(5f, 20){{
+                    pierceCap = 2;
+                    pierceBuilding = false;
+                    width = 7f;
+                    height = 12f;
+                    lifetime = 25f;
+                    shootEffect = Fx.sparkShoot;
+                    smokeEffect = Fx.shootBigSmoke;
+                    hitColor = backColor = trailColor = Pal.suppress;
+                    frontColor = Color.white;
+                    trailWidth = 1.5f;
+                    trailLength = 5;
+                    hitEffect = despawnEffect = Fx.hitBulletColor;
+                }};
+            }});
         }};
 
         avert = new ErekirUnitType("avert"){{

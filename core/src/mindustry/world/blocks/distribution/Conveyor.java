@@ -25,9 +25,6 @@ public class Conveyor extends Block implements Autotiler{
     private static final float itemSpace = 0.4f;
     private static final int capacity = 3;
 
-    final Vec2 tr1 = new Vec2();
-    final Vec2 tr2 = new Vec2();
-
     public @Load(value = "@-#1-#2", lengths = {7, 4}) TextureRegion[][] regions;
 
     public float speed = 0f;
@@ -162,12 +159,12 @@ public class Conveyor extends Block implements Autotiler{
 
             for(int i = 0; i < len; i++){
                 Item item = ids[i];
-                tr1.trns(rotation * 90, tilesize, 0);
-                tr2.trns(rotation * 90, -tilesize / 2f, xs[i] * tilesize / 2f);
+                Tmp.v1.trns(rotation * 90, tilesize, 0);
+                Tmp.v2.trns(rotation * 90, -tilesize / 2f, xs[i] * tilesize / 2f);
 
                 Draw.rect(item.fullIcon,
-                    (x + tr1.x * ys[i] + tr2.x),
-                    (y + tr1.y * ys[i] + tr2.y),
+                    (x + Tmp.v1.x * ys[i] + Tmp.v2.x),
+                    (y + Tmp.v1.y * ys[i] + Tmp.v2.y),
                     itemSize, itemSize);
             }
         }
