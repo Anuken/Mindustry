@@ -5,6 +5,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -17,9 +18,10 @@ public class RepairTower extends Block{
     static final float refreshInterval = 6f;
 
     public float range = 80f;
-    public Color circleColor = Pal.heal;
-    public float circleSpeed = 120f, circleStroke = 3f;
+    public Color circleColor = Pal.heal, glowColor = Pal.heal.cpy().a(0.5f);
+    public float circleSpeed = 120f, circleStroke = 3f, squareRad = 3f, squareSpinScl = 0.8f, glowMag = 0.5f, glowScl = 8f;
     public float healAmount = 1f;
+    public @Load("@-glow") TextureRegion glow;
 
     public RepairTower(String name){
         super(name);
@@ -63,7 +65,7 @@ public class RepairTower extends Block{
                 }
             }
 
-            warmup = Mathf.lerpDelta(warmup, any ? efficiency : 0f, 0.1f);
+            warmup = Mathf.lerpDelta(warmup, any ? efficiency : 0f, 0.08f);
             totalProgress += Time.delta / circleSpeed;
         }
 
@@ -76,12 +78,18 @@ public class RepairTower extends Block{
         public void draw(){
             super.draw();
 
+            if(warmup <= 0.001f) return;
+
             Draw.z(Layer.effect);
             float mod = totalProgress % 1f;
             Draw.color(circleColor);
-            Lines.stroke(circleStroke * (1f - mod));
+            Lines.stroke(circleStroke * (1f - mod) * warmup);
             Lines.circle(x, y, range * mod);
+            Draw.color(Pal.heal);
+            Fill.square(x, y, squareRad * warmup, Time.time / squareSpinScl);
             Draw.reset();
+
+            Drawf.additive(glow, glowColor, warmup * (1f - glowMag + Mathf.absin(Time.time, glowScl, glowMag)), x, y, 0f, Layer.blockAdditive);
         }
 
         @Override

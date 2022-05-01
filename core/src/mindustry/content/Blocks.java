@@ -4311,9 +4311,10 @@ public class Blocks{
 
             size = 2;
             range = 100f;
+            healAmount = 2f;
 
             consumePower(1f);
-            consumeLiquid(Liquids.hydrogen, 3f / 60f);
+            consumeLiquid(Liquids.ozone, 3f / 60f);
         }};
 
         //endregion
