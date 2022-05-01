@@ -94,5 +94,9 @@
   {
     "name": "[CIG]Potato",
     "address": ["mindustry.vicp.io:6800", "mindustry.vicp.io:7000", "mindustry.vicp.io:6567"]
+  },
+  {
+    "name": "FortressPvP",
+    "address": ["130.61.226.9"]
   }
 ]
