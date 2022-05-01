@@ -234,7 +234,7 @@ public class SectorPresets{
             rules = r -> {
                 float rad = 52f;
                 r.objectives.addAll(
-
+                    //new TimerObjective("@objective.enemiesapproaching", 5 * 60 * 60).withFlags("wave1")
                 );
             };
         }};
