@@ -142,7 +142,7 @@ public class UnitPayload implements Payload{
         if(unit.type == null) return;
 
         //TODO this would be more accurate but has all sorts of associated problems (?)
-        if(true){
+        if(false){
             float e = unit.elevation;
             unit.elevation = 0f;
             //avoids drawing mining or building

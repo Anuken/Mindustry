@@ -444,7 +444,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         if(trail != null){
             trail.length = type.trailLength;
 
-            float scale = elevation;
+            float scale = type.useEngineElevation ? elevation : 1f;
             float offset = type.engineOffset/2f + type.engineOffset/2f*scale;
 
             float cx = x + Angles.trnsx(rotation + 180, offset), cy = y + Angles.trnsy(rotation + 180, offset);

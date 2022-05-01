@@ -44,10 +44,12 @@ public class UnitTypes{
     //legs, legacy
     public static @EntityDef(value = {Unitc.class, Legsc.class}, legacy = true) UnitType spiroct, arkyid, toxopid;
 
+    //hover
+    public static @EntityDef({Unitc.class, ElevationMovec.class}) UnitType osc;
+
     //air
     public static @EntityDef({Unitc.class}) UnitType flare, eclipse, horizon, zenith, antumbra,
-    evoke, avert, obviate,
-    osc;
+    evoke, avert, obviate;
 
     //air, legacy
     public static @EntityDef(value = {Unitc.class}, legacy = true) UnitType mono;
@@ -2831,7 +2833,7 @@ public class UnitTypes{
         //region erekir - mech
 
         merui = new ErekirUnitType("merui"){{
-            speed = 0.7f;
+            speed = 0.72f;
             drag = 0.11f;
             hitSize = 9f;
             rotateSpeed = 3f;
@@ -3381,13 +3383,12 @@ public class UnitTypes{
         //region erekir - flying
 
         osc = new ErekirUnitType("osc"){{
-            //TODO needs hover passability like legs - move into UnitType?
             hovering = true;
             visualElevation = 0.1f;
 
-            drag = 0.08f;
+            drag = 0.07f;
             speed = 2f;
-            rotateSpeed = 6f;
+            rotateSpeed = 5f;
 
             accel = 0.09f;
             health = 600f;
@@ -3397,6 +3398,21 @@ public class UnitTypes{
             engineSize = 2f;
             itemCapacity = 0;
             useEngineElevation = false;
+            trailLength = 5;
+            trailScl = 1.1f;
+
+            for(float f : new float[]{-3f, 3f}){
+                parts.add(new HoverPart(){{
+                    x = 3.9f;
+                    y = f;
+                    mirror = true;
+                    radius = 6f;
+                    phase = 90f;
+                    stroke = 2f;
+                    layerOffset = -0.001f;
+                    color = Color.valueOf("bf92f9");
+                }});
+            }
         }};
 
         avert = new ErekirUnitType("avert"){{

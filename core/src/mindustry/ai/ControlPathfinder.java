@@ -38,6 +38,15 @@ public class ControlPathfinder{
     (PathTile.deep(tile) ? 6000 : 0) +
     (PathTile.damages(tile) ? 50 : 0),
 
+    //same as ground but ignores liquids/deep stuff
+    costHover = (team, tile) ->
+    //impassable same-team or neutral block
+    PathTile.solid(tile) && ((PathTile.team(tile) == team && !PathTile.teamPassable(tile)) || PathTile.team(tile) == 0) ? impassable :
+    //impassable synthetic enemy block
+    ((PathTile.team(tile) != team && PathTile.team(tile) != 0) && PathTile.solid(tile) ? wallImpassableCap : 0) +
+    1 +
+    (PathTile.nearSolid(tile) ? 6 : 0),
+
     costLegs = (team, tile) ->
     PathTile.legSolid(tile) ? impassable : 1 +
     (PathTile.deep(tile) ? 6000 : 0) +

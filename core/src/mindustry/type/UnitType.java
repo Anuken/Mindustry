@@ -446,6 +446,7 @@ public class UnitType extends UnlockableContent{
             pathCost =
                 example instanceof WaterMovec ? ControlPathfinder.costNaval :
                 allowLegStep ? ControlPathfinder.costLegs :
+                hovering ? ControlPathfinder.costHover :
                 ControlPathfinder.costGround;
         }
 
@@ -873,7 +874,7 @@ public class UnitType extends UnlockableContent{
         if(drawBody) drawOutline(unit);
         drawWeaponOutlines(unit);
         if(engineLayer > 0) Draw.z(engineLayer);
-        if(trailLength > 0 && !naval && unit.isFlying()){
+        if(trailLength > 0 && !naval && (unit.isFlying() || !useEngineElevation)){
             drawTrail(unit);
         }
         if(engines.size > 0) drawEngines(unit);
@@ -1019,7 +1020,7 @@ public class UnitType extends UnlockableContent{
             unit.trail = new Trail(trailLength);
         }
         Trail trail = unit.trail;
-        trail.draw(trailColor == null ? unit.team.color : trailColor, (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f) * unit.elevation) * trailScl);
+        trail.draw(trailColor == null ? unit.team.color : trailColor, (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f) * (useEngineElevation ? unit.elevation : 1f)) * trailScl);
     }
 
     public void drawEngines(Unit unit){
@@ -1040,7 +1041,7 @@ public class UnitType extends UnlockableContent{
                 unit.y + ey,
                 (engine.radius + Mathf.absin(Time.time, 2f, engine.radius / 4f)) * scale
             );
-            Draw.color(Color.white);
+            Draw.color(engineColorInner);
             Fill.circle(
                 unit.x + ex - Angles.trnsx(rot + engine.rotation, 1f),
                 unit.y + ey - Angles.trnsy(rot + engine.rotation, 1f),
