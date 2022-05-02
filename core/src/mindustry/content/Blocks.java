@@ -131,7 +131,7 @@ public class Blocks{
     duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, foreshadow, spectre, meltdown, segment, parallax, tsunami,
 
     //turrets - erekir
-    breach, sublimate, titan, disperse, afflict,
+    breach, diffuse, sublimate, titan, disperse, afflict,
 
     //units
     groundFactory, airFactory, navalFactory,
@@ -3751,7 +3751,61 @@ public class Blocks{
             range = 190;
             shootCone = 3f;
             scaledHealth = 180;
-            rotateSpeed = 1.6f;
+            rotateSpeed = 1.5f;
+            researchCostMultiplier = 0.05f;
+
+            coolant = consume(new ConsumeLiquid(Liquids.water, 15f / 60f));
+            limitRange();
+        }};
+
+        diffuse = new ItemTurret("diffuse"){{
+            requirements(Category.turret, with(Items.beryllium, 150, Items.silicon, 150, Items.graphite, 250));
+
+            Effect sfe = new MultiEffect(Fx.shootBigColor, Fx.colorSparkBig);
+
+            ammo(
+            Items.graphite, new BasicBulletType(8f, 30){{
+                knockback = 5f;
+                width = 25f;
+                hitSize = 7f;
+                height = 20f;
+                lifetime = 20f;
+                shootEffect = sfe;
+                smokeEffect = Fx.shootBigSmoke;
+                ammoMultiplier = 1;
+                pierceCap = 2;
+                pierce = true;
+                pierceBuilding = true;
+                hitColor = backColor = trailColor = Pal.berylShot;
+                frontColor = Color.white;
+                trailWidth = 5f;
+                trailLength = 4;
+                hitEffect = despawnEffect = Fx.hitBulletColor;
+                buildingDamageMultiplier = 0.3f;
+            }}
+            );
+
+            shoot = new ShootSpread(){{
+                shots = 14;
+                spread = 3f;
+            }};
+
+            coolantMultiplier = 6f;
+
+            shootShake = 1f;
+            ammoPerShot = 1;
+            drawer = new DrawTurret("reinforced-");
+            shootY = 5f;
+            outlineColor = Pal.darkOutline;
+            size = 3;
+            envEnabled |= Env.space;
+            reload = 30f;
+            recoilAmount = 2f;
+            restitution = 0.03f;
+            range = 190;
+            shootCone = 3f;
+            scaledHealth = 180;
+            rotateSpeed = 2f;
             researchCostMultiplier = 0.05f;
 
             coolant = consume(new ConsumeLiquid(Liquids.water, 15f / 60f));

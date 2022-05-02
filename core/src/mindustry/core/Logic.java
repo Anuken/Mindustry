@@ -46,10 +46,11 @@ public class Logic implements ApplicationListener{
             if(!event.breaking){
                 TeamData data = event.team.data();
                 Iterator<BlockPlan> it = data.blocks.iterator();
+                var bounds = event.tile.block().bounds(event.tile.x, event.tile.y, Tmp.r1);
                 while(it.hasNext()){
                     BlockPlan b = it.next();
                     Block block = content.block(b.block);
-                    if(event.tile.block().bounds(event.tile.x, event.tile.y, Tmp.r1).overlaps(block.bounds(b.x, b.y, Tmp.r2))){
+                    if(bounds.overlaps(block.bounds(b.x, b.y, Tmp.r2))){
                         b.removed = true;
                         it.remove();
                     }

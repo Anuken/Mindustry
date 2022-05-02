@@ -204,28 +204,6 @@ public class SectorPresets{
 
         three = new SectorPreset("three", erekir, 36){{
             difficulty = 5;
-
-            rules = r -> {
-                float rad = 52f;
-                r.objectives.addAll(
-                    new DestroyBlocksObjective(Blocks.coreBastion, Team.malis, Point2.pack(290,501), Point2.pack(158,496))
-                    .withFlags("nukeannounce"),
-                    new TimerObjective("@objective.nuclearlaunch", 8 * 60 * 60).withMarkers(
-                        new MinimapMarker(338, 377, rad, 14f, Pal.remove),
-                        new ShapeMarker(338 * 8, 377 * 8f){{
-                            radius = rad * 8f;
-                            fill = true;
-                            color = Pal.remove.cpy().mul(0.8f).a(0.3f);
-                            sides = 90;
-                        }},
-                        new ShapeMarker(338 * 8, 377 * 8f){{
-                            radius = rad * 8f;
-                            color = Pal.remove;
-                            sides = 90;
-                        }}
-                    ).withFlags("nuke1")
-                );
-            };
         }};
 
         four = new SectorPreset("four", erekir, 29){{
@@ -234,7 +212,22 @@ public class SectorPresets{
             rules = r -> {
                 float rad = 52f;
                 r.objectives.addAll(
-                    //new TimerObjective("@objective.enemiesapproaching", 5 * 60 * 60).withFlags("wave1")
+                new DestroyBlocksObjective(Blocks.coreBastion, Team.malis, Point2.pack(290,501), Point2.pack(158,496))
+                .withFlags("nukeannounce"),
+                new TimerObjective("@objective.nuclearlaunch", 8 * 60 * 60).withMarkers(
+                new MinimapMarker(338, 377, rad, 14f, Pal.remove),
+                new ShapeMarker(338 * 8, 377 * 8f){{
+                    radius = rad * 8f;
+                    fill = true;
+                    color = Pal.remove.cpy().mul(0.8f).a(0.3f);
+                    sides = 90;
+                }},
+                new ShapeMarker(338 * 8, 377 * 8f){{
+                    radius = rad * 8f;
+                    color = Pal.remove;
+                    sides = 90;
+                }}
+                ).withFlags("nuke1")
                 );
             };
         }};
