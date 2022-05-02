@@ -44,7 +44,7 @@ public class Turret extends ReloadTurret{
     public Sound chargeSound = Sounds.none;
     public float soundPitchMin = 0.9f, soundPitchMax = 1.1f;
 
-    //visuals
+    //visuals TODO document
     public float ammoEjectBack = 1f;
     public float shootWarmupSpeed = 0.1f;
     public boolean linearWarmup = false;
@@ -64,7 +64,7 @@ public class Turret extends ReloadTurret{
     /** Bullet angle randomness in degrees. */
     public float inaccuracy = 0f;
     /** Fraction of bullet velocity that is random. */
-    public float velocityInaccuracy = 0f;
+    public float velocityRnd = 0f;
     /** Maximum angle difference in degrees at which turret will still try to shoot. */
     public float shootCone = 8f;
     /** Turret shoot point. */
@@ -204,7 +204,7 @@ public class Turret extends ReloadTurret{
 
         @Override
         public boolean shouldConsume(){
-            return isShooting();
+            return isShooting() || reloadCounter < reload;
         }
 
         @Override
@@ -503,7 +503,7 @@ public class Turret extends ReloadTurret{
             float lifeScl = type.scaleLife ? Mathf.clamp(Mathf.dst(bulletX, bulletY, targetPos.x, targetPos.y) / type.range, minRange / type.range, range() / type.range) : 1f;
 
             //TODO aimX / aimY for multi shot turrets?
-            handleBullet(type.create(this, team, bulletX, bulletY, shootAngle, -1f, 1f + Mathf.range(velocityInaccuracy), lifeScl, null, mover, targetPos.x, targetPos.y), xOffset, yOffset, angleOffset);
+            handleBullet(type.create(this, team, bulletX, bulletY, shootAngle, -1f, (1f - velocityRnd) + Mathf.random(velocityRnd), lifeScl, null, mover, targetPos.x, targetPos.y), xOffset, yOffset, angleOffset);
 
             (shootEffect == Fx.none ? type.shootEffect : shootEffect).at(bulletX, bulletY, rotation + angleOffset, type.hitColor);
             (smokeEffect == Fx.none ? type.smokeEffect : smokeEffect).at(bulletX, bulletY, rotation + angleOffset, type.hitColor);

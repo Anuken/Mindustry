@@ -2922,6 +2922,7 @@ public class UnitTypes{
 
             legMoveSpace = 1f;
             allowLegStep = true;
+            hovering = true;
             legPhysicsLayer = false;
 
             shadowElevation = 0.1f;

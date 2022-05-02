@@ -3316,7 +3316,7 @@ public class Blocks{
             size = 3;
             reload = 3f;
             shoot.shots = 2;
-            velocityInaccuracy = 0.1f;
+            velocityRnd = 0.1f;
             inaccuracy = 4f;
             recoilAmount = 1f;
             restitution = 0.04f;
@@ -3456,7 +3456,7 @@ public class Blocks{
             ammoUseEffect = Fx.casing3Double;
             ammoPerShot = 2;
             cooldown = 0.03f;
-            velocityInaccuracy = 0.2f;
+            velocityRnd = 0.2f;
             restitution = 0.02f;
             recoilAmount = 6f;
             shootShake = 2f;
@@ -3759,22 +3759,22 @@ public class Blocks{
         }};
 
         diffuse = new ItemTurret("diffuse"){{
-            requirements(Category.turret, with(Items.beryllium, 150, Items.silicon, 150, Items.graphite, 250));
+            requirements(Category.turret, with(Items.beryllium, 150, Items.silicon, 200, Items.graphite, 200, Items.tungsten, 50));
 
             ammo(
-            Items.graphite, new BasicBulletType(8f, 30){{
-                knockback = 5f;
+            Items.graphite, new BasicBulletType(8f, 35){{
+                knockback = 6f;
                 width = 25f;
                 hitSize = 7f;
                 height = 20f;
-                shootEffect = Fx.shootTitan;
-                smokeEffect = Fx.shootBigSmoke;
+                shootEffect = Fx.shootBigColor;
+                smokeEffect = Fx.shootSmokeSquareSparse;
                 ammoMultiplier = 4;
                 hitColor = backColor = trailColor = Color.valueOf("ea8878");
-                frontColor = Color.white;
+                frontColor = Color.valueOf("feb380");
                 trailWidth = 6f;
                 trailLength = 3;
-                hitEffect = despawnEffect = Fx.hitBulletColor;
+                hitEffect = despawnEffect = Fx.hitSquaresColor;
                 buildingDamageMultiplier = 0.2f;
             }}
             );
@@ -3786,10 +3786,19 @@ public class Blocks{
 
             coolantMultiplier = 6f;
 
+            velocityRnd = 0.17f;
             shootShake = 1f;
             ammoPerShot = 1;
             maxAmmo = 50;
-            drawer = new DrawTurret("reinforced-");
+            drawer = new DrawTurret("reinforced-"){{
+                parts.add(new RegionPart("-front"){{
+                    progress = PartProgress.warmup;
+                    moveRot = -10f;
+                    mirror = true;
+                    moves.add(new PartMove(PartProgress.reload, 0f, -3f, -5f));
+                    heatColor = Color.red;
+                }});
+            }};
             shootY = 5f;
             outlineColor = Pal.darkOutline;
             size = 3;
@@ -3797,7 +3806,7 @@ public class Blocks{
             reload = 30f;
             recoilAmount = 2f;
             restitution = 0.03f;
-            range = 100;
+            range = 110;
             shootCone = 3f;
             scaledHealth = 180;
             rotateSpeed = 2f;
@@ -3977,7 +3986,7 @@ public class Blocks{
                 shrinkY = 0.3f;
                 backSprite = "large-bomb-back";
                 sprite = "mine-bullet";
-                velocityInaccuracy = 0.11f;
+                velocityRnd = 0.11f;
                 collidesGround = false;
                 collidesTiles = false;
                 shootEffect = Fx.shootBig2;
@@ -3993,7 +4002,6 @@ public class Blocks{
 
                 hitEffect = despawnEffect = Fx.hitBulletColor;
             }});
-
 
             reload = 9f;
             shootY = 15f;
