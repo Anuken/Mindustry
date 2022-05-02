@@ -332,7 +332,7 @@ public class BlockRenderer{
         procLinks.clear();
         procLights.clear();
 
-        var bounds = camera.bounds(Tmp.r3).grow(tilesize);
+        var bounds = camera.bounds(Tmp.r3).grow(tilesize * 2f);
 
         //draw floor lights
         floorTree.intersect(bounds, tile -> lightview.add(tile));

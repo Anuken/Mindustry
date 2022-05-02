@@ -80,7 +80,7 @@ public class UnitTypes{
     public static @EntityDef({Unitc.class, BuildingTetherc.class, Payloadc.class}) UnitType manifold, assemblyDrone, effectDrone;
 
     //tank
-    public static @EntityDef({Unitc.class, Tankc.class}) UnitType stell, locus, vanquish, conquer;
+    public static @EntityDef({Unitc.class, Tankc.class}) UnitType stell, locus, precept, vanquish, conquer;
 
     //endregion
 
@@ -2581,6 +2581,52 @@ public class UnitTypes{
                         color(e.color);
                         Fill.poly(e.x, e.y, 3, 4f * e.fout(), e.rotation);
                     }).layer(Layer.bullet - 0.001f);
+                }};
+            }});
+        }};
+
+        precept = new TankUnitType("precept"){{
+            hitSize = 26f;
+            treadPullOffset = 5;
+            speed = 0.64f;
+            rotateSpeed = 2f;
+            health = 2100;
+            armor = 8f;
+            itemCapacity = 0;
+            treadRects = new Rect[]{new Rect(16, 38, 30, 75), new Rect(44, 7, 17, 60)};
+            researchCostMultiplier = 0f;
+
+            weapons.add(new Weapon("precept-weapon"){{
+                layerOffset = 0.0001f;
+                reload = 30f;
+                shootY = 18f;
+                recoil = 1f;
+                rotate = true;
+                rotateSpeed = 1.3f;
+                mirror = false;
+                shootCone = 2f;
+                x = 0f;
+                y = -1f;
+                heatColor = Color.valueOf("f9350f");
+                cooldownTime = 30f;
+                bullet = new BasicBulletType(8f, 130){{
+                    sprite = "missile-large";
+                    width = 9.5f;
+                    height = 15f;
+                    lifetime = 30f;
+                    hitSize = 6f;
+                    shootEffect = Fx.shootTitan;
+                    smokeEffect = Fx.shootSmokeTitan;
+                    pierceCap = 2;
+                    pierce = true;
+                    pierceBuilding = true;
+                    hitColor = backColor = trailColor = Color.valueOf("feb380");
+                    frontColor = Color.white;
+                    trailWidth = 3.1f;
+                    trailLength = 8;
+                    hitEffect = despawnEffect = Fx.blastExplosion;
+                    splashDamageRadius = 20f;
+                    splashDamage = 50f;
                 }};
             }});
         }};
