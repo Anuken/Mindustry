@@ -25,6 +25,7 @@ import mindustry.world.blocks.defense.Wall.*;
 
 import static mindustry.Vars.*;
 
+//TODO document
 public class BulletType extends Content implements Cloneable{
     /** Lifetime in ticks. */
     public float lifetime = 40f;

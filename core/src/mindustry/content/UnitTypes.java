@@ -2589,18 +2589,18 @@ public class UnitTypes{
             hitSize = 26f;
             treadPullOffset = 5;
             speed = 0.64f;
-            rotateSpeed = 2f;
-            health = 2100;
-            armor = 8f;
+            rotateSpeed = 1.5f;
+            health = 4500;
+            armor = 10f;
             itemCapacity = 0;
             treadRects = new Rect[]{new Rect(16, 38, 30, 75), new Rect(44, 7, 17, 60)};
             researchCostMultiplier = 0f;
 
             weapons.add(new Weapon("precept-weapon"){{
                 layerOffset = 0.0001f;
-                reload = 30f;
-                shootY = 18f;
-                recoil = 1f;
+                reload = 85f;
+                shootY = 16f;
+                recoil = 3f;
                 rotate = true;
                 rotateSpeed = 1.3f;
                 mirror = false;
@@ -2609,24 +2609,44 @@ public class UnitTypes{
                 y = -1f;
                 heatColor = Color.valueOf("f9350f");
                 cooldownTime = 30f;
-                bullet = new BasicBulletType(8f, 130){{
+                bullet = new BasicBulletType(7f, 90){{
                     sprite = "missile-large";
-                    width = 9.5f;
-                    height = 15f;
-                    lifetime = 30f;
+                    width = 7.5f;
+                    height = 13f;
+                    lifetime = 28f;
                     hitSize = 6f;
-                    shootEffect = Fx.shootTitan;
-                    smokeEffect = Fx.shootSmokeTitan;
                     pierceCap = 2;
                     pierce = true;
                     pierceBuilding = true;
                     hitColor = backColor = trailColor = Color.valueOf("feb380");
                     frontColor = Color.white;
-                    trailWidth = 3.1f;
+                    trailWidth = 2.8f;
                     trailLength = 8;
                     hitEffect = despawnEffect = Fx.blastExplosion;
+                    shootEffect = Fx.shootTitan;
+                    smokeEffect = Fx.shootSmokeTitan;
                     splashDamageRadius = 20f;
                     splashDamage = 50f;
+
+                    trailEffect = Fx.hitSquaresColor;
+                    trailRotation = true;
+                    trailInterval = 3f;
+
+                    fragBullets = 4;
+
+                    fragBullet = new BasicBulletType(5f, 25){{
+                        sprite = "missile-large";
+                        width = 5f;
+                        height = 7f;
+                        lifetime = 15f;
+                        hitSize = 4f;
+                        hitColor = backColor = trailColor = Color.valueOf("feb380");
+                        frontColor = Color.white;
+                        trailWidth = 1.7f;
+                        trailLength = 3;
+                        drag = 0.01f;
+                        despawnEffect = hitEffect = Fx.hitBulletColor;
+                    }};
                 }};
             }});
         }};
@@ -2643,7 +2663,7 @@ public class UnitTypes{
 
             weapons.add(new Weapon("vanquish-weapon"){{
                 layerOffset = 0.0001f;
-                reload = 120f;
+                reload = 110f;
                 shootY = 71f / 4f;
                 shake = 5f;
                 recoil = 4f;
@@ -2656,7 +2676,7 @@ public class UnitTypes{
                 heatColor = Color.valueOf("f9350f");
                 cooldownTime = 80f;
 
-                bullet = new BasicBulletType(8f, 130){{
+                bullet = new BasicBulletType(8f, 140){{
                     sprite = "missile-large";
                     width = 9.5f;
                     height = 15f;
@@ -2664,7 +2684,7 @@ public class UnitTypes{
                     hitSize = 6f;
                     shootEffect = Fx.shootTitan;
                     smokeEffect = Fx.shootSmokeTitan;
-                    pierceCap = 2;
+                    pierceCap = 3;
                     pierce = true;
                     pierceBuilding = true;
                     hitColor = backColor = trailColor = Color.valueOf("feb380");

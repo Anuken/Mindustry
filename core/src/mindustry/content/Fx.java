@@ -824,12 +824,6 @@ public class Fx{
         Drawf.light(e.x, e.y, 23f, e.color, e.fout() * 0.7f);
     }),
 
-    hitYellowLaser = new Effect(8, e -> {
-        color(Color.white, Pal.lightTrail, e.fin());
-        stroke(0.5f + e.fout());
-        Lines.circle(e.x, e.y, e.fin() * 5f);
-    }),
-
     despawn = new Effect(12, e -> {
         color(Pal.lighterOrange, Color.gray, e.fin());
         stroke(e.fout());
