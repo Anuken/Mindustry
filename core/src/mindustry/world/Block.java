@@ -55,10 +55,12 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean acceptsItems = false;
     public boolean separateItemCapacity = false;
 
+    /** maximum items this block can carry (usually, this is per-type of item) */
     public int itemCapacity = 10;
+    /** maximum total liquids this block can carry if hasLiquids = true */
     public float liquidCapacity = 10f;
+    /** higher numbers increase liquid output speed; TODO remove and replace with better liquids system */
     public float liquidPressure = 1f;
-
     /** If true, this block outputs to its facing direction, when applicable.
      * Used for blending calculations. */
     public boolean outputFacing = true;

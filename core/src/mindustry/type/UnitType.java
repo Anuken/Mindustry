@@ -362,17 +362,26 @@ public class UnitType extends UnlockableContent{
     /** how much of a top part of a tread sprite is "cut off" relative to the pattern; this is corrected for */
     public int treadPullOffset = 0;
 
-    //SEGMENTED / CRAWL UNITS
+    //SEGMENTED / CRAWL UNITS (this is WIP content!)
 
-    //for crawlers
+    /** number of independent segments */
     public int segments = 0;
-    public float segmentSpacing = 2f, segmentScl = 4f, segmentPhase = 5f, segmentRotSpeed = 1f, segmentMaxRot = 30f;
+    /** magnitude of sine offset between segments */
+    public float segmentMag = 2f,
+    /** scale of sine offset between segments */
+    segmentScl = 4f,
+    /** index multiplier of sine offset between segments */
+    segmentPhase = 5f,
+    /** how fast each segment moves towards the next one */
+    segmentRotSpeed = 1f,
+    /** maximum difference between segment angles */
+    segmentMaxRot = 30f,
     /** speed multiplier this unit will have when crawlSlowdownFrac is met. */
-    public float crawlSlowdown = 0.5f;
+    crawlSlowdown = 0.5f,
     /** damage dealt to blocks under this tank/crawler every frame. */
-    public float crushDamage = 0f;
+    crushDamage = 0f,
     /** the fraction of solids under this block necessary for it to reach crawlSlowdown. */
-    public float crawlSlowdownFrac = 0.55f;
+    crawlSlowdownFrac = 0.55f;
 
     //MISSILE UNITS
 
@@ -1377,6 +1386,7 @@ public class UnitType extends UnlockableContent{
         Draw.reset();
     }
 
+    //TODO
     public void drawCrawl(Crawlc crawl){
         Unit unit = (Unit)crawl;
         applyColor(unit);
@@ -1386,19 +1396,17 @@ public class UnitType extends UnlockableContent{
             TextureRegion[] regions = p == 0 ? segmentOutlineRegions : segmentRegions;
 
             for(int i = 0; i < segments; i++){
-                float trns = Mathf.sin(crawl.crawlTime() + i * segmentPhase, segmentScl, segmentSpacing);
+                float trns = Mathf.sin(crawl.crawlTime() + i * segmentPhase, segmentScl, segmentMag);
 
                 //at segment 0, rotation = segmentRot, but at the last segment it is rotation
                 float rot = Mathf.slerp(crawl.segmentRot(), unit.rotation, i / (float)(segments - 1));
                 float tx = Angles.trnsx(rot, trns), ty = Angles.trnsy(rot, trns);
-
 
                 //shadow
                 Draw.color(0f, 0f, 0f, 0.2f);
                 //Draw.rect(regions[i], unit.x + tx + 2f, unit.y + ty - 2f, rot - 90);
 
                 applyColor(unit);
-
 
                 //TODO merge outlines?
                 Draw.rect(regions[i], unit.x + tx, unit.y + ty, rot - 90);
