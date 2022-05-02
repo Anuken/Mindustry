@@ -2141,7 +2141,7 @@ public class Blocks{
         }};
 
         reinforcedLiquidRouter = new LiquidRouter("reinforced-liquid-router"){{
-            requirements(Category.liquid, with(Items.tungsten, 4, Items.beryllium, 4));
+            requirements(Category.liquid, with(Items.graphite, 8, Items.beryllium, 4));
             liquidCapacity = 30f;
             newDrawing = true;
             liquidPadding = 3f/4f;
