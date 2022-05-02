@@ -9,6 +9,7 @@ import arc.scene.actions.*;
 import arc.scene.event.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
+import arc.scene.ui.ImageButton.*;
 import arc.scene.ui.TextButton.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
@@ -51,6 +52,10 @@ public class MenuFragment{
             }
         });
 
+        parent.fill(c -> c.bottom().right().button(Icon.discord, new ImageButtonStyle(){{
+            up = discordBanner;
+        }}, ui.discord::show).tooltip("@discord").size(84, 45).name("discord"));
+
         //info icon
         if(mobile){
             parent.fill(c -> c.bottom().left().button("", new TextButtonStyle(){{
@@ -59,11 +64,7 @@ public class MenuFragment{
                 up = infoBanner;
             }}, ui.about::show).size(84, 45).name("info"));
 
-            parent.fill(c -> c.bottom().right().button("", new TextButtonStyle(){{
-                font = Fonts.def;
-                fontColor = Color.white;
-                up = discordBanner;
-            }}, ui.discord::show).size(84, 45).name("discord"));
+
         }else if(becontrol.active()){
             parent.fill(c -> c.bottom().right().button("@be.check", Icon.refresh, () -> {
                 ui.loadfrag.show();
