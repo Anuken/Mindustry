@@ -2921,7 +2921,8 @@ public class UnitTypes{
             rippleScale = 0.2f;
 
             legMoveSpace = 1f;
-            hovering = true;
+            allowLegStep = true;
+            legPhysicsLayer = false;
 
             shadowElevation = 0.1f;
             groundLayer = Layer.legUnit - 1f;

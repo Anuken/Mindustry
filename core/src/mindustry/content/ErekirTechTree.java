@@ -281,34 +281,45 @@ public class ErekirTechTree{
 
                 });
 
-                node(basicReconstructor, Seq.with(new OnSector(three)), () -> {
-                    node(UnitTypes.latum);
-                    node(UnitTypes.avert);
-                    node(UnitTypes.locus);
+                node(mechFabricator, Seq.with(new OnSector(two)), () -> {
+                    node(UnitTypes.merui, () -> {
 
-                    node(tankAssembler, Seq.with(new OnSector(three), new Research(constructor), new Research(atmosphericConcentrator)), () -> {
-                        node(UnitTypes.vanquish, () -> {
-                            node(UnitTypes.conquer, Seq.with(tmpNever), () -> {
+                    });
 
-                            });
+                    node(shipFabricator, Seq.with(new OnSector(three)), () -> {
+                        node(UnitTypes.osc, () -> {
+
                         });
 
-                        node(shipAssembler, Seq.with(new OnSector(five)), () -> {
-                            node(UnitTypes.quell, () -> {
-                                node(UnitTypes.disrupt, Seq.with(tmpNever), () -> {
+                        node(basicReconstructor, Seq.with(new OnSector(three)), () -> {
+                            node(UnitTypes.latum);
+                            node(UnitTypes.avert);
+                            node(UnitTypes.locus);
 
+                            node(tankAssembler, Seq.with(new OnSector(three), new Research(constructor), new Research(atmosphericConcentrator)), () -> {
+                                node(UnitTypes.vanquish, () -> {
+                                    node(UnitTypes.conquer, Seq.with(tmpNever), () -> {
+
+                                    });
                                 });
-                            });
 
-                            node(mechAssembler, Seq.with(tmpNever), () -> {
-                                node(UnitTypes.bulwark, () -> {
-                                    node(UnitTypes.krepost, Seq.with(tmpNever), () -> {
+                                node(shipAssembler, Seq.with(new OnSector(five)), () -> {
+                                    node(UnitTypes.quell, () -> {
+                                        node(UnitTypes.disrupt, Seq.with(tmpNever), () -> {
 
+                                        });
+                                    });
+
+                                    node(mechAssembler, Seq.with(tmpNever), () -> {
+                                        node(UnitTypes.bulwark, () -> {
+                                            node(UnitTypes.krepost, Seq.with(tmpNever), () -> {
+
+                                            });
+                                        });
                                     });
                                 });
                             });
                         });
-
                     });
                 });
             });

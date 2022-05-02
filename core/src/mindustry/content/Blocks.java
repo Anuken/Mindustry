@@ -3761,39 +3761,34 @@ public class Blocks{
         diffuse = new ItemTurret("diffuse"){{
             requirements(Category.turret, with(Items.beryllium, 150, Items.silicon, 150, Items.graphite, 250));
 
-            Effect sfe = new MultiEffect(Fx.shootBigColor, Fx.colorSparkBig);
-
             ammo(
             Items.graphite, new BasicBulletType(8f, 30){{
                 knockback = 5f;
                 width = 25f;
                 hitSize = 7f;
                 height = 20f;
-                lifetime = 20f;
-                shootEffect = sfe;
+                shootEffect = Fx.shootTitan;
                 smokeEffect = Fx.shootBigSmoke;
-                ammoMultiplier = 1;
-                pierceCap = 2;
-                pierce = true;
-                pierceBuilding = true;
-                hitColor = backColor = trailColor = Pal.berylShot;
+                ammoMultiplier = 4;
+                hitColor = backColor = trailColor = Color.valueOf("ea8878");
                 frontColor = Color.white;
-                trailWidth = 5f;
-                trailLength = 4;
+                trailWidth = 6f;
+                trailLength = 3;
                 hitEffect = despawnEffect = Fx.hitBulletColor;
-                buildingDamageMultiplier = 0.3f;
+                buildingDamageMultiplier = 0.2f;
             }}
             );
 
             shoot = new ShootSpread(){{
-                shots = 14;
-                spread = 3f;
+                shots = 15;
+                spread = 4f;
             }};
 
             coolantMultiplier = 6f;
 
             shootShake = 1f;
             ammoPerShot = 1;
+            maxAmmo = 50;
             drawer = new DrawTurret("reinforced-");
             shootY = 5f;
             outlineColor = Pal.darkOutline;
@@ -3802,7 +3797,7 @@ public class Blocks{
             reload = 30f;
             recoilAmount = 2f;
             restitution = 0.03f;
-            range = 190;
+            range = 100;
             shootCone = 3f;
             scaledHealth = 180;
             rotateSpeed = 2f;

@@ -178,6 +178,8 @@ public class UnitType extends UnlockableContent{
     rotateToBuilding = true,
     /** if true and this is a legged unit, this unit can walk over blocks. */
     allowLegStep = false,
+    /** for legged units, setting this to false forces it to be on the ground physics layer. */
+    legPhysicsLayer = true,
     /** if true, this unit cannot drown, and will not be affected by the floor under it. */
     hovering = false,
     /** if true, this unit can move in any direction regardless of rotation. if false, this unit can only move in the direction it is facing. */
