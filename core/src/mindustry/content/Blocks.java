@@ -3807,10 +3807,9 @@ public class Blocks{
             recoilAmount = 2f;
             restitution = 0.03f;
             range = 110;
-            shootCone = 3f;
-            scaledHealth = 180;
-            rotateSpeed = 2f;
-            researchCostMultiplier = 0.05f;
+            shootCone = 50f;
+            scaledHealth = 210;
+            rotateSpeed = 3f;
 
             coolant = consume(new ConsumeLiquid(Liquids.water, 15f / 60f));
             limitRange();

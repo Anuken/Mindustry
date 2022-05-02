@@ -249,17 +249,19 @@ public class ErekirTechTree{
                     });
                 });
 
+                node(diffuse, Seq.with(new OnSector(two)), () -> {
+                    node(sublimate, () -> {
+                        //TODO implement
+                        node(titan, Seq.with(new OnSector(five)), () -> {
 
-                node(sublimate, () -> {
-                    //TODO implement
-                    node(titan, Seq.with(new OnSector(five)), () -> {
+                        });
 
-                    });
+                        node(disperse, Seq.with(new OnSector(five)), () -> {
 
-                    node(disperse, Seq.with(new OnSector(five)), () -> {
-
+                        });
                     });
                 });
+
 
                 node(radar, Seq.with(new Research(beamNode), new Research(turbineCondenser), new Research(tankFabricator), new OnSector(SectorPresets.two)), () -> {
 
