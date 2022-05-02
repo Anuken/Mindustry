@@ -886,7 +886,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         float range = unit.hasWeapons() ? unit.range() : 0f;
         float bulletSpeed = unit.hasWeapons() ? type.weapons.first().bullet.speed : 0f;
         float mouseAngle = unit.angleTo(unit.aimX(), unit.aimY());
-        boolean aimCursor = omni && player.shooting && type.hasWeapons() && type.faceTarget && !boosted && type.rotateShooting;
+        boolean aimCursor = omni && player.shooting && type.hasWeapons() && !boosted && type.faceTarget;
 
         if(aimCursor){
             unit.lookAt(mouseAngle);

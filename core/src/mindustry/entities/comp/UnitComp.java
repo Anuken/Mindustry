@@ -178,7 +178,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             return state.rules.infiniteResources ? Float.MAX_VALUE : Math.max(type.clipSize, type.region.width) + type.buildRange + tilesize*4f;
         }
         if(mining()){
-            return type.clipSize + type.miningRange;
+            return type.clipSize + type.mineRange;
         }
         return type.clipSize;
     }
@@ -253,8 +253,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         return !disarmed && !(type.canBoost && isFlying());
     }
 
-    public boolean isCounted(){
-        return type.isCounted;
+    public boolean isEnemy(){
+        return type.isEnemy;
     }
 
     @Override
@@ -396,8 +396,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     @Override
     public void landed(){
-        if(type.landShake > 0f){
-            Effect.shake(type.landShake, type.landShake, this);
+        if(type.mechLandShake > 0f){
+            Effect.shake(type.mechLandShake, type.mechLandShake, this);
         }
 
         type.landed(self());
@@ -478,7 +478,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             if(Mathf.chanceDelta(0.2)){
                 float offset = type.engineOffset/2f + type.engineOffset/2f * elevation;
                 float range = Mathf.range(type.engineSize);
-                type.fallThrusterEffect.at(
+                type.fallEngineEffect.at(
                     x + Angles.trnsx(rotation + 180, offset) + Mathf.range(range),
                     y + Angles.trnsy(rotation + 180, offset) + Mathf.range(range),
                     Mathf.random()

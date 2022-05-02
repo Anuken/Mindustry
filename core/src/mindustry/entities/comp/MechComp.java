@@ -44,8 +44,8 @@ abstract class MechComp implements Posc, Flyingc, Hitboxc, Unitc, Mechc, Elevati
             float cx = x + Angles.trnsx(baseRotation, length, width),
             cy = y + Angles.trnsy(baseRotation, length, width);
 
-            if(type.mechStepShake > 0){
-                Effect.shake(type.mechStepShake, type.mechStepShake, cx, cy);
+            if(type.stepShake > 0){
+                Effect.shake(type.stepShake, type.stepShake, cx, cy);
             }
 
             if(type.mechStepParticles){

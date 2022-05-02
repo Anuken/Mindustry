@@ -29,7 +29,7 @@ public class NeoplasmUnitType extends UnitType{
         }});
 
         //green flashing is unnecessary since they always regen
-        showHeal = false;
+        healFlash = false;
 
         //TODO
         //- liquid regen ability

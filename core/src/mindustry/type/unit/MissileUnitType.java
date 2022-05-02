@@ -16,7 +16,7 @@ public class MissileUnitType extends UnitType{
         createWreck = false;
         createScorch = false;
         logicControllable = false;
-        isCounted = false;
+        isEnemy = false;
         useUnitCap = false;
         allowedInPayloads = false;
         aiController = MissileAI::new;

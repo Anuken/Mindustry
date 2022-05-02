@@ -92,7 +92,7 @@ public class AIController implements UnitController{
     /** For ground units: Looks at the target, or the movement position. Does not apply to non-omni units. */
     public void faceTarget(){
         if(unit.type.omniMovement || unit instanceof Mechc){
-            if(!Units.invalidateTarget(target, unit, unit.range()) && unit.type.rotateShooting && unit.type.hasWeapons()){
+            if(!Units.invalidateTarget(target, unit, unit.range()) && unit.type.faceTarget && unit.type.hasWeapons()){
                 unit.lookAt(Predict.intercept(unit, target, unit.type.weapons.first().bullet.speed));
             }else if(unit.moving()){
                 unit.lookAt(unit.vel().angle());

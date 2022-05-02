@@ -89,6 +89,7 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
         resetLegs(type.legLength);
     }
 
+    //TODO clearly broken for many units
     public void resetLegs(float legLength){
         int count = type.legCount;
 
@@ -130,7 +131,7 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
         //TODO should move legs even when still, based on speed. also, to prevent "slipping", make sure legs move when they are too far from their destination
         totalLength += type.legContinuousMove ? type.speed * speedMultiplier : Mathf.dst(deltaX(), deltaY());
 
-        float trns = moveSpace * 0.85f * type.legTrns;
+        float trns = moveSpace * 0.85f * type.legForwardScl;
 
         //rotation + offset vector
         boolean moving = moving();
@@ -147,8 +148,8 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
             Leg l = legs[i];
 
             //TODO is limiting twice necessary?
-            l.joint.sub(baseOffset).clampLength(type.maxCompress * legLength/2f, type.maxStretch * legLength/2f).add(baseOffset);
-            l.base.sub(baseOffset).clampLength(type.maxCompress * legLength, type.maxStretch * legLength).add(baseOffset);
+            l.joint.sub(baseOffset).clampLength(type.legMinLength * legLength/2f, type.legMaxLength * legLength/2f).add(baseOffset);
+            l.base.sub(baseOffset).clampLength(type.legMinLength * legLength, type.legMaxLength * legLength).add(baseOffset);
 
             float stageF = (totalLength + i*type.legPairOffset) / moveSpace;
             int stage = (int)stageF;
@@ -182,8 +183,8 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
                         }
 
                         //shake when legs contact ground
-                        if(type.landShake > 0){
-                            Effect.shake(type.landShake, type.landShake, l.base);
+                        if(type.stepShake > 0){
+                            Effect.shake(type.stepShake, type.stepShake, l.base);
                         }
                     }
 
@@ -201,8 +202,9 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
             Vec2 jointDest = Tmp.v2;//.trns(rot2, legLength / 2f + type.legBaseOffset).add(moveOffset);
             InverseKinematics.solve(legLength/2f, legLength/2f, Tmp.v6.set(l.base).sub(baseOffset), side, jointDest);
             jointDest.add(baseOffset);
-            //lerp between kinematic and linear
-            jointDest.lerp(Tmp.v6.set(baseOffset).lerp(l.base, 0.5f), 1f - type.kinematicScl);
+            Tmp.v6.set(baseOffset).lerp(l.base, 0.5f);
+            //lerp between kinematic and linear?
+            //jointDest.lerp(Tmp.v6.set(baseOffset).lerp(l.base, 0.5f), 1f - type.kinematicScl);
 
             if(move){
                 float moveFract = stageF % 1f;
@@ -214,8 +216,8 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
             l.joint.lerpDelta(jointDest, moveSpeed / 4f);
 
             //limit again after updating
-            l.joint.sub(baseOffset).clampLength(type.maxCompress * legLength/2f, type.maxStretch * legLength/2f).add(baseOffset);
-            l.base.sub(baseOffset).clampLength(type.maxCompress * legLength, type.maxStretch * legLength).add(baseOffset);
+            l.joint.sub(baseOffset).clampLength(type.legMinLength * legLength/2f, type.legMaxLength * legLength/2f).add(baseOffset);
+            l.base.sub(baseOffset).clampLength(type.legMinLength * legLength, type.legMaxLength * legLength).add(baseOffset);
         }
 
         //when at least 1 leg is touching land, it can't drown

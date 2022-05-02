@@ -192,7 +192,7 @@ public class UnitTypes{
             ammoType = new ItemAmmoType(Items.thorium);
 
             mechStepParticles = true;
-            mechStepShake = 0.15f;
+            stepShake = 0.15f;
             singleTarget = true;
             drownTimeMultiplier = 4f;
 
@@ -257,7 +257,7 @@ public class UnitTypes{
             health = 24000;
             armor = 14f;
             mechStepParticles = true;
-            mechStepShake = 0.75f;
+            stepShake = 0.75f;
             drownTimeMultiplier = 6f;
             mechFrontSway = 1.9f;
             mechSideSway = 0.6f;
@@ -408,7 +408,7 @@ public class UnitTypes{
             buildSpeed = 1.7f;
             canBoost = true;
             armor = 9f;
-            landShake = 2f;
+            mechLandShake = 2f;
             riseSpeed = 0.05f;
 
             mechFrontSway = 0.55f;
@@ -453,7 +453,7 @@ public class UnitTypes{
             buildSpeed = 3f;
 
             mechStepParticles = true;
-            mechStepShake = 0.15f;
+            stepShake = 0.15f;
             ammoType = new PowerAmmoType(2500);
             drownTimeMultiplier = 4f;
 
@@ -467,7 +467,7 @@ public class UnitTypes{
             health = 8200f;
             armor = 9f;
             canBoost = true;
-            landShake = 4f;
+            mechLandShake = 4f;
             immunities = ObjectSet.with(StatusEffects.burning);
 
             singleTarget = true;
@@ -533,7 +533,7 @@ public class UnitTypes{
             hitSize = 29f;
             health = 18000f;
             armor = 9f;
-            landShake = 1.5f;
+            stepShake = 1.5f;
             rotateSpeed = 1.5f;
             drownTimeMultiplier = 6f;
 
@@ -541,9 +541,9 @@ public class UnitTypes{
             legLength = 14f;
             legBaseOffset = 11f;
             legMoveSpace = 1.5f;
-            legTrns = 0.58f;
+            legForwardScl = 0.58f;
             hovering = true;
-            visualElevation = 0.2f;
+            shadowElevation = 0.2f;
             ammoType = new PowerAmmoType(4000);
             groundLayer = Layer.legUnit;
 
@@ -649,13 +649,13 @@ public class UnitTypes{
 
             legCount = 4;
             legLength = 9f;
-            legTrns = 0.6f;
+            legForwardScl = 0.6f;
             legMoveSpace = 1.4f;
             hovering = true;
             armor = 3f;
             ammoType = new ItemAmmoType(Items.coal);
 
-            visualElevation = 0.2f;
+            shadowElevation = 0.2f;
             groundLayer = Layer.legUnit - 1f;
 
             weapons.add(new Weapon("atrax-weapon"){{
@@ -687,14 +687,14 @@ public class UnitTypes{
             immunities = ObjectSet.with(StatusEffects.burning, StatusEffects.melting);
             legCount = 6;
             legLength = 13f;
-            legTrns = 0.8f;
+            legForwardScl = 0.8f;
             legMoveSpace = 1.4f;
             legBaseOffset = 2f;
             hovering = true;
             armor = 5f;
             ammoType = new PowerAmmoType(1000);
 
-            visualElevation = 0.3f;
+            shadowElevation = 0.3f;
             groundLayer = Layer.legUnit;
 
             weapons.add(new Weapon("spiroct-weapon"){{
@@ -757,7 +757,7 @@ public class UnitTypes{
             legLength = 30f;
             legExtension = -15;
             legBaseOffset = 10f;
-            landShake = 1f;
+            stepShake = 1f;
             legLengthScl = 0.96f;
             rippleScale = 2f;
             legSpeed = 0.2f;
@@ -768,7 +768,7 @@ public class UnitTypes{
             drownTimeMultiplier = 2f;
 
             hovering = true;
-            visualElevation = 0.65f;
+            shadowElevation = 0.65f;
             groundLayer = Layer.legUnit;
 
             BulletType sapper = new SapBulletType(){{
@@ -860,7 +860,7 @@ public class UnitTypes{
             legLength = 75f;
             legExtension = -20;
             legBaseOffset = 8f;
-            landShake = 1f;
+            stepShake = 1f;
             legLengthScl = 0.93f;
             rippleScale = 3f;
             legSpeed = 0.19f;
@@ -870,7 +870,7 @@ public class UnitTypes{
             legSplashRange = 60;
 
             hovering = true;
-            visualElevation = 0.95f;
+            shadowElevation = 0.95f;
             groundLayer = Layer.legUnit;
 
             weapons.add(
@@ -1181,7 +1181,6 @@ public class UnitTypes{
             engineOffset = 38;
             engineSize = 7.3f;
             hitSize = 58f;
-            destructibleWreck = false;
             armor = 13f;
             targetFlags = new BlockFlag[]{BlockFlag.reactor, BlockFlag.battery, BlockFlag.core, null};
             ammoType = new ItemAmmoType(Items.thorium);
@@ -1263,7 +1262,7 @@ public class UnitTypes{
             engineSize = 1.8f;
             engineOffset = 5.7f;
             range = 50f;
-            isCounted = false;
+            isEnemy = false;
 
             ammoType = new PowerAmmoType(500);
 
@@ -1339,12 +1338,12 @@ public class UnitTypes{
             lowAltitude = true;
             flying = true;
             engineOffset = 10.5f;
-            rotateShooting = false;
+            faceTarget = false;
             hitSize = 16.05f;
             engineSize = 3f;
             payloadCapacity = (2 * 2) * tilePayload;
             buildSpeed = 2.6f;
-            isCounted = false;
+            isEnemy = false;
 
             ammoType = new PowerAmmoType(1100);
 
@@ -1391,7 +1390,7 @@ public class UnitTypes{
             circleTarget = true;
             engineOffset = 13f;
             engineSize = 7f;
-            rotateShooting = false;
+            faceTarget = false;
             hitSize = 36f;
             payloadCapacity = (3 * 3) * tilePayload;
             buildSpeed = 2.5f;
@@ -1462,7 +1461,7 @@ public class UnitTypes{
             flying = true;
             engineOffset = 46f;
             engineSize = 7.8f;
-            rotateShooting = false;
+            faceTarget = false;
             hitSize = 66f;
             payloadCapacity = (5.5f * 5.5f) * tilePayload;
             buildSpeed = 4f;
@@ -1484,7 +1483,7 @@ public class UnitTypes{
             health = 280;
             accel = 0.4f;
             rotateSpeed = 3.3f;
-            rotateShooting = false;
+            faceTarget = false;
 
             armor = 2f;
 
@@ -1540,13 +1539,13 @@ public class UnitTypes{
             armor = 4f;
             accel = 0.3f;
             rotateSpeed = 2.6f;
-            rotateShooting = false;
+            faceTarget = false;
             ammoType = new ItemAmmoType(Items.graphite);
 
             trailLength = 20;
-            trailX = 5.5f;
-            trailY = -4f;
-            trailScl = 1.9f;
+            waveTrailX = 5.5f;
+            waveTrailY = -4f;
+            tailScl = 1.9f;
 
             weapons.add(new Weapon("mount-weapon"){{
                 reload = 10f;
@@ -1599,13 +1598,13 @@ public class UnitTypes{
             drag = 0.17f;
             hitSize = 20f;
             armor = 7f;
-            rotateShooting = false;
+            faceTarget = false;
             ammoType = new ItemAmmoType(Items.graphite);
 
             trailLength = 22;
-            trailX = 7f;
-            trailY = -9f;
-            trailScl = 1.5f;
+            waveTrailX = 7f;
+            waveTrailY = -9f;
+            tailScl = 1.5f;
 
             abilities.add(new ShieldRegenFieldAbility(20f, 40f, 60f * 4, 60f));
 
@@ -1696,13 +1695,13 @@ public class UnitTypes{
             hitSize = 39f;
             accel = 0.2f;
             rotateSpeed = 1.3f;
-            rotateShooting = false;
+            faceTarget = false;
             ammoType = new ItemAmmoType(Items.thorium);
 
             trailLength = 50;
-            trailX = 18f;
-            trailY = -21f;
-            trailScl = 3f;
+            waveTrailX = 18f;
+            waveTrailY = -21f;
+            tailScl = 3f;
 
             weapons.add(new Weapon("sei-launcher"){{
 
@@ -1786,7 +1785,7 @@ public class UnitTypes{
             armor = 16f;
             accel = 0.19f;
             rotateSpeed = 0.9f;
-            rotateShooting = false;
+            faceTarget = false;
             ammoType = new PowerAmmoType(4000);
 
             float spawnTime = 60f * 15f;
@@ -1794,9 +1793,9 @@ public class UnitTypes{
             abilities.add(new UnitSpawnAbility(flare, spawnTime, 19.25f, -31.75f), new UnitSpawnAbility(flare, spawnTime, -19.25f, -31.75f));
 
             trailLength = 70;
-            trailX = 23f;
-            trailY = -32f;
-            trailScl = 3.5f;
+            waveTrailX = 23f;
+            waveTrailY = -32f;
+            tailScl = 3.5f;
 
             weapons.add(new Weapon("omura-cannon"){{
                 reload = 110f;
@@ -1839,9 +1838,9 @@ public class UnitTypes{
             accel = 0.4f;
             rotateSpeed = 5f;
             trailLength = 20;
-            trailX = 5f;
-            trailScl = 1.3f;
-            rotateShooting = false;
+            waveTrailX = 5f;
+            tailScl = 1.3f;
+            faceTarget = false;
             range = 100f;
             ammoType = new PowerAmmoType(900);
             armor = 3f;
@@ -1926,12 +1925,12 @@ public class UnitTypes{
             armor = 4f;
             accel = 0.4f;
             rotateSpeed = 4f;
-            rotateShooting = false;
+            faceTarget = false;
 
             trailLength = 22;
-            trailX = 5.5f;
-            trailY = -4f;
-            trailScl = 1.9f;
+            waveTrailX = 5.5f;
+            waveTrailY = -4f;
+            tailScl = 1.9f;
             ammoType = new ItemAmmoType(Items.coal);
 
             abilities.add(new StatusFieldAbility(StatusEffects.overclock, 60f * 6, 60f * 6f, 60f));
@@ -2002,13 +2001,13 @@ public class UnitTypes{
             drag = 0.16f;
             hitSize = 20f;
             armor = 6f;
-            rotateShooting = false;
+            faceTarget = false;
             ammoType = new ItemAmmoType(Items.graphite);
 
             trailLength = 23;
-            trailX = 9f;
-            trailY = -9f;
-            trailScl = 2f;
+            waveTrailX = 9f;
+            waveTrailY = -9f;
+            tailScl = 2f;
 
             buildSpeed = 2f;
 
@@ -2139,7 +2138,7 @@ public class UnitTypes{
             hitSize = 44f;
             accel = 0.2f;
             rotateSpeed = 1.4f;
-            rotateShooting = false;
+            faceTarget = false;
             ammoType = new PowerAmmoType(3500);
             ammoCapacity = 40;
 
@@ -2147,9 +2146,9 @@ public class UnitTypes{
             clipSize = 250f;
 
             trailLength = 50;
-            trailX = 18f;
-            trailY = -17f;
-            trailScl = 3.2f;
+            waveTrailX = 18f;
+            waveTrailY = -17f;
+            tailScl = 3.2f;
 
             buildSpeed = 3f;
 
@@ -2184,13 +2183,13 @@ public class UnitTypes{
             armor = 16f;
             accel = 0.2f;
             rotateSpeed = 1.1f;
-            rotateShooting = false;
+            faceTarget = false;
             ammoType = new PowerAmmoType(4500);
 
             trailLength = 70;
-            trailX = 23f;
-            trailY = -32f;
-            trailScl = 3.5f;
+            waveTrailX = 23f;
+            waveTrailY = -32f;
+            tailScl = 3.5f;
 
             buildSpeed = 3.5f;
 
@@ -2335,7 +2334,7 @@ public class UnitTypes{
 
         alpha = new UnitType("alpha"){{
             aiController = BuilderAI::new;
-            isCounted = false;
+            isEnemy = false;
 
             lowAltitude = true;
             flying = true;
@@ -2372,7 +2371,7 @@ public class UnitTypes{
 
         beta = new UnitType("beta"){{
             aiController = BuilderAI::new;
-            isCounted = false;
+            isEnemy = false;
 
             flying = true;
             mineSpeed = 7f;
@@ -2386,7 +2385,7 @@ public class UnitTypes{
             health = 170f;
             engineOffset = 6f;
             hitSize = 9f;
-            rotateShooting = false;
+            faceTarget = false;
             lowAltitude = true;
 
             weapons.add(new Weapon("small-mount-weapon"){{
@@ -2412,7 +2411,7 @@ public class UnitTypes{
 
         gamma = new UnitType("gamma"){{
             aiController = BuilderAI::new;
-            isCounted = false;
+            isEnemy = false;
 
             lowAltitude = true;
             flying = true;
@@ -2840,6 +2839,7 @@ public class UnitTypes{
             health = 680;
             armor = 4f;
             legStraightness = 0.3f;
+            stepShake = 0f;
 
             legCount = 6;
             legLength = 8f;
@@ -2847,17 +2847,17 @@ public class UnitTypes{
             legContinuousMove = true;
             legExtension = -2f;
             legBaseOffset = 3f;
-            maxStretch = 1.1f;
-            maxCompress = 0.2f;
+            legMaxLength = 1.1f;
+            legMinLength = 0.2f;
             legLengthScl = 0.96f;
-            legTrns = 1.1f;
+            legForwardScl = 1.1f;
             legGroupSize = 3;
             rippleScale = 0.2f;
 
             legMoveSpace = 1f;
             hovering = true;
 
-            visualElevation = 0.1f;
+            shadowElevation = 0.1f;
             groundLayer = Layer.legUnit - 1f;
             targetAir = false;
 
@@ -2918,6 +2918,7 @@ public class UnitTypes{
             rotateSpeed = 3f;
             health = 1100;
             armor = 5f;
+            stepShake = 0f;
 
             legCount = 4;
             legLength = 14f;
@@ -2925,15 +2926,15 @@ public class UnitTypes{
             legContinuousMove = true;
             legExtension = -3f;
             legBaseOffset = 5f;
-            maxStretch = 1.1f;
-            maxCompress = 0.2f;
+            legMaxLength = 1.1f;
+            legMinLength = 0.2f;
             legLengthScl = 0.95f;
-            legTrns = 0.7f;
+            legForwardScl = 0.7f;
 
             legMoveSpace = 1f;
             hovering = true;
 
-            visualElevation = 0.2f;
+            shadowElevation = 0.2f;
             groundLayer = Layer.legUnit - 1f;
 
             for(int i = 0; i < 5; i++){
@@ -3023,6 +3024,7 @@ public class UnitTypes{
             health = 2600;
             armor = 7f;
             fogRadius = 40f;
+            stepShake = 0f;
 
             legCount = 6;
             legLength = 18f;
@@ -3031,15 +3033,15 @@ public class UnitTypes{
             legContinuousMove = true;
             legExtension = -3f;
             legBaseOffset = 7f;
-            maxStretch = 1.1f;
-            maxCompress = 0.2f;
+            legMaxLength = 1.1f;
+            legMinLength = 0.2f;
             legLengthScl = 0.95f;
-            legTrns = 0.9f;
+            legForwardScl = 0.9f;
 
             legMoveSpace = 1f;
             hovering = true;
 
-            visualElevation = 0.2f;
+            shadowElevation = 0.2f;
             groundLayer = Layer.legUnit - 1f;
 
             for(int j = 0; j < 3; j++){
@@ -3176,7 +3178,7 @@ public class UnitTypes{
             legGroupSize = 3;
             legStraightness = 0.4f;
             baseLegStraightness = 0.5f;
-            maxStretch = 1.3f;
+            legMaxLength = 1.3f;
 
             abilities.add(new ShieldArcAbility(){{
                 region = "bulwark-shield";
@@ -3193,10 +3195,10 @@ public class UnitTypes{
 
             legCount = 6;
             legLength = 15f;
-            legTrns = 0.45f;
+            legForwardScl = 0.45f;
             legMoveSpace = 1.4f;
             rippleScale = 2f;
-            landShake = 0.5f;
+            stepShake = 0.5f;
             legExtension = -5f;
             legBaseOffset = 5f;
 
@@ -3207,7 +3209,7 @@ public class UnitTypes{
             drownTimeMultiplier = 2f;
 
             hovering = true;
-            visualElevation = 0.4f;
+            shadowElevation = 0.4f;
             groundLayer = Layer.legUnit;
 
             weapons.add(new Weapon("bulwark-weapon"){{
@@ -3280,15 +3282,15 @@ public class UnitTypes{
 
             legCount = 8;
             legLength = 30f;
-            legTrns = 2.1f;
+            legForwardScl = 2.1f;
             legMoveSpace = 1.05f;
             rippleScale = 1.2f;
-            landShake = 0.5f;
+            stepShake = 0.5f;
             legGroupSize = 2;
             legExtension = -6f;
             legBaseOffset = 19f;
             legStraightLength = 0.9f;
-            maxStretch = 1.2f;
+            legMaxLength = 1.2f;
 
             ammoType = new PowerAmmoType(2000);
 
@@ -3297,7 +3299,7 @@ public class UnitTypes{
             drownTimeMultiplier = 2f;
 
             hovering = true;
-            visualElevation = 0.4f;
+            shadowElevation = 0.4f;
             groundLayer = Layer.legUnit;
 
             weapons.add(new Weapon("krepost-weapon"){{
@@ -3384,7 +3386,7 @@ public class UnitTypes{
 
         osc = new ErekirUnitType("osc"){{
             hovering = true;
-            visualElevation = 0.1f;
+            shadowElevation = 0.1f;
 
             drag = 0.07f;
             speed = 2f;
@@ -3855,7 +3857,7 @@ public class UnitTypes{
         evoke = new ErekirUnitType("evoke"){{
             coreUnitDock = true;
             controller = u -> new BuilderAI(true, coreFleeRange);
-            isCounted = false;
+            isEnemy = false;
             envDisabled = 0;
 
             targetPriority = -2;
@@ -3916,7 +3918,7 @@ public class UnitTypes{
         incite = new ErekirUnitType("incite"){{
             coreUnitDock = true;
             controller = u -> new BuilderAI(true, coreFleeRange);
-            isCounted = false;
+            isEnemy = false;
             envDisabled = 0;
 
             targetPriority = -2;
@@ -3990,7 +3992,7 @@ public class UnitTypes{
         emanate = new ErekirUnitType("emanate"){{
             coreUnitDock = true;
             controller = u -> new BuilderAI(true, coreFleeRange);
-            isCounted = false;
+            isEnemy = false;
             envDisabled = 0;
 
             targetPriority = -2;
@@ -4067,7 +4069,7 @@ public class UnitTypes{
 
         manifold = new ErekirUnitType("manifold"){{
             aiController = CargoAI::new;
-            isCounted = false;
+            isEnemy = false;
             allowedInPayloads = false;
             logicControllable = false;
             playerControllable = false;
@@ -4106,7 +4108,7 @@ public class UnitTypes{
             targetable = false;
 
             outlineColor = Pal.darkOutline;
-            isCounted = false;
+            isEnemy = false;
             hidden = true;
             useUnitCap = false;
             logicControllable = false;
@@ -4122,7 +4124,7 @@ public class UnitTypes{
             drag = 0.08f;
             speed = 3f;
             drawCell = false;
-            logicControllable = playerControllable = allowedInPayloads = isCounted = false;
+            logicControllable = playerControllable = allowedInPayloads = isEnemy = false;
             hidden = true;
 
             engineSize = 0f;

@@ -40,16 +40,9 @@ import mindustry.world.meta.*;
 import static arc.graphics.g2d.Draw.*;
 import static mindustry.Vars.*;
 
-//TODO document
 public class UnitType extends UnlockableContent{
     public static final float shadowTX = -12, shadowTY = -13;
     private static final Vec2 legOffset = new Vec2();
-    private static TextureRegion itemCircleRegion;
-
-    /** If true, the unit is always at elevation 1. */
-    public boolean flying;
-    /** Creates a new instance of this unit class. */
-    public Prov<? extends Unit> constructor;
 
     /** Environmental flags that are *all* required for this unit to function. 0 = any environment */
     public int envRequired = 0;
@@ -58,161 +51,340 @@ public class UnitType extends UnlockableContent{
     /** The environment flags that this unit *cannot* function in. If the env matches any of these, it will explode or be disabled. */
     public int envDisabled = Env.scorching;
 
-    public float speed = 1.1f, boostMultiplier = 1f, rotateSpeed = 5f, baseRotateSpeed = 5f;
-    public float drag = 0.3f, accel = 0.5f, landShake = 0f, rippleScale = 1f, riseSpeed = 0.08f, fallSpeed = 0.018f;
-    public float health = 200f, range = -1, miningRange = 70f, armor = 0f, maxRange = -1f, buildRange = Vars.buildingRange;
-    public float crashDamageMultiplier = 1f;
-    public boolean targetAir = true, targetGround = true;
-    public boolean faceTarget = true, rotateShooting = true, isCounted = true, lowAltitude = false, circleTarget = false;
-    public boolean canBoost = false;
-    public boolean logicControllable = true;
-    public boolean playerControllable = true;
-    public boolean allowedInPayloads = true;
-    /** If false, this unit does not take damage and cannot be kill() / destroy()-ed. */
-    public boolean killable = true;
-    /** If true, this core unit will "dock" to other units, making it re-appear when "undocking". */
-    public boolean coreUnitDock = false;
-    public boolean createWreck = true;
-    public boolean createScorch = true;
-    public boolean useUnitCap = true;
-    public boolean destructibleWreck = true;
-    /** If true, this modded unit always has a -outline region generated for its base. Normally, outlines are ignored if there are no top = false weapons. */
-    public boolean alwaysCreateOutline = false;
-    /** If true, this unit has a square shadow. */
-    public boolean squareShape = false;
-    public float groundLayer = Layer.groundUnit;
-    public float payloadCapacity = 8;
-    public float aimDst = -1f;
-    public float buildBeamOffset = 3.8f;
-    /** WIP: Units of low priority will always be ignored in favor of those with higher priority, regardless of distance. */
-    public float targetPriority = 0f;
-    /** If false, this unit is not targeted by anything. */
-    public boolean targetable = true;
-    /** If true, this unit can be hit with bullets/splash damage.  */
-    public boolean hittable = true;
-    public boolean drawBuildBeam = true;
-    public boolean rotateToBuilding = true;
-    public float commandRadius = 150f;
-    public float visualElevation = -1f;
-    /** If true and this is a legged unit, this unit can walk over blocks. */
-    public boolean allowLegStep = false;
-    /** If true, this unit cannot drown, and will not be affected by the floor under it. */
-    public boolean hovering = false;
-    public boolean omniMovement = true;
-    /** If true, the unit faces its moving direction before actually moving. */
-    public boolean rotateMoveFirst = false;
-    public boolean showHeal = true;
-    public Color healColor = Pal.heal;
-    public Effect fallEffect = Fx.fallSmoke;
-    public Effect fallThrusterEffect = Fx.fallSmoke;
-    public Effect deathExplosionEffect = Fx.dynamicExplosion;
-    public @Nullable Effect treadEffect;
-    /** Extra (usually animated) parts */
-    public Seq<DrawPart> parts = new Seq<>(DrawPart.class);
-    public Seq<Ability> abilities = new Seq<>();
-    /** Flags to target based on priority. Null indicates that the closest target should be found. The closest enemy core is used as a fallback. */
-    public BlockFlag[] targetFlags = {null};
-    /** Target items to mine. Used in MinerAI */
-    public Seq<Item> mineItems = Seq.with(Items.copper, Items.lead, Items.titanium, Items.thorium);
+    /** movement speed (world units/t) */
+    public float speed = 1.1f,
+    /** multiplier for speed when boosting */
+    boostMultiplier = 1f,
+    /** body rotation speed in degrees/t */
+    rotateSpeed = 5f,
+    /** mech base rotation speed in degrees/t*/
+    baseRotateSpeed = 5f,
+    /** movement drag as fraction */
+    drag = 0.3f,
+    /** acceleration as fraction of speed */
+    accel = 0.5f,
+    /** size of one side of the hitbox square */
+    hitSize = 6f,
+    /** shake on each step for leg/mech units */
+    stepShake = -1f,
+    /** ripple / dust size for legged units */
+    rippleScale = 1f,
+    /** boosting rise speed as fraction */
+    riseSpeed = 0.08f,
+    /** how fast this unit falls when not boosting */
+    fallSpeed = 0.018f,
+    /** raw health amount */
+    health = 200f,
+    /** incoming damage is reduced by this amount */
+    armor = 0f,
+    /** minimum range of any weapon; used for approaching targets. can be overridden by setting a value > 0. */
+    range = -1,
+    /** maximum range of any weapon */
+    maxRange = -1f,
+    /** range at which this unit can mine ores */
+    mineRange = 70f,
+    /** range at which this unit can build */
+    buildRange = Vars.buildingRange,
+    /** multiplier for damage this (flying) unit deals when crashing on enemy things */
+    crashDamageMultiplier = 1f,
+    /** a VERY ROUGH estimate of unit DPS; initialized in init() */
+    dpsEstimate = -1,
+    /** graphics clipping size; <0 to calculate automatically */
+    clipSize = -1,
+    /** multiplier for how slowly this unit drowns - higher numbers, slower drowning. */
+    drownTimeMultiplier = 1f,
+    /** fractional movement speed penalty for this unit when it is moving in the opposite direction that it is facing */
+    strafePenalty = 0.5f,
+    /** multiplier for cost of research in tech tree */
+    researchCostMultiplier = 50,
 
-    //TODO different names for these fields.
+    /** for ground units, the layer upon which this unit is drawn */
+    groundLayer = Layer.groundUnit,
+    /** Payload capacity of this unit in blocks^2 */
+    payloadCapacity = 8,
+    /** building speed multiplier; <0 to disable. */
+    buildSpeed = -1f,
+    /** Minimum distance from this unit that weapons can target. Prevents units from firing "inside" the unit. */
+    aimDst = -1f,
+    /** Visual offset of build beam from front. */
+    buildBeamOffset = 3.8f,
+    /** WIP: Units of low priority will always be ignored in favor of those with higher priority, regardless of distance. */
+    targetPriority = 0f,
+    /** Elevation of shadow drawn under this (ground) unit. Visual only. */
+    shadowElevation = -1f,
+    /** backwards engine offset from center of unit */
+    engineOffset = 5f,
+    /** main engine radius */
+    engineSize = 2.5f,
+    /** layer of all engines (<0 for default) */
+    engineLayer = -1f,
+    /** visual backwards offset of items on unit */
+    itemOffsetY = 3f,
+    /** radius of light emitted, <0 for default */
+    lightRadius = -1f,
+    /** light color opacity*/
+    lightOpacity = 0.6f,
+    /** fog view radius in tiles. <0 for automatic radius. */
+    fogRadius = -1f,
+
+    /** horizontal offset of wave trail in naval units */
+    waveTrailX = 4f,
+    /** vertical offset of wave trail in naval units  */
+    waveTrailY = -3f,
+    /** width of all trails (including naval ones) */
+    tailScl = 1f;
+
+    /** if true, this unit counts as an enemy in the wave counter (usually false for support-only units) */
+    public boolean isEnemy = true,
+    /** If true, the unit is always at elevation 1. */
+    flying = false,
+    /** whether this unit tries to attack air units */
+    targetAir = true,
+    /** whether this unit tries to attack ground units */
+    targetGround = true,
+    /** if true, this unit will attempt to face its target when shooting/aiming at it */
+    faceTarget = true,
+    /** AI flag: if true, this flying unit circles around its target like a bomber */
+    circleTarget = false,
+    /** if true, this unit can boost into the air if a player/processors controls it*/
+    canBoost = false,
+    /** if false, logic processors cannot control this unit */
+    logicControllable = true,
+    /** if false, players cannot control this unit */
+    playerControllable = true,
+    /** if false, this unit cannot be moved into payloads */
+    allowedInPayloads = true,
+    /** if false, this unit cannot be hit by bullets or explosions*/
+    hittable = true,
+    /** if false, this unit does not take damage and cannot be kill() / destroy()-ed. */
+    killable = true,
+    /** if false, this unit is not targeted by anything. */
+    targetable = true,
+    /** if false, this unit does not physically collide with others. */
+    physics = true,
+    /** if true, this ground unit will drown in deep liquids. */
+    canDrown = true,
+    /** if false, this unit ignores the unit cap and can be spawned infinitely */
+    useUnitCap = true,
+    /** if true, this core unit will "dock" to other units, making it re-appear when "undocking". */
+    coreUnitDock = false,
+    /** if false, no falling "corpse" is created when this unit dies. */
+    createWreck = true,
+    /** if false, no scorch marks are created when this unit dies */
+    createScorch = true,
+    /** if true, this unit will be drawn under effects/bullets; this is a visual change only. */
+    lowAltitude = false,
+    /** if true, this unit will look at whatever it is building */
+    rotateToBuilding = true,
+    /** if true and this is a legged unit, this unit can walk over blocks. */
+    allowLegStep = false,
+    /** if true, this unit cannot drown, and will not be affected by the floor under it. */
+    hovering = false,
+    /** if true, this unit can move in any direction regardless of rotation. if false, this unit can only move in the direction it is facing. */
+    omniMovement = true,
+    /** if true, the unit faces its moving direction before actually moving. */
+    rotateMoveFirst = false,
+    /** if true, this unit flashes when being healed */
+    healFlash = true,
+
+    /** whether the unit can heal blocks. Initialized in init() */
+    canHeal = false,
+    /** if true, all weapons will attack the same target. */
+    singleTarget = false,
+    /** if true, this unit will be able to have multiple targets, even if it only has one mirrored weapon. */
+    forceMultiTarget = false,
+    /** if false, this unit has no weapons that can attack. */
+    canAttack = true,
+    /** if true, this unit won't show up in the database or various other UIs. */
+    hidden = false,
+    /** if true, this unit is for internal use only and does not have a sprite generated. */
+    internal = false,
+    /** if true, this unit is detected as naval - do NOT assign this manually! Initialized in init() */
+    naval = false,
+
+    /** if true, this modded unit always has a -outline region generated for its base. Normally, outlines are ignored if there are no top = false weapons. */
+    alwaysCreateOutline = false,
+    /** if true, this unit has a square shadow. */
+    squareShape = false,
+    /** if true, this unit will draw its building beam towards blocks. */
+    drawBuildBeam = true,
+    /** if false, the team indicator/cell is not drawn. */
+    drawCell = true,
+    /** if false, carried items are not drawn. */
+    drawItems = true,
+    /** if false, the unit shield (usually seen in waves) is not drawn. */
+    drawShields = true,
+    /** if false, the unit body is not drawn. */
+    drawBody = true;
+
     /** The default AI controller to assign on creation. */
     public Prov<? extends UnitController> aiController = () -> !flying ? new GroundAI() : new FlyingAI();
     /** Function that chooses AI controller based on unit entity. */
     public Func<Unit, ? extends UnitController> controller = u -> !playerControllable || (u.team.isAI() && !u.team.rules().rtsAi) ? aiController.get() : new CommandAI();
+    /** Creates a new instance of this unit class. */
+    public Prov<? extends Unit> constructor;
 
-    public Color outlineColor = Pal.darkerMetal;
-    public int outlineRadius = 3;
-    public boolean outlines = true;
+    /** list of "abilities", which are various behaviors that update each frame */
+    public Seq<Ability> abilities = new Seq<>();
+    /** All weapons that this unit will shoot with. */
+    public Seq<Weapon> weapons = new Seq<>();
+    /** None of the status effects in this set can be applied to this unit. */
+    public ObjectSet<StatusEffect> immunities = new ObjectSet<>();
 
-    public int legCount = 4, legGroupSize = 2;
-    public float legLength = 10f, legSpeed = 0.1f, legTrns = 1f, legBaseOffset = 0f, legMoveSpace = 1f, legExtension = 0, legPairOffset = 0, legLengthScl = 1f, kinematicScl = 1f, maxStretch = 1.75f, maxCompress = 0f;
-    public float legSplashDamage = 0f, legSplashRange = 5;
-    public float legStraightLength = 1f;
-    /** If true, legs are locked to the base of the unit instead of being on an implicit rotating "mount". */
-    public boolean lockLegBase = false, legContinuousMove;
-    public float baseLegStraightness, legStraightness;
-    /** TODO neither of these appear to do much */
-    public boolean flipBackLegs = true, flipLegSide = false;
-
-    public float mechSideSway = 0.54f, mechFrontSway = 0.1f;
-    public float mechStride = -1f;
-    public float mechStepShake = -1f;
-    public boolean mechStepParticles = false;
-    public Color mechLegColor = Pal.darkMetal;
-
-    public Rect[] treadRects = {};
-    public int treadFrames = 18;
-    public int treadPullOffset = 0;
-
-    public int itemCapacity = -1;
-    public int ammoCapacity = -1;
-    public AmmoType ammoType = new ItemAmmoType(Items.copper);
-    public int mineTier = -1;
-    public boolean mineWalls = false, mineFloor = true;
-    public boolean mineHardnessScaling = true;
-    public float buildSpeed = -1f, mineSpeed = 1f;
-    public Sound mineSound = Sounds.minebeam;
-    public float mineSoundVolume = 0.6f;
-
-    //missiles only!
-    public float lifetime = 60f * 5f;
-    public float homingDelay = 10f;
-
-    /** This is a VERY ROUGH estimate of unit DPS. */
-    public float dpsEstimate = -1;
-    public float clipSize = -1;
-    public boolean canDrown = true, naval = false;
-    public float drownTimeMultiplier = 1f;
-    public float engineOffset = 5f, engineSize = 2.5f;
-    public boolean useEngineElevation = true;
-    public @Nullable Color engineColor = null;
-    public @Nullable Color trailColor;
-    public Color engineColorInner = Color.white;
-    public float engineLayer = -1f;
-    public Seq<UnitEngine> engines = new Seq<>();
-    public float strafePenalty = 0.5f;
-    /** If false, this unit does not physically collide with others. */
-    public boolean physics = true;
-    public float hitSize = 6f;
-    public float itemOffsetY = 3f;
-    public float lightRadius = -1f, lightOpacity = 0.6f;
-    /** Fog view radius in tiles. <0 for automatic radius. */
-    public float fogRadius = -1f;
+    /** color that this unit flashes when getting healed (if healFlash is true) */
+    public Color healColor = Pal.heal;
+    /** Color of light that this unit produces when lighting is enabled in the map. */
     public Color lightColor = Pal.powerLight;
-    public boolean drawCell = true, drawItems = true, drawShields = true, drawBody = true;
+    /** sound played when this unit explodes (*not* when it is shot down) */
+    public Sound deathSound = Sounds.bang;
+    /** effect that this unit emits when falling */
+    public Effect fallEffect = Fx.fallSmoke;
+    /** effect created at engine when unit falls. */
+    public Effect fallEngineEffect = Fx.fallSmoke;
+    /** effect created when this unit dies */
+    public Effect deathExplosionEffect = Fx.dynamicExplosion;
+    /** optional effect created when this tank moves */
+    public @Nullable Effect treadEffect;
+    /** extra (usually animated) visual parts */
+    public Seq<DrawPart> parts = new Seq<>(DrawPart.class);
+    /** list of engines, or "thrusters" */
+    public Seq<UnitEngine> engines = new Seq<>();
+    /** if false, the thruster is always displayed at its normal size regardless of elevation */
+    public boolean useEngineElevation = true;
+    /** override for all engine colors */
+    public @Nullable Color engineColor = null;
+    /** color for inner portions of engines */
+    public Color engineColorInner = Color.white;
+    /** length of engine trail (if flying) or wave trail (if naval) */
     public int trailLength = 0;
-    public float researchCostMultiplier = 50;
-    public float trailX = 4f, trailY = -3f, trailScl = 1f;
-    /** Whether the unit can heal blocks. Initialized in init() */
-    public boolean canHeal = false;
-    /** If true, all weapons will attack the same target. */
-    public boolean singleTarget = false;
-    public boolean forceMultiTarget = false;
-    /** If false, this unit has no weapons that can attack. */
-    public boolean canAttack = true;
-    public boolean hidden = false;
-    public boolean internal = false;
+    /** override for engine trail color */
+    public @Nullable Color trailColor;
+
     /** Function used for calculating cost of moving with ControlPathfinder. Does not affect "normal" flow field pathfinding. */
     public @Nullable PathCost pathCost;
     /** A sample of the unit that this type creates. Do not modify! */
     public @Nullable Unit sample;
 
+    /** Flags to target based on priority. Null indicates that the closest target should be found. The closest enemy core is used as a fallback. */
+    public BlockFlag[] targetFlags = {null};
+
+    /** color for outline generated around sprites */
+    public Color outlineColor = Pal.darkerMetal;
+    /** thickness for sprite outline  */
+    public int outlineRadius = 3;
+    /** if false, no sprite outlines are generated */
+    public boolean outlines = true;
+
+    /** amount of items this unit can carry; <0 to determine based on hitSize. */
+    public int itemCapacity = -1;
+    /** amount of ammo this unit can hold (if the rule is enabled); <0 to determine based on weapon fire rate. */
+    public int ammoCapacity = -1;
+    /** ammo this unit uses, if that system is enabled. */
+    public AmmoType ammoType = new ItemAmmoType(Items.copper);
+
+    /** max hardness of ore that this unit can mine (<0 to disable) */
+    public int mineTier = -1;
+    /** mining speed in weird arbitrary units */
+    public float mineSpeed = 1f;
+    /** whether this unit can mine ores from floors/walls, respectively */
+    public boolean mineWalls = false, mineFloor = true;
+    /** if true, harder materials will take longer to mine */
+    public boolean mineHardnessScaling = true;
+    /** continuous sound emitted when mining. */
+    public Sound mineSound = Sounds.minebeam;
+    /** volume of mining sound. */
+    public float mineSoundVolume = 0.6f;
+    /** Target items to mine. Used in MinerAI */
+    public Seq<Item> mineItems = Seq.with(Items.copper, Items.lead, Items.titanium, Items.thorium);
+
+    //LEG UNITS
+
+    /** number of legs this unit has (must have the correct type to function!) */
+    public int legCount = 4;
+    /** size of groups in which legs move. for example, insects (6 legs) usually move legs in groups of 3. */
+    public int legGroupSize = 2;
+
+    /** total length of a leg (both segments) */
+    public float legLength = 10f,
+    /** how fast individual legs move towards their destination (non-linear) */
+    legSpeed = 0.1f,
+    /** scale for how far in front (relative to unit velocity) legs try to place themselves */
+    legForwardScl = 1f,
+    /** leg offset from the center of the unit */
+    legBaseOffset = 0f,
+    /** scaling for space between leg movements */
+    legMoveSpace = 1f,
+    /** for legs without "joints", this is how much the second leg sprite is moved "back" by, so it covers the joint region (it's hard to explain without an image) */
+    legExtension = 0,
+    /** ??? I don't really know what this does or why it's here */
+    legPairOffset = 0,
+    /** scaling for how far away legs *try* to be from the body (not their actual length); e.g. if set to 0.5, legs will appear somewhat folded */
+    legLengthScl = 1f,
+    /** if legStraightness > 0, this is the scale for how far away legs are from the body horizontally */
+    legStraightLength = 1f,
+    /** maximum length of an individual leg as fraction of real length */
+    legMaxLength = 1.75f,
+    /** minimum length of an individual leg as fraction of real length */
+    legMinLength = 0f,
+    /** splash damage dealt when a leg touches the ground */
+    legSplashDamage = 0f,
+    /** splash damage radius of legs */
+    legSplashRange = 5,
+    /** how straight the leg base/origin is (0 = circular, 1 = line) */
+    baseLegStraightness = 0f,
+    /** how straight the leg outward angles are (0 = circular, 1 = horizontal line) */
+    legStraightness = 0f;
+
+    /** If true, legs are locked to the base of the unit instead of being on an implicit rotating "mount". */
+    public boolean lockLegBase = false;
+    /** If true, legs always try to move around even when the unit is not moving (leads to more natural behavior) */
+    public boolean legContinuousMove;
+    /** TODO neither of these appear to do much */
+    public boolean flipBackLegs = true, flipLegSide = false;
+
+    //MECH UNITS
+
+    /** screen shake amount for when this mech lands after boosting */
+    public float mechLandShake = 0f;
+    /** parameters for mech swaying animation */
+    public float mechSideSway = 0.54f, mechFrontSway = 0.1f, mechStride = -1f;
+    /** whether particles are created when this mech takes a step */
+    public boolean mechStepParticles = false;
+    /** color that legs change to when moving, to simulate depth */
+    public Color mechLegColor = Pal.darkMetal;
+
+    //TANK UNITS
+
+    /** list of treads as rectangles in IMAGE COORDINATES. these should match the coordinates you see in an image editor*/
+    public Rect[] treadRects = {};
+    /** number of frames of movement in a tread */
+    public int treadFrames = 18;
+    /** how much of a top part of a tread sprite is "cut off" relative to the pattern; this is corrected for */
+    public int treadPullOffset = 0;
+
+    //SEGMENTED / CRAWL UNITS
+
     //for crawlers
     public int segments = 0;
-    public float segmentSpacing = 2f;
-    public float segmentScl = 4f, segmentPhase = 5f;
-    public float segmentRotSpeed = 1f, segmentMaxRot = 30f;
+    public float segmentSpacing = 2f, segmentScl = 4f, segmentPhase = 5f, segmentRotSpeed = 1f, segmentMaxRot = 30f;
+    /** speed multiplier this unit will have when crawlSlowdownFrac is met. */
     public float crawlSlowdown = 0.5f;
-    /** Damage dealt to blocks under this tank/crawler every frame. */
+    /** damage dealt to blocks under this tank/crawler every frame. */
     public float crushDamage = 0f;
+    /** the fraction of solids under this block necessary for it to reach crawlSlowdown. */
     public float crawlSlowdownFrac = 0.55f;
 
-    public ObjectSet<StatusEffect> immunities = new ObjectSet<>();
-    public Sound deathSound = Sounds.bang;
+    //MISSILE UNITS
 
-    public Seq<Weapon> weapons = new Seq<>();
-    public TextureRegion baseRegion, legRegion, region, previewRegion, shadowRegion, cellRegion,
+    /** lifetime of this missile. */
+    public float lifetime = 60f * 5f;
+    /** ticks that must pass before this missile starts homing. */
+    public float homingDelay = 10f;
+
+    //REGIONS
+
+    //(undocumented, you shouldn't need to use these, and if you do just check how they're drawn and copy that)
+    public TextureRegion baseRegion, legRegion, region, previewRegion, shadowRegion, cellRegion, itemCircleRegion,
         softShadowRegion, jointRegion, footRegion, legBaseRegion, baseJointRegion, outlineRegion, treadRegion;
     public TextureRegion[] wreckRegions, segmentRegions, segmentOutlineRegions;
     public TextureRegion[][] treadRegions;
@@ -430,8 +602,8 @@ public class UnitType extends UnlockableContent{
             canDrown = false;
             omniMovement = false;
             immunities.add(StatusEffects.wet);
-            if(visualElevation < 0f){
-                visualElevation = 0.11f;
+            if(shadowElevation < 0f){
+                shadowElevation = 0.11f;
             }
         }
 
@@ -491,7 +663,7 @@ public class UnitType extends UnlockableContent{
         }
 
         if(weapons.isEmpty()){
-            range = maxRange = miningRange;
+            range = maxRange = mineRange;
         }
 
         if(mechStride < 0){
@@ -502,8 +674,8 @@ public class UnitType extends UnlockableContent{
             aimDst = weapons.contains(w -> !w.rotate) ? hitSize * 2f : hitSize / 2f;
         }
 
-        if(mechStepShake < 0){
-            mechStepShake = Mathf.round((hitSize - 11f) / 9f);
+        if(stepShake < 0){
+            stepShake = Mathf.round((hitSize - 11f) / 9f);
             mechStepParticles = hitSize > 15f;
         }
 
@@ -596,6 +768,8 @@ public class UnitType extends UnlockableContent{
         baseJointRegion = Core.atlas.find(name + "-joint-base");
         footRegion = Core.atlas.find(name + "-foot");
         treadRegion = Core.atlas.find(name + "-treads");
+        itemCircleRegion = Core.atlas.find("ring-item");
+
         if(treadRegion.found()){
             treadRegions = new TextureRegion[treadRects.length][treadFrames];
             for(int r = 0; r < treadRects.length; r++){
@@ -831,7 +1005,7 @@ public class UnitType extends UnlockableContent{
             drawControl(unit);
         }
 
-        if(!isPayload && (unit.isFlying() || visualElevation > 0)){
+        if(!isPayload && (unit.isFlying() || shadowElevation > 0)){
             Draw.z(Math.min(Layer.darkness, z - 1f));
             drawShadow(unit);
         }
@@ -951,7 +1125,7 @@ public class UnitType extends UnlockableContent{
     }
 
     public void drawShadow(Unit unit){
-        float e = Math.max(unit.elevation, visualElevation) * (1f - unit.drownTime);
+        float e = Math.max(unit.elevation, shadowElevation) * (1f - unit.drownTime);
         float x = unit.x + shadowTX * e, y = unit.y + shadowTY * e;
         Floor floor = world.floorWorld(x, y);
 
@@ -994,10 +1168,6 @@ public class UnitType extends UnlockableContent{
             size, size, unit.rotation);
             Draw.mixcol();
 
-            if(itemCircleRegion == null || itemCircleRegion.texture.isDisposed()){
-                itemCircleRegion = Core.atlas.find("ring-item");
-            }
-
             size = (3f + Mathf.absin(Time.time, 5f, 1f)) * unit.itemTime + 0.5f;
             Draw.color(Pal.accent);
             Draw.rect(itemCircleRegion,
@@ -1021,7 +1191,7 @@ public class UnitType extends UnlockableContent{
             unit.trail = new Trail(trailLength);
         }
         Trail trail = unit.trail;
-        trail.draw(trailColor == null ? unit.team.color : trailColor, (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f) * (useEngineElevation ? unit.elevation : 1f)) * trailScl);
+        trail.draw(trailColor == null ? unit.team.color : trailColor, (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f) * (useEngineElevation ? unit.elevation : 1f)) * tailScl);
     }
 
     public void drawEngines(Unit unit){
@@ -1166,8 +1336,8 @@ public class UnitType extends UnlockableContent{
 
             Tmp.v1.set(leg.base).sub(leg.joint).inv().setLength(legExtension);
 
-            if(footRegion.found() && leg.moving && visualElevation > 0){
-                float scl = visualElevation * invDrown;
+            if(footRegion.found() && leg.moving && shadowElevation > 0){
+                float scl = shadowElevation * invDrown;
                 float elev = Mathf.slope(1f - leg.stage) * scl;
                 Draw.color(Pal.shadow);
                 Draw.rect(footRegion, leg.base.x + shadowTX * elev, leg.base.y + shadowTY * elev, position.angleTo(leg.base));
@@ -1285,7 +1455,7 @@ public class UnitType extends UnlockableContent{
 
     public void applyColor(Unit unit){
         Draw.color();
-        if(showHeal){
+        if(healFlash){
             Tmp.c1.set(Color.white).lerp(healColor, Mathf.clamp(unit.healTime - unit.hitTime));
         }
         Draw.mixcol(Tmp.c1, Math.max(unit.hitTime, Mathf.clamp(unit.healTime)));
