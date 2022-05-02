@@ -142,6 +142,7 @@ public class Blocks{
     tankFabricator, shipFabricator, mechFabricator,
 
     basicReconstructor,
+    advancedReconstructor,
     //tankReconstructor, shipReconstructor, mechReconstructor,
 
     tankAssembler, shipAssembler, mechAssembler,
@@ -4249,6 +4250,24 @@ public class Blocks{
             new UnitType[]{UnitTypes.stell, UnitTypes.locus},
             new UnitType[]{UnitTypes.merui, UnitTypes.latum},
             new UnitType[]{UnitTypes.osc, UnitTypes.avert}
+            );
+        }};
+
+        advancedReconstructor = new Reconstructor("advanced-reconstructor"){{
+            requirements(Category.units, with(Items.beryllium, 250, Items.oxide, 200, Items.tungsten, 200, Items.silicon, 400));
+            regionSuffix = "-dark";
+
+            size = 5;
+            consumePower(5f);
+            consumeLiquid(Liquids.nitrogen, 10f / 60f);
+            consumeItems(with(Items.oxide, 110, Items.tungsten, 100));
+
+            constructTime = 60f * 60f;
+
+            upgrades.addAll(
+            new UnitType[]{UnitTypes.locus, UnitTypes.precept},
+            new UnitType[]{UnitTypes.latum, UnitTypes.anthicus},
+            new UnitType[]{UnitTypes.avert, UnitTypes.obviate}
             );
         }};
 

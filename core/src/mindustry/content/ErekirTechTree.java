@@ -298,7 +298,15 @@ public class ErekirTechTree{
                             node(UnitTypes.avert);
                             node(UnitTypes.locus);
 
+                            //TODO
+                            node(advancedReconstructor, () -> {
+                                node(UnitTypes.precept);
+                                node(UnitTypes.anthicus);
+                                node(UnitTypes.obviate);
+                            });
+
                             node(tankAssembler, Seq.with(new OnSector(three), new Research(constructor), new Research(atmosphericConcentrator)), () -> {
+
                                 node(UnitTypes.vanquish, () -> {
                                     node(UnitTypes.conquer, Seq.with(tmpNever), () -> {
 
