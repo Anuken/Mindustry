@@ -120,11 +120,7 @@ public class SectorPresets{
             rules = r -> {
                 r.objectives.addAll(
                     new ItemObjective(Items.beryllium, 15).withMarkers(
-                        new ShapeTextMarker("Click to mine [accent]resources[] from walls.", 290f * 8f, 106f * 8f),
-                        new TextMarker("Move the unit with WASD.", 276.5f * 8f, 112.5f * 8f)
-                    ),
-                    new ResearchObjective(Blocks.turbineCondenser).withMarkers(
-                        new TextMarker("Open the [accent]research tree[] and research the [accent]turbine condenser[].\nThis will allow you to build it.", 280f * 8f, 118f * 8f)
+                        new ShapeTextMarker("Click to mine [accent]resources[] from walls.", 290f * 8f, 106f * 8f)
                     ),
                     new BuildCountObjective(Blocks.turbineCondenser, 1).withMarkers(
                         new ShapeTextMarker("Place a [accent]turbine condenser[] on the vent.\nThis will generate [accent]power[].", 289f * 8f, 116f * 8f, 8f * 2.6f, 0f, 9f)
