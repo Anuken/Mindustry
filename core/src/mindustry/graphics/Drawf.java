@@ -79,7 +79,7 @@ public class Drawf{
         if(allowLight(team)) renderer.lights.line(x, y, x2, y2, stroke, tint, alpha);
     }
 
-    private static boolean allowLight(Team team){
+    public static boolean allowLight(Team team){
         return renderer != null && (team == Team.derelict || team == Vars.player.team() || state.rules.enemyLights);
     }
 
