@@ -39,13 +39,13 @@ public class UnitTypes{
     //legs
     public static @EntityDef({Unitc.class, Legsc.class}) UnitType corvus, atrax,
     merui, latum, anthicus,
-    bulwark, krepost;
+    bulwark, krepost; //TODO horrid name here
 
     //legs, legacy
     public static @EntityDef(value = {Unitc.class, Legsc.class}, legacy = true) UnitType spiroct, arkyid, toxopid;
 
     //hover
-    public static @EntityDef({Unitc.class, ElevationMovec.class}) UnitType osc;
+    public static @EntityDef({Unitc.class, ElevationMovec.class}) UnitType osc; //TODO bad name
 
     //air
     public static @EntityDef({Unitc.class}) UnitType flare, eclipse, horizon, zenith, antumbra,
@@ -2679,7 +2679,7 @@ public class UnitTypes{
                 bullet = new BasicBulletType(8f, 140){{
                     sprite = "missile-large";
                     width = 9.5f;
-                    height = 15f;
+                    height = 13f;
                     lifetime = 18f;
                     hitSize = 6f;
                     shootEffect = Fx.shootTitan;
@@ -2702,7 +2702,7 @@ public class UnitTypes{
                     fragVelocityMin = 1f;
 
                     //TODO
-                    fragBullet = new BasicBulletType(8f, 30){{
+                    fragBullet = new BasicBulletType(8f, 25){{
                         sprite = "missile-large";
                         width = 8f;
                         height = 12f;

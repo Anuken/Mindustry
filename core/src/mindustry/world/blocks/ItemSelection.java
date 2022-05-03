@@ -38,7 +38,7 @@ public class ItemSelection{
         int i = 0;
 
         for(T item : items){
-            if(!item.unlockedNow() || (item instanceof Item checkVisible && state.rules.hiddenBuildItems.contains(checkVisible))) continue;
+            if(!item.unlockedNow() || (item instanceof Item checkVisible && state.rules.hiddenBuildItems.contains(checkVisible)) || item.isHidden()) continue;
 
             ImageButton button = cont.button(Tex.whiteui, Styles.clearToggleTransi, 24, () -> {
                 if(closeSelect) control.input.config.hideConfig();

@@ -23,6 +23,9 @@ public class Pathfinder implements Runnable{
     private static final int updateFPS = 60;
     private static final int updateInterval = 1000 / updateFPS;
 
+    /** cached world size */
+    static int wwidth, wheight;
+
     static final int impassable = -1;
 
     public static final int
@@ -66,8 +69,6 @@ public class Pathfinder implements Runnable{
 
     /** maps team, cost, type to flow field*/
     Flowfield[][][] cache;
-    /** cached world size */
-    int wwidth, wheight;
     /** unordered array of path data for iteration only. DO NOT iterate or access this in the main thread. */
     Seq<Flowfield> threadList = new Seq<>(), mainList = new Seq<>();
     /** handles task scheduling on the update thread. */
@@ -438,7 +439,7 @@ public class Pathfinder implements Runnable{
             if(cost != impassable){
                 for(Point2 point : Geometry.d4){
 
-                    int dx = (tile % wwidth) + point.x, dy = (tile / wheight) + point.y;
+                    int dx = (tile % wwidth) + point.x, dy = (tile / wwidth) + point.y;
 
                     if(dx < 0 || dy < 0 || dx >= wwidth || dy >= wheight) continue;
 
