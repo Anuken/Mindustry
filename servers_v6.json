@@ -1,4 +1,8 @@
 [
+    {
+    "name": "X-DUSTRY",
+    "address": ["xproject.zapto.org"]
+  },
   {
     "name": "Sectorized",
     "address": ["sectorized.ddns.net"]
