@@ -2054,14 +2054,12 @@ public class Blocks{
         liquidRouter = new LiquidRouter("liquid-router"){{
             requirements(Category.liquid, with(Items.graphite, 4, Items.metaglass, 2));
             liquidCapacity = 20f;
-            newDrawing = true;
         }};
 
         liquidContainer = new LiquidRouter("liquid-container"){{
             requirements(Category.liquid, with(Items.titanium, 10, Items.metaglass, 15));
             liquidCapacity = 700f;
             size = 2;
-            newDrawing = true;
         }};
 
         liquidTank = new LiquidRouter("liquid-tank"){{
@@ -2069,7 +2067,6 @@ public class Blocks{
             size = 3;
             liquidCapacity = 1800f;
             health = 500;
-            newDrawing = true;
         }};
 
         liquidJunction = new LiquidJunction("liquid-junction"){{
@@ -2144,7 +2141,6 @@ public class Blocks{
         reinforcedLiquidRouter = new LiquidRouter("reinforced-liquid-router"){{
             requirements(Category.liquid, with(Items.graphite, 8, Items.beryllium, 4));
             liquidCapacity = 30f;
-            newDrawing = true;
             liquidPadding = 3f/4f;
             researchCostMultiplier = 3;
             underBullets = true;
@@ -2154,19 +2150,17 @@ public class Blocks{
             requirements(Category.liquid, with(Items.tungsten, 10, Items.beryllium, 16));
             liquidCapacity = 1000f;
             size = 2;
-            newDrawing = true;
             liquidPadding = 6f/4f;
             researchCostMultiplier = 4;
-            underBullets = true;
+            solid = true;
         }};
 
         reinforcedLiquidTank = new LiquidRouter("reinforced-liquid-tank"){{
             requirements(Category.liquid, with(Items.tungsten, 40, Items.beryllium, 50));
             size = 3;
+            solid = true;
             liquidCapacity = 2700f;
-            newDrawing = true;
             liquidPadding = 2f;
-            underBullets = true;
         }};
 
         //endregion
@@ -3791,7 +3785,7 @@ public class Blocks{
             velocityRnd = 0.17f;
             shootShake = 1f;
             ammoPerShot = 3;
-            maxAmmo = 50;
+            maxAmmo = 30;
             consumeAmmoOnce = true;
 
             drawer = new DrawTurret("reinforced-"){{
@@ -4261,7 +4255,7 @@ public class Blocks{
             size = 5;
             consumePower(5f);
             consumeLiquid(Liquids.nitrogen, 10f / 60f);
-            consumeItems(with(Items.oxide, 110, Items.tungsten, 100));
+            consumeItems(with(Items.oxide, 20, Items.tungsten, 100));
 
             constructTime = 60f * 60f;
 

@@ -3970,6 +3970,7 @@ public class UnitTypes{
             engineSize = 0;
             payloadCapacity = 2f * 2f * tilesize * tilesize;
             pickupUnits = false;
+            vulnerableWithPayloads = true;
 
             fogRadius = 0f;
             targetable = false;
@@ -4032,6 +4033,7 @@ public class UnitTypes{
             hitSize = 11f;
             payloadCapacity = 2f * 2f * tilesize * tilesize;
             pickupUnits = false;
+            vulnerableWithPayloads = true;
 
             fogRadius = 0f;
             targetable = false;
@@ -4109,6 +4111,7 @@ public class UnitTypes{
             buildBeamOffset = 8f;
             payloadCapacity = 2f * 2f * tilesize * tilesize;
             pickupUnits = false;
+            vulnerableWithPayloads = true;
 
             fogRadius = 0f;
             targetable = false;

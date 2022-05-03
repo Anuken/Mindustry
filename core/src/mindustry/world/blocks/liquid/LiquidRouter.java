@@ -5,8 +5,6 @@ import mindustry.gen.*;
 import mindustry.type.*;
 
 public class LiquidRouter extends LiquidBlock{
-    /** kept only for mod compatibility reasons; all vanilla blocks have this as true */
-    public boolean newDrawing = false;
     public float liquidPadding = 0f;
 
     public LiquidRouter(String name){
@@ -20,7 +18,7 @@ public class LiquidRouter extends LiquidBlock{
 
     @Override
     public TextureRegion[] icons(){
-        return newDrawing ? new TextureRegion[]{bottomRegion, region} : super.icons();
+        return new TextureRegion[]{bottomRegion, region};
     }
 
     public class LiquidRouterBuild extends LiquidBuild{
@@ -33,18 +31,13 @@ public class LiquidRouter extends LiquidBlock{
 
         @Override
         public void draw(){
-            if(newDrawing){
-                Draw.rect(bottomRegion, x, y);
+            Draw.rect(bottomRegion, x, y);
 
-                if(liquids.currentAmount() > 0.001f){
-                    drawTiledFrames(size, x, y, liquidPadding, liquids.current(), liquids.currentAmount() / liquidCapacity);
-                }
-
-                Draw.rect(region, x, y);
-            }else{
-                super.draw();
+            if(liquids.currentAmount() > 0.001f){
+                drawTiledFrames(size, x, y, liquidPadding, liquids.current(), liquids.currentAmount() / liquidCapacity);
             }
 
+            Draw.rect(region, x, y);
         }
 
         @Override
