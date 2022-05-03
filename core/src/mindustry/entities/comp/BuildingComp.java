@@ -85,7 +85,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     transient float efficiency;
     /** Same as efficiency, but for optional consumers only. */
     transient float optionalEfficiency;
-    /** The efficiency this block would have if consValid() / productionValid() returned true. */
+    /** The efficiency this block *would* have if shouldConsume() returned true. */
     transient float potentialEfficiency;
 
     transient float healSuppressionTime = -1f;

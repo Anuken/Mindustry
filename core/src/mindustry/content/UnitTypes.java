@@ -290,7 +290,7 @@ public class UnitTypes{
 
                     fragBullets = 3;
                     fragLifeMin = 0f;
-                    fragCone = 30f;
+                    fragRandomSpread = 30f;
 
                     fragBullet = new BasicBulletType(9f, 20){{
                         width = 10f;
@@ -2680,11 +2680,11 @@ public class UnitTypes{
                     sprite = "missile-large";
                     width = 9.5f;
                     height = 15f;
-                    lifetime = 30f;
+                    lifetime = 18f;
                     hitSize = 6f;
                     shootEffect = Fx.shootTitan;
                     smokeEffect = Fx.shootSmokeTitan;
-                    pierceCap = 3;
+                    pierceCap = 2;
                     pierce = true;
                     pierceBuilding = true;
                     hitColor = backColor = trailColor = Color.valueOf("feb380");
@@ -2694,6 +2694,28 @@ public class UnitTypes{
                     hitEffect = despawnEffect = Fx.blastExplosion;
                     splashDamageRadius = 20f;
                     splashDamage = 50f;
+
+                    fragOnHit = false;
+                    fragRandomSpread = 0f;
+                    fragSpread = 10f;
+                    fragBullets = 5;
+                    fragVelocityMin = 1f;
+
+                    //TODO
+                    fragBullet = new BasicBulletType(8f, 30){{
+                        sprite = "missile-large";
+                        width = 8f;
+                        height = 12f;
+                        lifetime = 15f;
+                        hitSize = 4f;
+                        hitColor = backColor = trailColor = Color.valueOf("feb380");
+                        frontColor = Color.white;
+                        trailWidth = 2.8f;
+                        trailLength = 6;
+                        hitEffect = despawnEffect = Fx.blastExplosion;
+                        splashDamageRadius = 10f;
+                        splashDamage = 20f;
+                    }};
                 }};
             }});
 
@@ -3503,7 +3525,7 @@ public class UnitTypes{
                     spread = 11f;
                 }};
 
-                bullet = new BasicBulletType(5f, 18){{
+                bullet = new BasicBulletType(5f, 24){{
                     homingPower = 0.19f;
                     homingDelay = 4f;
                     width = 7f;

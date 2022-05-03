@@ -138,6 +138,8 @@ public class BulletType extends Content implements Cloneable{
     public boolean makeFire = false;
     /** Whether to create hit effects on despawn. Forced to true if this bullet has any special effects like splash damage. */
     public boolean despawnHit = false;
+    /** If true, this bullet will create bullets when it hits anything, not just when it despawns. */
+    public boolean fragOnHit = true;
     /** If true, unit armor is ignored in damage calculations. Ignored for building armor. */
     public boolean pierceArmor = false;
 
@@ -146,7 +148,8 @@ public class BulletType extends Content implements Cloneable{
     /** Whether status and despawnHit should automatically be set. */
     public boolean setDefaults = true;
 
-    public float fragCone = 360f;
+    public float fragRandomSpread = 360f;
+    public float fragSpread = 0f;
     public float fragAngle = 0f;
     public int fragBullets = 9;
     public float fragVelocityMin = 0.2f, fragVelocityMax = 1f, fragLifeMin = 1f, fragLifeMax = 1f;
@@ -308,12 +311,11 @@ public class BulletType extends Content implements Cloneable{
 
         Effect.shake(hitShake, hitShake, b);
 
-        createFrags(b, x, y);
-        createPuddles(b, x, y);
-
-        if(incendChance > 0 && Mathf.chance(incendChance)){
-            Damage.createIncend(x, y, incendSpread, incendAmount);
+        if(fragOnHit){
+            createFrags(b, x, y);
         }
+        createPuddles(b, x, y);
+        createIncend(b, x, y);
 
         if(suppressionRange > 0){
             //bullets are pooled, require separate Vec2 instance
@@ -324,6 +326,12 @@ public class BulletType extends Content implements Cloneable{
 
         for(int i = 0; i < lightning; i++){
             Lightning.create(b, lightningColor, lightningDamage < 0 ? damage : lightningDamage, b.x, b.y, b.rotation() + Mathf.range(lightningCone/2) + lightningAngle, lightningLength + Mathf.random(lightningLengthRand));
+        }
+    }
+
+    public void createIncend(Bullet b, float x, float y){
+        if(incendChance > 0 && Mathf.chance(incendChance)){
+            Damage.createIncend(x, y, incendSpread, incendAmount);
         }
     }
 
@@ -361,7 +369,7 @@ public class BulletType extends Content implements Cloneable{
         if(fragBullet != null){
             for(int i = 0; i < fragBullets; i++){
                 float len = Mathf.random(1f, 7f);
-                float a = b.rotation() + Mathf.range(fragCone / 2) + fragAngle;
+                float a = b.rotation() + Mathf.range(fragRandomSpread / 2) + fragAngle + ((i - fragBullets/2) * fragSpread);
                 fragBullet.create(b, x + Angles.trnsx(a, len), y + Angles.trnsy(a, len), a, Mathf.random(fragVelocityMin, fragVelocityMax), Mathf.random(fragLifeMin, fragLifeMax));
             }
         }
@@ -373,6 +381,11 @@ public class BulletType extends Content implements Cloneable{
         if(despawnHit){
             hit(b);
         }
+
+        if(!fragOnHit){
+            createFrags(b, b.x, b.y);
+        }
+
         despawnEffect.at(b.x, b.y, b.rotation(), hitColor);
         despawnSound.at(b);
 

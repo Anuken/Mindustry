@@ -54,7 +54,7 @@ public class MenuFragment{
 
         parent.fill(c -> c.bottom().right().button(Icon.discord, new ImageButtonStyle(){{
             up = discordBanner;
-        }}, ui.discord::show).tooltip("@discord").size(84, 45).name("discord"));
+        }}, ui.discord::show).marginTop(9f).marginLeft(10f).tooltip("@discord").size(84, 45).name("discord"));
 
         //info icon
         if(mobile){
