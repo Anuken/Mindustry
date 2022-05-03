@@ -129,7 +129,7 @@ public class Units{
             (range != Float.MAX_VALUE && !target.within(x, y, range + (target instanceof Sized hb ? hb.hitSize()/2f : 0f))) ||
             (target instanceof Teamc t && t.team() == team) ||
             (target instanceof Healthc h && !h.isValid()) ||
-            (target instanceof Unit u && !u.type.targetable);
+            (target instanceof Unit u && !u.targetable());
     }
 
     /** See {@link #invalidateTarget(Posc, Team, float, float, float)} */
@@ -274,7 +274,7 @@ public class Units{
         cpriority = -99999f;
 
         nearbyEnemies(team, x - range, y - range, range*2f, range*2f, e -> {
-            if(e.dead() || !predicate.get(e) || e.team == Team.derelict || !e.type.targetable) return;
+            if(e.dead() || !predicate.get(e) || e.team == Team.derelict || !e.targetable()) return;
 
             float dst2 = e.dst2(x, y) - (e.hitSize * e.hitSize);
             if(dst2 < range*range && (result == null || dst2 < cdist || e.type.targetPriority > cpriority) && e.type.targetPriority >= cpriority){
@@ -296,7 +296,7 @@ public class Units{
         cpriority = -99999f;
 
         nearbyEnemies(team, x - range, y - range, range*2f, range*2f, e -> {
-            if(e.dead() || !predicate.get(e) || e.team == Team.derelict || !e.within(x, y, range + e.hitSize/2f) || !e.type.targetable) return;
+            if(e.dead() || !predicate.get(e) || e.team == Team.derelict || !e.within(x, y, range + e.hitSize/2f) || !e.targetable()) return;
 
             float cost = sort.cost(e, x, y);
             if((result == null || cost < cdist || e.type.targetPriority > cpriority) && e.type.targetPriority >= cpriority){

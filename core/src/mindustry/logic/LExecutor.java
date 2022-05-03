@@ -776,7 +776,7 @@ public class LExecutor{
 
         void find(Ranged b, float range, int sortDir, Team team){
             Units.nearby(team, b.x(), b.y(), range, u -> {
-                if(!u.within(b, range) || !u.type.targetable) return;
+                if(!u.within(b, range) || !u.targetable()) return;
 
                 boolean valid =
                     target1.func.get(b.team(), u) &&

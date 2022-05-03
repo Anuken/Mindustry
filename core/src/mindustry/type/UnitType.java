@@ -100,7 +100,7 @@ public class UnitType extends UnlockableContent{
 
     /** for ground units, the layer upon which this unit is drawn */
     groundLayer = Layer.groundUnit,
-    /** Payload capacity of this unit in blocks^2 */
+    /** Payload capacity of this unit in world units^2 */
     payloadCapacity = 8,
     /** building speed multiplier; <0 to disable. */
     buildSpeed = -1f,
@@ -160,6 +160,10 @@ public class UnitType extends UnlockableContent{
     killable = true,
     /** if false, this unit is not targeted by anything. */
     targetable = true,
+    /** if true, this unit can be hit/targeted when it has payloads (assuming hittable/targetable is false) */
+    vulnerableWithPayloads = false,
+    /** if true, this payload unit can pick up units */
+    pickupUnits = true,
     /** if false, this unit does not physically collide with others. */
     physics = true,
     /** if true, this ground unit will drown in deep liquids. */
@@ -188,7 +192,6 @@ public class UnitType extends UnlockableContent{
     rotateMoveFirst = false,
     /** if true, this unit flashes when being healed */
     healFlash = true,
-
     /** whether the unit can heal blocks. Initialized in init() */
     canHeal = false,
     /** if true, all weapons will attack the same target. */
@@ -310,7 +313,7 @@ public class UnitType extends UnlockableContent{
     public float legLength = 10f,
     /** how fast individual legs move towards their destination (non-linear) */
     legSpeed = 0.1f,
-    /** scale for how far in front (relative to unit velocity) legs try to place themselves */
+    /** scale for how far in front (relative to unit velocity) legs try to place themselves; if legs lag behind a unit, increase this number */
     legForwardScl = 1f,
     /** leg offset from the center of the unit */
     legBaseOffset = 0f,

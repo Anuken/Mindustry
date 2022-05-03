@@ -49,7 +49,7 @@ public class UnitTypes{
 
     //air
     public static @EntityDef({Unitc.class}) UnitType flare, eclipse, horizon, zenith, antumbra,
-    evoke, avert, obviate;
+    avert, obviate;
 
     //air, legacy
     public static @EntityDef(value = {Unitc.class}, legacy = true) UnitType mono;
@@ -59,7 +59,7 @@ public class UnitTypes{
 
     //air + payload
     public static @EntityDef({Unitc.class, Payloadc.class}) UnitType mega,
-    incite, emanate, quell, disrupt;
+    evoke, incite, emanate, quell, disrupt;
 
     //air + payload, legacy
     public static @EntityDef(value = {Unitc.class, Payloadc.class}, legacy = true) UnitType quad;
@@ -986,7 +986,7 @@ public class UnitTypes{
             //TODO balance
             //targetAir = false;
             targetFlags = new BlockFlag[]{BlockFlag.generator, null};
-            hitSize = 7;
+            hitSize = 9;
             itemCapacity = 10;
 
             weapons.add(new Weapon(){{
@@ -3485,7 +3485,7 @@ public class UnitTypes{
             accel = 0.09f;
             health = 600f;
             armor = 3f;
-            hitSize = 7f;
+            hitSize = 11f;
             engineOffset = 7f;
             engineSize = 2f;
             itemCapacity = 0;
@@ -3549,7 +3549,7 @@ public class UnitTypes{
             speed = 2f;
             rotateSpeed = 4f;
             accel = 0.09f;
-            health = 1000f;
+            health = 1100f;
             armor = 3f;
             hitSize = 12f;
             engineSize = 0;
@@ -3574,7 +3574,7 @@ public class UnitTypes{
                 shoot = new ShootHelix();
 
                 //TODO cooler + balancing
-                bullet = new BasicBulletType(5f, 30){{
+                bullet = new BasicBulletType(5f, 34){{
                     width = 7f;
                     height = 12f;
                     lifetime = 25f;
@@ -3597,7 +3597,7 @@ public class UnitTypes{
             accel = 0.09f;
             health = 2300f;
             armor = 6f;
-            hitSize = 18f;
+            hitSize = 25f;
             engineSize = 4.3f;
             engineOffset = 54f / 4f;
             fogRadius = 25;
@@ -3968,6 +3968,8 @@ public class UnitTypes{
             armor = 1f;
             hitSize = 9f;
             engineSize = 0;
+            payloadCapacity = 2f * 2f * tilesize * tilesize;
+            pickupUnits = false;
 
             fogRadius = 0f;
             targetable = false;
@@ -4028,6 +4030,8 @@ public class UnitTypes{
             health = 500f;
             armor = 2f;
             hitSize = 11f;
+            payloadCapacity = 2f * 2f * tilesize * tilesize;
+            pickupUnits = false;
 
             fogRadius = 0f;
             targetable = false;
@@ -4103,6 +4107,8 @@ public class UnitTypes{
             armor = 3f;
             hitSize = 12f;
             buildBeamOffset = 8f;
+            payloadCapacity = 2f * 2f * tilesize * tilesize;
+            pickupUnits = false;
 
             fogRadius = 0f;
             targetable = false;

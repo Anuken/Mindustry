@@ -56,6 +56,8 @@ public class Turret extends ReloadTurret{
 
     public int maxAmmo = 30;
     public int ammoPerShot = 1;
+    /** If true, ammo is only consumed once per shot regardless of bullet count. */
+    public boolean consumeAmmoOnce = false;
     public float heatRequirement = -1f;
     public float maxHeatEfficiency = 3f;
 
@@ -488,12 +490,16 @@ public class Turret extends ReloadTurret{
                 }
                 totalShots ++;
             });
+
+            if(consumeAmmoOnce){
+                useAmmo();
+            }
         }
 
         protected void bullet(BulletType type, float xOffset, float yOffset, float angleOffset, Mover mover){
             queuedBullets --;
 
-            if(dead || !hasAmmo()) return;
+            if(dead || (!consumeAmmoOnce && !hasAmmo())) return;
 
             float
             bulletX = x + Angles.trnsx(rotation - 90, shootX + xOffset, shootY + yOffset),
@@ -522,7 +528,9 @@ public class Turret extends ReloadTurret{
             recoil = recoilAmount;
             heat = 1f;
 
-            useAmmo();
+            if(!consumeAmmoOnce){
+                useAmmo();
+            }
         }
 
         protected void handleBullet(@Nullable Bullet bullet, float offsetX, float offsetY, float angleOffset){

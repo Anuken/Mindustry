@@ -260,7 +260,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     @Override
     @Replace
     public boolean collides(Hitboxc other){
-        return type.hittable;
+        return hittable();
     }
 
     @Override
@@ -353,6 +353,14 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
                 abilities[i] = type.abilities.get(i).copy();
             }
         }
+    }
+
+    public boolean targetable(){
+        return type.targetable;
+    }
+
+    public boolean hittable(){
+        return type.hittable;
     }
 
     @Override

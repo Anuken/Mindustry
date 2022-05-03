@@ -27,10 +27,6 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
 
     Seq<Payload> payloads = new Seq<>();
 
-    //uncomment for insanity
-
-
-
     private transient @Nullable PowerGraph payloadPower;
 
     @Override
@@ -65,12 +61,24 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         }
     }
 
+    @Override
+    @Replace
+    public boolean targetable(){
+        return type.targetable || (type.vulnerableWithPayloads && hasPayload());
+    }
+
+    @Override
+    @Replace
+    public boolean hittable(){
+        return type.hittable || (type.vulnerableWithPayloads && hasPayload());
+    }
+
     float payloadUsed(){
         return payloads.sumf(p -> p.size() * p.size());
     }
 
     boolean canPickup(Unit unit){
-        return payloadUsed() + unit.hitSize * unit.hitSize <= type.payloadCapacity + 0.001f && unit.team == team() && unit.isAI();
+        return unit.type.pickupUnits && payloadUsed() + unit.hitSize * unit.hitSize <= type.payloadCapacity + 0.001f && unit.team == team() && unit.isAI();
     }
 
     boolean canPickup(Building build){

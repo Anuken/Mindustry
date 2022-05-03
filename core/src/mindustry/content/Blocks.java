@@ -3763,14 +3763,14 @@ public class Blocks{
             requirements(Category.turret, with(Items.beryllium, 150, Items.silicon, 200, Items.graphite, 200, Items.tungsten, 50));
 
             ammo(
-            Items.graphite, new BasicBulletType(8f, 35){{
-                knockback = 6f;
+            Items.graphite, new BasicBulletType(8f, 40){{
+                knockback = 4f;
                 width = 25f;
                 hitSize = 7f;
                 height = 20f;
                 shootEffect = Fx.shootBigColor;
                 smokeEffect = Fx.shootSmokeSquareSparse;
-                ammoMultiplier = 4;
+                ammoMultiplier = 1;
                 hitColor = backColor = trailColor = Color.valueOf("ea8878");
                 frontColor = Color.valueOf("feb380");
                 trailWidth = 6f;
@@ -3787,10 +3787,13 @@ public class Blocks{
 
             coolantMultiplier = 6f;
 
+            inaccuracy = 0.2f;
             velocityRnd = 0.17f;
             shootShake = 1f;
-            ammoPerShot = 1;
+            ammoPerShot = 3;
             maxAmmo = 50;
+            consumeAmmoOnce = true;
+
             drawer = new DrawTurret("reinforced-"){{
                 parts.add(new RegionPart("-front"){{
                     progress = PartProgress.warmup;
@@ -3807,7 +3810,7 @@ public class Blocks{
             reload = 30f;
             recoilAmount = 2f;
             restitution = 0.03f;
-            range = 110;
+            range = 125;
             shootCone = 50f;
             scaledHealth = 210;
             rotateSpeed = 3f;
