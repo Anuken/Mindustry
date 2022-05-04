@@ -2621,8 +2621,8 @@ public class Blocks{
 
         //TODO bad name
         eruptionDrill = new BurstDrill("eruption-drill"){{
-            requirements(Category.production, with(Items.silicon, 200, Items.beryllium, 250, Items.oxide, 80, Items.tungsten, 200, Items.carbide, 120));
-            drillTime = 60f * 9f;
+            requirements(Category.production, with(Items.silicon, 200, Items.oxide, 80, Items.tungsten, 200, Items.carbide, 120));
+            drillTime = 60f * 6f;
             size = 5;
             hasPower = true;
             tier = 7;
@@ -4317,10 +4317,13 @@ public class Blocks{
         }};*/
 
         tankAssembler = new UnitAssembler("tank-assembler"){{
-            requirements(Category.units, with(Items.graphite, 600, Items.beryllium, 600, Items.oxide, 250, Items.tungsten, 400, Items.silicon, 500));
+            requirements(Category.units, with(Items.thorium, 500, Items.oxide, 250, Items.tungsten, 500, Items.silicon, 500));
             regionSuffix = "-dark";
             size = 5;
-            plans.add(new AssemblerUnitPlan(UnitTypes.vanquish, 60f * 50f, PayloadStack.list(UnitTypes.stell, 4, Blocks.tungstenWallLarge, 10)));
+            plans.add(
+            new AssemblerUnitPlan(UnitTypes.vanquish, 60f * 50f, PayloadStack.list(UnitTypes.stell, 4, Blocks.tungstenWallLarge, 10)),
+            new AssemblerUnitPlan(UnitTypes.conquer, 60f * 60f * 3f, PayloadStack.list(UnitTypes.locus, 6, Blocks.carbideWallLarge, 20))
+            );
             areaSize = 13;
             researchCostMultiplier = 0.4f;
 
@@ -4356,13 +4359,12 @@ public class Blocks{
         }};
 
         //TODO 5x5
-        if(false)
         basicAssemblerModule = new UnitAssemblerModule("basic-assembler-module"){{
-            requirements(Category.units, with(Items.graphite, 10));
-            consumePower(0.5f);
+            requirements(Category.units, with(Items.carbide, 400, Items.thorium, 500, Items.oxide, 300, Items.graphite, 500));
+            consumePower(4f);
             regionSuffix = "-dark";
 
-            size = 3;
+            size = 5;
         }};
 
         //TODO setup, sprite, balance... or just scrap it completely.
