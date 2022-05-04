@@ -1401,7 +1401,7 @@ public class Blocks{
 
         //TODO bad name, and there's no use for phase yet...
         phaseSynthesizer = new HeatCrafter("phase-synthesizer"){{
-            requirements(Category.crafting, with(Items.surgeAlloy, 70, Items.carbide, 90, Items.silicon, 100, Items.thorium, 100, Items.beryllium, 200));
+            requirements(Category.crafting, with(Items.carbide, 90, Items.silicon, 100, Items.thorium, 100, Items.tungsten, 200));
 
             size = 3;
 
@@ -4249,13 +4249,13 @@ public class Blocks{
         }};
 
         advancedReconstructor = new Reconstructor("advanced-reconstructor"){{
-            requirements(Category.units, with(Items.beryllium, 250, Items.oxide, 200, Items.tungsten, 200, Items.silicon, 400));
+            requirements(Category.units, with(Items.thorium, 250, Items.oxide, 200, Items.tungsten, 200, Items.silicon, 400));
             regionSuffix = "-dark";
 
             size = 5;
             consumePower(5f);
             consumeLiquid(Liquids.nitrogen, 10f / 60f);
-            consumeItems(with(Items.oxide, 20, Items.tungsten, 100));
+            consumeItems(with(Items.thorium, 80, Items.silicon, 100));
 
             constructTime = 60f * 60f;
 

@@ -142,16 +142,17 @@ public class BulletType extends Content implements Cloneable{
     public boolean fragOnHit = true;
     /** If true, unit armor is ignored in damage calculations. Ignored for building armor. */
     public boolean pierceArmor = false;
-
-    //additional effects
-    
     /** Whether status and despawnHit should automatically be set. */
     public boolean setDefaults = true;
-
+    /** Degree spread range of fragmentation bullets. */
     public float fragRandomSpread = 360f;
+    /** Uniform spread between each frag bullet in degrees. */
     public float fragSpread = 0f;
+    /** Angle offset of fragmentation bullets. */
     public float fragAngle = 0f;
+    /** Number of fragmentation bullets created. */
     public int fragBullets = 9;
+
     public float fragVelocityMin = 0.2f, fragVelocityMax = 1f, fragLifeMin = 1f, fragLifeMax = 1f;
     public @Nullable BulletType fragBullet = null;
     public float bulletInterval = 20f;
