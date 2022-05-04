@@ -146,14 +146,9 @@ public class Blocks{
     //tankReconstructor, shipReconstructor, mechReconstructor,
 
     tankAssembler, shipAssembler, mechAssembler,
-    //TODO maybe making it 5x5 would be more appropriate, seems kinda cheap.
     basicAssemblerModule,
 
-    //TODO
     unitRepairTower,
-
-    //TODO remove
-    droneCenter,
 
     //payloads
     payloadConveyor, payloadRouter, reinforcedPayloadConveyor, reinforcedPayloadRouter, payloadMassDriver, payloadPropulsionTower, smallDeconstructor, deconstructor, constructor, largeConstructor, payloadLoader, payloadUnloader,
@@ -4365,17 +4360,6 @@ public class Blocks{
             regionSuffix = "-dark";
 
             size = 5;
-        }};
-
-        //TODO setup, sprite, balance... or just scrap it completely.
-        if(false)
-        droneCenter = new DroneCenter("drone-center"){{
-            requirements(Category.units, with(Items.graphite, 10));
-
-            size = 3;
-            consumePower(3f);
-
-            droneType = UnitTypes.effectDrone;
         }};
 
         unitRepairTower = new RepairTower("unit-repair-tower"){{
