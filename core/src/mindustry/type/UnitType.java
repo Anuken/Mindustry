@@ -1217,29 +1217,10 @@ public class UnitType extends UnlockableContent{
     }
 
     public void drawEngines(Unit unit){
-        float scale = useEngineElevation ? unit.elevation : 1f;
-
-        if(scale <= 0.0001f) return;
-
-        float rot = unit.rotation - 90;
-        Color color = engineColor == null ? unit.team.color : engineColor;
+        if((useEngineElevation ? unit.elevation : 1f) <= 0.0001f) return;
 
         for(var engine : engines){
-            Tmp.v1.set(engine.x, engine.y).rotate(rot);
-            float ex = Tmp.v1.x, ey = Tmp.v1.y;
-
-            Draw.color(color);
-            Fill.circle(
-                unit.x + ex,
-                unit.y + ey,
-                (engine.radius + Mathf.absin(Time.time, 2f, engine.radius / 4f)) * scale
-            );
-            Draw.color(engineColorInner);
-            Fill.circle(
-                unit.x + ex - Angles.trnsx(rot + engine.rotation, 1f),
-                unit.y + ey - Angles.trnsy(rot + engine.rotation, 1f),
-                (engine.radius + Mathf.absin(Time.time, 2f, engine.radius / 4f)) / 2f  * scale
-            );
+            engine.draw(unit);
         }
 
         Draw.color();
@@ -1499,6 +1480,32 @@ public class UnitType extends UnlockableContent{
         }
 
         public UnitEngine(){
+        }
+
+        public void draw(Unit unit){
+            UnitType type = unit.type;
+            float scale = type.useEngineElevation ? unit.elevation : 1f;
+
+            if(scale <= 0.0001f) return;
+
+            float rot = unit.rotation - 90;
+            Color color = type.engineColor == null ? unit.team.color : type.engineColor;
+
+            Tmp.v1.set(x, y).rotate(rot);
+            float ex = Tmp.v1.x, ey = Tmp.v1.y;
+
+            Draw.color(color);
+            Fill.circle(
+            unit.x + ex,
+            unit.y + ey,
+            (radius + Mathf.absin(Time.time, 2f, radius / 4f)) * scale
+            );
+            Draw.color(type.engineColorInner);
+            Fill.circle(
+            unit.x + ex - Angles.trnsx(rot + rotation, 1f),
+            unit.y + ey - Angles.trnsy(rot + rotation, 1f),
+            (radius + Mathf.absin(Time.time, 2f, radius / 4f)) / 2f  * scale
+            );
         }
 
         public UnitEngine copy(){

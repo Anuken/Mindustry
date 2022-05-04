@@ -4680,7 +4680,7 @@ public class Blocks{
             forceDark = true;
             privileged = true;
             size = 1;
-            maxInstructionsPerTick = 50;
+            maxInstructionsPerTick = 100;
         }};
 
         worldCell = new MemoryBlock("world-cell"){{

@@ -169,17 +169,23 @@ public class FloorRenderer{
         //only ever use the base environment texture
         texture.bind(0);
 
-        //enable all mesh attributes
-        for(VertexAttribute attribute : attributes){
-            shader.enableVertexAttribute(attribute.alias);
+        //enable all mesh attributes; TODO remove once the attribute cache bug is fixed
+        if(Core.gl30 == null){
+            for(VertexAttribute attribute : attributes){
+                int loc = shader.getAttributeLocation(attribute.alias);
+                if(loc != -1) Gl.enableVertexAttribArray(loc);
+            }
         }
+
     }
 
     public void endc(){
-
-        //disable all mesh attributes
-        for(VertexAttribute attribute : attributes){
-            shader.disableVertexAttribute(attribute.alias);
+        //disable all mesh attributes; TODO remove once the attribute cache bug is fixed
+        if(Core.gl30 == null){
+            for(VertexAttribute attribute : attributes){
+                int loc = shader.getAttributeLocation(attribute.alias);
+                if(loc != -1) Gl.disableVertexAttribArray(loc);
+            }
         }
 
         //unbind last buffer
@@ -244,30 +250,29 @@ public class FloorRenderer{
 
                 var mesh = cache[x][y][layer.id];
 
-                if(mesh != null){
+                //this *must* be a vertexbufferobject on gles2, so cast it and render it directly
+                if(mesh != null && mesh.vertices instanceof VertexBufferObject vbo && mesh.indices instanceof IndexBufferObject ibo){
 
-                    //this *must* be a vertexbufferobject, so cast it and render it directly
-                    if(mesh.vertices instanceof VertexBufferObject vbo && mesh.indices instanceof IndexBufferObject ibo){
+                    //bindi the buffer and update its contents, but do not unnecessarily enable all the attributes again
+                    vbo.bind();
+                    //set up vertex attribute pointers for this specific VBO
+                    int offset = 0;
+                    for(VertexAttribute attribute : attributes){
+                        int location = shader.getAttributeLocation(attribute.alias);
+                        int aoffset = offset;
+                        offset += attribute.size;
+                        if(location < 0) continue;
 
-                        //bindi the buffer and update its contents, but do not unnecessarily enable all the attributes again
-                        vbo.bind();
-                        //set up vertex attribute pointers for this specific VBO
-                        int offset = 0;
-                        for(VertexAttribute attribute : attributes){
-                            int location = shader.getAttributeLocation(attribute.alias);
-                            int aoffset = offset;
-                            offset += attribute.size;
-                            if(location < 0) continue;
-
-                            shader.setVertexAttribute(location, attribute.components, attribute.type, attribute.normalized, vertexSize * 4, aoffset);
-                        }
-
-                        ibo.bind();
-
-                        mesh.vertices.render(mesh.indices, Gl.triangles, 0, mesh.getNumIndices());
-                    }else{
-                        throw new ArcRuntimeException("Non-VBO meshes are not supported for caches.");
+                        Gl.vertexAttribPointer(location, attribute.components, attribute.type, attribute.normalized, vertexSize * 4, aoffset);
                     }
+
+                    ibo.bind();
+
+                    mesh.vertices.render(mesh.indices, Gl.triangles, 0, mesh.getNumIndices());
+                }else if(mesh != null){
+                    //TODO this should be the default branch!
+                    mesh.bind(shader);
+                    mesh.render(shader, Gl.triangles);
                 }
             }
         }
@@ -345,8 +350,8 @@ public class FloorRenderer{
         int vertCount = floats / vertexSize, indCount = vertCount * 6/4;
 
         Mesh mesh = new Mesh(true, vertCount, indCount, attributes);
-        mesh.setAutoBind(false);
         mesh.setVertices(vertices, 0, vidx);
+        mesh.setAutoBind(false);
         mesh.setIndices(indices, 0, indCount);
 
         return mesh;
@@ -372,8 +377,6 @@ public class FloorRenderer{
 
         texture = Core.atlas.find("grass1").texture;
         error = Core.atlas.find("env-error");
-        //not supported due to internal access
-        Mesh.useVAO = false;
 
         //pre-cache chunks
         if(!dynamic){
