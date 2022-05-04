@@ -61,18 +61,6 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         }
     }
 
-    @Override
-    @Replace
-    public boolean targetable(){
-        return type.targetable || (type.vulnerableWithPayloads && hasPayload());
-    }
-
-    @Override
-    @Replace
-    public boolean hittable(){
-        return type.hittable || (type.vulnerableWithPayloads && hasPayload());
-    }
-
     float payloadUsed(){
         return payloads.sumf(p -> p.size() * p.size());
     }

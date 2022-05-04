@@ -1284,7 +1284,7 @@ public class Blocks{
         }};
 
         carbideCrucible = new HeatCrafter("carbide-crucible"){{
-            requirements(Category.crafting, with(Items.tungsten, 90, Items.thorium, 70, Items.oxide, 50));
+            requirements(Category.crafting, with(Items.tungsten, 110, Items.thorium, 70, Items.oxide, 60));
             craftEffect = Fx.none;
             outputItem = new ItemStack(Items.carbide, 1);
             craftTime = 60f * 3f;
@@ -2585,9 +2585,9 @@ public class Blocks{
         //TODO awful name
         largePlasmaBore = new BeamDrill("large-plasma-bore"){{
             //TODO requirements
-            requirements(Category.production, with(Items.silicon, 100, Items.oxide, 30, Items.beryllium, 100, Items.tungsten, 70));
+            requirements(Category.production, with(Items.silicon, 100, Items.oxide, 25, Items.beryllium, 100, Items.tungsten, 70));
             consumePower(0.8f);
-            drillTime = 120f;
+            drillTime = 110f;
             tier = 5;
             size = 3;
             range = 6;
@@ -2596,7 +2596,7 @@ public class Blocks{
             itemCapacity = 20;
 
             consumeLiquid(Liquids.hydrogen, 0.5f / 60f);
-            consumeLiquid(Liquids.nitrogen, 4f / 60f).boost();
+            consumeLiquid(Liquids.nitrogen, 3f / 60f).boost();
         }};
 
         //TODO should be crusher or something
@@ -3757,7 +3757,7 @@ public class Blocks{
             requirements(Category.turret, with(Items.beryllium, 150, Items.silicon, 200, Items.graphite, 200, Items.tungsten, 50));
 
             ammo(
-            Items.graphite, new BasicBulletType(8f, 40){{
+            Items.graphite, new BasicBulletType(8f, 44){{
                 knockback = 4f;
                 width = 25f;
                 hitSize = 7f;

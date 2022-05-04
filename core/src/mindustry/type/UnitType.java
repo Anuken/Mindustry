@@ -452,6 +452,14 @@ public class UnitType extends UnlockableContent{
         return weapons.size > 0;
     }
 
+    public boolean targetable(Unit unit, Team targeter){
+        return targetable || (vulnerableWithPayloads && unit instanceof Payloadc p && p.hasPayload());
+    }
+
+    public boolean hittable(Unit unit){
+        return hittable || (vulnerableWithPayloads && unit instanceof Payloadc p && p.hasPayload());
+    }
+
     public void update(Unit unit){
 
     }

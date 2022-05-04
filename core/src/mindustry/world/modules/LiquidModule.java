@@ -22,7 +22,6 @@ public class LiquidModule extends BlockModule{
 
     private float[] liquids = new float[content.liquids().size];
     private Liquid current = content.liquid(0);
-    private float total;
 
     private @Nullable WindowedMean[] flow;
 
@@ -86,7 +85,6 @@ public class LiquidModule extends BlockModule{
     public void reset(Liquid liquid, float amount){
         Arrays.fill(liquids, 0f);
         liquids[liquid.id] = amount;
-        total = amount;
         current = liquid;
     }
 
@@ -99,13 +97,11 @@ public class LiquidModule extends BlockModule{
     }
 
     public void clear(){
-        total = 0;
         Arrays.fill(liquids, 0);
     }
 
     public void add(Liquid liquid, float amount){
         liquids[liquid.id] += amount;
-        total += amount;
         current = liquid;
 
         if(flow != null){
@@ -162,7 +158,6 @@ public class LiquidModule extends BlockModule{
     @Override
     public void read(Reads read, boolean legacy){
         Arrays.fill(liquids, 0);
-        total = 0f;
         int count = legacy ? read.ub() : read.s();
 
         for(int j = 0; j < count; j++){
@@ -173,7 +168,6 @@ public class LiquidModule extends BlockModule{
             if(amount > 0){
                 current = liq;
             }
-            this.total += amount;
         }
     }
 
