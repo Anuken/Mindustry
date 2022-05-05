@@ -97,12 +97,13 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
     public void draw(Cons<T> cons){
         Core.camera.bounds(viewport);
 
-        each(e -> {
-            Drawc draw = (Drawc)e;
-            if(viewport.overlaps(draw.x() - draw.clipSize()/2f, draw.y() - draw.clipSize()/2f, draw.clipSize(), draw.clipSize())){
-                cons.get(e);
+        for(index = 0; index < array.size; index++){
+            Drawc draw = (Drawc)array.items[index];
+            float clip = draw.clipSize();
+            if(viewport.overlaps(draw.x() - clip/2f, draw.y() - clip/2f, clip, clip)){
+                cons.get((T)draw);
             }
-        });
+        }
     }
 
     public boolean useTree(){

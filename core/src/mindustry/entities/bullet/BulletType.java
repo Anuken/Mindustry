@@ -25,7 +25,6 @@ import mindustry.world.blocks.defense.Wall.*;
 
 import static mindustry.Vars.*;
 
-//TODO document
 public class BulletType extends Content implements Cloneable{
     /** Lifetime in ticks. */
     public float lifetime = 40f;
@@ -144,6 +143,11 @@ public class BulletType extends Content implements Cloneable{
     public boolean pierceArmor = false;
     /** Whether status and despawnHit should automatically be set. */
     public boolean setDefaults = true;
+    /** Amount of shaking produced when this bullet hits something or despawns. */
+    public float hitShake = 0f, despawnShake = 0f;
+
+    /** Bullet type that is created when this bullet expires. */
+    public @Nullable BulletType fragBullet = null;
     /** Degree spread range of fragmentation bullets. */
     public float fragRandomSpread = 360f;
     /** Uniform spread between each frag bullet in degrees. */
@@ -152,69 +156,115 @@ public class BulletType extends Content implements Cloneable{
     public float fragAngle = 0f;
     /** Number of fragmentation bullets created. */
     public int fragBullets = 9;
+    /** Random range of frag velocity as a multiplier. */
+    public float fragVelocityMin = 0.2f, fragVelocityMax = 1f;
+    /** Random range of frag lifetime as a multiplier. */
+    public float fragLifeMin = 1f, fragLifeMax = 1f;
 
-    public float fragVelocityMin = 0.2f, fragVelocityMax = 1f, fragLifeMin = 1f, fragLifeMax = 1f;
-    public @Nullable BulletType fragBullet = null;
-    public float bulletInterval = 20f;
-    public int intervalBullets = 1;
+    /** Bullet that is created at a fixed interval. */
     public @Nullable BulletType intervalBullet;
+    /** Interval, in ticks, between which bullet spawn. */
+    public float bulletInterval = 20f;
+    /** Number of bullet spawned per interval. */
+    public int intervalBullets = 1;
+
+    /** Color used for hit/despawn effects. */
     public Color hitColor = Color.white;
+    /** Color used for block heal effects. */
     public Color healColor = Pal.heal;
+    /** Effect emitted upon blocks that are healed. */
     public Effect healEffect = Fx.healBlockFull;
     /** Bullets spawned when this bullet is created. Rarely necessary, used for visuals. */
     public Seq<BulletType> spawnBullets = new Seq<>();
     /** Unit spawned _instead of_ this bullet. Useful for missiles. */
     public @Nullable UnitType spawnUnit;
 
+    /** Color of trail behind bullet. */
     public Color trailColor = Pal.missileYellowBack;
+    /** Chance of trail effect spawning on bullet per tick. */
     public float trailChance = -0.0001f;
+    /** Uniform interval in which trail effect is spawned. */
     public float trailInterval = 0f;
+    /** Trail effect that is spawned. */
     public Effect trailEffect = Fx.missileTrail;
+    /** Rotation/size parameter that is passed to trail. Usually, this controls size. */
     public float trailParam =  2f;
+    /** Whether the parameter passed to the trail is the bullet rotation, instead of a flat value. */
     public boolean trailRotation = false;
+    /** Interpolation for trail width as function of bullet lifetime */
     public Interp trailInterp = Interp.one;
-    /** Any value <= 0 disables the trail. */
+    /** Length of trail quads. Any value <= 0 disables the trail. */
     public int trailLength = -1;
+    /** Width of trail, if trailLength > 0 */
     public float trailWidth = 2f;
+    /** If trailSinMag > 0, these values are applied as a sine curve to trail width. */
     public float trailSinMag = 0f, trailSinScl = 3f;
 
     /** Use a negative value to disable splash damage. */
     public float splashDamageRadius = -1f;
 
+    /** Amount of fires attempted around bullet. */
     public int incendAmount = 0;
+    /** Spread of fires around bullet. */
     public float incendSpread = 8f;
+    /** Chance of fire being created. */
     public float incendChance = 1f;
+
+    /** Power of bullet ability. Usually a number between 0 and 1; try 0.1 as a starting point. */
     public float homingPower = 0f;
+    /** Range of homing effect around bullet. */
     public float homingRange = 50f;
     /** Use a negative value to disable homing delay. */
     public float homingDelay = -1f;
 
-    public float suppressionRange = -1f, suppressionDuration = 60f * 8f, suppressionEffectChance = 50f;
+    /** Range of healing bock suppression effect. */
+    public float suppressionRange = -1f;
+    /** Duration of healing block suppression effect. */
+    public float suppressionDuration = 60f * 8f;
+    /** Chance of suppression effect occurring on block, scaled down by number of blocks. */
+    public float suppressionEffectChance = 50f;
 
+    /** Color of lightning created by bullet. */
     public Color lightningColor = Pal.surge;
+    /** Number of separate lightning "roots". */
     public int lightning;
-    public int lightningLength = 5, lightningLengthRand = 0;
+    /** Length of each lightning strand. */
+    public int lightningLength = 5;
+    /** Extra random length added onto base length of lightning. */
+    public int lightningLengthRand = 0;
     /** Use a negative value to use default bullet damage. */
     public float lightningDamage = -1;
+    /** Spread of lightning, relative to bullet rotation. */
     public float lightningCone = 360f;
+    /** Offset of lightning relative to bullet rotation. */
     public float lightningAngle = 0f;
     /** The bullet created at lightning points. */
     public @Nullable BulletType lightningType = null;
 
+    /** Scale of bullet weave pattern. Higher -> less vibration. */
     public float weaveScale = 1f;
+    /** Intensity of bullet weaving. Note that this may make bullets inaccurate. */
     public float weaveMag = 0f;
+    /** If true, the bullet weave will randomly switch directions on spawn. */
     public boolean weaveRandom = true;
-    public float hitShake = 0f, despawnShake = 0f;
 
+    /** Number of individual puddles created. */
     public int puddles;
+    /** Range of puddles around bullet position. */
     public float puddleRange;
+    /** Liquid count of each puddle created. */
     public float puddleAmount = 5f;
+    /** Liquid that puddles created are made of. */
     public Liquid puddleLiquid = Liquids.water;
 
+    /** Whether to display the ammo multiplayer for this bullet type in its stats. */
     public boolean displayAmmoMultiplier = true;
 
+    /** Radius of light emitted by this bullet; <0 to use defaults. */
     public float lightRadius = -1f;
+    /** Opacity of light color. */
     public float lightOpacity = 0.3f;
+    /** Color of light emitted by this bullet. */
     public Color lightColor = Pal.powerLight;
 
     public BulletType(float speed, float damage){

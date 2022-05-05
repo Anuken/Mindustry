@@ -45,16 +45,22 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean hasLiquids;
     /** If true, buildings have a PowerModule. */
     public boolean hasPower;
-
+    /** Flag for determining whether this block outputs liquid somewhere; used for connections. */
     public boolean outputsLiquid = false;
+    /** Used by certain power blocks (nodes) to flag as non-consuming of power. True by default, even if this block has no power. */
     public boolean consumesPower = true;
+    /** If true, this block is a generator that can produce power. */
     public boolean outputsPower = false;
+    /** If true, this block can conduct power like a cable. */
     public boolean conductivePower = false;
+    /** If true, this block can output payloads; affects blending. */
     public boolean outputsPayload = false;
+    /** If true, payloads will attempt to move into this block. */
     public boolean acceptsPayload = false;
+    /** Visual flag use for blending of certain transportation blocks. */
     public boolean acceptsItems = false;
+    /** If true, all item capacities of this block are separate instead of pooled as one number. */
     public boolean separateItemCapacity = false;
-
     /** maximum items this block can carry (usually, this is per-type of item) */
     public int itemCapacity = 10;
     /** maximum total liquids this block can carry if hasLiquids = true */
