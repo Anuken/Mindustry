@@ -30,6 +30,7 @@ public class CanvasBlock extends Block{
 
         configurable = true;
         destructible = true;
+        canOverdrive = false;
         solid = true;
 
         config(byte[].class, (CanvasBuild build, byte[] bytes) -> {

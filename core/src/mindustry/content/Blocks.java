@@ -3885,7 +3885,7 @@ public class Blocks{
         }};
 
         titan = new ItemTurret("titan"){{
-            requirements(Category.turret, with(Items.thorium, 300, Items.tungsten, 250, Items.silicon, 300, Items.beryllium, 400));
+            requirements(Category.turret, with(Items.thorium, 300, Items.tungsten, 250, Items.silicon, 300, Items.thorium, 400));
 
             ammo(
             //TODO 1 more ammo type, decide on base type
@@ -4047,6 +4047,8 @@ public class Blocks{
 
             limitRange(-5f);
         }};
+
+        //TODO 3+ more turrets.
 
         //endregion
         //region units
@@ -4661,6 +4663,7 @@ public class Blocks{
         worldProcessor = new LogicBlock("world-processor"){{
             requirements(Category.logic, BuildVisibility.editorOnly, with());
 
+            canOverdrive = false;
             targetable = false;
             instructionsPerTick = 8;
             forceDark = true;

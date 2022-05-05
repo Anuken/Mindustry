@@ -38,6 +38,7 @@ public class LogicDisplay extends Block{
         super(name);
         update = true;
         solid = true;
+        canOverdrive = false;
         group = BlockGroup.logic;
         drawDisabled = false;
         envEnabled = Env.any;
