@@ -103,7 +103,7 @@ public class LoadDialog extends BaseDialog{
 
             any = true;
 
-            TextButton button = new TextButton("", Styles.cleart);
+            TextButton button = new TextButton("", Styles.flatt);
             button.getLabel().remove();
             button.clearChildren();
 

@@ -63,7 +63,7 @@ public class MapGenerateDialog extends BaseDialog{
         shown(this::setup);
         addCloseListener();
 
-        var style = Styles.cleart;
+        var style = Styles.flatt;
 
         buttons.defaults().size(180f, 64f).pad(2f);
         buttons.button("@back", Icon.left, this::hide);
@@ -334,7 +334,7 @@ public class MapGenerateDialog extends BaseDialog{
 
                 if(filter.isPost() && applied) continue;
 
-                p.button((icon == '\0' ? "" : icon + " ") + filter.name(), Styles.cleart, () -> {
+                p.button((icon == '\0' ? "" : icon + " ") + filter.name(), Styles.flatt, () -> {
                     filter.randomize();
                     filters.add(filter);
                     rebuildFilters();
@@ -344,7 +344,7 @@ public class MapGenerateDialog extends BaseDialog{
                 if(++i % 3 == 0) p.row();
             }
 
-            p.button(Iconc.refresh + " " + Core.bundle.get("filter.defaultores"), Styles.cleart, () -> {
+            p.button(Iconc.refresh + " " + Core.bundle.get("filter.defaultores"), Styles.flatt, () -> {
                 maps.addDefaultOres(filters);
                 rebuildFilters();
                 update();

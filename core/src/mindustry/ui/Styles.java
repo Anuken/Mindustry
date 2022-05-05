@@ -28,8 +28,23 @@ public class Styles{
 
     public static ButtonStyle defaultb, underlineb;
 
-    public static TextButtonStyle defaultt, nodet, cleart, nonet, clearPartialt, clearTogglet, logicTogglet, clearToggleMenut, togglet, transt, fullTogglet, squareTogglet, logict;
+    /** Default text button style - gray corners at 45 degrees. */
+    public static TextButtonStyle defaultt,
+    /** Flat, square, opaque. */
+    flatt,
+    /** No background whatsoever, only text. */
+    nonet,
+    clearPartialt,
+    clearTogglet,
+    logicTogglet,
+    clearToggleMenut,
+    togglet, transt,
+    fullTogglet,
+    squareTogglet,
+    logict;
+
     public static ImageButtonStyle defaulti, nodei, emptyi, emptytogglei, selecti, logici, geni, colori, accenti, cleari, clearFulli, clearPartiali, clearTogglei, clearTransi, clearToggleTransi, clearTogglePartiali;
+
     public static ScrollPaneStyle defaultPane, horizontalPane, smallPane, noBarPane;
     public static SliderStyle defaultSlider;
     public static LabelStyle defaultLabel, outlineLabel, techLabel;
@@ -75,14 +90,6 @@ public class Styles{
             down = buttonDown;
             up = button;
         }};
-        nodet = new TextButtonStyle(){{
-            disabled = button;
-            font = Fonts.def;
-            fontColor = Color.white;
-            disabledFontColor = Color.gray;
-            up = buttonOver;
-            over = buttonDown;
-        }};
         nonet = new TextButtonStyle(){{
             font = Fonts.outline;
             fontColor = Color.lightGray;
@@ -90,7 +97,7 @@ public class Styles{
             disabledFontColor = Color.gray;
             up = none;
         }};
-        cleart = new TextButtonStyle(){{
+        flatt = new TextButtonStyle(){{
             over = flatOver;
             font = Fonts.def;
             fontColor = Color.white;

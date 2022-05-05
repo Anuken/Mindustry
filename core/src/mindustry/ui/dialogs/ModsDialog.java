@@ -160,7 +160,7 @@ public class ModsDialog extends BaseDialog{
             buttons.button("@mod.import", Icon.add, style, () -> {
                 BaseDialog dialog = new BaseDialog("@mod.import");
 
-                TextButtonStyle bstyle = Styles.cleart;
+                TextButtonStyle bstyle = Styles.flatt;
 
                 dialog.cont.table(Tex.button, t -> {
                     t.defaults().size(300f, 70f);

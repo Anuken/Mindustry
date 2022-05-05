@@ -516,7 +516,7 @@ public class LStatements{
                         //sensors
                         new Table(i -> {
                             for(LAccess sensor : LAccess.senseable){
-                                i.button(sensor.name(), Styles.cleart, () -> {
+                                i.button(sensor.name(), Styles.flatt, () -> {
                                     stype("@" + sensor.name());
                                     hide.run();
                                 }).size(240f, 40f).self(c -> tooltip(c, sensor)).row();

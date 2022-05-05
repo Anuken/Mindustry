@@ -445,7 +445,7 @@ public class CustomRulesDialog extends BaseDialog{
                 for(Weather weather : content.<Weather>getBy(ContentType.weather)){
                     if(weather.hidden) continue;
 
-                    t.button(weather.localizedName, Styles.cleart, () -> {
+                    t.button(weather.localizedName, Styles.flatt, () -> {
                         rules.weather.add(new WeatherEntry(weather));
                         rebuild[0].run();
 

@@ -258,7 +258,7 @@ public class SchematicsDialog extends BaseDialog{
         dialog.cont.pane(p -> {
             p.margin(10f);
             p.table(Tex.button, t -> {
-                TextButtonStyle style = Styles.cleart;
+                TextButtonStyle style = Styles.flatt;
                 t.defaults().size(280f, 60f).left();
                 t.row();
                 t.button("@schematic.copy.import", Icon.copy, style, () -> {
@@ -309,7 +309,7 @@ public class SchematicsDialog extends BaseDialog{
         dialog.cont.pane(p -> {
            p.margin(10f);
            p.table(Tex.button, t -> {
-               TextButtonStyle style = Styles.cleart;
+               TextButtonStyle style = Styles.flatt;
                 t.defaults().size(280f, 60f).left();
                 if(steam && !s.hasSteamID()){
                     t.button("@schematic.shareworkshop", Icon.book, style,

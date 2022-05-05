@@ -11,6 +11,7 @@ import arc.scene.actions.*;
 import arc.scene.event.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
+import arc.scene.ui.TextButton.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
@@ -30,6 +31,7 @@ import mindustry.ui.layout.TreeLayout.*;
 import java.util.*;
 
 import static mindustry.Vars.*;
+import static mindustry.gen.Tex.*;
 
 public class ResearchDialog extends BaseDialog{
     public static boolean debugShowRequirements = false;
@@ -667,7 +669,14 @@ public class ResearchDialog extends BaseDialog{
 
                 if(mobile && locked(node)){
                     b.row();
-                    b.button("@research", Icon.ok, Styles.nodet, () -> spend(node))
+                    b.button("@research", Icon.ok, new TextButtonStyle(){{
+                        disabled = Tex.button;
+                        font = Fonts.def;
+                        fontColor = Color.white;
+                        disabledFontColor = Color.gray;
+                        up = buttonOver;
+                        over = buttonDown;
+                    }}, () -> spend(node))
                     .disabled(i -> !canSpend(node)).growX().height(44f).colspan(3);
                 }
             });

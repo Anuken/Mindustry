@@ -80,7 +80,7 @@ public class WaveInfoDialog extends BaseDialog{
             dialog.addCloseButton();
             dialog.setFillParent(false);
             dialog.cont.table(Tex.button, t -> {
-                var style = Styles.cleart;
+                var style = Styles.flatt;
                 t.defaults().size(210f, 58f);
 
                 t.button("@waves.copy", Icon.copy, style, () -> {

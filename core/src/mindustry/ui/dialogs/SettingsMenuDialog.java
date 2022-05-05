@@ -85,7 +85,7 @@ public class SettingsMenuDialog extends BaseDialog{
 
         dataDialog.cont.table(Tex.button, t -> {
             t.defaults().size(280f, 60f).left();
-            TextButtonStyle style = Styles.cleart;
+            TextButtonStyle style = Styles.flatt;
 
             t.button("@settings.cleardata", Icon.trash, style, () -> ui.showConfirm("@confirm", "@settings.clearall.confirm", () -> {
                 ObjectMap<String, Object> map = new ObjectMap<>();
@@ -248,7 +248,7 @@ public class SettingsMenuDialog extends BaseDialog{
     void rebuildMenu(){
         menu.clearChildren();
 
-        TextButtonStyle style = Styles.cleart;
+        TextButtonStyle style = Styles.flatt;
 
         menu.defaults().size(300f, 60f);
         menu.button("@settings.game", style, () -> visible(0));

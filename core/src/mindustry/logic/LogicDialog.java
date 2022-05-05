@@ -43,7 +43,7 @@ public class LogicDialog extends BaseDialog{
             dialog.cont.pane(p -> {
                 p.margin(10f);
                 p.table(Tex.button, t -> {
-                    TextButtonStyle style = Styles.cleart;
+                    TextButtonStyle style = Styles.flatt;
                     t.defaults().size(280f, 60f).left();
 
                     t.button("@schematic.copy", Icon.copy, style, () -> {
@@ -159,7 +159,7 @@ public class LogicDialog extends BaseDialog{
                     LStatement example = prov.get();
                     if(example instanceof InvalidStatement || example.hidden() || (example.privileged() && !privileged) || (example.nonPrivileged() && privileged)) continue;
 
-                    TextButtonStyle style = new TextButtonStyle(Styles.cleart);
+                    TextButtonStyle style = new TextButtonStyle(Styles.flatt);
                     style.fontColor = example.color();
                     style.font = Fonts.outline;
 
