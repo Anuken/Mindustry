@@ -9,7 +9,7 @@
   },
   {
     "name": "Yeet Hosting",
-    "address": ["omegam.mindustry.me:5004", "omegav.mindustry.me:25575", "omegav.mindustry.me:25588"]
+    "address": ["node2.crewcraft.cc:25568", "node2.crewcraft.cc:25570"]
   },
   {
     "name": "RCM",
@@ -25,7 +25,7 @@
   },
   {
     "name": "C.A.M.S.",
-    "address": ["baseduser.eu.org:6568", "nikochio.ddns.net", "play.thedimas.pp.ua"]
+    "address": ["0.baseduser.eu.org:42000", "nikochio.ddns.net", "play.thedimas.pp.ua"]
   },
   {
     "name": "ECAN",
@@ -61,7 +61,7 @@
   },
   {
     "name": "Korea",
-    "address": ["mindustry.initd.kr"]
+    "address": ["mindustry.initd.kr","mindustry.kr:7100"]
   },
   {
     "name": "Omega",
