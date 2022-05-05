@@ -3736,7 +3736,7 @@ public class UnitTypes{
                 y = 5 / 4f;
                 rotate = true;
                 rotateSpeed = 2f;
-                reload = 60f;
+                reload = 55f;
                 layerOffset = -0.001f;
                 recoil = 1f;
                 rotationLimit = 60f;
@@ -3749,10 +3749,12 @@ public class UnitTypes{
                     keepVelocity = false;
 
                     spawnUnit = new MissileUnitType("quell-missile"){{
-                        speed = 3.8f;
+                        speed = 4.3f;
                         maxRange = 6f;
-                        lifetime = 60f * 1.2f;
+                        lifetime = 60f * 1.6f;
                         outlineColor = Pal.darkOutline;
+                        engineColor = trailColor = Pal.sapBulletBack;
+                        engineLayer = Layer.effect;
                         health = 45;
 
                         weapons.add(new Weapon(){{
@@ -3760,7 +3762,7 @@ public class UnitTypes{
                             mirror = false;
                             reload = 1f;
                             shootOnDeath = true;
-                            bullet = new ExplosionBulletType(100f, 22f){{
+                            bullet = new ExplosionBulletType(110f, 25f){{
                                 shootEffect = Fx.massiveExplosion;
                             }};
                         }});
