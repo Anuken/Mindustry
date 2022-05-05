@@ -40,7 +40,7 @@ public class ItemSelection{
         for(T item : items){
             if(!item.unlockedNow() || (item instanceof Item checkVisible && state.rules.hiddenBuildItems.contains(checkVisible)) || item.isHidden()) continue;
 
-            ImageButton button = cont.button(Tex.whiteui, Styles.clearToggleTransi, 24, () -> {
+            ImageButton button = cont.button(Tex.whiteui, Styles.clearTogglei, 24, () -> {
                 if(closeSelect) control.input.config.hideConfig();
             }).group(group).tooltip(item.localizedName).get();
             button.changed(() -> consumer.get(button.isChecked() ? item : null));

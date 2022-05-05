@@ -480,7 +480,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
                 Cons<EditorTool> addTool = tool -> {
 
-                    ImageButton button = new ImageButton(ui.getIcon(tool.name()), Styles.clearTogglei);
+                    ImageButton button = new ImageButton(ui.getIcon(tool.name()), Styles.squareTogglei);
                     button.clicked(() -> {
                         view.setTool(tool);
                         if(lastTable[0] != null){
@@ -516,7 +516,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                                 table.button(b -> {
                                     b.left();
                                     b.marginLeft(6);
-                                    b.setStyle(Styles.clearTogglet);
+                                    b.setStyle(Styles.flatTogglet);
                                     b.add(Core.bundle.get("toolmode." + name)).left();
                                     b.row();
                                     b.add(Core.bundle.get("toolmode." + name + ".description")).color(Color.lightGray).left();
@@ -556,16 +556,16 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
                 tools.defaults().size(size, size);
 
-                tools.button(Icon.menu, Styles.cleari, menu::show);
+                tools.button(Icon.menu, Styles.flati, menu::show);
 
-                ImageButton grid = tools.button(Icon.grid, Styles.clearTogglei, () -> view.setGrid(!view.isGrid())).get();
+                ImageButton grid = tools.button(Icon.grid, Styles.squareTogglei, () -> view.setGrid(!view.isGrid())).get();
 
                 addTool.get(EditorTool.zoom);
 
                 tools.row();
 
-                ImageButton undo = tools.button(Icon.undo, Styles.cleari, editor::undo).get();
-                ImageButton redo = tools.button(Icon.redo, Styles.cleari, editor::redo).get();
+                ImageButton undo = tools.button(Icon.undo, Styles.flati, editor::undo).get();
+                ImageButton redo = tools.button(Icon.redo, Styles.flati, editor::redo).get();
 
                 addTool.get(EditorTool.pick);
 
@@ -587,7 +587,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 addTool.get(EditorTool.fill);
                 addTool.get(EditorTool.spray);
 
-                ImageButton rotate = tools.button(Icon.right, Styles.cleari, () -> editor.rotation = (editor.rotation + 1) % 4).get();
+                ImageButton rotate = tools.button(Icon.right, Styles.flati, () -> editor.rotation = (editor.rotation + 1) % 4).get();
                 rotate.getImage().update(() -> {
                     rotate.getImage().setRotation(editor.rotation * 90);
                     rotate.getImage().setOrigin(Align.center);
@@ -605,7 +605,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 int i = 0;
 
                 for(Team team : Team.baseTeams){
-                    ImageButton button = new ImageButton(Tex.whiteui, Styles.clearTogglePartiali);
+                    ImageButton button = new ImageButton(Tex.whiteui, Styles.clearNoneTogglei);
                     button.margin(4f);
                     button.getImageCell().grow();
                     button.getStyle().imageUpColor = team.color;
@@ -788,7 +788,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                     || (!searchText.isEmpty() && !block.localizedName.toLowerCase().contains(searchText.toLowerCase()))
             ) continue;
 
-            ImageButton button = new ImageButton(Tex.whiteui, Styles.clearTogglei);
+            ImageButton button = new ImageButton(Tex.whiteui, Styles.squareTogglei);
             button.getStyle().imageUp = new TextureRegionDrawable(region);
             button.clicked(() -> editor.drawBlock = block);
             button.resizeImage(8 * 4f);

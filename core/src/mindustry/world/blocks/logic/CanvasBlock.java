@@ -131,7 +131,7 @@ public class CanvasBlock extends Block{
 
         @Override
         public void buildConfiguration(Table table){
-            table.button(Icon.pencil, Styles.clearTransi, () -> {
+            table.button(Icon.pencil, Styles.cleari, () -> {
                 Dialog dialog = new Dialog();
 
                 Pixmap pix = makePixmap();
@@ -197,7 +197,7 @@ public class CanvasBlock extends Block{
                     for(int i = 0; i < palette.length; i++){
                         int fi = i;
 
-                        var button = p.button(Tex.whiteui, Styles.clearTogglei, 30, () -> {
+                        var button = p.button(Tex.whiteui, Styles.squareTogglei, 30, () -> {
                             curColor[0] = palette[fi];
                         }).size(44).checked(b -> curColor[0] == palette[fi]).get();
                         button.getStyle().imageUpColor = new Color(palette[i]);

@@ -59,7 +59,7 @@ public class ModsDialog extends BaseDialog{
                 searchtxt = res;
                 rebuildBrowser();
             }).growX().get();
-            table.button(Icon.list, Styles.clearPartiali, 32f, () -> {
+            table.button(Icon.list, Styles.clearNonei, 32f, () -> {
                 orderDate = !orderDate;
                 rebuildBrowser();
             }).update(b -> b.getStyle().imageUp = (orderDate ? Icon.list : Icon.star)).size(40f).get()
@@ -154,7 +154,7 @@ public class ModsDialog extends BaseDialog{
         cont.table(buttons -> {
             buttons.left().defaults().growX().height(60f).uniformX();
 
-            TextButtonStyle style = Styles.clearPartialt;
+            TextButtonStyle style = Styles.flatBordert;
             float margin = 12f;
 
             buttons.button("@mod.import", Icon.add, style, () -> {
@@ -276,12 +276,12 @@ public class ModsDialog extends BaseDialog{
 
                             t.table(right -> {
                                 right.right();
-                                right.button(item.enabled() ? Icon.downOpen : Icon.upOpen, Styles.clearPartiali, () -> {
+                                right.button(item.enabled() ? Icon.downOpen : Icon.upOpen, Styles.clearNonei, () -> {
                                     mods.setEnabled(item, !item.enabled());
                                     setup();
                                 }).size(50f).disabled(!item.isSupported());
 
-                                right.button(item.hasSteamID() ? Icon.link : Icon.trash, Styles.clearPartiali, () -> {
+                                right.button(item.hasSteamID() ? Icon.link : Icon.trash, Styles.clearNonei, () -> {
                                     if(!item.hasSteamID()){
                                         ui.showConfirm("@confirm", "@mod.remove.confirm", () -> {
                                             mods.removeMod(item);
@@ -294,12 +294,12 @@ public class ModsDialog extends BaseDialog{
 
                                 if(steam && !item.hasSteamID()){
                                     right.row();
-                                    right.button(Icon.export, Styles.clearPartiali, () -> {
+                                    right.button(Icon.export, Styles.clearNonei, () -> {
                                         platform.publish(item);
                                     }).size(50f);
                                 }
                             }).growX().right().padRight(-8f).padTop(-8f);
-                        }, Styles.clearPartialt, () -> showMod(item)).size(w, h).growX().pad(4f);
+                        }, Styles.flatBordert, () -> showMod(item)).size(w, h).growX().pad(4f);
                         pane[0].row();
                     }
                 }
@@ -382,7 +382,7 @@ public class ModsDialog extends BaseDialog{
                 d.cont.pane(cs -> {
                     int i = 0;
                     for(UnlockableContent c : all){
-                        cs.button(new TextureRegionDrawable(c.uiIcon), Styles.cleari, iconMed, () -> {
+                        cs.button(new TextureRegionDrawable(c.uiIcon), Styles.flati, iconMed, () -> {
                             ui.content.show(c);
                         }).size(50f).with(im -> {
                             var click = im.getClickListener();
@@ -482,7 +482,7 @@ public class ModsDialog extends BaseDialog{
                     "\n" + Core.bundle.format("mod.requiresversion", mod.minGameVersion)))
                     .width(358f).wrap().grow().pad(4f, 2f, 4f, 6f).top().left().labelAlign(Align.topLeft);
 
-                }, Styles.clearPartialt, () -> {
+                }, Styles.flatBordert, () -> {
                     var sel = new BaseDialog(mod.name);
                     sel.cont.pane(p -> p.add(mod.description + "\n\n[accent]" + Core.bundle.get("editor.author") + "[lightgray] " + mod.author)
                         .width(mobile ? 400f : 500f).wrap().pad(4f).labelAlign(Align.center, Align.left)).grow();

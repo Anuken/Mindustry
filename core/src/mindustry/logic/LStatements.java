@@ -491,7 +491,7 @@ public class LStatements{
                             int c = 0;
                             for(Item item : Vars.content.items()){
                                 if(!item.unlockedNow()) continue;
-                                i.button(new TextureRegionDrawable(item.uiIcon), Styles.cleari, iconSmall, () -> {
+                                i.button(new TextureRegionDrawable(item.uiIcon), Styles.flati, iconSmall, () -> {
                                     stype("@" + item.name);
                                     hide.run();
                                 }).size(40f);
@@ -505,7 +505,7 @@ public class LStatements{
                             int c = 0;
                             for(Liquid item : Vars.content.liquids()){
                                 if(!item.unlockedNow()) continue;
-                                i.button(new TextureRegionDrawable(item.uiIcon), Styles.cleari, iconSmall, () -> {
+                                i.button(new TextureRegionDrawable(item.uiIcon), Styles.flati, iconSmall, () -> {
                                     stype("@" + item.name);
                                     hide.run();
                                 }).size(40f);
@@ -531,7 +531,7 @@ public class LStatements{
                     for(int i = 0; i < tables.length; i++){
                         int fi = i;
 
-                        t.button(icons[i], Styles.clearTogglei, () -> {
+                        t.button(icons[i], Styles.squareTogglei, () -> {
                             selected = fi;
 
                             stack.clearChildren();
@@ -870,7 +870,7 @@ public class LStatements{
                         int c = 0;
                         for(UnitType item : Vars.content.units()){
                             if(!item.unlockedNow() || item.isHidden() || !item.logicControllable) continue;
-                            i.button(new TextureRegionDrawable(item.uiIcon), Styles.cleari, iconSmall, () -> {
+                            i.button(new TextureRegionDrawable(item.uiIcon), Styles.flati, iconSmall, () -> {
                                 type = "@" + item.name;
                                 field.setText(type);
                                 hide.run();
@@ -1033,7 +1033,7 @@ public class LStatements{
                                     int c = 0;
                                     for(Item item : Vars.content.items()){
                                         if(!item.unlockedNow()) continue;
-                                        i.button(new TextureRegionDrawable(item.uiIcon), Styles.cleari, iconSmall, () -> {
+                                        i.button(new TextureRegionDrawable(item.uiIcon), Styles.flati, iconSmall, () -> {
                                             ore = "@" + item.name;
                                             rebuild(table);
                                             hide.run();

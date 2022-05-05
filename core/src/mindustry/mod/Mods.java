@@ -561,7 +561,7 @@ public class Mods implements Loadable{
                             d.left().marginLeft(15f);
                             for(Content c : m.erroredContent){
                                 d.add(c.minfo.sourceFile.nameWithoutExtension()).left().padRight(10);
-                                d.button("@details", Icon.downOpen, Styles.transt, () -> {
+                                d.button("@details", Icon.downOpen, Styles.cleart, () -> {
                                     new Dialog(""){{
                                         setFillParent(true);
                                         cont.pane(e -> e.add(c.minfo.error).wrap().grow().labelAlign(Align.center, Align.left)).grow();

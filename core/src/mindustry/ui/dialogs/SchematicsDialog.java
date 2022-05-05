@@ -144,7 +144,7 @@ public class SchematicsDialog extends BaseDialog{
                             buttons.left();
                             buttons.defaults().size(50f);
 
-                            ImageButtonStyle style = Styles.clearPartiali;
+                            ImageButtonStyle style = Styles.clearNonei;
 
                             buttons.button(Icon.info, style, () -> {
                                 showInfo(s);
@@ -231,7 +231,7 @@ public class SchematicsDialog extends BaseDialog{
                                 hide();
                             }
                         }
-                    }).pad(4).style(Styles.cleari).get();
+                    }).pad(4).style(Styles.flati).get();
 
                     sel[0].getStyle().up = Tex.pane;
 
@@ -419,7 +419,7 @@ public class SchematicsDialog extends BaseDialog{
                         int i = 0;
                         for(UnlockableContent u : content.getBy(ctype).<UnlockableContent>as()){
                             if(!u.isHidden() && u.unlockedNow() && u.hasEmoji() && !tags.contains(u.emoji())){
-                                t.button(new TextureRegionDrawable(u.uiIcon), Styles.cleari, iconMed, () -> {
+                                t.button(new TextureRegionDrawable(u.uiIcon), Styles.flati, iconMed, () -> {
                                     String out = u.emoji() + "";
 
                                     tags.add(out);

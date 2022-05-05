@@ -166,7 +166,7 @@ public class LaunchPad extends Block{
                 return;
             }
 
-            table.button(Icon.upOpen, Styles.clearTransi, () -> {
+            table.button(Icon.upOpen, Styles.cleari, () -> {
                 ui.planet.showSelect(state.rules.sector, other -> {
                     if(state.isCampaign()){
                         state.rules.sector.info.destination = other;

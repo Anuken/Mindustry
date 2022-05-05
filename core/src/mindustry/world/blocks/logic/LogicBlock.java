@@ -565,7 +565,7 @@ public class LogicBlock extends Block{
                 return;
             }
 
-            table.button(Icon.pencil, Styles.clearTransi, () -> {
+            table.button(Icon.pencil, Styles.cleari, () -> {
                 ui.logic.show(code, executor, privileged, code -> configure(compress(code, relativeConnections())));
             }).size(40);
         }

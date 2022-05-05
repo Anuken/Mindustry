@@ -29,9 +29,9 @@ public class HostDialog extends BaseDialog{
                 ui.listfrag.rebuild();
             }).grow().pad(8).get().setMaxLength(40);
 
-            ImageButton button = t.button(Tex.whiteui, Styles.clearFulli, 40, () -> {
+            ImageButton button = t.button(Tex.whiteui, Styles.squarei, 40, () -> {
                 new PaletteDialog().show(color -> {
-                    player.color().set(color);
+                    player.color.set(color);
                     Core.settings.put("color-0", color.rgba());
                 });
             }).size(54f).get();

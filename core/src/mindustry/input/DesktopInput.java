@@ -457,19 +457,19 @@ public class DesktopInput extends InputHandler{
         table.row();
         table.left().margin(0f).defaults().size(48f).left();
 
-        table.button(Icon.paste, Styles.clearPartiali, () -> {
+        table.button(Icon.paste, Styles.clearNonei, () -> {
             ui.schematics.show();
         }).tooltip("@schematics");
 
-        table.button(Icon.book, Styles.clearPartiali, () -> {
+        table.button(Icon.book, Styles.clearNonei, () -> {
             ui.database.show();
         }).tooltip("@database");
 
-        table.button(Icon.tree, Styles.clearPartiali, () -> {
+        table.button(Icon.tree, Styles.clearNonei, () -> {
             ui.research.show();
         }).visible(() -> state.isCampaign()).tooltip("@research");
 
-        table.button(Icon.map, Styles.clearPartiali, () -> {
+        table.button(Icon.map, Styles.clearNonei, () -> {
             ui.planet.show();
         }).visible(() -> state.isCampaign()).tooltip("@planetmap");
     }

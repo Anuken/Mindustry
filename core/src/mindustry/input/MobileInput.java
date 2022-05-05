@@ -189,18 +189,18 @@ public class MobileInput extends InputHandler implements GestureListener{
         table.row();
         table.left().margin(0f).defaults().size(48f);
 
-        table.button(Icon.hammer, Styles.clearTogglePartiali, () -> {
+        table.button(Icon.hammer, Styles.clearNoneTogglei, () -> {
             mode = mode == breaking ? block == null ? none : placing : breaking;
             lastBlock = block;
         }).update(l -> l.setChecked(mode == breaking)).name("breakmode");
 
         //diagonal swap button
-        table.button(Icon.diagonal, Styles.clearTogglePartiali, () -> {
+        table.button(Icon.diagonal, Styles.clearNoneTogglei, () -> {
             Core.settings.put("swapdiagonal", !Core.settings.getBool("swapdiagonal"));
         }).update(l -> l.setChecked(Core.settings.getBool("swapdiagonal")));
 
         //rotate button
-        table.button(Icon.right, Styles.clearTogglePartiali, () -> {
+        table.button(Icon.right, Styles.clearNoneTogglei, () -> {
             if(block != null && block.rotate){
                 rotation = Mathf.mod(rotation + 1, 4);
             }else{
@@ -219,7 +219,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         });
 
         //confirm button
-        table.button(Icon.ok, Styles.clearPartiali, () -> {
+        table.button(Icon.ok, Styles.clearNonei, () -> {
             for(BuildPlan plan : selectPlans){
                 Tile tile = plan.tile();
 
@@ -273,7 +273,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             t.table(Tex.pane, b -> {
                 b.defaults().size(50f);
 
-                ImageButtonStyle style = Styles.clearPartiali;
+                ImageButtonStyle style = Styles.clearNonei;
 
                 b.button(Icon.save, style, this::showSchematicSave).disabled(f -> lastSchematic == null || lastSchematic.file != null);
                 b.button(Icon.cancel, style, () -> {

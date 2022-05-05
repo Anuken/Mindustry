@@ -452,7 +452,9 @@ public class LCanvas extends Table{
         public JumpCurve curve;
 
         public JumpButton(Prov<StatementElem> getter, Cons<StatementElem> setter){
-            super(Tex.logicNode, Styles.colori);
+            super(Tex.logicNode, new ImageButtonStyle(){{
+                imageUpColor = Color.white;
+            }});
 
             to = getter;
             addListener(listener = new ClickListener());

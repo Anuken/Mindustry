@@ -70,7 +70,7 @@ public class ResearchDialog extends BaseDialog{
                             if(node.requiresUnlock && !node.content.unlocked() && node != getPrefRoot()) continue;
 
                             //TODO toggle
-                            in.button(node.localizedName(), node.icon(), Styles.clearTogglet, iconMed, () -> {
+                            in.button(node.localizedName(), node.icon(), Styles.flatTogglet, iconMed, () -> {
                                 if(node == lastNode){
                                     return;
                                 }
@@ -581,7 +581,7 @@ public class ResearchDialog extends BaseDialog{
                 b.margin(0).left().defaults().left();
 
                 if(selectable && (node.content.description != null || node.content.stats.toMap().size > 0)){
-                    b.button(Icon.info, Styles.cleari, () -> ui.content.show(node.content)).growY().width(50f);
+                    b.button(Icon.info, Styles.flati, () -> ui.content.show(node.content)).growY().width(50f);
                 }
                 b.add().grow();
                 b.table(desc -> {

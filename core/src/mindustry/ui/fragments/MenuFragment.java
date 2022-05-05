@@ -226,7 +226,7 @@ public class MenuFragment{
         for(Buttoni b : buttons){
             if(b == null) continue;
             Button[] out = {null};
-            out[0] = t.button(b.text, b.icon, Styles.clearToggleMenut, () -> {
+            out[0] = t.button(b.text, b.icon, Styles.flatToggleMenut, () -> {
                 if(currentMenu == out[0]){
                     currentMenu = null;
                     fadeOutMenu();

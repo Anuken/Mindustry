@@ -343,7 +343,7 @@ public class PlacementFragment{
                                 .left().width(190f).padLeft(5);
                                 header.add().growX();
                                 if(unlocked(displayBlock)){
-                                    header.button("?", Styles.clearPartialt, () -> {
+                                    header.button("?", Styles.flatBordert, () -> {
                                         ui.content.show(displayBlock);
                                         Events.fire(new BlockInfoEvent());
                                     }).size(8 * 5).padTop(-5).padRight(-5).right().grow().name("blockinfo");
@@ -518,7 +518,7 @@ public class PlacementFragment{
                                 needsAssign = false;
                             }
 
-                            categories.button(ui.getIcon(cat.name()), Styles.clearToggleTransi, () -> {
+                            categories.button(ui.getIcon(cat.name()), Styles.clearTogglei, () -> {
                                 currentCategory = cat;
                                 if(control.input.block != null){
                                     control.input.block = getSelectedBlock(currentCategory);

@@ -32,18 +32,57 @@ public class Styles{
     public static TextButtonStyle defaultt,
     /** Flat, square, opaque. */
     flatt,
+    /** Flat, square, toggleable. */
+    flatTogglet,
+    /** Flat, square, gray border.*/
+    flatBordert,
     /** No background whatsoever, only text. */
     nonet,
-    clearPartialt,
-    clearTogglet,
+    /** Similar to flatToggle, but slightly tweaked for logic. */
     logicTogglet,
-    clearToggleMenut,
-    togglet, transt,
+    /** Similar to flatToggle, but with a transparent base background. */
+    flatToggleMenut,
+    /** Toggle variant of default style. */
+    togglet,
+    /** Partially transparent square button. */
+    cleart,
+    /** Similar to flatToggle, but without a darker border. */
     fullTogglet,
+    /** Toggle-able version of flatBorder. */
     squareTogglet,
+    /** Special square button for logic dialogs. */
     logict;
 
-    public static ImageButtonStyle defaulti, nodei, emptyi, emptytogglei, selecti, logici, geni, colori, accenti, cleari, clearFulli, clearPartiali, clearTogglei, clearTransi, clearToggleTransi, clearTogglePartiali;
+    /** Default image button style - gray corners at 45 degrees. */
+    public static ImageButtonStyle defaulti,
+    /** Used for research nodes in the tech tree. */
+    nodei,
+    /** No background, tints the image itself when hovered. */
+    emptyi,
+    /** Toggleable variant of emptyi */
+    emptyTogglei,
+    /** Displays border around image when selected; used in placement fragment. */
+    selecti,
+    /** Pure black version of emptyi, used for logic toolbar. */
+    logici,
+    /** Used for toolbar in map generation filters. */
+    geni,
+    /** Gray, toggleable, no backvround. */
+    grayi,
+    /** Flat, square, black background. */
+    flati,
+    /** Square border. */
+    squarei,
+    /** Square border, toggleable. */
+    squareTogglei,
+    /** No background unless focused, no border. */
+    clearNonei,
+    /** Partially transparent black background. */
+    cleari,
+    /** Toggleable variant of cleari. */
+    clearTogglei,
+    /** clearNone, but toggleable. */
+    clearNoneTogglei;
 
     public static ScrollPaneStyle defaultPane, horizontalPane, smallPane, noBarPane;
     public static SliderStyle defaultSlider;
@@ -113,7 +152,7 @@ public class Styles{
             down = flatOver;
             up = underlineWhite;
         }};
-        clearPartialt = new TextButtonStyle(){{
+        flatBordert = new TextButtonStyle(){{
             down = flatOver;
             up = pane;
             over = flatDownBase;
@@ -121,7 +160,7 @@ public class Styles{
             fontColor = Color.white;
             disabledFontColor = Color.gray;
         }};
-        transt = new TextButtonStyle(){{
+        cleart = new TextButtonStyle(){{
             down = flatDown;
             up = none;
             over = flatOver;
@@ -129,7 +168,7 @@ public class Styles{
             fontColor = Color.white;
             disabledFontColor = Color.gray;
         }};
-        clearTogglet = new TextButtonStyle(){{
+        flatTogglet = new TextButtonStyle(){{
             font = Fonts.def;
             fontColor = Color.white;
             checked = flatDown;
@@ -149,7 +188,7 @@ public class Styles{
             disabled = black;
             disabledFontColor = Color.gray;
         }};
-        clearToggleMenut = new TextButtonStyle(){{
+        flatToggleMenut = new TextButtonStyle(){{
             font = Fonts.def;
             fontColor = Color.white;
             checked = flatDown;
@@ -206,7 +245,7 @@ public class Styles{
             imageOverColor = Color.lightGray;
             imageUpColor = Color.white;
         }};
-        emptytogglei = new ImageButtonStyle(){{
+        emptyTogglei = new ImageButtonStyle(){{
             imageCheckedColor = Color.white;
             imageDownColor = Color.white;
             imageUpColor = Color.gray;
@@ -216,33 +255,27 @@ public class Styles{
             up = none;
         }};
         logici = new ImageButtonStyle(){{
-            //imageDownColor = Pal.accent;
             imageUpColor = Color.black;
         }};
         geni = new ImageButtonStyle(){{
             imageDownColor = Pal.accent;
             imageUpColor = Color.black;
         }};
-        colori = new ImageButtonStyle(){{
-            //imageDownColor = Pal.accent;
-            imageUpColor = Color.white;
-        }};
-        accenti = new ImageButtonStyle(){{
-            //imageDownColor = Pal.accent;
+        grayi = new ImageButtonStyle(){{
             imageUpColor = Color.lightGray;
             imageDownColor = Color.white;
         }};
-        cleari = new ImageButtonStyle(){{
+        flati = new ImageButtonStyle(){{
             down = flatOver;
             up = black;
             over = flatOver;
         }};
-        clearFulli = new ImageButtonStyle(){{
+        squarei = new ImageButtonStyle(){{
             down = whiteui;
             up = pane;
             over = flatDown;
         }};
-        clearPartiali = new ImageButtonStyle(){{
+        clearNonei = new ImageButtonStyle(){{
             down = flatDown;
             up = none;
             over = flatOver;
@@ -250,13 +283,13 @@ public class Styles{
             imageDisabledColor = Color.gray;
             imageUpColor = Color.white;
         }};
-        clearTogglei = new ImageButtonStyle(){{
+        squareTogglei = new ImageButtonStyle(){{
             down = flatDown;
             checked = flatDown;
             up = black;
             over = flatOver;
         }};
-        clearTransi = new ImageButtonStyle(){{
+        cleari = new ImageButtonStyle(){{
             down = flatDown;
             up = black6;
             over = flatOver;
@@ -264,13 +297,13 @@ public class Styles{
             imageDisabledColor = Color.lightGray;
             imageUpColor = Color.white;
         }};
-        clearToggleTransi = new ImageButtonStyle(){{
+        clearTogglei = new ImageButtonStyle(){{
             down = flatDown;
             checked = flatDown;
             up = black6;
             over = flatOver;
         }};
-        clearTogglePartiali = new ImageButtonStyle(){{
+        clearNoneTogglei = new ImageButtonStyle(){{
             down = flatDown;
             checked = flatDown;
             up = none;

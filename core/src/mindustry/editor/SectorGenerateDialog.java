@@ -38,7 +38,7 @@ public class SectorGenerateDialog extends BaseDialog{
                 for(var plan : content.planets()){
                     if(plan.generator == null || plan.sectors.size == 0) continue;
 
-                    p.button(plan.localizedName, Styles.clearTogglet, () -> {
+                    p.button(plan.localizedName, Styles.flatTogglet, () -> {
                         planet = plan;
                         sector = Math.min(sector, planet.sectors.size - 1);
                         seed = 0;

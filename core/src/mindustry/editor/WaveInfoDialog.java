@@ -57,7 +57,7 @@ public class WaveInfoDialog extends BaseDialog{
             dialog.setFillParent(false);
             dialog.cont.table(Tex.button, t -> {
                 for(Sort s : Sort.all){
-                    t.button("@waves.sort." + s, Styles.clearTogglet, () -> {
+                    t.button("@waves.sort." + s, Styles.flatTogglet, () -> {
                         sort = s;
                         dialog.hide();
                         buildGroups();
@@ -346,7 +346,7 @@ public class WaveInfoDialog extends BaseDialog{
                                     }
 
                                     for(var spawn : spawner.getSpawns()){
-                                        p.button(spawn.x + ", " + spawn.y, Styles.clearTogglet, () -> {
+                                        p.button(spawn.x + ", " + spawn.y, Styles.flatTogglet, () -> {
                                             group.spawn = Point2.pack(spawn.x, spawn.y);
                                             dialog.hide();
                                         }).size(110f, 45f).checked(spawn.pos() == group.spawn);
@@ -361,7 +361,7 @@ public class WaveInfoDialog extends BaseDialog{
                                         }
                                     }
 
-                                    p.button("@waves.spawn.all", Styles.clearTogglet, () -> {
+                                    p.button("@waves.spawn.all", Styles.flatTogglet, () -> {
                                         group.spawn = -1;
                                         dialog.hide();
                                     }).size(110f, 45f).checked(-1 == group.spawn);

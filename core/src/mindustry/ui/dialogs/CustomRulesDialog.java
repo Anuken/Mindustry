@@ -68,7 +68,7 @@ public class CustomRulesDialog extends BaseDialog{
                         b.image(con.uiIcon).size(iconMed).padRight(3);
                         b.add(con.localizedName).color(Color.lightGray).padLeft(3).growX().left().wrap();
 
-                        b.button(Icon.cancel, Styles.clearPartiali, () -> {
+                        b.button(Icon.cancel, Styles.clearNonei, () -> {
                             set.remove(con);
                             rebuild[0].run();
                         }).size(70f).pad(-4f).padLeft(0f);
@@ -87,7 +87,7 @@ public class CustomRulesDialog extends BaseDialog{
                     int[] i = {0};
                     content.<T>getBy(type).each(b -> !set.contains(b) && pred.get(b), b -> {
                         int cols = mobile && Core.graphics.isPortrait() ? 4 : 12;
-                        t.button(new TextureRegionDrawable(b.uiIcon), Styles.cleari, iconMed, () -> {
+                        t.button(new TextureRegionDrawable(b.uiIcon), Styles.flati, iconMed, () -> {
                             set.add(b);
                             rebuild[0].run();
                             dialog.hide();
@@ -224,7 +224,7 @@ public class CustomRulesDialog extends BaseDialog{
         main.table(Tex.button, t -> {
             t.margin(10f);
             var group = new ButtonGroup<>();
-            var style = Styles.clearTogglet;
+            var style = Styles.flatTogglet;
 
             t.defaults().size(140f, 50f);
 
@@ -285,7 +285,7 @@ public class CustomRulesDialog extends BaseDialog{
             t.add(text).left().padRight(5);
 
             for(Team team : Team.baseTeams){
-                t.button(Tex.whiteui, Styles.clearTogglei, 38f, () -> {
+                t.button(Tex.whiteui, Styles.squareTogglei, 38f, () -> {
                     cons.get(team);
                 }).pad(1f).checked(b -> prov.get() == team).size(60f).tooltip(team.localized()).with(i -> i.getStyle().imageUpColor = team.color);
             }

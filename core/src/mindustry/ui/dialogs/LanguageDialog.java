@@ -71,7 +71,7 @@ public class LanguageDialog extends BaseDialog{
         ButtonGroup<TextButton> group = new ButtonGroup<>();
 
         for(Locale loc : locales){
-            TextButton button = new TextButton(getDisplayName(loc), Styles.clearTogglet);
+            TextButton button = new TextButton(getDisplayName(loc), Styles.flatTogglet);
             button.clicked(() -> {
                 if(getLocale().equals(loc)) return;
                 Core.settings.put("locale", loc.toString());

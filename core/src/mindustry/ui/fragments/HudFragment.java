@@ -134,7 +134,7 @@ public class HudFragment{
                     select.left();
                     select.defaults().size(dsize).left();
 
-                    ImageButtonStyle style = Styles.clearTransi;
+                    ImageButtonStyle style = Styles.cleari;
 
                     select.button(Icon.menu, style, ui.paused::show).name("menu");
                     flip = select.button(Icon.upOpen, style, this::toggleMenus).get();
@@ -242,7 +242,7 @@ public class HudFragment{
                     teams.left();
                     int i = 0;
                     for(Team team : Team.baseTeams){
-                        ImageButton button = teams.button(Tex.whiteui, Styles.clearTogglePartiali, 40f, () -> Call.setPlayerTeamEditor(player, team))
+                        ImageButton button = teams.button(Tex.whiteui, Styles.clearNoneTogglei, 40f, () -> Call.setPlayerTeamEditor(player, team))
                         .size(50f).margin(6f).get();
                         button.getImageCell().grow();
                         button.getStyle().imageUpColor = team.color;

@@ -559,7 +559,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                     for(int i = 0; i < content.planets().size; i++){
                         Planet planet = content.planets().get(i);
                         if(selectable(planet)){
-                            pt.button(planet.localizedName, Styles.clearTogglet, () -> {
+                            pt.button(planet.localizedName, Styles.flatTogglet, () -> {
                                 selected = null;
                                 launchSector = null;
                                 if(state.planet != planet){
@@ -961,7 +961,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             if(sector.preset == null){
                 title.add().growX();
 
-                title.button(Icon.pencilSmall, Styles.clearPartiali, () -> {
+                title.button(Icon.pencilSmall, Styles.clearNonei, () -> {
                    ui.showTextInput("@sectors.rename", "@name", 20, sector.name(), v -> {
                        sector.setName(v);
                        updateSelected();
@@ -974,7 +974,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 new TextureRegionDrawable(sector.info.contentIcon.uiIcon) :
                 Icon.icons.get(sector.info.icon + "Small");
 
-            title.button(icon == null ? Icon.noneSmall : icon, Styles.clearPartiali, iconSmall, () -> {
+            title.button(icon == null ? Icon.noneSmall : icon, Styles.clearNonei, iconSmall, () -> {
                 new Dialog(""){{
                     closeOnBack();
                     setFillParent(true);
@@ -992,7 +992,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                             t.marginRight(19f);
                             t.defaults().size(48f);
 
-                            t.button(Icon.none, Styles.clearTogglei, () -> {
+                            t.button(Icon.none, Styles.squareTogglei, () -> {
                                 sector.info.icon = null;
                                 sector.info.contentIcon = null;
                                 refresh.run();
@@ -1004,7 +1004,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                             for(var key : defaultIcons){
                                 var value = Icon.icons.get(key);
 
-                                t.button(value, Styles.clearTogglei, () -> {
+                                t.button(value, Styles.squareTogglei, () -> {
                                     sector.info.icon = key;
                                     sector.info.contentIcon = null;
                                     refresh.run();
@@ -1021,7 +1021,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                                 i = 0;
                                 for(UnlockableContent u : content.getBy(ctype).<UnlockableContent>as()){
                                     if(!u.isHidden() && u.unlocked()){
-                                        t.button(new TextureRegionDrawable(u.uiIcon), Styles.clearTogglei, iconMed, () -> {
+                                        t.button(new TextureRegionDrawable(u.uiIcon), Styles.squareTogglei, iconMed, () -> {
                                             sector.info.icon = null;
                                             sector.info.contentIcon = u;
                                             refresh.run();
@@ -1081,7 +1081,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         stable.row();
 
         if(sector.hasBase()){
-            stable.button("@stats", Icon.info, Styles.transt, () -> showStats(sector)).height(40f).fillX().row();
+            stable.button("@stats", Icon.info, Styles.cleart, () -> showStats(sector)).height(40f).fillX().row();
         }
 
         if((sector.hasBase() && mode == look) || canSelect(sector) || (sector.preset != null && sector.preset.alwaysUnlocked) || debugSelect){

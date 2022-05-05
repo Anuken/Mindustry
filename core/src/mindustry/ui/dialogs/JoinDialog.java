@@ -322,7 +322,7 @@ public class JoinDialog extends BaseDialog{
                 Core.settings.put("name", text);
             }).grow().pad(8).maxTextLength(maxNameLength);
 
-            ImageButton button = t.button(Tex.whiteui, Styles.clearFulli, 40, () -> {
+            ImageButton button = t.button(Tex.whiteui, Styles.squarei, 40, () -> {
                 new PaletteDialog().show(color -> {
                     player.color().set(color);
                     Core.settings.put("color-0", color.rgba8888());
@@ -424,7 +424,7 @@ public class JoinDialog extends BaseDialog{
 
                             //button for showing/hiding servers
                             ImageButton[] image = {null};
-                            image[0] = head.button(hidden ? Icon.eyeOffSmall : Icon.eyeSmall, Styles.accenti, () -> {
+                            image[0] = head.button(hidden ? Icon.eyeOffSmall : Icon.eyeSmall, Styles.grayi, () -> {
                                group.setHidden(!group.hidden());
                                image[0].getStyle().imageUp = group.hidden() ? Icon.eyeOffSmall : Icon.eyeSmall;
                                if(group.hidden() && !showHidden){
