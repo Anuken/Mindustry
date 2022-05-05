@@ -289,7 +289,7 @@ public class ErekirTechTree{
                     });
 
                     node(shipFabricator, Seq.with(new OnSector(three)), () -> {
-                        node(UnitTypes.osc, () -> {
+                        node(UnitTypes.elude, () -> {
 
                         });
 
@@ -321,8 +321,8 @@ public class ErekirTechTree{
                                     });
 
                                     node(mechAssembler, Seq.with(tmpNever), () -> {
-                                        node(UnitTypes.bulwark, () -> {
-                                            node(UnitTypes.krepost, Seq.with(tmpNever), () -> {
+                                        node(UnitTypes.tecta, () -> {
+                                            node(UnitTypes.collaris, Seq.with(tmpNever), () -> {
 
                                             });
                                         });

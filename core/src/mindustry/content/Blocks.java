@@ -143,7 +143,6 @@ public class Blocks{
 
     basicReconstructor,
     advancedReconstructor,
-    //tankReconstructor, shipReconstructor, mechReconstructor,
 
     tankAssembler, shipAssembler, mechAssembler,
     basicAssemblerModule,
@@ -4220,7 +4219,7 @@ public class Blocks{
             requirements(Category.units, with(Items.silicon, 200, Items.graphite, 300));
             size = 3;
             configurable = false;
-            plans.add(new UnitPlan(UnitTypes.osc, 60f * 40f, with(Items.graphite, 40f, Items.silicon, 70f)));
+            plans.add(new UnitPlan(UnitTypes.elude, 60f * 40f, with(Items.graphite, 40f, Items.silicon, 70f)));
             regionSuffix = "-dark";
             fogRadius = 3;
             consumePower(2f);
@@ -4241,7 +4240,7 @@ public class Blocks{
             upgrades.addAll(
             new UnitType[]{UnitTypes.stell, UnitTypes.locus},
             new UnitType[]{UnitTypes.merui, UnitTypes.latum},
-            new UnitType[]{UnitTypes.osc, UnitTypes.avert}
+            new UnitType[]{UnitTypes.elude, UnitTypes.avert}
             );
         }};
 
@@ -4347,7 +4346,7 @@ public class Blocks{
             regionSuffix = "-dark";
             size = 5;
             //TODO different reqs
-            plans.add(new AssemblerUnitPlan(UnitTypes.bulwark, 60f * 60f, PayloadStack.list(UnitTypes.latum, 2, Blocks.tungstenWallLarge, 10)));
+            plans.add(new AssemblerUnitPlan(UnitTypes.tecta, 60f * 60f, PayloadStack.list(UnitTypes.latum, 2, Blocks.tungstenWallLarge, 10)));
             consumePower(3f);
             areaSize = 13;
             researchCostMultiplier = 0.4f;

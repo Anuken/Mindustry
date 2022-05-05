@@ -39,13 +39,13 @@ public class UnitTypes{
     //legs
     public static @EntityDef({Unitc.class, Legsc.class}) UnitType corvus, atrax,
     merui, latum, anthicus,
-    bulwark, krepost; //TODO horrid name here
+    tecta, collaris; //TODO horrid name here
 
     //legs, legacy
     public static @EntityDef(value = {Unitc.class, Legsc.class}, legacy = true) UnitType spiroct, arkyid, toxopid;
 
     //hover
-    public static @EntityDef({Unitc.class, ElevationMovec.class}) UnitType osc; //TODO bad name
+    public static @EntityDef({Unitc.class, ElevationMovec.class}) UnitType elude; //TODO bad name
 
     //air
     public static @EntityDef({Unitc.class}) UnitType flare, eclipse, horizon, zenith, antumbra,
@@ -3256,7 +3256,7 @@ public class UnitTypes{
             }});
         }};
 
-        bulwark = new ErekirUnitType("bulwark"){{
+        tecta = new ErekirUnitType("tecta"){{
             drag = 0.1f;
             speed = 0.6f;
             hitSize = 23f;
@@ -3271,7 +3271,7 @@ public class UnitTypes{
             legMaxLength = 1.3f;
 
             abilities.add(new ShieldArcAbility(){{
-                region = "bulwark-shield";
+                region = "tecta-shield";
                 radius = 34f;
                 angle = 82f;
                 regen = 0.6f;
@@ -3302,7 +3302,7 @@ public class UnitTypes{
             shadowElevation = 0.4f;
             groundLayer = Layer.legUnit;
 
-            weapons.add(new Weapon("bulwark-weapon"){{
+            weapons.add(new Weapon("tecta-weapon"){{
                 mirror = true;
                 top = false;
 
@@ -3358,7 +3358,7 @@ public class UnitTypes{
             }});
         }};
 
-        krepost = new ErekirUnitType("krepost"){{
+        collaris = new ErekirUnitType("collaris"){{
             drag = 0.1f;
             speed = 1.1f;
             hitSize = 44f;
@@ -3392,7 +3392,7 @@ public class UnitTypes{
             shadowElevation = 0.4f;
             groundLayer = Layer.legUnit;
 
-            weapons.add(new Weapon("krepost-weapon"){{
+            weapons.add(new Weapon("collaris-weapon"){{
                 mirror = true;
                 rotationLimit = 30f;
                 rotateSpeed = 0.4f;
@@ -3474,7 +3474,7 @@ public class UnitTypes{
         //endregion
         //region erekir - flying
 
-        osc = new ErekirUnitType("osc"){{
+        elude = new ErekirUnitType("elude"){{
             hovering = true;
             shadowElevation = 0.1f;
 
@@ -3511,7 +3511,7 @@ public class UnitTypes{
                 }});
             }
 
-            weapons.add(new Weapon("osc-weapon"){{
+            weapons.add(new Weapon("elude-weapon"){{
                 y = -2f;
                 x = 4f;
                 top = true;
