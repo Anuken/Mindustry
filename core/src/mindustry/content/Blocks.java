@@ -1715,7 +1715,7 @@ public class Blocks{
         }};
 
         buildTower = new BuildTurret("build-tower"){{
-            requirements(Category.effect, with(Items.silicon, 80, Items.carbide, 30, Items.oxide, 40, Items.thorium, 30));
+            requirements(Category.effect, with(Items.silicon, 150, Items.oxide, 40, Items.thorium, 60));
             outlineColor = Pal.darkOutline;
             consumePower(3f);
             range = 160f;
@@ -4239,7 +4239,7 @@ public class Blocks{
 
             upgrades.addAll(
             new UnitType[]{UnitTypes.stell, UnitTypes.locus},
-            new UnitType[]{UnitTypes.merui, UnitTypes.latum},
+            new UnitType[]{UnitTypes.merui, UnitTypes.cleroi},
             new UnitType[]{UnitTypes.elude, UnitTypes.avert}
             );
         }};
@@ -4257,7 +4257,7 @@ public class Blocks{
 
             upgrades.addAll(
             new UnitType[]{UnitTypes.locus, UnitTypes.precept},
-            new UnitType[]{UnitTypes.latum, UnitTypes.anthicus},
+            new UnitType[]{UnitTypes.cleroi, UnitTypes.anthicus},
             new UnitType[]{UnitTypes.avert, UnitTypes.obviate}
             );
         }};
@@ -4346,7 +4346,7 @@ public class Blocks{
             regionSuffix = "-dark";
             size = 5;
             //TODO different reqs
-            plans.add(new AssemblerUnitPlan(UnitTypes.tecta, 60f * 60f, PayloadStack.list(UnitTypes.latum, 2, Blocks.tungstenWallLarge, 10)));
+            plans.add(new AssemblerUnitPlan(UnitTypes.tecta, 60f * 60f, PayloadStack.list(UnitTypes.cleroi, 2, Blocks.tungstenWallLarge, 10)));
             consumePower(3f);
             areaSize = 13;
             researchCostMultiplier = 0.4f;
@@ -4354,7 +4354,7 @@ public class Blocks{
             consumeLiquid(Liquids.nitrogen, 24f / 60f);
         }};
 
-        //TODO 5x5
+        //TODO requirements / only accept inputs
         basicAssemblerModule = new UnitAssemblerModule("basic-assembler-module"){{
             requirements(Category.units, with(Items.carbide, 400, Items.thorium, 500, Items.oxide, 300, Items.graphite, 500));
             consumePower(4f);

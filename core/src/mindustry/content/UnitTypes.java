@@ -38,7 +38,7 @@ public class UnitTypes{
 
     //legs
     public static @EntityDef({Unitc.class, Legsc.class}) UnitType corvus, atrax,
-    merui, latum, anthicus,
+    merui, cleroi, anthicus,
     tecta, collaris; //TODO horrid name here
 
     //legs, legacy
@@ -3001,7 +3001,7 @@ public class UnitTypes{
 
         }};
 
-        latum = new ErekirUnitType("latum"){{
+        cleroi = new ErekirUnitType("cleroi"){{
             speed = 0.7f;
             drag = 0.1f;
             hitSize = 14f;
@@ -3040,7 +3040,7 @@ public class UnitTypes{
                 }});
             }
 
-            weapons.add(new Weapon("latum-weapon"){{
+            weapons.add(new Weapon("cleroi-weapon"){{
                 x = 14f / 4f;
                 y = 33f / 4f;
                 reload = 30f;
@@ -3088,7 +3088,7 @@ public class UnitTypes{
                 }};
             }});
 
-            weapons.add(new PointDefenseWeapon("latum-point-defense"){{
+            weapons.add(new PointDefenseWeapon("cleroi-point-defense"){{
                 x = 16f / 4f;
                 y = -20f / 4f;
                 reload = 9f;

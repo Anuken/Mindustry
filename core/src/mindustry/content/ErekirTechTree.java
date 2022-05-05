@@ -294,7 +294,7 @@ public class ErekirTechTree{
                         });
 
                         node(basicReconstructor, Seq.with(new OnSector(three)), () -> {
-                            node(UnitTypes.latum);
+                            node(UnitTypes.cleroi);
                             node(UnitTypes.avert);
                             node(UnitTypes.locus);
 
