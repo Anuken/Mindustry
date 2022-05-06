@@ -1233,7 +1233,7 @@ public class Blocks{
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidRegion(), new DrawDefault(), new DrawHeatOutput());
 
             regionRotated1 = 2;
-            craftTime = 60f * 3f;
+            craftTime = 60f * 2f;
             liquidCapacity = 30f;
             heatOutput = 5f;
         }};
@@ -1279,7 +1279,7 @@ public class Blocks{
         }};
 
         carbideCrucible = new HeatCrafter("carbide-crucible"){{
-            requirements(Category.crafting, with(Items.tungsten, 110, Items.thorium, 70, Items.oxide, 60));
+            requirements(Category.crafting, with(Items.tungsten, 110, Items.thorium, 150, Items.oxide, 60));
             craftEffect = Fx.none;
             outputItem = new ItemStack(Items.carbide, 1);
             craftTime = 60f * 3f;
@@ -1323,8 +1323,8 @@ public class Blocks{
             craftTime = 60f * 2f;
 
             outputLiquid = new LiquidStack(Liquids.gallium, 1f / 60f);
-            //TODO NOT scrap
-            outputItem = new ItemStack(Items.scrap, 1);
+            //TODO something else?
+            //outputItem = new ItemStack(Items.scrap, 1);
         }};
 
         //TODO should have a useful turret ammo byproduct? scrap?
@@ -1718,10 +1718,13 @@ public class Blocks{
         buildTower = new BuildTurret("build-tower"){{
             requirements(Category.effect, with(Items.silicon, 150, Items.oxide, 40, Items.thorium, 60));
             outlineColor = Pal.darkOutline;
-            consumePower(3f);
+
             range = 160f;
             size = 3;
             buildSpeed = 1.5f;
+
+            consumePower(3f);
+            consumeLiquid(Liquids.nitrogen, 3f / 60f);
         }};
 
         regenProjector = new RegenProjector("regen-projector"){{
@@ -2096,7 +2099,7 @@ public class Blocks{
             consumeLiquid(Liquids.hydrogen, 1.5f / 60f);
 
             pumpAmount = 80f / 60f / 4f;
-            liquidCapacity = 40f;
+            liquidCapacity = 160f;
             size = 2;
         }};
 
@@ -3879,11 +3882,11 @@ public class Blocks{
         }};
 
         titan = new ItemTurret("titan"){{
-            requirements(Category.turret, with(Items.thorium, 300, Items.tungsten, 250, Items.silicon, 300, Items.thorium, 400));
+            requirements(Category.turret, with(Items.tungsten, 250, Items.silicon, 300, Items.thorium, 400));
 
             ammo(
             //TODO 1 more ammo type, decide on base type
-            Items.thorium, new ArtilleryBulletType(2.5f, 300, "shell"){{
+            Items.thorium, new ArtilleryBulletType(2.5f, 310, "shell"){{
                 hitEffect = new MultiEffect(Fx.titanExplosion, Fx.titanSmoke);
                 despawnEffect = Fx.none;
                 knockback = 2f;
@@ -3966,7 +3969,7 @@ public class Blocks{
             requirements(Category.turret, with(Items.carbide, 50, Items.oxide, 150, Items.silicon, 200, Items.beryllium, 350));
 
             ammo(Items.tungsten, new BasicBulletType(){{
-                damage = 40;
+                damage = 55;
                 speed = 8.5f;
                 width = height = 16;
                 shrinkY = 0.3f;
@@ -3980,6 +3983,7 @@ public class Blocks{
                 frontColor = Color.white;
                 backColor = trailColor = hitColor = Color.sky;
                 trailChance = 0.44f;
+                ammoMultiplier = 2f;
 
                 lifetime = 34f;
                 rotationOffset = 90f;
@@ -3993,6 +3997,7 @@ public class Blocks{
             shootY = 15f;
             rotateSpeed = 5f;
             shootCone = 30f;
+            consumeAmmoOnce = true;
 
             coolant = consume(new ConsumeLiquid(Liquids.water, 30f / 60f));
 
@@ -4356,7 +4361,7 @@ public class Blocks{
 
         //TODO requirements / only accept inputs
         basicAssemblerModule = new UnitAssemblerModule("basic-assembler-module"){{
-            requirements(Category.units, with(Items.carbide, 500, Items.thorium, 500, Items.oxide, 300, Items.phaseFabric, 100));
+            requirements(Category.units, with(Items.carbide, 300, Items.thorium, 500, Items.oxide, 200, Items.phaseFabric, 100));
             consumePower(4f);
             regionSuffix = "-dark";
 
@@ -4406,12 +4411,12 @@ public class Blocks{
         }};
 
         payloadMassDriver = new PayloadMassDriver("payload-mass-driver"){{
-            requirements(Category.units, with(Items.tungsten, 120, Items.silicon, 120, Items.oxide, 70));
+            requirements(Category.units, with(Items.tungsten, 120, Items.silicon, 120, Items.oxide, 25));
             regionSuffix = "-dark";
             size = 3;
             reloadTime = 130f;
             chargeTime = 90f;
-            range = 600f;
+            range = 700f;
             maxPayloadSize = 2.5f;
             fogRadius = 5;
             consumePower(0.5f);

@@ -440,7 +440,7 @@ public class Fx{
                 });
             });
         }
-    }).layer(Layer.bullet - 4f),
+    }),
 
     dynamicSpikes = new Effect(40f, 100f, e -> {
         color(e.color);
