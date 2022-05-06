@@ -87,7 +87,6 @@ public abstract class DrawPart{
             return p -> Mathf.slope(get(p));
         }
 
-
         default PartProgress clamp(){
             return p -> Mathf.clamp(get(p));
         }

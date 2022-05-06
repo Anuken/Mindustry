@@ -180,8 +180,10 @@ public class ContentParser{
             //I have to hard-code this, no easy way of getting parameter names, unfortunately
             return switch(op){
                 case "inv" -> base.inv();
+                case "slope" -> base.slope();
                 case "clamp" -> base.clamp();
                 case "delay" -> base.delay(data.getFloat("amount"));
+                case "sustain" -> base.sustain(data.getFloat("offset", 0f), data.getFloat("grow", 0f), data.getFloat("sustain"));
                 case "shorten" -> base.shorten(data.getFloat("amount"));
                 case "add" -> base.add(data.getFloat("amount"));
                 case "blend" -> base.blend(parser.readValue(PartProgress.class, data.get("other")), data.getFloat("amount"));
