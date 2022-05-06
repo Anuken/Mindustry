@@ -2947,6 +2947,7 @@ public class UnitTypes{
             shadowElevation = 0.1f;
             groundLayer = Layer.legUnit - 1f;
             targetAir = false;
+            researchCostMultiplier = 0f;
 
             weapons.add(new Weapon("merui-weapon"){{
                 mirror = false;
@@ -3487,6 +3488,7 @@ public class UnitTypes{
             engineSize = 2f;
             itemCapacity = 0;
             useEngineElevation = false;
+            researchCostMultiplier = 0f;
 
             //does this look better?
             //engineColor = Pal.sapBullet;
