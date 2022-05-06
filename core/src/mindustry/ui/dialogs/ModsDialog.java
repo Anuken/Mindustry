@@ -246,9 +246,9 @@ public class ModsDialog extends BaseDialog{
 
                                     text.add("[accent]" + Strings.stripColors(item.meta.displayName()) + "\n" +
                                         (shortDesc.length() > 0 ? "[lightgray]" + shortDesc + "\n" : "")
-                                        + "[gray]v" + Strings.stripColors(trimText(item.meta.version))
-                                        + (item.enabled() || hideDisabled ? "" : "\n" + Core.bundle.get("mod.disabled") + ""))
-
+                                        //so does anybody care about version?
+                                        //+ "[gray]v" + Strings.stripColors(trimText(item.meta.version)) + "\n"
+                                        + (item.enabled() || hideDisabled ? "" : Core.bundle.get("mod.disabled") + ""))
                                     .wrap().top().width(300f).growX().left();
 
                                     text.row();

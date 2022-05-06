@@ -62,6 +62,12 @@ public class DuctRouter extends Block{
     }
 
     @Override
+    public int minimapColor(Tile tile){
+        var build = (DuctRouterBuild)tile.build;
+        return build == null || build.sortItem == null ? 0 : build.sortItem.color.rgba();
+    }
+
+    @Override
     public boolean rotatedOutput(int x, int y){
         return false;
     }
