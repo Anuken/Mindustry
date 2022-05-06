@@ -45,7 +45,7 @@ public class DirectionBridge extends Block{
 
     @Override
     public void init(){
-        clipSize = Math.max(clipSize, (range + 0.5f) * 2 * tilesize);
+        updateClipRadius((range + 0.5f) * tilesize);
         super.init();
     }
 

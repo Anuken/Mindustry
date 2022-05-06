@@ -71,7 +71,7 @@ public class ForceProjector extends Block{
 
     @Override
     public void init(){
-        clipSize = Math.max(clipSize, (radius + phaseRadiusBoost + 3f) * 2f);
+        updateClipRadius(radius + phaseRadiusBoost + 3f);
         super.init();
     }
 

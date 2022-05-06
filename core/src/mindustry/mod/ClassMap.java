@@ -1,6 +1,7 @@
 package mindustry.mod;
 
 import arc.struct.*;
+import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.blocks.units.*;
 import mindustry.world.draw.*;
 
@@ -166,8 +167,8 @@ public class ClassMap{
         classes.put("LaserTurretBuild", mindustry.world.blocks.defense.turrets.LaserTurret.LaserTurretBuild.class);
         classes.put("LiquidTurret", mindustry.world.blocks.defense.turrets.LiquidTurret.class);
         classes.put("LiquidTurretBuild", mindustry.world.blocks.defense.turrets.LiquidTurret.LiquidTurretBuild.class);
-        classes.put("PayloadTurret", mindustry.world.blocks.defense.turrets.PayloadTurret.class);
-        classes.put("PayloadTurretBuild", mindustry.world.blocks.defense.turrets.PayloadTurret.PayloadTurretBuild.class);
+        classes.put("PayloadTurret", PayloadAmmoTurret.class);
+        classes.put("PayloadTurretBuild", PayloadAmmoTurret.PayloadTurretBuild.class);
         classes.put("PointDefenseTurret", mindustry.world.blocks.defense.turrets.PointDefenseTurret.class);
         classes.put("PointDefenseBuild", mindustry.world.blocks.defense.turrets.PointDefenseTurret.PointDefenseBuild.class);
         classes.put("PowerTurret", mindustry.world.blocks.defense.turrets.PowerTurret.class);

@@ -31,33 +31,31 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
 
     @Override
     public void update(){
-        if(Vars.state.rules.unitPayloadUpdate){
-            if(payloadPower != null){
-                payloadPower.clear();
-            }
+        if(payloadPower != null){
+            payloadPower.clear();
+        }
 
-            //update power graph first, resolve everything
-            for(Payload pay : payloads){
-                if(pay instanceof BuildPayload pb && pb.build.power != null){
-                    if(payloadPower == null) payloadPower = new PowerGraph();
+        //update power graph first, resolve everything
+        for(Payload pay : payloads){
+            if(pay instanceof BuildPayload pb && pb.build.power != null){
+                if(payloadPower == null) payloadPower = new PowerGraph();
 
-                    pb.build.team = team;
-                    pb.build.power.graph = null;
-                    payloadPower.add(pb.build);
-                }
+                pb.build.team = team;
+                pb.build.power.graph = null;
+                payloadPower.add(pb.build);
             }
+        }
 
-            if(payloadPower != null){
-                payloadPower.update();
-            }
+        if(payloadPower != null){
+            payloadPower.update();
+        }
 
-            for(Payload pay : payloads){
-                if(pay instanceof BuildPayload build){
-                    build.build.team = team;
-                }
-                pay.set(x, y, rotation);
-                pay.update(true);
+        for(Payload pay : payloads){
+            if(pay instanceof BuildPayload build){
+                build.build.team = team;
             }
+            pay.set(x, y, rotation);
+            pay.update(true);
         }
     }
 

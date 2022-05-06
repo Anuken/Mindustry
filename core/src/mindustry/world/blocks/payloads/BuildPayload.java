@@ -44,7 +44,7 @@ public class BuildPayload implements Payload{
 
     @Override
     public void update(boolean inUnit){
-        if(inUnit && !build.block.updateInUnits) return;
+        if(inUnit && (!build.block.updateInUnits || (!state.rules.unitPayloadUpdate && !build.block.alwaysUpdateInUnits))) return;
 
         build.tile = emptyTile;
         build.update();

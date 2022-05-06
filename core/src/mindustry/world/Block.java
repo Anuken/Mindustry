@@ -142,6 +142,8 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean noUpdateDisabled = false;
     /** if true, this block updates when it's a payload in a unit. */
     public boolean updateInUnits = true;
+    /** if true, this block updates in payloads in units regardless of the experimental game rule */
+    public boolean alwaysUpdateInUnits = false;
     /** Whether to use this block's color in the minimap. Only used for overlays. */
     public boolean useColor = true;
     /** item that drops from this block, used for drills */
@@ -827,6 +829,10 @@ public class Block extends UnlockableContent implements Senseable{
         return buildType.get();
     }
 
+    public void updateClipRadius(float size){
+        clipSize = Math.max(clipSize, size * tilesize + size * 2f);
+    }
+
     public Rect bounds(int x, int y, Rect rect){
         return rect.setSize(size * tilesize).setCenter(x * tilesize + offset, y * tilesize + offset);
     }
@@ -890,6 +896,13 @@ public class Block extends UnlockableContent implements Senseable{
         return consumers.length == 0 ? (T)consumeBuilder.find(filter) : (T)Structs.find(consumers, filter);
     }
 
+    public void removeConsumer(Consume cons){
+        if(consumers.length > 0){
+            throw new IllegalStateException("You can only remove consumers before init(). After init(), all consumers have already been initialized.");
+        }
+        consumeBuilder.remove(cons);
+    }
+
     public ConsumeLiquid consumeLiquid(Liquid liquid, float amount){
         return consume(new ConsumeLiquid(liquid, amount));
     }
@@ -935,6 +948,10 @@ public class Block extends UnlockableContent implements Senseable{
 
     public ConsumeItems consumeItems(ItemStack... items){
         return consume(new ConsumeItems(items));
+    }
+
+    public ConsumeCoolant consumeCoolant(float amount){
+        return consume(new ConsumeCoolant(amount));
     }
 
     public <T extends Consume> T consume(T consume){
@@ -1244,7 +1261,7 @@ public class Block extends UnlockableContent implements Senseable{
         var gen = icons();
 
         if(outlineIcon){
-            PixmapRegion region = Core.atlas.getPixmap(gen[outlinedIcon >= 0 ? outlinedIcon : gen.length -1]);
+            PixmapRegion region = Core.atlas.getPixmap(gen[outlinedIcon >= 0 ? Math.min(outlinedIcon, gen.length - 1) : gen.length -1]);
             Pixmap out = last = Pixmaps.outline(region, outlineColor, outlineRadius);
             if(Core.settings.getBool("linear", true)){
                 Pixmaps.bleed(out);

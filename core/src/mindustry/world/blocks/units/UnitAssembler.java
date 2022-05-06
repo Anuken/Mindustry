@@ -119,7 +119,7 @@ public class UnitAssembler extends PayloadBlock{
 
     @Override
     public void init(){
-        clipSize = Math.max(clipSize, (areaSize + size) * tilesize * 2);
+        updateClipRadius(areaSize * tilesize);
         consume(consPayload = new ConsumePayloadDynamic((UnitAssemblerBuild build) -> build.plan().requirements));
 
         super.init();

@@ -52,7 +52,7 @@ public class BeamNode extends PowerBlock{
     public void init(){
         super.init();
 
-        clipSize = Math.max(clipSize, tilesize*size + (range+1)*tilesize*2);
+        updateClipRadius((range + 1) * tilesize);
     }
 
     @Override

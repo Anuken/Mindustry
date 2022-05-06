@@ -66,7 +66,7 @@ public class BaseShield extends Block{
     public void init(){
         super.init();
 
-        clipSize = Math.max(clipSize, radius * 2f + 8f);
+        updateClipRadius(radius);
     }
 
     @Override

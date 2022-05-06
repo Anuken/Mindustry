@@ -142,7 +142,7 @@ public class Blocks{
     tankFabricator, shipFabricator, mechFabricator,
 
     //TODO names
-    basicReconstructor,
+    refabricator,
     advancedReconstructor,
 
     tankAssembler, shipAssembler, mechAssembler,
@@ -2883,7 +2883,7 @@ public class Blocks{
 
             scaledHealth = 200;
             shootSound = Sounds.shootSnap;
-            coolant = consume(new ConsumeCoolant(0.2f));
+            coolant = consumeCoolant(0.2f);
 
             limitRange(2);
         }};
@@ -2928,7 +2928,7 @@ public class Blocks{
             ammoUseEffect = Fx.none;
             health = 400;
             shootSound = Sounds.flame;
-            coolant = consume(new ConsumeCoolant(0.1f));
+            coolant = consumeCoolant(0.1f);
         }};
 
         hail = new ItemTurret("hail"){{
@@ -2979,7 +2979,7 @@ public class Blocks{
             shootCone = 10f;
             health = 260;
             shootSound = Sounds.bang;
-            coolant = consume(new ConsumeCoolant(0.1f));
+            coolant = consumeCoolant(0.1f);
             limitRange(0f);
         }};
 
@@ -3033,7 +3033,7 @@ public class Blocks{
             moveWhileCharging = false;
             accurateDelay = false;
             shootSound = Sounds.laser;
-            coolant = consume(new ConsumeCoolant(0.2f));
+            coolant = consumeCoolant(0.2f);
 
             consumePower(6f);
 
@@ -3089,7 +3089,7 @@ public class Blocks{
             health = 260;
             shootSound = Sounds.spark;
             consumePower(3.3f);
-            coolant = consume(new ConsumeCoolant(0.1f));
+            coolant = consumeCoolant(0.1f);
         }};
 
         parallax = new TractorBeamTurret("parallax"){{
@@ -3169,7 +3169,7 @@ public class Blocks{
             envEnabled |= Env.space;
 
             limitRange(5f);
-            coolant = consume(new ConsumeCoolant(0.3f));
+            coolant = consumeCoolant(0.3f);
         }};
 
         salvo = new ItemTurret("salvo"){{
@@ -3238,7 +3238,7 @@ public class Blocks{
             shootSound = Sounds.shootBig;
 
             limitRange();
-            coolant = consume(new ConsumeCoolant(0.2f));
+            coolant = consumeCoolant(0.2f);
         }};
 
         segment = new PointDefenseTurret("segment"){{
@@ -3326,10 +3326,7 @@ public class Blocks{
             range = 90f;
             recoilAmount = 5f;
 
-            shoot = new ShootSpread(){{
-                shots = 3;
-                spread = 20f;
-            }};
+            shoot = new ShootSpread(3, 20f);
 
             restitution = 0.1f;
             shootCone = 30;
@@ -3338,7 +3335,7 @@ public class Blocks{
 
             scaledHealth = 220;
             shootSound = Sounds.shotgun;
-            coolant = consume(new ConsumeCoolant(0.3f));
+            coolant = consumeCoolant(0.3f);
 
             float brange = range + 10f;
 
@@ -3452,7 +3449,7 @@ public class Blocks{
             shootShake = 2f;
             range = 290f;
             minRange = 50f;
-            coolant = consume(new ConsumeCoolant(0.3f));
+            coolant = consumeCoolant(0.3f);
 
             scaledHealth = 130;
             shootSound = Sounds.artillery;
@@ -3540,7 +3537,7 @@ public class Blocks{
             inaccuracy = 10f;
             shootCone = 30f;
             shootSound = Sounds.shootSnap;
-            coolant = consume(new ConsumeCoolant(0.3f));
+            coolant = consumeCoolant(0.3f);
 
             scaledHealth = 145;
             limitRange();
@@ -3584,7 +3581,7 @@ public class Blocks{
             coolantMultiplier = 0.4f;
             scaledHealth = 150;
 
-            coolant = consume(new ConsumeCoolant(1f));
+            coolant = consumeCoolant(1f);
             consumePower(10f);
         }};
 
@@ -3643,7 +3640,7 @@ public class Blocks{
             shootSound = Sounds.shootBig;
 
             scaledHealth = 160;
-            coolant = consume(new ConsumeCoolant(1f));
+            coolant = consumeCoolant(1f);
 
             limitRange();
         }};
@@ -3678,7 +3675,7 @@ public class Blocks{
             }};
 
             scaledHealth = 200;
-            coolant = consume(new ConsumeCoolant(0.5f));
+            coolant = consumeCoolant(0.5f);
             consumePower(17f);
         }};
 
@@ -3769,10 +3766,7 @@ public class Blocks{
             }}
             );
 
-            shoot = new ShootSpread(){{
-                shots = 15;
-                spread = 4f;
-            }};
+            shoot = new ShootSpread(15, 4f);
 
             coolantMultiplier = 6f;
 
@@ -4226,7 +4220,7 @@ public class Blocks{
             consumePower(2f);
         }};
 
-        basicReconstructor = new Reconstructor("basic-reconstructor"){{
+        refabricator = new Reconstructor("refabricator"){{
             requirements(Category.units, with(Items.beryllium, 250, Items.tungsten, 120, Items.silicon, 150));
             regionSuffix = "-dark";
 

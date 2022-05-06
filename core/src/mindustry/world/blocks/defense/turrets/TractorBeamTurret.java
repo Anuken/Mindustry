@@ -65,7 +65,7 @@ public class TractorBeamTurret extends BaseTurret{
     public void init(){
         super.init();
 
-        clipSize = Math.max(clipSize, (range + tilesize) * 2);
+        updateClipRadius(range + tilesize);
     }
 
     public class TractorBeamBuild extends BaseTurretBuild{

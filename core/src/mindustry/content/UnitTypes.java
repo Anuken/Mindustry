@@ -887,10 +887,7 @@ public class UnitTypes{
                 shadow = 12f;
                 recoil = 3f;
 
-                shoot = new ShootSpread(){{
-                    shots = 2;
-                    spread = 17f;
-                }};
+                shoot = new ShootSpread(2, 17f);
 
                 bullet = new ShrapnelBulletType(){{
                     length = 90f;
@@ -3520,10 +3517,7 @@ public class UnitTypes{
                 baseRotation = -35f;
                 shootCone = 360f;
 
-                shoot = new ShootSpread(){{
-                    shots = 2;
-                    spread = 11f;
-                }};
+                shoot = new ShootSpread(2, 11f);
 
                 bullet = new BasicBulletType(5f, 24){{
                     homingPower = 0.19f;

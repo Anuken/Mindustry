@@ -71,7 +71,7 @@ public class DirectionalForceProjector extends Block{
 
     @Override
     public void init(){
-        clipSize = Math.max(clipSize, (width + 3f) * 2f);
+        updateClipRadius((width + 3f));
 
         super.init();
 

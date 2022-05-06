@@ -18,12 +18,12 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 //TODO visuals!
-public class PayloadTurret extends Turret{
+public class PayloadAmmoTurret extends Turret{
     public ObjectMap<UnlockableContent, BulletType> ammoTypes = new ObjectMap<>();
 
     protected UnlockableContent[] ammoKeys;
 
-    public PayloadTurret(String name){
+    public PayloadAmmoTurret(String name){
         super(name);
 
         maxAmmo = 3;

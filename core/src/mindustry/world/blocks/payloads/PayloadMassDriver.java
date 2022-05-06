@@ -71,7 +71,7 @@ public class PayloadMassDriver extends PayloadBlock{
     @Override
     public void init(){
         super.init();
-        clipSize = Math.max(clipSize, range*2f + tilesize*size);
+        updateClipRadius(range);
     }
 
     @Override

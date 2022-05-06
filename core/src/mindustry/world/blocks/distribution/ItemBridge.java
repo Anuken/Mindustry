@@ -160,7 +160,7 @@ public class ItemBridge extends Block{
     @Override
     public void init(){
         super.init();
-        clipSize = Math.max(clipSize, (range + 0.5f) * tilesize * 2);
+        updateClipRadius((range + 0.5f) * tilesize);
     }
 
     @Override

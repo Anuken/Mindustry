@@ -65,7 +65,7 @@ public class BeamDrill extends Block{
 
     @Override
     public void init(){
-        clipSize = Math.max(clipSize, size * tilesize + (range + 2) * tilesize);
+        updateClipRadius((range + 2) * tilesize);
         super.init();
     }
 
