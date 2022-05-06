@@ -45,7 +45,7 @@ public class UnitTypes{
     public static @EntityDef(value = {Unitc.class, Legsc.class}, legacy = true) UnitType spiroct, arkyid, toxopid;
 
     //hover
-    public static @EntityDef({Unitc.class, ElevationMovec.class}) UnitType elude; //TODO bad name
+    public static @EntityDef({Unitc.class, ElevationMovec.class}) UnitType elude;
 
     //air
     public static @EntityDef({Unitc.class}) UnitType flare, eclipse, horizon, zenith, antumbra,
@@ -3850,13 +3850,15 @@ public class UnitTypes{
                     keepVelocity = false;
 
                     spawnUnit = new MissileUnitType("disrupt-missile"){{
-                        speed = 4.5f;
+                        speed = 4.6f;
                         maxRange = 5f;
                         outlineColor = Pal.darkOutline;
                         health = 70;
                         homingDelay = 10f;
                         lowAltitude = true;
                         engineSize = 3f;
+                        engineColor = trailColor = Pal.sapBulletBack;
+                        engineLayer = Layer.effect;
                         deathExplosionEffect = Fx.none;
 
                         parts.add(new ShapePart(){{
@@ -3884,7 +3886,7 @@ public class UnitTypes{
                             mirror = false;
                             reload = 1f;
                             shootOnDeath = true;
-                            bullet = new ExplosionBulletType(120f, 25f){{
+                            bullet = new ExplosionBulletType(140f, 25f){{
                                 suppressionRange = 140f;
                                 shootEffect = new ExplosionEffect(){{
                                     lifetime = 50f;

@@ -1980,7 +1980,7 @@ public class Blocks{
         }};
 
         unitCargoLoader = new UnitCargoLoader("unit-cargo-loader"){{
-            requirements(Category.distribution, with(Items.silicon, 80, Items.carbide, 50, Items.oxide, 50));
+            requirements(Category.distribution, with(Items.silicon, 80, Items.thorium, 50, Items.oxide, 50));
 
             size = 3;
             buildTime = 60f * 8f;
@@ -1988,7 +1988,7 @@ public class Blocks{
             consumePower(8f / 60f);
 
             //intentionally set absurdly high to make this block not overpowered
-            consumeLiquid(Liquids.gallium, 20f / 60f);
+            consumeLiquid(Liquids.nitrogen, 20f / 60f);
 
             itemCapacity = 200;
         }};
@@ -4211,7 +4211,7 @@ public class Blocks{
         }};
 
         shipFabricator = new UnitFactory("ship-fabricator"){{
-            requirements(Category.units, with(Items.silicon, 200, Items.graphite, 300));
+            requirements(Category.units, with(Items.silicon, 200, Items.graphite, 300, Items.tungsten, 60));
             size = 3;
             configurable = false;
             plans.add(new UnitPlan(UnitTypes.elude, 60f * 40f, with(Items.graphite, 40f, Items.silicon, 70f)));
@@ -4309,7 +4309,7 @@ public class Blocks{
         }};*/
 
         tankAssembler = new UnitAssembler("tank-assembler"){{
-            requirements(Category.units, with(Items.thorium, 500, Items.oxide, 250, Items.tungsten, 500, Items.silicon, 500));
+            requirements(Category.units, with(Items.thorium, 500, Items.oxide, 150, Items.tungsten, 500, Items.silicon, 500));
             regionSuffix = "-dark";
             size = 5;
             plans.add(
@@ -4325,12 +4325,14 @@ public class Blocks{
 
         //TODO requirements
         shipAssembler = new UnitAssembler("ship-assembler"){{
-            requirements(Category.units, with(Items.beryllium, 700, Items.oxide, 300, Items.tungsten, 500, Items.silicon, 800));
+            requirements(Category.units, with(Items.beryllium, 700, Items.oxide, 200, Items.tungsten, 500, Items.silicon, 800, Items.thorium, 400));
             regionSuffix = "-dark";
             size = 5;
-            plans.add(new AssemblerUnitPlan(UnitTypes.quell, 60f * 60f, PayloadStack.list(UnitTypes.avert, 2, Blocks.berylliumWallLarge, 8)));
+            plans.add(
+            new AssemblerUnitPlan(UnitTypes.quell, 60f * 60f, PayloadStack.list(UnitTypes.elude, 4, Blocks.berylliumWallLarge, 8)),
+            new AssemblerUnitPlan(UnitTypes.disrupt, 60f * 60f * 3f, PayloadStack.list(UnitTypes.locus, 6, Blocks.carbideWallLarge, 20))
+            );
             areaSize = 13;
-            researchCostMultiplier = 0.4f;
 
             consumePower(3f);
             consumeLiquid(Liquids.nitrogen, 24f / 60f);
@@ -4338,21 +4340,23 @@ public class Blocks{
 
         //TODO requirements
         mechAssembler = new UnitAssembler("mech-assembler"){{
-            requirements(Category.units, with(Items.graphite, 500, Items.thorium, 600, Items.oxide, 200, Items.tungsten, 500, Items.silicon, 900));
+            requirements(Category.units, with(Items.carbide, 500, Items.thorium, 600, Items.oxide, 200, Items.tungsten, 500, Items.silicon, 900));
             regionSuffix = "-dark";
             size = 5;
             //TODO different reqs
-            plans.add(new AssemblerUnitPlan(UnitTypes.tecta, 60f * 60f, PayloadStack.list(UnitTypes.cleroi, 2, Blocks.tungstenWallLarge, 10)));
+            plans.add(
+            new AssemblerUnitPlan(UnitTypes.tecta, 60f * 60f, PayloadStack.list(UnitTypes.merui, 4, Blocks.tungstenWallLarge, 10)),
+            new AssemblerUnitPlan(UnitTypes.collaris, 60f * 60f * 3f, PayloadStack.list(UnitTypes.cleroi, 6, Blocks.carbideWallLarge, 20))
+            );
             consumePower(3f);
             areaSize = 13;
-            researchCostMultiplier = 0.4f;
 
             consumeLiquid(Liquids.nitrogen, 24f / 60f);
         }};
 
         //TODO requirements / only accept inputs
         basicAssemblerModule = new UnitAssemblerModule("basic-assembler-module"){{
-            requirements(Category.units, with(Items.carbide, 400, Items.thorium, 500, Items.oxide, 300, Items.graphite, 500));
+            requirements(Category.units, with(Items.carbide, 500, Items.thorium, 500, Items.oxide, 300, Items.phaseFabric, 100));
             consumePower(4f);
             regionSuffix = "-dark";
 
