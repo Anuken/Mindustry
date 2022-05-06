@@ -494,6 +494,8 @@ public class LogicBlock extends Block{
                 ipt = instructionsPerTick;
             }
 
+            if(state.rules.disableWorldProcessors && privileged) return;
+
             if(enabled && executor.initialized()){
                 accumulator += edelta() * ipt * efficiency;
 

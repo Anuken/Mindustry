@@ -62,6 +62,8 @@ public class Rules{
     public float unitDamageMultiplier = 1f;
     /** Whether to allow units to build with logic. */
     public boolean logicUnitBuild = true;
+    /** If true, world processors no longer update. Used for testing. */
+    public boolean disableWorldProcessors = false;
     /** How much health blocks start with. */
     public float blockHealthMultiplier = 1f;
     /** How much damage blocks (turrets) deal. */
