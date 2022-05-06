@@ -172,7 +172,7 @@ public class SectorPresets{
                     new BuildCountObjective(Blocks.coreBastion, 1).withMarkers(
                         new ShapeTextMarker("New cores can be placed on [accent]core tiles[].\nNew cores function as forward bases and share a resource inventory with other cores.\nPlace a core.", 287.5f * 8f, 197.5f * 8f, 9f * 2.6f, 0f, 12f)
                     ),
-                    new TimerObjective("Set up defenses", 120 * 60).withMarkers(
+                    new TimerObjective("[accent]Set up defenses:[lightgray] {0}", 120 * 60).withMarkers(
                         new TextMarker("The enemy will be able to detect you in 2 minutes.\nSet up defenses, mining, and production.", 288f * 8f, 202f * 8f)
                     ).withFlags("openMap")
                 );

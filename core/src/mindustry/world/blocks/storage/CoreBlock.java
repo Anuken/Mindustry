@@ -495,13 +495,13 @@ public class CoreBlock extends StorageBlock{
         public void handleItem(Building source, Item item){
             boolean incinerate = incinerateNonBuildable && !item.buildable;
 
+            if(team == state.rules.defaultTeam){
+                state.stats.coreItemCount.increment(item);
+            }
+
             if(net.server() || !net.active()){
                 if(team == state.rules.defaultTeam && state.isCampaign() && !incinerate){
                     state.rules.sector.info.handleCoreItem(item, 1);
-                }
-
-                if(team == state.rules.defaultTeam){
-                    state.stats.coreItemCount.increment(item);
                 }
 
                 if(items.get(item) >= storageCapacity || incinerate){

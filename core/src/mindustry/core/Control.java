@@ -213,6 +213,7 @@ public class Control implements ApplicationListener, Loadable{
 
             if(state.isCampaign()){
 
+                //don't run when hosting, that doesn't really work.
                 if(state.rules.sector.planet.prebuildBase){
                     toBePlaced.clear();
                     float unitsPerTick = 2f;
@@ -225,19 +226,26 @@ public class Control implements ApplicationListener, Loadable{
                             var ccore = build.closestCore();
 
                             if(ccore != null && build.within(ccore, buildRadius)){
-                                build.pickedUp();
-                                build.tile.remove();
                                 anyBuilds = true;
 
-                                toBePlaced.add(build);
+                                if(!net.active()){
+                                    build.pickedUp();
+                                    build.tile.remove();
 
-                                Time.run(build.dst(ccore) / unitsPerTick + coreDelay, () -> {
-                                    if(build.tile.build != build){
-                                        placeLandBuild(build);
+                                    toBePlaced.add(build);
 
-                                        toBePlaced.remove(build);
-                                    }
-                                });
+                                    Time.run(build.dst(ccore) / unitsPerTick + coreDelay, () -> {
+                                        if(build.tile.build != build){
+                                            placeLandBuild(build);
+
+                                            toBePlaced.remove(build);
+                                        }
+                                    });
+                                }else{
+                                    //when already hosting, instantly build everything. this looks bad but it's better than a desync
+                                    Fx.coreBuildBlock.at(build.x, build.y, 0f, build.block);
+                                    Fx.placeBlock.at(build.x, build.y, build.block.size);
+                                }
                             }
                         }
                     }
