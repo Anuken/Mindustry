@@ -99,6 +99,10 @@ public class BlockRenderer{
             updateDarkness();
         });
 
+        Events.run(Trigger.newGame, () -> {
+            updateDarkness();
+        });
+
         Events.on(TilePreChangeEvent.class, event -> {
             if(indexBlock(event.tile)) blockTree.remove(event.tile);
             if(indexFloor(event.tile)) floorTree.remove(event.tile);
