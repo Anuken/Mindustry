@@ -2658,6 +2658,7 @@ public class UnitTypes{
             crushDamage = 13f / 5f;
             treadRects = new Rect[]{new Rect(22, 16, 28, 130)};
 
+
             weapons.add(new Weapon("vanquish-weapon"){{
                 layerOffset = 0.0001f;
                 reload = 110f;
@@ -3267,6 +3268,7 @@ public class UnitTypes{
             legStraightness = 0.4f;
             baseLegStraightness = 0.5f;
             legMaxLength = 1.3f;
+            researchCostMultiplier = 0f;
 
             abilities.add(new ShieldArcAbility(){{
                 region = "tecta-shield";
@@ -3718,6 +3720,7 @@ public class UnitTypes{
             armor = 5f;
             hitSize = 36f;
             payloadCapacity = Mathf.sqr(3f) * tilePayload;
+            researchCostMultiplier = 0f;
 
             engineSize = 4.8f;
             engineOffset = 61 / 4f;
