@@ -4215,6 +4215,7 @@ public class Blocks{
             plans.add(new UnitPlan(UnitTypes.merui, 60f * 45f, with(Items.beryllium, 50f, Items.silicon, 70f)));
             regionSuffix = "-dark";
             fogRadius = 3;
+            researchCostMultiplier = 0.5f;
             consumePower(2f);
         }};
 
@@ -4225,6 +4226,7 @@ public class Blocks{
             plans.add(new UnitPlan(UnitTypes.elude, 60f * 40f, with(Items.graphite, 40f, Items.silicon, 70f)));
             regionSuffix = "-dark";
             fogRadius = 3;
+            researchCostMultiplier = 0.5f;
             consumePower(2f);
         }};
 
