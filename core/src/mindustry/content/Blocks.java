@@ -2414,7 +2414,7 @@ public class Blocks{
 
             liquidCapacity = 30f * 5;
 
-            liquidOutput = new LiquidStack(Liquids.water, 5f / 60f);
+            liquidOutput = new LiquidStack(Liquids.water, 10f / 60f);
 
             generateEffect = Fx.none;
 
@@ -3919,7 +3919,7 @@ public class Blocks{
             }}
             );
 
-            ammoPerShot = 8;
+            ammoPerShot = 4;
             maxAmmo = ammoPerShot * 3;
             targetAir = false;
             shootShake = 4f;
@@ -3969,7 +3969,7 @@ public class Blocks{
             requirements(Category.turret, with(Items.carbide, 50, Items.oxide, 150, Items.silicon, 200, Items.beryllium, 350));
 
             ammo(Items.tungsten, new BasicBulletType(){{
-                damage = 55;
+                damage = 60;
                 speed = 8.5f;
                 width = height = 16;
                 shrinkY = 0.3f;
@@ -4043,6 +4043,9 @@ public class Blocks{
             scaledHealth = 280;
             range = 270f;
             size = 4;
+
+            coolant = consume(new ConsumeLiquid(Liquids.water, 20f / 60f));
+            coolantMultiplier = 2.5f;
 
             limitRange(-5f);
         }};

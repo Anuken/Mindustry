@@ -3316,7 +3316,7 @@ public class UnitTypes{
                 velocityRnd = 0.33f;
                 heatColor = Color.red;
 
-                bullet = new MissileBulletType(4.2f, 40){{
+                bullet = new MissileBulletType(4.2f, 50){{
                     homingPower = 0.2f;
                     weaveMag = 4;
                     weaveScale = 4;
