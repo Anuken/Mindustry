@@ -38,6 +38,7 @@ public class BlockRenderer{
     //TODO I don't like this system
     private Seq<UpdateRenderState> updateFloors = new Seq<>(UpdateRenderState.class);
 
+    private boolean hadMapLimit;
     private int lastCamX, lastCamY, lastRangeX, lastRangeY;
     private float brokenFade = 0f;
     private FrameBuffer shadows = new FrameBuffer();
@@ -67,6 +68,7 @@ public class BlockRenderer{
             shadowEvents.clear();
             updateFloors.clear();
             lastCamY = lastCamX = -99; //invalidate camera position so blocks get updated
+            hadMapLimit = state.rules.limitMapArea;
 
             shadows.getTexture().setFilter(TextureFilter.linear, TextureFilter.linear);
             shadows.resize(world.width(), world.height());
@@ -99,8 +101,12 @@ public class BlockRenderer{
             updateDarkness();
         });
 
+        //sometimes darkness gets disabled.
         Events.run(Trigger.newGame, () -> {
-            updateDarkness();
+            if(hadMapLimit && !state.rules.limitMapArea){
+                updateDarkness();
+                renderer.minimap.updateAll();
+            }
         });
 
         Events.on(TilePreChangeEvent.class, event -> {

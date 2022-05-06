@@ -299,7 +299,7 @@ public class ErekirTechTree{
                             node(UnitTypes.locus);
 
                             //TODO
-                            node(advancedReconstructor, () -> {
+                            node(primeRefabricator, () -> {
                                 node(UnitTypes.precept);
                                 node(UnitTypes.anthicus);
                                 node(UnitTypes.obviate);

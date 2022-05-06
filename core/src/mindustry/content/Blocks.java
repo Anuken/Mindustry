@@ -143,7 +143,7 @@ public class Blocks{
 
     //TODO names
     refabricator,
-    advancedReconstructor,
+    primeRefabricator,
 
     tankAssembler, shipAssembler, mechAssembler,
     basicAssemblerModule,
@@ -4239,7 +4239,8 @@ public class Blocks{
             );
         }};
 
-        advancedReconstructor = new Reconstructor("advanced-reconstructor"){{
+        //yes very silly name
+        primeRefabricator = new Reconstructor("prime-refabricator"){{
             requirements(Category.units, with(Items.thorium, 250, Items.oxide, 200, Items.tungsten, 200, Items.silicon, 400));
             regionSuffix = "-dark";
 
