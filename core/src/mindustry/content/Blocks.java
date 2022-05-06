@@ -4226,7 +4226,7 @@ public class Blocks{
             plans.add(new UnitPlan(UnitTypes.elude, 60f * 40f, with(Items.graphite, 40f, Items.silicon, 70f)));
             regionSuffix = "-dark";
             fogRadius = 3;
-            researchCostMultiplier = 0.5f;
+            researchCostMultiplier = 0.65f;
             consumePower(2f);
         }};
 
