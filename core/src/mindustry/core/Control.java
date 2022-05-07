@@ -441,7 +441,7 @@ public class Control implements ApplicationListener, Loadable{
                         //if there's still an enemy base left, fix it
                         if(state.rules.attackMode){
                             //replace all broken blocks
-                            for(var plan : state.rules.waveTeam.data().blocks){
+                            for(var plan : state.rules.waveTeam.data().plans){
                                 Tile tile = world.tile(plan.x, plan.y);
                                 if(tile != null){
                                     tile.setBlock(content.block(plan.block), state.rules.waveTeam, plan.rotation);
@@ -450,7 +450,7 @@ public class Control implements ApplicationListener, Loadable{
                                     }
                                 }
                             }
-                            state.rules.waveTeam.data().blocks.clear();
+                            state.rules.waveTeam.data().plans.clear();
                         }
 
                         //kill all units, since they should be dead anyway

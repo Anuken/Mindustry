@@ -187,7 +187,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         if(player == null) return;
 
-        var it = player.team().data().blocks.iterator();
+        var it = player.team().data().plans.iterator();
         //O(n^2) search here; no way around it
         outer:
         while(it.hasNext()){
@@ -1037,7 +1037,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
         }
 
-        for(BlockPlan plan : player.team().data().blocks){
+        for(BlockPlan plan : player.team().data().plans){
             Block block = content.block(plan.block);
             if(block.bounds(plan.x, plan.y, Tmp.r2).overlaps(Tmp.r1)){
                 drawSelected(plan.x, plan.y, content.block(plan.block), Pal.remove);
@@ -1187,7 +1187,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         removed.clear();
 
         //remove blocks to rebuild
-        Iterator<BlockPlan> broken = player.team().data().blocks.iterator();
+        Iterator<BlockPlan> broken = player.team().data().plans.iterator();
         while(broken.hasNext()){
             BlockPlan plan = broken.next();
             Block block = content.block(plan.block);

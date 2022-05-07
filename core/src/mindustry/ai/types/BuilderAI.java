@@ -85,7 +85,7 @@ public class BuilderAI extends AIController{
                     if(player.isBuilder() && player.unit().activelyBuilding() && player.unit().buildPlan().samePos(req) && player.unit().buildPlan().breaking){
                         unit.plans.removeFirst();
                         //remove from list of plans
-                        unit.team.data().blocks.remove(p -> p.x == req.x && p.y == req.y);
+                        unit.team.data().plans.remove(p -> p.x == req.x && p.y == req.y);
                         return;
                     }
                 }
@@ -136,8 +136,8 @@ public class BuilderAI extends AIController{
             float rebuildTime = (unit.team.rules().rtsAi ? 12f : 2f) * 60f;
 
             //find new plan
-            if(!unit.team.data().blocks.isEmpty() && following == null && timer.get(timerTarget3, rebuildTime)){
-                Queue<BlockPlan> blocks = unit.team.data().blocks;
+            if(!unit.team.data().plans.isEmpty() && following == null && timer.get(timerTarget3, rebuildTime)){
+                Queue<BlockPlan> blocks = unit.team.data().plans;
                 BlockPlan block = blocks.first();
 
                 //check if it's already been placed

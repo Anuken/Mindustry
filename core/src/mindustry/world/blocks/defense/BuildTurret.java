@@ -128,7 +128,7 @@ public class BuildTurret extends BaseTurret{
                     }
 
                 }else if(unit.buildPlan() == null && timer(timerTarget, targetInterval)){ //search for new stuff
-                    Queue<BlockPlan> blocks = team.data().blocks;
+                    Queue<BlockPlan> blocks = team.data().plans;
                     for(int i = 0; i < blocks.size; i++){
                         var block = blocks.get(i);
                         if(within(block.x * tilesize, block.y * tilesize, range)){
@@ -169,7 +169,7 @@ public class BuildTurret extends BaseTurret{
                             if(player.isBuilder() && player.unit().activelyBuilding() && player.unit().buildPlan().samePos(req) && player.unit().buildPlan().breaking){
                                 unit.plans().removeFirst();
                                 //remove from list of plans
-                                team.data().blocks.remove(p -> p.x == req.x && p.y == req.y);
+                                team.data().plans.remove(p -> p.x == req.x && p.y == req.y);
                                 return;
                             }
                         }
