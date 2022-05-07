@@ -339,10 +339,10 @@ public class ErekirTechTree{
                 node(two, Seq.with(new SectorComplete(onset), new Research(ductRouter), new Research(ductBridge)), () -> {
                     node(three, Seq.with(new SectorComplete(two), new Research(ventCondenser)), () -> {
                         node(four, Seq.with(new SectorComplete(three), new Research(oxidationChamber), new Research(chemicalCombustionChamber)), () -> {
-                            //TODO research reqs?
-                            node(five, Seq.with(new SectorComplete(four)), () -> {
+                            //TODO doesn't work
+                            //node(five, Seq.with(new SectorComplete(four)), () -> {
 
-                            });
+                            //});
                         });
                     });
                 });
