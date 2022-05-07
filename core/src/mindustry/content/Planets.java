@@ -76,6 +76,7 @@ public class Planets{
                 r.fog = true;
                 r.staticFog = true;
                 r.lighting = false;
+                r.coreDestroyClear = true;
                 r.onlyDepositCore = true; //TODO not sure
             };
 
@@ -124,6 +125,7 @@ public class Planets{
             allowWaveSimulation = true;
             allowSectorInvasion = true;
             allowLaunchSchematics = true;
+            enemyCoreSpawnReplace = true;
             allowLaunchLoadout = true;
             ruleSetter = r -> {
                 r.waveTeam = Team.crux;

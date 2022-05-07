@@ -161,9 +161,7 @@ public class Logic implements ApplicationListener{
         });
 
         Events.on(BlockDestroyEvent.class, e -> {
-            //TODO maybe make it a separate rule?
-            //makes cores go derelict in RTS mode, helps clean things up
-            if(e.tile.build instanceof CoreBuild core && core.team.isAI() && core.team.rules().rtsAi){
+            if(e.tile.build instanceof CoreBuild core && core.team.isAI() && state.rules.coreDestroyClear){
                 Core.app.post(() -> {
                     core.team.data().timeDestroy(core.x, core.y, state.rules.enemyCoreBuildRadius);
                 });

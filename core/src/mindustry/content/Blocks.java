@@ -3752,7 +3752,7 @@ public class Blocks{
             requirements(Category.turret, with(Items.beryllium, 150, Items.silicon, 200, Items.graphite, 200, Items.tungsten, 50));
 
             ammo(
-            Items.graphite, new BasicBulletType(8f, 44){{
+            Items.graphite, new BasicBulletType(8f, 41){{
                 knockback = 4f;
                 width = 25f;
                 hitSize = 7f;
@@ -3797,7 +3797,7 @@ public class Blocks{
             recoilAmount = 2f;
             restitution = 0.03f;
             range = 125;
-            shootCone = 50f;
+            shootCone = 40f;
             scaledHealth = 210;
             rotateSpeed = 3f;
 

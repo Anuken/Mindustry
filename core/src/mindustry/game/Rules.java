@@ -84,6 +84,8 @@ public class Rules{
     public boolean cleanupDeadTeams = true;
     /** If true, items can only be deposited in the core. */
     public boolean onlyDepositCore = false;
+    /** If true, every enemy block in the radius of the (enemy) core is destroyed upon death. Used for campaign maps. */
+    public boolean coreDestroyClear = false;
     /** Radius around enemy wave drop zones.*/
     public float dropZoneRadius = 300f;
     /** Time between waves in ticks. */
