@@ -49,12 +49,9 @@ public class DrawTurret extends DrawBlock{
         TurretBuild tb = (TurretBuild)build;
 
         Draw.rect(base, build.x, build.y);
-        Draw.color();
 
         Draw.z(Layer.turret - 0.02f);
-
-        Drawf.shadow(preview, build.x + tb.recoilOffset.x - turret.elevation, build.y + tb.recoilOffset.y - turret.elevation, tb.drawrot());
-
+        Drawf.shadow(turret.region, build.x + tb.recoilOffset.x - turret.elevation, build.y + tb.recoilOffset.y - turret.elevation, tb.drawrot());
         Draw.z(Layer.turret);
 
         drawTurret(turret, tb);
@@ -69,10 +66,14 @@ public class DrawTurret extends DrawBlock{
             }
 
             //TODO no smooth reload
-            var params = DrawPart.params.set(build.warmup(), 1f - tb.progress(), 1f - tb.progress(), tb.heat, tb.x + tb.recoilOffset.x, tb.y + tb.recoilOffset.y, tb.rotation);
+            var params = DrawPart.params.set(build.warmup(), 1f - tb.progress(), 1f - tb.progress(), tb.heat, tb.x + tb.recoilOffset.x, tb.y + tb.recoilOffset.y, tb.rotation, turret.elevation);
 
             for(var part : parts){
                 part.draw(params);
+
+                Draw.z(Layer.turret - 0.02f);
+                part.drawShadow(params);
+                Draw.z(Layer.turret);
             }
         }
     }

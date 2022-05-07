@@ -4,6 +4,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.graphics.Pal;
 
 public abstract class DrawPart{
     public static final PartParams params = new PartParams();
@@ -16,17 +17,30 @@ public abstract class DrawPart{
     public int weaponIndex = 0;
 
     public abstract void draw(PartParams params);
+    public void drawShadow(PartParams params){
+        float x = params.x;
+        float y = params.y;
+        params.x -= params.elevation;
+        params.y -= params.elevation;
+
+        Draw.color(Pal.shadow);
+        draw(params);
+        Draw.color();
+
+        params.x = x;
+        params.y = y;
+    }
     public abstract void load(String name);
     public void getOutlines(Seq<TextureRegion> out){}
 
     /** Parameters for drawing a part in draw(). */
     public static class PartParams{
         //TODO document
-        public float warmup, reload, smoothReload, heat, life;
+        public float warmup, reload, smoothReload, heat, life, elevation;
         public float x, y, rotation;
         public int sideOverride = -1, sideMultiplier = 1;
 
-        public PartParams set(float warmup, float reload, float smoothReload, float heat, float x, float y, float rotation){
+        public PartParams set(float warmup, float reload, float smoothReload, float heat, float x, float y, float rotation, float elevation){
             this.warmup = warmup;
             this.reload = reload;
             this.heat = heat;
@@ -34,6 +48,7 @@ public abstract class DrawPart{
             this.x = x;
             this.y = y;
             this.rotation = rotation;
+            this.elevation = elevation;
             this.sideOverride = -1;
             this.life = 0f;
             this.sideMultiplier = 1;

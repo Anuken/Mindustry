@@ -1097,9 +1097,9 @@ public class UnitType extends UnlockableContent{
 
                 WeaponMount first = unit.mounts.length > part.weaponIndex ? unit.mounts[part.weaponIndex] : null;
                 if(first != null){
-                    DrawPart.params.set(first.warmup, first.reload / weapons.first().reload, first.smoothReload, first.heat, unit.x, unit.y, unit.rotation);
+                    DrawPart.params.set(first.warmup, first.reload / weapons.first().reload, first.smoothReload, first.heat, unit.x, unit.y, unit.rotation, unit.elevation);
                 }else{
-                    DrawPart.params.set(0f, 0f, 0f, 0f, unit.x, unit.y, unit.rotation);
+                    DrawPart.params.set(0f, 0f, 0f, 0f, unit.x, unit.y, unit.rotation, unit.elevation);
                 }
 
                 if(unit instanceof Scaled s){

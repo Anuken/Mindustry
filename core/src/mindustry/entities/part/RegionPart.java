@@ -54,6 +54,7 @@ public class RegionPart extends DrawPart{
 
     @Override
     public void draw(PartParams params){
+        Color colorTemp = Draw.getColor();
         float z = Draw.z();
         if(layer > 0) Draw.z(layer);
         //TODO 'under' should not be special cased like this...
@@ -110,7 +111,7 @@ public class RegionPart extends DrawPart{
                 if(color != null) Draw.color();
             }
 
-            if(heat.found()){
+            if(heat.found() && !colorTemp.equals(Pal.shadow)){
                 Drawf.additive(heat, heatColor.write(Tmp.c1).a(heatProgress.getClamp(params) * heatColor.a), rx, ry, rot, turretShading ? Layer.turretHeat : Draw.z() + heatLayerOffset);
             }
 
@@ -127,7 +128,7 @@ public class RegionPart extends DrawPart{
                 float sign = (i == 1 ? -1 : 1) * params.sideMultiplier;
                 Tmp.v1.set((x + mx) * sign, y + my).rotate(params.rotation - 90);
 
-                childParam.set(params.warmup, params.reload, params.smoothReload, params.heat, params.x + Tmp.v1.x, params.y + Tmp.v1.y, i * sign + mr * sign + params.rotation);
+                childParam.set(params.warmup, params.reload, params.smoothReload, params.heat, params.x + Tmp.v1.x, params.y + Tmp.v1.y, i * sign + mr * sign + params.rotation, params.elevation);
                 childParam.sideMultiplier = params.sideMultiplier;
                 childParam.life = params.life;
                 childParam.sideOverride = i;
