@@ -135,7 +135,11 @@ public class SectorInfo{
 
         //if there are infinite waves and no win wave, add a win wave.
         if(winWave <= 0 && !attack){
-            winWave = 30;
+            if(state.rules.sector != null && state.rules.sector.preset != null && state.rules.sector.preset.captureWave > 0){
+                winWave = state.rules.sector.preset.captureWave;
+            }else{
+                winWave = 30;
+            }
         }
 
         state.wave = wave;
