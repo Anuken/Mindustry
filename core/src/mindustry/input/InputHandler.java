@@ -698,6 +698,121 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
     }
 
+    //TODO when shift is held? ctrl?
+    public boolean multiUnitSelect(){
+        return false;
+    }
+
+    public void selectUnitsRect(){
+        if(commandMode && commandRect){
+            if(!tappedOne){
+                var units = selectedCommandUnits(commandRectX, commandRectY, input.mouseWorldX() - commandRectX, input.mouseWorldY() - commandRectY);
+                if(multiUnitSelect()){
+                    //tiny brain method of unique addition
+                    selectedUnits.removeAll(units);
+                }else{
+                    //nothing selected, clear units
+                    selectedUnits.clear();
+                }
+                selectedUnits.addAll(units);
+                commandBuild = null;
+            }
+            commandRect = false;
+        }
+    }
+
+    public void commandTap(float screenX, float screenY){
+        if(commandMode){
+            //right click: move to position
+
+            //move to location - TODO right click instead?
+            Vec2 target = input.mouseWorld(screenX, screenY).cpy();
+
+            if(selectedUnits.size > 0){
+
+                Teamc attack = world.buildWorld(target.x, target.y);
+
+                if(attack == null || attack.team() == player.team()){
+                    attack = selectedEnemyUnit(target.x, target.y);
+                }
+
+                int[] ids = new int[selectedUnits.size];
+                for(int i = 0; i < ids.length; i++){
+                    ids[i] = selectedUnits.get(i).id;
+                }
+
+                Call.commandUnits(player, ids, attack instanceof Building b ? b : null, attack instanceof Unit u ? u : null, target);
+            }
+
+            if(commandBuild != null){
+                Call.commandBuilding(player, commandBuild, target);
+            }
+        }
+    }
+
+    public void drawCommand(Unit sel){
+        Drawf.square(sel.x, sel.y, sel.hitSize / 1.4f + Mathf.absin(4f, 1f), selectedUnits.contains(sel) ? Pal.remove : Pal.accent);
+    }
+
+    public void drawCommanded(){
+        if(commandMode){
+            //happens sometimes
+            selectedUnits.removeAll(u -> !u.isCommandable());
+
+            //draw command overlay UI
+            for(Unit unit : selectedUnits){
+                CommandAI ai = unit.command();
+                //draw target line
+                if(ai.targetPos != null){
+                    Position lineDest = ai.attackTarget != null ? ai.attackTarget : ai.targetPos;
+                    Drawf.limitLine(unit, lineDest, unit.hitSize / 2f, 3.5f);
+
+                    if(ai.attackTarget == null){
+                        Drawf.square(lineDest.getX(), lineDest.getY(), 3.5f);
+                    }
+                }
+
+                Drawf.square(unit.x, unit.y, unit.hitSize / 1.4f + 1f);
+
+                if(ai.attackTarget != null){
+                    Drawf.target(ai.attackTarget.getX(), ai.attackTarget.getY(), 6f, Pal.remove);
+                }
+            }
+
+            if(commandBuild != null){
+                Drawf.square(commandBuild.x, commandBuild.y, commandBuild.hitSize() / 1.4f + 1f);
+                var cpos = commandBuild.getCommandPosition();
+
+                if(cpos != null){
+                    Drawf.limitLine(commandBuild, cpos, commandBuild.hitSize() / 2f, 3.5f);
+                    Drawf.square(cpos.x, cpos.y, 3.5f);
+                }
+            }
+
+            if(commandMode && !commandRect){
+                Unit sel = selectedCommandUnit(input.mouseWorldX(), input.mouseWorldY());
+
+                if(sel != null && !(!multiUnitSelect() && selectedUnits.size == 1 && selectedUnits.contains(sel))){
+                    drawCommand(sel);
+                }
+            }
+
+            if(commandRect){
+                float x2 = input.mouseWorldX(), y2 = input.mouseWorldY();
+                var units = selectedCommandUnits(commandRectX, commandRectY, x2 - commandRectX, y2 - commandRectY);
+                for(var unit : units){
+                    drawCommand(unit);
+                }
+
+                Draw.color(Pal.accent, 0.3f);
+                Fill.crect(commandRectX, commandRectY, x2 - commandRectX, y2 - commandRectY);
+            }
+        }
+
+        Draw.reset();
+
+    }
+
     public void drawBottom(){
 
     }
