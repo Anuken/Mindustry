@@ -264,6 +264,13 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     }
 
     @Override
+    public void collision(Hitboxc other, float x, float y){
+        if(other instanceof Bullet bullet){
+            controller.hit(bullet);
+        }
+    }
+
+    @Override
     public int itemCapacity(){
         return type.itemCapacity;
     }

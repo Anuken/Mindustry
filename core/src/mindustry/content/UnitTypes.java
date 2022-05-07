@@ -39,7 +39,7 @@ public class UnitTypes{
     //legs
     public static @EntityDef({Unitc.class, Legsc.class}) UnitType corvus, atrax,
     merui, cleroi, anthicus,
-    tecta, collaris; //TODO horrid name here
+    tecta, collaris;
 
     //legs, legacy
     public static @EntityDef(value = {Unitc.class, Legsc.class}, legacy = true) UnitType spiroct, arkyid, toxopid;
@@ -2523,7 +2523,6 @@ public class UnitTypes{
                     spread = 3.5f;
                 }};
 
-                //TODO make this look nicer
                 bullet = new RailBulletType(){{
                     length = 160f;
                     damage = 48f;
@@ -2699,7 +2698,6 @@ public class UnitTypes{
                     fragBullets = 5;
                     fragVelocityMin = 1f;
 
-                    //TODO
                     fragBullet = new BasicBulletType(8f, 25){{
                         sprite = "missile-large";
                         width = 8f;
@@ -3324,7 +3322,6 @@ public class UnitTypes{
                     weaveMag = 4;
                     weaveScale = 4;
                     lifetime = 55f;
-                    //TODO better
                     shootEffect = Fx.shootBig2;
                     smokeEffect = Fx.shootSmokeTitan;
                     splashDamage = 60f;
@@ -3454,7 +3451,6 @@ public class UnitTypes{
 
                     despawnEffect = Fx.none;
 
-                    //TODO diff effect
                     hitEffect = despawnEffect = new ExplosionEffect(){{
                         lifetime = 30f;
                         waveStroke = 2f;
@@ -3571,7 +3567,6 @@ public class UnitTypes{
                 mirror = false;
                 shoot = new ShootHelix();
 
-                //TODO cooler + balancing
                 bullet = new BasicBulletType(5f, 34){{
                     width = 7f;
                     height = 12f;
@@ -3946,7 +3941,6 @@ public class UnitTypes{
 
         float coreFleeRange = 500f;
 
-        //TODO bad name
         evoke = new ErekirUnitType("evoke"){{
             coreUnitDock = true;
             controller = u -> new BuilderAI(true, coreFleeRange);
