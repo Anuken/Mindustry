@@ -294,7 +294,11 @@ public class Teams{
 
             //convert all team tiles to neutral, randomly killing them
             for(var b : builds){
-                scheduleDerelict(b);
+                if(b instanceof CoreBuild){
+                    b.kill();
+                }else{
+                    scheduleDerelict(b);
+                }
             }
 
             //kill all units randomly
