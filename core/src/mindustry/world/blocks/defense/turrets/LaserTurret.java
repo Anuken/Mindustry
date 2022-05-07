@@ -6,6 +6,7 @@ import arc.util.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.type.*;
+import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -27,6 +28,15 @@ public class LaserTurret extends PowerTurret{
 
         stats.remove(Stat.booster);
         stats.add(Stat.input, StatValues.boosters(reload, coolant.amount, coolantMultiplier, false, this::consumesLiquid));
+    }
+
+    @Override
+    public void init(){
+        super.init();
+
+        if(coolant == null){
+            coolant = findConsumer(c -> c instanceof ConsumeLiquidBase);
+        }
     }
 
     public class LaserTurretBuild extends PowerTurretBuild{
@@ -69,15 +79,20 @@ public class LaserTurret extends PowerTurret{
                 recoil = recoilAmount;
             }else if(reloadCounter > 0){
                 wasShooting = true;
-                //TODO does not handle multi liquid req?
-                Liquid liquid = liquids.current();
-                float maxUsed = coolant.amount;
-                float used = (cheating() ? maxUsed : Math.min(liquids.get(liquid), maxUsed)) * delta();
-                reloadCounter -= used * liquid.heatCapacity * coolantMultiplier;
-                liquids.remove(liquid, used);
 
-                if(Mathf.chance(0.06 * used)){
-                    coolEffect.at(x + Mathf.range(size * tilesize / 2f), y + Mathf.range(size * tilesize / 2f));
+                if(coolant != null){
+                    //TODO does not handle multi liquid req?
+                    Liquid liquid = liquids.current();
+                    float maxUsed = coolant.amount;
+                    float used = (cheating() ? maxUsed : Math.min(liquids.get(liquid), maxUsed)) * delta();
+                    reloadCounter -= used * liquid.heatCapacity * coolantMultiplier;
+                    liquids.remove(liquid, used);
+
+                    if(Mathf.chance(0.06 * used)){
+                        coolEffect.at(x + Mathf.range(size * tilesize / 2f), y + Mathf.range(size * tilesize / 2f));
+                    }
+                }else{
+                    reloadCounter -= edelta();
                 }
             }
         }
