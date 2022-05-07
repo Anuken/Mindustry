@@ -709,6 +709,13 @@ public class MobileInput extends InputHandler implements GestureListener{
             commandMode = false;
         }
 
+        //validate commanding units
+        selectedUnits.removeAll(u -> !u.isCommandable() || !u.isValid());
+
+        if(!commandMode){
+            selectedUnits.clear();
+        }
+
         //zoom camera
         if(!locked && Math.abs(Core.input.axisTap(Binding.zoom)) > 0 && !Core.input.keyDown(Binding.rotateplaced) && (Core.input.keyDown(Binding.diagonal_placement) || ((!player.isBuilder() || !isPlacing() || !block.rotate) && selectPlans.isEmpty()))){
             renderer.scaleCamera(Core.input.axisTap(Binding.zoom));
