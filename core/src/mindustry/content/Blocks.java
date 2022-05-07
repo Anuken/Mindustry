@@ -1327,10 +1327,8 @@ public class Blocks{
             //outputItem = new ItemStack(Items.scrap, 1);
         }};
 
-        //TODO should have a useful turret ammo byproduct? scrap?
-        //TODO surge being removed I think
         surgeCrucible = new HeatCrafter("surge-crucible"){{
-            requirements(Category.crafting, with(Items.silicon, 100, Items.graphite, 80, Items.carbide, 60, Items.thorium, 120, Items.phaseFabric, 80));
+            requirements(Category.crafting, with(Items.silicon, 100, Items.graphite, 80, Items.tungsten, 80, Items.oxide, 80));
 
             size = 3;
 
@@ -1952,7 +1950,7 @@ public class Blocks{
         }};
 
         surgeConveyor = new StackConveyor("surge-conveyor"){{
-            requirements(Category.distribution, with(Items.surgeAlloy, 3, Items.oxide, 5));
+            requirements(Category.distribution, with(Items.surgeAlloy, 1, Items.tungsten, 1));
             health = 130;
             //TODO different base speed/item capacity?
             speed = 5f / 60f;
@@ -1968,7 +1966,7 @@ public class Blocks{
         }};
 
         surgeRouter = new StackRouter("surge-router"){{
-            requirements(Category.distribution, with(Items.oxide, 10, Items.surgeAlloy, 10));
+            requirements(Category.distribution, with(Items.surgeAlloy, 5, Items.tungsten, 1));
             health = 130;
 
             speed = 6f;
@@ -1983,7 +1981,7 @@ public class Blocks{
         }};
 
         unitCargoLoader = new UnitCargoLoader("unit-cargo-loader"){{
-            requirements(Category.distribution, with(Items.silicon, 80, Items.thorium, 50, Items.oxide, 50));
+            requirements(Category.distribution, with(Items.silicon, 80, Items.surgeAlloy, 50, Items.oxide, 20));
 
             size = 3;
             buildTime = 60f * 8f;
@@ -1991,7 +1989,7 @@ public class Blocks{
             consumePower(8f / 60f);
 
             //intentionally set absurdly high to make this block not overpowered
-            consumeLiquid(Liquids.nitrogen, 20f / 60f);
+            consumeLiquid(Liquids.nitrogen, 10f / 60f);
 
             itemCapacity = 200;
         }};
@@ -3076,7 +3074,7 @@ public class Blocks{
                     statusDuration = 10f;
                     hittable = false;
                     lightColor = Color.white;
-                    collidesGround = false;
+                    collidesAir = false;
                     buildingDamageMultiplier = 0.25f;
                 }};
             }};

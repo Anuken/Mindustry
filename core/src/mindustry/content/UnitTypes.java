@@ -1322,8 +1322,7 @@ public class UnitTypes{
         }};
 
         mega = new UnitType("mega"){{
-            //TODO control?
-            aiController = RepairAI::new;
+            controller = u -> new RepairAI();
 
             mineTier = 3;
             mineSpeed = 4f;
