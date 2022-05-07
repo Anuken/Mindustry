@@ -217,7 +217,7 @@ public class BulletType extends Content implements Cloneable{
     /** Use a negative value to disable homing delay. */
     public float homingDelay = -1f;
 
-    /** Range of healing bock suppression effect. */
+    /** Range of healing block suppression effect. */
     public float suppressionRange = -1f;
     /** Duration of healing block suppression effect. */
     public float suppressionDuration = 60f * 8f;
