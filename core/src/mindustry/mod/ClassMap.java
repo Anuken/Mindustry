@@ -381,7 +381,6 @@ public class ClassMap{
         classes.put("Unloader", mindustry.world.blocks.storage.Unloader.class);
         classes.put("ContainerStat", mindustry.world.blocks.storage.Unloader.ContainerStat.class);
         classes.put("UnloaderBuild", mindustry.world.blocks.storage.Unloader.UnloaderBuild.class);
-        classes.put("ControlCore", mindustry.world.blocks.units.ControlCore.class);
         classes.put("DroneCenter", mindustry.world.blocks.units.DroneCenter.class);
         classes.put("DroneCenterBuild", mindustry.world.blocks.units.DroneCenter.DroneCenterBuild.class);
         classes.put("EffectDroneAI", mindustry.world.blocks.units.DroneCenter.EffectDroneAI.class);
