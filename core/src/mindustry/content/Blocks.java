@@ -4338,7 +4338,7 @@ public class Blocks{
             size = 5;
             plans.add(
             new AssemblerUnitPlan(UnitTypes.quell, 60f * 60f, PayloadStack.list(UnitTypes.elude, 4, Blocks.berylliumWallLarge, 8)),
-            new AssemblerUnitPlan(UnitTypes.disrupt, 60f * 60f * 3f, PayloadStack.list(UnitTypes.locus, 6, Blocks.carbideWallLarge, 20))
+            new AssemblerUnitPlan(UnitTypes.disrupt, 60f * 60f * 3f, PayloadStack.list(UnitTypes.avert, 6, Blocks.carbideWallLarge, 20))
             );
             areaSize = 13;
 
@@ -4462,7 +4462,7 @@ public class Blocks{
             consumePower(2f);
             size = 3;
             //TODO expand this list
-            filter = Seq.with(Blocks.tungstenWallLarge, Blocks.berylliumWallLarge, Blocks.reinforcedLiquidContainer, Blocks.reinforcedContainer, Blocks.beamNode);
+            filter = Seq.with(Blocks.tungstenWallLarge, Blocks.berylliumWallLarge, Blocks.carbideWallLarge, Blocks.reinforcedLiquidContainer, Blocks.reinforcedContainer, Blocks.beamNode);
         }};
 
         //yes this block is pretty much useless

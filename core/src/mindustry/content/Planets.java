@@ -50,6 +50,7 @@ public class Planets{
                 new HexSkyMesh(this, 2, 0.15f, 0.14f, 5, Color.valueOf("eba768").a(0.75f), 2, 0.42f, 1f, 0.43f),
                 new HexSkyMesh(this, 3, 0.6f, 0.15f, 5, Color.valueOf("eea293").a(0.75f), 2, 0.42f, 1.2f, 0.45f)
             );
+            sectorSeed = 1;
             alwaysUnlocked = true;
             landCloudColor = Color.valueOf("ed6542");
             atmosphereColor = Color.valueOf("f07218");

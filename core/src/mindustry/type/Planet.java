@@ -73,6 +73,8 @@ public class Planet extends UnlockableContent{
     public float lightSrcFrom = 0f, lightSrcTo = 0.8f, lightDstFrom = 0.2f, lightDstTo = 1f;
     /** The default starting sector displayed to the map dialog. */
     public int startSector = 0;
+    /** Seed for sector base generation on this planet. -1 to use a random one based on ID. */
+    public int sectorSeed = -1;
     /** Whether the bloom render effect is enabled. */
     public boolean bloom = false;
     /** Whether this planet is displayed. */
@@ -286,7 +288,7 @@ public class Planet extends UnlockableContent{
         }
 
         if(generator != null){
-            Noise.setSeed(id + 1);
+            Noise.setSeed(sectorSeed < 0 ? id + 1 : sectorSeed);
 
             for(Sector sector : sectors){
                 generator.generateSector(sector);
