@@ -24,7 +24,7 @@ import static mindustry.Vars.*;
 
 public class BuildTurret extends BaseTurret{
     public final int timerTarget = timers++, timerTarget2 = timers++;
-    public int targetInterval = 30;
+    public int targetInterval = 15;
 
     public @Load(value = "@-base", fallback = "block-@size") TextureRegion baseRegion;
     public @Load("@-glow") TextureRegion glowRegion;
@@ -107,10 +107,10 @@ public class BuildTurret extends BaseTurret{
 
             checkSuppression();
 
-            unit.buildSpeedMultiplier(Math.max(efficiency * timeScale, 0.0001f));
-            unit.speedMultiplier(efficiency * timeScale);
+            unit.buildSpeedMultiplier(potentialEfficiency * timeScale);
+            unit.speedMultiplier(potentialEfficiency * timeScale);
 
-            warmup = Mathf.lerpDelta(warmup, unit.activelyBuilding() ? 1f : 0f, 0.1f);
+            warmup = Mathf.lerpDelta(warmup, unit.activelyBuilding() ? efficiency : 0f, 0.1f);
 
             if(!isControlled()){
                 unit.updateBuilding(true);
@@ -164,8 +164,8 @@ public class BuildTurret extends BaseTurret{
                     BuildPlan req = unit.buildPlan();
 
                     //clear break plan if another player is breaking something
-                    if(!req.breaking && timer.get(timerTarget2, 40f)){
-                        for(Player player : Groups.player){
+                    if(!req.breaking && timer.get(timerTarget2, 30f)){
+                        for(Player player : team.data().players){
                             if(player.isBuilder() && player.unit().activelyBuilding() && player.unit().buildPlan().samePos(req) && player.unit().buildPlan().breaking){
                                 unit.plans().removeFirst();
                                 //remove from list of plans
@@ -197,9 +197,6 @@ public class BuildTurret extends BaseTurret{
             unit.plans().remove(b -> b.build() == this);
 
             unit.updateBuildLogic();
-
-            //at 0 build speed the unit thinks it can't build, so make it >0 after updating
-            unit.buildSpeedMultiplier(Math.max(unit.buildSpeedMultiplier(), 0.00001f));
         }
 
         @Override
@@ -223,7 +220,9 @@ public class BuildTurret extends BaseTurret{
                 Drawf.additive(glowRegion, heatColor, warmup, x, y, rotation - 90f, Layer.turretHeat);
             }
 
-            unit.drawBuilding();
+            if(efficiency > 0){
+                unit.drawBuilding();
+            }
         }
 
         @Override
