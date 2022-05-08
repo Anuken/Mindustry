@@ -122,6 +122,10 @@ public final class FogControl implements CustomChunk{
         return data.read.get(x + y * ww);
     }
 
+    public void resetFog(){
+        fog = null;
+    }
+
     @Nullable FogData data(Team team){
         return fog == null || fog[team.id] == null ? null : fog[team.id];
     }

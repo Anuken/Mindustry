@@ -46,7 +46,7 @@ public class MinimapRenderer{
                 if(event.tile.block().solid && event.tile.y > 0 && event.tile.isCenter()){
                     event.tile.getLinkedTiles(t -> {
                         Tile tile = world.tile(t.x, t.y - 1);
-                        if(tile.block() == Blocks.air){
+                        if(tile != null && tile.block() == Blocks.air){
                             update(tile);
                         }
                     });

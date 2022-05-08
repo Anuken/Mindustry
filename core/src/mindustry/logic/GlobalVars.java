@@ -17,8 +17,8 @@ import java.io.*;
 
 import static mindustry.Vars.*;
 
-/** Stores global constants for logic processors. */
-public class GlobalConstants{
+/** Stores global logic variables for logic processors. */
+public class GlobalVars{
     public static final int ctrlProcessor = 1, ctrlPlayer = 2, ctrlCommand = 3;
     public static final ContentType[] lookableContent = {ContentType.block, ContentType.unit, ContentType.item, ContentType.liquid};
     /** Global random state. */

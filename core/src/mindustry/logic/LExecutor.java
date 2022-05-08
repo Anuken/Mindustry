@@ -108,7 +108,7 @@ public class LExecutor{
 
     public Var var(int index){
         //global constants have variable IDs < 0, and they are fetched from the global constants object after being negated
-        return index < 0 ? constants.get(-index) : vars[index];
+        return index < 0 ? logicVars.get(-index) : vars[index];
     }
 
     public @Nullable Building building(int index){
@@ -1104,7 +1104,7 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            exec.setobj(dest, constants.lookupContent(type, exec.numi(from)));
+            exec.setobj(dest, logicVars.lookupContent(type, exec.numi(from)));
         }
     }
 

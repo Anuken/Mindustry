@@ -134,7 +134,7 @@ public class ImagePacker{
 
         Seq<UnlockableContent> lookupCont = new Seq<>();
 
-        for(ContentType t : GlobalConstants.lookableContent){
+        for(ContentType t : GlobalVars.lookableContent){
             lookupCont.addAll(Vars.content.<UnlockableContent>getBy(t).select(UnlockableContent::logicVisible));
         }
 
@@ -148,7 +148,7 @@ public class ImagePacker{
 
         if(logicidfile.exists()){
             try(DataInputStream in = new DataInputStream(logicidfile.readByteStream())){
-                for(ContentType ctype : GlobalConstants.lookableContent){
+                for(ContentType ctype : GlobalVars.lookableContent){
                     short amount = in.readShort();
                     for(int i = 0; i < amount; i++){
                         String name = in.readUTF();
@@ -183,7 +183,7 @@ public class ImagePacker{
 
         //write the resulting IDs
         try(DataOutputStream out = new DataOutputStream(logicidfile.write(false, 2048))){
-            for(ContentType t : GlobalConstants.lookableContent){
+            for(ContentType t : GlobalVars.lookableContent){
                 Seq<UnlockableContent> all = idToContent[t.ordinal()].values().toArray().sort(u -> registered[t.ordinal()].get(u));
                 out.writeShort(all.size);
                 for(UnlockableContent u : all){

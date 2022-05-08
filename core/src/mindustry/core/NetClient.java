@@ -469,8 +469,8 @@ public class NetClient implements ApplicationListener{
 
             //note that this is far from a guarantee that random state is synced - tiny changes in delta and ping can throw everything off again.
             //syncing will only make much of a difference when rand() is called infrequently
-            GlobalConstants.rand.seed0 = rand0;
-            GlobalConstants.rand.seed1 = rand1;
+            GlobalVars.rand.seed0 = rand0;
+            GlobalVars.rand.seed1 = rand1;
 
             universe.updateNetSeconds(timeData);
 

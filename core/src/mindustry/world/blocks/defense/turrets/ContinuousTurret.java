@@ -52,6 +52,11 @@ public class ContinuousTurret extends Turret{
         }
 
         @Override
+        public boolean shouldConsume(){
+            return isShooting();
+        }
+
+        @Override
         public BulletType peekAmmo(){
             return shootType;
         }

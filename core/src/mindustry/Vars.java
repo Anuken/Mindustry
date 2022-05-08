@@ -232,7 +232,7 @@ public class Vars implements Loadable{
     public static BeControl becontrol;
     public static AsyncCore asyncCore;
     public static BaseRegistry bases;
-    public static GlobalConstants constants;
+    public static GlobalVars logicVars;
     public static MapEditor editor;
     public static GameService service = new GameService();
 
@@ -313,7 +313,7 @@ public class Vars implements Loadable{
         controlPath = new ControlPathfinder();
         fogControl = new FogControl();
         bases = new BaseRegistry();
-        constants = new GlobalConstants();
+        logicVars = new GlobalVars();
         javaPath =
             new Fi(OS.prop("java.home")).child("bin/java").exists() ? new Fi(OS.prop("java.home")).child("bin/java").absolutePath() :
             Core.files.local("jre/bin/java").exists() ? Core.files.local("jre/bin/java").absolutePath() :
@@ -364,22 +364,24 @@ public class Vars implements Loadable{
 
         Seq<String> logBuffer = new Seq<>();
         Log.logger = (level, text) -> {
-            String result = text;
-            String rawText = Log.format(stags[level.ordinal()] + "&fr " + text);
-            System.out.println(rawText);
+            synchronized(logBuffer){
+                String result = text;
+                String rawText = Log.format(stags[level.ordinal()] + "&fr " + text);
+                System.out.println(rawText);
 
-            result = tags[level.ordinal()] + " " + result;
+                result = tags[level.ordinal()] + " " + result;
 
-            if(!headless && (ui == null || ui.scriptfrag == null)){
-                logBuffer.add(result);
-            }else if(!headless){
-                if(!OS.isWindows){
-                    for(String code : ColorCodes.values){
-                        result = result.replace(code, "");
+                if(!headless && (ui == null || ui.scriptfrag == null)){
+                    logBuffer.add(result);
+                }else if(!headless){
+                    if(!OS.isWindows){
+                        for(String code : ColorCodes.values){
+                            result = result.replace(code, "");
+                        }
                     }
-                }
 
-                ui.scriptfrag.addMessage(Log.removeColors(result));
+                    ui.scriptfrag.addMessage(Log.removeColors(result));
+                }
             }
         };
 

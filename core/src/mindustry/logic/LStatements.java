@@ -704,7 +704,7 @@ public class LStatements{
 
             table.button(b -> {
                 b.label(() -> type.name());
-                b.clicked(() -> showSelect(b, GlobalConstants.lookableContent, type, o -> {
+                b.clicked(() -> showSelect(b, GlobalVars.lookableContent, type, o -> {
                     type = o;
                 }));
             }, Styles.logict, () -> {}).size(64f, 40f).pad(4f).color(table.color);
