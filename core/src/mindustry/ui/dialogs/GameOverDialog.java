@@ -71,17 +71,17 @@ public class GameOverDialog extends BaseDialog{
             t.setBackground(Styles.black3);
 
             t.table(stats -> {
-                if(state.rules.waves) addStat(stats, Core.bundle.get("stat.wave"), state.stats.wavesLasted, 0f);
-                addStat(stats, Core.bundle.get("stat.unitsCreated"), state.stats.unitsCreated, 0.05f);
-                addStat(stats, Core.bundle.get("stat.enemiesDestroyed"), state.stats.enemyUnitsDestroyed, 0.1f);
-                addStat(stats, Core.bundle.get("stat.built"), state.stats.buildingsBuilt, 0.15f);
-                addStat(stats, Core.bundle.get("stat.destroyed"), state.stats.buildingsDestroyed, 0.2f);
-                addStat(stats, Core.bundle.get("stat.deconstructed"), state.stats.buildingsDeconstructed, 0.25f);
+                if(state.rules.waves) addStat(stats, Core.bundle.get("stats.wave"), state.stats.wavesLasted, 0f);
+                addStat(stats, Core.bundle.get("stats.unitsCreated"), state.stats.unitsCreated, 0.05f);
+                addStat(stats, Core.bundle.get("stats.enemiesDestroyed"), state.stats.enemyUnitsDestroyed, 0.1f);
+                addStat(stats, Core.bundle.get("stats.built"), state.stats.buildingsBuilt, 0.15f);
+                addStat(stats, Core.bundle.get("stats.destroyed"), state.stats.buildingsDestroyed, 0.2f);
+                addStat(stats, Core.bundle.get("stats.deconstructed"), state.stats.buildingsDeconstructed, 0.25f);
             }).top().grow().row();
 
             if(control.saves.getCurrent() != null){
                 t.table(tt -> {
-                    tt.add(new FLabel(Core.bundle.get("stat.playtime"))).left().pad(5).growX();
+                    tt.add(new FLabel(Core.bundle.get("stats.playtime"))).left().pad(5).growX();
                     tt.add(new FLabel("[accent]" + control.saves.getCurrent().getPlayTime())).right().pad(5);
                 }).growX();
             }
