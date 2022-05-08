@@ -112,6 +112,8 @@ public class UnitType extends UnlockableContent{
     targetPriority = 0f,
     /** Elevation of shadow drawn under this (ground) unit. Visual only. */
     shadowElevation = -1f,
+    /** Scale for length of shadow drawn under this unit. Does nothing if this unit has no shadow. */
+    shadowElevationScl = 1f,
     /** backwards engine offset from center of unit */
     engineOffset = 5f,
     /** main engine radius */
@@ -1147,7 +1149,7 @@ public class UnitType extends UnlockableContent{
     }
 
     public void drawShadow(Unit unit){
-        float e = Math.max(unit.elevation, shadowElevation) * (1f - unit.drownTime);
+        float e = Mathf.clamp(unit.elevation, shadowElevation, 1f) * shadowElevationScl * (1f - unit.drownTime);
         float x = unit.x + shadowTX * e, y = unit.y + shadowTY * e;
         Floor floor = world.floorWorld(x, y);
 
