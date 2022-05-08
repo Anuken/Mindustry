@@ -742,8 +742,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             Unit unit = selectedCommandUnit(input.mouseWorldX(), input.mouseWorldY());
             Building build = world.buildWorld(input.mouseWorldX(), input.mouseWorldY());
             if(unit != null){
-                if(selectedUnits.contains(unit)){
-                    selectedUnits.remove(unit);
+                if(!selectedUnits.contains(unit)){
+                    selectedUnits.add(unit);
                 }else{
                     selectedUnits.clear();
                     selectedUnits.add(unit);
