@@ -413,7 +413,7 @@ public class Mods implements Loadable{
                 mods.add(mod);
             }catch(Throwable e){
                 if(e instanceof ClassNotFoundException && e.getMessage().contains("mindustry.plugin.Plugin")){
-                    Log.warn("Plugin '@' is outdated and needs to be ported to v7! Update its main class to inherit from 'mindustry.mod.Plugin'. See https://mindustrygame.github.io/wiki/modding/6-migrationv6/", file.name());
+                    Log.warn("Plugin '@' is outdated and needs to be ported to v7! Update its main class to inherit from 'mindustry.mod.Plugin'. See https://mindustrygame.github.io/wiki/modding/7-migrationv7/", file.name());
                 }else{
                     Log.err("Failed to load mod file @. Skipping.", file);
                     Log.err(e);
