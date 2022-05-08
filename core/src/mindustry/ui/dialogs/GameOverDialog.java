@@ -1,19 +1,35 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
+import arc.flabel.*;
+import arc.math.*;
+import arc.scene.actions.*;
+import arc.scene.ui.*;
+import arc.scene.ui.layout.*;
+import arc.util.*;
 import mindustry.core.GameState.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
+import mindustry.gen.*;
+import mindustry.graphics.*;
+import mindustry.ui.*;
 
 import static mindustry.Vars.*;
 
 public class GameOverDialog extends BaseDialog{
     private Team winner;
+    private boolean hudShown;
 
     public GameOverDialog(){
         super("@gameover");
+        titleTable.remove();
         setFillParent(true);
-        shown(this::rebuild);
+        shown(() -> {
+            hudShown = ui.hudfrag.shown;
+            ui.hudfrag.shown = false;
+            rebuild();
+        });
+        hidden(() -> ui.hudfrag.shown = hudShown);
 
         Events.on(ResetEvent.class, e -> hide());
     }
@@ -29,7 +45,7 @@ public class GameOverDialog extends BaseDialog{
     }
 
     void rebuild(){
-        title.setText(state.isCampaign() ? Core.bundle.format("sector.lost", state.getSector().name()) : "@gameover");
+        ui.hudfrag.shown = false;
         buttons.clear();
         cont.clear();
 
@@ -37,55 +53,105 @@ public class GameOverDialog extends BaseDialog{
 
         if(state.rules.pvp && winner != null){
             cont.add(Core.bundle.format("gameover.pvp", winner.localized())).pad(6);
+        }else{
+            cont.add(state.isCampaign() ? Core.bundle.format("sector.lost", state.getSector().name()) : "@gameover").center().pad(6);
+        }
+        cont.row();
+
+        if(control.isHighScore()){
+            cont.add("@highscore").pad(6);
+            cont.row();
+        }
+
+        cont.pane(t -> {
+            t.margin(13f);
+            t.left().defaults().left();
+            t.setBackground(Styles.black3);
+
+            t.table(stats -> {
+                if(state.rules.waves) stats.add(new StatLabel(Core.bundle.get("stat.wave"), state.stats.wavesLasted, 0f)).top().pad(5).growX().height(50).row();
+                stats.add(new StatLabel(Core.bundle.get("stat.unitsCreated"), state.stats.unitsCreated, 0.05f)).top().pad(5).growX().height(50).row();
+                stats.add(new StatLabel(Core.bundle.get("stat.enemiesDestroyed"), state.stats.enemyUnitsDestroyed, 0.1f)).top().pad(5).growX().height(50).row();
+                stats.add(new StatLabel(Core.bundle.get("stat.built"), state.stats.buildingsBuilt, 0.15f)).top().pad(5).growX().height(50).row();
+                stats.add(new StatLabel(Core.bundle.get("stat.destroyed"), state.stats.buildingsDestroyed, 0.2f)).top().pad(5).growX().height(50).row();
+                stats.add(new StatLabel(Core.bundle.get("stat.deconstructed"), state.stats.buildingsDeconstructed, 0.25f)).top().pad(5).growX().height(50);
+            }).top().grow().row();
+
+            if(control.saves.getCurrent() != null){
+                t.table(tt -> {
+                    tt.add(new FLabel(Core.bundle.get("stat.playtime"))).left().pad(5).growX();
+
+                    tt.add(new FLabel("[accent]" + control.saves.getCurrent().getPlayTime())).right().pad(5);
+                }).growX();
+            }
+        }).minWidth(370).maxSize(580, 500).grow().pad(12).center().get();
+
+
+        if(state.isCampaign() && net.client()){
+            cont.add("@gameover.waiting").padTop(20f).row();
+        }
+
+        if(state.isCampaign()){
+            if(net.client()){
+                buttons.button("@gameover.disconnect", () -> {
+                    logic.reset();
+                    net.reset();
+                    hide();
+                    state.set(State.menu);
+                }).size(170f, 60f);
+            }else{
+                buttons.button("@continue", () -> {
+                    hide();
+                    ui.planet.show();
+                }).size(170f, 60f);
+            }
+        }else{
             buttons.button("@menu", () -> {
                 hide();
                 logic.reset();
-            }).size(130f, 60f);
-        }else{
-            if(control.isHighScore()){
-                cont.add("@highscore").pad(6);
-                cont.row();
-            }
+            }).size(140f, 60f);
+        }
+    }
 
-            cont.pane(t -> {
-                t.margin(13f);
-                t.left().defaults().left();
-                t.add(Core.bundle.format("stat.wave", state.stats.wavesLasted)).row();
-                t.add(Core.bundle.format("stat.unitsCreated", state.stats.unitsCreated)).row();
-                t.add(Core.bundle.format("stat.enemiesDestroyed", state.stats.enemyUnitsDestroyed)).row();
-                t.add(Core.bundle.format("stat.built", state.stats.buildingsBuilt)).row();
-                t.add(Core.bundle.format("stat.destroyed", state.stats.buildingsDestroyed)).row();
-                t.add(Core.bundle.format("stat.deconstructed", state.stats.buildingsDeconstructed)).row();
-                if(control.saves.getCurrent() != null){
-                    t.add(Core.bundle.format("stat.playtime", control.saves.getCurrent().getPlayTime())).row();
-                }
+    private static class StatLabel extends Table {
+        private float progress = 0;
 
-                if(state.isCampaign() && net.client()){
-                    t.add("@gameover.waiting").padTop(20f).row();
-                }
+        public StatLabel(String stat, int value, float delay){
+            setTransform(true);
+            setClip(true);
+            setBackground(Tex.whiteui);
+            setColor(Pal.accent);
+            margin(2f);
 
-            }).pad(12);
+            FLabel statLabel = new FLabel(stat);
+            statLabel.setStyle(Styles.outlineLabel);
+            statLabel.setWrap(true);
+            statLabel.pause();
 
-            if(state.isCampaign()){
-                if(net.client()){
-                    buttons.button("@gameover.disconnect", () -> {
-                        logic.reset();
-                        net.reset();
-                        hide();
-                        state.set(State.menu);
-                    }).size(170f, 60f);
-                }else{
-                    buttons.button("@continue", () -> {
-                        hide();
-                        ui.planet.show();
-                    }).size(170f, 60f);
-                }
-            }else{
-                buttons.button("@menu", () -> {
-                    hide();
-                    logic.reset();
-                }).size(140f, 60f);
-            }
+            Label valueLabel = new Label("", Styles.outlineLabel);
+            valueLabel.setAlignment(Align.right);
+
+            add(statLabel).left().growX().padLeft(5);
+            add(valueLabel).right().growX().padRight(5);
+
+            actions(
+                Actions.scaleTo(0, 1),
+                Actions.delay(delay),
+                Actions.parallel(
+                    Actions.scaleTo(1, 1, 0.3f, Interp.pow3Out),
+                    Actions.color(Pal.darkestGray, 0.3f, Interp.pow3Out),
+                    Actions.sequence(
+                        Actions.delay(0.3f),
+                        Actions.run(() -> {
+                            valueLabel.update(() -> {
+                                progress = Math.min(1, progress + (Time.delta / 60));
+                                valueLabel.setText("" + (int)Mathf.lerp(0, value, value < 10 ? progress : Interp.slowFast.apply(progress)));
+                            });
+                            statLabel.resume();
+                        })
+                    )
+                )
+            );
         }
     }
 }
