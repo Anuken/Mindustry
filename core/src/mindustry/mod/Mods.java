@@ -1167,7 +1167,7 @@ public class Mods implements Loadable{
             int dot = ver.indexOf(".");
             return dot != -1 ? Strings.parseInt(ver.substring(0, dot), 0) : Strings.parseInt(ver, 0);
         }
-        
+
         @Override
         public String toString(){
             return "ModMeta{" +
