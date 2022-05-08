@@ -1,7 +1,6 @@
 package mindustry.input;
 
 import arc.*;
-import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.input.GestureDetector.*;
 import arc.input.*;
@@ -26,6 +25,7 @@ import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 
+import static arc.Core.*;
 import static mindustry.Vars.*;
 import static mindustry.input.PlaceMode.*;
 
@@ -252,12 +252,19 @@ public class MobileInput extends InputHandler implements GestureListener{
         }).visible(() -> !selectPlans.isEmpty()).name("confirmplace");
     }
 
+    boolean showCancel(){
+        return (player.unit().isBuilding() || block != null || mode == breaking || !selectPlans.isEmpty()) && !hasSchem();
+    }
+
+    boolean hasSchem(){
+        return lastSchematic != null && !selectPlans.isEmpty();
+    }
+
     @Override
     public void buildUI(Group group){
-        Boolp schem = () -> lastSchematic != null && !selectPlans.isEmpty();
 
         group.fill(t -> {
-            t.visible(() -> (player.unit().isBuilding() || block != null || mode == breaking || !selectPlans.isEmpty()) && !schem.get());
+            t.visible(this::showCancel);
             t.bottom().left();
             t.button("@cancel", Icon.cancel, () -> {
                 player.unit().clearBuilding();
@@ -268,7 +275,15 @@ public class MobileInput extends InputHandler implements GestureListener{
         });
 
         group.fill(t -> {
-            t.visible(schem);
+            t.visible(() -> !showCancel() && block == null);
+            t.bottom().left();
+            t.button("@command", Icon.units, Styles.squareTogglet, () -> {
+                commandMode = !commandMode;
+            }).width(155f).height(50f).margin(12f).checked(b -> commandMode);
+        });
+
+        group.fill(t -> {
+            t.visible(this::hasSchem);
             t.bottom().left();
             t.table(Tex.pane, b -> {
                 b.defaults().size(50f);
@@ -342,6 +357,8 @@ public class MobileInput extends InputHandler implements GestureListener{
         if(mode == schematicSelect){
             drawSelection(lineStartX, lineStartY, lastLineX, lastLineY, Vars.maxSchematicSize);
         }
+
+        drawCommanded();
     }
 
     @Override
@@ -522,6 +539,10 @@ public class MobileInput extends InputHandler implements GestureListener{
 
             tryDropItems(tile == null ? null : tile.build, Core.input.mouseWorld(screenX, screenY).x, Core.input.mouseWorld(screenX, screenY).y);
         }
+
+        //select some units
+        selectUnitsRect();
+
         return false;
     }
 
@@ -538,26 +559,36 @@ public class MobileInput extends InputHandler implements GestureListener{
         if(mode == none){
             Vec2 pos = Core.input.mouseWorld(x, y);
 
-            if(player.unit() instanceof Payloadc pay){
-                Unit target = Units.closest(player.team(), pos.x, pos.y, 8f, u -> u.isAI() && u.isGrounded() && pay.canPickup(u) && u.within(pos, u.hitSize + 8f));
-                if(target != null){
-                    payloadTarget = target;
-                }else{
-                    Building build = world.buildWorld(pos.x, pos.y);
+            if(commandMode){
 
-                    if(build != null && build.team == player.team() && (pay.canPickup(build) || build.getPayload() != null && pay.canPickupPayload(build.getPayload()))){
-                        payloadTarget = build;
-                    }else if(pay.hasPayload()){
-                        //drop off at position
-                        payloadTarget = new Vec2(pos);
-                    }else{
-                        manualShooting = true;
-                        this.target = null;
-                    }
-                }
+                //long press begins rect selection.
+                commandRect = true;
+                commandRectX = input.mouseWorldX();
+                commandRectY = input.mouseWorldY();
+
             }else{
-                manualShooting = true;
-                this.target = null;
+
+                if(player.unit() instanceof Payloadc pay){
+                    Unit target = Units.closest(player.team(), pos.x, pos.y, 8f, u -> u.isAI() && u.isGrounded() && pay.canPickup(u) && u.within(pos, u.hitSize + 8f));
+                    if(target != null){
+                        payloadTarget = target;
+                    }else{
+                        Building build = world.buildWorld(pos.x, pos.y);
+
+                        if(build != null && build.team == player.team() && (pay.canPickup(build) || build.getPayload() != null && pay.canPickupPayload(build.getPayload()))){
+                            payloadTarget = build;
+                        }else if(pay.hasPayload()){
+                            //drop off at position
+                            payloadTarget = new Vec2(pos);
+                        }else{
+                            manualShooting = true;
+                            this.target = null;
+                        }
+                    }
+                }else{
+                    manualShooting = true;
+                    this.target = null;
+                }
             }
 
             if(!state.isPaused()) Fx.select.at(pos);
@@ -615,6 +646,9 @@ public class MobileInput extends InputHandler implements GestureListener{
         }else if(mode == breaking && validBreak(linked.x,linked.y) && !hasPlan(linked)){
             //add to selection queue if it's a valid BREAK position
             selectPlans.add(new BuildPlan(linked.x, linked.y));
+        }else if(commandMode && selectedUnits.size > 0){
+            //handle selecting units with command mode
+            commandTap(x, y);
         }else{
             //control units
             if(count == 2){
@@ -669,6 +703,17 @@ public class MobileInput extends InputHandler implements GestureListener{
             mode = none;
             manualShooting = false;
             payloadTarget = null;
+        }
+
+        if(locked || block != null || scene.hasField() || hasSchem() || selectPlans.size > 0){
+            commandMode = false;
+        }
+
+        //validate commanding units
+        selectedUnits.removeAll(u -> !u.isCommandable() || !u.isValid());
+
+        if(!commandMode){
+            selectedUnits.clear();
         }
 
         //zoom camera
@@ -801,7 +846,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public boolean pan(float x, float y, float deltaX, float deltaY){
-        if(Core.scene == null || Core.scene.hasDialog() || Core.settings.getBool("keyboard") || locked()) return false;
+        if(Core.scene == null || Core.scene.hasDialog() || Core.settings.getBool("keyboard") || locked() || commandRect) return false;
 
         float scale = Core.camera.width / Core.graphics.getWidth();
         deltaX *= scale;
@@ -946,7 +991,9 @@ public class MobileInput extends InputHandler implements GestureListener{
             }else if(target == null){
                 player.shooting = false;
                 if(Core.settings.getBool("autotarget") && !(player.unit() instanceof BlockUnitUnit u && u.tile() instanceof ControlBlock c && !c.shouldAutoTarget())){
-                    target = Units.closestTarget(unit.team, unit.x, unit.y, range, u -> u.checkTarget(type.targetAir, type.targetGround), u -> type.targetGround);
+                    if(player.unit().type.canAttack){
+                        target = Units.closestTarget(unit.team, unit.x, unit.y, range, u -> u.checkTarget(type.targetAir, type.targetGround), u -> type.targetGround);
+                    }
 
                     if(allowHealing && target == null){
                         target = Geometry.findClosest(unit.x, unit.y, indexer.getDamaged(Team.sharded));

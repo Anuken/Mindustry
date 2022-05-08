@@ -122,6 +122,13 @@ public class CommandAI extends AIController{
         }
     }
 
+    @Override
+    public void hit(Bullet bullet){
+        if(unit.team.isAI() && bullet.owner instanceof Teamc teamc && teamc.team() != unit.team && attackTarget == null){
+            commandTarget(teamc, true);
+        }
+    }
+
     public static float cohesionScl = 0.3f;
     public static float cohesionRad = 3f, separationRad = 1.1f, separationScl = 1f, flockMult = 0.5f;
 

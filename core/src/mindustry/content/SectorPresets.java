@@ -123,7 +123,7 @@ public class SectorPresets{
                         new ShapeTextMarker("Click to mine [accent]resources[] from walls.", 290f * 8f, 106f * 8f)
                     ),
                     new BuildCountObjective(Blocks.turbineCondenser, 1).withMarkers(
-                        new ShapeTextMarker("Place a [accent]turbine condenser[] on the vent.\nThis will generate [accent]power[].", 289f * 8f, 116f * 8f, 8f * 2.6f, 0f, 9f)
+                        new ShapeTextMarker("Open the tech tree.\nResearch, then place a [accent]turbine condenser[] on the vent.\nThis will generate [accent]power[].", 289f * 8f, 116f * 8f, 8f * 2.6f, 0f, 9f)
                     ),
                     new BuildCountObjective(Blocks.plasmaBore, 1).withMarkers(
                         new ShapeTextMarker("Research and place a [accent]plasma bore[]. \nThis automatically mines resources from walls.", 293.5f * 8f, 113.5f * 8f, 4f * 2.6f, 45f, 60f)

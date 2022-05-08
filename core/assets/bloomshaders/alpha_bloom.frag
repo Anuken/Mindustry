@@ -10,6 +10,6 @@ void main(){
     vec4 bloom = texture2D(u_texture1, v_texCoords) * BloomIntensity;
     original = original *  (vec4(1.0) - bloom);
     vec4 combined =  original + bloom;
-    float mx = min(max(combined.r,max(combined.g,combined.b)), 1.0);
-    gl_FragColor = vec4(combined.rgb / mx, mx);
+    float mx = min(max(combined.r, max(combined.g, combined.b)), 1.0);
+    gl_FragColor = vec4(combined.rgb / max(mx, 0.0001), mx);
 }

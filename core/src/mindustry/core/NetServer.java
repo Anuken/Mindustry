@@ -220,6 +220,7 @@ public class NetServer implements ApplicationListener{
                 }
 
                 if(Groups.player.contains(player -> player.uuid().equals(packet.uuid) || player.usid().equals(packet.usid))){
+                    con.uuid = packet.uuid;
                     con.kick(KickReason.idInUse);
                     return;
                 }

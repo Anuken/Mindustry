@@ -39,6 +39,11 @@ public class EditorTile extends Tile{
     }
 
     @Override
+    public boolean isEditorTile(){
+        return true;
+    }
+
+    @Override
     public void setBlock(Block type, Team team, int rotation, Prov<Building> entityprov){
         if(skip()){
             super.setBlock(type, team, rotation, entityprov);

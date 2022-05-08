@@ -247,7 +247,7 @@ public class Teams{
         /** Enemies with cores or spawn points. */
         public Team[] coreEnemies = {};
         /** Planned blocks for drones. This is usually only blocks that have been broken. */
-        public Queue<BlockPlan> blocks = new Queue<>();
+        public Queue<BlockPlan> plans = new Queue<>();
 
         /** Quadtree for all buildings of this team. Null if not active. */
         public @Nullable QuadTree<Building> buildingTree;
@@ -290,11 +290,15 @@ public class Teams{
             }
 
             //no remaining blocks, cease building if applicable
-            blocks.clear();
+            plans.clear();
 
             //convert all team tiles to neutral, randomly killing them
             for(var b : builds){
-                scheduleDerelict(b);
+                if(b instanceof CoreBuild){
+                    b.kill();
+                }else{
+                    scheduleDerelict(b);
+                }
             }
 
             //kill all units randomly

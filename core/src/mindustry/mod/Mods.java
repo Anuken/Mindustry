@@ -783,16 +783,17 @@ public class Mods implements Loadable{
         ObjectMap<String, Seq<String>> dependencies = new ObjectMap<>();
 
         for(Fi file : files){
-            Fi zip = file.isDirectory() ? file : new ZipFi(file);
-
-            if(zip.list().length == 1 && zip.list()[0].isDirectory()){
-                zip = zip.list()[0];
-            }
-
             ModMeta meta = null;
+
             try{
+                Fi zip = file.isDirectory() ? file : new ZipFi(file);
+
+                if(zip.list().length == 1 && zip.list()[0].isDirectory()){
+                    zip = zip.list()[0];
+                }
+
                 meta = findMeta(zip);
-            }catch(Exception ignored){
+            }catch(Throwable ignored){
             }
 
             if(meta == null) continue;

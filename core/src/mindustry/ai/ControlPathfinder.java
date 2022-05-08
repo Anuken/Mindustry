@@ -157,7 +157,7 @@ public class ControlPathfinder{
     /** @return whether a path is ready */
     public boolean getPathPosition(Unit unit, int pathId, Vec2 destination, Vec2 out){
         //uninitialized
-        if(threads == null) return false;
+        if(threads == null || !world.tiles.in(World.toTile(destination.x), World.toTile(destination.y))) return false;
 
         PathCost costType = unit.type.pathCost;
         int team = unit.team.id;

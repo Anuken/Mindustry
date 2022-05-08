@@ -318,6 +318,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     void lookAt(Sector sector){
         if(sector.tile == Ptile.empty) return;
 
+        state.planet = sector.planet;
         state.camPos.set(Tmp.v33.set(sector.tile.v).rotate(Vec3.Y, -sector.planet.getRotation()));
     }
 

@@ -267,7 +267,7 @@ public class BlockRenderer{
         }
 
         if(brokenFade > 0.001f){
-            for(BlockPlan block : player.team().data().blocks){
+            for(BlockPlan block : player.team().data().plans){
                 Block b = content.block(block.block);
                 if(!camera.bounds(Tmp.r1).grow(tilesize * 2f).overlaps(Tmp.r2.setSize(b.size * tilesize).setCenter(block.x * tilesize + b.offset, block.y * tilesize + b.offset))) continue;
 
