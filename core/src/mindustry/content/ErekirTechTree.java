@@ -374,6 +374,10 @@ public class ErekirTechTree{
 
                         });
 
+                        nodeProduce(Liquids.arkycite, () -> {
+
+                        });
+
                         nodeProduce(Items.thorium, () -> {
                             nodeProduce(Items.carbide, () -> {
                                 nodeProduce(Items.surgeAlloy, () -> {

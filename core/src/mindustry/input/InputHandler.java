@@ -725,6 +725,43 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
     }
 
+    public void selectTypedUnits(){
+        if(commandMode){
+            Unit unit = selectedCommandUnit(input.mouseWorldX(), input.mouseWorldY());
+            if(unit != null){
+                selectedUnits.clear();
+                camera.bounds(Tmp.r1);
+                selectedUnits.addAll(selectedCommandUnits(Tmp.r1.x, Tmp.r1.y, Tmp.r1.width, Tmp.r1.height, u -> u.type == unit.type));
+            }
+        }
+    }
+
+    public void tapCommandUnit(){
+        if(commandMode){
+
+            Unit unit = selectedCommandUnit(input.mouseWorldX(), input.mouseWorldY());
+            Building build = world.buildWorld(input.mouseWorldX(), input.mouseWorldY());
+            if(unit != null){
+                if(selectedUnits.contains(unit)){
+                    selectedUnits.remove(unit);
+                }else{
+                    selectedUnits.clear();
+                    selectedUnits.add(unit);
+                }
+                commandBuild = null;
+            }else{
+                //deselect
+                selectedUnits.clear();
+
+                if(build != null && build.team == player.team() && build.block.commandable){
+                    commandBuild = (commandBuild == build ? null : build);
+                }else{
+                    commandBuild = null;
+                }
+            }
+        }
+    }
+
     public void commandTap(float screenX, float screenY){
         if(commandMode){
             //right click: move to position
@@ -1434,13 +1471,17 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         return tmpUnits.min(u -> !u.inFogTo(player.team()), u -> u.dst(x, y) - u.hitSize/2f);
     }
 
-    public Seq<Unit> selectedCommandUnits(float x, float y, float w, float h){
+    public Seq<Unit> selectedCommandUnits(float x, float y, float w, float h, Boolf<Unit> predicate){
         var tree = player.team().data().tree();
         tmpUnits.clear();
         float rad = 4f;
         tree.intersect(Tmp.r1.set(x - rad/2f, y - rad/2f, rad*2f + w, rad*2f + h).normalize(), tmpUnits);
-        tmpUnits.removeAll(u -> !u.isCommandable());
+        tmpUnits.removeAll(u -> !u.isCommandable() || !predicate.get(u));
         return tmpUnits;
+    }
+
+    public Seq<Unit> selectedCommandUnits(float x, float y, float w, float h){
+        return selectedCommandUnits(x, y, w, h, u -> true);
     }
 
     public void remove(){

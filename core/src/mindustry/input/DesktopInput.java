@@ -242,7 +242,11 @@ public class DesktopInput extends InputHandler{
         if(!locked && block == null && !scene.hasField() &&
                 //disable command mode when player unit can boost and command mode binding is the same
                 !(!player.dead() && player.unit().type.canBoost && keybinds.get(Binding.command_mode).key == keybinds.get(Binding.boost).key)){
-            commandMode = input.keyDown(Binding.command_mode);
+            if(settings.getBool("commandmodehold")){
+                commandMode = input.keyDown(Binding.command_mode);
+            }else if(input.keyTap(Binding.command_mode)){
+                commandMode = !commandMode;
+            }
         }else{
             commandMode = false;
         }
@@ -652,26 +656,12 @@ public class DesktopInput extends InputHandler{
 
         //click: select a single unit
         if(button == KeyCode.mouseLeft){
-            Unit unit = selectedCommandUnit(input.mouseWorldX(), input.mouseWorldY());
-            Building build = world.buildWorld(input.mouseWorldX(), input.mouseWorldY());
-            if(unit != null){
-                if(selectedUnits.contains(unit)){
-                    selectedUnits.remove(unit);
-                }else{
-                    selectedUnits.clear();
-                    selectedUnits.add(unit);
-                }
-                commandBuild = null;
+            if(count >= 2){
+                selectTypedUnits();
             }else{
-                //deselect
-                selectedUnits.clear();
-
-                if(build != null && build.team == player.team() && build.block.commandable){
-                    commandBuild = (commandBuild == build ? null : build);
-                }else{
-                    commandBuild = null;
-                }
+                tapCommandUnit();
             }
+
         }
 
         return super.tap(x, y, count, button);
