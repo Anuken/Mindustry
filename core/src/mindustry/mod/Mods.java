@@ -184,16 +184,26 @@ public class Mods implements Loadable{
 
         for(Fi file : sprites){
             String name = file.nameWithoutExtension();
+            var page = getPage(file);
 
-            if(!prefix && !Core.atlas.has(name)){
-                Log.warn("Sprite '@' in mod '@' attempts to override a non-existent sprite. Ignoring.", name, mod.name);
+            if(!prefix){
+                var existing = Core.atlas.find(name);
+                if(existing == null){
+                    Log.warn("Sprite '@' in mod '@' attempts to override a non-existent sprite. Ignoring.", name, mod.name);
+                    continue;
+                }
+                var existingPage = getPage(existing);
+                if(page != existingPage){
+                    Log.warn("Sprite '@' on page '@' in mod '@' attempts to override a sprite on page '@'. Ignoring.", name, page, mod.name, existingPage);
+                    continue;
+                }
+            }else if(name.endsWith("-outline")){
+                //TODO !!! document this on the wiki !!!
+                //do not allow packing standard outline sprites for now, they are no longer necessary and waste space!
+                //TODO also full regions are bad:  || name.endsWith("-full")
+                Log.warn("Sprite '@' in mod '@' is redundant; outline sprites are no longer needed. Ignoring.", name, mod.name);
                 continue;
             }
-
-            //TODO !!! document this on the wiki !!!
-            //do not allow packing standard outline sprites for now, they are no longer necessary and waste space!
-            //TODO also full regions are bad:  || name.endsWith("-full")
-            if(prefix && (name.endsWith("-outline"))) continue;
 
             //read and bleed pixmaps in parallel
             tasks.add(mainExecutor.submit(() -> {
