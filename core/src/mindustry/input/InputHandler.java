@@ -590,6 +590,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             logicCutsceneZoom = -1f;
         }
 
+        if(!commandMode){
+            commandRect = false;
+        }
+
         playerPlanTree.clear();
         player.unit().plans.each(playerPlanTree::insert);
 

@@ -183,12 +183,12 @@ public class Turret extends ReloadTurret{
 
         public float estimateDps(){
             if(!hasAmmo()) return 0f;
-            return shoot.shots / reload * 60f * peekAmmo().estimateDPS() * potentialEfficiency * timeScale;
+            return shoot.shots / reload * 60f * (peekAmmo() == null ? 0f : peekAmmo().estimateDPS()) * potentialEfficiency * timeScale;
         }
 
         @Override
         public float range(){
-            if(hasAmmo()){
+            if(peekAmmo() != null){
                 return range + peekAmmo().rangeChange;
             }
             return range;
