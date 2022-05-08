@@ -240,8 +240,10 @@ public class DesktopInput extends InputHandler{
                 //disable command mode when player unit can boost and command mode binding is the same
                 !(!player.dead() && player.unit().type.canBoost && keybinds.get(Binding.command_mode).key == keybinds.get(Binding.boost).key)){
             commandMode = input.keyDown(Binding.command_mode);
+            commandRect = commandRect && commandMode;
         }else{
             commandMode = false;
+            commandRect = false;
         }
 
         //validate commanding units
