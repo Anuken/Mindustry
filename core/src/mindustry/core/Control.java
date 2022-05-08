@@ -160,7 +160,7 @@ public class Control implements ApplicationListener, Loadable{
         });
 
         Events.on(SectorCaptureEvent.class, e -> {
-            checkAutoUnlocks();
+            app.post(this::checkAutoUnlocks);
         });
 
         //delete save on campaign game over
@@ -303,7 +303,7 @@ public class Control implements ApplicationListener, Loadable{
     }
 
     /** Automatically unlocks things with no requirements and no locked parents. */
-    void checkAutoUnlocks(){
+    public void checkAutoUnlocks(){
         if(net.client()) return;
 
         for(TechNode node : TechTree.all){
