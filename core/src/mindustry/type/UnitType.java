@@ -362,7 +362,7 @@ public class UnitType extends UnlockableContent{
 
     //TANK UNITS
 
-    /** list of treads as rectangles in IMAGE COORDINATES. these should match the coordinates you see in an image editor*/
+    /** list of treads as rectangles in IMAGE COORDINATES. these are mirrored, and should match the coordinates you see in an image editor. */
     public Rect[] treadRects = {};
     /** number of frames of movement in a tread */
     public int treadFrames = 18;

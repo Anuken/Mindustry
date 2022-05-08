@@ -504,7 +504,7 @@ public class Control implements ApplicationListener, Loadable{
     @Override
     public void dispose(){
         //try to save when exiting
-        if(saves != null && saves.getCurrent() != null && saves.getCurrent().isAutosave() && !net.client() && !state.isMenu()){
+        if(saves != null && saves.getCurrent() != null && saves.getCurrent().isAutosave() && !net.client() && !state.isMenu() && !state.gameOver){
             try{
                 SaveIO.save(control.saves.getCurrent().file);
                 Log.info("Saved on exit.");

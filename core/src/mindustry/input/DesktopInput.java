@@ -225,7 +225,10 @@ public class DesktopInput extends InputHandler{
 
                 Core.camera.position.add(Tmp.v1.setZero().add(Core.input.axis(Binding.move_x), Core.input.axis(Binding.move_y)).nor().scl(camSpeed));
             }else if(!player.dead() && !panning){
-                Core.camera.position.lerpDelta(player, Core.settings.getBool("smoothcamera") ? 0.08f : 1f);
+                //TODO do not pan
+                Team corePanTeam = state.won ? state.rules.waveTeam : player.team();
+                Position coreTarget = state.gameOver && !state.rules.pvp && corePanTeam.data().lastCore != null ? corePanTeam.data().lastCore : null;
+                Core.camera.position.lerpDelta(coreTarget != null ? coreTarget : player, Core.settings.getBool("smoothcamera") ? 0.08f : 1f);
             }
 
             if(panCam){
