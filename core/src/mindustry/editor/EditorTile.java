@@ -157,7 +157,7 @@ public class EditorTile extends Tile{
     }
 
     private boolean skip(){
-        return state.isGame() || editor.isLoading();
+        return state.isGame() || editor.isLoading() || world.isGenerating();
     }
 
     private void op(OpType type, short value){
