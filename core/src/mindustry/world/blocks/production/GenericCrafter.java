@@ -151,7 +151,8 @@ public class GenericCrafter extends Block{
                     Draw.rect(
                         outputLiquids[i].liquid.fullIcon,
                         x + Geometry.d4x(dir) * (size * tilesize / 2f + 4),
-                        y + Geometry.d4y(dir) * (size * tilesize / 2f + 4)
+                        y + Geometry.d4y(dir) * (size * tilesize / 2f + 4),
+                        8f, 8f
                     );
                 }
             }
