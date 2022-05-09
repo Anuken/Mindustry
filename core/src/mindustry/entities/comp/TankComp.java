@@ -33,7 +33,6 @@ abstract class TankComp implements Posc, Flyingc, Hitboxc, Unitc, ElevationMovec
         if(walked && !headless && !inFogTo(player.team())){
             treadEffectTime += Time.delta;
             if(treadEffectTime >= 6f && type.treadRects.length > 0){
-                var treadRegion = type.treadRegion;
                 //first rect should always be at the back
                 var treadRect = type.treadRects[0];
 
