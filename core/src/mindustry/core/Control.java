@@ -407,71 +407,78 @@ public class Control implements ApplicationListener, Loadable{
                     //if there is no base, simulate a new game and place the right loadout at the spawn position
                     if(state.rules.defaultTeam.cores().isEmpty() || hadNoCore){
 
-                        //no spawn set -> delete the sector save
-                        if(sector.info.spawnPosition == 0){
-                            //delete old save
-                            sector.save = null;
-                            slot.delete();
-                            //play again
-                            playSector(origin, sector, reloader);
-                            return;
-                        }
+                        if(sector.planet.clearSectorOnLose){
+                            playNewSector(origin, sector, reloader);
+                        }else{
+                            //no spawn set -> delete the sector save
+                            if(sector.info.spawnPosition == 0){
+                                //delete old save
+                                sector.save = null;
+                                slot.delete();
+                                //play again
+                                playSector(origin, sector, reloader);
+                                return;
+                            }
 
-                        //set spawn for sector damage to use
-                        Tile spawn = world.tile(sector.info.spawnPosition);
-                        spawn.setBlock(Blocks.coreShard, state.rules.defaultTeam);
+                            //set spawn for sector damage to use
+                            Tile spawn = world.tile(sector.info.spawnPosition);
+                            spawn.setBlock(Blocks.coreShard, state.rules.defaultTeam);
 
-                        //add extra damage.
-                        SectorDamage.apply(1f);
+                            //add extra damage.
+                            SectorDamage.apply(1f);
 
-                        //reset wave so things are more fair
-                        state.wave = 1;
-                        //set up default wave time
-                        state.wavetime = state.rules.initialWaveSpacing <= 0f ? (state.rules.waveSpacing * (sector.preset == null ? 2f : sector.preset.startWaveTimeMultiplier)) : state.rules.initialWaveSpacing;
-                        //reset captured state
-                        sector.info.wasCaptured = false;
+                            //reset wave so things are more fair
+                            state.wave = 1;
+                            //set up default wave time
+                            state.wavetime = state.rules.initialWaveSpacing <= 0f ? (state.rules.waveSpacing * (sector.preset == null ? 2f : sector.preset.startWaveTimeMultiplier)) : state.rules.initialWaveSpacing;
+                            //reset captured state
+                            sector.info.wasCaptured = false;
 
-                        if(state.rules.sector.planet.allowWaves){
-                            //re-enable waves
-                            state.rules.waves = true;
-                            //reset win wave??
-                            state.rules.winWave = state.rules.attackMode ? -1 : sector.preset != null && sector.preset.captureWave > 0 ? sector.preset.captureWave : state.rules.winWave > state.wave ? state.rules.winWave : 30;
-                        }
+                            if(state.rules.sector.planet.allowWaves){
+                                //re-enable waves
+                                state.rules.waves = true;
+                                //reset win wave??
+                                state.rules.winWave = state.rules.attackMode ? -1 : sector.preset != null && sector.preset.captureWave > 0 ? sector.preset.captureWave : state.rules.winWave > state.wave ? state.rules.winWave : 30;
+                            }
 
-                        //if there's still an enemy base left, fix it
-                        if(state.rules.attackMode){
-                            //replace all broken blocks
-                            for(var plan : state.rules.waveTeam.data().plans){
-                                Tile tile = world.tile(plan.x, plan.y);
-                                if(tile != null){
-                                    tile.setBlock(content.block(plan.block), state.rules.waveTeam, plan.rotation);
-                                    if(plan.config != null && tile.build != null){
-                                        tile.build.configureAny(plan.config);
+                            //if there's still an enemy base left, fix it
+                            if(state.rules.attackMode){
+                                //replace all broken blocks
+                                for(var plan : state.rules.waveTeam.data().plans){
+                                    Tile tile = world.tile(plan.x, plan.y);
+                                    if(tile != null){
+                                        tile.setBlock(content.block(plan.block), state.rules.waveTeam, plan.rotation);
+                                        if(plan.config != null && tile.build != null){
+                                            tile.build.configureAny(plan.config);
+                                        }
                                     }
                                 }
+                                state.rules.waveTeam.data().plans.clear();
                             }
-                            state.rules.waveTeam.data().plans.clear();
+
+                            //kill all units, since they should be dead anyway
+                            Groups.unit.clear();
+                            Groups.fire.clear();
+                            Groups.puddle.clear();
+
+                            //reset to 0, so replaced cores don't count
+                            state.rules.defaultTeam.data().unitCap = 0;
+                            Schematics.placeLaunchLoadout(spawn.x, spawn.y);
+
+                            //set up camera/player locations
+                            player.set(spawn.x * tilesize, spawn.y * tilesize);
+                            camera.position.set(player);
+
+                            Events.fire(new SectorLaunchEvent(sector));
+                            Events.fire(Trigger.newGame);
+
+                            state.set(State.playing);
+                            reloader.end();
                         }
-
-                        //kill all units, since they should be dead anyway
-                        Groups.unit.clear();
-                        Groups.fire.clear();
-                        Groups.puddle.clear();
-
-                        //reset to 0, so replaced cores don't count
-                        state.rules.defaultTeam.data().unitCap = 0;
-                        Schematics.placeLaunchLoadout(spawn.x, spawn.y);
-
-                        //set up camera/player locations
-                        player.set(spawn.x * tilesize, spawn.y * tilesize);
-                        camera.position.set(player);
-
-                        Events.fire(new SectorLaunchEvent(sector));
-                        Events.fire(Trigger.newGame);
+                    }else{
+                        state.set(State.playing);
+                        reloader.end();
                     }
-
-                    state.set(State.playing);
-                    reloader.end();
 
                 }catch(SaveException e){
                     Log.err(e);
@@ -482,19 +489,24 @@ public class Control implements ApplicationListener, Loadable{
                 }
                 ui.planet.hide();
             }else{
-                reloader.begin();
-                world.loadSector(sector);
-                state.rules.sector = sector;
-                //assign origin when launching
-                sector.info.origin = origin;
-                sector.info.destination = origin;
-                logic.play();
-                control.saves.saveSector(sector);
-                Events.fire(new SectorLaunchEvent(sector));
-                Events.fire(Trigger.newGame);
-                reloader.end();
+                playNewSector(origin, sector, reloader);
             }
         });
+    }
+
+    public void playNewSector(@Nullable Sector origin, Sector sector, WorldReloader reloader){
+        reloader.begin();
+        world.loadSector(sector);
+        state.rules.sector = sector;
+        //assign origin when launching
+        sector.info.origin = origin;
+        sector.info.destination = origin;
+        logic.play();
+        control.saves.saveSector(sector);
+        Events.fire(new SectorLaunchEvent(sector));
+        Events.fire(Trigger.newGame);
+        reloader.end();
+        state.set(State.playing);
     }
 
     public boolean isHighScore(){

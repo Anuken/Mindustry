@@ -323,7 +323,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     }
 
     boolean canSelect(Sector sector){
-        if(mode == select) return sector.hasBase();
+        if(mode == select) return sector.hasBase() && launchSector != null && sector.planet == launchSector.planet;
         //cannot launch to existing sector w/ accelerator TODO test
         if(mode == planetLaunch) return sector.id == sector.planet.startSector;
         if(sector.hasBase() || sector.id == sector.planet.startSector) return true;
@@ -489,6 +489,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     boolean selectable(Planet planet){
         //TODO what if any sector is selectable?
         //TODO launch criteria - which planets can be launched to? Where should this be defined? Should planets even be selectable?
+        if(mode == select) return planet == state.planet;
         if(mode == planetLaunch) return launchSector != null && planet != launchSector.planet && launchSector.planet.launchCandidates.contains(planet);
         return (planet.alwaysUnlocked && planet.isLandable()) || planet.sectors.contains(Sector::hasBase) || debugSelect;
     }
