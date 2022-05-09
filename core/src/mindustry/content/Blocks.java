@@ -3986,7 +3986,7 @@ public class Blocks{
             shootCone = 30f;
             consumeAmmoOnce = true;
 
-            coolant = consume(new ConsumeLiquid(Liquids.water, 30f / 60f));
+            coolant = consumeCoolant(30f / 60f);
 
             drawer = new DrawTurret("reinforced-"){{
                 parts.add(new RegionPart("-side"){{

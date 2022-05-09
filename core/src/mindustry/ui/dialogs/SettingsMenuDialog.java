@@ -315,7 +315,7 @@ public class SettingsMenuDialog extends BaseDialog{
         }
 
         game.checkPref("doubletapmine", false);
-        game.checkPref("commandmodehold", false);
+        game.checkPref("commandmodehold", true);
       
         if(!ios){
             game.checkPref("modcrashdisable", true);
