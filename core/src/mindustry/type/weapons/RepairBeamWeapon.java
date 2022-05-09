@@ -110,10 +110,10 @@ public class RepairBeamWeapon extends Weapon{
         wy = unit.y + Angles.trnsy(weaponRotation, x, y);
 
         HealBeamMount heal = (HealBeamMount)mount;
-        heal.target = null;
         boolean canShoot = mount.shoot;
 
         if(!autoTarget){
+            heal.target = null;
             if(canShoot){
                 heal.lastEnd.set(heal.aimX, heal.aimY);
 
