@@ -399,6 +399,7 @@ public class ContentParser{
                             case "itemFlammable" -> block.consume((Consume)parser.readValue(ConsumeItemFlammable.class, child));
                             case "itemRadioactive" -> block.consume((Consume)parser.readValue(ConsumeItemRadioactive.class, child));
                             case "itemExplosive" -> block.consume((Consume)parser.readValue(ConsumeItemExplosive.class, child));
+                            case "itemExplode" -> block.consume((Consume)parser.readValue(ConsumeItemExplode.class, child));
                             case "items" -> block.consume((Consume)parser.readValue(ConsumeItems.class, child));
                             case "liquidFlammable" -> block.consume((Consume)parser.readValue(ConsumeLiquidFlammable.class, child));
                             case "liquid" -> block.consume((Consume)parser.readValue(ConsumeLiquid.class, child));

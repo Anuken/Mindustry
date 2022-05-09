@@ -66,8 +66,10 @@ public class Weapon implements Cloneable{
     public float shake = 0f;
     /** visual weapon knockback. */
     public float recoil = 1.5f;
-    /** the time it returns back to its original position in ticks. uses reload time by default */
+    /** time taken for weapon to return to starting position in ticks. uses reload time by default */
     public float recoilTime = -1f;
+    /** power curve applied to visual recoil */
+    public float recoilPow = 1.8f;
     /** ticks to cool down the heat region */
     public float cooldownTime = 20f;
     /** projectile/effect offsets from center of weapon */
@@ -164,9 +166,10 @@ public class Weapon implements Cloneable{
 
         float
         rotation = unit.rotation - 90,
+        realRecoil = Mathf.pow(mount.recoil, recoilPow) * recoil,
         weaponRotation  = rotation + (rotate ? mount.rotation : 0),
-        wx = unit.x + Angles.trnsx(rotation, x, y) + Angles.trnsx(weaponRotation, 0, -mount.recoil),
-        wy = unit.y + Angles.trnsy(rotation, x, y) + Angles.trnsy(weaponRotation, 0, -mount.recoil);
+        wx = unit.x + Angles.trnsx(rotation, x, y) + Angles.trnsx(weaponRotation, 0, -realRecoil),
+        wy = unit.y + Angles.trnsy(rotation, x, y) + Angles.trnsy(weaponRotation, 0, -realRecoil);
 
         Draw.xscl = -Mathf.sign(flipSprite);
         Draw.rect(outlineRegion, wx, wy, weaponRotation);
@@ -182,9 +185,10 @@ public class Weapon implements Cloneable{
 
         float
         rotation = unit.rotation - 90,
+        realRecoil = Mathf.pow(mount.recoil, recoilPow) * recoil,
         weaponRotation  = rotation + (rotate ? mount.rotation : baseRotation),
-        wx = unit.x + Angles.trnsx(rotation, x, y) + Angles.trnsx(weaponRotation, 0, -mount.recoil),
-        wy = unit.y + Angles.trnsy(rotation, x, y) + Angles.trnsy(weaponRotation, 0, -mount.recoil);
+        wx = unit.x + Angles.trnsx(rotation, x, y) + Angles.trnsx(weaponRotation, 0, -realRecoil),
+        wy = unit.y + Angles.trnsy(rotation, x, y) + Angles.trnsy(weaponRotation, 0, -realRecoil);
 
         if(shadow > 0){
             Drawf.shadow(wx, wy, shadow);
@@ -247,7 +251,7 @@ public class Weapon implements Cloneable{
         boolean can = unit.canShoot();
         float lastReload = mount.reload;
         mount.reload = Math.max(mount.reload - Time.delta * unit.reloadMultiplier, 0);
-        mount.recoil = Mathf.approachDelta(mount.recoil, 0, (Math.abs(recoil) * unit.reloadMultiplier) / recoilTime);
+        mount.recoil = Mathf.approachDelta(mount.recoil, 0, unit.reloadMultiplier / recoilTime);
         mount.warmup = Mathf.lerpDelta(mount.warmup, can && mount.shoot ? 1f : 0f, shootWarmupSpeed);
         mount.smoothReload = Mathf.lerpDelta(mount.smoothReload, mount.reload / reload, smoothReloadSpeed);
 
@@ -317,7 +321,7 @@ public class Weapon implements Cloneable{
                 mount.bullet.rotation(weaponRotation + 90);
                 mount.bullet.set(bulletX, bulletY);
                 mount.reload = reload;
-                mount.recoil = recoil;
+                mount.recoil = 1f;
                 unit.vel.add(Tmp.v1.trns(unit.rotation + 180f, mount.bullet.type.recoil));
                 if(shootSound != Sounds.none && !headless){
                     if(mount.sound == null) mount.sound = new SoundLoop(shootSound, 1f);
@@ -416,7 +420,7 @@ public class Weapon implements Cloneable{
 
         unit.vel.add(Tmp.v1.trns(shootAngle + 180f, bullet.recoil));
         Effect.shake(shake, shake, bulletX, bulletY);
-        mount.recoil = recoil;
+        mount.recoil = 1f;
         mount.heat = 1f;
     }
 

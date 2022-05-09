@@ -106,10 +106,12 @@ public class Turret extends ReloadTurret{
     public boolean linearWarmup = false;
     /** Visual amount by which the turret recoils back per shot. */
     public float recoil = 1f;
-    /** TODO rename */
-    public float restitution = 0.02f;
-    /** TODO rename */
-    public float cooldown = 0.02f;
+    /** ticks taken for turret to return to starting position in ticks. uses reload time by default  */
+    public float recoilTime = -1f;
+    /** power curve applied to visual recoil */
+    public float recoilPow = 1.8f;
+    /** ticks to cool down the heat region */
+    public float cooldownTime = 20f;
     /** Visual elevation of turret shadow, -1 to use defaults. */
     public float elevation = -1f;
     /** How much the screen shakes per shot. */
@@ -159,6 +161,8 @@ public class Turret extends ReloadTurret{
     public void init(){
         if(shootY == Float.NEGATIVE_INFINITY) shootY = size * tilesize / 2f;
         if(elevation < 0) elevation = size / 2f;
+        if(recoilTime < 0f) recoilTime = reload;
+        if(cooldownTime < 0f) cooldownTime = reload;
 
         super.init();
     }
@@ -339,14 +343,13 @@ public class Turret extends ReloadTurret{
 
             wasShooting = false;
 
-            //TODO do not lerp
-            curRecoil = Mathf.lerpDelta(curRecoil, 0f, restitution);
-            heat = Mathf.lerpDelta(heat, 0f, cooldown);
+            curRecoil = Math.max(curRecoil - Time.delta / recoilTime , 0);
+            heat = Math.max(heat - Time.delta / cooldownTime, 0);
 
             unit.tile(this);
             unit.rotation(rotation);
             unit.team(team);
-            recoilOffset.trns(rotation, -curRecoil);
+            recoilOffset.trns(rotation, -Mathf.pow(curRecoil, recoilPow) * recoil);
 
             if(logicControlTime > 0){
                 logicControlTime -= Time.delta;
@@ -550,7 +553,7 @@ public class Turret extends ReloadTurret{
                 Effect.shake(shake, shake, this);
             }
 
-            curRecoil = recoil;
+            curRecoil = 1f;
             heat = 1f;
 
             if(!consumeAmmoOnce){

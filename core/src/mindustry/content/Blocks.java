@@ -2811,7 +2811,6 @@ public class Blocks{
 
             shootY = 3f;
             reload = 20f;
-            restitution = 0.03f;
             range = 110;
             shootCone = 15f;
             ammoUseEffect = Fx.casing1;
@@ -3024,7 +3023,6 @@ public class Blocks{
 
             recoil = 2f;
             reload = 80f;
-            cooldown = 0.03f;
             shake = 2f;
             shootEffect = Fx.lancerLaserShoot;
             smokeEffect = Fx.none;
@@ -3227,9 +3225,7 @@ public class Blocks{
             size = 2;
             range = 190f;
             reload = 31f;
-            restitution = 0.03f;
             ammoEjectBack = 3f;
-            cooldown = 0.03f;
             recoil = 3f;
             shake = 1f;
             shoot.shots = 4;
@@ -3311,7 +3307,6 @@ public class Blocks{
             velocityRnd = 0.1f;
             inaccuracy = 4f;
             recoil = 1f;
-            restitution = 0.04f;
             shootCone = 45f;
             liquidCapacity = 40f;
             shootEffect = Fx.shootLiquid;
@@ -3330,7 +3325,6 @@ public class Blocks{
 
             shoot = new ShootSpread(3, 20f);
 
-            restitution = 0.1f;
             shootCone = 30;
             size = 3;
             envEnabled |= Env.space;
@@ -3444,9 +3438,7 @@ public class Blocks{
             ammoEjectBack = 5f;
             ammoUseEffect = Fx.casing3Double;
             ammoPerShot = 2;
-            cooldown = 0.03f;
             velocityRnd = 0.2f;
-            restitution = 0.02f;
             recoil = 6f;
             shake = 2f;
             range = 290f;
@@ -3571,8 +3563,7 @@ public class Blocks{
             reload = 200f;
             ammoUseEffect = Fx.casing3Double;
             recoil = 5f;
-            restitution = 0.009f;
-            cooldown = 0.009f;
+            cooldownTime = reload;
             shake = 4f;
             size = 4;
             shootCone = 2f;
@@ -3627,8 +3618,8 @@ public class Blocks{
                 }}
             );
             reload = 7f;
+            recoilTime = reload * 2f;
             coolantMultiplier = 0.5f;
-            restitution = 0.1f;
             ammoUseEffect = Fx.casing3;
             range = 260f;
             inaccuracy = 3f;
@@ -3736,7 +3727,6 @@ public class Blocks{
             envEnabled |= Env.space;
             reload = 40f;
             recoil = 2f;
-            restitution = 0.03f;
             range = 190;
             shootCone = 3f;
             scaledHealth = 180;
@@ -3794,7 +3784,6 @@ public class Blocks{
             envEnabled |= Env.space;
             reload = 30f;
             recoil = 2f;
-            restitution = 0.03f;
             range = 125;
             shootCone = 40f;
             scaledHealth = 210;
@@ -3952,7 +3941,6 @@ public class Blocks{
                 }});
             }};
 
-            restitution = 0.02f;
             shootWarmupSpeed = 0.08f;
 
             outlineColor = Pal.darkOutline;
@@ -4034,7 +4022,6 @@ public class Blocks{
             targetGround = false;
             inaccuracy = 8f;
 
-            restitution = 0.11f;
             shootWarmupSpeed = 0.08f;
 
             outlineColor = Pal.darkOutline;
