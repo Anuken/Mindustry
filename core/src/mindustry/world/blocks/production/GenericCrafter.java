@@ -142,8 +142,7 @@ public class GenericCrafter extends Block{
     }
 
     @Override
-    public void drawPlace(int x, int y, int rotation, boolean valid){
-        super.drawPlace(x, y, rotation, valid);
+    public void drawOverlay(float x, float y, int rotation){
         if(outputLiquids != null){
             for(int i = 0; i < outputLiquids.length; i++){
                 int dir = liquidOutputDirections.length > i ? liquidOutputDirections[i] + rotation : -1;
@@ -151,8 +150,8 @@ public class GenericCrafter extends Block{
                 if(dir != -1){
                     Draw.rect(
                         outputLiquids[i].liquid.fullIcon,
-                        x * tilesize + offset + Geometry.d4x(dir) * (size * tilesize / 2f + 4),
-                        y * tilesize + offset + Geometry.d4y(dir) * (size * tilesize / 2f + 4)
+                        x + Geometry.d4x(dir) * (size * tilesize / 2f + 4),
+                        y + Geometry.d4y(dir) * (size * tilesize / 2f + 4)
                     );
                 }
             }
@@ -173,24 +172,6 @@ public class GenericCrafter extends Block{
         public void drawLight(){
             super.drawLight();
             drawer.drawLight(this);
-        }
-
-        @Override
-        public void drawSelect(){
-            super.drawSelect();
-            if(outputLiquids != null){
-                for(int i = 0; i < outputLiquids.length; i++){
-                    int dir = liquidOutputDirections.length > i ? liquidOutputDirections[i] + rotation : -1;
-
-                    if(dir != -1){
-                        Draw.rect(
-                            outputLiquids[i].liquid.fullIcon,
-                            x + Geometry.d4x(dir) * (size * tilesize / 2f + 4),
-                            y + Geometry.d4y(dir) * (size * tilesize / 2f + 4)
-                        );
-                    }
-                }
-            }
         }
 
         @Override
