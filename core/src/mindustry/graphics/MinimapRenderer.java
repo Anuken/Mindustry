@@ -162,6 +162,10 @@ public class MinimapRenderer{
             //crisp pixels
             dynamicTex.setFilter(TextureFilter.nearest);
 
+            if(worldSpace){
+                region.set(0f, 0f, 1f, 1f);
+            }
+
             Tmp.tr1.set(dynamicTex);
             Tmp.tr1.set(region.u, 1f - region.v, region.u2, 1f - region.v2);
 
