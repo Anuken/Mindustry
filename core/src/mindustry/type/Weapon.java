@@ -59,7 +59,6 @@ public class Weapon implements Cloneable{
     public float rotateSpeed = 20f;
     /** weapon reload in frames */
     public float reload = 1;
-
     /** inaccuracy of degrees of each shot */
     public float inaccuracy = 0f;
     /** intensity and duration of each shot's screen shake */

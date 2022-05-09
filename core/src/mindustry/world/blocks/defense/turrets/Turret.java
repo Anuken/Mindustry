@@ -90,8 +90,8 @@ public class Turret extends ReloadTurret{
     public @Nullable Effect shootEffect;
     /** Optional override for all smoke effects. */
     public @Nullable Effect smokeEffect;
-    /** Optional override for all ammo use effects. */
-    public @Nullable Effect ammoUseEffect;
+    /** Effect created when ammo is used. Not optional. */
+    public Effect ammoUseEffect = Fx.none;
     /** Sound emitted when a single bullet is shot. */
     public Sound shootSound = Sounds.shoot;
     /** Sound emitted when shoot.firstShotDelay is >0 and shooting begins. */
