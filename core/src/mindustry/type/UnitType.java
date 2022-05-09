@@ -362,7 +362,7 @@ public class UnitType extends UnlockableContent{
 
     //TANK UNITS
 
-    /** list of treads as rectangles in IMAGE COORDINATES. these are mirrored, and should match the coordinates you see in an image editor. */
+    /** list of treads as rectangles in IMAGE COORDINATES, relative to the center. these are mirrored. */
     public Rect[] treadRects = {};
     /** number of frames of movement in a tread */
     public int treadFrames = 18;
@@ -1303,8 +1303,8 @@ public class UnitType extends UnlockableContent{
             for(int i = 0; i < treadRects.length; i ++){
                 var region = treadRegions[i][frame];
                 var treadRect = treadRects[i];
-                float xOffset = treadRegion.width/2f - (treadRect.x + treadRect.width/2f);
-                float yOffset = treadRegion.height/2f - (treadRect.y + treadRect.height/2f);
+                float xOffset = -(treadRect.x + treadRect.width/2f);
+                float yOffset = -(treadRect.y + treadRect.height/2f);
 
                 for(int side : Mathf.signs){
                     Tmp.v1.set(xOffset * side, yOffset).rotate(unit.rotation - 90);

@@ -530,7 +530,7 @@ public class Generators{
                     for(int r = 0; r < type.treadRects.length; r++){
                         Rect treadRect = type.treadRects[r];
                         //slice is always 1 pixel wide
-                        Pixmap slice = pix.crop((int)treadRect.x, (int)treadRect.y, 1, (int)treadRect.height);
+                        Pixmap slice = pix.crop((int)(treadRect.x + pix.width/2f), (int)(treadRect.y + pix.height/2f), 1, (int)treadRect.height);
                         int frames = type.treadFrames;
                         for(int i = 0; i < frames; i++){
                             int pullOffset = type.treadPullOffset;

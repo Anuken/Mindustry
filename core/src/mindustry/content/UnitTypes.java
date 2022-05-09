@@ -2460,7 +2460,7 @@ public class UnitTypes{
             health = 800;
             armor = 5f;
             itemCapacity = 0;
-            treadRects = new Rect[]{new Rect(12, 7, 14, 51)};
+            treadRects = new Rect[]{new Rect(12 - 32f, 7 - 32f, 14, 51)};
             researchCostMultiplier = 0f;
 
             weapons.add(new Weapon("stell-weapon"){{
@@ -2501,7 +2501,7 @@ public class UnitTypes{
             health = 2100;
             armor = 8f;
             itemCapacity = 0;
-            treadRects = new Rect[]{new Rect(17, 10, 19, 76)};
+            treadRects = new Rect[]{new Rect(17 - 96f/2f, 10 - 96f/2f, 19, 76)};
             researchCostMultiplier = 0f;
 
             weapons.add(new Weapon("locus-weapon"){{
@@ -2588,7 +2588,7 @@ public class UnitTypes{
             health = 4500;
             armor = 10f;
             itemCapacity = 0;
-            treadRects = new Rect[]{new Rect(16, 38, 30, 75), new Rect(44, 7, 17, 60)};
+            treadRects = new Rect[]{new Rect(16 - 60f, 38 - 60f, 30, 75), new Rect(44 - 60f, 7 - 60f, 17, 60)};
             researchCostMultiplier = 0f;
 
             weapons.add(new Weapon("precept-weapon"){{
@@ -2654,8 +2654,7 @@ public class UnitTypes{
             armor = 20f;
             itemCapacity = 0;
             crushDamage = 13f / 5f;
-            treadRects = new Rect[]{new Rect(22, 16, 28, 130)};
-
+            treadRects = new Rect[]{new Rect(22 - 154f/2f, 16 - 154f/2f, 28, 130)};
 
             weapons.add(new Weapon("vanquish-weapon"){{
                 layerOffset = 0.0001f;
@@ -2749,7 +2748,9 @@ public class UnitTypes{
             armor = 25f;
             crushDamage = 25f / 5f;
             rotateSpeed = 0.8f;
-            treadRects = new Rect[]{new Rect(27, 152, 56, 73), new Rect(24, 51 - 9, 29, 17), new Rect(59, 18 - 9, 39, 19)};
+
+            float xo = 231f/2f, yo = 231f/2f;
+            treadRects = new Rect[]{new Rect(27 - xo, 152 - yo, 56, 73), new Rect(24 - xo, 51 - 9 - yo, 29, 17), new Rect(59 - xo, 18 - 9 - yo, 39, 19)};
 
             weapons.add(new Weapon("conquer-weapon"){{
                 layerOffset = 0.1f;

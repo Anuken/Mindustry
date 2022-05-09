@@ -37,8 +37,8 @@ abstract class TankComp implements Posc, Flyingc, Hitboxc, Unitc, ElevationMovec
                 //first rect should always be at the back
                 var treadRect = type.treadRects[0];
 
-                float xOffset = (treadRegion.width/2f - (treadRect.x + treadRect.width/2f)) / 4f;
-                float yOffset = (treadRegion.height/2f - (treadRect.y + treadRect.height/2f)) / 4f;
+                float xOffset = (-(treadRect.x + treadRect.width/2f)) / 4f;
+                float yOffset = (-(treadRect.y + treadRect.height/2f)) / 4f;
 
                 for(int i : Mathf.signs){
                     Tmp.v1.set(xOffset * i, yOffset - treadRect.height / 2f / 4f).rotate(rotation - 90);
