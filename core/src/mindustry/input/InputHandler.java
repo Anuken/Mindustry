@@ -745,8 +745,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 if(!selectedUnits.contains(unit)){
                     selectedUnits.add(unit);
                 }else{
-                    selectedUnits.clear();
-                    selectedUnits.add(unit);
+                    selectedUnits.remove(unit);
                 }
                 commandBuild = null;
             }else{
