@@ -8,6 +8,13 @@ public class ShootAlternate extends ShootPattern{
     /** offset of barrel to start on */
     public int barrelOffset = 0;
 
+    public ShootAlternate(float spread){
+        this.spread = spread;
+    }
+
+    public ShootAlternate(){
+    }
+
     @Override
     public void shoot(int totalShots, BulletHandler handler){
         for(int i = 0; i < shots; i++){

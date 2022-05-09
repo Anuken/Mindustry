@@ -601,7 +601,8 @@ public class Generators{
 
                 //draw treads
                 if(sample instanceof Tankc){
-                    image.draw(outline.get(get(type.treadRegion)), true);
+                    Pixmap treads = outline.get(get(type.treadRegion));
+                    image.draw(treads, image.width / 2 - treads.width / 2, image.height / 2 - treads.height / 2, true);
                     image.draw(get(type.previewRegion), true);
                 }
 

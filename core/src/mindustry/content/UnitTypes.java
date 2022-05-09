@@ -2518,9 +2518,7 @@ public class UnitTypes{
                 heatColor = Color.valueOf("f9350f");
                 cooldownTime = 30f;
 
-                shoot = new ShootAlternate(){{
-                    spread = 3.5f;
-                }};
+                shoot = new ShootAlternate(3.5f);
 
                 bullet = new RailBulletType(){{
                     length = 160f;
@@ -4156,7 +4154,7 @@ public class UnitTypes{
         }};
 
         manifold = new ErekirUnitType("manifold"){{
-            aiController = CargoAI::new;
+            controller = u -> new CargoAI();
             isEnemy = false;
             allowedInPayloads = false;
             logicControllable = false;
@@ -4183,7 +4181,7 @@ public class UnitTypes{
         }};
 
         assemblyDrone = new ErekirUnitType("assembly-drone"){{
-            aiController = AssemblerAI::new;
+            controller = u -> new AssemblerAI();
 
             flying = true;
             drag = 0.06f;
