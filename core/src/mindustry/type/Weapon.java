@@ -68,6 +68,8 @@ public class Weapon implements Cloneable{
     public float recoil = 1.5f;
     /** the time it returns back to its original position in ticks. uses reload time by default */
     public float recoilTime = -1f;
+    /** ticks to cool down the heat region */
+    public float cooldownTime = 20f;
     /** projectile/effect offsets from center of weapon */
     public float shootX = 0f, shootY = 3f;
     /** offsets of weapon position on unit */
@@ -82,8 +84,6 @@ public class Weapon implements Cloneable{
     public float shootCone = 5f;
     /** Cone in which the weapon can rotate relative to its mount. */
     public float rotationLimit = 361f;
-    /** ticks to cool down the heat region */
-    public float cooldownTime = 20f;
     /** minimum weapon warmup before firing (this is not linear, do NOT use 1!) */
     public float minWarmup = 0f;
     /** lerp speed for shoot warmup, only used for parts */

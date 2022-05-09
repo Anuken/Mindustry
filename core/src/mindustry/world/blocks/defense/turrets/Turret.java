@@ -34,34 +34,19 @@ public class Turret extends ReloadTurret{
     public final static float logicControlCooldown = 60 * 2;
 
     public final int timerTarget = timers++;
-    public int targetInterval = 20;
+    /** Ticks between attempt at finding a target. */
+    public float targetInterval = 20;
 
-    public Color heatColor = Pal.turretHeat;
-    public Effect shootEffect = Fx.none;
-    public Effect smokeEffect = Fx.none;
-    public Effect ammoUseEffect = Fx.none;
-    public Sound shootSound = Sounds.shoot;
-    public Sound chargeSound = Sounds.none;
-    public float soundPitchMin = 0.9f, soundPitchMax = 1.1f;
-
-    //visuals TODO document
-    public float ammoEjectBack = 1f;
-    public float shootWarmupSpeed = 0.1f;
-    public boolean linearWarmup = false;
-    public float recoilAmount = 1f;
-    public float restitution = 0.02f;
-    public float cooldown = 0.02f;
-    public float elevation = -1f;
-    public float shootShake = 0f;
-
+    /** Maximum ammo units stored. */
     public int maxAmmo = 30;
+    /** Ammo units used per shot. */
     public int ammoPerShot = 1;
     /** If true, ammo is only consumed once per shot regardless of bullet count. */
     public boolean consumeAmmoOnce = false;
+    /** Minimum input heat required to fire. */
     public float heatRequirement = -1f;
+    /** Maximum efficiency possible, if this turret uses heat. */
     public float maxHeatEfficiency = 3f;
-
-    //TODO clean all of this up + weapon consistency
 
     /** Bullet angle randomness in degrees. */
     public float inaccuracy = 0f;
@@ -71,7 +56,7 @@ public class Turret extends ReloadTurret{
     public float shootCone = 8f;
     /** Turret shoot point. */
     public float shootX = 0f, shootY = Float.NEGATIVE_INFINITY;
-    /** Currently used for artillery only. */
+    /** Minimum bullet range. Used for artillery only. */
     public float minRange = 0f;
     /** Minimum warmup needed to fire. */
     public float minWarmup = 0f;
@@ -82,15 +67,55 @@ public class Turret extends ReloadTurret{
     /** pattern used for bullets */
     public ShootPattern shoot = new ShootPattern();
 
+    /** If true, this block targets air units. */
     public boolean targetAir = true;
+    /** If true, this block targets ground units and structures. */
     public boolean targetGround = true;
+    /** If true, this block targets friend blocks, to heal them. */
     public boolean targetHealing = false;
+    /** If true, this turret can be controlled by players. */
     public boolean playerControllable = true;
+    /** If true, this block will display ammo multipliers in its stats (irrelevant for certain types of turrets). */
     public boolean displayAmmoMultiplier = true;
+    /** Function for choosing which unit to target. */
     public Sortf unitSort = UnitSorts.closest;
+    /** Filter for types of units to attack. */
     public Boolf<Unit> unitFilter = u -> true;
+    /** Filter for types of buildings to attack. */
     public Boolf<Building> buildingFilter = b -> !b.block.underBullets;
 
+    /** Color of heat region drawn on top (if found) */
+    public Color heatColor = Pal.turretHeat;
+    /** Optional override for all shoot effects. */
+    public @Nullable Effect shootEffect;
+    /** Optional override for all smoke effects. */
+    public @Nullable Effect smokeEffect;
+    /** Optional override for all ammo use effects. */
+    public @Nullable Effect ammoUseEffect;
+    /** Sound emitted when a single bullet is shot. */
+    public Sound shootSound = Sounds.shoot;
+    /** Sound emitted when shoot.firstShotDelay is >0 and shooting begins. */
+    public Sound chargeSound = Sounds.none;
+    /** Range for pitch of shoot sound. */
+    public float soundPitchMin = 0.9f, soundPitchMax = 1.1f;
+    /** Backwards Y offset of ammo eject effect. */
+    public float ammoEjectBack = 1f;
+    /** Lerp speed of turret warmup. */
+    public float shootWarmupSpeed = 0.1f;
+    /** If true, turret warmup is linear instead of a curve. */
+    public boolean linearWarmup = false;
+    /** Visual amount by which the turret recoils back per shot. */
+    public float recoil = 1f;
+    /** TODO rename */
+    public float restitution = 0.02f;
+    /** TODO rename */
+    public float cooldown = 0.02f;
+    /** Visual elevation of turret shadow, -1 to use defaults. */
+    public float elevation = -1f;
+    /** How much the screen shakes per shot. */
+    public float shake = 0f;
+
+    /** Defines drawing behavior for this turret. */
     public DrawBlock drawer = new DrawTurret();
 
     public Turret(String name){
@@ -168,7 +193,7 @@ public class Turret extends ReloadTurret{
 
         public Seq<AmmoEntry> ammo = new Seq<>();
         public int totalAmmo;
-        public float recoil, heat, logicControlTime = -1;
+        public float curRecoil, heat, logicControlTime = -1;
         public float shootWarmup;
         public int totalShots;
         public boolean logicShooting = false;
@@ -315,13 +340,13 @@ public class Turret extends ReloadTurret{
             wasShooting = false;
 
             //TODO do not lerp
-            recoil = Mathf.lerpDelta(recoil, 0f, restitution);
+            curRecoil = Mathf.lerpDelta(curRecoil, 0f, restitution);
             heat = Mathf.lerpDelta(heat, 0f, cooldown);
 
             unit.tile(this);
             unit.rotation(rotation);
             unit.team(team);
-            recoilOffset.trns(rotation, -recoil);
+            recoilOffset.trns(rotation, -curRecoil);
 
             if(logicControlTime > 0){
                 logicControlTime -= Time.delta;
@@ -511,8 +536,8 @@ public class Turret extends ReloadTurret{
             //TODO aimX / aimY for multi shot turrets?
             handleBullet(type.create(this, team, bulletX, bulletY, shootAngle, -1f, (1f - velocityRnd) + Mathf.random(velocityRnd), lifeScl, null, mover, targetPos.x, targetPos.y), xOffset, yOffset, angleOffset);
 
-            (shootEffect == Fx.none ? type.shootEffect : shootEffect).at(bulletX, bulletY, rotation + angleOffset, type.hitColor);
-            (smokeEffect == Fx.none ? type.smokeEffect : smokeEffect).at(bulletX, bulletY, rotation + angleOffset, type.hitColor);
+            (shootEffect == null ? type.shootEffect : shootEffect).at(bulletX, bulletY, rotation + angleOffset, type.hitColor);
+            (smokeEffect == null ? type.smokeEffect : smokeEffect).at(bulletX, bulletY, rotation + angleOffset, type.hitColor);
             shootSound.at(bulletX, bulletY, Mathf.random(soundPitchMin, soundPitchMax));
 
             ammoUseEffect.at(
@@ -521,11 +546,11 @@ public class Turret extends ReloadTurret{
                 rotation * Mathf.sign(xOffset)
             );
 
-            if(shootShake > 0){
-                Effect.shake(shootShake, shootShake, this);
+            if(shake > 0){
+                Effect.shake(shake, shake, this);
             }
 
-            recoil = recoilAmount;
+            curRecoil = recoil;
             heat = 1f;
 
             if(!consumeAmmoOnce){

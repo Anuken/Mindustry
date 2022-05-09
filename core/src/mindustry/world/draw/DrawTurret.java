@@ -18,6 +18,7 @@ public class DrawTurret extends DrawBlock{
     protected static final Rand rand = new Rand();
 
     public Seq<DrawPart> parts = new Seq<>();
+    /** Prefix to use when loading base region. */
     public String basePrefix = "";
     /** Overrides the liquid to draw in the liquid region. */
     public @Nullable Liquid liquidDraw;

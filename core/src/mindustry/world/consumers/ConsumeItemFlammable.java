@@ -3,9 +3,11 @@ package mindustry.world.consumers;
 import mindustry.gen.*;
 
 public class ConsumeItemFlammable extends ConsumeItemFilter{
+    public float minFlammability;
 
     public ConsumeItemFlammable(float minFlammability){
-        super(item -> item.flammability >= minFlammability);
+        this.minFlammability = minFlammability;
+        filter = item -> item.flammability >= this.minFlammability;
     }
 
     public ConsumeItemFlammable(){

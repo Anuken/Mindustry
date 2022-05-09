@@ -395,7 +395,12 @@ public class ContentParser{
                     for(JsonValue child : value.get("consumes")){
                         switch(child.name){
                             case "item" -> block.consumeItem(find(ContentType.item, child.asString()));
+                            case "itemCharged" -> block.consume((Consume)parser.readValue(ConsumeItemCharged.class, child));
+                            case "itemFlammable" -> block.consume((Consume)parser.readValue(ConsumeItemFlammable.class, child));
+                            case "itemRadioactive" -> block.consume((Consume)parser.readValue(ConsumeItemRadioactive.class, child));
+                            case "itemExplosive" -> block.consume((Consume)parser.readValue(ConsumeItemExplosive.class, child));
                             case "items" -> block.consume((Consume)parser.readValue(ConsumeItems.class, child));
+                            case "liquidFlammable" -> block.consume((Consume)parser.readValue(ConsumeLiquidFlammable.class, child));
                             case "liquid" -> block.consume((Consume)parser.readValue(ConsumeLiquid.class, child));
                             case "liquids" -> block.consume((Consume)parser.readValue(ConsumeLiquids.class, child));
                             case "coolant" -> block.consume((Consume)parser.readValue(ConsumeCoolant.class, child));

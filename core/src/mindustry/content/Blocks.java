@@ -1052,7 +1052,8 @@ public class Blocks{
             requirements(Category.crafting, with(Items.copper, 30, Items.lead, 35, Items.graphite, 45));
             health = 200;
             outputLiquid = new LiquidStack(Liquids.slag, 12f / 60f);
-            craftTime = 1f;
+
+            craftTime = 10f;
             hasLiquids = hasPower = true;
             drawer = new DrawMulti(new DrawDefault(), new DrawLiquidRegion());
 
@@ -2877,7 +2878,7 @@ public class Blocks{
             shoot.shotDelay = 5f;
             shoot.shots = 2;
 
-            recoilAmount = 2f;
+            recoil = 2f;
             rotateSpeed = 15f;
             inaccuracy = 17f;
             shootCone = 35f;
@@ -2920,7 +2921,7 @@ public class Blocks{
                     hittable = false;
                 }}
             );
-            recoilAmount = 0f;
+            recoil = 0f;
             reload = 6f;
             coolantMultiplier = 1.5f;
             range = 60f;
@@ -2974,7 +2975,7 @@ public class Blocks{
             );
             targetAir = false;
             reload = 60f;
-            recoilAmount = 2f;
+            recoil = 2f;
             range = 235f;
             inaccuracy = 1f;
             shootCone = 10f;
@@ -3003,7 +3004,7 @@ public class Blocks{
                 }}
             );
             size = 2;
-            recoilAmount = 0f;
+            recoil = 0f;
             reload = 3f;
             inaccuracy = 5f;
             shootCone = 50f;
@@ -3021,10 +3022,10 @@ public class Blocks{
 
             shoot.firstShotDelay = 40f;
 
-            recoilAmount = 2f;
+            recoil = 2f;
             reload = 80f;
             cooldown = 0.03f;
-            shootShake = 2f;
+            shake = 2f;
             shootEffect = Fx.lancerLaserShoot;
             smokeEffect = Fx.none;
             heatColor = Color.red;
@@ -3085,7 +3086,7 @@ public class Blocks{
             range = 90f;
             shootEffect = Fx.lightningShoot;
             heatColor = Color.red;
-            recoilAmount = 1f;
+            recoil = 1f;
             size = 1;
             health = 260;
             shootSound = Sounds.spark;
@@ -3229,8 +3230,8 @@ public class Blocks{
             restitution = 0.03f;
             ammoEjectBack = 3f;
             cooldown = 0.03f;
-            recoilAmount = 3f;
-            shootShake = 1f;
+            recoil = 3f;
+            shake = 1f;
             shoot.shots = 4;
             shoot.shotDelay = 3f;
 
@@ -3309,7 +3310,7 @@ public class Blocks{
             shoot.shots = 2;
             velocityRnd = 0.1f;
             inaccuracy = 4f;
-            recoilAmount = 1f;
+            recoil = 1f;
             restitution = 0.04f;
             shootCone = 45f;
             liquidCapacity = 40f;
@@ -3323,9 +3324,9 @@ public class Blocks{
             requirements(Category.turret, with(Items.copper, 225, Items.graphite, 225, Items.thorium, 100));
 
             reload = 35f;
-            shootShake = 4f;
+            shake = 4f;
             range = 90f;
-            recoilAmount = 5f;
+            recoil = 5f;
 
             shoot = new ShootSpread(3, 20f);
 
@@ -3446,8 +3447,8 @@ public class Blocks{
             cooldown = 0.03f;
             velocityRnd = 0.2f;
             restitution = 0.02f;
-            recoilAmount = 6f;
-            shootShake = 2f;
+            recoil = 6f;
+            shake = 2f;
             range = 290f;
             minRange = 50f;
             coolant = consumeCoolant(0.3f);
@@ -3533,7 +3534,7 @@ public class Blocks{
             reload = 8f;
             range = 200f;
             size = 3;
-            recoilAmount = 3f;
+            recoil = 3f;
             rotateSpeed = 10f;
             inaccuracy = 10f;
             shootCone = 30f;
@@ -3569,10 +3570,10 @@ public class Blocks{
             rotateSpeed = 2f;
             reload = 200f;
             ammoUseEffect = Fx.casing3Double;
-            recoilAmount = 5f;
+            recoil = 5f;
             restitution = 0.009f;
             cooldown = 0.009f;
-            shootShake = 4f;
+            shake = 4f;
             size = 4;
             shootCone = 2f;
             shootSound = Sounds.railgun;
@@ -3631,11 +3632,11 @@ public class Blocks{
             ammoUseEffect = Fx.casing3;
             range = 260f;
             inaccuracy = 3f;
-            recoilAmount = 3f;
+            recoil = 3f;
             shoot = new ShootAlternate(){{
                 spread = 8f;
             }};
-            shootShake = 2f;
+            shake = 2f;
             size = 4;
             shootCone = 24f;
             shootSound = Sounds.shootBig;
@@ -3650,9 +3651,9 @@ public class Blocks{
             requirements(Category.turret, with(Items.copper, 1200, Items.lead, 350, Items.graphite, 300, Items.surgeAlloy, 325, Items.silicon, 325));
             shootEffect = Fx.shootBigSmoke2;
             shootCone = 40f;
-            recoilAmount = 4f;
+            recoil = 4f;
             size = 4;
-            shootShake = 2f;
+            shake = 2f;
             range = 195f;
             reload = 90f;
             firingMoveFract = 0.5f;
@@ -3726,7 +3727,7 @@ public class Blocks{
 
             coolantMultiplier = 6f;
 
-            shootShake = 1f;
+            shake = 1f;
             ammoPerShot = 2;
             drawer = new DrawTurret("reinforced-");
             shootY = -2;
@@ -3734,7 +3735,7 @@ public class Blocks{
             size = 3;
             envEnabled |= Env.space;
             reload = 40f;
-            recoilAmount = 2f;
+            recoil = 2f;
             restitution = 0.03f;
             range = 190;
             shootCone = 3f;
@@ -3773,7 +3774,7 @@ public class Blocks{
 
             inaccuracy = 0.2f;
             velocityRnd = 0.17f;
-            shootShake = 1f;
+            shake = 1f;
             ammoPerShot = 3;
             maxAmmo = 30;
             consumeAmmoOnce = true;
@@ -3792,7 +3793,7 @@ public class Blocks{
             size = 3;
             envEnabled |= Env.space;
             reload = 30f;
-            recoilAmount = 2f;
+            recoil = 2f;
             restitution = 0.03f;
             range = 125;
             shootCone = 40f;
@@ -3920,8 +3921,8 @@ public class Blocks{
             ammoPerShot = 4;
             maxAmmo = ammoPerShot * 3;
             targetAir = false;
-            shootShake = 4f;
-            recoilAmount = 1f;
+            shake = 4f;
+            recoil = 1f;
             reload = 60f * 2.3f;
             shootY = 7f;
             rotateSpeed = 1.4f;

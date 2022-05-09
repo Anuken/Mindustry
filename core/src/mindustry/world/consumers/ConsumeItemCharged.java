@@ -4,9 +4,11 @@ import mindustry.gen.*;
 
 /** For mods. I don't use this (yet). */
 public class ConsumeItemCharged extends ConsumeItemFilter{
+    public float minCharge;
 
     public ConsumeItemCharged(float minCharge){
-        super(item -> item.charge >= minCharge);
+        this.minCharge = minCharge;
+        filter = item -> item.charge >= this.minCharge;
     }
 
     public ConsumeItemCharged(){

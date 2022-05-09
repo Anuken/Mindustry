@@ -12,10 +12,13 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class ConsumeItemFilter extends Consume{
-    public final Boolf<Item> filter;
+    public Boolf<Item> filter = i -> false;
 
     public ConsumeItemFilter(Boolf<Item> item){
         this.filter = item;
+    }
+
+    public ConsumeItemFilter(){
     }
 
     @Override

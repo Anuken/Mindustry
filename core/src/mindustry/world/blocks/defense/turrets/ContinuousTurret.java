@@ -93,7 +93,7 @@ public class ContinuousTurret extends Turret{
 
                 wasShooting = true;
                 heat = 1f;
-                recoil = recoilAmount;
+                curRecoil = recoil;
             }
         }
 

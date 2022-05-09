@@ -3,9 +3,11 @@ package mindustry.world.consumers;
 import mindustry.gen.*;
 
 public class ConsumeItemExplosive extends ConsumeItemFilter{
+    public float minExplosiveness;
 
-    public ConsumeItemExplosive(float minExplosiveness){
-        super(item -> item.explosiveness >= minExplosiveness);
+    public ConsumeItemExplosive(float minCharge){
+        this.minExplosiveness = minCharge;
+        filter = item -> item.explosiveness >= this.minExplosiveness;
     }
 
     public ConsumeItemExplosive(){
