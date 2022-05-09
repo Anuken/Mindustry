@@ -1119,6 +1119,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     /** Draw the block overlay that is shown when a cursor is over the block. */
     public void drawSelect(){
+        block.drawOverlay(x, y, rotation);
     }
 
     public void drawDisabled(){
