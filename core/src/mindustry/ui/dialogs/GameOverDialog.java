@@ -53,42 +53,44 @@ public class GameOverDialog extends BaseDialog{
 
         buttons.margin(10);
 
-        if(state.rules.pvp && winner != null){
-            cont.add(Core.bundle.format("gameover.pvp", winner.localized())).pad(6);
-        }else{
-            cont.add(state.isCampaign() ? Core.bundle.format("sector.lost", state.getSector().name()) : "@gameover").center().pad(6);
-        }
-        cont.row();
-
-        if(control.isHighScore()){
-            cont.add("@highscore").pad(6);
-            cont.row();
-        }
-
-        cont.pane(t -> {
-            t.margin(13f);
-            t.left().defaults().left();
-            t.setBackground(Styles.black3);
-
-            t.table(stats -> {
-                if(state.rules.waves) addStat(stats, Core.bundle.get("stats.wave"), state.stats.wavesLasted, 0f);
-                addStat(stats, Core.bundle.get("stats.unitsCreated"), state.stats.unitsCreated, 0.05f);
-                addStat(stats, Core.bundle.get("stats.enemiesDestroyed"), state.stats.enemyUnitsDestroyed, 0.1f);
-                addStat(stats, Core.bundle.get("stats.built"), state.stats.buildingsBuilt, 0.15f);
-                addStat(stats, Core.bundle.get("stats.destroyed"), state.stats.buildingsDestroyed, 0.2f);
-                addStat(stats, Core.bundle.get("stats.deconstructed"), state.stats.buildingsDeconstructed, 0.25f);
-            }).top().grow().row();
-
-            if(control.saves.getCurrent() != null){
-                t.table(tt -> {
-                    tt.add(new FLabel(Core.bundle.get("stats.playtime"))).left().pad(5).growX();
-                    tt.add(new FLabel("[accent]" + control.saves.getCurrent().getPlayTime())).right().pad(5);
-                }).growX();
+        cont.table(t -> {
+            if(state.rules.pvp && winner != null){
+                t.add(Core.bundle.format("gameover.pvp", winner.localized())).center().pad(6);
+            }else{
+                t.add(state.isCampaign() ? Core.bundle.format("sector.lost", state.getSector().name()) : "@gameover").center().pad(6);
             }
-        }).minWidth(370).maxSize(580, 500).grow().pad(12).center().get();
+            t.row();
 
+            if(control.isHighScore()){
+                t.add("@highscore").pad(6);
+                t.row();
+            }
+
+            t.pane(p -> {
+                p.margin(13f);
+                p.left().defaults().left();
+                p.setBackground(Styles.black3);
+
+                p.table(stats -> {
+                    if(state.rules.waves) addStat(stats, Core.bundle.get("stats.wave"), state.stats.wavesLasted, 0f);
+                    addStat(stats, Core.bundle.get("stats.unitsCreated"), state.stats.unitsCreated, 0.05f);
+                    addStat(stats, Core.bundle.get("stats.enemiesDestroyed"), state.stats.enemyUnitsDestroyed, 0.1f);
+                    addStat(stats, Core.bundle.get("stats.built"), state.stats.buildingsBuilt, 0.15f);
+                    addStat(stats, Core.bundle.get("stats.destroyed"), state.stats.buildingsDestroyed, 0.2f);
+                    addStat(stats, Core.bundle.get("stats.deconstructed"), state.stats.buildingsDeconstructed, 0.25f);
+                }).top().grow().row();
+
+                if(control.saves.getCurrent() != null){
+                    p.table(pt -> {
+                        pt.add(new FLabel(Core.bundle.get("stats.playtime"))).left().pad(5).growX();
+                        pt.add(new FLabel("[accent]" + control.saves.getCurrent().getPlayTime())).right().pad(5);
+                    }).growX();
+                }
+            }).grow().pad(12).top();
+        }).center().minWidth(370).maxSize(600, 550).grow();
 
         if(state.isCampaign() && net.client()){
+            cont.row();
             cont.add("@gameover.waiting").padTop(20f).row();
         }
 
