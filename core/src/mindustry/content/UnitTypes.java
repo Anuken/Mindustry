@@ -2568,14 +2568,6 @@ public class UnitTypes{
                             Lines.line(e.x, e.y, v.x, v.y);
                         });
                     });
-
-                    pointEffectSpace = 8f;
-
-                    if(false)
-                    pointEffect = new Effect(20, e -> {
-                        color(e.color);
-                        Fill.poly(e.x, e.y, 3, 4f * e.fout(), e.rotation);
-                    }).layer(Layer.bullet - 0.001f);
                 }};
             }});
         }};
@@ -2588,7 +2580,7 @@ public class UnitTypes{
             health = 4500;
             armor = 10f;
             itemCapacity = 0;
-            treadRects = new Rect[]{new Rect(16 - 60f, 38 - 60f, 30, 75), new Rect(44 - 60f, 7 - 60f, 17, 60)};
+            treadRects = new Rect[]{new Rect(16 - 60f, 48 - 70f, 30, 75), new Rect(44 - 60f, 17 - 70f, 17, 60)};
             researchCostMultiplier = 0f;
 
             weapons.add(new Weapon("precept-weapon"){{

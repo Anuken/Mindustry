@@ -448,6 +448,7 @@ public class Block extends UnlockableContent implements Senseable{
     /** Drawn when placing and when hovering over. */
     public void drawOverlay(float x, float y, int rotation){
     }
+
     public float sumAttribute(@Nullable Attribute attr, int x, int y){
         if(attr == null) return 0;
         Tile tile = world.tile(x, y);

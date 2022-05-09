@@ -47,7 +47,7 @@ public class DuctRouter extends Block{
     public void setStats(){
         super.setStats();
 
-        stats.add(Stat.itemsMoved, 60f / speed, StatUnit.itemsSecond);
+        stats.add(Stat.itemsMoved, 60f / speed * itemCapacity, StatUnit.itemsSecond);
     }
 
     @Override
@@ -78,6 +78,8 @@ public class DuctRouter extends Block{
         public float progress;
         public @Nullable Item current;
 
+        protected int acceptors;
+
         @Override
         public void draw(){
             Draw.rect(region, x, y);
@@ -99,8 +101,7 @@ public class DuctRouter extends Block{
                     var target = target();
                     if(target != null){
                         target.handleItem(this, current);
-                        int mod = sortItem != null && current != sortItem ? 2 : 3;
-                        cdump = (byte)((cdump + 1) % mod);
+                        cdump = ((cdump + 1) % acceptors);
                         items.remove(current, 1);
                         current = null;
                         progress %= (1f - 1f/speed);
@@ -123,6 +124,18 @@ public class DuctRouter extends Block{
         @Nullable
         public Building target(){
             if(current == null) return null;
+
+            acceptors = 0;
+
+            //TODO this is horrible.
+            for(int i = -1; i <= 1; i++){
+                int dir = Mathf.mod(rotation + i, 4);
+                if(sortItem != null && (current == sortItem) != (dir == rotation)) continue;
+                Building other = nearby(dir);
+                if(other != null && other.team == team && other.acceptItem(this, current)){
+                    acceptors ++;
+                }
+            }
 
             for(int i = -1; i <= 1; i++){
                 int dir = Mathf.mod(rotation + (((i + cdump + 1) % 3) - 1), 4);
