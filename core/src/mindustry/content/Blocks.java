@@ -80,7 +80,7 @@ public class Blocks{
     //defense
     copperWall, copperWallLarge, titaniumWall, titaniumWallLarge, plastaniumWall, plastaniumWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge,
     phaseWall, phaseWallLarge, surgeWall, surgeWallLarge,
-    berylliumWall, berylliumWallLarge, tungstenWall, tungstenWallLarge, blastDoor, carbideWall, carbideWallLarge,
+    berylliumWall, berylliumWallLarge, tungstenWall, tungstenWallLarge, blastDoor, reinforcedSurgeWall, reinforcedSurgeWallLarge, carbideWall, carbideWallLarge,
     mender, mendProjector, overdriveProjector, overdriveDome, forceProjector, shockMine,
     scrapWall, scrapWallLarge, scrapWallHuge, scrapWallGigantic, thruster, //ok, these names are getting ridiculous, but at least I don't have humongous walls yet
 
@@ -141,8 +141,7 @@ public class Blocks{
     //units - erekir
     tankFabricator, shipFabricator, mechFabricator,
 
-    //TODO names
-    refabricator,
+    tankRefabricator, shipRefabricator, mechRefabricator,
     primeRefabricator,
 
     tankAssembler, shipAssembler, mechAssembler,
@@ -1361,7 +1360,7 @@ public class Blocks{
             consumeItem(Items.silicon, 3);
             //TODO must consume from 2 pumps, 1, or 1.5?
             //TODO consume hydrogen/ozone?
-            consumeLiquid(Liquids.slag, 80f / 60f);
+            consumeLiquid(Liquids.slag, 40f / 60f);
             consumePower(2f); //TODO necessary?
         }};
 
@@ -1385,10 +1384,11 @@ public class Blocks{
 
             size = 3;
 
-            liquidCapacity = 40f;
+            liquidCapacity = 80f;
             outputLiquid = new LiquidStack(Liquids.cyanogen, 3f / 60f);
 
-            consumeLiquids(LiquidStack.with(Liquids.hydrogen, 3f / 60f, Liquids.nitrogen, 2f / 60f));
+            //consumeLiquids(LiquidStack.with(Liquids.hydrogen, 3f / 60f, Liquids.nitrogen, 2f / 60f));
+            consumeLiquid(Liquids.arkycite, 40f / 60f);
             consumeItem(Items.graphite);
             consumePower(2f);
         }};
@@ -1622,6 +1622,23 @@ public class Blocks{
             requirements(Category.defense, with(Items.tungsten, 24, Items.silicon, 24));
             health = 175 * wallHealthMultiplier * 4;
             armor = 14f;
+            size = 2;
+        }};
+
+        reinforcedSurgeWall = new Wall("reinforced-surge-wall"){{
+            requirements(Category.defense, with(Items.surgeAlloy, 6, Items.tungsten, 2));
+            health = 230 * wallHealthMultiplier;
+            lightningChance = 0.05f;
+            lightningDamage = 30f;
+            armor = 20f;
+        }};
+
+        reinforcedSurgeWallLarge = new Wall("reinforced-surge-wall-large"){{
+            requirements(Category.defense, ItemStack.mult(reinforcedSurgeWall.requirements, 4));
+            health = 230 * wallHealthMultiplier * 4;
+            lightningChance = 0.05f;
+            lightningDamage = 30f;
+            armor = 20f;
             size = 2;
         }};
 
@@ -2394,7 +2411,7 @@ public class Blocks{
         pyrolysisGenerator = new ConsumeGenerator("pyrolysis-generator"){{
             //TODO requirements
             requirements(Category.power, with(Items.graphite, 50, Items.carbide, 50, Items.oxide, 60f, Items.silicon, 50));
-            powerProduction = 18f;
+            powerProduction = 27f;
 
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawPistons(){{
                 sinMag = 2.75f;
@@ -2413,7 +2430,7 @@ public class Blocks{
 
             liquidCapacity = 30f * 5;
 
-            liquidOutput = new LiquidStack(Liquids.water, 10f / 60f);
+            liquidOutput = new LiquidStack(Liquids.water, 20f / 60f);
 
             generateEffect = Fx.none;
 
@@ -2618,7 +2635,7 @@ public class Blocks{
 
         //TODO bad name
         eruptionDrill = new BurstDrill("eruption-drill"){{
-            requirements(Category.production, with(Items.silicon, 200, Items.oxide, 80, Items.tungsten, 200, Items.carbide, 120));
+            requirements(Category.production, with(Items.silicon, 200, Items.oxide, 20, Items.tungsten, 200, Items.thorium, 120));
             drillTime = 60f * 6f;
             size = 5;
             hasPower = true;
@@ -2640,7 +2657,7 @@ public class Blocks{
 
             //TODO different requirements
             consumePower(6f);
-            consumeLiquids(LiquidStack.with(Liquids.water, 0.4f, Liquids.hydrogen, 4f / 60f));
+            consumeLiquids(LiquidStack.with(Liquids.hydrogen, 4f / 60f));
         }};
 
         //endregion
@@ -3949,7 +3966,7 @@ public class Blocks{
         }};
 
         disperse = new ItemTurret("disperse"){{
-            requirements(Category.turret, with(Items.carbide, 50, Items.oxide, 150, Items.silicon, 200, Items.beryllium, 350));
+            requirements(Category.turret, with(Items.thorium, 50, Items.oxide, 150, Items.silicon, 200, Items.beryllium, 350));
 
             ammo(Items.tungsten, new BasicBulletType(){{
                 damage = 60;
@@ -4213,21 +4230,52 @@ public class Blocks{
             consumePower(2f);
         }};
 
-        refabricator = new Reconstructor("refabricator"){{
+        tankRefabricator = new Reconstructor("tank-refabricator"){{
+            requirements(Category.units, with(Items.beryllium, 200, Items.tungsten, 80, Items.silicon, 100));
+            regionSuffix = "-dark";
+
+            size = 3;
+            consumePower(3f);
+            consumeLiquid(Liquids.hydrogen, 3f / 60f);
+            consumeItems(with(Items.silicon, 40, Items.tungsten, 30));
+
+            constructTime = 60f * 30f;
+            researchCostMultiplier = 0.75f;
+
+            upgrades.addAll(
+            new UnitType[]{UnitTypes.stell, UnitTypes.locus}
+            );
+        }};
+
+        mechRefabricator = new Reconstructor("mech-refabricator"){{
             requirements(Category.units, with(Items.beryllium, 250, Items.tungsten, 120, Items.silicon, 150));
             regionSuffix = "-dark";
 
             size = 3;
-            consumePower(2f);
+            consumePower(2.5f);
             consumeLiquid(Liquids.hydrogen, 3f / 60f);
             consumeItems(with(Items.silicon, 50, Items.tungsten, 40));
 
-            constructTime = 60f * 40f;
+            constructTime = 60f * 45f;
             researchCostMultiplier = 0.75f;
 
             upgrades.addAll(
-            new UnitType[]{UnitTypes.stell, UnitTypes.locus},
-            new UnitType[]{UnitTypes.merui, UnitTypes.cleroi},
+            new UnitType[]{UnitTypes.merui, UnitTypes.cleroi}
+            );
+        }};
+
+        shipRefabricator = new Reconstructor("ship-refabricator"){{
+            requirements(Category.units, with(Items.beryllium, 200, Items.tungsten, 100, Items.silicon, 150, Items.oxide, 40));
+            regionSuffix = "-dark";
+
+            size = 3;
+            consumePower(2.5f);
+            consumeLiquid(Liquids.hydrogen, 3f / 60f);
+            consumeItems(with(Items.silicon, 60, Items.tungsten, 40));
+
+            constructTime = 60f * 50f;
+
+            upgrades.addAll(
             new UnitType[]{UnitTypes.elude, UnitTypes.avert}
             );
         }};
@@ -4251,58 +4299,8 @@ public class Blocks{
             );
         }};
 
-        /*
-        mechReconstructor = new Reconstructor("mech-reconstructor"){{
-            requirements(Category.units, with(Items.beryllium, 250, Items.tungsten, 120, Items.silicon, 150));
-            regionSuffix = "-dark";
-
-            size = 3;
-            consumePower(2f);
-            consumeLiquid(Liquids.hydrogen, 3f / 60f);
-            consumeItems(with(Items.silicon, 50, Items.tungsten, 40));
-
-            constructTime = 60f * 40f;
-            researchCostMultiplier = 0.75f;
-
-            upgrades.addAll(
-            new UnitType[]{UnitTypes.stell, UnitTypes.latum}
-            );
-        }};
-
-        shipReconstructor = new Reconstructor("ship-reconstructor"){{
-            requirements(Category.units, with(Items.graphite, 250, Items.tungsten, 120, Items.silicon, 200));
-            regionSuffix = "-dark";
-
-            size = 3;
-            consumePower(2.5f);
-            consumeLiquid(Liquids.hydrogen, 3f / 60f);
-            consumeItems(with(Items.silicon, 25, Items.tungsten, 25));
-
-            constructTime = 60f * 30f;
-
-            upgrades.addAll(
-            new UnitType[]{UnitTypes.stell, UnitTypes.avert}
-            );
-        }};
-
-        tankReconstructor = new Reconstructor("tank-reconstructor"){{
-            requirements(Category.units, with(Items.graphite, 150, Items.tungsten, 150, Items.silicon, 250, Items.oxide, 60));
-            regionSuffix = "-dark";
-
-            size = 3;
-            consumePower(3f);
-            consumeLiquid(Liquids.hydrogen, 3f / 60f);
-            consumeItems(with(Items.silicon, 90, Items.tungsten, 70));
-
-            constructTime = 60f * 60f;
-
-            upgrades.addAll(
-            new UnitType[]{UnitTypes.stell, UnitTypes.locus}
-            );
-        }};*/
-
         tankAssembler = new UnitAssembler("tank-assembler"){{
-            requirements(Category.units, with(Items.thorium, 500, Items.oxide, 150, Items.tungsten, 500, Items.silicon, 500));
+            requirements(Category.units, with(Items.thorium, 500, Items.oxide, 150, Items.carbide, 80, Items.silicon, 500));
             regionSuffix = "-dark";
             size = 5;
             plans.add(
@@ -4318,7 +4316,7 @@ public class Blocks{
 
         //TODO requirements
         shipAssembler = new UnitAssembler("ship-assembler"){{
-            requirements(Category.units, with(Items.beryllium, 700, Items.oxide, 200, Items.tungsten, 500, Items.silicon, 800, Items.thorium, 400));
+            requirements(Category.units, with(Items.carbide, 100, Items.oxide, 200, Items.tungsten, 500, Items.silicon, 800, Items.thorium, 400));
             regionSuffix = "-dark";
             size = 5;
             plans.add(
@@ -4328,12 +4326,12 @@ public class Blocks{
             areaSize = 13;
 
             consumePower(3f);
-            consumeLiquid(Liquids.nitrogen, 24f / 60f);
+            consumeLiquid(Liquids.cyanogen, 6f / 60f);
         }};
 
         //TODO requirements
         mechAssembler = new UnitAssembler("mech-assembler"){{
-            requirements(Category.units, with(Items.carbide, 500, Items.thorium, 600, Items.oxide, 200, Items.tungsten, 500, Items.silicon, 900));
+            requirements(Category.units, with(Items.carbide, 200, Items.thorium, 600, Items.oxide, 200, Items.tungsten, 500, Items.silicon, 900));
             regionSuffix = "-dark";
             size = 5;
             //TODO different reqs
@@ -4344,12 +4342,12 @@ public class Blocks{
             consumePower(3f);
             areaSize = 13;
 
-            consumeLiquid(Liquids.nitrogen, 24f / 60f);
+            consumeLiquid(Liquids.cyanogen, 9f / 60f);
         }};
 
         //TODO requirements / only accept inputs
         basicAssemblerModule = new UnitAssemblerModule("basic-assembler-module"){{
-            requirements(Category.units, with(Items.carbide, 300, Items.thorium, 500, Items.oxide, 200, Items.phaseFabric, 100));
+            requirements(Category.units, with(Items.carbide, 300, Items.thorium, 500, Items.oxide, 200, Items.phaseFabric, 400));
             consumePower(4f);
             regionSuffix = "-dark";
 

@@ -106,9 +106,10 @@ public class ErekirTechTree{
                             //TODO further limitations
                             node(payloadLoader, () -> {
                                 node(payloadUnloader, () -> {
-                                    node(payloadPropulsionTower, () -> {
+                                    //TODO replace.
+                                    //node(payloadPropulsionTower, () -> {
 
-                                    });
+                                    //});
                                 });
                             });
 
@@ -188,7 +189,7 @@ public class ErekirTechTree{
                 node(cliffCrusher, () -> {
                     node(siliconArcFurnace, () -> {
                         node(electrolyzer, Seq.with(new OnSector(three)), () -> {
-                            node(oxidationChamber, Seq.with(new Research(refabricator), new OnSector(four)), () -> {
+                            node(oxidationChamber, Seq.with(new Research(tankRefabricator), new OnSector(four)), () -> {
                                 node(electricHeater, Seq.with(new OnSector(four)), () -> {
                                     node(heatRedirector, () -> {
 
@@ -201,13 +202,15 @@ public class ErekirTechTree{
                                     });
 
                                     node(carbideCrucible, Seq.with(tmpNever), () -> {
-                                        node(surgeCrucible, () -> {
-                                            node(phaseSynthesizer, () -> {
-                                                node(phaseHeater, () -> {
+                                        node(phaseSynthesizer, () -> {
+                                            node(phaseHeater, () -> {
 
-                                                });
                                             });
                                         });
+                                    });
+
+                                    node(surgeCrucible, () -> {
+
                                     });
                                 });
                             });
@@ -237,6 +240,12 @@ public class ErekirTechTree{
                     node(tungstenWall, () -> {
                         node(tungstenWallLarge, () -> {
                             node(blastDoor, () -> {
+
+                            });
+                        });
+
+                        node(reinforcedSurgeWall, () -> {
+                            node(reinforcedSurgeWallLarge, () -> {
 
                             });
                         });
@@ -275,55 +284,55 @@ public class ErekirTechTree{
             });
 
             node(tankFabricator, Seq.with(new Research(siliconArcFurnace), new Research(plasmaBore), new Research(turbineCondenser)), () -> {
-                node(UnitTypes.stell, () -> {
-
-                });
+                node(UnitTypes.stell);
 
                 node(unitRepairTower, Seq.with(new OnSector(two)), () -> {
 
                 });
 
                 node(shipFabricator, Seq.with(new OnSector(two)), () -> {
-                    node(UnitTypes.elude, () -> {
-
-                    });
+                    node(UnitTypes.elude);
 
                     node(mechFabricator, Seq.with(new OnSector(three)), () -> {
-                        node(UnitTypes.merui, () -> {
+                        node(UnitTypes.merui);
 
-                        });
-
-                        node(refabricator, Seq.with(new OnSector(three)), () -> {
-                            node(UnitTypes.cleroi);
-                            node(UnitTypes.avert);
+                        node(tankRefabricator, Seq.with(new OnSector(three)), () -> {
                             node(UnitTypes.locus);
 
-                            //TODO
-                            node(primeRefabricator, () -> {
-                                node(UnitTypes.precept);
-                                node(UnitTypes.anthicus);
-                                node(UnitTypes.obviate);
-                            });
+                            node(mechRefabricator, Seq.with(new OnSector(three)), () -> {
+                                node(UnitTypes.cleroi);
 
-                            node(tankAssembler, Seq.with(new OnSector(three), new Research(constructor), new Research(atmosphericConcentrator)), () -> {
+                                node(shipRefabricator, Seq.with(new OnSector(four), tmpNever), () -> {
+                                    node(UnitTypes.avert);
 
-                                node(UnitTypes.vanquish, () -> {
-                                    node(UnitTypes.conquer, Seq.with(tmpNever), () -> {
-
+                                    //TODO
+                                    node(primeRefabricator, () -> {
+                                        node(UnitTypes.precept);
+                                        node(UnitTypes.anthicus);
+                                        node(UnitTypes.obviate);
                                     });
-                                });
 
-                                node(shipAssembler, Seq.with(new OnSector(four)), () -> {
-                                    node(UnitTypes.quell, () -> {
-                                        node(UnitTypes.disrupt, Seq.with(tmpNever), () -> {
+                                    node(tankAssembler, Seq.with(new OnSector(three), new Research(constructor), new Research(atmosphericConcentrator)), () -> {
 
+                                        node(UnitTypes.vanquish, () -> {
+                                            node(UnitTypes.conquer, Seq.with(tmpNever), () -> {
+
+                                            });
                                         });
-                                    });
 
-                                    node(mechAssembler, Seq.with(tmpNever), () -> {
-                                        node(UnitTypes.tecta, () -> {
-                                            node(UnitTypes.collaris, Seq.with(tmpNever), () -> {
+                                        node(shipAssembler, Seq.with(new OnSector(four)), () -> {
+                                            node(UnitTypes.quell, () -> {
+                                                node(UnitTypes.disrupt, Seq.with(tmpNever), () -> {
 
+                                                });
+                                            });
+
+                                            node(mechAssembler, Seq.with(tmpNever), () -> {
+                                                node(UnitTypes.tecta, () -> {
+                                                    node(UnitTypes.collaris, Seq.with(tmpNever), () -> {
+
+                                                    });
+                                                });
                                             });
                                         });
                                     });
@@ -387,9 +396,6 @@ public class ErekirTechTree{
                                 });
 
                                 nodeProduce(Liquids.gallium, () -> {
-                                    nodeProduce(Items.scrap, () -> {
-
-                                    });
                                 });
                             });
                         });

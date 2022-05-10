@@ -2640,7 +2640,7 @@ public class UnitTypes{
             hitSize = 28f;
             treadPullOffset = 4;
             speed = 0.63f;
-            health = 9000;
+            health = 10000;
             armor = 20f;
             itemCapacity = 0;
             crushDamage = 13f / 5f;
@@ -2734,7 +2734,7 @@ public class UnitTypes{
             hitSize = 46f;
             treadPullOffset = 1;
             speed = 0.48f;
-            health = 20000;
+            health = 22000;
             armor = 25f;
             crushDamage = 25f / 5f;
             rotateSpeed = 0.8f;
@@ -3701,7 +3701,7 @@ public class UnitTypes{
             speed = 1.1f;
             rotateSpeed = 3.2f;
             accel = 0.1f;
-            health = 3000f;
+            health = 8000f;
             armor = 5f;
             hitSize = 36f;
             payloadCapacity = Mathf.sqr(3f) * tilePayload;
@@ -3770,7 +3770,7 @@ public class UnitTypes{
             speed = 1f;
             rotateSpeed = 2f;
             accel = 0.1f;
-            health = 10000f;
+            health = 12000f;
             armor = 7f;
             hitSize = 46f;
             payloadCapacity = Mathf.sqr(6f) * tilePayload;
