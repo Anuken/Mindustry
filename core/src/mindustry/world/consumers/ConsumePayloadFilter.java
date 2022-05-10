@@ -19,7 +19,7 @@ public class ConsumePayloadFilter extends Consume{
 
     public ConsumePayloadFilter(Boolf<UnlockableContent> filter){
         this.filter = filter;
-        this.fitting = Vars.content.blocks().copy().<UnlockableContent>as().and(content.units().as())
+        this.fitting = Vars.content.blocks().copy().<UnlockableContent>as().add(content.units().as())
             .select(filter).toArray(UnlockableContent.class);
     }
 

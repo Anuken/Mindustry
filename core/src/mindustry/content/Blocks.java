@@ -1319,7 +1319,7 @@ public class Blocks{
                 }});
             }
 
-            drawer = new DrawMulti(drawers.and(new DrawDefault()));
+            drawer = new DrawMulti(drawers.add(new DrawDefault()));
 
             craftTime = 60f * 2f;
 
