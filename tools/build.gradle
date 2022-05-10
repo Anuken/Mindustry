@@ -348,7 +348,7 @@ task updateBundles{
             StringBuilder result = new StringBuilder()
 
             //add everything ordered
-            for(String key : base.orderedKeys().copy().and(extras.keys().toSeq())){
+            for(String key : base.orderedKeys().copy().add(extras.keys().toSeq())){
                 if(other.get(key) == null) continue
 
                 result.append(processor.get(key, other.get(key)))
