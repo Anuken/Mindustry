@@ -104,7 +104,7 @@ public class ScriptMainGenerator{
         StringBuilder cdef = new StringBuilder();
 
         Seq<Class<?>> mapped = classes.select(c -> Modifier.isPublic(c.getModifiers()) && packages.contains(c.getCanonicalName()::startsWith))
-        .and(Block.class); //special case
+        .add(Block.class); //special case
 
         for(Class<?> c : mapped){
             cdef.append("        classes.put(\"").append(c.getSimpleName()).append("\", ").append(c.getCanonicalName()).append(".class);\n");

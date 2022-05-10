@@ -246,6 +246,11 @@ public class SettingsMenuDialog extends BaseDialog{
         return out.toString();
     }
 
+    /** Adds a custom settings category, with the icon being the specified region. */
+    public void addCategory(String name, @Nullable String region, Cons<SettingsTable> builder){
+        categories.add(new SettingsCategory(name, region == null ? null : new TextureRegionDrawable(atlas.find(region)), builder));
+    }
+
     /** Adds a custom settings category, for use in mods. The specified consumer should add all relevant mod settings to the table. */
     public void addCategory(String name, @Nullable Drawable icon, Cons<SettingsTable> builder){
         categories.add(new SettingsCategory(name, icon, builder));
@@ -253,7 +258,7 @@ public class SettingsMenuDialog extends BaseDialog{
 
     /** Adds a custom settings category, for use in mods. The specified consumer should add all relevant mod settings to the table. */
     public void addCategory(String name, Cons<SettingsTable> builder){
-        addCategory(name, null, builder);
+        addCategory(name, (Drawable)null, builder);
     }
 
     void rebuildMenu(){

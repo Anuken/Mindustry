@@ -163,7 +163,7 @@ public class EntityProcess extends BaseProcessor{
                 //SPECIAL CASE: components with EntityDefs don't get a base class! the generated class becomes the base class itself
                 if(component.annotation(Component.class).base()){
 
-                    Seq<Stype> deps = depends.copy().and(component);
+                    Seq<Stype> deps = depends.copy().add(component);
                     baseClassDeps.get(component, ObjectSet::new).addAll(deps);
 
                     //do not generate base classes when the component will generate one itself
@@ -822,7 +822,7 @@ public class EntityProcess extends BaseProcessor{
             //create mock types of all components
             for(Stype interf : allInterfaces){
                 //indirect interfaces to implement methods for
-                Seq<Stype> dependencies = interf.allInterfaces().and(interf);
+                Seq<Stype> dependencies = interf.allInterfaces().add(interf);
                 Seq<Smethod> methods = dependencies.flatMap(Stype::methods);
                 methods.sortComparing(Object::toString);
 

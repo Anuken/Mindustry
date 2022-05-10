@@ -95,8 +95,6 @@ public class Vars implements Loadable{
     public static final float buildingRange = 220f;
     /** range for moving items */
     public static final float itemTransferRange = 220f;
-    /** multiplier for core item capacity when launching */
-    public static final float launchCapacityMultiplier = 0.25f;
     /** range for moving items for logic units */
     public static final float logicItemTransferRange = 45f;
     /** duration of time between turns in ticks */
@@ -277,7 +275,7 @@ public class Vars implements Loadable{
             }
 
             Arrays.sort(locales, Structs.comparing(LanguageDialog::getDisplayName, String.CASE_INSENSITIVE_ORDER));
-            locales = Seq.with(locales).and(new Locale("router")).toArray(Locale.class);
+            locales = Seq.with(locales).add(new Locale("router")).toArray(Locale.class);
         }
 
         Version.init();

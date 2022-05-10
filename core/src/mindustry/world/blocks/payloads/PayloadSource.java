@@ -89,7 +89,7 @@ public class PayloadSource extends PayloadBlock{
         public void buildConfiguration(Table table){
             ItemSelection.buildTable(PayloadSource.this, table,
                 content.blocks().select(PayloadSource.this::canProduce).<UnlockableContent>as()
-                .and(content.units().select(PayloadSource.this::canProduce).as()),
+                .add(content.units().select(PayloadSource.this::canProduce).as()),
             () -> (UnlockableContent)config(), this::configure);
         }
 

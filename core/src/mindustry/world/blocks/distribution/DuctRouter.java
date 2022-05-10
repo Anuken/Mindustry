@@ -1,7 +1,6 @@
 package mindustry.world.blocks.distribution;
 
 import arc.graphics.g2d.*;
-import arc.math.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.io.*;
@@ -99,8 +98,6 @@ public class DuctRouter extends Block{
                     var target = target();
                     if(target != null){
                         target.handleItem(this, current);
-                        int mod = sortItem != null && current != sortItem ? 2 : 3;
-                        cdump = ((cdump + 1) % mod);
                         items.remove(current, 1);
                         current = null;
                         progress %= (1f - 1f/speed);
@@ -124,14 +121,20 @@ public class DuctRouter extends Block{
         public Building target(){
             if(current == null) return null;
 
-            for(int i = -1; i <= 1; i++){
-                int dir = Mathf.mod(rotation + (((i + cdump + 1) % 3) - 1), 4);
-                if(sortItem != null && (current == sortItem) != (dir == rotation)) continue;
-                Building other = nearby(dir);
-                if(other != null && other.team == team && other.acceptItem(this, current)){
+            int dump = cdump;
+
+            for(int i = 0; i < proximity.size; i++){
+                Building other = proximity.get((i + dump) % proximity.size);
+                int rel = relativeTo(other);
+
+                if(!(sortItem != null && (current == sortItem) != (rel == rotation)) && !(rel == (rotation + 2) % 4) && other.team == team && other.acceptItem(this, current)){
+                    incrementDump(proximity.size);
                     return other;
                 }
+
+                incrementDump(proximity.size);
             }
+
             return null;
         }
 
