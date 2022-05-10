@@ -192,7 +192,9 @@ public class ErekirTechTree{
                             node(oxidationChamber, Seq.with(new Research(tankRefabricator), new OnSector(four)), () -> {
                                 node(electricHeater, Seq.with(new OnSector(four)), () -> {
                                     node(heatRedirector, () -> {
+                                        node(surgeCrucible, () -> {
 
+                                        });
                                     });
 
                                     node(atmosphericConcentrator, Seq.with(new OnSector(four)), () -> {
@@ -208,22 +210,14 @@ public class ErekirTechTree{
                                             });
                                         });
                                     });
-
-                                    node(surgeCrucible, () -> {
-
-                                    });
                                 });
                             });
 
                             node(slagIncinerator, Seq.with(new OnSector(four)), () -> {
 
-                                node(slagCentrifuge, () -> {
-
-                                });
-
-                                node(heatReactor, () -> {
-
-                                });
+                                //TODO these are unused.
+                                //node(slagCentrifuge, () -> {});
+                                //node(heatReactor, () -> {});
                             });
                         });
                     });
@@ -358,9 +352,7 @@ public class ErekirTechTree{
                 nodeProduce(Items.sand, () -> {
                     nodeProduce(Items.silicon, () -> {
                         nodeProduce(Items.oxide, () -> {
-                            nodeProduce(Items.fissileMatter, () -> {
-
-                            });
+                            //nodeProduce(Items.fissileMatter, () -> {});
                         });
                     });
                 });
@@ -369,9 +361,11 @@ public class ErekirTechTree{
                     nodeProduce(Liquids.ozone, () -> {
                         nodeProduce(Liquids.hydrogen, () -> {
                             nodeProduce(Liquids.nitrogen, () -> {
-                                nodeProduce(Liquids.cyanogen, () -> {
 
-                                });
+                            });
+
+                            nodeProduce(Liquids.cyanogen, () -> {
+
                             });
                         });
                     });
@@ -395,8 +389,7 @@ public class ErekirTechTree{
                                     });
                                 });
 
-                                nodeProduce(Liquids.gallium, () -> {
-                                });
+                                //nodeProduce(Liquids.gallium, () -> {});
                             });
                         });
                     });

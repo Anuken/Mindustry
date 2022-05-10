@@ -1256,10 +1256,9 @@ public class Blocks{
 
             drawer = new DrawMulti(new DrawDefault(), new DrawHeatOutput());
             size = 2;
-            heatOutput = 10f;
-            craftTime = 60f * 8f;
+            heatOutput = 15f;
+            craftTime = 60f * 15f;
             consumeItem(Items.phaseFabric);
-            consumePower(0.5f / 60f);
         }};
 
         heatRedirector = new HeatConductor("heat-redirector"){{
@@ -1297,7 +1296,7 @@ public class Blocks{
         }};
 
         slagCentrifuge = new GenericCrafter("slag-centrifuge"){{
-            requirements(Category.crafting, with(Items.carbide, 70, Items.graphite, 60, Items.silicon, 40, Items.oxide, 40));
+            requirements(Category.crafting, BuildVisibility.debugOnly, with(Items.carbide, 70, Items.graphite, 60, Items.silicon, 40, Items.oxide, 40));
 
             consumePower(2f / 60f);
 
@@ -1428,7 +1427,7 @@ public class Blocks{
         }};
 
         heatReactor = new HeatProducer("heat-reactor"){{
-            requirements(Category.crafting, with(Items.oxide, 70, Items.graphite, 20, Items.carbide, 10, Items.thorium, 80));
+            requirements(Category.crafting, BuildVisibility.debugOnly, with(Items.oxide, 70, Items.graphite, 20, Items.carbide, 10, Items.thorium, 80));
             size = 3;
             craftTime = 60f * 10f;
 

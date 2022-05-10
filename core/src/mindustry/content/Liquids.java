@@ -63,6 +63,7 @@ public class Liquids{
 
         gallium = new Liquid("gallium", Color.valueOf("9a9dbf")){{
             coolant = false;
+            hidden = true;
         }};
 
         //TODO reactivity, etc
