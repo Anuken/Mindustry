@@ -111,7 +111,9 @@ public class GameOverDialog extends BaseDialog{
         }else{
             buttons.button("@menu", () -> {
                 hide();
-                logic.reset();
+                if(!ui.paused.checkPlaytest()){
+                    logic.reset();
+                }
             }).size(140f, 60f);
         }
     }
