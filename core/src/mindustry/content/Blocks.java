@@ -4199,7 +4199,7 @@ public class Blocks{
             requirements(Category.units, with(Items.silicon, 200, Items.beryllium, 150));
             size = 3;
             configurable = false;
-            plans.add(new UnitPlan(UnitTypes.stell, 60f * 35f, with(Items.beryllium, 40f, Items.silicon, 50f)));
+            plans.add(new UnitPlan(UnitTypes.stell, 60f * 35f, with(Items.beryllium, 40, Items.silicon, 50)));
             researchCost = with(Items.beryllium, 200, Items.graphite, 80, Items.silicon, 80);
             regionSuffix = "-dark";
             fogRadius = 3;
@@ -4211,7 +4211,7 @@ public class Blocks{
 
             size = 3;
             configurable = false;
-            plans.add(new UnitPlan(UnitTypes.elude, 60f * 45f, with(Items.beryllium, 50f, Items.silicon, 70f)));
+            plans.add(new UnitPlan(UnitTypes.elude, 60f * 45f, with(Items.graphite, 50, Items.silicon, 70)));
             regionSuffix = "-dark";
             fogRadius = 3;
             researchCostMultiplier = 0.5f;
@@ -4222,7 +4222,7 @@ public class Blocks{
             requirements(Category.units, with(Items.silicon, 200, Items.graphite, 300, Items.tungsten, 60));
             size = 3;
             configurable = false;
-            plans.add(new UnitPlan(UnitTypes.merui, 60f * 40f, with(Items.graphite, 40f, Items.silicon, 70f)));
+            plans.add(new UnitPlan(UnitTypes.merui, 60f * 40f, with(Items.beryllium, 50, Items.silicon, 70)));
             regionSuffix = "-dark";
             fogRadius = 3;
             researchCostMultiplier = 0.65f;
