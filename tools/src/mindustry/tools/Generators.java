@@ -572,6 +572,7 @@ public class Generators{
                 //draw each extra segment on top before it is saved as outline
                 if(sample instanceof Crawlc){
                     for(int i = 0; i < type.segments; i++){
+                        //replace(type.segmentRegions[i], outline.get(get(type.segmentRegions[i])));
                         save(outline.get(get(type.segmentRegions[i])), type.name + "-segment-outline" + i);
 
                         if(i > 0){
@@ -584,7 +585,7 @@ public class Generators{
                 //outline is currently never needed, although it could theoretically be necessary
                 if(type.needsBodyOutline()){
                     save(image, type.name + "-outline");
-                }else{
+                }else if(type.segments == 0){
                     replace(type.name, type.segments > 0 ? get(type.segmentRegions[0]) : outline.get(get(type.region)));
                 }
 

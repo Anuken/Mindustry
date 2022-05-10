@@ -89,7 +89,7 @@ public class UnitTypes{
 
     //region neoplasm
 
-    public static @EntityDef({Unitc.class, Crawlc.class}) UnitType scuttler;
+    public static @EntityDef({Unitc.class, Crawlc.class}) UnitType latum;
 
     //endregion
 
@@ -3909,9 +3909,9 @@ public class UnitTypes{
         //region erekir - neoplasm
 
         if(false)
-            scuttler = new NeoplasmUnitType("scuttler"){{
+            latum = new NeoplasmUnitType("latum"){{
                 health = 20000;
-                armor = 17;
+                armor = 12;
                 hitSize = 48f;
                 omniMovement = false;
                 rotateSpeed = 1.7f;
@@ -3919,7 +3919,10 @@ public class UnitTypes{
                 drawCell = false;
                 segments = 4;
                 drawBody = false;
+                hidden = true;
                 crushDamage = 2f;
+                aiController = HugAI::new;
+                targetAir = false;
 
                 segmentScl = 4f;
                 segmentPhase = 5f;
