@@ -75,6 +75,8 @@ public class Planet extends UnlockableContent{
     public int startSector = 0;
     /** Seed for sector base generation on this planet. -1 to use a random one based on ID. */
     public int sectorSeed = -1;
+    /** multiplier for core item capacity when launching */
+    public float launchCapacityMultiplier = 0.25f;
     /** Whether the bloom render effect is enabled. */
     public boolean bloom = false;
     /** Whether this planet is displayed. */
