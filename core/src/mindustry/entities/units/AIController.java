@@ -234,6 +234,23 @@ public class AIController implements UnitController{
         }
     }
 
+    public void circleAttack(float circleLength){
+        vec.set(target).sub(unit);
+
+        float ang = unit.angleTo(target);
+        float diff = Angles.angleDist(ang, unit.rotation());
+
+        if(diff > 70f && vec.len() < circleLength){
+            vec.setAngle(unit.vel().angle());
+        }else{
+            vec.setAngle(Angles.moveToward(unit.vel().angle(), vec.angle(), 6f));
+        }
+
+        vec.setLength(unit.speed());
+
+        unit.moveAt(vec);
+    }
+
     public void circle(Position target, float circleLength){
         circle(target, circleLength, unit.speed());
     }

@@ -4190,22 +4190,23 @@ public class Blocks{
             consumePower(2f);
         }};
 
-        mechFabricator = new UnitFactory("mech-fabricator"){{
+        shipFabricator = new UnitFactory("ship-fabricator"){{
             requirements(Category.units, with(Items.silicon, 250, Items.beryllium, 200));
+
             size = 3;
             configurable = false;
-            plans.add(new UnitPlan(UnitTypes.merui, 60f * 45f, with(Items.beryllium, 50f, Items.silicon, 70f)));
+            plans.add(new UnitPlan(UnitTypes.elude, 60f * 45f, with(Items.beryllium, 50f, Items.silicon, 70f)));
             regionSuffix = "-dark";
             fogRadius = 3;
             researchCostMultiplier = 0.5f;
             consumePower(2f);
         }};
 
-        shipFabricator = new UnitFactory("ship-fabricator"){{
+        mechFabricator = new UnitFactory("mech-fabricator"){{
             requirements(Category.units, with(Items.silicon, 200, Items.graphite, 300, Items.tungsten, 60));
             size = 3;
             configurable = false;
-            plans.add(new UnitPlan(UnitTypes.elude, 60f * 40f, with(Items.graphite, 40f, Items.silicon, 70f)));
+            plans.add(new UnitPlan(UnitTypes.merui, 60f * 40f, with(Items.graphite, 40f, Items.silicon, 70f)));
             regionSuffix = "-dark";
             fogRadius = 3;
             researchCostMultiplier = 0.65f;

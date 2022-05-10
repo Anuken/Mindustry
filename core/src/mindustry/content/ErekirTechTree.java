@@ -283,13 +283,13 @@ public class ErekirTechTree{
 
                 });
 
-                node(mechFabricator, Seq.with(new OnSector(two)), () -> {
-                    node(UnitTypes.merui, () -> {
+                node(shipFabricator, Seq.with(new OnSector(two)), () -> {
+                    node(UnitTypes.elude, () -> {
 
                     });
 
-                    node(shipFabricator, Seq.with(new OnSector(three)), () -> {
-                        node(UnitTypes.elude, () -> {
+                    node(mechFabricator, Seq.with(new OnSector(three)), () -> {
+                        node(UnitTypes.merui, () -> {
 
                         });
 
