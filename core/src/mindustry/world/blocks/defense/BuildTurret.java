@@ -134,7 +134,7 @@ public class BuildTurret extends BaseTurret{
                         if(within(block.x * tilesize, block.y * tilesize, range)){
                             var btype = content.block(block.block);
 
-                            if(Build.validPlace(btype, unit.team(), block.x, block.y, block.rotation) && team.items().has(btype.requirements, state.rules.buildCostMultiplier)){
+                            if(Build.validPlace(btype, unit.team(), block.x, block.y, block.rotation) && (state.rules.infiniteResources || team.rules().infiniteResources || team.items().has(btype.requirements, state.rules.buildCostMultiplier))){
                                 unit.addBuild(new BuildPlan(block.x, block.y, block.rotation, content.block(block.block), block.config));
                                 //shift build plan to tail so next unit builds something else
                                 blocks.addLast(blocks.removeIndex(i));
