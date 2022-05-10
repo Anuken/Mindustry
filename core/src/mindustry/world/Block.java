@@ -396,6 +396,7 @@ public class Block extends UnlockableContent implements Senseable{
     /** Drawn when you are placing a block. */
     public void drawPlace(int x, int y, int rotation, boolean valid){
         drawPotentialLinks(x, y);
+        drawOverlay(x * tilesize + offset, y * tilesize + offset, rotation);
     }
 
     public void drawPotentialLinks(int x, int y){
@@ -442,6 +443,10 @@ public class Block extends UnlockableContent implements Senseable{
         Pools.free(layout);
 
         return width;
+    }
+
+    /** Drawn when placing and when hovering over. */
+    public void drawOverlay(float x, float y, int rotation){
     }
 
     public float sumAttribute(@Nullable Attribute attr, int x, int y){
@@ -621,7 +626,8 @@ public class Block extends UnlockableContent implements Senseable{
 
     public boolean canReplace(Block other){
         if(other.alwaysReplace) return true;
-        return other.replaceable && (other != this || rotate) && this.group != BlockGroup.none && other.group == this.group &&
+        if(other.privileged) return false;
+        return other.replaceable && (other != this || (rotate && quickRotate)) && this.group != BlockGroup.none && other.group == this.group &&
             (size == other.size || (size >= other.size && ((subclass != null && subclass == other.subclass) || group.anyReplace)));
     }
 

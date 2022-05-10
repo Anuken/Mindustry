@@ -102,7 +102,7 @@ public class ErekirTechTree{
                 node(reinforcedPayloadConveyor, Seq.with(new OnSector(four)), () -> {
                     //TODO should only be unlocked in unit sector
                     node(constructor, Seq.with(new Research(siliconArcFurnace), new OnSector(four)), () -> {
-                        node(payloadMassDriver, Seq.with(new OnSector(five)), () -> {
+                        node(payloadMassDriver, Seq.with(new OnSector(four)), () -> {
                             //TODO further limitations
                             node(payloadLoader, () -> {
                                 node(payloadUnloader, () -> {
@@ -133,7 +133,7 @@ public class ErekirTechTree{
             //TODO move into turbine condenser?
             node(plasmaBore, () -> {
                 node(impactDrill, Seq.with(new OnSector(two)), () -> {
-                    node(largePlasmaBore, Seq.with(new OnSector(five)), () -> {
+                    node(largePlasmaBore, Seq.with(new OnSector(four)), () -> {
                         node(eruptionDrill, () -> {
 
                         });
@@ -158,7 +158,7 @@ public class ErekirTechTree{
 
                     node(regenProjector, () -> {
                         //TODO more tiers of build tower or "support" structures like overdrive projectors
-                        node(buildTower, Seq.with(new OnSector(five)), () -> {
+                        node(buildTower, Seq.with(new OnSector(four)), () -> {
 
                         });
                     });
@@ -195,7 +195,7 @@ public class ErekirTechTree{
                                     });
 
                                     node(atmosphericConcentrator, Seq.with(new OnSector(four)), () -> {
-                                        node(cyanogenSynthesizer, Seq.with(new OnSector(five)), () -> {
+                                        node(cyanogenSynthesizer, Seq.with(new OnSector(four)), () -> {
 
                                         });
                                     });
@@ -252,11 +252,11 @@ public class ErekirTechTree{
                 node(diffuse, Seq.with(new OnSector(two)), () -> {
                     node(sublimate, () -> {
                         //TODO implement
-                        node(titan, Seq.with(new OnSector(five)), () -> {
+                        node(titan, Seq.with(new OnSector(four)), () -> {
 
                         });
 
-                        node(disperse, Seq.with(new OnSector(five)), () -> {
+                        node(disperse, Seq.with(new OnSector(four)), () -> {
 
                         });
                     });
@@ -313,7 +313,7 @@ public class ErekirTechTree{
                                     });
                                 });
 
-                                node(shipAssembler, Seq.with(new OnSector(five)), () -> {
+                                node(shipAssembler, Seq.with(new OnSector(four)), () -> {
                                     node(UnitTypes.quell, () -> {
                                         node(UnitTypes.disrupt, Seq.with(tmpNever), () -> {
 
@@ -339,10 +339,7 @@ public class ErekirTechTree{
                 node(two, Seq.with(new SectorComplete(onset), new Research(ductRouter), new Research(ductBridge)), () -> {
                     node(three, Seq.with(new SectorComplete(two), new Research(ventCondenser)), () -> {
                         node(four, Seq.with(new SectorComplete(three)), () -> {
-                            //TODO doesn't work
-                            node(five, Seq.with(new SectorComplete(four), tmpNever), () -> {
 
-                            });
                         });
                     });
                 });
@@ -374,6 +371,10 @@ public class ErekirTechTree{
                 nodeProduce(Items.graphite, () -> {
                     nodeProduce(Items.tungsten, () -> {
                         nodeProduce(Liquids.slag, () -> {
+
+                        });
+
+                        nodeProduce(Liquids.arkycite, () -> {
 
                         });
 

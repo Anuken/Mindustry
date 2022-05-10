@@ -108,7 +108,7 @@ public class LExecutor{
 
     public Var var(int index){
         //global constants have variable IDs < 0, and they are fetched from the global constants object after being negated
-        return index < 0 ? constants.get(-index) : vars[index];
+        return index < 0 ? logicVars.get(-index) : vars[index];
     }
 
     public @Nullable Building building(int index){
@@ -1104,7 +1104,7 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            exec.setobj(dest, constants.lookupContent(type, exec.numi(from)));
+            exec.setobj(dest, logicVars.lookupContent(type, exec.numi(from)));
         }
     }
 
@@ -1320,6 +1320,35 @@ public class LExecutor{
         }
     }
 
+    public static class ApplyEffectI implements LInstruction{
+        public boolean clear;
+        public String effect;
+        public int unit, duration;
+
+        public ApplyEffectI(boolean clear, String effect, int unit, int duration){
+            this.clear = clear;
+            this.effect = effect;
+            this.unit = unit;
+            this.duration = duration;
+        }
+
+        public ApplyEffectI(){
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            if(net.client()) return;
+
+            if(exec.obj(unit) instanceof Unit unit && content.statusEffect(effect) != null){
+                if(clear){
+                    unit.unapply(content.statusEffect(effect));
+                }else{
+                    unit.apply(content.statusEffect(effect), exec.numf(duration) * 60f);
+                }
+            }
+        }
+    }
+
     public static class SetRuleI implements LInstruction{
         public LogicRule rule = LogicRule.waveSpacing;
         public int value, p1, p2, p3, p4;
@@ -1440,8 +1469,8 @@ public class LExecutor{
             //skip back to self until possible
             //TODO this is guaranteed desync on servers - I don't see a good solution
             if(
-                type == MessageType.announce && ui.hudfrag.hasToast() ||
-                type == MessageType.notify && ui.hasAnnouncement() ||
+                type == MessageType.announce && ui.hasAnnouncement() ||
+                type == MessageType.notify && ui.hudfrag.hasToast() ||
                 type == MessageType.toast && ui.hasAnnouncement()
             ){
                 exec.var(varCounter).numval --;

@@ -649,6 +649,8 @@ public class MobileInput extends InputHandler implements GestureListener{
         }else if(commandMode && selectedUnits.size > 0){
             //handle selecting units with command mode
             commandTap(x, y);
+        }else if(commandMode){
+            tapCommandUnit();
         }else{
             //control units
             if(count == 2){

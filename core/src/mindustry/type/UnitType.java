@@ -112,6 +112,8 @@ public class UnitType extends UnlockableContent{
     targetPriority = 0f,
     /** Elevation of shadow drawn under this (ground) unit. Visual only. */
     shadowElevation = -1f,
+    /** Scale for length of shadow drawn under this unit. Does nothing if this unit has no shadow. */
+    shadowElevationScl = 1f,
     /** backwards engine offset from center of unit */
     engineOffset = 5f,
     /** main engine radius */
@@ -360,7 +362,7 @@ public class UnitType extends UnlockableContent{
 
     //TANK UNITS
 
-    /** list of treads as rectangles in IMAGE COORDINATES. these should match the coordinates you see in an image editor*/
+    /** list of treads as rectangles in IMAGE COORDINATES, relative to the center. these are mirrored. */
     public Rect[] treadRects = {};
     /** number of frames of movement in a tread */
     public int treadFrames = 18;
@@ -1147,7 +1149,7 @@ public class UnitType extends UnlockableContent{
     }
 
     public void drawShadow(Unit unit){
-        float e = Math.max(unit.elevation, shadowElevation) * (1f - unit.drownTime);
+        float e = Mathf.clamp(unit.elevation, shadowElevation, 1f) * shadowElevationScl * (1f - unit.drownTime);
         float x = unit.x + shadowTX * e, y = unit.y + shadowTY * e;
         Floor floor = world.floorWorld(x, y);
 
@@ -1301,8 +1303,8 @@ public class UnitType extends UnlockableContent{
             for(int i = 0; i < treadRects.length; i ++){
                 var region = treadRegions[i][frame];
                 var treadRect = treadRects[i];
-                float xOffset = treadRegion.width/2f - (treadRect.x + treadRect.width/2f);
-                float yOffset = treadRegion.height/2f - (treadRect.y + treadRect.height/2f);
+                float xOffset = -(treadRect.x + treadRect.width/2f);
+                float yOffset = -(treadRect.y + treadRect.height/2f);
 
                 for(int side : Mathf.signs){
                     Tmp.v1.set(xOffset * side, yOffset).rotate(unit.rotation - 90);

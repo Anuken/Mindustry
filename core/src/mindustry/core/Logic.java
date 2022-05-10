@@ -402,12 +402,18 @@ public class Logic implements ApplicationListener{
     @Remote(called = Loc.both)
     public static void updateGameOver(Team winner){
         state.gameOver = true;
+        if(!headless){
+            state.won = player.team() == winner;
+        }
     }
 
     @Remote(called = Loc.both)
     public static void gameOver(Team winner){
         state.stats.wavesLasted = state.wave;
-        ui.restart.show(winner);
+        state.won = player.team() == winner;
+        Time.run(60f * 3f, () -> {
+            ui.restart.show(winner);
+        });
         netClient.setQuiet();
     }
 
@@ -498,7 +504,7 @@ public class Logic implements ApplicationListener{
                 }
                 Time.update();
 
-                constants.update();
+                logicVars.update();
 
                 //weather is serverside
                 if(!net.client() && !state.isEditor()){

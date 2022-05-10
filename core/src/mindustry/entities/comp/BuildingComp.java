@@ -63,7 +63,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     transient Tile tile;
     transient Block block;
     transient Seq<Building> proximity = new Seq<>(6);
-    transient byte cdump;
+    transient int cdump;
     transient int rotation;
     transient float payloadRotation;
     transient String lastAccessed;
@@ -992,7 +992,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public void incrementDump(int prox){
-        cdump = (byte)((cdump + 1) % prox);
+        cdump = ((cdump + 1) % prox);
     }
 
     /** Used for dumping items. */
@@ -1119,6 +1119,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     /** Draw the block overlay that is shown when a cursor is over the block. */
     public void drawSelect(){
+        block.drawOverlay(x, y, rotation);
     }
 
     public void drawDisabled(){
@@ -1132,7 +1133,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public void draw(){
-        if(block.variants == 0){
+        if(block.variants == 0 || block.variantRegions == null){
             Draw.rect(block.region, x, y, drawrot());
         }else{
             Draw.rect(block.variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, block.variantRegions.length - 1))], x, y, drawrot());
@@ -1828,7 +1829,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             case powerNetStored -> power == null ? 0 : power.graph.getLastPowerStored();
             case powerNetCapacity -> power == null ? 0 : power.graph.getLastCapacity();
             case enabled -> enabled ? 1 : 0;
-            case controlled -> this instanceof ControlBlock c && c.isControlled() ? GlobalConstants.ctrlPlayer : 0;
+            case controlled -> this instanceof ControlBlock c && c.isControlled() ? GlobalVars.ctrlPlayer : 0;
             case payloadCount -> getPayload() != null ? 1 : 0;
             case size -> block.size;
             default -> Float.NaN; //gets converted to null in logic

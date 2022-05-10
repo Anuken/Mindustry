@@ -160,6 +160,9 @@ public class Teams{
             data.unitCount = 0;
             data.units.clear();
             data.players.clear();
+            if(data.cores.size > 0){
+                data.lastCore = data.cores.first();
+            }
             if(data.unitTree != null){
                 data.unitTree.clear();
             }
@@ -236,7 +239,6 @@ public class Teams{
     }
 
     public static class TeamData{
-        public final Seq<CoreBuild> cores = new Seq<>();
         public final Team team;
 
         /** Handles RTS unit control. */
@@ -249,6 +251,10 @@ public class Teams{
         /** Planned blocks for drones. This is usually only blocks that have been broken. */
         public Queue<BlockPlan> plans = new Queue<>();
 
+        /** List of live cores of this team. */
+        public final Seq<CoreBuild> cores = new Seq<>();
+        /** Last known live core of this team. */
+        public @Nullable CoreBuild lastCore;
         /** Quadtree for all buildings of this team. Null if not active. */
         public @Nullable QuadTree<Building> buildingTree;
         /** Turrets by range. Null if not active. */

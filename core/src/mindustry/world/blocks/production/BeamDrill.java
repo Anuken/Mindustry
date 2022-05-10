@@ -281,6 +281,8 @@ public class BeamDrill extends Block{
             Draw.rect(block.region, x, y);
             Draw.rect(topRegion, x, y, rotdeg());
 
+            if(isPayload()) return;
+
             var dir = Geometry.d4(rotation);
             int ddx = Geometry.d4x(rotation + 1), ddy = Geometry.d4y(rotation + 1);
 

@@ -46,7 +46,7 @@ public class MinimapRenderer{
                 if(event.tile.block().solid && event.tile.y > 0 && event.tile.isCenter()){
                     event.tile.getLinkedTiles(t -> {
                         Tile tile = world.tile(t.x, t.y - 1);
-                        if(tile.block() == Blocks.air){
+                        if(tile != null && tile.block() == Blocks.air){
                             update(tile);
                         }
                     });
@@ -161,6 +161,10 @@ public class MinimapRenderer{
 
             //crisp pixels
             dynamicTex.setFilter(TextureFilter.nearest);
+
+            if(worldSpace){
+                region.set(0f, 0f, 1f, 1f);
+            }
 
             Tmp.tr1.set(dynamicTex);
             Tmp.tr1.set(region.u, 1f - region.v, region.u2, 1f - region.v2);

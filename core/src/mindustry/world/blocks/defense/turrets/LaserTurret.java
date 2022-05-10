@@ -76,7 +76,7 @@ public class LaserTurret extends PowerTurret{
 
                 wasShooting = true;
                 heat = 1f;
-                recoil = recoilAmount;
+                curRecoil = 1f;
             }else if(reloadCounter > 0){
                 wasShooting = true;
 

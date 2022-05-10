@@ -18,7 +18,7 @@ public class ConsumeItemExplode extends ConsumeItemFilter{
     public Effect explodeEffect = Fx.generatespark;
 
     public ConsumeItemExplode(float threshold){
-        super(item -> item.explosiveness >= threshold);
+        this.filter = item -> item.explosiveness >= this.threshold;
         this.threshold = threshold;
     }
 

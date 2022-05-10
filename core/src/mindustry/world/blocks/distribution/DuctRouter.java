@@ -47,7 +47,7 @@ public class DuctRouter extends Block{
     public void setStats(){
         super.setStats();
 
-        stats.add(Stat.itemsMoved, 60f / speed, StatUnit.itemsSecond);
+        stats.add(Stat.itemsMoved, 60f / speed * itemCapacity, StatUnit.itemsSecond);
     }
 
     @Override
@@ -100,7 +100,7 @@ public class DuctRouter extends Block{
                     if(target != null){
                         target.handleItem(this, current);
                         int mod = sortItem != null && current != sortItem ? 2 : 3;
-                        cdump = (byte)((cdump + 1) % mod);
+                        cdump = ((cdump + 1) % mod);
                         items.remove(current, 1);
                         current = null;
                         progress %= (1f - 1f/speed);

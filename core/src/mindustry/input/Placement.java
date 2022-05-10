@@ -175,7 +175,7 @@ public class Placement{
         plans.set(result);
     }
 
-    public static void calculateBridges(Seq<BuildPlan> plans, DirectionBridge bridge, boolean hasJunction){
+    public static void calculateBridges(Seq<BuildPlan> plans, DirectionBridge bridge, boolean hasJunction, Boolf<Block> same){
         if(isSidePlace(plans)) return;
 
         //check for orthogonal placement + unlocked state
@@ -185,9 +185,9 @@ public class Placement{
 
         //TODO for chains of ducts, do not count consecutives in a different rotation as 'placeable'
         Boolf<BuildPlan> placeable = plan ->
-            !(!hasJunction && plan.build() != null && plan.build().block == plan.block && plan.rotation != plan.build().rotation) &&
+            !(!hasJunction && plan.build() != null && same.get(plan.build().block) && plan.rotation != plan.build().rotation) &&
             (plan.placeable(player.team()) ||
-            (plan.tile() != null && plan.tile().block() == plan.block)); //don't count the same block as inaccessible
+            (plan.tile() != null && same.get(plan.tile().block()))); //don't count the same block as inaccessible
 
         var result = plans1.clear();
 

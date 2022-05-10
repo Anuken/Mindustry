@@ -704,7 +704,7 @@ public class LStatements{
 
             table.button(b -> {
                 b.label(() -> type.name());
-                b.clicked(() -> showSelect(b, GlobalConstants.lookableContent, type, o -> {
+                b.clicked(() -> showSelect(b, GlobalVars.lookableContent, type, o -> {
                     type = o;
                 }));
             }, Styles.logict, () -> {}).size(64f, 40f).pad(4f).color(table.color);
@@ -1231,6 +1231,71 @@ public class LStatements{
         @Override
         public LInstruction build(LAssembler builder){
             return new SpawnUnitI(builder.var(type), builder.var(x), builder.var(y), builder.var(rotation), builder.var(team), builder.var(result));
+        }
+    }
+
+    @RegisterStatement("status")
+    public static class ApplyStatusStatement extends LStatement{
+        public boolean clear;
+        public String effect = "wet", unit = "unit", duration = "10";
+
+        private static @Nullable String[] statusNames;
+
+        @Override
+        public void build(Table table){
+            rebuild(table);
+        }
+
+        void rebuild(Table table){
+            table.clearChildren();
+
+            table.button(clear ? "clear" : "apply", Styles.logict, () -> {
+                clear = !clear;
+                rebuild(table);
+            }).size(80f, 40f).pad(4f).color(table.color);
+
+            if(statusNames == null){
+                statusNames = content.statusEffects().select(s -> !s.isHidden()).map(s -> s.name).toArray(String.class);
+            }
+
+            table.button(b -> {
+                b.label(() -> effect).grow().wrap().labelAlign(Align.center).center();
+                b.clicked(() -> showSelect(b, statusNames, effect, o -> {
+                    effect = o;
+                }, 2, c -> c.size(120f, 38f)));
+            }, Styles.logict, () -> {}).size(120f, 40f).pad(4f).color(table.color);
+
+            //TODO effect select
+
+            table.add(clear ? " from " : " to ");
+
+            row(table);
+
+            fields(table, unit, str -> unit = str);
+
+            if(!clear){
+
+                table.add(" for ");
+
+                fields(table, duration, str -> duration = str);
+
+                table.add(" sec");
+            }
+        }
+
+        @Override
+        public boolean privileged(){
+            return true;
+        }
+
+        @Override
+        public Color color(){
+            return Pal.logicWorld;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new ApplyEffectI(clear, effect, builder.var(unit), builder.var(duration));
         }
     }
 
