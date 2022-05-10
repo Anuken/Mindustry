@@ -35,5 +35,7 @@ jobs:
         fi
     - name: Publish package
       run: ./gradlew clean publish -PpackageVersion=${GITHUB_SHA}
+      env:
+        PACKAGE_TOKEN: ${{ secrets.PACKAGE_TOKEN }}
     - name: Run unit tests
       run: ./gradlew clean cleanTest test --stacktrace
