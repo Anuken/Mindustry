@@ -340,7 +340,7 @@ public class ErekirTechTree{
             //TODO more sectors
             node(onset, () -> {
                 node(two, Seq.with(new SectorComplete(onset), new Research(ductRouter), new Research(ductBridge)), () -> {
-                    node(three, Seq.with(new SectorComplete(two), new Research(ventCondenser)), () -> {
+                    node(three, Seq.with(new SectorComplete(two), new Research(ventCondenser), new Research(shipFabricator)), () -> {
                         node(four, Seq.with(new SectorComplete(three)), () -> {
 
                         });
