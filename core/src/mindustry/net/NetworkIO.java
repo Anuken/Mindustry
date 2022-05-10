@@ -41,8 +41,8 @@ public class NetworkIO{
             stream.writeInt(state.wave);
             stream.writeFloat(state.wavetime);
             stream.writeDouble(state.tick);
-            stream.writeLong(GlobalConstants.rand.seed0);
-            stream.writeLong(GlobalConstants.rand.seed1);
+            stream.writeLong(GlobalVars.rand.seed0);
+            stream.writeLong(GlobalVars.rand.seed1);
 
             Writes write = new Writes(stream);
 
@@ -81,8 +81,8 @@ public class NetworkIO{
             state.wave = stream.readInt();
             state.wavetime = stream.readFloat();
             state.tick = stream.readDouble();
-            GlobalConstants.rand.seed0 = stream.readLong();
-            GlobalConstants.rand.seed1 = stream.readLong();
+            GlobalVars.rand.seed0 = stream.readLong();
+            GlobalVars.rand.seed1 = stream.readLong();
 
             Reads read = new Reads(stream);
 

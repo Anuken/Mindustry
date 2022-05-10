@@ -267,7 +267,7 @@ public class BlockRenderer{
         }
 
         if(brokenFade > 0.001f){
-            for(BlockPlan block : player.team().data().blocks){
+            for(BlockPlan block : player.team().data().plans){
                 Block b = content.block(block.block);
                 if(!camera.bounds(Tmp.r1).grow(tilesize * 2f).overlaps(Tmp.r2.setSize(b.size * tilesize).setCenter(block.x * tilesize + b.offset, block.y * tilesize + b.offset))) continue;
 
@@ -426,7 +426,7 @@ public class BlockRenderer{
                             updateShadow(build);
                             renderer.minimap.update(tile);
                         }
-                        build.visibleFlags |= (1L << player.team().id);
+                        build.visibleFlags |= (1L << pteam.id);
                         build.wasVisible = true;
                     }
 
@@ -436,19 +436,17 @@ public class BlockRenderer{
                         Draw.z(Layer.block);
                     }
 
-                    if(build.team != player.team()){
+                    if(build.team != pteam){
                         build.drawTeam();
                         Draw.z(Layer.block);
-                    }
-
-                    if(build.team == player.team() && renderer.drawStatus && block.hasConsumers){
+                    }else if(renderer.drawStatus && block.hasConsumers){
                         build.drawStatus();
                     }
                 }
                 Draw.reset();
             }else if(!visible){
                 //TODO here is the question: should buildings you lost sight of remain rendered? if so, how should this information be stored?
-                //comment lines below for buggy persistence
+                //uncomment lines below for buggy persistence
                 //if(build.wasVisible) updateShadow(build);
                 //build.wasVisible = false;
             }

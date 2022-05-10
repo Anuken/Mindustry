@@ -530,7 +530,7 @@ public class Generators{
                     for(int r = 0; r < type.treadRects.length; r++){
                         Rect treadRect = type.treadRects[r];
                         //slice is always 1 pixel wide
-                        Pixmap slice = pix.crop((int)treadRect.x, (int)treadRect.y, 1, (int)treadRect.height);
+                        Pixmap slice = pix.crop((int)(treadRect.x + pix.width/2f), (int)(treadRect.y + pix.height/2f), 1, (int)treadRect.height);
                         int frames = type.treadFrames;
                         for(int i = 0; i < frames; i++){
                             int pullOffset = type.treadPullOffset;
@@ -572,6 +572,7 @@ public class Generators{
                 //draw each extra segment on top before it is saved as outline
                 if(sample instanceof Crawlc){
                     for(int i = 0; i < type.segments; i++){
+                        //replace(type.segmentRegions[i], outline.get(get(type.segmentRegions[i])));
                         save(outline.get(get(type.segmentRegions[i])), type.name + "-segment-outline" + i);
 
                         if(i > 0){
@@ -584,7 +585,7 @@ public class Generators{
                 //outline is currently never needed, although it could theoretically be necessary
                 if(type.needsBodyOutline()){
                     save(image, type.name + "-outline");
-                }else{
+                }else if(type.segments == 0){
                     replace(type.name, type.segments > 0 ? get(type.segmentRegions[0]) : outline.get(get(type.region)));
                 }
 
@@ -601,7 +602,8 @@ public class Generators{
 
                 //draw treads
                 if(sample instanceof Tankc){
-                    image.draw(outline.get(get(type.treadRegion)), true);
+                    Pixmap treads = outline.get(get(type.treadRegion));
+                    image.draw(treads, image.width / 2 - treads.width / 2, image.height / 2 - treads.height / 2, true);
                     image.draw(get(type.previewRegion), true);
                 }
 

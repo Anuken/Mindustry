@@ -63,7 +63,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     transient Tile tile;
     transient Block block;
     transient Seq<Building> proximity = new Seq<>(6);
-    transient byte cdump;
+    transient int cdump;
     transient int rotation;
     transient float payloadRotation;
     transient String lastAccessed;
@@ -290,16 +290,16 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if(checkPrevious){
             //remove existing blocks that have been placed here.
             //painful O(n) iteration + copy
-            for(int i = 0; i < data.blocks.size; i++){
-                BlockPlan b = data.blocks.get(i);
+            for(int i = 0; i < data.plans.size; i++){
+                BlockPlan b = data.plans.get(i);
                 if(b.x == tile.x && b.y == tile.y){
-                    data.blocks.removeIndex(i);
+                    data.plans.removeIndex(i);
                     break;
                 }
             }
         }
 
-        data.blocks.addFirst(new BlockPlan(tile.x, tile.y, (short)rotation, toAdd.id, overrideConfig == null ? config() : overrideConfig));
+        data.plans.addFirst(new BlockPlan(tile.x, tile.y, (short)rotation, toAdd.id, overrideConfig == null ? config() : overrideConfig));
     }
 
     public @Nullable Tile findClosestEdge(Position to, Boolf<Tile> solid){
@@ -992,7 +992,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public void incrementDump(int prox){
-        cdump = (byte)((cdump + 1) % prox);
+        cdump = ((cdump + 1) % prox);
     }
 
     /** Used for dumping items. */
@@ -1119,6 +1119,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     /** Draw the block overlay that is shown when a cursor is over the block. */
     public void drawSelect(){
+        block.drawOverlay(x, y, rotation);
     }
 
     public void drawDisabled(){
@@ -1132,7 +1133,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public void draw(){
-        if(block.variants == 0){
+        if(block.variants == 0 || block.variantRegions == null){
             Draw.rect(block.region, x, y, drawrot());
         }else{
             Draw.rect(block.variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, block.variantRegions.length - 1))], x, y, drawrot());
@@ -1633,10 +1634,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
             if(other == null || !(other.tile.interactable(team))) continue;
 
-            //add this tile to proximity of nearby tiles
-            if(!other.proximity.contains(self(), true)){
-                other.proximity.add(self());
-            }
+            other.proximity.addUnique(self());
 
             tmpTiles.add(other);
         }
@@ -1828,7 +1826,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             case powerNetStored -> power == null ? 0 : power.graph.getLastPowerStored();
             case powerNetCapacity -> power == null ? 0 : power.graph.getLastCapacity();
             case enabled -> enabled ? 1 : 0;
-            case controlled -> this instanceof ControlBlock c && c.isControlled() ? GlobalConstants.ctrlPlayer : 0;
+            case controlled -> this instanceof ControlBlock c && c.isControlled() ? GlobalVars.ctrlPlayer : 0;
             case payloadCount -> getPayload() != null ? 1 : 0;
             case size -> block.size;
             default -> Float.NaN; //gets converted to null in logic

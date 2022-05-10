@@ -281,10 +281,10 @@ public class SectorDamage{
         float avgHealth = totalPathBuild <= 1 ? sumHealth : sumHealth / totalPathBuild;
 
         //block dps + regen + extra health/shields
-        for(Building build : Groups.build){
-            float e = build.efficiency;
+        for(Building build : state.rules.defaultTeam.data().buildings){
+            float e = build.potentialEfficiency;
             if(e > 0.08f){
-                if(build.team == state.rules.defaultTeam && build instanceof Ranged ranged && sparse.contains(t -> t.within(build, ranged.range() + 4*tilesize))){
+                if(build instanceof Ranged ranged && sparse.contains(t -> t.within(build, ranged.range() + 4*tilesize))){
                     //TODO make sure power turret network supports the turrets?
                     if(build instanceof TurretBuild b && b.hasAmmo()){
                         sumDps += b.estimateDps();
@@ -296,7 +296,7 @@ public class SectorDamage{
 
                     //point defense turrets act as flat health right now
                     if(build.block instanceof PointDefenseTurret){
-                        sumHealth += 150f * build.timeScale() * build.efficiency;
+                        sumHealth += 150f * build.timeScale() * build.potentialEfficiency;
                     }
 
                     if(build.block instanceof ForceProjector f){

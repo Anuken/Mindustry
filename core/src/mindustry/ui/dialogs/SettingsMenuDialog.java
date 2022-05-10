@@ -9,6 +9,7 @@ import arc.input.*;
 import arc.math.geom.*;
 import arc.scene.*;
 import arc.scene.event.*;
+import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.TextButton.*;
 import arc.scene.ui.layout.*;
@@ -40,7 +41,7 @@ public class SettingsMenuDialog extends BaseDialog{
     private Table prefs;
     private Table menu;
     private BaseDialog dataDialog;
-    private boolean wasPaused;
+    private Seq<SettingsCategory> categories = new Seq<>();
 
     public SettingsMenuDialog(){
         super(bundle.get("settings", "Settings"));
@@ -245,26 +246,49 @@ public class SettingsMenuDialog extends BaseDialog{
         return out.toString();
     }
 
+    /** Adds a custom settings category, with the icon being the specified region. */
+    public void addCategory(String name, @Nullable String region, Cons<SettingsTable> builder){
+        categories.add(new SettingsCategory(name, region == null ? null : new TextureRegionDrawable(atlas.find(region)), builder));
+    }
+
+    /** Adds a custom settings category, for use in mods. The specified consumer should add all relevant mod settings to the table. */
+    public void addCategory(String name, @Nullable Drawable icon, Cons<SettingsTable> builder){
+        categories.add(new SettingsCategory(name, icon, builder));
+    }
+
+    /** Adds a custom settings category, for use in mods. The specified consumer should add all relevant mod settings to the table. */
+    public void addCategory(String name, Cons<SettingsTable> builder){
+        addCategory(name, (Drawable)null, builder);
+    }
+
     void rebuildMenu(){
         menu.clearChildren();
 
         TextButtonStyle style = Styles.flatt;
 
+        float marg = 8f, isize = iconMed;
+
         menu.defaults().size(300f, 60f);
-        menu.button("@settings.game", style, () -> visible(0));
-        menu.row();
-        menu.button("@settings.graphics", style, () -> visible(1));
-        menu.row();
-        menu.button("@settings.sound", style, () -> visible(2));
-        menu.row();
-        menu.button("@settings.language", style, ui.language::show);
+        menu.button("@settings.game", Icon.settings, style, isize, () -> visible(0)).marginLeft(marg).row();
+        menu.button("@settings.graphics", Icon.image, style, isize, () -> visible(1)).marginLeft(marg).row();
+        menu.button("@settings.sound", Icon.filters, style, isize, () -> visible(2)).marginLeft(marg).row();
+        menu.button("@settings.language", Icon.chat, style, isize, ui.language::show).marginLeft(marg).row();
         if(!mobile || Core.settings.getBool("keyboard")){
-            menu.row();
-            menu.button("@settings.controls", style, ui.controls::show);
+            menu.button("@settings.controls", Icon.move, style, isize, ui.controls::show).marginLeft(marg).row();
         }
 
-        menu.row();
-        menu.button("@settings.data", style, () -> dataDialog.show());
+        menu.button("@settings.data", Icon.save, style, isize, () -> dataDialog.show()).marginLeft(marg).row();
+
+        int i = 3;
+        for(var cat : categories){
+            int index = i;
+            if(cat.icon == null){
+                menu.button(cat.name, style, () -> visible(index)).marginLeft(marg).row();
+            }else{
+                menu.button(cat.name, cat.icon, style, isize, () -> visible(index)).with(b -> ((Image)b.getChildren().get(1)).setScaling(Scaling.fit)).marginLeft(marg).row();
+            }
+            i++;
+        }
     }
 
     void addSettings(){
@@ -315,6 +339,7 @@ public class SettingsMenuDialog extends BaseDialog{
         }
 
         game.checkPref("doubletapmine", false);
+        game.checkPref("commandmodehold", true);
       
         if(!ios){
             game.checkPref("modcrashdisable", true);
@@ -529,7 +554,14 @@ public class SettingsMenuDialog extends BaseDialog{
 
     private void visible(int index){
         prefs.clearChildren();
-        prefs.add(new Table[]{game, graphics, sound}[index]);
+
+        Seq<Table> tables = new Seq<>();
+        tables.addAll(game, graphics, sound);
+        for(var custom : categories){
+            tables.add(custom.table);
+        }
+
+        prefs.add(tables.get(index));
     }
 
     @Override
@@ -555,6 +587,22 @@ public class SettingsMenuDialog extends BaseDialog{
 
     public interface StringProcessor{
         String get(int i);
+    }
+
+    public static class SettingsCategory{
+        public String name;
+        public @Nullable Drawable icon;
+        public Cons<SettingsTable> builder;
+        public SettingsTable table;
+
+        public SettingsCategory(String name, Drawable icon, Cons<SettingsTable> builder){
+            this.name = name;
+            this.icon = icon;
+            this.builder = builder;
+
+            table = new SettingsTable();
+            builder.get(table);
+        }
     }
 
     public static class SettingsTable extends Table{
@@ -645,7 +693,7 @@ public class SettingsMenuDialog extends BaseDialog{
             public Setting(String name){
                 this.name = name;
                 String winkey = "setting." + name + ".name.windows";
-                title = OS.isWindows && bundle.has(winkey) ? bundle.get(winkey) : bundle.get("setting." + name + ".name");
+                title = OS.isWindows && bundle.has(winkey) ? bundle.get(winkey) : bundle.get("setting." + name + ".name", name);
                 description = bundle.getOrNull("setting." + name + ".description");
             }
 

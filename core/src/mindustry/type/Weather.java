@@ -57,7 +57,7 @@ public class Weather extends UnlockableContent{
 
     public WeatherState create(float intensity, float duration){
         WeatherState entity = type.get();
-        entity.intensity(intensity);
+        entity.intensity(Mathf.clamp(intensity));
         entity.init(this);
         entity.life(duration);
         entity.add();

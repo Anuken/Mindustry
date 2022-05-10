@@ -225,7 +225,10 @@ public class DesktopInput extends InputHandler{
 
                 Core.camera.position.add(Tmp.v1.setZero().add(Core.input.axis(Binding.move_x), Core.input.axis(Binding.move_y)).nor().scl(camSpeed));
             }else if(!player.dead() && !panning){
-                Core.camera.position.lerpDelta(player, Core.settings.getBool("smoothcamera") ? 0.08f : 1f);
+                //TODO do not pan
+                Team corePanTeam = state.won ? state.rules.waveTeam : player.team();
+                Position coreTarget = state.gameOver && !state.rules.pvp && corePanTeam.data().lastCore != null ? corePanTeam.data().lastCore : null;
+                Core.camera.position.lerpDelta(coreTarget != null ? coreTarget : player, Core.settings.getBool("smoothcamera") ? 0.08f : 1f);
             }
 
             if(panCam){
@@ -239,7 +242,11 @@ public class DesktopInput extends InputHandler{
         if(!locked && block == null && !scene.hasField() &&
                 //disable command mode when player unit can boost and command mode binding is the same
                 !(!player.dead() && player.unit().type.canBoost && keybinds.get(Binding.command_mode).key == keybinds.get(Binding.boost).key)){
-            commandMode = input.keyDown(Binding.command_mode);
+            if(settings.getBool("commandmodehold")){
+                commandMode = input.keyDown(Binding.command_mode);
+            }else if(input.keyTap(Binding.command_mode)){
+                commandMode = !commandMode;
+            }
         }else{
             commandMode = false;
         }
@@ -649,26 +656,12 @@ public class DesktopInput extends InputHandler{
 
         //click: select a single unit
         if(button == KeyCode.mouseLeft){
-            Unit unit = selectedCommandUnit(input.mouseWorldX(), input.mouseWorldY());
-            Building build = world.buildWorld(input.mouseWorldX(), input.mouseWorldY());
-            if(unit != null){
-                if(selectedUnits.contains(unit)){
-                    selectedUnits.remove(unit);
-                }else{
-                    selectedUnits.clear();
-                    selectedUnits.add(unit);
-                }
-                commandBuild = null;
+            if(count >= 2){
+                selectTypedUnits();
             }else{
-                //deselect
-                selectedUnits.clear();
-
-                if(build != null && build.team == player.team() && build.block.commandable){
-                    commandBuild = (commandBuild == build ? null : build);
-                }else{
-                    commandBuild = null;
-                }
+                tapCommandUnit();
             }
+
         }
 
         return super.tap(x, y, count, button);

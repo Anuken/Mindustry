@@ -220,6 +220,7 @@ public class NetServer implements ApplicationListener{
                 }
 
                 if(Groups.player.contains(player -> player.uuid().equals(packet.uuid) || player.usid().equals(packet.usid))){
+                    con.uuid = packet.uuid;
                     con.kick(KickReason.idInUse);
                     return;
                 }
@@ -933,7 +934,7 @@ public class NetServer implements ApplicationListener{
 
         //write basic state data.
         Call.stateSnapshot(player.con, state.wavetime, state.wave, state.enemies, state.serverPaused, state.gameOver,
-        universe.seconds(), tps, GlobalConstants.rand.seed0, GlobalConstants.rand.seed1, syncStream.toByteArray());
+        universe.seconds(), tps, GlobalVars.rand.seed0, GlobalVars.rand.seed1, syncStream.toByteArray());
 
         syncStream.reset();
 

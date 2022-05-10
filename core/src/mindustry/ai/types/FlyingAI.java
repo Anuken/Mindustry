@@ -15,11 +15,11 @@ public class FlyingAI extends AIController{
         unloadPayloads();
 
         if(target != null && unit.hasWeapons()){
-            if(!unit.type.circleTarget){
+            if(unit.type.circleTarget){
+                circleAttack(120f);
+            }else{
                 moveTo(target, unit.type.range * 0.8f);
                 unit.lookAt(target);
-            }else{
-                attack(120f);
             }
         }
 
@@ -55,22 +55,5 @@ public class FlyingAI extends AIController{
         }
 
         return core;
-    }
-
-    protected void attack(float circleLength){
-        vec.set(target).sub(unit);
-
-        float ang = unit.angleTo(target);
-        float diff = Angles.angleDist(ang, unit.rotation());
-
-        if(diff > 70f && vec.len() < circleLength){
-            vec.setAngle(unit.vel().angle());
-        }else{
-            vec.setAngle(Angles.moveToward(unit.vel().angle(), vec.angle(), 6f));
-        }
-
-        vec.setLength(unit.speed());
-
-        unit.moveAt(vec);
     }
 }

@@ -342,8 +342,8 @@ public abstract class SaveVersion extends SaveFileReader{
         stream.writeInt(data.size);
         for(TeamData team : data){
             stream.writeInt(team.team.id);
-            stream.writeInt(team.blocks.size);
-            for(BlockPlan block : team.blocks){
+            stream.writeInt(team.plans.size);
+            for(BlockPlan block : team.plans){
                 stream.writeShort(block.x);
                 stream.writeShort(block.y);
                 stream.writeShort(block.rotation);
@@ -387,8 +387,8 @@ public abstract class SaveVersion extends SaveFileReader{
             Team team = Team.get(stream.readInt());
             TeamData data = team.data();
             int blocks = stream.readInt();
-            data.blocks.clear();
-            data.blocks.ensureCapacity(Math.min(blocks, 1000));
+            data.plans.clear();
+            data.plans.ensureCapacity(Math.min(blocks, 1000));
             var reads = Reads.get(stream);
             var set = new IntSet();
 
@@ -397,7 +397,7 @@ public abstract class SaveVersion extends SaveFileReader{
                 var obj = TypeIO.readObject(reads);
                 //cannot have two in the same position
                 if(set.add(Point2.pack(x, y))){
-                    data.blocks.addLast(new BlockPlan(x, y, rot, content.block(bid).id, obj));
+                    data.plans.addLast(new BlockPlan(x, y, rot, content.block(bid).id, obj));
                 }
             }
         }

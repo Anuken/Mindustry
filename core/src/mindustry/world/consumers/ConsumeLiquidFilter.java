@@ -13,7 +13,7 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class ConsumeLiquidFilter extends ConsumeLiquidBase{
-    public Boolf<Liquid> filter;
+    public Boolf<Liquid> filter = l -> false;
 
     public ConsumeLiquidFilter(Boolf<Liquid> liquid, float amount){
         super(amount);
@@ -21,7 +21,6 @@ public class ConsumeLiquidFilter extends ConsumeLiquidBase{
     }
 
     public ConsumeLiquidFilter(){
-        this.filter = l -> false;
     }
 
     @Override

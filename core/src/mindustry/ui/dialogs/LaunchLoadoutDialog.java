@@ -7,7 +7,6 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
@@ -48,7 +47,7 @@ public class LaunchLoadoutDialog extends BaseDialog{
 
         //updates sum requirements
         Runnable update = () -> {
-            int cap = lastCapacity = (int)(Vars.launchCapacityMultiplier * selected.findCore().itemCapacity);
+            int cap = lastCapacity = (int)(sector.planet.launchCapacityMultiplier * selected.findCore().itemCapacity);
 
             //cap resources based on core type
             ItemSeq resources = universe.getLaunchResources();

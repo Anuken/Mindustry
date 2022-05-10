@@ -28,8 +28,8 @@ public class ReloadTurret extends BaseTurret{
         @Override
         public void created(){
             super.created();
-            //for visual reasons, the turret does not need reloading when placed
-            reloadCounter = reload;
+            //for visual reasons, the turret does not need reloading when placed; however, it should not be *fully* reloaded, so firing will not occur
+            reloadCounter = reload - 0.0001f;
         }
 
         protected void updateCooling(){

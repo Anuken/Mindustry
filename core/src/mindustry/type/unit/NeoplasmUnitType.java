@@ -4,6 +4,7 @@ import mindustry.content.*;
 import mindustry.entities.abilities.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.world.meta.*;
 
 /** This is just a preset. Contains no new behavior. */
 public class NeoplasmUnitType extends UnitType{
@@ -13,10 +14,11 @@ public class NeoplasmUnitType extends UnitType{
 
         outlineColor = Pal.neoplasmOutline;
         immunities.addAll(StatusEffects.burning, StatusEffects.melting);
+        envDisabled = Env.none;
 
         abilities.add(new RegenAbility(){{
-            //fully regen in 30 seconds
-            percentAmount = 1f / (30f * 60f) * 100f;
+            //fully regen in 70 seconds
+            percentAmount = 1f / (70f * 60f) * 100f;
         }});
 
         abilities.add(new LiquidExplodeAbility(){{
@@ -29,7 +31,9 @@ public class NeoplasmUnitType extends UnitType{
         }});
 
         //green flashing is unnecessary since they always regen
-        healFlash = false;
+        healFlash = true;
+
+        healColor = Pal.neoplasm1;
 
         //TODO
         //- liquid regen ability

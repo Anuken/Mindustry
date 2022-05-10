@@ -163,7 +163,7 @@ public class Universe{
                     //export to another sector
                     if(sector.info.destination != null){
                         Sector to = sector.info.destination;
-                        if(to.hasBase()){
+                        if(to.hasBase() && to.planet == planet){
                             ItemSeq items = new ItemSeq();
                             //calculated exported items to this sector
                             sector.info.export.each((item, stat) -> items.add(item, (int)(stat.mean * newSecondsPassed * sector.getProductionScale())));

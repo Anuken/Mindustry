@@ -170,7 +170,7 @@ public class PayloadRouter extends PayloadConveyor{
         public void buildConfiguration(Table table){
             ItemSelection.buildTable(PayloadRouter.this, table,
                 content.blocks().select(PayloadRouter.this::canSort).<UnlockableContent>as()
-                .and(content.units().select(PayloadRouter.this::canSort).as()),
+                .add(content.units().select(PayloadRouter.this::canSort).as()),
                 () -> (UnlockableContent)config(), this::configure);
         }
 

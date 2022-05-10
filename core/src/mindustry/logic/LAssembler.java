@@ -58,7 +58,7 @@ public class LAssembler{
     /** @return a variable ID by name.
      * This may be a constant variable referring to a number or object. */
     public int var(String symbol){
-        int constId = Vars.constants.get(symbol);
+        int constId = Vars.logicVars.get(symbol);
         if(constId > 0){
             //global constants are *negated* and stored separately
             return -constId;

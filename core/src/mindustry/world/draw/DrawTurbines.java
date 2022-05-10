@@ -34,6 +34,6 @@ public class DrawTurbines extends DrawBlock{
 
     @Override
     public TextureRegion[] icons(Block block){
-        return new TextureRegion[]{turbines[0], turbines[1]};
+        return new TextureRegion[]{turbines[0], turbines[1], cap};
     }
 }

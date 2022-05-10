@@ -55,13 +55,13 @@ public class ContinuousLaserBulletType extends ContinuousBulletType{
             float ellipseLenScl = Mathf.lerp(1 - i / (float)(colors.length), 1f, pointyScaling);
 
             Lines.stroke(stroke);
-            Lines.lineAngle(b.x, b.y, rot, length - frontLength, false);
+            Lines.lineAngle(b.x, b.y, rot, baseLen - frontLength, false);
 
             //back ellipse
             Drawf.flameFront(b.x, b.y, divisions, rot + 180f, backLength, stroke / 2f);
 
             //front ellipse
-            Tmp.v1.trnsExact(rot, length - frontLength);
+            Tmp.v1.trnsExact(rot, baseLen - frontLength);
             Drawf.flameFront(b.x + Tmp.v1.x, b.y + Tmp.v1.y, divisions, rot, frontLength * ellipseLenScl, stroke / 2f);
         }
 

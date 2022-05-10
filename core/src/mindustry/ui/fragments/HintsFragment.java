@@ -27,7 +27,7 @@ public class HintsFragment{
     private static final float foutTime = 0.6f;
 
     /** All hints to be displayed in the game. */
-    public Seq<Hint> hints = new Seq<>().and(DefaultHint.values()).as();
+    public Seq<Hint> hints = new Seq<>().add(DefaultHint.values()).as();
 
     @Nullable Hint current;
     Group group = new WidgetGroup();
