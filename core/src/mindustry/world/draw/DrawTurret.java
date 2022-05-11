@@ -117,7 +117,7 @@ public class DrawTurret extends DrawBlock{
         }
 
         //TODO test this for mods, e.g. exotic
-        if(!base.found() && block.minfo.mod != null) base = Core.atlas.find(block.minfo.mod.name + "-block-" + block.size);
+        if(!base.found() && block.minfo.mod != null) base = Core.atlas.find(block.minfo.mod.name + "-" + basePrefix + "block-" + block.size);
         if(!base.found()) base = Core.atlas.find(basePrefix + "block-" + block.size);
     }
 
