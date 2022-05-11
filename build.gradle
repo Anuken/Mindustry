@@ -468,20 +468,9 @@ configure([":core", ":server"].collect{project(it)}){
     }
 
     publishing{
-        repositories{
-            maven{
-                name = "GitHubPackages"
-                url = uri("https://maven.pkg.github.com/anuken/mindustry")
-                credentials{
-                    username = project.findProperty("gpr.user") ?: "Anuken"
-                    password = project.findProperty("gpr.key") ?: System.getenv("PACKAGE_TOKEN")
-                }
-            }
-        }
-
-        publications {
-            gpr(MavenPublication) {
-                from(components.java)
+        publications{
+            maven(MavenPublication){
+                from components.java
             }
         }
     }
