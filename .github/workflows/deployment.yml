@@ -36,7 +36,7 @@ jobs:
         rm -rf .github
         rm README.md
         git add .
-        git commit -m "${GITHUB_SHA}"
+        git commit --allow-empty -m "${GITHUB_SHA}"
         git push https://Anuken:${{ secrets.API_TOKEN_GITHUB }}@github.com/Anuken/MindustryJitpack
         git tag ${RELEASE_VERSION}
         git push https://Anuken:${{ secrets.API_TOKEN_GITHUB }}@github.com/Anuken/MindustryJitpack
