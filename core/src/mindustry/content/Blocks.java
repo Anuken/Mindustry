@@ -1097,6 +1097,7 @@ public class Blocks{
         sporePress = new GenericCrafter("spore-press"){{
             requirements(Category.crafting, with(Items.lead, 35, Items.silicon, 30));
             liquidCapacity = 60f;
+            craftTime = 20f;
             outputLiquid = new LiquidStack(Liquids.oil, 18f / 60f);
             size = 2;
             health = 320;
