@@ -1626,7 +1626,7 @@ public class Blocks{
 
         reinforcedSurgeWall = new Wall("reinforced-surge-wall"){{
             requirements(Category.defense, with(Items.surgeAlloy, 6, Items.tungsten, 2));
-            health = 230 * wallHealthMultiplier;
+            health = 250 * wallHealthMultiplier;
             lightningChance = 0.05f;
             lightningDamage = 30f;
             armor = 20f;
@@ -1634,7 +1634,7 @@ public class Blocks{
 
         reinforcedSurgeWallLarge = new Wall("reinforced-surge-wall-large"){{
             requirements(Category.defense, ItemStack.mult(reinforcedSurgeWall.requirements, 4));
-            health = 230 * wallHealthMultiplier * 4;
+            health = 250 * wallHealthMultiplier * 4;
             lightningChance = 0.05f;
             lightningDamage = 30f;
             armor = 20f;
@@ -1643,13 +1643,13 @@ public class Blocks{
 
         carbideWall = new Wall("carbide-wall"){{
             requirements(Category.defense, with(Items.thorium, 6, Items.carbide, 6));
-            health = 240 * wallHealthMultiplier;
+            health = 270 * wallHealthMultiplier;
             armor = 16f;
         }};
 
         carbideWallLarge = new Wall("carbide-wall-large"){{
             requirements(Category.defense, ItemStack.mult(carbideWall.requirements, 4));
-            health = 240 * wallHealthMultiplier * 4;
+            health = 270 * wallHealthMultiplier * 4;
             armor = 16f;
             size = 2;
         }};
