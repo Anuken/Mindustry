@@ -145,7 +145,7 @@ public class GenericCrafter extends Block{
     public void drawOverlay(float x, float y, int rotation){
         if(outputLiquids != null){
             for(int i = 0; i < outputLiquids.length; i++){
-                int dir = liquidOutputDirections.length > i ? liquidOutputDirections[i] + rotation : -1;
+                int dir = liquidOutputDirections.length > i && liquidOutputDirections[i]!=-1 ? liquidOutputDirections[i] + rotation : -1;
 
                 if(dir != -1){
                     Draw.rect(
