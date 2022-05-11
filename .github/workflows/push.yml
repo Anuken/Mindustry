@@ -42,6 +42,7 @@ jobs:
         rm -rf .git
         cp -r ./MindustryJitpack/.git ./.git
         rm -rf MindustryJitpack
+        rm -rf .github
         rm README.md
         git add .
         git commit -m "${GITHUB_SHA}"
