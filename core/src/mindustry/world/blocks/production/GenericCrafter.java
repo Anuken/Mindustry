@@ -145,13 +145,13 @@ public class GenericCrafter extends Block{
     public void drawOverlay(float x, float y, int rotation){
         if(outputLiquids != null){
             for(int i = 0; i < outputLiquids.length; i++){
-                int dir = liquidOutputDirections.length > i ? liquidOutputDirections[i] + rotation : -1;
+                int dir = liquidOutputDirections.length > i ? liquidOutputDirections[i] : -1;
 
                 if(dir != -1){
                     Draw.rect(
                         outputLiquids[i].liquid.fullIcon,
-                        x + Geometry.d4x(dir) * (size * tilesize / 2f + 4),
-                        y + Geometry.d4y(dir) * (size * tilesize / 2f + 4),
+                        x + Geometry.d4x(dir + rotation) * (size * tilesize / 2f + 4),
+                        y + Geometry.d4y(dir + rotation) * (size * tilesize / 2f + 4),
                         8f, 8f
                     );
                 }

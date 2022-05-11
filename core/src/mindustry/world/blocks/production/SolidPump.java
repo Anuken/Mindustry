@@ -119,6 +119,7 @@ public class SolidPump extends Pump{
 
         @Override
         public void updateTile(){
+            liquidDrop = result;
             float fraction = Math.max(validTiles + boost + (attribute == null ? 0 : attribute.env()), 0);
 
             if(efficiency > 0 && typeLiquid() < liquidCapacity - 0.001f){

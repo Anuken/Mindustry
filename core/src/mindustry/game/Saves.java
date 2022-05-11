@@ -21,6 +21,8 @@ import java.util.*;
 import static mindustry.Vars.*;
 
 public class Saves{
+    private static final DateFormat dateFormat = SimpleDateFormat.getDateTimeInstance();
+
     Seq<SaveSlot> saves = new Seq<>();
     @Nullable SaveSlot current;
     private @Nullable SaveSlot lastSectorSave;
@@ -268,7 +270,7 @@ public class Saves{
         }
 
         public String getDate(){
-            return SimpleDateFormat.getDateTimeInstance().format(new Date(meta.timestamp));
+            return dateFormat.format(new Date(meta.timestamp));
         }
 
         public Map getMap(){

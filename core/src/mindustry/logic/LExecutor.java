@@ -121,6 +121,17 @@ public class LExecutor{
         return var(index).isobj ? o : null;
     }
 
+    public @Nullable Team team(int index){
+        Var v = var(index);
+        if(v.isobj){
+            return v.objval instanceof Team t ? t : null;
+        }else{
+            int t = (int)v.numval;
+            if(t < 0 || t >= Team.all.length) return null;
+            return Team.all[t];
+        }
+    }
+
     public boolean bool(int index){
         Var v = var(index);
         return v.isobj ? v.objval != null : Math.abs(v.numval) >= 0.00001;
@@ -1182,7 +1193,8 @@ public class LExecutor{
         @Override
         public void run(LExecutor exec){
             int i = exec.numi(index);
-            if(!(exec.obj(team) instanceof Team t)) return;
+            Team t = exec.team(team);
+            if(t == null) return;
             TeamData data = t.data();
 
             switch(type){
@@ -1280,7 +1292,9 @@ public class LExecutor{
                         if(b instanceof Floor f && tile.floor() != f) tile.setFloorNet(f);
                     }
                     case block -> {
-                        Team t = exec.obj(team) instanceof Team steam ? steam : Team.derelict;
+                        Team t = exec.team(team);
+                        if(t == null) t = Team.derelict;
+
                         if(tile.block() != b || tile.team() != t){
                             tile.setNet(b, t, Mathf.clamp(exec.numi(rotation), 0, 3));
                         }
@@ -1310,9 +1324,11 @@ public class LExecutor{
         public void run(LExecutor exec){
             if(net.client()) return;
 
-            if(exec.obj(type) instanceof UnitType type && !type.hidden && exec.obj(team) instanceof Team team && Units.canCreate(team, type)){
+            Team t = exec.team(team);
+
+            if(exec.obj(type) instanceof UnitType type && !type.hidden && t != null && Units.canCreate(t, type)){
                 //random offset to prevent stacking
-                var unit = type.spawn(team, World.unconv(exec.numf(x)) + Mathf.range(0.01f), World.unconv(exec.numf(y)) + Mathf.range(0.01f));
+                var unit = type.spawn(t, World.unconv(exec.numf(x)) + Mathf.range(0.01f), World.unconv(exec.numf(y)) + Mathf.range(0.01f));
                 unit.rotation = exec.numf(rotation);
                 spawner.spawnEffect(unit);
                 exec.setobj(result, unit);
@@ -1386,7 +1402,8 @@ public class LExecutor{
                 }
                 case ambientLight -> state.rules.ambientLight.fromDouble(exec.num(value));
                 case unitBuildSpeed, unitDamage, blockHealth, blockDamage, buildSpeed, rtsMinSquad, rtsMinWeight -> {
-                    if(exec.obj(p1) instanceof Team team){
+                    Team team = exec.team(p1);
+                    if(team != null){
                         float num = exec.numf(value);
                         switch(rule){
                             case buildSpeed -> team.rules().buildSpeedMultiplier = Mathf.clamp(num, 0.001f, 50f);
@@ -1518,7 +1535,7 @@ public class LExecutor{
         public void run(LExecutor exec){
             if(net.client()) return;
 
-            Team t = exec.obj(team) instanceof Team te ? te : null;
+            Team t = exec.team(team);
             //note that there is a radius cap
             Call.logicExplosion(t, World.unconv(exec.numf(x)), World.unconv(exec.numf(y)), World.unconv(Math.min(exec.numf(radius), 100)), exec.numf(damage), exec.bool(air), exec.bool(ground), exec.bool(pierce));
         }

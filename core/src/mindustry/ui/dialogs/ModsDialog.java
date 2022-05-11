@@ -44,7 +44,7 @@ public class ModsDialog extends BaseDialog{
 
     private BaseDialog browser;
     private Table browserTable;
-    private float scoll = 0f;
+    private float scroll = 0f;
 
     public ModsDialog(){
         super("@mods");
@@ -320,7 +320,7 @@ public class ModsDialog extends BaseDialog{
             cont.pane(table1 -> {
                 pane[0] = table1.margin(10f).top();
                 rebuild.get("");
-            }).scrollX(false).update(s -> scoll = s.getScrollY()).get().setScrollYForce(scoll);
+            }).scrollX(false).update(s -> scroll = s.getScrollY()).get().setScrollYForce(scroll);
         }else{
             cont.table(Styles.black6, t -> t.add("@mods.none")).height(80f);
         }

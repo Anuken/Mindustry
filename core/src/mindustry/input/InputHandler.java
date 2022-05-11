@@ -701,6 +701,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             controlledType = null;
             logicCutscene = false;
             config.forceHide();
+            commandMode = commandRect = false;
         }
     }
 

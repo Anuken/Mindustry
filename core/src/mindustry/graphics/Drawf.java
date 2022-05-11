@@ -223,22 +223,27 @@ public class Drawf{
     }
 
     public static void light(float x, float y, float radius, Color color, float opacity){
+        if(renderer == null) return;
         renderer.lights.add(x, y, radius, color, opacity);
     }
 
     public static void light(Position pos, float radius, Color color, float opacity){
+        if(renderer == null) return;
        light(pos.getX(), pos.getY(), radius, color, opacity);
     }
 
     public static void light(float x, float y, TextureRegion region, Color color, float opacity){
+        if(renderer == null) return;
         renderer.lights.add(x, y, region, color, opacity);
     }
 
     public static void light(float x, float y, float x2, float y2){
+        if(renderer == null) return;
         renderer.lights.line(x, y, x2, y2, 30, Color.orange, 0.3f);
     }
 
     public static void light(float x, float y, float x2, float y2, float stroke, Color tint, float alpha){
+        if(renderer == null) return;
         renderer.lights.line(x, y, x2, y2, stroke, tint, alpha);
     }
 
