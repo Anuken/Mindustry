@@ -78,7 +78,7 @@ public class CommandAI extends AIController{
             float engageRange = unit.type.range - 10f;
 
             if(move){
-                if(unit.type.circleTarget && attackTarget != null){
+                if(unit.type.circleTarget && target != null){
                     circleAttack(80f);
                 }else{
                     moveTo(vecOut,
