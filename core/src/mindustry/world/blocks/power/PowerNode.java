@@ -159,7 +159,7 @@ public class PowerNode extends PowerBlock{
 
         getPotentialLinks(tile, player.team(), other -> {
             Draw.color(laserColor1, Renderer.laserOpacity * 0.5f);
-            drawLaser(tile.team(), x * tilesize + offset, y * tilesize + offset, other.x, other.y, size, other.block.size);
+            drawLaser(x * tilesize + offset, y * tilesize + offset, other.x, other.y, size, other.block.size);
 
             Drawf.square(other.x, other.y, other.block.size * tilesize / 2f + 2f, Pal.place);
         });
@@ -177,7 +177,7 @@ public class PowerNode extends PowerBlock{
         Draw.alpha(Renderer.laserOpacity);
     }
 
-    public void drawLaser(Team team, float x1, float y1, float x2, float y2, int size1, int size2){
+    public void drawLaser(float x1, float y1, float x2, float y2, int size1, int size2){
         float angle1 = Angles.angle(x1, y1, x2, y2),
             vx = Mathf.cosDeg(angle1), vy = Mathf.sinDeg(angle1),
             len1 = size1 * tilesize / 2f - 1.5f, len2 = size2 * tilesize / 2f - 1.5f;
@@ -325,7 +325,7 @@ public class PowerNode extends PowerBlock{
 
                 if(otherReq == null || otherReq.block == null) continue;
 
-                drawLaser(player == null ? Team.sharded : player.team(), plan.drawx(), plan.drawy(), otherReq.drawx(), otherReq.drawy(), size, otherReq.block.size);
+                drawLaser(plan.drawx(), plan.drawy(), otherReq.drawx(), otherReq.drawy(), size, otherReq.block.size);
             }
             Draw.color();
         }
@@ -472,7 +472,7 @@ public class PowerNode extends PowerBlock{
 
                 if(link.block instanceof PowerNode && link.id >= id) continue;
 
-                drawLaser(team, x, y, link.x, link.y, size, link.block.size);
+                drawLaser(x, y, link.x, link.y, size, link.block.size);
             }
 
             Draw.reset();
