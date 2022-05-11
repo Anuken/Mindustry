@@ -799,7 +799,7 @@ public class Mods implements Loadable{
 
             try{
                 Fi zip = file.isDirectory() ? file : new ZipFi(file);
-                if(OS.isMac) zip.child(".DS_Store").delete(); //macOS loves adding garbage files that break everything
+                if(zip.isDirectory() && OS.isMac) zip.child(".DS_Store").delete(); //macOS loves adding garbage files that break everything
                 if(zip.list().length == 1 && zip.list()[0].isDirectory()){
                     zip = zip.list()[0];
                 }
@@ -866,7 +866,7 @@ public class Mods implements Loadable{
 
         try{
             Fi zip = sourceFile.isDirectory() ? sourceFile : (rootZip = new ZipFi(sourceFile));
-            if(OS.isMac) zip.child(".DS_Store").delete(); //macOS loves adding garbage files that break everything
+            if(zip.isDirectory() && OS.isMac) zip.child(".DS_Store").delete(); //macOS loves adding garbage files that break everything
             if(zip.list().length == 1 && zip.list()[0].isDirectory()){
                 zip = zip.list()[0];
             }
