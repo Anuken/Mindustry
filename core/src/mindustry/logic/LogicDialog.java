@@ -66,6 +66,8 @@ public class LogicDialog extends BaseDialog{
             dialog.show();
         }).name("edit");
 
+        if(mobile && !Core.graphics.isPortrait()) buttons.row();
+
         buttons.button("@variables", Icon.menu, () -> {
             BaseDialog dialog = new BaseDialog("@variables");
             dialog.hidden(() -> {
