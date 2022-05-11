@@ -2832,7 +2832,7 @@ public class Blocks{
             health = 250;
             inaccuracy = 2f;
             rotateSpeed = 10f;
-            coolant = consume(new ConsumeCoolant(0.1f));
+            coolant = consumeCoolant(0.1f);
 
             limitRange();
         }};
