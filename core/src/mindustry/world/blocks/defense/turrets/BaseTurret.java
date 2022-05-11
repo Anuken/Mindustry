@@ -24,7 +24,6 @@ public class BaseTurret extends Block{
     /** How much reload is lowered by for each unit of liquid of heat capacity. */
     public float coolantMultiplier = 5f;
     /** If not null, this consumer will be used for coolant. */
-    //TODO make automatic for mods?
     public @Nullable ConsumeLiquidBase coolant;
 
     public BaseTurret(String name){
@@ -41,6 +40,10 @@ public class BaseTurret extends Block{
 
     @Override
     public void init(){
+        if(coolant == null){
+            coolant = findConsumer(c -> c instanceof ConsumeCoolant);
+        }
+
         //just makes things a little more convenient
         if(coolant != null){
             //TODO coolant fix
