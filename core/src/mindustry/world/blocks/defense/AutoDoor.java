@@ -76,9 +76,11 @@ public class AutoDoor extends Wall{
 
         public void setOpen(boolean open){
             this.open = open;
-            (!open ? closefx : openfx).at(this, size);
-            doorSound.at(this);
             pathfinder.updateTile(tile);
+            if(wasVisible){
+                (!open ? closefx : openfx).at(this, size);
+                doorSound.at(this);
+            }
         }
 
         @Override

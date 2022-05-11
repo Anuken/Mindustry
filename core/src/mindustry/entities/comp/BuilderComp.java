@@ -47,6 +47,19 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
         updateBuildLogic();
     }
 
+    public void validatePlans(){
+        if(plans.size > 0){
+            Iterator<BuildPlan> it = plans.iterator();
+            while(it.hasNext()){
+                BuildPlan plan = it.next();
+                Tile tile = world.tile(plan.x, plan.y);
+                if(tile == null || (plan.breaking && tile.block() == Blocks.air) || (!plan.breaking && ((tile.build != null && tile.build.rotation == plan.rotation) || !plan.block.rotate) && tile.block() == plan.block)){
+                    it.remove();
+                }
+            }
+        }
+    }
+
     public void updateBuildLogic(){
         if(type.buildSpeed <= 0f) return;
 
@@ -59,7 +72,11 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
             buildAlpha = Mathf.lerpDelta(buildAlpha, activelyBuilding() ? 1f : 0f, 0.15f);
         }
 
-        if(!updateBuilding || !canBuild()) return;
+        //validate regardless of whether building is enabled.
+        if(!updateBuilding || !canBuild()){
+            validatePlans();
+            return;
+        }
 
         float finalPlaceDst = state.rules.infiniteResources ? Float.MAX_VALUE : type.buildRange;
         boolean infinite = state.rules.infiniteResources || team().rules().infiniteResources;
@@ -69,14 +86,7 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
         while(buildCounter >= 1){
             buildCounter -= 1f;
 
-            Iterator<BuildPlan> it = plans.iterator();
-            while(it.hasNext()){
-                BuildPlan plan = it.next();
-                Tile tile = world.tile(plan.x, plan.y);
-                if(tile == null || (plan.breaking && tile.block() == Blocks.air) || (!plan.breaking && ((tile.build != null && tile.build.rotation == plan.rotation) || !plan.block.rotate) && tile.block() == plan.block)){
-                    it.remove();
-                }
-            }
+            validatePlans();
 
             var core = core();
 

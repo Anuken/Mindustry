@@ -58,7 +58,7 @@ public class PointDefenseWeapon extends Weapon{
         bullet.shootEffect.at(shootX, shootY, rotation, color);
         bullet.hitEffect.at(target.x, target.y, color);
         shootSound.at(shootX, shootY, Mathf.random(0.9f, 1.1f));
-        mount.recoil = recoil;
+        mount.recoil = 1f;
         mount.heat = 1f;
     }
 }

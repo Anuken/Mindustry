@@ -82,13 +82,13 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
             any = true;
         }
 
-        if(Structs.contains(tile.tiles, s -> sector.planet.getSector(s).id == sector.planet.startSector)) return;
-
         if(noise < 0.16){
             for(Ptile other : tile.tiles){
                 var osec = sector.planet.getSector(other);
 
+                //no sectors near start sector!
                 if(
+                    osec.id == sector.planet.startSector || //near starting sector
                     osec.generateEnemyBase && poles < 0.85 || //near other base
                     (sector.preset != null && noise < 0.11) //near preset
                 ){

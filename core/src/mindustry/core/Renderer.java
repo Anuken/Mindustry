@@ -550,7 +550,11 @@ public class Renderer implements ApplicationListener{
             drawThrusters(block, x, y, rotation, thrusterFrame);
             Draw.alpha(1f);
 
+            if(block.teamRegions[build.team.id] == block.teamRegion) Draw.color(build.team.color);
+
             Drawf.spinSprite(block.teamRegions[build.team.id], x, y, rotation);
+
+            Draw.color();
 
             Draw.scl();
 

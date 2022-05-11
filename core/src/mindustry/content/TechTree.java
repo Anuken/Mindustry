@@ -59,7 +59,7 @@ public class TechTree{
     }
 
     public static TechNode nodeProduce(UnlockableContent content, Seq<Objective> objectives, Runnable children){
-        return node(content, content.researchRequirements(), objectives.and(new Produce(content)), children);
+        return node(content, content.researchRequirements(), objectives.add(new Produce(content)), children);
     }
 
     public static TechNode nodeProduce(UnlockableContent content, Runnable children){

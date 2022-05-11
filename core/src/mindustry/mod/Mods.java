@@ -793,7 +793,7 @@ public class Mods implements Loadable{
                 }
 
                 meta = findMeta(zip);
-            }catch(Exception ignored){
+            }catch(Throwable ignored){
             }
 
             if(meta == null) continue;

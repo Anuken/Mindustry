@@ -65,6 +65,15 @@ public class ClassMap{
         classes.put("SeqEffect", mindustry.entities.effect.SeqEffect.class);
         classes.put("WaveEffect", mindustry.entities.effect.WaveEffect.class);
         classes.put("WrapEffect", mindustry.entities.effect.WrapEffect.class);
+        classes.put("DrawPart", mindustry.entities.part.DrawPart.class);
+        classes.put("PartFunc", mindustry.entities.part.DrawPart.PartFunc.class);
+        classes.put("PartMove", mindustry.entities.part.DrawPart.PartMove.class);
+        classes.put("PartParams", mindustry.entities.part.DrawPart.PartParams.class);
+        classes.put("PartProgress", mindustry.entities.part.DrawPart.PartProgress.class);
+        classes.put("FlarePart", mindustry.entities.part.FlarePart.class);
+        classes.put("HoverPart", mindustry.entities.part.HoverPart.class);
+        classes.put("RegionPart", mindustry.entities.part.RegionPart.class);
+        classes.put("ShapePart", mindustry.entities.part.ShapePart.class);
         classes.put("ShootAlternate", mindustry.entities.pattern.ShootAlternate.class);
         classes.put("ShootBarrel", mindustry.entities.pattern.ShootBarrel.class);
         classes.put("ShootHelix", mindustry.entities.pattern.ShootHelix.class);

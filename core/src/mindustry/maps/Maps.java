@@ -195,6 +195,7 @@ public class Maps{
 
             //create map, write it, etc etc etc
             Map map = new Map(file, world.width(), world.height(), tags, true);
+            fogControl.resetFog();
             MapIO.writeMap(file, map);
 
             if(!headless){

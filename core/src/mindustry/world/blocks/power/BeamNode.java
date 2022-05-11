@@ -173,6 +173,7 @@ public class BeamNode extends PowerBlock{
                     //unlinked, disconnect and reflow
                     if(prev != null){
                         prev.power.links.removeValue(pos());
+                        power.links.removeValue(prev.pos());
 
                         PowerGraph newgraph = new PowerGraph();
                         //reflow from this point, covering all tiles on this side

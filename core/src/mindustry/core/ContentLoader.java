@@ -85,7 +85,7 @@ public class ContentLoader{
     /** Calls Content#init() on everything. Use only after all modules have been created. */
     public void init(){
         initialize(Content::init);
-        if(constants != null) constants.init();
+        if(logicVars != null) logicVars.init();
         Events.fire(new ContentInitEvent());
     }
 

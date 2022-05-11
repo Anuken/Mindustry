@@ -89,7 +89,7 @@ public class UnitTypes{
 
     //region neoplasm
 
-    public static @EntityDef({Unitc.class, Crawlc.class}) UnitType scuttler;
+    public static @EntityDef({Unitc.class, Crawlc.class}) UnitType latum;
 
     //endregion
 
@@ -1322,8 +1322,7 @@ public class UnitTypes{
         }};
 
         mega = new UnitType("mega"){{
-            //TODO control?
-            aiController = RepairAI::new;
+            controller = u -> new RepairAI();
 
             mineTier = 3;
             mineSpeed = 4f;
@@ -2461,7 +2460,7 @@ public class UnitTypes{
             health = 800;
             armor = 5f;
             itemCapacity = 0;
-            treadRects = new Rect[]{new Rect(12, 7, 14, 51)};
+            treadRects = new Rect[]{new Rect(12 - 32f, 7 - 32f, 14, 51)};
             researchCostMultiplier = 0f;
 
             weapons.add(new Weapon("stell-weapon"){{
@@ -2502,7 +2501,7 @@ public class UnitTypes{
             health = 2100;
             armor = 8f;
             itemCapacity = 0;
-            treadRects = new Rect[]{new Rect(17, 10, 19, 76)};
+            treadRects = new Rect[]{new Rect(17 - 96f/2f, 10 - 96f/2f, 19, 76)};
             researchCostMultiplier = 0f;
 
             weapons.add(new Weapon("locus-weapon"){{
@@ -2519,9 +2518,7 @@ public class UnitTypes{
                 heatColor = Color.valueOf("f9350f");
                 cooldownTime = 30f;
 
-                shoot = new ShootAlternate(){{
-                    spread = 3.5f;
-                }};
+                shoot = new ShootAlternate(3.5f);
 
                 bullet = new RailBulletType(){{
                     length = 160f;
@@ -2569,14 +2566,6 @@ public class UnitTypes{
                             Lines.line(e.x, e.y, v.x, v.y);
                         });
                     });
-
-                    pointEffectSpace = 8f;
-
-                    if(false)
-                    pointEffect = new Effect(20, e -> {
-                        color(e.color);
-                        Fill.poly(e.x, e.y, 3, 4f * e.fout(), e.rotation);
-                    }).layer(Layer.bullet - 0.001f);
                 }};
             }});
         }};
@@ -2589,7 +2578,7 @@ public class UnitTypes{
             health = 4500;
             armor = 10f;
             itemCapacity = 0;
-            treadRects = new Rect[]{new Rect(16, 38, 30, 75), new Rect(44, 7, 17, 60)};
+            treadRects = new Rect[]{new Rect(16 - 60f, 48 - 70f, 30, 75), new Rect(44 - 60f, 17 - 70f, 17, 60)};
             researchCostMultiplier = 0f;
 
             weapons.add(new Weapon("precept-weapon"){{
@@ -2651,12 +2640,11 @@ public class UnitTypes{
             hitSize = 28f;
             treadPullOffset = 4;
             speed = 0.63f;
-            health = 9000;
+            health = 10000;
             armor = 20f;
             itemCapacity = 0;
             crushDamage = 13f / 5f;
-            treadRects = new Rect[]{new Rect(22, 16, 28, 130)};
-
+            treadRects = new Rect[]{new Rect(22 - 154f/2f, 16 - 154f/2f, 28, 130)};
 
             weapons.add(new Weapon("vanquish-weapon"){{
                 layerOffset = 0.0001f;
@@ -2746,11 +2734,13 @@ public class UnitTypes{
             hitSize = 46f;
             treadPullOffset = 1;
             speed = 0.48f;
-            health = 20000;
+            health = 22000;
             armor = 25f;
             crushDamage = 25f / 5f;
             rotateSpeed = 0.8f;
-            treadRects = new Rect[]{new Rect(27, 152, 56, 73), new Rect(24, 51 - 9, 29, 17), new Rect(59, 18 - 9, 39, 19)};
+
+            float xo = 231f/2f, yo = 231f/2f;
+            treadRects = new Rect[]{new Rect(27 - xo, 152 - yo, 56, 73), new Rect(24 - xo, 51 - 9 - yo, 29, 17), new Rect(59 - xo, 18 - 9 - yo, 39, 19)};
 
             weapons.add(new Weapon("conquer-weapon"){{
                 layerOffset = 0.1f;
@@ -3711,7 +3701,7 @@ public class UnitTypes{
             speed = 1.1f;
             rotateSpeed = 3.2f;
             accel = 0.1f;
-            health = 3000f;
+            health = 8000f;
             armor = 5f;
             hitSize = 36f;
             payloadCapacity = Mathf.sqr(3f) * tilePayload;
@@ -3780,7 +3770,7 @@ public class UnitTypes{
             speed = 1f;
             rotateSpeed = 2f;
             accel = 0.1f;
-            health = 10000f;
+            health = 12000f;
             armor = 7f;
             hitSize = 46f;
             payloadCapacity = Mathf.sqr(6f) * tilePayload;
@@ -3919,9 +3909,9 @@ public class UnitTypes{
         //region erekir - neoplasm
 
         if(false)
-            scuttler = new NeoplasmUnitType("scuttler"){{
+            latum = new NeoplasmUnitType("latum"){{
                 health = 20000;
-                armor = 17;
+                armor = 12;
                 hitSize = 48f;
                 omniMovement = false;
                 rotateSpeed = 1.7f;
@@ -3929,7 +3919,10 @@ public class UnitTypes{
                 drawCell = false;
                 segments = 4;
                 drawBody = false;
+                hidden = true;
                 crushDamage = 2f;
+                aiController = HugAI::new;
+                targetAir = false;
 
                 segmentScl = 4f;
                 segmentPhase = 5f;
@@ -3953,7 +3946,7 @@ public class UnitTypes{
             mineFloor = false;
             mineHardnessScaling = false;
             flying = true;
-            mineSpeed = 4f;
+            mineSpeed = 6f;
             mineTier = 3;
             buildSpeed = 1.2f;
             drag = 0.08f;
@@ -4017,7 +4010,7 @@ public class UnitTypes{
             mineFloor = false;
             mineHardnessScaling = false;
             flying = true;
-            mineSpeed = 4.5f;
+            mineSpeed = 8f;
             mineTier = 3;
             buildSpeed = 1.4f;
             drag = 0.08f;
@@ -4094,7 +4087,7 @@ public class UnitTypes{
             mineFloor = false;
             mineHardnessScaling = false;
             flying = true;
-            mineSpeed = 5f;
+            mineSpeed = 9f;
             mineTier = 3;
             buildSpeed = 1.5f;
             drag = 0.08f;
@@ -4164,7 +4157,7 @@ public class UnitTypes{
         }};
 
         manifold = new ErekirUnitType("manifold"){{
-            aiController = CargoAI::new;
+            controller = u -> new CargoAI();
             isEnemy = false;
             allowedInPayloads = false;
             logicControllable = false;
@@ -4191,7 +4184,7 @@ public class UnitTypes{
         }};
 
         assemblyDrone = new ErekirUnitType("assembly-drone"){{
-            aiController = AssemblerAI::new;
+            controller = u -> new AssemblerAI();
 
             flying = true;
             drag = 0.06f;
