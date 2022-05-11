@@ -72,7 +72,7 @@ public class Conveyor extends Block implements Autotiler{
         if(bits == null) return;
 
         TextureRegion region = regions[bits[0]][0];
-        Draw.rect(region, plan.drawx(), plan.drawy(), region.width * bits[1] * Draw.scl, region.height * bits[2] * Draw.scl, plan.rotation * 90);
+        Draw.rect(region, plan.drawx(), plan.drawy(), region.width * bits[1] * Draw.scl * region.scale, region.height * bits[2] * Draw.scl * region.scale, plan.rotation * 90);
     }
 
     @Override

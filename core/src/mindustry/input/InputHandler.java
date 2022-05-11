@@ -1615,18 +1615,19 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         int dx = Geometry.d4(rotation).x, dy = Geometry.d4(rotation).y;
 
         Draw.color(!valid ? Pal.removeBack : Pal.accentBack);
-        Draw.rect(Core.atlas.find("place-arrow"),
+        TextureRegion regionArrow = Core.atlas.find("place-arrow");
+        Draw.rect(regionArrow,
         x * tilesize + block.offset + dx*trns,
         y * tilesize + block.offset - 1 + dy*trns,
-        Core.atlas.find("place-arrow").width * Draw.scl,
-        Core.atlas.find("place-arrow").height * Draw.scl, rotation * 90 - 90);
+        regionArrow.width * Draw.scl * regionArrow.scale,
+        regionArrow.height * Draw.scl * regionArrow.scale, rotation * 90 - 90);
 
         Draw.color(!valid ? Pal.remove : Pal.accent);
-        Draw.rect(Core.atlas.find("place-arrow"),
+        Draw.rect(regionArrow,
         x * tilesize + block.offset + dx*trns,
         y * tilesize + block.offset + dy*trns,
-        Core.atlas.find("place-arrow").width * Draw.scl,
-        Core.atlas.find("place-arrow").height * Draw.scl, rotation * 90 - 90);
+        regionArrow.width * Draw.scl * regionArrow.scale,
+        regionArrow.height * Draw.scl * regionArrow.scale, rotation * 90 - 90);
     }
 
     void iterateLine(int startX, int startY, int endX, int endY, Cons<PlaceLine> cons){

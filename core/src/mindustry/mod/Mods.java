@@ -181,6 +181,7 @@ public class Mods implements Loadable{
 
     private void packSprites(Seq<Fi> sprites, LoadedMod mod, boolean prefix, Seq<Future<Runnable>> tasks){
         boolean linear = Core.settings.getBool("linear", true);
+        float textureScale = 32f / mod.meta.texturesize;
 
         for(Fi file : sprites){
             String name = file.nameWithoutExtension();
@@ -206,7 +207,9 @@ public class Mods implements Loadable{
                     }
                     //this returns a *runnable* which actually packs the resulting pixmap; this has to be done synchronously outside the method
                     return () -> {
-                        packer.add(getPage(file), (prefix ? mod.name + "-" : "") + name, new PixmapRegion(pix));
+                        String fullName = (prefix ? mod.name + "-" : "") + name;
+                        packer.add(getPage(file), fullName, new PixmapRegion(pix));
+                        if(textureScale != 1.0f){ Drawf.textureResize.put(fullName, textureScale); }
                         pix.dispose();
                     };
                 }catch(Exception e){
@@ -1134,6 +1137,8 @@ public class Mods implements Loadable{
         public boolean hidden;
         /** If true, this mod should be loaded as a Java class mod. This is technically optional, but highly recommended. */
         public boolean java;
+        /** To rescale textures with a different size. Represents the size in pixels of the sprite of a 1x1 block. */
+        public int texturesize = 32;
 
         public String displayName(){
             return displayName == null ? name : displayName;
@@ -1167,6 +1172,7 @@ public class Mods implements Loadable{
                     ", minGameVersion='" + minGameVersion + '\'' +
                     ", hidden=" + hidden +
                     ", repo=" + repo +
+                    ", texturesize=" + texturesize +
                     '}';
         }
     }
