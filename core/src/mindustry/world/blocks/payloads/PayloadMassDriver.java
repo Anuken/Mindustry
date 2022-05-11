@@ -24,7 +24,7 @@ public class PayloadMassDriver extends PayloadBlock{
     public float rotateSpeed = 2f;
     public float length = 89 / 8f;
     public float knockback = 5f;
-    public float reloadTime = 30f;
+    public float reload = 30f;
     public float chargeTime = 100f;
     public float maxPayloadSize = 3;
     public float grabWidth = 8f, grabHeight = 11/4f;
@@ -79,7 +79,7 @@ public class PayloadMassDriver extends PayloadBlock{
         super.setStats();
 
         stats.add(Stat.payloadCapacity, StatValues.squared(maxPayloadSize, StatUnit.blocksSquared));
-        stats.add(Stat.reload, 60f / (chargeTime + reloadTime), StatUnit.seconds);
+        stats.add(Stat.reload, 60f / (chargeTime + reload), StatUnit.seconds);
     }
 
     @Override
@@ -128,7 +128,7 @@ public class PayloadMassDriver extends PayloadBlock{
     public class PayloadDriverBuild extends PayloadBlockBuild<Payload>{
         public int link = -1;
         public float turretRotation = 90;
-        public float reload = 0f, charge = 0f;
+        public float reloadCounter = 0f, charge = 0f;
         public float targetSize = grabWidth*2f, curSize = targetSize;
         public float payLength = 0f, effectDelayTimer = -1f;
         public PayloadDriverBuild lastOther;
@@ -167,7 +167,7 @@ public class PayloadMassDriver extends PayloadBlock{
                 var other = lastOther;
                 float cx = Angles.trnsx(other.turretRotation, length), cy = Angles.trnsy(other.turretRotation, length);
                 receiveEffect.at(x - cx/2f, y - cy/2f, turretRotation);
-                reload = 1f;
+                reloadCounter = 1f;
                 Effect.shake(shake, shake, this);
             }
 
@@ -178,8 +178,8 @@ public class PayloadMassDriver extends PayloadBlock{
             }
 
             //reload regardless of state
-            reload -= edelta() / reloadTime;
-            if(reload < 0) reload = 0f;
+            reloadCounter -= edelta() / reload;
+            if(reloadCounter < 0) reloadCounter = 0f;
 
             var current = currentShooter();
 
@@ -248,7 +248,7 @@ public class PayloadMassDriver extends PayloadBlock{
 
                 payRotation = Angles.moveToward(payRotation, turretRotation, payloadRotateSpeed * delta());
                 if(loaded){
-                    float loadLength = length - reload*knockback;
+                    float loadLength = length - reloadCounter *knockback;
                     payLength += payloadSpeed * delta();
                     if(payLength >= loadLength){
                         payLength = loadLength;
@@ -267,14 +267,14 @@ public class PayloadMassDriver extends PayloadBlock{
                         other.waitingShooters.addLast(this);
                     }
 
-                    if(reload <= 0){
+                    if(reloadCounter <= 0){
                         //align to target location
                         turretRotation = Angles.moveToward(turretRotation, targetRotation, rotateSpeed * efficiency);
 
                         //fire when it's the first in the queue and angles are ready.
                         if(other.currentShooter() == this &&
                         other.state == accepting &&
-                        other.reload <= 0f &&
+                        other.reloadCounter <= 0f &&
                         Angles.within(turretRotation, targetRotation, 1f) && Angles.within(other.turretRotation, targetRotation + 180f, 1f)){
                             charge += edelta();
                             charging = true;
@@ -313,7 +313,7 @@ public class PayloadMassDriver extends PayloadBlock{
                                 payLength = 0f;
                                 loaded = false;
                                 state = idle;
-                                reload = 1f;
+                                reloadCounter = 1f;
                             }
                         }
                     }
@@ -323,7 +323,7 @@ public class PayloadMassDriver extends PayloadBlock{
 
         @Override
         public double sense(LAccess sensor){
-            if(sensor == LAccess.progress) return Mathf.clamp(1f - reload / reloadTime);
+            if(sensor == LAccess.progress) return Mathf.clamp(1f - reloadCounter / reload);
             return super.sense(sensor);
         }
 
@@ -341,8 +341,8 @@ public class PayloadMassDriver extends PayloadBlock{
         @Override
         public void draw(){
             float
-            tx = x + Angles.trnsx(turretRotation + 180f, reload * knockback),
-            ty = y + Angles.trnsy(turretRotation + 180f, reload * knockback), r = turretRotation - 90;
+            tx = x + Angles.trnsx(turretRotation + 180f, reloadCounter * knockback),
+            ty = y + Angles.trnsy(turretRotation + 180f, reloadCounter * knockback), r = turretRotation - 90;
 
             Draw.rect(baseRegion, x, y);
 
@@ -476,7 +476,7 @@ public class PayloadMassDriver extends PayloadBlock{
             write.f(turretRotation);
             write.b((byte)state.ordinal());
 
-            write.f(reload);
+            write.f(reloadCounter);
             write.f(charge);
             write.bool(loaded);
             write.bool(charging);
@@ -490,7 +490,7 @@ public class PayloadMassDriver extends PayloadBlock{
             state = PayloadDriverState.all[read.b()];
 
             if(revision >= 1){
-                reload = read.f();
+                reloadCounter = read.f();
                 charge = read.f();
                 loaded = read.bool();
                 charging = read.bool();

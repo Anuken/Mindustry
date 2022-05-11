@@ -1910,7 +1910,7 @@ public class Blocks{
             requirements(Category.distribution, with(Items.titanium, 125, Items.silicon, 75, Items.lead, 125, Items.thorium, 50));
             size = 3;
             itemCapacity = 120;
-            reloadTime = 200f;
+            reload = 200f;
             range = 440f;
             consumePower(1.75f);
         }};
@@ -4399,7 +4399,7 @@ public class Blocks{
             requirements(Category.units, with(Items.tungsten, 120, Items.silicon, 120, Items.oxide, 25));
             regionSuffix = "-dark";
             size = 3;
-            reloadTime = 130f;
+            reload = 130f;
             chargeTime = 90f;
             range = 700f;
             maxPayloadSize = 2.5f;
@@ -4411,7 +4411,7 @@ public class Blocks{
             requirements(Category.units, with(Items.thorium, 300, Items.silicon, 200, Items.plastanium, 200, Items.phaseFabric, 50));
             regionSuffix = "-dark";
             size = 5;
-            reloadTime = 130f;
+            reload = 130f;
             chargeTime = 100f;
             range = 1100f;
             maxPayloadSize = 3.5f;
