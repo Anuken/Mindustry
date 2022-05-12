@@ -85,9 +85,15 @@ public class Unloader extends Block{
         public int[] lastUsed;
 
         protected final Comparator<ContainerStat> comparator = Structs.comps(
+            //sort so it gives priority for blocks that can only either recieve or give (not both), and then by load, and then by last use
+            //highest = unload from, lowest = unload to
+
             Structs.comps(
-                Structs.comparingBool(e -> e.building.block.highUnloadPriority && !e.canLoad),
-                Structs.comparingBool(e -> e.canUnload) // && !e.canLoad
+                Structs.comparingBool(e -> e.building.block.highUnloadPriority && !e.canLoad), //stackConveyors and Storage
+                Structs.comps(
+                    Structs.comparingBool(e -> e.canUnload && !e.canLoad), //priority to give
+                    Structs.comparingBool(e -> e.canUnload || !e.canLoad) //priority to receive
+                )
             ),
             Structs.comps(
                 Structs.comparingFloat(e -> e.loadFactor),
@@ -168,7 +174,6 @@ public class Unloader extends Block{
                     pb.loadFactor = (other.getMaximumAccepted(item) == 0) || (other.items == null) ? 0 : other.items.get(item) / (float)other.getMaximumAccepted(item);
                 }
 
-                //sort so it gives full priority to blocks that can give but not receive (stackConveyors and Storage), and then by load, and then by last use
                 possibleBlocks.sort(comparator);
 
                 ContainerStat dumpingFrom = null;
