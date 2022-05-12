@@ -91,16 +91,8 @@ public class Unloader extends Block{
             Structs.comps(
                 Structs.comparingBool(e -> e.building.block.highUnloadPriority && !e.canLoad), //stackConveyors and Storage
                 Structs.comps(
-                    Structs.comparingBool(e -> {
-                        boolean i = e.canUnload && !e.canLoad;
-                        //if(i){ System.out.println(e);}
-                        return i;
-                    }), //priority to give
-                    Structs.comparingBool(e -> {
-                        boolean i = e.canUnload || !e.canLoad;
-                        //if(!i){ System.out.println(e);}
-                        return i;
-                    }) //priority to receive
+                    Structs.comparingBool(e -> e.canUnload && !e.canLoad), //priority to give
+                    Structs.comparingBool(e -> e.canUnload || !e.canLoad) //priority to receive
                 )
             ),
             Structs.comps(
