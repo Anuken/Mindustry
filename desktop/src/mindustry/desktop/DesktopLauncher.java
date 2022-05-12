@@ -41,10 +41,8 @@ public class DesktopLauncher extends ClientLauncher{
                 maximized = true;
                 width = 900;
                 height = 700;
-                //enable gl3 with command-line argument
-                if(Structs.contains(arg, "-gl3")){
-                    gl30 = true;
-                }
+                //gl30 now default, disable with argument.
+                gl30 = !Structs.contains(arg, "-gl2");
                 if(Structs.contains(arg, "-antialias")){
                     samples = 16;
                 }

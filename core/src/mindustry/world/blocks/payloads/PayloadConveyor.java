@@ -197,9 +197,8 @@ public class PayloadConveyor extends Block{
             float glow = Math.max((dst - (Math.abs(fract() - 0.5f) * 2)) / dst, 0);
             Draw.mixcol(team.color, glow);
 
-            float trnext = fract() * size * tilesize, trprev = size * tilesize * (fract() - 1), rot = rotdeg();
-
             float s = tilesize * size;
+            float trnext = s * fract(), trprev = s * (fract() - 1), rot = rotdeg();
 
             //next
             TextureRegion clipped = clipRegion(tile.getHitbox(Tmp.r1), tile.getHitbox(Tmp.r2).move(trnext, 0), topRegion);
@@ -334,6 +333,7 @@ public class PayloadConveyor extends Block{
 
             TextureRegion out = Tmp.tr1;
             out.set(region.texture);
+            out.scale = region.scale;
 
             if(overlaps){
                 float w = region.u2 - region.u;
@@ -347,7 +347,6 @@ public class PayloadConveyor extends Block{
             }else{
                 out.set(0f, 0f, 0f, 0f);
             }
-            out.scale = region.scale;
 
             return out;
         }

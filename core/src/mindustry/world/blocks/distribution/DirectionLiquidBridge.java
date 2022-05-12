@@ -76,6 +76,10 @@ public class DirectionLiquidBridge extends DirectionBridge{
 
         @Override
         public boolean acceptLiquid(Building source, Liquid liquid){
+            var link = findLink();
+            //only accept if there's an output point, or it comes from a link
+            if(link == null && !(source instanceof DirectionBridgeBuild b && b.findLink() == this)) return false;
+
             int rel = this.relativeToEdge(source.tile);
 
             return

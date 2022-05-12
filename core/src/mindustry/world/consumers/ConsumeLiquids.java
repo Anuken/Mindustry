@@ -8,7 +8,6 @@ import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
-//TODO test!
 public class ConsumeLiquids extends Consume{
     public final LiquidStack[] liquids;
 

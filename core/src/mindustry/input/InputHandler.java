@@ -287,7 +287,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             throw new ValidateException(player, "Player cannot transfer an item.");
         }
 
-        //deposit for every controlling unit
         var unit = player.unit();
         Item item = unit.item();
         int accepted = build.acceptStack(item, unit.stack.amount, unit);
@@ -701,6 +700,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             controlledType = null;
             logicCutscene = false;
             config.forceHide();
+            commandMode = commandRect = false;
         }
     }
 
@@ -1615,7 +1615,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         int dx = Geometry.d4(rotation).x, dy = Geometry.d4(rotation).y;
 
         Draw.color(!valid ? Pal.removeBack : Pal.accentBack);
-
         TextureRegion regionArrow = Core.atlas.find("place-arrow");
         Draw.rect(regionArrow,
         x * tilesize + block.offset + dx*trns,

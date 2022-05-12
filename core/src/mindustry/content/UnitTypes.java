@@ -1054,7 +1054,6 @@ public class UnitTypes{
             lowAltitude = true;
             forceMultiTarget = true;
             armor = 5f;
-            itemCapacity = 0;
 
             targetFlags = new BlockFlag[]{BlockFlag.launchPad, BlockFlag.storage, BlockFlag.battery, null};
             engineOffset = 12f;
