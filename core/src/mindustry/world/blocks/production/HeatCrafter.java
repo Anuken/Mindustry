@@ -67,8 +67,9 @@ public class HeatCrafter extends GenericCrafter{
         }
 
         @Override
-        public float getProgressIncrease(float base){
-            return super.getProgressIncrease(base) * efficiencyScale();
+        public void updateEfficiencyMultiplier(){
+            efficiency *= efficiencyScale();
+            potentialEfficiency *= efficiencyScale();
         }
 
         public float efficiencyScale(){
