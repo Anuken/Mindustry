@@ -490,7 +490,7 @@ public class LStatements{
                             i.left();
                             int c = 0;
                             for(Item item : Vars.content.items()){
-                                if(!item.unlockedNow()) continue;
+                                if(!item.unlockedNow() || item.hidden) continue;
                                 i.button(new TextureRegionDrawable(item.uiIcon), Styles.flati, iconSmall, () -> {
                                     stype("@" + item.name);
                                     hide.run();
@@ -504,7 +504,7 @@ public class LStatements{
                             i.left();
                             int c = 0;
                             for(Liquid item : Vars.content.liquids()){
-                                if(!item.unlockedNow()) continue;
+                                if(!item.unlockedNow() || item.hidden) continue;
                                 i.button(new TextureRegionDrawable(item.uiIcon), Styles.flati, iconSmall, () -> {
                                     stype("@" + item.name);
                                     hide.run();
