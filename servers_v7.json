@@ -5,7 +5,7 @@
   },
   {
     "name": "C.A.M.S.",
-    "address": ["0.baseduser.eu.org:42001", "0.baseduser.eu.org:42002", "v7.thedimas.pp.ua", "yeeth.mindustry.me:7000", "yeeth.mindustry.me:4000", "yeeth.mindustry.me:2000", "yeeth.mindustry.me:3000"]
+    "address": ["0.baseduser.eu.org:42001", "0.baseduser.eu.org:42002", "v7.thedimas.pp.ua"]
   },
   {
     "name": "SMokeOfAnarchy",
@@ -17,7 +17,7 @@
   },
   {
     "name": "Omega",
-    "address": ["node2.crewcraft.cc:25569", "node2.crewcraft.cc:25571", "node2.crewcraft.cc:25572"]
+    "address": ["node2.crewcraft.cc:25569", "node2.crewcraft.cc:25571", "node2.crewcraft.cc:25572", "node5.crewcraft.cc:25569"]
   },
   {
     "name": "MeowLand",
