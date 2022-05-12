@@ -209,7 +209,9 @@ public class Mods implements Loadable{
                     return () -> {
                         String fullName = (prefix ? mod.name + "-" : "") + name;
                         packer.add(getPage(file), fullName, new PixmapRegion(pix));
-                        if(textureScale != 1.0f){ Drawf.textureResize.put(fullName, textureScale); }
+                        if(textureScale != 1.0f){
+                            Drawf.textureResize.put(fullName, textureScale);
+                        }
                         pix.dispose();
                     };
                 }catch(Exception e){
