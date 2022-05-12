@@ -75,7 +75,7 @@ public class Blocks{
     carbideCrucible, slagCentrifuge, surgeCrucible, cyanogenSynthesizer, phaseSynthesizer, heatReactor,
 
     //sandbox
-    powerSource, powerVoid, itemSource, itemVoid, liquidSource, liquidVoid, payloadSource, payloadVoid, illuminator,
+    powerSource, powerVoid, itemSource, itemVoid, liquidSource, liquidVoid, payloadSource, payloadVoid, illuminator, heatSource
 
     //defense
     copperWall, copperWallLarge, titaniumWall, titaniumWallLarge, plastaniumWall, plastaniumWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge,
@@ -4523,6 +4523,16 @@ public class Blocks{
             requirements(Category.units, BuildVisibility.sandboxOnly, with());
             size = 5;
             alwaysUnlocked = true;
+        }};
+        heatSource = new HeatProducer("heat-source"){{
+            requirements(Category.crafting, BuildVisibility.sandboxOnly, with());
+            size = 1;
+            alwaysUnlocked = true;
+            rotateDraw = false;
+            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidRegion(), new DrawDefault(), new DrawHeatOutput());
+            regionRotated1 = 2;
+            craftTime = 1f;
+            heatOutput = 1000000f;
         }};
 
         //TODO move
