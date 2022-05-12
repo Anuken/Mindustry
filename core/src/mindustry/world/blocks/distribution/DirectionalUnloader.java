@@ -36,6 +36,7 @@ public class DirectionalUnloader extends Block{
         itemCapacity = 0;
         noUpdateDisabled = true;
         unloadable = false;
+        isDuct = true;
         envDisabled = Env.none;
         clearOnDoubleTap = true;
         priority = TargetPriority.transport;
