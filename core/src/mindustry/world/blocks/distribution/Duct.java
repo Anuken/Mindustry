@@ -75,7 +75,7 @@ public class Duct extends Block implements Autotiler{
             || ((!otherblock.rotatedOutput(otherx, othery) && Edges.getFacingEdge(otherblock, otherx, othery, tile) != null &&
             Edges.getFacingEdge(otherblock, otherx, othery, tile).relativeTo(tile) == rotation) ||
             //basically the only change here is that it treats overflow ducts specially, since they're... weird
-            ((otherblock.rotatedOutput(otherx, othery) || otherblock instanceof OverflowDuct) && Point2.equals(otherx + Geometry.d4(otherrot).x, othery + Geometry.d4(otherrot).y, tile.x, tile.y)));
+            ((otherblock.rotatedOutput(otherx, othery)) && Point2.equals(otherx + Geometry.d4(otherrot).x, othery + Geometry.d4(otherrot).y, tile.x, tile.y)));
     }
 
     @Override
@@ -175,7 +175,7 @@ public class Duct extends Block implements Autotiler{
             return current == null && items.total() == 0 &&
                 (armored ?
                     //armored acceptance
-                    ((source.block.rotate && source.front() == this && source.block.hasItems) || Edges.getFacingEdge(source.tile(), tile).relativeTo(tile) == rotation) :
+                    ((source.block.rotate && source.front() == this && source.block.hasItems && (source.block instanceof Duct)) || Edges.getFacingEdge(source.tile(), tile).relativeTo(tile) == rotation) :
                     //standard acceptance - do not accept from front
                     !(source.block.rotate && next == source) && Math.abs(Edges.getFacingEdge(source.tile, tile).relativeTo(tile.x, tile.y) - rotation) != 2
                 );
