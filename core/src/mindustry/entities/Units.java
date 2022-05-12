@@ -29,7 +29,7 @@ public class Units{
     private static float aeX, aeY, aeW, aeH;
     private static final Cons<Unit> anyEntityLambda = unit -> {
         if(boolResult) return;
-        if((unit.isGrounded() && !unit.hovering) == anyEntityGround){
+        if((unit.isGrounded() && !unit.type.allowLegStep) == anyEntityGround){
             unit.hitboxTile(hitrect);
 
             if(hitrect.overlaps(aeX, aeY, aeW, aeH)){
