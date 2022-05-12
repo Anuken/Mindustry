@@ -333,6 +333,7 @@ public class PayloadConveyor extends Block{
 
             TextureRegion out = Tmp.tr1;
             out.set(region.texture);
+            out.scale = region.scale;
 
             if(overlaps){
                 float w = region.u2 - region.u;
@@ -346,7 +347,6 @@ public class PayloadConveyor extends Block{
             }else{
                 out.set(0f, 0f, 0f, 0f);
             }
-            out.scale = region.scale;
 
             return out;
         }
