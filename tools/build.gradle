@@ -1,21 +1,18 @@
 sourceSets.main.java.srcDirs = ["src/"]
 
-
 import arc.files.Fi
 import arc.files.ZipFi
 import arc.func.Func2
 import arc.graphics.Color
 import arc.graphics.Pixmap
 import arc.packer.TexturePacker
-import arc.struct.IntIntMap
-import arc.struct.IntMap
 import arc.struct.ObjectMap
 import arc.struct.OrderedMap
 import arc.struct.Seq
 import arc.util.Http
 import arc.util.Log
 import arc.util.OS
-import arc.util.async.Threads
+import arc.util.Threads
 import arc.util.io.PropertiesUtils
 import arc.util.io.Streams
 
@@ -24,61 +21,34 @@ import java.util.concurrent.Executors
 
 def genFolder = "../core/assets-raw/sprites_out/generated/"
 def doAntialias = !project.hasProperty("disableAntialias")
-def colorMap = new IntMap<List<Color>>(), colorIndexMap = new IntIntMap()
-//on my machine, I have a native Nim AA implementation that is ~10x faster
-//it's not compiled for other platforms so they don't get it
-def useFastAA = project.hasProperty("fastAA") || System.getProperty("user.name") == "anuke"
+def enableAA = true
 
-def transformColors = { List<List<String>> list ->
-    list.each{ colors ->
-        def newColors = []
-        colors.each{ hexc ->
-            newColors += Color.valueOf(hexc)
-        }
-
-        newColors.each{ color ->
-            colorMap.put(color.rgba(), newColors)
-            colorIndexMap.put(color.rgba(), newColors.indexOf(color))
-        }
-    }
+@groovy.transform.CompileStatic
+static int getRGB(Pixmap image, int ix, int iy) {
+    return image.getRaw(Math.max(Math.min(ix, image.width - 1), 0), Math.max(Math.min(iy, image.height - 1), 0))
 }
 
-//TODO implementing this in gradle is a bad idea
-//d4816b
-transformColors([["a387ea", "8a73c6", "5c5e9f"], ["6e7080", "989aa4", "b0bac0"], ["bc5452", "ea8878", "feb380"],
-                 ["de9458", "f8c266", "ffe18f"], ["feb380", "ea8878", "bc5452"], ["d4816b", "eab678", "ffd37f"],
-                 ["ffffff", "dcc6c6", "9d7f7f"], ["df7646", "b23a4d", "752249"], ["3c3837", "515151", "646567"]])
+@groovy.transform.CompileStatic
+static void antialias(File file){
+    Pixmap image = new Pixmap(new Fi(file))
+    Pixmap out = image.copy()
 
-def antialias = { File file ->
-    if(!doAntialias) return
-
-    if(useFastAA){
-        "antialias ${file.absolutePath}".execute().waitFor()
-        return
-    }
-
-    def image = new Pixmap(new Fi(file))
-    def out = image.copy()
-    def getRGB = { int ix, int iy ->
-        return image.getRaw(Math.max(Math.min(ix, image.width - 1), 0), Math.max(Math.min(iy, image.height - 1), 0))
-    }
-
-    def color = new Color()
-    def sum = new Color()
-    def suma = new Color()
+    Color color = new Color()
+    Color sum = new Color()
+    Color suma = new Color()
     int[] p = new int[9]
 
     for(int x = 0; x < image.width; x++){
         for(int y = 0; y < image.height; y++){
-            int A = getRGB(x - 1, y + 1),
-                B = getRGB(x, y + 1),
-                C = getRGB(x + 1, y + 1),
-                D = getRGB(x - 1, y),
-                E = getRGB(x, y),
-                F = getRGB(x + 1, y),
-                G = getRGB(x - 1, y - 1),
-                H = getRGB(x, y - 1),
-                I = getRGB(x + 1, y - 1)
+            int A = getRGB(image, x - 1, y + 1),
+                B = getRGB(image, x, y + 1),
+                C = getRGB(image, x + 1, y + 1),
+                D = getRGB(image, x - 1, y),
+                E = getRGB(image, x, y),
+                F = getRGB(image, x + 1, y),
+                G = getRGB(image, x - 1, y - 1),
+                H = getRGB(image, x, y - 1),
+                I = getRGB(image, x + 1, y - 1)
 
             Arrays.fill(p, E)
 
@@ -95,10 +65,11 @@ def antialias = { File file ->
 
             for(int val : p){
                 color.rgba8888(val)
-                suma.r += color.r * color.a
-                suma.g += color.g * color.a
-                suma.b += color.b * color.a
-                suma.a += color.a
+                color.premultiplyAlpha()
+                suma.r(suma.r + color.r)
+                suma.g(suma.g + color.g)
+                suma.b(suma.b + color.b)
+                suma.a(suma.a + color.a)
             }
 
             float fm = suma.a <= 0.001f ? 0f : (float)(1f / suma.a)
@@ -111,10 +82,10 @@ def antialias = { File file ->
                 color.rgba8888(val)
                 float a = color.a
                 color.lerp(suma, (float) (1f - a))
-                sum.r += color.r
-                sum.g += color.g
-                sum.b += color.b
-                sum.a += a
+                sum.r(sum.r + color.r)
+                sum.g(sum.g + color.g)
+                sum.b(sum.b + color.b)
+                sum.a(sum.a + a)
                 total += 1f
             }
 
@@ -129,47 +100,6 @@ def antialias = { File file ->
     out.dispose()
 
     new Fi(file).writePng(out)
-}
-
-def tileImage = { File file ->
-    def image = new Pixmap(new Fi(file))
-
-    for(x in 0..image.width-1){
-        for(y in 0..image.height-1){
-            if(x > (image.height - 1 - y)){
-                def rx = image.height - 1 - y
-                def ry = x
-
-                image.setRaw(x, y, image.getRaw(rx, image.height - 1 - ry))
-            }
-        }
-    }
-
-    def result = new Pixmap(image.width * 2, image.height * 2)
-
-    result.draw(image.flipX(), 0, 0)
-    result.draw(image, image.width, 0)
-    result.draw(image.flipX().flipY(), 0, image.height)
-    result.draw(image.flipY(), image.width, image.height)
-
-    for(x in 0..result.width-1){
-        for(y in 0..result.height-1){
-            int p = result.getRaw(x, y)
-            if(x <= y){
-                List<Color> list = colorMap.get(p)
-                int index = colorIndexMap.get(p, -1)
-
-                if(index != -1){
-                    int resultIndex = (x == y ? 1 : index == 2 ? 0 : index == 0 ? 2 : 1);
-                    result.setRaw(x, y, list[resultIndex].rgba())
-                }
-            }
-        }
-    }
-
-    new Fi(file).writePng(result)
-    result.dispose()
-    image.dispose()
 }
 
 task antialiasImages(){
@@ -221,21 +151,23 @@ task pack(dependsOn: [classes, configurations.runtimeClasspath]){
             delete "../core/assets-raw/sprites_out/ui/icons"
         }
 
-        ExecutorService executor = Executors.newFixedThreadPool(16)
-        long ms = System.currentTimeMillis()
+        if(enableAA){
+            ExecutorService executor = Executors.newFixedThreadPool(OS.cores)
+            long ms = System.currentTimeMillis()
 
-        //antialias everything except UI elements
-        fileTree(dir: new File(rootDir, 'core/assets-raw/sprites_out/').absolutePath, include: "**/*.png").visit{ file ->
-            if(file.isDirectory() || (file.toString().replace("\\", "/").contains("/ui/") && file.toString().startsWith("icon-")) || file.toString().contains(".9.png")) return
+            //antialias everything except UI elements
+            fileTree(dir: new File(rootDir, 'core/assets-raw/sprites_out/').absolutePath, include: "**/*.png").visit{ file ->
+                if(file.isDirectory() || (file.toString().replace("\\", "/").contains("/ui/") && file.toString().startsWith("icon-")) || file.toString().contains(".9.png") || file.toString().contains("aaaa")) return
 
-            executor.submit{
-                antialias(file.file)
+                executor.submit{
+                    antialias(file.file)
+                }
             }
+
+            Threads.await(executor)
+
+            println "Time taken for AA: ${(System.currentTimeMillis() - ms) / 1000f} seconds"
         }
-
-        Threads.await(executor)
-
-        println "Time taken for AA: ${(System.currentTimeMillis() - ms) / 1000f}"
 
         println("\n\nPacking normal 4096 sprites...\n\n")
 
@@ -249,8 +181,10 @@ task pack(dependsOn: [classes, configurations.runtimeClasspath]){
             if(!file.isDirectory()) file.file.text = file.file.text.replace("4096", "2048")
         }
 
-        //pack fallback 2048x2048 sprites
-        TexturePacker.process(new File(rootDir, "core/assets-raw/sprites_out/").absolutePath, new File(rootDir, "core/assets/sprites/fallback/").absolutePath, "sprites.aatls")
+        //pack fallback 2048x2048 sprites - disabled when debugging
+        if(!project.hasProperty("args")){
+            TexturePacker.process(new File(rootDir, "core/assets-raw/sprites_out/").absolutePath, new File(rootDir, "core/assets/sprites/fallback/").absolutePath, "sprites.aatls")
+        }
     }
 }
 
@@ -271,29 +205,29 @@ task fontgen(dependsOn: classes, type: JavaExec){
      4. use json to generate a file with constants for every icon size+type (during annotation processing)
      */
     doLast{
-        Fi folder = Fi.get("core/assets-raw/fontgen/out/");
-        folder.mkdirs();
+        Fi folder = Fi.get("core/assets-raw/fontgen/out/")
+        folder.mkdirs()
 
-        Log.info("Session...");
+        Log.info("Session...")
 
-        OS.exec("curl", "--fail", "--output", "core/assets-raw/fontgen/out/session", "--form", "config=@core/assets-raw/fontgen/config.json", "https://fontello.com");
+        OS.exec("curl", "--fail", "--output", "core/assets-raw/fontgen/out/session", "--form", "config=@core/assets-raw/fontgen/config.json", "https://fontello.com")
 
-        Log.info("Zip...");
+        Log.info("Zip...")
 
-        String session = folder.child("session").readString();
+        String session = folder.child("session").readString()
 
         Http.get("https://fontello.com/" + session + "/get").block(result -> {
-            Streams.copy(result.getResultAsStream(), folder.child("font.zip").write());
-        });
+            Streams.copy(result.getResultAsStream(), folder.child("font.zip").write())
+        })
 
-        Log.info("Icon font...");
+        Log.info("Icon font...")
 
-        ZipFi zip = new ZipFi(folder.child("font.zip"));
-        Fi dest = folder.child("font.woff");
-        zip.list()[0].child("font").child("fontello.ttf").copyTo(dest);
-        dest.copyTo(Fi.get("core/assets/fonts/icon.ttf"));
+        ZipFi zip = new ZipFi(folder.child("font.zip"))
+        Fi dest = folder.child("font.woff")
+        zip.list()[0].child("font").child("fontello.ttf").copyTo(dest)
+        dest.copyTo(Fi.get("core/assets/fonts/icon.ttf"))
 
-        Log.info("Merge...");
+        Log.info("Merge...")
 
         //TODO this is broken
 
@@ -301,9 +235,9 @@ task fontgen(dependsOn: classes, type: JavaExec){
             Fi.get("core/assets-raw/fontgen/merge.pe").absolutePath(),
             Fi.get("core/assets/fonts/font.woff").absolutePath(),
             Fi.get("core/assets-raw/fontgen/out/font.woff").absolutePath())
-        );
+        )
 
-        Log.info("Done.");
+        Log.info("Done.")
     }
 }
 
@@ -324,104 +258,104 @@ task updateScripts(dependsOn: classes, type: JavaExec){
 task updateBundles{
     doLast{
         def uniEscape = { String string ->
-            StringBuilder outBuffer = new StringBuilder();
-            int len = string.length();
+            StringBuilder outBuffer = new StringBuilder()
+            int len = string.length()
             for(int i = 0; i < len; i++){
-                char ch = string.charAt(i);
+                char ch = string.charAt(i)
                 if((ch > 61) && (ch < 127)){
-                    outBuffer.append(ch == '\\' ? "\\\\" : ch);
-                    continue;
+                    outBuffer.append(ch == (char)'\\' ? "\\\\" : ch)
+                    continue
                 }
 
                 if(ch >= 0xE000 && ch <= 0xF8FF){
-                    String hex = Integer.toHexString((int)ch);
-                    outBuffer.append("\\u");
+                    String hex = Integer.toHexString((int)ch)
+                    outBuffer.append("\\u")
                     for(int j = 0; j < 4 - hex.length(); j++){
-                        outBuffer.append('0');
+                        outBuffer.append('0')
                     }
-                    outBuffer.append(hex);
+                    outBuffer.append(hex)
                 }else{
-                    outBuffer.append(ch);
+                    outBuffer.append(ch)
                 }
             }
 
-            return outBuffer.toString();
+            return outBuffer.toString()
         }
 
-        OrderedMap<String, String> base = new OrderedMap<>();
-        PropertiesUtils.load(base, Fi.get("core/assets/bundles/bundle.properties").reader());
-        Seq<String> removals = new Seq<>();
+        OrderedMap<String, String> base = new OrderedMap<>()
+        PropertiesUtils.load(base, Fi.get("core/assets/bundles/bundle.properties").reader())
+        Seq<String> removals = new Seq<>()
 
-        Log.info("Updating bundles...");
+        Log.info("Updating bundles...")
 
         Fi.get("core/assets/bundles").walk(child -> {
-            if(child.name().equals("bundle.properties") || child.toString().contains("output")) return;
+            if(child.name().equals("bundle.properties") || child.toString().contains("output")) return
 
-            Log.info("| @", child.nameWithoutExtension());
+            Log.info("| @", child.nameWithoutExtension())
 
-            OrderedMap<String, String> other = new OrderedMap<>();
+            OrderedMap<String, String> other = new OrderedMap<>()
 
             //find the last known comment of each line
-            ObjectMap<String, String> comments = new ObjectMap<>();
-            StringBuilder curComment = new StringBuilder();
+            ObjectMap<String, String> comments = new ObjectMap<>()
+            StringBuilder curComment = new StringBuilder()
 
             for(String line : Seq.with(child.readString().split("\n", -1))){
                 if(line.startsWith("#") || line.isEmpty()){
-                    curComment.append(line).append("\n");
+                    curComment.append(line).append("\n")
                 }else if(line.contains("=")){
-                    String lastKey = line.substring(0, line.indexOf("=")).trim();
+                    String lastKey = line.substring(0, line.indexOf("=")).trim()
                     if(curComment.length() != 0){
-                        comments.put(lastKey, curComment.toString());
-                        curComment.setLength(0);
+                        comments.put(lastKey, curComment.toString())
+                        curComment.setLength(0)
                     }
                 }
             }
 
-            ObjectMap<String, String> extras = new OrderedMap<>();
-            PropertiesUtils.load(other, child.reader());
-            removals.clear();
+            ObjectMap<String, String> extras = new OrderedMap<>()
+            PropertiesUtils.load(other, child.reader())
+            removals.clear()
 
             for(String key : other.orderedKeys()){
                 if(!base.containsKey(key) && key.contains(".details")){
-                    extras.put(key, other.get(key));
+                    extras.put(key, other.get(key))
                 }else if(!base.containsKey(key)){
-                    removals.add(key);
-                    Log.info("&lr- Removing unused key '@'...", key);
+                    removals.add(key)
+                    Log.info("&lr- Removing unused key '@'...", key)
                 }
             }
-            if(removals.size > 0) Log.info("&lr@ keys removed.", removals.size);
+            if(removals.size > 0) Log.info("&lr@ keys removed.", removals.size)
             for(String s : removals){
-                other.remove(s);
+                other.remove(s)
             }
 
-            int added = 0;
+            int added = 0
 
             for(String key : base.orderedKeys()){
                 if(other.get(key) == null || other.get(key).trim().isEmpty()){
-                    other.put(key, base.get(key));
-                    added++;
-                    Log.info("&lc- Adding missing key '@'...", key);
+                    other.put(key, base.get(key))
+                    added++
+                    Log.info("&lc- Adding missing key '@'...", key)
                 }
             }
 
             Func2<String, String, String> processor = (key, value) ->
                     (comments.containsKey(key) ? comments.get(key) : "") + //append last known comment if present
-                            (key + " =" + (value.trim().isEmpty() ? "" : " ") + uniEscape(value)).replace("\n", "\\n") + "\n";
-            Fi output = child.sibling("output/" + child.name());
+                            (key + " =" + (value.trim().isEmpty() ? "" : " ") + uniEscape(value)).replace("\n", "\\n") + "\n"
+            Fi output = child.sibling("output/" + child.name())
 
-            if(added > 0) Log.info("&lc@ keys added.", added);
-            if(removals.size + added > 0) Log.info("Writing bundle to @", output);
-            StringBuilder result = new StringBuilder();
+            if(added > 0) Log.info("&lc@ keys added.", added)
+            if(removals.size + added > 0) Log.info("Writing bundle to @", output)
+            StringBuilder result = new StringBuilder()
 
             //add everything ordered
-            for(String key : base.orderedKeys().copy().and(extras.keys().toSeq())){
-                if(other.get(key) == null) continue;
+            for(String key : base.orderedKeys().copy().add(extras.keys().toSeq())){
+                if(other.get(key) == null) continue
 
-                result.append(processor.get(key, other.get(key)));
-                other.remove(key);
+                result.append(processor.get(key, other.get(key)))
+                other.remove(key)
             }
 
-            child.writeString(result.toString());
-        });
+            child.writeString(result.toString())
+        })
     }
 }

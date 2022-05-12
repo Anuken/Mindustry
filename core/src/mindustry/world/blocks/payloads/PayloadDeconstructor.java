@@ -7,6 +7,7 @@ import arc.util.io.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.ui.*;
 
 import static mindustry.Vars.*;
@@ -42,7 +43,7 @@ public class PayloadDeconstructor extends PayloadBlock{
     public void setBars(){
         super.setBars();
 
-        bars.add("progress", (PayloadDeconstructorBuild e) -> new Bar("bar.progress", Pal.ammo, () -> e.progress));
+        addBar("progress", (PayloadDeconstructorBuild e) -> new Bar("bar.progress", Pal.ammo, () -> e.progress));
     }
 
     public class PayloadDeconstructorBuild extends PayloadBlockBuild<Payload>{
@@ -87,7 +88,8 @@ public class PayloadDeconstructor extends PayloadBlock{
 
         @Override
         public boolean acceptUnitPayload(Unit unit){
-            return payload == null && deconstructing == null && !unit.spawnedByCore && unit.type.getTotalRequirements().length > 0 && unit.hitSize / tilesize <= maxPayloadSize;
+            return payload == null && deconstructing == null && unit.type.allowedInPayloads && !unit.spawnedByCore
+                && unit.type.getTotalRequirements().length > 0 && unit.hitSize / tilesize <= maxPayloadSize;
         }
 
         @Override
@@ -142,7 +144,7 @@ public class PayloadDeconstructor extends PayloadBlock{
                     time += edelta();
 
                     for(int i = 0; i < reqs.length; i++){
-                        accum[i] += reqs[i].amount * realShift;
+                        accum[i] += reqs[i].amount * state.rules.deconstructRefundMultiplier * realShift;
                     }
                 }
 
@@ -186,6 +188,12 @@ public class PayloadDeconstructor extends PayloadBlock{
                 payload = null;
                 progress = 0f;
             }
+        }
+
+        @Override
+        public double sense(LAccess sensor){
+            if(sensor == LAccess.progress) return progress;
+            return super.sense(sensor);
         }
 
         @Override

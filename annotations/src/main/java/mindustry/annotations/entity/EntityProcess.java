@@ -141,7 +141,7 @@ public class EntityProcess extends BaseProcessor{
                     //getter
                     if(!signatures.contains(cname + "()")){
                         inter.addMethod(MethodSpec.methodBuilder(cname).addModifiers(Modifier.ABSTRACT, Modifier.PUBLIC)
-                        .addAnnotations(Seq.with(field.annotations()).select(a -> a.toString().contains("Null")).map(AnnotationSpec::get))
+                        .addAnnotations(Seq.with(field.annotations()).select(a -> a.toString().contains("Null") || a.toString().contains("Deprecated")).map(AnnotationSpec::get))
                         .addJavadoc(field.doc() == null ? "" : field.doc())
                         .returns(field.tname()).build());
                     }
@@ -153,7 +153,7 @@ public class EntityProcess extends BaseProcessor{
                         .addJavadoc(field.doc() == null ? "" : field.doc())
                         .addParameter(ParameterSpec.builder(field.tname(), field.name())
                         .addAnnotations(Seq.with(field.annotations())
-                        .select(a -> a.toString().contains("Null")).map(AnnotationSpec::get)).build()).build());
+                        .select(a -> a.toString().contains("Null") || a.toString().contains("Deprecated")).map(AnnotationSpec::get)).build()).build());
                     }
                 }
 
@@ -163,7 +163,7 @@ public class EntityProcess extends BaseProcessor{
                 //SPECIAL CASE: components with EntityDefs don't get a base class! the generated class becomes the base class itself
                 if(component.annotation(Component.class).base()){
 
-                    Seq<Stype> deps = depends.copy().and(component);
+                    Seq<Stype> deps = depends.copy().add(component);
                     baseClassDeps.get(component, ObjectSet::new).addAll(deps);
 
                     //do not generate base classes when the component will generate one itself
@@ -336,7 +336,7 @@ public class EntityProcess extends BaseProcessor{
                             fbuilder.initializer(varInitializers.get(f.descString()));
                         }
 
-                        fbuilder.addModifiers(f.has(ReadOnly.class) ? Modifier.PROTECTED : Modifier.PUBLIC);
+                        fbuilder.addModifiers(f.has(ReadOnly.class) || f.is(Modifier.PRIVATE) ? Modifier.PROTECTED : Modifier.PUBLIC);
                         fbuilder.addAnnotations(f.annotations().map(AnnotationSpec::get));
                         FieldSpec spec = fbuilder.build();
 
@@ -409,7 +409,7 @@ public class EntityProcess extends BaseProcessor{
                         err("Type " + type + " has multiple components implementing non-void method " + entry.key + ".");
                     }
 
-                    entry.value.sort(Structs.comps(Structs.comparingFloat(m -> m.has(MethodPriority.class) ? m.annotation(MethodPriority.class).value() : 0), Structs.comparing(Selement::name)));
+                    entry.value.sort(Structs.comps(Structs.comparingFloat(m -> m.has(MethodPriority.class) ? m.annotation(MethodPriority.class).value() : 0), Structs.comparing(s -> s.up().getSimpleName().toString())));
 
                     //representative method
                     Smethod first = entry.value.first();
@@ -545,6 +545,7 @@ public class EntityProcess extends BaseProcessor{
                     builder.addSuperinterface(Poolable.class);
                     //implement reset()
                     MethodSpec.Builder resetBuilder = MethodSpec.methodBuilder("reset").addModifiers(Modifier.PUBLIC);
+                    allFieldSpecs.sortComparing(s -> s.name);
                     for(FieldSpec spec : allFieldSpecs){
                         @Nullable Svar variable = specVariables.get(spec);
                         if(variable != null && variable.isAny(Modifier.STATIC, Modifier.FINAL)) continue;
@@ -595,10 +596,14 @@ public class EntityProcess extends BaseProcessor{
             //write the groups
             groupsBuilder.addMethod(groupInit.build());
 
+            groupsBuilder.addField(boolean.class, "isClearing", Modifier.PUBLIC, Modifier.STATIC);
+
             MethodSpec.Builder groupClear = MethodSpec.methodBuilder("clear").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+            groupClear.addStatement("isClearing = true");
             for(GroupDefinition group : groupDefs){
                 groupClear.addStatement("$L.clear()", group.name);
             }
+            groupClear.addStatement("isClearing = false");
 
             //write clear
             groupsBuilder.addMethod(groupClear.build());
@@ -800,12 +805,12 @@ public class EntityProcess extends BaseProcessor{
                     }
                 }
 
-                write(def.builder, imports.asArray());
+                write(def.builder, imports.toSeq());
             }
 
             //write base classes last
             for(TypeSpec.Builder b : baseClasses){
-                write(b, imports.asArray());
+                write(b, imports.toSeq());
             }
 
             //TODO nulls were an awful idea
@@ -817,7 +822,7 @@ public class EntityProcess extends BaseProcessor{
             //create mock types of all components
             for(Stype interf : allInterfaces){
                 //indirect interfaces to implement methods for
-                Seq<Stype> dependencies = interf.allInterfaces().and(interf);
+                Seq<Stype> dependencies = interf.allInterfaces().add(interf);
                 Seq<Smethod> methods = dependencies.flatMap(Stype::methods);
                 methods.sortComparing(Object::toString);
 
@@ -852,6 +857,10 @@ public class EntityProcess extends BaseProcessor{
 
                     Stype compType = interfaceToComp(method.type());
                     MethodSpec.Builder builder = MethodSpec.overriding(method.e).addModifiers(Modifier.PUBLIC, Modifier.FINAL);
+                    int index = 0;
+                    for(ParameterSpec spec : builder.parameters){
+                        Reflect.set(spec, "name",  "arg" + index++);
+                    }
                     builder.addAnnotation(OverrideCallSuper.class); //just in case
 
                     if(!method.isVoid()){
@@ -878,7 +887,7 @@ public class EntityProcess extends BaseProcessor{
 
                 nullsBuilder.addField(FieldSpec.builder(type, Strings.camelize(baseName)).initializer("new " + className + "()").addModifiers(Modifier.FINAL, Modifier.STATIC, Modifier.PUBLIC).build());
 
-                write(nullBuilder, imports.asArray());
+                write(nullBuilder, imports.toSeq());
             }
 
             write(nullsBuilder);
@@ -934,7 +943,7 @@ public class EntityProcess extends BaseProcessor{
                 out.addAll(getDependencies(comp));
             }
 
-            defComponents.put(type, out.asArray());
+            defComponents.put(type, out.toSeq());
         }
 
         return defComponents.get(type);
@@ -961,7 +970,7 @@ public class EntityProcess extends BaseProcessor{
 
             //remove it again just in case
             out.remove(component);
-            componentDependencies.put(component, result.asArray());
+            componentDependencies.put(component, result.toSeq());
         }
 
         return componentDependencies.get(component);

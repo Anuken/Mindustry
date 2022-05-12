@@ -5,6 +5,7 @@ import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.meta.*;
 
+//TODO should leak!
 public class LiquidJunction extends LiquidBlock{
 
     public LiquidJunction(String name){
@@ -20,7 +21,7 @@ public class LiquidJunction extends LiquidBlock{
     @Override
     public void setBars(){
         super.setBars();
-        bars.remove("liquid");
+        removeBar("liquid");
     }
 
     @Override

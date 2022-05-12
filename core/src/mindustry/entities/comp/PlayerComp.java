@@ -7,6 +7,7 @@ import arc.math.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.pooling.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.units.*;
@@ -82,7 +83,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         textFadeTime = 0f;
         x = y = 0f;
         if(!dead()){
-            unit.controller(unit.type.createController());
+            unit.resetController();
             unit = Nulls.unit;
         }
     }
@@ -124,12 +125,8 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         unit.aim(mouseX, mouseY);
         //this is only necessary when the thing being controlled isn't synced
         unit.controlWeapons(shooting, shooting);
-        //save previous formation to prevent reset
-        var formation = unit.formation;
         //extra precaution, necessary for non-synced things
         unit.controller(this);
-        //keep previous formation
-        unit.formation = formation;
     }
 
     @Override
@@ -203,7 +200,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
         if(this.unit != Nulls.unit){
             //un-control the old unit
-            this.unit.controller(this.unit.type.createController());
+            this.unit.resetController();
         }
         this.unit = unit;
         if(unit != Nulls.unit){
@@ -258,10 +255,12 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
     @Override
     public void draw(){
+        if(unit != null && unit.inFogTo(Vars.player.team())) return;
+
         Draw.z(Layer.playerName);
         float z = Drawf.text();
 
-        Font font = Fonts.def;
+        Font font = Fonts.outline;
         GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
         final float nameHeight = 11;
         final float textHeight = 15;

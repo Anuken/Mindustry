@@ -21,7 +21,6 @@ import static mindustry.Vars.*;
 public class SerpuloPlanetGenerator extends PlanetGenerator{
     //alternate, less direct generation (wip)
     public static boolean alt = false;
-    static final int seed = 0;
 
     BaseGenerator basegen = new BaseGenerator();
     float scl = 5f;
@@ -120,7 +119,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
         tile.floor = getBlock(position);
         tile.block = tile.floor.asFloor().wall;
 
-        if(Ridged.noise3d(1, position.x, position.y, position.z, 2, 22) > 0.31){
+        if(Ridged.noise3d(seed + 1, position.x, position.y, position.z, 2, 22) > 0.31){
             tile.block = Blocks.air;
         }
     }
@@ -195,7 +194,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
 
             void joinLiquid(int x1, int y1, int x2, int y2){
                 float nscl = rand.random(100f, 140f) * 6f;
-                int rad = rand.random(5, 10);
+                int rad = rand.random(7, 11);
                 int avoid = 2 + rad;
                 var path = pathfind(x1, y1, x2, y2, tile -> (tile.solid() || !tile.floor().isLiquid ? 70f : 0f) + noise(tile.x, tile.y, 2, 0.4f, 1f / nscl) * 500, Astar.manhattan);
                 path.each(t -> {
@@ -646,6 +645,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
 
         state.rules.waveSpacing = Mathf.lerp(60 * 65 * 2, 60f * 60f * 1f, Math.max(difficulty - waveTimeDec, 0f));
         state.rules.waves = sector.info.waves = true;
+        state.rules.env = sector.planet.defaultEnv;
         state.rules.enemyCoreBuildRadius = 600f;
 
         //spawn air only when spawn is blocked

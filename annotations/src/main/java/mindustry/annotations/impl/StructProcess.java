@@ -1,6 +1,7 @@
 package mindustry.annotations.impl;
 
 import arc.struct.*;
+import arc.util.*;
 import com.squareup.javapoet.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.annotations.*;
@@ -63,23 +64,28 @@ public class StructProcess extends BaseProcessor{
                     int size = varSize(var);
                     TypeName varType = var.tname();
                     String varName = var.name();
+                    boolean isBool = varType == TypeName.BOOLEAN;
 
                     //add val param to constructor
                     constructor.addParameter(varType, varName);
 
                     //[get] field(structType) : fieldType
-                    MethodSpec.Builder getter = MethodSpec.methodBuilder(var.name().toString())
+                    MethodSpec.Builder getter = MethodSpec.methodBuilder(var.name())
                     .addModifiers(Modifier.STATIC, Modifier.PUBLIC)
                     .returns(varType)
                     .addParameter(structType, structParam);
                     //[set] field(structType, fieldType) : structType
-                    MethodSpec.Builder setter = MethodSpec.methodBuilder(var.name().toString())
+                    MethodSpec.Builder setter = MethodSpec.methodBuilder(var.name())
                     .addModifiers(Modifier.STATIC, Modifier.PUBLIC)
                     .returns(structType)
                     .addParameter(structType, structParam).addParameter(varType, "value");
 
+                    //field for offset
+                    classBuilder.addField(FieldSpec.builder(structType, "bitMask" + Strings.capitalize(varName), Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
+                        .initializer(!isBool ? "($T)($L)" : "($T)(1L << $L)", structType, isBool ? offset : bitString(offset, size, structTotalSize)).build());
+
                     //[getter]
-                    if(varType == TypeName.BOOLEAN){
+                    if(isBool){
                         //bools: single bit, is simplified
                         getter.addStatement("return ($L & (1L << $L)) != 0", structParam, offset);
                     }else if(varType == TypeName.FLOAT){
@@ -124,7 +130,7 @@ public class StructProcess extends BaseProcessor{
                 classBuilder.addJavadoc(doc.toString());
 
                 //add constructor final statement + add to class and build
-                constructor.addStatement("return ($T)($L)", structType, cons.toString().substring(3));
+                constructor.addStatement("return ($T)($L)", structType, cons.substring(3));
                 classBuilder.addMethod(constructor.build());
 
                 JavaFile.builder(packageName, classBuilder.build()).build().writeTo(BaseProcessor.filer);

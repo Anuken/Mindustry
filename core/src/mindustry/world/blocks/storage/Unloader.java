@@ -6,6 +6,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -13,9 +14,13 @@ import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
 
+import java.util.*;
+
 import static mindustry.Vars.*;
 
 public class Unloader extends Block{
+    public @Load(value = "@-center", fallback = "unloader-center") TextureRegion centerRegion;
+
     public float speed = 1f;
 
     public Unloader(String name){
@@ -28,8 +33,8 @@ public class Unloader extends Block{
         saveConfig = true;
         itemCapacity = 0;
         noUpdateDisabled = true;
+        clearOnDoubleTap = true;
         unloadable = false;
-        envEnabled = Env.any;
 
         config(Item.class, (UnloaderBuild tile, Item item) -> tile.sortItem = item);
         configClear((UnloaderBuild tile) -> tile.sortItem = null);
@@ -42,14 +47,33 @@ public class Unloader extends Block{
     }
 
     @Override
-    public void drawRequestConfig(BuildPlan req, Eachable<BuildPlan> list){
-        drawRequestConfigCenter(req, req.config, "unloader-center");
+    public void drawPlanConfig(BuildPlan plan, Eachable<BuildPlan> list){
+        drawPlanConfigCenter(plan, plan.config, "unloader-center");
     }
 
     @Override
     public void setBars(){
         super.setBars();
-        bars.remove("items");
+        removeBar("items");
+    }
+
+    public static class ContainerStat{
+        Building building;
+        float loadFactor;
+        boolean canLoad;
+        boolean canUnload;
+        int index;
+
+        @Override
+        public String toString(){
+            return "ContainerStat{" +
+            "building=" + building.block + "#" + building.id +
+            ", loadFactor=" + loadFactor +
+            ", canLoad=" + canLoad +
+            ", canUnload=" + canUnload +
+            ", index=" + index +
+            '}';
+        }
     }
 
     public class UnloaderBuild extends Building{
@@ -58,16 +82,18 @@ public class Unloader extends Block{
         public int offset = 0;
         public int rotations = 0;
         public Seq<ContainerStat> possibleBlocks = new Seq<>();
-
-        public class ContainerStat{
-            Building building;
-            float loadFactor;
-            boolean canLoad;
-            boolean canUnload;
-            int index;
-        }
-
         public int[] lastUsed;
+
+        protected final Comparator<ContainerStat> comparator = Structs.comps(
+            Structs.comps(
+                Structs.comparingBool(e -> e.building.block.highUnloadPriority && !e.canLoad),
+                Structs.comparingBool(e -> e.canUnload) // && !e.canLoad
+            ),
+            Structs.comps(
+                Structs.comparingFloat(e -> e.loadFactor),
+                Structs.comparingInt(e -> -lastUsed[e.index])
+            )
+        );
 
         @Override
         public void updateTile(){
@@ -143,18 +169,7 @@ public class Unloader extends Block{
                 }
 
                 //sort so it gives full priority to blocks that can give but not receive (stackConveyors and Storage), and then by load, and then by last use
-                possibleBlocks.sort(
-                    Structs.comps(
-                        Structs.comps(
-                            Structs.comparingBool(e -> e.building.block.highUnloadPriority && !e.canLoad),
-                            Structs.comparingBool(e -> e.canUnload && !e.canLoad)
-                        ),
-                        Structs.comps(
-                            Structs.comparingFloat(e -> e.loadFactor),
-                            Structs.comparingInt(e -> -lastUsed[e.index])
-                        )
-                    )
-                );
+                possibleBlocks.sort(comparator);
 
                 ContainerStat dumpingFrom = null;
                 ContainerStat dumpingTo = null;
@@ -167,7 +182,7 @@ public class Unloader extends Block{
                     }
                 }
 
-                //choose the building to give the item
+                //choose the building to take the item from
                 for(int i = possibleBlocks.size - 1; i >= 0; i--){
                     if(possibleBlocks.get(i).canUnload){
                         dumpingFrom = possibleBlocks.get(i);
@@ -177,10 +192,11 @@ public class Unloader extends Block{
 
                 //increment the priority if not used
                 for(int i = 0; i < possibleBlocks.size; i++){
-                    lastUsed[i] = (lastUsed[i] + 1 ) % 2147483647;
+                    lastUsed[i] = (lastUsed[i] + 1) % 2147483647;
                 }
 
                 //trade the items
+                //TODO  && dumpingTo != dumpingFrom ?
                 if(dumpingFrom != null && dumpingTo != null && (dumpingFrom.loadFactor != dumpingTo.loadFactor || !dumpingFrom.canLoad)){
                     dumpingTo.building.handleItem(this, item);
                     dumpingFrom.building.removeStack(item, 1);
@@ -209,24 +225,13 @@ public class Unloader extends Block{
             super.draw();
 
             Draw.color(sortItem == null ? Color.clear : sortItem.color);
-            Draw.rect("unloader-center", x, y);
+            Draw.rect(centerRegion, x, y);
             Draw.color();
         }
 
         @Override
         public void buildConfiguration(Table table){
             ItemSelection.buildTable(Unloader.this, table, content.items(), () -> sortItem, this::configure);
-        }
-
-        @Override
-        public boolean onConfigureTileTapped(Building other){
-            if(this == other){
-                deselect();
-                configure(null);
-                return false;
-            }
-
-            return true;
         }
 
         @Override

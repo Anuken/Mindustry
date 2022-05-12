@@ -1,8 +1,7 @@
 package mindustry.world.consumers;
 
-import arc.math.*;
-import arc.scene.ui.layout.*;
 import mindustry.gen.*;
+import mindustry.world.*;
 import mindustry.world.meta.*;
 
 /** Consumer class for blocks which consume power while being connected to a power graph. */
@@ -25,32 +24,19 @@ public class ConsumePower extends Consume{
     }
 
     @Override
-    public ConsumeType type(){
-        return ConsumeType.power;
+    public void apply(Block block){
+        block.hasPower = true;
+        block.consPower = this;
     }
 
     @Override
-    public void build(Building tile, Table table){
-        //No tooltip for power, for now
+    public boolean ignore(){
+        return buffered;
     }
 
     @Override
-    public String getIcon(){
-        return "icon-power";
-    }
-
-    @Override
-    public void update(Building entity){
-        // Nothing to do since PowerGraph directly updates entity.power.status
-    }
-
-    @Override
-    public boolean valid(Building entity){
-        if(buffered){
-            return true;
-        }else{
-            return entity.power.status > 0f;
-        }
+    public float efficiency(Building build){
+        return build.power.status;
     }
 
     @Override
@@ -68,18 +54,9 @@ public class ConsumePower extends Consume{
      * @return The amount of power which is requested per tick.
      */
     public float requestedPower(Building entity){
-        if(entity == null) return 0f;
-
-        if(buffered){
-            return (1f-entity.power.status)*capacity;
-        }else{
-            try{
-                return usage * Mathf.num(entity.shouldConsume());
-            }catch(Exception e){
-                //HACK an error will only happen with a bar that is checking its requested power, and the entity is null/a different class
-                return 0;
-            }
-        }
+        return buffered ?
+            (1f - entity.power.status) * capacity :
+            usage * (entity.shouldConsume() ? 1f : 0f);
     }
 
 

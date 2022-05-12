@@ -69,7 +69,12 @@ public class PlanetRenderer implements Disposable{
 
         cam.resize(w, h);
         params.camPos.setLength((params.planet.radius + params.planet.camRadius) * camLength + (params.zoom-1f) * (params.planet.radius + params.planet.camRadius) * 2);
-        cam.position.set(params.planet.position).add(params.camPos);
+
+        if(params.otherCamPos != null){
+            cam.position.set(params.otherCamPos).lerp(params.planet.position, params.otherCamAlpha).add(params.camPos);
+        }else{
+            cam.position.set(params.planet.position).add(params.camPos);
+        }
         //cam.up.set(params.camUp); //TODO broken
         cam.lookAt(params.planet.position);
         cam.update();
@@ -223,8 +228,8 @@ public class PlanetRenderer implements Disposable{
         batch.flush(Gl.lineStrip);
     }
 
-    public void drawBorders(Sector sector, Color base){
-        Color color = Tmp.c1.set(base).a(base.a + 0.3f + Mathf.absin(Time.globalTime, 5f, 0.3f));
+    public void drawBorders(Sector sector, Color base, float alpha){
+        Color color = Tmp.c1.set(base).a((base.a + 0.3f + Mathf.absin(Time.globalTime, 5f, 0.3f)) * alpha);
 
         float r1 = 1f;
         float r2 = outlineRad + 0.001f;
@@ -279,8 +284,8 @@ public class PlanetRenderer implements Disposable{
         }
     }
 
-    public void drawSelection(Sector sector){
-        drawSelection(sector, Pal.accent, 0.04f, 0.001f);
+    public void drawSelection(Sector sector, float alpha){
+        drawSelection(sector, Tmp.c1.set(Pal.accent).a(alpha), 0.04f, 0.001f);
     }
 
     public void drawSelection(Sector sector, Color color, float stroke, float length){

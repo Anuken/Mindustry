@@ -22,6 +22,7 @@ import static mindustry.logic.LCanvas.*;
 public class LogicDialog extends BaseDialog{
     public LCanvas canvas;
     Cons<String> consumer = s -> {};
+    boolean privileged;
     @Nullable LExecutor executor;
 
     public LogicDialog(){
@@ -42,7 +43,7 @@ public class LogicDialog extends BaseDialog{
             dialog.cont.pane(p -> {
                 p.margin(10f);
                 p.table(Tex.button, t -> {
-                    TextButtonStyle style = Styles.cleart;
+                    TextButtonStyle style = Styles.flatt;
                     t.defaults().size(280f, 60f).left();
 
                     t.button("@schematic.copy", Icon.copy, style, () -> {
@@ -156,17 +157,17 @@ public class LogicDialog extends BaseDialog{
                 int i = 0;
                 for(Prov<LStatement> prov : LogicIO.allStatements){
                     LStatement example = prov.get();
-                    if(example instanceof InvalidStatement || example.hidden()) continue;
+                    if(example instanceof InvalidStatement || example.hidden() || (example.privileged() && !privileged) || (example.nonPrivileged() && privileged)) continue;
 
-                    TextButtonStyle style = new TextButtonStyle(Styles.cleart);
+                    TextButtonStyle style = new TextButtonStyle(Styles.flatt);
                     style.fontColor = example.color();
                     style.font = Fonts.outline;
 
                     t.button(example.name(), style, () -> {
                         canvas.add(prov.get());
                         dialog.hide();
-                    }).size(140f, 50f).self(c -> tooltip(c, "lst." + example.name()));
-                    if(++i % 2 == 0) t.row();
+                    }).size(130f, 50f).self(c -> tooltip(c, "lst." + example.name()));
+                    if(++i % 3 == 0) t.row();
                 }
             });
             dialog.addCloseButton();
@@ -184,10 +185,12 @@ public class LogicDialog extends BaseDialog{
         onResize(() -> canvas.rebuild());
     }
 
-    public void show(String code, LExecutor executor, Cons<String> modified){
+    public void show(String code, LExecutor executor, boolean privileged, Cons<String> modified){
         this.executor = executor;
+        this.privileged = privileged;
         canvas.statements.clearChildren();
         canvas.rebuild();
+        canvas.privileged = privileged;
         try{
             canvas.load(code);
         }catch(Throwable t){

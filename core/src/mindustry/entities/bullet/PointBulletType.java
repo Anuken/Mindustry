@@ -13,7 +13,7 @@ public class PointBulletType extends BulletType{
      public float trailSpacing = 10f;
 
      public PointBulletType(){
-         scaleVelocity = true;
+         scaleLife = true;
          lifetime = 100f;
          collides = false;
          keepVelocity = false;

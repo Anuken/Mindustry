@@ -47,10 +47,10 @@ public class SolidPump extends Pump{
     @Override
     public void setBars(){
         super.setBars();
-        bars.add("efficiency", (SolidPumpBuild entity) -> new Bar(() -> Core.bundle.formatFloat("bar.pumpspeed",
+        addBar("efficiency", (SolidPumpBuild entity) -> new Bar(() -> Core.bundle.formatFloat("bar.pumpspeed",
         entity.lastPump * 60, 1),
         () -> Pal.ammo,
-        () -> entity.warmup * entity.efficiency()));
+        () -> entity.warmup * entity.efficiency));
     }
 
     @Override
@@ -103,7 +103,9 @@ public class SolidPump extends Pump{
         @Override
         public void draw(){
             Draw.rect(region, x, y);
+            Draw.z(Layer.blockCracks);
             super.drawCracks();
+            Draw.z(Layer.blockAfterCracks);
 
             Drawf.liquid(liquidRegion, x, y, liquids.get(result) / liquidCapacity, result.color);
             Drawf.spinSprite(rotatorRegion, x, y, pumpTime * rotateSpeed);
@@ -112,15 +114,15 @@ public class SolidPump extends Pump{
 
         @Override
         public boolean shouldConsume(){
-            return liquids.get(result) < liquidCapacity - 0.01f && enabled;
+            return liquids.get(result) < liquidCapacity - 0.01f;
         }
 
         @Override
         public void updateTile(){
             float fraction = Math.max(validTiles + boost + (attribute == null ? 0 : attribute.env()), 0);
 
-            if(cons.valid() && typeLiquid() < liquidCapacity - 0.001f){
-                float maxPump = Math.min(liquidCapacity - typeLiquid(), pumpAmount * delta() * fraction * efficiency());
+            if(efficiency > 0 && typeLiquid() < liquidCapacity - 0.001f){
+                float maxPump = Math.min(liquidCapacity - typeLiquid(), pumpAmount * delta() * fraction * efficiency);
                 liquids.add(result, maxPump);
                 lastPump = maxPump / Time.delta;
                 warmup = Mathf.lerpDelta(warmup, 1f, 0.02f);

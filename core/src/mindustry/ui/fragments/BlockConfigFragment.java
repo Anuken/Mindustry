@@ -12,46 +12,34 @@ import mindustry.gen.*;
 
 import static mindustry.Vars.*;
 
-public class BlockConfigFragment extends Fragment{
+public class BlockConfigFragment{
     Table table = new Table();
-    Building configTile;
+    Building selected;
 
-    @Override
     public void build(Group parent){
         table.visible = false;
         parent.addChild(table);
 
-        //hacky way to hide block config when in menu
-        //TODO remove?
-        Core.scene.add(new Element(){
-            @Override
-            public void act(float delta){
-                super.act(delta);
-                if(state.isMenu()){
-                    table.visible = false;
-                    configTile = null;
-                }
-            }
-        });
+        Events.on(ResetEvent.class, e -> forceHide());
+    }
 
-        Events.on(ResetEvent.class, e -> {
-            table.visible = false;
-            configTile = null;
-        });
+    public void forceHide(){
+        table.visible = false;
+        selected = null;
     }
 
     public boolean isShown(){
-        return table.visible && configTile != null;
+        return table.visible && selected != null;
     }
 
-    public Building getSelectedTile(){
-        return configTile;
+    public Building getSelected(){
+        return selected;
     }
 
     public void showConfig(Building tile){
-        if(configTile != null) configTile.onConfigureClosed();
+        if(selected != null) selected.onConfigureClosed();
         if(tile.configTapped()){
-            configTile = tile;
+            selected = tile;
 
             table.visible = true;
             table.clear();
@@ -62,16 +50,16 @@ public class BlockConfigFragment extends Fragment{
             Actions.scaleTo(1f, 1f, 0.07f, Interp.pow3Out));
 
             table.update(() -> {
-                if(configTile != null && configTile.shouldHideConfigure(player)){
+                if(selected != null && selected.shouldHideConfigure(player)){
                     hideConfig();
                     return;
                 }
 
                 table.setOrigin(Align.center);
-                if(configTile == null || configTile.block == Blocks.air || !configTile.isValid()){
+                if(selected == null || selected.block == Blocks.air || !selected.isValid()){
                     hideConfig();
                 }else{
-                    configTile.updateTableAlign(table);
+                    selected.updateTableAlign(table);
                 }
             });
         }
@@ -83,8 +71,8 @@ public class BlockConfigFragment extends Fragment{
     }
 
     public void hideConfig(){
-        if(configTile != null) configTile.onConfigureClosed();
-        configTile = null;
+        if(selected != null) selected.onConfigureClosed();
+        selected = null;
         table.actions(Actions.scaleTo(0f, 1f, 0.06f, Interp.pow3Out), Actions.visible(false));
     }
 }

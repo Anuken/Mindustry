@@ -3,6 +3,7 @@ package mindustry.world.blocks.environment;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
+import mindustry.gen.*;
 import mindustry.world.*;
 
 public class WobbleProp extends Prop{
@@ -10,6 +11,7 @@ public class WobbleProp extends Prop{
 
     public WobbleProp(String name){
         super(name);
+        breakSound = Sounds.plantBreak;
     }
 
     @Override

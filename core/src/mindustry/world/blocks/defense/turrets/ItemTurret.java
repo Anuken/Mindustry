@@ -1,6 +1,7 @@
 package mindustry.world.blocks.defense.turrets;
 
 import arc.*;
+import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.io.*;
@@ -32,15 +33,16 @@ public class ItemTurret extends Turret{
 
     /** Makes copies of all bullets and limits their range. */
     public void limitRange(){
-        limitRange(1f);
+        limitRange(9f);
     }
 
     /** Makes copies of all bullets and limits their range. */
     public void limitRange(float margin){
         for(var entry : ammoTypes.copy().entries()){
-            var copy = entry.value.copy();
-            copy.lifetime = (range + margin) / copy.speed;
-            ammoTypes.put(entry.key, copy);
+            var bullet = entry.value;
+            float realRange = bullet.rangeChange + range;
+            //doesn't handle drag
+            bullet.lifetime = (realRange + margin) / bullet.speed;
         }
     }
 
@@ -54,20 +56,21 @@ public class ItemTurret extends Turret{
 
     @Override
     public void init(){
-        consumes.add(new ConsumeItemFilter(i -> ammoTypes.containsKey(i)){
+        consume(new ConsumeItemFilter(i -> ammoTypes.containsKey(i)){
             @Override
-            public void build(Building tile, Table table){
+            public void build(Building build, Table table){
                 MultiReqImage image = new MultiReqImage();
-                content.items().each(i -> filter.get(i) && i.unlockedNow(), item -> image.add(new ReqImage(new ItemImage(item.uiIcon),
-                () -> tile instanceof ItemTurretBuild it && !it.ammo.isEmpty() && ((ItemEntry)it.ammo.peek()).item == item)));
+                content.items().each(i -> filter.get(i) && i.unlockedNow(),
+                item -> image.add(new ReqImage(new Image(item.uiIcon),
+                () -> build instanceof ItemTurretBuild it && !it.ammo.isEmpty() && ((ItemEntry)it.ammo.peek()).item == item)));
 
                 table.add(image).size(8 * 4);
             }
 
             @Override
-            public boolean valid(Building entity){
+            public float efficiency(Building build){
                 //valid when there's any ammo in the turret
-                return entity instanceof ItemTurretBuild it && !it.ammo.isEmpty();
+                return build instanceof ItemTurretBuild it && !it.ammo.isEmpty() ? 1f : 0f;
             }
 
             @Override
@@ -130,6 +133,7 @@ public class ItemTurret extends Turret{
 
         @Override
         public void handleItem(Building source, Item item){
+            //TODO instead of all this "entry" crap, turrets could just accept only one type of ammo at a time - simpler for both users and the code
 
             if(item == Items.pyratite){
                 Events.fire(Trigger.flameAmmo);
@@ -206,6 +210,14 @@ public class ItemTurret extends Turret{
         @Override
         public BulletType type(){
             return ammoTypes.get(item);
+        }
+
+        @Override
+        public String toString(){
+            return "ItemEntry{" +
+            "item=" + item +
+            ", amount=" + amount +
+            '}';
         }
     }
 }

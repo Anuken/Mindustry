@@ -87,7 +87,7 @@ public class MessageBlock extends Block{
 
         @Override
         public void buildConfiguration(Table table){
-            table.button(Icon.pencil, () -> {
+            table.button(Icon.pencil, Styles.cleari, () -> {
                 if(mobile){
                     Core.input.getTextInput(new TextInput(){{
                         text = message.toString();
@@ -114,6 +114,8 @@ public class MessageBlock extends Block{
                         return true;
                     });
                     a.setMaxLength(maxTextLength);
+                    dialog.cont.row();
+                    dialog.cont.label(() -> a.getText().length() + " / " + maxTextLength).color(Color.lightGray);
                     dialog.buttons.button("@ok", () -> {
                         if(!a.getText().equals(message.toString())) configure(a.getText());
                         dialog.hide();
@@ -123,10 +125,21 @@ public class MessageBlock extends Block{
                             dialog.hide();
                         }
                     });
+                    dialog.closeOnBack();
                     dialog.show();
                 }
                 deselect();
             }).size(40f);
+        }
+
+        @Override
+        public boolean onConfigureBuildTapped(Building other){
+            if(this == other){
+                deselect();
+                return false;
+            }
+
+            return true;
         }
 
         @Override

@@ -7,7 +7,6 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
 import mindustry.game.EventType.*;
-import mindustry.io.legacy.*;
 import mindustry.io.versions.*;
 import mindustry.world.*;
 
@@ -21,7 +20,7 @@ public class SaveIO{
     /** Save format header. */
     public static final byte[] header = {'M', 'S', 'A', 'V'};
     public static final IntMap<SaveVersion> versions = new IntMap<>();
-    public static final Seq<SaveVersion> versionArray = Seq.with(new Save1(), new Save2(), new Save3(), new Save4(), new Save5());
+    public static final Seq<SaveVersion> versionArray = Seq.with(new Save1(), new Save2(), new Save3(), new Save4(), new Save5(), new Save6(), new Save7());
 
     static{
         for(SaveVersion version : versionArray){
@@ -87,7 +86,11 @@ public class SaveIO{
         try{
             readHeader(stream);
             int version = stream.readInt();
-            SaveMeta meta = versions.get(version).getMeta(stream);
+            SaveVersion ver = versions.get(version);
+
+            if(ver == null) throw new IOException("Unknown save version: " + version + ". Are you trying to load a save from a newer version?");
+
+            SaveMeta meta = ver.getMeta(stream);
             stream.close();
             return meta;
         }catch(IOException e){
@@ -159,8 +162,10 @@ public class SaveIO{
             int version = stream.readInt();
             SaveVersion ver = versions.get(version);
 
+            if(ver == null) throw new IOException("Unknown save version: " + version + ". Are you trying to load a save from a newer version?");
+
             ver.read(stream, counter, context);
-            Events.fire(new SaveLoadEvent());
+            Events.fire(new SaveLoadEvent(context.isMap()));
         }catch(Throwable e){
             throw new SaveException(e);
         }finally{

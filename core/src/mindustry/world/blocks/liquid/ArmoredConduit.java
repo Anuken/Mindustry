@@ -3,6 +3,7 @@ package mindustry.world.blocks.liquid;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.distribution.*;
 
 public class ArmoredConduit extends Conduit{
 
@@ -20,7 +21,7 @@ public class ArmoredConduit extends Conduit{
     public class ArmoredConduitBuild extends ConduitBuild{
         @Override
         public boolean acceptLiquid(Building source, Liquid liquid){
-            return super.acceptLiquid(source, liquid) && (tile == null || source.block instanceof Conduit ||
+            return super.acceptLiquid(source, liquid) && (tile == null || source.block instanceof Conduit || source.block instanceof DirectionLiquidBridge ||
                 source.tile.absoluteRelativeTo(tile.x, tile.y) == rotation);
         }
     }

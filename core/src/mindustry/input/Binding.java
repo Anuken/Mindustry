@@ -12,6 +12,7 @@ public enum Binding implements KeyBind{
     pan(KeyCode.mouseForward),
 
     boost(KeyCode.shiftLeft),
+    command_mode(KeyCode.shiftLeft),
     control(KeyCode.controlLeft),
     respawn(KeyCode.v),
     select(KeyCode.mouseLeft),
@@ -20,8 +21,6 @@ public enum Binding implements KeyBind{
 
     pickupCargo(KeyCode.leftBracket),
     dropCargo(KeyCode.rightBracket),
-
-    command(KeyCode.g),
 
     clear_building(KeyCode.q),
     pause_building(KeyCode.e),

@@ -3,6 +3,7 @@ package mindustry.maps.generators;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.struct.ObjectIntMap.*;
+import arc.util.*;
 import arc.util.noise.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
@@ -16,8 +17,11 @@ import mindustry.world.*;
 import static mindustry.Vars.*;
 
 public abstract class PlanetGenerator extends BasicGenerator implements HexMesher{
+    public int baseSeed = 0;
+    public int seed = 0;
+
     protected IntSeq ints = new IntSeq();
-    protected Sector sector;
+    protected @Nullable Sector sector;
 
     /** Should generate sector bases for a planet. */
     public void generateSector(Sector sector){
@@ -47,6 +51,11 @@ public abstract class PlanetGenerator extends BasicGenerator implements HexMeshe
         if(any){
             sector.generateEnemyBase = true;
         }
+    }
+
+    /** @return whether to allow landing on the specified procedural sector */
+    public boolean allowLanding(Sector sector){
+        return sector.hasBase() || sector.near().contains(Sector::hasBase);
     }
 
     public void addWeather(Sector sector, Rules rules){
@@ -128,19 +137,24 @@ public abstract class PlanetGenerator extends BasicGenerator implements HexMeshe
         return res % 2 == 0 ? res : res + 1;
     }
 
-    public void generate(Tiles tiles, Sector sec){
+    public void generate(Tiles tiles, Sector sec, int seed){
         this.tiles = tiles;
+        this.seed = seed + baseSeed;
         this.sector = sec;
-        this.rand.setSeed(sec.id);
+        this.width = tiles.width;
+        this.height = tiles.height;
+        this.rand.setSeed(sec.id + seed + baseSeed);
 
         TileGen gen = new TileGen();
-        tiles.each((x, y) -> {
-            gen.reset();
-            Vec3 position = sector.rect.project(x / (float)tiles.width, y / (float)tiles.height);
+        for(int y = 0; y < height; y++){
+            for(int x = 0; x < width; x++){
+                gen.reset();
+                Vec3 position = sector.rect.project(x / (float)tiles.width, y / (float)tiles.height);
 
-            genTile(position, gen);
-            tiles.set(x, y, new Tile(x, y, gen.floor, gen.overlay, gen.block));
-        });
+                genTile(position, gen);
+                tiles.set(x, y, new Tile(x, y, gen.floor, gen.overlay, gen.block));
+            }
+        }
 
         generate(tiles);
     }

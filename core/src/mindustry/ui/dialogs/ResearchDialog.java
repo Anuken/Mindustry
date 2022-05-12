@@ -11,6 +11,7 @@ import arc.scene.actions.*;
 import arc.scene.event.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
+import arc.scene.ui.TextButton.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
@@ -30,27 +31,88 @@ import mindustry.ui.layout.TreeLayout.*;
 import java.util.*;
 
 import static mindustry.Vars.*;
+import static mindustry.gen.Tex.*;
 
 public class ResearchDialog extends BaseDialog{
+    public static boolean debugShowRequirements = false;
+
     public final float nodeSize = Scl.scl(60f);
     public ObjectSet<TechTreeNode> nodes = new ObjectSet<>();
-    public TechTreeNode root = new TechTreeNode(TechTree.root, null);
+    public TechTreeNode root = new TechTreeNode(TechTree.roots.first(), null);
+    public TechNode lastNode = root.node;
     public Rect bounds = new Rect();
     public ItemsDisplay itemDisplay;
     public View view;
 
     public ItemSeq items;
 
+    private boolean showTechSelect;
+
     public ResearchDialog(){
         super("");
 
         titleTable.remove();
+        titleTable.clear();
+        titleTable.top();
+        titleTable.button(b -> {
+            //TODO custom icon here.
+            b.imageDraw(() -> root.node.icon()).padRight(8).size(iconMed);
+            b.add().growX();
+            b.label(() -> root.node.localizedName()).color(Pal.accent);
+            b.add().growX();
+            b.add().size(iconMed);
+        }, () -> {
+            new BaseDialog("@techtree.select"){{
+                cont.pane(t -> {
+                    t.table(Tex.button, in -> {
+                        in.defaults().width(300f).height(60f);
+                        for(TechNode node : TechTree.roots){
+                            if(node.requiresUnlock && !node.content.unlocked() && node != getPrefRoot()) continue;
+
+                            //TODO toggle
+                            in.button(node.localizedName(), node.icon(), Styles.flatTogglet, iconMed, () -> {
+                                if(node == lastNode){
+                                    return;
+                                }
+
+                                rebuildTree(node);
+                                hide();
+                            }).marginLeft(12f).checked(node == lastNode).row();
+                        }
+                    });
+                });
+
+                addCloseButton();
+            }}.show();
+        }).visible(() -> showTechSelect = TechTree.roots.count(node -> !(node.requiresUnlock && !node.content.unlocked())) > 1).minWidth(300f);
+
         margin(0f).marginBottom(8);
-        cont.stack(view = new View(), itemDisplay = new ItemsDisplay()).grow();
+        cont.stack(titleTable, view = new View(), itemDisplay = new ItemsDisplay()).grow();
+
+        titleTable.toFront();
 
         shouldPause = true;
 
+        Runnable checkMargin = () -> {
+            if(Core.graphics.isPortrait() && showTechSelect){
+                itemDisplay.marginTop(60f);
+            }else{
+                itemDisplay.marginTop(0f);
+            }
+        };
+
+        onResize(checkMargin);
+
         shown(() -> {
+            checkMargin.run();
+
+            Planet currPlanet = ui.planet.isShown() ?
+                ui.planet.state.planet :
+                state.isCampaign() ? state.rules.sector.planet : null;
+
+            if(currPlanet != null && currPlanet.techTree != null){
+                switchTree(currPlanet.techTree);
+            }
 
             items = new ItemSeq(){
                 //store sector item amounts for modifications
@@ -175,6 +237,35 @@ public class ResearchDialog extends BaseDialog{
         });
     }
 
+    public @Nullable TechNode getPrefRoot(){
+        Planet currPlanet = ui.planet.isShown() ?
+            ui.planet.state.planet :
+            state.isCampaign() ? state.rules.sector.planet : null;
+        return currPlanet == null ? null : currPlanet.techTree;
+    }
+
+    public void switchTree(TechNode node){
+        if(lastNode == node || node == null) return;
+        nodes.clear();
+        root = new TechTreeNode(node, null);
+        lastNode = node;
+        view.rebuildAll();
+    }
+
+    public void rebuildTree(TechNode node){
+        switchTree(node);
+        view.panX = 0f;
+        view.panY = -200f;
+        view.setScale(1f);
+
+        view.hoverNode = null;
+        view.infoTable.remove();
+        view.infoTable.clear();
+
+        checkNodes(root);
+        treeLayout();
+    }
+
     void treeLayout(){
         float spacing = 20f;
         LayoutNode node = new LayoutNode(root, null);
@@ -236,10 +327,10 @@ public class ResearchDialog extends BaseDialog{
 
     void checkNodes(TechTreeNode node){
         boolean locked = locked(node.node);
-        if(!locked) node.visible = true;
+        if(!locked && (node.parent == null || node.parent.visible)) node.visible = true;
         node.selectable = selectable(node.node);
         for(TechTreeNode l : node.children){
-            l.visible = !locked;
+            l.visible = !locked && l.parent.visible;
             checkNodes(l);
         }
 
@@ -292,6 +383,13 @@ public class ResearchDialog extends BaseDialog{
         public Table infoTable = new Table();
 
         {
+            rebuildAll();
+        }
+
+        public void rebuildAll(){
+            clear();
+            hoverNode = null;
+            infoTable.clear();
             infoTable.touchable = Touchable.enabled;
 
             for(TechTreeNode node : nodes){
@@ -483,14 +581,14 @@ public class ResearchDialog extends BaseDialog{
                 b.margin(0).left().defaults().left();
 
                 if(selectable && (node.content.description != null || node.content.stats.toMap().size > 0)){
-                    b.button(Icon.info, Styles.cleari, () -> ui.content.show(node.content)).growY().width(50f);
+                    b.button(Icon.info, Styles.flati, () -> ui.content.show(node.content)).growY().width(50f);
                 }
                 b.add().grow();
                 b.table(desc -> {
                     desc.left().defaults().left();
                     desc.add(selectable ? node.content.localizedName : "[accent]???");
                     desc.row();
-                    if(locked(node)){
+                    if(locked(node) || debugShowRequirements){
 
                         desc.table(t -> {
                             t.left();
@@ -524,11 +622,11 @@ public class ResearchDialog extends BaseDialog{
                                     ItemStack completed = node.finishedRequirements[i];
 
                                     //skip finished stacks
-                                    if(req.amount <= completed.amount) continue;
+                                    if(req.amount <= completed.amount && !debugShowRequirements) continue;
                                     boolean shiny = shine != null && shine[i];
 
                                     t.table(list -> {
-                                        int reqAmount = req.amount - completed.amount;
+                                        int reqAmount = debugShowRequirements ? req.amount : req.amount - completed.amount;
 
                                         list.left();
                                         list.image(req.item.uiIcon).size(8 * 3).padRight(3);
@@ -571,7 +669,14 @@ public class ResearchDialog extends BaseDialog{
 
                 if(mobile && locked(node)){
                     b.row();
-                    b.button("@research", Icon.ok, Styles.nodet, () -> spend(node))
+                    b.button("@research", Icon.ok, new TextButtonStyle(){{
+                        disabled = Tex.button;
+                        font = Fonts.def;
+                        fontColor = Color.white;
+                        disabledFontColor = Color.gray;
+                        up = buttonOver;
+                        over = buttonDown;
+                    }}, () -> spend(node))
                     .disabled(i -> !canSpend(node)).growX().height(44f).colspan(3);
                 }
             });

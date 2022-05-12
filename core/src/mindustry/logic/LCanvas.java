@@ -20,17 +20,19 @@ import mindustry.logic.LStatements.*;
 import mindustry.ui.*;
 
 public class LCanvas extends Table{
-    public static final int maxJumpsDrawn = 1000; // TODO Does nothing
+    public static final int maxJumpsDrawn = 100;
     //ew static variables
     static LCanvas canvas;
 
     public DragLayout statements;
     public ScrollPane pane;
     public Group jumps;
+
     StatementElem dragging;
     StatementElem hovered;
     float targetWidth;
     int jumpCount = 0;
+    boolean privileged;
     Seq<Tooltip> tooltips = new Seq<>();
 
     public LCanvas(){
@@ -104,23 +106,14 @@ public class LCanvas extends Table{
         clear();
 
         statements = new DragLayout();
-        jumps = new WidgetGroup(){
-            @Override
-            public void layout(){
-                cullable = false; //culling while scrolling results in weirdness
-                getChildren().each(h -> {
-                    if(!(h instanceof JumpCurve c)) return;
-                    c.setSize(width, c.getPrefHeight());
-                    c.setPosition(c.button.x + c.button.getWidth()/2f, c.py);
-                });
-                cullable = true;
-            }
-        };
+        jumps = new WidgetGroup();
 
         pane = pane(t -> {
             t.center();
             t.add(statements).pad(2f).center().width(targetWidth);
-            t.add(jumps).growY().width(100f).growY();
+            t.addChild(jumps);
+
+            jumps.cullable = false;
         }).grow().get();
         pane.setFlickScroll(false);
 
@@ -155,7 +148,7 @@ public class LCanvas extends Table{
     public void load(String asm){
         jumps.clear();
 
-        Seq<LStatement> statements = LAssembler.read(asm);
+        Seq<LStatement> statements = LAssembler.read(asm, privileged);
         statements.truncate(LExecutor.maxInstructions);
         this.statements.clearChildren();
         for(LStatement st : statements){
@@ -167,7 +160,6 @@ public class LCanvas extends Table{
         }
 
         this.statements.layout();
-        jumps.layout();
     }
 
     StatementElem checkHovered(){
@@ -195,17 +187,21 @@ public class LCanvas extends Table{
                 pane.setScrollY(pane.getScrollY() + sign * Scl.scl(15f) * Time.delta);
             }
         }
-
-        pane.scrolled(f -> jumps.layout()); //don't ask why this is needed, it just is
     }
 
     public class DragLayout extends WidgetGroup{
         float space = Scl.scl(10f), prefWidth, prefHeight;
         Seq<Element> seq = new Seq<>();
         int insertPosition = 0;
+        boolean invalidated;
+
+        {
+            setTransform(true);
+        }
 
         @Override
         public void layout(){
+            invalidated = true;
             float cy = 0;
             seq.clear();
 
@@ -253,9 +249,10 @@ public class LCanvas extends Table{
                 }
             }
 
-            if(parent instanceof Table){
+            invalidateHierarchy();
+
+            if(parent != null && parent instanceof Table){
                 setCullingArea(parent.getCullingArea());
-                jumps.setCullingArea(parent.getCullingArea());
             }
         }
 
@@ -282,7 +279,16 @@ public class LCanvas extends Table{
                 Tex.pane.draw(lastX, lastY - shiftAmount, width, dragging.getHeight());
             }
 
+            if(invalidated){
+                children.each(c -> c.cullable = false);
+            }
+
             super.draw();
+
+            if(invalidated){
+                children.each(c -> c.cullable = true);
+                invalidated = false;
+            }
         }
 
         void finishLayout(){
@@ -446,7 +452,9 @@ public class LCanvas extends Table{
         public JumpCurve curve;
 
         public JumpButton(Prov<StatementElem> getter, Cons<StatementElem> setter){
-            super(Tex.logicNode, Styles.colori);
+            super(Tex.logicNode, new ImageButtonStyle(){{
+                imageUpColor = Color.white;
+            }});
 
             to = getter;
             addListener(listener = new ClickListener());
@@ -507,15 +515,9 @@ public class LCanvas extends Table{
 
     public static class JumpCurve extends Element{
         public JumpButton button;
-        float ph, py;
 
         public JumpCurve(JumpButton button){
             this.button = button;
-        }
-
-        @Override
-        public float getPrefHeight(){
-            return ph;
         }
 
         @Override
@@ -536,6 +538,7 @@ public class LCanvas extends Table{
             }
 
             Element hover = button.to.get() == null && button.selecting ? canvas.hovered : button.to.get();
+            boolean draw = false;
             Vec2 t = Tmp.v1, r = Tmp.v2;
 
             Group desc = canvas.pane;
@@ -544,25 +547,26 @@ public class LCanvas extends Table{
 
             if(hover != null){
                 hover.localToAscendantCoordinates(desc, t.set(hover.getWidth(), hover.getHeight()/2f));
+
+                draw = true;
             }else if(button.selecting){
                 t.set(r).add(button.mx, button.my);
-            }else{
-                return;
+                draw = true;
             }
 
-            ph = Math.abs(t.y - r.y);
-            py = Math.min(t.y, r.y);
-
             float offset = canvas.pane.getVisualScrollY() - canvas.pane.getMaxY();
+
             t.y += offset;
             r.y += offset;
 
-            drawCurve(r.x + button.getWidth()/2f, r.y + button.getHeight()/2f, t.x, t.y);
+            if(draw){
+                drawCurve(r.x + button.getWidth()/2f, r.y + button.getHeight()/2f, t.x, t.y);
 
-            float s = button.getWidth();
-            Draw.color(button.color);
-            Tex.logicNode.draw(t.x + s*0.75f, t.y - s/2f, -s, s);
-            Draw.reset();
+                float s = button.getWidth();
+                Draw.color(button.color);
+                Tex.logicNode.draw(t.x + s*0.75f, t.y - s/2f, -s, s);
+                Draw.reset();
+            }
         }
 
         public void drawCurve(float x, float y, float x2, float y2){

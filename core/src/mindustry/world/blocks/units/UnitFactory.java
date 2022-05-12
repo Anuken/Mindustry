@@ -4,6 +4,7 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.scene.style.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
@@ -15,6 +16,7 @@ import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -35,23 +37,30 @@ public class UnitFactory extends UnitBlock{
         hasItems = true;
         solid = true;
         configurable = true;
+        clearOnDoubleTap = true;
         outputsPayload = true;
         rotate = true;
+        regionRotated1 = 1;
+        commandable = true;
 
         config(Integer.class, (UnitFactoryBuild tile, Integer i) -> {
+            if(!configurable) return;
+
             if(tile.currentPlan == i) return;
             tile.currentPlan = i < 0 || i >= plans.size ? -1 : i;
             tile.progress = 0;
         });
 
         config(UnitType.class, (UnitFactoryBuild tile, UnitType val) -> {
+            if(!configurable) return;
+
             int next = plans.indexOf(p -> p.unit == val);
             if(tile.currentPlan == next) return;
             tile.currentPlan = next;
             tile.progress = 0;
         });
 
-        consumes.add(new ConsumeItemDynamic((UnitFactoryBuild e) -> e.currentPlan != -1 ? plans.get(e.currentPlan).requirements : ItemStack.empty));
+        consume(new ConsumeItemDynamic((UnitFactoryBuild e) -> e.currentPlan != -1 ? plans.get(e.currentPlan).requirements : ItemStack.empty));
     }
 
     @Override
@@ -70,9 +79,9 @@ public class UnitFactory extends UnitBlock{
     @Override
     public void setBars(){
         super.setBars();
-        bars.add("progress", (UnitFactoryBuild e) -> new Bar("bar.progress", Pal.ammo, e::fraction));
+        addBar("progress", (UnitFactoryBuild e) -> new Bar("bar.progress", Pal.ammo, e::fraction));
 
-        bars.add("units", (UnitFactoryBuild e) ->
+        addBar("units", (UnitFactoryBuild e) ->
         new Bar(
             () -> e.unit() == null ? "[lightgray]" + Iconc.cancel :
                 Core.bundle.format("bar.unitcap",
@@ -116,10 +125,10 @@ public class UnitFactory extends UnitBlock{
     }
 
     @Override
-    public void drawRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
-        Draw.rect(region, req.drawx(), req.drawy());
-        Draw.rect(outRegion, req.drawx(), req.drawy(), req.rotation * 90);
-        Draw.rect(topRegion, req.drawx(), req.drawy());
+    public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
+        Draw.rect(region, plan.drawx(), plan.drawy());
+        Draw.rect(outRegion, plan.drawx(), plan.drawy(), plan.rotation * 90);
+        Draw.rect(topRegion, plan.drawx(), plan.drawy());
     }
 
     public static class UnitPlan{
@@ -137,10 +146,21 @@ public class UnitFactory extends UnitBlock{
     }
 
     public class UnitFactoryBuild extends UnitBuild{
+        public @Nullable Vec2 commandPos;
         public int currentPlan = -1;
 
         public float fraction(){
             return currentPlan == -1 ? 0 : progress / plans.get(currentPlan).time;
+        }
+
+        @Override
+        public Vec2 getCommandPosition(){
+            return commandPos;
+        }
+
+        @Override
+        public void onCommand(Vec2 target){
+            commandPos = target;
         }
 
         @Override
@@ -164,17 +184,6 @@ public class UnitFactory extends UnitBlock{
             }else{
                 table.table(Styles.black3, t -> t.add("@none").color(Color.lightGray));
             }
-        }
-
-        @Override
-        public boolean onConfigureTileTapped(Building other){
-            if(this == other){
-                deselect();
-                configure(null);
-                return false;
-            }
-
-            return true;
         }
 
         @Override
@@ -227,11 +236,15 @@ public class UnitFactory extends UnitBlock{
 
         @Override
         public void updateTile(){
+            if(!configurable){
+                currentPlan = 0;
+            }
+
             if(currentPlan < 0 || currentPlan >= plans.size){
                 currentPlan = -1;
             }
 
-            if(consValid() && currentPlan != -1){
+            if(efficiency > 0 && currentPlan != -1){
                 time += edelta() * speedScl * Vars.state.rules.unitBuildSpeed(team);
                 progress += edelta() * Vars.state.rules.unitBuildSpeed(team);
                 speedScl = Mathf.lerpDelta(speedScl, 1f, 0.05f);
@@ -250,10 +263,14 @@ public class UnitFactory extends UnitBlock{
                     return;
                 }
 
-                if(progress >= plan.time && consValid()){
+                if(progress >= plan.time){
                     progress %= 1f;
 
-                    payload = new UnitPayload(plan.unit.create(team));
+                    Unit unit = plan.unit.create(team);
+                    if(commandPos != null && unit.isCommandable()){
+                        unit.command().commandPosition(commandPos);
+                    }
+                    payload = new UnitPayload(unit);
                     payVector.setZero();
                     consume();
                     Events.fire(new UnitCreateEvent(payload.unit, this));
@@ -288,7 +305,7 @@ public class UnitFactory extends UnitBlock{
 
         @Override
         public byte version(){
-            return 1;
+            return 2;
         }
 
         @Override
@@ -296,6 +313,7 @@ public class UnitFactory extends UnitBlock{
             super.write(write);
             write.f(progress);
             write.s(currentPlan);
+            TypeIO.writeVecNullable(write, commandPos);
         }
 
         @Override
@@ -303,6 +321,9 @@ public class UnitFactory extends UnitBlock{
             super.read(read, revision);
             progress = read.f();
             currentPlan = read.s();
+            if(revision >= 2){
+                commandPos = TypeIO.readVecNullable(read);
+            }
         }
     }
 }

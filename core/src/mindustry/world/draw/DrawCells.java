@@ -5,24 +5,21 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
-import mindustry.world.blocks.production.GenericCrafter.*;
 
 public class DrawCells extends DrawBlock{
-    public TextureRegion bottom, middle;
+    public TextureRegion middle;
     public Color color = Color.white.cpy(), particleColorFrom = Color.black.cpy(), particleColorTo = Color.black.cpy();
     public int particles = 12;
     public float range = 4f, recurrence = 6f, radius = 3f, lifetime = 60f;
 
     @Override
-    public void draw(GenericCrafterBuild build){
+    public void draw(Building build){
+        Drawf.liquid(middle, build.x, build.y, build.warmup(), color);
 
-        Draw.rect(bottom, build.x, build.y);
-
-        Drawf.liquid(middle, build.x, build.y, build.warmup, color);
-
-        if(build.warmup > 0.001f){
+        if(build.warmup() > 0.001f){
             rand.setSeed(build.id);
             for(int i = 0; i < particles; i++){
                 float offset = rand.nextFloat() * 999999f;
@@ -33,7 +30,7 @@ public class DrawCells extends DrawBlock{
 
                 if(fin > 0){
                     Draw.color(particleColorFrom, particleColorTo, ca);
-                    Draw.alpha(build.warmup);
+                    Draw.alpha(build.warmup());
 
                     Fill.circle(build.x + x, build.y + y, fslope * radius);
                 }
@@ -46,12 +43,6 @@ public class DrawCells extends DrawBlock{
 
     @Override
     public void load(Block block){
-        bottom = Core.atlas.find(block.name + "-bottom");
         middle = Core.atlas.find(block.name + "-middle");
-    }
-
-    @Override
-    public TextureRegion[] icons(Block block){
-        return new TextureRegion[]{bottom, block.region};
     }
 }

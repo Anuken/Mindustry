@@ -38,7 +38,7 @@ public class ConstructBlock extends Block{
         super("build" + size);
         this.size = size;
         update = true;
-        health = 20;
+        health = 10;
         consumesTap = true;
         solidifes = true;
         inEditor = false;
@@ -55,10 +55,12 @@ public class ConstructBlock extends Block{
     @Remote(called = Loc.server)
     public static void deconstructFinish(Tile tile, Block block, Unit builder){
         Team team = tile.team();
-        block.breakEffect.at(tile.drawx(), tile.drawy(), block.size, block.mapColor);
+        if(fogControl.isVisibleTile(team, tile.x, tile.y)){
+            block.breakEffect.at(tile.drawx(), tile.drawy(), block.size, block.mapColor);
+            if(shouldPlay()) block.breakSound.at(tile, block.breakPitchChange ? calcPitch(false) : 1f);
+        }
         Events.fire(new BlockBuildEndEvent(tile, builder, team, true, null));
         tile.remove();
-        if(shouldPlay()) block.breakSound.at(tile, block.breakPitchChange ? calcPitch(false) : 1f);
     }
 
     @Remote(called = Loc.server)
@@ -96,8 +98,10 @@ public class ConstructBlock extends Block{
             tile.build.playerPlaced(config);
         }
 
-        Fx.placeBlock.at(tile.drawx(), tile.drawy(), block.size);
-        if(shouldPlay()) block.placeSound.at(tile, block.placePitchChange ? calcPitch(true) : 1f);
+        if(fogControl.isVisibleTile(team, tile.x, tile.y)){
+            Fx.placeBlock.at(tile.drawx(), tile.drawy(), block.size);
+            if(shouldPlay()) block.placeSound.at(tile, block.placePitchChange ? calcPitch(true) : 1f);
+        }
 
         Events.fire(new BlockBuildEndEvent(tile, builder, team, false, config));
     }
@@ -224,14 +228,17 @@ public class ConstructBlock extends Block{
 
             Draw.draw(Layer.blockBuilding, () -> {
                 Draw.color(Pal.accent, Pal.remove, constructColor);
+                boolean noOverrides = current.regionRotated1 == -1 && current.regionRotated2 == -1;
+                int i = 0;
 
                 for(TextureRegion region : current.getGeneratedIcons()){
                     Shaders.blockbuild.region = region;
                     Shaders.blockbuild.time = Time.time;
                     Shaders.blockbuild.progress = progress;
 
-                    Draw.rect(region, x, y, current.rotate ? rotdeg() : 0);
+                    Draw.rect(region, x, y, current.rotate && (noOverrides || current.regionRotated2 == i || current.regionRotated1 == i) ? rotdeg() : 0);
                     Draw.flush();
+                    i ++;
                 }
 
                 Draw.color();

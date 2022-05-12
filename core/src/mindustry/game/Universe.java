@@ -120,7 +120,7 @@ public class Universe{
     }
 
     public Schematic getLastLoadout(){
-        if(lastLoadout == null) lastLoadout = Loadouts.basicShard;
+        if(lastLoadout == null) lastLoadout = state.rules.sector == null || state.rules.sector.planet.generator == null ? Loadouts.basicShard : state.rules.sector.planet.generator.getDefaultLoadout();
         return lastLoadout;
     }
 
@@ -163,7 +163,7 @@ public class Universe{
                     //export to another sector
                     if(sector.info.destination != null){
                         Sector to = sector.info.destination;
-                        if(to.hasBase()){
+                        if(to.hasBase() && to.planet == planet){
                             ItemSeq items = new ItemSeq();
                             //calculated exported items to this sector
                             sector.info.export.each((item, stat) -> items.add(item, (int)(stat.mean * newSecondsPassed * sector.getProductionScale())));
@@ -194,7 +194,7 @@ public class Universe{
                         }
 
                         int wavesPassed = (int)(sector.info.secondsPassed*60f / sector.info.waveSpacing);
-                        boolean attacked = sector.info.waves;
+                        boolean attacked = sector.info.waves && sector.planet.allowWaveSimulation;
 
                         if(attacked){
                             sector.info.wavesPassed = wavesPassed;
@@ -243,7 +243,7 @@ public class Universe{
                     }
 
                     //queue random invasions
-                    if(!sector.isAttacked() && sector.info.minutesCaptured > invasionGracePeriod && sector.info.hasSpawns){
+                    if(!sector.isAttacked() && sector.planet.allowSectorInvasion && sector.info.minutesCaptured > invasionGracePeriod && sector.info.hasSpawns){
                         int count = sector.near().count(Sector::hasEnemyBase);
 
                         //invasion chance depends on # of nearby bases

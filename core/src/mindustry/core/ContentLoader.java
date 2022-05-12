@@ -30,42 +30,29 @@ public class ContentLoader{
     private @Nullable LoadedMod currentMod;
     private @Nullable Content lastAdded;
     private ObjectSet<Cons<Content>> initialization = new ObjectSet<>();
-    private ContentList[] content = {
-        new Items(),
-        new StatusEffects(),
-        new Liquids(),
-        new Bullets(),
-        new UnitTypes(),
-        new Blocks(),
-        new Loadouts(),
-        new Weathers(),
-        new Planets(),
-        new SectorPresets(),
-        new TechTree(),
-    };
 
     public ContentLoader(){
-        clear();
-    }
-
-    /** Clears all initialized content. */
-    public void clear(){
-        contentNameMap = new ObjectMap[ContentType.all.length];
-        contentMap = new Seq[ContentType.all.length];
-        initialization = new ObjectSet<>();
-
         for(ContentType type : ContentType.all){
             contentMap[type.ordinal()] = new Seq<>();
             contentNameMap[type.ordinal()] = new ObjectMap<>();
         }
     }
 
-
     /** Creates all base types. */
     public void createBaseContent(){
-        for(ContentList list : content){
-            list.load();
-        }
+        TeamEntries.load();
+        Items.load();
+        StatusEffects.load();
+        Liquids.load();
+        Bullets.load();
+        UnitTypes.load();
+        Blocks.load();
+        Loadouts.load();
+        Weathers.load();
+        Planets.load();
+        SectorPresets.load();
+        SerpuloTechTree.load();
+        ErekirTechTree.load();
     }
 
     /** Creates mod content, if applicable. */
@@ -98,7 +85,7 @@ public class ContentLoader{
     /** Calls Content#init() on everything. Use only after all modules have been created. */
     public void init(){
         initialize(Content::init);
-        if(constants != null) constants.init();
+        if(logicVars != null) logicVars.init();
         Events.fire(new ContentInitEvent());
     }
 

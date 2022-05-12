@@ -8,7 +8,6 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
-import arc.util.async.*;
 import mindustry.ai.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
@@ -18,7 +17,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.maps.*;
 import mindustry.mod.*;
-import mindustry.net.Net;
+import mindustry.net.*;
 import mindustry.ui.*;
 
 import static arc.Core.*;
@@ -76,6 +75,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         assets.load("sprites/error.png", Texture.class);
         atlas = TextureAtlas.blankAtlas();
         Vars.net = new Net(platform.getNet());
+        MapPreviewLoader.setupLoaders();
         mods = new Mods();
         schematics = new Schematics();
 
@@ -152,16 +152,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
                 }
                 mods.eachClass(Mod::init);
                 finished = true;
-                var event = new ClientLoadEvent();
-                //a temporary measure for compatibility with certain mods
-                Events.fireWrap(event.getClass(), event, listener -> {
-                    try{
-                        listener.get(event);
-                    }catch(NoSuchFieldError | NoSuchMethodError | NoClassDefFoundError error){
-                        Log.err(error);
-                    }
-
-                });
+                Events.fire(new ClientLoadEvent());
                 clientLoaded = true;
                 super.resize(graphics.getWidth(), graphics.getHeight());
                 app.post(() -> app.post(() -> app.post(() -> app.post(() -> {

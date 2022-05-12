@@ -5,7 +5,6 @@ import arc.func.*;
 import arc.net.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.async.*;
 import mindustry.gen.*;
 import mindustry.net.Packets.*;
 import mindustry.net.Streamable.*;
@@ -34,7 +33,7 @@ public class Net{
     private final ObjectMap<Class<?>, Cons> clientListeners = new ObjectMap<>();
     private final ObjectMap<Class<?>, Cons2<NetConnection, Object>> serverListeners = new ObjectMap<>();
     private final IntMap<StreamBuilder> streams = new IntMap<>();
-    private final ExecutorService pingExecutor = Threads.cachedExecutor();
+    private final ExecutorService pingExecutor = Threads.unboundedExecutor();
 
     private final NetProvider provider;
 

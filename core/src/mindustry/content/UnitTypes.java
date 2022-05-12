@@ -3,18 +3,22 @@ package mindustry.content;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
-import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.*;
+import mindustry.entities.part.*;
+import mindustry.entities.pattern.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.type.ammo.*;
+import mindustry.type.unit.*;
 import mindustry.type.weapons.*;
 import mindustry.world.meta.*;
 
@@ -23,8 +27,8 @@ import static arc.graphics.g2d.Lines.*;
 import static arc.math.Angles.*;
 import static mindustry.Vars.*;
 
-public class UnitTypes implements ContentList{
-    //region definitions
+public class UnitTypes{
+    //region standard
 
     //mech
     public static @EntityDef({Unitc.class, Mechc.class}) UnitType mace, dagger, crawler, fortress, scepter, reign, vela;
@@ -33,13 +37,19 @@ public class UnitTypes implements ContentList{
     public static @EntityDef(value = {Unitc.class, Mechc.class}, legacy = true) UnitType nova, pulsar, quasar;
 
     //legs
-    public static @EntityDef({Unitc.class, Legsc.class}) UnitType corvus, atrax;
+    public static @EntityDef({Unitc.class, Legsc.class}) UnitType corvus, atrax,
+    merui, cleroi, anthicus,
+    tecta, collaris;
 
     //legs, legacy
     public static @EntityDef(value = {Unitc.class, Legsc.class}, legacy = true) UnitType spiroct, arkyid, toxopid;
 
+    //hover
+    public static @EntityDef({Unitc.class, ElevationMovec.class}) UnitType elude;
+
     //air
-    public static @EntityDef({Unitc.class}) UnitType flare, eclipse, horizon, zenith, antumbra;
+    public static @EntityDef({Unitc.class}) UnitType flare, eclipse, horizon, zenith, antumbra,
+    avert, obviate;
 
     //air, legacy
     public static @EntityDef(value = {Unitc.class}, legacy = true) UnitType mono;
@@ -48,7 +58,8 @@ public class UnitTypes implements ContentList{
     public static @EntityDef(value = {Unitc.class}, legacy = true) UnitType poly;
 
     //air + payload
-    public static @EntityDef({Unitc.class, Payloadc.class}) UnitType mega;
+    public static @EntityDef({Unitc.class, Payloadc.class}) UnitType mega,
+    evoke, incite, emanate, quell, disrupt;
 
     //air + payload, legacy
     public static @EntityDef(value = {Unitc.class, Payloadc.class}, legacy = true) UnitType quad;
@@ -65,10 +76,24 @@ public class UnitTypes implements ContentList{
     //special block unit type
     public static @EntityDef({Unitc.class, BlockUnitc.class}) UnitType block;
 
+    //special tethered (has payload capability, because it's necessary sometimes)
+    public static @EntityDef({Unitc.class, BuildingTetherc.class, Payloadc.class}) UnitType manifold, assemblyDrone;
+
+    //tank
+    public static @EntityDef({Unitc.class, Tankc.class}) UnitType stell, locus, precept, vanquish, conquer;
+
     //endregion
 
-    @Override
-    public void load(){
+    //missile definition, unused here but needed for codegen
+    public static @EntityDef({Unitc.class, TimedKillc.class}) UnitType missile;
+
+    //region neoplasm
+
+    public static @EntityDef({Unitc.class, Crawlc.class}) UnitType latum;
+
+    //endregion
+
+    public static void load(){
         //region ground attack
 
         dagger = new UnitType("dagger"){{
@@ -81,14 +106,18 @@ public class UnitTypes implements ContentList{
                 y = 2f;
                 top = false;
                 ejectEffect = Fx.casing1;
-                bullet = Bullets.standardCopper;
+                bullet = new BasicBulletType(2.5f, 9){{
+                    width = 7f;
+                    height = 9f;
+                    lifetime = 60f;
+                }};
             }});
         }};
 
         mace = new UnitType("mace"){{
-            speed = 0.45f;
+            speed = 0.5f;
             hitSize = 10f;
-            health = 540;
+            health = 550;
             armor = 4f;
             ammoType = new ItemAmmoType(Items.coal);
 
@@ -101,11 +130,13 @@ public class UnitTypes implements ContentList{
                 reload = 11f;
                 recoil = 1f;
                 ejectEffect = Fx.none;
-                bullet = new BulletType(4.1f, 35f){{
+                bullet = new BulletType(4.2f, 37f){{
                     ammoMultiplier = 3f;
                     hitSize = 7f;
                     lifetime = 13f;
                     pierce = true;
+                    pierceBuilding = true;
+                    pierceCap = 2;
                     statusDuration = 60f * 4;
                     shootEffect = Fx.shootSmallFlame;
                     hitEffect = Fx.hitFlameSmall;
@@ -161,9 +192,15 @@ public class UnitTypes implements ContentList{
             ammoType = new ItemAmmoType(Items.thorium);
 
             mechStepParticles = true;
-            mechStepShake = 0.15f;
+            stepShake = 0.15f;
             singleTarget = true;
             drownTimeMultiplier = 4f;
+
+            BulletType smallBullet = new BasicBulletType(3f, 10){{
+                width = 7f;
+                height = 9f;
+                lifetime = 50f;
+            }};
 
             weapons.add(
             new Weapon("scepter-weapon"){{
@@ -176,9 +213,10 @@ public class UnitTypes implements ContentList{
                 shake = 2f;
                 ejectEffect = Fx.casing3;
                 shootSound = Sounds.bang;
-                shots = 3;
                 inaccuracy = 3f;
-                shotDelay = 4f;
+
+                shoot.shots = 3;
+                shoot.shotDelay = 4f;
 
                 bullet = new BasicBulletType(7f, 50){{
                     width = 11f;
@@ -199,7 +237,7 @@ public class UnitTypes implements ContentList{
                 y = 6f;
                 rotate = true;
                 ejectEffect = Fx.casing1;
-                bullet = Bullets.standardCopper;
+                bullet = smallBullet;
             }},
             new Weapon("mount-weapon"){{
                 reload = 16f;
@@ -207,9 +245,8 @@ public class UnitTypes implements ContentList{
                 y = -7f;
                 rotate = true;
                 ejectEffect = Fx.casing1;
-                bullet = Bullets.standardCopper;
+                bullet = smallBullet;
             }}
-
             );
         }};
 
@@ -220,7 +257,7 @@ public class UnitTypes implements ContentList{
             health = 24000;
             armor = 14f;
             mechStepParticles = true;
-            mechStepShake = 0.75f;
+            stepShake = 0.75f;
             drownTimeMultiplier = 6f;
             mechFrontSway = 1.9f;
             mechSideSway = 0.6f;
@@ -238,7 +275,7 @@ public class UnitTypes implements ContentList{
                 ejectEffect = Fx.casing4;
                 shootSound = Sounds.bang;
 
-                bullet = new BasicBulletType(13f, 70){{
+                bullet = new BasicBulletType(13f, 80){{
                     pierce = true;
                     pierceCap = 10;
                     width = 14f;
@@ -248,14 +285,14 @@ public class UnitTypes implements ContentList{
                     fragVelocityMin = 0.4f;
 
                     hitEffect = Fx.blastExplosion;
-                    splashDamage = 16f;
+                    splashDamage = 18f;
                     splashDamageRadius = 13f;
 
                     fragBullets = 3;
                     fragLifeMin = 0f;
-                    fragCone = 30f;
+                    fragRandomSpread = 30f;
 
-                    fragBullet = new BasicBulletType(9f, 18){{
+                    fragBullet = new BasicBulletType(9f, 20){{
                         width = 10f;
                         height = 10f;
                         pierce = true;
@@ -284,7 +321,6 @@ public class UnitTypes implements ContentList{
             health = 120f;
             buildSpeed = 0.8f;
             armor = 1f;
-            commandLimit = 8;
 
             abilities.add(new RepairFieldAbility(10f, 60f * 4, 60f));
             ammoType = new PowerAmmoType(1000);
@@ -321,7 +357,6 @@ public class UnitTypes implements ContentList{
 
             mineTier = 2;
             mineSpeed = 5f;
-            commandLimit = 9;
 
             abilities.add(new ShieldRegenFieldAbility(20f, 40f, 60f * 5, 60f));
             ammoType = new PowerAmmoType(1300);
@@ -334,10 +369,11 @@ public class UnitTypes implements ContentList{
                 shootY = 2.5f;
 
                 reload = 36f;
-                shots = 3;
                 inaccuracy = 35;
-                shotDelay = 0.5f;
-                spacing = 0f;
+
+                shoot.shots = 3;
+                shoot.shotDelay = 0.5f;
+
                 ejectEffect = Fx.none;
                 recoil = 2.5f;
                 shootSound = Sounds.spark;
@@ -358,7 +394,7 @@ public class UnitTypes implements ContentList{
                         status = StatusEffects.shocked;
                         statusDuration = 10f;
                         hittable = false;
-                        healPercent = 2f;
+                        healPercent = 1.6f;
                         collidesTeam = true;
                     }};
                 }};
@@ -372,10 +408,9 @@ public class UnitTypes implements ContentList{
             buildSpeed = 1.7f;
             canBoost = true;
             armor = 9f;
-            landShake = 2f;
+            mechLandShake = 2f;
             riseSpeed = 0.05f;
 
-            commandLimit = 10;
             mechFrontSway = 0.55f;
             ammoType = new PowerAmmoType(1500);
 
@@ -418,7 +453,7 @@ public class UnitTypes implements ContentList{
             buildSpeed = 3f;
 
             mechStepParticles = true;
-            mechStepShake = 0.15f;
+            stepShake = 0.15f;
             ammoType = new PowerAmmoType(2500);
             drownTimeMultiplier = 4f;
 
@@ -432,20 +467,19 @@ public class UnitTypes implements ContentList{
             health = 8200f;
             armor = 9f;
             canBoost = true;
-            landShake = 4f;
+            mechLandShake = 4f;
             immunities = ObjectSet.with(StatusEffects.burning);
 
-            commandLimit = 8;
             singleTarget = true;
 
             weapons.add(new Weapon("vela-weapon"){{
                 mirror = false;
                 top = false;
                 shake = 4f;
-                shootY = 13f;
+                shootY = 14f;
                 x = y = 0f;
 
-                firstShotDelay = Fx.greenLaserChargeSmall.lifetime - 1f;
+                shoot.firstShotDelay = Fx.greenLaserChargeSmall.lifetime - 1f;
                 parentizeEffects = true;
 
                 reload = 155f;
@@ -465,7 +499,7 @@ public class UnitTypes implements ContentList{
                     despawnEffect = Fx.smokeCloud;
                     smokeEffect = Fx.none;
 
-                    shootEffect = Fx.greenLaserChargeSmall;
+                    chargeEffect = Fx.greenLaserChargeSmall;
 
                     incendChance = 0.1f;
                     incendSpread = 5f;
@@ -479,7 +513,7 @@ public class UnitTypes implements ContentList{
                 }};
 
                 shootStatus = StatusEffects.slow;
-                shootStatusDuration = bullet.lifetime + firstShotDelay;
+                shootStatusDuration = bullet.lifetime + shoot.firstShotDelay;
             }});
 
             weapons.add(new RepairBeamWeapon("repair-beam-weapon-center-large"){{
@@ -499,19 +533,17 @@ public class UnitTypes implements ContentList{
             hitSize = 29f;
             health = 18000f;
             armor = 9f;
-            landShake = 1.5f;
+            stepShake = 1.5f;
             rotateSpeed = 1.5f;
             drownTimeMultiplier = 6f;
-
-            commandLimit = 8;
 
             legCount = 4;
             legLength = 14f;
             legBaseOffset = 11f;
             legMoveSpace = 1.5f;
-            legTrns = 0.58f;
+            legForwardScl = 0.58f;
             hovering = true;
-            visualElevation = 0.2f;
+            shadowElevation = 0.2f;
             ammoType = new PowerAmmoType(4000);
             groundLayer = Layer.legUnit;
 
@@ -535,7 +567,7 @@ public class UnitTypes implements ContentList{
 
                 shootStatusDuration = 60f * 2f;
                 shootStatus = StatusEffects.unmoving;
-                firstShotDelay = Fx.greenLaserCharge.lifetime;
+                shoot.firstShotDelay = Fx.greenLaserCharge.lifetime;
                 parentizeEffects = true;
 
                 bullet = new LaserBulletType(){{
@@ -554,7 +586,7 @@ public class UnitTypes implements ContentList{
                     largeHit = true;
                     lightColor = lightningColor = Pal.heal;
 
-                    shootEffect = Fx.greenLaserCharge;
+                    chargeEffect = Fx.greenLaserCharge;
 
                     healPercent = 25f;
                     collidesTeam = true;
@@ -571,7 +603,7 @@ public class UnitTypes implements ContentList{
         //region ground legs
 
         crawler = new UnitType("crawler"){{
-            defaultController = SuicideAI::new;
+            aiController = SuicideAI::new;
 
             speed = 1f;
             hitSize = 8f;
@@ -588,10 +620,14 @@ public class UnitTypes implements ContentList{
                 shootSound = Sounds.explosion;
                 x = shootY = 0f;
                 mirror = false;
-                bullet = new BombBulletType(0f, 0f, "clear"){{
+                bullet = new BulletType(){{
+                    collidesTiles = false;
+                    collides = false;
+                    hitSound = Sounds.explosion;
+
+                    rangeOverride = 30f;
                     hitEffect = Fx.pulverize;
-                    lifetime = 10f;
-                    speed = 1f;
+                    speed = 0f;
                     splashDamageRadius = 55f;
                     instantDisappear = true;
                     splashDamage = 90f;
@@ -603,7 +639,7 @@ public class UnitTypes implements ContentList{
         }};
 
         atrax = new UnitType("atrax"){{
-            speed = 0.57f;
+            speed = 0.6f;
             drag = 0.4f;
             hitSize = 13f;
             rotateSpeed = 3f;
@@ -613,16 +649,16 @@ public class UnitTypes implements ContentList{
 
             legCount = 4;
             legLength = 9f;
-            legTrns = 0.6f;
+            legForwardScl = 0.6f;
             legMoveSpace = 1.4f;
             hovering = true;
             armor = 3f;
             ammoType = new ItemAmmoType(Items.coal);
 
-            visualElevation = 0.2f;
+            shadowElevation = 0.2f;
             groundLayer = Layer.legUnit - 1f;
 
-            weapons.add(new Weapon("eruption"){{
+            weapons.add(new Weapon("atrax-weapon"){{
                 top = false;
                 shootY = 3f;
                 reload = 9f;
@@ -643,24 +679,22 @@ public class UnitTypes implements ContentList{
         }};
 
         spiroct = new UnitType("spiroct"){{
-            speed = 0.52f;
+            speed = 0.54f;
             drag = 0.4f;
             hitSize = 15f;
             rotateSpeed = 3f;
-            health = 940;
+            health = 1000;
             immunities = ObjectSet.with(StatusEffects.burning, StatusEffects.melting);
             legCount = 6;
             legLength = 13f;
-            legTrns = 0.8f;
+            legForwardScl = 0.8f;
             legMoveSpace = 1.4f;
             legBaseOffset = 2f;
             hovering = true;
             armor = 5f;
             ammoType = new PowerAmmoType(1000);
 
-            buildSpeed = 0.75f;
-
-            visualElevation = 0.3f;
+            shadowElevation = 0.3f;
             groundLayer = Layer.legUnit;
 
             weapons.add(new Weapon("spiroct-weapon"){{
@@ -723,19 +757,18 @@ public class UnitTypes implements ContentList{
             legLength = 30f;
             legExtension = -15;
             legBaseOffset = 10f;
-            landShake = 1f;
+            stepShake = 1f;
             legLengthScl = 0.96f;
             rippleScale = 2f;
             legSpeed = 0.2f;
             ammoType = new PowerAmmoType(2000);
-            buildSpeed = 1f;
 
             legSplashDamage = 32;
             legSplashRange = 30;
             drownTimeMultiplier = 2f;
 
             hovering = true;
-            visualElevation = 0.65f;
+            shadowElevation = 0.65f;
             groundLayer = Layer.legUnit;
 
             BulletType sapper = new SapBulletType(){{
@@ -827,18 +860,17 @@ public class UnitTypes implements ContentList{
             legLength = 75f;
             legExtension = -20;
             legBaseOffset = 8f;
-            landShake = 1f;
+            stepShake = 1f;
             legLengthScl = 0.93f;
             rippleScale = 3f;
             legSpeed = 0.19f;
             ammoType = new ItemAmmoType(Items.graphite, 8);
-            buildSpeed = 1f;
 
             legSplashDamage = 80;
             legSplashRange = 60;
 
             hovering = true;
-            visualElevation = 0.95f;
+            shadowElevation = 0.95f;
             groundLayer = Layer.legUnit;
 
             weapons.add(
@@ -854,8 +886,8 @@ public class UnitTypes implements ContentList{
                 rotate = true;
                 shadow = 12f;
                 recoil = 3f;
-                shots = 2;
-                spacing = 17f;
+
+                shoot = new ShootSpread(2, 17f);
 
                 bullet = new ShrapnelBulletType(){{
                     length = 90f;
@@ -885,6 +917,8 @@ public class UnitTypes implements ContentList{
                 shootSound = Sounds.artillery;
                 rotate = true;
                 shadow = 30f;
+
+                rotationLimit = 80f;
 
                 bullet = new ArtilleryBulletType(3f, 50){{
                     hitEffect = Fx.sapExplosion;
@@ -940,25 +974,22 @@ public class UnitTypes implements ContentList{
         //region air attack
 
         flare = new UnitType("flare"){{
-            speed = 3f;
+            speed = 2.7f;
             accel = 0.08f;
-            drag = 0.01f;
+            drag = 0.04f;
             flying = true;
-            health = 75;
-            engineOffset = 5.5f;
-            range = 140f;
-            targetAir = false;
-            //as default AI, flares are not very useful in core rushes, they attack nothing in the way
-            playerTargetFlags = new BlockFlag[]{null};
+            health = 70;
+            engineOffset = 5.75f;
+            //TODO balance
+            //targetAir = false;
             targetFlags = new BlockFlag[]{BlockFlag.generator, null};
-            commandLimit = 4;
-            circleTarget = true;
-            hitSize = 7;
+            hitSize = 9;
+            itemCapacity = 10;
 
             weapons.add(new Weapon(){{
                 y = 0f;
                 x = 2f;
-                reload = 13f;
+                reload = 20f;
                 ejectEffect = Fx.casing1;
                 bullet = new BasicBulletType(2.5f, 9){{
                     width = 7f;
@@ -978,16 +1009,14 @@ public class UnitTypes implements ContentList{
             accel = 0.08f;
             drag = 0.016f;
             flying = true;
-            hitSize = 9f;
+            hitSize = 10f;
             targetAir = false;
             engineOffset = 7.8f;
             range = 140f;
             faceTarget = false;
             armor = 3f;
-            //do not rush core, attack closest
-            playerTargetFlags = new BlockFlag[]{null};
+            itemCapacity = 0;
             targetFlags = new BlockFlag[]{BlockFlag.factory, null};
-            commandLimit = 5;
             circleTarget = true;
             ammoType = new ItemAmmoType(Items.graphite);
 
@@ -1025,6 +1054,7 @@ public class UnitTypes implements ContentList{
             lowAltitude = true;
             forceMultiTarget = true;
             armor = 5f;
+            itemCapacity = 0;
 
             targetFlags = new BlockFlag[]{BlockFlag.launchPad, BlockFlag.storage, BlockFlag.battery, null};
             engineOffset = 12f;
@@ -1036,7 +1066,7 @@ public class UnitTypes implements ContentList{
                 x = 7f;
                 rotate = true;
                 shake = 1f;
-                shots = 2;
+                shoot.shots = 2;
                 inaccuracy = 5f;
                 velocityRnd = 0.2f;
                 shootSound = Sounds.missile;
@@ -1148,7 +1178,6 @@ public class UnitTypes implements ContentList{
             engineOffset = 38;
             engineSize = 7.3f;
             hitSize = 58f;
-            destructibleWreck = false;
             armor = 13f;
             targetFlags = new BlockFlag[]{BlockFlag.reactor, BlockFlag.battery, BlockFlag.core, null};
             ammoType = new ItemAmmoType(Items.thorium);
@@ -1198,7 +1227,7 @@ public class UnitTypes implements ContentList{
                 shadow = 7f;
                 rotate = true;
                 recoil = 0.5f;
-
+                shootY = 7.25f;
                 bullet = fragBullet;
             }},
             new Weapon("large-artillery"){{
@@ -1211,6 +1240,7 @@ public class UnitTypes implements ContentList{
                 shootSound = Sounds.shoot;
                 rotate = true;
                 shadow = 12f;
+                shootY = 7.25f;
                 bullet = fragBullet;
             }});
         }};
@@ -1219,7 +1249,7 @@ public class UnitTypes implements ContentList{
         //region air support
 
         mono = new UnitType("mono"){{
-            defaultController = MinerAI::new;
+            controller = u -> new MinerAI();
 
             flying = true;
             drag = 0.06f;
@@ -1229,7 +1259,7 @@ public class UnitTypes implements ContentList{
             engineSize = 1.8f;
             engineOffset = 5.7f;
             range = 50f;
-            isCounted = false;
+            isEnemy = false;
 
             ammoType = new PowerAmmoType(500);
 
@@ -1238,7 +1268,7 @@ public class UnitTypes implements ContentList{
         }};
 
         poly = new UnitType("poly"){{
-            defaultController = BuilderAI::new;
+            controller = u -> new BuilderAI();
 
             flying = true;
             drag = 0.05f;
@@ -1259,15 +1289,14 @@ public class UnitTypes implements ContentList{
 
             abilities.add(new RepairFieldAbility(5f, 60f * 8, 50f));
 
-            weapons.add(new Weapon("heal-weapon-mount"){{
+            weapons.add(new Weapon("poly-weapon"){{
                 top = false;
                 y = -2.5f;
-                x = 3.5f;
+                x = 3.75f;
                 reload = 30f;
                 ejectEffect = Fx.none;
                 recoil = 2f;
                 shootSound = Sounds.missile;
-                shots = 1;
                 velocityRnd = 0.5f;
                 inaccuracy = 15f;
                 alternate = true;
@@ -1293,7 +1322,7 @@ public class UnitTypes implements ContentList{
         }};
 
         mega = new UnitType("mega"){{
-            defaultController = RepairAI::new;
+            controller = u -> new RepairAI();
 
             mineTier = 3;
             mineSpeed = 4f;
@@ -1305,12 +1334,12 @@ public class UnitTypes implements ContentList{
             lowAltitude = true;
             flying = true;
             engineOffset = 10.5f;
-            rotateShooting = false;
+            faceTarget = false;
             hitSize = 16.05f;
             engineSize = 3f;
             payloadCapacity = (2 * 2) * tilePayload;
             buildSpeed = 2.6f;
-            isCounted = false;
+            isEnemy = false;
 
             ammoType = new PowerAmmoType(1100);
 
@@ -1355,9 +1384,9 @@ public class UnitTypes implements ContentList{
             lowAltitude = false;
             flying = true;
             circleTarget = true;
-            engineOffset = 12f;
-            engineSize = 6f;
-            rotateShooting = false;
+            engineOffset = 13f;
+            engineSize = 7f;
+            faceTarget = false;
             hitSize = 36f;
             payloadCapacity = (3 * 3) * tilePayload;
             buildSpeed = 2.5f;
@@ -1417,7 +1446,7 @@ public class UnitTypes implements ContentList{
         }};
 
         oct = new UnitType("oct"){{
-            defaultController = DefenderAI::new;
+            aiController = DefenderAI::new;
 
             armor = 16f;
             health = 24000;
@@ -1428,12 +1457,11 @@ public class UnitTypes implements ContentList{
             flying = true;
             engineOffset = 46f;
             engineSize = 7.8f;
-            rotateShooting = false;
+            faceTarget = false;
             hitSize = 66f;
-            payloadCapacity = (5.3f * 5.3f) * tilePayload;
+            payloadCapacity = (5.5f * 5.5f) * tilePayload;
             buildSpeed = 4f;
             drawShields = false;
-            commandLimit = 6;
             lowAltitude = true;
             buildBeamOffset = 43;
             ammoCapacity = 1;
@@ -1451,8 +1479,7 @@ public class UnitTypes implements ContentList{
             health = 280;
             accel = 0.4f;
             rotateSpeed = 3.3f;
-            trailLength = 20;
-            rotateShooting = false;
+            faceTarget = false;
 
             armor = 2f;
 
@@ -1463,7 +1490,12 @@ public class UnitTypes implements ContentList{
                 y = 1.5f;
                 rotate = true;
                 ejectEffect = Fx.casing1;
-                bullet = Bullets.standardCopper;
+                bullet = new BasicBulletType(2.5f, 9){{
+                    width = 7f;
+                    height = 9f;
+                    lifetime = 60f;
+                    ammoMultiplier = 2;
+                }};
             }});
 
             weapons.add(new Weapon("missiles-mount"){{
@@ -1503,13 +1535,13 @@ public class UnitTypes implements ContentList{
             armor = 4f;
             accel = 0.3f;
             rotateSpeed = 2.6f;
-            rotateShooting = false;
+            faceTarget = false;
             ammoType = new ItemAmmoType(Items.graphite);
 
             trailLength = 20;
-            trailX = 5.5f;
-            trailY = -4f;
-            trailScl = 1.9f;
+            waveTrailX = 5.5f;
+            waveTrailY = -4f;
+            tailScl = 1.9f;
 
             weapons.add(new Weapon("mount-weapon"){{
                 reload = 10f;
@@ -1520,7 +1552,16 @@ public class UnitTypes implements ContentList{
                 inaccuracy = 8f;
                 ejectEffect = Fx.casing1;
                 shootSound = Sounds.shoot;
-                bullet = Bullets.flakLead;
+                bullet = new FlakBulletType(4.2f, 3){{
+                    lifetime = 60f;
+                    ammoMultiplier = 4f;
+                    shootEffect = Fx.shootSmall;
+                    width = 6f;
+                    height = 8f;
+                    hitEffect = Fx.flakExplosion;
+                    splashDamage = 27f * 1.5f;
+                    splashDamageRadius = 15f;
+                }};
             }});
 
             weapons.add(new Weapon("artillery-mount"){{
@@ -1553,13 +1594,13 @@ public class UnitTypes implements ContentList{
             drag = 0.17f;
             hitSize = 20f;
             armor = 7f;
-            rotateShooting = false;
+            faceTarget = false;
             ammoType = new ItemAmmoType(Items.graphite);
 
             trailLength = 22;
-            trailX = 7f;
-            trailY = -9f;
-            trailScl = 1.5f;
+            waveTrailX = 7f;
+            waveTrailY = -9f;
+            tailScl = 1.5f;
 
             abilities.add(new ShieldRegenFieldAbility(20f, 40f, 60f * 4, 60f));
 
@@ -1575,7 +1616,6 @@ public class UnitTypes implements ContentList{
                 recoil = 4f;
                 shadow = 12f;
 
-                shots = 1;
                 inaccuracy = 3f;
                 ejectEffect = Fx.casing3;
                 shootSound = Sounds.artillery;
@@ -1612,8 +1652,9 @@ public class UnitTypes implements ContentList{
 
                 rotateSpeed = 4f;
                 rotate = true;
-                shots = 2;
-                shotDelay = 3f;
+                shoot.shots = 2;
+                shoot.shotDelay = 3f;
+
                 inaccuracy = 5f;
                 velocityRnd = 0.1f;
                 shootSound = Sounds.missile;
@@ -1650,13 +1691,13 @@ public class UnitTypes implements ContentList{
             hitSize = 39f;
             accel = 0.2f;
             rotateSpeed = 1.3f;
-            rotateShooting = false;
+            faceTarget = false;
             ammoType = new ItemAmmoType(Items.thorium);
 
             trailLength = 50;
-            trailX = 18f;
-            trailY = -21f;
-            trailScl = 3f;
+            waveTrailX = 18f;
+            waveTrailY = -21f;
+            tailScl = 3f;
 
             weapons.add(new Weapon("sei-launcher"){{
 
@@ -1668,18 +1709,21 @@ public class UnitTypes implements ContentList{
 
                 shadow = 20f;
 
-                shootY = 2f;
+                shootY = 4.5f;
                 recoil = 4f;
                 reload = 45f;
-                shots = 6;
-                spacing = 10f;
                 velocityRnd = 0.4f;
                 inaccuracy = 7f;
                 ejectEffect = Fx.none;
-                shake = 3f;
+                shake = 1f;
                 shootSound = Sounds.missile;
-                xRand = 8f;
-                shotDelay = 1f;
+
+                shoot = new ShootAlternate(){{
+                    shots = 6;
+                    shotDelay = 1.5f;
+                    spread = 4f;
+                    barrels = 3;
+                }};
 
                 bullet = new MissileBulletType(4.2f, 42){{
                     homingPower = 0.12f;
@@ -1716,8 +1760,9 @@ public class UnitTypes implements ContentList{
                 ejectEffect = Fx.casing3;
                 shootSound = Sounds.shootBig;
 
-                shots = 3;
-                shotDelay = 4f;
+                shoot.shots = 3;
+                shoot.shotDelay = 4f;
+
                 inaccuracy = 1f;
                 bullet = new BasicBulletType(7f, 57){{
                     width = 13f;
@@ -1736,7 +1781,7 @@ public class UnitTypes implements ContentList{
             armor = 16f;
             accel = 0.19f;
             rotateSpeed = 0.9f;
-            rotateShooting = false;
+            faceTarget = false;
             ammoType = new PowerAmmoType(4000);
 
             float spawnTime = 60f * 15f;
@@ -1744,9 +1789,9 @@ public class UnitTypes implements ContentList{
             abilities.add(new UnitSpawnAbility(flare, spawnTime, 19.25f, -31.75f), new UnitSpawnAbility(flare, spawnTime, -19.25f, -31.75f));
 
             trailLength = 70;
-            trailX = 23f;
-            trailY = -32f;
-            trailScl = 3.5f;
+            waveTrailX = 23f;
+            waveTrailY = -32f;
+            tailScl = 3.5f;
 
             weapons.add(new Weapon("omura-cannon"){{
                 reload = 110f;
@@ -1762,15 +1807,14 @@ public class UnitTypes implements ContentList{
                 shadow = 50f;
                 shootSound = Sounds.railgun;
 
-                shots = 1;
                 ejectEffect = Fx.none;
 
                 bullet = new RailBulletType(){{
                     shootEffect = Fx.railShoot;
                     length = 500;
-                    updateEffectSeg = 60f;
+                    pointEffectSpace = 60f;
                     pierceEffect = Fx.railHit;
-                    updateEffect = Fx.railTrail;
+                    pointEffect = Fx.railTrail;
                     hitEffect = Fx.massiveExplosion;
                     smokeEffect = Fx.shootBig2;
                     damage = 1250;
@@ -1790,12 +1834,11 @@ public class UnitTypes implements ContentList{
             accel = 0.4f;
             rotateSpeed = 5f;
             trailLength = 20;
-            trailX = 5f;
-            trailScl = 1.3f;
-            rotateShooting = false;
+            waveTrailX = 5f;
+            tailScl = 1.3f;
+            faceTarget = false;
             range = 100f;
             ammoType = new PowerAmmoType(900);
-
             armor = 3f;
 
             buildSpeed = 1.5f;
@@ -1817,11 +1860,13 @@ public class UnitTypes implements ContentList{
                 mirror = false;
                 rotate = true;
                 reload = 90f;
-                shots = 3;
-                shotDelay = 7f;
                 x = y = shootX = shootY = 0f;
                 shootSound = Sounds.mineDeploy;
                 rotateSpeed = 180f;
+                targetAir = false;
+
+                shoot.shots = 3;
+                shoot.shotDelay = 7f;
 
                 bullet = new BasicBulletType(){{
                     sprite = "mine-bullet";
@@ -1876,12 +1921,12 @@ public class UnitTypes implements ContentList{
             armor = 4f;
             accel = 0.4f;
             rotateSpeed = 4f;
-            rotateShooting = false;
+            faceTarget = false;
 
             trailLength = 22;
-            trailX = 5.5f;
-            trailY = -4f;
-            trailScl = 1.9f;
+            waveTrailX = 5.5f;
+            waveTrailY = -4f;
+            tailScl = 1.9f;
             ammoType = new ItemAmmoType(Items.coal);
 
             abilities.add(new StatusFieldAbility(StatusEffects.overclock, 60f * 6, 60f * 6f, 60f));
@@ -1952,13 +1997,13 @@ public class UnitTypes implements ContentList{
             drag = 0.16f;
             hitSize = 20f;
             armor = 6f;
-            rotateShooting = false;
+            faceTarget = false;
             ammoType = new ItemAmmoType(Items.graphite);
 
             trailLength = 23;
-            trailX = 9f;
-            trailY = -9f;
-            trailScl = 2f;
+            waveTrailX = 9f;
+            waveTrailY = -9f;
+            tailScl = 2f;
 
             buildSpeed = 2f;
 
@@ -2089,7 +2134,7 @@ public class UnitTypes implements ContentList{
             hitSize = 44f;
             accel = 0.2f;
             rotateSpeed = 1.4f;
-            rotateShooting = false;
+            faceTarget = false;
             ammoType = new PowerAmmoType(3500);
             ammoCapacity = 40;
 
@@ -2097,13 +2142,13 @@ public class UnitTypes implements ContentList{
             clipSize = 250f;
 
             trailLength = 50;
-            trailX = 18f;
-            trailY = -17f;
-            trailScl = 3.2f;
+            waveTrailX = 18f;
+            waveTrailY = -17f;
+            tailScl = 3.2f;
 
             buildSpeed = 3f;
 
-            abilities.add(new EnergyFieldAbility(35f, 65f, 180f){{
+            abilities.add(new EnergyFieldAbility(40f, 65f, 180f){{
                 statusDuration = 60f * 6f;
                 maxTargets = 25;
             }});
@@ -2120,7 +2165,7 @@ public class UnitTypes implements ContentList{
                         shootEffect = Fx.sparkShoot;
                         hitEffect = Fx.pointHit;
                         maxRange = 180f;
-                        damage = 24f;
+                        damage = 25f;
                     }};
                 }});
             }
@@ -2134,13 +2179,13 @@ public class UnitTypes implements ContentList{
             armor = 16f;
             accel = 0.2f;
             rotateSpeed = 1.1f;
-            rotateShooting = false;
+            faceTarget = false;
             ammoType = new PowerAmmoType(4500);
 
             trailLength = 70;
-            trailX = 23f;
-            trailY = -32f;
-            trailScl = 3.5f;
+            waveTrailX = 23f;
+            waveTrailY = -32f;
+            tailScl = 3.5f;
 
             buildSpeed = 3.5f;
 
@@ -2214,7 +2259,7 @@ public class UnitTypes implements ContentList{
                 bullet = new EmpBulletType(){{
                     float rad = 100f;
 
-                    scaleVelocity = true;
+                    scaleLife = true;
                     lightOpacity = 0.7f;
                     unitDamageScl = 0.8f;
                     healPercent = 20f;
@@ -2284,8 +2329,8 @@ public class UnitTypes implements ContentList{
         //region core
 
         alpha = new UnitType("alpha"){{
-            defaultController = BuilderAI::new;
-            isCounted = false;
+            aiController = BuilderAI::new;
+            isEnemy = false;
 
             lowAltitude = true;
             flying = true;
@@ -2300,7 +2345,6 @@ public class UnitTypes implements ContentList{
             health = 150f;
             engineOffset = 6f;
             hitSize = 8f;
-            commandLimit = 3;
             alwaysUnlocked = true;
 
             weapons.add(new Weapon("small-basic-weapon"){{
@@ -2322,8 +2366,8 @@ public class UnitTypes implements ContentList{
         }};
 
         beta = new UnitType("beta"){{
-            defaultController = BuilderAI::new;
-            isCounted = false;
+            aiController = BuilderAI::new;
+            isEnemy = false;
 
             flying = true;
             mineSpeed = 7f;
@@ -2337,9 +2381,8 @@ public class UnitTypes implements ContentList{
             health = 170f;
             engineOffset = 6f;
             hitSize = 9f;
-            rotateShooting = false;
+            faceTarget = false;
             lowAltitude = true;
-            commandLimit = 4;
 
             weapons.add(new Weapon("small-mount-weapon"){{
                 top = false;
@@ -2347,9 +2390,8 @@ public class UnitTypes implements ContentList{
                 x = 3f;
                 y = 0.5f;
                 rotate = true;
-                shots = 2;
-                shotDelay = 4f;
-                spacing = 0f;
+                shoot.shots = 2;
+                shoot.shotDelay = 4f;
                 ejectEffect = Fx.casing1;
 
                 bullet = new BasicBulletType(3f, 11){{
@@ -2364,8 +2406,8 @@ public class UnitTypes implements ContentList{
         }};
 
         gamma = new UnitType("gamma"){{
-            defaultController = BuilderAI::new;
-            isCounted = false;
+            aiController = BuilderAI::new;
+            isEnemy = false;
 
             lowAltitude = true;
             flying = true;
@@ -2380,17 +2422,19 @@ public class UnitTypes implements ContentList{
             health = 220f;
             engineOffset = 6f;
             hitSize = 11f;
-            commandLimit = 5;
 
             weapons.add(new Weapon("small-mount-weapon"){{
                 top = false;
                 reload = 15f;
                 x = 1f;
                 y = 2f;
-                shots = 2;
-                spacing = 2f;
+                shoot = new ShootSpread(){{
+                    shots = 2;
+                    shotDelay = 3f;
+                    spread = 2f;
+                }};
+
                 inaccuracy = 3f;
-                shotDelay = 3f;
                 ejectEffect = Fx.casing1;
 
                 bullet = new BasicBulletType(3.5f, 11){{
@@ -2406,23 +2450,1763 @@ public class UnitTypes implements ContentList{
         }};
 
         //endregion
-        //region internal
+        //region erekir - tank
 
-        block = new UnitType("block"){
-            {
-                speed = 0f;
-                hitSize = 0f;
-                health = 1;
-                rotateSpeed = 360f;
-                itemCapacity = 0;
-                commandLimit = 0;
+        stell = new TankUnitType("stell"){{
+            hitSize = 12f;
+            treadPullOffset = 3;
+            speed = 0.75f;
+            rotateSpeed = 3.5f;
+            health = 800;
+            armor = 5f;
+            itemCapacity = 0;
+            treadRects = new Rect[]{new Rect(12 - 32f, 7 - 32f, 14, 51)};
+            researchCostMultiplier = 0f;
+
+            weapons.add(new Weapon("stell-weapon"){{
+                layerOffset = 0.0001f;
+                reload = 50f;
+                shootY = 4.5f;
+                recoil = 1f;
+                rotate = true;
+                rotateSpeed = 1.7f;
+                mirror = false;
+                x = 0f;
+                y = -0.75f;
+                heatColor = Color.valueOf("f9350f");
+                cooldownTime = 30f;
+
+                bullet = new BasicBulletType(4f, 40){{
+                    sprite = "missile-large";
+                    smokeEffect = Fx.shootBigSmoke;
+                    shootEffect = Fx.shootBigColor;
+                    width = 5f;
+                    height = 7f;
+                    lifetime = 40f;
+                    hitSize = 4f;
+                    hitColor = backColor = trailColor = Color.valueOf("feb380");
+                    frontColor = Color.white;
+                    trailWidth = 1.7f;
+                    trailLength = 5;
+                    despawnEffect = hitEffect = Fx.hitBulletColor;
+                }};
+            }});
+        }};
+
+        locus = new TankUnitType("locus"){{
+            hitSize = 18f;
+            treadPullOffset = 5;
+            speed = 0.7f;
+            rotateSpeed = 2.6f;
+            health = 2100;
+            armor = 8f;
+            itemCapacity = 0;
+            treadRects = new Rect[]{new Rect(17 - 96f/2f, 10 - 96f/2f, 19, 76)};
+            researchCostMultiplier = 0f;
+
+            weapons.add(new Weapon("locus-weapon"){{
+                layerOffset = 0.0001f;
+                reload = 12f;
+                shootY = 10f;
+                recoil = 1f;
+                rotate = true;
+                rotateSpeed = 1.4f;
+                mirror = false;
+                shootCone = 2f;
+                x = 0f;
+                y = 0f;
+                heatColor = Color.valueOf("f9350f");
+                cooldownTime = 30f;
+
+                shoot = new ShootAlternate(3.5f);
+
+                bullet = new RailBulletType(){{
+                    length = 160f;
+                    damage = 48f;
+                    hitColor = Color.valueOf("feb380");
+                    hitEffect = endEffect = Fx.hitBulletColor;
+                    pierceDamageFactor = 0.8f;
+
+                    smokeEffect = Fx.colorSpark;
+
+                    endEffect = new Effect(14f, e-> {
+                        color(e.color);
+                        Drawf.tri(e.x, e.y, e.fout() * 1.5f, 5f, e.rotation);
+                    });
+
+                    shootEffect = new Effect(10, e -> {
+                        color(e.color);
+                        float w = 1.2f + 7 * e.fout();
+
+                        Drawf.tri(e.x, e.y, w, 30f * e.fout(), e.rotation);
+                        color(e.color);
+
+                        for(int i : Mathf.signs){
+                            Drawf.tri(e.x, e.y, w * 0.9f, 18f * e.fout(), e.rotation + i * 90f);
+                        }
+
+                        Drawf.tri(e.x, e.y, w, 4f * e.fout(), e.rotation + 180f);
+                    });
+
+                    lineEffect = new Effect(20f, e -> {
+                        if(!(e.data instanceof Vec2 v)) return;
+
+                        color(e.color);
+                        stroke(e.fout() * 0.9f + 0.6f);
+
+                        Fx.rand.setSeed(e.id);
+                        for(int i = 0; i < 7; i++){
+                            Fx.v.trns(e.rotation, Fx.rand.random(8f, v.dst(e.x, e.y) - 8f));
+                            Lines.lineAngleCenter(e.x + Fx.v.x, e.y + Fx.v.y, e.rotation + e.finpow(), e.foutpowdown() * 20f * Fx.rand.random(0.5f, 1f) + 0.3f);
+                        }
+
+                        e.scaled(14f, b -> {
+                            stroke(b.fout() * 1.5f);
+                            color(e.color);
+                            Lines.line(e.x, e.y, v.x, v.y);
+                        });
+                    });
+                }};
+            }});
+        }};
+
+        precept = new TankUnitType("precept"){{
+            hitSize = 26f;
+            treadPullOffset = 5;
+            speed = 0.64f;
+            rotateSpeed = 1.5f;
+            health = 4500;
+            armor = 10f;
+            itemCapacity = 0;
+            treadRects = new Rect[]{new Rect(16 - 60f, 48 - 70f, 30, 75), new Rect(44 - 60f, 17 - 70f, 17, 60)};
+            researchCostMultiplier = 0f;
+
+            weapons.add(new Weapon("precept-weapon"){{
+                layerOffset = 0.0001f;
+                reload = 85f;
+                shootY = 16f;
+                recoil = 3f;
+                rotate = true;
+                rotateSpeed = 1.3f;
+                mirror = false;
+                shootCone = 2f;
+                x = 0f;
+                y = -1f;
+                heatColor = Color.valueOf("f9350f");
+                cooldownTime = 30f;
+                bullet = new BasicBulletType(7f, 90){{
+                    sprite = "missile-large";
+                    width = 7.5f;
+                    height = 13f;
+                    lifetime = 28f;
+                    hitSize = 6f;
+                    pierceCap = 2;
+                    pierce = true;
+                    pierceBuilding = true;
+                    hitColor = backColor = trailColor = Color.valueOf("feb380");
+                    frontColor = Color.white;
+                    trailWidth = 2.8f;
+                    trailLength = 8;
+                    hitEffect = despawnEffect = Fx.blastExplosion;
+                    shootEffect = Fx.shootTitan;
+                    smokeEffect = Fx.shootSmokeTitan;
+                    splashDamageRadius = 20f;
+                    splashDamage = 50f;
+
+                    trailEffect = Fx.hitSquaresColor;
+                    trailRotation = true;
+                    trailInterval = 3f;
+
+                    fragBullets = 4;
+
+                    fragBullet = new BasicBulletType(5f, 25){{
+                        sprite = "missile-large";
+                        width = 5f;
+                        height = 7f;
+                        lifetime = 15f;
+                        hitSize = 4f;
+                        hitColor = backColor = trailColor = Color.valueOf("feb380");
+                        frontColor = Color.white;
+                        trailWidth = 1.7f;
+                        trailLength = 3;
+                        drag = 0.01f;
+                        despawnEffect = hitEffect = Fx.hitBulletColor;
+                    }};
+                }};
+            }});
+        }};
+
+        vanquish = new TankUnitType("vanquish"){{
+            hitSize = 28f;
+            treadPullOffset = 4;
+            speed = 0.63f;
+            health = 10000;
+            armor = 20f;
+            itemCapacity = 0;
+            crushDamage = 13f / 5f;
+            treadRects = new Rect[]{new Rect(22 - 154f/2f, 16 - 154f/2f, 28, 130)};
+
+            weapons.add(new Weapon("vanquish-weapon"){{
+                layerOffset = 0.0001f;
+                reload = 110f;
+                shootY = 71f / 4f;
+                shake = 5f;
+                recoil = 4f;
+                rotate = true;
+                rotateSpeed = 1f;
+                mirror = false;
+                x = 0f;
+                y = 0;
+                shadow = 28f;
+                heatColor = Color.valueOf("f9350f");
+                cooldownTime = 80f;
+
+                bullet = new BasicBulletType(8f, 140){{
+                    sprite = "missile-large";
+                    width = 9.5f;
+                    height = 13f;
+                    lifetime = 18f;
+                    hitSize = 6f;
+                    shootEffect = Fx.shootTitan;
+                    smokeEffect = Fx.shootSmokeTitan;
+                    pierceCap = 2;
+                    pierce = true;
+                    pierceBuilding = true;
+                    hitColor = backColor = trailColor = Color.valueOf("feb380");
+                    frontColor = Color.white;
+                    trailWidth = 3.1f;
+                    trailLength = 8;
+                    hitEffect = despawnEffect = Fx.blastExplosion;
+                    splashDamageRadius = 20f;
+                    splashDamage = 50f;
+
+                    fragOnHit = false;
+                    fragRandomSpread = 0f;
+                    fragSpread = 10f;
+                    fragBullets = 5;
+                    fragVelocityMin = 1f;
+
+                    fragBullet = new BasicBulletType(8f, 25){{
+                        sprite = "missile-large";
+                        width = 8f;
+                        height = 12f;
+                        lifetime = 15f;
+                        hitSize = 4f;
+                        hitColor = backColor = trailColor = Color.valueOf("feb380");
+                        frontColor = Color.white;
+                        trailWidth = 2.8f;
+                        trailLength = 6;
+                        hitEffect = despawnEffect = Fx.blastExplosion;
+                        splashDamageRadius = 10f;
+                        splashDamage = 20f;
+                    }};
+                }};
+            }});
+
+            int i = 0;
+            for(float f : new float[]{34f / 4f, -36f / 4f}){
+                int fi = i ++;
+                weapons.add(new Weapon("vanquish-point-weapon"){{
+                    reload = 35f + fi * 5;
+                    x = 48f / 4f;
+                    y = f;
+                    shootY = 5.5f;
+                    recoil = 2f;
+                    rotate = true;
+                    rotateSpeed = 2f;
+
+                    bullet = new BasicBulletType(4.5f, 25){{
+                        width = 6.5f;
+                        height = 11f;
+                        shootEffect = Fx.sparkShoot;
+                        smokeEffect = Fx.shootBigSmoke;
+                        hitColor = backColor = trailColor = Color.valueOf("feb380");
+                        frontColor = Color.white;
+                        trailWidth = 1.5f;
+                        trailLength = 4;
+                        hitEffect = despawnEffect = Fx.hitBulletColor;
+                    }};
+                }});
+            }
+        }};
+
+        conquer = new TankUnitType("conquer"){{
+            hitSize = 46f;
+            treadPullOffset = 1;
+            speed = 0.48f;
+            health = 22000;
+            armor = 25f;
+            crushDamage = 25f / 5f;
+            rotateSpeed = 0.8f;
+
+            float xo = 231f/2f, yo = 231f/2f;
+            treadRects = new Rect[]{new Rect(27 - xo, 152 - yo, 56, 73), new Rect(24 - xo, 51 - 9 - yo, 29, 17), new Rect(59 - xo, 18 - 9 - yo, 39, 19)};
+
+            weapons.add(new Weapon("conquer-weapon"){{
+                layerOffset = 0.1f;
+                reload = 120f;
+                shootY = 32.5f;
+                shake = 5f;
+                recoil = 5f;
+                rotate = true;
+                rotateSpeed = 0.6f;
+                mirror = false;
+                x = 0f;
+                y = -2f;
+                shadow = 50f;
+                heatColor = Color.valueOf("f9350f");
+                shootWarmupSpeed = 0.06f;
+                cooldownTime = 110f;
+                heatColor = Color.valueOf("f9350f");
+                minWarmup = 0.9f;
+
+                parts.addAll(
+                new RegionPart("-glow"){{
+                    color = Color.red;
+                    blending = Blending.additive;
+                    outline = mirror = false;
+                }},
+                new RegionPart("-sides"){{
+                    progress = PartProgress.warmup;
+                    mirror = true;
+                    under = true;
+                    moveX = 0.75f;
+                    moveY = 0.75f;
+                    moveRot = 82f;
+                    x = 37 / 4f;
+                    y = 8 / 4f;
+                }},
+                new RegionPart("-sinks"){{
+                    progress = PartProgress.warmup;
+                    mirror = true;
+                    under = true;
+                    heatColor = new Color(1f, 0.1f, 0.1f);
+                    moveX = 17f / 4f;
+                    moveY = -15f / 4f;
+                    x = 32 / 4f;
+                    y = -34 / 4f;
+                }},
+                new RegionPart("-sinks-heat"){{
+                    blending = Blending.additive;
+                    progress = PartProgress.warmup;
+                    mirror = true;
+                    outline = false;
+                    colorTo = new Color(1f, 0f, 0f, 0.5f);
+                    color = colorTo.cpy().a(0f);
+                    moveX = 17f / 4f;
+                    moveY = -15f / 4f;
+                    x = 32 / 4f;
+                    y = -34 / 4f;
+                }}
+                );
+
+                for(int i = 1; i <= 3; i++){
+                    int fi = i;
+                    parts.add(new RegionPart("-blade"){{
+                        progress = PartProgress.warmup.delay((3 - fi) * 0.3f).blend(PartProgress.reload, 0.3f);
+                        heatProgress = PartProgress.heat.add(0.3f).min(PartProgress.warmup);
+                        heatColor = new Color(1f, 0.1f, 0.1f);
+                        mirror = true;
+                        under = true;
+                        moveRot = -40f * fi;
+                        moveX = 3f;
+                        layerOffset = -0.002f;
+
+                        x = 11 / 4f;
+                    }});
+                }
+
+                bullet = new BasicBulletType(8f, 250){{
+                    sprite = "missile-large";
+                    width = 12f;
+                    height = 20f;
+                    lifetime = 35f;
+                    hitSize = 6f;
+
+                    smokeEffect = Fx.shootSmokeTitan;
+                    pierceCap = 3;
+                    pierce = true;
+                    pierceBuilding = true;
+                    hitColor = backColor = trailColor = Color.valueOf("feb380");
+                    frontColor = Color.white;
+                    trailWidth = 4f;
+                    trailLength = 9;
+                    hitEffect = despawnEffect = Fx.massiveExplosion;
+
+                    shootEffect = new ExplosionEffect(){{
+                        lifetime = 40f;
+                        waveStroke = 4f;
+                        waveColor = sparkColor = trailColor;
+                        waveRad = 15f;
+                        smokeSize = 5f;
+                        smokes = 8;
+                        smokeSizeBase = 0f;
+                        smokeColor = trailColor;
+                        sparks = 8;
+                        sparkRad = 40f;
+                        sparkLen = 4f;
+                        sparkStroke = 3f;
+                    }};
+
+                    int count = 6;
+                    for(int j = 0; j < count; j++){
+                        int s = j;
+                        for(int i : Mathf.signs){
+                            float fin = 0.05f + (j + 1) / (float)count;
+                            float spd = speed;
+                            float life = lifetime / Mathf.lerp(fin, 1f, 0.5f);
+                            spawnBullets.add(new BasicBulletType(spd * fin, 45){{
+                                drag = 0.002f;
+                                width = 12f;
+                                height = 11f;
+                                lifetime = life + 5f;
+                                weaveRandom = false;
+                                hitSize = 5f;
+                                pierceCap = 2;
+                                pierce = true;
+                                pierceBuilding = true;
+                                hitColor = backColor = trailColor = Color.valueOf("feb380");
+                                frontColor = Color.white;
+                                trailWidth = 2.5f;
+                                trailLength = 7;
+                                weaveScale = (3f + s/2f) / 1.2f;
+                                weaveMag = i * (4f - fin * 2f);
+
+                                splashDamage = 40f;
+                                splashDamageRadius = 25f;
+                                despawnEffect = new ExplosionEffect(){{
+                                    lifetime = 50f;
+                                    waveStroke = 4f;
+                                    waveColor = sparkColor = trailColor;
+                                    waveRad = 30f;
+                                    smokeSize = 7f;
+                                    smokes = 6;
+                                    smokeSizeBase = 0f;
+                                    smokeColor = trailColor;
+                                    sparks = 5;
+                                    sparkRad = 30f;
+                                    sparkLen = 3f;
+                                    sparkStroke = 1.5f;
+                                }};
+                            }});
+                        }
+                    }
+                }};
+            }});
+
+            parts.add(new RegionPart("-glow"){{
+                color = Color.red;
+                blending = Blending.additive;
+                layer = -1f;
+                outline = false;
+            }});
+        }};
+
+        //endregion
+        //region erekir - mech
+
+        merui = new ErekirUnitType("merui"){{
+            speed = 0.72f;
+            drag = 0.11f;
+            hitSize = 9f;
+            rotateSpeed = 3f;
+            health = 680;
+            armor = 4f;
+            legStraightness = 0.3f;
+            stepShake = 0f;
+
+            legCount = 6;
+            legLength = 8f;
+            lockLegBase = true;
+            legContinuousMove = true;
+            legExtension = -2f;
+            legBaseOffset = 3f;
+            legMaxLength = 1.1f;
+            legMinLength = 0.2f;
+            legLengthScl = 0.96f;
+            legForwardScl = 1.1f;
+            legGroupSize = 3;
+            rippleScale = 0.2f;
+
+            legMoveSpace = 1f;
+            allowLegStep = true;
+            hovering = true;
+            legPhysicsLayer = false;
+
+            shadowElevation = 0.1f;
+            groundLayer = Layer.legUnit - 1f;
+            targetAir = false;
+            researchCostMultiplier = 0f;
+
+            weapons.add(new Weapon("merui-weapon"){{
+                mirror = false;
+                x = 0f;
+                y = 1f;
+                shootY = 4f;
+                reload = 60f;
+                cooldownTime = 42f;
+                heatColor = Pal.turretHeat;
+
+                bullet = new ArtilleryBulletType(3f, 40){{
+                    shootEffect = new MultiEffect(Fx.shootSmallColor, new Effect(9, e -> {
+                        color(Color.white, e.color, e.fin());
+                        stroke(0.7f + e.fout());
+                        Lines.square(e.x, e.y, e.fin() * 5f, e.rotation + 45f);
+
+                        Drawf.light(e.x, e.y, 23f, e.color, e.fout() * 0.7f);
+                    }));
+
+                    collidesTiles = true;
+                    recoil = 0.5f;
+                    backColor = hitColor = Pal.techBlue;
+                    frontColor = Color.white;
+
+                    knockback = 0.8f;
+                    lifetime = 50f;
+                    width = height = 9f;
+                    splashDamageRadius = 19f;
+                    splashDamage = 30f;
+
+                    trailLength = 27;
+                    trailWidth = 2.5f;
+                    trailEffect = Fx.none;
+                    trailColor = backColor;
+
+                    trailInterp = Interp.slope;
+
+                    shrinkX = 0.6f;
+                    shrinkY = 0.2f;
+
+                    hitEffect = despawnEffect = new MultiEffect(Fx.hitSquaresColor, new WaveEffect(){{
+                        colorFrom = colorTo = Pal.techBlue;
+                        sizeTo = splashDamageRadius + 2f;
+                        lifetime = 9f;
+                        strokeFrom = 2f;
+                    }});
+                }};
+            }});
+
+        }};
+
+        cleroi = new ErekirUnitType("cleroi"){{
+            speed = 0.7f;
+            drag = 0.1f;
+            hitSize = 14f;
+            rotateSpeed = 3f;
+            health = 1100;
+            armor = 5f;
+            stepShake = 0f;
+
+            legCount = 4;
+            legLength = 14f;
+            lockLegBase = true;
+            legContinuousMove = true;
+            legExtension = -3f;
+            legBaseOffset = 5f;
+            legMaxLength = 1.1f;
+            legMinLength = 0.2f;
+            legLengthScl = 0.95f;
+            legForwardScl = 0.7f;
+
+            legMoveSpace = 1f;
+            hovering = true;
+
+            shadowElevation = 0.2f;
+            groundLayer = Layer.legUnit - 1f;
+
+            for(int i = 0; i < 5; i++){
+                int fi = i;
+                parts.add(new RegionPart("-spine"){{
+                    y = 21f / 4f - 45f / 4f * fi / 4f;
+                    moveX = 21f / 4f + Mathf.slope(fi / 4f) * 1.25f;
+                    moveRot = 10f - fi * 14f;
+                    float fin = fi  / 4f;
+                    progress = PartProgress.reload.inv().mul(1.3f).add(0.1f).sustain(fin * 0.34f, 0.14f, 0.14f);
+                    layerOffset = -0.001f;
+                    mirror = true;
+                }});
             }
 
-            @Override
-            public boolean isHidden(){
-                return true;
+            weapons.add(new Weapon("cleroi-weapon"){{
+                x = 14f / 4f;
+                y = 33f / 4f;
+                reload = 30f;
+                layerOffset = -0.002f;
+                alternate = false;
+                heatColor = Color.red;
+                cooldownTime = 25f;
+                smoothReloadSpeed = 0.15f;
+                recoil = 2f;
+
+                bullet = new BasicBulletType(3.5f, 27){{
+                    backColor = trailColor = hitColor = Pal.techBlue;
+                    frontColor = Color.white;
+                    width = 7.5f;
+                    height = 10f;
+                    lifetime = 40f;
+                    trailWidth = 2f;
+                    trailLength = 4;
+                    shake = 1f;
+                    recoil = 0.1f;
+
+                    trailEffect = Fx.missileTrail;
+                    trailParam = 1.8f;
+                    trailInterval = 6f;
+
+                    splashDamageRadius = 23f;
+                    splashDamage = 40f;
+
+                    hitEffect = despawnEffect = new MultiEffect(Fx.hitBulletColor, new WaveEffect(){{
+                        colorFrom = colorTo = Pal.techBlue;
+                        sizeTo = splashDamageRadius + 3f;
+                        lifetime = 9f;
+                        strokeFrom = 3f;
+                    }});
+
+                    shootEffect = new MultiEffect(Fx.shootBigColor, new Effect(9, e -> {
+                        color(Color.white, e.color, e.fin());
+                        stroke(0.7f + e.fout());
+                        Lines.square(e.x, e.y, e.fin() * 5f, e.rotation + 45f);
+
+                        Drawf.light(e.x, e.y, 23f, e.color, e.fout() * 0.7f);
+                    }));
+                    smokeEffect = Fx.shootSmokeSquare;
+                    ammoMultiplier = 2;
+                }};
+            }});
+
+            weapons.add(new PointDefenseWeapon("cleroi-point-defense"){{
+                x = 16f / 4f;
+                y = -20f / 4f;
+                reload = 9f;
+
+                targetInterval = 9f;
+                targetSwitchInterval = 12f;
+                recoil = 0.5f;
+
+                bullet = new BulletType(){{
+                    shootEffect = Fx.sparkShoot;
+                    hitEffect = Fx.pointHit;
+                    maxRange = 100f;
+                    damage = 38f;
+                }};
+            }});
+        }};
+
+        anthicus = new ErekirUnitType("anthicus"){{
+            speed = 0.65f;
+            drag = 0.1f;
+            hitSize = 21f;
+            rotateSpeed = 3f;
+            health = 2600;
+            armor = 7f;
+            fogRadius = 40f;
+            stepShake = 0f;
+
+            legCount = 6;
+            legLength = 18f;
+            legGroupSize = 3;
+            lockLegBase = true;
+            legContinuousMove = true;
+            legExtension = -3f;
+            legBaseOffset = 7f;
+            legMaxLength = 1.1f;
+            legMinLength = 0.2f;
+            legLengthScl = 0.95f;
+            legForwardScl = 0.9f;
+
+            legMoveSpace = 1f;
+            hovering = true;
+
+            shadowElevation = 0.2f;
+            groundLayer = Layer.legUnit - 1f;
+
+            for(int j = 0; j < 3; j++){
+                int i = j;
+                parts.add(new RegionPart("-blade"){{
+                    layerOffset = -0.01f;
+                    heatLayerOffset = 0.005f;
+                    x = 2f;
+                    moveX = 6f + i * 1.9f;
+                    moveY = 8f + -4f * i;
+                    moveRot = 40f - i * 25f;
+                    mirror = true;
+                    progress = PartProgress.warmup.delay(i * 0.2f);
+                    heatProgress = p -> Mathf.absin(Time.time + i * 14f, 7f, 1f);
+
+                    heatColor = Pal.techBlue;
+                }});
             }
-        };
+
+            weapons.add(new Weapon("anthicus-weapon"){{
+                x = 29f / 4f;
+                y = -11f / 4f;
+                shootY = 1.5f;
+                reload = 130f;
+                layerOffset = 0.01f;
+                heatColor = Color.red;
+                cooldownTime = 60f;
+                smoothReloadSpeed = 0.15f;
+                shootWarmupSpeed = 0.05f;
+                minWarmup = 0.9f;
+                shootStatus = StatusEffects.slow;
+                shootStatusDuration = reload + 1f;
+                rotationLimit = 70f;
+                rotateSpeed = 2f;
+                inaccuracy = 20f;
+
+                rotate = true;
+
+                shoot = new ShootPattern(){{
+                    shots = 2;
+                    shotDelay = 6f;
+                }};
+
+                parts.add(new RegionPart("-blade"){{
+                    mirror = true;
+                    moveRot = -25f;
+                    under = true;
+                    moves.add(new PartMove(PartProgress.reload, 1f, 0f, 0f));
+
+                    heatColor = Color.red;
+                    cooldownTime = 60f;
+                }});
+
+                parts.add(new RegionPart("-blade"){{
+                    mirror = true;
+                    moveRot = -50f;
+                    moveY = -2f;
+                    moves.add(new PartMove(PartProgress.reload.shorten(0.5f), 1f, 0f, -15f));
+                    under = true;
+
+                    heatColor = Color.red;
+                    cooldownTime = 60f;
+                }});
+
+                bullet = new BulletType(){{
+                    shootEffect = new MultiEffect(Fx.shootBigColor, new Effect(9, e -> {
+                        color(Color.white, e.color, e.fin());
+                        stroke(0.7f + e.fout());
+                        Lines.square(e.x, e.y, e.fin() * 5f, e.rotation + 45f);
+
+                        Drawf.light(e.x, e.y, 23f, e.color, e.fout() * 0.7f);
+                    }), new WaveEffect(){{
+                        colorFrom = colorTo = Pal.techBlue;
+                        sizeTo = 15f;
+                        lifetime = 12f;
+                        strokeFrom = 3f;
+                    }});
+
+                    smokeEffect = Fx.shootBigSmoke2;
+                    shake = 2f;
+                    speed = 0f;
+                    keepVelocity = false;
+                    inaccuracy = 2f;
+
+                    spawnUnit = new MissileUnitType("anthicus-missile"){{
+                        trailColor = engineColor = Pal.techBlue;
+                        engineSize = 1.75f;
+                        engineLayer = Layer.effect;
+                        speed = 3.7f;
+                        maxRange = 6f;
+                        lifetime = 60f * 1.7f;
+                        outlineColor = Pal.darkOutline;
+                        health = 45;
+                        lowAltitude = true;
+
+                        parts.add(new FlarePart(){{
+                            progress = PartProgress.life.slope().curve(Interp.pow2In);
+                            radius = 0f;
+                            radiusTo = 35f;
+                            stroke = 3f;
+                            rotation = 45f;
+                            y = -5f;
+                            followRotation = true;
+                        }});
+
+                        weapons.add(new Weapon(){{
+                            shootCone = 360f;
+                            mirror = false;
+                            reload = 1f;
+                            shootOnDeath = true;
+                            bullet = new ExplosionBulletType(120f, 25f){{
+                                shootEffect = new MultiEffect(Fx.massiveExplosion, new WrapEffect(Fx.dynamicSpikes, Pal.techBlue, 24f), new WaveEffect(){{
+                                    colorFrom = colorTo = Pal.techBlue;
+                                    sizeTo = 40f;
+                                    lifetime = 12f;
+                                    strokeFrom = 4f;
+                                }});
+                            }};
+                        }});
+                    }};
+                }};
+            }});
+        }};
+
+        tecta = new ErekirUnitType("tecta"){{
+            drag = 0.1f;
+            speed = 0.6f;
+            hitSize = 23f;
+            health = 7000;
+            armor = 5f;
+
+            lockLegBase = true;
+            legContinuousMove = true;
+            legGroupSize = 3;
+            legStraightness = 0.4f;
+            baseLegStraightness = 0.5f;
+            legMaxLength = 1.3f;
+            researchCostMultiplier = 0f;
+
+            abilities.add(new ShieldArcAbility(){{
+                region = "tecta-shield";
+                radius = 34f;
+                angle = 82f;
+                regen = 0.6f;
+                cooldown = 60f * 8f;
+                max = 1500f;
+                y = -20f;
+                width = 6f;
+            }});
+
+            rotateSpeed = 2.1f;
+
+            legCount = 6;
+            legLength = 15f;
+            legForwardScl = 0.45f;
+            legMoveSpace = 1.4f;
+            rippleScale = 2f;
+            stepShake = 0.5f;
+            legExtension = -5f;
+            legBaseOffset = 5f;
+
+            ammoType = new PowerAmmoType(2000);
+
+            legSplashDamage = 32;
+            legSplashRange = 30;
+            drownTimeMultiplier = 2f;
+
+            hovering = true;
+            shadowElevation = 0.4f;
+            groundLayer = Layer.legUnit;
+
+            weapons.add(new Weapon("tecta-weapon"){{
+                mirror = true;
+                top = false;
+
+                x = 62/4f;
+                y = 1f;
+                shootY = 47 / 4f;
+                recoil = 3f;
+                reload = 40f;
+                shake = 3f;
+                cooldownTime = 40f;
+
+                shoot.shots = 3;
+                inaccuracy = 3f;
+                velocityRnd = 0.33f;
+                heatColor = Color.red;
+
+                bullet = new MissileBulletType(4.2f, 50){{
+                    homingPower = 0.2f;
+                    weaveMag = 4;
+                    weaveScale = 4;
+                    lifetime = 55f;
+                    shootEffect = Fx.shootBig2;
+                    smokeEffect = Fx.shootSmokeTitan;
+                    splashDamage = 60f;
+                    splashDamageRadius = 30f;
+                    frontColor = Color.white;
+                    hitSound = Sounds.none;
+                    width = height = 10f;
+
+                    lightColor = trailColor = backColor = Pal.techBlue;
+                    lightRadius = 40f;
+                    lightOpacity = 0.7f;
+
+                    trailWidth = 2.8f;
+                    trailLength = 20;
+                    trailChance = -1f;
+
+                    despawnEffect = Fx.none;
+                    hitEffect = new ExplosionEffect(){{
+                        lifetime = 20f;
+                        waveStroke = 2f;
+                        waveColor = sparkColor = trailColor;
+                        waveRad = 12f;
+                        smokeSize = 0f;
+                        smokeSizeBase = 0f;
+                        sparks = 10;
+                        sparkRad = 35f;
+                        sparkLen = 4f;
+                        sparkStroke = 1.5f;
+                    }};
+                }};
+            }});
+        }};
+
+        collaris = new ErekirUnitType("collaris"){{
+            drag = 0.1f;
+            speed = 1.1f;
+            hitSize = 44f;
+            health = 18000;
+            armor = 9f;
+            rotateSpeed = 1.6f;
+            lockLegBase = true;
+            legContinuousMove = true;
+            legStraightness = 0.6f;
+            baseLegStraightness = 0.5f;
+
+            legCount = 8;
+            legLength = 30f;
+            legForwardScl = 2.1f;
+            legMoveSpace = 1.05f;
+            rippleScale = 1.2f;
+            stepShake = 0.5f;
+            legGroupSize = 2;
+            legExtension = -6f;
+            legBaseOffset = 19f;
+            legStraightLength = 0.9f;
+            legMaxLength = 1.2f;
+
+            ammoType = new PowerAmmoType(2000);
+
+            legSplashDamage = 32;
+            legSplashRange = 32;
+            drownTimeMultiplier = 2f;
+
+            hovering = true;
+            shadowElevation = 0.4f;
+            groundLayer = Layer.legUnit;
+
+            weapons.add(new Weapon("collaris-weapon"){{
+                mirror = true;
+                rotationLimit = 30f;
+                rotateSpeed = 0.4f;
+                rotate = true;
+
+                x = 43 / 4f;
+                y = -20f / 4f;
+                shootY = 37 / 4f;
+                shootX = -5f / 4f;
+                recoil = 3f;
+                reload = 30f;
+                shake = 2f;
+                cooldownTime = 20f;
+                layerOffset = 0.02f;
+
+                shoot.shots = 3;
+                shoot.shotDelay = 3f;
+                inaccuracy = 2f;
+                velocityRnd = 0.1f;
+                heatColor = Color.red;
+
+                for(int i = 0; i < 5; i++){
+                    int fi = i;
+                    parts.add(new RegionPart("-blade"){{
+                        under = true;
+                        layerOffset = -0.001f;
+                        heatColor = Pal.techBlue;
+                        heatProgress = PartProgress.heat.add(0.2f).min(PartProgress.warmup);
+                        progress = PartProgress.warmup.blend(PartProgress.reload, 0.1f);
+                        x = 13.5f / 4f;
+                        y = 10f / 4f - fi * 2f;
+                        moveY = 1f - fi * 1f;
+                        moveX = fi * 0.3f;
+                        moveRot = -45f - fi * 17f;
+
+                        moves.add(new PartMove(PartProgress.reload.inv().mul(1.8f).inv().curve(fi / 5f, 0.2f), 0f, 0f, 36f));
+                    }});
+                }
+
+                bullet = new BasicBulletType(9f, 85){{
+                    pierceCap = 2;
+                    pierceBuilding = true;
+
+                    lifetime = 30f;
+                    shootEffect = Fx.shootBigColor;
+                    smokeEffect = Fx.shootSmokeSquareBig;
+                    frontColor = Color.white;
+                    hitSound = Sounds.none;
+                    width = 12f;
+                    height = 20f;
+
+                    lightColor = trailColor = hitColor = backColor = Pal.techBlue;
+                    lightRadius = 40f;
+                    lightOpacity = 0.7f;
+
+                    trailWidth = 2.2f;
+                    trailLength = 8;
+                    trailChance = -1f;
+
+                    despawnEffect = Fx.none;
+
+                    hitEffect = despawnEffect = new ExplosionEffect(){{
+                        lifetime = 30f;
+                        waveStroke = 2f;
+                        waveColor = sparkColor = trailColor;
+                        waveRad = 5f;
+                        smokeSize = 0f;
+                        smokeSizeBase = 0f;
+                        sparks = 5;
+                        sparkRad = 20f;
+                        sparkLen = 6f;
+                        sparkStroke = 2f;
+                    }};
+                }};
+            }});
+        }};
+
+        //endregion
+        //region erekir - flying
+
+        elude = new ErekirUnitType("elude"){{
+            hovering = true;
+            shadowElevation = 0.1f;
+
+            drag = 0.07f;
+            speed = 2f;
+            rotateSpeed = 5f;
+
+            accel = 0.09f;
+            health = 600f;
+            armor = 3f;
+            hitSize = 11f;
+            engineOffset = 7f;
+            engineSize = 2f;
+            itemCapacity = 0;
+            useEngineElevation = false;
+            researchCostMultiplier = 0f;
+
+            //does this look better?
+            //engineColor = Pal.sapBullet;
+
+            abilities.add(new MoveEffectAbility(0f, -7f, Pal.sapBulletBack, Fx.missileTrailShort, 4f){{
+                teamColor = true;
+            }});
+
+            for(float f : new float[]{-3f, 3f}){
+                parts.add(new HoverPart(){{
+                    x = 3.9f;
+                    y = f;
+                    mirror = true;
+                    radius = 6f;
+                    phase = 90f;
+                    stroke = 2f;
+                    layerOffset = -0.001f;
+                    color = Color.valueOf("bf92f9");
+                }});
+            }
+
+            weapons.add(new Weapon("elude-weapon"){{
+                y = -2f;
+                x = 4f;
+                top = true;
+                mirror = true;
+                reload = 40f;
+                baseRotation = -35f;
+                shootCone = 360f;
+
+                shoot = new ShootSpread(2, 11f);
+
+                bullet = new BasicBulletType(5f, 24){{
+                    homingPower = 0.19f;
+                    homingDelay = 4f;
+                    width = 7f;
+                    height = 12f;
+                    lifetime = 30f;
+                    shootEffect = Fx.sparkShoot;
+                    smokeEffect = Fx.shootBigSmoke;
+                    hitColor = backColor = trailColor = Pal.suppress;
+                    frontColor = Color.white;
+                    trailWidth = 1.5f;
+                    trailLength = 5;
+                    hitEffect = despawnEffect = Fx.hitBulletColor;
+                }};
+            }});
+        }};
+
+        avert = new ErekirUnitType("avert"){{
+            lowAltitude = false;
+            flying = true;
+            drag = 0.08f;
+            speed = 2f;
+            rotateSpeed = 4f;
+            accel = 0.09f;
+            health = 1100f;
+            armor = 3f;
+            hitSize = 12f;
+            engineSize = 0;
+            fogRadius = 25;
+            itemCapacity = 0;
+
+            setEnginesMirror(
+            new UnitEngine(35 / 4f, -38 / 4f, 3f, 315f),
+            new UnitEngine(39 / 4f, -16 / 4f, 3f, 315f)
+            );
+
+            weapons.add(new Weapon("avert-weapon"){{
+                reload = 35f;
+                x = 0f;
+                y = 6.5f;
+                shootY = 5f;
+                recoil = 1f;
+                top = false;
+                layerOffset = -0.01f;
+                rotate = false;
+                mirror = false;
+                shoot = new ShootHelix();
+
+                bullet = new BasicBulletType(5f, 34){{
+                    width = 7f;
+                    height = 12f;
+                    lifetime = 25f;
+                    shootEffect = Fx.sparkShoot;
+                    smokeEffect = Fx.shootBigSmoke;
+                    hitColor = backColor = trailColor = Pal.suppress;
+                    frontColor = Color.white;
+                    trailWidth = 1.5f;
+                    trailLength = 5;
+                    hitEffect = despawnEffect = Fx.hitBulletColor;
+                }};
+            }});
+        }};
+
+        obviate = new ErekirUnitType("obviate"){{
+            flying = true;
+            drag = 0.08f;
+            speed = 1.8f;
+            rotateSpeed = 2.5f;
+            accel = 0.09f;
+            health = 2300f;
+            armor = 6f;
+            hitSize = 25f;
+            engineSize = 4.3f;
+            engineOffset = 54f / 4f;
+            fogRadius = 25;
+            itemCapacity = 0;
+            lowAltitude = true;
+
+            setEnginesMirror(
+            new UnitEngine(38 / 4f, -46 / 4f, 3.1f, 315f)
+            );
+
+            parts.add(
+            new RegionPart("-blade"){{
+                moveRot = -10f;
+                moveX = -1f;
+                moves.add(new PartMove(PartProgress.reload, 2f, 1f, -5f));
+                progress = PartProgress.warmup;
+                mirror = true;
+
+                children.add(new RegionPart("-side"){{
+                    moveX = 2f;
+                    moveY = -2f;
+                    progress = PartProgress.warmup;
+                    under = true;
+                    mirror = true;
+                    moves.add(new PartMove(PartProgress.reload, -2f, 2f, 0f));
+                }});
+            }});
+
+            weapons.add(new Weapon(){{
+                x = 0f;
+                y = -2f;
+                shootY = 0f;
+                reload = 140f;
+                mirror = false;
+                minWarmup = 0.95f;
+                shake = 3f;
+                cooldownTime = reload - 10f;
+
+                bullet = new BasicBulletType(){{
+                    shoot = new ShootHelix(){{
+                        mag = 1f;
+                        scl = 5f;
+                    }};
+
+                    shootEffect = new MultiEffect(Fx.shootTitan, new WaveEffect(){{
+                        colorTo = Pal.sapBulletBack;
+                        sizeTo = 26f;
+                        lifetime = 14f;
+                        strokeFrom = 4f;
+                    }});
+                    smokeEffect = Fx.shootSmokeTitan;
+                    hitColor = Pal.sapBullet;
+
+                    sprite = "large-orb";
+                    trailEffect = Fx.missileTrail;
+                    trailInterval = 3f;
+                    trailParam = 4f;
+                    speed = 3f;
+                    damage = 80f;
+                    lifetime = 75f;
+                    width = height = 15f;
+                    backColor = Pal.sapBulletBack;
+                    frontColor = Pal.sapBullet;
+                    shrinkX = shrinkY = 0f;
+                    trailColor = Pal.sapBulletBack;
+                    trailLength = 12;
+                    trailWidth = 2.2f;
+                    despawnEffect = hitEffect = new ExplosionEffect(){{
+                        waveColor = Pal.sapBullet;
+                        smokeColor = Color.gray;
+                        sparkColor = Pal.sap;
+                        waveStroke = 4f;
+                        waveRad = 40f;
+                    }};
+
+                    intervalBullet = new LightningBulletType(){{
+                        damage = 18;
+                        collidesAir = false;
+                        ammoMultiplier = 1f;
+                        lightningColor = Pal.sapBullet;
+                        lightningLength = 3;
+                        lightningLengthRand = 6;
+
+                        //for visual stats only.
+                        buildingDamageMultiplier = 0.25f;
+
+                        lightningType = new BulletType(0.0001f, 0f){{
+                            lifetime = Fx.lightning.lifetime;
+                            hitEffect = Fx.hitLancer;
+                            despawnEffect = Fx.none;
+                            status = StatusEffects.shocked;
+                            statusDuration = 10f;
+                            hittable = false;
+                            lightColor = Color.white;
+                            buildingDamageMultiplier = 0.25f;
+                        }};
+                    }};
+
+                    bulletInterval = 4f;
+
+                    lightningColor = Pal.sapBullet;
+                    lightningDamage = 21;
+                    lightning = 8;
+                    lightningLength = 2;
+                    lightningLengthRand = 8;
+                }};
+
+            }});
+        }};
+
+        quell = new ErekirUnitType("quell"){{
+            aiController = FlyingFollowAI::new;
+            envDisabled = 0;
+
+            lowAltitude = false;
+            flying = true;
+            drag = 0.06f;
+            speed = 1.1f;
+            rotateSpeed = 3.2f;
+            accel = 0.1f;
+            health = 8000f;
+            armor = 5f;
+            hitSize = 36f;
+            payloadCapacity = Mathf.sqr(3f) * tilePayload;
+            researchCostMultiplier = 0f;
+
+            engineSize = 4.8f;
+            engineOffset = 61 / 4f;
+
+            abilities.add(new SuppressionFieldAbility(){{
+                orbRadius = 5.3f;
+                y = 1f;
+            }});
+
+            weapons.add(new Weapon("quell-weapon"){{
+                x = 51 / 4f;
+                y = 5 / 4f;
+                rotate = true;
+                rotateSpeed = 2f;
+                reload = 55f;
+                layerOffset = -0.001f;
+                recoil = 1f;
+                rotationLimit = 60f;
+
+                bullet = new BulletType(){{
+                    shootEffect = Fx.shootBig;
+                    smokeEffect = Fx.shootBigSmoke2;
+                    shake = 1f;
+                    speed = 0f;
+                    keepVelocity = false;
+
+                    spawnUnit = new MissileUnitType("quell-missile"){{
+                        speed = 4.3f;
+                        maxRange = 6f;
+                        lifetime = 60f * 1.6f;
+                        outlineColor = Pal.darkOutline;
+                        engineColor = trailColor = Pal.sapBulletBack;
+                        engineLayer = Layer.effect;
+                        health = 45;
+
+                        weapons.add(new Weapon(){{
+                            shootCone = 360f;
+                            mirror = false;
+                            reload = 1f;
+                            shootOnDeath = true;
+                            bullet = new ExplosionBulletType(110f, 25f){{
+                                shootEffect = Fx.massiveExplosion;
+                            }};
+                        }});
+                    }};
+                }};
+            }});
+
+            setEnginesMirror(
+            new UnitEngine(62 / 4f, -60 / 4f, 3.9f, 315f),
+            new UnitEngine(72 / 4f, -29 / 4f, 3f, 315f)
+            );
+        }};
+
+        disrupt = new ErekirUnitType("disrupt"){{
+            aiController = FlyingFollowAI::new;
+            envDisabled = 0;
+
+            lowAltitude = false;
+            flying = true;
+            drag = 0.07f;
+            speed = 1f;
+            rotateSpeed = 2f;
+            accel = 0.1f;
+            health = 12000f;
+            armor = 7f;
+            hitSize = 46f;
+            payloadCapacity = Mathf.sqr(6f) * tilePayload;
+
+            engineSize = 6f;
+            engineOffset = 25.25f;
+
+            float orbRad = 5f, partRad = 3f;
+            int parts = 10;
+
+            abilities.add(new SuppressionFieldAbility(){{
+                orbRadius = orbRad;
+                particleSize = partRad;
+                y = 10f;
+                particles = parts;
+            }});
+
+            for(int i : Mathf.signs){
+                abilities.add(new SuppressionFieldAbility(){{
+                    orbRadius = orbRad;
+                    particleSize = partRad;
+                    y = -32f / 4f;
+                    x = 43f * i / 4f;
+                    particles = parts;
+                    //visual only, the middle one does the actual suppressing
+                    active = false;
+                }});
+            }
+
+            weapons.add(new Weapon("disrupt-weapon"){{
+                x = 78f / 4f;
+                y = -10f / 4f;
+                mirror = true;
+                rotate = true;
+                rotateSpeed = 0.4f;
+                reload = 70f;
+                layerOffset = -20f;
+                recoil = 1f;
+                rotationLimit = 22f;
+                minWarmup = 0.95f;
+                shootWarmupSpeed = 0.1f;
+                shootY = 2f;
+                shootCone = 40f;
+                shoot.shots = 3;
+                shoot.shotDelay = 5f;
+                inaccuracy = 28f;
+
+                parts.add(new RegionPart("-blade"){{
+                    heatProgress = PartProgress.warmup;
+                    progress = PartProgress.warmup.blend(PartProgress.reload, 0.15f);
+                    heatColor = Color.valueOf("9c50ff");
+                    x = 5 / 4f;
+                    y = 0f;
+                    moveRot = -33f;
+                    moveY = -1f;
+                    moveX = -1f;
+                    under = true;
+                    mirror = true;
+                }});
+
+                bullet = new BulletType(){{
+                    shootEffect = Fx.sparkShoot;
+                    smokeEffect = Fx.shootSmokeTitan;
+                    hitColor = Pal.suppress;
+                    shake = 1f;
+                    speed = 0f;
+                    keepVelocity = false;
+
+                    spawnUnit = new MissileUnitType("disrupt-missile"){{
+                        speed = 4.6f;
+                        maxRange = 5f;
+                        outlineColor = Pal.darkOutline;
+                        health = 70;
+                        homingDelay = 10f;
+                        lowAltitude = true;
+                        engineSize = 3f;
+                        engineColor = trailColor = Pal.sapBulletBack;
+                        engineLayer = Layer.effect;
+                        deathExplosionEffect = Fx.none;
+
+                        parts.add(new ShapePart(){{
+                            layer = Layer.effect;
+                            circle = true;
+                            y = -0.25f;
+                            radius = 1.5f;
+                            color = Pal.suppress;
+                            colorTo = Color.white;
+                            progress = PartProgress.life.curve(Interp.pow5In);
+                        }});
+
+                        parts.add(new RegionPart("-fin"){{
+                            mirror = true;
+                            progress = PartProgress.life.mul(3f).curve(Interp.pow5In);
+                            moveRot = 32f;
+                            rotation = -6f;
+                            moveY = 1.5f;
+                            x = 3f / 4f;
+                            y = -6f / 4f;
+                        }});
+
+                        weapons.add(new Weapon(){{
+                            shootCone = 360f;
+                            mirror = false;
+                            reload = 1f;
+                            shootOnDeath = true;
+                            bullet = new ExplosionBulletType(140f, 25f){{
+                                suppressionRange = 140f;
+                                shootEffect = new ExplosionEffect(){{
+                                    lifetime = 50f;
+                                    waveStroke = 5f;
+                                    waveLife = 8f;
+                                    waveColor = Color.white;
+                                    sparkColor = smokeColor = Pal.suppress;
+                                    waveRad = 40f;
+                                    smokeSize = 4f;
+                                    smokes = 7;
+                                    smokeSizeBase = 0f;
+                                    sparks = 10;
+                                    sparkRad = 40f;
+                                    sparkLen = 6f;
+                                    sparkStroke = 2f;
+                                }};
+                            }};
+                        }});
+                    }};
+                }};
+            }});
+
+            setEnginesMirror(
+            new UnitEngine(95 / 4f, -56 / 4f, 5f, 330f),
+            new UnitEngine(89 / 4f, -95 / 4f, 4f, 315f)
+            );
+        }};
+
+        //endregion
+        //region erekir - neoplasm
+
+        if(false)
+            latum = new NeoplasmUnitType("latum"){{
+                health = 20000;
+                armor = 12;
+                hitSize = 48f;
+                omniMovement = false;
+                rotateSpeed = 1.7f;
+                drownTimeMultiplier = 4f;
+                drawCell = false;
+                segments = 4;
+                drawBody = false;
+                hidden = true;
+                crushDamage = 2f;
+                aiController = HugAI::new;
+                targetAir = false;
+
+                segmentScl = 4f;
+                segmentPhase = 5f;
+                speed = 1f;
+            }};
+
+        //endregion
+        //region erekir - core
+
+        float coreFleeRange = 500f;
+
+        evoke = new ErekirUnitType("evoke"){{
+            coreUnitDock = true;
+            controller = u -> new BuilderAI(true, coreFleeRange);
+            isEnemy = false;
+            envDisabled = 0;
+
+            targetPriority = -2;
+            lowAltitude = false;
+            mineWalls = true;
+            mineFloor = false;
+            mineHardnessScaling = false;
+            flying = true;
+            mineSpeed = 6f;
+            mineTier = 3;
+            buildSpeed = 1.2f;
+            drag = 0.08f;
+            speed = 5.6f;
+            rotateSpeed = 7f;
+            accel = 0.09f;
+            itemCapacity = 60;
+            health = 300f;
+            armor = 1f;
+            hitSize = 9f;
+            engineSize = 0;
+            payloadCapacity = 2f * 2f * tilesize * tilesize;
+            pickupUnits = false;
+            vulnerableWithPayloads = true;
+
+            fogRadius = 0f;
+            targetable = false;
+            hittable = false;
+
+            setEnginesMirror(
+            new UnitEngine(21 / 4f, 19 / 4f, 2.2f, 45f),
+            new UnitEngine(23 / 4f, -22 / 4f, 2.2f, 315f)
+            );
+
+            weapons.add(new RepairBeamWeapon(){{
+                widthSinMag = 0.11f;
+                reload = 20f;
+                x = 0f;
+                y = 6.5f;
+                rotate = false;
+                shootY = 0f;
+                beamWidth = 0.7f;
+                repairSpeed = 3.1f;
+                fractionRepairSpeed = 0.06f;
+                aimDst = 0f;
+                shootCone = 15f;
+                mirror = false;
+
+                targetUnits = false;
+                targetBuildings = true;
+                autoTarget = false;
+                controllable = true;
+                laserColor = Pal.accent;
+                healColor = Pal.accent;
+
+                bullet = new BulletType(){{
+                    maxRange = 60f;
+                }};
+            }});
+        }};
+
+        incite = new ErekirUnitType("incite"){{
+            coreUnitDock = true;
+            controller = u -> new BuilderAI(true, coreFleeRange);
+            isEnemy = false;
+            envDisabled = 0;
+
+            targetPriority = -2;
+            lowAltitude = false;
+            mineWalls = true;
+            mineFloor = false;
+            mineHardnessScaling = false;
+            flying = true;
+            mineSpeed = 8f;
+            mineTier = 3;
+            buildSpeed = 1.4f;
+            drag = 0.08f;
+            speed = 7f;
+            rotateSpeed = 8f;
+            accel = 0.09f;
+            itemCapacity = 90;
+            health = 500f;
+            armor = 2f;
+            hitSize = 11f;
+            payloadCapacity = 2f * 2f * tilesize * tilesize;
+            pickupUnits = false;
+            vulnerableWithPayloads = true;
+
+            fogRadius = 0f;
+            targetable = false;
+            hittable = false;
+
+            engineOffset = 7.2f;
+            engineSize = 3.1f;
+
+            setEnginesMirror(
+            new UnitEngine(25 / 4f, -1 / 4f, 2.4f, 300f)
+            );
+
+            weapons.add(new RepairBeamWeapon(){{
+                widthSinMag = 0.11f;
+                reload = 20f;
+                x = 0f;
+                y = 7.5f;
+                rotate = false;
+                shootY = 0f;
+                beamWidth = 0.7f;
+                aimDst = 0f;
+                shootCone = 15f;
+                mirror = false;
+
+                repairSpeed = 3.3f;
+                fractionRepairSpeed = 0.06f;
+
+                targetUnits = false;
+                targetBuildings = true;
+                autoTarget = false;
+                controllable = true;
+                laserColor = Pal.accent;
+                healColor = Pal.accent;
+
+                bullet = new BulletType(){{
+                    maxRange = 60f;
+                }};
+            }});
+
+            drawBuildBeam = false;
+
+            weapons.add(new BuildWeapon("build-weapon"){{
+                rotate = true;
+                rotateSpeed = 7f;
+                x = 14/4f;
+                y = 15/4f;
+                layerOffset = -0.001f;
+                shootY = 3f;
+            }});
+        }};
+
+        emanate = new ErekirUnitType("emanate"){{
+            coreUnitDock = true;
+            controller = u -> new BuilderAI(true, coreFleeRange);
+            isEnemy = false;
+            envDisabled = 0;
+
+            targetPriority = -2;
+            lowAltitude = false;
+            mineWalls = true;
+            mineFloor = false;
+            mineHardnessScaling = false;
+            flying = true;
+            mineSpeed = 9f;
+            mineTier = 3;
+            buildSpeed = 1.5f;
+            drag = 0.08f;
+            speed = 7.5f;
+            rotateSpeed = 8f;
+            accel = 0.08f;
+            itemCapacity = 110;
+            health = 700f;
+            armor = 3f;
+            hitSize = 12f;
+            buildBeamOffset = 8f;
+            payloadCapacity = 2f * 2f * tilesize * tilesize;
+            pickupUnits = false;
+            vulnerableWithPayloads = true;
+
+            fogRadius = 0f;
+            targetable = false;
+            hittable = false;
+
+            engineOffset = 7.5f;
+            engineSize = 3.4f;
+
+            setEnginesMirror(
+            new UnitEngine(35 / 4f, -13 / 4f, 2.7f, 315f),
+            new UnitEngine(28 / 4f, -35 / 4f, 2.7f, 315f)
+            );
+
+            weapons.add(new RepairBeamWeapon(){{
+                widthSinMag = 0.11f;
+                reload = 20f;
+                x = 19f/4f;
+                y = 19f/4f;
+                rotate = false;
+                shootY = 0f;
+                beamWidth = 0.7f;
+                aimDst = 0f;
+                shootCone = 40f;
+                mirror = true;
+
+                repairSpeed = 3.6f / 2f;
+                fractionRepairSpeed = 0.03f;
+
+                targetUnits = false;
+                targetBuildings = true;
+                autoTarget = false;
+                controllable = true;
+                laserColor = Pal.accent;
+                healColor = Pal.accent;
+
+                bullet = new BulletType(){{
+                    maxRange = 65f;
+                }};
+            }});
+        }};
+
+        //endregion
+        //region internal + special
+
+        block = new UnitType("block"){{
+            speed = 0f;
+            hitSize = 0f;
+            health = 1;
+            rotateSpeed = 360f;
+            itemCapacity = 0;
+            hidden = true;
+            internal = true;
+        }};
+
+        manifold = new ErekirUnitType("manifold"){{
+            controller = u -> new CargoAI();
+            isEnemy = false;
+            allowedInPayloads = false;
+            logicControllable = false;
+            playerControllable = false;
+            envDisabled = 0;
+            payloadCapacity = 0f;
+
+            lowAltitude = false;
+            flying = true;
+            drag = 0.06f;
+            speed = 2f;
+            rotateSpeed = 9f;
+            accel = 0.1f;
+            itemCapacity = 50;
+            health = 200f;
+            hitSize = 11f;
+            engineSize = 2.3f;
+            engineOffset = 6.5f;
+            hidden = true;
+
+            setEnginesMirror(
+                new UnitEngine(24 / 4f, -24 / 4f, 2.3f, 315f)
+            );
+        }};
+
+        assemblyDrone = new ErekirUnitType("assembly-drone"){{
+            controller = u -> new AssemblerAI();
+
+            flying = true;
+            drag = 0.06f;
+            accel = 0.11f;
+            speed = 1.3f;
+            health = 90;
+            engineSize = 2f;
+            engineOffset = 6.5f;
+            payloadCapacity = 0f;
+            targetable = false;
+
+            outlineColor = Pal.darkOutline;
+            isEnemy = false;
+            hidden = true;
+            useUnitCap = false;
+            logicControllable = false;
+            playerControllable = false;
+            allowedInPayloads = false;
+            createWreck = false;
+            envEnabled = Env.any;
+            envDisabled = Env.none;
+        }};
 
         //endregion
     }

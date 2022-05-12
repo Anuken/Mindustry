@@ -9,6 +9,7 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
 import mindustry.core.*;
+import mindustry.ctype.*;
 import mindustry.entities.EntityCollisions.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
@@ -38,6 +39,11 @@ public class UnitPayload implements Payload{
     public void showOverlay(TextureRegionDrawable icon){
         if(icon == null || headless) return;
         showOverlay(icon.getRegion());
+    }
+
+    @Override
+    public UnlockableContent content(){
+        return unit.type;
     }
 
     @Override
@@ -134,6 +140,16 @@ public class UnitPayload implements Payload{
     public void draw(){
         //TODO should not happen
         if(unit.type == null) return;
+
+        //TODO this would be more accurate but has all sorts of associated problems (?)
+        if(false){
+            float e = unit.elevation;
+            unit.elevation = 0f;
+            //avoids drawing mining or building
+            unit.type.draw(unit);
+            unit.elevation = e;
+            return;
+        }
 
         unit.type.drawSoftShadow(unit);
         Draw.rect(unit.type.fullIcon, unit.x, unit.y, unit.rotation - 90);

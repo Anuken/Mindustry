@@ -19,16 +19,39 @@ import static mindustry.Vars.*;
 public class Units{
     private static final Rect hitrect = new Rect();
     private static Unit result;
-    private static float cdist;
+    private static float cdist, cpriority;
     private static boolean boolResult;
     private static int intResult;
     private static Building buildResult;
+
+    //prevents allocations in anyEntities
+    private static boolean anyEntityGround;
+    private static float aeX, aeY, aeW, aeH;
+    private static final Cons<Unit> anyEntityLambda = unit -> {
+        if(boolResult) return;
+        if((unit.isGrounded() && !unit.hovering) == anyEntityGround){
+            unit.hitboxTile(hitrect);
+
+            if(hitrect.overlaps(aeX, aeY, aeW, aeH)){
+                boolResult = true;
+            }
+        }
+    };
 
     @Remote(called = Loc.server)
     public static void unitCapDeath(Unit unit){
         if(unit != null){
             unit.dead = true;
             Fx.unitCapKill.at(unit);
+            Core.app.post(() -> Call.unitDestroy(unit.id));
+        }
+    }
+
+    @Remote(called = Loc.server)
+    public static void unitEnvDeath(Unit unit){
+        if(unit != null){
+            unit.dead = true;
+            Fx.unitEnvKill.at(unit);
             Core.app.post(() -> Call.unitDestroy(unit.id));
         }
     }
@@ -102,7 +125,11 @@ public class Units{
      * @return whether the target is invalid
      */
     public static boolean invalidateTarget(Posc target, Team team, float x, float y, float range){
-        return target == null || (range != Float.MAX_VALUE && !target.within(x, y, range + (target instanceof Sized hb ? hb.hitSize()/2f : 0f))) || (target instanceof Teamc t && t.team() == team) || (target instanceof Healthc h && !h.isValid());
+        return target == null ||
+            (range != Float.MAX_VALUE && !target.within(x, y, range + (target instanceof Sized hb ? hb.hitSize()/2f : 0f))) ||
+            (target instanceof Teamc t && t.team() == team) ||
+            (target instanceof Healthc h && !h.isValid()) ||
+            (target instanceof Unit u && !u.targetable(team));
     }
 
     /** See {@link #invalidateTarget(Posc, Team, float, float, float)} */
@@ -126,16 +153,32 @@ public class Units{
         return anyEntities(tile, true);
     }
 
+    public static boolean anyEntities(float x, float y, float size){
+        return anyEntities(x - size/2f, y - size/2f, size, size, true);
+    }
+
     public static boolean anyEntities(float x, float y, float width, float height){
         return anyEntities(x, y, width, height, true);
     }
 
     public static boolean anyEntities(float x, float y, float width, float height, boolean ground){
         boolResult = false;
+        anyEntityGround = ground;
+        aeX = x;
+        aeY = y;
+        aeW = width;
+        aeH = height;
+
+        nearby(x, y, width, height, anyEntityLambda);
+        return boolResult;
+    }
+
+    public static boolean anyEntities(float x, float y, float width, float height, Boolf<Unit> check){
+        boolResult = false;
 
         nearby(x, y, width, height, unit -> {
             if(boolResult) return;
-            if((unit.isGrounded() && !unit.hovering) == ground){
+            if(check.get(unit)){
                 unit.hitboxTile(hitrect);
 
                 if(hitrect.overlaps(x, y, width, height)){
@@ -143,7 +186,6 @@ public class Units{
                 }
             }
         });
-
         return boolResult;
     }
 
@@ -169,7 +211,7 @@ public class Units{
         buildResult = null;
         cdist = 0f;
 
-        var buildings = team.data().buildings;
+        var buildings = team.data().buildingTree;
         if(buildings == null) return null;
         buildings.intersect(wx - range, wy - range, range*2f, range*2f, b -> {
             if(pred.get(b)){
@@ -229,14 +271,16 @@ public class Units{
 
         result = null;
         cdist = 0f;
+        cpriority = -99999f;
 
         nearbyEnemies(team, x - range, y - range, range*2f, range*2f, e -> {
-            if(e.dead() || !predicate.get(e) || e.team == Team.derelict) return;
+            if(e.dead() || !predicate.get(e) || e.team == Team.derelict || !e.targetable(team)) return;
 
             float dst2 = e.dst2(x, y) - (e.hitSize * e.hitSize);
-            if(dst2 < range*range && (result == null || dst2 < cdist)){
+            if(dst2 < range*range && (result == null || dst2 < cdist || e.type.targetPriority > cpriority) && e.type.targetPriority >= cpriority){
                 result = e;
                 cdist = dst2;
+                cpriority = e.type.targetPriority;
             }
         });
 
@@ -249,14 +293,16 @@ public class Units{
 
         result = null;
         cdist = 0f;
+        cpriority = -99999f;
 
         nearbyEnemies(team, x - range, y - range, range*2f, range*2f, e -> {
-            if(e.dead() || !predicate.get(e) || e.team == Team.derelict || !e.within(x, y, range + e.hitSize/2f)) return;
+            if(e.dead() || !predicate.get(e) || e.team == Team.derelict || !e.within(x, y, range + e.hitSize/2f) || !e.targetable(team)) return;
 
             float cost = sort.cost(e, x, y);
-            if(result == null || cost < cdist){
+            if((result == null || cost < cdist || e.type.targetPriority > cpriority) && e.type.targetPriority >= cpriority){
                 result = e;
                 cdist = cost;
+                cpriority = e.type.targetPriority;
             }
         });
 
@@ -409,6 +455,23 @@ public class Units{
     /** Iterates over all units that are enemies of this team. */
     public static void nearbyEnemies(Team team, Rect rect, Cons<Unit> cons){
         nearbyEnemies(team, rect.x, rect.y, rect.width, rect.height, cons);
+    }
+
+    /** @return whether there is an enemy in this rectangle. */
+    public static boolean nearEnemy(Team team, float x, float y, float width, float height){
+        Seq<TeamData> data = state.teams.present;
+        for(int i = 0; i < data.size; i++){
+            var other = data.items[i];
+            if(other.team != team){
+                if(other.tree().any(x, y, width, height)){
+                    return true;
+                }
+                if(other.turretTree != null && other.turretTree.any(x, y, width, height)){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public interface Sortf{

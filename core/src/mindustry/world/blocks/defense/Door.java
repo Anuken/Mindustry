@@ -36,6 +36,7 @@ public class Door extends Wall{
 
         config(Boolean.class, (DoorBuild base, Boolean open) -> {
             doorSound.at(base);
+            base.effect();
 
             for(DoorBuild entity : base.chained){
                 //skip doors with things in them
@@ -45,14 +46,13 @@ public class Door extends Wall{
 
                 entity.open = open;
                 pathfinder.updateTile(entity.tile());
-                entity.effect();
             }
         });
     }
 
     @Override
-    public TextureRegion getRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
-        return req.config == Boolean.TRUE ? openRegion : region;
+    public TextureRegion getPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
+        return plan.config == Boolean.TRUE ? openRegion : region;
     }
 
     public class DoorBuild extends Building{
@@ -100,7 +100,7 @@ public class Door extends Wall{
         }
 
         public void effect(){
-            (open ? closefx : openfx).at(this);
+            (open ? closefx : openfx).at(this, size);
         }
 
         public void updateChained(){

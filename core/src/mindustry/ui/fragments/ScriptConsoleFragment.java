@@ -32,12 +32,6 @@ public class ScriptConsoleFragment extends Table{
     private Seq<String> history = new Seq<>();
     private int historyPos = 0;
     private int scrollPos = 0;
-    private Fragment container = new Fragment(){
-        @Override
-        public void build(Group parent){
-            scene.add(ScriptConsoleFragment.this);
-        }
-    };
 
     public ScriptConsoleFragment(){
         setFillParent(true);
@@ -48,6 +42,9 @@ public class ScriptConsoleFragment extends Table{
                 shown = !shown;
                 if(shown && !open && enableConsole){
                     toggle();
+                }
+                if(shown){
+                    chatfield.requestKeyboard();
                 }
                 clearChatInput();
             }
@@ -79,8 +76,8 @@ public class ScriptConsoleFragment extends Table{
         setup();
     }
 
-    public Fragment container(){
-        return container;
+    public void build(Group parent){
+        scene.add(this);
     }
 
     public void clearMessages(){
@@ -104,6 +101,10 @@ public class ScriptConsoleFragment extends Table{
         add(chatfield).padBottom(offsety).padLeft(offsetx).growX().padRight(offsetx).height(28);
     }
 
+    protected void rect(float x, float y, float w, float h){
+        Draw.rect("whiteui", x + w/2f, y + h/2f, w, h);
+    }
+
     @Override
     public void draw(){
         float opacity = 1f;
@@ -112,7 +113,7 @@ public class ScriptConsoleFragment extends Table{
         Draw.color(shadowColor);
 
         if(open){
-            Fill.crect(offsetx, chatfield.y + scene.marginBottom, chatfield.getWidth() + 15f, chatfield.getHeight() - 1);
+            rect(offsetx, chatfield.y + scene.marginBottom, chatfield.getWidth() + 15f, chatfield.getHeight() - 1);
         }
 
         super.draw();
@@ -143,7 +144,7 @@ public class ScriptConsoleFragment extends Table{
                 font.getCache().setAlphas(opacity);
             }
 
-            Fill.crect(offsetx, theight - layout.height - 2, textWidth + Scl.scl(4f), layout.height + textspacing);
+            rect(offsetx, theight - layout.height - 2, textWidth + Scl.scl(4f), layout.height + textspacing);
             Draw.color(shadowColor);
             Draw.alpha(opacity * shadowColor.a);
 

@@ -1,6 +1,7 @@
 package mindustry.world.blocks.distribution;
 
 import arc.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -9,6 +10,7 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -22,6 +24,8 @@ import static mindustry.Vars.*;
 
 public class Duct extends Block implements Autotiler{
     public float speed = 5f;
+    public boolean armored = false;
+    public Color transparentColor = new Color(0.4f, 0.4f, 0.4f, 0.1f);
 
     public @Load(value = "@-top-#", length = 5) TextureRegion[] topRegions;
     public @Load(value = "@-bottom-#", length = 5, fallback = "duct-bottom-#") TextureRegion[] botRegions;
@@ -37,8 +41,10 @@ public class Duct extends Block implements Autotiler{
         unloadable = false;
         itemCapacity = 1;
         noUpdateDisabled = true;
+        underBullets = true;
         rotate = true;
         noSideBlend = true;
+        priority = TargetPriority.transport;
         envEnabled = Env.space | Env.terrestrial | Env.underwater;
     }
 
@@ -50,22 +56,36 @@ public class Duct extends Block implements Autotiler{
     }
 
     @Override
-    public void drawRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
-        int[] bits = getTiling(req, list);
+    public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
+        int[] bits = getTiling(plan, list);
 
         if(bits == null) return;
 
         Draw.scl(bits[1], bits[2]);
         Draw.alpha(0.5f);
-        Draw.rect(botRegions[bits[0]], req.drawx(), req.drawy(), req.rotation * 90);
+        Draw.rect(botRegions[bits[0]], plan.drawx(), plan.drawy(), plan.rotation * 90);
         Draw.color();
-        Draw.rect(topRegions[bits[0]], req.drawx(), req.drawy(), req.rotation * 90);
+        Draw.rect(topRegions[bits[0]], plan.drawx(), plan.drawy(), plan.rotation * 90);
         Draw.scl();
     }
 
     @Override
+    public boolean blendsArmored(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
+        return Point2.equals(tile.x + Geometry.d4(rotation).x, tile.y + Geometry.d4(rotation).y, otherx, othery)
+            || ((!otherblock.rotatedOutput(otherx, othery) && Edges.getFacingEdge(otherblock, otherx, othery, tile) != null &&
+            Edges.getFacingEdge(otherblock, otherx, othery, tile).relativeTo(tile) == rotation) ||
+            //basically the only change here is that it treats overflow ducts specially, since they're... weird
+            ((otherblock.rotatedOutput(otherx, othery) || otherblock instanceof OverflowDuct) && Point2.equals(otherx + Geometry.d4(otherrot).x, othery + Geometry.d4(otherrot).y, tile.x, tile.y)));
+    }
+
+    @Override
     public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
-        return otherblock.outputsItems() && blendsArmored(tile, rotation, otherx, othery, otherrot, otherblock);
+        if(!armored){
+            return (otherblock.outputsItems() || (lookingAt(tile, rotation, otherx, othery, otherblock) && otherblock.hasItems))
+            && lookingAtEither(tile, rotation, otherx, othery, otherrot, otherblock);
+        }else{
+            return (otherblock.outputsItems() && blendsArmored(tile, rotation, otherx, othery, otherrot, otherblock)) || (lookingAt(tile, rotation, otherx, othery, otherblock) && otherblock.hasItems);
+        }
     }
 
     @Override
@@ -75,7 +95,7 @@ public class Duct extends Block implements Autotiler{
 
     @Override
     public void handlePlacementLine(Seq<BuildPlan> plans){
-        Placement.calculateDuctBridges(plans, (DuctBridge)Blocks.ductBridge);
+        Placement.calculateBridges(plans, (DuctBridge)Blocks.ductBridge, false, b -> b instanceof Duct);
     }
 
     public class DuctBuild extends Building{
@@ -93,7 +113,7 @@ public class Duct extends Block implements Autotiler{
 
             //draw extra ducts facing this one for tiling purposes
             for(int i = 0; i < 4; i++){
-                if((blending & (1 << i)) != 0 && !(i == 0 && nextc != null)){
+                if((blending & (1 << i)) != 0){
                     int dir = r - i;
                     float rot = i == 0 ? rotation : (dir)*90;
                     drawAt(x + Geometry.d4x(dir) * tilesize*0.75f, y + Geometry.d4y(dir) * tilesize*0.75f, 0, rot, i != 0 ? SliceMode.bottom : SliceMode.top);
@@ -115,12 +135,17 @@ public class Duct extends Block implements Autotiler{
             Draw.reset();
         }
 
+        @Override
+        public void payloadDraw(){
+            Draw.rect(fullIcon, x, y);
+        }
+
         protected void drawAt(float x, float y, int bits, float rotation, SliceMode slice){
             Draw.z(Layer.blockUnder);
             Draw.rect(sliced(botRegions[bits], slice), x, y, rotation);
 
             Draw.z(Layer.blockUnder + 0.2f);
-            Draw.color(0.4f, 0.4f, 0.4f, 0.4f);
+            Draw.color(transparentColor);
             Draw.rect(sliced(botRegions[bits], slice), x, y, rotation);
             Draw.color();
             Draw.rect(sliced(topRegions[bits], slice), x, y, rotation);
@@ -148,7 +173,12 @@ public class Duct extends Block implements Autotiler{
         @Override
         public boolean acceptItem(Building source, Item item){
             return current == null && items.total() == 0 &&
-                ((source.block.rotate && source.front() == this && source.block.hasItems) || Edges.getFacingEdge(source.tile(), tile).relativeTo(tile) == rotation);
+                (armored ?
+                    //armored acceptance
+                    ((source.block.rotate && source.front() == this && source.block.hasItems) || Edges.getFacingEdge(source.tile(), tile).relativeTo(tile) == rotation) :
+                    //standard acceptance - do not accept from front
+                    !(source.block.rotate && next == source) && Math.abs(Edges.getFacingEdge(source.tile, tile).relativeTo(tile.x, tile.y) - rotation) != 2
+                );
         }
 
         @Override
