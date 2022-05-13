@@ -90,6 +90,8 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean destructible;
     /** whether unloaders work on this block */
     public boolean unloadable = true;
+    /** if true, this block acts a duct and will connect to armored ducts from the side. */
+    public boolean isDuct = false;
     /** whether units can resupply by taking items from this block */
     public boolean allowResupply = false;
     /** whether this is solid */

@@ -684,7 +684,6 @@ public class UnitTypes{
             hitSize = 15f;
             rotateSpeed = 3f;
             health = 1000;
-            immunities = ObjectSet.with(StatusEffects.burning, StatusEffects.melting);
             legCount = 6;
             legLength = 13f;
             legForwardScl = 0.8f;
@@ -1540,7 +1539,7 @@ public class UnitTypes{
             trailLength = 20;
             waveTrailX = 5.5f;
             waveTrailY = -4f;
-            tailScl = 1.9f;
+            trailScl = 1.9f;
 
             weapons.add(new Weapon("mount-weapon"){{
                 reload = 10f;
@@ -1599,7 +1598,7 @@ public class UnitTypes{
             trailLength = 22;
             waveTrailX = 7f;
             waveTrailY = -9f;
-            tailScl = 1.5f;
+            trailScl = 1.5f;
 
             abilities.add(new ShieldRegenFieldAbility(20f, 40f, 60f * 4, 60f));
 
@@ -1696,7 +1695,7 @@ public class UnitTypes{
             trailLength = 50;
             waveTrailX = 18f;
             waveTrailY = -21f;
-            tailScl = 3f;
+            trailScl = 3f;
 
             weapons.add(new Weapon("sei-launcher"){{
 
@@ -1790,7 +1789,7 @@ public class UnitTypes{
             trailLength = 70;
             waveTrailX = 23f;
             waveTrailY = -32f;
-            tailScl = 3.5f;
+            trailScl = 3.5f;
 
             weapons.add(new Weapon("omura-cannon"){{
                 reload = 110f;
@@ -1834,7 +1833,7 @@ public class UnitTypes{
             rotateSpeed = 5f;
             trailLength = 20;
             waveTrailX = 5f;
-            tailScl = 1.3f;
+            trailScl = 1.3f;
             faceTarget = false;
             range = 100f;
             ammoType = new PowerAmmoType(900);
@@ -1925,7 +1924,7 @@ public class UnitTypes{
             trailLength = 22;
             waveTrailX = 5.5f;
             waveTrailY = -4f;
-            tailScl = 1.9f;
+            trailScl = 1.9f;
             ammoType = new ItemAmmoType(Items.coal);
 
             abilities.add(new StatusFieldAbility(StatusEffects.overclock, 60f * 6, 60f * 6f, 60f));
@@ -2002,7 +2001,7 @@ public class UnitTypes{
             trailLength = 23;
             waveTrailX = 9f;
             waveTrailY = -9f;
-            tailScl = 2f;
+            trailScl = 2f;
 
             buildSpeed = 2f;
 
@@ -2143,7 +2142,7 @@ public class UnitTypes{
             trailLength = 50;
             waveTrailX = 18f;
             waveTrailY = -17f;
-            tailScl = 3.2f;
+            trailScl = 3.2f;
 
             buildSpeed = 3f;
 
@@ -2184,7 +2183,7 @@ public class UnitTypes{
             trailLength = 70;
             waveTrailX = 23f;
             waveTrailY = -32f;
-            tailScl = 3.5f;
+            trailScl = 3.5f;
 
             buildSpeed = 3.5f;
 
