@@ -196,7 +196,7 @@ public class FileChooser extends BaseDialog{
         Fi[] names = getFileNames();
 
         Image upimage = new Image(Icon.upOpen);
-        TextButton upbutton = new TextButton(".." + directory.toString(), Styles.clearTogglet);
+        TextButton upbutton = new TextButton(".." + directory.toString(), Styles.flatTogglet);
         upbutton.clicked(() -> {
             directory = directory.parent();
             setLastDirectory(directory);
@@ -218,7 +218,7 @@ public class FileChooser extends BaseDialog{
 
             String filename = file.name();
 
-            TextButton button = new TextButton(filename, Styles.clearTogglet);
+            TextButton button = new TextButton(filename.replace("[", "[["), Styles.flatTogglet);
             button.getLabel().setWrap(false);
             button.getLabel().setEllipsis(true);
             group.add(button);

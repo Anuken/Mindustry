@@ -11,6 +11,7 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
@@ -26,7 +27,7 @@ import mindustry.world.blocks.ConstructBlock.*;
 
 import static mindustry.Vars.*;
 
-public class PlacementFragment extends Fragment{
+public class PlacementFragment{
     final int rowWidth = 4;
 
     public Category currentCategory = Category.distribution;
@@ -36,14 +37,16 @@ public class PlacementFragment extends Fragment{
     boolean[] categoryEmpty = new boolean[Category.all.length];
     ObjectMap<Category,Block> selectedBlocks = new ObjectMap<>();
     ObjectFloatMap<Category> scrollPositions = new ObjectFloatMap<>();
-    Block menuHoverBlock;
-    Displayable hover;
-    Object lastDisplayState;
-    Team lastTeam;
+    @Nullable Block menuHoverBlock;
+    @Nullable Displayable hover;
+    @Nullable Building lastFlowBuild, nextFlowBuild;
+    @Nullable Object lastDisplayState;
+    @Nullable Team lastTeam;
     boolean wasHovered;
-    Table blockTable, toggler, topTable;
+    Table blockTable, toggler, topTable, blockCatTable, commandTable;
+    Stack mainStack;
     ScrollPane blockPane;
-    boolean blockSelectEnd;
+    boolean blockSelectEnd, wasCommandMode;
     int blockSelectSeq;
     long blockSelectSeqMillis;
     Binding[] blockSelect = {
@@ -66,6 +69,7 @@ public class PlacementFragment extends Fragment{
     public PlacementFragment(){
         Events.on(WorldLoadEvent.class, event -> {
             Core.app.post(() -> {
+                currentCategory = Category.distribution;
                 control.input.block = null;
                 rebuild();
             });
@@ -80,6 +84,21 @@ public class PlacementFragment extends Fragment{
         Events.on(ResetEvent.class, event -> {
             selectedBlocks.clear();
         });
+
+        Events.run(Trigger.update, () -> {
+            //disable flow updating on previous building so it doesn't waste CPU
+            if(lastFlowBuild != null && lastFlowBuild != nextFlowBuild){
+                if(lastFlowBuild.flowItems() != null) lastFlowBuild.flowItems().stopFlow();
+                if(lastFlowBuild.liquids != null) lastFlowBuild.liquids.stopFlow();
+            }
+
+            lastFlowBuild = nextFlowBuild;
+
+            if(nextFlowBuild != null){
+                if(nextFlowBuild.flowItems() != null) nextFlowBuild.flowItems().updateFlow();
+                if(nextFlowBuild.liquids != null) nextFlowBuild.liquids.updateFlow();
+            }
+        });
     }
 
     public Displayable hover(){
@@ -87,7 +106,7 @@ public class PlacementFragment extends Fragment{
     }
 
     void rebuild(){
-        currentCategory = Category.turret;
+        //category does not change on rebuild anymore, only on new world load
         Group group = toggler.parent;
         int index = toggler.getZIndex();
         toggler.remove();
@@ -100,6 +119,12 @@ public class PlacementFragment extends Fragment{
 
         if(Core.input.keyTap(Binding.pick) && player.isBuilder() && !Core.scene.hasDialog()){ //mouse eyedropper select
             var build = world.buildWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
+
+            //can't middle click buildings in fog
+            if(build != null && build.inFogTo(player.team())){
+                build = null;
+            }
+
             Block tryRecipe = build == null ? null : build instanceof ConstructBuild c ? c.current : build.block;
             Object tryConfig = build == null || !build.block.copyConfig ? null : build.config();
 
@@ -204,7 +229,6 @@ public class PlacementFragment extends Fragment{
         return false;
     }
 
-    @Override
     public void build(Group parent){
         parent.fill(full -> {
             toggler = full;
@@ -230,7 +254,7 @@ public class PlacementFragment extends Fragment{
 
                         ImageButton button = blockTable.button(new TextureRegionDrawable(block.uiIcon), Styles.selecti, () -> {
                             if(unlocked(block)){
-                                if(Core.input.keyDown(KeyCode.shiftLeft) && Fonts.getUnicode(block.name) != 0){
+                                if((Core.input.keyDown(KeyCode.shiftLeft) || Core.input.keyDown(KeyCode.controlLeft)) && Fonts.getUnicode(block.name) != 0){
                                     Core.app.setClipboardText((char)Fonts.getUnicode(block.name) + "");
                                     ui.showInfoFade("@copied");
                                 }else{
@@ -319,7 +343,7 @@ public class PlacementFragment extends Fragment{
                                 .left().width(190f).padLeft(5);
                                 header.add().growX();
                                 if(unlocked(displayBlock)){
-                                    header.button("?", Styles.clearPartialt, () -> {
+                                    header.button("?", Styles.flatBordert, () -> {
                                         ui.content.show(displayBlock);
                                         Events.fire(new BlockInfoEvent());
                                     }).size(8 * 5).padTop(-5).padRight(-5).right().grow().name("blockinfo");
@@ -354,7 +378,7 @@ public class PlacementFragment extends Fragment{
                                 topTable.row();
                                 topTable.table(b -> {
                                     b.image(Icon.cancel).padRight(2).color(Color.scarlet);
-                                    b.add(!player.isBuilder() ? "@unit.nobuild" : !displayBlock.supportsEnv(state.rules.environment) ? "@unsupported.environment" : "@banned").width(190f).wrap();
+                                    b.add(!player.isBuilder() ? "@unit.nobuild" : !displayBlock.supportsEnv(state.rules.env) ? "@unsupported.environment" : "@banned").width(190f).wrap();
                                     b.left();
                                 }).padTop(2).left();
                             }
@@ -364,61 +388,151 @@ public class PlacementFragment extends Fragment{
                             hovered.display(topTable);
                         }
                     });
-                }).colspan(3).fillX().visible(this::hasInfoBox).touchable(Touchable.enabled);
-                frame.row();
-                frame.image().color(Pal.gray).colspan(3).height(4).growX();
-                frame.row();
-                frame.table(Tex.pane2, blocksSelect -> {
-                    blocksSelect.margin(4).marginTop(0);
-                    blockPane = blocksSelect.pane(blocks -> blockTable = blocks).height(194f).update(pane -> {
-                        if(pane.hasScroll()){
-                            Element result = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
-                            if(result == null || !result.isDescendantOf(pane)){
-                                Core.scene.setScrollFocus(null);
+                }).colspan(3).fillX().visible(this::hasInfoBox).touchable(Touchable.enabled).row();
+
+                frame.image().color(Pal.gray).colspan(3).height(4).growX().row();
+
+                blockCatTable = new Table();
+                commandTable = new Table(Tex.pane2);
+                mainStack = new Stack();
+
+                mainStack.update(() -> {
+                    if(control.input.commandMode != wasCommandMode){
+                        mainStack.clearChildren();
+                        if(!mobile || !control.input.commandMode){
+                            mainStack.addChild(control.input.commandMode ? commandTable : blockCatTable);
+
+                            //hacky, but forces command table to be same width as blocks
+                            if(control.input.commandMode){
+                                commandTable.getCells().peek().width(blockCatTable.getWidth());
                             }
                         }
-                    }).grow().get();
-                    blockPane.setStyle(Styles.smallPane);
-                    blocksSelect.row();
-                    blocksSelect.table(control.input::buildPlacementUI).name("inputTable").growX();
-                }).fillY().bottom().touchable(Touchable.enabled);
-                frame.table(categories -> {
-                    categories.bottom();
-                    categories.add(new Image(Styles.black6){
-                        @Override
-                        public void draw(){
-                            if(height <= Scl.scl(3f)) return;
-                            getDrawable().draw(x, y, width, height - Scl.scl(3f));
-                        }
-                    }).colspan(2).growX().growY().padTop(-3f).row();
-                    categories.defaults().size(50f);
 
-                    ButtonGroup<ImageButton> group = new ButtonGroup<>();
-
-                    //update category empty values
-                    for(Category cat : Category.all){
-                        Seq<Block> blocks = getUnlockedByCategory(cat);
-                        categoryEmpty[cat.ordinal()] = blocks.isEmpty();
+                        wasCommandMode = control.input.commandMode;
                     }
+                });
 
-                    int f = 0;
-                    for(Category cat : getCategories()){
-                        if(f++ % 2 == 0) categories.row();
+                frame.add(mainStack).colspan(3).fill();
 
-                        if(categoryEmpty[cat.ordinal()]){
-                            categories.image(Styles.black6);
-                            continue;
-                        }
+                //commandTable: commanded units
+                {
+                    commandTable.touchable = Touchable.enabled;
+                    commandTable.add("[accent]Command Mode").fill().center().labelAlign(Align.center).row();
+                    commandTable.image().color(Pal.accent).growX().pad(20f).padTop(0f).padBottom(4f).row();
+                    commandTable.table(u -> {
+                        u.left();
+                        int[] curCount = {0};
 
-                        categories.button(ui.getIcon(cat.name()), Styles.clearToggleTransi, () -> {
-                            currentCategory = cat;
-                            if(control.input.block != null){
-                                control.input.block = getSelectedBlock(currentCategory);
+                        Runnable rebuildCommand = () -> {
+                            u.clearChildren();
+                            var units = control.input.selectedUnits;
+                            if(units.size > 0){
+                                int[] counts = new int[content.units().size];
+                                for(var unit : units){
+                                    counts[unit.type.id] ++;
+                                }
+                                int col = 0;
+                                for(int i = 0; i < counts.length; i++){
+                                    if(counts[i] > 0){
+                                        var type = content.unit(i);
+                                        u.add(new ItemImage(type.uiIcon, counts[i])).tooltip(type.localizedName).pad(4).with(b -> {
+                                            ClickListener listener = new ClickListener();
+
+                                            //left click -> select
+                                            b.clicked(KeyCode.mouseLeft, () -> control.input.selectedUnits.removeAll(unit -> unit.type != type));
+                                            //right click -> remove
+                                            b.clicked(KeyCode.mouseRight, () -> control.input.selectedUnits.removeAll(unit -> unit.type == type));
+
+                                            b.addListener(listener);
+                                            b.addListener(new HandCursorListener());
+                                            //gray on hover
+                                            b.update(() -> ((Group)b.getChildren().first()).getChildren().first().setColor(listener.isOver() ? Color.lightGray : Color.white));
+                                        });
+
+                                        if(++col % 7 == 0){
+                                            u.row();
+                                        }
+                                    }
+                                }
+                            }else{
+                                u.add("[no units]").color(Color.lightGray).growX().center().labelAlign(Align.center).pad(6);
                             }
-                            rebuildCategory.run();
-                        }).group(group).update(i -> i.setChecked(currentCategory == cat)).name("category-" + cat.name());
-                    }
-                }).fillY().bottom().touchable(Touchable.enabled);
+                        };
+
+                        u.update(() -> {
+                            int size = control.input.selectedUnits.size;
+                            if(curCount[0] != size){
+                                curCount[0] = size;
+                                rebuildCommand.run();
+                            }
+                        });
+                        rebuildCommand.run();
+                    }).grow();
+                }
+
+                //blockCatTable: all blocks | all categories
+                {
+                    blockCatTable.table(Tex.pane2, blocksSelect -> {
+                        blocksSelect.margin(4).marginTop(0);
+                        blockPane = blocksSelect.pane(blocks -> blockTable = blocks).height(194f).update(pane -> {
+                            if(pane.hasScroll()){
+                                Element result = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
+                                if(result == null || !result.isDescendantOf(pane)){
+                                    Core.scene.setScrollFocus(null);
+                                }
+                            }
+                        }).grow().get();
+                        blockPane.setStyle(Styles.smallPane);
+                        blocksSelect.row();
+                        blocksSelect.table(control.input::buildPlacementUI).name("inputTable").growX();
+                    }).fillY().bottom().touchable(Touchable.enabled);
+                    blockCatTable.table(categories -> {
+                        categories.bottom();
+                        categories.add(new Image(Styles.black6){
+                            @Override
+                            public void draw(){
+                                if(height <= Scl.scl(3f)) return;
+                                getDrawable().draw(x, y, width, height - Scl.scl(3f));
+                            }
+                        }).colspan(2).growX().growY().padTop(-3f).row();
+                        categories.defaults().size(50f);
+
+                        ButtonGroup<ImageButton> group = new ButtonGroup<>();
+
+                        //update category empty values
+                        for(Category cat : Category.all){
+                            Seq<Block> blocks = getUnlockedByCategory(cat);
+                            categoryEmpty[cat.ordinal()] = blocks.isEmpty();
+                        }
+
+                        boolean needsAssign = categoryEmpty[currentCategory.ordinal()];
+
+                        int f = 0;
+                        for(Category cat : getCategories()){
+                            if(f++ % 2 == 0) categories.row();
+
+                            if(categoryEmpty[cat.ordinal()]){
+                                categories.image(Styles.black6);
+                                continue;
+                            }
+
+                            if(needsAssign){
+                                currentCategory = cat;
+                                needsAssign = false;
+                            }
+
+                            categories.button(ui.getIcon(cat.name()), Styles.clearTogglei, () -> {
+                                currentCategory = cat;
+                                if(control.input.block != null){
+                                    control.input.block = getSelectedBlock(currentCategory);
+                                }
+                                rebuildCategory.run();
+                            }).group(group).update(i -> i.setChecked(currentCategory == cat)).name("category-" + cat.name());
+                        }
+                    }).fillY().bottom().touchable(Touchable.enabled);
+                }
+
+                mainStack.add(blockCatTable);
 
                 rebuildCategory.run();
                 frame.update(() -> {
@@ -445,7 +559,8 @@ public class PlacementFragment extends Fragment{
     }
 
     boolean unlocked(Block block){
-        return block.unlockedNow() && block.placeablePlayer && (state.rules.hiddenBuildItems.isEmpty() || !Structs.contains(block.requirements, i -> state.rules.hiddenBuildItems.contains(i.item)));
+        return block.unlockedNow() && block.placeablePlayer && block.environmentBuildable() &&
+            block.supportsEnv(state.rules.env); //TODO this hides env unsupported blocks, not always a good thing
     }
 
     boolean hasInfoBox(){
@@ -470,13 +585,12 @@ public class PlacementFragment extends Fragment{
         Tile hoverTile = world.tileWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
         if(hoverTile != null){
             //if the tile has a building, display it
-            if(hoverTile.build != null){
-                hoverTile.build.updateFlow = true;
-                return hoverTile.build;
+            if(hoverTile.build != null && hoverTile.build.displayable() && !hoverTile.build.inFogTo(player.team())){
+                return nextFlowBuild = hoverTile.build;
             }
 
             //if the tile has a drop, display the drop
-            if(hoverTile.drop() != null || hoverTile.wallDrop() != null){
+            if((hoverTile.drop() != null && hoverTile.block() == Blocks.air) || hoverTile.wallDrop() != null || hoverTile.floor().liquidDrop != null){
                 return hoverTile;
             }
         }

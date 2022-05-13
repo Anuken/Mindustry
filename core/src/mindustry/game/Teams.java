@@ -8,10 +8,9 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.ai.*;
-import mindustry.content.*;
-import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
+import mindustry.world.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
@@ -81,7 +80,10 @@ public class Teams{
 
     /** Returns team data by type. */
     public TeamData get(Team team){
-        if(map[team.id] == null) map[team.id] = new TeamData(team);
+        return map[team.id] == null ? (map[team.id] = new TeamData(team)) : map[team.id];
+    }
+
+    public @Nullable TeamData getOrNull(Team team){
         return map[team.id];
     }
 
@@ -138,11 +140,12 @@ public class Teams{
         unit.team.data().updateCount(unit.type, 1);
 
         if(unit instanceof Payloadc payloadc){
-            payloadc.payloads().each(p -> {
-                if(p instanceof UnitPayload payload){
+            var payloads = payloadc.payloads();
+            for(int i = 0; i < payloads.size; i++){
+                if(payloads.get(i) instanceof UnitPayload payload){
                     count(payload.unit);
                 }
-            });
+            }
         }
     }
 
@@ -153,11 +156,15 @@ public class Teams{
         for(Team team : Team.all){
             TeamData data = team.data();
 
-            data.presentFlag = false;
+            data.presentFlag = data.buildings.size > 0;
             data.unitCount = 0;
             data.units.clear();
-            if(data.tree != null){
-                data.tree.clear();
+            data.players.clear();
+            if(data.cores.size > 0){
+                data.lastCore = data.cores.first();
+            }
+            if(data.unitTree != null){
+                data.unitTree.clear();
             }
 
             if(data.typeCounts != null){
@@ -174,9 +181,7 @@ public class Teams{
             }
         }
 
-        //update presence flag.
-        Groups.build.each(b -> b.team.data().presentFlag = true);
-
+        //TODO this is slow and dumb
         for(Unit unit : Groups.unit){
             if(unit.type == null) continue;
             TeamData data = unit.team.data();
@@ -199,6 +204,10 @@ public class Teams{
             data.unitsByType[unit.type.id].add(unit);
 
             count(unit);
+        }
+
+        for(var player : Groups.player){
+            player.team().data().players.add(player);
         }
 
         //update presence of each team.
@@ -230,41 +239,51 @@ public class Teams{
     }
 
     public static class TeamData{
-        public final Seq<CoreBuild> cores = new Seq<>();
         public final Team team;
-        public final BaseAI ai;
+
+        /** Handles RTS unit control. */
+        public @Nullable RtsAI rtsAi;
 
         private boolean presentFlag;
 
         /** Enemies with cores or spawn points. */
         public Team[] coreEnemies = {};
         /** Planned blocks for drones. This is usually only blocks that have been broken. */
-        public Queue<BlockPlan> blocks = new Queue<>();
-        /** The current command for units to follow. */
-        public UnitCommand command = UnitCommand.attack;
+        public Queue<BlockPlan> plans = new Queue<>();
 
+        /** List of live cores of this team. */
+        public final Seq<CoreBuild> cores = new Seq<>();
+        /** Last known live core of this team. */
+        public @Nullable CoreBuild lastCore;
         /** Quadtree for all buildings of this team. Null if not active. */
-        @Nullable
-        public QuadTree<Building> buildings;
+        public @Nullable QuadTree<Building> buildingTree;
+        /** Turrets by range. Null if not active. */
+        public @Nullable QuadTree<Building> turretTree;
+        /** Quadtree for units of this team. Do not access directly. */
+        public @Nullable QuadTree<Unit> unitTree;
         /** Current unit cap. Do not modify externally. */
         public int unitCap;
         /** Total unit count. */
         public int unitCount;
         /** Counts for each type of unit. Do not access directly. */
-        @Nullable
-        public int[] typeCounts;
-        /** Quadtree for units of this team. Do not access directly. */
-        @Nullable
-        public QuadTree<Unit> tree;
+        public @Nullable int[] typeCounts;
+        /** Cached buildings by type. */
+        public ObjectMap<Block, Seq<Building>> buildingTypes = new ObjectMap<>();
         /** Units of this team. Updated each frame. */
-        public Seq<Unit> units = new Seq<>();
+        public Seq<Unit> units = new Seq<>(false);
+        /** Same as units, but players. */
+        public Seq<Player> players = new Seq<>(false);
+        /** All buildings. Updated on team change / building addition or removal. Includes even buildings that do not update(). */
+        public Seq<Building> buildings = new Seq<>(false);
         /** Units of this team by type. Updated each frame. */
-        @Nullable
-        public Seq<Unit>[] unitsByType;
+        public @Nullable Seq<Unit>[] unitsByType;
 
         public TeamData(Team team){
             this.team = team;
-            this.ai = new BaseAI(this);
+        }
+
+        public Seq<Building> getBuildings(Block block){
+            return buildingTypes.get(block, () -> new Seq<>(false));
         }
 
         /** Destroys this team's presence on the map, killing part of its buildings and converting everything to 'derelict'. */
@@ -272,17 +291,19 @@ public class Teams{
 
             //grab all buildings from quadtree.
             var builds = new Seq<Building>();
-            if(buildings != null){
-                buildings.getObjects(builds);
+            if(buildingTree != null){
+                buildingTree.getObjects(builds);
             }
+
+            //no remaining blocks, cease building if applicable
+            plans.clear();
 
             //convert all team tiles to neutral, randomly killing them
             for(var b : builds){
-                //TODO this may cause a lot of packet spam, optimize?
-                Call.setTeam(b, Team.derelict);
-
-                if(Mathf.chance(0.25)){
-                    Time.run(Mathf.random(0f, 60f * 6f), b::kill);
+                if(b instanceof CoreBuild){
+                    b.kill();
+                }else{
+                    scheduleDerelict(b);
                 }
             }
 
@@ -293,6 +314,45 @@ public class Teams{
                     u.kill();
                 }
             }));
+        }
+
+        /** Make all buildings within this range derelict / explode. */
+        public void makeDerelict(float x, float y, float range){
+            var builds = new Seq<Building>();
+            if(buildingTree != null){
+                buildingTree.intersect(x - range, y - range, range * 2f, range * 2f, builds);
+            }
+
+            for(var build : builds){
+                if(build.within(x, y, range)){
+                    scheduleDerelict(build);
+                }
+            }
+        }
+
+        /** Make all buildings within this range explode. */
+        public void timeDestroy(float x, float y, float range){
+            var builds = new Seq<Building>();
+            if(buildingTree != null){
+                buildingTree.intersect(x - range, y - range, range * 2f, range * 2f, builds);
+            }
+
+            for(var build : builds){
+                if(build.within(x, y, range) && !cores.contains(c -> c.within(x, y, range))){
+                    //TODO GPU driver bugs?
+                    build.kill();
+                    //Time.run(Mathf.random(0f, 60f * 6f), build::kill);
+                }
+            }
+        }
+
+        private void scheduleDerelict(Building build){
+            //TODO this may cause a lot of packet spam, optimize?
+            Call.setTeam(build, Team.derelict);
+
+            if(Mathf.chance(0.25)){
+                Time.run(Mathf.random(0f, 60f * 6f), build::kill);
+            }
         }
 
         @Nullable
@@ -311,8 +371,8 @@ public class Teams{
         }
 
         public QuadTree<Unit> tree(){
-            if(tree == null) tree = new QuadTree<>(Vars.world.getQuadBounds(new Rect()));
-            return tree;
+            if(unitTree == null) unitTree = new QuadTree<>(Vars.world.getQuadBounds(new Rect()));
+            return unitTree;
         }
 
         public int countType(UnitType type){
@@ -338,7 +398,7 @@ public class Teams{
 
         /** @return whether this team is controlled by the AI and builds bases. */
         public boolean hasAI(){
-            return team.rules().ai;
+            return team.rules().rtsAi;
         }
 
         @Override

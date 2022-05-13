@@ -57,6 +57,10 @@ public class OverlayRenderer{
             }
         }
 
+        if(pos.isEmpty()){
+            return;
+        }
+
         //if this is laggy, it could be shoved in another thread.
         var result = Voronoi.generate(pos.toArray(Vec2.class), 0, world.unitWidth(), 0, world.unitHeight());
         for(var edge : result){
@@ -95,7 +99,7 @@ public class OverlayRenderer{
                 }
             }
 
-            if(Core.settings.getBool("indicators")){
+            if(Core.settings.getBool("indicators") && !state.rules.fog){
                 Groups.unit.each(unit -> {
                     if(!unit.isLocal() && unit.team != player.team() && !rect.setSize(Core.camera.width * 0.9f, Core.camera.height * 0.9f)
                     .setCenter(Core.camera.position.x, Core.camera.position.y).contains(unit.x, unit.y)){
@@ -109,10 +113,17 @@ public class OverlayRenderer{
             }
         }
 
+        //draw objective markers, if any
+        if(state.rules.objectives.size > 0){
+            var first = state.rules.objectives.first();
+            for(var marker : first.markers){
+                marker.draw();
+            }
+        }
+
         if(player.dead()) return; //dead players don't draw
 
         InputHandler input = control.input;
-
 
         Sized select = input.selectedUnit();
         if(select == null) select = input.selectedControlBuild();
@@ -126,13 +137,9 @@ public class OverlayRenderer{
             Draw.mixcol(Pal.accent, 1f);
             Draw.alpha(unitFade);
             Building build = (select instanceof BlockUnitc b ? b.tile() : select instanceof Building b ? b : null);
+            TextureRegion region = build != null ? build.block.fullIcon : select instanceof Unit u ? u.icon() : Core.atlas.white();
 
-            if(build != null){
-                //special selection for block "units"
-                Fill.square(build.x, build.y, build.block.size * tilesize/2f);
-            }else if(select instanceof Unit u){
-                Draw.rect(u.type.fullIcon, u.x, u.y, u.rotation - 90);
-            }
+            Draw.rect(region, select.getX(), select.getY(), select instanceof Unit u && !(select instanceof BlockUnitc) ? u.rotation - 90f : 0f);
 
             for(int i = 0; i < 4; i++){
                 float rot = i * 90f + 45f + (-Time.time) % 360f;
@@ -144,8 +151,8 @@ public class OverlayRenderer{
         }
 
         //draw config selected block
-        if(input.frag.config.isShown()){
-            Building tile = input.frag.config.getSelectedTile();
+        if(input.config.isShown()){
+            Building tile = input.config.getSelected();
             tile.drawConfigure();
         }
 
@@ -175,7 +182,8 @@ public class OverlayRenderer{
                 Draw.color();
             }else{
                 state.teams.eachEnemyCore(player.team(), core -> {
-                    if(Core.camera.bounds(Tmp.r1).overlaps(Tmp.r2.setCentered(core.x, core.y, state.rules.enemyCoreBuildRadius * 2f))){
+                    //it must be clear that there is a core here.
+                    if(/*core.wasVisible && */Core.camera.bounds(Tmp.r1).overlaps(Tmp.r2.setCentered(core.x, core.y, state.rules.enemyCoreBuildRadius * 2f))){
                         Draw.color(Color.darkGray);
                         Lines.circle(core.x, core.y - 2, state.rules.enemyCoreBuildRadius);
                         Draw.color(Pal.accent, core.team.color, 0.5f + Mathf.absin(Time.time, 10f, 0.5f));
@@ -238,14 +246,19 @@ public class OverlayRenderer{
             Lines.circle(v.x, v.y, 6 + Mathf.absin(Time.time, 5f, 1f));
             Draw.reset();
 
-            Building tile = world.buildWorld(v.x, v.y);
-            if(input.canDropItem() && tile != null && tile.interactable(player.team()) && tile.acceptStack(player.unit().item(), player.unit().stack.amount, player.unit()) > 0 && player.within(tile, itemTransferRange)){
+            Building build = world.buildWorld(v.x, v.y);
+            if(input.canDropItem() && build != null && build.interactable(player.team()) && build.acceptStack(player.unit().item(), player.unit().stack.amount, player.unit()) > 0 && player.within(build, itemTransferRange)){
+                boolean invalid = (state.rules.onlyDepositCore && !(build instanceof CoreBuild));
+
                 Lines.stroke(3f, Pal.gray);
-                Lines.square(tile.x, tile.y, tile.block.size * tilesize / 2f + 3 + Mathf.absin(Time.time, 5f, 1f));
-                Lines.stroke(1f, Pal.place);
-                Lines.square(tile.x, tile.y, tile.block.size * tilesize / 2f + 2 + Mathf.absin(Time.time, 5f, 1f));
+                Lines.square(build.x, build.y, build.block.size * tilesize / 2f + 3 + Mathf.absin(Time.time, 5f, 1f));
+                Lines.stroke(1f, invalid ? Pal.remove : Pal.place);
+                Lines.square(build.x, build.y, build.block.size * tilesize / 2f + 2 + Mathf.absin(Time.time, 5f, 1f));
                 Draw.reset();
 
+                if(invalid){
+                    build.block.drawPlaceText(Core.bundle.get("bar.onlycoredeposit"), build.tileX(), build.tileY(), false);
+                }
             }
         }
     }

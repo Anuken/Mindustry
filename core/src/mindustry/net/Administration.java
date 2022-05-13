@@ -453,58 +453,67 @@ public class Administration{
         subnetBans = Core.settings.getJson("banned-subnets", Seq.class, Seq::new);
     }
 
-    /** Server configuration definition. Each config value can be a string, boolean or number. */
-    public enum Config{
-        name("The server name as displayed on clients.", "Server", "servername"),
-        desc("The server description, displayed under the name. Max 100 characters.", "off"),
-        port("The port to host on.", Vars.port),
-        autoUpdate("Whether to auto-update and exit when a new bleeding-edge update arrives.", false),
-        showConnectMessages("Whether to display connect/disconnect messages.", true),
-        enableVotekick("Whether votekick is enabled.", true),
-        startCommands("Commands run at startup. This should be a comma-separated list.", ""),
-        crashReport("Whether to send crash reports.", false, "crashreport"),
-        logging("Whether to log everything to files.", true),
-        strict("Whether strict mode is on - corrects positions and prevents duplicate UUIDs.", true),
-        antiSpam("Whether spammers are automatically kicked and rate-limited.", headless),
-        interactRateWindow("Block interaction rate limit window, in seconds.", 6),
-        interactRateLimit("Block interaction rate limit.", 25),
-        interactRateKick("How many times a player must interact inside the window to get kicked.", 60),
-        messageRateLimit("Message rate limit in seconds. 0 to disable.", 0),
-        messageSpamKick("How many times a player must send a message before the cooldown to get kicked. 0 to disable.", 3),
-        socketInput("Allows a local application to control this server through a local TCP socket.", false, "socket", () -> Events.fire(Trigger.socketConfigChanged)),
-        socketInputPort("The port for socket input.", 6859, () -> Events.fire(Trigger.socketConfigChanged)),
-        socketInputAddress("The bind address for socket input.", "localhost", () -> Events.fire(Trigger.socketConfigChanged)),
-        allowCustomClients("Whether custom clients are allowed to connect.", !headless, "allow-custom"),
-        whitelist("Whether the whitelist is used.", false),
-        motd("The message displayed to people on connection.", "off"),
-        autosave("Whether the periodically save the map when playing.", false),
-        autosaveAmount("The maximum amount of autosaves. Older ones get replaced.", 10),
-        autosaveSpacing("Spacing between autosaves in seconds.", 60 * 5),
-        debug("Enable debug logging", false, () -> Log.level = debug() ? LogLevel.debug : LogLevel.info);
+    /**
+     * Server configuration definition. Each config value can be a string, boolean or number.
+     * Creating a new Config instance implicitly adds it to the list of server configs. This can be used for custom plugin configuration.
+     * */
+    public static class Config{
+        public static final Seq<Config> all = new Seq<>();
 
-        public static final Config[] all = values();
+        public static final Config
+
+        serverName = new Config("name", "The server name as displayed on clients.", "Server", "servername"),
+        desc = new Config("desc", "The server description, displayed under the name. Max 100 characters.", "off"),
+        port = new Config("port", "The port to host on.", Vars.port),
+        autoUpdate = new Config("autoUpdate", "Whether to auto-update and exit when a new bleeding-edge update arrives.", false),
+        showConnectMessages = new Config("showConnectMessages", "Whether to display connect/disconnect messages.", true),
+        enableVotekick = new Config("enableVotekick", "Whether votekick is enabled.", true),
+        startCommands = new Config("startCommands", "Commands run at startup. This should be a comma-separated list.", ""),
+        logging = new Config("logging", "Whether to log everything to files.", true),
+        strict = new Config("strict", "Whether strict mode is on - corrects positions and prevents duplicate UUIDs.", true),
+        antiSpam = new Config("antiSpam", "Whether spammers are automatically kicked and rate-limited.", headless),
+        interactRateWindow = new Config("interactRateWindow", "Block interaction rate limit window, in seconds.", 6),
+        interactRateLimit = new Config("interactRateLimit", "Block interaction rate limit.", 25),
+        interactRateKick = new Config("interactRateKick", "How many times a player must interact inside the window to get kicked.", 60),
+        messageRateLimit = new Config("messageRateLimit", "Message rate limit in seconds. 0 to disable.", 0),
+        messageSpamKick = new Config("messageSpamKick", "How many times a player must send a message before the cooldown to get kicked. 0 to disable.", 3),
+        socketInput = new Config("socketInput", "Allows a local application to control this server through a local TCP socket.", false, "socket", () -> Events.fire(Trigger.socketConfigChanged)),
+        socketInputPort = new Config("socketInputPort", "The port for socket input.", 6859, () -> Events.fire(Trigger.socketConfigChanged)),
+        socketInputAddress = new Config("socketInputAddress", "The bind address for socket input.", "localhost", () -> Events.fire(Trigger.socketConfigChanged)),
+        allowCustomClients = new Config("allowCustomClients", "Whether custom clients are allowed to connect.", !headless, "allow-custom"),
+        whitelist = new Config("whitelist", "Whether the whitelist is used.", false),
+        motd = new Config("motd", "The message displayed to people on connection.", "off"),
+        autosave = new Config("autosave", "Whether the periodically save the map when playing.", false),
+        autosaveAmount = new Config("autosaveAmount", "The maximum amount of autosaves. Older ones get replaced.", 10),
+        autosaveSpacing = new Config("autosaveSpacing", "Spacing between autosaves in seconds.", 60 * 5),
+        debug = new Config("debug", "Enable debug logging", false, () -> Log.level = debug() ? LogLevel.debug : LogLevel.info),
+        snapshotInterval = new Config("snapshotInterval", "Client entity snapshot interval in ms.", 200);
 
         public final Object defaultValue;
-        public final String key, description;
+        public final String name, key, description;
+
         final Runnable changed;
 
-        Config(String description, Object def){
-            this(description, def, null, null);
+        public Config(String name, String description, Object def){
+            this(name, description, def, null, null);
         }
 
-        Config(String description, Object def, String key){
-            this(description, def, key, null);
+        public Config(String name, String description, Object def, String key){
+            this(name, description, def, key, null);
         }
 
-        Config(String description, Object def, Runnable changed){
-            this(description, def, null, changed);
+        public Config(String name, String description, Object def, Runnable changed){
+            this(name, description, def, null, changed);
         }
 
-        Config(String description, Object def, String key, Runnable changed){
+        public Config(String name, String description, Object def, String key, Runnable changed){
+            this.name = name;
             this.description = description;
-            this.key = key == null ? name() : key;
+            this.key = key == null ? name : key;
             this.defaultValue = def;
             this.changed = changed == null ? () -> {} : changed;
+
+            all.add(this);
         }
 
         public boolean isNum(){
@@ -625,6 +634,9 @@ public class Administration{
         /** valid only for removePlanned events only; contains packed positions. */
         public @Nullable int[] plans;
 
+        /** valid only for command unit events */
+        public @Nullable int[] unitIDs;
+
         public PlayerAction set(Player player, ActionType type, Tile tile){
             this.player = player;
             this.type = type;
@@ -654,7 +666,7 @@ public class Administration{
     }
 
     public enum ActionType{
-        breakBlock, placeBlock, rotate, configure, withdrawItem, depositItem, control, buildSelect, command, removePlanned
+        breakBlock, placeBlock, rotate, configure, withdrawItem, depositItem, control, buildSelect, command, removePlanned, commandUnits, commandBuilding
     }
 
 }

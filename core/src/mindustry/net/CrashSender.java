@@ -27,7 +27,10 @@ public class CrashSender{
         return report
         + "Version: " + Version.combined() + (Vars.headless ? " (Server)" : "") + "\n"
         + "OS: " + OS.osName + " x" + (OS.osArchBits) + " (" + OS.osArch + ")\n"
+        + ((OS.isAndroid || OS.isIos) && app != null ? "Android API level: " + Core.app.getVersion() + "\n" : "")
         + "Java Version: " + OS.javaVersion + "\n"
+        + "Runtime Available Memory: " + (Runtime.getRuntime().maxMemory() / 1024 / 1024) + "mb\n"
+        + "Cores: " + Runtime.getRuntime().availableProcessors() + "\n"
         + (mods == null ? "<no mod init>" : "Mods: " + (!mods.list().contains(LoadedMod::shouldBeEnabled) ? "none (vanilla)" : mods.list().select(LoadedMod::shouldBeEnabled).toString(", ", mod -> mod.name + ":" + mod.meta.version)))
         + "\n\n" + error;
     }
@@ -55,7 +58,7 @@ public class CrashSender{
             }catch(Throwable ignored){}
 
             //don't create crash logs for custom builds, as it's expected
-            if(Version.build == -1 || (OS.username.equals("anuke") && !"steam".equals(Version.modifier))){
+            if(OS.username.equals("anuke") && !"steam".equals(Version.modifier)){
                 ret();
             }
 

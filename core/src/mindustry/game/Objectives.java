@@ -24,7 +24,9 @@ public class Objectives{
 
         @Override
         public String display(){
-            return Core.bundle.format("requirement.research", content.emoji() + " " + content.localizedName);
+            return Core.bundle.format("requirement.research",
+                (content.techNode == null || content.techNode.parent == null || content.techNode.parent.content.unlocked()) && !(content instanceof Item) ?
+                    (content.emoji() + " " + content.localizedName) : "???");
         }
     }
 
@@ -44,7 +46,8 @@ public class Objectives{
 
         @Override
         public String display(){
-            return Core.bundle.format("requirement.produce", content.emoji() + " " + content.localizedName);
+            return Core.bundle.format("requirement.produce",
+                content.unlocked() ? (content.emoji() + " " + content.localizedName) : "???");
         }
     }
 
@@ -59,12 +62,52 @@ public class Objectives{
 
         @Override
         public boolean complete(){
-            return preset.sector.save != null && (!preset.sector.isAttacked() || preset.sector.info.wasCaptured) && preset.sector.hasBase();
+            return preset.sector.save != null && preset.sector.isCaptured() && preset.sector.hasBase();
         }
 
         @Override
         public String display(){
             return Core.bundle.format("requirement.capture", preset.localizedName);
+        }
+    }
+
+    public static class OnSector implements Objective{
+        public SectorPreset preset;
+
+        public OnSector(SectorPreset zone){
+            this.preset = zone;
+        }
+
+        protected OnSector(){}
+
+        @Override
+        public boolean complete(){
+            return preset.sector.hasBase();
+        }
+
+        @Override
+        public String display(){
+            return Core.bundle.format("requirement.onsector", preset.localizedName);
+        }
+    }
+
+    public static class OnPlanet implements Objective{
+        public Planet planet;
+
+        public OnPlanet(Planet planet){
+            this.planet = planet;
+        }
+
+        protected OnPlanet(){}
+
+        @Override
+        public boolean complete(){
+            return planet.sectors.contains(Sector::hasBase);
+        }
+
+        @Override
+        public String display(){
+            return Core.bundle.format("requirement.onplanet", planet.localizedName);
         }
     }
 

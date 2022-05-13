@@ -3,8 +3,10 @@ package mindustry.maps;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.ai.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.entities.abilities.*;
 import mindustry.game.*;
@@ -183,42 +185,53 @@ public class SectorDamage{
 
         if(core == null || spawns.isEmpty()) return;
 
+        boolean airOnly = !state.rules.spawns.contains(g -> !g.type.flying);
+
         Tile start = spawns.first();
-
-        var field = pathfinder.getField(state.rules.waveTeam, Pathfinder.costGround, Pathfinder.fieldCore);
         Seq<Tile> path = new Seq<>();
-        boolean found = false;
 
-        if(field != null && field.weights != null){
-            int[][] weights = field.weights;
-            int count = 0;
-            Tile current = start;
-            while(count < world.width() * world.height()){
-                int minCost = Integer.MAX_VALUE;
-                int cx = current.x, cy = current.y;
-                for(Point2 p : Geometry.d4){
-                    int nx = cx + p.x, ny = cy + p.y;
+        //TODO would be nice if this worked in a more generic way, with two different calculations and paths
+        if(airOnly){
+            World.raycastEach(start.x, start.y, core.tileX(), core.tileY(), (x, y) -> {
+                path.add(world.rawTile(x, y));
+                return false;
+            });
+        }else{
+            var field = pathfinder.getField(state.rules.waveTeam, Pathfinder.costGround, Pathfinder.fieldCore);
+            boolean found = false;
 
-                    Tile other = world.tile(nx, ny);
-                    if(other != null && weights[nx][ny] < minCost && weights[nx][ny] != -1){
-                       minCost = weights[nx][ny];
-                       current = other;
+            if(field != null && field.weights != null){
+                int[] weights = field.weights;
+                int count = 0;
+                Tile current = start;
+                while(count < weights.length){
+                    int minCost = Integer.MAX_VALUE;
+                    int cx = current.x, cy = current.y;
+                    for(Point2 p : Geometry.d4){
+                        int nx = cx + p.x, ny = cy + p.y, packed = world.packArray(nx, ny);
+
+                        Tile other = world.tile(nx, ny);
+                        if(other != null && weights[packed] < minCost && weights[packed] != -1){
+                            minCost = weights[packed];
+                            current = other;
+                        }
                     }
+
+                    path.add(current);
+
+                    if(current.build == core){
+                        found = true;
+                        break;
+                    }
+
+                    count ++;
                 }
-
-                path.add(current);
-
-                if(current.build == core){
-                    found = true;
-                    break;
-                }
-
-                count ++;
             }
-        }
 
-        if(!found){
-            path = Astar.pathfind(start, core.tile, SectorDamage::cost, t -> !(t.block().isStatic() && t.solid()));
+            if(!found){
+                path.clear();
+                path.addAll(Astar.pathfind(start, core.tile, SectorDamage::cost, t -> !(t.block().isStatic() && t.solid())));
+            }
         }
 
         //create sparse tile array for fast range query
@@ -243,7 +256,7 @@ public class SectorDamage{
         //first, calculate the total health of blocks in the path
 
         //radius around the path that gets counted
-        int radius = 5;
+        int radius = 6;
         IntSet counted = new IntSet();
 
         for(Tile t : sparse2){
@@ -268,26 +281,26 @@ public class SectorDamage{
         float avgHealth = totalPathBuild <= 1 ? sumHealth : sumHealth / totalPathBuild;
 
         //block dps + regen + extra health/shields
-        for(Building build : Groups.build){
-            float e = build.efficiency();
+        for(Building build : state.rules.defaultTeam.data().buildings){
+            float e = build.potentialEfficiency;
             if(e > 0.08f){
-                if(build.team == state.rules.defaultTeam && build instanceof Ranged ranged && sparse.contains(t -> t.within(build, ranged.range() + 4*tilesize))){
+                if(build instanceof Ranged ranged && sparse.contains(t -> t.within(build, ranged.range() + 4*tilesize))){
                     //TODO make sure power turret network supports the turrets?
-                    if(build.block instanceof Turret t && build instanceof TurretBuild b && b.hasAmmo()){
-                        sumDps += t.shots / t.reloadTime * 60f * b.peekAmmo().estimateDPS() * e * build.timeScale;
+                    if(build instanceof TurretBuild b && b.hasAmmo()){
+                        sumDps += b.estimateDps();
                     }
 
                     if(build.block instanceof MendProjector m){
-                        sumRps += m.healPercent / m.reload * avgHealth * 60f / 100f * e * build.timeScale;
+                        sumRps += m.healPercent / m.reload * avgHealth * 60f / 100f * e * build.timeScale();
                     }
 
                     //point defense turrets act as flat health right now
-                    if(build.block instanceof PointDefenseTurret && build.consValid()){
-                        sumHealth += 150f * build.timeScale;
+                    if(build.block instanceof PointDefenseTurret){
+                        sumHealth += 150f * build.timeScale() * build.potentialEfficiency;
                     }
 
                     if(build.block instanceof ForceProjector f){
-                        sumHealth += f.shieldHealth * e * build.timeScale;
+                        sumHealth += f.shieldHealth * e * build.timeScale();
                         sumRps += e;
                     }
                 }
@@ -307,7 +320,7 @@ public class SectorDamage{
             if(unit.team == state.rules.defaultTeam){
                 sumHealth += unit.health*healthMult + unit.shield;
                 sumDps += unit.type.dpsEstimate;
-                if(unit.abilities.find(a -> a instanceof RepairFieldAbility) instanceof RepairFieldAbility h){
+                if(Structs.find(unit.abilities, a -> a instanceof RepairFieldAbility) instanceof RepairFieldAbility h){
                     sumRps += h.amount / h.reload * 60f;
                 }
             }else{
@@ -323,6 +336,7 @@ public class SectorDamage{
         Seq<Vec2> waveDps = new Seq<>(), waveHealth = new Seq<>();
         int groundSpawns = Math.max(spawner.countFlyerSpawns(), 1), airSpawns = Math.max(spawner.countGroundSpawns(), 1);
 
+        //TODO storing all this is dumb when you can just calculate it exactly from the rules...
         for(int wave = state.wave; wave < state.wave + 10; wave ++){
             float sumWaveDps = 0f, sumWaveHealth = 0f;
 

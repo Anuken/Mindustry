@@ -4,7 +4,6 @@ import arc.*;
 import arc.files.*;
 import arc.func.*;
 import arc.util.*;
-import arc.util.async.*;
 import arc.util.serialization.*;
 import mindustry.*;
 import mindustry.core.*;
@@ -25,7 +24,6 @@ import static mindustry.Vars.*;
 public class BeControl{
     private static final int updateInterval = 60;
 
-    private AsyncExecutor executor = new AsyncExecutor(1);
     private boolean checkUpdates = true;
     private boolean updateAvailable;
     private String updateUrl;
@@ -168,7 +166,7 @@ public class BeControl{
     }
 
     private void download(String furl, Fi dest, Intc length, Floatc progressor, Boolp canceled, Runnable done, Cons<Throwable> error){
-        executor.submit(() -> {
+        mainExecutor.submit(() -> {
             try{
                 HttpURLConnection con = (HttpURLConnection)new URL(furl).openConnection();
                 BufferedInputStream in = new BufferedInputStream(con.getInputStream());

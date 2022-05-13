@@ -55,7 +55,10 @@ public class LaunchPad extends Block{
     public void setBars(){
         super.setBars();
 
-        bars.add("items", entity -> new Bar(() -> Core.bundle.format("bar.items", entity.items.total()), () -> Pal.items, () -> (float)entity.items.total() / itemCapacity));
+        addBar("items", entity -> new Bar(() -> Core.bundle.format("bar.items", entity.items.total()), () -> Pal.items, () -> (float)entity.items.total() / itemCapacity));
+
+        //TODO is "bar.launchcooldown" the right terminology?
+        addBar("progress", (LaunchPadBuild build) -> new Bar(() -> Core.bundle.get("bar.launchcooldown"), () -> Pal.ammo, () -> Mathf.clamp(build.launchCounter / launchTime)));
     }
 
     @Override
@@ -73,7 +76,8 @@ public class LaunchPad extends Block{
 
         @Override
         public boolean shouldConsume(){
-            return true;
+            //TODO add launch costs, maybe legacy version
+            return launchCounter < launchTime;
         }
 
         @Override
@@ -122,7 +126,9 @@ public class LaunchPad extends Block{
             if(!state.isCampaign()) return;
 
             //increment launchCounter then launch when full and base conditions are met
-            if((launchCounter += edelta()) >= launchTime && edelta() >= 0.001f && items.total() >= itemCapacity){
+            if((launchCounter += edelta()) >= launchTime && items.total() >= itemCapacity){
+                //if there are item requirements, use those.
+                consume();
                 launchSound.at(x, y);
                 LaunchPayload entity = LaunchPayload.create();
                 items.each((item, amount) -> entity.stacks.add(new ItemStack(item, amount)));
@@ -160,9 +166,9 @@ public class LaunchPad extends Block{
                 return;
             }
 
-            table.button(Icon.upOpen, Styles.clearTransi, () -> {
+            table.button(Icon.upOpen, Styles.cleari, () -> {
                 ui.planet.showSelect(state.rules.sector, other -> {
-                    if(state.isCampaign()){
+                    if(state.isCampaign() && other.planet == state.rules.sector.planet){
                         state.rules.sector.info.destination = other;
                     }
                 });

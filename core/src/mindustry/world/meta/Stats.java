@@ -14,8 +14,7 @@ public class Stats{
     /** Production time period in ticks. Used for crafters. **/
     public float timePeriod = -1;
 
-    @Nullable
-    private OrderedMap<StatCat, OrderedMap<Stat, Seq<StatValue>>> map;
+    private @Nullable OrderedMap<StatCat, OrderedMap<Stat, Seq<StatValue>>> map;
     private boolean dirty;
 
     /** Adds a single float value with this stat, formatted to 2 decimal places. */
@@ -91,8 +90,8 @@ public class Stats{
     public void remove(Stat stat){
         if(map == null) map = new OrderedMap<>();
 
-        if(!map.containsKey(stat.category) || !map.get(stat.category).containsKey(stat)){
-            throw new RuntimeException("No stat entry found: \"" + stat + "\" in block.");
+        if(!map.containsKey(stat.category)){
+            return;
         }
 
         map.get(stat.category).remove(stat);

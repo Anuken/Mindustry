@@ -13,6 +13,7 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class StorageBlock extends Block{
+    public boolean coreMerge = true;
 
     public StorageBlock(String name){
         super(name);
@@ -37,7 +38,7 @@ public class StorageBlock extends Block{
         if(Mathf.chance(0.3)){
             Tile edge = Edges.getFacingEdge(source, self);
             Tile edge2 = Edges.getFacingEdge(self, source);
-            if(edge != null && edge2 != null){
+            if(edge != null && edge2 != null && self.wasVisible){
                 Fx.coreBurn.at((edge.worldx() + edge2.worldx())/2f, (edge.worldy() + edge2.worldy())/2f);
             }
         }

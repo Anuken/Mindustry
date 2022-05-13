@@ -8,10 +8,10 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
-import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
+import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
@@ -82,6 +82,9 @@ public class TypeIO{
         }else if(object instanceof Building b){
             write.b(12);
             write.i(b.pos());
+        }else if(object instanceof BuildingBox b){
+            write.b(12);
+            write.i(b.pos);
         }else if(object instanceof LAccess l){
             write.b((byte)13);
             write.s(l.ordinal());
@@ -89,18 +92,32 @@ public class TypeIO{
             write.b((byte)14);
             write.i(b.length);
             write.b(b);
-        }else if(object instanceof UnitCommand c){
-            write.b((byte)15);
-            write.b(c.ordinal());
-        }else if(object instanceof BuildingBox b){
-            write.b(12);
-            write.i(b.pos);
         }else if(object instanceof boolean[] b){
             write.b(16);
             write.i(b.length);
             for(boolean bool : b){
                 write.bool(bool);
             }
+        }else if(object instanceof Unit u){
+            write.b(17);
+            write.i(u.id);
+        }else if(object instanceof UnitBox u){
+            write.b(17);
+            write.i(u.id);
+        }else if(object instanceof Vec2[] vecs){
+            write.b(18);
+            write.s(vecs.length);
+            for(Vec2 v : vecs){
+                write.f(v.x);
+                write.f(v.y);
+            }
+        }else if(object instanceof Vec2 v){
+            write.b((byte)19);
+            write.f(v.x);
+            write.f(v.y);
+        }else if(object instanceof Team t){
+            write.b((byte)20);
+            write.b(t.id);
         }else{
             throw new IllegalArgumentException("Unknown object type: " + object.getClass());
         }
@@ -115,26 +132,58 @@ public class TypeIO{
     @Nullable
     public static Object readObjectBoxed(Reads read, boolean box){
         byte type = read.b();
-        switch(type){
-            case 0: return null;
-            case 1: return read.i();
-            case 2: return read.l();
-            case 3: return read.f();
-            case 4: return readString(read);
-            case 5: return content.getByID(ContentType.all[read.b()], read.s());
-            case 6: short length = read.s(); IntSeq arr = new IntSeq(); for(int i = 0; i < length; i ++) arr.add(read.i()); return arr;
-            case 7: return new Point2(read.i(), read.i());
-            case 8: byte len = read.b(); Point2[] out = new Point2[len]; for(int i = 0; i < len; i ++) out[i] = Point2.unpack(read.i()); return out;
-            case 9: return TechTree.getNotNull(content.getByID(ContentType.all[read.b()], read.s()));
-            case 10: return read.bool();
-            case 11: return read.d();
-            case 12: return !box ? world.build(read.i()) : new BuildingBox(read.i());
-            case 13: return LAccess.all[read.s()];
-            case 14: int blen = read.i(); byte[] bytes = new byte[blen]; read.b(bytes); return bytes;
-            case 15: return UnitCommand.all[read.b()];
-            case 16: int boollen = read.i(); boolean[] bools = new boolean[boollen]; for(int i = 0; i < boollen; i ++) bools[i] = read.bool(); return bools;
-            default: throw new IllegalArgumentException("Unknown object type: " + type);
-        }
+        return switch(type){
+            case 0 -> null;
+            case 1 -> read.i();
+            case 2 -> read.l();
+            case 3 -> read.f();
+            case 4 -> readString(read);
+            case 5 -> content.getByID(ContentType.all[read.b()], read.s());
+            case 6 -> {
+                short length = read.s();
+                IntSeq arr = new IntSeq(); for(int i = 0; i < length; i ++) arr.add(read.i());
+                yield arr;
+            }
+            case 7 -> new Point2(read.i(), read.i());
+            case 8 -> {
+                byte len = read.b();
+                Point2[] out = new Point2[len];
+                for(int i = 0; i < len; i ++) out[i] = Point2.unpack(read.i());
+                yield out;
+            }
+            case 9 -> content.<UnlockableContent>getByID(ContentType.all[read.b()], read.s()).techNode;
+            case 10 -> read.bool();
+            case 11 -> read.d();
+            case 12 -> !box ? world.build(read.i()) : new BuildingBox(read.i());
+            case 13 -> LAccess.all[read.s()];
+            case 14 -> {
+                int blen = read.i();
+                byte[] bytes = new byte[blen];
+                read.b(bytes);
+                yield bytes;
+            }
+            //unit command
+            case 15 -> {
+                read.b();
+                yield null;
+            }
+            case 16 -> {
+                int boollen = read.i();
+                boolean[] bools = new boolean[boollen];
+                for(int i = 0; i < boollen; i ++) bools[i] = read.bool();
+                yield bools;
+            }
+            case 17 -> !box ? Groups.unit.getByID(read.i()) : new UnitBox(read.i());
+            case 18 -> {
+                int len = read.s();
+                Vec2[] out = new Vec2[len];
+                for(int i = 0; i < len; i ++) out[i] = new Vec2(read.f(), read.f());
+                yield out;
+            }
+            case 19 -> new Vec2(read.f(), read.f());
+            case 20 -> Team.all[read.ub()];
+            default -> throw new IllegalArgumentException("Unknown object type: " + type);
+        };
     }
 
     public static void writePayload(Writes writes, Payload payload){
@@ -179,6 +228,31 @@ public class TypeIO{
         read.skip(read.b() * (1 + 4 + 4));
 
         return noMounts;
+    }
+
+    public static Ability[] readAbilities(Reads read, Ability[] abilities){
+        byte len = read.b();
+        for(int i = 0; i < len; i++){
+            float data = read.f();
+            if(abilities.length > i){
+                abilities[i].data = data;
+            }
+        }
+        return abilities;
+    }
+
+    public static void writeAbilities(Writes write, Ability[] abilities){
+        write.b(abilities.length);
+        for(var a : abilities){
+            write.f(a.data);
+        }
+    }
+
+    static final Ability[] noAbilities = {};
+
+    public static Ability[] readAbilities(Reads read){
+        read.skip(read.b());
+        return noAbilities;
     }
 
     public static void writeUnit(Writes write, Unit unit){
@@ -241,19 +315,70 @@ public class TypeIO{
         return content.block(read.s());
     }
 
-    public static void writeRequest(Writes write, BuildPlan request){
-        write.b(request.breaking ? (byte)1 : 0);
-        write.i(Point2.pack(request.x, request.y));
-        if(!request.breaking){
-            write.s(request.block.id);
-            write.b((byte)request.rotation);
-            write.b(1); //always has config
-            writeObject(write, request.config);
+    /** @return the maximum acceptable amount of plans to send over the network */
+    public static int getMaxPlans(Queue<BuildPlan> plans){
+        //limit to prevent buffer overflows
+        int used = Math.min(plans.size, 20);
+        int totalLength = 0;
+
+        //prevent buffer overflow by checking config length
+        for(int i = 0; i < used; i++){
+            BuildPlan plan = plans.get(i);
+            if(plan.config instanceof byte[] b){
+                totalLength += b.length;
+            }
+
+            if(plan.config instanceof String b){
+                totalLength += b.length();
+            }
+
+            if(totalLength > 500){
+                used = i + 1;
+                break;
+            }
+        }
+
+        return used;
+    }
+
+    //on the network, plans must be capped by size
+    public static void writePlansQueueNet(Writes write, Queue<BuildPlan> plans){
+        if(plans == null){
+            write.i(-1);
+            return;
+        }
+
+        int used = getMaxPlans(plans);
+
+        write.i(used);
+        for(int i = 0; i < used; i++){
+            writePlan(write, plans.get(i));
         }
     }
 
-    public static BuildPlan readRequest(Reads read){
-        BuildPlan currentRequest;
+    public static Queue<BuildPlan> readPlansQueue(Reads read){
+        int used = read.i();
+        if(used == -1) return null;
+        var out = new Queue<BuildPlan>();
+        for(int i = 0; i < used; i++){
+            out.add(readPlan(read));
+        }
+        return out;
+    }
+
+    public static void writePlan(Writes write, BuildPlan plan){
+        write.b(plan.breaking ? (byte)1 : 0);
+        write.i(Point2.pack(plan.x, plan.y));
+        if(!plan.breaking){
+            write.s(plan.block.id);
+            write.b((byte)plan.rotation);
+            write.b(1); //always has config
+            writeObject(write, plan.config);
+        }
+    }
+
+    public static BuildPlan readPlan(Reads read){
+        BuildPlan current;
 
         byte type = read.b();
         int position = read.i();
@@ -263,34 +388,34 @@ public class TypeIO{
         }
 
         if(type == 1){ //remove
-            currentRequest = new BuildPlan(Point2.x(position), Point2.y(position));
+            current = new BuildPlan(Point2.x(position), Point2.y(position));
         }else{ //place
             short block = read.s();
             byte rotation = read.b();
             boolean hasConfig = read.b() == 1;
             Object config = readObject(read);
-            currentRequest = new BuildPlan(Point2.x(position), Point2.y(position), rotation, content.block(block));
+            current = new BuildPlan(Point2.x(position), Point2.y(position), rotation, content.block(block));
             //should always happen, but is kept for legacy reasons just in case
             if(hasConfig){
-                currentRequest.config = config;
+                current.config = config;
             }
         }
 
-        return currentRequest;
+        return current;
     }
 
-    public static void writeRequests(Writes write, BuildPlan[] requests){
-        if(requests == null){
+    public static void writePlans(Writes write, BuildPlan[] plans){
+        if(plans == null){
             write.s(-1);
             return;
         }
-        write.s((short)requests.length);
-        for(BuildPlan request : requests){
-            writeRequest(write, request);
+        write.s((short)plans.length);
+        for(BuildPlan plan : plans){
+            writePlan(write, plan);
         }
     }
 
-    public static BuildPlan[] readRequests(Reads read){
+    public static BuildPlan[] readPlans(Reads read){
         short reqamount = read.s();
         if(reqamount == -1){
             return null;
@@ -298,9 +423,9 @@ public class TypeIO{
 
         BuildPlan[] reqs = new BuildPlan[reqamount];
         for(int i = 0; i < reqamount; i++){
-            BuildPlan request = readRequest(read);
-            if(request != null){
-                reqs[i] = request;
+            BuildPlan plan = readPlan(read);
+            if(plan != null){
+                reqs[i] = plan;
             }
         }
 
@@ -312,12 +437,28 @@ public class TypeIO{
         if(control instanceof Player p){
             write.b(0);
             write.i(p.id);
-        }else if(control instanceof FormationAI form && form.leader != null){
-            write.b(1);
-            write.i(form.leader.id);
         }else if(control instanceof LogicAI logic && logic.controller != null){
             write.b(3);
             write.i(logic.controller.pos());
+        }else if(control instanceof CommandAI ai){
+            write.b(4);
+            write.bool(ai.attackTarget != null);
+            write.bool(ai.targetPos != null);
+
+            if(ai.targetPos != null){
+                write.f(ai.targetPos.x);
+                write.f(ai.targetPos.y);
+            }
+            if(ai.attackTarget != null){
+                write.b(ai.attackTarget instanceof Building ? 1 : 0);
+                if(ai.attackTarget instanceof Building b){
+                    write.i(b.pos());
+                }else{
+                    write.i(((Unit)ai.attackTarget).id);
+                }
+            }
+        }else if(control instanceof AssemblerAI){  //hate
+            write.b(5);
         }else{
             write.b(2);
         }
@@ -331,13 +472,9 @@ public class TypeIO{
             //make sure player exists
             if(player == null) return prev;
             return player;
-        }else if(type == 1){ //formation controller
-            int id = read.i();
-            if(prev instanceof FormationAI f){
-                f.leader = Groups.unit.getByID(id);
-                return f;
-            }
-            return new FormationAI(Groups.unit.getByID(id), null);
+        }else if(type == 1){ //formation controller (ignored)
+            read.i();
+            return prev;
         }else if(type == 3){
             int pos = read.i();
             if(prev instanceof LogicAI pai){
@@ -351,12 +488,40 @@ public class TypeIO{
                 out.controller = world.build(pos);
                 return out;
             }
+        }else if(type == 4){
+            CommandAI ai = prev instanceof CommandAI pai ? pai : new CommandAI();
+
+            boolean hasAttack = read.bool(), hasPos = read.bool();
+            if(hasPos){
+                if(ai.targetPos == null) ai.targetPos = new Vec2();
+                ai.targetPos.set(read.f(), read.f());
+            }else{
+                ai.targetPos = null;
+            }
+            ai.setupLastPos();
+
+            if(hasAttack){
+                byte entityType = read.b();
+                if(entityType == 1){
+                    ai.attackTarget = world.build(read.i());
+                }else{
+                    ai.attackTarget = Groups.unit.getByID(read.i());
+                }
+            }else{
+                ai.attackTarget = null;
+            }
+
+            return ai;
+        }else if(type == 5){
+            //augh
+            return prev instanceof AssemblerAI ? prev : new AssemblerAI();
         }else{
             //there are two cases here:
             //1: prev controller was not a player, carry on
             //2: prev controller was a player, so replace this controller with *anything else*
             //...since AI doesn't update clientside it doesn't matter
-            return (!(prev instanceof AIController) || (prev instanceof FormationAI) || (prev instanceof LogicAI)) ? new GroundAI() : prev;
+            //TODO I hate this
+            return (!(prev instanceof AIController) || (prev instanceof LogicAI)) ? new GroundAI() : prev;
         }
     }
 
@@ -379,6 +544,21 @@ public class TypeIO{
         int length = read.i();
         String string = new String(read.b(new byte[length]), charset);
         return JsonIO.read(Rules.class, string);
+    }
+
+    public static void writeVecNullable(Writes write, @Nullable Vec2 v){
+        if(v == null){
+            write.f(Float.NaN);
+            write.f(Float.NaN);
+        }else{
+            write.f(v.x);
+            write.f(v.y);
+        }
+    }
+
+    public static @Nullable Vec2 readVecNullable(Reads read){
+        float x = read.f(), y = read.f();
+        return Float.isNaN(x) || Float.isNaN(y) ? null : new Vec2(x, y);
     }
 
     public static void writeVec2(Writes write, Vec2 v){
@@ -429,14 +609,6 @@ public class TypeIO{
         return Team.get(read.b());
     }
 
-    public static void writeUnitCommand(Writes write, UnitCommand reason){
-        write.b((byte)reason.ordinal());
-    }
-
-    public static UnitCommand readUnitCommand(Reads read){
-        return UnitCommand.all[read.b()];
-    }
-
     public static void writeAction(Writes write, AdminAction reason){
         write.b((byte)reason.ordinal());
     }
@@ -471,6 +643,23 @@ public class TypeIO{
 
     public static Color readColor(Reads read, Color color){
         return color.set(read.i());
+    }
+
+    public static void writeIntSeq(Writes write, IntSeq seq){
+        write.i(seq.size);
+        for(int i = 0; i < seq.size; i++){
+            write.i(seq.items[i]);
+        }
+    }
+
+    public static IntSeq readIntSeq(Reads read){
+        int size = read.i();
+        IntSeq result = new IntSeq(size);
+        for(int i = 0; i < size; i++){
+            result.items[i] = read.i();
+        }
+        result.size = size;
+        return result;
     }
 
     public static void writeContent(Writes write, Content cont){
@@ -656,6 +845,37 @@ public class TypeIO{
 
         public BuildingBox(int pos){
             this.pos = pos;
+        }
+
+        public Building unbox(){
+            return world.build(pos);
+        }
+
+        @Override
+        public String toString(){
+            return "BuildingBox{" +
+            "pos=" + pos +
+            '}';
+        }
+    }
+
+    /** Represents a unit that has not been resolved yet. TODO unimplemented / unused*/
+    public static class UnitBox{
+        public int id;
+
+        public UnitBox(int id){
+            this.id = id;
+        }
+
+        public Unit unbox(){
+            return Groups.unit.getByID(id);
+        }
+
+        @Override
+        public String toString(){
+            return "UnitBox{" +
+            "id=" + id +
+            '}';
         }
     }
 }

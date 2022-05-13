@@ -6,6 +6,7 @@ import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -17,14 +18,16 @@ public class LogicDisplay extends Block{
     public static final byte
         commandClear = 0,
         commandColor = 1,
-        commandStroke = 2,
-        commandLine = 3,
-        commandRect = 4,
-        commandLineRect = 5,
-        commandPoly = 6,
-        commandLinePoly = 7,
-        commandTriangle = 8,
-        commandImage = 9;
+        //virtual command, unpacked in instruction
+        commandColorPack = 2,
+        commandStroke = 3,
+        commandLine = 4,
+        commandRect = 5,
+        commandLineRect = 6,
+        commandPoly = 7,
+        commandLinePoly = 8,
+        commandTriangle = 9,
+        commandImage = 10;
 
     public int maxSides = 25;
 
@@ -35,6 +38,7 @@ public class LogicDisplay extends Block{
         super(name);
         update = true;
         solid = true;
+        canOverdrive = false;
         group = BlockGroup.logic;
         drawDisabled = false;
         envEnabled = Env.any;
@@ -57,6 +61,9 @@ public class LogicDisplay extends Block{
         public void draw(){
             super.draw();
 
+            //don't even bother processing anything when displays are off.
+            if(!Vars.renderer.drawDisplays) return;
+
             Draw.draw(Draw.z(), () -> {
                 if(buffer == null){
                     buffer = new FrameBuffer(displaySize, displaySize);
@@ -66,6 +73,7 @@ public class LogicDisplay extends Block{
                 }
             });
 
+            //don't bother processing commands if displays are off
             if(!commands.isEmpty()){
                 Draw.draw(Draw.z(), () -> {
                     Tmp.m1.set(Draw.proj());
@@ -126,6 +134,8 @@ public class LogicDisplay extends Block{
     public enum GraphicsType{
         clear,
         color,
+        //virtual
+        col,
         stroke,
         line,
         rect,
@@ -133,7 +143,7 @@ public class LogicDisplay extends Block{
         poly,
         linePoly,
         triangle,
-        image;
+        image,;
 
         public static final GraphicsType[] all = values();
     }

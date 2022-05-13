@@ -40,7 +40,7 @@ public enum LogicOp{
     floor("floor", Math::floor),
     ceil("ceil", Math::ceil),
     sqrt("sqrt", Math::sqrt),
-    rand("rand", d -> GlobalConstants.rand.nextDouble() * d),
+    rand("rand", d -> GlobalVars.rand.nextDouble() * d),
 
     sin("sin", d -> Math.sin(d * Mathf.doubleDegRad)),
     cos("cos", d -> Math.cos(d * Mathf.doubleDegRad)),

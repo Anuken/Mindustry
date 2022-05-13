@@ -41,6 +41,11 @@ task dist(type: Jar, dependsOn: configurations.runtimeClasspath){
     from files(project.assetsDir)
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
+    //don't include steam shared libraries unless necessary
+    if(!versionModifier.contains("steam")){
+        exclude("**steam**.so", "**steam**.dll", "**steam**.dylib")
+    }
+
     archiveFileName = "${appName}.jar"
 
     manifest{
@@ -55,6 +60,7 @@ if(!project.ext.hasSprites() && System.getenv("JITPACK") != "true"){
 }
 
 //this is only for local testing
+//add -Prelease -PversionModifier=steam as build properties
 task steamtest(dependsOn: dist){
     doLast{
         copy{

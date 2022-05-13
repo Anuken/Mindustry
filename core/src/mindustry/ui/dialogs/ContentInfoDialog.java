@@ -61,7 +61,7 @@ public class ContentInfoDialog extends BaseDialog{
             if(map.size == 0) continue;
 
             if(stats.useCategories){
-                table.add("@category." + cat.name()).color(Pal.accent).fillX();
+                table.add("@category." + cat.name).color(Pal.accent).fillX();
                 table.row();
             }
 
@@ -84,6 +84,8 @@ public class ContentInfoDialog extends BaseDialog{
             table.add("[gray]" + (content.unlocked() || !content.hideDetails ? content.details : Iconc.lock + " " + Core.bundle.get("unlock.incampaign"))).pad(6).padTop(20).width(400f).wrap().fillX();
             table.row();
         }
+
+        content.displayExtra(table);
 
         ScrollPane pane = new ScrollPane(table);
         cont.add(pane);

@@ -1,32 +1,25 @@
 package mindustry.world.blocks.defense.turrets;
 
 import arc.math.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
-import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
+/** A turret that fires a continuous beam with a delay between shots. Liquid coolant is required. Yes, this class name is awful. NEEDS RENAME */
 public class LaserTurret extends PowerTurret{
     public float firingMoveFract = 0.25f;
     public float shootDuration = 100f;
 
     public LaserTurret(String name){
         super(name);
-        canOverdrive = false;
 
-        consumes.add(new ConsumeCoolant(0.01f)).update(false);
         coolantMultiplier = 1f;
-    }
-
-    @Override
-    public void init(){
-        consumes.powerCond(powerUse, entity -> ((LaserTurretBuild)entity).bullet != null || ((LaserTurretBuild)entity).target != null);
-        super.init();
     }
 
     @Override
@@ -34,12 +27,20 @@ public class LaserTurret extends PowerTurret{
         super.setStats();
 
         stats.remove(Stat.booster);
-        stats.add(Stat.input, StatValues.boosters(reloadTime, consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount, coolantMultiplier, false, l -> consumes.liquidfilters.get(l.id)));
+        stats.add(Stat.input, StatValues.boosters(reload, coolant.amount, coolantMultiplier, false, this::consumesLiquid));
+    }
+
+    @Override
+    public void init(){
+        super.init();
+
+        if(coolant == null){
+            coolant = findConsumer(c -> c instanceof ConsumeLiquidBase);
+        }
     }
 
     public class LaserTurretBuild extends PowerTurretBuild{
-        public Bullet bullet;
-        public float bulletLife;
+        public Seq<BulletEntry> bullets = new Seq<>();
 
         @Override
         protected void updateCooling(){
@@ -47,72 +48,95 @@ public class LaserTurret extends PowerTurret{
         }
 
         @Override
+        public boolean shouldConsume(){
+            //still consumes power when bullet is around
+            return bullets.any() || isActive();
+        }
+
+        @Override
         public void updateTile(){
             super.updateTile();
 
-            if(bulletLife > 0 && bullet != null){
-                wasShooting = true;
-                tr.trns(rotation, shootLength, 0f);
-                bullet.rotation(rotation);
-                bullet.set(x + tr.x, y + tr.y);
-                bullet.time(0f);
-                heat = 1f;
-                recoil = recoilAmount;
-                bulletLife -= Time.delta / Math.max(efficiency(), 0.00001f);
-                if(bulletLife <= 0f){
-                    bullet = null;
+            bullets.removeAll(b -> !b.bullet.isAdded() || b.bullet.type == null || b.life <= 0f || b.bullet.owner != this);
+
+            if(bullets.any()){
+
+                for(var entry : bullets){
+                    float
+                    bulletX = x + Angles.trnsx(rotation - 90, shootX + entry.x, shootY + entry.y),
+                    bulletY = y + Angles.trnsy(rotation - 90, shootX + entry.x, shootY + entry.y),
+                    angle = rotation + entry.rotation;
+
+                    entry.bullet.rotation(angle);
+                    entry.bullet.set(bulletX, bulletY);
+                    entry.bullet.time = entry.bullet.type.lifetime * entry.bullet.type.optimalLifeFract;
+                    entry.bullet.keepAlive = true;
+                    entry.life -= Time.delta / Math.max(efficiency, 0.00001f);
                 }
-            }else if(reload > 0){
+
                 wasShooting = true;
-                Liquid liquid = liquids.current();
-                float maxUsed = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount;
+                heat = 1f;
+                curRecoil = 1f;
+            }else if(reloadCounter > 0){
+                wasShooting = true;
 
-                float used = (cheating() ? maxUsed : Math.min(liquids.get(liquid), maxUsed)) * Time.delta;
-                reload -= used * liquid.heatCapacity * coolantMultiplier;
-                liquids.remove(liquid, used);
+                if(coolant != null){
+                    //TODO does not handle multi liquid req?
+                    Liquid liquid = liquids.current();
+                    float maxUsed = coolant.amount;
+                    float used = (cheating() ? maxUsed : Math.min(liquids.get(liquid), maxUsed)) * delta();
+                    reloadCounter -= used * liquid.heatCapacity * coolantMultiplier;
+                    liquids.remove(liquid, used);
 
-                if(Mathf.chance(0.06 * used)){
-                    coolEffect.at(x + Mathf.range(size * tilesize / 2f), y + Mathf.range(size * tilesize / 2f));
+                    if(Mathf.chance(0.06 * used)){
+                        coolEffect.at(x + Mathf.range(size * tilesize / 2f), y + Mathf.range(size * tilesize / 2f));
+                    }
+                }else{
+                    reloadCounter -= edelta();
                 }
             }
         }
 
         @Override
-        public double sense(LAccess sensor){
-            //reload reversed for laser turrets
-            if(sensor == LAccess.progress) return Mathf.clamp(1f - reload / reloadTime);
-            return super.sense(sensor);
+        public float progress(){
+            return 1f - Mathf.clamp(reloadCounter / reload);
+        }
+
+        @Override
+        protected void updateReload(){
+            //updated in updateTile() depending on coolant
         }
 
         @Override
         protected void updateShooting(){
-            if(bulletLife > 0 && bullet != null){
+            if(bullets.any()){
                 return;
             }
 
-            if(reload <= 0 && (consValid() || cheating()) && !charging){
+            if(reloadCounter <= 0 && efficiency > 0 && !charging() && shootWarmup >= minWarmup){
                 BulletType type = peekAmmo();
 
                 shoot(type);
 
-                reload = reloadTime;
+                reloadCounter = reload;
             }
         }
 
         @Override
         protected void turnToTarget(float targetRot){
-            rotation = Angles.moveToward(rotation, targetRot, efficiency() * rotateSpeed * delta() * (bulletLife > 0f ? firingMoveFract : 1f));
+            rotation = Angles.moveToward(rotation, targetRot, efficiency * rotateSpeed * delta() * (bullets.any() ? firingMoveFract : 1f));
         }
 
         @Override
-        protected void bullet(BulletType type, float angle){
-            bullet = type.create(this, team, x + tr.x, y + tr.y, angle);
-            bulletLife = shootDuration;
+        protected void handleBullet(@Nullable Bullet bullet, float offsetX, float offsetY, float angleOffset){
+            if(bullet != null){
+                bullets.add(new BulletEntry(bullet, offsetX, offsetY, angleOffset, shootDuration));
+            }
         }
 
         @Override
         public boolean shouldActiveSound(){
-            return bulletLife > 0 && bullet != null;
+            return bullets.any();
         }
     }
 }

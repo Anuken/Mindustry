@@ -407,7 +407,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
         public SteamConnection(SteamID sid){
             super(sid.getAccountID() + "");
             this.sid = sid;
-            Log.info("Create STEAM client @", sid.getAccountID());
+            Log.info("Created STEAM connection: @", sid.getAccountID());
         }
 
         @Override

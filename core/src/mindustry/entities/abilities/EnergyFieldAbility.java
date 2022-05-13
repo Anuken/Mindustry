@@ -28,7 +28,7 @@ public class EnergyFieldAbility extends Ability{
     public float x, y;
     public boolean targetGround = true, targetAir = true, hitBuildings = true, hitUnits = true;
     public int maxTargets = 25;
-    public float healPercent = 2.5f;
+    public float healPercent = 3f;
 
     public float layer = Layer.bullet - 0.001f, blinkScl = 20f, blinkSize = 0.1f;
     public float effectRadius = 5f, sectorRad = 0.14f, rotateSpeed = 0.5f;
@@ -135,7 +135,7 @@ public class EnergyFieldAbility extends Ability{
                         hitEffect.at(rx, ry, unit.angleTo(other), color);
 
                         if(other instanceof Building b){
-                            Fx.healBlockFull.at(b.x, b.y, b.block.size, color);
+                            Fx.healBlockFull.at(b.x, b.y, 0f, color, b.block);
                         }
                     }
                 }else{

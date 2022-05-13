@@ -26,6 +26,15 @@ public class Layer{
     //base block layer - most blocks go here
     block = 30,
 
+    //layer for cracks over blocks, batched to prevent excessive texture swaps
+    blockCracks = 30f + 0.1f,
+
+    //some blocks need to draw stuff after cracks
+    blockAfterCracks = 30f + 0.2f,
+
+    //informal layer used for additive blending overlay, grouped together to reduce draw calls
+    blockAdditive = 31,
+
     //things drawn over blocks (intermediate layer)
     blockOver = 35,
 
@@ -34,6 +43,9 @@ public class Layer{
 
     //turrets
     turret = 50,
+
+    //special layer for turret additive blending heat stuff
+    turretHeat = 50.1f,
 
     //ground units
     groundUnit = 60,
@@ -79,6 +91,9 @@ public class Layer{
 
     //names of players in the game
     playerName = 150,
+
+    //fog of war effect, if applicable
+    fogOfWar = 155,
 
     //space effects, currently only the land and launch effects
     space = 160,

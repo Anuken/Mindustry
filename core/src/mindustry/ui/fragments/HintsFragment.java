@@ -22,12 +22,12 @@ import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
-public class HintsFragment extends Fragment{
+public class HintsFragment{
     private static final Boolp isTutorial = () -> Vars.state.rules.sector == SectorPresets.groundZero.sector;
     private static final float foutTime = 0.6f;
 
     /** All hints to be displayed in the game. */
-    public Seq<Hint> hints = new Seq<>().and(DefaultHint.values()).as();
+    public Seq<Hint> hints = new Seq<>().add(DefaultHint.values()).as();
 
     @Nullable Hint current;
     Group group = new WidgetGroup();
@@ -35,11 +35,11 @@ public class HintsFragment extends Fragment{
     ObjectSet<Block> placedBlocks = new ObjectSet<>();
     Table last;
 
-    @Override
     public void build(Group parent){
         group.setFillParent(true);
         group.touchable = Touchable.childrenOnly;
-        group.visibility = () -> Core.settings.getBool("hints", true) && ui.hudfrag.shown;
+        //TODO hints off for now.
+        group.visibility = () -> !state.isCampaign() && Core.settings.getBool("hints", true) && ui.hudfrag.shown;
         group.update(() -> {
             if(current != null){
                 //current got completed
@@ -165,10 +165,9 @@ public class HintsFragment extends Fragment{
         boost(visibleDesktop, () -> !player.dead() && player.unit().type.canBoost, () -> Core.input.keyDown(Binding.boost)),
         blockInfo(() -> !(state.isCampaign() && state.rules.sector == SectorPresets.groundZero.sector && state.wave < 3), () -> ui.content.isShown()),
         derelict(() -> ui.hints.events.contains("derelictmouse"), () -> false),
-        command(() -> state.rules.defaultTeam.data().units.size > 3 && !net.active(), () -> player.unit().isCommanding()),
         payloadPickup(() -> !player.unit().dead && player.unit() instanceof Payloadc p && p.payloads().isEmpty(), () -> player.unit() instanceof Payloadc p && p.payloads().any()),
         payloadDrop(() -> !player.unit().dead && player.unit() instanceof Payloadc p && p.payloads().any(), () -> player.unit() instanceof Payloadc p && p.payloads().isEmpty()),
-        waveFire(() -> Groups.fire.size() > 0 && Blocks.wave.unlockedNow(), () -> indexer.getAllied(state.rules.defaultTeam, BlockFlag.extinguisher).size() > 0),
+        waveFire(() -> Groups.fire.size() > 0 && Blocks.wave.unlockedNow(), () -> indexer.getFlagged(state.rules.defaultTeam, BlockFlag.extinguisher).size > 0),
         generator(() -> control.input.block == Blocks.combustionGenerator, () -> ui.hints.placedBlocks.contains(Blocks.combustionGenerator)),
         guardian(() -> state.boss() != null && state.boss().armor >= 4, () -> state.boss() == null),
         coreUpgrade(() -> state.isCampaign() && Blocks.coreFoundation.unlocked()

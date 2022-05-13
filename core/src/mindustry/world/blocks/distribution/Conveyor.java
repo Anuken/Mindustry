@@ -9,6 +9,7 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -24,9 +25,6 @@ public class Conveyor extends Block implements Autotiler{
     private static final float itemSpace = 0.4f;
     private static final int capacity = 3;
 
-    final Vec2 tr1 = new Vec2();
-    final Vec2 tr2 = new Vec2();
-
     public @Load(value = "@-#1-#2", lengths = {7, 4}) TextureRegion[][] regions;
 
     public float speed = 0f;
@@ -41,7 +39,9 @@ public class Conveyor extends Block implements Autotiler{
         group = BlockGroup.transportation;
         hasItems = true;
         itemCapacity = capacity;
+        priority = TargetPriority.transport;
         conveyorPlacement = true;
+        underBullets = true;
 
         ambientSound = Sounds.conveyor;
         ambientSoundVolume = 0.0022f;
@@ -66,13 +66,13 @@ public class Conveyor extends Block implements Autotiler{
     }
 
     @Override
-    public void drawRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
-        int[] bits = getTiling(req, list);
+    public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
+        int[] bits = getTiling(plan, list);
 
         if(bits == null) return;
 
         TextureRegion region = regions[bits[0]][0];
-        Draw.rect(region, req.drawx(), req.drawy(), region.width * bits[1] * Draw.scl, region.height * bits[2] * Draw.scl, req.rotation * 90);
+        Draw.rect(region, plan.drawx(), plan.drawy(), region.width * bits[1] * Draw.scl, region.height * bits[2] * Draw.scl, plan.rotation * 90);
     }
 
     @Override
@@ -105,10 +105,10 @@ public class Conveyor extends Block implements Autotiler{
     }
 
     @Override
-    public Block getReplacement(BuildPlan req, Seq<BuildPlan> requests){
+    public Block getReplacement(BuildPlan req, Seq<BuildPlan> plans){
         if(junctionReplacement == null) return this;
 
-        Boolf<Point2> cont = p -> requests.contains(o -> o.x == req.x + p.x && o.y == req.y + p.y && (req.block instanceof Conveyor || req.block instanceof Junction));
+        Boolf<Point2> cont = p -> plans.contains(o -> o.x == req.x + p.x && o.y == req.y + p.y && (req.block instanceof Conveyor || req.block instanceof Junction));
         return cont.get(Geometry.d4(req.rotation)) &&
             cont.get(Geometry.d4(req.rotation - 2)) &&
             req.tile() != null &&
@@ -138,7 +138,7 @@ public class Conveyor extends Block implements Autotiler{
 
         @Override
         public void draw(){
-            int frame = enabled && clogHeat <= 0.5f ? (int)(((Time.time * speed * 8f * timeScale)) % 4) : 0;
+            int frame = enabled && clogHeat <= 0.5f ? (int)(((Time.time * speed * 8f * timeScale * efficiency)) % 4) : 0;
 
             //draw extra conveyors facing this one for non-square tiling purposes
             Draw.z(Layer.blockUnder);
@@ -159,12 +159,12 @@ public class Conveyor extends Block implements Autotiler{
 
             for(int i = 0; i < len; i++){
                 Item item = ids[i];
-                tr1.trns(rotation * 90, tilesize, 0);
-                tr2.trns(rotation * 90, -tilesize / 2f, xs[i] * tilesize / 2f);
+                Tmp.v1.trns(rotation * 90, tilesize, 0);
+                Tmp.v2.trns(rotation * 90, -tilesize / 2f, xs[i] * tilesize / 2f);
 
                 Draw.rect(item.fullIcon,
-                    (x + tr1.x * ys[i] + tr2.x),
-                    (y + tr1.y * ys[i] + tr2.y),
+                    (x + Tmp.v1.x * ys[i] + Tmp.v2.x),
+                    (y + Tmp.v1.y * ys[i] + Tmp.v2.y),
                     itemSize, itemSize);
             }
         }

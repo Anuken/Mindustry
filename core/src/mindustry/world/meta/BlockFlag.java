@@ -14,19 +14,21 @@ public enum BlockFlag{
     factory,
     /** Repair point. */
     repair,
-    /** Rally point. */
-    rally,
     /** Block that stored power for resupply. */
     battery,
     /** Any reactor block. */
     reactor,
     /** Blocks that extinguishes fires. */
     extinguisher,
-    /** Just a launch pad. */
-    launchPad;
+
+    //special, internal identifiers
+    launchPad,
+    unitCargoUnloadPoint,
+    unitAssembler,
+    hasFogRadius;
 
     public final static BlockFlag[] all = values();
 
     /** Values for logic only. Filters out some internal flags. */
-    public final static BlockFlag[] allLogic = {core, storage, generator, turret, factory, repair, rally, battery, reactor};
+    public final static BlockFlag[] allLogic = {core, storage, generator, turret, factory, repair, battery, reactor};
 }

@@ -2,7 +2,7 @@ package mindustry.async;
 
 import arc.*;
 import arc.struct.*;
-import arc.util.async.*;
+import arc.util.*;
 import mindustry.game.EventType.*;
 
 import java.util.concurrent.*;
@@ -77,7 +77,7 @@ public class AsyncCore{
 
     private void complete(){
         //wait for all threads to stop processing
-        for(Future future : futures){
+        for(var future : futures){
             try{
                 future.get();
             }catch(Throwable t){

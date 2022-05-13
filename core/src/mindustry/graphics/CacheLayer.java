@@ -10,7 +10,8 @@ import static mindustry.Vars.*;
 public class CacheLayer{
     public static CacheLayer
 
-    water, mud, cryofluid, tar, slag, space, normal, walls;
+    water, mud, cryofluid, tar, slag, arkycite,
+    space, normal, walls;
 
     public static CacheLayer[] all = {};
 
@@ -37,6 +38,7 @@ public class CacheLayer{
             mud = new ShaderLayer(Shaders.mud),
             tar = new ShaderLayer(Shaders.tar),
             slag = new ShaderLayer(Shaders.slag),
+            arkycite = new ShaderLayer(Shaders.arkycite),
             cryofluid = new ShaderLayer(Shaders.cryofluid),
             space = new ShaderLayer(Shaders.space),
             normal = new CacheLayer(),

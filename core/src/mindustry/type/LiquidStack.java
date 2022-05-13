@@ -1,10 +1,11 @@
 package mindustry.type;
 
-import arc.math.*;
 import arc.struct.*;
 import mindustry.content.*;
 
 public class LiquidStack implements Comparable<LiquidStack>{
+    public static final LiquidStack[] empty = {};
+
     public Liquid liquid;
     public float amount;
 
@@ -36,7 +37,7 @@ public class LiquidStack implements Comparable<LiquidStack>{
     public static LiquidStack[] mult(LiquidStack[] stacks, float amount){
         LiquidStack[] copy = new LiquidStack[stacks.length];
         for(int i = 0; i < copy.length; i++){
-            copy[i] = new LiquidStack(stacks[i].liquid, Mathf.round(stacks[i].amount * amount));
+            copy[i] = new LiquidStack(stacks[i].liquid, stacks[i].amount * amount);
         }
         return copy;
     }
@@ -44,7 +45,7 @@ public class LiquidStack implements Comparable<LiquidStack>{
     public static LiquidStack[] with(Object... items){
         LiquidStack[] stacks = new LiquidStack[items.length / 2];
         for(int i = 0; i < items.length; i += 2){
-            stacks[i / 2] = new LiquidStack((Liquid)items[i], ((Number)items[i + 1]).intValue());
+            stacks[i / 2] = new LiquidStack((Liquid)items[i], ((Number)items[i + 1]).floatValue());
         }
         return stacks;
     }
@@ -52,7 +53,7 @@ public class LiquidStack implements Comparable<LiquidStack>{
     public static Seq<LiquidStack> list(Object... items){
         Seq<LiquidStack> stacks = new Seq<>(items.length / 2);
         for(int i = 0; i < items.length; i += 2){
-            stacks.add(new LiquidStack((Liquid)items[i], ((Number)items[i + 1]).intValue()));
+            stacks.add(new LiquidStack((Liquid)items[i], ((Number)items[i + 1]).floatValue()));
         }
         return stacks;
     }

@@ -1,6 +1,7 @@
 package mindustry.logic;
 
 import arc.func.*;
+import arc.graphics.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
@@ -22,20 +23,16 @@ public class LAssembler{
     public LAssembler(){
         //instruction counter
         putVar("@counter").value = 0;
-        //unix timestamp
-        putConst("@time", 0);
         //currently controlled unit
         putConst("@unit", null);
         //reference to self
         putConst("@this", null);
-        //global tick
-        putConst("@tick", 0);
     }
 
-    public static LAssembler assemble(String data){
+    public static LAssembler assemble(String data, boolean privileged){
         LAssembler asm = new LAssembler();
 
-        Seq<LStatement> st = read(data);
+        Seq<LStatement> st = read(data, privileged);
 
         asm.instructions = st.map(l -> l.build(asm)).filter(l -> l != null).toArray(LInstruction.class);
         return asm;
@@ -51,14 +48,17 @@ public class LAssembler{
         return out.toString();
     }
 
-    public static Seq<LStatement> read(String data){
-        return LParser.parse(data);
+    /** Parses a sequence of statements from a string. */
+    public static Seq<LStatement> read(String text, boolean privileged){
+        //don't waste time parsing null/empty text
+        if(text == null || text.isEmpty()) return new Seq<>();
+        return new LParser(text, privileged).parse();
     }
 
     /** @return a variable ID by name.
      * This may be a constant variable referring to a number or object. */
     public int var(String symbol){
-        int constId = Vars.constants.get(symbol);
+        int constId = Vars.logicVars.get(symbol);
         if(constId > 0){
             //global constants are *negated* and stored separately
             return -constId;
@@ -88,8 +88,19 @@ public class LAssembler{
         //parse hex/binary syntax
         if(symbol.startsWith("0b")) return Strings.parseLong(symbol, 2, 2, symbol.length(), invalidNum);
         if(symbol.startsWith("0x")) return Strings.parseLong(symbol, 16, 2, symbol.length(), invalidNum);
+        if(symbol.startsWith("%") && (symbol.length() == 7 || symbol.length() == 9)) return parseColor(symbol);
 
         return Strings.parseDouble(symbol, invalidNum);
+    }
+
+    double parseColor(String symbol){
+        int
+        r = Strings.parseInt(symbol, 16, 0, 1, 3),
+        g = Strings.parseInt(symbol, 16, 0, 3, 5),
+        b = Strings.parseInt(symbol, 16, 0, 5, 7),
+        a = symbol.length() == 9 ? Strings.parseInt(symbol, 16, 0, 7, 9) : 255;
+
+        return Color.toDoubleBits(r, g, b, a);
     }
 
     /** Adds a constant value by name. */

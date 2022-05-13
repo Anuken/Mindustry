@@ -180,7 +180,7 @@ public class MapsDialog extends BaseDialog{
                     mapTable.row();
                 }
 
-                TextButton button = mapTable.button("", Styles.cleart, () -> showMapInfo(map)).width(mapsize).pad(8).get();
+                TextButton button = mapTable.button("", Styles.flatt, () -> showMapInfo(map)).width(mapsize).pad(8).get();
                 button.clearChildren();
                 button.margin(9);
                 button.add(map.name()).width(mapsize - 18f).center().get().setEllipsis(true);
@@ -209,7 +209,7 @@ public class MapsDialog extends BaseDialog{
                 for(Gamemode mode : Gamemode.all){
                     TextureRegionDrawable icon = Vars.ui.getIcon("mode" + Strings.capitalize(mode.name()));
                     if(Core.atlas.isFound(icon.getRegion())){
-                        t.button(icon, Styles.emptytogglei, () -> {
+                        t.button(icon, Styles.emptyTogglei, () -> {
                             if(modes.contains(mode)){
                                 modes.remove(mode);
                             }else{
@@ -224,13 +224,13 @@ public class MapsDialog extends BaseDialog{
 
             menu.add("@editor.filters.type").width(150f).left();
             menu.table(Tex.button, t -> {
-                t.button("@custom", Styles.clearTogglet, () -> {
+                t.button("@custom", Styles.flatTogglet, () -> {
                     showCustom = !showCustom;
                     Core.settings.put("editorshowcustommaps", showCustom);
                     Core.settings.forceSave();
                     rebuildMaps();
                 }).size(150f, 60f).checked(showCustom);
-                t.button("@builtin", Styles.clearTogglet, () -> {
+                t.button("@builtin", Styles.flatTogglet, () -> {
                     showBuiltIn = !showBuiltIn;
                     Core.settings.put("editorshowbuiltinmaps", showBuiltIn);
                     Core.settings.forceSave();
@@ -241,13 +241,13 @@ public class MapsDialog extends BaseDialog{
 
             menu.add("@editor.filters.search").width(150f).left();
             menu.table(Tex.button, t -> {
-                t.button("@editor.filters.author", Styles.clearTogglet, () -> {
+                t.button("@editor.filters.author", Styles.flatTogglet, () -> {
                     searchAuthor = !searchAuthor;
                     Core.settings.put("editorsearchauthor", searchAuthor);
                     Core.settings.forceSave();
                     rebuildMaps();
                 }).size(150f, 60f).checked(searchAuthor);
-                t.button("@editor.filters.description", Styles.clearTogglet, () -> {
+                t.button("@editor.filters.description", Styles.flatTogglet, () -> {
                     searchDescription = !searchDescription;
                     Core.settings.put("editorsearchdescription", searchDescription);
                     Core.settings.forceSave();

@@ -17,7 +17,6 @@ import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
-import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -43,13 +42,15 @@ public class NuclearReactor extends PowerGenerator{
     public int explosionDamage = 1250;
     /** heat removed per unit of coolant */
     public float coolantPower = 0.5f;
+    public float smoothLight;
+
+    public Item fuelItem = Items.thorium;
 
     public @Load("@-top") TextureRegion topRegion;
     public @Load("@-lights") TextureRegion lightsRegion;
 
     public NuclearReactor(String name){
         super(name);
-        updateInUnits = false;
         itemCapacity = 30;
         liquidCapacity = 30;
         hasItems = true;
@@ -72,7 +73,7 @@ public class NuclearReactor extends PowerGenerator{
     @Override
     public void setBars(){
         super.setBars();
-        bars.add("heat", (NuclearReactorBuild entity) -> new Bar("bar.heat", Pal.lightOrange, () -> entity.heat));
+        addBar("heat", (NuclearReactorBuild entity) -> new Bar("bar.heat", Pal.lightOrange, () -> entity.heat));
     }
 
     public class NuclearReactorBuild extends GeneratorBuild{
@@ -81,10 +82,7 @@ public class NuclearReactor extends PowerGenerator{
 
         @Override
         public void updateTile(){
-            ConsumeLiquid cliquid = consumes.get(ConsumeType.liquid);
-            Item item = consumes.getItem().items[0].item;
-
-            int fuel = items.get(item);
+            int fuel = items.get(fuelItem);
             float fullness = (float)fuel / itemCapacity;
             productionEfficiency = fullness;
 
@@ -98,12 +96,10 @@ public class NuclearReactor extends PowerGenerator{
                 productionEfficiency = 0f;
             }
 
-            Liquid liquid = cliquid.liquid;
-
             if(heat > 0){
-                float maxUsed = Math.min(liquids.get(liquid), heat / coolantPower);
+                float maxUsed = Math.min(liquids.currentAmount(), heat / coolantPower);
                 heat -= maxUsed * coolantPower;
-                liquids.remove(liquid, maxUsed);
+                liquids.remove(liquids.current(), maxUsed);
             }
 
             if(heat > smokeThreshold){
@@ -134,7 +130,7 @@ public class NuclearReactor extends PowerGenerator{
 
             Sounds.explosionbig.at(this);
 
-            int fuel = items.get(consumes.<ConsumeItems>get(ConsumeType.item).items[0].item);
+            int fuel = items.get(fuelItem);
 
             if((fuel < 5 && heat < 0.5f) || !state.rules.reactorExplosions) return;
 
@@ -148,7 +144,8 @@ public class NuclearReactor extends PowerGenerator{
         @Override
         public void drawLight(){
             float fract = productionEfficiency;
-            Drawf.light(team, x, y, (90f + Mathf.absin(5, 5f)) * fract, Tmp.c1.set(lightColor).lerp(Color.scarlet, heat), 0.6f * fract);
+            smoothLight = Mathf.lerpDelta(smoothLight, fract, 0.08f);
+            Drawf.light(x, y, (90f + Mathf.absin(5, 5f)) * smoothLight, Tmp.c1.set(lightColor).lerp(Color.scarlet, heat), 0.6f * smoothLight);
         }
 
         @Override

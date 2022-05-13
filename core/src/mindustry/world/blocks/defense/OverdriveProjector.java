@@ -76,7 +76,7 @@ public class OverdriveProjector extends Block{
     @Override
     public void setBars(){
         super.setBars();
-        bars.add("boost", (OverdriveBuild entity) -> new Bar(() -> Core.bundle.format("bar.boost", Mathf.round(Math.max((entity.realBoost() * 100 - 100), 0))), () -> Pal.accent, () -> entity.realBoost() / (hasBoost ? speedBoost + speedBoostPhase : speedBoost)));
+        addBar("boost", (OverdriveBuild entity) -> new Bar(() -> Core.bundle.format("bar.boost", Mathf.round(Math.max((entity.realBoost() * 100 - 100), 0))), () -> Pal.accent, () -> entity.realBoost() / (hasBoost ? speedBoost + speedBoostPhase : speedBoost)));
     }
 
     public class OverdriveBuild extends Building implements Ranged{
@@ -92,17 +92,17 @@ public class OverdriveProjector extends Block{
 
         @Override
         public void drawLight(){
-            Drawf.light(team, x, y, lightRadius * smoothEfficiency, baseColor, 0.7f * smoothEfficiency);
+            Drawf.light(x, y, lightRadius * smoothEfficiency, baseColor, 0.7f * smoothEfficiency);
         }
 
         @Override
         public void updateTile(){
-            smoothEfficiency = Mathf.lerpDelta(smoothEfficiency, efficiency(), 0.08f);
-            heat = Mathf.lerpDelta(heat, consValid() ? 1f : 0f, 0.08f);
+            smoothEfficiency = Mathf.lerpDelta(smoothEfficiency, efficiency, 0.08f);
+            heat = Mathf.lerpDelta(heat, efficiency > 0 ? 1f : 0f, 0.08f);
             charge += heat * Time.delta;
 
             if(hasBoost){
-                phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(cons.optionalValid()), 0.1f);
+                phaseHeat = Mathf.lerpDelta(phaseHeat, optionalEfficiency, 0.1f);
             }
 
             if(charge >= reload){
@@ -112,13 +112,13 @@ public class OverdriveProjector extends Block{
                 indexer.eachBlock(this, realRange, other -> other.block.canOverdrive, other -> other.applyBoost(realBoost(), reload + 1f));
             }
 
-            if(timer(timerUse, useTime) && efficiency() > 0 && consValid()){
+            if(timer(timerUse, useTime) && efficiency > 0){
                 consume();
             }
         }
 
         public float realBoost(){
-            return consValid() ? (speedBoost + phaseHeat * speedBoostPhase) * efficiency() : 0f;
+            return (speedBoost + phaseHeat * speedBoostPhase) * efficiency;
         }
 
         @Override

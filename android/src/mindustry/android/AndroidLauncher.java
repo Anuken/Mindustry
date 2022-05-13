@@ -33,9 +33,6 @@ public class AndroidLauncher extends AndroidApplication{
     FileChooser chooser;
     Runnable permCallback;
 
-    Object gpService;
-    Class<?> serviceClass;
-
     @Override
     protected void onCreate(Bundle savedInstanceState){
         UncaughtExceptionHandler handler = Thread.getDefaultUncaughtExceptionHandler();
@@ -183,6 +180,7 @@ public class AndroidLauncher extends AndroidApplication{
         }, new AndroidApplicationConfiguration(){{
             useImmersiveMode = true;
             hideStatusBar = true;
+            useGL30 = true;
         }});
         checkFiles(getIntent());
 
@@ -239,24 +237,6 @@ public class AndroidLauncher extends AndroidApplication{
             if(permCallback != null){
                 Core.app.post(permCallback);
                 permCallback = null;
-            }
-        }
-    }
-
-    @Override
-    public void onResume(){
-        super.onResume();
-
-        //TODO enable once GPGS is set up on the GP console
-        if(false && getPackageName().endsWith(".gp")){
-            try{
-                if(gpService == null){
-                    serviceClass = Class.forName("mindustry.android.GPGameService");
-                    gpService = serviceClass.getConstructor().newInstance();
-                }
-                serviceClass.getMethod("onResume", Context.class).invoke(gpService, this);
-            }catch(Exception e){
-                Log.err("Failed to update Google Play Services", e);
             }
         }
     }

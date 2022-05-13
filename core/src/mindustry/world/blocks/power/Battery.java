@@ -24,13 +24,16 @@ public class Battery extends PowerDistributor{
         flags = EnumSet.of(BlockFlag.battery);
         //TODO could be supported everywhere...
         envEnabled |= Env.space;
+        destructible = true;
+        //batteries don't need to update
+        update = false;
     }
 
     public class BatteryBuild extends Building{
         @Override
         public void draw(){
             Draw.color(emptyLightColor, fullLightColor, power.status);
-            Fill.square(x, y, tilesize * size / 2f - 1);
+            Fill.square(x, y, (tilesize * size / 2f - 1) * Draw.xscl);
             Draw.color();
 
             Draw.rect(topRegion, x, y);
@@ -39,9 +42,9 @@ public class Battery extends PowerDistributor{
         @Override
         public void overwrote(Seq<Building> previous){
             for(Building other : previous){
-                if(other.power != null && other.block.consumes.hasPower() && other.block.consumes.getPower().buffered){
-                    float amount = other.block.consumes.getPower().capacity * other.power.status;
-                    power.status = Mathf.clamp(power.status + amount / block.consumes.getPower().capacity);
+                if(other.power != null && other.block.consPower != null && other.block.consPower.buffered){
+                    float amount = other.block.consPower.capacity * other.power.status;
+                    power.status = Mathf.clamp(power.status + amount / consPower.capacity);
                 }
             }
         }

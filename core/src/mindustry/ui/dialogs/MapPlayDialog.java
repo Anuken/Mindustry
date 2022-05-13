@@ -12,6 +12,8 @@ import mindustry.ui.*;
 import static mindustry.Vars.*;
 
 public class MapPlayDialog extends BaseDialog{
+    public @Nullable Runnable playListener;
+
     CustomRulesDialog dialog = new CustomRulesDialog();
     Rules rules;
     Gamemode selectedGamemode = Gamemode.survival;
@@ -31,6 +33,10 @@ public class MapPlayDialog extends BaseDialog{
     }
 
     public void show(Map map){
+        show(map, false);
+    }
+
+    public void show(Map map, boolean playtesting){
         this.lastMap = map;
         title.setText(map.name());
         cont.clearChildren();
@@ -79,7 +85,8 @@ public class MapPlayDialog extends BaseDialog{
         addCloseButton();
 
         buttons.button("@play", Icon.play, () -> {
-            control.playMap(map, rules);
+            if(playListener != null) playListener.run();
+            control.playMap(map, rules, playtesting);
             hide();
             ui.custom.hide();
         }).size(210f, 64f);

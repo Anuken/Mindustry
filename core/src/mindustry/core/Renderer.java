@@ -12,13 +12,13 @@ import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.async.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
+import mindustry.type.*;
 import mindustry.world.blocks.storage.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
@@ -36,6 +36,7 @@ public class Renderer implements ApplicationListener{
     private static final Interp landInterp = Interp.pow3;
 
     public final BlockRenderer blocks = new BlockRenderer();
+    public final FogRenderer fog = new FogRenderer();
     public final MinimapRenderer minimap = new MinimapRenderer();
     public final OverlayRenderer overlays = new OverlayRenderer();
     public final LightRenderer lights = new LightRenderer();
@@ -45,13 +46,14 @@ public class Renderer implements ApplicationListener{
     public @Nullable Bloom bloom;
     public @Nullable FrameBuffer backgroundBuffer;
     public FrameBuffer effectBuffer = new FrameBuffer();
-    public boolean animateShields, drawWeather = true, drawStatus;
+    public boolean animateShields, drawWeather = true, drawStatus, enableEffects, drawDisplays = true;
     public float weatherAlpha;
     /** minZoom = zooming out, maxZoom = zooming in */
     public float minZoom = 1.5f, maxZoom = 6f;
     public Seq<EnvRenderer> envRenderers = new Seq<>();
     public ObjectMap<String, Runnable> customBackgrounds = new ObjectMap<>();
     public TextureRegion[] bubbles = new TextureRegion[16], splashes = new TextureRegion[12];
+    public TextureRegion[][] fluidFrames;
 
     private @Nullable CoreBuild landCore;
     private @Nullable CoreBlock launchCoreType;
@@ -80,6 +82,11 @@ public class Renderer implements ApplicationListener{
     public Renderer(){
         camera = new Camera();
         Shaders.init();
+
+        Events.on(ResetEvent.class, e ->  {
+            shakeTime = shakeIntensity = 0f;
+            camShakeOffset.setZero();
+        });
     }
 
     public void shake(float intensity, float duration){
@@ -111,6 +118,12 @@ public class Renderer implements ApplicationListener{
         for(int i = 0; i < bubbles.length; i++) bubbles[i] = atlas.find("bubble-" + i);
         for(int i = 0; i < splashes.length; i++) splashes[i] = atlas.find("splash-" + i);
 
+        loadFluidFrames();
+
+        Events.on(ClientLoadEvent.class, e -> {
+            loadFluidFrames();
+        });
+
         assets.load("sprites/clouds.png", Texture.class).loaded = t -> {
             t.setWrap(TextureWrap.repeat);
             t.setFilter(TextureFilter.linear);
@@ -125,17 +138,45 @@ public class Renderer implements ApplicationListener{
         });
     }
 
+    public void loadFluidFrames(){
+        fluidFrames = new TextureRegion[2][Liquid.animationFrames];
+
+        String[] fluidTypes = {"liquid", "gas"};
+
+        for(int i = 0; i < fluidTypes.length; i++){
+
+            for(int j = 0; j < Liquid.animationFrames; j++){
+                fluidFrames[i][j] = atlas.find("fluid-" + fluidTypes[i] + "-" + j);
+            }
+        }
+    }
+
+    public TextureRegion[][] getFluidFrames(){
+        if(fluidFrames == null){
+            loadFluidFrames();
+        }
+        return fluidFrames;
+    }
+
     @Override
     public void update(){
         Color.white.set(1f, 1f, 1f, 1f);
 
-        float dest = Mathf.clamp(Mathf.round(targetscale, 0.5f), minScale(), maxScale());
+        float baseTarget = targetscale;
+
+        if(control.input.logicCutscene){
+            baseTarget = Mathf.lerp(minZoom, maxZoom, control.input.logicCutsceneZoom);
+        }
+
+        float dest = Mathf.clamp(Mathf.round(baseTarget, 0.5f), minScale(), maxScale());
         camerascale = Mathf.lerpDelta(camerascale, dest, 0.1f);
         if(Mathf.equal(camerascale, dest, 0.001f)) camerascale = dest;
         laserOpacity = settings.getInt("lasersopacity") / 100f;
         bridgeOpacity = settings.getInt("bridgeopacity") / 100f;
         animateShields = settings.getBool("animatedshields");
         drawStatus = Core.settings.getBool("blockstatus");
+        enableEffects = settings.getBool("effects");
+        drawDisplays = !settings.getBool("hidedisplays");
 
         if(landTime > 0){
             if(!state.isPaused()){
@@ -185,6 +226,11 @@ public class Renderer implements ApplicationListener{
 
             camera.position.sub(camShakeOffset);
         }
+    }
+
+    public void updateAllDarkness(){
+        blocks.updateDarkness();
+        minimap.updateAll();
     }
 
     /** @return whether a launch/land cutscene is playing. */
@@ -278,7 +324,7 @@ public class Renderer implements ApplicationListener{
 
         //render all matching environments
         for(var renderer : envRenderers){
-            if((renderer.env & state.rules.environment) == renderer.env){
+            if((renderer.env & state.rules.env) == renderer.env){
                 renderer.renderer.run();
             }
         }
@@ -293,6 +339,8 @@ public class Renderer implements ApplicationListener{
 
         if(bloom != null){
             bloom.resize(graphics.getWidth(), graphics.getHeight());
+            bloom.setBloomIntesity(settings.getInt("bloomintensity", 6) / 4f + 1f);
+            bloom.blurPasses = settings.getInt("bloomblur", 1);
             Draw.draw(Layer.bullet - 0.02f, bloom::capture);
             Draw.draw(Layer.effect + 0.02f, bloom::render);
         }
@@ -300,6 +348,7 @@ public class Renderer implements ApplicationListener{
         Draw.draw(Layer.plans, overlays::drawBottom);
 
         if(animateShields && Shaders.shield != null){
+            //TODO would be nice if there were a way to detect if any shields or build beams actually *exist* before beginning/ending buffers, otherwise you're just blitting and swapping shaders for nothing
             Draw.drawRange(Layer.shields, 1f, () -> effectBuffer.begin(Color.clear), () -> {
                 effectBuffer.end();
                 effectBuffer.blit(Shaders.shield);
@@ -312,6 +361,7 @@ public class Renderer implements ApplicationListener{
         }
 
         Draw.draw(Layer.overlayUI, overlays::drawTop);
+        if(state.rules.fog) Draw.draw(Layer.fogOfWar, fog::drawFog);
         Draw.draw(Layer.space, this::drawLanding);
 
         Events.fire(Trigger.drawOver);
@@ -500,7 +550,11 @@ public class Renderer implements ApplicationListener{
             drawThrusters(block, x, y, rotation, thrusterFrame);
             Draw.alpha(1f);
 
+            if(block.teamRegions[build.team.id] == block.teamRegion) Draw.color(build.team.color);
+
             Drawf.spinSprite(block.teamRegions[build.team.id], x, y, rotation);
+
+            Draw.color();
 
             Draw.scl();
 
@@ -593,8 +647,8 @@ public class Renderer implements ApplicationListener{
 
     public void showLaunch(CoreBlock coreType){
         Vars.ui.hudfrag.showLaunch();
-        Vars.control.input.frag.config.hideConfig();
-        Vars.control.input.frag.inv.hide();
+        Vars.control.input.config.hideConfig();
+        Vars.control.input.inv.hide();
         launchCoreType = coreType;
         launching = true;
         landCore = player.team().core();

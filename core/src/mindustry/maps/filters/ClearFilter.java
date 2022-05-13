@@ -7,12 +7,12 @@ import mindustry.world.*;
 import static mindustry.maps.filters.FilterOption.*;
 
 public class ClearFilter extends GenerateFilter{
-    protected Block target = Blocks.stone;
-    protected Block replace = Blocks.air;
+    public Block target = Blocks.stone;
+    public Block replace = Blocks.air;
 
     @Override
     public FilterOption[] options(){
-        return new BlockOption[]{
+        return new FilterOption[]{
             new BlockOption("target", () -> target, b -> target = b, anyOptional),
             new BlockOption("replacement", () -> replace, b -> replace = b, anyOptional)
         };

@@ -10,6 +10,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.world.*;
+import mindustry.world.blocks.environment.*;
 
 public abstract class GenerateFilter{
     public int seed = 0;
@@ -37,7 +38,7 @@ public abstract class GenerateFilter{
                 Block block = Vars.content.block(PackTile.block(b)), floor = Vars.content.block(PackTile.floor(b)), overlay = Vars.content.block(PackTile.overlay(b));
 
                 tile.setFloor(floor.asFloor());
-                tile.setOverlay(!floor.asFloor().hasSurface() && overlay.asFloor().needsSurface ? Blocks.air : overlay);
+                tile.setOverlay(!floor.asFloor().hasSurface() && overlay.asFloor().needsSurface && overlay instanceof OreBlock ? Blocks.air : overlay);
 
                 if(!tile.block().synthetic() && !block.synthetic()){
                     tile.setBlock(block);
@@ -49,7 +50,7 @@ public abstract class GenerateFilter{
                 apply(in);
 
                 tile.setFloor(in.floor.asFloor());
-                tile.setOverlay(!in.floor.asFloor().hasSurface() && in.overlay.asFloor().needsSurface ? Blocks.air : in.overlay);
+                tile.setOverlay(!in.floor.asFloor().hasSurface() && in.overlay.asFloor().needsSurface && in.overlay instanceof OreBlock ? Blocks.air : in.overlay);
 
                 if(!tile.block().synthetic() && !in.block.synthetic()){
                     tile.setBlock(in.block);
@@ -109,6 +110,10 @@ public abstract class GenerateFilter{
 
     protected float noise(GenerateInput in, float scl, float mag, float octaves, float persistence){
         return Simplex.noise2d(seed, octaves, persistence, 1f / scl, in.x, in.y) * mag;
+    }
+
+    protected float noise(float x, float y, float scl, float mag, float octaves, float persistence){
+        return Simplex.noise2d(seed, octaves, persistence, 1f / scl, x, y) * mag;
     }
 
     protected float rnoise(float x, float y, float scl, float mag){

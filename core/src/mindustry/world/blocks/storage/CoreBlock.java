@@ -32,6 +32,8 @@ public class CoreBlock extends StorageBlock{
     public @Load(value = "@-thruster1", fallback = "clear-effect") TextureRegion thruster1; //top right
     public @Load(value = "@-thruster2", fallback = "clear-effect") TextureRegion thruster2; //bot left
     public float thrusterLength = 14f/4f;
+    public boolean isFirstTier;
+    public boolean incinerateNonBuildable = false;
 
     public UnitType unitType = UnitTypes.alpha;
 
@@ -50,9 +52,9 @@ public class CoreBlock extends StorageBlock{
         loopSoundVolume = 1f;
         drawDisabled = false;
         canOverdrive = false;
+        envEnabled |= Env.space;
 
         //support everything
-        envEnabled = Env.any;
         replaceable = false;
         rebuildable = false;
     }
@@ -62,7 +64,9 @@ public class CoreBlock extends StorageBlock{
         if(player == null || tile == null || !(tile.build instanceof CoreBuild entity)) return;
 
         CoreBlock block = (CoreBlock)tile.block();
-        Fx.spawn.at(entity);
+        if(entity.wasVisible){
+            Fx.spawn.at(entity);
+        }
 
         player.set(entity);
 
@@ -92,7 +96,7 @@ public class CoreBlock extends StorageBlock{
     public void setBars(){
         super.setBars();
 
-        bars.add("capacity", (CoreBuild e) -> new Bar(
+        addBar("capacity", (CoreBuild e) -> new Bar(
             () -> Core.bundle.format("bar.capacity", UI.formatAmount(e.storageCapacity)),
             () -> Pal.items,
             () -> e.items.total() / ((float)e.storageCapacity * content.items().count(i -> i.unlockedNow()))
@@ -103,6 +107,7 @@ public class CoreBlock extends StorageBlock{
     public void init(){
         //assign to update clipSize internally
         lightRadius = 30f + 20f * size;
+        fogRadius = Math.max(fogRadius, (int)(lightRadius / 8f * 3f) + 13);
         emitLight = true;
 
         super.init();
@@ -122,6 +127,15 @@ public class CoreBlock extends StorageBlock{
     @Override
     public boolean canPlaceOn(Tile tile, Team team, int rotation){
         if(tile == null) return false;
+        //in the editor, you can place them anywhere for convenience
+        if(state.isEditor()) return true;
+
+        //special floor upon which cores can be placed
+        tile.getLinkedTilesAs(this, tempTiles);
+        if(!tempTiles.contains(o -> !o.floor().allowCorePlacement)){
+            return true;
+        }
+
         CoreBuild core = team.core();
         //must have all requirements
         if(core == null || (!state.rules.infiniteResources && !core.items.has(requirements, state.rules.buildCostMultiplier))) return false;
@@ -134,7 +148,8 @@ public class CoreBlock extends StorageBlock{
         if(previous instanceof CoreBlock){
             tile.setBlock(this, tile.team());
             Fx.placeBlock.at(tile, tile.block().size);
-            Fx.upgradeCore.at(tile, tile.block().size);
+            Fx.upgradeCore.at(tile.drawx(), tile.drawy(), 0f, tile.block());
+            Fx.upgradeCoreBloom.at(tile, tile.block().size);
 
             //set up the correct items
             if(nextItems != null){
@@ -168,9 +183,12 @@ public class CoreBlock extends StorageBlock{
         if(!canPlaceOn(world.tile(x, y), player.team(), rotation)){
 
             drawPlaceText(Core.bundle.get(
-                (player.team().core() != null && player.team().core().items.has(requirements, state.rules.buildCostMultiplier)) || state.rules.infiniteResources ?
-                "bar.corereq" :
-                "bar.noresources"
+                isFirstTier ?
+                    //TODO better message
+                    "bar.corefloor" :
+                    (player.team().core() != null && player.team().core().items.has(requirements, state.rules.buildCostMultiplier)) || state.rules.infiniteResources ?
+                    "bar.corereq" :
+                    "bar.noresources"
             ), x, y, valid);
         }
     }
@@ -262,7 +280,7 @@ public class CoreBlock extends StorageBlock{
 
         public void requestSpawn(Player player){
             //do not try to respawn in unsupported environments at all
-            if(!unitType.supportsEnv(state.rules.environment)) return;
+            if(!unitType.supportsEnv(state.rules.env)) return;
 
             Call.playerSpawn(tile, player);
         }
@@ -290,7 +308,7 @@ public class CoreBlock extends StorageBlock{
             }
 
             //add a spawn to the map for future reference - waves should be disabled, so it shouldn't matter
-            if(state.isCampaign() && team == state.rules.waveTeam && team.cores().size <= 1){
+            if(state.isCampaign() && team == state.rules.waveTeam && team.cores().size <= 1 && state.rules.sector.planet.enemyCoreSpawnReplace){
                 //do not recache
                 tile.setOverlayQuiet(Blocks.spawn);
 
@@ -322,7 +340,7 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public void drawLight(){
-            Drawf.light(team, x, y, lightRadius, Pal.accent, 0.65f + Mathf.absin(20f, 0.1f));
+            Drawf.light(x, y, lightRadius, Pal.accent, 0.65f + Mathf.absin(20f, 0.1f));
         }
 
         @Override
@@ -332,7 +350,7 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public int getMaximumAccepted(Item item){
-            return state.rules.coreIncinerates ? storageCapacity * 2 : storageCapacity;
+            return state.rules.coreIncinerates ? storageCapacity * 20 : storageCapacity;
         }
 
         @Override
@@ -347,7 +365,7 @@ public class CoreBlock extends StorageBlock{
             state.teams.registerCore(this);
 
             storageCapacity = itemCapacity + proximity().sum(e -> owns(e) ? e.block.itemCapacity : 0);
-            proximity.each(e -> owns(e), t -> {
+            proximity.each(this::owns, t -> {
                 t.items = items;
                 ((StorageBuild)t).linkedCore = this;
             });
@@ -371,13 +389,16 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public void handleStack(Item item, int amount, Teamc source){
-            int realAmount = Math.min(amount, storageCapacity - items.get(item));
+            boolean incinerate = incinerateNonBuildable && !item.buildable;
+            int realAmount = incinerate ? 0 : Math.min(amount, storageCapacity - items.get(item));
             super.handleStack(item, realAmount, source);
 
             if(team == state.rules.defaultTeam && state.isCampaign()){
-                state.rules.sector.info.handleCoreItem(item, amount);
+                if(!incinerate){
+                    state.rules.sector.info.handleCoreItem(item, amount);
+                }
 
-                if(realAmount == 0){
+                if(realAmount == 0 && wasVisible){
                     Fx.coreBurn.at(x, y);
                 }
             }
@@ -396,6 +417,9 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public void drawSelect(){
+            //do not draw a pointless single outline when there's no storage
+            if(team.cores().size <= 1 && !proximity.contains(storage -> storage.items == items)) return;
+
             Lines.stroke(1f, Pal.accent);
             Cons<Building> outline = b -> {
                 for(int i = 0; i < 4; i++){
@@ -416,7 +440,7 @@ public class CoreBlock extends StorageBlock{
         }
 
         public boolean owns(Building core, Building tile){
-            return tile instanceof StorageBuild b && (b.linkedCore == core || b.linkedCore == null);
+            return tile instanceof StorageBuild b && ((StorageBlock)b.block).coreMerge && (b.linkedCore == core || b.linkedCore == null);
         }
 
         @Override
@@ -469,12 +493,18 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public void handleItem(Building source, Item item){
+            boolean incinerate = incinerateNonBuildable && !item.buildable;
+
+            if(team == state.rules.defaultTeam){
+                state.stats.coreItemCount.increment(item);
+            }
+
             if(net.server() || !net.active()){
-                if(team == state.rules.defaultTeam && state.isCampaign()){
+                if(team == state.rules.defaultTeam && state.isCampaign() && !incinerate){
                     state.rules.sector.info.handleCoreItem(item, 1);
                 }
 
-                if(items.get(item) >= storageCapacity){
+                if(items.get(item) >= storageCapacity || incinerate){
                     //create item incineration effect at random intervals
                     if(!noEffect){
                         incinerateEffect(this, source);
@@ -483,7 +513,7 @@ public class CoreBlock extends StorageBlock{
                 }else{
                     super.handleItem(source, item);
                 }
-            }else if(state.rules.coreIncinerates && items.get(item) >= storageCapacity && !noEffect){
+            }else if(((state.rules.coreIncinerates && items.get(item) >= storageCapacity) || incinerate) && !noEffect){
                 //create item incineration effect at random intervals
                 incinerateEffect(this, source);
                 noEffect = false;

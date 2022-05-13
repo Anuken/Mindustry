@@ -26,8 +26,8 @@ public class PowerTestFixture{
     @BeforeAll
     static void initializeDependencies(){
         headless = true;
-        Core.graphics = new FakeGraphics();
         Core.files = new MockFiles();
+        Groups.init();
 
         boolean make = content == null;
 
@@ -58,14 +58,14 @@ public class PowerTestFixture{
     protected static Battery createFakeBattery(float capacity){
         return new Battery("fakebattery" + System.nanoTime()){{
             buildType = () -> new BatteryBuild();
-            consumes.powerBuffered(capacity);
+            consumePowerBuffered(capacity);
         }};
     }
 
     protected static Block createFakeDirectConsumer(float powerPerTick){
         return new PowerBlock("fakedirectconsumer" + System.nanoTime()){{
             buildType = Building::create;
-            consumes.power(powerPerTick);
+            consumePower(powerPerTick);
         }};
     }
 
@@ -81,8 +81,8 @@ public class PowerTestFixture{
             Tile tile = new Tile(x, y);
 
             //workaround since init() is not called for custom blocks
-            if(block.consumes.all() == null){
-                block.consumes.init();
+            if(block.consumers.length == 0){
+                block.init();
             }
 
             // Using the Tile(int, int, byte, byte) constructor would require us to register any fake block or tile we create
@@ -95,18 +95,12 @@ public class PowerTestFixture{
             // Simulate the "changed" method. Calling it through reflections would require half the game to be initialized.
             tile.build = block.newBuilding().init(tile, Team.sharded, false, 0);
             if(block.hasPower){
-                new PowerGraph(){
-                    //assume there's always something consuming power
-                    @Override
-                    public float getUsageFraction(){
-                        return 1f;
-                    }
-                }.add(tile.build);
+                new PowerGraph().add(tile.build);
             }
 
             // Assign incredibly high health so the block does not get destroyed on e.g. burning Blast Compound
             block.health = 100000;
-            tile.build.health(100000.0f);
+            tile.build.health = 100000.0f;
 
             return tile;
         }catch(Exception ex){

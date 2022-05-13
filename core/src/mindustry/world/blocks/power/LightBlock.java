@@ -63,7 +63,7 @@ public class LightBlock extends Block{
         @Override
         public void control(LAccess type, double p1, double p2, double p3, double p4){
             if(type == LAccess.color){
-                color = Color.rgba8888(Mathf.clamp((float)p1), Mathf.clamp((float)p2), Mathf.clamp((float)p3), 1f);
+                color = Tmp.c1.fromDouble(p1).rgba8888();
             }
 
             super.control(type, p1, p2, p3, p4);
@@ -73,7 +73,7 @@ public class LightBlock extends Block{
         public void draw(){
             super.draw();
             Draw.blend(Blending.additive);
-            Draw.color(Tmp.c1.set(color), efficiency() * 0.3f);
+            Draw.color(Tmp.c1.set(color), efficiency * 0.3f);
             Draw.rect(topRegion, x, y);
             Draw.color();
             Draw.blend();
@@ -94,7 +94,7 @@ public class LightBlock extends Block{
 
         @Override
         public void drawLight(){
-            Drawf.light(team, x, y, lightRadius * Math.min(smoothTime, 2f), Tmp.c1.set(color), brightness * efficiency());
+            Drawf.light(x, y, lightRadius * Math.min(smoothTime, 2f), Tmp.c1.set(color), brightness * efficiency);
         }
 
         @Override

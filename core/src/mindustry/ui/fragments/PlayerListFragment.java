@@ -18,14 +18,13 @@ import mindustry.ui.*;
 
 import static mindustry.Vars.*;
 
-public class PlayerListFragment extends Fragment{
+public class PlayerListFragment{
     public Table content = new Table().marginRight(13f).marginLeft(13f);
     private boolean visible = false;
     private Interval timer = new Interval();
     private TextField search;
     private Seq<Player> players = new Seq<>();
 
-    @Override
     public void build(Group parent){
         content.name = "players";
         parent.fill(cont -> {

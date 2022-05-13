@@ -10,6 +10,10 @@ import mindustry.type.*;
 public class PlanetParams{
     /** Camera direction relative to the planet. Length is determined by zoom. */
     public Vec3 camPos = new Vec3(0f, 0f, 4f);
+    /** If not null, this is the position of the "previous" planet for smooth camera movement. */
+    public @Nullable Vec3 otherCamPos;
+    /** Interpolation value for otherCamPos. */
+    public float otherCamAlpha = 0f;
     /** Camera up vector. */
     public Vec3 camUp = new Vec3(0f, 1f, 0f);
     /** the unit length direction vector of the camera **/
