@@ -4247,6 +4247,22 @@ public class Blocks{
             );
         }};
 
+        shipRefabricator = new Reconstructor("ship-refabricator"){{
+            requirements(Category.units, with(Items.beryllium, 200, Items.tungsten, 100, Items.silicon, 150, Items.oxide, 40));
+            regionSuffix = "-dark";
+
+            size = 3;
+            consumePower(2.5f);
+            consumeLiquid(Liquids.hydrogen, 3f / 60f);
+            consumeItems(with(Items.silicon, 60, Items.tungsten, 40));
+
+            constructTime = 60f * 50f;
+
+            upgrades.addAll(
+            new UnitType[]{UnitTypes.elude, UnitTypes.avert}
+            );
+        }};
+        
         mechRefabricator = new Reconstructor("mech-refabricator"){{
             requirements(Category.units, with(Items.beryllium, 250, Items.tungsten, 120, Items.silicon, 150));
             regionSuffix = "-dark";
@@ -4261,22 +4277,6 @@ public class Blocks{
 
             upgrades.addAll(
             new UnitType[]{UnitTypes.merui, UnitTypes.cleroi}
-            );
-        }};
-
-        shipRefabricator = new Reconstructor("ship-refabricator"){{
-            requirements(Category.units, with(Items.beryllium, 200, Items.tungsten, 100, Items.silicon, 150, Items.oxide, 40));
-            regionSuffix = "-dark";
-
-            size = 3;
-            consumePower(2.5f);
-            consumeLiquid(Liquids.hydrogen, 3f / 60f);
-            consumeItems(with(Items.silicon, 60, Items.tungsten, 40));
-
-            constructTime = 60f * 50f;
-
-            upgrades.addAll(
-            new UnitType[]{UnitTypes.elude, UnitTypes.avert}
             );
         }};
 
