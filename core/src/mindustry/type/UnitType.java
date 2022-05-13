@@ -134,7 +134,7 @@ public class UnitType extends UnlockableContent{
     /** vertical offset of wave trail in naval units  */
     waveTrailY = -3f,
     /** width of all trails (including naval ones) */
-    tailScl = 1f;
+    trailScl = 1f;
 
     /** if true, this unit counts as an enemy in the wave counter (usually false for support-only units) */
     public boolean isEnemy = true,
@@ -1215,7 +1215,7 @@ public class UnitType extends UnlockableContent{
             unit.trail = new Trail(trailLength);
         }
         Trail trail = unit.trail;
-        trail.draw(trailColor == null ? unit.team.color : trailColor, (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f) * (useEngineElevation ? unit.elevation : 1f)) * tailScl);
+        trail.draw(trailColor == null ? unit.team.color : trailColor, (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f) * (useEngineElevation ? unit.elevation : 1f)) * trailScl);
     }
 
     public void drawEngines(Unit unit){
