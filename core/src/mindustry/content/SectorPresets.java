@@ -148,7 +148,7 @@ public class SectorPresets{
                         new TextMarker("Use [accent]cliff crushers[] to mine sand.", 262f * 8f, 88f * 8f)
                     ),
                     new BuildCountObjective(Blocks.tankFabricator, 1).withMarkers(
-                        new TextMarker("Use [accent]units[] to explore the map, defend buildings, and go on the offensive.\n Research and place a [accent]fabricator[].", 258f * 8f, 116f * 8f)
+                        new TextMarker("Use [accent]units[] to explore the map, defend buildings, and go on the offensive.\n Research and place a [accent]tank fabricator[].", 258f * 8f, 116f * 8f)
                     ),
                     new UnitCountObjective(UnitTypes.stell, 1).withMarkers(
                         new TextMarker("Produce a unit.\nUse the \"?\" button to see selected factory requirements.", 258f * 8f, 116f * 8f)
