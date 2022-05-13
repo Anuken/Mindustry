@@ -160,7 +160,7 @@ public class SectorPresets{
                         new TextMarker("Units are effective, but [accent]turrets[] provide better defensive capabilities if used effectively.\n Place a [accent]Breach[] turret.\nTurrets require [accent]ammo[].", 258f * 8f, 114f * 8f)
                     ),
                     new BuildCountObjective(Blocks.berylliumWall, 6).withMarkers(
-                        new TextMarker("[accent]Walls[] can prevent oncoming damage from reaching buildings\nPlace some [accent]beryllium walls[] around the turret.", 276f * 8f, 133f * 8f)
+                        new TextMarker("[accent]Walls[] can prevent oncoming damage from reaching buildings.\nPlace some [accent]beryllium walls[] around the turret.", 276f * 8f, 133f * 8f)
                     ),
                     new TimerObjective("@objective.enemiesapproaching",30 * 60).withMarkers(
                         new TextMarker("Enemy incoming, prepare to defend.", 276f * 8f, 133f * 8f)
