@@ -466,6 +466,10 @@ public class UnitType extends UnlockableContent{
 
     }
 
+    public void updatePayload(Unit unit, @Nullable Unit unitHolder, @Nullable Building buildingHolder){
+
+    }
+
     public void landed(Unit unit){}
 
     public void display(Unit unit, Table table){
