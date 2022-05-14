@@ -1496,6 +1496,17 @@ public class UnitType extends UnlockableContent{
             Tmp.v1.set(x, y).rotate(rot);
             float ex = Tmp.v1.x, ey = Tmp.v1.y;
 
+            //engine outlines (cursed?)
+            /*float z = Draw.z();
+            Draw.z(z - 0.0001f);
+            Draw.color(type.outlineColor);
+            Fill.circle(
+            unit.x + ex,
+            unit.y + ey,
+            (type.outlineRadius * Draw.scl + radius + Mathf.absin(Time.time, 2f, radius / 4f)) * scale
+            );
+            Draw.z(z);*/
+
             Draw.color(color);
             Fill.circle(
             unit.x + ex,
