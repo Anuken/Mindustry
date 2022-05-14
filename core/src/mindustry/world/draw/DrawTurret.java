@@ -37,7 +37,7 @@ public class DrawTurret extends DrawBlock{
             part.getOutlines(out);
         }
 
-        if(block.region.found() && !Core.atlas.has(block.name + "-preview")){
+        if(block.region.found()){
             out.add(block.region);
         }
     }

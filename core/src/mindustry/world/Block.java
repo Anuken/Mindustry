@@ -1269,12 +1269,13 @@ public class Block extends UnlockableContent implements Senseable{
         var gen = icons();
 
         if(outlineIcon){
-            PixmapRegion region = Core.atlas.getPixmap(gen[outlinedIcon >= 0 ? Math.min(outlinedIcon, gen.length - 1) : gen.length -1]);
+            AtlasRegion atlasRegion = (AtlasRegion)gen[outlinedIcon >= 0 ? Math.min(outlinedIcon, gen.length - 1) : gen.length -1];
+            PixmapRegion region = Core.atlas.getPixmap(atlasRegion);
             Pixmap out = last = Pixmaps.outline(region, outlineColor, outlineRadius);
             if(Core.settings.getBool("linear", true)){
                 Pixmaps.bleed(out);
             }
-            packer.add(PageType.main, name, out);
+            packer.add(PageType.main, atlasRegion.name, out);
         }
 
         var toOutline = new Seq<TextureRegion>();
