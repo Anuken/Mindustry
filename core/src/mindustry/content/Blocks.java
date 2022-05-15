@@ -4526,13 +4526,11 @@ public class Blocks{
         }};
         heatSource = new HeatProducer("heat-source"){{
             requirements(Category.crafting, BuildVisibility.sandboxOnly, with());
-            size = 1;
-            alwaysUnlocked = true;
+            drawer = new DrawMulti(new DrawDefault(), new DrawHeatOutput());
             rotateDraw = false;
-            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawDefault(), new DrawHeatOutput());
-            regionRotated1 = 2;
-            craftTime = 1f;
+            size = 1;
             heatOutput = 1000000f;
+            regionRotated1 = 1;
         }};
 
         //TODO move
