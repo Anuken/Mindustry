@@ -60,10 +60,12 @@ public class Turret extends ReloadTurret{
     public float minRange = 0f;
     /** Minimum warmup needed to fire. */
     public float minWarmup = 0f;
-    /** If true, this turret will accurately target moving targets with respect to charge time. */
+    /** If true, this turret will accurately target moving targets with respect to shoot.firstShotDelay. */
     public boolean accurateDelay = true;
     /** If false, this turret can't move while charging. */
     public boolean moveWhileCharging = true;
+    /** If false, this turret can't reload while charging */
+    public boolean reloadWhileCharging = true;
     /** pattern used for bullets */
     public ShootPattern shoot = new ShootPattern();
 
@@ -362,7 +364,10 @@ public class Turret extends ReloadTurret{
             }
 
             //turret always reloads regardless of whether it's targeting something
-            updateReload();
+            if(reloadWhileCharging || !charging()){
+                updateReload();
+                updateCooling();
+            }
 
             if(hasAmmo()){
                 if(Float.isNaN(reloadCounter)) reloadCounter = 0;
@@ -396,10 +401,6 @@ public class Turret extends ReloadTurret{
                         updateShooting();
                     }
                 }
-            }
-
-            if(coolant != null){
-                updateCooling();
             }
         }
 
