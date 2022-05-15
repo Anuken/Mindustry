@@ -78,8 +78,7 @@ public class ThermalGenerator extends PowerGenerator{
     }
 
     public class ThermalGeneratorBuild extends GeneratorBuild{
-        public float sum;
-        public float spinRotation;
+        public float sum, spinRotation;
 
         @Override
         public void updateTile(){

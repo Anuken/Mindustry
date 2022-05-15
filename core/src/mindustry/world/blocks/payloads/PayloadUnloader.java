@@ -48,7 +48,7 @@ public class PayloadUnloader extends PayloadLoader{
         @Override
         public void updateTile(){
             if(payload != null){
-                payload.update(false);
+                payload.update(null, this);
             }
             lastOutputPower = 0f;
 

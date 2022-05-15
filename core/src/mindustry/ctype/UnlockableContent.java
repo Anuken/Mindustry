@@ -100,12 +100,23 @@ public abstract class UnlockableContent extends MappableContent{
             if(!makeNew || !packer.has(name + "-outline")){
                 PixmapRegion base = Core.atlas.getPixmap(region);
                 var result = Pixmaps.outline(base, outlineColor, outlineRadius);
-                if(Core.settings.getBool("linear", true)){
-                    Pixmaps.bleed(result);
-                }
+                Drawf.checkBleed(result);
                 packer.add(page, name + (makeNew ? "-outline" : ""), result);
             }
         }
+    }
+
+    protected void makeOutline(MultiPacker packer, TextureRegion region, String name, Color outlineColor, int outlineRadius){
+        if(region.found()){
+            PixmapRegion base = Core.atlas.getPixmap(region);
+            var result = Pixmaps.outline(base, outlineColor, outlineRadius);
+            Drawf.checkBleed(result);
+            packer.add(PageType.main, name, result);
+        }
+    }
+
+    protected void makeOutline(MultiPacker packer, TextureRegion region, String name, Color outlineColor){
+        makeOutline(packer, region, name, outlineColor, 4);
     }
 
     /** @return items needed to research this content */
