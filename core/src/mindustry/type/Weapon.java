@@ -408,6 +408,7 @@ public class Weapon implements Cloneable{
         angle = angleOffset + shootAngle + Mathf.range(inaccuracy);
 
         mount.bullet = bullet.create(unit, unit.team, bulletX, bulletY, angle, -1f, (1f - velocityRnd) + Mathf.random(velocityRnd), lifeScl, null, mover, mount.aimX, mount.aimY);
+        handleBullet(unit, mount, mount.bullet);
 
         if(!continuous){
             shootSound.at(bulletX, bulletY, Mathf.random(soundPitchMin, soundPitchMax));
@@ -421,6 +422,11 @@ public class Weapon implements Cloneable{
         Effect.shake(shake, shake, bulletX, bulletY);
         mount.recoil = 1f;
         mount.heat = 1f;
+    }
+
+    //override to do special things to a bullet after spawning
+    protected void handleBullet(Unit unit, WeaponMount mount, Bullet bullet){
+
     }
 
     public void flip(){
