@@ -279,7 +279,6 @@ public class ContentParser{
             readFields(obj, data);
             return obj;
         });
-
         put(Ability.class, (type, data) -> {
             Class<? extends Ability> oc = resolve(data.getString("type", ""));
             data.remove("type");
