@@ -101,7 +101,7 @@
   },
   {
     "name": "Xpdustry",
-    "address": ["n1.xpdustry.fr"]
+    "address": ["n1.xpdustry.fr", "n2.xpdustry.fr:6000"]
   },
   {
     "name": "CxZx",
