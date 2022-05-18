@@ -383,7 +383,7 @@ public class PlacementFragment{
                                 }).padTop(2).left();
                             }
 
-                        }else if(hovered != null){
+                        }else if(hovered != null && hovered.shouldDisplay()){
                             //show hovered item, whatever that may be
                             hovered.display(topTable);
                         }

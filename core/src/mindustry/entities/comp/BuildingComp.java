@@ -613,6 +613,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         Fx.unitDrop.at(unit);
     }
 
+    public boolean canWithdraw(){
+        return true;
+    }
+
     public boolean canUnload(){
         return block.unloadable;
     }
