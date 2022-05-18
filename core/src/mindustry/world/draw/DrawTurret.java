@@ -36,11 +36,9 @@ public class DrawTurret extends DrawBlock{
         for(var part : parts){
             part.getOutlines(out);
         }
-        if(preview.found()){
-            out.add(preview);
-            if(block.region.found()){
-                out.add(block.region);
-            }
+
+        if(block.region.found()){
+            out.add(block.region);
         }
     }
 
@@ -69,8 +67,10 @@ public class DrawTurret extends DrawBlock{
                 Draw.z(Layer.turret);
             }
 
+            float progress = tb.visualReloadValid ? tb.progress() : 1f;
+
             //TODO no smooth reload
-            var params = DrawPart.params.set(build.warmup(), 1f - tb.progress(), 1f - tb.progress(), tb.heat, tb.x + tb.recoilOffset.x, tb.y + tb.recoilOffset.y, tb.rotation);
+            var params = DrawPart.params.set(build.warmup(), 1f - progress, 1f - progress, tb.heat, tb.x + tb.recoilOffset.x, tb.y + tb.recoilOffset.y, tb.rotation);
 
             for(var part : parts){
                 part.draw(params);
@@ -124,7 +124,6 @@ public class DrawTurret extends DrawBlock{
     /** @return the generated icons to be used for this block. */
     @Override
     public TextureRegion[] icons(Block block){
-        TextureRegion showTop = preview.found() ? preview : block.region;
-        return top.found() ? new TextureRegion[]{base, showTop, top} : new TextureRegion[]{base, showTop};
+        return top.found() ? new TextureRegion[]{base, preview, top} : new TextureRegion[]{base, preview};
     }
 }

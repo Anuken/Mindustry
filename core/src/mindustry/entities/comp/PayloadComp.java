@@ -56,7 +56,7 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
             //    build.build.team = team;
             //}
             pay.set(x, y, rotation);
-            pay.update(true);
+            pay.update(self(), null);
         }
     }
 

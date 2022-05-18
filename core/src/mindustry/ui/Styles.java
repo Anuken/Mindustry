@@ -67,7 +67,7 @@ public class Styles{
     logici,
     /** Used for toolbar in map generation filters. */
     geni,
-    /** Gray, toggleable, no backvround. */
+    /** Gray, toggleable, no background. */
     grayi,
     /** Flat, square, black background. */
     flati,

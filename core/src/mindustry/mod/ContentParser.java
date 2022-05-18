@@ -279,7 +279,6 @@ public class ContentParser{
             readFields(obj, data);
             return obj;
         });
-
         put(Ability.class, (type, data) -> {
             Class<? extends Ability> oc = resolve(data.getString("type", ""));
             data.remove("type");
@@ -887,7 +886,7 @@ public class ContentParser{
                 researchName = research.asString();
                 customRequirements = null;
             }else{
-                researchName = research.getString("parent");
+                researchName = research.getString("parent", null);
                 customRequirements = research.has("requirements") ? parser.readValue(ItemStack[].class, research.get("requirements")) : null;
             }
 
@@ -923,18 +922,28 @@ public class ContentParser{
                     node.setupRequirements(unlock.researchRequirements());
                 }
 
-                //find parent node.
-                TechNode parent = TechTree.all.find(t -> t.content.name.equals(researchName) || t.content.name.equals(currentMod.name + "-" + researchName) || t.content.name.equals(SaveVersion.mapFallback(researchName)));
-
-                if(parent == null){
-                    Log.warn("Content '" + researchName + "' isn't in the tech tree, but '" + unlock.name + "' requires it to be researched.");
+                if(research.getBoolean("root", false)){
+                    node.name = research.getString("name", unlock.name);
+                    node.requiresUnlock = research.getBoolean("requiresUnlock", false);
+                    TechTree.roots.add(node);
                 }else{
-                    //add this node to the parent
-                    if(!parent.children.contains(node)){
-                        parent.children.add(node);
+                    if(researchName != null){
+                        //find parent node.
+                        TechNode parent = TechTree.all.find(t -> t.content.name.equals(researchName) || t.content.name.equals(currentMod.name + "-" + researchName) || t.content.name.equals(SaveVersion.mapFallback(researchName)));
+
+                        if(parent == null){
+                            Log.warn("Content '" + researchName + "' isn't in the tech tree, but '" + unlock.name + "' requires it to be researched.");
+                        }else{
+                            //add this node to the parent
+                            if(!parent.children.contains(node)){
+                                parent.children.add(node);
+                            }
+                            //reparent the node
+                            node.parent = parent;
+                        }
+                    }else{
+                        Log.warn(unlock.name + " is not a root node, and does not have a `parent: ` property. Ignoring.");
                     }
-                    //reparent the node
-                    node.parent = parent;
                 }
             });
         }

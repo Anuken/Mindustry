@@ -141,7 +141,7 @@ public class TechTree{
         }
 
         public String localizedName(){
-            return Core.bundle.get("techtree." + name);
+            return Core.bundle.get("techtree." + name, name);
         }
 
         public void setupRequirements(ItemStack[] requirements){
