@@ -260,6 +260,10 @@ public class SettingsMenuDialog extends BaseDialog{
     public void addCategory(String name, Cons<SettingsTable> builder){
         addCategory(name, (Drawable)null, builder);
     }
+    
+    public Seq<SettingsCategory> getCategories(){
+        return categories;
+    }
 
     void rebuildMenu(){
         menu.clearChildren();
