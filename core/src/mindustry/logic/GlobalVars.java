@@ -73,7 +73,6 @@ public class GlobalVars{
 
         //used as a special value for any environmental solid block
         put("@solid", Blocks.stoneWall);
-        put("@air", Blocks.air);
 
         for(UnitType type : Vars.content.units()){
             put("@" + type.name, type);
