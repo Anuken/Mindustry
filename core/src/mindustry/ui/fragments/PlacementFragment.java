@@ -383,7 +383,7 @@ public class PlacementFragment{
                                 }).padTop(2).left();
                             }
 
-                        }else if(hovered != null && hovered.shouldDisplay()){
+                        }else if(hovered != null){
                             //show hovered item, whatever that may be
                             hovered.display(topTable);
                         }
@@ -577,7 +577,7 @@ public class PlacementFragment{
         if(Core.scene.hasMouse() || topTable.hit(v.x, v.y, false) != null) return null;
 
         //check for a unit
-        Unit unit = Units.closestOverlap(player.team(), Core.input.mouseWorldX(), Core.input.mouseWorldY(), 5f, u -> !u.isLocal());
+        Unit unit = Units.closestOverlap(player.team(), Core.input.mouseWorldX(), Core.input.mouseWorldY(), 5f, u -> !u.isLocal() && u.displayable());
         //if cursor has a unit, display it
         if(unit != null) return unit;
 
