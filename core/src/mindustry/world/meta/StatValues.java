@@ -204,7 +204,7 @@ public class StatValues{
             for(int i = 0; i < list.size; i++){
                 var item = list.get(i);
 
-                if(item instanceof Block block && block.itemDrop != null && !block.itemDrop.unlocked()) continue;
+                if(item instanceof Block block && block.itemDrop != null && !block.itemDrop.unlockedNow()) continue;
 
                 l.image(item.uiIcon).size(iconSmall).padRight(2).padLeft(2).padTop(3).padBottom(3);
                 l.add(item.localizedName).left().padLeft(1).padRight(4);

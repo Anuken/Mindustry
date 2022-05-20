@@ -106,7 +106,6 @@ public class BeamDrill extends Block{
         super.setStats();
 
         stats.add(Stat.drillTier, StatValues.blocks(b -> (b instanceof Floor f && f.wallOre && f.itemDrop != null && f.itemDrop.hardness <= tier) || (b instanceof StaticWall w && w.itemDrop != null && w.itemDrop.hardness <= tier)));
-//        stats.add(Stat.drillTier, StatValues.blocks(new Seq<Block>().add(Blocks.beryllicStoneWall)));
 
         stats.add(Stat.drillSpeed, 60f / drillTime * size, StatUnit.itemsSecond);
         if(optionalBoostIntensity != 1){
