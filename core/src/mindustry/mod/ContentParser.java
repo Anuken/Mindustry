@@ -470,8 +470,8 @@ public class ContentParser{
 
                 }
 
-                if(value.has("controller")){
-                    unit.aiController = supply(resolve(value.getString("controller"), FlyingAI.class));
+                if(value.has("controller") || value.has("aiController")){
+                    unit.aiController = supply(resolve(value.getString("controller", value.getString("aiController", "")), FlyingAI.class));
                     value.remove("controller");
                 }
 
