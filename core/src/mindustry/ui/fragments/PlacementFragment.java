@@ -547,7 +547,7 @@ public class PlacementFragment{
     }
 
     Seq<Block> getByCategory(Category cat){
-        return returnArray.selectFrom(content.blocks(), block -> block.category == cat && block.isVisible());
+        return returnArray.selectFrom(content.blocks(), block -> block.category == cat && block.isVisible() && block.environmentBuildable());
     }
 
     Seq<Block> getUnlockedByCategory(Category cat){
