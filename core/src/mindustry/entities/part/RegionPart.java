@@ -143,7 +143,6 @@ public class RegionPart extends DrawPart{
         String realName = this.name == null ? name + suffix : this.name;
 
         if(drawRegion){
-            //TODO l/r
             if(mirror && turretShading){
                 regions = new TextureRegion[]{
                 Core.atlas.find(realName + "-r"),

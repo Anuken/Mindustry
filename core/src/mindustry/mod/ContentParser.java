@@ -437,7 +437,9 @@ public class ContentParser{
 
             UnitType unit;
             if(locate(ContentType.unit, name) == null){
-                unit = new UnitType(mod + "-" + name);
+
+                unit = make(resolve(value.getString("type", ""), UnitType.class), mod + "-" + name);
+
                 var typeVal = value.get("type");
 
                 if(typeVal != null && !typeVal.isString()){
