@@ -22,5 +22,8 @@
   },
   {
     "address": "xpdustry.fr:8000"
+  },
+  {
+    "address": "mindustry.vicp.io:7000" 
   }
 ]
