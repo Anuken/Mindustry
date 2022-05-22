@@ -197,6 +197,10 @@ public class ErekirTechTree{
                                         });
                                     });
 
+                                    node(slagHeater, () -> {
+
+                                    });
+                                    
                                     node(atmosphericConcentrator, Seq.with(new OnSector(four)), () -> {
                                         node(cyanogenSynthesizer, Seq.with(new OnSector(four)), () -> {
 
