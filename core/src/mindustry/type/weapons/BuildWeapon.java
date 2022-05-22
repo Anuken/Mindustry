@@ -20,6 +20,8 @@ public class BuildWeapon extends Weapon{
     {
         rotate = true;
         bullet = new BulletType();
+        noAttack = false;
+        predictTarget = false;
     }
 
     @Override
@@ -29,9 +31,7 @@ public class BuildWeapon extends Weapon{
 
     @Override
     public void update(Unit unit, WeaponMount mount){
-        //no
         mount.shoot = false;
-        //yes
         mount.rotate = true;
 
         //always aim at build plan
