@@ -127,7 +127,7 @@ public class RegionPart extends DrawPart{
                 float sign = (i == 1 ? -1 : 1) * params.sideMultiplier;
                 Tmp.v1.set((x + mx) * sign, y + my).rotate(params.rotation - 90);
 
-                childParam.set(params.warmup, params.reload, params.smoothReload, params.heat, params.x + Tmp.v1.x, params.y + Tmp.v1.y, i * sign + mr * sign + params.rotation);
+                childParam.set(params.warmup, params.reload, params.smoothReload, params.heat, params.recoil, params.x + Tmp.v1.x, params.y + Tmp.v1.y, i * sign + mr * sign + params.rotation);
                 childParam.sideMultiplier = params.sideMultiplier;
                 childParam.life = params.life;
                 childParam.sideOverride = i;
@@ -143,7 +143,6 @@ public class RegionPart extends DrawPart{
         String realName = this.name == null ? name + suffix : this.name;
 
         if(drawRegion){
-            //TODO l/r
             if(mirror && turretShading){
                 regions = new TextureRegion[]{
                 Core.atlas.find(realName + "-r"),
