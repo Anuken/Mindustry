@@ -141,6 +141,6 @@
   },
   {
     "name": "bariscodefx",
-    "address": ["mds.bariscodefx.tk"]
+    "address": ["mds.bariscodefx.tk", "mds.bariscodefx.tk:6568"]
   }
 ]
