@@ -138,5 +138,9 @@
   {
     "name": "Fish",
     "address": ["170.187.144.235"]
+  },
+  {
+    "name": "bariscodefx",
+    "address": ["mds.bariscodefx.tk"]
   }
 ]
