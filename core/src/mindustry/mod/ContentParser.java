@@ -108,9 +108,9 @@ public class ContentParser{
             if(data.isString()){
                 return field(Bullets.class, data);
             }
-            var bc = resolve(data.getString("type", ""), BasicBulletType.class);
+            Class<?> bc = resolve(data.getString("type", ""), BasicBulletType.class);
             data.remove("type");
-            BulletType result = make(bc);
+            BulletType result = (BulletType)make(bc);
             readFields(result, data);
             return result;
         });
@@ -150,7 +150,7 @@ public class ContentParser{
             return result;
         });
         put(DrawPart.class, (type, data) -> {
-            var bc = resolve(data.getString("type", ""), RegionPart.class);
+            Class<?> bc = resolve(data.getString("type", ""), RegionPart.class);
             data.remove("type");
             var result = make(bc);
             readFields(result, data);
