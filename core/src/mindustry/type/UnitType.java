@@ -323,7 +323,7 @@ public class UnitType extends UnlockableContent{
     legMoveSpace = 1f,
     /** for legs without "joints", this is how much the second leg sprite is moved "back" by, so it covers the joint region (it's hard to explain without an image) */
     legExtension = 0,
-    /** ??? I don't really know what this does or why it's here */
+    /** Higher values of this field make groups of legs move less in-sync with each other. */
     legPairOffset = 0,
     /** scaling for how far away legs *try* to be from the body (not their actual length); e.g. if set to 0.5, legs will appear somewhat folded */
     legLengthScl = 1f,
