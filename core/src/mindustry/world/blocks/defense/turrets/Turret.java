@@ -514,14 +514,14 @@ public class Turret extends ReloadTurret{
                 type.chargeEffect.at(bulletX, bulletY, rotation);
             }
 
-            shoot.shoot(totalShots, (xOffset, yOffset, angle, delay, mover) -> {
-                queuedBullets ++;
+            shoot.shoot(totalShots, (xOffset, yOffset, xEffectOffset, yEffectOffset, angle, delay, mover) -> {
+                queuedBullets++;
                 if(delay > 0f){
-                    Time.run(delay, () -> bullet(type, xOffset, yOffset, angle, mover));
+                    Time.run(delay, () -> bullet(type, xOffset, yOffset, xEffectOffset, yEffectOffset, angle, mover));
                 }else{
-                    bullet(type, xOffset, yOffset, angle, mover);
+                    bullet(type, xOffset, yOffset, xEffectOffset, yEffectOffset, angle, mover);
                 }
-                totalShots ++;
+                totalShots++;
             });
 
             if(consumeAmmoOnce){
@@ -529,8 +529,8 @@ public class Turret extends ReloadTurret{
             }
         }
 
-        protected void bullet(BulletType type, float xOffset, float yOffset, float angleOffset, Mover mover){
-            queuedBullets --;
+        protected void bullet(BulletType type, float xOffset, float yOffset, float xEffectOffset, float yEffectOffset, float angleOffset, Mover mover){
+            queuedBullets--;
 
             if(dead || (!consumeAmmoOnce && !hasAmmo())) return;
 
@@ -550,9 +550,9 @@ public class Turret extends ReloadTurret{
             shootSound.at(bulletX, bulletY, Mathf.random(soundPitchMin, soundPitchMax));
 
             ammoUseEffect.at(
-                x - Angles.trnsx(rotation, ammoEjectBack),
-                y - Angles.trnsy(rotation, ammoEjectBack),
-                rotation * Mathf.sign(xOffset)
+            x - Angles.trnsx(rotation, ammoEjectBack) + Angles.trnsx(rotation, xEffectOffset, yEffectOffset),
+            y - Angles.trnsy(rotation, ammoEjectBack) + Angles.trnsy(rotation, xEffectOffset, yEffectOffset),
+            rotation * Mathf.sign(xOffset)
             );
 
             if(shake > 0){

@@ -386,17 +386,17 @@ public class Weapon implements Cloneable{
             bullet.chargeEffect.at(shootX, shootY, rotation, bullet.keepVelocity || parentizeEffects ? unit : null);
         }
 
-        shoot.shoot(mount.totalShots, (xOffset, yOffset, angle, delay, mover) -> {
+        shoot.shoot(mount.totalShots, (xOffset, yOffset,xEffectOffset,yEffectOffset, angle, delay, mover) -> {
             if(delay > 0f){
-                Time.run(delay, () -> bullet(unit, mount, xOffset, yOffset, angle, mover));
+                Time.run(delay, () -> bullet(unit, mount, xOffset, yOffset,xEffectOffset,yEffectOffset, angle, mover));
             }else{
-                bullet(unit, mount, xOffset, yOffset, angle, mover);
+                bullet(unit, mount, xOffset, yOffset,xEffectOffset,yEffectOffset, angle, mover);
             }
             mount.totalShots ++;
         });
     }
 
-    protected void bullet(Unit unit, WeaponMount mount, float xOffset, float yOffset, float angleOffset, Mover mover){
+    protected void bullet(Unit unit, WeaponMount mount, float xOffset, float yOffset, float xEffectOffset, float yEffectOffset, float angleOffset, Mover mover){
         if(!unit.isAdded()) return;
 
         float
@@ -417,7 +417,10 @@ public class Weapon implements Cloneable{
             shootSound.at(bulletX, bulletY, Mathf.random(soundPitchMin, soundPitchMax));
         }
 
-        ejectEffect.at(mountX, mountY, angle * Mathf.sign(this.x));
+        ejectEffect.at(
+        mountX + Angles.trnsx(weaponRotation, xEffectOffset, yEffectOffset),
+        mountY + Angles.trnsy(weaponRotation, xEffectOffset, yEffectOffset),
+        angle * Mathf.sign(this.x));
         bullet.shootEffect.at(bulletX, bulletY, angle, bullet.hitColor, unit);
         bullet.smokeEffect.at(bulletX, bulletY, angle, bullet.hitColor, unit);
 

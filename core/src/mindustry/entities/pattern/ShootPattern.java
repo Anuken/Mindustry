@@ -42,6 +42,22 @@ public class ShootPattern implements Cloneable{
             shoot(x, y, rotation, delay, null);
         }
 
-        void shoot(float x, float y, float rotation, float delay, Mover move);
+        default void shoot(float x, float y, float rotation, float delay, Mover move){
+            shoot(x,y,0f,0f,rotation,delay,move);
+        }
+
+        /**
+         * @param x x offset of bullet, should be transformed by weapon rotation
+         * @param y y offset of bullet, should be transformed by weapon rotation
+         * @param ammoUseEffectX x offset of ammoUseEffect, should be transformed by weapon rotation
+         * @param ammoUseEffectY y offset of ammoUseEffect, should be transformed by weapon rotation
+         * @param rotation rotation offset relative to weapon
+         * @param delay bullet delay in ticks
+         * */
+        default void shoot(float x, float y,float ammoUseEffectX,float ammoUseEffectY, float rotation, float delay){
+            shoot(x, y,ammoUseEffectX,ammoUseEffectY, rotation, delay, null);
+        }
+
+        void shoot(float x, float y,float ammoUseEffectX,float ammoUseEffectY, float rotation, float delay, Mover move);
     }
 }
