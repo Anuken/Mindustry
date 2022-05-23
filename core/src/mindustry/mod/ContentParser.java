@@ -65,6 +65,9 @@ public class ContentParser{
             if(data.isString()){
                 return field(Fx.class, data);
             }
+            if(data.isArray()){
+                return new MultiEffect(parser.readValue(Effect[].class, data));
+            }
             Class<? extends Effect> bc = resolve(data.getString("type", ""), ParticleEffect.class);
             data.remove("type");
             Effect result = make(bc);
