@@ -112,6 +112,9 @@ public class DesktopLauncher extends ClientLauncher{
                 Log.err("Failed to load Steam native libraries.");
                 logSteamError(e);
             }
+        }else{ // doesn't use steam
+            initNoSteam();
+            service.init();
         }
     }
 
@@ -209,6 +212,34 @@ public class DesktopLauncher extends ClientLauncher{
                 SteamAPI.shutdown();
             }
         }));
+    }
+
+    void initNoSteam(){
+        service = new GameService(){
+            @Override
+            public boolean enabled(){ return true; }
+
+            @Override
+            public void completeAchievement(String name){
+                Core.settings.put("achievement-" + name, true);
+                ui.showInfoFade("Achievement complete: " + name);
+            }
+
+            @Override
+            public boolean isAchieved(String name){
+                return Core.settings.getBool("achievement-" + name, false);
+            }
+
+            @Override
+            public int getStat(String name, int def) {
+                return Core.settings.getInt("achievementstat-" + name, def);
+            }
+
+            @Override
+            public void setStat(String name, int amount) {
+                Core.settings.put("achievementstat-" + name, amount);
+            }
+        };
     }
 
     static void handleCrash(Throwable e){
