@@ -84,6 +84,11 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
         }
 
         @Override
+        public boolean hasAmmo(){
+            return ammoTypes.get(liquids.current()) != null && liquids.currentAmount() >= 1f / ammoTypes.get(liquids.current()).ammoMultiplier;
+        }
+
+        @Override
         public boolean acceptItem(Building source, Item item){
             return false;
         }
