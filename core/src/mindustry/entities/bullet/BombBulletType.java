@@ -2,6 +2,7 @@ package mindustry.entities.bullet;
 
 import mindustry.gen.*;
 
+/** Template class for an unmoving shrinking bullet. */
 public class BombBulletType extends BasicBulletType{
 
     public BombBulletType(float damage, float radius, String sprite){
