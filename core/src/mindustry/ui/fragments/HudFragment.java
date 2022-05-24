@@ -225,7 +225,7 @@ public class HudFragment{
                     }else{
                         logic.skipWave();
                     }
-                }).growY().fillX().right().width(40f).disabled(b -> !canSkipWave()).name("skip").get().toBack();
+                }).growY().fillX().right().width(40f).disabled(b -> !logic.canSkipWave()).name("skip").get().toBack();
             }).width(dsize * 5 + 4f).name("statustable");
 
             wavesMain.row();
@@ -760,9 +760,9 @@ public class HudFragment{
         lcell[0] = table.labelWrap(() -> {
 
             //update padding depend on whether the button to the right is there
-            boolean can = canSkipWave();
+            boolean can = logic.canSkipWave();
             if(can != couldSkip[0]){
-                if(canSkipWave()){
+                if(logic.canSkipWave()){
                     lcell[0].padRight(8f);
                 }else{
                     lcell[0].padRight(-42f);
@@ -884,10 +884,6 @@ public class HudFragment{
                 }
             }
         }).left();
-    }
-
-    private boolean canSkipWave(){
-        return state.rules.waves && ((net.server() || player.admin) || !net.active()) && state.enemies == 0 && !spawner.isSpawning();
     }
 
 }

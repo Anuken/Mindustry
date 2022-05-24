@@ -18,6 +18,7 @@ import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.net.Packets;
 import mindustry.ui.*;
 import mindustry.world.*;
 
@@ -483,6 +484,14 @@ public class DesktopInput extends InputHandler{
             }
             schemX = -1;
             schemY = -1;
+        }
+
+        if(Core.input.keyTap(Binding.skipWaveCall)){
+            if(net.client() && player.admin && logic.canSkipWave()){
+                Call.adminRequest(player, Packets.AdminAction.wave);
+            }else if (logic.canSkipWave()){
+                logic.skipWave();
+            }
         }
 
         if(!selectPlans.isEmpty()){

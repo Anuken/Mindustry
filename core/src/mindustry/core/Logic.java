@@ -551,4 +551,9 @@ public class Logic implements ApplicationListener{
     public boolean isWaitingWave(){
         return (state.rules.waitEnemies || (state.wave >= state.rules.winWave && state.rules.winWave > 0)) && state.enemies > 0;
     }
+
+    /* @return if currently wave wait time can be skipped or not */
+    public boolean canSkipWave(){
+        return state.rules.waves && ((net.server() || player.admin) || !net.active()) && state.enemies == 0 && !spawner.isSpawning();
+    }
 }

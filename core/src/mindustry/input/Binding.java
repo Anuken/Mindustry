@@ -4,6 +4,7 @@ import arc.*;
 import arc.KeyBinds.*;
 import arc.input.InputDevice.*;
 import arc.input.*;
+import mindustry.net.Packets;
 
 public enum Binding implements KeyBind{
     move_x(new Axis(KeyCode.a, KeyCode.d), "general"),
@@ -71,6 +72,7 @@ public enum Binding implements KeyBind{
     chat_scroll(new Axis(KeyCode.scroll)),
     chat_mode(KeyCode.tab),
     console(KeyCode.f8),
+    skipWaveCall(KeyCode.f9),
     ;
 
     private final KeybindValue defaultValue;
