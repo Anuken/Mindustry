@@ -9,6 +9,7 @@ import arc.discord.DiscordRPC.*;
 import arc.files.*;
 import arc.func.*;
 import arc.math.*;
+import arc.scene.style.TextureRegionDrawable;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
@@ -23,9 +24,11 @@ import mindustry.net.*;
 import mindustry.net.Net.*;
 import mindustry.service.*;
 import mindustry.type.*;
+import mindustry.ui.fragments.HudFragment;
 
 import java.io.*;
 
+import static arc.Core.bundle;
 import static mindustry.Vars.*;
 
 public class DesktopLauncher extends ClientLauncher{
@@ -222,12 +225,13 @@ public class DesktopLauncher extends ClientLauncher{
             @Override
             public void completeAchievement(String name){
                 Core.settings.put("achievement-" + name, true);
-                ui.showInfoFade("Achievement complete: " + name);
+                ui.hudfrag.showToast(Core.atlas.getDrawable("error"), bundle.get("achievement.unlocked") +"\n"+ bundle.get("achievement."+name+".name"));
             }
 
             @Override
             public boolean isAchieved(String name){
                 return Core.settings.getBool("achievement-" + name, false);
+                //return false;
             }
 
             @Override

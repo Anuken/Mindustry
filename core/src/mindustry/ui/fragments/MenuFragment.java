@@ -180,6 +180,7 @@ public class MenuFragment{
                     new Buttoni("@about.button", Icon.info, ui.about::show)
                 ),
                 new Buttoni("@editor", Icon.terrain, () -> checkPlay(ui.maps::show)), steam ? new Buttoni("@workshop", Icon.steam, platform::openWorkshop) : null,
+                new Buttoni("@achievements", Icon.star, ui.achievements::show),
                 new Buttoni("@mods", Icon.book, ui.mods::show),
                 new Buttoni("@settings", Icon.settings, ui.settings::show),
                 new Buttoni("@quit", Icon.exit, Core.app::exit)

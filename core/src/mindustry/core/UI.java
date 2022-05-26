@@ -74,6 +74,8 @@ public class UI implements ApplicationListener, Loadable{
     public LogicDialog logic;
     public FullTextDialog fullText;
 
+    public AchievementsDialog achievements;
+
     public Cursor drillCursor, unloadCursor, targetCursor;
 
     private @Nullable Element lastAnnouncement;
@@ -196,6 +198,7 @@ public class UI implements ApplicationListener, Loadable{
         planet = new PlanetDialog();
         research = new ResearchDialog();
         mods = new ModsDialog();
+        achievements = new AchievementsDialog();
         schematics = new SchematicsDialog();
         logic = new LogicDialog();
         fullText = new FullTextDialog();
