@@ -224,24 +224,24 @@ public class DesktopLauncher extends ClientLauncher{
 
             @Override
             public void completeAchievement(String name){
-                Core.settings.put("achievement-" + name, true);
+                Core.settings.put("achievement." + name, true);
+                //TODO draw the sprite of the achievement
                 ui.hudfrag.showToast(Core.atlas.getDrawable("error"), bundle.get("achievement.unlocked") +"\n"+ bundle.get("achievement."+name+".name"));
             }
 
             @Override
             public boolean isAchieved(String name){
-                return Core.settings.getBool("achievement-" + name, false);
-                //return false;
+                return Core.settings.getBool("achievement." + name, false);
             }
 
             @Override
             public int getStat(String name, int def) {
-                return Core.settings.getInt("achievementstat-" + name, def);
+                return Core.settings.getInt("achievementstat." + name, def);
             }
 
             @Override
             public void setStat(String name, int amount) {
-                Core.settings.put("achievementstat-" + name, amount);
+                Core.settings.put("achievementstat." + name, amount);
             }
         };
     }

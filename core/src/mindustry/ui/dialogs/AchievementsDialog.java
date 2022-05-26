@@ -89,6 +89,8 @@ public class AchievementsDialog extends BaseDialog{
                     public void draw(){
                         super.draw();
 
+                        //TODO draw the sprite of the achievement
+
                         //textures are only requested when the rendering happens; this assists with culling
                         /*
                         if(!textureCache.containsKey(repo)){
