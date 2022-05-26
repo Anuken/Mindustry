@@ -66,10 +66,10 @@ public class PayloadRouter extends PayloadConveyor{
         }
 
         public void pickNext(){
-            if(item != null && controlTime <= 0f){
-                if(matches){
-                    //when the item matches, always move forward.
-                    rotation = recDir;
+            if(item != null){
+                if(matches || controlTime > 0f){
+                    //when the item matches (or direction is set via logic), always move forward.
+                    rotation = recDir; //TODO Payloads "snap" to new rotations
                     onProximityUpdate();
                 }else{
                     int rotations = 0;
@@ -77,7 +77,7 @@ public class PayloadRouter extends PayloadConveyor{
                         rotation = (rotation + 1) % 4;
                         //if it doesn't match the sort item and this router is facing forward, skip this rotation
                         if(!matches && sorted != null && rotation == recDir){
-                            rotation ++;
+                            continue;
                         }
                         onProximityUpdate();
 
@@ -96,7 +96,7 @@ public class PayloadRouter extends PayloadConveyor{
         public void control(LAccess type, double p1, double p2, double p3, double p4){
             super.control(type, p1, p2, p3, p4);
             if(type == LAccess.config){
-                rotation = (int)p1;
+                recDir = (int)p1;
                 //when manually controlled, routers do not turn automatically for a while, same as turrets
                 controlTime = 60f * 6f;
             }
@@ -105,14 +105,18 @@ public class PayloadRouter extends PayloadConveyor{
         @Override
         public void onControlSelect(Unit player){
             super.onControlSelect(player);
-            recDir = rotation;
+            if(controlTime < 0f){ //don't overwrite logic recDir
+                recDir = rotation;
+            }
             checkMatch();
         }
 
         @Override
         public void handlePayload(Building source, Payload payload){
             super.handlePayload(source, payload);
-            recDir = source == null ? rotation : source.relativeTo(this);
+            if(controlTime < 0f){ //don't overwrite logic recDir
+                recDir = source == null ? rotation : source.relativeTo(this);
+            }
             checkMatch();
             pickNext();
         }
