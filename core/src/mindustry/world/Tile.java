@@ -71,7 +71,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         return relativeTo(tile.x, tile.y);
     }
 
-    /** Return relative rotation to a coordinate. Returns -1 if the coordinate is not near this tile. */
+    /** Return relative rotation to a coordinate. Returns -1 if the coordinate is not directly adjacent to this tile. */
     public byte relativeTo(int cx, int cy){
         if(x == cx && y == cy - 1) return 1;
         if(x == cx && y == cy + 1) return 3;
@@ -507,19 +507,13 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     public @Nullable Tile nearby(int rotation){
-        if(rotation == 0) return world.tile(x + 1, y);
-        if(rotation == 1) return world.tile(x, y + 1);
-        if(rotation == 2) return world.tile(x - 1, y);
-        if(rotation == 3) return world.tile(x, y - 1);
-        return null;
+        if(rotation < 0 || rotation > 3) return null;
+        return world.tile(x + Geometry.d4x[rotation], y + Geometry.d4y[rotation]);
     }
 
     public @Nullable Building nearbyBuild(int rotation){
-        if(rotation == 0) return world.build(x + 1, y);
-        if(rotation == 1) return world.build(x, y + 1);
-        if(rotation == 2) return world.build(x - 1, y);
-        if(rotation == 3) return world.build(x, y - 1);
-        return null;
+        if(rotation < 0 || rotation > 3) return null;
+        return world.build(x + Geometry.d4x[rotation], y + Geometry.d4y[rotation]);
     }
 
     public boolean interactable(Team team){
