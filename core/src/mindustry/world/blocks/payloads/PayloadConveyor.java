@@ -44,10 +44,11 @@ public class PayloadConveyor extends Block{
     public void drawPlace(int x, int y, int rotation, boolean valid){
         super.drawPlace(x, y, rotation, valid);
 
+        int ntrns = 1 + size/2;
         for(int i = 0; i < 4; i++){
-            Building other = world.build(x + Geometry.d4x[i] * size, y + Geometry.d4y[i] * size);
+            Building other = world.build(x + Geometry.d4x[i] * ntrns, y + Geometry.d4y[i] * ntrns);
             if(other != null && other.block.outputsPayload && other.block.size == size){
-                Drawf.selected(other.tileX(), other.tileY(), other.block, other.team.color);
+                Drawf.selected(other, other.team.color);
             }
         }
     }
@@ -96,11 +97,12 @@ public class PayloadConveyor extends Block{
         public void onProximityUpdate(){
             super.onProximityUpdate();
 
-            Building accept = nearby(Geometry.d4(rotation).x * (size/2+1), Geometry.d4(rotation).y * (size/2+1));
+            int ntrns = 1 + size/2;
+            Building accept = nearby(Geometry.d4x(rotation) * ntrns, Geometry.d4y(rotation) * ntrns);
             //next block must be aligned and of the same size
             if(accept != null && (
                 //same size
-                (accept.block.size == size && tileX() + Geometry.d4(rotation).x * size == accept.tileX() && tileY() + Geometry.d4(rotation).y * size == accept.tileY()) ||
+                (accept.block.size == size && tileX() + Geometry.d4x(rotation) * size == accept.tileX() && tileY() + Geometry.d4y(rotation) * size == accept.tileY()) ||
 
                 //differing sizes
                 (accept.block.size > size &&
@@ -113,8 +115,7 @@ public class PayloadConveyor extends Block{
                 next = null;
             }
 
-            int ntrns = 1 + size/2;
-            Tile next = tile.nearby(Geometry.d4(rotation).x * ntrns, Geometry.d4(rotation).y * ntrns);
+            Tile next = tile.nearby(Geometry.d4x(rotation) * ntrns, Geometry.d4y(rotation) * ntrns);
             blocked = (next != null && next.solid() && !(next.block().outputsPayload || next.block().acceptsPayload)) || (this.next != null && this.next.payloadCheck(rotation));
         }
 
@@ -296,13 +297,13 @@ public class PayloadConveyor extends Block{
 
         public void updatePayload(){
             if(item != null){
-                if(animation > fract()){
-                    animation = Mathf.lerp(animation, 0.8f, 0.15f);
+                float fract = fract();
+                if(animation > fract){
+                    fract = Mathf.lerp(animation, 0.8f, 0.15f);
                 }
 
-                animation = Math.max(animation, fract());
+                animation = fract;
 
-                float fract = animation;
                 float rot = Mathf.slerp(itemRotation, rotdeg(), fract);
 
                 if(fract < 0.5f){
