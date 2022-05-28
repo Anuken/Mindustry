@@ -478,14 +478,10 @@ public class Block extends UnlockableContent implements Senseable{
 
     /** @return whether this block can be placed on the specified tile. */
     public boolean canPlaceOn(Tile tile, Team team, int rotation){
-        return canPlaceOn(tile, team);
-    }
-
-    /** Legacy canPlaceOn implementation, override {@link #canPlaceOn(Tile, Team, int)} instead.*/
-    public boolean canPlaceOn(Tile tile, Team team){
         return true;
     }
-    
+
+    /** @return whether this block can be broken on the specified tile. */
     public boolean canBreak(Tile tile){
         return true;
     }

@@ -443,6 +443,10 @@ public class ContentParser{
 
                 unit = make(resolve(value.getString("class", ""), UnitType.class), mod + "-" + name);
 
+                if(value.has("class")){
+                    value.remove("class");
+                }
+
                 var typeVal = value.get("type");
 
                 if(typeVal != null && !typeVal.isString()){
