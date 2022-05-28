@@ -913,17 +913,15 @@ public class Mods implements Loadable{
                 LoadedMod mod = getMod(it);
                 return mod.shouldBeEnabled() ? mod : null;
             }).contains((LoadedMod)null);
-            //debug logging
-            Log.info("@.validDependencies: @",sourceFile.name(),validDependencies);
             //make sure the main class exists before loading it; if it doesn't just don't put it there
             //if the mod is explicitly marked as java, try loading it anyway
             if(
-            (mainFile.exists() || meta.java) &&
-            !skipModLoading() &&
-            Core.settings.getBool("mod-" + baseName + "-enabled", true) &&
-            Version.isAtLeast(meta.minGameVersion) &&
-            (meta.getMinMajor() >= 136 || headless) &&
-            validDependencies
+                (mainFile.exists() || meta.java) &&
+                !skipModLoading() &&
+                Core.settings.getBool("mod-" + baseName + "-enabled", true) &&
+                Version.isAtLeast(meta.minGameVersion) &&
+                (meta.getMinMajor() >= 136 || headless) &&
+                validDependencies
             ){
                 if(ios){
                     throw new ModLoadException("Java class mods are not supported on iOS.");
