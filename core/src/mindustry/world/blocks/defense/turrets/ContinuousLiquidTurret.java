@@ -58,7 +58,7 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
         super.init();
     }
 
-    public class LiquidTurretBuild extends ContinuousTurretBuild{
+    public class ContinuousLiquidTurretBuild extends ContinuousTurretBuild{
 
         @Override
         public boolean shouldActiveSound(){
