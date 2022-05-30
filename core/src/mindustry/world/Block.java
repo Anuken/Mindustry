@@ -112,6 +112,8 @@ public class Block extends UnlockableContent implements Senseable{
     public int variants = 0;
     /** whether to draw a rotation arrow - this does not apply to lines of blocks */
     public boolean drawArrow = true;
+    /** whether to draw the team corner by default */
+    public boolean drawTeamOverlay = true;
     /** for static blocks only: if true, tile data() is saved in world data. */
     public boolean saveData;
     /** whether you can break this with rightclick */
