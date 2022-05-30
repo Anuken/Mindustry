@@ -566,7 +566,7 @@ public class UnitType extends UnlockableContent{
             var unique = new ObjectSet<String>();
 
             for(Ability a : abilities){
-                if(unique.add(a.localized())){
+                if(a.display && unique.add(a.localized())){
                     stats.add(Stat.abilities, a.localized());
                 }
             }
