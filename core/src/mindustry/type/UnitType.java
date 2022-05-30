@@ -609,9 +609,7 @@ public class UnitType extends UnlockableContent{
             if(naval){
                 imm.remove(StatusEffects.wet);
             }
-            for(var i : imm){
-                stats.add(Stat.immunities, i.emoji() + " " + i.localizedName);
-            }
+            stats.add(Stat.immunities, StatValues.statusEffects(imm));
         }
     }
 
