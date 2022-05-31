@@ -10,6 +10,7 @@ import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.world.*;
+import mindustry.world.blocks.payloads.PayloadConveyor.*;
 
 public class CommandAI extends AIController{
     private static final float localInterval = 40f;
@@ -103,7 +104,12 @@ public class CommandAI extends AIController{
                 faceTarget();
             }
 
-            if(attackTarget == null){
+            PayloadConveyorBuild payConv = (PayloadConveyorBuild)Vars.world.buildWorld(vecOut.x, vecOut.y);
+            if(payConv != null && payConv.canControlSelect(unit)){
+                payConv.handleUnitPayload(unit, p -> payConv.item = p);
+            }
+
+            if(payConv == null && attackTarget == null){
                 if(unit.within(targetPos, Math.max(5f, unit.hitSize / 2f))){
                     targetPos = null;
                 }else if(local.size > 1){
