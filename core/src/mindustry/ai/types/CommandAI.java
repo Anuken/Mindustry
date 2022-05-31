@@ -107,6 +107,7 @@ public class CommandAI extends AIController{
             PayloadConveyorBuild payConv = (PayloadConveyorBuild)Vars.world.buildWorld(vecOut.x, vecOut.y);
             if(payConv != null && payConv.canControlSelect(unit)){
                 payConv.handleUnitPayload(unit, p -> payConv.item = p);
+                targetPos = null;
             }
 
             if(payConv == null && attackTarget == null){
