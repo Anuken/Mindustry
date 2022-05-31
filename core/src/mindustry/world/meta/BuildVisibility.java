@@ -9,6 +9,7 @@ public enum BuildVisibility{
     shown(() -> true),
     debugOnly(() -> false),
     editorOnly(() -> Vars.state.rules.editor),
+    worldProcOnly(() -> Vars.state.rules.editor || Vars.state.rules.accessibleWorldProcessors),
     sandboxOnly(() -> Vars.state == null || Vars.state.rules.infiniteResources),
     campaignOnly(() -> Vars.state == null || Vars.state.isCampaign()),
     lightingOnly(() -> Vars.state == null || Vars.state.rules.lighting || Vars.state.isCampaign()),
