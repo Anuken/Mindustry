@@ -501,7 +501,7 @@ public class LExecutor{
                         }else{
                             Tile tile = world.tile(exec.numi(p1), exec.numi(p2));
                             if(tile == null){
-                                exec.setobj(dest, null);
+                                exec.setobj(p4, null);
                             }else{
                             exec.setobj(p4, switch(p3){
                                 case 0 -> tile.floor();
@@ -509,12 +509,13 @@ public class LExecutor{
                                 case 2 -> tile.block();
                                 case 3 -> tile.build;
                              });
-                           
+                            
                             //Tile tile = world.tileWorld(x1, y1);
                             //any environmental solid block is returned as StoneWall, aka "@solid"
                             //Block block = tile == null ? null : !tile.synthetic() ? (tile.solid() ? Blocks.stoneWall : Blocks.air) : tile.block();
                             //exec.setobj(p3, block);
                             //exec.setobj(p4, tile != null && tile.build != null ? tile.build : null);
+                            }
                         }
                     }
                     case itemDrop -> {
