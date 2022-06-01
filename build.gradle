@@ -364,7 +364,7 @@ project(":core"){
     dependencies{
         compileJava.dependsOn(preGen)
 
-        api "org.lz4:lz4-java:1.7.1"
+        api "org.lz4:lz4-java:1.8.0"
         api arcModule("arc-core")
         api arcModule("extensions:flabel")
         api arcModule("extensions:freetype")

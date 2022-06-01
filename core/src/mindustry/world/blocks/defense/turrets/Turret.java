@@ -56,6 +56,8 @@ public class Turret extends ReloadTurret{
     public float shootCone = 8f;
     /** Turret shoot point. */
     public float shootX = 0f, shootY = Float.NEGATIVE_INFINITY;
+    /** Random spread on the X axis. */
+    public float xRand = 0f;
     /** Minimum bullet range. Used for artillery only. */
     public float minRange = 0f;
     /** Minimum warmup needed to fire. */
@@ -533,8 +535,9 @@ public class Turret extends ReloadTurret{
             if(dead || (!consumeAmmoOnce && !hasAmmo())) return;
 
             float
-            bulletX = x + Angles.trnsx(rotation - 90, shootX + xOffset, shootY + yOffset),
-            bulletY = y + Angles.trnsy(rotation - 90, shootX + xOffset, shootY + yOffset),
+            xSpread = Mathf.range(xRand),
+            bulletX = x + Angles.trnsx(rotation - 90, shootX + xOffset + xSpread, shootY + yOffset),
+            bulletY = y + Angles.trnsy(rotation - 90, shootX + xOffset + xSpread, shootY + yOffset),
             shootAngle = rotation + angleOffset + Mathf.range(inaccuracy);
 
             float lifeScl = type.scaleLife ? Mathf.clamp(Mathf.dst(bulletX, bulletY, targetPos.x, targetPos.y) / type.range, minRange / type.range, range() / type.range) : 1f;

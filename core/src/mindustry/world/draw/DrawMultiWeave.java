@@ -7,7 +7,6 @@ import arc.math.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 
-/** Not standalone. */
 public class DrawMultiWeave extends DrawBlock{
     public TextureRegion weave, glow;
     public float rotateSpeed = 1f, rotateSpeed2 = -0.9f;

@@ -3787,7 +3787,7 @@ public class Blocks{
                     progress = PartProgress.warmup;
                     moveRot = -10f;
                     mirror = true;
-                    moves.add(new PartMove(PartProgress.reload, 0f, -3f, -5f));
+                    moves.add(new PartMove(PartProgress.recoil, 0f, -3f, -5f));
                     heatColor = Color.red;
                 }});
             }};
@@ -3937,7 +3937,7 @@ public class Blocks{
             drawer = new DrawTurret("reinforced-"){{
                 parts.addAll(
                 new RegionPart("-barrel"){{
-                    progress = PartProgress.reload.curve(Interp.pow2In);
+                    progress = PartProgress.recoil.curve(Interp.pow2In);
                     moveY = -5f * 4f / 3f;
                     heatColor = Color.valueOf("f03b0e");
                     mirror = false;
@@ -4011,8 +4011,8 @@ public class Blocks{
                 parts.add(new RegionPart("-mid"){{
                     under = true;
                     moveY = -1.5f;
-                    progress = PartProgress.reload;
-                    heatProgress = PartProgress.reload.add(0.25f).min(PartProgress.warmup);
+                    progress = PartProgress.recoil;
+                    heatProgress = PartProgress.recoil.add(0.25f).min(PartProgress.warmup);
                     heatColor = Color.sky.cpy().a(0.9f);
                 }});
                 parts.add(new RegionPart("-blade"){{
@@ -4445,7 +4445,7 @@ public class Blocks{
             consumePower(2f);
             size = 3;
             //TODO expand this list
-            filter = Seq.with(Blocks.tungstenWallLarge, Blocks.berylliumWallLarge, Blocks.carbideWallLarge, Blocks.reinforcedLiquidContainer, Blocks.reinforcedContainer, Blocks.beamNode);
+            filter = Seq.with(Blocks.tungstenWallLarge, Blocks.berylliumWallLarge, Blocks.carbideWallLarge, Blocks.reinforcedSurgeWallLarge, Blocks.reinforcedLiquidContainer, Blocks.reinforcedContainer, Blocks.beamNode);
         }};
 
         //yes this block is pretty much useless

@@ -75,6 +75,8 @@ public class Weapon implements Cloneable{
     public float shootX = 0f, shootY = 3f;
     /** offsets of weapon position on unit */
     public float x = 5f, y = 0f;
+    /** Random spread on the X axis. */
+    public float xRand = 0f;
     /** pattern used for bullets */
     public ShootPattern shoot = new ShootPattern();
     /** radius of shadow drawn under the weapon; <0 to disable */
@@ -198,7 +200,7 @@ public class Weapon implements Cloneable{
         }
 
         if(parts.size > 0){
-            DrawPart.params.set(mount.warmup, mount.reload / reload, mount.smoothReload, mount.heat, wx, wy, weaponRotation + 90);
+            DrawPart.params.set(mount.warmup, mount.reload / reload, mount.smoothReload, mount.heat, mount.recoil, wx, wy, weaponRotation + 90);
             DrawPart.params.sideMultiplier = flipSprite ? -1 : 1;
 
             for(int i = 0; i < parts.size; i++){
@@ -251,7 +253,7 @@ public class Weapon implements Cloneable{
         float lastReload = mount.reload;
         mount.reload = Math.max(mount.reload - Time.delta * unit.reloadMultiplier, 0);
         mount.recoil = Mathf.approachDelta(mount.recoil, 0, unit.reloadMultiplier / recoilTime);
-        mount.warmup = Mathf.lerpDelta(mount.warmup, can && mount.shoot ? 1f : 0f, shootWarmupSpeed);
+        mount.warmup = Mathf.lerpDelta(mount.warmup, (can && mount.shoot) || (continuous && mount.bullet != null) ? 1f : 0f, shootWarmupSpeed);
         mount.smoothReload = Mathf.lerpDelta(mount.smoothReload, mount.reload / reload, smoothReloadSpeed);
 
         //rotate if applicable
@@ -326,6 +328,12 @@ public class Weapon implements Cloneable{
                     if(mount.sound == null) mount.sound = new SoundLoop(shootSound, 1f);
                     mount.sound.update(bulletX, bulletY, true);
                 }
+
+                //TODO: how do continuous flame bullets work here? a new system is needed
+                if(mount.bullet.type.optimalLifeFract > 0){
+                //    mount.bullet.time = mount.bullet.lifetime * mount.bullet.type.optimalLifeFract * mount.warmup;
+                //    mount.bullet.keepAlive = true;
+                }
             }
         }else{
             //heat decreases when not firing
@@ -398,16 +406,18 @@ public class Weapon implements Cloneable{
         if(!unit.isAdded()) return;
 
         float
+        xSpread = Mathf.range(xRand),
         weaponRotation = unit.rotation - 90 + (rotate ? mount.rotation : baseRotation),
         mountX = unit.x + Angles.trnsx(unit.rotation - 90, x, y),
         mountY = unit.y + Angles.trnsy(unit.rotation - 90, x, y),
-        bulletX = mountX + Angles.trnsx(weaponRotation, this.shootX + xOffset, this.shootY + yOffset),
-        bulletY = mountY + Angles.trnsy(weaponRotation, this.shootX + xOffset, this.shootY + yOffset),
+        bulletX = mountX + Angles.trnsx(weaponRotation, this.shootX + xOffset + xSpread, this.shootY + yOffset),
+        bulletY = mountY + Angles.trnsy(weaponRotation, this.shootX + xOffset + xSpread, this.shootY + yOffset),
         shootAngle = bulletRotation(unit, mount, bulletX, bulletY) + angleOffset,
         lifeScl = bullet.scaleLife ? Mathf.clamp(Mathf.dst(bulletX, bulletY, mount.aimX, mount.aimY) / bullet.range) : 1f,
         angle = angleOffset + shootAngle + Mathf.range(inaccuracy);
 
         mount.bullet = bullet.create(unit, unit.team, bulletX, bulletY, angle, -1f, (1f - velocityRnd) + Mathf.random(velocityRnd), lifeScl, null, mover, mount.aimX, mount.aimY);
+        handleBullet(unit, mount, mount.bullet);
 
         if(!continuous){
             shootSound.at(bulletX, bulletY, Mathf.random(soundPitchMin, soundPitchMax));
@@ -421,6 +431,11 @@ public class Weapon implements Cloneable{
         Effect.shake(shake, shake, bulletX, bulletY);
         mount.recoil = 1f;
         mount.heat = 1f;
+    }
+
+    //override to do special things to a bullet after spawning
+    protected void handleBullet(Unit unit, WeaponMount mount, Bullet bullet){
+
     }
 
     public void flip(){

@@ -169,7 +169,9 @@ public class Damage{
         });
 
         Units.nearbyEnemies(b.team, rect, u -> {
-            if(u.checkTarget(b.type.collidesAir, b.type.collidesGround) && u.hittable()){
+            u.hitbox(hitrect);
+
+            if(u.checkTarget(b.type.collidesAir, b.type.collidesGround) && u.hittable() && Intersector.intersectSegmentRectangle(b.x, b.y, b.x + vec.x, b.y + vec.y, hitrect)){
                 distances.add(u.dst(b));
             }
         });
