@@ -4529,7 +4529,7 @@ public class Blocks{
             drawer = new DrawMulti(new DrawDefault(), new DrawHeatOutput());
             rotateDraw = false;
             size = 1;
-            heatOutput = 1000000f;
+            heatOutput = 10000f;
             regionRotated1 = 1;
         }};
 
