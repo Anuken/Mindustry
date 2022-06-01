@@ -104,7 +104,8 @@ public class CommandAI extends AIController{
                 faceTarget();
             }
 
-            PayloadConveyorBuild payConv = (PayloadConveyorBuild)Vars.world.buildWorld(vecOut.x, vecOut.y);
+            //If PayloadConveyor extended off PayloadBlock I could easily make this work for any payload block that could accept a unit, but they don't.
+            PayloadConveyorBuild payConv = targetConv();
             if(payConv != null && payConv.canControlSelect(unit)){
                 payConv.handleUnitPayload(unit, p -> payConv.item = p);
                 targetPos = null;
@@ -213,6 +214,11 @@ public class CommandAI extends AIController{
 
     public void commandPosition(Vec2 pos){
         targetPos = pos;
+        PayloadConveyorBuild payConv = targetConv();
+        if(payConv != null){
+            targetPos.set(payConv);
+            pos.set(payConv);
+        }
         lastTargetPos = pos;
         attackTarget = null;
         pathId = Vars.controlPath.nextTargetId();
@@ -226,5 +232,20 @@ public class CommandAI extends AIController{
         attackTarget = moveTo;
         this.stopAtTarget = stopAtTarget;
         pathId = Vars.controlPath.nextTargetId();
+    }
+
+    public Position getTargetPos(){
+        if(attackTarget != null) return attackTarget;
+
+        PayloadConveyorBuild payConv = targetConv();
+        if(payConv != null) return payConv;
+
+        return targetPos;
+    }
+
+    public PayloadConveyorBuild targetConv(){
+        PayloadConveyorBuild payConv = (PayloadConveyorBuild)Vars.world.buildWorld(targetPos.x, targetPos.y);
+        if(payConv != null && payConv.team == unit.team) return payConv;
+        return null;
     }
 }

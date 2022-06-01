@@ -35,6 +35,7 @@ import mindustry.world.blocks.ConstructBlock.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.distribution.*;
 import mindustry.world.blocks.payloads.*;
+import mindustry.world.blocks.payloads.PayloadConveyor.*;
 import mindustry.world.blocks.storage.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 import mindustry.world.meta.*;
@@ -256,7 +257,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         build.onCommand(target);
-        Fx.moveCommand.at(target);
+        Fx.moveCommand.at(build.getCommandPosition());
     }
 
     @Remote(called = Loc.server, targets = Loc.both, forward = true)
@@ -806,11 +807,15 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 CommandAI ai = unit.command();
                 //draw target line
                 if(ai.targetPos != null){
-                    Position lineDest = ai.attackTarget != null ? ai.attackTarget : ai.targetPos;
+                    Position lineDest = ai.getTargetPos();
                     Drawf.limitLine(unit, lineDest, unit.hitSize / 2f, 3.5f);
 
                     if(ai.attackTarget == null){
-                        Drawf.square(lineDest.getX(), lineDest.getY(), 3.5f);
+                        if(ai.targetConv() == null){
+                            Drawf.square(lineDest.getX(), lineDest.getY(), 3.5f);
+                        }else{
+                            Drawf.target(lineDest.getX(), lineDest.getY(), 6f, Pal.accent);
+                        }
                     }
                 }
 

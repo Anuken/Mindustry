@@ -22,6 +22,7 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.payloads.*;
+import mindustry.world.blocks.payloads.PayloadConveyor.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
@@ -155,6 +156,7 @@ public class UnitFactory extends UnitBlock{
 
         @Override
         public Vec2 getCommandPosition(){
+            if(commandPos != null && Vars.world.buildWorld(commandPos.x, commandPos.y) instanceof PayloadConveyorBuild b && b.team == team) commandPos.set(b);
             return commandPos;
         }
 
@@ -268,7 +270,7 @@ public class UnitFactory extends UnitBlock{
 
                     Unit unit = plan.unit.create(team);
                     if(commandPos != null && unit.isCommandable()){
-                        unit.command().commandPosition(commandPos);
+                        unit.command().commandPosition(getCommandPosition());
                     }
                     payload = new UnitPayload(unit);
                     payVector.setZero();

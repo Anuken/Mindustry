@@ -20,6 +20,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.payloads.PayloadConveyor.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
@@ -359,7 +360,7 @@ public class DesktopInput extends InputHandler{
                 cursorType = ui.drillCursor;
             }
 
-            if(commandMode && selectedUnits.any() && ((cursor.build != null && !cursor.build.inFogTo(player.team()) && cursor.build.team != player.team()) || (selectedEnemyUnit(input.mouseWorldX(), input.mouseWorldY()) != null))){
+            if(commandMode && selectedUnits.any() && ((cursor.build != null && !cursor.build.inFogTo(player.team()) && (cursor.build.team != player.team() || (cursor.build.team == player.team() && cursor.build instanceof PayloadConveyorBuild))) || (selectedEnemyUnit(input.mouseWorldX(), input.mouseWorldY()) != null))){
                 cursorType = ui.targetCursor;
             }
 

@@ -19,6 +19,7 @@ import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.payloads.*;
+import mindustry.world.blocks.payloads.PayloadConveyor.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
@@ -119,6 +120,7 @@ public class Reconstructor extends UnitBlock{
 
         @Override
         public Vec2 getCommandPosition(){
+            if(commandPos != null && world.buildWorld(commandPos.x, commandPos.y) instanceof PayloadConveyorBuild b && b.team == team) commandPos.set(b);
             return commandPos;
         }
 
@@ -228,7 +230,7 @@ public class Reconstructor extends UnitBlock{
                         if(progress >= constructTime){
                             payload.unit = upgrade(payload.unit.type).create(payload.unit.team());
                             if(commandPos != null && payload.unit.isCommandable()){
-                                payload.unit.command().commandPosition(commandPos);
+                                payload.unit.command().commandPosition(getCommandPosition());
                             }
                             progress %= 1f;
                             Effect.shake(2f, 3f, this);
