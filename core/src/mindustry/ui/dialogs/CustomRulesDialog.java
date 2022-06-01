@@ -156,7 +156,7 @@ public class CustomRulesDialog extends BaseDialog{
         check("@rules.coreincinerates", b -> rules.coreIncinerates = b, () -> rules.coreIncinerates);
         check("@rules.cleanupdeadteams", b -> rules.cleanupDeadTeams = b, () -> rules.cleanupDeadTeams, () -> rules.pvp);
         check("@rules.disableworldprocessors", b -> rules.disableWorldProcessors = b, () -> rules.disableWorldProcessors);
-        check("@rules.accessibleworldprocessors", b -> {rules.accessibleWorldProcessors = b; rules.disableWorldProcessors &= !b;}, () -> rules.accessibleWorldProcessors);
+        check("@rules.accessibleworldprocessors", b -> rules.accessibleWorldProcessors = b, () -> rules.accessibleWorldProcessors);
         number("@rules.buildcostmultiplier", false, f -> rules.buildCostMultiplier = f, () -> rules.buildCostMultiplier, () -> !rules.infiniteResources);
         number("@rules.buildspeedmultiplier", f -> rules.buildSpeedMultiplier = f, () -> rules.buildSpeedMultiplier, 0.001f, 50f);
         number("@rules.deconstructrefundmultiplier", false, f -> rules.deconstructRefundMultiplier = f, () -> rules.deconstructRefundMultiplier, () -> !rules.infiniteResources);
