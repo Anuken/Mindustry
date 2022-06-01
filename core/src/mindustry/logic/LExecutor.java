@@ -503,11 +503,12 @@ public class LExecutor{
                             if(tile == null){
                                 exec.setobj(p4, null);
                             }else{
-                            exec.setobj(p4, switch(p3){
+                            exec.setobj(p4, switch(exec.numi(p3)){
                                 case 0 -> tile.floor();
                                 case 1 -> tile.overlay();
                                 case 2 -> tile.block();
                                 case 3 -> tile.build;
+                                default -> null;
                              });
                             
                             //Tile tile = world.tileWorld(x1, y1);
