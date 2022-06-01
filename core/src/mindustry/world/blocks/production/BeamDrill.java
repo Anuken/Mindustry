@@ -15,6 +15,7 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.environment.Prop;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -123,7 +124,7 @@ public class BeamDrill extends Block{
                 Tile other = world.tile(rx, ry);
                 if(other != null && other.solid()){
                     Item drop = other.wallDrop();
-                    if(drop != null){
+                    if(drop != null && !other.breakable()){
                         if(drop.hardness <= tier){
                             found = drop;
                             count++;
@@ -175,7 +176,7 @@ public class BeamDrill extends Block{
                 Tile other = world.tile(Tmp.p1.x + Geometry.d4x(rotation)*j, Tmp.p1.y + Geometry.d4y(rotation)*j);
                 if(other != null && other.solid()){
                     Item drop = other.wallDrop();
-                    if(drop != null && drop.hardness <= tier){
+                    if(drop != null && !other.breakable() && drop.hardness <= tier){
                         return true;
                     }
                     break;
@@ -228,7 +229,7 @@ public class BeamDrill extends Block{
                     if(other != null){
                         if(other.solid()){
                             Item drop = other.wallDrop();
-                            if(drop != null && drop.hardness <= tier){
+                            if(drop != null && !other.breakable() && drop.hardness <= tier){
                                 facingAmount ++;
                                 if(lastItem != drop && lastItem != null){
                                     multiple = true;
