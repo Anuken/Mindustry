@@ -497,13 +497,13 @@ public class LExecutor{
                     case getBlock -> {
                         float range = Math.max(unit.range(), unit.type.buildRange);
                         if(!unit.within(x1, y1, range)){
-                            exec.setobj(p4, null);
+                            exec.setobj(p3, null);
                         }else{
                             Tile tile = world.tile(exec.numi(p1), exec.numi(p2));
                             if(tile == null){
-                                exec.setobj(p4, null);
+                                exec.setobj(p3, null);
                             }else{
-                            exec.setobj(p4, switch(exec.numi(p3)){
+                            exec.setobj(p3, switch(exec.numi(p4)){
                                 case 0 -> tile.floor();
                                 case 1 -> tile.overlay();
                                 case 2 -> tile.block();
