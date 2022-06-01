@@ -499,6 +499,10 @@ public class LExecutor{
                         if(!unit.within(x1, y1, range)){
                             exec.setobj(p4, null);
                         }else{
+                            Tile tile = world.tile(exec.numi(p1), exec.numi(p2));
+                            if(tile == null){
+                                exec.setobj(dest, null);
+                            }else{
                             exec.setobj(p4, switch(p3){
                                 case 0 -> tile.floor();
                                 case 1 -> tile.overlay();
