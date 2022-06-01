@@ -503,19 +503,13 @@ public class LExecutor{
                             if(tile == null){
                                 exec.setobj(p3, null);
                             }else{
-                            exec.setobj(p3, switch(exec.numi(p4)){
-                                case 0 -> tile.floor();
-                                case 1 -> tile.overlay();
-                                case 2 -> tile.block();
-                                case 3 -> tile.build;
-                                default -> null;
-                             });
-                            
-                            //Tile tile = world.tileWorld(x1, y1);
-                            //any environmental solid block is returned as StoneWall, aka "@solid"
-                            //Block block = tile == null ? null : !tile.synthetic() ? (tile.solid() ? Blocks.stoneWall : Blocks.air) : tile.block();
-                            //exec.setobj(p3, block);
-                            //exec.setobj(p4, tile != null && tile.build != null ? tile.build : null);
+                                exec.setobj(p3, switch(exec.numi(p4)){
+                                    case 0 -> tile.floor();
+                                    case 1 -> tile.overlay();
+                                    case 2 -> tile.block();
+                                    case 3 -> tile.build;
+                                    default -> null;
+                                });
                             }
                         }
                     }
