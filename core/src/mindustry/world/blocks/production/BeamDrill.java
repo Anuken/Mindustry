@@ -123,7 +123,7 @@ public class BeamDrill extends Block{
                 Tile other = world.tile(rx, ry);
                 if(other != null && other.solid()){
                     Item drop = other.wallDrop();
-                    if(drop != null && !other.breakable()){
+                    if(drop != null && validOre(other)){
                         if(drop.hardness <= tier){
                             found = drop;
                             count++;
@@ -175,7 +175,7 @@ public class BeamDrill extends Block{
                 Tile other = world.tile(Tmp.p1.x + Geometry.d4x(rotation)*j, Tmp.p1.y + Geometry.d4y(rotation)*j);
                 if(other != null && other.solid()){
                     Item drop = other.wallDrop();
-                    if(drop != null && !other.breakable() && drop.hardness <= tier){
+                    if(drop != null && validOre(other) && drop.hardness <= tier){
                         return true;
                     }
                     break;
@@ -184,6 +184,10 @@ public class BeamDrill extends Block{
         }
 
         return false;
+    }
+
+    public boolean validOre(Tile tile){
+        return !tile.breakable();
     }
 
     public class BeamDrillBuild extends Building{
@@ -228,7 +232,7 @@ public class BeamDrill extends Block{
                     if(other != null){
                         if(other.solid()){
                             Item drop = other.wallDrop();
-                            if(drop != null && !other.breakable() && drop.hardness <= tier){
+                            if(drop != null && validOre(other) && drop.hardness <= tier){
                                 facingAmount ++;
                                 if(lastItem != drop && lastItem != null){
                                     multiple = true;
