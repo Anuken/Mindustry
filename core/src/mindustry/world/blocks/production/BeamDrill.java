@@ -15,7 +15,6 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
-import mindustry.world.blocks.environment.Prop;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
