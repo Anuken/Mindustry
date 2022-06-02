@@ -292,7 +292,7 @@ public class BeamDrill extends Block{
 
             for(int i = 0; i < size; i++){
                 Tile face = facing[i];
-                if(face != null){
+                if(face != null && face.wallDrop() != null){
                     Point2 p = lasers[i];
                     float lx = face.worldx() - (dir.x/2f)*tilesize, ly = face.worldy() - (dir.y/2f)*tilesize;
 
