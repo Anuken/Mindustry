@@ -82,7 +82,7 @@ public class LogicBlock extends Block{
     }
 
     public boolean accessible(){
-        return !privileged || state.rules.editor || state.rules.accessibleWorldProcessors || state.playtestingMap != null;
+        return !privileged || state.rules.editor || state.rules.accessibleWorldLogic || state.playtestingMap != null;
     }
 
     @Override

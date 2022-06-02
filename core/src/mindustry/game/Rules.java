@@ -65,7 +65,7 @@ public class Rules{
     /** If true, world processors no longer update. Used for testing. */
     public boolean disableWorldProcessors = false;
     /** If true, world processors are always accessible in the game. */
-    public boolean accessibleWorldProcessors = false;
+    public boolean accessibleWorldLogic = false;
     /** How much health blocks start with. */
     public float blockHealthMultiplier = 1f;
     /** How much damage blocks (turrets) deal. */

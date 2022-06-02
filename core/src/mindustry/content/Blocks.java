@@ -4651,7 +4651,7 @@ public class Blocks{
         }};
 
         worldProcessor = new LogicBlock("world-processor"){{
-            requirements(Category.logic, BuildVisibility.worldProcOnly, with());
+            requirements(Category.logic, BuildVisibility.worldLogicOnly, with());
 
             canOverdrive = false;
             targetable = false;
@@ -4663,7 +4663,7 @@ public class Blocks{
         }};
 
         worldCell = new MemoryBlock("world-cell"){{
-            requirements(Category.logic, BuildVisibility.worldProcOnly, with());
+            requirements(Category.logic, BuildVisibility.worldLogicOnly, with());
 
             privileged = true;
             memoryCapacity = 128;
