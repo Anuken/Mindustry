@@ -17,7 +17,7 @@
   },
     {
     "name": "Tendhost",
-    "address": ["tendhost.ddns.net"]
+    "address": ["tendhost.ddns.net", "smokeofanarchy.ru:7576"]
   },
   {
     "name": "Atanner",
