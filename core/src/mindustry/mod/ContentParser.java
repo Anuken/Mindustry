@@ -188,7 +188,7 @@ public class ContentParser{
                 case "delay" -> base.delay(data.getFloat("amount"));
                 case "sustain" -> base.sustain(data.getFloat("offset", 0f), data.getFloat("grow", 0f), data.getFloat("sustain"));
                 case "shorten" -> base.shorten(data.getFloat("amount"));
-                case "add" -> base.add(data.getFloat("amount"));
+                case "add" -> data.has("amount") ? base.add(data.getFloat("amount")) : base.add(parser.readValue(PartProgress.class, data.get("other")));
                 case "blend" -> base.blend(parser.readValue(PartProgress.class, data.get("other")), data.getFloat("amount"));
                 case "mul" -> base.mul(parser.readValue(PartProgress.class, data.get("other")));
                 case "min" -> base.min(parser.readValue(PartProgress.class, data.get("other")));
