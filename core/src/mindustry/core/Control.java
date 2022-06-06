@@ -482,10 +482,13 @@ public class Control implements ApplicationListener, Loadable{
 
                 }catch(SaveException e){
                     Log.err(e);
-                    sector.save = null;
-                    Time.runTask(10f, () -> ui.showErrorMessage("@save.corrupted"));
-                    slot.delete();
-                    playSector(origin, sector);
+                    
+                    Time.runTask(10f, () -> ui.showConfirm("@save.corrupted.title", 
+                        "@save.corrupted.message", () -> {
+                            sector.save = null;
+                            slot.delete();
+                            playSector(origin, sector);
+                        }));
                 }
                 ui.planet.hide();
             }else{
