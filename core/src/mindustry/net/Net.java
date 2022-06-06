@@ -5,6 +5,9 @@ import arc.func.*;
 import arc.net.*;
 import arc.struct.*;
 import arc.util.*;
+import java.lang.*;
+
+import mindustry.*;
 import mindustry.gen.*;
 import mindustry.net.Packets.*;
 import mindustry.net.Streamable.*;
@@ -14,6 +17,7 @@ import java.io.*;
 import java.nio.*;
 import java.nio.channels.*;
 import java.util.concurrent.*;
+import org.xbill.DNS.*;
 
 import static arc.util.Log.*;
 import static mindustry.Vars.*;
@@ -325,9 +329,36 @@ public class Net{
 
     /**
      * Pings a host in a pooled thread. If an error occurred, failed() should be called with the exception.
+     * If the port is the default mindustry port, SRV records are checked too.
      */
     public void pingHost(String address, int port, Cons<Host> valid, Cons<Exception> failed){
-        pingExecutor.submit(() -> provider.pingHost(address, port, valid, failed));
+        pingExecutor.submit(() -> provider.pingHost(address, port, valid, e -> {
+            if (port == Vars.port) {
+                pingExecutor.submit(() -> {
+                    var query = "_mindustry._tcp." + address;
+                    try {
+                        var records = new Lookup(query, Type.SRV).run();
+                        var result = records == null ? new Seq<SRVRecord>() : Seq.with(records).<SRVRecord>as().sortComparing(SRVRecord::getPriority);
+                        pingSrvHost(result, valid, failed);
+                    } catch (TextParseException ex) {
+                        failed.get(new ArcNetException("Invalid address.", ex));
+                    }
+                });
+            } else {
+                failed.get(e);
+            }
+        }));
+    }
+
+    private void pingSrvHost(Seq<SRVRecord> records, Cons<Host> valid, Cons<Exception> failed) {
+        if (records.isEmpty()) {
+            failed.get(new ArcNetException("No reachable server found."));
+        } else {
+            var srv = records.remove(0);
+            var host = srv.getTarget().toString().replaceFirst("\\.$", "");
+            var port = srv.getPort();
+            provider.pingHost(host, port, valid, e -> pingSrvHost(records, valid, failed));
+        }
     }
 
     /**
