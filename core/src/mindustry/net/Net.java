@@ -333,18 +333,18 @@ public class Net{
      */
     public void pingHost(String address, int port, Cons<Host> valid, Cons<Exception> failed){
         pingExecutor.submit(() -> provider.pingHost(address, port, valid, e -> {
-            if (port == Vars.port) {
+            if(port == Vars.port){
                 pingExecutor.submit(() -> {
                     var query = "_mindustry._tcp." + address;
-                    try {
+                    try{
                         var records = new Lookup(query, Type.SRV).run();
                         var result = records == null ? new Seq<SRVRecord>() : Seq.with(records).<SRVRecord>as().sortComparing(SRVRecord::getPriority);
                         pingSrvHost(result, valid, failed);
-                    } catch (TextParseException ex) {
+                    }catch(TextParseException ex){
                         failed.get(new ArcNetException("Invalid address.", ex));
                     }
                 });
-            } else {
+            }else{
                 failed.get(e);
             }
         }));
