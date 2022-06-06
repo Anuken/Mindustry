@@ -112,6 +112,8 @@ public class Block extends UnlockableContent implements Senseable{
     public int variants = 0;
     /** whether to draw a rotation arrow - this does not apply to lines of blocks */
     public boolean drawArrow = true;
+    /** whether to draw the team corner by default */
+    public boolean drawTeamOverlay = true;
     /** for static blocks only: if true, tile data() is saved in world data. */
     public boolean saveData;
     /** whether you can break this with rightclick */
@@ -478,14 +480,10 @@ public class Block extends UnlockableContent implements Senseable{
 
     /** @return whether this block can be placed on the specified tile. */
     public boolean canPlaceOn(Tile tile, Team team, int rotation){
-        return canPlaceOn(tile, team);
-    }
-
-    /** Legacy canPlaceOn implementation, override {@link #canPlaceOn(Tile, Team, int)} instead.*/
-    public boolean canPlaceOn(Tile tile, Team team){
         return true;
     }
-    
+
+    /** @return whether this block can be broken on the specified tile. */
     public boolean canBreak(Tile tile){
         return true;
     }
@@ -542,7 +540,7 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     public void addLiquidBar(Liquid liq){
-        addBar("liquid-" + liq.name, entity -> !liq.unlocked() ? null : new Bar(
+        addBar("liquid-" + liq.name, entity -> !liq.unlockedNow() ? null : new Bar(
             () -> liq.localizedName,
             liq::barColor,
             () -> entity.liquids.get(liq) / liquidCapacity

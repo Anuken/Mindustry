@@ -350,10 +350,10 @@ public class Net{
         }));
     }
 
-    private void pingSrvHost(Seq<SRVRecord> records, Cons<Host> valid, Cons<Exception> failed) {
-        if (records.isEmpty()) {
+    private void pingSrvHost(Seq<SRVRecord> records, Cons<Host> valid, Cons<Exception> failed){
+        if(records.isEmpty()){
             failed.get(new ArcNetException("No reachable server found."));
-        } else {
+        }else{
             var srv = records.remove(0);
             var host = srv.getTarget().toString().replaceFirst("\\.$", "");
             var port = srv.getPort();

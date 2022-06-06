@@ -54,7 +54,7 @@ public class Vars implements Loadable{
     public static final int defaultEnv = Env.terrestrial | Env.spores | Env.groundOil | Env.groundWater | Env.oxygen;
     /** Wall darkness radius. */
     public static final int darkRadius = 4;
-    /** Maximum extra padding around deployment schematics. TODO 4, or 5?*/
+    /** Maximum extra padding around deployment schematics. */
     public static final int maxLoadoutSchematicPad = 4;
     /** All schematic base64 starts with this string.*/
     public static final String schematicBaseStart ="bXNjaA";

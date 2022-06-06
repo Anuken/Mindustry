@@ -3906,26 +3906,25 @@ public class UnitTypes{
         //endregion
         //region erekir - neoplasm
 
-        if(false)
-            latum = new NeoplasmUnitType("latum"){{
-                health = 20000;
-                armor = 12;
-                hitSize = 48f;
-                omniMovement = false;
-                rotateSpeed = 1.7f;
-                drownTimeMultiplier = 4f;
-                drawCell = false;
-                segments = 4;
-                drawBody = false;
-                hidden = true;
-                crushDamage = 2f;
-                aiController = HugAI::new;
-                targetAir = false;
+        latum = new NeoplasmUnitType("latum"){{
+            health = 20000;
+            armor = 12;
+            hitSize = 48f;
+            omniMovement = false;
+            rotateSpeed = 1.7f;
+            drownTimeMultiplier = 4f;
+            drawCell = false;
+            segments = 4;
+            drawBody = false;
+            hidden = true;
+            crushDamage = 2f;
+            aiController = HugAI::new;
+            targetAir = false;
 
-                segmentScl = 4f;
-                segmentPhase = 5f;
-                speed = 1f;
-            }};
+            segmentScl = 4f;
+            segmentPhase = 5f;
+            speed = 1f;
+        }};
 
         //endregion
         //region erekir - core
