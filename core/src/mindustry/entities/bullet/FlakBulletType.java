@@ -25,10 +25,9 @@ public class FlakBulletType extends BasicBulletType{
     @Override
     public void update(Bullet b){
         super.update(b);
-        //don't check for targets if primed to explode
-        if(b.fdata < 0f) return;
 
-        if(b.timer(2, 6)){
+        //don't check for targets if primed to explode
+        if(b.fdata >= 0 && b.timer(2, 6)){
             Units.nearbyEnemies(b.team, Tmp.r1.setSize(explodeRange * 2f).setCenter(b.x, b.y), unit -> {
                 //fadata < 0 means it's primed to explode
                 if(b.fdata < 0f || !unit.checkTarget(collidesAir, collidesGround)) return;

@@ -70,7 +70,7 @@ public class DrawTurret extends DrawBlock{
             float progress = tb.visualReloadValid ? tb.progress() : 1f;
 
             //TODO no smooth reload
-            var params = DrawPart.params.set(build.warmup(), 1f - progress, 1f - progress, tb.heat, tb.x + tb.recoilOffset.x, tb.y + tb.recoilOffset.y, tb.rotation);
+            var params = DrawPart.params.set(build.warmup(), 1f - progress, 1f - progress, tb.heat, tb.curRecoil, tb.x + tb.recoilOffset.x, tb.y + tb.recoilOffset.y, tb.rotation);
 
             for(var part : parts){
                 part.draw(params);
