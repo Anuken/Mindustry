@@ -566,7 +566,7 @@ public class UnitType extends UnlockableContent{
             var unique = new ObjectSet<String>();
 
             for(Ability a : abilities){
-                if(unique.add(a.localized())){
+                if(a.display && unique.add(a.localized())){
                     stats.add(Stat.abilities, a.localized());
                 }
             }
@@ -609,9 +609,7 @@ public class UnitType extends UnlockableContent{
             if(naval){
                 imm.remove(StatusEffects.wet);
             }
-            for(var i : imm){
-                stats.add(Stat.immunities, i.emoji() + " " + i.localizedName);
-            }
+            stats.add(Stat.immunities, StatValues.statusEffects(imm));
         }
     }
 
@@ -1106,9 +1104,9 @@ public class UnitType extends UnlockableContent{
 
                 WeaponMount first = unit.mounts.length > part.weaponIndex ? unit.mounts[part.weaponIndex] : null;
                 if(first != null){
-                    DrawPart.params.set(first.warmup, first.reload / weapons.first().reload, first.smoothReload, first.heat, first.recoil, unit.x, unit.y, unit.rotation);
+                    DrawPart.params.set(first.warmup, first.reload / weapons.first().reload, first.smoothReload, first.heat, first.recoil, first.charge, unit.x, unit.y, unit.rotation);
                 }else{
-                    DrawPart.params.set(0f, 0f, 0f, 0f, 0f, unit.x, unit.y, unit.rotation);
+                    DrawPart.params.set(0f, 0f, 0f, 0f, 0f, 0f, unit.x, unit.y, unit.rotation);
                 }
 
                 if(unit instanceof Scaled s){

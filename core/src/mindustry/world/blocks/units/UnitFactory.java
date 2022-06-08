@@ -110,10 +110,17 @@ public class UnitFactory extends UnitBlock{
             table.row();
             for(var plan : p){
                 if(plan.unit.unlockedNow()){
-                    table.image(plan.unit.uiIcon).size(8 * 3).padRight(2).right();
-                    table.add(plan.unit.localizedName).left();
-                    table.add(Strings.autoFixed(plan.time / 60f, 1) + " " + Core.bundle.get("unit.seconds")).color(Color.lightGray).padLeft(12).left();
-                    table.row();
+                    table.table(c -> {
+                        c.left();
+                        c.image(plan.unit.uiIcon).size(8 * 3).padRight(2);
+                        c.add(plan.unit.localizedName).left();
+                        c.add(Strings.autoFixed(plan.time / 60f, 1) + " " + Core.bundle.get("unit.seconds")).color(Color.lightGray).padLeft(12).left();
+                    }).padLeft(40).left().row();
+                    table.table(req -> {
+                        req.left();
+                        StatValues.items(plan.requirements).display(req);
+                    }).padLeft(60).left().row();
+
                 }
             }
         });

@@ -83,5 +83,9 @@ public class BaseTurret extends Block{
         public void drawSelect(){
             Drawf.dashCircle(x, y, range(), team.color);
         }
+
+        public float estimateDps(){
+            return 0f;
+        }
     }
 }

@@ -200,7 +200,7 @@ public class Turret extends ReloadTurret{
         public Seq<AmmoEntry> ammo = new Seq<>();
         public int totalAmmo;
         public float curRecoil, heat, logicControlTime = -1;
-        public float shootWarmup;
+        public float shootWarmup, charge;
         public int totalShots;
         //turrets need to shoot once for 'visual reload' to be valid, otherwise they seem stuck at reload 0 when placed.
         public boolean visualReloadValid;
@@ -214,6 +214,7 @@ public class Turret extends ReloadTurret{
         public float heatReq;
         public float[] sideHeat = new float[4];
 
+        @Override
         public float estimateDps(){
             if(!hasAmmo()) return 0f;
             return shoot.shots / reload * 60f * (peekAmmo() == null ? 0f : peekAmmo().estimateDPS()) * potentialEfficiency * timeScale;
@@ -347,8 +348,9 @@ public class Turret extends ReloadTurret{
 
             wasShooting = false;
 
-            curRecoil = Math.max(curRecoil - Time.delta / recoilTime , 0);
-            heat = Math.max(heat - Time.delta / cooldownTime, 0);
+            curRecoil = Mathf.approachDelta(curRecoil, 0, 1 / recoilTime);
+            heat = Mathf.approachDelta(heat, 0, 1 / cooldownTime);
+            charge = charging() ? Mathf.approachDelta(charge, 1, 1 / shoot.firstShotDelay) : 0;
 
             unit.tile(this);
             unit.rotation(rotation);

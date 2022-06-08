@@ -17,11 +17,11 @@
   },
   {
     "name": "Omega",
-    "address": ["node2.crewcraft.cc:25569", "node2.crewcraft.cc:25571", "node2.crewcraft.cc:25572", "node5.crewcraft.cc:25569"]
+    "address": ["node2.crewcraft.cc:25569", "node2.crewcraft.cc:25571", "node2.crewcraft.cc:25572", "node2.crewcraft.cc:6569"]
   },
   {
     "name": "MeowLand",
-    "address": ["kgstudios.ddns.net:6565"]
+    "address": ["meowland.ru"]
   },
   {
     "name": "DarkDustry",

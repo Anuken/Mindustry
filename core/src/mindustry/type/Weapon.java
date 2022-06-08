@@ -178,8 +178,6 @@ public class Weapon implements Cloneable{
     }
 
     public void draw(Unit unit, WeaponMount mount){
-        if(!region.found()) return;
-
         //apply layer offset, roll it back at the end
         float z = Draw.z();
         Draw.z(z + layerOffset);
@@ -200,7 +198,7 @@ public class Weapon implements Cloneable{
         }
 
         if(parts.size > 0){
-            DrawPart.params.set(mount.warmup, mount.reload / reload, mount.smoothReload, mount.heat, mount.recoil, wx, wy, weaponRotation + 90);
+            DrawPart.params.set(mount.warmup, mount.reload / reload, mount.smoothReload, mount.heat, mount.recoil, mount.charge, wx, wy, weaponRotation + 90);
             DrawPart.params.sideMultiplier = flipSprite ? -1 : 1;
 
             for(int i = 0; i < parts.size; i++){
@@ -213,7 +211,7 @@ public class Weapon implements Cloneable{
 
         Draw.xscl = -Mathf.sign(flipSprite);
 
-        Draw.rect(region, wx, wy, weaponRotation);
+        if(region.found()) Draw.rect(region, wx, wy, weaponRotation);
 
         if(cellRegion.found()){
             Draw.color(unit.type.cellColor(unit));
@@ -255,6 +253,7 @@ public class Weapon implements Cloneable{
         mount.recoil = Mathf.approachDelta(mount.recoil, 0, unit.reloadMultiplier / recoilTime);
         mount.warmup = Mathf.lerpDelta(mount.warmup, (can && mount.shoot) || (continuous && mount.bullet != null) ? 1f : 0f, shootWarmupSpeed);
         mount.smoothReload = Mathf.lerpDelta(mount.smoothReload, mount.reload / reload, smoothReloadSpeed);
+        mount.charge = mount.charging && shoot.firstShotDelay > 0 ? Mathf.approachDelta(mount.charge, 1, 1 / shoot.firstShotDelay) : 0;
 
         //rotate if applicable
         if(rotate && (mount.rotate || mount.shoot) && can){
@@ -388,6 +387,7 @@ public class Weapon implements Cloneable{
         unit.apply(shootStatus, shootStatusDuration);
 
         if(shoot.firstShotDelay > 0){
+            mount.charging = true;
             chargeSound.at(shootX, shootY, Mathf.random(soundPitchMin, soundPitchMax));
             bullet.chargeEffect.at(shootX, shootY, rotation, bullet.keepVelocity || parentizeEffects ? unit : null);
         }
@@ -398,13 +398,14 @@ public class Weapon implements Cloneable{
             }else{
                 bullet(unit, mount, xOffset, yOffset, angle, mover);
             }
-            mount.totalShots ++;
+            mount.totalShots++;
         });
     }
 
     protected void bullet(Unit unit, WeaponMount mount, float xOffset, float yOffset, float angleOffset, Mover mover){
         if(!unit.isAdded()) return;
 
+        mount.charging = false;
         float
         xSpread = Mathf.range(xRand),
         weaponRotation = unit.rotation - 90 + (rotate ? mount.rotation : baseRotation),
