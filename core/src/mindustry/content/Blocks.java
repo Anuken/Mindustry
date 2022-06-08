@@ -4660,6 +4660,7 @@ public class Blocks{
             privileged = true;
             size = 1;
             maxInstructionsPerTick = 100;
+            range = Float.MAX_VALUE;
         }};
 
         worldCell = new MemoryBlock("world-cell"){{
