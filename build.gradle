@@ -327,7 +327,7 @@ project(":core"){
     dependencies{
         compileJava.dependsOn(preGen)
 
-        api "dnsjava:dnsjava:3.5.1"
+        api "com.github.Phinner:dnsjava:257f8e633c"
         api "org.lz4:lz4-java:1.8.0"
         api arcModule("arc-core")
         api arcModule("extensions:flabel")
