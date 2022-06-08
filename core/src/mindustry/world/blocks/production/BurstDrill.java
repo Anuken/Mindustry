@@ -65,7 +65,7 @@ public class BurstDrill extends Drill{
 
                 timeDrilled += speedCurve.apply(progress / drillTime) * speed;
 
-                lastDrillSpeed = 1f / drillTime * speed * size * size;
+                lastDrillSpeed = 1f / drillTime * speed * dominantItems;
                 progress += delta() * speed;
             }else{
                 warmup = Mathf.approachDelta(warmup, 0f, 0.01f);
