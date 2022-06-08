@@ -5,7 +5,6 @@ import arc.func.*;
 import arc.net.*;
 import arc.struct.*;
 import arc.util.*;
-import java.lang.*;
 
 import mindustry.gen.*;
 import mindustry.net.Packets.*;
@@ -378,7 +377,10 @@ public class Net{
          */
         void discoverServers(Cons<Host> callback, Runnable done);
 
-        /** Ping a host. If an error occurred, failed() should be called with the exception. This method should block. */
+        /**
+         * Ping a host. If an error occurred, failed() should be called with the exception. This method should block.
+         * If the port is the default mindustry port (6567), SRV records are checked too.
+         */
         void pingHost(String address, int port, Cons<Host> valid, Cons<Exception> failed);
 
         /** Host a server at specified port. */
@@ -396,5 +398,4 @@ public class Net{
             closeServer();
         }
     }
-
 }
