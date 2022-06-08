@@ -138,6 +138,12 @@ public class TractorBeamTurret extends BaseTurret{
         }
 
         @Override
+        public float estimateDps(){
+            if(!any) return 0f;
+            return damage * 60f * efficiency * coolantMultiplier;
+        }
+
+        @Override
         public void draw(){
             Draw.rect(baseRegion, x, y);
             Drawf.shadow(region, x - (size / 2f), y - (size / 2f), rotation - 90);
