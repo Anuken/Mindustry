@@ -119,7 +119,7 @@ public class UnitFactory extends UnitBlock{
                     table.table(req -> {
                         req.left();
                         StatValues.items(plan.requirements).display(req);
-                    }).padLeft(40).left();
+                    }).padLeft(60).left().row();
 
                 }
             }

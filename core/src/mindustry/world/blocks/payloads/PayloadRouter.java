@@ -99,10 +99,10 @@ public class PayloadRouter extends PayloadConveyor{
             super.control(type, p1, p2, p3, p4);
             if(type == LAccess.config){
                 int prev = rotation;
-                rotation = (int)p1;
+                rotation = Mathf.mod((int)p1, 4);
                 //when manually controlled, routers do not turn automatically for a while, same as turrets
                 controlTime = 60f * 6f;
-                if(prev != (int)p1){
+                if(prev != rotation){
                     onProximityUpdate();
                 }
             }
