@@ -71,7 +71,7 @@ public class Blocks{
     melter, separator, disassembler, sporePress, pulverizer, incinerator, coalCentrifuge,
 
     //erekir
-    siliconArcFurnace, electrolyzer, oxidationChamber, atmosphericConcentrator, electricHeater, phaseHeater, heatRedirector, slagIncinerator,
+    siliconArcFurnace, electrolyzer, oxidationChamber, atmosphericConcentrator, electricHeater, slagHeater, phaseHeater, heatRedirector, slagIncinerator,
     carbideCrucible, slagCentrifuge, surgeCrucible, cyanogenSynthesizer, phaseSynthesizer, heatReactor,
 
     //sandbox
@@ -1250,6 +1250,20 @@ public class Blocks{
             heatOutput = 3f;
             regionRotated1 = 1;
             consumePower(50f / 60f);
+        }};
+        
+        slagHeater = new HeatProducer("slag-heater"){{
+            requirements(Category.crafting, with(Items.tungsten, 50, Items.oxide, 20, Items.beryllium, 20));
+
+            researchCostMultiplier = 4f;
+
+            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(Liquids.slag), new DrawDefault(), new DrawHeatOutput());
+            size = 3;
+            liquidCapacity = 40f;
+            rotateDraw = false;
+            regionRotated1 = 1;
+            consumeLiquid(Liquids.slag, 40f / 60f);
+            heatOutput = 6f;
         }};
 
         phaseHeater = new HeatProducer("phase-heater"){{
@@ -3999,8 +4013,6 @@ public class Blocks{
             shootCone = 30f;
             consumeAmmoOnce = true;
 
-            coolant = consumeCoolant(30f / 60f);
-
             drawer = new DrawTurret("reinforced-"){{
                 parts.add(new RegionPart("-side"){{
                     mirror = true;
@@ -4660,6 +4672,7 @@ public class Blocks{
             privileged = true;
             size = 1;
             maxInstructionsPerTick = 100;
+            range = Float.MAX_VALUE;
         }};
 
         worldCell = new MemoryBlock("world-cell"){{
