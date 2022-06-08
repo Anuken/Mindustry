@@ -20,6 +20,10 @@ public class WeaponMount{
     public float heat;
     /** lerps to 1 when shooting, 0 when not */
     public float warmup;
+    /** is the weapon actively charging */
+    public boolean charging;
+    /** counts up to 1 when charging, 0 when not */
+    public float charge;
     /** lerps to reload time */
     public float smoothReload;
     /** aiming position in world coordinates */

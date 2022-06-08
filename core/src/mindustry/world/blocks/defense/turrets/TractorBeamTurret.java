@@ -58,7 +58,7 @@ public class TractorBeamTurret extends BaseTurret{
 
         stats.add(Stat.targetsAir, targetAir);
         stats.add(Stat.targetsGround, targetGround);
-        stats.add(Stat.damage, damage * 60f, StatUnit.perSecond);
+        if(damage > 0) stats.add(Stat.damage, damage * 60f, StatUnit.perSecond);
     }
 
     @Override
@@ -135,6 +135,12 @@ public class TractorBeamTurret extends BaseTurret{
         @Override
         public boolean shouldConsume(){
             return super.shouldConsume() && target != null;
+        }
+
+        @Override
+        public float estimateDps(){
+            if(!any || damage <= 0) return 0f;
+            return damage * 60f * efficiency * coolantMultiplier;
         }
 
         @Override

@@ -3794,7 +3794,7 @@ public class UnitTypes{
                     x = 43f * i / 4f;
                     particles = parts;
                     //visual only, the middle one does the actual suppressing
-                    active = false;
+                    display = active = false;
                 }});
             }
 

@@ -7,7 +7,7 @@ buildscript{
     }
 
     dependencies{
-        classpath 'com.android.tools.build:gradle:7.0.3'
+        classpath 'com.android.tools.build:gradle:7.2.1'
     }
 }
 
@@ -29,8 +29,8 @@ task deploy(type: Copy){
 }
 
 android{
-    buildToolsVersion '30.0.3'
-    compileSdkVersion 30
+    buildToolsVersion '31.0.0'
+    compileSdkVersion 31
     sourceSets{
         main{
             manifest.srcFile 'AndroidManifest.xml'
@@ -56,7 +56,7 @@ android{
 
         applicationId "io.anuke.mindustry"
         minSdkVersion 14
-        targetSdkVersion 30
+        targetSdkVersion 31
         
         versionName versionNameResult
         versionCode = vcode

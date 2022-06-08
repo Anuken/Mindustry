@@ -170,7 +170,7 @@ public class ClassMap{
         classes.put("BaseTurret", mindustry.world.blocks.defense.turrets.BaseTurret.class);
         classes.put("BaseTurretBuild", mindustry.world.blocks.defense.turrets.BaseTurret.BaseTurretBuild.class);
         classes.put("ContinuousLiquidTurret", mindustry.world.blocks.defense.turrets.ContinuousLiquidTurret.class);
-        classes.put("LiquidTurretBuild", mindustry.world.blocks.defense.turrets.ContinuousLiquidTurret.LiquidTurretBuild.class);
+        classes.put("ContinuousLiquidTurretBuild", mindustry.world.blocks.defense.turrets.ContinuousLiquidTurret.ContinuousLiquidTurretBuild.class);
         classes.put("ContinuousTurret", mindustry.world.blocks.defense.turrets.ContinuousTurret.class);
         classes.put("ContinuousTurretBuild", mindustry.world.blocks.defense.turrets.ContinuousTurret.ContinuousTurretBuild.class);
         classes.put("ItemTurret", mindustry.world.blocks.defense.turrets.ItemTurret.class);
