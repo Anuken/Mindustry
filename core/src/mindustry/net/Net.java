@@ -357,7 +357,7 @@ public class Net{
             var srv = records.remove(0);
             var host = srv.getTarget().toString().replaceFirst("\\.$", "");
             var port = srv.getPort();
-            provider.pingHost(host, port, valid, e -> pingSrvHost(records, valid, failed));
+            provider.pingHost(host, port, valid, e -> pingExecutor.submit(() -> pingSrvHost(records, valid, failed)));
         }
     }
 
