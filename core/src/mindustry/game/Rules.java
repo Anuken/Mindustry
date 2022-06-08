@@ -124,7 +124,7 @@ public class Rules{
     public Seq<MapObjective> objectives = new Seq<>();
     /** Flags set by objectives. Used in world processors. n*/
     public ObjectSet<String> objectiveFlags = new ObjectSet<>();
-    /** HIGHLY UNSTABLE/EXPERIMENTAL. DO NOT USE THIS. */
+    /** If true, fog of war is enabled. Enemy units and buildings are hidden unless in radar view. */
     public boolean fog = false;
     /** If fog = true, this is whether static (black) fog is enabled. */
     public boolean staticFog = true;

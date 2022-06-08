@@ -206,8 +206,8 @@ public class StatValues{
 
                 if(item instanceof Block block && block.itemDrop != null && !block.itemDrop.unlocked()) continue;
 
-                l.image(item.uiIcon).size(iconSmall).padRight(2).padLeft(2).padTop(3).padBottom(3);
-                l.add(item.localizedName).left().padLeft(1).padRight(4);
+                if(item.uiIcon.found()) l.image(item.uiIcon).size(iconSmall).padRight(2).padLeft(2).padTop(3).padBottom(3);
+                l.add(item.localizedName).left().padLeft(1).padRight(4).colspan(item.uiIcon.found() ? 1 : 2);
                 if(i % 5 == 4){
                     l.row();
                 }
@@ -220,6 +220,10 @@ public class StatValues{
     }
 
     public static StatValue blocks(Seq<Block> list){
+        return content(list.as());
+    }
+
+    public static StatValue statusEffects(Seq<StatusEffect> list){
         return content(list.as());
     }
 

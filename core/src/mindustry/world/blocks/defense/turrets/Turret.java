@@ -42,7 +42,7 @@ public class Turret extends ReloadTurret{
     /** Ammo units used per shot. */
     public int ammoPerShot = 1;
     /** If true, ammo is only consumed once per shot regardless of bullet count. */
-    public boolean consumeAmmoOnce = false;
+    public boolean consumeAmmoOnce = true;
     /** Minimum input heat required to fire. */
     public float heatRequirement = -1f;
     /** Maximum efficiency possible, if this turret uses heat. */

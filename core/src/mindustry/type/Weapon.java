@@ -204,7 +204,7 @@ public class Weapon implements Cloneable{
             DrawPart.params.sideMultiplier = flipSprite ? -1 : 1;
 
             for(int i = 0; i < parts.size; i++){
-                var part = parts.items[i];
+                var part = parts.get(i);
                 if(part.under){
                     part.draw(DrawPart.params);
                 }
@@ -232,7 +232,7 @@ public class Weapon implements Cloneable{
         if(parts.size > 0){
             //TODO does it need an outline?
             for(int i = 0; i < parts.size; i++){
-                var part = parts.items[i];
+                var part = parts.get(i);
                 if(!part.under){
                     part.draw(DrawPart.params);
                 }

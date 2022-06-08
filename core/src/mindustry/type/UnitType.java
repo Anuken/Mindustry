@@ -566,7 +566,7 @@ public class UnitType extends UnlockableContent{
             var unique = new ObjectSet<String>();
 
             for(Ability a : abilities){
-                if(unique.add(a.localized())){
+                if(a.display && unique.add(a.localized())){
                     stats.add(Stat.abilities, a.localized());
                 }
             }
@@ -609,9 +609,7 @@ public class UnitType extends UnlockableContent{
             if(naval){
                 imm.remove(StatusEffects.wet);
             }
-            for(var i : imm){
-                stats.add(Stat.immunities, i.emoji() + " " + i.localizedName);
-            }
+            stats.add(Stat.immunities, StatValues.statusEffects(imm));
         }
     }
 
