@@ -214,6 +214,7 @@ public class Turret extends ReloadTurret{
         public float heatReq;
         public float[] sideHeat = new float[4];
 
+        @Override
         public float estimateDps(){
             if(!hasAmmo()) return 0f;
             return shoot.shots / reload * 60f * (peekAmmo() == null ? 0f : peekAmmo().estimateDPS()) * potentialEfficiency * timeScale;
