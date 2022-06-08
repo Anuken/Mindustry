@@ -144,7 +144,7 @@ public class PlacementFragment{
             }
         }
 
-        if(ui.chatfrag.shown() || Core.scene.hasKeyboard()) return false;
+        if(ui.chatfrag.shown() || ui.consolefrag.shown() || Core.scene.hasKeyboard()) return false;
 
         for(int i = 0; i < blockSelect.length; i++){
             if(Core.input.keyTap(blockSelect[i])){

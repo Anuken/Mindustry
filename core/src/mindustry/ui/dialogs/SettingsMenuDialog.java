@@ -358,6 +358,10 @@ public class SettingsMenuDialog extends BaseDialog{
             }
         }
 
+        if(!mobile){
+            game.checkPref("console", false);
+        }
+
         int[] lastUiScale = {settings.getInt("uiscale", 100)};
 
         graphics.sliderPref("uiscale", 100, 25, 300, 25, s -> {

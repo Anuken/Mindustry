@@ -18,7 +18,7 @@ import mindustry.ui.*;
 import static arc.Core.*;
 import static mindustry.Vars.*;
 
-public class ScriptConsoleFragment extends Table{
+public class ConsoleFragment extends Table{
     private static final int messagesShown = 30;
     private Seq<String> messages = new Seq<>();
     private boolean open = false, shown;
@@ -33,14 +33,14 @@ public class ScriptConsoleFragment extends Table{
     private int historyPos = 0;
     private int scrollPos = 0;
 
-    public ScriptConsoleFragment(){
+    public ConsoleFragment(){
         setFillParent(true);
         font = Fonts.def;
 
         visible(() -> {
-            if(input.keyTap(Binding.console)  && (scene.getKeyboardFocus() == chatfield || scene.getKeyboardFocus() == null) && !ui.chatfrag.shown()){
+            if(input.keyTap(Binding.console) && settings.getBool("console") && (scene.getKeyboardFocus() == chatfield || scene.getKeyboardFocus() == null) && !ui.chatfrag.shown()){
                 shown = !shown;
-                if(shown && !open && enableConsole){
+                if(shown && !open && settings.getBool("console")){
                     toggle();
                 }
                 if(shown){
@@ -53,7 +53,7 @@ public class ScriptConsoleFragment extends Table{
         });
 
         update(() -> {
-            if(input.keyTap(Binding.chat) && enableConsole && (scene.getKeyboardFocus() == chatfield || scene.getKeyboardFocus() == null)){
+            if(input.keyTap(Binding.chat) && settings.getBool("console") && (scene.getKeyboardFocus() == chatfield || scene.getKeyboardFocus() == null)){
                 toggle();
             }
 
