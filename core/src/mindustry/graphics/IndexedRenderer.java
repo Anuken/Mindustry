@@ -215,6 +215,5 @@ public class IndexedRenderer implements Disposable{
     @Override
     public void dispose(){
         mesh.dispose();
-        program.dispose();
     }
 }
