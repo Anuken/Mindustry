@@ -34,6 +34,7 @@ jobs:
           git push
         fi
     - name: Update JITpack repo
+      if: ${{ github.repository == 'Anuken/Mindustry' }}
       run: |
         cd ../
         cp -r ./Mindustry ./MindustryJitpack

@@ -188,12 +188,15 @@ public class Mods implements Loadable{
             if(!prefix && !Core.atlas.has(name)){
                 Log.warn("Sprite '@' in mod '@' attempts to override a non-existent sprite. Ignoring.", name, mod.name);
                 continue;
-            }
 
-            //TODO !!! document this on the wiki !!!
-            //do not allow packing standard outline sprites for now, they are no longer necessary and waste space!
-            //TODO also full regions are bad:  || name.endsWith("-full")
-            if(prefix && (name.endsWith("-outline"))) continue;
+                //(horrible code below)
+            }else if(prefix && name.endsWith("-outline") && file.path().contains("units") && !file.path().contains("blocks")){
+                Log.warn("Sprite '@' in mod '@' is likely to be an unnecessary unit outline. These should not be separate sprites. Ignoring.", name, mod.name);
+                //TODO !!! document this on the wiki !!!
+                //do not allow packing standard outline sprites for now, they are no longer necessary and waste space!
+                //TODO also full regions are bad:  || name.endsWith("-full")
+                continue;
+            }
 
             //read and bleed pixmaps in parallel
             tasks.add(mainExecutor.submit(() -> {
