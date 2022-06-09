@@ -3,16 +3,8 @@
     "address": "be.mindustry.nydus.app:6567"
   },
   {
-    "address": "130.61.226.9"
-  },
-  {
-    "address": "130.61.226.9:7777"
-  },
-  {
-    "address": "0.baseduser.eu.org:7777"
-  },
-  {
-    "address": "0.baseduser.eu.org:42001"
+    "name": "mindustry.pl",
+    "address": ["130.61.190.181:6567", "130.61.190.181:7777", "0.baseduser.eu.org:7777", "0.baseduser.eu.org:42001"]
   },
   {
     "address": "v7.mindurka.tk:9999"
@@ -21,6 +13,12 @@
     "address": "c-n.ddns.net:6567"
   },
   {
-    "address": "xpdustry.fr:8000"
+    "address": "n1.xpdustry.fr:8000"
+  },
+  {
+    "address": "mindustry.vicp.io:7000" 
+  },
+  {
+    "address": "node2.crewcraft.cc:25569"
   }
 ]

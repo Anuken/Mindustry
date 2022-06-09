@@ -36,9 +36,8 @@ public interface Payload extends Position{
     /** @return the time taken to build this payload. */
     float buildTime();
 
-    /** update this payload if it is a block
-     * @param inUnit whether this payload is in a unit */
-    default void update(boolean inUnit){}
+    /** update this payload inside a container unit or building. either can be null. */
+    default void update(@Nullable Unit unitHolder, @Nullable Building buildingHolder){}
 
     /** @return whether this payload was dumped. */
     default boolean dump(){

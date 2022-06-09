@@ -65,6 +65,9 @@ public class ContentParser{
             if(data.isString()){
                 return field(Fx.class, data);
             }
+            if(data.isArray()){
+                return new MultiEffect(parser.readValue(Effect[].class, data));
+            }
             Class<? extends Effect> bc = resolve(data.getString("type", ""), ParticleEffect.class);
             data.remove("type");
             Effect result = make(bc);
@@ -105,9 +108,9 @@ public class ContentParser{
             if(data.isString()){
                 return field(Bullets.class, data);
             }
-            var bc = resolve(data.getString("type", ""), BasicBulletType.class);
+            Class<?> bc = resolve(data.getString("type", ""), BasicBulletType.class);
             data.remove("type");
-            BulletType result = make(bc);
+            BulletType result = (BulletType)make(bc);
             readFields(result, data);
             return result;
         });
@@ -147,7 +150,7 @@ public class ContentParser{
             return result;
         });
         put(DrawPart.class, (type, data) -> {
-            var bc = resolve(data.getString("type", ""), RegionPart.class);
+            Class<?> bc = resolve(data.getString("type", ""), RegionPart.class);
             data.remove("type");
             var result = make(bc);
             readFields(result, data);
@@ -185,7 +188,7 @@ public class ContentParser{
                 case "delay" -> base.delay(data.getFloat("amount"));
                 case "sustain" -> base.sustain(data.getFloat("offset", 0f), data.getFloat("grow", 0f), data.getFloat("sustain"));
                 case "shorten" -> base.shorten(data.getFloat("amount"));
-                case "add" -> base.add(data.getFloat("amount"));
+                case "add" -> data.has("amount") ? base.add(data.getFloat("amount")) : base.add(parser.readValue(PartProgress.class, data.get("other")));
                 case "blend" -> base.blend(parser.readValue(PartProgress.class, data.get("other")), data.getFloat("amount"));
                 case "mul" -> base.mul(parser.readValue(PartProgress.class, data.get("other")));
                 case "min" -> base.min(parser.readValue(PartProgress.class, data.get("other")));
@@ -279,7 +282,6 @@ public class ContentParser{
             readFields(obj, data);
             return obj;
         });
-
         put(Ability.class, (type, data) -> {
             Class<? extends Ability> oc = resolve(data.getString("type", ""));
             data.remove("type");
@@ -400,10 +402,14 @@ public class ContentParser{
                             case "itemRadioactive" -> block.consume((Consume)parser.readValue(ConsumeItemRadioactive.class, child));
                             case "itemExplosive" -> block.consume((Consume)parser.readValue(ConsumeItemExplosive.class, child));
                             case "itemExplode" -> block.consume((Consume)parser.readValue(ConsumeItemExplode.class, child));
-                            case "items" -> block.consume((Consume)parser.readValue(ConsumeItems.class, child));
+                            case "items" -> block.consume(child.isArray() ?
+                                    new ConsumeItems(parser.readValue(ItemStack[].class, child)) :
+                                    parser.readValue(ConsumeItems.class, child));
                             case "liquidFlammable" -> block.consume((Consume)parser.readValue(ConsumeLiquidFlammable.class, child));
                             case "liquid" -> block.consume((Consume)parser.readValue(ConsumeLiquid.class, child));
-                            case "liquids" -> block.consume((Consume)parser.readValue(ConsumeLiquids.class, child));
+                            case "liquids" -> block.consume(child.isArray() ?
+                                    new ConsumeLiquids(parser.readValue(LiquidStack[].class, child)) :
+                                    parser.readValue(ConsumeLiquids.class, child));
                             case "coolant" -> block.consume((Consume)parser.readValue(ConsumeCoolant.class, child));
                             case "power" -> {
                                 if(child.isNumber()){
@@ -438,7 +444,13 @@ public class ContentParser{
 
             UnitType unit;
             if(locate(ContentType.unit, name) == null){
-                unit = new UnitType(mod + "-" + name);
+
+                unit = make(resolve(value.getString("class", ""), UnitType.class), mod + "-" + name);
+
+                if(value.has("class")){
+                    value.remove("class");
+                }
+
                 var typeVal = value.get("type");
 
                 if(typeVal != null && !typeVal.isString()){
@@ -471,8 +483,8 @@ public class ContentParser{
 
                 }
 
-                if(value.has("controller")){
-                    unit.aiController = supply(resolve(value.getString("controller"), FlyingAI.class));
+                if(value.has("controller") || value.has("aiController")){
+                    unit.aiController = supply(resolve(value.getString("controller", value.getString("aiController", "")), FlyingAI.class));
                     value.remove("controller");
                 }
 
@@ -559,7 +571,8 @@ public class ContentParser{
             case "tank" -> TankUnit::create;
             case "hover" -> ElevationMoveUnit::create;
             case "tether" -> BuildingTetherPayloadUnit::create;
-            default -> throw new RuntimeException("Invalid unit type: '" + value + "'. Must be 'flying/mech/legs/naval/payload/missile/tether'.");
+            case "crawl" -> CrawlUnit::create;
+            default -> throw new RuntimeException("Invalid unit type: '" + value + "'. Must be 'flying/mech/legs/naval/payload/missile/tether/crawl'.");
         };
     }
 
@@ -887,7 +900,7 @@ public class ContentParser{
                 researchName = research.asString();
                 customRequirements = null;
             }else{
-                researchName = research.getString("parent");
+                researchName = research.getString("parent", null);
                 customRequirements = research.has("requirements") ? parser.readValue(ItemStack[].class, research.get("requirements")) : null;
             }
 
@@ -923,18 +936,28 @@ public class ContentParser{
                     node.setupRequirements(unlock.researchRequirements());
                 }
 
-                //find parent node.
-                TechNode parent = TechTree.all.find(t -> t.content.name.equals(researchName) || t.content.name.equals(currentMod.name + "-" + researchName) || t.content.name.equals(SaveVersion.mapFallback(researchName)));
-
-                if(parent == null){
-                    Log.warn("Content '" + researchName + "' isn't in the tech tree, but '" + unlock.name + "' requires it to be researched.");
+                if(research.getBoolean("root", false)){
+                    node.name = research.getString("name", unlock.name);
+                    node.requiresUnlock = research.getBoolean("requiresUnlock", false);
+                    TechTree.roots.add(node);
                 }else{
-                    //add this node to the parent
-                    if(!parent.children.contains(node)){
-                        parent.children.add(node);
+                    if(researchName != null){
+                        //find parent node.
+                        TechNode parent = TechTree.all.find(t -> t.content.name.equals(researchName) || t.content.name.equals(currentMod.name + "-" + researchName) || t.content.name.equals(SaveVersion.mapFallback(researchName)));
+
+                        if(parent == null){
+                            Log.warn("Content '" + researchName + "' isn't in the tech tree, but '" + unlock.name + "' requires it to be researched.");
+                        }else{
+                            //add this node to the parent
+                            if(!parent.children.contains(node)){
+                                parent.children.add(node);
+                            }
+                            //reparent the node
+                            node.parent = parent;
+                        }
+                    }else{
+                        Log.warn(unlock.name + " is not a root node, and does not have a `parent: ` property. Ignoring.");
                     }
-                    //reparent the node
-                    node.parent = parent;
                 }
             });
         }

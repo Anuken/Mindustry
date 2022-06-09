@@ -8,7 +8,6 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 
-/** Not standalone. */
 public class DrawRegion extends DrawBlock{
     public TextureRegion region;
     public String suffix = "";

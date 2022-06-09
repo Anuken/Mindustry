@@ -16,7 +16,7 @@ import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.ui.*;
 import mindustry.world.*;
-import mindustry.world.blocks.defense.turrets.Turret.*;
+import mindustry.world.blocks.defense.turrets.BaseTurret.*;
 import mindustry.world.blocks.storage.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 import mindustry.world.meta.*;
@@ -277,9 +277,9 @@ public class RtsAI{
         float extraRadius = 50f;
 
         for(var turret : Vars.indexer.getEnemy(data.team, BlockFlag.turret)){
-            if(Intersector.distanceSegmentPoint(fromX, fromY,  x, y, turret.x, turret.y) <= ((TurretBuild)turret).range() + extraRadius){
-                health[0] += turret.health;
-                dps[0] += ((TurretBuild)turret).estimateDps();
+            if(turret instanceof BaseTurretBuild t && Intersector.distanceSegmentPoint(fromX, fromY,  x, y, t.x, t.y) <= t.range() + extraRadius){
+                health[0] += t.health;
+                dps[0] += t.estimateDps();
             }
         }
 

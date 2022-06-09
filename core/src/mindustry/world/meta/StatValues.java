@@ -70,7 +70,7 @@ public class StatValues{
 
     public static StatValue liquids(Boolf<Liquid> filter, float amount, boolean perSecond){
         return table -> {
-            Seq<Liquid> list = content.liquids().select(i -> filter.get(i) && i.unlockedNow());
+            Seq<Liquid> list = content.liquids().select(i -> filter.get(i) && i.unlockedNow() && !i.isHidden());
 
             for(int i = 0; i < list.size; i++){
                 table.add(new LiquidDisplay(list.get(i), amount, perSecond)).padRight(5);
@@ -120,7 +120,7 @@ public class StatValues{
 
     public static StatValue items(float timePeriod, Boolf<Item> filter){
         return table -> {
-            Seq<Item> list = content.items().select(i -> filter.get(i) && i.unlockedNow());
+            Seq<Item> list = content.items().select(i -> filter.get(i) && i.unlockedNow() && !i.isHidden());
 
             for(int i = 0; i < list.size; i++){
                 Item item = list.get(i);
@@ -204,10 +204,10 @@ public class StatValues{
             for(int i = 0; i < list.size; i++){
                 var item = list.get(i);
 
-                if(item instanceof Block block && block.itemDrop != null && !block.itemDrop.unlocked()) continue;
+                if(item instanceof Block block && block.itemDrop != null && !block.itemDrop.unlockedNow()) continue;
 
-                l.image(item.uiIcon).size(iconSmall).padRight(2).padLeft(2).padTop(3).padBottom(3);
-                l.add(item.localizedName).left().padLeft(1).padRight(4);
+                if(item.uiIcon.found()) l.image(item.uiIcon).size(iconSmall).padRight(2).padLeft(2).padTop(3).padBottom(3);
+                l.add(item.localizedName).left().padLeft(1).padRight(4).colspan(item.uiIcon.found() ? 1 : 2);
                 if(i % 5 == 4){
                     l.row();
                 }
@@ -220,6 +220,10 @@ public class StatValues{
     }
 
     public static StatValue blocks(Seq<Block> list){
+        return content(list.as());
+    }
+
+    public static StatValue statusEffects(Seq<StatusEffect> list){
         return content(list.as());
     }
 

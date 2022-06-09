@@ -24,6 +24,7 @@ public class MoveEffectAbility extends Ability{
         this.color = color;
         this.effect = effect;
         this.interval = interval;
+        display = false;
     }
 
     public MoveEffectAbility(){
