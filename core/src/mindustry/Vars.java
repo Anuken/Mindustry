@@ -150,8 +150,6 @@ public class Vars implements Loadable{
     public static int maxTextureSize = 2048;
     /** Maximum schematic size.*/
     public static int maxSchematicSize = 32;
-    /** Maximum distance the camera can be from the player unit before it starts to follow it */
-    public static float unitAttractDst = 15f;
     /** Whether to show sector info upon landing. */
     public static boolean showSectorLandInfo = true;
     /** Whether to check for memory use before taking screenshots. */
@@ -176,6 +174,8 @@ public class Vars implements Loadable{
     public static boolean clearSectors = false;
     /** whether any light rendering is enabled */
     public static boolean enableLight = true;
+    /** Whether to make the player unit follow the camera */
+    public static boolean mobileFreecam = false;
     /** Whether to draw shadows of blocks at map edges and static blocks.
      * Do not change unless you know exactly what you are doing.*/
     public static boolean enableDarkness = true;
