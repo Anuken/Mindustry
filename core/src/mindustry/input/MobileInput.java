@@ -927,7 +927,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }
 
         targetPos.set(Core.camera.position);
-        float attractDst = unitAttractDst;
+        float attractDst = mobileFreecam ? Float.MAX_VALUE : 15f;
 
         float speed = unit.speed();
         float range = unit.hasWeapons() ? unit.range() : 0f;
