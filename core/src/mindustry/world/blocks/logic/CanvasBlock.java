@@ -56,6 +56,8 @@ public class CanvasBlock extends Block{
         public byte[] data = new byte[Mathf.ceil(canvasSize * canvasSize * bitsPerPixel / 8f)];
 
         public void updateTexture(){
+            if(headless) return;
+
             Pixmap pix = makePixmap();
             if(texture != null){
                 texture.draw(pix);

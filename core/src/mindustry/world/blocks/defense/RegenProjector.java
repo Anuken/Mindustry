@@ -128,7 +128,7 @@ public class RegenProjector extends Block{
             if(efficiency > 0){
                 if((optionalTimer += Time.delta * optionalEfficiency) >= optionalUseTime){
                     consume();
-                    optionalUseTime = 0f;
+                    optionalTimer = 0f;
                 }
 
                 float healAmount = Mathf.lerp(1f, optionalMultiplier, optionalEfficiency) * healPercent;

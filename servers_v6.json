@@ -9,7 +9,7 @@
   },
   {
     "name": "Yeet Hosting",
-    "address": ["node2.crewcraft.cc:25568", "node2.crewcraft.cc:25570","node2.crewcraft.cc:25568" , "node5.crewcraft.cc:25567" ,"node5.crewcraft.cc:25566", "node3.crewcraft.cc:25568"]
+    "address": ["node2.crewcraft.cc:25568", "node2.crewcraft.cc:25570","node2.crewcraft.cc:25568" , "node2.crewcraft.cc:6568" ,"node2.crewcraft.cc:6567"]
   },
   {
     "name": "RCM",
@@ -20,8 +20,8 @@
     "address": ["tendhost.ddns.net"]
   },
   {
-    "name": "Atanner",
-    "address": ["atannergaming.com:13000"]
+    "name": "Atanner Gaming",
+    "address": ["mindustry.atannergaming.com:6567", "mindustry.atannergaming.com:6700", "mindustry.atannergaming.com:9000"]
   },
   {
     "name": "C.A.M.S.",
@@ -113,7 +113,7 @@
   },
   {
     "name": "CreateDustry",
-    "address": ["129.151.66.139:26032"]
+    "address": ["129.151.64.81:26032"]
   },
   {
     "name": "NukeDustry",

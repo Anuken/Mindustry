@@ -17,6 +17,7 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 
+import static arc.Core.*;
 import static mindustry.Vars.*;
 
 public class DatabaseDialog extends BaseDialog{
@@ -98,7 +99,7 @@ public class DatabaseDialog extends BaseDialog{
                                 ui.content.show(unlock);
                             }
                         });
-                        image.addListener(new Tooltip(t -> t.background(Tex.button).add(unlock.localizedName + (enableConsole ? "\n[gray]" + unlock.name : ""))));
+                        image.addListener(new Tooltip(t -> t.background(Tex.button).add(unlock.localizedName + (settings.getBool("console") ? "\n[gray]" + unlock.name : ""))));
                     }
 
                     if((++count) % cols == 0){
