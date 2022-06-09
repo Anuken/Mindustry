@@ -150,6 +150,8 @@ public class Vars implements Loadable{
     public static int maxTextureSize = 2048;
     /** Maximum schematic size.*/
     public static int maxSchematicSize = 32;
+    /** Maximum distance the camera can be from the player unit before it starts to follow it */
+    public static float unitAttractDst = 15f;
     /** Whether to show sector info upon landing. */
     public static boolean showSectorLandInfo = true;
     /** Whether to check for memory use before taking screenshots. */
