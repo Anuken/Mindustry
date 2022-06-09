@@ -14,7 +14,7 @@ public enum BuildVisibility{
     lightingOnly(() -> Vars.state == null || Vars.state.rules.lighting || Vars.state.isCampaign()),
     berylliumOnly(() -> !Vars.state.rules.hiddenBuildItems.contains(Items.beryllium)),
     ammoOnly(() -> Vars.state == null || Vars.state.rules.unitAmmo),
-    fogOnly(() -> Vars.state == null || Vars.state.rules.fog);
+    fogOnly(() -> Vars.state == null || Vars.state.rules.fog || Vars.state.rules.editor);
 
     private final Boolp visible;
 

@@ -99,8 +99,8 @@ public class MultiPacker implements Disposable{
     //rubble page - scorch textures for unit deaths & wrecks
     //ui page (sprites5.png) - content icons, white icons, fonts and UI elements
     public enum PageType{
-        //main page can be massive.
-        main(8192),
+        //main page can be massive, but 8192 throws GL_OUT_OF_MEMORY on some GPUs and I can't deal with it yet.
+        main(4096),
 
         environment(4096, 2048),
         editor(4096, 2048),

@@ -74,12 +74,11 @@ public class ThermalGenerator extends PowerGenerator{
 
     @Override
     public TextureRegion[] icons(){
-        return spinners ? new TextureRegion[]{region, rotatorRegion} : super.makeIconRegions();
+        return spinners ? new TextureRegion[]{region, rotatorRegion} : super.icons();
     }
 
     public class ThermalGeneratorBuild extends GeneratorBuild{
-        public float sum;
-        public float spinRotation;
+        public float sum, spinRotation;
 
         @Override
         public void updateTile(){

@@ -148,7 +148,7 @@ public class SectorPresets{
                         new TextMarker("Use [accent]cliff crushers[] to mine sand.", 262f * 8f, 88f * 8f)
                     ),
                     new BuildCountObjective(Blocks.tankFabricator, 1).withMarkers(
-                        new TextMarker("Use [accent]units[] to explore the map, defend buildings, and go on the offensive.\n Research and place a [accent]fabricator[]", 258f * 8f, 116f * 8f)
+                        new TextMarker("Use [accent]units[] to explore the map, defend buildings, and go on the offensive.\n Research and place a [accent]tank fabricator[].", 258f * 8f, 116f * 8f)
                     ),
                     new UnitCountObjective(UnitTypes.stell, 1).withMarkers(
                         new TextMarker("Produce a unit.\nUse the \"?\" button to see selected factory requirements.", 258f * 8f, 116f * 8f)
@@ -160,7 +160,7 @@ public class SectorPresets{
                         new TextMarker("Units are effective, but [accent]turrets[] provide better defensive capabilities if used effectively.\n Place a [accent]Breach[] turret.\nTurrets require [accent]ammo[].", 258f * 8f, 114f * 8f)
                     ),
                     new BuildCountObjective(Blocks.berylliumWall, 6).withMarkers(
-                        new TextMarker("[accent]Walls[] can prevent oncoming damage from reaching buildings\nPlace some [accent]beryllium walls[] around the turret.", 276f * 8f, 133f * 8f)
+                        new TextMarker("[accent]Walls[] can prevent oncoming damage from reaching buildings.\nPlace some [accent]beryllium walls[] around the turret.", 276f * 8f, 133f * 8f)
                     ),
                     new TimerObjective("@objective.enemiesapproaching",30 * 60).withMarkers(
                         new TextMarker("Enemy incoming, prepare to defend.", 276f * 8f, 133f * 8f)

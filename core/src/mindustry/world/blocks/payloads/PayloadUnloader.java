@@ -48,7 +48,7 @@ public class PayloadUnloader extends PayloadLoader{
         @Override
         public void updateTile(){
             if(payload != null){
-                payload.update(false);
+                payload.update(null, this);
             }
             lastOutputPower = 0f;
 
@@ -114,7 +114,7 @@ public class PayloadUnloader extends PayloadLoader{
         public boolean shouldExport(){
             return payload != null && (
                 (!payload.block().hasItems || payload.build.items.empty()) &&
-                (!payload.block().hasLiquids || payload.build.liquids.currentAmount() <= 0.001f) &&
+                (!payload.block().hasLiquids || payload.build.liquids.currentAmount() <= 0.011f) &&
                 (!hasBattery() || payload.build.power.status <= 0.0000001f)
             );
         }

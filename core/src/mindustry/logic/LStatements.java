@@ -1585,7 +1585,7 @@ public class LStatements{
 
             fields(table, "team", team, s -> team = s);
 
-            if(type != FetchType.coreCount && type != FetchType.playerCount && type != FetchType.unitCount){
+            if(type != FetchType.coreCount && type != FetchType.playerCount && type != FetchType.unitCount && type != FetchType.buildCount){
                 table.add(" # ");
 
                 row(table);

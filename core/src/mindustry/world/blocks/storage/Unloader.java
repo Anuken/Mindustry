@@ -259,7 +259,7 @@ public class Unloader extends Block{
         public void read(Reads read, byte revision){
             super.read(read, revision);
             int id = revision == 1 ? read.s() : read.b();
-            sortItem = id == -1 ? null : content.items().get(id);
+            sortItem = id == -1 ? null : content.item(id);
         }
     }
 }
