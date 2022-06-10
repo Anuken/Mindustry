@@ -219,7 +219,7 @@ public class LoadDialog extends BaseDialog{
                 }catch(SaveException e){
                     Log.err(e);
                     logic.reset();
-                    ui.showErrorMessage("@save.corrupted");
+                    ui.showErrorMessage("@save.corrupted.title");
                 }
             });
         });
