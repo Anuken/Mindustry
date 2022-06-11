@@ -20,6 +20,10 @@
     "address": ["tendhost.ddns.net", "smokeofanarchy.ru:7576"]
   },
   {
+    "name": "SMokeOfAnarchy",
+    "address": ["strider.smokeofanarchy.ru:6566"]
+  },
+  {
     "name": "Atanner Gaming",
     "address": ["mindustry.atannergaming.com:6567", "mindustry.atannergaming.com:6700", "mindustry.atannergaming.com:9000"]
   },
