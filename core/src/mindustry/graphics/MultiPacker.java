@@ -102,10 +102,10 @@ public class MultiPacker implements Disposable{
         //main page can be massive, but 8192 throws GL_OUT_OF_MEMORY on some GPUs and I can't deal with it yet.
         main(4096),
 
-        environment(4096, 2048),
-        editor(4096, 2048),
+        environment(2048, 2048),
+        editor(2048, 2048),
         rubble(4096, 2048),
-        ui(4096);
+        ui(2048);
 
         public static final PageType[] all = values();
 

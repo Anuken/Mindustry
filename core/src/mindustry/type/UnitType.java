@@ -884,6 +884,34 @@ public class UnitType extends UnlockableContent{
                 }
             }
         }
+
+        //TODO test
+        if(sample instanceof Tankc){
+            PixmapRegion pix = Core.atlas.getPixmap(treadRegion);
+
+            for(int r = 0; r < treadRects.length; r++){
+                Rect treadRect = treadRects[r];
+                //slice is always 1 pixel wide
+                Pixmap slice = pix.crop((int)(treadRect.x + pix.width/2f), (int)(treadRect.y + pix.height/2f), 1, (int)treadRect.height);
+                int frames = treadFrames;
+                for(int i = 0; i < frames; i++){
+                    int pullOffset = treadPullOffset;
+                    Pixmap frame = new Pixmap(slice.width, slice.height);
+                    for(int y = 0; y < slice.height; y++){
+                        int idx = y + i;
+                        if(idx >= slice.height){
+                            idx -= slice.height;
+                            idx += pullOffset;
+                            idx = Mathf.mod(idx, slice.height);
+                        }
+
+                        frame.setRaw(0, y, slice.getRaw(0, idx));
+                    }
+
+                    packer.add(PageType.main, name + "-treads" + r + "-" + i, frame);
+                }
+            }
+        }
     }
 
     /** @return the time required to build this unit, as a value that takes into account reconstructors */
