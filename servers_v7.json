@@ -9,7 +9,7 @@
   },
   {
     "name": "SMokeOfAnarchy",
-    "address": "strider.SMokeOfAnarchy.ru"
+    "address": ["SMokeOfAnarchy.ru", "strider.smokeofanarchy.ru"]
   },
   {
     "name": "hexpvp.ml",
