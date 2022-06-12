@@ -46,7 +46,8 @@ public class ShapePart extends DrawPart{
             }else if(color != null){
                 Draw.color(color);
             }
-            if(hollow){
+            
+            if(!hollow){
                 if(!circle){
                     Fill.poly(rx, ry, sides, rad, moveRot * prog * sign + params.rotation - 90 * sign + rotation * sign);
                 }else{
