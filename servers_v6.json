@@ -21,7 +21,7 @@
   },
   {
     "name": "SMokeOfAnarchy",
-    "address": ["smokeofanarchy.ru:6566"]
+    "address": ["smokeofanarchy.ru:6566", "strider.smokeofanarchy.ru:6566"]
   },
   {
     "name": "Atanner Gaming",
