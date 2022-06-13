@@ -595,8 +595,9 @@ public class UI implements ApplicationListener, Loadable{
     }
 
     public static String formatAmount(long number){
-        //prevent overflow
-        if(number == Long.MIN_VALUE) number ++;
+        //prevent things like bars displaying erroneous representations of casted infinities
+        if(number == Long.MAX_VALUE) return "+∞";
+        if(number == Long.MIN_VALUE) return "-∞";
 
         long mag = Math.abs(number);
         String sign = number < 0 ? "-" : "";
