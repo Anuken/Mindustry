@@ -56,6 +56,8 @@ public class Rules{
     public boolean unitCapVariable = true;
     /** If true, unit spawn points are shown. */
     public boolean showSpawns = false;
+    /** Multiplies power output of solar panels. */
+    public float solarMultiplier = 1f;
     /** How fast unit factories build units. */
     public float unitBuildSpeedMultiplier = 1f;
     /** How much damage any other units deal. */
