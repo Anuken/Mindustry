@@ -34,7 +34,7 @@ public class RepairTower extends Block{
     public void setStats(){
         super.setStats();
 
-        stats.add(Stat.range, range, StatUnit.blocks);
+        stats.add(Stat.range, range / tilesize, StatUnit.blocks);
         stats.add(Stat.repairSpeed, healAmount * 60f, StatUnit.perSecond);
     }
 
