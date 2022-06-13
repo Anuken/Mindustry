@@ -32,6 +32,8 @@ public abstract class UnlockableContent extends MappableContent{
     public boolean inlineDescription = true;
     /** Whether details of blocks are hidden in custom games if they haven't been unlocked in campaign mode. */
     public boolean hideDetails = true;
+    /** If false, all icon generation is disabled for this content; createIcons is not called. */
+    public boolean generateIcons = true;
     /** Special logic icon ID. */
     public int iconId = 0;
     /** Icon of the content to use in UI. */

@@ -857,6 +857,8 @@ public class UnitType extends UnlockableContent{
         var toOutline = new Seq<TextureRegion>();
         getRegionsToOutline(toOutline);
 
+        boolean separateOutline = weapons.contains(w -> !w.top);
+
         for(var region : toOutline){
             if(region instanceof AtlasRegion atlas){
                 String regionName = atlas.name;
@@ -869,9 +871,13 @@ public class UnitType extends UnlockableContent{
         }
 
         if(outlines){
+            Seq<TextureRegion> outlineSeq = Seq.with(region, jointRegion, footRegion, baseJointRegion, legRegion, treadRegion);
+            if(Core.atlas.has(name + "-leg-base")){
+                outlineSeq.add(legBaseRegion);
+            }
 
             //note that mods with these regions already outlined will have *two* outlines made, which is... undesirable
-            for(var outlineTarget : new TextureRegion[]{region, jointRegion, footRegion, legBaseRegion, baseJointRegion, legRegion, treadRegion}){
+            for(var outlineTarget : outlineSeq){
                 if(!outlineTarget.found()) continue;
 
                 makeOutline(PageType.main, packer, outlineTarget, alwaysCreateOutline && region == outlineTarget, outlineColor, outlineRadius);
@@ -880,7 +886,7 @@ public class UnitType extends UnlockableContent{
             for(Weapon weapon : weapons){
                 if(!weapon.name.isEmpty()){
                     //TODO makeNew isn't really necessary here is it
-                    makeOutline(PageType.main, packer, weapon.region, true, outlineColor, outlineRadius);
+                    makeOutline(PageType.main, packer, weapon.region, separateOutline, outlineColor, outlineRadius);
                 }
             }
         }
