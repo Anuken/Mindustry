@@ -42,6 +42,8 @@ public class Rules{
     public boolean coreCapture = false;
     /** Whether reactors can explode and damage other blocks. */
     public boolean reactorExplosions = true;
+    /** Whether to allow manual unit control. */
+    public boolean possessionAllowed = true;
     /** Whether schematics are allowed. */
     public boolean schematicsAllowed = true;
     /** Whether friendly explosions can occur and set fire/damage other blocks. */
