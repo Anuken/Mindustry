@@ -100,16 +100,19 @@ public abstract class UnlockableContent extends MappableContent{
         if(region instanceof AtlasRegion at && region.found()){
             String name = at.name;
             if(!makeNew || !packer.has(name + "-outline")){
-                PixmapRegion base = Core.atlas.getPixmap(region);
-                var result = Pixmaps.outline(base, outlineColor, outlineRadius);
-                Drawf.checkBleed(result);
-                packer.add(page, name + (makeNew ? "-outline" : ""), result);
+                String regName = name + (makeNew ? "-outline" : "");
+                if(packer.registerOutlined(regName)){
+                    PixmapRegion base = Core.atlas.getPixmap(region);
+                    var result = Pixmaps.outline(base, outlineColor, outlineRadius);
+                    Drawf.checkBleed(result);
+                    packer.add(page, regName, result);
+                }
             }
         }
     }
 
     protected void makeOutline(MultiPacker packer, TextureRegion region, String name, Color outlineColor, int outlineRadius){
-        if(region.found()){
+        if(region.found() && packer.registerOutlined(name)){
             PixmapRegion base = Core.atlas.getPixmap(region);
             var result = Pixmaps.outline(base, outlineColor, outlineRadius);
             Drawf.checkBleed(result);
