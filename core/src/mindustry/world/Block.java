@@ -1305,7 +1305,7 @@ public class Block extends UnlockableContent implements Senseable{
 
             editorBase = new PixmapRegion(base);
         }else{
-            editorBase = Core.atlas.getPixmap(gen[0]);
+            editorBase = gen[0] == null ? Core.atlas.getPixmap(fullIcon) : Core.atlas.getPixmap(gen[0]);
         }
 
         packer.add(PageType.editor, name + "-icon-editor", editorBase);
