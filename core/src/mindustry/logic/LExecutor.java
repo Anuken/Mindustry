@@ -622,7 +622,7 @@ public class LExecutor{
             int address = exec.numi(position);
             Building from = exec.building(target);
 
-            if(from instanceof MemoryBuild mem && from.team == exec.team){
+            if(from instanceof MemoryBuild mem && (exec.privileged || from.team == exec.team)){
 
                 exec.setnum(output, address < 0 || address >= mem.memory.length ? 0 : mem.memory[address]);
             }
@@ -646,7 +646,7 @@ public class LExecutor{
             int address = exec.numi(position);
             Building from = exec.building(target);
 
-            if(from instanceof MemoryBuild mem && from.team == exec.team){
+            if(from instanceof MemoryBuild mem && (exec.privileged || from.team == exec.team)){
 
                 if(address >= 0 && address < mem.memory.length){
                     mem.memory[address] = exec.num(value);
@@ -733,7 +733,7 @@ public class LExecutor{
             int sortDir = exec.bool(sortOrder) ? 1 : -1;
             LogicAI ai = null;
 
-            if(base instanceof Ranged r && r.team() == exec.team &&
+            if(base instanceof Ranged r && (exec.privileged || r.team() == exec.team) &&
                 (base instanceof Building || (ai = UnitControlI.checkLogicAI(exec, base)) != null)){ //must be a building or a controllable unit
                 float range = r.range();
 
