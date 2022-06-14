@@ -208,6 +208,8 @@ public class CustomRulesDialog extends BaseDialog{
             numberi("h", h -> state.rules.limitHeight = h, () -> state.rules.limitHeight, () -> state.rules.limitMapArea, 0, 10000);
         }
 
+        number("@rules.solarmultiplier", f -> rules.solarMultiplier = f, () -> rules.solarMultiplier);
+
         main.button(b -> {
             b.left();
             b.table(Tex.pane, in -> {
