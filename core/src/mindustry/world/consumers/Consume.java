@@ -1,5 +1,6 @@
 package mindustry.world.consumers;
 
+import arc.func.*;
 import arc.scene.ui.layout.*;
 import mindustry.gen.*;
 import mindustry.world.*;
@@ -15,6 +16,7 @@ public abstract class Consume{
     public boolean booster;
     /** If false, this consumer will still be checked, but it will need to updated manually. */
     public boolean update = true;
+    public Floatp consumeMultiplier = () -> 1f; //Does not work on power consumers
 
     /**
      * Apply extra filters to a block.
@@ -58,6 +60,10 @@ public abstract class Consume{
     /** @return multiplier for efficiency - this can be above 1. Will not influence a building's base efficiency value. */
     public float efficiencyMultiplier(Building build){
         return 1f;
+    }
+
+    public void consumeMultiplier(Floatp prov){
+        consumeMultiplier = prov;
     }
 
     public void display(Stats stats){}

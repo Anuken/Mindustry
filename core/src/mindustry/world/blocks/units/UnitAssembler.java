@@ -122,6 +122,9 @@ public class UnitAssembler extends PayloadBlock{
     public void init(){
         updateClipRadius(areaSize * tilesize);
         consume(consPayload = new ConsumePayloadDynamic((UnitAssemblerBuild build) -> build.plan().requirements));
+        consumeBuilder.each(c -> {
+            c.consumeMultiplier(() -> state.rules.unitCostMultiplier);
+        });
 
         super.init();
     }

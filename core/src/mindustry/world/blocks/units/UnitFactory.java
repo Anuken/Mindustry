@@ -25,6 +25,8 @@ import mindustry.world.blocks.payloads.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
+import static mindustry.Vars.*;
+
 public class UnitFactory extends UnitBlock{
     public int[] capacities = {};
 
@@ -65,6 +67,9 @@ public class UnitFactory extends UnitBlock{
 
     @Override
     public void init(){
+        consumeBuilder.each(c -> {
+            c.consumeMultiplier(() -> state.rules.unitCostMultiplier);
+        });
         capacities = new int[Vars.content.items().size];
         for(UnitPlan plan : plans){
             for(ItemStack stack : plan.requirements){

@@ -35,13 +35,13 @@ public class ConsumeLiquid extends ConsumeLiquidBase{
 
     @Override
     public void update(Building build){
-        build.liquids.remove(liquid, amount * build.edelta());
+        build.liquids.remove(liquid, amount * build.edelta() * consumeMultiplier.get());
     }
 
     @Override
     public float efficiency(Building build){
         //there can be more liquid than necessary, so cap at 1
-        return Math.min(build.liquids.get(liquid) / (amount * build.edelta()), 1f);
+        return Math.min(build.liquids.get(liquid) / (amount * build.edelta() * consumeMultiplier.get()), 1f);
     }
 
     @Override

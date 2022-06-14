@@ -43,16 +43,16 @@ public class ConsumeLiquidFilter extends ConsumeLiquidBase{
     public void update(Building build){
         Liquid liq = getConsumed(build);
         if(liq != null){
-            build.liquids.remove(liq, amount * build.edelta());
+            build.liquids.remove(liq, amount * build.edelta() * consumeMultiplier.get());
         }
     }
 
     @Override
     public float efficiency(Building build){
         var liq = getConsumed(build);
-        return liq != null ? Math.min(build.liquids.get(liq) / (amount * build.edelta()), 1f) : 0f;
+        return liq != null ? Math.min(build.liquids.get(liq) / (amount * build.edelta() * consumeMultiplier.get()), 1f) : 0f;
     }
-    
+
     public @Nullable Liquid getConsumed(Building build){
         if(filter.get(build.liquids.current()) && build.liquids.currentAmount() > 0){
             return build.liquids.current();

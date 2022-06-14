@@ -102,6 +102,9 @@ public class Reconstructor extends UnitBlock{
                 itemCapacity = Math.max(itemCapacity, stack.amount * 2);
             }
         }
+        consumeBuilder.each(c -> {
+            c.consumeMultiplier(() -> state.rules.unitCostMultiplier);
+        });
 
         super.init();
     }

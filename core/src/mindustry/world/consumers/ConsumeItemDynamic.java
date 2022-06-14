@@ -42,8 +42,8 @@ public class ConsumeItemDynamic extends Consume{
         int i = 0;
 
         for(ItemStack stack : items.get(tile)){
-            table.add(new ReqImage(new ItemImage(stack.item.uiIcon, stack.amount),
-            () -> tile.items != null && tile.items.has(stack.item, stack.amount))).padRight(8).left();
+            table.add(new ReqImage(new ItemImage(stack.item.uiIcon, Math.round(stack.amount * consumeMultiplier.get())),
+            () -> tile.items != null && tile.items.has(stack.item, Math.round(stack.amount * consumeMultiplier.get())))).padRight(8).left();
             if(++i % 4 == 0) table.row();
         }
     }
@@ -51,12 +51,20 @@ public class ConsumeItemDynamic extends Consume{
     @Override
     public void trigger(Building build){
         for(ItemStack stack : items.get(build)){
-            build.items.remove(stack);
+            build.items.remove(stack.item, Math.round(stack.amount * consumeMultiplier.get()));
         }
     }
 
     @Override
     public float efficiency(Building build){
-        return build.consumeTriggerValid() || build.items.has(items.get(build)) ? 1f : 0f;
+        if(build.consumeTriggerValid()){
+            for(ItemStack stack : items.get(build)){
+                if(!build.items.has(stack.item, Math.round(stack.amount * consumeMultiplier.get()))){
+                    return 0f;
+                }
+            }
+            return 1f;
+        }
+        return 0f;
     }
 }
