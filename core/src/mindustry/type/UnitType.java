@@ -519,7 +519,7 @@ public class UnitType extends UnlockableContent{
             }
             table.row();
             table.label(() -> Iconc.settings + " " + (long)unit.flag + "").color(Color.lightGray).growX().wrap().left();
-            if(ai.controller != null && ai.controller.lastAccessed != null){
+            if(net.active() && ai.controller != null && ai.controller.lastAccessed != null){
                 table.row();
                 table.add(Core.bundle.format("lastaccessed", ai.controller.lastAccessed)).growX().wrap().left();
             }
@@ -527,7 +527,7 @@ public class UnitType extends UnlockableContent{
             table.row();
             table.add(Core.bundle.format("lastcommanded", unit.lastCommanded)).growX().wrap().left();
         }
-        
+
         table.row();
     }
 
