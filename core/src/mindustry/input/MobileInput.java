@@ -658,10 +658,10 @@ public class MobileInput extends InputHandler implements GestureListener{
                 payloadTarget = null;
 
                 //control a unit/block detected on first tap of double-tap
-                if(unitTapped != null){
+                if(unitTapped != null && state.rules.possessionAllowed){
                     Call.unitControl(player, unitTapped);
                     recentRespawnTimer = 1f;
-                }else if(buildingTapped != null){
+                }else if(buildingTapped != null && state.rules.possessionAllowed){
                     Call.buildingControlSelect(player, buildingTapped);
                     recentRespawnTimer = 1f;
                 }else if(!checkConfigTap() && !tryBeginMine(cursor)){

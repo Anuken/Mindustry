@@ -127,7 +127,7 @@ public class OverlayRenderer{
 
         Sized select = input.selectedUnit();
         if(select == null) select = input.selectedControlBuild();
-        if(!Core.input.keyDown(Binding.control)) select = null;
+        if(!Core.input.keyDown(Binding.control) || !state.rules.possessionAllowed) select = null;
 
         unitFade = Mathf.lerpDelta(unitFade, Mathf.num(select != null), 0.1f);
 

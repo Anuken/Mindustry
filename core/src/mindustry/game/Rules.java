@@ -42,6 +42,8 @@ public class Rules{
     public boolean coreCapture = false;
     /** Whether reactors can explode and damage other blocks. */
     public boolean reactorExplosions = true;
+    /** Whether to allow manual unit control. */
+    public boolean possessionAllowed = true;
     /** Whether schematics are allowed. */
     public boolean schematicsAllowed = true;
     /** Whether friendly explosions can occur and set fire/damage other blocks. */
@@ -56,6 +58,8 @@ public class Rules{
     public boolean unitCapVariable = true;
     /** If true, unit spawn points are shown. */
     public boolean showSpawns = false;
+    /** Multiplies power output of solar panels. */
+    public float solarMultiplier = 1f;
     /** How fast unit factories build units. */
     public float unitBuildSpeedMultiplier = 1f;
     /** How much damage any other units deal. */
