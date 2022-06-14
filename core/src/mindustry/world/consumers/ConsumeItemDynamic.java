@@ -57,14 +57,12 @@ public class ConsumeItemDynamic extends Consume{
 
     @Override
     public float efficiency(Building build){
-        if(build.consumeTriggerValid()){
-            for(ItemStack stack : items.get(build)){
-                if(!build.items.has(stack.item, Math.round(stack.amount * consumeMultiplier.get()))){
-                    return 0f;
-                }
+        if(build.consumeTriggerValid()) return 1f;
+        for(ItemStack stack : items.get(build)){
+            if(!build.items.has(stack.item, Math.round(stack.amount * consumeMultiplier.get()))){
+                return 0f;
             }
-            return 1f;
         }
-        return 0f;
+        return 1f;
     }
 }
