@@ -3,12 +3,14 @@ package mindustry.graphics;
 import arc.graphics.*;
 import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
 import mindustry.*;
 
 public class MultiPacker implements Disposable{
     private PixmapPacker[] packers = new PixmapPacker[PageType.all.length];
+    private ObjectSet<String> outlined = new ObjectSet<>();
 
     public MultiPacker(){
         for(int i = 0; i < packers.length; i++){
@@ -46,6 +48,15 @@ public class MultiPacker implements Disposable{
                 i ++;
             }
         }
+    }
+
+    /** @return whether this image was not already outlined. */
+    public boolean registerOutlined(String named){
+        return outlined.add(named);
+    }
+
+    public boolean isOutlined(String name){
+        return outlined.contains(name);
     }
 
     public PixmapPacker getPacker(PageType type){

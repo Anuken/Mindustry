@@ -883,6 +883,12 @@ public class UnitType extends UnlockableContent{
                 makeOutline(PageType.main, packer, outlineTarget, alwaysCreateOutline && region == outlineTarget, outlineColor, outlineRadius);
             }
 
+            if(sample instanceof Crawlc){
+                for(int i = 0; i < segments; i++){
+                    makeOutline(packer, segmentRegions[i], name + "-segment-outline" + i, outlineColor, outlineRadius);
+                }
+            }
+
             for(Weapon weapon : weapons){
                 if(!weapon.name.isEmpty()){
                     //TODO makeNew isn't really necessary here is it
