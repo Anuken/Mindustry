@@ -353,7 +353,7 @@ public class UnitAssembler extends PayloadBlock{
             droneWarmup = Mathf.lerpDelta(droneWarmup, units.size < dronesCreated ? powerStatus : 0f, 0.1f);
             totalDroneProgress += droneWarmup * delta();
 
-            if(units.size < dronesCreated && (droneProgress += delta() * powerStatus / droneConstructTime) >= 1f){
+            if(units.size < dronesCreated && (droneProgress += delta() * state.rules.unitBuildSpeed(team) * powerStatus / droneConstructTime) >= 1f){
                 if(!net.client()){
                     var unit = droneType.create(team);
                     if(unit instanceof BuildingTetherc bt){
@@ -400,7 +400,7 @@ public class UnitAssembler extends PayloadBlock{
             if(!wasOccupied && efficiency > 0 && Units.canCreate(team, plan.unit)){
                 warmup = Mathf.lerpDelta(warmup, efficiency, 0.1f);
 
-                if((progress += edelta() * eff / plan.time) >= 1f){
+                if((progress += edelta() * state.rules.unitBuildSpeed(team) * eff / plan.time) >= 1f){
                     Call.assemblerUnitSpawned(tile);
                 }
             }else{
