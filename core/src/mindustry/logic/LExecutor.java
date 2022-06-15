@@ -1263,14 +1263,16 @@ public class LExecutor{
         public int x, y;
         public int block;
         public int team, rotation;
+        public int config;
         public TileLayer layer = TileLayer.block;
 
-        public SetBlockI(int x, int y, int block, int team, int rotation, TileLayer layer){
+        public SetBlockI(int x, int y, int block, int team, int rotation, int config, TileLayer layer){
             this.x = x;
             this.y = y;
             this.block = block;
             this.team = team;
             this.rotation = rotation;
+            this.config = config;
             this.layer = layer;
         }
 
@@ -1295,8 +1297,14 @@ public class LExecutor{
                         Team t = exec.team(team);
                         if(t == null) t = Team.derelict;
 
+                        var conf = exec.obj(config);
                         if(tile.block() != b || tile.team() != t){
                             tile.setNet(b, t, Mathf.clamp(exec.numi(rotation), 0, 3));
+                            tile.build.configure(conf);
+                        }else if(tile.build != null){
+                            if(tile.build.config() != conf){
+                                tile.build.configure(conf);
+                            }
                         }
                     }
                     //building case not allowed

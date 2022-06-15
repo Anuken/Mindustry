@@ -1128,7 +1128,7 @@ public class LStatements{
     @RegisterStatement("setblock")
     public static class SetBlockStatement extends LStatement{
         public TileLayer layer = TileLayer.block;
-        public String block = "@air", x = "0", y = "0", team = "@derelict", rotation = "0";
+        public String block = "@air", x = "0", y = "0", team = "@derelict", rotation = "0", config = "null";
 
         @Override
         public void build(Table table){
@@ -1169,6 +1169,11 @@ public class LStatements{
 
                 table.add(" rotation ");
                 fields(table, rotation, str -> rotation = str);
+
+                table.row();
+
+                table.add(" config ");
+                fields(table, config, str -> config = str);
             }
         }
 
@@ -1184,7 +1189,7 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new SetBlockI(builder.var(x), builder.var(y), builder.var(block), builder.var(team), builder.var(rotation), layer);
+            return new SetBlockI(builder.var(x), builder.var(y), builder.var(block), builder.var(team), builder.var(rotation), builder.var(config), layer);
         }
     }
 
