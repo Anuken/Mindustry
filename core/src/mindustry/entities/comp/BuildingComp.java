@@ -397,7 +397,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public boolean isHealSuppressed(){
-        return Time.time <= healSuppressionTime;
+        return block.suppressable && Time.time <= healSuppressionTime;
     }
 
     public void recentlyHealed(){
