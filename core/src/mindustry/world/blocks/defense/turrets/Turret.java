@@ -186,6 +186,12 @@ public class Turret extends ReloadTurret{
         drawer.getRegionsToOutline(this, out);
     }
 
+    public void limitRange(BulletType bullet, float margin){
+        float realRange = bullet.rangeChange + range;
+        //doesn't handle drag
+        bullet.lifetime = (realRange + margin) / bullet.speed;
+    }
+
     public static abstract class AmmoEntry{
         public int amount;
 

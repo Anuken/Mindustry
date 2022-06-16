@@ -4061,7 +4061,120 @@ public class Blocks{
             limitRange(-5f);
         }};
 
-        //TODO 3+ more turrets.
+        //TODO very WIP
+        afflict = new PowerTurret("afflict"){{
+            requirements(Category.turret, with(Items.surgeAlloy, 100, Items.silicon, 200, Items.graphite, 250, Items.oxide, 40));
+
+            shootType = new BasicBulletType(){{
+                shootEffect = new MultiEffect(Fx.shootTitan, new WaveEffect(){{
+                    colorTo = Pal.surge;
+                    sizeTo = 26f;
+                    lifetime = 14f;
+                    strokeFrom = 4f;
+                }});
+                smokeEffect = Fx.shootSmokeTitan;
+                hitColor = Pal.surge;
+
+                sprite = "large-orb";
+                trailEffect = Fx.missileTrail;
+                trailInterval = 3f;
+                trailParam = 4f;
+                speed = 5f;
+                damage = 150f;
+                lifetime = 80f;
+                width = height = 16f;
+                backColor = Pal.surge;
+                frontColor = Color.white;
+                shrinkX = shrinkY = 0f;
+                trailColor = Pal.surge;
+                trailLength = 12;
+                trailWidth = 2.2f;
+                despawnEffect = hitEffect = new ExplosionEffect(){{
+                    waveColor = Pal.surge;
+                    smokeColor = Color.gray;
+                    sparkColor = Pal.sap;
+                    waveStroke = 4f;
+                    waveRad = 40f;
+                }};
+
+                intervalBullet = new LightningBulletType(){{
+                    damage = 18;
+                    collidesAir = false;
+                    ammoMultiplier = 1f;
+                    lightningColor = Pal.surge;
+                    lightningLength = 5;
+                    lightningLengthRand = 8;
+
+                    //for visual stats only.
+                    buildingDamageMultiplier = 0.25f;
+
+                    lightningType = new BulletType(0.0001f, 0f){{
+                        lifetime = Fx.lightning.lifetime;
+                        hitEffect = Fx.hitLancer;
+                        despawnEffect = Fx.none;
+                        status = StatusEffects.shocked;
+                        statusDuration = 10f;
+                        hittable = false;
+                        lightColor = Color.white;
+                        buildingDamageMultiplier = 0.25f;
+                    }};
+                }};
+
+                bulletInterval = 3f;
+
+                lightningColor = Pal.surge;
+                lightningDamage = 25;
+                lightning = 8;
+                lightningLength = 5;
+                lightningLengthRand = 8;
+            }};
+
+            drawer = new DrawTurret("reinforced-"){{
+                parts.add(new RegionPart("-blade"){{
+                    progress = PartProgress.recoil;
+                    heatColor = Color.valueOf("ff6214");
+                    mirror = true;
+                    under = true;
+                    moveX = 2f;
+                    moveY = -1f;
+                    moveRot = -5f;
+                }},
+                new RegionPart("-blade-glow"){{
+                    progress = PartProgress.recoil;
+                    heatProgress = PartProgress.warmup;
+                    heatColor = Color.valueOf("ff6214");
+                    drawRegion = false;
+                    mirror = true;
+                    under = true;
+                    moveX = 2f;
+                    moveY = -1f;
+                    moveRot = -5f;
+                }});
+            }};
+
+            consumePower(2f);
+            heatRequirement = 8f;
+            maxHeatEfficiency = 2f;
+
+            inaccuracy = 1f;
+            shake = 2f;
+            shootY = 4;
+            outlineColor = Pal.darkOutline;
+            size = 4;
+            envEnabled |= Env.space;
+            reload = 80f;
+            cooldownTime = reload;
+            recoil = 3f;
+            range = 290;
+            shootCone = 15f;
+            scaledHealth = 180;
+            rotateSpeed = 1.5f;
+            researchCostMultiplier = 0.05f;
+
+            limitRange(9f);
+        }};
+
+        //TODO 5 more turrets.
 
         //endregion
         //region units
