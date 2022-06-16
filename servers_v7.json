@@ -9,19 +9,19 @@
   },
   {
     "name": "SMokeOfAnarchy",
-    "address": "strider.SMokeOfAnarchy.ru"
+    "address": ["SMokeOfAnarchy.ru", "strider.smokeofanarchy.ru"]
   },
   {
     "name": "hexpvp.ml",
     "address": "hexpvp.ml"
   },
   {
-    "name": "Omega",
-    "address": ["node2.crewcraft.cc:25569", "node2.crewcraft.cc:25571", "node2.crewcraft.cc:25572", "node5.crewcraft.cc:25569"]
+    "name": "Omega Hub",
+    "address": ["node2.crewcraft.cc:6574", "node2.crewcraft.cc:6569"]
   },
   {
     "name": "MeowLand",
-    "address": ["kgstudios.ddns.net:6565"]
+    "address": ["meowland.ru"]
   },
   {
     "name": "DarkDustry",
@@ -57,7 +57,7 @@
   },
   {
     "name": "Xpdustry",
-    "address": ["xpdustry.fr:7000"]
+    "address": ["n1.xpdustry.fr:7000"]
   },
   {
     "name": "Pandorum",

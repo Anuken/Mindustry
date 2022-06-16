@@ -110,12 +110,12 @@ public class StructProcess extends BaseProcessor{
                         cons.append(" | (").append("(").append(structType).append(")").append("Float.floatToIntBits(").append(varName).append(") << ").append(offset).append("L)");
 
                         //floats: need conversion
-                        setter.addStatement("return ($T)(($L & $L) | (($T)Float.floatToIntBits(value) << $LL))", structType, structParam, bitString(offset, size, structTotalSize), structType, offset);
+                        setter.addStatement("return ($T)(($L & (~$L)) | (($T)Float.floatToIntBits(value) << $LL))", structType, structParam, bitString(offset, size, structTotalSize), structType, offset);
                     }else{
                         cons.append(" | (((").append(structType).append(")").append(varName).append(" << ").append(offset).append("L)").append(" & ").append(bitString(offset, size, structTotalSize)).append(")");
 
                         //bytes, shorts, chars, ints
-                        setter.addStatement("return ($T)(($L & $L) | (($T)value << $LL))", structType, structParam, bitString(offset, size, structTotalSize), structType, offset);
+                        setter.addStatement("return ($T)(($L & (~$L)) | (($T)value << $LL))", structType, structParam, bitString(offset, size, structTotalSize), structType, offset);
                     }
 
                     doc.append("<br>  ").append(varName).append(" [").append(offset).append("..").append(size + offset).append("]\n");

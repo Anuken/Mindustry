@@ -51,7 +51,7 @@ public class StatusEffects{
 
         unmoving = new StatusEffect("unmoving"){{
             color = Pal.gray;
-            speedMultiplier = 0.001f;
+            speedMultiplier = 0f;
         }};
 
         slow = new StatusEffect("slow"){{

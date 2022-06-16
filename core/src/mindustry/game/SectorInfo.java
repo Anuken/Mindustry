@@ -130,7 +130,9 @@ public class SectorInfo{
         //enable attack mode when there's a core.
         if(state.rules.waveTeam.core() != null){
             attack = true;
-            winWave = 0;
+            if(!state.rules.sector.planet.allowWaves){
+                winWave = 0;
+            }
         }
 
         //if there are infinite waves and no win wave, add a win wave.
@@ -138,7 +140,7 @@ public class SectorInfo{
             winWave = 30;
         }
 
-        if(state.rules.sector != null && state.rules.sector.preset != null && state.rules.sector.preset.captureWave > 0){
+        if(state.rules.sector != null && state.rules.sector.preset != null && state.rules.sector.preset.captureWave > 0 && !state.rules.sector.planet.allowWaves){
             winWave = state.rules.sector.preset.captureWave;
         }
 

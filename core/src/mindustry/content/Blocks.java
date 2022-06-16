@@ -71,7 +71,7 @@ public class Blocks{
     melter, separator, disassembler, sporePress, pulverizer, incinerator, coalCentrifuge,
 
     //erekir
-    siliconArcFurnace, electrolyzer, oxidationChamber, atmosphericConcentrator, electricHeater, phaseHeater, heatRedirector, slagIncinerator,
+    siliconArcFurnace, electrolyzer, oxidationChamber, atmosphericConcentrator, electricHeater, slagHeater, phaseHeater, heatRedirector, slagIncinerator,
     carbideCrucible, slagCentrifuge, surgeCrucible, cyanogenSynthesizer, phaseSynthesizer, heatReactor,
 
     //sandbox
@@ -1250,6 +1250,20 @@ public class Blocks{
             heatOutput = 3f;
             regionRotated1 = 1;
             consumePower(50f / 60f);
+        }};
+        
+        slagHeater = new HeatProducer("slag-heater"){{
+            requirements(Category.crafting, with(Items.tungsten, 50, Items.oxide, 20, Items.beryllium, 20));
+
+            researchCostMultiplier = 4f;
+
+            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(Liquids.slag), new DrawDefault(), new DrawHeatOutput());
+            size = 3;
+            liquidCapacity = 40f;
+            rotateDraw = false;
+            regionRotated1 = 1;
+            consumeLiquid(Liquids.slag, 40f / 60f);
+            heatOutput = 6f;
         }};
 
         phaseHeater = new HeatProducer("phase-heater"){{
@@ -3787,7 +3801,7 @@ public class Blocks{
                     progress = PartProgress.warmup;
                     moveRot = -10f;
                     mirror = true;
-                    moves.add(new PartMove(PartProgress.reload, 0f, -3f, -5f));
+                    moves.add(new PartMove(PartProgress.recoil, 0f, -3f, -5f));
                     heatColor = Color.red;
                 }});
             }};
@@ -3937,7 +3951,7 @@ public class Blocks{
             drawer = new DrawTurret("reinforced-"){{
                 parts.addAll(
                 new RegionPart("-barrel"){{
-                    progress = PartProgress.reload.curve(Interp.pow2In);
+                    progress = PartProgress.recoil.curve(Interp.pow2In);
                     moveY = -5f * 4f / 3f;
                     heatColor = Color.valueOf("f03b0e");
                     mirror = false;
@@ -3999,8 +4013,6 @@ public class Blocks{
             shootCone = 30f;
             consumeAmmoOnce = true;
 
-            coolant = consumeCoolant(30f / 60f);
-
             drawer = new DrawTurret("reinforced-"){{
                 parts.add(new RegionPart("-side"){{
                     mirror = true;
@@ -4011,8 +4023,8 @@ public class Blocks{
                 parts.add(new RegionPart("-mid"){{
                     under = true;
                     moveY = -1.5f;
-                    progress = PartProgress.reload;
-                    heatProgress = PartProgress.reload.add(0.25f).min(PartProgress.warmup);
+                    progress = PartProgress.recoil;
+                    heatProgress = PartProgress.recoil.add(0.25f).min(PartProgress.warmup);
                     heatColor = Color.sky.cpy().a(0.9f);
                 }});
                 parts.add(new RegionPart("-blade"){{
@@ -4445,7 +4457,7 @@ public class Blocks{
             consumePower(2f);
             size = 3;
             //TODO expand this list
-            filter = Seq.with(Blocks.tungstenWallLarge, Blocks.berylliumWallLarge, Blocks.carbideWallLarge, Blocks.reinforcedLiquidContainer, Blocks.reinforcedContainer, Blocks.beamNode);
+            filter = Seq.with(Blocks.tungstenWallLarge, Blocks.berylliumWallLarge, Blocks.carbideWallLarge, Blocks.reinforcedSurgeWallLarge, Blocks.reinforcedLiquidContainer, Blocks.reinforcedContainer, Blocks.beamNode);
         }};
 
         //yes this block is pretty much useless
@@ -4660,6 +4672,7 @@ public class Blocks{
             privileged = true;
             size = 1;
             maxInstructionsPerTick = 100;
+            range = Float.MAX_VALUE;
         }};
 
         worldCell = new MemoryBlock("world-cell"){{

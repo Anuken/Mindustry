@@ -2,6 +2,7 @@ package mindustry.world.blocks.payloads;
 
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.util.*;
 import arc.util.io.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
@@ -43,11 +44,11 @@ public class BuildPayload implements Payload{
     }
 
     @Override
-    public void update(boolean inUnit){
-        if(inUnit && (!build.block.updateInUnits || (!state.rules.unitPayloadUpdate && !build.block.alwaysUpdateInUnits))) return;
+    public void update(@Nullable Unit unitHolder, @Nullable Building buildingHolder){
+        if(unitHolder != null && (!build.block.updateInUnits || (!state.rules.unitPayloadUpdate && !build.block.alwaysUpdateInUnits))) return;
 
         build.tile = emptyTile;
-        build.update();
+        build.updatePayload(unitHolder, buildingHolder);
     }
 
     @Override

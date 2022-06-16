@@ -188,12 +188,15 @@ public class Mods implements Loadable{
             if(!prefix && !Core.atlas.has(name)){
                 Log.warn("Sprite '@' in mod '@' attempts to override a non-existent sprite. Ignoring.", name, mod.name);
                 continue;
-            }
 
-            //TODO !!! document this on the wiki !!!
-            //do not allow packing standard outline sprites for now, they are no longer necessary and waste space!
-            //TODO also full regions are bad:  || name.endsWith("-full")
-            if(prefix && (name.endsWith("-outline"))) continue;
+                //(horrible code below)
+            }else if(prefix && !mod.meta.keepOutlines && name.endsWith("-outline") && file.path().contains("units") && !file.path().contains("blocks")){
+                Log.warn("Sprite '@' in mod '@' is likely to be an unnecessary unit outline. These should not be separate sprites. Ignoring.", name, mod.name);
+                //TODO !!! document this on the wiki !!!
+                //do not allow packing standard outline sprites for now, they are no longer necessary and waste space!
+                //TODO also full regions are bad:  || name.endsWith("-full")
+                continue;
+            }
 
             //read and bleed pixmaps in parallel
             tasks.add(mainExecutor.submit(() -> {
@@ -333,7 +336,9 @@ public class Mods implements Loadable{
                     if(c instanceof UnlockableContent u && c.minfo.mod != null){
                         u.load();
                         u.loadIcon();
-                        u.createIcons(packer);
+                        if(u.generateIcons){
+                            u.createIcons(packer);
+                        }
                     }
                 });
             }
@@ -1134,6 +1139,8 @@ public class Mods implements Loadable{
         public boolean hidden;
         /** If true, this mod should be loaded as a Java class mod. This is technically optional, but highly recommended. */
         public boolean java;
+        /** If true, -outline regions for units are kept when packing. Only use if you know exactly what you are doing. */
+        public boolean keepOutlines;
 
         public String displayName(){
             return displayName == null ? name : displayName;

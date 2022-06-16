@@ -323,7 +323,7 @@ public class UnitType extends UnlockableContent{
     legMoveSpace = 1f,
     /** for legs without "joints", this is how much the second leg sprite is moved "back" by, so it covers the joint region (it's hard to explain without an image) */
     legExtension = 0,
-    /** ??? I don't really know what this does or why it's here */
+    /** Higher values of this field make groups of legs move less in-sync with each other. */
     legPairOffset = 0,
     /** scaling for how far away legs *try* to be from the body (not their actual length); e.g. if set to 0.5, legs will appear somewhat folded */
     legLengthScl = 1f,
@@ -466,6 +466,10 @@ public class UnitType extends UnlockableContent{
 
     }
 
+    public void updatePayload(Unit unit, @Nullable Unit unitHolder, @Nullable Building buildingHolder){
+
+    }
+
     public void landed(Unit unit){}
 
     public void display(Unit unit, Table table){
@@ -562,7 +566,7 @@ public class UnitType extends UnlockableContent{
             var unique = new ObjectSet<String>();
 
             for(Ability a : abilities){
-                if(unique.add(a.localized())){
+                if(a.display && unique.add(a.localized())){
                     stats.add(Stat.abilities, a.localized());
                 }
             }
@@ -605,8 +609,16 @@ public class UnitType extends UnlockableContent{
             if(naval){
                 imm.remove(StatusEffects.wet);
             }
-            for(var i : imm){
-                stats.add(Stat.immunities, i.emoji() + " " + i.localizedName);
+            stats.add(Stat.immunities, StatValues.statusEffects(imm));
+        }
+    }
+
+    //never actually called; it turns out certain mods have custom weapons that do not need bullets.
+    protected void validateWeapons(){
+        for(int i = 0; i < weapons.size; i++){
+            var wep = weapons.get(i);
+            if(wep.bullet == Bullets.placeholder || wep.bullet == null){
+                throw new RuntimeException("Unit: " + name + ": weapon #" + i + " ('" + wep.name + "') does not have a bullet defined. Make sure you have a bullet: (JSON) or `bullet = ` field in your unit definition.");
             }
         }
     }
@@ -628,13 +640,6 @@ public class UnitType extends UnlockableContent{
             immunities.add(StatusEffects.wet);
             if(shadowElevation < 0f){
                 shadowElevation = 0.11f;
-            }
-        }
-
-        for(int i = 0; i < weapons.size; i++){
-            var wep = weapons.get(i);
-            if(wep.bullet == Bullets.placeholder || wep.bullet == null){
-                throw new RuntimeException("Unit: " + name + ": weapon #" + i + " ('" + wep.name + "') does not have a bullet defined. Make sure you have a bullet: (JSON) or `bullet = ` field in your unit definition.");
             }
         }
 
@@ -852,30 +857,70 @@ public class UnitType extends UnlockableContent{
         var toOutline = new Seq<TextureRegion>();
         getRegionsToOutline(toOutline);
 
+        boolean separateOutline = weapons.contains(w -> !w.top);
+
         for(var region : toOutline){
             if(region instanceof AtlasRegion atlas){
                 String regionName = atlas.name;
                 Pixmap outlined = Pixmaps.outline(Core.atlas.getPixmap(region), outlineColor, outlineRadius);
 
-                if(Core.settings.getBool("linear", true)) Pixmaps.bleed(outlined);
+                Drawf.checkBleed(outlined);
 
                 packer.add(PageType.main, regionName + "-outline", outlined);
             }
         }
 
         if(outlines){
+            Seq<TextureRegion> outlineSeq = Seq.with(region, jointRegion, footRegion, baseJointRegion, legRegion, treadRegion);
+            if(Core.atlas.has(name + "-leg-base")){
+                outlineSeq.add(legBaseRegion);
+            }
 
             //note that mods with these regions already outlined will have *two* outlines made, which is... undesirable
-            for(var outlineTarget : new TextureRegion[]{region, jointRegion, footRegion, legBaseRegion, baseJointRegion, legRegion, treadRegion}){
+            for(var outlineTarget : outlineSeq){
                 if(!outlineTarget.found()) continue;
 
                 makeOutline(PageType.main, packer, outlineTarget, alwaysCreateOutline && region == outlineTarget, outlineColor, outlineRadius);
             }
 
+            if(sample instanceof Crawlc){
+                for(int i = 0; i < segments; i++){
+                    makeOutline(packer, segmentRegions[i], name + "-segment-outline" + i, outlineColor, outlineRadius);
+                }
+            }
+
             for(Weapon weapon : weapons){
-                if(!weapon.name.isEmpty()){
+                if(!weapon.name.isEmpty() && (minfo.mod == null || weapon.name.startsWith(minfo.mod.name))){
                     //TODO makeNew isn't really necessary here is it
-                    makeOutline(PageType.main, packer, weapon.region, true, outlineColor, outlineRadius);
+                    makeOutline(PageType.main, packer, weapon.region, separateOutline, outlineColor, outlineRadius);
+                }
+            }
+        }
+
+        //TODO test
+        if(sample instanceof Tankc){
+            PixmapRegion pix = Core.atlas.getPixmap(treadRegion);
+
+            for(int r = 0; r < treadRects.length; r++){
+                Rect treadRect = treadRects[r];
+                //slice is always 1 pixel wide
+                Pixmap slice = pix.crop((int)(treadRect.x + pix.width/2f), (int)(treadRect.y + pix.height/2f), 1, (int)treadRect.height);
+                int frames = treadFrames;
+                for(int i = 0; i < frames; i++){
+                    int pullOffset = treadPullOffset;
+                    Pixmap frame = new Pixmap(slice.width, slice.height);
+                    for(int y = 0; y < slice.height; y++){
+                        int idx = y + i;
+                        if(idx >= slice.height){
+                            idx -= slice.height;
+                            idx += pullOffset;
+                            idx = Mathf.mod(idx, slice.height);
+                        }
+
+                        frame.setRaw(0, y, slice.getRaw(0, idx));
+                    }
+
+                    packer.add(PageType.main, name + "-treads" + r + "-" + i, frame);
                 }
             }
         }
@@ -1099,9 +1144,9 @@ public class UnitType extends UnlockableContent{
 
                 WeaponMount first = unit.mounts.length > part.weaponIndex ? unit.mounts[part.weaponIndex] : null;
                 if(first != null){
-                    DrawPart.params.set(first.warmup, first.reload / weapons.first().reload, first.smoothReload, first.heat, unit.x, unit.y, unit.rotation);
+                    DrawPart.params.set(first.warmup, first.reload / weapons.first().reload, first.smoothReload, first.heat, first.recoil, first.charge, unit.x, unit.y, unit.rotation);
                 }else{
-                    DrawPart.params.set(0f, 0f, 0f, 0f, unit.x, unit.y, unit.rotation);
+                    DrawPart.params.set(0f, 0f, 0f, 0f, 0f, 0f, unit.x, unit.y, unit.rotation);
                 }
 
                 if(unit instanceof Scaled s){
@@ -1495,6 +1540,17 @@ public class UnitType extends UnlockableContent{
 
             Tmp.v1.set(x, y).rotate(rot);
             float ex = Tmp.v1.x, ey = Tmp.v1.y;
+
+            //engine outlines (cursed?)
+            /*float z = Draw.z();
+            Draw.z(z - 0.0001f);
+            Draw.color(type.outlineColor);
+            Fill.circle(
+            unit.x + ex,
+            unit.y + ey,
+            (type.outlineRadius * Draw.scl + radius + Mathf.absin(Time.time, 2f, radius / 4f)) * scale
+            );
+            Draw.z(z);*/
 
             Draw.color(color);
             Fill.circle(

@@ -25,13 +25,6 @@ public class ReloadTurret extends BaseTurret{
     public class ReloadTurretBuild extends BaseTurretBuild{
         public float reloadCounter;
 
-        @Override
-        public void created(){
-            super.created();
-            //for visual reasons, the turret does not need reloading when placed; however, it should not be *fully* reloaded, so firing will not occur
-            reloadCounter = reload - 0.0001f;
-        }
-
         protected void updateCooling(){
             if(reloadCounter < reload && coolant != null && coolant.efficiency(this) > 0 && efficiency > 0){
                 float capacity = coolant instanceof ConsumeLiquidFilter filter ? filter.getConsumed(this).heatCapacity : 1f;

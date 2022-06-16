@@ -42,7 +42,7 @@ public class Turret extends ReloadTurret{
     /** Ammo units used per shot. */
     public int ammoPerShot = 1;
     /** If true, ammo is only consumed once per shot regardless of bullet count. */
-    public boolean consumeAmmoOnce = false;
+    public boolean consumeAmmoOnce = true;
     /** Minimum input heat required to fire. */
     public float heatRequirement = -1f;
     /** Maximum efficiency possible, if this turret uses heat. */
@@ -56,6 +56,8 @@ public class Turret extends ReloadTurret{
     public float shootCone = 8f;
     /** Turret shoot point. */
     public float shootX = 0f, shootY = Float.NEGATIVE_INFINITY;
+    /** Random spread on the X axis. */
+    public float xRand = 0f;
     /** Minimum bullet range. Used for artillery only. */
     public float minRange = 0f;
     /** Minimum warmup needed to fire. */
@@ -198,8 +200,10 @@ public class Turret extends ReloadTurret{
         public Seq<AmmoEntry> ammo = new Seq<>();
         public int totalAmmo;
         public float curRecoil, heat, logicControlTime = -1;
-        public float shootWarmup;
+        public float shootWarmup, charge;
         public int totalShots;
+        //turrets need to shoot once for 'visual reload' to be valid, otherwise they seem stuck at reload 0 when placed.
+        public boolean visualReloadValid;
         public boolean logicShooting = false;
         public @Nullable Posc target;
         public Vec2 targetPos = new Vec2();
@@ -210,6 +214,7 @@ public class Turret extends ReloadTurret{
         public float heatReq;
         public float[] sideHeat = new float[4];
 
+        @Override
         public float estimateDps(){
             if(!hasAmmo()) return 0f;
             return shoot.shots / reload * 60f * (peekAmmo() == null ? 0f : peekAmmo().estimateDPS()) * potentialEfficiency * timeScale;
@@ -343,8 +348,9 @@ public class Turret extends ReloadTurret{
 
             wasShooting = false;
 
-            curRecoil = Math.max(curRecoil - Time.delta / recoilTime , 0);
-            heat = Math.max(heat - Time.delta / cooldownTime, 0);
+            curRecoil = Mathf.approachDelta(curRecoil, 0, 1 / recoilTime);
+            heat = Mathf.approachDelta(heat, 0, 1 / cooldownTime);
+            charge = charging() ? Mathf.approachDelta(charge, 1, 1 / shoot.firstShotDelay) : 0;
 
             unit.tile(this);
             unit.rotation(rotation);
@@ -471,7 +477,7 @@ public class Turret extends ReloadTurret{
 
             //skip first entry if it has less than the required amount of ammo
             if(ammo.size >= 2 && ammo.peek().amount < ammoPerShot && ammo.get(ammo.size - 2).amount >= ammoPerShot){
-                totalAmmo -= ammo.pop().amount;
+                ammo.swap(ammo.size - 1, ammo.size - 2);
             }
             return ammo.size > 0 && ammo.peek().amount >= ammoPerShot;
         }
@@ -491,6 +497,7 @@ public class Turret extends ReloadTurret{
         protected void updateShooting(){
 
             if(reloadCounter >= reload && !charging() && shootWarmup >= minWarmup){
+                visualReloadValid = true;
                 BulletType type = peekAmmo();
 
                 shoot(type);
@@ -530,8 +537,9 @@ public class Turret extends ReloadTurret{
             if(dead || (!consumeAmmoOnce && !hasAmmo())) return;
 
             float
-            bulletX = x + Angles.trnsx(rotation - 90, shootX + xOffset, shootY + yOffset),
-            bulletY = y + Angles.trnsy(rotation - 90, shootX + xOffset, shootY + yOffset),
+            xSpread = Mathf.range(xRand),
+            bulletX = x + Angles.trnsx(rotation - 90, shootX + xOffset + xSpread, shootY + yOffset),
+            bulletY = y + Angles.trnsy(rotation - 90, shootX + xOffset + xSpread, shootY + yOffset),
             shootAngle = rotation + angleOffset + Mathf.range(inaccuracy);
 
             float lifeScl = type.scaleLife ? Mathf.clamp(Mathf.dst(bulletX, bulletY, targetPos.x, targetPos.y) / type.range, minRange / type.range, range() / type.range) : 1f;

@@ -1,5 +1,6 @@
 package mindustry.graphics;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -17,6 +18,11 @@ import static mindustry.Vars.*;
 public class Drawf{
     private static final Vec2[] vecs = new Vec2[]{new Vec2(), new Vec2(), new Vec2(), new Vec2()};
     private static final FloatSeq points = new FloatSeq();
+
+    /** Bleeds a mod pixmap if linear filtering is enabled. */
+    public static void checkBleed(Pixmap pixmap){
+        if(Core.settings.getBool("linear", true)) Pixmaps.bleed(pixmap);
+    }
 
     //TODO offset unused
     public static void flame(float x, float y, int divisions, float rotation, float length, float width, float pan){
