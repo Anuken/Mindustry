@@ -167,6 +167,12 @@ public class BulletType extends Content implements Cloneable{
     public float bulletInterval = 20f;
     /** Number of bullet spawned per interval. */
     public int intervalBullets = 1;
+    /** Random spread of interval bullets. */
+    public float intervalRandomSpread = 360f;
+    /** Angle spread between individual interval bullets. */
+    public float intervalSpread = 0f;
+    /** Angle offset for interval bullets. */
+    public float intervalAngle = 0f;
 
     /** Color used for hit/despawn effects. */
     public Color hitColor = Color.white;
@@ -496,8 +502,9 @@ public class BulletType extends Content implements Cloneable{
 
     public void updateBulletInterval(Bullet b){
         if(intervalBullet != null && b.timer.get(2, bulletInterval)){
+            float ang = b.rotation();
             for(int i = 0; i < intervalBullets; i++){
-                intervalBullet.create(b, b.x, b.y, Mathf.random(360f));
+                intervalBullet.create(b, b.x, b.y, ang + Mathf.range(intervalRandomSpread) + intervalAngle + ((i - (intervalBullets - 1f)/2f) * intervalSpread));
             }
         }
     }

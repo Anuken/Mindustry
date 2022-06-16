@@ -4079,6 +4079,8 @@ public class Blocks{
                 trailEffect = Fx.missileTrail;
                 trailInterval = 3f;
                 trailParam = 4f;
+                pierceCap = 2;
+                fragOnHit = false;
                 speed = 5f;
                 damage = 150f;
                 lifetime = 80f;
@@ -4097,36 +4099,37 @@ public class Blocks{
                     waveRad = 40f;
                 }};
 
-                intervalBullet = new LightningBulletType(){{
-                    damage = 18;
-                    collidesAir = false;
-                    ammoMultiplier = 1f;
-                    lightningColor = Pal.surge;
-                    lightningLength = 5;
-                    lightningLengthRand = 8;
-
-                    //for visual stats only.
-                    buildingDamageMultiplier = 0.25f;
-
-                    lightningType = new BulletType(0.0001f, 0f){{
-                        lifetime = Fx.lightning.lifetime;
-                        hitEffect = Fx.hitLancer;
-                        despawnEffect = Fx.none;
-                        status = StatusEffects.shocked;
-                        statusDuration = 10f;
-                        hittable = false;
-                        lightColor = Color.white;
-                        buildingDamageMultiplier = 0.25f;
+                fragBullet = intervalBullet = new BasicBulletType(3f, 20){{
+                    width = 9f;
+                    hitSize = 5f;
+                    height = 15f;
+                    pierce = true;
+                    lifetime = 30f;
+                    pierceBuilding = true;
+                    hitColor = backColor = trailColor = Pal.surge;
+                    frontColor = Color.white;
+                    trailWidth = 2.1f;
+                    trailLength = 5;
+                    hitEffect = despawnEffect = new WaveEffect(){{
+                        colorFrom = colorTo = Pal.surge;
+                        sizeTo = 4f;
+                        strokeFrom = 4f;
+                        lifetime = 10f;
                     }};
+                    buildingDamageMultiplier = 0.3f;
+                    homingPower = 0.2f;
                 }};
 
                 bulletInterval = 3f;
+                intervalRandomSpread = 20f;
+                intervalBullets = 2;
+                intervalAngle = 180f;
+                intervalSpread = 280f;
 
-                lightningColor = Pal.surge;
-                lightningDamage = 25;
-                lightning = 8;
-                lightningLength = 5;
-                lightningLengthRand = 8;
+                fragBullets = 20;
+                fragVelocityMin = 0.5f;
+                fragVelocityMax = 1.5f;
+                fragLifeMin = 0.5f;
             }};
 
             drawer = new DrawTurret("reinforced-"){{
@@ -4153,7 +4156,7 @@ public class Blocks{
             }};
 
             consumePower(2f);
-            heatRequirement = 8f;
+            heatRequirement = 10f;
             maxHeatEfficiency = 2f;
 
             inaccuracy = 1f;
@@ -4162,11 +4165,11 @@ public class Blocks{
             outlineColor = Pal.darkOutline;
             size = 4;
             envEnabled |= Env.space;
-            reload = 80f;
+            reload = 110f;
             cooldownTime = reload;
             recoil = 3f;
-            range = 290;
-            shootCone = 15f;
+            range = 340;
+            shootCone = 20f;
             scaledHealth = 180;
             rotateSpeed = 1.5f;
             researchCostMultiplier = 0.05f;
