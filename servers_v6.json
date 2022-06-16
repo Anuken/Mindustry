@@ -8,8 +8,8 @@
     "address": ["recessive.net"]
   },
   {
-    "name": "Yeet Hosting",
-    "address": ["node2.crewcraft.cc:25568", "node2.crewcraft.cc:25570","node2.crewcraft.cc:25568" , "node5.crewcraft.cc:25567" ,"node5.crewcraft.cc:25566", "node3.crewcraft.cc:25568"]
+    "name": "Omega Hub",
+    "address": ["node2.crewcraft.cc:6573", "node2.crewcraft.cc:6572","node2.crewcraft.cc:6571" , "node2.crewcraft.cc:6568" ,"node2.crewcraft.cc:6567"]
   },
   {
     "name": "RCM",
@@ -17,11 +17,15 @@
   },
     {
     "name": "Tendhost",
-    "address": ["tendhost.ddns.net"]
+    "address": ["tendhost.ddns.net", "smokeofanarchy.ru:7576"]
   },
   {
-    "name": "Atanner",
-    "address": ["atannergaming.com:13000"]
+    "name": "SMokeOfAnarchy",
+    "address": ["smokeofanarchy.ru:6566", "strider.smokeofanarchy.ru:6566"]
+  },
+  {
+    "name": "Atanner Gaming",
+    "address": ["mindustry.atannergaming.com:6567", "mindustry.atannergaming.com:6700", "mindustry.atannergaming.com:9000"]
   },
   {
     "name": "C.A.M.S.",
@@ -101,7 +105,7 @@
   },
   {
     "name": "Xpdustry",
-    "address": ["xpdustry.fr"]
+    "address": ["n2.xpdustry.fr", "n2.xpdustry.fr:6000"]
   },
   {
     "name": "CxZx",
@@ -109,11 +113,11 @@
   },
   {
     "name": "Mindustry Español",
-    "address": ["xpdustry.fr:9000"]
+    "address": ["n1.xpdustry.fr:9000"]
   },
   {
     "name": "CreateDustry",
-    "address": ["129.151.66.139:26032"]
+    "address": ["129.151.64.81:26032"]
   },
   {
     "name": "NukeDustry",

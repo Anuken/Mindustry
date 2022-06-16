@@ -197,6 +197,10 @@ public class ErekirTechTree{
                                         });
                                     });
 
+                                    node(slagHeater, () -> {
+
+                                    });
+                                    
                                     node(atmosphericConcentrator, Seq.with(new OnSector(four)), () -> {
                                         node(cyanogenSynthesizer, Seq.with(new OnSector(four)), () -> {
 
@@ -254,9 +258,10 @@ public class ErekirTechTree{
 
                 node(diffuse, Seq.with(new OnSector(two)), () -> {
                     node(sublimate, () -> {
-                        //TODO implement
                         node(titan, Seq.with(new OnSector(four)), () -> {
+                            node(afflict, Seq.with(new OnSector(four)), () -> {
 
+                            });
                         });
 
                         node(disperse, Seq.with(new OnSector(four)), () -> {

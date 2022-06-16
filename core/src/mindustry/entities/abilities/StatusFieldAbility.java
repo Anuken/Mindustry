@@ -14,7 +14,7 @@ public class StatusFieldAbility extends Ability{
     public Effect applyEffect = Fx.none;
     public Effect activeEffect = Fx.overdriveWave;
     public float effectX, effectY;
-    public boolean parentizeEffects;
+    public boolean parentizeEffects, effectSizeParam = true;
 
     protected float timer;
 
@@ -43,7 +43,7 @@ public class StatusFieldAbility extends Ability{
             });
 
             float x = unit.x + Angles.trnsx(unit.rotation, effectY, effectX), y = unit.y + Angles.trnsy(unit.rotation, effectY, effectX);
-            activeEffect.at(x, y, unit.rotation, parentizeEffects ? unit : null);
+            activeEffect.at(x, y, effectSizeParam ? range : unit.rotation, parentizeEffects ? unit : null);
 
             timer = 0f;
         }

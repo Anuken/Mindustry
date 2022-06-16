@@ -42,6 +42,8 @@ public class Rules{
     public boolean coreCapture = false;
     /** Whether reactors can explode and damage other blocks. */
     public boolean reactorExplosions = true;
+    /** Whether to allow manual unit control. */
+    public boolean possessionAllowed = true;
     /** Whether schematics are allowed. */
     public boolean schematicsAllowed = true;
     /** Whether friendly explosions can occur and set fire/damage other blocks. */
@@ -56,6 +58,8 @@ public class Rules{
     public boolean unitCapVariable = true;
     /** If true, unit spawn points are shown. */
     public boolean showSpawns = false;
+    /** Multiplies power output of solar panels. */
+    public float solarMultiplier = 1f;
     /** How fast unit factories build units. */
     public float unitBuildSpeedMultiplier = 1f;
     /** How much damage any other units deal. */
@@ -124,7 +128,7 @@ public class Rules{
     public Seq<MapObjective> objectives = new Seq<>();
     /** Flags set by objectives. Used in world processors. n*/
     public ObjectSet<String> objectiveFlags = new ObjectSet<>();
-    /** HIGHLY UNSTABLE/EXPERIMENTAL. DO NOT USE THIS. */
+    /** If true, fog of war is enabled. Enemy units and buildings are hidden unless in radar view. */
     public boolean fog = false;
     /** If fog = true, this is whether static (black) fog is enabled. */
     public boolean staticFog = true;

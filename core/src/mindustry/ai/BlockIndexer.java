@@ -476,12 +476,15 @@ public class BlockIndexer{
             notifyBuildDamaged(tile.build);
         }
 
-        if(!tile.block().isStatic()){
-            blocksPresent[tile.floorID()] = true;
-            blocksPresent[tile.overlayID()] = true;
+        if(blocksPresent != null){
+            if(!tile.block().isStatic()){
+                blocksPresent[tile.floorID()] = true;
+                blocksPresent[tile.overlayID()] = true;
+            }
+            //bounds checks only needed in very specific scenarios
+            if(tile.blockID() < blocksPresent.length) blocksPresent[tile.blockID()] = true;
         }
-        //bounds checks only needed in very specific scenarios
-        if(tile.blockID() < blocksPresent.length) blocksPresent[tile.blockID()] = true;
+
     }
 
     static class TurretQuadtree extends QuadTree<Building>{

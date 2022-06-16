@@ -3,12 +3,14 @@ package mindustry.graphics;
 import arc.graphics.*;
 import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
 import mindustry.*;
 
 public class MultiPacker implements Disposable{
     private PixmapPacker[] packers = new PixmapPacker[PageType.all.length];
+    private ObjectSet<String> outlined = new ObjectSet<>();
 
     public MultiPacker(){
         for(int i = 0; i < packers.length; i++){
@@ -48,6 +50,15 @@ public class MultiPacker implements Disposable{
         }
     }
 
+    /** @return whether this image was not already outlined. */
+    public boolean registerOutlined(String named){
+        return outlined.add(named);
+    }
+
+    public boolean isOutlined(String name){
+        return outlined.contains(name);
+    }
+
     public PixmapPacker getPacker(PageType type){
         return packers[type.ordinal()];
     }
@@ -66,7 +77,7 @@ public class MultiPacker implements Disposable{
     }
 
     public void add(PageType type, String name, PixmapRegion region){
-        packers[type.ordinal()].pack(name, region);
+        add(type, name, region, null, null);
     }
 
     public void add(PageType type, String name, PixmapRegion region, int[] splits, int[] pads){
@@ -74,7 +85,7 @@ public class MultiPacker implements Disposable{
     }
 
     public void add(PageType type, String name, Pixmap pix){
-        packers[type.ordinal()].pack(name, pix);
+        add(type, name, new PixmapRegion(pix));
     }
 
     public TextureAtlas flush(TextureFilter filter, TextureAtlas atlas){
@@ -95,13 +106,13 @@ public class MultiPacker implements Disposable{
     //main page (sprites.png) - all sprites for units, weapons, placeable blocks, effects, bullets, etc
     //environment page (sprites2.png) - all sprites for things in the environmental cache layer
     //editor page (sprites3.png) - all sprites needed for rendering in the editor, including block icons and a few minor sprites
-    //zone page (sprites4.png) - zone preview
     //rubble page - scorch textures for unit deaths & wrecks
     //ui page (sprites5.png) - content icons, white icons, fonts and UI elements
     public enum PageType{
         //main page can be massive, but 8192 throws GL_OUT_OF_MEMORY on some GPUs and I can't deal with it yet.
         main(4096),
 
+        //TODO stuff like this throws OOM on some devices
         environment(4096, 2048),
         editor(4096, 2048),
         rubble(4096, 2048),

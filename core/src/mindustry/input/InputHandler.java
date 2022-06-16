@@ -475,7 +475,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(player == null) return;
 
         //make sure player is allowed to control the unit
-        if(net.server() && !netServer.admins.allowAction(player, ActionType.control, action -> action.unit = unit)){
+        if(net.server() && (!state.rules.possessionAllowed || !netServer.admins.allowAction(player, ActionType.control, action -> action.unit = unit))){
             throw new ValidateException(player, "Player cannot control a unit.");
         }
 
