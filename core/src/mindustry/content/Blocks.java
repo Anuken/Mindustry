@@ -1020,6 +1020,7 @@ public class Blocks{
             envEnabled = Env.any;
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(Liquids.cryofluid), new DrawDefault());
             liquidCapacity = 24f;
+            craftTime = 120;
 
             consumePower(1f);
             consumeItem(Items.titanium);
