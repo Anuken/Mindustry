@@ -21,7 +21,7 @@ void main(){
     vec4 color = texture2D(u_texture, T);
     vec2 v = u_invsize;
 
-    vec4 maxed = max(max(max(texture2D(u_texture, T + vec2(0, step) * v), texture2D(u_texture, T + vec2(0, -step) * v)), texture2D(u_texture, T + vec2(step, 0) * v)), texture2D(u_texture, T + vec2(-step, 0) * v));
+    vec4 maxed = max(max(max(max(max(max(max(texture2D(u_texture, T + vec2(0, step) * v), texture2D(u_texture, T + vec2(0, -step) * v)), texture2D(u_texture, T + vec2(step, 0) * v)), texture2D(u_texture, T + vec2(-step, 0) * v)), texture2D(u_texture, T + vec2(step, step) * v)), texture2D(u_texture, T + vec2(step, -step) * v)), texture2D(u_texture, T + vec2(-step, step) * v)), texture2D(u_texture, T + vec2(-step, -step) * v));
 
     if(texture2D(u_texture, T).a < 0.9 && maxed.a > 0.9){
 
