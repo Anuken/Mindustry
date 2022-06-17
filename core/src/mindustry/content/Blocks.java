@@ -1682,6 +1682,8 @@ public class Blocks{
             consumesPower = true;
             conductivePower = true;
 
+            chanceDeflect = 8f;
+
             health = 260 * wallHealthMultiplier * 4;
             armor = 15f;
             size = 2;

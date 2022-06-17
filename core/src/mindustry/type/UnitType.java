@@ -857,8 +857,6 @@ public class UnitType extends UnlockableContent{
         var toOutline = new Seq<TextureRegion>();
         getRegionsToOutline(toOutline);
 
-        boolean separateOutline = weapons.contains(w -> !w.top);
-
         for(var region : toOutline){
             if(region instanceof AtlasRegion atlas){
                 String regionName = atlas.name;
@@ -890,9 +888,8 @@ public class UnitType extends UnlockableContent{
             }
 
             for(Weapon weapon : weapons){
-                if(!weapon.name.isEmpty() && (minfo.mod == null || weapon.name.startsWith(minfo.mod.name))){
-                    //TODO makeNew isn't really necessary here is it
-                    makeOutline(PageType.main, packer, weapon.region, separateOutline, outlineColor, outlineRadius);
+                if(!weapon.name.isEmpty() && (minfo.mod == null || weapon.name.startsWith(minfo.mod.name)) && !(!weapon.top && packer.isOutlined(weapon.name))){
+                    makeOutline(PageType.main, packer, weapon.region, !weapon.top, outlineColor, outlineRadius);
                 }
             }
         }
