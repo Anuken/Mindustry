@@ -80,7 +80,11 @@ public class Blocks{
     //defense
     copperWall, copperWallLarge, titaniumWall, titaniumWallLarge, plastaniumWall, plastaniumWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge,
     phaseWall, phaseWallLarge, surgeWall, surgeWallLarge,
+
+    //walls - erekir
     berylliumWall, berylliumWallLarge, tungstenWall, tungstenWallLarge, blastDoor, reinforcedSurgeWall, reinforcedSurgeWallLarge, carbideWall, carbideWallLarge,
+    shieldedWall,
+
     mender, mendProjector, overdriveProjector, overdriveDome, forceProjector, shockMine,
     scrapWall, scrapWallLarge, scrapWallHuge, scrapWallGigantic, thruster, //ok, these names are getting ridiculous, but at least I don't have humongous walls yet
 
@@ -1669,6 +1673,20 @@ public class Blocks{
             size = 2;
         }};
 
+        shieldedWall = new ShieldWall("shielded-wall"){{
+            requirements(Category.defense, ItemStack.with(Items.phaseFabric, 20, Items.surgeAlloy, 12));
+            consumePower(3f / 60f);
+
+            outputsPower = false;
+            hasPower = true;
+            consumesPower = true;
+            conductivePower = true;
+
+            health = 260 * wallHealthMultiplier * 4;
+            armor = 15f;
+            size = 2;
+        }};
+
         mender = new MendProjector("mender"){{
             requirements(Category.effect, with(Items.lead, 30, Items.copper, 25));
             consumePower(0.3f);
@@ -1992,6 +2010,7 @@ public class Blocks{
             hasPower = true;
             consumesPower = true;
             conductivePower = true;
+
             underBullets = true;
             baseEfficiency = 1f;
             consumePower(1f / 60f);
@@ -4124,7 +4143,7 @@ public class Blocks{
                 intervalRandomSpread = 20f;
                 intervalBullets = 2;
                 intervalAngle = 180f;
-                intervalSpread = 280f;
+                intervalSpread = 300f;
 
                 fragBullets = 20;
                 fragVelocityMin = 0.5f;
@@ -4140,7 +4159,7 @@ public class Blocks{
                     under = true;
                     moveX = 2f;
                     moveY = -1f;
-                    moveRot = -5f;
+                    moveRot = -7f;
                 }},
                 new RegionPart("-blade-glow"){{
                     progress = PartProgress.recoil;
@@ -4151,7 +4170,7 @@ public class Blocks{
                     under = true;
                     moveX = 2f;
                     moveY = -1f;
-                    moveRot = -5f;
+                    moveRot = -7f;
                 }});
             }};
 
