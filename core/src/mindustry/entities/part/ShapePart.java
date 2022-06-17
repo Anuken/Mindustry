@@ -6,9 +6,9 @@ import arc.math.*;
 import arc.util.*;
 
 public class ShapePart extends DrawPart{
-    public boolean circle = false;
+    public boolean circle = false, hollow = false;
     public int sides = 3;
-    public float radius = 3f, radiusTo = -1f;
+    public float radius = 3f, radiusTo = -1f, stroke = 1f, strokeTo = -1f;
     public float x, y, rotation;
     public float moveX, moveY, moveRot;
     public Color color = Color.white;
@@ -38,18 +38,29 @@ public class ShapePart extends DrawPart{
             float
             rx = params.x + Tmp.v1.x,
             ry = params.y + Tmp.v1.y,
-            rad = radiusTo < 0 ? radius : Mathf.lerp(radius, radiusTo, prog);
+            rad = radiusTo < 0 ? radius : Mathf.lerp(radius, radiusTo, prog),
+            str = strokeTo < 0 ? stroke : Mathf.lerp(stroke, strokeTo, prog);
 
             if(color != null && colorTo != null){
                 Draw.color(color, colorTo, prog);
             }else if(color != null){
                 Draw.color(color);
             }
-
-            if(!circle){
-                Fill.poly(rx, ry, sides, rad, moveRot * prog * sign + params.rotation - 90 * sign + rotation * sign);
+            
+            if(!hollow){
+                if(!circle){
+                    Fill.poly(rx, ry, sides, rad, moveRot * prog * sign + params.rotation - 90 * sign + rotation * sign);
+                }else{
+                    Fill.circle(rx, ry, rad);
+                }
             }else{
-                Fill.circle(rx, ry, rad);
+                Lines.stroke(str);
+                if(!circle){
+                    Lines.poly(rx, ry, sides, rad, moveRot * prog * sign + params.rotation - 90 * sign + rotation * sign);
+                }else{
+                    Lines.circle(rx, ry, rad);
+                }
+                Lines.stroke(1f);
             }
             if(color != null) Draw.color();
         }
