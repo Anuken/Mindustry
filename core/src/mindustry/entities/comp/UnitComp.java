@@ -609,6 +609,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             a.death(self());
         }
 
+        type.killed(self());
+
         remove();
     }
 
