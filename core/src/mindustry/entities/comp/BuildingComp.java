@@ -1278,12 +1278,12 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             block.destroyBullet.create(this, Team.derelict, x, y, 0);
         }
         if(block.spawnUnit != null){
+            float radX = Mathf.range(block.spawnUnitRadius), radY = Mathf.range(block.spawnUnitRadius);
             for(int i = 0; i < block.spawnUnitCount; i++){
                 if(block.spawnUnitTeam != null){
-                    //Spawn units with a small offset to prevent "unit stacking"
-                    block.spawnUnit.spawn(block.spawnUnitTeam, x + Mathf.random(2f), y);
+                    block.spawnUnit.spawn(block.spawnUnitTeam, x + radX, y + radY);
                 }else{
-                    block.spawnUnit.spawn(team, x + Mathf.random(2f), y);
+                    block.spawnUnit.spawn(team, x + radX, y + radY);
                 }
             }
         }

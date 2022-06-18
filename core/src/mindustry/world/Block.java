@@ -170,6 +170,8 @@ public class Block extends UnlockableContent implements Senseable{
     public @Nullable UnitType spawnUnit = null;
     /** amount of units that this block spawns when destroyed */
     public int spawnUnitCount = 1;
+    /** random distance radius from block position */
+    public float spawnUnitRadius = 2f;
     /** default team for the unit defined in spawnUnit */
     public @Nullable Team spawnUnitTeam = null;
     /** whether cracks are drawn when this block is damaged */
