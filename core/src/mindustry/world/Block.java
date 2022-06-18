@@ -166,6 +166,10 @@ public class Block extends UnlockableContent implements Senseable{
     public float baseExplosiveness = 0f;
     /** bullet that this block spawns when destroyed */
     public @Nullable BulletType destroyBullet = null;
+    /** unit that this block spawns when destroyed */
+    public @Nullable UnitType spawnUnit = null;
+    /** default team for the unit defined in spawnUnit */
+    public @Nullable Team spawnUnitTeam = null;
     /** whether cracks are drawn when this block is damaged */
     public boolean drawCracks = true;
     /** whether rubble is created when this block is destroyed */
