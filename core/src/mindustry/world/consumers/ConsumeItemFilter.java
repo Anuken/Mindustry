@@ -2,69 +2,66 @@ package mindustry.world.consumers;
 
 import arc.func.*;
 import arc.scene.ui.layout.*;
-import arc.struct.*;
+import arc.util.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
+import mindustry.world.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
 public class ConsumeItemFilter extends Consume{
-    public final Boolf<Item> filter;
+    public Boolf<Item> filter = i -> false;
 
     public ConsumeItemFilter(Boolf<Item> item){
         this.filter = item;
     }
 
-    @Override
-    public void applyItemFilter(Bits arr){
-        content.items().each(filter, item -> arr.set(item.id));
+    public ConsumeItemFilter(){
     }
 
     @Override
-    public ConsumeType type(){
-        return ConsumeType.item;
+    public void apply(Block block){
+        block.hasItems = true;
+        block.acceptsItems = true;
+        content.items().each(filter, item -> block.itemFilter[item.id] = true);
     }
 
     @Override
-    public void build(Building tile, Table table){
+    public void build(Building build, Table table){
         MultiReqImage image = new MultiReqImage();
         content.items().each(i -> filter.get(i) && i.unlockedNow(), item -> image.add(new ReqImage(new ItemImage(item.uiIcon, 1),
-            () -> tile.items != null && tile.items.has(item))));
+            () -> build.items.has(item))));
 
         table.add(image).size(8 * 4);
     }
 
     @Override
-    public String getIcon(){
-        return "icon-item";
+    public void update(Building build){
     }
 
     @Override
-    public void update(Building entity){
-    }
-
-    @Override
-    public void trigger(Building entity){
-        for(int i = 0; i < content.items().size; i++){
-            Item item = content.item(i);
-            if(entity.items != null && entity.items.has(item) && this.filter.get(item)){
-                entity.items.remove(item, 1);
-                break;
-            }
+    public void trigger(Building build){
+        Item item = getConsumed(build);
+        if(item != null){
+            build.items.remove(item, 1);
         }
     }
 
     @Override
-    public boolean valid(Building entity){
+    public float efficiency(Building build){
+        return build.consumeTriggerValid() || getConsumed(build) != null ? 1f : 0f;
+    }
+
+    public @Nullable Item getConsumed(Building build){
         for(int i = 0; i < content.items().size; i++){
             Item item = content.item(i);
-            if(entity.items != null && entity.items.has(item) && this.filter.get(item)){
-                return true;
+            if(build.items.has(item) && this.filter.get(item)){
+                return item;
             }
         }
-        return false;
+        return null;
     }
 
     @Override

@@ -11,8 +11,8 @@ import static mindustry.Vars.*;
 public class MedianFilter extends GenerateFilter{
     private static final IntSeq blocks = new IntSeq(), floors = new IntSeq();
 
-    float radius = 2;
-    float percentile = 0.5f;
+    public float radius = 2;
+    public float percentile = 0.5f;
 
     @Override
     public FilterOption[] options(){

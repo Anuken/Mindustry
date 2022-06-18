@@ -1,20 +1,12 @@
 package mindustry.io.versions;
 
-import mindustry.io.*;
-
 import java.io.*;
 
-/** This version only writes entities, no entity ID mappings. */
-public class Save4 extends SaveVersion{
+/** This version only reads entities, no entity ID mappings. */
+public class Save4 extends LegacySaveVersion2{
 
     public Save4(){
         super(4);
-    }
-
-    @Override
-    public void writeEntities(DataOutput stream) throws IOException{
-        writeTeamBlocks(stream);
-        writeWorldEntities(stream);
     }
 
     @Override

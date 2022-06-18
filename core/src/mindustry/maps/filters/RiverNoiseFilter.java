@@ -7,8 +7,8 @@ import mindustry.world.*;
 import static mindustry.maps.filters.FilterOption.*;
 
 public class RiverNoiseFilter extends GenerateFilter{
-    float scl = 40, threshold = 0f, threshold2 = 0.1f, octaves = 1, falloff = 0.5f;
-    Block floor = Blocks.water, floor2 = Blocks.deepwater, block = Blocks.sandWall, target = Blocks.air;
+    public float scl = 40, threshold = 0f, threshold2 = 0.1f, octaves = 1, falloff = 0.5f;
+    public Block floor = Blocks.water, floor2 = Blocks.deepwater, block = Blocks.sandWall, target = Blocks.air;
 
     @Override
     public FilterOption[] options(){

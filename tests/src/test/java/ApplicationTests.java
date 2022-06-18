@@ -350,13 +350,22 @@ public class ApplicationTests{
     }
 
     @Test
-    void load(){
+    void saveLoad(){
         world.loadMap(testMap);
         Map map = state.map;
+
+        float hp = 30f;
+
+        Unit unit = UnitTypes.dagger.spawn(Team.sharded, 20f, 30f);
+        unit.health = hp;
 
         SaveIO.save(saveDirectory.child("0.msav"));
         resetWorld();
         SaveIO.load(saveDirectory.child("0.msav"));
+
+        Unit spawned = Groups.unit.find(u -> u.type == UnitTypes.dagger);
+        assertNotNull(spawned, "Saved daggers must persist");
+        assertEquals(hp, spawned.health, "Spawned dagger health must save.");
 
         assertEquals(world.width(), map.width);
         assertEquals(world.height(), map.height);
@@ -756,7 +765,7 @@ public class ApplicationTests{
 
     @Test
     void allBlockTest(){
-        Tiles tiles = world.resize(256 * 3 + 20, 10);
+        Tiles tiles = world.resize(80, 80);
 
         world.beginMapLoad();
         for(int x = 0; x < tiles.width; x++){
@@ -764,14 +773,24 @@ public class ApplicationTests{
                 tiles.set(x, y, new Tile(x, y, Blocks.stone, Blocks.air, Blocks.air));
             }
         }
-        int i = 0;
+        int maxHeight = 0;
+        state.rules.canGameOver = false;
+        state.rules.borderDarkness = false;
 
-        for(int x = 5; x < tiles.width && i < content.blocks().size; ){
-            Block block = content.block(i++);
+        for(int x = 0, y = 0, i = 0; i < content.blocks().size; i ++){
+            Block block = content.block(i);
             if(block.canBeBuilt()){
+                int offset = Math.max(block.size % 2 == 0 ? block.size/2 - 1 : block.size/2, 0);
+
+                if(x + block.size + 1 >= world.width()){
+                    y += maxHeight;
+                    maxHeight = 0;
+                    x = 0;
+                }
+
+                tiles.get(x + offset, y + offset).setBlock(block);
                 x += block.size;
-                tiles.get(x, 5).setBlock(block);
-                x += block.size;
+                maxHeight = Math.max(maxHeight, block.size);
             }
         }
         world.endMapLoad();
@@ -894,14 +913,16 @@ public class ApplicationTests{
                 if(state.rules.attackMode){
                     bossWave = 100;
                 }else{
-                    assertNotEquals(0, bossWave, "Sector doesn't have a boss wave.");
+                    assertNotEquals(0, bossWave, "Sector " + zone.name + " doesn't have a boss/end wave.");
                 }
+
+                if(state.rules.winWave > 0) bossWave = state.rules.winWave - 1;
 
                 //TODO check for difficulty?
                 for(int i = 1; i <= bossWave; i++){
                     int total = 0;
                     for(SpawnGroup spawn : spawns){
-                        total += spawn.getSpawned(i);
+                        total += spawn.getSpawned(i - 1);
                     }
 
                     assertNotEquals(0, total, "Sector " + zone + " has no spawned enemies at wave " + i);

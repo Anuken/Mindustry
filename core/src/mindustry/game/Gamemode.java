@@ -18,7 +18,8 @@ public enum Gamemode{
     }),
     attack(rules -> {
         rules.attackMode = true;
-        rules.waves = true;
+        //TODO waves is now a bad idea
+        //rules.waves = true;
         rules.waveTimer = true;
 
         rules.waveSpacing = 2f * Time.toMinutes;

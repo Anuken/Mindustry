@@ -94,7 +94,7 @@ public class Build{
 
         Block previous = tile.block();
         Block sub = ConstructBlock.get(result.size);
-        Seq<Building> prevBuild = new Seq<>(9);
+        var prevBuild = new Seq<Building>(9);
 
         result.beforePlaceBegan(tile, previous);
         tmp.clear();
@@ -126,7 +126,7 @@ public class Build{
     /** Returns whether a tile can be placed at this location by this team. */
     public static boolean validPlace(Block type, Team team, int x, int y, int rotation, boolean checkVisible){
         //the wave team can build whatever they want as long as it's visible - banned blocks are not applicable
-        if(type == null || (checkVisible && (!type.isPlaceable() && !(state.rules.waves && team == state.rules.waveTeam && type.isVisible())))){
+        if(type == null || (checkVisible && (!type.environmentBuildable() || (!type.isPlaceable() && !(state.rules.waves && team == state.rules.waveTeam && type.isVisible()))))){
             return false;
         }
 
@@ -184,6 +184,8 @@ public class Build{
 
                 if(
                 check == null || //nothing there
+                (type.size == 2 && world.getDarkness(wx, wy) >= 3) ||
+                (state.rules.staticFog && state.rules.fog && !fogControl.isDiscovered(team, wx, wy)) ||
                 (check.floor().isDeep() && !type.floating && !type.requiresWater && !type.placeableLiquid) || //deep water
                 (type == check.block() && check.build != null && rotation == check.build.rotation && type.rotate) || //same block, same rotation
                 !check.interactable(team) || //cannot interact
@@ -201,7 +203,15 @@ public class Build{
             }
         }
 
+        if(state.rules.placeRangeCheck && !state.isEditor() && getEnemyOverlap(type, team, x, y) != null){
+            return false;
+        }
+
         return true;
+    }
+
+    public static @Nullable Building getEnemyOverlap(Block block, Team team, int x, int y){
+        return indexer.findEnemyTile(team, x * tilesize + block.size, y * tilesize + block.size, block.placeOverlapRange + 4f, p -> true);
     }
 
     public static boolean contactsGround(int x, int y, Block block){
@@ -221,12 +231,12 @@ public class Build{
 
     public static boolean contactsShallows(int x, int y, Block block){
         if(block.isMultiblock()){
-            for(Point2 point : Edges.getInsideEdges(block.size)){
+            for(Point2 point : block.getInsideEdges()){
                 Tile tile = world.tile(x + point.x, y + point.y);
                 if(tile != null && !tile.floor().isDeep()) return true;
             }
 
-            for(Point2 point : Edges.getEdges(block.size)){
+            for(Point2 point : block.getEdges()){
                 Tile tile = world.tile(x + point.x, y + point.y);
                 if(tile != null && !tile.floor().isDeep()) return true;
             }

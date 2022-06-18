@@ -20,6 +20,7 @@ import static mindustry.Vars.*;
 public class Accelerator extends Block{
     public @Load("launch-arrow") TextureRegion arrowRegion;
 
+    //TODO dynamic
     public Block launching = Blocks.coreNucleus;
     public int[] capacities = {};
 
@@ -40,7 +41,7 @@ public class Accelerator extends Block{
             capacities[stack.item.id] = stack.amount;
             itemCapacity += stack.amount;
         }
-        consumes.items(launching.requirements);
+        consumeItems(launching.requirements);
         super.init();
     }
 
@@ -55,7 +56,7 @@ public class Accelerator extends Block{
         @Override
         public void updateTile(){
             super.updateTile();
-            heat = Mathf.lerpDelta(heat, consValid() ? 1f : 0f, 0.05f);
+            heat = Mathf.lerpDelta(heat, efficiency, 0.05f);
             statusLerp = Mathf.lerpDelta(statusLerp, power.status, 0.05f);
         }
 
@@ -100,24 +101,25 @@ public class Accelerator extends Block{
 
         @Override
         public Cursor getCursor(){
-            return !state.isCampaign() || !consValid() ? SystemCursor.arrow : super.getCursor();
+            return !state.isCampaign() || efficiency <= 0f ? SystemCursor.arrow : super.getCursor();
         }
 
         @Override
         public void buildConfiguration(Table table){
             deselect();
 
-            if(!state.isCampaign() || !consValid()) return;
+            if(!state.isCampaign() || efficiency <= 0f) return;
 
-            //TODO implement
-            if(true){
-                ui.showInfo("@indev.campaign");
-            }else{
-                ui.planet.showPlanetLaunch(state.rules.sector, sector -> {
-                    //TODO cutscene, etc...
-                    consume();
-                });
-            }
+            ui.planet.showPlanetLaunch(state.rules.sector, sector -> {
+                //TODO cutscene, etc...
+
+                //TODO should consume resources based on destination schem
+                consume();
+
+                universe.clearLoadoutInfo();
+                universe.updateLoadout(sector.planet.generator.getDefaultLoadout().findCore(), sector.planet.generator.getDefaultLoadout());
+            });
+
             Events.fire(Trigger.acceleratorUse);
         }
 

@@ -31,6 +31,8 @@ public class PayloadSource extends PayloadBlock{
         //make sure to display large units.
         clipSize = 120;
         noUpdateDisabled = true;
+        clearOnDoubleTap = true;
+        regionRotated1 = 1;
 
         config(Block.class, (PayloadSourceBuild build, Block block) -> {
             if(canProduce(block) && build.block != block){
@@ -64,18 +66,18 @@ public class PayloadSource extends PayloadBlock{
     }
 
     @Override
-    public void drawRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
-        Draw.rect(region, req.drawx(), req.drawy());
-        Draw.rect(outRegion, req.drawx(), req.drawy(), req.rotation * 90);
-        Draw.rect(topRegion, req.drawx(), req.drawy());
+    public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
+        Draw.rect(region, plan.drawx(), plan.drawy());
+        Draw.rect(outRegion, plan.drawx(), plan.drawy(), plan.rotation * 90);
+        Draw.rect(topRegion, plan.drawx(), plan.drawy());
     }
 
     public boolean canProduce(Block b){
-        return b.isVisible() && b.size < size && !(b instanceof CoreBlock) && !state.rules.bannedBlocks.contains(b);
+        return b.isVisible() && b.size < size && !(b instanceof CoreBlock) && !state.rules.bannedBlocks.contains(b) && b.environmentBuildable();
     }
 
     public boolean canProduce(UnitType t){
-        return !t.isHidden() && !t.isBanned();
+        return !t.isHidden() && !t.isBanned() && t.supportsEnv(state.rules.env);
     }
     
     public class PayloadSourceBuild extends PayloadBlockBuild<Payload>{
@@ -87,19 +89,8 @@ public class PayloadSource extends PayloadBlock{
         public void buildConfiguration(Table table){
             ItemSelection.buildTable(PayloadSource.this, table,
                 content.blocks().select(PayloadSource.this::canProduce).<UnlockableContent>as()
-                .and(content.units().select(PayloadSource.this::canProduce).as()),
+                .add(content.units().select(PayloadSource.this::canProduce).as()),
             () -> (UnlockableContent)config(), this::configure);
-        }
-
-        @Override
-        public boolean onConfigureTileTapped(Building other){
-            if(this == other){
-                deselect();
-                configure(null);
-                return false;
-            }
-
-            return true;
         }
 
         @Override

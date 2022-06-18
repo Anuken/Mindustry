@@ -44,6 +44,7 @@ public class ModsDialog extends BaseDialog{
 
     private BaseDialog browser;
     private Table browserTable;
+    private float scroll = 0f;
 
     public ModsDialog(){
         super("@mods");
@@ -58,7 +59,7 @@ public class ModsDialog extends BaseDialog{
                 searchtxt = res;
                 rebuildBrowser();
             }).growX().get();
-            table.button(Icon.list, Styles.clearPartiali, 32f, () -> {
+            table.button(Icon.list, Styles.clearNonei, 32f, () -> {
                 orderDate = !orderDate;
                 rebuildBrowser();
             }).update(b -> b.getStyle().imageUp = (orderDate ? Icon.list : Icon.star)).size(40f).get()
@@ -101,7 +102,7 @@ public class ModsDialog extends BaseDialog{
     void modError(Throwable error){
         ui.loadfrag.hide();
 
-        if(Strings.getCauses(error).contains(t -> t.getMessage() != null && (t.getMessage().contains("trust anchor") || t.getMessage().contains("SSL") || t.getMessage().contains("protocol")))){
+        if(error instanceof NoSuchMethodError || Strings.getCauses(error).contains(t -> t.getMessage() != null && (t.getMessage().contains("trust anchor") || t.getMessage().contains("SSL") || t.getMessage().contains("protocol")))){
             ui.showErrorMessage("@feature.unsupported");
         }else if(error instanceof HttpStatusException st){
             ui.showErrorMessage(Core.bundle.format("connectfail", Strings.capitalize(st.status.toString().toLowerCase())));
@@ -153,13 +154,13 @@ public class ModsDialog extends BaseDialog{
         cont.table(buttons -> {
             buttons.left().defaults().growX().height(60f).uniformX();
 
-            TextButtonStyle style = Styles.clearPartialt;
+            TextButtonStyle style = Styles.flatBordert;
             float margin = 12f;
 
             buttons.button("@mod.import", Icon.add, style, () -> {
                 BaseDialog dialog = new BaseDialog("@mod.import");
 
-                TextButtonStyle bstyle = Styles.cleart;
+                TextButtonStyle bstyle = Styles.flatt;
 
                 dialog.cont.table(Tex.button, t -> {
                     t.defaults().size(300f, 70f);
@@ -241,14 +242,19 @@ public class ModsDialog extends BaseDialog{
 
                                 title1.table(text -> {
                                     boolean hideDisabled = !item.isSupported() || item.hasUnmetDependencies() || item.hasContentErrors();
+                                    String shortDesc = item.meta.shortDescription();
 
-                                    text.add("[accent]" + Strings.stripColors(item.meta.displayName()) + "\n[lightgray]v" + Strings.stripColors(trimText(item.meta.version)) + (item.enabled() || hideDisabled ? "" : "\n" + Core.bundle.get("mod.disabled") + ""))
+                                    text.add("[accent]" + Strings.stripColors(item.meta.displayName()) + "\n" +
+                                        (shortDesc.length() > 0 ? "[lightgray]" + shortDesc + "\n" : "")
+                                        //so does anybody care about version?
+                                        //+ "[gray]v" + Strings.stripColors(trimText(item.meta.version)) + "\n"
+                                        + (item.enabled() || hideDisabled ? "" : Core.bundle.get("mod.disabled") + ""))
                                     .wrap().top().width(300f).growX().left();
 
                                     text.row();
 
                                     if(item.isOutdated()){
-                                        text.labelWrap("@mod.outdated").growX();
+                                        text.labelWrap("@mod.outdatedv7").growX();
                                         text.row();
                                     }else if(!item.isSupported()){
                                         text.labelWrap(Core.bundle.format("mod.requiresversion", item.meta.minGameVersion)).growX();
@@ -270,12 +276,12 @@ public class ModsDialog extends BaseDialog{
 
                             t.table(right -> {
                                 right.right();
-                                right.button(item.enabled() ? Icon.downOpen : Icon.upOpen, Styles.clearPartiali, () -> {
+                                right.button(item.enabled() ? Icon.downOpen : Icon.upOpen, Styles.clearNonei, () -> {
                                     mods.setEnabled(item, !item.enabled());
                                     setup();
                                 }).size(50f).disabled(!item.isSupported());
 
-                                right.button(item.hasSteamID() ? Icon.link : Icon.trash, Styles.clearPartiali, () -> {
+                                right.button(item.hasSteamID() ? Icon.link : Icon.trash, Styles.clearNonei, () -> {
                                     if(!item.hasSteamID()){
                                         ui.showConfirm("@confirm", "@mod.remove.confirm", () -> {
                                             mods.removeMod(item);
@@ -288,12 +294,12 @@ public class ModsDialog extends BaseDialog{
 
                                 if(steam && !item.hasSteamID()){
                                     right.row();
-                                    right.button(Icon.export, Styles.clearPartiali, () -> {
+                                    right.button(Icon.export, Styles.clearNonei, () -> {
                                         platform.publish(item);
                                     }).size(50f);
                                 }
                             }).growX().right().padRight(-8f).padTop(-8f);
-                        }, Styles.clearPartialt, () -> showMod(item)).size(w, h).growX().pad(4f);
+                        }, Styles.flatBordert, () -> showMod(item)).size(w, h).growX().pad(4f);
                         pane[0].row();
                     }
                 }
@@ -314,7 +320,7 @@ public class ModsDialog extends BaseDialog{
             cont.pane(table1 -> {
                 pane[0] = table1.margin(10f).top();
                 rebuild.get("");
-            }).scrollX(false);
+            }).scrollX(false).update(s -> scroll = s.getScrollY()).get().setScrollYForce(scroll);
         }else{
             cont.table(Styles.black6, t -> t.add("@mods.none")).height(80f);
         }
@@ -323,7 +329,10 @@ public class ModsDialog extends BaseDialog{
     }
 
     private void reload(){
-        ui.showInfoOnHidden("@mods.reloadexit", () -> Core.app.exit());
+        ui.showInfoOnHidden("@mods.reloadexit", () -> {
+            Log.info("Exiting to reload mods.");
+            Core.app.exit();
+        });
     }
 
     private void showMod(LoadedMod mod){
@@ -373,7 +382,7 @@ public class ModsDialog extends BaseDialog{
                 d.cont.pane(cs -> {
                     int i = 0;
                     for(UnlockableContent c : all){
-                        cs.button(new TextureRegionDrawable(c.uiIcon), Styles.cleari, iconMed, () -> {
+                        cs.button(new TextureRegionDrawable(c.uiIcon), Styles.flati, iconMed, () -> {
                             ui.content.show(c);
                         }).size(50f).with(im -> {
                             var click = im.getClickListener();
@@ -468,12 +477,12 @@ public class ModsDialog extends BaseDialog{
                     con.add(
                     "[accent]" + mod.name.replace("\n", "") +
                     (installed.contains(mod.repo) ? "\n[lightgray]" + Core.bundle.get("mod.installed") : "") +
-                    //"[white]\n[lightgray]Author:[] " + trimText(mod.author) +
                     "\n[lightgray]\uE809 " + mod.stars +
-                    (Version.isAtLeast(mod.minGameVersion) ? "" : "\n" + Core.bundle.format("mod.requiresversion", mod.minGameVersion)))
+                    (Version.isAtLeast(mod.minGameVersion) ? mod.subtitle == null ? "" : "\n[lightgray]" + Strings.truncate(mod.subtitle, maxModSubtitleLength) :
+                    "\n" + Core.bundle.format("mod.requiresversion", mod.minGameVersion)))
                     .width(358f).wrap().grow().pad(4f, 2f, 4f, 6f).top().left().labelAlign(Align.topLeft);
 
-                }, Styles.clearPartialt, () -> {
+                }, Styles.flatBordert, () -> {
                     var sel = new BaseDialog(mod.name);
                     sel.cont.pane(p -> p.add(mod.description + "\n\n[accent]" + Core.bundle.get("editor.author") + "[lightgray] " + mod.author)
                         .width(mobile ? 400f : 500f).wrap().pad(4f).labelAlign(Align.center, Align.left)).grow();

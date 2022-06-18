@@ -30,8 +30,6 @@ public interface Autotiler{
     }
 
     /**
-     * Slices a texture region depending on the SliceMode paramater
-     *
      * @param input The TextureRegion to be sliced
      * @param mode The SliceMode to be applied
      * @return The sliced texture
@@ -40,12 +38,7 @@ public interface Autotiler{
         return mode == SliceMode.none ? input : mode == SliceMode.bottom ? botHalf(input) : topHalf(input);
     }
 
-    /**
-     * Get the top half of a texture
-     *
-     * @param input The TextureRegion to slice
-     * @return The top half of the texture
-     */
+    /** @return The top half of the input */
     default TextureRegion topHalf(TextureRegion input){
         TextureRegion region = Tmp.tr1;
         region.set(input);
@@ -53,12 +46,7 @@ public interface Autotiler{
         return region;
     }
 
-    /**
-     * Get the buttom half of a texture
-     *
-     * @param input The TextureRegion to slice
-     * @return The buttom half of the texture
-     */
+    /** @return The bottom half of the input */
     default TextureRegion botHalf(TextureRegion input){
         TextureRegion region = Tmp.tr1;
         region.set(input);
@@ -73,6 +61,7 @@ public interface Autotiler{
         BuildPlan[] directionals = AutotilerHolder.directionals;
 
         Arrays.fill(directionals, null);
+        //TODO this is O(n^2), very slow, should use quadtree or intmap or something instead
         list.each(other -> {
             if(other.breaking || other == req) return;
 
@@ -201,7 +190,8 @@ public interface Autotiler{
     default boolean blendsArmored(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
         return Point2.equals(tile.x + Geometry.d4(rotation).x, tile.y + Geometry.d4(rotation).y, otherx, othery)
                 || ((!otherblock.rotatedOutput(otherx, othery) && Edges.getFacingEdge(otherblock, otherx, othery, tile) != null &&
-                Edges.getFacingEdge(otherblock, otherx, othery, tile).relativeTo(tile) == rotation) || (otherblock.rotatedOutput(otherx, othery) && Point2.equals(otherx + Geometry.d4(otherrot).x, othery + Geometry.d4(otherrot).y, tile.x, tile.y)));
+                Edges.getFacingEdge(otherblock, otherx, othery, tile).relativeTo(tile) == rotation) ||
+                (otherblock.rotatedOutput(otherx, othery) && Point2.equals(otherx + Geometry.d4(otherrot).x, othery + Geometry.d4(otherrot).y, tile.x, tile.y)));
     }
 
     /** @return whether this other block is *not* looking at this one. */
@@ -212,8 +202,13 @@ public interface Autotiler{
     /** @return whether this tile is looking at the other tile, or the other tile is looking at this one.
      * If the other tile does not rotate, it is always considered to be facing this one. */
     default boolean lookingAtEither(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
-        return (Point2.equals(tile.x + Geometry.d4(rotation).x, tile.y + Geometry.d4(rotation).y, otherx, othery)
-        || (!otherblock.rotatedOutput(otherx, othery) || Point2.equals(otherx + Geometry.d4(otherrot).x, othery + Geometry.d4(otherrot).y, tile.x, tile.y)));
+        return
+            //block is facing the other
+            Point2.equals(tile.x + Geometry.d4(rotation).x, tile.y + Geometry.d4(rotation).y, otherx, othery) ||
+            //does not output to rotated direction
+            !otherblock.rotatedOutput(otherx, othery) ||
+            //other block is facing this one
+            Point2.equals(otherx + Geometry.d4(otherrot).x, othery + Geometry.d4(otherrot).y, tile.x, tile.y);
     }
 
     /**

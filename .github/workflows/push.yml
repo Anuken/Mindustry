@@ -21,6 +21,8 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 17
+    - name: Setup Gradle
+      uses: gradle/gradle-build-action@v2
     - name: Update bundles
       if: ${{ github.repository == 'Anuken/Mindustry' }}
       run: |
@@ -31,5 +33,21 @@ jobs:
           git commit -m "Automatic bundle update"
           git push
         fi
+    - name: Update JITpack repo
+      if: ${{ github.repository == 'Anuken/Mindustry' }}
+      run: |
+        cd ../
+        cp -r ./Mindustry ./MindustryJitpack
+        cd MindustryJitpack
+        git clone --depth 1 https://github.com/Anuken/MindustryJitpack.git
+        rm -rf .git
+        cp -r ./MindustryJitpack/.git ./.git
+        rm -rf MindustryJitpack
+        rm -rf .github
+        rm README.md
+        git add .
+        git commit --allow-empty -m "${GITHUB_SHA}"
+        git push https://Anuken:${{ secrets.API_TOKEN_GITHUB }}@github.com/Anuken/MindustryJitpack
+        cd ../Mindustry
     - name: Run unit tests
       run: ./gradlew clean cleanTest test --stacktrace

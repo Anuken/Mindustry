@@ -3,7 +3,6 @@ package mindustry.net;
 import arc.*;
 import arc.util.*;
 import arc.util.io.*;
-import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
@@ -29,7 +28,7 @@ public class NetworkIO{
                 state.rules.researched.clear();
                 for(ContentType type : ContentType.all){
                     for(Content c : content.getBy(type)){
-                        if(c instanceof UnlockableContent u && u.unlocked() && TechTree.get(u) != null){
+                        if(c instanceof UnlockableContent u && u.unlocked() && u.techNode != null){
                             state.rules.researched.add(u.name);
                         }
                     }
@@ -42,15 +41,31 @@ public class NetworkIO{
             stream.writeInt(state.wave);
             stream.writeFloat(state.wavetime);
             stream.writeDouble(state.tick);
-            stream.writeLong(GlobalConstants.rand.seed0);
-            stream.writeLong(GlobalConstants.rand.seed1);
+            stream.writeLong(GlobalVars.rand.seed0);
+            stream.writeLong(GlobalVars.rand.seed1);
+
+            Writes write = new Writes(stream);
 
             stream.writeInt(player.id);
-            player.write(Writes.get(stream));
+            player.write(write);
+
+            boolean any = !state.rules.fog;
+
+            stream.writeInt(any ? Groups.sync.size() : 0);
+
+            if(any){
+                //write all synced entities *immediately*
+                for(Syncc entity : Groups.sync){
+                    stream.writeInt(entity.id());
+                    stream.writeByte(entity.classId());
+                    entity.writeSync(write);
+                }
+            }
 
             SaveIO.getSaveWriter().writeContentHeader(stream);
             SaveIO.getSaveWriter().writeMap(stream);
             SaveIO.getSaveWriter().writeTeamBlocks(stream);
+            SaveIO.getSaveWriter().writeCustomChunks(stream, true);
         }catch(IOException e){
             throw new RuntimeException(e);
         }
@@ -66,19 +81,28 @@ public class NetworkIO{
             state.wave = stream.readInt();
             state.wavetime = stream.readFloat();
             state.tick = stream.readDouble();
-            GlobalConstants.rand.seed0 = stream.readLong();
-            GlobalConstants.rand.seed1 = stream.readLong();
+            GlobalVars.rand.seed0 = stream.readLong();
+            GlobalVars.rand.seed1 = stream.readLong();
+
+            Reads read = new Reads(stream);
 
             Groups.clear();
             int id = stream.readInt();
             player.reset();
-            player.read(Reads.get(stream));
+            player.read(read);
             player.id = id;
             player.add();
+
+            int entities = stream.readInt();
+
+            for(int j = 0; j < entities; j++){
+                NetClient.readSyncEntity(stream, read);
+            }
 
             SaveIO.getSaveWriter().readContentHeader(stream);
             SaveIO.getSaveWriter().readMap(stream, world.context);
             SaveIO.getSaveWriter().readTeamBlocks(stream);
+            SaveIO.getSaveWriter().readCustomChunks(stream);
         }catch(IOException e){
             throw new RuntimeException(e);
         }finally{
@@ -87,7 +111,7 @@ public class NetworkIO{
     }
 
     public static ByteBuffer writeServerData(){
-        String name = (headless ? Config.name.string() : player.name);
+        String name = (headless ? Config.serverName.string() : player.name);
         String description = headless && !Config.desc.string().equals("off") ? Config.desc.string() : "";
         String map = state.map.name();
 

@@ -36,9 +36,9 @@ public class PhysicsProcess implements AsyncProcess{
             return false;
         });
 
-        //find Unit without bodies and assign them
+        //find Units without bodies and assign them
         for(Unit entity : group){
-            if(entity == null || entity.type == null) continue;
+            if(entity == null || entity.type == null || !entity.type.physics) continue;
 
             if(entity.physref == null){
                 PhysicsBody body = new PhysicsBody();
@@ -59,7 +59,7 @@ public class PhysicsProcess implements AsyncProcess{
             PhysicRef ref = entity.physref;
 
             ref.body.layer =
-                entity.type.allowLegStep ? layerLegs :
+                entity.type.allowLegStep && entity.type.legPhysicsLayer ? layerLegs :
                 entity.isGrounded() ? layerGround : layerFlying;
             ref.x = entity.x;
             ref.y = entity.y;
@@ -150,14 +150,17 @@ public class PhysicsProcess implements AsyncProcess{
                 trees[i].clear();
             }
 
-            for(int i = 0; i < bodies.size; i++){
-                PhysicsBody body = bodies.items[i];
+            var bodyItems = bodies.items;
+            int bodySize = bodies.size;
+
+            for(int i = 0; i < bodySize; i++){
+                PhysicsBody body = bodyItems[i];
                 body.collided = false;
                 trees[body.layer].insert(body);
             }
 
-            for(int i = 0; i < bodies.size; i++){
-                PhysicsBody body = bodies.items[i];
+            for(int i = 0; i < bodySize; i++){
+                PhysicsBody body = bodyItems[i];
 
                 //for clients, the only body that collides is the local one; all other physics simulations are handled by the server.
                 if(!body.local) continue;
@@ -166,9 +169,11 @@ public class PhysicsProcess implements AsyncProcess{
 
                 seq.size = 0;
                 trees[body.layer].intersect(rect, seq);
+                int size = seq.size;
+                var items = seq.items;
 
-                for(int j = 0; j < seq.size; j++){
-                    PhysicsBody other = seq.items[j];
+                for(int j = 0; j < size; j++){
+                    PhysicsBody other = items[j];
 
                     if(other == body || other.collided) continue;
 

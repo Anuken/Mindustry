@@ -69,7 +69,6 @@ public class LightRenderer{
             float u2 = lmid.u2;
             float v2 = lmid.v;
 
-
             Vec2 v1 = Tmp.v1.trnsExact(rot + 90f, stroke);
             float lx1 = x - v1.x, ly1 = y - v1.y,
             lx2 = x + v1.x, ly2 = y + v1.y,

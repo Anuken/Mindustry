@@ -4,16 +4,20 @@ import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
+import mindustry.world.blocks.liquid.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
 public class LiquidSource extends Block{
+    public @Load("cross") TextureRegion crossRegion;
+    public @Load("source-bottom") TextureRegion bottomRegion;
 
     public LiquidSource(String name){
         super(name);
@@ -28,6 +32,7 @@ public class LiquidSource extends Block{
         displayFlow = false;
         group = BlockGroup.liquids;
         envEnabled = Env.any;
+        clearOnDoubleTap = true;
 
         config(Liquid.class, (LiquidSourceBuild tile, Liquid l) -> tile.source = l);
         configClear((LiquidSourceBuild tile) -> tile.source = null);
@@ -37,12 +42,17 @@ public class LiquidSource extends Block{
     public void setBars(){
         super.setBars();
 
-        bars.remove("liquid");
+        removeBar("liquid");
     }
 
     @Override
-    public void drawRequestConfig(BuildPlan req, Eachable<BuildPlan> list){
-        drawRequestConfigCenter(req, req.config, "center", true);
+    public void drawPlanConfig(BuildPlan plan, Eachable<BuildPlan> list){
+        drawPlanConfigCenter(plan, plan.config, "center", true);
+    }
+
+    @Override
+    public TextureRegion[] icons(){
+        return new TextureRegion[]{bottomRegion, region};
     }
 
     public class LiquidSourceBuild extends Building{
@@ -62,29 +72,20 @@ public class LiquidSource extends Block{
         public void draw(){
             super.draw();
 
+            Draw.rect(bottomRegion, x, y);
+
             if(source == null){
-                Draw.rect("cross", x, y);
+                Draw.rect(crossRegion, x, y);
             }else{
-                Draw.color(source.color);
-                Draw.rect("center", x, y);
-                Draw.color();
+                LiquidBlock.drawTiledFrames(size, x, y, 0f, source, 1f);
             }
+
+            Draw.rect(block.region, x, y);
         }
 
         @Override
         public void buildConfiguration(Table table){
             ItemSelection.buildTable(LiquidSource.this, table, content.liquids(), () -> source, this::configure);
-        }
-
-        @Override
-        public boolean onConfigureTileTapped(Building other){
-            if(this == other){
-                deselect();
-                configure(null);
-                return false;
-            }
-
-            return true;
         }
 
         @Override

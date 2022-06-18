@@ -10,7 +10,6 @@ import arc.scene.ui.ImageButton.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.async.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -22,6 +21,8 @@ import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
+
+import java.util.concurrent.*;
 
 import static mindustry.Vars.*;
 
@@ -36,8 +37,7 @@ public class MapGenerateDialog extends BaseDialog{
     int scaling = mobile ? 3 : 1;
     Table filterTable;
 
-    AsyncExecutor executor = new AsyncExecutor(1);
-    AsyncResult<Void> result;
+    Future<?> result;
     boolean generating;
 
     long[] buffer1, buffer2;
@@ -63,7 +63,7 @@ public class MapGenerateDialog extends BaseDialog{
         shown(this::setup);
         addCloseListener();
 
-        var style = Styles.cleart;
+        var style = Styles.flatt;
 
         buttons.defaults().size(180f, 64f).pad(2f);
         buttons.button("@back", Icon.left, this::hide);
@@ -334,7 +334,7 @@ public class MapGenerateDialog extends BaseDialog{
 
                 if(filter.isPost() && applied) continue;
 
-                p.button((icon == '\0' ? "" : icon + " ") + filter.name(), Styles.cleart, () -> {
+                p.button((icon == '\0' ? "" : icon + " ") + filter.name(), Styles.flatt, () -> {
                     filter.randomize();
                     filters.add(filter);
                     rebuildFilters();
@@ -344,7 +344,7 @@ public class MapGenerateDialog extends BaseDialog{
                 if(++i % 3 == 0) p.row();
             }
 
-            p.button(Iconc.refresh + " " + Core.bundle.get("filter.defaultores"), Styles.cleart, () -> {
+            p.button(Iconc.refresh + " " + Core.bundle.get("filter.defaultores"), Styles.flatt, () -> {
                 maps.addDefaultOres(filters);
                 rebuildFilters();
                 update();
@@ -369,7 +369,10 @@ public class MapGenerateDialog extends BaseDialog{
 
     void apply(){
         if(result != null){
-            result.get();
+            //ignore errors yay
+            try{
+                result.get();
+            }catch(Exception e){}
         }
 
         buffer1 = null;
@@ -393,7 +396,7 @@ public class MapGenerateDialog extends BaseDialog{
 
         var copy = filters.copy();
 
-        result = executor.submit(() -> {
+        result = mainExecutor.submit(() -> {
             try{
                 int w = pixmap.width;
                 world.setGenerating(true);

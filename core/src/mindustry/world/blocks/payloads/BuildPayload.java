@@ -2,7 +2,9 @@ package mindustry.world.blocks.payloads;
 
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.util.*;
 import arc.util.io.*;
+import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -37,11 +39,16 @@ public class BuildPayload implements Payload{
     }
 
     @Override
-    public void update(boolean inUnit){
-        if(inUnit && !build.block.updateInUnits) return;
+    public UnlockableContent content(){
+        return build.block;
+    }
+
+    @Override
+    public void update(@Nullable Unit unitHolder, @Nullable Building buildingHolder){
+        if(unitHolder != null && (!build.block.updateInUnits || (!state.rules.unitPayloadUpdate && !build.block.alwaysUpdateInUnits))) return;
 
         build.tile = emptyTile;
-        build.update();
+        build.updatePayload(unitHolder, buildingHolder);
     }
 
     @Override
@@ -85,13 +92,15 @@ public class BuildPayload implements Payload{
 
     @Override
     public void drawShadow(float alpha){
-        Drawf.shadow(build.x, build.y, build.block.size * tilesize * 2f, alpha);
+        Drawf.squareShadow(build.x, build.y, build.block.size * tilesize * 1.85f, alpha);
     }
 
     @Override
     public void draw(){
-        drawShadow(1f);
         float prevZ = Draw.z();
+        Draw.z(prevZ - 0.0001f);
+        drawShadow(1f);
+        Draw.z(prevZ);
         Draw.zTransform(z -> z >= Layer.flyingUnitLow ? z : 0.0011f + Mathf.clamp(z, prevZ - 0.001f, prevZ + 0.9f));
         build.tile = emptyTile;
         build.payloadDraw();

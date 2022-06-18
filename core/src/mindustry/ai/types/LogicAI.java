@@ -1,17 +1,11 @@
 package mindustry.ai.types;
 
 import arc.math.*;
-import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.ai.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.logic.*;
-import mindustry.world.*;
-import mindustry.world.meta.*;
-
-import static mindustry.Vars.*;
 
 public class LogicAI extends AIController{
     /** Minimum delay between item transfers. */
@@ -70,28 +64,6 @@ public class LogicAI extends AIController{
             case approach -> {
                 moveTo(Tmp.v1.set(moveX, moveY), moveRad - 7f, 7);
             }
-            case pathfind -> {
-                Building core = unit.closestEnemyCore();
-
-                if((core == null || !unit.within(core, unit.range() * 0.5f)) && command() == UnitCommand.attack){
-                    boolean move = true;
-
-                    if(state.rules.waves && unit.team == state.rules.defaultTeam){
-                        Tile spawner = getClosestSpawner();
-                        if(spawner != null && unit.within(spawner, state.rules.dropZoneRadius + 120f)) move = false;
-                    }
-
-                    if(move) pathfind(Pathfinder.fieldCore);
-                }
-
-                if(command() == UnitCommand.rally){
-                    Teamc target = targetFlag(unit.x, unit.y, BlockFlag.rally, false);
-
-                    if(target != null && !unit.within(target, 70f)){
-                        pathfind(Pathfinder.fieldRally);
-                    }
-                }
-            }
             case stop -> {
                 unit.clearBuilding();
             }
@@ -111,33 +83,6 @@ public class LogicAI extends AIController{
 
     public boolean checkTargetTimer(Object radar){
         return radars.add(radar);
-    }
-
-    @Override
-    public void moveTo(Position target, float circleLength, float smooth){
-        if(target == null) return;
-
-        vec.set(target).sub(unit);
-
-        float length = circleLength <= 0.001f ? 1f : Mathf.clamp((unit.dst(target) - circleLength) / smooth, -1f, 1f);
-
-        vec.setLength(unit.speed() * length);
-        if(length < -0.5f){
-            vec.rotate(180f);
-        }else if(length < 0){
-            vec.setZero();
-        }
-
-        //do not move when infinite vectors are used.
-        if(vec.isNaN() || vec.isInfinite()) return;
-
-        if(unit.type.omniMovement){
-            unit.approach(vec);
-        }else{
-            unit.rotateMove(vec);
-        }
-
-
     }
 
     @Override

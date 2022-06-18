@@ -8,7 +8,6 @@ import arc.net.FrameworkMessage.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
-import arc.util.async.*;
 import arc.util.io.*;
 import mindustry.net.Net.*;
 import mindustry.net.Packets.*;
@@ -25,7 +24,6 @@ import static mindustry.Vars.*;
 public class ArcNetProvider implements NetProvider{
     final Client client;
     final Prov<DatagramPacket> packetSupplier = () -> new DatagramPacket(new byte[512], 512);
-    final AsyncExecutor executor = new AsyncExecutor(Math.max(Runtime.getRuntime().availableProcessors(), 6));
 
     final Server server;
     final CopyOnWriteArrayList<ArcConnection> connections = new CopyOnWriteArrayList<>();
@@ -264,7 +262,7 @@ public class ArcNetProvider implements NetProvider{
     @Override
     public void closeServer(){
         connections.clear();
-        executor.submit(server::stop);
+        mainExecutor.submit(server::stop);
     }
 
     ArcConnection getByArcID(int id){

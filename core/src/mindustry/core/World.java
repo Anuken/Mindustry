@@ -31,12 +31,20 @@ public class World{
     public final Context context = new Context();
 
     public Tiles tiles = new Tiles(0, 0);
+    /** The number of times tiles have changed in this session. Used for blocks that need to poll world state, but not frequently. */
+    public int tileChanges = -1;
 
     private boolean generating, invalidMap;
     private ObjectMap<Map, Runnable> customMapLoaders = new ObjectMap<>();
 
     public World(){
+        Events.on(TileChangeEvent.class, e -> {
+            tileChanges ++;
+        });
 
+        Events.on(WorldLoadEvent.class, e -> {
+            tileChanges = -1;
+        });
     }
 
     /** Adds a custom handler function for loading a custom map - usually a generated one. */
@@ -162,6 +170,10 @@ public class World{
         return Math.round(coord / tilesize);
     }
 
+    public int packArray(int x, int y){
+        return x + y * tiles.width;
+    }
+
     private void clearTileEntities(){
         for(Tile tile : tiles){
             if(tile != null && tile.build != null){
@@ -219,7 +231,7 @@ public class World{
     }
 
     public Rect getQuadBounds(Rect in){
-        return in.set(-finalWorldBounds, -finalWorldBounds, world.width() * tilesize + finalWorldBounds * 2, world.height() * tilesize + finalWorldBounds * 2);
+        return in.set(-finalWorldBounds, -finalWorldBounds, width() * tilesize + finalWorldBounds * 2, height() * tilesize + finalWorldBounds * 2);
     }
 
     public void setGenerating(boolean gen){
@@ -240,6 +252,10 @@ public class World{
     }
 
     public void loadSector(Sector sector){
+        loadSector(sector, 0);
+    }
+
+    public void loadSector(Sector sector, int seedOffset){
         setSectorRules(sector);
 
         int size = sector.getSize();
@@ -248,7 +264,7 @@ public class World{
                 sector.preset.generator.generate(tiles);
                 sector.preset.rules.get(state.rules); //apply extra rules
             }else if(sector.planet.generator != null){
-                sector.planet.generator.generate(tiles, sector);
+                sector.planet.generator.generate(tiles, sector, seedOffset);
             }else{
                 throw new RuntimeException("Sector " + sector.id + " on planet " + sector.planet.name + " has no generator or preset defined. Provide a planet generator or preset map.");
             }
@@ -279,19 +295,24 @@ public class World{
         ObjectSet<UnlockableContent> content = new ObjectSet<>();
 
         //TODO duplicate code?
-        for(Tile tile : world.tiles){
-            if(world.getDarkness(tile.x, tile.y) >= 3){
+        for(Tile tile : tiles){
+            if(getDarkness(tile.x, tile.y) >= 3){
                 continue;
             }
 
             Liquid liquid = tile.floor().liquidDrop;
             if(tile.floor().itemDrop != null) content.add(tile.floor().itemDrop);
             if(tile.overlay().itemDrop != null) content.add(tile.overlay().itemDrop);
+            if(tile.wallDrop() != null) content.add(tile.wallDrop());
             if(liquid != null) content.add(liquid);
         }
 
         state.rules.cloudColor = sector.planet.landCloudColor;
-        sector.info.resources = content.asArray();
+        state.rules.env = sector.planet.defaultEnv;
+        state.rules.hiddenBuildItems.clear();
+        state.rules.hiddenBuildItems.addAll(sector.planet.hiddenItems);
+        sector.planet.applyRules(state.rules);
+        sector.info.resources = content.toSeq();
         sector.info.resources.sort(Structs.comps(Structs.comparing(Content::getContentType), Structs.comparingInt(c -> c.id)));
         sector.saveInfo();
     }
@@ -352,60 +373,6 @@ public class World{
         }
 
         if(invalidMap) Core.app.post(() -> state.set(State.menu));
-    }
-
-    public void raycastEachWorld(float x0, float y0, float x1, float y1, Raycaster cons){
-        raycastEach(toTile(x0), toTile(y0), toTile(x1), toTile(y1), cons);
-    }
-
-    public void raycastEach(int x0f, int y0f, int x1, int y1, Raycaster cons){
-        int x0 = x0f, dx = Math.abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
-        int y0 = y0f, dy = Math.abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
-        int e2, err = dx - dy;
-
-        while(true){
-            if(cons.accept(x0, y0)) break;
-            if(x0 == x1 && y0 == y1) break;
-
-            e2 = 2 * err;
-            if(e2 > -dy){
-                err -= dy;
-                x0 += sx;
-            }
-
-            if(e2 < dx){
-                err += dx;
-                y0 += sy;
-            }
-        }
-    }
-
-    public boolean raycast(int x0f, int y0f, int x1, int y1, Raycaster cons){
-        int x0 = x0f;
-        int y0 = y0f;
-        int dx = Math.abs(x1 - x0);
-        int dy = Math.abs(y1 - y0);
-
-        int sx = x0 < x1 ? 1 : -1;
-        int sy = y0 < y1 ? 1 : -1;
-
-        int err = dx - dy;
-        int e2;
-        while(true){
-            if(cons.accept(x0, y0)) return true;
-            if(x0 == x1 && y0 == y1) return false;
-
-            e2 = 2 * err;
-            if(e2 > -dy){
-                err = err - dy;
-                x0 = x0 + sx;
-            }
-
-            if(e2 < dx){
-                err = err + dx;
-                y0 = y0 + sy;
-            }
-        }
     }
 
     public void addDarkness(Tiles tiles){
@@ -478,20 +445,39 @@ public class World{
         return 0;
     }
 
+    public void checkMapArea(){
+        for(var build : Groups.build){
+            //reset map-area-based disabled blocks.
+            if(build.allowUpdate() && !build.enabled){
+                build.enabled = true;
+            }
+        }
+    }
+
     //TODO optimize; this is very slow and called too often!
     public float getDarkness(int x, int y){
         float dark = 0;
 
         if(Vars.state.rules.borderDarkness){
             int edgeBlend = 2;
-            int edgeDst = Math.min(x, Math.min(y, Math.min(Math.abs(x - (tiles.width - 1)), Math.abs(y - (tiles.height - 1)))));
+            int edgeDst;
+
+            if(!state.rules.limitMapArea){
+                edgeDst = Math.min(x, Math.min(y, Math.min(-(x - (tiles.width - 1)), -(y - (tiles.height - 1)))));
+            }else{
+                edgeDst =
+                    Math.min(x - state.rules.limitX,
+                    Math.min(y - state.rules.limitY,
+                    Math.min(-(x - (state.rules.limitX + state.rules.limitWidth - 1)), -(y - (state.rules.limitY + state.rules.limitHeight - 1)))));
+            }
+
             if(edgeDst <= edgeBlend){
                 dark = Math.max((edgeBlend - edgeDst) * (4f / edgeBlend), dark);
             }
         }
 
         if(state.hasSector() && state.getSector().preset == null){
-            int circleBlend = 14;
+            int circleBlend = 5;
             //quantized angle
             float offset = state.getSector().rect.rotation + 90;
             float angle = Angles.angle(x, y, tiles.width/2, tiles.height/2) + offset;
@@ -514,12 +500,60 @@ public class World{
             }
         }
 
-        Tile tile = world.tile(x, y);
-        if(tile != null && tile.block().solid && tile.block().fillsTile && !tile.block().synthetic()){
+        Tile tile = tile(x, y);
+        if(tile != null && tile.isDarkened()){
             dark = Math.max(dark, tile.data);
         }
 
         return dark;
+    }
+
+    public static void raycastEachWorld(float x0, float y0, float x1, float y1, Raycaster cons){
+        raycastEach(toTile(x0), toTile(y0), toTile(x1), toTile(y1), cons);
+    }
+
+    public static void raycastEach(int x1, int y1, int x2, int y2, Raycaster cons){
+        int x = x1, dx = Math.abs(x2 - x), sx = x < x2 ? 1 : -1;
+        int y = y1, dy = Math.abs(y2 - y), sy = y < y2 ? 1 : -1;
+        int e2, err = dx - dy;
+
+        while(true){
+            if(cons.accept(x, y)) break;
+            if(x == x2 && y == y2) break;
+
+            e2 = 2 * err;
+            if(e2 > -dy){
+                err -= dy;
+                x += sx;
+            }
+
+            if(e2 < dx){
+                err += dx;
+                y += sy;
+            }
+        }
+    }
+
+    public static boolean raycast(int x1, int y1, int x2, int y2, Raycaster cons){
+        int x = x1, dx = Math.abs(x2 - x), sx = x < x2 ? 1 : -1;
+        int y = y1, dy = Math.abs(y2 - y), sy = y < y2 ? 1 : -1;
+        int e2, err = dx - dy;
+
+        while(true){
+            if(cons.accept(x, y)) return true;
+            if(x == x2 && y == y2) return false;
+
+            e2 = 2 * err;
+            if(e2 > -dy){
+                err = err - dy;
+                x = x + sx;
+            }
+
+            if(e2 < dx){
+                err = err + dx;
+                y = y + sy;
+            }
+        }
     }
 
     private class Context implements WorldContext{
@@ -560,15 +594,21 @@ public class World{
     }
 
     /** World context that applies filters after generation end. */
-    private class FilterContext extends Context{
+    public class FilterContext extends Context{
         final Map map;
 
-        FilterContext(Map map){
+        public FilterContext(Map map){
             this.map = map;
         }
 
         @Override
         public void end(){
+            applyFilters();
+
+            super.end();
+        }
+
+        public void applyFilters(){
             Seq<GenerateFilter> filters = map.filters();
 
             if(!filters.isEmpty()){
@@ -581,8 +621,6 @@ public class World{
                     filter.apply(tiles, input);
                 }
             }
-
-            super.end();
         }
     }
 }

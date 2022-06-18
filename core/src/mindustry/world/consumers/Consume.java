@@ -1,31 +1,25 @@
 package mindustry.world.consumers;
 
 import arc.scene.ui.layout.*;
-import arc.struct.*;
 import mindustry.gen.*;
+import mindustry.world.*;
 import mindustry.world.meta.*;
 
 /** An abstract class that defines a type of resource that a block can consume. */
 public abstract class Consume{
+
+    //TODO maybe remove these and make it an interface if possible?
     /** If true, this consumer will not influence consumer validity. */
     public boolean optional;
     /** If true, this consumer will be displayed as a boost input. */
     public boolean booster;
+    /** If false, this consumer will still be checked, but it will need to updated manually. */
     public boolean update = true;
 
     /**
-     * Apply a filter to items accepted.
-     * This should set all item IDs that are present in the filter to true.
+     * Apply extra filters to a block.
      */
-    public void applyItemFilter(Bits filter){
-
-    }
-
-    /**
-     * Apply a filter to liquids accepted.
-     * This should set all liquid IDs that are present in the filter to true.
-     */
-    public void applyLiquidFilter(Bits filter){
+    public void apply(Block block){
 
     }
 
@@ -44,30 +38,30 @@ public abstract class Consume{
         return this;
     }
 
-    public boolean isOptional(){
-        return optional;
+    /** @return if true, this consumer will be ignored in the consumer list (no updates or valid() checks) */
+    public boolean ignore(){
+        return false;
     }
 
-    public boolean isBoost(){
-        return booster;
-    }
-
-    public boolean isUpdate(){
-        return update;
-    }
-
-    public abstract ConsumeType type();
-
-    public abstract void build(Building tile, Table table);
+    public void build(Building build, Table table){}
 
     /** Called when a consumption is triggered manually. */
-    public void trigger(Building entity){}
+    public void trigger(Building build){}
 
-    public abstract String getIcon();
+    public void update(Building build){}
 
-    public abstract void update(Building entity);
+    /** @return [0, 1] efficiency multiplier based on input. Returns 0 if not valid in subclasses. Should return fraction if needs are partially met. */
+    public float efficiency(Building build){
+        return 1f;
+    }
 
-    public abstract boolean valid(Building entity);
+    /** @return multiplier for efficiency - this can be above 1. Will not influence a building's base efficiency value. */
+    public float efficiencyMultiplier(Building build){
+        return 1f;
+    }
 
-    public abstract void display(Stats stats);
+    public void display(Stats stats){}
+
+    //TODO this should use efficiency instead - remove or deprecate
+    //public abstract boolean valid(Building build);
 }

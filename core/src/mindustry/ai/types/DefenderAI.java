@@ -4,7 +4,6 @@ import arc.math.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
-import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -28,16 +27,10 @@ public class DefenderAI extends AIController{
     @Override
     public Teamc findTarget(float x, float y, float range, boolean air, boolean ground){
 
-        //find unit to follow if not in rally mode
-        if(command() != UnitCommand.rally){
-            //Sort by max health and closer target.
-            var result = Units.closest(unit.team, x, y, Math.max(range, 400f), u -> !u.dead() && u.type != unit.type, (u, tx, ty) -> -u.maxHealth + Mathf.dst2(u.x, u.y, tx, ty) / 6400f);
-            if(result != null) return result;
-        }
+        //Sort by max health and closer target.
+        var result = Units.closest(unit.team, x, y, Math.max(range, 400f), u -> !u.dead() && u.type != unit.type, (u, tx, ty) -> -u.maxHealth + Mathf.dst2(u.x, u.y, tx, ty) / 6400f);
+        if(result != null) return result;
 
-        //find rally point
-        var block = targetFlag(unit.x, unit.y, BlockFlag.rally, false);
-        if(block != null) return block;
         //return core if found
         var core = unit.closestCore();
         if(core != null) return core;

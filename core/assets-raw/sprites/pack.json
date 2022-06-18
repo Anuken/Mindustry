@@ -4,5 +4,7 @@
   flattenPaths: true,
   maxWidth: 4096,
   maxHeight: 4096,
-  fast: true
+  fast: true,
+  stripWhitespaceCenter: true,
+  ignoredWhitespaceStrings: ["effects/"]
 }

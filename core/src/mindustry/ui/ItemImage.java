@@ -15,33 +15,20 @@ public class ItemImage extends Stack{
             o.add(new Image(region)).size(32f);
         }));
 
-        add(new Table(t -> {
-            t.left().bottom();
-            t.add(amount > 1000 ? UI.formatAmount(amount) : amount + "");
-            t.pack();
-        }));
-    }
-
-    public ItemImage(TextureRegion region){
-        Table t = new Table().left().bottom();
-
-        add(new Image(region));
-        add(t);
-    }
-
-    public ItemImage(ItemStack stack){
-
-        add(new Table(o -> {
-            o.left();
-            o.add(new Image(stack.item.uiIcon)).size(32f);
-        }));
-
-        if(stack.amount != 0){
+        if(amount != 0){
             add(new Table(t -> {
                 t.left().bottom();
-                t.add(stack.amount > 1000 ? UI.formatAmount(stack.amount) : stack.amount + "").style(Styles.outlineLabel);
+                t.add(amount >= 1000 ? UI.formatAmount(amount) : amount + "").style(Styles.outlineLabel);
                 t.pack();
             }));
         }
+    }
+
+    public ItemImage(ItemStack stack){
+        this(stack.item.uiIcon, stack.amount);
+    }
+
+    public ItemImage(PayloadStack stack){
+        this(stack.item.uiIcon, stack.amount);
     }
 }

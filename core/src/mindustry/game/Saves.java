@@ -6,7 +6,6 @@ import arc.files.*;
 import arc.graphics.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.async.*;
 import mindustry.*;
 import mindustry.core.GameState.*;
 import mindustry.game.EventType.*;
@@ -22,10 +21,11 @@ import java.util.*;
 import static mindustry.Vars.*;
 
 public class Saves{
+    private static final DateFormat dateFormat = SimpleDateFormat.getDateTimeInstance();
+
     Seq<SaveSlot> saves = new Seq<>();
     @Nullable SaveSlot current;
     private @Nullable SaveSlot lastSectorSave;
-    AsyncExecutor previewExecutor = new AsyncExecutor(1);
     private boolean saving;
     private float time;
 
@@ -223,7 +223,7 @@ public class Saves{
             if(Core.assets.isLoaded(loadPreviewFile().path())){
                 Core.assets.unload(loadPreviewFile().path());
             }
-            previewExecutor.submit(() -> {
+            mainExecutor.submit(() -> {
                 try{
                     previewFile().writePng(renderer.minimap.getPixmap());
                     requestedPreview = false;
@@ -270,7 +270,7 @@ public class Saves{
         }
 
         public String getDate(){
-            return SimpleDateFormat.getDateTimeInstance().format(new Date(meta.timestamp));
+            return dateFormat.format(new Date(meta.timestamp));
         }
 
         public Map getMap(){

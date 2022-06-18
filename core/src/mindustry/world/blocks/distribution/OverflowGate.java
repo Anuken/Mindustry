@@ -15,8 +15,9 @@ public class OverflowGate extends Block{
     public OverflowGate(String name){
         super(name);
         hasItems = true;
-        solid = true;
-        update = true;
+        underBullets = true;
+        update = false;
+        destructible = true;
         group = BlockGroup.transportation;
         instantTransfer = true;
         unloadable = false;

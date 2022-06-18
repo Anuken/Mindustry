@@ -165,7 +165,7 @@ public class MapIO{
         if(wall.synthetic()){
             return team.color.rgba();
         }
-        return (wall.solid ? wall.mapColor : !overlay.useColor ? floor.mapColor : overlay.mapColor).rgba();
+        return (((Floor)overlay).wallOre ? overlay.mapColor : wall.solid ? wall.mapColor : !overlay.useColor ? floor.mapColor : overlay.mapColor).rgba();
     }
 
     public static Pixmap writeImage(Tiles tiles){
@@ -184,7 +184,9 @@ public class MapIO{
             int color = pixmap.get(tile.x, pixmap.height - 1 - tile.y);
             Block block = ColorMapper.get(color);
 
-            if(block.isFloor()){
+            if(block.isOverlay()){
+                tile.setOverlay(block.asFloor());
+            }else if(block.isFloor()){
                 tile.setFloor(block.asFloor());
             }else if(block.isMultiblock()){
                 tile.setBlock(block, Team.derelict, 0);
@@ -195,16 +197,6 @@ public class MapIO{
 
         //guess at floors by grabbing a random adjacent floor
         for(Tile tile : tiles){
-            if(tile.floor() == Blocks.air && tile.block() != Blocks.air){
-                for(Point2 p : Geometry.d4){
-                    Tile other = tiles.get(tile.x + p.x, tile.y + p.y);
-                    if(other != null && other.floor() != Blocks.air){
-                        tile.setFloorUnder(other.floor());
-                        break;
-                    }
-                }
-            }
-
             //default to stone floor
             if(tile.floor() == Blocks.air){
                 tile.setFloorUnder((Floor)Blocks.stone);
