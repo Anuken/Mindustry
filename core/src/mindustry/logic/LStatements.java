@@ -93,6 +93,11 @@ public class LStatements{
         public LInstruction build(LAssembler builder){
             return new ReadI(builder.var(target), builder.var(address), builder.var(output));
         }
+
+        @Override
+        public LCategory category(){
+            return LCategory.io;
+        }
     }
 
     @RegisterStatement("write")
@@ -124,6 +129,11 @@ public class LStatements{
         @Override
         public LInstruction build(LAssembler builder){
             return new WriteI(builder.var(target), builder.var(address), builder.var(input));
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.io;
         }
     }
 
@@ -250,6 +260,11 @@ public class LStatements{
         public LInstruction build(LAssembler builder){
             return new DrawI((byte)type.ordinal(), 0, builder.var(x), builder.var(y), builder.var(p1), builder.var(p2), builder.var(p3), builder.var(p4));
         }
+
+        @Override
+        public LCategory category(){
+            return LCategory.io;
+        }
     }
 
     @RegisterStatement("print")
@@ -269,6 +284,12 @@ public class LStatements{
         @Override
         public Color color(){
             return Pal.logicIo;
+        }
+
+
+        @Override
+        public LCategory category(){
+            return LCategory.io;
         }
     }
 
@@ -291,6 +312,11 @@ public class LStatements{
         public LInstruction build(LAssembler builder){
             return new DrawFlushI(builder.var(target));
         }
+
+        @Override
+        public LCategory category(){
+            return LCategory.block;
+        }
     }
 
     @RegisterStatement("printflush")
@@ -311,6 +337,11 @@ public class LStatements{
         @Override
         public LInstruction build(LAssembler builder){
             return new PrintFlushI(builder.var(target));
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.block;
         }
     }
 
@@ -335,6 +366,11 @@ public class LStatements{
         @Override
         public LInstruction build(LAssembler builder){
             return new GetLinkI(builder.var(output), builder.var(address));
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.block;
         }
     }
 
@@ -388,6 +424,11 @@ public class LStatements{
         @Override
         public LInstruction build(LAssembler builder){
             return new ControlI(type, builder.var(target), builder.var(p1), builder.var(p2), builder.var(p3), builder.var(p4));
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.block;
         }
     }
 
@@ -459,6 +500,11 @@ public class LStatements{
         @Override
         public LInstruction build(LAssembler builder){
             return new RadarI(target1, target2, target3, sort, builder.var(radar), builder.var(sortOrder), builder.var(output));
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.block;
         }
     }
 
@@ -565,6 +611,11 @@ public class LStatements{
         public LInstruction build(LAssembler builder){
             return new SenseI(builder.var(from), builder.var(to), builder.var(type));
         }
+
+        @Override
+        public LCategory category(){
+            return LCategory.block;
+        }
     }
 
     @RegisterStatement("set")
@@ -589,6 +640,11 @@ public class LStatements{
         @Override
         public LInstruction build(LAssembler builder){
             return new SetI(builder.var(from), builder.var(to));
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.operation;
         }
     }
 
@@ -666,6 +722,11 @@ public class LStatements{
         public Color color(){
             return Pal.logicOperations;
         }
+
+        @Override
+        public LCategory category(){
+            return LCategory.operation;
+        }
     }
 
     @RegisterStatement("wait")
@@ -686,6 +747,11 @@ public class LStatements{
         @Override
         public LInstruction build(LAssembler builder){
             return new WaitI(builder.var(value));
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.operation;
         }
     }
 
@@ -723,6 +789,11 @@ public class LStatements{
         public LInstruction build(LAssembler builder){
             return new LookupI(builder.var(result), builder.var(id), type);
         }
+
+        @Override
+        public LCategory category(){
+            return LCategory.operation;
+        }
     }
 
     @RegisterStatement("packcolor")
@@ -752,6 +823,11 @@ public class LStatements{
         public LInstruction build(LAssembler builder){
             return new PackColorI(builder.var(result), builder.var(r), builder.var(g), builder.var(b), builder.var(a));
         }
+
+        @Override
+        public LCategory category(){
+            return LCategory.operation;
+        }
     }
 
     @RegisterStatement("end")
@@ -769,6 +845,11 @@ public class LStatements{
         @Override
         public Color color(){
             return Pal.logicControl;
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.control;
         }
     }
 
@@ -849,6 +930,11 @@ public class LStatements{
         public Color color(){
             return Pal.logicControl;
         }
+
+        @Override
+        public LCategory category(){
+            return LCategory.control;
+        }
     }
 
     @RegisterStatement("ubind")
@@ -891,6 +977,11 @@ public class LStatements{
         @Override
         public LInstruction build(LAssembler builder){
             return new UnitBindI(builder.var(type));
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.unit;
         }
     }
 
@@ -949,6 +1040,11 @@ public class LStatements{
         public LInstruction build(LAssembler builder){
             return new UnitControlI(type, builder.var(p1), builder.var(p2), builder.var(p3), builder.var(p4), builder.var(p5));
         }
+
+        @Override
+        public LCategory category(){
+            return LCategory.unit;
+        }
     }
 
     @RegisterStatement("uradar")
@@ -972,6 +1068,11 @@ public class LStatements{
         @Override
         public LInstruction build(LAssembler builder){
             return new RadarI(target1, target2, target3, sort, LExecutor.varUnit, builder.var(sortOrder), builder.var(output));
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.unit;
         }
     }
 
@@ -1082,6 +1183,11 @@ public class LStatements{
         public LInstruction build(LAssembler builder){
             return new UnitLocateI(locate, flag, builder.var(enemy), builder.var(ore), builder.var(outX), builder.var(outY), builder.var(outFound), builder.var(outBuild));
         }
+
+        @Override
+        public LCategory category(){
+            return LCategory.unit;
+        }
     }
 
     @RegisterStatement("getblock")
@@ -1122,6 +1228,11 @@ public class LStatements{
         @Override
         public LInstruction build(LAssembler builder){
             return new GetBlockI(builder.var(x), builder.var(y), builder.var(result), layer);
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.world;
         }
     }
 
@@ -1186,6 +1297,11 @@ public class LStatements{
         public LInstruction build(LAssembler builder){
             return new SetBlockI(builder.var(x), builder.var(y), builder.var(block), builder.var(team), builder.var(rotation), layer);
         }
+
+        @Override
+        public LCategory category(){
+            return LCategory.world;
+        }
     }
 
     @RegisterStatement("spawn")
@@ -1231,6 +1347,11 @@ public class LStatements{
         @Override
         public LInstruction build(LAssembler builder){
             return new SpawnUnitI(builder.var(type), builder.var(x), builder.var(y), builder.var(rotation), builder.var(team), builder.var(result));
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.world;
         }
     }
 
@@ -1297,6 +1418,11 @@ public class LStatements{
         public LInstruction build(LAssembler builder){
             return new ApplyEffectI(clear, effect, builder.var(unit), builder.var(duration));
         }
+
+        @Override
+        public LCategory category(){
+            return LCategory.world;
+        }
     }
 
     @RegisterStatement("spawnwave")
@@ -1326,6 +1452,11 @@ public class LStatements{
         @Override
         public LInstruction build(LAssembler builder){
             return new SpawnWaveI(builder.var(x), builder.var(y));
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.world;
         }
     }
 
@@ -1392,6 +1523,11 @@ public class LStatements{
         public LInstruction build(LAssembler builder){
             return new SetRuleI(rule, builder.var(value), builder.var(p1), builder.var(p2), builder.var(p3), builder.var(p4));
         }
+
+        @Override
+        public LCategory category(){
+            return LCategory.world;
+        }
     }
 
     @RegisterStatement("message")
@@ -1437,6 +1573,11 @@ public class LStatements{
         @Override
         public LInstruction build(LAssembler builder){
             return new FlushMessageI(type, builder.var(duration));
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.world;
         }
     }
 
@@ -1494,6 +1635,11 @@ public class LStatements{
         public LInstruction build(LAssembler builder){
             return new CutsceneI(action, builder.var(p1), builder.var(p2), builder.var(p3), builder.var(p4));
         }
+
+        @Override
+        public LCategory category(){
+            return LCategory.world;
+        }
     }
 
     @RegisterStatement("explosion")
@@ -1529,6 +1675,11 @@ public class LStatements{
         public LInstruction build(LAssembler b){
             return new ExplosionI(b.var(team), b.var(x), b.var(y), b.var(radius), b.var(damage), b.var(air), b.var(ground), b.var(pierce));
         }
+
+        @Override
+        public LCategory category(){
+            return LCategory.world;
+        }
     }
 
     @RegisterStatement("setrate")
@@ -1553,6 +1704,11 @@ public class LStatements{
         @Override
         public LInstruction build(LAssembler builder){
             return new SetRateI(builder.var(amount));
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.world;
         }
     }
 
@@ -1614,6 +1770,11 @@ public class LStatements{
         public LInstruction build(LAssembler builder){
             return new FetchI(type, builder.var(result), builder.var(team), builder.var(extra), builder.var(index));
         }
+
+        @Override
+        public LCategory category(){
+            return LCategory.world;
+        }
     }
 
     @RegisterStatement("getflag")
@@ -1643,6 +1804,11 @@ public class LStatements{
         public LInstruction build(LAssembler builder){
             return new GetFlagI(builder.var(result), builder.var(flag));
         }
+
+        @Override
+        public LCategory category(){
+            return LCategory.world;
+        }
     }
 
     @RegisterStatement("setflag")
@@ -1671,6 +1837,11 @@ public class LStatements{
         @Override
         public LInstruction build(LAssembler builder){
             return new SetFlagI(builder.var(flag), builder.var(value));
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.world;
         }
     }
 }

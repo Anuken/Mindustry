@@ -27,6 +27,10 @@ public abstract class LStatement{
     public abstract Color color();
     public abstract LInstruction build(LAssembler builder);
 
+    public LCategory category(){
+        return LCategory.unknown;
+    }
+
     public LStatement copy(){
         StringBuilder build = new StringBuilder();
         write(build);
