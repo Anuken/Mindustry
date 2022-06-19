@@ -1277,7 +1277,7 @@ public class Blocks{
             drawer = new DrawMulti(new DrawDefault(), new DrawHeatOutput());
             size = 2;
             heatOutput = 15f;
-            craftTime = 60f * 15f;
+            craftTime = 60f * 12f;
             consumeItem(Items.phaseFabric);
         }};
 
