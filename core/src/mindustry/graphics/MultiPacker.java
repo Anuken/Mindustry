@@ -114,9 +114,9 @@ public class MultiPacker implements Disposable{
 
         //TODO stuff like this throws OOM on some devices
         environment(4096, 2048),
+        ui(4096),
         editor(4096, 2048),
-        rubble(4096, 2048),
-        ui(4096);
+        rubble(4096, 2048);
 
         public static final PageType[] all = values();
 
