@@ -182,7 +182,7 @@ public class LogicDialog extends BaseDialog{
                         }
 
                         TextButtonStyle style = new TextButtonStyle(Styles.flatt);
-                        style.fontColor = example.color();
+                        style.fontColor = category.color;
                         style.font = Fonts.outline;
 
                         cat.button(example.name(), style, () -> {

@@ -35,11 +35,6 @@ public class LStatements{
         }
 
         @Override
-        public Color color(){
-            return Pal.logicControl;
-        }
-
-        @Override
         public LInstruction build(LAssembler builder){
             return null;
         }
@@ -50,11 +45,6 @@ public class LStatements{
 
         @Override
         public void build(Table table){
-        }
-
-        @Override
-        public Color color(){
-            return Pal.logicOperations;
         }
 
         @Override
@@ -82,11 +72,6 @@ public class LStatements{
             table.add(" at ");
 
             field(table, address, str -> address = str);
-        }
-
-        @Override
-        public Color color(){
-            return Pal.logicIo;
         }
 
         @Override
@@ -119,11 +104,6 @@ public class LStatements{
             table.add(" at ");
 
             field(table, address, str -> address = str);
-        }
-
-        @Override
-        public Color color(){
-            return Pal.logicIo;
         }
 
         @Override
@@ -252,11 +232,6 @@ public class LStatements{
         }
 
         @Override
-        public Color color(){
-            return Pal.logicIo;
-        }
-
-        @Override
         public LInstruction build(LAssembler builder){
             return new DrawI((byte)type.ordinal(), 0, builder.var(x), builder.var(y), builder.var(p1), builder.var(p2), builder.var(p3), builder.var(p4));
         }
@@ -281,11 +256,6 @@ public class LStatements{
             return new PrintI(builder.var(value));
         }
 
-        @Override
-        public Color color(){
-            return Pal.logicIo;
-        }
-
 
         @Override
         public LCategory category(){
@@ -301,11 +271,6 @@ public class LStatements{
         public void build(Table table){
             table.add(" to ");
             field(table, target, str -> target = str);
-        }
-
-        @Override
-        public Color color(){
-            return Pal.logicBlocks;
         }
 
         @Override
@@ -330,11 +295,6 @@ public class LStatements{
         }
 
         @Override
-        public Color color(){
-            return Pal.logicBlocks;
-        }
-
-        @Override
         public LInstruction build(LAssembler builder){
             return new PrintFlushI(builder.var(target));
         }
@@ -356,11 +316,6 @@ public class LStatements{
             table.add(" = link# ");
 
             field(table, address, str -> address = str);
-        }
-
-        @Override
-        public Color color(){
-            return Pal.logicBlocks;
         }
 
         @Override
@@ -414,11 +369,6 @@ public class LStatements{
 
                 if(++c % 2 == 0) row(table);
             }
-        }
-
-        @Override
-        public Color color(){
-            return Pal.logicBlocks;
         }
 
         @Override
@@ -490,11 +440,6 @@ public class LStatements{
 
         public boolean buildFrom(){
             return true;
-        }
-
-        @Override
-        public Color color(){
-            return Pal.logicBlocks;
         }
 
         @Override
@@ -603,11 +548,6 @@ public class LStatements{
         }
 
         @Override
-        public Color color(){
-            return Pal.logicBlocks;
-        }
-
-        @Override
         public LInstruction build(LAssembler builder){
             return new SenseI(builder.var(from), builder.var(to), builder.var(type));
         }
@@ -630,11 +570,6 @@ public class LStatements{
             table.add(" = ");
 
             field(table, from, str -> from = str);
-        }
-
-        @Override
-        public Color color(){
-            return Pal.logicOperations;
         }
 
         @Override
@@ -678,7 +613,7 @@ public class LStatements{
                         table.left();
                         table.row();
                         table.table(c -> {
-                            c.color.set(color());
+                            c.color.set(category().color);
                             c.left();
                             funcs(c, table);
                         }).colspan(2).left();
@@ -719,11 +654,6 @@ public class LStatements{
         }
 
         @Override
-        public Color color(){
-            return Pal.logicOperations;
-        }
-
-        @Override
         public LCategory category(){
             return LCategory.operation;
         }
@@ -737,11 +667,6 @@ public class LStatements{
         public void build(Table table){
             field(table, value, str -> value = str);
             table.add(" sec");
-        }
-
-        @Override
-        public Color color(){
-            return Pal.logicOperations;
         }
 
         @Override
@@ -781,11 +706,6 @@ public class LStatements{
         }
 
         @Override
-        public Color color(){
-            return Pal.logicOperations;
-        }
-
-        @Override
         public LInstruction build(LAssembler builder){
             return new LookupI(builder.var(result), builder.var(id), type);
         }
@@ -815,11 +735,6 @@ public class LStatements{
         }
 
         @Override
-        public Color color(){
-            return Pal.logicOperations;
-        }
-
-        @Override
         public LInstruction build(LAssembler builder){
             return new PackColorI(builder.var(result), builder.var(r), builder.var(g), builder.var(b), builder.var(a));
         }
@@ -840,11 +755,6 @@ public class LStatements{
         @Override
         public LInstruction build(LAssembler builder){
             return new EndI();
-        }
-
-        @Override
-        public Color color(){
-            return Pal.logicControl;
         }
 
         @Override
@@ -927,11 +837,6 @@ public class LStatements{
         }
 
         @Override
-        public Color color(){
-            return Pal.logicControl;
-        }
-
-        @Override
         public LCategory category(){
             return LCategory.control;
         }
@@ -967,11 +872,6 @@ public class LStatements{
                     }).colspan(3).width(240f).left();
                 }));
             }, Styles.logict, () -> {}).size(40f).padLeft(-2).color(table.color);
-        }
-
-        @Override
-        public Color color(){
-            return Pal.logicUnits;
         }
 
         @Override
@@ -1032,11 +932,6 @@ public class LStatements{
         }
 
         @Override
-        public Color color(){
-            return Pal.logicUnits;
-        }
-
-        @Override
         public LInstruction build(LAssembler builder){
             return new UnitControlI(type, builder.var(p1), builder.var(p2), builder.var(p3), builder.var(p4), builder.var(p5));
         }
@@ -1058,11 +953,6 @@ public class LStatements{
         public boolean buildFrom(){
             //do not build the "from" section
             return false;
-        }
-
-        @Override
-        public Color color(){
-            return Pal.logicUnits;
         }
 
         @Override
@@ -1175,11 +1065,6 @@ public class LStatements{
         }
 
         @Override
-        public Color color(){
-            return Pal.logicUnits;
-        }
-
-        @Override
         public LInstruction build(LAssembler builder){
             return new UnitLocateI(locate, flag, builder.var(enemy), builder.var(ore), builder.var(outX), builder.var(outY), builder.var(outFound), builder.var(outBuild));
         }
@@ -1218,11 +1103,6 @@ public class LStatements{
         @Override
         public boolean privileged(){
             return true;
-        }
-
-        @Override
-        public Color color(){
-            return Pal.logicWorld;
         }
 
         @Override
@@ -1289,11 +1169,6 @@ public class LStatements{
         }
 
         @Override
-        public Color color(){
-            return Pal.logicWorld;
-        }
-
-        @Override
         public LInstruction build(LAssembler builder){
             return new SetBlockI(builder.var(x), builder.var(y), builder.var(block), builder.var(team), builder.var(rotation), layer);
         }
@@ -1337,11 +1212,6 @@ public class LStatements{
         @Override
         public boolean privileged(){
             return true;
-        }
-
-        @Override
-        public Color color(){
-            return Pal.logicWorld;
         }
 
         @Override
@@ -1410,11 +1280,6 @@ public class LStatements{
         }
 
         @Override
-        public Color color(){
-            return Pal.logicWorld;
-        }
-
-        @Override
         public LInstruction build(LAssembler builder){
             return new ApplyEffectI(clear, effect, builder.var(unit), builder.var(duration));
         }
@@ -1442,11 +1307,6 @@ public class LStatements{
         @Override
         public boolean privileged(){
             return true;
-        }
-
-        @Override
-        public Color color(){
-            return Pal.logicWorld;
         }
 
         @Override
@@ -1515,11 +1375,6 @@ public class LStatements{
         }
 
         @Override
-        public Color color(){
-            return Pal.logicWorld;
-        }
-
-        @Override
         public LInstruction build(LAssembler builder){
             return new SetRuleI(rule, builder.var(value), builder.var(p1), builder.var(p2), builder.var(p3), builder.var(p4));
         }
@@ -1563,11 +1418,6 @@ public class LStatements{
         @Override
         public boolean privileged(){
             return true;
-        }
-
-        @Override
-        public Color color(){
-            return Pal.logicWorld;
         }
 
         @Override
@@ -1627,11 +1477,6 @@ public class LStatements{
         }
 
         @Override
-        public Color color(){
-            return Pal.logicWorld;
-        }
-
-        @Override
         public LInstruction build(LAssembler builder){
             return new CutsceneI(action, builder.var(p1), builder.var(p2), builder.var(p3), builder.var(p4));
         }
@@ -1667,11 +1512,6 @@ public class LStatements{
         }
 
         @Override
-        public Color color(){
-            return Pal.logicWorld;
-        }
-
-        @Override
         public LInstruction build(LAssembler b){
             return new ExplosionI(b.var(team), b.var(x), b.var(y), b.var(radius), b.var(damage), b.var(air), b.var(ground), b.var(pierce));
         }
@@ -1694,11 +1534,6 @@ public class LStatements{
         @Override
         public boolean privileged(){
             return true;
-        }
-
-        @Override
-        public Color color(){
-            return Pal.logicWorld;
         }
 
         @Override
@@ -1762,11 +1597,6 @@ public class LStatements{
         }
 
         @Override
-        public Color color(){
-            return Pal.logicWorld;
-        }
-
-        @Override
         public LInstruction build(LAssembler builder){
             return new FetchI(type, builder.var(result), builder.var(team), builder.var(extra), builder.var(index));
         }
@@ -1796,11 +1626,6 @@ public class LStatements{
         }
 
         @Override
-        public Color color(){
-            return Pal.logicWorld;
-        }
-
-        @Override
         public LInstruction build(LAssembler builder){
             return new GetFlagI(builder.var(result), builder.var(flag));
         }
@@ -1827,11 +1652,6 @@ public class LStatements{
         @Override
         public boolean privileged(){
             return true;
-        }
-
-        @Override
-        public Color color(){
-            return Pal.logicWorld;
         }
 
         @Override
