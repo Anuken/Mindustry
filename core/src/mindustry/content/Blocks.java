@@ -1020,6 +1020,7 @@ public class Blocks{
             envEnabled = Env.any;
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(Liquids.cryofluid), new DrawDefault());
             liquidCapacity = 24f;
+            craftTime = 120;
 
             consumePower(1f);
             consumeItem(Items.titanium);
@@ -1276,7 +1277,7 @@ public class Blocks{
             drawer = new DrawMulti(new DrawDefault(), new DrawHeatOutput());
             size = 2;
             heatOutput = 15f;
-            craftTime = 60f * 15f;
+            craftTime = 60f * 12f;
             consumeItem(Items.phaseFabric);
         }};
 
@@ -1681,6 +1682,8 @@ public class Blocks{
             hasPower = true;
             consumesPower = true;
             conductivePower = true;
+
+            chanceDeflect = 8f;
 
             health = 260 * wallHealthMultiplier * 4;
             armor = 15f;
