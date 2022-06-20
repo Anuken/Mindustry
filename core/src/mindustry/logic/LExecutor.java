@@ -900,9 +900,9 @@ public class LExecutor{
             float _x = World.unconv(exec.numf(x));
             float _y = World.unconv(exec.numf(y));
             switch (_sound) {
-                case -1 -> Sounds.logic_noise_0.at(_x, _y, _pitch, _volume);
-                case -2 -> Sounds.logic_noise_1.at(_x, _y, _pitch, _volume);
-                case -3 -> Sounds.logic_noise_2.at(_x, _y, _pitch, _volume);
+                case -1 -> Sounds.logic0.at(_x, _y, _pitch, _volume);
+                case -2 -> Sounds.logic1.at(_x, _y, _pitch, _volume);
+                case -3 -> Sounds.logic2.at(_x, _y, _pitch, _volume);
                 default -> Sounds.getSound(_sound).at(_x, _y, _pitch, _volume);
             }
         }
