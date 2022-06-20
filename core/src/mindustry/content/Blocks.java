@@ -80,7 +80,11 @@ public class Blocks{
     //defense
     copperWall, copperWallLarge, titaniumWall, titaniumWallLarge, plastaniumWall, plastaniumWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge,
     phaseWall, phaseWallLarge, surgeWall, surgeWallLarge,
+
+    //walls - erekir
     berylliumWall, berylliumWallLarge, tungstenWall, tungstenWallLarge, blastDoor, reinforcedSurgeWall, reinforcedSurgeWallLarge, carbideWall, carbideWallLarge,
+    shieldedWall,
+
     mender, mendProjector, overdriveProjector, overdriveDome, forceProjector, shockMine,
     scrapWall, scrapWallLarge, scrapWallHuge, scrapWallGigantic, thruster, //ok, these names are getting ridiculous, but at least I don't have humongous walls yet
 
@@ -1016,6 +1020,7 @@ public class Blocks{
             envEnabled = Env.any;
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(Liquids.cryofluid), new DrawDefault());
             liquidCapacity = 24f;
+            craftTime = 120;
 
             consumePower(1f);
             consumeItem(Items.titanium);
@@ -1272,7 +1277,7 @@ public class Blocks{
             drawer = new DrawMulti(new DrawDefault(), new DrawHeatOutput());
             size = 2;
             heatOutput = 15f;
-            craftTime = 60f * 15f;
+            craftTime = 60f * 12f;
             consumeItem(Items.phaseFabric);
         }};
 
@@ -1669,6 +1674,22 @@ public class Blocks{
             size = 2;
         }};
 
+        shieldedWall = new ShieldWall("shielded-wall"){{
+            requirements(Category.defense, ItemStack.with(Items.phaseFabric, 20, Items.surgeAlloy, 12));
+            consumePower(3f / 60f);
+
+            outputsPower = false;
+            hasPower = true;
+            consumesPower = true;
+            conductivePower = true;
+
+            chanceDeflect = 8f;
+
+            health = 260 * wallHealthMultiplier * 4;
+            armor = 15f;
+            size = 2;
+        }};
+
         mender = new MendProjector("mender"){{
             requirements(Category.effect, with(Items.lead, 30, Items.copper, 25));
             consumePower(0.3f);
@@ -1992,6 +2013,7 @@ public class Blocks{
             hasPower = true;
             consumesPower = true;
             conductivePower = true;
+
             underBullets = true;
             baseEfficiency = 1f;
             consumePower(1f / 60f);
@@ -4061,7 +4083,123 @@ public class Blocks{
             limitRange(-5f);
         }};
 
-        //TODO 3+ more turrets.
+        //TODO very WIP
+        afflict = new PowerTurret("afflict"){{
+            requirements(Category.turret, with(Items.surgeAlloy, 100, Items.silicon, 200, Items.graphite, 250, Items.oxide, 40));
+
+            shootType = new BasicBulletType(){{
+                shootEffect = new MultiEffect(Fx.shootTitan, new WaveEffect(){{
+                    colorTo = Pal.surge;
+                    sizeTo = 26f;
+                    lifetime = 14f;
+                    strokeFrom = 4f;
+                }});
+                smokeEffect = Fx.shootSmokeTitan;
+                hitColor = Pal.surge;
+
+                sprite = "large-orb";
+                trailEffect = Fx.missileTrail;
+                trailInterval = 3f;
+                trailParam = 4f;
+                pierceCap = 2;
+                fragOnHit = false;
+                speed = 5f;
+                damage = 150f;
+                lifetime = 80f;
+                width = height = 16f;
+                backColor = Pal.surge;
+                frontColor = Color.white;
+                shrinkX = shrinkY = 0f;
+                trailColor = Pal.surge;
+                trailLength = 12;
+                trailWidth = 2.2f;
+                despawnEffect = hitEffect = new ExplosionEffect(){{
+                    waveColor = Pal.surge;
+                    smokeColor = Color.gray;
+                    sparkColor = Pal.sap;
+                    waveStroke = 4f;
+                    waveRad = 40f;
+                }};
+
+                fragBullet = intervalBullet = new BasicBulletType(3f, 20){{
+                    width = 9f;
+                    hitSize = 5f;
+                    height = 15f;
+                    pierce = true;
+                    lifetime = 30f;
+                    pierceBuilding = true;
+                    hitColor = backColor = trailColor = Pal.surge;
+                    frontColor = Color.white;
+                    trailWidth = 2.1f;
+                    trailLength = 5;
+                    hitEffect = despawnEffect = new WaveEffect(){{
+                        colorFrom = colorTo = Pal.surge;
+                        sizeTo = 4f;
+                        strokeFrom = 4f;
+                        lifetime = 10f;
+                    }};
+                    buildingDamageMultiplier = 0.3f;
+                    homingPower = 0.2f;
+                }};
+
+                bulletInterval = 3f;
+                intervalRandomSpread = 20f;
+                intervalBullets = 2;
+                intervalAngle = 180f;
+                intervalSpread = 300f;
+
+                fragBullets = 20;
+                fragVelocityMin = 0.5f;
+                fragVelocityMax = 1.5f;
+                fragLifeMin = 0.5f;
+            }};
+
+            drawer = new DrawTurret("reinforced-"){{
+                parts.add(new RegionPart("-blade"){{
+                    progress = PartProgress.recoil;
+                    heatColor = Color.valueOf("ff6214");
+                    mirror = true;
+                    under = true;
+                    moveX = 2f;
+                    moveY = -1f;
+                    moveRot = -7f;
+                }},
+                new RegionPart("-blade-glow"){{
+                    progress = PartProgress.recoil;
+                    heatProgress = PartProgress.warmup;
+                    heatColor = Color.valueOf("ff6214");
+                    drawRegion = false;
+                    mirror = true;
+                    under = true;
+                    moveX = 2f;
+                    moveY = -1f;
+                    moveRot = -7f;
+                }});
+            }};
+
+            consumePower(2f);
+            heatRequirement = 10f;
+            maxHeatEfficiency = 2f;
+
+            inaccuracy = 1f;
+            shake = 2f;
+            shootY = 4;
+            outlineColor = Pal.darkOutline;
+            size = 4;
+            envEnabled |= Env.space;
+            reload = 110f;
+            cooldownTime = reload;
+            recoil = 3f;
+            range = 340;
+            shootCone = 20f;
+            scaledHealth = 180;
+            rotateSpeed = 1.5f;
+            researchCostMultiplier = 0.05f;
+
+            limitRange(9f);
+        }};
+
+        //TODO 5 more turrets.
 
         //endregion
         //region units
