@@ -125,10 +125,7 @@ public class ImpactReactor extends PowerGenerator{
             Draw.blend();
 
             Draw.color();
-
             Draw.rect(region, x, y);
-
-            Draw.color();
         }
 
         @Override

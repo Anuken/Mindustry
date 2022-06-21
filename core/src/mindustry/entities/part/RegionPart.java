@@ -3,6 +3,7 @@ package mindustry.entities.part;
 import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.graphics.*;
@@ -83,7 +84,7 @@ public class RegionPart extends DrawPart{
             //can be null
             var region = drawRegion ? regions[Math.min(i, regions.length - 1)] : null;
             float sign = (i == 0 ? 1 : -1) * params.sideMultiplier;
-            Tmp.v1.set((x + mx) * sign, y + my).rotate(params.rotation - 90);
+            Tmp.v1.set((x + mx) * sign, y + my).rotateRadExact((params.rotation - 90) * Mathf.degRad);
 
             float
                 rx = params.x + Tmp.v1.x,
@@ -125,7 +126,7 @@ public class RegionPart extends DrawPart{
             for(int s = 0; s < len; s++){
                 int i = (params.sideOverride == -1 ? s : params.sideOverride);
                 float sign = (i == 1 ? -1 : 1) * params.sideMultiplier;
-                Tmp.v1.set((x + mx) * sign, y + my).rotate(params.rotation - 90);
+                Tmp.v1.set((x + mx) * sign, y + my).rotateRadExact((params.rotation - 90) * Mathf.degRad);
 
                 childParam.set(params.warmup, params.reload, params.smoothReload, params.heat, params.recoil, params.charge, params.x + Tmp.v1.x, params.y + Tmp.v1.y, i * sign + mr * sign + params.rotation);
                 childParam.sideMultiplier = params.sideMultiplier;
