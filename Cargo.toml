@@ -1,6 +1,6 @@
 # i dont know how cargo works so i copied it from the simple Rust 🚀 hello world program and added required dependencies
 [package]
-name    = "hello-world"
+name    = "hello-world (now mindustry)"
 version = "0.1.0"
 authors = ["mTvare6 <mTvare6@users.noreply.github.com>"]
 edition = "2018"
