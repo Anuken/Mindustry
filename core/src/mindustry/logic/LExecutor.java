@@ -1289,14 +1289,16 @@ public class LExecutor{
                         if(b instanceof OverlayFloor o && tile.overlay() != o) tile.setOverlayNet(o);
                     }
                     case floor -> {
-                        if(b instanceof Floor f && tile.floor() != f) tile.setFloorNet(f);
+                        if(b instanceof Floor f && tile.floor() != f && !f.isOverlay()) tile.setFloorNet(f);
                     }
                     case block -> {
-                        Team t = exec.team(team);
-                        if(t == null) t = Team.derelict;
+                        if(!b.isFloor()){
+                            Team t = exec.team(team);
+                            if(t == null) t = Team.derelict;
 
-                        if(tile.block() != b || tile.team() != t){
-                            tile.setNet(b, t, Mathf.clamp(exec.numi(rotation), 0, 3));
+                            if(tile.block() != b || tile.team() != t){
+                                tile.setNet(b, t, Mathf.clamp(exec.numi(rotation), 0, 3));
+                            }
                         }
                     }
                     //building case not allowed

@@ -10,6 +10,7 @@ import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
+import mindustry.world.*;
 import mindustry.world.meta.*;
 
 import static mindustry.entities.Puddles.*;
@@ -143,6 +144,11 @@ public class Liquid extends UnlockableContent implements Senseable{
     /** Runs when puddles update. */
     public void update(Puddle puddle){
 
+    }
+
+    //TODO proper API for this (do not use yet!)
+    public float react(Liquid other, float amount, Tile tile, float x, float y){
+        return 0f;
     }
 
     @Override
