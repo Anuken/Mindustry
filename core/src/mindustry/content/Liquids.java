@@ -48,9 +48,10 @@ public class Liquids{
             heatCapacity = 0.4f;
             temperature = 0.54f;
             viscosity = 0.85f;
-            flammability = 0.1f;
+            flammability = 0f;
             capPuddles = false;
             hidden = true;
+            spreadTarget = Liquids.water;
 
             colorFrom = Color.valueOf("f98f4a");
             colorTo = Color.valueOf("9e172c");
