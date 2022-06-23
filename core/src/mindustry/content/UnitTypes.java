@@ -89,7 +89,7 @@ public class UnitTypes{
 
     //region neoplasm
 
-    public static @EntityDef({Unitc.class, Crawlc.class}) UnitType latum;
+    public static @EntityDef({Unitc.class, Crawlc.class}) UnitType latum, renale;
 
     //endregion
 
@@ -3906,6 +3906,27 @@ public class UnitTypes{
         //endregion
         //region erekir - neoplasm
 
+        renale = new NeoplasmUnitType("renale"){{
+            health = 500;
+            armor = 2;
+            hitSize = 9f;
+            omniMovement = false;
+            rotateSpeed = 2.5f;
+            drownTimeMultiplier = 2f;
+            drawCell = false;
+            segments = 3;
+            drawBody = false;
+            hidden = true;
+            crushDamage = 0.5f;
+            aiController = HugAI::new;
+            targetAir = false;
+
+            segmentScl = 3f;
+            segmentPhase = 5f;
+            segmentMag = 0.5f;
+            speed = 1.2f;
+        }};
+
         latum = new NeoplasmUnitType("latum"){{
             health = 20000;
             armor = 12;
@@ -3924,6 +3945,8 @@ public class UnitTypes{
             segmentScl = 4f;
             segmentPhase = 5f;
             speed = 1f;
+
+            abilities.add(new SpawnDeathAbility(renale, 5, 11f));
         }};
 
         //endregion
