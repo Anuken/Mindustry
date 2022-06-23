@@ -869,6 +869,7 @@ public class NetServer implements ApplicationListener{
         }
     }
 
+    //TODO I don't like where this is, move somewhere else?
     /** Queues a building health update. This will be sent in a Call.buildHealthUpdate packet later. */
     public void buildHealthUpdate(Building build){
         buildHealthChanged.add(build.pos());

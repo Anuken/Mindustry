@@ -4190,7 +4190,7 @@ public class Blocks{
             recoil = 3f;
             range = 340;
             shootCone = 20f;
-            scaledHealth = 180;
+            scaledHealth = 220;
             rotateSpeed = 1.5f;
             researchCostMultiplier = 0.05f;
 
@@ -4198,7 +4198,7 @@ public class Blocks{
         }};
 
         fracture = new ItemTurret("fracture"){{
-            //requirements(Category.turret, with(Items.beryllium, 150, Items.silicon, 200, Items.graphite, 200, Items.carbide, 50));
+            requirements(Category.turret, with(Items.beryllium, 150, Items.silicon, 200, Items.graphite, 200, Items.carbide, 50));
 
             ammo(
             Items.tungsten, new BasicBulletType(8f, 41){{
@@ -4215,19 +4215,28 @@ public class Blocks{
                 trailLength = 3;
                 hitEffect = despawnEffect = Fx.hitSquaresColor;
                 buildingDamageMultiplier = 0.2f;
+
+                if(false)
+                spawnBullets.add(new BulletType(){{
+                    instantDisappear = true;
+                    lightning = 6;
+                    lightningLength = 10;
+                    lightningLengthRand = 10;
+                    lightningColor = Color.valueOf("ff6214");
+                    lightningCone = 20f;
+                    damage = 30;
+                    despawnEffect = hitEffect = Fx.none;
+                }});
             }}
             );
 
-            shoot = new ShootSpread(15, 2f);
-
             coolantMultiplier = 6f;
-
-            inaccuracy = 0.2f;
-            velocityRnd = 0.17f;
             shake = 1f;
-            ammoPerShot = 3;
-            maxAmmo = 30;
-            consumeAmmoOnce = true;
+
+            //shoot = new ShootAlternate(){{
+            //    shots = 3;
+            //    barrels = 3;
+            //}};
 
             drawer = new DrawTurret("reinforced-"){{
                 parts.add(new RegionPart("-blade"){{
@@ -4237,7 +4246,6 @@ public class Blocks{
                     mirror = true;
                     under = true;
                     moveX = 2f;
-                    //moveY = -1f;
                     moveRot = -7f;
                     moves.add(new PartMove(PartProgress.recoil, 0f, -2f, 3f));
                 }},
@@ -4254,20 +4262,18 @@ public class Blocks{
                     heatColor = Color.valueOf("ff6214");
                     moveY = -8f;
                     progress = PartProgress.recoil;
-                    //drawRegion = false;
                     mirror = false;
                     under = true;
                 }});
             }};
 
-            shootY = 5f;
+            shootY = 11f;
             outlineColor = Pal.darkOutline;
             size = 4;
             envEnabled |= Env.space;
             reload = 30f;
             recoil = 2f;
             range = 125;
-            shootCone = 40f;
             scaledHealth = 210;
             rotateSpeed = 3f;
 
