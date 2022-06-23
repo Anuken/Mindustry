@@ -1762,13 +1762,13 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     @MethodPriority(100)
     @Override
     public void heal(){
-        indexer.notifyBuildHealed(self());
+        healthChanged();
     }
 
     @MethodPriority(100)
     @Override
     public void heal(float amount){
-        indexer.notifyBuildHealed(self());
+        healthChanged();
     }
 
     @Override
@@ -1779,7 +1779,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     @Replace
     @Override
     public void kill(){
-        Call.tileDestroyed(self());
+        Call.buildDestroyed(self());
     }
 
     @Replace
@@ -1796,11 +1796,25 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             damage = Damage.applyArmor(damage, block.armor) / dm;
         }
 
-        Call.tileDamage(self(), health - handleDamage(damage));
+        //TODO handle this better on the client.
+        if(!net.client()){
+            health -= handleDamage(damage);
+        }
+
+        healthChanged();
 
         if(health <= 0){
-            Call.tileDestroyed(self());
+            Call.buildDestroyed(self());
         }
+    }
+
+    public void healthChanged(){
+        //server-side, health updates are batched.
+        if(net.server()){
+            netServer.buildHealthUpdate(self());
+        }
+
+        indexer.notifyHealthChanged(self());
     }
 
     @Override
