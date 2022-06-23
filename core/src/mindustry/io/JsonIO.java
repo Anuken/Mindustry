@@ -1,5 +1,6 @@
 package mindustry.io;
 
+import arc.graphics.*;
 import arc.util.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
@@ -71,6 +72,23 @@ public class JsonIO{
     static void apply(Json json){
         json.setElementType(Rules.class, "spawns", SpawnGroup.class);
         json.setElementType(Rules.class, "loadout", ItemStack.class);
+
+        json.setSerializer(Color.class, new Serializer<>(){
+            @Override
+            public void write(Json json, Color object, Class knownType){
+                json.writeValue(object.toString());
+            }
+
+            @Override
+            public Color read(Json json, JsonValue jsonData, Class type){
+                if(jsonData.isString()){
+                    return Color.valueOf(jsonData.asString());
+                }
+                Color out = new Color();
+                json.readFields(out, jsonData);
+                return out;
+            }
+        });
 
         json.setSerializer(Sector.class, new Serializer<>(){
             @Override
