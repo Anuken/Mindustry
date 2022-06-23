@@ -4197,6 +4197,7 @@ public class Blocks{
             limitRange(9f);
         }};
 
+        if(false)
         fracture = new ItemTurret("fracture"){{
             requirements(Category.turret, with(Items.beryllium, 150, Items.silicon, 200, Items.graphite, 200, Items.carbide, 50));
 
@@ -4278,7 +4279,6 @@ public class Blocks{
             rotateSpeed = 3f;
 
             coolant = consume(new ConsumeLiquid(Liquids.water, 15f / 60f));
-            limitRange();
         }};
 
         //TODO 3 more turrets.

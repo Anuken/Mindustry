@@ -3913,7 +3913,6 @@ public class UnitTypes{
             omniMovement = false;
             rotateSpeed = 2.5f;
             drownTimeMultiplier = 2f;
-            drawCell = false;
             segments = 3;
             drawBody = false;
             hidden = true;
@@ -3934,7 +3933,6 @@ public class UnitTypes{
             omniMovement = false;
             rotateSpeed = 1.7f;
             drownTimeMultiplier = 4f;
-            drawCell = false;
             segments = 4;
             drawBody = false;
             hidden = true;
