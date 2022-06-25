@@ -12,7 +12,7 @@ import mindustry.graphics.*;
 
 /** A continuous bullet type that only damages in a point. */
 public class PointLaserBulletType extends BulletType{
-    public String sprite = "drill-laser";
+    public String sprite = "point-laser";
     public TextureRegion laser, laserEnd;
 
     public Color color = Color.white;

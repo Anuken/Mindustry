@@ -365,10 +365,15 @@ public class MapObjectives{
 
     /** Base abstract class for any in-map objective. */
     public static abstract class MapObjective{
+        public @Nullable String details;
         public String[] flagsAdded = {};
         public String[] flagsRemoved = {};
         public ObjectiveMarker[] markers = {};
-        public @Nullable String details;
+
+        //TODO localize
+        public String typeName(){
+            return getClass().getSimpleName().replace("Objective", "");
+        }
 
         public MapObjective withFlags(String... flags){
             this.flagsAdded = flags;

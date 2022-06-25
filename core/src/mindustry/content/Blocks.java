@@ -4196,14 +4196,14 @@ public class Blocks{
         }};
 
         lustre = new ContinuousTurret("lustre"){{
-            requirements(Category.turret, with(Items.beryllium, 150, Items.silicon, 200, Items.graphite, 200, Items.carbide, 50));
+            requirements(Category.turret, with(Items.silicon, 250, Items.graphite, 200, Items.oxide, 50, Items.carbide, 90));
 
             range = 100f;
 
             shootType = new PointLaserBulletType(){{
                 damage = 150f;
                 buildingDamageMultiplier = 0.3f;
-                hitColor = Color.valueOf("fd9e81");
+                hitColor = Color.valueOf("fda981");
             }};
 
             drawer = new DrawTurret("reinforced-"){{
