@@ -859,10 +859,6 @@ public class Block extends UnlockableContent implements Senseable{
         return isVisible() && (!state.rules.bannedBlocks.contains(this) || state.rules.editor) && supportsEnv(state.rules.env);
     }
 
-    public boolean shouldConnect(Building build){
-        return true;
-    }
-
     /** @return whether this block supports a specific environment. */
     public boolean supportsEnv(int env){
         return (envEnabled & env) != 0 && (envDisabled & env) == 0 && (envRequired == 0 || (envRequired & env) == envRequired);
