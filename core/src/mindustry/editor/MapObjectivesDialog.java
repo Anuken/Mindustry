@@ -2,7 +2,9 @@ package mindustry.editor;
 
 import arc.*;
 import arc.func.*;
+import arc.graphics.*;
 import arc.scene.event.*;
+import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
@@ -184,6 +186,8 @@ public class MapObjectivesDialog extends BaseDialog{
             f.field(Reflect.get(objective, field), text -> {
                 Reflect.set(objective, field, text);
             });
+        }else if(type == boolean.class){
+            f.check("", Reflect.get(objective, field), val -> Reflect.set(objective, field, val));
         }else if(type == int.class){
             f.field(Reflect.<Integer>get(objective, field) + "", text -> {
                 if(Strings.canParseInt(text)){
@@ -212,14 +216,23 @@ public class MapObjectivesDialog extends BaseDialog{
                     setup();
                 }, b -> ((Block)b).synthetic());
             }).pad(4);
-        }else if(type == Team.class){ //TODO list of flags
+        }else if(type == Team.class){
             f.button(b -> b.image(Tex.whiteui).color(Reflect.<Team>get(objective, field).color).size(iconSmall), () -> {
                 showTeamSelect(result -> {
                     Reflect.set(objective, field, result);
                     setup();
                 });
             }).pad(4);
-        }else if(type == String[].class){ //TODO list of flags
+        }else if(type == Color.class){
+            Color fieldCol = Reflect.get(objective, field);
+
+            f.table(Tex.pane, in -> {
+                in.stack(new Image(Tex.alphaBg), new Image(Tex.whiteui){{
+                    update(() -> setColor(fieldCol));
+                }}).grow();
+            }).margin(4).size(50f).get().clicked(() -> ui.picker.show(fieldCol, fieldCol::set));
+
+        }else if(type == String[].class){
 
             Table strings = new Table();
             strings.marginLeft(20f);
@@ -242,13 +255,7 @@ public class MapObjectivesDialog extends BaseDialog{
                     }).maxTextLength(20).height(h);
 
                     strings.button(Icon.cancel, Styles.squarei, () -> {
-
-                        String[] next = new String[array.length - 1];
-                        System.arraycopy(array, 0, next, 0, fi);
-                        if(fi < array.length - 1){
-                            System.arraycopy(array, fi + 1, next, fi, array.length - 1 - fi);
-                        }
-                        Reflect.set(objective, field, next);
+                        Reflect.set(objective, field, Structs.remove(array, fi));
 
                         rebuild[0].run();
                     }).padLeft(4).size(h);
@@ -257,10 +264,7 @@ public class MapObjectivesDialog extends BaseDialog{
                 }
 
                 strings.button("+ Add", () -> {
-                    String[] next = new String[array.length + 1];
-                    next[array.length] = "";
-                    System.arraycopy(array, 0, next, 0, array.length);
-                    Reflect.set(objective, field, next);
+                    Reflect.set(objective, field, Structs.add(array, ""));
 
                     rebuild[0].run();
                 }).height(h).width(140f).padLeft(-20f).left().row();
@@ -271,7 +275,106 @@ public class MapObjectivesDialog extends BaseDialog{
             f.row();
             f.add(strings).colspan(2).fill();
 
-        //}else if(type == ObjectiveMarker[].class){
+        }else if(type == ObjectiveMarker[].class){
+            Runnable[] rebuild = {null};
+
+            f.row();
+
+            f.table(t -> {
+                t.margin(0).marginLeft(10f);
+
+                rebuild[0] = () -> {
+                    t.clear();
+
+                    t.left().defaults().growX().left();
+
+                    ObjectiveMarker[] array = Reflect.get(objective, field);
+
+                    //TODO very very broken
+                    for(var marker : array){
+                        t.button(b -> {
+                            b.left();
+                            b.add(marker.typeName()).color(Pal.accent);
+
+                            b.add().growX();
+
+                            b.button(Icon.upOpen, Styles.emptyi, () -> {
+                                int index = Structs.indexOf(array, marker);
+                                if(index > 0){
+                                    Structs.swap(array, index, index - 1);
+                                    rebuild[0].run();
+                                }
+                            }).pad(-6).size(46f);
+
+                            b.button(Icon.downOpen, Styles.emptyi, () -> {
+                                int index = Structs.indexOf(array, marker);
+                                if(index < objectives.size - 1){
+                                    Structs.swap(array, index, index + 1);
+                                    rebuild[0].run();
+                                }
+                            }).pad(-6).size(46f);
+
+                            b.button(Icon.cancel, Styles.emptyi, () -> {
+                                Reflect.set(objective, field, Structs.remove(array, marker));
+
+                                t.getCell(b).pad(0f);
+                                b.remove();
+                                rebuild[0].run();
+                            }).pad(-6).size(46f).padRight(-12f);
+                        }, () -> {
+                            if(selectedMarker != marker){
+                                selectedMarker = marker;
+                                rebuild[0].run();
+                            }
+                        }).width(310f).growX().height(46f).pad(-6f).padBottom(12f).row();
+
+                        if(selectedMarker == marker){
+                            t.table(b -> {
+                                b.left();
+                                b.margin(10f);
+
+                                b.defaults().minHeight(40f).left();
+
+                                var fields = marker.getClass().getFields();
+
+                                for(var disp : fields){
+                                    if((disp.getModifiers() & Modifier.TRANSIENT) != 0) continue;
+
+                                    displayField(b, disp, marker);
+                                }
+
+                            }).padTop(-12f).grow().row();
+                        }
+                    }
+                };
+
+                rebuild[0].run();
+
+            }).width(310f).pad(8f).colspan(2).row();
+
+            f.button("+ Add", () -> {
+                var selection = new BaseDialog("@add");
+                selection.cont.pane(p -> {
+                    p.background(Tex.button);
+                    p.marginRight(14);
+                    p.defaults().size(195f, 56f);
+                    int i = 0;
+                    for(var gen : MapObjectives.allMarkerTypes){
+                        var marker = gen.get();
+
+                        p.button(marker.typeName(), Styles.flatt, () -> {
+                            Reflect.set(objective, field, Structs.add(Reflect.get(objective, field), marker));
+                            rebuild[0].run();
+                            selection.hide();
+                        }).with(Table::left).get().getLabelCell().growX().left().padLeft(5).labelAlign(Align.left);
+
+                        if(++i % 3 == 0) p.row();
+                    }
+                }).scrollX(false);
+
+                selection.addCloseButton();
+                selection.show();
+            }).height(40f).width(140f).left().row();
 
         }else{
             f.add("[red]UNFINISHED");
@@ -292,7 +395,8 @@ public class MapObjectivesDialog extends BaseDialog{
 
                 if(!check.get(block)) continue;
 
-                p.image(block == Blocks.air ? Icon.none.getRegion() : block.uiIcon).size(iconMed).pad(3).with(b -> b.addListener(new HandCursorListener()))
+                p.image(block == Blocks.air ? Icon.none.getRegion() : block.uiIcon).size(iconMed).pad(3)
+                .with(b -> b.addListener(new HandCursorListener()))
                 .tooltip(block.localizedName).get().clicked(() -> {
                     cons.get(block);
                     dialog.hide();
@@ -309,7 +413,8 @@ public class MapObjectivesDialog extends BaseDialog{
         BaseDialog dialog = new BaseDialog("");
         for(var team : Team.baseTeams){
 
-            dialog.cont.image(Tex.whiteui).size(iconMed).color(team.color).pad(4).with(i -> i.addListener(new HandCursorListener()))
+            dialog.cont.image(Tex.whiteui).size(iconMed).color(team.color).pad(4)
+            .with(i -> i.addListener(new HandCursorListener()))
             .tooltip(team.localized()).get().clicked(() -> {
                 cons.get(team);
                 dialog.hide();
