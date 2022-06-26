@@ -432,7 +432,7 @@ public class MapObjectives{
 
         public float radius = 6f, rotation = 0f;
         public int sides = 4;
-        public Color color = Pal.accent;
+        public Color color = Color.valueOf("ffd37f");
 
         //cached localized text
         private transient String fetchedText;
@@ -491,7 +491,7 @@ public class MapObjectives{
     public static class MinimapMarker extends ObjectiveMarker{
         //in tiles.
         public float x, y, radius = 5f, stroke = 11f;
-        public Color color = Team.crux.color;
+        public Color color = Color.valueOf("f25555");
 
         public MinimapMarker(float x, float y){
             this.x = x;
@@ -533,7 +533,7 @@ public class MapObjectives{
         public float x, y, radius = 6f, rotation = 0f, stroke = 1f;
         public boolean fill = false, outline = true;
         public int sides = 4;
-        public Color color = Pal.accent;
+        public Color color = Color.valueOf("ffd37f");
 
         public ShapeMarker(float x, float y){
             this.x = x;
@@ -608,6 +608,11 @@ public class MapObjectives{
     public static abstract class ObjectiveMarker{
         /** makes sure markers are only added once */
         public transient boolean wasAdded;
+
+        //TODO localize
+        public String typeName(){
+            return getClass().getSimpleName().replace("Objective", "");
+        }
 
         /** Called in the overlay draw layer.*/
         public void draw(){}
