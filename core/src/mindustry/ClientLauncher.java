@@ -98,7 +98,40 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
                 }
             }
         });
-        assets.setLoader(Music.class, new MusicLoader(tree));
+        assets.setLoader(Music.class, new MusicLoader(tree){
+            @Override
+            public void loadAsync(AssetManager manager, String fileName, Fi file, MusicParameter parameter){
+
+            }
+
+            @Override
+            public Music loadSync(AssetManager manager, String fileName, Fi file, MusicParameter parameter){
+
+                if(parameter != null && parameter.music != null){
+                    mainExecutor.submit(() -> {
+                        try{
+                            parameter.music.load(file);
+                        }catch(Throwable t){
+                            Log.err("Error loading music: " + file, t);
+                        }
+                    });
+
+                    return parameter.music;
+                }else{
+                    Music music = new Music();
+
+                    mainExecutor.submit(() -> {
+                        try{
+                            music.load(file);
+                        }catch(Throwable t){
+                            Log.err("Error loading music: " + file, t);
+                        }
+                    });
+
+                    return music;
+                }
+            }
+        });
 
         assets.load("sprites/error.png", Texture.class);
         atlas = TextureAtlas.blankAtlas();
