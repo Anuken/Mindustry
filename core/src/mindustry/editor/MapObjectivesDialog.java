@@ -24,8 +24,10 @@ import static mindustry.Vars.*;
 
 public class MapObjectivesDialog extends BaseDialog{
     private Seq<MapObjective> objectives = new Seq<>();
-    private @Nullable MapObjective selectedObjective;
     private Table list = new Table();
+
+    private @Nullable MapObjective selectedObjective;
+    private @Nullable ObjectiveMarker selectedMarker;
 
     public MapObjectivesDialog(){
         super("@editor.objectives");
@@ -163,106 +165,7 @@ public class MapObjectivesDialog extends BaseDialog{
                         for(var field : fields){
                             if((field.getModifiers() & Modifier.PUBLIC) == 0) continue;
 
-                            f.add(field.getName() + ": ");
-
-                            var type = field.getType();
-
-                            if(type == String.class){
-                                f.field(Reflect.get(objective, field), text -> {
-                                    Reflect.set(objective, field, text);
-                                });
-                            }else if(type == int.class){
-                                f.field(Reflect.<Integer>get(objective, field) + "", text -> {
-                                    if(Strings.canParseInt(text)){
-                                        Reflect.set(objective, field, Strings.parseInt(text));
-                                    }
-                                }).valid(Strings::canParseInt);
-                            }else if(type == float.class){
-                                f.field(Reflect.<Float>get(objective, field) + "", text -> {
-                                    if(Strings.canParsePositiveFloat(text)){
-                                        Reflect.set(objective, field, Strings.parseFloat(text));
-                                    }
-                                }).valid(Strings::canParseFloat);
-                            }else if(type == UnlockableContent.class){
-
-                                f.button(b -> b.image(Reflect.<UnlockableContent>get(objective, field).uiIcon).size(iconSmall), () -> {
-                                    showContentSelect(null, result -> {
-                                        Reflect.set(objective, field, result);
-                                        setup();
-                                    }, b -> b.techNode != null);
-                                }).pad(4);
-
-                            }else if(type == Block.class){
-                                f.button(b -> b.image(Reflect.<Block>get(objective, field).uiIcon).size(iconSmall), () -> {
-                                    showContentSelect(ContentType.block, result -> {
-                                        Reflect.set(objective, field, result);
-                                        setup();
-                                    }, b -> ((Block)b).synthetic());
-                                }).pad(4);
-                            }else if(type == Team.class){ //TODO list of flags
-                                f.button(b -> b.image(Tex.whiteui).color(Reflect.<Team>get(objective, field).color).size(iconSmall), () -> {
-                                    showTeamSelect(result -> {
-                                        Reflect.set(objective, field, result);
-                                        setup();
-                                    });
-                                }).pad(4);
-                            }else if(type == String[].class){ //TODO list of flags
-
-                                Table strings = new Table();
-                                strings.marginLeft(20f);
-                                Runnable[] rebuild = {null};
-
-                                strings.left();
-
-                                float h = 40f;
-
-                                rebuild[0] = () -> {
-                                    strings.clear();
-                                    strings.left().defaults().padBottom(3f).padTop(3f);
-                                    String[] array = Reflect.get(objective, field);
-
-                                    for(int i = 0; i < array.length; i ++){
-                                        int fi = i;
-                                        var str = array[i];
-                                        strings.field(str, result -> {
-                                            array[fi] = result;
-                                        }).maxTextLength(20).height(h);
-
-                                        strings.button(Icon.cancel, Styles.squarei, () -> {
-
-                                            String[] next = new String[array.length - 1];
-                                            System.arraycopy(array, 0, next, 0, fi);
-                                            if(fi < array.length - 1){
-                                                System.arraycopy(array, fi + 1, next, fi, array.length - 1 - fi);
-                                            }
-                                            Reflect.set(objective, field, next);
-
-                                            rebuild[0].run();
-                                        }).padLeft(4).size(h);
-
-                                        strings.row();
-                                    }
-
-                                    strings.button("+ Add", () -> {
-                                        String[] next = new String[array.length + 1];
-                                        next[array.length] = "";
-                                        System.arraycopy(array, 0, next, 0, array.length);
-                                        Reflect.set(objective, field, next);
-
-                                        rebuild[0].run();
-                                    }).height(h).width(140f).padLeft(-20f).left().row();
-                                };
-
-                                rebuild[0].run();
-
-                                f.row();
-                                f.add(strings).colspan(2).fill();
-
-                            }else{
-                                f.add("[red]UNFINISHED");
-                            }
-
-                            f.row();
+                            displayField(f, field, objective);
                         }
 
                     }).grow();
@@ -270,6 +173,111 @@ public class MapObjectivesDialog extends BaseDialog{
 
             }).width(340f).pad(8f).row();
         }
+    }
+
+    void displayField(Table f, Field field, Object objective){
+        f.add(field.getName() + ": ");
+
+        var type = field.getType();
+
+        if(type == String.class){
+            f.field(Reflect.get(objective, field), text -> {
+                Reflect.set(objective, field, text);
+            });
+        }else if(type == int.class){
+            f.field(Reflect.<Integer>get(objective, field) + "", text -> {
+                if(Strings.canParseInt(text)){
+                    Reflect.set(objective, field, Strings.parseInt(text));
+                }
+            }).valid(Strings::canParseInt);
+        }else if(type == float.class){
+            f.field(Reflect.<Float>get(objective, field) + "", text -> {
+                if(Strings.canParsePositiveFloat(text)){
+                    Reflect.set(objective, field, Strings.parseFloat(text));
+                }
+            }).valid(Strings::canParseFloat);
+        }else if(type == UnlockableContent.class){
+
+            f.button(b -> b.image(Reflect.<UnlockableContent>get(objective, field).uiIcon).size(iconSmall), () -> {
+                showContentSelect(null, result -> {
+                    Reflect.set(objective, field, result);
+                    setup();
+                }, b -> b.techNode != null);
+            }).pad(4);
+
+        }else if(type == Block.class){
+            f.button(b -> b.image(Reflect.<Block>get(objective, field).uiIcon).size(iconSmall), () -> {
+                showContentSelect(ContentType.block, result -> {
+                    Reflect.set(objective, field, result);
+                    setup();
+                }, b -> ((Block)b).synthetic());
+            }).pad(4);
+        }else if(type == Team.class){ //TODO list of flags
+            f.button(b -> b.image(Tex.whiteui).color(Reflect.<Team>get(objective, field).color).size(iconSmall), () -> {
+                showTeamSelect(result -> {
+                    Reflect.set(objective, field, result);
+                    setup();
+                });
+            }).pad(4);
+        }else if(type == String[].class){ //TODO list of flags
+
+            Table strings = new Table();
+            strings.marginLeft(20f);
+            Runnable[] rebuild = {null};
+
+            strings.left();
+
+            float h = 40f;
+
+            rebuild[0] = () -> {
+                strings.clear();
+                strings.left().defaults().padBottom(3f).padTop(3f);
+                String[] array = Reflect.get(objective, field);
+
+                for(int i = 0; i < array.length; i++){
+                    int fi = i;
+                    var str = array[i];
+                    strings.field(str, result -> {
+                        array[fi] = result;
+                    }).maxTextLength(20).height(h);
+
+                    strings.button(Icon.cancel, Styles.squarei, () -> {
+
+                        String[] next = new String[array.length - 1];
+                        System.arraycopy(array, 0, next, 0, fi);
+                        if(fi < array.length - 1){
+                            System.arraycopy(array, fi + 1, next, fi, array.length - 1 - fi);
+                        }
+                        Reflect.set(objective, field, next);
+
+                        rebuild[0].run();
+                    }).padLeft(4).size(h);
+
+                    strings.row();
+                }
+
+                strings.button("+ Add", () -> {
+                    String[] next = new String[array.length + 1];
+                    next[array.length] = "";
+                    System.arraycopy(array, 0, next, 0, array.length);
+                    Reflect.set(objective, field, next);
+
+                    rebuild[0].run();
+                }).height(h).width(140f).padLeft(-20f).left().row();
+            };
+
+            rebuild[0].run();
+
+            f.row();
+            f.add(strings).colspan(2).fill();
+
+        //}else if(type == ObjectiveMarker[].class){
+
+        }else{
+            f.add("[red]UNFINISHED");
+        }
+
+        f.row();
     }
 
     void showContentSelect(@Nullable ContentType type, Cons<UnlockableContent> cons, Boolf<UnlockableContent> check){

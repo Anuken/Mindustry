@@ -4,6 +4,7 @@ import arc.*;
 import arc.assets.*;
 import arc.assets.loaders.*;
 import arc.audio.*;
+import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -69,7 +70,34 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         assets.setLoader(Texture.class, "." + mapExtension, new MapPreviewLoader());
 
         tree = new FileTree();
-        assets.setLoader(Sound.class, new SoundLoader(tree));
+        assets.setLoader(Sound.class, new SoundLoader(tree){
+
+            @Override
+            public void loadAsync(AssetManager manager, String fileName, Fi file, SoundParameter parameter){
+
+            }
+
+            @Override
+            public Sound loadSync(AssetManager manager, String fileName, Fi file, SoundParameter parameter){
+                if(parameter != null && parameter.sound != null){
+                    mainExecutor.submit(() -> parameter.sound.load(file));
+
+                    return parameter.sound;
+                }else{
+                    Sound sound = new Sound();
+
+                    mainExecutor.submit(() -> {
+                        try{
+                            sound.load(file);
+                        }catch(Throwable t){
+                            Log.err("Error loading sound: " + file, t);
+                        }
+                    });
+
+                    return sound;
+                }
+            }
+        });
         assets.setLoader(Music.class, new MusicLoader(tree));
 
         assets.load("sprites/error.png", Texture.class);
