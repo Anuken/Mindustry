@@ -16,6 +16,7 @@ import mindustry.game.MapObjectives.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.io.*;
+import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
@@ -25,6 +26,8 @@ import java.lang.reflect.*;
 import static mindustry.Vars.*;
 
 public class MapObjectivesDialog extends BaseDialog{
+    private static final Seq<String> worldFields = Seq.with("x", "y");
+
     private Seq<MapObjective> objectives = new Seq<>();
     private Table list = new Table();
 
@@ -183,9 +186,9 @@ public class MapObjectivesDialog extends BaseDialog{
         var type = field.getType();
 
         if(type == String.class){
-            f.field(Reflect.get(objective, field), text -> {
+            f.area(Reflect.get(objective, field), text -> {
                 Reflect.set(objective, field, text);
-            });
+            }).height(60f);
         }else if(type == boolean.class){
             f.check("", Reflect.get(objective, field), val -> Reflect.set(objective, field, val));
         }else if(type == int.class){
@@ -195,9 +198,11 @@ public class MapObjectivesDialog extends BaseDialog{
                 }
             }).valid(Strings::canParseInt);
         }else if(type == float.class){
-            f.field(Reflect.<Float>get(objective, field) + "", text -> {
+            float multiplier = worldFields.contains(field.getName()) ? tilesize : 1f;
+
+            f.field((Reflect.<Float>get(objective, field) / multiplier) + "", text -> {
                 if(Strings.canParsePositiveFloat(text)){
-                    Reflect.set(objective, field, Strings.parseFloat(text));
+                    Reflect.set(objective, field, Strings.parseFloat(text) * multiplier);
                 }
             }).valid(Strings::canParseFloat);
         }else if(type == UnlockableContent.class){
@@ -215,6 +220,13 @@ public class MapObjectivesDialog extends BaseDialog{
                     Reflect.set(objective, field, result);
                     setup();
                 }, b -> ((Block)b).synthetic());
+            }).pad(4);
+        }else if(type == Item.class){
+            f.button(b -> b.image(Reflect.<Item>get(objective, field).uiIcon).size(iconSmall), () -> {
+                showContentSelect(ContentType.item, result -> {
+                    Reflect.set(objective, field, result);
+                    setup();
+                }, b -> true);
             }).pad(4);
         }else if(type == Team.class){
             f.button(b -> b.image(Tex.whiteui).color(Reflect.<Team>get(objective, field).color).size(iconSmall), () -> {
@@ -274,7 +286,6 @@ public class MapObjectivesDialog extends BaseDialog{
 
             f.row();
             f.add(strings).colspan(2).fill();
-
         }else if(type == ObjectiveMarker[].class){
             Runnable[] rebuild = {null};
 
@@ -290,7 +301,6 @@ public class MapObjectivesDialog extends BaseDialog{
 
                     ObjectiveMarker[] array = Reflect.get(objective, field);
 
-                    //TODO very very broken
                     for(var marker : array){
                         t.button(b -> {
                             b.left();
@@ -326,7 +336,7 @@ public class MapObjectivesDialog extends BaseDialog{
                                 selectedMarker = marker;
                                 rebuild[0].run();
                             }
-                        }).width(310f).growX().height(46f).pad(-6f).padBottom(12f).row();
+                        }).width(280f).growX().height(46f).pad(-6f).padBottom(12f).row();
 
                         if(selectedMarker == marker){
                             t.table(b -> {
@@ -346,36 +356,46 @@ public class MapObjectivesDialog extends BaseDialog{
                             }).padTop(-12f).grow().row();
                         }
                     }
+
+                    t.button("+ Add", () -> {
+                        var selection = new BaseDialog("@add");
+                        selection.cont.pane(p -> {
+                            p.background(Tex.button);
+                            p.marginRight(14);
+                            p.defaults().size(195f, 56f);
+                            int i = 0;
+                            for(var gen : MapObjectives.allMarkerTypes){
+                                var marker = gen.get();
+
+                                p.button(marker.typeName(), Styles.flatt, () -> {
+                                    Reflect.set(objective, field, Structs.add(Reflect.get(objective, field), marker));
+                                    rebuild[0].run();
+                                    selection.hide();
+                                }).with(Table::left).get().getLabelCell().growX().left().padLeft(5).labelAlign(Align.left);
+
+                                if(++i % 3 == 0) p.row();
+                            }
+                        }).scrollX(false);
+
+                        selection.addCloseButton();
+                        selection.show();
+                    }).height(40f).width(140f).left().padLeft(-18f).padTop(-6f).row();
                 };
 
                 rebuild[0].run();
 
-            }).width(310f).pad(8f).colspan(2).row();
+            }).width(280f).pad(8f).colspan(2).row();
 
-            f.button("+ Add", () -> {
-                var selection = new BaseDialog("@add");
-                selection.cont.pane(p -> {
-                    p.background(Tex.button);
-                    p.marginRight(14);
-                    p.defaults().size(195f, 56f);
-                    int i = 0;
-                    for(var gen : MapObjectives.allMarkerTypes){
-                        var marker = gen.get();
-
-                        p.button(marker.typeName(), Styles.flatt, () -> {
-                            Reflect.set(objective, field, Structs.add(Reflect.get(objective, field), marker));
-                            rebuild[0].run();
-                            selection.hide();
-                        }).with(Table::left).get().getLabelCell().growX().left().padLeft(5).labelAlign(Align.left);
-
-                        if(++i % 3 == 0) p.row();
-                    }
-                }).scrollX(false);
-
-                selection.addCloseButton();
-                selection.show();
-            }).height(40f).width(140f).left().row();
-
+        }else if(type == byte.class){
+            f.table(t -> {
+                byte value = Reflect.get(objective, field);
+                t.left().defaults().left();
+                t.check("background", (value & WorldLabel.flagBackground) != 0, val ->
+                    Reflect.set(objective, field, (byte)(val ? value | WorldLabel.flagBackground : value & ~WorldLabel.flagBackground))).padTop(4f).padBottom(4f);
+                t.row();
+                t.check("outline", (value & WorldLabel.flagOutline) != 0, val ->
+                    Reflect.set(objective, field, (byte)(val ? value | WorldLabel.flagOutline : value & ~WorldLabel.flagOutline)));
+            });
         }else{
             f.add("[red]UNFINISHED");
         }
