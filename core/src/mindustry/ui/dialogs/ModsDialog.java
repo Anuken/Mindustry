@@ -40,7 +40,7 @@ public class ModsDialog extends BaseDialog{
     private float modImportProgress;
     private String searchtxt = "";
     private @Nullable Seq<ModListing> modList;
-    private boolean orderDate = false;
+    private boolean orderDate = true;
     private BaseDialog currentContent;
 
     private BaseDialog browser;
@@ -506,48 +506,54 @@ public class ModsDialog extends BaseDialog{
                         load.cont.add("[accent]Fetching Releases...");
                         load.show();
                         Http.get(ghApi + "/repos/" + mod.repo + "/releases", res -> {
-                            load.hide();
                             var json = Jval.read(res.getResultAsString());
                             JsonArray releases = json.asArray();
 
-                            if(releases.size == 0){
-                                ui.showInfo("@mods.browser.noreleases");
-                            }else{
-                                sel.hide();
-                                BaseDialog downloads = new BaseDialog("@mods.browser.releases");
-                                downloads.cont.pane(p -> {
-                                    for(int j = 0; j < releases.size; j++){
-                                        var release = releases.get(j);
+                            Core.app.post(() -> {
+                                load.hide();
 
-                                        int index = j;
-                                        p.table(((TextureRegionDrawable) Tex.whiteui).tint(Pal.darkestGray), t -> {
-                                            t.add((index == 0 ? Core.bundle.get("mods.browser.latest") + " " : "") + release.getString("name")).top().left().growX().wrap().pad(5f).color(Pal.accent);
-                                            t.row();
-                                            t.add((release.getString("published_at")).substring(0, 10).replaceAll("-", "/")).top().left().growX().wrap().pad(5f).color(Color.gray);
-                                            t.table(b -> {
-                                                b.defaults().size(150f, 54f).pad(2f);
-                                                b.button("@mods.github.open-release", Icon.link, () -> Core.app.openURI(release.getString("html_url")));
-                                                b.button("@mods.browser.add", Icon.download, () -> {
-                                                    String releaseUrl = release.getString("url");
-                                                    githubImportMod(mod.repo, mod.hasJava, releaseUrl.substring(releaseUrl.lastIndexOf("/") + 1));
-                                                });
-                                            }).right();
-                                        }).margin(5f).growX().pad(5f);
+                                if(releases.size == 0){
+                                    ui.showInfo("@mods.browser.noreleases");
+                                }else{
+                                    sel.hide();
+                                    BaseDialog downloads = new BaseDialog("@mods.browser.releases");
+                                    downloads.cont.pane(p -> {
+                                        for(int j = 0; j < releases.size; j++){
+                                            var release = releases.get(j);
 
-                                        if(j < releases.size - 1) p.row();
-                                    }
-                                }).width(600f).scrollX(false).fillY();
-                                downloads.buttons.button("@back", Icon.left, () -> {
-                                    downloads.clear();
-                                    downloads.hide();
-                                    sel.show();
-                                }).size(150f, 54f).pad(2f);
-                                downloads.keyDown(KeyCode.escape, downloads::hide);
-                                downloads.keyDown(KeyCode.back, downloads::hide);
-                                downloads.hidden(sel::show);
-                                downloads.show();
-                            }
-                        });
+                                            int index = j;
+                                            p.table(((TextureRegionDrawable)Tex.whiteui).tint(Pal.darkestGray), t -> {
+                                                t.add("[accent]" + release.getString("name") + (index == 0 ? " " + Core.bundle.get("mods.browser.latest") : "")).top().left().growX().wrap().pad(5f);
+                                                t.row();
+                                                t.add((release.getString("published_at")).substring(0, 10).replaceAll("-", "/")).top().left().growX().wrap().pad(5f).color(Color.gray);
+                                                t.table(b -> {
+                                                    b.defaults().size(150f, 54f).pad(2f);
+                                                    b.button("@mods.github.open-release", Icon.link, () -> Core.app.openURI(release.getString("html_url")));
+                                                    b.button("@mods.browser.add", Icon.download, () -> {
+                                                        String releaseUrl = release.getString("url");
+                                                        githubImportMod(mod.repo, mod.hasJava, releaseUrl.substring(releaseUrl.lastIndexOf("/") + 1));
+                                                    });
+                                                }).right();
+                                            }).margin(5f).growX().pad(5f);
+
+                                            if(j < releases.size - 1) p.row();
+                                        }
+                                    }).width(600f).scrollX(false).fillY();
+                                    downloads.buttons.button("@back", Icon.left, () -> {
+                                        downloads.clear();
+                                        downloads.hide();
+                                        sel.show();
+                                    }).size(150f, 54f).pad(2f);
+                                    downloads.keyDown(KeyCode.escape, downloads::hide);
+                                    downloads.keyDown(KeyCode.back, downloads::hide);
+                                    downloads.hidden(sel::show);
+                                    downloads.show();
+                                }
+                            });
+                        }, t -> Core.app.post(() -> {
+                            modError(t);
+                            load.hide();
+                        }));
                     });
                     sel.keyDown(KeyCode.escape, sel::hide);
                     sel.keyDown(KeyCode.back, sel::hide);
