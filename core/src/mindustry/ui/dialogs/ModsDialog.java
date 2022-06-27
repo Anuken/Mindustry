@@ -495,6 +495,13 @@ public class ModsDialog extends BaseDialog{
 
                     var found = mods.list().find(l -> mod.repo != null && mod.repo.equals(l.getRepo()));
                     sel.buttons.button(found == null ? "@mods.browser.add" : "@mods.browser.reinstall", Icon.download, () -> {
+                        sel.hide();
+                        githubImportMod(mod.repo, mod.hasJava, null);
+                    });
+                    sel.buttons.button("@mods.github.open", Icon.link, () -> {
+                        Core.app.openURI("https://github.com/" + mod.repo);
+                    });
+                    sel.buttons.button("@mods.browser.view-releases", Icon.zoom, () -> {
                         BaseDialog load = new BaseDialog("");
                         load.cont.add("[accent]Fetching Releases...");
                         load.show();
@@ -503,10 +510,8 @@ public class ModsDialog extends BaseDialog{
                             var json = Jval.read(res.getResultAsString());
                             JsonArray releases = json.asArray();
 
-                            if(releases.size < 2){
-                                //just import the mod
-                                sel.hide();
-                                githubImportMod(mod.repo, mod.hasJava, null);
+                            if(releases.size == 0){
+                                ui.showInfo("@mods.browser.noreleases");
                             }else{
                                 sel.hide();
                                 BaseDialog downloads = new BaseDialog("@mods.browser.releases");
@@ -543,9 +548,6 @@ public class ModsDialog extends BaseDialog{
                                 downloads.show();
                             }
                         });
-                    });
-                    sel.buttons.button("@mods.github.open", Icon.link, () -> {
-                        Core.app.openURI("https://github.com/" + mod.repo);
                     });
                     sel.keyDown(KeyCode.escape, sel::hide);
                     sel.keyDown(KeyCode.back, sel::hide);
