@@ -4,7 +4,7 @@ import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 
-/** Basic continuous bullet type that does not draw itself. Essentially abstract. */
+/** Basic continuous (line) bullet type that does not draw itself. Essentially abstract. */
 public class ContinuousBulletType extends BulletType{
     public float length = 220f;
     public float shake = 0f;

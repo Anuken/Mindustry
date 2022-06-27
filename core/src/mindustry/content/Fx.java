@@ -1003,6 +1003,11 @@ public class Fx{
         Fill.circle(e.x, e.y, e.rotation * e.fout());
     }).layer(Layer.bullet - 0.001f),
 
+    colorTrail = new Effect(50, e -> {
+        color(e.color);
+        Fill.circle(e.x, e.y, e.rotation * e.fout());
+    }),
+
     absorb = new Effect(12, e -> {
         color(Pal.accent);
         stroke(2f * e.fout());

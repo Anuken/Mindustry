@@ -51,6 +51,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     //TODO could be better represented as a unit
     transient @Nullable UnitType dockedType;
 
+    transient String lastCommanded;
     transient float shadowAlpha = -1f, healTime;
     transient int lastFogPos;
     private transient float resupplyTime = Mathf.random(10f);
@@ -608,6 +609,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         for(Ability a : abilities){
             a.death(self());
         }
+
+        type.killed(self());
 
         remove();
     }

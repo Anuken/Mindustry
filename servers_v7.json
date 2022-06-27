@@ -12,12 +12,12 @@
     "address": ["SMokeOfAnarchy.ru", "strider.smokeofanarchy.ru"]
   },
   {
-    "name": "hexpvp.ml",
-    "address": "hexpvp.ml"
+    "name": "HexPvP Network",
+    "address": ["hexpvp.ml"]
   },
   {
     "name": "Omega Hub",
-    "address": ["node2.crewcraft.cc:6574", "node2.crewcraft.cc:6569"]
+    "address": ["n1.yeet.ml:6572", "n1.yeet.ml:6573"]
   },
   {
     "name": "MeowLand",
@@ -94,5 +94,9 @@
   {
     "name": "[CIG]Potato",
     "address": ["mindustry.vicp.io:6800", "mindustry.vicp.io:7000", "mindustry.vicp.io:6567"]
+  },
+  {
+    "name": "SurvivalHard",
+    "address": ["212.20.42.61:6567"]
   }
 ]

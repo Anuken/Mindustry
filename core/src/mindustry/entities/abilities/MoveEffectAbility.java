@@ -13,6 +13,7 @@ public class MoveEffectAbility extends Ability{
     public boolean rotateEffect = false;
     public float effectParam = 3f;
     public boolean teamColor = false;
+    public boolean parentizeEffects;
     public Color color = Color.white;
     public Effect effect = Fx.missileTrail;
 
@@ -36,7 +37,7 @@ public class MoveEffectAbility extends Ability{
         if(unit.vel.len2() >= minVelocity * minVelocity && (counter >= interval)){
             Tmp.v1.trns(unit.rotation - 90f, x, y);
             counter %= interval;
-            effect.at(Tmp.v1.x + unit.x, Tmp.v1.y + unit.y, rotateEffect ? unit.rotation : effectParam, teamColor ? unit.team.color : color);
+            effect.at(Tmp.v1.x + unit.x, Tmp.v1.y + unit.y, rotateEffect ? unit.rotation : effectParam, teamColor ? unit.team.color : color, parentizeEffects ? unit : null);
         }
     }
 }

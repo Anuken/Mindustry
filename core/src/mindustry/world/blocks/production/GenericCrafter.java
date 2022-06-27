@@ -35,7 +35,6 @@ public class GenericCrafter extends Block{
     public boolean dumpExtraLiquid = true;
     public boolean ignoreLiquidFullness = false;
 
-    //TODO should be seconds?
     public float craftTime = 80;
     public Effect craftEffect = Fx.none;
     public Effect updateEffect = Fx.none;
