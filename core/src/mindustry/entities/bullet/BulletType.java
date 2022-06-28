@@ -184,6 +184,8 @@ public class BulletType extends Content implements Cloneable{
     public Seq<BulletType> spawnBullets = new Seq<>();
     /** Unit spawned _instead of_ this bullet. Useful for missiles. */
     public @Nullable UnitType spawnUnit;
+    /** Unit spawned when this bullet hits something or despawns due to it hitting the end of its lifetime. */
+    public @Nullable UnitType despawnUnit;
 
     /** Color of trail behind bullet. */
     public Color trailColor = Pal.missileYellowBack;
@@ -441,6 +443,10 @@ public class BulletType extends Content implements Cloneable{
 
         if(!fragOnHit){
             createFrags(b, b.x, b.y);
+        }
+
+        if(despawnUnit != null){
+            despawnUnit.spawn(b.team, b.x + Mathf.range(2f), b.y);
         }
 
         despawnEffect.at(b.x, b.y, b.rotation(), hitColor);
