@@ -458,13 +458,7 @@ public class BulletType extends Content implements Cloneable{
         if(!fragOnHit){
             createFrags(b, b.x, b.y);
         }
-
-        if(despawnUnit != null){
-            for(int i = 0; i < despawnUnitCount; i++){
-                despawnUnit.spawn(b.team, b.x + Mathf.range(0.1f), b.y);
-            }
-        }
-
+        
         despawnEffect.at(b.x, b.y, b.rotation(), hitColor);
         despawnSound.at(b);
 
