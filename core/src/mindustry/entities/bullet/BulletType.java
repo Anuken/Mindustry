@@ -446,7 +446,7 @@ public class BulletType extends Content implements Cloneable{
         }
 
         if(despawnUnit != null){
-            despawnUnit.spawn(b.team, b.x + Mathf.range(2f), b.y);
+            despawnUnit.spawn(b.team, b.x + Mathf.range(0.1f), b.y);
         }
 
         despawnEffect.at(b.x, b.y, b.rotation(), hitColor);
