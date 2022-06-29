@@ -191,7 +191,6 @@ public class BulletType extends Content implements Cloneable{
     /** Random offset distance from the original bullet despawn/hit coordinate. */
     public float despawnUnitRadius = 0.1f;
 
- 
     /** Color of trail behind bullet. */
     public Color trailColor = Pal.missileYellowBack;
     /** Chance of trail effect spawning on bullet per tick. */
