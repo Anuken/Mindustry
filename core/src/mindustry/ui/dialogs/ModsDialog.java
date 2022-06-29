@@ -520,7 +520,7 @@ public class ModsDialog extends BaseDialog{
                                     ui.showInfo("@mods.browser.noreleases");
                                 }else{
                                     sel.hide();
-                                    BaseDialog downloads = new BaseDialog("@mods.browser.releases");
+                                    var downloads = new BaseDialog("@mods.browser.releases");
                                     downloads.cont.pane(p -> {
                                         for(int j = 0; j < releases.size; j++){
                                             var release = releases.get(j);
@@ -568,14 +568,6 @@ public class ModsDialog extends BaseDialog{
                 if(++i % cols == 0) browserTable.row();
             }
         });
-    }
-
-    private String trimText(String text){
-        if(text == null) return "";
-        if(text.contains("\n")){
-            return text.substring(0, text.indexOf("\n"));
-        }
-        return text;
     }
 
     private void handleMod(String repo, HttpResponse result){

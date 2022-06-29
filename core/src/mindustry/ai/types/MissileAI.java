@@ -1,5 +1,6 @@
 package mindustry.ai.types;
 
+import arc.math.*;
 import arc.util.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -18,7 +19,7 @@ public class MissileAI extends AIController{
         }
 
         //move forward forever
-        unit.moveAt(vec.trns(unit.rotation, unit.speed()));
+        unit.moveAt(vec.trns(unit.rotation, unit.type.missileAccelTime <= 0f ? unit.speed() : Mathf.pow(Math.min(time / unit.type.missileAccelTime, 1f), 2f) * unit.speed()));
 
         var build = unit.buildOn();
 

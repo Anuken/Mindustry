@@ -654,10 +654,19 @@ public class BulletType extends Content implements Cloneable{
                 spawned.set(x, y);
                 spawned.rotation = angle;
                 //immediately spawn at top speed, since it was launched
-                spawned.vel.trns(angle, spawnUnit.speed);
+                if(spawnUnit.missileAccelTime <= 0f){
+                    spawned.vel.trns(angle, spawnUnit.speed);
+                }
                 //assign unit owner
-                if(spawned.controller() instanceof MissileAI ai && owner instanceof Unit unit){
-                    ai.shooter = unit;
+                if(spawned.controller() instanceof MissileAI ai){
+                    if(owner instanceof Unit unit){
+                        ai.shooter = unit;
+                    }
+
+                    if(owner instanceof ControlBlock control){
+                        ai.shooter = control.unit();
+                    }
+
                 }
                 spawned.add();
             }

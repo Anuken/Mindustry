@@ -5,6 +5,7 @@ import arc.math.*;
 import arc.struct.*;
 import mindustry.*;
 import mindustry.entities.*;
+import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.*;
 import mindustry.entities.part.*;
@@ -13,6 +14,7 @@ import mindustry.entities.pattern.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.type.unit.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.campaign.*;
@@ -69,7 +71,7 @@ public class Blocks{
     siliconSmelter, siliconCrucible, kiln, graphitePress, plastaniumCompressor, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
     melter, separator, disassembler, sporePress, pulverizer, incinerator, coalCentrifuge,
 
-    //erekir
+    //crafting - erekir
     siliconArcFurnace, electrolyzer, oxidationChamber, atmosphericConcentrator, electricHeater, slagHeater, phaseHeater, heatRedirector, slagIncinerator,
     carbideCrucible, slagCentrifuge, surgeCrucible, cyanogenSynthesizer, phaseSynthesizer, heatReactor,
 
@@ -134,7 +136,7 @@ public class Blocks{
     duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, foreshadow, spectre, meltdown, segment, parallax, tsunami,
 
     //turrets - erekir
-    breach, diffuse, sublimate, titan, disperse, afflict, lustre,
+    breach, diffuse, sublimate, titan, disperse, afflict, lustre, scathe,
 
     //units
     groundFactory, airFactory, navalFactory,
@@ -922,25 +924,6 @@ public class Blocks{
             consumePower(4f);
         }};
 
-        siliconArcFurnace = new GenericCrafter("silicon-arc-furnace"){{
-            requirements(Category.crafting, with(Items.beryllium, 70, Items.graphite, 80));
-            craftEffect = Fx.none;
-            outputItem = new ItemStack(Items.silicon, 4);
-            craftTime = 50f;
-            size = 3;
-            hasPower = true;
-            hasLiquids = false;
-            envEnabled |= Env.space | Env.underwater;
-            envDisabled = Env.none;
-            itemCapacity = 30;
-            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawArcSmelt(), new DrawDefault());
-            fogRadius = 3;
-            researchCost = with(Items.beryllium, 150, Items.graphite, 50);
-
-            consumeItems(with(Items.graphite, 1, Items.sand, 4));
-            consumePower(6f);
-        }};
-
         kiln = new GenericCrafter("kiln"){{
             requirements(Category.crafting, with(Items.copper, 60, Items.graphite, 30, Items.lead, 30));
             craftEffect = Fx.smeltsmoke;
@@ -1155,6 +1138,27 @@ public class Blocks{
             health = 90;
             envEnabled |= Env.space;
             consumePower(0.50f);
+        }};
+
+        //erekir
+
+        siliconArcFurnace = new GenericCrafter("silicon-arc-furnace"){{
+            requirements(Category.crafting, with(Items.beryllium, 70, Items.graphite, 80));
+            craftEffect = Fx.none;
+            outputItem = new ItemStack(Items.silicon, 4);
+            craftTime = 50f;
+            size = 3;
+            hasPower = true;
+            hasLiquids = false;
+            envEnabled |= Env.space | Env.underwater;
+            envDisabled = Env.none;
+            itemCapacity = 30;
+            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawArcSmelt(), new DrawDefault());
+            fogRadius = 3;
+            researchCost = with(Items.beryllium, 150, Items.graphite, 50);
+
+            consumeItems(with(Items.graphite, 1, Items.sand, 4));
+            consumePower(6f);
         }};
 
         //TODO better name
@@ -3798,7 +3802,7 @@ public class Blocks{
                 smokeEffect = Fx.shootSmokeSquareSparse;
                 ammoMultiplier = 1;
                 hitColor = backColor = trailColor = Color.valueOf("ea8878");
-                frontColor = Color.valueOf("feb380");
+                frontColor = Pal.redLight;
                 trailWidth = 6f;
                 trailLength = 3;
                 hitEffect = despawnEffect = Fx.hitSquaresColor;
@@ -3930,7 +3934,7 @@ public class Blocks{
                 splashDamageRadius = 65f;
                 splashDamage = 350f;
                 scaledSplashDamage = true;
-                backColor = hitColor = trailColor = Color.valueOf("ea8878").lerp(Color.valueOf("feb380"), 0.5f);
+                backColor = hitColor = trailColor = Color.valueOf("ea8878").lerp(Pal.redLight, 0.5f);
                 frontColor = Color.white;
                 ammoMultiplier = 1f;
 
@@ -4002,7 +4006,7 @@ public class Blocks{
             requirements(Category.turret, with(Items.thorium, 50, Items.oxide, 150, Items.silicon, 200, Items.beryllium, 350));
 
             ammo(Items.tungsten, new BasicBulletType(){{
-                damage = 60;
+                damage = 65;
                 speed = 8.5f;
                 width = height = 16;
                 shrinkY = 0.3f;
@@ -4071,7 +4075,7 @@ public class Blocks{
             outlineColor = Pal.darkOutline;
 
             scaledHealth = 280;
-            range = 270f;
+            range = 310f;
             size = 4;
 
             coolant = consume(new ConsumeLiquid(Liquids.water, 20f / 60f));
@@ -4100,7 +4104,7 @@ public class Blocks{
                 pierceCap = 2;
                 fragOnHit = false;
                 speed = 5f;
-                damage = 150f;
+                damage = 170f;
                 lifetime = 80f;
                 width = height = 16f;
                 backColor = Pal.surge;
@@ -4117,12 +4121,12 @@ public class Blocks{
                     waveRad = 40f;
                 }};
 
-                fragBullet = intervalBullet = new BasicBulletType(3f, 20){{
+                fragBullet = intervalBullet = new BasicBulletType(3f, 30){{
                     width = 9f;
                     hitSize = 5f;
                     height = 15f;
                     pierce = true;
-                    lifetime = 30f;
+                    lifetime = 35f;
                     pierceBuilding = true;
                     hitColor = backColor = trailColor = Pal.surge;
                     frontColor = Color.white;
@@ -4201,7 +4205,7 @@ public class Blocks{
             range = 100f;
 
             shootType = new PointLaserBulletType(){{
-                damage = 150f;
+                damage = 140f;
                 buildingDamageMultiplier = 0.3f;
                 hitColor = Color.valueOf("fda981");
             }};
@@ -4255,6 +4259,154 @@ public class Blocks{
             unitSort = UnitSorts.strongest;
 
             consumeLiquid(Liquids.nitrogen, 5f / 60f);
+        }};
+
+        scathe = new ItemTurret("scathe"){{
+            requirements(Category.turret, with(Items.silicon, 300, Items.graphite, 400, Items.tungsten, 450, Items.carbide, 250));
+
+            ammo(
+            Items.carbide, new BasicBulletType(0f, 1){{
+                shootEffect = Fx.shootBig;
+                smokeEffect = Fx.shootSmokeMissile;
+
+                spawnUnit = new MissileUnitType("scathe-missile"){{
+                    speed = 4.6f;
+                    maxRange = 6f;
+                    lifetime = 60f * 5.5f;
+                    outlineColor = Pal.darkOutline;
+                    engineColor = trailColor = Pal.redLight;
+                    engineLayer = Layer.effect;
+                    engineSize = 3.1f;
+                    engineOffset = 10f;
+                    rotateSpeed = 0f;
+                    trailLength = 18;
+                    missileAccelTime = 50f;
+                    lowAltitude = true;
+
+                    fogRadius = 6f;
+
+                    health = 160;
+
+                    weapons.add(new Weapon(){{
+                        shootCone = 360f;
+                        mirror = false;
+                        reload = 1f;
+                        deathExplosionEffect = Fx.massiveExplosion;
+                        shootOnDeath = true;
+                        shake = 10f;
+                        bullet = new ExplosionBulletType(500f, 65f){{
+                            hitColor = Pal.redLight;
+                            shootEffect = new MultiEffect(Fx.massiveExplosion, Fx.scatheExplosion, Fx.scatheLight, new WaveEffect(){{
+                                lifetime = 10f;
+                                strokeFrom = 4f;
+                                sizeTo = 130f;
+                            }});
+
+                            fragLifeMin = 0.1f;
+                            fragBullets = 7;
+                            fragBullet = new ArtilleryBulletType(3.4f, 30){{
+                                drag = 0.02f;
+                                hitEffect = Fx.massiveExplosion;
+                                despawnEffect = Fx.scatheSlash;
+                                knockback = 0.8f;
+                                lifetime = 23f;
+                                width = height = 18f;
+                                collidesTiles = false;
+                                splashDamageRadius = 40f;
+                                splashDamage = 80f;
+                                backColor = trailColor = hitColor = Pal.redLight;
+                                frontColor = Color.white;
+                                smokeEffect = Fx.shootBigSmoke2;
+                                despawnShake = 7f;
+                                lightRadius = 30f;
+                                lightColor = Pal.redLight;
+                                lightOpacity = 0.5f;
+
+                                trailLength = 20;
+                                trailWidth = 3.5f;
+                                trailEffect = Fx.none;
+                            }};
+                        }};
+                    }});
+
+                    abilities.add(new MoveEffectAbility(){{
+                        effect = Fx.missileTrailSmoke;
+                        rotation = 180f;
+                        y = -9f;
+                        color = Color.grays(0.6f).lerp(Pal.redLight, 0.5f).a(0.4f);
+                        interval = 7f;
+                    }});
+                }};
+            }}
+            );
+
+            drawer = new DrawTurret("reinforced-"){{
+                parts.add(new RegionPart("-blade"){{
+                    progress = PartProgress.warmup;
+                    heatProgress = PartProgress.warmup;
+                    heatColor = Color.red;
+                    moveRot = -22f;
+                    moveX = 0f;
+                    moveY = -5f;
+                    mirror = true;
+                    children.add(new RegionPart("-side"){{
+                        progress = PartProgress.warmup.delay(0.6f);
+                        heatProgress = PartProgress.recoil;
+                        heatColor = Color.red;
+                        mirror = true;
+                        under = false;
+                        moveY = -4f;
+                        moveX = 1f;
+
+                        moves.add(new PartMove(PartProgress.recoil, 1f, 6f, -40f));
+                    }});
+                }},
+                new RegionPart("-mid"){{
+                    progress = PartProgress.recoil;
+                    heatProgress = PartProgress.warmup.add(-0.2f).add(p -> Mathf.sin(9f, 0.2f) * p.warmup);
+                    mirror = false;
+                    under = true;
+                    moveY = -5f;
+                }}, new RegionPart("-missile"){{
+                    progress = PartProgress.reload.curve(Interp.pow2In);
+
+                    colorTo = new Color(1f, 1f, 1f, 0f);
+                    color = Color.white;
+                    mixColorTo = Pal.accent;
+                    mixColor = new Color(1f, 1f, 1f, 0f);
+                    outline = false;
+                    under = true;
+
+                    layerOffset = -0.01f;
+
+                    moves.add(new PartMove(PartProgress.warmup.inv(), 0f, -4f, 0f));
+                }});
+            }};
+
+            recoil = 0.5f;
+
+            coolantMultiplier = 6f;
+
+            minWarmup = 0.94f;
+            shootWarmupSpeed = 0.03f;
+            targetAir = false;
+
+            shake = 6f;
+            ammoPerShot = 30;
+            maxAmmo = 30;
+            shootY = -1;
+            outlineColor = Pal.darkOutline;
+            size = 4;
+            envEnabled |= Env.space;
+            reload = 600f;
+            range = 1350;
+            shootCone = 1f;
+            scaledHealth = 220;
+            rotateSpeed = 0.9f;
+            researchCostMultiplier = 0.05f;
+
+            coolant = consume(new ConsumeLiquid(Liquids.water, 15f / 60f));
+            limitRange();
         }};
 
         //TODO 3 more turrets.
