@@ -4409,7 +4409,7 @@ public class Blocks{
             limitRange();
         }};
 
-        //TODO 3 more turrets.
+        //TODO 2 more turrets.
 
         //endregion
         //region units
