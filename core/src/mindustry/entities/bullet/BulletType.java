@@ -186,6 +186,8 @@ public class BulletType extends Content implements Cloneable{
     public @Nullable UnitType spawnUnit;
     /** Unit spawned when this bullet hits something or despawns due to it hitting the end of its lifetime. */
     public @Nullable UnitType despawnUnit;
+    /** Amount of units spawned when this bullet despawns. */
+    public int despawnUnitCount = 1;
 
     /** Color of trail behind bullet. */
     public Color trailColor = Pal.missileYellowBack;
@@ -446,7 +448,9 @@ public class BulletType extends Content implements Cloneable{
         }
 
         if(despawnUnit != null){
-            despawnUnit.spawn(b.team, b.x + Mathf.range(0.1f), b.y);
+            for(int i = 0; i < despawnUnitCount; i++){
+                despawnUnit.spawn(b.team, b.x + Mathf.range(0.1f), b.y);
+            }
         }
 
         despawnEffect.at(b.x, b.y, b.rotation(), hitColor);
