@@ -2109,7 +2109,7 @@ public class Blocks{
             requirements(Category.liquid, with(Items.titanium, 10, Items.metaglass, 15));
             liquidCapacity = 700f;
             size = 2;
-            allowResupply = true
+            allowResupply = true;
         }};
 
         liquidTank = new LiquidRouter("liquid-tank"){{
