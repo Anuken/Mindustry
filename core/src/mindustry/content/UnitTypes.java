@@ -653,7 +653,7 @@ public class UnitTypes{
             legMoveSpace = 1.4f;
             hovering = true;
             armor = 3f;
-            ammoType = new ItemAmmoType(Items.coal);
+            ammoType = new LiquidAmmoType(Liquids.slag);
 
             shadowElevation = 0.2f;
             groundLayer = Layer.legUnit - 1f;
