@@ -20,7 +20,7 @@ public class ShieldBreaker extends Block{
 
     @Override
     public boolean canBreak(Tile tile){
-        return false;
+        return state.isEditor();
     }
 
     public class ShieldBreakerBuild extends Building{
