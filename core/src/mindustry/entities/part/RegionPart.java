@@ -34,7 +34,7 @@ public class RegionPart extends DrawPart{
     public float outlineLayerOffset = -0.001f;
     public float x, y, rotation;
     public float moveX, moveY, moveRot;
-    public @Nullable Color color, colorTo;
+    public @Nullable Color color, colorTo, mixColor, mixColorTo;
     public Color heatColor = Pal.turretHeat.cpy();
     public Seq<DrawPart> children = new Seq<>();
     public Seq<PartMove> moves = new Seq<>();
@@ -105,6 +105,13 @@ public class RegionPart extends DrawPart{
                 }else if(color != null){
                     Draw.color(color);
                 }
+
+                if(mixColor != null && mixColorTo != null){
+                    Draw.mixcol(mixColor, mixColorTo, prog);
+                }else if(mixColor != null){
+                    Draw.mixcol(mixColor, mixColor.a);
+                }
+
                 Draw.blend(blending);
                 Draw.rect(region, rx, ry, rot);
                 Draw.blend();
@@ -117,6 +124,9 @@ public class RegionPart extends DrawPart{
 
             Draw.xscl *= sign;
         }
+
+        Draw.color();
+        Draw.mixcol();
 
         Draw.z(z);
 
@@ -162,6 +172,7 @@ public class RegionPart extends DrawPart{
 
         heat = Core.atlas.find(realName + "-heat");
         for(var child : children){
+            child.turretShading = turretShading;
             child.load(name);
         }
     }

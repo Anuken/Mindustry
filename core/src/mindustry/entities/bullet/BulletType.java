@@ -184,6 +184,12 @@ public class BulletType extends Content implements Cloneable{
     public Seq<BulletType> spawnBullets = new Seq<>();
     /** Unit spawned _instead of_ this bullet. Useful for missiles. */
     public @Nullable UnitType spawnUnit;
+    /** Unit spawned when this bullet hits something or despawns due to it hitting the end of its lifetime. */
+    public @Nullable UnitType despawnUnit;
+    /** Amount of units spawned when this bullet despawns. */
+    public int despawnUnitCount = 1;
+    /** Random offset distance from the original bullet despawn/hit coordinate. */
+    public float despawnUnitRadius = 0.1f;
 
     /** Color of trail behind bullet. */
     public Color trailColor = Pal.missileYellowBack;
@@ -373,6 +379,7 @@ public class BulletType extends Content implements Cloneable{
         }
         createPuddles(b, x, y);
         createIncend(b, x, y);
+        createUnits(b, x, y);
 
         if(suppressionRange > 0){
             //bullets are pooled, require separate Vec2 instance
@@ -432,17 +439,26 @@ public class BulletType extends Content implements Cloneable{
         }
     }
 
+    public void createUnits(Bullet b, float x, float y){
+        if(despawnUnit != null){
+            for(int i = 0; i < despawnUnitCount; i++){
+                despawnUnit.spawn(b.team, x + Mathf.range(despawnUnitRadius), y + Mathf.range(despawnUnitRadius));
+            }
+        }
+    }
 
     /** Called when the bullet reaches the end of its lifetime or is destroyed by something external. */
     public void despawned(Bullet b){
         if(despawnHit){
             hit(b);
+        }else{
+            createUnits(b, b.x, b.y);
         }
 
         if(!fragOnHit){
             createFrags(b, b.x, b.y);
         }
-
+        
         despawnEffect.at(b.x, b.y, b.rotation(), hitColor);
         despawnSound.at(b);
 
@@ -654,10 +670,19 @@ public class BulletType extends Content implements Cloneable{
                 spawned.set(x, y);
                 spawned.rotation = angle;
                 //immediately spawn at top speed, since it was launched
-                spawned.vel.trns(angle, spawnUnit.speed);
+                if(spawnUnit.missileAccelTime <= 0f){
+                    spawned.vel.trns(angle, spawnUnit.speed);
+                }
                 //assign unit owner
-                if(spawned.controller() instanceof MissileAI ai && owner instanceof Unit unit){
-                    ai.shooter = unit;
+                if(spawned.controller() instanceof MissileAI ai){
+                    if(owner instanceof Unit unit){
+                        ai.shooter = unit;
+                    }
+
+                    if(owner instanceof ControlBlock control){
+                        ai.shooter = control.unit();
+                    }
+
                 }
                 spawned.add();
             }

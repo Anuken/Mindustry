@@ -208,8 +208,6 @@ public class Turret extends ReloadTurret{
         public float curRecoil, heat, logicControlTime = -1;
         public float shootWarmup, charge;
         public int totalShots;
-        //turrets need to shoot once for 'visual reload' to be valid, otherwise they seem stuck at reload 0 when placed.
-        public boolean visualReloadValid;
         public boolean logicShooting = false;
         public @Nullable Posc target;
         public Vec2 targetPos = new Vec2();
@@ -503,7 +501,6 @@ public class Turret extends ReloadTurret{
         protected void updateShooting(){
 
             if(reloadCounter >= reload && !charging() && shootWarmup >= minWarmup){
-                visualReloadValid = true;
                 BulletType type = peekAmmo();
 
                 shoot(type);

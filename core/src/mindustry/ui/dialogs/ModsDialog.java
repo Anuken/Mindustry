@@ -428,9 +428,10 @@ public class ModsDialog extends BaseDialog{
 
             for(ModListing mod : listings){
                 if(((mod.hasJava || mod.hasScripts) && Vars.ios) ||
-                    (!Strings.matches(searchtxt, mod.name) && !Strings.matches(searchtxt, mod.repo)) ||
+                    (!Strings.matches(searchtxt, mod.name) && !Strings.matches(searchtxt, mod.repo))
                     //hack, I'm basically testing if 135.10 >= modVersion, which is equivalent to modVersion >= 136
-                    (Version.isAtLeast(135, 10, mod.minGameVersion))) continue;
+                    //|| (Version.isAtLeast(135, 10, mod.minGameVersion))
+                ) continue;
 
                 float s = 64f;
 
@@ -519,7 +520,7 @@ public class ModsDialog extends BaseDialog{
                                     ui.showInfo("@mods.browser.noreleases");
                                 }else{
                                     sel.hide();
-                                    BaseDialog downloads = new BaseDialog("@mods.browser.releases");
+                                    var downloads = new BaseDialog("@mods.browser.releases");
                                     downloads.cont.pane(p -> {
                                         for(int j = 0; j < releases.size; j++){
                                             var release = releases.get(j);
@@ -529,6 +530,7 @@ public class ModsDialog extends BaseDialog{
                                                 t.add("[accent]" + release.getString("name") + (index == 0 ? " " + Core.bundle.get("mods.browser.latest") : "")).top().left().growX().wrap().pad(5f);
                                                 t.row();
                                                 t.add((release.getString("published_at")).substring(0, 10).replaceAll("-", "/")).top().left().growX().wrap().pad(5f).color(Color.gray);
+                                                t.row();
                                                 t.table(b -> {
                                                     b.defaults().size(150f, 54f).pad(2f);
                                                     b.button("@mods.github.open-release", Icon.link, () -> Core.app.openURI(release.getString("html_url")));
@@ -541,7 +543,7 @@ public class ModsDialog extends BaseDialog{
 
                                             if(j < releases.size - 1) p.row();
                                         }
-                                    }).width(600f).scrollX(false).fillY();
+                                    }).width(500f).scrollX(false).fillY();
                                     downloads.buttons.button("@back", Icon.left, () -> {
                                         downloads.clear();
                                         downloads.hide();
@@ -566,14 +568,6 @@ public class ModsDialog extends BaseDialog{
                 if(++i % cols == 0) browserTable.row();
             }
         });
-    }
-
-    private String trimText(String text){
-        if(text == null) return "";
-        if(text.contains("\n")){
-            return text.substring(0, text.indexOf("\n"));
-        }
-        return text;
     }
 
     private void handleMod(String repo, HttpResponse result){
