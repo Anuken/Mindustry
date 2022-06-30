@@ -96,7 +96,7 @@
     "address": ["mindustry.vicp.io:6800", "mindustry.vicp.io:7000", "mindustry.vicp.io:6567"]
   },
   {
-    "name": "SurvivalHard",
-    "address": ["212.20.42.61:6567"]
+    "name": "Harders",
+    "address": ["212.20.42.61:6567", "212.20.42.61:6568", "212.20.42.61:6569"]
   }
 ]
