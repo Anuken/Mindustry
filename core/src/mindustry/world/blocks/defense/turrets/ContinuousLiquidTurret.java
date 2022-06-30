@@ -4,9 +4,12 @@ import arc.struct.*;
 import mindustry.content.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
+
+import static mindustry.Vars.*;
 
 public class ContinuousLiquidTurret extends ContinuousTurret{
     public ObjectMap<Liquid, BulletType> ammoTypes = new ObjectMap<>();
