@@ -326,8 +326,10 @@ public class StatValues{
 
                     if(type.damage > 0 && (type.collides || type.splashDamage <= 0)){
                         if(type.spawnUnit != null){
-                            BulletType b = type.spawnUnit.weapons.get(0).bullet;
-                            bt.add(Core.bundle.format("bullet.damage", b.splashDamage != 0 ? b.splashDamage : b.damage));
+                            if(type.spawnUnit.weapons.size > 0){
+                                BulletType b = type.spawnUnit.weapons.get(0).bullet;
+                                bt.add(Core.bundle.format("bullet.damage", b.splashDamage != 0 ? b.splashDamage : b.damage));
+                            }
                         }else if(type.continuousDamage() > 0){
                             bt.add(Core.bundle.format("bullet.damage", type.continuousDamage()) + StatUnit.perSecond.localized());
                         }else{
