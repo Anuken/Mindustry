@@ -50,6 +50,15 @@ public class ItemTurret extends Turret{
         stats.remove(Stat.itemCapacity);
         stats.add(Stat.ammo, StatValues.ammo(ammoTypes));
     }
+    
+    @Override
+    public void drawPlace(int x, int y, int rotation, boolean valid){
+        super.drawPlace(x, y, rotation, valid);
+
+        ammoTypes.each((Item, BulletType)->{
+            if(BulletType.rangeChange>0 && Item.unlockedNow()) Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range + BulletType.rangeChange, Pal.placing);
+        });
+    }
 
     @Override
     public void init(){
