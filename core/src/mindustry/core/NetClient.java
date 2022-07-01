@@ -330,6 +330,11 @@ public class NetClient implements ApplicationListener{
     }
 
     @Remote(variants = Variant.both)
+    public static void setObjectives(MapObjectives executor){
+        state.rules.objectives = executor;
+    }
+
+    @Remote(variants = Variant.both)
     public static void worldDataBegin(){
         Groups.clear();
         netClient.removed.clear();

@@ -775,14 +775,30 @@ public class HudFragment{
             builder.setLength(0);
 
             //objectives override mission?
-            if(state.rules.objectives.size > 0){
+            if(state.rules.objectives.any()){
+                boolean first = true;
+                for(var obj : state.rules.objectives){
+                    if(!obj.qualified()) continue;
+
+                    String text = obj.text();
+                    if(text != null){
+                        if(!first) builder.append('\n');
+                        builder.append(text);
+
+                        first = false;
+                    }
+                }
+
+                return builder;
+            }
+            /*if(state.rules.objectives.size > 0){
                 var first = state.rules.objectives.first();
                 String text = first.text();
                 if(text != null){
                     builder.append(text);
                     return builder;
                 }
-            }
+            }*/
 
             //mission overrides everything
             if(state.rules.mission != null){
@@ -832,13 +848,34 @@ public class HudFragment{
         table.row();
 
         table.clicked(() -> {
-            if(state.rules.objectives.size > 0){
+            /*if(state.rules.objectives.size > 0){
                 var first = state.rules.objectives.first();
                 var details = first.details();
                 if(details != null){
                     //TODO this could be much better.
                     ui.showInfo(details);
                 }
+            }*/
+
+            if(state.rules.objectives.any()){
+                //TODO is `builder` reusable here? is it reserved? should i allocate a new one?
+                builder.setLength(0);
+
+                boolean first = true;
+                for(var obj : state.rules.objectives){
+                    if(!obj.qualified()) continue;
+
+                    String details = obj.details();
+                    if(details != null){
+                        if(!first) builder.append('\n');
+                        builder.append(details);
+
+                        first = false;
+                    }
+                }
+
+                //TODO this, as said before, could be much better.
+                ui.showInfo(builder.toString());
             }
         });
 

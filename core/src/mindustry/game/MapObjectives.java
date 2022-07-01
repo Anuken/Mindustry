@@ -7,27 +7,251 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
+import mindustry.game.MapObjectives.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
+import java.util.*;
+
 import static mindustry.Vars.*;
 
-public class MapObjectives{
-    public static Prov<MapObjective>[] allObjectiveTypes = new Prov[]{
-        ResearchObjective::new, BuildCountObjective::new, UnitCountObjective::new, ItemObjective::new,
-        CommandModeObjective::new, CoreItemObjective::new, DestroyCoreObjective::new, DestroyUnitsObjective::new,
-        TimerObjective::new, FlagObjective::new, DestroyBlockObjective::new, ProduceObjective::new,
-        DestroyBlocksObjective::new
-    };
+/** Handles and executes in-map objectives. */
+public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObjective>{
+    public static final ObjectMap<Class<? extends MapObjective>, Prov<? extends MapObjective>> allObjectiveTypes = new ObjectMap<>();
+    public static final ObjectMap<Class<? extends ObjectiveMarker>, Prov<? extends ObjectiveMarker>> allMarkerTypes = new ObjectMap<>();
 
-    public static Prov<ObjectiveMarker>[] allMarkerTypes = new Prov[]{
-        TextMarker::new, ShapeMarker::new, ShapeTextMarker::new, MinimapMarker::new
-    };
+    static{
+        registerObjective(ResearchObjective.class, ResearchObjective::new);
+        registerObjective(ProduceObjective.class, ProduceObjective::new);
+        registerObjective(ItemObjective.class, ItemObjective::new);
+        registerObjective(CoreItemObjective.class, CoreItemObjective::new);
+        registerObjective(BuildCountObjective.class, BuildCountObjective::new);
+        registerObjective(UnitCountObjective.class, UnitCountObjective::new);
+        registerObjective(DestroyUnitsObjective.class, DestroyUnitsObjective::new);
+        registerObjective(TimerObjective.class, TimerObjective::new);
+        registerObjective(DestroyBlockObjective.class, DestroyBlockObjective::new);
+        registerObjective(DestroyBlocksObjective.class, DestroyBlocksObjective::new);
+        registerObjective(DestroyCoreObjective.class, DestroyCoreObjective::new);
+        registerObjective(CommandModeObjective.class, CommandModeObjective::new);
+        registerObjective(FlagObjective.class, FlagObjective::new);
+
+        registerMarker(ShapeTextMarker.class, ShapeTextMarker::new);
+        registerMarker(MinimapMarker.class, MinimapMarker::new);
+        registerMarker(ShapeMarker.class, ShapeMarker::new);
+        registerMarker(TextMarker.class, TextMarker::new);
+    }
+
+    public static <T extends MapObjective> void registerObjective(Class<T> type, Prov<T> prov){
+        allObjectiveTypes.put(type, prov);
+        JsonIO.json.addClassTag(type.getSimpleName().replace("Objective", ""), type);
+    }
+
+    public static <T extends ObjectiveMarker> void registerMarker(Class<T> type, Prov<T> prov){
+        allMarkerTypes.put(type, prov);
+        JsonIO.json.addClassTag(type.getSimpleName().replace("Marker", ""), type);
+    }
+
+    /**
+     * All objectives the executor contains. Do not modify directly, ever!
+     * @see #eachRunning(Cons)
+     */
+    public Seq<MapObjective> all = new Seq<>(4);
+
+    /** @see #checkChanged() */
+    protected transient boolean changed;
+
+    /** Adds all given objectives to the executor as root objectives. */
+    public void add(MapObjective... objectives){
+        for(var objective : objectives) flatten(objective);
+    }
+
+    /** Recursively adds the objective and its children. */
+    private void flatten(MapObjective objective){
+        for(var child : objective.children) flatten(child);
+
+        objective.children.clear();
+        all.add(objective);
+    }
+
+    /** Updates all objectives this executor contains. */
+    public void update(){
+        //TODO am i doing this correctly
+        if(net.client()) return;
+        eachRunning(obj -> {
+            for(var marker : obj.markers){
+                if(!marker.wasAdded){
+                    marker.wasAdded = true;
+                    marker.added();
+                }
+            }
+
+            if(obj.update()){
+                obj.completed = true;
+                obj.done();
+                for(var marker : obj.markers){
+                    if(marker.wasAdded){
+                        marker.removed();
+                        marker.wasAdded = false;
+                    }
+                }
+            }
+
+            changed |= obj.changed;
+            obj.changed = false;
+        });
+    }
+
+    /** @return True if map rules should be synced. Reserved for {@link Vars#logic}; do not invoke directly! */
+    public boolean checkChanged(){
+        boolean has = changed;
+        changed = false;
+
+        return has;
+    }
+
+    /** @return Whether there are any objectives at all. */
+    public boolean any(){
+        return all.size > 0;
+    }
+
+    /** Iterates over all qualified in-map objectives. */
+    public void eachRunning(Cons<MapObjective> cons){
+        all.each(MapObjective::qualified, cons);
+    }
+
+    /** Iterates over all qualified in-map objectives, with a filter. */
+    public <T extends MapObjective> void eachRunning(Boolf<? super MapObjective> pred, Cons<T> cons){
+        all.each(obj -> obj.qualified() && pred.get(obj), cons);
+    }
+
+    @Override
+    public Iterator<MapObjective> iterator(){
+        return all.iterator();
+    }
+
+    @Override
+    public Spliterator<MapObjective> spliterator(){
+        return all.spliterator();
+    }
+
+    @Override
+    public void each(Cons<? super MapObjective> cons){
+        all.each(cons);
+    }
+
+    /** Base abstract class for any in-map objective. */
+    public static abstract class MapObjective{
+        public @Nullable String details;
+        public String[] flagsAdded = {};
+        public String[] flagsRemoved = {};
+        public ObjectiveMarker[] markers = {};
+
+        /** The parents of this objective. All parents must be done in order for this to be updated. */
+        public transient Seq<MapObjective> parents = new Seq<>(2);
+        /** Temporary container to store references since this class is static. Will immediately be flattened. */
+        private transient final Seq<MapObjective> children = new Seq<>(2);
+
+        /** Internal value, do not modify. */
+        private transient boolean depFinished, completed, changed;
+
+        /** @return True if this objective is done and should be removed from the executor. */
+        public abstract boolean update();
+
+        /** Reset internal state, if any. */
+        public void reset(){}
+
+        /** Called once after {@link #update()} returns true, before this objective is removed. */
+        public void done(){
+            changed();
+            state.rules.objectiveFlags.removeAll(flagsRemoved);
+            state.rules.objectiveFlags.addAll(flagsAdded);
+        }
+
+        /** Notifies the executor that map rules should be synced. */
+        protected void changed(){
+            changed = true;
+        }
+
+        /** @return True if all {@link #parents} are completed, rendering this objective able to execute. */
+        public final boolean dependencyFinished(){
+            if(depFinished) return true;
+
+            boolean f = true;
+            for(var parent : parents){
+                if(!parent.isCompleted()){
+                    f = false;
+                    break;
+                }
+            }
+
+            return f && (depFinished = true);
+        }
+
+        /** @return True if this objective is done (practically, has been removed from the executor). */
+        public final boolean isCompleted(){
+            return completed;
+        }
+
+        /** @return Whether this objective should run at all. */
+        public boolean qualified(){
+            return !completed && dependencyFinished();
+        }
+
+        /** @return This objective, with the given child's parents added with this, for chaining operations. */
+        public MapObjective child(MapObjective child){
+            child.parents.add(this);
+            children.add(child);
+            return this;
+        }
+
+        /** @return This objective, with the given parent added to this objective's parents, for chaining operations. */
+        public MapObjective parent(MapObjective parent){
+            parents.add(parent);
+            return this;
+        }
+
+        /** @return This objective, with the details message assigned to, for chaining operations. */
+        public MapObjective details(String details){
+            this.details = details;
+            return this;
+        }
+
+        /** @return This objective, with the added-flags assigned to, for chaining operations. */
+        public MapObjective flagsAdded(String... flagsAdded){
+            this.flagsAdded = flagsAdded;
+            return this;
+        }
+
+        /** @return This objective, with the removed-flags assigned to, for chaining operations. */
+        public MapObjective flagsRemoved(String... flagsRemoved){
+            this.flagsRemoved = flagsRemoved;
+            return this;
+        }
+
+        /** @return This objective, with the markers assigned to, for chaining operations. */
+        public MapObjective markers(ObjectiveMarker... markers){
+            this.markers = markers;
+            return this;
+        }
+
+        /** @return Basic mission display text. If null, falls back to standard text. */
+        public @Nullable String text(){
+            return null;
+        }
+
+        /** @return Details that appear upon click. */
+        public @Nullable String details(){
+            return details;
+        }
+    }
 
     /** Research a specific piece of content in the tech tree. */
     public static class ResearchObjective extends MapObjective{
@@ -37,17 +261,16 @@ public class MapObjectives{
             this.content = content;
         }
 
-        public ResearchObjective(){
+        public ResearchObjective(){}
+
+        @Override
+        public boolean update(){
+            return content.unlocked();
         }
 
         @Override
         public String text(){
             return Core.bundle.format("objective.research", content.emoji(), content.localizedName);
-        }
-
-        @Override
-        public boolean complete(){
-            return content.unlocked();
         }
     }
 
@@ -59,17 +282,16 @@ public class MapObjectives{
             this.content = content;
         }
 
-        public ProduceObjective(){
+        public ProduceObjective(){}
+
+        @Override
+        public boolean update(){
+            return content.unlocked();
         }
 
         @Override
         public String text(){
             return Core.bundle.format("objective.produce", content.emoji(), content.localizedName);
-        }
-
-        @Override
-        public boolean complete(){
-            return content.unlocked();
         }
     }
 
@@ -83,17 +305,16 @@ public class MapObjectives{
             this.amount = amount;
         }
 
-        public ItemObjective(){
+        public ItemObjective(){}
+
+        @Override
+        public boolean update(){
+            return state.rules.defaultTeam.items().has(item, amount);
         }
 
         @Override
         public String text(){
             return Core.bundle.format("objective.item", state.rules.defaultTeam.items().get(item), amount, item.emoji(), item.localizedName);
-        }
-
-        @Override
-        public boolean complete(){
-            return state.rules.defaultTeam.items().has(item, amount);
         }
     }
 
@@ -107,17 +328,16 @@ public class MapObjectives{
             this.amount = amount;
         }
 
-        public CoreItemObjective(){
+        public CoreItemObjective(){}
+
+        @Override
+        public boolean update(){
+            return state.stats.coreItemCount.get(item) >= amount;
         }
 
         @Override
         public String text(){
             return Core.bundle.format("objective.coreitem", state.stats.coreItemCount.get(item), amount, item.emoji(), item.localizedName);
-        }
-
-        @Override
-        public boolean complete(){
-            return state.stats.coreItemCount.get(item) >= amount;
         }
     }
 
@@ -131,17 +351,16 @@ public class MapObjectives{
             this.count = count;
         }
 
-        public BuildCountObjective(){
+        public BuildCountObjective(){}
+
+        @Override
+        public boolean update(){
+            return state.stats.placedBlockCount.get(block, 0) >= count;
         }
 
         @Override
         public String text(){
             return Core.bundle.format("objective.build", count, block.emoji(), block.localizedName);
-        }
-
-        @Override
-        public boolean complete(){
-            return state.stats.placedBlockCount.get(block, 0) >= count;
         }
     }
 
@@ -155,17 +374,16 @@ public class MapObjectives{
             this.count = count;
         }
 
-        public UnitCountObjective(){
+        public UnitCountObjective(){}
+
+        @Override
+        public boolean update(){
+            return state.rules.defaultTeam.data().countType(unit) >= count;
         }
 
         @Override
         public String text(){
             return Core.bundle.format("objective.buildunit", count, unit.emoji(), unit.localizedName);
-        }
-
-        @Override
-        public boolean complete(){
-            return state.rules.defaultTeam.data().countType(unit) >= count;
         }
     }
 
@@ -177,17 +395,16 @@ public class MapObjectives{
             this.count = count;
         }
 
-        public DestroyUnitsObjective(){
+        public DestroyUnitsObjective(){}
+
+        @Override
+        public boolean update(){
+            return state.stats.enemyUnitsDestroyed >= count;
         }
 
         @Override
         public String text(){
             return Core.bundle.format("objective.destroyunits", count);
-        }
-
-        @Override
-        public boolean complete(){
-            return state.stats.enemyUnitsDestroyed >= count;
         }
     }
 
@@ -205,13 +422,8 @@ public class MapObjectives{
         }
 
         @Override
-        public boolean complete(){
-            return countup >= duration;
-        }
-
-        @Override
-        public void update(){
-            countup += Time.delta;
+        public boolean update(){
+            return (countup += Time.delta) >= duration;
         }
 
         @Override
@@ -243,7 +455,8 @@ public class MapObjectives{
                     return Core.bundle.formatString(text, timeString.toString());
                 }
             }
-            return text;
+
+            return null;
         }
     }
 
@@ -259,11 +472,10 @@ public class MapObjectives{
             this.team = team;
         }
 
-        public DestroyBlockObjective(){
-        }
+        public DestroyBlockObjective(){}
 
         @Override
-        public boolean complete(){
+        public boolean update(){
             var build = world.build(x, y);
             return build == null || build.team != team || build.block != block;
         }
@@ -285,8 +497,7 @@ public class MapObjectives{
             this.positions = positions;
         }
 
-        public DestroyBlocksObjective(){
-        }
+        public DestroyBlocksObjective(){}
 
         public int progress(){
             int count = 0;
@@ -302,7 +513,7 @@ public class MapObjectives{
         }
 
         @Override
-        public boolean complete(){
+        public boolean update(){
             return progress() >= positions.length;
         }
 
@@ -314,15 +525,14 @@ public class MapObjectives{
 
     /** Command any unit to do anything. Always compete in headless mode. */
     public static class CommandModeObjective extends MapObjective{
+        @Override
+        public boolean update(){
+            return headless || control.input.selectedUnits.contains(u -> u.isCommandable() && u.command().hasCommand());
+        }
 
         @Override
         public String text(){
             return Core.bundle.get("objective.command");
-        }
-
-        @Override
-        public boolean complete(){
-            return headless || control.input.selectedUnits.contains(u -> u.isCommandable() && u.command().hasCommand());
         }
     }
 
@@ -335,93 +545,50 @@ public class MapObjectives{
             this.text = text;
         }
 
-        public FlagObjective(){
+        public FlagObjective(){}
+
+        @Override
+        public boolean update(){
+            return state.rules.objectiveFlags.contains(flag);
         }
 
         @Override
         public String text(){
             return text != null && text.startsWith("@") ? Core.bundle.get(text.substring(1)) : text;
         }
-
-        @Override
-        public boolean complete(){
-            return state.rules.objectiveFlags.contains(flag);
-        }
     }
 
     /** Destroy all enemy core(s). */
     public static class DestroyCoreObjective extends MapObjective{
+        @Override
+        public boolean update(){
+            return state.rules.waveTeam.cores().size == 0;
+        }
 
         @Override
         public String text(){
             return Core.bundle.get("objective.destroycore");
         }
-
-        @Override
-        public boolean complete(){
-            return state.rules.waveTeam.cores().size == 0;
-        }
     }
 
-    /** Base abstract class for any in-map objective. */
-    public static abstract class MapObjective{
-        public @Nullable String details;
-        public String[] flagsAdded = {};
-        public String[] flagsRemoved = {};
-        public ObjectiveMarker[] markers = {};
+    /** Marker used for drawing UI to indicate something along with an objective. */
+    public static abstract class ObjectiveMarker{
+        /** Makes sure markers are only added once. */
+        private transient boolean wasAdded;
 
         //TODO localize
         public String typeName(){
-            return getClass().getSimpleName().replace("Objective", "");
+            return getClass().getSimpleName().replace("Marker", "");
         }
 
-        public MapObjective withFlags(String... flags){
-            this.flagsAdded = flags;
-            return this;
-        }
-
-        public MapObjective withFlagsRemoved(String... flags){
-            this.flagsRemoved = flags;
-            return this;
-        }
-
-        public MapObjective withMarkers(ObjectiveMarker... markers){
-            this.markers = markers;
-            return this;
-        }
-
-        public MapObjective withDetails(String details){
-            this.details = details;
-            return this;
-        }
-
-        public boolean complete(){
-            return false;
-        }
-
-        /** Called immediately after this objective is completed and removed from the rules. */
-        public void completed(){
-
-        }
-
-        public void update(){
-
-        }
-
-        /** Reset internal state, if any. */
-        public void reset(){
-
-        }
-
-        /** Basic mission display text. If null, falls back to standard text. */
-        public @Nullable String text(){
-            return null;
-        }
-
-        /** Details that appear upon click. */
-        public @Nullable String details(){
-            return details;
-        }
+        /** Called in the overlay draw layer.*/
+        public void draw(){}
+        /** Called in the small and large map. */
+        public void drawMinimap(MinimapRenderer minimap){}
+        /** Add any UI elements necessary. */
+        public void added(){}
+        /** Remove any UI elements, if necessary. */
+        public void removed(){}
     }
 
     /** Displays text above a shape. */
@@ -434,7 +601,7 @@ public class MapObjectives{
         public int sides = 4;
         public Color color = Color.valueOf("ffd37f");
 
-        //cached localized text
+        // Cached localized text.
         private transient String fetchedText;
 
         public ShapeTextMarker(String text, float x, float y){
@@ -467,9 +634,7 @@ public class MapObjectives{
             this.textHeight = textHeight;
         }
 
-        public ShapeTextMarker(){
-
-        }
+        public ShapeTextMarker(){}
 
         @Override
         public void draw(){
@@ -512,8 +677,7 @@ public class MapObjectives{
             this.color = color;
         }
 
-        public MinimapMarker(){
-        }
+        public MinimapMarker(){}
 
         @Override
         public void drawMinimap(MinimapRenderer minimap){
@@ -547,8 +711,7 @@ public class MapObjectives{
             this.rotation = rotation;
         }
 
-        public ShapeMarker(){
-        }
+        public ShapeMarker(){}
 
         @Override
         public void draw(){
@@ -594,8 +757,7 @@ public class MapObjectives{
             this.y = y;
         }
 
-        public TextMarker(){
-        }
+        public TextMarker(){}
 
         @Override
         public void draw(){
@@ -605,25 +767,5 @@ public class MapObjectives{
 
             WorldLabel.drawAt(fetchedText, x, y, Draw.z(), flags, fontSize);
         }
-    }
-
-    /** Marker used for drawing UI to indicate something along with an objective. */
-    public static abstract class ObjectiveMarker{
-        /** makes sure markers are only added once */
-        public transient boolean wasAdded;
-
-        //TODO localize
-        public String typeName(){
-            return getClass().getSimpleName().replace("Marker", "");
-        }
-
-        /** Called in the overlay draw layer.*/
-        public void draw(){}
-        /** Called in the small & large map. */
-        public void drawMinimap(MinimapRenderer minimap){}
-        /** Add any UI elements necessary. */
-        public void added(){}
-        /** Remove any UI elements, if necessary. */
-        public void removed(){}
     }
 }

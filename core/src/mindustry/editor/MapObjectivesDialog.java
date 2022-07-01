@@ -1,32 +1,13 @@
 package mindustry.editor;
 
-import arc.*;
-import arc.func.*;
-import arc.graphics.*;
-import arc.scene.event.*;
-import arc.scene.ui.*;
-import arc.scene.ui.layout.*;
-import arc.struct.*;
-import arc.util.*;
-import mindustry.*;
-import mindustry.content.*;
-import mindustry.ctype.*;
-import mindustry.game.*;
-import mindustry.game.MapObjectives.*;
-import mindustry.gen.*;
-import mindustry.graphics.*;
-import mindustry.io.*;
-import mindustry.type.*;
-import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
-import mindustry.world.*;
-
-import java.lang.reflect.*;
-
-import static mindustry.Vars.*;
 
 public class MapObjectivesDialog extends BaseDialog{
-    private static final Seq<String> worldFields = Seq.with("x", "y");
+    public MapObjectivesDialog(){
+        super("@editor.objectives");
+    }
+
+    /*private static final Seq<String> worldFields = Seq.with("x", "y");
 
     private Seq<MapObjective> objectives = new Seq<>();
     private Table list = new Table();
@@ -443,5 +424,5 @@ public class MapObjectivesDialog extends BaseDialog{
 
         dialog.closeOnBack();
         dialog.show();
-    }
+    }*/
 }
