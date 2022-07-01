@@ -1616,7 +1616,7 @@ public class Fx{
         alpha(0.5f);
         rand.setSeed(e.id);
         for(int i = 0; i < 35; i++){
-            v.trns(e.rotation + rand.range(21f), rand.random(e.finpow() * 90f)).add(rand.range(3f), rand.range(3f));
+            v.trns(e.rotation + 180f + rand.range(21f), rand.random(e.finpow() * 90f)).add(rand.range(3f), rand.range(3f));
             e.scaled(e.lifetime * rand.random(0.2f, 1f), b -> {
                 Fill.circle(e.x + v.x, e.y + v.y, b.fout() * 9f + 0.3f);
             });
