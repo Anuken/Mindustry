@@ -336,8 +336,11 @@ public class ItemModule extends BlockModule{
         for(int j = 0; j < count; j++){
             int itemid = legacy ? read.ub() : read.s();
             int itemamount = read.i();
-            items[content.item(itemid).id] = itemamount;
-            total += itemamount;
+            Item item = content.item(itemid);
+            if(item != null){
+                items[item.id] = itemamount;
+                total += itemamount;
+            }
         }
     }
 

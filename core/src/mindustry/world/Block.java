@@ -1290,7 +1290,7 @@ public class Block extends UnlockableContent implements Senseable{
             }
         }
 
-        var editorBase = Core.atlas.getPixmap(fullIcon);
+        PixmapRegion editorBase;
 
         if(gen.length > 1){
             Pixmap base = Core.atlas.getPixmap(gen[0]).crop();
@@ -1304,6 +1304,8 @@ public class Block extends UnlockableContent implements Senseable{
             packer.add(PageType.main, "block-" + name + "-full", base);
 
             editorBase = new PixmapRegion(base);
+        }else{
+            editorBase = gen[0] == null ? Core.atlas.getPixmap(fullIcon) : Core.atlas.getPixmap(gen[0]);
         }
 
         packer.add(PageType.editor, name + "-icon-editor", editorBase);

@@ -41,6 +41,7 @@ public class ConstructBlock extends Block{
         health = 10;
         consumesTap = true;
         solidifes = true;
+        generateIcons = false;
         inEditor = false;
         consBlocks[size - 1] = this;
         sync = true;
@@ -88,9 +89,7 @@ public class ConstructBlock extends Block{
             }
 
             //make sure block indexer knows it's damaged
-            if(tile.build.damaged()){
-                indexer.notifyBuildDamaged(tile.build);
-            }
+            indexer.notifyHealthChanged(tile.build);
         }
 
         //last builder was this local client player, call placed()

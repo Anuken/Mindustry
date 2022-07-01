@@ -70,7 +70,7 @@ public class StatValues{
 
     public static StatValue liquids(Boolf<Liquid> filter, float amount, boolean perSecond){
         return table -> {
-            Seq<Liquid> list = content.liquids().select(i -> filter.get(i) && i.unlockedNow());
+            Seq<Liquid> list = content.liquids().select(i -> filter.get(i) && i.unlockedNow() && !i.isHidden());
 
             for(int i = 0; i < list.size; i++){
                 table.add(new LiquidDisplay(list.get(i), amount, perSecond)).padRight(5);
@@ -120,7 +120,7 @@ public class StatValues{
 
     public static StatValue items(float timePeriod, Boolf<Item> filter){
         return table -> {
-            Seq<Item> list = content.items().select(i -> filter.get(i) && i.unlockedNow());
+            Seq<Item> list = content.items().select(i -> filter.get(i) && i.unlockedNow() && !i.isHidden());
 
             for(int i = 0; i < list.size; i++){
                 Item item = list.get(i);

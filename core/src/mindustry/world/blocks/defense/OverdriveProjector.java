@@ -80,10 +80,7 @@ public class OverdriveProjector extends Block{
     }
 
     public class OverdriveBuild extends Building implements Ranged{
-        float heat;
-        float charge = Mathf.random(reload);
-        float phaseHeat;
-        float smoothEfficiency;
+        public float heat, charge = Mathf.random(reload), phaseHeat, smoothEfficiency;
 
         @Override
         public float range(){

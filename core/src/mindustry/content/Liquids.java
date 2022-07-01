@@ -44,16 +44,17 @@ public class Liquids{
             gasColor = Color.valueOf("c1e8f5");
         }};
 
-        neoplasm = new CellLiquid("neoplasm", Color.valueOf("e05438")){{
+        neoplasm = new CellLiquid("neoplasm", Color.valueOf("c33e2b")){{
             heatCapacity = 0.4f;
             temperature = 0.54f;
             viscosity = 0.85f;
-            flammability = 0.1f;
+            flammability = 0f;
             capPuddles = false;
             hidden = true;
+            spreadTarget = Liquids.water;
 
-            colorFrom = Color.valueOf("f98f4a");
-            colorTo = Color.valueOf("9e172c");
+            colorFrom = Color.valueOf("e8803f");
+            colorTo = Color.valueOf("8c1225");
         }};
 
         arkycite = new Liquid("arkycite", Color.valueOf("84a94b")){{

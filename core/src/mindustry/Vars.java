@@ -214,7 +214,7 @@ public class Vars implements Loadable{
     public static Locale[] locales;
 
     //the main executor will only have at most [cores] number of threads active
-    public static ExecutorService mainExecutor = Threads.cachedExecutor(1, OS.cores, true);
+    public static ExecutorService mainExecutor = Threads.executor("Main Executor", OS.cores);
 
     public static FileTree tree = new FileTree();
     public static Net net;
@@ -278,6 +278,10 @@ public class Vars implements Loadable{
 
         Version.init();
         CacheLayer.init();
+
+        if(!headless){
+            Log.info("[Mindustry] Version: @", Version.buildString());
+        }
 
         dataDirectory = settings.getDataDirectory();
         screenshotDirectory = dataDirectory.child("screenshots/");

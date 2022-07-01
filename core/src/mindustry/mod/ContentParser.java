@@ -402,10 +402,14 @@ public class ContentParser{
                             case "itemRadioactive" -> block.consume((Consume)parser.readValue(ConsumeItemRadioactive.class, child));
                             case "itemExplosive" -> block.consume((Consume)parser.readValue(ConsumeItemExplosive.class, child));
                             case "itemExplode" -> block.consume((Consume)parser.readValue(ConsumeItemExplode.class, child));
-                            case "items" -> block.consume((Consume)parser.readValue(ConsumeItems.class, child));
+                            case "items" -> block.consume(child.isArray() ?
+                                    new ConsumeItems(parser.readValue(ItemStack[].class, child)) :
+                                    parser.readValue(ConsumeItems.class, child));
                             case "liquidFlammable" -> block.consume((Consume)parser.readValue(ConsumeLiquidFlammable.class, child));
                             case "liquid" -> block.consume((Consume)parser.readValue(ConsumeLiquid.class, child));
-                            case "liquids" -> block.consume((Consume)parser.readValue(ConsumeLiquids.class, child));
+                            case "liquids" -> block.consume(child.isArray() ?
+                                    new ConsumeLiquids(parser.readValue(LiquidStack[].class, child)) :
+                                    parser.readValue(ConsumeLiquids.class, child));
                             case "coolant" -> block.consume((Consume)parser.readValue(ConsumeCoolant.class, child));
                             case "power" -> {
                                 if(child.isNumber()){
@@ -441,10 +445,10 @@ public class ContentParser{
             UnitType unit;
             if(locate(ContentType.unit, name) == null){
 
-                unit = make(resolve(value.getString("class", ""), UnitType.class), mod + "-" + name);
+                unit = make(resolve(value.getString("template", ""), UnitType.class), mod + "-" + name);
 
-                if(value.has("class")){
-                    value.remove("class");
+                if(value.has("template")){
+                    value.remove("template");
                 }
 
                 var typeVal = value.get("type");
@@ -485,7 +489,8 @@ public class ContentParser{
                 }
 
                 if(value.has("defaultController")){
-                    unit.controller = u -> supply(resolve(value.getString("defaultController"), FlyingAI.class)).get();
+                    var sup = supply(resolve(value.getString("defaultController"), FlyingAI.class));
+                    unit.controller = u -> sup.get();
                     value.remove("defaultController");
                 }
 
@@ -520,7 +525,20 @@ public class ContentParser{
             return item;
         },
         ContentType.item, parser(ContentType.item, Item::new),
-        ContentType.liquid, parser(ContentType.liquid, Liquid::new),
+        ContentType.liquid, (TypeParser<Liquid>)(mod, name, value) -> {
+            Liquid liquid;
+            if(locate(ContentType.liquid, name) != null){
+                liquid = locate(ContentType.liquid, name);
+                readBundle(ContentType.liquid, name, value);
+            }else{
+                readBundle(ContentType.liquid, name, value);
+                liquid = make(resolve(value.getString("type", null), Liquid.class), mod + "-" + name);
+                value.remove("type");
+            }
+            currentContent = liquid;
+            read(() -> readFields(liquid, value));
+            return liquid;
+        },
         ContentType.status, parser(ContentType.status, StatusEffect::new),
         ContentType.sector, (TypeParser<SectorPreset>)(mod, name, value) -> {
             if(value.isString()){
