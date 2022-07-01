@@ -393,6 +393,11 @@ public class Turret extends ReloadTurret{
                         if(Float.isNaN(rotation)) rotation = 0;
                     }
 
+                    if(!isControlled()){
+                        unit.aimX(targetPos.x);
+                        unit.aimY(targetPos.y);
+                    }
+
                     float targetRot = angleTo(targetPos);
 
                     if(shouldTurn()){
