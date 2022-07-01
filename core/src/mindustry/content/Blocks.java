@@ -136,7 +136,7 @@ public class Blocks{
     duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, foreshadow, spectre, meltdown, segment, parallax, tsunami,
 
     //turrets - erekir
-    breach, diffuse, sublimate, titan, disperse, afflict, lustre, scathe,
+    breach, diffuse, sublimate, titan, disperse, afflict, lustre, scathe, ravage,
 
     //units
     groundFactory, airFactory, navalFactory,
@@ -4278,7 +4278,7 @@ public class Blocks{
                     engineLayer = Layer.effect;
                     engineSize = 3.1f;
                     engineOffset = 10f;
-                    rotateSpeed = 0f;
+                    rotateSpeed = 0.25f;
                     trailLength = 18;
                     missileAccelTime = 50f;
                     lowAltitude = true;
@@ -4403,6 +4403,52 @@ public class Blocks{
             shootCone = 1f;
             scaledHealth = 220;
             rotateSpeed = 0.9f;
+            researchCostMultiplier = 0.05f;
+
+            coolant = consume(new ConsumeLiquid(Liquids.water, 15f / 60f));
+            limitRange();
+        }};
+
+        //TODO
+        if(false)
+        ravage = new ItemTurret("ravage"){{
+            requirements(Category.turret, with(Items.beryllium, 150, Items.silicon, 150, Items.carbide, 250, Items.phaseFabric, 100));
+
+            ammo(
+            Items.beryllium, new BasicBulletType(7.5f, 85){{
+                width = 12f;
+                hitSize = 7f;
+                height = 20f;
+                shootEffect = new MultiEffect(Fx.shootBigColor, Fx.colorSparkBig);
+                smokeEffect = Fx.shootBigSmoke;
+                ammoMultiplier = 1;
+                pierceCap = 2;
+                pierce = true;
+                pierceBuilding = true;
+                hitColor = backColor = trailColor = Pal.berylShot;
+                frontColor = Color.white;
+                trailWidth = 2.1f;
+                trailLength = 10;
+                hitEffect = despawnEffect = Fx.hitBulletColor;
+                buildingDamageMultiplier = 0.3f;
+            }}
+            );
+
+            coolantMultiplier = 6f;
+
+            shake = 1f;
+            ammoPerShot = 2;
+            drawer = new DrawTurret("reinforced-");
+            shootY = -2;
+            outlineColor = Pal.darkOutline;
+            size = 5;
+            envEnabled |= Env.space;
+            reload = 40f;
+            recoil = 2f;
+            range = 190;
+            shootCone = 3f;
+            scaledHealth = 250;
+            rotateSpeed = 1.5f;
             researchCostMultiplier = 0.05f;
 
             coolant = consume(new ConsumeLiquid(Liquids.water, 15f / 60f));
