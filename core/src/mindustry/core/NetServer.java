@@ -36,11 +36,12 @@ import static mindustry.Vars.*;
 public class NetServer implements ApplicationListener{
     /** note that snapshots are compressed, so the max snapshot size here is above the typical UDP safe limit */
     private static final int maxSnapshotSize = 800;
-    private static final int timerBlockSync = 0;
-    private static final float blockSyncTime = 60 * 6;
+    private static final int timerBlockSync = 0, timerHealthSync = 1;
+    private static final float blockSyncTime = 60 * 6, healthSyncTime = 30;
     private static final FloatBuffer fbuffer = FloatBuffer.allocate(20);
     private static final Writes dataWrites = new Writes(null);
     private static final IntSeq hiddenIds = new IntSeq();
+    private static final IntSeq healthSeq = new IntSeq(maxSnapshotSize / 4 + 1);
     private static final Vec2 vector = new Vec2();
     /** If a player goes away of their server-side coordinates by this distance, they get teleported back. */
     private static final float correctDist = tilesize * 14f;
@@ -96,7 +97,8 @@ public class NetServer implements ApplicationListener{
     };
 
     private boolean closing = false;
-    private Interval timer = new Interval();
+    private Interval timer = new Interval(10);
+    private IntSet buildHealthChanged = new IntSet();
 
     private ReusableByteOutStream writeBuffer = new ReusableByteOutStream(127);
     private Writes outputBuffer = new Writes(new DataOutputStream(writeBuffer));
@@ -867,6 +869,12 @@ public class NetServer implements ApplicationListener{
         }
     }
 
+    //TODO I don't like where this is, move somewhere else?
+    /** Queues a building health update. This will be sent in a Call.buildHealthUpdate packet later. */
+    public void buildHealthUpdate(Building build){
+        buildHealthChanged.add(build.pos());
+    }
+
     /** Should only be used on the headless backend. */
     public void openServer(){
         try{
@@ -1049,6 +1057,34 @@ public class NetServer implements ApplicationListener{
 
             if(Groups.player.size() > 0 && Core.settings.getBool("blocksync") && timer.get(timerBlockSync, blockSyncTime)){
                 writeBlockSnapshots();
+            }
+
+            if(Groups.player.size() > 0 && buildHealthChanged.size > 0 && timer.get(timerHealthSync, healthSyncTime)){
+                healthSeq.clear();
+
+                var iter = buildHealthChanged.iterator();
+                while(iter.hasNext){
+                    int next = iter.next();
+                    var build = world.build(next);
+
+                    //pack pos + health into update list
+                    if(build != null){
+                        healthSeq.add(next, Float.floatToRawIntBits(build.health));
+                    }
+
+                    //if size exceeds snapshot limit, send it out and begin building it up again
+                    if(healthSeq.size * 4 >= maxSnapshotSize){
+                        Call.buildHealthUpdate(healthSeq);
+                        healthSeq.clear();
+                    }
+                }
+
+                //send any residual health updates
+                if(healthSeq.size > 0){
+                    Call.buildHealthUpdate(healthSeq);
+                }
+
+                buildHealthChanged.clear();
             }
         }catch(IOException e){
             Log.err(e);

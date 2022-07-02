@@ -315,6 +315,11 @@ public class StatValues{
 
                 BulletType type = map.get(t);
 
+                if(type.spawnUnit != null && type.spawnUnit.weapons.size > 0){
+                    ammo(ObjectMap.of(t, type.spawnUnit.weapons.first().bullet), indent).display(table);
+                    return;
+                }
+
                 //no point in displaying unit icon twice
                 if(!compact && !(t instanceof PowerTurret)){
                     table.image(icon(t)).size(3 * 8).padRight(4).right().top();

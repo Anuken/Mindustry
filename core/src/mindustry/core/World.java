@@ -174,7 +174,7 @@ public class World{
         return x + y * tiles.width;
     }
 
-    private void clearTileEntities(){
+    public void clearBuildings(){
         for(Tile tile : tiles){
             if(tile != null && tile.build != null){
                 tile.build.remove();
@@ -187,7 +187,7 @@ public class World{
      * Only use for loading saves!
      */
     public Tiles resize(int width, int height){
-        clearTileEntities();
+        clearBuildings();
 
         if(tiles.width != width || tiles.height != height){
             tiles = new Tiles(width, height);

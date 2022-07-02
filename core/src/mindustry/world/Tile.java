@@ -709,20 +709,22 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         }
     }
 
-    @Remote(called = Loc.server, unreliable = true)
-    public static void tileDamage(Building build, float health){
-        if(build == null) return;
-
-        build.health = health;
-
-        if(build.damaged()){
-            indexer.notifyBuildDamaged(build);
-        }
-    }
-
     @Remote(called = Loc.server)
-    public static void tileDestroyed(Building build){
+    public static void buildDestroyed(Building build){
         if(build == null) return;
         build.killed();
+    }
+
+    @Remote
+    public static void buildHealthUpdate(IntSeq buildings){
+        for(int i = 0; i < buildings.size; i += 2){
+            int pos = buildings.items[i];
+            float health = Float.intBitsToFloat(buildings.items[i + 1]);
+            var build = world.build(pos);
+            if(build != null && build.health != health){
+                build.health = health;
+                indexer.notifyHealthChanged(build);
+            }
+        }
     }
 }
