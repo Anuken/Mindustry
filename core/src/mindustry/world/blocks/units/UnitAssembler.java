@@ -275,7 +275,10 @@ public class UnitAssembler extends PayloadBlock{
                     break;
                 }
             }
-            currentTier = max;
+            if(currentTier != max){
+                progress=0;
+                currentTier = max;
+            }
         }
 
         public UnitType unit(){
