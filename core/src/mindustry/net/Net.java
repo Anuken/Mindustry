@@ -5,7 +5,6 @@ import arc.func.*;
 import arc.net.*;
 import arc.struct.*;
 import arc.util.*;
-
 import mindustry.gen.*;
 import mindustry.net.Packets.*;
 import mindustry.net.Streamable.*;
