@@ -390,7 +390,7 @@ public class StatValues{
                     }
 
                     if(type.status != StatusEffects.none){
-                        sep(bt, (type.status.minfo.mod == null ? type.status.emoji() : "") + "[stat]" + type.status.localizedName);
+                        sep(bt, (type.status.minfo.mod == null ? type.status.emoji() : "") + "[stat]" + type.status.localizedName + "[] ~ [stat]" + (type.statusDuration / 60f) + "[] " + Core.bundle.get("unit.seconds"));
                     }
 
                     if(type.fragBullet != null){
