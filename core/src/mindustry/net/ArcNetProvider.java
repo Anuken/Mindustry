@@ -5,6 +5,7 @@ import arc.func.*;
 import arc.math.*;
 import arc.net.*;
 import arc.net.FrameworkMessage.*;
+import arc.net.dns.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
@@ -193,12 +194,22 @@ public class ArcNetProvider implements NetProvider{
         try{
             var host = pingHostImpl(address, port);
             Core.app.post(() -> valid.get(host));
-        }catch(Exception e){
+        }catch(IOException e){
+            if(port == Vars.port){
+                for (var record : ArcDns.getSrvRecords("_mindustry._tcp." + address)) {
+                    try{
+                        var host = pingHostImpl(record.target, record.port);
+                        Core.app.post(() -> valid.get(host));
+                        return;
+                    }catch(IOException ignored){
+                    }
+                }
+            }
             Core.app.post(() -> invalid.get(e));
         }
     }
 
-    private Host pingHostImpl(String address, int port) throws Exception {
+    private Host pingHostImpl(String address, int port) throws IOException {
         try(DatagramSocket socket = new DatagramSocket()){
             long time = Time.millis();
 
