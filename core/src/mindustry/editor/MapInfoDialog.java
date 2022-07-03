@@ -16,7 +16,7 @@ public class MapInfoDialog extends BaseDialog{
     private final WaveInfoDialog waveInfo;
     private final MapGenerateDialog generate;
     private final CustomRulesDialog ruleInfo = new CustomRulesDialog();
-    //private final MapObjectivesDialog objectives = new MapObjectivesDialog();
+    private final MapObjectivesDialog objectives = new MapObjectivesDialog();
 
     public MapInfoDialog(){
         super("@editor.mapinfo");
@@ -76,10 +76,10 @@ public class MapInfoDialog extends BaseDialog{
 
                 r.row();
 
-                /*r.button("@editor.objectives", Icon.info, style, () -> {
-                    objectives.show(state.rules.objectives);
+                r.button("@editor.objectives", Icon.info, style, () -> {
+                    objectives.show(/*state.rules.objectives*/);
                     hide();
-                }).marginLeft(10f);*/
+                }).marginLeft(10f);
 
                 r.button("@editor.generation", Icon.terrain, style, () -> {
                     //randomize so they're not all the same seed

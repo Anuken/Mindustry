@@ -25,38 +25,52 @@ import static mindustry.Vars.*;
 
 /** Handles and executes in-map objectives. */
 public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObjective>{
-    public static final ObjectMap<Class<? extends MapObjective>, Prov<? extends MapObjective>> allObjectiveTypes = new ObjectMap<>();
-    public static final ObjectMap<Class<? extends ObjectiveMarker>, Prov<? extends ObjectiveMarker>> allMarkerTypes = new ObjectMap<>();
+    public static final Seq<Prov<? extends MapObjective>> allObjectiveTypes = new Seq<>();
+    public static final Seq<Prov<? extends ObjectiveMarker>> allMarkerTypes = new Seq<>();
 
     static{
-        registerObjective(ResearchObjective.class, ResearchObjective::new);
-        registerObjective(ProduceObjective.class, ProduceObjective::new);
-        registerObjective(ItemObjective.class, ItemObjective::new);
-        registerObjective(CoreItemObjective.class, CoreItemObjective::new);
-        registerObjective(BuildCountObjective.class, BuildCountObjective::new);
-        registerObjective(UnitCountObjective.class, UnitCountObjective::new);
-        registerObjective(DestroyUnitsObjective.class, DestroyUnitsObjective::new);
-        registerObjective(TimerObjective.class, TimerObjective::new);
-        registerObjective(DestroyBlockObjective.class, DestroyBlockObjective::new);
-        registerObjective(DestroyBlocksObjective.class, DestroyBlocksObjective::new);
-        registerObjective(DestroyCoreObjective.class, DestroyCoreObjective::new);
-        registerObjective(CommandModeObjective.class, CommandModeObjective::new);
-        registerObjective(FlagObjective.class, FlagObjective::new);
+        registerObjective(
+            ResearchObjective::new,
+            ProduceObjective::new,
+            ItemObjective::new,
+            CoreItemObjective::new,
+            BuildCountObjective::new,
+            UnitCountObjective::new,
+            DestroyUnitsObjective::new,
+            TimerObjective::new,
+            DestroyBlockObjective::new,
+            DestroyBlocksObjective::new,
+            DestroyCoreObjective::new,
+            CommandModeObjective::new,
+            FlagObjective::new
+        );
 
-        registerMarker(ShapeTextMarker.class, ShapeTextMarker::new);
-        registerMarker(MinimapMarker.class, MinimapMarker::new);
-        registerMarker(ShapeMarker.class, ShapeMarker::new);
-        registerMarker(TextMarker.class, TextMarker::new);
+        registerMarker(
+            ShapeTextMarker::new,
+            MinimapMarker::new,
+            ShapeMarker::new,
+            TextMarker::new
+        );
     }
 
-    public static <T extends MapObjective> void registerObjective(Class<T> type, Prov<T> prov){
-        allObjectiveTypes.put(type, prov);
-        JsonIO.json.addClassTag(type.getSimpleName().replace("Objective", ""), type);
+    @SafeVarargs
+    public static void registerObjective(Prov<? extends MapObjective>... providers){
+        for(var prov : providers){
+            allObjectiveTypes.add(prov);
+
+            Class<? extends MapObjective> type = prov.get().getClass();
+            JsonIO.json.addClassTag(type.getSimpleName().replace("Objective", ""), type);
+        }
     }
 
-    public static <T extends ObjectiveMarker> void registerMarker(Class<T> type, Prov<T> prov){
-        allMarkerTypes.put(type, prov);
-        JsonIO.json.addClassTag(type.getSimpleName().replace("Marker", ""), type);
+    @SafeVarargs
+    public static void registerMarker(Prov<? extends ObjectiveMarker>... providers){
+        for(var prov : providers){
+            allMarkerTypes.add(prov);
+
+            Class<? extends ObjectiveMarker> type = prov.get().getClass();
+            JsonIO.json.addClassTag(type.getSimpleName().replace("Marker", ""), type);
+        }
     }
 
     /**
@@ -159,8 +173,13 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         /** Temporary container to store references since this class is static. Will immediately be flattened. */
         private transient final Seq<MapObjective> children = new Seq<>(2);
 
-        /** Internal value, do not modify. */
-        private transient boolean depFinished, completed, changed;
+        /** For the objectives UI dialog. Do not modify! */
+        public transient int editorX = -1, editorY = -1;
+
+        /** Whether this objective has been done yet. This is internally set. */
+        private boolean completed;
+        /** Internal value. Do not modify! */
+        private transient boolean depFinished, changed;
 
         /** @return True if this objective is done and should be removed from the executor. */
         public abstract boolean update();
@@ -250,6 +269,12 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         /** @return Details that appear upon click. */
         public @Nullable String details(){
             return details;
+        }
+
+        /** The localized type-name of this objective, defaulting to the class simple name without the "Objective" prefix. */
+        public String typeName(){
+            String className = getClass().getSimpleName().replace("Objective", "");
+            return Core.bundle == null || !Core.bundle.has("objective." + className) ? className : Core.bundle.get("objective." + className);
         }
     }
 

@@ -1,6 +1,7 @@
 package mindustry.io;
 
 import arc.graphics.*;
+import arc.math.geom.*;
 import arc.util.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
@@ -268,6 +269,8 @@ public class JsonIO{
                     }
 
                     json.writeArrayEnd();
+
+                    json.writeValue("editorPos", Point2.pack(obj.editorX, obj.editorY));
                     json.writeObjectEnd();
                 }
 
@@ -279,7 +282,13 @@ public class JsonIO{
                 var exec = new MapObjectives();
                 // First iteration to instantiate the objectives.
                 for(var value = data.child; value != null; value = value.next){
-                    exec.all.add(json.readValue(MapObjective.class, value));
+                    MapObjective obj = json.readValue(MapObjective.class, value);
+
+                    int pos = value.asInt();
+                    obj.editorX = Point2.x(pos);
+                    obj.editorY = Point2.y(pos);
+
+                    exec.all.add(obj);
                 }
 
                 // Second iteration to map the parents.
