@@ -42,6 +42,12 @@ public class LogicDialog extends BaseDialog{
             setup();
             canvas.rebuild();
         });
+
+        add(canvas).grow().name("canvas");
+
+        row();
+
+        add(buttons).growX().name("canvas");
     }
 
     private void setup(){
@@ -207,13 +213,6 @@ public class LogicDialog extends BaseDialog{
             dialog.addCloseButton();
             dialog.show();
         }).disabled(t -> canvas.statements.getChildren().size >= LExecutor.maxInstructions);
-
-
-        add(canvas).grow().name("canvas");
-
-        row();
-
-        add(buttons).growX().name("canvas");
     }
 
     public void show(String code, LExecutor executor, boolean privileged, Cons<String> modified){
