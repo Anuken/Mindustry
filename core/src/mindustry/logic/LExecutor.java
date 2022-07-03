@@ -1021,7 +1021,7 @@ public class LExecutor{
         @Override
         public void run(LExecutor exec){
 
-            if(exec.building(target) instanceof MessageBuild d && d.team == exec.team){
+            if(exec.building(target) instanceof MessageBuild d && (d.team == exec.team || exec.privileged)){
 
                 d.message.setLength(0);
                 d.message.append(exec.textBuffer, 0, Math.min(exec.textBuffer.length(), maxTextBuffer));
@@ -1546,6 +1546,8 @@ public class LExecutor{
 
     @Remote(called = Loc.server, unreliable = true)
     public static void logicExplosion(Team team, float x, float y, float radius, float damage, boolean air, boolean ground, boolean pierce){
+        if(damage < 0f) return;
+
         Damage.damage(team, x, y, radius, damage, pierce, air, ground);
         if(pierce){
             Fx.spawnShockwave.at(x, y, World.conv(radius));

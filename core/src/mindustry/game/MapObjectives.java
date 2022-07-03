@@ -432,7 +432,7 @@ public class MapObjectives{
 
         public float radius = 6f, rotation = 0f;
         public int sides = 4;
-        public Color color = Pal.accent;
+        public Color color = Color.valueOf("ffd37f");
 
         //cached localized text
         private transient String fetchedText;
@@ -489,22 +489,22 @@ public class MapObjectives{
 
     /** Displays a circle on the minimap. */
     public static class MinimapMarker extends ObjectiveMarker{
-        //in tiles.
-        public float x, y, radius = 5f, stroke = 11f;
-        public Color color = Team.crux.color;
+        public int x, y;
+        public float radius = 5f, stroke = 11f;
+        public Color color = Color.valueOf("f25555");
 
-        public MinimapMarker(float x, float y){
+        public MinimapMarker(int x, int y){
             this.x = x;
             this.y = y;
         }
 
-        public MinimapMarker(float x, float y, Color color){
+        public MinimapMarker(int x, int y, Color color){
             this.x = x;
             this.y = y;
             this.color = color;
         }
 
-        public MinimapMarker(float x, float y, float radius, float stroke, Color color){
+        public MinimapMarker(int x, int y, float radius, float stroke, Color color){
             this.x = x;
             this.y = y;
             this.stroke = stroke;
@@ -530,10 +530,10 @@ public class MapObjectives{
 
     /** Displays a shape with an outline and color. */
     public static class ShapeMarker extends ObjectiveMarker{
-        public float x, y, radius = 6f, rotation = 0f, stroke = 1f;
+        public float x, y, radius = 8f, rotation = 0f, stroke = 1f;
         public boolean fill = false, outline = true;
         public int sides = 4;
-        public Color color = Pal.accent;
+        public Color color = Color.valueOf("ffd37f");
 
         public ShapeMarker(float x, float y){
             this.x = x;
@@ -552,6 +552,9 @@ public class MapObjectives{
 
         @Override
         public void draw(){
+            //in case some idiot decides to make 9999999 sides and freeze the game
+            int sides = Math.min(this.sides, 200);
+
             if(!fill){
                 if(outline){
                     Lines.stroke(stroke + 2f, Pal.gray);
@@ -608,6 +611,11 @@ public class MapObjectives{
     public static abstract class ObjectiveMarker{
         /** makes sure markers are only added once */
         public transient boolean wasAdded;
+
+        //TODO localize
+        public String typeName(){
+            return getClass().getSimpleName().replace("Marker", "");
+        }
 
         /** Called in the overlay draw layer.*/
         public void draw(){}

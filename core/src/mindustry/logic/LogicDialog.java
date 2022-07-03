@@ -36,6 +36,16 @@ public class LogicDialog extends BaseDialog{
 
         addCloseListener();
 
+        shown(this::setup);
+        hidden(() -> consumer.get(canvas.save()));
+        onResize(() -> {
+            setup();
+            canvas.rebuild();
+        });
+    }
+
+    private void setup(){
+        buttons.clearChildren();
         buttons.defaults().size(160f, 64f);
         buttons.button("@back", Icon.left, this::hide).name("back");
 
@@ -67,7 +77,7 @@ public class LogicDialog extends BaseDialog{
             dialog.show();
         }).name("edit");
 
-        if(mobile && !Core.graphics.isPortrait()) buttons.row();
+        if(Core.graphics.isPortrait()) buttons.row();
 
         buttons.button("@variables", Icon.menu, () -> {
             BaseDialog dialog = new BaseDialog("@variables");
@@ -204,10 +214,6 @@ public class LogicDialog extends BaseDialog{
         row();
 
         add(buttons).growX().name("canvas");
-
-        hidden(() -> consumer.get(canvas.save()));
-
-        onResize(() -> canvas.rebuild());
     }
 
     public void show(String code, LExecutor executor, boolean privileged, Cons<String> modified){
