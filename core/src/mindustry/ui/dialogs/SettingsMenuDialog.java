@@ -270,26 +270,26 @@ public class SettingsMenuDialog extends BaseDialog{
 
         TextButtonStyle style = Styles.flatt;
 
-        float isize = iconMed;
+        float marg = 8f, isize = iconMed;
 
-        menu.defaults().size(300f, 60f).marginLeft(8f);
-        menu.button("@settings.game", Icon.settings, style, isize, () -> visible(0)).row();
-        menu.button("@settings.graphics", Icon.image, style, isize, () -> visible(1)).row();
-        menu.button("@settings.sound", Icon.filters, style, isize, () -> visible(2)).row();
-        menu.button("@settings.language", Icon.chat, style, isize, ui.language::show).row();
+        menu.defaults().size(300f, 60f);
+        menu.button("@settings.game", Icon.settings, style, isize, () -> visible(0)).marginLeft(marg).row();
+        menu.button("@settings.graphics", Icon.image, style, isize, () -> visible(1)).marginLeft(marg).row();
+        menu.button("@settings.sound", Icon.filters, style, isize, () -> visible(2)).marginLeft(marg).row();
+        menu.button("@settings.language", Icon.chat, style, isize, ui.language::show).marginLeft(marg).row();
         if(!mobile || Core.settings.getBool("keyboard")){
-            menu.button("@settings.controls", Icon.move, style, isize, ui.controls::show).row();
+            menu.button("@settings.controls", Icon.move, style, isize, ui.controls::show).marginLeft(marg).row();
         }
 
-        menu.button("@settings.data", Icon.save, style, isize, () -> dataDialog.show()).row();
+        menu.button("@settings.data", Icon.save, style, isize, () -> dataDialog.show()).marginLeft(marg).row();
 
         int i = 3;
         for(var cat : categories){
             int index = i;
             if(cat.icon == null){
-                menu.button(cat.name, style, () -> visible(index)).row();
+                menu.button(cat.name, style, () -> visible(index)).marginLeft(marg).row();
             }else{
-                menu.button(cat.name, cat.icon, style, isize, () -> visible(index)).with(b -> ((Image)b.getChildren().get(1)).setScaling(Scaling.fit)).row();
+                menu.button(cat.name, cat.icon, style, isize, () -> visible(index)).with(b -> ((Image)b.getChildren().get(1)).setScaling(Scaling.fit)).marginLeft(marg).row();
             }
             i++;
         }
@@ -438,19 +438,22 @@ public class SettingsMenuDialog extends BaseDialog{
         }
 
         graphics.checkPref("effects", true);
+        graphics.checkPref("atmosphere", !mobile);
         graphics.checkPref("destroyedblocks", true);
         graphics.checkPref("blockstatus", false);
         graphics.checkPref("playerchat", true);
-        if(!mobile) graphics.checkPref("coreitems", true);
-        graphics.row();
+        if(!mobile){
+            graphics.checkPref("coreitems", true);
+        }
         graphics.checkPref("minimap", !mobile);
         graphics.checkPref("smoothcamera", true);
         graphics.checkPref("position", false);
-        if(!mobile) graphics.checkPref("mouseposition", false);
+        if(!mobile){
+            graphics.checkPref("mouseposition", false);
+        }
         graphics.checkPref("fps", false);
         graphics.checkPref("playerindicators", true);
         graphics.checkPref("indicators", true);
-        graphics.checkPref("atmosphere", !mobile);
         graphics.checkPref("showweather", true);
         graphics.checkPref("animatedwater", true);
 
