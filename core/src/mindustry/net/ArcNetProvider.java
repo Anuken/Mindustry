@@ -209,7 +209,7 @@ public class ArcNetProvider implements NetProvider{
         }
     }
 
-    private Host pingHostImpl(String address, int port) throws IOException {
+    private Host pingHostImpl(String address, int port) throws IOException{
         try(DatagramSocket socket = new DatagramSocket()){
             long time = Time.millis();
 
