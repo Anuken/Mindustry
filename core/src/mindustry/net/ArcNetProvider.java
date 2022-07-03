@@ -196,7 +196,7 @@ public class ArcNetProvider implements NetProvider{
             Core.app.post(() -> valid.get(host));
         }catch(IOException e){
             if(port == Vars.port){
-                for (var record : ArcDns.getSrvRecords("_mindustry._tcp." + address)) {
+                for(var record : ArcDns.getSrvRecords("_mindustry._tcp." + address)){
                     try{
                         var host = pingHostImpl(record.target, record.port);
                         Core.app.post(() -> valid.get(host));
