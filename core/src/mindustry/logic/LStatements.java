@@ -1434,7 +1434,7 @@ public class LStatements{
     @RegisterStatement("cutscene")
     public static class CutsceneStatement extends LStatement{
         public CutsceneAction action = CutsceneAction.pan;
-        public String p1 = "100", p2 = "100", p3 = " 0.06", p4 = "0";
+        public String p1 = "10", p2 = "10", p3 = " 0.06", p4 = "0";
 
         @Override
         public void build(Table table){
@@ -1467,6 +1467,12 @@ public class LStatements{
                 case zoom -> {
                     table.add(" level ");
                     fields(table, p1, str -> p1 = str);
+                }
+                case shake -> {
+                    table.add(" intensity ");
+                    fields(table, p1, str -> p1 = str);
+                    table.add(" duration ");
+                    fields(table, p2, str -> p2 = str);
                 }
             }
         }
