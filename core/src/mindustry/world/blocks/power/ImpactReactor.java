@@ -1,6 +1,7 @@
 package mindustry.world.blocks.power;
 
 import arc.*;
+import arc.audio.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -27,6 +28,7 @@ public class ImpactReactor extends PowerGenerator{
     public int explosionRadius = 23;
     public int explosionDamage = 1900;
     public Effect explodeEffect = Fx.impactReactorExplosion;
+    public Sound explodeSound = Sounds.explosionbig;
 
     public Color plasma1 = Color.valueOf("ffd06b"), plasma2 = Color.valueOf("ff361b");
 
@@ -145,12 +147,11 @@ public class ImpactReactor extends PowerGenerator{
 
             if(warmup < 0.3f || !state.rules.reactorExplosions) return;
 
-            Sounds.explosionbig.at(this);
-
             Damage.damage(x, y, explosionRadius * tilesize, explosionDamage * 4);
 
             Effect.shake(6f, 16f, x, y);
-            explodeEffect.at(x, y);
+            explodeEffect.at(this);
+            explodeSound.at(this);
         }
 
         @Override

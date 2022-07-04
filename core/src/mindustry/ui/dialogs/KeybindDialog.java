@@ -27,7 +27,7 @@ public class KeybindDialog extends Dialog{
     protected ObjectIntMap<Section> sectionControls = new ObjectIntMap<>();
 
     public KeybindDialog(){
-        super(bundle.get("keybind.title", "Rebind Keys"));
+        super(bundle.get("keybind.title"));
         setup();
         addCloseButton();
         setFillParent(true);
@@ -154,7 +154,7 @@ public class KeybindDialog extends Dialog{
                         openDialog(section, keybind);
                     }).width(130f);
                 }
-                table.button("@settings.resetKey", tstyle, () -> keybinds.resetToDefault(section, keybind)).width(130f);
+                table.button("@settings.resetKey", tstyle, () -> keybinds.resetToDefault(section, keybind)).width(130f).pad(2f).padLeft(4f);
                 table.row();
             }
 
@@ -194,7 +194,7 @@ public class KeybindDialog extends Dialog{
     }
 
     private void openDialog(Section section, KeyBind name){
-        rebindDialog = new Dialog(rebindAxis ? bundle.get("keybind.press.axis", "Press an axis or key...") : bundle.get("keybind.press", "Press a key..."));
+        rebindDialog = new Dialog(rebindAxis ? bundle.get("keybind.press.axis") : bundle.get("keybind.press"));
 
         rebindKey = name;
 
