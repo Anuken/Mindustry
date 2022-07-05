@@ -4466,7 +4466,6 @@ public class Blocks{
                 trailEffect = Fx.disperseTrail;
                 trailInterval = 3f;
 
-                //TODO
                 intervalBullet = new LightningBulletType(){{
                     damage = 30;
                     collidesAir = false;
