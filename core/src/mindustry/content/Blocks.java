@@ -3885,6 +3885,7 @@ public class Blocks{
             outlineColor = Pal.darkOutline;
 
             liquidConsumed = 10f / 60f;
+            targetInterval = 5f;
 
             float r = range = 130f;
 
@@ -4268,6 +4269,7 @@ public class Blocks{
             Items.carbide, new BasicBulletType(0f, 1){{
                 shootEffect = Fx.shootBig;
                 smokeEffect = Fx.shootSmokeMissile;
+                ammoMultiplier = 1f;
 
                 spawnUnit = new MissileUnitType("scathe-missile"){{
                     speed = 4.6f;
@@ -4285,7 +4287,7 @@ public class Blocks{
 
                     fogRadius = 6f;
 
-                    health = 250;
+                    health = 190;
 
                     weapons.add(new Weapon(){{
                         shootCone = 360f;
@@ -4302,6 +4304,7 @@ public class Blocks{
                                 sizeTo = 130f;
                             }});
 
+                            ammoMultiplier = 1f;
                             fragLifeMin = 0.1f;
                             fragBullets = 7;
                             fragBullet = new ArtilleryBulletType(3.4f, 30){{
@@ -4403,53 +4406,169 @@ public class Blocks{
             shootCone = 1f;
             scaledHealth = 220;
             rotateSpeed = 0.9f;
-            researchCostMultiplier = 0.05f;
 
             coolant = consume(new ConsumeLiquid(Liquids.water, 15f / 60f));
             limitRange();
         }};
 
-        //TODO
-        if(false)
         ravage = new ItemTurret("ravage"){{
             requirements(Category.turret, with(Items.beryllium, 150, Items.silicon, 150, Items.carbide, 250, Items.phaseFabric, 100));
 
             ammo(
-            Items.beryllium, new BasicBulletType(7.5f, 85){{
-                width = 12f;
+            //this is really lazy
+            Items.surgeAlloy, new BasicBulletType(7f, 250){{
+                width = 16f;
                 hitSize = 7f;
                 height = 20f;
-                shootEffect = new MultiEffect(Fx.shootBigColor, Fx.colorSparkBig);
-                smokeEffect = Fx.shootBigSmoke;
+                shootEffect = new MultiEffect(Fx.shootTitan, Fx.colorSparkBig, new WaveEffect(){{
+                    colorFrom = colorTo = Pal.accent;
+                    lifetime = 12f;
+                    sizeTo = 20f;
+                    strokeFrom = 3f;
+                    strokeTo = 0.3f;
+                }});
+                smokeEffect = Fx.shootSmokeRavage;
                 ammoMultiplier = 1;
-                pierceCap = 2;
+                pierceCap = 4;
                 pierce = true;
                 pierceBuilding = true;
-                hitColor = backColor = trailColor = Pal.berylShot;
+                hitColor = backColor = trailColor = Pal.accent;
                 frontColor = Color.white;
-                trailWidth = 2.1f;
-                trailLength = 10;
-                hitEffect = despawnEffect = Fx.hitBulletColor;
+                trailWidth = 2.8f;
+                trailLength = 9;
+                hitEffect = despawnEffect = Fx.hitBulletBig;
                 buildingDamageMultiplier = 0.3f;
+
+                //TODO
+                intervalBullet = new LightningBulletType(){{
+                    damage = 30;
+                    collidesAir = false;
+                    ammoMultiplier = 1f;
+                    lightningColor = Pal.accent;
+                    lightningLength = 5;
+                    lightningLengthRand = 10;
+
+                    //for visual stats only.
+                    buildingDamageMultiplier = 0.25f;
+
+                    lightningType = new BulletType(0.0001f, 0f){{
+                        lifetime = Fx.lightning.lifetime;
+                        hitEffect = Fx.hitLancer;
+                        despawnEffect = Fx.none;
+                        status = StatusEffects.shocked;
+                        statusDuration = 10f;
+                        hittable = false;
+                        lightColor = Color.white;
+                        buildingDamageMultiplier = 0.25f;
+                    }};
+                }};
+
+                bulletInterval = 3f;
             }}
             );
 
+            shoot = new ShootAlternate(){{
+                spread = 3.3f;
+                barrels = 9;
+                shots = 9;
+            }};
+
+            minWarmup = 0.99f;
             coolantMultiplier = 6f;
 
-            shake = 1f;
+            shake = 2f;
             ammoPerShot = 2;
-            drawer = new DrawTurret("reinforced-");
-            shootY = -2;
+            drawer = new DrawTurret("reinforced-"){{
+                parts.addAll(
+
+                new RegionPart("-mid"){{
+                    heatProgress = PartProgress.heat.blend(PartProgress.warmup, 0.5f);
+                    mirror = false;
+                }},
+                new RegionPart("-blade"){{
+                    progress = PartProgress.warmup;
+                    heatProgress = PartProgress.warmup;
+                    mirror = true;
+                    moveX = 5.5f;
+                    moves.add(new PartMove(PartProgress.recoil, 0f, -3f, 0f));
+                }},
+                new RegionPart("-front"){{
+                    progress = PartProgress.warmup;
+                    heatProgress = PartProgress.recoil;
+                    mirror = true;
+                    under = true;
+                    moveY = 4f;
+                    moveX = 6.5f;
+                    moves.add(new PartMove(PartProgress.recoil, 0f, -5.5f, 0f));
+                }},
+                new RegionPart("-back"){{
+                    progress = PartProgress.warmup;
+                    heatProgress = PartProgress.warmup;
+                    mirror = true;
+                    under = true;
+                    moveX = 5.5f;
+                }},
+                new ShapePart(){{
+                    progress = PartProgress.warmup.delay(0.5f);
+                    color = Pal.accent;
+                    sides = 6;
+                    hollow = true;
+                    stroke = 0f;
+                    strokeTo = 3f;
+                    radius = 10f;
+                    layer = Layer.effect;
+                    y = -15f;
+                    rotateSpeed = 2f;
+                }}
+                );
+
+                for(int i = 0; i < 3; i++){
+                    int fi = i;
+                    parts.add(new RegionPart("-blade-bar"){{
+                        progress = PartProgress.warmup;
+                        heatProgress = PartProgress.warmup;
+                        mirror = true;
+                        under = true;
+                        outline = false;
+                        layerOffset = -0.3f;
+                        turretHeatLayer = Layer.turret - 0.2f;
+                        y = 44f / 4f - fi * 38f / 4f;
+                        moveX = 2f;
+
+                        color = Pal.accent;
+                    }});
+                }
+
+                for(int i = 0; i < 4; i++){
+                    int fi = i;
+                    parts.add(new RegionPart("-spine"){{
+                        progress = PartProgress.warmup.delay(fi / 5f);
+                        heatProgress = PartProgress.warmup;
+                        mirror = true;
+                        under = true;
+                        layerOffset = -0.3f;
+                        turretHeatLayer = Layer.turret - 0.2f;
+                        moveY = -22f / 4f - fi * 3f;
+                        moveX = 52f / 4f - fi * 1f + 2f;
+                        moveRot = -fi * 30f;
+
+                        color = Pal.accent;
+                        moves.add(new PartMove(PartProgress.recoil.delay(fi / 5f), 0f, 0f, 35f));
+                    }});
+                }
+            }};
+
+            shootWarmupSpeed = 0.05f;
+            shootY = 15f;
             outlineColor = Pal.darkOutline;
             size = 5;
             envEnabled |= Env.space;
-            reload = 40f;
+            reload = 100f;
             recoil = 2f;
-            range = 190;
-            shootCone = 3f;
-            scaledHealth = 250;
+            range = 300;
+            shootCone = 7f;
+            scaledHealth = 350;
             rotateSpeed = 1.5f;
-            researchCostMultiplier = 0.05f;
 
             coolant = consume(new ConsumeLiquid(Liquids.water, 15f / 60f));
             limitRange();

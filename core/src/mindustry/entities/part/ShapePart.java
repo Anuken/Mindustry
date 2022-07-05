@@ -11,6 +11,7 @@ public class ShapePart extends DrawPart{
     public float radius = 3f, radiusTo = -1f, stroke = 1f, strokeTo = -1f;
     public float x, y, rotation;
     public float moveX, moveY, moveRot;
+    public float rotateSpeed = 0f;
     public Color color = Color.white;
     public @Nullable Color colorTo;
     public boolean mirror = false;
@@ -26,6 +27,7 @@ public class ShapePart extends DrawPart{
         Draw.z(Draw.z() + layerOffset);
 
         float prog = progress.getClamp(params);
+        float baseRot = Time.time * rotateSpeed;
         int len = mirror && params.sideOverride == -1 ? 2 : 1;
 
         for(int s = 0; s < len; s++){
@@ -49,14 +51,14 @@ public class ShapePart extends DrawPart{
             
             if(!hollow){
                 if(!circle){
-                    Fill.poly(rx, ry, sides, rad, moveRot * prog * sign + params.rotation - 90 * sign + rotation * sign);
+                    Fill.poly(rx, ry, sides, rad, moveRot * prog * sign + params.rotation - 90 * sign + rotation * sign + baseRot * sign);
                 }else{
                     Fill.circle(rx, ry, rad);
                 }
             }else{
                 Lines.stroke(str);
                 if(!circle){
-                    Lines.poly(rx, ry, sides, rad, moveRot * prog * sign + params.rotation - 90 * sign + rotation * sign);
+                    Lines.poly(rx, ry, sides, rad, moveRot * prog * sign + params.rotation - 90 * sign + rotation * sign + baseRot * sign);
                 }else{
                     Lines.circle(rx, ry, rad);
                 }
