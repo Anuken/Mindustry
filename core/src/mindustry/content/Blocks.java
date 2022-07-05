@@ -1092,8 +1092,10 @@ public class Blocks{
             hasPower = true;
             craftEffect = Fx.none;
             drawer = new DrawMulti(
+            new DrawPistons(){{
+                sinMag = 1f;
+            }},
             new DrawDefault(),
-            new DrawFrames(),
             new DrawLiquidRegion(),
             new DrawRegion("-top")
             );

@@ -6,6 +6,7 @@ import arc.math.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 
+@Deprecated
 public class DrawFrames extends DrawBlock{
     /** Number of frames to draw. */
     public int frames = 3;
