@@ -1474,8 +1474,10 @@ public class LStatements{
                     
                     row(table);
                     
-                    table.add(" duration (seconds) ");
+                    table.add(" x ");
                     fields(table, p2, str -> p2 = str);
+                    table.add(" y ");
+                    fields(table, p3, str -> p3 = str);
                 }
             }
         }

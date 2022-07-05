@@ -1170,7 +1170,7 @@ public class LExecutor{
                 }
                 case shake -> {
                     // control.input.logicCutscene = true;
-                    renderer.shake(exec.numf(p1), exec.numf(p2) * 60f);
+                    Effect.shake(exec.numf(p1), exec.numf(p1), World.unconv(exec.numf(p2)), World.unconv(exec.numf(p3)));
                 }
                 case stop -> {
                     control.input.logicCutscene = false;
