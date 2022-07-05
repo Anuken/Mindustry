@@ -1092,8 +1092,11 @@ public class Blocks{
             hasPower = true;
             craftEffect = Fx.none;
             drawer = new DrawMulti(
+            new DrawRegion("-bottom"),
+            new DrawPistons(){{
+                sinMag = 1f;
+            }},
             new DrawDefault(),
-            new DrawFrames(),
             new DrawLiquidRegion(),
             new DrawRegion("-top")
             );
@@ -2298,7 +2301,18 @@ public class Blocks{
             consume(new ConsumeItemFlammable());
             consume(new ConsumeItemExplode());
 
-            drawer = new DrawMulti(new DrawDefault(), new DrawWarmupRegion(), new DrawTurbines());
+            drawer = new DrawMulti(
+            new DrawDefault(),
+            new DrawWarmupRegion(),
+            new DrawRegion("-turbine"){{
+                rotateSpeed = 2f;
+            }},
+            new DrawRegion("-turbine"){{
+                rotateSpeed = -2f;
+                rotation = 45f;
+            }},
+            new DrawRegion("-cap")
+            );
         }};
 
         differentialGenerator = new ConsumeGenerator("differential-generator"){{
