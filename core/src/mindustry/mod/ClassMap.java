@@ -429,7 +429,6 @@ public class ClassMap{
         classes.put("DrawDefault", mindustry.world.draw.DrawDefault.class);
         classes.put("DrawFade", mindustry.world.draw.DrawFade.class);
         classes.put("DrawFlame", mindustry.world.draw.DrawFlame.class);
-        classes.put("DrawFrames", mindustry.world.draw.DrawFrames.class);
         classes.put("DrawGlowRegion", mindustry.world.draw.DrawGlowRegion.class);
         classes.put("DrawHeatInput", mindustry.world.draw.DrawHeatInput.class);
         classes.put("DrawHeatOutput", mindustry.world.draw.DrawHeatOutput.class);
