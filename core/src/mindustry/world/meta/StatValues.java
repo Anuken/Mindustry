@@ -234,7 +234,7 @@ public class StatValues{
                 for(Liquid liquid : content.liquids()){
                     if(!filter.get(liquid)) continue;
 
-                    c.image(liquid.uiIcon).size(3 * 8).padRight(4).right().top();
+                    c.image(liquid.uiIcon).size(3 * 8).scaling(Scaling.fit).padRight(4).right().top();
                     c.add(liquid.localizedName).padRight(10).left().top();
                     c.table(Tex.underline, bt -> {
                         bt.left().defaults().padRight(3).left();
@@ -258,7 +258,7 @@ public class StatValues{
                 for(Liquid liquid : content.liquids()){
                     if(!filter.get(liquid)) continue;
 
-                    c.image(liquid.uiIcon).size(3 * 8).padRight(4).right().top();
+                    c.image(liquid.uiIcon).size(3 * 8).scaling(Scaling.fit).padRight(4).right().top();
                     c.add(liquid.localizedName).padRight(10).left().top();
                     c.table(Tex.underline, bt -> {
                         bt.left().defaults().padRight(3).left();
