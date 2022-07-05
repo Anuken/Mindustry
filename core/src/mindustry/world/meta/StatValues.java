@@ -70,7 +70,7 @@ public class StatValues{
 
     public static StatValue liquids(Boolf<Liquid> filter, float amount, boolean perSecond){
         return table -> {
-            Seq<Liquid> list = content.liquids().select(i -> filter.get(i) && i.unlockedNow());
+            Seq<Liquid> list = content.liquids().select(i -> filter.get(i) && i.unlockedNow() && !i.isHidden());
 
             for(int i = 0; i < list.size; i++){
                 table.add(new LiquidDisplay(list.get(i), amount, perSecond)).padRight(5);
@@ -120,7 +120,7 @@ public class StatValues{
 
     public static StatValue items(float timePeriod, Boolf<Item> filter){
         return table -> {
-            Seq<Item> list = content.items().select(i -> filter.get(i) && i.unlockedNow());
+            Seq<Item> list = content.items().select(i -> filter.get(i) && i.unlockedNow() && !i.isHidden());
 
             for(int i = 0; i < list.size; i++){
                 Item item = list.get(i);
@@ -204,10 +204,10 @@ public class StatValues{
             for(int i = 0; i < list.size; i++){
                 var item = list.get(i);
 
-                if(item instanceof Block block && block.itemDrop != null && !block.itemDrop.unlocked()) continue;
+                if(item instanceof Block block && block.itemDrop != null && !block.itemDrop.unlockedNow()) continue;
 
-                l.image(item.uiIcon).size(iconSmall).padRight(2).padLeft(2).padTop(3).padBottom(3);
-                l.add(item.localizedName).left().padLeft(1).padRight(4);
+                if(item.uiIcon.found()) l.image(item.uiIcon).size(iconSmall).padRight(2).padLeft(2).padTop(3).padBottom(3);
+                l.add(item.localizedName).left().padLeft(1).padRight(4).colspan(item.uiIcon.found() ? 1 : 2);
                 if(i % 5 == 4){
                     l.row();
                 }
@@ -223,6 +223,10 @@ public class StatValues{
         return content(list.as());
     }
 
+    public static StatValue statusEffects(Seq<StatusEffect> list){
+        return content(list.as());
+    }
+
     public static StatValue boosters(float reload, float maxUsed, float multiplier, boolean baseReload, Boolf<Liquid> filter){
         return table -> {
             table.row();
@@ -230,7 +234,7 @@ public class StatValues{
                 for(Liquid liquid : content.liquids()){
                     if(!filter.get(liquid)) continue;
 
-                    c.image(liquid.uiIcon).size(3 * 8).padRight(4).right().top();
+                    c.image(liquid.uiIcon).size(3 * 8).scaling(Scaling.fit).padRight(4).right().top();
                     c.add(liquid.localizedName).padRight(10).left().top();
                     c.table(Tex.underline, bt -> {
                         bt.left().defaults().padRight(3).left();
@@ -254,7 +258,7 @@ public class StatValues{
                 for(Liquid liquid : content.liquids()){
                     if(!filter.get(liquid)) continue;
 
-                    c.image(liquid.uiIcon).size(3 * 8).padRight(4).right().top();
+                    c.image(liquid.uiIcon).size(3 * 8).scaling(Scaling.fit).padRight(4).right().top();
                     c.add(liquid.localizedName).padRight(10).left().top();
                     c.table(Tex.underline, bt -> {
                         bt.left().defaults().padRight(3).left();
@@ -311,8 +315,13 @@ public class StatValues{
 
                 BulletType type = map.get(t);
 
+                if(type.spawnUnit != null && type.spawnUnit.weapons.size > 0){
+                    ammo(ObjectMap.of(t, type.spawnUnit.weapons.first().bullet), indent).display(table);
+                    return;
+                }
+
                 //no point in displaying unit icon twice
-                if(!compact && !(t instanceof PowerTurret)){
+                if(!compact && !(t instanceof Turret)){
                     table.image(icon(t)).size(3 * 8).padRight(4).right().top();
                     table.add(t.localizedName).padRight(10).left().top();
                 }
@@ -381,7 +390,7 @@ public class StatValues{
                     }
 
                     if(type.status != StatusEffects.none){
-                        sep(bt, (type.status.minfo.mod == null ? type.status.emoji() : "") + "[stat]" + type.status.localizedName);
+                        sep(bt, (type.status.minfo.mod == null ? type.status.emoji() : "") + "[stat]" + type.status.localizedName + "[lightgray] ~ [stat]" + ((int)(type.statusDuration / 60f)) + "[lightgray] " + Core.bundle.get("unit.seconds"));
                     }
 
                     if(type.fragBullet != null){

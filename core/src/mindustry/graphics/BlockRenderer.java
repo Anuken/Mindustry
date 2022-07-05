@@ -110,6 +110,8 @@ public class BlockRenderer{
         });
 
         Events.on(TilePreChangeEvent.class, event -> {
+            if(blockTree == null || floorTree == null) return;
+
             if(indexBlock(event.tile)) blockTree.remove(event.tile);
             if(indexFloor(event.tile)) floorTree.remove(event.tile);
         });

@@ -522,7 +522,7 @@ public class SectorDamage{
                                 other.build.addPlan(false);
                                 other.remove();
                             }else{
-                                indexer.notifyBuildDamaged(other.build);
+                                indexer.notifyHealthChanged(other.build);
                             }
 
                         }else if(other.solid() && !other.synthetic()){ //skip damage propagation through solid blocks

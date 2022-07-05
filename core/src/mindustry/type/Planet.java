@@ -278,8 +278,10 @@ public class Planet extends UnlockableContent{
     public void load(){
         super.load();
 
-        mesh = meshLoader.get();
-        cloudMesh = cloudMeshLoader.get();
+        if(!headless){
+            mesh = meshLoader.get();
+            cloudMesh = cloudMeshLoader.get();
+        }
     }
 
     @Override

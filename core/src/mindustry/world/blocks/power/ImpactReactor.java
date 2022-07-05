@@ -1,6 +1,7 @@
 package mindustry.world.blocks.power;
 
 import arc.*;
+import arc.audio.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -27,6 +28,7 @@ public class ImpactReactor extends PowerGenerator{
     public int explosionRadius = 23;
     public int explosionDamage = 1900;
     public Effect explodeEffect = Fx.impactReactorExplosion;
+    public Sound explodeSound = Sounds.explosionbig;
 
     public Color plasma1 = Color.valueOf("ffd06b"), plasma2 = Color.valueOf("ff361b");
 
@@ -50,7 +52,7 @@ public class ImpactReactor extends PowerGenerator{
     public void setBars(){
         super.setBars();
 
-        addBar("poweroutput", (GeneratorBuild entity) -> new Bar(() ->
+        addBar("power", (GeneratorBuild entity) -> new Bar(() ->
         Core.bundle.format("bar.poweroutput",
         Strings.fixed(Math.max(entity.getPowerProduction() - consPower.usage, 0) * 60 * entity.timeScale(), 1)),
         () -> Pal.powerBar,
@@ -76,7 +78,7 @@ public class ImpactReactor extends PowerGenerator{
 
         @Override
         public void updateTile(){
-            if(efficiency > 0 && power.status >= 0.99f){
+            if(efficiency >= 0.9999f && power.status >= 0.99f){
                 boolean prevOut = getPowerProduction() <= consPower.requestedPower(this);
 
                 warmup = Mathf.lerpDelta(warmup, 1f, warmupSpeed * timeScale);
@@ -125,10 +127,7 @@ public class ImpactReactor extends PowerGenerator{
             Draw.blend();
 
             Draw.color();
-
             Draw.rect(region, x, y);
-
-            Draw.color();
         }
 
         @Override
@@ -148,12 +147,11 @@ public class ImpactReactor extends PowerGenerator{
 
             if(warmup < 0.3f || !state.rules.reactorExplosions) return;
 
-            Sounds.explosionbig.at(this);
-
             Damage.damage(x, y, explosionRadius * tilesize, explosionDamage * 4);
 
             Effect.shake(6f, 16f, x, y);
-            explodeEffect.at(x, y);
+            explodeEffect.at(this);
+            explodeSound.at(this);
         }
 
         @Override
