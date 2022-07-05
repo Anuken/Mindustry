@@ -4436,7 +4436,7 @@ public class Blocks{
                 frontColor = Color.white;
                 trailWidth = 2.8f;
                 trailLength = 9;
-                hitEffect = despawnEffect = Fx.hitBulletBig;
+                hitEffect = despawnEffect = Fx.hitBulletColor;
                 buildingDamageMultiplier = 0.3f;
 
                 //TODO
