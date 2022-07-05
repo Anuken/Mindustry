@@ -164,6 +164,8 @@ public class UnitType extends UnlockableContent{
     killable = true,
     /** if false, this unit is not targeted by anything. */
     targetable = true,
+    /** If false, {@link DefenderAI} ignores this unit. */
+    defendable = true,
     /** if true, this unit can be hit/targeted when it has payloads (assuming hittable/targetable is false) */
     vulnerableWithPayloads = false,
     /** if true, this payload unit can pick up units */
