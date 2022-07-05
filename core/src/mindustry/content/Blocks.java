@@ -4431,9 +4431,12 @@ public class Blocks{
             ammo(
             //this is really lazy
             Items.surgeAlloy, new BasicBulletType(7f, 250){{
-                width = 16f;
+                sprite = "large-orb";
+                width = 17f;
+                height = 21f;
                 hitSize = 7f;
-                height = 20f;
+                hitSize = 8f;
+
                 shootEffect = new MultiEffect(Fx.shootTitan, Fx.colorSparkBig, new WaveEffect(){{
                     colorFrom = colorTo = Pal.accent;
                     lifetime = 12f;
@@ -4450,8 +4453,18 @@ public class Blocks{
                 frontColor = Color.white;
                 trailWidth = 2.8f;
                 trailLength = 9;
-                hitEffect = despawnEffect = Fx.hitBulletColor;
+                hitEffect = Fx.hitBulletColor;
                 buildingDamageMultiplier = 0.3f;
+
+                despawnEffect = new MultiEffect(Fx.hitBulletColor, new WaveEffect(){{
+                    sizeTo = 30f;
+                    colorFrom = colorTo = Pal.accent;
+                    lifetime = 12f;
+                }});
+
+                trailRotation = true;
+                trailEffect = Fx.disperseTrail;
+                trailInterval = 3f;
 
                 //TODO
                 intervalBullet = new LightningBulletType(){{
@@ -4481,11 +4494,13 @@ public class Blocks{
             }}
             );
 
-            shoot = new ShootAlternate(){{
-                spread = 3.3f;
-                barrels = 9;
-                shots = 9;
-            }};
+            shoot = new ShootMulti(new ShootAlternate(){{
+                spread = 3.3f * 1.9f;
+                shots = barrels = 5;
+            }}, new ShootHelix(){{
+                scl = 4f;
+                mag = 3f;
+            }});
 
             minWarmup = 0.99f;
             coolantMultiplier = 6f;
@@ -4678,7 +4693,7 @@ public class Blocks{
             limitRange();
         }};
 
-        //TODO 2 more turrets.
+        //TODO 1 more turret
 
         //endregion
         //region units
