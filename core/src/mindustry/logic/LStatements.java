@@ -1471,7 +1471,10 @@ public class LStatements{
                 case shake -> {
                     table.add(" intensity ");
                     fields(table, p1, str -> p1 = str);
-                    table.add(" duration ");
+                    
+                    row(table);
+                    
+                    table.add(" duration (seconds) ");
                     fields(table, p2, str -> p2 = str);
                 }
             }

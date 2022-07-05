@@ -1169,8 +1169,8 @@ public class LExecutor{
                     control.input.logicCutsceneZoom = Mathf.clamp(exec.numf(p1));
                 }
                 case shake -> {
-                    control.input.logicCutscene = true; // should be enabled?
-                    renderer.shake(exec.numf(p1), exec.numf(p2));
+                    // control.input.logicCutscene = true;
+                    renderer.shake(exec.numf(p1), exec.numf(p2) * 60f);
                 }
                 case stop -> {
                     control.input.logicCutscene = false;
