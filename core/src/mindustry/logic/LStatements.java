@@ -1449,7 +1449,7 @@ public class LStatements{
                 b.clicked(() -> showSelect(b, CutsceneAction.all, action, o -> {
                     action = o;
                     rebuild(table);
-                }));
+                }, 2, cell -> cell.size(110, 50)));
             }, Styles.logict, () -> {}).size(90f, 40f).padLeft(2).color(table.color);
 
             switch(action){
