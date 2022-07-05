@@ -4490,6 +4490,9 @@ public class Blocks{
             minWarmup = 0.99f;
             coolantMultiplier = 6f;
 
+            var haloProgress = PartProgress.warmup.delay(0.5f);
+            float haloY = -15f, haloRotSpeed = 1f;
+
             shake = 2f;
             ammoPerShot = 2;
             drawer = new DrawTurret("reinforced-"){{
@@ -4523,16 +4526,103 @@ public class Blocks{
                     moveX = 5.5f;
                 }},
                 new ShapePart(){{
-                    progress = PartProgress.warmup.delay(0.5f);
+                    progress = PartProgress.warmup.delay(0.2f);
                     color = Pal.accent;
-                    sides = 6;
+                    circle = true;
                     hollow = true;
                     stroke = 0f;
-                    strokeTo = 3f;
+                    strokeTo = 2f;
                     radius = 10f;
                     layer = Layer.effect;
-                    y = -15f;
-                    rotateSpeed = 2f;
+                    y = haloY;
+                    rotateSpeed = haloRotSpeed;
+                }},
+                new ShapePart(){{
+                    progress = PartProgress.warmup.delay(0.2f);
+                    color = Pal.accent;
+                    circle = true;
+                    hollow = true;
+                    stroke = 0f;
+                    strokeTo = 1.6f;
+                    radius = 4f;
+                    layer = Layer.effect;
+                    y = haloY;
+                    rotateSpeed = haloRotSpeed;
+                }},
+                new HaloPart(){{
+                    progress = haloProgress;
+                    color = Pal.accent;
+                    layer = Layer.effect;
+                    y = haloY;
+
+                    haloRotation = 90f;
+                    shapes = 2;
+                    triLength = 0f;
+                    triLengthTo = 20f;
+                    haloRadius = 16f;
+                    tri = true;
+                    radius = 4f;
+                }},
+                new HaloPart(){{
+                    progress = haloProgress;
+                    color = Pal.accent;
+                    layer = Layer.effect;
+                    y = haloY;
+
+                    haloRotation = 90f;
+                    shapes = 2;
+                    triLength = 0f;
+                    triLengthTo = 5f;
+                    haloRadius = 16f;
+                    tri = true;
+                    radius = 4f;
+                    shapeRotation = 180f;
+                }},
+                new HaloPart(){{
+                    progress = haloProgress;
+                    color = Pal.accent;
+                    layer = Layer.effect;
+                    y = haloY;
+                    haloRotateSpeed = -haloRotSpeed;
+
+                    shapes = 4;
+                    triLength = 0f;
+                    triLengthTo = 5f;
+                    haloRotation = 45f;
+                    haloRadius = 16f;
+                    tri = true;
+                    radius = 8f;
+                }},
+                new HaloPart(){{
+                    progress = haloProgress;
+                    color = Pal.accent;
+                    layer = Layer.effect;
+                    y = haloY;
+                    haloRotateSpeed = -haloRotSpeed;
+
+                    shapes = 4;
+                    shapeRotation = 180f;
+                    triLength = 0f;
+                    triLengthTo = 2f;
+                    haloRotation = 45f;
+                    haloRadius = 16f;
+                    tri = true;
+                    radius = 8f;
+                }},
+                new HaloPart(){{
+                    progress = haloProgress;
+                    color = Pal.accent;
+                    layer = Layer.effect;
+                    y = haloY;
+                    haloRotateSpeed = haloRotSpeed;
+
+                    shapes = 4;
+                    triLength = 0f;
+                    triLengthTo = 3f;
+                    haloRotation = 45f;
+                    haloRadius = 10f;
+                    tri = true;
+                    radius = 6f;
                 }}
                 );
 

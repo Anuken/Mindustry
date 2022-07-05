@@ -4,13 +4,18 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
+import mindustry.graphics.*;
 
-public class ShapePart extends DrawPart{
-    public boolean circle = false, hollow = false;
+public class HaloPart extends DrawPart{
+    public boolean hollow = false, tri = false;
+    public int shapes = 3;
     public int sides = 3;
     public float radius = 3f, radiusTo = -1f, stroke = 1f, strokeTo = -1f;
-    public float x, y, rotation;
-    public float moveX, moveY, moveRot;
+    public float triLength = 1f, triLengthTo = -1f;
+    public float haloRadius = 10f, haloRadiusTo = -1f;
+    public float x, y, shapeRotation;
+    public float moveX, moveY, shapeMoveRot;
+    public float haloRotateSpeed = 0f, haloRotation = 0f;
     public float rotateSpeed = 0f;
     public Color color = Color.white;
     public @Nullable Color colorTo;
@@ -26,10 +31,13 @@ public class ShapePart extends DrawPart{
 
         Draw.z(Draw.z() + layerOffset);
 
-        float prog = progress.getClamp(params),
+        float
+        prog = progress.getClamp(params),
         baseRot = Time.time * rotateSpeed,
         rad = radiusTo < 0 ? radius : Mathf.lerp(radius, radiusTo, prog),
-        str = strokeTo < 0 ? stroke : Mathf.lerp(stroke, strokeTo, prog);
+        triLen = triLengthTo < 0 ? triLength : Mathf.lerp(triLength, triLengthTo, prog),
+        str = strokeTo < 0 ? stroke : Mathf.lerp(stroke, strokeTo, prog),
+        haloRad = haloRadiusTo < 0 ? haloRadius : Mathf.lerp(haloRadius, haloRadiusTo, prog);
 
         int len = mirror && params.sideOverride == -1 ? 2 : 1;
 
@@ -49,22 +57,25 @@ public class ShapePart extends DrawPart{
             }else if(color != null){
                 Draw.color(color);
             }
-            
-            if(!hollow){
-                if(!circle){
-                    Fill.poly(rx, ry, sides, rad, moveRot * prog * sign + params.rotation - 90 * sign + rotation * sign + baseRot * sign);
+
+            float haloRot = (haloRotation + haloRotateSpeed * Time.time) * sign;
+
+            for(int v = 0; v < shapes; v++){
+                float rot = haloRot + v * 360f / shapes + params.rotation;
+                float shapeX = Angles.trnsx(rot, haloRad) + rx, shapeY = Angles.trnsy(rot, haloRad) + ry;
+                float pointRot = rot + shapeMoveRot * prog * sign + shapeRotation * sign + baseRot * sign;
+
+                if(tri){
+                    Drawf.tri(shapeX, shapeY, rad, triLen, pointRot);
+                }else if(!hollow){
+                    Fill.poly(shapeX, shapeY, sides, rad, pointRot);
                 }else{
-                    Fill.circle(rx, ry, rad);
+                    Lines.stroke(str);
+                    Lines.poly(shapeX, shapeY, sides, rad, pointRot);
+                    Lines.stroke(1f);
                 }
-            }else{
-                Lines.stroke(str);
-                if(!circle){
-                    Lines.poly(rx, ry, sides, rad, moveRot * prog * sign + params.rotation - 90 * sign + rotation * sign + baseRot * sign);
-                }else{
-                    Lines.circle(rx, ry, rad);
-                }
-                Lines.stroke(1f);
             }
+
             if(color != null) Draw.color();
         }
 
