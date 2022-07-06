@@ -45,8 +45,10 @@ public class Weapon implements Cloneable{
     public float baseRotation = 0f;
     /** whether to draw the outline on top. */
     public boolean top = true;
-    /** whether to hold the bullet in place while firing */
+    /** whether to hold the bullet in place while firing; it will still require reload. */
     public boolean continuous;
+    /** whether this weapon uses continuous fire without reloading; implies continuous = true */
+    public boolean alwaysContinuous;
     /** whether this weapon can be aimed manually by players */
     public boolean controllable = true;
     /** whether to automatically target relevant units in update(); only works when controllable = false. */
@@ -149,7 +151,7 @@ public class Weapon implements Cloneable{
             t.row();
             t.add("[lightgray]" + Stat.inaccuracy.localized() + ": [white]" + (int)inaccuracy + " " + StatUnit.degrees.localized());
         }
-        if(reload > 0){
+        if(!alwaysContinuous && reload > 0){
             t.row();
             t.add("[lightgray]" + Stat.reload.localized() + ": " + (mirror ? "2x " : "") + "[white]" + Strings.autoFixed(60f / reload * shoot.shots, 2) + " " + StatUnit.perSecond.localized());
         }
@@ -328,10 +330,11 @@ public class Weapon implements Cloneable{
                     mount.sound.update(bulletX, bulletY, true);
                 }
 
-                //TODO: how do continuous flame bullets work here? a new system is needed
-                if(mount.bullet.type.optimalLifeFract > 0){
-                //    mount.bullet.time = mount.bullet.lifetime * mount.bullet.type.optimalLifeFract * mount.warmup;
-                //    mount.bullet.keepAlive = true;
+                if(alwaysContinuous && mount.shoot){
+                    mount.bullet.time = mount.bullet.lifetime * mount.bullet.type.optimalLifeFract * mount.warmup;
+                    mount.bullet.keepAlive = true;
+
+                    unit.apply(shootStatus, shootStatusDuration);
                 }
             }
         }else{
@@ -357,7 +360,7 @@ public class Weapon implements Cloneable{
         (!alternate || wasFlipped == flipSprite) &&
         mount.warmup >= minWarmup && //must be warmed up
         unit.vel.len() >= minShootVelocity && //check velocity requirements
-        mount.reload <= 0.0001f && //reload has to be 0
+        (mount.reload <= 0.0001f || (alwaysContinuous && mount.bullet == null)) && //reload has to be 0, or it has to be an always-continuous weapon
         Angles.within(rotate ? mount.rotation : unit.rotation + baseRotation, mount.targetRotation, shootCone) //has to be within the cone
         ){
             shoot(unit, mount, bulletX, bulletY, shootAngle);
@@ -458,7 +461,9 @@ public class Weapon implements Cloneable{
 
     @CallSuper
     public void init(){
-
+        if(alwaysContinuous){
+            continuous = true;
+        }
     }
 
     public void load(){

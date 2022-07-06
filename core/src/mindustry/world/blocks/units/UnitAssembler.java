@@ -228,6 +228,7 @@ public class UnitAssembler extends PayloadBlock{
         public float progress, warmup, droneWarmup, powerWarmup, sameTypeWarmup;
         public float invalidWarmup = 0f;
         public int currentTier = 0;
+        public int lastTier = -2;
         public boolean wasOccupied = false;
 
         public float droneProgress, totalDroneProgress;
@@ -275,6 +276,7 @@ public class UnitAssembler extends PayloadBlock{
                     break;
                 }
             }
+
             currentTier = max;
         }
 
@@ -335,6 +337,15 @@ public class UnitAssembler extends PayloadBlock{
                     }
                 });
                 readUnits.clear();
+            }
+
+            if(lastTier != currentTier){
+                if(lastTier >= 0f){
+                    progress = 0f;
+                }
+
+                lastTier =
+                    lastTier == -2 ? -1 : currentTier;
             }
 
             //read newly synced drones on client end

@@ -234,7 +234,7 @@ public class StatValues{
                 for(Liquid liquid : content.liquids()){
                     if(!filter.get(liquid)) continue;
 
-                    c.image(liquid.uiIcon).size(3 * 8).padRight(4).right().top();
+                    c.image(liquid.uiIcon).size(3 * 8).scaling(Scaling.fit).padRight(4).right().top();
                     c.add(liquid.localizedName).padRight(10).left().top();
                     c.table(Tex.underline, bt -> {
                         bt.left().defaults().padRight(3).left();
@@ -258,7 +258,7 @@ public class StatValues{
                 for(Liquid liquid : content.liquids()){
                     if(!filter.get(liquid)) continue;
 
-                    c.image(liquid.uiIcon).size(3 * 8).padRight(4).right().top();
+                    c.image(liquid.uiIcon).size(3 * 8).scaling(Scaling.fit).padRight(4).right().top();
                     c.add(liquid.localizedName).padRight(10).left().top();
                     c.table(Tex.underline, bt -> {
                         bt.left().defaults().padRight(3).left();
@@ -315,8 +315,13 @@ public class StatValues{
 
                 BulletType type = map.get(t);
 
+                if(type.spawnUnit != null && type.spawnUnit.weapons.size > 0){
+                    ammo(ObjectMap.of(t, type.spawnUnit.weapons.first().bullet), indent).display(table);
+                    return;
+                }
+
                 //no point in displaying unit icon twice
-                if(!compact && !(t instanceof PowerTurret)){
+                if(!compact && !(t instanceof Turret)){
                     table.image(icon(t)).size(3 * 8).padRight(4).right().top();
                     table.add(t.localizedName).padRight(10).left().top();
                 }
@@ -385,7 +390,7 @@ public class StatValues{
                     }
 
                     if(type.status != StatusEffects.none){
-                        sep(bt, (type.status.minfo.mod == null ? type.status.emoji() : "") + "[stat]" + type.status.localizedName);
+                        sep(bt, (type.status.minfo.mod == null ? type.status.emoji() : "") + "[stat]" + type.status.localizedName + "[lightgray] ~ [stat]" + ((int)(type.statusDuration / 60f)) + "[lightgray] " + Core.bundle.get("unit.seconds"));
                     }
 
                     if(type.fragBullet != null){
