@@ -56,7 +56,7 @@ public class ShapePart extends DrawPart{
                 }else{
                     Fill.circle(rx, ry, rad);
                 }
-            }else{
+            }else if(str > 0.0001f){
                 Lines.stroke(str);
                 if(!circle){
                     Lines.poly(rx, ry, sides, rad, moveRot * prog * sign + params.rotation - 90 * sign + rotation * sign + baseRot * sign);
