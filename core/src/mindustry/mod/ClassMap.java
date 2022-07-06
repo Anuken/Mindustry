@@ -1,6 +1,8 @@
 package mindustry.mod;
 
 import arc.struct.*;
+import mindustry.world.blocks.distribution.OverflowDuct.*;
+
 /** Generated class. Maps simple class names to concrete classes. For use in JSON mods. */
 @SuppressWarnings("deprecation")
 public class ClassMap{
@@ -226,7 +228,7 @@ public class ClassMap{
         classes.put("DriverState", mindustry.world.blocks.distribution.MassDriver.DriverState.class);
         classes.put("MassDriverBuild", mindustry.world.blocks.distribution.MassDriver.MassDriverBuild.class);
         classes.put("OverflowDuct", mindustry.world.blocks.distribution.OverflowDuct.class);
-        classes.put("DuctRouterBuild", mindustry.world.blocks.distribution.OverflowDuct.DuctRouterBuild.class);
+        classes.put("DuctRouterBuild", OverflowDuctBuild.class);
         classes.put("OverflowGate", mindustry.world.blocks.distribution.OverflowGate.class);
         classes.put("OverflowGateBuild", mindustry.world.blocks.distribution.OverflowGate.OverflowGateBuild.class);
         classes.put("Router", mindustry.world.blocks.distribution.Router.class);
@@ -447,7 +449,6 @@ public class ClassMap{
         classes.put("DrawShape", mindustry.world.draw.DrawShape.class);
         classes.put("DrawSideRegion", mindustry.world.draw.DrawSideRegion.class);
         classes.put("DrawSpikes", mindustry.world.draw.DrawSpikes.class);
-        classes.put("DrawTurbines", mindustry.world.draw.DrawTurbines.class);
         classes.put("DrawTurret", mindustry.world.draw.DrawTurret.class);
         classes.put("DrawWarmupRegion", mindustry.world.draw.DrawWarmupRegion.class);
         classes.put("DrawWeave", mindustry.world.draw.DrawWeave.class);
