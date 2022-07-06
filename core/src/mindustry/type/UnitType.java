@@ -73,6 +73,8 @@ public class UnitType extends UnlockableContent{
     riseSpeed = 0.08f,
     /** how fast this unit falls when not boosting */
     fallSpeed = 0.018f,
+    /** how many ticks it takes this missile to accelerate to full speed */
+    missileAccelTime = 0f,
     /** raw health amount */
     health = 200f,
     /** incoming damage is reduced by this amount */

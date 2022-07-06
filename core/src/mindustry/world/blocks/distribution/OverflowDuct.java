@@ -13,6 +13,7 @@ import mindustry.world.meta.*;
 
 public class OverflowDuct extends Block{
     public float speed = 5f;
+    public boolean invert = false;
 
     public @Load(value = "@-top") TextureRegion topRegion;
 
@@ -57,7 +58,7 @@ public class OverflowDuct extends Block{
         return false;
     }
 
-    public class DuctRouterBuild extends Building{
+    public class OverflowDuctBuild extends Building{
         public float progress;
         public @Nullable Item current;
 
@@ -95,10 +96,26 @@ public class OverflowDuct extends Block{
         public Building target(){
             if(current == null) return null;
 
+            if(invert){ //Lots of extra code. Make separate UnderflowDuct class?
+                Building l = left(), r = right();
+                boolean lc = l != null && l.team == team && l.acceptItem(this, current),
+                    rc = r != null && r.team == team && r.acceptItem(this, current);
+
+                if(lc && !rc){
+                    return l;
+                }else if(rc && !lc){
+                    return r;
+                }else if(lc && rc){
+                    return cdump == 0 ? l : r;
+                }
+            }
+
             Building front = front();
             if(front != null && front.team == team && front.acceptItem(this, current)){
                 return front;
             }
+
+            if(invert) return null;
 
             for(int i = -1; i <= 1; i++){
                 int dir = Mathf.mod(rotation + (((i + cdump + 1) % 3) - 1), 4);
@@ -108,6 +125,7 @@ public class OverflowDuct extends Block{
                     return other;
                 }
             }
+
             return null;
         }
 

@@ -436,9 +436,61 @@ public class Fx{
                     float rad = fout * ((2f + intensity) * 2.35f);
 
                     Fill.circle(e.x + x, e.y + y, rad);
-                    Drawf.light(e.x + x, e.y + y, rad * 2.5f, Pal.berylShot, 0.5f);
+                    Drawf.light(e.x + x, e.y + y, rad * 2.5f, b.color, 0.5f);
                 });
             });
+        }
+    }),
+
+    missileTrailSmoke = new Effect(180f, 300f, b -> {
+        float intensity = 2f;
+
+        color(b.color, 0.7f);
+        for(int i = 0; i < 4; i++){
+            rand.setSeed(b.id*2 + i);
+            float lenScl = rand.random(0.5f, 1f);
+            int fi = i;
+            b.scaled(b.lifetime * lenScl, e -> {
+                randLenVectors(e.id + fi - 1, e.fin(Interp.pow10Out), (int)(2.9f * intensity), 13f * intensity, (x, y, in, out) -> {
+                    float fout = e.fout(Interp.pow5Out) * rand.random(0.5f, 1f);
+                    float rad = fout * ((2f + intensity) * 2.35f);
+
+                    Fill.circle(e.x + x, e.y + y, rad);
+                    Drawf.light(e.x + x, e.y + y, rad * 2.5f, b.color, 0.5f);
+                });
+            });
+        }
+    }).layer(Layer.bullet - 1f),
+
+    scatheExplosion = new Effect(60f, 160f, e -> {
+        color(e.color);
+        stroke(e.fout() * 5f);
+        float circleRad = 6f + e.finpow() * 60f;
+        Lines.circle(e.x, e.y, circleRad);
+
+        rand.setSeed(e.id);
+        for(int i = 0; i < 16; i++){
+            float angle = rand.random(360f);
+            float lenRand = rand.random(0.5f, 1f);
+            Tmp.v1.trns(angle, circleRad);
+
+            for(int s : Mathf.signs){
+                Drawf.tri(e.x + Tmp.v1.x, e.y + Tmp.v1.y, e.foutpow() * 40f, e.fout() * 30f * lenRand + 6f, angle + 90f + s * 90f);
+            }
+        }
+    }),
+
+    scatheLight = new Effect(60f, 160f, e -> {
+        float circleRad = 6f + e.finpow() * 60f;
+
+        color(e.color, e.foutpow());
+        Fill.circle(e.x, e.y, circleRad);
+    }).layer(Layer.bullet + 2f),
+
+    scatheSlash = new Effect(40f, 160f, e -> {
+        Draw.color(e.color);
+        for(int s : Mathf.signs){
+            Drawf.tri(e.x, e.y, e.fout() * 25f, e.foutpow() * 66f + 6f, e.rotation + s * 90f);
         }
     }),
 
@@ -1555,6 +1607,31 @@ public class Fx{
             e.scaled(e.lifetime * rand.random(0.3f, 1f), b -> {
                 color(e.color, Pal.lightishGray, b.fin());
                 Fill.circle(e.x + v.x, e.y + v.y, b.fout() * 3.4f + 0.3f);
+            });
+        }
+    }),
+
+    shootSmokeRavage = new Effect(70f, e -> {
+        rand.setSeed(e.id);
+        for(int i = 0; i < 13; i++){
+            float a = e.rotation + rand.range(30f);
+            v.trns(a, rand.random(e.finpow() * 50f));
+            e.scaled(e.lifetime * rand.random(0.3f, 1f), b -> {
+                color(e.color);
+                Lines.stroke(b.fout() * 3f + 0.5f);
+                Lines.lineAngle(e.x + v.x, e.y + v.y, a, b.fout() * 8f + 0.4f);
+            });
+        }
+    }),
+
+    shootSmokeMissile = new Effect(130f, 300f, e -> {
+        color(Pal.redLight);
+        alpha(0.5f);
+        rand.setSeed(e.id);
+        for(int i = 0; i < 35; i++){
+            v.trns(e.rotation + 180f + rand.range(21f), rand.random(e.finpow() * 90f)).add(rand.range(3f), rand.range(3f));
+            e.scaled(e.lifetime * rand.random(0.2f, 1f), b -> {
+                Fill.circle(e.x + v.x, e.y + v.y, b.fout() * 9f + 0.3f);
             });
         }
     }),

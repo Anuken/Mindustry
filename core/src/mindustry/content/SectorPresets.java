@@ -192,7 +192,7 @@ public class SectorPresets{
                     ),
                     new DestroyBlockObjective(Blocks.largeShieldProjector, 210, 278, Team.malis).withMarkers(
                         new TextMarker("The enemy is protected by shields.\nAn experimental shield breaker module has been detected in this sector.\nFind and activate it using tungsten.", 276f * 8f, 164f * 8f),
-                        new MinimapMarker(23f, 137f, Pal.accent)
+                        new MinimapMarker(23, 137, Pal.accent)
                     )
                 );
             };
