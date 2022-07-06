@@ -321,7 +321,7 @@ public class StatValues{
                 }
 
                 //no point in displaying unit icon twice
-                if(!compact && !(t instanceof PowerTurret)){
+                if(!compact && !(t instanceof Turret)){
                     table.image(icon(t)).size(3 * 8).padRight(4).right().top();
                     table.add(t.localizedName).padRight(10).left().top();
                 }
