@@ -1,45 +1,130 @@
 package mindustry.editor;
 
-import arc.*;
+import arc.func.*;
 import arc.graphics.*;
-import arc.graphics.g2d.*;
-import arc.input.*;
-import arc.math.*;
-import arc.math.geom.*;
-import arc.scene.*;
 import arc.scene.event.*;
 import arc.scene.ui.*;
-import arc.scene.ui.ImageButton.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.editor.MapObjectivesDialog.ObjectiveContainer.ObjectiveTilemap.ObjectiveTile.*;
+import mindustry.content.*;
+import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.game.MapObjectives.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
+import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
+import mindustry.world.*;
 
+import java.lang.annotation.*;
+import java.lang.reflect.*;
+
+import static mindustry.Vars.*;
+import static mindustry.editor.MapObjectivesCanvas.*;
+
+@SuppressWarnings("unchecked")
 public class MapObjectivesDialog extends BaseDialog{
-    private static final int
-    objWidth = 6, objHeight = 3,
-    bounds = 100;
+    public MapObjectivesCanvas canvas;
+    protected Cons<Seq<MapObjective>> out = arr -> {};
 
-    private static final float unitSize = 48f;
+    /** Defines default value providers. */
+    private static final ObjectMap<Class<?>, FieldProvider<?>> providers = new ObjectMap<>();
+    /** Maps annotation type with its field parsers. Non-annotated fields are mapped with {@link Override}. */
+    private static final ObjectMap<Class<? extends Annotation>, ObjectMap<Class<?>, FieldInterpreter<?>>> interpreters = new ObjectMap<>();
 
-    public ObjectiveContainer container;
+    static{
+        // Default un-annotated field interpreters.
+        setProvider(String.class, (type, cons) -> cons.get(""));
+        setInterpreter(String.class, (cont, name, type, get, set) -> {
+            cont.add(name + ": ");
+            cont.area(get.get(), set).height(60f);
+        });
 
-    public MapObjectivesDialog(){
-        super("@editor.objectives");
-        cont.add(container = new ObjectiveContainer()).pad(12f).grow();
+        setProvider(byte.class, (type, cons) -> cons.get((byte)0));
 
-        buttons.defaults().size(170f, 64f).pad(2f);
-        buttons.button("@back", Icon.left, this::hide);
+        setProvider(boolean.class, (type, cons) -> cons.get(false));
+        setInterpreter(boolean.class, (cont, name, type, get, set) -> {
+            cont.add(name + ": ");
+            cont.check("", get.get(), set::get);
+        });
 
-        buttons.button("@add", Icon.add, () -> {
-            var selection = new BaseDialog("@add");
-            selection.cont.pane(p -> {
+        setProvider(int.class, (type, cons) -> cons.get(0));
+        setInterpreter(int.class, (cont, name, type, get, set) -> {
+            cont.add(name + ": ");
+            cont.field(Integer.toString(get.get()), str -> set.get(Strings.parseInt(str))).valid(Strings::canParseInt);
+        });
+
+        setProvider(float.class, (type, cons) -> cons.get(0f));
+        setInterpreter(float.class, (cont, name, type, get, set) -> {
+            cont.add(name + ": ");
+            cont.field(Float.toString(get.get()), str -> set.get(Strings.parseFloat(str))).valid(Strings::canParseFloat);
+        });
+
+        setProvider(UnlockableContent.class, (type, cons) -> cons.get(Blocks.coreShard));
+        setInterpreter(UnlockableContent.class, (cont, name, type, get, set) -> {
+            cont.add(name + ": ");
+            cont.button(
+                b -> b.image().size(iconSmall).update(i -> i.setDrawable(get.get().uiIcon)),
+                () -> showContentSelect(null, set, b -> b.techNode != null)
+            ).pad(4);
+        });
+
+        setProvider(Block.class, (type, cons) -> cons.get(Blocks.copperWall));
+        setInterpreter(Block.class, (cont, name, type, get, set) -> {
+            cont.add(name + ": ");
+            cont.button(
+                b -> b.image().size(iconSmall).update(i -> i.setDrawable(get.get().uiIcon)),
+                () -> showContentSelect(ContentType.block, set, Block::synthetic)
+            ).pad(4f);
+        });
+
+        setProvider(Item.class, (type, cons) -> cons.get(Items.copper));
+        setInterpreter(Item.class, (cont, name, type, get, set) -> {
+            cont.add(name + ": ");
+            cont.button(
+                b -> b.image().size(iconSmall).update(i -> i.setDrawable(get.get().uiIcon)),
+                () -> showContentSelect(ContentType.item, set, item -> true)
+            ).pad(4f);
+        });
+
+        setProvider(UnitType.class, (type, cons) -> cons.get(UnitTypes.dagger));
+        setInterpreter(UnitType.class, (cont, name, type, get, set) -> {
+            cont.add(name + ": ");
+            cont.button(
+                b -> b.image().size(iconSmall).update(i -> i.setDrawable(get.get().uiIcon)),
+                () -> showContentSelect(ContentType.unit, set, unit -> true)
+            ).pad(4f);
+        });
+
+        setProvider(Team.class, (type, cons) -> cons.get(Team.sharded));
+        setInterpreter(Team.class, (cont, name, type, get, set) -> {
+            cont.add(name + ": ");
+            cont.button(
+                b -> b.image(Tex.whiteui).size(iconSmall).update(i -> i.setColor(get.get().color)),
+                () -> showTeamSelect(set)
+            ).pad(4f);
+        });
+
+        setProvider(Color.class, (type, cons) -> cons.get(Color.red));
+        setInterpreter(Color.class, (cont, name, type, get, set) -> {
+            var out = get.get();
+
+            cont.add(name + ": ");
+            cont.button(
+                b -> b.stack(new Image(Tex.alphaBg), new Image(Tex.whiteui){{
+                    update(() -> setColor(out));
+                }}).grow(),
+                Styles.squarei,
+                () -> ui.picker.show(out, res -> set.get(out.set(res)))
+            ).margin(4f).pad(4f).size(50f);
+        });
+
+        // Types that have a provider, but delegate to the default interpreter.
+        setProvider(MapObjective.class, (type, cons) -> new BaseDialog("@add"){{
+            cont.pane(p -> {
                 p.background(Tex.button);
                 p.marginRight(14f);
                 p.defaults().size(195f, 56f);
@@ -47,32 +132,188 @@ public class MapObjectivesDialog extends BaseDialog{
                 int i = 0;
                 for(var gen : MapObjectives.allObjectiveTypes){
                     var obj = gen.get();
-
                     p.button(obj.typeName(), Styles.flatt, () -> {
-                        container.query(obj);
-                        selection.hide();
+                        cons.get(obj);
+                        hide();
                     }).with(Table::left).get().getLabelCell().growX().left().padLeft(5f).labelAlign(Align.left);
 
                     if(++i % 3 == 0) p.row();
                 }
             }).scrollX(false);
 
-            selection.addCloseButton();
-            selection.show();
+            addCloseButton();
+            show();
+        }});
+
+        setProvider(ObjectiveMarker.class, (type, cons) -> new BaseDialog("@add"){{
+            cont.pane(p -> {
+                p.background(Tex.button);
+                p.marginRight(14f);
+                p.defaults().size(195f, 56f);
+
+                int i = 0;
+                for(var gen : MapObjectives.allMarkerTypes){
+                    var marker = gen.get();
+                    p.button(marker.typeName(), Styles.flatt, () -> {
+                        cons.get(marker);
+                        hide();
+                    }).with(Table::left).get().getLabelCell().growX().left().padLeft(5f).labelAlign(Align.left);
+
+                    if(++i % 3 == 0) p.row();
+                }
+            }).scrollX(false);
+
+            addCloseButton();
+            show();
+        }});
+
+        // Types that use the default interpreter. It would be nice if all types could use it, but I don't know how to reliably prevent classes like [? extends Content] not to use it.
+        for(var obj : MapObjectives.allObjectiveTypes) setInterpreter(obj.get().getClass(), defaultInterpreter());
+        for(var mark : MapObjectives.allMarkerTypes) setInterpreter(mark.get().getClass(), defaultInterpreter());
+
+        // Annotated field interpreters.
+        setInterpreter(LabelFlag.class, byte.class, (cont, name, type, get, set) -> {
+            cont.add(name + ": ");
+            cont.table(t -> {
+                t.left().defaults().left();
+                byte
+                    value = get.get(),
+                    bg = WorldLabel.flagBackground, out = WorldLabel.flagOutline;
+
+                t.check("@marker.background", (value & bg) == bg, res -> set.get((byte)(res ? value | bg : value & ~bg))).padTop(4f).padBottom(4f);
+
+                t.row();
+                t.check("@marker.outline", (value & out) == out, res -> set.get((byte)(res ? value | out : value & ~out)));
+            });
+        });
+
+        // Special data structure interpreters.
+        // Instantiate default `Seq`s with a reflectively allocated array.
+        setProvider(Seq.class, (type, cons) -> cons.get(new Seq<>(type.element.raw)));
+        setInterpreter(Seq.class, (cont, name, type, get, set) -> cont.table(main -> {
+            Runnable[] rebuild = {null};
+            var arr = get.get();
+
+            main.margin(0f, 10f, 0f, 10f);
+            var header = main.table(Tex.button, t -> {
+                t.left();
+                t.margin(10f);
+
+                t.add(name + ":").color(Pal.accent);
+                t.add().growX();
+                t.button(Icon.add, Styles.emptyi, () -> getProvider(type.element.raw).get(type.element, res -> {
+                    arr.add(res);
+                    rebuild[0].run();
+                })).fill();
+            }).growX().height(46f).pad(-10f).padTop(0f).get();
+
+            main.row().table(Tex.button, t -> rebuild[0] = () -> {
+                t.clear();
+                t.top();
+
+                if(arr.isEmpty()){
+                    t.background(Tex.clear).margin(0f).setSize(0f);
+                }else{
+                    t.background(Tex.button).margin(10f);
+                }
+
+                for(int i = 0, len = arr.size; i < len; i++){
+                    int index = i;
+                    if(index > 0) t.row();
+
+                    t.table(e -> {
+                        e.defaults().pad(0f);
+                        e.table(b -> b.right().table(Tex.buttonEdge2, buttons -> {
+                            buttons.right();
+                            buttons.defaults().size(20f);
+
+                            buttons.button(Icon.trashSmall, Styles.emptyi, () -> {
+                                arr.remove(index);
+                                rebuild[0].run();
+                            });
+
+                            buttons.button(Icon.upOpenSmall, Styles.emptyi, () -> {
+                                arr.swap(index, index - 1);
+                                rebuild[0].run();
+                            }).disabled(a -> index <= 0).padLeft(1f).padRight(1f);
+
+                            buttons.button(Icon.downOpenSmall, Styles.emptyi, () -> {
+                                arr.swap(index, index + 1);
+                                rebuild[0].run();
+                            }).disabled(a -> index >= len - 1);
+                        }).fill()).growX().fillY();
+
+                        e.row().table(Tex.paneSolid, element -> 
+                            getInterpreter((Class<Object>)arr.get(index).getClass()).build(
+                                element, Integer.toString(index), new TypeInfo(arr.get(index).getClass()),
+                                () -> arr.get(index),
+                                res -> arr.set(index, res)
+                            )
+                        ).growX().fillY();
+                    }).growX().fillY().padTop(4f);
+                }
+
+                set.get(arr);
+            }).growX().fillY();
+            rebuild[0].run();
+
+            header.toFront();
+        }).growX().fillY().pad(4f).colspan(2));
+
+        // Reserved for array types that are not explicitly handled. Essentially handles it the same way as `Seq`.
+        setProvider(Object[].class, (type, cons) -> cons.get(Reflect.newArray(type.element.raw, 0)));
+        setInterpreter(Object[].class, (cont, name, type, get, set) -> {
+            var arr = Seq.with(get.get());
+            getInterpreter(Seq.class).build(
+                cont, name, new TypeInfo(Seq.class, type.element),
+                () -> arr,
+                res -> set.get(arr.toArray(type.element.raw))
+            );
         });
     }
 
-    public void show(Seq<MapObjective> objectives){
-        container.clearObjectives();
+    public MapObjectivesDialog(){
+        super("@editor.objectives");
+
+        clear();
+        margin(0f);
+
+        stack(
+            canvas = new MapObjectivesCanvas(),
+            new Table(){{
+                buttons.defaults().size(170f, 64f).pad(2f);
+                buttons.button("@back", Icon.left, MapObjectivesDialog.this::hide);
+                buttons.button("@add", Icon.add, () -> getProvider(MapObjective.class).get(new TypeInfo(MapObjective.class), canvas::query));
+
+                setFillParent(true);
+                margin(3f);
+
+                add(titleTable).growX().fillY();
+                row().add().grow();
+                row().add(buttons).fill();
+                addCloseListener();
+            }}
+        ).grow().pad(0f).margin(0f);
+
+        hidden(() -> {
+            out.get(canvas.objectives);
+            out = arr -> {};
+        });
+    }
+
+    public void show(Seq<MapObjective> objectives, Cons<Seq<MapObjective>> out){
+        this.out = out;
+
+        canvas.clearObjectives();
         if(
             objectives.any() && (
             // If the objectives were previously programmatically made...
             objectives.contains(obj -> obj.editorX == -1 || obj.editorY == -1) ||
             // ... or some idiot somehow made it not work...
-            objectives.contains(obj -> !container.tilemap.createTile(obj))
+            objectives.contains(obj -> !canvas.tilemap.createTile(obj))
         )){
             // ... then rebuild the structure.
-            container.clearObjectives();
+            canvas.clearObjectives();
 
             // This is definitely NOT a good way to do it, but only insane people or people from the distant past would actually encounter this anyway.
             int w = objWidth + 2,
@@ -89,490 +330,245 @@ public class MapObjectivesDialog extends BaseDialog{
             loop:
             for(int y = 0; y < rows; y++){
                 for(int x = 0; x < columns; x++){
-                    container.tilemap.createTile(x * w, bounds - 1 - y * 2, objectives.get(i++));
+                    canvas.tilemap.createTile(x * w, bounds - 1 - y * 2, objectives.get(i++));
                     if(i >= objectives.size) break loop;
                 }
             }
         }
 
-        container.objectives.set(objectives);
+        canvas.objectives.set(objectives);
+        show();
     }
 
-    public static class ObjectiveContainer extends ScrollPane{
-        public Seq<MapObjective> objectives = new Seq<>();
-        public ObjectiveTilemap tilemap;
+    public static void showEditor(MapObjective obj){
+        BaseDialog dialog = new BaseDialog("@editor.objectives");
+        dialog.cont.pane(Styles.noBarPane, list -> list.top().table(t -> {
+            t.margin(0f);
+            getInterpreter((Class<MapObjective>)obj.getClass()).build(
+                t, obj.typeName(), new TypeInfo(obj.getClass()),
+                () -> obj,
+                res -> {}
+            );
+        }).width(400f).fillY()).grow();
 
-        protected boolean querying;
-        protected MapObjective toQuery;
+        dialog.addCloseButton();
+        dialog.show();
+    }
 
-        protected final InputListener canceler;
-        protected final ClickListener creator;
+    public static <T extends UnlockableContent> void showContentSelect(@Nullable ContentType type, Cons<T> cons, Boolf<T> check){
+        BaseDialog dialog = new BaseDialog("");
+        dialog.cont.pane(p -> {
+            int i = 0;
+            for(var content : (type == null ? content.blocks().copy().<UnlockableContent>as()
+                .add(content.items())
+                .add(content.liquids())
+                .add(content.units()) :
+                content.getBy(type).<UnlockableContent>as()
+            )){
+                if(!check.get((T)content)) continue;
+                p.image(content == Blocks.air ? Icon.none.getRegion() : content.uiIcon).size(iconMed).pad(3)
+                    .with(b -> b.addListener(new HandCursorListener()))
+                    .tooltip(content.localizedName).get().clicked(() -> {
+                        cons.get((T)content);
+                        dialog.hide();
+                    });
 
-        public ObjectiveContainer(){
-            super(null, Styles.noBarPane);
-
-            getStyle().background = Styles.black5;
-            setWidget(tilemap = new ObjectiveTilemap());
-            setOverscroll(false, false);
-            setCancelTouchFocus(false);
-
-            addCaptureListener(canceler = new InputListener(){
-                @Override
-                public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
-                    if(querying && button == KeyCode.mouseRight){
-                        stopQuery();
-
-                        event.stop();
-                        return true;
-                    }else{
-                        return false;
-                    }
-                }
-            });
-
-            addCaptureListener(creator = new HandCursorListener(){
-                @Override
-                public void enter(InputEvent event, float x, float y, int pointer, Element fromActor){
-                    if(querying) super.enter(event, x, y, pointer, fromActor);
-                }
-
-                @Override
-                public void exit(InputEvent event, float x, float y, int pointer, Element toActor){
-                    if(querying) super.exit(event, x, y, pointer, toActor);
-                }
-
-                @Override
-                public void touchDragged(InputEvent event, float x, float y, int pointer){
-                    cancel();
-                }
-
-                @Override
-                public void clicked(InputEvent event, float x, float y){
-                    if(!querying || toQuery == null) return;
-
-                    Vec2 pos = localToDescendantCoordinates(tilemap, Tmp.v1.set(x, y));
-                    if(tilemap.createTile(
-                        Mathf.round((pos.x - objWidth * unitSize / 2f) / unitSize),
-                        Mathf.floor((pos.y - unitSize) / unitSize),
-                        toQuery
-                    )){
-                        objectives.add(toQuery);
-                        stopQuery();
-                    }
-                }
-            });
-        }
-
-        public void clearObjectives(){
-            stopQuery();
-            tilemap.clearTiles();
-        }
-
-        protected void stopQuery(){
-            if(!querying) return;
-            querying = false;
-
-            Core.graphics.restoreCursor();
-        }
-
-        public void query(MapObjective obj){
-            stopQuery();
-            querying = true;
-            toQuery = obj;
-        }
-
-        public boolean isQuerying(){
-            return querying;
-        }
-
-        public boolean isVisualPressed(){
-            return creator.isVisualPressed();
-        }
-
-        public class ObjectiveTilemap extends WidgetGroup{
-            protected final GridBits grid = new GridBits(bounds, bounds);
-
-            /** The connector button that is being pressed. */
-            protected @Nullable Connector connecting;
-            /** The current tile that is being moved. */
-            protected @Nullable ObjectiveTile moving;
-            /** True if {@link #connecting} is looking for a parent, false otherwise. */
-            protected boolean findParent;
-
-            public ObjectiveTilemap(){
-                setTransform(false);
-                setSize(getPrefWidth(), getPrefHeight());
-                touchable(() -> isQuerying() ? Touchable.disabled : Touchable.childrenOnly);
+                if(++i % 10 == 0) p.row();
             }
+        });
 
-            @Override
-            public void draw(){
-                validate();
-                int minX = Math.max(Mathf.floor((x - 1f) / unitSize), 0), minY = Math.max(Mathf.floor((y - 1f) / unitSize), 0),
-                    maxX = Math.min(Mathf.ceil((x + width + 1f) / unitSize), bounds), maxY = Math.min(Mathf.ceil((y + height + 1f) / unitSize), bounds);
-                float progX = x % unitSize, progY = y % unitSize;
+        dialog.closeOnBack();
+        dialog.show();
+    }
 
-                Lines.stroke(2f);
-                Draw.color(Pal.gray, parentAlpha);
+    public static void showTeamSelect(Cons<Team> cons){
+        BaseDialog dialog = new BaseDialog("");
+        for(var team : Team.baseTeams){
+            dialog.cont.image(Tex.whiteui).size(iconMed).color(team.color).pad(4)
+                .with(i -> i.addListener(new HandCursorListener()))
+                .tooltip(team.localized()).get().clicked(() -> {
+                    cons.get(team);
+                    dialog.hide();
+                });
+        }
 
-                for(int x = minX; x <= maxX; x++) Lines.line(progX + x * unitSize, minY * unitSize, progX + x * unitSize, maxY * unitSize);
-                for(int y = minY; y <= maxY; y++) Lines.line(minX * unitSize, progY + y * unitSize, maxX * unitSize, progY + y * unitSize);
+        dialog.closeOnBack();
+        dialog.show();
+    }
 
-                if(isQuerying()){
-                    int tx, ty;
-                    Vec2 pos = screenToLocalCoordinates(Core.input.mouse());
-                    pos.x = x + (tx = Mathf.round((pos.x - objWidth * unitSize / 2f) / unitSize)) * unitSize;
-                    pos.y = y + (ty = Mathf.floor((pos.y - unitSize) / unitSize)) * unitSize;
+    public static Class<?> unbox(Class<?> boxed){
+        return switch(boxed.getSimpleName()){
+            case "Boolean" -> boolean.class;
+            case "Byte" -> byte.class;
+            case "Character" -> char.class;
+            case "Short" -> short.class;
+            case "Integer" -> int.class;
+            case "Long" -> long.class;
+            case "Float" -> float.class;
+            case "Double" -> double.class;
+            default -> boxed;
+        };
+    }
 
-                    Lines.stroke(4f);
-                    Draw.color(
-                        isVisualPressed() ? Pal.metalGrayDark : validPlace(tx, ty) ? Pal.accent : Pal.remove,
-                        parentAlpha * (inPlaceBounds(tx, ty) ? 1f : Mathf.absin(6f, 1f))
+    public static <T> FieldInterpreter<T> defaultInterpreter(){
+        return (cont, name, type, get, set) -> cont.table(main -> {
+            main.margin(0f, 10f, 0f, 10f);
+            var header = main.table(Tex.button, t -> {
+                t.left();
+                t.margin(10f);
+
+                t.add(name + ":").color(Pal.accent);
+                t.add().growX();
+            }).growX().height(46f).pad(-10f).padTop(0f).get();
+
+            main.row().table(Tex.button, t -> {
+                t.left();
+                t.top().margin(10f);
+
+                t.defaults().minHeight(40f).left();
+                var obj = get.get();
+
+                int i = 0;
+                for(var entry : JsonIO.json.getFields(type.raw)){
+                    if(i++ > 0) t.row();
+
+                    var f = entry.value.field;
+                    var ft = f.getType();
+                    int mods = f.getModifiers();
+
+                    if(!Modifier.isPublic(mods) || (Modifier.isFinal(mods) && (
+                        String.class.isAssignableFrom(ft) ||
+                        unbox(ft).isPrimitive()
+                    ))) continue;
+
+                    var anno = Structs.find(f.getDeclaredAnnotations(), a -> hasInterpreter(a.annotationType(), ft));
+                    getInterpreter(anno == null ? Override.class : anno.annotationType(), ft).build(
+                        t, f.getName(), new TypeInfo(f),
+                        () -> Reflect.get(obj, f),
+                        Modifier.isFinal(mods) ? res -> {} : res -> Reflect.set(obj, f, res)
                     );
-
-                    Lines.rect(pos.x, pos.y, objWidth * unitSize, objHeight * unitSize);
                 }
+            }).growX().fillY();
 
-                if(moving != null){
-                    int tx, ty;
-                    float x = this.x + (tx = Mathf.round(moving.x / unitSize)) * unitSize;
-                    float y = this.y + (ty = Mathf.round(moving.y / unitSize)) * unitSize;
+            header.toFront();
+        }).growX().fillY().pad(4f).colspan(2);
+    }
 
-                    Draw.color(
-                        validMove(moving, tx, ty) ? Pal.accent : Pal.remove,
-                        0.5f * parentAlpha * (inPlaceBounds(tx, ty) ? 1f : Mathf.absin(6f, 1f))
-                    );
+    public static <T> void setInterpreter(Class<T> type, FieldInterpreter<? super T> interpreter){
+        setInterpreter(Override.class, type, interpreter);
+    }
 
-                    Fill.crect(x, y, objWidth * unitSize, objHeight * unitSize);
-                }
+    public static <T> void setInterpreter(Class<? extends Annotation> anno, Class<T> type, FieldInterpreter<? super T> interpreter){
+        interpreters.get(anno, ObjectMap::new).put(type, interpreter);
+    }
 
-                Draw.reset();
-                super.draw();
+    public static boolean hasInterpreter(Class<?> type){
+        return hasInterpreter(Override.class, type);
+    }
 
-                Draw.reset();
-                Seq<ObjectiveTile> tiles = getChildren().as();
+    public static boolean hasInterpreter(Class<? extends Annotation> anno, Class<?> type){
+        return interpreters.get(anno, ObjectMap::new).containsKey(unbox(type));
+    }
 
-                Connector targetConnect = null;
-                if(connecting != null){
-                    Vec2 pos = screenToLocalCoordinates(Core.input.mouse());
-                    if(hit(pos.x, pos.y, true) instanceof Connector con && connecting.canConnectTo(con)) targetConnect = con;
-                }
+    public static <T> FieldInterpreter<T> getInterpreter(Class<T> type){
+        return getInterpreter(Override.class, type);
+    }
 
-                boolean removing = false;
-                for(var tile : tiles){
-                    for(var parent : tile.obj.parents){
-                        var parentTile = tiles.find(t -> t.obj == parent);
+    public static <T> FieldInterpreter<T> getInterpreter(Class<? extends Annotation> anno, Class<T> type){
+        if(hasInterpreter(anno, type)){
+            return (FieldInterpreter<T>)interpreters.get(anno, ObjectMap::new).get(unbox(type));
+        }else if(hasInterpreter(Override.class, type)){
+            return (FieldInterpreter<T>)interpreters.get(Override.class, ObjectMap::new).get(unbox(type));
+        }else if(type.isArray() && !type.getComponentType().isPrimitive()){
+            return (FieldInterpreter<T>)(hasInterpreter(anno, Object[].class)
+                ? interpreters.get(anno).get(Object[].class)
+                : interpreters.get(Override.class).get(Object[].class)
+            );
+        }else{
+            throw new IllegalArgumentException("Interpreter for type " + type + " not set up yet.");
+        }
+    }
 
-                        Connector
-                            parentConnect = parentTile.selectorChildren,
-                            childConnect = tile.selectorParent;
+    public static <T> void setProvider(Class<T> type, FieldProvider<T> provider){
+        providers.put(unbox(type), provider);
+    }
 
-                        if(targetConnect != null && (
-                            (connecting.findParent && connecting == childConnect && targetConnect == parentConnect) ||
-                            (!connecting.findParent && connecting == parentConnect && targetConnect == childConnect)
-                        )){
-                            removing = true;
-                            continue;
-                        }
+    public static boolean hasProvider(Class<?> type){
+        return providers.containsKey(unbox(type));
+    }
 
-                        Vec2
-                            from = parentConnect.localToAscendantCoordinates(this, Tmp.v1.set(parentConnect.getWidth() / 2f, parentConnect.getHeight() / 2f)).add(x, y),
-                            to = childConnect.localToAscendantCoordinates(this, Tmp.v2.set(childConnect.getWidth() / 2f, childConnect.getHeight() / 2f)).add(x, y);
+    public static <T> FieldProvider<T> getProvider(Class<T> type){
+        return (FieldProvider<T>)providers.getThrow(unbox(type), () -> new IllegalArgumentException("Provider for type " + type + " not set up yet."));
+    }
 
-                        drawCurve(false, from.x, from.y, to.x, to.y);
-                    }
-                }
+    public interface FieldInterpreter<T>{
+        void build(Table cont, CharSequence name, TypeInfo type, Prov<T> get, Cons<T> set);
+    }
 
-                if(connecting != null){
-                    Vec2
-                        from = (targetConnect == null
-                            ? screenToLocalCoordinates(Core.input.mouse())
-                            : targetConnect.localToAscendantCoordinates(this, Tmp.v2.set(targetConnect.getWidth() / 2f, targetConnect.getHeight() / 2f))
-                        ).add(x, y),
-                        to = connecting.localToAscendantCoordinates(this, Tmp.v1.set(connecting.getWidth() / 2f, connecting.getHeight() / 2f)).add(x, y);
+    public interface FieldProvider<T>{
+        void get(TypeInfo type, Cons<T> cons);
+    }
 
-                    drawCurve(removing, to.x, to.y, from.x, from.y);
-                }
+    /**
+     * Stores parameterized or array type information for convenience.
+     * For {@code A[]}: {@link #raw} is {@code A[]}, {@link #element} is {@code A}, {@link #key} is {@code null}.
+     * For {@code Seq<A>}: {@link #raw} is {@link Seq}, {@link #element} is {@code A}, {@link #key} is {@code null}.
+     * For {@code ObjectMap<A, B>}: {@link #raw} is {@link ObjectMap}, {@link #element} is {@code A}, {@link #key} is {@code B}.
+     */
+    public static class TypeInfo{
+        public final Class<?> raw;
+        public final TypeInfo element, key;
 
-                Draw.reset();
+        public TypeInfo(Field field){
+            this(field.getType(), field.getGenericType());
+        }
+
+        public TypeInfo(Class<?> raw){
+            this(raw, raw);
+        }
+
+        /** Use with care! */
+        public TypeInfo(Class<?> raw, TypeInfo element){
+            this.raw = raw;
+            this.element = element;
+            key = null;
+        }
+
+        public TypeInfo(Class<?> raw, Type generic){
+            this.raw = raw;
+            if(raw.isArray()){
+                key = null;
+                element = new TypeInfo(raw.getComponentType(), generic instanceof GenericArrayType type ? type.getGenericComponentType() : raw.getComponentType());
+            }else if(Seq.class.isAssignableFrom(raw)){
+                key = null;
+                element = getParam(generic, 0);
+            }else if(ObjectMap.class.isAssignableFrom(raw)){
+                key = getParam(generic, 0);
+                element = getParam(generic, 1);
+            }else{
+                key = element = null;
+            }
+        }
+
+        public static TypeInfo getParam(Type generic, int index){
+            Type[] params =
+                generic instanceof ParameterizedType type ? type.getActualTypeArguments() :
+                generic instanceof GenericDeclaration type ? type.getTypeParameters() : null;
+
+            if(params != null && index < params.length){
+                var target = params[index];
+                return new TypeInfo(raw(target), target);
             }
 
-            protected void drawCurve(boolean remove, float x1, float y1, float x2, float y2){
-                Lines.stroke(4f);
-                Draw.color(remove ? Pal.remove : Pal.accent, parentAlpha);
+            return new TypeInfo(Object.class, Object.class);
+        }
 
-                float dist = Math.abs(x1 - x2) / 2f;
-                Lines.curve(x1, y1, x1 + dist, y1, x2 - dist, y2, x2, y2, Math.max(4, (int)(Mathf.dst(x1, y1, x2, y2) / 4f)));
-
-                Draw.reset();
-            }
-
-            public boolean inPlaceBounds(int x, int y){
-                return Structs.inBounds(x, y, bounds - objWidth + 1, bounds - objHeight + 1);
-            }
-
-            public boolean validPlace(int x, int y){
-                if(!inPlaceBounds(x, y)) return false;
-                for(int tx = 0; tx < objWidth; tx++){
-                    for(int ty = 0; ty < objHeight; ty++){
-                        if(occupied(x + tx, y + ty)) return false;
-                    }
-                }
-
-                return true;
-            }
-
-            public boolean validMove(ObjectiveTile tile, int newX, int newY){
-                if(!inPlaceBounds(newX, newY)) return false;
-
-                int x = tile.tx, y = tile.ty;
-                for(int tx = 0; tx < objWidth; tx++){
-                    for(int ty = 0; ty < objHeight; ty++){
-                        grid.set(x + tx, y + ty, false);
-                    }
-                }
-
-                boolean valid = validPlace(newX, newY);
-                for(int tx = 0; tx < objWidth; tx++){
-                    for(int ty = 0; ty < objHeight; ty++){
-                        grid.set(x + tx, y + ty);
-                    }
-                }
-
-                return valid;
-            }
-
-            public boolean occupied(int x, int y){
-                return grid.get(x, y);
-            }
-
-            public boolean createTile(MapObjective obj){
-                return createTile(obj.editorX, obj.editorY, obj);
-            }
-
-            public boolean createTile(int x, int y, MapObjective obj){
-                if(!validPlace(x, y)) return false;
-
-                ObjectiveTile tile = new ObjectiveTile(obj, x, y);
-                tile.pack();
-
-                addChild(tile);
-                for(int tx = 0; tx < objWidth; tx++){
-                    for(int ty = 0; ty < objHeight; ty++){
-                        grid.set(x + tx, y + ty);
-                    }
-                }
-
-                return true;
-            }
-
-            public boolean moveTile(ObjectiveTile tile, int newX, int newY){
-                if(!validMove(tile, newX, newY)) return false;
-
-                int x = tile.tx, y = tile.ty;
-                for(int tx = 0; tx < objWidth; tx++){
-                    for(int ty = 0; ty < objHeight; ty++){
-                        grid.set(x + tx, y + ty, false);
-                    }
-                }
-
-                tile.pos(newX, newY);
-
-                x = newX;
-                y = newY;
-                for(int tx = 0; tx < objWidth; tx++){
-                    for(int ty = 0; ty < objHeight; ty++){
-                        grid.set(x + tx, y + ty);
-                    }
-                }
-
-                return true;
-            }
-
-            public void clearTiles(){
-                clearChildren();
-                grid.clear();
-            }
-
-            @Override
-            public float getPrefWidth(){
-                return bounds * unitSize;
-            }
-
-            @Override
-            public float getPrefHeight(){
-                return bounds * unitSize;
-            }
-
-            public class ObjectiveTile extends Table{
-                public final MapObjective obj;
-                public int tx, ty;
-
-                public final Connector selectorParent, selectorChildren;
-
-                public ObjectiveTile(MapObjective obj, int x, int y){
-                    this.obj = obj;
-                    setTransform(false);
-                    setClip(false);
-
-                    var middle = new ImageButtonStyle(){{
-                        down = Tex.buttonEdgeDown5;
-                        up = Tex.buttonEdge5;
-                        over = Tex.buttonEdgeOver5;
-                        imageUpColor = Color.white;
-                    }};
-
-                    add(selectorParent = new Connector(true)).size(unitSize);
-                    button(Icon.eraser, middle, obj.parents::clear).size(unitSize);
-
-                    add(new ImageButton(Icon.move, new ImageButtonStyle(){{
-                        up = Tex.whiteui;
-                        imageUpColor = Color.black;
-                    }}){{
-                        var e = this;
-
-                        setColor(Pal.accent);
-                        addCaptureListener(new InputListener(){
-                            int prevX, prevY;
-                            float lastX, lastY;
-
-                            @Override
-                            public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
-                                if(moving != null) return false;
-                                moving = ObjectiveTile.this;
-
-                                prevX = moving.tx;
-                                prevY = moving.ty;
-
-                                // Convert to world pos first because the button gets dragged too.
-                                Vec2 pos = e.localToStageCoordinates(Tmp.v1.set(x, y));
-                                lastX = pos.x;
-                                lastY = pos.y;
-
-                                moving.getScene().cancelTouchFocusExcept(this, event.listenerActor);
-                                return true;
-                            }
-
-                            @Override
-                            public void touchDragged(InputEvent event, float x, float y, int pointer){
-                                Vec2 pos = e.localToStageCoordinates(Tmp.v1.set(x, y));
-
-                                moving.moveBy(pos.x - lastX, pos.y - lastY);
-                                lastX = pos.x;
-                                lastY = pos.y;
-
-                                moving.getScene().cancelTouchFocusExcept(this, event.listenerActor);
-                            }
-
-                            @Override
-                            public void touchUp(InputEvent event, float x, float y, int pointer, KeyCode button){
-                                if(!moveTile(moving,
-                                    Mathf.round(moving.x / unitSize),
-                                    Mathf.round(moving.y / unitSize)
-                                )) moving.pos(prevX, prevY);
-                                moving = null;
-                            }
-                        });
-                    }}).height(unitSize).growX();
-
-                    button(Icon.eraser, middle, () -> objectives.each(o -> o.parents.remove(obj))).size(unitSize);
-                    add(selectorChildren = new Connector(false)).size(unitSize);
-
-                    row().table(t -> t.background(Tex.buttonSelectTrans)).grow().colspan(5);
-
-                    setSize(getPrefWidth(), getPrefHeight());
-                    pos(x, y);
-                }
-
-                public void pos(int x, int y){
-                    tx = obj.editorX = x;
-                    ty = obj.editorY = y;
-                    this.x = x * unitSize;
-                    this.y = y * unitSize;
-                }
-
-                @Override
-                public float getPrefWidth(){
-                    return objWidth * unitSize;
-                }
-
-                @Override
-                public float getPrefHeight(){
-                    return objHeight * unitSize;
-                }
-
-                public class Connector extends ImageButton{
-                    public final boolean findParent;
-
-                    public Connector(boolean findParent){
-                        super(new ImageButtonStyle(){{
-                            down = findParent ? Tex.buttonEdgeDown1 : Tex.buttonEdgeDown3;
-                            up = findParent ? Tex.buttonEdge1 : Tex.buttonEdge3;
-                            over = findParent ? Tex.buttonEdgeOver1 : Tex.buttonEdgeOver3;
-                            imageUp = Tex.checkOn;
-                        }});
-
-                        this.findParent = findParent;
-
-                        clearChildren();
-                        addCaptureListener(new InputListener(){
-                            @Override
-                            public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
-                                if(connecting != null) return false;
-                                connecting = Connector.this;
-                                ObjectiveTilemap.this.findParent = true;
-
-                                connecting.getScene().cancelTouchFocusExcept(this, event.listenerActor);
-                                return true;
-                            }
-
-                            @Override
-                            public void touchDragged(InputEvent event, float x, float y, int pointer){
-                                connecting.getScene().cancelTouchFocusExcept(this, event.listenerActor);
-                            }
-
-                            @Override
-                            public void touchUp(InputEvent event, float x, float y, int pointer, KeyCode button){
-                                if(connecting != Connector.this) return;
-
-                                Vec2 pos = Connector.this.localToAscendantCoordinates(ObjectiveTilemap.this, Tmp.v1.set(x, y));
-                                if(
-                                    ObjectiveTilemap.this.hit(pos.x, pos.y, true) instanceof Connector con &&
-                                        con.tile() != tile() &&
-                                        con.findParent != findParent
-                                ){
-                                    if(findParent){
-                                        if(!obj.parents.remove(con.tile().obj)) obj.parents.add(con.tile().obj);
-                                    }else{
-                                        if(!con.tile().obj.parents.remove(obj)) con.tile().obj.parents.add(obj);
-                                    }
-                                }
-
-                                connecting = null;
-                            }
-                        });
-                    }
-                    
-                    public boolean canConnectTo(Connector other){
-                        return
-                            findParent != other.findParent &&
-                            tile() != other.tile();
-                    }
-                    
-                    public boolean isConnectedTo(Connector other){
-                        return (findParent ? other.tile() : tile()).obj.parents.contains(findParent ? obj : other.tile().obj);
-                    }
-
-                    public ObjectiveTile tile(){
-                        return ObjectiveTile.this;
-                    }
-
-                    @Override
-                    public boolean isPressed(){
-                        return super.isPressed() || connecting == this;
-                    }
-                }
-            }
+        public static Class<?> raw(Type type){
+            if(type instanceof Class<?> c) return c;
+            if(type instanceof ParameterizedType c) return (Class<?>)c.getRawType();
+            if(type instanceof GenericArrayType c) return Reflect.newArray(raw(c.getGenericComponentType()), 0).getClass();
+            if(type instanceof TypeVariable<?> c) return raw(c.getBounds()[0]);
+            return Object.class;
         }
     }
 }

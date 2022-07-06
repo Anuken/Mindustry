@@ -19,8 +19,11 @@ import mindustry.io.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
+import java.lang.annotation.*;
 import java.util.*;
 
+import static java.lang.annotation.ElementType.*;
+import static java.lang.annotation.RetentionPolicy.*;
 import static mindustry.Vars.*;
 
 /** Handles and executes in-map objectives. */
@@ -271,10 +274,10 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             return details;
         }
 
-        /** The localized type-name of this objective, defaulting to the class simple name without the "Objective" prefix. */
+        /** @return The localized type-name of this objective, defaulting to the class simple name without the "Objective" prefix. */
         public String typeName(){
             String className = getClass().getSimpleName().replace("Objective", "");
-            return Core.bundle == null || !Core.bundle.has("objective." + className) ? className : Core.bundle.get("objective." + className);
+            return Core.bundle == null ? className : Core.bundle.get("objective." + className.toLowerCase() + ".name", className);
         }
     }
 
@@ -601,11 +604,6 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         /** Makes sure markers are only added once. */
         private transient boolean wasAdded;
 
-        //TODO localize
-        public String typeName(){
-            return getClass().getSimpleName().replace("Marker", "");
-        }
-
         /** Called in the overlay draw layer.*/
         public void draw(){}
         /** Called in the small and large map. */
@@ -614,13 +612,20 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public void added(){}
         /** Remove any UI elements, if necessary. */
         public void removed(){}
+
+        /** @return The localized type-name of this objective, defaulting to the class simple name without the "Marker" prefix. */
+        public String typeName(){
+            String className = getClass().getSimpleName().replace("Marker", "");
+            return Core.bundle == null ? className : Core.bundle.get("marker." + className.toLowerCase() + ".name", className);
+        }
     }
 
     /** Displays text above a shape. */
     public static class ShapeTextMarker extends ObjectiveMarker{
         public String text = "frog";
-        public float x, y, fontSize = 1f, textHeight = 7f;
-        public byte flags = WorldLabel.flagBackground | WorldLabel.flagOutline;
+        public float x, y;
+        public float fontSize = 1f, textHeight = 7f;
+        public @LabelFlag byte flags = WorldLabel.flagBackground | WorldLabel.flagOutline;
 
         public float radius = 6f, rotation = 0f;
         public int sides = 4;
@@ -719,7 +724,8 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
     /** Displays a shape with an outline and color. */
     public static class ShapeMarker extends ObjectiveMarker{
-        public float x, y, radius = 8f, rotation = 0f, stroke = 1f;
+        public float x, y;
+        public float radius = 8f, rotation = 0f, stroke = 1f;
         public boolean fill = false, outline = true;
         public int sides = 4;
         public Color color = Color.valueOf("ffd37f");
@@ -763,9 +769,10 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
     /** Displays text at a location. */
     public static class TextMarker extends ObjectiveMarker{
         public String text = "uwu";
-        public float x, y, fontSize = 1f;
-        public byte flags = WorldLabel.flagBackground | WorldLabel.flagOutline;
-        //cached localized text
+        public float x, y;
+        public float fontSize = 1f;
+        public @LabelFlag byte flags = WorldLabel.flagBackground | WorldLabel.flagOutline;
+        // Cached localized text.
         private transient String fetchedText;
 
         public TextMarker(String text, float x, float y, float fontSize, byte flags){
@@ -793,4 +800,8 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             WorldLabel.drawAt(fetchedText, x, y, Draw.z(), flags, fontSize);
         }
     }
+
+    @Target(FIELD)
+    @Retention(RUNTIME)
+    public @interface LabelFlag{}
 }
