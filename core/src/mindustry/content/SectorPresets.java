@@ -16,7 +16,7 @@ public class SectorPresets{
     impact0078, desolateRift, nuclearComplex, planetaryTerminal,
     coastline, navalFortress,
 
-    onset, two, lake, three, four, atlas, split;
+    onset, two, lake, three, four, atlas, split, darkness;
 
     public static void load(){
         //region serpulo
@@ -214,6 +214,10 @@ public class SectorPresets{
 
         split = new SectorPreset("split", erekir, 19){{ //TODO random sector, pick a better one
             difficulty = 5;
+        }};
+        
+        darkness = new SectorPreset("darkness", erekir, 44)
+            difficulty = 6;
         }};
 
         four = new SectorPreset("four", erekir, 29){{
