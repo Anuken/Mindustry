@@ -151,7 +151,7 @@ public class Weapon implements Cloneable{
             t.row();
             t.add("[lightgray]" + Stat.inaccuracy.localized() + ": [white]" + (int)inaccuracy + " " + StatUnit.degrees.localized());
         }
-        if(reload > 0){
+        if(!alwaysContinuous && reload > 0){
             t.row();
             t.add("[lightgray]" + Stat.reload.localized() + ": " + (mirror ? "2x " : "") + "[white]" + Strings.autoFixed(60f / reload * shoot.shots, 2) + " " + StatUnit.perSecond.localized());
         }
@@ -333,6 +333,8 @@ public class Weapon implements Cloneable{
                 if(alwaysContinuous && mount.shoot){
                     mount.bullet.time = mount.bullet.lifetime * mount.bullet.type.optimalLifeFract * mount.warmup;
                     mount.bullet.keepAlive = true;
+
+                    unit.apply(shootStatus, shootStatusDuration);
                 }
             }
         }else{
