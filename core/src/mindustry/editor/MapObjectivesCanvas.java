@@ -6,7 +6,6 @@ import arc.graphics.g2d.*;
 import arc.input.*;
 import arc.math.*;
 import arc.math.geom.*;
-import arc.scene.*;
 import arc.scene.event.*;
 import arc.scene.ui.*;
 import arc.scene.ui.ImageButton.*;
@@ -22,85 +21,29 @@ import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 
 @SuppressWarnings("unchecked")
-public class MapObjectivesCanvas extends ScrollPane{
+public class MapObjectivesCanvas extends WidgetGroup{
     public static final int
         objWidth = 5, objHeight = 2,
         bounds = 100;
 
-    public static final float
-        unitSize = 48f, edgeDrag = unitSize * 2.5f;
+    public static final float unitSize = 48f;
 
     public Seq<MapObjective> objectives = new Seq<>();
     public ObjectiveTilemap tilemap;
 
-    protected boolean querying;
-    protected MapObjective toQuery;
+    protected MapObjective query;
 
-    protected final InputListener canceler;
-    protected final ClickListener creator;
+    private boolean pressed;
+    private long visualPressed;
 
     public MapObjectivesCanvas(){
-        super(null, Styles.noBarPane);
-        getStyle().background = Styles.black5;
-
         setFillParent(true);
-        setWidget(tilemap = new ObjectiveTilemap());
-        setOverscroll(false, false);
-        setCancelTouchFocus(false);
+        addChild(tilemap = new ObjectiveTilemap());
 
-        getListeners().pop(); // Remove the scroll listener.
-
-        // Use custom element gesture implementation that doesn't fling.
-        setFlickScroll(false);
-        Reflect.set(ScrollPane.class, this, "flickScrollListener", new ElementGestureListener(){
-            @Override
-            public void pan(InputEvent event, float x, float y, float deltaX, float deltaY){
-                setScrollX(getScrollX() - deltaX);
-                setScrollY(getScrollY() + deltaY);
-            }
-
-            @Override
-            public boolean handle(SceneEvent e){
-                if(super.handle(e)){
-                    MapObjectivesCanvas.this.fling(0f, 0f, 0f);
-                    return true;
-                }else{
-                    return false;
-                }
-            }
-        });
-        setFlickScroll(true);
-
-        // Automatically pans without touching, only when connecting or moving tiles.
-        update(() -> {
-            fling(0f, 0f, 0f); // Absolutely force it not to fling.
-            if(tilemap.connecting == null && tilemap.moving == null) return;
-
-            Vec2 pos = screenToLocalCoordinates(Core.input.mouse());
-            float prevX, prevY;
-
-            setScrollX((prevX = getScrollX()) + (
-                pos.x <= edgeDrag ? -Mathf.clamp(1f - pos.x / edgeDrag) :
-                    pos.x >= width - edgeDrag ? Mathf.clamp((pos.x - width + edgeDrag) / edgeDrag) : 0f
-            ) * 14f);
-
-            setScrollY((prevY = getScrollY()) + (
-                pos.y <= edgeDrag ? Mathf.clamp(1f - pos.y / edgeDrag) :
-                    pos.y >= height - edgeDrag ? -Mathf.clamp((pos.y - height + edgeDrag) / edgeDrag) : 0f
-            ) * 14f);
-
-            float dx = getScrollX() - prevX, dy = getScrollY() - prevY;
-            if(tilemap.moving != null){
-                tilemap.moving.moveBy(dx, -dy);
-                //tilemap.moving.mover.lastX += dx;
-                //tilemap.moving.mover.lastY -= dy;
-            }
-        });
-
-        addCaptureListener(canceler = new InputListener(){
+        addCaptureListener(new InputListener(){
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
-                if(querying && button == KeyCode.mouseRight){
+                if(query != null && button == KeyCode.mouseRight){
                     stopQuery();
 
                     event.stop();
@@ -111,34 +54,44 @@ public class MapObjectivesCanvas extends ScrollPane{
             }
         });
 
-        addCaptureListener(creator = new HandCursorListener(){
+        addCaptureListener(new ElementGestureListener(){
+            int pressPointer = -1;
+
             @Override
-            public void enter(InputEvent event, float x, float y, int pointer, Element fromActor){
-                if(querying) super.enter(event, x, y, pointer, fromActor);
+            public void pan(InputEvent event, float x, float y, float deltaX, float deltaY){
+                if(tilemap.moving != null || tilemap.connecting != null) return;
+                tilemap.x = Mathf.clamp(tilemap.x + deltaX, -bounds * unitSize + width, 0f);
+                tilemap.y = Mathf.clamp(tilemap.y + deltaY, -bounds * unitSize + height, 0f);
             }
 
             @Override
-            public void exit(InputEvent event, float x, float y, int pointer, Element toActor){
-                if(querying) super.exit(event, x, y, pointer, toActor);
-            }
-
-            @Override
-            public void touchDragged(InputEvent event, float x, float y, int pointer){
-                cancel();
-            }
-
-            @Override
-            public void clicked(InputEvent event, float x, float y){
-                if(!querying || toQuery == null) return;
+            public void tap(InputEvent event, float x, float y, int count, KeyCode button){
+                if(query == null) return;
 
                 Vec2 pos = localToDescendantCoordinates(tilemap, Tmp.v1.set(x, y));
                 if(tilemap.createTile(
                     Mathf.round((pos.x - objWidth * unitSize / 2f) / unitSize),
                     Mathf.floor((pos.y - unitSize) / unitSize),
-                    toQuery
+                    query
                 )){
-                    objectives.add(toQuery);
+                    objectives.add(query);
                     stopQuery();
+                }
+            }
+
+            @Override
+            public void touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
+                if(pressPointer != -1) return;
+                pressPointer = pointer;
+                pressed = true;
+                visualPressed = Time.millis() + 100;
+            }
+
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, KeyCode button){
+                if(pointer == pressPointer){
+                    pressPointer = -1;
+                    pressed = false;
                 }
             }
         });
@@ -150,24 +103,23 @@ public class MapObjectivesCanvas extends ScrollPane{
     }
 
     protected void stopQuery(){
-        if(!querying) return;
-        querying = false;
+        if(query == null) return;
+        query = null;
 
         Core.graphics.restoreCursor();
     }
 
     public void query(MapObjective obj){
         stopQuery();
-        querying = true;
-        toQuery = obj;
+        query = obj;
     }
 
     public boolean isQuerying(){
-        return querying;
+        return query != null;
     }
 
     public boolean isVisualPressed(){
-        return creator.isVisualPressed();
+        return pressed || visualPressed > Time.millis();
     }
 
     public class ObjectiveTilemap extends WidgetGroup{
@@ -194,10 +146,8 @@ public class MapObjectivesCanvas extends ScrollPane{
             Lines.stroke(2f);
             Draw.color(Pal.gray, parentAlpha);
 
-            for(int x = minX; x <= maxX; x++)
-                Lines.line(progX + x * unitSize, minY * unitSize, progX + x * unitSize, maxY * unitSize);
-            for(int y = minY; y <= maxY; y++)
-                Lines.line(minX * unitSize, progY + y * unitSize, maxX * unitSize, progY + y * unitSize);
+            for(int x = minX; x <= maxX; x++) Lines.line(progX + x * unitSize, minY * unitSize, progX + x * unitSize, maxY * unitSize);
+            for(int y = minY; y <= maxY; y++) Lines.line(minX * unitSize, progY + y * unitSize, maxX * unitSize, progY + y * unitSize);
 
             if(isQuerying()){
                 int tx, ty;
@@ -235,7 +185,7 @@ public class MapObjectivesCanvas extends ScrollPane{
 
             Connector conTarget = null;
             if(connecting != null){
-                Vec2 pos = screenToLocalCoordinates(Core.input.mouse());
+                Vec2 pos = connecting.localToAscendantCoordinates(this, Tmp.v1.set(connecting.pointX, connecting.pointY));
                 if(hit(pos.x, pos.y, true) instanceof Connector con && connecting.canConnectTo(con)) conTarget = con;
             }
 
@@ -250,7 +200,7 @@ public class MapObjectivesCanvas extends ScrollPane{
 
                     if(conTarget != null && (
                         (connecting.findParent && connecting == conTo && conTarget == conFrom) ||
-                            (!connecting.findParent && connecting == conFrom && conTarget == conTo)
+                        (!connecting.findParent && connecting == conFrom && conTarget == conTo)
                     )){
                         removing = true;
                         continue;
@@ -267,10 +217,10 @@ public class MapObjectivesCanvas extends ScrollPane{
             if(connecting != null){
                 Vec2
                     mouse = (conTarget == null
-                    ? screenToLocalCoordinates(Core.input.mouse())
-                    : conTarget.localToAscendantCoordinates(this, Tmp.v2.set(conTarget.getWidth() / 2f, conTarget.getHeight() / 2f))
-                ).add(x, y),
-                    anchor = connecting.localToAscendantCoordinates(this, Tmp.v1.set(connecting.getWidth() / 2f, connecting.getHeight() / 2f)).add(x, y);
+                        ? connecting.localToAscendantCoordinates(this, Tmp.v1.set(connecting.pointX, connecting.pointY))
+                        : conTarget.localToAscendantCoordinates(this, Tmp.v1.set(conTarget.getWidth() / 2f, conTarget.getHeight() / 2f))
+                    ).add(x, y),
+                    anchor = connecting.localToAscendantCoordinates(this, Tmp.v2.set(connecting.getWidth() / 2f, connecting.getHeight() / 2f)).add(x, y);
 
                 Vec2
                     from = connecting.findParent ? mouse : anchor,
@@ -505,7 +455,7 @@ public class MapObjectivesCanvas extends ScrollPane{
                     lastX = pos.x;
                     lastY = pos.y;
 
-                    moving.getScene().cancelTouchFocusExcept(this, event.listenerActor);
+                    //moving.getScene().cancelTouchFocusExcept(this, event.listenerActor);
                     return true;
                 }
 
@@ -517,7 +467,7 @@ public class MapObjectivesCanvas extends ScrollPane{
                     lastX = pos.x;
                     lastY = pos.y;
 
-                    moving.getScene().cancelTouchFocusExcept(this, event.listenerActor);
+                    //moving.getScene().cancelTouchFocusExcept(this, event.listenerActor);
                 }
 
                 @Override
@@ -531,6 +481,7 @@ public class MapObjectivesCanvas extends ScrollPane{
             }
 
             public class Connector extends Button{
+                public float pointX, pointY;
                 public final boolean findParent;
 
                 public Connector(boolean findParent){
@@ -544,23 +495,34 @@ public class MapObjectivesCanvas extends ScrollPane{
 
                     clearChildren();
                     addCaptureListener(new InputListener(){
+                        int conPointer = -1;
+
                         @Override
                         public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
+                            if(conPointer != -1) return false;
+                            conPointer = pointer;
+
                             if(connecting != null) return false;
                             connecting = Connector.this;
 
-                            connecting.getScene().cancelTouchFocusExcept(this, event.listenerActor);
+                            pointX = x;
+                            pointY = y;
+                            //connecting.getScene().cancelTouchFocusExcept(this, event.listenerActor);
                             return true;
                         }
 
                         @Override
                         public void touchDragged(InputEvent event, float x, float y, int pointer){
-                            connecting.getScene().cancelTouchFocusExcept(this, event.listenerActor);
+                            if(conPointer != pointer) return;
+                            pointX = x;
+                            pointY = y;
+                            //connecting.getScene().cancelTouchFocusExcept(this, event.listenerActor);
                         }
 
                         @Override
                         public void touchUp(InputEvent event, float x, float y, int pointer, KeyCode button){
-                            if(connecting != Connector.this) return;
+                            if(conPointer != pointer || connecting != Connector.this) return;
+                            conPointer = -1;
 
                             Vec2 pos = Connector.this.localToAscendantCoordinates(ObjectiveTilemap.this, Tmp.v1.set(x, y));
                             if(ObjectiveTilemap.this.hit(pos.x, pos.y, true) instanceof Connector con && con.canConnectTo(Connector.this)){

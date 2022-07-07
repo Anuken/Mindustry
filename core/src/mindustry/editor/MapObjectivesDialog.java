@@ -517,6 +517,18 @@ public class MapObjectivesDialog extends BaseDialog{
     }
 
     public interface FieldInterpreter<T>{
+        /**
+         * Builds the interpreter for (not-necessarily) a possibly annotated field. Implementations must add exactly
+         * 2 columns to the table.
+         * @param name    May be empty.
+         * @param handled If this interpreter populates this set with another field, subsequent rows will ignore said field.
+         * @param indexer If this callback is not {@code null}, this interpreter should add 3 buttons that invokes the
+         *                callback with the following: <ul>
+         *                <li>0: Remove element.</li>
+         *                <li>1: Swap element with previous index.</li>
+         *                <li>2: Swap element with next index.</li>
+         *                </ul>
+         */
         void build(Table cont,
                    CharSequence name, TypeInfo type,
                    @Nullable Seq<Field> allFields, @Nullable Field field, @Nullable ObjectSet<Field> handled,
@@ -532,7 +544,7 @@ public class MapObjectivesDialog extends BaseDialog{
      * Stores parameterized or array type information for convenience.
      * For {@code A[]}: {@link #raw} is {@code A[]}, {@link #element} is {@code A}, {@link #key} is {@code null}.
      * For {@code Seq<A>}: {@link #raw} is {@link Seq}, {@link #element} is {@code A}, {@link #key} is {@code null}.
-     * For {@code ObjectMap<A, B>}: {@link #raw} is {@link ObjectMap}, {@link #element} is {@code A}, {@link #key} is {@code B}.
+     * For {@code ObjectMap<A, B>}: {@link #raw} is {@link ObjectMap}, {@link #element} is {@code B}, {@link #key} is {@code A}.
      */
     public static class TypeInfo{
         public final Class<?> raw;
