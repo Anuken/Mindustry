@@ -50,7 +50,7 @@ public class DrawTurret extends DrawBlock{
         Draw.rect(base, build.x, build.y);
         Draw.color();
 
-        Draw.z(Layer.turret - 0.02f);
+        Draw.z(Layer.turret - 0.5f);
 
         Drawf.shadow(preview, build.x + tb.recoilOffset.x - turret.elevation, build.y + tb.recoilOffset.y - turret.elevation, tb.drawrot());
 

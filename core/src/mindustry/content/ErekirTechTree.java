@@ -87,6 +87,7 @@ public class ErekirTechTree{
                     });
 
                     node(overflowDuct, Seq.with(new OnSector(two)), () -> {
+                        node(underflowDuct);
                         node(reinforcedContainer, () -> {
                             node(ductUnloader, () -> {
 
