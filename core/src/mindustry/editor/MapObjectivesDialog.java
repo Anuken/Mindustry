@@ -214,7 +214,7 @@ public class MapObjectivesDialog extends BaseDialog{
                 })).fill();
             }).growX().height(46f).pad(0f, -10f, 0f, -10f).get();
 
-            main.row().table(Tex.button, t -> rebuild[0] = () -> {
+            main.row().table(Tex.buttonTrans, t -> rebuild[0] = () -> {
                 t.clear();
                 t.top();
 
@@ -292,7 +292,7 @@ public class MapObjectivesDialog extends BaseDialog{
                 }
             }).growX().height(46f).pad(0f, -10f, -0f, -10f).get();
 
-            main.row().table(Tex.button, t -> {
+            main.row().table(Tex.buttonTrans, t -> {
                 t.left();
                 t.top().margin(10f).marginTop(20f);
 

@@ -446,6 +446,7 @@ public class MapObjectivesCanvas extends WidgetGroup{
                 public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
                     if(moving != null) return false;
                     moving = ObjectiveTile.this;
+                    moving.toFront();
 
                     prevX = moving.tx;
                     prevY = moving.ty;
@@ -454,8 +455,6 @@ public class MapObjectivesCanvas extends WidgetGroup{
                     Vec2 pos = event.listenerActor.localToStageCoordinates(Tmp.v1.set(x, y));
                     lastX = pos.x;
                     lastY = pos.y;
-
-                    //moving.getScene().cancelTouchFocusExcept(this, event.listenerActor);
                     return true;
                 }
 
@@ -466,8 +465,6 @@ public class MapObjectivesCanvas extends WidgetGroup{
                     moving.moveBy(pos.x - lastX, pos.y - lastY);
                     lastX = pos.x;
                     lastY = pos.y;
-
-                    //moving.getScene().cancelTouchFocusExcept(this, event.listenerActor);
                 }
 
                 @Override
@@ -507,7 +504,6 @@ public class MapObjectivesCanvas extends WidgetGroup{
 
                             pointX = x;
                             pointY = y;
-                            //connecting.getScene().cancelTouchFocusExcept(this, event.listenerActor);
                             return true;
                         }
 
@@ -516,7 +512,6 @@ public class MapObjectivesCanvas extends WidgetGroup{
                             if(conPointer != pointer) return;
                             pointX = x;
                             pointY = y;
-                            //connecting.getScene().cancelTouchFocusExcept(this, event.listenerActor);
                         }
 
                         @Override
