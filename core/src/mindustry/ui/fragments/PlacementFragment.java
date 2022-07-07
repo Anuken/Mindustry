@@ -560,7 +560,7 @@ public class PlacementFragment{
 
     boolean unlocked(Block block){
         return block.unlockedNow() && block.placeablePlayer && block.environmentBuildable() &&
-            block.supportsEnv(state.rules.env); //TODO this hides env unsupported blocks, not always a good thing
+            (block.supportsEnv(state.rules.env) || state.isEditor()); //TODO this hides env unsupported blocks, not always a good thing
     }
 
     boolean hasInfoBox(){
