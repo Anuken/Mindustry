@@ -200,6 +200,12 @@ public class SectorPresets{
         lake = new SectorPreset("lake", erekir, 41){{
             difficulty = 4;
 
+            rules = r -> {
+                r.objectives.addAll(
+                        new BuildCountObjective(Blocks.shipFabricator, 1),
+                        new UnitCountObjective(UnitTypes.elude, 1)
+                );
+            };
         }};
 
         three = new SectorPreset("three", erekir, 36){{
