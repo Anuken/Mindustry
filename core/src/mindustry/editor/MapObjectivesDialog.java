@@ -38,52 +38,52 @@ public class MapObjectivesDialog extends BaseDialog{
     static{
         // Default un-annotated field interpreters.
         setProvider(String.class, (type, cons) -> cons.get(""));
-        setInterpreter(String.class, (cont, name, type, get, set) -> {
-            cont.add(name + ": ");
+        setInterpreter(String.class, (cont, name, type, allFields, field, handled, indexer, get, set) -> {
+            name(cont, name, indexer);
             cont.area(get.get(), set).height(60f);
         });
 
         setProvider(byte.class, (type, cons) -> cons.get((byte)0));
 
         setProvider(boolean.class, (type, cons) -> cons.get(false));
-        setInterpreter(boolean.class, (cont, name, type, get, set) -> {
-            cont.add(name + ": ");
+        setInterpreter(boolean.class, (cont, name, type, allFields, field, handled, indexer, get, set) -> {
+            name(cont, name, indexer);
             cont.check("", get.get(), set::get);
         });
 
         setProvider(int.class, (type, cons) -> cons.get(0));
-        setInterpreter(int.class, (cont, name, type, get, set) -> {
-            cont.add(name + ": ");
+        setInterpreter(int.class, (cont, name, type, allFields, field, handled, indexer, get, set) -> {
+            name(cont, name, indexer);
             cont.field(Integer.toString(get.get()), str -> set.get(Strings.parseInt(str))).valid(Strings::canParseInt);
         });
 
         setProvider(float.class, (type, cons) -> cons.get(0f));
-        setInterpreter(float.class, (cont, name, type, get, set) -> {
-            cont.add(name + ": ");
+        setInterpreter(float.class, (cont, name, type, allFields, field, handled, indexer, get, set) -> {
+            name(cont, name, indexer);
             cont.field(Float.toString(get.get()), str -> set.get(Strings.parseFloat(str))).valid(Strings::canParseFloat);
         });
 
         setProvider(UnlockableContent.class, (type, cons) -> cons.get(Blocks.coreShard));
-        setInterpreter(UnlockableContent.class, (cont, name, type, get, set) -> {
-            cont.add(name + ": ");
+        setInterpreter(UnlockableContent.class, (cont, name, type, allFields, field, handled, indexer, get, set) -> {
+            name(cont, name, indexer);
             cont.button(
                 b -> b.image().size(iconSmall).update(i -> i.setDrawable(get.get().uiIcon)),
-                () -> showContentSelect(null, set, b -> b.techNode != null)
+                () -> showContentSelect(null, set, b -> !field.isAnnotationPresent(Researchable.class) || b.techNode != null)
             ).pad(4);
         });
 
         setProvider(Block.class, (type, cons) -> cons.get(Blocks.copperWall));
-        setInterpreter(Block.class, (cont, name, type, get, set) -> {
-            cont.add(name + ": ");
+        setInterpreter(Block.class, (cont, name, type, allFields, field, handled, indexer, get, set) -> {
+            name(cont, name, indexer);
             cont.button(
                 b -> b.image().size(iconSmall).update(i -> i.setDrawable(get.get().uiIcon)),
-                () -> showContentSelect(ContentType.block, set, Block::synthetic)
+                () -> showContentSelect(ContentType.block, set, b -> !field.isAnnotationPresent(Synthetic.class) || b.synthetic())
             ).pad(4f);
         });
 
         setProvider(Item.class, (type, cons) -> cons.get(Items.copper));
-        setInterpreter(Item.class, (cont, name, type, get, set) -> {
-            cont.add(name + ": ");
+        setInterpreter(Item.class, (cont, name, type, allFields, field, handled, indexer, get, set) -> {
+            name(cont, name, indexer);
             cont.button(
                 b -> b.image().size(iconSmall).update(i -> i.setDrawable(get.get().uiIcon)),
                 () -> showContentSelect(ContentType.item, set, item -> true)
@@ -91,8 +91,8 @@ public class MapObjectivesDialog extends BaseDialog{
         });
 
         setProvider(UnitType.class, (type, cons) -> cons.get(UnitTypes.dagger));
-        setInterpreter(UnitType.class, (cont, name, type, get, set) -> {
-            cont.add(name + ": ");
+        setInterpreter(UnitType.class, (cont, name, type, allFields, field, handled, indexer, get, set) -> {
+            name(cont, name, indexer);
             cont.button(
                 b -> b.image().size(iconSmall).update(i -> i.setDrawable(get.get().uiIcon)),
                 () -> showContentSelect(ContentType.unit, set, unit -> true)
@@ -100,19 +100,19 @@ public class MapObjectivesDialog extends BaseDialog{
         });
 
         setProvider(Team.class, (type, cons) -> cons.get(Team.sharded));
-        setInterpreter(Team.class, (cont, name, type, get, set) -> {
-            cont.add(name + ": ");
+        setInterpreter(Team.class, (cont, name, type, allFields, field, handled, indexer, get, set) -> {
+            name(cont, name, indexer);
             cont.button(
                 b -> b.image(Tex.whiteui).size(iconSmall).update(i -> i.setColor(get.get().color)),
                 () -> showTeamSelect(set)
             ).pad(4f);
         });
 
-        setProvider(Color.class, (type, cons) -> cons.get(Color.red));
-        setInterpreter(Color.class, (cont, name, type, get, set) -> {
+        setProvider(Color.class, (type, cons) -> cons.get(Pal.accent.cpy()));
+        setInterpreter(Color.class, (cont, name, type, allFields, field, handled, indexer, get, set) -> {
             var out = get.get();
 
-            cont.add(name + ": ");
+            name(cont, name, indexer);
             cont.button(
                 b -> b.stack(new Image(Tex.alphaBg), new Image(Tex.whiteui){{
                     update(() -> setColor(out));
@@ -172,8 +172,8 @@ public class MapObjectivesDialog extends BaseDialog{
         for(var mark : MapObjectives.allMarkerTypes) setInterpreter(mark.get().getClass(), defaultInterpreter());
 
         // Annotated field interpreters.
-        setInterpreter(LabelFlag.class, byte.class, (cont, name, type, get, set) -> {
-            cont.add(name + ": ");
+        setInterpreter(LabelFlag.class, byte.class, (cont, name, type, allFields, field, handled, indexer, get, set) -> {
+            name(cont, name, indexer);
             cont.table(t -> {
                 t.left().defaults().left();
                 byte
@@ -190,7 +190,7 @@ public class MapObjectivesDialog extends BaseDialog{
         // Special data structure interpreters.
         // Instantiate default `Seq`s with a reflectively allocated array.
         setProvider(Seq.class, (type, cons) -> cons.get(new Seq<>(type.element.raw)));
-        setInterpreter(Seq.class, (cont, name, type, get, set) -> cont.table(main -> {
+        setInterpreter(Seq.class, (cont, name, type, allFields, field, handled, indexer, get, set) -> cont.table(main -> {
             Runnable[] rebuild = {null};
             var arr = get.get();
 
@@ -199,13 +199,20 @@ public class MapObjectivesDialog extends BaseDialog{
                 t.left();
                 t.margin(10f);
 
-                t.add(name + ":").color(Pal.accent);
+                if(name.length() > 0) t.add(name + ":").color(Pal.accent);
                 t.add().growX();
+
+                if(indexer != null){
+                    t.button(Icon.trash, Styles.emptyi, () -> indexer.get(0)).fill().padRight(4f);
+                    t.button(Icon.upOpen, Styles.emptyi, () -> indexer.get(1)).fill().padRight(4f);
+                    t.button(Icon.downOpen, Styles.emptyi, () -> indexer.get(-1)).fill().padRight(4f);
+                }
+
                 t.button(Icon.add, Styles.emptyi, () -> getProvider(type.element.raw).get(type.element, res -> {
                     arr.add(res);
                     rebuild[0].run();
                 })).fill();
-            }).growX().height(46f).pad(-10f).padTop(0f).get();
+            }).growX().height(46f).pad(0f, -10f, 0f, -10f).get();
 
             main.row().table(Tex.button, t -> rebuild[0] = () -> {
                 t.clear();
@@ -214,47 +221,42 @@ public class MapObjectivesDialog extends BaseDialog{
                 if(arr.isEmpty()){
                     t.background(Tex.clear).margin(0f).setSize(0f);
                 }else{
-                    t.background(Tex.button).margin(10f);
+                    t.background(Tex.button).margin(10f).marginTop(20f);
                 }
 
                 for(int i = 0, len = arr.size; i < len; i++){
                     int index = i;
                     if(index > 0) t.row();
 
-                    t.table(e -> {
-                        e.defaults().pad(0f);
-                        e.table(b -> b.right().table(Tex.buttonEdge2, buttons -> {
-                            buttons.right();
-                            buttons.defaults().size(20f);
+                    getInterpreter((Class<Object>)arr.get(index).getClass()).build(
+                        t, "", new TypeInfo(arr.get(index).getClass()),
+                        null, null, null, in -> {
+                            if(switch(in){
+                                case 0 -> {
+                                    arr.remove(index);
+                                    yield true;
+                                }
 
-                            buttons.button(Icon.trashSmall, Styles.emptyi, () -> {
-                                arr.remove(index);
-                                rebuild[0].run();
-                            });
+                                case 1 -> {
+                                    if(index > 0) arr.swap(index, index - 1);
+                                    yield true;
+                                }
 
-                            buttons.button(Icon.upOpenSmall, Styles.emptyi, () -> {
-                                arr.swap(index, index - 1);
-                                rebuild[0].run();
-                            }).disabled(a -> index <= 0).padLeft(1f).padRight(1f);
+                                case -1 -> {
+                                    if(index < len - 1) arr.swap(index, index + 1);
+                                    yield true;
+                                }
 
-                            buttons.button(Icon.downOpenSmall, Styles.emptyi, () -> {
-                                arr.swap(index, index + 1);
-                                rebuild[0].run();
-                            }).disabled(a -> index >= len - 1);
-                        }).fill()).growX().fillY();
-
-                        e.row().table(Tex.paneSolid, element -> 
-                            getInterpreter((Class<Object>)arr.get(index).getClass()).build(
-                                element, Integer.toString(index), new TypeInfo(arr.get(index).getClass()),
-                                () -> arr.get(index),
-                                res -> arr.set(index, res)
-                            )
-                        ).growX().fillY();
-                    }).growX().fillY().padTop(4f);
+                                default -> false;
+                            }) rebuild[0].run();
+                        },
+                        () -> arr.get(index),
+                        res -> arr.set(index, res)
+                    );
                 }
 
                 set.get(arr);
-            }).growX().fillY();
+            }).padTop(-10f).growX().fillY();
             rebuild[0].run();
 
             header.toFront();
@@ -262,14 +264,86 @@ public class MapObjectivesDialog extends BaseDialog{
 
         // Reserved for array types that are not explicitly handled. Essentially handles it the same way as `Seq`.
         setProvider(Object[].class, (type, cons) -> cons.get(Reflect.newArray(type.element.raw, 0)));
-        setInterpreter(Object[].class, (cont, name, type, get, set) -> {
+        setInterpreter(Object[].class, (cont, name, type, allFields, field, handled, indexer, get, set) -> {
             var arr = Seq.with(get.get());
             getInterpreter(Seq.class).build(
                 cont, name, new TypeInfo(Seq.class, type.element),
+                allFields, field, handled, indexer,
                 () -> arr,
                 res -> set.get(arr.toArray(type.element.raw))
             );
         });
+    }
+
+    public static <T> FieldInterpreter<T> defaultInterpreter(){
+        return (cont, name, type, allFields, field, handled, indexer, get, set) -> cont.table(main -> {
+            main.margin(0f, 10f, 0f, 10f);
+            var header = main.table(Tex.button, t -> {
+                t.left();
+                t.margin(10f);
+
+                if(name.length() > 0) t.add(name + ":").color(Pal.accent);
+                t.add().growX();
+
+                if(indexer != null){
+                    t.button(Icon.trash, Styles.emptyi, () -> indexer.get(0)).fill().padRight(4f);
+                    t.button(Icon.upOpen, Styles.emptyi, () -> indexer.get(1)).fill().padRight(4f);
+                    t.button(Icon.downOpen, Styles.emptyi, () -> indexer.get(-1)).fill();
+                }
+            }).growX().height(46f).pad(0f, -10f, -0f, -10f).get();
+
+            main.row().table(Tex.button, t -> {
+                t.left();
+                t.top().margin(10f).marginTop(20f);
+
+                t.defaults().minHeight(40f).left();
+                var obj = get.get();
+
+                Seq<Field> all = new Seq<>();
+                ObjectSet<Field> skip = new ObjectSet<>();
+
+                JsonIO.json.getFields(type.raw).each((n, f) -> all.add(f.field));
+
+                int i = 0;
+                for(var e : JsonIO.json.getFields(type.raw).values()){
+                    var f = e.field;
+                    if(!skip.add(f)) continue;
+
+                    if(i++ > 0) t.row();
+
+                    var ft = f.getType();
+                    int mods = f.getModifiers();
+
+                    if(!Modifier.isPublic(mods) || (Modifier.isFinal(mods) && (
+                        String.class.isAssignableFrom(ft) ||
+                        unbox(ft).isPrimitive()
+                    ))) continue;
+
+                    var anno = Structs.find(f.getDeclaredAnnotations(), a -> hasInterpreter(a.annotationType(), ft));
+                    getInterpreter(anno == null ? Override.class : anno.annotationType(), ft).build(
+                        t, f.getName(), new TypeInfo(f),
+                        all, f, skip, null,
+                        () -> Reflect.get(obj, f),
+                        Modifier.isFinal(mods) ? res -> {} : res -> Reflect.set(obj, f, res)
+                    );
+                }
+            }).padTop(-10f).growX().fillY();
+
+            header.toFront();
+        }).growX().fillY().pad(4f).colspan(2);
+    }
+
+    public static void name(Table cont, CharSequence name, @Nullable Intc indexer){
+        if(indexer != null){
+            cont.table(t -> {
+                t.button(Icon.trash, Styles.emptyi, () -> indexer.get(0)).fill().padRight(4f);
+                t.button(Icon.upOpen, Styles.emptyi, () -> indexer.get(1)).fill().padRight(4f);
+                t.button(Icon.downOpen, Styles.emptyi, () -> indexer.get(-1)).fill().padRight(4f);
+                t.add(": ").center();
+            }).fill();
+        }else{
+            cont.add(name + ": ");
+        }
     }
 
     public MapObjectivesDialog(){
@@ -340,24 +414,9 @@ public class MapObjectivesDialog extends BaseDialog{
         show();
     }
 
-    public static void showEditor(MapObjective obj){
-        BaseDialog dialog = new BaseDialog("@editor.objectives");
-        dialog.cont.pane(Styles.noBarPane, list -> list.top().table(t -> {
-            t.margin(0f);
-            getInterpreter((Class<MapObjective>)obj.getClass()).build(
-                t, obj.typeName(), new TypeInfo(obj.getClass()),
-                () -> obj,
-                res -> {}
-            );
-        }).width(400f).fillY()).grow();
-
-        dialog.addCloseButton();
-        dialog.show();
-    }
-
     public static <T extends UnlockableContent> void showContentSelect(@Nullable ContentType type, Cons<T> cons, Boolf<T> check){
         BaseDialog dialog = new BaseDialog("");
-        dialog.cont.pane(p -> {
+        dialog.cont.pane(t -> {
             int i = 0;
             for(var content : (type == null ? content.blocks().copy().<UnlockableContent>as()
                 .add(content.items())
@@ -366,16 +425,16 @@ public class MapObjectivesDialog extends BaseDialog{
                 content.getBy(type).<UnlockableContent>as()
             )){
                 if(!check.get((T)content)) continue;
-                p.image(content == Blocks.air ? Icon.none.getRegion() : content.uiIcon).size(iconMed).pad(3)
+                t.image(content == Blocks.air ? Icon.none.getRegion() : content.uiIcon).size(iconMed).pad(3)
                     .with(b -> b.addListener(new HandCursorListener()))
                     .tooltip(content.localizedName).get().clicked(() -> {
                         cons.get((T)content);
                         dialog.hide();
                     });
 
-                if(++i % 10 == 0) p.row();
+                if(++i % 10 == 0) t.row();
             }
-        });
+        }).fill();
 
         dialog.closeOnBack();
         dialog.show();
@@ -408,50 +467,6 @@ public class MapObjectivesDialog extends BaseDialog{
             case "Double" -> double.class;
             default -> boxed;
         };
-    }
-
-    public static <T> FieldInterpreter<T> defaultInterpreter(){
-        return (cont, name, type, get, set) -> cont.table(main -> {
-            main.margin(0f, 10f, 0f, 10f);
-            var header = main.table(Tex.button, t -> {
-                t.left();
-                t.margin(10f);
-
-                t.add(name + ":").color(Pal.accent);
-                t.add().growX();
-            }).growX().height(46f).pad(-10f).padTop(0f).get();
-
-            main.row().table(Tex.button, t -> {
-                t.left();
-                t.top().margin(10f);
-
-                t.defaults().minHeight(40f).left();
-                var obj = get.get();
-
-                int i = 0;
-                for(var entry : JsonIO.json.getFields(type.raw)){
-                    if(i++ > 0) t.row();
-
-                    var f = entry.value.field;
-                    var ft = f.getType();
-                    int mods = f.getModifiers();
-
-                    if(!Modifier.isPublic(mods) || (Modifier.isFinal(mods) && (
-                        String.class.isAssignableFrom(ft) ||
-                        unbox(ft).isPrimitive()
-                    ))) continue;
-
-                    var anno = Structs.find(f.getDeclaredAnnotations(), a -> hasInterpreter(a.annotationType(), ft));
-                    getInterpreter(anno == null ? Override.class : anno.annotationType(), ft).build(
-                        t, f.getName(), new TypeInfo(f),
-                        () -> Reflect.get(obj, f),
-                        Modifier.isFinal(mods) ? res -> {} : res -> Reflect.set(obj, f, res)
-                    );
-                }
-            }).growX().fillY();
-
-            header.toFront();
-        }).growX().fillY().pad(4f).colspan(2);
     }
 
     public static <T> void setInterpreter(Class<T> type, FieldInterpreter<? super T> interpreter){
@@ -502,7 +517,11 @@ public class MapObjectivesDialog extends BaseDialog{
     }
 
     public interface FieldInterpreter<T>{
-        void build(Table cont, CharSequence name, TypeInfo type, Prov<T> get, Cons<T> set);
+        void build(Table cont,
+                   CharSequence name, TypeInfo type,
+                   @Nullable Seq<Field> allFields, @Nullable Field field, @Nullable ObjectSet<Field> handled,
+                   @Nullable Intc indexer,
+                   Prov<T> get, Cons<T> set);
     }
 
     public interface FieldProvider<T>{

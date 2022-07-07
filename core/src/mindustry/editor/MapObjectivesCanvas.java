@@ -14,11 +14,14 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.editor.MapObjectivesCanvas.ObjectiveTilemap.ObjectiveTile.*;
+import mindustry.editor.MapObjectivesDialog.*;
 import mindustry.game.MapObjectives.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
+import mindustry.ui.dialogs.*;
 
+@SuppressWarnings("unchecked")
 public class MapObjectivesCanvas extends ScrollPane{
     public static final int
         objWidth = 5, objHeight = 2,
@@ -424,7 +427,21 @@ public class MapObjectivesCanvas extends ScrollPane{
 
                     t.table(b -> {
                         b.right().defaults().size(32f).pad((unitSize - 32f) / 2f - 4f);
-                        b.button(Icon.pencilSmall, () -> MapObjectivesDialog.showEditor(obj));
+                        b.button(Icon.pencilSmall, () -> {
+                            BaseDialog dialog = new BaseDialog("@editor.objectives");
+                            dialog.cont.pane(Styles.noBarPane, list -> list.top().table(e -> {
+                                e.margin(0f);
+                                MapObjectivesDialog.getInterpreter((Class<MapObjective>)obj.getClass()).build(
+                                    e, obj.typeName(), new TypeInfo(obj.getClass()),
+                                    null, null, null, null,
+                                    () -> obj,
+                                    res -> {}
+                                );
+                            }).width(400f).fillY()).grow();
+
+                            dialog.addCloseButton();
+                            dialog.show();
+                        });
                         b.button(Icon.trashSmall, () -> removeTile(this));
                     }).growY().fillX();
                 }).grow().colspan(3);

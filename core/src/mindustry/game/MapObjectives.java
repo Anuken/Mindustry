@@ -283,7 +283,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
     /** Research a specific piece of content in the tech tree. */
     public static class ResearchObjective extends MapObjective{
-        public UnlockableContent content = Items.copper;
+        public @Researchable UnlockableContent content = Items.copper;
 
         public ResearchObjective(UnlockableContent content){
             this.content = content;
@@ -304,7 +304,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
     /** Produce a specific piece of content in the tech tree (essentially research with different text). */
     public static class ProduceObjective extends MapObjective{
-        public UnlockableContent content = Items.copper;
+        public @Researchable UnlockableContent content = Items.copper;
 
         public ProduceObjective(UnlockableContent content){
             this.content = content;
@@ -371,7 +371,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
     /** Build a certain amount of a block. */
     public static class BuildCountObjective extends MapObjective{
-        public Block block = Blocks.conveyor;
+        public @Synthetic Block block = Blocks.conveyor;
         public int count = 1;
 
         public BuildCountObjective(Block block, int count){
@@ -491,7 +491,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
     public static class DestroyBlockObjective extends MapObjective{
         public int x, y;
         public Team team = Team.crux;
-        public Block block = Blocks.router;
+        public @Synthetic Block block = Blocks.router;
 
         public DestroyBlockObjective(Block block, int x, int y, Team team){
             this.block = block;
@@ -517,7 +517,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
     public static class DestroyBlocksObjective extends MapObjective{
         public int[] positions = {};
         public Team team = Team.crux;
-        public Block block = Blocks.router;
+        public @Synthetic Block block = Blocks.router;
 
         public DestroyBlocksObjective(Block block, Team team, int... positions){
             this.block = block;
@@ -801,7 +801,18 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         }
     }
 
+    /** For {@code byte}; treats it as a world label flag. */
     @Target(FIELD)
     @Retention(RUNTIME)
     public @interface LabelFlag{}
+
+    /** For {@link UnlockableContent}; filters all un-researchable content. */
+    @Target(FIELD)
+    @Retention(RUNTIME)
+    public @interface Researchable{}
+
+    /** For {@link Block}; filters all un-buildable blocks. */
+    @Target(FIELD)
+    @Retention(RUNTIME)
+    public @interface Synthetic{}
 }
