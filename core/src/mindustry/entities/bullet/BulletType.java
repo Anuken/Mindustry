@@ -14,6 +14,8 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
+import mindustry.entities.part.*;
+import mindustry.entities.part.DrawPart.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -173,6 +175,9 @@ public class BulletType extends Content implements Cloneable{
     public float intervalSpread = 0f;
     /** Angle offset for interval bullets. */
     public float intervalAngle = 0f;
+    
+    /** Extra visual parts for this bullet. */
+    public Seq<DrawPart> parts = new Seq<>(DrawPart.class);
 
     /** Color used for hit/despawn effects. */
     public Color hitColor = Color.white;
@@ -474,6 +479,18 @@ public class BulletType extends Content implements Cloneable{
 
     public void draw(Bullet b){
         drawTrail(b);
+
+        if(parts.size > 0){
+
+            DrawPart.params.set(0f, 0f, 0f, 0f, 0f, 0f, b.x, b.y, b.rotation());
+            DrawPart.params.life = b.fin()
+
+            for(int i = 0; i < parts.size; i++){
+                var part = parts.get(i);
+
+                part.draw(DrawPart.params);
+            }
+        }
     }
 
     public void drawTrail(Bullet b){
@@ -492,6 +509,8 @@ public class BulletType extends Content implements Cloneable{
     }
 
     public void init(Bullet b){
+
+        b.partLifetime = b.lifetime;
 
         if(killShooter && b.owner() instanceof Healthc h){
             h.kill();
@@ -614,6 +633,10 @@ public class BulletType extends Content implements Cloneable{
         
         drawSize = Math.max(drawSize, trailLength * speed * 2f);
         range = calculateRange();
+
+        if(parts.size > 0){
+            parts.each(p -> p.progress = PartProgress.life);
+        }
     }
 
     @Override

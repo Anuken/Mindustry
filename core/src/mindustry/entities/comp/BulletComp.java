@@ -41,6 +41,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     transient boolean keepAlive;
     transient @Nullable Tile aimTile;
     transient float aimX, aimY;
+    transient float partTime, partLifetime;
     transient float originX, originY;
     transient @Nullable Mover mover;
     transient boolean absorbed, hit;
@@ -148,6 +149,8 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
             time -= Time.delta;
             keepAlive = false;
         }
+
+        partTime = Math.min(partTime + Time.delta, partLifetime);
     }
 
     public void moveRelative(float x, float y){
@@ -265,5 +268,10 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     @Override
     public float rotation(){
         return vel.isZero(0.001f) ? rotation : vel.angle();
+    }
+
+    @Override
+    public float fin(){
+        return partTime / partLifetime;
     }
 }
