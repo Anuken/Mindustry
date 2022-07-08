@@ -483,7 +483,7 @@ public class BulletType extends Content implements Cloneable{
         if(parts.size > 0){
 
             DrawPart.params.set(0f, 0f, 0f, 0f, 0f, 0f, b.x, b.y, b.rotation());
-            DrawPart.params.life = b.fin()
+            DrawPart.params.life = b.fin();
 
             for(int i = 0; i < parts.size; i++){
                 var part = parts.get(i);
