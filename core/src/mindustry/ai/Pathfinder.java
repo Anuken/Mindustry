@@ -12,6 +12,7 @@ import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.storage.*;
 import mindustry.world.meta.*;
@@ -152,11 +153,11 @@ public class Pathfinder implements Runnable{
 
     /** Packs a tile into its internal representation. */
     public int packTile(Tile tile){
-        boolean nearLiquid = false, nearSolid = false, nearGround = false, solid = tile.solid(), allDeep = tile.floor().isDeep();
+        boolean nearLiquid = false, nearSolid = false, nearGround = false, solid = tile.solid() || tile.block() instanceof ConstructBlock, allDeep = tile.floor().isDeep();
 
         for(int i = 0; i < 4; i++){
             Tile other = tile.nearby(i);
-            if(other != null)   {
+            if(other != null){
                 Floor floor = other.floor();
                 boolean osolid = other.solid();
                 if(floor.isLiquid) nearLiquid = true;

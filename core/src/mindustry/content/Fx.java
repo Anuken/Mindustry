@@ -1611,12 +1611,25 @@ public class Fx{
         }
     }),
 
+    shootSmokeRavage = new Effect(70f, e -> {
+        rand.setSeed(e.id);
+        for(int i = 0; i < 13; i++){
+            float a = e.rotation + rand.range(30f);
+            v.trns(a, rand.random(e.finpow() * 50f));
+            e.scaled(e.lifetime * rand.random(0.3f, 1f), b -> {
+                color(e.color);
+                Lines.stroke(b.fout() * 3f + 0.5f);
+                Lines.lineAngle(e.x + v.x, e.y + v.y, a, b.fout() * 8f + 0.4f);
+            });
+        }
+    }),
+
     shootSmokeMissile = new Effect(130f, 300f, e -> {
         color(Pal.redLight);
         alpha(0.5f);
         rand.setSeed(e.id);
         for(int i = 0; i < 35; i++){
-            v.trns(e.rotation + rand.range(21f), rand.random(e.finpow() * 90f)).add(rand.range(3f), rand.range(3f));
+            v.trns(e.rotation + 180f + rand.range(21f), rand.random(e.finpow() * 90f)).add(rand.range(3f), rand.range(3f));
             e.scaled(e.lifetime * rand.random(0.2f, 1f), b -> {
                 Fill.circle(e.x + v.x, e.y + v.y, b.fout() * 9f + 0.3f);
             });

@@ -715,6 +715,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         selectedUnits.removeAll(u -> !u.isCommandable() || !u.isValid());
 
         if(!commandMode){
+            commandBuild = null;
             selectedUnits.clear();
         }
 
