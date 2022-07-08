@@ -1862,8 +1862,8 @@ public class Blocks{
             itemCapacity = 100;
             scaledHealth = 120f;
         }};
-        //endregion
         
+        //endregion
         //region distribution
 
         conveyor = new Conveyor("conveyor"){{
