@@ -176,7 +176,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         /** Temporary container to store references since this class is static. Will immediately be flattened. */
         private transient final Seq<MapObjective> children = new Seq<>(2);
 
-        /** For the objectives UI dialog. Do not modify! */
+        /** For the objectives UI dialog. Do not modify directly! */
         public transient int editorX = -1, editorY = -1;
 
         /** Whether this objective has been done yet. This is internally set. */
@@ -438,8 +438,9 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
     public static class TimerObjective extends MapObjective{
         public String text;
-        public float countup;
-        public float duration = 60f * 30f;
+        public @Second float duration = 60f * 30f;
+
+        protected float countup;
 
         public TimerObjective(String text, float duration){
             this.text = text;
@@ -489,22 +490,21 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
     }
 
     public static class DestroyBlockObjective extends MapObjective{
-        public int x, y;
+        public Point2 pos = new Point2();
         public Team team = Team.crux;
         public @Synthetic Block block = Blocks.router;
 
         public DestroyBlockObjective(Block block, int x, int y, Team team){
             this.block = block;
-            this.x = x;
-            this.y = y;
             this.team = team;
+            this.pos.set(x, y);
         }
 
         public DestroyBlockObjective(){}
 
         @Override
         public boolean update(){
-            var build = world.build(x, y);
+            var build = world.build(pos.x, pos.y);
             return build == null || build.team != team || build.block != block;
         }
 
@@ -515,11 +515,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
     }
 
     public static class DestroyBlocksObjective extends MapObjective{
-        public int[] positions = {};
+        public Point2[] positions = {};
         public Team team = Team.crux;
         public @Synthetic Block block = Blocks.router;
 
-        public DestroyBlocksObjective(Block block, Team team, int... positions){
+        public DestroyBlocksObjective(Block block, Team team, Point2... positions){
             this.block = block;
             this.team = team;
             this.positions = positions;
@@ -530,9 +530,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public int progress(){
             int count = 0;
             for(var pos : positions){
-                int x = Point2.x(pos), y = Point2.y(pos);
-
-                var build = world.build(x, y);
+                var build = world.build(pos.x, pos.y);
                 if(build == null || build.team != team || build.block != block){
                     count ++;
                 }
@@ -623,7 +621,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
     /** Displays text above a shape. */
     public static class ShapeTextMarker extends ObjectiveMarker{
         public String text = "frog";
-        public float x, y;
+        public Vec2 pos = new Vec2();
         public float fontSize = 1f, textHeight = 7f;
         public @LabelFlag byte flags = WorldLabel.flagBackground | WorldLabel.flagOutline;
 
@@ -636,29 +634,25 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         public ShapeTextMarker(String text, float x, float y){
             this.text = text;
-            this.x = x;
-            this.y = y;
+            this.pos.set(x, y);
         }
 
         public ShapeTextMarker(String text, float x, float y, float radius){
             this.text = text;
-            this.x = x;
-            this.y = y;
+            this.pos.set(x, y);
             this.radius = radius;
         }
 
         public ShapeTextMarker(String text, float x, float y, float radius, float rotation){
             this.text = text;
-            this.x = x;
-            this.y = y;
+            this.pos.set(x, y);
             this.radius = radius;
             this.rotation = rotation;
         }
 
         public ShapeTextMarker(String text, float x, float y, float radius, float rotation, float textHeight){
             this.text = text;
-            this.x = x;
-            this.y = y;
+            this.pos.set(x, y);
             this.radius = radius;
             this.rotation = rotation;
             this.textHeight = textHeight;
@@ -669,39 +663,36 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         @Override
         public void draw(){
             Lines.stroke(3f, Pal.gray);
-            Lines.poly(x, y, sides, radius + 1f, rotation);
+            Lines.poly(pos.x, pos.y, sides, radius + 1f, rotation);
             Lines.stroke(1f, color);
-            Lines.poly(x, y, sides, radius + 1f, rotation);
+            Lines.poly(pos.x, pos.y, sides, radius + 1f, rotation);
             Draw.reset();
 
             if(fetchedText == null){
                 fetchedText = text.startsWith("@") ? Core.bundle.get(text.substring(1)) : text;
             }
 
-            WorldLabel.drawAt(text, x, y + radius + textHeight, Draw.z(), flags, fontSize);
+            WorldLabel.drawAt(text, pos.x, pos.y + radius + textHeight, Draw.z(), flags, fontSize);
         }
     }
 
     /** Displays a circle on the minimap. */
     public static class MinimapMarker extends ObjectiveMarker{
-        public int x, y;
+        public Point2 pos = new Point2();
         public float radius = 5f, stroke = 11f;
         public Color color = Color.valueOf("f25555");
 
         public MinimapMarker(int x, int y){
-            this.x = x;
-            this.y = y;
+            this.pos.set(x, y);
         }
 
         public MinimapMarker(int x, int y, Color color){
-            this.x = x;
-            this.y = y;
+            this.pos.set(x, y);
             this.color = color;
         }
 
         public MinimapMarker(int x, int y, float radius, float stroke, Color color){
-            this.x = x;
-            this.y = y;
+            this.pos.set(x, y);
             this.stroke = stroke;
             this.radius = radius;
             this.color = color;
@@ -711,7 +702,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public void drawMinimap(MinimapRenderer minimap){
-            minimap.transform(Tmp.v1.set(x * tilesize, y * tilesize));
+            minimap.transform(Tmp.v1.set(pos.x * tilesize, pos.y * tilesize));
 
             float rad = minimap.scale(radius * tilesize);
             float fin = Interp.pow2Out.apply((Time.globalTime / 100f) % 1f);
@@ -724,20 +715,18 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
     /** Displays a shape with an outline and color. */
     public static class ShapeMarker extends ObjectiveMarker{
-        public float x, y;
+        public Vec2 pos = new Vec2();
         public float radius = 8f, rotation = 0f, stroke = 1f;
         public boolean fill = false, outline = true;
         public int sides = 4;
         public Color color = Color.valueOf("ffd37f");
 
         public ShapeMarker(float x, float y){
-            this.x = x;
-            this.y = y;
+            this.pos.set(x, y);
         }
 
         public ShapeMarker(float x, float y, float radius, float rotation){
-            this.x = x;
-            this.y = y;
+            this.pos.set(x, y);
             this.radius = radius;
             this.rotation = rotation;
         }
@@ -752,14 +741,14 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             if(!fill){
                 if(outline){
                     Lines.stroke(stroke + 2f, Pal.gray);
-                    Lines.poly(x, y, sides, radius + 1f, rotation);
+                    Lines.poly(pos.x, pos.y, sides, radius + 1f, rotation);
                 }
 
                 Lines.stroke(stroke, color);
-                Lines.poly(x, y, sides, radius + 1f, rotation);
+                Lines.poly(pos.x, pos.y, sides, radius + 1f, rotation);
             }else{
                 Draw.color(color);
-                Fill.poly(x, y, sides, radius);
+                Fill.poly(pos.x, pos.y, sides, radius);
             }
 
             Draw.reset();
@@ -769,7 +758,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
     /** Displays text at a location. */
     public static class TextMarker extends ObjectiveMarker{
         public String text = "uwu";
-        public float x, y;
+        public Vec2 pos = new Vec2();
         public float fontSize = 1f;
         public @LabelFlag byte flags = WorldLabel.flagBackground | WorldLabel.flagOutline;
         // Cached localized text.
@@ -777,16 +766,14 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         public TextMarker(String text, float x, float y, float fontSize, byte flags){
             this.text = text;
-            this.x = x;
-            this.y = y;
             this.fontSize = fontSize;
             this.flags = flags;
+            this.pos.set(x, y);
         }
 
         public TextMarker(String text, float x, float y){
             this.text = text;
-            this.x = x;
-            this.y = y;
+            this.pos.set(x, y);
         }
 
         public TextMarker(){}
@@ -797,7 +784,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                 fetchedText = text.startsWith("@") ? Core.bundle.get(text.substring(1)) : text;
             }
 
-            WorldLabel.drawAt(fetchedText, x, y, Draw.z(), flags, fontSize);
+            WorldLabel.drawAt(fetchedText, pos.x, pos.y, Draw.z(), flags, fontSize);
         }
     }
 
@@ -815,4 +802,14 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
     @Target(FIELD)
     @Retention(RUNTIME)
     public @interface Synthetic{}
+
+    /** For {@code float}; multiplies the UI input by 60. */
+    @Target(FIELD)
+    @Retention(RUNTIME)
+    public @interface Second{}
+
+    /** For {@code float} or similar data structures, such as {@link Vec2}; multiplies the UI input by {@link Vars#tilesize}. */
+    @Target(FIELD)
+    @Retention(RUNTIME)
+    public @interface TilePos{}
 }

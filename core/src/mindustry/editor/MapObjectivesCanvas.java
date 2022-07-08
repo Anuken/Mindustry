@@ -383,7 +383,7 @@ public class MapObjectivesCanvas extends WidgetGroup{
                                 e.margin(0f);
                                 MapObjectivesDialog.getInterpreter((Class<MapObjective>)obj.getClass()).build(
                                     e, obj.typeName(), new TypeInfo(obj.getClass()),
-                                    null, null, null, null,
+                                    null, null,
                                     () -> obj,
                                     res -> {}
                                 );

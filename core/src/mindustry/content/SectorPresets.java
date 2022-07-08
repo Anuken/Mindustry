@@ -194,7 +194,7 @@ public class SectorPresets{
             rules = r -> {
                 float rad = 52f;
                 r.objectives.add(
-                    new DestroyBlocksObjective(Blocks.coreBastion, Team.malis, Point2.pack(290,501), Point2.pack(158,496))
+                    new DestroyBlocksObjective(Blocks.coreBastion, Team.malis, new Point2(290, 501), new Point2(158, 496))
                     .flagsAdded("nukeannounce")
                     .child(new TimerObjective("@objective.nuclearlaunch", 8 * 60 * 60).markers(
                         new MinimapMarker(338, 377, rad, 14f, Pal.remove),
