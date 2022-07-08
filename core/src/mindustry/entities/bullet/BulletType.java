@@ -633,10 +633,6 @@ public class BulletType extends Content implements Cloneable{
         
         drawSize = Math.max(drawSize, trailLength * speed * 2f);
         range = calculateRange();
-
-        if(parts.size > 0){
-            parts.each(p -> p.progress = PartProgress.life);
-        }
     }
 
     @Override
