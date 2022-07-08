@@ -93,6 +93,8 @@ public class Blocks{
     radar,
     buildTower,
     regenProjector, barrierProjector,
+    shockwaveTower,
+
     //campaign only
     shieldProjector,
     largeShieldProjector,
@@ -1811,6 +1813,12 @@ public class Blocks{
                 color = col;
             }});
         }};
+        shockwaveTower = new ShockwaveTower("shockwave-tower"){{
+            requirements(Category.effect, with());
+            size = 2;
+            consumeLiquids(LiquidStack.with(Liquids.cyanogen, 1f / 60f));
+            consumePower(80f / 60f);
+        }};
 
         //TODO implement
         if(false)
@@ -1854,7 +1862,6 @@ public class Blocks{
             itemCapacity = 100;
             scaledHealth = 120f;
         }};
-
         //endregion
         //region distribution
 
@@ -2241,7 +2248,7 @@ public class Blocks{
             requirements(Category.power, with(Items.titanium, 5, Items.lead, 10, Items.silicon, 3));
             size = 2;
             maxNodes = 15;
-            laserRange = 15f;
+            laserRange = 9.5f;
         }};
 
         surgeTower = new PowerNode("surge-tower"){{
