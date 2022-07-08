@@ -12,34 +12,20 @@ import mindustry.world.meta.*;
 import mindustry.world.*;
 import mindustry.entities.*;
 import mindustry.annotations.Annotations.Load;
-
-import static arc.graphics.g2d.Draw.color;
-import static arc.graphics.g2d.Lines.*;
-import static arc.math.Angles.randLenVectors;
-import static mindustry.Vars.tilesize;
+import mindustry.*;
 
 public class ShockwaveTower extends Block {
     public float range = 80f;
     public float interval = 30f;
     public float bulletDamage = 150;
-    public float minTargets = 1; //don't know if anyone needs this, adding it anyway
     public float falloffCount = 20f;
     public float shake = 3f;
     public Sound shootSound = Sounds.bang;
     public Color waveColor = Pal.redSpark, heatColor = Color.red;
     public float cooldownMultiplier = 1f;
+    public Effect waveEffect = Fx.pointShockwave
 
     public @Load("@-heat") TextureRegion heatRegion; //debating whether it should be "glow" instead
-
-    public Effect waveEffect = new Effect(20, e -> {
-        color(waveColor);
-        stroke(e.fout() * 2f);
-        Lines.circle(e.x, e.y, range * e.finpow());
-        color(Pal.gray);
-        randLenVectors(e.id + 1, 8, 1f + 23f * e.finpow(), (x, y) ->
-            lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1f + e.fout() * 3f
-        ));
-    });
 
     public ShockwaveTower(String name) {
         super(name);
@@ -66,9 +52,9 @@ public class ShockwaveTower extends Block {
     public class ShockwaveTowerBuild extends Building {
         public float refresh = Mathf.random(interval);
         public float reload = 0f;
-        float heat = 0f;
+        public float heat = 0f;
         public Seq<Bullet> targets = new Seq<>();
-        public float d;
+        public float waveDamage;
 
         @Override
         public void updateTile() {
@@ -77,16 +63,16 @@ public class ShockwaveTower extends Block {
                 refresh = 0f;
                 targets = Groups.bullet.intersect(x - range, y - range, range * 2, range * 2).filter(b -> b.team != team && b.type().hittable);
 
-                if (efficiency > 0 && targets.size >= minTargets) {
+                if (efficiency > 0 && targets.size != 0) {
                     waveEffect.at(this);
                     shootSound.at(this);
                     Effect.shake(shake, shake, this);
                     reload = interval;
-                    d = Math.min(bulletDamage, bulletDamage * falloffCount / targets.size);
+                    waveDamage = Math.min(bulletDamage, bulletDamage * falloffCount / targets.size);
 
                     for (var target : targets) {
                         if (target.type() != null && target.type().hittable) { //destroys lasers regardless of the filter sometimes
-                            if (target.damage() > d) {
+                            if (target.damage() > waveDamage) {
                                 target.damage(target.damage() - d);
                             } else {
                                 target.remove();
@@ -99,7 +85,7 @@ public class ShockwaveTower extends Block {
         }
         @Override
         public boolean shouldConsume() {
-            return targets.size >= minTargets;
+            return targets.size != 0;
         }
 
         @Override
