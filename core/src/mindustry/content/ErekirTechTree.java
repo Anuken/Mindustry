@@ -351,7 +351,7 @@ public class ErekirTechTree{
 
                     node(three, Seq.with(new SectorComplete(two), new SectorComplete(lake), new Research(ventCondenser), new Research(shipFabricator)), () -> {
                         node(atlas, Seq.with(new SectorComplete(three), new Research(mechFabricator)), () -> {
-                            node(split, Seq.with(new SectorComplete(atlas), new Research(payloadConveyor)), () -> {
+                            node(split, Seq.with(new SectorComplete(atlas), new Research(payloadConveyor), new Research(reinforcedContainer)), () -> {
 
                             });
 
