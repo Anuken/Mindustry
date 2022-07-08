@@ -356,7 +356,8 @@ public class ErekirTechTree{
                             });
 
                             node(four, Seq.with(new SectorComplete(three)), () -> {
-
+                                node(darkness, Seq.with(new SectorComplete(four)), () -> {
+                                });
                             });
                         });
                     });
