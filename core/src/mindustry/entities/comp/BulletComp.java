@@ -22,7 +22,7 @@ import static mindustry.Vars.*;
 
 @EntityDef(value = {Bulletc.class}, pooled = true, serialize = false)
 @Component(base = true)
-abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Drawc, Shielderc, Ownerc, Velc, Bulletc, Timerc{
+abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Drawc, Shielderc, Ownerc, Velc, Bulletc, Timerc, Scaled{
     @Import Team team;
     @Import Entityc owner;
     @Import float x, y, damage, lastX, lastY, time, lifetime;
