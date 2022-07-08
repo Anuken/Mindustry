@@ -56,6 +56,10 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
         });
 
         super.init();
+        ammoTypes.each((Item, BulletType) -> {
+            if(BulletType.rangeChange>0)
+                placeOverlapRange = Math.max(placeOverlapRange, range + BulletType.rangeChange + placeOverlapMargin);
+        });
     }
 
     public class ContinuousLiquidTurretBuild extends ContinuousTurretBuild{
