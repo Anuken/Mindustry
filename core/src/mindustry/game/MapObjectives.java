@@ -167,8 +167,8 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
     /** Base abstract class for any in-map objective. */
     public static abstract class MapObjective{
         public @Nullable String details;
-        public String[] flagsAdded = {};
-        public String[] flagsRemoved = {};
+        public @Unordered String[] flagsAdded = {};
+        public @Unordered String[] flagsRemoved = {};
         public ObjectiveMarker[] markers = {};
 
         /** The parents of this objective. All parents must be done in order for this to be updated. */
@@ -515,7 +515,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
     }
 
     public static class DestroyBlocksObjective extends MapObjective{
-        public Point2[] positions = {};
+        public @Unordered Point2[] positions = {};
         public Team team = Team.crux;
         public @Synthetic Block block = Blocks.router;
 
@@ -787,6 +787,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             WorldLabel.drawAt(fetchedText, pos.x, pos.y, Draw.z(), flags, fontSize);
         }
     }
+
+    /** For arrays or {@link Seq}s; does not create element rearrangement buttons. */
+    @Target(FIELD)
+    @Retention(RUNTIME)
+    public @interface Unordered{}
 
     /** For {@code byte}; treats it as a world label flag. */
     @Target(FIELD)

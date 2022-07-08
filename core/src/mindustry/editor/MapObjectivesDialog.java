@@ -40,20 +40,20 @@ public class MapObjectivesDialog extends BaseDialog{
     static{
         // Default un-annotated field interpreters.
         setProvider(String.class, (type, cons) -> cons.get(""));
-        setInterpreter(String.class, (cont, name, type, field, indexer, get, set) -> {
-            name(cont, name, indexer);
-            cont.area(get.get(), set).height(60f).growX();
+        setInterpreter(String.class, (cont, name, type, field, remover, indexer, get, set) -> {
+            name(cont, name, remover, indexer);
+            cont.area(get.get(), set).growX();
         });
 
         setProvider(boolean.class, (type, cons) -> cons.get(false));
-        setInterpreter(boolean.class, (cont, name, type, field, indexer, get, set) -> {
-            name(cont, name, indexer);
+        setInterpreter(boolean.class, (cont, name, type, field, remover, indexer, get, set) -> {
+            name(cont, name, remover, indexer);
             cont.check("", get.get(), set::get).growX().fillY().get().getLabelCell().growX();
         });
 
         setProvider(byte.class, (type, cons) -> cons.get((byte)0));
-        setInterpreter(byte.class, (cont, name, type, field, indexer, get, set) -> {
-            name(cont, name, indexer);
+        setInterpreter(byte.class, (cont, name, type, field, remover, indexer, get, set) -> {
+            name(cont, name, remover, indexer);
             cont.field(Byte.toString(get.get()), str -> set.get((byte)Strings.parseInt(str)))
                 .growX().fillY()
                 .valid(Strings::canParseInt)
@@ -61,8 +61,8 @@ public class MapObjectivesDialog extends BaseDialog{
         });
 
         setProvider(int.class, (type, cons) -> cons.get(0));
-        setInterpreter(int.class, (cont, name, type, field, indexer, get, set) -> {
-            name(cont, name, indexer);
+        setInterpreter(int.class, (cont, name, type, field, remover, indexer, get, set) -> {
+            name(cont, name, remover, indexer);
             cont.field(Integer.toString(get.get()), str -> set.get(Strings.parseInt(str)))
                 .growX().fillY()
                 .valid(Strings::canParseInt)
@@ -70,7 +70,7 @@ public class MapObjectivesDialog extends BaseDialog{
         });
 
         setProvider(float.class, (type, cons) -> cons.get(0f));
-        setInterpreter(float.class, (cont, name, type, field, indexer, get, set) -> {
+        setInterpreter(float.class, (cont, name, type, field, remover, indexer, get, set) -> {
             float m = 1f;
             if(field != null){
                 if(field.isAnnotationPresent(Second.class)){
@@ -82,7 +82,7 @@ public class MapObjectivesDialog extends BaseDialog{
 
             float mult = m;
 
-            name(cont, name, indexer);
+            name(cont, name, remover, indexer);
             cont.field(Float.toString(get.get() / mult), str -> set.get(Strings.parseFloat(str) * mult))
                 .growX().fillY()
                 .valid(Strings::canParseFloat)
@@ -90,8 +90,8 @@ public class MapObjectivesDialog extends BaseDialog{
         });
 
         setProvider(UnlockableContent.class, (type, cons) -> cons.get(Blocks.coreShard));
-        setInterpreter(UnlockableContent.class, (cont, name, type, field, indexer, get, set) -> {
-            name(cont, name, indexer);
+        setInterpreter(UnlockableContent.class, (cont, name, type, field, remover, indexer, get, set) -> {
+            name(cont, name, remover, indexer);
             cont.table(t -> t.left().button(
                 b -> b.image().size(iconSmall).update(i -> i.setDrawable(get.get().uiIcon)),
                 () -> showContentSelect(null, set, b -> (field != null && !field.isAnnotationPresent(Researchable.class)) || b.techNode != null)
@@ -99,8 +99,8 @@ public class MapObjectivesDialog extends BaseDialog{
         });
 
         setProvider(Block.class, (type, cons) -> cons.get(Blocks.copperWall));
-        setInterpreter(Block.class, (cont, name, type, field, indexer, get, set) -> {
-            name(cont, name, indexer);
+        setInterpreter(Block.class, (cont, name, type, field, remover, indexer, get, set) -> {
+            name(cont, name, remover, indexer);
             cont.table(t -> t.left().button(
                 b -> b.image().size(iconSmall).update(i -> i.setDrawable(get.get().uiIcon)),
                 () -> showContentSelect(ContentType.block, set, b -> (field != null && !field.isAnnotationPresent(Synthetic.class)) || b.synthetic())
@@ -108,8 +108,8 @@ public class MapObjectivesDialog extends BaseDialog{
         });
 
         setProvider(Item.class, (type, cons) -> cons.get(Items.copper));
-        setInterpreter(Item.class, (cont, name, type, field, indexer, get, set) -> {
-            name(cont, name, indexer);
+        setInterpreter(Item.class, (cont, name, type, field, remover, indexer, get, set) -> {
+            name(cont, name, remover, indexer);
             cont.table(t -> t.left().button(
                 b -> b.image().size(iconSmall).update(i -> i.setDrawable(get.get().uiIcon)),
                 () -> showContentSelect(ContentType.item, set, item -> true)
@@ -117,8 +117,8 @@ public class MapObjectivesDialog extends BaseDialog{
         });
 
         setProvider(UnitType.class, (type, cons) -> cons.get(UnitTypes.dagger));
-        setInterpreter(UnitType.class, (cont, name, type, field, indexer, get, set) -> {
-            name(cont, name, indexer);
+        setInterpreter(UnitType.class, (cont, name, type, field, remover, indexer, get, set) -> {
+            name(cont, name, remover, indexer);
             cont.table(t -> t.left().button(
                 b -> b.image().size(iconSmall).update(i -> i.setDrawable(get.get().uiIcon)),
                 () -> showContentSelect(ContentType.unit, set, unit -> true)
@@ -126,8 +126,8 @@ public class MapObjectivesDialog extends BaseDialog{
         });
 
         setProvider(Team.class, (type, cons) -> cons.get(Team.sharded));
-        setInterpreter(Team.class, (cont, name, type, field, indexer, get, set) -> {
-            name(cont, name, indexer);
+        setInterpreter(Team.class, (cont, name, type, field, remover, indexer, get, set) -> {
+            name(cont, name, remover, indexer);
             cont.table(t -> t.left().button(
                 b -> b.image(Tex.whiteui).size(iconSmall).update(i -> i.setColor(get.get().color)),
                 () -> showTeamSelect(set)
@@ -135,10 +135,10 @@ public class MapObjectivesDialog extends BaseDialog{
         });
 
         setProvider(Color.class, (type, cons) -> cons.get(Pal.accent.cpy()));
-        setInterpreter(Color.class, (cont, name, type, field, indexer, get, set) -> {
+        setInterpreter(Color.class, (cont, name, type, field, remover, indexer, get, set) -> {
             var out = get.get();
 
-            name(cont, name, indexer);
+            name(cont, name, remover, indexer);
             cont.table(t -> t.left().button(
                 b -> b.stack(new Image(Tex.alphaBg), new Image(Tex.whiteui){{
                     update(() -> setColor(out));
@@ -149,10 +149,10 @@ public class MapObjectivesDialog extends BaseDialog{
         });
 
         setProvider(Vec2.class, (type, cons) -> cons.get(new Vec2()));
-        setInterpreter(Vec2.class, (cont, name, type, field, indexer, get, set) -> {
+        setInterpreter(Vec2.class, (cont, name, type, field, remover, indexer, get, set) -> {
             var obj = get.get();
 
-            name(cont, name, indexer);
+            name(cont, name, remover, indexer);
             cont.table(t -> {
                 boolean isInt = type.raw == int.class;
 
@@ -161,7 +161,7 @@ public class MapObjectivesDialog extends BaseDialog{
 
                 in.build(
                     t, "x", new TypeInfo(isInt ? int.class : float.class),
-                    field, null,
+                    field, null, null,
                     isInt ? () -> (int)obj.x : () -> obj.x,
                     res -> {
                         obj.x = isInt ? (Integer)res : (Float)res;
@@ -171,7 +171,7 @@ public class MapObjectivesDialog extends BaseDialog{
 
                 in.build(
                     t.row(), "y", new TypeInfo(isInt ? int.class : float.class),
-                    field, null,
+                    field, null, null,
                     isInt ? () -> (int)obj.y : () -> obj.y,
                     res -> {
                         obj.y = isInt ? (Integer)res : (Float)res;
@@ -182,12 +182,12 @@ public class MapObjectivesDialog extends BaseDialog{
         });
 
         setProvider(Point2.class, (type, cons) -> cons.get(new Point2()));
-        setInterpreter(Point2.class, (cont, name, type, field, indexer, get, set) -> {
+        setInterpreter(Point2.class, (cont, name, type, field, remover, indexer, get, set) -> {
             var obj = get.get();
             var vec = new Vec2(obj.x, obj.y);
             getInterpreter(Vec2.class).build(
                 cont, name, new TypeInfo(int.class),
-                field, indexer,
+                field, remover, indexer,
                 () -> vec,
                 res -> {
                     vec.set(res);
@@ -246,8 +246,8 @@ public class MapObjectivesDialog extends BaseDialog{
         for(var mark : MapObjectives.allMarkerTypes) setInterpreter(mark.get().getClass(), defaultInterpreter());
 
         // Annotated field interpreters.
-        setInterpreter(LabelFlag.class, byte.class, (cont, name, type, field, indexer, get, set) -> {
-            name(cont, name, indexer);
+        setInterpreter(LabelFlag.class, byte.class, (cont, name, type, field, remover, indexer, get, set) -> {
+            name(cont, name, remover, indexer);
             cont.table(t -> {
                 t.left().defaults().left();
                 byte
@@ -267,7 +267,7 @@ public class MapObjectivesDialog extends BaseDialog{
         // Special data structure interpreters.
         // Instantiate default `Seq`s with a reflectively allocated array.
         setProvider(Seq.class, (type, cons) -> cons.get(new Seq<>(type.element.raw)));
-        setInterpreter(Seq.class, (cont, name, type, field, indexer, get, set) -> cont.table(main -> {
+        setInterpreter(Seq.class, (cont, name, type, field, remover, indexer, get, set) -> cont.table(main -> {
             Runnable[] rebuild = {null};
             var arr = get.get();
 
@@ -279,10 +279,10 @@ public class MapObjectivesDialog extends BaseDialog{
                 if(name.length() > 0) t.add(name + ":").color(Pal.accent);
                 t.add().growX();
 
+                if(remover != null) t.button(Icon.trash, Styles.emptyi, remover).fill().padRight(4f);
                 if(indexer != null){
-                    t.button(Icon.trash, Styles.emptyi, () -> indexer.get(0)).fill().padRight(4f);
-                    t.button(Icon.upOpen, Styles.emptyi, () -> indexer.get(1)).fill().padRight(4f);
-                    t.button(Icon.downOpen, Styles.emptyi, () -> indexer.get(-1)).fill().padRight(4f);
+                    t.button(Icon.upOpen, Styles.emptyi, () -> indexer.get(true)).fill().padRight(4f);
+                    t.button(Icon.downOpen, Styles.emptyi, () -> indexer.get(false)).fill().padRight(4f);
                 }
 
                 t.button(Icon.add, Styles.emptyi, () -> getProvider(type.element.raw).get(type.element, res -> {
@@ -307,26 +307,18 @@ public class MapObjectivesDialog extends BaseDialog{
 
                     getInterpreter((Class<Object>)arr.get(index).getClass()).build(
                         t, "", new TypeInfo(arr.get(index).getClass()),
-                        field, in -> {
-                            if(switch(in){
-                                case 0 -> {
-                                    arr.remove(index);
-                                    yield true;
-                                }
-
-                                case 1 -> {
-                                    if(index > 0) arr.swap(index, index - 1);
-                                    yield true;
-                                }
-
-                                case -1 -> {
-                                    if(index < len - 1) arr.swap(index, index + 1);
-                                    yield true;
-                                }
-
-                                default -> false;
-                            }) rebuild[0].run();
-                        },
+                        field, () -> {
+                            arr.remove(index);
+                            rebuild[0].run();
+                        }, field == null || !field.isAnnotationPresent(Unordered.class) ? in -> {
+                            if(in && index > 0){
+                                arr.swap(index, index - 1);
+                                rebuild[0].run();
+                            }else if(!in && index < len - 1){
+                                arr.swap(index, index + 1);
+                                rebuild[0].run();
+                            }
+                        } : null,
                         () -> arr.get(index),
                         res -> {
                             arr.set(index, res);
@@ -344,11 +336,11 @@ public class MapObjectivesDialog extends BaseDialog{
 
         // Reserved for array types that are not explicitly handled. Essentially handles it the same way as `Seq`.
         setProvider(Object[].class, (type, cons) -> cons.get(Reflect.newArray(type.element.raw, 0)));
-        setInterpreter(Object[].class, (cont, name, type, field, indexer, get, set) -> {
+        setInterpreter(Object[].class, (cont, name, type, field, remover, indexer, get, set) -> {
             var arr = Seq.with(get.get());
             getInterpreter(Seq.class).build(
                 cont, name, new TypeInfo(Seq.class, type.element),
-                field, indexer,
+                field, remover, indexer,
                 () -> arr,
                 res -> set.get(arr.toArray(type.element.raw))
             );
@@ -356,7 +348,7 @@ public class MapObjectivesDialog extends BaseDialog{
     }
 
     public static <T> FieldInterpreter<T> defaultInterpreter(){
-        return (cont, name, type, field, indexer, get, set) -> cont.table(main -> {
+        return (cont, name, type, field, remover, indexer, get, set) -> cont.table(main -> {
             main.margin(0f, 10f, 0f, 10f);
             var header = main.table(Tex.button, t -> {
                 t.left();
@@ -365,10 +357,12 @@ public class MapObjectivesDialog extends BaseDialog{
                 if(name.length() > 0) t.add(name + ":").color(Pal.accent);
                 t.add().growX();
 
+                Cell<ImageButton> remove = null;
+                if(remover != null) remove = t.button(Icon.trash, Styles.emptyi, remover).fill();
                 if(indexer != null){
-                    t.button(Icon.trash, Styles.emptyi, () -> indexer.get(0)).fill().padRight(4f);
-                    t.button(Icon.upOpen, Styles.emptyi, () -> indexer.get(1)).fill().padRight(4f);
-                    t.button(Icon.downOpen, Styles.emptyi, () -> indexer.get(-1)).fill();
+                    if(remove != null) remove.padRight(4f);
+                    t.button(Icon.upOpen, Styles.emptyi, () -> indexer.get(true)).fill().padRight(4f);
+                    t.button(Icon.downOpen, Styles.emptyi, () -> indexer.get(false)).fill();
                 }
             }).growX().height(46f).pad(0f, -10f, -0f, -10f).get();
 
@@ -395,7 +389,7 @@ public class MapObjectivesDialog extends BaseDialog{
                     var anno = Structs.find(f.getDeclaredAnnotations(), a -> hasInterpreter(a.annotationType(), ft));
                     getInterpreter(anno == null ? Override.class : anno.annotationType(), ft).build(
                         t, f.getName(), new TypeInfo(f),
-                        f, null,
+                        f, null, null,
                         () -> Reflect.get(obj, f),
                         Modifier.isFinal(mods) ? res -> {} : res -> Reflect.set(obj, f, res)
                     );
@@ -406,12 +400,15 @@ public class MapObjectivesDialog extends BaseDialog{
         }).growX().fillY().pad(4f).colspan(2);
     }
 
-    public static void name(Table cont, CharSequence name, @Nullable Intc indexer){
-        if(indexer != null){
+    public static void name(Table cont, CharSequence name, @Nullable Runnable remover, @Nullable Boolc indexer){
+        if(indexer != null || remover != null){
             cont.table(t -> {
-                t.button(Icon.trash, Styles.emptyi, () -> indexer.get(0)).fill().padRight(4f);
-                t.button(Icon.upOpen, Styles.emptyi, () -> indexer.get(1)).fill().padRight(4f);
-                t.button(Icon.downOpen, Styles.emptyi, () -> indexer.get(-1)).fill().padRight(4f);
+                if(remover != null) t.button(Icon.trash, Styles.emptyi, remover).fill().padRight(4f);
+                if(indexer != null){
+                    t.button(Icon.upOpen, Styles.emptyi, () -> indexer.get(true)).fill().padRight(4f);
+                    t.button(Icon.downOpen, Styles.emptyi, () -> indexer.get(false)).fill().padRight(4f);
+                }
+
                 t.add(": ").center();
             }).fill();
         }else{
@@ -594,17 +591,18 @@ public class MapObjectivesDialog extends BaseDialog{
          * Builds the interpreter for (not-necessarily) a possibly annotated field. Implementations must add exactly
          * 2 columns to the table.
          * @param name    May be empty.
-         * @param indexer If this callback is not {@code null}, this interpreter should add 3 buttons that invokes the
-         *                callback with the following:<ul>
-         *                <li>0: Remove element.</li>
-         *                <li>1: Swap element with previous index.</li>
-         *                <li>2: Swap element with next index.</li>
+         * @param remover If this callback is not {@code null}, this interpreter should add a button that invokes the
+         *                callback to signal element removal.
+         * @param indexer If this callback is not {@code null}, this interpreter should add 2 buttons that invoke the
+         *                callback to signal element rearrangement with the following values:<ul>
+         *                <li>{@code true}: Swap element with previous index.</li>
+         *                <li>{@code false}: Swap element with next index.</li>
          *                </ul>
          */
         void build(Table cont,
                    CharSequence name, TypeInfo type,
                    @Nullable Field field,
-                   @Nullable Intc indexer,
+                   @Nullable Runnable remover, @Nullable Boolc indexer,
                    Prov<T> get, Cons<T> set);
     }
 
