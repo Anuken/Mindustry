@@ -22,7 +22,7 @@ import static mindustry.Vars.*;
 
 @EntityDef(value = {Bulletc.class}, pooled = true, serialize = false)
 @Component(base = true)
-abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Drawc, Shielderc, Ownerc, Velc, Bulletc, Timerc, Scaled{
+abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Drawc, Shielderc, Ownerc, Velc, Bulletc, Timerc{
     @Import Team team;
     @Import Entityc owner;
     @Import float x, y, damage, lastX, lastY, time, lifetime;
@@ -270,8 +270,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
         return vel.isZero(0.001f) ? rotation : vel.angle();
     }
 
-    @Override
-    public float fin(){
+    public float partFin(){
         return partTime / partLifetime;
     }
 }
