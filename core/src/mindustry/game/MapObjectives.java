@@ -62,7 +62,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             allObjectiveTypes.add(prov);
 
             Class<? extends MapObjective> type = prov.get().getClass();
-            JsonIO.json.addClassTag(type.getSimpleName().replace("Objective", ""), type);
+            JsonIO.classTag(type.getSimpleName().replace("Objective", ""), type);
         }
     }
 
@@ -72,7 +72,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             allMarkerTypes.add(prov);
 
             Class<? extends ObjectiveMarker> type = prov.get().getClass();
-            JsonIO.json.addClassTag(type.getSimpleName().replace("Marker", ""), type);
+            JsonIO.classTag(type.getSimpleName().replace("Marker", ""), type);
         }
     }
 
@@ -134,9 +134,9 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         return has;
     }
 
-    /** @return Whether there are any objectives at all. */
+    /** @return Whether there are any qualified objectives at all. */
     public boolean any(){
-        return all.size > 0;
+        return all.count(MapObjective::qualified) > 0;
     }
 
     /** Iterates over all qualified in-map objectives. */
@@ -621,7 +621,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
     /** Displays text above a shape. */
     public static class ShapeTextMarker extends ObjectiveMarker{
         public String text = "frog";
-        public Vec2 pos = new Vec2();
+        public @TilePos Vec2 pos = new Vec2();
         public float fontSize = 1f, textHeight = 7f;
         public @LabelFlag byte flags = WorldLabel.flagBackground | WorldLabel.flagOutline;
 
@@ -715,7 +715,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
     /** Displays a shape with an outline and color. */
     public static class ShapeMarker extends ObjectiveMarker{
-        public Vec2 pos = new Vec2();
+        public @TilePos Vec2 pos = new Vec2();
         public float radius = 8f, rotation = 0f, stroke = 1f;
         public boolean fill = false, outline = true;
         public int sides = 4;
@@ -758,7 +758,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
     /** Displays text at a location. */
     public static class TextMarker extends ObjectiveMarker{
         public String text = "uwu";
-        public Vec2 pos = new Vec2();
+        public @TilePos Vec2 pos = new Vec2();
         public float fontSize = 1f;
         public @LabelFlag byte flags = WorldLabel.flagBackground | WorldLabel.flagOutline;
         // Cached localized text.

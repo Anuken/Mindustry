@@ -69,6 +69,11 @@ public class JsonIO{
         return json.prettyPrint(in);
     }
 
+    public static void classTag(String tag, Class<?> type){
+        json.addClassTag(tag, type);
+        jsonBase.addClassTag(tag, type);
+    }
+
     static void apply(Json json){
         json.setElementType(Rules.class, "spawns", SpawnGroup.class);
         json.setElementType(Rules.class, "loadout", ItemStack.class);
@@ -284,7 +289,7 @@ public class JsonIO{
                 for(var value = data.child; value != null; value = value.next){
                     MapObjective obj = json.readValue(MapObjective.class, value);
 
-                    int pos = value.asInt();
+                    int pos = value.getInt("editorPos");
                     obj.editorX = Point2.x(pos);
                     obj.editorY = Point2.y(pos);
 
@@ -302,6 +307,8 @@ public class JsonIO{
                 return exec;
             }
         });
+
+        
 
         //use short names for all filter types
         for(var filter : Maps.allFilterTypes){

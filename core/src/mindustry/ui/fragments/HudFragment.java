@@ -791,14 +791,6 @@ public class HudFragment{
 
                 return builder;
             }
-            /*if(state.rules.objectives.size > 0){
-                var first = state.rules.objectives.first();
-                String text = first.text();
-                if(text != null){
-                    builder.append(text);
-                    return builder;
-                }
-            }*/
 
             //mission overrides everything
             if(state.rules.mission != null){
@@ -848,15 +840,6 @@ public class HudFragment{
         table.row();
 
         table.clicked(() -> {
-            /*if(state.rules.objectives.size > 0){
-                var first = state.rules.objectives.first();
-                var details = first.details();
-                if(details != null){
-                    //TODO this could be much better.
-                    ui.showInfo(details);
-                }
-            }*/
-
             if(state.rules.objectives.any()){
                 //TODO is `builder` reusable here? is it reserved? should i allocate a new one?
                 builder.setLength(0);

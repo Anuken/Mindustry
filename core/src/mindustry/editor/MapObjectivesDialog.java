@@ -328,7 +328,10 @@ public class MapObjectivesDialog extends BaseDialog{
                             }) rebuild[0].run();
                         },
                         () -> arr.get(index),
-                        res -> arr.set(index, res)
+                        res -> {
+                            arr.set(index, res);
+                            set.get(arr);
+                        }
                     );
                 }
 
