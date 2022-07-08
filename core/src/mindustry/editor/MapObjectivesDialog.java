@@ -408,8 +408,6 @@ public class MapObjectivesDialog extends BaseDialog{
                     t.button(Icon.upOpen, Styles.emptyi, () -> indexer.get(true)).fill().padRight(4f);
                     t.button(Icon.downOpen, Styles.emptyi, () -> indexer.get(false)).fill().padRight(4f);
                 }
-
-                t.add(": ").center();
             }).fill();
         }else{
             cont.add(name + ": ");
