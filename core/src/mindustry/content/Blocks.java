@@ -1814,7 +1814,7 @@ public class Blocks{
             }});
         }};
         shockwaveTower = new ShockwaveTower("shockwave-tower"){{
-            requirements(Category.effect, with());
+            requirements(Category.effect, BuildVisibility.editorOnly, with());
             size = 2;
             consumeLiquids(LiquidStack.with(Liquids.cyanogen, 1f / 60f));
             consumePower(80f / 60f);
