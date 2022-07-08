@@ -120,18 +120,6 @@ public class SectorPresets{
 
         two = new SectorPreset("two", erekir, 88){{
             difficulty = 3;
-
-            /*rules = r -> r.objectives.add(
-                new TimerObjective("[lightgray]Enemy detection:[] [accent]{0}", 7 * 60 * 60).markers(
-                    new TextMarker("The enemy will begin constructing units in 7 minutes.", 276f * 8f, 164f * 8f)
-                ).flagsAdded("beginBuilding")
-                .child(new ProduceObjective(Items.tungsten).markers(
-                    new ShapeTextMarker("Tungsten can be mined using an [accent]impact drill[].\nThis structure requires [accent]water[] and [accent]power[].", 220f * 8f, 181f * 8f)
-                ).child(new DestroyBlockObjective(Blocks.largeShieldProjector, 210, 278, Team.malis).markers(
-                    new TextMarker("The enemy is protected by shields.\nAn experimental shield breaker module has been detected in this sector.\nFind and activate it using tungsten.", 276f * 8f, 164f * 8f),
-                    new MinimapMarker(23, 137, Pal.accent)
-                )))
-            );*/
         }};
 
         lake = new SectorPreset("lake", erekir, 41){{
@@ -147,28 +135,6 @@ public class SectorPresets{
 
         four = new SectorPreset("four", erekir, 29){{
             difficulty = 6;
-
-            /*rules = r -> {
-                float rad = 52f;
-                r.objectives.add(
-                    new DestroyBlocksObjective(Blocks.coreBastion, Team.malis, new Point2(290, 501), new Point2(158, 496))
-                    .flagsAdded("nukeannounce")
-                    .child(new TimerObjective("@objective.nuclearlaunch", 8 * 60 * 60).markers(
-                        new MinimapMarker(338, 377, rad, 14f, Pal.remove),
-                        new ShapeMarker(338 * 8, 377 * 8f){{
-                            radius = rad * 8f;
-                            fill = true;
-                            color = Pal.remove.cpy().mul(0.8f).a(0.3f);
-                            sides = 90;
-                        }},
-                        new ShapeMarker(338 * 8, 377 * 8f){{
-                            radius = rad * 8f;
-                            color = Pal.remove;
-                            sides = 90;
-                        }}
-                    ).flagsAdded("nuke1"))
-                );
-            };*/
         }};
 
         //endregion
