@@ -136,7 +136,7 @@ public class Blocks{
     duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, foreshadow, spectre, meltdown, segment, parallax, tsunami,
 
     //turrets - erekir
-    breach, diffuse, sublimate, titan, disperse, afflict, lustre, scathe, ravage,
+    breach, diffuse, sublimate, titan, disperse, afflict, lustre, scathe, ravage, divine,
 
     //units
     groundFactory, airFactory, navalFactory,
@@ -4693,7 +4693,7 @@ public class Blocks{
             reload = 100f;
             recoil = 2f;
             range = 300;
-            shootCone = 7f;
+            shootCone = 10f;
             scaledHealth = 350;
             rotateSpeed = 1.5f;
 
@@ -4701,7 +4701,44 @@ public class Blocks{
             limitRange();
         }};
 
-        //TODO 1 more turret
+        divine = new PowerTurret("divine"){{
+            requirements(Category.turret, with(Items.beryllium, 150, Items.silicon, 150, Items.graphite, 250, Items.phaseFabric, 300));
+
+            shootType = new BasicBulletType(7.5f, 85){{
+                width = 12f;
+                hitSize = 7f;
+                height = 20f;
+                shootEffect = Fx.shootBig2;
+                smokeEffect = Fx.shootBigSmoke;
+                ammoMultiplier = 1;
+                pierceCap = 2;
+                pierce = true;
+                pierceBuilding = true;
+                hitColor = backColor = trailColor = Pal.berylShot;
+                frontColor = Color.white;
+                trailWidth = 2.1f;
+                trailLength = 10;
+                hitEffect = despawnEffect = Fx.hitBulletColor;
+                buildingDamageMultiplier = 0.3f;
+            }};
+
+            heatRequirement = 30f;
+            consumePower(5f);
+
+            size = 5;
+            drawer = new DrawTurret("reinforced-");
+            outlineColor = Pal.darkOutline;
+            envEnabled |= Env.space;
+            reload = 200f;
+            recoil = 2f;
+            range = 350;
+            shootCone = 100f;
+            scaledHealth = 370;
+            rotateSpeed = 2f;
+
+            coolant = consume(new ConsumeLiquid(Liquids.water, 15f / 60f));
+            limitRange(5f);
+        }};
 
         //endregion
         //region units
