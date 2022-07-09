@@ -20,6 +20,8 @@ import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
+import java.util.*;
+
 import static mindustry.Vars.*;
 
 public class HintsFragment{
@@ -29,11 +31,19 @@ public class HintsFragment{
     /** All hints to be displayed in the game. */
     public Seq<Hint> hints = new Seq<>().add(DefaultHint.values()).as();
 
+    /** Already shown hints. */
+    public Seq<Hint> shownHints = new Seq<>();
+
     @Nullable Hint current;
     Group group = new WidgetGroup();
     ObjectSet<String> events = new ObjectSet<>();
     ObjectSet<Block> placedBlocks = new ObjectSet<>();
     Table last;
+
+    public void removeHint(Hint h){
+        hints.remove(h);
+        shownHints.add(h);
+    };
 
     public void build(Group parent){
         group.setFillParent(true);
@@ -52,7 +62,7 @@ public class HintsFragment{
                 //check one hint each frame to see if it should be shown.
                 Hint hint = hints.find(Hint::show);
                 if(hint != null && hint.complete()){
-                    hints.remove(hint);
+                    removeHint(hint);
                 }else if(hint != null && !renderer.isCutscene() && state.isGame() && control.saves.getTotalPlaytime() > 8000){
                     display(hint);
                 }else{
@@ -88,12 +98,19 @@ public class HintsFragment{
     void checkNext(){
         if(current != null) return;
 
-        hints.removeAll(h -> !h.valid() || h.finished() || (h.show() && h.complete()));
+        Iterator<Hint> iter = hints.iterator();
+        while(iter.hasNext()){
+            Hint h = iter.next();
+            if(!h.valid() || h.finished() || (h.show() && h.complete())){
+                iter.remove();
+                shownHints.add(h);
+            }
+        };
         hints.sort(Hint::order);
 
         Hint first = hints.find(Hint::show);
         if(first != null && !renderer.isCutscene() && state.isGame()){
-            hints.remove(first);
+            removeHint(first);
             display(first);
         }
     }
@@ -124,7 +141,7 @@ public class HintsFragment{
         if(current == null) return;
 
         current.finish();
-        hints.remove(current);
+        removeHint(current);
 
         hide();
     }
@@ -229,6 +246,12 @@ public class HintsFragment{
         }
 
         @Override
+        public void reset(){
+            Core.settings.remove(name() + "-hint-done");
+            finished = false;
+        }
+
+        @Override
         public String text(){
             if(text == null){
                 text = Vars.mobile && Core.bundle.has("hint." + name() + ".mobile") ? Core.bundle.get("hint." + name() + ".mobile") : Core.bundle.get("hint." + name());
@@ -278,6 +301,11 @@ public class HintsFragment{
         /** finishes the hint - it should not be shown again */
         default void finish(){
             Core.settings.put(name() + "-hint-done", true);
+        }
+
+        /** resets the hint - it will be shown again */
+        default void reset(){
+            Core.settings.remove(name() + "-hint-done");
         }
 
         /** @return whether the hint is finished - if true, it should not be shown again */

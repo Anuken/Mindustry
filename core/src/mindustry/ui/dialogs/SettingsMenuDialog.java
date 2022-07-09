@@ -134,12 +134,13 @@ public class SettingsMenuDialog extends BaseDialog{
 
             t.button("@settings.clearhints", Icon.trash, style, () -> {
                 ui.showConfirm("@confirm","@settings.clearhints.confirm", () -> {
-                    for(String s : Seq.with(settings.keys())){
-                        if(s.endsWith("-hint-done")) settings.remove(s);
+                    for(var h : ui.hints.shownHints){
+                        h.reset();
                     }
+                    ui.hints.hints.add(ui.hints.shownHints);
+                    ui.hints.shownHints.clear();
 
                     settings.manualSave();
-                    Core.app.exit();
                 });
             }).marginLeft(4);
 
