@@ -2453,5 +2453,15 @@ public class Fx{
 
         stroke(data.region.height * scl);
         line(data.region, data.a.x + ox, data.a.y + oy, data.b.x + ox, data.b.y + oy, false);
-    }).layer(Layer.groundUnit + 5f);
+    }).layer(Layer.groundUnit + 5f),
+
+    pointShockwave = new Effect(20, e -> {
+        color(Pal.redSpark);
+        stroke(e.fout() * 2f);
+        Lines.circle(e.x, e.y, 80f * e.finpow()); //no clue how to get range and waveColor params
+        color(Pal.gray);
+        randLenVectors(e.id + 1, 8, 1f + 23f * e.finpow(), (x, y) ->
+            lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1f + e.fout() * 3f
+        ));
+    });
 }
