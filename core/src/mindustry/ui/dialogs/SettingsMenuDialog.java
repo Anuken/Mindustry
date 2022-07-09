@@ -132,6 +132,19 @@ public class SettingsMenuDialog extends BaseDialog{
 
             t.row();
 
+            t.button("@settings.clearhints", Icon.trash, style, () -> {
+                ui.showConfirm("@confirm","@settings.clearhints.confirm", () -> {
+                    for(String s : Seq.with(settings.keys())){
+                        if(s.endsWith("-hint-done")) settings.remove(s);
+                    }
+
+                    settings.manualSave();
+                    Core.app.exit();
+                });
+            }).marginLeft(4);
+
+            t.row();
+
             t.button("@settings.clearcampaignsaves", Icon.trash, style, () -> {
                 ui.showConfirm("@confirm", "@settings.clearcampaignsaves.confirm", () -> {
                     for(var planet : content.planets()){
