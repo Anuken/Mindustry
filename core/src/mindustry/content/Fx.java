@@ -1611,7 +1611,7 @@ public class Fx{
         }
     }),
 
-    shootSmokeRavage = new Effect(70f, e -> {
+    shootSmokeSmite = new Effect(70f, e -> {
         rand.setSeed(e.id);
         for(int i = 0; i < 13; i++){
             float a = e.rotation + rand.range(30f);
