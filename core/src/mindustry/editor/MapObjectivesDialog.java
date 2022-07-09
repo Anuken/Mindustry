@@ -241,7 +241,7 @@ public class MapObjectivesDialog extends BaseDialog{
             show();
         }});
 
-        // Types that use the default interpreter. It would be nice if all types could use it, but I don't know how to reliably prevent classes like [? extends Content] not to use it.
+        // Types that use the default interpreter. It would be nice if all types could use it, but I don't know how to reliably prevent classes like [? extends Content] from using it.
         for(var obj : MapObjectives.allObjectiveTypes) setInterpreter(obj.get().getClass(), defaultInterpreter());
         for(var mark : MapObjectives.allMarkerTypes) setInterpreter(mark.get().getClass(), defaultInterpreter());
 
@@ -489,7 +489,7 @@ public class MapObjectivesDialog extends BaseDialog{
 
     public static <T extends UnlockableContent> void showContentSelect(@Nullable ContentType type, Cons<T> cons, Boolf<T> check){
         BaseDialog dialog = new BaseDialog("");
-        dialog.cont.pane(t -> {
+        dialog.cont.pane(Styles.noBarPane, t -> {
             int i = 0;
             for(var content : (type == null ? content.blocks().copy().<UnlockableContent>as()
                 .add(content.items())
