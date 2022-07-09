@@ -416,7 +416,6 @@ public class MapObjectivesDialog extends BaseDialog{
 
     public MapObjectivesDialog(){
         super("@editor.objectives");
-
         clear();
         margin(0f);
 
@@ -426,6 +425,12 @@ public class MapObjectivesDialog extends BaseDialog{
                 buttons.defaults().size(170f, 64f).pad(2f);
                 buttons.button("@back", Icon.left, MapObjectivesDialog.this::hide);
                 buttons.button("@add", Icon.add, () -> getProvider(MapObjective.class).get(new TypeInfo(MapObjective.class), canvas::query));
+
+                if(mobile){
+                    buttons.row();
+                    buttons.button("@cancel", Icon.cancel, canvas::stopQuery).disabled(b -> !canvas.isQuerying());
+                    buttons.button("@ok", Icon.ok, canvas::placeQuery).disabled(b -> !canvas.isQuerying());
+                }
 
                 setFillParent(true);
                 margin(3f);

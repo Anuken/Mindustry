@@ -20,6 +20,8 @@ import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 
+import static mindustry.Vars.*;
+
 @SuppressWarnings("unchecked")
 public class MapObjectivesCanvas extends WidgetGroup{
     public static final int
@@ -35,6 +37,7 @@ public class MapObjectivesCanvas extends WidgetGroup{
 
     private boolean pressed;
     private long visualPressed;
+    private int queryX = -objWidth, queryY = -objHeight;
 
     public MapObjectivesCanvas(){
         setFillParent(true);
@@ -69,14 +72,11 @@ public class MapObjectivesCanvas extends WidgetGroup{
                 if(query == null) return;
 
                 Vec2 pos = localToDescendantCoordinates(tilemap, Tmp.v1.set(x, y));
-                if(tilemap.createTile(
-                    Mathf.round((pos.x - objWidth * unitSize / 2f) / unitSize),
-                    Mathf.floor((pos.y - unitSize) / unitSize),
-                    query
-                )){
-                    objectives.add(query);
-                    stopQuery();
-                }
+                queryX = Mathf.round((pos.x - objWidth * unitSize / 2f) / unitSize);
+                queryY = Mathf.floor((pos.y - unitSize) / unitSize);
+
+                // In mobile, placing the query is done in a separate button.
+                if(!mobile) placeQuery();
             }
 
             @Override
@@ -112,6 +112,13 @@ public class MapObjectivesCanvas extends WidgetGroup{
     public void query(MapObjective obj){
         stopQuery();
         query = obj;
+    }
+
+    public void placeQuery(){
+        if(isQuerying() && tilemap.createTile(queryX, queryY, query)){
+            objectives.add(query);
+            stopQuery();
+        }
     }
 
     public boolean isQuerying(){
@@ -151,9 +158,14 @@ public class MapObjectivesCanvas extends WidgetGroup{
 
             if(isQuerying()){
                 int tx, ty;
-                Vec2 pos = screenToLocalCoordinates(Core.input.mouse());
-                pos.x = x + (tx = Mathf.round((pos.x - objWidth * unitSize / 2f) / unitSize)) * unitSize;
-                pos.y = y + (ty = Mathf.floor((pos.y - unitSize) / unitSize)) * unitSize;
+                if(mobile){
+                    tx = queryX;
+                    ty = queryY;
+                }else{
+                    Vec2 pos = screenToLocalCoordinates(Core.input.mouse());
+                    tx = Mathf.round((pos.x - objWidth * unitSize / 2f) / unitSize);
+                    ty = Mathf.floor((pos.y - unitSize) / unitSize);
+                }
 
                 Lines.stroke(4f);
                 Draw.color(
@@ -161,7 +173,7 @@ public class MapObjectivesCanvas extends WidgetGroup{
                     parentAlpha * (inPlaceBounds(tx, ty) ? 1f : Mathf.absin(3f, 1f))
                 );
 
-                Lines.rect(pos.x, pos.y, objWidth * unitSize, objHeight * unitSize);
+                Lines.rect(x + tx * unitSize, y + ty * unitSize, objWidth * unitSize, objHeight * unitSize);
             }
 
             if(moving != null){
