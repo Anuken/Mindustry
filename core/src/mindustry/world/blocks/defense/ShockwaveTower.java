@@ -63,7 +63,6 @@ public class ShockwaveTower extends Block {
                 targets.clear();
                 refresh = 0f;
                 targets = Groups.bullet.intersect(x - range, y - range, range * 2, range * 2).filter(b -> b.team != team && b.type().hittable);
-                Log.info(targets.size +" "+ efficiency);
 
                 if(efficiency > 0 && targets.size != 0){
                     waveEffect.at(this);
@@ -71,7 +70,6 @@ public class ShockwaveTower extends Block {
                     Effect.shake(shake, shake, this);
                     reload = interval;
                     waveDamage = Math.min(bulletDamage, bulletDamage * falloffCount / targets.size);
-                    Log.info("e");
 
                     for(var target : targets) {
                         if(target.type() != null && target.type().hittable){ //destroys lasers regardless of the filter sometimes
