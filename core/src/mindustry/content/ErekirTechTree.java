@@ -355,7 +355,7 @@ public class ErekirTechTree{
 
                             });
 
-                            node(four, Seq.with(new SectorComplete(three)), () -> {
+                            node(four, Seq.with(new SectorComplete(atlas)), () -> {
 
                             });
                         });
