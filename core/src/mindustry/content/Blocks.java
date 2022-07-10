@@ -4435,7 +4435,7 @@ public class Blocks{
         }};
 
         smite = new ItemTurret("smite"){{
-            requirements(Category.turret, with(Items.beryllium, 150, Items.silicon, 150, Items.carbide, 250, Items.phaseFabric, 100));
+            requirements(Category.turret, with(Items.oxide, 200, Items.surgeAlloy, 400, Items.silicon, 800, Items.carbide, 500, Items.phaseFabric, 300));
 
             ammo(
             //this is really lazy
@@ -4701,7 +4701,7 @@ public class Blocks{
         }};
 
         malign = new PowerTurret("malign"){{
-            requirements(Category.turret, with(Items.beryllium, 150, Items.silicon, 150, Items.graphite, 250, Items.phaseFabric, 300));
+            requirements(Category.turret, with(Items.carbide, 400, Items.beryllium, 2000, Items.silicon, 800, Items.graphite, 800, Items.phaseFabric, 300));
 
             var haloProgress = PartProgress.warmup;
             Color haloColor = Color.valueOf("d370d3"), heatCol = Color.purple;
@@ -4756,7 +4756,7 @@ public class Blocks{
                     sideAngle = 175f;
                     sideWidth = 1f;
                     sideLength = 40f;
-                    lifetime = 16f;
+                    lifetime = 22f;
                     drawSize = 400f;
                     length = 180f;
                     pierceCap = 2;
