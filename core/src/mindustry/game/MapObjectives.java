@@ -31,6 +31,14 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
     public static final Seq<Prov<? extends MapObjective>> allObjectiveTypes = new Seq<>();
     public static final Seq<Prov<? extends ObjectiveMarker>> allMarkerTypes = new Seq<>();
 
+    /**
+     * All objectives the executor contains. Do not modify directly, ever!
+     * @see #eachRunning(Cons)
+     */
+    public Seq<MapObjective> all = new Seq<>(4);
+    /** @see #checkChanged() */
+    protected transient boolean changed;
+
     static{
         registerObjective(
             ResearchObjective::new,
@@ -75,15 +83,6 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             JsonIO.classTag(type.getSimpleName().replace("Marker", ""), type);
         }
     }
-
-    /**
-     * All objectives the executor contains. Do not modify directly, ever!
-     * @see #eachRunning(Cons)
-     */
-    public Seq<MapObjective> all = new Seq<>(4);
-
-    /** @see #checkChanged() */
-    protected transient boolean changed;
 
     /** Adds all given objectives to the executor as root objectives. */
     public void add(MapObjective... objectives){
@@ -155,11 +154,6 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
     }
 
     @Override
-    public Spliterator<MapObjective> spliterator(){
-        return all.spliterator();
-    }
-
-    @Override
     public void each(Cons<? super MapObjective> cons){
         all.each(cons);
     }
@@ -208,10 +202,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
             boolean f = true;
             for(var parent : parents){
-                if(!parent.isCompleted()){
-                    f = false;
-                    break;
-                }
+                if(!parent.isCompleted()) return false;
             }
 
             return f && (depFinished = true);

@@ -841,8 +841,7 @@ public class HudFragment{
 
         table.clicked(() -> {
             if(state.rules.objectives.any()){
-                //TODO is `builder` reusable here? is it reserved? should i allocate a new one?
-                builder.setLength(0);
+                StringBuilder text = new StringBuilder();
 
                 boolean first = true;
                 for(var obj : state.rules.objectives){
@@ -850,15 +849,15 @@ public class HudFragment{
 
                     String details = obj.details();
                     if(details != null){
-                        if(!first) builder.append('\n');
-                        builder.append(details);
+                        if(!first) text.append('\n');
+                        text.append(details);
 
                         first = false;
                     }
                 }
 
                 //TODO this, as said before, could be much better.
-                ui.showInfo(builder.toString());
+                ui.showInfo(text.toString());
             }
         });
 
