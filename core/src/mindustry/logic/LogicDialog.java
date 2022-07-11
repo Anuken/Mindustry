@@ -118,7 +118,7 @@ public class LogicDialog extends BaseDialog{
                             s.objval instanceof Building ? Pal.logicBlocks :
                             s.objval instanceof Unit ? Pal.logicUnits :
                             s.objval instanceof Enum<?> ? Pal.logicIo :
-                            s.objval instanceof Team ? Pal.darkishGray :
+                            s.objval instanceof Team ? Color.pink :
                             Color.white;
 
                         String typeName =
