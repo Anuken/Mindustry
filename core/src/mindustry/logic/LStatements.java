@@ -1225,6 +1225,65 @@ public class LStatements{
         }
     }
 
+    @RegisterStatement("getteam")
+    public static class GetTeamStatement extends LStatement{
+        public String id = "6", result = "result";
+
+        @Override
+        public void build(Table table){
+            fields(table, result, str -> result = str);
+
+            table.add(" = team of id ");
+
+            field(table, id, str -> id = str);
+        }
+
+        @Override
+        public boolean privileged(){
+            return true;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new GetTeamI(builder.var(id),builder.var(result));
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.world;
+        }
+    }
+
+    @RegisterStatement("getteamid")
+    public static class GetTeamIdStatement extends LStatement{
+        public String team = "@derelict", result = "result";
+
+        @Override
+        public void build(Table table){
+            fields(table, result, str -> result = str);
+
+            table.add(" = id of team ");
+
+            field(table, team, str -> team = str);
+        }
+
+        @Override
+        public boolean privileged(){
+            return true;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new GetTeamIdI(builder.var(team),builder.var(result));
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.world;
+        }
+    }
+
+
     @RegisterStatement("status")
     public static class ApplyStatusStatement extends LStatement{
         public boolean clear;

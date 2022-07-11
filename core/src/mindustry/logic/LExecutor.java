@@ -1337,6 +1337,37 @@ public class LExecutor{
         }
     }
 
+    public static class GetTeamI implements LInstruction{
+        public int id, result;
+
+        public GetTeamI(int id, int result){
+            this.id = id;
+            this.result = result;
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            exec.setobj(result, Team.get(exec.numi(id)));
+        }
+    }
+
+    public static class GetTeamIdI implements LInstruction{
+        public int team, result;
+
+        public GetTeamIdI(int team, int result){
+            this.team = team;
+            this.result = result;
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            Object team = exec.obj(this.team);
+            if(team instanceof Team t){
+                exec.setnum(result, t.id);
+            }
+        }
+    }
+
     public static class ApplyEffectI implements LInstruction{
         public boolean clear;
         public String effect;

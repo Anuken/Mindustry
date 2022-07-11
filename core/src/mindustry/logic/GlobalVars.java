@@ -74,6 +74,11 @@ public class GlobalVars{
             }
         }
 
+        //store all teams
+        for(int i = 0; i < Team.all.length; i++){
+            put("@team" + i, Team.get(i));
+        }
+
         //used as a special value for any environmental solid block
         put("@solid", Blocks.stoneWall);
 
