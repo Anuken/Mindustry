@@ -10,9 +10,7 @@ import mindustry.type.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
-/**
- * A generator that just takes in certain items or liquids. Basically SingleTypeGenerator, but not unreliable garbage.
- */
+/** A generator that just takes in certain items or liquids. */
 public class ConsumeGenerator extends PowerGenerator{
     /** The time in number of ticks during which a single item will produce power. */
     public float itemDuration = 120f;

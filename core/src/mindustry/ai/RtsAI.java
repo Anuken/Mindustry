@@ -109,6 +109,9 @@ public class RtsAI{
             if(unit.isCommandable() && !unit.command().hasCommand() && used.add(unit.id)){
                 squad.clear();
                 data.tree().intersect(unit.x - squadRadius/2f, unit.y - squadRadius/2f, squadRadius, squadRadius, squad);
+
+                squad.truncate(data.team.rules().rtsMaxSquad);
+
                 //remove overlapping squads
                 squad.removeAll(u -> (u != unit && used.contains(u.id)) || !u.isCommandable() || u.command().hasCommand());
                 //mark used so other squads can't steal them
