@@ -92,7 +92,7 @@ public class Blocks{
     //defense - erekir
     radar,
     buildTower,
-    regenProjector, barrierProjector,
+    regenProjector, barrierProjector, shockwaveTower,
     //campaign only
     shieldProjector,
     largeShieldProjector,
@@ -1824,6 +1824,13 @@ public class Blocks{
             cooldownBrokenBase = 0.35f;
 
             consumePower(4f);
+        }};
+
+        shockwaveTower = new ShockwaveTower("shockwave-tower"){{
+            requirements(Category.effect, with(Items.surgeAlloy, 50, Items.silicon, 150, Items.oxide, 30, Items.tungsten, 100));
+            size = 3;
+            consumeLiquids(LiquidStack.with(Liquids.cyanogen, 1f / 60f));
+            consumePower(80f / 60f);
         }};
 
         //TODO 5x5??
