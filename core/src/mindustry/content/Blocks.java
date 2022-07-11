@@ -2479,9 +2479,7 @@ public class Blocks{
             ambientSoundVolume = 0.06f;
         }};
 
-        //TODO cooler name?
         pyrolysisGenerator = new ConsumeGenerator("pyrolysis-generator"){{
-            //TODO requirements
             requirements(Category.power, with(Items.graphite, 50, Items.carbide, 50, Items.oxide, 60f, Items.silicon, 50));
             powerProduction = 27f;
 
@@ -2502,7 +2500,7 @@ public class Blocks{
 
             liquidCapacity = 30f * 5;
 
-            liquidOutput = new LiquidStack(Liquids.water, 20f / 60f);
+            outputLiquid = new LiquidStack(Liquids.water, 20f / 60f);
 
             generateEffect = Fx.none;
 
