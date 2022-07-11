@@ -31,6 +31,7 @@ public class ShockwaveTower extends Block{
     public float cooldownMultiplier = 1f;
     public Effect waveEffect = Fx.pointShockwave;
 
+    //TODO switch to drawers eventually or something
     public float shapeRotateSpeed = 1f, shapeRadius = 6f;
     public int shapeSides = 4;
 

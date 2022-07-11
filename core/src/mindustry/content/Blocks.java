@@ -2445,8 +2445,11 @@ public class Blocks{
             size = 3;
             ambientSound = Sounds.hum;
             ambientSoundVolume = 0.06f;
-            spinSpeed = 0.6f;
-            spinners = true;
+
+            drawer = new DrawMulti(new DrawDefault(), new DrawBlurSpin("-rotator", 0.6f * 9f){{
+                blurThresh = 0.01f;
+            }});
+
             hasLiquids = true;
             outputLiquid = new LiquidStack(Liquids.water, 5f / 60f / 9f);
             liquidCapacity = 20f;

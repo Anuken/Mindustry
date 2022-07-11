@@ -17,6 +17,7 @@ public class ConsumeGenerator extends PowerGenerator{
     /** The time in number of ticks during which a single item will produce power. */
     public float itemDuration = 120f;
 
+    public float warmupSpeed = 0.05f;
     public float effectChance = 0.01f;
     public Effect generateEffect = Fx.none, consumeEffect = Fx.none;
     public float generateEffectRange = 3f;
@@ -86,7 +87,7 @@ public class ConsumeGenerator extends PowerGenerator{
         public void updateTile(){
             boolean valid = efficiency > 0;
 
-            warmup = Mathf.lerpDelta(warmup, valid ? 1f : 0f, 0.05f);
+            warmup = Mathf.lerpDelta(warmup, valid ? 1f : 0f, warmupSpeed);
 
             productionEfficiency = efficiency * efficiencyMultiplier;
             totalTime += warmup * Time.delta;
