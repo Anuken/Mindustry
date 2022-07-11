@@ -198,6 +198,14 @@ public class Fx{
         rect(block.fullIcon, e.x, e.y);
     }).layer(Layer.turret - 5f),
 
+    pointShockwave = new Effect(20, e -> {
+        color(e.color);
+        stroke(e.fout() * 2f);
+        Lines.circle(e.x, e.y, e.finpow() * e.rotation);
+        randLenVectors(e.id + 1, 8, 1f + 23f * e.finpow(), (x, y) ->
+            lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1f + e.fout() * 3f));
+    }),
+
     moveCommand = new Effect(20, e -> {
         color(Pal.command);
         stroke(e.fout() * 5f);
@@ -1611,7 +1619,7 @@ public class Fx{
         }
     }),
 
-    shootSmokeRavage = new Effect(70f, e -> {
+    shootSmokeSmite = new Effect(70f, e -> {
         rand.setSeed(e.id);
         for(int i = 0; i < 13; i++){
             float a = e.rotation + rand.range(30f);
