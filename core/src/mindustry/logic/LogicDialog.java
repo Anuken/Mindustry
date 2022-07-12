@@ -10,6 +10,7 @@ import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.core.GameState.*;
 import mindustry.ctype.*;
+import mindustry.type.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.LExecutor.*;
@@ -127,6 +128,7 @@ public class LogicDialog extends BaseDialog{
                             s.objval instanceof Building ? "building" :
                             s.objval instanceof Unit ? "unit" :
                             s.objval instanceof Enum<?> ? "enum" :
+                            s.objval instanceof Weather ? "weather" :
                             "unknown";
 
                         t.add(new Image(Tex.whiteui, varColor.cpy().mul(mul))).width(stub);
