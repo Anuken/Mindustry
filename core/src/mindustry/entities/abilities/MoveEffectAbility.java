@@ -34,6 +34,8 @@ public class MoveEffectAbility extends Ability{
 
     @Override
     public void update(Unit unit){
+        if(Vars.headless) return;
+
         counter += Time.delta;
         if(unit.vel.len2() >= minVelocity * minVelocity && (counter >= interval) && !unit.inFogTo(Vars.player.team())){
             Tmp.v1.trns(unit.rotation - 90f, x, y);
