@@ -118,7 +118,6 @@ public class LogicDialog extends BaseDialog{
                             s.objval instanceof Building ? Pal.logicBlocks :
                             s.objval instanceof Unit ? Pal.logicUnits :
                             s.objval instanceof Enum<?> ? Pal.logicIo :
-                            s.objval instanceof Weather ? Pal.techBlue :
                             Color.white;
 
                         String typeName =
@@ -129,7 +128,6 @@ public class LogicDialog extends BaseDialog{
                             s.objval instanceof Building ? "building" :
                             s.objval instanceof Unit ? "unit" :
                             s.objval instanceof Enum<?> ? "enum" :
-                            s.objval instanceof Weather ? "weather" :
                             "unknown";
 
                         t.add(new Image(Tex.whiteui, varColor.cpy().mul(mul))).width(stub);
