@@ -20,7 +20,7 @@ public class ConsumeGenerator extends PowerGenerator{
     public Effect generateEffect = Fx.none, consumeEffect = Fx.none;
     public float generateEffectRange = 3f;
 
-    public @Nullable LiquidStack liquidOutput;
+    public @Nullable LiquidStack outputLiquid;
 
     public @Nullable ConsumeItemFilter filterItem;
     public @Nullable ConsumeLiquidFilter filterLiquid;
@@ -33,8 +33,8 @@ public class ConsumeGenerator extends PowerGenerator{
     public void setBars(){
         super.setBars();
 
-        if(liquidOutput != null){
-            addLiquidBar(liquidOutput.liquid);
+        if(outputLiquid != null){
+            addLiquidBar(outputLiquid.liquid);
         }
     }
 
@@ -43,7 +43,7 @@ public class ConsumeGenerator extends PowerGenerator{
         filterItem = findConsumer(c -> c instanceof ConsumeItemFilter);
         filterLiquid = findConsumer(c -> c instanceof ConsumeLiquidFilter);
 
-        if(liquidOutput != null){
+        if(outputLiquid != null){
             outputsLiquid = true;
             hasLiquids = true;
         }
@@ -62,8 +62,8 @@ public class ConsumeGenerator extends PowerGenerator{
             stats.add(Stat.productionTime, itemDuration / 60f, StatUnit.seconds);
         }
 
-        if(liquidOutput != null){
-            stats.add(Stat.output, StatValues.liquid(liquidOutput.liquid, liquidOutput.amount * 60f, true));
+        if(outputLiquid != null){
+            stats.add(Stat.output, StatValues.liquid(outputLiquid.liquid, outputLiquid.amount * 60f, true));
         }
     }
 
@@ -102,10 +102,10 @@ public class ConsumeGenerator extends PowerGenerator{
                 generateTime = 1f;
             }
 
-            if(liquidOutput != null){
-                float added = Math.min(productionEfficiency * delta() * liquidOutput.amount, liquidCapacity - liquids.get(liquidOutput.liquid));
-                liquids.add(liquidOutput.liquid, added);
-                dumpLiquid(liquidOutput.liquid);
+            if(outputLiquid != null){
+                float added = Math.min(productionEfficiency * delta() * outputLiquid.amount, liquidCapacity - liquids.get(outputLiquid.liquid));
+                liquids.add(outputLiquid.liquid, added);
+                dumpLiquid(outputLiquid.liquid);
             }
 
             //generation time always goes down, but only at the end so consumeTriggerValid doesn't assume fake items
