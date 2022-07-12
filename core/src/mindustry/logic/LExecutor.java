@@ -1676,7 +1676,7 @@ public class LExecutor{
             if(obj instanceof Weather w){
                 switch(action){
                     case create -> {
-                        if(!Vars.net.client()) w.create(exec.numf(intensity), exec.numf(duration) * 60f);
+                        if(!Vars.net.client() && !Groups.weather.contains(ws -> ws.weather == w)) w.create(exec.numf(intensity), exec.numf(duration) * 60f);
                     }
                     case remove -> Groups.weather.each(ws -> ws.weather == w, ws -> ws.remove());
                     case clear -> Groups.weather.each(ws -> ws.remove());
