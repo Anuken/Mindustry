@@ -146,7 +146,7 @@ public class ErekirTechTree{
             node(turbineCondenser, () -> {
                 node(beamNode, () -> {
                     node(ventCondenser, Seq.with(new OnSector(two)), () -> {
-                        node(chemicalCombustionChamber, Seq.with(new OnSector(three)), () -> {
+                        node(chemicalCombustionChamber, Seq.with(new OnSector(four)), () -> {
                             node(pyrolysisGenerator, () -> {
 
                             });
@@ -170,7 +170,7 @@ public class ErekirTechTree{
 
                 node(reinforcedConduit, Seq.with(new OnSector(two)), () -> {
                     //TODO maybe should be even later
-                    node(reinforcedPump, Seq.with(new OnSector(three)), () -> {
+                    node(reinforcedPump, Seq.with(new OnSector(four)), () -> {
                         //TODO T2 pump, consume cyanogen or similar
                     });
 
@@ -288,7 +288,7 @@ public class ErekirTechTree{
             node(tankFabricator, Seq.with(new Research(siliconArcFurnace), new Research(plasmaBore), new Research(turbineCondenser)), () -> {
                 node(UnitTypes.stell);
 
-                node(unitRepairTower, Seq.with(new OnSector(two)), () -> {
+                node(unitRepairTower, Seq.with(new OnSector(four), new Research(mechRefabricator)), () -> {
 
                 });
 
@@ -301,7 +301,7 @@ public class ErekirTechTree{
                         node(tankRefabricator, Seq.with(new OnSector(atlas)), () -> {
                             node(UnitTypes.locus);
 
-                            node(mechRefabricator, Seq.with(new OnSector(three)), () -> {
+                            node(mechRefabricator, Seq.with(new OnSector(four)), () -> {
                                 node(UnitTypes.cleroi);
 
                                 node(shipRefabricator, Seq.with(new OnSector(four), tmpNever), () -> {
