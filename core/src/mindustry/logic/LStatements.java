@@ -1663,4 +1663,65 @@ public class LStatements{
             return LCategory.world;
         }
     }
+    
+    @RegisterStatement("weather")
+    public static class WeatherStatement extends LStatement{
+        public WeatherAction action = WeatherAction.create;
+        public String weather = "@rain", intensity = "1", duration = "10";
+        
+        @Override
+        public void build(Table table){
+            rebuild(table);
+        }
+        
+        void rebuild(Table table){
+            table.clearChildren();
+            
+            table.button(b -> {
+                b.label(() -> action.name()).growX().wrap().labelAlign(Align.center);
+                b.clicked(() -> showSelect(b, WeatherAction.all, action, o -> {
+                    action = o;
+                    rebuild(table);
+                }, 2, c -> c.width(170f)));
+            }, Styles.logict, () -> {}).size(180f, 40f).margin(5f).pad(4f).color(table.color);
+            
+            switch(action){
+                case create -> {
+                    row(table);
+                    
+                    fields(table, weather, str -> weather = str);
+                    
+                    row(table);
+                    
+                    table.add("intensity (0 - 1) ");
+                    fields(table, intensity, str -> intensity = str);
+                    
+                    row(table);
+                    
+                    table.add("duration ");
+                    fields(table, duration, str -> duration = str);
+                }
+                case remove -> {
+                    row(table);
+                    
+                    fields(table, weather, str -> weather = str);
+                }
+            }
+        }
+        
+        @Override
+        public boolean privileged(){
+            return true;
+        }
+        
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new WeatherI(action, builder.var(weather), builder.var(intensity), builder.var(duration));
+        }
+        
+        @Override
+        public LCategory category(){
+            return LCategory.world;
+        }
+    }
 }

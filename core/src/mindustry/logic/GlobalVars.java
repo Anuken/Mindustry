@@ -20,7 +20,7 @@ import static mindustry.Vars.*;
 /** Stores global logic variables for logic processors. */
 public class GlobalVars{
     public static final int ctrlProcessor = 1, ctrlPlayer = 2, ctrlCommand = 3;
-    public static final ContentType[] lookableContent = {ContentType.block, ContentType.unit, ContentType.item, ContentType.liquid};
+    public static final ContentType[] lookableContent = {ContentType.block, ContentType.unit, ContentType.item, ContentType.liquid, ContentType.weather};
     /** Global random state. */
     public static final Rand rand = new Rand();
 
@@ -71,6 +71,13 @@ public class GlobalVars{
             //only register blocks that have no item equivalent (this skips sand)
             if(content.item(block.name) == null){
                 put("@" + block.name, block);
+            }
+        }
+        
+        for(Weather weather : Vars.content.weathers()){
+            //only register weathers that have no block equivalent (this skips snow)
+            if(content.block(weather.name) == null){
+                put("@" + weather.name, weather);
             }
         }
 
