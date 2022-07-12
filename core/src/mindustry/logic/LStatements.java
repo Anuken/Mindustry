@@ -1682,8 +1682,8 @@ public class LStatements{
                 b.clicked(() -> showSelect(b, WeatherAction.all, action, o -> {
                     action = o;
                     rebuild(table);
-                }, 2, c -> c.width(170f)));
-            }, Styles.logict, () -> {}).size(180f, 40f).margin(5f).pad(4f).color(table.color);
+                }, 2, c -> c.width(140f)));
+            }, Styles.logict, () -> {}).size(150f, 40f).margin(5f).pad(4f).color(table.color);
             
             switch(action){
                 case create -> {
