@@ -5382,7 +5382,7 @@ public class Blocks{
         }};
 
         payloadMassDriver = new PayloadMassDriver("payload-mass-driver"){{
-            requirements(Category.units, with(Items.tungsten, 120, Items.silicon, 120, Items.oxide, 25));
+            requirements(Category.units, with(Items.tungsten, 120, Items.silicon, 120, Items.graphite, 50));
             regionSuffix = "-dark";
             size = 3;
             reload = 130f;
@@ -5456,7 +5456,7 @@ public class Blocks{
         }};
 
         payloadUnloader = new PayloadUnloader("payload-unloader"){{
-            requirements(Category.units, with(Items.graphite, 50, Items.silicon, 50, Items.oxide, 30));
+            requirements(Category.units, with(Items.graphite, 50, Items.silicon, 50, Items.tungsten, 30));
             regionSuffix = "-dark";
             hasPower = true;
             consumePower(2f);
