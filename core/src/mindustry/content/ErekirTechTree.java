@@ -87,6 +87,7 @@ public class ErekirTechTree{
                     });
 
                     node(overflowDuct, Seq.with(new OnSector(two)), () -> {
+                        node(underflowDuct);
                         node(reinforcedContainer, () -> {
                             node(ductUnloader, () -> {
 
@@ -160,7 +161,9 @@ public class ErekirTechTree{
                     node(regenProjector, () -> {
                         //TODO more tiers of build tower or "support" structures like overdrive projectors
                         node(buildTower, Seq.with(new OnSector(four)), () -> {
+                            node(shockwaveTower, () -> {
 
+                            });
                         });
                     });
                 });
@@ -289,7 +292,7 @@ public class ErekirTechTree{
 
                 });
 
-                node(shipFabricator, Seq.with(new OnSector(two)), () -> {
+                node(shipFabricator, Seq.with(new OnSector(lake)), () -> {
                     node(UnitTypes.elude);
 
                     node(mechFabricator, Seq.with(new OnSector(three)), () -> {
@@ -342,10 +345,13 @@ public class ErekirTechTree{
                 });
             });
 
-            //TODO more sectors
             node(onset, () -> {
                 node(two, Seq.with(new SectorComplete(onset), new Research(ductRouter), new Research(ductBridge)), () -> {
-                    node(three, Seq.with(new SectorComplete(two), new Research(ventCondenser), new Research(shipFabricator)), () -> {
+                    node(lake, Seq.with(new SectorComplete(two)), () -> {
+
+                    });
+
+                    node(three, Seq.with(new SectorComplete(two), new SectorComplete(lake), new Research(ventCondenser), new Research(shipFabricator)), () -> {
                         node(four, Seq.with(new SectorComplete(three)), () -> {
 
                         });

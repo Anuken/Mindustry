@@ -1021,7 +1021,7 @@ public class LExecutor{
         @Override
         public void run(LExecutor exec){
 
-            if(exec.building(target) instanceof MessageBuild d && d.team == exec.team){
+            if(exec.building(target) instanceof MessageBuild d && (d.team == exec.team || exec.privileged)){
 
                 d.message.setLength(0);
                 d.message.append(exec.textBuffer, 0, Math.min(exec.textBuffer.length(), maxTextBuffer));
@@ -1289,14 +1289,16 @@ public class LExecutor{
                         if(b instanceof OverlayFloor o && tile.overlay() != o) tile.setOverlayNet(o);
                     }
                     case floor -> {
-                        if(b instanceof Floor f && tile.floor() != f) tile.setFloorNet(f);
+                        if(b instanceof Floor f && tile.floor() != f && !f.isOverlay()) tile.setFloorNet(f);
                     }
                     case block -> {
-                        Team t = exec.team(team);
-                        if(t == null) t = Team.derelict;
+                        if(!b.isFloor() || b == Blocks.air){
+                            Team t = exec.team(team);
+                            if(t == null) t = Team.derelict;
 
-                        if(tile.block() != b || tile.team() != t){
-                            tile.setNet(b, t, Mathf.clamp(exec.numi(rotation), 0, 3));
+                            if(tile.block() != b || tile.team() != t){
+                                tile.setNet(b, t, Mathf.clamp(exec.numi(rotation), 0, 3));
+                            }
                         }
                     }
                     //building case not allowed
@@ -1329,8 +1331,7 @@ public class LExecutor{
             if(exec.obj(type) instanceof UnitType type && !type.hidden && t != null && Units.canCreate(t, type)){
                 //random offset to prevent stacking
                 var unit = type.spawn(t, World.unconv(exec.numf(x)) + Mathf.range(0.01f), World.unconv(exec.numf(y)) + Mathf.range(0.01f));
-                unit.rotation = exec.numf(rotation);
-                spawner.spawnEffect(unit);
+                spawner.spawnEffect(unit, exec.numf(rotation));
                 exec.setobj(result, unit);
             }
         }
@@ -1544,6 +1545,8 @@ public class LExecutor{
 
     @Remote(called = Loc.server, unreliable = true)
     public static void logicExplosion(Team team, float x, float y, float radius, float damage, boolean air, boolean ground, boolean pierce){
+        if(damage < 0f) return;
+
         Damage.damage(team, x, y, radius, damage, pierce, air, ground);
         if(pierce){
             Fx.spawnShockwave.at(x, y, World.conv(radius));

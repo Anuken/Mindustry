@@ -109,6 +109,9 @@ public class RtsAI{
             if(unit.isCommandable() && !unit.command().hasCommand() && used.add(unit.id)){
                 squad.clear();
                 data.tree().intersect(unit.x - squadRadius/2f, unit.y - squadRadius/2f, squadRadius, squadRadius, squad);
+
+                squad.truncate(data.team.rules().rtsMaxSquad);
+
                 //remove overlapping squads
                 squad.removeAll(u -> (u != unit && used.contains(u.id)) || !u.isCommandable() || u.command().hasCommand());
                 //mark used so other squads can't steal them
@@ -129,8 +132,12 @@ public class RtsAI{
     boolean handleSquad(Seq<Unit> units, boolean noDefenders){
         float health = 0f, dps = 0f;
         float ax = 0f, ay = 0f;
+        boolean targetAir = true, targetGround = true;
 
         for(var unit : units){
+            if(!unit.type.targetAir) targetAir = false;
+            if(!unit.type.targetGround) targetGround = false;
+
             ax += unit.x;
             ay += unit.y;
             health += unit.health;
@@ -167,7 +174,7 @@ public class RtsAI{
 
             //defend when close, or this is the only squad defending
             //TODO will always rush to defense no matter what
-            if(best instanceof CoreBuild || units.size >= data.team.rules().rtsMinSquad || best.within(ax, ay, 500f)){
+            if(best != null && (best instanceof CoreBuild || units.size >= data.team.rules().rtsMinSquad || best.within(ax, ay, 500f))){
                 defend = best;
 
                 if(debug){
@@ -176,6 +183,8 @@ public class RtsAI{
             }
         }
 
+        boolean tair = targetAir, tground = targetGround;
+
         //find aggressor, or else, the thing being attacked
         Vec2 defendPos = null;
         Teamc defendTarget = null;
@@ -183,7 +192,7 @@ public class RtsAI{
             float checkRange = 260f;
 
             //TODO could be made faster by storing bullet shooter
-            Unit aggressor = Units.closestEnemy(data.team, defend.x, defend.y, checkRange, u -> true);
+            Unit aggressor = Units.closestEnemy(data.team, defend.x, defend.y, checkRange, u -> u.checkTarget(tair, tground));
             if(aggressor != null){
                 defendTarget = aggressor;
             }else if(false){ //TODO currently ignored, no use defending against nothing

@@ -279,6 +279,10 @@ public class Vars implements Loadable{
         Version.init();
         CacheLayer.init();
 
+        if(!headless){
+            Log.info("[Mindustry] Version: @", Version.buildString());
+        }
+
         dataDirectory = settings.getDataDirectory();
         screenshotDirectory = dataDirectory.child("screenshots/");
         customMapDirectory = dataDirectory.child("maps/");

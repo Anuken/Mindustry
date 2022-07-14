@@ -89,9 +89,7 @@ public class ConstructBlock extends Block{
             }
 
             //make sure block indexer knows it's damaged
-            if(tile.build.damaged()){
-                indexer.notifyBuildDamaged(tile.build);
-            }
+            indexer.notifyHealthChanged(tile.build);
         }
 
         //last builder was this local client player, call placed()
@@ -375,6 +373,7 @@ public class ConstructBlock extends Block{
             this.buildCost = block.buildCost * state.rules.buildCostMultiplier;
             this.accumulator = new float[block.requirements.length];
             this.totalAccumulator = new float[block.requirements.length];
+            pathfinder.updateTile(tile);
         }
 
         public void setDeconstruct(Block previous){
@@ -388,6 +387,7 @@ public class ConstructBlock extends Block{
             this.buildCost = previous.buildCost * state.rules.buildCostMultiplier;
             this.accumulator = new float[previous.requirements.length];
             this.totalAccumulator = new float[previous.requirements.length];
+            pathfinder.updateTile(tile);
         }
 
         @Override

@@ -233,11 +233,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 }else if(posTarget != null){
                     ai.commandPosition(posTarget);
                 }
+                unit.lastCommanded = player.coloredName();
             }
-            unit.lastCommanded = player.coloredName();
         }
 
-        if(unitIds.length > 0 && player == Vars.player){
+        if(unitIds.length > 0 && player == Vars.player && !state.isPaused()){
             if(teamTarget != null){
                 Fx.attackCommand.at(teamTarget);
             }else{
@@ -257,7 +257,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         build.onCommand(target);
-        Fx.moveCommand.at(target);
+        if(!state.isPaused() && player == Vars.player){
+            Fx.moveCommand.at(target);
+        }
     }
 
     @Remote(called = Loc.server, targets = Loc.both, forward = true)
@@ -590,6 +592,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             Core.camera.position.lerpDelta(logicCamPan, logicCamSpeed);
         }else{
             logicCutsceneZoom = -1f;
+        }
+
+        if(commandBuild != null && !commandBuild.isValid()){
+            commandBuild = null;
         }
 
         if(!commandMode){

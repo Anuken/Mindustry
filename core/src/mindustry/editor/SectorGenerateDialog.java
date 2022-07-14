@@ -93,7 +93,7 @@ public class SectorGenerateDialog extends BaseDialog{
                 var preset = sectorobj.preset;
                 sectorobj.preset = null;
 
-                world.loadSector(sectorobj, seed);
+                world.loadSector(sectorobj, seed, false);
 
                 sectorobj.preset = preset;
 
