@@ -5644,7 +5644,7 @@ public class Blocks{
             forceDark = true;
             privileged = true;
             size = 1;
-            maxInstructionsPerTick = 100;
+            maxInstructionsPerTick = 500;
             range = Float.MAX_VALUE;
         }};
 

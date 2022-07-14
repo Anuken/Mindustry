@@ -3383,20 +3383,16 @@ public class UnitTypes{
                 rotateSpeed = 0.4f;
                 rotate = true;
 
-                x = 43 / 4f;
-                y = -20f / 4f;
-                shootY = 37 / 4f;
-                shootX = -5f / 4f;
+                x = 48 / 4f;
+                y = -28f / 4f;
+                shootY = 64f / 4f;
                 recoil = 3f;
-                reload = 30f;
-                shake = 2f;
-                cooldownTime = 20f;
+                reload = 90f;
+                shake = 5f;
                 layerOffset = 0.02f;
+                shadow = 10f;
 
-                shoot.shots = 3;
-                shoot.shotDelay = 3f;
-                inaccuracy = 2f;
-                velocityRnd = 0.1f;
+                shoot.shots = 1;
                 heatColor = Color.red;
 
                 for(int i = 0; i < 5; i++){
@@ -3417,24 +3413,24 @@ public class UnitTypes{
                     }});
                 }
 
-                bullet = new BasicBulletType(9f, 85){{
+                bullet = new ArtilleryBulletType(5.5f, 290){{
                     pierceCap = 2;
                     pierceBuilding = true;
 
-                    lifetime = 30f;
+                    lifetime = 75f;
                     shootEffect = Fx.shootBigColor;
                     smokeEffect = Fx.shootSmokeSquareBig;
                     frontColor = Color.white;
                     hitSound = Sounds.none;
-                    width = 12f;
-                    height = 20f;
+                    width = 18f;
+                    height = 24f;
 
                     lightColor = trailColor = hitColor = backColor = Pal.techBlue;
                     lightRadius = 40f;
                     lightOpacity = 0.7f;
 
-                    trailWidth = 2.2f;
-                    trailLength = 8;
+                    trailWidth = 4.5f;
+                    trailLength = 19;
                     trailChance = -1f;
 
                     despawnEffect = Fx.none;
@@ -3450,6 +3446,53 @@ public class UnitTypes{
                         sparkRad = 20f;
                         sparkLen = 6f;
                         sparkStroke = 2f;
+                    }};
+
+                    fragBullets = 15;
+                    fragVelocityMin = 0.5f;
+                    fragRandomSpread = 130f;
+                    fragLifeMin = 0.3f;
+                    despawnShake = 5f;
+
+                    fragBullet = new BasicBulletType(5.5f, 85){{
+                        pierceCap = 2;
+                        pierceBuilding = true;
+
+                        homingPower = 0.09f;
+                        homingRange = 150f;
+
+                        lifetime = 50f;
+                        shootEffect = Fx.shootBigColor;
+                        smokeEffect = Fx.shootSmokeSquareBig;
+                        frontColor = Color.white;
+                        hitSound = Sounds.none;
+                        width = 12f;
+                        height = 20f;
+
+                        lightColor = trailColor = hitColor = backColor = Pal.techBlue;
+                        lightRadius = 40f;
+                        lightOpacity = 0.7f;
+
+                        trailWidth = 2.2f;
+                        trailLength = 8;
+                        trailChance = -1f;
+
+                        despawnEffect = Fx.none;
+                        splashDamage = 50f;
+                        splashDamageRadius = 30f;
+
+                        hitEffect = despawnEffect = new MultiEffect(new ExplosionEffect(){{
+                            lifetime = 30f;
+                            waveStroke = 2f;
+                            waveColor = sparkColor = trailColor;
+                            waveRad = 5f;
+                            smokeSize = 0f;
+                            smokeSizeBase = 0f;
+                            sparks = 5;
+                            sparkRad = 20f;
+                            sparkLen = 6f;
+                            sparkStroke = 2f;
+                        }}, Fx.blastExplosion);
                     }};
                 }};
             }});
