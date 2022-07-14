@@ -3,6 +3,7 @@ package mindustry.ui.dialogs;
 import arc.func.*;
 import arc.graphics.*;
 import arc.scene.ui.*;
+import arc.scene.utils.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 
@@ -36,21 +37,38 @@ public class ColorPicker extends BaseDialog{
 
             t.row();
 
+            TextField hField = Elem.newField(current.toString(), h -> Color.valueOf(current, h));
+            hField.setValidator(h -> !h.isEmpty()); //TODO: Check for valid hex. Somehow. Anuke help.
+
             t.defaults().padBottom(4);
             t.add("R").color(Pal.remove);
-            t.slider(0f, 1f, 0.01f, current.r, current::r).width(w);
+            t.slider(0f, 1f, 0.01f, current.r, r -> {
+                current.r(r);
+                hField.setText(current.toString());
+            }).width(w);
             t.row();
             t.add("G").color(Color.lime);
-            t.slider(0f, 1f, 0.01f, current.g, current::g).width(w);
+            t.slider(0f, 1f, 0.01f, current.g, g -> {
+                current.g(g);
+                hField.setText(current.toString());
+            }).width(w);
             t.row();
             t.add("B").color(Color.royal);
-            t.slider(0f, 1f, 0.01f, current.b, current::b).width(w);
+            t.slider(0f, 1f, 0.01f, current.b, b -> {
+                current.b(b);
+                hField.setText(current.toString());
+            }).width(w);
             t.row();
             if(alpha){
                 t.add("A");
-                t.slider(0f, 1f, 0.01f, current.a, current::a).width(w);
+                t.slider(0f, 1f, 0.01f, current.a, a -> {
+                    current.a(a);
+                    hField.setText(current.toString());
+                }).width(w);
                 t.row();
             }
+            t.add("Hex");
+            t.add(hField);
         });
 
         buttons.clear();
