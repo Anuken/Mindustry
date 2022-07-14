@@ -76,7 +76,7 @@ public class UnitTypes{
     //special block unit type
     public static @EntityDef({Unitc.class, BlockUnitc.class}) UnitType block;
 
-    //special tethered (has payload capability, because it's necessary sometimes)
+    //special building tethered (has payload capability, because it's necessary sometimes)
     public static @EntityDef({Unitc.class, BuildingTetherc.class, Payloadc.class}) UnitType manifold, assemblyDrone;
 
     //tank
