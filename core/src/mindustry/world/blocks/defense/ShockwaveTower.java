@@ -59,6 +59,11 @@ public class ShockwaveTower extends Block{
         Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range, waveColor);
     }
 
+    @Override
+    public void drawSelect(){
+        Drawf.dashCircle(x, y, range(), waveColor);
+    }
+    
     public class ShockwaveTowerBuild extends Building{
         public float reloadCounter = Mathf.random(reload);
         public float heat = 0f;
