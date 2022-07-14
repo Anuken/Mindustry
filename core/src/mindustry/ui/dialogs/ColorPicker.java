@@ -38,7 +38,7 @@ public class ColorPicker extends BaseDialog{
             t.row();
 
             TextField hField = Elem.newField(current.toString(), h -> Color.valueOf(current, h));
-            hField.setValidator(h -> !h.isEmpty()); //TODO: Check for valid hex. Somehow. Anuke help.
+            hField.setValidator(h -> h.length() == 6 || h.length() == 8); //TODO: Check for valid hex. Somehow. Anuke help.
 
             t.defaults().padBottom(4);
             t.add("R").color(Pal.remove);
