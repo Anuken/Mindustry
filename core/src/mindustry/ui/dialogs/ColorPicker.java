@@ -37,38 +37,49 @@ public class ColorPicker extends BaseDialog{
 
             t.row();
 
-            TextField hField = Elem.newField(current.toString(), h -> Color.valueOf(current, h));
+            TextField hField = new TextField(current.toString());
             hField.setValidator(h -> h.length() == 6 || h.length() == 8); //TODO: Check for valid hex. Somehow. Anuke help.
 
             t.defaults().padBottom(4);
             t.add("R").color(Pal.remove);
-            t.slider(0f, 1f, 0.01f, current.r, r -> {
+            Slider rs = t.slider(0f, 1f, 0.01f, current.r, r -> {
                 current.r(r);
                 hField.setText(current.toString());
-            }).width(w);
+            }).width(w).get();
             t.row();
             t.add("G").color(Color.lime);
-            t.slider(0f, 1f, 0.01f, current.g, g -> {
+            Slider gs = t.slider(0f, 1f, 0.01f, current.g, g -> {
                 current.g(g);
                 hField.setText(current.toString());
-            }).width(w);
+            }).width(w).get();
             t.row();
             t.add("B").color(Color.royal);
-            t.slider(0f, 1f, 0.01f, current.b, b -> {
+            Slider bs = t.slider(0f, 1f, 0.01f, current.b, b -> {
                 current.b(b);
                 hField.setText(current.toString());
-            }).width(w);
+            }).width(w).get();
             t.row();
+            Slider as = null;
             if(alpha){
                 t.add("A");
-                t.slider(0f, 1f, 0.01f, current.a, a -> {
+                as = t.slider(0f, 1f, 0.01f, current.a, a -> {
                     current.a(a);
                     hField.setText(current.toString());
-                }).width(w);
+                }).width(w).get();
                 t.row();
             }
             t.add("Hex");
             t.add(hField);
+            Slider javaWhy = as; //mUsT bE fInAl Or EfFeCtIvElY fInAl
+            hField.changed(() -> {
+                if(hField.isValid()){
+                    Color.valueOf(current, hField.getText());
+                    rs.setValue(current.r);
+                    bs.setValue(current.b);
+                    gs.setValue(current.g);
+                    if(alpha) javaWhy.setValue(current.a);
+                }
+            });
         });
 
         buttons.clear();
