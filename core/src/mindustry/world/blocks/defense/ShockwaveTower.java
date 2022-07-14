@@ -117,7 +117,7 @@ public class ShockwaveTower extends Block{
         }
         @Override
         public void drawSelect(){
-            Drawf.dashCircle(x, y, range(), waveColor);
+            Drawf.dashCircle(x, y, range, waveColor);
         }
     }
 }
