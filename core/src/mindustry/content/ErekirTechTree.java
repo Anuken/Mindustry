@@ -100,20 +100,20 @@ public class ErekirTechTree{
                     });
                 });
 
-                node(reinforcedPayloadConveyor, Seq.with(new OnSector(four)), () -> {
+                node(reinforcedPayloadConveyor, Seq.with(new OnSector(atlas)), () -> {
                     //TODO should only be unlocked in unit sector
-                    node(constructor, Seq.with(new Research(siliconArcFurnace), new OnSector(four)), () -> {
-                        node(payloadMassDriver, Seq.with(new OnSector(four)), () -> {
-                            //TODO further limitations
-                            node(payloadLoader, () -> {
-                                node(payloadUnloader, () -> {
-                                    //TODO replace.
-                                    //node(payloadPropulsionTower, () -> {
+                    node(payloadMassDriver, Seq.with(new Research(siliconArcFurnace), new OnSector(split)), () -> {
+                        //TODO further limitations
+                        node(payloadLoader, () -> {
+                            node(payloadUnloader, () -> {
+                                //TODO replace.
+                                //node(payloadPropulsionTower, () -> {
 
-                                    //});
-                                });
+                                //});
                             });
+                        });
 
+                        node(constructor, Seq.with(new OnSector(split)), () -> {
                             node(smallDeconstructor, () -> {
                                 node(largeConstructor, () -> {
 
@@ -146,7 +146,7 @@ public class ErekirTechTree{
             node(turbineCondenser, () -> {
                 node(beamNode, () -> {
                     node(ventCondenser, Seq.with(new OnSector(two)), () -> {
-                        node(chemicalCombustionChamber, Seq.with(new OnSector(three)), () -> {
+                        node(chemicalCombustionChamber, Seq.with(new OnSector(four)), () -> {
                             node(pyrolysisGenerator, () -> {
 
                             });
@@ -170,7 +170,7 @@ public class ErekirTechTree{
 
                 node(reinforcedConduit, Seq.with(new OnSector(two)), () -> {
                     //TODO maybe should be even later
-                    node(reinforcedPump, Seq.with(new OnSector(three)), () -> {
+                    node(reinforcedPump, Seq.with(new OnSector(four)), () -> {
                         //TODO T2 pump, consume cyanogen or similar
                     });
 
@@ -191,7 +191,7 @@ public class ErekirTechTree{
 
                 node(cliffCrusher, () -> {
                     node(siliconArcFurnace, () -> {
-                        node(electrolyzer, Seq.with(new OnSector(three)), () -> {
+                        node(electrolyzer, Seq.with(new OnSector(atlas)), () -> {
                             node(oxidationChamber, Seq.with(new Research(tankRefabricator), new OnSector(four)), () -> {
                                 node(electricHeater, Seq.with(new OnSector(four)), () -> {
                                     node(heatRedirector, () -> {
@@ -259,7 +259,7 @@ public class ErekirTechTree{
                     });
                 });
 
-                node(diffuse, Seq.with(new OnSector(two)), () -> {
+                node(diffuse, Seq.with(new OnSector(lake)), () -> {
                     node(sublimate, () -> {
                         node(titan, Seq.with(new OnSector(four)), () -> {
                             node(afflict, Seq.with(new OnSector(four)), () -> {
@@ -288,7 +288,7 @@ public class ErekirTechTree{
             node(tankFabricator, Seq.with(new Research(siliconArcFurnace), new Research(plasmaBore), new Research(turbineCondenser)), () -> {
                 node(UnitTypes.stell);
 
-                node(unitRepairTower, Seq.with(new OnSector(two)), () -> {
+                node(unitRepairTower, Seq.with(new OnSector(four), new Research(mechRefabricator)), () -> {
 
                 });
 
@@ -298,10 +298,10 @@ public class ErekirTechTree{
                     node(mechFabricator, Seq.with(new OnSector(three)), () -> {
                         node(UnitTypes.merui);
 
-                        node(tankRefabricator, Seq.with(new OnSector(three)), () -> {
+                        node(tankRefabricator, Seq.with(new OnSector(atlas)), () -> {
                             node(UnitTypes.locus);
 
-                            node(mechRefabricator, Seq.with(new OnSector(three)), () -> {
+                            node(mechRefabricator, Seq.with(new OnSector(four)), () -> {
                                 node(UnitTypes.cleroi);
 
                                 node(shipRefabricator, Seq.with(new OnSector(four), tmpNever), () -> {
@@ -352,8 +352,14 @@ public class ErekirTechTree{
                     });
 
                     node(three, Seq.with(new SectorComplete(two), new SectorComplete(lake), new Research(ventCondenser), new Research(shipFabricator)), () -> {
-                        node(four, Seq.with(new SectorComplete(three)), () -> {
+                        node(atlas, Seq.with(new SectorComplete(three), new Research(mechFabricator)), () -> {
+                            node(split, Seq.with(new SectorComplete(atlas), new Research(reinforcedPayloadConveyor), new Research(reinforcedContainer)), () -> {
 
+                            });
+
+                            node(four, Seq.with(new SectorComplete(atlas)), () -> {
+
+                            });
                         });
                     });
                 });
