@@ -225,7 +225,7 @@ public class Control implements ApplicationListener, Loadable{
                         if(!(build instanceof CoreBuild) && !build.block.privileged){
                             var ccore = build.closestCore();
 
-                            if(ccore != null && build.within(ccore, buildRadius)){
+                            if(ccore != null){
                                 anyBuilds = true;
 
                                 if(!net.active()){
