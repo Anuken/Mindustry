@@ -53,7 +53,7 @@ public class ColorPicker extends BaseDialog{
 
             t.row();
 
-            t.defaults().padBottom(6).width(400f).height(44f);
+            t.defaults().padBottom(6).width(370f).height(44f);
 
             t.stack(new Image(new TextureRegion(hueTex)), hSlider = new Slider(0f, 360f, 0.3f, false){{
                 setValue(h);

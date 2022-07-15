@@ -275,9 +275,7 @@ public class Control implements ApplicationListener, Loadable{
     }
 
     private void placeLandBuild(Building build){
-        //TODO instance reuse bad?
         build.tile.setBlock(build.block, build.team, build.rotation, () -> build);
-        //TODO dropped bad?
         build.dropped();
 
         Fx.coreBuildBlock.at(build.x, build.y, 0f, build.block);

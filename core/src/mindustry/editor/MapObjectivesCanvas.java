@@ -384,6 +384,7 @@ public class MapObjectivesCanvas extends WidgetGroup{
 
                 row().table(Tex.buttonSelectTrans, t -> {
                     t.labelWrap(obj.typeName()).grow()
+                        .style(Styles.outlineLabel)
                         .color(Pal.accent).align(Align.left).padLeft(6f)
                         .ellipsis(true).get().setAlignment(Align.left);
 
