@@ -328,52 +328,6 @@ public class Logic implements ApplicationListener{
         }
     }
 
-    protected void updateObjectives(){
-        //update objectives; do not get completed clientside
-        if(state.rules.objectives.size > 0){
-            var first = state.rules.objectives.first();
-            first.update();
-
-            //initialize markers
-            for(var marker : first.markers){
-                if(!marker.wasAdded){
-                    marker.wasAdded = true;
-                    marker.added();
-                }
-            }
-
-            boolean completed = false;
-
-            //multiple objectives can be updated in the same frame
-            while(!net.client() && first != null && first.complete()){
-                state.rules.objectives.remove(0);
-                first.completed();
-                //apply flags.
-                state.rules.objectiveFlags.removeAll(first.flagsRemoved);
-                state.rules.objectiveFlags.addAll(first.flagsAdded);
-                if(!headless){
-                    //delete markers
-                    for(var marker : first.markers){
-                        if(marker.wasAdded){
-                            marker.removed();
-                            marker.wasAdded = false;
-                        }
-                    }
-                }
-
-                first = state.rules.objectives.firstOpt();
-                completed = true;
-            }
-
-            if(completed){
-                //TODO call packet for this?
-                if(net.server()){
-                    Call.setRules(state.rules);
-                }
-            }
-        }
-    }
-
     @Remote(called = Loc.server)
     public static void sectorCapture(){
         //the sector has been conquered - waves get disabled
@@ -520,7 +474,10 @@ public class Logic implements ApplicationListener{
 
                 //TODO objectives clientside???
                 if(!state.isEditor()){
-                    updateObjectives();
+                    state.rules.objectives.update();
+                    if(state.rules.objectives.checkChanged() && net.server()){
+                        Call.setObjectives(state.rules.objectives);
+                    }
                 }
 
                 if(state.rules.waves && state.rules.waveTimer && !state.gameOver){
