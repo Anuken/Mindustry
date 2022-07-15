@@ -18,6 +18,8 @@ public class SectorPreset extends UnlockableContent{
     public float startWaveTimeMultiplier = 2f;
     public boolean addStartingItems = false;
     public boolean showSectorLandInfo = true;
+    /** If true, switches to attack mode after waves end. */
+    public boolean attackAfterWaves = false;
 
     public SectorPreset(String name, Planet planet, int sector){
         super(name);

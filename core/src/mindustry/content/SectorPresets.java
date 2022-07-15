@@ -1,9 +1,5 @@
 package mindustry.content;
 
-import arc.math.geom.*;
-import mindustry.game.*;
-import mindustry.game.MapObjectives.*;
-import mindustry.graphics.*;
 import mindustry.type.*;
 
 import static mindustry.content.Planets.*;
@@ -128,6 +124,7 @@ public class SectorPresets{
         three = new SectorPreset("three", erekir, 36){{
             difficulty = 5;
             captureWave = 9;
+            attackAfterWaves = true;
         }};
 
         atlas = new SectorPreset("atlas", erekir, 14){{ //TODO random sector, pick a better one

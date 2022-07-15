@@ -291,7 +291,14 @@ public class Logic implements ApplicationListener{
             if(state.rules.waves && (state.enemies == 0 && state.rules.winWave > 0 && state.wave >= state.rules.winWave && !spawner.isSpawning()) ||
                 (state.rules.attackMode && state.rules.waveTeam.cores().isEmpty())){
 
-                Call.sectorCapture();
+                if(state.rules.sector.preset != null && state.rules.sector.preset.attackAfterWaves && !state.rules.attackMode){
+                    //activate attack mode to destroy cores after waves are done.
+                    state.rules.attackMode = true;
+                    state.rules.waves = false;
+                    Call.setRules(state.rules);
+                }else{
+                    Call.sectorCapture();
+                }
             }
         }else{
             if(!state.rules.attackMode && state.teams.playerCores().size == 0 && !state.gameOver){
