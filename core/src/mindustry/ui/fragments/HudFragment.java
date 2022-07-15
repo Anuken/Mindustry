@@ -782,7 +782,7 @@ public class HudFragment{
 
                     String text = obj.text();
                     if(text != null){
-                        if(!first) builder.append('\n');
+                        if(!first) builder.append("\n[white]");
                         builder.append(text);
 
                         first = false;

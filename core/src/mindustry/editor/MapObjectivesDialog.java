@@ -42,7 +42,12 @@ public class MapObjectivesDialog extends BaseDialog{
         setProvider(String.class, (type, cons) -> cons.get(""));
         setInterpreter(String.class, (cont, name, type, field, remover, indexer, get, set) -> {
             name(cont, name, remover, indexer);
-            cont.area(get.get(), set).growX();
+
+            if(field != null && field.isAnnotationPresent(Multiline.class)){
+                cont.area(get.get(), set).height(85f).growX();
+            }else{
+                cont.field(get.get(), set).growX();
+            }
         });
 
         setProvider(boolean.class, (type, cons) -> cons.get(false));
