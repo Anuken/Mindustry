@@ -497,7 +497,7 @@ public class MapObjectivesDialog extends BaseDialog{
                 .add(content.units()) :
                 content.getBy(type).<UnlockableContent>as()
             )){
-                if(!check.get((T)content)) continue;
+                if(content.isHidden() || !check.get((T)content)) continue;
                 t.image(content == Blocks.air ? Icon.none.getRegion() : content.uiIcon).size(iconMed).pad(3)
                     .with(b -> b.addListener(new HandCursorListener()))
                     .tooltip(content.localizedName).get().clicked(() -> {
