@@ -10,6 +10,7 @@ import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.core.GameState.*;
 import mindustry.ctype.*;
+import mindustry.type.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.LExecutor.*;

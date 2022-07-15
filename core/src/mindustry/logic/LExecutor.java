@@ -1654,6 +1654,36 @@ public class LExecutor{
             }
         }
     }
+    
+    public static class WeatherI implements LInstruction{
+        public WeatherAction action = WeatherAction.create;
+        public int weather, intensity, duration;
+        
+        public WeatherI(){
+        }
+        
+        public WeatherI(WeatherAction action, int weather, int intensity, int duration){
+            this.action = action;
+            this.weather = weather;
+            this.intensity = intensity;
+            this.duration = duration;
+        }
+        
+        @Override
+        public void run(LExecutor exec){
+            Object obj = exec.obj(weather);
+            
+            if(obj instanceof Weather w){
+                switch(action){
+                    case create -> {
+                        if(!Vars.net.client() && !Groups.weather.contains(ws -> ws.weather == w)) w.create(exec.numf(intensity), exec.numf(duration) * 60f);
+                    }
+                    case remove -> Groups.weather.each(ws -> ws.weather == w, ws -> ws.remove());
+                    case clear -> Groups.weather.each(ws -> ws.remove());
+                }
+            }
+        }
+    }
 
     //endregion
 }

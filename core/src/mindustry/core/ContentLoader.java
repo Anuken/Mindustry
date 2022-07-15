@@ -310,4 +310,12 @@ public class ContentLoader{
     public Planet planet(String name){
         return getByName(ContentType.planet, name);
     }
+    
+    public Seq<Weather> weathers(){
+        return getBy(ContentType.weather);
+    }
+    
+    public Weather weather(String name){
+        return getByName(ContentType.weather, name);
+    }
 }
