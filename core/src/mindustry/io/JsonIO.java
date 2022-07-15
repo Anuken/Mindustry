@@ -287,11 +287,19 @@ public class JsonIO{
                 var exec = new MapObjectives();
                 // First iteration to instantiate the objectives.
                 for(var value = data.child; value != null; value = value.next){
+                    //glenn why did you implement this in the least backwards compatible way possible
+                    //the old objectives had lowercase class tags, now they're uppercase and either way I can't deserialize them without errors
+                    if(value.has("class") && Character.isLowerCase(value.getString("class").charAt(0))){
+                        return new MapObjectives();
+                    }
+
                     MapObjective obj = json.readValue(MapObjective.class, value);
 
-                    int pos = value.getInt("editorPos");
-                    obj.editorX = Point2.x(pos);
-                    obj.editorY = Point2.y(pos);
+                    if(value.has("editorPos")){
+                        int pos = value.getInt("editorPos");
+                        obj.editorX = Point2.x(pos);
+                        obj.editorY = Point2.y(pos);
+                    }
 
                     exec.all.add(obj);
                 }

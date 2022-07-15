@@ -70,6 +70,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             allObjectiveTypes.add(prov);
 
             Class<? extends MapObjective> type = prov.get().getClass();
+            JsonIO.classTag(Strings.camelize(type.getSimpleName().replace("Objective", "")), type);
             JsonIO.classTag(type.getSimpleName().replace("Objective", ""), type);
         }
     }
@@ -80,6 +81,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             allMarkerTypes.add(prov);
 
             Class<? extends ObjectiveMarker> type = prov.get().getClass();
+            JsonIO.classTag(Strings.camelize(type.getSimpleName().replace("Marker", "")), type);
             JsonIO.classTag(type.getSimpleName().replace("Marker", ""), type);
         }
     }
