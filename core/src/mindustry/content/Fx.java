@@ -1597,14 +1597,14 @@ public class Fx{
         }
     }),
 
-    shootSmokeSquareBig = new Effect(30f, e -> {
+    shootSmokeSquareBig = new Effect(32f, e -> {
         color(Color.white, e.color, e.fin());
 
         rand.setSeed(e.id);
-        for(int i = 0; i < 8; i++){
-            float rot = e.rotation + rand.range(22f);
-            v.trns(rot, rand.random(e.finpow() * 24f));
-            Fill.poly(e.x + v.x, e.y + v.y, 4, e.fout() * 3.8f + 0.2f, rand.random(360f));
+        for(int i = 0; i < 13; i++){
+            float rot = e.rotation + rand.range(26f);
+            v.trns(rot, rand.random(e.finpow() * 30f));
+            Fill.poly(e.x + v.x, e.y + v.y, 4, e.fout() * 4f + 0.2f, rand.random(360f));
         }
     }),
 
@@ -2088,6 +2088,21 @@ public class Fx{
             color(Color.white, Pal.accent, e.fin());
             Fill.square(e.x + x, e.y + y, 1f + e.fout() * 3f, 45);
         });
+    }),
+
+    artilleryTrailSmoke = new Effect(50, e -> {
+        color(e.color);
+        rand.setSeed(e.id);
+        for(int i = 0; i < 13; i++){
+            float fin = e.fin() / rand.random(0.5f, 1f), fout = 1f - fin, angle = rand.random(360f), len = rand.random(0.5f, 1f);
+
+            if(fin <= 1f){
+                Tmp.v1.trns(angle, fin * 24f * len);
+
+                alpha((0.5f - Math.abs(fin - 0.5f)) * 2f);
+                Fill.circle(e.x + Tmp.v1.x, e.y + Tmp.v1.y, 0.5f + fout * 4f);
+            }
+        }
     }),
 
     smokeCloud = new Effect(70, e -> {

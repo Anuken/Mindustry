@@ -2848,9 +2848,9 @@ public class Blocks{
         }};
 
         reinforcedContainer = new StorageBlock("reinforced-container"){{
-            requirements(Category.effect, with(Items.tungsten, 80, Items.graphite, 80));
+            requirements(Category.effect, with(Items.tungsten, 30, Items.graphite, 40));
             size = 2;
-            itemCapacity = 250;
+            itemCapacity = 75;
             scaledHealth = 120;
             coreMerge = false;
         }};
@@ -5382,7 +5382,7 @@ public class Blocks{
         }};
 
         payloadMassDriver = new PayloadMassDriver("payload-mass-driver"){{
-            requirements(Category.units, with(Items.tungsten, 120, Items.silicon, 120, Items.oxide, 25));
+            requirements(Category.units, with(Items.tungsten, 120, Items.silicon, 120, Items.graphite, 50));
             regionSuffix = "-dark";
             size = 3;
             reload = 130f;
@@ -5456,7 +5456,7 @@ public class Blocks{
         }};
 
         payloadUnloader = new PayloadUnloader("payload-unloader"){{
-            requirements(Category.units, with(Items.graphite, 50, Items.silicon, 50, Items.oxide, 30));
+            requirements(Category.units, with(Items.graphite, 50, Items.silicon, 50, Items.tungsten, 30));
             regionSuffix = "-dark";
             hasPower = true;
             consumePower(2f);
@@ -5644,7 +5644,7 @@ public class Blocks{
             forceDark = true;
             privileged = true;
             size = 1;
-            maxInstructionsPerTick = 100;
+            maxInstructionsPerTick = 500;
             range = Float.MAX_VALUE;
         }};
 
