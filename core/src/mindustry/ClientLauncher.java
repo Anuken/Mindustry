@@ -56,6 +56,9 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         Log.info("[GL] Using @ context.", gl30 != null ? "OpenGL 3" : "OpenGL 2");
         if(maxTextureSize < 4096) Log.warn("[GL] Your maximum texture size is below the recommended minimum of 4096. This will cause severe performance issues.");
         Log.info("[JAVA] Version: @", OS.javaVersion);
+        if(Core.app.isAndroid()){
+            Log.info("[ANDROID] API level: @", Core.app.getVersion());
+        }
         long ram = Runtime.getRuntime().maxMemory();
         boolean gb = ram >= 1024 * 1024 * 1024;
         Log.info("[RAM] Available: @ @", Strings.fixed(gb ? ram / 1024f / 1024 / 1024f : ram / 1024f / 1024f, 1), gb ? "GB" : "MB");
@@ -71,7 +74,6 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
 
         tree = new FileTree();
         assets.setLoader(Sound.class, new SoundLoader(tree){
-
             @Override
             public void loadAsync(AssetManager manager, String fileName, Fi file, SoundParameter parameter){
 
@@ -106,7 +108,6 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
 
             @Override
             public Music loadSync(AssetManager manager, String fileName, Fi file, MusicParameter parameter){
-
                 if(parameter != null && parameter.music != null){
                     mainExecutor.submit(() -> {
                         try{

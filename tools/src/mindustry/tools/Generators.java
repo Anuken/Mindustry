@@ -382,7 +382,7 @@ public class Generators{
                     save(image, "../editor/" + block.name + "-icon-editor");
 
                     if(block.buildVisibility != BuildVisibility.hidden){
-                        saveScaled(image, block.name + "-icon-logic", logicIconSize);
+                        saveScaled(image, block.name + "-icon-logic", Math.min(32 * 3, image.width));
                     }
                     saveScaled(image, "../ui/block-" + block.name + "-ui", Math.min(image.width, maxUiIcon));
 
