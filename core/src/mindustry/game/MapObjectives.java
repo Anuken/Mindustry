@@ -99,8 +99,6 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
     /** Updates all objectives this executor contains. */
     public void update(){
-        //TODO am i doing this correctly
-        if(net.client()) return;
         eachRunning(obj -> {
             for(var marker : obj.markers){
                 if(!marker.wasAdded){
@@ -109,7 +107,8 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                 }
             }
 
-            if(obj.update()){
+            //objectives cannot get completed on the client, but they do try to update for timers and such
+            if(obj.update() && !net.client()){
                 obj.completed = true;
                 obj.done();
                 for(var marker : obj.markers){
@@ -592,7 +591,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
     /** Marker used for drawing UI to indicate something along with an objective. */
     public static abstract class ObjectiveMarker{
         /** Makes sure markers are only added once. */
-        private transient boolean wasAdded;
+        public transient boolean wasAdded;
 
         /** Called in the overlay draw layer.*/
         public void draw(){}
