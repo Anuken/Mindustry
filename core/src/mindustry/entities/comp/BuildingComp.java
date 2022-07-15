@@ -1275,7 +1275,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             //I really do not like that the bullet will not destroy derelict
             //but I can't do anything about it without using a random team
             //which may or may not cause issues with servers and js
-            block.destroyBullet.create(this, Team.derelict, x, y, 0);
+            block.destroyBullet.create(this, Team.derelict, x, y, Mathf.random(0f, 360f));
         }
     }
 
