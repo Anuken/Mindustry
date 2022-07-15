@@ -115,6 +115,7 @@ public class ShockwaveTower extends Block{
             Fill.poly(x, y, shapeSides, shapeRadius * potentialEfficiency, Time.time * shapeRotateSpeed);
             Draw.color();
         }
+
         @Override
         public void drawSelect(){
             Drawf.dashCircle(x, y, range, waveColor);
