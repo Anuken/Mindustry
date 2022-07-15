@@ -202,8 +202,8 @@ public class SectorPresets{
 
             rules = r -> {
                 r.objectives.addAll(
-                        new BuildCountObjective(Blocks.shipFabricator, 1),
-                        new UnitCountObjective(UnitTypes.elude, 1)
+                    new BuildCountObjective(Blocks.shipFabricator, 1),
+                    new UnitCountObjective(UnitTypes.elude, 1)
                 );
             };
         }};

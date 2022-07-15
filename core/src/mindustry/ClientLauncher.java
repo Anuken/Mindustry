@@ -74,7 +74,6 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
 
         tree = new FileTree();
         assets.setLoader(Sound.class, new SoundLoader(tree){
-
             @Override
             public void loadAsync(AssetManager manager, String fileName, Fi file, SoundParameter parameter){
 
@@ -109,7 +108,6 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
 
             @Override
             public Music loadSync(AssetManager manager, String fileName, Fi file, MusicParameter parameter){
-
                 if(parameter != null && parameter.music != null){
                     mainExecutor.submit(() -> {
                         try{
