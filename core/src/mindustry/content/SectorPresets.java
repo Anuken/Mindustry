@@ -16,8 +16,7 @@ public class SectorPresets{
     impact0078, desolateRift, nuclearComplex, planetaryTerminal,
     coastline, navalFortress,
 
-    onset, two, lake, three, four
-    ;
+    onset, two, lake, three, four, atlas, split;
 
     public static void load(){
         //region serpulo
@@ -125,12 +124,41 @@ public class SectorPresets{
         lake = new SectorPreset("lake", erekir, 41){{
             difficulty = 4;
 
+            rules = r -> {
+                r.objectives.addAll(
+                    new BuildCountObjective(Blocks.shipFabricator, 1),
+                    new UnitCountObjective(UnitTypes.elude, 1)
+                );
+            };
         }};
 
         three = new SectorPreset("three", erekir, 36){{
             difficulty = 5;
 
             captureWave = 9;
+        }};
+
+        atlas = new SectorPreset("atlas", erekir, 14){{ //TODO random sector, pick a better one
+            difficulty = 5;
+        }};
+
+        split = new SectorPreset("split", erekir, 19){{ //TODO random sector, pick a better one
+            difficulty = 5;
+
+            rules = r -> {
+                r.objectives.addAll(
+                    new CoreItemObjective(Items.tungsten, 100).withMarkers(
+                        new TextMarker("Some blocks can be picked up by the core unit.\nPick up this [accent]container[] and place it onto the [accent]payload loader[].\n(Default keys are [ and ] to pick up and drop)", 347 * 8f, 445f * 8f),
+                        new TextMarker("You must acquire some tungsten to build units.", 293 * 8f, 417 * 8f)
+                    ),
+                    new BuildCountObjective(Blocks.payloadMassDriver, 2).withMarkers(
+                        new TextMarker("Units must be transported to the other side of the wall.\nPlace two [accent]Payload Mass Drivers[], one on each side of the wall.\nSet up the link by pressing one of them, then selecting the other.", 293 * 8f, 417 * 8f)
+                    ),
+                    new DestroyCoreObjective().withMarkers(
+                        new TextMarker("Similar to the container, units can also be transported using a [accent]Payload Mass Driver[].\nPlace a unit fabricator adjacent to a mass driver to load them, then send them across the wall to attack the enemy base.", 293 * 8f, 417 * 8f)
+                    )
+                );
+            };
         }};
 
         four = new SectorPreset("four", erekir, 29){{
