@@ -248,8 +248,24 @@ public class MapObjectivesCanvas extends WidgetGroup{
             Lines.stroke(4f);
             Draw.color(remove ? Pal.remove : Pal.accent, parentAlpha);
 
+            Fill.square(x1, y1, 8f, 45f);
+            Fill.square(x2, y2, 8f, 45f);
+
             float dist = Math.abs(x1 - x2) / 2f;
-            Lines.curve(x1, y1, x1 + dist, y1, x2 - dist, y2, x2, y2, Math.max(4, (int) (Mathf.dst(x1, y1, x2, y2) / 4f)));
+            float cx1 = x1 + dist;
+            float cx2 = x2 - dist;
+            Lines.curve(x1, y1, cx1, y1, cx2, y2, x2, y2, Math.max(4, (int) (Mathf.dst(x1, y1, x2, y2) / 4f)));
+
+            float progress = (Time.time % (60 * 4)) / (60 * 4);
+
+            float t2 = progress * progress;
+            float t3 = progress * t2;
+            float t1 = 1 - progress;
+            float t13 = t1 * t1 * t1;
+            float kx1 = t13 * x1 + 3 * progress * t1 * t1 * cx1 + 3 * t2 * t1 * cx2 + t3 * x2;
+            float ky1 = t13  *y1 + 3 * progress * t1 * t1 * y1 + 3 * t2 * t1 * y2 + t3 * y2;
+
+            Fill.circle(kx1, ky1, 6f);
 
             Draw.reset();
         }
@@ -382,7 +398,7 @@ public class MapObjectivesCanvas extends WidgetGroup{
 
                     t.labelWrap(obj.typeName()).grow()
                     .style(Styles.outlineLabel)
-                    .align(Align.left).pad(6f)
+                    .align(Align.left).pad((unitSize - 32f) / 2f - 4f)
                     .size(unitSize * 3, unitSize * 2)
                     .ellipsis(false).get().setAlignment(Align.left);
                     t.row();
@@ -395,10 +411,10 @@ public class MapObjectivesCanvas extends WidgetGroup{
                             dialog.cont.pane(Styles.noBarPane, list -> list.top().table(e -> {
                                 e.margin(0f);
                                 MapObjectivesDialog.getInterpreter((Class<MapObjective>)obj.getClass()).build(
-                                e, obj.typeName(), new TypeInfo(obj.getClass()),
-                                null, null, null,
-                                () -> obj,
-                                res -> {}
+                                    e, obj.typeName(), new TypeInfo(obj.getClass()),
+                                    null, null, null,
+                                    () -> obj,
+                                    res -> {}
                                 );
                             }).width(400f).fillY()).grow();
 
@@ -406,7 +422,7 @@ public class MapObjectivesCanvas extends WidgetGroup{
                             dialog.show();
                         });
                         b.button(Icon.trashSmall, Styles.cleari, () -> removeTile(this));
-                    }).left().pad(6f);
+                    }).left();
                 }).growX().height(unitSize * 2).get().addCaptureListener(mover = new Mover());
                 add(conChildren = new Connector(false)).size(unitSize, unitSize * 2);
 
@@ -506,8 +522,6 @@ public class MapObjectivesCanvas extends WidgetGroup{
 
                     clearChildren();
 
-                    image(Icon.play).touchable(Touchable.disabled).size(16f).color(Pal.accent);
-
                     addCaptureListener(new InputListener(){
                         int conPointer = -1;
 
@@ -554,6 +568,22 @@ public class MapObjectivesCanvas extends WidgetGroup{
                     return
                         findParent != other.findParent &&
                         tile() != other.tile();
+                }
+
+                @Override
+                public void draw(){
+                    super.draw();
+                    float cx = x + width / 2f;
+                    float cy = y + height / 2f;
+
+                    // these are all magic numbers tweaked until they looked good in-game, don't mind them.
+                    Lines.stroke(3f, Pal.accent);
+                    if(findParent){
+                        Lines.line(cx, cy + 9f, cx + 9f, cy);
+                        Lines.line(cx + 9f, cy, cx, cy - 9f);
+                    }else{
+                        Lines.square(cx, cy, 9f, 45f);
+                    }
                 }
 
                 public ObjectiveTile tile(){
