@@ -513,9 +513,9 @@ public class MapObjectivesCanvas extends WidgetGroup{
 
                 public Connector(boolean findParent){
                     super(new ButtonStyle(){{
-                        down = findParent ? Tex.buttonEdgeDown1 : Tex.buttonEdgeDown3;
-                        up = findParent ? Tex.buttonEdge1 : Tex.buttonEdge3;
-                        over = findParent ? Tex.buttonEdgeOver1 : Tex.buttonEdgeOver3;
+                        down = findParent ? Tex.buttonSideLeftDown : Tex.buttonSideRightDown;
+                        up = findParent ? Tex.buttonSideLeft : Tex.buttonSideRight;
+                        over = findParent ? Tex.buttonSideLeftOver : Tex.buttonSideRightOver;
                     }});
 
                     this.findParent = findParent;
