@@ -150,8 +150,8 @@ public class MapObjectivesCanvas extends WidgetGroup{
                 maxX = Math.min(Mathf.ceil((x + width + 1f) / unitSize), bounds), maxY = Math.min(Mathf.ceil((y + height + 1f) / unitSize), bounds);
             float progX = x % unitSize, progY = y % unitSize;
 
-            Lines.stroke(2f);
-            Draw.color(Pal.gray, parentAlpha);
+            Lines.stroke(3f);
+            Draw.color(Pal.darkestGray, parentAlpha);
 
             for(int x = minX; x <= maxX; x++) Lines.line(progX + x * unitSize, minY * unitSize, progX + x * unitSize, maxY * unitSize);
             for(int y = minY; y <= maxY; y++) Lines.line(minX * unitSize, progY + y * unitSize, maxX * unitSize, progY + y * unitSize);
@@ -375,39 +375,40 @@ public class MapObjectivesCanvas extends WidgetGroup{
                 setTransform(false);
                 setClip(false);
 
-                add(conParent = new Connector(true)).size(unitSize);
-                add(new ImageButton(Icon.move, new ImageButtonStyle(){{
-                    up = Tex.whiteui;
-                    imageUpColor = Color.black;
-                }})).color(Pal.accent).height(unitSize).growX().get().addCaptureListener(mover = new Mover());
-                add(conChildren = new Connector(false)).size(unitSize);
+                add(conParent = new Connector(true)).size(unitSize, unitSize * 2);
+                table(Tex.whiteui, t -> {
+                    t.touchable(() -> Touchable.enabled);
+                    t.setColor(Pal.gray);
 
-                row().table(Tex.buttonSelectTrans, t -> {
                     t.labelWrap(obj.typeName()).grow()
-                        .style(Styles.outlineLabel)
-                        .color(Pal.accent).align(Align.left).padLeft(6f)
-                        .ellipsis(true).get().setAlignment(Align.left);
+                    .style(Styles.outlineLabel)
+                    .align(Align.left).pad(6f)
+                    .size(unitSize * 3, unitSize * 2)
+                    .ellipsis(false).get().setAlignment(Align.left);
+                    t.row();
 
                     t.table(b -> {
-                        b.right().defaults().size(32f).pad((unitSize - 32f) / 2f - 4f);
-                        b.button(Icon.pencilSmall, () -> {
+                        b.left().defaults().size(32f).pad((unitSize - 32f) / 2f - 4f);
+
+                        b.button(Icon.pencilSmall, Styles.cleari,  () -> {
                             BaseDialog dialog = new BaseDialog("@editor.objectives");
                             dialog.cont.pane(Styles.noBarPane, list -> list.top().table(e -> {
                                 e.margin(0f);
                                 MapObjectivesDialog.getInterpreter((Class<MapObjective>)obj.getClass()).build(
-                                    e, obj.typeName(), new TypeInfo(obj.getClass()),
-                                    null, null, null,
-                                    () -> obj,
-                                    res -> {}
+                                e, obj.typeName(), new TypeInfo(obj.getClass()),
+                                null, null, null,
+                                () -> obj,
+                                res -> {}
                                 );
                             }).width(400f).fillY()).grow();
 
                             dialog.addCloseButton();
                             dialog.show();
                         });
-                        b.button(Icon.trashSmall, () -> removeTile(this));
-                    }).growY().fillX();
-                }).grow().colspan(3);
+                        b.button(Icon.trashSmall, Styles.cleari, () -> removeTile(this));
+                    }).left().pad(6f);
+                }).growX().height(unitSize * 2).get().addCaptureListener(mover = new Mover());
+                add(conChildren = new Connector(false)).size(unitSize, unitSize * 2);
 
                 setSize(getPrefWidth(), getPrefHeight());
                 pos(x, y);
@@ -504,6 +505,9 @@ public class MapObjectivesCanvas extends WidgetGroup{
                     this.findParent = findParent;
 
                     clearChildren();
+
+                    image(Icon.play).touchable(Touchable.disabled).size(16f).color(Pal.accent);
+
                     addCaptureListener(new InputListener(){
                         int conPointer = -1;
 
