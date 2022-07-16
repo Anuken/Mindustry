@@ -76,7 +76,7 @@ public class UnitTypes{
     //special block unit type
     public static @EntityDef({Unitc.class, BlockUnitc.class}) UnitType block;
 
-    //special tethered (has payload capability, because it's necessary sometimes)
+    //special building tethered (has payload capability, because it's necessary sometimes)
     public static @EntityDef({Unitc.class, BuildingTetherc.class, Payloadc.class}) UnitType manifold, assemblyDrone;
 
     //tank
@@ -3377,6 +3377,8 @@ public class UnitTypes{
             shadowElevation = 0.4f;
             groundLayer = Layer.legUnit;
 
+            targetAir = false;
+
             weapons.add(new Weapon("collaris-weapon"){{
                 mirror = true;
                 rotationLimit = 30f;
@@ -3386,11 +3388,15 @@ public class UnitTypes{
                 x = 48 / 4f;
                 y = -28f / 4f;
                 shootY = 64f / 4f;
-                recoil = 3f;
-                reload = 90f;
-                shake = 5f;
+                recoil = 4f;
+                reload = 130f;
+                cooldownTime = reload * 1.2f;
+                shake = 7f;
                 layerOffset = 0.02f;
                 shadow = 10f;
+
+                shootStatus = StatusEffects.slow;
+                shootStatusDuration = reload + 1f;
 
                 shoot.shots = 1;
                 heatColor = Color.red;
@@ -3413,14 +3419,13 @@ public class UnitTypes{
                     }});
                 }
 
-                bullet = new ArtilleryBulletType(5.5f, 290){{
-                    pierceCap = 2;
-                    pierceBuilding = true;
-
+                bullet = new ArtilleryBulletType(5.5f, 300){{
+                    collidesTiles = collides = true;
                     lifetime = 75f;
                     shootEffect = Fx.shootBigColor;
                     smokeEffect = Fx.shootSmokeSquareBig;
                     frontColor = Color.white;
+                    trailEffect = new MultiEffect(Fx.artilleryTrail, Fx.artilleryTrailSmoke);
                     hitSound = Sounds.none;
                     width = 18f;
                     height = 24f;
@@ -3436,17 +3441,20 @@ public class UnitTypes{
                     despawnEffect = Fx.none;
 
                     hitEffect = despawnEffect = new ExplosionEffect(){{
-                        lifetime = 30f;
-                        waveStroke = 2f;
+                        lifetime = 34f;
+                        waveStroke = 4f;
                         waveColor = sparkColor = trailColor;
-                        waveRad = 5f;
+                        waveRad = 25f;
                         smokeSize = 0f;
                         smokeSizeBase = 0f;
-                        sparks = 5;
-                        sparkRad = 20f;
-                        sparkLen = 6f;
-                        sparkStroke = 2f;
+                        sparks = 10;
+                        sparkRad = 25f;
+                        sparkLen = 8f;
+                        sparkStroke = 3f;
                     }};
+
+                    splashDamage = 90f;
+                    splashDamageRadius = 20f;
 
                     fragBullets = 15;
                     fragVelocityMin = 0.5f;
@@ -3454,7 +3462,7 @@ public class UnitTypes{
                     fragLifeMin = 0.3f;
                     despawnShake = 5f;
 
-                    fragBullet = new BasicBulletType(5.5f, 85){{
+                    fragBullet = new BasicBulletType(5.5f, 60){{
                         pierceCap = 2;
                         pierceBuilding = true;
 
@@ -3474,7 +3482,7 @@ public class UnitTypes{
                         lightOpacity = 0.7f;
 
                         trailWidth = 2.2f;
-                        trailLength = 8;
+                        trailLength = 7;
                         trailChance = -1f;
 
                         despawnEffect = Fx.none;

@@ -2090,6 +2090,21 @@ public class Fx{
         });
     }),
 
+    artilleryTrailSmoke = new Effect(50, e -> {
+        color(e.color);
+        rand.setSeed(e.id);
+        for(int i = 0; i < 13; i++){
+            float fin = e.fin() / rand.random(0.5f, 1f), fout = 1f - fin, angle = rand.random(360f), len = rand.random(0.5f, 1f);
+
+            if(fin <= 1f){
+                Tmp.v1.trns(angle, fin * 24f * len);
+
+                alpha((0.5f - Math.abs(fin - 0.5f)) * 2f);
+                Fill.circle(e.x + Tmp.v1.x, e.y + Tmp.v1.y, 0.5f + fout * 4f);
+            }
+        }
+    }),
+
     smokeCloud = new Effect(70, e -> {
         randLenVectors(e.id, e.fin(), 30, 30f, (x, y, fin, fout) -> {
             color(Color.gray);

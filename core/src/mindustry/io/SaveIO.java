@@ -68,6 +68,7 @@ public class SaveIO{
             getMeta(stream);
             return true;
         }catch(Throwable e){
+            Log.err(e);
             return false;
         }
     }

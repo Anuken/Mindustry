@@ -89,16 +89,19 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
         resetLegs(type.legLength);
     }
 
-    //TODO clearly broken for many units
     public void resetLegs(float legLength){
         int count = type.legCount;
 
         this.legs = new Leg[count];
 
+        if(type.lockLegBase){
+            baseRotation = rotation;
+        }
+
         for(int i = 0; i < legs.length; i++){
             Leg l = new Leg();
 
-            float dstRot = legAngle(i) + (type.lockLegBase ? rotation - baseRotation : baseRotation);
+            float dstRot = legAngle(i);
             Vec2 baseOffset = legOffset(Tmp.v5, i).add(x, y);
 
             l.joint.trns(dstRot, legLength/2f).add(baseOffset);
