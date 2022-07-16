@@ -92,7 +92,7 @@ public class Blocks{
     //defense - erekir
     radar,
     buildTower,
-    regenProjector, barrierProjector,
+    regenProjector, barrierProjector, shockwaveTower,
     //campaign only
     shieldProjector,
     largeShieldProjector,
@@ -1826,6 +1826,13 @@ public class Blocks{
             consumePower(4f);
         }};
 
+        shockwaveTower = new ShockwaveTower("shockwave-tower"){{
+            requirements(Category.effect, with(Items.surgeAlloy, 50, Items.silicon, 150, Items.oxide, 30, Items.tungsten, 100));
+            size = 3;
+            consumeLiquids(LiquidStack.with(Liquids.cyanogen, 1f / 60f));
+            consumePower(80f / 60f);
+        }};
+
         //TODO 5x5??
         shieldProjector = new BaseShield("shield-projector"){{
             requirements(Category.effect, BuildVisibility.editorOnly, with());
@@ -2438,8 +2445,11 @@ public class Blocks{
             size = 3;
             ambientSound = Sounds.hum;
             ambientSoundVolume = 0.06f;
-            spinSpeed = 0.6f;
-            spinners = true;
+
+            drawer = new DrawMulti(new DrawDefault(), new DrawBlurSpin("-rotator", 0.6f * 9f){{
+                blurThresh = 0.01f;
+            }});
+
             hasLiquids = true;
             outputLiquid = new LiquidStack(Liquids.water, 5f / 60f / 9f);
             liquidCapacity = 20f;
@@ -2469,9 +2479,7 @@ public class Blocks{
             ambientSoundVolume = 0.06f;
         }};
 
-        //TODO cooler name?
         pyrolysisGenerator = new ConsumeGenerator("pyrolysis-generator"){{
-            //TODO requirements
             requirements(Category.power, with(Items.graphite, 50, Items.carbide, 50, Items.oxide, 60f, Items.silicon, 50));
             powerProduction = 27f;
 
@@ -2492,7 +2500,7 @@ public class Blocks{
 
             liquidCapacity = 30f * 5;
 
-            liquidOutput = new LiquidStack(Liquids.water, 20f / 60f);
+            outputLiquid = new LiquidStack(Liquids.water, 20f / 60f);
 
             generateEffect = Fx.none;
 
@@ -2840,9 +2848,9 @@ public class Blocks{
         }};
 
         reinforcedContainer = new StorageBlock("reinforced-container"){{
-            requirements(Category.effect, with(Items.tungsten, 80, Items.graphite, 80));
+            requirements(Category.effect, with(Items.tungsten, 30, Items.graphite, 40));
             size = 2;
-            itemCapacity = 250;
+            itemCapacity = 75;
             scaledHealth = 120;
             coreMerge = false;
         }};
@@ -4435,7 +4443,7 @@ public class Blocks{
         }};
 
         smite = new ItemTurret("smite"){{
-            requirements(Category.turret, with(Items.beryllium, 150, Items.silicon, 150, Items.carbide, 250, Items.phaseFabric, 100));
+            requirements(Category.turret, with(Items.oxide, 200, Items.surgeAlloy, 400, Items.silicon, 800, Items.carbide, 500, Items.phaseFabric, 300));
 
             ammo(
             //this is really lazy
@@ -4701,7 +4709,7 @@ public class Blocks{
         }};
 
         malign = new PowerTurret("malign"){{
-            requirements(Category.turret, with(Items.beryllium, 150, Items.silicon, 150, Items.graphite, 250, Items.phaseFabric, 300));
+            requirements(Category.turret, with(Items.carbide, 400, Items.beryllium, 2000, Items.silicon, 800, Items.graphite, 800, Items.phaseFabric, 300));
 
             var haloProgress = PartProgress.warmup;
             Color haloColor = Color.valueOf("d370d3"), heatCol = Color.purple;
@@ -4756,7 +4764,7 @@ public class Blocks{
                     sideAngle = 175f;
                     sideWidth = 1f;
                     sideLength = 40f;
-                    lifetime = 16f;
+                    lifetime = 22f;
                     drawSize = 400f;
                     length = 180f;
                     pierceCap = 2;
@@ -5189,7 +5197,7 @@ public class Blocks{
 
             size = 3;
             configurable = false;
-            plans.add(new UnitPlan(UnitTypes.elude, 60f * 45f, with(Items.graphite, 50, Items.silicon, 70)));
+            plans.add(new UnitPlan(UnitTypes.elude, 60f * 40f, with(Items.graphite, 50, Items.silicon, 70)));
             regionSuffix = "-dark";
             fogRadius = 3;
             researchCostMultiplier = 0.5f;
@@ -5374,7 +5382,7 @@ public class Blocks{
         }};
 
         payloadMassDriver = new PayloadMassDriver("payload-mass-driver"){{
-            requirements(Category.units, with(Items.tungsten, 120, Items.silicon, 120, Items.oxide, 25));
+            requirements(Category.units, with(Items.tungsten, 120, Items.silicon, 120, Items.graphite, 50));
             regionSuffix = "-dark";
             size = 3;
             reload = 130f;
@@ -5448,7 +5456,7 @@ public class Blocks{
         }};
 
         payloadUnloader = new PayloadUnloader("payload-unloader"){{
-            requirements(Category.units, with(Items.graphite, 50, Items.silicon, 50, Items.oxide, 30));
+            requirements(Category.units, with(Items.graphite, 50, Items.silicon, 50, Items.tungsten, 30));
             regionSuffix = "-dark";
             hasPower = true;
             consumePower(2f);
@@ -5636,7 +5644,7 @@ public class Blocks{
             forceDark = true;
             privileged = true;
             size = 1;
-            maxInstructionsPerTick = 100;
+            maxInstructionsPerTick = 500;
             range = Float.MAX_VALUE;
         }};
 
