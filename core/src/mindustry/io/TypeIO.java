@@ -546,6 +546,19 @@ public class TypeIO{
         return JsonIO.read(Rules.class, string);
     }
 
+    public static void writeObjectives(Writes write, MapObjectives executor){
+        String string = JsonIO.write(executor);
+        byte[] bytes = string.getBytes(charset);
+        write.i(bytes.length);
+        write.b(bytes);
+    }
+
+    public static MapObjectives readObjectives(Reads read){
+        int length = read.i();
+        String string = new String(read.b(new byte[length]), charset);
+        return JsonIO.read(MapObjectives.class, string);
+    }
+
     public static void writeVecNullable(Writes write, @Nullable Vec2 v){
         if(v == null){
             write.f(Float.NaN);
