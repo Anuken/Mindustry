@@ -502,6 +502,11 @@ public class ModsDialog extends BaseDialog{
                         sel.hide();
                         githubImportMod(mod.repo, mod.hasJava, null);
                     });
+
+                    if(Core.graphics.isPortrait()){
+                        sel.buttons.row();
+                    }
+
                     sel.buttons.button("@mods.github.open", Icon.link, () -> {
                         Core.app.openURI("https://github.com/" + mod.repo);
                     });
