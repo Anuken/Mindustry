@@ -393,20 +393,22 @@ public class MapObjectivesCanvas extends WidgetGroup{
 
                 add(conParent = new Connector(true)).size(unitSize, unitSize * 2);
                 table(Tex.whiteui, t -> {
+                    float pad = (unitSize - 32f) / 2f - 4f;
+                    t.margin(pad);
                     t.touchable(() -> Touchable.enabled);
                     t.setColor(Pal.gray);
 
-                    t.labelWrap(obj.typeName()).grow()
+                    t.labelWrap(obj.typeName())
                     .style(Styles.outlineLabel)
-                    .align(Align.left).pad((unitSize - 32f) / 2f - 4f)
-                    .size(unitSize * 3, unitSize * 2)
-                    .ellipsis(false).get().setAlignment(Align.left);
+                    .left().grow().get()
+                    .setAlignment(Align.left);
+
                     t.row();
 
                     t.table(b -> {
-                        b.left().defaults().size(32f).pad((unitSize - 32f) / 2f - 4f);
+                        b.left().defaults().size(40f);
 
-                        b.button(Icon.pencilSmall, Styles.cleari,  () -> {
+                        b.button(Icon.pencilSmall, () -> {
                             BaseDialog dialog = new BaseDialog("@editor.objectives");
                             dialog.cont.pane(Styles.noBarPane, list -> list.top().table(e -> {
                                 e.margin(0f);
@@ -421,8 +423,8 @@ public class MapObjectivesCanvas extends WidgetGroup{
                             dialog.addCloseButton();
                             dialog.show();
                         });
-                        b.button(Icon.trashSmall, Styles.cleari, () -> removeTile(this));
-                    }).left();
+                        b.button(Icon.trashSmall, () -> removeTile(this));
+                    }).left().grow();
                 }).growX().height(unitSize * 2).get().addCaptureListener(mover = new Mover());
                 add(conChildren = new Connector(false)).size(unitSize, unitSize * 2);
 
