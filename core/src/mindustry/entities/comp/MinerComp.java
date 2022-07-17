@@ -72,18 +72,7 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc{
     public void update(){
         if(mineTile == null) return;
 
-        Building core = closestCore();
         Item item = getMineResult(mineTile);
-
-        if(core != null && item != null && !acceptsItem(item) && within(core, mineTransferRange) && !offloadImmediately()){
-            int accepted = core.acceptStack(item(), stack().amount, this);
-            if(accepted > 0){
-                Call.transferItemTo(self(), item(), accepted,
-                mineTile.worldx() + Mathf.range(tilesize / 2f),
-                mineTile.worldy() + Mathf.range(tilesize / 2f), core);
-                clearItem();
-            }
-        }
 
         if((!net.client() || isLocal()) && !validMine(mineTile)){
             mineTile = null;
@@ -100,13 +89,7 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc{
 
                 if(state.rules.sector != null && team() == state.rules.defaultTeam) state.rules.sector.info.handleProduction(item, 1);
 
-                if(core != null && within(core, mineTransferRange) && core.acceptStack(item, 1, this) == 1 && offloadImmediately()){
-                    //add item to inventory before it is transferred
-                    if(item() == item && !net.client()) addItem(item);
-                    Call.transferItemTo(self(), item, 1,
-                    mineTile.worldx() + Mathf.range(tilesize / 2f),
-                    mineTile.worldy() + Mathf.range(tilesize / 2f), core);
-                }else if(acceptsItem(item)){
+                if(acceptsItem(item)){
                     //this is clientside, since items are synced anyway
                     InputHandler.transferItemToUnit(item,
                     mineTile.worldx() + Mathf.range(tilesize / 2f),
