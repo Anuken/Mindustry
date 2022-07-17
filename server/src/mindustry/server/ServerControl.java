@@ -9,6 +9,7 @@ import arc.util.CommandHandler.*;
 import arc.util.Timer.*;
 import arc.util.serialization.*;
 import arc.util.serialization.JsonValue.*;
+import mindustry.TowerDefense;
 import mindustry.core.GameState.*;
 import mindustry.core.*;
 import mindustry.game.EventType.*;
@@ -266,6 +267,8 @@ public class ServerControl implements ApplicationListener{
             Thread thread = new Thread(serverInput, "Server Controls");
             thread.setDaemon(true);
             thread.start();
+
+            TowerDefense.init();
 
             info("Server loaded. Type @ for help.", "'help'");
         });
