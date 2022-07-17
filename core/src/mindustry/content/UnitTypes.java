@@ -603,8 +603,6 @@ public class UnitTypes{
         //region ground legs
 
         crawler = new UnitType("crawler"){{
-            aiController = SuicideAI::new;
-
             speed = 1f;
             hitSize = 8f;
             health = 200;
@@ -1335,7 +1333,7 @@ public class UnitTypes{
             faceTarget = false;
             hitSize = 16.05f;
             engineSize = 3f;
-            payloadCapacity = (2 * 2) * tilePayload;
+            payloadCapacity = 0;
             buildSpeed = 2.6f;
             isEnemy = false;
 
@@ -1386,7 +1384,7 @@ public class UnitTypes{
             engineSize = 7f;
             faceTarget = false;
             hitSize = 36f;
-            payloadCapacity = (3 * 3) * tilePayload;
+            payloadCapacity = 0;
             buildSpeed = 2.5f;
             buildBeamOffset = 23;
             range = 140f;
@@ -1457,7 +1455,7 @@ public class UnitTypes{
             engineSize = 7.8f;
             faceTarget = false;
             hitSize = 66f;
-            payloadCapacity = (5.5f * 5.5f) * tilePayload;
+            payloadCapacity = 0;
             buildSpeed = 4f;
             drawShields = false;
             lowAltitude = true;
