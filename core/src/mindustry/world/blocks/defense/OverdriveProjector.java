@@ -8,6 +8,8 @@ import arc.math.geom.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.content.StatusEffects;
+import mindustry.entities.Units;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
@@ -27,6 +29,7 @@ public class OverdriveProjector extends Block{
     public float speedBoostPhase = 0.75f;
     public float useTime = 400f;
     public float phaseRangeBoost = 20f;
+    public float overdriveTime = 90f;
     public boolean hasBoost = true;
     public Color baseColor = Color.valueOf("feb380");
     public Color phaseColor = Color.valueOf("ffd59e");
@@ -107,6 +110,8 @@ public class OverdriveProjector extends Block{
 
                 charge = 0f;
                 indexer.eachBlock(this, realRange, other -> other.block.canOverdrive, other -> other.applyBoost(realBoost(), reload + 1f));
+
+                Units.nearby(team, x, y, realRange, u -> u.apply(StatusEffects.overclock, overdriveTime * efficiency()));
             }
 
             if(timer(timerUse, useTime) && efficiency > 0){

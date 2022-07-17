@@ -7,6 +7,7 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.entities.Units;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
@@ -23,6 +24,7 @@ public class MendProjector extends Block{
     public float reload = 250f;
     public float range = 60f;
     public float healPercent = 12f;
+    public float electrifyTime = 120f;
     public float phaseBoost = 12f;
     public float phaseRangeBoost = 50f;
     public float useTime = 400f;
@@ -97,6 +99,10 @@ public class MendProjector extends Block{
                     other.recentlyHealed();
                     Fx.healBlockFull.at(other.x, other.y, other.block.size, baseColor, other.block);
                 });
+
+                if (team != state.rules.waveTeam) {
+                    Units.nearby(state.rules.waveTeam, x, y, realRange, u -> u.apply(StatusEffects.electrified, electrifyTime * efficiency()));
+                }
             }
         }
 
