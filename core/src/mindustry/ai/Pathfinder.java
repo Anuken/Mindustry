@@ -41,27 +41,25 @@ public class Pathfinder implements Runnable{
         costNaval = 2;
 
     public static final Seq<PathCost> costTypes = Seq.with(
-        //ground
-        (team, tile) ->
-            (PathTile.allDeep(tile) || ((PathTile.team(tile) == team && !PathTile.teamPassable(tile)) || PathTile.team(tile) == 0) && PathTile.solid(tile)) ? impassable : 1 +
-            PathTile.health(tile) * 5 +
-            (PathTile.nearSolid(tile) ? 2 : 0) +
-            (PathTile.nearLiquid(tile) ? 6 : 0) +
-            (PathTile.deep(tile) ? 6000 : 0) +
-            (PathTile.damages(tile) ? 30 : 0),
+            //ground
+            (team, tile) -> (PathTile.team(tile) == team || PathTile.team(tile) == 0) && PathTile.solid(tile) ? impassable : 1 +
+                    (PathTile.nearLiquid(tile) ? 300 : 0) +
+                    (PathTile.deep(tile) ? 6000 : 0) +
+                    (!PathTile.isDarkPanel5(tile) ? 6000 : 0) +
+                    (!PathTile.isDarkPanel4(tile) ? 300 : 0) +
+                    (PathTile.damages(tile) ? 300 : 0),
 
-        //legs
-        (team, tile) ->
-            PathTile.legSolid(tile) ? impassable : 1 +
-            (PathTile.deep(tile) ? 6000 : 0) + //leg units can now drown
-            (PathTile.solid(tile) ? 5 : 0),
+            //legs
+            (team, tile) -> (PathTile.team(tile) == team || PathTile.team(tile) == 0) && PathTile.solid(tile) ? impassable : 1 +
+                    (PathTile.deep(tile) || !PathTile.isDarkPanel5(tile) ? 6000 : 0) +
+                    (!PathTile.isDarkPanel4(tile) ? 30 : 0) +
+                    (PathTile.damages(tile) ? 300 : 0),
 
-        //water
-        (team, tile) ->
-            (PathTile.solid(tile) || !PathTile.liquid(tile) ? 6000 : 1) +
-            (PathTile.nearGround(tile) || PathTile.nearSolid(tile) ? 14 : 0) +
-            (PathTile.deep(tile) ? 0 : 1) +
-            (PathTile.damages(tile) ? 35 : 0)
+            //water
+            (team, tile) -> !PathTile.liquid(tile) ? impassable : 2 +
+                    (PathTile.nearGround(tile) || PathTile.nearSolid(tile) ? 14 : 0) +
+                    (PathTile.deep(tile) ? -1 : 0) +
+                    (PathTile.damages(tile) ? 35 : 0)
     );
 
     /** tile data, see PathTileStruct - kept as a separate array for threading reasons */
@@ -115,6 +113,11 @@ public class Pathfinder implements Runnable{
         Events.on(ResetEvent.class, event -> stop());
 
         Events.on(TileChangeEvent.class, event -> updateTile(event.tile));
+        Events.on(BlockDestroyEvent.class, event -> {
+            if (event.tile.block() instanceof CoreBlock) {
+                Core.app.post(() -> updateTile(event.tile));
+            }
+        });
 
         //remove nearSolid flag for tiles
         Events.on(TilePreChangeEvent.class, event -> {
@@ -186,7 +189,9 @@ public class Pathfinder implements Runnable{
             tile.floor().isDeep(),
             tile.floor().damageTaken > 0.00001f,
             allDeep,
-            tile.block().teamPassable
+            tile.block().teamPassable,
+            tile.floor() == Blocks.darkPanel5.asFloor(),
+            tile.floor() == Blocks.darkPanel4.asFloor()
         );
     }
 
@@ -567,5 +572,9 @@ public class Pathfinder implements Runnable{
         boolean allDeep;
         //block teamPassable is true
         boolean teamPassable;
+        //whether the floor is darkPanel5
+        boolean isDarkPanel5;
+        //whether the floor is darkPanel4
+        boolean isDarkPanel4;
     }
 }
