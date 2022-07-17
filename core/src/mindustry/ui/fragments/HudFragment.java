@@ -839,6 +839,8 @@ public class HudFragment{
 
         table.row();
 
+        //TODO nobody reads details anyway.
+        /*
         table.clicked(() -> {
             if(state.rules.objectives.any()){
                 StringBuilder text = new StringBuilder();
@@ -859,7 +861,7 @@ public class HudFragment{
                 //TODO this, as said before, could be much better.
                 ui.showInfo(text.toString());
             }
-        });
+        });*/
 
         return table;
     }
