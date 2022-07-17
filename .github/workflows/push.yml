@@ -51,3 +51,10 @@ jobs:
         cd ../Mindustry
     - name: Run unit tests
       run: ./gradlew clean cleanTest test --stacktrace
+    - name: Compile server-release.jar
+      run: ./gradlew server:dist
+    - name: Upload server-release.jar
+      uses: actions/upload-artifact@v2
+      with:
+        name: server-release.jar
+        path: server/build/libs/server-release.jar
