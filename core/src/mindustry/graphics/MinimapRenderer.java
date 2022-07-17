@@ -190,12 +190,9 @@ public class MinimapRenderer{
             drawSpawns(x, y, w, h, scaling);
         }
 
-        if(state.rules.objectives.size > 0){
-            var first = state.rules.objectives.first();
-            for(var marker : first.markers){
-                marker.drawMinimap(this);
-            }
-        }
+        state.rules.objectives.eachRunning(obj -> {
+            for(var marker : obj.markers) marker.drawMinimap(this);
+        });
     }
 
     public void drawSpawns(float x, float y, float w, float h, float scaling){
