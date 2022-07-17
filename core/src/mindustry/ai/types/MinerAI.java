@@ -28,13 +28,6 @@ public class MinerAI extends AIController{
                 targetItem = unit.type.mineItems.min(i -> indexer.hasOre(i) && unit.canMine(i), i -> core.items.get(i));
             }
 
-            //core full of the target item, do nothing
-            if(targetItem != null && core.acceptStack(targetItem, 1, unit) == 0){
-                unit.clearItem();
-                unit.mineTile = null;
-                return;
-            }
-
             //if inventory is full, drop it off.
             if(unit.stack.amount >= unit.type.itemCapacity || (targetItem != null && !unit.acceptsItem(targetItem))){
                 mining = false;
@@ -63,16 +56,21 @@ public class MinerAI extends AIController{
                 return;
             }
 
-            if(unit.within(core, unit.type.range)){
-                if(core.acceptStack(unit.stack.item, unit.stack.amount, unit) > 0){
-                    Call.transferItemTo(unit, unit.stack.item, unit.stack.amount, unit.x, unit.y, core);
-                }
+            if(core.health < core.maxHealth && unit.within(core, unit.type.range)){
+                Call.effect(Fx.greenCloud, core.x, core.y, core.rotation, core.team.color);
+                Call.effect(Fx.greenCloud, unit.x, unit.y, unit.rotation, unit.team.color);
+                core.heal(unit.stack.item.hardness * unit.stack.amount * core.block.size);
 
                 unit.clearItem();
                 mining = true;
+                return;
             }
 
-            circle(core, unit.type.range / 1.8f);
+            if(core.health < core.maxHealth){
+                moveTo(core, unit.type.range / 1.5f);
+            }else{
+                circle(core, unit.type.range * 3f);
+            }
         }
     }
 }

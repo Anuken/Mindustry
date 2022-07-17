@@ -18,7 +18,7 @@ public class FlyingAI extends AIController{
             if(unit.type.circleTarget){
                 circleAttack(120f);
             }else{
-                moveTo(target, unit.type.range * 0.8f);
+                moveTo(target, unit.type.range * 0.4f);
                 unit.lookAt(target);
             }
         }
@@ -30,10 +30,7 @@ public class FlyingAI extends AIController{
 
     @Override
     public Teamc findTarget(float x, float y, float range, boolean air, boolean ground){
-        var result = findMainTarget(x, y, range, air, ground);
-
-        //if the main target is in range, use it, otherwise target whatever is closest
-        return checkTarget(result, x, y, range) ? target(x, y, range, air, ground) : result;
+        return findMainTarget(x, y, range, air, ground);
     }
 
     @Override
@@ -44,16 +41,12 @@ public class FlyingAI extends AIController{
             return core;
         }
 
-        for(var flag : unit.type.targetFlags){
-            if(flag == null){
-                Teamc result = target(x, y, range, air, ground);
-                if(result != null) return result;
-            }else if(ground){
-                Teamc result = targetFlag(x, y, flag, true);
-                if(result != null) return result;
-            }
+        Teamc result = target(x, y, range, air, ground);
+        if(unit.team == state.rules.waveTeam){
+            result = target(x, y, range, false, false);
         }
 
+        if(result != null) return result;
         return core;
     }
 }
