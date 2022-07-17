@@ -144,7 +144,7 @@ public class BlockIndexer{
         process(tile);
 
         var drop = tile.drop();
-        if(drop != null){
+        if(drop != null && ores != null){
             int qx = tile.x / quadrantSize;
             int qy = tile.y / quadrantSize;
 
