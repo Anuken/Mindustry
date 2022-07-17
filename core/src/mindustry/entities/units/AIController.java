@@ -5,6 +5,8 @@ import arc.math.geom.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.ai.*;
+import mindustry.ai.Pathfinder.Flowfield;
+import mindustry.content.Fx;
 import mindustry.entities.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -45,6 +47,26 @@ public class AIController implements UnitController{
         updateVisuals();
         updateTargeting();
         updateMovement();
+
+        Building core = unit.closestEnemyCore();
+
+        if(unit.team == state.rules.waveTeam && core != null && unit.dst(core) < tilesize * 10f) {
+            float damage = unit.health / Mathf.sqrt(TowerDefense.multiplier / 16);
+            core.damage(damage, true);
+
+            Effect hitFx = Fx.blastExplosion;
+
+            if (damage > 20000f) {
+                hitFx = Fx.reactorExplosion;
+            }
+
+            if (damage > 50000f) {
+                hitFx = Fx.massiveExplosion;
+            }
+
+            Call.effect(hitFx, core.x(), core.y(), Math.max(1f, damage / 500f), state.rules.waveTeam.color);
+            unit.kill();
+        }
     }
 
     /**
@@ -118,6 +140,25 @@ public class AIController implements UnitController{
         Tile targetTile = pathfinder.getTargetTile(tile, pathfinder.getField(unit.team, costType, pathTarget));
 
         if(tile == targetTile || (costType == Pathfinder.costNaval && !targetTile.floor().isLiquid)) return;
+
+        unit.movePref(vec.trns(unit.angleTo(targetTile.worldx(), targetTile.worldy()), unit.speed()));
+    }
+
+    public Flowfield findPath(int pathTarget) {
+        int costType = unit.pathType();
+
+        Tile tile = unit.tileOn();
+        if(tile == null) return null;
+        return pathfinder.getField(unit.team, costType, pathTarget);
+    }
+
+    public void moveWithField(Flowfield field) {
+        Tile tile = unit.tileOn();
+        if(tile == null) return;
+
+        Tile targetTile = pathfinder.getTargetTile(tile, field);
+
+        if(tile == targetTile) return;
 
         unit.movePref(vec.trns(unit.angleTo(targetTile.worldx(), targetTile.worldy()), unit.speed()));
     }
