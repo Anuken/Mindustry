@@ -49,9 +49,11 @@ public class ConsumeLiquids extends Consume{
 
     @Override
     public float efficiency(Building build){
-        float min = 1f, delta = build.edelta();
+        float ed = build.edelta();
+        if(ed <= 0.00000001f) return 0f;
+        float min = 1f;
         for(var stack : liquids){
-            min = Math.min(build.liquids.get(stack.liquid) / (stack.amount * delta), min);
+            min = Math.min(build.liquids.get(stack.liquid) / (stack.amount * ed), min);
         }
         return min;
     }

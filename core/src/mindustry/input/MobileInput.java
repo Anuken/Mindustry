@@ -90,7 +90,7 @@ public class MobileInput extends InputHandler implements GestureListener{
     void checkTargets(float x, float y){
         Unit unit = Units.closestEnemy(player.team(), x, y, 20f, u -> !u.dead);
 
-        if(unit != null){
+        if(unit != null && player.unit().type.canAttack){
             player.unit().mineTile = null;
             target = unit;
         }else{
