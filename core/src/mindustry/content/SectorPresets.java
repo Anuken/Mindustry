@@ -124,6 +124,7 @@ public class SectorPresets{
         intersect = new SectorPreset("intersect", erekir, 36){{
             difficulty = 5;
             captureWave = 9;
+            attackAfterWaves = true;
         }};
 
         atlas = new SectorPreset("atlas", erekir, 14){{ //TODO random sector, pick a better one

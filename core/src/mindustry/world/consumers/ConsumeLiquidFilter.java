@@ -50,7 +50,9 @@ public class ConsumeLiquidFilter extends ConsumeLiquidBase{
     @Override
     public float efficiency(Building build){
         var liq = getConsumed(build);
-        return liq != null ? Math.min(build.liquids.get(liq) / (amount * build.edelta()), 1f) : 0f;
+        float ed = build.edelta();
+        if(ed <= 0.00000001f) return 0f;
+        return liq != null ? Math.min(build.liquids.get(liq) / (amount * ed), 1f) : 0f;
     }
     
     public @Nullable Liquid getConsumed(Building build){

@@ -609,6 +609,15 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             String className = getClass().getSimpleName().replace("Marker", "");
             return Core.bundle == null ? className : Core.bundle.get("marker." + className.toLowerCase() + ".name", className);
         }
+
+        public static String fetchText(String text){
+            return text.startsWith("@") ?
+                //on mobile, try ${text}.mobile first for mobile-specific hints.
+                mobile ? Core.bundle.get(text.substring(1) + ".mobile", Core.bundle.get(text.substring(1))) :
+                Core.bundle.get(text.substring(1)) :
+                text;
+
+        }
     }
 
     /** Displays text above a shape. */
@@ -662,7 +671,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             Draw.reset();
 
             if(fetchedText == null){
-                fetchedText = text.startsWith("@") ? Core.bundle.get(text.substring(1)) : text;
+                fetchedText = fetchText(text);
             }
 
             WorldLabel.drawAt(text, pos.x, pos.y + radius + textHeight, Draw.z(), flags, fontSize);
@@ -774,7 +783,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         @Override
         public void draw(){
             if(fetchedText == null){
-                fetchedText = text.startsWith("@") ? Core.bundle.get(text.substring(1)) : text;
+                fetchedText = fetchText(text);
             }
 
             WorldLabel.drawAt(fetchedText, pos.x, pos.y, Draw.z(), flags, fontSize);
