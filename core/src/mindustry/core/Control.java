@@ -420,7 +420,7 @@ public class Control implements ApplicationListener, Loadable{
 
                             //set spawn for sector damage to use
                             Tile spawn = world.tile(sector.info.spawnPosition);
-                            spawn.setBlock(Blocks.coreShard, state.rules.defaultTeam);
+                            spawn.setBlock(sector.planet.defaultCore, state.rules.defaultTeam);
 
                             //add extra damage.
                             SectorDamage.apply(1f);
