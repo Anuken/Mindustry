@@ -9,6 +9,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.noise.*;
+import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
@@ -16,6 +17,7 @@ import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
 import mindustry.maps.generators.*;
+import mindustry.world.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -105,6 +107,8 @@ public class Planet extends UnlockableContent{
     public boolean prebuildBase = true;
     /** If true, waves are created on sector loss. TODO remove. */
     public boolean allowWaves = false;
+    /** Default core block for launching. */
+    public Block defaultCore = Blocks.coreShard;
     /** Sets up rules on game load for any sector on this planet. */
     public Cons<Rules> ruleSetter = r -> {};
     /** Parent body that this planet orbits around. If null, this planet is considered to be in the middle of the solar system.*/
