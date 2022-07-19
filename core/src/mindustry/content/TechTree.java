@@ -23,6 +23,7 @@ public class TechTree{
     public static TechNode nodeRoot(String name, UnlockableContent content, boolean requireUnlock, Runnable children){
         var root = node(content, content.researchRequirements(), children);
         root.name = name;
+        root.tree = name;
         root.requiresUnlock = requireUnlock;
         roots.add(root);
         return root;
@@ -77,6 +78,8 @@ public class TechTree{
         public @Nullable Drawable icon;
         /** Name for root node - used in tech tree selector. */
         public @Nullable String name;
+        /** Name of the tech tree. TODO: Just use name instead? */
+        public @Nullable String tree;
         /** For roots only. If true, this needs to be unlocked before it is selectable in the research dialog. Does not apply when you are on the planet itself. */
         public boolean requiresUnlock = false;
         /** Requirement node. */
@@ -98,6 +101,7 @@ public class TechTree{
             if(parent != null){
                 parent.children.add(this);
                 researchCostMultipliers = parent.researchCostMultipliers;
+                tree = parent.tree;
             }else if(researchCostMultipliers == null){
                 researchCostMultipliers = new ObjectFloatMap<>();
             }
