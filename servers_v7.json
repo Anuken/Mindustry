@@ -6,7 +6,11 @@
   {
     "name": "C.A.M.S.",
     "address": ["0.baseduser.eu.org:42001", "0.baseduser.eu.org:42002", "v7.thedimas.pp.ua"]
-  },
+   },
+   {
+  "name" : "Four Gaming Studio" ,
+  "address": ["Fourgamingstudio.ddns.net"]
+   },
   {
     "name": "SMokeOfAnarchy",
     "address": ["SMokeOfAnarchy.ru", "strider.smokeofanarchy.ru"]
