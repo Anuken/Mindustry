@@ -431,7 +431,7 @@ project(":annotations"){
     }
 }
 
-configure([":core", ":server"].collect{project(it)}){
+configure([":core", ":desktop", ":server", ":tools"].collect{project(it)}){
     java{
         withJavadocJar()
         withSourcesJar()
