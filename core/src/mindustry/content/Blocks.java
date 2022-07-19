@@ -446,7 +446,6 @@ public class Blocks{
         }};
 
         redIce = new Floor("red-ice"){{
-            //TODO red ice boulder
             dragMultiplier = 0.4f;
             speedMultiplier = 0.9f;
             attributes.set(Attribute.water, 0.4f);
@@ -458,9 +457,9 @@ public class Blocks{
             liquidDrop = Liquids.arkycite;
             liquidMultiplier = 1.5f;
             isLiquid = true;
-            //TODO status, cache layer for this crap
-            status = StatusEffects.wet;
-            statusDuration = 120f;
+            //TODO no status for now
+            //status = StatusEffects.slow;
+            //statusDuration = 120f;
             drownTime = 200f;
             cacheLayer = CacheLayer.arkycite;
             albedo = 0.9f;
@@ -470,7 +469,6 @@ public class Blocks{
             variants = 3;
         }};
 
-        //TODO different vent colors
         rhyoliteVent = new SteamVent("rhyolite-vent"){{
             parent = blendGroup = rhyolite;
             attributes.set(Attribute.steam, 1f);
