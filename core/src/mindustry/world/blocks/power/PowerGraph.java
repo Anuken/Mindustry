@@ -358,12 +358,17 @@ public class PowerGraph{
 
     @Deprecated
     private boolean otherConsumersAreValid(Building build, Consume consumePower){
+        float f = build.efficiency;
+        //hack so liquids output positive efficiency values
+        build.efficiency = 1f;
         for(Consume cons : build.block.nonOptionalConsumers){
             //TODO fix this properly
             if(cons != consumePower && cons.efficiency(build) <= 0.0000001f){
+                build.efficiency = f;
                 return false;
             }
         }
+        build.efficiency = f;
         return true;
     }
 
