@@ -2325,7 +2325,8 @@ public class Blocks{
                 rotateSpeed = -2f;
                 rotation = 45f;
             }},
-            new DrawRegion("-cap")
+            new DrawRegion("-cap"),
+            new DrawLiquidRegion()
             );
         }};
 
@@ -2340,7 +2341,7 @@ public class Blocks{
             generateEffect = Fx.generatespark;
             ambientSoundVolume = 0.03f;
 
-            drawer = new DrawMulti(new DrawDefault(), new DrawWarmupRegion());
+            drawer = new DrawMulti(new DrawDefault(), new DrawWarmupRegion(), new DrawLiquidRegion());
 
             consumeItem(Items.pyratite);
             consumeLiquid(Liquids.cryofluid, 0.1f);
