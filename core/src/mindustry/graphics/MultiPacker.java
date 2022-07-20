@@ -4,13 +4,10 @@ import arc.Core;
 import arc.graphics.*;
 import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
-import arc.math.geom.Vec2;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
 import mindustry.*;
-
-import static mindustry.Vars.ui;
 
 public class MultiPacker implements Disposable {
     private PixmapPacker[] packers = new PixmapPacker[PageType.all.length];
