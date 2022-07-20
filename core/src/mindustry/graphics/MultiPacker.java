@@ -1,20 +1,26 @@
 package mindustry.graphics;
 
+import arc.Core;
 import arc.graphics.*;
 import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
+import arc.math.geom.Vec2;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
 import mindustry.*;
 
-public class MultiPacker implements Disposable{
+import static mindustry.Vars.ui;
+
+public class MultiPacker implements Disposable {
     private PixmapPacker[] packers = new PixmapPacker[PageType.all.length];
     private ObjectSet<String> outlined = new ObjectSet<>();
 
     public MultiPacker(){
         for(int i = 0; i < packers.length; i++){
-            packers[i] = new PixmapPacker(Math.min(Vars.maxTextureSize, PageType.all[i].width), Math.min(Vars.maxTextureSize, PageType.all[i].height), 2, true);
+            int sizeX = Core.settings.getInt("pagetype"+i+"x", PageType.all[i].width);
+            int sizeY = Core.settings.getInt("pagetype"+i+"y", PageType.all[i].height);
+            packers[i] = new PixmapPacker(Math.min(Vars.maxTextureSize, sizeX), Math.min(Vars.maxTextureSize, sizeY), 2, true);
         }
     }
 
@@ -47,6 +53,36 @@ public class MultiPacker implements Disposable{
 
                 i ++;
             }
+        }
+    }
+
+    public void updatePageSize(){
+        //safe margin
+        float epsilon = 1.1f; //results in filling between 45% and 91% (50/1.1 = 45, 100/1.1 = 91)
+
+        for(PageType type : PageType.all){
+            var packer = packers[type.ordinal()];
+            float totalArea = 0;
+            for(var page : packer.getPages()){
+                for(var region : page.getRects().values()){
+                    totalArea += region.area();
+                }
+            }
+            int sizeX = 1024;
+            int sizeY = 1024;
+
+            while(sizeX * sizeY < totalArea * epsilon){ //no need to check maxTextureSize here
+                if(sizeX <= sizeY){
+                    sizeX *= 2;
+                }else{
+                    sizeY *= 2;
+                }
+            }
+
+            Log.info(type.name() + " " + sizeX + "x" + sizeY);
+
+            Core.settings.put("pagetype"+type.ordinal()+"x", sizeX);
+            Core.settings.put("pagetype"+type.ordinal()+"y", sizeY);
         }
     }
 

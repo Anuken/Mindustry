@@ -95,6 +95,12 @@ public class ModsDialog extends BaseDialog{
         hidden(() -> {
             if(mods.requiresReload()){
                 reload();
+
+                //reset everything to default after mod reload
+                for(var type : MultiPacker.PageType.all){
+                    Core.settings.put("pagetype"+type.ordinal()+"x", type.width);
+                    Core.settings.put("pagetype"+type.ordinal()+"y", type.width);
+                }
             }
         });
 
