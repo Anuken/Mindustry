@@ -9,7 +9,7 @@ import arc.util.*;
 import arc.util.Log.*;
 import mindustry.*;
 
-public class MultiPacker implements Disposable {
+public class MultiPacker implements Disposable{
     private PixmapPacker[] packers = new PixmapPacker[PageType.all.length];
     private ObjectSet<String> outlined = new ObjectSet<>();
 
@@ -75,9 +75,6 @@ public class MultiPacker implements Disposable {
                     sizeY *= 2;
                 }
             }
-
-            Log.info(type.name() + " " + sizeX + "x" + sizeY);
-
             Core.settings.put("pagetype"+type.ordinal()+"x", sizeX);
             Core.settings.put("pagetype"+type.ordinal()+"y", sizeY);
         }
