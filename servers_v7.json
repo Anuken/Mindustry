@@ -64,10 +64,6 @@
     "address": ["pandorum.su:5018", "pandorum.su:5019", "pandorum.su:5020"]
   },
   {
-    "name": "MindustryBR",
-    "address": ["mindustryptbr.myddns.me"]
-  },
-  {
     "name": "LostDustry",
     "address": ["lostdustry.northeurope.cloudapp.azure.com:6568", "lostdustry.northeurope.cloudapp.azure.com:6569", "lostdustry.northeurope.cloudapp.azure.com:6570"]
   },
@@ -97,6 +93,6 @@
   },
   {
     "name": "Harders",
-    "address": ["212.20.42.61:6567", "212.20.42.61:6568", "212.20.42.61:6569", "212.20.42.61:6570", "212.20.42.61:6571", "212.20.42.61:6572", "212.20.42.61:6573",]
+    "address": ["212.20.42.61:6567", "212.20.42.61:6568", "212.20.42.61:6569", "212.20.42.61:6570", "212.20.42.61:6571", "212.20.42.61:6572", "212.20.42.61:6573"]
   }
 ]
