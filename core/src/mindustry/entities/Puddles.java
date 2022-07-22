@@ -124,7 +124,7 @@ public class Puddles{
             }
             return -0.4f * amount;
         }
-        return 0f;
+        return dest.react(liquid, amount, tile, x, y);
     }
 
     /**

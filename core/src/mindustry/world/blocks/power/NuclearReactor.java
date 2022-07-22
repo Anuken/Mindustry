@@ -1,6 +1,7 @@
 package mindustry.world.blocks.power;
 
 import arc.*;
+import arc.audio.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -30,6 +31,7 @@ public class NuclearReactor extends PowerGenerator{
     public Color coolColor = new Color(1, 1, 1, 0f);
     public Color hotColor = Color.valueOf("ff9575a3");
     public Effect explodeEffect = Fx.reactorExplosion;
+    public Sound explodeSound = Sounds.explosionbig;
     /** ticks to consume 1 fuel */
     public float itemDuration = 120;
     /** heating per frame * fullness */
@@ -128,8 +130,6 @@ public class NuclearReactor extends PowerGenerator{
         public void onDestroyed(){
             super.onDestroyed();
 
-            Sounds.explosionbig.at(this);
-
             int fuel = items.get(fuelItem);
 
             if((fuel < 5 && heat < 0.5f) || !state.rules.reactorExplosions) return;
@@ -138,7 +138,8 @@ public class NuclearReactor extends PowerGenerator{
             // * ((float)fuel / itemCapacity) to scale based on fullness
             Damage.damage(x, y, explosionRadius * tilesize, explosionDamage * 4);
 
-            explodeEffect.at(x, y);
+            explodeEffect.at(this);
+            explodeSound.at(this);
         }
 
         @Override

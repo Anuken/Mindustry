@@ -32,6 +32,8 @@ public abstract class UnlockableContent extends MappableContent{
     public boolean inlineDescription = true;
     /** Whether details of blocks are hidden in custom games if they haven't been unlocked in campaign mode. */
     public boolean hideDetails = true;
+    /** If false, all icon generation is disabled for this content; createIcons is not called. */
+    public boolean generateIcons = true;
     /** Special logic icon ID. */
     public int iconId = 0;
     /** Icon of the content to use in UI. */
@@ -98,16 +100,19 @@ public abstract class UnlockableContent extends MappableContent{
         if(region instanceof AtlasRegion at && region.found()){
             String name = at.name;
             if(!makeNew || !packer.has(name + "-outline")){
-                PixmapRegion base = Core.atlas.getPixmap(region);
-                var result = Pixmaps.outline(base, outlineColor, outlineRadius);
-                Drawf.checkBleed(result);
-                packer.add(page, name + (makeNew ? "-outline" : ""), result);
+                String regName = name + (makeNew ? "-outline" : "");
+                if(packer.registerOutlined(regName)){
+                    PixmapRegion base = Core.atlas.getPixmap(region);
+                    var result = Pixmaps.outline(base, outlineColor, outlineRadius);
+                    Drawf.checkBleed(result);
+                    packer.add(page, regName, result);
+                }
             }
         }
     }
 
     protected void makeOutline(MultiPacker packer, TextureRegion region, String name, Color outlineColor, int outlineRadius){
-        if(region.found()){
+        if(region.found() && packer.registerOutlined(name)){
             PixmapRegion base = Core.atlas.getPixmap(region);
             var result = Pixmaps.outline(base, outlineColor, outlineRadius);
             Drawf.checkBleed(result);

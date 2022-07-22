@@ -42,7 +42,7 @@ public class Turret extends ReloadTurret{
     /** Ammo units used per shot. */
     public int ammoPerShot = 1;
     /** If true, ammo is only consumed once per shot regardless of bullet count. */
-    public boolean consumeAmmoOnce = false;
+    public boolean consumeAmmoOnce = true;
     /** Minimum input heat required to fire. */
     public float heatRequirement = -1f;
     /** Maximum efficiency possible, if this turret uses heat. */
@@ -186,6 +186,12 @@ public class Turret extends ReloadTurret{
         drawer.getRegionsToOutline(this, out);
     }
 
+    public void limitRange(BulletType bullet, float margin){
+        float realRange = bullet.rangeChange + range;
+        //doesn't handle drag
+        bullet.lifetime = (realRange + margin) / bullet.speed;
+    }
+
     public static abstract class AmmoEntry{
         public int amount;
 
@@ -200,10 +206,8 @@ public class Turret extends ReloadTurret{
         public Seq<AmmoEntry> ammo = new Seq<>();
         public int totalAmmo;
         public float curRecoil, heat, logicControlTime = -1;
-        public float shootWarmup;
+        public float shootWarmup, charge;
         public int totalShots;
-        //turrets need to shoot once for 'visual reload' to be valid, otherwise they seem stuck at reload 0 when placed.
-        public boolean visualReloadValid;
         public boolean logicShooting = false;
         public @Nullable Posc target;
         public Vec2 targetPos = new Vec2();
@@ -214,6 +218,7 @@ public class Turret extends ReloadTurret{
         public float heatReq;
         public float[] sideHeat = new float[4];
 
+        @Override
         public float estimateDps(){
             if(!hasAmmo()) return 0f;
             return shoot.shots / reload * 60f * (peekAmmo() == null ? 0f : peekAmmo().estimateDPS()) * potentialEfficiency * timeScale;
@@ -340,15 +345,16 @@ public class Turret extends ReloadTurret{
 
             float warmupTarget = isShooting() && canConsume() ? 1f : 0f;
             if(linearWarmup){
-                shootWarmup = Mathf.approachDelta(shootWarmup, warmupTarget, shootWarmupSpeed);
+                shootWarmup = Mathf.approachDelta(shootWarmup, warmupTarget, shootWarmupSpeed * (warmupTarget > 0 ? efficiency : 1f));
             }else{
-                shootWarmup = Mathf.lerpDelta(shootWarmup, warmupTarget, shootWarmupSpeed);
+                shootWarmup = Mathf.lerpDelta(shootWarmup, warmupTarget, shootWarmupSpeed * (warmupTarget > 0 ? efficiency : 1f));
             }
 
             wasShooting = false;
 
-            curRecoil = Math.max(curRecoil - Time.delta / recoilTime , 0);
-            heat = Math.max(heat - Time.delta / cooldownTime, 0);
+            curRecoil = Mathf.approachDelta(curRecoil, 0, 1 / recoilTime);
+            heat = Mathf.approachDelta(heat, 0, 1 / cooldownTime);
+            charge = charging() ? Mathf.approachDelta(charge, 1, 1 / shoot.firstShotDelay) : 0;
 
             unit.tile(this);
             unit.rotation(rotation);
@@ -385,6 +391,11 @@ public class Turret extends ReloadTurret{
                         targetPosition(target);
 
                         if(Float.isNaN(rotation)) rotation = 0;
+                    }
+
+                    if(!isControlled()){
+                        unit.aimX(targetPos.x);
+                        unit.aimY(targetPos.y);
                     }
 
                     float targetRot = angleTo(targetPos);
@@ -475,7 +486,7 @@ public class Turret extends ReloadTurret{
 
             //skip first entry if it has less than the required amount of ammo
             if(ammo.size >= 2 && ammo.peek().amount < ammoPerShot && ammo.get(ammo.size - 2).amount >= ammoPerShot){
-                totalAmmo -= ammo.pop().amount;
+                ammo.swap(ammo.size - 1, ammo.size - 2);
             }
             return ammo.size > 0 && ammo.peek().amount >= ammoPerShot;
         }
@@ -495,7 +506,6 @@ public class Turret extends ReloadTurret{
         protected void updateShooting(){
 
             if(reloadCounter >= reload && !charging() && shootWarmup >= minWarmup){
-                visualReloadValid = true;
                 BulletType type = peekAmmo();
 
                 shoot(type);

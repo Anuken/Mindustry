@@ -350,7 +350,7 @@ public class LExecutor{
         /** Checks is a unit is valid for logic AI control, and returns the controller. */
         @Nullable
         public static LogicAI checkLogicAI(LExecutor exec, Object unitObj){
-            if(unitObj instanceof Unit unit && unit.isValid() && exec.obj(varUnit) == unit && unit.team == exec.team && !unit.isPlayer() && !(unit.isCommandable() && unit.command().hasCommand())){
+            if(unitObj instanceof Unit unit && unit.isValid() && exec.obj(varUnit) == unit && (unit.team == exec.team || exec.privileged) && !unit.isPlayer() && !(unit.isCommandable() && unit.command().hasCommand())){
                 if(unit.controller() instanceof LogicAI la){
                     la.controller = exec.building(varThis);
                     return la;
@@ -622,7 +622,7 @@ public class LExecutor{
             int address = exec.numi(position);
             Building from = exec.building(target);
 
-            if(from instanceof MemoryBuild mem && from.team == exec.team){
+            if(from instanceof MemoryBuild mem && (exec.privileged || from.team == exec.team)){
 
                 exec.setnum(output, address < 0 || address >= mem.memory.length ? 0 : mem.memory[address]);
             }
@@ -646,7 +646,7 @@ public class LExecutor{
             int address = exec.numi(position);
             Building from = exec.building(target);
 
-            if(from instanceof MemoryBuild mem && from.team == exec.team){
+            if(from instanceof MemoryBuild mem && (exec.privileged || from.team == exec.team)){
 
                 if(address >= 0 && address < mem.memory.length){
                     mem.memory[address] = exec.num(value);
@@ -733,7 +733,7 @@ public class LExecutor{
             int sortDir = exec.bool(sortOrder) ? 1 : -1;
             LogicAI ai = null;
 
-            if(base instanceof Ranged r && r.team() == exec.team &&
+            if(base instanceof Ranged r && (exec.privileged || r.team() == exec.team) &&
                 (base instanceof Building || (ai = UnitControlI.checkLogicAI(exec, base)) != null)){ //must be a building or a controllable unit
                 float range = r.range();
 
@@ -1021,7 +1021,7 @@ public class LExecutor{
         @Override
         public void run(LExecutor exec){
 
-            if(exec.building(target) instanceof MessageBuild d && d.team == exec.team){
+            if(exec.building(target) instanceof MessageBuild d && (d.team == exec.team || exec.privileged)){
 
                 d.message.setLength(0);
                 d.message.append(exec.textBuffer, 0, Math.min(exec.textBuffer.length(), maxTextBuffer));
@@ -1289,14 +1289,16 @@ public class LExecutor{
                         if(b instanceof OverlayFloor o && tile.overlay() != o) tile.setOverlayNet(o);
                     }
                     case floor -> {
-                        if(b instanceof Floor f && tile.floor() != f) tile.setFloorNet(f);
+                        if(b instanceof Floor f && tile.floor() != f && !f.isOverlay()) tile.setFloorNet(f);
                     }
                     case block -> {
-                        Team t = exec.team(team);
-                        if(t == null) t = Team.derelict;
+                        if(!b.isFloor() || b == Blocks.air){
+                            Team t = exec.team(team);
+                            if(t == null) t = Team.derelict;
 
-                        if(tile.block() != b || tile.team() != t){
-                            tile.setNet(b, t, Mathf.clamp(exec.numi(rotation), 0, 3));
+                            if(tile.block() != b || tile.team() != t){
+                                tile.setNet(b, t, Mathf.clamp(exec.numi(rotation), 0, 3));
+                            }
                         }
                     }
                     //building case not allowed
@@ -1329,8 +1331,7 @@ public class LExecutor{
             if(exec.obj(type) instanceof UnitType type && !type.hidden && t != null && Units.canCreate(t, type)){
                 //random offset to prevent stacking
                 var unit = type.spawn(t, World.unconv(exec.numf(x)) + Mathf.range(0.01f), World.unconv(exec.numf(y)) + Mathf.range(0.01f));
-                unit.rotation = exec.numf(rotation);
-                spawner.spawnEffect(unit);
+                spawner.spawnEffect(unit, exec.numf(rotation));
                 exec.setobj(result, unit);
             }
         }
@@ -1401,6 +1402,7 @@ public class LExecutor{
                     }
                 }
                 case ambientLight -> state.rules.ambientLight.fromDouble(exec.num(value));
+                case solarMultiplier -> state.rules.solarMultiplier = exec.numf(value);
                 case unitBuildSpeed, unitDamage, blockHealth, blockDamage, buildSpeed, rtsMinSquad, rtsMinWeight -> {
                     Team team = exec.team(p1);
                     if(team != null){
@@ -1543,6 +1545,8 @@ public class LExecutor{
 
     @Remote(called = Loc.server, unreliable = true)
     public static void logicExplosion(Team team, float x, float y, float radius, float damage, boolean air, boolean ground, boolean pierce){
+        if(damage < 0f) return;
+
         Damage.damage(team, x, y, radius, damage, pierce, air, ground);
         if(pierce){
             Fx.spawnShockwave.at(x, y, World.conv(radius));

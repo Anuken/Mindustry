@@ -11,7 +11,7 @@ import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
-/** A turret that fires a continuous beam with a delay between shots. Liquid coolant is required. Yes, this class name is awful. NEEDS RENAME */
+/** A turret that fires a continuous beam with a delay between shots. Liquid coolant is required. Yes, this class name is awful. */
 public class LaserTurret extends PowerTurret{
     public float firingMoveFract = 0.25f;
     public float shootDuration = 100f;
@@ -50,7 +50,7 @@ public class LaserTurret extends PowerTurret{
         @Override
         public boolean shouldConsume(){
             //still consumes power when bullet is around
-            return bullets.any() || isActive();
+            return bullets.any() || isActive() || isShooting();
         }
 
         @Override

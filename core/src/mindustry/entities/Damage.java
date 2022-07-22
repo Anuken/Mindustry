@@ -299,6 +299,39 @@ public class Damage{
     }
 
     /**
+     * Damages entities on a point.
+     * Only enemies of the specified team are damaged.
+     */
+    public static void collidePoint(Bullet hitter, Team team, Effect effect, float x, float y){
+
+        if(hitter.type.collidesGround){
+            Building build = world.build(World.toTile(x), World.toTile(y));
+
+            if(build != null && hitter.damage > 0){
+                float health = build.health;
+
+                if(build.team != team && build.collide(hitter)){
+                    build.collision(hitter);
+                    hitter.type.hit(hitter, x, y);
+                }
+
+                //try to heal the tile
+                if(hitter.type.testCollision(hitter, build)){
+                    hitter.type.hitTile(hitter, build, x, y, health, false);
+                }
+            }
+        }
+
+        Units.nearbyEnemies(team, rect.setCentered(x, y, 1f), u -> {
+            if(u.checkTarget(hitter.type.collidesAir, hitter.type.collidesGround) && u.hittable()){
+                effect.at(x, y);
+                u.collision(hitter, x, y);
+                hitter.collision(u, x, y);
+            }
+        });
+    }
+
+    /**
      * Casts forward in a line.
      * @return the first encountered object.
      */

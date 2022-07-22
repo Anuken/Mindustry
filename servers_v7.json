@@ -1,6 +1,6 @@
 [
   {
-    "name": "distributorium",
+    "name": "mindustry.pl",
     "address": ["0.baseduser.eu.org:6966", "0.baseduser.eu.org:6666", "0.baseduser.eu.org:6000"]
   },
   {
@@ -9,23 +9,23 @@
   },
   {
     "name": "SMokeOfAnarchy",
-    "address": "strider.SMokeOfAnarchy.ru"
+    "address": ["SMokeOfAnarchy.ru", "strider.smokeofanarchy.ru"]
   },
   {
-    "name": "hexpvp.ml",
-    "address": "hexpvp.ml"
+    "name": "HexPvP Network",
+    "address": ["hexpvp.ml", "kycb42148.ddns.net:6614"]
   },
   {
-    "name": "Omega",
-    "address": ["node2.crewcraft.cc:25569", "node2.crewcraft.cc:25571", "node2.crewcraft.cc:25572", "node5.crewcraft.cc:25569"]
+    "name": "Omega Hub",
+    "address": ["n1.yeet.ml:6572", "n1.yeet.ml:6573"]
   },
   {
-    "name": "MeowLand",
-    "address": ["kgstudios.ddns.net:6565"]
+    "name": "KMWStudios",
+    "address": ["meowland.ru"]
   },
   {
-    "name": "DarkDustry",
-    "address": ["darkdustry.ml", "darkdustry.ml:5000", "darkdustry.ml:6000", "darkdustry.ml:7000", "darkdustry.ml:8000", "darkdustry.ml:9000"] 
+    "name": "Darkdustry",
+    "address": ["darkdustry.tk", "darkdustry.tk:5000", "darkdustry.tk:6000", "darkdustry.tk:7000", "darkdustry.tk:8000", "darkdustry.tk:9000"] 
   },
   {
     "name": "Chaotic Neutral",
@@ -57,15 +57,11 @@
   },
   {
     "name": "Xpdustry",
-    "address": ["xpdustry.fr:7000"]
+    "address": ["n1.xpdustry.fr:7000"]
   },
   {
     "name": "Pandorum",
     "address": ["pandorum.su:5018", "pandorum.su:5019", "pandorum.su:5020"]
-  },
-  {
-    "name": "MindustryBR",
-    "address": ["mindustryptbr.myddns.me"]
   },
   {
     "name": "LostDustry",
@@ -94,5 +90,9 @@
   {
     "name": "[CIG]Potato",
     "address": ["mindustry.vicp.io:6800", "mindustry.vicp.io:7000", "mindustry.vicp.io:6567"]
+  },
+  {
+    "name": "Harders",
+    "address": ["212.20.42.61:6567", "212.20.42.61:6568", "212.20.42.61:6569", "212.20.42.61:6570", "212.20.42.61:6571", "212.20.42.61:6572", "212.20.42.61:6573"]
   }
 ]

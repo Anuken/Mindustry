@@ -15,6 +15,7 @@ import static mindustry.Vars.*;
 
 /** Displays a list of items, e.g. launched items.*/
 public class ItemsDisplay extends Table{
+    boolean collapsed;
 
     public ItemsDisplay(){
         rebuild(new ItemSeq());
@@ -52,8 +53,11 @@ public class ItemsDisplay extends Table{
                 }
             }).scrollX(false), false).setDuration(0.3f);
 
+            col.setCollapsed(collapsed, false);
+
             c.button("@globalitems", Icon.downOpen, Styles.flatTogglet, col::toggle).update(t -> {
                 t.setChecked(col.isCollapsed());
+                collapsed = col.isCollapsed();
                 ((Image)t.getChildren().get(1)).setDrawable(col.isCollapsed() ? Icon.upOpen : Icon.downOpen);
             }).padBottom(4).left().fillX().margin(12f).minWidth(200f);
             c.row();

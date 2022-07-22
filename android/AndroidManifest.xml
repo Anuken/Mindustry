@@ -24,6 +24,7 @@
                 android:name="mindustry.android.AndroidLauncher"
                 android:label="@string/app_name"
                 android:screenOrientation="user"
+                android:exported="true"
                 android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout">
 
             <intent-filter>

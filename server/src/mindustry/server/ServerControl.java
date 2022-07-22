@@ -784,6 +784,7 @@ public class ServerControl implements ApplicationListener{
 
             if(info != null){
                 info.lastKicked = 0;
+                netServer.admins.kickedIPs.remove(info.lastIP);
                 info("Pardoned player: @", info.plainLastName());
             }else{
                 err("That ID can't be found.");
@@ -814,7 +815,7 @@ public class ServerControl implements ApplicationListener{
 
             if(target != null){
                 if(add){
-                    netServer.admins.adminPlayer(target.id, target.adminUsid);
+                    netServer.admins.adminPlayer(target.id, playert == null ? target.adminUsid : playert.usid());
                 }else{
                     netServer.admins.unAdminPlayer(target.id);
                 }

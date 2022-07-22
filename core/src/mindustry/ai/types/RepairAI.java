@@ -11,6 +11,7 @@ public class RepairAI extends AIController{
 
     @Nullable Teamc avoid;
     float retreatTimer;
+    Building damagedTarget;
 
     @Override
     public void updateMovement(){
@@ -57,14 +58,15 @@ public class RepairAI extends AIController{
 
     @Override
     public void updateTargeting(){
-        Building target = Units.findDamagedTile(unit.team, unit.x, unit.y);
+        if(timer.get(timerTarget, 15)){
+            damagedTarget = Units.findDamagedTile(unit.team, unit.x, unit.y);
+            if(damagedTarget instanceof ConstructBuild) damagedTarget = null;
+        }
 
-        if(target instanceof ConstructBuild) target = null;
-
-        if(target == null){
+        if(damagedTarget == null){
             super.updateTargeting();
         }else{
-            this.target = target;
+            this.target = damagedTarget;
         }
     }
 }

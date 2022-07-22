@@ -8,6 +8,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.core.*;
+import mindustry.game.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -378,6 +379,12 @@ public class ControlPathfinder{
     }
 
     private static int cost(int team, PathCost cost, int tilePos){
+        if(state.rules.limitMapArea && !Team.get(team).isAI()){
+            int x = tilePos % wwidth, y = tilePos / wwidth;
+            if(x < state.rules.limitX || y < state.rules.limitY || x > state.rules.limitX + state.rules.limitWidth || y > state.rules.limitY + state.rules.limitHeight){
+                return impassable;
+            }
+        }
         return cost.getCost(team, pathfinder.tiles[tilePos]);
     }
 

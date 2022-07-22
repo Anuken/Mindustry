@@ -63,6 +63,7 @@ public class Planets{
             lightSrcTo = 0.5f;
             lightDstFrom = 0.2f;
             clearSectorOnLose = true;
+            defaultCore = Blocks.coreBastion;
             hiddenItems.addAll(Items.serpuloItems).removeAll(Items.erekirItems);
 
             //TODO SHOULD there be lighting?
@@ -102,6 +103,7 @@ public class Planets{
         tantros = new Planet("tantros", sun, 1f, 2){{
             generator = new TantrosPlanetGenerator();
             meshLoader = () -> new HexMesh(this, 4);
+            accessible = false;
             atmosphereColor = Color.valueOf("3db899");
             startSector = 10;
             atmosphereRadIn = -0.01f;
@@ -164,6 +166,7 @@ public class Planets{
             camRadius = 0.68f * scale;
             minZoom = 0.6f;
             drawOrbit = false;
+            accessible = false;
             clipRadius = 2f;
             defaultEnv = Env.space;
 

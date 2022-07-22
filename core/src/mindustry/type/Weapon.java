@@ -45,8 +45,10 @@ public class Weapon implements Cloneable{
     public float baseRotation = 0f;
     /** whether to draw the outline on top. */
     public boolean top = true;
-    /** whether to hold the bullet in place while firing */
+    /** whether to hold the bullet in place while firing; it will still require reload. */
     public boolean continuous;
+    /** whether this weapon uses continuous fire without reloading; implies continuous = true */
+    public boolean alwaysContinuous;
     /** whether this weapon can be aimed manually by players */
     public boolean controllable = true;
     /** whether to automatically target relevant units in update(); only works when controllable = false. */
@@ -149,7 +151,7 @@ public class Weapon implements Cloneable{
             t.row();
             t.add("[lightgray]" + Stat.inaccuracy.localized() + ": [white]" + (int)inaccuracy + " " + StatUnit.degrees.localized());
         }
-        if(reload > 0){
+        if(!alwaysContinuous && reload > 0){
             t.row();
             t.add("[lightgray]" + Stat.reload.localized() + ": " + (mirror ? "2x " : "") + "[white]" + Strings.autoFixed(60f / reload * shoot.shots, 2) + " " + StatUnit.perSecond.localized());
         }
@@ -178,8 +180,6 @@ public class Weapon implements Cloneable{
     }
 
     public void draw(Unit unit, WeaponMount mount){
-        if(!region.found()) return;
-
         //apply layer offset, roll it back at the end
         float z = Draw.z();
         Draw.z(z + layerOffset);
@@ -200,11 +200,11 @@ public class Weapon implements Cloneable{
         }
 
         if(parts.size > 0){
-            DrawPart.params.set(mount.warmup, mount.reload / reload, mount.smoothReload, mount.heat, mount.recoil, wx, wy, weaponRotation + 90);
+            DrawPart.params.set(mount.warmup, mount.reload / reload, mount.smoothReload, mount.heat, mount.recoil, mount.charge, wx, wy, weaponRotation + 90);
             DrawPart.params.sideMultiplier = flipSprite ? -1 : 1;
 
             for(int i = 0; i < parts.size; i++){
-                var part = parts.items[i];
+                var part = parts.get(i);
                 if(part.under){
                     part.draw(DrawPart.params);
                 }
@@ -213,7 +213,7 @@ public class Weapon implements Cloneable{
 
         Draw.xscl = -Mathf.sign(flipSprite);
 
-        Draw.rect(region, wx, wy, weaponRotation);
+        if(region.found()) Draw.rect(region, wx, wy, weaponRotation);
 
         if(cellRegion.found()){
             Draw.color(unit.type.cellColor(unit));
@@ -232,7 +232,7 @@ public class Weapon implements Cloneable{
         if(parts.size > 0){
             //TODO does it need an outline?
             for(int i = 0; i < parts.size; i++){
-                var part = parts.items[i];
+                var part = parts.get(i);
                 if(!part.under){
                     part.draw(DrawPart.params);
                 }
@@ -255,6 +255,7 @@ public class Weapon implements Cloneable{
         mount.recoil = Mathf.approachDelta(mount.recoil, 0, unit.reloadMultiplier / recoilTime);
         mount.warmup = Mathf.lerpDelta(mount.warmup, (can && mount.shoot) || (continuous && mount.bullet != null) ? 1f : 0f, shootWarmupSpeed);
         mount.smoothReload = Mathf.lerpDelta(mount.smoothReload, mount.reload / reload, smoothReloadSpeed);
+        mount.charge = mount.charging && shoot.firstShotDelay > 0 ? Mathf.approachDelta(mount.charge, 1, 1 / shoot.firstShotDelay) : 0;
 
         //rotate if applicable
         if(rotate && (mount.rotate || mount.shoot) && can){
@@ -329,10 +330,11 @@ public class Weapon implements Cloneable{
                     mount.sound.update(bulletX, bulletY, true);
                 }
 
-                //TODO: how do continuous flame bullets work here? a new system is needed
-                if(mount.bullet.type.optimalLifeFract > 0){
-                //    mount.bullet.time = mount.bullet.lifetime * mount.bullet.type.optimalLifeFract * mount.warmup;
-                //    mount.bullet.keepAlive = true;
+                if(alwaysContinuous && mount.shoot){
+                    mount.bullet.time = mount.bullet.lifetime * mount.bullet.type.optimalLifeFract * mount.warmup;
+                    mount.bullet.keepAlive = true;
+
+                    unit.apply(shootStatus, shootStatusDuration);
                 }
             }
         }else{
@@ -358,7 +360,7 @@ public class Weapon implements Cloneable{
         (!alternate || wasFlipped == flipSprite) &&
         mount.warmup >= minWarmup && //must be warmed up
         unit.vel.len() >= minShootVelocity && //check velocity requirements
-        mount.reload <= 0.0001f && //reload has to be 0
+        (mount.reload <= 0.0001f || (alwaysContinuous && mount.bullet == null)) && //reload has to be 0, or it has to be an always-continuous weapon
         Angles.within(rotate ? mount.rotation : unit.rotation + baseRotation, mount.targetRotation, shootCone) //has to be within the cone
         ){
             shoot(unit, mount, bulletX, bulletY, shootAngle);
@@ -388,6 +390,7 @@ public class Weapon implements Cloneable{
         unit.apply(shootStatus, shootStatusDuration);
 
         if(shoot.firstShotDelay > 0){
+            mount.charging = true;
             chargeSound.at(shootX, shootY, Mathf.random(soundPitchMin, soundPitchMax));
             bullet.chargeEffect.at(shootX, shootY, rotation, bullet.keepVelocity || parentizeEffects ? unit : null);
         }
@@ -398,13 +401,14 @@ public class Weapon implements Cloneable{
             }else{
                 bullet(unit, mount, xOffset, yOffset, angle, mover);
             }
-            mount.totalShots ++;
+            mount.totalShots++;
         });
     }
 
     protected void bullet(Unit unit, WeaponMount mount, float xOffset, float yOffset, float angleOffset, Mover mover){
         if(!unit.isAdded()) return;
 
+        mount.charging = false;
         float
         xSpread = Mathf.range(xRand),
         weaponRotation = unit.rotation - 90 + (rotate ? mount.rotation : baseRotation),
@@ -457,7 +461,9 @@ public class Weapon implements Cloneable{
 
     @CallSuper
     public void init(){
-
+        if(alwaysContinuous){
+            continuous = true;
+        }
     }
 
     public void load(){

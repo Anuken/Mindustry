@@ -134,16 +134,16 @@ public class DirectionBridge extends Block{
         cy = (y1 + y2)/2f,
         len = Math.max(Math.abs(x1 - x2), Math.abs(y1 - y2)) - size * tilesize;
 
-        Draw.rect(bridgeRegion, cx, cy, len, tilesize, angle);
+        Draw.rect(bridgeRegion, cx, cy, len, bridgeRegion.height * Draw.scl, angle);
         if(liquidColor != null){
             Draw.color(liquidColor, liquidColor.a * Renderer.bridgeOpacity);
-            Draw.rect(bridgeLiquidRegion, cx, cy, len, tilesize, angle);
+            Draw.rect(bridgeLiquidRegion, cx, cy, len, bridgeLiquidRegion.height * Draw.scl, angle);
             Draw.color();
             Draw.alpha(Renderer.bridgeOpacity);
         }
         if(bridgeBotRegion.found()){
             Draw.color(0.4f, 0.4f, 0.4f, 0.4f * Renderer.bridgeOpacity);
-            Draw.rect(bridgeBotRegion, cx, cy, len, tilesize, angle);
+            Draw.rect(bridgeBotRegion, cx, cy, len, bridgeBotRegion.height * Draw.scl, angle);
             Draw.reset();
         }
         Draw.alpha(Renderer.bridgeOpacity);

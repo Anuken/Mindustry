@@ -105,21 +105,24 @@ public abstract class FilterOption{
         public void build(Table table){
             table.button(b -> b.image(supplier.get().uiIcon).update(i -> ((TextureRegionDrawable)i.getDrawable())
                 .setRegion(supplier.get() == Blocks.air ? Icon.none.getRegion() : supplier.get().uiIcon)).size(iconSmall), () -> {
-                BaseDialog dialog = new BaseDialog("");
-                dialog.setFillParent(false);
-                int i = 0;
-                for(Block block : Vars.content.blocks()){
-                    if(!filter.get(block)) continue;
+                BaseDialog dialog = new BaseDialog("@filter.option." + name);
+                dialog.cont.pane(t -> {
+                    int i = 0;
+                    for(Block block : Vars.content.blocks()){
+                        if(!filter.get(block)) continue;
 
-                    dialog.cont.image(block == Blocks.air ? Icon.none.getRegion() : block.uiIcon).size(iconMed).pad(3).get().clicked(() -> {
-                        consumer.get(block);
-                        dialog.hide();
-                        changed.run();
-                    });
-                    if(++i % 10 == 0) dialog.cont.row();
-                }
+                        t.image(block == Blocks.air ? Icon.none.getRegion() : block.uiIcon).size(iconMed).pad(3).tooltip(block == Blocks.air ? "@none" : block.localizedName).get().clicked(() -> {
+                            consumer.get(block);
+                            dialog.hide();
+                            changed.run();
+                        });
+                        if(++i % 10 == 0) t.row();
+                    }
+                    dialog.setFillParent(i > 100);
+                }).padRight(8f).scrollX(false);
 
-                dialog.closeOnBack();
+
+                dialog.addCloseButton();
                 dialog.show();
             }).pad(4).margin(12f);
 

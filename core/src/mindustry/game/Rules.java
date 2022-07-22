@@ -7,7 +7,6 @@ import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
 import mindustry.*;
 import mindustry.content.*;
-import mindustry.game.MapObjectives.*;
 import mindustry.graphics.g3d.*;
 import mindustry.io.*;
 import mindustry.type.*;
@@ -42,6 +41,8 @@ public class Rules{
     public boolean coreCapture = false;
     /** Whether reactors can explode and damage other blocks. */
     public boolean reactorExplosions = true;
+    /** Whether to allow manual unit control. */
+    public boolean possessionAllowed = true;
     /** Whether schematics are allowed. */
     public boolean schematicsAllowed = true;
     /** Whether friendly explosions can occur and set fire/damage other blocks. */
@@ -56,6 +57,8 @@ public class Rules{
     public boolean unitCapVariable = true;
     /** If true, unit spawn points are shown. */
     public boolean showSpawns = false;
+    /** Multiplies power output of solar panels. */
+    public float solarMultiplier = 1f;
     /** How fast unit factories build units. */
     public float unitBuildSpeedMultiplier = 1f;
     /** How much damage any other units deal. */
@@ -90,7 +93,7 @@ public class Rules{
     public float dropZoneRadius = 300f;
     /** Time between waves in ticks. */
     public float waveSpacing = 2 * Time.toMinutes;
-    /** Starting wave spacing; if <0, uses waveSpacing * 2. */
+    /** Starting wave spacing; if <=0, uses waveSpacing * 2. */
     public float initialWaveSpacing = 0f;
     /** Wave after which the player 'wins'. Used in sectors. Use a value <= 0 to disable. */
     public int winWave = 0;
@@ -120,11 +123,11 @@ public class Rules{
     public ObjectSet<String> researched = new ObjectSet<>();
     /** Block containing these items as requirements are hidden. */
     public ObjectSet<Item> hiddenBuildItems = Items.erekirOnlyItems.asSet();
-    /** Campaign-only map objectives. */
-    public Seq<MapObjective> objectives = new Seq<>();
-    /** Flags set by objectives. Used in world processors. n*/
+    /** In-map objective executor. */
+    public MapObjectives objectives = new MapObjectives();
+    /** Flags set by objectives. Used in world processors. */
     public ObjectSet<String> objectiveFlags = new ObjectSet<>();
-    /** HIGHLY UNSTABLE/EXPERIMENTAL. DO NOT USE THIS. */
+    /** If true, fog of war is enabled. Enemy units and buildings are hidden unless in radar view. */
     public boolean fog = false;
     /** If fog = true, this is whether static (black) fog is enabled. */
     public boolean staticFog = true;
@@ -226,10 +229,12 @@ public class Rules{
         /** If true, this team has infinite unit ammo. */
         public boolean infiniteAmmo;
 
-        /** Enables "RTS" unit AI. TODO wip */
+        /** Enables "RTS" unit AI. */
         public boolean rtsAi;
         /** Minimum size of attack squads. */
         public int rtsMinSquad = 4;
+        /** Maximum size of attack squads. */
+        public int rtsMaxSquad = 1000;
         /** Minimum "advantage" needed for a squad to attack. Higher -> more cautious. */
         public float rtsMinWeight = 1.2f;
 

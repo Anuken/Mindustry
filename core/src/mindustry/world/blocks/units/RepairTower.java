@@ -11,6 +11,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.world.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -27,6 +28,14 @@ public class RepairTower extends Block{
         super(name);
         update = true;
         solid = true;
+    }
+
+    @Override
+    public void setStats(){
+        super.setStats();
+
+        stats.add(Stat.range, range / tilesize, StatUnit.blocks);
+        stats.add(Stat.repairSpeed, healAmount * 60f, StatUnit.perSecond);
     }
 
     @Override

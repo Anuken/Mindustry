@@ -64,6 +64,7 @@ public class WallCrafter extends Block{
 
         stats.add(Stat.output, output);
         stats.add(Stat.tiles, StatValues.blocks(attribute, floating, 1f, true, false));
+        stats.add(Stat.drillSpeed, 60f / drillTime * size, StatUnit.itemsSecond);
     }
 
     @Override
