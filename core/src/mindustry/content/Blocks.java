@@ -5514,6 +5514,7 @@ public class Blocks{
             rotateDraw = false;
             size = 1;
             heatOutput = 1000f;
+            warmupRate = 1000f;
             regionRotated1 = 1;
         }};
 
