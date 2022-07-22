@@ -37,7 +37,7 @@ public class StatusFieldAbility extends Ability{
     public void update(Unit unit){
         timer += Time.delta;
 
-        if(timer >= reload && (onShoot ? unit.isShooting : !onShoot)){
+        if(timer >= reload && (!onShoot || unit.isShooting)){
             Units.nearby(unit.team, unit.x, unit.y, range, other -> {
                 other.apply(effect, duration);
                 applyEffect.at(other, parentizeEffects);
