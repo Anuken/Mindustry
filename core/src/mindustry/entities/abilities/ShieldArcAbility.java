@@ -72,7 +72,7 @@ public class ShieldArcAbility extends Ability{
             data += Time.delta * regen;
         }
 
-        boolean active = data > 0 && (unit.isShooting || !whenShooting);
+        boolean active = data > 0 && whenShooting ? unit.isShooting : !whenShooting;
         alpha = Math.max(alpha - Time.delta/10f, 0f);
 
         if(active){
