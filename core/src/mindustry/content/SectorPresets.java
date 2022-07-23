@@ -132,7 +132,7 @@ public class SectorPresets{
         }};
 
         split = new SectorPreset("split", erekir, 19){{ //TODO random sector, pick a better one
-            difficulty = 5;
+            difficulty = 2;
         }};
 
         basin = new SectorPreset("basin", erekir, 29){{

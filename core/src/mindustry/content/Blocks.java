@@ -76,7 +76,7 @@ public class Blocks{
     carbideCrucible, slagCentrifuge, surgeCrucible, cyanogenSynthesizer, phaseSynthesizer, heatReactor,
 
     //sandbox
-    powerSource, powerVoid, itemSource, itemVoid, liquidSource, liquidVoid, payloadSource, payloadVoid, illuminator,
+    powerSource, powerVoid, itemSource, itemVoid, liquidSource, liquidVoid, payloadSource, payloadVoid, illuminator, heatSource,
 
     //defense
     copperWall, copperWallLarge, titaniumWall, titaniumWallLarge, plastaniumWall, plastaniumWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge,
@@ -2325,7 +2325,8 @@ public class Blocks{
                 rotateSpeed = -2f;
                 rotation = 45f;
             }},
-            new DrawRegion("-cap")
+            new DrawRegion("-cap"),
+            new DrawLiquidRegion()
             );
         }};
 
@@ -2340,7 +2341,7 @@ public class Blocks{
             generateEffect = Fx.generatespark;
             ambientSoundVolume = 0.03f;
 
-            drawer = new DrawMulti(new DrawDefault(), new DrawWarmupRegion());
+            drawer = new DrawMulti(new DrawDefault(), new DrawWarmupRegion(), new DrawLiquidRegion());
 
             consumeItem(Items.pyratite);
             consumeLiquid(Liquids.cryofluid, 0.1f);
@@ -5506,6 +5507,15 @@ public class Blocks{
             requirements(Category.units, BuildVisibility.sandboxOnly, with());
             size = 5;
             alwaysUnlocked = true;
+        }};
+        heatSource = new HeatProducer("heat-source"){{
+            requirements(Category.crafting, BuildVisibility.sandboxOnly, with());
+            drawer = new DrawMulti(new DrawDefault(), new DrawHeatOutput());
+            rotateDraw = false;
+            size = 1;
+            heatOutput = 1000f;
+            warmupRate = 1000f;
+            regionRotated1 = 1;
         }};
 
         //TODO move
