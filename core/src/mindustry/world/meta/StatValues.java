@@ -196,15 +196,20 @@ public class StatValues{
             });
         });
     }
-
     public static StatValue content(Seq<UnlockableContent> list){
+        return content(list, i -> true);
+    }
+
+    public static <T extends UnlockableContent> StatValue content(Seq<T> list, Boolf<T> check){
         return table -> table.table(l -> {
             l.left();
 
+            boolean any = false;
             for(int i = 0; i < list.size; i++){
                 var item = list.get(i);
 
-                if(item instanceof Block block && block.itemDrop != null && !block.itemDrop.unlockedNow()) continue;
+                if(!check.get(item)) continue;
+                any = true;
 
                 if(item.uiIcon.found()) l.image(item.uiIcon).size(iconSmall).padRight(2).padLeft(2).padTop(3).padBottom(3);
                 l.add(item.localizedName).left().padLeft(1).padRight(4).colspan(item.uiIcon.found() ? 1 : 2);
@@ -212,11 +217,15 @@ public class StatValues{
                     l.row();
                 }
             }
+
+            if(!any){
+                l.add("@none.inmap");
+            }
         });
     }
 
     public static StatValue blocks(Boolf<Block> pred){
-        return blocks(content.blocks().select(pred));
+        return content(content.blocks(), pred);
     }
 
     public static StatValue blocks(Seq<Block> list){

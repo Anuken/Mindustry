@@ -160,7 +160,8 @@ public class Drill extends Block{
     public void setStats(){
         super.setStats();
 
-        stats.add(Stat.drillTier, StatValues.blocks(b -> b instanceof Floor f && !f.wallOre && f.itemDrop != null && f.itemDrop.hardness <= tier && f.itemDrop != blockedItem));
+        stats.add(Stat.drillTier, StatValues.blocks(b -> b instanceof Floor f && !f.wallOre && f.itemDrop != null &&
+            f.itemDrop.hardness <= tier && f.itemDrop != blockedItem && (indexer.isBlockPresent(f) || state.isMenu())));
 
         stats.add(Stat.drillSpeed, 60f / drillTime * size * size, StatUnit.itemsSecond);
         if(liquidBoostIntensity != 1){
