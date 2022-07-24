@@ -35,11 +35,7 @@ public class Fonts{
     private static TextureRegion[] iconTable;
     private static int lastCid;
 
-    public static Font def;
-    public static Font outline;
-    public static Font icon;
-    public static Font iconLarge;
-    public static Font tech;
+    public static Font def, outline, icon, iconLarge, tech;
 
     public static TextureRegion logicIcon(int id){
         return iconTable[id];

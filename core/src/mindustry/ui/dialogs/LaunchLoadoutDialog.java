@@ -50,8 +50,30 @@ public class LaunchLoadoutDialog extends BaseDialog{
             int cap = lastCapacity = (int)(sector.planet.launchCapacityMultiplier * selected.findCore().itemCapacity);
 
             //cap resources based on core type
+            ItemSeq schems = selected.requirements();
             ItemSeq resources = universe.getLaunchResources();
             resources.min(cap);
+
+            int capacity = lastCapacity;
+
+            if(!sector.planet.allowLaunchLoadout){
+                resources.clear();
+                //TODO this should be set to a proper loadout based on sector.
+                if(destination.preset != null){
+                    var rules = destination.preset.generator.map.rules();
+                    for(var stack : rules.loadout){
+                        if(!sector.planet.hiddenItems.contains(stack.item)){
+                            resources.add(stack.item, stack.amount);
+                        }
+                    }
+                }
+
+            }else if(getMax()){
+                for(Item item : content.items()){
+                    resources.set(item, Mathf.clamp(sitems.get(item) - schems.get(item), 0, capacity));
+                }
+            }
+
             universe.updateLaunchResources(resources);
 
             total.clear();
@@ -66,28 +88,6 @@ public class LaunchLoadoutDialog extends BaseDialog{
 
             ItemSeq schems = selected.requirements();
             ItemSeq launches = universe.getLaunchResources();
-            int capacity = lastCapacity;
-
-            if(!sector.planet.allowLaunchLoadout){
-                launches.clear();
-                //TODO this should be set to a proper loadout based on sector.
-                if(destination.preset != null){
-                    var rules = destination.preset.generator.map.rules();
-                    for(var stack : rules.loadout){
-                        if(!sector.planet.hiddenItems.contains(stack.item)){
-                            launches.add(stack.item, stack.amount);
-                        }
-                    }
-                }
-
-                universe.updateLaunchResources(launches);
-            }else if(getMax()){
-                for(Item item : content.items()){
-                    launches.set(item, Mathf.clamp(sitems.get(item) - launches.get(item), 0, capacity));
-                }
-
-                universe.updateLaunchResources(launches);
-            }
 
             for(ItemStack s : total){
                 int as = schems.get(s.item), al = launches.get(s.item);

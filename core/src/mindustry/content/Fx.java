@@ -198,6 +198,14 @@ public class Fx{
         rect(block.fullIcon, e.x, e.y);
     }).layer(Layer.turret - 5f),
 
+    pointShockwave = new Effect(20, e -> {
+        color(e.color);
+        stroke(e.fout() * 2f);
+        Lines.circle(e.x, e.y, e.finpow() * e.rotation);
+        randLenVectors(e.id + 1, 8, 1f + 23f * e.finpow(), (x, y) ->
+            lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1f + e.fout() * 3f));
+    }),
+
     moveCommand = new Effect(20, e -> {
         color(Pal.command);
         stroke(e.fout() * 5f);
@@ -1589,14 +1597,14 @@ public class Fx{
         }
     }),
 
-    shootSmokeSquareBig = new Effect(30f, e -> {
+    shootSmokeSquareBig = new Effect(32f, e -> {
         color(Color.white, e.color, e.fin());
 
         rand.setSeed(e.id);
-        for(int i = 0; i < 8; i++){
-            float rot = e.rotation + rand.range(22f);
-            v.trns(rot, rand.random(e.finpow() * 24f));
-            Fill.poly(e.x + v.x, e.y + v.y, 4, e.fout() * 3.8f + 0.2f, rand.random(360f));
+        for(int i = 0; i < 13; i++){
+            float rot = e.rotation + rand.range(26f);
+            v.trns(rot, rand.random(e.finpow() * 30f));
+            Fill.poly(e.x + v.x, e.y + v.y, 4, e.fout() * 4f + 0.2f, rand.random(360f));
         }
     }),
 
@@ -1607,6 +1615,19 @@ public class Fx{
             e.scaled(e.lifetime * rand.random(0.3f, 1f), b -> {
                 color(e.color, Pal.lightishGray, b.fin());
                 Fill.circle(e.x + v.x, e.y + v.y, b.fout() * 3.4f + 0.3f);
+            });
+        }
+    }),
+
+    shootSmokeSmite = new Effect(70f, e -> {
+        rand.setSeed(e.id);
+        for(int i = 0; i < 13; i++){
+            float a = e.rotation + rand.range(30f);
+            v.trns(a, rand.random(e.finpow() * 50f));
+            e.scaled(e.lifetime * rand.random(0.3f, 1f), b -> {
+                color(e.color);
+                Lines.stroke(b.fout() * 3f + 0.5f);
+                Lines.lineAngle(e.x + v.x, e.y + v.y, a, b.fout() * 8f + 0.4f);
             });
         }
     }),
@@ -2067,6 +2088,21 @@ public class Fx{
             color(Color.white, Pal.accent, e.fin());
             Fill.square(e.x + x, e.y + y, 1f + e.fout() * 3f, 45);
         });
+    }),
+
+    artilleryTrailSmoke = new Effect(50, e -> {
+        color(e.color);
+        rand.setSeed(e.id);
+        for(int i = 0; i < 13; i++){
+            float fin = e.fin() / rand.random(0.5f, 1f), fout = 1f - fin, angle = rand.random(360f), len = rand.random(0.5f, 1f);
+
+            if(fin <= 1f){
+                Tmp.v1.trns(angle, fin * 24f * len);
+
+                alpha((0.5f - Math.abs(fin - 0.5f)) * 2f);
+                Fill.circle(e.x + Tmp.v1.x, e.y + Tmp.v1.y, 0.5f + fout * 4f);
+            }
+        }
     }),
 
     smokeCloud = new Effect(70, e -> {

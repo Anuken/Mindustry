@@ -2,6 +2,7 @@ package mindustry.entities.abilities;
 
 import arc.graphics.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
@@ -33,8 +34,10 @@ public class MoveEffectAbility extends Ability{
 
     @Override
     public void update(Unit unit){
+        if(Vars.headless) return;
+
         counter += Time.delta;
-        if(unit.vel.len2() >= minVelocity * minVelocity && (counter >= interval)){
+        if(unit.vel.len2() >= minVelocity * minVelocity && (counter >= interval) && !unit.inFogTo(Vars.player.team())){
             Tmp.v1.trns(unit.rotation - 90f, x, y);
             counter %= interval;
             effect.at(Tmp.v1.x + unit.x, Tmp.v1.y + unit.y, (rotateEffect ? unit.rotation : effectParam) + rotation, teamColor ? unit.team.color : color, parentizeEffects ? unit : null);

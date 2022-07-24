@@ -196,15 +196,20 @@ public class StatValues{
             });
         });
     }
-
     public static StatValue content(Seq<UnlockableContent> list){
+        return content(list, i -> true);
+    }
+
+    public static <T extends UnlockableContent> StatValue content(Seq<T> list, Boolf<T> check){
         return table -> table.table(l -> {
             l.left();
 
+            boolean any = false;
             for(int i = 0; i < list.size; i++){
                 var item = list.get(i);
 
-                if(item instanceof Block block && block.itemDrop != null && !block.itemDrop.unlockedNow()) continue;
+                if(!check.get(item)) continue;
+                any = true;
 
                 if(item.uiIcon.found()) l.image(item.uiIcon).size(iconSmall).padRight(2).padLeft(2).padTop(3).padBottom(3);
                 l.add(item.localizedName).left().padLeft(1).padRight(4).colspan(item.uiIcon.found() ? 1 : 2);
@@ -212,11 +217,15 @@ public class StatValues{
                     l.row();
                 }
             }
+
+            if(!any){
+                l.add("@none.inmap");
+            }
         });
     }
 
     public static StatValue blocks(Boolf<Block> pred){
-        return blocks(content.blocks().select(pred));
+        return content(content.blocks(), pred);
     }
 
     public static StatValue blocks(Seq<Block> list){
@@ -234,7 +243,7 @@ public class StatValues{
                 for(Liquid liquid : content.liquids()){
                     if(!filter.get(liquid)) continue;
 
-                    c.image(liquid.uiIcon).size(3 * 8).padRight(4).right().top();
+                    c.image(liquid.uiIcon).size(3 * 8).scaling(Scaling.fit).padRight(4).right().top();
                     c.add(liquid.localizedName).padRight(10).left().top();
                     c.table(Tex.underline, bt -> {
                         bt.left().defaults().padRight(3).left();
@@ -258,7 +267,7 @@ public class StatValues{
                 for(Liquid liquid : content.liquids()){
                     if(!filter.get(liquid)) continue;
 
-                    c.image(liquid.uiIcon).size(3 * 8).padRight(4).right().top();
+                    c.image(liquid.uiIcon).size(3 * 8).scaling(Scaling.fit).padRight(4).right().top();
                     c.add(liquid.localizedName).padRight(10).left().top();
                     c.table(Tex.underline, bt -> {
                         bt.left().defaults().padRight(3).left();
@@ -321,7 +330,7 @@ public class StatValues{
                 }
 
                 //no point in displaying unit icon twice
-                if(!compact && !(t instanceof PowerTurret)){
+                if(!compact && !(t instanceof Turret)){
                     table.image(icon(t)).size(3 * 8).padRight(4).right().top();
                     table.add(t.localizedName).padRight(10).left().top();
                 }

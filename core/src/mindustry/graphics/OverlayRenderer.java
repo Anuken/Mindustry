@@ -113,13 +113,10 @@ public class OverlayRenderer{
             }
         }
 
-        //draw objective markers, if any
-        if(state.rules.objectives.size > 0){
-            var first = state.rules.objectives.first();
-            for(var marker : first.markers){
-                marker.draw();
-            }
-        }
+        //draw objective markers
+        state.rules.objectives.eachRunning(obj -> {
+            for(var marker : obj.markers) marker.draw();
+        });
 
         if(player.dead()) return; //dead players don't draw
 

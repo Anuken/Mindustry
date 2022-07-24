@@ -11,6 +11,7 @@ public class ShapePart extends DrawPart{
     public float radius = 3f, radiusTo = -1f, stroke = 1f, strokeTo = -1f;
     public float x, y, rotation;
     public float moveX, moveY, moveRot;
+    public float rotateSpeed = 0f;
     public Color color = Color.white;
     public @Nullable Color colorTo;
     public boolean mirror = false;
@@ -25,7 +26,11 @@ public class ShapePart extends DrawPart{
 
         Draw.z(Draw.z() + layerOffset);
 
-        float prog = progress.getClamp(params);
+        float prog = progress.getClamp(params),
+        baseRot = Time.time * rotateSpeed,
+        rad = radiusTo < 0 ? radius : Mathf.lerp(radius, radiusTo, prog),
+        str = strokeTo < 0 ? stroke : Mathf.lerp(stroke, strokeTo, prog);
+
         int len = mirror && params.sideOverride == -1 ? 2 : 1;
 
         for(int s = 0; s < len; s++){
@@ -37,9 +42,7 @@ public class ShapePart extends DrawPart{
 
             float
             rx = params.x + Tmp.v1.x,
-            ry = params.y + Tmp.v1.y,
-            rad = radiusTo < 0 ? radius : Mathf.lerp(radius, radiusTo, prog),
-            str = strokeTo < 0 ? stroke : Mathf.lerp(stroke, strokeTo, prog);
+            ry = params.y + Tmp.v1.y;
 
             if(color != null && colorTo != null){
                 Draw.color(color, colorTo, prog);
@@ -49,14 +52,14 @@ public class ShapePart extends DrawPart{
             
             if(!hollow){
                 if(!circle){
-                    Fill.poly(rx, ry, sides, rad, moveRot * prog * sign + params.rotation - 90 * sign + rotation * sign);
+                    Fill.poly(rx, ry, sides, rad, moveRot * prog * sign + params.rotation - 90 * sign + rotation * sign + baseRot * sign);
                 }else{
                     Fill.circle(rx, ry, rad);
                 }
-            }else{
+            }else if(str > 0.0001f){
                 Lines.stroke(str);
                 if(!circle){
-                    Lines.poly(rx, ry, sides, rad, moveRot * prog * sign + params.rotation - 90 * sign + rotation * sign);
+                    Lines.poly(rx, ry, sides, rad, moveRot * prog * sign + params.rotation - 90 * sign + rotation * sign + baseRot * sign);
                 }else{
                     Lines.circle(rx, ry, rad);
                 }

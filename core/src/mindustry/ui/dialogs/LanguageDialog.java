@@ -13,7 +13,7 @@ import static mindustry.Vars.*;
 
 public class LanguageDialog extends BaseDialog{
     public static final ObjectMap<String, String> displayNames = ObjectMap.of(
-    "id_ID", "Bahasa Indonesia (Indonesia)",
+    "id_ID", "Bahasa Indonesia",
     "da", "Dansk",
     "de", "Deutsch",
     "et", "Eesti",
@@ -59,7 +59,8 @@ public class LanguageDialog extends BaseDialog{
     }
 
     public static String getDisplayName(Locale locale){
-        return displayNames.get(locale.toString(), locale.toString());
+        String str = locale.toString().replace("in_ID", "id_ID");
+        return displayNames.get(str, str);
     }
 
     private void setup(){

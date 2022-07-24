@@ -48,8 +48,8 @@ public class BlockRenderer{
     private IntSet darkEvents = new IntSet();
     private IntSet procLinks = new IntSet(), procLights = new IntSet();
 
-    private BlockQuadtree blockTree;
-    private FloorQuadtree floorTree;
+    private BlockQuadtree blockTree = new BlockQuadtree(new Rect(0, 0, 1, 1));
+    private FloorQuadtree floorTree = new FloorQuadtree(new Rect(0, 0, 1, 1));
 
     public BlockRenderer(){
 

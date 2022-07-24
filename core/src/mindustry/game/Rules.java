@@ -7,7 +7,6 @@ import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
 import mindustry.*;
 import mindustry.content.*;
-import mindustry.game.MapObjectives.*;
 import mindustry.graphics.g3d.*;
 import mindustry.io.*;
 import mindustry.type.*;
@@ -124,9 +123,9 @@ public class Rules{
     public ObjectSet<String> researched = new ObjectSet<>();
     /** Block containing these items as requirements are hidden. */
     public ObjectSet<Item> hiddenBuildItems = Items.erekirOnlyItems.asSet();
-    /** Campaign-only map objectives. */
-    public Seq<MapObjective> objectives = new Seq<>();
-    /** Flags set by objectives. Used in world processors. n*/
+    /** In-map objective executor. */
+    public MapObjectives objectives = new MapObjectives();
+    /** Flags set by objectives. Used in world processors. */
     public ObjectSet<String> objectiveFlags = new ObjectSet<>();
     /** If true, fog of war is enabled. Enemy units and buildings are hidden unless in radar view. */
     public boolean fog = false;
@@ -230,10 +229,12 @@ public class Rules{
         /** If true, this team has infinite unit ammo. */
         public boolean infiniteAmmo;
 
-        /** Enables "RTS" unit AI. TODO wip */
+        /** Enables "RTS" unit AI. */
         public boolean rtsAi;
         /** Minimum size of attack squads. */
         public int rtsMinSquad = 4;
+        /** Maximum size of attack squads. */
+        public int rtsMaxSquad = 1000;
         /** Minimum "advantage" needed for a squad to attack. Higher -> more cautious. */
         public float rtsMinWeight = 1.2f;
 
