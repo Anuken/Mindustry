@@ -330,6 +330,21 @@ public class NetClient implements ApplicationListener{
     }
 
     @Remote(variants = Variant.both)
+    public static void setObjectives(MapObjectives executor){
+        //clear old markers
+        for(var objective : state.rules.objectives){
+            for(var marker : objective.markers){
+                if(marker.wasAdded){
+                    marker.removed();
+                    marker.wasAdded = false;
+                }
+            }
+        }
+
+        state.rules.objectives = executor;
+    }
+
+    @Remote(variants = Variant.both)
     public static void worldDataBegin(){
         Groups.clear();
         netClient.removed.clear();

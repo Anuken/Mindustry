@@ -430,7 +430,7 @@ public class ModsDialog extends BaseDialog{
                 if(((mod.hasJava || mod.hasScripts) && Vars.ios) ||
                     (!Strings.matches(searchtxt, mod.name) && !Strings.matches(searchtxt, mod.repo))
                     //hack, I'm basically testing if 135.10 >= modVersion, which is equivalent to modVersion >= 136
-                    //|| (Version.isAtLeast(135, 10, mod.minGameVersion))
+                    || (Version.isAtLeast(135, 10, mod.minGameVersion))
                 ) continue;
 
                 float s = 64f;
@@ -502,6 +502,11 @@ public class ModsDialog extends BaseDialog{
                         sel.hide();
                         githubImportMod(mod.repo, mod.hasJava, null);
                     });
+
+                    if(Core.graphics.isPortrait()){
+                        sel.buttons.row();
+                    }
+
                     sel.buttons.button("@mods.github.open", Icon.link, () -> {
                         Core.app.openURI("https://github.com/" + mod.repo);
                     });

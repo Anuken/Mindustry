@@ -29,6 +29,7 @@ public class BurstDrill extends Drill{
 
         //does not drill in the traditional sense, so this is not even used
         hardnessDrillMultiplier = 0f;
+        liquidBoostIntensity = 1f;
         //generally at center
         drillEffectRnd = 0f;
         drillEffect = Fx.shockwave;

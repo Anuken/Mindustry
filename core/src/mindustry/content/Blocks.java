@@ -76,7 +76,7 @@ public class Blocks{
     carbideCrucible, slagCentrifuge, surgeCrucible, cyanogenSynthesizer, phaseSynthesizer, heatReactor,
 
     //sandbox
-    powerSource, powerVoid, itemSource, itemVoid, liquidSource, liquidVoid, payloadSource, payloadVoid, illuminator,
+    powerSource, powerVoid, itemSource, itemVoid, liquidSource, liquidVoid, payloadSource, payloadVoid, illuminator, heatSource,
 
     //defense
     copperWall, copperWallLarge, titaniumWall, titaniumWallLarge, plastaniumWall, plastaniumWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge,
@@ -446,7 +446,6 @@ public class Blocks{
         }};
 
         redIce = new Floor("red-ice"){{
-            //TODO red ice boulder
             dragMultiplier = 0.4f;
             speedMultiplier = 0.9f;
             attributes.set(Attribute.water, 0.4f);
@@ -458,9 +457,9 @@ public class Blocks{
             liquidDrop = Liquids.arkycite;
             liquidMultiplier = 1.5f;
             isLiquid = true;
-            //TODO status, cache layer for this crap
-            status = StatusEffects.wet;
-            statusDuration = 120f;
+            //TODO no status for now
+            //status = StatusEffects.slow;
+            //statusDuration = 120f;
             drownTime = 200f;
             cacheLayer = CacheLayer.arkycite;
             albedo = 0.9f;
@@ -470,7 +469,6 @@ public class Blocks{
             variants = 3;
         }};
 
-        //TODO different vent colors
         rhyoliteVent = new SteamVent("rhyolite-vent"){{
             parent = blendGroup = rhyolite;
             attributes.set(Attribute.steam, 1f);
@@ -2327,7 +2325,8 @@ public class Blocks{
                 rotateSpeed = -2f;
                 rotation = 45f;
             }},
-            new DrawRegion("-cap")
+            new DrawRegion("-cap"),
+            new DrawLiquidRegion()
             );
         }};
 
@@ -2342,7 +2341,7 @@ public class Blocks{
             generateEffect = Fx.generatespark;
             ambientSoundVolume = 0.03f;
 
-            drawer = new DrawMulti(new DrawDefault(), new DrawWarmupRegion());
+            drawer = new DrawMulti(new DrawDefault(), new DrawWarmupRegion(), new DrawLiquidRegion());
 
             consumeItem(Items.pyratite);
             consumeLiquid(Liquids.cryofluid, 0.1f);
@@ -5197,7 +5196,7 @@ public class Blocks{
 
             size = 3;
             configurable = false;
-            plans.add(new UnitPlan(UnitTypes.elude, 60f * 45f, with(Items.graphite, 50, Items.silicon, 70)));
+            plans.add(new UnitPlan(UnitTypes.elude, 60f * 40f, with(Items.graphite, 50, Items.silicon, 70)));
             regionSuffix = "-dark";
             fogRadius = 3;
             researchCostMultiplier = 0.5f;
@@ -5508,6 +5507,15 @@ public class Blocks{
             requirements(Category.units, BuildVisibility.sandboxOnly, with());
             size = 5;
             alwaysUnlocked = true;
+        }};
+        heatSource = new HeatProducer("heat-source"){{
+            requirements(Category.crafting, BuildVisibility.sandboxOnly, with());
+            drawer = new DrawMulti(new DrawDefault(), new DrawHeatOutput());
+            rotateDraw = false;
+            size = 1;
+            heatOutput = 1000f;
+            warmupRate = 1000f;
+            regionRotated1 = 1;
         }};
 
         //TODO move

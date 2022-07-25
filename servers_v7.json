@@ -1,6 +1,6 @@
 [
   {
-    "name": "distributorium",
+    "name": "mindustry.pl",
     "address": ["0.baseduser.eu.org:6966", "0.baseduser.eu.org:6666", "0.baseduser.eu.org:6000"]
   },
   {
@@ -20,12 +20,12 @@
     "address": ["n1.yeet.ml:6572", "n1.yeet.ml:6573"]
   },
   {
-    "name": "MeowLand",
+    "name": "KMWStudios",
     "address": ["meowland.ru"]
   },
   {
-    "name": "DarkDustry",
-    "address": ["darkdustry.ml", "darkdustry.ml:5000", "darkdustry.ml:6000", "darkdustry.ml:7000", "darkdustry.ml:8000", "darkdustry.ml:9000"] 
+    "name": "Darkdustry",
+    "address": ["darkdustry.tk", "darkdustry.tk:5000", "darkdustry.tk:6000", "darkdustry.tk:7000", "darkdustry.tk:8000", "darkdustry.tk:9000"] 
   },
   {
     "name": "Chaotic Neutral",
@@ -64,10 +64,6 @@
     "address": ["pandorum.su:5018", "pandorum.su:5019", "pandorum.su:5020"]
   },
   {
-    "name": "MindustryBR",
-    "address": ["mindustryptbr.myddns.me"]
-  },
-  {
     "name": "LostDustry",
     "address": ["lostdustry.northeurope.cloudapp.azure.com:6568", "lostdustry.northeurope.cloudapp.azure.com:6569", "lostdustry.northeurope.cloudapp.azure.com:6570"]
   },
@@ -97,6 +93,6 @@
   },
   {
     "name": "Harders",
-    "address": ["212.20.42.61:6567", "212.20.42.61:6568", "212.20.42.61:6569"]
+    "address": ["212.20.42.61:6567", "212.20.42.61:6568", "212.20.42.61:6569", "212.20.42.61:6570", "212.20.42.61:6571", "212.20.42.61:6572", "212.20.42.61:6573"]
   }
 ]
