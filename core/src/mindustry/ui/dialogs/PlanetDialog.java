@@ -340,7 +340,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     }
 
     Sector findLauncher(Sector to){
-        Sector launchSector = this.launchSector != null && this.launchSector.hasBase() ? this.launchSector : null;
+        Sector launchSector = this.launchSector != null && this.launchSector.planet == to.planet && this.launchSector.hasBase() ? this.launchSector : null;
         //directly nearby.
         if(to.near().contains(launchSector)) return launchSector;
 
@@ -1153,13 +1153,14 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         if(mode == look && !sector.hasBase()){
             shouldHide = false;
             Sector from = findLauncher(sector);
+
             if(from == null){
                 //clear loadout information, so only the basic loadout gets used
                 universe.clearLoadoutInfo();
                 //free launch.
                 control.playSector(sector);
             }else{
-                CoreBlock block = from.info.bestCoreType instanceof CoreBlock b ? b : (CoreBlock)Blocks.coreShard;
+                CoreBlock block = from.planet.allowLaunchSchematics ? (from.info.bestCoreType instanceof CoreBlock b ? b : (CoreBlock)from.planet.defaultCore) : (CoreBlock)from.planet.defaultCore;
 
                 loadouts.show(block, from, sector, () -> {
                     var schemCore = universe.getLastLoadout().findCore();

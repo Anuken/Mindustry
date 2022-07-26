@@ -99,12 +99,15 @@ public class ResearchDialog extends BaseDialog{
             }else{
                 itemDisplay.marginTop(0f);
             }
+            itemDisplay.invalidate();
+            itemDisplay.layout();
         };
 
         onResize(checkMargin);
 
         shown(() -> {
             checkMargin.run();
+            Core.app.post(checkMargin);
 
             Planet currPlanet = ui.planet.isShown() ?
                 ui.planet.state.planet :

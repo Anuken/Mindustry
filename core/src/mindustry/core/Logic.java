@@ -168,18 +168,6 @@ public class Logic implements ApplicationListener{
             }
         });
 
-        //send out items to each client
-        Events.on(TurnEvent.class, e -> {
-            if(net.server() && state.isCampaign()){
-                int[] out = new int[content.items().size];
-                state.getSector().info.production.each((item, stat) -> {
-                    out[item.id] = Math.max(0, (int)(stat.mean * turnDuration / 60));
-                });
-
-                Call.sectorProduced(out);
-            }
-        });
-
         //listen to core changes; if all cores have been destroyed, set to derelict.
         Events.on(CoreChangeEvent.class, e -> Core.app.post(() -> {
             if(state.rules.cleanupDeadTeams && state.rules.pvp && !e.core.isAdded() && e.core.team != Team.derelict && e.core.team.cores().isEmpty()){
@@ -397,7 +385,9 @@ public class Logic implements ApplicationListener{
     //called when the remote server runs a turn and produces something
     @Remote
     public static void sectorProduced(int[] amounts){
-        if(!state.isCampaign()) return;
+        //TODO currently disabled.
+        if(!state.isCampaign() || true) return;
+
         Planet planet = state.rules.sector.planet;
         boolean any = false;
 
