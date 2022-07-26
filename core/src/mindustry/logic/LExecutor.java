@@ -1020,8 +1020,6 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-
-            exec.textBuffer.setLength(0);
             
             if(exec.building(target) instanceof MessageBuild d && (d.team == exec.team || exec.privileged)){
 
@@ -1029,6 +1027,8 @@ public class LExecutor{
                 d.message.append(exec.textBuffer, 0, Math.min(exec.textBuffer.length(), maxTextBuffer));
 
             }
+            exec.textBuffer.setLength(0);
+
         }
     }
 
