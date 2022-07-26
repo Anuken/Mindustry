@@ -1095,7 +1095,7 @@ public class Blocks{
                 sinMag = 1f;
             }},
             new DrawDefault(),
-            new DrawLiquidTile(Liquids.oil),
+            new DrawLiquidRegion(),
             new DrawRegion("-top")
             );
 
@@ -2592,8 +2592,9 @@ public class Blocks{
 
             legacyReadWarmup = true;
             drawer = new DrawMulti(
-            new DrawDefault(),
+            new DrawRegion("-bottom"),
             new DrawLiquidTile(Liquids.water),
+            new DrawDefault(),
             new DrawCultivator(),
             new DrawRegion("-top")
             );
