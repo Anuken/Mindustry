@@ -55,7 +55,7 @@ public class LExecutor{
     public @Nullable LogicBuild build;
     public IntSet linkIds = new IntSet();
     public Team team = Team.derelict;
-    public boolean privileged = false;
+    public boolean privileged = false, isFilter = false;
 
     public boolean initialized(){
         return instructions.length > 0;
