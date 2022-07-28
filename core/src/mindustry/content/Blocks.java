@@ -998,7 +998,7 @@ public class Blocks{
             solid = true;
             outputsLiquid = true;
             envEnabled = Env.any;
-            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(Liquids.cryofluid), new DrawDefault());
+            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(Liquids.water), new DrawLiquidTile(Liquids.cryofluid){{drawLiquidLight = true;}}, new DrawDefault());
             liquidCapacity = 24f;
             craftTime = 120;
 
@@ -2592,6 +2592,8 @@ public class Blocks{
 
             legacyReadWarmup = true;
             drawer = new DrawMulti(
+            new DrawRegion("-bottom"),
+            new DrawLiquidTile(Liquids.water),
             new DrawDefault(),
             new DrawCultivator(),
             new DrawRegion("-top")

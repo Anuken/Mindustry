@@ -202,12 +202,10 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
             //leg destination
             Vec2 legDest = Tmp.v1.trns(dstRot, legLength * type.legLengthScl).add(baseOffset).add(moveOffset);
             //join destination
-            Vec2 jointDest = Tmp.v2;//.trns(rot2, legLength / 2f + type.legBaseOffset).add(moveOffset);
+            Vec2 jointDest = Tmp.v2;
             InverseKinematics.solve(legLength/2f, legLength/2f, Tmp.v6.set(l.base).sub(baseOffset), side, jointDest);
             jointDest.add(baseOffset);
             Tmp.v6.set(baseOffset).lerp(l.base, 0.5f);
-            //lerp between kinematic and linear?
-            //jointDest.lerp(Tmp.v6.set(baseOffset).lerp(l.base, 0.5f), 1f - type.kinematicScl);
 
             if(move){
                 float moveFract = stageF % 1f;
@@ -224,7 +222,7 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
         }
 
         //when at least 1 leg is touching land, it can't drown
-        if(deeps != legs.length){
+        if(deeps != legs.length || !floorOn().isDeep()){
             lastDeepFloor = null;
         }
     }
