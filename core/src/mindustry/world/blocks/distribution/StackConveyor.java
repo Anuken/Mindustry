@@ -51,7 +51,6 @@ public class StackConveyor extends Block implements Autotiler{
         hasItems = true;
         itemCapacity = 10;
         conveyorPlacement = true;
-        highUnloadPriority = true;
         underBullets = true;
         priority = TargetPriority.transport;
 
