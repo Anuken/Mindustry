@@ -65,7 +65,6 @@ public class LogicFilter extends GenerateFilter{
             asm.putConst("@links", executor.links.length);
             asm.putConst("@ipt", 1);
 
-            asm.getVar("@this").value = this;
             asm.putConst("@thisx", 0);
             asm.putConst("@thisy", 0);
 
