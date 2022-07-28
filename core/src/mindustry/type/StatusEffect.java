@@ -53,7 +53,7 @@ public class StatusEffect extends UnlockableContent{
     /** Set to false to disable outline generation. */
     public boolean outline = true;
     /** Called on update. */
-    public Cons2<Unit, float> updateCons = (unit, time) -> {};
+    public Cons<Unit> updateCons = (unit) -> {};
     /** Transition handler map. */
     protected ObjectMap<StatusEffect, TransitionHandler> transitions = new ObjectMap<>();
     /** Called on init. */
@@ -134,7 +134,7 @@ public class StatusEffect extends UnlockableContent{
             effect.at(unit.x + Tmp.v1.x, unit.y + Tmp.v1.y, 0, color, parentizeEffect ? unit : null);
         }
         
-        updateCons.get(unit, time);
+        updateCons.get(unit);
     }
 
     protected void trans(StatusEffect effect, TransitionHandler handler){
