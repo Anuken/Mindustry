@@ -55,11 +55,6 @@ public class LogicFilter extends GenerateFilter{
         return Iconc.blockMicroProcessor;
     }
 
-    @Override
-    public boolean isPost(){
-        return true;
-    }
-
     void configure(String code){
         try{
             //create assembler to store extra variables
