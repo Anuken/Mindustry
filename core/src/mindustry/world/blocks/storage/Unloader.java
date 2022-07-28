@@ -88,9 +88,9 @@ public class Unloader extends Block{
         protected final Comparator<ContainerStat> comparator = (x, y) -> {
             //sort so it gives priority for blocks that can only either receive or give (not both), and then by load, and then by last use
             //highest = unload from, lowest = unload to
-            int unloadPriority = Boolean.compare(x.canUnload && !x.canLoad, y.canUnload && !y.canLoad); //priority to receive //(x.canUnload, y.canUnload)
+            int unloadPriority = Boolean.compare(x.canUnload && !x.canLoad, y.canUnload && !y.canLoad); //priority to receive if it cannot give
             if (unloadPriority != 0) return unloadPriority;
-            int loadPriority = Boolean.compare(x.canUnload || !x.canLoad, y.canUnload || !y.canLoad); //priority to give //(y.canLoad, x.canLoad)
+            int loadPriority = Boolean.compare(x.canUnload || !x.canLoad, y.canUnload || !y.canLoad); //priority to give if it cannot receive
             if (loadPriority != 0) return loadPriority;
             int loadFactor = Float.compare(x.loadFactor, y.loadFactor);
             if (loadFactor != 0) return loadFactor;
@@ -110,10 +110,10 @@ public class Unloader extends Block{
                 pb.canLoad = !(other.block instanceof StorageBlock) && other.acceptItem(this, item);
                 pb.canUnload = other.canUnload() && other.items != null && other.items.has(item);
 
-                //the part handling framerate issues and slow conveyor belts, to avoid skipping items
+                //thats also handling framerate issues and slow conveyor belts, to avoid skipping items if nulloader
                 if((hasProvider && pb.canLoad) || (hasReceiver && pb.canUnload)) isDistinct = true;
-                hasProvider = hasProvider || pb.canUnload;
-                hasReceiver = hasReceiver || pb.canLoad;
+                hasProvider |= pb.canUnload;
+                hasReceiver |= pb.canLoad;
             }
             return isDistinct;
         }
@@ -128,7 +128,7 @@ public class Unloader extends Block{
 
             for(int i = 0; i < proximity.size; i++){
                 var other = proximity.get(i);
-                if(!other.interactable(team)) continue; //avoid blocks that are not of your team
+                if(!other.interactable(team)) continue; //avoid blocks of the wrong team
                 ContainerStat pb = Pools.obtain(ContainerStat.class, ContainerStat::new);
 
                 //partial check
@@ -168,11 +168,11 @@ public class Unloader extends Block{
             if(item != null){
                 rotations = item.id; //next rotation for nulloaders //TODO maybe if(sortItem == null)
 
-                for(int pos = 0; pos < possibleBlocks.size; pos++){
-                    var pb = possibleBlocks.get(pos);
+                for(int i = 0; i < possibleBlocks.size; i++){
+                    var pb = possibleBlocks.get(i);
                     var other = pb.building;
                     pb.loadFactor = (other.getMaximumAccepted(item) == 0) || (other.items == null) ? 0 : other.items.get(item) / (float)other.getMaximumAccepted(item);
-                    pb.lastUsed = (pb.lastUsed + 1) % Integer.MAX_VALUE;
+                    pb.lastUsed = (pb.lastUsed + 1) % Integer.MAX_VALUE; //increment the priority if not used
                 }
 
                 possibleBlocks.sort(comparator);
