@@ -1,5 +1,6 @@
 package mindustry.type;
 
+import arc.func.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.struct.*;
@@ -51,6 +52,8 @@ public class StatusEffect extends UnlockableContent{
     public ObjectSet<StatusEffect> affinities = new ObjectSet<>(), opposites = new ObjectSet<>();
     /** Set to false to disable outline generation. */
     public boolean outline = true;
+    /** Called on update. */
+    public Cons2<Unit, float> updateCons = (unit, time) -> {};
     /** Transition handler map. */
     protected ObjectMap<StatusEffect, TransitionHandler> transitions = new ObjectMap<>();
     /** Called on init. */
@@ -130,6 +133,8 @@ public class StatusEffect extends UnlockableContent{
             Tmp.v1.rnd(Mathf.range(unit.type.hitSize/2f));
             effect.at(unit.x + Tmp.v1.x, unit.y + Tmp.v1.y, 0, color, parentizeEffect ? unit : null);
         }
+        
+        updateCons.get(unit, time);
     }
 
     protected void trans(StatusEffect effect, TransitionHandler handler){
