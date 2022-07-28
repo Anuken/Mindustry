@@ -53,7 +53,7 @@ public class StatusEffect extends UnlockableContent{
     /** Set to false to disable outline generation. */
     public boolean outline = true;
     /** Called on update. */
-    public Cons<Unit> updateCons = (unit) -> {};
+    public Cons<Unit> updateCons = unit -> {};
     /** Transition handler map. */
     protected ObjectMap<StatusEffect, TransitionHandler> transitions = new ObjectMap<>();
     /** Called on init. */
