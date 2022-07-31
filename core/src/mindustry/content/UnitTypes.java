@@ -6,6 +6,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.ai.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.entities.*;
@@ -1247,7 +1248,10 @@ public class UnitTypes{
         //region air support
 
         mono = new UnitType("mono"){{
+            //there's no reason to command monos anywhere. it's just annoying.
             controller = u -> new MinerAI();
+
+            defaultCommand = UnitCommand.mineCommand;
 
             flying = true;
             drag = 0.06f;
@@ -1266,7 +1270,7 @@ public class UnitTypes{
         }};
 
         poly = new UnitType("poly"){{
-            controller = u -> new BuilderAI();
+            defaultCommand = UnitCommand.rebuildCommand;
 
             flying = true;
             drag = 0.05f;
@@ -1320,7 +1324,7 @@ public class UnitTypes{
         }};
 
         mega = new UnitType("mega"){{
-            controller = u -> new RepairAI();
+            defaultCommand = UnitCommand.repairCommand;
 
             mineTier = 3;
             mineSpeed = 4f;
