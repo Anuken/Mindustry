@@ -48,6 +48,7 @@ public class PlacementFragment{
     Table blockTable, toggler, topTable, blockCatTable, commandTable;
     Stack mainStack;
     ScrollPane blockPane;
+    Runnable rebuildCommand;
     boolean blockSelectEnd, wasCommandMode;
     int blockSelectSeq;
     long blockSelectSeqMillis;
@@ -75,6 +76,12 @@ public class PlacementFragment{
                 control.input.block = null;
                 rebuild();
             });
+        });
+
+        Events.run(Trigger.unitCommandChange, () -> {
+            if(rebuildCommand != null){
+                rebuildCommand.run();
+            }
         });
 
         Events.on(UnlockEvent.class, event -> {
@@ -425,7 +432,7 @@ public class PlacementFragment{
                         UnitCommand[] currentCommand = {null};
                         var commands = new Seq<UnitCommand>();
 
-                        Runnable rebuildCommand = () -> {
+                        rebuildCommand = () -> {
                             u.clearChildren();
                             var units = control.input.selectedUnits;
                             if(units.size > 0){
