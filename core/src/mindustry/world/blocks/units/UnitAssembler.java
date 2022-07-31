@@ -136,9 +136,7 @@ public class UnitAssembler extends PayloadBlock{
             int tier = 0;
             for(var plan : plans){
                 int ttier = tier;
-                table.table(t -> {
-                    t.setBackground(Tex.whiteui);
-                    t.setColor(Pal.darkestGray);
+                table.table(Styles.grayPanel, t -> {
 
                     if(plan.unit.isBanned()){
                         t.image(Icon.cancel).color(Pal.remove).size(40).pad(10);
@@ -146,7 +144,7 @@ public class UnitAssembler extends PayloadBlock{
                     }
 
                     if(plan.unit.unlockedNow()){
-                        t.image(plan.unit.uiIcon).size(40).pad(10f).left();
+                        t.image(plan.unit.uiIcon).scaling(Scaling.fit).size(40).pad(10f).left();
                         t.table(info -> {
                             info.defaults().left();
                             info.add(plan.unit.localizedName);
