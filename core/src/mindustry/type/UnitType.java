@@ -781,10 +781,7 @@ public class UnitType extends UnlockableContent{
         if(commands.length == 0){
             Seq<UnitCommand> cmds = new Seq<>(UnitCommand.class);
 
-            //TODO ????
-            //if(canAttack){
-                cmds.add(UnitCommand.moveCommand);
-            //}
+            cmds.add(UnitCommand.moveCommand);
 
             //healing, mining and building is only supported for flying units; pathfinding to ambiguously reachable locations is hard.
             if(flying){
