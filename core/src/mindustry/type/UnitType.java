@@ -796,7 +796,7 @@ public class UnitType extends UnlockableContent{
                     cmds.add(UnitCommand.rebuildCommand, UnitCommand.assistCommand);
                 }
 
-                if(mineSpeed > 0){
+                if(mineTier > 0){
                     cmds.add(UnitCommand.mineCommand);
                 }
             }
