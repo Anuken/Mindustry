@@ -757,6 +757,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                     selectedUnits.clear();
                 }
                 selectedUnits.addAll(units);
+                Events.fire(Trigger.unitCommandChange);
                 commandBuild = null;
             }
             commandRect = false;
@@ -770,6 +771,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 selectedUnits.clear();
                 camera.bounds(Tmp.r1);
                 selectedUnits.addAll(selectedCommandUnits(Tmp.r1.x, Tmp.r1.y, Tmp.r1.width, Tmp.r1.height, u -> u.type == unit.type));
+                Events.fire(Trigger.unitCommandChange);
             }
         }
     }
@@ -796,6 +798,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                     commandBuild = null;
                 }
             }
+            Events.fire(Trigger.unitCommandChange);
         }
     }
 

@@ -119,8 +119,7 @@ public class Blocks{
     impactReactor, battery, batteryLarge, powerNode, powerNodeLarge, surgeTower, diode,
 
     //power - erekir
-    //TODO rename chemicalCombustionChamber
-    turbineCondenser, ventCondenser, chemicalCombustionChamber, pyrolysisGenerator,
+    turbineCondenser, ventCondenser, chemicalCombustionChamber, pyrolysisGenerator, fluxReactor,
     beamNode, beamTower, beamLink,
 
     //production
@@ -1258,7 +1257,7 @@ public class Blocks{
             size = 2;
             heatOutput = 3f;
             regionRotated1 = 1;
-            consumePower(50f / 60f);
+            consumePower(100f / 60f);
         }};
         
         slagHeater = new HeatProducer("slag-heater"){{
@@ -1828,7 +1827,7 @@ public class Blocks{
             requirements(Category.effect, with(Items.surgeAlloy, 50, Items.silicon, 150, Items.oxide, 30, Items.tungsten, 100));
             size = 3;
             consumeLiquids(LiquidStack.with(Liquids.cyanogen, 1f / 60f));
-            consumePower(80f / 60f);
+            consumePower(100f / 60f);
         }};
 
         //TODO 5x5??
@@ -2480,7 +2479,7 @@ public class Blocks{
 
         pyrolysisGenerator = new ConsumeGenerator("pyrolysis-generator"){{
             requirements(Category.power, with(Items.graphite, 50, Items.carbide, 50, Items.oxide, 60f, Items.silicon, 50));
-            powerProduction = 27f;
+            powerProduction = 25f;
 
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawPistons(){{
                 sinMag = 2.75f;
@@ -2505,6 +2504,36 @@ public class Blocks{
 
             ambientSound = Sounds.smelter;
             ambientSoundVolume = 0.06f;
+        }};
+
+        //TODO still very much WIP, stats are bad
+        fluxReactor = new VariableReactor("flux-reactor"){{
+            requirements(Category.power, with(Items.graphite, 300, Items.carbide, 200, Items.oxide, 100, Items.silicon, 600, Items.surgeAlloy, 300));
+            powerProduction = 140f;
+            maxHeat = 150f;
+
+            consumeLiquid(Liquids.cyanogen, 9f / 60f);
+            liquidCapacity = 30f;
+
+            size = 5;
+
+            drawer = new DrawMulti(
+            new DrawRegion("-bottom"),
+            new DrawLiquidTile(Liquids.cyanogen),
+            new DrawRegion("-mid"),
+            new DrawSoftParticles(){{
+                alpha = 0.35f;
+                particleRad = 12f;
+                particleSize = 9f;
+                particleLife = 120f;
+                particles = 27;
+            }},
+            new DrawDefault(),
+            new DrawHeatInput(),
+            new DrawGlowRegion("-ventglow"){{
+                color = Color.valueOf("32603a");
+            }}
+            );
         }};
 
         //endregion power
@@ -4210,7 +4239,7 @@ public class Blocks{
                 }});
             }};
 
-            consumePower(2f);
+            consumePower(5f);
             heatRequirement = 10f;
             maxHeatEfficiency = 2f;
 
@@ -4316,6 +4345,7 @@ public class Blocks{
                     trailLength = 18;
                     missileAccelTime = 50f;
                     lowAltitude = true;
+                    //targetAir = false;
 
                     fogRadius = 6f;
 
@@ -4335,6 +4365,8 @@ public class Blocks{
                                 strokeFrom = 4f;
                                 sizeTo = 130f;
                             }});
+
+                            collidesAir = false;
 
                             ammoMultiplier = 1f;
                             fragLifeMin = 0.1f;
@@ -5016,7 +5048,7 @@ public class Blocks{
             velocityRnd = 0.15f;
             heatRequirement = 90f;
             maxHeatEfficiency = 2f;
-            consumePower(5f);
+            consumePower(10f);
 
             shoot = new ShootSummon(0f, 0f, circleRad, 48f);
 
