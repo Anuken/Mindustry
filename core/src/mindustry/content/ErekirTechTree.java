@@ -192,8 +192,8 @@ public class ErekirTechTree{
                 node(cliffCrusher, () -> {
                     node(siliconArcFurnace, () -> {
                         node(electrolyzer, Seq.with(new OnSector(atlas)), () -> {
-                            node(oxidationChamber, Seq.with(new Research(tankRefabricator), new OnSector(basin)), () -> {
-                                node(electricHeater, Seq.with(new OnSector(basin)), () -> {
+                            node(oxidationChamber, Seq.with(new Research(tankRefabricator), new OnSector(marsh)), () -> {
+                                node(electricHeater, Seq.with(new OnSector(marsh)), () -> {
                                     node(heatRedirector, () -> {
                                         node(surgeCrucible, () -> {
 
@@ -358,7 +358,9 @@ public class ErekirTechTree{
                             });
 
                             node(basin, Seq.with(new SectorComplete(atlas)), () -> {
+                                node(marsh, Seq.with(new SectorComplete(basin)), () ->{
 
+                                });
                             });
                         });
                     });
