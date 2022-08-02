@@ -1,5 +1,9 @@
 [
   {
+    "name": "Mindustry Español",
+    "address": ["n1.xpdustry.fr:6001"]
+  },
+  {
     "name": "Sectorized",
     "address": ["sectorized.ddns.net"]
   },
@@ -110,10 +114,6 @@
   {
     "name": "CxZx",
     "address": ["usfr2.forcehost.net:25578"]
-  },
-  {
-    "name": "Mindustry Español",
-    "address": ["n1.xpdustry.fr:9000"]
   },
   {
     "name": "CreateDustry",
