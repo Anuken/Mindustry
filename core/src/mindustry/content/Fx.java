@@ -1202,6 +1202,15 @@ public class Fx{
         }
     }).startDelay(30f),
 
+    fluxVapor = new Effect(140f, e -> {
+        color(e.color);
+        alpha(e.fout() * 0.7f);
+
+        randLenVectors(e.id, 2, 3f + e.finpow() * 10f, (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, 0.6f + e.fin() * 5f);
+        });
+    }).layer(Layer.bullet - 1f),
+
     vapor = new Effect(110f, e -> {
         color(e.color);
         alpha(e.fout());

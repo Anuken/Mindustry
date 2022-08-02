@@ -5,7 +5,6 @@ import arc.audio.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
@@ -24,8 +23,6 @@ import static mindustry.Vars.*;
 
 public class NuclearReactor extends PowerGenerator{
     public final int timerFuel = timers++;
-
-    public final Vec2 tr = new Vec2();
 
     public Color lightColor = Color.valueOf("7f19ea");
     public Color coolColor = new Color(1, 1, 1, 0f);

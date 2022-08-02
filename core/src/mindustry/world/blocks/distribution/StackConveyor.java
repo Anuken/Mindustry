@@ -134,13 +134,13 @@ public class StackConveyor extends Block implements Autotiler{
                 for(int i = 0; i < 4; i++){
                     int dir = rotation - i;
                     var near = nearby(dir);
-                    if((blendprox & (1 << i)) != 0 && i != 0 && near != null && !near.block.fillsTile){
+                    if((blendprox & (1 << i)) != 0 && i != 0 && near != null && !near.block.squareSprite){
                         Draw.rect(sliced(regions[0], SliceMode.bottom), x + Geometry.d4x(dir) * tilesize*0.75f, y + Geometry.d4y(dir) * tilesize*0.75f, (float)(dir*90));
                     }
                 }
             }else if(state == stateUnload){ //front unload
                 //TOOD hacky front check
-                if((blendprox & (1)) != 0 && !front().block.fillsTile){
+                if((blendprox & (1)) != 0 && !front().block.squareSprite){
                     Draw.rect(sliced(regions[0], SliceMode.top), x + Geometry.d4x(rotation) * tilesize*0.75f, y + Geometry.d4y(rotation) * tilesize*0.75f, rotation * 90f);
                 }
             }
