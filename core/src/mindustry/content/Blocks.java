@@ -127,7 +127,7 @@ public class Blocks{
     cliffCrusher, plasmaBore, largePlasmaBore, impactDrill, eruptionDrill,
 
     //storage
-    coreShard, coreFoundation, /*TODO core foundation is a bad name, rename to fragment */ coreNucleus, vault, container, unloader,
+    coreShard, coreFoundation, coreNucleus, vault, container, unloader,
     //storage - erekir
     coreBastion, coreCitadel, coreAcropolis, reinforcedContainer, reinforcedVault,
 
@@ -162,7 +162,6 @@ public class Blocks{
     worldProcessor, worldCell,
 
     //campaign
-    //TODO launch pad on erekir, 5x5, uses nuclear(?) fuel
     launchPad, interplanetaryAccelerator
 
     ;
@@ -1161,7 +1160,6 @@ public class Blocks{
             consumePower(6f);
         }};
 
-        //TODO better name
         electrolyzer = new GenericCrafter("electrolyzer"){{
             requirements(Category.crafting, with(Items.silicon, 50, Items.graphite, 40, Items.beryllium, 130, Items.tungsten, 80));
             size = 3;
@@ -1222,7 +1220,6 @@ public class Blocks{
 
             heatRequirement = 6f;
 
-            //TODO continuous output
             outputLiquid = new LiquidStack(Liquids.nitrogen, 4f / 60f);
         }};
 
@@ -1380,10 +1377,9 @@ public class Blocks{
             }});
 
             consumeItem(Items.silicon, 3);
-            //TODO must consume from 2 pumps, 1, or 1.5?
             //TODO consume hydrogen/ozone?
             consumeLiquid(Liquids.slag, 40f / 60f);
-            consumePower(2f); //TODO necessary?
+            consumePower(2f);
         }};
 
         cyanogenSynthesizer = new HeatCrafter("cyanogen-synthesizer"){{
@@ -1415,7 +1411,6 @@ public class Blocks{
             consumePower(2f);
         }};
 
-        //TODO bad name, and there's no use for phase yet...
         phaseSynthesizer = new HeatCrafter("phase-synthesizer"){{
             requirements(Category.crafting, with(Items.carbide, 90, Items.silicon, 100, Items.thorium, 100, Items.tungsten, 200));
 
@@ -1512,7 +1507,6 @@ public class Blocks{
             envDisabled |= Env.scorching;
         }};
 
-        //TODO all these should be hidden from view completely
         thoriumWall = new Wall("thorium-wall"){{
             requirements(Category.defense, with(Items.thorium, 6));
             health = 200 * wallHealthMultiplier;
@@ -2492,7 +2486,6 @@ public class Blocks{
                 color = Pal.slagOrange;
             }});
 
-            //TODO ratios, extra requirements?
             consumeLiquids(LiquidStack.with(Liquids.slag, 20f / 60f, Liquids.arkycite, 30f / 60f));
             size = 3;
 
@@ -2509,7 +2502,7 @@ public class Blocks{
         //TODO still very much WIP, stats are bad
         fluxReactor = new VariableReactor("flux-reactor"){{
             requirements(Category.power, with(Items.graphite, 300, Items.carbide, 200, Items.oxide, 100, Items.silicon, 600, Items.surgeAlloy, 300));
-            powerProduction = 140f;
+            powerProduction = 120f;
             maxHeat = 150f;
 
             consumeLiquid(Liquids.cyanogen, 9f / 60f);

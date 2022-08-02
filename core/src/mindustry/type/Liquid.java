@@ -45,6 +45,8 @@ public class Liquid extends UnlockableContent implements Senseable{
     public float explosiveness;
     /** if false, this liquid cannot be a coolant */
     public boolean coolant = true;
+    /** if true, this liquid can move through blocks as a puddle. */
+    public boolean moveThroughBlocks = false;
     /** The associated status effect. */
     public StatusEffect effect = StatusEffects.none;
     /** Effect shown in puddles. */

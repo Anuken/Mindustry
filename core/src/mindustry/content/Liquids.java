@@ -52,6 +52,7 @@ public class Liquids{
             capPuddles = false;
             hidden = true;
             spreadTarget = Liquids.water;
+            moveThroughBlocks = true;
 
             colorFrom = Color.valueOf("e8803f");
             colorTo = Color.valueOf("8c1225");
