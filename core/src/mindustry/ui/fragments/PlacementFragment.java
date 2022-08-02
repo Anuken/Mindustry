@@ -412,7 +412,7 @@ public class PlacementFragment{
 
                         //hacky, but forces command table to be same width as blocks
                         if(control.input.commandMode){
-                            commandTable.getCells().peek().width(blockCatTable.getWidth());
+                            commandTable.getCells().peek().width(blockCatTable.getWidth() / Scl.scl(1f));
                         }
 
                         wasCommandMode = control.input.commandMode;
