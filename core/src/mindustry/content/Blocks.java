@@ -36,6 +36,7 @@ import mindustry.world.consumers.*;
 import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
+import static mindustry.Vars.*;
 import static mindustry.type.ItemStack.*;
 
 public class Blocks{
@@ -119,7 +120,7 @@ public class Blocks{
     impactReactor, battery, batteryLarge, powerNode, powerNodeLarge, surgeTower, diode,
 
     //power - erekir
-    turbineCondenser, ventCondenser, chemicalCombustionChamber, pyrolysisGenerator, fluxReactor,
+    turbineCondenser, ventCondenser, chemicalCombustionChamber, pyrolysisGenerator, fluxReactor, neoplasiaReactor,
     beamNode, beamTower, beamLink,
 
     //production
@@ -2374,7 +2375,6 @@ public class Blocks{
             heating = 0.02f;
 
             consumeItem(Items.thorium);
-            //TODO how to non update
             consumeLiquid(Liquids.cryofluid, heating / coolantPower).update(false);
         }};
 
@@ -2507,6 +2507,7 @@ public class Blocks{
 
             consumeLiquid(Liquids.cyanogen, 9f / 60f);
             liquidCapacity = 30f;
+            explosionMinWarmup = 0.5f;
 
             size = 5;
 
@@ -2525,6 +2526,70 @@ public class Blocks{
             new DrawHeatInput(),
             new DrawGlowRegion("-ventglow"){{
                 color = Color.valueOf("32603a");
+            }}
+            );
+        }};
+
+        //TODO stats
+        neoplasiaReactor = new HeaterGenerator("neoplasia-reactor"){{
+            requirements(Category.power, with(Items.tungsten, 1000, Items.carbide, 300, Items.oxide, 150, Items.silicon, 500, Items.phaseFabric, 300, Items.surgeAlloy, 200));
+
+            size = 5;
+            liquidCapacity = 80f;
+            outputLiquid = new LiquidStack(Liquids.neoplasm, 20f / 60f);
+            explodeOnFull = true;
+
+            heatOutput = 60f;
+
+            //TODO arkycite, or nitrogen? both? Decide.
+            consumeLiquid(Liquids.arkycite, 80f / 60f);
+            consumeLiquid(Liquids.water, 10f / 60f);
+            consumeItem(Items.phaseFabric);
+
+            itemDuration = 60f * 3f;
+            itemCapacity = 10;
+
+            explosionRadius = 5;
+            explosionDamage = 500;
+            explodeEffect = new MultiEffect(Fx.bigShockwave, new WrapEffect(Fx.titanSmoke, Liquids.neoplasm.color), Fx.neoplasmSplat);
+            explodeSound = Sounds.explosionbig;
+
+            powerProduction = 100f;
+            rebuildable = false;
+
+            explosionPuddles = 80;
+            explosionPuddleRange = tilesize * 7f;
+            explosionPuddleLiquid = Liquids.neoplasm;
+            explosionPuddleAmount = 200f;
+            explosionMinWarmup = 0.5f;
+
+            consumeEffect = new RadialEffect(Fx.neoplasiaSmoke, 4, 90f, 54f / 4f);
+
+            drawer = new DrawMulti(
+            new DrawRegion("-bottom"),
+            new DrawLiquidTile(Liquids.arkycite, 3f),
+            new DrawCircles(){{
+                color = Color.valueOf("feb380").a(0.8f);
+                strokeMax = 3.25f;
+                radius = 65f / 4f;
+                amount = 5;
+                timeScl = 200f;
+            }},
+
+            new DrawRegion("-center"),
+
+            new DrawCells(){{
+                color = Color.valueOf("c33e2b");
+                particleColorFrom = Color.valueOf("e8803f");
+                particleColorTo = Color.valueOf("8c1225");
+                particles = 50;
+                range = 4f;
+            }},
+            new DrawDefault(),
+            new DrawHeatOutput(),
+            new DrawGlowRegion("-glow"){{
+                color = Color.valueOf("70170b");
+                alpha = 0.7f;
             }}
             );
         }};
