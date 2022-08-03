@@ -260,14 +260,14 @@ public class ErekirTechTree{
                 });
 
                 node(diffuse, Seq.with(new OnSector(lake)), () -> {
-                    node(sublimate, () -> {
-                        node(titan, Seq.with(new OnSector(basin)), () -> {
-                            node(afflict, Seq.with(new OnSector(basin)), () -> {
+                    node(sublimate, Seq.with(new OnSector(marsh)), () -> {
+                        node(titan, Seq.with(new OnSector(marsh)), () -> {
+                            node(afflict, Seq.with(new OnSector(marsh)), () -> {
 
                             });
                         });
 
-                        node(disperse, Seq.with(new OnSector(basin)), () -> {
+                        node(disperse, Seq.with(new OnSector(marsh)), () -> {
 
                         });
                     });
