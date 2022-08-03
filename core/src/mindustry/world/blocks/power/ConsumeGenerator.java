@@ -21,6 +21,8 @@ public class ConsumeGenerator extends PowerGenerator{
     public float generateEffectRange = 3f;
 
     public @Nullable LiquidStack outputLiquid;
+    /** If true, this block explodes when outputLiquid exceeds capacity. */
+    public boolean explodeOnFull = false;
 
     public @Nullable ConsumeItemFilter filterItem;
     public @Nullable ConsumeLiquidFilter filterLiquid;
@@ -46,6 +48,10 @@ public class ConsumeGenerator extends PowerGenerator{
         if(outputLiquid != null){
             outputsLiquid = true;
             hasLiquids = true;
+        }
+
+        if(explodeOnFull && outputLiquid != null && explosionPuddleLiquid == null){
+            explosionPuddleLiquid = outputLiquid.liquid;
         }
 
         //TODO hardcoded
@@ -106,6 +112,10 @@ public class ConsumeGenerator extends PowerGenerator{
                 float added = Math.min(productionEfficiency * delta() * outputLiquid.amount, liquidCapacity - liquids.get(outputLiquid.liquid));
                 liquids.add(outputLiquid.liquid, added);
                 dumpLiquid(outputLiquid.liquid);
+
+                if(explodeOnFull && liquids.get(outputLiquid.liquid) >= liquidCapacity - 0.0001f){
+                    kill();
+                }
             }
 
             //generation time always goes down, but only at the end so consumeTriggerValid doesn't assume fake items

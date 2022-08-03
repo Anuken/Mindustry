@@ -50,8 +50,9 @@ public class Liquids{
             viscosity = 0.85f;
             flammability = 0f;
             capPuddles = false;
-            hidden = true;
             spreadTarget = Liquids.water;
+            moveThroughBlocks = true;
+            incinerable = true;
 
             colorFrom = Color.valueOf("e8803f");
             colorTo = Color.valueOf("8c1225");

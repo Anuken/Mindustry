@@ -1,7 +1,6 @@
 package mindustry.world.blocks.power;
 
 import arc.*;
-import arc.audio.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -13,9 +12,7 @@ import mindustry.entities.*;
 import mindustry.entities.effect.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.type.*;
 import mindustry.ui.*;
-import mindustry.world.*;
 import mindustry.world.blocks.heat.*;
 
 import static mindustry.Vars.*;
@@ -32,22 +29,23 @@ public class VariableReactor extends PowerGenerator{
     public float flashThreshold = 0.01f, flashAlpha = 0.4f, flashSpeed = 7f;
     public Color flashColor1 = Color.red, flashColor2 = Color.valueOf("89e8b6");
 
-    public int explosionRadius = 12;
-    public int explosionDamage = 1000;
-    public Effect explodeEffect = new MultiEffect(Fx.bigShockwave, new WrapEffect(Fx.titanSmoke, Color.valueOf("e3ae6f")));
-    public Sound explodeSound = Sounds.explosionbig;
-
-    public int puddles = 70;
-    public float puddleRange = tilesize * 6f;
-    public Liquid puddleLiquid = Liquids.slag;
-    public float puddleAmount = 100f;
-
     public @Load("@-lights") TextureRegion lightsRegion;
 
     public VariableReactor(String name){
         super(name);
         powerProduction = 20f;
         rebuildable = false;
+
+
+        explosionRadius = 12;
+        explosionDamage = 1000;
+        explodeEffect = new MultiEffect(Fx.bigShockwave, new WrapEffect(Fx.titanSmoke, Color.valueOf("e3ae6f")));
+        explodeSound = Sounds.explosionbig;
+
+        explosionPuddles = 70;
+        explosionPuddleRange = tilesize * 6f;
+        explosionPuddleLiquid = Liquids.slag;
+        explosionPuddleAmount = 100f;
     }
 
     @Override
@@ -83,24 +81,6 @@ public class VariableReactor extends PowerGenerator{
 
             if(Mathf.chanceDelta(effectChance * warmup)){
                 effect.at(x, y, effectColor);
-            }
-        }
-
-        @Override
-        public void onDestroyed(){
-            super.onDestroyed();
-
-            if(!state.rules.reactorExplosions) return;
-
-            Damage.damage(x, y, explosionRadius * tilesize, explosionDamage);
-
-            explodeEffect.at(this);
-            explodeSound.at(this);
-
-            for(int i = 0; i < puddles; i++){
-                Tmp.v1.trns(Mathf.random(360f), Mathf.random(puddleRange));
-                Tile tile = world.tileWorld(x + Tmp.v1.x, y + Tmp.v1.y);
-                Puddles.deposit(tile, puddleLiquid, puddleAmount);
             }
         }
 

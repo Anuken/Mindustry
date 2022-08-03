@@ -105,7 +105,7 @@
   },
   {
     "name": "Xpdustry",
-    "address": ["n2.xpdustry.fr", "n2.xpdustry.fr:6000"]
+    "address": ["n2.xpdustry.fr:6000", "n2.xpdustry.fr:6002"]
   },
   {
     "name": "CxZx",
@@ -113,7 +113,7 @@
   },
   {
     "name": "Mindustry Español",
-    "address": ["n1.xpdustry.fr:9000"]
+    "address": ["n1.xpdustry.fr:6001"]
   },
   {
     "name": "CreateDustry",
