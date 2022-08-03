@@ -36,6 +36,7 @@ import mindustry.world.consumers.*;
 import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
+import static mindustry.Vars.*;
 import static mindustry.type.ItemStack.*;
 
 public class Blocks{
@@ -119,7 +120,7 @@ public class Blocks{
     impactReactor, battery, batteryLarge, powerNode, powerNodeLarge, surgeTower, diode,
 
     //power - erekir
-    turbineCondenser, ventCondenser, chemicalCombustionChamber, pyrolysisGenerator, fluxReactor,
+    turbineCondenser, ventCondenser, chemicalCombustionChamber, pyrolysisGenerator, fluxReactor, neoplasiaReactor,
     beamNode, beamTower, beamLink,
 
     //production
@@ -127,7 +128,7 @@ public class Blocks{
     cliffCrusher, plasmaBore, largePlasmaBore, impactDrill, eruptionDrill,
 
     //storage
-    coreShard, coreFoundation, /*TODO core foundation is a bad name, rename to fragment */ coreNucleus, vault, container, unloader,
+    coreShard, coreFoundation, coreNucleus, vault, container, unloader,
     //storage - erekir
     coreBastion, coreCitadel, coreAcropolis, reinforcedContainer, reinforcedVault,
 
@@ -162,7 +163,6 @@ public class Blocks{
     worldProcessor, worldCell,
 
     //campaign
-    //TODO launch pad on erekir, 5x5, uses nuclear(?) fuel
     launchPad, interplanetaryAccelerator
 
     ;
@@ -1161,7 +1161,6 @@ public class Blocks{
             consumePower(6f);
         }};
 
-        //TODO better name
         electrolyzer = new GenericCrafter("electrolyzer"){{
             requirements(Category.crafting, with(Items.silicon, 50, Items.graphite, 40, Items.beryllium, 130, Items.tungsten, 80));
             size = 3;
@@ -1222,7 +1221,6 @@ public class Blocks{
 
             heatRequirement = 6f;
 
-            //TODO continuous output
             outputLiquid = new LiquidStack(Liquids.nitrogen, 4f / 60f);
         }};
 
@@ -1380,10 +1378,9 @@ public class Blocks{
             }});
 
             consumeItem(Items.silicon, 3);
-            //TODO must consume from 2 pumps, 1, or 1.5?
             //TODO consume hydrogen/ozone?
             consumeLiquid(Liquids.slag, 40f / 60f);
-            consumePower(2f); //TODO necessary?
+            consumePower(2f);
         }};
 
         cyanogenSynthesizer = new HeatCrafter("cyanogen-synthesizer"){{
@@ -1415,7 +1412,6 @@ public class Blocks{
             consumePower(2f);
         }};
 
-        //TODO bad name, and there's no use for phase yet...
         phaseSynthesizer = new HeatCrafter("phase-synthesizer"){{
             requirements(Category.crafting, with(Items.carbide, 90, Items.silicon, 100, Items.thorium, 100, Items.tungsten, 200));
 
@@ -1512,7 +1508,6 @@ public class Blocks{
             envDisabled |= Env.scorching;
         }};
 
-        //TODO all these should be hidden from view completely
         thoriumWall = new Wall("thorium-wall"){{
             requirements(Category.defense, with(Items.thorium, 6));
             health = 200 * wallHealthMultiplier;
@@ -1678,7 +1673,7 @@ public class Blocks{
         }};
 
         shieldedWall = new ShieldWall("shielded-wall"){{
-            requirements(Category.defense, ItemStack.with(Items.phaseFabric, 20, Items.surgeAlloy, 12));
+            requirements(Category.defense, ItemStack.with(Items.phaseFabric, 20, Items.surgeAlloy, 12, Items.beryllium, 12));
             consumePower(3f / 60f);
 
             outputsPower = false;
@@ -2380,7 +2375,6 @@ public class Blocks{
             heating = 0.02f;
 
             consumeItem(Items.thorium);
-            //TODO how to non update
             consumeLiquid(Liquids.cryofluid, heating / coolantPower).update(false);
         }};
 
@@ -2492,7 +2486,6 @@ public class Blocks{
                 color = Pal.slagOrange;
             }});
 
-            //TODO ratios, extra requirements?
             consumeLiquids(LiquidStack.with(Liquids.slag, 20f / 60f, Liquids.arkycite, 30f / 60f));
             size = 3;
 
@@ -2509,11 +2502,12 @@ public class Blocks{
         //TODO still very much WIP, stats are bad
         fluxReactor = new VariableReactor("flux-reactor"){{
             requirements(Category.power, with(Items.graphite, 300, Items.carbide, 200, Items.oxide, 100, Items.silicon, 600, Items.surgeAlloy, 300));
-            powerProduction = 140f;
+            powerProduction = 120f;
             maxHeat = 150f;
 
             consumeLiquid(Liquids.cyanogen, 9f / 60f);
             liquidCapacity = 30f;
+            explosionMinWarmup = 0.5f;
 
             size = 5;
 
@@ -2532,6 +2526,70 @@ public class Blocks{
             new DrawHeatInput(),
             new DrawGlowRegion("-ventglow"){{
                 color = Color.valueOf("32603a");
+            }}
+            );
+        }};
+
+        //TODO stats
+        neoplasiaReactor = new HeaterGenerator("neoplasia-reactor"){{
+            requirements(Category.power, with(Items.tungsten, 1000, Items.carbide, 300, Items.oxide, 150, Items.silicon, 500, Items.phaseFabric, 300, Items.surgeAlloy, 200));
+
+            size = 5;
+            liquidCapacity = 80f;
+            outputLiquid = new LiquidStack(Liquids.neoplasm, 20f / 60f);
+            explodeOnFull = true;
+
+            heatOutput = 60f;
+
+            //TODO arkycite, or nitrogen? both? Decide.
+            consumeLiquid(Liquids.arkycite, 80f / 60f);
+            consumeLiquid(Liquids.water, 10f / 60f);
+            consumeItem(Items.phaseFabric);
+
+            itemDuration = 60f * 3f;
+            itemCapacity = 10;
+
+            explosionRadius = 5;
+            explosionDamage = 500;
+            explodeEffect = new MultiEffect(Fx.bigShockwave, new WrapEffect(Fx.titanSmoke, Liquids.neoplasm.color), Fx.neoplasmSplat);
+            explodeSound = Sounds.explosionbig;
+
+            powerProduction = 140f;
+            rebuildable = false;
+
+            explosionPuddles = 80;
+            explosionPuddleRange = tilesize * 7f;
+            explosionPuddleLiquid = Liquids.neoplasm;
+            explosionPuddleAmount = 200f;
+            explosionMinWarmup = 0.5f;
+
+            consumeEffect = new RadialEffect(Fx.neoplasiaSmoke, 4, 90f, 54f / 4f);
+
+            drawer = new DrawMulti(
+            new DrawRegion("-bottom"),
+            new DrawLiquidTile(Liquids.arkycite, 3f),
+            new DrawCircles(){{
+                color = Color.valueOf("feb380").a(0.8f);
+                strokeMax = 3.25f;
+                radius = 65f / 4f;
+                amount = 5;
+                timeScl = 200f;
+            }},
+
+            new DrawRegion("-center"),
+
+            new DrawCells(){{
+                color = Color.valueOf("c33e2b");
+                particleColorFrom = Color.valueOf("e8803f");
+                particleColorTo = Color.valueOf("8c1225");
+                particles = 50;
+                range = 4f;
+            }},
+            new DrawDefault(),
+            new DrawHeatOutput(),
+            new DrawGlowRegion("-glow"){{
+                color = Color.valueOf("70170b");
+                alpha = 0.7f;
             }}
             );
         }};

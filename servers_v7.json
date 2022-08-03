@@ -94,5 +94,9 @@
   {
     "name": "OMNIDUSTRY",
     "address": ["109.94.209.233:6569","109.94.209.233:6570"]
-  }
+  },
+  {
+    "name": "The Devil",
+    "address": ["dc8.i8mc.cn:8169", "dc8.i8mc.cn:8920", "other.xem8k5.top:10530"]
+  }  
 ]
