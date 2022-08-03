@@ -88,6 +88,11 @@ public class ShieldWall extends Wall{
         }
 
         @Override
+        public void pickedUp(){
+            shieldRadius = 0f;
+        }
+
+        @Override
         public void damage(float damage){
             float shieldTaken = broken() ? 0f : Math.min(shield, damage);
 

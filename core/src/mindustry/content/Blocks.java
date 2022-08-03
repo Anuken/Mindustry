@@ -1673,7 +1673,7 @@ public class Blocks{
         }};
 
         shieldedWall = new ShieldWall("shielded-wall"){{
-            requirements(Category.defense, ItemStack.with(Items.phaseFabric, 20, Items.surgeAlloy, 12));
+            requirements(Category.defense, ItemStack.with(Items.phaseFabric, 20, Items.surgeAlloy, 12, Items.beryllium, 12));
             consumePower(3f / 60f);
 
             outputsPower = false;
@@ -2554,7 +2554,7 @@ public class Blocks{
             explodeEffect = new MultiEffect(Fx.bigShockwave, new WrapEffect(Fx.titanSmoke, Liquids.neoplasm.color), Fx.neoplasmSplat);
             explodeSound = Sounds.explosionbig;
 
-            powerProduction = 100f;
+            powerProduction = 140f;
             rebuildable = false;
 
             explosionPuddles = 80;
