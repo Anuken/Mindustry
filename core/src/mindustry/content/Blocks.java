@@ -454,7 +454,6 @@ public class Blocks{
             speedMultiplier = 0.3f;
             variants = 0;
             liquidDrop = Liquids.arkycite;
-            liquidMultiplier = 1.5f;
             isLiquid = true;
             //TODO no status for now
             //status = StatusEffects.slow;
@@ -3162,6 +3161,7 @@ public class Blocks{
                 Liquids.water,new LiquidBulletType(Liquids.water){{
                     knockback = 0.7f;
                     drag = 0.01f;
+                    layer = Layer.bullet - 2f;
                 }},
                 Liquids.slag, new LiquidBulletType(Liquids.slag){{
                     damage = 4;
@@ -3172,6 +3172,7 @@ public class Blocks{
                 }},
                 Liquids.oil, new LiquidBulletType(Liquids.oil){{
                     drag = 0.01f;
+                    layer = Layer.bullet - 2f;
                 }}
             );
             size = 2;
@@ -3438,6 +3439,7 @@ public class Blocks{
                     ammoMultiplier = 0.4f;
                     statusDuration = 60f * 4f;
                     damage = 0.2f;
+                    layer = Layer.bullet - 2f;
                 }},
                 Liquids.slag,  new LiquidBulletType(Liquids.slag){{
                     lifetime = 49f;
@@ -3471,6 +3473,7 @@ public class Blocks{
                     ammoMultiplier = 0.4f;
                     statusDuration = 60f * 4f;
                     damage = 0.2f;
+                    layer = Layer.bullet - 2f;
                 }}
             );
             size = 3;
