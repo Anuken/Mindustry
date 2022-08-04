@@ -54,7 +54,7 @@
   },
   {
     "name": "Phoenix Network",
-    "address": ["172.104.253.198", "172.104.253.198:6464"]
+    "address": ["phoenix-network.dev", "phoenix-network.dev:6464"]
   },
   {
     "name": "Xpdustry",
