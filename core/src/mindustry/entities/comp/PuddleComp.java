@@ -61,7 +61,7 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc{
             int targets = 0;
             for(Point2 point : Geometry.d4){
                 Tile other = world.tile(tile.x + point.x, tile.y + point.y);
-                if(other != null && other.block() == Blocks.air){
+                if(other != null && (other.block() == Blocks.air || liquid.moveThroughBlocks)){
                     targets ++;
                     Puddles.deposit(other, tile, liquid, deposited, false);
                 }

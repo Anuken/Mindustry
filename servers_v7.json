@@ -1,7 +1,12 @@
 [
+  
   {
     "name": "mindustry.pl",
     "address": ["0.baseduser.eu.org:6966", "0.baseduser.eu.org:6666", "0.baseduser.eu.org:6000"]
+  },
+  {
+    "name": "SynapseOS",
+    "address": ["0nera.ru:7777", "185.178.45.224:7777"]
   },
   {
     "name": "C.A.M.S.",
@@ -48,16 +53,12 @@
     "address": ["mindustry.kr"]
   },
   {
-    "name": "SubZero",
-    "address": ["minty-server.ddns.net"]
-  },
-  {
     "name": "Phoenix Network",
     "address": ["172.104.253.198", "172.104.253.198:6464"]
   },
   {
     "name": "Xpdustry",
-    "address": ["n1.xpdustry.fr:7000"]
+    "address": ["play.xpdustry.fr"]
   },
   {
     "name": "Pandorum",
@@ -85,7 +86,7 @@
   },
   {
     "name": "TinyLake",
-    "address": ["mdt.wayzer.cf"]
+    "address": ["mindustry.top","g.mindustry.top"]
   },
   {
     "name": "[CIG]Potato",
@@ -94,5 +95,13 @@
   {
     "name": "Harders",
     "address": ["212.20.42.61:6567", "212.20.42.61:6568", "212.20.42.61:6569", "212.20.42.61:6570", "212.20.42.61:6571", "212.20.42.61:6572", "212.20.42.61:6573"]
-  }
+  },
+  {
+    "name": "OMNIDUSTRY",
+    "address": ["109.94.209.233:6569","109.94.209.233:6570"]
+  },
+  {
+    "name": "The Devil",
+    "address": ["dc8.i8mc.cn:8169", "dc8.i8mc.cn:8920", "other.xem8k5.top:10530"]
+  }  
 ]
