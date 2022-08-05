@@ -14,6 +14,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.heat.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -59,6 +60,13 @@ public class VariableReactor extends PowerGenerator{
             Core.bundle.format("bar.heatpercent", (int)entity.heat, (int)(Mathf.clamp(entity.heat / maxHeat) * 100)),
             () -> Pal.lightOrange,
             () -> entity.heat / maxHeat));
+    }
+
+    @Override
+    public void setStats(){
+        super.setStats();
+
+        stats.add(Stat.input, maxHeat, StatUnit.heatUnits);
     }
 
     //TODO: draw warmup fraction on block?
