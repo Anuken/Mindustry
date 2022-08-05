@@ -401,7 +401,7 @@ public class JoinDialog extends BaseDialog{
         global.table(t -> {
             t.add("Search:").padRight(10);
             t.field(serverSearch, text ->
-                serverSearch = text.trim().replaceAll(" +", " ")
+                serverSearch = text.trim().replaceAll(" +", " ").toLowerCase()
             ).grow().pad(8);
             t.button(Icon.zoom, Styles.emptyi, this::refreshCommunity).size(54f);
         }).width(targetWidth()).height(70f).pad(4).row();
@@ -423,11 +423,11 @@ public class JoinDialog extends BaseDialog{
                     if(refreshes != cur) return;
 
                     if(!serverSearch.isEmpty()){
-                        if(!(group.name.contains(serverSearch)
-                            || res.name.contains(serverSearch)
-                            || res.description.contains(serverSearch)
-                            || res.mapname.contains(serverSearch)
-                            || (res.modeName != null && res.modeName.contains(serverSearch))))
+                        if(!(group.name.toLowerCase().contains(serverSearch)
+                            || res.name.toLowerCase().contains(serverSearch)
+                            || res.description.toLowerCase().contains(serverSearch)
+                            || res.mapname.toLowerCase().contains(serverSearch)
+                            || (res.modeName != null && res.modeName.toLowerCase().contains(serverSearch))))
                             return;
                     }
 
