@@ -109,9 +109,7 @@ public class UnitFactory extends UnitBlock{
             table.row();
 
             for(var plan : plans){
-                table.table(t -> {
-                    t.setBackground(Tex.whiteui);
-                    t.setColor(Pal.darkestGray);
+                table.table(Styles.grayPanel, t -> {
 
                     if(plan.unit.isBanned()){
                         t.image(Icon.cancel).color(Pal.remove).size(40);

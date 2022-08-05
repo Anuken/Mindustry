@@ -32,6 +32,7 @@ public class EventType{
         teamCoreDamage,
         socketConfigChanged,
         update,
+        unitCommandChange,
         draw,
         drawOver,
         preDraw,

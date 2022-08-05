@@ -324,8 +324,6 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean quickRotate = true;
     /** Main subclass. Non-anonymous. */
     public @Nullable Class<?> subclass;
-    /** Determines if this block gets a higher unloader priority. */
-    public boolean highUnloadPriority = false;
     /** Scroll position for certain blocks. */
     public float selectScroll;
     /** Building that is created for this block. Initialized in init() via reflection. Set manually if modded. */

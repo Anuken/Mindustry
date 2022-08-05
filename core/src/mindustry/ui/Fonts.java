@@ -118,12 +118,14 @@ public class Fonts{
                 unicodeIcons.put(nametex[0], ch);
                 stringIcons.put(nametex[0], ((char)ch) + "");
 
+                Vec2 out = Scaling.fit.apply(region.width, region.height, size, size);
+
                 Glyph glyph = new Glyph();
                 glyph.id = ch;
                 glyph.srcX = 0;
                 glyph.srcY = 0;
-                glyph.width = size;
-                glyph.height = (int)((float)region.height / region.width * size);
+                glyph.width = (int)out.x;
+                glyph.height = (int)out.y;
                 glyph.u = region.u;
                 glyph.v = region.v2;
                 glyph.u2 = region.u2;

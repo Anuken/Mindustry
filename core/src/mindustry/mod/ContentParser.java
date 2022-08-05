@@ -16,6 +16,7 @@ import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
 import arc.util.serialization.Jval.*;
 import mindustry.*;
+import mindustry.ai.*;
 import mindustry.ai.types.*;
 import mindustry.content.*;
 import mindustry.content.TechTree.*;
@@ -103,6 +104,18 @@ public class ContentParser{
             effect.minfo.mod = currentMod;
             readFields(effect, data);
             return effect;
+        });
+        put(UnitCommand.class, (type, data) -> {
+            if(data.isString()){
+               var cmd = UnitCommand.all.find(u -> u.name.equals(data.asString()));
+               if(cmd != null){
+                   return cmd;
+               }else{
+                   throw new IllegalArgumentException("Unknown unit command name: " + data.asString());
+               }
+            }else{
+                throw new IllegalArgumentException("Unit commands must be strings.");
+            }
         });
         put(BulletType.class, (type, data) -> {
             if(data.isString()){

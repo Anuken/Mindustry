@@ -47,7 +47,7 @@ public class Rules{
     public boolean schematicsAllowed = true;
     /** Whether friendly explosions can occur and set fire/damage other blocks. */
     public boolean damageExplosions = true;
-    /** Whether fire is enabled. */
+    /** Whether fire (and neoplasm spread) is enabled. */
     public boolean fire = true;
     /** Whether units use and require ammo. */
     public boolean unitAmmo = false;
