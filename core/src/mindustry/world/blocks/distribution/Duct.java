@@ -96,7 +96,7 @@ public class Duct extends Block implements Autotiler{
 
     @Override
     public void handlePlacementLine(Seq<BuildPlan> plans){
-        Placement.calculateBridges(plans, (DuctBridge)Blocks.ductBridge, false, b -> b instanceof Duct);
+        Placement.calculateBridges(plans, (DuctBridge)Blocks.ductBridge, false, b -> b instanceof Duct || b instanceof StackConveyor || b instanceof Conveyor);
     }
 
     public class DuctBuild extends Building{

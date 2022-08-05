@@ -101,7 +101,7 @@ public class BuildPayload implements Payload{
         Draw.z(prevZ - 0.0001f);
         drawShadow(1f);
         Draw.z(prevZ);
-        Draw.zTransform(z -> z >= Layer.flyingUnitLow ? z : 0.0011f + Mathf.clamp(z, prevZ - 0.001f, prevZ + 0.9f));
+        Draw.zTransform(z -> z >= Layer.flyingUnitLow + 1f ? z : 0.0011f + Math.min(Mathf.clamp(z, prevZ - 0.001f, prevZ + 0.9f), Layer.flyingUnitLow - 1f));
         build.tile = emptyTile;
         build.payloadDraw();
         Draw.zTransform();
