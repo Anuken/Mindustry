@@ -399,7 +399,7 @@ public class JoinDialog extends BaseDialog{
         global.background(null);
 
         global.table(t -> {
-            t.add("Search:").padRight(10);
+            t.add("@search").padRight(10);
             t.field(serverSearch, text ->
                 serverSearch = text.trim().replaceAll(" +", " ").toLowerCase()
             ).grow().pad(8);
