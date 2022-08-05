@@ -270,7 +270,7 @@ public class PowerGraph{
         if(build.power.graph != this || !build.power.init){
             //any old graph that is added here MUST be invalid, remove it
             if(build.power.graph != null && build.power.graph != this){
-                if( build.power.graph.entity != null) build.power.graph.entity.remove();
+                if(build.power.graph.entity != null) build.power.graph.entity.remove();
             }
 
             build.power.graph = this;
