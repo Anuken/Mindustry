@@ -2754,7 +2754,6 @@ public class Blocks{
 
         //TODO awful name
         largePlasmaBore = new BeamDrill("large-plasma-bore"){{
-            //TODO requirements
             requirements(Category.production, with(Items.silicon, 100, Items.oxide, 25, Items.beryllium, 100, Items.tungsten, 70));
             consumePower(0.8f);
             drillTime = 110f;
@@ -2769,7 +2768,6 @@ public class Blocks{
             consumeLiquid(Liquids.nitrogen, 3f / 60f).boost();
         }};
 
-        //TODO should be crusher or something
         impactDrill = new BurstDrill("impact-drill"){{
             requirements(Category.production, with(Items.silicon, 70, Items.beryllium, 90, Items.graphite, 60));
             drillTime = 60f * 12f;
@@ -2783,13 +2781,14 @@ public class Blocks{
             blockedItem = Items.thorium;
             researchCostMultiplier = 0.5f;
 
+            drillMultipliers.put(Items.beryllium, 2.5f);
+
             fogRadius = 4;
 
             consumePower(160f / 60f);
             consumeLiquid(Liquids.water, 0.2f);
         }};
 
-        //TODO bad name
         eruptionDrill = new BurstDrill("eruption-drill"){{
             requirements(Category.production, with(Items.silicon, 200, Items.oxide, 20, Items.tungsten, 200, Items.thorium, 120));
             drillTime = 60f * 6f;
@@ -2810,6 +2809,8 @@ public class Blocks{
             arrows = 2;
             glowColor.a = 0.6f;
             fogRadius = 5;
+
+            drillMultipliers.put(Items.beryllium, 2.5f);
 
             //TODO different requirements
             consumePower(6f);
