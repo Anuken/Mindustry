@@ -85,7 +85,7 @@
   },
   {
     "name": "TSR", 
-    "address": ["fi01.optik.host:28301", "uk01.optik.host:26164"]
+    "address": ["uk01.optik.host:26175", "uk01.optik.host:26164"]
   },
   {
     "name": "Sakura", 

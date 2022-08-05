@@ -153,6 +153,13 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     @Override
+    public void add(){
+        if(power != null){
+            power.graph.checkAdd();
+        }
+    }
+
+    @Override
     @Replace
     public int tileX(){
         return tile.x;
