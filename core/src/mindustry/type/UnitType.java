@@ -277,6 +277,11 @@ public class UnitType extends UnlockableContent{
     /** Flags to target based on priority. Null indicates that the closest target should be found. The closest enemy core is used as a fallback. */
     public BlockFlag[] targetFlags = {null};
 
+    /** Commands available to this unit through RTS controls. An empty array means commands will be assigned based on unit capabilities in init(). */
+    public UnitCommand[] commands = {};
+    /** Command to assign to this unit upon creation. Null indicates the first command in the array. */
+    public @Nullable UnitCommand defaultCommand;
+
     /** color for outline generated around sprites */
     public Color outlineColor = Pal.darkerMetal;
     /** thickness for sprite outline  */
@@ -742,8 +747,6 @@ public class UnitType extends UnlockableContent{
             ab.init(this);
         }
 
-        canHeal = weapons.contains(w -> w.bullet.heals());
-
         //add mirrored weapon variants
         Seq<Weapon> mapped = new Seq<>();
         for(Weapon w : weapons){
@@ -770,7 +773,33 @@ public class UnitType extends UnlockableContent{
 
         weapons.each(Weapon::init);
 
+        canHeal = weapons.contains(w -> w.bullet.heals());
+
         canAttack = weapons.contains(w -> !w.noAttack);
+
+        //assign default commands.
+        if(commands.length == 0){
+            Seq<UnitCommand> cmds = new Seq<>(UnitCommand.class);
+
+            cmds.add(UnitCommand.moveCommand);
+
+            //healing, mining and building is only supported for flying units; pathfinding to ambiguously reachable locations is hard.
+            if(flying){
+                if(canHeal){
+                    cmds.add(UnitCommand.repairCommand);
+                }
+
+                if(buildSpeed > 0){
+                    cmds.add(UnitCommand.rebuildCommand, UnitCommand.assistCommand);
+                }
+
+                if(mineTier > 0){
+                    cmds.add(UnitCommand.mineCommand);
+                }
+            }
+
+            commands = cmds.toArray();
+        }
 
         //dynamically create ammo capacity based on firing rate
         if(ammoCapacity < 0){

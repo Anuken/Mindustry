@@ -36,6 +36,7 @@ import mindustry.world.consumers.*;
 import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
+import static mindustry.Vars.*;
 import static mindustry.type.ItemStack.*;
 
 public class Blocks{
@@ -76,7 +77,7 @@ public class Blocks{
     carbideCrucible, slagCentrifuge, surgeCrucible, cyanogenSynthesizer, phaseSynthesizer, heatReactor,
 
     //sandbox
-    powerSource, powerVoid, itemSource, itemVoid, liquidSource, liquidVoid, payloadSource, payloadVoid, illuminator,
+    powerSource, powerVoid, itemSource, itemVoid, liquidSource, liquidVoid, payloadSource, payloadVoid, illuminator, heatSource,
 
     //defense
     copperWall, copperWallLarge, titaniumWall, titaniumWallLarge, plastaniumWall, plastaniumWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge,
@@ -119,8 +120,7 @@ public class Blocks{
     impactReactor, battery, batteryLarge, powerNode, powerNodeLarge, surgeTower, diode,
 
     //power - erekir
-    //TODO rename chemicalCombustionChamber
-    turbineCondenser, ventCondenser, chemicalCombustionChamber, pyrolysisGenerator,
+    turbineCondenser, ventCondenser, chemicalCombustionChamber, pyrolysisGenerator, fluxReactor, neoplasiaReactor,
     beamNode, beamTower, beamLink,
 
     //production
@@ -128,7 +128,7 @@ public class Blocks{
     cliffCrusher, plasmaBore, largePlasmaBore, impactDrill, eruptionDrill,
 
     //storage
-    coreShard, coreFoundation, /*TODO core foundation is a bad name, rename to fragment */ coreNucleus, vault, container, unloader,
+    coreShard, coreFoundation, coreNucleus, vault, container, unloader,
     //storage - erekir
     coreBastion, coreCitadel, coreAcropolis, reinforcedContainer, reinforcedVault,
 
@@ -163,7 +163,6 @@ public class Blocks{
     worldProcessor, worldCell,
 
     //campaign
-    //TODO launch pad on erekir, 5x5, uses nuclear(?) fuel
     launchPad, interplanetaryAccelerator
 
     ;
@@ -446,7 +445,6 @@ public class Blocks{
         }};
 
         redIce = new Floor("red-ice"){{
-            //TODO red ice boulder
             dragMultiplier = 0.4f;
             speedMultiplier = 0.9f;
             attributes.set(Attribute.water, 0.4f);
@@ -456,11 +454,10 @@ public class Blocks{
             speedMultiplier = 0.3f;
             variants = 0;
             liquidDrop = Liquids.arkycite;
-            liquidMultiplier = 1.5f;
             isLiquid = true;
-            //TODO status, cache layer for this crap
-            status = StatusEffects.wet;
-            statusDuration = 120f;
+            //TODO no status for now
+            //status = StatusEffects.slow;
+            //statusDuration = 120f;
             drownTime = 200f;
             cacheLayer = CacheLayer.arkycite;
             albedo = 0.9f;
@@ -470,7 +467,6 @@ public class Blocks{
             variants = 3;
         }};
 
-        //TODO different vent colors
         rhyoliteVent = new SteamVent("rhyolite-vent"){{
             parent = blendGroup = rhyolite;
             attributes.set(Attribute.steam, 1f);
@@ -1000,7 +996,7 @@ public class Blocks{
             solid = true;
             outputsLiquid = true;
             envEnabled = Env.any;
-            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(Liquids.cryofluid), new DrawDefault());
+            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(Liquids.water), new DrawLiquidTile(Liquids.cryofluid){{drawLiquidLight = true;}}, new DrawDefault());
             liquidCapacity = 24f;
             craftTime = 120;
 
@@ -1164,7 +1160,6 @@ public class Blocks{
             consumePower(6f);
         }};
 
-        //TODO better name
         electrolyzer = new GenericCrafter("electrolyzer"){{
             requirements(Category.crafting, with(Items.silicon, 50, Items.graphite, 40, Items.beryllium, 130, Items.tungsten, 80));
             size = 3;
@@ -1225,7 +1220,6 @@ public class Blocks{
 
             heatRequirement = 6f;
 
-            //TODO continuous output
             outputLiquid = new LiquidStack(Liquids.nitrogen, 4f / 60f);
         }};
 
@@ -1260,7 +1254,7 @@ public class Blocks{
             size = 2;
             heatOutput = 3f;
             regionRotated1 = 1;
-            consumePower(50f / 60f);
+            consumePower(100f / 60f);
         }};
         
         slagHeater = new HeatProducer("slag-heater"){{
@@ -1383,10 +1377,9 @@ public class Blocks{
             }});
 
             consumeItem(Items.silicon, 3);
-            //TODO must consume from 2 pumps, 1, or 1.5?
             //TODO consume hydrogen/ozone?
             consumeLiquid(Liquids.slag, 40f / 60f);
-            consumePower(2f); //TODO necessary?
+            consumePower(2f);
         }};
 
         cyanogenSynthesizer = new HeatCrafter("cyanogen-synthesizer"){{
@@ -1418,7 +1411,6 @@ public class Blocks{
             consumePower(2f);
         }};
 
-        //TODO bad name, and there's no use for phase yet...
         phaseSynthesizer = new HeatCrafter("phase-synthesizer"){{
             requirements(Category.crafting, with(Items.carbide, 90, Items.silicon, 100, Items.thorium, 100, Items.tungsten, 200));
 
@@ -1515,7 +1507,6 @@ public class Blocks{
             envDisabled |= Env.scorching;
         }};
 
-        //TODO all these should be hidden from view completely
         thoriumWall = new Wall("thorium-wall"){{
             requirements(Category.defense, with(Items.thorium, 6));
             health = 200 * wallHealthMultiplier;
@@ -1681,7 +1672,7 @@ public class Blocks{
         }};
 
         shieldedWall = new ShieldWall("shielded-wall"){{
-            requirements(Category.defense, ItemStack.with(Items.phaseFabric, 20, Items.surgeAlloy, 12));
+            requirements(Category.defense, ItemStack.with(Items.phaseFabric, 20, Items.surgeAlloy, 12, Items.beryllium, 12));
             consumePower(3f / 60f);
 
             outputsPower = false;
@@ -1830,7 +1821,7 @@ public class Blocks{
             requirements(Category.effect, with(Items.surgeAlloy, 50, Items.silicon, 150, Items.oxide, 30, Items.tungsten, 100));
             size = 3;
             consumeLiquids(LiquidStack.with(Liquids.cyanogen, 1f / 60f));
-            consumePower(80f / 60f);
+            consumePower(100f / 60f);
         }};
 
         //TODO 5x5??
@@ -2132,17 +2123,20 @@ public class Blocks{
             requirements(Category.liquid, with(Items.titanium, 10, Items.metaglass, 15));
             liquidCapacity = 700f;
             size = 2;
+            solid = true;
         }};
 
         liquidTank = new LiquidRouter("liquid-tank"){{
             requirements(Category.liquid, with(Items.titanium, 30, Items.metaglass, 40));
             size = 3;
+            solid = true;
             liquidCapacity = 1800f;
             health = 500;
         }};
 
         liquidJunction = new LiquidJunction("liquid-junction"){{
             requirements(Category.liquid, with(Items.graphite, 4, Items.metaglass, 8));
+            solid = false;
         }};
 
         bridgeConduit = new LiquidBridge("bridge-conduit"){{
@@ -2166,10 +2160,8 @@ public class Blocks{
 
         //reinforced stuff
 
-        //TODO different name
         reinforcedPump = new Pump("reinforced-pump"){{
             requirements(Category.liquid, with(Items.beryllium, 40, Items.tungsten, 30, Items.silicon, 20));
-            //TODO CUSTOM DRAW ANIMATION - pistons - repurpose DrawBlock?
             consumeLiquid(Liquids.hydrogen, 1.5f / 60f);
 
             pumpAmount = 80f / 60f / 4f;
@@ -2327,7 +2319,8 @@ public class Blocks{
                 rotateSpeed = -2f;
                 rotation = 45f;
             }},
-            new DrawRegion("-cap")
+            new DrawRegion("-cap"),
+            new DrawLiquidRegion()
             );
         }};
 
@@ -2342,7 +2335,7 @@ public class Blocks{
             generateEffect = Fx.generatespark;
             ambientSoundVolume = 0.03f;
 
-            drawer = new DrawMulti(new DrawDefault(), new DrawWarmupRegion());
+            drawer = new DrawMulti(new DrawDefault(), new DrawWarmupRegion(), new DrawLiquidRegion());
 
             consumeItem(Items.pyratite);
             consumeLiquid(Liquids.cryofluid, 0.1f);
@@ -2382,7 +2375,6 @@ public class Blocks{
             heating = 0.02f;
 
             consumeItem(Items.thorium);
-            //TODO how to non update
             consumeLiquid(Liquids.cryofluid, heating / coolantPower).update(false);
         }};
 
@@ -2457,10 +2449,9 @@ public class Blocks{
             researchCost = with(Items.beryllium, 15);
         }};
 
-        //TODO rename
         chemicalCombustionChamber = new ConsumeGenerator("chemical-combustion-chamber"){{
             requirements(Category.power, with(Items.graphite, 40, Items.tungsten, 40, Items.oxide, 40f, Items.silicon, 30));
-            powerProduction = 9f;
+            powerProduction = 8f;
             consumeLiquids(LiquidStack.with(Liquids.ozone, 2f / 60f, Liquids.arkycite, 40f / 60f));
             size = 3;
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawPistons(){{
@@ -2481,7 +2472,7 @@ public class Blocks{
 
         pyrolysisGenerator = new ConsumeGenerator("pyrolysis-generator"){{
             requirements(Category.power, with(Items.graphite, 50, Items.carbide, 50, Items.oxide, 60f, Items.silicon, 50));
-            powerProduction = 27f;
+            powerProduction = 25f;
 
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawPistons(){{
                 sinMag = 2.75f;
@@ -2494,7 +2485,6 @@ public class Blocks{
                 color = Pal.slagOrange;
             }});
 
-            //TODO ratios, extra requirements?
             consumeLiquids(LiquidStack.with(Liquids.slag, 20f / 60f, Liquids.arkycite, 30f / 60f));
             size = 3;
 
@@ -2506,6 +2496,101 @@ public class Blocks{
 
             ambientSound = Sounds.smelter;
             ambientSoundVolume = 0.06f;
+        }};
+
+        //TODO still very much WIP, stats are bad
+        fluxReactor = new VariableReactor("flux-reactor"){{
+            requirements(Category.power, with(Items.graphite, 300, Items.carbide, 200, Items.oxide, 100, Items.silicon, 600, Items.surgeAlloy, 300));
+            powerProduction = 120f;
+            maxHeat = 150f;
+
+            consumeLiquid(Liquids.cyanogen, 9f / 60f);
+            liquidCapacity = 30f;
+            explosionMinWarmup = 0.5f;
+
+            size = 5;
+
+            drawer = new DrawMulti(
+            new DrawRegion("-bottom"),
+            new DrawLiquidTile(Liquids.cyanogen),
+            new DrawRegion("-mid"),
+            new DrawSoftParticles(){{
+                alpha = 0.35f;
+                particleRad = 12f;
+                particleSize = 9f;
+                particleLife = 120f;
+                particles = 27;
+            }},
+            new DrawDefault(),
+            new DrawHeatInput(),
+            new DrawGlowRegion("-ventglow"){{
+                color = Color.valueOf("32603a");
+            }}
+            );
+        }};
+
+        //TODO stats
+        neoplasiaReactor = new HeaterGenerator("neoplasia-reactor"){{
+            requirements(Category.power, with(Items.tungsten, 1000, Items.carbide, 300, Items.oxide, 150, Items.silicon, 500, Items.phaseFabric, 300, Items.surgeAlloy, 200));
+
+            size = 5;
+            liquidCapacity = 80f;
+            outputLiquid = new LiquidStack(Liquids.neoplasm, 20f / 60f);
+            explodeOnFull = true;
+
+            heatOutput = 60f;
+
+            //TODO arkycite, or nitrogen? both? Decide.
+            consumeLiquid(Liquids.arkycite, 80f / 60f);
+            consumeLiquid(Liquids.water, 10f / 60f);
+            consumeItem(Items.phaseFabric);
+
+            itemDuration = 60f * 3f;
+            itemCapacity = 10;
+
+            explosionRadius = 5;
+            explosionDamage = 500;
+            explodeEffect = new MultiEffect(Fx.bigShockwave, new WrapEffect(Fx.titanSmoke, Liquids.neoplasm.color), Fx.neoplasmSplat);
+            explodeSound = Sounds.explosionbig;
+
+            powerProduction = 140f;
+            rebuildable = false;
+
+            explosionPuddles = 80;
+            explosionPuddleRange = tilesize * 7f;
+            explosionPuddleLiquid = Liquids.neoplasm;
+            explosionPuddleAmount = 200f;
+            explosionMinWarmup = 0.5f;
+
+            consumeEffect = new RadialEffect(Fx.neoplasiaSmoke, 4, 90f, 54f / 4f);
+
+            drawer = new DrawMulti(
+            new DrawRegion("-bottom"),
+            new DrawLiquidTile(Liquids.arkycite, 3f),
+            new DrawCircles(){{
+                color = Color.valueOf("feb380").a(0.8f);
+                strokeMax = 3.25f;
+                radius = 65f / 4f;
+                amount = 5;
+                timeScl = 200f;
+            }},
+
+            new DrawRegion("-center"),
+
+            new DrawCells(){{
+                color = Color.valueOf("c33e2b");
+                particleColorFrom = Color.valueOf("e8803f");
+                particleColorTo = Color.valueOf("8c1225");
+                particles = 50;
+                range = 4f;
+            }},
+            new DrawDefault(),
+            new DrawHeatOutput(),
+            new DrawGlowRegion("-glow"){{
+                color = Color.valueOf("70170b");
+                alpha = 0.7f;
+            }}
+            );
         }};
 
         //endregion power
@@ -2593,6 +2678,8 @@ public class Blocks{
 
             legacyReadWarmup = true;
             drawer = new DrawMulti(
+            new DrawRegion("-bottom"),
+            new DrawLiquidTile(Liquids.water),
             new DrawDefault(),
             new DrawCultivator(),
             new DrawRegion("-top")
@@ -2668,7 +2755,6 @@ public class Blocks{
 
         //TODO awful name
         largePlasmaBore = new BeamDrill("large-plasma-bore"){{
-            //TODO requirements
             requirements(Category.production, with(Items.silicon, 100, Items.oxide, 25, Items.beryllium, 100, Items.tungsten, 70));
             consumePower(0.8f);
             drillTime = 110f;
@@ -2683,7 +2769,6 @@ public class Blocks{
             consumeLiquid(Liquids.nitrogen, 3f / 60f).boost();
         }};
 
-        //TODO should be crusher or something
         impactDrill = new BurstDrill("impact-drill"){{
             requirements(Category.production, with(Items.silicon, 70, Items.beryllium, 90, Items.graphite, 60));
             drillTime = 60f * 12f;
@@ -2697,13 +2782,14 @@ public class Blocks{
             blockedItem = Items.thorium;
             researchCostMultiplier = 0.5f;
 
+            drillMultipliers.put(Items.beryllium, 2.5f);
+
             fogRadius = 4;
 
             consumePower(160f / 60f);
             consumeLiquid(Liquids.water, 0.2f);
         }};
 
-        //TODO bad name
         eruptionDrill = new BurstDrill("eruption-drill"){{
             requirements(Category.production, with(Items.silicon, 200, Items.oxide, 20, Items.tungsten, 200, Items.thorium, 120));
             drillTime = 60f * 6f;
@@ -2724,6 +2810,8 @@ public class Blocks{
             arrows = 2;
             glowColor.a = 0.6f;
             fogRadius = 5;
+
+            drillMultipliers.put(Items.beryllium, 2.5f);
 
             //TODO different requirements
             consumePower(6f);
@@ -3075,6 +3163,7 @@ public class Blocks{
                 Liquids.water,new LiquidBulletType(Liquids.water){{
                     knockback = 0.7f;
                     drag = 0.01f;
+                    layer = Layer.bullet - 2f;
                 }},
                 Liquids.slag, new LiquidBulletType(Liquids.slag){{
                     damage = 4;
@@ -3085,6 +3174,7 @@ public class Blocks{
                 }},
                 Liquids.oil, new LiquidBulletType(Liquids.oil){{
                     drag = 0.01f;
+                    layer = Layer.bullet - 2f;
                 }}
             );
             size = 2;
@@ -3351,6 +3441,7 @@ public class Blocks{
                     ammoMultiplier = 0.4f;
                     statusDuration = 60f * 4f;
                     damage = 0.2f;
+                    layer = Layer.bullet - 2f;
                 }},
                 Liquids.slag,  new LiquidBulletType(Liquids.slag){{
                     lifetime = 49f;
@@ -3384,6 +3475,7 @@ public class Blocks{
                     ammoMultiplier = 0.4f;
                     statusDuration = 60f * 4f;
                     damage = 0.2f;
+                    layer = Layer.bullet - 2f;
                 }}
             );
             size = 3;
@@ -4209,7 +4301,7 @@ public class Blocks{
                 }});
             }};
 
-            consumePower(2f);
+            consumePower(5f);
             heatRequirement = 10f;
             maxHeatEfficiency = 2f;
 
@@ -4315,6 +4407,7 @@ public class Blocks{
                     trailLength = 18;
                     missileAccelTime = 50f;
                     lowAltitude = true;
+                    //targetAir = false;
 
                     fogRadius = 6f;
 
@@ -4334,6 +4427,8 @@ public class Blocks{
                                 strokeFrom = 4f;
                                 sizeTo = 130f;
                             }});
+
+                            collidesAir = false;
 
                             ammoMultiplier = 1f;
                             fragLifeMin = 0.1f;
@@ -5015,7 +5110,7 @@ public class Blocks{
             velocityRnd = 0.15f;
             heatRequirement = 90f;
             maxHeatEfficiency = 2f;
-            consumePower(5f);
+            consumePower(10f);
 
             shoot = new ShootSummon(0f, 0f, circleRad, 48f);
 
@@ -5508,6 +5603,15 @@ public class Blocks{
             requirements(Category.units, BuildVisibility.sandboxOnly, with());
             size = 5;
             alwaysUnlocked = true;
+        }};
+        heatSource = new HeatProducer("heat-source"){{
+            requirements(Category.crafting, BuildVisibility.sandboxOnly, with());
+            drawer = new DrawMulti(new DrawDefault(), new DrawHeatOutput());
+            rotateDraw = false;
+            size = 1;
+            heatOutput = 1000f;
+            warmupRate = 1000f;
+            regionRotated1 = 1;
         }};
 
         //TODO move

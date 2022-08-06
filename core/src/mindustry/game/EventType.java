@@ -1,5 +1,6 @@
 package mindustry.game;
 
+import arc.math.geom.*;
 import arc.util.*;
 import mindustry.core.GameState.*;
 import mindustry.ctype.*;
@@ -31,6 +32,7 @@ public class EventType{
         teamCoreDamage,
         socketConfigChanged,
         update,
+        unitCommandChange,
         draw,
         drawOver,
         preDraw,
@@ -264,6 +266,18 @@ public class EventType{
         public UnitControlEvent(Player player, @Nullable Unit unit){
             this.player = player;
             this.unit = unit;
+        }
+    }
+
+    public static class BuildingCommandEvent{
+        public final Player player;
+        public final Building building;
+        public final Vec2 position;
+
+        public BuildingCommandEvent(Player player, Building building, Vec2 position){
+            this.player = player;
+            this.building = building;
+            this.position = position;
         }
     }
 

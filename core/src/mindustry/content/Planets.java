@@ -63,6 +63,7 @@ public class Planets{
             lightSrcTo = 0.5f;
             lightDstFrom = 0.2f;
             clearSectorOnLose = true;
+            defaultCore = Blocks.coreBastion;
             hiddenItems.addAll(Items.serpuloItems).removeAll(Items.erekirItems);
 
             //TODO SHOULD there be lighting?
@@ -130,6 +131,8 @@ public class Planets{
             allowLaunchSchematics = true;
             enemyCoreSpawnReplace = true;
             allowLaunchLoadout = true;
+            //doesn't play well with configs
+            prebuildBase = false;
             ruleSetter = r -> {
                 r.waveTeam = Team.crux;
                 r.placeRangeCheck = false;
