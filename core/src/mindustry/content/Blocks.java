@@ -2129,6 +2129,7 @@ public class Blocks{
         liquidTank = new LiquidRouter("liquid-tank"){{
             requirements(Category.liquid, with(Items.titanium, 30, Items.metaglass, 40));
             size = 3;
+            solid = true;
             liquidCapacity = 1800f;
             health = 500;
         }};
