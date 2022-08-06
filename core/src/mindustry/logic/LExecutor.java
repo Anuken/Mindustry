@@ -57,6 +57,17 @@ public class LExecutor{
     public Team team = Team.derelict;
     public boolean privileged = false;
 
+    //yes, this is a minor memory leak, but it's probably not significant enough to matter
+    protected IntFloatMap unitTimeouts = new IntFloatMap();
+
+    boolean timeoutDone(Unit unit, float delay){
+        return Time.time >= unitTimeouts.get(unit.id) + delay;
+    }
+
+    void updateTimeout(Unit unit){
+        unitTimeouts.put(unit.id, Time.time);
+    }
+
     public boolean initialized(){
         return instructions.length > 0;
     }
@@ -428,15 +439,15 @@ public class LExecutor{
                         }
                     }
                     case payDrop -> {
-                        if(ai.payTimer > 0) return;
+                        if(!exec.timeoutDone(unit, LogicAI.transferDelay)) return;
 
                         if(unit instanceof Payloadc pay && pay.hasPayload()){
                             Call.payloadDropped(unit, unit.x, unit.y);
-                            ai.payTimer = LogicAI.transferDelay;
+                            exec.updateTimeout(unit);
                         }
                     }
                     case payTake -> {
-                        if(ai.payTimer > 0) return;
+                        if(!exec.timeoutDone(unit, LogicAI.transferDelay)) return;
 
                         if(unit instanceof Payloadc pay){
                             //units
@@ -460,7 +471,7 @@ public class LExecutor{
                                     }
                                 }
                             }
-                            ai.payTimer = LogicAI.transferDelay;
+                            exec.updateTimeout(unit);
                         }
                     }
                     case payEnter -> {
@@ -508,7 +519,7 @@ public class LExecutor{
                         }
                     }
                     case itemDrop -> {
-                        if(ai.itemTimer > 0) return;
+                        if(!exec.timeoutDone(unit, LogicAI.transferDelay)) return;
 
                         //clear item when dropping to @air
                         if(exec.obj(p1) == Blocks.air){
@@ -516,7 +527,7 @@ public class LExecutor{
                             if(!net.client()){
                                 unit.clearItem();
                             }
-                            ai.itemTimer = LogicAI.transferDelay;
+                            exec.updateTimeout(unit);
                         }else{
                             Building build = exec.building(p1);
                             int dropped = Math.min(unit.stack.amount, exec.numi(p2));
@@ -524,13 +535,13 @@ public class LExecutor{
                                 int accepted = build.acceptStack(unit.item(), dropped, unit);
                                 if(accepted > 0){
                                     Call.transferItemTo(unit, unit.item(), accepted, unit.x, unit.y, build);
-                                    ai.itemTimer = LogicAI.transferDelay;
+                                    exec.updateTimeout(unit);
                                 }
                             }
                         }
                     }
                     case itemTake -> {
-                        if(ai.itemTimer > 0) return;
+                        if(!exec.timeoutDone(unit, LogicAI.transferDelay)) return;
 
                         Building build = exec.building(p1);
                         int amount = exec.numi(p3);
@@ -541,7 +552,7 @@ public class LExecutor{
 
                             if(taken > 0){
                                 Call.takeItems(build, item, taken, unit);
-                                ai.itemTimer = LogicAI.transferDelay;
+                                exec.updateTimeout(unit);
                             }
                         }
                     }
