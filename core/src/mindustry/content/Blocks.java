@@ -2123,6 +2123,7 @@ public class Blocks{
             requirements(Category.liquid, with(Items.titanium, 10, Items.metaglass, 15));
             liquidCapacity = 700f;
             size = 2;
+            solid = true;
         }};
 
         liquidTank = new LiquidRouter("liquid-tank"){{
@@ -2134,6 +2135,7 @@ public class Blocks{
 
         liquidJunction = new LiquidJunction("liquid-junction"){{
             requirements(Category.liquid, with(Items.graphite, 4, Items.metaglass, 8));
+            solid = false;
         }};
 
         bridgeConduit = new LiquidBridge("bridge-conduit"){{
