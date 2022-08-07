@@ -6,6 +6,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.ai.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.TechTree.*;
@@ -283,6 +284,14 @@ public class TypeIO{
         return Nulls.unit;
     }
 
+    public static void writeCommand(Writes write, UnitCommand command){
+        write.b(command.id);
+    }
+
+    public static UnitCommand readCommand(Reads read){
+        return UnitCommand.all.get(read.ub());
+    }
+
     public static void writeEntity(Writes write, Entityc entity){
         write.i(entity == null ? -1 : entity.id());
     }
@@ -441,7 +450,7 @@ public class TypeIO{
             write.b(3);
             write.i(logic.controller.pos());
         }else if(control instanceof CommandAI ai){
-            write.b(4);
+            write.b(6);
             write.bool(ai.attackTarget != null);
             write.bool(ai.targetPos != null);
 
@@ -457,6 +466,7 @@ public class TypeIO{
                     write.i(((Unit)ai.attackTarget).id);
                 }
             }
+            write.b(ai.command == null ? -1 : ai.command.id);
         }else if(control instanceof AssemblerAI){  //hate
             write.b(5);
         }else{
@@ -488,7 +498,8 @@ public class TypeIO{
                 out.controller = world.build(pos);
                 return out;
             }
-        }else if(type == 4){
+            //type 4 is the old CommandAI with no commandIndex, type 6 is the new one with the index as a single byte.
+        }else if(type == 4 || type == 6){
             CommandAI ai = prev instanceof CommandAI pai ? pai : new CommandAI();
 
             boolean hasAttack = read.bool(), hasPos = read.bool();
@@ -509,6 +520,11 @@ public class TypeIO{
                 }
             }else{
                 ai.attackTarget = null;
+            }
+
+            if(type == 6){
+                byte id = read.b();
+                ai.command = id < 0 ? null : UnitCommand.all.get(id);
             }
 
             return ai;

@@ -82,6 +82,8 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
         boolean infinite = state.rules.infiniteResources || team().rules().infiniteResources;
 
         buildCounter += Time.delta;
+        if(Float.isNaN(buildCounter) || Float.isInfinite(buildCounter)) buildCounter = 0f;
+        buildCounter = Math.min(buildCounter, 10f);
 
         while(buildCounter >= 1){
             buildCounter -= 1f;
@@ -96,8 +98,9 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
             //find the next build plan
             if(plans.size > 1){
                 int total = 0;
+                int size = plans.size;
                 BuildPlan plan;
-                while((!within((plan = buildPlan()).tile(), finalPlaceDst) || shouldSkip(plan, core)) && total < plans.size){
+                while((!within((plan = buildPlan()).tile(), finalPlaceDst) || shouldSkip(plan, core)) && total < size){
                     plans.removeFirst();
                     plans.addLast(plan);
                     total++;

@@ -180,7 +180,7 @@ public class MapsDialog extends BaseDialog{
                     mapTable.row();
                 }
 
-                TextButton button = mapTable.button("", Styles.flatt, () -> showMapInfo(map)).width(mapsize).pad(8).get();
+                TextButton button = mapTable.button("", Styles.grayt, () -> showMapInfo(map)).width(mapsize).pad(8).get();
                 button.clearChildren();
                 button.margin(9);
                 button.add(map.name()).width(mapsize - 18f).center().get().setEllipsis(true);

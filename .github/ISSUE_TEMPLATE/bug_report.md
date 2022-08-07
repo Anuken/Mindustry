@@ -7,7 +7,7 @@ assignees: ''
 
 ---
 
-**Platform**: *Android/iOS/Mac/Windows/Linux*
+**Platform**: *The type of device you were playing on - Android/iOS/Mac/Windows/Linux* ("All" is NOT a platform!)
 
 **Build**: *The build number under the title in the main menu. Required. "LATEST" IS NOT A VERSION, I NEED THE EXACT BUILD NUMBER OF YOUR GAME.*
 
