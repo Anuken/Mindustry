@@ -384,6 +384,9 @@ project(":server"){
     dependencies{
         implementation project(":core")
         implementation arcModule("backends:backend-headless")
+        
+        implementation 'org.jline:jline-reader:3.21.0'
+        implementation 'org.jline:jline-terminal-jna:3.21.0'
     }
 }
 
