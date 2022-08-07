@@ -51,7 +51,7 @@ public class PayloadAmmoTurret extends Turret{
         super.setStats();
 
         stats.remove(Stat.itemCapacity);
-        stats.add(Stat.ammo, StatValues.ammo(ammoTypes));
+        stats.add(Stat.ammo, StatValues.ammo(ammoTypes, true));
     }
 
     @Override
@@ -60,8 +60,8 @@ public class PayloadAmmoTurret extends Turret{
             @Override
             public void build(Building build, Table table){
                 MultiReqImage image = new MultiReqImage();
-                content.blocks().each(i -> filter.get(i) && i.unlockedNow(), block -> image.add(new ReqImage(new Image(block.uiIcon),
-                () -> build instanceof PayloadTurretBuild it && !it.payloads.isEmpty() && it.currentBlock() == block)));
+                content.blocks().each(i -> filter.get(i) && i.unlockedNow(), content -> image.add(new ReqImage(new Image(content.uiIcon),
+                () -> build instanceof PayloadTurretBuild it && !it.payloads.isEmpty() && it.currentBlock() == content)));
 
                 table.add(image).size(8 * 4);
             }
@@ -78,7 +78,7 @@ public class PayloadAmmoTurret extends Turret{
             }
         });
 
-        ammoKeys = ammoTypes.keys().toSeq().toArray(Block.class);
+        ammoKeys = ammoTypes.keys().toSeq().toArray(UnlockableContent.class);
 
         super.init();
     }
@@ -87,9 +87,9 @@ public class PayloadAmmoTurret extends Turret{
         public PayloadSeq payloads = new PayloadSeq();
 
         public UnlockableContent currentBlock(){
-            for(var block : ammoKeys){
-                if(payloads.contains(block)){
-                    return block;
+            for(var content : ammoKeys){
+                if(payloads.contains(content)){
+                    return content;
                 }
             }
             return null;
@@ -97,12 +97,12 @@ public class PayloadAmmoTurret extends Turret{
 
         @Override
         public boolean acceptPayload(Building source, Payload payload){
-            return payload instanceof BuildPayload build && payloads.total() < maxAmmo && ammoTypes.containsKey(build.block());
+            return payloads.total() < maxAmmo && ammoTypes.containsKey(payload.content());
         }
 
         @Override
         public void handlePayload(Building source, Payload payload){
-            payloads.add(((BuildPayload)payload).block());
+            payloads.add(payload.content());
         }
 
         @Override
@@ -112,10 +112,10 @@ public class PayloadAmmoTurret extends Turret{
 
         @Override
         public BulletType useAmmo(){
-            for(var block : ammoKeys){
-                if(payloads.contains(block)){
-                    payloads.remove(block);
-                    return ammoTypes.get(block);
+            for(var content : ammoKeys){
+                if(payloads.contains(content)){
+                    payloads.remove(content);
+                    return ammoTypes.get(content);
                 }
             }
             return null;
@@ -123,9 +123,9 @@ public class PayloadAmmoTurret extends Turret{
 
         @Override
         public BulletType peekAmmo(){
-            for(var block : ammoKeys){
-                if(payloads.contains(block)){
-                    return ammoTypes.get(block);
+            for(var content : ammoKeys){
+                if(payloads.contains(content)){
+                    return ammoTypes.get(content);
                 }
             }
             return null;
