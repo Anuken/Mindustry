@@ -24,11 +24,17 @@ import mindustry.net.Packets.*;
 import mindustry.net.*;
 import mindustry.type.*;
 
+import org.jline.reader.EndOfFileException;
+import org.jline.reader.UserInterruptException;
+import org.jline.reader.LineReader;
+import org.jline.reader.LineReaderBuilder;
+import org.jline.terminal.Terminal;
+import org.jline.terminal.TerminalBuilder;
+
 import java.io.*;
 import java.net.*;
 import java.time.*;
 import java.time.format.*;
-import java.util.*;
 
 import static arc.util.ColorCodes.*;
 import static arc.util.Log.*;
@@ -45,14 +51,6 @@ public class ServerControl implements ApplicationListener{
     public final CommandHandler handler = new CommandHandler("");
     public final Fi logFolder = Core.settings.getDataDirectory().child("logs/");
 
-    public Runnable serverInput = () -> {
-        Scanner scan = new Scanner(System.in);
-        while(scan.hasNext()){
-            String line = scan.nextLine();
-            Core.app.post(() -> handleCommandString(line));
-        }
-    };
-
     private Fi currentLogFile;
     private boolean inGameOverWait;
     private Task lastTask;
@@ -64,12 +62,14 @@ public class ServerControl implements ApplicationListener{
     private ServerSocket serverSocket;
     private PrintWriter socketOutput;
     private String suggested;
+    private Terminal terminal;
+    private LineReader lineReader;
 
     public ServerControl(String[] args){
         setup(args);
     }
 
-    protected void setup(String[] args){
+    protected void setup(String[] args) {
         Core.settings.defaults(
             "bans", "",
             "admins", "",
@@ -85,13 +85,30 @@ public class ServerControl implements ApplicationListener{
         }catch(Exception e){ //handle enum parse exception
             lastMode = Gamemode.survival;
         }
-
+        try {
+            terminal = TerminalBuilder.builder().system(true).build();
+            lineReader = LineReaderBuilder
+                    .builder()
+                    .terminal(terminal)
+                    .build();
+        } catch (Exception e){
+            e.printStackTrace();
+            Log.err("Console not loaded. Stopping...");
+            Core.app.exit();
+        }
         logger = (level1, text) -> {
             //err has red text instead of reset.
             if(level1 == LogLevel.err) text = text.replace(reset, lightRed + bold);
 
             String result = bold + lightBlack + "[" + dateTime.format(LocalDateTime.now()) + "] " + reset + format(tags[level1.ordinal()] + " " + text + "&fr");
-            System.out.println(result);
+            //System.out.println(result);
+
+            if (lineReader.isReading()) {
+                lineReader.callWidget(LineReader.CLEAR);
+                lineReader.getTerminal().writer().println(result);
+                lineReader.callWidget(LineReader.REDRAW_LINE);
+                lineReader.callWidget(LineReader.REDISPLAY);
+            } else lineReader.getTerminal().writer().println(result);
 
             if(Config.logging.bool()){
                 logToFile("[" + dateTime.format(LocalDateTime.now()) + "] " + formatColors(tags[level1.ordinal()] + " " + text + "&fr", false));
@@ -1042,6 +1059,23 @@ public class ServerControl implements ApplicationListener{
             r.run();
         }
     }
+
+    public Runnable serverInput = () -> {
+        while(true){
+            try {
+                String line = lineReader.readLine("> ");
+                if (!line.isEmpty())
+                    Core.app.post(() -> handleCommandString(line));
+            } catch (EndOfFileException e) {
+                Core.app.exit();
+            } catch (UserInterruptException e) {
+                Core.app.exit();
+            } catch (Exception e) {
+                Log.err(e);
+                Core.app.exit();
+            }
+        }
+    };
 
     private void logToFile(String text){
         if(currentLogFile != null && currentLogFile.length() > maxLogLength){
