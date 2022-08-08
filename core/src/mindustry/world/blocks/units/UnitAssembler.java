@@ -298,6 +298,8 @@ public class UnitAssembler extends PayloadBlock{
             for(var module : modules){
                 Drawf.selected(module, Pal.accent);
             }
+
+            Drawf.dashRect(Tmp.c1.set(Pal.accent).lerp(Pal.remove, invalidWarmup), getRect(Tmp.r1, x, y, rotation));
         }
 
         @Override
@@ -320,7 +322,7 @@ public class UnitAssembler extends PayloadBlock{
                     prev = mod.block;
                 }
 
-                t.label(() -> "[accent] -> []" + unit().emoji() + " " + unit().name);
+                t.label(() -> "[accent] -> []" + unit().emoji() + " " + unit().localizedName);
             }).pad(4).padLeft(0f).fillX().left();
         }
 
