@@ -198,6 +198,9 @@ public class ErekirTechTree{
                                         node(surgeCrucible, () -> {
 
                                         });
+                                        node(heatRouter, () -> {
+
+                                        });
                                     });
 
                                     node(slagHeater, () -> {
