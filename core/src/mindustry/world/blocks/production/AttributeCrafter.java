@@ -38,8 +38,8 @@ public class AttributeCrafter extends GenericCrafter{
         if(!displayEfficiency) return;
 
         addBar("efficiency", (AttributeCrafterBuild entity) ->
-            new Bar(() ->
-            Core.bundle.format("bar.efficiency", (int)(entity.efficiencyScale() * 100 * displayEfficiencyScale)),
+            new Bar(
+            () -> Core.bundle.format("bar.efficiency", (int)(entity.efficiencyScale() * 100 * displayEfficiencyScale)),
             () -> Pal.lightOrange,
             entity::efficiencyScale));
     }

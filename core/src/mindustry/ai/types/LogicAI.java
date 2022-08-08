@@ -15,7 +15,7 @@ public class LogicAI extends AIController{
 
     public LUnitControl control = LUnitControl.idle;
     public float moveX, moveY, moveRad;
-    public float itemTimer, payTimer, controlTimer = logicControlTimeout, targetTimer;
+    public float controlTimer = logicControlTimeout, targetTimer;
     @Nullable
     public Building controller;
     public BuildPlan plan = new BuildPlan();
@@ -39,8 +39,6 @@ public class LogicAI extends AIController{
 
     @Override
     public void updateMovement(){
-        if(itemTimer >= 0) itemTimer -= Time.delta;
-        if(payTimer >= 0) payTimer -= Time.delta;
 
         if(targetTimer > 0f){
             targetTimer -= Time.delta;
