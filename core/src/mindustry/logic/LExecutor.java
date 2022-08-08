@@ -1645,6 +1645,8 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
+            if(net.client()) return;
+
             float
             spawnX = World.unconv(exec.numf(x)),
             spawnY = World.unconv(exec.numf(y));
