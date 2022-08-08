@@ -155,7 +155,10 @@ public class ControlPathfinder{
         return lastTargetId ++;
     }
 
-    /** @return whether a path is ready */
+    /**
+     * @return whether a path is ready.
+     * @param pathId a unique ID for this location query, which should change every time the 'destination' vector is modified.
+     * */
     public boolean getPathPosition(Unit unit, int pathId, Vec2 destination, Vec2 out){
         //uninitialized
         if(threads == null || !world.tiles.in(World.toTile(destination.x), World.toTile(destination.y))) return false;
