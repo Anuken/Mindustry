@@ -1685,6 +1685,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     }
 
+    /** Calculate your own efficiency multiplier. */
+    public float efficiencyScale(){
+        return 1f;
+    }
+
     public void updateConsumption(){
         //everything is valid when cheating
         if(!block.hasConsumers || cheating()){
