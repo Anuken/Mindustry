@@ -1682,10 +1682,12 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     /** Called after efficiency is updated but before consumers are updated. Use to apply your own multiplier. */
     public void updateEfficiencyMultiplier(){
-
+        float scale = efficiencyScale();
+        efficiency *= scale;
+        optionalEfficiency *= scale;
     }
 
-    /** Calculate your own efficiency multiplier. */
+    /** Calculate your own efficiency multiplier. By default, this is applied in updateEfficiencyMultiplier. */
     public float efficiencyScale(){
         return 1f;
     }
