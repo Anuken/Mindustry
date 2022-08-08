@@ -91,7 +91,7 @@ public class HeatConductor extends Block{
 
         @Override
         public float heatFrac(){
-            return heat / visualMaxHeat;
+            return (heat / visualMaxHeat) / (splitHeat ? 3f : 1);
         }
     }
 }
