@@ -1297,7 +1297,7 @@ public class Blocks{
             researchCostMultiplier = 10f;
 
             size = 3;
-            drawer = new DrawMulti(new DrawDefault(), new DrawHeatOutput(-1, false), new DrawHeatOutput(0, true), new DrawHeatOutput(1, false), new DrawHeatInput("-heat"));
+            drawer = new DrawMulti(new DrawDefault(), new DrawHeatOutput(-1, false), new DrawHeatOutput(), new DrawHeatOutput(1, false), new DrawHeatInput("-heat"));
             regionRotated1 = 1;
             splitHeat = true;
         }};
