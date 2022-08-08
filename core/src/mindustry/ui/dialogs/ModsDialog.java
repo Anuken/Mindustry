@@ -60,7 +60,7 @@ public class ModsDialog extends BaseDialog{
                 searchtxt = res;
                 rebuildBrowser();
             }).growX().get();
-            table.button(Icon.list, Styles.clearNonei, 32f, () -> {
+            table.button(Icon.list, Styles.emptyi, 32f, () -> {
                 orderDate = !orderDate;
                 rebuildBrowser();
             }).update(b -> b.getStyle().imageUp = (orderDate ? Icon.list : Icon.star)).size(40f).get()
