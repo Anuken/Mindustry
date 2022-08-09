@@ -24,16 +24,14 @@ public class PointBulletType extends BulletType{
     public void init(Bullet b){
         super.init(b);
 
-        float px = b.x + b.lifetime * b.vel.x,
-            py = b.y + b.lifetime * b.vel.y,
-            rot = b.rotation();
+        float rot = b.rotation();
 
-        Geometry.iterateLine(0f, b.x, b.y, px, py, trailSpacing, (x, y) -> {
+        Geometry.iterateLine(0f, b.x, b.y, b.aimX, b.aimY, trailSpacing, (x, y) -> {
             trailEffect.at(x, y, rot);
         });
 
         b.time = b.lifetime;
-        b.set(px, py);
+        b.set(b.aimX, b.aimY);
 
         //calculate hit entity
 
@@ -41,13 +39,13 @@ public class PointBulletType extends BulletType{
         result = null;
         float range = 1f;
 
-        Units.nearbyEnemies(b.team, px - range, py - range, range*2f, range*2f, e -> {
+        Units.nearbyEnemies(b.team, b.aimX - range, b.aimY - range, range * 2f, range * 2f, e -> {
             if(e.dead()) return;
 
             e.hitbox(Tmp.r1);
-            if(!Tmp.r1.contains(px, py)) return;
+            if(!Tmp.r1.contains(b.aimX, b.aimY)) return;
 
-            float dst = e.dst(px, py) - e.hitSize;
+            float dst = e.dst(b.aimX, b.aimY) - e.hitSize;
             if((result == null || dst < cdist)){
                 result = e;
                 cdist = dst;
@@ -55,9 +53,9 @@ public class PointBulletType extends BulletType{
         });
 
         if(result != null){
-            b.collision(result, px, py);
+            b.collision(result, b.aimX, b.aimY);
         }else{
-            Building build = Vars.world.buildWorld(px, py);
+            Building build = Vars.world.buildWorld(b.aimX, b.aimY);
             if(build != null && build.team != b.team){
                 build.collision(b);
             }
