@@ -3871,7 +3871,7 @@ public class Blocks{
                 hitEffect = despawnEffect = Fx.hitBulletColor;
                 buildingDamageMultiplier = 0.3f;
             }},
-            Items.tungsten, new BasicBulletType(8f, 165){{
+            Items.tungsten, new BasicBulletType(8f, 95){{
                 width = 13f;
                 height = 19f;
                 hitSize = 7f;
