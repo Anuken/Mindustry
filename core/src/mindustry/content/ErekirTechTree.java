@@ -114,12 +114,12 @@ public class ErekirTechTree{
                         });
 
                         node(constructor, Seq.with(new OnSector(split)), () -> {
-                            node(smallDeconstructor, Seq.with(tmpNever), () -> {
-                                node(largeConstructor, () -> {
+                            node(smallDeconstructor, Seq.with(new OnSector(peaks)), () -> {
+                                node(largeConstructor, Seq.with(tmpNever), () -> {
 
                                 });
 
-                                node(deconstructor, () -> {
+                                node(deconstructor, Seq.with(tmpNever), () -> {
 
                                 });
                             });
@@ -153,14 +153,14 @@ public class ErekirTechTree{
                         });
                     });
 
-                    node(beamTower, Seq.with(tmpNever), () -> {
+                    node(beamTower, Seq.with(new OnSector(peaks)), () -> {
 
                     });
 
 
-                    node(regenProjector, Seq.with(tmpNever), () -> {
+                    node(regenProjector, Seq.with(new OnSector(peaks)), () -> {
                         //TODO more tiers of build tower or "support" structures like overdrive projectors
-                        node(buildTower, Seq.with(new OnSector(basin)), () -> {
+                        node(buildTower, Seq.with(tmpNever), () -> {
                             node(shockwaveTower, () -> {
 
                             });
@@ -304,11 +304,11 @@ public class ErekirTechTree{
                             node(mechRefabricator, Seq.with(new OnSector(basin)), () -> {
                                 node(UnitTypes.cleroi);
 
-                                node(shipRefabricator, Seq.with(new OnSector(basin), tmpNever), () -> {
+                                node(shipRefabricator, Seq.with(new OnSector(peaks)), () -> {
                                     node(UnitTypes.avert);
 
                                     //TODO
-                                    node(primeRefabricator, () -> {
+                                    node(primeRefabricator, Seq.with(tmpNever), () -> {
                                         node(UnitTypes.precept);
                                         node(UnitTypes.anthicus);
                                         node(UnitTypes.obviate);
