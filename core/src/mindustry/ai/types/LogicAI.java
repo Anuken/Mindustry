@@ -60,7 +60,7 @@ public class LogicAI extends AIController{
                 moveTo(Tmp.v1.set(moveX, moveY), 1f, 30f);
             }
             case approach -> {
-                moveTo(Tmp.v1.set(moveX, moveY), moveRad - 7f, 7);
+                moveTo(Tmp.v1.set(moveX, moveY), moveRad - 7f, 7, true, null);
             }
             case stop -> {
                 unit.clearBuilding();
