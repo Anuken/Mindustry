@@ -5754,7 +5754,8 @@ public class Blocks{
 
         worldCell = new MemoryBlock("world-cell"){{
             requirements(Category.logic, BuildVisibility.editorOnly, with());
-
+            
+            targetable = false;
             privileged = true;
             memoryCapacity = 128;
             forceDark = true;
