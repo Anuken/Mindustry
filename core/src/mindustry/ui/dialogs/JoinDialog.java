@@ -402,7 +402,7 @@ public class JoinDialog extends BaseDialog{
             t.add("@search").padRight(10);
             t.field(serverSearch, text ->
                 serverSearch = text.trim().replaceAll(" +", " ").toLowerCase()
-            ).grow().pad(8);
+            ).grow().pad(8).get().keyDown(KeyCode.enter, this::refreshCommunity);
             t.button(Icon.zoom, Styles.emptyi, this::refreshCommunity).size(54f);
         }).width(targetWidth()).height(70f).pad(4).row();
 
@@ -422,14 +422,11 @@ public class JoinDialog extends BaseDialog{
                 net.pingHost(resaddress, resport, res -> {
                     if(refreshes != cur) return;
 
-                    if(!serverSearch.isEmpty()){
-                        if(!(group.name.toLowerCase().contains(serverSearch)
-                            || res.name.toLowerCase().contains(serverSearch)
-                            || res.description.toLowerCase().contains(serverSearch)
-                            || res.mapname.toLowerCase().contains(serverSearch)
-                            || (res.modeName != null && res.modeName.toLowerCase().contains(serverSearch))))
-                            return;
-                    }
+                    if(!serverSearch.isEmpty() && !(group.name.toLowerCase().contains(serverSearch)
+                        || res.name.toLowerCase().contains(serverSearch)
+                        || res.description.toLowerCase().contains(serverSearch)
+                        || res.mapname.toLowerCase().contains(serverSearch)
+                        || (res.modeName != null && res.modeName.toLowerCase().contains(serverSearch)))) return;
 
                     //add header
                     if(groupTable[0] == null){
