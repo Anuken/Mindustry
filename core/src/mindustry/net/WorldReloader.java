@@ -3,6 +3,7 @@ package mindustry.net;
 import arc.struct.*;
 import arc.struct.Seq.*;
 import mindustry.gen.*;
+import mindustry.io.*;
 
 import static mindustry.Vars.*;
 
@@ -29,6 +30,7 @@ public class WorldReloader{
             }
 
             logic.reset();
+            SaveIO.justReset = true;
 
             Call.worldDataBegin();
         }else{

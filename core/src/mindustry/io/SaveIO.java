@@ -21,6 +21,7 @@ public class SaveIO{
     public static final byte[] header = {'M', 'S', 'A', 'V'};
     public static final IntMap<SaveVersion> versions = new IntMap<>();
     public static final Seq<SaveVersion> versionArray = Seq.with(new Save1(), new Save2(), new Save3(), new Save4(), new Save5(), new Save6(), new Save7());
+    public static boolean justReset = false;
 
     static{
         for(SaveVersion version : versionArray){
@@ -157,7 +158,8 @@ public class SaveIO{
     /** Loads from a deflated (!) input stream. */
     public static void load(InputStream is, WorldContext context) throws SaveException{
         try(CounterInputStream counter = new CounterInputStream(is); DataInputStream stream = new DataInputStream(counter)){
-            logic.reset();
+            if(!justReset) logic.reset();
+            justReset = false;
             readHeader(stream);
             int version = stream.readInt();
             SaveVersion ver = versions.get(version);

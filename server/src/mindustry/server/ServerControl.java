@@ -345,6 +345,7 @@ public class ServerControl implements ApplicationListener{
             lastMode = preset;
             Core.settings.put("lastServerMode", lastMode.name());
             try{
+                SaveIO.justReset = true;
                 world.loadMap(result, result.applyRules(lastMode));
                 state.rules = result.applyRules(preset);
                 logic.play();

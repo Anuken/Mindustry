@@ -347,6 +347,7 @@ public class Control implements ApplicationListener, Loadable{
     public void playMap(Map map, Rules rules, boolean playtest){
         ui.loadAnd(() -> {
             logic.reset();
+            SaveIO.justReset = true;
             world.loadMap(map, rules);
             state.rules = rules;
             if(playtest) state.playtestingMap = map;
