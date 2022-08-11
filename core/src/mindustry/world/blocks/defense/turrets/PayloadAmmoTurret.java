@@ -10,7 +10,6 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
-import mindustry.world.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
@@ -60,10 +59,17 @@ public class PayloadAmmoTurret extends Turret{
             @Override
             public void build(Building build, Table table){
                 MultiReqImage image = new MultiReqImage();
-                content.blocks().each(i -> filter.get(i) && i.unlockedNow(), content -> image.add(new ReqImage(new Image(content.uiIcon),
-                () -> build instanceof PayloadTurretBuild it && !it.payloads.isEmpty() && it.currentBlock() == content)));
+
+                for(var block : content.blocks()) displayContent(build, image, block);
+                for(var unit : content.units()) displayContent(build, image, unit);
 
                 table.add(image).size(8 * 4);
+            }
+
+            void displayContent(Building build, MultiReqImage image, UnlockableContent content){
+                if(filter.get(content) && content.unlockedNow()){
+                    image.add(new ReqImage(new Image(content.uiIcon), () -> build instanceof PayloadTurretBuild it && !it.payloads.isEmpty() && it.currentAmmo() == content));
+                }
             }
 
             @Override
@@ -86,7 +92,7 @@ public class PayloadAmmoTurret extends Turret{
     public class PayloadTurretBuild extends TurretBuild{
         public PayloadSeq payloads = new PayloadSeq();
 
-        public UnlockableContent currentBlock(){
+        public UnlockableContent currentAmmo(){
             for(var content : ammoKeys){
                 if(payloads.contains(content)){
                     return content;

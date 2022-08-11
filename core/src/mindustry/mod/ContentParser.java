@@ -360,6 +360,15 @@ public class ContentParser{
                     return (T)fromJson(ItemStack.class, "{item: " + split[0] + ", amount: " + split[1] + "}");
                 }
 
+                //try to parse "payloaditem/amount" syntax
+                if(type == PayloadStack.class && jsonData.isString() && jsonData.asString().contains("/")){
+                    String[] split = jsonData.asString().split("/");
+                    int number = Strings.parseInt(split[1], 1);
+                    UnlockableContent cont = content.unit(split[0]) == null ? content.block(split[0]) : content.unit(split[0]);
+
+                    return (T)new PayloadStack(cont == null ? Blocks.router : cont, number);
+                }
+
                 //try to parse "liquid/amount" syntax
                 if(jsonData.isString() && jsonData.asString().contains("/")){
                     String[] split = jsonData.asString().split("/");

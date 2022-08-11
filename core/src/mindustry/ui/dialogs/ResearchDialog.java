@@ -679,8 +679,7 @@ public class ResearchDialog extends BaseDialog{
                         disabledFontColor = Color.gray;
                         up = buttonOver;
                         over = buttonDown;
-                    }}, () -> spend(node))
-                    .disabled(i -> !canSpend(node)).growX().height(44f).colspan(3);
+                    }}, () -> spend(node)).disabled(i -> !canSpend(node)).growX().height(44f).colspan(3);
                 }
             });
 
