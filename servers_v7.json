@@ -1,7 +1,12 @@
 [
+  
   {
-    "name": "distributorium",
+    "name": "mindustry.pl",
     "address": ["0.baseduser.eu.org:6966", "0.baseduser.eu.org:6666", "0.baseduser.eu.org:6000"]
+  },
+  {
+    "name": "SynapseOS",
+    "address": ["0nera.ru:7777", "185.178.45.224:7777"]
   },
   {
     "name": "C.A.M.S.",
@@ -13,19 +18,19 @@
   },
   {
     "name": "HexPvP Network",
-    "address": ["hexpvp.ml"]
+    "address": ["hexpvp.ml", "kycb42148.ddns.net:6614"]
   },
   {
     "name": "Omega Hub",
-    "address": ["n1.yeet.ml:6572", "n1.yeet.ml:6573"]
+    "address": ["n1.yeet.ml:6572", "n1.yeet.ml:6573", "n1.yeet.ml:6604", "n1.yeet.ml:6605"]
   },
   {
-    "name": "MeowLand",
+    "name": "KMWStudios",
     "address": ["meowland.ru"]
   },
   {
-    "name": "DarkDustry",
-    "address": ["darkdustry.ml", "darkdustry.ml:5000", "darkdustry.ml:6000", "darkdustry.ml:7000", "darkdustry.ml:8000", "darkdustry.ml:9000"] 
+    "name": "Darkdustry",
+    "address": ["darkdustry.tk", "darkdustry.tk:5000", "darkdustry.tk:6000", "darkdustry.tk:7000", "darkdustry.tk:8000", "darkdustry.tk:9000"] 
   },
   {
     "name": "Chaotic Neutral",
@@ -48,24 +53,16 @@
     "address": ["mindustry.kr"]
   },
   {
-    "name": "SubZero",
-    "address": ["minty-server.ddns.net"]
-  },
-  {
     "name": "Phoenix Network",
-    "address": ["172.104.253.198", "172.104.253.198:6464"]
+    "address": ["phoenix-network.dev", "phoenix-network.dev:6464"]
   },
   {
     "name": "Xpdustry",
-    "address": ["n1.xpdustry.fr:7000"]
+    "address": ["play.xpdustry.fr"]
   },
   {
     "name": "Pandorum",
     "address": ["pandorum.su:5018", "pandorum.su:5019", "pandorum.su:5020"]
-  },
-  {
-    "name": "MindustryBR",
-    "address": ["mindustryptbr.myddns.me"]
   },
   {
     "name": "LostDustry",
@@ -89,14 +86,18 @@
   },
   {
     "name": "TinyLake",
-    "address": ["mdt.wayzer.cf"]
-  },
-  {
-    "name": "[CIG]Potato",
-    "address": ["mindustry.vicp.io:6800", "mindustry.vicp.io:7000", "mindustry.vicp.io:6567"]
+    "address": ["mindustry.top","g.mindustry.top"]
   },
   {
     "name": "Harders",
-    "address": ["212.20.42.61:6567", "212.20.42.61:6568", "212.20.42.61:6569"]
-  }
+    "address": ["212.20.42.61:6567", "212.20.42.61:6568", "212.20.42.61:6569", "212.20.42.61:6570", "212.20.42.61:6571", "212.20.42.61:6572", "212.20.42.61:6573"]
+  },
+  {
+    "name": "OMNIDUSTRY",
+    "address": ["109.94.209.233:6569","109.94.209.233:6570","109.94.209.233:6571","109.94.209.233:6572","109.94.209.233:6573"]
+  },
+  {
+    "name": "The Devil",
+    "address": ["dc8.i8mc.cn:8169", "dc8.i8mc.cn:8920", "other.xem8k5.top:10530"]
+  }  
 ]

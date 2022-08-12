@@ -11,7 +11,6 @@ import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.ctype.*;
 import mindustry.gen.*;
-import mindustry.graphics.*;
 import mindustry.logic.LCanvas.*;
 import mindustry.logic.LExecutor.*;
 import mindustry.type.*;
@@ -1264,7 +1263,7 @@ public class LStatements{
 
             fields(table, unit, str -> unit = str);
 
-            if(!clear){
+            if(!clear && !(content.statusEffect(effect) != null && content.statusEffect(effect).permanent)){
 
                 table.add(" for ");
 

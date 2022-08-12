@@ -28,7 +28,7 @@ public class IconConverter{
             }
         }
 
-        Seq<String> args = Seq.with("inkscape", "--batch-process", "--verb", "EditSelectAll;SelectionUnion;FitCanvasToSelectionOrDrawing;FileSave");
+        Seq<String> args = Seq.with("inkscape", "--batch-process", "--actions", "select-all; path-union; fit-canvas-to-selection; export-overwrite; export-do");
         args.addAll(files.map(Fi::absolutePath));
 
         Fi.get("fontgen/extra").findAll().each(f -> f.copyTo(Fi.get("fontgen/icons").child(f.name())));

@@ -305,12 +305,16 @@ public class UI implements ApplicationListener, Loadable{
     }
 
     public void showInfoFade(String info){
+        showInfoFade(info,  7f);
+    }
+
+    public void showInfoFade(String info, float duration){
         var cinfo = Core.scene.find("coreinfo");
         Table table = new Table();
         table.touchable = Touchable.disabled;
         table.setFillParent(true);
         if(cinfo.visible && !state.isMenu()) table.marginTop(cinfo.getPrefHeight() / Scl.scl() / 2);
-        table.actions(Actions.fadeOut(7f, Interp.fade), Actions.remove());
+        table.actions(Actions.fadeOut(duration, Interp.fade), Actions.remove());
         table.top().add(info).style(Styles.outlineLabel).padTop(10);
         Core.scene.add(table);
     }

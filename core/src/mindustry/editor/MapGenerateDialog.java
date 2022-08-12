@@ -294,7 +294,9 @@ public class MapGenerateDialog extends BaseDialog{
                     }
 
                     t.button(Icon.copy, style, () -> {
-                        filters.insert(filters.indexOf(filter), filter);
+                        GenerateFilter copy = filter.copy();
+                        copy.randomize();
+                        filters.insert(filters.indexOf(filter) + 1, copy);
                         rebuildFilters();
                         update();
                     }).tooltip("@editor.copy");

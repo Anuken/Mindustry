@@ -345,9 +345,9 @@ public class Turret extends ReloadTurret{
 
             float warmupTarget = isShooting() && canConsume() ? 1f : 0f;
             if(linearWarmup){
-                shootWarmup = Mathf.approachDelta(shootWarmup, warmupTarget, shootWarmupSpeed);
+                shootWarmup = Mathf.approachDelta(shootWarmup, warmupTarget, shootWarmupSpeed * (warmupTarget > 0 ? efficiency : 1f));
             }else{
-                shootWarmup = Mathf.lerpDelta(shootWarmup, warmupTarget, shootWarmupSpeed);
+                shootWarmup = Mathf.lerpDelta(shootWarmup, warmupTarget, shootWarmupSpeed * (warmupTarget > 0 ? efficiency : 1f));
             }
 
             wasShooting = false;
@@ -391,6 +391,11 @@ public class Turret extends ReloadTurret{
                         targetPosition(target);
 
                         if(Float.isNaN(rotation)) rotation = 0;
+                    }
+
+                    if(!isControlled()){
+                        unit.aimX(targetPos.x);
+                        unit.aimY(targetPos.y);
                     }
 
                     float targetRot = angleTo(targetPos);

@@ -6,6 +6,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.ai.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.entities.*;
@@ -76,7 +77,7 @@ public class UnitTypes{
     //special block unit type
     public static @EntityDef({Unitc.class, BlockUnitc.class}) UnitType block;
 
-    //special tethered (has payload capability, because it's necessary sometimes)
+    //special building tethered (has payload capability, because it's necessary sometimes)
     public static @EntityDef({Unitc.class, BuildingTetherc.class, Payloadc.class}) UnitType manifold, assemblyDrone;
 
     //tank
@@ -1247,7 +1248,10 @@ public class UnitTypes{
         //region air support
 
         mono = new UnitType("mono"){{
+            //there's no reason to command monos anywhere. it's just annoying.
             controller = u -> new MinerAI();
+
+            defaultCommand = UnitCommand.mineCommand;
 
             flying = true;
             drag = 0.06f;
@@ -1266,7 +1270,7 @@ public class UnitTypes{
         }};
 
         poly = new UnitType("poly"){{
-            controller = u -> new BuilderAI();
+            defaultCommand = UnitCommand.rebuildCommand;
 
             flying = true;
             drag = 0.05f;
@@ -1320,7 +1324,7 @@ public class UnitTypes{
         }};
 
         mega = new UnitType("mega"){{
-            controller = u -> new RepairAI();
+            defaultCommand = UnitCommand.repairCommand;
 
             mineTier = 3;
             mineSpeed = 4f;
@@ -3377,26 +3381,28 @@ public class UnitTypes{
             shadowElevation = 0.4f;
             groundLayer = Layer.legUnit;
 
+            targetAir = false;
+
             weapons.add(new Weapon("collaris-weapon"){{
                 mirror = true;
                 rotationLimit = 30f;
                 rotateSpeed = 0.4f;
                 rotate = true;
 
-                x = 43 / 4f;
-                y = -20f / 4f;
-                shootY = 37 / 4f;
-                shootX = -5f / 4f;
-                recoil = 3f;
-                reload = 30f;
-                shake = 2f;
-                cooldownTime = 20f;
+                x = 48 / 4f;
+                y = -28f / 4f;
+                shootY = 64f / 4f;
+                recoil = 4f;
+                reload = 130f;
+                cooldownTime = reload * 1.2f;
+                shake = 7f;
                 layerOffset = 0.02f;
+                shadow = 10f;
 
-                shoot.shots = 3;
-                shoot.shotDelay = 3f;
-                inaccuracy = 2f;
-                velocityRnd = 0.1f;
+                shootStatus = StatusEffects.slow;
+                shootStatusDuration = reload + 1f;
+
+                shoot.shots = 1;
                 heatColor = Color.red;
 
                 for(int i = 0; i < 5; i++){
@@ -3417,39 +3423,88 @@ public class UnitTypes{
                     }});
                 }
 
-                bullet = new BasicBulletType(9f, 85){{
-                    pierceCap = 2;
-                    pierceBuilding = true;
-
-                    lifetime = 30f;
+                bullet = new ArtilleryBulletType(5.5f, 300){{
+                    collidesTiles = collides = true;
+                    lifetime = 75f;
                     shootEffect = Fx.shootBigColor;
                     smokeEffect = Fx.shootSmokeSquareBig;
                     frontColor = Color.white;
+                    trailEffect = new MultiEffect(Fx.artilleryTrail, Fx.artilleryTrailSmoke);
                     hitSound = Sounds.none;
-                    width = 12f;
-                    height = 20f;
+                    width = 18f;
+                    height = 24f;
 
                     lightColor = trailColor = hitColor = backColor = Pal.techBlue;
                     lightRadius = 40f;
                     lightOpacity = 0.7f;
 
-                    trailWidth = 2.2f;
-                    trailLength = 8;
+                    trailWidth = 4.5f;
+                    trailLength = 19;
                     trailChance = -1f;
 
                     despawnEffect = Fx.none;
 
                     hitEffect = despawnEffect = new ExplosionEffect(){{
-                        lifetime = 30f;
-                        waveStroke = 2f;
+                        lifetime = 34f;
+                        waveStroke = 4f;
                         waveColor = sparkColor = trailColor;
-                        waveRad = 5f;
+                        waveRad = 25f;
                         smokeSize = 0f;
                         smokeSizeBase = 0f;
-                        sparks = 5;
-                        sparkRad = 20f;
-                        sparkLen = 6f;
-                        sparkStroke = 2f;
+                        sparks = 10;
+                        sparkRad = 25f;
+                        sparkLen = 8f;
+                        sparkStroke = 3f;
+                    }};
+
+                    splashDamage = 90f;
+                    splashDamageRadius = 20f;
+
+                    fragBullets = 15;
+                    fragVelocityMin = 0.5f;
+                    fragRandomSpread = 130f;
+                    fragLifeMin = 0.3f;
+                    despawnShake = 5f;
+
+                    fragBullet = new BasicBulletType(5.5f, 60){{
+                        pierceCap = 2;
+                        pierceBuilding = true;
+
+                        homingPower = 0.09f;
+                        homingRange = 150f;
+
+                        lifetime = 50f;
+                        shootEffect = Fx.shootBigColor;
+                        smokeEffect = Fx.shootSmokeSquareBig;
+                        frontColor = Color.white;
+                        hitSound = Sounds.none;
+                        width = 12f;
+                        height = 20f;
+
+                        lightColor = trailColor = hitColor = backColor = Pal.techBlue;
+                        lightRadius = 40f;
+                        lightOpacity = 0.7f;
+
+                        trailWidth = 2.2f;
+                        trailLength = 7;
+                        trailChance = -1f;
+
+                        despawnEffect = Fx.none;
+                        splashDamage = 50f;
+                        splashDamageRadius = 30f;
+
+                        hitEffect = despawnEffect = new MultiEffect(new ExplosionEffect(){{
+                            lifetime = 30f;
+                            waveStroke = 2f;
+                            waveColor = sparkColor = trailColor;
+                            waveRad = 5f;
+                            smokeSize = 0f;
+                            smokeSizeBase = 0f;
+                            sparks = 5;
+                            sparkRad = 20f;
+                            sparkLen = 6f;
+                            sparkStroke = 2f;
+                        }}, Fx.blastExplosion);
                     }};
                 }};
             }});

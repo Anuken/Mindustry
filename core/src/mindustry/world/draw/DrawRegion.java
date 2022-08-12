@@ -13,7 +13,7 @@ public class DrawRegion extends DrawBlock{
     public String suffix = "";
     public boolean spinSprite = false;
     public boolean drawPlan = true;
-    public float rotateSpeed, x, y;
+    public float rotateSpeed, x, y, rotation;
     /** Any number <=0 disables layer changes. */
     public float layer = -1;
 
@@ -29,9 +29,9 @@ public class DrawRegion extends DrawBlock{
         float z = Draw.z();
         if(layer > 0) Draw.z(layer);
         if(spinSprite){
-            Drawf.spinSprite(region, build.x + x, build.y + y, build.totalProgress() * rotateSpeed);
+            Drawf.spinSprite(region, build.x + x, build.y + y, build.totalProgress() * rotateSpeed + rotation);
         }else{
-            Draw.rect(region, build.x + x, build.y + y, build.totalProgress() * rotateSpeed);
+            Draw.rect(region, build.x + x, build.y + y, build.totalProgress() * rotateSpeed + rotation);
         }
         Draw.z(z);
     }

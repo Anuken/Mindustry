@@ -13,12 +13,13 @@
     "address": "c-n.ddns.net:6567"
   },
   {
-    "address": "n1.xpdustry.fr:8000"
-  },
-  {
-    "address": "mindustry.vicp.io:7000" 
+    "address": "be.xpdustry.fr"
   },
   {
     "address": "n1.yeet.ml:6574"
+  },
+  {
+    "name":"Phoenix-Network",
+    "address":["be.phoenix-network.dev"]
   }
 ]

@@ -36,6 +36,7 @@ import mindustry.world.consumers.*;
 import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
+import static mindustry.Vars.*;
 import static mindustry.type.ItemStack.*;
 
 public class Blocks{
@@ -76,7 +77,7 @@ public class Blocks{
     carbideCrucible, slagCentrifuge, surgeCrucible, cyanogenSynthesizer, phaseSynthesizer, heatReactor,
 
     //sandbox
-    powerSource, powerVoid, itemSource, itemVoid, liquidSource, liquidVoid, payloadSource, payloadVoid, illuminator,
+    powerSource, powerVoid, itemSource, itemVoid, liquidSource, liquidVoid, payloadSource, payloadVoid, illuminator, heatSource,
 
     //defense
     copperWall, copperWallLarge, titaniumWall, titaniumWallLarge, plastaniumWall, plastaniumWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge,
@@ -92,7 +93,7 @@ public class Blocks{
     //defense - erekir
     radar,
     buildTower,
-    regenProjector, barrierProjector,
+    regenProjector, barrierProjector, shockwaveTower,
     //campaign only
     shieldProjector,
     largeShieldProjector,
@@ -103,7 +104,7 @@ public class Blocks{
     overflowGate, underflowGate, massDriver,
 
     //transport - alternate
-    duct, armoredDuct, ductRouter, overflowDuct, ductBridge, ductUnloader,
+    duct, armoredDuct, ductRouter, overflowDuct, underflowDuct, ductBridge, ductUnloader,
     surgeConveyor, surgeRouter,
 
     unitCargoLoader, unitCargoUnloadPoint,
@@ -119,8 +120,7 @@ public class Blocks{
     impactReactor, battery, batteryLarge, powerNode, powerNodeLarge, surgeTower, diode,
 
     //power - erekir
-    //TODO rename chemicalCombustionChamber
-    turbineCondenser, ventCondenser, chemicalCombustionChamber, pyrolysisGenerator,
+    turbineCondenser, ventCondenser, chemicalCombustionChamber, pyrolysisGenerator, fluxReactor, neoplasiaReactor,
     beamNode, beamTower, beamLink,
 
     //production
@@ -128,7 +128,7 @@ public class Blocks{
     cliffCrusher, plasmaBore, largePlasmaBore, impactDrill, eruptionDrill,
 
     //storage
-    coreShard, coreFoundation, /*TODO core foundation is a bad name, rename to fragment */ coreNucleus, vault, container, unloader,
+    coreShard, coreFoundation, coreNucleus, vault, container, unloader,
     //storage - erekir
     coreBastion, coreCitadel, coreAcropolis, reinforcedContainer, reinforcedVault,
 
@@ -136,7 +136,7 @@ public class Blocks{
     duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, foreshadow, spectre, meltdown, segment, parallax, tsunami,
 
     //turrets - erekir
-    breach, diffuse, sublimate, titan, disperse, afflict, lustre, scathe,
+    breach, diffuse, sublimate, titan, disperse, afflict, lustre, scathe, smite, malign,
 
     //units
     groundFactory, airFactory, navalFactory,
@@ -163,7 +163,6 @@ public class Blocks{
     worldProcessor, worldCell,
 
     //campaign
-    //TODO launch pad on erekir, 5x5, uses nuclear(?) fuel
     launchPad, interplanetaryAccelerator
 
     ;
@@ -446,7 +445,6 @@ public class Blocks{
         }};
 
         redIce = new Floor("red-ice"){{
-            //TODO red ice boulder
             dragMultiplier = 0.4f;
             speedMultiplier = 0.9f;
             attributes.set(Attribute.water, 0.4f);
@@ -456,11 +454,10 @@ public class Blocks{
             speedMultiplier = 0.3f;
             variants = 0;
             liquidDrop = Liquids.arkycite;
-            liquidMultiplier = 1.5f;
             isLiquid = true;
-            //TODO status, cache layer for this crap
-            status = StatusEffects.wet;
-            statusDuration = 120f;
+            //TODO no status for now
+            //status = StatusEffects.slow;
+            //statusDuration = 120f;
             drownTime = 200f;
             cacheLayer = CacheLayer.arkycite;
             albedo = 0.9f;
@@ -470,7 +467,6 @@ public class Blocks{
             variants = 3;
         }};
 
-        //TODO different vent colors
         rhyoliteVent = new SteamVent("rhyolite-vent"){{
             parent = blendGroup = rhyolite;
             attributes.set(Attribute.steam, 1f);
@@ -1000,7 +996,7 @@ public class Blocks{
             solid = true;
             outputsLiquid = true;
             envEnabled = Env.any;
-            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(Liquids.cryofluid), new DrawDefault());
+            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(Liquids.water), new DrawLiquidTile(Liquids.cryofluid){{drawLiquidLight = true;}}, new DrawDefault());
             liquidCapacity = 24f;
             craftTime = 120;
 
@@ -1092,8 +1088,11 @@ public class Blocks{
             hasPower = true;
             craftEffect = Fx.none;
             drawer = new DrawMulti(
+            new DrawRegion("-bottom"),
+            new DrawPistons(){{
+                sinMag = 1f;
+            }},
             new DrawDefault(),
-            new DrawFrames(),
             new DrawLiquidRegion(),
             new DrawRegion("-top")
             );
@@ -1161,7 +1160,6 @@ public class Blocks{
             consumePower(6f);
         }};
 
-        //TODO better name
         electrolyzer = new GenericCrafter("electrolyzer"){{
             requirements(Category.crafting, with(Items.silicon, 50, Items.graphite, 40, Items.beryllium, 130, Items.tungsten, 80));
             size = 3;
@@ -1222,7 +1220,6 @@ public class Blocks{
 
             heatRequirement = 6f;
 
-            //TODO continuous output
             outputLiquid = new LiquidStack(Liquids.nitrogen, 4f / 60f);
         }};
 
@@ -1257,7 +1254,7 @@ public class Blocks{
             size = 2;
             heatOutput = 3f;
             regionRotated1 = 1;
-            consumePower(50f / 60f);
+            consumePower(100f / 60f);
         }};
         
         slagHeater = new HeatProducer("slag-heater"){{
@@ -1380,10 +1377,9 @@ public class Blocks{
             }});
 
             consumeItem(Items.silicon, 3);
-            //TODO must consume from 2 pumps, 1, or 1.5?
             //TODO consume hydrogen/ozone?
             consumeLiquid(Liquids.slag, 40f / 60f);
-            consumePower(2f); //TODO necessary?
+            consumePower(2f);
         }};
 
         cyanogenSynthesizer = new HeatCrafter("cyanogen-synthesizer"){{
@@ -1415,7 +1411,6 @@ public class Blocks{
             consumePower(2f);
         }};
 
-        //TODO bad name, and there's no use for phase yet...
         phaseSynthesizer = new HeatCrafter("phase-synthesizer"){{
             requirements(Category.crafting, with(Items.carbide, 90, Items.silicon, 100, Items.thorium, 100, Items.tungsten, 200));
 
@@ -1512,7 +1507,6 @@ public class Blocks{
             envDisabled |= Env.scorching;
         }};
 
-        //TODO all these should be hidden from view completely
         thoriumWall = new Wall("thorium-wall"){{
             requirements(Category.defense, with(Items.thorium, 6));
             health = 200 * wallHealthMultiplier;
@@ -1678,7 +1672,7 @@ public class Blocks{
         }};
 
         shieldedWall = new ShieldWall("shielded-wall"){{
-            requirements(Category.defense, ItemStack.with(Items.phaseFabric, 20, Items.surgeAlloy, 12));
+            requirements(Category.defense, ItemStack.with(Items.phaseFabric, 20, Items.surgeAlloy, 12, Items.beryllium, 12));
             consumePower(3f / 60f);
 
             outputsPower = false;
@@ -1821,6 +1815,13 @@ public class Blocks{
             cooldownBrokenBase = 0.35f;
 
             consumePower(4f);
+        }};
+
+        shockwaveTower = new ShockwaveTower("shockwave-tower"){{
+            requirements(Category.effect, with(Items.surgeAlloy, 50, Items.silicon, 150, Items.oxide, 30, Items.tungsten, 100));
+            size = 3;
+            consumeLiquids(LiquidStack.with(Liquids.cyanogen, 1f / 60f));
+            consumePower(100f / 60f);
         }};
 
         //TODO 5x5??
@@ -1988,6 +1989,15 @@ public class Blocks{
             researchCostMultiplier = 1.5f;
         }};
 
+        underflowDuct = new OverflowDuct("underflow-duct"){{
+            requirements(Category.distribution, with(Items.graphite, 8, Items.beryllium, 8));
+            health = 90;
+            speed = 4f;
+            solid = false;
+            researchCostMultiplier = 1.5f;
+            invert = true;
+        }};
+
         ductBridge = new DuctBridge("duct-bridge"){{
             requirements(Category.distribution, with(Items.beryllium, 20));
             health = 90;
@@ -2113,17 +2123,20 @@ public class Blocks{
             requirements(Category.liquid, with(Items.titanium, 10, Items.metaglass, 15));
             liquidCapacity = 700f;
             size = 2;
+            solid = true;
         }};
 
         liquidTank = new LiquidRouter("liquid-tank"){{
             requirements(Category.liquid, with(Items.titanium, 30, Items.metaglass, 40));
             size = 3;
+            solid = true;
             liquidCapacity = 1800f;
             health = 500;
         }};
 
         liquidJunction = new LiquidJunction("liquid-junction"){{
             requirements(Category.liquid, with(Items.graphite, 4, Items.metaglass, 8));
+            solid = false;
         }};
 
         bridgeConduit = new LiquidBridge("bridge-conduit"){{
@@ -2147,10 +2160,8 @@ public class Blocks{
 
         //reinforced stuff
 
-        //TODO different name
         reinforcedPump = new Pump("reinforced-pump"){{
             requirements(Category.liquid, with(Items.beryllium, 40, Items.tungsten, 30, Items.silicon, 20));
-            //TODO CUSTOM DRAW ANIMATION - pistons - repurpose DrawBlock?
             consumeLiquid(Liquids.hydrogen, 1.5f / 60f);
 
             pumpAmount = 80f / 60f / 4f;
@@ -2229,7 +2240,7 @@ public class Blocks{
             requirements(Category.power, with(Items.titanium, 5, Items.lead, 10, Items.silicon, 3));
             size = 2;
             maxNodes = 15;
-            laserRange = 9.5f;
+            laserRange = 15f;
         }};
 
         surgeTower = new PowerNode("surge-tower"){{
@@ -2298,7 +2309,19 @@ public class Blocks{
             consume(new ConsumeItemFlammable());
             consume(new ConsumeItemExplode());
 
-            drawer = new DrawMulti(new DrawDefault(), new DrawWarmupRegion(), new DrawTurbines());
+            drawer = new DrawMulti(
+            new DrawDefault(),
+            new DrawWarmupRegion(),
+            new DrawRegion("-turbine"){{
+                rotateSpeed = 2f;
+            }},
+            new DrawRegion("-turbine"){{
+                rotateSpeed = -2f;
+                rotation = 45f;
+            }},
+            new DrawRegion("-cap"),
+            new DrawLiquidRegion()
+            );
         }};
 
         differentialGenerator = new ConsumeGenerator("differential-generator"){{
@@ -2312,7 +2335,7 @@ public class Blocks{
             generateEffect = Fx.generatespark;
             ambientSoundVolume = 0.03f;
 
-            drawer = new DrawMulti(new DrawDefault(), new DrawWarmupRegion());
+            drawer = new DrawMulti(new DrawDefault(), new DrawWarmupRegion(), new DrawLiquidRegion());
 
             consumeItem(Items.pyratite);
             consumeLiquid(Liquids.cryofluid, 0.1f);
@@ -2352,7 +2375,6 @@ public class Blocks{
             heating = 0.02f;
 
             consumeItem(Items.thorium);
-            //TODO how to non update
             consumeLiquid(Liquids.cryofluid, heating / coolantPower).update(false);
         }};
 
@@ -2415,8 +2437,11 @@ public class Blocks{
             size = 3;
             ambientSound = Sounds.hum;
             ambientSoundVolume = 0.06f;
-            spinSpeed = 0.6f;
-            spinners = true;
+
+            drawer = new DrawMulti(new DrawDefault(), new DrawBlurSpin("-rotator", 0.6f * 9f){{
+                blurThresh = 0.01f;
+            }});
+
             hasLiquids = true;
             outputLiquid = new LiquidStack(Liquids.water, 5f / 60f / 9f);
             liquidCapacity = 20f;
@@ -2424,10 +2449,9 @@ public class Blocks{
             researchCost = with(Items.beryllium, 15);
         }};
 
-        //TODO rename
         chemicalCombustionChamber = new ConsumeGenerator("chemical-combustion-chamber"){{
             requirements(Category.power, with(Items.graphite, 40, Items.tungsten, 40, Items.oxide, 40f, Items.silicon, 30));
-            powerProduction = 9f;
+            powerProduction = 8f;
             consumeLiquids(LiquidStack.with(Liquids.ozone, 2f / 60f, Liquids.arkycite, 40f / 60f));
             size = 3;
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawPistons(){{
@@ -2446,11 +2470,9 @@ public class Blocks{
             ambientSoundVolume = 0.06f;
         }};
 
-        //TODO cooler name?
         pyrolysisGenerator = new ConsumeGenerator("pyrolysis-generator"){{
-            //TODO requirements
             requirements(Category.power, with(Items.graphite, 50, Items.carbide, 50, Items.oxide, 60f, Items.silicon, 50));
-            powerProduction = 27f;
+            powerProduction = 25f;
 
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawPistons(){{
                 sinMag = 2.75f;
@@ -2463,18 +2485,112 @@ public class Blocks{
                 color = Pal.slagOrange;
             }});
 
-            //TODO ratios, extra requirements?
             consumeLiquids(LiquidStack.with(Liquids.slag, 20f / 60f, Liquids.arkycite, 30f / 60f));
             size = 3;
 
             liquidCapacity = 30f * 5;
 
-            liquidOutput = new LiquidStack(Liquids.water, 20f / 60f);
+            outputLiquid = new LiquidStack(Liquids.water, 20f / 60f);
 
             generateEffect = Fx.none;
 
             ambientSound = Sounds.smelter;
             ambientSoundVolume = 0.06f;
+        }};
+
+        //TODO still very much WIP, stats are bad
+        fluxReactor = new VariableReactor("flux-reactor"){{
+            requirements(Category.power, with(Items.graphite, 300, Items.carbide, 200, Items.oxide, 100, Items.silicon, 600, Items.surgeAlloy, 300));
+            powerProduction = 120f;
+            maxHeat = 150f;
+
+            consumeLiquid(Liquids.cyanogen, 9f / 60f);
+            liquidCapacity = 30f;
+            explosionMinWarmup = 0.5f;
+
+            size = 5;
+
+            drawer = new DrawMulti(
+            new DrawRegion("-bottom"),
+            new DrawLiquidTile(Liquids.cyanogen),
+            new DrawRegion("-mid"),
+            new DrawSoftParticles(){{
+                alpha = 0.35f;
+                particleRad = 12f;
+                particleSize = 9f;
+                particleLife = 120f;
+                particles = 27;
+            }},
+            new DrawDefault(),
+            new DrawHeatInput(),
+            new DrawGlowRegion("-ventglow"){{
+                color = Color.valueOf("32603a");
+            }}
+            );
+        }};
+
+        //TODO stats
+        neoplasiaReactor = new HeaterGenerator("neoplasia-reactor"){{
+            requirements(Category.power, with(Items.tungsten, 1000, Items.carbide, 300, Items.oxide, 150, Items.silicon, 500, Items.phaseFabric, 300, Items.surgeAlloy, 200));
+
+            size = 5;
+            liquidCapacity = 80f;
+            outputLiquid = new LiquidStack(Liquids.neoplasm, 20f / 60f);
+            explodeOnFull = true;
+
+            heatOutput = 60f;
+
+            //TODO arkycite, or nitrogen? both? Decide.
+            consumeLiquid(Liquids.arkycite, 80f / 60f);
+            consumeLiquid(Liquids.water, 10f / 60f);
+            consumeItem(Items.phaseFabric);
+
+            itemDuration = 60f * 3f;
+            itemCapacity = 10;
+
+            explosionRadius = 5;
+            explosionDamage = 500;
+            explodeEffect = new MultiEffect(Fx.bigShockwave, new WrapEffect(Fx.titanSmoke, Liquids.neoplasm.color), Fx.neoplasmSplat);
+            explodeSound = Sounds.explosionbig;
+
+            powerProduction = 140f;
+            rebuildable = false;
+
+            explosionPuddles = 80;
+            explosionPuddleRange = tilesize * 7f;
+            explosionPuddleLiquid = Liquids.neoplasm;
+            explosionPuddleAmount = 200f;
+            explosionMinWarmup = 0.5f;
+
+            consumeEffect = new RadialEffect(Fx.neoplasiaSmoke, 4, 90f, 54f / 4f);
+
+            drawer = new DrawMulti(
+            new DrawRegion("-bottom"),
+            new DrawLiquidTile(Liquids.arkycite, 3f),
+            new DrawCircles(){{
+                color = Color.valueOf("feb380").a(0.8f);
+                strokeMax = 3.25f;
+                radius = 65f / 4f;
+                amount = 5;
+                timeScl = 200f;
+            }},
+
+            new DrawRegion("-center"),
+
+            new DrawCells(){{
+                color = Color.valueOf("c33e2b");
+                particleColorFrom = Color.valueOf("e8803f");
+                particleColorTo = Color.valueOf("8c1225");
+                particles = 50;
+                range = 4f;
+            }},
+            new DrawDefault(),
+            new DrawHeatOutput(),
+            new DrawGlowRegion("-glow"){{
+                color = Color.valueOf("70170b");
+                alpha = 0.7f;
+            }}
+            );
         }};
 
         //endregion power
@@ -2562,6 +2678,8 @@ public class Blocks{
 
             legacyReadWarmup = true;
             drawer = new DrawMulti(
+            new DrawRegion("-bottom"),
+            new DrawLiquidTile(Liquids.water),
             new DrawDefault(),
             new DrawCultivator(),
             new DrawRegion("-top")
@@ -2637,7 +2755,6 @@ public class Blocks{
 
         //TODO awful name
         largePlasmaBore = new BeamDrill("large-plasma-bore"){{
-            //TODO requirements
             requirements(Category.production, with(Items.silicon, 100, Items.oxide, 25, Items.beryllium, 100, Items.tungsten, 70));
             consumePower(0.8f);
             drillTime = 110f;
@@ -2652,7 +2769,6 @@ public class Blocks{
             consumeLiquid(Liquids.nitrogen, 3f / 60f).boost();
         }};
 
-        //TODO should be crusher or something
         impactDrill = new BurstDrill("impact-drill"){{
             requirements(Category.production, with(Items.silicon, 70, Items.beryllium, 90, Items.graphite, 60));
             drillTime = 60f * 12f;
@@ -2666,13 +2782,14 @@ public class Blocks{
             blockedItem = Items.thorium;
             researchCostMultiplier = 0.5f;
 
+            drillMultipliers.put(Items.beryllium, 2.5f);
+
             fogRadius = 4;
 
             consumePower(160f / 60f);
             consumeLiquid(Liquids.water, 0.2f);
         }};
 
-        //TODO bad name
         eruptionDrill = new BurstDrill("eruption-drill"){{
             requirements(Category.production, with(Items.silicon, 200, Items.oxide, 20, Items.tungsten, 200, Items.thorium, 120));
             drillTime = 60f * 6f;
@@ -2693,6 +2810,8 @@ public class Blocks{
             arrows = 2;
             glowColor.a = 0.6f;
             fogRadius = 5;
+
+            drillMultipliers.put(Items.beryllium, 2.5f);
 
             //TODO different requirements
             consumePower(6f);
@@ -2817,9 +2936,9 @@ public class Blocks{
         }};
 
         reinforcedContainer = new StorageBlock("reinforced-container"){{
-            requirements(Category.effect, with(Items.tungsten, 80, Items.graphite, 80));
+            requirements(Category.effect, with(Items.tungsten, 30, Items.graphite, 40));
             size = 2;
-            itemCapacity = 250;
+            itemCapacity = 75;
             scaledHealth = 120;
             coreMerge = false;
         }};
@@ -3044,6 +3163,7 @@ public class Blocks{
                 Liquids.water,new LiquidBulletType(Liquids.water){{
                     knockback = 0.7f;
                     drag = 0.01f;
+                    layer = Layer.bullet - 2f;
                 }},
                 Liquids.slag, new LiquidBulletType(Liquids.slag){{
                     damage = 4;
@@ -3054,6 +3174,7 @@ public class Blocks{
                 }},
                 Liquids.oil, new LiquidBulletType(Liquids.oil){{
                     drag = 0.01f;
+                    layer = Layer.bullet - 2f;
                 }}
             );
             size = 2;
@@ -3320,6 +3441,7 @@ public class Blocks{
                     ammoMultiplier = 0.4f;
                     statusDuration = 60f * 4f;
                     damage = 0.2f;
+                    layer = Layer.bullet - 2f;
                 }},
                 Liquids.slag,  new LiquidBulletType(Liquids.slag){{
                     lifetime = 49f;
@@ -3353,6 +3475,7 @@ public class Blocks{
                     ammoMultiplier = 0.4f;
                     statusDuration = 60f * 4f;
                     damage = 0.2f;
+                    layer = Layer.bullet - 2f;
                 }}
             );
             size = 3;
@@ -3885,6 +4008,7 @@ public class Blocks{
             outlineColor = Pal.darkOutline;
 
             liquidConsumed = 10f / 60f;
+            targetInterval = 5f;
 
             float r = range = 130f;
 
@@ -4177,7 +4301,7 @@ public class Blocks{
                 }});
             }};
 
-            consumePower(2f);
+            consumePower(5f);
             heatRequirement = 10f;
             maxHeatEfficiency = 2f;
 
@@ -4268,6 +4392,7 @@ public class Blocks{
             Items.carbide, new BasicBulletType(0f, 1){{
                 shootEffect = Fx.shootBig;
                 smokeEffect = Fx.shootSmokeMissile;
+                ammoMultiplier = 1f;
 
                 spawnUnit = new MissileUnitType("scathe-missile"){{
                     speed = 4.6f;
@@ -4278,14 +4403,15 @@ public class Blocks{
                     engineLayer = Layer.effect;
                     engineSize = 3.1f;
                     engineOffset = 10f;
-                    rotateSpeed = 0f;
+                    rotateSpeed = 0.25f;
                     trailLength = 18;
                     missileAccelTime = 50f;
                     lowAltitude = true;
+                    //targetAir = false;
 
                     fogRadius = 6f;
 
-                    health = 250;
+                    health = 190;
 
                     weapons.add(new Weapon(){{
                         shootCone = 360f;
@@ -4302,6 +4428,9 @@ public class Blocks{
                                 sizeTo = 130f;
                             }});
 
+                            collidesAir = false;
+
+                            ammoMultiplier = 1f;
                             fragLifeMin = 0.1f;
                             fragBullets = 7;
                             fragBullet = new ArtilleryBulletType(3.4f, 30){{
@@ -4403,13 +4532,604 @@ public class Blocks{
             shootCone = 1f;
             scaledHealth = 220;
             rotateSpeed = 0.9f;
-            researchCostMultiplier = 0.05f;
 
             coolant = consume(new ConsumeLiquid(Liquids.water, 15f / 60f));
             limitRange();
         }};
 
-        //TODO 2 more turrets.
+        smite = new ItemTurret("smite"){{
+            requirements(Category.turret, with(Items.oxide, 200, Items.surgeAlloy, 400, Items.silicon, 800, Items.carbide, 500, Items.phaseFabric, 300));
+
+            ammo(
+            //this is really lazy
+            Items.surgeAlloy, new BasicBulletType(7f, 250){{
+                sprite = "large-orb";
+                width = 17f;
+                height = 21f;
+                hitSize = 8f;
+
+                shootEffect = new MultiEffect(Fx.shootTitan, Fx.colorSparkBig, new WaveEffect(){{
+                    colorFrom = colorTo = Pal.accent;
+                    lifetime = 12f;
+                    sizeTo = 20f;
+                    strokeFrom = 3f;
+                    strokeTo = 0.3f;
+                }});
+                smokeEffect = Fx.shootSmokeSmite;
+                ammoMultiplier = 1;
+                pierceCap = 4;
+                pierce = true;
+                pierceBuilding = true;
+                hitColor = backColor = trailColor = Pal.accent;
+                frontColor = Color.white;
+                trailWidth = 2.8f;
+                trailLength = 9;
+                hitEffect = Fx.hitBulletColor;
+                buildingDamageMultiplier = 0.3f;
+
+                despawnEffect = new MultiEffect(Fx.hitBulletColor, new WaveEffect(){{
+                    sizeTo = 30f;
+                    colorFrom = colorTo = Pal.accent;
+                    lifetime = 12f;
+                }});
+
+                trailRotation = true;
+                trailEffect = Fx.disperseTrail;
+                trailInterval = 3f;
+
+                intervalBullet = new LightningBulletType(){{
+                    damage = 30;
+                    collidesAir = false;
+                    ammoMultiplier = 1f;
+                    lightningColor = Pal.accent;
+                    lightningLength = 5;
+                    lightningLengthRand = 10;
+
+                    //for visual stats only.
+                    buildingDamageMultiplier = 0.25f;
+
+                    lightningType = new BulletType(0.0001f, 0f){{
+                        lifetime = Fx.lightning.lifetime;
+                        hitEffect = Fx.hitLancer;
+                        despawnEffect = Fx.none;
+                        status = StatusEffects.shocked;
+                        statusDuration = 10f;
+                        hittable = false;
+                        lightColor = Color.white;
+                        buildingDamageMultiplier = 0.25f;
+                    }};
+                }};
+
+                bulletInterval = 3f;
+            }}
+            );
+
+            shoot = new ShootMulti(new ShootAlternate(){{
+                spread = 3.3f * 1.9f;
+                shots = barrels = 5;
+            }}, new ShootHelix(){{
+                scl = 4f;
+                mag = 3f;
+            }});
+
+            minWarmup = 0.99f;
+            coolantMultiplier = 6f;
+
+            var haloProgress = PartProgress.warmup.delay(0.5f);
+            float haloY = -15f, haloRotSpeed = 1f;
+
+            shake = 2f;
+            ammoPerShot = 2;
+            drawer = new DrawTurret("reinforced-"){{
+                parts.addAll(
+
+                new RegionPart("-mid"){{
+                    heatProgress = PartProgress.heat.blend(PartProgress.warmup, 0.5f);
+                    mirror = false;
+                }},
+                new RegionPart("-blade"){{
+                    progress = PartProgress.warmup;
+                    heatProgress = PartProgress.warmup;
+                    mirror = true;
+                    moveX = 5.5f;
+                    moves.add(new PartMove(PartProgress.recoil, 0f, -3f, 0f));
+                }},
+                new RegionPart("-front"){{
+                    progress = PartProgress.warmup;
+                    heatProgress = PartProgress.recoil;
+                    mirror = true;
+                    under = true;
+                    moveY = 4f;
+                    moveX = 6.5f;
+                    moves.add(new PartMove(PartProgress.recoil, 0f, -5.5f, 0f));
+                }},
+                new RegionPart("-back"){{
+                    progress = PartProgress.warmup;
+                    heatProgress = PartProgress.warmup;
+                    mirror = true;
+                    under = true;
+                    moveX = 5.5f;
+                }},
+                new ShapePart(){{
+                    progress = PartProgress.warmup.delay(0.2f);
+                    color = Pal.accent;
+                    circle = true;
+                    hollow = true;
+                    stroke = 0f;
+                    strokeTo = 2f;
+                    radius = 10f;
+                    layer = Layer.effect;
+                    y = haloY;
+                    rotateSpeed = haloRotSpeed;
+                }},
+                new ShapePart(){{
+                    progress = PartProgress.warmup.delay(0.2f);
+                    color = Pal.accent;
+                    circle = true;
+                    hollow = true;
+                    stroke = 0f;
+                    strokeTo = 1.6f;
+                    radius = 4f;
+                    layer = Layer.effect;
+                    y = haloY;
+                    rotateSpeed = haloRotSpeed;
+                }},
+                new HaloPart(){{
+                    progress = haloProgress;
+                    color = Pal.accent;
+                    layer = Layer.effect;
+                    y = haloY;
+
+                    haloRotation = 90f;
+                    shapes = 2;
+                    triLength = 0f;
+                    triLengthTo = 20f;
+                    haloRadius = 16f;
+                    tri = true;
+                    radius = 4f;
+                }},
+                new HaloPart(){{
+                    progress = haloProgress;
+                    color = Pal.accent;
+                    layer = Layer.effect;
+                    y = haloY;
+
+                    haloRotation = 90f;
+                    shapes = 2;
+                    triLength = 0f;
+                    triLengthTo = 5f;
+                    haloRadius = 16f;
+                    tri = true;
+                    radius = 4f;
+                    shapeRotation = 180f;
+                }},
+                new HaloPart(){{
+                    progress = haloProgress;
+                    color = Pal.accent;
+                    layer = Layer.effect;
+                    y = haloY;
+                    haloRotateSpeed = -haloRotSpeed;
+
+                    shapes = 4;
+                    triLength = 0f;
+                    triLengthTo = 5f;
+                    haloRotation = 45f;
+                    haloRadius = 16f;
+                    tri = true;
+                    radius = 8f;
+                }},
+                new HaloPart(){{
+                    progress = haloProgress;
+                    color = Pal.accent;
+                    layer = Layer.effect;
+                    y = haloY;
+                    haloRotateSpeed = -haloRotSpeed;
+
+                    shapes = 4;
+                    shapeRotation = 180f;
+                    triLength = 0f;
+                    triLengthTo = 2f;
+                    haloRotation = 45f;
+                    haloRadius = 16f;
+                    tri = true;
+                    radius = 8f;
+                }},
+                new HaloPart(){{
+                    progress = haloProgress;
+                    color = Pal.accent;
+                    layer = Layer.effect;
+                    y = haloY;
+                    haloRotateSpeed = haloRotSpeed;
+
+                    shapes = 4;
+                    triLength = 0f;
+                    triLengthTo = 3f;
+                    haloRotation = 45f;
+                    haloRadius = 10f;
+                    tri = true;
+                    radius = 6f;
+                }}
+                );
+
+                for(int i = 0; i < 3; i++){
+                    int fi = i;
+                    parts.add(new RegionPart("-blade-bar"){{
+                        progress = PartProgress.warmup;
+                        heatProgress = PartProgress.warmup;
+                        mirror = true;
+                        under = true;
+                        outline = false;
+                        layerOffset = -0.3f;
+                        turretHeatLayer = Layer.turret - 0.2f;
+                        y = 44f / 4f - fi * 38f / 4f;
+                        moveX = 2f;
+
+                        color = Pal.accent;
+                    }});
+                }
+
+                for(int i = 0; i < 4; i++){
+                    int fi = i;
+                    parts.add(new RegionPart("-spine"){{
+                        progress = PartProgress.warmup.delay(fi / 5f);
+                        heatProgress = PartProgress.warmup;
+                        mirror = true;
+                        under = true;
+                        layerOffset = -0.3f;
+                        turretHeatLayer = Layer.turret - 0.2f;
+                        moveY = -22f / 4f - fi * 3f;
+                        moveX = 52f / 4f - fi * 1f + 2f;
+                        moveRot = -fi * 30f;
+
+                        color = Pal.accent;
+                        moves.add(new PartMove(PartProgress.recoil.delay(fi / 5f), 0f, 0f, 35f));
+                    }});
+                }
+            }};
+
+            shootWarmupSpeed = 0.04f;
+            shootY = 15f;
+            outlineColor = Pal.darkOutline;
+            size = 5;
+            envEnabled |= Env.space;
+            reload = 100f;
+            recoil = 2f;
+            range = 300;
+            shootCone = 10f;
+            scaledHealth = 350;
+            rotateSpeed = 1.5f;
+
+            coolant = consume(new ConsumeLiquid(Liquids.water, 15f / 60f));
+            limitRange();
+        }};
+
+        malign = new PowerTurret("malign"){{
+            requirements(Category.turret, with(Items.carbide, 400, Items.beryllium, 2000, Items.silicon, 800, Items.graphite, 800, Items.phaseFabric, 300));
+
+            var haloProgress = PartProgress.warmup;
+            Color haloColor = Color.valueOf("d370d3"), heatCol = Color.purple;
+            float haloY = -15f, haloRotSpeed = 1.5f;
+
+            var circleProgress = PartProgress.warmup.delay(0.9f);
+            var circleColor = haloColor;
+            float circleY = 25f, circleRad = 11f, circleRotSpeed = 3.5f, circleStroke = 1.6f;
+
+            shootType = new FlakBulletType(8f, 80f){{
+                sprite = "missile-large";
+
+                lifetime = 45f;
+                width = 12f;
+                height = 22f;
+
+                hitSize = 7f;
+                shootEffect = Fx.shootSmokeSquareBig;
+                smokeEffect = Fx.shootSmokeDisperse;
+                ammoMultiplier = 1;
+                hitColor = backColor = trailColor = lightningColor = circleColor;
+                frontColor = Color.white;
+                trailWidth = 3f;
+                trailLength = 12;
+                hitEffect = despawnEffect = Fx.hitBulletColor;
+                buildingDamageMultiplier = 0.3f;
+
+                trailEffect = Fx.colorSpark;
+                trailRotation = true;
+                trailInterval = 3f;
+                lightning = 1;
+                lightningCone = 15f;
+                lightningLength = 20;
+                lightningLengthRand = 30;
+                lightningDamage = 20f;
+
+                homingPower = 0.17f;
+                homingDelay = 19f;
+                homingRange = 160f;
+
+                explodeRange = 160f;
+                explodeDelay = 0f;
+
+                flakInterval = 20f;
+                despawnShake = 3f;
+
+                fragBullet = new LaserBulletType(90f){{
+                    colors = new Color[]{haloColor.cpy().a(0.4f), haloColor, Color.white};
+                    buildingDamageMultiplier = 0.25f;
+                    width = 19f;
+                    hitEffect = Fx.hitLancer;
+                    sideAngle = 175f;
+                    sideWidth = 1f;
+                    sideLength = 40f;
+                    lifetime = 22f;
+                    drawSize = 400f;
+                    length = 180f;
+                    pierceCap = 2;
+                }};
+
+                fragSpread = fragRandomSpread = 0f;
+
+                splashDamage = 0f;
+                hitEffect = Fx.hitSquaresColor;
+                collidesGround = true;
+            }};
+
+            size = 5;
+            drawer = new DrawTurret("reinforced-"){{
+                parts.addAll(
+
+                //summoning circle
+                new ShapePart(){{
+                    progress = circleProgress;
+                    color = circleColor;
+                    circle = true;
+                    hollow = true;
+                    stroke = 0f;
+                    strokeTo = circleStroke;
+                    radius = circleRad;
+                    layer = Layer.effect;
+                    y = circleY;
+                }},
+
+                new ShapePart(){{
+                    progress = circleProgress;
+                    rotateSpeed = -circleRotSpeed;
+                    color = circleColor;
+                    sides = 4;
+                    hollow = true;
+                    stroke = 0f;
+                    strokeTo = circleStroke;
+                    radius = circleRad - 1f;
+                    layer = Layer.effect;
+                    y = circleY;
+                }},
+
+                //outer squares
+
+                new ShapePart(){{
+                    progress = circleProgress;
+                    rotateSpeed = -circleRotSpeed;
+                    color = circleColor;
+                    sides = 4;
+                    hollow = true;
+                    stroke = 0f;
+                    strokeTo = circleStroke;
+                    radius = circleRad - 1f;
+                    layer = Layer.effect;
+                    y = circleY;
+                }},
+
+                //inner square
+                new ShapePart(){{
+                    progress = circleProgress;
+                    rotateSpeed = -circleRotSpeed/2f;
+                    color = circleColor;
+                    sides = 4;
+                    hollow = true;
+                    stroke = 0f;
+                    strokeTo = 2f;
+                    radius = 3f;
+                    layer = Layer.effect;
+                    y = circleY;
+                }},
+
+                //spikes on circle
+                new HaloPart(){{
+                    progress = circleProgress;
+                    color = circleColor;
+                    tri = true;
+                    shapes = 3;
+                    triLength = 0f;
+                    triLengthTo = 5f;
+                    radius = 6f;
+                    haloRadius = circleRad;
+                    haloRotateSpeed = haloRotSpeed / 2f;
+                    shapeRotation = 180f;
+                    haloRotation = 180f;
+                    layer = Layer.effect;
+                    y = circleY;
+                }},
+
+                //actual turret
+                new RegionPart("-mouth"){{
+                    heatColor = heatCol;
+                    heatProgress = PartProgress.warmup;
+
+                    moveY = -8f;
+                }},
+                new RegionPart("-end"){{
+                    moveY = 0f;
+                }},
+
+                new RegionPart("-front"){{
+                    heatColor = heatCol;
+                    heatProgress = PartProgress.warmup;
+
+                    mirror = true;
+                    moveRot = 33f;
+                    moveY = -4f;
+                    moveX = 10f;
+                }},
+                new RegionPart("-back"){{
+                    heatColor = heatCol;
+                    heatProgress = PartProgress.warmup;
+
+                    mirror = true;
+                    moveRot = 10f;
+                    moveX = 2f;
+                    moveY = 5f;
+                }},
+
+                new RegionPart("-mid"){{
+                    heatColor = heatCol;
+                    heatProgress = PartProgress.recoil;
+
+                    moveY = -9.5f;
+                }},
+
+                new ShapePart(){{
+                    progress = haloProgress;
+                    color = haloColor;
+                    circle = true;
+                    hollow = true;
+                    stroke = 0f;
+                    strokeTo = 2f;
+                    radius = 10f;
+                    layer = Layer.effect;
+                    y = haloY;
+                }},
+                new ShapePart(){{
+                    progress = haloProgress;
+                    color = haloColor;
+                    sides = 3;
+                    rotation = 90f;
+                    hollow = true;
+                    stroke = 0f;
+                    strokeTo = 2f;
+                    radius = 4f;
+                    layer = Layer.effect;
+                    y = haloY;
+                }},
+                new HaloPart(){{
+                    progress = haloProgress;
+                    color = haloColor;
+                    sides = 3;
+                    shapes = 3;
+                    hollow = true;
+                    stroke = 0f;
+                    strokeTo = 2f;
+                    radius = 3f;
+                    haloRadius = 10f + radius/2f;
+                    haloRotateSpeed = haloRotSpeed;
+                    layer = Layer.effect;
+                    y = haloY;
+                }},
+
+                new HaloPart(){{
+                    progress = haloProgress;
+                    color = haloColor;
+                    tri = true;
+                    shapes = 3;
+                    triLength = 0f;
+                    triLengthTo = 10f;
+                    radius = 6f;
+                    haloRadius = 16f;
+                    haloRotation = 180f;
+                    layer = Layer.effect;
+                    y = haloY;
+                }},
+                new HaloPart(){{
+                    progress = haloProgress;
+                    color = haloColor;
+                    tri = true;
+                    shapes = 3;
+                    triLength = 0f;
+                    triLengthTo = 3f;
+                    radius = 6f;
+                    haloRadius = 16f;
+                    shapeRotation = 180f;
+                    haloRotation = 180f;
+                    layer = Layer.effect;
+                    y = haloY;
+                }},
+
+                new HaloPart(){{
+                    progress = haloProgress;
+                    color = haloColor;
+                    sides = 3;
+                    tri = true;
+                    shapes = 3;
+                    triLength = 0f;
+                    triLengthTo = 10f;
+                    shapeRotation = 180f;
+                    radius = 6f;
+                    haloRadius = 16f;
+                    haloRotateSpeed = -haloRotSpeed;
+                    haloRotation = 180f / 3f;
+                    layer = Layer.effect;
+                    y = haloY;
+                }},
+
+                new HaloPart(){{
+                    progress = haloProgress;
+                    color = haloColor;
+                    sides = 3;
+                    tri = true;
+                    shapes = 3;
+                    triLength = 0f;
+                    triLengthTo = 4f;
+                    radius = 6f;
+                    haloRadius = 16f;
+                    haloRotateSpeed = -haloRotSpeed;
+                    haloRotation = 180f / 3f;
+                    layer = Layer.effect;
+                    y = haloY;
+                }}
+                );
+
+                Color heatCol2 = heatCol.cpy().add(0.1f, 0.1f, 0.1f).mul(1.2f);
+                for(int i = 1; i < 4; i++){
+                    int fi = i;
+                    parts.add(new RegionPart("-spine"){{
+                        outline = false;
+                        progress = PartProgress.warmup.delay(fi / 5f);
+                        heatProgress = PartProgress.warmup.add(p -> (Mathf.absin(3f, 0.2f) - 0.2f) * p.warmup);
+                        mirror = true;
+                        under = true;
+                        layerOffset = -0.3f;
+                        turretHeatLayer = Layer.turret - 0.2f;
+                        moveY = 9f;
+                        moveX = 1f + fi * 4f;
+                        moveRot = fi * 60f - 130f;
+
+                        color = Color.valueOf("bb68c3");
+                        heatColor = heatCol2;
+                        moves.add(new PartMove(PartProgress.recoil.delay(fi / 5f), 1f, 0f, 3f));
+                    }});
+                }
+            }};
+
+            velocityRnd = 0.15f;
+            heatRequirement = 90f;
+            maxHeatEfficiency = 2f;
+            consumePower(10f);
+
+            shoot = new ShootSummon(0f, 0f, circleRad, 48f);
+
+            minWarmup = 0.96f;
+            shootWarmupSpeed = 0.03f;
+
+            shootY = circleY - 5f;
+
+            outlineColor = Pal.darkOutline;
+            envEnabled |= Env.space;
+            reload = 8f;
+            range = 370;
+            shootCone = 100f;
+            scaledHealth = 370;
+            rotateSpeed = 2f;
+            recoil = 0.5f;
+            recoilTime = 30f;
+            shake = 3f;
+        }};
 
         //endregion
         //region units
@@ -4572,7 +5292,7 @@ public class Blocks{
 
             size = 3;
             configurable = false;
-            plans.add(new UnitPlan(UnitTypes.elude, 60f * 45f, with(Items.graphite, 50, Items.silicon, 70)));
+            plans.add(new UnitPlan(UnitTypes.elude, 60f * 40f, with(Items.graphite, 50, Items.silicon, 70)));
             regionSuffix = "-dark";
             fogRadius = 3;
             researchCostMultiplier = 0.5f;
@@ -4757,7 +5477,7 @@ public class Blocks{
         }};
 
         payloadMassDriver = new PayloadMassDriver("payload-mass-driver"){{
-            requirements(Category.units, with(Items.tungsten, 120, Items.silicon, 120, Items.oxide, 25));
+            requirements(Category.units, with(Items.tungsten, 120, Items.silicon, 120, Items.graphite, 50));
             regionSuffix = "-dark";
             size = 3;
             reload = 130f;
@@ -4831,7 +5551,7 @@ public class Blocks{
         }};
 
         payloadUnloader = new PayloadUnloader("payload-unloader"){{
-            requirements(Category.units, with(Items.graphite, 50, Items.silicon, 50, Items.oxide, 30));
+            requirements(Category.units, with(Items.graphite, 50, Items.silicon, 50, Items.tungsten, 30));
             regionSuffix = "-dark";
             hasPower = true;
             consumePower(2f);
@@ -4884,6 +5604,15 @@ public class Blocks{
             size = 5;
             alwaysUnlocked = true;
         }};
+        heatSource = new HeatProducer("heat-source"){{
+            requirements(Category.crafting, BuildVisibility.sandboxOnly, with());
+            drawer = new DrawMulti(new DrawDefault(), new DrawHeatOutput());
+            rotateDraw = false;
+            size = 1;
+            heatOutput = 1000f;
+            warmupRate = 1000f;
+            regionRotated1 = 1;
+        }};
 
         //TODO move
         illuminator = new LightBlock("illuminator"){{
@@ -4923,7 +5652,7 @@ public class Blocks{
         }};
 
         interplanetaryAccelerator = new Accelerator("interplanetary-accelerator"){{
-            requirements(Category.effect, BuildVisibility.hidden, with(Items.copper, 16000, Items.silicon, 11000, Items.thorium, 13000, Items.titanium, 12000, Items.surgeAlloy, 6000, Items.phaseFabric, 5000));
+            requirements(Category.effect, BuildVisibility.campaignOnly, with(Items.copper, 16000, Items.silicon, 11000, Items.thorium, 13000, Items.titanium, 12000, Items.surgeAlloy, 6000, Items.phaseFabric, 5000));
             researchCostMultiplier = 0.1f;
             size = 7;
             hasPower = true;
@@ -5019,13 +5748,14 @@ public class Blocks{
             forceDark = true;
             privileged = true;
             size = 1;
-            maxInstructionsPerTick = 100;
+            maxInstructionsPerTick = 500;
             range = Float.MAX_VALUE;
         }};
 
         worldCell = new MemoryBlock("world-cell"){{
             requirements(Category.logic, BuildVisibility.editorOnly, with());
-
+            
+            targetable = false;
             privileged = true;
             memoryCapacity = 128;
             forceDark = true;

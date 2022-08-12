@@ -55,7 +55,7 @@ public class Vars implements Loadable{
     /** Wall darkness radius. */
     public static final int darkRadius = 4;
     /** Maximum extra padding around deployment schematics. */
-    public static final int maxLoadoutSchematicPad = 4;
+    public static final int maxLoadoutSchematicPad = 5;
     /** All schematic base64 starts with this string.*/
     public static final String schematicBaseStart ="bXNjaA";
     /** IO buffer size. */
@@ -278,6 +278,10 @@ public class Vars implements Loadable{
 
         Version.init();
         CacheLayer.init();
+
+        if(!headless){
+            Log.info("[Mindustry] Version: @", Version.buildString());
+        }
 
         dataDirectory = settings.getDataDirectory();
         screenshotDirectory = dataDirectory.child("screenshots/");

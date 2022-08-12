@@ -365,6 +365,13 @@ project(":core"){
         }
     }
 
+    gradle.taskGraph.whenReady{
+        //these are completely unnecessary
+        tasks.kaptGenerateStubsKotlin.onlyIf{ false }
+        tasks.compileKotlin.onlyIf{ false }
+        tasks.inspectClassesForKotlinIC.onlyIf{ false }
+    }
+
     //comp** classes are only used for code generation
     jar{
         exclude("mindustry/entities/comp/**")

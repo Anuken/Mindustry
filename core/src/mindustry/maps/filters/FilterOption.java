@@ -106,7 +106,6 @@ public abstract class FilterOption{
             table.button(b -> b.image(supplier.get().uiIcon).update(i -> ((TextureRegionDrawable)i.getDrawable())
                 .setRegion(supplier.get() == Blocks.air ? Icon.none.getRegion() : supplier.get().uiIcon)).size(iconSmall), () -> {
                 BaseDialog dialog = new BaseDialog("@filter.option." + name);
-                dialog.setFillParent(false);
                 dialog.cont.pane(t -> {
                     int i = 0;
                     for(Block block : Vars.content.blocks()){
@@ -119,7 +118,8 @@ public abstract class FilterOption{
                         });
                         if(++i % 10 == 0) t.row();
                     }
-                });
+                    dialog.setFillParent(i > 100);
+                }).padRight(8f).scrollX(false);
 
 
                 dialog.addCloseButton();
@@ -145,6 +145,7 @@ public abstract class FilterOption{
         public void build(Table table){
             table.row();
             CheckBox check = table.check("@filter.option." + name, setter).growX().padBottom(5).padTop(5).center().get();
+            check.setChecked(getter.get());
             check.changed(changed);
         }
     }

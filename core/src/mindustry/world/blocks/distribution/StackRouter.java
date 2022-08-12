@@ -46,8 +46,6 @@ public class StackRouter extends DuctRouter{
                 var target = target();
                 while(target != null && items.total() > 0){
                     target.handleItem(this, current);
-                    int mod = sortItem != null && current != sortItem ? 2 : 3;
-                    cdump = (byte)((cdump + 1) % mod);
                     items.remove(current, 1);
 
                     target = target();

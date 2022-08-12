@@ -16,6 +16,7 @@ import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
 import arc.util.serialization.Jval.*;
 import mindustry.*;
+import mindustry.ai.*;
 import mindustry.ai.types.*;
 import mindustry.content.*;
 import mindustry.content.TechTree.*;
@@ -103,6 +104,18 @@ public class ContentParser{
             effect.minfo.mod = currentMod;
             readFields(effect, data);
             return effect;
+        });
+        put(UnitCommand.class, (type, data) -> {
+            if(data.isString()){
+               var cmd = UnitCommand.all.find(u -> u.name.equals(data.asString()));
+               if(cmd != null){
+                   return cmd;
+               }else{
+                   throw new IllegalArgumentException("Unknown unit command name: " + data.asString());
+               }
+            }else{
+                throw new IllegalArgumentException("Unit commands must be strings.");
+            }
         });
         put(BulletType.class, (type, data) -> {
             if(data.isString()){
@@ -345,6 +358,15 @@ public class ContentParser{
                     String[] split = jsonData.asString().split("/");
 
                     return (T)fromJson(ItemStack.class, "{item: " + split[0] + ", amount: " + split[1] + "}");
+                }
+
+                //try to parse "payloaditem/amount" syntax
+                if(type == PayloadStack.class && jsonData.isString() && jsonData.asString().contains("/")){
+                    String[] split = jsonData.asString().split("/");
+                    int number = Strings.parseInt(split[1], 1);
+                    UnlockableContent cont = content.unit(split[0]) == null ? content.block(split[0]) : content.unit(split[0]);
+
+                    return (T)new PayloadStack(cont == null ? Blocks.router : cont, number);
                 }
 
                 //try to parse "liquid/amount" syntax

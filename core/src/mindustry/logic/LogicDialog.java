@@ -36,6 +36,22 @@ public class LogicDialog extends BaseDialog{
 
         addCloseListener();
 
+        shown(this::setup);
+        hidden(() -> consumer.get(canvas.save()));
+        onResize(() -> {
+            setup();
+            canvas.rebuild();
+        });
+
+        add(canvas).grow().name("canvas");
+
+        row();
+
+        add(buttons).growX().name("canvas");
+    }
+
+    private void setup(){
+        buttons.clearChildren();
         buttons.defaults().size(160f, 64f);
         buttons.button("@back", Icon.left, this::hide).name("back");
 
@@ -197,17 +213,6 @@ public class LogicDialog extends BaseDialog{
             dialog.addCloseButton();
             dialog.show();
         }).disabled(t -> canvas.statements.getChildren().size >= LExecutor.maxInstructions);
-
-
-        add(canvas).grow().name("canvas");
-
-        row();
-
-        add(buttons).growX().name("canvas");
-
-        hidden(() -> consumer.get(canvas.save()));
-
-        onResize(() -> canvas.rebuild());
     }
 
     public void show(String code, LExecutor executor, boolean privileged, Cons<String> modified){

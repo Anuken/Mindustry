@@ -14,12 +14,14 @@ import static mindustry.Vars.*;
 public class BuilderAI extends AIController{
     public static float buildRadius = 1500, retreatDst = 110f, retreatDelay = Time.toSeconds * 2f;
 
+    public @Nullable Unit assistFollowing;
     public @Nullable Unit following;
     public @Nullable Teamc enemy;
     public @Nullable BlockPlan lastPlan;
 
     public float fleeRange = 370f;
     public boolean alwaysFlee;
+    public boolean onlyAssist;
 
     boolean found = false;
     float retreatTimer;
@@ -40,6 +42,10 @@ public class BuilderAI extends AIController{
         }
 
         unit.updateBuilding = true;
+
+        if(assistFollowing != null && assistFollowing.activelyBuilding()){
+            following = assistFollowing;
+        }
 
         if(following != null){
             retreatTimer = 0f;
@@ -108,6 +114,10 @@ public class BuilderAI extends AIController{
             }
         }else{
 
+            if(assistFollowing != null){
+                moveTo(assistFollowing, assistFollowing.type.hitSize + unit.type.hitSize/2f + 60f);
+            }
+
             //follow someone and help them build
             if(timer.get(timerTarget2, 60f)){
                 found = false;
@@ -130,13 +140,29 @@ public class BuilderAI extends AIController{
                         }
                     }
                 });
+
+                if(onlyAssist){
+                    float minDst = Float.MAX_VALUE;
+                    Player closest = null;
+                    for(var player : Groups.player){
+                        if(player.unit().canBuild() && !player.dead()){
+                            float dst = player.dst2(unit);
+                            if(dst < minDst){
+                                closest = player;
+                                minDst = dst;
+                            }
+                        }
+                    }
+
+                    assistFollowing = closest == null ? null : closest.unit();
+                }
             }
 
             //TODO this is bad, rebuild time should not depend on AI here
             float rebuildTime = (unit.team.rules().rtsAi ? 12f : 2f) * 60f;
 
             //find new plan
-            if(!unit.team.data().plans.isEmpty() && following == null && timer.get(timerTarget3, rebuildTime)){
+            if(!onlyAssist && !unit.team.data().plans.isEmpty() && following == null && timer.get(timerTarget3, rebuildTime)){
                 Queue<BlockPlan> blocks = unit.team.data().plans;
                 BlockPlan block = blocks.first();
 

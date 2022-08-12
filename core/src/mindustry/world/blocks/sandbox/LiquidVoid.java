@@ -14,6 +14,7 @@ public class LiquidVoid extends Block{
         update = true;
         group = BlockGroup.liquids;
         envEnabled = Env.any;
+        liquidCapacity = 10000f;
     }
 
     @Override

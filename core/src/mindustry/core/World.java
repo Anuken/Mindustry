@@ -252,11 +252,11 @@ public class World{
     }
 
     public void loadSector(Sector sector){
-        loadSector(sector, 0);
+        loadSector(sector, 0, true);
     }
 
-    public void loadSector(Sector sector, int seedOffset){
-        setSectorRules(sector);
+    public void loadSector(Sector sector, int seedOffset, boolean saveInfo){
+        setSectorRules(sector, saveInfo);
 
         int size = sector.getSize();
         loadGenerator(size, size, tiles -> {
@@ -278,14 +278,14 @@ public class World{
         }
 
         //reset rules
-        setSectorRules(sector);
+        setSectorRules(sector, saveInfo);
 
         if(state.rules.defaultTeam.core() != null){
             sector.info.spawnPosition = state.rules.defaultTeam.core().pos();
         }
     }
 
-    private void setSectorRules(Sector sector){
+    private void setSectorRules(Sector sector, boolean saveInfo){
         state.map = new Map(StringMap.of("name", sector.preset == null ? sector.planet.localizedName + "; Sector " + sector.id : sector.preset.localizedName));
         state.rules.sector = sector;
         state.rules.weather.clear();
@@ -314,7 +314,9 @@ public class World{
         sector.planet.applyRules(state.rules);
         sector.info.resources = content.toSeq();
         sector.info.resources.sort(Structs.comps(Structs.comparing(Content::getContentType), Structs.comparingInt(c -> c.id)));
-        sector.saveInfo();
+        if(saveInfo){
+            sector.saveInfo();
+        }
     }
 
     public Context filterContext(Map map){

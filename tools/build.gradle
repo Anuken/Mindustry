@@ -20,7 +20,6 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 def genFolder = "../core/assets-raw/sprites_out/generated/"
-def doAntialias = !project.hasProperty("disableAntialias")
 def enableAA = true
 
 @groovy.transform.CompileStatic
