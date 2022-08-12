@@ -2779,7 +2779,7 @@ public class Blocks{
             shake = 4f;
             itemCapacity = 40;
             //can't mine thorium for balance reasons, needs better drill
-            blockedItem = Items.thorium;
+            blockedItems.add(Items.thorium);
             researchCostMultiplier = 0.5f;
 
             drillMultipliers.put(Items.beryllium, 2.5f);
