@@ -37,8 +37,8 @@ public class Drill extends Block{
     public float liquidBoostIntensity = 1.6f;
     /** Speed at which the drill speeds up. */
     public float warmupSpeed = 0.015f;
-    /** Special exemption item that this drill can't mine. */
-    public Seq<Item> blockedItems = new Seq<>();
+    /** Special exemption items that this drill can't mine. */
+    public ObjectSet<Item> blockedItems = new ObjectSet<>();
 
     //return variables for countOre
     protected @Nullable Item returnItem;
