@@ -22,7 +22,7 @@
   },
   {
     "name": "Omega Hub",
-    "address": ["n1.yeet.ml:6572", "n1.yeet.ml:6573", "n1.yeet.ml:6604", "n1.yeet.ml:6605"]
+    "address": ["n1.yeet.ml:6572", "n1.yeet.ml:6573", "n1.yeet.ml:6604", "n1.yeet.ml:6605", "n1.yeet.ml:6608"]
   },
   {
     "name": "KMWStudios",
@@ -30,7 +30,7 @@
   },
   {
     "name": "Darkdustry",
-    "address": ["darkdustry.tk", "darkdustry.tk:5000", "darkdustry.tk:6000", "darkdustry.tk:7000", "darkdustry.tk:8000", "darkdustry.tk:9000"] 
+    "address": ["darkdustry.tk", "darkdustry.tk:1500", "darkdustry.tk:2000", "darkdustry.tk:3000", "darkdustry.tk:4000", "darkdustry.tk:5000", "darkdustry.tk:6000", "darkdustry.tk:7000", "darkdustry.tk:8000", "darkdustry.tk:9000"] 
   },
   {
     "name": "Chaotic Neutral",
