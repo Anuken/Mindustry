@@ -203,11 +203,11 @@ public class ContentParser{
                 case "shorten" -> base.shorten(data.getFloat("amount"));
                 case "add" -> data.has("amount") ? base.add(data.getFloat("amount")) : base.add(parser.readValue(PartProgress.class, data.get("other")));
                 case "blend" -> base.blend(parser.readValue(PartProgress.class, data.get("other")), data.getFloat("amount"));
-                case "mul" -> base.mul(parser.readValue(PartProgress.class, data.get("other")));
+                case "mul" -> data.has("amount") ? base.mul(data.getFloat("amount")) : base.mul(parser.readValue(PartProgress.class, data.get("other")));
                 case "min" -> base.min(parser.readValue(PartProgress.class, data.get("other")));
-                case "sin" -> base.sin(data.getFloat("scl"), data.getFloat("mag"));
+                case "sin" -> base.sin(data.has("offset") ? data.getFloat("offset") : 0f, data.getFloat("scl"), data.getFloat("mag"));
                 case "absin" -> base.absin(data.getFloat("scl"), data.getFloat("mag"));
-                case "curve" -> base.curve(parser.readValue(Interp.class, data.get("interp")));
+                case "curve" -> data.has("interp") ? base.curve(parser.readValue(Interp.class, data.get("interp"))) : base.curve(data.getFloat("offset"), data.getFloat("duration"));
                 default -> throw new RuntimeException("Unknown operation '" + op + "', check PartProgress class for a list of methods.");
             };
         });
