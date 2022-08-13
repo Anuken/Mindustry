@@ -43,14 +43,6 @@ public class UnitFactory extends UnitBlock{
         regionRotated1 = 1;
         commandable = true;
 
-        config(Integer.class, (UnitFactoryBuild tile, Integer i) -> {
-            if(!configurable) return;
-
-            if(tile.currentPlan == i) return;
-            tile.currentPlan = i < 0 || i >= plans.size ? -1 : i;
-            tile.progress = 0;
-        });
-
         config(UnitType.class, (UnitFactoryBuild tile, UnitType val) -> {
             if(!configurable) return;
 
@@ -205,7 +197,7 @@ public class UnitFactory extends UnitBlock{
             Seq<UnitType> units = Seq.with(plans).map(u -> u.unit).filter(u -> u.unlockedNow() && !u.isBanned());
 
             if(units.any()){
-                ItemSelection.buildTable(UnitFactory.this, table, units, () -> currentPlan == -1 ? null : plans.get(currentPlan).unit, unit -> configure(plans.indexOf(u -> u.unit == unit)));
+                ItemSelection.buildTable(UnitFactory.this, table, units, () -> currentPlan == -1 ? null : plans.get(currentPlan).unit, unit -> configure(unit));
             }else{
                 table.table(Styles.black3, t -> t.add("@none").color(Color.lightGray));
             }
