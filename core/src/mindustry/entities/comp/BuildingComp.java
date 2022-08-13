@@ -153,6 +153,13 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     @Override
+    public void add(){
+        if(power != null){
+            power.graph.checkAdd();
+        }
+    }
+
+    @Override
     @Replace
     public int tileX(){
         return tile.x;
@@ -1675,7 +1682,14 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     /** Called after efficiency is updated but before consumers are updated. Use to apply your own multiplier. */
     public void updateEfficiencyMultiplier(){
+        float scale = efficiencyScale();
+        efficiency *= scale;
+        optionalEfficiency *= scale;
+    }
 
+    /** Calculate your own efficiency multiplier. By default, this is applied in updateEfficiencyMultiplier. */
+    public float efficiencyScale(){
+        return 1f;
     }
 
     public void updateConsumption(){
@@ -1921,7 +1935,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         afterDestroyed();
     }
 
-    //TODO atrocious method and should be squished
     @Final
     @Replace
     @Override

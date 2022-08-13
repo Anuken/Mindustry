@@ -22,7 +22,7 @@
   },
   {
     "name": "Omega Hub",
-    "address": ["n1.yeet.ml:6572", "n1.yeet.ml:6573"]
+    "address": ["n1.yeet.ml:6572", "n1.yeet.ml:6573", "n1.yeet.ml:6604", "n1.yeet.ml:6605", "n1.yeet.ml:6608"]
   },
   {
     "name": "KMWStudios",
@@ -30,7 +30,7 @@
   },
   {
     "name": "Darkdustry",
-    "address": ["darkdustry.tk", "darkdustry.tk:5000", "darkdustry.tk:6000", "darkdustry.tk:7000", "darkdustry.tk:8000", "darkdustry.tk:9000"] 
+    "address": ["darkdustry.tk", "darkdustry.tk:1500", "darkdustry.tk:2000", "darkdustry.tk:3000", "darkdustry.tk:4000", "darkdustry.tk:5000", "darkdustry.tk:6000", "darkdustry.tk:7000", "darkdustry.tk:8000", "darkdustry.tk:9000"] 
   },
   {
     "name": "Chaotic Neutral",
@@ -54,7 +54,7 @@
   },
   {
     "name": "Phoenix Network",
-    "address": ["172.104.253.198", "172.104.253.198:6464"]
+    "address": ["phoenix-network.dev", "phoenix-network.dev:6464"]
   },
   {
     "name": "Xpdustry",
@@ -89,16 +89,12 @@
     "address": ["mindustry.top","g.mindustry.top"]
   },
   {
-    "name": "[CIG]Potato",
-    "address": ["mindustry.vicp.io:6800", "mindustry.vicp.io:7000", "mindustry.vicp.io:6567"]
-  },
-  {
     "name": "Harders",
     "address": ["212.20.42.61:6567", "212.20.42.61:6568", "212.20.42.61:6569", "212.20.42.61:6570", "212.20.42.61:6571", "212.20.42.61:6572", "212.20.42.61:6573"]
   },
   {
     "name": "OMNIDUSTRY",
-    "address": ["109.94.209.233:6569","109.94.209.233:6570"]
+    "address": ["109.94.209.233:6569","109.94.209.233:6570","109.94.209.233:6571","109.94.209.233:6572","109.94.209.233:6573"]
   },
   {
     "name": "The Devil",

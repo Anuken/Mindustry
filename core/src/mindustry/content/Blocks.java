@@ -454,7 +454,6 @@ public class Blocks{
             speedMultiplier = 0.3f;
             variants = 0;
             liquidDrop = Liquids.arkycite;
-            liquidMultiplier = 1.5f;
             isLiquid = true;
             //TODO no status for now
             //status = StatusEffects.slow;
@@ -2124,17 +2123,20 @@ public class Blocks{
             requirements(Category.liquid, with(Items.titanium, 10, Items.metaglass, 15));
             liquidCapacity = 700f;
             size = 2;
+            solid = true;
         }};
 
         liquidTank = new LiquidRouter("liquid-tank"){{
             requirements(Category.liquid, with(Items.titanium, 30, Items.metaglass, 40));
             size = 3;
+            solid = true;
             liquidCapacity = 1800f;
             health = 500;
         }};
 
         liquidJunction = new LiquidJunction("liquid-junction"){{
             requirements(Category.liquid, with(Items.graphite, 4, Items.metaglass, 8));
+            solid = false;
         }};
 
         bridgeConduit = new LiquidBridge("bridge-conduit"){{
@@ -2158,10 +2160,8 @@ public class Blocks{
 
         //reinforced stuff
 
-        //TODO different name
         reinforcedPump = new Pump("reinforced-pump"){{
             requirements(Category.liquid, with(Items.beryllium, 40, Items.tungsten, 30, Items.silicon, 20));
-            //TODO CUSTOM DRAW ANIMATION - pistons - repurpose DrawBlock?
             consumeLiquid(Liquids.hydrogen, 1.5f / 60f);
 
             pumpAmount = 80f / 60f / 4f;
@@ -2449,10 +2449,9 @@ public class Blocks{
             researchCost = with(Items.beryllium, 15);
         }};
 
-        //TODO rename
         chemicalCombustionChamber = new ConsumeGenerator("chemical-combustion-chamber"){{
             requirements(Category.power, with(Items.graphite, 40, Items.tungsten, 40, Items.oxide, 40f, Items.silicon, 30));
-            powerProduction = 9f;
+            powerProduction = 8f;
             consumeLiquids(LiquidStack.with(Liquids.ozone, 2f / 60f, Liquids.arkycite, 40f / 60f));
             size = 3;
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawPistons(){{
@@ -2756,7 +2755,6 @@ public class Blocks{
 
         //TODO awful name
         largePlasmaBore = new BeamDrill("large-plasma-bore"){{
-            //TODO requirements
             requirements(Category.production, with(Items.silicon, 100, Items.oxide, 25, Items.beryllium, 100, Items.tungsten, 70));
             consumePower(0.8f);
             drillTime = 110f;
@@ -2771,7 +2769,6 @@ public class Blocks{
             consumeLiquid(Liquids.nitrogen, 3f / 60f).boost();
         }};
 
-        //TODO should be crusher or something
         impactDrill = new BurstDrill("impact-drill"){{
             requirements(Category.production, with(Items.silicon, 70, Items.beryllium, 90, Items.graphite, 60));
             drillTime = 60f * 12f;
@@ -2785,13 +2782,14 @@ public class Blocks{
             blockedItem = Items.thorium;
             researchCostMultiplier = 0.5f;
 
+            drillMultipliers.put(Items.beryllium, 2.5f);
+
             fogRadius = 4;
 
             consumePower(160f / 60f);
             consumeLiquid(Liquids.water, 0.2f);
         }};
 
-        //TODO bad name
         eruptionDrill = new BurstDrill("eruption-drill"){{
             requirements(Category.production, with(Items.silicon, 200, Items.oxide, 20, Items.tungsten, 200, Items.thorium, 120));
             drillTime = 60f * 6f;
@@ -2812,6 +2810,8 @@ public class Blocks{
             arrows = 2;
             glowColor.a = 0.6f;
             fogRadius = 5;
+
+            drillMultipliers.put(Items.beryllium, 2.5f);
 
             //TODO different requirements
             consumePower(6f);
@@ -3163,6 +3163,7 @@ public class Blocks{
                 Liquids.water,new LiquidBulletType(Liquids.water){{
                     knockback = 0.7f;
                     drag = 0.01f;
+                    layer = Layer.bullet - 2f;
                 }},
                 Liquids.slag, new LiquidBulletType(Liquids.slag){{
                     damage = 4;
@@ -3173,6 +3174,7 @@ public class Blocks{
                 }},
                 Liquids.oil, new LiquidBulletType(Liquids.oil){{
                     drag = 0.01f;
+                    layer = Layer.bullet - 2f;
                 }}
             );
             size = 2;
@@ -3439,6 +3441,7 @@ public class Blocks{
                     ammoMultiplier = 0.4f;
                     statusDuration = 60f * 4f;
                     damage = 0.2f;
+                    layer = Layer.bullet - 2f;
                 }},
                 Liquids.slag,  new LiquidBulletType(Liquids.slag){{
                     lifetime = 49f;
@@ -3472,6 +3475,7 @@ public class Blocks{
                     ammoMultiplier = 0.4f;
                     statusDuration = 60f * 4f;
                     damage = 0.2f;
+                    layer = Layer.bullet - 2f;
                 }}
             );
             size = 3;
@@ -5648,7 +5652,7 @@ public class Blocks{
         }};
 
         interplanetaryAccelerator = new Accelerator("interplanetary-accelerator"){{
-            requirements(Category.effect, BuildVisibility.hidden, with(Items.copper, 16000, Items.silicon, 11000, Items.thorium, 13000, Items.titanium, 12000, Items.surgeAlloy, 6000, Items.phaseFabric, 5000));
+            requirements(Category.effect, BuildVisibility.campaignOnly, with(Items.copper, 16000, Items.silicon, 11000, Items.thorium, 13000, Items.titanium, 12000, Items.surgeAlloy, 6000, Items.phaseFabric, 5000));
             researchCostMultiplier = 0.1f;
             size = 7;
             hasPower = true;
@@ -5750,7 +5754,8 @@ public class Blocks{
 
         worldCell = new MemoryBlock("world-cell"){{
             requirements(Category.logic, BuildVisibility.editorOnly, with());
-
+            
+            targetable = false;
             privileged = true;
             memoryCapacity = 128;
             forceDark = true;

@@ -44,10 +44,8 @@ public class NetworkIO{
             stream.writeLong(GlobalVars.rand.seed0);
             stream.writeLong(GlobalVars.rand.seed1);
 
-            Writes write = new Writes(stream);
-
             stream.writeInt(player.id);
-            player.write(write);
+            player.write(new Writes(stream));
 
             SaveIO.getSaveWriter().writeContentHeader(stream);
             SaveIO.getSaveWriter().writeMap(stream);
