@@ -1935,7 +1935,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         afterDestroyed();
     }
 
-    //TODO atrocious method and should be squished
     @Final
     @Replace
     @Override
