@@ -1663,4 +1663,122 @@ public class LStatements{
             return LCategory.world;
         }
     }
+
+    @RegisterStatement("setstat")
+    public static class SetStatStatement extends LStatement{
+        public String type = "@copper";
+        public String target = "block1", p = "0";
+
+        private transient int selected = 0;
+        private transient TextField tfield;
+
+        @Override
+        public void build(Table table){
+            rebuild(table);
+        }
+
+        // stolen from sense stat
+        void rebuild(Table table){
+            table.add(" setstat ");
+
+            row(table);
+
+            tfield = field(table, type, str -> type = str).padRight(0f).get();
+
+            table.button(b -> {
+                b.image(Icon.pencilSmall);
+                //240
+                b.clicked(() -> showSelectTable(b, (t, hide) -> {
+                    Table[] tables = {
+                    //items
+                    new Table(i -> {
+                        i.left();
+                        int c = 0;
+                        for(Item item : Vars.content.items()){
+                            if(!item.unlockedNow() || item.hidden) continue;
+                            i.button(new TextureRegionDrawable(item.uiIcon), Styles.flati, iconSmall, () -> {
+                                stype("@" + item.name);
+                                hide.run();
+                            }).size(40f);
+
+                            if(++c % 6 == 0) i.row();
+                        }
+                    }),
+                    //liquids
+                    new Table(i -> {
+                        i.left();
+                        int c = 0;
+                        for(Liquid item : Vars.content.liquids()){
+                            if(!item.unlockedNow() || item.hidden) continue;
+                            i.button(new TextureRegionDrawable(item.uiIcon), Styles.flati, iconSmall, () -> {
+                                stype("@" + item.name);
+                                hide.run();
+                            }).size(40f);
+
+                            if(++c % 6 == 0) i.row();
+                        }
+                    }),
+                    //sensors
+                    new Table(i -> {
+                        for(LAccess sensor : LAccess.senseable){
+                            if (sensor.params.length != 0) continue;
+                            i.button(sensor.name(), Styles.flatt, () -> {
+                                stype("@" + sensor.name());
+                                hide.run();
+                            }).size(240f, 40f).self(c -> tooltip(c, sensor)).row();
+                        }
+                    })
+                    };
+
+                    Drawable[] icons = {Icon.box, Icon.liquid, Icon.tree};
+                    Stack stack = new Stack(tables[selected]);
+                    ButtonGroup<Button> group = new ButtonGroup<>();
+
+                    for(int i = 0; i < tables.length; i++){
+                        int fi = i;
+
+                        t.button(icons[i], Styles.squareTogglei, () -> {
+                            selected = fi;
+
+                            stack.clearChildren();
+                            stack.addChild(tables[selected]);
+
+                            t.parent.parent.pack();
+                            t.parent.parent.invalidateHierarchy();
+                        }).height(50f).growX().checked(selected == fi).group(group);
+                    }
+                    t.row();
+                    t.add(stack).colspan(3).width(240f).left();
+                }));
+            }, Styles.logict, () -> {}).size(40f).padLeft(-1).color(table.color);
+
+            table.add(" of ").self(this::param);
+
+            field(table, target, str -> target = str);
+
+            table.add(" to ").self(this::param);
+
+            field(table, p, str -> p = str);
+        }
+
+        private void stype(String text){
+            tfield.setText(text);
+            this.type = text;
+        }
+
+        @Override
+        public boolean privileged(){
+            return true;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new SetStatI(builder.var(type), builder.var(target), builder.var(p));
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.world;
+        }
+    }
 }

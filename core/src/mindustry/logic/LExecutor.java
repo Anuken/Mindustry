@@ -1669,5 +1669,37 @@ public class LExecutor{
         }
     }
 
+    public static class SetStatI implements LInstruction{
+        public int target;
+        public int type;
+        public int p;
+
+        public SetStatI(int type, int target, int p){
+            this.type = type;
+            this.target = target;
+            this.p = p;
+        }
+
+        SetStatI(){}
+
+        @Override
+        public void run(LExecutor exec){
+            Object obj = exec.obj(target);
+            Object sense = exec.obj(type);
+
+            if(obj instanceof Building b && (exec.privileged || (b.team == exec.team && exec.linkIds.contains(b.id)))){
+                if(sense == LAccess.enabled && !exec.bool(p)){
+                    b.lastDisabler = exec.build;
+                }
+
+                if (sense instanceof LAccess access) {
+                    b.setStat(access, exec.num(p));
+                } else if (sense instanceof Content content) {
+                    b.setStat(content, exec.num(p));
+                }
+            }
+        }
+    }
+
     //endregion
 }

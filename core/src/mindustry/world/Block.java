@@ -38,7 +38,7 @@ import java.util.*;
 
 import static mindustry.Vars.*;
 
-public class Block extends UnlockableContent implements Senseable{
+public class Block extends UnlockableContent implements Senseable, SetStatable{
     /** If true, buildings have an ItemModule. */
     public boolean hasItems;
     /** If true, buildings have a LiquidModule. */
@@ -1326,6 +1326,20 @@ public class Block extends UnlockableContent implements Senseable{
             case powerCapacity -> consPower != null && consPower.buffered ? consPower.capacity : 0f;
             default -> Double.NaN;
         };
+    }
+
+    @Override
+    public void setStat(LAccess sensor, double value){
+        switch(sensor){
+            case color -> mapColor.fromDouble(value);
+            case health, maxHealth -> health = (int)value;
+            case size -> size = (int)(value / tilesize);
+            case itemCapacity -> itemCapacity = (int)value;
+            case liquidCapacity -> liquidCapacity = (int)value;
+            case powerCapacity -> {
+                if(consPower != null && consPower.buffered) consPower.capacity = (float)value;
+            }
+        }
     }
 
     @Override
