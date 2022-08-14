@@ -3,6 +3,7 @@ package mindustry.world.blocks.heat;
 import arc.math.*;
 import arc.util.io.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.draw.*;
@@ -36,7 +37,7 @@ public class HeatProducer extends GenericCrafter{
         addBar("heat", (HeatProducerBuild entity) -> new Bar("bar.heat", Pal.lightOrange, () -> entity.heat / heatOutput));
     }
 
-    public class HeatProducerBuild extends GenericCrafterBuild implements HeatBlock{
+    public class HeatProducerBuild extends GenericCrafterBuild implements HeatBlock, Senseable, SetStatable{
         public float heat;
 
         @Override
@@ -55,6 +56,18 @@ public class HeatProducer extends GenericCrafter{
         @Override
         public float heat(){
             return heat;
+        }
+
+        @Override
+        public double sense(LAccess sensor){
+            if(sensor == LAccess.heat) return heat;
+            return super.sense(sensor);
+        }
+
+        @Override
+        public void setStat(LAccess sensor, double value){
+            if(sensor == LAccess.heat) heat = (float)value;
+            else super.sense(sensor);
         }
 
         @Override

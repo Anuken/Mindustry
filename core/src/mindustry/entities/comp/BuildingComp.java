@@ -1870,7 +1870,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             case x -> set((float)value, y);
             case y -> set(x, (float)value);
             case color -> { /* big shrug; */ }
-            case dead -> { /* big shrug; */ }
+            case dead -> { if (!isValid()) heal(); else kill();}
             case team -> team = Team.get((int)value);
             case health -> health = (float)value;
             case maxHealth -> maxHealth = (float)value;
