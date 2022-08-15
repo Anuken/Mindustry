@@ -131,6 +131,7 @@ public class PayloadConveyor extends Block{
                 if (value instanceof Payload p) item = p;
                 else if (value instanceof Block b) item = new BuildPayload(b, team());
                 else if (value instanceof UnitType ut) item = new UnitPayload(ut.create(team()));
+                else if (value == null) item = null;
             }
             else super.setPropObject(sensor, value);
         }

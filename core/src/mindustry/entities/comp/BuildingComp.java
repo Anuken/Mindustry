@@ -1893,7 +1893,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             case maxHealth -> maxHealth = (float)value;
             case efficiency -> efficiency = (float)value;
             case timescale -> timeScale = (float)value;
-            case rotation -> rotation = (int)value;
+            case rotation -> rotation((int)value);
             case totalPower -> {if (power != null && block.consPower != null) power.status = (float)(value / (block.consPower.buffered ? block.consPower.capacity : 1f));}
             case itemCapacity -> {if (block.hasItems) block.itemCapacity = (int)value;}
             case liquidCapacity -> {if (block.hasLiquids) block.liquidCapacity = (float)value;}

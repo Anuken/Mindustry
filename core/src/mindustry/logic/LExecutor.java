@@ -1687,16 +1687,12 @@ public class LExecutor{
             Object obj = exec.obj(target);
             Object sense = exec.obj(type);
 
-            if(obj instanceof Building b && (exec.privileged || (b.team == exec.team && exec.linkIds.contains(b.id)))){
-                if(sense == LAccess.enabled && !exec.bool(p)){
-                    b.lastDisabler = exec.build;
-                }
-
+            if(obj instanceof SetProppable s) {
                 if (sense instanceof LAccess access) {
-                    b.setProp(access, exec.num(p));
-                    b.setPropObject(access, exec.obj(p));
+                    s.setProp(access, exec.num(p));
+                    s.setPropObject(access, exec.obj(p));
                 } else if (sense instanceof Content content) {
-                    b.setProp(content, exec.num(p));
+                    s.setProp(content, exec.num(p));
                 }
             }
         }

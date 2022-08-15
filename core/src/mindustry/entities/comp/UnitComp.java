@@ -31,7 +31,7 @@ import static mindustry.Vars.*;
 import static mindustry.logic.GlobalVars.*;
 
 @Component(base = true)
-abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Boundedc, Syncc, Shieldc, Displayable, Senseable, Ranged, Minerc, Builderc{
+abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Boundedc, Syncc, Shieldc, Displayable, Senseable, SetProppable, Ranged, Minerc, Builderc{
 
     @Import boolean hovering, dead, disarmed;
     @Import float x, y, rotation, elevation, maxHealth, drag, armor, hitSize, health, ammo, dragMultiplier;
@@ -239,6 +239,27 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     public double sense(Content content){
         if(content == stack().item) return stack().amount;
         return Float.NaN;
+    }
+
+    @Override
+    public void setProp(LAccess sensor, double value){
+        switch(sensor){
+            case totalItems -> stack().amount = (int)value;
+            case itemCapacity -> type.itemCapacity = (int)value;
+            case rotation -> rotation = (float)value;
+            case health -> health = (float)value;
+            case maxHealth -> maxHealth = (float)value;
+            case ammo -> ammo = (float)value;
+            case ammoCapacity -> type.ammoCapacity = (int)value;
+            case x -> set((float)value, y);
+            case y -> set(x, (float)value);
+            case dead -> { if (value == 1) heal(); kill(); }
+            case team -> team = Team.get((int)value);
+            case mineX -> mineTile.x = (short)value;
+            case mineY -> mineTile.y = (short)value;
+            case flag -> flag = value;
+            case size -> hitSize = (float)(value * tilesize);
+        };
     }
 
     @Override

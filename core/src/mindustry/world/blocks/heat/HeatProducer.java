@@ -67,7 +67,7 @@ public class HeatProducer extends GenericCrafter{
         @Override
         public void setProp(LAccess sensor, double value){
             if(sensor == LAccess.heat) heat = (float)value;
-            else super.sense(sensor);
+            else super.setProp(sensor, value);
         }
 
         @Override
