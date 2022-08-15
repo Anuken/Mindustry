@@ -81,7 +81,7 @@ public class Router extends Block{
 
         @Override
         public void setProp(Content content, double value){
-            if (content instanceof Item && value == 0) lastItem = null;
+            if(content instanceof Item && value == 0) lastItem = null;
             super.setProp(content, value);
         }
 

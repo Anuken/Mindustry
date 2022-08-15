@@ -127,11 +127,11 @@ public class PayloadConveyor extends Block{
 
         @Override
         public void setPropObject(LProperty property, Object value){
-            if(property == LProperty.payload) {
-                if (value instanceof Block b) item = new BuildPayload(b, team());
-                else if (value instanceof UnitType ut) item = new UnitPayload(ut.create(team()));
+            if(property == LProperty.payload){
+                if(value instanceof Block b) item = new BuildPayload(b, team());
+                else if(value instanceof UnitType ut) item = new UnitPayload(ut.create(team()));
                 else item = null;
-            } else super.setPropObject(property, value);
+            }else super.setPropObject(property, value);
         }
 
         @Override

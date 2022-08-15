@@ -1687,14 +1687,14 @@ public class LExecutor{
             Object key = exec.obj(type);
 
             // because some names conflict
-            if (key instanceof LAccess sensor && LProperty.has(sensor.name()))
+            if(key instanceof LAccess sensor && LProperty.has(sensor.name()))
                 key = LProperty.forName(sensor.name());
 
-            if (target instanceof SetProppable sp) {
-                if (key instanceof LProperty property) {
+            if(target instanceof SetProppable sp){
+                if(key instanceof LProperty property){
                     sp.setProp(property, exec.num(value));
                     sp.setPropObject(property, exec.obj(value));
-                } else if (key instanceof Content content) {
+                }else if(key instanceof Content content){
                     sp.setProp(content, exec.num(value));
                 }
             }

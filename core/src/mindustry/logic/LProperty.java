@@ -12,16 +12,16 @@ public enum LProperty{
 
     public static final LProperty[] all = values();
     public static final ObjectMap<String, LProperty> allMap = ObjectMap.of();
-    static {
-        for (LProperty property : all) allMap.put(property.name(), property);
+
+    static{
+        for(LProperty property : all) allMap.put(property.name(), property);
     }
 
-    public static LProperty forName(String key) {
-        if (!has(key)) return null;
+    public static LProperty forName(String key){
         return allMap.get(key);
     }
 
-    public static boolean has(String key) {
+    public static boolean has(String key){
         return allMap.containsKey(key);
     }
 }
