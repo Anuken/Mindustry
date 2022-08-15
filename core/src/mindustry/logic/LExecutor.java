@@ -1669,5 +1669,37 @@ public class LExecutor{
         }
     }
 
+    public static class SetPropI implements LInstruction{
+        public int of, type, value;
+
+        public SetPropI(int of, int type, int value){
+            this.of = of;
+            this.type = type;
+            this.value = value;
+        }
+
+        public SetPropI(){
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            Object target = exec.obj(of);
+            Object key = exec.obj(type);
+
+            // because some names conflict
+            if (key instanceof LAccess sensor && LProperty.has(sensor.name()))
+                key = LProperty.forName(sensor.name());
+
+            if (target instanceof SetProppable sp) {
+                if (key instanceof LProperty property) {
+                    sp.setProp(property, exec.num(value));
+                    sp.setPropObject(property, exec.obj(value));
+                } else if (key instanceof Content content) {
+                    sp.setProp(content, exec.num(value));
+                }
+            }
+        }
+    }
+
     //endregion
 }

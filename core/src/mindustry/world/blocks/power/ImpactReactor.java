@@ -111,6 +111,12 @@ public class ImpactReactor extends PowerGenerator{
         }
 
         @Override
+        public void setProp(LProperty property, double value){
+            if(property == LProperty.reactorHeat) warmup = Mathf.clamp((float)value);
+            else super.setProp(property, value);
+        }
+
+        @Override
         public void createExplosion(){
             if(warmup >= 0.3f){
                 super.createExplosion();

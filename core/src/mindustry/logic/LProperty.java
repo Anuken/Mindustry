@@ -1,0 +1,27 @@
+package mindustry.logic;
+
+import arc.struct.*;
+
+public enum LProperty{
+    reactorHeat,
+    storedPower,
+    health,
+    team,
+    flag,
+    payload;
+
+    public static final LProperty[] all = values();
+    public static final ObjectMap<String, LProperty> allMap = ObjectMap.of();
+    static {
+        for (LProperty property : all) allMap.put(property.name(), property);
+    }
+
+    public static LProperty forName(String key) {
+        if (!has(key)) return null;
+        return allMap.get(key);
+    }
+
+    public static boolean has(String key) {
+        return allMap.containsKey(key);
+    }
+}

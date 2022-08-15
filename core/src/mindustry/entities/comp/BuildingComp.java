@@ -48,7 +48,7 @@ import static mindustry.Vars.*;
 
 @EntityDef(value = {Buildingc.class}, isFinal = false, genio = false, serialize = false)
 @Component(base = true)
-abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, QuadTreeObject, Displayable, Senseable, Controllable, Sized{
+abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, QuadTreeObject, Displayable, Senseable, SetProppable, Controllable, Sized{
     //region vars and initialization
     static final float timeToSleep = 60f * 1, recentDamageTime = 60f * 5f;
     static final ObjectSet<Building> tmpTiles = new ObjectSet<>();
@@ -1880,6 +1880,24 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if(content instanceof Item i && items != null) return items.get(i);
         if(content instanceof Liquid l && liquids != null) return liquids.get(l);
         return Float.NaN; //invalid sense
+    }
+
+    @Override
+    public void setProp(LProperty property, double value){
+        switch(property){
+            case health -> health = (float)Mathf.clamp(value, 0, maxHealth);
+            case team -> team = Team.get((int)value);
+            case storedPower -> {
+                if(power != null && block.consPower.buffered)
+                    power.status = Mathf.clamp((float)(value / block.consPower.capacity));
+            }
+        }
+    }
+
+    @Override
+    public void setProp(Content content, double value){
+        if(content instanceof Item i && items != null) items.set(i, (int)Mathf.clamp(value, 0, block.itemCapacity));
+        if(content instanceof Liquid l && liquids != null) liquids.reset(l, (int)Mathf.clamp(value, 0, block.liquidCapacity));
     }
 
     @Override

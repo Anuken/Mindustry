@@ -86,6 +86,11 @@ public class GlobalVars{
             put("@" + sensor.name(), sensor);
         }
 
+        // properties
+        for(LProperty property : LProperty.all){
+            put("@" + property.name(), property);
+        }
+
         logicIdToContent = new UnlockableContent[ContentType.all.length][];
         contentIdToLogicId = new int[ContentType.all.length][];
 
