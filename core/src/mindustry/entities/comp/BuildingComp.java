@@ -1885,8 +1885,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     @Override
     public void setProp(LProperty property, double value){
         switch(property){
-            case health -> health = (float)Mathf.clamp(value, 0, maxHealth);
-            case team -> team = Team.get((int)value);
+            case health -> health((float)Mathf.clamp(value, 0, maxHealth));
+            case team -> team(Team.get((int)value));
             case storedPower -> {
                 if(power != null && block.consPower.buffered)
                     power.status = Mathf.clamp((float)(value / block.consPower.capacity));
@@ -1903,7 +1903,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     @Override
     public void setPropObject(LProperty property, Object value){
         if(property == LProperty.team){
-            if(value instanceof Team t) team = t;
+            if(value instanceof Team t) team(t);
         }
     }
 
