@@ -38,7 +38,7 @@ import java.util.*;
 
 import static mindustry.Vars.*;
 
-public class Block extends UnlockableContent implements Senseable, SetStatable{
+public class Block extends UnlockableContent implements Senseable, SetProppable{
     /** If true, buildings have an ItemModule. */
     public boolean hasItems;
     /** If true, buildings have a LiquidModule. */
@@ -1329,7 +1329,7 @@ public class Block extends UnlockableContent implements Senseable, SetStatable{
     }
 
     @Override
-    public void setStat(LAccess sensor, double value){
+    public void setProp(LAccess sensor, double value){
         switch(sensor){
             case color -> mapColor.fromDouble(value);
             case health, maxHealth -> health = (int)value;

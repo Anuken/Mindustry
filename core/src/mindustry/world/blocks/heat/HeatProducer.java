@@ -37,7 +37,7 @@ public class HeatProducer extends GenericCrafter{
         addBar("heat", (HeatProducerBuild entity) -> new Bar("bar.heat", Pal.lightOrange, () -> entity.heat / heatOutput));
     }
 
-    public class HeatProducerBuild extends GenericCrafterBuild implements HeatBlock, Senseable, SetStatable{
+    public class HeatProducerBuild extends GenericCrafterBuild implements HeatBlock, Senseable, SetProppable{
         public float heat;
 
         @Override
@@ -65,7 +65,7 @@ public class HeatProducer extends GenericCrafter{
         }
 
         @Override
-        public void setStat(LAccess sensor, double value){
+        public void setProp(LAccess sensor, double value){
             if(sensor == LAccess.heat) heat = (float)value;
             else super.sense(sensor);
         }

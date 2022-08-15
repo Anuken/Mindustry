@@ -48,7 +48,7 @@ import static mindustry.Vars.*;
 
 @EntityDef(value = {Buildingc.class}, isFinal = false, genio = false, serialize = false)
 @Component(base = true)
-abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, QuadTreeObject, Displayable, Senseable, SetStatable, Controllable, Sized{
+abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, QuadTreeObject, Displayable, Senseable, SetProppable, Controllable, Sized{
     //region vars and initialization
     static final float timeToSleep = 60f * 1, recentDamageTime = 60f * 5f;
     static final ObjectSet<Building> tmpTiles = new ObjectSet<>();
@@ -1865,37 +1865,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     @Override
-    public void setStat(LAccess sensor, double value){
-        switch(sensor){
-            case x -> set((float)value, y);
-            case y -> set(x, (float)value);
-            case color -> { /* big shrug; */ }
-            case dead -> { if (!isValid()) heal(); else kill();}
-            case team -> team = Team.get((int)value);
-            case health -> health = (float)value;
-            case maxHealth -> maxHealth = (float)value;
-            case efficiency -> efficiency = (float)value;
-            case timescale -> timeScale = (float)value;
-            case range -> { /* big shrug returns */ }
-            case rotation -> rotation = (int)value;
-            case totalItems -> { /* big shrug */ }
-            case totalLiquids -> { /* big shrug */ }
-            case totalPower -> {if (power != null && block.consPower != null) power.status = (float)(value / (block.consPower.buffered ? block.consPower.capacity : 1f));}
-            case itemCapacity -> {if (block.hasItems) block.itemCapacity = (int)value;}
-            case liquidCapacity -> {if (block.hasLiquids) block.liquidCapacity = (float)value;}
-            case powerCapacity -> {if (block.consPower != null) block.consPower.capacity = (float)value;}
-            case powerNetIn -> { /* big shrug */ }
-            case powerNetOut -> { /* big shrug */ }
-            case powerNetStored -> { /* big shrug */ }
-            case powerNetCapacity -> { /* big shrug */ }
-            case enabled -> enabled = value == 1;
-            case controlled -> { /* big shrug */ }
-            case payloadCount -> { /* big shrug */ }
-            case size -> block.size = (int)value;
-        };
-    }
-
-    @Override
     public Object senseObject(LAccess sensor){
         return switch(sensor){
             case type -> block;
@@ -1914,7 +1883,28 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     @Override
-    public void setStat(Content content, double value){
+    public void setProp(LAccess sensor, double value){
+        switch(sensor){
+            case x -> set((float)value, y);
+            case y -> set(x, (float)value);
+            case dead -> { if (value == 1) heal(); else kill();}
+            case team -> team = Team.get((int)value);
+            case health -> health = (float)value;
+            case maxHealth -> maxHealth = (float)value;
+            case efficiency -> efficiency = (float)value;
+            case timescale -> timeScale = (float)value;
+            case rotation -> rotation = (int)value;
+            case totalPower -> {if (power != null && block.consPower != null) power.status = (float)(value / (block.consPower.buffered ? block.consPower.capacity : 1f));}
+            case itemCapacity -> {if (block.hasItems) block.itemCapacity = (int)value;}
+            case liquidCapacity -> {if (block.hasLiquids) block.liquidCapacity = (float)value;}
+            case powerCapacity -> {if (block.consPower != null) block.consPower.capacity = (float)value;}
+            case enabled -> enabled = value == 1;
+            case size -> block.size = (int)value;
+        };
+    }
+
+    @Override
+    public void setProp(Content content, double value){
         if(content instanceof Item i && items != null) items.set(i, (int)value);
         if(content instanceof Liquid l && liquids != null) liquids.reset(l, (float)value);
     }

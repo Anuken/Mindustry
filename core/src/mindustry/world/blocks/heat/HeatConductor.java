@@ -48,7 +48,7 @@ public class HeatConductor extends Block{
         return drawer.finalIcons(this);
     }
 
-    public class HeatConductorBuild extends Building implements HeatBlock, HeatConsumer, Senseable, SetStatable{
+    public class HeatConductorBuild extends Building implements HeatBlock, HeatConsumer, Senseable, SetProppable{
         public float heat = 0f;
         public float[] sideHeat = new float[4];
         public IntSet cameFrom = new IntSet();
@@ -101,7 +101,7 @@ public class HeatConductor extends Block{
         }
 
         @Override
-        public void setStat(LAccess sensor, double value){
+        public void setProp(LAccess sensor, double value){
             if(sensor == LAccess.heat) heat = (float)value;
             else super.sense(sensor);
         }

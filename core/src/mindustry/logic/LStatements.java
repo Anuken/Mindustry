@@ -1664,8 +1664,8 @@ public class LStatements{
         }
     }
 
-    @RegisterStatement("setstat")
-    public static class SetStatStatement extends LStatement{
+    @RegisterStatement("setprop")
+    public static class SetPropStatement extends LStatement{
         public String type = "@copper";
         public String target = "block1", p = "0";
 
@@ -1773,7 +1773,7 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new SetStatI(builder.var(type), builder.var(target), builder.var(p));
+            return new SetPropI(builder.var(type), builder.var(target), builder.var(p));
         }
 
         @Override

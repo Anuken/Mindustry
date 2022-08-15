@@ -10,6 +10,8 @@ import mindustry.annotations.Annotations.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
+import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
@@ -121,6 +123,16 @@ public class PayloadConveyor extends Block{
         @Override
         public Payload getPayload(){
             return item;
+        }
+
+        @Override
+        public void setPropObject(LAccess sensor, Object value){
+            if (sensor == LAccess.payloadType) {
+                if (value instanceof Payload p) item = p;
+                else if (value instanceof Block b) item = new BuildPayload(b, team());
+                else if (value instanceof UnitType ut) item = new UnitPayload(ut.create(team()));
+            }
+            else super.setPropObject(sensor, value);
         }
 
         @Override

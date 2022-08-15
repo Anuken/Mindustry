@@ -1669,18 +1669,18 @@ public class LExecutor{
         }
     }
 
-    public static class SetStatI implements LInstruction{
+    public static class SetPropI implements LInstruction{
         public int target;
         public int type;
         public int p;
 
-        public SetStatI(int type, int target, int p){
+        public SetPropI(int type, int target, int p){
             this.type = type;
             this.target = target;
             this.p = p;
         }
 
-        SetStatI(){}
+        SetPropI(){}
 
         @Override
         public void run(LExecutor exec){
@@ -1693,9 +1693,10 @@ public class LExecutor{
                 }
 
                 if (sense instanceof LAccess access) {
-                    b.setStat(access, exec.num(p));
+                    b.setProp(access, exec.num(p));
+                    b.setPropObject(access, exec.obj(p));
                 } else if (sense instanceof Content content) {
-                    b.setStat(content, exec.num(p));
+                    b.setProp(content, exec.num(p));
                 }
             }
         }
