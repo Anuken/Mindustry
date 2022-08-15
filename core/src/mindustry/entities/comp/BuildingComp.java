@@ -1901,6 +1901,13 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     @Override
+    public void setPropObject(LProperty property, Object value){
+        if(property == LProperty.team){
+            if(value instanceof Team t) team = t;
+        }
+    }
+
+    @Override
     public void control(LAccess type, double p1, double p2, double p3, double p4){
         if(type == LAccess.enabled){
             enabled = !Mathf.zero((float)p1);
