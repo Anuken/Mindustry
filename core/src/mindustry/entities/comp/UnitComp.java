@@ -262,10 +262,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
                 if(((Object)this) instanceof Payloadc pay){
                     if(value instanceof Block b){
                         Building build = b.newBuilding().create(b, team());
-                        if(pay.canPickup(build)) pay.pickup(build);
+                        if(pay.canPickup(build)) pay.addPayload(new BuildPayload(build));
                     }else if(value instanceof UnitType ut){
                         Unit unit = ut.create(team());
-                        if(pay.canPickup(unit)) pay.pickup(unit);
+                        if(pay.canPickup(unit)) pay.addPayload(new UnitPayload(unit));
                     }else pay.dropLastPayload();
                 }
             }
