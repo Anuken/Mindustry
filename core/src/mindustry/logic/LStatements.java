@@ -1679,7 +1679,7 @@ public class LStatements{
 
         // stolen from sense stat
         void rebuild(Table table){
-            table.add(" setstat ");
+            table.add(" setprop ");
 
             row(table);
 
