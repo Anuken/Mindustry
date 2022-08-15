@@ -252,7 +252,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     @Override
     public void setProp(Content content, double value){
-        if(content == stack().item) stack().amount = (int)Mathf.clamp(value, 0, itemCapacity());
+        if(content instanceof Item i) stack(new ItemStack(i, (int)Mathf.clamp(value, 0, itemCapacity())));
     }
 
     @Override
