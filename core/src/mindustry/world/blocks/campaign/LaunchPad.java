@@ -87,6 +87,12 @@ public class LaunchPad extends Block{
         }
 
         @Override
+        public void setProp(LAccess sensor, double value){
+            if(sensor == LAccess.progress) launchCounter = (float)(value * launchTime);
+            else super.setProp(sensor, value);
+        }
+
+        @Override
         public void draw(){
             super.draw();
 

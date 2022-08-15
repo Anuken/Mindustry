@@ -1898,7 +1898,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             case itemCapacity -> {if (block.hasItems) block.itemCapacity = (int)value;}
             case liquidCapacity -> {if (block.hasLiquids) block.liquidCapacity = (float)value;}
             case powerCapacity -> {if (block.consPower != null) block.consPower.capacity = (float)value;}
-            case enabled -> enabled = value == 1;
             case size -> block.size = (int)value;
         };
     }

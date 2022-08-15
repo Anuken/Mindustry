@@ -293,6 +293,13 @@ public class GenericCrafter extends Block{
         }
 
         @Override
+        public void setProp(LAccess sensor, double value){
+            if(sensor == LAccess.progress) progress = (float)value;
+            else if(sensor == LAccess.totalLiquids && outputLiquid != null) liquids.reset(outputLiquid.liquid, (float)value);
+            else super.setProp(sensor, value);
+        }
+
+        @Override
         public float progress(){
             return Mathf.clamp(progress);
         }

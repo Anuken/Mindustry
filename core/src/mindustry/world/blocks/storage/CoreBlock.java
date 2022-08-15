@@ -261,6 +261,12 @@ public class CoreBlock extends StorageBlock{
         }
 
         @Override
+        public void setProp(LAccess sensor, double value){
+            if(sensor == LAccess.itemCapacity) storageCapacity = (int)value;
+            else super.setProp(sensor, value);
+        }
+
+        @Override
         public boolean canControlSelect(Unit player){
             return player.isPlayer();
         }

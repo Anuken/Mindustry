@@ -582,6 +582,12 @@ public class UnitAssembler extends PayloadBlock{
         }
 
         @Override
+        public void setProp(LAccess sensor, double value){
+            if(sensor == LAccess.progress) progress = (float)value;
+            else super.setProp(sensor, value);
+        }
+
+        @Override
         public PayloadSeq getPayloads(){
             return blocks;
         }

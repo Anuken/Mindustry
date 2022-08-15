@@ -268,6 +268,12 @@ public class Reconstructor extends UnitBlock{
         }
 
         @Override
+        public void setProp(LAccess sensor, double value){
+            if(sensor == LAccess.progress) progress = (float)(value * constructTime);
+            else super.setProp(sensor, value);
+        }
+
+        @Override
         public boolean shouldConsume(){
             return constructing() && enabled;
         }

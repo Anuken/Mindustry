@@ -201,6 +201,12 @@ public class UnitFactory extends UnitBlock{
         }
 
         @Override
+        public void setProp(LAccess sensor, double value){
+            if(sensor == LAccess.progress && currentPlan != -1) progress = (float)(value * plans.get(currentPlan).time);
+            else super.setProp(sensor, value);
+        }
+
+        @Override
         public void buildConfiguration(Table table){
             Seq<UnitType> units = Seq.with(plans).map(u -> u.unit).filter(u -> u.unlockedNow() && !u.isBanned());
 

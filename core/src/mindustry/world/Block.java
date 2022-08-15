@@ -1329,20 +1329,6 @@ public class Block extends UnlockableContent implements Senseable, SetProppable{
     }
 
     @Override
-    public void setProp(LAccess sensor, double value){
-        switch(sensor){
-            case color -> mapColor.fromDouble(value);
-            case health, maxHealth -> health = (int)value;
-            case size -> size = (int)(value / tilesize);
-            case itemCapacity -> itemCapacity = (int)value;
-            case liquidCapacity -> liquidCapacity = (int)value;
-            case powerCapacity -> {
-                if(consPower != null && consPower.buffered) consPower.capacity = (float)value;
-            }
-        }
-    }
-
-    @Override
     public double sense(Content content){
         return Double.NaN;
     }
@@ -1351,5 +1337,18 @@ public class Block extends UnlockableContent implements Senseable, SetProppable{
     public Object senseObject(LAccess sensor){
         if(sensor == LAccess.name) return name;
         return noSensed;
+    }
+
+    @Override
+    public void setProp(LAccess sensor, double value){
+        switch(sensor){
+            case health, maxHealth -> health = (int)value;
+            case size -> size = (int)(value / tilesize);
+            case itemCapacity -> itemCapacity = (int)value;
+            case liquidCapacity -> liquidCapacity = (int)value;
+            case powerCapacity -> {
+                if(consPower != null && consPower.buffered) consPower.capacity = (float)value;
+            }
+        }
     }
 }

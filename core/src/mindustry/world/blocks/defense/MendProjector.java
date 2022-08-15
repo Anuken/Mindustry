@@ -107,6 +107,12 @@ public class MendProjector extends Block{
         }
 
         @Override
+        public void setProp(LAccess sensor, double value){
+            if(sensor == LAccess.progress) charge = (float)(value * reload);
+            else super.setProp(sensor, value);
+        }
+
+        @Override
         public void drawSelect(){
             float realRange = range + phaseHeat * phaseRangeBoost;
 

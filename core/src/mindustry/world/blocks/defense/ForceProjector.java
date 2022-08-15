@@ -216,6 +216,12 @@ public class ForceProjector extends Block{
         }
 
         @Override
+        public void setProp(LAccess sensor, double value){
+            if(sensor == LAccess.heat) buildup = (float)value;
+            else super.setProp(sensor, value);
+        }
+
+        @Override
         public void draw(){
             super.draw();
 

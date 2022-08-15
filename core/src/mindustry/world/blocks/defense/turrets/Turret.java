@@ -292,6 +292,19 @@ public class Turret extends ReloadTurret{
         }
 
         @Override
+        public void setProp(LAccess sensor, double value){
+            switch(sensor){
+                case ammo -> totalAmmo = (int)value;
+                case ammoCapacity -> maxAmmo = (int)value;
+                case rotation -> rotation = (float)value;
+                case shootX -> targetPos.x = World.unconv((float)value);
+                case shootY -> targetPos.y = World.unconv((float)value);
+                case progress -> reloadCounter = (float)(value * reload);
+                default -> super.setProp(sensor, value);
+            };
+        }
+
+        @Override
         public float progress(){
             return Mathf.clamp(reloadCounter / reload);
         }

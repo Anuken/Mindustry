@@ -42,6 +42,12 @@ public class PowerTurret extends Turret{
         }
 
         @Override
+        public void setProp(LAccess sensor, double value){
+            if(sensor == LAccess.ammo) power.status = (float)value;
+            else super.setProp(sensor, value);
+        }
+
+        @Override
         public BulletType useAmmo(){
             //nothing used directly
             return shootType;

@@ -214,6 +214,12 @@ public class MassDriver extends Block{
         }
 
         @Override
+        public void setProp(LAccess sensor, double value){
+            if(sensor == LAccess.progress) reloadCounter = (float)(1 - (value * reload));
+            else super.setProp(sensor, value);
+        }
+
+        @Override
         public void draw(){
             Draw.rect(baseRegion, x, y);
 
