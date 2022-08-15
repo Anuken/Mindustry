@@ -251,8 +251,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case maxHealth -> maxHealth = (float)value;
             case ammo -> ammo = (float)value;
             case ammoCapacity -> type.ammoCapacity = (int)value;
-            case x -> set((float)value, y);
-            case y -> set(x, (float)value);
+            case x -> x = World.unconv((float)value);
+            case y -> y = World.unconv((float)value);
             case dead -> { if (value == 1) heal(); kill(); }
             case team -> team = Team.get((int)value);
             case mineX -> mineTile.x = (short)value;

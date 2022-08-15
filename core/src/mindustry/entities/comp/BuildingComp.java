@@ -1885,15 +1885,15 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     @Override
     public void setProp(LAccess sensor, double value){
         switch(sensor){
-            case x -> set((float)value, y);
-            case y -> set(x, (float)value);
+            case x -> x = World.unconv((float)value);
+            case y -> y = World.unconv((float)value);
             case dead -> { if (value == 1) heal(); else kill();}
             case team -> team = Team.get((int)value);
             case health -> health = (float)value;
             case maxHealth -> maxHealth = (float)value;
             case efficiency -> efficiency = (float)value;
             case timescale -> timeScale = (float)value;
-            case rotation -> rotation((int)value);
+            case rotation -> rotation = (int)value;
             case totalPower -> {if (power != null && block.consPower != null) power.status = (float)(value / (block.consPower.buffered ? block.consPower.capacity : 1f));}
             case itemCapacity -> {if (block.hasItems) block.itemCapacity = (int)value;}
             case liquidCapacity -> {if (block.hasLiquids) block.liquidCapacity = (float)value;}
