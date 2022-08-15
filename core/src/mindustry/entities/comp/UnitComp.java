@@ -257,16 +257,20 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     @Override
     public void setPropObject(LProperty property, Object value){
-        switch(property) {
+        switch(property){
             case payload -> {
-                if (((Object)this) instanceof Payloadc pay) {
-                    if (value instanceof Block b) pay.addPayload(new BuildPayload(b, team()));
-                    else if (value instanceof UnitType ut) pay.addPayload(new UnitPayload(ut.create(team())));
-                    else pay.dropLastPayload();
+                if(((Object)this) instanceof Payloadc pay){
+                    if(value instanceof Block b){
+                        Building build = b.newBuilding().create(b, team());
+                        if(pay.canPickup(build)) pay.pickup(build);
+                    }else if(value instanceof UnitType ut){
+                        Unit unit = ut.create(team());
+                        if(pay.canPickup(unit)) pay.pickup(unit);
+                    }else pay.dropLastPayload();
                 }
             }
             case team -> {
-                if (value instanceof Team t) team = t;
+                if(value instanceof Team t) team = t;
             }
         }
     }
