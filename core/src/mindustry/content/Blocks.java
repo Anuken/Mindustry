@@ -1268,7 +1268,7 @@ public class Blocks{
             rotateDraw = false;
             regionRotated1 = 1;
             consumeLiquid(Liquids.slag, 40f / 60f);
-            heatOutput = 6f;
+            heatOutput = 8f;
         }};
 
         phaseHeater = new HeatProducer("phase-heater"){{
