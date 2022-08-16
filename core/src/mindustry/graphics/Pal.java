@@ -112,6 +112,7 @@ public class Pal{
     neoplasmOutline = Color.valueOf("2e191d"),
 
     neoplasm1 = Color.valueOf("f98f4a"),
+    neoplasmMid = Color.valueOf("e05438"),
     neoplasm2 = Color.valueOf("9e172c"),
 
     logicBlocks = Color.valueOf("d4816b"),

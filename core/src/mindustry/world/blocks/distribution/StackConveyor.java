@@ -17,7 +17,6 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.distribution.Conveyor.*;
-import mindustry.world.blocks.distribution.Duct.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -51,7 +50,6 @@ public class StackConveyor extends Block implements Autotiler{
         hasItems = true;
         itemCapacity = 10;
         conveyorPlacement = true;
-        highUnloadPriority = true;
         underBullets = true;
         priority = TargetPriority.transport;
 
@@ -134,14 +132,15 @@ public class StackConveyor extends Block implements Autotiler{
             //draw inputs
             if(state == stateLoad){
                 for(int i = 0; i < 4; i++){
-                    if((blendprox & (1 << i)) != 0 && i != 0){
-                        int dir = rotation - i;
+                    int dir = rotation - i;
+                    var near = nearby(dir);
+                    if((blendprox & (1 << i)) != 0 && i != 0 && near != null && !near.block.squareSprite){
                         Draw.rect(sliced(regions[0], SliceMode.bottom), x + Geometry.d4x(dir) * tilesize*0.75f, y + Geometry.d4y(dir) * tilesize*0.75f, (float)(dir*90));
                     }
                 }
             }else if(state == stateUnload){ //front unload
                 //TOOD hacky front check
-                if((blendprox & (1)) != 0 && !(front() instanceof DuctBuild)){
+                if((blendprox & (1)) != 0 && !front().block.squareSprite){
                     Draw.rect(sliced(regions[0], SliceMode.top), x + Geometry.d4x(rotation) * tilesize*0.75f, y + Geometry.d4y(rotation) * tilesize*0.75f, rotation * 90f);
                 }
             }

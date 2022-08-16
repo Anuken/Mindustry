@@ -470,6 +470,26 @@ public class Fx{
         }
     }).layer(Layer.bullet - 1f),
 
+    neoplasmSplat = new Effect(400f, 300f, b -> {
+        float intensity = 3f;
+
+        color(Pal.neoplasm1);
+        for(int i = 0; i < 4; i++){
+            rand.setSeed(b.id*2 + i);
+            float lenScl = rand.random(0.5f, 1f);
+            int fi = i;
+            b.scaled(b.lifetime * lenScl, e -> {
+                randLenVectors(e.id + fi - 1, e.fin(Interp.pow10Out), (int)(5f * intensity), 22f * intensity, (x, y, in, out) -> {
+                    float fout = e.fout(Interp.pow5Out) * rand.random(0.5f, 1f);
+                    float rad = fout * ((2f + intensity) * 1.35f);
+
+                    Fill.circle(e.x + x, e.y + y, rad);
+                    Drawf.light(e.x + x, e.y + y, rad * 2.5f, b.color, 0.5f);
+                });
+            });
+        }
+    }).layer(Layer.bullet - 2f),
+
     scatheExplosion = new Effect(60f, 160f, e -> {
         color(e.color);
         stroke(e.fout() * 5f);
@@ -1202,6 +1222,15 @@ public class Fx{
         }
     }).startDelay(30f),
 
+    fluxVapor = new Effect(140f, e -> {
+        color(e.color);
+        alpha(e.fout() * 0.7f);
+
+        randLenVectors(e.id, 2, 3f + e.finpow() * 10f, (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, 0.6f + e.fin() * 5f);
+        });
+    }).layer(Layer.bullet - 1f),
+
     vapor = new Effect(110f, e -> {
         color(e.color);
         alpha(e.fout());
@@ -1685,6 +1714,21 @@ public class Fx{
             e.scaled(e.lifetime * rand.random(0.3f, 1f), b -> {
                 v.trns(rot, len * b.finpow());
                 Fill.circle(e.x + v.x, e.y + v.y, 2f * b.fslope() + 0.2f);
+            });
+        }
+    }),
+
+    neoplasiaSmoke = new Effect(280f, e -> {
+        color(Pal.neoplasmMid);
+        alpha(0.6f);
+
+        rand.setSeed(e.id);
+        for(int i = 0; i < 6; i++){
+            float len = rand.random(10f), rot = rand.range(120f) + e.rotation;
+
+            e.scaled(e.lifetime * rand.random(0.3f, 1f), b -> {
+                v.trns(rot, len * b.finpow());
+                Fill.circle(e.x + v.x, e.y + v.y, 3.3f * b.fslope() + 0.2f);
             });
         }
     }),

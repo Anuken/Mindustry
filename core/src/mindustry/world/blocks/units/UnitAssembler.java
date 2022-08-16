@@ -136,9 +136,7 @@ public class UnitAssembler extends PayloadBlock{
             int tier = 0;
             for(var plan : plans){
                 int ttier = tier;
-                table.table(t -> {
-                    t.setBackground(Tex.whiteui);
-                    t.setColor(Pal.darkestGray);
+                table.table(Styles.grayPanel, t -> {
 
                     if(plan.unit.isBanned()){
                         t.image(Icon.cancel).color(Pal.remove).size(40).pad(10);
@@ -146,7 +144,7 @@ public class UnitAssembler extends PayloadBlock{
                     }
 
                     if(plan.unit.unlockedNow()){
-                        t.image(plan.unit.uiIcon).size(40).pad(10f).left();
+                        t.image(plan.unit.uiIcon).scaling(Scaling.fit).size(40).pad(10f).left();
                         t.table(info -> {
                             info.defaults().left();
                             info.add(plan.unit.localizedName);
@@ -300,6 +298,8 @@ public class UnitAssembler extends PayloadBlock{
             for(var module : modules){
                 Drawf.selected(module, Pal.accent);
             }
+
+            Drawf.dashRect(Tmp.c1.set(Pal.accent).lerp(Pal.remove, invalidWarmup), getRect(Tmp.r1, x, y, rotation));
         }
 
         @Override
@@ -322,7 +322,7 @@ public class UnitAssembler extends PayloadBlock{
                     prev = mod.block;
                 }
 
-                t.label(() -> "[accent] -> []" + unit().emoji() + " " + unit().name);
+                t.label(() -> "[accent] -> []" + unit().emoji() + " " + unit().localizedName);
             }).pad(4).padLeft(0f).fillX().left();
         }
 

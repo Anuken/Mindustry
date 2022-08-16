@@ -9,7 +9,7 @@
   },
   {
     "name": "Omega Hub",
-    "address": ["n1.yeet.ml", "n1.yeet.ml:6568","n1.yeet.ml:6569" , "n1.yeet.ml:6570" ,"n1.yeet.ml:6571"]
+    "address": ["n1.yeet.ml", "n1.yeet.ml:6568","n1.yeet.ml:6569" , "n1.yeet.ml:6570" ,"n1.yeet.ml:6571", "n1.yeet.ml:6609"]
   },
   {
     "name": "RCM",
@@ -68,10 +68,6 @@
     "address": ["mindustry.initd.kr","mindustry.kr:7100"]
   },
   {
-    "name": "Omega",
-    "address": ["omegav.mindustry.me:6572"] 
-  },
-  {
     "name": "Obvilion Network",
     "address": ["obvilion.ru", "obvilion.ru:7001", "obvilion.ru:7002", "obvilion.ru:7003"]
   },
@@ -85,7 +81,7 @@
   },
   {
     "name": "TSR", 
-    "address": ["fi01.optik.host:28301", "uk01.optik.host:26164"]
+    "address": ["uk01.optik.host:26175", "uk01.optik.host:26164"]
   },
   {
     "name": "Sakura", 
@@ -105,7 +101,7 @@
   },
   {
     "name": "Xpdustry",
-    "address": ["n2.xpdustry.fr", "n2.xpdustry.fr:6000"]
+    "address": ["n2.xpdustry.fr:6000", "n2.xpdustry.fr:6002"]
   },
   {
     "name": "CxZx",
@@ -113,7 +109,7 @@
   },
   {
     "name": "Mindustry Español",
-    "address": ["n1.xpdustry.fr:9000"]
+    "address": ["n1.xpdustry.fr:6001"]
   },
   {
     "name": "CreateDustry",

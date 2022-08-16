@@ -145,6 +145,7 @@ public abstract class FilterOption{
         public void build(Table table){
             table.row();
             CheckBox check = table.check("@filter.option." + name, setter).growX().padBottom(5).padTop(5).center().get();
+            check.setChecked(getter.get());
             check.changed(changed);
         }
     }
