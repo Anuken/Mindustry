@@ -1666,7 +1666,7 @@ public class LStatements{
 
     @RegisterStatement("setprop")
     public static class SetPropStatement extends LStatement{
-        public String of = "block1", type = "@copper", value = "0";
+        public String type = "@copper", of = "block1", value = "0";
 
         private transient int selected = 0;
         private transient TextField tfield;
@@ -1764,7 +1764,7 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new SetPropI(builder.var(of), builder.var(type), builder.var(value));
+            return new SetPropI(builder.var(type), builder.var(of), builder.var(value));
         }
 
         @Override

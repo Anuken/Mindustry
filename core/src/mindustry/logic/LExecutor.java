@@ -1670,11 +1670,11 @@ public class LExecutor{
     }
 
     public static class SetPropI implements LInstruction{
-        public int of, type, value;
+        public int type, of, value;
 
-        public SetPropI(int of, int type, int value){
-            this.of = of;
+        public SetPropI(int type, int of, int value){
             this.type = type;
+            this.of = of;
             this.value = value;
         }
 
