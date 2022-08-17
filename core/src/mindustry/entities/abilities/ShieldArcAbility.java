@@ -39,6 +39,8 @@ public class ShieldArcAbility extends Ability{
         }
     };
 
+    /** Shield color. Set to null to use team color instead. */
+    public @Nullable Color color;
     /** Shield radius. */
     public float radius = 60f;
     /** Shield regen speed in damage/tick. */
@@ -98,7 +100,7 @@ public class ShieldArcAbility extends Ability{
         if(widthScale > 0.001f){
             Draw.z(Layer.shields);
 
-            Draw.color(unit.team.color, Color.white, Mathf.clamp(alpha));
+            Draw.color(color == null ? unit.team.color : color, Color.white, Mathf.clamp(alpha));
             var pos = paramPos.set(x, y).rotate(unit.rotation - 90f).add(unit);
 
             if(Vars.renderer.animateShields){

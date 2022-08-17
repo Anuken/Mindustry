@@ -14,6 +14,8 @@ import mindustry.graphics.*;
 import mindustry.ui.*;
 
 public class ForceFieldAbility extends Ability{
+    /** Shield color. Set to null to use team color instead. */
+    public @Nullable Color color;
     /** Shield radius. */
     public float radius = 60f;
     /** Shield regen speed in damage/tick. */
@@ -82,7 +84,7 @@ public class ForceFieldAbility extends Ability{
         if(unit.shield > 0){
             Draw.z(Layer.shields);
 
-            Draw.color(unit.team.color, Color.white, Mathf.clamp(alpha));
+            Draw.color(color == null ? unit.team.color : color, Color.white, Mathf.clamp(alpha));
 
             if(Vars.renderer.animateShields){
                 Fill.poly(unit.x, unit.y, 6, realRad);
