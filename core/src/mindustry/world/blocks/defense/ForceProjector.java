@@ -25,6 +25,7 @@ public class ForceProjector extends Block{
     public final int timerUse = timers++;
     public float phaseUseTime = 350f;
 
+    public @Nullable Color color;
     public float phaseRadiusBoost = 80f;
     public float phaseShieldBoost = 400f;
     public float radius = 101.7f;
@@ -238,7 +239,7 @@ public class ForceProjector extends Block{
 
                 Draw.z(Layer.shields);
 
-                Draw.color(team.color, Color.white, Mathf.clamp(hit));
+                Draw.color(color == null ? team.color : color, Color.white, Mathf.clamp(hit));
 
                 if(renderer.animateShields){
                     Fill.poly(x, y, 6, radius);
