@@ -15,7 +15,7 @@ public class ShieldWall extends Wall{
     public float shieldHealth = 900f;
     public float breakCooldown = 60f * 10f;
     public float regenSpeed = 2f;
-    public @Nullable Color shieldColor;
+    public @Nullable Color color;
 
     public Color glowColor = Color.valueOf("ff7531").a(0.5f);
     public float glowMag = 0.6f, glowScl = 8f;
