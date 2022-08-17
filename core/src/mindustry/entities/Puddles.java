@@ -129,9 +129,8 @@ public class Puddles{
 
     /**
      * Returns whether the first liquid can 'stay' on the second one.
-     * Currently, the only place where this can happen is oil on water.
      */
     private static boolean canStayOn(Liquid liquid, Liquid other){
-        return liquid == Liquids.oil && other == Liquids.water;
+        return liquid.canStayOn.contains(other);
     }
 }

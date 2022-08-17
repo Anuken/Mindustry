@@ -3,6 +3,7 @@ package mindustry.type;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
@@ -63,6 +64,8 @@ public class Liquid extends UnlockableContent implements Senseable{
     public Effect vaporEffect = Fx.vapor;
     /** If true, this liquid is hidden in most UI. */
     public boolean hidden;
+    /** Liquids this puddle can stay on, e.g. oil on water. */
+    public ObjectSet<Liquid> canStayOn = new ObjectSet<>();
 
     public Liquid(String name, Color color){
         super(name);

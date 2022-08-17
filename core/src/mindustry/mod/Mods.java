@@ -962,7 +962,7 @@ public class Mods implements Loadable{
                 Core.settings.put("mod-" + baseName + "-enabled", false);
             }
 
-            if(!headless){
+            if(!headless && Core.settings.getBool("mod-" + baseName + "-enabled", true)){
                 Log.info("Loaded mod '@' in @ms", meta.name, Time.elapsed());
             }
 

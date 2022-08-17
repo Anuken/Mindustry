@@ -8,7 +8,6 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
-import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -126,7 +125,7 @@ public class LaunchLoadoutDialog extends BaseDialog{
                 ItemSeq realItems = sitems.copy();
                 selected.requirements().each(realItems::remove);
 
-                loadout.show(lastCapacity, realItems, out, UnlockableContent::unlocked, out::clear, () -> {}, () -> {
+                loadout.show(lastCapacity, realItems, out, i -> i.unlocked() && !sector.planet.hiddenItems.contains(i), out::clear, () -> {}, () -> {
                     universe.updateLaunchResources(new ItemSeq(out));
                     update.run();
                     rebuildItems.run();
