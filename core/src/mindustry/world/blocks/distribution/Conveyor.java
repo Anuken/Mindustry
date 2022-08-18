@@ -378,7 +378,7 @@ public class Conveyor extends Block implements Autotiler{
         @Override
         public void setProp(Content content, double value){
             if(content instanceof Item i){
-                if (value <= 0) removeStack(i, capacity);
+                if(value <= 0) removeStack(i, capacity);
                 else handleStack(i, (int)value, this);
             }
             super.setProp(content, value);
