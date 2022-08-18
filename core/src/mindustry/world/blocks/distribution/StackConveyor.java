@@ -9,6 +9,7 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -369,6 +370,16 @@ public class StackConveyor extends Block implements Autotiler{
             ||  (items.any() && !items.has(item)) //incompatible items
             ||  (items.total() >= getMaximumAccepted(item)) //filled to capacity
             ||  (front()  == source));
+        }
+
+        @Override
+        public void setProp(Content content, double value){
+            if(content instanceof Item i){
+                lastItem = (value <= 0 ? null : i);
+                if(value <= 0) link = -1;
+                else if(items.empty() && tile != null) poofIn();
+            }
+            super.setProp(content, value);
         }
 
         @Override
