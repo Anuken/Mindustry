@@ -245,7 +245,11 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     public void setProp(LProperty property, double value){
         switch(property){
             case health -> health((float)Mathf.clamp(value, 0, maxHealth));
-            case team -> team(Team.get((int)value));
+            case team -> {
+                Team team = Team.get((int)value);
+                if(controller instanceof Player p) p.team(team);
+                team(team);
+            }
             case flag -> flag(value);
         }
     }
@@ -269,8 +273,17 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
                     }else pay.dropLastPayload();
                 }
             }
+            case playerUnit -> {
+                if(controller instanceof Player p){
+                    if(value instanceof Unit u) p.unit(u);
+                    else if(value == null) p.clearUnit();
+                }
+            }
             case team -> {
-                if(value instanceof Team t) team(t);
+                if(value instanceof Team t){
+                    if(controller instanceof Player p) p.team(t);
+                    team(t);
+                }
             }
         }
     }

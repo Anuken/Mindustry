@@ -8,6 +8,7 @@ public enum LProperty{
     health,
     team,
     flag,
+    playerUnit,
     payload;
 
     public static final LProperty[] all = values();
