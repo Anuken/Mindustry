@@ -146,9 +146,5 @@
   {
     "name": "AAS",
     "address": ["fi01.optik.host:28453", "n1.yeet.ml:6577"]
-  },
-  {
-    "name": "CyanDustry",
-    "address": ["n1.yeet.ml:6576"]
   }
 ]
