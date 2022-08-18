@@ -29,7 +29,7 @@ abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
     transient @Nullable Floor lastDrownFloor;
 
     boolean checkTarget(boolean targetAir, boolean targetGround){
-        return (isGrounded() && targetGround) || (isFlying() && targetAir);
+        return (isGrounded() && targetGround) || (isFlying() && targetAir) && type.hittable(self());
     }
 
     boolean isGrounded(){
