@@ -375,9 +375,8 @@ public class StackConveyor extends Block implements Autotiler{
         @Override
         public void setProp(Content content, double value){
             if(content instanceof Item i){
-                lastItem = (value <= 0 ? null : i);
-                if(value <= 0) link = -1;
-                else if(items.empty() && tile != null) poofIn();
+                if (value <= 0) link = -1;
+                else handleStack(i, (int)value, this);
             }
             super.setProp(content, value);
         }

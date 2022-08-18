@@ -9,6 +9,7 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -372,6 +373,15 @@ public class Conveyor extends Block implements Autotiler{
                 ys[mid] = 0.5f;
                 ids[mid] = item;
             }
+        }
+
+        @Override
+        public void setProp(Content content, double value){
+            if(content instanceof Item i){
+                if (value <= 0) removeStack(i, capacity);
+                else handleStack(i, (int)value, this);
+            }
+            super.setProp(content, value);
         }
 
         @Override
