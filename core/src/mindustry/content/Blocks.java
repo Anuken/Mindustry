@@ -1268,7 +1268,7 @@ public class Blocks{
             rotateDraw = false;
             regionRotated1 = 1;
             consumeLiquid(Liquids.slag, 40f / 60f);
-            heatOutput = 6f;
+            heatOutput = 8f;
         }};
 
         phaseHeater = new HeatProducer("phase-heater"){{
@@ -3629,16 +3629,16 @@ public class Blocks{
         cyclone = new ItemTurret("cyclone"){{
             requirements(Category.turret, with(Items.copper, 200, Items.titanium, 125, Items.plastanium, 80));
             ammo(
-                Items.metaglass, new FlakBulletType(4f, 9){{
+                Items.metaglass, new FlakBulletType(4f, 10){{
                     ammoMultiplier = 3f;
                     shootEffect = Fx.shootSmall;
                     reloadMultiplier = 0.8f;
                     width = 6f;
                     height = 8f;
                     hitEffect = Fx.flakExplosion;
-                    splashDamage = 32f * 1.5f;
+                    splashDamage = 55f;
                     splashDamageRadius = 25f;
-                    fragBullet = new BasicBulletType(3f, 8, "bullet"){{
+                    fragBullet = new BasicBulletType(3f, 12, "bullet"){{
                         width = 5f;
                         height = 12f;
                         shrinkY = 1f;
