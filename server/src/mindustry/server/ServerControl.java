@@ -467,8 +467,7 @@ public class ServerControl implements ApplicationListener{
 
         handler.register("pause", "<on/off>", "Pause or unpause the game.", arg -> {
             boolean pause = arg[0].equals("on");
-            state.serverPaused = pause;
-            info(pause ? "Game paused." : "Game unpaused.");
+            setPauseState(pause);
         });
 
         handler.register("rules", "[remove/add] [name] [value...]", "List, remove or add global rules. These will apply regardless of map.", arg -> {
@@ -971,6 +970,14 @@ public class ServerControl implements ApplicationListener{
         });
 
         mods.eachClass(p -> p.registerServerCommands(handler));
+    }
+
+    private static void setPauseState(boolean pause) {
+        if (pause == state.serverPaused)
+            return;
+
+        state.serverPaused = pause;
+        info(pause ? "Game paused." : "Game unpaused.");
     }
 
     public void handleCommandString(String line){
