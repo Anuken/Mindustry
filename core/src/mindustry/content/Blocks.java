@@ -1268,7 +1268,7 @@ public class Blocks{
             rotateDraw = false;
             regionRotated1 = 1;
             consumeLiquid(Liquids.slag, 40f / 60f);
-            heatOutput = 6f;
+            heatOutput = 8f;
         }};
 
         phaseHeater = new HeatProducer("phase-heater"){{
@@ -3629,16 +3629,16 @@ public class Blocks{
         cyclone = new ItemTurret("cyclone"){{
             requirements(Category.turret, with(Items.copper, 200, Items.titanium, 125, Items.plastanium, 80));
             ammo(
-                Items.metaglass, new FlakBulletType(4f, 9){{
+                Items.metaglass, new FlakBulletType(4f, 10){{
                     ammoMultiplier = 3f;
                     shootEffect = Fx.shootSmall;
                     reloadMultiplier = 0.8f;
                     width = 6f;
                     height = 8f;
                     hitEffect = Fx.flakExplosion;
-                    splashDamage = 32f * 1.5f;
+                    splashDamage = 55f;
                     splashDamageRadius = 25f;
-                    fragBullet = new BasicBulletType(3f, 8, "bullet"){{
+                    fragBullet = new BasicBulletType(3f, 12, "bullet"){{
                         width = 5f;
                         height = 12f;
                         shrinkY = 1f;
@@ -4091,6 +4091,7 @@ public class Blocks{
             rotateSpeed = 1.4f;
             minWarmup = 0.85f;
             shootWarmupSpeed = 0.07f;
+            shootSound = Sounds.artillery;
 
             coolant = consume(new ConsumeLiquid(Liquids.water, 30f / 60f));
             coolantMultiplier = 1.5f;
@@ -4159,6 +4160,7 @@ public class Blocks{
             rotateSpeed = 5f;
             shootCone = 30f;
             consumeAmmoOnce = true;
+            shootSound = Sounds.shootBig;
 
             drawer = new DrawTurret("reinforced-"){{
                 parts.add(new RegionPart("-side"){{
@@ -4166,15 +4168,15 @@ public class Blocks{
                     under = true;
                     moveX = 1.75f;
                     moveY = -0.5f;
-                }});
-                parts.add(new RegionPart("-mid"){{
+                }},
+                new RegionPart("-mid"){{
                     under = true;
                     moveY = -1.5f;
                     progress = PartProgress.recoil;
                     heatProgress = PartProgress.recoil.add(0.25f).min(PartProgress.warmup);
                     heatColor = Color.sky.cpy().a(0.9f);
-                }});
-                parts.add(new RegionPart("-blade"){{
+                }},
+                new RegionPart("-blade"){{
                     heatProgress = PartProgress.warmup;
                     heatColor = Color.sky.cpy().a(0.9f);
                     mirror = true;
