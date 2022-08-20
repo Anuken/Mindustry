@@ -374,7 +374,7 @@ public class Damage{
         tmpUnit = null;
 
         Units.nearbyEnemies(hitter.team, rect, e -> {
-            if((tmpUnit != null && e.dst2(x, y) > tmpUnit.dst2(x, y)) || !e.checkTarget(hitter.type.collidesAir, hitter.type.collidesGround)) return;
+            if((tmpUnit != null && e.dst2(x, y) > tmpUnit.dst2(x, y)) || !e.checkTarget(hitter.type.collidesAir, hitter.type.collidesGround) || !e.targetable(hitter.team)) return;
 
             e.hitbox(hitrect);
             Rect other = hitrect;
