@@ -69,8 +69,12 @@ public class ServerControl implements ApplicationListener{
     }
 
     protected void setup(String[] args){
-        Core.settings.defaults("bans", "", "admins", "", "shufflemode", "custom", "globalrules", "{reactorExplosions: false, logicUnitBuild: false}");
-
+        Core.settings.defaults(
+            "bans", "",
+            "admins", "",
+            "shufflemode", "custom",
+            "globalrules", "{reactorExplosions: false, logicUnitBuild: false}"
+        );
         //update log level
         Config.debug.set(Config.debug.bool());
 
@@ -173,7 +177,11 @@ public class ServerControl implements ApplicationListener{
             Map map = nextMapOverride != null ? nextMapOverride : maps.getNextMap(lastMode, state.map);
             nextMapOverride = null;
             if(map != null){
-                Call.infoMessage((state.rules.pvp ? "[accent]The " + event.winner.name + " team is victorious![]\n" : "[scarlet]Game over![]\n") + "\nNext selected map:[accent] " + Strings.stripColors(map.name()) + "[]" + (map.tags.containsKey("author") && !map.tags.get("author").trim().isEmpty() ? " by[accent] " + map.author() + "[white]" : "") + "." + "\nNew game begins in " + roundExtraTime + " seconds.");
+                Call.infoMessage((state.rules.pvp
+                ? "[accent]The " + event.winner.name + " team is victorious![]\n" : "[scarlet]Game over![]\n")
+                + "\nNext selected map:[accent] " + Strings.stripColors(map.name()) + "[]"
+                + (map.tags.containsKey("author") && !map.tags.get("author").trim().isEmpty() ? " by[accent] " + map.author() + "[white]" : "") + "." +
+                "\nNew game begins in " + roundExtraTime + " seconds.");
 
                 state.gameOver = true;
                 Call.updateGameOver(event.winner);
@@ -361,6 +369,7 @@ public class ServerControl implements ApplicationListener{
                 logic.play();
 
                 info("Map loaded.");
+
                 netServer.openServer();
 
                 if(Config.autoPause.bool()){
