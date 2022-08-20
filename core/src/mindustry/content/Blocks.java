@@ -4091,6 +4091,7 @@ public class Blocks{
             rotateSpeed = 1.4f;
             minWarmup = 0.85f;
             shootWarmupSpeed = 0.07f;
+            shootSound = Sounds.artillery;
 
             coolant = consume(new ConsumeLiquid(Liquids.water, 30f / 60f));
             coolantMultiplier = 1.5f;
@@ -4159,6 +4160,7 @@ public class Blocks{
             rotateSpeed = 5f;
             shootCone = 30f;
             consumeAmmoOnce = true;
+            shootSound = Sounds.shootBig;
 
             drawer = new DrawTurret("reinforced-"){{
                 parts.add(new RegionPart("-side"){{
@@ -4166,15 +4168,15 @@ public class Blocks{
                     under = true;
                     moveX = 1.75f;
                     moveY = -0.5f;
-                }});
-                parts.add(new RegionPart("-mid"){{
+                }},
+                new RegionPart("-mid"){{
                     under = true;
                     moveY = -1.5f;
                     progress = PartProgress.recoil;
                     heatProgress = PartProgress.recoil.add(0.25f).min(PartProgress.warmup);
                     heatColor = Color.sky.cpy().a(0.9f);
-                }});
-                parts.add(new RegionPart("-blade"){{
+                }},
+                new RegionPart("-blade"){{
                     heatProgress = PartProgress.warmup;
                     heatColor = Color.sky.cpy().a(0.9f);
                     mirror = true;
