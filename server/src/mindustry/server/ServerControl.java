@@ -40,7 +40,7 @@ public class ServerControl implements ApplicationListener{
 
     protected static String[] tags = {"&lc&fb[D]&fr", "&lb&fb[I]&fr", "&ly&fb[W]&fr", "&lr&fb[E]", ""};
     protected static DateTimeFormatter dateTime = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss"),
-            autosaveDate = DateTimeFormatter.ofPattern("MM-dd-yyyy_HH-mm-ss");
+        autosaveDate = DateTimeFormatter.ofPattern("MM-dd-yyyy_HH-mm-ss");
 
     public final CommandHandler handler = new CommandHandler("");
     public final Fi logFolder = Core.settings.getDataDirectory().child("logs/");
@@ -59,9 +59,9 @@ public class ServerControl implements ApplicationListener{
     private Gamemode lastMode;
     private @Nullable Map nextMapOverride;
     private Interval autosaveCount = new Interval();
+
     private Thread socketThread;
     private ServerSocket serverSocket;
-
     private PrintWriter socketOutput;
     private String suggested;
     private boolean autoPaused = false;
