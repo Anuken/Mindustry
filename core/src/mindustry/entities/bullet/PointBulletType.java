@@ -43,7 +43,7 @@ public class PointBulletType extends BulletType{
         float range = 1f;
 
         Units.nearbyEnemies(b.team, px - range, py - range, range*2f, range*2f, e -> {
-            if(e.dead() && !e.checkTarget(collidesAir, collidesGround)) return;
+            if(e.dead() || !e.checkTarget(collidesAir, collidesGround)) return;
 
             e.hitbox(Tmp.r1);
             if(!Tmp.r1.contains(px, py)) return;
