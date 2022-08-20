@@ -374,7 +374,7 @@ public class Damage{
         tmpUnit = null;
 
         Units.nearbyEnemies(hitter.team, rect, e -> {
-            if((tmpUnit != null && e.dst2(x, y) > tmpUnit.dst2(x, y)) || !e.checkTarget(hitter.type.collidesAir, hitter.type.collidesGround)) return;
+            if((tmpUnit != null && e.dst2(x, y) > tmpUnit.dst2(x, y)) || !e.checkTarget(hitter.type.collidesAir, hitter.type.collidesGround) || !e.targetable(hitter.team)) return;
 
             e.hitbox(hitrect);
             Rect other = hitrect;
@@ -468,7 +468,7 @@ public class Damage{
     /** Damages all entities and blocks in a radius that are enemies of the team. */
     public static void damage(Team team, float x, float y, float radius, float damage, boolean complete, boolean air, boolean ground, boolean scaled, Bullet source){
         Cons<Unit> cons = entity -> {
-            if(entity.team == team  || !entity.hittable() || !entity.within(x, y, radius + (scaled ? entity.hitSize / 2f : 0f)) || (entity.isFlying() && !air) || (entity.isGrounded() && !ground)){
+            if(entity.team == team  || !entity.checkTarget(air, ground) || !entity.hittable() || !entity.within(x, y, radius + (scaled ? entity.hitSize / 2f : 0f))){
                 return;
             }
 
