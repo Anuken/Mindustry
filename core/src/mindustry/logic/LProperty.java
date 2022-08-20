@@ -9,6 +9,9 @@ public enum LProperty{
     team,
     flag,
     playerUnit,
+    x, y, rotation,
+    shootX, shootY, shooting,
+    link,
     payload;
 
     public static final LProperty[] all = values();

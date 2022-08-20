@@ -245,6 +245,9 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     public void setProp(LProperty property, double value){
         switch(property){
             case health -> health((float)Mathf.clamp(value, 0, maxHealth));
+            case x -> set(World.unconv((float)value), y());
+            case y -> set(x(), World.unconv((float)value));
+            case rotation -> rotation((float)value);
             case team -> {
                 Team team = Team.get((int)value);
                 if(controller instanceof Player p) p.team(team);

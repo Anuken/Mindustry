@@ -292,6 +292,19 @@ public class Turret extends ReloadTurret{
         }
 
         @Override
+        public void setProp(LProperty property, double value){
+            logicControlTime = logicControlCooldown;
+            switch(property){
+                case shootX -> targetPos.x = World.unconv((float)value);
+                case shootY -> targetPos.y = World.unconv((float)value);
+                case rotation -> rotation = (float)Mathf.clamp(value, 0, 360);
+                case shooting -> logicShooting = !Mathf.zero(value);
+                default -> super.setProp(property, value);
+            }
+            if(property == LProperty.shootX || property == LProperty.shootY) rotation = angleTo(targetPos);
+        }
+
+        @Override
         public float progress(){
             return Mathf.clamp(reloadCounter / reload);
         }

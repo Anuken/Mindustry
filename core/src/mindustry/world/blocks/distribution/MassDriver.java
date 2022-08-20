@@ -341,6 +341,12 @@ public class MassDriver extends Block{
         }
 
         @Override
+        public void setPropObject(LProperty property, Object value){
+            if(property == LProperty.link && value instanceof Building b) link = b.pos();
+            else super.setPropObject(property, value);
+        }
+
+        @Override
         public void write(Writes write){
             super.write(write);
             write.i(link);
