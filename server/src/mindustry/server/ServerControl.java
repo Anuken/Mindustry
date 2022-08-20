@@ -77,6 +77,7 @@ public class ServerControl implements ApplicationListener{
             "shufflemode", "custom",
             "globalrules", "{reactorExplosions: false, logicUnitBuild: false}"
         );
+
         //update log level
         Config.debug.set(Config.debug.bool());
 
