@@ -456,7 +456,7 @@ public class ModsDialog extends BaseDialog{
                             //textures are only requested when the rendering happens; this assists with culling
                             if(!textureCache.containsKey(repo)){
                                 textureCache.put(repo, last = Core.atlas.find("nomap"));
-                                Http.get("https://raw.githubusercontent.com/Anuken/MindustryMods/master/icons/" + repo.replace("/", "_"), res -> {
+                                Http.get("https://raw.githubusercontent.com/" + repo + "/master/icon.png", res -> {
                                     Pixmap pix = new Pixmap(res.getResult());
                                     Core.app.post(() -> {
                                         try{
@@ -468,7 +468,19 @@ public class ModsDialog extends BaseDialog{
                                             Log.err(e);
                                         }
                                     });
-                                }, err -> {});
+                                }, err -> {Http.get("https://raw.githubusercontent.com/" + repo + "/master/assets/icon.png", res -> {
+                                    Pixmap pix = new Pixmap(res.getResult());
+                                    Core.app.post(() -> {
+                                        try{
+                                            var tex = new Texture(pix);
+                                            tex.setFilter(TextureFilter.linear);
+                                            textureCache.put(repo, new TextureRegion(tex));
+                                            pix.dispose();
+                                        }catch(Exception e){
+                                            Log.err(e);
+                                        }
+                                    });
+                                }, er -> {});});
                             }
 
                             var next = textureCache.get(repo);
