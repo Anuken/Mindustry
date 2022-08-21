@@ -374,8 +374,6 @@ public class ServerControl implements ApplicationListener{
                 if(Config.autoPause.bool()){
                     state.serverPaused = true;
                     autoPaused = true;
-
-                    info("Game was automatically paused because no players are online.");
                 }
             }catch(MapException e){
                 err(e.map.name() + ": " + e.getMessage());
