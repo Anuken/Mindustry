@@ -275,8 +275,6 @@ public class ServerControl implements ApplicationListener{
             if(state.serverPaused && autoPaused && Config.autoPause.bool()){
                 state.serverPaused = false;
                 autoPaused = false;
-
-                info("Game was automatically resumed because a player joined.");
             }
         });
 
@@ -286,8 +284,6 @@ public class ServerControl implements ApplicationListener{
             if(!state.serverPaused && Config.autoPause.bool() && Groups.player.size() == 1){
                 state.serverPaused = true;
                 autoPaused = true;
-
-                info("Game was automatically paused because no players are online.");
             }
         });
 
