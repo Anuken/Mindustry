@@ -4253,6 +4253,7 @@ public class Blocks{
                     waveStroke = 4f;
                     waveRad = 40f;
                 }};
+                despawnSound = Sounds.dullExplosion;
 
                 //TODO shoot sound
                 shootSound = Sounds.cannon;
@@ -4426,6 +4427,7 @@ public class Blocks{
                     //targetAir = false;
                     loopSound = Sounds.missileTrail;
                     loopSoundVolume = 0.6f;
+                    deathSound = Sounds.largeExplosion;
 
                     fogRadius = 6f;
 
@@ -5631,6 +5633,7 @@ public class Blocks{
             size = 5;
             alwaysUnlocked = true;
         }};
+
         heatSource = new HeatProducer("heat-source"){{
             requirements(Category.crafting, BuildVisibility.sandboxOnly, with());
             drawer = new DrawMulti(new DrawDefault(), new DrawHeatOutput());
@@ -5639,6 +5642,7 @@ public class Blocks{
             heatOutput = 1000f;
             warmupRate = 1000f;
             regionRotated1 = 1;
+            ambientSound = Sounds.none;
         }};
 
         //TODO move
