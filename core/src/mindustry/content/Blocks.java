@@ -3892,6 +3892,7 @@ public class Blocks{
             );
 
             coolantMultiplier = 6f;
+            shootSound = Sounds.shootAlt;
 
             shake = 1f;
             ammoPerShot = 2;
@@ -3943,6 +3944,8 @@ public class Blocks{
             ammoPerShot = 3;
             maxAmmo = 30;
             consumeAmmoOnce = true;
+
+            shootSound = Sounds.shootAltLong;
 
             drawer = new DrawTurret("reinforced-"){{
                 parts.add(new RegionPart("-front"){{
@@ -4011,6 +4014,10 @@ public class Blocks{
             targetInterval = 5f;
 
             float r = range = 130f;
+
+            loopSound = Sounds.torch;
+            shootSound = Sounds.none;
+            loopSoundVolume = 1f;
 
             //TODO balance, set up, where is liquid/sec displayed? status effects maybe?
             ammo(
@@ -4247,6 +4254,9 @@ public class Blocks{
                     waveRad = 40f;
                 }};
 
+                //TODO shoot sound
+                shootSound = Sounds.cannon;
+
                 fragBullet = intervalBullet = new BasicBulletType(3f, 30){{
                     width = 9f;
                     hitSize = 5f;
@@ -4368,6 +4378,10 @@ public class Blocks{
                 }});
             }};
 
+            shootSound = Sounds.none;
+            loopSoundVolume = 1f;
+            loopSound = Sounds.laserbeam;
+
             shootWarmupSpeed = 0.08f;
             shootCone = 360f;
 
@@ -4410,6 +4424,8 @@ public class Blocks{
                     missileAccelTime = 50f;
                     lowAltitude = true;
                     //targetAir = false;
+                    loopSound = Sounds.missileTrail;
+                    loopSoundVolume = 0.6f;
 
                     fogRadius = 6f;
 
@@ -4517,6 +4533,7 @@ public class Blocks{
             recoil = 0.5f;
 
             coolantMultiplier = 6f;
+            shootSound = Sounds.missileLaunch;
 
             minWarmup = 0.94f;
             shootWarmupSpeed = 0.03f;
@@ -4614,6 +4631,7 @@ public class Blocks{
                 mag = 3f;
             }});
 
+            shootSound = Sounds.shootSmite;
             minWarmup = 0.99f;
             coolantMultiplier = 6f;
 
@@ -4803,6 +4821,9 @@ public class Blocks{
 
             coolant = consume(new ConsumeLiquid(Liquids.water, 15f / 60f));
             limitRange();
+
+            loopSound = Sounds.glow;
+            loopSoundVolume = 0.8f;
         }};
 
         malign = new PowerTurret("malign"){{
@@ -4815,6 +4836,10 @@ public class Blocks{
             var circleProgress = PartProgress.warmup.delay(0.9f);
             var circleColor = haloColor;
             float circleY = 25f, circleRad = 11f, circleRotSpeed = 3.5f, circleStroke = 1.6f;
+
+            shootSound = Sounds.malignShoot;
+            loopSound = Sounds.spellLoop;
+            loopSoundVolume = 1.3f;
 
             shootType = new FlakBulletType(8f, 80f){{
                 sprite = "missile-large";

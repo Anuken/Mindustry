@@ -582,6 +582,16 @@ public class Turret extends ReloadTurret{
         }
 
         @Override
+        public float activeSoundVolume(){
+            return shootWarmup;
+        }
+
+        @Override
+        public boolean shouldActiveSound(){
+            return shootWarmup > 0.01f && loopSound != Sounds.none;
+        }
+
+        @Override
         public void write(Writes write){
             super.write(write);
             write.f(reloadCounter);

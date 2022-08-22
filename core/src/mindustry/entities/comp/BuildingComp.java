@@ -1098,6 +1098,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return false;
     }
 
+    /** @return volume cale of active sound. */
+    public float activeSoundVolume(){
+        return 1f;
+    }
+
     /** @return whether this block should play its idle sound.*/
     public boolean shouldAmbientSound(){
         return shouldConsume();
@@ -1954,7 +1959,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         //TODO separate system for sound? AudioSource, etc
         if(!headless){
             if(sound != null){
-                sound.update(x, y, shouldActiveSound());
+                sound.update(x, y, shouldActiveSound(), activeSoundVolume());
             }
 
             if(block.ambientSound != Sounds.none && shouldAmbientSound()){

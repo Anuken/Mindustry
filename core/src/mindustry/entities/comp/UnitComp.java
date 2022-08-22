@@ -437,6 +437,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         healTime -= Time.delta / 20f;
         wasHealed = false;
 
+        if(!headless && type.loopSound != Sounds.none){
+            control.sound.loop(type.loopSound, this, type.loopSoundVolume);
+        }
+
         //check if environment is unsupported
         if(!type.supportsEnv(state.rules.env) && !dead){
             Call.unitEnvDeath(self());
