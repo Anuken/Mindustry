@@ -1,5 +1,6 @@
 package mindustry.world.blocks.production;
 
+import arc.audio.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -8,6 +9,7 @@ import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 
@@ -26,6 +28,9 @@ public class BurstDrill extends Drill{
     public Color arrowColor = Color.valueOf("feb380"), baseArrowColor = Color.valueOf("6e7080");
     public Color glowColor = arrowColor.cpy();
 
+    public Sound drillSound = Sounds.drillImpact;
+    public float drillSoundVolume = 0.6f, drillSoundPitchRand = 0.1f;
+
     /** Multipliers of drill speed for each item. Defaults to 1. */
     public ObjectFloatMap<Item> drillMultipliers = new ObjectFloatMap<>();
 
@@ -38,6 +43,8 @@ public class BurstDrill extends Drill{
         //generally at center
         drillEffectRnd = 0f;
         drillEffect = Fx.shockwave;
+        ambientSoundVolume = 0.18f;
+        ambientSound = Sounds.drillCharge;
     }
 
     @Override
@@ -96,9 +103,15 @@ public class BurstDrill extends Drill{
 
                 if(wasVisible){
                     Effect.shake(shake, shake, this);
+                    drillSound.at(x, y, 1f + Mathf.range(drillSoundPitchRand), drillSoundVolume);
                     drillEffect.at(x + Mathf.range(drillEffectRnd), y + Mathf.range(drillEffectRnd), dominantItem.color);
                 }
             }
+        }
+
+        @Override
+        public float ambientVolume(){
+            return super.ambientVolume() * Mathf.pow(progress(), 4f);
         }
 
         @Override

@@ -1155,6 +1155,8 @@ public class Blocks{
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawArcSmelt(), new DrawDefault());
             fogRadius = 3;
             researchCost = with(Items.beryllium, 150, Items.graphite, 50);
+            ambientSound = Sounds.smelter;
+            ambientSoundVolume = 0.12f;
 
             consumeItems(with(Items.graphite, 1, Items.sand, 4));
             consumePower(6f);
@@ -1194,6 +1196,9 @@ public class Blocks{
                 }}
             );
 
+            ambientSound = Sounds.electricHum;
+            ambientSoundVolume = 0.08f;
+
             regionRotated1 = 3;
             outputLiquids = LiquidStack.with(Liquids.ozone, 4f / 60, Liquids.hydrogen, 6f / 60);
             liquidOutputDirections = new int[]{1, 3};
@@ -1217,6 +1222,8 @@ public class Blocks{
             researchCostMultiplier = 1.1f;
             liquidCapacity = 40f;
             consumePower(2f);
+            ambientSound = Sounds.extractLoop;
+            ambientSoundVolume = 0.06f;
 
             heatRequirement = 6f;
 
@@ -1237,6 +1244,8 @@ public class Blocks{
             rotateDraw = false;
 
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidRegion(), new DrawDefault(), new DrawHeatOutput());
+            ambientSound = Sounds.extractLoop;
+            ambientSoundVolume = 0.08f;
 
             regionRotated1 = 2;
             craftTime = 60f * 2f;
@@ -1307,7 +1316,7 @@ public class Blocks{
             hasPower = hasItems = true;
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawCrucibleFlame(), new DrawDefault(), new DrawHeatInput());
             ambientSound = Sounds.smelter;
-            ambientSoundVolume = 0.07f;
+            ambientSoundVolume = 0.09f;
 
             heatRequirement = 10f;
 
@@ -1357,7 +1366,7 @@ public class Blocks{
             liquidCapacity = 80f * 5;
 
             ambientSound = Sounds.smelter;
-            ambientSoundVolume = 0.07f;
+            ambientSoundVolume = 0.9f;
 
             outputItem = new ItemStack(Items.surgeAlloy, 1);
 
@@ -1402,6 +1411,9 @@ public class Blocks{
 
             size = 3;
 
+            ambientSound = Sounds.extractLoop;
+            ambientSoundVolume = 0.08f;
+
             liquidCapacity = 80f;
             outputLiquid = new LiquidStack(Liquids.cyanogen, 3f / 60f);
 
@@ -1422,7 +1434,7 @@ public class Blocks{
             liquidCapacity = 10f * 4;
 
             ambientSound = Sounds.techloop;
-            ambientSoundVolume = 0.03f;
+            ambientSoundVolume = 0.04f;
 
             outputItem = new ItemStack(Items.phaseFabric, 1);
 
@@ -2498,7 +2510,7 @@ public class Blocks{
             ambientSoundVolume = 0.06f;
         }};
 
-        //TODO still very much WIP, stats are bad
+        //TODO stats
         fluxReactor = new VariableReactor("flux-reactor"){{
             requirements(Category.power, with(Items.graphite, 300, Items.carbide, 200, Items.oxide, 100, Items.silicon, 600, Items.surgeAlloy, 300));
             powerProduction = 120f;
@@ -2507,6 +2519,9 @@ public class Blocks{
             consumeLiquid(Liquids.cyanogen, 9f / 60f);
             liquidCapacity = 30f;
             explosionMinWarmup = 0.5f;
+
+            ambientSound = Sounds.flux;
+            ambientSoundVolume = 0.13f;
 
             size = 5;
 
@@ -2540,7 +2555,6 @@ public class Blocks{
 
             heatOutput = 60f;
 
-            //TODO arkycite, or nitrogen? both? Decide.
             consumeLiquid(Liquids.arkycite, 80f / 60f);
             consumeLiquid(Liquids.water, 10f / 60f);
             consumeItem(Items.phaseFabric);
@@ -2551,10 +2565,13 @@ public class Blocks{
             explosionRadius = 5;
             explosionDamage = 500;
             explodeEffect = new MultiEffect(Fx.bigShockwave, new WrapEffect(Fx.titanSmoke, Liquids.neoplasm.color), Fx.neoplasmSplat);
-            explodeSound = Sounds.explosionbig;
+            explodeSound = Sounds.largeExplosion;
 
             powerProduction = 140f;
             rebuildable = false;
+
+            ambientSound = Sounds.bioLoop;
+            ambientSoundVolume = 0.2f;
 
             explosionPuddles = 80;
             explosionPuddleRange = tilesize * 7f;
@@ -2729,7 +2746,6 @@ public class Blocks{
 
         cliffCrusher = new WallCrafter("cliff-crusher"){{
             requirements(Category.production, with(Items.graphite, 25, Items.beryllium, 20));
-
             consumePower(11 / 60f);
 
             drillTime = 110f;
@@ -2743,6 +2759,7 @@ public class Blocks{
         plasmaBore = new BeamDrill("plasma-bore"){{
             requirements(Category.production, with(Items.beryllium, 40));
             consumePower(0.15f);
+
             drillTime = 160f;
             tier = 3;
             size = 2;
@@ -2758,6 +2775,7 @@ public class Blocks{
             requirements(Category.production, with(Items.silicon, 100, Items.oxide, 25, Items.beryllium, 100, Items.tungsten, 70));
             consumePower(0.8f);
             drillTime = 110f;
+
             tier = 5;
             size = 3;
             range = 6;
