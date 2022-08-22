@@ -343,7 +343,7 @@ public class Turret extends ReloadTurret{
         public void updateTile(){
             if(!validateTarget()) target = null;
 
-            float warmupTarget = isShooting() && canConsume() ? 1f : 0f;
+            float warmupTarget = (isShooting() && canConsume()) || charging() ? 1f : 0f;
             if(linearWarmup){
                 shootWarmup = Mathf.approachDelta(shootWarmup, warmupTarget, shootWarmupSpeed * (warmupTarget > 0 ? efficiency : 1f));
             }else{
