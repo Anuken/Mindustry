@@ -30,7 +30,7 @@ public class FlakBulletType extends BasicBulletType{
         if(b.time >= flakDelay && b.fdata >= 0 && b.timer(2, flakInterval)){
             Units.nearbyEnemies(b.team, Tmp.r1.setSize(explodeRange * 2f).setCenter(b.x, b.y), unit -> {
                 //fdata < 0 means it's primed to explode
-                if(b.fdata < 0f || !unit.checkTarget(collidesAir, collidesGround)) return;
+                if(b.fdata < 0f || !unit.checkTarget(collidesAir, collidesGround) || !unit.targetable(b.team)) return;
 
                 if(unit.within(b, explodeRange + unit.hitSize/2f)){
                     //mark as primed

@@ -1,6 +1,7 @@
 [
   {
-    "address": "be.mindustry.nydus.app:6567"
+    "name": "Nydus",
+    "address": ["be.mindustry.nydus.app:6567", "be.mindustry.nydus.app:6568"]
   },
   {
     "name": "mindustry.pl",
@@ -14,9 +15,6 @@
   },
   {
     "address": "be.xpdustry.fr"
-  },
-  {
-    "address": "mindustry.vicp.io:7000" 
   },
   {
     "address": "n1.yeet.ml:6574"

@@ -368,6 +368,8 @@ public class PowerGraph{
 
     @Deprecated
     private boolean otherConsumersAreValid(Building build, Consume consumePower){
+        if(!build.enabled) return false;
+
         float f = build.efficiency;
         //hack so liquids output positive efficiency values
         build.efficiency = 1f;

@@ -1268,7 +1268,7 @@ public class Blocks{
             rotateDraw = false;
             regionRotated1 = 1;
             consumeLiquid(Liquids.slag, 40f / 60f);
-            heatOutput = 6f;
+            heatOutput = 8f;
         }};
 
         phaseHeater = new HeatProducer("phase-heater"){{
@@ -2129,6 +2129,7 @@ public class Blocks{
         liquidTank = new LiquidRouter("liquid-tank"){{
             requirements(Category.liquid, with(Items.titanium, 30, Items.metaglass, 40));
             size = 3;
+            solid = true;
             liquidCapacity = 1800f;
             health = 500;
         }};
@@ -2159,10 +2160,8 @@ public class Blocks{
 
         //reinforced stuff
 
-        //TODO different name
         reinforcedPump = new Pump("reinforced-pump"){{
             requirements(Category.liquid, with(Items.beryllium, 40, Items.tungsten, 30, Items.silicon, 20));
-            //TODO CUSTOM DRAW ANIMATION - pistons - repurpose DrawBlock?
             consumeLiquid(Liquids.hydrogen, 1.5f / 60f);
 
             pumpAmount = 80f / 60f / 4f;
@@ -3630,16 +3629,16 @@ public class Blocks{
         cyclone = new ItemTurret("cyclone"){{
             requirements(Category.turret, with(Items.copper, 200, Items.titanium, 125, Items.plastanium, 80));
             ammo(
-                Items.metaglass, new FlakBulletType(4f, 9){{
+                Items.metaglass, new FlakBulletType(4f, 10){{
                     ammoMultiplier = 3f;
                     shootEffect = Fx.shootSmall;
                     reloadMultiplier = 0.8f;
                     width = 6f;
                     height = 8f;
                     hitEffect = Fx.flakExplosion;
-                    splashDamage = 32f * 1.5f;
+                    splashDamage = 55f;
                     splashDamageRadius = 25f;
-                    fragBullet = new BasicBulletType(3f, 8, "bullet"){{
+                    fragBullet = new BasicBulletType(3f, 12, "bullet"){{
                         width = 5f;
                         height = 12f;
                         shrinkY = 1f;
@@ -3893,6 +3892,7 @@ public class Blocks{
             );
 
             coolantMultiplier = 6f;
+            shootSound = Sounds.shootAlt;
 
             shake = 1f;
             ammoPerShot = 2;
@@ -3944,6 +3944,8 @@ public class Blocks{
             ammoPerShot = 3;
             maxAmmo = 30;
             consumeAmmoOnce = true;
+
+            shootSound = Sounds.shootAltLong;
 
             drawer = new DrawTurret("reinforced-"){{
                 parts.add(new RegionPart("-front"){{
@@ -4012,6 +4014,10 @@ public class Blocks{
             targetInterval = 5f;
 
             float r = range = 130f;
+
+            loopSound = Sounds.torch;
+            shootSound = Sounds.none;
+            loopSoundVolume = 1f;
 
             //TODO balance, set up, where is liquid/sec displayed? status effects maybe?
             ammo(
@@ -4092,6 +4098,7 @@ public class Blocks{
             rotateSpeed = 1.4f;
             minWarmup = 0.85f;
             shootWarmupSpeed = 0.07f;
+            shootSound = Sounds.artillery;
 
             coolant = consume(new ConsumeLiquid(Liquids.water, 30f / 60f));
             coolantMultiplier = 1.5f;
@@ -4160,6 +4167,7 @@ public class Blocks{
             rotateSpeed = 5f;
             shootCone = 30f;
             consumeAmmoOnce = true;
+            shootSound = Sounds.shootBig;
 
             drawer = new DrawTurret("reinforced-"){{
                 parts.add(new RegionPart("-side"){{
@@ -4167,15 +4175,15 @@ public class Blocks{
                     under = true;
                     moveX = 1.75f;
                     moveY = -0.5f;
-                }});
-                parts.add(new RegionPart("-mid"){{
+                }},
+                new RegionPart("-mid"){{
                     under = true;
                     moveY = -1.5f;
                     progress = PartProgress.recoil;
                     heatProgress = PartProgress.recoil.add(0.25f).min(PartProgress.warmup);
                     heatColor = Color.sky.cpy().a(0.9f);
-                }});
-                parts.add(new RegionPart("-blade"){{
+                }},
+                new RegionPart("-blade"){{
                     heatProgress = PartProgress.warmup;
                     heatColor = Color.sky.cpy().a(0.9f);
                     mirror = true;
@@ -4245,6 +4253,10 @@ public class Blocks{
                     waveStroke = 4f;
                     waveRad = 40f;
                 }};
+                despawnSound = Sounds.dullExplosion;
+
+                //TODO shoot sound
+                shootSound = Sounds.cannon;
 
                 fragBullet = intervalBullet = new BasicBulletType(3f, 30){{
                     width = 9f;
@@ -4367,6 +4379,10 @@ public class Blocks{
                 }});
             }};
 
+            shootSound = Sounds.none;
+            loopSoundVolume = 1f;
+            loopSound = Sounds.laserbeam;
+
             shootWarmupSpeed = 0.08f;
             shootCone = 360f;
 
@@ -4409,6 +4425,9 @@ public class Blocks{
                     missileAccelTime = 50f;
                     lowAltitude = true;
                     //targetAir = false;
+                    loopSound = Sounds.missileTrail;
+                    loopSoundVolume = 0.6f;
+                    deathSound = Sounds.largeExplosion;
 
                     fogRadius = 6f;
 
@@ -4516,6 +4535,7 @@ public class Blocks{
             recoil = 0.5f;
 
             coolantMultiplier = 6f;
+            shootSound = Sounds.missileLaunch;
 
             minWarmup = 0.94f;
             shootWarmupSpeed = 0.03f;
@@ -4613,6 +4633,7 @@ public class Blocks{
                 mag = 3f;
             }});
 
+            shootSound = Sounds.shootSmite;
             minWarmup = 0.99f;
             coolantMultiplier = 6f;
 
@@ -4802,6 +4823,9 @@ public class Blocks{
 
             coolant = consume(new ConsumeLiquid(Liquids.water, 15f / 60f));
             limitRange();
+
+            loopSound = Sounds.glow;
+            loopSoundVolume = 0.8f;
         }};
 
         malign = new PowerTurret("malign"){{
@@ -4814,6 +4838,10 @@ public class Blocks{
             var circleProgress = PartProgress.warmup.delay(0.9f);
             var circleColor = haloColor;
             float circleY = 25f, circleRad = 11f, circleRotSpeed = 3.5f, circleStroke = 1.6f;
+
+            shootSound = Sounds.malignShoot;
+            loopSound = Sounds.spellLoop;
+            loopSoundVolume = 1.3f;
 
             shootType = new FlakBulletType(8f, 80f){{
                 sprite = "missile-large";
@@ -5605,6 +5633,7 @@ public class Blocks{
             size = 5;
             alwaysUnlocked = true;
         }};
+
         heatSource = new HeatProducer("heat-source"){{
             requirements(Category.crafting, BuildVisibility.sandboxOnly, with());
             drawer = new DrawMulti(new DrawDefault(), new DrawHeatOutput());
@@ -5613,6 +5642,7 @@ public class Blocks{
             heatOutput = 1000f;
             warmupRate = 1000f;
             regionRotated1 = 1;
+            ambientSound = Sounds.none;
         }};
 
         //TODO move
@@ -5653,7 +5683,7 @@ public class Blocks{
         }};
 
         interplanetaryAccelerator = new Accelerator("interplanetary-accelerator"){{
-            requirements(Category.effect, BuildVisibility.hidden, with(Items.copper, 16000, Items.silicon, 11000, Items.thorium, 13000, Items.titanium, 12000, Items.surgeAlloy, 6000, Items.phaseFabric, 5000));
+            requirements(Category.effect, BuildVisibility.campaignOnly, with(Items.copper, 16000, Items.silicon, 11000, Items.thorium, 13000, Items.titanium, 12000, Items.surgeAlloy, 6000, Items.phaseFabric, 5000));
             researchCostMultiplier = 0.1f;
             size = 7;
             hasPower = true;
@@ -5755,7 +5785,8 @@ public class Blocks{
 
         worldCell = new MemoryBlock("world-cell"){{
             requirements(Category.logic, BuildVisibility.editorOnly, with());
-
+            
+            targetable = false;
             privileged = true;
             memoryCapacity = 128;
             forceDark = true;

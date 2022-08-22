@@ -1,14 +1,12 @@
 package mindustry.editor;
 
 import arc.*;
-import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.input.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.event.*;
 import arc.scene.ui.*;
-import arc.scene.ui.ImageButton.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
@@ -28,7 +26,7 @@ public class MapObjectivesCanvas extends WidgetGroup{
         objWidth = 5, objHeight = 2,
         bounds = 100;
 
-    public static final float unitSize = 48f;
+    public final float unitSize = Scl.scl(48f);
 
     public Seq<MapObjective> objectives = new Seq<>();
     public ObjectiveTilemap tilemap;
@@ -391,9 +389,9 @@ public class MapObjectivesCanvas extends WidgetGroup{
                 setTransform(false);
                 setClip(false);
 
-                add(conParent = new Connector(true)).size(unitSize, unitSize * 2);
+                add(conParent = new Connector(true)).size(unitSize / Scl.scl(1f), unitSize * 2 / Scl.scl(1f));
                 table(Tex.whiteui, t -> {
-                    float pad = (unitSize - 32f) / 2f - 4f;
+                    float pad = (unitSize / Scl.scl(1f) - 32f) / 2f - 4f;
                     t.margin(pad);
                     t.touchable(() -> Touchable.enabled);
                     t.setColor(Pal.gray);
@@ -425,8 +423,8 @@ public class MapObjectivesCanvas extends WidgetGroup{
                         });
                         b.button(Icon.trashSmall, () -> removeTile(this));
                     }).left().grow();
-                }).growX().height(unitSize * 2).get().addCaptureListener(mover = new Mover());
-                add(conChildren = new Connector(false)).size(unitSize, unitSize * 2);
+                }).growX().height(unitSize / Scl.scl(1f) * 2).get().addCaptureListener(mover = new Mover());
+                add(conChildren = new Connector(false)).size(unitSize / Scl.scl(1f), unitSize / Scl.scl(1f) * 2);
 
                 setSize(getPrefWidth(), getPrefHeight());
                 pos(x, y);

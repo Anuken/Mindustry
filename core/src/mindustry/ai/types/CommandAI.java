@@ -129,8 +129,6 @@ public class CommandAI extends AIController{
                         attackTarget != null ? engageRange :
                         0f, unit.isFlying() ? 40f : 100f, false, null, true);
                 }
-
-                //calculateFlock().limit(unit.speed() * flockMult)
             }
 
             //if stopAtTarget is set, stop trying to move to the target once it is reached - used for defending
@@ -145,7 +143,6 @@ public class CommandAI extends AIController{
             }
 
             if(attackTarget == null){
-                //TODO overshoot.
                 if(unit.within(targetPos, Math.max(5f, unit.hitSize / 2f))){
                     targetPos = null;
                 }else if(local.size > 1){

@@ -124,6 +124,10 @@ public abstract class DrawPart{
             return p -> get(p) / (1f - amount);
         }
 
+        default PartProgress compress(float start, float end){
+            return p -> Mathf.curve(get(p), start, end);
+        }
+
         default PartProgress blend(PartProgress other, float amount){
             return p -> Mathf.lerp(get(p), other.get(p), amount);
         }
