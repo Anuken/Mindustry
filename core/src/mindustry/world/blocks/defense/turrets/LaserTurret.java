@@ -52,6 +52,11 @@ public class LaserTurret extends PowerTurret{
             //still consumes power when bullet is around
             return bullets.any() || isActive() || isShooting();
         }
+        
+        @Override
+        public boolean isShooting(){
+            return super.isShooting() || bullet != null;
+        }
 
         @Override
         public void updateTile(){
