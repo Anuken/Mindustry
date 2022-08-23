@@ -18,7 +18,7 @@
   },
   {
     "name": "HexPvP Network",
-    "address": ["hexpvp.ml", "kycb42148.ddns.net:6614", "america-flux.at.playit.gg:23208"]
+    "address": ["hexpvp.ml", "kycb42148.ddns.net:6614"]
   },
   {
     "name": "Omega Hub",
@@ -50,7 +50,7 @@
   },
   {
     "name": "Korea",
-    "address": ["mindustry.kr", "america-flux.at.playit.gg:23208"]
+    "address": ["mindustry.kr"]
   },
   {
     "name": "Phoenix Network",
