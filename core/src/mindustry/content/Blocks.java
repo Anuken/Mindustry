@@ -2754,6 +2754,8 @@ public class Blocks{
             output = Items.sand;
             fogRadius = 2;
             researchCost = with(Items.beryllium, 100, Items.graphite, 40);
+            ambientSound = Sounds.drill;
+            ambientSoundVolume = 0.04f;
         }};
 
         plasmaBore = new BeamDrill("plasma-bore"){{
@@ -4086,6 +4088,7 @@ public class Blocks{
                 backColor = hitColor = trailColor = Color.valueOf("ea8878").lerp(Pal.redLight, 0.5f);
                 frontColor = Color.white;
                 ammoMultiplier = 1f;
+                hitSound = Sounds.titanExplosion;
 
                 status = StatusEffects.blasted;
 
@@ -4106,6 +4109,7 @@ public class Blocks{
             }}
             );
 
+            shootSound = Sounds.mediumCannon;
             ammoPerShot = 4;
             maxAmmo = ammoPerShot * 3;
             targetAir = false;
@@ -4116,7 +4120,6 @@ public class Blocks{
             rotateSpeed = 1.4f;
             minWarmup = 0.85f;
             shootWarmupSpeed = 0.07f;
-            shootSound = Sounds.artillery;
 
             coolant = consume(new ConsumeLiquid(Liquids.water, 30f / 60f));
             coolantMultiplier = 1.5f;
