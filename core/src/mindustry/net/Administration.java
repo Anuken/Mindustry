@@ -487,7 +487,8 @@ public class Administration{
         autosaveAmount = new Config("autosaveAmount", "The maximum amount of autosaves. Older ones get replaced.", 10),
         autosaveSpacing = new Config("autosaveSpacing", "Spacing between autosaves in seconds.", 60 * 5),
         debug = new Config("debug", "Enable debug logging", false, () -> Log.level = debug() ? LogLevel.debug : LogLevel.info),
-        snapshotInterval = new Config("snapshotInterval", "Client entity snapshot interval in ms.", 200);
+        snapshotInterval = new Config("snapshotInterval", "Client entity snapshot interval in ms.", 200),
+        autoPause = new Config("autoPause", "Whether the game should pause when nobody is online.", false);
 
         public final Object defaultValue;
         public final String name, key, description;
