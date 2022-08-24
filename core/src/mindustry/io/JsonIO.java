@@ -308,7 +308,10 @@ public class JsonIO{
                 int i = 0;
                 for(var value = data.child; value != null; value = value.next, i++){
                     for(var parent = value.get("parents").child; parent != null; parent = parent.next){
-                        exec.all.get(i).parents.add(exec.all.get(parent.asInt()));
+                        int val = parent.asInt();
+                        if(val >= 0 && val < exec.all.size){
+                            exec.all.get(i).parents.add(exec.all.get(val));
+                        }
                     }
                 }
 

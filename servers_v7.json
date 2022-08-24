@@ -22,7 +22,7 @@
   },
   {
     "name": "Omega Hub",
-    "address": ["n1.yeet.ml:6572", "n1.yeet.ml:6573"]
+    "address": ["n1.yeet.ml:6572", "n1.yeet.ml:6573", "n1.yeet.ml:6604", "n5.yeet.ml:6605", "n5.yeet.ml:6606", "n1.yeet.ml:6608","n1.yeet.ml:6599"]
   },
   {
     "name": "KMWStudios",
@@ -30,7 +30,7 @@
   },
   {
     "name": "Darkdustry",
-    "address": ["darkdustry.tk", "darkdustry.tk:5000", "darkdustry.tk:6000", "darkdustry.tk:7000", "darkdustry.tk:8000", "darkdustry.tk:9000"] 
+    "address": ["darkdustry.tk", "darkdustry.tk:1500", "darkdustry.tk:2000", "darkdustry.tk:3000", "darkdustry.tk:4000", "darkdustry.tk:5000", "darkdustry.tk:6000", "darkdustry.tk:7000", "darkdustry.tk:8000", "darkdustry.tk:9000"] 
   },
   {
     "name": "Chaotic Neutral",
@@ -89,8 +89,8 @@
     "address": ["mindustry.top","g.mindustry.top"]
   },
   {
-    "name": "[CIG]Potato",
-    "address": ["mindustry.vicp.io:6800", "mindustry.vicp.io:7000", "mindustry.vicp.io:6567"]
+    "name": "Fish",
+    "address": ["170.187.144.235"]
   },
   {
     "name": "Harders",
@@ -98,10 +98,14 @@
   },
   {
     "name": "OMNIDUSTRY",
-    "address": ["109.94.209.233:6569","109.94.209.233:6570","109.94.209.233:6571","109.94.209.233:6572"]
+    "address": ["109.94.209.233:6568","109.94.209.233:6569","109.94.209.233:6570","109.94.209.233:6571","109.94.209.233:6572","109.94.209.233:6573","109.94.209.233:6574"]
   },
   {
     "name": "The Devil",
     "address": ["dc8.i8mc.cn:8169", "dc8.i8mc.cn:8920", "other.xem8k5.top:10530"]
-  }  
+  },
+    {
+    "name": "Eradicationdustry",
+    "address": ["n1.yeet.ml:6577", "n1.yeet.ml:6576", "n1.yeet.ml:6602", "n1.yeet.ml:6669"]
+  }
 ]

@@ -343,7 +343,7 @@ public class Turret extends ReloadTurret{
         public void updateTile(){
             if(!validateTarget()) target = null;
 
-            float warmupTarget = isShooting() && canConsume() ? 1f : 0f;
+            float warmupTarget = (isShooting() && canConsume()) || charging() ? 1f : 0f;
             if(linearWarmup){
                 shootWarmup = Mathf.approachDelta(shootWarmup, warmupTarget, shootWarmupSpeed * (warmupTarget > 0 ? efficiency : 1f));
             }else{
@@ -579,6 +579,16 @@ public class Turret extends ReloadTurret{
 
         protected void handleBullet(@Nullable Bullet bullet, float offsetX, float offsetY, float angleOffset){
 
+        }
+
+        @Override
+        public float activeSoundVolume(){
+            return shootWarmup;
+        }
+
+        @Override
+        public boolean shouldActiveSound(){
+            return shootWarmup > 0.01f && loopSound != Sounds.none;
         }
 
         @Override

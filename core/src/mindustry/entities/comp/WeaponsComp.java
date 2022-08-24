@@ -82,7 +82,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
     @Override
     public void remove(){
         for(WeaponMount mount : mounts){
-            if(mount.bullet != null && mount.bullet.owner == self()){
+            if(mount.weapon.continuous && mount.bullet != null && mount.bullet.owner == self()){
                 mount.bullet.time = mount.bullet.lifetime - 10f;
                 mount.bullet = null;
             }

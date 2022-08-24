@@ -36,7 +36,6 @@ public class NuclearReactor extends PowerGenerator{
 
     /** heat removed per unit of coolant */
     public float coolantPower = 0.5f;
-    public float smoothLight;
 
     public Item fuelItem = Items.thorium;
 
@@ -82,6 +81,7 @@ public class NuclearReactor extends PowerGenerator{
     public class NuclearReactorBuild extends GeneratorBuild{
         public float heat;
         public float flash;
+        public float smoothLight;
 
         @Override
         public void updateTile(){

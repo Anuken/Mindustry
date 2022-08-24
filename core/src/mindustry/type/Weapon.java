@@ -93,6 +93,8 @@ public class Weapon implements Cloneable{
     public float minWarmup = 0f;
     /** lerp speed for shoot warmup, only used for parts */
     public float shootWarmupSpeed = 0.1f, smoothReloadSpeed = 0.15f;
+    /** If true, shoot warmup is linear instead of a curve. */
+    public boolean linearWarmup = false;
     /** random sound pitch range */
     public float soundPitchMin = 0.8f, soundPitchMax = 1f;
     /** whether shooter rotation is ignored when shooting. */
@@ -253,9 +255,15 @@ public class Weapon implements Cloneable{
         float lastReload = mount.reload;
         mount.reload = Math.max(mount.reload - Time.delta * unit.reloadMultiplier, 0);
         mount.recoil = Mathf.approachDelta(mount.recoil, 0, unit.reloadMultiplier / recoilTime);
-        mount.warmup = Mathf.lerpDelta(mount.warmup, (can && mount.shoot) || (continuous && mount.bullet != null) ? 1f : 0f, shootWarmupSpeed);
         mount.smoothReload = Mathf.lerpDelta(mount.smoothReload, mount.reload / reload, smoothReloadSpeed);
         mount.charge = mount.charging && shoot.firstShotDelay > 0 ? Mathf.approachDelta(mount.charge, 1, 1 / shoot.firstShotDelay) : 0;
+        
+        float warmupTarget = (can && mount.shoot) || (continuous && mount.bullet != null) || mount.charging ? 1f : 0f;
+        if(linearWarmup){
+            mount.warmup = Mathf.approachDelta(mount.warmup, warmupTarget, shootWarmupSpeed);
+        }else{
+            mount.warmup = Mathf.lerpDelta(mount.warmup, warmupTarget, shootWarmupSpeed);
+        }
 
         //rotate if applicable
         if(rotate && (mount.rotate || mount.shoot) && can){
