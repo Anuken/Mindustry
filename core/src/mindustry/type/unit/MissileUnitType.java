@@ -34,6 +34,8 @@ public class MissileUnitType extends UnitType{
         targetPriority = -1f;
         outlineColor = Pal.darkOutline;
         fogRadius = 2f;
+        loopSound = Sounds.missileTrail;
+        loopSoundVolume = 0.05f;
         //TODO weapon configs, etc?
     }
 }

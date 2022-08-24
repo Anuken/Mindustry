@@ -134,13 +134,5 @@
   {
     "name": "OMNIDUSTRY",
     "address": ["109.94.209.233"]
-  },
-  {
-    "name": "Fish",
-    "address": ["170.187.144.235"]
-  },
-  {
-    "name": "CyanDustry",
-    "address": ["n1.yeet.ml:6576", "n3.yeet.ml:6568"]
   }
 ]
