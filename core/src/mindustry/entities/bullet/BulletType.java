@@ -417,7 +417,7 @@ public class BulletType extends Content implements Cloneable{
 
     public void createSplashDamage(Bullet b, float x, float y){
         if(splashDamageRadius > 0 && !b.absorbed){
-            Damage.damage(b.team, x, y, splashDamageRadius, splashDamage * damageMultiplier(b), false, collidesAir, collidesGround, scaledSplashDamage, b);
+            Damage.damage(b.team, x, y, splashDamageRadius, splashDamage * b.damageMultiplier(), false, collidesAir, collidesGround, scaledSplashDamage, b);
 
             if(status != StatusEffects.none){
                 Damage.status(b.team, x, y, splashDamageRadius, status, statusDuration, collidesAir, collidesGround);
@@ -719,7 +719,7 @@ public class BulletType extends Content implements Cloneable{
         bullet.drag = drag;
         bullet.hitSize = hitSize;
         bullet.mover = mover;
-        bullet.damage = (damage < 0 ? this.damage : damage) * damageMultiplier(bullet);
+        bullet.damage = (damage < 0 ? this.damage : damage) * bullet.damageMultiplier();
         //reset trail
         if(bullet.trail != null){
             bullet.trail.clear();
