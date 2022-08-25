@@ -279,7 +279,7 @@ public class ErekirTechTree{
                 });
             });
 
-            node(coreCitadel, Seq.with(new SectorComplete(basin)), () -> {
+            node(coreCitadel, Seq.with(new SectorComplete(peaks)), () -> {
                 node(coreAcropolis, () -> {
 
                 });
