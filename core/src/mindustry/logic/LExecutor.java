@@ -588,6 +588,10 @@ public class LExecutor{
                     b.lastDisabler = exec.build;
                 }
 
+                if(type == LAccess.enabled && exec.bool(p1)){
+                    b.noSleep();
+                }
+
                 if(type.isObj && exec.var(p1).isobj){
                     b.control(type, exec.obj(p1), exec.num(p2), exec.num(p3), exec.num(p4));
                 }else{
