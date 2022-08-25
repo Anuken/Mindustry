@@ -38,7 +38,7 @@
   },
   {
     "name": "XCore",
-    "address": ["sandbox.xcore.tk:2707", "attack.xcore.tk:8141"]
+    "address": ["185.187.170.159:28221"]
   },
   {
     "name": "Obvilion Network",
