@@ -1634,14 +1634,14 @@ public class LExecutor{
     }
 
     public static class SpawnWaveI implements LInstruction{
-        public WaveType type;
+        public int natural;
         public int x, y;
 
         public SpawnWaveI(){
         }
 
-        public SpawnWaveI(WaveType type, int x, int y){
-            this.type = type;
+        public SpawnWaveI(int natural, int x, int y){
+            this.natural = natural;
             this.x = x;
             this.y = y;
         }
@@ -1650,7 +1650,7 @@ public class LExecutor{
         public void run(LExecutor exec){
             if(net.client()) return;
 
-            if(type == WaveType.natural){
+            if(exec.bool(natural)){
                 logic.skipWave(); //TODO: Does this sync?
                 return;
             }
