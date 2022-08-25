@@ -5361,6 +5361,8 @@ public class Blocks{
             upgrades.addAll(
             new UnitType[]{UnitTypes.elude, UnitTypes.avert}
             );
+
+            researchCost = with(Items.beryllium, 500, Items.tungsten, 200, Items.silicon, 300, Items.oxide, 80);
         }};
 
         //yes very silly name
