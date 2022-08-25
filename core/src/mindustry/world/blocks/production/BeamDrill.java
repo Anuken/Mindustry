@@ -60,7 +60,7 @@ public class BeamDrill extends Block{
         solid = true;
         drawArrow = false;
         regionRotated1 = 1;
-        ambientSoundVolume = 0.04f;
+        ambientSoundVolume = 0.05f;
         ambientSound = Sounds.minebeam;
 
         envEnabled |= Env.space;

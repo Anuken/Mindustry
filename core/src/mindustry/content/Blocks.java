@@ -1263,6 +1263,7 @@ public class Blocks{
             size = 2;
             heatOutput = 3f;
             regionRotated1 = 1;
+            ambientSound = Sounds.hum;
             consumePower(100f / 60f);
         }};
         
@@ -1276,6 +1277,7 @@ public class Blocks{
             liquidCapacity = 40f;
             rotateDraw = false;
             regionRotated1 = 1;
+            ambientSound = Sounds.hum;
             consumeLiquid(Liquids.slag, 40f / 60f);
             heatOutput = 8f;
         }};
@@ -1287,6 +1289,7 @@ public class Blocks{
             size = 2;
             heatOutput = 15f;
             craftTime = 60f * 8f;
+            ambientSound = Sounds.hum;
             consumeItem(Items.phaseFabric);
         }};
 
@@ -3650,13 +3653,13 @@ public class Blocks{
             requirements(Category.turret, with(Items.copper, 200, Items.titanium, 125, Items.plastanium, 80));
             ammo(
                 Items.metaglass, new FlakBulletType(4f, 10){{
-                    ammoMultiplier = 3f;
+                    ammoMultiplier = 2f;
                     shootEffect = Fx.shootSmall;
                     reloadMultiplier = 0.8f;
                     width = 6f;
                     height = 8f;
                     hitEffect = Fx.flakExplosion;
-                    splashDamage = 55f;
+                    splashDamage = 50f;
                     splashDamageRadius = 25f;
                     fragBullet = new BasicBulletType(3f, 12, "bullet"){{
                         width = 5f;
@@ -3674,7 +3677,7 @@ public class Blocks{
                 Items.blastCompound, new FlakBulletType(4f, 5){{
                     shootEffect = Fx.shootBig;
                     ammoMultiplier = 5f;
-                    splashDamage = 26f * 1.5f;
+                    splashDamage = 30f * 1.5f;
                     splashDamageRadius = 60f;
                     collidesGround = true;
 
@@ -3682,6 +3685,7 @@ public class Blocks{
                     statusDuration = 60f;
                 }},
                 Items.plastanium, new FlakBulletType(4f, 6){{
+                    ammoMultiplier = 4f;
                     splashDamageRadius = 40f;
                     splashDamage = 25f * 1.5f;
                     fragBullet = new BasicBulletType(2.5f, 12, "bullet"){{
