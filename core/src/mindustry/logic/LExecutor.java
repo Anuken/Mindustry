@@ -1401,6 +1401,7 @@ public class LExecutor{
                 case wave -> state.wave = exec.numi(value);
                 case currentWaveTime -> state.wavetime = exec.numf(value) * 60f;
                 case waves -> state.rules.waves = exec.bool(value);
+                case waveSending -> state.rules.waveSending = exec.bool(value);
                 case attackMode -> state.rules.attackMode = exec.bool(value);
                 case waveSpacing -> state.rules.waveSpacing = exec.numf(value) * 60f;
                 case enemyCoreBuildRadius -> state.rules.enemyCoreBuildRadius = exec.numf(value) * 8f;
