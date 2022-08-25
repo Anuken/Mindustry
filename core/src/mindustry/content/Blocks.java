@@ -1832,7 +1832,7 @@ public class Blocks{
         shockwaveTower = new ShockwaveTower("shockwave-tower"){{
             requirements(Category.effect, with(Items.surgeAlloy, 50, Items.silicon, 150, Items.oxide, 30, Items.tungsten, 100));
             size = 3;
-            consumeLiquids(LiquidStack.with(Liquids.cyanogen, 1f / 60f));
+            consumeLiquids(LiquidStack.with(Liquids.cyanogen, 1.5f / 60f));
             consumePower(100f / 60f);
         }};
 
