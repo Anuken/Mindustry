@@ -12,7 +12,7 @@ public class SectorPresets{
     impact0078, desolateRift, nuclearComplex, planetaryTerminal,
     coastline, navalFortress,
 
-    onset, aegis, lake, intersect, basin, atlas, split;
+    onset, aegis, lake, intersect, basin, atlas, split, marsh, peaks;
 
     public static void load(){
         //region serpulo
@@ -137,6 +137,14 @@ public class SectorPresets{
 
         basin = new SectorPreset("basin", erekir, 29){{
             difficulty = 6;
+        }};
+
+        marsh = new SectorPreset("marsh", erekir, 25){{
+            difficulty = 4;
+        }};
+
+        peaks = new SectorPreset("peaks", erekir, 30){{
+            difficulty = 3;
         }};
 
         //endregion
