@@ -1291,16 +1291,32 @@ public class LStatements{
 
     @RegisterStatement("spawnwave")
     public static class SpawnWaveStatement extends LStatement{
+        public WaveType type = WaveType.simulation;
         public String x = "10", y = "10";
 
         @Override
         public void build(Table table){
+            rebuild(table);
+        }
 
-            table.add("x ");
-            fields(table, x, str -> x = str);
+        void rebuild(Table table){
+            table.clearChildren();
 
-            table.add(" y ");
-            fields(table, y, str -> y = str);
+            table.button(b -> {
+                b.label(() -> type.name()).growX().wrap().labelAlign(Align.center);
+                b.clicked(() -> showSelect(b, WaveType.all, type, o -> {
+                    type = o;
+                    rebuild(table);
+                }, 1, c -> c.width(150f)));
+            }, Styles.logict, () -> {}).size(160f, 40f).padLeft(2).color(table.color);
+
+            if(type == WaveType.simulation){
+                table.add("x ");
+                fields(table, x, str -> x = str);
+
+                table.add(" y ");
+                fields(table, y, str -> y = str);
+            }
         }
 
         @Override
@@ -1310,7 +1326,7 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new SpawnWaveI(builder.var(x), builder.var(y));
+            return new SpawnWaveI(type, builder.var(x), builder.var(y));
         }
 
         @Override

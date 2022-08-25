@@ -1634,12 +1634,14 @@ public class LExecutor{
     }
 
     public static class SpawnWaveI implements LInstruction{
+        public WaveType type;
         public int x, y;
 
         public SpawnWaveI(){
         }
 
-        public SpawnWaveI(int x, int y){
+        public SpawnWaveI(WaveType type, int x, int y){
+            this.type = type;
             this.x = x;
             this.y = y;
         }
@@ -1648,9 +1650,14 @@ public class LExecutor{
         public void run(LExecutor exec){
             if(net.client()) return;
 
+            if(type == WaveType.natural){
+                logic.skipWave(); //TODO: Does this sync?
+                return;
+            }
+
             float
-            spawnX = World.unconv(exec.numf(x)),
-            spawnY = World.unconv(exec.numf(y));
+                spawnX = World.unconv(exec.numf(x)),
+                spawnY = World.unconv(exec.numf(y));
             int packed = Point2.pack(exec.numi(x), exec.numi(y));
 
             for(SpawnGroup group : state.rules.spawns){
