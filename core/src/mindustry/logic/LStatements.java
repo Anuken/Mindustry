@@ -969,7 +969,8 @@ public class LStatements{
     public static class UnitLocateStatement extends LStatement{
         public LLocate locate = LLocate.building;
         public BlockFlag flag = BlockFlag.core;
-        public String enemy = "true", ore = "@copper";
+        public String ore = "@copper";
+        public boolean enemy = true;
         public String outX = "outx", outY = "outy", outFound = "found", outBuild = "building";
 
         @Override
@@ -1000,9 +1001,13 @@ public class LStatements{
                     }, Styles.logict, () -> {}).size(110, 40).color(table.color).left().padLeft(2);
                     row(table);
 
-                    table.add(" enemy ").left().self(this::param);
-
-                    fields(table, enemy, str -> enemy = str);
+                    table.add(" enemy ");
+                    table.button(b -> {
+                        b.label(() -> String.valueOf(enemy)).growX().wrap().labelAlign(Align.center);
+                        b.clicked(() -> boolSelect(b, "loc-enemy", enemy, o -> {
+                            enemy = o;
+                        }));
+                    }, Styles.logict, () -> {}).size(90f, 40f).padLeft(2).color(table.color);
 
                     table.row();
                 }
@@ -1065,7 +1070,7 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new UnitLocateI(locate, flag, builder.var(enemy), builder.var(ore), builder.var(outX), builder.var(outY), builder.var(outFound), builder.var(outBuild));
+            return new UnitLocateI(locate, flag, enemy, builder.var(ore), builder.var(outX), builder.var(outY), builder.var(outFound), builder.var(outBuild));
         }
 
         @Override
@@ -1291,21 +1296,33 @@ public class LStatements{
 
     @RegisterStatement("spawnwave")
     public static class SpawnWaveStatement extends LStatement{
-        public String natural = "false";
+        public boolean natural = false;
         public String x = "10", y = "10";
 
         @Override
         public void build(Table table){
-            table.add("natural ");
-            fields(table, natural, str -> {
-                natural = str;
-            });
+            rebuild(table);
+        }
 
-            table.add("x ").visible(() -> natural.equals("false"));
-            fields(table, x, str -> x = str).visible(() -> natural.equals("false"));
+        public void rebuild(Table table){
+            table.clearChildren();
 
-            table.add(" y ").visible(() -> natural.equals("false"));
-            fields(table, y, str -> y = str).visible(() -> natural.equals("false"));
+            table.add("natural").padLeft(10);
+            table.button(b -> {
+                b.label(() -> String.valueOf(natural)).growX().wrap().labelAlign(Align.center);
+                b.clicked(() -> boolSelect(b, "wave-natural", natural, o -> {
+                    natural = o;
+                    rebuild(table);
+                }));
+            }, Styles.logict, () -> {}).size(90f, 40f).padLeft(2).color(table.color);
+
+
+            if(natural) return;
+            table.add(" x ");
+            fields(table, x, str -> x = str);
+
+            table.add(" y ");
+            fields(table, y, str -> y = str);
         }
 
         @Override
@@ -1315,7 +1332,7 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new SpawnWaveI(builder.var(natural), builder.var(x), builder.var(y));
+            return new SpawnWaveI(natural, builder.var(x), builder.var(y));
         }
 
         @Override
@@ -1493,7 +1510,8 @@ public class LStatements{
 
     @RegisterStatement("explosion")
     public static class ExplosionStatement extends LStatement{
-        public String team = "@crux", x = "0", y = "0", radius = "5", damage = "50", air = "true", ground = "true", pierce = "false";
+        public String team = "@crux", x = "0", y = "0", radius = "5", damage = "50";
+        public boolean air = true, ground = true, pierce = false;
 
         @Override
         public void build(Table table){
@@ -1504,10 +1522,28 @@ public class LStatements{
             fields(table, "radius", radius, str -> radius = str);
             table.row();
             fields(table, "damage", damage, str -> damage = str);
-            fields(table, "air", air, str -> air = str);
+            table.add("air");;
+            table.button(b -> {
+                b.label(() -> String.valueOf(air)).growX().wrap().labelAlign(Align.center);
+                b.clicked(() -> boolSelect(b, "exp-air", air, o -> {
+                    air = o;
+                }));
+            }, Styles.logict, () -> {}).size(90f, 40f).padLeft(2).color(table.color);
             row(table);
-            fields(table, "ground", ground, str -> ground = str);
-            fields(table, "pierce", pierce, str -> pierce = str);
+            table.add("ground");
+            table.button(b -> {
+                b.label(() -> String.valueOf(ground)).growX().wrap().labelAlign(Align.center);
+                b.clicked(() -> boolSelect(b, "exp-ground", ground, o -> {
+                    ground = o;
+                }));
+            }, Styles.logict, () -> {}).size(90f, 40f).padLeft(2).color(table.color);
+            table.add("pierce");
+            table.button(b -> {
+                b.label(() -> String.valueOf(pierce)).growX().wrap().labelAlign(Align.center);
+                b.clicked(() -> boolSelect(b, "exp-pierce", pierce, o -> {
+                    pierce = o;
+                }));
+            }, Styles.logict, () -> {}).size(90f, 40f).padLeft(2).color(table.color);
         }
 
         @Override
@@ -1517,7 +1553,7 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler b){
-            return new ExplosionI(b.var(team), b.var(x), b.var(y), b.var(radius), b.var(damage), b.var(air), b.var(ground), b.var(pierce));
+            return new ExplosionI(b.var(team), b.var(x), b.var(y), b.var(radius), b.var(damage), air, ground, pierce);
         }
 
         @Override
@@ -1642,7 +1678,8 @@ public class LStatements{
 
     @RegisterStatement("setflag")
     public static class SetFlagStatement extends LStatement{
-        public String flag = "\"flag\"", value = "true";
+        public String flag = "\"flag\"";
+        public boolean value = true;
 
         @Override
         public void build(Table table){
@@ -1650,7 +1687,12 @@ public class LStatements{
 
             table.add(" = ");
 
-            fields(table, value, str -> value = str);
+            table.button(b -> {
+                b.label(() -> String.valueOf(value)).growX().wrap().labelAlign(Align.center);
+                b.clicked(() -> boolSelect(b, "flag-value", value, o -> {
+                    value = o;
+                }));
+            }, Styles.logict, () -> {}).size(90f, 40f).padLeft(2).color(table.color);
         }
 
         @Override
@@ -1660,7 +1702,7 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new SetFlagI(builder.var(flag), builder.var(value));
+            return new SetFlagI(builder.var(flag), value);
         }
 
         @Override

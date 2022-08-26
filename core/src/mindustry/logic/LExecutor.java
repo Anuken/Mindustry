@@ -260,10 +260,11 @@ public class LExecutor{
     public static class UnitLocateI implements LInstruction{
         public LLocate locate = LLocate.building;
         public BlockFlag flag = BlockFlag.core;
-        public int enemy, ore;
+        public int ore;
+        public boolean enemy;
         public int outX, outY, outFound, outBuild;
 
-        public UnitLocateI(LLocate locate, BlockFlag flag, int enemy, int ore, int outX, int outY, int outFound, int outBuild){
+        public UnitLocateI(LLocate locate, BlockFlag flag, boolean enemy, int ore, int outX, int outY, int outFound, int outBuild){
             this.locate = locate;
             this.flag = flag;
             this.enemy = enemy;
@@ -298,7 +299,7 @@ public class LExecutor{
                             }
                         }
                         case building -> {
-                            Building b = Geometry.findClosest(unit.x, unit.y, exec.bool(enemy) ? indexer.getEnemy(unit.team, flag) : indexer.getFlagged(unit.team, flag));
+                            Building b = Geometry.findClosest(unit.x, unit.y, enemy ? indexer.getEnemy(unit.team, flag) : indexer.getFlagged(unit.team, flag));
                             res = b == null ? null : b.tile;
                             build = true;
                         }
@@ -1530,9 +1531,10 @@ public class LExecutor{
     }
 
     public static class ExplosionI implements LInstruction{
-        public int team, x, y, radius, damage, air, ground, pierce;
+        public int team, x, y, radius, damage;
+        public boolean air, ground, pierce;
 
-        public ExplosionI(int team, int x, int y, int radius, int damage, int air, int ground, int pierce){
+        public ExplosionI(int team, int x, int y, int radius, int damage, boolean air, boolean ground, boolean pierce){
             this.team = team;
             this.x = x;
             this.y = y;
@@ -1552,7 +1554,7 @@ public class LExecutor{
 
             Team t = exec.team(team);
             //note that there is a radius cap
-            Call.logicExplosion(t, World.unconv(exec.numf(x)), World.unconv(exec.numf(y)), World.unconv(Math.min(exec.numf(radius), 100)), exec.numf(damage), exec.bool(air), exec.bool(ground), exec.bool(pierce));
+            Call.logicExplosion(t, World.unconv(exec.numf(x)), World.unconv(exec.numf(y)), World.unconv(Math.min(exec.numf(radius), 100)), exec.numf(damage), air, ground, pierce);
         }
     }
 
@@ -1611,9 +1613,10 @@ public class LExecutor{
     }
 
     public static class SetFlagI implements LInstruction{
-        public int flag, value;
+        public int flag;
+        public boolean value;
 
-        public SetFlagI(int flag, int value){
+        public SetFlagI(int flag, boolean value){
             this.flag = flag;
             this.value = value;
         }
@@ -1624,7 +1627,7 @@ public class LExecutor{
         @Override
         public void run(LExecutor exec){
             if(exec.obj(flag) instanceof String str){
-                if(!exec.bool(value)){
+                if(!value){
                     state.rules.objectiveFlags.remove(str);
                 }else{
                     state.rules.objectiveFlags.add(str);
@@ -1634,13 +1637,13 @@ public class LExecutor{
     }
 
     public static class SpawnWaveI implements LInstruction{
-        public int natural;
+        public boolean natural;
         public int x, y;
 
         public SpawnWaveI(){
         }
 
-        public SpawnWaveI(int natural, int x, int y){
+        public SpawnWaveI(boolean natural, int x, int y){
             this.natural = natural;
             this.x = x;
             this.y = y;
@@ -1650,7 +1653,7 @@ public class LExecutor{
         public void run(LExecutor exec){
             if(net.client()) return;
 
-            if(exec.bool(natural)){
+            if(natural){
                 logic.skipWave(); //TODO: Does this sync?
                 return;
             }

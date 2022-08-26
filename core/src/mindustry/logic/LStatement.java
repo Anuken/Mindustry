@@ -119,6 +119,23 @@ public abstract class LStatement{
         }
     }
 
+    protected void boolSelect(Button b, String name, boolean current, Boolc getter){
+        showSelectTable(b, (t, hide) -> {
+            ButtonGroup<Button> group = new ButtonGroup<>();
+            int i = 0;
+            t.defaults().size(60f, 38f);
+
+            for(boolean bool : Mathf.booleans){
+                t.button(String.valueOf(bool), Styles.logicTogglet, () -> {
+                    getter.get(bool);
+                    hide.run();
+                }).self(c -> {
+                    tooltip(c, "lbool." + name + "." + bool);
+                }).checked(current == bool).group(group);
+            }
+        });
+    }
+
     protected <T> void showSelect(Button b, T[] values, T current, Cons<T> getter, int cols, Cons<Cell> sizer){
         showSelectTable(b, (t, hide) -> {
             ButtonGroup<Button> group = new ButtonGroup<>();
