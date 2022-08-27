@@ -1291,15 +1291,12 @@ public class LStatements{
 
     @RegisterStatement("spawnwave")
     public static class SpawnWaveStatement extends LStatement{
-        public String natural = "false";
-        public String x = "10", y = "10";
+        public String x = "10", y = "10", natural = "false";
 
         @Override
         public void build(Table table){
             table.add("natural ");
-            fields(table, natural, str -> {
-                natural = str;
-            });
+            fields(table, natural, str -> natural = str);
 
             table.add("x ").visible(() -> natural.equals("false"));
             fields(table, x, str -> x = str).visible(() -> natural.equals("false"));
