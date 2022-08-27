@@ -38,7 +38,6 @@ import mindustry.world.blocks.heat.HeatConductor.*;
 import mindustry.world.blocks.logic.LogicBlock.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.power.*;
-import mindustry.world.blocks.production.Drill.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 import mindustry.world.modules.*;
@@ -1874,7 +1873,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public Object senseObject(LAccess sensor){
         return switch(sensor){
             case type -> block;
-            case firstItem -> self() instanceof DrillBuild ? ((DrillBuild) self()).dominantItem : items == null ? null : items.first();
+            case firstItem -> items == null ? null : items.first();
             case config -> block.configSenseable() ? config() : null;
             case payloadType -> getPayload() instanceof UnitPayload p1 ? p1.unit.type : getPayload() instanceof BuildPayload p2 ? p2.block() : null;
             default -> noSensed;
