@@ -1651,7 +1651,7 @@ public class LExecutor{
             if(net.client()) return;
 
             if(exec.bool(natural)){
-                logic.skipWave(); //TODO: Does this sync?
+                logic.skipWave();
                 return;
             }
 
