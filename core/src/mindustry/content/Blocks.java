@@ -348,7 +348,7 @@ public class Blocks{
             lightColor = Color.orange.cpy().a(0.3f);
         }};
 
-        sand = new Floor("sand"){{
+        sand = new Floor("sand-floor"){{
             itemDrop = Items.sand;
             playerUnmineable = true;
             attributes.set(Attribute.oil, 0.7f);
@@ -4056,7 +4056,7 @@ public class Blocks{
                 colors = new Color[]{Color.valueOf("eb7abe").a(0.55f), Color.valueOf("e189f5").a(0.7f), Color.valueOf("907ef7").a(0.8f), Color.valueOf("91a4ff"), Color.white};
             }},
             Liquids.cyanogen, new ContinuousFlameBulletType(){{
-                damage = 140f;
+                damage = 130f;
                 rangeChange = 70f;
                 length = r + rangeChange;
                 knockback = 2f;

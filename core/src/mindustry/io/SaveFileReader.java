@@ -54,6 +54,7 @@ public abstract class SaveFileReader{
     "craters", "crater-stone",
     "deepwater", "deep-water",
     "water", "shallow-water",
+    "sand", "sand-floor",
     "slag", "molten-slag",
 
     "cryofluidmixer", "cryofluid-mixer",
