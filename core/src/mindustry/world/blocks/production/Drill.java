@@ -267,6 +267,12 @@ public class Drill extends Block{
         }
 
         @Override
+        public Object senseObject(LAccess sensor){
+            if(sensor == LAccess.firstItem) return dominantItem;
+            return super.senseObject(sensor);
+        }
+
+        @Override
         public void updateTile(){
             if(dominantItem == null){
                 return;
