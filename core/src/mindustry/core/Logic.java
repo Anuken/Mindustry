@@ -34,12 +34,14 @@ public class Logic implements ApplicationListener{
     public Logic(){
 
         Events.on(BlockDestroyEvent.class, event -> {
-            //blocks that get broken are appended to the team's broken block queue
-            Tile tile = event.tile;
-            //skip null entities or un-rebuildables, for obvious reasons
-            if(tile.build == null || !tile.block().rebuildable) return;
+            if(state.rules.unitAutoRebuild){
+                //blocks that get broken are appended to the team's broken block queue
+                Tile tile = event.tile;
+                //skip null entities or un-rebuildables, for obvious reasons
+                if(tile.build == null || !tile.block().rebuildable) return;
 
-            tile.build.addPlan(true);
+                tile.build.addPlan(true);
+            }
         });
 
         Events.on(BlockBuildEndEvent.class, event -> {

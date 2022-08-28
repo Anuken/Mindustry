@@ -63,6 +63,8 @@ public class Rules{
     public float unitBuildSpeedMultiplier = 1f;
     /** How much damage any other units deal. */
     public float unitDamageMultiplier = 1f;
+    /** If true, builder units will automatically rebuild destroyed blocks. */
+    public boolean unitAutoRebuild = true;
     /** Whether to allow units to build with logic. */
     public boolean logicUnitBuild = true;
     /** If true, world processors no longer update. Used for testing. */
