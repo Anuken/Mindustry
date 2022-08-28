@@ -107,5 +107,9 @@
     {
     "name": "Eradicationdustry",
     "address": ["n1.yeet.ml:6577", "n1.yeet.ml:6576", "n1.yeet.ml:6602", "n1.yeet.ml:6669"]
+  },
+  {
+  "name": "LamNguyenServer",
+  "address": ["america-flux.at.playit.gg:23208"]
   }
 ]
