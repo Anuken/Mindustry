@@ -4452,10 +4452,10 @@ public class Blocks{
                     trailLength = 18;
                     missileAccelTime = 50f;
                     lowAltitude = true;
-                    //targetAir = false;
                     loopSound = Sounds.missileTrail;
                     loopSoundVolume = 0.6f;
                     deathSound = Sounds.largeExplosion;
+                    targetAir = false;
 
                     fogRadius = 6f;
 
