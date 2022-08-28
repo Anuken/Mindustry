@@ -42,6 +42,7 @@ public class UnitFactory extends UnitBlock{
         rotate = true;
         regionRotated1 = 1;
         commandable = true;
+        ambientSound = Sounds.respawning;
 
         config(Integer.class, (UnitFactoryBuild tile, Integer i) -> {
             if(!configurable) return;
@@ -192,6 +193,11 @@ public class UnitFactory extends UnitBlock{
         public Object senseObject(LAccess sensor){
             if(sensor == LAccess.config) return currentPlan == -1 ? null : plans.get(currentPlan).unit;
             return super.senseObject(sensor);
+        }
+
+        @Override
+        public boolean shouldActiveSound(){
+            return shouldConsume();
         }
 
         @Override

@@ -661,12 +661,8 @@ public class LExecutor{
             int address = exec.numi(position);
             Building from = exec.building(target);
 
-            if(from instanceof MemoryBuild mem && (exec.privileged || from.team == exec.team)){
-
-                if(address >= 0 && address < mem.memory.length){
-                    mem.memory[address] = exec.num(value);
-                }
-
+            if(from instanceof MemoryBuild mem && (exec.privileged || from.team == exec.team) && address >= 0 && address < mem.memory.length){
+                mem.memory[address] = exec.num(value);
             }
         }
     }
