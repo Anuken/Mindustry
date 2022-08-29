@@ -38,8 +38,8 @@ public class VariableReactor extends PowerGenerator{
         rebuildable = false;
 
 
-        explosionRadius = 12;
-        explosionDamage = 1000;
+        explosionRadius = 16;
+        explosionDamage = 1500;
         explodeEffect = new MultiEffect(Fx.bigShockwave, new WrapEffect(Fx.titanSmoke, Color.valueOf("e3ae6f")));
         explodeSound = Sounds.explosionbig;
 

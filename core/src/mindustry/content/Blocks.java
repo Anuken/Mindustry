@@ -2566,8 +2566,8 @@ public class Blocks{
             itemDuration = 60f * 3f;
             itemCapacity = 10;
 
-            explosionRadius = 5;
-            explosionDamage = 500;
+            explosionRadius = 7;
+            explosionDamage = 1000;
             explodeEffect = new MultiEffect(Fx.bigShockwave, new WrapEffect(Fx.titanSmoke, Liquids.neoplasm.color), Fx.neoplasmSplat);
             explodeSound = Sounds.largeExplosion;
 
@@ -4842,10 +4842,11 @@ public class Blocks{
             outlineColor = Pal.darkOutline;
             size = 5;
             envEnabled |= Env.space;
+            warmupMaintainTime = 30f;
             reload = 100f;
             recoil = 2f;
             range = 300;
-            shootCone = 10f;
+            shootCone = 30f;
             scaledHealth = 350;
             rotateSpeed = 1.5f;
 
@@ -4871,7 +4872,7 @@ public class Blocks{
             loopSound = Sounds.spellLoop;
             loopSoundVolume = 1.3f;
 
-            shootType = new FlakBulletType(8f, 80f){{
+            shootType = new FlakBulletType(8f, 70f){{
                 sprite = "missile-large";
 
                 lifetime = 45f;
@@ -4908,7 +4909,7 @@ public class Blocks{
                 flakInterval = 20f;
                 despawnShake = 3f;
 
-                fragBullet = new LaserBulletType(90f){{
+                fragBullet = new LaserBulletType(65f){{
                     colors = new Color[]{haloColor.cpy().a(0.4f), haloColor, Color.white};
                     buildingDamageMultiplier = 0.25f;
                     width = 19f;
@@ -5167,6 +5168,7 @@ public class Blocks{
             velocityRnd = 0.15f;
             heatRequirement = 90f;
             maxHeatEfficiency = 2f;
+            warmupMaintainTime = 30f;
             consumePower(10f);
 
             shoot = new ShootSummon(0f, 0f, circleRad, 48f);
