@@ -359,6 +359,10 @@ public class ErekirTechTree{
 
                             node(basin, Seq.with(new SectorComplete(atlas)), () -> {
                                 node(marsh, Seq.with(new SectorComplete(basin)), () ->{
+                                    node(ravine, Seq.with(new SectorComplete(marsh)), () ->{
+
+                                    });
+
                                     node(peaks, Seq.with(new SectorComplete(marsh), new SectorComplete(split)), () ->{
 
                                     });
