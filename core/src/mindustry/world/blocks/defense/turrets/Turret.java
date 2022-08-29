@@ -346,7 +346,7 @@ public class Turret extends ReloadTurret{
             if(!validateTarget()) target = null;
 
             float warmupTarget = (isShooting() && canConsume()) || charging() ? 1f : 0f;
-            if(warmupTarget > 0){
+            if(warmupTarget > 0 && shootWarmup >= minWarmup && !isControlled()){
                 warmupHold = 1f;
             }
             if(warmupHold > 0f){
