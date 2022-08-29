@@ -51,6 +51,8 @@ public class Weapon implements Cloneable{
     public boolean alwaysContinuous;
     /** whether this weapon can be aimed manually by players */
     public boolean controllable = true;
+    /** whether this weapon is always shooting, regardless of targets ore cone */
+    public boolean alwaysShooting = false;
     /** whether to automatically target relevant units in update(); only works when controllable = false. */
     public boolean autoTarget = false;
     /** whether to perform target trajectory prediction */
@@ -322,6 +324,8 @@ public class Weapon implements Cloneable{
             //note that shooting state is not affected, as these cannot be controlled
             //logic will return shooting as false even if these return true, which is fine
         }
+
+        if(alwaysShooting) mount.shoot = true;
 
         //update continuous state
         if(continuous && mount.bullet != null){
