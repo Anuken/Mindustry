@@ -193,27 +193,27 @@ public class ErekirTechTree{
                     node(siliconArcFurnace, () -> {
                         node(electrolyzer, Seq.with(new OnSector(atlas)), () -> {
                             node(oxidationChamber, Seq.with(new Research(tankRefabricator), new OnSector(marsh)), () -> {
-                                node(electricHeater, Seq.with(tmpNever), () -> {
-                                    node(heatRedirector, () -> {
-                                        node(surgeCrucible, () -> {
+
+                                node(surgeCrucible, Seq.with(new OnSector(ravine)), () -> {
+
+                                });
+                                node(heatRedirector, Seq.with(new OnSector(ravine)), () -> {
+                                    node(electricHeater, Seq.with(tmpNever), () -> {
+                                        node(slagHeater, () -> {
 
                                         });
-                                    });
 
-                                    node(slagHeater, () -> {
+                                        node(atmosphericConcentrator, Seq.with(tmpNever), () -> {
+                                            node(cyanogenSynthesizer, Seq.with(tmpNever), () -> {
 
-                                    });
-                                    
-                                    node(atmosphericConcentrator, Seq.with(new OnSector(basin)), () -> {
-                                        node(cyanogenSynthesizer, Seq.with(new OnSector(basin)), () -> {
-
+                                            });
                                         });
-                                    });
 
-                                    node(carbideCrucible, Seq.with(tmpNever), () -> {
-                                        node(phaseSynthesizer, () -> {
-                                            node(phaseHeater, () -> {
+                                        node(carbideCrucible, Seq.with(tmpNever), () -> {
+                                            node(phaseSynthesizer, () -> {
+                                                node(phaseHeater, () -> {
 
+                                                });
                                             });
                                         });
                                     });
@@ -262,7 +262,7 @@ public class ErekirTechTree{
                 node(diffuse, Seq.with(new OnSector(lake)), () -> {
                     node(sublimate, Seq.with(new OnSector(marsh)), () -> {
                         node(titan, Seq.with(new OnSector(marsh)), () -> {
-                            node(afflict, Seq.with(new OnSector(marsh)), () -> {
+                            node(afflict, Seq.with(new OnSector(ravine)), () -> {
 
                             });
                         });
@@ -288,7 +288,7 @@ public class ErekirTechTree{
             node(tankFabricator, Seq.with(new Research(siliconArcFurnace), new Research(plasmaBore), new Research(turbineCondenser)), () -> {
                 node(UnitTypes.stell);
 
-                node(unitRepairTower, Seq.with(tmpNever, new Research(mechRefabricator)), () -> {
+                node(unitRepairTower, Seq.with(new OnSector(ravine), new Research(mechRefabricator)), () -> {
 
                 });
 
@@ -359,7 +359,7 @@ public class ErekirTechTree{
 
                             node(basin, Seq.with(new SectorComplete(atlas)), () -> {
                                 node(marsh, Seq.with(new SectorComplete(basin)), () ->{
-                                    node(ravine, Seq.with(new SectorComplete(marsh)), () ->{
+                                    node(ravine, Seq.with(new SectorComplete(marsh), new Research(Liquids.slag)), () ->{
 
                                     });
 
