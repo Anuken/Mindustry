@@ -55,7 +55,7 @@ public class LExecutor{
     public @Nullable LogicBuild build;
     public IntSet linkIds = new IntSet();
     public Team team = Team.derelict;
-    public boolean privileged = false;
+    public boolean privileged = false, isFilter = false;
 
     //yes, this is a minor memory leak, but it's probably not significant enough to matter
     protected IntFloatMap unitTimeouts = new IntFloatMap();
@@ -1298,10 +1298,22 @@ public class LExecutor{
                 //TODO this can be quite laggy...
                 switch(layer){
                     case ore -> {
-                        if(b instanceof OverlayFloor o && tile.overlay() != o) tile.setOverlayNet(o);
+                        if(b instanceof OverlayFloor o && tile.overlay() != o){
+                            if(exec.isFilter){
+                                tile.setOverlay(o);
+                            }else{
+                                tile.setOverlayNet(o);
+                            }
+                        }
                     }
                     case floor -> {
-                        if(b instanceof Floor f && tile.floor() != f && !f.isOverlay()) tile.setFloorNet(f);
+                        if(b instanceof Floor f && tile.floor() != f && !f.isOverlay()){
+                            if(exec.isFilter){
+                                tile.setFloor(f);
+                            }else{
+                                tile.setFloorNet(f);
+                            }
+                        }
                     }
                     case block -> {
                         if(!b.isFloor() || b == Blocks.air){
@@ -1309,7 +1321,11 @@ public class LExecutor{
                             if(t == null) t = Team.derelict;
 
                             if(tile.block() != b || tile.team() != t){
-                                tile.setNet(b, t, Mathf.clamp(exec.numi(rotation), 0, 3));
+                                if(exec.isFilter){
+                                    tile.setBlock(b, t, Mathf.clamp(exec.numi(rotation), 0, 3));
+                                }else{
+                                    tile.setNet(b, t, Mathf.clamp(exec.numi(rotation), 0, 3));
+                                }
                             }
                         }
                     }
