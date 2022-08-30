@@ -198,8 +198,8 @@ public class ErekirTechTree{
 
                                 });
                                 node(heatRedirector, Seq.with(new OnSector(ravine)), () -> {
-                                    node(electricHeater, Seq.with(tmpNever), () -> {
-                                        node(slagHeater, () -> {
+                                    node(electricHeater, Seq.with(new OnSector(ravine), new Research(afflict)), () -> {
+                                        node(slagHeater, Seq.with(tmpNever), () -> {
 
                                         });
 
