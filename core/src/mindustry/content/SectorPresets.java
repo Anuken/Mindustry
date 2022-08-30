@@ -149,6 +149,7 @@ public class SectorPresets{
 
         ravine = new SectorPreset("ravine", erekir, 39){{
             difficulty = 4;
+            captureWave = 24;
         }};
 
         //endregion
