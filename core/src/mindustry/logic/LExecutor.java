@@ -588,6 +588,10 @@ public class LExecutor{
                     b.lastDisabler = exec.build;
                 }
 
+                if(type == LAccess.enabled && exec.bool(p1)){
+                    b.noSleep();
+                }
+
                 if(type.isObj && exec.var(p1).isobj){
                     b.control(type, exec.obj(p1), exec.num(p2), exec.num(p3), exec.num(p4));
                 }else{
@@ -657,12 +661,8 @@ public class LExecutor{
             int address = exec.numi(position);
             Building from = exec.building(target);
 
-            if(from instanceof MemoryBuild mem && (exec.privileged || from.team == exec.team)){
-
-                if(address >= 0 && address < mem.memory.length){
-                    mem.memory[address] = exec.num(value);
-                }
-
+            if(from instanceof MemoryBuild mem && (exec.privileged || from.team == exec.team) && address >= 0 && address < mem.memory.length){
+                mem.memory[address] = exec.num(value);
             }
         }
     }
