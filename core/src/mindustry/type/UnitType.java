@@ -246,6 +246,10 @@ public class UnitType extends UnlockableContent{
     public Color lightColor = Pal.powerLight;
     /** sound played when this unit explodes (*not* when it is shot down) */
     public Sound deathSound = Sounds.bang;
+    /** sound played on loop when this unit is around. */
+    public Sound loopSound = Sounds.none;
+    /** volume of loop sound */
+    public float loopSoundVolume = 0.5f;
     /** effect that this unit emits when falling */
     public Effect fallEffect = Fx.fallSmoke;
     /** effect created at engine when unit falls. */

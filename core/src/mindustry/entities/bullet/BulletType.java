@@ -364,6 +364,13 @@ public class BulletType extends Content implements Cloneable{
         }
     }
 
+    public float damageMultiplier(Bullet b){
+        if(b.owner instanceof Unit u) return u.damageMultiplier() * state.rules.unitDamage(b.team);
+        if(b.owner instanceof Building) return state.rules.blockDamage(b.team);
+
+        return 1f;
+    }
+
     public void hit(Bullet b){
         hit(b, b.x, b.y);
     }

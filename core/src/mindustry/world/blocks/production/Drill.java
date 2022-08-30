@@ -267,6 +267,12 @@ public class Drill extends Block{
         }
 
         @Override
+        public Object senseObject(LAccess sensor){
+            if(sensor == LAccess.firstItem) return dominantItem;
+            return super.senseObject(sensor);
+        }
+
+        @Override
         public void updateTile(){
             if(dominantItem == null){
                 return;
@@ -305,8 +311,13 @@ public class Drill extends Block{
         }
 
         @Override
+        public float progress(){
+            return dominantItem == null ? 0f : Mathf.clamp(progress / getDrillTime(dominantItem));
+        }
+
+        @Override
         public double sense(LAccess sensor){
-            if(sensor == LAccess.progress && dominantItem != null) return Mathf.clamp(progress / getDrillTime(dominantItem));
+            if(sensor == LAccess.progress && dominantItem != null) return progress;
             return super.sense(sensor);
         }
 

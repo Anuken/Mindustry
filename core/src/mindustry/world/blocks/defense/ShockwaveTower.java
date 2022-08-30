@@ -19,9 +19,9 @@ import static mindustry.Vars.*;
 public class ShockwaveTower extends Block{
     public int timerCheck = timers ++;
 
-    public float range = 90f;
-    public float reload = 60f * 2f;
-    public float bulletDamage = 150;
+    public float range = 110f;
+    public float reload = 60f * 1.5f;
+    public float bulletDamage = 160;
     public float falloffCount = 20f;
     public float shake = 2f;
     //checking for bullets every frame is costly, so only do it at intervals even when ready.

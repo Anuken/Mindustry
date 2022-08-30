@@ -152,6 +152,11 @@ public class ContinuousTurret extends Turret{
         }
 
         @Override
+        public float activeSoundVolume(){
+            return 1f;
+        }
+
+        @Override
         public byte version(){
             return 3;
         }

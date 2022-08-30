@@ -1,6 +1,7 @@
 [
   {
-    "address": "be.mindustry.nydus.app:6567"
+    "name": "Nydus",
+    "address": ["be.mindustry.nydus.app:6567", "be.mindustry.nydus.app:6568"]
   },
   {
     "name": "mindustry.pl",

@@ -38,9 +38,9 @@ public class LightBlock extends Block{
 
     @Override
     public void init(){
-        //double needed for some reason
-        lightRadius = radius*2f;
+        lightRadius = radius*3f;
         emitLight = true;
+
         super.init();
     }
 
