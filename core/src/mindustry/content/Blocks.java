@@ -4367,10 +4367,10 @@ public class Blocks{
         lustre = new ContinuousTurret("lustre"){{
             requirements(Category.turret, with(Items.silicon, 250, Items.graphite, 200, Items.oxide, 50, Items.carbide, 90));
 
-            range = 100f;
+            range = 130f;
 
             shootType = new PointLaserBulletType(){{
-                damage = 140f;
+                damage = 180f;
                 buildingDamageMultiplier = 0.3f;
                 hitColor = Color.valueOf("fda981");
             }};
