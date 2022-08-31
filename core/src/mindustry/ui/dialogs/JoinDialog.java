@@ -40,6 +40,8 @@ public class JoinDialog extends BaseDialog{
     int lastPort;
     Task ping;
 
+    String serverSearch = "";
+
     public JoinDialog(){
         super("@joingame");
 
@@ -395,6 +397,15 @@ public class JoinDialog extends BaseDialog{
 
         global.clear();
         global.background(null);
+
+        global.table(t -> {
+            t.add("@search").padRight(10);
+            t.field(serverSearch, text ->
+                serverSearch = text.trim().replaceAll(" +", " ").toLowerCase()
+            ).grow().pad(8).get().keyDown(KeyCode.enter, this::refreshCommunity);
+            t.button(Icon.zoom, Styles.emptyi, this::refreshCommunity).size(54f);
+        }).width(targetWidth()).height(70f).pad(4).row();
+
         for(int i = 0; i < defaultServers.size; i ++){
             ServerGroup group = defaultServers.get((i + defaultServers.size/2) % defaultServers.size);
             boolean hidden = group.hidden();
@@ -410,6 +421,12 @@ public class JoinDialog extends BaseDialog{
                 int resport = address.contains(":") ? Strings.parseInt(address.split(":")[1]) : port;
                 net.pingHost(resaddress, resport, res -> {
                     if(refreshes != cur) return;
+
+                    if(!serverSearch.isEmpty() && !(group.name.toLowerCase().contains(serverSearch)
+                        || res.name.toLowerCase().contains(serverSearch)
+                        || res.description.toLowerCase().contains(serverSearch)
+                        || res.mapname.toLowerCase().contains(serverSearch)
+                        || (res.modeName != null && res.modeName.toLowerCase().contains(serverSearch)))) return;
 
                     //add header
                     if(groupTable[0] == null){

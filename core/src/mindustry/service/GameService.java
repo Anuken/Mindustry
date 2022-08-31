@@ -158,7 +158,7 @@ public class GameService{
         Events.on(UnitCreateEvent.class, e -> {
             if(campaign()){
                 if(unitsBuilt.add(e.unit.type.name)){
-                    SStat.unitTypesBuilt.set(content.units().count(u -> unitsBuilt.contains(u.name) && !u.isHidden()));
+                    SStat.unitTypesBuilt.max(content.units().count(u -> unitsBuilt.contains(u.name) && !u.isHidden()));
                     save();
                 }
 
@@ -325,7 +325,7 @@ public class GameService{
             }
 
             for(Building entity : player.team().cores()){
-                if(!content.items().contains(i -> entity.items.get(i) < entity.block.itemCapacity)){
+                if(!content.items().contains(i -> !state.rules.hiddenBuildItems.contains(i) && entity.items.get(i) < entity.block.itemCapacity)){
                     fillCoreAllCampaign.complete();
                     break;
                 }

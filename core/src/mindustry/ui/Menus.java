@@ -111,6 +111,13 @@ public class Menus{
         ui.hudfrag.showToast(Fonts.getGlyph(Fonts.icon, (char)unicode), text);
     }
 
+    @Remote(variants = Variant.both)
+    public static void openURI(String uri){
+        if(uri == null) return;
+
+        ui.showConfirm(Core.bundle.format("linkopen", uri), () -> Core.app.openURI(uri));
+    }
+
     //internal use only
     @Remote
     public static void removeWorldLabel(int id){

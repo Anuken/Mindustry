@@ -29,20 +29,19 @@ public class DiscordDialog extends Dialog{
             }).expandY();
 
             t.table(i -> {
-                i.background(Tex.button);
                 i.image(Icon.discord);
             }).size(h).left();
 
             t.add("@discord").color(Pal.accent).growX().padLeft(10f);
-        }).size(440f, h).pad(10f);
+        }).size(520f, h).pad(10f);
 
-        buttons.defaults().size(150f, 50);
+        buttons.defaults().size(170f, 50);
 
-        buttons.button("@back", this::hide);
-        buttons.button("@copylink", () -> {
+        buttons.button("@back", Icon.left, this::hide);
+        buttons.button("@copylink", Icon.copy, () -> {
             Core.app.setClipboardText(discordURL);
         });
-        buttons.button("@openlink", () -> {
+        buttons.button("@openlink", Icon.discord, () -> {
             if(!Core.app.openURI(discordURL)){
                 ui.showErrorMessage("@linkfail");
                 Core.app.setClipboardText(discordURL);

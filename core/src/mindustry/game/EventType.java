@@ -32,6 +32,7 @@ public class EventType{
         teamCoreDamage,
         socketConfigChanged,
         update,
+        unitCommandChange,
         draw,
         drawOver,
         preDraw,
@@ -553,6 +554,7 @@ public class EventType{
         }
     }
 
+    /** Called before a player leaves the game. */
     public static class PlayerLeave{
         public final Player player;
 

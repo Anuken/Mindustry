@@ -11,9 +11,10 @@ import mindustry.world.*;
 
 public class DrawCells extends DrawBlock{
     public TextureRegion middle;
+
     public Color color = Color.white.cpy(), particleColorFrom = Color.black.cpy(), particleColorTo = Color.black.cpy();
     public int particles = 12;
-    public float range = 4f, recurrence = 6f, radius = 3f, lifetime = 60f;
+    public float range = 4f, recurrence = 2f, radius = 1.8f, lifetime = 60f * 3f;
 
     @Override
     public void draw(Building build){
@@ -38,7 +39,6 @@ public class DrawCells extends DrawBlock{
         }
 
         Draw.color();
-        Draw.rect(build.block.region, build.x, build.y);
     }
 
     @Override

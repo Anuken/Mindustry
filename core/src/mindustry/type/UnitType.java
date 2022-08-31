@@ -246,6 +246,10 @@ public class UnitType extends UnlockableContent{
     public Color lightColor = Pal.powerLight;
     /** sound played when this unit explodes (*not* when it is shot down) */
     public Sound deathSound = Sounds.bang;
+    /** sound played on loop when this unit is around. */
+    public Sound loopSound = Sounds.none;
+    /** volume of loop sound */
+    public float loopSoundVolume = 0.5f;
     /** effect that this unit emits when falling */
     public Effect fallEffect = Fx.fallSmoke;
     /** effect created at engine when unit falls. */
@@ -276,6 +280,11 @@ public class UnitType extends UnlockableContent{
 
     /** Flags to target based on priority. Null indicates that the closest target should be found. The closest enemy core is used as a fallback. */
     public BlockFlag[] targetFlags = {null};
+
+    /** Commands available to this unit through RTS controls. An empty array means commands will be assigned based on unit capabilities in init(). */
+    public UnitCommand[] commands = {};
+    /** Command to assign to this unit upon creation. Null indicates the first command in the array. */
+    public @Nullable UnitCommand defaultCommand;
 
     /** color for outline generated around sprites */
     public Color outlineColor = Pal.darkerMetal;
@@ -771,6 +780,30 @@ public class UnitType extends UnlockableContent{
         canHeal = weapons.contains(w -> w.bullet.heals());
 
         canAttack = weapons.contains(w -> !w.noAttack);
+
+        //assign default commands.
+        if(commands.length == 0){
+            Seq<UnitCommand> cmds = new Seq<>(UnitCommand.class);
+
+            cmds.add(UnitCommand.moveCommand);
+
+            //healing, mining and building is only supported for flying units; pathfinding to ambiguously reachable locations is hard.
+            if(flying){
+                if(canHeal){
+                    cmds.add(UnitCommand.repairCommand);
+                }
+
+                if(buildSpeed > 0){
+                    cmds.add(UnitCommand.rebuildCommand, UnitCommand.assistCommand);
+                }
+
+                if(mineTier > 0){
+                    cmds.add(UnitCommand.mineCommand);
+                }
+            }
+
+            commands = cmds.toArray();
+        }
 
         //dynamically create ammo capacity based on firing rate
         if(ammoCapacity < 0){
