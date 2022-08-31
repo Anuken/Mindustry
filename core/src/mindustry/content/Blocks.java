@@ -1662,6 +1662,7 @@ public class Blocks{
             lightningChance = 0.05f;
             lightningDamage = 30f;
             armor = 20f;
+            researchCost = with(Items.surgeAlloy, 20, Items.tungsten, 100);
         }};
 
         reinforcedSurgeWallLarge = new Wall("reinforced-surge-wall-large"){{
@@ -1671,6 +1672,7 @@ public class Blocks{
             lightningDamage = 30f;
             armor = 20f;
             size = 2;
+            researchCost = with(Items.surgeAlloy, 40, Items.tungsten, 200);
         }};
 
         carbideWall = new Wall("carbide-wall"){{
@@ -2045,6 +2047,7 @@ public class Blocks{
             underBullets = true;
             baseEfficiency = 1f;
             consumePower(1f / 60f);
+            researchCost = with(Items.surgeAlloy, 30, Items.tungsten, 80);
         }};
 
         surgeRouter = new StackRouter("surge-router"){{
@@ -4359,7 +4362,7 @@ public class Blocks{
             shootCone = 20f;
             scaledHealth = 220;
             rotateSpeed = 1.5f;
-            researchCostMultiplier = 0.05f;
+            researchCostMultiplier = 0.04f;
 
             limitRange(9f);
         }};
@@ -4367,10 +4370,10 @@ public class Blocks{
         lustre = new ContinuousTurret("lustre"){{
             requirements(Category.turret, with(Items.silicon, 250, Items.graphite, 200, Items.oxide, 50, Items.carbide, 90));
 
-            range = 100f;
+            range = 130f;
 
             shootType = new PointLaserBulletType(){{
-                damage = 140f;
+                damage = 180f;
                 buildingDamageMultiplier = 0.3f;
                 hitColor = Color.valueOf("fda981");
             }};
