@@ -44,6 +44,8 @@ public class Liquid extends UnlockableContent implements Senseable{
     public float viscosity = 0.5f;
     /** how prone to exploding this liquid is, when heated. 0 = nothing, 1 = nuke */
     public float explosiveness;
+    /** whether this fluid reacts in blocks at all (e.g. slag with water) */
+    public boolean blockReactive = true;
     /** if false, this liquid cannot be a coolant */
     public boolean coolant = true;
     /** if true, this liquid can move through blocks as a puddle. */
