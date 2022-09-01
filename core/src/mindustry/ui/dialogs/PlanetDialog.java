@@ -1160,7 +1160,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 //free launch.
                 control.playSector(sector);
             }else{
-                CoreBlock block = sector.allowLaunchSchematics() ? (sector.info.bestCoreType instanceof CoreBlock b ? b : (CoreBlock)sector.planet.defaultCore) : (CoreBlock)sector.planet.defaultCore;
+                CoreBlock block = from.allowLaunchSchematics() ? (from.info.bestCoreType instanceof CoreBlock b ? b : (CoreBlock)from.planet.defaultCore) : (CoreBlock)from.planet.defaultCore;
 
                 loadouts.show(block, from, sector, () -> {
                     var schemCore = universe.getLastLoadout().findCore();
