@@ -1298,7 +1298,8 @@ public class LExecutor{
                 //TODO this can be quite laggy...
                 switch(layer){
                     case ore -> {
-                        if((b instanceof OverlayFloor o || b == Blocks.air) && tile.overlay() != o) tile.setOverlayNet(o);
+                        if((b instanceof OverlayFloor o) && tile.overlay() != o) tile.setOverlayNet(o);
+                        if(b == Blocks.air) tile.setOverlayNet(Blocks.air);
                     }
                     case floor -> {
                         if(b instanceof Floor f && tile.floor() != f && !f.isOverlay()) tile.setFloorNet(f);
