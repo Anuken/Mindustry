@@ -2507,6 +2507,7 @@ public class UnitTypes{
             researchCostMultiplier = 0f;
 
             weapons.add(new Weapon("locus-weapon"){{
+                shootSound = Sounds.bolt;
                 layerOffset = 0.0001f;
                 reload = 12f;
                 shootY = 10f;
@@ -2584,6 +2585,7 @@ public class UnitTypes{
             researchCostMultiplier = 0f;
 
             weapons.add(new Weapon("precept-weapon"){{
+                shootSound = Sounds.dullExplosion;
                 layerOffset = 0.0001f;
                 reload = 85f;
                 shootY = 16f;
@@ -2649,6 +2651,7 @@ public class UnitTypes{
             treadRects = new Rect[]{new Rect(22 - 154f/2f, 16 - 154f/2f, 28, 130)};
 
             weapons.add(new Weapon("vanquish-weapon"){{
+                shootSound = Sounds.mediumCannon;
                 layerOffset = 0.0001f;
                 reload = 110f;
                 shootY = 71f / 4f;
@@ -2687,6 +2690,7 @@ public class UnitTypes{
                     fragSpread = 10f;
                     fragBullets = 5;
                     fragVelocityMin = 1f;
+                    despawnSound = Sounds.dullExplosion;
 
                     fragBullet = new BasicBulletType(8f, 25){{
                         sprite = "missile-large";
@@ -2745,6 +2749,7 @@ public class UnitTypes{
             treadRects = new Rect[]{new Rect(27 - xo, 152 - yo, 56, 73), new Rect(24 - xo, 51 - 9 - yo, 29, 17), new Rect(59 - xo, 18 - 9 - yo, 39, 19)};
 
             weapons.add(new Weapon("conquer-weapon"){{
+                shootSound = Sounds.largeCannon;
                 layerOffset = 0.1f;
                 reload = 120f;
                 shootY = 32.5f;
@@ -2941,6 +2946,7 @@ public class UnitTypes{
             researchCostMultiplier = 0f;
 
             weapons.add(new Weapon("merui-weapon"){{
+                shootSound = Sounds.missile;
                 mirror = false;
                 x = 0f;
                 y = 1f;
@@ -3030,6 +3036,7 @@ public class UnitTypes{
             }
 
             weapons.add(new Weapon("cleroi-weapon"){{
+                shootSound = Sounds.blaster;
                 x = 14f / 4f;
                 y = 33f / 4f;
                 reload = 30f;
@@ -3141,6 +3148,7 @@ public class UnitTypes{
             }
 
             weapons.add(new Weapon("anthicus-weapon"){{
+                shootSound = Sounds.missileLarge;
                 x = 29f / 4f;
                 y = -11f / 4f;
                 shootY = 1.5f;
@@ -3293,6 +3301,7 @@ public class UnitTypes{
             groundLayer = Layer.legUnit;
 
             weapons.add(new Weapon("tecta-weapon"){{
+                shootSound = Sounds.malignShoot;
                 mirror = true;
                 top = false;
 
@@ -3329,6 +3338,7 @@ public class UnitTypes{
                     trailWidth = 2.8f;
                     trailLength = 20;
                     trailChance = -1f;
+                    despawnSound = Sounds.dullExplosion;
 
                     despawnEffect = Fx.none;
                     hitEffect = new ExplosionEffect(){{
@@ -3384,6 +3394,7 @@ public class UnitTypes{
             targetAir = false;
 
             weapons.add(new Weapon("collaris-weapon"){{
+                shootSound = Sounds.pulseBlast;
                 mirror = true;
                 rotationLimit = 30f;
                 rotateSpeed = 0.4f;
@@ -3443,6 +3454,7 @@ public class UnitTypes{
                     trailChance = -1f;
 
                     despawnEffect = Fx.none;
+                    despawnSound = Sounds.dullExplosion;
 
                     hitEffect = despawnEffect = new ExplosionEffect(){{
                         lifetime = 34f;
@@ -3552,6 +3564,7 @@ public class UnitTypes{
             }
 
             weapons.add(new Weapon("elude-weapon"){{
+                shootSound = Sounds.blaster;
                 y = -2f;
                 x = 4f;
                 top = true;
@@ -3599,6 +3612,7 @@ public class UnitTypes{
             );
 
             weapons.add(new Weapon("avert-weapon"){{
+                shootSound = Sounds.blaster;
                 reload = 35f;
                 x = 0f;
                 y = 6.5f;
@@ -3663,6 +3677,7 @@ public class UnitTypes{
             }});
 
             weapons.add(new Weapon(){{
+                shootSound = Sounds.shockBlast;
                 x = 0f;
                 y = -2f;
                 shootY = 0f;
@@ -3686,6 +3701,7 @@ public class UnitTypes{
                     }});
                     smokeEffect = Fx.shootSmokeTitan;
                     hitColor = Pal.sapBullet;
+                    despawnSound = Sounds.spark;
 
                     sprite = "large-orb";
                     trailEffect = Fx.missileTrail;
@@ -3769,6 +3785,7 @@ public class UnitTypes{
             }});
 
             weapons.add(new Weapon("quell-weapon"){{
+                shootSound = Sounds.missileSmall;
                 x = 51 / 4f;
                 y = 5 / 4f;
                 rotate = true;
@@ -3793,6 +3810,7 @@ public class UnitTypes{
                         engineColor = trailColor = Pal.sapBulletBack;
                         engineLayer = Layer.effect;
                         health = 45;
+                        loopSoundVolume = 0.1f;
 
                         weapons.add(new Weapon(){{
                             shootCone = 360f;
@@ -3854,6 +3872,7 @@ public class UnitTypes{
             }
 
             weapons.add(new Weapon("disrupt-weapon"){{
+                shootSound = Sounds.missileLarge;
                 x = 78f / 4f;
                 y = -10f / 4f;
                 mirror = true;
@@ -3903,6 +3922,7 @@ public class UnitTypes{
                         engineColor = trailColor = Pal.sapBulletBack;
                         engineLayer = Layer.effect;
                         deathExplosionEffect = Fx.none;
+                        loopSoundVolume = 0.1f;
 
                         parts.add(new ShapePart(){{
                             layer = Layer.effect;

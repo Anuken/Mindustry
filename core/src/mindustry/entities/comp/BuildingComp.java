@@ -855,17 +855,19 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                 float fx = (x + next.x) / 2f, fy = (y + next.y) / 2f;
 
                 Liquid other = next.liquids.current();
-                //TODO liquid reaction handler for extensibility
-                if((other.flammability > 0.3f && liquid.temperature > 0.7f) || (liquid.flammability > 0.3f && other.temperature > 0.7f)){
-                    damageContinuous(1);
-                    next.damageContinuous(1);
-                    if(Mathf.chanceDelta(0.1)){
-                        Fx.fire.at(fx, fy);
-                    }
-                }else if((liquid.temperature > 0.7f && other.temperature < 0.55f) || (other.temperature > 0.7f && liquid.temperature < 0.55f)){
-                    liquids.remove(liquid, Math.min(liquids.get(liquid), 0.7f * Time.delta));
-                    if(Mathf.chanceDelta(0.2f)){
-                        Fx.steam.at(fx, fy);
+                if(other.blockReactive && liquid.blockReactive){
+                    //TODO liquid reaction handler for extensibility
+                    if((other.flammability > 0.3f && liquid.temperature > 0.7f) || (liquid.flammability > 0.3f && other.temperature > 0.7f)){
+                        damageContinuous(1);
+                        next.damageContinuous(1);
+                        if(Mathf.chanceDelta(0.1)){
+                            Fx.fire.at(fx, fy);
+                        }
+                    }else if((liquid.temperature > 0.7f && other.temperature < 0.55f) || (other.temperature > 0.7f && liquid.temperature < 0.55f)){
+                        liquids.remove(liquid, Math.min(liquids.get(liquid), 0.7f * Time.delta));
+                        if(Mathf.chanceDelta(0.2f)){
+                            Fx.steam.at(fx, fy);
+                        }
                     }
                 }
             }
@@ -1096,6 +1098,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     /** @return whether this block should play its active sound.*/
     public boolean shouldActiveSound(){
         return false;
+    }
+
+    /** @return volume cale of active sound. */
+    public float activeSoundVolume(){
+        return 1f;
     }
 
     /** @return whether this block should play its idle sound.*/
@@ -1979,7 +1986,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         //TODO separate system for sound? AudioSource, etc
         if(!headless){
             if(sound != null){
-                sound.update(x, y, shouldActiveSound());
+                sound.update(x, y, shouldActiveSound(), activeSoundVolume());
             }
 
             if(block.ambientSound != Sounds.none && shouldAmbientSound()){

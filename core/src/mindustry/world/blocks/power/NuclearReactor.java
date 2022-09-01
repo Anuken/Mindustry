@@ -135,7 +135,7 @@ public class NuclearReactor extends PowerGenerator{
 
         @Override
         public void createExplosion(){
-            if(items.get(fuelItem) >= 5 && heat >= 0.5f){
+            if(items.get(fuelItem) >= 5 || heat >= 0.5f){
                 super.createExplosion();
             }
         }

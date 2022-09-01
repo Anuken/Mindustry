@@ -26,6 +26,7 @@ public class PayloadAmmoTurret extends Turret{
         super(name);
 
         maxAmmo = 3;
+        acceptsPayload = true;
     }
 
     /** Initializes accepted ammo map. Format: [block1, bullet1, block2, bullet2...] */

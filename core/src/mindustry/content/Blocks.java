@@ -348,7 +348,7 @@ public class Blocks{
             lightColor = Color.orange.cpy().a(0.3f);
         }};
 
-        sand = new Floor("sand"){{
+        sand = new Floor("sand-floor"){{
             itemDrop = Items.sand;
             playerUnmineable = true;
             attributes.set(Attribute.oil, 0.7f);
@@ -1155,6 +1155,8 @@ public class Blocks{
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawArcSmelt(), new DrawDefault());
             fogRadius = 3;
             researchCost = with(Items.beryllium, 150, Items.graphite, 50);
+            ambientSound = Sounds.smelter;
+            ambientSoundVolume = 0.12f;
 
             consumeItems(with(Items.graphite, 1, Items.sand, 4));
             consumePower(6f);
@@ -1194,6 +1196,9 @@ public class Blocks{
                 }}
             );
 
+            ambientSound = Sounds.electricHum;
+            ambientSoundVolume = 0.08f;
+
             regionRotated1 = 3;
             outputLiquids = LiquidStack.with(Liquids.ozone, 4f / 60, Liquids.hydrogen, 6f / 60);
             liquidOutputDirections = new int[]{1, 3};
@@ -1217,6 +1222,8 @@ public class Blocks{
             researchCostMultiplier = 1.1f;
             liquidCapacity = 40f;
             consumePower(2f);
+            ambientSound = Sounds.extractLoop;
+            ambientSoundVolume = 0.06f;
 
             heatRequirement = 6f;
 
@@ -1237,6 +1244,8 @@ public class Blocks{
             rotateDraw = false;
 
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidRegion(), new DrawDefault(), new DrawHeatOutput());
+            ambientSound = Sounds.extractLoop;
+            ambientSoundVolume = 0.08f;
 
             regionRotated1 = 2;
             craftTime = 60f * 2f;
@@ -1254,6 +1263,7 @@ public class Blocks{
             size = 2;
             heatOutput = 3f;
             regionRotated1 = 1;
+            ambientSound = Sounds.hum;
             consumePower(100f / 60f);
         }};
         
@@ -1267,6 +1277,7 @@ public class Blocks{
             liquidCapacity = 40f;
             rotateDraw = false;
             regionRotated1 = 1;
+            ambientSound = Sounds.hum;
             consumeLiquid(Liquids.slag, 40f / 60f);
             heatOutput = 8f;
         }};
@@ -1277,7 +1288,8 @@ public class Blocks{
             drawer = new DrawMulti(new DrawDefault(), new DrawHeatOutput());
             size = 2;
             heatOutput = 15f;
-            craftTime = 60f * 10f;
+            craftTime = 60f * 8f;
+            ambientSound = Sounds.hum;
             consumeItem(Items.phaseFabric);
         }};
 
@@ -1307,7 +1319,7 @@ public class Blocks{
             hasPower = hasItems = true;
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawCrucibleFlame(), new DrawDefault(), new DrawHeatInput());
             ambientSound = Sounds.smelter;
-            ambientSoundVolume = 0.07f;
+            ambientSoundVolume = 0.09f;
 
             heatRequirement = 10f;
 
@@ -1357,7 +1369,7 @@ public class Blocks{
             liquidCapacity = 80f * 5;
 
             ambientSound = Sounds.smelter;
-            ambientSoundVolume = 0.07f;
+            ambientSoundVolume = 0.9f;
 
             outputItem = new ItemStack(Items.surgeAlloy, 1);
 
@@ -1402,6 +1414,9 @@ public class Blocks{
 
             size = 3;
 
+            ambientSound = Sounds.extractLoop;
+            ambientSoundVolume = 0.08f;
+
             liquidCapacity = 80f;
             outputLiquid = new LiquidStack(Liquids.cyanogen, 3f / 60f);
 
@@ -1422,7 +1437,7 @@ public class Blocks{
             liquidCapacity = 10f * 4;
 
             ambientSound = Sounds.techloop;
-            ambientSoundVolume = 0.03f;
+            ambientSoundVolume = 0.04f;
 
             outputItem = new ItemStack(Items.phaseFabric, 1);
 
@@ -1647,6 +1662,7 @@ public class Blocks{
             lightningChance = 0.05f;
             lightningDamage = 30f;
             armor = 20f;
+            researchCost = with(Items.surgeAlloy, 20, Items.tungsten, 100);
         }};
 
         reinforcedSurgeWallLarge = new Wall("reinforced-surge-wall-large"){{
@@ -1656,6 +1672,7 @@ public class Blocks{
             lightningDamage = 30f;
             armor = 20f;
             size = 2;
+            researchCost = with(Items.surgeAlloy, 40, Items.tungsten, 200);
         }};
 
         carbideWall = new Wall("carbide-wall"){{
@@ -1820,7 +1837,7 @@ public class Blocks{
         shockwaveTower = new ShockwaveTower("shockwave-tower"){{
             requirements(Category.effect, with(Items.surgeAlloy, 50, Items.silicon, 150, Items.oxide, 30, Items.tungsten, 100));
             size = 3;
-            consumeLiquids(LiquidStack.with(Liquids.cyanogen, 1f / 60f));
+            consumeLiquids(LiquidStack.with(Liquids.cyanogen, 1.5f / 60f));
             consumePower(100f / 60f);
         }};
 
@@ -2030,6 +2047,7 @@ public class Blocks{
             underBullets = true;
             baseEfficiency = 1f;
             consumePower(1f / 60f);
+            researchCost = with(Items.surgeAlloy, 30, Items.tungsten, 80);
         }};
 
         surgeRouter = new StackRouter("surge-router"){{
@@ -2451,7 +2469,8 @@ public class Blocks{
 
         chemicalCombustionChamber = new ConsumeGenerator("chemical-combustion-chamber"){{
             requirements(Category.power, with(Items.graphite, 40, Items.tungsten, 40, Items.oxide, 40f, Items.silicon, 30));
-            powerProduction = 8f;
+            powerProduction = 10f;
+            researchCost = with(Items.graphite, 2000, Items.tungsten, 1000, Items.oxide, 10, Items.silicon, 1500);
             consumeLiquids(LiquidStack.with(Liquids.ozone, 2f / 60f, Liquids.arkycite, 40f / 60f));
             size = 3;
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawPistons(){{
@@ -2498,7 +2517,7 @@ public class Blocks{
             ambientSoundVolume = 0.06f;
         }};
 
-        //TODO still very much WIP, stats are bad
+        //TODO stats
         fluxReactor = new VariableReactor("flux-reactor"){{
             requirements(Category.power, with(Items.graphite, 300, Items.carbide, 200, Items.oxide, 100, Items.silicon, 600, Items.surgeAlloy, 300));
             powerProduction = 120f;
@@ -2507,6 +2526,9 @@ public class Blocks{
             consumeLiquid(Liquids.cyanogen, 9f / 60f);
             liquidCapacity = 30f;
             explosionMinWarmup = 0.5f;
+
+            ambientSound = Sounds.flux;
+            ambientSoundVolume = 0.13f;
 
             size = 5;
 
@@ -2540,7 +2562,6 @@ public class Blocks{
 
             heatOutput = 60f;
 
-            //TODO arkycite, or nitrogen? both? Decide.
             consumeLiquid(Liquids.arkycite, 80f / 60f);
             consumeLiquid(Liquids.water, 10f / 60f);
             consumeItem(Items.phaseFabric);
@@ -2548,13 +2569,16 @@ public class Blocks{
             itemDuration = 60f * 3f;
             itemCapacity = 10;
 
-            explosionRadius = 5;
-            explosionDamage = 500;
+            explosionRadius = 7;
+            explosionDamage = 1000;
             explodeEffect = new MultiEffect(Fx.bigShockwave, new WrapEffect(Fx.titanSmoke, Liquids.neoplasm.color), Fx.neoplasmSplat);
-            explodeSound = Sounds.explosionbig;
+            explodeSound = Sounds.largeExplosion;
 
             powerProduction = 140f;
             rebuildable = false;
+
+            ambientSound = Sounds.bioLoop;
+            ambientSoundVolume = 0.2f;
 
             explosionPuddles = 80;
             explosionPuddleRange = tilesize * 7f;
@@ -2729,7 +2753,6 @@ public class Blocks{
 
         cliffCrusher = new WallCrafter("cliff-crusher"){{
             requirements(Category.production, with(Items.graphite, 25, Items.beryllium, 20));
-
             consumePower(11 / 60f);
 
             drillTime = 110f;
@@ -2738,11 +2761,14 @@ public class Blocks{
             output = Items.sand;
             fogRadius = 2;
             researchCost = with(Items.beryllium, 100, Items.graphite, 40);
+            ambientSound = Sounds.drill;
+            ambientSoundVolume = 0.04f;
         }};
 
         plasmaBore = new BeamDrill("plasma-bore"){{
             requirements(Category.production, with(Items.beryllium, 40));
             consumePower(0.15f);
+
             drillTime = 160f;
             tier = 3;
             size = 2;
@@ -2758,6 +2784,7 @@ public class Blocks{
             requirements(Category.production, with(Items.silicon, 100, Items.oxide, 25, Items.beryllium, 100, Items.tungsten, 70));
             consumePower(0.8f);
             drillTime = 110f;
+
             tier = 5;
             size = 3;
             range = 6;
@@ -3630,13 +3657,13 @@ public class Blocks{
             requirements(Category.turret, with(Items.copper, 200, Items.titanium, 125, Items.plastanium, 80));
             ammo(
                 Items.metaglass, new FlakBulletType(4f, 10){{
-                    ammoMultiplier = 3f;
+                    ammoMultiplier = 2f;
                     shootEffect = Fx.shootSmall;
                     reloadMultiplier = 0.8f;
                     width = 6f;
                     height = 8f;
                     hitEffect = Fx.flakExplosion;
-                    splashDamage = 55f;
+                    splashDamage = 45f;
                     splashDamageRadius = 25f;
                     fragBullet = new BasicBulletType(3f, 12, "bullet"){{
                         width = 5f;
@@ -3654,7 +3681,7 @@ public class Blocks{
                 Items.blastCompound, new FlakBulletType(4f, 5){{
                     shootEffect = Fx.shootBig;
                     ammoMultiplier = 5f;
-                    splashDamage = 26f * 1.5f;
+                    splashDamage = 45f;
                     splashDamageRadius = 60f;
                     collidesGround = true;
 
@@ -3662,8 +3689,9 @@ public class Blocks{
                     statusDuration = 60f;
                 }},
                 Items.plastanium, new FlakBulletType(4f, 6){{
+                    ammoMultiplier = 4f;
                     splashDamageRadius = 40f;
-                    splashDamage = 25f * 1.5f;
+                    splashDamage = 37.5f;
                     fragBullet = new BasicBulletType(2.5f, 12, "bullet"){{
                         width = 10f;
                         height = 12f;
@@ -3870,7 +3898,7 @@ public class Blocks{
                 hitEffect = despawnEffect = Fx.hitBulletColor;
                 buildingDamageMultiplier = 0.3f;
             }},
-            Items.tungsten, new BasicBulletType(8f, 165){{
+            Items.tungsten, new BasicBulletType(8f, 95){{
                 width = 13f;
                 height = 19f;
                 hitSize = 7f;
@@ -3892,6 +3920,7 @@ public class Blocks{
             );
 
             coolantMultiplier = 6f;
+            shootSound = Sounds.shootAlt;
 
             shake = 1f;
             ammoPerShot = 2;
@@ -3943,6 +3972,8 @@ public class Blocks{
             ammoPerShot = 3;
             maxAmmo = 30;
             consumeAmmoOnce = true;
+
+            shootSound = Sounds.shootAltLong;
 
             drawer = new DrawTurret("reinforced-"){{
                 parts.add(new RegionPart("-front"){{
@@ -4012,6 +4043,10 @@ public class Blocks{
 
             float r = range = 130f;
 
+            loopSound = Sounds.torch;
+            shootSound = Sounds.none;
+            loopSoundVolume = 1f;
+
             //TODO balance, set up, where is liquid/sec displayed? status effects maybe?
             ammo(
             Liquids.ozone, new ContinuousFlameBulletType(){{
@@ -4024,7 +4059,7 @@ public class Blocks{
                 colors = new Color[]{Color.valueOf("eb7abe").a(0.55f), Color.valueOf("e189f5").a(0.7f), Color.valueOf("907ef7").a(0.8f), Color.valueOf("91a4ff"), Color.white};
             }},
             Liquids.cyanogen, new ContinuousFlameBulletType(){{
-                damage = 140f;
+                damage = 130f;
                 rangeChange = 70f;
                 length = r + rangeChange;
                 knockback = 2f;
@@ -4041,6 +4076,8 @@ public class Blocks{
             scaledHealth = 210;
             shootY = 7f;
             size = 3;
+
+            researchCost = with(Items.tungsten, 400, Items.silicon, 400, Items.oxide, 80, Items.beryllium, 800);
         }};
 
         titan = new ItemTurret("titan"){{
@@ -4061,6 +4098,7 @@ public class Blocks{
                 backColor = hitColor = trailColor = Color.valueOf("ea8878").lerp(Pal.redLight, 0.5f);
                 frontColor = Color.white;
                 ammoMultiplier = 1f;
+                hitSound = Sounds.titanExplosion;
 
                 status = StatusEffects.blasted;
 
@@ -4081,6 +4119,7 @@ public class Blocks{
             }}
             );
 
+            shootSound = Sounds.mediumCannon;
             ammoPerShot = 4;
             maxAmmo = ammoPerShot * 3;
             targetAir = false;
@@ -4159,6 +4198,7 @@ public class Blocks{
             rotateSpeed = 5f;
             shootCone = 30f;
             consumeAmmoOnce = true;
+            shootSound = Sounds.shootBig;
 
             drawer = new DrawTurret("reinforced-"){{
                 parts.add(new RegionPart("-side"){{
@@ -4166,15 +4206,15 @@ public class Blocks{
                     under = true;
                     moveX = 1.75f;
                     moveY = -0.5f;
-                }});
-                parts.add(new RegionPart("-mid"){{
+                }},
+                new RegionPart("-mid"){{
                     under = true;
                     moveY = -1.5f;
                     progress = PartProgress.recoil;
                     heatProgress = PartProgress.recoil.add(0.25f).min(PartProgress.warmup);
                     heatColor = Color.sky.cpy().a(0.9f);
-                }});
-                parts.add(new RegionPart("-blade"){{
+                }},
+                new RegionPart("-blade"){{
                     heatProgress = PartProgress.warmup;
                     heatColor = Color.sky.cpy().a(0.9f);
                     mirror = true;
@@ -4244,6 +4284,10 @@ public class Blocks{
                     waveStroke = 4f;
                     waveRad = 40f;
                 }};
+                despawnSound = Sounds.dullExplosion;
+
+                //TODO shoot sound
+                shootSound = Sounds.cannon;
 
                 fragBullet = intervalBullet = new BasicBulletType(3f, 30){{
                     width = 9f;
@@ -4318,7 +4362,7 @@ public class Blocks{
             shootCone = 20f;
             scaledHealth = 220;
             rotateSpeed = 1.5f;
-            researchCostMultiplier = 0.05f;
+            researchCostMultiplier = 0.04f;
 
             limitRange(9f);
         }};
@@ -4326,10 +4370,10 @@ public class Blocks{
         lustre = new ContinuousTurret("lustre"){{
             requirements(Category.turret, with(Items.silicon, 250, Items.graphite, 200, Items.oxide, 50, Items.carbide, 90));
 
-            range = 100f;
+            range = 130f;
 
             shootType = new PointLaserBulletType(){{
-                damage = 140f;
+                damage = 180f;
                 buildingDamageMultiplier = 0.3f;
                 hitColor = Color.valueOf("fda981");
             }};
@@ -4365,6 +4409,10 @@ public class Blocks{
                     under = true;
                 }});
             }};
+
+            shootSound = Sounds.none;
+            loopSoundVolume = 1f;
+            loopSound = Sounds.laserbeam;
 
             shootWarmupSpeed = 0.08f;
             shootCone = 360f;
@@ -4407,7 +4455,10 @@ public class Blocks{
                     trailLength = 18;
                     missileAccelTime = 50f;
                     lowAltitude = true;
-                    //targetAir = false;
+                    loopSound = Sounds.missileTrail;
+                    loopSoundVolume = 0.6f;
+                    deathSound = Sounds.largeExplosion;
+                    targetAir = false;
 
                     fogRadius = 6f;
 
@@ -4515,6 +4566,7 @@ public class Blocks{
             recoil = 0.5f;
 
             coolantMultiplier = 6f;
+            shootSound = Sounds.missileLaunch;
 
             minWarmup = 0.94f;
             shootWarmupSpeed = 0.03f;
@@ -4612,6 +4664,7 @@ public class Blocks{
                 mag = 3f;
             }});
 
+            shootSound = Sounds.shootSmite;
             minWarmup = 0.99f;
             coolantMultiplier = 6f;
 
@@ -4792,15 +4845,19 @@ public class Blocks{
             outlineColor = Pal.darkOutline;
             size = 5;
             envEnabled |= Env.space;
+            warmupMaintainTime = 30f;
             reload = 100f;
             recoil = 2f;
             range = 300;
-            shootCone = 10f;
+            shootCone = 30f;
             scaledHealth = 350;
             rotateSpeed = 1.5f;
 
             coolant = consume(new ConsumeLiquid(Liquids.water, 15f / 60f));
             limitRange();
+
+            loopSound = Sounds.glow;
+            loopSoundVolume = 0.8f;
         }};
 
         malign = new PowerTurret("malign"){{
@@ -4814,7 +4871,11 @@ public class Blocks{
             var circleColor = haloColor;
             float circleY = 25f, circleRad = 11f, circleRotSpeed = 3.5f, circleStroke = 1.6f;
 
-            shootType = new FlakBulletType(8f, 80f){{
+            shootSound = Sounds.malignShoot;
+            loopSound = Sounds.spellLoop;
+            loopSoundVolume = 1.3f;
+
+            shootType = new FlakBulletType(8f, 70f){{
                 sprite = "missile-large";
 
                 lifetime = 45f;
@@ -4851,7 +4912,7 @@ public class Blocks{
                 flakInterval = 20f;
                 despawnShake = 3f;
 
-                fragBullet = new LaserBulletType(90f){{
+                fragBullet = new LaserBulletType(65f){{
                     colors = new Color[]{haloColor.cpy().a(0.4f), haloColor, Color.white};
                     buildingDamageMultiplier = 0.25f;
                     width = 19f;
@@ -5110,6 +5171,7 @@ public class Blocks{
             velocityRnd = 0.15f;
             heatRequirement = 90f;
             maxHeatEfficiency = 2f;
+            warmupMaintainTime = 30f;
             consumePower(10f);
 
             shoot = new ShootSummon(0f, 0f, circleRad, 48f);
@@ -5121,7 +5183,7 @@ public class Blocks{
 
             outlineColor = Pal.darkOutline;
             envEnabled |= Env.space;
-            reload = 8f;
+            reload = 9f;
             range = 370;
             shootCone = 100f;
             scaledHealth = 370;
@@ -5358,6 +5420,8 @@ public class Blocks{
             upgrades.addAll(
             new UnitType[]{UnitTypes.elude, UnitTypes.avert}
             );
+
+            researchCost = with(Items.beryllium, 500, Items.tungsten, 200, Items.silicon, 300, Items.oxide, 80);
         }};
 
         //yes very silly name
@@ -5604,6 +5668,7 @@ public class Blocks{
             size = 5;
             alwaysUnlocked = true;
         }};
+
         heatSource = new HeatProducer("heat-source"){{
             requirements(Category.crafting, BuildVisibility.sandboxOnly, with());
             drawer = new DrawMulti(new DrawDefault(), new DrawHeatOutput());
@@ -5612,6 +5677,7 @@ public class Blocks{
             heatOutput = 1000f;
             warmupRate = 1000f;
             regionRotated1 = 1;
+            ambientSound = Sounds.none;
         }};
 
         //TODO move
