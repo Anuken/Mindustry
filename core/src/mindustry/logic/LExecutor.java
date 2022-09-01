@@ -1299,7 +1299,7 @@ public class LExecutor{
                 switch(layer){
                     case ore -> {
                         if((b instanceof OverlayFloor o) && tile.overlay() != o) tile.setOverlayNet(o);
-                        if(b == Blocks.air) tile.setOverlayNet(Blocks.air);
+                        if(b == Blocks.air && tile.overlay() != Blocks.air) tile.setOverlayNet(Blocks.air);
                     }
                     case floor -> {
                         if(b instanceof Floor f && tile.floor() != f && !f.isOverlay()) tile.setFloorNet(f);
