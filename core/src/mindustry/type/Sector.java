@@ -80,6 +80,14 @@ public class Sector{
         return hasBase() || (preset != null && preset.alwaysUnlocked);
     }
 
+    public boolean allowLaunchSchematics(){
+        return (preset != null && preset.overrideLaunchDefaults) ? preset.allowLaunchSchematics : planet.allowLaunchSchematics;
+    }
+
+    public boolean allowLaunchLoadout(){
+        return (preset != null && preset.overrideLaunchDefaults) ? preset.allowLaunchLoadout : planet.allowLaunchLoadout;
+    }
+
     public void saveInfo(){
         Core.settings.putJson(planet.name + "-s-" + id + "-info", info);
     }
