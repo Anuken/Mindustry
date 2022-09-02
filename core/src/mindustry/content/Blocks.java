@@ -1228,6 +1228,8 @@ public class Blocks{
             heatRequirement = 6f;
 
             outputLiquid = new LiquidStack(Liquids.nitrogen, 4f / 60f);
+
+            researchCost = with(Items.silicon, 2000, Items.oxide, 900, Items.beryllium, 2400);
         }};
 
         oxidationChamber = new HeatProducer("oxidation-chamber"){{
@@ -1280,6 +1282,8 @@ public class Blocks{
             ambientSound = Sounds.hum;
             consumeLiquid(Liquids.slag, 40f / 60f);
             heatOutput = 8f;
+
+            researchCost = with(Items.tungsten, 1200, Items.oxide, 900, Items.beryllium, 2400);
         }};
 
         phaseHeater = new HeatProducer("phase-heater"){{
@@ -2794,6 +2798,8 @@ public class Blocks{
 
             consumeLiquid(Liquids.hydrogen, 0.5f / 60f);
             consumeLiquid(Liquids.nitrogen, 3f / 60f).boost();
+
+            researchCost = with(Items.silicon, 1500, Items.oxide, 200, Items.beryllium, 3000, Items.tungsten, 1200);
         }};
 
         impactDrill = new BurstDrill("impact-drill"){{
