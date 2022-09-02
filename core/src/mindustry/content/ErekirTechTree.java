@@ -135,8 +135,8 @@ public class ErekirTechTree{
             //TODO move into turbine condenser?
             node(plasmaBore, () -> {
                 node(impactDrill, Seq.with(new OnSector(aegis)), () -> {
-                    node(largePlasmaBore, Seq.with(tmpNever), () -> {
-                        node(eruptionDrill, () -> {
+                    node(largePlasmaBore, Seq.with(new OnSector(caldera)), () -> {
+                        node(eruptionDrill, Seq.with(tmpNever), () -> {
 
                         });
                     });
