@@ -58,6 +58,8 @@ public class Turret extends ReloadTurret{
     public float shootX = 0f, shootY = Float.NEGATIVE_INFINITY;
     /** Random spread on the X axis. */
     public float xRand = 0f;
+    /** If true, a range ring is also drawn for minRange. */
+    public boolean drawMinRange;
     /** Minimum bullet range. Used for artillery only. */
     public float minRange = 0f;
     /** Minimum warmup needed to fire. */
@@ -194,6 +196,15 @@ public class Turret extends ReloadTurret{
         bullet.lifetime = (realRange + margin) / bullet.speed;
     }
 
+    @Override
+    public void drawPlace(int x, int y, int rotation, boolean valid){
+        super.drawPlace(x, y, rotation, valid);
+
+        if(drawMinRange){
+            Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, minRange, Pal.placing);
+        }
+    }
+
     public static abstract class AmmoEntry{
         public int amount;
 
@@ -224,6 +235,13 @@ public class Turret extends ReloadTurret{
         public float estimateDps(){
             if(!hasAmmo()) return 0f;
             return shoot.shots / reload * 60f * (peekAmmo() == null ? 0f : peekAmmo().estimateDPS()) * potentialEfficiency * timeScale;
+        }
+
+        public float minRange(){
+            if(peekAmmo() != null){
+                return minRange + peekAmmo().minRangeChange;
+            }
+            return minRange;
         }
 
         @Override
@@ -339,6 +357,15 @@ public class Turret extends ReloadTurret{
         @Override
         public void draw(){
             drawer.draw(this);
+        }
+
+        @Override
+        public void drawSelect(){
+            super.drawSelect();
+
+            if(drawMinRange){
+                Drawf.dashCircle(x, y, minRange(), team.color);
+            }
         }
 
         @Override
@@ -560,7 +587,7 @@ public class Turret extends ReloadTurret{
             bulletY = y + Angles.trnsy(rotation - 90, shootX + xOffset + xSpread, shootY + yOffset),
             shootAngle = rotation + angleOffset + Mathf.range(inaccuracy);
 
-            float lifeScl = type.scaleLife ? Mathf.clamp(Mathf.dst(bulletX, bulletY, targetPos.x, targetPos.y) / type.range, minRange / type.range, range() / type.range) : 1f;
+            float lifeScl = type.scaleLife ? Mathf.clamp(Mathf.dst(bulletX, bulletY, targetPos.x, targetPos.y) / type.range, minRange() / type.range, range() / type.range) : 1f;
 
             //TODO aimX / aimY for multi shot turrets?
             handleBullet(type.create(this, team, bulletX, bulletY, shootAngle, -1f, (1f - velocityRnd) + Mathf.random(velocityRnd), lifeScl, null, mover, targetPos.x, targetPos.y), xOffset, yOffset, shootAngle - rotation);
