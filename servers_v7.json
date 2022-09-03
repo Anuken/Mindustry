@@ -10,7 +10,11 @@
   },
   {
     "name": "C.A.M.S.",
-    "address": ["0.baseduser.eu.org:42001", "0.baseduser.eu.org:42002", "v7.thedimas.pp.ua"]
+    "address": ["0.baseduser.eu.org:42001", "0.baseduser.eu.org:42002"]
+  },
+  {
+    "name": "thedimas",
+    "address": ["play.thedimas.pp.ua", "play.thedimas.pp.ua:6510", "play.thedimas.pp.ua:6511", "play.thedimas.pp.ua:6509", "play.thedimas.pp.ua:6508"]
   },
   {
     "name": "SMokeOfAnarchy",
