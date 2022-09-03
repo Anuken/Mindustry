@@ -9,7 +9,6 @@ import arc.scene.ui.ImageButton.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
@@ -237,13 +236,16 @@ public class CustomRulesDialog extends BaseDialog{
                     rules.env = planet.defaultEnv;
                     rules.hiddenBuildItems.clear();
                     rules.hiddenBuildItems.addAll(planet.hiddenItems);
-                }).group(group).checked(rules.env == planet.defaultEnv);
+                }).group(group).checked(b -> rules.env == planet.defaultEnv);
             }
 
             t.button("@rules.anyenv", style, () -> {
-                rules.env = Vars.defaultEnv;
-                rules.hiddenBuildItems.clear();
-            }).group(group).checked(rules.hiddenBuildItems.size == 0);
+                //unlocalized for now
+                ui.showInfo("[accent]'Any' environment, or 'mixed tech', is no longer allowed.[]\n\nReasoning: Serpulo and Erekir tech were never meant to be used in the same map. They are not compatible.\nI have received far too many complains in this regard.");
+
+                //rules.env = Vars.defaultEnv;
+                //rules.hiddenBuildItems.clear();
+            }).group(group).checked(b -> rules.hiddenBuildItems.size == 0);
         }).left().fill(false).expand(false, false).row();
 
         title("@rules.title.teams");
