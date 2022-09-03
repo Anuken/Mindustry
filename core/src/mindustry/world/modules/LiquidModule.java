@@ -166,7 +166,7 @@ public class LiquidModule extends BlockModule{
             if(liq != null){
                 int liquidid = liq.id;
                 liquids[liquidid] = amount;
-                if(amount > 0){
+                if(amount > liquids[current.id]){
                     current = liq;
                 }
             }

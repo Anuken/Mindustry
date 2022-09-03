@@ -55,7 +55,7 @@ public class LaunchLoadoutDialog extends BaseDialog{
 
             int capacity = lastCapacity;
 
-            if(!sector.planet.allowLaunchLoadout){
+            if(!destination.allowLaunchLoadout()){
                 resources.clear();
                 //TODO this should be set to a proper loadout based on sector.
                 if(destination.preset != null){
@@ -95,7 +95,7 @@ public class LaunchLoadoutDialog extends BaseDialog{
 
                 table.image(s.item.uiIcon).left().size(iconSmall);
 
-                String amountStr = (al + as) + (sector.planet.allowLaunchLoadout ? "[gray] (" + (al + " + " + as + ")") : "");
+                String amountStr = (al + as) + (destination.allowLaunchLoadout() ? "[gray] (" + (al + " + " + as + ")") : "");
 
                 table.add(
                     sitems.has(s.item, s.amount) ? amountStr :
@@ -111,7 +111,7 @@ public class LaunchLoadoutDialog extends BaseDialog{
 
         Runnable rebuildItems = () -> rebuild.get(items);
 
-        if(sector.planet.allowLaunchLoadout){
+        if(destination.allowLaunchLoadout()){
             buttons.button("@resources.max", Icon.add, Styles.togglet, () -> {
                 setMax(!getMax());
                 update.run();
@@ -154,7 +154,7 @@ public class LaunchLoadoutDialog extends BaseDialog{
 
         cont.add(Core.bundle.format("launch.from", sector.name())).row();
 
-        if(sector.planet.allowLaunchSchematics){
+        if(destination.allowLaunchSchematics()){
             cont.pane(t -> {
                 int[] i = {0};
 
@@ -176,7 +176,7 @@ public class LaunchLoadoutDialog extends BaseDialog{
                     }
                 };
 
-                if(sector.planet.allowLaunchSchematics || schematics.getDefaultLoadout(core) == null){
+                if(destination.allowLaunchSchematics() || schematics.getDefaultLoadout(core) == null){
                     for(var entry : schematics.getLoadouts()){
                         if(entry.key.size <= core.size){
                             for(Schematic s : entry.value){
