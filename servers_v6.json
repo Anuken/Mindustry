@@ -4,6 +4,10 @@
     "address": ["sectorized.ddns.net"]
   },
   {
+    "name": "generic survival",
+    "address": ["212.192.29.92:25554"]
+  },
+  {
     "name": "{AA}",
     "address": ["recessive.net"]
   },
