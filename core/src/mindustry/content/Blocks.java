@@ -1863,17 +1863,6 @@ public class Blocks{
             consumePower(5f);
         }};
 
-        shieldBreaker = new ShieldBreaker("shield-breaker"){{
-            requirements(Category.effect, BuildVisibility.editorOnly, with());
-
-            size = 5;
-            toDestroy = new Block[]{Blocks.shieldProjector, Blocks.largeShieldProjector};
-
-            consumeItem(Items.tungsten, 100);
-            itemCapacity = 100;
-            scaledHealth = 120f;
-        }};
-
         //endregion
         //region distribution
 

@@ -675,7 +675,25 @@ public class LStatements{
 
         @Override
         public LCategory category(){
-            return LCategory.operation;
+            return LCategory.control;
+        }
+    }
+
+    @RegisterStatement("stop")
+    public static class StopStatement extends LStatement{
+
+        @Override
+        public void build(Table table){
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new StopI();
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.control;
         }
     }
 

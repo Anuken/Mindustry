@@ -163,8 +163,6 @@ public class ClassMap{
         classes.put("RadarBuild", mindustry.world.blocks.defense.Radar.RadarBuild.class);
         classes.put("RegenProjector", mindustry.world.blocks.defense.RegenProjector.class);
         classes.put("RegenProjectorBuild", mindustry.world.blocks.defense.RegenProjector.RegenProjectorBuild.class);
-        classes.put("ShieldBreaker", mindustry.world.blocks.defense.ShieldBreaker.class);
-        classes.put("ShieldBreakerBuild", mindustry.world.blocks.defense.ShieldBreaker.ShieldBreakerBuild.class);
         classes.put("ShieldWall", mindustry.world.blocks.defense.ShieldWall.class);
         classes.put("ShieldWallBuild", mindustry.world.blocks.defense.ShieldWall.ShieldWallBuild.class);
         classes.put("ShockMine", mindustry.world.blocks.defense.ShockMine.class);

@@ -19,7 +19,7 @@ public class LCategory implements Comparable<LCategory>{
     operation = new LCategory("operation", Pal.logicOperations, Icon.settingsSmall),
     control = new LCategory("control", Pal.logicControl, Icon.rotateSmall),
     unit = new LCategory("unit", Pal.logicUnits, Icon.unitsSmall),
-    world = new LCategory("world", Pal.logicWorld, Icon.terminalSmall);
+    world = new LCategory("world", Pal.logicWorld, Icon.terrainSmall);
 
     public final String name;
     public final int id;

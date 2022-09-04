@@ -241,7 +241,7 @@ public class CustomRulesDialog extends BaseDialog{
 
             t.button("@rules.anyenv", style, () -> {
                 //unlocalized for now
-                ui.showInfo("[accent]'Any' environment, or 'mixed tech', is no longer allowed.[]\n\nReasoning: Serpulo and Erekir tech were never meant to be used in the same map. They are not compatible.\nI have received far too many complains in this regard.");
+                ui.showInfo("[accent]'Any' environment, or 'mixed tech', is no longer allowed.[]\n\nReasoning: Serpulo and Erekir tech were never meant to be used in the same map. They are not compatible or remotely balanced.\nI have received far too many complains in this regard.");
 
                 //rules.env = Vars.defaultEnv;
                 //rules.hiddenBuildItems.clear();

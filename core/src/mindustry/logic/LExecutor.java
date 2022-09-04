@@ -1084,7 +1084,6 @@ public class LExecutor{
         public int value;
 
         public float curTime;
-        public double wait;
         public long frameId;
 
         public WaitI(int value){
@@ -1107,6 +1106,15 @@ public class LExecutor{
                 curTime += Time.delta / 60f;
                 frameId = state.updateId;
             }
+        }
+    }
+
+    public static class StopI implements LInstruction{
+
+        @Override
+        public void run(LExecutor exec){
+            //skip back to self.
+            exec.var(varCounter).numval --;
         }
     }
 
