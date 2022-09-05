@@ -328,6 +328,29 @@ public class SettingsMenuDialog extends BaseDialog{
 
             t.row();
 
+            t.button("@crash.export", Icon.upload, style, () -> {
+                if(settings.getDataDirectory().child("crashes").list().length == 0 && !settings.getDataDirectory().child("last_log.txt").exists()){
+                    ui.showInfo("@crash.none");
+                }else{
+                    if(ios){
+                        Fi logs = tmpDirectory.child("logs.txt");
+                        logs.writeString(getLogs());
+                        platform.shareFile(logs);
+                    }else{
+                        platform.showFileChooser(false, "txt", file -> {
+                            try{
+                                file.writeBytes(getLogs().getBytes(Strings.utf8));
+                                app.post(() -> ui.showInfo("@crash.exported"));
+                            }catch(Throwable e){
+                                ui.showException(e);
+                            }
+                        });
+                    }
+                }
+            }).marginLeft(4);
+
+            t.row();
+
             t.button("@data.cloudsave", Icon.save, style, () -> {
                 cloudDialog.show();
             }).marginLeft(4);
