@@ -14,6 +14,7 @@ import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
+import mindustry.logic.LAccess;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -431,6 +432,12 @@ public class Conveyor extends Block implements Autotiler{
         @Override
         public Building next(){
             return nextc;
+        }
+
+        @Override
+        public Object senseObject(LAccess sensor){
+            if(sensor == LAccess.firstItem) return ids[Math.max(0, len - 1)];
+            return super.senseObject(sensor);
         }
     }
 }
