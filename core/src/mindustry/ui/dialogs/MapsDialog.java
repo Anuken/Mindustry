@@ -136,7 +136,7 @@ public class MapsDialog extends BaseDialog{
             rebuildMaps();
         }).maxTextLength(50).growX().get();
         searchField.setMessageText("@editor.search");
-        search.button(Icon.filter, Styles.emptyi, this::showMapFilters);
+        search.button(Icon.filter, Styles.emptyi, this::showMapFilters).tooltip("@editor.filters");
 
         cont.add(search).growX();
         cont.row();

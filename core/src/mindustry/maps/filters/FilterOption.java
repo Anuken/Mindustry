@@ -3,6 +3,7 @@ package mindustry.maps.filters;
 
 import arc.*;
 import arc.func.*;
+import arc.input.*;
 import arc.scene.*;
 import arc.scene.event.*;
 import arc.scene.style.*;
@@ -103,7 +104,7 @@ public abstract class FilterOption{
 
         @Override
         public void build(Table table){
-            table.button(b -> b.image(supplier.get().uiIcon).update(i -> ((TextureRegionDrawable)i.getDrawable())
+            Button button = table.button(b -> b.image(supplier.get().uiIcon).update(i -> ((TextureRegionDrawable)i.getDrawable())
                 .setRegion(supplier.get() == Blocks.air ? Icon.none.getRegion() : supplier.get().uiIcon)).size(iconSmall), () -> {
                 BaseDialog dialog = new BaseDialog("@filter.option." + name);
                 dialog.cont.pane(t -> {
@@ -124,7 +125,19 @@ public abstract class FilterOption{
 
                 dialog.addCloseButton();
                 dialog.show();
-            }).pad(4).margin(12f);
+            }).pad(4).margin(12f).get();
+
+            button.clicked(KeyCode.mouseMiddle, () -> {
+                Core.app.setClipboardText(supplier.get().id + "");
+                ui.showInfoFade("@copied");
+            });
+
+            button.clicked(KeyCode.mouseRight, () -> {
+                if(content.block(Strings.parseInt(Core.app.getClipboardText())) != null && filter.get(content.block(Strings.parseInt(Core.app.getClipboardText())))){
+                    consumer.get(content.block(Strings.parseInt(Core.app.getClipboardText())));
+                    changed.run();
+                }
+            });
 
             table.add("@filter.option." + name);
         }
