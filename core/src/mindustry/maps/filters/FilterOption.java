@@ -128,13 +128,13 @@ public abstract class FilterOption{
             }).pad(4).margin(12f).get();
 
             button.clicked(KeyCode.mouseMiddle, () -> {
-                Core.app.setClipboardText(supplier.get().id + "");
+                Core.app.setClipboardText(supplier.get().name);
                 ui.showInfoFade("@copied");
             });
 
             button.clicked(KeyCode.mouseRight, () -> {
-                if(content.block(Strings.parseInt(Core.app.getClipboardText())) != null && filter.get(content.block(Strings.parseInt(Core.app.getClipboardText())))){
-                    consumer.get(content.block(Strings.parseInt(Core.app.getClipboardText())));
+                if(content.block(Core.app.getClipboardText()) != null && filter.get(content.block(Core.app.getClipboardText()))){
+                    consumer.get(content.block(Core.app.getClipboardText()));
                     changed.run();
                 }
             });
