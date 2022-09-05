@@ -328,6 +328,7 @@ project(":core"){
     dependencies{
         compileJava.dependsOn(preGen)
 
+        api "cn.hutool:hutool-all:5.8.5"
         api "org.lz4:lz4-java:1.8.0"
         api arcModule("arc-core")
         api arcModule("extensions:flabel")

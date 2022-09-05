@@ -16,6 +16,16 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
+import arc.util.serialization.Json;
+import arc.util.serialization.JsonReader;
+import arc.util.serialization.JsonValue;
+import cn.hutool.core.io.StreamProgress;
+import cn.hutool.core.net.url.UrlBuilder;
+import cn.hutool.db.handler.StringHandler;
+import cn.hutool.http.HttpDownloader;
+import cn.hutool.http.HttpRequest;
+import cn.hutool.http.HttpResponse;
+import cn.hutool.http.HttpUtil;
 import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.core.*;
@@ -41,6 +51,7 @@ public class SettingsMenuDialog extends BaseDialog{
     private Table prefs;
     private Table menu;
     private BaseDialog dataDialog;
+    private BaseDialog cloudDialog;
     private Seq<SettingsCategory> categories = new Seq<>();
 
     public SettingsMenuDialog(){
@@ -80,6 +91,122 @@ public class SettingsMenuDialog extends BaseDialog{
 
         prefs.clearChildren();
         prefs.add(menu);
+
+        cloudDialog = new BaseDialog("@data.cloudsave");
+        cloudDialog.addCloseButton();
+        cloudDialog.cont.table(Tex.button, t -> {
+            t.add("@data.cloudsave.upload.url").padRight(1);
+            t.field(Core.settings.getString("cloudsave.upload.url"), text -> {
+                Core.settings.put("cloudsave.upload.url", text);
+            }).grow().pad(4);
+            t.row();
+            t.add("@data.cloudsave.download.url").padRight(1);
+            t.field(Core.settings.getString("cloudsave.download.url"), text -> {
+                Core.settings.put("cloudsave.download.url", text);
+            }).grow().pad(4);
+        }).width(targetWidth());
+
+        cloudDialog.cont.row();
+
+        cloudDialog.cont.table(Tex.button, t -> {
+            t.add("@data.cloudsave.filename").padRight(1);
+            t.field(Core.settings.getString("cloudsave.filename"), text -> {
+                Core.settings.put("cloudsave.filename", text);
+            }).grow().pad(4);
+        }).width(targetWidth());
+
+        cloudDialog.cont.row();
+
+        cloudDialog.cont.add("@data.cloudsave.auth").width(targetWidth()).pad(4);
+
+        cloudDialog.cont.row();
+
+        cloudDialog.cont.table(Tex.button, t -> {
+            t.add("@data.cloudsave.username").padRight(1);
+            t.field(Core.settings.getString("cloudsave.username"), text -> {
+                Core.settings.put("cloudsave.username", text);
+            }).grow().pad(4);
+            t.add("@data.cloudsave.password").padRight(1);
+            t.field(Core.settings.getString("cloudsave.password"), text -> {
+                Core.settings.put("cloudsave.password", text);
+            }).grow().pad(4);
+        }).width(targetWidth());
+
+        cloudDialog.cont.row();
+
+        cloudDialog.cont.buttonCenter("@data.cloudsave.upload", Icon.upload, () -> {
+            String url = settings.getString("cloudsave.upload.url");
+            String username = settings.getString("cloudsave.username");
+            String password = settings.getString("cloudsave.password");
+            String filename = settings.getString("cloudsave.filename");
+            if (url != null && !url.isEmpty() && filename != null && !filename.isEmpty()){
+                HttpRequest request = HttpRequest.post(url);
+                if (username != null && password != null) {
+                    request.basicAuth(username, password);
+                }
+                try{
+                    byte[] data = exportData();
+                    request.form("file", data,filename + ".zip");
+                    HttpResponse response = request.execute();
+                    if (response.isOk()){
+                        JsonValue jsonResponse = new JsonReader().parse(response.body());
+                        if ("20000".equals(jsonResponse.getString("code"))) {
+                            ui.showInfo("@data.cloudsave.uploaded");
+                        } else {
+                            ui.showInfo(jsonResponse.getString("message"));
+                        }
+                    } else if (response.getStatus() == 401) {
+                        ui.showInfo("@data.cloudsave.unauthorized");
+                    } else {
+                        ui.showInfo(response.body());
+                    }
+                }catch(Exception e){
+                    ui.showException(e);
+                }
+            }
+        }).width(targetWidth());
+
+        cloudDialog.cont.row();
+
+        cloudDialog.cont.buttonCenter("@data.cloudsave.download", Icon.download, () -> {
+            String url = settings.getString("cloudsave.download.url");
+            String username = settings.getString("cloudsave.username");
+            String password = settings.getString("cloudsave.password");
+            String filename = settings.getString("cloudsave.filename");
+            if (url != null && !url.isEmpty() && filename != null && !filename.isEmpty()){
+                File downloadedFile = files.local(filename + ".zip").file();
+                url = url + "?filename=" + filename + ".zip";
+                HttpDownloader.downloadFile(url, downloadedFile,-1,new StreamProgress(){
+                    @Override
+                    public void start() {}
+                    @Override
+                    public void progress(long total, long progressSize) {}
+                    @Override
+                    public void finish() {
+                        try {
+                            importData(new Fi(downloadedFile));
+                            app.exit();
+                        }catch(IllegalArgumentException e){
+                            ui.showErrorMessage("@data.invalid");
+                        }catch (ArcRuntimeException e){
+                            e.printStackTrace();
+                            if(e.getMessage() == null || !e.getMessage().contains("too short")){
+                                ui.showErrorMessage("@data.cloudsave.download.error");
+                            }else{
+                                ui.showErrorMessage("@data.invalid");
+                            }
+                        }catch(Exception e){
+                            e.printStackTrace();
+                            if(e.getMessage() == null || !e.getMessage().contains("too short")){
+                                ui.showException(e);
+                            }else{
+                                ui.showErrorMessage("@data.invalid");
+                            }
+                        }
+                    }
+                });
+            }
+        }).width(targetWidth());
 
         dataDialog = new BaseDialog("@settings.data");
         dataDialog.addCloseButton();
@@ -201,25 +328,8 @@ public class SettingsMenuDialog extends BaseDialog{
 
             t.row();
 
-            t.button("@crash.export", Icon.upload, style, () -> {
-                if(settings.getDataDirectory().child("crashes").list().length == 0 && !settings.getDataDirectory().child("last_log.txt").exists()){
-                    ui.showInfo("@crash.none");
-                }else{
-                    if(ios){
-                        Fi logs = tmpDirectory.child("logs.txt");
-                        logs.writeString(getLogs());
-                        platform.shareFile(logs);
-                    }else{
-                        platform.showFileChooser(false, "txt", file -> {
-                            try{
-                                file.writeBytes(getLogs().getBytes(Strings.utf8));
-                                app.post(() -> ui.showInfo("@crash.exported"));
-                            }catch(Throwable e){
-                                ui.showException(e);
-                            }
-                        });
-                    }
-                }
+            t.button("@data.cloudsave", Icon.save, style, () -> {
+                cloudDialog.show();
             }).marginLeft(4);
         });
 
@@ -229,6 +339,10 @@ public class SettingsMenuDialog extends BaseDialog{
         add(buttons).fillX();
 
         addSettings();
+    }
+
+    static float targetWidth(){
+        return Math.min(Core.graphics.getWidth() / Scl.scl() * 0.9f, 550f);
     }
 
     String getLogs(){
@@ -552,6 +666,44 @@ public class SettingsMenuDialog extends BaseDialog{
         settings.clear();
         //load data so it's saved on exit
         settings.load();
+    }
+
+    public byte[] exportData() throws IOException{
+        Seq<Fi> files = new Seq<>();
+        files.add(Core.settings.getSettingsFile());
+        files.addAll(customMapDirectory.list());
+        files.addAll(saveDirectory.list());
+        files.addAll(screenshotDirectory.list());
+        files.addAll(modDirectory.list());
+        files.addAll(schematicDirectory.list());
+        String base = Core.settings.getDataDirectory().path();
+
+        //add directories
+        for(Fi other : files.copy()){
+            Fi parent = other.parent();
+            while(!files.contains(parent) && !parent.equals(settings.getDataDirectory())){
+                files.add(parent);
+            }
+        }
+
+        byte[] data = null;
+        try(ByteArrayOutputStream bos = new ByteArrayOutputStream(); ZipOutputStream zos = new ZipOutputStream(bos)){
+            for(Fi add : files){
+                String path = add.path().substring(base.length());
+                if(add.isDirectory()) path += "/";
+                //fix trailing / in path
+                path = path.startsWith("/") ? path.substring(1) : path;
+                zos.putNextEntry(new ZipEntry(path));
+                if(!add.isDirectory()){
+                    Streams.copy(add.read(), zos);
+                }
+                zos.closeEntry();
+            }
+            zos.finish();
+            zos.close();
+            data = bos.toByteArray();
+        }
+        return data;
     }
 
     private void back(){
