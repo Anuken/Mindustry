@@ -227,47 +227,8 @@ public class NetClient implements ApplicationListener{
         if(message.length() > maxTextLength){
             throw new ValidateException(player, "Player has sent a message above the text limit.");
         }
-
-        message = message.replace("\n", "");
-
-        Events.fire(new PlayerChatEvent(player, message));
-
-        //log commands before they are handled
-        if(message.startsWith(netServer.clientCommands.getPrefix())){
-            //log with brackets
-            Log.info("<&fi@: @&fr>", "&lk" + player.plainName(), "&lw" + message);
-        }
-
-        //check if it's a command
-        CommandResponse response = netServer.clientCommands.handleMessage(message, player);
-        if(response.type == ResponseType.noCommand){ //no command to handle
-            message = netServer.admins.filterMessage(player, message);
-            //suppress chat message if it's filtered out
-            if(message == null){
-                return;
-            }
-
-            //special case; graphical server needs to see its message
-            if(!headless){
-                sendMessage(netServer.chatFormatter.format(player, message), message, player);
-            }
-
-            //server console logging
-            Log.info("&fi@: @", "&lc" + player.plainName(), "&lw" + message);
-
-            //invoke event for all clients but also locally
-            //this is required so other clients get the correct name even if they don't know who's sending it yet
-            Call.sendMessage(netServer.chatFormatter.format(player, message), message, player);
-        }else{
-
-            //a command was sent, now get the output
-            if(response.type != ResponseType.valid){
-                String text = netServer.invalidHandler.handle(player, response);
-                if(text != null){
-                    player.sendMessage(text);
-                }
-            }
-        }
+        
+        netServer.messageHandler.handle(player, message);
     }
 
     @Remote(called = Loc.client, variants = Variant.one)
