@@ -51,7 +51,7 @@ public class NetServer implements ApplicationListener{
     public TeamAssigner assigner = (player, players) -> {
         if(state.rules.pvp){
             //find team with minimum amount of players and auto-assign player to that.
-            TeamData re = state.teams.getActive().min(data -> {
+            TeamData data = state.teams.getActive().min(data -> {
                 if((state.rules.waveTeam == data.team && state.rules.waves) || !data.team.active() || data.team == Team.derelict) return Integer.MAX_VALUE;
 
                 int count = 0;
@@ -62,7 +62,7 @@ public class NetServer implements ApplicationListener{
                 }
                 return count;
             });
-            return re == null ? null : re.team;
+            return data == null ? null : data.team;
         }
 
         return state.rules.defaultTeam;
@@ -78,15 +78,15 @@ public class NetServer implements ApplicationListener{
         Events.fire(new PlayerChatEvent(player, message));
 
         //log commands before they are handled
-        if(message.startsWith(netServer.clientCommands.getPrefix())){
+        if(message.startsWith(clientCommands.getPrefix())){
             //log with brackets
             Log.info("<&fi@: @&fr>", "&lk" + player.plainName(), "&lw" + message);
         }
 
         //check if it's a command
-        CommandResponse response = netServer.clientCommands.handleMessage(message, player);
+        CommandResponse response = clientCommands.handleMessage(message, player);
         if(response.type == ResponseType.noCommand){ //no command to handle
-            message = netServer.admins.filterMessage(player, message);
+            message = admins.filterMessage(player, message);
             //suppress chat message if it's filtered out
             if(message == null){
                 return;
@@ -94,7 +94,7 @@ public class NetServer implements ApplicationListener{
 
             //special case; graphical server needs to see its message
             if(!headless){
-                sendMessage(netServer.chatFormatter.format(player, message), message, player);
+                NetClient.sendMessage(chatFormatter.format(player, message), message, player);
             }
 
             //server console logging
@@ -102,9 +102,8 @@ public class NetServer implements ApplicationListener{
 
             //invoke event for all clients but also locally
             //this is required so other clients get the correct name even if they don't know who's sending it yet
-            Call.sendMessage(netServer.chatFormatter.format(player, message), message, player);
+            Call.sendMessage(chatFormatter.format(player, message), message, player);
         }else{
-
             //a command was sent, now get the output
             if(response.type != ResponseType.valid){
                 if(response.type == ResponseType.manyArguments){
@@ -115,7 +114,7 @@ public class NetServer implements ApplicationListener{
                     int minDst = 0;
                     Command closest = null;
 
-                    for(Command command : netServer.clientCommands.getCommandList()){
+                    for(Command command : clientCommands.getCommandList()){
                         int dst = Strings.levenshtein(command.text, response.runCommand);
                         if(dst < 3 && (closest == null || dst < minDst)){
                             minDst = dst;
