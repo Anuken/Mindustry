@@ -1409,6 +1409,7 @@ public class LExecutor{
                 case wave -> state.wave = exec.numi(value);
                 case currentWaveTime -> state.wavetime = exec.numf(value) * 60f;
                 case waves -> state.rules.waves = exec.bool(value);
+                case waveSending -> state.rules.waveSending = exec.bool(value);
                 case attackMode -> state.rules.attackMode = exec.bool(value);
                 case waveSpacing -> state.rules.waveSpacing = exec.numf(value) * 60f;
                 case enemyCoreBuildRadius -> state.rules.enemyCoreBuildRadius = exec.numf(value) * 8f;
@@ -1641,12 +1642,14 @@ public class LExecutor{
     }
 
     public static class SpawnWaveI implements LInstruction{
+        public int natural;
         public int x, y;
 
         public SpawnWaveI(){
         }
 
-        public SpawnWaveI(int x, int y){
+        public SpawnWaveI(int natural, int x, int y){
+            this.natural = natural;
             this.x = x;
             this.y = y;
         }
@@ -1655,9 +1658,14 @@ public class LExecutor{
         public void run(LExecutor exec){
             if(net.client()) return;
 
+            if(exec.bool(natural)){
+                logic.skipWave();
+                return;
+            }
+
             float
-            spawnX = World.unconv(exec.numf(x)),
-            spawnY = World.unconv(exec.numf(y));
+                spawnX = World.unconv(exec.numf(x)),
+                spawnY = World.unconv(exec.numf(y));
             int packed = Point2.pack(exec.numi(x), exec.numi(y));
 
             for(SpawnGroup group : state.rules.spawns){
