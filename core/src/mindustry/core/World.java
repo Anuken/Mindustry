@@ -202,7 +202,7 @@ public class World{
      */
     public void beginMapLoad(){
         generating = true;
-        Events.fire(new WorldBeforeLoadEvent());
+        Events.fire(new WorldLoadBeginEvent());
     }
 
     /**
@@ -210,7 +210,7 @@ public class World{
      * A WorldLoadEvent will be fire.
      */
     public void endMapLoad(){
-        Events.fire(new WorldEndLoadEvent());
+        Events.fire(new WorldLoadEndEvent());
 
         for(Tile tile : tiles){
             //remove legacy blocks; they need to stop existing

@@ -81,9 +81,9 @@ public class EventType{
     /** Called when a game begins and the world tiles are loaded, just set `generating = false`. Entities are not yet loaded at this stage. */
     public static class WorldLoadEvent{}
     /** Called when the world begin to load, just set `generating = true`. */
-    public static class WorldBeforeLoadEvent{}
+    public static class WorldLoadBeginEvent{}
     /** Called when a game begins and the world tiles are initiated. About to updates tile proximity and sets up physics for the world(Before WorldLoadEvent) */
-    public static class WorldEndLoadEvent{}
+    public static class WorldLoadEndEvent{}
 
     public static class SaveLoadEvent{
         public final boolean isMap;
