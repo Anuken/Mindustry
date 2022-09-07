@@ -51,7 +51,7 @@ public class NetServer implements ApplicationListener{
     public TeamAssigner assigner = (player, players) -> {
         if(state.rules.pvp){
             //find team with minimum amount of players and auto-assign player to that.
-            TeamData data = state.teams.getActive().min(data -> {
+            TeamData re = state.teams.getActive().min(data -> {
                 if((state.rules.waveTeam == data.team && state.rules.waves) || !data.team.active() || data.team == Team.derelict) return Integer.MAX_VALUE;
 
                 int count = 0;
@@ -62,7 +62,7 @@ public class NetServer implements ApplicationListener{
                 }
                 return count;
             });
-            return data == null ? null : data.team;
+            return re == null ? null : re.team;
         }
 
         return state.rules.defaultTeam;
