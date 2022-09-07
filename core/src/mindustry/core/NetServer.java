@@ -67,31 +67,68 @@ public class NetServer implements ApplicationListener{
 
         return state.rules.defaultTeam;
     };
+    
     /** Converts a message + NULLABLE player sender into a single string. Override for custom prefixes/suffixes. */
     public ChatFormatter chatFormatter = (player, message) -> player == null ? message : "[coral][[" + player.coloredName() + "[coral]]:[white] " + message;
+    
+    /** Handles every message or command sent by any player. Override for customisation. */
+    public MessageHandler messageHandler = (player, message) -> {
+        message = message.replace("\n", "");
 
-    /** Handles an incorrect command response. Returns text that will be sent to player. Override for customisation. */
-    public InvalidCommandHandler invalidHandler = (player, response) -> {
-        if(response.type == ResponseType.manyArguments){
-            return "[scarlet]Too many arguments. Usage:[lightgray] " + response.command.text + "[gray] " + response.command.paramText;
-        }else if(response.type == ResponseType.fewArguments){
-            return "[scarlet]Too few arguments. Usage:[lightgray] " + response.command.text + "[gray] " + response.command.paramText;
-        }else{ //unknown command
-            int minDst = 0;
-            Command closest = null;
+        Events.fire(new PlayerChatEvent(player, message));
 
-            for(Command command : netServer.clientCommands.getCommandList()){
-                int dst = Strings.levenshtein(command.text, response.runCommand);
-                if(dst < 3 && (closest == null || dst < minDst)){
-                    minDst = dst;
-                    closest = command;
-                }
+        //log commands before they are handled
+        if(message.startsWith(netServer.clientCommands.getPrefix())){
+            //log with brackets
+            Log.info("<&fi@: @&fr>", "&lk" + player.plainName(), "&lw" + message);
+        }
+
+        //check if it's a command
+        CommandResponse response = netServer.clientCommands.handleMessage(message, player);
+        if(response.type == ResponseType.noCommand){ //no command to handle
+            message = netServer.admins.filterMessage(player, message);
+            //suppress chat message if it's filtered out
+            if(message == null){
+                return;
             }
 
-            if(closest != null){
-                return "[scarlet]Unknown command. Did you mean \"[lightgray]" + closest.text + "[]\"?";
-            }else{
-                return "[scarlet]Unknown command. Check [lightgray]/help[scarlet].";
+            //special case; graphical server needs to see its message
+            if(!headless){
+                sendMessage(netServer.chatFormatter.format(player, message), message, player);
+            }
+
+            //server console logging
+            Log.info("&fi@: @", "&lc" + player.plainName(), "&lw" + message);
+
+            //invoke event for all clients but also locally
+            //this is required so other clients get the correct name even if they don't know who's sending it yet
+            Call.sendMessage(netServer.chatFormatter.format(player, message), message, player);
+        }else{
+
+            //a command was sent, now get the output
+            if(response.type != ResponseType.valid){
+                if(response.type == ResponseType.manyArguments){
+                    player.sendMessage("[scarlet]Too many arguments. Usage:[lightgray] " + response.command.text + "[gray] " + response.command.paramText);
+                }else if(response.type == ResponseType.fewArguments){
+                    player.sendMessage("[scarlet]Too few arguments. Usage:[lightgray] " + response.command.text + "[gray] " + response.command.paramText);
+                }else{ //unknown command
+                    int minDst = 0;
+                    Command closest = null;
+
+                    for(Command command : netServer.clientCommands.getCommandList()){
+                        int dst = Strings.levenshtein(command.text, response.runCommand);
+                        if(dst < 3 && (closest == null || dst < minDst)){
+                            minDst = dst;
+                            closest = command;
+                        }
+                    }
+
+                    if(closest != null){
+                        player.sendMessage("[scarlet]Unknown command. Did you mean \"[lightgray]" + closest.text + "[]\"?");
+                    }else{
+                        player.sendMessage("[scarlet]Unknown command. Check [lightgray]/help[scarlet].");
+                    }
+                }
             }
         }
     };
@@ -1100,7 +1137,7 @@ public class NetServer implements ApplicationListener{
         String format(@Nullable Player player, String message);
     }
 
-    public interface InvalidCommandHandler{
-        String handle(Player player, CommandResponse response);
+    public interface MessageHandler{
+        void handle(Player player, String message);
     }
 }
