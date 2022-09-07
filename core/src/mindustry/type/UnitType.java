@@ -937,8 +937,8 @@ public class UnitType extends UnlockableContent{
             }
 
             for(Weapon weapon : weapons){
-                if(!weapon.name.isEmpty() && (minfo.mod == null || weapon.name.startsWith(minfo.mod.name)) && !(!weapon.top && packer.isOutlined(weapon.name))){
-                    makeOutline(PageType.main, packer, weapon.region, !weapon.top, outlineColor, outlineRadius);
+                if(!weapon.name.isEmpty() && (minfo.mod == null || weapon.name.startsWith(minfo.mod.name)) && (weapon.top || !packer.isOutlined(weapon.name) || weapon.parts.contains(p -> p.under))){
+                    makeOutline(PageType.main, packer, weapon.region, !weapon.top || weapon.parts.contains(p -> p.under), outlineColor, outlineRadius);
                 }
             }
         }
