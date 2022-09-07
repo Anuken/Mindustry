@@ -545,7 +545,7 @@ public class Damage{
                         float mult = (1f-(Mathf.dst2(startX, startY, x, y) / rad2) + edgeScale) / (1f + edgeScale);
                         float next = damage * mult - dealt;
                         //register damage dealt
-                        int p = Point2.pack(startX, startY);
+                        int p = build.pos();
                         damages.put(p, Math.max(damages.get(p), next));
                         //register as hit
                         dealt += build.health;
