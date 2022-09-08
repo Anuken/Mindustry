@@ -119,7 +119,7 @@ public class ErekirTechTree{
 
                                 });
 
-                                node(deconstructor, Seq.with(tmpNever), () -> {
+                                node(largeDeconstructor, Seq.with(tmpNever), () -> {
 
                                 });
                             });
