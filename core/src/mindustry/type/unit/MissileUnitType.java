@@ -25,6 +25,7 @@ public class MissileUnitType extends UnitType{
         envEnabled = Env.any;
         envDisabled = Env.none;
         physics = false;
+        bounded = false;
         trailLength = 7;
         hidden = true;
         speed = 4f;
