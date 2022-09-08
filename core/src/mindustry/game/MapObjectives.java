@@ -424,7 +424,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public String text(){
-            return Core.bundle.format("objective.destroyunits", count);
+            return Core.bundle.format("objective.destroyunits", count - state.stats.enemyUnitsDestroyed);
         }
     }
 
