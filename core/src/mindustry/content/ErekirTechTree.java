@@ -114,7 +114,7 @@ public class ErekirTechTree{
                         });
 
                         node(constructor, Seq.with(new OnSector(split)), () -> {
-                            node(smallDeconstructor, Seq.with(new OnSector(peaks)), () -> {
+                            node(deconstructor, Seq.with(new OnSector(peaks)), () -> {
                                 node(largeConstructor, Seq.with(tmpNever), () -> {
 
                                 });

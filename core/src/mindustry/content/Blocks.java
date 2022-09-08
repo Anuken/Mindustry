@@ -155,7 +155,7 @@ public class Blocks{
     unitRepairTower,
 
     //payloads
-    payloadConveyor, payloadRouter, reinforcedPayloadConveyor, reinforcedPayloadRouter, payloadMassDriver, payloadPropulsionTower, smallDeconstructor, largeDeconstructor, constructor, largeConstructor, payloadLoader, payloadUnloader,
+    payloadConveyor, payloadRouter, reinforcedPayloadConveyor, reinforcedPayloadRouter, payloadMassDriver, payloadPropulsionTower, deconstructor, largeDeconstructor, constructor, largeConstructor, payloadLoader, payloadUnloader,
     
     //logic
     message, switchBlock, microProcessor, logicProcessor, hyperProcessor, largeLogicDisplay, logicDisplay, memoryCell, memoryBank,
@@ -5563,7 +5563,7 @@ public class Blocks{
             consumePower(6f);
         }};
 
-        smallDeconstructor = new PayloadDeconstructor("small-deconstructor"){{
+        deconstructor = new PayloadDeconstructor("deconstructor"){{
             requirements(Category.units, with(Items.beryllium, 100, Items.silicon, 100, Items.oxide, 40, Items.graphite, 80));
             regionSuffix = "-dark";
             itemCapacity = 100;
