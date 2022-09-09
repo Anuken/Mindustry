@@ -623,7 +623,7 @@ public class Blocks{
         }};
 
         sandWall = new StaticWall("sand-wall"){{
-            sandWater.asFloor().wall = water.asFloor().wall = deepwater.asFloor().wall = this;
+            sandWater.asFloor().wall = water.asFloor().wall = deepwater.asFloor().wall = sand.asFloor().wall = this;
             attributes.set(Attribute.sand, 2f);
         }};
 
