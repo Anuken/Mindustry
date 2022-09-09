@@ -20,6 +20,7 @@ public class SectorPresets{
         groundZero = new SectorPreset("groundZero", serpulo, 15){{
             alwaysUnlocked = true;
             addStartingItems = true;
+            overrideLaunchDefaults = true;
             captureWave = 10;
             difficulty = 1;
             startWaveTimeMultiplier = 3f;
