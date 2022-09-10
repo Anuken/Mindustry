@@ -2965,7 +2965,6 @@ public class UnitTypes{
                     }));
 
                     collidesTiles = true;
-                    recoil = 0.5f;
                     backColor = hitColor = Pal.techBlue;
                     frontColor = Color.white;
 
