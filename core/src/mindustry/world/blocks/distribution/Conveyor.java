@@ -409,7 +409,7 @@ public class Conveyor extends Block implements Autotiler{
 
         @Override
         public Object senseObject(LAccess sensor){
-            if(sensor == LAccess.firstItem && len > 0) return ids[Math.max(0, len - 1)];
+            if(sensor == LAccess.firstItem && len > 0) return ids[len - 1];
             return super.senseObject(sensor);
         }
 

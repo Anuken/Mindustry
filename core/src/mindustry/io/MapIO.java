@@ -2,7 +2,6 @@ package mindustry.io;
 
 import arc.files.*;
 import arc.graphics.*;
-import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.io.*;
 import mindustry.content.*;
