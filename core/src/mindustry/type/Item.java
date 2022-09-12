@@ -47,6 +47,8 @@ public class Item extends UnlockableContent implements Senseable{
     /** If true, this material is used by buildings. If false, this material will be incinerated in certain cores. */
     public boolean buildable = true;
     public boolean hidden = false;
+    /** For mods. Adds this item to the listed planets' hidden items Seq. */
+    public String[] hiddenOn;
 
     public Item(String name, Color color){
         super(name);
@@ -55,6 +57,17 @@ public class Item extends UnlockableContent implements Senseable{
 
     public Item(String name){
         this(name, new Color(Color.black));
+    }
+
+    @Override
+    public void init(){
+        super.init();
+
+        if(hiddenOn != null){
+            for(String planet : hiddenOn){
+                content.planet(planet).hiddenItems.add(this);
+            }
+        }
     }
 
     @Override
