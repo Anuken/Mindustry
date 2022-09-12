@@ -1181,10 +1181,6 @@ public class UnitType extends UnlockableContent{
             drawShield(unit);
         }
 
-        if(mech != null){
-            unit.trns(-legOffset.x, -legOffset.y);
-        }
-
         //TODO how/where do I draw under?
         if(parts.size > 0){
             for(int i = 0; i < parts.size; i++){
@@ -1210,6 +1206,10 @@ public class UnitType extends UnlockableContent{
                 Draw.reset();
                 a.draw(unit);
             }
+        }
+
+        if(mech != null){
+            unit.trns(-legOffset.x, -legOffset.y);
         }
 
         Draw.reset();
