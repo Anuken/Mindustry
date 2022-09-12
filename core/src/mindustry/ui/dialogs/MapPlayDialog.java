@@ -51,7 +51,10 @@ public class MapPlayDialog extends BaseDialog{
 
         rules = map.applyRules(selectedGamemode);
 
-        if(!map.description().isEmpty()) cont.add(map.description()).wrap();
+        if(!map.description().isEmpty()){
+            cont.add(map.description()).wrap();
+            cont.row();
+        }
 
         Table selmode = new Table();
         selmode.add("@level.mode").colspan(2);
