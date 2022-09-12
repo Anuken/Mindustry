@@ -275,7 +275,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         });
 
         group.fill(t -> {
-            t.visible(() -> !showCancel() && block == null);
+            t.visible(() -> !showCancel() && block == null && !hasSchem());
             t.bottom().left();
             t.button("@command", Icon.units, Styles.squareTogglet, () -> {
                 commandMode = !commandMode;

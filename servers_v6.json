@@ -4,6 +4,10 @@
     "address": ["sectorized.ddns.net"]
   },
   {
+    "name": "generic survival",
+    "address": ["212.192.29.92:25554"]
+  },
+  {
     "name": "{AA}",
     "address": ["recessive.net"]
   },
@@ -12,7 +16,7 @@
     "address": ["n5.yeet.ml", "n1.yeet.ml:6568","n5.yeet.ml:6569" , "n1.yeet.ml:6570" ,"n1.yeet.ml:6571", "n1.yeet.ml:6609"]
   },
   {
-    "name": "RCM",
+    "name": "EasyPlay",
     "address": ["easyplay.su"]
   },
     {
@@ -29,7 +33,7 @@
   },
   {
     "name": "C.A.M.S.",
-    "address": ["0.baseduser.eu.org:42000", "nikochio.ddns.net", "play.thedimas.pp.ua"]
+    "address": ["0.baseduser.eu.org:42000", "nikochio.ddns.net"]
   },
   {
     "name": "ECAN",

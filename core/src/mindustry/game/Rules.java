@@ -25,6 +25,8 @@ public class Rules{
     public TeamRules teams = new TeamRules();
     /** Whether the waves come automatically on a timer. If not, waves come when the play button is pressed. */
     public boolean waveTimer = true;
+    /** Whether the waves can be manually summoned with the play button. */
+    public boolean waveSending = true;
     /** Whether waves are spawnable at all. */
     public boolean waves;
     /** Whether the game objective is PvP. Note that this enables automatic hosting. */

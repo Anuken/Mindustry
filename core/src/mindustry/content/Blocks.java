@@ -623,7 +623,7 @@ public class Blocks{
         }};
 
         sandWall = new StaticWall("sand-wall"){{
-            sandWater.asFloor().wall = water.asFloor().wall = deepwater.asFloor().wall = this;
+            sandWater.asFloor().wall = water.asFloor().wall = deepwater.asFloor().wall = sand.asFloor().wall = this;
             attributes.set(Attribute.sand, 2f);
         }};
 
@@ -1228,6 +1228,8 @@ public class Blocks{
             heatRequirement = 6f;
 
             outputLiquid = new LiquidStack(Liquids.nitrogen, 4f / 60f);
+
+            researchCost = with(Items.silicon, 2000, Items.oxide, 900, Items.beryllium, 2400);
         }};
 
         oxidationChamber = new HeatProducer("oxidation-chamber"){{
@@ -1280,6 +1282,8 @@ public class Blocks{
             ambientSound = Sounds.hum;
             consumeLiquid(Liquids.slag, 40f / 60f);
             heatOutput = 8f;
+
+            researchCost = with(Items.tungsten, 1200, Items.oxide, 900, Items.beryllium, 2400);
         }};
 
         phaseHeater = new HeatProducer("phase-heater"){{
@@ -1859,17 +1863,6 @@ public class Blocks{
             consumePower(5f);
         }};
 
-        shieldBreaker = new ShieldBreaker("shield-breaker"){{
-            requirements(Category.effect, BuildVisibility.editorOnly, with());
-
-            size = 5;
-            toDestroy = new Block[]{Blocks.shieldProjector, Blocks.largeShieldProjector};
-
-            consumeItem(Items.tungsten, 100);
-            itemCapacity = 100;
-            scaledHealth = 120f;
-        }};
-
         //endregion
         //region distribution
 
@@ -2077,6 +2070,7 @@ public class Blocks{
             consumeLiquid(Liquids.nitrogen, 10f / 60f);
 
             itemCapacity = 200;
+            researchCost = with(Items.silicon, 2500, Items.surgeAlloy, 20, Items.oxide, 30);
         }};
 
         unitCargoUnloadPoint = new UnitCargoUnloadPoint("unit-cargo-unload-point"){{
@@ -2085,6 +2079,8 @@ public class Blocks{
             size = 2;
 
             itemCapacity = 100;
+
+            researchCost = with(Items.silicon, 3000, Items.oxide, 20);
         }};
 
         //endregion
@@ -2794,6 +2790,8 @@ public class Blocks{
 
             consumeLiquid(Liquids.hydrogen, 0.5f / 60f);
             consumeLiquid(Liquids.nitrogen, 3f / 60f).boost();
+
+            researchCost = with(Items.silicon, 1500, Items.oxide, 200, Items.beryllium, 3000, Items.tungsten, 1200);
         }};
 
         impactDrill = new BurstDrill("impact-drill"){{

@@ -675,7 +675,25 @@ public class LStatements{
 
         @Override
         public LCategory category(){
-            return LCategory.operation;
+            return LCategory.control;
+        }
+    }
+
+    @RegisterStatement("stop")
+    public static class StopStatement extends LStatement{
+
+        @Override
+        public void build(Table table){
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new StopI();
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.control;
         }
     }
 
@@ -1291,16 +1309,18 @@ public class LStatements{
 
     @RegisterStatement("spawnwave")
     public static class SpawnWaveStatement extends LStatement{
-        public String x = "10", y = "10";
+        public String x = "10", y = "10", natural = "false";
 
         @Override
         public void build(Table table){
+            table.add("natural ");
+            fields(table, natural, str -> natural = str);
 
-            table.add("x ");
-            fields(table, x, str -> x = str);
+            table.add("x ").visible(() -> natural.equals("false"));
+            fields(table, x, str -> x = str).visible(() -> natural.equals("false"));
 
-            table.add(" y ");
-            fields(table, y, str -> y = str);
+            table.add(" y ").visible(() -> natural.equals("false"));
+            fields(table, y, str -> y = str).visible(() -> natural.equals("false"));
         }
 
         @Override
@@ -1310,7 +1330,7 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new SpawnWaveI(builder.var(x), builder.var(y));
+            return new SpawnWaveI(builder.var(natural), builder.var(x), builder.var(y));
         }
 
         @Override
