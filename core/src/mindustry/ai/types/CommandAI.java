@@ -155,7 +155,7 @@ public class CommandAI extends AIController{
                     }
 
                     //others have arrived at destination, so this one will too
-                    if(count >= Math.max(3, local.size / 2)){
+                    if(count >= Math.max(2, local.size / 2)){
                         targetPos = null;
                     }
                 }
