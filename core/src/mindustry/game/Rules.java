@@ -91,6 +91,10 @@ public class Rules{
     public boolean onlyDepositCore = false;
     /** If true, every enemy block in the radius of the (enemy) core is destroyed upon death. Used for campaign maps. */
     public boolean coreDestroyClear = false;
+    /** If true, bannedBlocks becomes a whitelist. */
+    public boolean blockWhitelist = false;
+    /** If true, bannedUnits becomes a whitelist. */
+    public boolean unitWhitelist = false;
     /** Radius around enemy wave drop zones.*/
     public float dropZoneRadius = 300f;
     /** Time between waves in ticks. */
@@ -218,6 +222,14 @@ public class Rules{
 
     public float buildSpeed(Team team){
         return buildSpeedMultiplier * teams.get(team).buildSpeedMultiplier;
+    }
+
+    public boolean isBanned(Block block){
+        return blockWhitelist != bannedBlocks.contains(block);
+    }
+
+    public boolean isBanned(UnitType unit){
+        return unitWhitelist != bannedUnits.contains(unit);
     }
 
     /** A team-specific ruleset. */

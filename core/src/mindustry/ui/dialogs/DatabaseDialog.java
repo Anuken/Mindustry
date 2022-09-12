@@ -74,7 +74,7 @@ public class DatabaseDialog extends BaseDialog{
                     Image image = unlocked(unlock) ? new Image(unlock.uiIcon).setScaling(Scaling.fit) : new Image(Icon.lock, Pal.gray);
 
                     //banned cross
-                    if(state.isGame() && (unlock instanceof UnitType u && u.isBanned() || unlock instanceof Block b && state.rules.bannedBlocks.contains(b))){
+                    if(state.isGame() && (unlock instanceof UnitType u && u.isBanned() || unlock instanceof Block b && state.rules.isBanned(b))){
                         list.stack(image, new Image(Icon.cancel){{
                             setColor(Color.scarlet);
                             touchable = Touchable.disabled;

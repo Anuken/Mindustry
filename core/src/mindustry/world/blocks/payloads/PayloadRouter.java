@@ -44,7 +44,7 @@ public class PayloadRouter extends PayloadConveyor{
     }
 
     public boolean canSort(Block b){
-        return b.isVisible() && b.size <= size && !(b instanceof CoreBlock) && !state.rules.bannedBlocks.contains(b) && b.environmentBuildable();
+        return b.isVisible() && b.size <= size && !(b instanceof CoreBlock) && !state.rules.isBanned(b) && b.environmentBuildable();
     }
 
     public boolean canSort(UnitType t){
