@@ -169,6 +169,7 @@ public class CustomRulesDialog extends BaseDialog{
                 () -> {}, () -> {}
         )).left().width(300f).row();
 
+        check("@rules.hidebannedblocks", b -> rules.hideBannedBlocks = b, () -> rules.hideBannedBlocks);
         main.button("@bannedblocks", () -> showBanned("@bannedblocks", ContentType.block, rules.bannedBlocks, Block::canBeBuilt)).left().width(300f).row();
         check("@whitelist", b -> rules.blockWhitelist = b, () -> rules.blockWhitelist);
 

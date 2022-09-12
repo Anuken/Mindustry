@@ -853,7 +853,7 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     public boolean isVisible(){
-        return !isHidden();
+        return !isHidden() && (state.rules.editor || (!state.rules.hideBannedBlocks || !state.rules.isBanned(this)));
     }
 
     public boolean isPlaceable(){
