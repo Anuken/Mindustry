@@ -76,11 +76,7 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
 
         @Override
         public boolean canConsume(){
-            boolean correctAmmo = true;
-            if(bullets.any()){
-                correctAmmo = hasAmmo() && bullets.first().bullet.type == peekAmmo();
-            }
-            return correctAmmo && super.canConsume();
+            return hasCorrectAmmo() && super.canConsume();
         }
 
         @Override
@@ -96,11 +92,11 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
 
         @Override
         public boolean hasAmmo(){
-            boolean correctAmmo = true;
-            if(bullets.any()){
-                correctAmmo = bullets.first().bullet.type == peekAmmo();
-            }
-            return correctAmmo && ammoTypes.get(liquids.current()) != null && liquids.currentAmount() >= 1f / ammoTypes.get(liquids.current()).ammoMultiplier;
+            return hasCorrectAmmo() && ammoTypes.get(liquids.current()) != null && liquids.currentAmount() >= 1f / ammoTypes.get(liquids.current()).ammoMultiplier;
+        }
+
+        public boolean hasCorrectAmmo(){
+            return !bullets.any() || bullets.first().bullet.type == peekAmmo();
         }
 
         @Override
