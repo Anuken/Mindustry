@@ -75,34 +75,6 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
         }
 
         @Override
-        protected void updateBullet(BulletEntry entry){
-            float
-                bulletX = x + Angles.trnsx(rotation - 90, shootX + entry.x, shootY + entry.y),
-                bulletY = y + Angles.trnsy(rotation - 90, shootX + entry.x, shootY + entry.y),
-                angle = rotation + entry.rotation;
-
-            entry.bullet.rotation(angle);
-            entry.bullet.set(bulletX, bulletY);
-
-            //target length of laser
-            float shootLength = Math.min(dst(targetPos), range);
-            //current length of laser
-            float curLength = dst(entry.bullet.aimX, entry.bullet.aimY);
-            //resulting length of the bullet (smoothed)
-            float resultLength = Mathf.approachDelta(curLength, shootLength, aimChangeSpeed);
-            //actual aim end point based on length
-            Tmp.v1.trns(rotation, lastLength = resultLength).add(x, y);
-
-            entry.bullet.aimX = Tmp.v1.x;
-            entry.bullet.aimY = Tmp.v1.y;
-
-            if(isShooting() && hasAmmo() && entry.bullet.type == peekAmmo()){
-                entry.bullet.time = entry.bullet.lifetime * entry.bullet.type.optimalLifeFract * shootWarmup;
-                entry.bullet.keepAlive = true;
-            }
-        }
-
-        @Override
         public boolean canConsume(){
             boolean correctAmmo = true;
             if(bullets.any()){
@@ -124,7 +96,11 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
 
         @Override
         public boolean hasAmmo(){
-            return ammoTypes.get(liquids.current()) != null && liquids.currentAmount() >= 1f / ammoTypes.get(liquids.current()).ammoMultiplier;
+            boolean correctAmmo = true;
+            if(bullets.any()){
+                correctAmmo = bullets.first().bullet.type == peekAmmo();
+            }
+            return correctAmmo && ammoTypes.get(liquids.current()) != null && liquids.currentAmount() >= 1f / ammoTypes.get(liquids.current()).ammoMultiplier;
         }
 
         @Override
