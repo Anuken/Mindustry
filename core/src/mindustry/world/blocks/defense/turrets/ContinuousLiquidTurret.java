@@ -103,6 +103,15 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
         }
 
         @Override
+        public boolean canConsume(){
+            boolean correctAmmo = true;
+            if(bullets.any()){
+                correctAmmo = hasAmmo() && bullets.first().bullet.type == peekAmmo();
+            }
+            return correctAmmo && super.canConsume();
+        }
+
+        @Override
         public BulletType useAmmo(){
             //does not consume ammo upon firing
             return peekAmmo();
