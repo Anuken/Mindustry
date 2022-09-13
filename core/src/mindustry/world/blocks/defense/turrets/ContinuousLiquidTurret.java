@@ -1,6 +1,8 @@
 package mindustry.world.blocks.defense.turrets;
 
+import arc.math.*;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
@@ -70,6 +72,34 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
             unit.ammo(unit.type().ammoCapacity * liquids.currentAmount() / liquidCapacity);
 
             super.updateTile();
+        }
+
+        @Override
+        protected void updateBullet(BulletEntry entry){
+            float
+                bulletX = x + Angles.trnsx(rotation - 90, shootX + entry.x, shootY + entry.y),
+                bulletY = y + Angles.trnsy(rotation - 90, shootX + entry.x, shootY + entry.y),
+                angle = rotation + entry.rotation;
+
+            entry.bullet.rotation(angle);
+            entry.bullet.set(bulletX, bulletY);
+
+            //target length of laser
+            float shootLength = Math.min(dst(targetPos), range);
+            //current length of laser
+            float curLength = dst(entry.bullet.aimX, entry.bullet.aimY);
+            //resulting length of the bullet (smoothed)
+            float resultLength = Mathf.approachDelta(curLength, shootLength, aimChangeSpeed);
+            //actual aim end point based on length
+            Tmp.v1.trns(rotation, lastLength = resultLength).add(x, y);
+
+            entry.bullet.aimX = Tmp.v1.x;
+            entry.bullet.aimY = Tmp.v1.y;
+
+            if(isShooting() && hasAmmo() && entry.bullet.type == peekAmmo()){
+                entry.bullet.time = entry.bullet.lifetime * entry.bullet.type.optimalLifeFract * shootWarmup;
+                entry.bullet.keepAlive = true;
+            }
         }
 
         @Override
