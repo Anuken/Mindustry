@@ -32,7 +32,7 @@ import static mindustry.Vars.*;
 public class Turret extends ReloadTurret{
     //after being logic-controlled and this amount of time passes, the turret will resume normal AI
     public static final float logicControlCooldown = 60 * 2;
-    /** Turret sprite offset, based on recoil. Updated every frame. */
+    /** Turret sprite offset, based on recoil. Updated before drawing. */
     public static final Vec2 recoilOffset = new Vec2();
 
     public final int timerTarget = timers++;
