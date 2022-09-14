@@ -202,6 +202,7 @@ public class World{
      */
     public void beginMapLoad(){
         generating = true;
+        Events.fire(new WorldLoadBeginEvent());
     }
 
     /**
@@ -209,6 +210,7 @@ public class World{
      * A WorldLoadEvent will be fire.
      */
     public void endMapLoad(){
+        Events.fire(new WorldLoadEndEvent());
 
         for(Tile tile : tiles){
             //remove legacy blocks; they need to stop existing
@@ -272,6 +274,10 @@ public class World{
             state.rules.sector = sector;
         });
 
+        if(saveInfo && state.rules.waves){
+            sector.info.waves = state.rules.waves;
+        }
+
         //postgenerate for bases
         if(sector.preset == null && sector.planet.generator != null){
             sector.planet.generator.postGenerate(tiles);
@@ -314,6 +320,7 @@ public class World{
         sector.planet.applyRules(state.rules);
         sector.info.resources = content.toSeq();
         sector.info.resources.sort(Structs.comps(Structs.comparing(Content::getContentType), Structs.comparingInt(c -> c.id)));
+
         if(saveInfo){
             sector.saveInfo();
         }

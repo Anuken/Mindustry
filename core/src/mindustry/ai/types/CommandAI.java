@@ -127,7 +127,7 @@ public class CommandAI extends AIController{
                         attackTarget != null && unit.within(attackTarget, engageRange) ? engageRange :
                         unit.isGrounded() ? 0f :
                         attackTarget != null ? engageRange :
-                        0f, unit.isFlying() ? 40f : 100f, false, null, true);
+                        0f, unit.isFlying() ? 40f : 100f, false, null, targetPos.epsilonEquals(vecOut, 4.1f));
                 }
             }
 
@@ -155,7 +155,7 @@ public class CommandAI extends AIController{
                     }
 
                     //others have arrived at destination, so this one will too
-                    if(count >= Math.max(3, local.size / 2)){
+                    if(count >= Math.max(2, local.size / 2)){
                         targetPos = null;
                     }
                 }
@@ -168,7 +168,9 @@ public class CommandAI extends AIController{
 
     @Override
     public void hit(Bullet bullet){
-        if(unit.team.isAI() && bullet.owner instanceof Teamc teamc && teamc.team() != unit.team && attackTarget == null && !(teamc instanceof Unit u && !u.checkTarget(unit.type.targetAir, unit.type.targetGround))){
+        if(unit.team.isAI() && bullet.owner instanceof Teamc teamc && teamc.team() != unit.team && attackTarget == null &&
+            //can only counter-attack every few seconds to prevent rapidly changing targets
+            !(teamc instanceof Unit u && !u.checkTarget(unit.type.targetAir, unit.type.targetGround)) && timer.get(timerTarget4, 60f * 12f)){
             commandTarget(teamc, true);
         }
     }
