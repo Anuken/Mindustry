@@ -31,7 +31,9 @@ import static mindustry.Vars.*;
 
 public class Turret extends ReloadTurret{
     //after being logic-controlled and this amount of time passes, the turret will resume normal AI
-    public final static float logicControlCooldown = 60 * 2;
+    public static final float logicControlCooldown = 60 * 2;
+    /** Turret sprite offset, based on recoil. Updated every frame. */
+    public static final Vec2 recoilOffset = new Vec2();
 
     public final int timerTarget = timers++;
     /** Ticks between attempt at finding a target. */
@@ -201,10 +203,6 @@ public class Turret extends ReloadTurret{
     }
 
     public class TurretBuild extends ReloadTurretBuild implements ControlBlock{
-        //TODO storing these as instance variables is horrible design
-        /** Turret sprite offset, based on recoil. Updated every frame. */
-        public Vec2 recoilOffset = new Vec2();
-
         public Seq<AmmoEntry> ammo = new Seq<>();
         public int totalAmmo;
         public float curRecoil, heat, logicControlTime = -1;
@@ -338,6 +336,7 @@ public class Turret extends ReloadTurret{
 
         @Override
         public void draw(){
+            recoilOffset.trns(rotation, -Mathf.pow(curRecoil, recoilPow) * recoil);
             drawer.draw(this);
         }
 
@@ -369,7 +368,6 @@ public class Turret extends ReloadTurret{
             unit.tile(this);
             unit.rotation(rotation);
             unit.team(team);
-            recoilOffset.trns(rotation, -Mathf.pow(curRecoil, recoilPow) * recoil);
 
             if(logicControlTime > 0){
                 logicControlTime -= Time.delta;

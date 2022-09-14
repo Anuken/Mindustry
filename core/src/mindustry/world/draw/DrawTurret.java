@@ -52,7 +52,7 @@ public class DrawTurret extends DrawBlock{
 
         Draw.z(Layer.turret - 0.5f);
 
-        Drawf.shadow(preview, build.x + tb.recoilOffset.x - turret.elevation, build.y + tb.recoilOffset.y - turret.elevation, tb.drawrot());
+        Drawf.shadow(preview, build.x + Turret.recoilOffset.x - turret.elevation, build.y + Turret.recoilOffset.y - turret.elevation, tb.drawrot());
 
         Draw.z(Layer.turret);
 
@@ -63,14 +63,14 @@ public class DrawTurret extends DrawBlock{
             if(outline.found()){
                 //draw outline under everything when parts are involved
                 Draw.z(Layer.turret - 0.01f);
-                Draw.rect(outline, build.x + tb.recoilOffset.x, build.y + tb.recoilOffset.y, tb.drawrot());
+                Draw.rect(outline, build.x + Turret.recoilOffset.x, build.y + Turret.recoilOffset.y, tb.drawrot());
                 Draw.z(Layer.turret);
             }
 
             float progress = tb.progress();
 
             //TODO no smooth reload
-            var params = DrawPart.params.set(build.warmup(), 1f - progress, 1f - progress, tb.heat, tb.curRecoil, tb.charge, tb.x + tb.recoilOffset.x, tb.y + tb.recoilOffset.y, tb.rotation);
+            var params = DrawPart.params.set(build.warmup(), 1f - progress, 1f - progress, tb.heat, tb.curRecoil, tb.charge, tb.x + Turret.recoilOffset.x, tb.y + Turret.recoilOffset.y, tb.rotation);
 
             for(var part : parts){
                 part.draw(params);
@@ -80,23 +80,23 @@ public class DrawTurret extends DrawBlock{
 
     public void drawTurret(Turret block, TurretBuild build){
         if(block.region.found()){
-            Draw.rect(block.region, build.x + build.recoilOffset.x, build.y + build.recoilOffset.y, build.drawrot());
+            Draw.rect(block.region, build.x + Turret.recoilOffset.x, build.y + Turret.recoilOffset.y, build.drawrot());
         }
 
         if(liquid.found()){
             Liquid toDraw = liquidDraw == null ? build.liquids.current() : liquidDraw;
-            Drawf.liquid(liquid, build.x + build.recoilOffset.x, build.y + build.recoilOffset.y, build.liquids.get(toDraw) / block.liquidCapacity, toDraw.color.write(Tmp.c1).a(1f), build.drawrot());
+            Drawf.liquid(liquid, build.x + Turret.recoilOffset.x, build.y + Turret.recoilOffset.y, build.liquids.get(toDraw) / block.liquidCapacity, toDraw.color.write(Tmp.c1).a(1f), build.drawrot());
         }
 
         if(top.found()){
-            Draw.rect(top, build.x + build.recoilOffset.x, build.y + build.recoilOffset.y, build.drawrot());
+            Draw.rect(top, build.x + Turret.recoilOffset.x, build.y + Turret.recoilOffset.y, build.drawrot());
         }
     }
 
     public void drawHeat(Turret block, TurretBuild build){
         if(build.heat <= 0.00001f || !heat.found()) return;
 
-        Drawf.additive(heat, block.heatColor.write(Tmp.c1).a(build.heat), build.x + build.recoilOffset.x, build.y + build.recoilOffset.y, build.drawrot(), Layer.turretHeat);
+        Drawf.additive(heat, block.heatColor.write(Tmp.c1).a(build.heat), build.x + Turret.recoilOffset.x, build.y + Turret.recoilOffset.y, build.drawrot(), Layer.turretHeat);
     }
 
     /** Load any relevant texture regions. */
