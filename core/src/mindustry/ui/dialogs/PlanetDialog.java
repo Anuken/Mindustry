@@ -1123,7 +1123,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 Sector attacked = planet.sectors.find(s -> s.isAttacked() && s != sector);
                 if(attacked != null &&  planet.sectors.count(s -> s.isAttacked()) < 2){
                     BaseDialog dialog = new BaseDialog("@sector.noswitch.title");
-                    dialog.cont.add(bundle.format("sector.noswitch", attacked.name(), attacked.planet.localizedName)).maxWidth(400f).labelAlign(Align.center).center().wrap();
+                    dialog.cont.add(bundle.format("sector.noswitch", attacked.name(), attacked.planet.localizedName)).width(400f).labelAlign(Align.center).center().wrap();
                     dialog.addCloseButton();
                     dialog.buttons.button("@sector.view", Icon.eyeSmall, () -> {
                         dialog.hide();
