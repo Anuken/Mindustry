@@ -1404,7 +1404,6 @@ public class Blocks{
         }};
 
         cyanogenSynthesizer = new HeatCrafter("cyanogen-synthesizer"){{
-            //TODO requirements
             requirements(Category.crafting, with(Items.carbide, 50, Items.silicon, 80, Items.beryllium, 90));
 
             heatRequirement = 5f;
