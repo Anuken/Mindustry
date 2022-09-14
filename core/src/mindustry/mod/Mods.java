@@ -38,6 +38,7 @@ public class Mods implements Loadable{
     private ContentParser parser = new ContentParser();
     private ObjectMap<String, Seq<Fi>> bundles = new ObjectMap<>();
     private ObjectSet<String> specialFolders = ObjectSet.with("bundles", "sprites", "sprites-override");
+    ObjectIntMap<String> totalAreas = new ObjectIntMap<>(PageType.all.length);
 
     private int totalSprites;
     private MultiPacker packer;
@@ -344,6 +345,7 @@ public class Mods implements Loadable{
             }
             Log.debug("Time to generate icons: @", Time.elapsed());
 
+            packer.updatePageSize();
             packer.printStats();
 
             //dispose old atlas data
