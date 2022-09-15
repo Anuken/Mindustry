@@ -115,5 +115,9 @@
     {
     "name": "AlternightBR",
     "address": ["mindustry.ga:6567","mindustry.ga:6565","mindustry.ga:7770","mindustry.ga:6564","mindustry.ga:6566"]
-    }
+    },
+  {
+    "name": "AlexanderVn",
+    "address": ["mindustry.myddns.me:6567", "mindustry.myddns.me:6568", "mindustry.myddns.me:6569"]
+  }
 ]
