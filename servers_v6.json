@@ -146,6 +146,10 @@
   {
     "name": "Vanilla"
     "address": ["130.162.228.202"]
+  },
+  {
+    "name": "AlternightBR"
+    "address": ["mindustrypt.ga:8300"]
   }
 
 ]
