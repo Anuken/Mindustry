@@ -104,6 +104,7 @@ public class Planets{
             generator = new TantrosPlanetGenerator();
             meshLoader = () -> new HexMesh(this, 4);
             accessible = false;
+            visible = false;
             atmosphereColor = Color.valueOf("3db899");
             startSector = 10;
             atmosphereRadIn = -0.01f;
