@@ -226,7 +226,9 @@ public class UnitType extends UnlockableContent{
     /** if false, the unit shield (usually seen in waves) is not drawn. */
     drawShields = true,
     /** if false, the unit body is not drawn. */
-    drawBody = true;
+    drawBody = true,
+    /** if false, the unit is not drawn on the minimap. */
+    drawMinimap = true;
 
     /** The default AI controller to assign on creation. */
     public Prov<? extends UnitController> aiController = () -> !flying ? new GroundAI() : new FlyingAI();

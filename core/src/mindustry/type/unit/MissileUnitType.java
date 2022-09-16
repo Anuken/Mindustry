@@ -37,6 +37,7 @@ public class MissileUnitType extends UnitType{
         fogRadius = 2f;
         loopSound = Sounds.missileTrail;
         loopSoundVolume = 0.05f;
+        drawMinimap = false;
         //TODO weapon configs, etc?
     }
 }
