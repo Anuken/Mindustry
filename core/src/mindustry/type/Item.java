@@ -63,7 +63,7 @@ public class Item extends UnlockableContent implements Senseable{
     public void init(){
         super.init();
 
-        if(hiddenOn != null){
+        if(hiddenOnPlanets != null){
             for(Planet planet : hiddenOnPlanets){
                 planet.hiddenItems.add(this);
             }
