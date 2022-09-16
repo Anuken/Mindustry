@@ -115,5 +115,9 @@
     {
     "name": "AlternightBR",
     "address": ["mindustrypt.ga:6567","mindustrypt.ga:6565","mindustrypt.ga:7770","mindustrypt.ga:6564","mindustrypt.ga:6566"]
-    }
+  },
+    {
+    "name": "Vanilla",
+    "address": ["130.162.228.202"]
+  }
 ]
