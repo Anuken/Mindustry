@@ -142,6 +142,10 @@
   {
     "name": "New Campaign Like",
     "address": ["n5.yeet.ml:6568"]
+  },
+  {
+    "name": "AlternightBR"
+    "address": ["mindustrypt.ga:8300"]
   }
 
 ]
