@@ -48,7 +48,7 @@ public class Item extends UnlockableContent implements Senseable{
     public boolean buildable = true;
     public boolean hidden = false;
     /** For mods. Adds this item to the listed planets' hidden items Seq. */
-    public String[] hiddenOn;
+    public @Nullable Planet[] hiddenOnPlanets;
 
     public Item(String name, Color color){
         super(name);
@@ -64,8 +64,8 @@ public class Item extends UnlockableContent implements Senseable{
         super.init();
 
         if(hiddenOn != null){
-            for(String planet : hiddenOn){
-                content.planet(planet).hiddenItems.add(this);
+            for(Planet planet : hiddenOnPlanets){
+                planet.hiddenItems.add(this);
             }
         }
     }
