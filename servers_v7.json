@@ -119,5 +119,9 @@
     {
     "name": "Vanilla",
     "address": ["130.162.228.202"]
+  },
+  {
+    "name": "LightDustry",
+    "address": ["lightdustry.ddns.net:28583", "lightdustry.ddns.net:6567", "lightdustry.ddns.net:6568"]
   }
 ]
