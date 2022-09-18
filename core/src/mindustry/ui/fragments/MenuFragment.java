@@ -48,6 +48,7 @@ public class MenuFragment{
                 cont.name = "menu container";
 
                 if(!mobile){
+                    c.left();
                     buildDesktop();
                     Events.on(ResizeEvent.class, event -> buildDesktop());
                 }else{
@@ -58,8 +59,7 @@ public class MenuFragment{
                 pane.setOverscroll(false, false);
                 pane.setFadeScrollBars(true);
                 pane.setupFadeScrollBars(0.2f, 1f);
-                pane.setScrollBarPositions(true, false);
-            });
+            }).grow();
         });
 
         parent.fill(c -> c.bottom().right().button(Icon.discord, new ImageButtonStyle(){{
