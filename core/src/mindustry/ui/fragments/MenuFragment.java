@@ -122,7 +122,7 @@ public class MenuFragment{
         Seq<MobileButton> customs = customButtons.map(b -> new MobileButton(b.icon, b.text, b.runnable == null ? () -> {} : b.runnable));
 
         if(!Core.graphics.isPortrait()){
-            container.marginTop(60f).left();
+            container.marginTop(60f);
             container.add(play);
             container.add(join);
             container.add(custom);
@@ -133,19 +133,14 @@ public class MenuFragment{
             }
             container.row();
 
-            container.table(table -> {
-                table.defaults().set(container.defaults());
-
-                table.add(editor);
-                table.add(tools);
-
-                table.add(mods);
-                // add odd custom buttons (before the exit button)
-                for(int i = 1; i < customs.size; i += 2){
-                    table.add(customs.get(i));
-                }
-                if(!ios) table.add(exit);
-            }).colspan(container.getChildren().size - 1);
+            container.add(editor);
+            container.add(tools);
+            container.add(mods);
+            // add custom buttons (before the exit button)
+            for(int i = 1; i < customs.size; i += 2){
+                container.add(customs.get(i));
+            }
+            if(!ios) container.add(exit);
         }else{
             container.marginTop(0f);
             container.add(play);
