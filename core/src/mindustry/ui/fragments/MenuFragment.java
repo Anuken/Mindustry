@@ -127,8 +127,8 @@ public class MenuFragment{
             container.add(join);
             container.add(custom);
             container.add(maps);
-            // add even custom buttons
-            for(int i = 0; i < customs.size; i += 2){
+            // add odd custom buttons
+            for(int i = 1; i < customs.size; i += 2){
                 container.add(customs.get(i));
             }
             container.row();
@@ -136,8 +136,8 @@ public class MenuFragment{
             container.add(editor);
             container.add(tools);
             container.add(mods);
-            // add custom buttons (before the exit button)
-            for(int i = 1; i < customs.size; i += 2){
+            // add even custom buttons (before the exit button)
+            for(int i = 0; i < customs.size; i += 2){
                 container.add(customs.get(i));
             }
             if(!ios) container.add(exit);
