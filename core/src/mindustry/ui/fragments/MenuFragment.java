@@ -122,7 +122,7 @@ public class MenuFragment{
         Seq<MobileButton> customs = customButtons.map(b -> new MobileButton(b.icon, b.text, b.runnable == null ? () -> {} : b.runnable));
 
         if(!Core.graphics.isPortrait()){
-            container.marginTop(60f);
+            container.marginTop(60f).left();
             container.add(play);
             container.add(join);
             container.add(custom);
@@ -196,7 +196,7 @@ public class MenuFragment{
                 new Buttoni("@mods", Icon.book, ui.mods::show),
                 new Buttoni("@settings", Icon.settings, ui.settings::show)
             );
-            buttons(t, customButtons.toArray());
+            buttons(t, customButtons.toArray(Buttoni.class));
             buttons(t, new Buttoni("@quit", Icon.exit, Core.app::exit));
         }).width(width).growY();
 
