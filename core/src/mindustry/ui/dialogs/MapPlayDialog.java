@@ -25,7 +25,6 @@ public class MapPlayDialog extends BaseDialog{
     Gamemode selectedGamemode = Gamemode.survival;
     Seq<Gamemode> validModes = new Seq<>();
     Map lastMap;
-
     int modeIndex = 0;
 
     public MapPlayDialog(){
@@ -193,7 +192,6 @@ public class MapPlayDialog extends BaseDialog{
                 t.table(Styles.grayPanel, desc -> {
                     desc.margin(15f);
                     desc.pane(descPane -> {
-                        Log.info("described");
                         descPane.labelWrap(map.description()).grow().top().left().get().setAlignment(Align.topLeft);
                     }).grow().padBottom(15f);
                     desc.row();
