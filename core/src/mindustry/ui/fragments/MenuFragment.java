@@ -42,53 +42,6 @@ public class MenuFragment{
 
         parent.fill((x, y, w, h) -> renderer.render());
 
-        parent.fill(c -> {
-            c.pane(cont -> {
-                container = cont;
-                cont.name = "menu container";
-
-                if(!mobile){
-                    c.left();
-                    buildDesktop();
-                    Events.on(ResizeEvent.class, event -> buildDesktop());
-                }else{
-                    buildMobile();
-                    Events.on(ResizeEvent.class, event -> buildMobile());
-                }
-            }).with(pane -> {
-                pane.setOverscroll(false, false);
-                pane.setFadeScrollBars(true);
-                pane.setupFadeScrollBars(0.2f, 1f);
-            }).grow();
-        });
-
-        parent.fill(c -> c.bottom().right().button(Icon.discord, new ImageButtonStyle(){{
-            up = discordBanner;
-        }}, ui.discord::show).marginTop(9f).marginLeft(10f).tooltip("@discord").size(84, 45).name("discord"));
-
-        //info icon
-        if(mobile){
-            parent.fill(c -> c.bottom().left().button("", new TextButtonStyle(){{
-                font = Fonts.def;
-                fontColor = Color.white;
-                up = infoBanner;
-            }}, ui.about::show).size(84, 45).name("info"));
-
-
-        }else if(becontrol.active()){
-            parent.fill(c -> c.bottom().right().button("@be.check", Icon.refresh, () -> {
-                ui.loadfrag.show();
-                becontrol.checkUpdate(result -> {
-                    ui.loadfrag.hide();
-                    if(!result){
-                        ui.showInfo("@be.noupdates");
-                    }
-                });
-            }).size(200, 60).name("becheck").update(t -> {
-                t.getLabel().setColor(becontrol.isUpdateAvailable() ? Tmp.c1.set(Color.white).lerp(Pal.accent, Mathf.absin(5f, 1f)) : Color.white);
-            }));
-        }
-
         String versionText = ((Version.build == -1) ? "[#fc8140aa]" : "[#ffffffba]") + Version.combined();
         parent.fill((x, y, w, h) -> {
             TextureRegion logo = Core.atlas.find("logo");
@@ -106,6 +59,49 @@ public class MenuFragment{
             Fonts.outline.setColor(Color.white);
             Fonts.outline.draw(versionText, fx, fy - logoh/2f - Scl.scl(2f), Align.center);
         }).touchable = Touchable.disabled;
+
+        parent.fill(c -> {
+            c.pane(Styles.noBarPane, cont -> {
+                container = cont;
+                cont.name = "menu container";
+
+                if(!mobile){
+                    c.left();
+                    buildDesktop();
+                    Events.on(ResizeEvent.class, event -> buildDesktop());
+                }else{
+                    buildMobile();
+                    Events.on(ResizeEvent.class, event -> buildMobile());
+                }
+            }).with(pane -> {
+                pane.setOverscroll(false, false);
+            }).grow();
+        });
+
+        parent.fill(c -> c.bottom().right().button(Icon.discord, new ImageButtonStyle(){{
+            up = discordBanner;
+        }}, ui.discord::show).marginTop(9f).marginLeft(10f).tooltip("@discord").size(84, 45).name("discord"));
+
+        //info icon
+        if(mobile){
+            parent.fill(c -> c.bottom().left().button("", new TextButtonStyle(){{
+                font = Fonts.def;
+                fontColor = Color.white;
+                up = infoBanner;
+            }}, ui.about::show).size(84, 45).name("info"));
+        }else if(becontrol.active()){
+            parent.fill(c -> c.bottom().right().button("@be.check", Icon.refresh, () -> {
+                ui.loadfrag.show();
+                becontrol.checkUpdate(result -> {
+                    ui.loadfrag.hide();
+                    if(!result){
+                        ui.showInfo("@be.noupdates");
+                    }
+                });
+            }).size(200, 60).name("becheck").update(t -> {
+                t.getLabel().setColor(becontrol.isUpdateAvailable() ? Tmp.c1.set(Color.white).lerp(Pal.accent, Mathf.absin(5f, 1f)) : Color.white);
+            }));
+        }
     }
 
     private void buildMobile(){
