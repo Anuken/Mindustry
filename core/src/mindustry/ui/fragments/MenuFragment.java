@@ -128,7 +128,7 @@ public class MenuFragment{
             container.add(custom);
             container.add(maps);
             // add even custom buttons
-            for (int i = 0; i < customs.size; i += 2) {
+            for(int i = 0; i < customs.size; i += 2){
                 container.add(customs.get(i));
             }
             container.row();
@@ -141,11 +141,11 @@ public class MenuFragment{
 
                 table.add(mods);
                 // add odd custom buttons (before the exit button)
-                for (int i = 1; i < customs.size; i += 2) {
+                for(int i = 1; i < customs.size; i += 2){
                     table.add(customs.get(i));
                 }
                 if(!ios) table.add(exit);
-            }).colspan(4);
+            }).colspan(container.getChildren().size - 1);
         }else{
             container.marginTop(0f);
             container.add(play);
@@ -157,18 +157,13 @@ public class MenuFragment{
             container.add(editor);
             container.add(tools);
             container.row();
+            container.add(mods);
             // add custom buttons
-            for (int i = 0; i < customs.size; i++) {
+            for(int i = 0; i < customs.size; i++){
                 container.add(customs.get(i));
-                if (i % 2 == 1) container.row();
+                if(i % 2 == 0) container.row();
             }
-
-            container.table(table -> {
-                table.defaults().set(container.defaults());
-
-                table.add(mods);
-                if(!ios) table.add(exit);
-            }).colspan(2);
+            if(!ios) container.add(exit);
         }
     }
 
@@ -293,7 +288,7 @@ public class MenuFragment{
         public final String text;
         /** Runnable ran when the button is clicked. Ignored on desktop if {@link #submenu} is not null. */
         public final Runnable runnable;
-        /** Submenu shown when this button is clicked. Used instead of {@link runnable} on desktop. */
+        /** Submenu shown when this button is clicked. Used instead of {@link #runnable} on desktop. */
         public final @Nullable Buttoni[] submenu;
 
         /** Constructs a simple menu button, which behaves the same way on desktop and mobile. */
