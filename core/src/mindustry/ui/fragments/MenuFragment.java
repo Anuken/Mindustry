@@ -43,16 +43,23 @@ public class MenuFragment{
         parent.fill((x, y, w, h) -> renderer.render());
 
         parent.fill(c -> {
-            container = c;
-            c.name = "menu container";
+            c.pane(cont -> {
+                container = cont;
+                cont.name = "menu container";
 
-            if(!mobile){
-                buildDesktop();
-                Events.on(ResizeEvent.class, event -> buildDesktop());
-            }else{
-                buildMobile();
-                Events.on(ResizeEvent.class, event -> buildMobile());
-            }
+                if(!mobile){
+                    buildDesktop();
+                    Events.on(ResizeEvent.class, event -> buildDesktop());
+                }else{
+                    buildMobile();
+                    Events.on(ResizeEvent.class, event -> buildMobile());
+                }
+            }).with(pane -> {
+                pane.setOverscroll(false, false);
+                pane.setFadeScrollBars(true);
+                pane.setupFadeScrollBars(0.2f, 1f);
+                pane.setScrollBarPositions(true, false);
+            });
         });
 
         parent.fill(c -> c.bottom().right().button(Icon.discord, new ImageButtonStyle(){{
