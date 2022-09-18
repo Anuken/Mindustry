@@ -78,7 +78,7 @@ public class MapPlayDialog extends BaseDialog{
         show();
     }
 
-    public void buildMobile(Map map, boolean playtesting){
+    private void buildMobile(Map map, boolean playtesting){
         float width = Core.graphics.getWidth() * 0.8f;
 
         cont.table(Styles.grayPanel, t -> {
@@ -131,7 +131,7 @@ public class MapPlayDialog extends BaseDialog{
         }).fillX().padTop(15f);
     }
 
-    public void buildDesktop(Map map, boolean playtesting){
+    private void buildDesktop(Map map, boolean playtesting){
         boolean hasDesc = map.tags.containsKey("description") && !map.tags.get("description").trim().isEmpty();
 
         Table buttonsTable = new Table();
