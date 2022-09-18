@@ -12,7 +12,9 @@ import arc.scene.ui.*;
 import arc.scene.ui.ImageButton.*;
 import arc.scene.ui.TextButton.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.core.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
@@ -26,6 +28,7 @@ public class MenuFragment{
     private Table container, submenu;
     private Button currentMenu;
     private MenuRenderer renderer;
+    private Seq<Buttoni> customButtons = new Seq<>();
 
     public void build(Group parent){
         renderer = new MenuRenderer();
@@ -116,12 +119,18 @@ public class MenuFragment{
             mods = new MobileButton(Icon.book, "@mods", ui.mods::show),
             exit = new MobileButton(Icon.exit, "@quit", () -> Core.app.exit());
 
+        Seq<MobileButton> customs = customButtons.map(b -> new MobileButton(b.icon, b.text, b.runnable == null ? () -> {} : b.runnable));
+
         if(!Core.graphics.isPortrait()){
             container.marginTop(60f);
             container.add(play);
             container.add(join);
             container.add(custom);
             container.add(maps);
+            // add even custom buttons
+            for (int i = 0; i < customs.size; i += 2) {
+                container.add(customs.get(i));
+            }
             container.row();
 
             container.table(table -> {
@@ -131,6 +140,10 @@ public class MenuFragment{
                 table.add(tools);
 
                 table.add(mods);
+                // add odd custom buttons (before the exit button)
+                for (int i = 1; i < customs.size; i += 2) {
+                    table.add(customs.get(i));
+                }
                 if(!ios) table.add(exit);
             }).colspan(4);
         }else{
@@ -144,6 +157,11 @@ public class MenuFragment{
             container.add(editor);
             container.add(tools);
             container.row();
+            // add custom buttons
+            for (int i = 0; i < customs.size; i++) {
+                container.add(customs.get(i));
+                if (i % 2 == 1) container.row();
+            }
 
             container.table(table -> {
                 table.defaults().set(container.defaults());
@@ -181,10 +199,10 @@ public class MenuFragment{
                 ),
                 new Buttoni("@editor", Icon.terrain, () -> checkPlay(ui.maps::show)), steam ? new Buttoni("@workshop", Icon.steam, platform::openWorkshop) : null,
                 new Buttoni("@mods", Icon.book, ui.mods::show),
-                new Buttoni("@settings", Icon.settings, ui.settings::show),
-                new Buttoni("@quit", Icon.exit, Core.app::exit)
+                new Buttoni("@settings", Icon.settings, ui.settings::show)
             );
-
+            buttons(t, customButtons.toArray());
+            buttons(t, new Buttoni("@quit", Icon.exit, Core.app::exit));
         }).width(width).growY();
 
         container.table(background, t -> {
@@ -199,7 +217,6 @@ public class MenuFragment{
     }
 
     private void checkPlay(Runnable run){
-
         if(!mods.hasContentErrors()){
             run.run();
         }else{
@@ -251,12 +268,35 @@ public class MenuFragment{
         }
     }
 
-    private static class Buttoni{
-        final Drawable icon;
-        final String text;
-        final Runnable runnable;
-        final Buttoni[] submenu;
+    /** Adds a custom button to the menu. */
+    public void addButton(String text, Drawable icon, Runnable callback){
+        addButton(new Buttoni(text, icon, callback));
+    }
 
+    /** Adds a custom button to the menu. */
+    public void addButton(String text, Runnable callback){
+        addButton(text, Styles.none, callback);
+    }
+
+    /** 
+     * Adds a custom button to the menu.
+     * If {@link Buttoni#submenu} is null or the player is on mobile, {@link Buttoni#runnable} is invoked on click.
+     * Otherwise, {@link Buttoni#submenu} is shown.
+     */
+    public void addButton(Buttoni button){
+        customButtons.add(button);
+    }
+
+    /** Represents a menu button definition. */
+    public static class Buttoni{
+        public final Drawable icon;
+        public final String text;
+        /** Runnable ran when the button is clicked. Ignored on desktop if {@link #submenu} is not null. */
+        public final Runnable runnable;
+        /** Submenu shown when this button is clicked. Used instead of {@link runnable} on desktop. */
+        public final @Nullable Buttoni[] submenu;
+
+        /** Constructs a simple menu button, which behaves the same way on desktop and mobile. */
         public Buttoni(String text, Drawable icon, Runnable runnable){
             this.icon = icon;
             this.text = text;
@@ -264,11 +304,20 @@ public class MenuFragment{
             this.submenu = null;
         }
 
-        public Buttoni(String text, Drawable icon, Buttoni... buttons){
+        /** Constructs a button that runs the runnable when clicked on mobile or shows the submenu on desktop. */
+        public Buttoni(String text, Drawable icon, Runnable runnable, Buttoni... submenu){
+            this.icon = icon;
+            this.text = text;
+            this.runnable = runnable;
+            this.submenu = submenu;
+        }
+
+        /** Comstructs a desktop-only button; used internally. */
+        Buttoni(String text, Drawable icon, Buttoni... submenu){
             this.icon = icon;
             this.text = text;
             this.runnable = () -> {};
-            this.submenu = buttons;
+            this.submenu = submenu;
         }
     }
 }
