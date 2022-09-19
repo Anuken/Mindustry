@@ -110,7 +110,7 @@ public class Planet extends UnlockableContent{
     /** If true, waves are created on sector loss. TODO remove. */
     public boolean allowWaves = false;
     /** Icon as displayed in the planet selection dialog. This is a string, as drawables are null at load time. */
-    public String icon = "commandRally";
+    public String icon = "planet";
     /** Default core block for launching. */
     public Block defaultCore = Blocks.coreShard;
     /** Sets up rules on game load for any sector on this planet. */
