@@ -31,6 +31,8 @@ public class Weapon implements Cloneable{
     public BulletType bullet = Bullets.placeholder;
     /** shell ejection effect */
     public Effect ejectEffect = Fx.none;
+    /** whether weapon should appear in the stats of a unit with this weapon */
+    public boolean display = true;
     /** whether to consume ammo when ammo is enabled in rules */
     public boolean useAmmo = true;
     /** whether to create a flipped copy of this weapon upon initialization. default: true */
@@ -147,7 +149,7 @@ public class Weapon implements Cloneable{
     }
 
     public boolean hasStats(UnitType u){
-        return true;
+        return display;
     }
 
     public void addStats(UnitType u, Table t){
