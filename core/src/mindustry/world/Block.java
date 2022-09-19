@@ -303,7 +303,7 @@ public class Block extends UnlockableContent implements Senseable{
     /** Time to build this block in ticks; do not modify directly! */
     public float buildCost = 20f;
     /** Whether this block is visible and can currently be built. */
-    public BuildVisibility buildVisibility = BuildVisibility.hidden;
+    public Boolp buildVisibility = BuildVisibility.hidden;
     /** Multiplier for speed of building this block. */
     public float buildCostMultiplier = 1f;
     /** Build completion at which deconstruction finishes. */
@@ -979,7 +979,7 @@ public class Block extends UnlockableContent implements Senseable{
         requirements(cat, stacks);
     }
 
-    public void setupRequirements(Category cat, BuildVisibility visible, ItemStack[] stacks){
+    public void setupRequirements(Category cat, Boolp visible, ItemStack[] stacks){
         requirements(cat, visible, stacks);
     }
 
@@ -993,7 +993,7 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     /** Sets up requirements. Use only this method to set up requirements. */
-    public void requirements(Category cat, BuildVisibility visible, ItemStack[] stacks){
+    public void requirements(Category cat, Boolp visible, ItemStack[] stacks){
         this.category = cat;
         this.requirements = stacks;
         this.buildVisibility = visible;
@@ -1213,7 +1213,7 @@ public class Block extends UnlockableContent implements Senseable{
 
     @Override
     public boolean isHidden(){
-        return !buildVisibility.visible() && !state.rules.revealedBlocks.contains(this);
+        return !buildVisibility.get() && !state.rules.revealedBlocks.contains(this);
     }
 
     @Override
