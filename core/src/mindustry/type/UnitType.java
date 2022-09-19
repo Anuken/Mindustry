@@ -208,6 +208,8 @@ public class UnitType extends UnlockableContent{
     hidden = false,
     /** if true, this unit is for internal use only and does not have a sprite generated. */
     internal = false,
+    /** If false, this unit is not pushed away from map edges. */
+    bounded = true,
     /** if true, this unit is detected as naval - do NOT assign this manually! Initialized in init() */
     naval = false,
 
@@ -224,7 +226,9 @@ public class UnitType extends UnlockableContent{
     /** if false, the unit shield (usually seen in waves) is not drawn. */
     drawShields = true,
     /** if false, the unit body is not drawn. */
-    drawBody = true;
+    drawBody = true,
+    /** if false, the unit is not drawn on the minimap. */
+    drawMinimap = true;
 
     /** The default AI controller to assign on creation. */
     public Prov<? extends UnitController> aiController = () -> !flying ? new GroundAI() : new FlyingAI();
@@ -423,6 +427,7 @@ public class UnitType extends UnlockableContent{
         super(name);
 
         constructor = EntityMapping.map(this.name);
+        selectionSize = 30f;
     }
 
     public UnitController createController(Unit unit){
@@ -936,8 +941,8 @@ public class UnitType extends UnlockableContent{
             }
 
             for(Weapon weapon : weapons){
-                if(!weapon.name.isEmpty() && (minfo.mod == null || weapon.name.startsWith(minfo.mod.name)) && !(!weapon.top && packer.isOutlined(weapon.name))){
-                    makeOutline(PageType.main, packer, weapon.region, !weapon.top, outlineColor, outlineRadius);
+                if(!weapon.name.isEmpty() && (minfo.mod == null || weapon.name.startsWith(minfo.mod.name)) && (weapon.top || !packer.isOutlined(weapon.name) || weapon.parts.contains(p -> p.under))){
+                    makeOutline(PageType.main, packer, weapon.region, !weapon.top || weapon.parts.contains(p -> p.under), outlineColor, outlineRadius);
                 }
             }
         }
@@ -1178,10 +1183,6 @@ public class UnitType extends UnlockableContent{
             drawShield(unit);
         }
 
-        if(mech != null){
-            unit.trns(-legOffset.x, -legOffset.y);
-        }
-
         //TODO how/where do I draw under?
         if(parts.size > 0){
             for(int i = 0; i < parts.size; i++){
@@ -1207,6 +1208,10 @@ public class UnitType extends UnlockableContent{
                 Draw.reset();
                 a.draw(unit);
             }
+        }
+
+        if(mech != null){
+            unit.trns(-legOffset.x, -legOffset.y);
         }
 
         Draw.reset();

@@ -135,8 +135,8 @@ public class ErekirTechTree{
             //TODO move into turbine condenser?
             node(plasmaBore, () -> {
                 node(impactDrill, Seq.with(new OnSector(aegis)), () -> {
-                    node(largePlasmaBore, Seq.with(tmpNever), () -> {
-                        node(eruptionDrill, () -> {
+                    node(largePlasmaBore, Seq.with(new OnSector(caldera)), () -> {
+                        node(eruptionDrill, Seq.with(tmpNever), () -> {
 
                         });
                     });
@@ -148,7 +148,11 @@ public class ErekirTechTree{
                     node(ventCondenser, Seq.with(new OnSector(aegis)), () -> {
                         node(chemicalCombustionChamber, Seq.with(new OnSector(basin)), () -> {
                             node(pyrolysisGenerator, () -> {
+                                node(fluxReactor, () -> {
+                                    node(neoplasiaReactor, () -> {
 
+                                    });
+                                });
                             });
                         });
                     });
@@ -199,11 +203,11 @@ public class ErekirTechTree{
                                 });
                                 node(heatRedirector, Seq.with(new OnSector(ravine)), () -> {
                                     node(electricHeater, Seq.with(new OnSector(ravine), new Research(afflict)), () -> {
-                                        node(slagHeater, Seq.with(tmpNever), () -> {
+                                        node(slagHeater, Seq.with(new OnSector(caldera)), () -> {
 
                                         });
 
-                                        node(atmosphericConcentrator, Seq.with(tmpNever), () -> {
+                                        node(atmosphericConcentrator, Seq.with(new OnSector(caldera)), () -> {
                                             node(cyanogenSynthesizer, Seq.with(tmpNever), () -> {
 
                                             });
@@ -247,7 +251,9 @@ public class ErekirTechTree{
 
                         node(reinforcedSurgeWall, () -> {
                             node(reinforcedSurgeWallLarge, () -> {
+                                node(shieldedWall, () -> {
 
+                                });
                             });
                         });
 
@@ -263,13 +269,21 @@ public class ErekirTechTree{
                     node(sublimate, Seq.with(new OnSector(marsh)), () -> {
                         node(afflict, Seq.with(new OnSector(ravine)), () -> {
                             node(titan, Seq.with(new OnSector(marsh)), () -> {
+                                node(lustre, () -> {
+                                    node(smite, () -> {
 
+                                    });
+                                });
                             });
                         });
                     });
 
-                    node(disperse, Seq.with(new OnSector(marsh)), () -> {
+                    node(disperse, Seq.with(tmpNever), () -> {
+                        node(scathe, () -> {
+                            node(malign, () -> {
 
+                            });
+                        });
                     });
                 });
 
@@ -335,6 +349,10 @@ public class ErekirTechTree{
 
                                                     });
                                                 });
+
+                                                node(basicAssemblerModule, () -> {
+
+                                                });
                                             });
                                         });
                                     });
@@ -360,7 +378,9 @@ public class ErekirTechTree{
                             node(basin, Seq.with(new SectorComplete(atlas)), () -> {
                                 node(marsh, Seq.with(new SectorComplete(basin)), () ->{
                                     node(ravine, Seq.with(new SectorComplete(marsh), new Research(Liquids.slag)), () ->{
+                                        node(caldera, Seq.with(new SectorComplete(peaks), new Research(heatRedirector)), () -> {
 
+                                        });
                                     });
 
                                     node(peaks, Seq.with(new SectorComplete(marsh), new SectorComplete(split)), () ->{

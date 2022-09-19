@@ -49,7 +49,7 @@ public class Blocks{
     redmat, bluemat,
     stoneWall, dirtWall, sporeWall, iceWall, daciteWall, sporePine, snowPine, pine, shrubs, whiteTree, whiteTreeDead, sporeCluster,
     redweed, purbush, yellowCoral,
-    rhyoliteVent, carbonVent, arkyicVent, yellowStoneVent, redStoneVent,
+    rhyoliteVent, carbonVent, arkyicVent, yellowStoneVent, redStoneVent, crystallineVent,
     regolithWall, yellowStoneWall, rhyoliteWall, carbonWall, redIceWall, ferricStoneWall, beryllicStoneWall, arkyicWall, crystallineStoneWall, redStoneWall, redDiamondWall,
     ferricStone, ferricCraters, carbonStone, beryllicStone, crystallineStone, crystalFloor, yellowStonePlates,
     iceSnow, sandWater, darksandWater, duneWall, sandWall, moss, sporeMoss, shale, shaleWall, grass, salt,
@@ -492,6 +492,11 @@ public class Blocks{
             attributes.set(Attribute.steam, 1f);
         }};
 
+        crystallineVent = new SteamVent("crystalline-vent"){{
+            parent = blendGroup = crystallineStone;
+            attributes.set(Attribute.steam, 1f);
+        }};
+
         redmat = new Floor("redmat");
         bluemat = new Floor("bluemat");
 
@@ -623,7 +628,7 @@ public class Blocks{
         }};
 
         sandWall = new StaticWall("sand-wall"){{
-            sandWater.asFloor().wall = water.asFloor().wall = deepwater.asFloor().wall = this;
+            sandWater.asFloor().wall = water.asFloor().wall = deepwater.asFloor().wall = sand.asFloor().wall = this;
             attributes.set(Attribute.sand, 2f);
         }};
 
@@ -1228,6 +1233,8 @@ public class Blocks{
             heatRequirement = 6f;
 
             outputLiquid = new LiquidStack(Liquids.nitrogen, 4f / 60f);
+
+            researchCost = with(Items.silicon, 2000, Items.oxide, 900, Items.beryllium, 2400);
         }};
 
         oxidationChamber = new HeatProducer("oxidation-chamber"){{
@@ -1280,6 +1287,8 @@ public class Blocks{
             ambientSound = Sounds.hum;
             consumeLiquid(Liquids.slag, 40f / 60f);
             heatOutput = 8f;
+
+            researchCost = with(Items.tungsten, 1200, Items.oxide, 900, Items.beryllium, 2400);
         }};
 
         phaseHeater = new HeatProducer("phase-heater"){{
@@ -1395,7 +1404,6 @@ public class Blocks{
         }};
 
         cyanogenSynthesizer = new HeatCrafter("cyanogen-synthesizer"){{
-            //TODO requirements
             requirements(Category.crafting, with(Items.carbide, 50, Items.silicon, 80, Items.beryllium, 90));
 
             heatRequirement = 5f;
@@ -1859,17 +1867,6 @@ public class Blocks{
             consumePower(5f);
         }};
 
-        shieldBreaker = new ShieldBreaker("shield-breaker"){{
-            requirements(Category.effect, BuildVisibility.editorOnly, with());
-
-            size = 5;
-            toDestroy = new Block[]{Blocks.shieldProjector, Blocks.largeShieldProjector};
-
-            consumeItem(Items.tungsten, 100);
-            itemCapacity = 100;
-            scaledHealth = 120f;
-        }};
-
         //endregion
         //region distribution
 
@@ -2077,6 +2074,7 @@ public class Blocks{
             consumeLiquid(Liquids.nitrogen, 10f / 60f);
 
             itemCapacity = 200;
+            researchCost = with(Items.silicon, 2500, Items.surgeAlloy, 20, Items.oxide, 30);
         }};
 
         unitCargoUnloadPoint = new UnitCargoUnloadPoint("unit-cargo-unload-point"){{
@@ -2085,6 +2083,8 @@ public class Blocks{
             size = 2;
 
             itemCapacity = 100;
+
+            researchCost = with(Items.silicon, 3000, Items.oxide, 20);
         }};
 
         //endregion
@@ -2794,6 +2794,8 @@ public class Blocks{
 
             consumeLiquid(Liquids.hydrogen, 0.5f / 60f);
             consumeLiquid(Liquids.nitrogen, 3f / 60f).boost();
+
+            researchCost = with(Items.silicon, 1500, Items.oxide, 200, Items.beryllium, 3000, Items.tungsten, 1200);
         }};
 
         impactDrill = new BurstDrill("impact-drill"){{
@@ -3656,7 +3658,7 @@ public class Blocks{
         cyclone = new ItemTurret("cyclone"){{
             requirements(Category.turret, with(Items.copper, 200, Items.titanium, 125, Items.plastanium, 80));
             ammo(
-                Items.metaglass, new FlakBulletType(4f, 10){{
+                Items.metaglass, new FlakBulletType(4f, 6){{
                     ammoMultiplier = 2f;
                     shootEffect = Fx.shootSmall;
                     reloadMultiplier = 0.8f;
@@ -3678,7 +3680,7 @@ public class Blocks{
                     explodeRange = 20f;
                     collidesGround = true;
                 }},
-                Items.blastCompound, new FlakBulletType(4f, 5){{
+                Items.blastCompound, new FlakBulletType(4f, 8){{
                     shootEffect = Fx.shootBig;
                     ammoMultiplier = 5f;
                     splashDamage = 45f;
@@ -3688,7 +3690,7 @@ public class Blocks{
                     status = StatusEffects.blasted;
                     statusDuration = 60f;
                 }},
-                Items.plastanium, new FlakBulletType(4f, 6){{
+                Items.plastanium, new FlakBulletType(4f, 8){{
                     ammoMultiplier = 4f;
                     splashDamageRadius = 40f;
                     splashDamage = 37.5f;
@@ -4471,7 +4473,7 @@ public class Blocks{
                         deathExplosionEffect = Fx.massiveExplosion;
                         shootOnDeath = true;
                         shake = 10f;
-                        bullet = new ExplosionBulletType(500f, 65f){{
+                        bullet = new ExplosionBulletType(600f, 65f){{
                             hitColor = Pal.redLight;
                             shootEffect = new MultiEffect(Fx.massiveExplosion, Fx.scatheExplosion, Fx.scatheLight, new WaveEffect(){{
                                 lifetime = 10f;
@@ -4480,11 +4482,13 @@ public class Blocks{
                             }});
 
                             collidesAir = false;
+                            buildingDamageMultiplier = 0.3f;
 
                             ammoMultiplier = 1f;
                             fragLifeMin = 0.1f;
                             fragBullets = 7;
                             fragBullet = new ArtilleryBulletType(3.4f, 30){{
+                                buildingDamageMultiplier = 0.3f;
                                 drag = 0.02f;
                                 hitEffect = Fx.massiveExplosion;
                                 despawnEffect = Fx.scatheSlash;
