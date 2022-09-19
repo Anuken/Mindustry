@@ -64,6 +64,7 @@ public class Planets{
             lightDstFrom = 0.2f;
             clearSectorOnLose = true;
             defaultCore = Blocks.coreBastion;
+            iconColor = Color.valueOf("ff9266");
             hiddenItems.addAll(Items.serpuloItems).removeAll(Items.erekirItems);
 
             //TODO SHOULD there be lighting?
@@ -140,6 +141,7 @@ public class Planets{
                 r.attributes.clear();
                 r.showSpawns = false;
             };
+            iconColor = Color.valueOf("7d4dff");
             atmosphereColor = Color.valueOf("3c1b8f");
             atmosphereRadIn = 0.02f;
             atmosphereRadOut = 0.3f;
