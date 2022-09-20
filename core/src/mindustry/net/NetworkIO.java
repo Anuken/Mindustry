@@ -44,8 +44,23 @@ public class NetworkIO{
             stream.writeLong(GlobalVars.rand.seed0);
             stream.writeLong(GlobalVars.rand.seed1);
 
+            Writes write = new Writes(stream);
+
             stream.writeInt(player.id);
-            player.write(new Writes(stream));
+            player.write(write);
+
+            boolean any = !state.rules.fog;
+
+            stream.writeInt(any ? Groups.sync.size() : 0);
+
+            if(any){
+                //write all synced entities *immediately*
+                for(Syncc entity : Groups.sync){
+                    stream.writeInt(entity.id());
+                    stream.writeByte(entity.classId());
+                    entity.writeSync(write);
+                }
+            }
 
             SaveIO.getSaveWriter().writeContentHeader(stream);
             SaveIO.getSaveWriter().writeMap(stream);
@@ -77,6 +92,12 @@ public class NetworkIO{
             player.read(read);
             player.id = id;
             player.add();
+
+            int entities = stream.readInt();
+
+            for(int j = 0; j < entities; j++){
+                NetClient.readSyncEntity(stream, read);
+            }
 
             SaveIO.getSaveWriter().readContentHeader(stream);
             SaveIO.getSaveWriter().readMap(stream, world.context);

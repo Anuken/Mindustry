@@ -82,13 +82,8 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
         boolean infinite = state.rules.infiniteResources || team().rules().infiniteResources;
 
         buildCounter += Time.delta;
-        if(Float.isNaN(buildCounter) || Float.isInfinite(buildCounter)) buildCounter = 0f;
-        buildCounter = Math.min(buildCounter, 10f);
 
-        //random attempt to fix a freeze that only occurs on Android
-        int maxPerFrame = 10, count = 0;
-
-        while(buildCounter >= 1 && count++ < maxPerFrame){
+        while(buildCounter >= 1){
             buildCounter -= 1f;
 
             validatePlans();
@@ -96,14 +91,13 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
             var core = core();
 
             //nothing to build.
-            if(buildPlan() == null) return;
+            if(buildPlan() == null) continue;
 
             //find the next build plan
             if(plans.size > 1){
                 int total = 0;
-                int size = plans.size;
                 BuildPlan plan;
-                while((!within((plan = buildPlan()).tile(), finalPlaceDst) || shouldSkip(plan, core)) && total < size){
+                while((!within((plan = buildPlan()).tile(), finalPlaceDst) || shouldSkip(plan, core)) && total < plans.size){
                     plans.removeFirst();
                     plans.addLast(plan);
                     total++;
@@ -264,8 +258,7 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
     boolean activelyBuilding(){
         //not actively building when not near the build plan
         if(isBuilding()){
-            var plan = buildPlan();
-            if(!state.isEditor() && plan != null && !within(plan, state.rules.infiniteResources ? Float.MAX_VALUE : type.buildRange)){
+            if(!state.isEditor() && !within(buildPlan(), state.rules.infiniteResources ? Float.MAX_VALUE : type.buildRange)){
                 return false;
             }
         }

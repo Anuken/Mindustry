@@ -13,7 +13,6 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
 import mindustry.logic.*;
-import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
@@ -38,9 +37,9 @@ public class LightBlock extends Block{
 
     @Override
     public void init(){
-        lightRadius = radius*3f;
+        //double needed for some reason
+        lightRadius = radius*2f;
         emitLight = true;
-
         super.init();
     }
 
@@ -87,20 +86,10 @@ public class LightBlock extends Block{
 
         @Override
         public void buildConfiguration(Table table){
-            table.button(Icon.pencil, Styles.cleari, () -> {
+            table.button(Icon.pencil, () -> {
                 ui.picker.show(Tmp.c1.set(color).a(0.5f), false, res -> configure(res.rgba()));
                 deselect();
             }).size(40f);
-        }
-
-        @Override
-        public boolean onConfigureBuildTapped(Building other){
-            if(this == other){
-                deselect();
-                return false;
-            }
-
-            return true;
         }
 
         @Override

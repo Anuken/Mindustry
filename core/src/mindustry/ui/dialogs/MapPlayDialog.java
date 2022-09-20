@@ -52,22 +52,22 @@ public class MapPlayDialog extends BaseDialog{
         rules = map.applyRules(selectedGamemode);
 
         Table selmode = new Table();
-        selmode.add("@level.mode").colspan(2);
+        selmode.add("@level.mode").colspan(4);
         selmode.row();
+        int i = 0;
 
-        selmode.table(Tex.button, modes -> {
-            int i = 0;
-            for(Gamemode mode : Gamemode.all){
-                if(mode.hidden) continue;
+        Table modes = new Table();
 
-                modes.button(mode.toString(), Styles.flatToggleMenut, () -> {
-                    selectedGamemode = mode;
-                    rules = map.applyRules(mode);
-                }).update(b -> b.setChecked(selectedGamemode == mode)).size(140f, 54f).disabled(!mode.valid(map));
-                if(i++ % 2 == 1) modes.row();
-            }
-        });
+        for(Gamemode mode : Gamemode.values()){
+            if(mode.hidden) continue;
 
+            modes.button(mode.toString(), Styles.togglet, () -> {
+                selectedGamemode = mode;
+                rules = map.applyRules(mode);
+            }).update(b -> b.setChecked(selectedGamemode == mode)).size(140f, 54f).disabled(!mode.valid(map));
+            if(i++ % 2 == 1) modes.row();
+        }
+        selmode.add(modes);
         selmode.button("?", this::displayGameModeHelp).width(50f).fillY().padLeft(18f);
 
         cont.add(selmode);

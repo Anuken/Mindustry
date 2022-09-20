@@ -60,10 +60,7 @@ public class BeControl{
     /** asynchronously checks for updates. */
     public void checkUpdate(Boolc done){
         Http.get("https://api.github.com/repos/Anuken/MindustryBuilds/releases/latest")
-        .error(e -> {
-            //don't log the error, as it would clog output if there is no internet. make sure it's handled to prevent infinite loading.
-            done.get(false);
-        })
+        .error(e -> {}) //ignore errors
         .submit(res -> {
             Jval val = Jval.read(res.getResultAsString());
             int newBuild = Strings.parseInt(val.getString("tag_name", "0"));

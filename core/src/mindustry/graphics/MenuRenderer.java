@@ -247,7 +247,7 @@ public class MenuRenderer implements Disposable{
             Draw.rect(icon, x - 12f, y - 13f, flyerRot - 90);
         });
 
-        float size = Math.max(icon.width, icon.height) * icon.scl() * 1.6f;
+        float size = Math.max(icon.width, icon.height)* icon.scale * Draw.scl  * 1.6f;
 
         flyers((x, y) -> {
             Draw.rect("circle-shadow", x, y, size, size);

@@ -7,20 +7,15 @@ import arc.math.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 
+/** Not standalone. */
 public class DrawMultiWeave extends DrawBlock{
     public TextureRegion weave, glow;
     public float rotateSpeed = 1f, rotateSpeed2 = -0.9f;
-    public boolean fadeWeave = false;
-    public Color glowColor = new Color(1f, 0.4f, 0.4f, 0.8f), weaveColor = Color.white.cpy();
+    public Color glowColor = new Color(1f, 0.4f, 0.4f, 0.8f);
     public float pulse = 0.3f, pulseScl = 10f;
 
     @Override
     public void draw(Building build){
-        Draw.color(weaveColor);
-        if(fadeWeave){
-            Draw.alpha(build.warmup());
-        }
-
         Draw.rect(weave, build.x, build.y, build.totalProgress() * rotateSpeed);
         Draw.rect(weave, build.x, build.y, build.totalProgress() * rotateSpeed * rotateSpeed2);
 
@@ -37,7 +32,7 @@ public class DrawMultiWeave extends DrawBlock{
 
     @Override
     public TextureRegion[] icons(Block block){
-        return fadeWeave ? new TextureRegion[0] : new TextureRegion[]{weave};
+        return new TextureRegion[]{weave};
     }
 
     @Override

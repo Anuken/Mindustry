@@ -164,6 +164,7 @@ public class FloorRenderer{
     public void beginc(){
         shader.bind();
         shader.setUniformMatrix4("u_projectionViewMatrix", Core.camera.mat);
+        shader.setUniformi("u_texture", 0);
 
         //only ever use the base environment texture
         texture.bind(0);

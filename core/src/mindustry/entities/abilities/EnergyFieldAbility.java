@@ -101,7 +101,7 @@ public class EnergyFieldAbility extends Ability{
 
             if(hitUnits){
                 Units.nearby(null, rx, ry, range, other -> {
-                    if(other != unit && other.checkTarget(targetAir, targetGround) && other.targetable(unit.team)){
+                    if(other != unit && (other.isFlying() ? targetAir : targetGround)){
                         all.add(other);
                     }
                 });

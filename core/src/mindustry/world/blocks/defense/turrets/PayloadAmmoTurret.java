@@ -10,6 +10,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
+import mindustry.world.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
@@ -26,7 +27,6 @@ public class PayloadAmmoTurret extends Turret{
         super(name);
 
         maxAmmo = 3;
-        acceptsPayload = true;
     }
 
     /** Initializes accepted ammo map. Format: [block1, bullet1, block2, bullet2...] */
@@ -51,7 +51,7 @@ public class PayloadAmmoTurret extends Turret{
         super.setStats();
 
         stats.remove(Stat.itemCapacity);
-        stats.add(Stat.ammo, StatValues.ammo(ammoTypes, true));
+        stats.add(Stat.ammo, StatValues.ammo(ammoTypes));
     }
 
     @Override
@@ -60,17 +60,10 @@ public class PayloadAmmoTurret extends Turret{
             @Override
             public void build(Building build, Table table){
                 MultiReqImage image = new MultiReqImage();
-
-                for(var block : content.blocks()) displayContent(build, image, block);
-                for(var unit : content.units()) displayContent(build, image, unit);
+                content.blocks().each(i -> filter.get(i) && i.unlockedNow(), block -> image.add(new ReqImage(new Image(block.uiIcon),
+                () -> build instanceof PayloadTurretBuild it && !it.payloads.isEmpty() && it.currentBlock() == block)));
 
                 table.add(image).size(8 * 4);
-            }
-
-            void displayContent(Building build, MultiReqImage image, UnlockableContent content){
-                if(filter.get(content) && content.unlockedNow()){
-                    image.add(new ReqImage(new Image(content.uiIcon), () -> build instanceof PayloadTurretBuild it && !it.payloads.isEmpty() && it.currentAmmo() == content));
-                }
             }
 
             @Override
@@ -85,7 +78,7 @@ public class PayloadAmmoTurret extends Turret{
             }
         });
 
-        ammoKeys = ammoTypes.keys().toSeq().toArray(UnlockableContent.class);
+        ammoKeys = ammoTypes.keys().toSeq().toArray(Block.class);
 
         super.init();
     }
@@ -93,10 +86,10 @@ public class PayloadAmmoTurret extends Turret{
     public class PayloadTurretBuild extends TurretBuild{
         public PayloadSeq payloads = new PayloadSeq();
 
-        public UnlockableContent currentAmmo(){
-            for(var content : ammoKeys){
-                if(payloads.contains(content)){
-                    return content;
+        public UnlockableContent currentBlock(){
+            for(var block : ammoKeys){
+                if(payloads.contains(block)){
+                    return block;
                 }
             }
             return null;
@@ -104,12 +97,12 @@ public class PayloadAmmoTurret extends Turret{
 
         @Override
         public boolean acceptPayload(Building source, Payload payload){
-            return payloads.total() < maxAmmo && ammoTypes.containsKey(payload.content());
+            return payload instanceof BuildPayload build && payloads.total() < maxAmmo && ammoTypes.containsKey(build.block());
         }
 
         @Override
         public void handlePayload(Building source, Payload payload){
-            payloads.add(payload.content());
+            payloads.add(((BuildPayload)payload).block());
         }
 
         @Override
@@ -119,10 +112,10 @@ public class PayloadAmmoTurret extends Turret{
 
         @Override
         public BulletType useAmmo(){
-            for(var content : ammoKeys){
-                if(payloads.contains(content)){
-                    payloads.remove(content);
-                    return ammoTypes.get(content);
+            for(var block : ammoKeys){
+                if(payloads.contains(block)){
+                    payloads.remove(block);
+                    return ammoTypes.get(block);
                 }
             }
             return null;
@@ -130,9 +123,9 @@ public class PayloadAmmoTurret extends Turret{
 
         @Override
         public BulletType peekAmmo(){
-            for(var content : ammoKeys){
-                if(payloads.contains(content)){
-                    return ammoTypes.get(content);
+            for(var block : ammoKeys){
+                if(payloads.contains(block)){
+                    return ammoTypes.get(block);
                 }
             }
             return null;

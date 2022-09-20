@@ -12,13 +12,12 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
-import mindustry.game.EventType.*;
 import mindustry.game.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.input.*;
 import mindustry.ui.*;
 import mindustry.world.*;
-import mindustry.world.blocks.payloads.PayloadBlock.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -39,7 +38,7 @@ public class HintsFragment{
     public void build(Group parent){
         group.setFillParent(true);
         group.touchable = Touchable.childrenOnly;
-        //TODO hints off for now - figure out tutorial system.
+        //TODO hints off for now.
         group.visibility = () -> !state.isCampaign() && Core.settings.getBool("hints", true) && ui.hudfrag.shown;
         group.update(() -> {
             if(current != null){
@@ -84,11 +83,6 @@ public class HintsFragment{
             events.clear();
         });
 
-        Events.on(BuildingCommandEvent.class, e -> {
-            if(e.building instanceof PayloadBlockBuild<?>){
-                events.add("factorycontrol");
-            }
-        });
     }
 
     void checkNext(){
@@ -176,8 +170,6 @@ public class HintsFragment{
         waveFire(() -> Groups.fire.size() > 0 && Blocks.wave.unlockedNow(), () -> indexer.getFlagged(state.rules.defaultTeam, BlockFlag.extinguisher).size > 0),
         generator(() -> control.input.block == Blocks.combustionGenerator, () -> ui.hints.placedBlocks.contains(Blocks.combustionGenerator)),
         guardian(() -> state.boss() != null && state.boss().armor >= 4, () -> state.boss() == null),
-        factoryControl(() -> !(state.isCampaign() && state.rules.sector.preset == SectorPresets.onset) &&
-            state.rules.defaultTeam.data().getBuildings(Blocks.tankFabricator).size + state.rules.defaultTeam.data().getBuildings(Blocks.groundFactory).size > 0, () -> ui.hints.events.contains("factorycontrol")),
         coreUpgrade(() -> state.isCampaign() && Blocks.coreFoundation.unlocked()
             && state.rules.defaultTeam.core() != null
             && state.rules.defaultTeam.core().block == Blocks.coreShard

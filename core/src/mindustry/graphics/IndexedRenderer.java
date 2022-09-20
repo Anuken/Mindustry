@@ -9,7 +9,7 @@ import arc.util.*;
 public class IndexedRenderer implements Disposable{
     private static final int vsize = 5;
 
-    private final static Shader program = new Shader(
+    private final Shader program = new Shader(
     """
     attribute vec4 a_position;
     attribute vec4 a_color;
@@ -34,9 +34,9 @@ public class IndexedRenderer implements Disposable{
     }
     """
     );
-    private static final float[] tmpVerts = new float[vsize * 6];
-
     private Mesh mesh;
+    private float[] tmpVerts = new float[vsize * 6];
+    private float[] vertices;
 
     private Mat projMatrix = new Mat();
     private Mat transMatrix = new Mat();
@@ -56,8 +56,9 @@ public class IndexedRenderer implements Disposable{
         texture.bind();
 
         program.setUniformMatrix4("u_projTrans", combined);
+        program.setUniformi("u_texture", 0);
 
-        mesh.render(program, Gl.triangles, 0, mesh.getMaxVertices());
+        mesh.render(program, Gl.triangles, 0, vertices.length / vsize);
     }
 
     public void setColor(Color color){
@@ -203,9 +204,8 @@ public class IndexedRenderer implements Disposable{
         VertexAttribute.position,
         VertexAttribute.color,
         VertexAttribute.texCoords);
-
-        //TODO why is this the only way to get it working properly? it should not need an array
-        mesh.setVertices(new float[6 * sprites * vsize]);
+        vertices = new float[6 * sprites * vsize];
+        mesh.setVertices(vertices);
     }
 
     private void updateMatrix(){
@@ -215,5 +215,6 @@ public class IndexedRenderer implements Disposable{
     @Override
     public void dispose(){
         mesh.dispose();
+        program.dispose();
     }
 }

@@ -152,7 +152,7 @@ public class Renderer implements ApplicationListener{
     }
 
     public TextureRegion[][] getFluidFrames(){
-        if(fluidFrames == null || fluidFrames[0][0].texture.isDisposed()){
+        if(fluidFrames == null){
             loadFluidFrames();
         }
         return fluidFrames;

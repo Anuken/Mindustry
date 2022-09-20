@@ -10,19 +10,18 @@ import mindustry.type.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
-/** A generator that just takes in certain items or liquids. */
+/**
+ * A generator that just takes in certain items or liquids. Basically SingleTypeGenerator, but not unreliable garbage.
+ */
 public class ConsumeGenerator extends PowerGenerator{
     /** The time in number of ticks during which a single item will produce power. */
     public float itemDuration = 120f;
 
-    public float warmupSpeed = 0.05f;
     public float effectChance = 0.01f;
     public Effect generateEffect = Fx.none, consumeEffect = Fx.none;
     public float generateEffectRange = 3f;
 
-    public @Nullable LiquidStack outputLiquid;
-    /** If true, this block explodes when outputLiquid exceeds capacity. */
-    public boolean explodeOnFull = false;
+    public @Nullable LiquidStack liquidOutput;
 
     public @Nullable ConsumeItemFilter filterItem;
     public @Nullable ConsumeLiquidFilter filterLiquid;
@@ -35,8 +34,8 @@ public class ConsumeGenerator extends PowerGenerator{
     public void setBars(){
         super.setBars();
 
-        if(outputLiquid != null){
-            addLiquidBar(outputLiquid.liquid);
+        if(liquidOutput != null){
+            addLiquidBar(liquidOutput.liquid);
         }
     }
 
@@ -45,13 +44,9 @@ public class ConsumeGenerator extends PowerGenerator{
         filterItem = findConsumer(c -> c instanceof ConsumeItemFilter);
         filterLiquid = findConsumer(c -> c instanceof ConsumeLiquidFilter);
 
-        if(outputLiquid != null){
+        if(liquidOutput != null){
             outputsLiquid = true;
             hasLiquids = true;
-        }
-
-        if(explodeOnFull && outputLiquid != null && explosionPuddleLiquid == null){
-            explosionPuddleLiquid = outputLiquid.liquid;
         }
 
         //TODO hardcoded
@@ -68,8 +63,8 @@ public class ConsumeGenerator extends PowerGenerator{
             stats.add(Stat.productionTime, itemDuration / 60f, StatUnit.seconds);
         }
 
-        if(outputLiquid != null){
-            stats.add(Stat.output, StatValues.liquid(outputLiquid.liquid, outputLiquid.amount * 60f, true));
+        if(liquidOutput != null){
+            stats.add(Stat.output, StatValues.liquid(liquidOutput.liquid, liquidOutput.amount * 60f, true));
         }
     }
 
@@ -91,7 +86,7 @@ public class ConsumeGenerator extends PowerGenerator{
         public void updateTile(){
             boolean valid = efficiency > 0;
 
-            warmup = Mathf.lerpDelta(warmup, valid ? 1f : 0f, warmupSpeed);
+            warmup = Mathf.lerpDelta(warmup, valid ? 1f : 0f, 0.05f);
 
             productionEfficiency = efficiency * efficiencyMultiplier;
             totalTime += warmup * Time.delta;
@@ -108,14 +103,10 @@ public class ConsumeGenerator extends PowerGenerator{
                 generateTime = 1f;
             }
 
-            if(outputLiquid != null){
-                float added = Math.min(productionEfficiency * delta() * outputLiquid.amount, liquidCapacity - liquids.get(outputLiquid.liquid));
-                liquids.add(outputLiquid.liquid, added);
-                dumpLiquid(outputLiquid.liquid);
-
-                if(explodeOnFull && liquids.get(outputLiquid.liquid) >= liquidCapacity - 0.0001f){
-                    kill();
-                }
+            if(liquidOutput != null){
+                float added = Math.min(productionEfficiency * delta() * liquidOutput.amount, liquidCapacity - liquids.get(liquidOutput.liquid));
+                liquids.add(liquidOutput.liquid, added);
+                dumpLiquid(liquidOutput.liquid);
             }
 
             //generation time always goes down, but only at the end so consumeTriggerValid doesn't assume fake items

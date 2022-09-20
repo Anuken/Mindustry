@@ -40,7 +40,7 @@ public class UI implements ApplicationListener, Loadable{
     public MenuFragment menufrag;
     public HudFragment hudfrag;
     public ChatFragment chatfrag;
-    public ConsoleFragment consolefrag;
+    public ScriptConsoleFragment scriptfrag;
     public MinimapFragment minimapfrag;
     public PlayerListFragment listfrag;
     public LoadingFragment loadfrag;
@@ -172,7 +172,7 @@ public class UI implements ApplicationListener, Loadable{
         minimapfrag = new MinimapFragment();
         listfrag = new PlayerListFragment();
         loadfrag = new LoadingFragment();
-        consolefrag = new ConsoleFragment();
+        scriptfrag = new ScriptConsoleFragment();
 
         picker = new ColorPicker();
         editor = new MapEditorDialog();
@@ -217,7 +217,7 @@ public class UI implements ApplicationListener, Loadable{
         chatfrag.build(hudGroup);
         minimapfrag.build(hudGroup);
         listfrag.build(hudGroup);
-        consolefrag.build(hudGroup);
+        scriptfrag.build(hudGroup);
         loadfrag.build(group);
         new FadeInFragment().build(group);
     }
@@ -305,16 +305,12 @@ public class UI implements ApplicationListener, Loadable{
     }
 
     public void showInfoFade(String info){
-        showInfoFade(info,  7f);
-    }
-
-    public void showInfoFade(String info, float duration){
         var cinfo = Core.scene.find("coreinfo");
         Table table = new Table();
         table.touchable = Touchable.disabled;
         table.setFillParent(true);
         if(cinfo.visible && !state.isMenu()) table.marginTop(cinfo.getPrefHeight() / Scl.scl() / 2);
-        table.actions(Actions.fadeOut(duration, Interp.fade), Actions.remove());
+        table.actions(Actions.fadeOut(7f, Interp.fade), Actions.remove());
         table.top().add(info).style(Styles.outlineLabel).padTop(10);
         Core.scene.add(table);
     }
@@ -599,9 +595,8 @@ public class UI implements ApplicationListener, Loadable{
     }
 
     public static String formatAmount(long number){
-        //prevent things like bars displaying erroneous representations of casted infinities
-        if(number == Long.MAX_VALUE) return "∞";
-        if(number == Long.MIN_VALUE) return "-∞";
+        //prevent overflow
+        if(number == Long.MIN_VALUE) number ++;
 
         long mag = Math.abs(number);
         String sign = number < 0 ? "-" : "";

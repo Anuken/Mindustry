@@ -32,7 +32,7 @@ import java.util.zip.*;
 import static mindustry.Vars.*;
 
 public class NetClient implements ApplicationListener{
-    private static final float dataTimeout = 60 * 30;
+    private static final float dataTimeout = 60 * 20;
     /** ticks between syncs, e.g. 5 means 60/5 = 12 syncs/sec*/
     private static final float playerSyncTime = 4;
     private static final Reads dataReads = new Reads(null);
@@ -198,7 +198,6 @@ public class NetClient implements ApplicationListener{
     public static void sendMessage(String message, @Nullable String unformatted, @Nullable Player playersender){
         if(Vars.ui != null){
             Vars.ui.chatfrag.addMessage(message);
-            Sounds.chatMessage.play();
         }
 
         //display raw unformatted text above player head
@@ -213,7 +212,6 @@ public class NetClient implements ApplicationListener{
     public static void sendMessage(String message){
         if(Vars.ui != null){
             Vars.ui.chatfrag.addMessage(message);
-            Sounds.chatMessage.play();
         }
     }
 
@@ -327,21 +325,6 @@ public class NetClient implements ApplicationListener{
     @Remote(variants = Variant.both)
     public static void setRules(Rules rules){
         state.rules = rules;
-    }
-
-    @Remote(variants = Variant.both)
-    public static void setObjectives(MapObjectives executor){
-        //clear old markers
-        for(var objective : state.rules.objectives){
-            for(var marker : objective.markers){
-                if(marker.wasAdded){
-                    marker.removed();
-                    marker.wasAdded = false;
-                }
-            }
-        }
-
-        state.rules.objectives = executor;
     }
 
     @Remote(variants = Variant.both)

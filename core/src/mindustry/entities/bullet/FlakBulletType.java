@@ -6,7 +6,7 @@ import mindustry.entities.*;
 import mindustry.gen.*;
 
 public class FlakBulletType extends BasicBulletType{
-    public float explodeRange = 30f, explodeDelay = 5f, flakDelay = 0f, flakInterval = 6f;
+    public float explodeRange = 30f, explodeDelay = 5f;
 
     public FlakBulletType(float speed, float damage){
         super(speed, damage, "shell");
@@ -25,14 +25,15 @@ public class FlakBulletType extends BasicBulletType{
     @Override
     public void update(Bullet b){
         super.update(b);
-
         //don't check for targets if primed to explode
-        if(b.time >= flakDelay && b.fdata >= 0 && b.timer(2, flakInterval)){
-            Units.nearbyEnemies(b.team, Tmp.r1.setSize(explodeRange * 2f).setCenter(b.x, b.y), unit -> {
-                //fdata < 0 means it's primed to explode
-                if(b.fdata < 0f || !unit.checkTarget(collidesAir, collidesGround) || !unit.targetable(b.team)) return;
+        if(b.fdata < 0f) return;
 
-                if(unit.within(b, explodeRange + unit.hitSize/2f)){
+        if(b.timer(2, 6)){
+            Units.nearbyEnemies(b.team, Tmp.r1.setSize(explodeRange * 2f).setCenter(b.x, b.y), unit -> {
+                //fadata < 0 means it's primed to explode
+                if(b.fdata < 0f || !unit.checkTarget(collidesAir, collidesGround)) return;
+
+                if(unit.within(b, explodeRange)){
                     //mark as primed
                     b.fdata = -1f;
                     Time.run(explodeDelay, () -> {

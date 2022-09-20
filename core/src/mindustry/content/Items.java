@@ -30,7 +30,7 @@ public class Items{
             cost = 1.5f;
         }};
 
-        graphite = new Item("graphite", Color.valueOf("b2c6d2")){{
+        graphite = new Item("graphite", Color.valueOf("95abd9")){{
             cost = 1f;
         }};
 

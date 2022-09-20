@@ -126,7 +126,7 @@ public class Sorter extends Block{
 
         @Override
         public void buildConfiguration(Table table){
-            ItemSelection.buildTable(Sorter.this, table, content.items(), () -> sortItem, this::configure, selectionRows, selectionColumns);
+            ItemSelection.buildTable(Sorter.this, table, content.items(), () -> sortItem, this::configure);
         }
 
         @Override

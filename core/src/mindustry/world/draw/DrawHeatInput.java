@@ -11,6 +11,7 @@ import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.blocks.heat.*;
 
+/** Not standalone. */
 public class DrawHeatInput extends DrawBlock{
     public String suffix = "-heat";
     public Color heatColor = new Color(1f, 0.22f, 0.22f, 0.8f);

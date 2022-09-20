@@ -52,7 +52,7 @@ public final class FogControl implements CustomChunk{
 
             //all old buildings have static light scheduled around them
             if(state.rules.fog && state.rules.staticFog){
-                pushStaticBlocks(true);
+                pushStaticBlocks();
                 //force draw all static stuff immediately
                 updateStatic();
 
@@ -70,7 +70,7 @@ public final class FogControl implements CustomChunk{
                 if(state.rules.staticFog){
                     synchronized(staticEvents){
                         //TODO event per team?
-                        pushEvent(FogEvent.get(event.tile.x, event.tile.y, Mathf.round(event.tile.build.fogRadius()), event.tile.build.team.id), false);
+                        pushEvent(FogEvent.get(event.tile.x, event.tile.y, Mathf.round(event.tile.build.fogRadius()), event.tile.build.team.id));
                     }
                 }
             }
@@ -146,8 +146,7 @@ public final class FogControl implements CustomChunk{
         }
     }
 
-    /** @param initial whether this is the initial update; if true, does not update renderer */
-    void pushStaticBlocks(boolean initial){
+    void pushStaticBlocks(){
         if(fog == null) fog = new FogData[256];
 
         synchronized(staticEvents){
@@ -157,18 +156,17 @@ public final class FogControl implements CustomChunk{
                         fog[build.team.id] = new FogData();
                     }
 
-                    pushEvent(FogEvent.get(build.tile.x, build.tile.y, Mathf.round(build.fogRadius()), build.team.id), initial);
+                    pushEvent(FogEvent.get(build.tile.x, build.tile.y, Mathf.round(build.fogRadius()), build.team.id));
                 }
             }
         }
     }
 
-    /** @param skipRender whether the event is passed to the fog renderer */
-    void pushEvent(long event, boolean skipRender){
+    void pushEvent(long event){
         if(!state.rules.staticFog) return;
 
         staticEvents.add(event);
-        if(!skipRender && !headless && FogEvent.team(event) == Vars.player.team().id){
+        if(!headless && FogEvent.team(event) == Vars.player.team().id){
             renderer.fog.handleEvent(event);
         }
     }
@@ -179,7 +177,7 @@ public final class FogControl implements CustomChunk{
 
             if(state.rules.staticFog){
                 synchronized(staticEvents){
-                    pushEvent(FogEvent.get(build.tile.x, build.tile.y, Mathf.round(build.fogRadius()), build.team.id), false);
+                    pushEvent(FogEvent.get(build.tile.x, build.tile.y, Mathf.round(build.fogRadius()), build.team.id));
                 }
             }
         }
@@ -192,7 +190,7 @@ public final class FogControl implements CustomChunk{
 
         //force update static
         if(state.rules.staticFog && !loadedStatic){
-            pushStaticBlocks(false);
+            pushStaticBlocks();
             updateStatic();
             loadedStatic = true;
         }
@@ -237,7 +235,7 @@ public final class FogControl implements CustomChunk{
                         unitEventQueue.add(event);
 
                         if(unit.lastFogPos != pos){
-                            pushEvent(event, false);
+                            pushEvent(event);
                             unit.lastFogPos = pos;
                             data.dynamicUpdated = true;
                         }

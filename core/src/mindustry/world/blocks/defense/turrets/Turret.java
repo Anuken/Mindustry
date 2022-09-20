@@ -42,7 +42,7 @@ public class Turret extends ReloadTurret{
     /** Ammo units used per shot. */
     public int ammoPerShot = 1;
     /** If true, ammo is only consumed once per shot regardless of bullet count. */
-    public boolean consumeAmmoOnce = true;
+    public boolean consumeAmmoOnce = false;
     /** Minimum input heat required to fire. */
     public float heatRequirement = -1f;
     /** Maximum efficiency possible, if this turret uses heat. */
@@ -56,8 +56,6 @@ public class Turret extends ReloadTurret{
     public float shootCone = 8f;
     /** Turret shoot point. */
     public float shootX = 0f, shootY = Float.NEGATIVE_INFINITY;
-    /** Random spread on the X axis. */
-    public float xRand = 0f;
     /** Minimum bullet range. Used for artillery only. */
     public float minRange = 0f;
     /** Minimum warmup needed to fire. */
@@ -66,8 +64,6 @@ public class Turret extends ReloadTurret{
     public boolean accurateDelay = true;
     /** If false, this turret can't move while charging. */
     public boolean moveWhileCharging = true;
-    /** How long warmup is maintained even if this turret isn't shooting. */
-    public float warmupMaintainTime = 0f;
     /** pattern used for bullets */
     public ShootPattern shoot = new ShootPattern();
 
@@ -188,12 +184,6 @@ public class Turret extends ReloadTurret{
         drawer.getRegionsToOutline(this, out);
     }
 
-    public void limitRange(BulletType bullet, float margin){
-        float realRange = bullet.rangeChange + range;
-        //doesn't handle drag
-        bullet.lifetime = (realRange + margin) / bullet.speed;
-    }
-
     public static abstract class AmmoEntry{
         public int amount;
 
@@ -208,7 +198,7 @@ public class Turret extends ReloadTurret{
         public Seq<AmmoEntry> ammo = new Seq<>();
         public int totalAmmo;
         public float curRecoil, heat, logicControlTime = -1;
-        public float shootWarmup, charge, warmupHold = 0f;
+        public float shootWarmup;
         public int totalShots;
         public boolean logicShooting = false;
         public @Nullable Posc target;
@@ -220,7 +210,6 @@ public class Turret extends ReloadTurret{
         public float heatReq;
         public float[] sideHeat = new float[4];
 
-        @Override
         public float estimateDps(){
             if(!hasAmmo()) return 0f;
             return shoot.shots / reload * 60f * (peekAmmo() == null ? 0f : peekAmmo().estimateDPS()) * potentialEfficiency * timeScale;
@@ -345,26 +334,17 @@ public class Turret extends ReloadTurret{
         public void updateTile(){
             if(!validateTarget()) target = null;
 
-            float warmupTarget = (isShooting() && canConsume()) || charging() ? 1f : 0f;
-            if(warmupTarget > 0 && shootWarmup >= minWarmup && !isControlled()){
-                warmupHold = 1f;
-            }
-            if(warmupHold > 0f){
-                warmupHold -= Time.delta / warmupMaintainTime;
-                warmupTarget = 1f;
-            }
-
+            float warmupTarget = isShooting() && canConsume() ? 1f : 0f;
             if(linearWarmup){
-                shootWarmup = Mathf.approachDelta(shootWarmup, warmupTarget, shootWarmupSpeed * (warmupTarget > 0 ? efficiency : 1f));
+                shootWarmup = Mathf.approachDelta(shootWarmup, warmupTarget, shootWarmupSpeed);
             }else{
-                shootWarmup = Mathf.lerpDelta(shootWarmup, warmupTarget, shootWarmupSpeed * (warmupTarget > 0 ? efficiency : 1f));
+                shootWarmup = Mathf.lerpDelta(shootWarmup, warmupTarget, shootWarmupSpeed);
             }
 
             wasShooting = false;
 
-            curRecoil = Mathf.approachDelta(curRecoil, 0, 1 / recoilTime);
-            heat = Mathf.approachDelta(heat, 0, 1 / cooldownTime);
-            charge = charging() ? Mathf.approachDelta(charge, 1, 1 / shoot.firstShotDelay) : 0;
+            curRecoil = Math.max(curRecoil - Time.delta / recoilTime , 0);
+            heat = Math.max(heat - Time.delta / cooldownTime, 0);
 
             unit.tile(this);
             unit.rotation(rotation);
@@ -401,11 +381,6 @@ public class Turret extends ReloadTurret{
                         targetPosition(target);
 
                         if(Float.isNaN(rotation)) rotation = 0;
-                    }
-
-                    if(!isControlled()){
-                        unit.aimX(targetPos.x);
-                        unit.aimY(targetPos.y);
                     }
 
                     float targetRot = angleTo(targetPos);
@@ -496,7 +471,7 @@ public class Turret extends ReloadTurret{
 
             //skip first entry if it has less than the required amount of ammo
             if(ammo.size >= 2 && ammo.peek().amount < ammoPerShot && ammo.get(ammo.size - 2).amount >= ammoPerShot){
-                ammo.swap(ammo.size - 1, ammo.size - 2);
+                totalAmmo -= ammo.pop().amount;
             }
             return ammo.size > 0 && ammo.peek().amount >= ammoPerShot;
         }
@@ -555,15 +530,14 @@ public class Turret extends ReloadTurret{
             if(dead || (!consumeAmmoOnce && !hasAmmo())) return;
 
             float
-            xSpread = Mathf.range(xRand),
-            bulletX = x + Angles.trnsx(rotation - 90, shootX + xOffset + xSpread, shootY + yOffset),
-            bulletY = y + Angles.trnsy(rotation - 90, shootX + xOffset + xSpread, shootY + yOffset),
+            bulletX = x + Angles.trnsx(rotation - 90, shootX + xOffset, shootY + yOffset),
+            bulletY = y + Angles.trnsy(rotation - 90, shootX + xOffset, shootY + yOffset),
             shootAngle = rotation + angleOffset + Mathf.range(inaccuracy);
 
             float lifeScl = type.scaleLife ? Mathf.clamp(Mathf.dst(bulletX, bulletY, targetPos.x, targetPos.y) / type.range, minRange / type.range, range() / type.range) : 1f;
 
             //TODO aimX / aimY for multi shot turrets?
-            handleBullet(type.create(this, team, bulletX, bulletY, shootAngle, -1f, (1f - velocityRnd) + Mathf.random(velocityRnd), lifeScl, null, mover, targetPos.x, targetPos.y), xOffset, yOffset, shootAngle - rotation);
+            handleBullet(type.create(this, team, bulletX, bulletY, shootAngle, -1f, (1f - velocityRnd) + Mathf.random(velocityRnd), lifeScl, null, mover, targetPos.x, targetPos.y), xOffset, yOffset, angleOffset);
 
             (shootEffect == null ? type.shootEffect : shootEffect).at(bulletX, bulletY, rotation + angleOffset, type.hitColor);
             (smokeEffect == null ? type.smokeEffect : smokeEffect).at(bulletX, bulletY, rotation + angleOffset, type.hitColor);
@@ -589,16 +563,6 @@ public class Turret extends ReloadTurret{
 
         protected void handleBullet(@Nullable Bullet bullet, float offsetX, float offsetY, float angleOffset){
 
-        }
-
-        @Override
-        public float activeSoundVolume(){
-            return shootWarmup;
-        }
-
-        @Override
-        public boolean shouldActiveSound(){
-            return shootWarmup > 0.01f && loopSound != Sounds.none;
         }
 
         @Override

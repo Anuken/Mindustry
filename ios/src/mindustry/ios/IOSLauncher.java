@@ -143,8 +143,11 @@ public class IOSLauncher extends IOSApplication.Delegate{
                     Log.info("Attempting to share file " + file);
                     List<Object> list = new ArrayList<>();
 
+                    list.add(file.name());
+                    list.add(NSData.read(file.file()));
+
                     //better choice?
-                    list.add(new NSURL(file.file()));
+                    //list.add(new NSURL(file.file()));
 
                     UIActivityViewController p = new UIActivityViewController(list, null);
                     UIViewController rootVc = UIApplication.getSharedApplication().getKeyWindow().getRootViewController();
@@ -174,7 +177,9 @@ public class IOSLauncher extends IOSApplication.Delegate{
                 forced = false;
                 UINavigationController.attemptRotationToDeviceOrientation();
             }
-        }, new IOSApplicationConfiguration());
+        }, new IOSApplicationConfiguration(){{
+            useGL30 = true;
+        }});
     }
 
     @Override

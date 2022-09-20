@@ -123,7 +123,7 @@ public class MinimapRenderer{
         rect.set((dx - sz) * tilesize, (dy - sz) * tilesize, sz * 2 * tilesize, sz * 2 * tilesize);
 
         for(Unit unit : units){
-            if(unit.inFogTo(player.team()) || !unit.type.drawMinimap) continue;
+            if(unit.inFogTo(player.team())) continue;
 
             float rx = !withLabels ? (unit.x - rect.x) / rect.width * w : unit.x / (world.width() * tilesize) * w;
             float ry = !withLabels ? (unit.y - rect.y) / rect.width * h : unit.y / (world.height() * tilesize) * h;
@@ -190,9 +190,12 @@ public class MinimapRenderer{
             drawSpawns(x, y, w, h, scaling);
         }
 
-        state.rules.objectives.eachRunning(obj -> {
-            for(var marker : obj.markers) marker.drawMinimap(this);
-        });
+        if(state.rules.objectives.size > 0){
+            var first = state.rules.objectives.first();
+            for(var marker : first.markers){
+                marker.drawMinimap(this);
+            }
+        }
     }
 
     public void drawSpawns(float x, float y, float w, float h, float scaling){

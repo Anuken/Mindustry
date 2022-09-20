@@ -48,8 +48,8 @@ public class BlockRenderer{
     private IntSet darkEvents = new IntSet();
     private IntSet procLinks = new IntSet(), procLights = new IntSet();
 
-    private BlockQuadtree blockTree = new BlockQuadtree(new Rect(0, 0, 1, 1));
-    private FloorQuadtree floorTree = new FloorQuadtree(new Rect(0, 0, 1, 1));
+    private BlockQuadtree blockTree;
+    private FloorQuadtree floorTree;
 
     public BlockRenderer(){
 
@@ -110,8 +110,6 @@ public class BlockRenderer{
         });
 
         Events.on(TilePreChangeEvent.class, event -> {
-            if(blockTree == null || floorTree == null) return;
-
             if(indexBlock(event.tile)) blockTree.remove(event.tile);
             if(indexFloor(event.tile)) floorTree.remove(event.tile);
         });
@@ -439,10 +437,8 @@ public class BlockRenderer{
                     }
 
                     if(build.team != pteam){
-                        if(build.block.drawTeamOverlay){
-                            build.drawTeam();
-                            Draw.z(Layer.block);
-                        }
+                        build.drawTeam();
+                        Draw.z(Layer.block);
                     }else if(renderer.drawStatus && block.hasConsumers){
                         build.drawStatus();
                     }

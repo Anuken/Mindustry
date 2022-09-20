@@ -775,21 +775,13 @@ public class HudFragment{
             builder.setLength(0);
 
             //objectives override mission?
-            if(state.rules.objectives.any()){
-                boolean first = true;
-                for(var obj : state.rules.objectives){
-                    if(!obj.qualified()) continue;
-
-                    String text = obj.text();
-                    if(text != null){
-                        if(!first) builder.append("\n[white]");
-                        builder.append(text);
-
-                        first = false;
-                    }
+            if(state.rules.objectives.size > 0){
+                var first = state.rules.objectives.first();
+                String text = first.text();
+                if(text != null){
+                    builder.append(text);
+                    return builder;
                 }
-
-                return builder;
             }
 
             //mission overrides everything
@@ -839,29 +831,16 @@ public class HudFragment{
 
         table.row();
 
-        //TODO nobody reads details anyway.
-        /*
         table.clicked(() -> {
-            if(state.rules.objectives.any()){
-                StringBuilder text = new StringBuilder();
-
-                boolean first = true;
-                for(var obj : state.rules.objectives){
-                    if(!obj.qualified()) continue;
-
-                    String details = obj.details();
-                    if(details != null){
-                        if(!first) text.append('\n');
-                        text.append(details);
-
-                        first = false;
-                    }
+            if(state.rules.objectives.size > 0){
+                var first = state.rules.objectives.first();
+                var details = first.details();
+                if(details != null){
+                    //TODO this could be much better.
+                    ui.showInfo(details);
                 }
-
-                //TODO this, as said before, could be much better.
-                ui.showInfo(text.toString());
             }
-        });*/
+        });
 
         return table;
     }
@@ -908,7 +887,7 @@ public class HudFragment{
     }
 
     private boolean canSkipWave(){
-        return state.rules.waves && state.rules.waveSending && ((net.server() || player.admin) || !net.active()) && state.enemies == 0 && !spawner.isSpawning();
+        return state.rules.waves && ((net.server() || player.admin) || !net.active()) && state.enemies == 0 && !spawner.isSpawning();
     }
 
 }

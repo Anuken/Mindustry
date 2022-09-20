@@ -62,9 +62,7 @@ public class StatusEffect extends UnlockableContent{
 
     @Override
     public void init(){
-        if(initblock != null){
-            initblock.run();
-        }
+        initblock.run();
     }
 
     public void init(Runnable run){

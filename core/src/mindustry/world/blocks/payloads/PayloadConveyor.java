@@ -128,7 +128,7 @@ public class PayloadConveyor extends Block{
             if(!enabled) return;
 
             if(item != null){
-                item.update(null, this);
+                item.update(false);
             }
 
             lastInterp = curInterp;

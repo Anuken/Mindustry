@@ -10,14 +10,6 @@ public class IconConverter{
     float width, height;
 
     public static void main(String[] __){
-        /*
-        Process for adding an icon to the font:
-        1. Have an SVG ready, possibly created with this tool.
-        2. Go to Fontello and load the config.json from core/assets-raw/fontgen/config.json
-        3. Drag the SVG in.
-        4. Export the config and font file, replace the old config.
-        5. Take the font (ttf) from the zip, open it in FontForge, and merge it into font.woff and icon.ttf. Usually, you would do view -> go to (the 0x unicode index).
-        **/
 
         Log.info("Converting icons...");
         Time.mark();
@@ -36,7 +28,7 @@ public class IconConverter{
             }
         }
 
-        Seq<String> args = Seq.with("inkscape", "--batch-process", "--actions", "select-all; path-union; fit-canvas-to-selection; export-overwrite; export-do");
+        Seq<String> args = Seq.with("inkscape", "--batch-process", "--verb", "EditSelectAll;SelectionUnion;FitCanvasToSelectionOrDrawing;FileSave");
         args.addAll(files.map(Fi::absolutePath));
 
         Fi.get("fontgen/extra").findAll().each(f -> f.copyTo(Fi.get("fontgen/icons").child(f.name())));

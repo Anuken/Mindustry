@@ -229,8 +229,7 @@ public class LaunchPad extends Block{
             Draw.z(Layer.weather - 1);
 
             TextureRegion region = blockOn() instanceof mindustry.world.blocks.campaign.LaunchPad p ? p.podRegion : Core.atlas.find("launchpod");
-            scale *= region.scl();
-            float rw = region.width * scale, rh = region.height * scale;
+            float rw = region.width * region.scale * Draw.scl * scale, rh = region.height * region.scale * Draw.scl * scale;
 
             Draw.alpha(alpha);
             Draw.rect(region, cx, cy, rw, rh, rotation);

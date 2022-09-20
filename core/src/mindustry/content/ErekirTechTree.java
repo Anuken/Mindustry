@@ -86,8 +86,7 @@ public class ErekirTechTree{
                         });
                     });
 
-                    node(overflowDuct, Seq.with(new OnSector(aegis)), () -> {
-                        node(underflowDuct);
+                    node(overflowDuct, Seq.with(new OnSector(two)), () -> {
                         node(reinforcedContainer, () -> {
                             node(ductUnloader, () -> {
 
@@ -100,26 +99,26 @@ public class ErekirTechTree{
                     });
                 });
 
-                node(reinforcedPayloadConveyor, Seq.with(new OnSector(atlas)), () -> {
+                node(reinforcedPayloadConveyor, Seq.with(new OnSector(four)), () -> {
                     //TODO should only be unlocked in unit sector
-                    node(payloadMassDriver, Seq.with(new Research(siliconArcFurnace), new OnSector(split)), () -> {
-                        //TODO further limitations
-                        node(payloadLoader, () -> {
-                            node(payloadUnloader, () -> {
-                                //TODO replace.
-                                //node(payloadPropulsionTower, () -> {
+                    node(constructor, Seq.with(new Research(siliconArcFurnace), new OnSector(four)), () -> {
+                        node(payloadMassDriver, Seq.with(new OnSector(four)), () -> {
+                            //TODO further limitations
+                            node(payloadLoader, () -> {
+                                node(payloadUnloader, () -> {
+                                    //TODO replace.
+                                    //node(payloadPropulsionTower, () -> {
 
-                                //});
+                                    //});
+                                });
                             });
-                        });
 
-                        node(constructor, Seq.with(new OnSector(split)), () -> {
-                            node(smallDeconstructor, Seq.with(new OnSector(peaks)), () -> {
-                                node(largeConstructor, Seq.with(tmpNever), () -> {
+                            node(smallDeconstructor, () -> {
+                                node(largeConstructor, () -> {
 
                                 });
 
-                                node(deconstructor, Seq.with(tmpNever), () -> {
+                                node(deconstructor, () -> {
 
                                 });
                             });
@@ -134,9 +133,9 @@ public class ErekirTechTree{
 
             //TODO move into turbine condenser?
             node(plasmaBore, () -> {
-                node(impactDrill, Seq.with(new OnSector(aegis)), () -> {
-                    node(largePlasmaBore, Seq.with(new OnSector(caldera)), () -> {
-                        node(eruptionDrill, Seq.with(tmpNever), () -> {
+                node(impactDrill, Seq.with(new OnSector(two)), () -> {
+                    node(largePlasmaBore, Seq.with(new OnSector(four)), () -> {
+                        node(eruptionDrill, () -> {
 
                         });
                     });
@@ -145,36 +144,30 @@ public class ErekirTechTree{
 
             node(turbineCondenser, () -> {
                 node(beamNode, () -> {
-                    node(ventCondenser, Seq.with(new OnSector(aegis)), () -> {
-                        node(chemicalCombustionChamber, Seq.with(new OnSector(basin)), () -> {
+                    node(ventCondenser, Seq.with(new OnSector(two)), () -> {
+                        node(chemicalCombustionChamber, Seq.with(new OnSector(three)), () -> {
                             node(pyrolysisGenerator, () -> {
-                                node(fluxReactor, () -> {
-                                    node(neoplasiaReactor, () -> {
 
-                                    });
-                                });
                             });
                         });
                     });
 
-                    node(beamTower, Seq.with(new OnSector(peaks)), () -> {
+                    node(beamTower, Seq.with(new OnSector(four)), () -> {
 
                     });
 
 
-                    node(regenProjector, Seq.with(new OnSector(peaks)), () -> {
+                    node(regenProjector, () -> {
                         //TODO more tiers of build tower or "support" structures like overdrive projectors
-                        node(buildTower, Seq.with(tmpNever), () -> {
-                            node(shockwaveTower, () -> {
+                        node(buildTower, Seq.with(new OnSector(four)), () -> {
 
-                            });
                         });
                     });
                 });
 
-                node(reinforcedConduit, Seq.with(new OnSector(aegis)), () -> {
+                node(reinforcedConduit, Seq.with(new OnSector(two)), () -> {
                     //TODO maybe should be even later
-                    node(reinforcedPump, Seq.with(new OnSector(basin)), () -> {
+                    node(reinforcedPump, Seq.with(new OnSector(three)), () -> {
                         //TODO T2 pump, consume cyanogen or similar
                     });
 
@@ -185,7 +178,7 @@ public class ErekirTechTree{
 
                         node(reinforcedLiquidRouter, () -> {
                             node(reinforcedLiquidContainer, () -> {
-                                node(reinforcedLiquidTank, Seq.with(new SectorComplete(intersect)), () -> {
+                                node(reinforcedLiquidTank, Seq.with(new SectorComplete(three)), () -> {
 
                                 });
                             });
@@ -195,36 +188,32 @@ public class ErekirTechTree{
 
                 node(cliffCrusher, () -> {
                     node(siliconArcFurnace, () -> {
-                        node(electrolyzer, Seq.with(new OnSector(atlas)), () -> {
-                            node(oxidationChamber, Seq.with(new Research(tankRefabricator), new OnSector(marsh)), () -> {
-
-                                node(surgeCrucible, Seq.with(new OnSector(ravine)), () -> {
-
-                                });
-                                node(heatRedirector, Seq.with(new OnSector(ravine)), () -> {
-                                    node(electricHeater, Seq.with(new OnSector(ravine), new Research(afflict)), () -> {
-                                        node(slagHeater, Seq.with(new OnSector(caldera)), () -> {
+                        node(electrolyzer, Seq.with(new OnSector(three)), () -> {
+                            node(oxidationChamber, Seq.with(new Research(tankRefabricator), new OnSector(four)), () -> {
+                                node(electricHeater, Seq.with(new OnSector(four)), () -> {
+                                    node(heatRedirector, () -> {
+                                        node(surgeCrucible, () -> {
 
                                         });
+                                    });
 
-                                        node(atmosphericConcentrator, Seq.with(new OnSector(caldera)), () -> {
-                                            node(cyanogenSynthesizer, Seq.with(tmpNever), () -> {
+                                    node(atmosphericConcentrator, Seq.with(new OnSector(four)), () -> {
+                                        node(cyanogenSynthesizer, Seq.with(new OnSector(four)), () -> {
 
-                                            });
                                         });
+                                    });
 
-                                        node(carbideCrucible, Seq.with(tmpNever), () -> {
-                                            node(phaseSynthesizer, () -> {
-                                                node(phaseHeater, () -> {
+                                    node(carbideCrucible, Seq.with(tmpNever), () -> {
+                                        node(phaseSynthesizer, () -> {
+                                            node(phaseHeater, () -> {
 
-                                                });
                                             });
                                         });
                                     });
                                 });
                             });
 
-                            node(slagIncinerator, Seq.with(new OnSector(basin)), () -> {
+                            node(slagIncinerator, Seq.with(new OnSector(four)), () -> {
 
                                 //TODO these are unused.
                                 //node(slagCentrifuge, () -> {});
@@ -251,9 +240,7 @@ public class ErekirTechTree{
 
                         node(reinforcedSurgeWall, () -> {
                             node(reinforcedSurgeWallLarge, () -> {
-                                node(shieldedWall, () -> {
 
-                                });
                             });
                         });
 
@@ -265,35 +252,26 @@ public class ErekirTechTree{
                     });
                 });
 
-                node(diffuse, Seq.with(new OnSector(lake)), () -> {
-                    node(sublimate, Seq.with(new OnSector(marsh)), () -> {
-                        node(afflict, Seq.with(new OnSector(ravine)), () -> {
-                            node(titan, Seq.with(new OnSector(marsh)), () -> {
-                                node(lustre, () -> {
-                                    node(smite, () -> {
+                node(diffuse, Seq.with(new OnSector(two)), () -> {
+                    node(sublimate, () -> {
+                        //TODO implement
+                        node(titan, Seq.with(new OnSector(four)), () -> {
 
-                                    });
-                                });
-                            });
                         });
-                    });
 
-                    node(disperse, Seq.with(tmpNever), () -> {
-                        node(scathe, () -> {
-                            node(malign, () -> {
+                        node(disperse, Seq.with(new OnSector(four)), () -> {
 
-                            });
                         });
                     });
                 });
 
 
-                node(radar, Seq.with(new Research(beamNode), new Research(turbineCondenser), new Research(tankFabricator), new OnSector(SectorPresets.aegis)), () -> {
+                node(radar, Seq.with(new Research(beamNode), new Research(turbineCondenser), new Research(tankFabricator), new OnSector(SectorPresets.two)), () -> {
 
                 });
             });
 
-            node(coreCitadel, Seq.with(new SectorComplete(peaks)), () -> {
+            node(coreCitadel, Seq.with(new SectorComplete(four)), () -> {
                 node(coreAcropolis, () -> {
 
                 });
@@ -302,33 +280,33 @@ public class ErekirTechTree{
             node(tankFabricator, Seq.with(new Research(siliconArcFurnace), new Research(plasmaBore), new Research(turbineCondenser)), () -> {
                 node(UnitTypes.stell);
 
-                node(unitRepairTower, Seq.with(new OnSector(ravine), new Research(mechRefabricator)), () -> {
+                node(unitRepairTower, Seq.with(new OnSector(two)), () -> {
 
                 });
 
-                node(shipFabricator, Seq.with(new OnSector(lake)), () -> {
+                node(shipFabricator, Seq.with(new OnSector(two)), () -> {
                     node(UnitTypes.elude);
 
-                    node(mechFabricator, Seq.with(new OnSector(intersect)), () -> {
+                    node(mechFabricator, Seq.with(new OnSector(three)), () -> {
                         node(UnitTypes.merui);
 
-                        node(tankRefabricator, Seq.with(new OnSector(atlas)), () -> {
+                        node(tankRefabricator, Seq.with(new OnSector(three)), () -> {
                             node(UnitTypes.locus);
 
-                            node(mechRefabricator, Seq.with(new OnSector(basin)), () -> {
+                            node(mechRefabricator, Seq.with(new OnSector(three)), () -> {
                                 node(UnitTypes.cleroi);
 
-                                node(shipRefabricator, Seq.with(new OnSector(peaks)), () -> {
+                                node(shipRefabricator, Seq.with(new OnSector(four), tmpNever), () -> {
                                     node(UnitTypes.avert);
 
                                     //TODO
-                                    node(primeRefabricator, Seq.with(tmpNever), () -> {
+                                    node(primeRefabricator, () -> {
                                         node(UnitTypes.precept);
                                         node(UnitTypes.anthicus);
                                         node(UnitTypes.obviate);
                                     });
 
-                                    node(tankAssembler, Seq.with(new OnSector(intersect), new Research(constructor), new Research(atmosphericConcentrator)), () -> {
+                                    node(tankAssembler, Seq.with(new OnSector(three), new Research(constructor), new Research(atmosphericConcentrator)), () -> {
 
                                         node(UnitTypes.vanquish, () -> {
                                             node(UnitTypes.conquer, Seq.with(tmpNever), () -> {
@@ -336,7 +314,7 @@ public class ErekirTechTree{
                                             });
                                         });
 
-                                        node(shipAssembler, Seq.with(new OnSector(basin)), () -> {
+                                        node(shipAssembler, Seq.with(new OnSector(four)), () -> {
                                             node(UnitTypes.quell, () -> {
                                                 node(UnitTypes.disrupt, Seq.with(tmpNever), () -> {
 
@@ -349,10 +327,6 @@ public class ErekirTechTree{
 
                                                     });
                                                 });
-
-                                                node(basicAssemblerModule, () -> {
-
-                                                });
                                             });
                                         });
                                     });
@@ -363,31 +337,12 @@ public class ErekirTechTree{
                 });
             });
 
+            //TODO more sectors
             node(onset, () -> {
-                node(aegis, Seq.with(new SectorComplete(onset), new Research(ductRouter), new Research(ductBridge)), () -> {
-                    node(lake, Seq.with(new SectorComplete(aegis)), () -> {
+                node(two, Seq.with(new SectorComplete(onset), new Research(ductRouter), new Research(ductBridge)), () -> {
+                    node(three, Seq.with(new SectorComplete(two), new Research(ventCondenser), new Research(shipFabricator)), () -> {
+                        node(four, Seq.with(new SectorComplete(three)), () -> {
 
-                    });
-
-                    node(intersect, Seq.with(new SectorComplete(aegis), new SectorComplete(lake), new Research(ventCondenser), new Research(shipFabricator)), () -> {
-                        node(atlas, Seq.with(new SectorComplete(intersect), new Research(mechFabricator)), () -> {
-                            node(split, Seq.with(new SectorComplete(atlas), new Research(reinforcedPayloadConveyor), new Research(reinforcedContainer)), () -> {
-
-                            });
-
-                            node(basin, Seq.with(new SectorComplete(atlas)), () -> {
-                                node(marsh, Seq.with(new SectorComplete(basin)), () ->{
-                                    node(ravine, Seq.with(new SectorComplete(marsh), new Research(Liquids.slag)), () ->{
-                                        node(caldera, Seq.with(new SectorComplete(peaks), new Research(heatRedirector)), () -> {
-
-                                        });
-                                    });
-
-                                    node(peaks, Seq.with(new SectorComplete(marsh), new SectorComplete(split)), () ->{
-
-                                    });
-                                });
-                            });
                         });
                     });
                 });

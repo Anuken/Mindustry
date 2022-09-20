@@ -11,8 +11,6 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.*;
-import mindustry.ai.*;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.entities.*;
@@ -48,7 +46,6 @@ public class PlacementFragment{
     Table blockTable, toggler, topTable, blockCatTable, commandTable;
     Stack mainStack;
     ScrollPane blockPane;
-    Runnable rebuildCommand;
     boolean blockSelectEnd, wasCommandMode;
     int blockSelectSeq;
     long blockSelectSeqMillis;
@@ -76,12 +73,6 @@ public class PlacementFragment{
                 control.input.block = null;
                 rebuild();
             });
-        });
-
-        Events.run(Trigger.unitCommandChange, () -> {
-            if(rebuildCommand != null){
-                rebuildCommand.run();
-            }
         });
 
         Events.on(UnlockEvent.class, event -> {
@@ -153,7 +144,7 @@ public class PlacementFragment{
             }
         }
 
-        if(ui.chatfrag.shown() || ui.consolefrag.shown() || Core.scene.hasKeyboard()) return false;
+        if(ui.chatfrag.shown() || Core.scene.hasKeyboard()) return false;
 
         for(int i = 0; i < blockSelect.length; i++){
             if(Core.input.keyTap(blockSelect[i])){
@@ -408,11 +399,13 @@ public class PlacementFragment{
                 mainStack.update(() -> {
                     if(control.input.commandMode != wasCommandMode){
                         mainStack.clearChildren();
-                        mainStack.addChild(control.input.commandMode ? commandTable : blockCatTable);
+                        if(!mobile || !control.input.commandMode){
+                            mainStack.addChild(control.input.commandMode ? commandTable : blockCatTable);
 
-                        //hacky, but forces command table to be same width as blocks
-                        if(control.input.commandMode){
-                            commandTable.getCells().peek().width(blockCatTable.getWidth() / Scl.scl(1f));
+                            //hacky, but forces command table to be same width as blocks
+                            if(control.input.commandMode){
+                                commandTable.getCells().peek().width(blockCatTable.getWidth());
+                            }
                         }
 
                         wasCommandMode = control.input.commandMode;
@@ -429,10 +422,8 @@ public class PlacementFragment{
                     commandTable.table(u -> {
                         u.left();
                         int[] curCount = {0};
-                        UnitCommand[] currentCommand = {null};
-                        var commands = new Seq<UnitCommand>();
 
-                        rebuildCommand = () -> {
+                        Runnable rebuildCommand = () -> {
                             u.clearChildren();
                             var units = control.input.selectedUnits;
                             if(units.size > 0){
@@ -440,17 +431,12 @@ public class PlacementFragment{
                                 for(var unit : units){
                                     counts[unit.type.id] ++;
                                 }
-                                commands.clear();
-                                boolean firstCommand = false;
-                                Table unitlist = u.table().growX().left().get();
-                                unitlist.left();
-
                                 int col = 0;
                                 for(int i = 0; i < counts.length; i++){
                                     if(counts[i] > 0){
                                         var type = content.unit(i);
-                                        unitlist.add(new ItemImage(type.uiIcon, counts[i])).tooltip(type.localizedName).pad(4).with(b -> {
-                                            var listener = new ClickListener();
+                                        u.add(new ItemImage(type.uiIcon, counts[i])).tooltip(type.localizedName).pad(4).with(b -> {
+                                            ClickListener listener = new ClickListener();
 
                                             //left click -> select
                                             b.clicked(KeyCode.mouseLeft, () -> control.input.selectedUnits.removeAll(unit -> unit.type != type));
@@ -464,34 +450,9 @@ public class PlacementFragment{
                                         });
 
                                         if(++col % 7 == 0){
-                                            unitlist.row();
-                                        }
-
-                                        if(!firstCommand){
-                                            commands.add(type.commands);
-                                            firstCommand = true;
-                                        }else{
-                                            //remove commands that this next unit type doesn't have
-                                            commands.removeAll(com -> !Structs.contains(type.commands, com));
+                                            u.row();
                                         }
                                     }
-                                }
-
-                                if(commands.size > 1){
-                                    u.row();
-
-                                    u.table(coms -> {
-                                        for(var command : commands){
-                                            coms.button(Icon.icons.get(command.icon, Icon.cancel), Styles.clearNoneTogglei, () -> {
-                                                IntSeq ids = new IntSeq();
-                                                for(var unit : units){
-                                                    ids.add(unit.id);
-                                                }
-
-                                                Call.setUnitCommand(Vars.player, ids.toArray(), command);
-                                            }).checked(i -> currentCommand[0] == command).size(50f).tooltip(command.localized());
-                                        }
-                                    }).fillX().padTop(4f).left();
                                 }
                             }else{
                                 u.add("[no units]").color(Color.lightGray).growX().center().labelAlign(Align.center).pad(6);
@@ -499,27 +460,6 @@ public class PlacementFragment{
                         };
 
                         u.update(() -> {
-                            boolean hadCommand = false;
-                            UnitCommand shareCommand = null;
-
-                            //find the command that all units have, or null if they do not share one
-                            for(var unit : control.input.selectedUnits){
-                                if(unit.isCommandable()){
-                                    var nextCommand = unit.command().currentCommand();
-
-                                    if(hadCommand){
-                                        if(shareCommand != nextCommand){
-                                            shareCommand = null;
-                                        }
-                                    }else{
-                                        shareCommand = nextCommand;
-                                        hadCommand = true;
-                                    }
-                                }
-                            }
-
-                            currentCommand[0] = shareCommand;
-
                             int size = control.input.selectedUnits.size;
                             if(curCount[0] != size){
                                 curCount[0] = size;
@@ -607,7 +547,7 @@ public class PlacementFragment{
     }
 
     Seq<Block> getByCategory(Category cat){
-        return returnArray.selectFrom(content.blocks(), block -> block.category == cat && block.isVisible() && block.environmentBuildable());
+        return returnArray.selectFrom(content.blocks(), block -> block.category == cat && block.isVisible());
     }
 
     Seq<Block> getUnlockedByCategory(Category cat){
@@ -637,7 +577,7 @@ public class PlacementFragment{
         if(Core.scene.hasMouse() || topTable.hit(v.x, v.y, false) != null) return null;
 
         //check for a unit
-        Unit unit = Units.closestOverlap(player.team(), Core.input.mouseWorldX(), Core.input.mouseWorldY(), 5f, u -> !u.isLocal() && u.displayable());
+        Unit unit = Units.closestOverlap(player.team(), Core.input.mouseWorldX(), Core.input.mouseWorldY(), 5f, u -> !u.isLocal());
         //if cursor has a unit, display it
         if(unit != null) return unit;
 

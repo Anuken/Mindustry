@@ -5,11 +5,13 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import arc.util.noise.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.maps.generators.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -84,6 +86,10 @@ public class TantrosPlanetGenerator extends PlanetGenerator{
         });
 
         Schematics.placeLaunchLoadout(width / 2, height / 2);
+
+        Vars.state.rules.env = Env.underwater;
+
+        state.rules.canGameOver = false;
     }
 
     float rawHeight(Vec3 position){

@@ -93,8 +93,6 @@ public class TechTree{
         public Seq<Objective> objectives = new Seq<>();
         /** Nodes that depend on this node. */
         public final Seq<TechNode> children = new Seq<>();
-        /** Planet associated with this tech node. Null to auto-detect, or use Serpulo if no associated planet is found. */
-        public @Nullable Planet planet;
 
         public TechNode(@Nullable TechNode parent, UnlockableContent content, ItemStack[] requirements){
             if(parent != null){
@@ -143,7 +141,7 @@ public class TechTree{
         }
 
         public String localizedName(){
-            return Core.bundle.get("techtree." + name, name);
+            return Core.bundle.get("techtree." + name);
         }
 
         public void setupRequirements(ItemStack[] requirements){

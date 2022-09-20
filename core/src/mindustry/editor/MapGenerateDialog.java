@@ -268,44 +268,30 @@ public class MapGenerateDialog extends BaseDialog{
                     t.add().growX();
 
                     ImageButtonStyle style = Styles.geni;
-                    t.defaults().size(42f).padLeft(-5f);
+                    t.defaults().size(42f);
 
                     t.button(Icon.refresh, style, () -> {
                         filter.randomize();
                         update();
-                    }).padLeft(-16f).tooltip("@editor.randomize");
+                    });
 
-                    if(filter != filters.first()){
-                        t.button(Icon.upOpen, style, () -> {
-                            int idx = filters.indexOf(filter);
-                            filters.swap(idx, Math.max(0, idx - 1));
-                            rebuildFilters();
-                            update();
-                        }).tooltip("@editor.moveup");
-                    }
-
-                    if(filter != filters.peek()){
-                        t.button(Icon.downOpen, style, () -> {
-                            int idx = filters.indexOf(filter);
-                            filters.swap(idx, Math.min(filters.size - 1, idx + 1));
-                            rebuildFilters();
-                            update();
-                        }).tooltip("@editor.movedown");
-                    }
-
-                    t.button(Icon.copy, style, () -> {
-                        GenerateFilter copy = filter.copy();
-                        copy.randomize();
-                        filters.insert(filters.indexOf(filter) + 1, copy);
+                    t.button(Icon.upOpen, style, () -> {
+                        int idx = filters.indexOf(filter);
+                        filters.swap(idx, Math.max(0, idx - 1));
                         rebuildFilters();
                         update();
-                    }).tooltip("@editor.copy");
-
+                    });
+                    t.button(Icon.downOpen, style, () -> {
+                        int idx = filters.indexOf(filter);
+                        filters.swap(idx, Math.min(filters.size - 1, idx + 1));
+                        rebuildFilters();
+                        update();
+                    });
                     t.button(Icon.cancel, style, () -> {
                         filters.remove(filter);
                         rebuildFilters();
                         update();
-                    }).tooltip("@waves.remove");
+                    });
                 }).growX();
 
                 c.row();
@@ -323,6 +309,7 @@ public class MapGenerateDialog extends BaseDialog{
                     }
                 }).grow().left().pad(6).top();
             }).width(280f).pad(3).top().left().fillY();
+
 
             if(++i % cols == 0){
                 filterTable.row();

@@ -156,7 +156,7 @@ public class Pathfinder implements Runnable{
 
         for(int i = 0; i < 4; i++){
             Tile other = tile.nearby(i);
-            if(other != null){
+            if(other != null)   {
                 Floor floor = other.floor();
                 boolean osolid = other.solid();
                 if(floor.isLiquid) nearLiquid = true;

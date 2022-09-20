@@ -124,13 +124,14 @@ public class Puddles{
             }
             return -0.4f * amount;
         }
-        return dest.react(liquid, amount, tile, x, y);
+        return 0f;
     }
 
     /**
      * Returns whether the first liquid can 'stay' on the second one.
+     * Currently, the only place where this can happen is oil on water.
      */
     private static boolean canStayOn(Liquid liquid, Liquid other){
-        return liquid.canStayOn.contains(other);
+        return liquid == Liquids.oil && other == Liquids.water;
     }
 }

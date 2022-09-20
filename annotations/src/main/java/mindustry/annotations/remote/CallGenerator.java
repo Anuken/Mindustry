@@ -60,13 +60,7 @@ public class CallGenerator{
             register.addStatement("mindustry.net.Net.registerPacket($L.$L::new)", packageName, ent.packetClassName);
 
             //add fields to the type
-            Seq<Svar> params = ent.element.params();
-            for(int i = 0; i < params.size; i++){
-                if(!ent.where.isServer && i == 0){
-                    continue;
-                }
-
-                Svar param = params.get(i);
+            for(Svar param : ent.element.params()){
                 packet.addField(param.tname(), param.name(), Modifier.PUBLIC);
             }
 

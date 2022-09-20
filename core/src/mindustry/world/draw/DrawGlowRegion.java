@@ -8,6 +8,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 
+/** Not standalone. */
 public class DrawGlowRegion extends DrawBlock{
     public Blending blending = Blending.additive;
     public String suffix = "-glow";

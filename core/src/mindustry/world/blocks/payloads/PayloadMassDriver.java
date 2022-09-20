@@ -80,7 +80,6 @@ public class PayloadMassDriver extends PayloadBlock{
 
         stats.add(Stat.payloadCapacity, StatValues.squared(maxPayloadSize, StatUnit.blocksSquared));
         stats.add(Stat.reload, 60f / (chargeTime + reload), StatUnit.seconds);
-        stats.add(Stat.shootRange, range / tilesize, StatUnit.blocks);
     }
 
     @Override

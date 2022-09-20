@@ -40,7 +40,6 @@ public class Mods implements Loadable{
     private ObjectSet<String> specialFolders = ObjectSet.with("bundles", "sprites", "sprites-override");
 
     private int totalSprites;
-    private static ObjectFloatMap<String> textureResize = new ObjectFloatMap<>();
     private MultiPacker packer;
     private ModClassLoader mainLoader = new ModClassLoader(getClass().getClassLoader());
 
@@ -182,7 +181,7 @@ public class Mods implements Loadable{
 
     private void packSprites(Seq<Fi> sprites, LoadedMod mod, boolean prefix, Seq<Future<Runnable>> tasks){
         boolean linear = Core.settings.getBool("linear", true);
-        float textureScale = mod.meta.texturescale;
+        float textureScale = 32f / mod.meta.texturesize;
 
         for(Fi file : sprites){
             String name = file.nameWithoutExtension();
@@ -190,15 +189,12 @@ public class Mods implements Loadable{
             if(!prefix && !Core.atlas.has(name)){
                 Log.warn("Sprite '@' in mod '@' attempts to override a non-existent sprite. Ignoring.", name, mod.name);
                 continue;
-
-                //(horrible code below)
-            }else if(prefix && !mod.meta.keepOutlines && name.endsWith("-outline") && file.path().contains("units") && !file.path().contains("blocks")){
-                Log.warn("Sprite '@' in mod '@' is likely to be an unnecessary unit outline. These should not be separate sprites. Ignoring.", name, mod.name);
-                //TODO !!! document this on the wiki !!!
-                //do not allow packing standard outline sprites for now, they are no longer necessary and waste space!
-                //TODO also full regions are bad:  || name.endsWith("-full")
-                continue;
             }
+
+            //TODO !!! document this on the wiki !!!
+            //do not allow packing standard outline sprites for now, they are no longer necessary and waste space!
+            //TODO also full regions are bad:  || name.endsWith("-full")
+            if(prefix && (name.endsWith("-outline"))) continue;
 
             //read and bleed pixmaps in parallel
             tasks.add(mainExecutor.submit(() -> {
@@ -214,7 +210,7 @@ public class Mods implements Loadable{
                         String fullName = (prefix ? mod.name + "-" : "") + name;
                         packer.add(getPage(file), fullName, new PixmapRegion(pix));
                         if(textureScale != 1.0f){
-                            textureResize.put(fullName, textureScale);
+                            Drawf.textureResize.put(fullName, textureScale);
                         }
                         pix.dispose();
                     };
@@ -342,25 +338,19 @@ public class Mods implements Loadable{
                     if(c instanceof UnlockableContent u && c.minfo.mod != null){
                         u.load();
                         u.loadIcon();
-                        if(u.generateIcons){
-                            u.createIcons(packer);
-                        }
+                        u.createIcons(packer);
                     }
                 });
             }
             Log.debug("Time to generate icons: @", Time.elapsed());
 
+            packer.printStats();
+
             //dispose old atlas data
             Core.atlas = packer.flush(filter, new TextureAtlas());
 
-            Time.mark();
-            textureResize.each(e -> { Core.atlas.find(e.key).scale = e.value; });
-            Log.debug("Time to rescale textures: @", Time.elapsed());
-
             Core.atlas.setErrorRegion("error");
             Log.debug("Total pages: @", Core.atlas.getTextures().size);
-
-            packer.printStats();
         }
 
         packer.dispose();
@@ -972,7 +962,7 @@ public class Mods implements Loadable{
                 Core.settings.put("mod-" + baseName + "-enabled", false);
             }
 
-            if(!headless && Core.settings.getBool("mod-" + baseName + "-enabled", true)){
+            if(!headless){
                 Log.info("Loaded mod '@' in @ms", meta.name, Time.elapsed());
             }
 
@@ -1149,10 +1139,8 @@ public class Mods implements Loadable{
         public boolean hidden;
         /** If true, this mod should be loaded as a Java class mod. This is technically optional, but highly recommended. */
         public boolean java;
-        /** If true, -outline regions for units are kept when packing. Only use if you know exactly what you are doing. */
-        public boolean keepOutlines;
         /** To rescale textures with a different size. Represents the size in pixels of the sprite of a 1x1 block. */
-        public float texturescale = 1.0f;
+        public int texturesize = 32;
 
         public String displayName(){
             return displayName == null ? name : displayName;
@@ -1186,7 +1174,7 @@ public class Mods implements Loadable{
                     ", minGameVersion='" + minGameVersion + '\'' +
                     ", hidden=" + hidden +
                     ", repo=" + repo +
-                    ", texturescale=" + texturescale +
+                    ", texturesize=" + texturesize +
                     '}';
         }
     }

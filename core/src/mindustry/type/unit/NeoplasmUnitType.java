@@ -15,7 +15,6 @@ public class NeoplasmUnitType extends UnitType{
         outlineColor = Pal.neoplasmOutline;
         immunities.addAll(StatusEffects.burning, StatusEffects.melting);
         envDisabled = Env.none;
-        drawCell = false;
 
         abilities.add(new RegenAbility(){{
             //fully regen in 70 seconds

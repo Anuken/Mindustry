@@ -56,8 +56,6 @@ public class CanvasBlock extends Block{
         public byte[] data = new byte[Mathf.ceil(canvasSize * canvasSize * bitsPerPixel / 8f)];
 
         public void updateTexture(){
-            if(headless) return;
-
             Pixmap pix = makePixmap();
             if(texture != null){
                 texture.draw(pix);
@@ -222,16 +220,6 @@ public class CanvasBlock extends Block{
 
                 dialog.show();
             }).size(40f);
-        }
-
-        @Override
-        public boolean onConfigureBuildTapped(Building other){
-            if(this == other){
-                deselect();
-                return false;
-            }
-
-            return true;
         }
 
         @Override

@@ -50,7 +50,8 @@ public class MedianFilter extends GenerateFilter{
         floors.sort();
         blocks.sort();
 
-        int floor = floors.get(Math.min((int)(floors.size * percentile), floors.size - 1)), block = blocks.get(Math.min((int)(blocks.size * percentile), blocks.size - 1));
+        int index = Math.min((int)(floors.size * percentile), floors.size - 1);
+        int floor = floors.get(index), block = blocks.get(index);
 
         in.floor = content.block(floor);
         if(!content.block(block).synthetic() && !in.block.synthetic()) in.block = content.block(block);

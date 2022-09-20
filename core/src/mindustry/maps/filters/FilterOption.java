@@ -3,7 +3,6 @@ package mindustry.maps.filters;
 
 import arc.*;
 import arc.func.*;
-import arc.input.*;
 import arc.scene.*;
 import arc.scene.event.*;
 import arc.scene.style.*;
@@ -104,40 +103,25 @@ public abstract class FilterOption{
 
         @Override
         public void build(Table table){
-            Button button = table.button(b -> b.image(supplier.get().uiIcon).update(i -> ((TextureRegionDrawable)i.getDrawable())
+            table.button(b -> b.image(supplier.get().uiIcon).update(i -> ((TextureRegionDrawable)i.getDrawable())
                 .setRegion(supplier.get() == Blocks.air ? Icon.none.getRegion() : supplier.get().uiIcon)).size(iconSmall), () -> {
-                BaseDialog dialog = new BaseDialog("@filter.option." + name);
-                dialog.cont.pane(t -> {
-                    int i = 0;
-                    for(Block block : Vars.content.blocks()){
-                        if(!filter.get(block)) continue;
+                BaseDialog dialog = new BaseDialog("");
+                dialog.setFillParent(false);
+                int i = 0;
+                for(Block block : Vars.content.blocks()){
+                    if(!filter.get(block)) continue;
 
-                        t.image(block == Blocks.air ? Icon.none.getRegion() : block.uiIcon).size(iconMed).pad(3).tooltip(block == Blocks.air ? "@none" : block.localizedName).get().clicked(() -> {
-                            consumer.get(block);
-                            dialog.hide();
-                            changed.run();
-                        });
-                        if(++i % 10 == 0) t.row();
-                    }
-                    dialog.setFillParent(i > 100);
-                }).padRight(8f).scrollX(false);
-
-
-                dialog.addCloseButton();
-                dialog.show();
-            }).pad(4).margin(12f).get();
-
-            button.clicked(KeyCode.mouseMiddle, () -> {
-                Core.app.setClipboardText(supplier.get().name);
-                ui.showInfoFade("@copied");
-            });
-
-            button.clicked(KeyCode.mouseRight, () -> {
-                if(content.block(Core.app.getClipboardText()) != null && filter.get(content.block(Core.app.getClipboardText()))){
-                    consumer.get(content.block(Core.app.getClipboardText()));
-                    changed.run();
+                    dialog.cont.image(block == Blocks.air ? Icon.none.getRegion() : block.uiIcon).size(iconMed).pad(3).get().clicked(() -> {
+                        consumer.get(block);
+                        dialog.hide();
+                        changed.run();
+                    });
+                    if(++i % 10 == 0) dialog.cont.row();
                 }
-            });
+
+                dialog.closeOnBack();
+                dialog.show();
+            }).pad(4).margin(12f);
 
             table.add("@filter.option." + name);
         }
@@ -158,7 +142,6 @@ public abstract class FilterOption{
         public void build(Table table){
             table.row();
             CheckBox check = table.check("@filter.option." + name, setter).growX().padBottom(5).padTop(5).center().get();
-            check.setChecked(getter.get());
             check.changed(changed);
         }
     }

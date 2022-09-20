@@ -36,7 +36,7 @@ public class SectorGenerateDialog extends BaseDialog{
                 int i = 0;
 
                 for(var plan : content.planets()){
-                    if(plan.generator == null || plan.sectors.size == 0 || !plan.accessible) continue;
+                    if(plan.generator == null || plan.sectors.size == 0) continue;
 
                     p.button(plan.localizedName, Styles.flatTogglet, () -> {
                         planet = plan;
@@ -93,7 +93,7 @@ public class SectorGenerateDialog extends BaseDialog{
                 var preset = sectorobj.preset;
                 sectorobj.preset = null;
 
-                world.loadSector(sectorobj, seed, false);
+                world.loadSector(sectorobj, seed);
 
                 sectorobj.preset = preset;
 

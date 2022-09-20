@@ -8,12 +8,13 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 
+/** Not standalone. */
 public class DrawRegion extends DrawBlock{
     public TextureRegion region;
     public String suffix = "";
     public boolean spinSprite = false;
     public boolean drawPlan = true;
-    public float rotateSpeed, x, y, rotation;
+    public float rotateSpeed, x, y;
     /** Any number <=0 disables layer changes. */
     public float layer = -1;
 
@@ -29,9 +30,9 @@ public class DrawRegion extends DrawBlock{
         float z = Draw.z();
         if(layer > 0) Draw.z(layer);
         if(spinSprite){
-            Drawf.spinSprite(region, build.x + x, build.y + y, build.totalProgress() * rotateSpeed + rotation);
+            Drawf.spinSprite(region, build.x + x, build.y + y, build.totalProgress() * rotateSpeed);
         }else{
-            Draw.rect(region, build.x + x, build.y + y, build.totalProgress() * rotateSpeed + rotation);
+            Draw.rect(region, build.x + x, build.y + y, build.totalProgress() * rotateSpeed);
         }
         Draw.z(z);
     }

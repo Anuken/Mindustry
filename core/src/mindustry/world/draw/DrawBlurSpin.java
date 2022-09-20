@@ -6,6 +6,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 
+/** Not standalone. */
 public class DrawBlurSpin extends DrawBlock{
     public TextureRegion region, blurRegion;
     public String suffix = "";

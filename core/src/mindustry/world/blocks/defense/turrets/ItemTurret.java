@@ -31,15 +31,18 @@ public class ItemTurret extends Turret{
         ammoTypes = ObjectMap.of(objects);
     }
 
-    /** Limits bullet range to this turret's range value. */
+    /** Makes copies of all bullets and limits their range. */
     public void limitRange(){
         limitRange(9f);
     }
 
-    /** Limits bullet range to this turret's range value. */
+    /** Makes copies of all bullets and limits their range. */
     public void limitRange(float margin){
-        for(var entry : ammoTypes.entries()){
-            limitRange(entry.value, margin);
+        for(var entry : ammoTypes.copy().entries()){
+            var bullet = entry.value;
+            float realRange = bullet.rangeChange + range;
+            //doesn't handle drag
+            bullet.lifetime = (realRange + margin) / bullet.speed;
         }
     }
 

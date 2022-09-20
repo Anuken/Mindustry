@@ -20,6 +20,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 def genFolder = "../core/assets-raw/sprites_out/generated/"
+def doAntialias = !project.hasProperty("disableAntialias")
 def enableAA = true
 
 @groovy.transform.CompileStatic
@@ -315,7 +316,7 @@ task updateBundles{
             removals.clear()
 
             for(String key : other.orderedKeys()){
-                if(!base.containsKey(key) && key.contains(".details") && false){
+                if(!base.containsKey(key) && key.contains(".details")){
                     extras.put(key, other.get(key))
                 }else if(!base.containsKey(key)){
                     removals.add(key)

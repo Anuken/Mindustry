@@ -76,7 +76,7 @@ public class Incinerator extends Block{
 
         @Override
         public boolean acceptLiquid(Building source, Liquid liquid){
-            return heat > 0.5f && liquid.incinerable;
+            return heat > 0.5f;
         }
     }
 }

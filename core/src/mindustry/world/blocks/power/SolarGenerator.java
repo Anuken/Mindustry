@@ -26,7 +26,7 @@ public class SolarGenerator extends PowerGenerator{
         @Override
         public void updateTile(){
             productionEfficiency = enabled ?
-                state.rules.solarMultiplier * Mathf.maxZero(Attribute.light.env() +
+                Mathf.maxZero(Attribute.light.env() +
                     (state.rules.lighting ?
                         1f - state.rules.ambientLight.a :
                         1f

@@ -5,7 +5,6 @@ import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.game.*;
 import mindustry.gen.*;
-import mindustry.type.*;
 
 import static mindustry.Vars.*;
 
@@ -13,14 +12,11 @@ import static mindustry.Vars.*;
 abstract class BoundedComp implements Velc, Posc, Healthc, Flyingc{
     static final float warpDst = 30f;
 
-    @Import UnitType type;
     @Import float x, y;
     @Import Team team;
 
     @Override
     public void update(){
-        if(!type.bounded) return;
-        
         float bot = 0f, left = 0f, top = world.unitHeight(), right = world.unitWidth();
 
         //TODO hidden map rules only apply to player teams? should they?

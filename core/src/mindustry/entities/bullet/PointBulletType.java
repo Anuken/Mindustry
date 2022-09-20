@@ -16,7 +16,6 @@ public class PointBulletType extends BulletType{
          scaleLife = true;
          lifetime = 100f;
          collides = false;
-         reflectable = false;
          keepVelocity = false;
          backMove = false;
      }
@@ -43,7 +42,7 @@ public class PointBulletType extends BulletType{
         float range = 1f;
 
         Units.nearbyEnemies(b.team, px - range, py - range, range*2f, range*2f, e -> {
-            if(e.dead() || !e.checkTarget(collidesAir, collidesGround) || !e.hittable()) return;
+            if(e.dead()) return;
 
             e.hitbox(Tmp.r1);
             if(!Tmp.r1.contains(px, py)) return;
@@ -57,7 +56,7 @@ public class PointBulletType extends BulletType{
 
         if(result != null){
             b.collision(result, px, py);
-        }else if(collidesTiles){
+        }else{
             Building build = Vars.world.buildWorld(px, py);
             if(build != null && build.team != b.team){
                 build.collision(b);

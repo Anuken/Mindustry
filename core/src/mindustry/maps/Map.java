@@ -105,7 +105,7 @@ public class Map implements Comparable<Map>, Publishable{
             return result;
         }catch(Exception e){
             //error reading rules. ignore?
-            Log.err(e);
+            e.printStackTrace();
             return new Rules();
         }
     }

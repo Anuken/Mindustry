@@ -507,23 +507,19 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     public @Nullable Tile nearby(int rotation){
-        return switch(rotation){
-            case 0 -> world.tile(x + 1, y);
-            case 1 -> world.tile(x, y + 1);
-            case 2 -> world.tile(x - 1, y);
-            case 3 -> world.tile(x, y - 1);
-            default -> null;
-        };
+        if(rotation == 0) return world.tile(x + 1, y);
+        if(rotation == 1) return world.tile(x, y + 1);
+        if(rotation == 2) return world.tile(x - 1, y);
+        if(rotation == 3) return world.tile(x, y - 1);
+        return null;
     }
 
     public @Nullable Building nearbyBuild(int rotation){
-        return switch(rotation){
-            case 0 -> world.build(x + 1, y);
-            case 1 -> world.build(x, y + 1);
-            case 2 -> world.build(x - 1, y);
-            case 3 -> world.build(x, y - 1);
-            default -> null;
-        };
+        if(rotation == 0) return world.build(x + 1, y);
+        if(rotation == 1) return world.build(x, y + 1);
+        if(rotation == 2) return world.build(x - 1, y);
+        if(rotation == 3) return world.build(x, y - 1);
+        return null;
     }
 
     public boolean interactable(Team team){
@@ -537,7 +533,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     public @Nullable Item wallDrop(){
         return block.solid ?
             block.itemDrop != null ? block.itemDrop :
-            overlay.wallOre && !block.synthetic() ? overlay.itemDrop :
+            overlay.wallOre ? overlay.itemDrop :
             null : null;
     }
 
@@ -658,7 +654,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
 
         table.table(t -> {
             t.left();
-            t.add(new Image(toDisplay.getDisplayIcon(this))).scaling(Scaling.fit).size(8 * 4);
+            t.add(new Image(toDisplay.getDisplayIcon(this))).size(8 * 4);
             t.labelWrap(toDisplay.getDisplayName(this)).left().width(190f).padLeft(5);
         }).growX().left();
     }
@@ -709,22 +705,20 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         }
     }
 
-    @Remote(called = Loc.server)
-    public static void buildDestroyed(Building build){
+    @Remote(called = Loc.server, unreliable = true)
+    public static void tileDamage(Building build, float health){
         if(build == null) return;
-        build.killed();
+
+        build.health = health;
+
+        if(build.damaged()){
+            indexer.notifyBuildDamaged(build);
+        }
     }
 
-    @Remote
-    public static void buildHealthUpdate(IntSeq buildings){
-        for(int i = 0; i < buildings.size; i += 2){
-            int pos = buildings.items[i];
-            float health = Float.intBitsToFloat(buildings.items[i + 1]);
-            var build = world.build(pos);
-            if(build != null && build.health != health){
-                build.health = health;
-                indexer.notifyHealthChanged(build);
-            }
-        }
+    @Remote(called = Loc.server)
+    public static void tileDestroyed(Building build){
+        if(build == null) return;
+        build.killed();
     }
 }

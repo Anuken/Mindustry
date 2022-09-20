@@ -7,7 +7,7 @@ buildscript{
     }
 
     dependencies{
-        classpath 'com.android.tools.build:gradle:7.2.1'
+        classpath 'com.android.tools.build:gradle:7.0.3'
     }
 }
 
@@ -23,14 +23,14 @@ repositories{
 task deploy(type: Copy){
     dependsOn "assembleRelease"
 
-    from "build/outputs/apk/release/android-release.apk"
+    from "build/outputs/apk/standard/release/android-standard-release.apk"
     into "../deploy/"
-    rename("android-release.apk", "${generateDeployName('android')}.apk")
+    rename("android-standard-release.apk", "${generateDeployName('android')}.apk")
 }
 
 android{
-    buildToolsVersion '31.0.0'
-    compileSdkVersion 31
+    buildToolsVersion '30.0.3'
+    compileSdkVersion 30
     sourceSets{
         main{
             manifest.srcFile 'AndroidManifest.xml'
@@ -56,7 +56,7 @@ android{
 
         applicationId "io.anuke.mindustry"
         minSdkVersion 14
-        targetSdkVersion 31
+        targetSdkVersion 30
         
         versionName versionNameResult
         versionCode = vcode

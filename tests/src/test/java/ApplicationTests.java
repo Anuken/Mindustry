@@ -893,43 +893,41 @@ public class ApplicationTests{
                     }
                 }
 
-                if(state.rules.waves){
-                    Seq<SpawnGroup> spawns = state.rules.spawns;
+                Seq<SpawnGroup> spawns = state.rules.spawns;
 
-                    int bossWave = 0;
-                    if(state.rules.winWave > 0){
-                        bossWave = state.rules.winWave;
-                    }else{
-                        outer:
-                        for(int i = 1; i <= 1000; i++){
-                            for(SpawnGroup spawn : spawns){
-                                if(spawn.effect == StatusEffects.boss && spawn.getSpawned(i) > 0){
-                                    bossWave = i;
-                                    break outer;
-                                }
+                int bossWave = 0;
+                if(state.rules.winWave > 0){
+                    bossWave = state.rules.winWave;
+                }else{
+                    outer:
+                    for(int i = 1; i <= 1000; i++){
+                        for(SpawnGroup spawn : spawns){
+                            if(spawn.effect == StatusEffects.boss && spawn.getSpawned(i) > 0){
+                                bossWave = i;
+                                break outer;
                             }
                         }
                     }
+                }
 
-                    if(state.rules.attackMode){
-                        bossWave = 100;
-                    }else{
-                        assertNotEquals(0, bossWave, "Sector " + zone.name + " doesn't have a boss/end wave.");
+                if(state.rules.attackMode){
+                    bossWave = 100;
+                }else{
+                    assertNotEquals(0, bossWave, "Sector " + zone.name + " doesn't have a boss/end wave.");
+                }
+
+                if(state.rules.winWave > 0) bossWave = state.rules.winWave - 1;
+
+                //TODO check for difficulty?
+                for(int i = 1; i <= bossWave; i++){
+                    int total = 0;
+                    for(SpawnGroup spawn : spawns){
+                        total += spawn.getSpawned(i - 1);
                     }
 
-                    if(state.rules.winWave > 0) bossWave = state.rules.winWave - 1;
-
-                    //TODO check for difficulty?
-                    for(int i = 1; i <= bossWave; i++){
-                        int total = 0;
-                        for(SpawnGroup spawn : spawns){
-                            total += spawn.getSpawned(i - 1);
-                        }
-
-                        assertNotEquals(0, total, "Sector " + zone + " has no spawned enemies at wave " + i);
-                        //TODO this is flawed and needs to be changed later
-                        //assertTrue(total < 75, "Sector spawns too many enemies at wave " + i + " (" + total + ")");
-                    }
+                    assertNotEquals(0, total, "Sector " + zone + " has no spawned enemies at wave " + i);
+                    //TODO this is flawed and needs to be changed later
+                    //assertTrue(total < 75, "Sector spawns too many enemies at wave " + i + " (" + total + ")");
                 }
 
                 assertEquals(1, Team.sharded.cores().size, "Sector must have one core: " + zone);

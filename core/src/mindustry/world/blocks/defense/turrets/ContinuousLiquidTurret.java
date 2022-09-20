@@ -58,7 +58,7 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
         super.init();
     }
 
-    public class ContinuousLiquidTurretBuild extends ContinuousTurretBuild{
+    public class LiquidTurretBuild extends ContinuousTurretBuild{
 
         @Override
         public boolean shouldActiveSound(){
@@ -73,11 +73,6 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
         }
 
         @Override
-        public boolean canConsume(){
-            return hasCorrectAmmo() && super.canConsume();
-        }
-
-        @Override
         public BulletType useAmmo(){
             //does not consume ammo upon firing
             return peekAmmo();
@@ -86,15 +81,6 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
         @Override
         public BulletType peekAmmo(){
             return ammoTypes.get(liquids.current());
-        }
-
-        @Override
-        public boolean hasAmmo(){
-            return hasCorrectAmmo() && ammoTypes.get(liquids.current()) != null && liquids.currentAmount() >= 1f / ammoTypes.get(liquids.current()).ammoMultiplier;
-        }
-
-        public boolean hasCorrectAmmo(){
-            return !bullets.any() || bullets.first().bullet.type == peekAmmo();
         }
 
         @Override

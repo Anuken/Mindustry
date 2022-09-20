@@ -225,7 +225,7 @@ public class Control implements ApplicationListener, Loadable{
                         if(!(build instanceof CoreBuild) && !build.block.privileged){
                             var ccore = build.closestCore();
 
-                            if(ccore != null){
+                            if(ccore != null && build.within(ccore, buildRadius)){
                                 anyBuilds = true;
 
                                 if(!net.active()){
@@ -275,7 +275,9 @@ public class Control implements ApplicationListener, Loadable{
     }
 
     private void placeLandBuild(Building build){
+        //TODO instance reuse bad?
         build.tile.setBlock(build.block, build.team, build.rotation, () -> build);
+        //TODO dropped bad?
         build.dropped();
 
         Fx.coreBuildBlock.at(build.x, build.y, 0f, build.block);
@@ -420,7 +422,7 @@ public class Control implements ApplicationListener, Loadable{
 
                             //set spawn for sector damage to use
                             Tile spawn = world.tile(sector.info.spawnPosition);
-                            spawn.setBlock(sector.planet.defaultCore, state.rules.defaultTeam);
+                            spawn.setBlock(Blocks.coreShard, state.rules.defaultTeam);
 
                             //add extra damage.
                             SectorDamage.apply(1f);

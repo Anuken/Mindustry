@@ -24,7 +24,7 @@ import static mindustry.Vars.*;
 public class LoadDialog extends BaseDialog{
     Table slots;
     String searchString;
-    Seq<Gamemode> filteredModes;
+    Gamemode filteredMode;
     TextField searchField;
     ScrollPane pane;
 
@@ -50,7 +50,6 @@ public class LoadDialog extends BaseDialog{
         cont.clear();
 
         slots = new Table();
-        filteredModes = new Seq<>();
         pane = new ScrollPane(slots);
 
         rebuild();
@@ -67,9 +66,9 @@ public class LoadDialog extends BaseDialog{
             boolean sandbox = mode == Gamemode.sandbox;
             if(Core.atlas.isFound(icon.getRegion()) || sandbox){
                 search.button(sandbox ? Icon.terrain : icon, Styles.emptyTogglei, () -> {
-                    if(!filteredModes.addUnique(mode)) filteredModes.remove(mode);
+                    filteredMode = filteredMode == mode ? null : mode;
                     rebuild();
-                }).size(60f).padLeft(-8f).checked(b -> !filteredModes.contains(mode)).tooltip("@mode." + mode.name() + ".name");
+                }).size(60f).checked(b -> filteredMode == mode).tooltip("@mode." + mode.name() + ".name");
             }
         }
 
@@ -98,13 +97,13 @@ public class LoadDialog extends BaseDialog{
         for(SaveSlot slot : array){
             if(slot.isHidden()
             || (searchString != null && !Strings.stripColors(slot.getName()).toLowerCase().contains(searchString))
-            || (!filteredModes.isEmpty() && filteredModes.contains(slot.mode()))){
+            || (filteredMode != null && filteredMode != slot.mode())){
                 continue;
             }
 
             any = true;
 
-            TextButton button = new TextButton("", Styles.grayt);
+            TextButton button = new TextButton("", Styles.flatt);
             button.getLabel().remove();
             button.clearChildren();
 

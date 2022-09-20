@@ -7,6 +7,7 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
+/** Not standalone. */
 public class DrawLiquidRegion extends DrawBlock{
     public Liquid drawLiquid;
     public TextureRegion liquid;

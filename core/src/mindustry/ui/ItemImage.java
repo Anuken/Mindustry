@@ -3,7 +3,6 @@ package mindustry.ui;
 import arc.graphics.g2d.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
-import arc.util.*;
 import mindustry.core.*;
 import mindustry.type.*;
 
@@ -13,7 +12,7 @@ public class ItemImage extends Stack{
 
         add(new Table(o -> {
             o.left();
-            o.add(new Image(region)).size(32f).scaling(Scaling.fit);
+            o.add(new Image(region)).size(32f);
         }));
 
         if(amount != 0){

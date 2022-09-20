@@ -131,48 +131,22 @@ public class UnitAssembler extends PayloadBlock{
         super.setStats();
 
         stats.add(Stat.output, table -> {
+            Seq<AssemblerUnitPlan> p = plans.select(u -> u.unit.unlockedNow());
             table.row();
-
-            int tier = 0;
-            for(var plan : plans){
-                int ttier = tier;
-                table.table(Styles.grayPanel, t -> {
-
-                    if(plan.unit.isBanned()){
-                        t.image(Icon.cancel).color(Pal.remove).size(40).pad(10);
-                        return;
-                    }
-
-                    if(plan.unit.unlockedNow()){
-                        t.image(plan.unit.uiIcon).scaling(Scaling.fit).size(40).pad(10f).left();
-                        t.table(info -> {
-                            info.defaults().left();
-                            info.add(plan.unit.localizedName);
-                            info.row();
-                            info.add(Strings.autoFixed(plan.time / 60f, 1) + " " + Core.bundle.get("unit.seconds")).color(Color.lightGray);
-                            if(ttier > 0){
-                                info.row();
-                                info.add(Stat.moduleTier.localized() + ": " + ttier).color(Color.lightGray);
-                            }
-                        }).left();
-
-                        t.table(req -> {
-                            req.right();
-                            for(int i = 0; i < plan.requirements.size; i++){
-                                if(i % 6 == 0){
-                                    req.row();
-                                }
-
-                                PayloadStack stack = plan.requirements.get(i);
-                                req.add(new ItemImage(stack)).pad(5);
-                            }
-                        }).right().grow().pad(10f);
-                    }else{
-                        t.image(Icon.lock).color(Pal.darkerGray).size(40).pad(10);
-                    }
-                }).growX().pad(5);
-                table.row();
-                tier++;
+            for(var plan : p){
+                if(plan.unit.unlockedNow()){
+                    table.image(plan.unit.uiIcon).size(8 * 3).padRight(2).right();
+                    table.add(plan.unit.localizedName).left();
+                    table.add(Strings.autoFixed(plan.time / 60f, 1) + " " + Core.bundle.get("unit.seconds")).color(Color.lightGray).padLeft(12).left();
+                    table.row();
+                    table.add().right();
+                    table.table(t -> {
+                        t.left();
+                        for(var stack : plan.requirements){
+                            t.add(new ItemImage(stack)).padRight(4).padTop(4).left();
+                        }
+                    }).left().fillX().padLeft(-8 * 3f - 2).padBottom(6).row();
+                }
             }
         });
     }
@@ -226,7 +200,6 @@ public class UnitAssembler extends PayloadBlock{
         public float progress, warmup, droneWarmup, powerWarmup, sameTypeWarmup;
         public float invalidWarmup = 0f;
         public int currentTier = 0;
-        public int lastTier = -2;
         public boolean wasOccupied = false;
 
         public float droneProgress, totalDroneProgress;
@@ -274,7 +247,6 @@ public class UnitAssembler extends PayloadBlock{
                     break;
                 }
             }
-
             currentTier = max;
         }
 
@@ -298,8 +270,6 @@ public class UnitAssembler extends PayloadBlock{
             for(var module : modules){
                 Drawf.selected(module, Pal.accent);
             }
-
-            Drawf.dashRect(Tmp.c1.set(Pal.accent).lerp(Pal.remove, invalidWarmup), getRect(Tmp.r1, x, y, rotation));
         }
 
         @Override
@@ -322,7 +292,7 @@ public class UnitAssembler extends PayloadBlock{
                     prev = mod.block;
                 }
 
-                t.label(() -> "[accent] -> []" + unit().emoji() + " " + unit().localizedName);
+                t.label(() -> "[accent] -> []" + unit().emoji() + " " + unit().name);
             }).pad(4).padLeft(0f).fillX().left();
         }
 
@@ -337,15 +307,6 @@ public class UnitAssembler extends PayloadBlock{
                     }
                 });
                 readUnits.clear();
-            }
-
-            if(lastTier != currentTier){
-                if(lastTier >= 0f){
-                    progress = 0f;
-                }
-
-                lastTier =
-                    lastTier == -2 ? -1 : currentTier;
             }
 
             //read newly synced drones on client end
@@ -372,7 +333,7 @@ public class UnitAssembler extends PayloadBlock{
             droneWarmup = Mathf.lerpDelta(droneWarmup, units.size < dronesCreated ? powerStatus : 0f, 0.1f);
             totalDroneProgress += droneWarmup * delta();
 
-            if(units.size < dronesCreated && (droneProgress += delta() * state.rules.unitBuildSpeed(team) * powerStatus / droneConstructTime) >= 1f){
+            if(units.size < dronesCreated && (droneProgress += delta() * powerStatus / droneConstructTime) >= 1f){
                 if(!net.client()){
                     var unit = droneType.create(team);
                     if(unit instanceof BuildingTetherc bt){
@@ -419,7 +380,7 @@ public class UnitAssembler extends PayloadBlock{
             if(!wasOccupied && efficiency > 0 && Units.canCreate(team, plan.unit)){
                 warmup = Mathf.lerpDelta(warmup, efficiency, 0.1f);
 
-                if((progress += edelta() * state.rules.unitBuildSpeed(team) * eff / plan.time) >= 1f){
+                if((progress += edelta() * eff / plan.time) >= 1f){
                     Call.assemblerUnitSpawned(tile);
                 }
             }else{

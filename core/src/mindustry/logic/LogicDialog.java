@@ -6,11 +6,9 @@ import arc.graphics.*;
 import arc.scene.actions.*;
 import arc.scene.ui.*;
 import arc.scene.ui.TextButton.*;
-import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.core.GameState.*;
 import mindustry.ctype.*;
-import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.LExecutor.*;
@@ -37,49 +35,6 @@ public class LogicDialog extends BaseDialog{
 
         addCloseListener();
 
-        shown(this::setup);
-        hidden(() -> consumer.get(canvas.save()));
-        onResize(() -> {
-            setup();
-            canvas.rebuild();
-        });
-
-        add(canvas).grow().name("canvas");
-
-        row();
-
-        add(buttons).growX().name("canvas");
-    }
-
-    private Color typeColor(Var s, Color color){
-        return color.set(
-            !s.isobj ? Pal.place :
-            s.objval == null ? Color.darkGray :
-            s.objval instanceof String ? Pal.ammo :
-            s.objval instanceof Content ? Pal.logicOperations :
-            s.objval instanceof Building ? Pal.logicBlocks :
-            s.objval instanceof Unit ? Pal.logicUnits :
-            s.objval instanceof Team ? Pal.logicUnits :
-            s.objval instanceof Enum<?> ? Pal.logicIo :
-            Color.white
-        );
-    }
-
-    private String typeName(Var s){
-        return
-            !s.isobj ? "number" :
-            s.objval == null ? "null" :
-            s.objval instanceof String ? "string" :
-            s.objval instanceof Content ? "content" :
-            s.objval instanceof Building ? "building" :
-            s.objval instanceof Team ? "team" :
-            s.objval instanceof Unit ? "unit" :
-            s.objval instanceof Enum<?> ? "enum" :
-            "unknown";
-    }
-
-    private void setup(){
-        buttons.clearChildren();
         buttons.defaults().size(160f, 64f);
         buttons.button("@back", Icon.left, this::hide).name("back");
 
@@ -111,7 +66,7 @@ public class LogicDialog extends BaseDialog{
             dialog.show();
         }).name("edit");
 
-        if(Core.graphics.isPortrait()) buttons.row();
+        if(mobile && !Core.graphics.isPortrait()) buttons.row();
 
         buttons.button("@variables", Icon.menu, () -> {
             BaseDialog dialog = new BaseDialog("@variables");
@@ -136,6 +91,26 @@ public class LogicDialog extends BaseDialog{
 
                         Color varColor = Pal.gray;
                         float stub = 8f, mul = 0.5f, pad = 4;
+
+                        Color color =
+                            !s.isobj ? Pal.place :
+                            s.objval == null ? Color.darkGray :
+                            s.objval instanceof String ? Pal.ammo :
+                            s.objval instanceof Content ? Pal.logicOperations :
+                            s.objval instanceof Building ? Pal.logicBlocks :
+                            s.objval instanceof Unit ? Pal.logicUnits :
+                            s.objval instanceof Enum<?> ? Pal.logicIo :
+                            Color.white;
+
+                        String typeName =
+                            !s.isobj ? "number" :
+                            s.objval == null ? "null" :
+                            s.objval instanceof String ? "string" :
+                            s.objval instanceof Content ? "content" :
+                            s.objval instanceof Building ? "building" :
+                            s.objval instanceof Unit ? "unit" :
+                            s.objval instanceof Enum<?> ? "enum" :
+                            "unknown";
 
                         t.add(new Image(Tex.whiteui, varColor.cpy().mul(mul))).width(stub);
                         t.stack(new Image(Tex.whiteui, varColor), new Label(" " + s.name + " ", Styles.outlineLabel){{
@@ -162,13 +137,9 @@ public class LogicDialog extends BaseDialog{
                             label.act(1f);
                         }).padRight(pad);
 
-                        t.add(new Image(Tex.whiteui, typeColor(s, new Color()).mul(mul))).update(i -> i.setColor(typeColor(s, i.color).mul(mul))).width(stub);
-
-                        t.stack(new Image(Tex.whiteui, typeColor(s, new Color())){{
-                            update(() -> setColor(typeColor(s, color)));
-                        }}, new Label(() -> " " + typeName(s) + " "){{
-                            setStyle(Styles.outlineLabel);
-                        }});
+                        //TODO type name does not update, is this important?
+                        t.add(new Image(Tex.whiteui, color.cpy().mul(mul))).width(stub);
+                        t.stack(new Image(Tex.whiteui, color), new Label(" " + typeName + " ", Styles.outlineLabel));
 
                         t.row();
 
@@ -183,48 +154,37 @@ public class LogicDialog extends BaseDialog{
 
         buttons.button("@add", Icon.add, () -> {
             BaseDialog dialog = new BaseDialog("@add");
-            dialog.cont.table(table -> {
-                table.background(Tex.button);
-                table.pane(t -> {
-                    for(Prov<LStatement> prov : LogicIO.allStatements){
-                        LStatement example = prov.get();
-                        if(example instanceof InvalidStatement || example.hidden() || (example.privileged() && !privileged) || (example.nonPrivileged() && privileged)) continue;
+            dialog.cont.pane(t -> {
+                t.background(Tex.button);
+                int i = 0;
+                for(Prov<LStatement> prov : LogicIO.allStatements){
+                    LStatement example = prov.get();
+                    if(example instanceof InvalidStatement || example.hidden() || (example.privileged() && !privileged) || (example.nonPrivileged() && privileged)) continue;
 
-                        LCategory category = example.category();
-                        Table cat = t.find(category.name);
-                        if(cat == null){
-                            t.table(s -> {
-                                if(category.icon != null){
-                                    s.image(category.icon, Pal.darkishGray).left().size(15f).padRight(10f);
-                                }
-                                s.add(category.localized()).color(Pal.darkishGray).left().tooltip(category.description());
-                                s.image(Tex.whiteui, Pal.darkishGray).left().height(5f).growX().padLeft(10f);
-                            }).growX().pad(5f).padTop(10f);
+                    TextButtonStyle style = new TextButtonStyle(Styles.flatt);
+                    style.fontColor = example.color();
+                    style.font = Fonts.outline;
 
-                            t.row();
-
-                            cat = t.table(c -> {
-                                c.top().left();
-                            }).name(category.name).top().left().growX().fillY().get();
-                            t.row();
-                        }
-
-                        TextButtonStyle style = new TextButtonStyle(Styles.flatt);
-                        style.fontColor = category.color;
-                        style.font = Fonts.outline;
-
-                        cat.button(example.name(), style, () -> {
-                            canvas.add(prov.get());
-                            dialog.hide();
-                        }).size(130f, 50f).self(c -> tooltip(c, "lst." + example.name())).top().left();
-
-                        if(cat.getChildren().size % 3 == 0) cat.row();
-                    }
-                }).grow();
-            }).fill().maxHeight(Core.graphics.getHeight() * 0.8f);
+                    t.button(example.name(), style, () -> {
+                        canvas.add(prov.get());
+                        dialog.hide();
+                    }).size(130f, 50f).self(c -> tooltip(c, "lst." + example.name()));
+                    if(++i % 3 == 0) t.row();
+                }
+            });
             dialog.addCloseButton();
             dialog.show();
         }).disabled(t -> canvas.statements.getChildren().size >= LExecutor.maxInstructions);
+
+        add(canvas).grow().name("canvas");
+
+        row();
+
+        add(buttons).growX().name("canvas");
+
+        hidden(() -> consumer.get(canvas.save()));
+
+        onResize(() -> canvas.rebuild());
     }
 
     public void show(String code, LExecutor executor, boolean privileged, Cons<String> modified){

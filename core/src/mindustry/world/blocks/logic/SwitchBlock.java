@@ -1,6 +1,5 @@
 package mindustry.world.blocks.logic;
 
-import arc.audio.*;
 import arc.graphics.g2d.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
@@ -9,8 +8,6 @@ import mindustry.world.*;
 import mindustry.world.meta.*;
 
 public class SwitchBlock extends Block{
-    public Sound clickSound = Sounds.click;
-
     public @Load("@-on") TextureRegion onRegion;
 
     public SwitchBlock(String name){
@@ -30,7 +27,7 @@ public class SwitchBlock extends Block{
         @Override
         public boolean configTapped(){
             configure(!enabled);
-            clickSound.at(this);
+            Sounds.click.at(this);
             return false;
         }
 

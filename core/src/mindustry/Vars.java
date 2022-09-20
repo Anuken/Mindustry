@@ -54,8 +54,8 @@ public class Vars implements Loadable{
     public static final int defaultEnv = Env.terrestrial | Env.spores | Env.groundOil | Env.groundWater | Env.oxygen;
     /** Wall darkness radius. */
     public static final int darkRadius = 4;
-    /** Maximum extra padding around deployment schematics. */
-    public static final int maxLoadoutSchematicPad = 5;
+    /** Maximum extra padding around deployment schematics. TODO 4, or 5?*/
+    public static final int maxLoadoutSchematicPad = 4;
     /** All schematic base64 starts with this string.*/
     public static final String schematicBaseStart ="bXNjaA";
     /** IO buffer size. */
@@ -170,6 +170,8 @@ public class Vars implements Loadable{
     public static boolean headless;
     /** whether steam is enabled for this game */
     public static boolean steam;
+    /** whether typing into the console is enabled - developers only TODO change */
+    public static boolean enableConsole = true;
     /** whether to clear sector saves when landing */
     public static boolean clearSectors = false;
     /** whether any light rendering is enabled */
@@ -214,7 +216,7 @@ public class Vars implements Loadable{
     public static Locale[] locales;
 
     //the main executor will only have at most [cores] number of threads active
-    public static ExecutorService mainExecutor = Threads.executor("Main Executor", OS.cores);
+    public static ExecutorService mainExecutor = Threads.cachedExecutor(1, OS.cores, true);
 
     public static FileTree tree = new FileTree();
     public static Net net;
@@ -279,10 +281,6 @@ public class Vars implements Loadable{
         Version.init();
         CacheLayer.init();
 
-        if(!headless){
-            Log.info("[Mindustry] Version: @", Version.buildString());
-        }
-
         dataDirectory = settings.getDataDirectory();
         screenshotDirectory = dataDirectory.child("screenshots/");
         customMapDirectory = dataDirectory.child("maps/");
@@ -316,8 +314,7 @@ public class Vars implements Loadable{
         logicVars = new GlobalVars();
         javaPath =
             new Fi(OS.prop("java.home")).child("bin/java").exists() ? new Fi(OS.prop("java.home")).child("bin/java").absolutePath() :
-            Core.files.local("jre/bin/java").exists() ? Core.files.local("jre/bin/java").absolutePath() : // Unix
-            Core.files.local("jre/bin/java.exe").exists() ? Core.files.local("jre/bin/java.exe").absolutePath() : // Windows
+            Core.files.local("jre/bin/java").exists() ? Core.files.local("jre/bin/java").absolutePath() :
             "java";
 
         state = new GameState();
@@ -372,7 +369,7 @@ public class Vars implements Loadable{
 
                 result = tags[level.ordinal()] + " " + result;
 
-                if(!headless && (ui == null || ui.consolefrag == null)){
+                if(!headless && (ui == null || ui.scriptfrag == null)){
                     logBuffer.add(result);
                 }else if(!headless){
                     if(!OS.isWindows){
@@ -381,12 +378,12 @@ public class Vars implements Loadable{
                         }
                     }
 
-                    ui.consolefrag.addMessage(Log.removeColors(result));
+                    ui.scriptfrag.addMessage(Log.removeColors(result));
                 }
             }
         };
 
-        Events.on(ClientLoadEvent.class, e -> logBuffer.each(ui.consolefrag::addMessage));
+        Events.on(ClientLoadEvent.class, e -> logBuffer.each(ui.scriptfrag::addMessage));
 
         loadedLogger = true;
     }

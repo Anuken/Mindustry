@@ -188,10 +188,10 @@ public class MapEditorDialog extends Dialog implements Disposable{
             menu.hide();
         }).padTop(!steam && !experimental ? -3 : 1).size(swidth * 2f + 10, 60f);
 
-        resizeDialog = new MapResizeDialog((width, height, shiftX, shiftY) -> {
-            if(!(editor.width() == width && editor.height() == height && shiftX == 0 && shiftY == 0)){
+        resizeDialog = new MapResizeDialog((x, y) -> {
+            if(!(editor.width() == x && editor.height() == y)){
                 ui.loadAnd(() -> {
-                    editor.resize(width, height, shiftX, shiftY);
+                    editor.resize(x, y);
                 });
             }
         });

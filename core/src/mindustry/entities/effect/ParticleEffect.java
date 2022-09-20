@@ -44,7 +44,6 @@ public class ParticleEffect extends Effect{
     //line only
     public boolean line;
     public float strokeFrom = 2f, strokeTo = 0f, lenFrom = 4f, lenTo = 2f;
-    public boolean cap = true;
 
     private @Nullable TextureRegion tex;
 
@@ -78,7 +77,7 @@ public class ParticleEffect extends Effect{
                 rv.trns(realRotation + rand.range(cone), !randLength ? l : rand.random(l));
                 float x = rv.x, y = rv.y;
 
-                Lines.lineAngle(ox + x, oy + y, Mathf.angle(x, y), len, cap);
+                Lines.lineAngle(ox + x, oy + y, Mathf.angle(x, y), len);
                 Drawf.light(ox + x, oy + y, len * lightScl, lightColor, lightOpacity * Draw.getColor().a);
             }
         }else{
