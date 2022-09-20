@@ -28,7 +28,7 @@ public class MenuFragment{
     private Table container, submenu;
     private Button currentMenu;
     private MenuRenderer renderer;
-    private Seq<Buttoni> customButtons = new Seq<>();
+    private Seq<MenuButton> customButtons = new Seq<>();
 
     public void build(Group parent){
         renderer = new MenuRenderer();
@@ -179,23 +179,23 @@ public class MenuFragment{
             t.name = "buttons";
 
             buttons(t,
-                new Buttoni("@play", Icon.play,
-                    new Buttoni("@campaign", Icon.play, () -> checkPlay(ui.planet::show)),
-                    new Buttoni("@joingame", Icon.add, () -> checkPlay(ui.join::show)),
-                    new Buttoni("@customgame", Icon.terrain, () -> checkPlay(ui.custom::show)),
-                    new Buttoni("@loadgame", Icon.download, () -> checkPlay(ui.load::show))
+                new MenuButton("@play", Icon.play,
+                    new MenuButton("@campaign", Icon.play, () -> checkPlay(ui.planet::show)),
+                    new MenuButton("@joingame", Icon.add, () -> checkPlay(ui.join::show)),
+                    new MenuButton("@customgame", Icon.terrain, () -> checkPlay(ui.custom::show)),
+                    new MenuButton("@loadgame", Icon.download, () -> checkPlay(ui.load::show))
                 ),
-                new Buttoni("@database.button", Icon.menu,
-                    new Buttoni("@schematics", Icon.paste, ui.schematics::show),
-                    new Buttoni("@database", Icon.book, ui.database::show),
-                    new Buttoni("@about.button", Icon.info, ui.about::show)
+                new MenuButton("@database.button", Icon.menu,
+                    new MenuButton("@schematics", Icon.paste, ui.schematics::show),
+                    new MenuButton("@database", Icon.book, ui.database::show),
+                    new MenuButton("@about.button", Icon.info, ui.about::show)
                 ),
-                new Buttoni("@editor", Icon.terrain, () -> checkPlay(ui.maps::show)), steam ? new Buttoni("@workshop", Icon.steam, platform::openWorkshop) : null,
-                new Buttoni("@mods", Icon.book, ui.mods::show),
-                new Buttoni("@settings", Icon.settings, ui.settings::show)
+                new MenuButton("@editor", Icon.terrain, () -> checkPlay(ui.maps::show)), steam ? new MenuButton("@workshop", Icon.steam, platform::openWorkshop) : null,
+                new MenuButton("@mods", Icon.book, ui.mods::show),
+                new MenuButton("@settings", Icon.settings, ui.settings::show)
             );
-            buttons(t, customButtons.toArray(Buttoni.class));
-            buttons(t, new Buttoni("@quit", Icon.exit, Core.app::exit));
+            buttons(t, customButtons.toArray(MenuButton.class));
+            buttons(t, new MenuButton("@quit", Icon.exit, Core.app::exit));
         }).width(width).growY();
 
         container.table(background, t -> {
@@ -232,8 +232,8 @@ public class MenuFragment{
         submenu.actions(Actions.alpha(1f), Actions.alpha(0f, 0.2f, Interp.fade), Actions.run(() -> submenu.clearChildren()));
     }
 
-    private void buttons(Table t, Buttoni... buttons){
-        for(Buttoni b : buttons){
+    private void buttons(Table t, MenuButton... buttons){
+        for(MenuButton b : buttons){
             if(b == null) continue;
             Button[] out = {null};
             out[0] = t.button(b.text, b.icon, Styles.flatToggleMenut, () -> {
@@ -263,7 +263,7 @@ public class MenuFragment{
 
     /** Adds a custom button to the menu. */
     public void addButton(String text, Drawable icon, Runnable callback){
-        addButton(new Buttoni(text, icon, callback));
+        addButton(new MenuButton(text, icon, callback));
     }
 
     /** Adds a custom button to the menu. */
@@ -273,24 +273,24 @@ public class MenuFragment{
 
     /** 
      * Adds a custom button to the menu.
-     * If {@link Buttoni#submenu} is null or the player is on mobile, {@link Buttoni#runnable} is invoked on click.
-     * Otherwise, {@link Buttoni#submenu} is shown.
+     * If {@link MenuButton#submenu} is null or the player is on mobile, {@link MenuButton#runnable} is invoked on click.
+     * Otherwise, {@link MenuButton#submenu} is shown.
      */
-    public void addButton(Buttoni button){
+    public void addButton(MenuButton button){
         customButtons.add(button);
     }
 
     /** Represents a menu button definition. */
-    public static class Buttoni{
+    public static class MenuButton{
         public final Drawable icon;
         public final String text;
         /** Runnable ran when the button is clicked. Ignored on desktop if {@link #submenu} is not null. */
         public final Runnable runnable;
         /** Submenu shown when this button is clicked. Used instead of {@link #runnable} on desktop. */
-        public final @Nullable Buttoni[] submenu;
+        public final @Nullable MenuButton[] submenu;
 
         /** Constructs a simple menu button, which behaves the same way on desktop and mobile. */
-        public Buttoni(String text, Drawable icon, Runnable runnable){
+        public MenuButton(String text, Drawable icon, Runnable runnable){
             this.icon = icon;
             this.text = text;
             this.runnable = runnable;
@@ -298,7 +298,7 @@ public class MenuFragment{
         }
 
         /** Constructs a button that runs the runnable when clicked on mobile or shows the submenu on desktop. */
-        public Buttoni(String text, Drawable icon, Runnable runnable, Buttoni... submenu){
+        public MenuButton(String text, Drawable icon, Runnable runnable, MenuButton... submenu){
             this.icon = icon;
             this.text = text;
             this.runnable = runnable;
@@ -306,7 +306,7 @@ public class MenuFragment{
         }
 
         /** Comstructs a desktop-only button; used internally. */
-        Buttoni(String text, Drawable icon, Buttoni... submenu){
+        MenuButton(String text, Drawable icon, MenuButton... submenu){
             this.icon = icon;
             this.text = text;
             this.runnable = () -> {};
