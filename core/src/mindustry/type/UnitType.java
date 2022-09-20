@@ -907,6 +907,8 @@ public class UnitType extends UnlockableContent{
     public void createIcons(MultiPacker packer){
         super.createIcons(packer);
 
+        sample = constructor.get();
+
         var toOutline = new Seq<TextureRegion>();
         getRegionsToOutline(toOutline);
 
@@ -947,7 +949,6 @@ public class UnitType extends UnlockableContent{
             }
         }
 
-        //TODO test
         if(sample instanceof Tankc){
             PixmapRegion pix = Core.atlas.getPixmap(treadRegion);
 
