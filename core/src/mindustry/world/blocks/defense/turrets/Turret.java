@@ -66,6 +66,8 @@ public class Turret extends ReloadTurret{
     public boolean accurateDelay = true;
     /** If false, this turret can't move while charging. */
     public boolean moveWhileCharging = true;
+    /** How long warmup is maintained even if this turret isn't shooting. */
+    public float warmupMaintainTime = 0f;
     /** pattern used for bullets */
     public ShootPattern shoot = new ShootPattern();
 
@@ -206,7 +208,7 @@ public class Turret extends ReloadTurret{
         public Seq<AmmoEntry> ammo = new Seq<>();
         public int totalAmmo;
         public float curRecoil, heat, logicControlTime = -1;
-        public float shootWarmup, charge;
+        public float shootWarmup, charge, warmupHold = 0f;
         public int totalShots;
         public boolean logicShooting = false;
         public @Nullable Posc target;
@@ -343,11 +345,19 @@ public class Turret extends ReloadTurret{
         public void updateTile(){
             if(!validateTarget()) target = null;
 
-            float warmupTarget = isShooting() && canConsume() ? 1f : 0f;
+            float warmupTarget = (isShooting() && canConsume()) || charging() ? 1f : 0f;
+            if(warmupTarget > 0 && shootWarmup >= minWarmup && !isControlled()){
+                warmupHold = 1f;
+            }
+            if(warmupHold > 0f){
+                warmupHold -= Time.delta / warmupMaintainTime;
+                warmupTarget = 1f;
+            }
+
             if(linearWarmup){
-                shootWarmup = Mathf.approachDelta(shootWarmup, warmupTarget, shootWarmupSpeed);
+                shootWarmup = Mathf.approachDelta(shootWarmup, warmupTarget, shootWarmupSpeed * (warmupTarget > 0 ? efficiency : 1f));
             }else{
-                shootWarmup = Mathf.lerpDelta(shootWarmup, warmupTarget, shootWarmupSpeed);
+                shootWarmup = Mathf.lerpDelta(shootWarmup, warmupTarget, shootWarmupSpeed * (warmupTarget > 0 ? efficiency : 1f));
             }
 
             wasShooting = false;
@@ -579,6 +589,16 @@ public class Turret extends ReloadTurret{
 
         protected void handleBullet(@Nullable Bullet bullet, float offsetX, float offsetY, float angleOffset){
 
+        }
+
+        @Override
+        public float activeSoundVolume(){
+            return shootWarmup;
+        }
+
+        @Override
+        public boolean shouldActiveSound(){
+            return shootWarmup > 0.01f && loopSound != Sounds.none;
         }
 
         @Override

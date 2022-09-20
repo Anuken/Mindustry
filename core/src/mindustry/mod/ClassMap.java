@@ -73,6 +73,7 @@ public class ClassMap{
         classes.put("PartParams", mindustry.entities.part.DrawPart.PartParams.class);
         classes.put("PartProgress", mindustry.entities.part.DrawPart.PartProgress.class);
         classes.put("FlarePart", mindustry.entities.part.FlarePart.class);
+        classes.put("HaloPart", mindustry.entities.part.HaloPart.class);
         classes.put("HoverPart", mindustry.entities.part.HoverPart.class);
         classes.put("RegionPart", mindustry.entities.part.RegionPart.class);
         classes.put("ShapePart", mindustry.entities.part.ShapePart.class);
@@ -84,6 +85,7 @@ public class ClassMap{
         classes.put("BulletHandler", mindustry.entities.pattern.ShootPattern.BulletHandler.class);
         classes.put("ShootSine", mindustry.entities.pattern.ShootSine.class);
         classes.put("ShootSpread", mindustry.entities.pattern.ShootSpread.class);
+        classes.put("ShootSummon", mindustry.entities.pattern.ShootSummon.class);
         classes.put("Objectives", mindustry.game.Objectives.class);
         classes.put("Objective", mindustry.game.Objectives.Objective.class);
         classes.put("OnPlanet", mindustry.game.Objectives.OnPlanet.class);
@@ -161,12 +163,12 @@ public class ClassMap{
         classes.put("RadarBuild", mindustry.world.blocks.defense.Radar.RadarBuild.class);
         classes.put("RegenProjector", mindustry.world.blocks.defense.RegenProjector.class);
         classes.put("RegenProjectorBuild", mindustry.world.blocks.defense.RegenProjector.RegenProjectorBuild.class);
-        classes.put("ShieldBreaker", mindustry.world.blocks.defense.ShieldBreaker.class);
-        classes.put("ShieldBreakerBuild", mindustry.world.blocks.defense.ShieldBreaker.ShieldBreakerBuild.class);
         classes.put("ShieldWall", mindustry.world.blocks.defense.ShieldWall.class);
         classes.put("ShieldWallBuild", mindustry.world.blocks.defense.ShieldWall.ShieldWallBuild.class);
         classes.put("ShockMine", mindustry.world.blocks.defense.ShockMine.class);
         classes.put("ShockMineBuild", mindustry.world.blocks.defense.ShockMine.ShockMineBuild.class);
+        classes.put("ShockwaveTower", mindustry.world.blocks.defense.ShockwaveTower.class);
+        classes.put("ShockwaveTowerBuild", mindustry.world.blocks.defense.ShockwaveTower.ShockwaveTowerBuild.class);
         classes.put("Thruster", mindustry.world.blocks.defense.Thruster.class);
         classes.put("ThrusterBuild", mindustry.world.blocks.defense.Thruster.ThrusterBuild.class);
         classes.put("Wall", mindustry.world.blocks.defense.Wall.class);
@@ -226,7 +228,7 @@ public class ClassMap{
         classes.put("DriverState", mindustry.world.blocks.distribution.MassDriver.DriverState.class);
         classes.put("MassDriverBuild", mindustry.world.blocks.distribution.MassDriver.MassDriverBuild.class);
         classes.put("OverflowDuct", mindustry.world.blocks.distribution.OverflowDuct.class);
-        classes.put("DuctRouterBuild", mindustry.world.blocks.distribution.OverflowDuct.DuctRouterBuild.class);
+        classes.put("OverflowDuctBuild", mindustry.world.blocks.distribution.OverflowDuct.OverflowDuctBuild.class);
         classes.put("OverflowGate", mindustry.world.blocks.distribution.OverflowGate.class);
         classes.put("OverflowGateBuild", mindustry.world.blocks.distribution.OverflowGate.OverflowGateBuild.class);
         classes.put("Router", mindustry.world.blocks.distribution.Router.class);
@@ -327,6 +329,8 @@ public class ClassMap{
         classes.put("BeamNodeBuild", mindustry.world.blocks.power.BeamNode.BeamNodeBuild.class);
         classes.put("ConsumeGenerator", mindustry.world.blocks.power.ConsumeGenerator.class);
         classes.put("ConsumeGeneratorBuild", mindustry.world.blocks.power.ConsumeGenerator.ConsumeGeneratorBuild.class);
+        classes.put("HeaterGenerator", mindustry.world.blocks.power.HeaterGenerator.class);
+        classes.put("HeaterGeneratorBuild", mindustry.world.blocks.power.HeaterGenerator.HeaterGeneratorBuild.class);
         classes.put("ImpactReactor", mindustry.world.blocks.power.ImpactReactor.class);
         classes.put("ImpactReactorBuild", mindustry.world.blocks.power.ImpactReactor.ImpactReactorBuild.class);
         classes.put("LightBlock", mindustry.world.blocks.power.LightBlock.class);
@@ -348,6 +352,8 @@ public class ClassMap{
         classes.put("SolarGeneratorBuild", mindustry.world.blocks.power.SolarGenerator.SolarGeneratorBuild.class);
         classes.put("ThermalGenerator", mindustry.world.blocks.power.ThermalGenerator.class);
         classes.put("ThermalGeneratorBuild", mindustry.world.blocks.power.ThermalGenerator.ThermalGeneratorBuild.class);
+        classes.put("VariableReactor", mindustry.world.blocks.power.VariableReactor.class);
+        classes.put("VariableReactorBuild", mindustry.world.blocks.power.VariableReactor.VariableReactorBuild.class);
         classes.put("AttributeCrafter", mindustry.world.blocks.production.AttributeCrafter.class);
         classes.put("AttributeCrafterBuild", mindustry.world.blocks.production.AttributeCrafter.AttributeCrafterBuild.class);
         classes.put("BeamDrill", mindustry.world.blocks.production.BeamDrill.class);
@@ -441,11 +447,13 @@ public class ClassMap{
         classes.put("DrawMultiWeave", mindustry.world.draw.DrawMultiWeave.class);
         classes.put("DrawParticles", mindustry.world.draw.DrawParticles.class);
         classes.put("DrawPistons", mindustry.world.draw.DrawPistons.class);
+        classes.put("DrawPlasma", mindustry.world.draw.DrawPlasma.class);
         classes.put("DrawPulseShape", mindustry.world.draw.DrawPulseShape.class);
         classes.put("DrawPumpLiquid", mindustry.world.draw.DrawPumpLiquid.class);
         classes.put("DrawRegion", mindustry.world.draw.DrawRegion.class);
         classes.put("DrawShape", mindustry.world.draw.DrawShape.class);
         classes.put("DrawSideRegion", mindustry.world.draw.DrawSideRegion.class);
+        classes.put("DrawSoftParticles", mindustry.world.draw.DrawSoftParticles.class);
         classes.put("DrawSpikes", mindustry.world.draw.DrawSpikes.class);
         classes.put("DrawTurret", mindustry.world.draw.DrawTurret.class);
         classes.put("DrawWarmupRegion", mindustry.world.draw.DrawWarmupRegion.class);

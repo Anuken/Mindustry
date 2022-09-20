@@ -77,7 +77,7 @@ public class MapInfoDialog extends BaseDialog{
                 r.row();
 
                 r.button("@editor.objectives", Icon.info, style, () -> {
-                    objectives.show(state.rules.objectives);
+                    objectives.show(state.rules.objectives.all, state.rules.objectives.all::set);
                     hide();
                 }).marginLeft(10f);
 

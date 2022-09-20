@@ -5,6 +5,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -18,7 +19,7 @@ public class CellLiquid extends Liquid{
     public int cells = 8;
 
     public @Nullable Liquid spreadTarget;
-    public float maxSpread = 0.5f, spreadConversion = 0.5f, spreadDamage = 0.1f;
+    public float maxSpread = 0.5f, spreadConversion = 1f, spreadDamage = 0.1f, removeScaling = 0.25f;
 
     public CellLiquid(String name, Color color){
         super(name, color);
@@ -30,20 +31,32 @@ public class CellLiquid extends Liquid{
 
     @Override
     public void update(Puddle puddle){
+        if(!Vars.state.rules.fire) return;
+
         if(spreadTarget != null){
             float scaling = Mathf.pow(Mathf.clamp(puddle.amount / maxLiquid), 2f);
 
             for(var point : Geometry.d4c){
                 Tile tile = puddle.tile.nearby(point);
-                if(tile != null && tile.build != null && tile.build.liquids != null && tile.build.liquids.get(spreadTarget) > 0){
+                if(tile != null && tile.build != null && tile.build.liquids != null && tile.build.liquids.get(spreadTarget) > 0.0001f){
                     float amount = Math.min(tile.build.liquids.get(spreadTarget), maxSpread * Time.delta * scaling);
-                    tile.build.liquids.remove(spreadTarget, amount);
+                    tile.build.liquids.remove(spreadTarget, amount * removeScaling);
                     Puddles.deposit(tile, this, amount * spreadConversion);
                 }
             }
 
             //damage thing it is on
-            if(spreadDamage > 0 && puddle.tile.build != null && puddle.tile.build.liquids != null && puddle.tile.build.liquids.get(spreadTarget) > 0){
+            if(spreadDamage > 0 && puddle.tile.build != null && puddle.tile.build.liquids != null && puddle.tile.build.liquids.get(spreadTarget) > 0.0001f){
+
+                //spread in 4 adjacent directions around thing it is on
+                float amountSpread = Math.min(puddle.tile.build.liquids.get(spreadTarget) * spreadConversion, maxSpread * Time.delta) / 2f;
+                for(var dir : Geometry.d4){
+                    Tile other = puddle.tile.nearby(dir);
+                    if(other != null){
+                        Puddles.deposit(puddle.tile, other, puddle.liquid, amountSpread);
+                    }
+                }
+
                 puddle.tile.build.damage(spreadDamage * Time.delta * scaling);
             }
 
@@ -79,7 +92,7 @@ public class CellLiquid extends Liquid{
     public void drawPuddle(Puddle puddle){
         super.drawPuddle(puddle);
 
-        float baseLayer = puddle.tile != null && puddle.tile.build != null ? Layer.blockOver : Layer.debris - 0.5f;
+        float baseLayer = puddle.tile != null && puddle.tile.block().solid || puddle.tile.build != null ? Layer.blockOver : Layer.debris - 0.5f;
 
         int id = puddle.id;
         float amount = puddle.amount, x = puddle.x, y = puddle.y;

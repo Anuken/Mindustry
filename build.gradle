@@ -231,6 +231,7 @@ configure(subprojects - project(":annotations")){
         options{
             addStringOption('Xdoclint:none', '-quiet')
             addStringOption('-release', '16')
+            encoding('UTF-8')
         }
     }
 }
@@ -363,6 +364,13 @@ project(":core"){
             })
             destinationDir = new File(buildDir, 'javadoc')
         }
+    }
+
+    gradle.taskGraph.whenReady{
+        //these are completely unnecessary
+        tasks.kaptGenerateStubsKotlin.onlyIf{ false }
+        tasks.compileKotlin.onlyIf{ false }
+        tasks.inspectClassesForKotlinIC.onlyIf{ false }
     }
 
     //comp** classes are only used for code generation

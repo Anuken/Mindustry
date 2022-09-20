@@ -18,7 +18,6 @@ import static mindustry.Vars.*;
 public class Constructor extends BlockProducer{
     /** Empty seq for no filter. */
     public Seq<Block> filter = new Seq<>();
-    public float buildSpeed = 0.4f;
     public int minBlockSize = 1, maxBlockSize = 2;
 
     public Constructor(String name){
@@ -59,7 +58,7 @@ public class Constructor extends BlockProducer{
 
         @Override
         public void buildConfiguration(Table table){
-            ItemSelection.buildTable(Constructor.this, table, filter.isEmpty() ? content.blocks().select(Constructor.this::canProduce) : filter, () -> recipe, this::configure);
+            ItemSelection.buildTable(Constructor.this, table, filter.isEmpty() ? content.blocks().select(Constructor.this::canProduce) : filter, () -> recipe, this::configure, selectionRows, selectionColumns);
         }
 
         @Override

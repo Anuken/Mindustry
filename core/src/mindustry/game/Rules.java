@@ -7,7 +7,6 @@ import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
 import mindustry.*;
 import mindustry.content.*;
-import mindustry.game.MapObjectives.*;
 import mindustry.graphics.g3d.*;
 import mindustry.io.*;
 import mindustry.type.*;
@@ -26,6 +25,8 @@ public class Rules{
     public TeamRules teams = new TeamRules();
     /** Whether the waves come automatically on a timer. If not, waves come when the play button is pressed. */
     public boolean waveTimer = true;
+    /** Whether the waves can be manually summoned with the play button. */
+    public boolean waveSending = true;
     /** Whether waves are spawnable at all. */
     public boolean waves;
     /** Whether the game objective is PvP. Note that this enables automatic hosting. */
@@ -48,7 +49,7 @@ public class Rules{
     public boolean schematicsAllowed = true;
     /** Whether friendly explosions can occur and set fire/damage other blocks. */
     public boolean damageExplosions = true;
-    /** Whether fire is enabled. */
+    /** Whether fire (and neoplasm spread) is enabled. */
     public boolean fire = true;
     /** Whether units use and require ammo. */
     public boolean unitAmmo = false;
@@ -124,9 +125,9 @@ public class Rules{
     public ObjectSet<String> researched = new ObjectSet<>();
     /** Block containing these items as requirements are hidden. */
     public ObjectSet<Item> hiddenBuildItems = Items.erekirOnlyItems.asSet();
-    /** Campaign-only map objectives. */
-    public Seq<MapObjective> objectives = new Seq<>();
-    /** Flags set by objectives. Used in world processors. n*/
+    /** In-map objective executor. */
+    public MapObjectives objectives = new MapObjectives();
+    /** Flags set by objectives. Used in world processors. */
     public ObjectSet<String> objectiveFlags = new ObjectSet<>();
     /** If true, fog of war is enabled. Enemy units and buildings are hidden unless in radar view. */
     public boolean fog = false;
@@ -230,10 +231,12 @@ public class Rules{
         /** If true, this team has infinite unit ammo. */
         public boolean infiniteAmmo;
 
-        /** Enables "RTS" unit AI. TODO wip */
+        /** Enables "RTS" unit AI. */
         public boolean rtsAi;
         /** Minimum size of attack squads. */
         public int rtsMinSquad = 4;
+        /** Maximum size of attack squads. */
+        public int rtsMaxSquad = 1000;
         /** Minimum "advantage" needed for a squad to attack. Higher -> more cautious. */
         public float rtsMinWeight = 1.2f;
 
