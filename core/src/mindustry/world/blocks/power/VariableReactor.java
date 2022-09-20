@@ -78,7 +78,7 @@ public class VariableReactor extends PowerGenerator{
         public void updateTile(){
             heat = calculateHeat(sideHeat);
 
-            productionEfficiency = efficiency;
+            productionEfficiency = Mathf.clamp(heat / maxHeat) * efficiency;
             warmup = Mathf.lerpDelta(warmup, productionEfficiency > 0 ? 1f : 0f, warmupSpeed);
 
             if(instability >= 1f){

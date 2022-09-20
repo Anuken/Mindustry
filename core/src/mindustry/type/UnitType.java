@@ -885,7 +885,7 @@ public class UnitType extends UnlockableContent{
             segmentOutlineRegions[i] = Core.atlas.find(name + "-segment-outline" + i);
         }
 
-        clipSize = Math.max(region.width * 2f, clipSize);
+        clipSize = Math.max(region.width * region.scale * 2f, clipSize);
     }
 
     public void getRegionsToOutline(Seq<TextureRegion> out){
@@ -1268,7 +1268,7 @@ public class UnitType extends UnlockableContent{
     public void drawSoftShadow(float x, float y, float rotation, float alpha){
         Draw.color(0, 0, 0, 0.4f * alpha);
         float rad = 1.6f;
-        float size = Math.max(region.width, region.height) * Draw.scl;
+        float size = Math.max(region.width, region.height) * region.scl();
         Draw.rect(softShadowRegion, x, y, size * rad * Draw.xscl, size * rad * Draw.yscl, rotation - 90);
         Draw.color();
     }
@@ -1287,11 +1287,12 @@ public class UnitType extends UnlockableContent{
             size, size, unit.rotation);
             Draw.mixcol();
 
-            size = (3f + Mathf.absin(Time.time, 5f, 1f)) * unit.itemTime + 0.5f;
+            size = ((3f + Mathf.absin(Time.time, 5f, 1f)) * unit.itemTime + 0.5f) * 2 * itemCircleRegion.scale;
             Draw.color(Pal.accent);
             Draw.rect(itemCircleRegion,
             unit.x + Angles.trnsx(unit.rotation + 180f, itemOffsetY),
-            unit.y + Angles.trnsy(unit.rotation + 180f, itemOffsetY), size * 2, size * 2);
+            unit.y + Angles.trnsy(unit.rotation + 180f, itemOffsetY),
+            size, size);
 
             if(unit.isLocal() && !renderer.pixelator.enabled()){
                 Fonts.outline.draw(unit.stack.amount + "",
@@ -1403,7 +1404,7 @@ public class UnitType extends UnlockableContent{
 
                 for(int side : Mathf.signs){
                     Tmp.v1.set(xOffset * side, yOffset).rotate(unit.rotation - 90);
-                    Draw.rect(region, unit.x + Tmp.v1.x / 4f, unit.y + Tmp.v1.y / 4f, treadRect.width / 4f, region.height / 4f, unit.rotation - 90);
+                    Draw.rect(region, unit.x + Tmp.v1.x / 4f, unit.y + Tmp.v1.y / 4f, treadRect.width / 4f, region.height * region.scale / 4f, unit.rotation - 90);
                 }
             }
         }
@@ -1415,7 +1416,7 @@ public class UnitType extends UnlockableContent{
 
         Leg[] legs = unit.legs();
 
-        float ssize = footRegion.width * Draw.scl * 1.5f;
+        float ssize = footRegion.width * footRegion.scl() * 1.5f;
         float rotation = unit.baseRotation();
         float invDrown = 1f - unit.drownTime;
 
@@ -1450,10 +1451,10 @@ public class UnitType extends UnlockableContent{
                 Draw.rect(footRegion, leg.base.x, leg.base.y, position.angleTo(leg.base));
             }
 
-            Lines.stroke(legRegion.height * Draw.scl * flips);
+            Lines.stroke(legRegion.height * legRegion.scl() * flips);
             Lines.line(legRegion, position.x, position.y, leg.joint.x, leg.joint.y, false);
 
-            Lines.stroke(legBaseRegion.height * Draw.scl * flips);
+            Lines.stroke(legBaseRegion.height * legRegion.scl() * flips);
             Lines.line(legBaseRegion, leg.joint.x + Tmp.v1.x, leg.joint.y + Tmp.v1.y, leg.base.x, leg.base.y, false);
 
             if(jointRegion.found()){
@@ -1528,8 +1529,8 @@ public class UnitType extends UnlockableContent{
             Draw.rect(legRegion,
             unit.x + Angles.trnsx(mech.baseRotation(), extension * i - boostTrns, -boostTrns*i),
             unit.y + Angles.trnsy(mech.baseRotation(), extension * i - boostTrns, -boostTrns*i),
-            legRegion.width * i * Draw.scl,
-            legRegion.height * Draw.scl - Math.max(-sin * i, 0) * legRegion.height * 0.5f * Draw.scl,
+            legRegion.width * legRegion.scl() * i,
+            legRegion.height * legRegion.scl() * (1 - Math.max(-sin * i, 0) * 0.5f),
             mech.baseRotation() - 90 + 35f*i*e);
         }
 
