@@ -387,6 +387,21 @@ public class SettingsMenuDialog extends BaseDialog{
             }
             return s + "%";
         });
+        /* these two settings that allow for max and min zoom changing */
+        graphics.sliderPref("maxmagnificationmultiplierpercent", 100, 100, 200, 25, s -> {
+            if(ui.settings != null){
+                Core.settings.put("maxzoomingamemultiplier", (float)s / 100.0f);
+            }
+            return s + "%";
+        });
+
+        graphics.sliderPref("minmagnificationmultiplierpercent", 100, 100, 300, 25, s -> {
+            if(ui.settings != null){
+                Core.settings.put("minzoomingamemultiplier", (float)s / 100.0f);
+            }
+            return s + "%";
+        });
+
         graphics.sliderPref("bridgeopacity", 100, 0, 100, 5, s -> s + "%");
 
         if(!mobile){
