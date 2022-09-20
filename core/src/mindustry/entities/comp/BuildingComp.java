@@ -153,6 +153,13 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     @Override
+    public void add(){
+        if(power != null){
+            power.graph.checkAdd();
+        }
+    }
+
+    @Override
     @Replace
     public int tileX(){
         return tile.x;
@@ -397,7 +404,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public boolean isHealSuppressed(){
-        return Time.time <= healSuppressionTime;
+        return block.suppressable && Time.time <= healSuppressionTime;
     }
 
     public void recentlyHealed(){
@@ -611,6 +618,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         grabber.get(new UnitPayload(unit));
         Fx.unitDrop.at(unit);
+    }
+
+    public boolean canWithdraw(){
+        return true;
     }
 
     public boolean canUnload(){
@@ -844,17 +855,19 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                 float fx = (x + next.x) / 2f, fy = (y + next.y) / 2f;
 
                 Liquid other = next.liquids.current();
-                //TODO liquid reaction handler for extensibility
-                if((other.flammability > 0.3f && liquid.temperature > 0.7f) || (liquid.flammability > 0.3f && other.temperature > 0.7f)){
-                    damageContinuous(1);
-                    next.damageContinuous(1);
-                    if(Mathf.chanceDelta(0.1)){
-                        Fx.fire.at(fx, fy);
-                    }
-                }else if((liquid.temperature > 0.7f && other.temperature < 0.55f) || (other.temperature > 0.7f && liquid.temperature < 0.55f)){
-                    liquids.remove(liquid, Math.min(liquids.get(liquid), 0.7f * Time.delta));
-                    if(Mathf.chanceDelta(0.2f)){
-                        Fx.steam.at(fx, fy);
+                if(other.blockReactive && liquid.blockReactive){
+                    //TODO liquid reaction handler for extensibility
+                    if((other.flammability > 0.3f && liquid.temperature > 0.7f) || (liquid.flammability > 0.3f && other.temperature > 0.7f)){
+                        damageContinuous(1);
+                        next.damageContinuous(1);
+                        if(Mathf.chanceDelta(0.1)){
+                            Fx.fire.at(fx, fy);
+                        }
+                    }else if((liquid.temperature > 0.7f && other.temperature < 0.55f) || (other.temperature > 0.7f && liquid.temperature < 0.55f)){
+                        liquids.remove(liquid, Math.min(liquids.get(liquid), 0.7f * Time.delta));
+                        if(Mathf.chanceDelta(0.2f)){
+                            Fx.steam.at(fx, fy);
+                        }
                     }
                 }
             }
@@ -1087,6 +1100,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return false;
     }
 
+    /** @return volume cale of active sound. */
+    public float activeSoundVolume(){
+        return 1f;
+    }
+
     /** @return whether this block should play its idle sound.*/
     public boolean shouldAmbientSound(){
         return shouldConsume();
@@ -1108,7 +1126,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public void drawCracks(){
-        if(!damaged() || block.size > BlockRenderer.maxCrackSize) return;
+        if(!block.drawCracks || !damaged() || block.size > BlockRenderer.maxCrackSize) return;
         int id = pos();
         TextureRegion region = renderer.blocks.cracks[block.size - 1][Mathf.clamp((int)((1f - healthf()) * BlockRenderer.crackRegions), 0, BlockRenderer.crackRegions-1)];
         Draw.colorl(0.2f, 0.1f + (1f - healthf())* 0.6f);
@@ -1246,7 +1264,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if(value instanceof UnitType) type = UnitType.class;
         
         if(builder != null && builder.isPlayer()){
-            lastAccessed = builder.getPlayer().name;
+            lastAccessed = builder.getPlayer().coloredName();
         }
 
         if(block.configurations.containsKey(type)){
@@ -1322,7 +1340,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         Damage.dynamicExplosion(x, y, flammability, explosiveness * 3.5f, power, tilesize * block.size / 2f, state.rules.damageExplosions, block.destroyEffect);
 
-        if(!floor().solid && !floor().isLiquid){
+        if(block.createRubble && !floor().solid && !floor().isLiquid){
             Effect.rubble(x, y, block.size);
         }
     }
@@ -1342,11 +1360,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public ItemModule flowItems(){
         return items;
     }
-
-    public boolean displayable(){
-        return true;
-    }
-
     @Override
     public void display(Table table){
         //display the block stuff
@@ -1676,13 +1689,20 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     /** Called after efficiency is updated but before consumers are updated. Use to apply your own multiplier. */
     public void updateEfficiencyMultiplier(){
+        float scale = efficiencyScale();
+        efficiency *= scale;
+        optionalEfficiency *= scale;
+    }
 
+    /** Calculate your own efficiency multiplier. By default, this is applied in updateEfficiencyMultiplier. */
+    public float efficiencyScale(){
+        return 1f;
     }
 
     public void updateConsumption(){
         //everything is valid when cheating
         if(!block.hasConsumers || cheating()){
-            potentialEfficiency = efficiency = optionalEfficiency = 1f;
+            potentialEfficiency = efficiency = optionalEfficiency = enabled ? 1f : 0f;
             return;
         }
 
@@ -1732,6 +1752,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         }
     }
 
+    public void updatePayload(@Nullable Unit unitHolder, @Nullable Building buildingHolder){
+        update();
+    }
+
     public void updateTile(){
 
     }
@@ -1759,13 +1783,13 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     @MethodPriority(100)
     @Override
     public void heal(){
-        indexer.notifyBuildHealed(self());
+        healthChanged();
     }
 
     @MethodPriority(100)
     @Override
     public void heal(float amount){
-        indexer.notifyBuildHealed(self());
+        healthChanged();
     }
 
     @Override
@@ -1776,7 +1800,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     @Replace
     @Override
     public void kill(){
-        Call.tileDestroyed(self());
+        Call.buildDestroyed(self());
     }
 
     @Replace
@@ -1793,11 +1817,25 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             damage = Damage.applyArmor(damage, block.armor) / dm;
         }
 
-        Call.tileDamage(self(), health - handleDamage(damage));
+        //TODO handle this better on the client.
+        if(!net.client()){
+            health -= handleDamage(damage);
+        }
+
+        healthChanged();
 
         if(health <= 0){
-            Call.tileDestroyed(self());
+            Call.buildDestroyed(self());
         }
+    }
+
+    public void healthChanged(){
+        //server-side, health updates are batched.
+        if(net.server()){
+            netServer.buildHealthUpdate(self());
+        }
+
+        indexer.notifyHealthChanged(self());
     }
 
     @Override
@@ -1904,7 +1942,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         afterDestroyed();
     }
 
-    //TODO atrocious method and should be squished
     @Final
     @Replace
     @Override
@@ -1924,7 +1961,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         //TODO separate system for sound? AudioSource, etc
         if(!headless){
             if(sound != null){
-                sound.update(x, y, shouldActiveSound());
+                sound.update(x, y, shouldActiveSound(), activeSoundVolume());
             }
 
             if(block.ambientSound != Sounds.none && shouldAmbientSound()){

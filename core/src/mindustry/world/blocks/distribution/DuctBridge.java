@@ -12,6 +12,7 @@ public class DuctBridge extends DirectionBridge{
         itemCapacity = 4;
         hasItems = true;
         underBullets = true;
+        isDuct = true;
     }
 
     public class DuctBridgeBuild extends DirectionBridgeBuild{

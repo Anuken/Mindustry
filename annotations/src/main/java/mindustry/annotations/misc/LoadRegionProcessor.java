@@ -85,7 +85,6 @@ public class LoadRegionProcessor extends BaseProcessor{
             method.endControlFlow();
         }
 
-        method.addCode("mindustry.graphics.Drawf.textureResize.each(e -> { $T.atlas.find(e.key).scale = e.value; });", Core.class);
         regionClass.addMethod(method.build());
 
         write(regionClass);

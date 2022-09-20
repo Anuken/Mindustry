@@ -24,8 +24,12 @@ public abstract class LStatement{
     public transient @Nullable StatementElem elem;
 
     public abstract void build(Table table);
-    public abstract Color color();
+
     public abstract LInstruction build(LAssembler builder);
+
+    public LCategory category(){
+        return LCategory.unknown;
+    }
 
     public LStatement copy(){
         StringBuilder build = new StringBuilder();

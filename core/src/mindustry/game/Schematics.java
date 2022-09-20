@@ -363,6 +363,8 @@ public class Schematics implements Loadable{
         for(int cx = x; cx <= x2; cx++){
             for(int cy = y; cy <= y2; cy++){
                 Building linked = world.build(cx, cy);
+                if(linked != null && !linked.wasVisible) continue;
+
                 Block realBlock = linked == null ? null : linked instanceof ConstructBuild cons ? cons.current : linked.block;
 
                 if(linked != null && realBlock != null && (realBlock.isVisible() || realBlock instanceof CoreBlock)){

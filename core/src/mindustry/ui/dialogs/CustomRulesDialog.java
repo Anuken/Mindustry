@@ -9,7 +9,6 @@ import arc.scene.ui.ImageButton.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
@@ -140,6 +139,7 @@ public class CustomRulesDialog extends BaseDialog{
         title("@rules.title.waves");
         check("@rules.waves", b -> rules.waves = b, () -> rules.waves);
         check("@rules.wavetimer", b -> rules.waveTimer = b, () -> rules.waveTimer);
+        check("@rules.wavesending", b -> rules.waveSending = b, () -> rules.waveSending);
         check("@rules.waitForWaveToEnd", b -> rules.waitEnemies = b, () -> rules.waitEnemies);
         number("@rules.wavespacing", false, f -> rules.waveSpacing = f * 60f, () -> rules.waveSpacing / 60f, () -> rules.waveTimer, 1, Float.MAX_VALUE);
         //this is experimental, because it's not clear that 0 makes it default.
@@ -208,6 +208,8 @@ public class CustomRulesDialog extends BaseDialog{
             numberi("h", h -> state.rules.limitHeight = h, () -> state.rules.limitHeight, () -> state.rules.limitMapArea, 0, 10000);
         }
 
+        number("@rules.solarmultiplier", f -> rules.solarMultiplier = f, () -> rules.solarMultiplier);
+
         main.button(b -> {
             b.left();
             b.table(Tex.pane, in -> {
@@ -235,13 +237,16 @@ public class CustomRulesDialog extends BaseDialog{
                     rules.env = planet.defaultEnv;
                     rules.hiddenBuildItems.clear();
                     rules.hiddenBuildItems.addAll(planet.hiddenItems);
-                }).group(group).checked(rules.env == planet.defaultEnv);
+                }).group(group).checked(b -> rules.env == planet.defaultEnv);
             }
 
             t.button("@rules.anyenv", style, () -> {
-                rules.env = Vars.defaultEnv;
-                rules.hiddenBuildItems.clear();
-            }).group(group).checked(rules.hiddenBuildItems.size == 0);
+                //unlocalized for now
+                ui.showInfo("[accent]'Any' environment, or 'mixed tech', is no longer allowed.[]\n\nReasoning: Serpulo and Erekir tech were never meant to be used in the same map. They are not compatible or remotely balanced.\nI have received far too many complains in this regard.");
+
+                //rules.env = Vars.defaultEnv;
+                //rules.hiddenBuildItems.clear();
+            }).group(group).checked(b -> rules.hiddenBuildItems.size == 0);
         }).left().fill(false).expand(false, false).row();
 
         title("@rules.title.teams");
@@ -267,6 +272,7 @@ public class CustomRulesDialog extends BaseDialog{
 
                 check("@rules.rtsai", b -> teams.rtsAi = b, () -> teams.rtsAi, () -> team != rules.defaultTeam);
                 numberi("@rules.rtsminsquadsize", f -> teams.rtsMinSquad = f, () -> teams.rtsMinSquad, () -> teams.rtsAi, 0, 100);
+                numberi("@rules.rtsmaxsquadsize", f -> teams.rtsMaxSquad = f, () -> teams.rtsMaxSquad, () -> teams.rtsAi, 1, 1000);
                 number("@rules.rtsminattackweight", f -> teams.rtsMinWeight = f, () -> teams.rtsMinWeight, () -> teams.rtsAi);
 
                 check("@rules.infiniteresources", b -> teams.infiniteResources = b, () -> teams.infiniteResources);

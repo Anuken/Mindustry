@@ -5,10 +5,12 @@ import arc.func.*;
 import arc.math.*;
 import arc.net.*;
 import arc.net.FrameworkMessage.*;
+import arc.net.dns.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
 import arc.util.io.*;
+import mindustry.*;
 import mindustry.net.Net.*;
 import mindustry.net.Packets.*;
 import net.jpountz.lz4.*;
@@ -17,6 +19,7 @@ import java.io.*;
 import java.net.*;
 import java.nio.*;
 import java.nio.channels.*;
+import java.util.*;
 import java.util.concurrent.*;
 
 import static mindustry.Vars.*;
@@ -189,8 +192,27 @@ public class ArcNetProvider implements NetProvider{
     @Override
     public void pingHost(String address, int port, Cons<Host> valid, Cons<Exception> invalid){
         try{
-            DatagramSocket socket = new DatagramSocket();
+            var host = pingHostImpl(address, port);
+            Core.app.post(() -> valid.get(host));
+        }catch(IOException e){
+            if(port == Vars.port){
+                for(var record : ArcDns.getSrvRecords("_mindustry._tcp." + address)){
+                    try{
+                        var host = pingHostImpl(record.target, record.port);
+                        Core.app.post(() -> valid.get(host));
+                        return;
+                    }catch(IOException ignored){
+                    }
+                }
+            }
+            Core.app.post(() -> invalid.get(e));
+        }
+    }
+
+    private Host pingHostImpl(String address, int port) throws IOException{
+        try(DatagramSocket socket = new DatagramSocket()){
             long time = Time.millis();
+
             socket.send(new DatagramPacket(new byte[]{-2, 1}, 2, InetAddress.getByName(address), port));
             socket.setSoTimeout(2000);
 
@@ -199,10 +221,8 @@ public class ArcNetProvider implements NetProvider{
 
             ByteBuffer buffer = ByteBuffer.wrap(packet.getData());
             Host host = NetworkIO.readServerData((int)Time.timeSinceMillis(time), packet.getAddress().getHostAddress(), buffer);
-
-            Core.app.post(() -> valid.get(host));
-        }catch(Exception e){
-            Core.app.post(() -> invalid.get(e));
+            host.port = port;
+            return host;
         }
     }
 

@@ -14,6 +14,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.ai.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -228,19 +229,46 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         for(int id : unitIds){
             Unit unit = Groups.unit.getByID(id);
             if(unit != null && unit.team == player.team() && unit.controller() instanceof CommandAI ai){
+
+                //implicitly order it to move
+                ai.command(UnitCommand.moveCommand);
+
                 if(teamTarget != null && teamTarget.team() != player.team()){
                     ai.commandTarget(teamTarget);
                 }else if(posTarget != null){
                     ai.commandPosition(posTarget);
                 }
+                unit.lastCommanded = player.coloredName();
             }
         }
 
-        if(unitIds.length > 0 && player == Vars.player){
+        if(unitIds.length > 0 && player == Vars.player && !state.isPaused()){
             if(teamTarget != null){
                 Fx.attackCommand.at(teamTarget);
             }else{
                 Fx.moveCommand.at(posTarget);
+            }
+        }
+    }
+
+    @Remote(called = Loc.server, targets = Loc.both, forward = true)
+    public static void setUnitCommand(Player player, int[] unitIds, UnitCommand command){
+        if(player == null || unitIds == null || command == null) return;
+
+        if(net.server() && !netServer.admins.allowAction(player, ActionType.commandUnits, event -> {
+            event.unitIDs = unitIds;
+        })){
+            throw new ValidateException(player, "Player cannot command units.");
+        }
+
+        for(int id : unitIds){
+            Unit unit = Groups.unit.getByID(id);
+            if(unit != null && unit.team == player.team() && unit.controller() instanceof CommandAI ai){
+                ai.command(command);
+                //reset targeting
+                ai.targetPos = null;
+                ai.attackTarget = null;
+                unit.lastCommanded = player.coloredName();
             }
         }
     }
@@ -256,7 +284,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         build.onCommand(target);
-        Fx.moveCommand.at(target);
+        if(!state.isPaused() && player == Vars.player){
+            Fx.moveCommand.at(target);
+        }
+
+        Events.fire(new BuildingCommandEvent(player, build, target));
     }
 
     @Remote(called = Loc.server, targets = Loc.both, forward = true)
@@ -475,7 +507,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(player == null) return;
 
         //make sure player is allowed to control the unit
-        if(net.server() && !netServer.admins.allowAction(player, ActionType.control, action -> action.unit = unit)){
+        if(net.server() && (!state.rules.possessionAllowed || !netServer.admins.allowAction(player, ActionType.control, action -> action.unit = unit))){
             throw new ValidateException(player, "Player cannot control a unit.");
         }
 
@@ -589,6 +621,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             Core.camera.position.lerpDelta(logicCamPan, logicCamSpeed);
         }else{
             logicCutsceneZoom = -1f;
+        }
+
+        if(commandBuild != null && !commandBuild.isValid()){
+            commandBuild = null;
         }
 
         if(!commandMode){
@@ -721,6 +757,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                     selectedUnits.clear();
                 }
                 selectedUnits.addAll(units);
+                Events.fire(Trigger.unitCommandChange);
                 commandBuild = null;
             }
             commandRect = false;
@@ -734,6 +771,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 selectedUnits.clear();
                 camera.bounds(Tmp.r1);
                 selectedUnits.addAll(selectedCommandUnits(Tmp.r1.x, Tmp.r1.y, Tmp.r1.width, Tmp.r1.height, u -> u.type == unit.type));
+                Events.fire(Trigger.unitCommandChange);
             }
         }
     }
@@ -760,6 +798,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                     commandBuild = null;
                 }
             }
+            Events.fire(Trigger.unitCommandChange);
         }
     }
 
@@ -805,7 +844,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             for(Unit unit : selectedUnits){
                 CommandAI ai = unit.command();
                 //draw target line
-                if(ai.targetPos != null){
+                if(ai.targetPos != null && ai.command == UnitCommand.moveCommand){
                     Position lineDest = ai.attackTarget != null ? ai.attackTarget : ai.targetPos;
                     Drawf.limitLine(unit, lineDest, unit.hitSize / 2f, 3.5f);
 
@@ -816,7 +855,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
                 Drawf.square(unit.x, unit.y, unit.hitSize / 1.4f + 1f);
 
-                if(ai.attackTarget != null){
+                //TODO when to draw, when to not?
+                if(ai.attackTarget != null && ai.command == UnitCommand.moveCommand){
                     Drawf.target(ai.attackTarget.getX(), ai.attackTarget.getY(), 6f, Pal.remove);
                 }
             }
@@ -1613,21 +1653,26 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public void drawArrow(Block block, int x, int y, int rotation, boolean valid){
         float trns = (block.size / 2) * tilesize;
         int dx = Geometry.d4(rotation).x, dy = Geometry.d4(rotation).y;
+        float offsetx = x * tilesize + block.offset + dx*trns;
+        float offsety = y * tilesize + block.offset + dy*trns;
 
         Draw.color(!valid ? Pal.removeBack : Pal.accentBack);
         TextureRegion regionArrow = Core.atlas.find("place-arrow");
+
         Draw.rect(regionArrow,
-        x * tilesize + block.offset + dx*trns,
-        y * tilesize + block.offset - 1 + dy*trns,
-        regionArrow.width * Draw.scl * regionArrow.scale,
-        regionArrow.height * Draw.scl * regionArrow.scale, rotation * 90 - 90);
+        offsetx,
+        offsety - 1,
+        regionArrow.width * regionArrow.scl(),
+        regionArrow.height * regionArrow.scl(),
+        rotation * 90 - 90);
 
         Draw.color(!valid ? Pal.remove : Pal.accent);
         Draw.rect(regionArrow,
-        x * tilesize + block.offset + dx*trns,
-        y * tilesize + block.offset + dy*trns,
-        regionArrow.width * Draw.scl * regionArrow.scale,
-        regionArrow.height * Draw.scl * regionArrow.scale, rotation * 90 - 90);
+        offsetx,
+        offsety,
+        regionArrow.width * regionArrow.scl(),
+        regionArrow.height * regionArrow.scl(),
+        rotation * 90 - 90);
     }
 
     void iterateLine(int startX, int startY, int endX, int endY, Cons<PlaceLine> cons){

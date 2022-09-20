@@ -5,6 +5,7 @@ import arc.graphics.g2d.*;
 import arc.scene.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
+import arc.util.*;
 import mindustry.graphics.*;
 
 public class ReqImage extends Stack{
@@ -30,7 +31,7 @@ public class ReqImage extends Stack{
     }
 
     public ReqImage(TextureRegion region, Boolp valid){
-        this(new Image(region), valid);
+        this(new Image(region).setScaling(Scaling.fit), valid);
     }
 
     public boolean valid(){

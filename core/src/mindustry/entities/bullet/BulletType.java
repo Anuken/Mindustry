@@ -167,6 +167,12 @@ public class BulletType extends Content implements Cloneable{
     public float bulletInterval = 20f;
     /** Number of bullet spawned per interval. */
     public int intervalBullets = 1;
+    /** Random spread of interval bullets. */
+    public float intervalRandomSpread = 360f;
+    /** Angle spread between individual interval bullets. */
+    public float intervalSpread = 0f;
+    /** Angle offset for interval bullets. */
+    public float intervalAngle = 0f;
 
     /** Color used for hit/despawn effects. */
     public Color hitColor = Color.white;
@@ -178,6 +184,12 @@ public class BulletType extends Content implements Cloneable{
     public Seq<BulletType> spawnBullets = new Seq<>();
     /** Unit spawned _instead of_ this bullet. Useful for missiles. */
     public @Nullable UnitType spawnUnit;
+    /** Unit spawned when this bullet hits something or despawns due to it hitting the end of its lifetime. */
+    public @Nullable UnitType despawnUnit;
+    /** Amount of units spawned when this bullet despawns. */
+    public int despawnUnitCount = 1;
+    /** Random offset distance from the original bullet despawn/hit coordinate. */
+    public float despawnUnitRadius = 0.1f;
 
     /** Color of trail behind bullet. */
     public Color trailColor = Pal.missileYellowBack;
@@ -352,6 +364,13 @@ public class BulletType extends Content implements Cloneable{
         }
     }
 
+    public float damageMultiplier(Bullet b){
+        if(b.owner instanceof Unit u) return u.damageMultiplier() * state.rules.unitDamage(b.team);
+        if(b.owner instanceof Building) return state.rules.blockDamage(b.team);
+
+        return 1f;
+    }
+
     public void hit(Bullet b){
         hit(b, b.x, b.y);
     }
@@ -367,6 +386,7 @@ public class BulletType extends Content implements Cloneable{
         }
         createPuddles(b, x, y);
         createIncend(b, x, y);
+        createUnits(b, x, y);
 
         if(suppressionRange > 0){
             //bullets are pooled, require separate Vec2 instance
@@ -426,17 +446,26 @@ public class BulletType extends Content implements Cloneable{
         }
     }
 
+    public void createUnits(Bullet b, float x, float y){
+        if(despawnUnit != null){
+            for(int i = 0; i < despawnUnitCount; i++){
+                despawnUnit.spawn(b.team, x + Mathf.range(despawnUnitRadius), y + Mathf.range(despawnUnitRadius));
+            }
+        }
+    }
 
     /** Called when the bullet reaches the end of its lifetime or is destroyed by something external. */
     public void despawned(Bullet b){
         if(despawnHit){
             hit(b);
+        }else{
+            createUnits(b, b.x, b.y);
         }
 
         if(!fragOnHit){
             createFrags(b, b.x, b.y);
         }
-
+        
         despawnEffect.at(b.x, b.y, b.rotation(), hitColor);
         despawnSound.at(b);
 
@@ -496,8 +525,9 @@ public class BulletType extends Content implements Cloneable{
 
     public void updateBulletInterval(Bullet b){
         if(intervalBullet != null && b.timer.get(2, bulletInterval)){
+            float ang = b.rotation();
             for(int i = 0; i < intervalBullets; i++){
-                intervalBullet.create(b, b.x, b.y, Mathf.random(360f));
+                intervalBullet.create(b, b.x, b.y, ang + Mathf.range(intervalRandomSpread) + intervalAngle + ((i - (intervalBullets - 1f)/2f) * intervalSpread));
             }
         }
     }
@@ -515,7 +545,11 @@ public class BulletType extends Content implements Cloneable{
                 t -> collidesGround && (t.team != b.team || t.damaged()) && !b.hasCollided(t.id)
                 );
             }else{
-                target = Units.closestTarget(b.team, realAimX, realAimY, homingRange, e -> e.checkTarget(collidesAir, collidesGround) && !b.hasCollided(e.id), t -> collidesGround && !b.hasCollided(t.id));
+                if(b.aimTile != null && b.aimTile.build != null && b.aimTile.build.team != b.team && collidesGround && !b.hasCollided(b.aimTile.build.id)){
+                    target = b.aimTile.build;
+                }else{
+                    target = Units.closestTarget(b.team, realAimX, realAimY, homingRange, e -> e.checkTarget(collidesAir, collidesGround) && !b.hasCollided(e.id), t -> collidesGround && !b.hasCollided(t.id));
+                }
             }
 
             if(target != null){
@@ -643,10 +677,19 @@ public class BulletType extends Content implements Cloneable{
                 spawned.set(x, y);
                 spawned.rotation = angle;
                 //immediately spawn at top speed, since it was launched
-                spawned.vel.trns(angle, spawnUnit.speed);
+                if(spawnUnit.missileAccelTime <= 0f){
+                    spawned.vel.trns(angle, spawnUnit.speed);
+                }
                 //assign unit owner
-                if(spawned.controller() instanceof MissileAI ai && owner instanceof Unit unit){
-                    ai.shooter = unit;
+                if(spawned.controller() instanceof MissileAI ai){
+                    if(owner instanceof Unit unit){
+                        ai.shooter = unit;
+                    }
+
+                    if(owner instanceof ControlBlock control){
+                        ai.shooter = control.unit();
+                    }
+
                 }
                 spawned.add();
             }

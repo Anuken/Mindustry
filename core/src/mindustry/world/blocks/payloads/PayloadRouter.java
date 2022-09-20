@@ -89,6 +89,8 @@ public class PayloadRouter extends PayloadConveyor{
                         //"accept from self" conditions are for dropped payloads and are less restrictive
                     }while((blocked || next == null || !next.acceptPayload(next, item)) && ++rotations < 4);
                 }
+            }else{
+                onProximityUpdate();
             }
         }
 
@@ -96,15 +98,20 @@ public class PayloadRouter extends PayloadConveyor{
         public void control(LAccess type, double p1, double p2, double p3, double p4){
             super.control(type, p1, p2, p3, p4);
             if(type == LAccess.config){
-                rotation = (int)p1;
+                int prev = rotation;
+                rotation = Mathf.mod((int)p1, 4);
                 //when manually controlled, routers do not turn automatically for a while, same as turrets
                 controlTime = 60f * 6f;
+                if(prev != rotation){
+                    onProximityUpdate();
+                }
             }
         }
 
         @Override
         public void onControlSelect(Unit player){
             super.onControlSelect(player);
+            //this will immediately snap back if logic controlled
             recDir = rotation;
             checkMatch();
         }
@@ -112,7 +119,9 @@ public class PayloadRouter extends PayloadConveyor{
         @Override
         public void handlePayload(Building source, Payload payload){
             super.handlePayload(source, payload);
-            recDir = source == null ? rotation : source.relativeTo(this);
+            if(controlTime < 0f){ //don't overwrite logic recDir
+                recDir = source == null ? rotation : source.relativeTo(this);
+            }
             checkMatch();
             pickNext();
         }

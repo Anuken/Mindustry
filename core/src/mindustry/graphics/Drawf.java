@@ -1,5 +1,6 @@
 package mindustry.graphics;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -15,9 +16,13 @@ import java.util.*;
 import static mindustry.Vars.*;
 
 public class Drawf{
-    public static ObjectFloatMap<String> textureResize = new ObjectFloatMap<>();
     private static final Vec2[] vecs = new Vec2[]{new Vec2(), new Vec2(), new Vec2(), new Vec2()};
     private static final FloatSeq points = new FloatSeq();
+
+    /** Bleeds a mod pixmap if linear filtering is enabled. */
+    public static void checkBleed(Pixmap pixmap){
+        if(Core.settings.getBool("linear", true)) Pixmaps.bleed(pixmap);
+    }
 
     //TODO offset unused
     public static void flame(float x, float y, int divisions, float rotation, float length, float width, float pan){
@@ -395,8 +400,8 @@ public class Drawf{
         float scl = 8f * scale * Draw.scl, rot = Mathf.angle(x2 - x, y2 - y);
         float vx = Mathf.cosDeg(rot) * scl, vy = Mathf.sinDeg(rot) * scl;
 
-        Draw.rect(start, x, y, start.width * scale * Draw.scl * start.scale, start.height * scale * Draw.scl * start.scale, rot + 180);
-        Draw.rect(end, x2, y2, end.width * scale * Draw.scl * end.scale, end.height * scale * Draw.scl * end.scale, rot);
+        Draw.rect(start, x, y, start.width * scale * start.scl(), start.height * scale * start.scl(), rot + 180);
+        Draw.rect(end, x2, y2, end.width * scale * end.scl(), end.height * scale * end.scl(), rot);
 
         Lines.stroke(12f * scale);
         Lines.line(line, x + vx, y + vy, x2 - vx, y2 - vy, false);

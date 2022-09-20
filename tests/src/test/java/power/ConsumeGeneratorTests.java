@@ -13,8 +13,6 @@ import mindustry.world.blocks.power.ConsumeGenerator.*;
 import mindustry.world.consumers.*;
 import org.junit.jupiter.api.*;
 
-import java.util.*;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.DynamicTest.*;
 
@@ -24,8 +22,6 @@ import static org.junit.jupiter.api.DynamicTest.*;
  * Any expected power amount (produced, consumed, buffered) should be affected by fakeDelta but status should not!
  */
 public class ConsumeGeneratorTests extends PowerTestFixture{
-    private ConsumeGenerator generator;
-    private Tile tile;
     private ConsumeGeneratorBuild build;
     private final float fakeItemDuration = 60f; //ticks
     private final float maximumLiquidUsage = 1f;
@@ -33,7 +29,7 @@ public class ConsumeGeneratorTests extends PowerTestFixture{
     public void createGenerator(InputType inputType){
         Vars.state = new GameState();
         Vars.state.rules = new Rules();
-        generator = new ConsumeGenerator("fakegen" + System.nanoTime()){{
+        ConsumeGenerator generator = new ConsumeGenerator("fakegen" + System.nanoTime()){{
             powerProduction = 0.1f;
             itemDuration = fakeItemDuration;
             buildType = ConsumeGeneratorBuild::new;
@@ -49,23 +45,9 @@ public class ConsumeGeneratorTests extends PowerTestFixture{
         }};
 
         generator.init();
-        tile = createFakeTile(0, 0, generator);
+        Tile tile = createFakeTile(0, 0, generator);
         build = (ConsumeGeneratorBuild)tile.build;
     }
-
-    //require = 1
-    //provided = 0.25
-    //delta = 0.5 (half speed)
-    //scaled requirement = 1 * 0.5 = 0.5
-    //efficiency = provided / required = 0.25 / 0.5 = 0.5
-    //-> ???
-
-    //require = 1
-    //provided = 0.25
-    //delta = 1 (full speed)
-    //scaled requirement = 1 * 1 = 1
-    //efficiency = provided / required = 0.25
-    //-> makes sense, you're running at double speed without doubling input
 
     /** Tests the consumption and efficiency when being supplied with liquids. */
     @TestFactory
@@ -137,7 +119,7 @@ public class ConsumeGeneratorTests extends PowerTestFixture{
         //InputType.any
         };
 
-        ArrayList<DynamicTest> tests = new ArrayList<>();
+        Seq<DynamicTest> tests = new Seq<>();
         for(InputType inputType : inputTypesToBeTested){
             tests.add(dynamicTest("01", () -> simulateItemConsumption(inputType, Items.coal, 0, "No items provided")));
             tests.add(dynamicTest("02", () -> simulateItemConsumption(inputType, Items.coal, 1, "Sufficient coal provided")));
@@ -146,9 +128,7 @@ public class ConsumeGeneratorTests extends PowerTestFixture{
             tests.add(dynamicTest("05", () -> simulateItemConsumption(inputType, Items.sporePod, 1, "Biomatter provided")));
             tests.add(dynamicTest("06", () -> simulateItemConsumption(inputType, Items.pyratite, 1, "Pyratite provided")));
         }
-        DynamicTest[] testArray = new DynamicTest[tests.size()];
-        testArray = tests.toArray(testArray);
-        return testArray;
+        return tests.toArray(DynamicTest.class);
     }
 
     void simulateItemConsumption(InputType inputType, Item item, int amount, String parameterDescription){
@@ -174,12 +154,6 @@ public class ConsumeGeneratorTests extends PowerTestFixture{
     @Test
     void efficiencyRemainsConstantWithinItemDuration_ItemsOnly(){
         testItemDuration(InputType.items);
-    }
-
-    /** Makes sure the efficiency stays equal during the item duration. */
-    @Test
-    void efficiencyRemainsConstantWithinItemDuration_ItemsAndLiquids(){
-        //testItemDuration(InputType.any);
     }
 
     void testItemDuration(InputType inputType){

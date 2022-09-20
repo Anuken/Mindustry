@@ -15,6 +15,7 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.environment.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -59,6 +60,8 @@ public class BeamDrill extends Block{
         solid = true;
         drawArrow = false;
         regionRotated1 = 1;
+        ambientSoundVolume = 0.05f;
+        ambientSound = Sounds.minebeam;
 
         envEnabled |= Env.space;
     }
@@ -102,6 +105,9 @@ public class BeamDrill extends Block{
     public void setStats(){
         super.setStats();
 
+        stats.add(Stat.drillTier, StatValues.blocks(b -> (b instanceof Floor f && f.wallOre && f.itemDrop != null && f.itemDrop.hardness <= tier) || (b instanceof StaticWall w && w.itemDrop != null && w.itemDrop.hardness <= tier)));
+
+        stats.add(Stat.drillSpeed, 60f / drillTime * size, StatUnit.itemsSecond);
         if(optionalBoostIntensity != 1){
             stats.add(Stat.boostEffect, optionalBoostIntensity, StatUnit.timesSpeed);
         }

@@ -2,6 +2,7 @@ package mindustry.world.blocks.payloads;
 
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.io.*;
@@ -28,11 +29,13 @@ public class PayloadSource extends PayloadBlock{
         hasPower = false;
         rotate = true;
         configurable = true;
+        selectionRows = selectionColumns = 8;
         //make sure to display large units.
         clipSize = 120;
         noUpdateDisabled = true;
         clearOnDoubleTap = true;
         regionRotated1 = 1;
+        commandable = true;
 
         config(Block.class, (PayloadSourceBuild build, Block block) -> {
             if(canProduce(block) && build.block != block){
@@ -83,14 +86,25 @@ public class PayloadSource extends PayloadBlock{
     public class PayloadSourceBuild extends PayloadBlockBuild<Payload>{
         public UnitType unit;
         public Block block;
+        public @Nullable Vec2 commandPos;
         public float scl;
+
+        @Override
+        public Vec2 getCommandPosition(){
+            return commandPos;
+        }
+
+        @Override
+        public void onCommand(Vec2 target){
+            commandPos = target;
+        }
 
         @Override
         public void buildConfiguration(Table table){
             ItemSelection.buildTable(PayloadSource.this, table,
                 content.blocks().select(PayloadSource.this::canProduce).<UnlockableContent>as()
                 .add(content.units().select(PayloadSource.this::canProduce).as()),
-            () -> (UnlockableContent)config(), this::configure);
+            () -> (UnlockableContent)config(), this::configure, selectionRows, selectionColumns);
         }
 
         @Override
@@ -110,6 +124,11 @@ public class PayloadSource extends PayloadBlock{
                 scl = 0f;
                 if(unit != null){
                     payload = new UnitPayload(unit.create(team));
+
+                    Unit p = ((UnitPayload)payload).unit;
+                    if(commandPos != null && p.isCommandable()){
+                        p.command().commandPosition(commandPos);
+                    }
                 }else if(block != null){
                     payload = new BuildPayload(block, team);
                 }

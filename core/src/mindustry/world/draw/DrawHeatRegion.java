@@ -9,7 +9,6 @@ import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.blocks.production.HeatCrafter.*;
 
-/** Not standalone. */
 public class DrawHeatRegion extends DrawBlock{
     public Color color = new Color(1f, 0.22f, 0.22f, 0.8f);
     public float pulse = 0.3f, pulseScl = 10f;

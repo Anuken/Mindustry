@@ -46,8 +46,13 @@ public class Version{
         }
     }
 
-    /** @return whether the version is greater than the specified version string, e.g. "120.1"*/
+    /** @return whether the current game version is greater than the specified version string, e.g. "120.1"*/
     public static boolean isAtLeast(String str){
+        return isAtLeast(build, revision, str);
+    }
+
+    /** @return whether the version numbers are greater than the specified version string, e.g. "120.1"*/
+    public static boolean isAtLeast(int build, int revision, String str){
         if(build <= 0 || str == null || str.isEmpty()) return true;
 
         int dot = str.indexOf('.');

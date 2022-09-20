@@ -162,16 +162,17 @@ public class RepairBeamWeapon extends Weapon{
 
         HealBeamMount heal = (HealBeamMount)mount;
 
-        float
-        weaponRotation = unit.rotation - 90,
-        wx = unit.x + Angles.trnsx(weaponRotation, x, y),
-        wy = unit.y + Angles.trnsy(weaponRotation, x, y);
-
-        float z = Draw.z();
-        RepairTurret.drawBeam(wx, wy, unit.rotation + mount.rotation, shootY, unit.id, mount.target == null || controllable ? null : (Sized)mount.target, unit.team, heal.strength,
+        if(unit.canShoot()){
+            float
+                weaponRotation = unit.rotation - 90,
+                wx = unit.x + Angles.trnsx(weaponRotation, x, y),
+                wy = unit.y + Angles.trnsy(weaponRotation, x, y),
+                z = Draw.z();
+            RepairTurret.drawBeam(wx, wy, unit.rotation + mount.rotation, shootY, unit.id, mount.target == null || controllable ? null : (Sized)mount.target, unit.team, heal.strength,
             pulseStroke, pulseRadius, beamWidth + Mathf.absin(widthSinScl, widthSinMag), heal.lastEnd, heal.offset, laserColor, laserTopColor,
             laser, laserEnd, laserTop, laserTopEnd);
-        Draw.z(z);
+            Draw.z(z);
+        }
     }
 
     @Override

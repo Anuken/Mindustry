@@ -361,13 +361,13 @@ public class WaveInfoDialog extends BaseDialog{
                                         }
                                     }
 
-                                    p.button("@waves.spawn.all", Styles.flatTogglet, () -> {
-                                        group.spawn = -1;
-                                        dialog.hide();
-                                    }).size(110f, 45f).checked(-1 == group.spawn);
-
                                     if(spawner.getSpawns().isEmpty()){
                                         p.add("@waves.spawn.none");
+                                    }else{
+                                        p.button("@waves.spawn.all", Styles.flatTogglet, () -> {
+                                            group.spawn = -1;
+                                            dialog.hide();
+                                        }).size(110f, 45f).checked(-1 == group.spawn);
                                     }
                                 });
                                 dialog.setFillParent(false);

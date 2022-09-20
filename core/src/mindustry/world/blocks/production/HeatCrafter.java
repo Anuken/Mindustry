@@ -67,11 +67,6 @@ public class HeatCrafter extends GenericCrafter{
         }
 
         @Override
-        public void updateEfficiencyMultiplier(){
-            efficiency *= efficiencyScale();
-            potentialEfficiency *= efficiencyScale();
-        }
-
         public float efficiencyScale(){
             float over = Math.max(heat - heatRequirement, 0f);
             return Math.min(Mathf.clamp(heat / heatRequirement) + over / heatRequirement * overheatScale, maxEfficiency);

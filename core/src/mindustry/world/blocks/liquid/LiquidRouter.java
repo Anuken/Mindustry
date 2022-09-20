@@ -14,6 +14,7 @@ public class LiquidRouter extends LiquidBlock{
         solid = false;
         noUpdateDisabled = true;
         canOverdrive = false;
+        floating = true;
     }
 
     @Override
