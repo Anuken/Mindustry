@@ -380,6 +380,11 @@ public class ContentParser{
                     }
                 }
 
+                //try to parse Rect as array
+                if(type == Rect.class && jsonData.isArray() && jsonData.size == 4){
+                    return (T)new Rect(jsonData.get(0).asFloat(), jsonData.get(1).asFloat(), jsonData.get(2).asFloat(), jsonData.get(3).asFloat());
+                }
+
                 if(Content.class.isAssignableFrom(type)){
                     ContentType ctype = contentTypes.getThrow(type, () -> new IllegalArgumentException("No content type for class: " + type.getSimpleName()));
                     String prefix = currentMod != null ? currentMod.name + "-" : "";

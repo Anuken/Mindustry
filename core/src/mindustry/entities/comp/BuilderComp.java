@@ -85,7 +85,10 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
         if(Float.isNaN(buildCounter) || Float.isInfinite(buildCounter)) buildCounter = 0f;
         buildCounter = Math.min(buildCounter, 10f);
 
-        while(buildCounter >= 1){
+        //random attempt to fix a freeze that only occurs on Android
+        int maxPerFrame = 10, count = 0;
+
+        while(buildCounter >= 1 && count++ < maxPerFrame){
             buildCounter -= 1f;
 
             validatePlans();
@@ -93,7 +96,7 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
             var core = core();
 
             //nothing to build.
-            if(buildPlan() == null) continue;
+            if(buildPlan() == null) return;
 
             //find the next build plan
             if(plans.size > 1){

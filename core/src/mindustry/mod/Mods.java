@@ -180,7 +180,7 @@ public class Mods implements Loadable{
     }
 
     private void packSprites(Seq<Fi> sprites, LoadedMod mod, boolean prefix, Seq<Future<Runnable>> tasks){
-        boolean linear = Core.settings.getBool("linear", true);
+        boolean bleed = Core.settings.getBool("linear", true) && !mod.meta.pregenerated;
 
         for(Fi file : sprites){
             String name = file.nameWithoutExtension();
@@ -204,7 +204,7 @@ public class Mods implements Loadable{
                 try{
                     Pixmap pix = new Pixmap(file.readBytes());
                     //only bleeds when linear filtering is on at startup
-                    if(linear){
+                    if(bleed){
                         Pixmaps.bleed(pix, 2);
                     }
                     //this returns a *runnable* which actually packs the resulting pixmap; this has to be done synchronously outside the method
@@ -336,7 +336,7 @@ public class Mods implements Loadable{
                     if(c instanceof UnlockableContent u && c.minfo.mod != null){
                         u.load();
                         u.loadIcon();
-                        if(u.generateIcons){
+                        if(u.generateIcons && !c.minfo.mod.meta.pregenerated){
                             u.createIcons(packer);
                         }
                     }
@@ -1141,6 +1141,8 @@ public class Mods implements Loadable{
         public boolean java;
         /** If true, -outline regions for units are kept when packing. Only use if you know exactly what you are doing. */
         public boolean keepOutlines;
+        /** If true, bleeding is skipped and no content icons are generated. */
+        public boolean pregenerated;
 
         public String displayName(){
             return displayName == null ? name : displayName;

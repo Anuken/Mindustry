@@ -148,7 +148,11 @@ public class ErekirTechTree{
                     node(ventCondenser, Seq.with(new OnSector(aegis)), () -> {
                         node(chemicalCombustionChamber, Seq.with(new OnSector(basin)), () -> {
                             node(pyrolysisGenerator, () -> {
+                                node(fluxReactor, () -> {
+                                    node(neoplasiaReactor, () -> {
 
+                                    });
+                                });
                             });
                         });
                     });
@@ -247,7 +251,9 @@ public class ErekirTechTree{
 
                         node(reinforcedSurgeWall, () -> {
                             node(reinforcedSurgeWallLarge, () -> {
+                                node(shieldedWall, () -> {
 
+                                });
                             });
                         });
 
@@ -263,13 +269,21 @@ public class ErekirTechTree{
                     node(sublimate, Seq.with(new OnSector(marsh)), () -> {
                         node(afflict, Seq.with(new OnSector(ravine)), () -> {
                             node(titan, Seq.with(new OnSector(marsh)), () -> {
+                                node(lustre, () -> {
+                                    node(smite, () -> {
 
+                                    });
+                                });
                             });
                         });
                     });
 
                     node(disperse, Seq.with(tmpNever), () -> {
+                        node(scathe, () -> {
+                            node(malign, () -> {
 
+                            });
+                        });
                     });
                 });
 
@@ -334,6 +348,10 @@ public class ErekirTechTree{
                                                     node(UnitTypes.collaris, Seq.with(tmpNever), () -> {
 
                                                     });
+                                                });
+
+                                                node(basicAssemblerModule, () -> {
+
                                                 });
                                             });
                                         });

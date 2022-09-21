@@ -89,6 +89,8 @@ public class Planet extends UnlockableContent{
     public Color lightColor = Color.white.cpy();
     /** Atmosphere tint for landable planets. */
     public Color atmosphereColor = new Color(0.3f, 0.7f, 1.0f);
+    /** Icon for appearance in planet list. */
+    public Color iconColor = Color.white.cpy();
     /** Whether this planet has an atmosphere. */
     public boolean hasAtmosphere = true;
     /** Whether to allow users to specify a custom launch schematic for this map. */
@@ -107,6 +109,8 @@ public class Planet extends UnlockableContent{
     public boolean prebuildBase = true;
     /** If true, waves are created on sector loss. TODO remove. */
     public boolean allowWaves = false;
+    /** Icon as displayed in the planet selection dialog. This is a string, as drawables are null at load time. */
+    public String icon = "planet";
     /** Default core block for launching. */
     public Block defaultCore = Blocks.coreShard;
     /** Sets up rules on game load for any sector on this planet. */
@@ -119,7 +123,7 @@ public class Planet extends UnlockableContent{
     public Seq<Planet> children = new Seq<>();
     /** Default root node shown when the tech tree is opened here. */
     public @Nullable TechNode techTree;
-    /** Planets that can be launched to from this one. Made mutual in init(). */
+    /** TODO remove? Planets that can be launched to from this one. Made mutual in init(). */
     public Seq<Planet> launchCandidates = new Seq<>();
     /** Items not available on this planet. */
     public Seq<Item> hiddenItems = new Seq<>();
@@ -167,6 +171,10 @@ public class Planet extends UnlockableContent{
 
             sectorApproxRadius = sectors.first().tile.v.dst(sectors.first().tile.corners[0].v);
         }
+    }
+
+    public @Nullable Sector getStartSector(){
+        return sectors.size == 0 ? null : sectors.get(startSector);
     }
 
     public void applyRules(Rules rules){

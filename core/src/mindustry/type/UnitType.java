@@ -212,6 +212,8 @@ public class UnitType extends UnlockableContent{
     bounded = true,
     /** if true, this unit is detected as naval - do NOT assign this manually! Initialized in init() */
     naval = false,
+    /** if false, RTS AI controlled units do not automatically attack things while moving. This is automatically assigned. */
+    autoFindTarget = true,
 
     /** if true, this modded unit always has a -outline region generated for its base. Normally, outlines are ignored if there are no top = false weapons. */
     alwaysCreateOutline = false,
@@ -226,7 +228,9 @@ public class UnitType extends UnlockableContent{
     /** if false, the unit shield (usually seen in waves) is not drawn. */
     drawShields = true,
     /** if false, the unit body is not drawn. */
-    drawBody = true;
+    drawBody = true,
+    /** if false, the unit is not drawn on the minimap. */
+    drawMinimap = true;
 
     /** The default AI controller to assign on creation. */
     public Prov<? extends UnitController> aiController = () -> !flying ? new GroundAI() : new FlyingAI();
@@ -686,6 +690,9 @@ public class UnitType extends UnlockableContent{
             lightRadius = Math.max(60f, hitSize * 2.3f);
         }
 
+        //if a status effects slows a unit when firing, don't shoot while moving.
+        autoFindTarget = !weapons.contains(w -> w.shootStatus.speedMultiplier < 0.99f);
+
         clipSize = Math.max(clipSize, lightRadius * 1.1f);
         singleTarget = weapons.size <= 1 && !forceMultiTarget;
 
@@ -905,6 +912,8 @@ public class UnitType extends UnlockableContent{
     public void createIcons(MultiPacker packer){
         super.createIcons(packer);
 
+        sample = constructor.get();
+
         var toOutline = new Seq<TextureRegion>();
         getRegionsToOutline(toOutline);
 
@@ -945,7 +954,6 @@ public class UnitType extends UnlockableContent{
             }
         }
 
-        //TODO test
         if(sample instanceof Tankc){
             PixmapRegion pix = Core.atlas.getPixmap(treadRegion);
 

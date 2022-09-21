@@ -49,7 +49,7 @@ public class Blocks{
     redmat, bluemat,
     stoneWall, dirtWall, sporeWall, iceWall, daciteWall, sporePine, snowPine, pine, shrubs, whiteTree, whiteTreeDead, sporeCluster,
     redweed, purbush, yellowCoral,
-    rhyoliteVent, carbonVent, arkyicVent, yellowStoneVent, redStoneVent,
+    rhyoliteVent, carbonVent, arkyicVent, yellowStoneVent, redStoneVent, crystallineVent,
     regolithWall, yellowStoneWall, rhyoliteWall, carbonWall, redIceWall, ferricStoneWall, beryllicStoneWall, arkyicWall, crystallineStoneWall, redStoneWall, redDiamondWall,
     ferricStone, ferricCraters, carbonStone, beryllicStone, crystallineStone, crystalFloor, yellowStonePlates,
     iceSnow, sandWater, darksandWater, duneWall, sandWall, moss, sporeMoss, shale, shaleWall, grass, salt,
@@ -489,6 +489,11 @@ public class Blocks{
 
         redStoneVent = new SteamVent("red-stone-vent"){{
             parent = blendGroup = denseRedStone;
+            attributes.set(Attribute.steam, 1f);
+        }};
+
+        crystallineVent = new SteamVent("crystalline-vent"){{
+            parent = blendGroup = crystallineStone;
             attributes.set(Attribute.steam, 1f);
         }};
 
@@ -1399,7 +1404,6 @@ public class Blocks{
         }};
 
         cyanogenSynthesizer = new HeatCrafter("cyanogen-synthesizer"){{
-            //TODO requirements
             requirements(Category.crafting, with(Items.carbide, 50, Items.silicon, 80, Items.beryllium, 90));
 
             heatRequirement = 5f;
