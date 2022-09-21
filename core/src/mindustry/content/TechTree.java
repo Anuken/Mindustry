@@ -21,10 +21,17 @@ public class TechTree{
     }
 
     public static TechNode nodeRoot(String name, UnlockableContent content, boolean requireUnlock, Runnable children){
-        var root = node(content, content.researchRequirements(), children);
+        var root = node(content, content.researchRequirements(), () -> {});
         root.name = name;
+        root.root = root;
         root.requiresUnlock = requireUnlock;
         roots.add(root);
+
+        TechNode prev = context;
+        context = root;
+        children.run();
+        context = prev;
+
         return root;
     }
 
@@ -66,6 +73,13 @@ public class TechTree{
         return nodeProduce(content, new Seq<>(), children);
     }
 
+    public static void setContext(String root, UnlockableContent parent){
+        context = all.find(r -> r.root.name.equals(root) && r.content == parent);
+        if(context == null){
+            throw new RuntimeException("Cannot find TechNode with a root of '" + root + "' with content '" + parent + "'!");
+        }
+    }
+
     public static @Nullable TechNode context(){
         return context;
     }
@@ -79,6 +93,8 @@ public class TechTree{
         public @Nullable String name;
         /** For roots only. If true, this needs to be unlocked before it is selectable in the research dialog. Does not apply when you are on the planet itself. */
         public boolean requiresUnlock = false;
+        /** Root node. */
+        public @Nullable TechNode root;
         /** Requirement node. */
         public @Nullable TechNode parent;
         /** Multipliers for research costs on a per-item basis. Inherits from parent. */
@@ -99,6 +115,7 @@ public class TechTree{
         public TechNode(@Nullable TechNode parent, UnlockableContent content, ItemStack[] requirements){
             if(parent != null){
                 parent.children.add(this);
+                root = parent.root;
                 researchCostMultipliers = parent.researchCostMultipliers;
             }else if(researchCostMultipliers == null){
                 researchCostMultipliers = new ObjectFloatMap<>();
