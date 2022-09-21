@@ -944,7 +944,7 @@ public class ContentParser{
             String finalRootName = rootName; //Amazing language design
 
             //remove old node
-            TechNode lastNode = TechTree.all.find(t -> t.content == unlock && t.root.name.equals(finalRootName));
+            TechNode lastNode = TechTree.all.find(t -> t.content == unlock && t.root.equals(finalRootName));
             if(lastNode != null){
                 lastNode.remove();
             }
@@ -982,7 +982,7 @@ public class ContentParser{
                 }else{
                     if(researchName != null){
                         //find parent node.
-                        TechNode parent = TechTree.all.find(t -> (t.content.name.equals(researchName) || t.content.name.equals(currentMod.name + "-" + researchName) || t.content.name.equals(SaveVersion.mapFallback(researchName))) && t.root.name.equals(finalRootName));
+                        TechNode parent = TechTree.all.find(t -> (t.content.name.equals(researchName) || t.content.name.equals(currentMod.name + "-" + researchName) || t.content.name.equals(SaveVersion.mapFallback(researchName))) && t.root.equals(finalRootName));
 
                         if(parent == null){
                             Log.warn("Content '" + researchName + "' isn't in the tech tree, but '" + unlock.name + "' requires it to be researched.");

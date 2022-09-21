@@ -22,8 +22,7 @@ public class TechTree{
 
     public static TechNode nodeRoot(String name, UnlockableContent content, boolean requireUnlock, Runnable children){
         var root = node(content, content.researchRequirements(), () -> {});
-        root.name = name;
-        root.root = root;
+        root.name = root.root = name;
         root.requiresUnlock = requireUnlock;
         roots.add(root);
 
@@ -74,7 +73,7 @@ public class TechTree{
     }
 
     public static void setContext(String root, UnlockableContent parent){
-        context = all.find(r -> r.root.name.equals(root) && r.content == parent);
+        context = all.find(r -> r.root.equals(root) && r.content == parent);
         if(context == null){
             throw new RuntimeException("Cannot find TechNode with a root of '" + root + "' with content '" + parent + "'!");
         }
@@ -93,8 +92,8 @@ public class TechTree{
         public @Nullable String name;
         /** For roots only. If true, this needs to be unlocked before it is selectable in the research dialog. Does not apply when you are on the planet itself. */
         public boolean requiresUnlock = false;
-        /** Root node. */
-        public @Nullable TechNode root;
+        /** Root node name. */
+        public @Nullable String root;
         /** Requirement node. */
         public @Nullable TechNode parent;
         /** Multipliers for research costs on a per-item basis. Inherits from parent. */
