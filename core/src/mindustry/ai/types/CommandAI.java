@@ -68,7 +68,18 @@ public class CommandAI extends AIController{
         }
 
         updateVisuals();
-        updateTargeting();
+        //only autotarget if the unit supports it
+        if(targetPos == null || unit.type.autoFindTarget){
+            updateTargeting();
+        }else if(attackTarget == null){
+            //if the unit does not have an attack target, is currently moving, and does not have autotargeting, stop attacking stuff
+            target = null;
+            for(var mount : unit.mounts){
+                if(mount.weapon.controllable){
+                    mount.target = null;
+                }
+            }
+        }
 
         if(attackTarget != null && invalid(attackTarget)){
             attackTarget = null;

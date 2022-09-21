@@ -212,6 +212,8 @@ public class UnitType extends UnlockableContent{
     bounded = true,
     /** if true, this unit is detected as naval - do NOT assign this manually! Initialized in init() */
     naval = false,
+    /** if false, RTS AI controlled units do not automatically attack things while moving. This is automatically assigned. */
+    autoFindTarget = true,
 
     /** if true, this modded unit always has a -outline region generated for its base. Normally, outlines are ignored if there are no top = false weapons. */
     alwaysCreateOutline = false,
@@ -687,6 +689,9 @@ public class UnitType extends UnlockableContent{
         if(lightRadius == -1){
             lightRadius = Math.max(60f, hitSize * 2.3f);
         }
+
+        //if a status effects slows a unit when firing, don't shoot while moving.
+        autoFindTarget = !weapons.contains(w -> w.shootStatus.speedMultiplier < 0.99f);
 
         clipSize = Math.max(clipSize, lightRadius * 1.1f);
         singleTarget = weapons.size <= 1 && !forceMultiTarget;
