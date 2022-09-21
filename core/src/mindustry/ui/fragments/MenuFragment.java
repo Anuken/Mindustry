@@ -14,7 +14,6 @@ import arc.scene.ui.TextButton.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.annotations.Annotations.*;
 import mindustry.core.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
@@ -41,24 +40,6 @@ public class MenuFragment{
         parent = group;
 
         parent.fill((x, y, w, h) -> renderer.render());
-
-        String versionText = ((Version.build == -1) ? "[#fc8140aa]" : "[#ffffffba]") + Version.combined();
-        parent.fill((x, y, w, h) -> {
-            TextureRegion logo = Core.atlas.find("logo");
-            float width = Core.graphics.getWidth(), height = Core.graphics.getHeight() - Core.scene.marginTop;
-            float logoscl = Scl.scl(1);
-            float logow = Math.min(logo.width * logoscl, Core.graphics.getWidth() - Scl.scl(20));
-            float logoh = logow * (float)logo.height / logo.width;
-
-            float fx = (int)(width / 2f);
-            float fy = (int)(height - 6 - logoh) + logoh / 2 - (Core.graphics.isPortrait() ? Scl.scl(30f) : 0f);
-
-            Draw.color();
-            Draw.rect(logo, fx, fy, logow, logoh);
-
-            Fonts.outline.setColor(Color.white);
-            Fonts.outline.draw(versionText, fx, fy - logoh/2f - Scl.scl(2f), Align.center);
-        }).touchable = Touchable.disabled;
 
         parent.fill(c -> {
             c.pane(Styles.noBarPane, cont -> {
@@ -102,6 +83,24 @@ public class MenuFragment{
                 t.getLabel().setColor(becontrol.isUpdateAvailable() ? Tmp.c1.set(Color.white).lerp(Pal.accent, Mathf.absin(5f, 1f)) : Color.white);
             }));
         }
+
+        String versionText = ((Version.build == -1) ? "[#fc8140aa]" : "[#ffffffba]") + Version.combined();
+        parent.fill((x, y, w, h) -> {
+            TextureRegion logo = Core.atlas.find("logo");
+            float width = Core.graphics.getWidth(), height = Core.graphics.getHeight() - Core.scene.marginTop;
+            float logoscl = Scl.scl(1);
+            float logow = Math.min(logo.width * logoscl, Core.graphics.getWidth() - Scl.scl(20));
+            float logoh = logow * (float)logo.height / logo.width;
+
+            float fx = (int)(width / 2f);
+            float fy = (int)(height - 6 - logoh) + logoh / 2 - (Core.graphics.isPortrait() ? Scl.scl(30f) : 0f);
+
+            Draw.color();
+            Draw.rect(logo, fx, fy, logow, logoh);
+
+            Fonts.outline.setColor(Color.white);
+            Fonts.outline.draw(versionText, fx, fy - logoh/2f - Scl.scl(2f), Align.center);
+        }).touchable = Touchable.disabled;
     }
 
     private void buildMobile(){
