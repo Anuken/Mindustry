@@ -6,6 +6,8 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.audio.*;
+import arc.files.*;
 import mindustry.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
@@ -884,6 +886,36 @@ public class LExecutor{
         @Override
         public void run(LExecutor exec){
             exec.var(varCounter).numval = exec.instructions.length;
+        }
+    }
+
+    public static class SoundI implements LInstruction{
+        public int sound;
+        public int volume;
+        public int pitch;
+        public int x, y;
+
+        public SoundI(int sound, int volume, int pitch, int x, int y){
+            this.sound = sound;
+            this.volume = volume;
+            this.pitch = pitch;
+            this.x = x;
+            this.y = y;
+        }
+        
+        @Override
+        public void run(LExecutor exec){
+            int _sound = exec.numi(sound);
+            float _volume = exec.numf(volume);
+            float _pitch = exec.numf(pitch);
+            float _x = World.unconv(exec.numf(x));
+            float _y = World.unconv(exec.numf(y));
+            switch (_sound) {
+                case -1 -> Sounds.logic0.at(_x, _y, _pitch, _volume);
+                case -2 -> Sounds.logic1.at(_x, _y, _pitch, _volume);
+                case -3 -> Sounds.logic2.at(_x, _y, _pitch, _volume);
+                default -> Sounds.getSound(_sound).at(_x, _y, _pitch, _volume);
+            }
         }
     }
 

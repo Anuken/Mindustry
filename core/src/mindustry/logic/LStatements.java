@@ -52,6 +52,46 @@ public class LStatements{
         }
     }
 
+    @RegisterStatement("sound")
+    public static class SoundStatement extends LStatement{
+        public String sound = "0", volume = "1.0", pitch = "1.0", x = "@thisx", y = "@thisy";
+
+        @Override
+        public void build(Table table){
+            table.add(" sound ");
+
+            field(table, sound, str -> sound = str);
+
+            table.add(" volume ");
+
+            fields(table, volume, str -> volume = str);
+
+            table.add(" pitch ");
+
+            field(table, pitch, str -> pitch = str);
+
+            table.row();
+
+            table.add(" x ");
+
+            field(table, x, str -> x = str);
+
+            table.add(" y ");
+
+            field(table, y, str -> y = str);
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new SoundI(builder.var(sound), builder.var(volume), builder.var(pitch), builder.var(x), builder.var(y));
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.io;
+        }
+    }
+
     @RegisterStatement("read")
     public static class ReadStatement extends LStatement{
         public String output = "result", target = "cell1", address = "0";
