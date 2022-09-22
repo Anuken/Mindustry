@@ -885,7 +885,7 @@ public class UnitType extends UnlockableContent{
             segmentOutlineRegions[i] = Core.atlas.find(name + "-segment-outline" + i);
         }
 
-        clipSize = Math.max(region.width * region.scale * 2f, clipSize);
+        clipSize = Math.max(region.width * 2f, clipSize);
     }
 
     public void getRegionsToOutline(Seq<TextureRegion> out){
@@ -1287,7 +1287,7 @@ public class UnitType extends UnlockableContent{
             size, size, unit.rotation);
             Draw.mixcol();
 
-            size = ((3f + Mathf.absin(Time.time, 5f, 1f)) * unit.itemTime + 0.5f) * 2 * itemCircleRegion.scale;
+            size = ((3f + Mathf.absin(Time.time, 5f, 1f)) * unit.itemTime + 0.5f) * 2;
             Draw.color(Pal.accent);
             Draw.rect(itemCircleRegion,
             unit.x + Angles.trnsx(unit.rotation + 180f, itemOffsetY),

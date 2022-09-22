@@ -202,15 +202,15 @@ public class PayloadConveyor extends Block{
 
             //next
             TextureRegion clipped = clipRegion(tile.getHitbox(Tmp.r1), tile.getHitbox(Tmp.r2).move(trnext, 0), topRegion);
-            float widthNext = (s - clipped.width * clipped.scale * Draw.scl) * 0.5f;
-            float heightNext = (s - clipped.height * clipped.scale * Draw.scl) * 0.5f;
+            float widthNext = (s - clipped.width * clipped.scl()) * 0.5f;
+            float heightNext = (s - clipped.height * clipped.scl()) * 0.5f;
             Tmp.v1.set(widthNext, heightNext).rotate(rot);
             Draw.rect(clipped, x + Tmp.v1.x, y + Tmp.v1.y, rot);
 
             //prev
             clipped = clipRegion(tile.getHitbox(Tmp.r1), tile.getHitbox(Tmp.r2).move(trprev, 0), topRegion);
-            float widthPrev = (clipped.width * clipped.scale * Draw.scl - s) * 0.5f;
-            float heightPrev = (clipped.height * clipped.scale * Draw.scl - s) * 0.5f;
+            float widthPrev = (clipped.width * clipped.scl() - s) * 0.5f;
+            float heightPrev = (clipped.height * clipped.scl() - s) * 0.5f;
             Tmp.v1.set(widthPrev, heightPrev).rotate(rot);
             Draw.rect(clipped, x + Tmp.v1.x, y + Tmp.v1.y, rot);
 
