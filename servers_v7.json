@@ -1,5 +1,8 @@
 [
-  
+  {
+    "name": "Mindustry Español",
+    "address": ["n1.xpdustry.fr:6001"]
+  },
   {
     "name": "mindustry.pl",
     "address": ["0.baseduser.eu.org:6966", "0.baseduser.eu.org:6666", "0.baseduser.eu.org:6000"]
