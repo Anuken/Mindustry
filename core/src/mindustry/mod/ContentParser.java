@@ -100,7 +100,7 @@ public class ContentParser{
             
             if(pal != null){
                 return pal;
-            }else if(color != null && color instanceof Color){
+            }else if(color != null){
                 return color;
             }else{
                 return Color.valueOf(data.asString());
