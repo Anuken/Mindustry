@@ -83,7 +83,7 @@ public class Renderer implements ApplicationListener{
         camera = new Camera();
         Shaders.init();
 
-        Events.on(ResetEvent.class, e ->  {
+        Events.on(ResetEvent.class, e -> {
             shakeTime = shakeIntensity = 0f;
             camShakeOffset.setZero();
         });

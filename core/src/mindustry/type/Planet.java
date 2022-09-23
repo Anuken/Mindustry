@@ -123,7 +123,7 @@ public class Planet extends UnlockableContent{
     public Seq<Planet> children = new Seq<>();
     /** Default root node shown when the tech tree is opened here. */
     public @Nullable TechNode techTree;
-    /** Planets that can be launched to from this one. Made mutual in init(). */
+    /** TODO remove? Planets that can be launched to from this one. Made mutual in init(). */
     public Seq<Planet> launchCandidates = new Seq<>();
     /** Items not available on this planet. */
     public Seq<Item> hiddenItems = new Seq<>();

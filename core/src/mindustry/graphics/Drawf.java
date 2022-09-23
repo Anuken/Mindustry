@@ -21,7 +21,9 @@ public class Drawf{
 
     /** Bleeds a mod pixmap if linear filtering is enabled. */
     public static void checkBleed(Pixmap pixmap){
-        if(Core.settings.getBool("linear", true)) Pixmaps.bleed(pixmap);
+        if(Core.settings.getBool("linear", true)){
+            Pixmaps.bleed(pixmap);
+        }
     }
 
     //TODO offset unused
