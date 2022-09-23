@@ -484,7 +484,7 @@ public class Renderer implements ApplicationListener{
             TextureRegion reg = block.fullIcon;
             float scl = Scl.scl(4f) / camerascale;
             float shake = 0f;
-            float s = reg.width * Draw.scl * scl * 3.6f * Interp.pow2Out.apply(fout);
+            float s = reg.width * reg.scl() * scl * 3.6f * Interp.pow2Out.apply(fout);
             float rotation = Interp.pow2In.apply(fout) * 135f, x = build.x + Mathf.range(shake), y = build.y + Mathf.range(shake);
             float thrustOpen = 0.25f;
             float thrusterFrame = fin >= thrustOpen ? 1f : fin / thrustOpen;
