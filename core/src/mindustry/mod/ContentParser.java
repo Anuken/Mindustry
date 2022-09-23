@@ -93,7 +93,19 @@ public class ContentParser{
                 }
             }
         });
-        put(Color.class, (type, data) -> Color.valueOf(data.asString()));
+        put(Color.class, (type, data) -> {
+            Object
+            pal = fieldOpt(Pal.class, data),
+            color = fieldOpt(Color.class, data);
+            
+            if(pal != null){
+                return pal;
+            }else if(color != null && color instanceof Color){
+                return color;
+            }else{
+                return Color.valueOf(data.asString());
+            }
+        });
         put(StatusEffect.class, (type, data) -> {
             if(data.isString()){
                 StatusEffect result = locate(ContentType.status, data.asString());
