@@ -5,7 +5,9 @@ import arc.scene.ui.TextField.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.logic.*;
 import mindustry.ui.*;
+import mindustry.world.blocks.logic.LogicBlock.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.meta.*;
 
@@ -32,6 +34,13 @@ public class PowerSource extends PowerNode{
 
     public class PowerSourceBuild extends PowerNodeBuild{
         public float configPower = powerProduction;
+
+        @Override
+        public Object senseObject(LAccess sensor){
+            if(sensor == LAccess.config) return configPower;
+
+            return super.senseObject(sensor);
+        }
 
         @Override
         public float getPowerProduction(){

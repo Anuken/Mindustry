@@ -9,6 +9,7 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
+import mindustry.logic.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.heat.*;
@@ -69,6 +70,13 @@ public class HeatSource extends Block{
         public void drawLight(){
             super.drawLight();
             drawer.drawLight(this);
+        }
+
+        @Override
+        public Object senseObject(LAccess sensor){
+            if(sensor == LAccess.config) return heat;
+
+            return super.senseObject(sensor);
         }
 
         @Override
