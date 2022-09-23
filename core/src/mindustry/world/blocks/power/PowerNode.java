@@ -483,7 +483,7 @@ public class PowerNode extends PowerBlock{
         }
 
         @Override
-        public Point2[] config(){
+        public Object config(){
             Point2[] out = new Point2[power.links.size];
             for(int i = 0; i < out.length; i++){
                 out[i] = Point2.unpack(power.links.get(i)).sub(tile.x, tile.y);

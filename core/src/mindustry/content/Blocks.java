@@ -5632,7 +5632,6 @@ public class Blocks{
 
         powerSource = new PowerSource("power-source"){{
             requirements(Category.power, BuildVisibility.sandboxOnly, with());
-            powerProduction = 1000000f / 60f;
             alwaysUnlocked = true;
         }};
 
