@@ -422,6 +422,14 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
+        handler.register("gamemodes", "Display available gamemodes.", arg -> {
+            info("@: resources, waves, primary enemy type","Gamemode");
+            info("  @: mined, countdown, drop point","survival");
+            info("  @: unlimited, manual, none","sandbox");
+            info("  @: mined, none/countdown, enemy AI core","attack");
+            info("  @: mined, none/countdown, enemy player core", "pvp");
+        });
+
         handler.register("status", "Display server status.", arg -> {
             if(state.isMenu()){
                 info("Status: &rserver closed");
