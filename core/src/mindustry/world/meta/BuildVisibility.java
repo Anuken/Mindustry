@@ -2,7 +2,6 @@ package mindustry.world.meta;
 
 import arc.func.*;
 import mindustry.*;
-import mindustry.content.*;
 
 public class BuildVisibility{
     public static final BuildVisibility
@@ -14,7 +13,6 @@ public class BuildVisibility{
     sandboxOnly = new BuildVisibility(() -> Vars.state == null || Vars.state.rules.infiniteResources),
     campaignOnly = new BuildVisibility(() -> Vars.state == null || Vars.state.isCampaign()),
     lightingOnly = new BuildVisibility(() -> Vars.state == null || Vars.state.rules.lighting || Vars.state.isCampaign()),
-    berylliumOnly = new BuildVisibility(() -> !Vars.state.rules.hiddenBuildItems.contains(Items.beryllium)),
     ammoOnly = new BuildVisibility(() -> Vars.state == null || Vars.state.rules.unitAmmo),
     fogOnly = new BuildVisibility(() -> Vars.state == null || Vars.state.rules.fog || Vars.state.rules.editor);
 

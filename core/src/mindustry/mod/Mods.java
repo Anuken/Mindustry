@@ -353,9 +353,7 @@ public class Mods implements Loadable{
             //dispose old atlas data
             Core.atlas = packer.flush(filter, new TextureAtlas());
 
-            Time.mark();
-            textureResize.each(e -> { Core.atlas.find(e.key).scale = e.value; });
-            Log.debug("Time to rescale textures: @", Time.elapsed());
+            textureResize.each(e -> Core.atlas.find(e.key).scale = e.value);
 
             Core.atlas.setErrorRegion("error");
             Log.debug("Total pages: @", Core.atlas.getTextures().size);
