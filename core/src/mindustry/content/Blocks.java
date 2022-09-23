@@ -5801,7 +5801,7 @@ public class Blocks{
         }};
 
         canvas = new CanvasBlock("canvas"){{
-            requirements(Category.logic, BuildVisibility.debugOnly, with(Items.silicon, 50));
+            requirements(Category.logic, BuildVisibility.shown, with(Items.silicon, 40, Items.graphite, 10));
 
             canvasSize = 12;
             padding = 7f / 4f * 2f;
