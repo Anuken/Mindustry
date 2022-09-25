@@ -119,21 +119,11 @@ public class CommandAI extends AIController{
             }
         }
 
-        boolean noBoost = true;
-
         if(targetPos != null){
             boolean move = true;
             vecOut.set(targetPos);
 
-            //boosting units with RTS controls are incredibly buggy and hard to use. there's no clear way for units to know where to land to approach or attack something
-            boolean tryBoosting = false;//unit.type.canBoost && (attackTarget == null || !unit.within(attackTarget, unit.type.range));
-            //noBoost = false;
-
-            if(tryBoosting){
-                unit.updateBoosting(true);
-            }
-
-            if(unit.isGrounded() && !tryBoosting){
+            if(unit.isGrounded()){
                 move = Vars.controlPath.getPathPosition(unit, pathId, targetPos, vecOut);
             }
 
@@ -184,10 +174,6 @@ public class CommandAI extends AIController{
 
         }else if(target != null){
             faceTarget();
-        }
-
-        if(noBoost){
-            unit.updateBoosting(false);
         }
     }
 
