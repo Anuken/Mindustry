@@ -773,7 +773,7 @@ public class ServerControl implements ApplicationListener{
                         target.team(Team.blue);
                         break;
                     default:
-                        warn("No team with that name found");
+                        err("No team with that name found");
                         return;
                 }
 
@@ -782,7 +782,6 @@ public class ServerControl implements ApplicationListener{
                 info("Nobody with that name could be found...");
             }
         });
-
 
         handler.register("ban", "<type-id/name/ip> <username/IP/ID...>", "Ban a person.", arg -> {
             if(arg[0].equals("id")){
