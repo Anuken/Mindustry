@@ -749,17 +749,21 @@ public class ServerControl implements ApplicationListener{
             }
             Player target = Groups.player.find(p -> p.name().equals(arg[0]));
             if(target != null){
-                switch (arg[1].toLowerCase()) {
-                    case "derelict", "black":
+                switch (arg[1].toLowerCase()){
+                    case "derelict":
+                    case "black":
                         target.team(Team.derelict);
                         break;
-                    case "sharded", "yellow":
+                    case "sharded":
+                    case "yellow":
                         target.team(Team.sharded);
                         break;
-                    case "crux", "red":
+                    case "crux":
+                    case "red":
                         target.team(Team.crux);
                         break;
-                    case "malis", "purple":
+                    case "malis":
+                    case "purple":
                         target.team(Team.malis);
                         break;
                     case "green":
@@ -768,10 +772,9 @@ public class ServerControl implements ApplicationListener{
                     case "blue":
                         target.team(Team.blue);
                         break;
-                    default: {
-                        err("No team with that name found");
-                        break;
-                    }
+                    default:
+                        warn("No team with that name found");
+                        return;
                 }
 
                 info("Moved "+arg[0]+" to team "+arg[1]);
@@ -779,6 +782,7 @@ public class ServerControl implements ApplicationListener{
                 info("Nobody with that name could be found...");
             }
         });
+
 
         handler.register("ban", "<type-id/name/ip> <username/IP/ID...>", "Ban a person.", arg -> {
             if(arg[0].equals("id")){
