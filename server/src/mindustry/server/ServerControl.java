@@ -739,6 +739,47 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
+        handler.register("teamset", "<username> [team]", "Move a player to another team", arg -> {
+            if(!state.is(State.playing)){
+                err("Not hosting a game yet. Calm down.");
+                return;
+            }else if(arg.length == 1){
+                err("You must specify a team");
+                return;
+            }
+            Player target = Groups.player.find(p -> p.name().equals(arg[0]));
+            if(target != null){
+                switch (arg[1].toLowerCase()) {
+                    case "derelict", "black":
+                        target.team(Team.derelict);
+                        break;
+                    case "sharded", "yellow":
+                        target.team(Team.sharded);
+                        break;
+                    case "crux", "red":
+                        target.team(Team.crux);
+                        break;
+                    case "malis", "purple":
+                        target.team(Team.malis);
+                        break;
+                    case "green":
+                        target.team(Team.green);
+                        break;
+                    case "blue":
+                        target.team(Team.blue);
+                        break;
+                    default: {
+                        err("No team with that name found");
+                        break;
+                    }
+                }
+
+                info("Moved "+arg[0]+" to team "+arg[1]);
+            }else{
+                info("Nobody with that name could be found...");
+            }
+        });
+
         handler.register("ban", "<type-id/name/ip> <username/IP/ID...>", "Ban a person.", arg -> {
             if(arg[0].equals("id")){
                 netServer.admins.banPlayerID(arg[1]);
