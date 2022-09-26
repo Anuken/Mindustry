@@ -1,5 +1,7 @@
 package mindustry.server;
 
+package darkdustry;
+
 import arc.*;
 import arc.files.*;
 import arc.func.Cons;
@@ -41,7 +43,7 @@ public class ServerControl implements ApplicationListener{
 
     protected static String[] tags = {"&lc&fb[D]&fr", "&lb&fb[I]&fr", "&ly&fb[W]&fr", "&lr&fb[E]", ""};
     protected static DateTimeFormatter dateTime = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss"),
-            autosaveDate = DateTimeFormatter.ofPattern("MM-dd-yyyy_HH-mm-ss");
+        autosaveDate = DateTimeFormatter.ofPattern("MM-dd-yyyy_HH-mm-ss");
 
     public final CommandHandler handler = new CommandHandler("");
     public final Fi logFolder = Core.settings.getDataDirectory().child("logs/");
@@ -98,10 +100,10 @@ public class ServerControl implements ApplicationListener{
 
     protected void setup(String[] args){
         Core.settings.defaults(
-                "bans", "",
-                "admins", "",
-                "shufflemode", "custom",
-                "globalrules", "{reactorExplosions: false, logicUnitBuild: false}"
+            "bans", "",
+            "admins", "",
+            "shufflemode", "custom",
+            "globalrules", "{reactorExplosions: false, logicUnitBuild: false}"
         );
 
         //update log level
@@ -432,7 +434,7 @@ public class ServerControl implements ApplicationListener{
                 info("  Playing on map &fi@ / Wave @", Strings.capitalize(Strings.stripColors(state.map.name())), state.wave);
 
                 if(state.rules.waves){
-                    info("  @ seconds until next wave.", (int) (state.wavetime / 60));
+                    info("  @ seconds until next wave.", (int)(state.wavetime / 60));
                 }
                 info("  @ units / @ enemies", Groups.unit.size(), state.enemies);
 
@@ -742,25 +744,22 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("ban", "<type-id/name/ip> <username/IP/ID...>", "Ban a person.", arg -> {
-            switch(arg[0]){
-                case "id" -> {
-                    netServer.admins.banPlayerID(arg[1]);
+            if(arg[0].equals("id")){
+                netServer.admins.banPlayerID(arg[1]);
+                info("Banned.");
+            }else if(arg[0].equals("name")){
+                Player target = Groups.player.find(p -> p.name().equalsIgnoreCase(arg[1]));
+                if(target != null){
+                    netServer.admins.banPlayer(target.uuid());
                     info("Banned.");
+                }else{
+                    err("No matches found.");
                 }
-                case "name" -> {
-                    Player target = Groups.player.find(p -> p.name().equalsIgnoreCase(arg[1]));
-                    if(target != null){
-                        netServer.admins.banPlayer(target.uuid());
-                        info("Banned.");
-                    }else{
-                        err("No matches found.");
-                    }
-                }
-                case "ip" -> {
-                    netServer.admins.banPlayerIP(arg[1]);
-                    info("Banned.");
-                }
-                default -> err("Invalid type.");
+            }else if(arg[0].equals("ip")){
+                netServer.admins.banPlayerIP(arg[1]);
+                info("Banned.");
+            }else{
+                err("Invalid type.");
             }
 
             for(Player player : Groups.player){
@@ -985,9 +984,9 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("gc", "Trigger a garbage collection. Testing only.", arg -> {
-            int pre = (int) (Core.app.getJavaHeap() / 1024 / 1024);
+            int pre = (int)(Core.app.getJavaHeap() / 1024 / 1024);
             System.gc();
-            int post = (int) (Core.app.getJavaHeap() / 1024 / 1024);
+            int post = (int)(Core.app.getJavaHeap() / 1024 / 1024);
             info("@ MB collected. Memory usage now at @ MB.", pre - post, post);
         });
 
@@ -1080,7 +1079,7 @@ public class ServerControl implements ApplicationListener{
 
     private void toggleSocket(boolean on){
         if(on && socketThread == null){
-            socketThread = new Thread(() -> {
+            socketThread = Threads.daemon(() -> {
                 try{
                     serverSocket = new ServerSocket();
                     serverSocket.bind(new InetSocketAddress(Config.socketInputAddress.string(), Config.socketInputPort.num()));
@@ -1106,8 +1105,6 @@ public class ServerControl implements ApplicationListener{
                     }
                 }
             });
-            socketThread.setDaemon(true);
-            socketThread.start();
         }else if(socketThread != null){
             socketThread.interrupt();
             try{
