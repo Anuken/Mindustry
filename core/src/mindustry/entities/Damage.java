@@ -466,7 +466,7 @@ public class Damage{
     }
 
     /** Damages all entities and blocks in a radius that are enemies of the team. */
-    public static void damage(Team team, float x, float y, float radius, float damage, boolean complete, boolean air, boolean ground, boolean scaled, Bullet source){
+    public static void damage(Team team, float x, float y, float radius, float damage, boolean complete, boolean air, boolean ground, boolean scaled, @Nullable Bullet source){
         Cons<Unit> cons = entity -> {
             if(entity.team == team  || !entity.checkTarget(air, ground) || !entity.hittable() || !entity.within(x, y, radius + (scaled ? entity.hitSize / 2f : 0f))){
                 return;
@@ -474,7 +474,9 @@ public class Damage{
 
             float amount = calculateDamage(scaled ? Math.max(0, entity.dst(x, y) - entity.type.hitSize/2) : entity.dst(x, y), radius, damage);
             entity.damage(amount);
-            entity.controller().hit(source);
+            if(source != null){
+                entity.controller().hit(source);
+            }
             //TODO better velocity displacement
             float dst = vec.set(entity.x - x, entity.y - y).len();
             entity.vel.add(vec.setLength((1f - dst / radius) * 2f / entity.mass()));
