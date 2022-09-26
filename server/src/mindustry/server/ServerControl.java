@@ -40,14 +40,14 @@ public class ServerControl implements ApplicationListener{
     private static final int maxLogLength = 1024 * 1024 * 5;
 
     protected static String[] tags = {"&lc&fb[D]&fr", "&lb&fb[I]&fr", "&ly&fb[W]&fr", "&lr&fb[E]", ""};
-    protected static DateTimeFormatter dateTime = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss"),
+    protected static DateTimeFormatter dateTime = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss"), 
         autosaveDate = DateTimeFormatter.ofPattern("MM-dd-yyyy_HH-mm-ss");
 
     public final CommandHandler handler = new CommandHandler("");
     public final Fi logFolder = Core.settings.getDataDirectory().child("logs/");
 
+    //next map to be played after a game-over, overrides shuffling.
     public @Nullable Map nextMapOverride;
-    public Gamemode lastMode;
 
     public Runnable serverInput = () -> {
         Scanner scan = new Scanner(System.in);
@@ -59,7 +59,7 @@ public class ServerControl implements ApplicationListener{
 
     public Cons<GameOverEvent> onGameOver = event -> {
         //set next map to be played
-        Map map = nextMapOverride != null ? nextMapOverride : maps.getNextMap(lastMode, state.map);
+        Map map = nextMapOverride != null ? nextMapOverride : maps.getNextMap(state.rules.mode(), state.map);
         nextMapOverride = null;
         if(map != null){
             Call.infoMessage((state.rules.pvp
@@ -73,7 +73,7 @@ public class ServerControl implements ApplicationListener{
 
             info("Selected next map to be @.", Strings.stripColors(map.name()));
 
-            play(() -> world.loadMap(map, map.applyRules(lastMode)));
+            play(() -> world.loadMap(map, map.applyRules(state.rules.mode())));
         }else{
             netServer.kickAll(KickReason.gameover);
             state.set(State.menu);
@@ -106,12 +106,6 @@ public class ServerControl implements ApplicationListener{
 
         //update log level
         Config.debug.set(Config.debug.bool());
-
-        try{
-            lastMode = Gamemode.valueOf(Core.settings.getString("lastServerMode", "survival"));
-        }catch(Exception e){ //handle enum parse exception
-            lastMode = Gamemode.survival;
-        }
 
         logger = (level, text) -> {
             //err has red text instead of reset.
@@ -362,10 +356,9 @@ public class ServerControl implements ApplicationListener{
             info("Loading map...");
 
             logic.reset();
-            lastMode = preset;
-            Core.settings.put("lastServerMode", lastMode.name());
+
             try{
-                world.loadMap(result, result.applyRules(lastMode));
+                world.loadMap(result, result.applyRules(preset));
                 state.rules = result.applyRules(preset);
                 logic.play();
 
@@ -1041,7 +1034,7 @@ public class ServerControl implements ApplicationListener{
 
                 run.run();
 
-                state.rules = state.map.applyRules(lastMode);
+                state.rules = state.map.applyRules(state.rules.mode());
                 logic.play();
 
                 reloader.end();
