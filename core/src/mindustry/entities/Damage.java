@@ -474,6 +474,7 @@ public class Damage{
 
             float amount = calculateDamage(scaled ? Math.max(0, entity.dst(x, y) - entity.type.hitSize/2) : entity.dst(x, y), radius, damage);
             entity.damage(amount);
+            entity.controller().hit(source);
             //TODO better velocity displacement
             float dst = vec.set(entity.x - x, entity.y - y).len();
             entity.vel.add(vec.setLength((1f - dst / radius) * 2f / entity.mass()));
