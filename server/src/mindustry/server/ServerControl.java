@@ -1,7 +1,5 @@
 package mindustry.server;
 
-package darkdustry;
-
 import arc.*;
 import arc.files.*;
 import arc.func.Cons;
