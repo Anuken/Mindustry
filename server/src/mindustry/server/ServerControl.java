@@ -40,7 +40,7 @@ public class ServerControl implements ApplicationListener{
     private static final int maxLogLength = 1024 * 1024 * 5;
 
     protected static String[] tags = {"&lc&fb[D]&fr", "&lb&fb[I]&fr", "&ly&fb[W]&fr", "&lr&fb[E]", ""};
-    protected static DateTimeFormatter dateTime = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss"), 
+    protected static DateTimeFormatter dateTime = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss"),
         autosaveDate = DateTimeFormatter.ofPattern("MM-dd-yyyy_HH-mm-ss");
 
     public final CommandHandler handler = new CommandHandler("");
