@@ -26,8 +26,8 @@ public class RtsAI{
     static final Seq<Unit> squad = new Seq<>(false);
     static final IntSet used = new IntSet();
     static final IntSet assignedTargets = new IntSet();
-    static final float squadRadius = 120f;
-    static final int timeUpdate = 0, timerSpawn = 1;
+    static final float squadRadius = 140f;
+    static final int timeUpdate = 0, timerSpawn = 1, maxTargetsChecked = 15;
 
     //in order of priority??
     static final BlockFlag[] flags = {BlockFlag.generator, BlockFlag.factory, BlockFlag.core, BlockFlag.battery};
@@ -259,6 +259,10 @@ public class RtsAI{
 
         weights.clear();
 
+        //only check a maximum number of targets to prevent hammering the CPU with estimateStats calls
+        targets.shuffle();
+        targets.truncate(maxTargetsChecked);
+
         for(var target : targets){
             weights.put(target, estimateStats(x, y, target.x, target.y, dps, health));
         }
@@ -281,6 +285,7 @@ public class RtsAI{
         return result;
     }
 
+    //TODO extremely slow especially with many squads.
     float estimateStats(float fromX, float fromY, float x, float y, float selfDps, float selfHealth){
         float[] health = {0f}, dps = {0f};
         float extraRadius = 50f;
