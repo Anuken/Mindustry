@@ -93,18 +93,6 @@ public class Separator extends Block{
             return total < itemCapacity && enabled;
         }
 
-        /*
-        @Override
-        public void draw(){
-            super.draw();
-
-            Drawf.liquid(liquidRegion, x, y, liquids.currentAmount() / liquidCapacity, liquids.current().color);
-
-            if(Core.atlas.isFound(spinnerRegion)){
-                Draw.rect(spinnerRegion, x, y, totalProgress * spinnerSpeed);
-            }
-        }*/
-
         @Override
         public void draw(){
             drawer.draw(this);
