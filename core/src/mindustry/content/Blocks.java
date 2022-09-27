@@ -1063,7 +1063,7 @@ public class Blocks{
             consumePower(1.1f);
             consumeLiquid(Liquids.slag, 4f / 60f);
 
-            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(), new DrawRegion("-spinner", 3), new DrawDefault());
+            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(), new DrawRegion("-spinner", 3, true), new DrawDefault());
         }};
 
         disassembler = new Separator("disassembler"){{
@@ -1083,7 +1083,7 @@ public class Blocks{
             consumeItem(Items.scrap);
             consumeLiquid(Liquids.slag, 0.12f);
 
-            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(), new DrawRegion("-spinner", 3), new DrawDefault());
+            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(), new DrawRegion("-spinner", 3, true), new DrawDefault());
         }};
 
         sporePress = new GenericCrafter("spore-press"){{

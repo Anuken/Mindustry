@@ -26,6 +26,12 @@ public class DrawRegion extends DrawBlock{
         this.rotateSpeed = rotateSpeed;
     }
 
+    public DrawRegion(String suffix, float rotateSpeed, boolean spinSprite){
+        this.suffix = suffix;
+        this.spinSprite = spinSprite;
+        this.rotateSpeed = rotateSpeed;
+    }
+
     public DrawRegion(){
     }
 
