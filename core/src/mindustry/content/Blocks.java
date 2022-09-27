@@ -8,8 +8,8 @@ import mindustry.entities.*;
 import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.*;
-import mindustry.entities.part.*;
 import mindustry.entities.part.DrawPart.*;
+import mindustry.entities.part.*;
 import mindustry.entities.pattern.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -1042,7 +1042,7 @@ public class Blocks{
 
             craftTime = 10f;
             hasLiquids = hasPower = true;
-            drawer = new DrawMulti(new DrawDefault(), new DrawLiquidRegion());
+            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(), new DrawDefault());
 
             consumePower(1f);
             consumeItem(Items.scrap, 1);
@@ -1062,6 +1062,8 @@ public class Blocks{
 
             consumePower(1.1f);
             consumeLiquid(Liquids.slag, 4f / 60f);
+
+            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(), new DrawRegion("-spinner", 3), new DrawDefault());
         }};
 
         disassembler = new Separator("disassembler"){{
@@ -1080,6 +1082,8 @@ public class Blocks{
             consumePower(4f);
             consumeItem(Items.scrap);
             consumeLiquid(Liquids.slag, 0.12f);
+
+            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(), new DrawRegion("-spinner", 3), new DrawDefault());
         }};
 
         sporePress = new GenericCrafter("spore-press"){{
