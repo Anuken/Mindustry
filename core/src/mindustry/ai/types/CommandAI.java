@@ -67,6 +67,15 @@ public class CommandAI extends AIController{
             return;
         }
 
+        //acquiring naval targets isn't supported yet, so use the fallback dumb AI
+        if(unit.team.isAI() && unit.team.rules().rtsAi && unit.type.naval){
+            if(fallback == null) fallback = new GroundAI();
+
+            if(fallback.unit() != unit) fallback.unit(unit);
+            fallback.updateUnit();
+            return;
+        }
+
         updateVisuals();
         //only autotarget if the unit supports it
         if(targetPos == null || unit.type.autoFindTarget){
@@ -226,6 +235,8 @@ public class CommandAI extends AIController{
         this.stopAtTarget = stopAtTarget;
         pathId = Vars.controlPath.nextTargetId();
     }
+
+
 
     /*
 
