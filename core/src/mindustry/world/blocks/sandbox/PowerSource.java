@@ -52,12 +52,8 @@ public class PowerSource extends PowerNode{
             table.table(Styles.black5, t -> {
                 t.marginLeft(6f).marginRight(6f).right();
                 t.field(String.valueOf(configPower), text -> {
-                    float newPower = configPower;
-                    if(Strings.canParsePositiveFloat(text)){
-                        newPower = Strings.parseFloat(text);
-                    }
-                    configure(newPower);
-                }).width(120).get().setFilter(TextFieldFilter.floatsOnly);
+                    configure(Strings.parseFloat(text));
+                }).width(120).valid(Strings::canParsePositiveFloat).get().setFilter(TextFieldFilter.floatsOnly);
                 t.add(Core.bundle.get("unit.powersecond")).left();
             });
         }

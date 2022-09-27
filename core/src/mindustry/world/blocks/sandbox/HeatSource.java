@@ -84,12 +84,8 @@ public class HeatSource extends Block{
             table.table(Styles.black5, t -> {
                 t.marginLeft(6f).marginRight(6f).right();
                 t.field(String.valueOf(heat), text -> {
-                    float newHeat = heat;
-                    if(Strings.canParsePositiveFloat(text)){
-                        newHeat = Strings.parseFloat(text);
-                    }
-                    configure(newHeat);
-                }).width(120).get().setFilter(TextFieldFilter.floatsOnly);
+                    configure(Strings.parseFloat(text));
+                }).width(120).valid(Strings::canParsePositiveFloat).get().setFilter(TextFieldFilter.floatsOnly);
                 t.add(Core.bundle.get("unit.heatunits")).left();
             });
         }
