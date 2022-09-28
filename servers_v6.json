@@ -13,7 +13,7 @@
   },
   {
     "name": "Omega Hub",
-    "address": ["n5.yeet.ml", "n1.yeet.ml:6568","n5.yeet.ml:6569" , "n1.yeet.ml:6570" ,"n1.yeet.ml:6571", "n1.yeet.ml:6609"]
+    "address": ["n1.mindustry.me:6614","n1.mindustry.me:6568","n1.mindustry.me:6612","n1.mindustry.me:6570","n1.mindustry.me:6609"]
   },
   {
     "name": "EasyPlay",
@@ -112,10 +112,6 @@
     "address": ["usfr2.forcehost.net:25578"]
   },
   {
-    "name": "Mindustry Español",
-    "address": ["n1.xpdustry.fr:6001"]
-  },
-  {
     "name": "CreateDustry",
     "address": ["129.151.64.81:26032"]
   },
@@ -136,11 +132,11 @@
     "address": ["59.12.120.171"]
   },
   {
-    "name": "OMNIDUSTRY",
-    "address": ["109.94.209.233"]
-  }
-  {
     "name": "New Campaign Like",
     "address": ["n5.yeet.ml:6568"]
   },
+  {
+    "name": "AlternightBR",
+    "address": ["mindustrypt.ga:8300"]
+  }
 ]

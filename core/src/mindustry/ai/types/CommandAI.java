@@ -67,8 +67,28 @@ public class CommandAI extends AIController{
             return;
         }
 
+        //acquiring naval targets isn't supported yet, so use the fallback dumb AI
+        if(unit.team.isAI() && unit.team.rules().rtsAi && unit.type.naval){
+            if(fallback == null) fallback = new GroundAI();
+
+            if(fallback.unit() != unit) fallback.unit(unit);
+            fallback.updateUnit();
+            return;
+        }
+
         updateVisuals();
-        updateTargeting();
+        //only autotarget if the unit supports it
+        if(targetPos == null || unit.type.autoFindTarget){
+            updateTargeting();
+        }else if(attackTarget == null){
+            //if the unit does not have an attack target, is currently moving, and does not have autotargeting, stop attacking stuff
+            target = null;
+            for(var mount : unit.mounts){
+                if(mount.weapon.controllable){
+                    mount.target = null;
+                }
+            }
+        }
 
         if(attackTarget != null && invalid(attackTarget)){
             attackTarget = null;
@@ -170,7 +190,7 @@ public class CommandAI extends AIController{
     public void hit(Bullet bullet){
         if(unit.team.isAI() && bullet.owner instanceof Teamc teamc && teamc.team() != unit.team && attackTarget == null &&
             //can only counter-attack every few seconds to prevent rapidly changing targets
-            !(teamc instanceof Unit u && !u.checkTarget(unit.type.targetAir, unit.type.targetGround)) && timer.get(timerTarget4, 60f * 12f)){
+            !(teamc instanceof Unit u && !u.checkTarget(unit.type.targetAir, unit.type.targetGround)) && timer.get(timerTarget4, 60f * 10f)){
             commandTarget(teamc, true);
         }
     }
@@ -215,6 +235,8 @@ public class CommandAI extends AIController{
         this.stopAtTarget = stopAtTarget;
         pathId = Vars.controlPath.nextTargetId();
     }
+
+
 
     /*
 
