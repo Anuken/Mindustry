@@ -1020,7 +1020,7 @@ public class UnitType extends UnlockableContent{
         //find reconstructor
         var rec = (Reconstructor)content.blocks().find(b -> b instanceof Reconstructor re && re.upgrades.contains(u -> u[1] == this));
 
-        if(rec != null && Structs.find(rec.consumers, i -> i instanceof ConsumeItems) instanceof ConsumeItems ci){
+        if(rec != null && rec.findConsumer(i -> i instanceof ConsumeItems) instanceof ConsumeItems ci){
             if(prevReturn != null){
                 prevReturn[0] = rec.upgrades.find(u -> u[1] == this)[0];
             }
