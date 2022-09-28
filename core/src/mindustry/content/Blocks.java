@@ -8,8 +8,8 @@ import mindustry.entities.*;
 import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.*;
-import mindustry.entities.part.*;
 import mindustry.entities.part.DrawPart.*;
+import mindustry.entities.part.*;
 import mindustry.entities.pattern.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -1042,7 +1042,7 @@ public class Blocks{
 
             craftTime = 10f;
             hasLiquids = hasPower = true;
-            drawer = new DrawMulti(new DrawDefault(), new DrawLiquidRegion());
+            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(), new DrawDefault());
 
             consumePower(1f);
             consumeItem(Items.scrap, 1);
@@ -1062,6 +1062,8 @@ public class Blocks{
 
             consumePower(1.1f);
             consumeLiquid(Liquids.slag, 4f / 60f);
+
+            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(), new DrawRegion("-spinner", 3, true), new DrawDefault());
         }};
 
         disassembler = new Separator("disassembler"){{
@@ -1080,6 +1082,8 @@ public class Blocks{
             consumePower(4f);
             consumeItem(Items.scrap);
             consumeLiquid(Liquids.slag, 0.12f);
+
+            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(), new DrawRegion("-spinner", 3, true), new DrawDefault());
         }};
 
         sporePress = new GenericCrafter("spore-press"){{
@@ -2135,6 +2139,8 @@ public class Blocks{
         liquidRouter = new LiquidRouter("liquid-router"){{
             requirements(Category.liquid, with(Items.graphite, 4, Items.metaglass, 2));
             liquidCapacity = 20f;
+            underBullets = true;
+            solid = false;
         }};
 
         liquidContainer = new LiquidRouter("liquid-container"){{
@@ -2226,6 +2232,7 @@ public class Blocks{
             liquidPadding = 3f/4f;
             researchCostMultiplier = 3;
             underBullets = true;
+            solid = false;
         }};
 
         reinforcedLiquidContainer = new LiquidRouter("reinforced-liquid-container"){{
@@ -5746,7 +5753,6 @@ public class Blocks{
             requirements(Category.logic, with(Items.copper, 90, Items.lead, 50, Items.silicon, 50));
 
             instructionsPerTick = 2;
-
             size = 1;
         }};
 
@@ -5754,9 +5760,7 @@ public class Blocks{
             requirements(Category.logic, with(Items.lead, 320, Items.silicon, 80, Items.graphite, 60, Items.thorium, 50));
 
             instructionsPerTick = 8;
-
             range = 8 * 22;
-
             size = 2;
         }};
 
@@ -5801,7 +5805,7 @@ public class Blocks{
         }};
 
         canvas = new CanvasBlock("canvas"){{
-            requirements(Category.logic, BuildVisibility.debugOnly, with(Items.silicon, 50));
+            requirements(Category.logic, BuildVisibility.shown, with(Items.silicon, 40, Items.graphite, 10));
 
             canvasSize = 12;
             padding = 7f / 4f * 2f;

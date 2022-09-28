@@ -22,12 +22,8 @@ public class BuildWeapon extends Weapon{
         rotate = true;
         noAttack = true;
         predictTarget = false;
+        display = false;
         bullet = new BulletType();
-    }
-
-    @Override
-    public boolean hasStats(UnitType u){
-        return false;
     }
 
     @Override
