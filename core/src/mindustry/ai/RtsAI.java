@@ -113,7 +113,7 @@ public class RtsAI{
                 squad.truncate(data.team.rules().rtsMaxSquad);
 
                 //remove overlapping squads
-                squad.removeAll(u -> (u != unit && used.contains(u.id)) || !u.isCommandable() || u.command().hasCommand());
+                squad.removeAll(u -> (u != unit && used.contains(u.id)) || !u.isCommandable() || u.command().hasCommand() || ((u.flag == 0) != (unit.flag == 0)));
                 //mark used so other squads can't steal them
                 for(var item : squad){
                     used.add(item.id);
@@ -130,6 +130,8 @@ public class RtsAI{
     }
 
     boolean handleSquad(Seq<Unit> units, boolean noDefenders){
+        if(units.isEmpty()) return false;
+
         float health = 0f, dps = 0f;
         float ax = 0f, ay = 0f;
         boolean targetAir = true, targetGround = true;
@@ -174,7 +176,7 @@ public class RtsAI{
 
             //defend when close, or this is the only squad defending
             //TODO will always rush to defense no matter what
-            if(best != null && (best instanceof CoreBuild || units.size >= data.team.rules().rtsMinSquad || best.within(ax, ay, 500f))){
+            if(best != null && (best instanceof CoreBuild || (units.size >= data.team.rules().rtsMinSquad || (units.size > 0 && units.first().flag != 0)) || best.within(ax, ay, 500f))){
                 defend = best;
 
                 if(debug){
@@ -194,7 +196,9 @@ public class RtsAI{
             //TODO could be made faster by storing bullet shooter
             Unit aggressor = Units.closestEnemy(data.team, defend.x, defend.y, checkRange, u -> u.checkTarget(tair, tground));
             if(aggressor != null){
-                defendTarget = aggressor;
+                //do not target it directly - target the position?
+                //defendTarget = aggressor;
+                defendPos = new Vec2(aggressor.x, aggressor.y);
             }else if(false){ //TODO currently ignored, no use defending against nothing
                 //should it even go there if there's no aggressor found?
                 Tile closest = defend.findClosestEdge(units.first(), Tile::solid);
@@ -224,7 +228,7 @@ public class RtsAI{
 
         boolean anyDefend = defendPos != null || defendTarget != null;
 
-        var build = anyDefend ? null : findTarget(ax, ay, units.size, dps, health);
+        var build = anyDefend ? null : findTarget(ax, ay, units.size, dps, health, units.first().flag == 0);
 
         if(build != null || anyDefend){
             for(var unit : units){
@@ -235,6 +239,9 @@ public class RtsAI{
                         //TODO stopAtTarget parameter could be false, could be tweaked
                         unit.command().commandTarget(defendTarget == null ? build : defendTarget, defendTarget != null);
                     }
+
+                    //assign a flag, so it will be "mobilized" more easily later
+                    unit.flag = 1;
                 }
             }
         }
@@ -242,7 +249,7 @@ public class RtsAI{
         return anyDefend;
     }
 
-    @Nullable Building findTarget(float x, float y, int total, float dps, float health){
+    @Nullable Building findTarget(float x, float y, int total, float dps, float health, boolean checkWeight){
         if(total < data.team.rules().rtsMinSquad) return null;
 
         //flag priority?
@@ -277,7 +284,7 @@ public class RtsAI{
         );
 
         float weight = weights.get(result, 0f);
-        if(weight < data.team.rules().rtsMinWeight && total < Units.getCap(data.team)){
+        if(checkWeight && weight < data.team.rules().rtsMinWeight && total < Units.getCap(data.team)){
             return null;
         }
 

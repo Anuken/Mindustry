@@ -19,7 +19,7 @@ public class CellLiquid extends Liquid{
     public int cells = 8;
 
     public @Nullable Liquid spreadTarget;
-    public float maxSpread = 0.75f, spreadConversion = 1f, spreadDamage = 0.1f, removeScaling = 0.25f;
+    public float maxSpread = 0.75f, spreadConversion = 1.2f, spreadDamage = 0.11f, removeScaling = 0.25f;
 
     public CellLiquid(String name, Color color){
         super(name, color);
