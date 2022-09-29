@@ -184,6 +184,9 @@ public class CommandAI extends AIController{
         }else if(target != null){
             faceTarget();
         }
+
+        //boosting control is not supported, so just don't.
+        unit.updateBoosting(false);
     }
 
     @Override
@@ -235,8 +238,6 @@ public class CommandAI extends AIController{
         this.stopAtTarget = stopAtTarget;
         pathId = Vars.controlPath.nextTargetId();
     }
-
-
 
     /*
 

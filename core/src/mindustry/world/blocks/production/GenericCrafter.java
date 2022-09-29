@@ -240,14 +240,17 @@ public class GenericCrafter extends Block{
         @Override
         public float getProgressIncrease(float baseTime){
             //limit progress increase by maximum amount of liquid it can produce
-            float scaling = 1f;
+            float scaling = 1f, max = 0f;
             if(outputLiquids != null){
                 for(var s : outputLiquids){
-                    scaling = Math.min(scaling, (liquidCapacity - liquids.get(s.liquid)) / (s.amount * edelta()));
+                    float value = (liquidCapacity - liquids.get(s.liquid)) / (s.amount * edelta());
+                    scaling = Math.min(scaling, value);
+                    max = Math.max(max, value);
                 }
             }
 
-            return super.getProgressIncrease(baseTime) * scaling;
+            //when dumping excess take the maximum value instead of the minimum.
+            return super.getProgressIncrease(baseTime) * (dumpExtraLiquid ? Math.min(max, 1f) : scaling);
         }
 
         public float warmupTarget(){
