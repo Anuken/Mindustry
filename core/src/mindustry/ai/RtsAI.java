@@ -238,9 +238,10 @@ public class RtsAI{
                     }else{
                         //TODO stopAtTarget parameter could be false, could be tweaked
                         unit.command().commandTarget(defendTarget == null ? build : defendTarget, defendTarget != null);
-                        //assign a flag, so it will be "mobilized" more easily later
-                        unit.flag = 1;
                     }
+
+                    //assign a flag, so it will be "mobilized" more easily later
+                    unit.flag = 1;
                 }
             }
         }
