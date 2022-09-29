@@ -130,6 +130,8 @@ public class RtsAI{
     }
 
     boolean handleSquad(Seq<Unit> units, boolean noDefenders){
+        if(units.isEmpty()) return false;
+
         float health = 0f, dps = 0f;
         float ax = 0f, ay = 0f;
         boolean targetAir = true, targetGround = true;
@@ -226,7 +228,7 @@ public class RtsAI{
 
         boolean anyDefend = defendPos != null || defendTarget != null;
 
-        var build = anyDefend ? null : findTarget(ax, ay, units.size, dps, health);
+        var build = anyDefend ? null : findTarget(ax, ay, units.size, dps, health, units.first().flag == 0);
 
         if(build != null || anyDefend){
             for(var unit : units){
@@ -246,7 +248,7 @@ public class RtsAI{
         return anyDefend;
     }
 
-    @Nullable Building findTarget(float x, float y, int total, float dps, float health){
+    @Nullable Building findTarget(float x, float y, int total, float dps, float health, boolean checkWeight){
         if(total < data.team.rules().rtsMinSquad) return null;
 
         //flag priority?
@@ -281,7 +283,7 @@ public class RtsAI{
         );
 
         float weight = weights.get(result, 0f);
-        if(weight < data.team.rules().rtsMinWeight && total < Units.getCap(data.team)){
+        if(checkWeight && weight < data.team.rules().rtsMinWeight && total < Units.getCap(data.team)){
             return null;
         }
 
