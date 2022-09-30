@@ -49,6 +49,8 @@ public class StatusEffect extends UnlockableContent{
     public Effect effect = Fx.none;
     /** Effect that is displayed once when applied to a unit. */
     public Effect applyEffect = Fx.none;
+    /** Whether the apply effect should display even if effect is already on the unit. */
+    public boolean applyExtend = false;
     /** Affinity & opposite values for stat displays. */
     public ObjectSet<StatusEffect> affinities = new ObjectSet<>(), opposites = new ObjectSet<>();
     /** Set to false to disable outline generation. */
@@ -190,7 +192,7 @@ public class StatusEffect extends UnlockableContent{
     }
 
     public void applied(Unit unit, float time, boolean extend){
-        if(!extend) applyEffect.at(unit);
+        if(!extend || applyExtend) applyEffect.at(unit);
     }
 
     @Override
