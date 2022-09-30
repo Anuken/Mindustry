@@ -240,8 +240,9 @@ public class GenericCrafter extends Block{
         @Override
         public float getProgressIncrease(float baseTime){
             //limit progress increase by maximum amount of liquid it can produce
-            float scaling = 1f, max = 0f;
+            float scaling = 1f, max = 1f;
             if(outputLiquids != null){
+                max = 0f;
                 for(var s : outputLiquids){
                     float value = (liquidCapacity - liquids.get(s.liquid)) / (s.amount * edelta());
                     scaling = Math.min(scaling, value);
