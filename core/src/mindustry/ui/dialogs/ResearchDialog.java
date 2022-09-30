@@ -381,11 +381,9 @@ public class ResearchDialog extends BaseDialog{
             this.parent = parent;
             this.width = this.height = nodeSize;
             nodes.add(this);
-            if(node.children != null){
-                children = new TechTreeNode[node.children.size];
-                for(int i = 0; i < children.length; i++){
-                    children[i] = new TechTreeNode(node.children.get(i), this);
-                }
+            children = new TechTreeNode[node.children.size];
+            for(int i = 0; i < children.length; i++){
+                children[i] = new TechTreeNode(node.children.get(i), this);
             }
         }
     }
