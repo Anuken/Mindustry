@@ -1653,20 +1653,26 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public void drawArrow(Block block, int x, int y, int rotation, boolean valid){
         float trns = (block.size / 2) * tilesize;
         int dx = Geometry.d4(rotation).x, dy = Geometry.d4(rotation).y;
+        float offsetx = x * tilesize + block.offset + dx*trns;
+        float offsety = y * tilesize + block.offset + dy*trns;
 
         Draw.color(!valid ? Pal.removeBack : Pal.accentBack);
-        Draw.rect(Core.atlas.find("place-arrow"),
-        x * tilesize + block.offset + dx*trns,
-        y * tilesize + block.offset - 1 + dy*trns,
-        Core.atlas.find("place-arrow").width * Draw.scl,
-        Core.atlas.find("place-arrow").height * Draw.scl, rotation * 90 - 90);
+        TextureRegion regionArrow = Core.atlas.find("place-arrow");
+
+        Draw.rect(regionArrow,
+        offsetx,
+        offsety - 1,
+        regionArrow.width * regionArrow.scl(),
+        regionArrow.height * regionArrow.scl(),
+        rotation * 90 - 90);
 
         Draw.color(!valid ? Pal.remove : Pal.accent);
-        Draw.rect(Core.atlas.find("place-arrow"),
-        x * tilesize + block.offset + dx*trns,
-        y * tilesize + block.offset + dy*trns,
-        Core.atlas.find("place-arrow").width * Draw.scl,
-        Core.atlas.find("place-arrow").height * Draw.scl, rotation * 90 - 90);
+        Draw.rect(regionArrow,
+        offsetx,
+        offsety,
+        regionArrow.width * regionArrow.scl(),
+        regionArrow.height * regionArrow.scl(),
+        rotation * 90 - 90);
     }
 
     void iterateLine(int startX, int startY, int endX, int endY, Cons<PlaceLine> cons){

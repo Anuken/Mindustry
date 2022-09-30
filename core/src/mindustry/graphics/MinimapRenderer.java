@@ -123,7 +123,7 @@ public class MinimapRenderer{
         rect.set((dx - sz) * tilesize, (dy - sz) * tilesize, sz * 2 * tilesize, sz * 2 * tilesize);
 
         for(Unit unit : units){
-            if(unit.inFogTo(player.team())) continue;
+            if(unit.inFogTo(player.team()) || !unit.type.drawMinimap) continue;
 
             float rx = !withLabels ? (unit.x - rect.x) / rect.width * w : unit.x / (world.width() * tilesize) * w;
             float ry = !withLabels ? (unit.y - rect.y) / rect.width * h : unit.y / (world.height() * tilesize) * h;
