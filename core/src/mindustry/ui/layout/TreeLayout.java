@@ -18,5 +18,15 @@ public interface TreeLayout{
         public boolean isLeaf(){
             return children == null || children.length == 0;
         }
+
+        public float calcWidth(){
+            if(children == null) return width;
+
+            float cWidth = 0;
+            for(T node : children){
+                cWidth += node.calcWidth();
+            }
+            return Math.max(width, cWidth);
+        }
     }
 }
