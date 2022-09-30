@@ -187,6 +187,8 @@ public class StatusEffect extends UnlockableContent{
         return false;
     }
 
+    public void applied(Unit unit, float time, boolean extend){}
+
     @Override
     public void createIcons(MultiPacker packer){
         super.createIcons(packer);
