@@ -47,6 +47,8 @@ public class StatusEffect extends UnlockableContent{
     public Color color = Color.white.cpy();
     /** Effect that happens randomly on top of the affected unit. */
     public Effect effect = Fx.none;
+    /** Effect that is displayed once when applied to a unit. */
+    public Effect applyEffect = Fx.none;
     /** Affinity & opposite values for stat displays. */
     public ObjectSet<StatusEffect> affinities = new ObjectSet<>(), opposites = new ObjectSet<>();
     /** Set to false to disable outline generation. */
@@ -187,7 +189,9 @@ public class StatusEffect extends UnlockableContent{
         return false;
     }
 
-    public void applied(Unit unit, float time, boolean extend){}
+    public void applied(Unit unit, float time, boolean extend){
+        if(!extend) applyEffect.at(unit);
+    }
 
     @Override
     public void createIcons(MultiPacker packer){
