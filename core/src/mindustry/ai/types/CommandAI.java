@@ -78,7 +78,7 @@ public class CommandAI extends AIController{
 
         updateVisuals();
         //only autotarget if the unit supports it
-        if(targetPos == null || unit.type.autoFindTarget){
+        if((targetPos == null || nearAttackTarget(unit.x, unit.y, unit.range())) || unit.type.autoFindTarget){
             updateTargeting();
         }else if(attackTarget == null){
             //if the unit does not have an attack target, is currently moving, and does not have autotargeting, stop attacking stuff
@@ -205,7 +205,11 @@ public class CommandAI extends AIController{
 
     @Override
     public Teamc findTarget(float x, float y, float range, boolean air, boolean ground){
-        return attackTarget == null || !attackTarget.within(x, y, range + 3f + (attackTarget instanceof Sized s ? s.hitSize()/2f : 0f)) ? super.findTarget(x, y, range, air, ground) : attackTarget;
+        return !nearAttackTarget(x, y, range) ? super.findTarget(x, y, range, air, ground) : attackTarget;
+    }
+
+    public boolean nearAttackTarget(float x, float y, float range){
+        return attackTarget != null && attackTarget.within(x, y, range + 3f + (attackTarget instanceof Sized s ? s.hitSize()/2f : 0f));
     }
 
     @Override
