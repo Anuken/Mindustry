@@ -13,12 +13,14 @@ public class LiquidVoid extends Block{
         solid = true;
         update = true;
         group = BlockGroup.liquids;
+        envEnabled = Env.any;
+        liquidCapacity = 10000f;
     }
 
     @Override
     public void setBars(){
         super.setBars();
-        bars.remove("liquid");
+        removeBar("liquid");
     }
 
     public class LiquidVoidBuild extends Building{
@@ -29,6 +31,7 @@ public class LiquidVoid extends Block{
 
         @Override
         public void handleLiquid(Building source, Liquid liquid, float amount){
+            liquids.handleFlow(liquid, amount);
         }
     }
 

@@ -27,7 +27,7 @@ public class ScriptMainGenerator{
     public static void main(String[] args) throws Exception{
         String base = "mindustry";
         Seq<String> blacklist = Seq.with("plugin", "mod", "net", "io", "tools");
-        Seq<String> nameBlacklist = Seq.with("ClassAccess");
+        Seq<String> nameBlacklist = Seq.with();
         Seq<Class<?>> whitelist = Seq.with(Draw.class, Fill.class, Lines.class, Core.class, TextureAtlas.class, TextureRegion.class, Time.class, System.class, PrintStream.class,
         AtlasRegion.class, String.class, Mathf.class, Angles.class, Color.class, Runnable.class, Object.class, Icon.class, Tex.class, Shader.class,
         Sounds.class, Musics.class, Call.class, Texture.class, TextureData.class, Pixmap.class, I18NBundle.class, Interval.class, DataInput.class, DataOutput.class,
@@ -84,7 +84,9 @@ public class ScriptMainGenerator{
         "mindustry.game.Objectives",
         "mindustry.world.blocks",
         "mindustry.world.draw",
-        "mindustry.type"
+        "mindustry.type",
+        "mindustry.entities.pattern",
+        "mindustry.entities.part"
         );
 
         String classTemplate = "package mindustry.mod;\n" +
@@ -102,7 +104,7 @@ public class ScriptMainGenerator{
         StringBuilder cdef = new StringBuilder();
 
         Seq<Class<?>> mapped = classes.select(c -> Modifier.isPublic(c.getModifiers()) && packages.contains(c.getCanonicalName()::startsWith))
-        .and(Block.class); //special case
+        .add(Block.class); //special case
 
         for(Class<?> c : mapped){
             cdef.append("        classes.put(\"").append(c.getSimpleName()).append("\", ").append(c.getCanonicalName()).append(".class);\n");

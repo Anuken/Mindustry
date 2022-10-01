@@ -14,8 +14,8 @@ import mindustry.world.*;
 public class MirrorFilter extends GenerateFilter{
     private static final Vec2 v1 = new Vec2(), v2 = new Vec2(), v3 = new Vec2();
 
-    int angle = 45;
-    boolean rotate = false;
+    public int angle = 45;
+    public boolean rotate = false;
 
     @Override
     public FilterOption[] options(){

@@ -21,6 +21,14 @@ abstract class SyncComp implements Entityc{
     void afterSync(){}
     void interpolate(){}
 
+    boolean isSyncHidden(Player player){
+        return false;
+    }
+
+    void handleSyncHidden(){
+
+    }
+
     @Override
     public void update(){
         //interpolate the player if:

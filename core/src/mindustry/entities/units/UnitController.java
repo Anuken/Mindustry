@@ -6,12 +6,12 @@ public interface UnitController{
     void unit(Unit unit);
     Unit unit();
 
-    default boolean isValidController(){
-        return true;
+    default void hit(Bullet bullet){
+
     }
 
-    default void command(UnitCommand command){
-
+    default boolean isValidController(){
+        return true;
     }
 
     default void updateUnit(){

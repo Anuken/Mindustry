@@ -10,6 +10,8 @@ import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
+import mindustry.graphics.MultiPacker.*;
 import mindustry.world.meta.*;
 
 public class StatusEffect extends UnlockableContent{
@@ -33,6 +35,8 @@ public class StatusEffect extends UnlockableContent{
     public float damage;
     /** Chance of effect appearing. */
     public float effectChance = 0.15f;
+    /** Should the effect be given a parent. */
+    public boolean parentizeEffect;
     /** If true, the effect never disappears. */
     public boolean permanent;
     /** If true, this effect will only react with other effects and cannot be applied. */
@@ -43,8 +47,18 @@ public class StatusEffect extends UnlockableContent{
     public Color color = Color.white.cpy();
     /** Effect that happens randomly on top of the affected unit. */
     public Effect effect = Fx.none;
+    /** Effect that is displayed once when applied to a unit. */
+    public Effect applyEffect = Fx.none;
+    /** Whether the apply effect should display even if effect is already on the unit. */
+    public boolean applyExtend;
+    /** Tint color of apply effect. */
+    public Color applyColor = Color.white.cpy();
+    /** Should the apply effect be given a parent. */
+    public boolean parentizeApplyEffect;
     /** Affinity & opposite values for stat displays. */
     public ObjectSet<StatusEffect> affinities = new ObjectSet<>(), opposites = new ObjectSet<>();
+    /** Set to false to disable outline generation. */
+    public boolean outline = true;
     /** Transition handler map. */
     protected ObjectMap<StatusEffect, TransitionHandler> transitions = new ObjectMap<>();
     /** Called on init. */
@@ -56,7 +70,9 @@ public class StatusEffect extends UnlockableContent{
 
     @Override
     public void init(){
-        initblock.run();
+        if(initblock != null){
+            initblock.run();
+        }
     }
 
     public void init(Runnable run){
@@ -80,7 +96,7 @@ public class StatusEffect extends UnlockableContent{
 
         boolean reacts = false;
 
-        for(var e : opposites.asArray().sort()){
+        for(var e : opposites.toSeq().sort()){
             stats.add(Stat.opposites, e.emoji() + "" + e);
         }
 
@@ -94,7 +110,7 @@ public class StatusEffect extends UnlockableContent{
 
         //don't list affinities *and* reactions, as that would be redundant
         if(!reacts){
-            for(var e : affinities.asArray().sort()){
+            for(var e : affinities.toSeq().sort()){
                 stats.add(Stat.affinities, e.emoji() + "" + e);
             }
 
@@ -120,7 +136,7 @@ public class StatusEffect extends UnlockableContent{
 
         if(effect != Fx.none && Mathf.chanceDelta(effectChance)){
             Tmp.v1.rnd(Mathf.range(unit.type.hitSize/2f));
-            effect.at(unit.x + Tmp.v1.x, unit.y + Tmp.v1.y, color);
+            effect.at(unit.x + Tmp.v1.x, unit.y + Tmp.v1.y, 0, color, parentizeEffect ? unit : null);
         }
     }
 
@@ -177,6 +193,19 @@ public class StatusEffect extends UnlockableContent{
             return true;
         }
         return false;
+    }
+
+    public void applied(Unit unit, float time, boolean extend){
+        if(!extend || applyExtend) applyEffect.at(unit.x, unit.y, 0, applyColor, parentizeApplyEffect ? unit : null);
+    }
+
+    @Override
+    public void createIcons(MultiPacker packer){
+        super.createIcons(packer);
+
+        if(outline){
+            makeOutline(PageType.ui, packer, uiIcon, true, Pal.gray, 3);
+        }
     }
 
     @Override

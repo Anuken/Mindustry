@@ -18,11 +18,13 @@ bool id(vec2 coords, vec4 base){
 }
 
 bool cont(vec2 T, vec2 v){
-    const float step = 3.0;
+    const float step = 3.5;
     vec4 base = texture2D(u_texture, T);
     return base.a > 0.1 &&
            		(id(T + vec2(0, step) * v, base) || id(T + vec2(0, -step) * v, base) ||
-           		id(T + vec2(step, 0) * v, base) || id(T + vec2(-step, 0) * v, base));
+           		id(T + vec2(step, 0) * v, base) || id(T + vec2(-step, 0) * v, base) ||
+                id(T + vec2(step, step) * v, base) || id(T + vec2(step, -step) * v, base) ||
+                id(T + vec2(-step, -step) * v, base) || id(T + vec2(-step, step) * v, base));
 }
 
 void main(){
@@ -42,7 +44,7 @@ void main(){
         gl_FragColor = v_color;
     }else if(dst > (1.0-u_progress) * (center.x)){
         gl_FragColor = color;
-    }else if((dst + 1.0 > (1.0-u_progress) * (center.x)) && color.a > 0.1){
+    }else if((dst + 2.0 > (1.0-u_progress) * (center.x)) && color.a > 0.1){
         gl_FragColor = v_color;
     }else{
         gl_FragColor = vec4(0.0);

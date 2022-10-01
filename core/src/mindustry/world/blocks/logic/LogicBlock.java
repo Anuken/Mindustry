@@ -1,13 +1,15 @@
 package mindustry.world.blocks.logic;
 
+import arc.Graphics.*;
+import arc.Graphics.Cursor.*;
 import arc.func.*;
+import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.struct.Bits;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
-import mindustry.*;
 import mindustry.ai.types.*;
 import mindustry.core.*;
 import mindustry.gen.*;
@@ -32,6 +34,8 @@ public class LogicBlock extends Block{
 
     public int maxInstructionScale = 5;
     public int instructionsPerTick = 1;
+    //privileged only
+    public int maxInstructionsPerTick = 40;
     public float range = 8 * 10;
 
     public LogicBlock(String name){
@@ -42,9 +46,18 @@ public class LogicBlock extends Block{
         group = BlockGroup.logic;
         schematicPriority = 5;
 
-        config(byte[].class, (LogicBuild build, byte[] data) -> build.readCompressed(data, true));
+        //universal, no real requirements
+        envEnabled = Env.any;
+
+        config(byte[].class, (LogicBuild build, byte[] data) -> {
+            if(!accessible()) return;
+
+            build.readCompressed(data, true);
+        });
 
         config(Integer.class, (LogicBuild entity, Integer pos) -> {
+            if(!accessible()) return;
+
             //if there is no valid link in the first place, nobody cares
             if(!entity.validLink(world.build(pos))) return;
             var lbuild = world.build(pos);
@@ -69,6 +82,15 @@ public class LogicBlock extends Block{
         });
     }
 
+    public boolean accessible(){
+        return !privileged || state.rules.editor || state.playtestingMap != null;
+    }
+
+    @Override
+    public boolean canBreak(Tile tile){
+        return accessible();
+    }
+
     public static String getLinkName(Block block){
         String name = block.name;
         if(name.contains("-")){
@@ -89,8 +111,8 @@ public class LogicBlock extends Block{
 
     public static byte[] compress(byte[] bytes, Seq<LogicLink> links){
         try{
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            DataOutputStream stream = new DataOutputStream(new DeflaterOutputStream(baos));
+            var baos = new ByteArrayOutputStream();
+            var stream = new DataOutputStream(new DeflaterOutputStream(baos));
 
             //current version of config format
             stream.write(1);
@@ -122,12 +144,16 @@ public class LogicBlock extends Block{
     public void setStats(){
         super.setStats();
 
-        stats.add(Stat.linkRange, range / 8, StatUnit.blocks);
-        stats.add(Stat.instructions, instructionsPerTick * 60, StatUnit.perSecond);
+        if(!privileged){
+            stats.add(Stat.linkRange, range / 8, StatUnit.blocks);
+            stats.add(Stat.instructions, instructionsPerTick * 60, StatUnit.perSecond);
+        }
     }
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
+        if(privileged) return;
+
         Drawf.circles(x*tilesize + offset, y*tilesize + offset, range);
     }
 
@@ -197,9 +223,16 @@ public class LogicBlock extends Block{
         public float accumulator = 0;
         public Seq<LogicLink> links = new Seq<>();
         public boolean checkedDuplicates = false;
+        //dynamic only for privileged processors
+        public int ipt = instructionsPerTick;
 
         /** Block of code to run after load. */
         public @Nullable Runnable loadBlock;
+
+        {
+            executor.privileged = privileged;
+            executor.build = this;
+        }
 
         public void readCompressed(byte[] data, boolean relative){
             try(DataInputStream stream = new DataInputStream(new InflaterInputStream(new ByteArrayInputStream(data)))){
@@ -290,7 +323,7 @@ public class LogicBlock extends Block{
 
                 try{
                     //create assembler to store extra variables
-                    LAssembler asm = LAssembler.assemble(str);
+                    LAssembler asm = LAssembler.assemble(str, privileged);
 
                     //store connections
                     for(LogicLink link : links){
@@ -342,9 +375,43 @@ public class LogicBlock extends Block{
                     executor.load(asm);
                 }catch(Exception e){
                     //handle malformed code and replace it with nothing
-                    executor.load(code = "");
+                    executor.load(LAssembler.assemble(code = "", privileged));
                 }
             }
+        }
+
+        //editor-only processors cannot be damaged or destroyed
+        @Override
+        public boolean collide(Bullet other){
+            return !privileged;
+        }
+
+        @Override
+        public boolean displayable(){
+            return accessible();
+        }
+
+        @Override
+        public void damage(float damage){
+            if(!privileged){
+                super.damage(damage);
+            }
+        }
+
+        @Override
+        public void removeFromProximity(){
+            super.removeFromProximity();
+
+            for(var link : executor.links){
+                if(!link.enabled && link.lastDisabler == this){
+                    link.enabled = true;
+                }
+            }
+        }
+
+        @Override
+        public Cursor getCursor(){
+            return !accessible() ? SystemCursor.arrow : super.getCursor();
         }
 
         //logic blocks cause write problems when picked up
@@ -424,15 +491,19 @@ public class LogicBlock extends Block{
                 updateCode(code, true, null);
             }
 
-            if(enabled){
-                accumulator += edelta() * instructionsPerTick * (consValid() ? 1 : 0);
+            if(!privileged){
+                ipt = instructionsPerTick;
+            }
 
-                if(accumulator > maxInstructionScale * instructionsPerTick) accumulator = maxInstructionScale * instructionsPerTick;
+            if(state.rules.disableWorldProcessors && privileged) return;
+
+            if(enabled && executor.initialized()){
+                accumulator += edelta() * ipt * efficiency;
+
+                if(accumulator > maxInstructionScale * ipt) accumulator = maxInstructionScale * ipt;
 
                 for(int i = 0; i < (int)accumulator; i++){
-                    if(executor.initialized()){
-                        executor.runOnce();
-                    }
+                    executor.runOnce();
                     accumulator --;
                 }
             }
@@ -458,7 +529,9 @@ public class LogicBlock extends Block{
         public void drawConfigure(){
             super.drawConfigure();
 
-            Drawf.circles(x, y, range);
+            if(!privileged){
+                Drawf.circles(x, y, range);
+            }
 
             for(LogicLink l : links){
                 Building build = world.build(l.x, l.y);
@@ -484,19 +557,25 @@ public class LogicBlock extends Block{
         }
 
         public boolean validLink(Building other){
-            return other != null && other.isValid() && other.team == team && other.within(this, range + other.block.size*tilesize/2f) && !(other instanceof ConstructBuild);
+            return other != null && other.isValid() && (privileged || (!other.block.privileged && other.team == team && other.within(this, range + other.block.size*tilesize/2f))) && !(other instanceof ConstructBuild);
         }
 
         @Override
         public void buildConfiguration(Table table){
-            table.button(Icon.pencil, Styles.clearTransi, () -> {
-                Vars.ui.logic.show(code, code -> configure(compress(code, relativeConnections())));
+            if(!accessible()){
+                //go away
+                deselect();
+                return;
+            }
+
+            table.button(Icon.pencil, Styles.cleari, () -> {
+                ui.logic.show(code, executor, privileged, code -> configure(compress(code, relativeConnections())));
             }).size(40);
         }
 
         @Override
-        public boolean onConfigureTileTapped(Building other){
-            if(this == other){
+        public boolean onConfigureBuildTapped(Building other){
+            if(this == other || !accessible()){
                 deselect();
                 return false;
             }
@@ -506,12 +585,12 @@ public class LogicBlock extends Block{
                 return false;
             }
 
-            return super.onConfigureTileTapped(other);
+            return super.onConfigureBuildTapped(other);
         }
 
         @Override
         public byte version(){
-            return 1;
+            return 2;
         }
 
         @Override
@@ -523,31 +602,38 @@ public class LogicBlock extends Block{
             write.b(compressed);
 
             //write only the non-constant variables
-            int count = Structs.count(executor.vars, v -> !v.constant);
+            int count = Structs.count(executor.vars, v -> (!v.constant || v == executor.vars[LExecutor.varUnit]) && !(v.isobj && v.objval == null));
 
             write.i(count);
             for(int i = 0; i < executor.vars.length; i++){
                 Var v = executor.vars[i];
 
-                if(v.constant) continue;
+                //null is the default variable value, so waste no time serializing that
+                if(v.isobj && v.objval == null) continue;
+
+                //skip constants
+                if(v.constant && i != LExecutor.varUnit) continue;
 
                 //write the name and the object value
                 write.str(v.name);
 
                 Object value = v.isobj ? v.objval : v.numval;
-                if(value instanceof Unit) value = null; //do not save units.
                 TypeIO.writeObject(write, value);
             }
 
             //no memory
             write.i(0);
+
+            if(privileged){
+                write.s(Mathf.clamp(ipt, 1, maxInstructionsPerTick));
+            }
         }
 
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
 
-            if(revision == 1){
+            if(revision >= 1){
                 int compl = read.i();
                 byte[] bytes = new byte[compl];
                 read.b(bytes);
@@ -583,11 +669,19 @@ public class LogicBlock extends Block{
                 //load up the variables that were stored
                 for(int i = 0; i < varcount; i++){
                     BVar dest = asm.getVar(names[i]);
-                    if(dest != null && !dest.constant){
-                        dest.value = values[i] instanceof BuildingBox box ? world.build(box.pos) : values[i];
+
+                    if(dest != null && (!dest.constant || dest.id == LExecutor.varUnit)){
+                        dest.value =
+                            values[i] instanceof BuildingBox box ? box.unbox() :
+                            values[i] instanceof UnitBox box ? box.unbox() :
+                            values[i];
                     }
                 }
             });
+
+            if(privileged && revision >= 2){
+                ipt = Mathf.clamp(read.s(), 1, maxInstructionsPerTick);
+            }
 
         }
     }

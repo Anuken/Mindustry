@@ -36,12 +36,12 @@ public enum LAccess{
     mineX,
     mineY,
     mining,
+    speed,
     team,
     type,
     flag,
     controlled,
     controller,
-    commanded,
     name,
     payloadCount,
     payloadType,
@@ -51,7 +51,7 @@ public enum LAccess{
     shoot("x", "y", "shoot"),
     shootp(true, "unit", "shoot"),
     config(true, "to"),
-    color("r", "g", "b");
+    color("to");
 
     public final String[] params;
     public final boolean isObj;

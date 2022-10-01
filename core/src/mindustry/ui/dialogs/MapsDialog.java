@@ -2,11 +2,14 @@ package mindustry.ui.dialogs;
 
 import arc.*;
 import arc.graphics.*;
+import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.game.EventType.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.io.*;
@@ -17,6 +20,15 @@ import static mindustry.Vars.*;
 
 public class MapsDialog extends BaseDialog{
     private BaseDialog dialog;
+    private String searchString;
+    private Seq<Gamemode> modes = new Seq<>();
+    private Table mapTable = new Table();
+    private TextField searchField;
+
+    private boolean showBuiltIn = Core.settings.getBool("editorshowbuiltinmaps", true);
+    private boolean showCustom = Core.settings.getBool("editorshowcustommaps", true);
+    private boolean searchAuthor = Core.settings.getBool("editorsearchauthor", false);
+    private boolean searchDescription = Core.settings.getBool("editorsearchdescription", false);
 
     public MapsDialog(){
         super("@maps");
@@ -37,8 +49,10 @@ public class MapsDialog extends BaseDialog{
     void setup(){
         buttons.clearChildren();
 
+        searchString = null;
+
         if(Core.graphics.isPortrait()){
-            buttons.button("@back", Icon.left, this::hide).size(210f*2f, 64f).colspan(2);
+            buttons.button("@back", Icon.left, this::hide).size(210f * 2f, 64f).colspan(2);
             buttons.row();
         }else{
             buttons.button("@back", Icon.left, this::hide).size(210f, 64f);
@@ -76,7 +90,7 @@ public class MapsDialog extends BaseDialog{
                         String name = map.tags.get("name", () -> {
                             String result = "unknown";
                             int number = 0;
-                            while(maps.byName(result + number++) != null);
+                            while(maps.byName(result + number++) != null) ;
                             return result + number;
                         });
 
@@ -108,46 +122,141 @@ public class MapsDialog extends BaseDialog{
             });
         }).size(210f, 64f);
 
-
         cont.clear();
 
-        Table maps = new Table();
-        maps.marginRight(24);
+        rebuildMaps();
 
-        ScrollPane pane = new ScrollPane(maps);
+        ScrollPane pane = new ScrollPane(mapTable);
         pane.setFadeScrollBars(false);
+
+        Table search = new Table();
+        search.image(Icon.zoom);
+        searchField = search.field("", t -> {
+            searchString = t.length() > 0 ? t.toLowerCase() : null;
+            rebuildMaps();
+        }).maxTextLength(50).growX().get();
+        searchField.setMessageText("@editor.search");
+        search.button(Icon.filter, Styles.emptyi, this::showMapFilters).tooltip("@editor.filters");
+
+        cont.add(search).growX();
+        cont.row();
+        cont.add(pane).uniformX().growY();
+        cont.row();
+        cont.add(buttons).growX();
+    }
+
+    void rebuildMaps(){
+        mapTable.clear();
+
+        mapTable.marginRight(24);
 
         int maxwidth = Math.max((int)(Core.graphics.getWidth() / Scl.scl(230)), 1);
         float mapsize = 200f;
+        boolean noMapsShown = true;
 
         int i = 0;
-        for(Map map : Vars.maps.all()){
 
-            if(i % maxwidth == 0){
-                maps.row();
+        Seq<Map> mapList = showCustom ?
+            showBuiltIn ? maps.all() : maps.customMaps() :
+            showBuiltIn ? maps.defaultMaps() : null;
+
+        if(mapList != null){
+            for(Map map : mapList){
+
+                boolean invalid = false;
+                for(Gamemode mode : modes){
+                    invalid |= !mode.valid(map);
+                }
+                if(invalid || (searchString != null
+                    && !Strings.stripColors(map.name()).toLowerCase().contains(searchString)
+                    && (!searchAuthor || !Strings.stripColors(map.author()).toLowerCase().contains(searchString))
+                    && (!searchDescription || !Strings.stripColors(map.description()).toLowerCase().contains(searchString)))){
+                    continue;
+                }
+
+                noMapsShown = false;
+
+                if(i % maxwidth == 0){
+                    mapTable.row();
+                }
+
+                TextButton button = mapTable.button("", Styles.grayt, () -> showMapInfo(map)).width(mapsize).pad(8).get();
+                button.clearChildren();
+                button.margin(9);
+                button.add(map.name()).width(mapsize - 18f).center().get().setEllipsis(true);
+                button.row();
+                button.image().growX().pad(4).color(Pal.gray);
+                button.row();
+                button.stack(new Image(map.safeTexture()).setScaling(Scaling.fit), new BorderImage(map.safeTexture()).setScaling(Scaling.fit)).size(mapsize - 20f);
+                button.row();
+                button.add(map.custom ? "@custom" : map.workshop ? "@workshop" : map.mod != null ? "[lightgray]" + map.mod.meta.displayName() : "@builtin").color(Color.gray).padTop(3);
+
+                i++;
             }
-
-            TextButton button = maps.button("", Styles.cleart, () -> showMapInfo(map)).width(mapsize).pad(8).get();
-            button.clearChildren();
-            button.margin(9);
-            button.add(map.name()).width(mapsize - 18f).center().get().setEllipsis(true);
-            button.row();
-            button.image().growX().pad(4).color(Pal.gray);
-            button.row();
-            button.stack(new Image(map.safeTexture()).setScaling(Scaling.fit), new BorderImage(map.safeTexture()).setScaling(Scaling.fit)).size(mapsize - 20f);
-            button.row();
-            button.add(map.custom ? "@custom" : map.workshop ? "@workshop" : map.mod != null ? "[lightgray]" + map.mod.meta.displayName() : "@builtin").color(Color.gray).padTop(3);
-
-            i++;
         }
 
-        if(Vars.maps.all().size == 0){
-            maps.add("@maps.none");
+        if(noMapsShown){
+            mapTable.add("@maps.none");
         }
+    }
 
-        cont.add(buttons).growX();
-        cont.row();
-        cont.add(pane).uniformX();
+    void showMapFilters(){
+        dialog = new BaseDialog("@editor.filters");
+        dialog.addCloseButton();
+        dialog.cont.table(menu -> {
+            menu.add("@editor.filters.mode").width(150f).left();
+            menu.table(t -> {
+                for(Gamemode mode : Gamemode.all){
+                    TextureRegionDrawable icon = Vars.ui.getIcon("mode" + Strings.capitalize(mode.name()));
+                    if(Core.atlas.isFound(icon.getRegion())){
+                        t.button(icon, Styles.emptyTogglei, () -> {
+                            if(modes.contains(mode)){
+                                modes.remove(mode);
+                            }else{
+                                modes.add(mode);
+                            }
+                            rebuildMaps();
+                        }).size(60f).checked(modes.contains(mode)).tooltip("@mode." + mode.name() + ".name");
+                    }
+                }
+            }).padBottom(10f);
+            menu.row();
+
+            menu.add("@editor.filters.type").width(150f).left();
+            menu.table(Tex.button, t -> {
+                t.button("@custom", Styles.flatTogglet, () -> {
+                    showCustom = !showCustom;
+                    Core.settings.put("editorshowcustommaps", showCustom);
+                    Core.settings.forceSave();
+                    rebuildMaps();
+                }).size(150f, 60f).checked(showCustom);
+                t.button("@builtin", Styles.flatTogglet, () -> {
+                    showBuiltIn = !showBuiltIn;
+                    Core.settings.put("editorshowbuiltinmaps", showBuiltIn);
+                    Core.settings.forceSave();
+                    rebuildMaps();
+                }).size(150f, 60f).checked(showBuiltIn);
+            }).padBottom(10f);
+            menu.row();
+
+            menu.add("@editor.filters.search").width(150f).left();
+            menu.table(Tex.button, t -> {
+                t.button("@editor.filters.author", Styles.flatTogglet, () -> {
+                    searchAuthor = !searchAuthor;
+                    Core.settings.put("editorsearchauthor", searchAuthor);
+                    Core.settings.forceSave();
+                    rebuildMaps();
+                }).size(150f, 60f).checked(searchAuthor);
+                t.button("@editor.filters.description", Styles.flatTogglet, () -> {
+                    searchDescription = !searchDescription;
+                    Core.settings.put("editorsearchdescription", searchDescription);
+                    Core.settings.forceSave();
+                    rebuildMaps();
+                }).size(150f, 60f).checked(searchDescription);
+            });
+        });
+
+        dialog.show();
     }
 
     void showMapInfo(Map map){
@@ -212,5 +321,16 @@ public class MapsDialog extends BaseDialog{
         }).fillX().height(54f).marginLeft(10).disabled(!map.workshop && !map.custom);
 
         dialog.show();
+    }
+
+    @Override
+    public Dialog show(){
+        super.show();
+
+        if(Core.app.isDesktop() && searchField != null){
+            Core.scene.setKeyboardFocus(searchField);
+        }
+
+        return this;
     }
 }

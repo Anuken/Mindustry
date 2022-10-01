@@ -1,10 +1,14 @@
 package mindustry.world.blocks.payloads;
 
 import arc.graphics.g2d.*;
+import arc.math.*;
+import arc.util.*;
 import arc.util.io.*;
+import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.type.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
@@ -14,6 +18,7 @@ public class BuildPayload implements Payload{
 
     public BuildPayload(Block block, Team team){
         this.build = block.newBuilding().create(block, team);
+        this.build.tile = emptyTile;
     }
 
     public BuildPayload(Building build){
@@ -31,6 +36,29 @@ public class BuildPayload implements Payload{
     public void place(Tile tile, int rotation){
         tile.setBlock(build.block, build.team, rotation, () -> build);
         build.dropped();
+    }
+
+    @Override
+    public UnlockableContent content(){
+        return build.block;
+    }
+
+    @Override
+    public void update(@Nullable Unit unitHolder, @Nullable Building buildingHolder){
+        if(unitHolder != null && (!build.block.updateInUnits || (!state.rules.unitPayloadUpdate && !build.block.alwaysUpdateInUnits))) return;
+
+        build.tile = emptyTile;
+        build.updatePayload(unitHolder, buildingHolder);
+    }
+
+    @Override
+    public ItemStack[] requirements(){
+        return build.block.requirements;
+    }
+
+    @Override
+    public float buildTime(){
+        return build.block.buildCost;
     }
 
     @Override
@@ -59,12 +87,25 @@ public class BuildPayload implements Payload{
     @Override
     public void set(float x, float y, float rotation){
         build.set(x, y);
+        build.payloadRotation = rotation;
+    }
+
+    @Override
+    public void drawShadow(float alpha){
+        Drawf.squareShadow(build.x, build.y, build.block.size * tilesize * 1.85f, alpha);
     }
 
     @Override
     public void draw(){
-        Drawf.shadow(build.x, build.y, build.block.size * tilesize * 2f);
-        Draw.rect(build.block.fullIcon, build.x, build.y);
+        float prevZ = Draw.z();
+        Draw.z(prevZ - 0.0001f);
+        drawShadow(1f);
+        Draw.z(prevZ);
+        Draw.zTransform(z -> z >= Layer.flyingUnitLow + 1f ? z : 0.0011f + Math.min(Mathf.clamp(z, prevZ - 0.001f, prevZ + 0.9f), Layer.flyingUnitLow - 1f));
+        build.tile = emptyTile;
+        build.payloadDraw();
+        Draw.zTransform();
+        Draw.z(prevZ);
     }
 
     @Override

@@ -9,7 +9,9 @@ import mindustry.*;
 import mindustry.ai.*;
 import mindustry.ai.Astar.*;
 import mindustry.content.*;
+import mindustry.game.*;
 import mindustry.world.*;
+import mindustry.world.blocks.environment.*;
 
 import static mindustry.Vars.*;
 
@@ -19,12 +21,10 @@ public abstract class BasicGenerator implements WorldGenerator{
     protected Rand rand = new Rand();
 
     protected int width, height;
-    protected Tiles tiles;
+    protected @Nullable Tiles tiles;
 
     //for drawing
-    protected Block floor;
-    protected Block block;
-    protected Block ore;
+    protected @Nullable Block floor, block, ore;
 
     @Override
     public void generate(Tiles tiles){
@@ -33,6 +33,10 @@ public abstract class BasicGenerator implements WorldGenerator{
         this.height = tiles.height;
 
         generate();
+    }
+
+    public Schematic getDefaultLoadout(){
+        return Loadouts.basicShard;
     }
 
     protected void generate(){
@@ -44,10 +48,16 @@ public abstract class BasicGenerator implements WorldGenerator{
     }
 
     public void median(int radius, double percentile){
+        median(radius, percentile, null);
+    }
+
+    public void median(int radius, double percentile, @Nullable Block targetFloor){
         short[] blocks = new short[tiles.width * tiles.height];
         short[] floors = new short[blocks.length];
 
         tiles.each((x, y) -> {
+            if(targetFloor != null && tiles.getn(x, y).floor() != targetFloor) return;
+
             ints1.clear();
             ints2.clear();
             Geometry.circle(x, y, width, height, radius, (cx, cy) -> {
@@ -62,6 +72,8 @@ public abstract class BasicGenerator implements WorldGenerator{
         });
 
         pass((x, y) -> {
+            if(targetFloor != null && floor != targetFloor) return;
+
             block = content.block(blocks[x + y * width]);
             floor = content.block(floors[x + y * width]);
         });
@@ -81,6 +93,91 @@ public abstract class BasicGenerator implements WorldGenerator{
                 }
             }
         });
+    }
+
+    public void ore(Block dest, Block src, float i, float thresh){
+        pass((x, y) -> {
+            if(floor != src) return;
+
+            if(Math.abs(0.5f - noise(x, y + i*999, 2, 0.7, (40 + i * 2))) > 0.26f * thresh &&
+            Math.abs(0.5f - noise(x, y - i*999, 1, 1, (30 + i * 4))) > 0.37f * thresh){
+                ore = dest;
+            }
+        });
+    }
+
+    public void oreAround(Block ore, Block wall, int radius, float scl, float thresh){
+        for(Tile tile : tiles){
+            int x = tile.x, y = tile.y;
+
+            if(tile.block() == Blocks.air && tile.floor().hasSurface() && noise(x, y + ore.id*999, scl, 1f) > thresh){
+                boolean found = false;
+
+                outer:
+                for(int dx = x-radius; dx <= x+radius; dx++){
+                    for(int dy = y-radius; dy <= y+radius; dy++){
+                        if(Mathf.within(dx, dy, x, y, radius + 0.001f) && tiles.in(dx, dy) && tiles.get(dx, dy).block() == wall){
+                            found = true;
+                            break outer;
+                        }
+                    }
+                }
+
+                if(found){
+                    tile.setOverlay(ore);
+                }
+            }
+        }
+    }
+
+    public void wallOre(Block src, Block dest, float scl, float thresh){
+        boolean overlay = dest.isOverlay();
+        pass((x, y) -> {
+            if(block != Blocks.air){
+                boolean empty = false;
+                for(Point2 p : Geometry.d8){
+                    Tile other = tiles.get(x + p.x, y + p.y);
+                    if(other != null && other.block() == Blocks.air){
+                        empty = true;
+                        break;
+                    }
+                }
+
+                if(empty && noise(x + 78, y, 4, 0.7f, scl, 1f) > thresh && block == src){
+                    if(overlay){
+                        ore = dest;
+                    }else{
+                        block = dest;
+                    }
+                }
+            }
+        });
+    }
+
+    public void cliffs(){
+        for(Tile tile : tiles){
+            if(!tile.block().isStatic() || tile.block() == Blocks.cliff) continue;
+
+            int rotation = 0;
+            for(int i = 0; i < 8; i++){
+                Tile other = world.tiles.get(tile.x + Geometry.d8[i].x, tile.y + Geometry.d8[i].y);
+                if(other != null && !other.block().isStatic()){
+                    rotation |= (1 << i);
+                }
+            }
+
+            if(rotation != 0){
+                tile.setBlock(Blocks.cliff);
+            }
+
+            tile.data = (byte)rotation;
+        }
+
+        for(Tile tile : tiles){
+            if(tile.block() != Blocks.cliff && tile.block().isStatic()){
+                tile.setBlock(Blocks.air);
+            }
+        }
     }
 
     public void terrain(Block dst, float scl, float mag, float cmag){
@@ -242,6 +339,94 @@ public abstract class BasicGenerator implements WorldGenerator{
             tile.setFloor(floor.asFloor());
             tile.setBlock(block);
             tile.setOverlay(ore);
+        }
+    }
+
+    public boolean nearWall(int x, int y){
+        for(Point2 p : Geometry.d8){
+            Tile other = tiles.get(x + p.x, y + p.y);
+            if(other != null && other.block() != Blocks.air){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean nearAir(int x, int y){
+        for(Point2 p : Geometry.d4){
+            Tile other = tiles.get(x + p.x, y + p.y);
+            if(other != null && other.block() == Blocks.air){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void removeWall(int cx, int cy, int rad, Boolf<Block> pred){
+        for(int x = -rad; x <= rad; x++){
+            for(int y = -rad; y <= rad; y++){
+                int wx = cx + x, wy = cy + y;
+                if(Structs.inBounds(wx, wy, width, height) && Mathf.within(x, y, rad)){
+                    Tile other = tiles.getn(wx, wy);
+                    if(pred.get(other.block())){
+                        other.setBlock(Blocks.air);
+                    }
+                }
+            }
+        }
+    }
+
+    public boolean near(int cx, int cy, int rad, Block block){
+        for(int x = -rad; x <= rad; x++){
+            for(int y = -rad; y <= rad; y++){
+                int wx = cx + x, wy = cy + y;
+                if(Structs.inBounds(wx, wy, width, height) && Mathf.within(x, y, rad)){
+                    Tile other = tiles.getn(wx, wy);
+                    if(other.block() == block){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public void decoration(float chance){
+        pass((x, y) -> {
+            for(int i = 0; i < 4; i++){
+                Tile near = world.tile(x + Geometry.d4[i].x, y + Geometry.d4[i].y);
+                if(near != null && near.block() != Blocks.air){
+                    return;
+                }
+            }
+
+            if(rand.chance(chance) && floor.asFloor().hasSurface() && block == Blocks.air){
+                block = floor.asFloor().decoration;
+            }
+        });
+    }
+
+    public void blend(Block floor, Block around, float radius){
+        float r2 = radius*radius;
+        int cap = Mathf.ceil(radius);
+        int max = tiles.width * tiles.height;
+        Floor dest = around.asFloor();
+
+        for(int i = 0; i < max; i++){
+            Tile tile = tiles.geti(i);
+            if(tile.floor() == floor || tile.block() == floor){
+                for(int cx = -cap; cx <= cap; cx++){
+                    for(int cy = -cap; cy <= cap; cy++){
+                        if(cx*cx + cy*cy <= r2){
+                            Tile other = tiles.get(tile.x + cx, tile.y + cy);
+
+                            if(other != null && other.floor() != floor){
+                                other.setFloor(dest);
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 

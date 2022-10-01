@@ -14,7 +14,6 @@ import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.defense.*;
-import mindustry.world.blocks.distribution.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.production.*;
@@ -31,7 +30,10 @@ public class BaseGenerator{
     private Seq<Tile> cores;
 
     public static Block getDifficultyWall(int size, float difficulty){
-        Seq<Block> wallsSmall = content.blocks().select(b -> b instanceof Wall && b.size == size && !b.insulated && b.buildVisibility == BuildVisibility.shown && !(b instanceof Door));
+        Seq<Block> wallsSmall = content.blocks().select(b -> b instanceof Wall && b.size == size
+            && !b.insulated && b.buildVisibility == BuildVisibility.shown
+            && !(b instanceof Door)
+            && !(Structs.contains(b.requirements, i -> state.rules.hiddenBuildItems.contains(i.item))));
         wallsSmall.sort(b -> b.buildCost);
         return wallsSmall.getFrac(difficulty * 0.91f);
     }
@@ -57,7 +59,7 @@ public class BaseGenerator{
 
         for(Tile tile : cores){
             tile.clearOverlay();
-            Schematics.placeLoadout(coreschem.schematic, tile.x, tile.y, team, coreschem.required instanceof Item ? bases.ores.get((Item)coreschem.required) : Blocks.oreCopper, false);
+            Schematics.placeLoadout(coreschem.schematic, tile.x, tile.y, team, false);
 
             //fill core with every type of item (even non-material)
             Building entity = tile.build;

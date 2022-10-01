@@ -15,8 +15,12 @@ public class HexMesh extends PlanetMesh{
         super(planet, MeshBuilder.buildHex(mesher, divisions, false, planet.radius, 0.2f), shader);
     }
 
+    public HexMesh(){
+    }
+
     @Override
-    public void preRender(){
+    public void preRender(PlanetParams params){
+        Shaders.planet.planet = planet;
         Shaders.planet.lightDir.set(planet.solarSystem.position).sub(planet.position).rotate(Vec3.Y, planet.getRotation()).nor();
         Shaders.planet.ambientColor.set(planet.solarSystem.lightColor);
     }

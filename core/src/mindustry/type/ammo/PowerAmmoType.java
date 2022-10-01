@@ -38,17 +38,17 @@ public class PowerAmmoType implements AmmoType{
     public void resupply(Unit unit){
         float range = unit.hitSize + this.range;
 
-        Building build = Units.closestBuilding(unit.team, unit.x, unit.y, range, u -> u.block.consumes.hasPower() && u.block.consumes.getPower().buffered);
+        Building build = Units.closestBuilding(unit.team, unit.x, unit.y, range, u -> u.block.consPower != null && u.block.consPower.buffered);
 
         if(build != null){
-            float amount = build.power.status * build.block.consumes.getPower().capacity;
+            float amount = build.power.status * build.block.consPower.capacity;
             float powerPerAmmo = totalPower / unit.type.ammoCapacity;
             float ammoRequired = unit.type.ammoCapacity - unit.ammo;
             float powerRequired = ammoRequired * powerPerAmmo;
             float powerTaken = Math.min(amount, powerRequired);
 
             if(powerTaken > 1){
-                build.power.status -= powerTaken / build.block.consumes.getPower().capacity;
+                build.power.status -= powerTaken / build.block.consPower.capacity;
                 unit.ammo += powerTaken / powerPerAmmo;
 
                 Fx.itemTransfer.at(build.x, build.y, Math.max(powerTaken / 100f, 1f), Pal.power, unit);

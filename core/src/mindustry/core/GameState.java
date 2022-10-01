@@ -16,8 +16,16 @@ public class GameState{
     public int wave = 1;
     /** Wave countdown in ticks. */
     public float wavetime;
+    /** Logic tick. */
+    public double tick;
+    /** Continuously ticks up every non-paused update. */
+    public long updateId;
     /** Whether the game is in game over state. */
-    public boolean gameOver = false, serverPaused = false;
+    public boolean gameOver = false;
+    /** Whether the player's team won the match. */
+    public boolean won = false;
+    /** If true, the server has been put into the paused state on multiplayer. This is synced. */
+    public boolean serverPaused = false;
     /** Server ticks/second. Only valid in multiplayer. */
     public int serverTps = -1;
     /** Map that is currently being played on. */
@@ -32,6 +40,8 @@ public class GameState{
     public Teams teams = new Teams();
     /** Number of enemies in the game; only used clientside in servers. */
     public int enemies;
+    /** Map being playtested (not edited!) */
+    public @Nullable Map playtestingMap;
     /** Current game state. */
     private State state = State.menu;
 
@@ -49,7 +59,7 @@ public class GameState{
     }
 
     public boolean hasSpawns(){
-        return rules.waves && !(isCampaign() && rules.attackMode);
+        return rules.waves && ((rules.waveTeam.cores().size > 0 && rules.attackMode) || rules.spawns.size > 0);
     }
 
     /** Note that being in a campaign does not necessarily mean having a sector. */
@@ -71,7 +81,7 @@ public class GameState{
     }
 
     public boolean isPaused(){
-        return (is(State.paused) && !net.active()) || (gameOver && (!net.active() || isCampaign())) || (serverPaused && !isMenu());
+        return (is(State.paused) && !net.active()) || (serverPaused && !isMenu());
     }
 
     public boolean isPlaying(){

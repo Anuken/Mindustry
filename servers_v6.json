@@ -1,23 +1,39 @@
 [
   {
-    "name": "RCM",
-    "address": ["185.104.248.61", "easyplay.su"]
+    "name": "Sectorized",
+    "address": ["sectorized.ddns.net"]
   },
   {
-    "name": "SMokeOfAnarchy.duckdns.org",
-    "address": ["smokeofanarchy.duckdns.org:6853"]
+    "name": "generic survival",
+    "address": ["212.192.29.92:25554"]
   },
   {
     "name": "{AA}",
-    "address": ["aamindustry.play.ai", "aamindustry.play.ai:6571", "aamindustry.play.ai:6572", "aamindustry.play.ai:6573", "aamindustry.play.ai:6574"]
+    "address": ["recessive.net"]
   },
-   {
-    "name": "Atanner",
-    "address": ["atannergaming.com:13000"]
+  {
+    "name": "Omega Hub",
+    "address": ["n1.mindustry.me:6614","n1.mindustry.me:6568","n1.mindustry.me:6612","n1.mindustry.me:6570","n1.mindustry.me:6609"]
+  },
+  {
+    "name": "EasyPlay",
+    "address": ["easyplay.su"]
+  },
+    {
+    "name": "Tendhost",
+    "address": ["tendhost.ddns.net", "smokeofanarchy.ru:7576"]
+  },
+  {
+    "name": "SMokeOfAnarchy",
+    "address": ["smokeofanarchy.ru:6566", "strider.smokeofanarchy.ru:6566"]
+  },
+  {
+    "name": "Atanner Gaming",
+    "address": ["mindustry.atannergaming.com:6567", "mindustry.atannergaming.com:6700", "mindustry.atannergaming.com:9000"]
   },
   {
     "name": "C.A.M.S.",
-    "address": ["baseduser.eu.org:6568", "nikochio.ddns.net", "play.thedimas.pp.ua"]
+    "address": ["0.baseduser.eu.org:42000", "nikochio.ddns.net"]
   },
   {
     "name": "ECAN",
@@ -25,7 +41,7 @@
   },
   {
     "name": "Chaotic Neutral",
-    "address": ["Chaotic-Neutral.ddns.net:1111", "Chaotic-Neutral.ddns.net:2222", "Chaotic-Neutral.ddns.net:7777"]
+    "address": ["c-n.ddns.net:1111", "c-n.ddns.net:2222", "c-n.ddns.net:3333", "c-n.ddns.net:4444"]
   },
   {
     "name": "Ranked",
@@ -33,15 +49,15 @@
   },
   {
     "name": "TWS",
-    "address": ["twsmindustry.24x7.hk:6701", "twsmindustry.24x7.hk:6702"]
+    "address": ["twsmindustry.24x7.hk:6701", "twsmindustry.24x7.hk:6702", "twsmindustry.24x7.hk:6969"]
   },
   {
     "name": "mindustry.ddns.net",
     "address": ["mindustry.ddns.net", "mindustry.ddns.net:1000", "mindustry.ddns.net:2000", "mindustry.ddns.net:3000", "mindustry.ddns.net:4000"]
   },
   {
-    "name": "Surrealment",
-    "address": ["md.surrealment.com"]
+    "name": "Surrealment v6",
+    "address": ["md.surrealment.com:6566"]
   },
   {
     "name": "ALEX",
@@ -53,19 +69,11 @@
   },
   {
     "name": "Korea",
-    "address": ["mindustry.initd.kr"]
+    "address": ["mindustry.initd.kr","mindustry.kr:7100"]
   },
   {
-    "name": "Omega",
-    "address": ["yeeth.mindustry.me:2004","185.86.230.61:25570"] 
-  },
-  {
-    "name": "md.obvilionnetwork.ru",
-    "address": ["obvilionnetwork.ru", "obvilionnetwork.ru:7001", "obvilionnetwork.ru:7002", "obvilionnetwork.ru:7003"]
-  },
-  {
-    "name": "Mindustry PLAY",
-    "address": ["92.63.100.160"]
+    "name": "Obvilion Network",
+    "address": ["obvilion.ru", "obvilion.ru:7001", "obvilion.ru:7002", "obvilion.ru:7003"]
   },
   {
     "name": "Nydus",
@@ -77,11 +85,11 @@
   },
   {
     "name": "TSR", 
-    "address": ["ult4.falix.gg:26904"]
+    "address": ["uk01.optik.host:26175", "uk01.optik.host:26164"]
   },
   {
     "name": "Sakura", 
-    "address": ["160.16.207.141", "160.16.207.141:21527", "160.16.207.141:31587", "160.16.207.141:26810"]
+    "address": ["160.16.207.141", "160.16.207.141:21527", "160.16.207.141:31587", "160.16.207.141:26810", "160.16.207.141:4848"]
   },
   {
     "name": "MeowLand",
@@ -93,26 +101,42 @@
   },
   {
     "name": "Hungarian",
-    "address": ["magyarmindustry.tk", "148.251.175.124:25601"]
+    "address": ["play.hudustry.tk"]
   },
   {
     "name": "Xpdustry",
-    "address": ["xpdustry.fr"]
+    "address": ["n2.xpdustry.fr:6000", "n2.xpdustry.fr:6002"]
   },
   {
     "name": "CxZx",
     "address": ["usfr2.forcehost.net:25578"]
   },
   {
-    "name": "Español",
-    "address": ["168.119.36.188:41445"]
-  },
-  {
     "name": "CreateDustry",
-    "address": ["144.76.120.74:18645"]
+    "address": ["129.151.64.81:26032"]
   },
   {
-    "name": "HexedPvP",
-    "address": ["001.finland.eu.hosts.dynamichost.xyz:23664"]
+    "name": "NukeDustry",
+    "address": ["nukedustry.tk:7777", "nukedustry.tk:8888"]
+  },
+  {
+    "name": "MindustryBR",
+    "address": ["mindustryptbr.ddns.net:25579"]
+  },
+  {
+    "name": "Conservatory",
+    "address": ["143.198.71.232"]
+  },
+  {
+    "name": "Shard",
+    "address": ["59.12.120.171"]
+  },
+  {
+    "name": "New Campaign Like",
+    "address": ["n5.yeet.ml:6568"]
+  },
+  {
+    "name": "AlternightBR",
+    "address": ["mindustrypt.ga:8300"]
   }
 ]

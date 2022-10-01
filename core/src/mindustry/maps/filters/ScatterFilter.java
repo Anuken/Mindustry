@@ -7,8 +7,8 @@ import mindustry.world.*;
 import static mindustry.maps.filters.FilterOption.*;
 
 public class ScatterFilter extends GenerateFilter{
-    protected float chance = 0.013f;
-    protected Block flooronto = Blocks.air, floor = Blocks.air, block = Blocks.air;
+    public float chance = 0.013f;
+    public Block flooronto = Blocks.air, floor = Blocks.air, block = Blocks.air;
 
     @Override
     public FilterOption[] options(){

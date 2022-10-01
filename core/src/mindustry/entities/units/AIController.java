@@ -17,11 +17,13 @@ import static mindustry.Vars.*;
 
 public class AIController implements UnitController{
     protected static final Vec2 vec = new Vec2();
+    protected static final float rotateBackTimer = 60f * 5f;
     protected static final int timerTarget = 0, timerTarget2 = 1, timerTarget3 = 2, timerTarget4 = 3;
 
     protected Unit unit;
     protected Interval timer = new Interval(4);
     protected AIController fallback;
+    protected float noTargetTime;
 
     /** main target that is being faced */
     protected Teamc target;
@@ -45,6 +47,21 @@ public class AIController implements UnitController{
         updateMovement();
     }
 
+    /**
+     * @return whether controller state should not be reset after reading.
+     * Do not override unless you know exactly what you are doing.
+     * */
+    public boolean keepState(){
+        return false;
+    }
+
+    public void stopShooting(){
+        for(var mount : unit.mounts){
+            //ignore mount controllable stats too, they should not shoot either
+            mount.shoot = false;
+        }
+    }
+
     @Nullable
     public AIController fallback(){
         return null;
@@ -52,10 +69,6 @@ public class AIController implements UnitController{
 
     public boolean useFallback(){
         return false;
-    }
-
-    public UnitCommand command(){
-        return unit.team.data().command;
     }
 
     public void updateVisuals(){
@@ -79,7 +92,7 @@ public class AIController implements UnitController{
     /** For ground units: Looks at the target, or the movement position. Does not apply to non-omni units. */
     public void faceTarget(){
         if(unit.type.omniMovement || unit instanceof Mechc){
-            if(!Units.invalidateTarget(target, unit, unit.range()) && unit.type.rotateShooting && unit.type.hasWeapons()){
+            if(!Units.invalidateTarget(target, unit, unit.range()) && unit.type.faceTarget && unit.type.hasWeapons()){
                 unit.lookAt(Predict.intercept(unit, target, unit.type.weapons.first().bullet.speed));
             }else if(unit.moving()){
                 unit.lookAt(unit.vel().angle());
@@ -117,17 +130,22 @@ public class AIController implements UnitController{
             target = findMainTarget(unit.x, unit.y, unit.range(), unit.type.targetAir, unit.type.targetGround);
         }
 
+        noTargetTime += Time.delta;
+
         if(invalid(target)){
             target = null;
+        }else{
+            noTargetTime = 0f;
         }
 
         unit.isShooting = false;
 
         for(var mount : unit.mounts){
             Weapon weapon = mount.weapon;
+            float wrange = weapon.range();
 
             //let uncontrollable weapons do their own thing
-            if(!weapon.controllable) continue;
+            if(!weapon.controllable || weapon.noAttack) continue;
 
             if(!weapon.aiControllable){
                 mount.rotate = false;
@@ -141,10 +159,10 @@ public class AIController implements UnitController{
                 mount.target = target;
             }else{
                 if(ret){
-                    mount.target = findTarget(mountX, mountY, weapon.bullet.range(), weapon.bullet.collidesAir, weapon.bullet.collidesGround);
+                    mount.target = findTarget(mountX, mountY, wrange, weapon.bullet.collidesAir, weapon.bullet.collidesGround);
                 }
 
-                if(checkTarget(mount.target, mountX, mountY, weapon.bullet.range())){
+                if(checkTarget(mount.target, mountX, mountY, wrange)){
                     mount.target = null;
                 }
             }
@@ -152,7 +170,7 @@ public class AIController implements UnitController{
             boolean shoot = false;
 
             if(mount.target != null){
-                shoot = mount.target.within(mountX, mountY, weapon.bullet.range() + (mount.target instanceof Sized s ? s.hitSize()/2f : 0f)) && shouldShoot();
+                shoot = mount.target.within(mountX, mountY, wrange + (mount.target instanceof Sized s ? s.hitSize()/2f : 0f)) && shouldShoot();
 
                 Vec2 to = Predict.intercept(unit, mount.target, weapon.bullet.speed);
                 mount.aimX = to.x;
@@ -160,6 +178,13 @@ public class AIController implements UnitController{
             }
 
             unit.isShooting |= (mount.shoot = mount.rotate = shoot);
+
+            if(mount.target == null && !shoot && !Angles.within(mount.rotation, 0f, 0.01f) && noTargetTime >= rotateBackTimer){
+                mount.rotate = true;
+                Tmp.v1.trns(unit.rotation, 5f);
+                mount.aimX = mountX + Tmp.v1.x;
+                mount.aimY = mountY + Tmp.v1.y;
+            }
 
             if(shoot){
                 unit.aimX = mount.aimX;
@@ -178,8 +203,7 @@ public class AIController implements UnitController{
 
     public Teamc targetFlag(float x, float y, BlockFlag flag, boolean enemy){
         if(unit.team == Team.derelict) return null;
-        Tile target = Geometry.findClosest(x, y, enemy ? indexer.getEnemy(unit.team, flag) : indexer.getAllied(unit.team, flag));
-        return target == null ? null : target.build;
+        return Geometry.findClosest(x, y, enemy ? indexer.getEnemy(unit.team, flag) : indexer.getFlagged(unit.team, flag));
     }
 
     public Teamc target(float x, float y, float range, boolean air, boolean ground){
@@ -198,6 +222,7 @@ public class AIController implements UnitController{
         return target(x, y, range, air, ground);
     }
 
+    /** Called after this controller is assigned a unit. */
     public void init(){
 
     }
@@ -212,6 +237,23 @@ public class AIController implements UnitController{
                 pay.dropLastPayload();
             }
         }
+    }
+
+    public void circleAttack(float circleLength){
+        vec.set(target).sub(unit);
+
+        float ang = unit.angleTo(target);
+        float diff = Angles.angleDist(ang, unit.rotation());
+
+        if(diff > 70f && vec.len() < circleLength){
+            vec.setAngle(unit.vel().angle());
+        }else{
+            vec.setAngle(Angles.moveToward(unit.vel().angle(), vec.angle(), 6f));
+        }
+
+        vec.setLength(unit.speed());
+
+        unit.moveAt(vec);
     }
 
     public void circle(Position target, float circleLength){
@@ -237,6 +279,14 @@ public class AIController implements UnitController{
     }
 
     public void moveTo(Position target, float circleLength, float smooth){
+        moveTo(target, circleLength, smooth, unit.isFlying(), null);
+    }
+
+    public void moveTo(Position target, float circleLength, float smooth, boolean keepDistance, @Nullable Vec2 offset){
+        moveTo(target, circleLength, smooth, keepDistance, offset, false);
+    }
+
+    public void moveTo(Position target, float circleLength, float smooth, boolean keepDistance, @Nullable Vec2 offset, boolean arrive){
         if(target == null) return;
 
         vec.set(target).sub(unit);
@@ -244,13 +294,39 @@ public class AIController implements UnitController{
         float length = circleLength <= 0.001f ? 1f : Mathf.clamp((unit.dst(target) - circleLength) / smooth, -1f, 1f);
 
         vec.setLength(unit.speed() * length);
+
+        if(arrive){
+            Tmp.v3.set(-unit.vel.x / unit.type.accel * 2f, -unit.vel.y / unit.type.accel * 2f).add((target.getX() - unit.x), (target.getY() - unit.y));
+            vec.add(Tmp.v3).limit(unit.speed() * length);
+        }
+
         if(length < -0.5f){
-            vec.rotate(180f);
+            if(keepDistance){
+                vec.rotate(180f);
+            }else{
+                vec.setZero();
+            }
         }else if(length < 0){
             vec.setZero();
         }
 
-        unit.moveAt(vec);
+        if(offset != null){
+            vec.add(offset);
+            vec.setLength(unit.speed() * length);
+        }
+
+        //do not move when infinite vectors are used.
+        if(vec.isNaN() || vec.isInfinite()) return;
+
+        if(!unit.type.omniMovement && unit.type.rotateMoveFirst){
+            float angle = vec.angle();
+            unit.lookAt(angle);
+            if(Angles.within(unit.rotation, angle, 3f)){
+                unit.movePref(vec);
+            }
+        }else{
+            unit.movePref(vec);
+        }
     }
 
     @Override

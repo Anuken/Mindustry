@@ -36,6 +36,8 @@ public class MendProjector extends Block{
         hasItems = true;
         emitLight = true;
         lightRadius = 50f;
+        suppressable = true;
+        envEnabled |= Env.space;
     }
 
     @Override
@@ -65,10 +67,7 @@ public class MendProjector extends Block{
     }
 
     public class MendBuild extends Building implements Ranged{
-        float heat;
-        float charge = Mathf.random(reload);
-        float phaseHeat;
-        float smoothEfficiency;
+        public float heat, charge = Mathf.random(reload), phaseHeat, smoothEfficiency;
 
         @Override
         public float range(){
@@ -77,23 +76,26 @@ public class MendProjector extends Block{
 
         @Override
         public void updateTile(){
-            smoothEfficiency = Mathf.lerpDelta(smoothEfficiency, efficiency(), 0.08f);
-            heat = Mathf.lerpDelta(heat, consValid() || cheating() ? 1f : 0f, 0.08f);
+            boolean canHeal = !checkSuppression();
+
+            smoothEfficiency = Mathf.lerpDelta(smoothEfficiency, efficiency, 0.08f);
+            heat = Mathf.lerpDelta(heat, efficiency > 0 && canHeal ? 1f : 0f, 0.08f);
             charge += heat * delta();
 
-            phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(cons.optionalValid()), 0.1f);
+            phaseHeat = Mathf.lerpDelta(phaseHeat, optionalEfficiency, 0.1f);
 
-            if(cons.optionalValid() && timer(timerUse, useTime) && efficiency() > 0){
+            if(optionalEfficiency > 0 && timer(timerUse, useTime) && canHeal){
                 consume();
             }
 
-            if(charge >= reload){
+            if(charge >= reload && canHeal){
                 float realRange = range + phaseHeat * phaseRangeBoost;
                 charge = 0f;
 
-                indexer.eachBlock(this, realRange, Building::damaged, other -> {
-                    other.heal(other.maxHealth() * (healPercent + phaseHeat * phaseBoost) / 100f * efficiency());
-                    Fx.healBlockFull.at(other.x, other.y, other.block.size, baseColor);
+                indexer.eachBlock(this, realRange, b -> b.damaged() && !b.isHealSuppressed(), other -> {
+                    other.heal(other.maxHealth() * (healPercent + phaseHeat * phaseBoost) / 100f * efficiency);
+                    other.recentlyHealed();
+                    Fx.healBlockFull.at(other.x, other.y, other.block.size, baseColor, other.block);
                 });
             }
         }
@@ -120,7 +122,7 @@ public class MendProjector extends Block{
             float f = 1f - (Time.time / 100f) % 1f;
 
             Draw.color(baseColor, phaseColor, phaseHeat);
-            Draw.alpha(heat * Mathf.absin(Time.time, 10f, 1f) * 0.5f);
+            Draw.alpha(heat * Mathf.absin(Time.time, 50f / Mathf.PI2, 1f) * 0.5f);
             Draw.rect(topRegion, x, y);
             Draw.alpha(1f);
             Lines.stroke((2f * f + 0.2f) * heat);
@@ -131,7 +133,7 @@ public class MendProjector extends Block{
 
         @Override
         public void drawLight(){
-            Drawf.light(team, x, y, lightRadius * smoothEfficiency, baseColor, 0.7f * smoothEfficiency);
+            Drawf.light(x, y, lightRadius * smoothEfficiency, baseColor, 0.7f * smoothEfficiency);
         }
 
         @Override

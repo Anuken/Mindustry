@@ -5,6 +5,8 @@ import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
+import static mindustry.Vars.*;
+
 public class MemoryBlock extends Block{
     public int memoryCapacity = 32;
 
@@ -14,6 +16,8 @@ public class MemoryBlock extends Block{
         solid = true;
         group = BlockGroup.logic;
         drawDisabled = false;
+        envEnabled = Env.any;
+        canOverdrive = false;
     }
 
     @Override
@@ -23,6 +27,15 @@ public class MemoryBlock extends Block{
         stats.add(Stat.memoryCapacity, memoryCapacity, StatUnit.none);
     }
 
+    public boolean accessible(){
+        return !privileged || state.rules.editor;
+    }
+
+    @Override
+    public boolean canBreak(Tile tile){
+        return accessible();
+    }
+
     public class MemoryBuild extends Building{
         public double[] memory = new double[memoryCapacity];
 
@@ -30,6 +43,22 @@ public class MemoryBlock extends Block{
         @Override
         public boolean canPickup(){
             return false;
+        }
+
+        @Override
+        public boolean collide(Bullet other){
+            return !privileged;
+        }
+
+        @Override
+        public boolean displayable(){
+            return accessible();
+        }
+
+        @Override
+        public void damage(float damage){
+            if(privileged) return;
+            super.damage(damage);
         }
 
         @Override

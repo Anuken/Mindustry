@@ -7,8 +7,8 @@ import mindustry.world.*;
 import static mindustry.maps.filters.FilterOption.*;
 
 public class BlendFilter extends GenerateFilter{
-    float radius = 2f;
-    Block block = Blocks.sand, floor = Blocks.sandWater, ignore = Blocks.air;
+    public float radius = 2f;
+    public Block block = Blocks.sand, floor = Blocks.sandWater, ignore = Blocks.air;
 
     @Override
     public FilterOption[] options(){

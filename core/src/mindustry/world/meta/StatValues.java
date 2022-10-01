@@ -34,13 +34,34 @@ public class StatValues{
         return table ->  table.add(!value ? "@no" : "@yes");
     }
 
-    public static StatValue number(float value, StatUnit unit){
-        return table -> {
-            int precision = Math.abs((int)value - value) <= 0.001f ? 0 : Math.abs((int)(value * 10) - value * 10) <= 0.001f ? 1 : 2;
+    public static String fixValue(float value){
+        int precision = Math.abs((int)value - value) <= 0.001f ? 0 : Math.abs((int)(value * 10) - value * 10) <= 0.001f ? 1 : 2;
+        return Strings.fixed(value, precision);
+    }
 
-            table.add(Strings.fixed(value, precision));
+    public static StatValue squared(float value, StatUnit unit){
+        return table -> {
+            String fixed = fixValue(value);
+            table.add(fixed + "x" + fixed);
             table.add((unit.space ? " " : "") + unit.localized());
         };
+    }
+
+    public static StatValue number(float value, StatUnit unit, boolean merge){
+        return table -> {
+            String l1 = fixValue(value), l2 = (unit.space ? " " : "") + unit.localized();
+
+            if(merge){
+                table.add(l1 + l2);
+            }else{
+                table.add(l1);
+                table.add(l2);
+            }
+        };
+    }
+
+    public static StatValue number(float value, StatUnit unit){
+        return number(value, unit, false);
     }
 
     public static StatValue liquid(Liquid liquid, float amount, boolean perSecond){
@@ -49,7 +70,7 @@ public class StatValues{
 
     public static StatValue liquids(Boolf<Liquid> filter, float amount, boolean perSecond){
         return table -> {
-            Seq<Liquid> list = content.liquids().select(i -> filter.get(i) && i.unlockedNow());
+            Seq<Liquid> list = content.liquids().select(i -> filter.get(i) && i.unlockedNow() && !i.isHidden());
 
             for(int i = 0; i < list.size; i++){
                 table.add(new LiquidDisplay(list.get(i), amount, perSecond)).padRight(5);
@@ -57,6 +78,18 @@ public class StatValues{
                 if(i != list.size - 1){
                     table.add("/");
                 }
+            }
+        };
+    }
+
+    public static StatValue liquids(float timePeriod, LiquidStack... stacks){
+        return liquids(timePeriod, true, stacks);
+    }
+
+    public static StatValue liquids(float timePeriod, boolean perSecond, LiquidStack... stacks){
+        return table -> {
+            for(var stack : stacks){
+                table.add(new LiquidDisplay(stack.liquid, stack.amount * (60f / timePeriod), perSecond)).padRight(5);
             }
         };
     }
@@ -87,7 +120,7 @@ public class StatValues{
 
     public static StatValue items(float timePeriod, Boolf<Item> filter){
         return table -> {
-            Seq<Item> list = content.items().select(i -> filter.get(i) && i.unlockedNow());
+            Seq<Item> list = content.items().select(i -> filter.get(i) && i.unlockedNow() && !i.isHidden());
 
             for(int i = 0; i < list.size; i++){
                 Item item = list.get(i);
@@ -108,14 +141,18 @@ public class StatValues{
         };
     }
 
-    public static StatValue floorEfficiency(Floor floor, float multiplier, boolean startZero){
+    public static StatValue blockEfficiency(Block floor, float multiplier, boolean startZero){
         return table -> table.stack(
             new Image(floor.uiIcon).setScaling(Scaling.fit),
             new Table(t -> t.top().right().add((multiplier < 0 ? "[scarlet]" : startZero ? "[accent]" : "[accent]+") + (int)((multiplier) * 100) + "%").style(Styles.outlineLabel))
-        );
+        ).maxSize(64f);
     }
 
-    public static StatValue floors(Attribute attr, boolean floating, float scale, boolean startZero){
+    public static StatValue blocks(Attribute attr, boolean floating, float scale, boolean startZero){
+        return blocks(attr, floating, scale, startZero, true);
+    }
+
+    public static StatValue blocks(Attribute attr, boolean floating, float scale, boolean startZero, boolean checkFloors){
         return table -> table.table(c -> {
             Runnable[] rebuild = {null};
             Map[] lastMap = {null};
@@ -126,14 +163,14 @@ public class StatValues{
 
                 if(state.isGame()){
                     var blocks = Vars.content.blocks()
-                    .select(block -> block instanceof Floor f && indexer.isBlockPresent(block) && f.attributes.get(attr) != 0 && !(f.isDeep() && !floating))
-                    .<Floor>as().with(s -> s.sort(f -> f.attributes.get(attr)));
+                    .select(block -> (!checkFloors || block instanceof Floor) && indexer.isBlockPresent(block) && block.attributes.get(attr) != 0 && !((block instanceof Floor f && f.isDeep()) && !floating))
+                    .with(s -> s.sort(f -> f.attributes.get(attr)));
 
                     if(blocks.any()){
                         int i = 0;
                         for(var block : blocks){
 
-                            floorEfficiency(block, block.attributes.get(attr) * scale, startZero).display(c);
+                            blockEfficiency(block, block.attributes.get(attr) * scale, startZero).display(c);
                             if(++i % 5 == 0){
                                 c.row();
                             }
@@ -159,25 +196,44 @@ public class StatValues{
             });
         });
     }
-
-    public static StatValue blocks(Boolf<Block> pred){
-        return blocks(content.blocks().select(pred));
+    public static StatValue content(Seq<UnlockableContent> list){
+        return content(list, i -> true);
     }
 
-    public static StatValue blocks(Seq<Block> list){
+    public static <T extends UnlockableContent> StatValue content(Seq<T> list, Boolf<T> check){
         return table -> table.table(l -> {
             l.left();
 
+            boolean any = false;
             for(int i = 0; i < list.size; i++){
-                Block item = list.get(i);
+                var item = list.get(i);
 
-                l.image(item.uiIcon).size(iconSmall).padRight(2).padLeft(2).padTop(3).padBottom(3);
-                l.add(item.localizedName).left().padLeft(1).padRight(4);
+                if(!check.get(item)) continue;
+                any = true;
+
+                if(item.uiIcon.found()) l.image(item.uiIcon).size(iconSmall).padRight(2).padLeft(2).padTop(3).padBottom(3);
+                l.add(item.localizedName).left().padLeft(1).padRight(4).colspan(item.uiIcon.found() ? 1 : 2);
                 if(i % 5 == 4){
                     l.row();
                 }
             }
+
+            if(!any){
+                l.add("@none.inmap");
+            }
         });
+    }
+
+    public static StatValue blocks(Boolf<Block> pred){
+        return content(content.blocks(), pred);
+    }
+
+    public static StatValue blocks(Seq<Block> list){
+        return content(list.as());
+    }
+
+    public static StatValue statusEffects(Seq<StatusEffect> list){
+        return content(list.as());
     }
 
     public static StatValue boosters(float reload, float maxUsed, float multiplier, boolean baseReload, Boolf<Liquid> filter){
@@ -187,7 +243,7 @@ public class StatValues{
                 for(Liquid liquid : content.liquids()){
                     if(!filter.get(liquid)) continue;
 
-                    c.image(liquid.uiIcon).size(3 * 8).padRight(4).right().top();
+                    c.image(liquid.uiIcon).size(3 * 8).scaling(Scaling.fit).padRight(4).right().top();
                     c.add(liquid.localizedName).padRight(10).left().top();
                     c.table(Tex.underline, bt -> {
                         bt.left().defaults().padRight(3).left();
@@ -211,7 +267,7 @@ public class StatValues{
                 for(Liquid liquid : content.liquids()){
                     if(!filter.get(liquid)) continue;
 
-                    c.image(liquid.uiIcon).size(3 * 8).padRight(4).right().top();
+                    c.image(liquid.uiIcon).size(3 * 8).scaling(Scaling.fit).padRight(4).right().top();
                     c.add(liquid.localizedName).padRight(10).left().top();
                     c.table(Tex.underline, bt -> {
                         bt.left().defaults().padRight(3).left();
@@ -232,12 +288,12 @@ public class StatValues{
             for(int i = 0; i < weapons.size;i ++){
                 Weapon weapon = weapons.get(i);
 
-                if(weapon.flipSprite){
+                if(weapon.flipSprite || !weapon.hasStats(unit)){
                     //flipped weapons are not given stats
                     continue;
                 }
 
-                TextureRegion region = !weapon.name.equals("") && weapon.outlineRegion.found() ? weapon.outlineRegion : unit.fullIcon;
+                TextureRegion region = !weapon.name.equals("") && weapon.region.found() ? weapon.region : Core.atlas.find("clear");
 
                 table.image(region).size(60).scaling(Scaling.bounded).right().top();
 
@@ -252,10 +308,14 @@ public class StatValues{
     }
 
     public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map){
-        return ammo(map, 0);
+        return ammo(map, 0, false);
     }
 
-    public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map, int indent){
+    public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map, boolean showUnit){
+        return ammo(map, 0, showUnit);
+    }
+
+    public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map, int indent, boolean showUnit){
         return table -> {
 
             table.row();
@@ -264,12 +324,17 @@ public class StatValues{
             orderedKeys.sort();
 
             for(T t : orderedKeys){
-                boolean compact = t instanceof UnitType || indent > 0;
+                boolean compact = t instanceof UnitType && !showUnit || indent > 0;
 
                 BulletType type = map.get(t);
 
+                if(type.spawnUnit != null && type.spawnUnit.weapons.size > 0){
+                    ammo(ObjectMap.of(t, type.spawnUnit.weapons.first().bullet), indent, false).display(table);
+                    return;
+                }
+
                 //no point in displaying unit icon twice
-                if(!compact && !(t instanceof PowerTurret)){
+                if(!compact && !(t instanceof Turret)){
                     table.image(icon(t)).size(3 * 8).padRight(4).right().top();
                     table.add(t.localizedName).padRight(10).left().top();
                 }
@@ -289,11 +354,15 @@ public class StatValues{
                         sep(bt, Core.bundle.format("bullet.buildingdamage", (int)(type.buildingDamageMultiplier * 100)));
                     }
 
+                    if(type.rangeChange != 0 && !compact){
+                        sep(bt, Core.bundle.format("bullet.range", (type.rangeChange > 0 ? "+" : "-") + Strings.autoFixed(type.rangeChange / tilesize, 1)));
+                    }
+
                     if(type.splashDamage > 0){
                         sep(bt, Core.bundle.format("bullet.splashdamage", (int)type.splashDamage, Strings.fixed(type.splashDamageRadius / tilesize, 1)));
                     }
 
-                    if(!compact && !Mathf.equal(type.ammoMultiplier, 1f) && type.displayAmmoMultiplier){
+                    if(!compact && !Mathf.equal(type.ammoMultiplier, 1f) && type.displayAmmoMultiplier && (!(t instanceof Turret turret) || turret.displayAmmoMultiplier)){
                         sep(bt, Core.bundle.format("bullet.multiplier", (int)type.ammoMultiplier));
                     }
 
@@ -307,6 +376,10 @@ public class StatValues{
 
                     if(type.healPercent > 0f){
                         sep(bt, Core.bundle.format("bullet.healpercent", Strings.autoFixed(type.healPercent, 2)));
+                    }
+
+                    if(type.healAmount > 0f){
+                        sep(bt, Core.bundle.format("bullet.healamount", Strings.autoFixed(type.healAmount, 2)));
                     }
 
                     if(type.pierce || type.pierceCap != -1){
@@ -325,15 +398,19 @@ public class StatValues{
                         sep(bt, Core.bundle.format("bullet.lightning", type.lightning, type.lightningDamage < 0 ? type.damage : type.lightningDamage));
                     }
 
+                    if(type.pierceArmor){
+                        sep(bt, "@bullet.armorpierce");
+                    }
+
                     if(type.status != StatusEffects.none){
-                        sep(bt, (type.minfo.mod == null ? type.status.emoji() : "") + "[stat]" + type.status.localizedName);
+                        sep(bt, (type.status.minfo.mod == null ? type.status.emoji() : "") + "[stat]" + type.status.localizedName + "[lightgray] ~ [stat]" + ((int)(type.statusDuration / 60f)) + "[lightgray] " + Core.bundle.get("unit.seconds"));
                     }
 
                     if(type.fragBullet != null){
                         sep(bt, Core.bundle.format("bullet.frags", type.fragBullets));
                         bt.row();
 
-                        ammo(ObjectMap.of(t, type.fragBullet), indent + 1).display(bt);
+                        ammo(ObjectMap.of(t, type.fragBullet), indent + 1, false).display(bt);
                     }
                 }).padTop(compact ? 0 : -9).padLeft(indent * 8).left().get().background(compact ? null : Tex.underline);
 

@@ -3,7 +3,6 @@ package mindustry.ui.dialogs;
 import arc.*;
 import arc.func.*;
 import arc.graphics.*;
-import arc.math.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.ImageButton.*;
@@ -56,7 +55,7 @@ public class CustomRulesDialog extends BaseDialog{
                     t.add("@empty");
                 }
 
-                Seq<T> array = set.asArray();
+                Seq<T> array = set.toSeq();
                 array.sort();
 
                 int cols = mobile && Core.graphics.isPortrait() ? 1 : mobile ? 2 : 3;
@@ -68,7 +67,7 @@ public class CustomRulesDialog extends BaseDialog{
                         b.image(con.uiIcon).size(iconMed).padRight(3);
                         b.add(con.localizedName).color(Color.lightGray).padLeft(3).growX().left().wrap();
 
-                        b.button(Icon.cancel, Styles.clearPartiali, () -> {
+                        b.button(Icon.cancel, Styles.clearNonei, () -> {
                             set.remove(con);
                             rebuild[0].run();
                         }).size(70f).pad(-4f).padLeft(0f);
@@ -87,7 +86,7 @@ public class CustomRulesDialog extends BaseDialog{
                     int[] i = {0};
                     content.<T>getBy(type).each(b -> !set.contains(b) && pred.get(b), b -> {
                         int cols = mobile && Core.graphics.isPortrait() ? 4 : 12;
-                        t.button(new TextureRegionDrawable(b.uiIcon), Styles.cleari, iconMed, () -> {
+                        t.button(new TextureRegionDrawable(b.uiIcon), Styles.flati, iconMed, () -> {
                             set.add(b);
                             rebuild[0].run();
                             dialog.hide();
@@ -140,16 +139,23 @@ public class CustomRulesDialog extends BaseDialog{
         title("@rules.title.waves");
         check("@rules.waves", b -> rules.waves = b, () -> rules.waves);
         check("@rules.wavetimer", b -> rules.waveTimer = b, () -> rules.waveTimer);
+        check("@rules.wavesending", b -> rules.waveSending = b, () -> rules.waveSending);
         check("@rules.waitForWaveToEnd", b -> rules.waitEnemies = b, () -> rules.waitEnemies);
-        number("@rules.wavespacing", false, f -> rules.waveSpacing = f * 60f, () -> rules.waveSpacing / 60f, () -> true, 1, Float.MAX_VALUE);
+        number("@rules.wavespacing", false, f -> rules.waveSpacing = f * 60f, () -> rules.waveSpacing / 60f, () -> rules.waveTimer, 1, Float.MAX_VALUE);
+        //this is experimental, because it's not clear that 0 makes it default.
+        if(experimental){
+            number("@rules.initialwavespacing", false, f -> rules.initialWaveSpacing = f * 60f, () -> rules.initialWaveSpacing / 60f, () -> true, 0, Float.MAX_VALUE);
+        }
         number("@rules.dropzoneradius", false, f -> rules.dropZoneRadius = f * tilesize, () -> rules.dropZoneRadius / tilesize, () -> true);
 
         title("@rules.title.resourcesbuilding");
         check("@rules.infiniteresources", b -> rules.infiniteResources = b, () -> rules.infiniteResources);
+        check("@rules.onlydepositcore", b -> rules.onlyDepositCore = b, () -> rules.onlyDepositCore);
         check("@rules.reactorexplosions", b -> rules.reactorExplosions = b, () -> rules.reactorExplosions);
         check("@rules.schematic", b -> rules.schematicsAllowed = b, () -> rules.schematicsAllowed);
         check("@rules.coreincinerates", b -> rules.coreIncinerates = b, () -> rules.coreIncinerates);
         check("@rules.cleanupdeadteams", b -> rules.cleanupDeadTeams = b, () -> rules.cleanupDeadTeams, () -> rules.pvp);
+        check("@rules.disableworldprocessors", b -> rules.disableWorldProcessors = b, () -> rules.disableWorldProcessors);
         number("@rules.buildcostmultiplier", false, f -> rules.buildCostMultiplier = f, () -> rules.buildCostMultiplier, () -> !rules.infiniteResources);
         number("@rules.buildspeedmultiplier", f -> rules.buildSpeedMultiplier = f, () -> rules.buildSpeedMultiplier, 0.001f, 50f);
         number("@rules.deconstructrefundmultiplier", false, f -> rules.deconstructRefundMultiplier = f, () -> rules.deconstructRefundMultiplier, () -> !rules.infiniteResources);
@@ -161,34 +167,48 @@ public class CustomRulesDialog extends BaseDialog{
                 i -> true,
                 () -> rules.loadout.clear().add(new ItemStack(Items.copper, 100)),
                 () -> {}, () -> {}
-        )).left().width(300f);
-        main.row();
+        )).left().width(300f).row();
 
-        main.button("@bannedblocks", () -> showBanned("@bannedblocks", ContentType.block, rules.bannedBlocks, Block::canBeBuilt)).left().width(300f);
-        main.row();
+        main.button("@bannedblocks", () -> showBanned("@bannedblocks", ContentType.block, rules.bannedBlocks, Block::canBeBuilt)).left().width(300f).row();
+
+        //TODO objectives would be nice
+        if(experimental && false){
+            main.button("@objectives", () -> {
+
+            }).left().width(300f).row();
+        }
 
         title("@rules.title.unit");
         check("@rules.unitammo", b -> rules.unitAmmo = b, () -> rules.unitAmmo);
         check("@rules.unitcapvariable", b -> rules.unitCapVariable = b, () -> rules.unitCapVariable);
-        number("@rules.unitcap", true, f -> rules.unitCap = f, () -> rules.unitCap, -999, 999);
+        numberi("@rules.unitcap", f -> rules.unitCap = f, () -> rules.unitCap, -999, 999);
         number("@rules.unitdamagemultiplier", f -> rules.unitDamageMultiplier = f, () -> rules.unitDamageMultiplier);
-        number("@rules.unitbuildspeedmultiplier", f -> rules.unitBuildSpeedMultiplier = f, () -> rules.unitBuildSpeedMultiplier, 0.001f, 50f);
+        number("@rules.unitbuildspeedmultiplier", f -> rules.unitBuildSpeedMultiplier = f, () -> rules.unitBuildSpeedMultiplier, 0f, 50f);
 
-        main.button("@bannedunits", () -> showBanned("@bannedunits", ContentType.unit, rules.bannedUnits, u -> !u.isHidden())).left().width(300f);
-        main.row();
+        main.button("@bannedunits", () -> showBanned("@bannedunits", ContentType.unit, rules.bannedUnits, u -> !u.isHidden())).left().width(300f).row();
 
         title("@rules.title.enemy");
         check("@rules.attack", b -> rules.attackMode = b, () -> rules.attackMode);
-        check("@rules.buildai", b -> rules.teams.get(rules.waveTeam).ai = rules.teams.get(rules.waveTeam).infiniteResources = b, () -> rules.teams.get(rules.waveTeam).ai);
         check("@rules.corecapture", b -> rules.coreCapture = b, () -> rules.coreCapture);
+        check("@rules.placerangecheck", b -> rules.placeRangeCheck = b, () -> rules.placeRangeCheck);
         check("@rules.polygoncoreprotection", b -> rules.polygonCoreProtection = b, () -> rules.polygonCoreProtection);
         number("@rules.enemycorebuildradius", f -> rules.enemyCoreBuildRadius = f * tilesize, () -> Math.min(rules.enemyCoreBuildRadius / tilesize, 200), () -> !rules.polygonCoreProtection);
 
         title("@rules.title.environment");
         check("@rules.explosions", b -> rules.damageExplosions = b, () -> rules.damageExplosions);
         check("@rules.fire", b -> rules.fire = b, () -> rules.fire);
+        check("@rules.fog", b -> rules.fog = b, () -> rules.fog);
         check("@rules.lighting", b -> rules.lighting = b, () -> rules.lighting);
-        check("@rules.enemyLights", b -> rules.enemyLights = b, () -> rules.enemyLights);
+
+        if(experimental){
+            check("@rules.limitarea", b -> rules.limitMapArea = b, () -> rules.limitMapArea);
+            numberi("x", x -> rules.limitX = x, () -> rules.limitX, () -> rules.limitMapArea, 0, 10000);
+            numberi("y", y -> rules.limitY = y, () -> rules.limitY, () -> rules.limitMapArea, 0, 10000);
+            numberi("w", w -> rules.limitWidth = w, () -> rules.limitWidth, () -> rules.limitMapArea, 0, 10000);
+            numberi("h", h -> rules.limitHeight = h, () -> rules.limitHeight, () -> rules.limitMapArea, 0, 10000);
+        }
+
+        number("@rules.solarmultiplier", f -> rules.solarMultiplier = f, () -> rules.solarMultiplier);
 
         main.button(b -> {
             b.left();
@@ -201,6 +221,33 @@ public class CustomRulesDialog extends BaseDialog{
         }, () -> ui.picker.show(rules.ambientLight, rules.ambientLight::set)).left().width(250f).row();
 
         main.button("@rules.weather", this::weatherDialog).width(250f).left().row();
+
+        title("@rules.title.planet");
+
+        main.table(Tex.button, t -> {
+            t.margin(10f);
+            var group = new ButtonGroup<>();
+            var style = Styles.flatTogglet;
+
+            t.defaults().size(140f, 50f);
+
+            //TODO dynamic selection of planets
+            for(Planet planet : new Planet[]{Planets.serpulo, Planets.erekir}){
+                t.button(planet.localizedName, style, () -> {
+                    rules.env = planet.defaultEnv;
+                    rules.hiddenBuildItems.clear();
+                    rules.hiddenBuildItems.addAll(planet.hiddenItems);
+                }).group(group).checked(b -> rules.env == planet.defaultEnv);
+            }
+
+            t.button("@rules.anyenv", style, () -> {
+                //unlocalized for now
+                ui.showInfo("[accent]'Any' environment, or 'mixed tech', is no longer allowed.[]\n\nReasoning: Serpulo and Erekir tech were never meant to be used in the same map. They are not compatible or remotely balanced.\nI have received far too many complains in this regard.");
+
+                //rules.env = Vars.defaultEnv;
+                //rules.hiddenBuildItems.clear();
+            }).group(group).checked(b -> rules.hiddenBuildItems.size == 0);
+        }).left().fill(false).expand(false, false).row();
 
         title("@rules.title.teams");
 
@@ -223,8 +270,10 @@ public class CustomRulesDialog extends BaseDialog{
                 number("@rules.blockhealthmultiplier", f -> teams.blockHealthMultiplier = f, () -> teams.blockHealthMultiplier);
                 number("@rules.blockdamagemultiplier", f -> teams.blockDamageMultiplier = f, () -> teams.blockDamageMultiplier);
 
-                check("@rules.buildai", b -> teams.ai = b, () -> teams.ai, () -> team != rules.defaultTeam);
-                number("@rules.aitier", false, f -> teams.aiTier = f, () -> teams.aiTier, () -> teams.ai, 0, 1);
+                check("@rules.rtsai", b -> teams.rtsAi = b, () -> teams.rtsAi, () -> team != rules.defaultTeam);
+                numberi("@rules.rtsminsquadsize", f -> teams.rtsMinSquad = f, () -> teams.rtsMinSquad, () -> teams.rtsAi, 0, 100);
+                numberi("@rules.rtsmaxsquadsize", f -> teams.rtsMaxSquad = f, () -> teams.rtsMaxSquad, () -> teams.rtsAi, 1, 1000);
+                number("@rules.rtsminattackweight", f -> teams.rtsMinWeight = f, () -> teams.rtsMinWeight, () -> teams.rtsAi);
 
                 check("@rules.infiniteresources", b -> teams.infiniteResources = b, () -> teams.infiniteResources);
                 number("@rules.buildspeedmultiplier", f -> teams.buildSpeedMultiplier = f, () -> teams.buildSpeedMultiplier, 0.001f, 50f);
@@ -243,7 +292,7 @@ public class CustomRulesDialog extends BaseDialog{
             t.add(text).left().padRight(5);
 
             for(Team team : Team.baseTeams){
-                t.button(Tex.whiteui, Styles.clearTogglei, 38f, () -> {
+                t.button(Tex.whiteui, Styles.squareTogglei, 38f, () -> {
                     cons.get(team);
                 }).pad(1f).checked(b -> prov.get() == team).size(60f).tooltip(team.localized()).with(i -> i.getStyle().imageUpColor = team.color);
             }
@@ -266,14 +315,19 @@ public class CustomRulesDialog extends BaseDialog{
         number(text, false, cons, prov, condition, 0, Float.MAX_VALUE);
     }
 
-    //TODO integer param unused
-    void number(String text, boolean integer, Intc cons, Intp prov, int min, int max){
+    void numberi(String text, Intc cons, Intp prov, int min, int max){
+        numberi(text, cons, prov, () -> true, min, max);
+    }
+
+    void numberi(String text, Intc cons, Intp prov, Boolp condition, int min, int max){
         main.table(t -> {
             t.left();
-            t.add(text).left().padRight(5);
+            t.add(text).left().padRight(5)
+                .update(a -> a.setColor(condition.get() ? Color.white : Color.gray));
             t.field((prov.get()) + "", s -> cons.get(Strings.parseInt(s)))
-                    .padRight(100f)
-                    .valid(f -> Strings.parseInt(f) >= min && Strings.parseInt(f) <= max).width(120f).left();
+                .update(a -> a.setDisabled(!condition.get()))
+                .padRight(100f)
+                .valid(f -> Strings.parseInt(f) >= min && Strings.parseInt(f) <= max).width(120f).left();
         }).padTop(0).row();
     }
 
@@ -398,7 +452,7 @@ public class CustomRulesDialog extends BaseDialog{
                 for(Weather weather : content.<Weather>getBy(ContentType.weather)){
                     if(weather.hidden) continue;
 
-                    t.button(weather.localizedName, Styles.cleart, () -> {
+                    t.button(weather.localizedName, Styles.flatt, () -> {
                         rules.weather.add(new WeatherEntry(weather));
                         rebuild[0].run();
 
@@ -410,19 +464,6 @@ public class CustomRulesDialog extends BaseDialog{
             add.addCloseButton();
             add.show();
         }).width(170f);
-
-        //reset cooldown to random number
-        dialog.hidden(() -> {
-            float sum = 0;
-            Seq<WeatherEntry> sh = rules.weather.copy();
-            sh.shuffle();
-
-            for(WeatherEntry w : sh){
-                //add the previous cooldowns to the sum so weather events are staggered and don't happen all at once.
-                w.cooldown = sum + Mathf.random(w.minFrequency, w.maxFrequency);
-                sum += w.cooldown;
-            }
-        });
 
         dialog.show();
     }

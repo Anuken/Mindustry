@@ -1,15 +1,13 @@
 package mindustry.world.blocks.defense.turrets;
 
 import arc.math.*;
-import arc.util.*;
-import mindustry.type.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
 public class ReloadTurret extends BaseTurret{
-    public float reloadTime = 10f;
+    public float reload = 10f;
 
     public ReloadTurret(String name){
         super(name);
@@ -19,31 +17,28 @@ public class ReloadTurret extends BaseTurret{
     public void setStats(){
         super.setStats();
 
-        if(acceptCoolant){
-            stats.add(Stat.booster, StatValues.boosters(reloadTime, consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount, coolantMultiplier, true, l -> consumes.liquidfilters.get(l.id)));
+        if(coolant != null){
+            stats.add(Stat.booster, StatValues.boosters(reload, coolant.amount, coolantMultiplier, true, l -> l.coolant && consumesLiquid(l)));
         }
     }
 
     public class ReloadTurretBuild extends BaseTurretBuild{
-        public float reload;
+        public float reloadCounter;
 
         protected void updateCooling(){
-            if(reload < reloadTime){
-                float maxUsed = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount;
-                Liquid liquid = liquids.current();
+            if(reloadCounter < reload && coolant != null && coolant.efficiency(this) > 0 && efficiency > 0){
+                float capacity = coolant instanceof ConsumeLiquidFilter filter ? filter.getConsumed(this).heatCapacity : 1f;
+                coolant.update(this);
+                reloadCounter += coolant.amount * edelta() * capacity * coolantMultiplier;
 
-                float used = Math.min(liquids.get(liquid), maxUsed * Time.delta) * baseReloadSpeed();
-                reload += used * liquid.heatCapacity * coolantMultiplier;
-                liquids.remove(liquid, used);
-
-                if(Mathf.chance(0.06 * used)){
+                if(Mathf.chance(0.06 * coolant.amount)){
                     coolEffect.at(x + Mathf.range(size * tilesize / 2f), y + Mathf.range(size * tilesize / 2f));
                 }
             }
         }
 
         protected float baseReloadSpeed(){
-            return efficiency();
+            return efficiency;
         }
     }
 }

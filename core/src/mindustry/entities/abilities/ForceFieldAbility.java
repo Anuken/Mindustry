@@ -1,6 +1,5 @@
 package mindustry.entities.abilities;
 
-import arc.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -8,6 +7,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -84,7 +84,7 @@ public class ForceFieldAbility extends Ability{
 
             Draw.color(unit.team.color, Color.white, Mathf.clamp(alpha));
 
-            if(Core.settings.getBool("animatedshields")){
+            if(Vars.renderer.animateShields){
                 Fill.poly(unit.x, unit.y, 6, realRad);
             }else{
                 Lines.stroke(1.5f);

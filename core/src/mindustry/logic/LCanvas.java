@@ -27,10 +27,12 @@ public class LCanvas extends Table{
     public DragLayout statements;
     public ScrollPane pane;
     public Group jumps;
+
     StatementElem dragging;
     StatementElem hovered;
     float targetWidth;
     int jumpCount = 0;
+    boolean privileged;
     Seq<Tooltip> tooltips = new Seq<>();
 
     public LCanvas(){
@@ -146,7 +148,7 @@ public class LCanvas extends Table{
     public void load(String asm){
         jumps.clear();
 
-        Seq<LStatement> statements = LAssembler.read(asm);
+        Seq<LStatement> statements = LAssembler.read(asm, privileged);
         statements.truncate(LExecutor.maxInstructions);
         this.statements.clearChildren();
         for(LStatement st : statements){
@@ -217,6 +219,7 @@ public class LCanvas extends Table{
 
                 e.setSize(width, e.getPrefHeight());
                 e.setPosition(0, height - cy, Align.topLeft);
+                ((StatementElem)e).updateAddress(i);
 
                 cy += e.getPrefHeight() + space;
                 seq.add(e);
@@ -316,13 +319,15 @@ public class LCanvas extends Table{
 
     public class StatementElem extends Table{
         public LStatement st;
+        public int index;
+        Label addressLabel;
 
         public StatementElem(LStatement st){
             this.st = st;
             st.elem = this;
 
             background(Tex.whitePane);
-            setColor(st.color());
+            setColor(st.category().color);
             margin(0f);
             touchable = Touchable.enabled;
 
@@ -333,8 +338,10 @@ public class LCanvas extends Table{
                 t.margin(6f);
                 t.touchable = Touchable.enabled;
 
-                t.add(st.name()).style(Styles.outlineLabel).color(color).padRight(8);
+                t.add(st.name()).style(Styles.outlineLabel).name("statement-name").color(color).padRight(8);
                 t.add().growX();
+
+                addressLabel = t.add(index + "").style(Styles.outlineLabel).color(color).padRight(8).get();
 
                 t.button(Icon.copy, Styles.logici, () -> {
                 }).size(24f).padRight(6).get().tapped(this::copy);
@@ -395,6 +402,11 @@ public class LCanvas extends Table{
             marginBottom(7);
         }
 
+        public void updateAddress(int index){
+            this.index = index;
+            addressLabel.setText(index + "");
+        }
+
         public void copy(){
             st.saveUI();
             LStatement copy = st.copy();
@@ -440,7 +452,9 @@ public class LCanvas extends Table{
         public JumpCurve curve;
 
         public JumpButton(Prov<StatementElem> getter, Cons<StatementElem> setter){
-            super(Tex.logicNode, Styles.colori);
+            super(Tex.logicNode, new ImageButtonStyle(){{
+                imageUpColor = Color.white;
+            }});
 
             to = getter;
             addListener(listener = new ClickListener());

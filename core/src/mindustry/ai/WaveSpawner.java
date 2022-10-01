@@ -187,7 +187,7 @@ public class WaveSpawner{
         return spawning && !net.client();
     }
 
-    private void reset(){
+    public void reset(){
         spawning = false;
         spawns.clear();
 
@@ -198,11 +198,18 @@ public class WaveSpawner{
         }
     }
 
-    private void spawnEffect(Unit unit){
-        unit.rotation = unit.angleTo(world.width()/2f * tilesize, world.height()/2f * tilesize);
+    /** Applies the standard wave spawn effects to a unit - invincibility, unmoving. */
+    public void spawnEffect(Unit unit){
+        spawnEffect(unit, unit.angleTo(world.width()/2f * tilesize, world.height()/2f * tilesize));
+    }
+
+    /** Applies the standard wave spawn effects to a unit - invincibility, unmoving. */
+    public void spawnEffect(Unit unit, float rotation){
+        unit.rotation = rotation;
         unit.apply(StatusEffects.unmoving, 30f);
         unit.apply(StatusEffects.invincible, 60f);
         unit.add();
+        unit.unloaded();
 
         Events.fire(new UnitSpawnEvent(unit));
         Call.spawnEffect(unit.x, unit.y, unit.rotation, unit.type);
@@ -214,6 +221,7 @@ public class WaveSpawner{
 
     @Remote(called = Loc.server, unreliable = true)
     public static void spawnEffect(float x, float y, float rotation, UnitType u){
+
         Fx.unitSpawn.at(x, y, rotation, u);
 
         Time.run(30f, () -> Fx.spawn.at(x, y));

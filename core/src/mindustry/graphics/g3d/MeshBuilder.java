@@ -3,6 +3,7 @@ package mindustry.graphics.g3d;
 import arc.graphics.*;
 import arc.math.geom.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
+import mindustry.maps.generators.*;
 
 public class MeshBuilder{
     private static final Vec3 v1 = new Vec3(), v2 = new Vec3(), v3 = new Vec3(), v4 = new Vec3();
@@ -44,6 +45,10 @@ public class MeshBuilder{
 
     public static Mesh buildHex(HexMesher mesher, int divisions, boolean lines, float radius, float intensity){
         PlanetGrid grid = PlanetGrid.create(divisions);
+
+        if(mesher instanceof PlanetGenerator generator){
+            generator.seed = generator.baseSeed;
+        }
 
         begin(grid.tiles.length * 12 * (3 + 3 + 1));
 

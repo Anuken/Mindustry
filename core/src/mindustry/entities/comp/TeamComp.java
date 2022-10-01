@@ -18,6 +18,11 @@ abstract class TeamComp implements Posc{
         return team.rules().cheat;
     }
 
+    /** @return whether the center of this entity is visible to the viewing team. */
+    boolean inFogTo(Team viewer){
+        return this.team != viewer && !fogControl.isVisible(viewer, x, y);
+    }
+
     @Nullable
     public CoreBuild core(){
         return team.core();

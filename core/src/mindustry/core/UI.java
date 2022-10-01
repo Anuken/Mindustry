@@ -40,7 +40,7 @@ public class UI implements ApplicationListener, Loadable{
     public MenuFragment menufrag;
     public HudFragment hudfrag;
     public ChatFragment chatfrag;
-    public ScriptConsoleFragment scriptfrag;
+    public ConsoleFragment consolefrag;
     public MinimapFragment minimapfrag;
     public PlayerListFragment listfrag;
     public LoadingFragment loadfrag;
@@ -72,8 +72,11 @@ public class UI implements ApplicationListener, Loadable{
     public ModsDialog mods;
     public ColorPicker picker;
     public LogicDialog logic;
+    public FullTextDialog fullText;
 
-    public Cursor drillCursor, unloadCursor;
+    public Cursor drillCursor, unloadCursor, targetCursor;
+
+    private @Nullable Element lastAnnouncement;
 
     public UI(){
         Fonts.loadFonts();
@@ -126,6 +129,7 @@ public class UI implements ApplicationListener, Loadable{
 
         drillCursor = Core.graphics.newCursor("drill", Fonts.cursorScale());
         unloadCursor = Core.graphics.newCursor("unload", Fonts.cursorScale());
+        targetCursor = Core.graphics.newCursor("target", Fonts.cursorScale());
     }
 
     @Override
@@ -142,7 +146,7 @@ public class UI implements ApplicationListener, Loadable{
         Core.scene.act();
         Core.scene.draw();
 
-        if(Core.input.keyTap(KeyCode.mouseLeft) && Core.scene.getKeyboardFocus() instanceof TextField){
+        if(Core.input.keyTap(KeyCode.mouseLeft) && Core.scene.hasField()){
             Element e = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
             if(!(e instanceof TextField)){
                 Core.scene.setKeyboardFocus(null);
@@ -168,7 +172,7 @@ public class UI implements ApplicationListener, Loadable{
         minimapfrag = new MinimapFragment();
         listfrag = new PlayerListFragment();
         loadfrag = new LoadingFragment();
-        scriptfrag = new ScriptConsoleFragment();
+        consolefrag = new ConsoleFragment();
 
         picker = new ColorPicker();
         editor = new MapEditorDialog();
@@ -194,6 +198,7 @@ public class UI implements ApplicationListener, Loadable{
         mods = new ModsDialog();
         schematics = new SchematicsDialog();
         logic = new LogicDialog();
+        fullText = new FullTextDialog();
 
         Group group = Core.scene.root;
 
@@ -209,10 +214,10 @@ public class UI implements ApplicationListener, Loadable{
 
         hudfrag.build(hudGroup);
         menufrag.build(menuGroup);
-        chatfrag.container().build(hudGroup);
+        chatfrag.build(hudGroup);
         minimapfrag.build(hudGroup);
         listfrag.build(hudGroup);
-        scriptfrag.container().build(hudGroup);
+        consolefrag.build(hudGroup);
         loadfrag.build(group);
         new FadeInFragment().build(group);
     }
@@ -300,25 +305,34 @@ public class UI implements ApplicationListener, Loadable{
     }
 
     public void showInfoFade(String info){
+        showInfoFade(info,  7f);
+    }
+
+    public void showInfoFade(String info, float duration){
+        var cinfo = Core.scene.find("coreinfo");
         Table table = new Table();
         table.touchable = Touchable.disabled;
         table.setFillParent(true);
-        table.actions(Actions.fadeOut(7f, Interp.fade), Actions.remove());
+        if(cinfo.visible && !state.isMenu()) table.marginTop(cinfo.getPrefHeight() / Scl.scl() / 2);
+        table.actions(Actions.fadeOut(duration, Interp.fade), Actions.remove());
         table.top().add(info).style(Styles.outlineLabel).padTop(10);
         Core.scene.add(table);
     }
 
     /** Shows a fading label at the top of the screen. */
     public void showInfoToast(String info, float duration){
+        var cinfo = Core.scene.find("coreinfo");
         Table table = new Table();
-        table.setFillParent(true);
         table.touchable = Touchable.disabled;
+        table.setFillParent(true);
+        if(cinfo.visible && !state.isMenu()) table.marginTop(cinfo.getPrefHeight() / Scl.scl() / 2);
         table.update(() -> {
             if(state.isMenu()) table.remove();
         });
         table.actions(Actions.delay(duration * 0.9f), Actions.fadeOut(duration * 0.1f, Interp.fade), Actions.remove());
         table.top().table(Styles.black3, t -> t.margin(4).add(info).style(Styles.outlineLabel)).padTop(10);
         Core.scene.add(table);
+        lastAnnouncement = table;
     }
 
     /** Shows a label at some position on the screen. Does not fade. */
@@ -472,8 +486,8 @@ public class UI implements ApplicationListener, Loadable{
         dialog.cont.add(text).width(mobile ? 400f : 500f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);
         dialog.buttons.defaults().size(200f, 54f).pad(2f);
         dialog.setFillParent(false);
-        dialog.buttons.button("@cancel", dialog::hide);
-        dialog.buttons.button("@ok", () -> {
+        dialog.buttons.button("@cancel", Icon.cancel, dialog::hide);
+        dialog.buttons.button("@ok", Icon.ok, () -> {
             dialog.hide();
             confirmed.run();
         });
@@ -511,6 +525,10 @@ public class UI implements ApplicationListener, Loadable{
         dialog.show();
     }
 
+    public boolean hasAnnouncement(){
+        return lastAnnouncement != null && lastAnnouncement.parent != null;
+    }
+
     /** Display text in the middle of the screen, then fade out. */
     public void announce(String text){
         announce(text, 3);
@@ -526,6 +544,7 @@ public class UI implements ApplicationListener, Loadable{
         t.pack();
         t.act(0.1f);
         Core.scene.add(t);
+        lastAnnouncement = t;
     }
 
     public void showOkText(String title, String text, Runnable confirmed){
@@ -580,15 +599,16 @@ public class UI implements ApplicationListener, Loadable{
     }
 
     public static String formatAmount(long number){
-        //prevent overflow
-        if(number == Long.MIN_VALUE) number ++;
+        //prevent things like bars displaying erroneous representations of casted infinities
+        if(number == Long.MAX_VALUE) return "∞";
+        if(number == Long.MIN_VALUE) return "-∞";
 
         long mag = Math.abs(number);
         String sign = number < 0 ? "-" : "";
         if(mag >= 1_000_000_000){
             return sign + Strings.fixed(mag / 1_000_000_000f, 1) + "[gray]" + billions+ "[]";
         }else if(mag >= 1_000_000){
-            return sign + Strings.fixed(mag / 1_000_000f, 1) + "[gray]" +millions + "[]";
+            return sign + Strings.fixed(mag / 1_000_000f, 1) + "[gray]" + millions + "[]";
         }else if(mag >= 10_000){
             return number / 1000 + "[gray]" + thousands + "[]";
         }else if(mag >= 1000){

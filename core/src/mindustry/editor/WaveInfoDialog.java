@@ -11,6 +11,7 @@ import arc.scene.ui.TextField.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -36,12 +37,16 @@ public class WaveInfoDialog extends BaseDialog{
     private Sort sort = Sort.begin;
     private boolean reverseSort = false;
     private float updateTimer, updatePeriod = 1f;
+    private boolean checkedSpawns;
     private WaveGraph graph = new WaveGraph();
 
     public WaveInfoDialog(){
         super("@waves.title");
 
-        shown(this::setup);
+        shown(() -> {
+            checkedSpawns = false;
+            setup();
+        });
         hidden(() -> state.rules.spawns = groups);
 
         addCloseListener();
@@ -52,7 +57,7 @@ public class WaveInfoDialog extends BaseDialog{
             dialog.setFillParent(false);
             dialog.cont.table(Tex.button, t -> {
                 for(Sort s : Sort.all){
-                    t.button("@waves.sort." + s, Styles.clearTogglet, () -> {
+                    t.button("@waves.sort." + s, Styles.flatTogglet, () -> {
                         sort = s;
                         dialog.hide();
                         buildGroups();
@@ -75,7 +80,7 @@ public class WaveInfoDialog extends BaseDialog{
             dialog.addCloseButton();
             dialog.setFillParent(false);
             dialog.cont.table(Tex.button, t -> {
-                var style = Styles.cleart;
+                var style = Styles.flatt;
                 t.defaults().size(210f, 58f);
 
                 t.button("@waves.copy", Icon.copy, style, () -> {
@@ -95,7 +100,7 @@ public class WaveInfoDialog extends BaseDialog{
                     dialog.hide();
                 }).marginLeft(12f).disabled(b -> Core.app.getClipboardText() == null || Core.app.getClipboardText().isEmpty()).row();
 
-               t.button("@settings.reset", Icon.upload, style, () -> ui.showConfirm("@confirm", "@settings.clear.confirm", () -> {
+                t.button("@settings.reset", Icon.upload, style, () -> ui.showConfirm("@confirm", "@settings.clear.confirm", () -> {
                     groups = JsonIO.copy(waves.get());
                     buildGroups();
                     dialog.hide();
@@ -319,28 +324,58 @@ public class WaveInfoDialog extends BaseDialog{
                             buildGroups();
                         }).padTop(4).update(b -> b.setChecked(group.effect == StatusEffects.boss)).padBottom(8f).row();
 
-                        //spawn positions are clunky and thus experimental for now
-                        if(experimental){
-                            t.table(a -> {
-                                a.add("spawn at ");
+                        t.table(a -> {
+                            a.add("@waves.spawn").padRight(8);
 
-                                a.field(group.spawn == -1 ? "" : Point2.x(group.spawn) + "", TextFieldFilter.digitsOnly, text -> {
-                                    if(Strings.canParsePositiveInt(text)){
-                                        group.spawn = Point2.pack(Strings.parseInt(text), Point2.y(group.spawn));
-                                        Log.info(group.spawn);
+                            a.button("", () -> {
+                                if(!checkedSpawns){
+                                    //recalculate waves when changed
+                                    Vars.spawner.reset();
+                                    checkedSpawns = true;
+                                }
+
+                                BaseDialog dialog = new BaseDialog("@waves.spawn.select");
+                                dialog.cont.pane(p -> {
+                                    p.background(Tex.button).margin(10f);
+                                    int i = 0;
+                                    int cols = 4;
+                                    int max = 20;
+
+                                    if(spawner.getSpawns().size >= max){
+                                        p.add("[lightgray](first " + max + ")").colspan(cols).padBottom(4).row();
                                     }
-                                }).width(70f);
 
-                                a.add(",");
+                                    for(var spawn : spawner.getSpawns()){
+                                        p.button(spawn.x + ", " + spawn.y, Styles.flatTogglet, () -> {
+                                            group.spawn = Point2.pack(spawn.x, spawn.y);
+                                            dialog.hide();
+                                        }).size(110f, 45f).checked(spawn.pos() == group.spawn);
 
-                                a.field(group.spawn == -1 ? "" : Point2.y(group.spawn) + "", TextFieldFilter.digitsOnly, text -> {
-                                    if(Strings.canParsePositiveInt(text)){
-                                        group.spawn = Point2.pack(Point2.x(group.spawn), Strings.parseInt(text));
-                                        Log.info(group.spawn);
+                                        if(++i % cols == 0){
+                                            p.row();
+                                        }
+
+                                        //only display first 20 spawns, you don't need to see more.
+                                        if(i >= 20){
+                                            break;
+                                        }
                                     }
-                                }).width(70f);
-                            }).padBottom(8f).padTop(-8f).row();
-                        }
+
+                                    if(spawner.getSpawns().isEmpty()){
+                                        p.add("@waves.spawn.none");
+                                    }else{
+                                        p.button("@waves.spawn.all", Styles.flatTogglet, () -> {
+                                            group.spawn = -1;
+                                            dialog.hide();
+                                        }).size(110f, 45f).checked(-1 == group.spawn);
+                                    }
+                                });
+                                dialog.setFillParent(false);
+                                dialog.addCloseButton();
+                                dialog.show();
+                            }).width(160f).height(36f).get().getLabel().setText(() -> group.spawn == -1 ? "@waves.spawn.all" : Point2.x(group.spawn) + ", " + Point2.y(group.spawn));
+
+                        }).padBottom(8f).row();
                     }
                 }).width(340f).pad(8);
 

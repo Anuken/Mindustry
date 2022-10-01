@@ -15,8 +15,9 @@ public class OverflowGate extends Block{
     public OverflowGate(String name){
         super(name);
         hasItems = true;
-        solid = true;
-        update = true;
+        underBullets = true;
+        update = false;
+        destructible = true;
         group = BlockGroup.transportation;
         instantTransfer = true;
         unloadable = false;
@@ -69,13 +70,8 @@ public class OverflowGate extends Block{
                 }else if(bc && !ac){
                     to = b;
                 }else{
-                    if(rotation == 0){
-                        to = a;
-                        if(flip) rotation =1;
-                    }else{
-                        to = b;
-                        if(flip) rotation = 0;
-                    }
+                    to = (rotation & (1 << from)) == 0 ? a : b;
+                    if(flip) rotation ^= (1 << from);
                 }
             }
 

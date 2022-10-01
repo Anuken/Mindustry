@@ -17,6 +17,7 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 
+import static arc.Core.*;
 import static mindustry.Vars.*;
 
 public class DatabaseDialog extends BaseDialog{
@@ -39,7 +40,7 @@ public class DatabaseDialog extends BaseDialog{
             search.setMessageText("@players.search");
         }).fillX().padBottom(4).row();
 
-        cont.pane(all);
+        cont.pane(all).scrollX(false);
     }
 
     void rebuild(){
@@ -53,7 +54,7 @@ public class DatabaseDialog extends BaseDialog{
 
             Seq<Content> array = allContent[j]
                 .select(c -> c instanceof UnlockableContent u &&
-                    (!u.isHidden() || u.node() != null) &&
+                    (!u.isHidden() || u.techNode != null) &&
                     (text.isEmpty() || u.localizedName.toLowerCase().contains(text.toLowerCase())));
             if(array.size == 0) continue;
 
@@ -64,7 +65,7 @@ public class DatabaseDialog extends BaseDialog{
             all.table(list -> {
                 list.left();
 
-                int cols = (int)Mathf.clamp((Core.graphics.getWidth() - Scl.scl(30)) / Scl.scl(32 + 10), 1, 22);
+                int cols = (int)Mathf.clamp((Core.graphics.getWidth() - Scl.scl(30)) / Scl.scl(32 + 12), 1, 22);
                 int count = 0;
 
                 for(int i = 0; i < array.size; i++){
@@ -98,7 +99,7 @@ public class DatabaseDialog extends BaseDialog{
                                 ui.content.show(unlock);
                             }
                         });
-                        image.addListener(new Tooltip(t -> t.background(Tex.button).add(unlock.localizedName)));
+                        image.addListener(new Tooltip(t -> t.background(Tex.button).add(unlock.localizedName + (settings.getBool("console") ? "\n[gray]" + unlock.name : ""))));
                     }
 
                     if((++count) % cols == 0){

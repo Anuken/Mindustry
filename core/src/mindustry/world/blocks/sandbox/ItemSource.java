@@ -1,5 +1,6 @@
 package mindustry.world.blocks.sandbox;
 
+import arc.*;
 import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
@@ -14,6 +15,7 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class ItemSource extends Block{
+    public int itemsPerSecond = 100;
 
     public ItemSource(String name){
         super(name);
@@ -25,6 +27,7 @@ public class ItemSource extends Block{
         saveConfig = true;
         noUpdateDisabled = true;
         envEnabled = Env.any;
+        clearOnDoubleTap = true;
 
         config(Item.class, (ItemSourceBuild tile, Item item) -> tile.outputItem = item);
         configClear((ItemSourceBuild tile) -> tile.outputItem = null);
@@ -33,12 +36,24 @@ public class ItemSource extends Block{
     @Override
     public void setBars(){
         super.setBars();
-        bars.remove("items");
+        removeBar("items");
     }
 
     @Override
-    public void drawRequestConfig(BuildPlan req, Eachable<BuildPlan> list){
-        drawRequestConfigCenter(req, req.config, "center", true);
+    public void setStats(){
+        super.setStats();
+
+        stats.add(Stat.output, itemsPerSecond, StatUnit.itemsSecond);
+    }
+
+    @Override
+    protected TextureRegion[] icons(){
+        return new TextureRegion[]{Core.atlas.find("source-bottom"), region};
+    }
+
+    @Override
+    public void drawPlanConfig(BuildPlan plan, Eachable<BuildPlan> list){
+        drawPlanConfigCenter(plan, plan.config, "center", true);
     }
 
     @Override
@@ -47,44 +62,40 @@ public class ItemSource extends Block{
     }
 
     public class ItemSourceBuild extends Building{
-        Item outputItem;
+        public float counter;
+        public Item outputItem;
 
         @Override
         public void draw(){
-            super.draw();
-
             if(outputItem == null){
-                Draw.rect("cross", x, y);
+                Draw.rect("cross-full", x, y);
             }else{
                 Draw.color(outputItem.color);
-                Draw.rect("center", x, y);
+                Fill.square(x, y, tilesize/2f - 0.00001f);
                 Draw.color();
             }
+
+            super.draw();
         }
 
         @Override
         public void updateTile(){
             if(outputItem == null) return;
 
-            items.set(outputItem, 1);
-            dump(outputItem);
-            items.set(outputItem, 0);
+            counter += edelta();
+            float limit = 60f / itemsPerSecond;
+
+            while(counter >= limit){
+                items.set(outputItem, 1);
+                dump(outputItem);
+                items.set(outputItem, 0);
+                counter -= limit;
+            }
         }
 
         @Override
         public void buildConfiguration(Table table){
-            ItemSelection.buildTable(table, content.items(), () -> outputItem, this::configure);
-        }
-
-        @Override
-        public boolean onConfigureTileTapped(Building other){
-            if(this == other){
-                deselect();
-                configure(null);
-                return false;
-            }
-
-            return true;
+            ItemSelection.buildTable(ItemSource.this, table, content.items(), () -> outputItem, this::configure, selectionRows, selectionColumns);
         }
 
         @Override
