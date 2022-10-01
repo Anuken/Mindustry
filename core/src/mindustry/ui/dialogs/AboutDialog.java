@@ -1,6 +1,7 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
+import arc.func.Cons;
 import arc.graphics.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
@@ -8,9 +9,12 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
+import mindustry.gen.Icon;
 import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.ui.Links.*;
+
+import javax.swing.*;
 
 import static mindustry.Vars.*;
 
@@ -45,34 +49,33 @@ public class AboutDialog extends BaseDialog{
                 continue;
             }
 
-            Table table = new Table(Tex.underline);
+            Table table = new Table();
             table.margin(0);
             table.table(img -> {
                 img.image().height(h - 5).width(40f).color(link.color);
                 img.row();
                 img.image().height(5).width(40f).color(link.color.cpy().mul(0.8f, 0.8f, 0.8f, 1f));
-            }).expandY();
+            }).expandY().padLeft(5);
 
             table.table(i -> {
-                i.background(Tex.buttonEdge3);
                 i.image(link.icon);
-            }).size(h - 5, h);
+            }).size(h - 10, h);
 
             table.table(inset -> {
                 inset.add("[accent]" + link.title).growX().left();
                 inset.row();
                 inset.labelWrap(link.description).width(w - 100f).color(Color.lightGray).growX();
-            }).padLeft(8);
+            });
 
-            table.button(Icon.link, () -> {
+            table.button(Icon.link, Styles.flaty, () -> {
                 if(link.name.equals("wiki")) Events.fire(Trigger.openWiki);
 
                 if(!Core.app.openURI(link.link)){
                     ui.showErrorMessage("@linkfail");
                     Core.app.setClipboardText(link.link);
                 }
-            }).size(h - 5, h);
-
+            }).size(h-5,h);
+            table.setBackground(Styles.grayPanel);
             in.add(table).size(w, h).padTop(5).row();
         }
 
@@ -116,3 +119,4 @@ public class AboutDialog extends BaseDialog{
         dialog.show();
     }
 }
+
