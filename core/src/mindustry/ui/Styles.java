@@ -24,7 +24,7 @@ import static mindustry.gen.Tex.*;
 @StyleDefaults
 public class Styles{
     //TODO all these names are inconsistent and not descriptive
-    public static Drawable black, black9, black8, black6, black3, black5, grayPanel, none, flatDown, flatOver, accentDrawable;
+    public static Drawable black, black9, black8, black6, black3, black5, grayPanel, none, flatY, flatDown, flatOver, accentDrawable;
 
     public static ButtonStyle defaultb, underlineb;
 
@@ -73,6 +73,8 @@ public class Styles{
     grayi,
     /** Flat, square, black background. */
     flati,
+    /**Flat, square, gray background*/
+    flaty,
     /** Square border. */
     squarei,
     /** Square border, toggleable. */
@@ -105,6 +107,7 @@ public class Styles{
         black3 = whiteui.tint(0f, 0f, 0f, 0.3f);
         none = whiteui.tint(0f, 0f, 0f, 0f);
         grayPanel = whiteui.tint(Pal.darkestGray);
+        flatY = whiteui.tint(Pal.accent);
         flatDown = createFlatDown();
         flatOver = whiteui.tint(Color.valueOf("454545"));
         accentDrawable = whiteui.tint(Pal.accent);
@@ -280,6 +283,11 @@ public class Styles{
             down = flatOver;
             up = black;
             over = flatOver;
+        }};
+        flaty = new ImageButtonStyle(){{
+            up = grayPanel;
+            down = flatY;
+            over = flatY;
         }};
         squarei = new ImageButtonStyle(){{
             down = whiteui;
