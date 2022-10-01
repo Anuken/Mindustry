@@ -14,7 +14,6 @@ public class UnitCommand{
 
     public static final UnitCommand
 
-    //TODO they do not use the command "interface" or designation at all
     moveCommand = new UnitCommand("move", "right", u -> null),
     repairCommand = new UnitCommand("repair", "modeSurvival", u -> new RepairAI()),
     rebuildCommand = new UnitCommand("rebuild", "hammer", u -> new BuilderAI()),
@@ -24,9 +23,6 @@ public class UnitCommand{
         return ai;
     }),
     mineCommand = new UnitCommand("mine", "production", u -> new MinerAI());
-
-    /** Default set of specified commands. */
-    public static final UnitCommand[] defaultCommands = {moveCommand};
 
     /** Unique ID number. */
     public final int id;

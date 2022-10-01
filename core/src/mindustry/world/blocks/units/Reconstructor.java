@@ -34,6 +34,7 @@ public class Reconstructor extends UnitBlock{
         regionRotated1 = 1;
         regionRotated2 = 2;
         commandable = true;
+        ambientSound = Sounds.respawning;
     }
 
     @Override
@@ -132,6 +133,11 @@ public class Reconstructor extends UnitBlock{
 
         public float fraction(){
             return progress / constructTime;
+        }
+
+        @Override
+        public boolean shouldActiveSound(){
+            return shouldConsume();
         }
 
         @Override

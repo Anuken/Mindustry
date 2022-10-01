@@ -267,13 +267,19 @@ public class Drill extends Block{
         }
 
         @Override
+        public Object senseObject(LAccess sensor){
+            if(sensor == LAccess.firstItem) return dominantItem;
+            return super.senseObject(sensor);
+        }
+
+        @Override
         public void updateTile(){
-            if(dominantItem == null){
-                return;
+            if(timer(timerDump, dumpTime)){
+                dump(dominantItem != null && items.has(dominantItem) ? dominantItem : null);
             }
 
-            if(timer(timerDump, dumpTime)){
-                dump(items.has(dominantItem) ? dominantItem : null);
+            if(dominantItem == null){
+                return;
             }
 
             timeDrilled += warmup * delta();

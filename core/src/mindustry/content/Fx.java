@@ -54,9 +54,9 @@ public class Fx{
     unitSpawn = new Effect(30f, e -> {
         if(!(e.data instanceof UnitType unit)) return;
 
-        float scl = 1f + e.fout() * 2f;
-
         TextureRegion region = unit.fullIcon;
+
+        float scl = (1f + e.fout() * 2f) * region.scl();
 
         alpha(e.fout());
         mixcol(Color.white, e.fin());
@@ -67,7 +67,7 @@ public class Fx{
 
         alpha(e.fin());
 
-        rect(region, e.x, e.y, region.width * Draw.scl * scl, region.height * Draw.scl * scl, e.rotation - 90);
+        rect(region, e.x, e.y, region.width * scl, region.height * scl, e.rotation - 90);
     }),
 
     unitCapKill = new Effect(80f, e -> {

@@ -36,6 +36,8 @@ public abstract class UnlockableContent extends MappableContent{
     public boolean generateIcons = true;
     /** Special logic icon ID. */
     public int iconId = 0;
+    /** How big the content appears in certain selection menus */
+    public float selectionSize = 24f;
     /** Icon of the content to use in UI. */
     public TextureRegion uiIcon;
     /** Icon of the full content. Unscaled.*/

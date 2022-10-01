@@ -54,6 +54,7 @@ public class Liquids{
             spreadTarget = Liquids.water;
             moveThroughBlocks = true;
             incinerable = true;
+            blockReactive = false;
             canStayOn.addAll(water, oil, cryofluid);
 
             colorFrom = Color.valueOf("e8803f");

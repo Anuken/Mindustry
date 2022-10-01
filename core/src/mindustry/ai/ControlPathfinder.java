@@ -22,7 +22,7 @@ public class ControlPathfinder{
     private static final long maxUpdate = Time.millisToNanos(30);
     private static final int updateFPS = 60;
     private static final int updateInterval = 1000 / updateFPS;
-    private static final int wallImpassableCap = 100_000;
+    private static final int wallImpassableCap = 1_000_000;
 
     public static final PathCost
 
@@ -134,13 +134,17 @@ public class ControlPathfinder{
                             }
                         }
                     }else{
+                        var view = Core.camera.bounds(Tmp.r1);
                         int len = req.frontier.size;
                         float[] weights = req.frontier.weights;
                         int[] poses = req.frontier.queue;
-                        for(int i = 0; i < len; i++){
-                            Draw.color(Tmp.c1.set(Color.white).fromHsv((weights[i] * 4f) % 360f, 1f, 0.9f));
+                        for(int i = 0; i < Math.min(len, 1000); i++){
                             int pos = poses[i];
-                            Lines.square(pos % wwidth * tilesize, pos / wwidth * tilesize, 4f);
+                            if(view.contains(pos % wwidth * tilesize, pos / wwidth * tilesize)){
+                                Draw.color(Tmp.c1.set(Color.white).fromHsv((weights[i] * 4f) % 360f, 1f, 0.9f));
+
+                                Lines.square(pos % wwidth * tilesize, pos / wwidth * tilesize, 4f);
+                            }
                         }
                     }
                     Draw.reset();
@@ -529,6 +533,8 @@ public class ControlPathfinder{
                     float add = tileCost(team, cost, current, next);
                     float currentCost = costs.get(current);
 
+                    if(add < 0) continue;
+
                     //the cost can include an impassable enemy wall, so cap the cost if so and add the base cost instead
                     //essentially this means that any path with enemy walls will only count the walls once, preventing strange behavior like avoiding based on wall count
                     float newCost = currentCost >= wallImpassableCap && add >= wallImpassableCap ? currentCost + add - wallImpassableCap : currentCost + add;
@@ -572,9 +578,12 @@ public class ControlPathfinder{
                 smoothPath();
             }
 
-            done = true;
+            //don't keep this around in memory, better to dump entirely - using clear() keeps around massive arrays for paths
+            frontier = new PathfindQueue();
+            cameFrom = new IntIntMap();
+            costs = new IntFloatMap();
 
-            //TODO free resources?
+            done = true;
         }
 
         void smoothPath(){

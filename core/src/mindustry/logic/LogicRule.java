@@ -6,6 +6,7 @@ public enum LogicRule{
     waves,
     wave,
     waveSpacing,
+    waveSending,
     attackMode,
     enemyCoreBuildRadius,
     dropZoneRadius,

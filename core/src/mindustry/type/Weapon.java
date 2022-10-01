@@ -31,6 +31,8 @@ public class Weapon implements Cloneable{
     public BulletType bullet = Bullets.placeholder;
     /** shell ejection effect */
     public Effect ejectEffect = Fx.none;
+    /** whether weapon should appear in the stats of a unit with this weapon */
+    public boolean display = true;
     /** whether to consume ammo when ammo is enabled in rules */
     public boolean useAmmo = true;
     /** whether to create a flipped copy of this weapon upon initialization. default: true */
@@ -51,6 +53,8 @@ public class Weapon implements Cloneable{
     public boolean alwaysContinuous;
     /** whether this weapon can be aimed manually by players */
     public boolean controllable = true;
+    /** whether this weapon is always shooting, regardless of targets ore cone */
+    public boolean alwaysShooting = false;
     /** whether to automatically target relevant units in update(); only works when controllable = false. */
     public boolean autoTarget = false;
     /** whether to perform target trajectory prediction */
@@ -145,7 +149,7 @@ public class Weapon implements Cloneable{
     }
 
     public boolean hasStats(UnitType u){
-        return true;
+        return display;
     }
 
     public void addStats(UnitType u, Table t){
@@ -323,6 +327,8 @@ public class Weapon implements Cloneable{
             //logic will return shooting as false even if these return true, which is fine
         }
 
+        if(alwaysShooting) mount.shoot = true;
+
         //update continuous state
         if(continuous && mount.bullet != null){
             if(!mount.bullet.isAdded() || mount.bullet.time >= mount.bullet.lifetime || mount.bullet.type != bullet){
@@ -404,12 +410,12 @@ public class Weapon implements Cloneable{
         }
 
         shoot.shoot(mount.totalShots, (xOffset, yOffset, angle, delay, mover) -> {
+            mount.totalShots++;
             if(delay > 0f){
                 Time.run(delay, () -> bullet(unit, mount, xOffset, yOffset, angle, mover));
             }else{
                 bullet(unit, mount, xOffset, yOffset, angle, mover);
             }
-            mount.totalShots++;
         });
     }
 

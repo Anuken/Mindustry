@@ -1,5 +1,8 @@
 [
-  
+  {
+    "name": "Mindustry Español",
+    "address": ["n1.xpdustry.fr:6001"]
+  },
   {
     "name": "mindustry.pl",
     "address": ["0.baseduser.eu.org:6966", "0.baseduser.eu.org:6666", "0.baseduser.eu.org:6000"]
@@ -9,8 +12,16 @@
     "address": ["0nera.ru:7777", "185.178.45.224:7777"]
   },
   {
+    "name": "Voiddustry",
+    "address": ["45.144.66.250:6566"]
+  },
+  {
     "name": "C.A.M.S.",
-    "address": ["0.baseduser.eu.org:42001", "0.baseduser.eu.org:42002", "v7.thedimas.pp.ua"]
+    "address": ["0.baseduser.eu.org:42001", "0.baseduser.eu.org:42002"]
+  },
+  {
+    "name": "thedimas",
+    "address": ["play.thedimas.pp.ua", "play.thedimas.pp.ua:6510", "play.thedimas.pp.ua:6511", "play.thedimas.pp.ua:6509", "play.thedimas.pp.ua:6508"]
   },
   {
     "name": "SMokeOfAnarchy",
@@ -22,7 +33,7 @@
   },
   {
     "name": "Omega Hub",
-    "address": ["n1.yeet.ml:6572", "n1.yeet.ml:6573", "n1.yeet.ml:6604", "n5.yeet.ml:6605", "n5.yeet.ml:6606", "n1.yeet.ml:6608","n1.yeet.ml:6599"]
+    "address": ["n1.mindustry.me:6572","n1.mindustry.me:6573","n1.mindustry.me:6574","n1.mindustry.me:6604","n1.mindustry.me:6569","n1.mindustry.me:6611","n1.mindustry.me:6610","n1.mindustry.me:6599","n1.mindustry.me","n1.mindustry.me:6608"]
   },
   {
     "name": "KMWStudios",
@@ -86,19 +97,19 @@
   },
   {
     "name": "TinyLake",
-    "address": ["mindustry.top","g.mindustry.top"]
+    "address": ["mindustry.top"]
   },
   {
     "name": "Fish",
-    "address": ["170.187.144.235"]
+    "address": ["170.187.144.235", "45.79.203.155"]
   },
   {
     "name": "Harders",
-    "address": ["212.20.42.61:6567", "212.20.42.61:6568", "212.20.42.61:6569", "212.20.42.61:6570", "212.20.42.61:6571", "212.20.42.61:6572", "212.20.42.61:6573"]
+    "address": ["212.20.42.61:6567", "212.20.42.61:6568", "212.20.42.61:6569", "212.20.42.61:6570", "212.20.42.61:6571", "212.20.42.61:6572", "212.20.42.61:6573", "212.20.42.61:6574"]
   },
   {
     "name": "OMNIDUSTRY",
-    "address": ["109.94.209.233:6568","109.94.209.233:6569","109.94.209.233:6570","109.94.209.233:6571","109.94.209.233:6572","109.94.209.233:6573","109.94.209.233:6574"]
+    "address": ["109.94.209.233","109.94.209.233:6568","109.94.209.233:6569","109.94.209.233:6570","109.94.209.233:6571","109.94.209.233:6572","109.94.209.233:6573","109.94.209.233:6574"]
   },
   {
     "name": "The Devil",
@@ -106,6 +117,22 @@
   },
     {
     "name": "Eradicationdustry",
-    "address": ["n1.yeet.ml:6577", "n1.yeet.ml:6576", "n1.yeet.ml:6602", "n1.yeet.ml:6669"]
+    "address": ["n1.yeet.ml:6577", "n1.yeet.ml:6576", "n1.yeet.ml:6602", "n1.yeet.ml:6669", "eradicationmindustry.yeet.ml:9547", "n1.yeet.ml:6593"]
+  },
+    {
+    "name": "AlternightBrasil",
+    "address": ["mindustrypt.ga:6567","mindustrypt.ga:6565","mindustrypt.ga:7770","mindustrypt.ga:6564","mindustrypt.ga:6566","mindustrypt.ga:6568"]
+  },
+    {
+    "name": "Vanilla",
+    "address": ["130.162.228.202"]
+  },
+  {
+    "name": "LightDustry",
+    "address": ["own-formerly.craft.playit.gg:26618", "lightdusy.ddns.net:6567", "lightdusy.ddns.net:6568", "209.25.142.180:39065"]
+  },
+  {
+    "name": "Simply",
+    "address": ["178.203.202.107"]
   }
 ]
