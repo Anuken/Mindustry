@@ -224,7 +224,7 @@ public class MinimapRenderer{
         if(!worldSpace){
             position.sub(rect.x, rect.y).scl(lastW / rect.width, lastH / rect.height);
         }else{
-            position.scl(1f / world.unitWidth(), 1f / world.unitHeight()).scl(lastW, lastH);
+            position.scl(lastW / world.unitWidth(), lastH / world.unitHeight());
         }
 
         return position.add(lastX, lastY);
