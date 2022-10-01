@@ -576,6 +576,11 @@ public class ControlPathfinder{
                 result.reverse();
 
                 smoothPath();
+            }else{
+                //don't keep this around in memory, better to dump entirely - using clear() keeps around massive arrays for invalid paths
+                frontier = new PathfindQueue();
+                cameFrom = new IntIntMap();
+                costs = new IntFloatMap();
             }
 
             done = true;
