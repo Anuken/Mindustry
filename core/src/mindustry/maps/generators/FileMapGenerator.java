@@ -77,7 +77,7 @@ public class FileMapGenerator implements WorldGenerator{
             }
 
             if(tile.isCenter() && tile.block() instanceof CoreBlock && tile.team() == state.rules.defaultTeam && !anyCores){
-                if(sector != null && sector.allowLaunchLoadout()){
+                if(state.rules.sector != null && state.rules.sector.allowLaunchLoadout()){
                     Schematics.placeLaunchLoadout(tile.x, tile.y);
                 }
                 anyCores = true;

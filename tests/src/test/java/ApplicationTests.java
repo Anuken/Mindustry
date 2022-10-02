@@ -873,6 +873,7 @@ public class ApplicationTests{
                 Time.setDeltaProvider(() -> 1f);
 
                 logic.reset();
+                state.rules.sector = zone.sector;
                 try{
                     world.loadGenerator(zone.generator.map.width, zone.generator.map.height, zone.generator::generate);
                 }catch(SaveException e){
