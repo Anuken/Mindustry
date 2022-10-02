@@ -53,6 +53,8 @@ public class Weapon implements Cloneable{
     public boolean alwaysContinuous;
     /** whether this weapon can be aimed manually by players */
     public boolean controllable = true;
+    /** whether this weapon can be automatically aimed by the unit */
+    public boolean aiControllable = true;
     /** whether this weapon is always shooting, regardless of targets ore cone */
     public boolean alwaysShooting = false;
     /** whether to automatically target relevant units in update(); only works when controllable = false. */
@@ -338,7 +340,7 @@ public class Weapon implements Cloneable{
                 mount.bullet.set(bulletX, bulletY);
                 mount.reload = reload;
                 mount.recoil = 1f;
-                unit.vel.add(Tmp.v1.trns(unit.rotation + 180f, mount.bullet.type.recoil));
+                unit.vel.add(Tmp.v1.trns(unit.rotation + 180f, mount.bullet.type.recoil * Time.delta));
                 if(shootSound != Sounds.none && !headless){
                     if(mount.sound == null) mount.sound = new SoundLoop(shootSound, 1f);
                     mount.sound.update(bulletX, bulletY, true);

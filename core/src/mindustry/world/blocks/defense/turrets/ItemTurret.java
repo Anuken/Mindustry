@@ -76,6 +76,8 @@ public class ItemTurret extends Turret{
             }
         });
 
+        ammoTypes.each((item, type) -> placeOverlapRange = Math.max(placeOverlapRange, range + type.rangeChange + placeOverlapMargin));
+
         super.init();
     }
 
