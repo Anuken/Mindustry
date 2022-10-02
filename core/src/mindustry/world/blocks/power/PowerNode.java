@@ -27,6 +27,9 @@ public class PowerNode extends PowerBlock{
     protected static int returnInt = 0;
     protected final static ObjectSet<PowerGraph> graphs = new ObjectSet<>();
 
+    /** The maximum range of all power nodes on the map */
+    public static float maxRange;
+
     public @Load("laser") TextureRegion laser;
     public @Load("laser-end") TextureRegion laserEnd;
     public float laserRange = 6;
@@ -236,10 +239,10 @@ public class PowerNode extends PowerBlock{
             graphs.add(tile.build.power.graph);
         }
 
-        Geometry.circle(tile.x, tile.y, (int)(laserRange + 2), (x, y) -> {
-            Building other = world.build(x, y);
-            if(valid.get(other) && !tempBuilds.contains(other)){
-                tempBuilds.add(other);
+        var worldRange = laserRange * tilesize;
+        team.data().buildingTree.intersect(tile.worldx() - worldRange, tile.worldy() - worldRange, worldRange * 2, worldRange * 2, build -> {
+            if(valid.get(build) && !tempBuilds.contains(build)){
+                tempBuilds.add(build);
             }
         });
 
@@ -289,10 +292,10 @@ public class PowerNode extends PowerBlock{
             graphs.add(tile.build.power.graph);
         }
 
-        Geometry.circle(tile.x, tile.y, 13, (x, y) -> {
-            Building other = world.build(x, y);
-            if(valid.get(other) && !tempBuilds.contains(other)){
-                tempBuilds.add(other);
+        var rangeWorld = maxRange * tilesize;
+        team.data().buildingTree.intersect(tile.worldx() - rangeWorld, tile.worldy() - rangeWorld, rangeWorld * 2, rangeWorld * 2, build -> {
+            if(valid.get(build) && !tempBuilds.contains(build)){
+                tempBuilds.add(build);
             }
         });
 
@@ -363,6 +366,14 @@ public class PowerNode extends PowerBlock{
     }
 
     public class PowerNodeBuild extends Building{
+
+        @Override
+        public void created(){ // Called when one is placed/loaded in the world
+            if(autolink && laserRange > maxRange) maxRange = laserRange;
+
+            super.created();
+        }
+
 
         @Override
         public void placed(){
