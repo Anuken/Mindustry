@@ -1,22 +1,16 @@
 package mindustry.ui.dialogs;
 
-import arc.Core;
-import arc.Events;
-import arc.graphics.Color;
-import arc.scene.ui.ScrollPane;
-import arc.scene.ui.layout.Cell;
-import arc.scene.ui.layout.Table;
-import arc.struct.ObjectSet;
-import arc.struct.Seq;
-import arc.util.Align;
-import arc.util.OS;
-import arc.util.Time;
-import mindustry.game.EventType.Trigger;
-import mindustry.gen.Icon;
-import mindustry.graphics.Pal;
-import mindustry.ui.Links;
-import mindustry.ui.Links.LinkEntry;
-import mindustry.ui.Styles;
+import arc.*;
+import arc.graphics.*;
+import arc.scene.ui.*;
+import arc.scene.ui.layout.*;
+import arc.struct.*;
+import arc.util.*;
+import mindustry.game.EventType.*;
+import mindustry.gen.*;
+import mindustry.graphics.*;
+import mindustry.ui.*;
+import mindustry.ui.Links.*;
 
 import static mindustry.Vars.*;
 
