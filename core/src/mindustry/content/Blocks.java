@@ -2790,7 +2790,7 @@ public class Blocks{
         largePlasmaBore = new BeamDrill("large-plasma-bore"){{
             requirements(Category.production, with(Items.silicon, 100, Items.oxide, 25, Items.beryllium, 100, Items.tungsten, 70));
             consumePower(0.8f);
-            drillTime = 110f;
+            drillTime = 100f;
 
             tier = 5;
             size = 3;

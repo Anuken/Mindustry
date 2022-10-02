@@ -8,8 +8,6 @@ import mindustry.type.*;
 import mindustry.type.unit.*;
 import mindustry.world.blocks.defense.turrets.*;
 
-import java.awt.*;
-
 import static mindustry.Vars.*;
 import static mindustry.content.Blocks.*;
 import static mindustry.content.SectorPresets.*;
@@ -432,13 +430,14 @@ public class ErekirTechTree{
 
                         nodeProduce(Items.thorium, () -> {
                             nodeProduce(Items.carbide, () -> {
-                                nodeProduce(Items.surgeAlloy, () -> {
-                                    nodeProduce(Items.phaseFabric, () -> {
-
-                                    });
-                                });
 
                                 //nodeProduce(Liquids.gallium, () -> {});
+                            });
+
+                            nodeProduce(Items.surgeAlloy, () -> {
+                                nodeProduce(Items.phaseFabric, () -> {
+
+                                });
                             });
                         });
                     });

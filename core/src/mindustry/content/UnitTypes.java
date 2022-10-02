@@ -2578,7 +2578,7 @@ public class UnitTypes{
             treadPullOffset = 5;
             speed = 0.64f;
             rotateSpeed = 1.5f;
-            health = 4500;
+            health = 4800;
             armor = 10f;
             itemCapacity = 0;
             treadRects = new Rect[]{new Rect(16 - 60f, 48 - 70f, 30, 75), new Rect(44 - 60f, 17 - 70f, 17, 60)};
@@ -2598,7 +2598,7 @@ public class UnitTypes{
                 y = -1f;
                 heatColor = Color.valueOf("f9350f");
                 cooldownTime = 30f;
-                bullet = new BasicBulletType(7f, 90){{
+                bullet = new BasicBulletType(7f, 100){{
                     sprite = "missile-large";
                     width = 7.5f;
                     height = 13f;
@@ -2644,7 +2644,7 @@ public class UnitTypes{
             hitSize = 28f;
             treadPullOffset = 4;
             speed = 0.63f;
-            health = 10000;
+            health = 11000;
             armor = 20f;
             itemCapacity = 0;
             crushDamage = 13f / 5f;
@@ -3707,7 +3707,7 @@ public class UnitTypes{
                     trailInterval = 3f;
                     trailParam = 4f;
                     speed = 3f;
-                    damage = 80f;
+                    damage = 75f;
                     lifetime = 75f;
                     width = height = 15f;
                     backColor = Pal.sapBulletBack;
@@ -3725,7 +3725,7 @@ public class UnitTypes{
                     }};
 
                     intervalBullet = new LightningBulletType(){{
-                        damage = 18;
+                        damage = 16;
                         collidesAir = false;
                         ammoMultiplier = 1f;
                         lightningColor = Pal.sapBullet;
@@ -3750,7 +3750,7 @@ public class UnitTypes{
                     bulletInterval = 4f;
 
                     lightningColor = Pal.sapBullet;
-                    lightningDamage = 21;
+                    lightningDamage = 17;
                     lightning = 8;
                     lightningLength = 2;
                     lightningLengthRand = 8;
