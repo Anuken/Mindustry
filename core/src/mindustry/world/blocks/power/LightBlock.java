@@ -13,7 +13,9 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
 import mindustry.logic.*;
+import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -28,6 +30,7 @@ public class LightBlock extends Block{
         update = true;
         configurable = true;
         saveConfig = true;
+        envEnabled |= Env.space;
         swapDiagonalPlacement = true;
 
         config(Integer.class, (LightBuild tile, Integer value) -> tile.color = value);
@@ -35,8 +38,9 @@ public class LightBlock extends Block{
 
     @Override
     public void init(){
-        lightRadius = radius;
+        lightRadius = radius*3f;
         emitLight = true;
+
         super.init();
     }
 
@@ -60,7 +64,7 @@ public class LightBlock extends Block{
         @Override
         public void control(LAccess type, double p1, double p2, double p3, double p4){
             if(type == LAccess.color){
-                color = Color.rgba8888((float)p1, (float)p2, (float)p3, 1f);
+                color = Tmp.c1.fromDouble(p1).rgba8888();
             }
 
             super.control(type, p1, p2, p3, p4);
@@ -70,7 +74,7 @@ public class LightBlock extends Block{
         public void draw(){
             super.draw();
             Draw.blend(Blending.additive);
-            Draw.color(Tmp.c1.set(color), efficiency() * 0.3f);
+            Draw.color(Tmp.c1.set(color), efficiency * 0.3f);
             Draw.rect(topRegion, x, y);
             Draw.color();
             Draw.blend();
@@ -83,15 +87,25 @@ public class LightBlock extends Block{
 
         @Override
         public void buildConfiguration(Table table){
-            table.button(Icon.pencil, () -> {
+            table.button(Icon.pencil, Styles.cleari, () -> {
                 ui.picker.show(Tmp.c1.set(color).a(0.5f), false, res -> configure(res.rgba()));
                 deselect();
             }).size(40f);
         }
 
         @Override
+        public boolean onConfigureBuildTapped(Building other){
+            if(this == other){
+                deselect();
+                return false;
+            }
+
+            return true;
+        }
+
+        @Override
         public void drawLight(){
-            Drawf.light(team, x, y, lightRadius * Math.min(smoothTime, 2f), Tmp.c1.set(color), brightness * efficiency());
+            Drawf.light(x, y, lightRadius * Math.min(smoothTime, 2f), Tmp.c1.set(color), brightness * efficiency);
         }
 
         @Override

@@ -46,6 +46,7 @@ abstract class StatusComp implements Posc, Flyingc{
                 //extend effect
                 if(entry.effect == effect){
                     entry.time = Math.max(entry.time, duration);
+                    effect.applied(self(), entry.time, true);
                     return;
                 }else if(entry.effect.applyTransition(self(), effect, entry, duration)){ //find reaction
                     //TODO effect may react with multiple other effects
@@ -60,6 +61,7 @@ abstract class StatusComp implements Posc, Flyingc{
             StatusEntry entry = Pools.obtain(StatusEntry.class, StatusEntry::new);
             entry.set(effect, duration);
             statuses.add(entry);
+            effect.applied(self(), duration, false);
         }
     }
 
@@ -154,7 +156,7 @@ abstract class StatusComp implements Posc, Flyingc{
 
     public void draw(){
         for(StatusEntry e : statuses){
-            e.effect.draw(self());
+            e.effect.draw(self(), e.time);
         }
     }
 

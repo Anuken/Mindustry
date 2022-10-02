@@ -4,11 +4,11 @@ import arc.*;
 import arc.assets.*;
 import arc.assets.loaders.*;
 import arc.audio.*;
+import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
-import arc.util.async.*;
 import mindustry.ai.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
@@ -18,7 +18,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.maps.*;
 import mindustry.mod.*;
-import mindustry.net.Net;
+import mindustry.net.*;
 import mindustry.ui.*;
 
 import static arc.Core.*;
@@ -56,6 +56,12 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         Log.info("[GL] Using @ context.", gl30 != null ? "OpenGL 3" : "OpenGL 2");
         if(maxTextureSize < 4096) Log.warn("[GL] Your maximum texture size is below the recommended minimum of 4096. This will cause severe performance issues.");
         Log.info("[JAVA] Version: @", OS.javaVersion);
+        if(Core.app.isAndroid()){
+            Log.info("[ANDROID] API level: @", Core.app.getVersion());
+        }
+        long ram = Runtime.getRuntime().maxMemory();
+        boolean gb = ram >= 1024 * 1024 * 1024;
+        Log.info("[RAM] Available: @ @", Strings.fixed(gb ? ram / 1024f / 1024 / 1024f : ram / 1024f / 1024f, 1), gb ? "GB" : "MB");
 
         Time.setDeltaProvider(() -> {
             float result = Core.graphics.getDeltaTime() * 60f;
@@ -67,12 +73,71 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         assets.setLoader(Texture.class, "." + mapExtension, new MapPreviewLoader());
 
         tree = new FileTree();
-        assets.setLoader(Sound.class, new SoundLoader(tree));
-        assets.setLoader(Music.class, new MusicLoader(tree));
+        assets.setLoader(Sound.class, new SoundLoader(tree){
+            @Override
+            public void loadAsync(AssetManager manager, String fileName, Fi file, SoundParameter parameter){
+
+            }
+
+            @Override
+            public Sound loadSync(AssetManager manager, String fileName, Fi file, SoundParameter parameter){
+                if(parameter != null && parameter.sound != null){
+                    mainExecutor.submit(() -> parameter.sound.load(file));
+
+                    return parameter.sound;
+                }else{
+                    Sound sound = new Sound();
+
+                    mainExecutor.submit(() -> {
+                        try{
+                            sound.load(file);
+                        }catch(Throwable t){
+                            Log.err("Error loading sound: " + file, t);
+                        }
+                    });
+
+                    return sound;
+                }
+            }
+        });
+        assets.setLoader(Music.class, new MusicLoader(tree){
+            @Override
+            public void loadAsync(AssetManager manager, String fileName, Fi file, MusicParameter parameter){
+
+            }
+
+            @Override
+            public Music loadSync(AssetManager manager, String fileName, Fi file, MusicParameter parameter){
+                if(parameter != null && parameter.music != null){
+                    mainExecutor.submit(() -> {
+                        try{
+                            parameter.music.load(file);
+                        }catch(Throwable t){
+                            Log.err("Error loading music: " + file, t);
+                        }
+                    });
+
+                    return parameter.music;
+                }else{
+                    Music music = new Music();
+
+                    mainExecutor.submit(() -> {
+                        try{
+                            music.load(file);
+                        }catch(Throwable t){
+                            Log.err("Error loading music: " + file, t);
+                        }
+                    });
+
+                    return music;
+                }
+            }
+        });
 
         assets.load("sprites/error.png", Texture.class);
         atlas = TextureAtlas.blankAtlas();
         Vars.net = new Net(platform.getNet());
+        MapPreviewLoader.setupLoaders();
         mods = new Mods();
         schematics = new Schematics();
 
@@ -83,7 +148,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         Fonts.loadDefaultFont();
 
         //load fallback atlas if max texture size is below 4096
-        assets.load(new AssetDescriptor<>(maxTextureSize >= 4096 ? "sprites/sprites.aatls" : "sprites/fallback/sprites.aatls", TextureAtlas.class)).loaded = t -> atlas = (TextureAtlas)t;
+        assets.load(new AssetDescriptor<>(maxTextureSize >= 4096 ? "sprites/sprites.aatls" : "sprites/fallback/sprites.aatls", TextureAtlas.class)).loaded = t -> atlas = t;
         assets.loadRun("maps", Map.class, () -> maps.loadPreviews());
 
         Musics.load();
@@ -149,16 +214,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
                 }
                 mods.eachClass(Mod::init);
                 finished = true;
-                var event = new ClientLoadEvent();
-                //a temporary measure for compatibility with certain mods
-                Events.fireWrap(event.getClass(), event, listener -> {
-                    try{
-                        listener.get(event);
-                    }catch(NoSuchFieldError | NoSuchMethodError | NoClassDefFoundError error){
-                        Log.err(error);
-                    }
-
-                });
+                Events.fire(new ClientLoadEvent());
                 clientLoaded = true;
                 super.resize(graphics.getWidth(), graphics.getHeight());
                 app.post(() -> app.post(() -> app.post(() -> app.post(() -> {

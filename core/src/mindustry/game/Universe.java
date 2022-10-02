@@ -82,10 +82,11 @@ public class Universe{
             }
         }
 
-        if(state.hasSector()){
+        if(state.hasSector() && state.getSector().planet.updateLighting){
+            var planet = state.getSector().planet;
             //update sector light
             float light = state.getSector().getLight();
-            float alpha = Mathf.clamp(Mathf.map(light, 0f, 0.8f, 0.3f, 1f));
+            float alpha = Mathf.clamp(Mathf.map(light, planet.lightSrcFrom, planet.lightSrcTo, planet.lightDstFrom, planet.lightDstTo));
 
             //assign and map so darkness is not 100% dark
             state.rules.ambientLight.a = 1f - alpha;
@@ -119,7 +120,7 @@ public class Universe{
     }
 
     public Schematic getLastLoadout(){
-        if(lastLoadout == null) lastLoadout = Loadouts.basicShard;
+        if(lastLoadout == null) lastLoadout = state.rules.sector == null || state.rules.sector.planet.generator == null ? Loadouts.basicShard : state.rules.sector.planet.generator.getDefaultLoadout();
         return lastLoadout;
     }
 
@@ -147,8 +148,35 @@ public class Universe{
 
         //update relevant sectors
         for(Planet planet : content.planets()){
+
+            //first pass: clear import stats
             for(Sector sector : planet.sectors){
-                if(sector.hasSave() && sector.hasBase()){
+                if(sector.hasBase() && !sector.isBeingPlayed()){
+                    sector.info.lastImported.clear();
+                }
+            }
+
+            //second pass: update export & import statistics
+            for(Sector sector : planet.sectors){
+                if(sector.hasBase() && !sector.isBeingPlayed()){
+
+                    //export to another sector
+                    if(sector.info.destination != null){
+                        Sector to = sector.info.destination;
+                        if(to.hasBase() && to.planet == planet){
+                            ItemSeq items = new ItemSeq();
+                            //calculated exported items to this sector
+                            sector.info.export.each((item, stat) -> items.add(item, (int)(stat.mean * newSecondsPassed * sector.getProductionScale())));
+                            to.addItems(items);
+                            to.info.lastImported.add(items);
+                        }
+                    }
+                }
+            }
+
+            //third pass: everything else
+            for(Sector sector : planet.sectors){
+                if(sector.hasBase()){
 
                     //if it is being attacked, capture time is 0; otherwise, increment the timer
                     if(sector.isAttacked()){
@@ -166,7 +194,7 @@ public class Universe{
                         }
 
                         int wavesPassed = (int)(sector.info.secondsPassed*60f / sector.info.waveSpacing);
-                        boolean attacked = sector.info.waves;
+                        boolean attacked = sector.info.waves && sector.planet.allowWaveSimulation;
 
                         if(attacked){
                             sector.info.wavesPassed = wavesPassed;
@@ -198,26 +226,16 @@ public class Universe{
 
                         float scl = sector.getProductionScale();
 
-                        //export to another sector
-                        if(sector.info.destination != null){
-                            Sector to = sector.info.destination;
-                            if(to.hasBase()){
-                                ItemSeq items = new ItemSeq();
-                                //calculated exported items to this sector
-                                sector.info.export.each((item, stat) -> items.add(item, (int)(stat.mean * newSecondsPassed * scl)));
-                                to.addItems(items);
-                            }
-                        }
+                        //add production, making sure that it's capped
+                        sector.info.production.each((item, stat) -> sector.info.items.add(item, Math.min((int)(stat.mean * newSecondsPassed * scl), sector.info.storageCapacity - sector.info.items.get(item))));
 
-                        sector.info.export.each((item, amount) -> {
-                            if(sector.info.items.get(item) <= 0 && sector.info.production.get(item, ExportStat::new).mean < 0){
-                                //disable export when production is negative.
-                                sector.info.export.get(item).mean = 0f;
+                        sector.info.export.each((item, stat) -> {
+                            if(sector.info.items.get(item) <= 0 && sector.info.production.get(item, ExportStat::new).mean < 0 && stat.mean > 0){
+                                //cap export by import when production is negative.
+                                stat.mean = Math.min(sector.info.lastImported.get(item) / (float)newSecondsPassed, stat.mean);
                             }
                         });
 
-                        //add production, making sure that it's capped
-                        sector.info.production.each((item, stat) -> sector.info.items.add(item, Math.min((int)(stat.mean * newSecondsPassed * scl), sector.info.storageCapacity - sector.info.items.get(item))));
                         //prevent negative values with unloaders
                         sector.info.items.checkNegative();
 
@@ -225,7 +243,7 @@ public class Universe{
                     }
 
                     //queue random invasions
-                    if(!sector.isAttacked() && sector.info.minutesCaptured > invasionGracePeriod && sector.info.hasSpawns){
+                    if(!sector.isAttacked() && sector.planet.allowSectorInvasion && sector.info.minutesCaptured > invasionGracePeriod && sector.info.hasSpawns){
                         int count = sector.near().count(Sector::hasEnemyBase);
 
                         //invasion chance depends on # of nearby bases
@@ -258,21 +276,6 @@ public class Universe{
         Events.fire(new TurnEvent());
 
         save();
-    }
-
-    /** This method is expensive to call; only do so sparingly. */
-    public ItemSeq getGlobalResources(){
-        ItemSeq count = new ItemSeq();
-
-        for(Planet planet : content.planets()){
-            for(Sector sector : planet.sectors){
-                if(sector.hasSave()){
-                    count.add(sector.items());
-                }
-            }
-        }
-
-        return count;
     }
 
     public void updateNetSeconds(int value){

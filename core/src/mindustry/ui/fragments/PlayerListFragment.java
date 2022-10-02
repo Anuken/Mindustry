@@ -1,29 +1,31 @@
 package mindustry.ui.fragments;
 
 import arc.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.scene.*;
 import arc.scene.event.*;
 import arc.scene.ui.*;
+import arc.scene.ui.ImageButton.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.input.*;
 import mindustry.net.*;
 import mindustry.net.Packets.*;
 import mindustry.ui.*;
 
 import static mindustry.Vars.*;
 
-public class PlayerListFragment extends Fragment{
+public class PlayerListFragment{
     public Table content = new Table().marginRight(13f).marginLeft(13f);
     private boolean visible = false;
     private Interval timer = new Interval();
-    private TextField sField;
+    private TextField search;
     private Seq<Player> players = new Seq<>();
 
-    @Override
     public void build(Group parent){
         content.name = "players";
         parent.fill(cont -> {
@@ -47,15 +49,12 @@ public class PlayerListFragment extends Fragment{
             cont.table(Tex.buttonTrans, pane -> {
                 pane.label(() -> Core.bundle.format(Groups.player.size() == 1 ? "players.single" : "players", Groups.player.size()));
                 pane.row();
-                sField = pane.field(null, text -> {
-                    rebuild();
-                }).grow().pad(8).get();
-                sField.name = "search";
-                sField.setMaxLength(maxNameLength);
-                sField.setMessageText(Core.bundle.format("players.search"));
+
+                search = pane.field(null, text -> rebuild()).grow().pad(8).name("search").maxTextLength(maxNameLength).get();
+                search.setMessageText(Core.bundle.get("players.search"));
 
                 pane.row();
-                pane.pane(content).grow().get().setScrollingDisabled(true, false);
+                pane.pane(content).grow().scrollX(false);
                 pane.row();
 
                 pane.table(menu -> {
@@ -76,15 +75,15 @@ public class PlayerListFragment extends Fragment{
     public void rebuild(){
         content.clear();
 
-        float h = 74f;
+        float h = 50f;
         boolean found = false;
 
         players.clear();
         Groups.player.copy(players);
 
         players.sort(Structs.comps(Structs.comparing(Player::team), Structs.comparingBool(p -> !p.admin)));
-        if(sField.getText().length() > 0){
-            players.filter(p -> Strings.stripColors(p.name().toLowerCase()).contains(sField.getText().toLowerCase()));
+        if(search.getText().length() > 0){
+            players.filter(p -> Strings.stripColors(p.name().toLowerCase()).contains(search.getText().toLowerCase()));
         }
 
         for(var user : players){
@@ -97,26 +96,65 @@ public class PlayerListFragment extends Fragment{
             button.left();
             button.margin(5).marginBottom(10);
 
-            Table table = new Table(){
+            ClickListener listener = new ClickListener();
+
+            Table iconTable = new Table(){
                 @Override
                 public void draw(){
                     super.draw();
-                    Draw.color(Pal.gray);
+                    Draw.colorMul(user.team().color, listener.isOver() ? 1.3f : 1f);
                     Draw.alpha(parentAlpha);
                     Lines.stroke(Scl.scl(4f));
                     Lines.rect(x, y, width, height);
                     Draw.reset();
                 }
             };
-            table.margin(8);
-            table.add(new Image(user.icon()).setScaling(Scaling.bounded)).grow();
-            table.name = user.name();
 
-            button.add(table).size(h);
-            button.labelWrap("[#" + user.color().toString().toUpperCase() + "]" + user.name()).width(170f).pad(10);
+            boolean clickable = !(state.rules.fog && state.rules.pvp && user.team() != player.team());
+
+            if(clickable){
+                iconTable.addListener(listener);
+                iconTable.addListener(new HandCursorListener());
+            }
+            iconTable.margin(8);
+            iconTable.add(new Image(user.icon()).setScaling(Scaling.bounded)).grow();
+            iconTable.name = user.name();
+            iconTable.touchable = Touchable.enabled;
+
+            iconTable.tapped(() -> {
+                if(!user.dead() && clickable){
+                    Core.camera.position.set(user.unit());
+                    ui.showInfoFade(Core.bundle.format("viewplayer", user.name), 1f);
+                    if(control.input instanceof DesktopInput input){
+                        input.panning = true;
+                    }
+                }
+            });
+
+            button.add(iconTable).size(h);
+            button.labelWrap("[#" + user.color().toString().toUpperCase() + "]" + user.name()).style(Styles.outlineLabel).width(170f).pad(10);
             button.add().grow();
 
+            button.background(Tex.underline);
+
             button.image(Icon.admin).visible(() -> user.admin && !(!user.isLocal() && net.server())).padRight(5).get().updateVisibility();
+
+            var style = new ImageButtonStyle(){{
+                down = Styles.none;
+                up = Styles.none;
+                imageCheckedColor = Pal.accent;
+                imageDownColor = Pal.accent;
+                imageUpColor = Color.white;
+                imageOverColor = Color.lightGray;
+            }};
+
+            var ustyle = new ImageButtonStyle(){{
+                down = Styles.none;
+                up = Styles.none;
+                imageDownColor = Pal.accent;
+                imageUpColor = Color.white;
+                imageOverColor = Color.lightGray;
+            }};
 
             if((net.server() || player.admin) && !user.isLocal() && (!user.admin || net.server())){
                 button.add().growY();
@@ -126,45 +164,47 @@ public class PlayerListFragment extends Fragment{
                 button.table(t -> {
                     t.defaults().size(bs);
 
-                    t.button(Icon.hammer, Styles.clearPartiali,
+                    t.button(Icon.hammerSmall, ustyle,
                     () -> ui.showConfirm("@confirm", Core.bundle.format("confirmban",  user.name()), () -> Call.adminRequest(user, AdminAction.ban)));
-                    t.button(Icon.cancel, Styles.clearPartiali,
+                    t.button(Icon.cancelSmall, ustyle,
                     () -> ui.showConfirm("@confirm", Core.bundle.format("confirmkick",  user.name()), () -> Call.adminRequest(user, AdminAction.kick)));
 
                     t.row();
 
-                    t.button(Icon.admin, Styles.clearTogglePartiali, () -> {
+                    t.button(Icon.adminSmall, style, () -> {
                         if(net.client()) return;
 
                         String id = user.uuid();
 
-                        if(netServer.admins.isAdmin(id, connection.address)){
-                            ui.showConfirm("@confirm", Core.bundle.format("confirmunadmin",  user.name()), () -> netServer.admins.unAdminPlayer(id));
+                        if(user.admin){
+                            ui.showConfirm("@confirm", Core.bundle.format("confirmunadmin",  user.name()), () -> {
+                                netServer.admins.unAdminPlayer(id);
+                                user.admin = false;
+                            });
                         }else{
-                            ui.showConfirm("@confirm", Core.bundle.format("confirmadmin",  user.name()), () -> netServer.admins.adminPlayer(id, user.usid()));
+                            ui.showConfirm("@confirm", Core.bundle.format("confirmadmin",  user.name()), () -> {
+                                netServer.admins.adminPlayer(id, user.usid());
+                                user.admin = true;
+                            });
                         }
                     }).update(b -> b.setChecked(user.admin))
                         .disabled(b -> net.client())
                         .touchable(() -> net.client() ? Touchable.disabled : Touchable.enabled)
                         .checked(user.admin);
 
-                    t.button(Icon.zoom, Styles.clearPartiali, () -> Call.adminRequest(user, AdminAction.trace));
+                    t.button(Icon.zoomSmall, ustyle, () -> Call.adminRequest(user, AdminAction.trace));
 
                 }).padRight(12).size(bs + 10f, bs);
             }else if(!user.isLocal() && !user.admin && net.client() && Groups.player.size() >= 3 && player.team() == user.team()){ //votekick
                 button.add().growY();
 
-                button.button(Icon.hammer, Styles.clearPartiali,
-                () -> {
-                    ui.showConfirm("@confirm", Core.bundle.format("confirmvotekick",  user.name()), () -> {
-                        Call.sendChatMessage("/votekick " + user.name());
-                    });
-                }).size(h);
+                button.button(Icon.hammer, ustyle,
+                    () -> ui.showConfirm("@confirm", Core.bundle.format("confirmvotekick",  user.name()),
+                    () -> Call.sendChatMessage("/votekick #" + user.id)))
+                .size(h);
             }
 
-            content.add(button).padBottom(-6).width(350f).maxHeight(h + 14);
-            content.row();
-            content.image().height(4f).color(state.rules.pvp ? user.team().color : Pal.gray).growX();
+            content.add(button).width(350f).height(h + 14);
             content.row();
         }
 
@@ -181,7 +221,7 @@ public class PlayerListFragment extends Fragment{
             rebuild();
         }else{
             Core.scene.setKeyboardFocus(null);
-            sField.clearText();
+            search.clearText();
         }
     }
 

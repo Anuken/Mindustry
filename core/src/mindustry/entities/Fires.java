@@ -8,6 +8,7 @@ import mindustry.content.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.world.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -17,7 +18,7 @@ public class Fires{
 
     /** Start a fire on the tile. If there already is a fire there, refreshes its lifetime. */
     public static void create(Tile tile){
-        if(net.client() || tile == null || !state.rules.fire) return; //not clientside.
+        if(net.client() || tile == null || !state.rules.fire || !state.rules.hasEnv(Env.oxygen)) return; //not clientside.
 
         Fire fire = map.get(tile.pos());
 
@@ -61,10 +62,14 @@ public class Fires{
     }
 
     public static void remove(Tile tile){
-        map.remove(tile.pos());
+        if(tile != null){
+            map.remove(tile.pos());
+        }
     }
 
     public static void register(Fire fire){
-        map.put(fire.tile.pos(), fire);
+        if(fire.tile != null){
+            map.put(fire.tile.pos(), fire);
+        }
     }
 }

@@ -6,7 +6,6 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
-import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.SectorInfo.*;
 import mindustry.gen.*;
@@ -113,12 +112,6 @@ public class GameService{
             }
         }));
 
-        Events.on(CommandIssueEvent.class, e -> {
-            if(campaign() && e.command == UnitCommand.attack){
-                issueAttackCommand.complete();
-            }
-        });
-
         Events.on(BlockBuildEndEvent.class, e -> {
             if(campaign() && e.unit != null && e.unit.isLocal() && !e.breaking){
                 SStat.blocksBuilt.add();
@@ -165,7 +158,8 @@ public class GameService{
         Events.on(UnitCreateEvent.class, e -> {
             if(campaign()){
                 if(unitsBuilt.add(e.unit.type.name)){
-                    SStat.unitTypesBuilt.set(content.units().count(u -> unitsBuilt.contains(u.name) && !u.isHidden()));
+                    SStat.unitTypesBuilt.max(content.units().count(u -> unitsBuilt.contains(u.name) && !u.isHidden()));
+                    save();
                 }
 
                 if(t5s.contains(e.unit.type)){
@@ -175,7 +169,7 @@ public class GameService{
         });
 
         Events.on(UnitControlEvent.class, e -> {
-            if(e.unit instanceof BlockUnitc && ((BlockUnitc)e.unit).tile().block == Blocks.router){
+            if(e.unit instanceof BlockUnitc unit && unit.tile().block == Blocks.router){
                 becomeRouter.complete();
             }
         });
@@ -331,7 +325,7 @@ public class GameService{
             }
 
             for(Building entity : player.team().cores()){
-                if(!content.items().contains(i -> entity.items.get(i) < entity.block.itemCapacity)){
+                if(!content.items().contains(i -> !state.rules.hiddenBuildItems.contains(i) && entity.items.get(i) < entity.block.itemCapacity)){
                     fillCoreAllCampaign.complete();
                     break;
                 }

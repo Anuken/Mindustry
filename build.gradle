@@ -13,51 +13,32 @@ buildscript{
         google()
         maven{ url "https://oss.sonatype.org/content/repositories/snapshots/" }
         maven{ url 'https://jitpack.io' }
-
-        //fake repository to download my patched robovm jar from
-        ivy{
-            url 'https://github.com/'
-
-            patternLayout {
-                artifact '/[organisation]/[module]/raw/a-single-jar-file/[revision].jar'
-            }
-
-            // This is required in Gradle 6.0+ as metadata file (ivy.xml)
-            // is mandatory. Docs linked below this code section
-            metadataSources { artifact() }
-        }
     }
 
     dependencies{
-        //use local, patched robovm gradle plugin until my PR for gradle 7.0 support is merged
-        //https://github.com/Anuken/robovm/raw/a-single-jar-file/robovm-gradle-plugin-2.3.14-SNAPSHOT.jar
-        classpath "Anuken:robovm:robovm-gradle-plugin-2.3.14-SNAPSHOT"
-        //needed for plugin above
-        classpath "com.mobidevelop.robovm:robovm-dist-compiler:2.3.13"
-
         classpath "com.github.Anuken.Arc:packer:$arcHash"
         classpath "com.github.Anuken.Arc:arc-core:$arcHash"
     }
 }
 
 plugins{
-    id 'org.jetbrains.kotlin.jvm' version '1.4.32'
-    id "org.jetbrains.kotlin.kapt" version "1.4.32"
+    id "org.jetbrains.kotlin.jvm" version "1.6.0"
+    id "org.jetbrains.kotlin.kapt" version "1.6.0"
 }
 
 allprojects{
     apply plugin: 'maven-publish'
     
-    version = 'release'
+    version = project.hasProperty("packageVersion") ? project.getProperty("packageVersion") : 'release'
     group = 'com.github.Anuken'
 
     ext{
         versionNumber = '7'
-        if(!project.hasProperty("versionModifier")) versionModifier = 'pre-alpha'
+        if(!project.hasProperty("versionModifier")) versionModifier = 'alpha'
         if(!project.hasProperty("versionType")) versionType = 'official'
         appName = 'Mindustry'
         steamworksVersion = '0b86023401880bb5e586bc404bedbaae9b1f1c94'
-        rhinoVersion = '9f792d202471fb3789eab7bb261fec13d67287e2'
+        rhinoVersion = '73a812444ac388ac2d94013b5cadc8f70b7ea027'
 
         loadVersionProps = {
             return new Properties().with{p -> p.load(file('../core/assets/version.properties').newReader()); return p }
@@ -219,10 +200,16 @@ allprojects{
         options.compilerArgs += ["-Xlint:deprecation"]
         dependsOn clearCache
 
-        options.forkOptions.jvmArgs.addAll([
+        options.forkOptions.jvmArgs += [
+            '--add-opens=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED',
             '--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED',
-            '--add-opens=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED'
-        ])
+            '--add-opens=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED',
+            '--add-opens=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED',
+            '--add-opens=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED',
+            '--add-opens=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED',
+            '--add-opens=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED',
+            '--add-opens=java.base/sun.reflect.annotation=ALL-UNNAMED'
+        ]
     }
 }
 
@@ -244,6 +231,7 @@ configure(subprojects - project(":annotations")){
         options{
             addStringOption('Xdoclint:none', '-quiet')
             addStringOption('-release', '16')
+            encoding('UTF-8')
         }
     }
 }
@@ -264,42 +252,6 @@ project(":desktop"){
         implementation "com.github.Anuken:steamworks4j:$steamworksVersion"
 
         implementation arcModule("backends:backend-sdl")
-    }
-}
-
-project(":ios"){
-    apply plugin: "java"
-    apply plugin: "robovm"
-
-    task incrementConfig{
-        def vfile = file('robovm.properties')
-        def bversion = getBuildVersion()
-        def props = new Properties()
-        if(vfile.exists()){
-            props.load(new FileInputStream(vfile))
-        }else{
-            props['app.id'] = 'io.anuke.mindustry'
-            props['app.version'] = '6.0'
-            props['app.mainclass'] = 'mindustry.IOSLauncher'
-            props['app.executable'] = 'IOSLauncher'
-            props['app.name'] = 'Mindustry'
-        }
-        
-        props['app.build'] = (!props.containsKey("app.build") ? 40 : props['app.build'].toInteger() + 1) + ""
-        if(bversion != "custom build"){
-            props['app.version'] = versionNumber + "." + bversion + (bversion.contains(".") ? "" : ".0")
-        }
-        props.store(vfile.newWriter(), null)
-    }
-
-    dependencies{
-        implementation project(":core")
-
-        implementation arcModule("natives:natives-ios")
-        implementation arcModule("natives:natives-freetype-ios")
-        implementation arcModule("backends:backend-robovm")
-
-        compileOnly project(":annotations")
     }
 }
 
@@ -341,7 +293,11 @@ project(":core"){
                 }
             }
             def changelogs = file("../fastlane/metadata/android/en-US/changelogs/")
-            new File(changelogs, androidVersion + ".txt").text = (result)
+            changelogs.mkdirs()
+            try{
+                new File(changelogs, androidVersion + ".txt").text = (result)
+            }catch(Exception ignored){
+            }
         }
     }
 
@@ -372,7 +328,7 @@ project(":core"){
     dependencies{
         compileJava.dependsOn(preGen)
 
-        api "org.lz4:lz4-java:1.7.1"
+        api "org.lz4:lz4-java:1.8.0"
         api arcModule("arc-core")
         api arcModule("extensions:flabel")
         api arcModule("extensions:freetype")
@@ -383,7 +339,7 @@ project(":core"){
         if(localArc() && debugged()) api arcModule("extensions:recorder")
         if(localArc()) api arcModule(":extensions:packer")
 
-        annotationProcessor 'com.github.Anuken:jabel:34e4c172e65b3928cd9eabe1993654ea79c409cd'
+        annotationProcessor 'com.github.Anuken:jabel:0.9.0'
         compileOnly project(":annotations")
         kapt project(":annotations")
     }
@@ -408,6 +364,13 @@ project(":core"){
             })
             destinationDir = new File(buildDir, 'javadoc')
         }
+    }
+
+    gradle.taskGraph.whenReady{
+        //these are completely unnecessary
+        tasks.kaptGenerateStubsKotlin.onlyIf{ false }
+        tasks.compileKotlin.onlyIf{ false }
+        tasks.inspectClassesForKotlinIC.onlyIf{ false }
     }
 
     //comp** classes are only used for code generation
@@ -469,7 +432,7 @@ project(":annotations"){
     }
 }
 
-configure([":core", ":desktop", ":server", ":tools"].collect{project(it)}){
+configure([":core", ":server"].collect{project(it)}){
     java{
         withJavadocJar()
         withSourcesJar()

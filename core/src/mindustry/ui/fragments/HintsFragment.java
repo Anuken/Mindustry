@@ -13,20 +13,22 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.game.EventType.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.input.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.payloads.PayloadBlock.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
-public class HintsFragment extends Fragment{
+public class HintsFragment{
     private static final Boolp isTutorial = () -> Vars.state.rules.sector == SectorPresets.groundZero.sector;
     private static final float foutTime = 0.6f;
 
     /** All hints to be displayed in the game. */
-    public Seq<Hint> hints = new Seq<>().and(DefaultHint.values()).as();
+    public Seq<Hint> hints = new Seq<>().add(DefaultHint.values()).as();
 
     @Nullable Hint current;
     Group group = new WidgetGroup();
@@ -34,11 +36,11 @@ public class HintsFragment extends Fragment{
     ObjectSet<Block> placedBlocks = new ObjectSet<>();
     Table last;
 
-    @Override
     public void build(Group parent){
         group.setFillParent(true);
         group.touchable = Touchable.childrenOnly;
-        group.visibility = () -> Core.settings.getBool("hints", true) && ui.hudfrag.shown;
+        //TODO hints off for now - figure out tutorial system.
+        group.visibility = () -> !state.isCampaign() && Core.settings.getBool("hints", true) && ui.hudfrag.shown;
         group.update(() -> {
             if(current != null){
                 //current got completed
@@ -52,8 +54,14 @@ public class HintsFragment extends Fragment{
                 Hint hint = hints.find(Hint::show);
                 if(hint != null && hint.complete()){
                     hints.remove(hint);
-                }else if(hint != null){
+                }else if(hint != null && !renderer.isCutscene() && state.isGame() && control.saves.getTotalPlaytime() > 8000){
                     display(hint);
+                }else{
+                    //moused over a derelict structure
+                    var build = world.buildWorld(Core.input.mouseWorldX(), Core.input.mouseWorldY());
+                    if(build != null && build.team == Team.derelict){
+                        events.add("derelictmouse");
+                    }
                 }
             }
         });
@@ -76,6 +84,11 @@ public class HintsFragment extends Fragment{
             events.clear();
         });
 
+        Events.on(BuildingCommandEvent.class, e -> {
+            if(e.building instanceof PayloadBlockBuild<?>){
+                events.add("factorycontrol");
+            }
+        });
     }
 
     void checkNext(){
@@ -85,7 +98,7 @@ public class HintsFragment extends Fragment{
         hints.sort(Hint::order);
 
         Hint first = hints.find(Hint::show);
-        if(first != null){
+        if(first != null && !renderer.isCutscene() && state.isGame()){
             hints.remove(first);
             display(first);
         }
@@ -156,23 +169,28 @@ public class HintsFragment extends Fragment{
         schematicSelect(visibleDesktop, () -> ui.hints.placedBlocks.contains(Blocks.router), () -> Core.input.keyRelease(Binding.schematic_select) || Core.input.keyTap(Binding.pick)),
         conveyorPathfind(() -> control.input.block == Blocks.titaniumConveyor, () -> Core.input.keyRelease(Binding.diagonal_placement) || (mobile && Core.settings.getBool("swapdiagonal"))),
         boost(visibleDesktop, () -> !player.dead() && player.unit().type.canBoost, () -> Core.input.keyDown(Binding.boost)),
-        blockInfo(() -> true, () -> ui.content.isShown()),
-        command(() -> state.rules.defaultTeam.data().units.size > 3 && !net.active(), () -> player.unit().isCommanding()),
+        blockInfo(() -> !(state.isCampaign() && state.rules.sector == SectorPresets.groundZero.sector && state.wave < 3), () -> ui.content.isShown()),
+        derelict(() -> ui.hints.events.contains("derelictmouse"), () -> false),
         payloadPickup(() -> !player.unit().dead && player.unit() instanceof Payloadc p && p.payloads().isEmpty(), () -> player.unit() instanceof Payloadc p && p.payloads().any()),
         payloadDrop(() -> !player.unit().dead && player.unit() instanceof Payloadc p && p.payloads().any(), () -> player.unit() instanceof Payloadc p && p.payloads().isEmpty()),
-        waveFire(() -> Groups.fire.size() > 0 && Blocks.wave.unlockedNow(), () -> indexer.getAllied(state.rules.defaultTeam, BlockFlag.extinguisher).size() > 0),
+        waveFire(() -> Groups.fire.size() > 0 && Blocks.wave.unlockedNow(), () -> indexer.getFlagged(state.rules.defaultTeam, BlockFlag.extinguisher).size > 0),
         generator(() -> control.input.block == Blocks.combustionGenerator, () -> ui.hints.placedBlocks.contains(Blocks.combustionGenerator)),
         guardian(() -> state.boss() != null && state.boss().armor >= 4, () -> state.boss() == null),
+        factoryControl(() -> !(state.isCampaign() && state.rules.sector.preset == SectorPresets.onset) &&
+            state.rules.defaultTeam.data().getBuildings(Blocks.tankFabricator).size + state.rules.defaultTeam.data().getBuildings(Blocks.groundFactory).size > 0, () -> ui.hints.events.contains("factorycontrol")),
         coreUpgrade(() -> state.isCampaign() && Blocks.coreFoundation.unlocked()
             && state.rules.defaultTeam.core() != null
             && state.rules.defaultTeam.core().block == Blocks.coreShard
             && state.rules.defaultTeam.core().items.has(Blocks.coreFoundation.requirements),
             () -> ui.hints.placedBlocks.contains(Blocks.coreFoundation)),
         presetLaunch(() -> state.isCampaign()
-            && state.getSector().preset == null
-            && SectorPresets.frozenForest.unlocked()
-            && SectorPresets.frozenForest.sector.save == null,
+            && state.getSector().preset == null,
             () -> state.isCampaign() && state.getSector().preset == SectorPresets.frozenForest),
+        presetDifficulty(() -> state.isCampaign()
+            && state.getSector().preset == null
+            && state.getSector().threat >= 0.5f
+            && !SectorPresets.tarFields.sector.isCaptured(), //appear only when the player hasn't progressed much in the game yet
+            () -> state.isCampaign() && state.getSector().preset != null),
         coreIncinerate(() -> state.isCampaign() && state.rules.defaultTeam.core() != null && state.rules.defaultTeam.core().items.get(Items.copper) >= state.rules.defaultTeam.core().storageCapacity - 10, () -> false),
         coopCampaign(() -> net.client() && state.isCampaign() && SectorPresets.groundZero.sector.hasBase(), () -> false),
         ;

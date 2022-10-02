@@ -23,20 +23,21 @@ public class PowerDiode extends Block{
         group = BlockGroup.power;
         noUpdateDisabled = true;
         schematicPriority = 10;
+        envEnabled |= Env.space;
     }
 
     @Override
     public void setBars(){
         super.setBars();
 
-        bars.add("back", entity -> new Bar("bar.input", Pal.powerBar, () -> bar(entity.back())));
-        bars.add("front", entity -> new Bar("bar.output", Pal.powerBar, () -> bar(entity.front())));
+        addBar("back", entity -> new Bar("bar.input", Pal.powerBar, () -> bar(entity.back())));
+        addBar("front", entity -> new Bar("bar.output", Pal.powerBar, () -> bar(entity.front())));
     }
 
     @Override
-    public void drawRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
-        Draw.rect(fullIcon, req.drawx(), req.drawy());
-        Draw.rect(arrow, req.drawx(), req.drawy(), !rotate ? 0 : req.rotation * 90);
+    public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
+        Draw.rect(fullIcon, plan.drawx(), plan.drawy());
+        Draw.rect(arrow, plan.drawx(), plan.drawy(), !rotate ? 0 : plan.rotation * 90);
     }
 
     // battery % of the graph on either side, defaults to zero
@@ -55,7 +56,7 @@ public class PowerDiode extends Block{
         public void updateTile(){
             super.updateTile();
 
-            if(front() == null || back() == null || !back().block.hasPower || !front().block.hasPower || back().team != front().team) return;
+            if(tile == null || front() == null || back() == null || !back().block.hasPower || !front().block.hasPower || back().team != front().team) return;
 
             PowerGraph backGraph = back().power.graph;
             PowerGraph frontGraph = front().power.graph;

@@ -1,18 +1,16 @@
 package power;
 
-import arc.*;
 import arc.math.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.core.*;
 import mindustry.world.*;
-import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.power.PowerGenerator.*;
-import mindustry.world.consumers.*;
+import mindustry.world.blocks.power.*;
 import org.junit.jupiter.api.*;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.DynamicTest.dynamicTest;
+import static org.junit.jupiter.api.DynamicTest.*;
 
 /**
  * Tests code related to the power system in general, but not specific blocks.
@@ -25,7 +23,6 @@ public class PowerTests extends PowerTestFixture{
 
     @BeforeAll
     static void init(){
-        Core.graphics = new FakeGraphics();
         Vars.state = new GameState();
     }
 
@@ -135,9 +132,8 @@ public class PowerTests extends PowerTestFixture{
             powerGraph.update();
 
             assertEquals(0.0f, consumerTile.build.power.status, Mathf.FLOAT_ROUNDING_ERROR);
-            if(consumerTile.block().consumes.hasPower()){
-                ConsumePower consumePower = consumerTile.block().consumes.getPower();
-                assertFalse(consumePower.valid(consumerTile.build));
+            if(consumerTile.block().consPower != null){
+                assertEquals(0f, consumerTile.block().consPower.efficiency(consumerTile.build));
             }
         }
     }

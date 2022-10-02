@@ -1,29 +1,40 @@
 package mindustry.world.blocks.payloads;
 
+import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import arc.util.io.*;
-import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
 public class PayloadBlock extends Block{
     public float payloadSpeed = 0.7f, payloadRotateSpeed = 5f;
 
-    public @Load(value = "@-top", fallback = "factory-top-@size") TextureRegion topRegion;
-    public @Load(value = "@-out", fallback = "factory-out-@size") TextureRegion outRegion;
-    public @Load(value = "@-in", fallback = "factory-in-@size") TextureRegion inRegion;
+    public String regionSuffix = "";
+    public TextureRegion topRegion, outRegion, inRegion;
 
     public PayloadBlock(String name){
         super(name);
 
         update = true;
         sync = true;
+        group = BlockGroup.payloads;
+        envEnabled |= Env.space | Env.underwater;
+    }
+
+    @Override
+    public void load(){
+        super.load();
+
+        topRegion = Core.atlas.find(name + "-top", "factory-top-" + size + regionSuffix);
+        outRegion = Core.atlas.find(name + "-out", "factory-out-" + size + regionSuffix);
+        inRegion = Core.atlas.find(name + "-in", "factory-in-" + size + regionSuffix);
     }
 
     public static boolean blends(Building build, int direction){
@@ -78,16 +89,16 @@ public class PayloadBlock extends Block{
         }
 
         @Override
-        public boolean canControlSelect(Player player){
-            return !player.unit().spawnedByCore && this.payload == null && acceptUnitPayload(player.unit()) && player.tileOn().build == this;
+        public boolean canControlSelect(Unit unit){
+            return !unit.spawnedByCore && unit.type.allowedInPayloads && this.payload == null && acceptUnitPayload(unit) && unit.tileOn() != null && unit.tileOn().build == this;
         }
 
         @Override
-        public void onControlSelect(Player player){
+        public void onControlSelect(Unit player){
             float x = player.x, y = player.y;
-            acceptPlayerPayload(player, p -> payload = (T)p);
+            handleUnitPayload(player, p -> payload = (T)p);
             this.payVector.set(x, y).sub(this).clamp(-size * tilesize / 2f, -size * tilesize / 2f, size * tilesize / 2f, size * tilesize / 2f);
-            this.payRotation = player.unit().rotation;
+            this.payRotation = player.rotation;
         }
 
         @Override
@@ -132,6 +143,13 @@ public class PayloadBlock extends Block{
             if(payload != null && !carried) payload.dump();
         }
 
+        @Override
+        public void updateTile(){
+            if(payload != null){
+                payload.update(null, this);
+            }
+        }
+
         public boolean blends(int direction){
             return PayloadBlock.blends(this, direction);
         }
@@ -154,7 +172,7 @@ public class PayloadBlock extends Block{
             updatePayload();
 
             if(rotate){
-                payRotation = Angles.moveToward(payRotation, rotate ? rotdeg() : 90f, payloadRotateSpeed * edelta());
+                payRotation = Angles.moveToward(payRotation, block.rotate ? rotdeg() : 90f, payloadRotateSpeed * delta());
             }
             payVector.approach(Vec2.ZERO, payloadSpeed * delta());
 
@@ -168,7 +186,7 @@ public class PayloadBlock extends Block{
 
             Vec2 dest = Tmp.v1.trns(rotdeg(), size * tilesize/2f);
 
-            payRotation = Angles.moveToward(payRotation, rotdeg(), payloadRotateSpeed * edelta());
+            payRotation = Angles.moveToward(payRotation, rotdeg(), payloadRotateSpeed * delta());
             payVector.approach(dest, payloadSpeed * delta());
 
             Building front = front();
@@ -193,8 +211,14 @@ public class PayloadBlock extends Block{
         }
 
         public void dumpPayload(){
+            //translate payload forward slightly
+            float tx = Angles.trnsx(payload.rotation(), 0.1f), ty = Angles.trnsy(payload.rotation(), 0.1f);
+            payload.set(payload.x() + tx, payload.y() + ty, payload.rotation());
+
             if(payload.dump()){
                 payload = null;
+            }else{
+                payload.set(payload.x() - tx, payload.y() - ty, payload.rotation());
             }
         }
 

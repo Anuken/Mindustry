@@ -30,6 +30,11 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
         return lastId++;
     }
 
+    /** Makes sure the next ID counter is higher than this number, so future entities cannot possibly use this ID. */
+    public static void checkNextId(int id){
+        lastId = Math.max(lastId, id + 1);
+    }
+
     public EntityGroup(Class<T> type, boolean spatial, boolean mapping){
         array = new Seq<>(false, 32, type);
 
@@ -40,6 +45,18 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
         if(mapping){
             map = new IntMap<>();
         }
+    }
+
+    /** @return entities with colliding IDs, or an empty array. */
+    public Seq<T> checkIDCollisions(){
+        Seq<T> out = new Seq<>();
+        IntSet ints = new IntSet();
+        each(u -> {
+            if(!ints.add(u.id())){
+                out.add(u);
+            }
+        });
+        return out;
     }
 
     public void sort(Comparator<? super T> comp){
@@ -80,12 +97,13 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
     public void draw(Cons<T> cons){
         Core.camera.bounds(viewport);
 
-        each(e -> {
-            Drawc draw = (Drawc)e;
-            if(viewport.overlaps(draw.x() - draw.clipSize()/2f, draw.y() - draw.clipSize()/2f, draw.clipSize(), draw.clipSize())){
-                cons.get(e);
+        for(index = 0; index < array.size; index++){
+            Drawc draw = (Drawc)array.items[index];
+            float clip = draw.clipSize();
+            if(viewport.overlaps(draw.x() - clip/2f, draw.y() - clip/2f, clip, clip)){
+                cons.get((T)draw);
             }
-        });
+        }
     }
 
     public boolean useTree(){

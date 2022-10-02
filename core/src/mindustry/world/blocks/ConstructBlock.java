@@ -8,6 +8,7 @@ import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -38,9 +39,10 @@ public class ConstructBlock extends Block{
         super("build" + size);
         this.size = size;
         update = true;
-        health = 20;
+        health = 10;
         consumesTap = true;
         solidifes = true;
+        generateIcons = false;
         inEditor = false;
         consBlocks[size - 1] = this;
         sync = true;
@@ -55,10 +57,12 @@ public class ConstructBlock extends Block{
     @Remote(called = Loc.server)
     public static void deconstructFinish(Tile tile, Block block, Unit builder){
         Team team = tile.team();
-        block.breakEffect.at(tile.drawx(), tile.drawy(), block.size, block.mapColor);
+        if(!headless && fogControl.isVisibleTile(Vars.player.team(), tile.x, tile.y)){
+            block.breakEffect.at(tile.drawx(), tile.drawy(), block.size, block.mapColor);
+            if(shouldPlay()) block.breakSound.at(tile, block.breakPitchChange ? calcPitch(false) : 1f);
+        }
         Events.fire(new BlockBuildEndEvent(tile, builder, team, true, null));
         tile.remove();
-        if(shouldPlay()) block.breakSound.at(tile, calcPitch(false));
     }
 
     @Remote(called = Loc.server)
@@ -84,6 +88,9 @@ public class ConstructBlock extends Block{
             if(builder != null && builder.getControllerName() != null){
                 tile.build.lastAccessed = builder.getControllerName();
             }
+
+            //make sure block indexer knows it's damaged
+            indexer.notifyHealthChanged(tile.build);
         }
 
         //last builder was this local client player, call placed()
@@ -91,8 +98,10 @@ public class ConstructBlock extends Block{
             tile.build.playerPlaced(config);
         }
 
-        Fx.placeBlock.at(tile.drawx(), tile.drawy(), block.size);
-        if(shouldPlay()) Sounds.place.at(tile, calcPitch(true));
+        if(fogControl.isVisibleTile(team, tile.x, tile.y)){
+            Fx.placeBlock.at(tile.drawx(), tile.drawy(), block.size);
+            if(shouldPlay()) block.placeSound.at(tile, block.placePitchChange ? calcPitch(true) : 1f);
+        }
 
         Events.fire(new BlockBuildEndEvent(tile, builder, team, false, config));
     }
@@ -219,13 +228,17 @@ public class ConstructBlock extends Block{
 
             Draw.draw(Layer.blockBuilding, () -> {
                 Draw.color(Pal.accent, Pal.remove, constructColor);
+                boolean noOverrides = current.regionRotated1 == -1 && current.regionRotated2 == -1;
+                int i = 0;
 
                 for(TextureRegion region : current.getGeneratedIcons()){
                     Shaders.blockbuild.region = region;
+                    Shaders.blockbuild.time = Time.time;
                     Shaders.blockbuild.progress = progress;
 
-                    Draw.rect(region, x, y, current.rotate ? rotdeg() : 0);
+                    Draw.rect(region, x, y, current.rotate && (noOverrides || current.regionRotated2 == i || current.regionRotated1 == i) ? rotdeg() : 0);
                     Draw.flush();
+                    i ++;
                 }
 
                 Draw.color();
@@ -297,7 +310,7 @@ public class ConstructBlock extends Block{
                 int accumulated = (int)(accumulator[i]); //get amount
 
                 if(clampedAmount > 0 && accumulated > 0){ //if it's positive, add it to the core
-                    if(core != null && requirements[i].item.unlockedNow()){ //only accept items that are unlocked
+                    if(core != null && requirements[i].item.unlockedNowHost()){ //only accept items that are unlocked
                         int accepting = Math.min(accumulated, core.storageCapacity - core.items.get(requirements[i].item));
                         //transfer items directly, as this is not production.
                         core.items.add(requirements[i].item, accepting);
@@ -361,6 +374,7 @@ public class ConstructBlock extends Block{
             this.buildCost = block.buildCost * state.rules.buildCostMultiplier;
             this.accumulator = new float[block.requirements.length];
             this.totalAccumulator = new float[block.requirements.length];
+            pathfinder.updateTile(tile);
         }
 
         public void setDeconstruct(Block previous){
@@ -374,6 +388,7 @@ public class ConstructBlock extends Block{
             this.buildCost = previous.buildCost * state.rules.buildCostMultiplier;
             this.accumulator = new float[previous.requirements.length];
             this.totalAccumulator = new float[previous.requirements.length];
+            pathfinder.updateTile(tile);
         }
 
         @Override

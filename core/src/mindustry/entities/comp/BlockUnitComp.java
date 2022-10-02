@@ -18,9 +18,16 @@ abstract class BlockUnitComp implements Unitc{
 
         //sets up block stats
         maxHealth(tile.block.health);
-        health(tile.health());
+        health(tile.health);
         hitSize(tile.block.size * tilesize * 0.7f);
         set(tile);
+    }
+
+    @Override
+    public void add(){
+        if(tile == null){
+            throw new RuntimeException("Do not add BlockUnit entities to the game, they will simply crash. Internal use only.");
+        }
     }
 
     @Override

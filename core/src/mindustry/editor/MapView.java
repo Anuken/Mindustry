@@ -9,7 +9,6 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.*;
 import arc.scene.event.*;
-import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.graphics.*;
@@ -38,7 +37,8 @@ public class MapView extends Element implements GestureListener{
 
         for(int i = 0; i < MapEditor.brushSizes.length; i++){
             float size = MapEditor.brushSizes[i];
-            brushPolygons[i] = Geometry.pixelCircle(size, (index, x, y) -> Mathf.dst(x, y, index, index) <= index - 0.5f);
+            float mod = size % 1f;
+            brushPolygons[i] = Geometry.pixelCircle(size, (index, x, y) -> Mathf.dst(x, y, index - mod, index - mod) <= size - 0.5f);
         }
 
         Core.input.getInputProcessors().insert(0, new GestureDetector(20, 0.5f, 2, 0.15f, this));
@@ -177,11 +177,11 @@ public class MapView extends Element implements GestureListener{
     public void act(float delta){
         super.act(delta);
 
-        if(Core.scene.getKeyboardFocus() == null || !(Core.scene.getKeyboardFocus() instanceof TextField) && !Core.input.keyDown(KeyCode.controlLeft)){
+        if(Core.scene.getKeyboardFocus() == null || !Core.scene.hasField() && !Core.input.keyDown(KeyCode.controlLeft)){
             float ax = Core.input.axis(Binding.move_x);
             float ay = Core.input.axis(Binding.move_y);
-            offsetx -= ax * 15f / zoom;
-            offsety -= ay * 15f / zoom;
+            offsetx -= ax * 15 * Time.delta / zoom;
+            offsety -= ay * 15 * Time.delta / zoom;
         }
 
         if(Core.input.keyTap(KeyCode.shiftLeft)){
@@ -196,7 +196,7 @@ public class MapView extends Element implements GestureListener{
 
         if(Core.scene.getScrollFocus() != this) return;
 
-        zoom += Core.input.axis(KeyCode.scroll) / 10f * zoom;
+        zoom += Core.input.axis(Binding.zoom) / 10f * zoom;
         clampZoom();
     }
 
@@ -256,6 +256,13 @@ public class MapView extends Element implements GestureListener{
             image.setBounds(centerx - sclwidth / 2, centery - sclheight / 2, sclwidth, sclheight);
             image.draw();
 
+            Lines.stroke(2f);
+            Draw.color(Pal.bulletYellowBack);
+            Lines.line(centerx - sclwidth/2f, centery - sclheight/4f, centerx + sclwidth/2f, centery - sclheight/4f);
+            Lines.line(centerx - sclwidth/4f, centery - sclheight/2f, centerx - sclwidth/4f, centery + sclheight/2f);
+            Lines.line(centerx - sclwidth/2f, centery + sclheight/4f, centerx + sclwidth/2f, centery + sclheight/4f);
+            Lines.line(centerx + sclwidth/4f, centery - sclheight/2f, centerx + sclwidth/4f, centery + sclheight/2f);
+
             Lines.stroke(3f);
             Draw.color(Pal.accent);
             Lines.line(centerx - sclwidth/2f, centery, centerx + sclwidth/2f, centery);
@@ -293,7 +300,7 @@ public class MapView extends Element implements GestureListener{
 
                 //pencil square outline
                 if(tool == EditorTool.pencil && tool.mode == 1){
-                    Lines.square(v.x + scaling/2f, v.y + scaling/2f, scaling * (editor.brushSize + 0.5f));
+                    Lines.square(v.x + scaling/2f, v.y + scaling/2f, scaling * ((editor.brushSize == 1.5f ? 1f : editor.brushSize) + 0.5f));
                 }else{
                     Lines.poly(brushPolygons[index], v.x, v.y, scaling);
                 }

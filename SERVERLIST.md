@@ -5,6 +5,7 @@ This is done by letting clients `GET` a [JSON list of servers](https://github.co
 
 You may want to add your server to this list. The steps for getting this done are as follows:
 
+0. **Take note of the fact that modded servers are not allowed on this list.** Such servers confuse users, and there's currently no easy way to fix mod incompatibilities after a failed connection.
 1. **Ensure your server is properly moderated.** For the most part, this applies to survival servers, but PvP servers can be affected as well.
 You'll need to either hire some moderators, or make use of (currently non-existent) anti-grief and anti-curse plugins.
 *Consider enabling a rate limit:* `config messageRateLimit 2` will make it so that players can only send messages every 2 seconds, for example.

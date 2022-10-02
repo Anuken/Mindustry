@@ -7,3 +7,5 @@
 -keep class net.jpountz.** { *; }
 -keep class rhino.** { *; }
 -keep class com.android.dex.** { *; }
+
+#-printusage out.txt

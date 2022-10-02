@@ -13,11 +13,19 @@ public class SectorPreset extends UnlockableContent{
 
     public int captureWave = 0;
     public Cons<Rules> rules = rules -> rules.winWave = captureWave;
-    public boolean useAI = true;
     /** Difficulty, 0-10. */
     public float difficulty;
     public float startWaveTimeMultiplier = 2f;
     public boolean addStartingItems = false;
+    public boolean showSectorLandInfo = true;
+    /** If true, uses this sector's launch fields instead */
+    public boolean overrideLaunchDefaults = false;
+    /** Whether to allow users to specify a custom launch schematic for this map. */
+    public boolean allowLaunchSchematics = false;
+    /** Whether to allow users to specify the resources they take to this map. */
+    public boolean allowLaunchLoadout = false;
+    /** If true, switches to attack mode after waves end. */
+    public boolean attackAfterWaves = false;
 
     public SectorPreset(String name, Planet planet, int sector){
         super(name);

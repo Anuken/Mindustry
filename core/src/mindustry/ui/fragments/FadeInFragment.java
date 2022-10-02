@@ -7,11 +7,10 @@ import arc.scene.*;
 import arc.scene.event.*;
 
 /** Fades in a black overlay.*/
-public class FadeInFragment extends Fragment{
+public class FadeInFragment{
     private static final float duration = 40f;
     float time = 0f;
 
-    @Override
     public void build(Group parent){
         parent.addChild(new Element(){
             {

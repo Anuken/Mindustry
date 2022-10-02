@@ -1,0 +1,1 @@
+Kaynak yönetimine odaklanan açık uçlu bir kule savunma oyunu.

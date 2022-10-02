@@ -1,20 +1,22 @@
 package mindustry.editor;
 
-import arc.func.*;
 import arc.math.*;
 import arc.scene.ui.TextField.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.ui.dialogs.*;
+
 import static mindustry.Vars.*;
 
 public class MapResizeDialog extends BaseDialog{
-    public static int minSize = 50, maxSize = 500, increment = 50;
+    public static int minSize = 50, maxSize = 600, increment = 50;
 
-    int width, height;
+    int width, height, shiftX, shiftY;
 
-    public MapResizeDialog(Intc2 cons){
+    public MapResizeDialog(ResizeListener cons){
         super("@editor.resizemap");
+
+        closeOnBack();
         shown(() -> {
             cont.clear();
             width = editor.width();
@@ -29,10 +31,23 @@ public class MapResizeDialog extends BaseDialog{
                 table.field((w ? width : height) + "", TextFieldFilter.digitsOnly, value -> {
                     int val = Integer.parseInt(value);
                     if(w) width = val; else height = val;
-                }).valid(value -> Strings.canParsePositiveInt(value) && Integer.parseInt(value) <= maxSize && Integer.parseInt(value) >= minSize).addInputDialog(3);
+                }).valid(value -> Strings.canParsePositiveInt(value) && Integer.parseInt(value) <= maxSize && Integer.parseInt(value) >= minSize).maxTextLength(3);
 
                 table.row();
             }
+
+            for(boolean x : Mathf.booleans){
+                table.add(x ? "@editor.shiftx" : "@editor.shifty").padRight(8f);
+                table.defaults().height(60f).padTop(8);
+
+                table.field((x ? shiftX : shiftY) + "", value -> {
+                    int val = Integer.parseInt(value);
+                    if(x) shiftX = val; else shiftY = val;
+                }).valid(Strings::canParseInt).maxTextLength(3);
+
+                table.row();
+            }
+
             cont.row();
             cont.add(table);
 
@@ -41,8 +56,12 @@ public class MapResizeDialog extends BaseDialog{
         buttons.defaults().size(200f, 50f);
         buttons.button("@cancel", this::hide);
         buttons.button("@ok", () -> {
-            cons.get(width, height);
+            cons.get(width, height, shiftX, shiftY);
             hide();
         });
+    }
+
+    public interface ResizeListener{
+        void get(int width, int height, int shiftX, int shiftY);
     }
 }

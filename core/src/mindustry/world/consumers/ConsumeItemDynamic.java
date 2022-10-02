@@ -2,42 +2,38 @@ package mindustry.world.consumers;
 
 import arc.func.*;
 import arc.scene.ui.layout.*;
-import arc.struct.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
-import mindustry.world.meta.*;
+import mindustry.world.*;
 
 public class ConsumeItemDynamic extends Consume{
     public final Func<Building, ItemStack[]> items;
 
+    @SuppressWarnings("unchecked")
     public <T extends Building> ConsumeItemDynamic(Func<T, ItemStack[]> items){
         this.items = (Func<Building, ItemStack[]>)items;
     }
 
     @Override
-    public void applyItemFilter(Bits filter){
-        //this must be done dynamically
+    public void apply(Block block){
+        block.hasItems = true;
+        block.acceptsItems = true;
     }
 
     @Override
-    public ConsumeType type(){
-        return ConsumeType.item;
-    }
-
-    @Override
-    public void build(Building tile, Table table){
-        ItemStack[][] current = {items.get(tile)};
+    public void build(Building build, Table table){
+        ItemStack[][] current = {items.get(build)};
 
         table.table(cont -> {
             table.update(() -> {
-                if(current[0] != items.get(tile)){
-                    rebuild(tile, cont);
-                    current[0] = items.get(tile);
+                if(current[0] != items.get(build)){
+                    rebuild(build, cont);
+                    current[0] = items.get(build);
                 }
             });
 
-            rebuild(tile, cont);
+            rebuild(build, cont);
         });
     }
 
@@ -53,29 +49,14 @@ public class ConsumeItemDynamic extends Consume{
     }
 
     @Override
-    public String getIcon(){
-        return "icon-item";
-    }
-
-    @Override
-    public void update(Building entity){
-
-    }
-
-    @Override
-    public void trigger(Building entity){
-        for(ItemStack stack : items.get(entity)){
-            entity.items.remove(stack);
+    public void trigger(Building build){
+        for(ItemStack stack : items.get(build)){
+            build.items.remove(stack);
         }
     }
 
     @Override
-    public boolean valid(Building entity){
-        return entity.items != null && entity.items.has(items.get(entity));
-    }
-
-    @Override
-    public void display(Stats stats){
-        //should be handled by the block
+    public float efficiency(Building build){
+        return build.consumeTriggerValid() || build.items.has(items.get(build)) ? 1f : 0f;
     }
 }

@@ -3,7 +3,7 @@
 [![Build Status](https://github.com/Anuken/Mindustry/workflows/Tests/badge.svg?event=push)](https://github.com/Anuken/Mindustry/actions)
 [![Discord](https://img.shields.io/discord/391020510269669376.svg?logo=discord&logoColor=white&logoWidth=20&labelColor=7289DA&label=Discord&color=17cf48)](https://discord.gg/mindustry)  
 
-A sandbox tower defense game written in Java.
+The automation tower defense RTS, written in Java.
 
 _[Trello Board](https://trello.com/b/aE2tcUwF/mindustry-40-plans)_  
 _[Wiki](https://mindustrygame.github.io/wiki)_  
@@ -18,7 +18,7 @@ See [CONTRIBUTING](CONTRIBUTING.md).
 Bleeding-edge builds are generated automatically for every commit. You can see them [here](https://github.com/Anuken/MindustryBuilds/releases).
 
 If you'd rather compile on your own, follow these instructions.
-First, make sure you have [JDK 16](https://adoptopenjdk.net/archive.html?variant=openjdk16&jvmVariant=hotspot) installed. **Other JDK versions will not work.** Open a terminal in the Mindustry directory and run the following commands:
+First, make sure you have [JDK 16-17](https://adoptium.net/archive.html?variant=openjdk17&jvmVariant=hotspot) installed. **Other JDK versions will not work.** Open a terminal in the Mindustry directory and run the following commands:
 
 ### Windows
 
@@ -38,7 +38,7 @@ Server builds are bundled with each released build (in Releases). If you'd rathe
 
 ### Android
 
-1. Install the Android SDK [here.](https://developer.android.com/studio#downloads) Make sure you're downloading the "Command line tools only", as Android Studio is not required.
+1. Install the Android SDK [here.](https://developer.android.com/studio#command-tools) Make sure you're downloading the "Command line tools only", as Android Studio is not required.
 2. Set the `ANDROID_HOME` environment variable to point to your unzipped Android SDK directory.
 3. Run `gradlew android:assembleDebug` (or `./gradlew` if on linux/mac). This will create an unsigned APK in `android/build/outputs/apk`.
 

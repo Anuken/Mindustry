@@ -24,17 +24,32 @@ public abstract class LStatement{
     public transient @Nullable StatementElem elem;
 
     public abstract void build(Table table);
-    public abstract Color color();
+
     public abstract LInstruction build(LAssembler builder);
+
+    public LCategory category(){
+        return LCategory.unknown;
+    }
 
     public LStatement copy(){
         StringBuilder build = new StringBuilder();
         write(build);
-        Seq<LStatement> read = LAssembler.read(build.toString());
+        //assume privileged when copying, because there's no way privileged instructions can appear here anyway, and the instructions get validated on load anyway
+        Seq<LStatement> read = LAssembler.read(build.toString(), true);
         return read.size == 0 ? null : read.first();
     }
 
     public boolean hidden(){
+        return false;
+    }
+
+    /** Privileged instructions are only allowed in world processors. */
+    public boolean privileged(){
+        return false;
+    }
+
+    /** If true, this statement is considered useless with privileged processors and is not allowed in them. */
+    public boolean nonPrivileged(){
         return false;
     }
 
@@ -86,7 +101,7 @@ public abstract class LStatement{
 
     protected Cell<TextField> field(Table table, String value, Cons<String> setter){
         return table.field(value, Styles.nodeField, s -> setter.get(sanitize(s)))
-            .size(144f, 40f).pad(2f).color(table.color).maxTextLength(LAssembler.maxTokenLength).addInputDialog();
+            .size(144f, 40f).pad(2f).color(table.color).maxTextLength(LAssembler.maxTokenLength);
     }
 
     protected Cell<TextField> fields(Table table, String desc, String value, Cons<String> setter){
@@ -94,8 +109,8 @@ public abstract class LStatement{
         return field(table, value, setter).width(85f).padRight(10).left();
     }
 
-    protected void fields(Table table, String value, Cons<String> setter){
-        field(table, value, setter).width(85f);
+    protected Cell<TextField> fields(Table table, String value, Cons<String> setter){
+        return field(table, value, setter).width(85f);
     }
 
     protected void row(Table table){
@@ -104,7 +119,7 @@ public abstract class LStatement{
         }
     }
 
-    protected <T extends Enum<T>> void showSelect(Button b, T[] values, T current, Cons<T> getter, int cols, Cons<Cell> sizer){
+    protected <T> void showSelect(Button b, T[] values, T current, Cons<T> getter, int cols, Cons<Cell> sizer){
         showSelectTable(b, (t, hide) -> {
             ButtonGroup<Button> group = new ButtonGroup<>();
             int i = 0;
@@ -114,14 +129,18 @@ public abstract class LStatement{
                 sizer.get(t.button(p.toString(), Styles.logicTogglet, () -> {
                     getter.get(p);
                     hide.run();
-                }).self(c -> tooltip(c, p)).checked(current == p).group(group));
+                }).self(c -> {
+                    if(p instanceof Enum e){
+                        tooltip(c, e);
+                    }
+                }).checked(current == p).group(group));
 
                 if(++i % cols == 0) t.row();
             }
         });
     }
 
-    protected <T extends Enum<T>> void showSelect(Button b, T[] values, T current, Cons<T> getter){
+    protected <T> void showSelect(Button b, T[] values, T current, Cons<T> getter){
         showSelect(b, values, current, getter, 4, c -> {});
     }
 
@@ -175,7 +194,7 @@ public abstract class LStatement{
         t.top().pane(inner -> {
             inner.top();
             hideCons.get(inner, hide);
-        }).pad(0f).top().get().setScrollingDisabled(true, false);
+        }).pad(0f).top().scrollX(false);
 
         t.pack();
     }

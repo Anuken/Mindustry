@@ -10,7 +10,6 @@ import arc.scene.ui.ImageButton.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.async.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -22,6 +21,8 @@ import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
+
+import java.util.concurrent.*;
 
 import static mindustry.Vars.*;
 
@@ -36,8 +37,7 @@ public class MapGenerateDialog extends BaseDialog{
     int scaling = mobile ? 3 : 1;
     Table filterTable;
 
-    AsyncExecutor executor = new AsyncExecutor(1);
-    AsyncResult<Void> result;
+    Future<?> result;
     boolean generating;
 
     long[] buffer1, buffer2;
@@ -63,7 +63,7 @@ public class MapGenerateDialog extends BaseDialog{
         shown(this::setup);
         addCloseListener();
 
-        var style = Styles.cleart;
+        var style = Styles.flatt;
 
         buttons.defaults().size(180f, 64f).pad(2f);
         buttons.button("@back", Icon.left, this::hide);
@@ -232,7 +232,7 @@ public class MapGenerateDialog extends BaseDialog{
                 }else{
                     Core.scene.setScrollFocus(null);
                 }
-            }).grow().uniformX().get().setScrollingDisabled(true, false);
+            }).grow().uniformX().scrollX(false);
         }).grow();
 
         buffer1 = create();
@@ -268,30 +268,44 @@ public class MapGenerateDialog extends BaseDialog{
                     t.add().growX();
 
                     ImageButtonStyle style = Styles.geni;
-                    t.defaults().size(42f);
+                    t.defaults().size(42f).padLeft(-5f);
 
                     t.button(Icon.refresh, style, () -> {
                         filter.randomize();
                         update();
-                    });
+                    }).padLeft(-16f).tooltip("@editor.randomize");
 
-                    t.button(Icon.upOpen, style, () -> {
-                        int idx = filters.indexOf(filter);
-                        filters.swap(idx, Math.max(0, idx - 1));
+                    if(filter != filters.first()){
+                        t.button(Icon.upOpen, style, () -> {
+                            int idx = filters.indexOf(filter);
+                            filters.swap(idx, Math.max(0, idx - 1));
+                            rebuildFilters();
+                            update();
+                        }).tooltip("@editor.moveup");
+                    }
+
+                    if(filter != filters.peek()){
+                        t.button(Icon.downOpen, style, () -> {
+                            int idx = filters.indexOf(filter);
+                            filters.swap(idx, Math.min(filters.size - 1, idx + 1));
+                            rebuildFilters();
+                            update();
+                        }).tooltip("@editor.movedown");
+                    }
+
+                    t.button(Icon.copy, style, () -> {
+                        GenerateFilter copy = filter.copy();
+                        copy.randomize();
+                        filters.insert(filters.indexOf(filter) + 1, copy);
                         rebuildFilters();
                         update();
-                    });
-                    t.button(Icon.downOpen, style, () -> {
-                        int idx = filters.indexOf(filter);
-                        filters.swap(idx, Math.min(filters.size - 1, idx + 1));
-                        rebuildFilters();
-                        update();
-                    });
+                    }).tooltip("@editor.copy");
+
                     t.button(Icon.cancel, style, () -> {
                         filters.remove(filter);
                         rebuildFilters();
                         update();
-                    });
+                    }).tooltip("@waves.remove");
                 }).growX();
 
                 c.row();
@@ -309,7 +323,6 @@ public class MapGenerateDialog extends BaseDialog{
                     }
                 }).grow().left().pad(6).top();
             }).width(280f).pad(3).top().left().fillY();
-
 
             if(++i % cols == 0){
                 filterTable.row();
@@ -334,7 +347,7 @@ public class MapGenerateDialog extends BaseDialog{
 
                 if(filter.isPost() && applied) continue;
 
-                p.button((icon == '\0' ? "" : icon + " ") + filter.name(), Styles.cleart, () -> {
+                p.button((icon == '\0' ? "" : icon + " ") + filter.name(), Styles.flatt, () -> {
                     filter.randomize();
                     filters.add(filter);
                     rebuildFilters();
@@ -344,13 +357,13 @@ public class MapGenerateDialog extends BaseDialog{
                 if(++i % 3 == 0) p.row();
             }
 
-            p.button(Iconc.refresh + " " + Core.bundle.get("filter.defaultores"), Styles.cleart, () -> {
+            p.button(Iconc.refresh + " " + Core.bundle.get("filter.defaultores"), Styles.flatt, () -> {
                 maps.addDefaultOres(filters);
                 rebuildFilters();
                 update();
                 selection.hide();
             }).with(Table::left).get().getLabelCell().growX().left().padLeft(5).labelAlign(Align.left);
-        }).get().setScrollingDisabled(true, false);
+        }).scrollX(false);
 
         selection.addCloseButton();
         selection.show();
@@ -369,7 +382,10 @@ public class MapGenerateDialog extends BaseDialog{
 
     void apply(){
         if(result != null){
-            result.get();
+            //ignore errors yay
+            try{
+                result.get();
+            }catch(Exception e){}
         }
 
         buffer1 = null;
@@ -393,7 +409,7 @@ public class MapGenerateDialog extends BaseDialog{
 
         var copy = filters.copy();
 
-        result = executor.submit(() -> {
+        result = mainExecutor.submit(() -> {
             try{
                 int w = pixmap.width;
                 world.setGenerating(true);

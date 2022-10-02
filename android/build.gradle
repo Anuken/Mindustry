@@ -7,7 +7,7 @@ buildscript{
     }
 
     dependencies{
-        classpath 'com.android.tools.build:gradle:7.1.0-alpha02'
+        classpath 'com.android.tools.build:gradle:7.2.1'
     }
 }
 
@@ -18,20 +18,19 @@ configurations{ natives }
 repositories{
     mavenCentral()
     maven{ url "https://maven.google.com" }
-    jcenter() //remove later once google/JetBrains fixes the dependency
 }
 
 task deploy(type: Copy){
     dependsOn "assembleRelease"
 
-    from "build/outputs/apk/standard/release/android-standard-release.apk"
+    from "build/outputs/apk/release/android-release.apk"
     into "../deploy/"
-    rename("android-standard-release.apk", "${generateDeployName('android')}.apk")
+    rename("android-release.apk", "${generateDeployName('android')}.apk")
 }
 
 android{
-    buildToolsVersion '30.0.2'
-    compileSdkVersion 30
+    buildToolsVersion '31.0.0'
+    compileSdkVersion 31
     sourceSets{
         main{
             manifest.srcFile 'AndroidManifest.xml'
@@ -41,9 +40,6 @@ android{
             res.srcDirs = ['res']
             assets.srcDirs = ['assets', 'src/main/assets', '../core/assets/']
             jniLibs.srcDirs = ['libs']
-        }
-        gp{
-            java.srcDirs = ['srcgp']
         }
 
         androidTest.setRoot('tests')
@@ -60,10 +56,10 @@ android{
 
         applicationId "io.anuke.mindustry"
         minSdkVersion 14
-        targetSdkVersion 30
+        targetSdkVersion 31
         
         versionName versionNameResult
-        versionCode = (System.getenv("TRAVIS_BUILD_ID") != null ? System.getenv("TRAVIS_BUILD_ID").toInteger() : vcode)
+        versionCode = vcode
 
         if(project.hasProperty("release")){
             props['androidBuildCode'] = (vcode + 1).toString()
@@ -98,11 +94,12 @@ android{
 
     buildTypes{
         all{
+            //TODO without these lines (r8 enabled), Mindustry crashes with missing default interface method errors.
+            //WHY THE HELL ARE DEFAULT INTERFACES NOT BEING DESUGARED? WHY DID UPDATING AGP MAKE THIS HAPPEN?
+            //When I ENABLE shrinking, r8 goes and REMOVES ALL DEFAULT INTERFACE CLASSES, which breaks mods. Why?
+            //-keep class mindustry.** { *; } should *keep the classes* - WHY IS R8 REMOVING THEM?
             minifyEnabled = true
             shrinkResources = true
-            //this is the ONLY WAY I could find to force r8 to keep its filthy hands off of my default interfaces.
-            //may have undesirable side effects
-            debuggable = true
             proguardFiles("proguard-rules.pro")
         }
     }
@@ -112,18 +109,6 @@ android{
             release{
                 signingConfig signingConfigs.release
             }
-        }
-    }
-
-    // Specifies one flavor dimension.
-    flavorDimensions "version"
-    productFlavors{
-        standard{
-
-        }
-        gp{
-            applicationIdSuffix ".gp"
-            versionNameSuffix "-gp"
         }
     }
 }
@@ -137,11 +122,8 @@ dependencies{
     natives "com.github.Anuken.Arc:natives-android:${getArcHash()}"
     natives "com.github.Anuken.Arc:natives-freetype-android:${getArcHash()}"
 
-    gpImplementation "com.google.android.gms:play-services-games:21.0.0"
-    gpImplementation "com.google.android.gms:play-services-auth:19.0.0"
-
-    //android dependencies magically disappear during compilation, thanks gradle!
-    def sdkFile = new File((String)findSdkDir(), "/platforms/android-29/android.jar")
+    //TODO dynamically find best android platform jar instead of hard-coding to 30
+    def sdkFile = new File((String)findSdkDir(), "/platforms/android-30/android.jar")
     if(sdkFile.exists()) compileOnly files(sdkFile.absolutePath)
 }
 

@@ -1,9 +1,9 @@
 package mindustry.game;
 
+import arc.math.geom.*;
 import arc.util.*;
 import mindustry.core.GameState.*;
 import mindustry.ctype.*;
-import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.net.*;
 import mindustry.net.Packets.*;
@@ -32,7 +32,9 @@ public class EventType{
         teamCoreDamage,
         socketConfigChanged,
         update,
+        unitCommandChange,
         draw,
+        drawOver,
         preDraw,
         postDraw,
         uiDrawBegin,
@@ -50,12 +52,13 @@ public class EventType{
     public static class ResizeEvent{}
     public static class MapMakeEvent{}
     public static class MapPublishEvent{}
-    public static class SaveLoadEvent{}
+    public static class SaveWriteEvent{}
     public static class ClientCreateEvent{}
     public static class ServerLoadEvent{}
     public static class DisposeEvent{}
     public static class PlayEvent{}
     public static class ResetEvent{}
+    public static class HostEvent{}
     public static class WaveEvent{}
     public static class TurnEvent{}
     /** Called when the player places a line, mobile or desktop.*/
@@ -70,10 +73,25 @@ public class EventType{
     public static class ContentInitEvent{}
     /** Called when the client game is first loaded. */
     public static class ClientLoadEvent{}
+    /** Called after SoundControl registers its music. */
+    public static class MusicRegisterEvent{}
     /** Called *after* all the modded files have been added into Vars.tree */
     public static class FileTreeInitEvent{}
-    /** Called when a game begins and the world is loaded. */
+
+    /** Called when a game begins and the world tiles are loaded, just set `generating = false`. Entities are not yet loaded at this stage. */
     public static class WorldLoadEvent{}
+    /** Called when the world begin to load, just set `generating = true`. */
+    public static class WorldLoadBeginEvent{}
+    /** Called when a game begins and the world tiles are initiated. About to updates tile proximity and sets up physics for the world(Before WorldLoadEvent) */
+    public static class WorldLoadEndEvent{}
+
+    public static class SaveLoadEvent{
+        public final boolean isMap;
+
+        public SaveLoadEvent(boolean isMap){
+            this.isMap = isMap;
+        }
+    }
 
     /** Called when a sector is destroyed by waves when you're not there. */
     public static class SectorLoseEvent{
@@ -114,16 +132,6 @@ public class EventType{
 
         public SchematicCreateEvent(Schematic schematic){
             this.schematic = schematic;
-        }
-    }
-
-    public static class CommandIssueEvent{
-        public final Building tile;
-        public final UnitCommand command;
-
-        public CommandIssueEvent(Building tile, UnitCommand command){
-            this.tile = tile;
-            this.command = command;
         }
     }
 
@@ -238,6 +246,24 @@ public class EventType{
         }
     }
 
+    public static class PayloadDropEvent{
+        public final Unit carrier;
+        public final @Nullable Unit unit;
+        public final @Nullable Building build;
+
+        public PayloadDropEvent(Unit carrier, Unit unit){
+            this.carrier = carrier;
+            this.unit = unit;
+            this.build = null;
+        }
+
+        public PayloadDropEvent(Unit carrier, Building build){
+            this.carrier = carrier;
+            this.build = build;
+            this.unit = null;
+        }
+    }
+
     public static class UnitControlEvent{
         public final Player player;
         public final @Nullable Unit unit;
@@ -248,11 +274,38 @@ public class EventType{
         }
     }
 
+    public static class BuildingCommandEvent{
+        public final Player player;
+        public final Building building;
+        public final Vec2 position;
+
+        public BuildingCommandEvent(Player player, Building building, Vec2 position){
+            this.player = player;
+            this.building = building;
+            this.position = position;
+        }
+    }
+
     public static class GameOverEvent{
         public final Team winner;
 
         public GameOverEvent(Team winner){
             this.winner = winner;
+        }
+    }
+
+    /**
+     * Called when a bullet damages a building. May not be called for all damage events!
+     * This event is re-used! Never do anything to re-raise this event in the listener.
+     * */
+    public static class BuildDamageEvent{
+        public Building build;
+        public Bullet source;
+
+        public BuildDamageEvent set(Building build, Bullet source){
+            this.build = build;
+            this.source = source;
+            return this;
         }
     }
 
@@ -273,13 +326,28 @@ public class EventType{
     /**
      * Called *after* a tile has changed.
      * WARNING! This event is special: its instance is reused! Do not cache or use with a timer.
-     * Do not modify any tiles inside listeners that use this tile.
+     * Do not modify any tiles inside listener code.
      * */
     public static class TileChangeEvent{
         public Tile tile;
 
         public TileChangeEvent set(Tile tile){
             this.tile = tile;
+            return this;
+        }
+    }
+
+    /**
+     * Called after a building's team changes.
+     * Event object is reused, do not nest!
+     * */
+    public static class BuildTeamChangeEvent{
+        public Team previous;
+        public Building build;
+
+        public BuildTeamChangeEvent set(Team previous, Building build){
+            this.build = build;
+            this.previous = previous;
             return this;
         }
     }
@@ -396,14 +464,29 @@ public class EventType{
         }
     }
 
-    /** Called when a unit is created in a reconstructor or factory. */
+    /** Called when a unit is created in a reconstructor, factory or other unit. */
     public static class UnitCreateEvent{
         public final Unit unit;
-        public final Building spawner;
+        public final @Nullable Building spawner;
+        public final @Nullable Unit spawnerUnit;
 
-        public UnitCreateEvent(Unit unit, Building spawner){
+        public UnitCreateEvent(Unit unit, Building spawner, Unit spawnerUnit){
             this.unit = unit;
             this.spawner = spawner;
+            this.spawnerUnit = spawnerUnit;
+        }
+
+        public UnitCreateEvent(Unit unit, Building spawner){
+            this(unit, spawner, null);
+        }
+    }
+
+    /** Called when a unit is spawned by wave. */
+    public static class UnitSpawnEvent{
+        public final Unit unit;
+
+        public UnitSpawnEvent(Unit unit) {
+            this.unit = unit;
         }
     }
 
@@ -446,7 +529,19 @@ public class EventType{
         }
     }
 
-    /** Called after connecting; when a player receives world data and is ready to play.*/
+    /**
+     * Called after player confirmed it has received world data and is ready to play.
+     * Note that if this is the first world receival, then player.con.hasConnected is false.
+     */
+    public static class PlayerConnectionConfirmed{
+        public final Player player;
+
+        public PlayerConnectionConfirmed(Player player){
+            this.player = player;
+        }
+    }
+
+    /** Called after connecting; when a player receives world data and is ready to play. Fired only once, after initial connection. */
     public static class PlayerJoin{
         public final Player player;
 
@@ -464,6 +559,7 @@ public class EventType{
         }
     }
 
+    /** Called before a player leaves the game. */
     public static class PlayerLeave{
         public final Player player;
 
@@ -471,7 +567,7 @@ public class EventType{
             this.player = player;
         }
     }
-    
+
     public static class PlayerBanEvent{
         @Nullable
         public final Player player;
@@ -482,7 +578,7 @@ public class EventType{
             this.uuid = uuid;
         }
     }
-    
+
     public static class PlayerUnbanEvent{
         @Nullable
         public final Player player;
@@ -493,7 +589,7 @@ public class EventType{
             this.uuid = uuid;
         }
     }
-    
+
     public static class PlayerIpBanEvent{
         public final String ip;
 
@@ -501,7 +597,7 @@ public class EventType{
             this.ip = ip;
         }
     }
-    
+
     public static class PlayerIpUnbanEvent{
         public final String ip;
 
@@ -509,6 +605,16 @@ public class EventType{
             this.ip = ip;
         }
     }
-    
-}
 
+    public static class AdminRequestEvent{
+        public final Player player;
+        public final @Nullable Player other;
+        public final AdminAction action;
+
+        public AdminRequestEvent(Player player, Player other, AdminAction action){
+            this.player = player;
+            this.other = other;
+            this.action = action;
+        }
+    }
+}

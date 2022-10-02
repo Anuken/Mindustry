@@ -79,9 +79,10 @@ public interface Platform{
     }
 
     default Context getScriptContext(){
-        Context c = Context.enter();
-        c.setOptimizationLevel(9);
-        return c;
+        Context context = Context.getCurrentContext();
+        if(context == null) context = Context.enter();
+        context.setOptimizationLevel(9);
+        return context;
     }
 
     /** Update discord RPC. */
@@ -120,7 +121,7 @@ public interface Platform{
         }else{
             ui.loadAnd(() -> {
                 try{
-                    Fi result = Core.files.local(name+ "." + extension);
+                    Fi result = Core.files.local(name + "." + extension);
                     writer.write(result);
                     platform.shareFile(result);
                 }catch(Throwable e){

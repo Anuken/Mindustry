@@ -57,7 +57,7 @@ public class Weather extends UnlockableContent{
 
     public WeatherState create(float intensity, float duration){
         WeatherState entity = type.get();
-        entity.intensity(intensity);
+        entity.intensity(Mathf.clamp(intensity));
         entity.init(this);
         entity.life(duration);
         entity.add();
@@ -148,6 +148,8 @@ public class Weather extends UnlockableContent{
                 Draw.rect(region, x, y, size, size, rotation);
             }
         }
+
+        Draw.reset();
     }
 
     public static void drawRain(float sizeMin, float sizeMax, float xspeed, float yspeed, float density, float intensity, float stroke, Color color){
@@ -342,15 +344,15 @@ public class Weather extends UnlockableContent{
 
         @Override
         public void draw(){
-            if(renderer.weatherAlpha() > 0.0001f && renderer.drawWeather && Core.settings.getBool("showweather")){
+            if(renderer.weatherAlpha > 0.0001f && renderer.drawWeather && Core.settings.getBool("showweather")){
                 Draw.draw(Layer.weather, () -> {
-                    Draw.alpha(renderer.weatherAlpha() * opacity * weather.opacityMultiplier);
+                    Draw.alpha(renderer.weatherAlpha * opacity * weather.opacityMultiplier);
                     weather.drawOver(self());
                     Draw.reset();
                 });
 
                 Draw.draw(Layer.debris, () -> {
-                    Draw.alpha(renderer.weatherAlpha() * opacity * weather.opacityMultiplier);
+                    Draw.alpha(renderer.weatherAlpha * opacity * weather.opacityMultiplier);
                     weather.drawUnder(self());
                     Draw.reset();
                 });

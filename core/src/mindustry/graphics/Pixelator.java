@@ -5,6 +5,7 @@ import arc.graphics.*;
 import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
+import arc.math.*;
 import arc.util.*;
 
 import static arc.Core.*;
@@ -30,8 +31,13 @@ public class Pixelator implements Disposable{
         py = Core.camera.position.y;
         Core.camera.position.set((int)px + ((int)(camera.width) % 2 == 0 ? 0 : 0.5f), (int)py + ((int)(camera.height) % 2 == 0 ? 0 : 0.5f));
 
-        int w = (int)(Core.camera.width * renderer.landScale());
-        int h = (int)(Core.camera.height * renderer.landScale());
+        int w = (int)Core.camera.width, h = (int)Core.camera.height;
+        if(renderer.isCutscene()){
+            w = (int)(Core.camera.width * renderer.landScale() / renderer.getScale());
+            h = (int)(Core.camera.height * renderer.landScale() / renderer.getScale());
+        }
+        w = Mathf.clamp(w, 2, graphics.getWidth());
+        h = Mathf.clamp(h, 2, graphics.getHeight());
 
         buffer.resize(w, h);
 

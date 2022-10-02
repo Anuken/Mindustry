@@ -40,7 +40,7 @@ public class CustomGameDialog extends BaseDialog{
         float images = 146f;
 
         ImageButtonStyle style = new ImageButtonStyle(){{
-            up = Styles.none;
+            up = Styles.grayPanel;
             down = Styles.flatOver;
             over = Styles.flatOver;
             disabled = Styles.none;

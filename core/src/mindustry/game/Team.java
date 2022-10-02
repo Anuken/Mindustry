@@ -17,6 +17,8 @@ public class Team implements Comparable<Team>{
     public final int id;
     public final Color color;
     public final Color[] palette;
+    public final int[] palettei = new int[3];
+    public String emoji = "";
     public boolean hasPalette;
     public String name;
 
@@ -27,13 +29,13 @@ public class Team implements Comparable<Team>{
 
     public final static Team
         derelict = new Team(0, "derelict", Color.valueOf("4d4e58")),
-        sharded = new Team(1, "sharded", Pal.accent.cpy(),
-            Color.valueOf("ffd37f"), Color.valueOf("eab678"), Color.valueOf("d4816b")),
-        crux = new Team(2, "crux", Color.valueOf("f25555"),
-            Color.valueOf("fc8e6c"), Color.valueOf("f25555"), Color.valueOf("a04553")),
-        green = new Team(3, "green", Color.valueOf("54d67d")),
-        purple = new Team(4, "purple", Color.valueOf("995bb0")),
-        blue = new Team(5, "blue", Color.valueOf("5a4deb"));
+        sharded = new Team(1, "sharded", Pal.accent.cpy(), Color.valueOf("ffd37f"), Color.valueOf("eab678"), Color.valueOf("d4816b")),
+        crux = new Team(2, "crux", Color.valueOf("f25555"), Color.valueOf("fc8e6c"), Color.valueOf("f25555"), Color.valueOf("a04553")),
+        malis = new Team(3, "malis", Color.valueOf("a27ce5"), Color.valueOf("c195fb"), Color.valueOf("665c9f"), Color.valueOf("484988")),
+
+        //TODO temporarily no palettes for these teams.
+        green = new Team(4, "green", Color.valueOf("54d67d")),//Color.valueOf("96f58c"), Color.valueOf("54d67d"), Color.valueOf("28785c")),
+        blue = new Team(5, "blue", Color.valueOf("6c87fd")); //Color.valueOf("85caf9"), Color.valueOf("6c87fd"), Color.valueOf("3b3392")
 
     static{
         Mathf.rand.setSeed(8);
@@ -60,6 +62,10 @@ public class Team implements Comparable<Team>{
         palette[0] = color;
         palette[1] = color.cpy().mul(0.75f);
         palette[2] = color.cpy().mul(0.5f);
+
+        for(int i = 0; i < 3; i++){
+            palettei[i] = palette[i].rgba();
+        }
     }
 
     /** Specifies a 3-color team palette. */
@@ -69,6 +75,9 @@ public class Team implements Comparable<Team>{
         palette[0] = pal1;
         palette[1] = pal2;
         palette[2] = pal3;
+        for(int i = 0; i < 3; i++){
+            palettei[i] = palette[i].rgba();
+        }
         hasPalette = true;
     }
 
@@ -94,6 +103,21 @@ public class Team implements Comparable<Team>{
 
     public boolean active(){
         return state.teams.isActive(this);
+    }
+
+    /** @return whether this team is supposed to be AI-controlled. */
+    public boolean isAI(){
+        return (state.rules.waves || state.rules.attackMode) && this != state.rules.defaultTeam && !state.rules.pvp;
+    }
+
+    /** @return whether this team is solely comprised of AI (with no players possible). */
+    public boolean isOnlyAI(){
+        return isAI() && data().players.size == 0;
+    }
+
+    /** @return whether this team needs a flow field for "dumb" wave pathfinding. */
+    public boolean needsFlowField(){
+        return isAI() && !rules().rtsAi;
     }
 
     public boolean isEnemy(Team other){

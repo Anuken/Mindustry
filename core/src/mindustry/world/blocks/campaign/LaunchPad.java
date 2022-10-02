@@ -22,7 +22,6 @@ import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
-import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -42,7 +41,6 @@ public class LaunchPad extends Block{
         solid = true;
         update = true;
         configurable = true;
-        drawDisabled = false;
         flags = EnumSet.of(BlockFlag.launchPad);
     }
 
@@ -57,7 +55,10 @@ public class LaunchPad extends Block{
     public void setBars(){
         super.setBars();
 
-        bars.add("items", entity -> new Bar(() -> Core.bundle.format("bar.items", entity.items.total()), () -> Pal.items, () -> (float)entity.items.total() / itemCapacity));
+        addBar("items", entity -> new Bar(() -> Core.bundle.format("bar.items", entity.items.total()), () -> Pal.items, () -> (float)entity.items.total() / itemCapacity));
+
+        //TODO is "bar.launchcooldown" the right terminology?
+        addBar("progress", (LaunchPadBuild build) -> new Bar(() -> Core.bundle.get("bar.launchcooldown"), () -> Pal.ammo, () -> Mathf.clamp(build.launchCounter / launchTime)));
     }
 
     @Override
@@ -73,15 +74,10 @@ public class LaunchPad extends Block{
             return !state.isCampaign() || net.client() ? SystemCursor.arrow : super.getCursor();
         }
 
-        //cannot be disabled
-        @Override
-        public float efficiency(){
-            return power != null && (block.consumes.has(ConsumeType.power) && !block.consumes.getPower().buffered) ? power.status : 1f;
-        }
-
         @Override
         public boolean shouldConsume(){
-            return true;
+            //TODO add launch costs, maybe legacy version
+            return launchCounter < launchTime;
         }
 
         @Override
@@ -131,6 +127,8 @@ public class LaunchPad extends Block{
 
             //increment launchCounter then launch when full and base conditions are met
             if((launchCounter += edelta()) >= launchTime && items.total() >= itemCapacity){
+                //if there are item requirements, use those.
+                consume();
                 launchSound.at(x, y);
                 LaunchPayload entity = LaunchPayload.create();
                 items.each((item, amount) -> entity.stacks.add(new ItemStack(item, amount)));
@@ -149,14 +147,14 @@ public class LaunchPad extends Block{
         public void display(Table table){
             super.display(table);
 
-            if(!state.isCampaign() || net.client()) return;
+            if(!state.isCampaign() || net.client() || team != player.team()) return;
 
             table.row();
             table.label(() -> {
                 Sector dest = state.rules.sector == null ? null : state.rules.sector.info.getRealDestination();
 
                 return Core.bundle.format("launch.destination",
-                    dest == null ? Core.bundle.get("sectors.nonelaunch") :
+                    dest == null || !dest.hasBase() ? Core.bundle.get("sectors.nonelaunch") :
                     "[accent]" + dest.name());
             }).pad(4).wrap().width(200f).left();
         }
@@ -168,9 +166,9 @@ public class LaunchPad extends Block{
                 return;
             }
 
-            table.button(Icon.upOpen, Styles.clearTransi, () -> {
+            table.button(Icon.upOpen, Styles.cleari, () -> {
                 ui.planet.showSelect(state.rules.sector, other -> {
-                    if(state.isCampaign()){
+                    if(state.isCampaign() && other.planet == state.rules.sector.planet){
                         state.rules.sector.info.destination = other;
                     }
                 });
@@ -231,7 +229,8 @@ public class LaunchPad extends Block{
             Draw.z(Layer.weather - 1);
 
             TextureRegion region = blockOn() instanceof mindustry.world.blocks.campaign.LaunchPad p ? p.podRegion : Core.atlas.find("launchpod");
-            float rw = region.width * Draw.scl * scale, rh = region.height * Draw.scl * scale;
+            scale *= region.scl();
+            float rw = region.width * scale, rh = region.height * scale;
 
             Draw.alpha(alpha);
             Draw.rect(region, cx, cy, rw, rh, rotation);

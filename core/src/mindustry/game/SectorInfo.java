@@ -1,5 +1,6 @@
 package mindustry.game;
 
+import arc.func.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
@@ -21,6 +22,7 @@ public class SectorInfo{
     private static final int valueWindow = 60;
     /** refresh period of export in ticks */
     private static final float refreshPeriod = 60;
+    private static float returnf;
 
     /** Core input statistics. */
     public ObjectMap<Item, ExportStat> production = new ObjectMap<>();
@@ -76,6 +78,8 @@ public class SectorInfo{
     public int waveVersion = -1;
     /** Whether this sector was indicated to the player or not. */
     public boolean shown = false;
+    /** Temporary seq for last imported items. Do not use. */
+    public transient ItemSeq lastImported = new ItemSeq();
 
     /** Special variables for simulation. */
     public float sumHealth, sumRps, sumDps, waveHealthBase, waveHealthSlope, waveDpsBase, waveDpsSlope, bossHealth, bossDps, curEnemyHealth, curEnemyDps;
@@ -126,12 +130,18 @@ public class SectorInfo{
         //enable attack mode when there's a core.
         if(state.rules.waveTeam.core() != null){
             attack = true;
-            winWave = 0;
+            if(!state.rules.sector.planet.allowWaves){
+                winWave = 0;
+            }
         }
 
         //if there are infinite waves and no win wave, add a win wave.
-        if(winWave <= 0 && !attack){
+        if(winWave <= 0 && !attack && state.rules.sector.planet.allowWaves){
             winWave = 30;
+        }
+
+        if(state.rules.sector != null && state.rules.sector.preset != null && state.rules.sector.preset.captureWave > 0 && !state.rules.sector.planet.allowWaves){
+            winWave = state.rules.sector.preset.captureWave;
         }
 
         state.wave = wave;
@@ -189,10 +199,10 @@ public class SectorInfo{
             stat.mean = Math.min(stat.mean, rawProduction.get(item, ExportStat::new).mean);
         });
 
-        var pads = indexer.getAllied(state.rules.defaultTeam, BlockFlag.launchPad);
+        var pads = indexer.getFlagged(state.rules.defaultTeam, BlockFlag.launchPad);
 
         //disable export when launch pads are disabled, or there aren't any active ones
-        if(pads.size() == 0 || !Seq.with(pads).contains(t -> t.build.consValid())){
+        if(pads.size == 0 || !pads.contains(t -> t.efficiency > 0)){
             export.clear();
         }
 
@@ -200,7 +210,9 @@ public class SectorInfo{
             state.rules.sector.saveInfo();
         }
 
-        SectorDamage.writeParameters(this);
+        if(state.rules.sector != null && state.rules.sector.planet.allowWaveSimulation){
+            SectorDamage.writeParameters(this);
+        }
     }
 
     /** Update averages of various stats, updates some special sector logic.
@@ -238,7 +250,8 @@ public class SectorInfo{
                 production.get(item).mean = Math.min(production.get(item).mean, rawProduction.get(item).mean);
 
                 if(export.containsKey(item)){
-                    export.get(item).mean = Math.min(export.get(item).mean, Math.max(rawProduction.get(item).mean, -production.get(item).mean));
+                    //export can, at most, be the raw items being produced from factories + the items being taken from the core
+                    export.get(item).mean = Math.min(export.get(item).mean, rawProduction.get(item).mean + Math.max(-production.get(item).mean, 0));
                 }
             }
 
@@ -265,23 +278,29 @@ public class SectorInfo{
         return map;
     }
 
+    public boolean anyExports(){
+        if(export.size == 0) return false;
+        returnf = 0f;
+        export.each((i, e) -> returnf += e.mean);
+        return returnf >= 0.01f;
+    }
+
     /** @return a newly allocated map with import statistics. Use sparingly. */
     //TODO this can be a float map
-    public ObjectMap<Item, ExportStat> importStats(){
+    public ObjectMap<Item, ExportStat> importStats(Planet planet){
         ObjectMap<Item, ExportStat> imports = new ObjectMap<>();
-        //for all sectors on all planets that have bases and export to this sector
-        for(Planet planet : content.planets()){
-            for(Sector sector : planet.sectors){
-                Sector dest = sector.info.getRealDestination();
-                if(sector.hasBase() && sector.info != this && dest != null && dest.info == this){
-                    //add their exports to our imports
-                    sector.info.export.each((item, stat) -> {
-                        imports.get(item, ExportStat::new).mean += stat.mean;
-                    });
-                }
+        eachImport(planet, sector -> sector.info.export.each((item, stat) -> imports.get(item, ExportStat::new).mean += stat.mean));
+        return imports;
+    }
+
+    /** Iterates through every sector this one imports from. */
+    public void eachImport(Planet planet, Cons<Sector> cons){
+        for(Sector sector : planet.sectors){
+            Sector dest = sector.info.getRealDestination();
+            if(sector.hasBase() && sector.info != this && dest != null && dest.info == this && sector.info.anyExports()){
+                cons.get(sector);
             }
         }
-        return imports;
     }
 
     public static class ExportStat{

@@ -5,8 +5,6 @@ import arc.func.*;
 import arc.util.*;
 import mindustry.maps.*;
 
-import static mindustry.Vars.*;
-
 /** Defines preset rule sets. */
 public enum Gamemode{
     survival(rules -> {
@@ -20,12 +18,13 @@ public enum Gamemode{
     }),
     attack(rules -> {
         rules.attackMode = true;
-        rules.waves = true;
+        //TODO waves is now a bad idea
+        //rules.waves = true;
         rules.waveTimer = true;
 
-        rules.waveSpacing = 60f * Time.toMinutes;
-        rules.teams.get(rules.waveTeam).infiniteResources = true;
-    }, map -> map.teams.contains(state.rules.waveTeam.id)),
+        rules.waveSpacing = 2f * Time.toMinutes;
+        rules.waveTeam.rules().infiniteResources = true;
+    }, map -> map.teams.size > 1),
     pvp(rules -> {
         rules.pvp = true;
         rules.enemyCoreBuildRadius = 600f;

@@ -1,6 +1,5 @@
 package mindustry.maps.generators;
 
-import arc.math.*;
 import arc.math.geom.*;
 import mindustry.content.*;
 import mindustry.game.*;
@@ -21,26 +20,48 @@ public class FileMapGenerator implements WorldGenerator{
         this.preset = preset;
     }
 
+    public FileMapGenerator(Map map, SectorPreset preset){
+        this.map = map;
+        this.preset = preset;
+    }
+
+    /** If you use this constructor, make sure to override generate()! */
+    public FileMapGenerator(SectorPreset preset){
+        this(emptyMap, preset);
+    }
+
     @Override
     public void generate(Tiles tiles){
         if(map == null) throw new RuntimeException("Generator has null map, cannot be used.");
 
+        Sector sector = state.rules.sector;
+
         world.setGenerating(false);
-        SaveIO.load(map.file, world.filterContext(map));
+        SaveIO.load(map.file, world.new FilterContext(map){
+            @Override
+            public Sector getSector(){
+                return sector;
+            }
+
+            @Override
+            public void end(){
+                applyFilters();
+                //no super.end(), don't call world load event twice
+            }
+
+            @Override
+            public boolean isMap(){
+                return true;
+            }
+        });
         world.setGenerating(true);
 
-        tiles = world.tiles;
-        Item[] items = {Items.blastCompound, Items.pyratite, Items.copper, Items.thorium, Items.copper, Items.lead};
-
-        for(Tile tile : tiles){
-            if(tile.block() instanceof StorageBlock && !(tile.block() instanceof CoreBlock) && state.hasSector()){
-                for(Item content : items){
-                    if(Mathf.chance(0.2)){
-                        tile.build.items.add(content, Math.min(Mathf.random(500), tile.block().itemCapacity));
-                    }
-                }
-            }
+        //make sure sector is maintained - don't reset it after map load.
+        if(sector != null){
+            state.rules.sector = sector;
         }
+
+        tiles = world.tiles;
 
         boolean anyCores = false;
 
@@ -56,7 +77,9 @@ public class FileMapGenerator implements WorldGenerator{
             }
 
             if(tile.isCenter() && tile.block() instanceof CoreBlock && tile.team() == state.rules.defaultTeam && !anyCores){
-                Schematics.placeLaunchLoadout(tile.x, tile.y);
+                if(state.rules.sector != null && state.rules.sector.allowLaunchLoadout()){
+                    Schematics.placeLaunchLoadout(tile.x, tile.y);
+                }
                 anyCores = true;
 
                 if(preset.addStartingItems){

@@ -4,9 +4,10 @@ import arc.graphics.g2d.*;
 import arc.math.geom.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
-import mindustry.ui.*;
+import mindustry.type.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
@@ -20,12 +21,23 @@ public interface Payload extends Position{
     /** draws this payload at a position. */
     void draw();
 
+    void drawShadow(float alpha);
+
     /** @return hitbox size of the payload. */
     float size();
 
     float x();
 
     float y();
+
+    /** @return the items needed to make this payload; may be empty. */
+    ItemStack[] requirements();
+
+    /** @return the time taken to build this payload. */
+    float buildTime();
+
+    /** update this payload inside a container unit or building. either can be null. */
+    default void update(@Nullable Unit unitHolder, @Nullable Building buildingHolder){}
 
     /** @return whether this payload was dumped. */
     default boolean dump(){
@@ -48,11 +60,8 @@ public interface Payload extends Position{
     /** @return icon describing the contents. */
     TextureRegion icon();
 
-    /** @deprecated use icon() instead. */
-    @Deprecated
-    default TextureRegion icon(Cicon icon){
-        return icon();
-    }
+    /** @return content describing this payload (block or unit) */
+    UnlockableContent content();
 
     @Override
     default float getX(){
@@ -85,6 +94,7 @@ public interface Payload extends Position{
             BuildPayload payload = new BuildPayload(block, Team.derelict);
             byte version = read.b();
             payload.build.readAll(read, version);
+            payload.build.tile = emptyTile;
             return (T)payload;
         }else if(type == payloadUnit){
             byte id = read.b();

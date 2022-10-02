@@ -11,6 +11,7 @@ import arc.func.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.Log.*;
 import arc.util.serialization.*;
 import com.codedisaster.steamworks.*;
 import mindustry.*;
@@ -40,9 +41,15 @@ public class DesktopLauncher extends ClientLauncher{
                 maximized = true;
                 width = 900;
                 height = 700;
-                //enable gl3 with command-line argument
+                //enable gl3 with command-line argument (slower performance, apparently)
                 if(Structs.contains(arg, "-gl3")){
                     gl30 = true;
+                }
+                if(Structs.contains(arg, "-antialias")){
+                    samples = 16;
+                }
+                if(Structs.contains(arg, "-debug")){
+                    Log.level = LogLevel.debug;
                 }
                 setWindowIcon(FileType.internal, "icons/icon_64.png");
             }});
@@ -100,9 +107,6 @@ public class DesktopLauncher extends ClientLauncher{
                 if(SteamAPI.restartAppIfNecessary(SVars.steamID)){
                     System.exit(0);
                 }
-            }catch(NullPointerException ignored){
-                steam = false;
-                Log.info("Running in offline mode.");
             }catch(Throwable e){
                 steam = false;
                 Log.err("Failed to load Steam native libraries.");
@@ -356,12 +360,5 @@ public class DesktopLauncher extends ClientLauncher{
 
     private static void message(String message){
         SDL.SDL_ShowSimpleMessageBox(SDL.SDL_MESSAGEBOX_ERROR, "oh no", message);
-    }
-
-    private boolean validAddress(byte[] bytes){
-        if(bytes == null) return false;
-        byte[] result = new byte[8];
-        System.arraycopy(bytes, 0, result, 0, bytes.length);
-        return !new String(Base64Coder.encode(result)).equals("AAAAAAAAAOA=") && !new String(Base64Coder.encode(result)).equals("AAAAAAAAAAA=");
     }
 }

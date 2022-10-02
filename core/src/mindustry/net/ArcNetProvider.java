@@ -5,11 +5,12 @@ import arc.func.*;
 import arc.math.*;
 import arc.net.*;
 import arc.net.FrameworkMessage.*;
+import arc.net.dns.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
-import arc.util.async.*;
 import arc.util.io.*;
+import mindustry.*;
 import mindustry.net.Net.*;
 import mindustry.net.Packets.*;
 import net.jpountz.lz4.*;
@@ -18,6 +19,7 @@ import java.io.*;
 import java.net.*;
 import java.nio.*;
 import java.nio.channels.*;
+import java.util.*;
 import java.util.concurrent.*;
 
 import static mindustry.Vars.*;
@@ -25,7 +27,6 @@ import static mindustry.Vars.*;
 public class ArcNetProvider implements NetProvider{
     final Client client;
     final Prov<DatagramPacket> packetSupplier = () -> new DatagramPacket(new byte[512], 512);
-    final AsyncExecutor executor = new AsyncExecutor(Math.max(Runtime.getRuntime().availableProcessors(), 6));
 
     final Server server;
     final CopyOnWriteArrayList<ArcConnection> connections = new CopyOnWriteArrayList<>();
@@ -162,7 +163,9 @@ public class ArcNetProvider implements NetProvider{
                 client.connect(5000, ip, port, port);
                 success.run();
             }catch(Exception e){
-                net.handleException(e);
+                if(netClient.isConnecting()){
+                    net.handleException(e);
+                }
             }
         });
     }
@@ -189,8 +192,27 @@ public class ArcNetProvider implements NetProvider{
     @Override
     public void pingHost(String address, int port, Cons<Host> valid, Cons<Exception> invalid){
         try{
-            DatagramSocket socket = new DatagramSocket();
+            var host = pingHostImpl(address, port);
+            Core.app.post(() -> valid.get(host));
+        }catch(IOException e){
+            if(port == Vars.port){
+                for(var record : ArcDns.getSrvRecords("_mindustry._tcp." + address)){
+                    try{
+                        var host = pingHostImpl(record.target, record.port);
+                        Core.app.post(() -> valid.get(host));
+                        return;
+                    }catch(IOException ignored){
+                    }
+                }
+            }
+            Core.app.post(() -> invalid.get(e));
+        }
+    }
+
+    private Host pingHostImpl(String address, int port) throws IOException{
+        try(DatagramSocket socket = new DatagramSocket()){
             long time = Time.millis();
+
             socket.send(new DatagramPacket(new byte[]{-2, 1}, 2, InetAddress.getByName(address), port));
             socket.setSoTimeout(2000);
 
@@ -199,10 +221,8 @@ public class ArcNetProvider implements NetProvider{
 
             ByteBuffer buffer = ByteBuffer.wrap(packet.getData());
             Host host = NetworkIO.readServerData((int)Time.timeSinceMillis(time), packet.getAddress().getHostAddress(), buffer);
-
-            Core.app.post(() -> valid.get(host));
-        }catch(Exception e){
-            Core.app.post(() -> invalid.get(e));
+            host.port = port;
+            return host;
         }
     }
 
@@ -262,7 +282,7 @@ public class ArcNetProvider implements NetProvider{
     @Override
     public void closeServer(){
         connections.clear();
-        executor.submit(server::stop);
+        mainExecutor.submit(server::stop);
     }
 
     ArcConnection getByArcID(int id){
@@ -342,24 +362,9 @@ public class ArcNetProvider implements NetProvider{
         //for debugging total read/write speeds
         private static final boolean debug = false;
 
-        ThreadLocal<ByteBuffer> decompressBuffer = new ThreadLocal<>(){
-            @Override
-            protected ByteBuffer initialValue(){
-                return ByteBuffer.allocate(32768);
-            }
-        };
-        ThreadLocal<Reads> reads = new ThreadLocal<>(){
-            @Override
-            protected Reads initialValue(){
-                return new Reads(new ByteBufferInput(decompressBuffer.get()));
-            }
-        };
-        ThreadLocal<Writes> writes = new ThreadLocal<>(){
-            @Override
-            protected Writes initialValue(){
-                return new Writes(new ByteBufferOutput(decompressBuffer.get()));
-            }
-        };
+        ThreadLocal<ByteBuffer> decompressBuffer = Threads.local(() -> ByteBuffer.allocate(32768));
+        ThreadLocal<Reads> reads = Threads.local(() -> new Reads(new ByteBufferInput(decompressBuffer.get())));
+        ThreadLocal<Writes> writes = Threads.local(() -> new Writes(new ByteBufferOutput(decompressBuffer.get())));
 
         //for debugging network write counts
         static WindowedMean upload = new WindowedMean(5), download = new WindowedMean(5);

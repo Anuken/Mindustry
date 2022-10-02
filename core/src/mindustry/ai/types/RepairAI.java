@@ -11,9 +11,10 @@ public class RepairAI extends AIController{
 
     @Nullable Teamc avoid;
     float retreatTimer;
+    Building damagedTarget;
 
     @Override
-    protected void updateMovement(){
+    public void updateMovement(){
         if(target instanceof Building){
             boolean shoot = false;
 
@@ -27,12 +28,14 @@ public class RepairAI extends AIController{
             unit.controlWeapons(false);
         }
 
-        if(target != null){
-            if(!target.within(unit, unit.type.range * 0.65f) && target instanceof Building b && b.team == unit.team){
+        if(target != null && target instanceof Building b && b.team == unit.team){
+            if(unit.type.circleTarget){
+                circleAttack(120f);
+            }else if(!target.within(unit, unit.type.range * 0.65f)){
                 moveTo(target, unit.type.range * 0.65f);
-            }
 
-            unit.lookAt(target);
+                unit.lookAt(target);
+            }
         }
 
         //not repairing
@@ -56,15 +59,16 @@ public class RepairAI extends AIController{
     }
 
     @Override
-    protected void updateTargeting(){
-        Building target = Units.findDamagedTile(unit.team, unit.x, unit.y);
+    public void updateTargeting(){
+        if(timer.get(timerTarget, 15)){
+            damagedTarget = Units.findDamagedTile(unit.team, unit.x, unit.y);
+            if(damagedTarget instanceof ConstructBuild) damagedTarget = null;
+        }
 
-        if(target instanceof ConstructBuild) target = null;
-
-        if(target == null){
+        if(damagedTarget == null){
             super.updateTargeting();
         }else{
-            this.target = target;
+            this.target = damagedTarget;
         }
     }
 }
