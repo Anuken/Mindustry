@@ -25,16 +25,12 @@ public class BranchTreeLayout implements TreeLayout{
         secondWalk(root, -root.prelim, 0, 0);
     }
 
-    private float getWidthOrHeightOfNode(TreeNode treeNode, boolean returnWidth){
-        return returnWidth ? treeNode.calcWidth() : treeNode.height;
-    }
-
     private float getNodeThickness(TreeNode treeNode){
-        return getWidthOrHeightOfNode(treeNode, !isLevelChangeInYAxis());
+        return treeNode.height;
     }
 
-    private float getNodeSize(TreeNode treeNode){
-        return getWidthOrHeightOfNode(treeNode, isLevelChangeInYAxis());
+    private float getNodeSize(TreeNode treeNode, int levels){
+        return treeNode.calcWidth(levels);
     }
 
     private boolean isLevelChangeInYAxis(){
@@ -111,7 +107,8 @@ public class BranchTreeLayout implements TreeLayout{
     }
 
     private float getDistance(TreeNode v, TreeNode w){
-        float sizeOfNodes = getNodeSize(v) + getNodeSize(w);
+        int levels = Math.min(v.countDepth(), w.countDepth()) + 1;
+        float sizeOfNodes = getNodeSize(v, levels) + getNodeSize(w, levels);
 
         return sizeOfNodes / 2 + getGapBetweenNodes(v, w);
     }
@@ -223,7 +220,6 @@ public class BranchTreeLayout implements TreeLayout{
             if(leftSibling != null){
                 v.prelim = leftSibling.prelim + getDistance(v, leftSibling);
             }
-
         }else{
             TreeNode defaultAncestor = v.children[0];
             TreeNode previousChild = null;

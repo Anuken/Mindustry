@@ -11,7 +11,7 @@ public interface TreeLayout{
         public T parent;
 
         //internal stuff
-        public float mode, prelim, change, shift, cachedWidth = -1f;
+        public float mode, prelim, change, shift;
         public int number = -1, leaves;
         public TreeNode thread, ancestor;
 
@@ -19,15 +19,24 @@ public interface TreeLayout{
             return children == null || children.length == 0;
         }
 
-        public float calcWidth(){
-            if(children == null) return width;
-            if(cachedWidth > 0) return cachedWidth;
+        public float calcWidth(int depth){
+            if(children == null || depth == 0) return width;
 
             float cWidth = 0;
             for(T node : children){
-                cWidth += node.calcWidth();
+                cWidth += node.calcWidth(depth - 1);
             }
-            return cachedWidth = Math.max(width, cWidth);
+            return Math.max(width, cWidth);
+        }
+
+        public int countDepth(){
+            if(children == null) return 0;
+
+            int depth = 0;
+            for(T node : children){
+                depth = Math.max(depth, node.countDepth() + 1);
+            }
+            return depth;
         }
     }
 }
