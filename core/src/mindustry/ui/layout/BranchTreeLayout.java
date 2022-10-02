@@ -107,7 +107,7 @@ public class BranchTreeLayout implements TreeLayout{
     }
 
     private float getDistance(TreeNode v, TreeNode w){
-        int levels = Math.min(v.countDepth(), w.countDepth()) + 1;
+        int levels = Math.min(v.countDepth(), w.countDepth()) + 2;
         float sizeOfNodes = getNodeSize(v, levels) + getNodeSize(w, levels);
 
         return sizeOfNodes / 2 + getGapBetweenNodes(v, w);
