@@ -74,7 +74,7 @@ public class Styles{
     /** Flat, square, black background. */
     flati,
     /**Flat, square, gray background*/
-    flaty,
+    paneli,
     /** Square border. */
     squarei,
     /** Square border, toggleable. */
@@ -107,7 +107,6 @@ public class Styles{
         black3 = whiteui.tint(0f, 0f, 0f, 0.3f);
         none = whiteui.tint(0f, 0f, 0f, 0f);
         grayPanel = whiteui.tint(Pal.darkestGray);
-        flatY = whiteui.tint(Pal.accent);
         flatDown = createFlatDown();
         flatOver = whiteui.tint(Color.valueOf("454545"));
         accentDrawable = whiteui.tint(Pal.accent);
@@ -284,10 +283,10 @@ public class Styles{
             up = black;
             over = flatOver;
         }};
-        flaty = new ImageButtonStyle(){{
+        paneli = new ImageButtonStyle(){{
             up = grayPanel;
-            down = flatY;
-            over = flatY;
+            down = flatOver;
+            over = flatOver;
         }};
         squarei = new ImageButtonStyle(){{
             down = whiteui;
