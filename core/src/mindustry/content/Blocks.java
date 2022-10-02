@@ -1796,7 +1796,7 @@ public class Blocks{
             requirements(Category.effect, with(Items.silicon, 150, Items.oxide, 40, Items.thorium, 60));
             outlineColor = Pal.darkOutline;
 
-            range = 160f;
+            range = 180f;
             size = 3;
             buildSpeed = 1.5f;
 
@@ -5439,6 +5439,8 @@ public class Blocks{
         primeRefabricator = new Reconstructor("prime-refabricator"){{
             requirements(Category.units, with(Items.thorium, 250, Items.oxide, 200, Items.tungsten, 200, Items.silicon, 400));
             regionSuffix = "-dark";
+
+            researchCostMultipliers.put(Items.thorium, 0.2f);
 
             size = 5;
             consumePower(5f);
