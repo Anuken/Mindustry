@@ -26,9 +26,8 @@ public class PowerNode extends PowerBlock{
     protected static BuildPlan otherReq;
     protected static int returnInt = 0;
     protected final static ObjectSet<PowerGraph> graphs = new ObjectSet<>();
-
     /** The maximum range of all power nodes on the map */
-    public static float maxRange;
+    protected static float maxRange;
 
     public @Load("laser") TextureRegion laser;
     public @Load("laser-end") TextureRegion laserEnd;
@@ -92,14 +91,12 @@ public class PowerNode extends PowerBlock{
 
             //clear old
             for(int i = 0; i < old.size; i++){
-                int cur = old.get(i);
-                configurations.get(Integer.class).get(tile, cur);
+                configurations.get(Integer.class).get(tile, old.get(i));
             }
 
             //set new
             for(Point2 p : value){
-                int newPos = Point2.pack(p.x + tile.tileX(), p.y + tile.tileY());
-                configurations.get(Integer.class).get(tile, newPos);
+                configurations.get(Integer.class).get(tile, Point2.pack(p.x + tile.tileX(), p.y + tile.tileY()));
             }
         });
     }
