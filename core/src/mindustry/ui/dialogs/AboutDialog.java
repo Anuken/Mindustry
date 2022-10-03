@@ -12,7 +12,6 @@ import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.ui.Links.*;
 
-import javax.swing.*;
 import static mindustry.Vars.*;
 
 public class AboutDialog extends BaseDialog{
