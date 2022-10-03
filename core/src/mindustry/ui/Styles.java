@@ -24,7 +24,7 @@ import static mindustry.gen.Tex.*;
 @StyleDefaults
 public class Styles{
     //TODO all these names are inconsistent and not descriptive
-    public static Drawable black, black9, black8, black6, black3, black5, grayPanel, none, flatY, flatDown, flatOver, accentDrawable;
+    public static Drawable black, black9, black8, black6, black3, black5, grayPanel, none, flatDown, flatOver, accentDrawable;
 
     public static ButtonStyle defaultb, underlineb;
 
