@@ -82,7 +82,8 @@ public class FileMapGenerator implements WorldGenerator{
                 }
                 anyCores = true;
 
-                if(preset.addStartingItems){
+                if(preset.addStartingItems || !preset.planet.allowLaunchLoadout){
+                    tile.build.items.clear();
                     tile.build.items.add(state.rules.loadout);
                 }
             }
