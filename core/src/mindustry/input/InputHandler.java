@@ -239,6 +239,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                     ai.commandPosition(posTarget);
                 }
                 unit.lastCommanded = player.coloredName();
+                
+                //remove when other player command
+                if(!headless && player != Vars.player){
+                    control.input.selectedUnits.remove(unit);
+                }
             }
         }
 
