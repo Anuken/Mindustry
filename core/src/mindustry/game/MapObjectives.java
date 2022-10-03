@@ -473,7 +473,13 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                 if(text.startsWith("@")){
                     return Core.bundle.format(text.substring(1), timeString.toString());
                 }else{
-                    return Core.bundle.formatString(text, timeString.toString());
+                    try{
+                        return Core.bundle.formatString(text, timeString.toString());
+                    }catch(IllegalArgumentException e){
+                        //illegal text.
+                        text = "";
+                    }
+
                 }
             }
 
