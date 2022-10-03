@@ -2598,7 +2598,7 @@ public class UnitTypes{
                 y = -1f;
                 heatColor = Color.valueOf("f9350f");
                 cooldownTime = 30f;
-                bullet = new BasicBulletType(7f, 100){{
+                bullet = new BasicBulletType(7f, 110){{
                     sprite = "missile-large";
                     width = 7.5f;
                     height = 13f;
@@ -2666,7 +2666,7 @@ public class UnitTypes{
                 heatColor = Color.valueOf("f9350f");
                 cooldownTime = 80f;
 
-                bullet = new BasicBulletType(8f, 140){{
+                bullet = new BasicBulletType(8f, 150){{
                     sprite = "missile-large";
                     width = 9.5f;
                     height = 13f;
@@ -3106,7 +3106,7 @@ public class UnitTypes{
             drag = 0.1f;
             hitSize = 21f;
             rotateSpeed = 3f;
-            health = 2600;
+            health = 2900;
             armor = 7f;
             fogRadius = 40f;
             stepShake = 0f;
@@ -3158,8 +3158,6 @@ public class UnitTypes{
                 smoothReloadSpeed = 0.15f;
                 shootWarmupSpeed = 0.05f;
                 minWarmup = 0.9f;
-                shootStatus = StatusEffects.slow;
-                shootStatusDuration = reload + 1f;
                 rotationLimit = 70f;
                 rotateSpeed = 2f;
                 inaccuracy = 20f;
@@ -3220,7 +3218,7 @@ public class UnitTypes{
                         maxRange = 6f;
                         lifetime = 60f * 1.7f;
                         outlineColor = Pal.darkOutline;
-                        health = 45;
+                        health = 55;
                         lowAltitude = true;
 
                         parts.add(new FlarePart(){{
@@ -3238,7 +3236,7 @@ public class UnitTypes{
                             mirror = false;
                             reload = 1f;
                             shootOnDeath = true;
-                            bullet = new ExplosionBulletType(120f, 25f){{
+                            bullet = new ExplosionBulletType(140f, 25f){{
                                 shootEffect = new MultiEffect(Fx.massiveExplosion, new WrapEffect(Fx.dynamicSpikes, Pal.techBlue, 24f), new WaveEffect(){{
                                     colorFrom = colorTo = Pal.techBlue;
                                     sizeTo = 40f;
