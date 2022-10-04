@@ -20,7 +20,7 @@ public class MirrorFilter extends GenerateFilter{
     @Override
     public FilterOption[] options(){
         return new FilterOption[]{
-            new SliderOption("angle", () -> angle, f -> angle = (int)f, 0, 360, 45),
+            new SliderOption("angle", () -> angle, f -> angle = (int)f, 0, 360, 15),
             new ToggleOption("rotate", () -> rotate, f -> rotate = f)
         };
     }
@@ -54,19 +54,19 @@ public class MirrorFilter extends GenerateFilter{
     @Override
     public void draw(Image image){
         super.draw(image);
+        float imageGetWidth = image.getWidth()/2f;
+        float imageGetHeight = image.getHeight()/2f;
+        float size = Math.max(imageGetWidth, imageGetHeight);
 
-        Vec2 vsize = Scaling.fit.apply(image.getDrawable().getMinWidth(), image.getDrawable().getMinHeight(), image.getWidth(), image.getHeight());
-        float imageWidth = Math.max(vsize.x, vsize.y);
-        float imageHeight = Math.max(vsize.y, vsize.x);
+        Vec2 vsize = Scaling.fit.apply(image.getDrawable().getMinWidth(), image.getDrawable().getMinHeight(), imageGetWidth, imageGetHeight);
 
-        float size = Math.max(image.getWidth() *2, image.getHeight()*2);
-        Cons<Vec2> clamper = v -> v.clamp(
-            image.x + image.getWidth()/2f - imageWidth/2f,
-        image.y + image.getHeight()/2f - imageHeight/2f, image.y + image.getHeight()/2f + imageHeight/2f, image.x + image.getWidth()/2f + imageWidth/2f
-        );
+        Tmp.v1.trns(angle - 90, size);
+        clipHalfLine(Tmp.v1, -vsize.x, -vsize.y, vsize.x, vsize.y);
+        Tmp.v2.set(Tmp.v1).scl(-1f); //opposite of v1
 
-        clamper.get(Tmp.v1.trns(angle - 90, size).add(image.getWidth()/2f + image.x, image.getHeight()/2f + image.y));
-        clamper.get(Tmp.v2.set(Tmp.v1).sub(image.getWidth()/2f + image.x, image.getHeight()/2f + image.y).rotate(180f).add(image.getWidth()/2f + image.x, image.getHeight()/2f + image.y));
+        //adding back the coordinates of the center of the image
+        Tmp.v1.add(imageGetWidth + image.x, imageGetHeight + image.y);
+        Tmp.v2.add(imageGetWidth + image.x, imageGetHeight + image.y);
 
         Lines.stroke(Scl.scl(3f), Pal.accent);
         Lines.line(Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y);
@@ -90,6 +90,40 @@ public class MirrorFilter extends GenerateFilter{
     }
 
     boolean left(Vec2 a, Vec2 b, Vec2 c){
-        return ((b.x - a.x)*(c.y - a.y) - (b.y - a.y)*(c.x - a.x)) > 0;
+        return ((b.x - a.x)*(c.y - a.y) > (b.y - a.y)*(c.x - a.x));
+    }
+
+    void clipHalfLine(Vec2 v, float xmin, float ymin, float xmax, float ymax){
+        //finds the coordinates of the intersection of the half line created by the vector at (0,0) with the clipping rectangle
+
+        if(v.x < 0){
+            if(v.y < 0){
+                if(v.x * ymin > v.y * xmin){
+                    v.set(xmin, xmin * v.y/v.x);
+                }else{
+                    v.set(ymin * v.x/v.y, ymin);
+                }
+            }else{
+                if(v.x * ymax < v.y * xmin){
+                    v.set(xmin, xmin * v.y/v.x);
+                }else{
+                    v.set(ymax * v.x/v.y, ymax);
+                }
+            }
+        }else{
+            if(v.y < 0){
+                if(v.x * ymin < v.y * xmax){
+                    v.set(xmax, xmax * v.y/v.x);
+                }else{
+                    v.set(ymin * v.x/v.y, ymin);
+                }
+            }else{
+                if(v.x * ymax > v.y * xmax){
+                    v.set(xmax, xmax * v.y/v.x);
+                }else{
+                    v.set(ymax * v.x/v.y, ymax);
+                }
+            }
+        }
     }
 }
