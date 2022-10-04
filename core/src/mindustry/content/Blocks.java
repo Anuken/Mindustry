@@ -1317,7 +1317,7 @@ public class Blocks{
         }};
 
         heatRouter = new HeatConductor("heat-router"){{
-            requirements(Category.crafting, with(Items.tungsten, 10, Items.graphite, 10));
+            requirements(Category.crafting, with(Items.tungsten, 15, Items.graphite, 10));
 
             researchCostMultiplier = 10f;
 
