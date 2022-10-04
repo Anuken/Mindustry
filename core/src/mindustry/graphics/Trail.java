@@ -9,7 +9,7 @@ import arc.util.*;
 public class Trail{
     public int length;
 
-    protected final FloatSeq points;
+    protected FloatSeq points;
     protected float lastX = -1, lastY = -1, lastAngle = -1, counter = 0f, lastW = 0f;
 
     public Trail(int length){

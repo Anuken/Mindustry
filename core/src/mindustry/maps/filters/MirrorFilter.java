@@ -1,6 +1,5 @@
 package mindustry.maps.filters;
 
-import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.math.geom.*;
 import arc.scene.ui.*;
@@ -95,35 +94,6 @@ public class MirrorFilter extends GenerateFilter{
 
     void clipHalfLine(Vec2 v, float xmin, float ymin, float xmax, float ymax){
         //finds the coordinates of the intersection of the half line created by the vector at (0,0) with the clipping rectangle
-
-        if(v.x < 0){
-            if(v.y < 0){
-                if(v.x * ymin > v.y * xmin){
-                    v.set(xmin, xmin * v.y/v.x);
-                }else{
-                    v.set(ymin * v.x/v.y, ymin);
-                }
-            }else{
-                if(v.x * ymax < v.y * xmin){
-                    v.set(xmin, xmin * v.y/v.x);
-                }else{
-                    v.set(ymax * v.x/v.y, ymax);
-                }
-            }
-        }else{
-            if(v.y < 0){
-                if(v.x * ymin < v.y * xmax){
-                    v.set(xmax, xmax * v.y/v.x);
-                }else{
-                    v.set(ymin * v.x/v.y, ymin);
-                }
-            }else{
-                if(v.x * ymax > v.y * xmax){
-                    v.set(xmax, xmax * v.y/v.x);
-                }else{
-                    v.set(ymax * v.x/v.y, ymax);
-                }
-            }
-        }
+        v.scl(1f / Math.max(Math.abs(v.x < 0 ? v.x / xmin : v.x / xmax), Math.abs(v.y < 0 ? v.y / ymin : v.y / ymax)));
     }
 }
