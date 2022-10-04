@@ -147,6 +147,11 @@ public class AIController implements UnitController{
             //let uncontrollable weapons do their own thing
             if(!weapon.controllable || weapon.noAttack) continue;
 
+            if(!weapon.aiControllable){
+                mount.rotate = false;
+                continue;
+            }
+
             float mountX = unit.x + Angles.trnsx(rotation, weapon.x, weapon.y),
                 mountY = unit.y + Angles.trnsy(rotation, weapon.x, weapon.y);
 
@@ -278,6 +283,10 @@ public class AIController implements UnitController{
     }
 
     public void moveTo(Position target, float circleLength, float smooth, boolean keepDistance, @Nullable Vec2 offset){
+        moveTo(target, circleLength, smooth, keepDistance, offset, false);
+    }
+
+    public void moveTo(Position target, float circleLength, float smooth, boolean keepDistance, @Nullable Vec2 offset, boolean arrive){
         if(target == null) return;
 
         vec.set(target).sub(unit);
@@ -285,6 +294,11 @@ public class AIController implements UnitController{
         float length = circleLength <= 0.001f ? 1f : Mathf.clamp((unit.dst(target) - circleLength) / smooth, -1f, 1f);
 
         vec.setLength(unit.speed() * length);
+
+        if(arrive){
+            Tmp.v3.set(-unit.vel.x / unit.type.accel * 2f, -unit.vel.y / unit.type.accel * 2f).add((target.getX() - unit.x), (target.getY() - unit.y));
+            vec.add(Tmp.v3).limit(unit.speed() * length);
+        }
 
         if(length < -0.5f){
             if(keepDistance){

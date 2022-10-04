@@ -21,7 +21,7 @@ public class ArmoredConduit extends Conduit{
     public class ArmoredConduitBuild extends ConduitBuild{
         @Override
         public boolean acceptLiquid(Building source, Liquid liquid){
-            return super.acceptLiquid(source, liquid) && (tile == null || source.block instanceof Conduit || source.block instanceof DirectionLiquidBridge ||
+            return super.acceptLiquid(source, liquid) && (tile == null || source.block instanceof Conduit || source.block instanceof DirectionLiquidBridge || source.block instanceof LiquidJunction ||
                 source.tile.absoluteRelativeTo(tile.x, tile.y) == rotation);
         }
     }

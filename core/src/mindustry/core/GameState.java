@@ -59,7 +59,7 @@ public class GameState{
     }
 
     public boolean hasSpawns(){
-        return rules.waves && !(isCampaign() && rules.attackMode);
+        return rules.waves && ((rules.waveTeam.cores().size > 0 && rules.attackMode) || rules.spawns.size > 0);
     }
 
     /** Note that being in a campaign does not necessarily mean having a sector. */

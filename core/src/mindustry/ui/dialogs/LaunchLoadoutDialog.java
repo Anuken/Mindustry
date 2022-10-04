@@ -8,7 +8,6 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
-import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -45,13 +44,46 @@ public class LaunchLoadoutDialog extends BaseDialog{
 
         ItemSeq sitems = sector.items();
 
+        //hide nonsensical items
+        ItemSeq launch = universe.getLaunchResources();
+        if(sector.planet.allowLaunchLoadout){
+            for(var item : content.items()){
+                if(sector.planet.hiddenItems.contains(item)){
+                    launch.set(item, 0);
+                }
+            }
+            universe.updateLaunchResources(launch);
+        }
+
         //updates sum requirements
         Runnable update = () -> {
             int cap = lastCapacity = (int)(sector.planet.launchCapacityMultiplier * selected.findCore().itemCapacity);
 
             //cap resources based on core type
+            ItemSeq schems = selected.requirements();
             ItemSeq resources = universe.getLaunchResources();
             resources.min(cap);
+
+            int capacity = lastCapacity;
+
+            if(!destination.allowLaunchLoadout()){
+                resources.clear();
+                //TODO this should be set to a proper loadout based on sector.
+                if(destination.preset != null){
+                    var rules = destination.preset.generator.map.rules();
+                    for(var stack : rules.loadout){
+                        if(!sector.planet.hiddenItems.contains(stack.item)){
+                            resources.add(stack.item, stack.amount);
+                        }
+                    }
+                }
+
+            }else if(getMax()){
+                for(Item item : content.items()){
+                    resources.set(item, Mathf.clamp(sitems.get(item) - schems.get(item), 0, capacity));
+                }
+            }
+
             universe.updateLaunchResources(resources);
 
             total.clear();
@@ -66,28 +98,6 @@ public class LaunchLoadoutDialog extends BaseDialog{
 
             ItemSeq schems = selected.requirements();
             ItemSeq launches = universe.getLaunchResources();
-            int capacity = lastCapacity;
-
-            if(!sector.planet.allowLaunchLoadout){
-                launches.clear();
-                //TODO this should be set to a proper loadout based on sector.
-                if(destination.preset != null){
-                    var rules = destination.preset.generator.map.rules();
-                    for(var stack : rules.loadout){
-                        if(!sector.planet.hiddenItems.contains(stack.item)){
-                            launches.add(stack.item, stack.amount);
-                        }
-                    }
-                }
-
-                universe.updateLaunchResources(launches);
-            }else if(getMax()){
-                for(Item item : content.items()){
-                    launches.set(item, Mathf.clamp(sitems.get(item) - launches.get(item), 0, capacity));
-                }
-
-                universe.updateLaunchResources(launches);
-            }
 
             for(ItemStack s : total){
                 int as = schems.get(s.item), al = launches.get(s.item);
@@ -96,7 +106,7 @@ public class LaunchLoadoutDialog extends BaseDialog{
 
                 table.image(s.item.uiIcon).left().size(iconSmall);
 
-                String amountStr = (al + as) + (sector.planet.allowLaunchLoadout ? "[gray] (" + (al + " + " + as + ")") : "");
+                String amountStr = (al + as) + (destination.allowLaunchLoadout() ? "[gray] (" + (al + " + " + as + ")") : "");
 
                 table.add(
                     sitems.has(s.item, s.amount) ? amountStr :
@@ -112,7 +122,7 @@ public class LaunchLoadoutDialog extends BaseDialog{
 
         Runnable rebuildItems = () -> rebuild.get(items);
 
-        if(sector.planet.allowLaunchLoadout){
+        if(destination.allowLaunchLoadout()){
             buttons.button("@resources.max", Icon.add, Styles.togglet, () -> {
                 setMax(!getMax());
                 update.run();
@@ -126,7 +136,7 @@ public class LaunchLoadoutDialog extends BaseDialog{
                 ItemSeq realItems = sitems.copy();
                 selected.requirements().each(realItems::remove);
 
-                loadout.show(lastCapacity, realItems, out, UnlockableContent::unlocked, out::clear, () -> {}, () -> {
+                loadout.show(lastCapacity, realItems, out, i -> i.unlocked() && !sector.planet.hiddenItems.contains(i), out::clear, () -> {}, () -> {
                     universe.updateLaunchResources(new ItemSeq(out));
                     update.run();
                     rebuildItems.run();
@@ -155,7 +165,7 @@ public class LaunchLoadoutDialog extends BaseDialog{
 
         cont.add(Core.bundle.format("launch.from", sector.name())).row();
 
-        if(sector.planet.allowLaunchSchematics){
+        if(destination.allowLaunchSchematics()){
             cont.pane(t -> {
                 int[] i = {0};
 
@@ -177,7 +187,7 @@ public class LaunchLoadoutDialog extends BaseDialog{
                     }
                 };
 
-                if(sector.planet.allowLaunchSchematics || schematics.getDefaultLoadout(core) == null){
+                if(destination.allowLaunchSchematics() || schematics.getDefaultLoadout(core) == null){
                     for(var entry : schematics.getLoadouts()){
                         if(entry.key.size <= core.size){
                             for(Schematic s : entry.value){

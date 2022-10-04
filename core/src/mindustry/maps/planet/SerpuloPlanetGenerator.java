@@ -644,7 +644,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
         float waveTimeDec = 0.4f;
 
         state.rules.waveSpacing = Mathf.lerp(60 * 65 * 2, 60f * 60f * 1f, Math.max(difficulty - waveTimeDec, 0f));
-        state.rules.waves = sector.info.waves = true;
+        state.rules.waves = true;
         state.rules.env = sector.planet.defaultEnv;
         state.rules.enemyCoreBuildRadius = 600f;
 

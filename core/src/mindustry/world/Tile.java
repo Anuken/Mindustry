@@ -658,7 +658,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
 
         table.table(t -> {
             t.left();
-            t.add(new Image(toDisplay.getDisplayIcon(this))).size(8 * 4);
+            t.add(new Image(toDisplay.getDisplayIcon(this))).scaling(Scaling.fit).size(8 * 4);
             t.labelWrap(toDisplay.getDisplayName(this)).left().width(190f).padLeft(5);
         }).growX().left();
     }

@@ -278,21 +278,6 @@ public class Universe{
         save();
     }
 
-    /** This method is expensive to call; only do so sparingly. */
-    public ItemSeq getGlobalResources(){
-        ItemSeq count = new ItemSeq();
-
-        for(Planet planet : content.planets()){
-            for(Sector sector : planet.sectors){
-                if(sector.hasSave()){
-                    count.add(sector.items());
-                }
-            }
-        }
-
-        return count;
-    }
-
     public void updateNetSeconds(int value){
         netSeconds = value;
     }

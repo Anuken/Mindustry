@@ -275,7 +275,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         });
 
         group.fill(t -> {
-            t.visible(() -> !showCancel() && block == null);
+            t.visible(() -> !showCancel() && block == null && !hasSchem());
             t.bottom().left();
             t.button("@command", Icon.units, Styles.squareTogglet, () -> {
                 commandMode = !commandMode;
@@ -980,7 +980,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         unit.hitbox(rect);
         rect.grow(4f);
 
-        player.boosting = collisions.overlapsTile(rect, unit.solidity()) || !unit.within(targetPos, 85f);
+        player.boosting = collisions.overlapsTile(rect, EntityCollisions::solid) || !unit.within(targetPos, 85f);
 
         unit.movePref(movement);
 

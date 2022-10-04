@@ -60,7 +60,7 @@ public class ModsDialog extends BaseDialog{
                 searchtxt = res;
                 rebuildBrowser();
             }).growX().get();
-            table.button(Icon.list, Styles.clearNonei, 32f, () -> {
+            table.button(Icon.list, Styles.emptyi, 32f, () -> {
                 orderDate = !orderDate;
                 rebuildBrowser();
             }).update(b -> b.getStyle().imageUp = (orderDate ? Icon.list : Icon.star)).size(40f).get()
@@ -483,7 +483,7 @@ public class ModsDialog extends BaseDialog{
                     "[accent]" + mod.name.replace("\n", "") +
                     (installed.contains(mod.repo) ? "\n[lightgray]" + Core.bundle.get("mod.installed") : "") +
                     "\n[lightgray]\uE809 " + mod.stars +
-                    (Version.isAtLeast(mod.minGameVersion) ? mod.subtitle == null ? "" : "\n[lightgray]" + Strings.truncate(mod.subtitle, maxModSubtitleLength) :
+                    (Version.isAtLeast(mod.minGameVersion) ?  "" :
                     "\n" + Core.bundle.format("mod.requiresversion", mod.minGameVersion)))
                     .width(358f).wrap().grow().pad(4f, 2f, 4f, 6f).top().left().labelAlign(Align.topLeft);
 

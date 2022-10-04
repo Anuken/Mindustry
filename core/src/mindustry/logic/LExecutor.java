@@ -57,6 +57,17 @@ public class LExecutor{
     public Team team = Team.derelict;
     public boolean privileged = false;
 
+    //yes, this is a minor memory leak, but it's probably not significant enough to matter
+    protected IntFloatMap unitTimeouts = new IntFloatMap();
+
+    boolean timeoutDone(Unit unit, float delay){
+        return Time.time >= unitTimeouts.get(unit.id) + delay;
+    }
+
+    void updateTimeout(Unit unit){
+        unitTimeouts.put(unit.id, Time.time);
+    }
+
     public boolean initialized(){
         return instructions.length > 0;
     }
@@ -428,15 +439,15 @@ public class LExecutor{
                         }
                     }
                     case payDrop -> {
-                        if(ai.payTimer > 0) return;
+                        if(!exec.timeoutDone(unit, LogicAI.transferDelay)) return;
 
                         if(unit instanceof Payloadc pay && pay.hasPayload()){
                             Call.payloadDropped(unit, unit.x, unit.y);
-                            ai.payTimer = LogicAI.transferDelay;
+                            exec.updateTimeout(unit);
                         }
                     }
                     case payTake -> {
-                        if(ai.payTimer > 0) return;
+                        if(!exec.timeoutDone(unit, LogicAI.transferDelay)) return;
 
                         if(unit instanceof Payloadc pay){
                             //units
@@ -460,7 +471,7 @@ public class LExecutor{
                                     }
                                 }
                             }
-                            ai.payTimer = LogicAI.transferDelay;
+                            exec.updateTimeout(unit);
                         }
                     }
                     case payEnter -> {
@@ -470,7 +481,7 @@ public class LExecutor{
                         }
                     }
                     case build -> {
-                        if((state.rules.logicUnitBuild || exec.privileged) && unit.canBuild() && exec.obj(p3) instanceof Block block && block.canBeBuilt()){
+                        if((state.rules.logicUnitBuild || exec.privileged) && unit.canBuild() && exec.obj(p3) instanceof Block block && block.canBeBuilt() && (block.unlockedNow() || unit.team.isAI())){
                             int x = World.toTile(x1 - block.offset/tilesize), y = World.toTile(y1 - block.offset/tilesize);
                             int rot = Mathf.mod(exec.numi(p4), 4);
 
@@ -508,7 +519,7 @@ public class LExecutor{
                         }
                     }
                     case itemDrop -> {
-                        if(ai.itemTimer > 0) return;
+                        if(!exec.timeoutDone(unit, LogicAI.transferDelay)) return;
 
                         //clear item when dropping to @air
                         if(exec.obj(p1) == Blocks.air){
@@ -516,7 +527,7 @@ public class LExecutor{
                             if(!net.client()){
                                 unit.clearItem();
                             }
-                            ai.itemTimer = LogicAI.transferDelay;
+                            exec.updateTimeout(unit);
                         }else{
                             Building build = exec.building(p1);
                             int dropped = Math.min(unit.stack.amount, exec.numi(p2));
@@ -524,13 +535,13 @@ public class LExecutor{
                                 int accepted = build.acceptStack(unit.item(), dropped, unit);
                                 if(accepted > 0){
                                     Call.transferItemTo(unit, unit.item(), accepted, unit.x, unit.y, build);
-                                    ai.itemTimer = LogicAI.transferDelay;
+                                    exec.updateTimeout(unit);
                                 }
                             }
                         }
                     }
                     case itemTake -> {
-                        if(ai.itemTimer > 0) return;
+                        if(!exec.timeoutDone(unit, LogicAI.transferDelay)) return;
 
                         Building build = exec.building(p1);
                         int amount = exec.numi(p3);
@@ -541,7 +552,7 @@ public class LExecutor{
 
                             if(taken > 0){
                                 Call.takeItems(build, item, taken, unit);
-                                ai.itemTimer = LogicAI.transferDelay;
+                                exec.updateTimeout(unit);
                             }
                         }
                     }
@@ -575,6 +586,10 @@ public class LExecutor{
 
                 if(type == LAccess.enabled && !exec.bool(p1)){
                     b.lastDisabler = exec.build;
+                }
+
+                if(type == LAccess.enabled && exec.bool(p1)){
+                    b.noSleep();
                 }
 
                 if(type.isObj && exec.var(p1).isobj){
@@ -646,12 +661,8 @@ public class LExecutor{
             int address = exec.numi(position);
             Building from = exec.building(target);
 
-            if(from instanceof MemoryBuild mem && (exec.privileged || from.team == exec.team)){
-
-                if(address >= 0 && address < mem.memory.length){
-                    mem.memory[address] = exec.num(value);
-                }
-
+            if(from instanceof MemoryBuild mem && (exec.privileged || from.team == exec.team) && address >= 0 && address < mem.memory.length){
+                mem.memory[address] = exec.num(value);
             }
         }
     }
@@ -1020,14 +1031,15 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-
+            
             if(exec.building(target) instanceof MessageBuild d && (d.team == exec.team || exec.privileged)){
 
                 d.message.setLength(0);
                 d.message.append(exec.textBuffer, 0, Math.min(exec.textBuffer.length(), maxTextBuffer));
 
-                exec.textBuffer.setLength(0);
             }
+            exec.textBuffer.setLength(0);
+
         }
     }
 
@@ -1072,7 +1084,6 @@ public class LExecutor{
         public int value;
 
         public float curTime;
-        public double wait;
         public long frameId;
 
         public WaitI(int value){
@@ -1095,6 +1106,15 @@ public class LExecutor{
                 curTime += Time.delta / 60f;
                 frameId = state.updateId;
             }
+        }
+    }
+
+    public static class StopI implements LInstruction{
+
+        @Override
+        public void run(LExecutor exec){
+            //skip back to self.
+            exec.var(varCounter).numval --;
         }
     }
 
@@ -1286,7 +1306,7 @@ public class LExecutor{
                 //TODO this can be quite laggy...
                 switch(layer){
                     case ore -> {
-                        if(b instanceof OverlayFloor o && tile.overlay() != o) tile.setOverlayNet(o);
+                        if((b instanceof OverlayFloor || b == Blocks.air) && tile.overlay() != b) tile.setOverlayNet(b);
                     }
                     case floor -> {
                         if(b instanceof Floor f && tile.floor() != f && !f.isOverlay()) tile.setFloorNet(f);
@@ -1389,6 +1409,7 @@ public class LExecutor{
                 case wave -> state.wave = exec.numi(value);
                 case currentWaveTime -> state.wavetime = exec.numf(value) * 60f;
                 case waves -> state.rules.waves = exec.bool(value);
+                case waveSending -> state.rules.waveSending = exec.bool(value);
                 case attackMode -> state.rules.attackMode = exec.bool(value);
                 case waveSpacing -> state.rules.waveSpacing = exec.numf(value) * 60f;
                 case enemyCoreBuildRadius -> state.rules.enemyCoreBuildRadius = exec.numf(value) * 8f;
@@ -1403,13 +1424,14 @@ public class LExecutor{
                 }
                 case ambientLight -> state.rules.ambientLight.fromDouble(exec.num(value));
                 case solarMultiplier -> state.rules.solarMultiplier = exec.numf(value);
-                case unitBuildSpeed, unitDamage, blockHealth, blockDamage, buildSpeed, rtsMinSquad, rtsMinWeight -> {
+                case unitBuildSpeed, unitCost, unitDamage, blockHealth, blockDamage, buildSpeed, rtsMinSquad, rtsMinWeight -> {
                     Team team = exec.team(p1);
                     if(team != null){
                         float num = exec.numf(value);
                         switch(rule){
                             case buildSpeed -> team.rules().buildSpeedMultiplier = Mathf.clamp(num, 0.001f, 50f);
                             case unitBuildSpeed -> team.rules().unitBuildSpeedMultiplier = Mathf.clamp(num, 0f, 50f);
+                            case unitCost -> team.rules().unitCostMultiplier = Math.max(num, 0f);
                             case unitDamage -> team.rules().unitDamageMultiplier = Math.max(num, 0f);
                             case blockHealth -> team.rules().blockHealthMultiplier = Math.max(num, 0.001f);
                             case blockDamage -> team.rules().blockDamageMultiplier = Math.max(num, 0f);
@@ -1621,21 +1643,30 @@ public class LExecutor{
     }
 
     public static class SpawnWaveI implements LInstruction{
+        public int natural;
         public int x, y;
 
         public SpawnWaveI(){
         }
 
-        public SpawnWaveI(int x, int y){
+        public SpawnWaveI(int natural, int x, int y){
+            this.natural = natural;
             this.x = x;
             this.y = y;
         }
 
         @Override
         public void run(LExecutor exec){
+            if(net.client()) return;
+
+            if(exec.bool(natural)){
+                logic.skipWave();
+                return;
+            }
+
             float
-            spawnX = World.unconv(exec.numf(x)),
-            spawnY = World.unconv(exec.numf(y));
+                spawnX = World.unconv(exec.numf(x)),
+                spawnY = World.unconv(exec.numf(y));
             int packed = Point2.pack(exec.numi(x), exec.numi(y));
 
             for(SpawnGroup group : state.rules.spawns){

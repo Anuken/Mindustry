@@ -64,6 +64,7 @@ public class Planets{
             lightDstFrom = 0.2f;
             clearSectorOnLose = true;
             defaultCore = Blocks.coreBastion;
+            iconColor = Color.valueOf("ff9266");
             hiddenItems.addAll(Items.serpuloItems).removeAll(Items.erekirItems);
 
             //TODO SHOULD there be lighting?
@@ -104,7 +105,9 @@ public class Planets{
             generator = new TantrosPlanetGenerator();
             meshLoader = () -> new HexMesh(this, 4);
             accessible = false;
+            visible = false;
             atmosphereColor = Color.valueOf("3db899");
+            iconColor = Color.valueOf("597be3");
             startSector = 10;
             atmosphereRadIn = -0.01f;
             atmosphereRadOut = 0.3f;
@@ -114,7 +117,6 @@ public class Planets{
             };
         }};
 
-        //TODO hide beryllium and others on load in rules
         serpulo = new Planet("serpulo", sun, 1f, 3){{
             generator = new SerpuloPlanetGenerator();
             meshLoader = () -> new HexMesh(this, 6);
@@ -131,12 +133,15 @@ public class Planets{
             allowLaunchSchematics = true;
             enemyCoreSpawnReplace = true;
             allowLaunchLoadout = true;
+            //doesn't play well with configs
+            prebuildBase = false;
             ruleSetter = r -> {
                 r.waveTeam = Team.crux;
                 r.placeRangeCheck = false;
                 r.attributes.clear();
                 r.showSpawns = false;
             };
+            iconColor = Color.valueOf("7d4dff");
             atmosphereColor = Color.valueOf("3c1b8f");
             atmosphereRadIn = 0.02f;
             atmosphereRadOut = 0.3f;
@@ -152,10 +157,6 @@ public class Planets{
             gen.carbonChance = 0.1f;
             gen.ferricChance = 0f;
         });
-
-        //define launch candidates after all planets initialize
-        //TODO how will it use the nucleus???
-        serpulo.launchCandidates.add(erekir);
     }
 
     private static Planet makeAsteroid(String name, Planet parent, Block base, Block tint, float tintThresh, int pieces, float scale, Cons<AsteroidGenerator> cgen){
@@ -169,11 +170,12 @@ public class Planets{
             accessible = false;
             clipRadius = 2f;
             defaultEnv = Env.space;
-
+            icon = "commandRally";
             generator = new AsteroidGenerator();
             cgen.get((AsteroidGenerator)generator);
 
             meshLoader = () -> {
+                iconColor = tint.mapColor;
                 Color tinted = tint.mapColor.cpy().a(1f - tint.mapColor.a);
                 Seq<GenericMesh> meshes = new Seq<>();
                 Color color = base.mapColor;

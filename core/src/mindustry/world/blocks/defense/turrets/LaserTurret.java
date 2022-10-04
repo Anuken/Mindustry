@@ -135,6 +135,11 @@ public class LaserTurret extends PowerTurret{
         }
 
         @Override
+        public float activeSoundVolume(){
+            return 1f;
+        }
+
+        @Override
         public boolean shouldActiveSound(){
             return bullets.any();
         }

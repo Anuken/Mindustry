@@ -153,6 +153,13 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     @Override
+    public void add(){
+        if(power != null){
+            power.graph.checkAdd();
+        }
+    }
+
+    @Override
     @Replace
     public int tileX(){
         return tile.x;
@@ -344,7 +351,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return calculateHeat(sideHeat, null);
     }
 
-    //TODO can cameFrom be an IntSet?
     public float calculateHeat(float[] sideHeat, @Nullable IntSet cameFrom){
         Arrays.fill(sideHeat, 0f);
         if(cameFrom != null) cameFrom.clear();
@@ -353,22 +359,31 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         for(var edge : block.getEdges()){
             Building build = nearby(edge.x, edge.y);
-            if(build != null && build.team == team && build instanceof HeatBlock heater && (!build.block.rotate || (relativeTo(build) + 2) % 4 == build.rotation)){ //TODO hacky
+            if(build != null && build.team == team && build instanceof HeatBlock heater){
 
-                //if there's a cycle, ignore its heat
-                if(!(build instanceof HeatConductorBuild hc && hc.cameFrom.contains(id()))){
-                    //heat is distributed across building size
-                    float add = heater.heat() / build.block.size;
+                boolean split = build.block instanceof HeatConductor cond && cond.splitHeat;
+                // non-routers must face us, routers must face away - next to a redirector, they're forced to face away due to cycles anyway
+                if(!build.block.rotate || (!split && (relativeTo(build) + 2) % 4 == build.rotation) || (split && relativeTo(build) != build.rotation)){ //TODO hacky
 
-                    sideHeat[Mathf.mod(relativeTo(build), 4)] += add;
-                    heat += add;
-                }
+                    //if there's a cycle, ignore its heat
+                    if(!(build instanceof HeatConductorBuild hc && hc.cameFrom.contains(id()))){
+                        //heat is distributed across building size
+                        float add = heater.heat() / build.block.size;
+                        if(split){
+                            //heat routers split heat across 3 surfaces
+                            add /= 3f;
+                        }
 
-                //register traversed cycles
-                if(cameFrom != null){
-                    cameFrom.add(build.id);
-                    if(build instanceof HeatConductorBuild hc){
-                        cameFrom.addAll(hc.cameFrom);
+                        sideHeat[Mathf.mod(relativeTo(build), 4)] += add;
+                        heat += add;
+                    }
+
+                    //register traversed cycles
+                    if(cameFrom != null){
+                        cameFrom.add(build.id);
+                        if(build instanceof HeatConductorBuild hc){
+                            cameFrom.addAll(hc.cameFrom);
+                        }
                     }
                 }
             }
@@ -848,17 +863,19 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                 float fx = (x + next.x) / 2f, fy = (y + next.y) / 2f;
 
                 Liquid other = next.liquids.current();
-                //TODO liquid reaction handler for extensibility
-                if((other.flammability > 0.3f && liquid.temperature > 0.7f) || (liquid.flammability > 0.3f && other.temperature > 0.7f)){
-                    damageContinuous(1);
-                    next.damageContinuous(1);
-                    if(Mathf.chanceDelta(0.1)){
-                        Fx.fire.at(fx, fy);
-                    }
-                }else if((liquid.temperature > 0.7f && other.temperature < 0.55f) || (other.temperature > 0.7f && liquid.temperature < 0.55f)){
-                    liquids.remove(liquid, Math.min(liquids.get(liquid), 0.7f * Time.delta));
-                    if(Mathf.chanceDelta(0.2f)){
-                        Fx.steam.at(fx, fy);
+                if(other.blockReactive && liquid.blockReactive){
+                    //TODO liquid reaction handler for extensibility
+                    if((other.flammability > 0.3f && liquid.temperature > 0.7f) || (liquid.flammability > 0.3f && other.temperature > 0.7f)){
+                        damageContinuous(1);
+                        next.damageContinuous(1);
+                        if(Mathf.chanceDelta(0.1)){
+                            Fx.fire.at(fx, fy);
+                        }
+                    }else if((liquid.temperature > 0.7f && other.temperature < 0.55f) || (other.temperature > 0.7f && liquid.temperature < 0.55f)){
+                        liquids.remove(liquid, Math.min(liquids.get(liquid), 0.7f * Time.delta));
+                        if(Mathf.chanceDelta(0.2f)){
+                            Fx.steam.at(fx, fy);
+                        }
                     }
                 }
             }
@@ -1089,6 +1106,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     /** @return whether this block should play its active sound.*/
     public boolean shouldActiveSound(){
         return false;
+    }
+
+    /** @return volume cale of active sound. */
+    public float activeSoundVolume(){
+        return 1f;
     }
 
     /** @return whether this block should play its idle sound.*/
@@ -1675,7 +1697,14 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     /** Called after efficiency is updated but before consumers are updated. Use to apply your own multiplier. */
     public void updateEfficiencyMultiplier(){
+        float scale = efficiencyScale();
+        efficiency *= scale;
+        optionalEfficiency *= scale;
+    }
 
+    /** Calculate your own efficiency multiplier. By default, this is applied in updateEfficiencyMultiplier. */
+    public float efficiencyScale(){
+        return 1f;
     }
 
     public void updateConsumption(){
@@ -1921,7 +1950,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         afterDestroyed();
     }
 
-    //TODO atrocious method and should be squished
     @Final
     @Replace
     @Override
@@ -1941,7 +1969,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         //TODO separate system for sound? AudioSource, etc
         if(!headless){
             if(sound != null){
-                sound.update(x, y, shouldActiveSound());
+                sound.update(x, y, shouldActiveSound(), activeSoundVolume());
             }
 
             if(block.ambientSound != Sounds.none && shouldAmbientSound()){

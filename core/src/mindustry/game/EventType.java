@@ -32,6 +32,7 @@ public class EventType{
         teamCoreDamage,
         socketConfigChanged,
         update,
+        unitCommandChange,
         draw,
         drawOver,
         preDraw,
@@ -76,8 +77,13 @@ public class EventType{
     public static class MusicRegisterEvent{}
     /** Called *after* all the modded files have been added into Vars.tree */
     public static class FileTreeInitEvent{}
-    /** Called when a game begins and the world tiles are loaded. Entities are not yet loaded at this stage.  */
+
+    /** Called when a game begins and the world tiles are loaded, just set `generating = false`. Entities are not yet loaded at this stage. */
     public static class WorldLoadEvent{}
+    /** Called when the world begin to load, just set `generating = true`. */
+    public static class WorldLoadBeginEvent{}
+    /** Called when a game begins and the world tiles are initiated. About to updates tile proximity and sets up physics for the world(Before WorldLoadEvent) */
+    public static class WorldLoadEndEvent{}
 
     public static class SaveLoadEvent{
         public final boolean isMap;
@@ -553,6 +559,7 @@ public class EventType{
         }
     }
 
+    /** Called before a player leaves the game. */
     public static class PlayerLeave{
         public final Player player;
 

@@ -211,6 +211,8 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean commandable;
     /** If true, the building inventory can be shown with the config. */
     public boolean allowConfigInventory = true;
+    /** Defines how large selection menus, such as that of sorters, should be. */
+    public int selectionRows = 5, selectionColumns = 4;
     /** If true, this block can be configured by logic. */
     public boolean logicConfigurable = false;
     /** Whether this block consumes touchDown events when tapped. */
@@ -324,8 +326,6 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean quickRotate = true;
     /** Main subclass. Non-anonymous. */
     public @Nullable Class<?> subclass;
-    /** Determines if this block gets a higher unloader priority. */
-    public boolean highUnloadPriority = false;
     /** Scroll position for certain blocks. */
     public float selectScroll;
     /** Building that is created for this block. Initialized in init() via reflection. Set manually if modded. */
@@ -367,6 +367,7 @@ public class Block extends UnlockableContent implements Senseable{
     public Block(String name){
         super(name);
         initBuilding();
+        selectionSize = 28f;
     }
 
     public void drawBase(Tile tile){

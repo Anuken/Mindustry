@@ -196,15 +196,20 @@ public class StatValues{
             });
         });
     }
-
     public static StatValue content(Seq<UnlockableContent> list){
+        return content(list, i -> true);
+    }
+
+    public static <T extends UnlockableContent> StatValue content(Seq<T> list, Boolf<T> check){
         return table -> table.table(l -> {
             l.left();
 
+            boolean any = false;
             for(int i = 0; i < list.size; i++){
                 var item = list.get(i);
 
-                if(item instanceof Block block && block.itemDrop != null && !block.itemDrop.unlockedNow()) continue;
+                if(!check.get(item)) continue;
+                any = true;
 
                 if(item.uiIcon.found()) l.image(item.uiIcon).size(iconSmall).padRight(2).padLeft(2).padTop(3).padBottom(3);
                 l.add(item.localizedName).left().padLeft(1).padRight(4).colspan(item.uiIcon.found() ? 1 : 2);
@@ -212,11 +217,15 @@ public class StatValues{
                     l.row();
                 }
             }
+
+            if(!any){
+                l.add("@none.inmap");
+            }
         });
     }
 
     public static StatValue blocks(Boolf<Block> pred){
-        return blocks(content.blocks().select(pred));
+        return content(content.blocks(), pred);
     }
 
     public static StatValue blocks(Seq<Block> list){
@@ -299,10 +308,14 @@ public class StatValues{
     }
 
     public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map){
-        return ammo(map, 0);
+        return ammo(map, 0, false);
     }
 
-    public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map, int indent){
+    public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map, boolean showUnit){
+        return ammo(map, 0, showUnit);
+    }
+
+    public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map, int indent, boolean showUnit){
         return table -> {
 
             table.row();
@@ -311,12 +324,12 @@ public class StatValues{
             orderedKeys.sort();
 
             for(T t : orderedKeys){
-                boolean compact = t instanceof UnitType || indent > 0;
+                boolean compact = t instanceof UnitType && !showUnit || indent > 0;
 
                 BulletType type = map.get(t);
 
                 if(type.spawnUnit != null && type.spawnUnit.weapons.size > 0){
-                    ammo(ObjectMap.of(t, type.spawnUnit.weapons.first().bullet), indent).display(table);
+                    ammo(ObjectMap.of(t, type.spawnUnit.weapons.first().bullet), indent, false).display(table);
                     return;
                 }
 
@@ -397,7 +410,7 @@ public class StatValues{
                         sep(bt, Core.bundle.format("bullet.frags", type.fragBullets));
                         bt.row();
 
-                        ammo(ObjectMap.of(t, type.fragBullet), indent + 1).display(bt);
+                        ammo(ObjectMap.of(t, type.fragBullet), indent + 1, false).display(bt);
                     }
                 }).padTop(compact ? 0 : -9).padLeft(indent * 8).left().get().background(compact ? null : Tex.underline);
 

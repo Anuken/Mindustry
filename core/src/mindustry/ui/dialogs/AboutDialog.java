@@ -45,7 +45,7 @@ public class AboutDialog extends BaseDialog{
                 continue;
             }
 
-            Table table = new Table(Tex.underline);
+            Table table = new Table(Styles.grayPanel);
             table.margin(0);
             table.table(img -> {
                 img.image().height(h - 5).width(40f).color(link.color);
@@ -54,7 +54,7 @@ public class AboutDialog extends BaseDialog{
             }).expandY();
 
             table.table(i -> {
-                i.background(Tex.buttonEdge3);
+                i.background(Styles.grayPanel);
                 i.image(link.icon);
             }).size(h - 5, h);
 
@@ -64,14 +64,14 @@ public class AboutDialog extends BaseDialog{
                 inset.labelWrap(link.description).width(w - 100f).color(Color.lightGray).growX();
             }).padLeft(8);
 
-            table.button(Icon.link, () -> {
+            table.button(Icon.link, Styles.clearNoneTogglei, () -> {
                 if(link.name.equals("wiki")) Events.fire(Trigger.openWiki);
 
                 if(!Core.app.openURI(link.link)){
                     ui.showErrorMessage("@linkfail");
                     Core.app.setClipboardText(link.link);
                 }
-            }).size(h - 5, h);
+            }).size(h - 5, h).padRight(100);
 
             in.add(table).size(w, h).padTop(5).row();
         }
