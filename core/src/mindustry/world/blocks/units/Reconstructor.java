@@ -121,6 +121,8 @@ public class Reconstructor extends UnitBlock{
             }
         }
 
+        consumeBuilder.each(c -> c.multiplier = b -> state.rules.unitCost(b.team));
+
         super.init();
     }
 
