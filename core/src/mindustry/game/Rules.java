@@ -63,8 +63,12 @@ public class Rules{
     public float solarMultiplier = 1f;
     /** How fast unit factories build units. */
     public float unitBuildSpeedMultiplier = 1f;
+    /** Multiplier of resources that units take to build. */
+    public float unitCostMultiplier = 1f;
     /** How much damage any other units deal. */
     public float unitDamageMultiplier = 1f;
+    /** If true, ghost blocks will appear upon destruction, letting builder blocks/units rebuild them. */
+    public boolean ghostBlocks = true;
     /** Whether to allow units to build with logic. */
     public boolean logicUnitBuild = true;
     /** If true, world processors no longer update. Used for testing. */
@@ -204,6 +208,10 @@ public class Rules{
         return unitBuildSpeedMultiplier * teams.get(team).unitBuildSpeedMultiplier;
     }
 
+    public float unitCost(Team team){
+        return unitCostMultiplier * teams.get(team).unitCostMultiplier;
+    }
+
     public float unitDamage(Team team){
         return unitDamageMultiplier * teams.get(team).unitDamageMultiplier;
     }
@@ -244,6 +252,8 @@ public class Rules{
         public float unitBuildSpeedMultiplier = 1f;
         /** How much damage any other units deal. */
         public float unitDamageMultiplier = 1f;
+        /** Multiplier of resources that units take to build. */
+        public float unitCostMultiplier = 1f;
         /** How much health blocks start with. */
         public float blockHealthMultiplier = 1f;
         /** How much damage blocks (turrets) deal. */

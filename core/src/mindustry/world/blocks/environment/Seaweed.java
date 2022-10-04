@@ -19,7 +19,7 @@ public class Seaweed extends Prop{
         x = tile.worldx(), y = tile.worldy(),
         rotmag = 3f, rotscl = 0.5f,
         rot = Mathf.randomSeedRange(tile.pos(), 20f) - 45 + Mathf.sin(Time.time + x, 50f * rotscl, 0.5f * rotmag) + Mathf.sin(Time.time - y, 65f * rotscl, 0.9f* rotmag) + Mathf.sin(Time.time + y - x, 85f * rotscl, 0.9f* rotmag),
-        w = region.width * Draw.scl, h = region.height * Draw.scl,
+        w = region.width * region.scl(), h = region.height * region.scl(),
         scl = 30f, mag = 0.3f;
 
         Draw.rectv(region, x, y, w, h, rot, vec -> vec.add(

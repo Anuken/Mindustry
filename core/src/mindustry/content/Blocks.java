@@ -8,8 +8,8 @@ import mindustry.entities.*;
 import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.*;
-import mindustry.entities.part.*;
 import mindustry.entities.part.DrawPart.*;
+import mindustry.entities.part.*;
 import mindustry.entities.pattern.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -73,7 +73,7 @@ public class Blocks{
     melter, separator, disassembler, sporePress, pulverizer, incinerator, coalCentrifuge,
 
     //crafting - erekir
-    siliconArcFurnace, electrolyzer, oxidationChamber, atmosphericConcentrator, electricHeater, slagHeater, phaseHeater, heatRedirector, slagIncinerator,
+    siliconArcFurnace, electrolyzer, oxidationChamber, atmosphericConcentrator, electricHeater, slagHeater, phaseHeater, heatRedirector, heatRouter, slagIncinerator,
     carbideCrucible, slagCentrifuge, surgeCrucible, cyanogenSynthesizer, phaseSynthesizer, heatReactor,
 
     //sandbox
@@ -1042,7 +1042,7 @@ public class Blocks{
 
             craftTime = 10f;
             hasLiquids = hasPower = true;
-            drawer = new DrawMulti(new DrawDefault(), new DrawLiquidRegion());
+            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(), new DrawDefault());
 
             consumePower(1f);
             consumeItem(Items.scrap, 1);
@@ -1062,6 +1062,8 @@ public class Blocks{
 
             consumePower(1.1f);
             consumeLiquid(Liquids.slag, 4f / 60f);
+
+            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(), new DrawRegion("-spinner", 3, true), new DrawDefault());
         }};
 
         disassembler = new Separator("disassembler"){{
@@ -1080,6 +1082,8 @@ public class Blocks{
             consumePower(4f);
             consumeItem(Items.scrap);
             consumeLiquid(Liquids.slag, 0.12f);
+
+            drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(), new DrawRegion("-spinner", 3, true), new DrawDefault());
         }};
 
         sporePress = new GenericCrafter("spore-press"){{
@@ -1310,6 +1314,17 @@ public class Blocks{
             size = 3;
             drawer = new DrawMulti(new DrawDefault(), new DrawHeatOutput(), new DrawHeatInput("-heat"));
             regionRotated1 = 1;
+        }};
+
+        heatRouter = new HeatConductor("heat-router"){{
+            requirements(Category.crafting, with(Items.tungsten, 10, Items.graphite, 10));
+
+            researchCostMultiplier = 10f;
+
+            size = 3;
+            drawer = new DrawMulti(new DrawDefault(), new DrawHeatOutput(-1, false), new DrawHeatOutput(), new DrawHeatOutput(1, false), new DrawHeatInput("-heat"));
+            regionRotated1 = 1;
+            splitHeat = true;
         }};
 
         slagIncinerator = new ItemIncinerator("slag-incinerator"){{
@@ -1792,7 +1807,7 @@ public class Blocks{
             requirements(Category.effect, with(Items.silicon, 150, Items.oxide, 40, Items.thorium, 60));
             outlineColor = Pal.darkOutline;
 
-            range = 160f;
+            range = 180f;
             size = 3;
             buildSpeed = 1.5f;
 
@@ -2135,6 +2150,8 @@ public class Blocks{
         liquidRouter = new LiquidRouter("liquid-router"){{
             requirements(Category.liquid, with(Items.graphite, 4, Items.metaglass, 2));
             liquidCapacity = 20f;
+            underBullets = true;
+            solid = false;
         }};
 
         liquidContainer = new LiquidRouter("liquid-container"){{
@@ -2226,6 +2243,7 @@ public class Blocks{
             liquidPadding = 3f/4f;
             researchCostMultiplier = 3;
             underBullets = true;
+            solid = false;
         }};
 
         reinforcedLiquidContainer = new LiquidRouter("reinforced-liquid-container"){{
@@ -2783,7 +2801,7 @@ public class Blocks{
         largePlasmaBore = new BeamDrill("large-plasma-bore"){{
             requirements(Category.production, with(Items.silicon, 100, Items.oxide, 25, Items.beryllium, 100, Items.tungsten, 70));
             consumePower(0.8f);
-            drillTime = 110f;
+            drillTime = 100f;
 
             tier = 5;
             size = 3;
@@ -2967,7 +2985,7 @@ public class Blocks{
         reinforcedContainer = new StorageBlock("reinforced-container"){{
             requirements(Category.effect, with(Items.tungsten, 30, Items.graphite, 40));
             size = 2;
-            itemCapacity = 75;
+            itemCapacity = 80;
             scaledHealth = 120;
             coreMerge = false;
         }};
@@ -4087,7 +4105,7 @@ public class Blocks{
 
             ammo(
             //TODO 1 more ammo type, decide on base type
-            Items.thorium, new ArtilleryBulletType(2.5f, 310, "shell"){{
+            Items.thorium, new ArtilleryBulletType(2.5f, 350, "shell"){{
                 hitEffect = new MultiEffect(Fx.titanExplosion, Fx.titanSmoke);
                 despawnEffect = Fx.none;
                 knockback = 2f;
@@ -4185,7 +4203,7 @@ public class Blocks{
                 frontColor = Color.white;
                 backColor = trailColor = hitColor = Color.sky;
                 trailChance = 0.44f;
-                ammoMultiplier = 2f;
+                ammoMultiplier = 3f;
 
                 lifetime = 34f;
                 rotationOffset = 90f;
@@ -5433,6 +5451,8 @@ public class Blocks{
             requirements(Category.units, with(Items.thorium, 250, Items.oxide, 200, Items.tungsten, 200, Items.silicon, 400));
             regionSuffix = "-dark";
 
+            researchCostMultipliers.put(Items.thorium, 0.2f);
+
             size = 5;
             consumePower(5f);
             consumeLiquid(Liquids.nitrogen, 10f / 60f);
@@ -5746,7 +5766,6 @@ public class Blocks{
             requirements(Category.logic, with(Items.copper, 90, Items.lead, 50, Items.silicon, 50));
 
             instructionsPerTick = 2;
-
             size = 1;
         }};
 
@@ -5754,9 +5773,7 @@ public class Blocks{
             requirements(Category.logic, with(Items.lead, 320, Items.silicon, 80, Items.graphite, 60, Items.thorium, 50));
 
             instructionsPerTick = 8;
-
             range = 8 * 22;
-
             size = 2;
         }};
 
@@ -5801,7 +5818,7 @@ public class Blocks{
         }};
 
         canvas = new CanvasBlock("canvas"){{
-            requirements(Category.logic, BuildVisibility.debugOnly, with(Items.silicon, 50));
+            requirements(Category.logic, BuildVisibility.shown, with(Items.silicon, 40, Items.graphite, 10));
 
             canvasSize = 12;
             padding = 7f / 4f * 2f;

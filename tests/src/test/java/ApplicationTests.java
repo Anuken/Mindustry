@@ -873,6 +873,7 @@ public class ApplicationTests{
                 Time.setDeltaProvider(() -> 1f);
 
                 logic.reset();
+                state.rules.sector = zone.sector;
                 try{
                     world.loadGenerator(zone.generator.map.width, zone.generator.map.height, zone.generator::generate);
                 }catch(SaveException e){
@@ -933,7 +934,6 @@ public class ApplicationTests{
                 }
 
                 assertEquals(1, Team.sharded.cores().size, "Sector must have one core: " + zone);
-                assertTrue(Team.sharded.core().items.total() < 1000, "Sector must not have starting resources: " + zone);
 
                 assertTrue(hasSpawnPoint, "Sector \"" + zone.name + "\" has no spawn points.");
                 assertTrue(spawner.countSpawns() > 0 || (state.rules.attackMode && state.rules.waveTeam.data().hasCore()), "Sector \"" + zone.name + "\" has no enemy spawn points: " + spawner.countSpawns());

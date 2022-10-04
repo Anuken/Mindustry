@@ -67,8 +67,28 @@ public class CommandAI extends AIController{
             return;
         }
 
+        //acquiring naval targets isn't supported yet, so use the fallback dumb AI
+        if(unit.team.isAI() && unit.team.rules().rtsAi && unit.type.naval){
+            if(fallback == null) fallback = new GroundAI();
+
+            if(fallback.unit() != unit) fallback.unit(unit);
+            fallback.updateUnit();
+            return;
+        }
+
         updateVisuals();
-        updateTargeting();
+        //only autotarget if the unit supports it
+        if((targetPos == null || nearAttackTarget(unit.x, unit.y, unit.range())) || unit.type.autoFindTarget){
+            updateTargeting();
+        }else if(attackTarget == null){
+            //if the unit does not have an attack target, is currently moving, and does not have autotargeting, stop attacking stuff
+            target = null;
+            for(var mount : unit.mounts){
+                if(mount.weapon.controllable){
+                    mount.target = null;
+                }
+            }
+        }
 
         if(attackTarget != null && invalid(attackTarget)){
             attackTarget = null;
@@ -155,7 +175,7 @@ public class CommandAI extends AIController{
                     }
 
                     //others have arrived at destination, so this one will too
-                    if(count >= Math.max(2, local.size / 2)){
+                    if(count >= Math.max(3, local.size / 2)){
                         targetPos = null;
                     }
                 }
@@ -164,13 +184,16 @@ public class CommandAI extends AIController{
         }else if(target != null){
             faceTarget();
         }
+
+        //boosting control is not supported, so just don't.
+        unit.updateBoosting(false);
     }
 
     @Override
     public void hit(Bullet bullet){
         if(unit.team.isAI() && bullet.owner instanceof Teamc teamc && teamc.team() != unit.team && attackTarget == null &&
             //can only counter-attack every few seconds to prevent rapidly changing targets
-            !(teamc instanceof Unit u && !u.checkTarget(unit.type.targetAir, unit.type.targetGround)) && timer.get(timerTarget4, 60f * 12f)){
+            !(teamc instanceof Unit u && !u.checkTarget(unit.type.targetAir, unit.type.targetGround)) && timer.get(timerTarget4, 60f * 10f)){
             commandTarget(teamc, true);
         }
     }
@@ -182,7 +205,11 @@ public class CommandAI extends AIController{
 
     @Override
     public Teamc findTarget(float x, float y, float range, boolean air, boolean ground){
-        return attackTarget == null || !attackTarget.within(x, y, range + 3f + (attackTarget instanceof Sized s ? s.hitSize()/2f : 0f)) ? super.findTarget(x, y, range, air, ground) : attackTarget;
+        return !nearAttackTarget(x, y, range) ? super.findTarget(x, y, range, air, ground) : attackTarget;
+    }
+
+    public boolean nearAttackTarget(float x, float y, float range){
+        return attackTarget != null && attackTarget.within(x, y, range + 3f + (attackTarget instanceof Sized s ? s.hitSize()/2f : 0f));
     }
 
     @Override
