@@ -9,6 +9,7 @@ import arc.scene.ui.ImageButton.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
@@ -149,7 +150,17 @@ public class CustomRulesDialog extends BaseDialog{
         number("@rules.dropzoneradius", false, f -> rules.dropZoneRadius = f * tilesize, () -> rules.dropZoneRadius / tilesize, () -> true);
 
         title("@rules.title.resourcesbuilding");
-        check("@rules.infiniteresources", b -> rules.infiniteResources = b, () -> rules.infiniteResources);
+        check("@rules.infiniteresources", b -> {
+            rules.infiniteResources = b;
+
+            //reset to serpulo if any env was enabled
+            if(!b && rules.hiddenBuildItems.isEmpty()){
+                rules.env = Planets.serpulo.defaultEnv;
+                rules.hiddenBuildItems.clear();
+                rules.hiddenBuildItems.addAll(Planets.serpulo.hiddenItems);
+                setup();
+            }
+        }, () -> rules.infiniteResources);
         check("@rules.onlydepositcore", b -> rules.onlyDepositCore = b, () -> rules.onlyDepositCore);
         check("@rules.reactorexplosions", b -> rules.reactorExplosions = b, () -> rules.reactorExplosions);
         check("@rules.schematic", b -> rules.schematicsAllowed = b, () -> rules.schematicsAllowed);
@@ -241,11 +252,13 @@ public class CustomRulesDialog extends BaseDialog{
             }
 
             t.button("@rules.anyenv", style, () -> {
-                //unlocalized for now
-                ui.showInfo("[accent]'Any' environment, or 'mixed tech', is no longer allowed.[]\n\nReasoning: Serpulo and Erekir tech were never meant to be used in the same map. They are not compatible or remotely balanced.\nI have received far too many complains in this regard.");
-
-                //rules.env = Vars.defaultEnv;
-                //rules.hiddenBuildItems.clear();
+                if(!rules.infiniteResources){
+                    //unlocalized for now
+                    ui.showInfo("[accent]'Any' environment, or 'mixed tech', is no longer allowed outside of sandbox.[]\n\nReasoning: Serpulo and Erekir tech were never meant to be used in the same map. They are not compatible or remotely balanced.\nI have received far too many complains in this regard.");
+                }else{
+                    rules.env = Vars.defaultEnv;
+                    rules.hiddenBuildItems.clear();
+                }
             }).group(group).checked(b -> rules.hiddenBuildItems.size == 0);
         }).left().fill(false).expand(false, false).row();
 

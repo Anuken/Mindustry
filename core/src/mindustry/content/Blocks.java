@@ -4192,7 +4192,7 @@ public class Blocks{
                 frontColor = Color.white;
                 backColor = trailColor = hitColor = Color.sky;
                 trailChance = 0.44f;
-                ammoMultiplier = 2f;
+                ammoMultiplier = 3f;
 
                 lifetime = 34f;
                 rotationOffset = 90f;
