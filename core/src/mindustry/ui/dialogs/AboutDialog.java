@@ -71,7 +71,7 @@ public class AboutDialog extends BaseDialog{
                     ui.showErrorMessage("@linkfail");
                     Core.app.setClipboardText(link.link);
                 }
-            }).size(h - 5, h);
+            }).size(h - 5, h).padRight(100);
 
             in.add(table).size(w, h).padTop(5).row();
         }
