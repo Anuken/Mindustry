@@ -190,7 +190,7 @@ public class CustomRulesDialog extends BaseDialog{
         }
 
         title("@rules.title.unit");
-        check("@rules.unitammo", b -> rules.unitAmmo = b, () -> rules.unitAmmo);
+        check("@rules.unitammo", b -> rules.unitAmmo = b, () -> rules.unitAmmo, () -> rules.env != Planets.erekir.defaultEnv);
         check("@rules.unitcapvariable", b -> rules.unitCapVariable = b, () -> rules.unitCapVariable);
         numberi("@rules.unitcap", f -> rules.unitCap = f, () -> rules.unitCap, -999, 999);
         number("@rules.unitdamagemultiplier", f -> rules.unitDamageMultiplier = f, () -> rules.unitDamageMultiplier);
