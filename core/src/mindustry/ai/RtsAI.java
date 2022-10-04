@@ -153,6 +153,7 @@ public class RtsAI{
         }
 
         Building defend = null;
+        boolean defendingCore = false;
 
         //there is something to defend, see if it's worth the time
         if(damaged.size > 0){
@@ -181,6 +182,10 @@ public class RtsAI{
 
                 if(debug){
                     Vars.ui.showLabel("Defend, dst = " + (int)(best.dst(ax, ay)), 8f, best.x, best.y);
+                }
+
+                if(best instanceof CoreBuild){
+                    defendingCore = true;
                 }
             }
         }
@@ -241,7 +246,9 @@ public class RtsAI{
                     }
 
                     //assign a flag, so it will be "mobilized" more easily later
-                    unit.flag = 1;
+                    if(!defendingCore){
+                        unit.flag = 1;
+                    }
                 }
             }
         }
