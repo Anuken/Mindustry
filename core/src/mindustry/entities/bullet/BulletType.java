@@ -301,6 +301,14 @@ public class BulletType extends Content implements Cloneable{
         }
     }
 
+    @Override
+    public void load(){
+        for(var part : parts){
+            part.turretShading = false;
+            part.load(null);
+        }
+    }
+
     /** @return estimated damage per shot. this can be very inaccurate. */
     public float estimateDPS(){
         float sum = damage + splashDamage*0.75f;
