@@ -191,8 +191,6 @@ public class BulletType extends Content implements Cloneable{
     public int despawnUnitCount = 1;
     /** Random offset distance from the original bullet despawn/hit coordinate. */
     public float despawnUnitRadius = 0.1f;
-    /** Name used for loading part regions. */
-    public String name;
     /** Extra visual parts for this bullet. */
     public Seq<DrawPart> parts = new Seq<>();
 
@@ -307,7 +305,7 @@ public class BulletType extends Content implements Cloneable{
     public void load(){
         for(var part : parts){
             part.turretShading = false;
-            part.load(name);
+            part.load(null);
         }
     }
 
