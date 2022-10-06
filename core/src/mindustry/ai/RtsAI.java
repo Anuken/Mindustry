@@ -7,6 +7,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.ai.types.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
@@ -25,7 +26,7 @@ public class RtsAI{
     static final Seq<Building> targets = new Seq<>();
     static final Seq<Unit> squad = new Seq<>(false);
     static final IntSet used = new IntSet();
-    static final IntSet assignedTargets = new IntSet();
+    static final IntSet assignedTargets = new IntSet(), invalidTarget = new IntSet();
     static final float squadRadius = 140f;
     static final int timeUpdate = 0, timerSpawn = 1, maxTargetsChecked = 15;
 
@@ -233,6 +234,14 @@ public class RtsAI{
 
         boolean anyDefend = defendPos != null || defendTarget != null;
 
+        invalidTarget.clear();
+
+        for(var unit : squad){
+            if(unit.controller() instanceof CommandAI ai){
+                invalidTarget.addAll(ai.unreachableBuildings);
+            }
+        }
+
         var build = anyDefend ? null : findTarget(ax, ay, units.size, dps, health, units.first().flag == 0);
 
         if(build != null || anyDefend){
@@ -267,7 +276,7 @@ public class RtsAI{
         for(var flag : flags){
             targets.addAll(Vars.indexer.getEnemy(data.team, flag));
         }
-        targets.removeAll(b -> assignedTargets.contains(b.id));
+        targets.removeAll(b -> assignedTargets.contains(b.id) || invalidTarget.contains(b.pos()));
 
         if(targets.size == 0) return null;
 
@@ -327,9 +336,9 @@ public class RtsAI{
         float timeDestroySelf = Mathf.zero(dp) ? Float.POSITIVE_INFINITY : selfHealth / dp;
 
         //other can never be destroyed | other destroys self instantly
-        if(Float.isInfinite(timeDestroyOther) | Mathf.zero(timeDestroySelf)) return 0f;
+        if(Float.isInfinite(timeDestroyOther) || Mathf.zero(timeDestroySelf)) return 0f;
         //self can never be destroyed | self destroys other instantly
-        if(Float.isInfinite(timeDestroySelf) | Mathf.zero(timeDestroyOther)) return 1f;
+        if(Float.isInfinite(timeDestroySelf) || Mathf.zero(timeDestroyOther)) return 1f;
 
         //examples:
         // self 10 sec / other 10 sec -> can destroy target with 100 % losses -> returns 1
