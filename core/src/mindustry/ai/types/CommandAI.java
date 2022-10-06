@@ -14,9 +14,12 @@ import mindustry.world.*;
 public class CommandAI extends AIController{
     protected static final float localInterval = 40f;
     protected static final Vec2 vecOut = new Vec2(), flockVec = new Vec2(), separation = new Vec2(), cohesion = new Vec2(), massCenter = new Vec2();
+    protected static final boolean[] noFound = {false};
 
     public @Nullable Vec2 targetPos;
     public @Nullable Teamc attackTarget;
+    /** All encountered unreachable buildings of this AI. Why a sequence? Because contains() is very rarely called on it. */
+    public IntSeq unreachableBuildings = new IntSeq(8);
 
     protected boolean stopAtTarget;
     protected Vec2 lastTargetPos;
@@ -133,7 +136,17 @@ public class CommandAI extends AIController{
             vecOut.set(targetPos);
 
             if(unit.isGrounded()){
-                move = Vars.controlPath.getPathPosition(unit, pathId, targetPos, vecOut);
+                move = Vars.controlPath.getPathPosition(unit, pathId, targetPos, vecOut, noFound);
+
+                //if the path is invalid, stop trying and record the end as unreachable
+                if(unit.team.isAI() && noFound[0]){
+                    if(attackTarget instanceof Building build){
+                        unreachableBuildings.addUnique(build.pos());
+                    }
+                    attackTarget = null;
+                    targetPos = null;
+                    return;
+                }
             }
 
             float engageRange = unit.type.range - 10f;
