@@ -42,6 +42,7 @@ public class GlobalVars{
         //math
         put("@pi", Mathf.PI);
         put("π", Mathf.PI); //for the "cool" kids
+        put("@e", Mathf.E);
         put("@degToRad", Mathf.degRad);
         put("@radToDeg", Mathf.radDeg);
         
