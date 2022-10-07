@@ -15,6 +15,7 @@ public enum LogicRule{
     lighting,
     ambientLight,
     solarMultiplier,
+    lightRadiusMultiplier,
 
     //team specific
     buildSpeed,
