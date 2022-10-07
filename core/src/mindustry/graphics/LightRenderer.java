@@ -55,7 +55,7 @@ public class LightRenderer{
     }
 
     public void line(float x, float y, float x2, float y2, float stroke, Color tint, float alpha){
-        if(!enabled()) return;
+        if(!enabled() || stroke <= 0f) return;
 
         add(() -> {
             Draw.color(tint, alpha);
