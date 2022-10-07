@@ -224,6 +224,7 @@ public class CustomRulesDialog extends BaseDialog{
         }
 
         number("@rules.solarmultiplier", f -> rules.solarMultiplier = f, () -> rules.solarMultiplier);
+        number("@rules.lightradiusmultiplier", f -> rules.lightRadiusMultiplier = f, () -> rules.lightRadiusMultiplier);
 
         main.button(b -> {
             b.left();
