@@ -232,12 +232,12 @@ public class Drawf{
 
     public static void light(float x, float y, float radius, Color color, float opacity){
         if(renderer == null) return;
-        renderer.lights.add(x, y, radius, color, opacity);
+        renderer.lights.add(x, y, radius * state.rules.lightRadiusMultiplier, color, opacity);
     }
 
     public static void light(Position pos, float radius, Color color, float opacity){
         if(renderer == null) return;
-       light(pos.getX(), pos.getY(), radius, color, opacity);
+       light(pos.getX(), pos.getY(), radius * state.rules.lightRadiusMultiplier, color, opacity);
     }
 
     public static void light(float x, float y, TextureRegion region, Color color, float opacity){
@@ -247,12 +247,12 @@ public class Drawf{
 
     public static void light(float x, float y, float x2, float y2){
         if(renderer == null) return;
-        renderer.lights.line(x, y, x2, y2, 30, Color.orange, 0.3f);
+        renderer.lights.line(x, y, x2, y2, 15, Color.orange, 0.3f);
     }
 
     public static void light(float x, float y, float x2, float y2, float stroke, Color tint, float alpha){
         if(renderer == null) return;
-        renderer.lights.line(x, y, x2, y2, stroke, tint, alpha);
+        renderer.lights.line(x, y, x2, y2, stroke * state.rules.lightRadiusMultiplier, tint, alpha);
     }
 
     public static void selected(Building tile, Color color){
