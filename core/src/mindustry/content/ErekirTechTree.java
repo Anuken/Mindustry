@@ -147,8 +147,8 @@ public class ErekirTechTree{
                 node(beamNode, () -> {
                     node(ventCondenser, Seq.with(new OnSector(aegis)), () -> {
                         node(chemicalCombustionChamber, Seq.with(new OnSector(basin)), () -> {
-                            node(pyrolysisGenerator, Seq.with(tmpNever), () -> {
-                                node(fluxReactor, () -> {
+                            node(pyrolysisGenerator, Seq.with(new OnSector(crevice)), () -> {
+                                node(fluxReactor, Seq.with(tmpNever), () -> {
                                     node(neoplasiaReactor, () -> {
 
                                     });
@@ -213,8 +213,8 @@ public class ErekirTechTree{
                                             });
                                         });
 
-                                        node(carbideCrucible, Seq.with(tmpNever), () -> {
-                                            node(phaseSynthesizer, () -> {
+                                        node(carbideCrucible, Seq.with(new OnSector(crevice)), () -> {
+                                            node(phaseSynthesizer, Seq.with(tmpNever), () -> {
                                                 node(phaseHeater, () -> {
 
                                                 });
@@ -273,8 +273,8 @@ public class ErekirTechTree{
                     node(sublimate, Seq.with(new OnSector(marsh)), () -> {
                         node(afflict, Seq.with(new OnSector(ravine)), () -> {
                             node(titan, Seq.with(new OnSector(stronghold)), () -> {
-                                node(lustre, Seq.with(tmpNever), () -> {
-                                    node(smite, () -> {
+                                node(lustre, Seq.with(new OnSector(crevice)), () -> {
+                                    node(smite, Seq.with(tmpNever), () -> {
 
                                     });
                                 });
@@ -384,7 +384,9 @@ public class ErekirTechTree{
                                     node(ravine, Seq.with(new SectorComplete(marsh), new Research(Liquids.slag)), () ->{
                                         node(caldera, Seq.with(new SectorComplete(peaks), new Research(heatRedirector)), () -> {
                                             node(stronghold, Seq.with(new SectorComplete(caldera), new Research(coreCitadel)), () -> {
+                                                node(crevice, Seq.with(new SectorComplete(stronghold)), () -> {
 
+                                                });
                                             });
                                         });
                                     });
