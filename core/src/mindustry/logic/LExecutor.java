@@ -860,7 +860,7 @@ public class LExecutor{
         public void run(LExecutor exec){
             if(op == LogicOp.strictEqual){
                 Var v = exec.var(a), v2 = exec.var(b);
-                exec.setnum(dest, v.isobj == v2.isobj && ((v.isobj && v.objval == v2.objval) || (!v.isobj && v.numval == v2.numval)) ? 1 : 0);
+                exec.setnum(dest, v.isobj == v2.isobj && ((v.isobj && Structs.eq(v.objval, v2.objval)) || (!v.isobj && v.numval == v2.numval)) ? 1 : 0);
             }else if(op.unary){
                 exec.setnum(dest, op.function1.get(exec.num(a)));
             }else{
