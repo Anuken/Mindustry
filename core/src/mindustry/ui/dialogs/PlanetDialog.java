@@ -22,6 +22,7 @@ import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
+import mindustry.game.EventType.*;
 import mindustry.game.Objectives.*;
 import mindustry.game.SectorInfo.*;
 import mindustry.game.*;
@@ -1215,9 +1216,12 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 CoreBlock block = sector.allowLaunchSchematics() ? (from.info.bestCoreType instanceof CoreBlock b ? b : (CoreBlock)from.planet.defaultCore) : (CoreBlock)from.planet.defaultCore;
 
                 loadouts.show(block, from, sector, () -> {
-                    var schemCore = universe.getLastLoadout().findCore();
-                    from.removeItems(universe.getLastLoadout().requirements());
+                    var loadout = universe.getLastLoadout();
+                    var schemCore = loadout.findCore();
+                    from.removeItems(loadout.requirements());
                     from.removeItems(universe.getLaunchResources());
+
+                    Events.fire(new SectorLaunchLoadoutEvent(sector, from, loadout));
 
                     if(settings.getBool("skipcoreanimation")){
                         //just... go there

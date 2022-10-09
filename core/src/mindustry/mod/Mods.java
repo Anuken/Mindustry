@@ -110,6 +110,9 @@ public class Mods implements Loadable{
             sortMods();
             //try to load the mod's icon so it displays on import
             Core.app.post(() -> loadIcon(loaded));
+
+            Events.fire(Trigger.importMod);
+
             return loaded;
         }catch(IOException e){
             dest.delete();

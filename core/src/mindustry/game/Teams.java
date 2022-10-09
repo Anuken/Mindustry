@@ -286,6 +286,11 @@ public class Teams{
             return buildingTypes.get(block, () -> new Seq<>(false));
         }
 
+        public int getCount(Block block){
+            var res = buildingTypes.get(block);
+            return res == null ? 0 : res.size;
+        }
+
         /** Destroys this team's presence on the map, killing part of its buildings and converting everything to 'derelict'. */
         public void destroyToDerelict(){
 
@@ -353,6 +358,12 @@ public class Teams{
             if(Mathf.chance(0.25)){
                 Time.run(Mathf.random(0f, 60f * 6f), build::kill);
             }
+        }
+
+        //this is just an alias for consistency
+        @Nullable
+        public Seq<Unit> getUnits(UnitType type){
+            return unitCache(type);
         }
 
         @Nullable

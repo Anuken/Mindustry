@@ -856,6 +856,10 @@ public class Block extends UnlockableContent implements Senseable{
         return !isHidden() && (state.rules.editor || (!state.rules.hideBannedBlocks || !state.rules.isBanned(this)));
     }
 
+    public boolean isVisibleOn(Planet planet){
+        return !Structs.contains(requirements, i -> planet.hiddenItems.contains(i.item));
+    }
+
     public boolean isPlaceable(){
         return isVisible() && (!state.rules.isBanned(this) || state.rules.editor) && supportsEnv(state.rules.env);
     }
