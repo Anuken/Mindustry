@@ -39,8 +39,7 @@ public class HintsFragment{
     public void build(Group parent){
         group.setFillParent(true);
         group.touchable = Touchable.childrenOnly;
-        //TODO hints off for now - figure out tutorial system.
-        group.visibility = () -> !state.isCampaign() && Core.settings.getBool("hints", true) && ui.hudfrag.shown;
+        group.visibility = () -> Core.settings.getBool("hints", true) && ui.hudfrag.shown;
         group.update(() -> {
             if(current != null){
                 //current got completed
@@ -151,6 +150,10 @@ public class HintsFragment{
         return current != null;
     }
 
+    static boolean isSerpulo(){
+        return !state.rules.hasEnv(Env.scorching);
+    }
+
     public enum DefaultHint implements Hint{
         desktopMove(visibleDesktop, () -> Core.input.axis(Binding.move_x) != 0 || Core.input.axis(Binding.move_y) != 0),
         zoom(visibleDesktop, () -> Core.input.axis(KeyCode.scroll) != 0),
@@ -159,11 +162,11 @@ public class HintsFragment{
         placeConveyor(isTutorial, () -> ui.hints.placedBlocks.contains(Blocks.conveyor)),
         placeTurret(isTutorial, () -> ui.hints.placedBlocks.contains(Blocks.duo)),
         breaking(isTutorial, () -> ui.hints.events.contains("break")),
-        desktopShoot(visibleDesktop, () -> Vars.state.enemies > 0, () -> player.shooting),
+        desktopShoot(visibleDesktop, () -> isSerpulo() && Vars.state.enemies > 0, () -> player.shooting),
         depositItems(() -> player.unit().hasItem(), () -> !player.unit().hasItem()),
         desktopPause(visibleDesktop, () -> isTutorial.get() && !Vars.net.active(), () -> Core.input.keyTap(Binding.pause)),
         research(isTutorial, () -> ui.research.isShown()),
-        unitControl(() -> state.rules.defaultTeam.data().units.size > 2 && !net.active() && !player.dead(), () -> !player.dead() && !player.unit().spawnedByCore),
+        unitControl(() -> isSerpulo() && state.rules.defaultTeam.data().units.size > 2 && !net.active() && !player.dead(), () -> !player.dead() && !player.unit().spawnedByCore),
         respawn(visibleMobile, () -> !player.dead() && !player.unit().spawnedByCore, () -> !player.dead() && player.unit().spawnedByCore),
         launch(() -> isTutorial.get() && state.rules.sector.isCaptured(), () -> ui.planet.isShown()),
         schematicSelect(visibleDesktop, () -> ui.hints.placedBlocks.contains(Blocks.router), () -> Core.input.keyRelease(Binding.schematic_select) || Core.input.keyTap(Binding.pick)),
@@ -178,7 +181,7 @@ public class HintsFragment{
         guardian(() -> state.boss() != null && state.boss().armor >= 4, () -> state.boss() == null),
         factoryControl(() -> !(state.isCampaign() && state.rules.sector.preset == SectorPresets.onset) &&
             state.rules.defaultTeam.data().getBuildings(Blocks.tankFabricator).size + state.rules.defaultTeam.data().getBuildings(Blocks.groundFactory).size > 0, () -> ui.hints.events.contains("factorycontrol")),
-        coreUpgrade(() -> state.isCampaign() && Blocks.coreFoundation.unlocked()
+        coreUpgrade(() -> state.isCampaign() && state.rules.sector.planet == Planets.serpulo && Blocks.coreFoundation.unlocked()
             && state.rules.defaultTeam.core() != null
             && state.rules.defaultTeam.core().block == Blocks.coreShard
             && state.rules.defaultTeam.core().items.has(Blocks.coreFoundation.requirements),
@@ -191,8 +194,7 @@ public class HintsFragment{
             && state.getSector().threat >= 0.5f
             && !SectorPresets.tarFields.sector.isCaptured(), //appear only when the player hasn't progressed much in the game yet
             () -> state.isCampaign() && state.getSector().preset != null),
-        coreIncinerate(() -> state.isCampaign() && state.rules.defaultTeam.core() != null && state.rules.defaultTeam.core().items.get(Items.copper) >= state.rules.defaultTeam.core().storageCapacity - 10, () -> false),
-        coopCampaign(() -> net.client() && state.isCampaign() && SectorPresets.groundZero.sector.hasBase(), () -> false),
+        coreIncinerate(() -> state.isCampaign() && state.rules.defaultTeam.core() != null && state.rules.defaultTeam.core().items.get(Items.copper) >= state.rules.defaultTeam.core().storageCapacity - 10, () -> false)
         ;
 
         @Nullable
