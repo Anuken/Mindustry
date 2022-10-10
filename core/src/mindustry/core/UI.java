@@ -561,10 +561,14 @@ public class UI implements ApplicationListener, Loadable{
 
     /** Shows a menu that fires a callback when an option is selected. If nothing is selected, -1 is returned. */
     public void showMenu(String title, String message, String[][] options, Intc callback){
-        new Dialog(title){{
+        new Dialog("[accent]" + title){{
             setFillParent(true);
             removeChild(titleTable);
             cont.add(titleTable).width(400f);
+
+            getStyle().titleFontColor = Color.white;
+            title.getStyle().fontColor = Color.white;
+            title.setStyle(title.getStyle());
 
             cont.row();
             cont.image().width(400f).pad(2).colspan(2).height(4f).color(Pal.accent).bottom();
