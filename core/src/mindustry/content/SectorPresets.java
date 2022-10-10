@@ -22,6 +22,7 @@ public class SectorPresets{
             addStartingItems = true;
             captureWave = 10;
             difficulty = 1;
+            overrideLaunchDefaults = true;
             startWaveTimeMultiplier = 3f;
         }};
 
