@@ -165,7 +165,7 @@ public class ErekirTechTree{
                     node(regenProjector, Seq.with(new OnSector(peaks)), () -> {
                         //TODO more tiers of build tower or "support" structures like overdrive projectors
                         node(buildTower, Seq.with(new OnSector(stronghold)), () -> {
-                            node(shockwaveTower, Seq.with(tmpNever), () -> {
+                            node(shockwaveTower, Seq.with(new OnSector(siege)), () -> {
 
                             });
                         });
@@ -208,7 +208,7 @@ public class ErekirTechTree{
                                         });
 
                                         node(atmosphericConcentrator, Seq.with(new OnSector(caldera)), () -> {
-                                            node(cyanogenSynthesizer, Seq.with(tmpNever), () -> {
+                                            node(cyanogenSynthesizer, Seq.with(new OnSector(siege)), () -> {
 
                                             });
                                         });
@@ -283,8 +283,8 @@ public class ErekirTechTree{
                     });
 
                     node(disperse, Seq.with(new OnSector(stronghold)), () -> {
-                        node(scathe, Seq.with(tmpNever), () -> {
-                            node(malign, () -> {
+                        node(scathe, Seq.with(new OnSector(siege)), () -> {
+                            node(malign, Seq.with(tmpNever), () -> {
 
                             });
                         });
@@ -332,7 +332,7 @@ public class ErekirTechTree{
                                         node(UnitTypes.obviate);
                                     });
 
-                                    node(tankAssembler, Seq.with(tmpNever, new OnSector(intersect), new Research(constructor), new Research(atmosphericConcentrator)), () -> {
+                                    node(tankAssembler, Seq.with(new OnSector(siege), new Research(constructor), new Research(atmosphericConcentrator)), () -> {
 
                                         node(UnitTypes.vanquish, () -> {
                                             node(UnitTypes.conquer, Seq.with(tmpNever), () -> {
@@ -340,7 +340,7 @@ public class ErekirTechTree{
                                             });
                                         });
 
-                                        node(shipAssembler, Seq.with(new OnSector(basin)), () -> {
+                                        node(shipAssembler, Seq.with(tmpNever), () -> {
                                             node(UnitTypes.quell, () -> {
                                                 node(UnitTypes.disrupt, Seq.with(tmpNever), () -> {
 
@@ -385,7 +385,9 @@ public class ErekirTechTree{
                                         node(caldera, Seq.with(new SectorComplete(peaks), new Research(heatRedirector)), () -> {
                                             node(stronghold, Seq.with(new SectorComplete(caldera), new Research(coreCitadel)), () -> {
                                                 node(crevice, Seq.with(new SectorComplete(stronghold)), () -> {
+                                                    node(siege, Seq.with(new SectorComplete(crevice)), () -> {
 
+                                                    });
                                                 });
                                             });
                                         });
