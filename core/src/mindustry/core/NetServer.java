@@ -46,8 +46,8 @@ public class NetServer implements ApplicationListener{
     /** If a player goes away of their server-side coordinates by this distance, they get teleported back. */
     private static final float correctDist = tilesize * 14f;
 
-    public final Administration admins = new Administration();
-    public final CommandHandler clientCommands = new CommandHandler("/");
+    public Administration admins = new Administration();
+    public CommandHandler clientCommands = new CommandHandler("/");
     public TeamAssigner assigner = (player, players) -> {
         if(state.rules.pvp){
             //find team with minimum amount of players and auto-assign player to that.
