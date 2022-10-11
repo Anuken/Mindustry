@@ -212,6 +212,11 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             }}).loaded = t -> planetTextures[fi] = t;
             assets.finishLoadingAsset(names[i]);
         }
+
+        //unlock defaults for older campaign saves (TODO move? where to?)
+        if(content.planets().contains(p -> p.sectors.contains(s -> s.hasBase())) || Blocks.scatter.unlocked() || Blocks.router.unlocked()){
+            Seq.with(Blocks.junction, Blocks.mechanicalDrill, Blocks.duo, Items.copper, Items.lead).each(UnlockableContent::quietUnlock);
+        }
     }
 
     /** show with no limitations, just as a map. */
