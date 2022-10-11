@@ -221,7 +221,6 @@ public class ApplicationTests{
         String str2 = JsonIO.write(new Rules(){{
             attackMode = true;
         }});
-        Log.info(str2);
     }
 
     @Test

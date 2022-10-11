@@ -952,31 +952,33 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         dialog.addCloseButton();
 
         if(sector.hasBase()){
-            dialog.buttons.button("@sector.abandon", Icon.cancel, () -> {
-                ui.showConfirm("@sector.abandon.confirm", () -> {
-                    dialog.hide();
-
-                    if(sector.isBeingPlayed()){
-                        hide();
-                        //after dialog is hidden
-                        Time.runTask(7f, () -> {
-                            //force game over in a more dramatic fashion
-                            for(var core : player.team().cores().copy()){
-                                core.kill();
-                            }
-                        });
-                    }else{
-                        if(sector.save != null){
-                            sector.save.delete();
-                        }
-                        sector.save = null;
-                    }
-                    updateSelected();
-                });
-            });
+            dialog.buttons.button("@sector.abandon", Icon.cancel, () -> abandonSectorConfirm(sector, dialog::hide));
         }
 
         dialog.show();
+    }
+
+    public void abandonSectorConfirm(Sector sector, Runnable listener){
+        ui.showConfirm("@sector.abandon.confirm", () -> {
+            if(listener != null) listener.run();
+
+            if(sector.isBeingPlayed()){
+                hide();
+                //after dialog is hidden
+                Time.runTask(7f, () -> {
+                    //force game over in a more dramatic fashion
+                    for(var core : player.team().cores().copy()){
+                        core.kill();
+                    }
+                });
+            }else{
+                if(sector.save != null){
+                    sector.save.delete();
+                }
+                sector.save = null;
+            }
+            updateSelected();
+        });
     }
 
     void addSurvivedInfo(Sector sector, Table table, boolean wrap){
