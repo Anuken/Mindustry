@@ -516,6 +516,7 @@ public class LExecutor{
                                 exec.setobj(p3, null);
                             }else{
                                 if(exec.bool(p5)){
+                                    //Allows reading of ore tiles if they are present (overlay is not air) otherwise returns the floor
                                     exec.setobj(p3, tile.overlay() == Blocks.air ? tile.floor() : tile.overlay());
                                 }else{
                                     //any environmental solid block is returned as StoneWall, aka "@solid"
