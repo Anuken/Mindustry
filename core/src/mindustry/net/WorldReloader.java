@@ -31,8 +31,10 @@ public class WorldReloader{
             logic.reset();
 
             Call.worldDataBegin();
-        }else if(net.client()){
-            net.reset();
+        }else {
+            if(net.client()){
+                net.reset();
+            }    
             logic.reset();
         }
 
