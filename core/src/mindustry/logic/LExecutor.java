@@ -515,7 +515,7 @@ public class LExecutor{
                             if(tile == null){
                                 exec.setobj(p3, null);
                             }else{
-                                if(floor){
+                                if(exec.bool(p5)){
                                 exec.setobj(p3, tile.overlay() != null ? tile.floor() : tile.overlay());
                                 }else{
                                     //any environmental solid block is returned as StoneWall, aka "@solid"
