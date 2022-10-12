@@ -516,7 +516,7 @@ public class LExecutor{
                                 exec.setobj(p3, null);
                             }else{
                                 if(exec.bool(p5)){
-                                    exec.setobj(p3, tile.overlay() == null ? tile.floor() : tile.overlay());
+                                    exec.setobj(p3, tile.overlay() == Blocks.air ? tile.floor() : tile.overlay());
                                 }else{
                                     //any environmental solid block is returned as StoneWall, aka "@solid"
                                     Block block = !tile.synthetic() ? (tile.solid() ? Blocks.stoneWall : Blocks.air) : tile.block();
