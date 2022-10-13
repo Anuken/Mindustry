@@ -510,20 +510,20 @@ public class LExecutor{
                         if(!unit.within(x1, y1, range)){
                             exec.setobj(p3, null);
                             exec.setobj(p4, null);
+                            exec.setobj(p5, null);
                         }else{
                             Tile tile = world.tileWorld(x1, y1);
                             if(tile == null){
                                 exec.setobj(p3, null);
+                                exec.setobj(p4, null);
+                                exec.setobj(p5, null);
                             }else{
-                                if(exec.bool(p5)){
-                                    //Allows reading of ore tiles if they are present (overlay is not air) otherwise returns the floor
-                                    exec.setobj(p3, tile.overlay() == Blocks.air ? tile.floor() : tile.overlay());
-                                }else{
-                                    //any environmental solid block is returned as StoneWall, aka "@solid"
-                                    Block block = !tile.synthetic() ? (tile.solid() ? Blocks.stoneWall : Blocks.air) : tile.block();
-                                    exec.setobj(p3, block);
-                                    }
-                                exec.setobj(p4, tile != null && tile.build != null ? tile.build : null);
+                                //any environmental solid block is returned as StoneWall, aka "@solid"
+                                Block block = !tile.synthetic() ? (tile.solid() ? Blocks.stoneWall : Blocks.air) : tile.block();
+                                exec.setobj(p3, block);
+                                exec.setobj(p4, tile.build != null ? tile.build : null);
+                                //Allows reading of ore tiles if they are present (overlay is not air) otherwise returns the floor
+                                exec.setobj(p5, tile.overlay() == Blocks.air ? tile.floor() : tile.overlay());
                             }
                         }
                     }
