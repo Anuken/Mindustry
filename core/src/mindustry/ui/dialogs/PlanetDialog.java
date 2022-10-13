@@ -199,7 +199,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                     diag.hide();
                 }).size(300f, 64f).disabled(b -> selected[0] == null);
 
-                app.post(() -> diag.show());
+                app.post(diag::show);
             }
         });
 
