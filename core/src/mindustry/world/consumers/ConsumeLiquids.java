@@ -42,18 +42,20 @@ public class ConsumeLiquids extends Consume{
 
     @Override
     public void update(Building build){
+        float mult = multiplier.get(build);
         for(var stack : liquids){
-            build.liquids.remove(stack.liquid, stack.amount * build.edelta());
+            build.liquids.remove(stack.liquid, stack.amount * build.edelta() * mult);
         }
     }
 
     @Override
     public float efficiency(Building build){
+        float mult = multiplier.get(build);
         float ed = build.edelta();
         if(ed <= 0.00000001f) return 0f;
         float min = 1f;
         for(var stack : liquids){
-            min = Math.min(build.liquids.get(stack.liquid) / (stack.amount * ed), min);
+            min = Math.min(build.liquids.get(stack.liquid) / (stack.amount * ed * mult), min);
         }
         return min;
     }

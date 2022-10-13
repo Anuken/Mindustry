@@ -211,6 +211,8 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean commandable;
     /** If true, the building inventory can be shown with the config. */
     public boolean allowConfigInventory = true;
+    /** Defines how large selection menus, such as that of sorters, should be. */
+    public int selectionRows = 5, selectionColumns = 4;
     /** If true, this block can be configured by logic. */
     public boolean logicConfigurable = false;
     /** Whether this block consumes touchDown events when tapped. */
@@ -365,6 +367,7 @@ public class Block extends UnlockableContent implements Senseable{
     public Block(String name){
         super(name);
         initBuilding();
+        selectionSize = 28f;
     }
 
     public void drawBase(Tile tile){
@@ -850,11 +853,15 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     public boolean isVisible(){
-        return !isHidden();
+        return !isHidden() && (state.rules.editor || (!state.rules.hideBannedBlocks || !state.rules.isBanned(this)));
+    }
+
+    public boolean isVisibleOn(Planet planet){
+        return !Structs.contains(requirements, i -> planet.hiddenItems.contains(i.item));
     }
 
     public boolean isPlaceable(){
-        return isVisible() && (!state.rules.bannedBlocks.contains(this) || state.rules.editor) && supportsEnv(state.rules.env);
+        return isVisible() && (!state.rules.isBanned(this) || state.rules.editor) && supportsEnv(state.rules.env);
     }
 
     /** @return whether this block supports a specific environment. */

@@ -116,60 +116,7 @@ public class ResearchDialog extends BaseDialog{
             if(currPlanet != null && currPlanet.techTree != null){
                 switchTree(currPlanet.techTree);
             }
-
-            items = new ItemSeq(){
-                //store sector item amounts for modifications
-                ObjectMap<Sector, ItemSeq> cache = new ObjectMap<>();
-
-                {
-                    //add global counts of each sector
-                    for(Planet planet : content.planets()){
-                        for(Sector sector : planet.sectors){
-                            if(sector.hasBase()){
-                                ItemSeq cached = sector.items();
-                                cache.put(sector, cached);
-                                cached.each((item, amount) -> {
-                                    values[item.id] += Math.max(amount, 0);
-                                    total += Math.max(amount, 0);
-                                });
-                            }
-                        }
-                    }
-                }
-
-                //this is the only method that actually modifies the sequence itself.
-                @Override
-                public void add(Item item, int amount){
-                    //only have custom removal logic for when the sequence gets items taken out of it (e.g. research)
-                    if(amount < 0){
-                        //remove items from each sector's storage, one by one
-
-                        //negate amount since it's being *removed* - this makes it positive
-                        amount = -amount;
-
-                        //% that gets removed from each sector
-                        double percentage = (double)amount / get(item);
-                        int[] counter = {amount};
-                        cache.each((sector, seq) -> {
-                            if(counter[0] == 0) return;
-
-                            //amount that will be removed
-                            int toRemove = Math.min((int)Math.ceil(percentage * seq.get(item)), counter[0]);
-
-                            //actually remove it from the sector
-                            sector.removeItem(item, toRemove);
-                            seq.remove(item, toRemove);
-
-                            counter[0] -= toRemove;
-                        });
-
-                        //negate again to display correct number
-                        amount = -amount;
-                    }
-
-                    super.add(item, amount);
-                }
-            };
+            rebuildItems();
 
             checkNodes(root);
             treeLayout();
@@ -240,6 +187,68 @@ public class ResearchDialog extends BaseDialog{
         });
     }
 
+    public void rebuildItems(){
+        items = new ItemSeq(){
+            //store sector item amounts for modifications
+            ObjectMap<Sector, ItemSeq> cache = new ObjectMap<>();
+
+            {
+                //first, find a planet associated with the current tech tree
+                Planet rootPlanet = lastNode.planet != null ? lastNode.planet : content.planets().find(p -> p.techTree == lastNode);
+
+                //if there is no root, fall back to serpulo
+                if(rootPlanet == null) rootPlanet = Planets.serpulo;
+
+                //add global counts of each sector
+                for(Sector sector : rootPlanet.sectors){
+                    if(sector.hasBase()){
+                        ItemSeq cached = sector.items();
+                        cache.put(sector, cached);
+                        cached.each((item, amount) -> {
+                            values[item.id] += Math.max(amount, 0);
+                            total += Math.max(amount, 0);
+                        });
+                    }
+                }
+            }
+
+            //this is the only method that actually modifies the sequence itself.
+            @Override
+            public void add(Item item, int amount){
+                //only have custom removal logic for when the sequence gets items taken out of it (e.g. research)
+                if(amount < 0){
+                    //remove items from each sector's storage, one by one
+
+                    //negate amount since it's being *removed* - this makes it positive
+                    amount = -amount;
+
+                    //% that gets removed from each sector
+                    double percentage = (double)amount / get(item);
+                    int[] counter = {amount};
+                    cache.each((sector, seq) -> {
+                        if(counter[0] == 0) return;
+
+                        //amount that will be removed
+                        int toRemove = Math.min((int)Math.ceil(percentage * seq.get(item)), counter[0]);
+
+                        //actually remove it from the sector
+                        sector.removeItem(item, toRemove);
+                        seq.remove(item, toRemove);
+
+                        counter[0] -= toRemove;
+                    });
+
+                    //negate again to display correct number
+                    amount = -amount;
+                }
+
+                super.add(item, amount);
+            }
+        };
+
+        itemDisplay.rebuild(items);
+    }
+
     public @Nullable TechNode getPrefRoot(){
         Planet currPlanet = ui.planet.isShown() ?
             ui.planet.state.planet :
@@ -253,6 +262,8 @@ public class ResearchDialog extends BaseDialog{
         root = new TechTreeNode(node, null);
         lastNode = node;
         view.rebuildAll();
+
+        rebuildItems();
     }
 
     public void rebuildTree(TechNode node){
@@ -370,11 +381,9 @@ public class ResearchDialog extends BaseDialog{
             this.parent = parent;
             this.width = this.height = nodeSize;
             nodes.add(this);
-            if(node.children != null){
-                children = new TechTreeNode[node.children.size];
-                for(int i = 0; i < children.length; i++){
-                    children[i] = new TechTreeNode(node.children.get(i), this);
-                }
+            children = new TechTreeNode[node.children.size];
+            for(int i = 0; i < children.length; i++){
+                children[i] = new TechTreeNode(node.children.get(i), this);
             }
         }
     }

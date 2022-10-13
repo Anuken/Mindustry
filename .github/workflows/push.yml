@@ -2,8 +2,12 @@ name: Tests
 
 on: [push, workflow_dispatch]
 
+permissions: {}
 jobs:
   runPush:
+    permissions:
+      contents: write # for Update bundles
+
     runs-on: ubuntu-latest
 
     steps:

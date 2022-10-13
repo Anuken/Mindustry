@@ -380,7 +380,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public String text(){
-            return Core.bundle.format("objective.build", count, block.emoji(), block.localizedName);
+            return Core.bundle.format("objective.build", count - state.stats.placedBlockCount.get(block, 0), block.emoji(), block.localizedName);
         }
     }
 
@@ -403,7 +403,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public String text(){
-            return Core.bundle.format("objective.buildunit", count, unit.emoji(), unit.localizedName);
+            return Core.bundle.format("objective.buildunit", count - state.rules.defaultTeam.data().countType(unit), unit.emoji(), unit.localizedName);
         }
     }
 
@@ -424,7 +424,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public String text(){
-            return Core.bundle.format("objective.destroyunits", count);
+            return Core.bundle.format("objective.destroyunits", count - state.stats.enemyUnitsDestroyed);
         }
     }
 
@@ -473,7 +473,13 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                 if(text.startsWith("@")){
                     return Core.bundle.format(text.substring(1), timeString.toString());
                 }else{
-                    return Core.bundle.formatString(text, timeString.toString());
+                    try{
+                        return Core.bundle.formatString(text, timeString.toString());
+                    }catch(IllegalArgumentException e){
+                        //illegal text.
+                        text = "";
+                    }
+
                 }
             }
 
@@ -674,7 +680,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                 fetchedText = fetchText(text);
             }
 
-            WorldLabel.drawAt(text, pos.x, pos.y + radius + textHeight, Draw.z(), flags, fontSize);
+            WorldLabel.drawAt(fetchedText, pos.x, pos.y + radius + textHeight, Draw.z(), flags, fontSize);
         }
     }
 

@@ -19,6 +19,7 @@ import static mindustry.Vars.*;
 
 /** Utility class for damaging in an area. */
 public class Damage{
+    private static final UnitDamageEvent bulletDamageEvent = new UnitDamageEvent();
     private static final Rect rect = new Rect();
     private static final Rect hitrect = new Rect();
     private static final Vec2 vec = new Vec2(), seg1 = new Vec2(), seg2 = new Vec2();
@@ -466,19 +467,30 @@ public class Damage{
     }
 
     /** Damages all entities and blocks in a radius that are enemies of the team. */
-    public static void damage(Team team, float x, float y, float radius, float damage, boolean complete, boolean air, boolean ground, boolean scaled, Bullet source){
-        Cons<Unit> cons = entity -> {
-            if(entity.team == team  || !entity.checkTarget(air, ground) || !entity.hittable() || !entity.within(x, y, radius + (scaled ? entity.hitSize / 2f : 0f))){
+    public static void damage(Team team, float x, float y, float radius, float damage, boolean complete, boolean air, boolean ground, boolean scaled, @Nullable Bullet source){
+        Cons<Unit> cons = unit -> {
+            if(unit.team == team  || !unit.checkTarget(air, ground) || !unit.hittable() || !unit.within(x, y, radius + (scaled ? unit.hitSize / 2f : 0f))){
                 return;
             }
 
-            float amount = calculateDamage(scaled ? Math.max(0, entity.dst(x, y) - entity.type.hitSize/2) : entity.dst(x, y), radius, damage);
-            entity.damage(amount);
-            //TODO better velocity displacement
-            float dst = vec.set(entity.x - x, entity.y - y).len();
-            entity.vel.add(vec.setLength((1f - dst / radius) * 2f / entity.mass()));
+            boolean dead = unit.dead;
 
-            if(complete && damage >= 9999999f && entity.isPlayer()){
+            float amount = calculateDamage(scaled ? Math.max(0, unit.dst(x, y) - unit.type.hitSize/2) : unit.dst(x, y), radius, damage);
+            unit.damage(amount);
+
+            if(source != null){
+                Events.fire(bulletDamageEvent.set(unit, source));
+                unit.controller().hit(source);
+
+                if(!dead && unit.dead){
+                    Events.fire(new UnitBulletDestroyEvent(unit, source));
+                }
+            }
+            //TODO better velocity displacement
+            float dst = vec.set(unit.x - x, unit.y - y).len();
+            unit.vel.add(vec.setLength((1f - dst / radius) * 2f / unit.mass()));
+
+            if(complete && damage >= 9999999f && unit.isPlayer()){
                 Events.fire(Trigger.exclusionDeath);
             }
         };
@@ -504,9 +516,7 @@ public class Damage{
     }
 
     public static void tileDamage(Team team, int x, int y, float baseRadius, float damage, @Nullable Bullet source){
-
         Core.app.post(() -> {
-
             var in = world.build(x, y);
             //spawned inside a multiblock. this means that damage needs to be dealt directly.
             //why? because otherwise the building would absorb everything in one cell, which means much less damage than a nearby explosion.

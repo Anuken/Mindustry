@@ -16,9 +16,13 @@ public class EventType{
     //events that occur very often
     public enum Trigger{
         shock,
-        phaseDeflectHit,
+        blastFreeze,
         impactPower,
+        blastGenerator,
+        shockwaveTowerUse,
+        forceProjectorBreak,
         thoriumReactorOverheat,
+        neoplasmReact,
         fireExtinguish,
         acceleratorUse,
         newGame,
@@ -33,6 +37,7 @@ public class EventType{
         socketConfigChanged,
         update,
         unitCommandChange,
+        importMod,
         draw,
         drawOver,
         preDraw,
@@ -77,8 +82,13 @@ public class EventType{
     public static class MusicRegisterEvent{}
     /** Called *after* all the modded files have been added into Vars.tree */
     public static class FileTreeInitEvent{}
-    /** Called when a game begins and the world tiles are loaded. Entities are not yet loaded at this stage.  */
+
+    /** Called when a game begins and the world tiles are loaded, just set `generating = false`. Entities are not yet loaded at this stage. */
     public static class WorldLoadEvent{}
+    /** Called when the world begin to load, just set `generating = true`. */
+    public static class WorldLoadBeginEvent{}
+    /** Called when a game begins and the world tiles are initiated. About to updates tile proximity and sets up physics for the world(Before WorldLoadEvent) */
+    public static class WorldLoadEndEvent{}
 
     public static class SaveLoadEvent{
         public final boolean isMap;
@@ -119,6 +129,17 @@ public class EventType{
 
         public SectorLaunchEvent(Sector sector){
             this.sector = sector;
+        }
+    }
+
+    public static class SectorLaunchLoadoutEvent{
+        public final Sector sector, from;
+        public final Schematic loadout;
+
+        public SectorLaunchLoadoutEvent(Sector sector, Sector from, Schematic loadout){
+            this.sector = sector;
+            this.from = from;
+            this.loadout = loadout;
         }
     }
 
@@ -443,11 +464,63 @@ public class EventType{
         }
     }
 
+    /** Called when a neoplasia (or other pressure-based block, from mods) reactor explodes due to pressure.*/
+    public static class GeneratorPressureExplodeEvent{
+        public final Building build;
+
+        public GeneratorPressureExplodeEvent(Building build){
+            this.build = build;
+        }
+    }
+
+    /** Called when a building is directly killed by a bullet. May not fire in all circumstances. */
+    public static class BuildingBulletDestroyEvent{
+        public Building build;
+        public Bullet bullet;
+
+        public BuildingBulletDestroyEvent(Building build, Bullet bullet){
+            this.build = build;
+            this.bullet = bullet;
+        }
+
+        public BuildingBulletDestroyEvent(){
+        }
+    }
+
     public static class UnitDestroyEvent{
         public final Unit unit;
 
         public UnitDestroyEvent(Unit unit){
             this.unit = unit;
+        }
+    }
+
+    /** Called when a unit is directly killed by a bullet. May not fire in all circumstances. */
+    public static class UnitBulletDestroyEvent{
+        public Unit unit;
+        public Bullet bullet;
+
+        public UnitBulletDestroyEvent(Unit unit, Bullet bullet){
+            this.unit = unit;
+            this.bullet = bullet;
+        }
+
+        public UnitBulletDestroyEvent(){
+        }
+    }
+
+    /**
+     * Called when a unit is hit by a bullet.
+     * This event is REUSED, do not nest invocations of it (e.g. damage units in its event handler)
+     * */
+    public static class UnitDamageEvent{
+        public Unit unit;
+        public Bullet bullet;
+
+        public UnitDamageEvent set(Unit unit, Bullet bullet){
+            this.unit = unit;
+            this.bullet = bullet;
+            return this;
         }
     }
 
