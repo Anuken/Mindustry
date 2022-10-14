@@ -218,26 +218,6 @@ public class ContentParser{
             readFields(result, data);
             return result;
         });
-        put(GenericMesh.class, (type, data) -> {
-            if(!data.isObject()) throw new RuntimeException("Meshes must be objects.");
-            if(!(currentContent instanceof Planet planet)) throw new RuntimeException("Meshes can only be parsed as parts of planets.");
-
-            String tname = Strings.capitalize(data.getString("type", "NoiseMesh"));
-
-            return switch(tname){
-                //TODO NoiseMesh is bad
-                case "NoiseMesh" -> new NoiseMesh(planet,
-                    data.getInt("seed", 0), data.getInt("divisions", 1), data.getFloat("radius", 1f),
-                    data.getInt("octaves", 1), data.getFloat("persistence", 0.5f), data.getFloat("scale", 1f), data.getFloat("mag", 0.5f),
-                    Color.valueOf(data.getString("color1", data.getString("color", "ffffff"))),
-                    Color.valueOf(data.getString("color2", data.getString("color", "ffffff"))),
-                    data.getInt("colorOct", 1), data.getFloat("colorPersistence", 0.5f), data.getFloat("colorScale", 1f),
-                    data.getFloat("colorThreshold", 0.5f));
-                case "MultiMesh" -> new MultiMesh(parser.readValue(GenericMesh[].class, data.get("meshes")));
-                case "MatMesh" -> new MatMesh(parser.readValue(GenericMesh.class, data.get("mesh")), parser.readValue(Mat3D.class, data.get("mat")));
-                default -> throw new RuntimeException("Unknown mesh type: " + tname);
-            };
-        });
         put(Mat3D.class, (type, data) -> {
             if(data == null) return new Mat3D();
 
@@ -590,7 +570,18 @@ public class ContentParser{
             Planet planet = new Planet(name, parent, value.getFloat("radius", 1f), value.getInt("sectorSize", 0));
 
             if(value.has("mesh")){
-                planet.meshLoader = () -> parser.readValue(GenericMesh.class, value.get("mesh"));
+                var mesh = value.get("mesh");
+                if(!mesh.isObject()) throw new RuntimeException("Meshes must be objects.");
+                value.remove("mesh");
+                planet.meshLoader = () -> {
+                    //don't crash, just log an error
+                    try{
+                        return parseMesh(planet, mesh);
+                    }catch(Exception e){
+                        Log.err(e);
+                        return new ShaderSphereMesh(planet, Shaders.unlit, 2);
+                    }
+                };
             }
 
             //always one sector right now...
@@ -815,6 +806,24 @@ public class ContentParser{
             }
         }
         return null;
+    }
+
+    private GenericMesh parseMesh(Planet planet, JsonValue data){
+        String tname = Strings.capitalize(data.getString("type", "NoiseMesh"));
+
+        return switch(tname){
+            //TODO NoiseMesh is bad
+            case "NoiseMesh" -> new NoiseMesh(planet,
+            data.getInt("seed", 0), data.getInt("divisions", 1), data.getFloat("radius", 1f),
+            data.getInt("octaves", 1), data.getFloat("persistence", 0.5f), data.getFloat("scale", 1f), data.getFloat("mag", 0.5f),
+            Color.valueOf(data.getString("color1", data.getString("color", "ffffff"))),
+            Color.valueOf(data.getString("color2", data.getString("color", "ffffff"))),
+            data.getInt("colorOct", 1), data.getFloat("colorPersistence", 0.5f), data.getFloat("colorScale", 1f),
+            data.getFloat("colorThreshold", 0.5f));
+            case "MultiMesh" -> new MultiMesh(parser.readValue(GenericMesh[].class, data.get("meshes")));
+            case "MatMesh" -> new MatMesh(parser.readValue(GenericMesh.class, data.get("mesh")), parser.readValue(Mat3D.class, data.get("mat")));
+            default -> throw new RuntimeException("Unknown mesh type: " + tname);
+        };
     }
 
     <T> T make(Class<T> type){

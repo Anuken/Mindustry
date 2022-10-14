@@ -23,6 +23,7 @@ public class SectorPresets{
             captureWave = 10;
             difficulty = 1;
             overrideLaunchDefaults = true;
+            noLighting = true;
             startWaveTimeMultiplier = 3f;
         }};
 
