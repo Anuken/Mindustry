@@ -39,6 +39,11 @@ public abstract class Content implements Comparable<Content>{
         return minfo.error != null;
     }
 
+    /** @return whether this is content from the base game. */
+    public boolean isVanilla(){
+        return minfo.mod == null;
+    }
+
     @Override
     public int compareTo(Content c){
         return Integer.compare(id, c.id);

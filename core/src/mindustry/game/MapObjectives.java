@@ -680,7 +680,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                 fetchedText = fetchText(text);
             }
 
-            WorldLabel.drawAt(text, pos.x, pos.y + radius + textHeight, Draw.z(), flags, fontSize);
+            WorldLabel.drawAt(fetchedText, pos.x, pos.y + radius + textHeight, Draw.z(), flags, fontSize);
         }
     }
 

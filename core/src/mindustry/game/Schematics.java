@@ -292,6 +292,10 @@ public class Schematics implements Loadable{
         return defaultLoadouts.get(block);
     }
 
+    public boolean isDefaultLoadout(Schematic schem){
+        return defaultLoadouts.containsValue(schem, true);
+    }
+
     /** Checks a schematic for deployment validity and adds it to the cache. */
     private void checkLoadout(Schematic s, boolean customSchem){
         Stile core = s.tiles.find(t -> t.block instanceof CoreBlock);

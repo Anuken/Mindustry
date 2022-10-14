@@ -15,7 +15,7 @@ public enum Achievement{
     launch30Times(SStat.timesLaunched, 30),
     captureBackground,
     survive100Waves(SStat.maxWavesSurvived, 100),
-    researchAll,
+    researchAll, //TODO - remake/change?
     shockWetEnemy,
     killEnemyPhaseWall,
     researchRouter,
@@ -51,6 +51,7 @@ public enum Achievement{
     circleConveyor,
     becomeRouter,
     create20Schematics(SStat.schematicsCreated, 20),
+    create500Schematics(SStat.schematicsCreated, 50), //TODO - Steam
     survive10WavesNoBlocks,
     captureNoBlocksBroken,
     useFlameAmmo,
@@ -59,6 +60,61 @@ public enum Achievement{
     openWiki,
     useAccelerator,
     unlockAllZones,
+
+    //TODO new ones
+
+    allTransportOneMap, //TODO - Steam
+    buildOverdrive, //TODO - Steam
+    buildMendProjector, //TODO - Steam
+    buildWexWater, //TODO - Steam
+
+    have10mItems(SStat.totalCampaignItems, 10_000_000), //TODO - Steam
+    killEclipseDuo, //TODO - Steam
+
+    allPresetsErekir, //TODO - Steam
+
+    launchCoreSchematic, //TODO - Steam
+    nucleusGroundZero, //TODO - Steam
+
+    neoplasmWater, //TODO - Steam
+    blastFrozenUnit, //TODO - Steam
+
+    allBlocksSerpulo, //TODO - Steam
+    allBlocksErekir, //TODO - Steam
+
+    //TODO are these necessary?
+    //allTurretsSerpulo, //TODO
+    //allTurretsErekir, //TODO
+    //allTechSerpulo, //TODO
+    //allTechErekir, //TODO
+
+    breakForceProjector, //TODO - Steam
+    researchLogic, //TODO - Steam
+
+    negative10kPower, //TODO - Steam
+    positive100kPower, //TODO - Steam
+    store1milPower, //TODO - Steam
+
+    blastGenerator, //TODO - Steam
+    neoplasiaExplosion, //TODO - Steam
+
+    installMod, //TODO - Steam
+    routerLanguage, //TODO - Steam
+    joinCommunityServer, //TODO - Steam
+    openConsole, //TODO - Steam
+
+    controlTurret, //TODO - Steam
+    dropUnitsCoreZone, //TODO - Steam
+    destroyScatterFlare, //TODO - Steam
+    boostUnit, //TODO - Steam
+    boostBuildingFloor, //TODO - Steam
+
+    hoverUnitLiquid, //TODO - Steam
+
+    break100Boulders(SStat.bouldersDeconstructed, 100), //TODO - Steam
+    break10000Boulders(SStat.bouldersDeconstructed, 10_000), //TODO - Steam
+
+    shockwaveTowerUse, //TODO - Steam
 
     ;
 

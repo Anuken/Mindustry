@@ -22,11 +22,12 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
-import mindustry.world.blocks.defense.Wall.*;
 
 import static mindustry.Vars.*;
 
 public class BulletType extends Content implements Cloneable{
+    static final UnitDamageEvent bulletDamageEvent = new UnitDamageEvent();
+
     /** Lifetime in ticks. */
     public float lifetime = 40f;
     /** Speed in units/tick. */
@@ -354,6 +355,8 @@ public class BulletType extends Content implements Cloneable{
     }
 
     public void hitEntity(Bullet b, Hitboxc entity, float health){
+        boolean wasDead = entity instanceof Unit u && u.dead;
+
         if(entity instanceof Healthc h){
             if(pierceArmor){
                 h.damagePierce(b.damage);
@@ -367,11 +370,12 @@ public class BulletType extends Content implements Cloneable{
             if(impact) Tmp.v3.setAngle(b.rotation() + (knockback < 0 ? 180f : 0f));
             unit.impulse(Tmp.v3);
             unit.apply(status, statusDuration);
+
+            Events.fire(bulletDamageEvent.set(unit, b));
         }
 
-        //for achievements
-        if(b.owner instanceof WallBuild && player != null && b.team == player.team() && entity instanceof Unit unit && unit.dead){
-            Events.fire(Trigger.phaseDeflectHit);
+        if(!wasDead && entity instanceof Unit unit && unit.dead){
+            Events.fire(new UnitBulletDestroyEvent(unit, b));
         }
     }
 
