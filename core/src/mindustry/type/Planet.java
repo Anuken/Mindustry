@@ -137,7 +137,7 @@ public class Planet extends UnlockableContent{
 
         this.radius = radius;
         this.parent = parent;
-        this.orbitOffset = Mathf.randomSeed(id, 360);
+        this.orbitOffset = Mathf.randomSeed(id + 1, 360);
 
         //total radius is initially just the radius
         totalRadius = radius;

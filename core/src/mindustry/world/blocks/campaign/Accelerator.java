@@ -110,7 +110,7 @@ public class Accelerator extends Block{
 
             if(!state.isCampaign() || efficiency <= 0f) return;
 
-            ui.showInfo("This block doesn't work properly in the beta/alpha. It maybe removed, or reworked. Check back in a later update.");
+            ui.showInfo("This block doesn't work properly in the beta/alpha. It may be removed, or reworked. Check back in a later update.");
 
             if(false)
             ui.planet.showPlanetLaunch(state.rules.sector, sector -> {

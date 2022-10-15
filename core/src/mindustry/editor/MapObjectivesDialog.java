@@ -425,6 +425,7 @@ public class MapObjectivesDialog extends BaseDialog{
         margin(0f);
 
         stack(
+            new Image(Styles.black5),
             canvas = new MapObjectivesCanvas(),
             new Table(){{
                 buttons.defaults().size(160f, 64f).pad(2f);

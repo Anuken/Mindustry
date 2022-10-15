@@ -473,7 +473,13 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                 if(text.startsWith("@")){
                     return Core.bundle.format(text.substring(1), timeString.toString());
                 }else{
-                    return Core.bundle.formatString(text, timeString.toString());
+                    try{
+                        return Core.bundle.formatString(text, timeString.toString());
+                    }catch(IllegalArgumentException e){
+                        //illegal text.
+                        text = "";
+                    }
+
                 }
             }
 
@@ -674,7 +680,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                 fetchedText = fetchText(text);
             }
 
-            WorldLabel.drawAt(text, pos.x, pos.y + radius + textHeight, Draw.z(), flags, fontSize);
+            WorldLabel.drawAt(fetchedText, pos.x, pos.y + radius + textHeight, Draw.z(), flags, fontSize);
         }
     }
 

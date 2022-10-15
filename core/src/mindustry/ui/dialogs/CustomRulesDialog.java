@@ -9,6 +9,7 @@ import arc.scene.ui.ImageButton.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
@@ -149,7 +150,17 @@ public class CustomRulesDialog extends BaseDialog{
         number("@rules.dropzoneradius", false, f -> rules.dropZoneRadius = f * tilesize, () -> rules.dropZoneRadius / tilesize, () -> true);
 
         title("@rules.title.resourcesbuilding");
-        check("@rules.infiniteresources", b -> rules.infiniteResources = b, () -> rules.infiniteResources);
+        check("@rules.infiniteresources", b -> {
+            rules.infiniteResources = b;
+
+            //reset to serpulo if any env was enabled
+            if(!b && rules.hiddenBuildItems.isEmpty()){
+                rules.env = Planets.serpulo.defaultEnv;
+                rules.hiddenBuildItems.clear();
+                rules.hiddenBuildItems.addAll(Planets.serpulo.hiddenItems);
+                setup();
+            }
+        }, () -> rules.infiniteResources);
         check("@rules.onlydepositcore", b -> rules.onlyDepositCore = b, () -> rules.onlyDepositCore);
         check("@rules.reactorexplosions", b -> rules.reactorExplosions = b, () -> rules.reactorExplosions);
         check("@rules.schematic", b -> rules.schematicsAllowed = b, () -> rules.schematicsAllowed);
@@ -170,6 +181,8 @@ public class CustomRulesDialog extends BaseDialog{
         )).left().width(300f).row();
 
         main.button("@bannedblocks", () -> showBanned("@bannedblocks", ContentType.block, rules.bannedBlocks, Block::canBeBuilt)).left().width(300f).row();
+        check("@rules.hidebannedblocks", b -> rules.hideBannedBlocks = b, () -> rules.hideBannedBlocks);
+        check("@bannedblocks.whitelist", b -> rules.blockWhitelist = b, () -> rules.blockWhitelist);
 
         //TODO objectives would be nice
         if(experimental && false){
@@ -179,13 +192,15 @@ public class CustomRulesDialog extends BaseDialog{
         }
 
         title("@rules.title.unit");
-        check("@rules.unitammo", b -> rules.unitAmmo = b, () -> rules.unitAmmo);
+        //check("@rules.unitammo", b -> rules.unitAmmo = b, () -> rules.unitAmmo);
         check("@rules.unitcapvariable", b -> rules.unitCapVariable = b, () -> rules.unitCapVariable);
         numberi("@rules.unitcap", f -> rules.unitCap = f, () -> rules.unitCap, -999, 999);
         number("@rules.unitdamagemultiplier", f -> rules.unitDamageMultiplier = f, () -> rules.unitDamageMultiplier);
         number("@rules.unitbuildspeedmultiplier", f -> rules.unitBuildSpeedMultiplier = f, () -> rules.unitBuildSpeedMultiplier, 0f, 50f);
+        number("@rules.unitcostmultiplier", f -> rules.unitCostMultiplier = f, () -> rules.unitCostMultiplier);
 
         main.button("@bannedunits", () -> showBanned("@bannedunits", ContentType.unit, rules.bannedUnits, u -> !u.isHidden())).left().width(300f).row();
+        check("@bannedunits.whitelist", b -> rules.unitWhitelist = b, () -> rules.unitWhitelist);
 
         title("@rules.title.enemy");
         check("@rules.attack", b -> rules.attackMode = b, () -> rules.attackMode);
@@ -241,11 +256,13 @@ public class CustomRulesDialog extends BaseDialog{
             }
 
             t.button("@rules.anyenv", style, () -> {
-                //unlocalized for now
-                ui.showInfo("[accent]'Any' environment, or 'mixed tech', is no longer allowed.[]\n\nReasoning: Serpulo and Erekir tech were never meant to be used in the same map. They are not compatible or remotely balanced.\nI have received far too many complains in this regard.");
-
-                //rules.env = Vars.defaultEnv;
-                //rules.hiddenBuildItems.clear();
+                if(!rules.infiniteResources){
+                    //unlocalized for now
+                    ui.showInfo("[accent]'Any' environment, or 'mixed tech', is no longer allowed outside of sandbox.[]\n\nReasoning: Serpulo and Erekir tech were never meant to be used in the same map. They are not compatible or remotely balanced.\nI have received far too many complains in this regard.");
+                }else{
+                    rules.env = Vars.defaultEnv;
+                    rules.hiddenBuildItems.clear();
+                }
             }).group(group).checked(b -> rules.hiddenBuildItems.size == 0);
         }).left().fill(false).expand(false, false).row();
 
@@ -280,6 +297,7 @@ public class CustomRulesDialog extends BaseDialog{
 
                 number("@rules.unitdamagemultiplier", f -> teams.unitDamageMultiplier = f, () -> teams.unitDamageMultiplier);
                 number("@rules.unitbuildspeedmultiplier", f -> teams.unitBuildSpeedMultiplier = f, () -> teams.unitBuildSpeedMultiplier, 0.001f, 50f);
+                number("@rules.unitcostmultiplier", f -> teams.unitCostMultiplier = f, () -> teams.unitCostMultiplier);
 
                 main = wasMain;
             }, () -> shown[0]).growX().row();
