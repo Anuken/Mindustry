@@ -138,6 +138,10 @@ public class ItemTurret extends Turret{
                 Events.fire(Trigger.flameAmmo);
             }
 
+            if(totalAmmo == 0){
+                Events.fire(Trigger.resupplyTurret);
+            }
+
             BulletType type = ammoTypes.get(item);
             if(type == null) return;
             totalAmmo += type.ammoMultiplier;
