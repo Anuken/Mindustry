@@ -28,6 +28,7 @@ public class EventType{
         newGame,
         tutorialComplete,
         flameAmmo,
+        resupplyTurret,
         turretCool,
         enablePixelation,
         exclusionDeath,

@@ -1503,6 +1503,7 @@ public class Blocks{
         copperWall = new Wall("copper-wall"){{
             requirements(Category.defense, with(Items.copper, 6));
             health = 80 * wallHealthMultiplier;
+            researchCostMultiplier = 0.1f;
             envDisabled |= Env.scorching;
         }};
 
@@ -1886,11 +1887,12 @@ public class Blocks{
         //region distribution
 
         conveyor = new Conveyor("conveyor"){{
-            requirements(Category.distribution, with(Items.copper, 1), true);
+            requirements(Category.distribution, with(Items.copper, 1));
             health = 45;
             speed = 0.03f;
             displayedSpeed = 4.2f;
             buildCostMultiplier = 2f;
+            researchCost = with(Items.copper, 5);
         }};
 
         titaniumConveyor = new Conveyor("titanium-conveyor"){{
@@ -1915,7 +1917,7 @@ public class Blocks{
         }};
 
         junction = new Junction("junction"){{
-            requirements(Category.distribution, with(Items.copper, 2), true);
+            requirements(Category.distribution, with(Items.copper, 2));
             speed = 26;
             capacity = 6;
             health = 30;
@@ -2639,12 +2641,13 @@ public class Blocks{
         //region production
 
         mechanicalDrill = new Drill("mechanical-drill"){{
-            requirements(Category.production, with(Items.copper, 12), true);
+            requirements(Category.production, with(Items.copper, 12));
             tier = 2;
             drillTime = 600;
             size = 2;
             //mechanical drill doesn't work in space
             envEnabled ^= Env.space;
+            researchCost = with(Items.copper, 10);
 
             consumeLiquid(Liquids.water, 0.05f).boost();
         }};
@@ -3002,7 +3005,7 @@ public class Blocks{
         //region turrets
 
         duo = new ItemTurret("duo"){{
-            requirements(Category.turret, with(Items.copper, 35), true);
+            requirements(Category.turret, with(Items.copper, 35));
             ammo(
                 Items.copper,  new BasicBulletType(2.5f, 9){{
                     width = 7f;
@@ -3038,6 +3041,7 @@ public class Blocks{
             inaccuracy = 2f;
             rotateSpeed = 10f;
             coolant = consumeCoolant(0.1f);
+            researchCostMultiplier = 0.05f;
 
             limitRange();
         }};
@@ -3105,6 +3109,7 @@ public class Blocks{
             scaledHealth = 200;
             shootSound = Sounds.shootSnap;
             coolant = consumeCoolant(0.2f);
+            researchCostMultiplier = 0.05f;
 
             limitRange(2);
         }};

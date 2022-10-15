@@ -199,7 +199,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                     diag.hide();
                 }).size(300f, 64f).disabled(b -> selected[0] == null);
 
-                app.post(() -> diag.show());
+                app.post(diag::show);
             }
         });
 
@@ -211,6 +211,11 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 minFilter = magFilter = TextureFilter.linear;
             }}).loaded = t -> planetTextures[fi] = t;
             assets.finishLoadingAsset(names[i]);
+        }
+
+        //unlock defaults for older campaign saves (TODO move? where to?)
+        if(content.planets().contains(p -> p.sectors.contains(s -> s.hasBase())) || Blocks.scatter.unlocked() || Blocks.router.unlocked()){
+            Seq.with(Blocks.junction, Blocks.mechanicalDrill, Blocks.conveyor, Blocks.duo, Items.copper, Items.lead).each(UnlockableContent::quietUnlock);
         }
     }
 
@@ -952,31 +957,33 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         dialog.addCloseButton();
 
         if(sector.hasBase()){
-            dialog.buttons.button("@sector.abandon", Icon.cancel, () -> {
-                ui.showConfirm("@sector.abandon.confirm", () -> {
-                    dialog.hide();
-
-                    if(sector.isBeingPlayed()){
-                        hide();
-                        //after dialog is hidden
-                        Time.runTask(7f, () -> {
-                            //force game over in a more dramatic fashion
-                            for(var core : player.team().cores().copy()){
-                                core.kill();
-                            }
-                        });
-                    }else{
-                        if(sector.save != null){
-                            sector.save.delete();
-                        }
-                        sector.save = null;
-                    }
-                    updateSelected();
-                });
-            });
+            dialog.buttons.button("@sector.abandon", Icon.cancel, () -> abandonSectorConfirm(sector, dialog::hide));
         }
 
         dialog.show();
+    }
+
+    public void abandonSectorConfirm(Sector sector, Runnable listener){
+        ui.showConfirm("@sector.abandon.confirm", () -> {
+            if(listener != null) listener.run();
+
+            if(sector.isBeingPlayed()){
+                hide();
+                //after dialog is hidden
+                Time.runTask(7f, () -> {
+                    //force game over in a more dramatic fashion
+                    for(var core : player.team().cores().copy()){
+                        core.kill();
+                    }
+                });
+            }else{
+                if(sector.save != null){
+                    sector.save.delete();
+                }
+                sector.save = null;
+            }
+            updateSelected();
+        });
     }
 
     void addSurvivedInfo(Sector sector, Table table, boolean wrap){

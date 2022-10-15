@@ -61,8 +61,8 @@ public class MapObjectivesCanvas extends WidgetGroup{
             @Override
             public void pan(InputEvent event, float x, float y, float deltaX, float deltaY){
                 if(tilemap.moving != null || tilemap.connecting != null) return;
-                tilemap.x = Mathf.clamp(tilemap.x + deltaX, -bounds * unitSize + width, 0f);
-                tilemap.y = Mathf.clamp(tilemap.y + deltaY, -bounds * unitSize + height, 0f);
+                tilemap.x = Mathf.clamp(tilemap.x + deltaX, -bounds * unitSize + width, bounds * unitSize);
+                tilemap.y = Mathf.clamp(tilemap.y + deltaY, -bounds * unitSize + height, bounds * unitSize);
             }
 
             @Override
@@ -128,7 +128,6 @@ public class MapObjectivesCanvas extends WidgetGroup{
     }
 
     public class ObjectiveTilemap extends WidgetGroup{
-        protected final GridBits grid = new GridBits(bounds, bounds);
 
         /** The connector button that is being pressed. */
         protected @Nullable Connector connecting;
@@ -144,7 +143,7 @@ public class MapObjectivesCanvas extends WidgetGroup{
         @Override
         public void draw(){
             validate();
-            int minX = Math.max(Mathf.floor((x - 1f) / unitSize), 0), minY = Math.max(Mathf.floor((y - 1f) / unitSize), 0),
+            int minX = Math.max(Mathf.floor((x - width - 1f) / unitSize), -bounds), minY = Math.max(Mathf.floor((y - height - 1f) / unitSize), -bounds),
                 maxX = Math.min(Mathf.ceil((x + width + 1f) / unitSize), bounds), maxY = Math.min(Mathf.ceil((y + height + 1f) / unitSize), bounds);
             float progX = x % unitSize, progY = y % unitSize;
 
@@ -167,8 +166,8 @@ public class MapObjectivesCanvas extends WidgetGroup{
 
                 Lines.stroke(4f);
                 Draw.color(
-                    isVisualPressed() ? Pal.metalGrayDark : validPlace(tx, ty) ? Pal.accent : Pal.remove,
-                    parentAlpha * (inPlaceBounds(tx, ty) ? 1f : Mathf.absin(3f, 1f))
+                    isVisualPressed() ? Pal.metalGrayDark : validPlace(tx, ty, null) ? Pal.accent : Pal.remove,
+                    parentAlpha
                 );
 
                 Lines.rect(x + tx * unitSize, y + ty * unitSize, objWidth * unitSize, objHeight * unitSize);
@@ -180,8 +179,8 @@ public class MapObjectivesCanvas extends WidgetGroup{
                 float y = this.y + (ty = Mathf.round(moving.y / unitSize)) * unitSize;
 
                 Draw.color(
-                    validMove(moving, tx, ty) ? Pal.accent : Pal.remove,
-                    0.5f * parentAlpha * (inPlaceBounds(tx, ty) ? 1f : Mathf.absin(3f, 1f))
+                    validPlace(tx, ty, moving) ? Pal.accent : Pal.remove,
+                    0.5f * parentAlpha
                 );
 
                 Fill.crect(x, y, objWidth * unitSize, objHeight * unitSize);
@@ -268,43 +267,20 @@ public class MapObjectivesCanvas extends WidgetGroup{
             Draw.reset();
         }
 
-        public boolean inPlaceBounds(int x, int y){
-            return Structs.inBounds(x, y, bounds - objWidth + 1, bounds - objHeight + 1);
-        }
+        public boolean validPlace(int x, int y, @Nullable ObjectiveTile ignore){
+            Tmp.r1.set(x, y, objWidth, objHeight).grow(-0.001f);
 
-        public boolean validPlace(int x, int y){
-            if(!inPlaceBounds(x, y)) return false;
-            for(int tx = 0; tx < objWidth; tx++){
-                for(int ty = 0; ty < objHeight; ty++){
-                    if(occupied(x + tx, y + ty)) return false;
+            if(!Tmp.r2.setCentered(0, 0, bounds * 2, bounds * 2).contains(Tmp.r1)){
+                return false;
+            }
+
+            for(var other : children){
+                if(other instanceof ObjectiveTile tile && tile != ignore && Tmp.r2.set(tile.tx, tile.ty, objWidth, objHeight).overlaps(Tmp.r1)){
+                    return false;
                 }
             }
 
             return true;
-        }
-
-        public boolean validMove(ObjectiveTile tile, int newX, int newY){
-            if(!inPlaceBounds(newX, newY)) return false;
-
-            int x = tile.tx, y = tile.ty;
-            for(int tx = 0; tx < objWidth; tx++){
-                for(int ty = 0; ty < objHeight; ty++){
-                    grid.set(x + tx, y + ty, false);
-                }
-            }
-
-            boolean valid = validPlace(newX, newY);
-            for(int tx = 0; tx < objWidth; tx++){
-                for(int ty = 0; ty < objHeight; ty++){
-                    grid.set(x + tx, y + ty);
-                }
-            }
-
-            return valid;
-        }
-
-        public boolean occupied(int x, int y){
-            return grid.get(x, y);
         }
 
         public boolean createTile(MapObjective obj){
@@ -312,40 +288,20 @@ public class MapObjectivesCanvas extends WidgetGroup{
         }
 
         public boolean createTile(int x, int y, MapObjective obj){
-            if(!validPlace(x, y)) return false;
+            if(!validPlace(x, y, null)) return false;
 
             ObjectiveTile tile = new ObjectiveTile(obj, x, y);
             tile.pack();
 
             addChild(tile);
-            for(int tx = 0; tx < objWidth; tx++){
-                for(int ty = 0; ty < objHeight; ty++){
-                    grid.set(x + tx, y + ty);
-                }
-            }
 
             return true;
         }
 
         public boolean moveTile(ObjectiveTile tile, int newX, int newY){
-            if(!validMove(tile, newX, newY)) return false;
-
-            int x = tile.tx, y = tile.ty;
-            for(int tx = 0; tx < objWidth; tx++){
-                for(int ty = 0; ty < objHeight; ty++){
-                    grid.set(x + tx, y + ty, false);
-                }
-            }
+            if(!validPlace(newX, newY, tile)) return false;
 
             tile.pos(newX, newY);
-
-            x = newX;
-            y = newY;
-            for(int tx = 0; tx < objWidth; tx++){
-                for(int ty = 0; ty < objHeight; ty++){
-                    grid.set(x + tx, y + ty);
-                }
-            }
 
             return true;
         }
@@ -353,18 +309,10 @@ public class MapObjectivesCanvas extends WidgetGroup{
         public void removeTile(ObjectiveTile tile){
             if(!tile.isDescendantOf(this)) return;
             tile.remove();
-
-            int x = tile.tx, y = tile.ty;
-            for(int tx = 0; tx < objWidth; tx++){
-                for(int ty = 0; ty < objHeight; ty++){
-                    grid.set(x + tx, y + ty, false);
-                }
-            }
         }
 
         public void clearTiles(){
             clearChildren();
-            grid.clear();
         }
 
         @Override
