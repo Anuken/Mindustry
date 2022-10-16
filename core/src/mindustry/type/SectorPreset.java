@@ -29,8 +29,17 @@ public class SectorPreset extends UnlockableContent{
     public boolean attackAfterWaves = false;
 
     public SectorPreset(String name, Planet planet, int sector){
+        this(name);
+        initialize(planet, sector);
+    }
+
+    /** Internal use only! */
+    public SectorPreset(String name){
         super(name);
         this.generator = new FileMapGenerator(name, this);
+    }
+
+    public void initialize(Planet planet, int sector){
         this.planet = planet;
         sector %= planet.sectors.size;
         this.sector = planet.sectors.get(sector);
