@@ -346,6 +346,9 @@ public class Logic implements ApplicationListener{
         //disable attack mode
         state.rules.attackMode = false;
 
+        //map is over, no more world processor objective stuff
+        state.rules.disableWorldProcessors = true;
+
         //save, just in case
         if(!headless && !net.client()){
             control.saves.saveSector(state.rules.sector);
