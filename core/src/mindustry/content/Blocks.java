@@ -5484,7 +5484,7 @@ public class Blocks{
             researchCostMultiplier = 0.4f;
 
             consumePower(3f);
-            consumeLiquid(Liquids.nitrogen, 24f / 60f);
+            consumeLiquid(Liquids.cyanogen, 24f / 60f);
         }};
 
         //TODO requirements
