@@ -393,7 +393,7 @@ public class ErekirTechTree{
                                         });
                                     });
 
-                                    node(peaks, Seq.with(new SectorComplete(marsh), new SectorComplete(split)), () ->{
+                                    node(peaks, Seq.with(new SectorComplete(marsh), new SectorComplete(split)), () -> {
 
                                     });
                                 });

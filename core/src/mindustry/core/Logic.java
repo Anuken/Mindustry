@@ -377,6 +377,7 @@ public class Logic implements ApplicationListener{
     public static void researched(Content content){
         if(!(content instanceof UnlockableContent u)) return;
 
+        //TODO node is wrong for shared tech nodes
         var node = u.techNode;
 
         //unlock all direct dependencies on client, permanently
