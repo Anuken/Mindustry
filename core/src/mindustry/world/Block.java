@@ -828,6 +828,10 @@ public class Block extends UnlockableContent implements Senseable{
         return generatedIcons == null ? (generatedIcons = icons()) : generatedIcons;
     }
 
+    public void resetGeneratedIcons(){
+        generatedIcons = null;
+    }
+
     public TextureRegion[] variantRegions(){
         return variantRegions == null ? (variantRegions = new TextureRegion[]{fullIcon}) : variantRegions;
     }
@@ -854,6 +858,10 @@ public class Block extends UnlockableContent implements Senseable{
 
     public boolean isVisible(){
         return !isHidden() && (state.rules.editor || (!state.rules.hideBannedBlocks || !state.rules.isBanned(this)));
+    }
+
+    public boolean isVisibleOn(Planet planet){
+        return !Structs.contains(requirements, i -> planet.hiddenItems.contains(i.item));
     }
 
     public boolean isPlaceable(){

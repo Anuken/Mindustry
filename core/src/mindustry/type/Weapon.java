@@ -221,6 +221,9 @@ public class Weapon implements Cloneable{
 
         Draw.xscl = -Mathf.sign(flipSprite);
 
+        //fix color
+        unit.type.applyColor(unit);
+
         if(region.found()) Draw.rect(region, wx, wy, weaponRotation);
 
         if(cellRegion.found()){
@@ -434,7 +437,7 @@ public class Weapon implements Cloneable{
         bulletY = mountY + Angles.trnsy(weaponRotation, this.shootX + xOffset + xSpread, this.shootY + yOffset),
         shootAngle = bulletRotation(unit, mount, bulletX, bulletY) + angleOffset,
         lifeScl = bullet.scaleLife ? Mathf.clamp(Mathf.dst(bulletX, bulletY, mount.aimX, mount.aimY) / bullet.range) : 1f,
-        angle = angleOffset + shootAngle + Mathf.range(inaccuracy);
+        angle = angleOffset + shootAngle + Mathf.range(inaccuracy + bullet.inaccuracy);
 
         mount.bullet = bullet.create(unit, unit.team, bulletX, bulletY, angle, -1f, (1f - velocityRnd) + Mathf.random(velocityRnd), lifeScl, null, mover, mount.aimX, mount.aimY);
         handleBullet(unit, mount, mount.bullet);

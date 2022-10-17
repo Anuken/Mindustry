@@ -510,12 +510,21 @@ public class LExecutor{
                         if(!unit.within(x1, y1, range)){
                             exec.setobj(p3, null);
                             exec.setobj(p4, null);
+                            exec.setobj(p5, null);
                         }else{
                             Tile tile = world.tileWorld(x1, y1);
-                            //any environmental solid block is returned as StoneWall, aka "@solid"
-                            Block block = tile == null ? null : !tile.synthetic() ? (tile.solid() ? Blocks.stoneWall : Blocks.air) : tile.block();
-                            exec.setobj(p3, block);
-                            exec.setobj(p4, tile != null && tile.build != null ? tile.build : null);
+                            if(tile == null){
+                                exec.setobj(p3, null);
+                                exec.setobj(p4, null);
+                                exec.setobj(p5, null);
+                            }else{
+                                //any environmental solid block is returned as StoneWall, aka "@solid"
+                                Block block = !tile.synthetic() ? (tile.solid() ? Blocks.stoneWall : Blocks.air) : tile.block();
+                                exec.setobj(p3, block);
+                                exec.setobj(p4, tile.build != null ? tile.build : null);
+                                //Allows reading of ore tiles if they are present (overlay is not air) otherwise returns the floor
+                                exec.setobj(p5, tile.overlay() == Blocks.air ? tile.floor() : tile.overlay());
+                            }
                         }
                     }
                     case itemDrop -> {
@@ -860,7 +869,7 @@ public class LExecutor{
         public void run(LExecutor exec){
             if(op == LogicOp.strictEqual){
                 Var v = exec.var(a), v2 = exec.var(b);
-                exec.setnum(dest, v.isobj == v2.isobj && ((v.isobj && v.objval == v2.objval) || (!v.isobj && v.numval == v2.numval)) ? 1 : 0);
+                exec.setnum(dest, v.isobj == v2.isobj && ((v.isobj && Structs.eq(v.objval, v2.objval)) || (!v.isobj && v.numval == v2.numval)) ? 1 : 0);
             }else if(op.unary){
                 exec.setnum(dest, op.function1.get(exec.num(a)));
             }else{

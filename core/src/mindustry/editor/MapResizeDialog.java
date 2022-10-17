@@ -43,7 +43,7 @@ public class MapResizeDialog extends BaseDialog{
                 table.field((x ? shiftX : shiftY) + "", value -> {
                     int val = Integer.parseInt(value);
                     if(x) shiftX = val; else shiftY = val;
-                }).valid(Strings::canParseInt).maxTextLength(3);
+                }).valid(Strings::canParseInt).maxTextLength(4);
 
                 table.row();
             }
