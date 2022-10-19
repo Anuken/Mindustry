@@ -103,18 +103,18 @@ public enum Achievement{
     joinCommunityServer, //TODO - Steam
     openConsole, //TODO - Steam
 
-    controlTurret, //TODO - Steam
-    dropUnitsCoreZone, //TODO - Steam
-    destroyScatterFlare, //TODO - Steam
-    boostUnit, //TODO - Steam
-    boostBuildingFloor, //TODO - Steam
+    controlTurret, //TODO - Steam - icon done
+    dropUnitsCoreZone, //TODO - Steam - icon done
+    destroyScatterFlare, //TODO - Steam - icon done
+    boostUnit, //TODO - Steam - icon done
+    boostBuildingFloor, //TODO - Steam - icon done
 
-    hoverUnitLiquid, //TODO - Steam
+    hoverUnitLiquid, //TODO - Steam - icon done
 
-    break100Boulders(SStat.bouldersDeconstructed, 100), //TODO - Steam
-    break10000Boulders(SStat.bouldersDeconstructed, 10_000), //TODO - Steam
+    break100Boulders(SStat.bouldersDeconstructed, 100), //TODO - Steam - icon done
+    break10000Boulders(SStat.bouldersDeconstructed, 10_000), //TODO - Steam - icon done
 
-    shockwaveTowerUse, //TODO - Steam
+    shockwaveTowerUse, //TODO - Steam - icon done
 
     ;
 

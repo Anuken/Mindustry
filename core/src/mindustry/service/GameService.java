@@ -481,7 +481,7 @@ public class GameService{
         });
 
         Events.on(PayloadDropEvent.class, e -> {
-            if(e.unit != null && e.carrier.team == state.rules.defaultTeam && state.rules.waveTeam.cores().contains(c -> c.within(e.unit, state.rules.enemyCoreBuildRadius))){
+            if(campaign() && e.unit != null && e.carrier.team == state.rules.defaultTeam && state.rules.waveTeam.cores().contains(c -> c.within(e.unit, state.rules.enemyCoreBuildRadius))){
                 dropUnitsCoreZone.complete();
             }
         });
