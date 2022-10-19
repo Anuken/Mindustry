@@ -1337,7 +1337,7 @@ public class Blocks{
             requirements(Category.crafting, with(Items.tungsten, 110, Items.thorium, 150, Items.oxide, 60));
             craftEffect = Fx.none;
             outputItem = new ItemStack(Items.carbide, 1);
-            craftTime = 60f * 3f;
+            craftTime = 60f * 2.25f;
             size = 3;
             itemCapacity = 20;
             hasPower = hasItems = true;

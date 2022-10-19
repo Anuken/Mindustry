@@ -165,7 +165,7 @@ public class SectorPresets{
 
         crevice = new SectorPreset("crevice", erekir, 3){{
             difficulty = 4;
-            captureWave = 45;
+            captureWave = 46;
         }};
 
         siege = new SectorPreset("siege", erekir, 58){{
