@@ -298,7 +298,7 @@ public class ErekirTechTree{
             });
 
             node(coreCitadel, Seq.with(new SectorComplete(peaks)), () -> {
-                node(coreAcropolis, () -> {
+                node(coreAcropolis, Seq.with(new SectorComplete(siege)), () -> {
 
                 });
             });
