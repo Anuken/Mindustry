@@ -148,8 +148,8 @@ public class ErekirTechTree{
                     node(ventCondenser, Seq.with(new OnSector(aegis)), () -> {
                         node(chemicalCombustionChamber, Seq.with(new OnSector(basin)), () -> {
                             node(pyrolysisGenerator, Seq.with(new OnSector(crevice)), () -> {
-                                node(fluxReactor, Seq.with(tmpNever), () -> {
-                                    node(neoplasiaReactor, () -> {
+                                node(fluxReactor, Seq.with(new OnSector(crossroads), new Research(cyanogenSynthesizer)), () -> {
+                                    node(neoplasiaReactor, Seq.with(new OnSector(karst)), () -> {
 
                                     });
                                 });
@@ -214,8 +214,8 @@ public class ErekirTechTree{
                                         });
 
                                         node(carbideCrucible, Seq.with(new OnSector(crevice)), () -> {
-                                            node(phaseSynthesizer, Seq.with(tmpNever), () -> {
-                                                node(phaseHeater, () -> {
+                                            node(phaseSynthesizer, Seq.with(new OnSector(karst)), () -> {
+                                                node(phaseHeater, Seq.with(new Research(phaseSynthesizer)), () -> {
 
                                                 });
                                             });
@@ -274,7 +274,7 @@ public class ErekirTechTree{
                         node(afflict, Seq.with(new OnSector(ravine)), () -> {
                             node(titan, Seq.with(new OnSector(stronghold)), () -> {
                                 node(lustre, Seq.with(new OnSector(crevice)), () -> {
-                                    node(smite, Seq.with(tmpNever), () -> {
+                                    node(smite, Seq.with(new OnSector(karst)), () -> {
 
                                     });
                                 });
@@ -340,24 +340,24 @@ public class ErekirTechTree{
                                             });
                                         });
 
-                                        node(shipAssembler, Seq.with(tmpNever), () -> {
+                                        node(shipAssembler, Seq.with(new OnSector(crossroads)), () -> {
                                             node(UnitTypes.quell, () -> {
                                                 node(UnitTypes.disrupt, Seq.with(tmpNever), () -> {
 
                                                 });
                                             });
+                                        });
 
-                                            node(mechAssembler, Seq.with(tmpNever), () -> {
-                                                node(UnitTypes.tecta, () -> {
-                                                    node(UnitTypes.collaris, Seq.with(tmpNever), () -> {
-
-                                                    });
-                                                });
-
-                                                node(basicAssemblerModule, () -> {
+                                        node(mechAssembler, Seq.with(new OnSector(crossroads)), () -> {
+                                            node(UnitTypes.tecta, () -> {
+                                                node(UnitTypes.collaris, Seq.with(tmpNever), () -> {
 
                                                 });
                                             });
+                                        });
+
+                                        node(basicAssemblerModule, Seq.with(tmpNever), () -> {
+
                                         });
                                     });
                                 });
@@ -386,7 +386,11 @@ public class ErekirTechTree{
                                             node(stronghold, Seq.with(new SectorComplete(caldera), new Research(coreCitadel)), () -> {
                                                 node(crevice, Seq.with(new SectorComplete(stronghold)), () -> {
                                                     node(siege, Seq.with(new SectorComplete(crevice)), () -> {
+                                                        node(crossroads, Seq.with(new SectorComplete(siege)), () -> {
+                                                            node(karst, Seq.with(new SectorComplete(crossroads), new Research(coreAcropolis)), () -> {
 
+                                                            });
+                                                        });
                                                     });
                                                 });
                                             });
