@@ -424,7 +424,9 @@ public class ErekirTechTree{
                             });
 
                             nodeProduce(Liquids.cyanogen, () -> {
+                                nodeProduce(Liquids.neoplasm, () -> {
 
+                                });
                             });
                         });
                     });
