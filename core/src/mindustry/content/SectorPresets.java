@@ -172,7 +172,7 @@ public class SectorPresets{
             difficulty = 4;
         }};
 
-        crossroads = new SectorPreset("crossroads", erekir, 36){{
+        crossroads = new SectorPreset("crossroads", erekir, 37){{
             difficulty = 5;
         }};
 
