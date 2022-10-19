@@ -25,6 +25,8 @@ import mindustry.world.blocks.payloads.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
+import static mindustry.Vars.*;
+
 public class UnitFactory extends UnitBlock{
     public int[] capacities = {};
 
@@ -73,6 +75,8 @@ public class UnitFactory extends UnitBlock{
                 itemCapacity = Math.max(itemCapacity, stack.amount * 2);
             }
         }
+
+        consumeBuilder.each(c -> c.multiplier = b -> state.rules.unitCost(b.team));
 
         super.init();
     }

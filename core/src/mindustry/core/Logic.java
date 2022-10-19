@@ -346,6 +346,10 @@ public class Logic implements ApplicationListener{
         //disable attack mode
         state.rules.attackMode = false;
 
+        //map is over, no more world processor objective stuff
+        state.rules.disableWorldProcessors = true;
+        state.rules.objectives.clear();
+
         //save, just in case
         if(!headless && !net.client()){
             control.saves.saveSector(state.rules.sector);
@@ -364,9 +368,7 @@ public class Logic implements ApplicationListener{
     public static void gameOver(Team winner){
         state.stats.wavesLasted = state.wave;
         state.won = player.team() == winner;
-        Time.run(60f * 3f, () -> {
-            ui.restart.show(winner);
-        });
+        Time.run(60f * 3f, () -> ui.restart.show(winner));
         netClient.setQuiet();
     }
 
@@ -375,6 +377,7 @@ public class Logic implements ApplicationListener{
     public static void researched(Content content){
         if(!(content instanceof UnlockableContent u)) return;
 
+        //TODO node is wrong for shared tech nodes
         var node = u.techNode;
 
         //unlock all direct dependencies on client, permanently
@@ -384,39 +387,6 @@ public class Logic implements ApplicationListener{
         }
 
         state.rules.researched.add(u.name);
-    }
-
-    //called when the remote server runs a turn and produces something
-    @Remote
-    public static void sectorProduced(int[] amounts){
-        //TODO currently disabled.
-        if(!state.isCampaign() || true) return;
-
-        Planet planet = state.rules.sector.planet;
-        boolean any = false;
-
-        for(Item item : content.items()){
-            int am = amounts[item.id];
-            if(am > 0){
-                int sumMissing = planet.sectors.sum(s -> s.hasBase() ? s.info.storageCapacity - s.info.items.get(item) : 0);
-                if(sumMissing == 0) continue;
-                //how much % to add
-                double percent = Math.min((double)am / sumMissing, 1);
-                for(Sector sec : planet.sectors){
-                    if(sec.hasBase()){
-                        int added = (int)Math.ceil(((sec.info.storageCapacity - sec.info.items.get(item)) * percent));
-                        sec.info.items.add(item, added);
-                        any = true;
-                    }
-                }
-            }
-        }
-
-        if(any){
-            for(Sector sec : planet.sectors){
-                sec.saveInfo();
-            }
-        }
     }
 
     @Override

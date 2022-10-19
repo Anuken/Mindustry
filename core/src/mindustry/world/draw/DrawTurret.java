@@ -40,6 +40,8 @@ public class DrawTurret extends DrawBlock{
         if(block.region.found() && !(block.outlinedIcon > 0 && block.getGeneratedIcons()[block.outlinedIcon].equals(block.region))){
             out.add(block.region);
         }
+
+        block.resetGeneratedIcons();
     }
 
     @Override

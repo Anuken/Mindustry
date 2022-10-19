@@ -63,6 +63,8 @@ public class Rules{
     public float solarMultiplier = 1f;
     /** How fast unit factories build units. */
     public float unitBuildSpeedMultiplier = 1f;
+    /** Multiplier of resources that units take to build. */
+    public float unitCostMultiplier = 1f;
     /** How much damage any other units deal. */
     public float unitDamageMultiplier = 1f;
     /** If true, ghost blocks will appear upon destruction, letting builder blocks/units rebuild them. */
@@ -93,6 +95,12 @@ public class Rules{
     public boolean onlyDepositCore = false;
     /** If true, every enemy block in the radius of the (enemy) core is destroyed upon death. Used for campaign maps. */
     public boolean coreDestroyClear = false;
+    /** If true, banned blocks are hidden from the build menu. */
+    public boolean hideBannedBlocks = false;
+    /** If true, bannedBlocks becomes a whitelist. */
+    public boolean blockWhitelist = false;
+    /** If true, bannedUnits becomes a whitelist. */
+    public boolean unitWhitelist = false;
     /** Radius around enemy wave drop zones.*/
     public float dropZoneRadius = 300f;
     /** Time between waves in ticks. */
@@ -206,6 +214,10 @@ public class Rules{
         return unitBuildSpeedMultiplier * teams.get(team).unitBuildSpeedMultiplier;
     }
 
+    public float unitCost(Team team){
+        return unitCostMultiplier * teams.get(team).unitCostMultiplier;
+    }
+
     public float unitDamage(Team team){
         return unitDamageMultiplier * teams.get(team).unitDamageMultiplier;
     }
@@ -220,6 +232,14 @@ public class Rules{
 
     public float buildSpeed(Team team){
         return buildSpeedMultiplier * teams.get(team).buildSpeedMultiplier;
+    }
+
+    public boolean isBanned(Block block){
+        return blockWhitelist != bannedBlocks.contains(block);
+    }
+
+    public boolean isBanned(UnitType unit){
+        return unitWhitelist != bannedUnits.contains(unit);
     }
 
     /** A team-specific ruleset. */
@@ -246,6 +266,8 @@ public class Rules{
         public float unitBuildSpeedMultiplier = 1f;
         /** How much damage any other units deal. */
         public float unitDamageMultiplier = 1f;
+        /** Multiplier of resources that units take to build. */
+        public float unitCostMultiplier = 1f;
         /** How much health blocks start with. */
         public float blockHealthMultiplier = 1f;
         /** How much damage blocks (turrets) deal. */

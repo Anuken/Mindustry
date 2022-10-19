@@ -45,6 +45,9 @@ public class StatusEffects{
 
                 affinity(blasted, (unit, result, time) -> {
                     unit.damagePierce(transitionDamage);
+                    if(unit.team == state.rules.waveTeam){
+                        Events.fire(Trigger.blastFreeze);
+                    }
                 });
             });
         }};

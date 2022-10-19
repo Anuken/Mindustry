@@ -141,7 +141,7 @@ public class MinimapRenderer{
                     float rx = player.x / (world.width() * tilesize) * w;
                     float ry = player.y / (world.height() * tilesize) * h;
 
-                    drawLabel(x + rx, y + ry, player.name, player.team().color);
+                    drawLabel(x + rx, y + ry, player.name, player.color);
                 }
             }
         }

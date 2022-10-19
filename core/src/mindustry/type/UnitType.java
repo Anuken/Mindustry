@@ -557,7 +557,7 @@ public class UnitType extends UnlockableContent{
     }
 
     public boolean isBanned(){
-        return state.rules.bannedUnits.contains(this);
+        return state.rules.isBanned(this);
     }
 
     @Override
@@ -589,7 +589,7 @@ public class UnitType extends UnlockableContent{
         stats.add(Stat.health, health);
         stats.add(Stat.armor, armor);
         stats.add(Stat.speed, speed * 60f / tilesize, StatUnit.tilesSecond);
-        stats.add(Stat.size, StatValues.squared(hitSize / tilesize, StatUnit.blocksSquared));
+        stats.add(Stat.size, StatValues.squared(hitSize / tilesize, StatUnit.blocks));
         stats.add(Stat.itemCapacity, itemCapacity);
         stats.add(Stat.range, (int)(maxRange / tilesize), StatUnit.blocks);
 
@@ -621,7 +621,7 @@ public class UnitType extends UnlockableContent{
             stats.addPercent(Stat.buildSpeed, buildSpeed);
         }
         if(sample instanceof Payloadc){
-            stats.add(Stat.payloadCapacity, StatValues.squared(Mathf.sqrt(payloadCapacity / (tilesize * tilesize)), StatUnit.blocksSquared));
+            stats.add(Stat.payloadCapacity, StatValues.squared(Mathf.sqrt(payloadCapacity / (tilesize * tilesize)), StatUnit.blocks));
         }
 
         var reqs = getFirstRequirements();
