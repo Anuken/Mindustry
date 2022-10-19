@@ -2535,6 +2535,8 @@ public class Blocks{
 
             ambientSound = Sounds.smelter;
             ambientSoundVolume = 0.06f;
+
+            researchCostMultiplier = 0.4f;
         }};
 
         //TODO stats
