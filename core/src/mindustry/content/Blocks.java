@@ -2934,7 +2934,7 @@ public class Blocks{
         }};
 
         coreCitadel = new CoreBlock("core-citadel"){{
-            requirements(Category.effect, with(Items.silicon, 4000, Items.beryllium, 5000, Items.tungsten, 3000, Items.oxide, 2000));
+            requirements(Category.effect, with(Items.silicon, 4000, Items.beryllium, 5000, Items.tungsten, 3000, Items.oxide, 1000));
 
             unitType = UnitTypes.incite;
             health = 16000;
@@ -2943,6 +2943,7 @@ public class Blocks{
             thrusterLength = 40/4f;
             armor = 10f;
             incinerateNonBuildable = true;
+            buildCostMultiplier = 0.7f;
 
             unitCapModifier = 15;
             researchCostMultipliers.put(Items.silicon, 0.5f);
@@ -2950,7 +2951,7 @@ public class Blocks{
         }};
 
         coreAcropolis = new CoreBlock("core-acropolis"){{
-            requirements(Category.effect, with(Items.beryllium, 8000, Items.silicon, 8000, Items.tungsten, 6000, Items.carbide, 5000, Items.oxide, 5000));
+            requirements(Category.effect, with(Items.beryllium, 8000, Items.silicon, 7000, Items.tungsten, 6000, Items.carbide, 5000, Items.oxide, 4000));
 
             unitType = UnitTypes.emanate;
             health = 30000;
@@ -2959,6 +2960,7 @@ public class Blocks{
             thrusterLength = 48/4f;
             armor = 15f;
             incinerateNonBuildable = true;
+            buildCostMultiplier = 0.7f;
 
             unitCapModifier = 15;
             researchCostMultipliers.put(Items.silicon, 0.4f);

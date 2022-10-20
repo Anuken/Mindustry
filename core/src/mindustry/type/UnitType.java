@@ -215,6 +215,8 @@ public class UnitType extends UnlockableContent{
     /** if false, RTS AI controlled units do not automatically attack things while moving. This is automatically assigned. */
     autoFindTarget = true,
 
+    /** whether this unit has a hover tooltip */
+    hoverable = true,
     /** if true, this modded unit always has a -outline region generated for its base. Normally, outlines are ignored if there are no top = false weapons. */
     alwaysCreateOutline = false,
     /** if true, this unit has a square shadow. */
