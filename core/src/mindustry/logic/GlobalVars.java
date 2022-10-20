@@ -38,7 +38,14 @@ public class GlobalVars{
         put("false", 0);
         put("true", 1);
         put("null", null);
-
+        
+        //math
+        put("@pi", Mathf.PI);
+        put("π", Mathf.PI); //for the "cool" kids
+        put("@e", Mathf.E);
+        put("@degToRad", Mathf.degRad);
+        put("@radToDeg", Mathf.radDeg);
+        
         //time
         varTime = put("@time", 0);
         varTick = put("@tick", 0);
@@ -48,7 +55,6 @@ public class GlobalVars{
         varWaveTime = put("@waveTime", 0);
 
         //special enums
-
         put("@ctrlProcessor", ctrlProcessor);
         put("@ctrlPlayer", ctrlPlayer);
         put("@ctrlCommand", ctrlCommand);
@@ -68,12 +74,14 @@ public class GlobalVars{
         }
 
         for(Block block : Vars.content.blocks()){
-            put("@" + block.name, block);
+            //only register blocks that have no item equivalent (this skips sand)
+            if(content.item(block.name) == null){
+                put("@" + block.name, block);
+            }
         }
 
         //used as a special value for any environmental solid block
         put("@solid", Blocks.stoneWall);
-        put("@air", Blocks.air);
 
         for(UnitType type : Vars.content.units()){
             put("@" + type.name, type);
@@ -161,6 +169,12 @@ public class GlobalVars{
 
     /** Adds a constant value by name. */
     public int put(String name, Object value){
+        int existingIdx = namesToIds.get(name, -1);
+        if(existingIdx != -1){ //don't overwrite existing vars (see #6910)
+            Log.debug("Failed to add global logic variable '@', as it already exists.", name);
+            return existingIdx;
+        }
+
         Var var = new Var(name);
         var.constant = true;
         if(value instanceof Number num){

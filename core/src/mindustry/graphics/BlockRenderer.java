@@ -48,8 +48,8 @@ public class BlockRenderer{
     private IntSet darkEvents = new IntSet();
     private IntSet procLinks = new IntSet(), procLights = new IntSet();
 
-    private BlockQuadtree blockTree;
-    private FloorQuadtree floorTree;
+    private BlockQuadtree blockTree = new BlockQuadtree(new Rect(0, 0, 1, 1));
+    private FloorQuadtree floorTree = new FloorQuadtree(new Rect(0, 0, 1, 1));
 
     public BlockRenderer(){
 
@@ -110,6 +110,8 @@ public class BlockRenderer{
         });
 
         Events.on(TilePreChangeEvent.class, event -> {
+            if(blockTree == null || floorTree == null) return;
+
             if(indexBlock(event.tile)) blockTree.remove(event.tile);
             if(indexFloor(event.tile)) floorTree.remove(event.tile);
         });
@@ -422,12 +424,12 @@ public class BlockRenderer{
 
                 if(build != null){
                     if(visible){
+                        build.visibleFlags |= (1L << pteam.id);
                         if(!build.wasVisible){
+                            build.wasVisible = true;
                             updateShadow(build);
                             renderer.minimap.update(tile);
                         }
-                        build.visibleFlags |= (1L << pteam.id);
-                        build.wasVisible = true;
                     }
 
                     if(build.damaged()){
@@ -437,8 +439,10 @@ public class BlockRenderer{
                     }
 
                     if(build.team != pteam){
-                        build.drawTeam();
-                        Draw.z(Layer.block);
+                        if(build.block.drawTeamOverlay){
+                            build.drawTeam();
+                            Draw.z(Layer.block);
+                        }
                     }else if(renderer.drawStatus && block.hasConsumers){
                         build.drawStatus();
                     }

@@ -8,7 +8,7 @@ import mindustry.entities.*;
 public class WrapEffect extends Effect{
     public Effect effect = Fx.none;
     public Color color = Color.white.cpy();
-    public float rotation = Float.NaN;
+    public float rotation;
 
     public WrapEffect(){
     }

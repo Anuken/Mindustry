@@ -9,11 +9,10 @@ public class LiquidRouter extends LiquidBlock{
 
     public LiquidRouter(String name){
         super(name);
-
-        underBullets = true;
-        solid = false;
+        solid = true;
         noUpdateDisabled = true;
         canOverdrive = false;
+        floating = true;
     }
 
     @Override

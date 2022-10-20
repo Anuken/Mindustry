@@ -51,6 +51,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     //TODO could be better represented as a unit
     transient @Nullable UnitType dockedType;
 
+    transient String lastCommanded;
     transient float shadowAlpha = -1f, healTime;
     transient int lastFogPos;
     private transient float resupplyTime = Mathf.random(10f);
@@ -60,6 +61,12 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     /** Called when this unit was unloaded from a factory or spawn point. */
     public void unloaded(){
 
+    }
+
+    public void updateBoosting(boolean boost){
+        if(!type.canBoost) return;
+
+        elevation = Mathf.approachDelta(elevation, type.canBoost ? Mathf.num(boost || onSolid() || (isFlying() && !canLand())) : 0f, type.riseSpeed);
     }
 
     /** Move based on preferred unit movement type. */
@@ -132,6 +139,11 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             return vel().angle();
         }
         return rotation;
+    }
+
+    @Override
+    public boolean displayable(){
+        return type.hoverable;
     }
 
     @Override
@@ -405,7 +417,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
         //make sure trail doesn't just go poof
         if(trail != null && trail.size() > 0){
-            Fx.trailFade.at(x, y, trail.width(), team.color, trail.copy());
+            Fx.trailFade.at(x, y, trail.width(), type.trailColor == null ? team.color : type.trailColor, trail.copy());
         }
     }
 
@@ -435,6 +447,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         }
         healTime -= Time.delta / 20f;
         wasHealed = false;
+
+        if(!headless && type.loopSound != Sounds.none){
+            control.sound.loop(type.loopSound, this, type.loopSoundVolume);
+        }
 
         //check if environment is unsupported
         if(!type.supportsEnv(state.rules.env) && !dead){
@@ -469,7 +485,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         drag = type.drag * (isGrounded() ? (floorOn().dragMultiplier) : 1f) * dragMultiplier * state.rules.dragMultiplier;
 
         //apply knockback based on spawns
-        if(team != state.rules.waveTeam && state.hasSpawns() && (!net.client() || isLocal())){
+        if(team != state.rules.waveTeam && state.hasSpawns() && (!net.client() || isLocal()) && hittable()){
             float relativeSize = state.rules.dropZoneRadius + hitSize/2f + 1f;
             for(Tile spawn : spawner.getSpawns()){
                 if(within(spawn.worldx(), spawn.worldy(), relativeSize)){
@@ -583,7 +599,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         }
 
         for(WeaponMount mount : mounts){
-            if(mount.weapon.shootOnDeath && !(mount.weapon.bullet.killShooter && mount.shoot)){
+            if(mount.weapon.shootOnDeath && !(mount.weapon.bullet.killShooter && mount.totalShots > 0)){
                 mount.reload = 0f;
                 mount.shoot = true;
                 mount.weapon.update(self(), mount);
@@ -591,7 +607,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         }
 
         //if this unit crash landed (was flying), damage stuff in a radius
-        if(type.flying && !spawnedByCore && !type.createWreck){
+        if(type.flying && !spawnedByCore && type.createWreck){
             Damage.damage(team, x, y, Mathf.pow(hitSize, 0.94f) * 1.25f, Mathf.pow(hitSize, 0.75f) * type.crashDamageMultiplier * 5f, true, false, true);
         }
 
@@ -608,6 +624,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         for(Ability a : abilities){
             a.death(self());
         }
+
+        type.killed(self());
 
         remove();
     }

@@ -144,7 +144,7 @@ public class BlockIndexer{
         process(tile);
 
         var drop = tile.drop();
-        if(drop != null){
+        if(drop != null && ores != null){
             int qx = tile.x / quadrantSize;
             int qy = tile.y / quadrantSize;
 
@@ -306,22 +306,24 @@ public class BlockIndexer{
         return breturnArray;
     }
 
-    public void notifyBuildHealed(Building build){
-        if(build.wasDamaged && !build.damaged() && damagedTiles[build.team.id] != null){
-            damagedTiles[build.team.id].remove(build);
-            build.wasDamaged = false;
+    public void notifyHealthChanged(Building build){
+        boolean damaged = build.damaged();
+
+        if(build.wasDamaged != damaged){
+            if(damagedTiles[build.team.id] == null){
+                damagedTiles[build.team.id] = new Seq<>(false);
+            }
+
+            if(damaged){
+                //is now damaged, add to array
+                damagedTiles[build.team.id].add(build);
+            }else{
+                //no longer damaged, remove
+                damagedTiles[build.team.id].remove(build);
+            }
+
+            build.wasDamaged = damaged;
         }
-    }
-
-    public void notifyBuildDamaged(Building build){
-        if(build.wasDamaged || !build.damaged()) return;
-
-        if(damagedTiles[build.team.id] == null){
-            damagedTiles[build.team.id] = new Seq<>(false);
-        }
-
-        damagedTiles[build.team.id].add(build);
-        build.wasDamaged = true;
     }
 
     public void allBuildings(float x, float y, float range, Cons<Building> cons){
@@ -473,15 +475,18 @@ public class BlockIndexer{
                 data.turretTree.insert(tile.build);
             }
 
-            notifyBuildDamaged(tile.build);
+            notifyHealthChanged(tile.build);
         }
 
-        if(!tile.block().isStatic()){
-            blocksPresent[tile.floorID()] = true;
-            blocksPresent[tile.overlayID()] = true;
+        if(blocksPresent != null){
+            if(!tile.block().isStatic()){
+                blocksPresent[tile.floorID()] = true;
+                blocksPresent[tile.overlayID()] = true;
+            }
+            //bounds checks only needed in very specific scenarios
+            if(tile.blockID() < blocksPresent.length) blocksPresent[tile.blockID()] = true;
         }
-        //bounds checks only needed in very specific scenarios
-        if(tile.blockID() < blocksPresent.length) blocksPresent[tile.blockID()] = true;
+
     }
 
     static class TurretQuadtree extends QuadTree<Building>{

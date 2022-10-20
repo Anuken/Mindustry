@@ -34,6 +34,7 @@ public class Reconstructor extends UnitBlock{
         regionRotated1 = 1;
         regionRotated2 = 2;
         commandable = true;
+        ambientSound = Sounds.respawning;
     }
 
     @Override
@@ -76,15 +77,32 @@ public class Reconstructor extends UnitBlock{
         stats.add(Stat.output, table -> {
             table.row();
             for(var upgrade : upgrades){
-                float size = 8 * 3;
                 if(upgrade[0].unlockedNow() && upgrade[1].unlockedNow()){
-                    table.image(upgrade[0].uiIcon).size(size).padRight(4).padLeft(10).scaling(Scaling.fit).right();
-                    table.add(upgrade[0].localizedName).left();
+                    table.table(Styles.grayPanel, t -> {
+                        t.left();
 
-                    table.add("[lightgray] -> ");
+                        t.image(upgrade[0].uiIcon).size(40).pad(10f).left().scaling(Scaling.fit);
+                        t.table(info -> {
+                            info.add(upgrade[0].localizedName).left();
+                            info.row();
+                        }).pad(10).left();
+                    }).fill().padTop(5).padBottom(5);
 
-                    table.image(upgrade[1].uiIcon).size(size).padRight(4).scaling(Scaling.fit);
-                    table.add(upgrade[1].localizedName).left();
+                    table.table(Styles.grayPanel, t -> {
+
+                        t.image(Icon.right).color(Pal.darkishGray).size(40).pad(10f);
+                    }).fill().padTop(5).padBottom(5);
+
+                    table.table(Styles.grayPanel, t -> {
+                        t.left();
+
+                        t.image(upgrade[1].uiIcon).size(40).pad(10f).right().scaling(Scaling.fit);
+                        t.table(info -> {
+                            info.add(upgrade[1].localizedName).right();
+                            info.row();
+                        }).pad(10).right();
+                    }).fill().padTop(5).padBottom(5);
+
                     table.row();
                 }
             }
@@ -103,6 +121,8 @@ public class Reconstructor extends UnitBlock{
             }
         }
 
+        consumeBuilder.each(c -> c.multiplier = b -> state.rules.unitCost(b.team));
+
         super.init();
     }
 
@@ -115,6 +135,11 @@ public class Reconstructor extends UnitBlock{
 
         public float fraction(){
             return progress / constructTime;
+        }
+
+        @Override
+        public boolean shouldActiveSound(){
+            return shouldConsume();
         }
 
         @Override

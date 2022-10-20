@@ -64,6 +64,7 @@ public class ServerControl implements ApplicationListener{
     private ServerSocket serverSocket;
     private PrintWriter socketOutput;
     private String suggested;
+    private boolean autoPaused = false;
 
     public ServerControl(String[] args){
         setup(args);
@@ -269,6 +270,23 @@ public class ServerControl implements ApplicationListener{
 
             info("Server loaded. Type @ for help.", "'help'");
         });
+
+        Events.on(PlayerJoin.class, e -> {
+            if(state.serverPaused && autoPaused && Config.autoPause.bool()){
+                state.serverPaused = false;
+                autoPaused = false;
+            }
+        });
+
+        Events.on(PlayerLeave.class, e -> {
+            // The player list length is compared with 1 and not 0 here,
+            // because when PlayerLeave gets fired, the player hasn't been removed from the player list yet
+            if(!state.serverPaused && Config.autoPause.bool() && Groups.player.size() == 1){
+                state.serverPaused = true;
+                autoPaused = true;
+            }
+        });
+
     }
 
     protected void registerCommands(){
@@ -352,6 +370,11 @@ public class ServerControl implements ApplicationListener{
                 info("Map loaded.");
 
                 netServer.openServer();
+
+                if(Config.autoPause.bool()){
+                    state.serverPaused = true;
+                    autoPaused = true;
+                }
             }catch(MapException e){
                 err(e.map.name() + ": " + e.getMessage());
             }
@@ -467,6 +490,7 @@ public class ServerControl implements ApplicationListener{
 
         handler.register("pause", "<on/off>", "Pause or unpause the game.", arg -> {
             boolean pause = arg[0].equals("on");
+            autoPaused = false;
             state.serverPaused = pause;
             info(pause ? "Game paused." : "Game unpaused.");
         });
@@ -784,6 +808,7 @@ public class ServerControl implements ApplicationListener{
 
             if(info != null){
                 info.lastKicked = 0;
+                netServer.admins.kickedIPs.remove(info.lastIP);
                 info("Pardoned player: @", info.plainLastName());
             }else{
                 err("That ID can't be found.");
@@ -814,7 +839,7 @@ public class ServerControl implements ApplicationListener{
 
             if(target != null){
                 if(add){
-                    netServer.admins.adminPlayer(target.id, target.adminUsid);
+                    netServer.admins.adminPlayer(target.id, playert == null ? target.adminUsid : playert.usid());
                 }else{
                     netServer.admins.unAdminPlayer(target.id);
                 }

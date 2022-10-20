@@ -10,7 +10,6 @@ public class Items{
     phaseFabric, surgeAlloy, sporePod, sand, blastCompound, pyratite, metaglass,
     beryllium, tungsten, oxide, carbide, fissileMatter, dormantCyst;
 
-    //TODO remove, these are for debugging only
     public static final Seq<Item> serpuloItems = new Seq<>(), erekirItems = new Seq<>(), erekirOnlyItems = new Seq<>();
 
     public static void load(){
@@ -23,21 +22,21 @@ public class Items{
         lead = new Item("lead", Color.valueOf("8c7fa9")){{
             hardness = 1;
             cost = 0.7f;
-            alwaysUnlocked = true;
         }};
 
         metaglass = new Item("metaglass", Color.valueOf("ebeef5")){{
             cost = 1.5f;
         }};
 
-        graphite = new Item("graphite", Color.valueOf("95abd9")){{
+        graphite = new Item("graphite", Color.valueOf("b2c6d2")){{
             cost = 1f;
         }};
 
         sand = new Item("sand", Color.valueOf("f7cba4")){{
             lowPriority = true;
-            alwaysUnlocked = true;
             buildable = false;
+            //needed to show up as requirement
+            alwaysUnlocked = true;
         }};
 
         coal = new Item("coal", Color.valueOf("272727")){{

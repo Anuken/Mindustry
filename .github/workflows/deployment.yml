@@ -5,8 +5,12 @@ on:
     tags:
       - 'v*'
 
+permissions: {}
 jobs:
   deploy:
+    permissions:
+      contents: write # for release creation (svenstaro/upload-release-action)
+
     runs-on: ubuntu-latest
 
     steps:
@@ -29,6 +33,8 @@ jobs:
         cd ../
         cp -r ./Mindustry ./MindustryJitpack
         cd MindustryJitpack
+        git config --global user.name "Github Actions"
+        git config --global user.email "actions@github.com"
         git clone --depth 1 https://github.com/Anuken/MindustryJitpack.git
         rm -rf .git
         cp -r ./MindustryJitpack/.git ./.git

@@ -59,7 +59,7 @@ public class GameState{
     }
 
     public boolean hasSpawns(){
-        return rules.waves && !(isCampaign() && rules.attackMode);
+        return rules.waves && ((rules.waveTeam.cores().size > 0 && rules.attackMode) || rules.spawns.size > 0);
     }
 
     /** Note that being in a campaign does not necessarily mean having a sector. */
@@ -71,9 +71,12 @@ public class GameState{
         return rules.sector != null;
     }
 
-    @Nullable
-    public Sector getSector(){
+    public @Nullable Sector getSector(){
         return rules.sector;
+    }
+
+    public @Nullable Planet getPlanet(){
+        return rules.sector != null ? rules.sector.planet : null;
     }
 
     public boolean isEditor(){

@@ -28,7 +28,7 @@ public class AutoDoor extends Wall{
     public Effect closefx = Fx.doorclose;
     public Sound doorSound = Sounds.door;
     public @Load("@-open") TextureRegion openRegion;
-    public float triggerMargin = 10f;
+    public float triggerMargin = 12f;
 
     public AutoDoor(String name){
         super(name);

@@ -174,7 +174,7 @@ public class World{
         return x + y * tiles.width;
     }
 
-    private void clearTileEntities(){
+    public void clearBuildings(){
         for(Tile tile : tiles){
             if(tile != null && tile.build != null){
                 tile.build.remove();
@@ -187,7 +187,7 @@ public class World{
      * Only use for loading saves!
      */
     public Tiles resize(int width, int height){
-        clearTileEntities();
+        clearBuildings();
 
         if(tiles.width != width || tiles.height != height){
             tiles = new Tiles(width, height);
@@ -202,6 +202,7 @@ public class World{
      */
     public void beginMapLoad(){
         generating = true;
+        Events.fire(new WorldLoadBeginEvent());
     }
 
     /**
@@ -209,6 +210,7 @@ public class World{
      * A WorldLoadEvent will be fire.
      */
     public void endMapLoad(){
+        Events.fire(new WorldLoadEndEvent());
 
         for(Tile tile : tiles){
             //remove legacy blocks; they need to stop existing
@@ -252,11 +254,11 @@ public class World{
     }
 
     public void loadSector(Sector sector){
-        loadSector(sector, 0);
+        loadSector(sector, 0, true);
     }
 
-    public void loadSector(Sector sector, int seedOffset){
-        setSectorRules(sector);
+    public void loadSector(Sector sector, int seedOffset, boolean saveInfo){
+        setSectorRules(sector, saveInfo);
 
         int size = sector.getSize();
         loadGenerator(size, size, tiles -> {
@@ -272,20 +274,24 @@ public class World{
             state.rules.sector = sector;
         });
 
+        if(saveInfo && state.rules.waves){
+            sector.info.waves = state.rules.waves;
+        }
+
         //postgenerate for bases
         if(sector.preset == null && sector.planet.generator != null){
             sector.planet.generator.postGenerate(tiles);
         }
 
         //reset rules
-        setSectorRules(sector);
+        setSectorRules(sector, saveInfo);
 
         if(state.rules.defaultTeam.core() != null){
             sector.info.spawnPosition = state.rules.defaultTeam.core().pos();
         }
     }
 
-    private void setSectorRules(Sector sector){
+    private void setSectorRules(Sector sector, boolean saveInfo){
         state.map = new Map(StringMap.of("name", sector.preset == null ? sector.planet.localizedName + "; Sector " + sector.id : sector.preset.localizedName));
         state.rules.sector = sector;
         state.rules.weather.clear();
@@ -314,7 +320,10 @@ public class World{
         sector.planet.applyRules(state.rules);
         sector.info.resources = content.toSeq();
         sector.info.resources.sort(Structs.comps(Structs.comparing(Content::getContentType), Structs.comparingInt(c -> c.id)));
-        sector.saveInfo();
+
+        if(saveInfo){
+            sector.saveInfo();
+        }
     }
 
     public Context filterContext(Map map){
@@ -448,7 +457,7 @@ public class World{
     public void checkMapArea(){
         for(var build : Groups.build){
             //reset map-area-based disabled blocks.
-            if(build.allowUpdate() && !build.enabled){
+            if(build.allowUpdate() && !build.enabled && build.block.autoResetEnabled){
                 build.enabled = true;
             }
         }

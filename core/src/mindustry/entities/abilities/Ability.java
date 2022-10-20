@@ -6,6 +6,8 @@ import mindustry.gen.*;
 import mindustry.type.*;
 
 public abstract class Ability implements Cloneable{
+    /** If false, this ability does not show in unit stats. */
+    public boolean display = true;
     //the one and only data variable that is synced.
     public float data;
 

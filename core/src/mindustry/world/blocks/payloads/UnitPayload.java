@@ -42,6 +42,11 @@ public class UnitPayload implements Payload{
     }
 
     @Override
+    public void update(@Nullable Unit unitHolder, @Nullable Building buildingHolder){
+        unit.type.updatePayload(unit, unitHolder, buildingHolder);
+    }
+
+    @Override
     public UnlockableContent content(){
         return unit.type;
     }

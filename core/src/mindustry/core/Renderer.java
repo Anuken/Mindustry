@@ -83,7 +83,7 @@ public class Renderer implements ApplicationListener{
         camera = new Camera();
         Shaders.init();
 
-        Events.on(ResetEvent.class, e ->  {
+        Events.on(ResetEvent.class, e -> {
             shakeTime = shakeIntensity = 0f;
             camShakeOffset.setZero();
         });
@@ -152,7 +152,7 @@ public class Renderer implements ApplicationListener{
     }
 
     public TextureRegion[][] getFluidFrames(){
-        if(fluidFrames == null){
+        if(fluidFrames == null || fluidFrames[0][0].texture.isDisposed()){
             loadFluidFrames();
         }
         return fluidFrames;
@@ -484,7 +484,7 @@ public class Renderer implements ApplicationListener{
             TextureRegion reg = block.fullIcon;
             float scl = Scl.scl(4f) / camerascale;
             float shake = 0f;
-            float s = reg.width * Draw.scl * scl * 3.6f * Interp.pow2Out.apply(fout);
+            float s = reg.width * reg.scl() * scl * 3.6f * Interp.pow2Out.apply(fout);
             float rotation = Interp.pow2In.apply(fout) * 135f, x = build.x + Mathf.range(shake), y = build.y + Mathf.range(shake);
             float thrustOpen = 0.25f;
             float thrusterFrame = fin >= thrustOpen ? 1f : fin / thrustOpen;

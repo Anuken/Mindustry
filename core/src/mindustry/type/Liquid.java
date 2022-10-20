@@ -3,6 +3,7 @@ package mindustry.type;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
@@ -10,6 +11,7 @@ import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
+import mindustry.world.*;
 import mindustry.world.meta.*;
 
 import static mindustry.entities.Puddles.*;
@@ -42,8 +44,14 @@ public class Liquid extends UnlockableContent implements Senseable{
     public float viscosity = 0.5f;
     /** how prone to exploding this liquid is, when heated. 0 = nothing, 1 = nuke */
     public float explosiveness;
+    /** whether this fluid reacts in blocks at all (e.g. slag with water) */
+    public boolean blockReactive = true;
     /** if false, this liquid cannot be a coolant */
     public boolean coolant = true;
+    /** if true, this liquid can move through blocks as a puddle. */
+    public boolean moveThroughBlocks = false;
+    /** if true, this liquid can be incinerated in the incinerator block. */
+    public boolean incinerable = true;
     /** The associated status effect. */
     public StatusEffect effect = StatusEffects.none;
     /** Effect shown in puddles. */
@@ -58,6 +66,8 @@ public class Liquid extends UnlockableContent implements Senseable{
     public Effect vaporEffect = Fx.vapor;
     /** If true, this liquid is hidden in most UI. */
     public boolean hidden;
+    /** Liquids this puddle can stay on, e.g. oil on water. */
+    public ObjectSet<Liquid> canStayOn = new ObjectSet<>();
 
     public Liquid(String name, Color color){
         super(name);
@@ -143,6 +153,11 @@ public class Liquid extends UnlockableContent implements Senseable{
     /** Runs when puddles update. */
     public void update(Puddle puddle){
 
+    }
+
+    //TODO proper API for this (do not use yet!)
+    public float react(Liquid other, float amount, Tile tile, float x, float y){
+        return 0f;
     }
 
     @Override

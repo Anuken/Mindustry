@@ -77,10 +77,13 @@ public class FileMapGenerator implements WorldGenerator{
             }
 
             if(tile.isCenter() && tile.block() instanceof CoreBlock && tile.team() == state.rules.defaultTeam && !anyCores){
-                Schematics.placeLaunchLoadout(tile.x, tile.y);
+                if(state.rules.sector != null && state.rules.sector.allowLaunchLoadout()){
+                    Schematics.placeLaunchLoadout(tile.x, tile.y);
+                }
                 anyCores = true;
 
-                if(preset.addStartingItems){
+                if(preset.addStartingItems || !preset.planet.allowLaunchLoadout){
+                    tile.build.items.clear();
                     tile.build.items.add(state.rules.loadout);
                 }
             }

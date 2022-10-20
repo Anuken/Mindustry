@@ -18,6 +18,7 @@ public class BaseTurret extends Block{
     public float range = 80f;
     public float placeOverlapMargin = 8 * 7f;
     public float rotateSpeed = 5;
+    public float fogRadiusMultiuplier = 1f;
 
     /** Effect displayed when coolant is used. */
     public Effect coolEffect = Fx.fuelburn;
@@ -53,7 +54,7 @@ public class BaseTurret extends Block{
         }
 
         placeOverlapRange = Math.max(placeOverlapRange, range + placeOverlapMargin);
-        fogRadius = Math.max(Mathf.round(range / tilesize), fogRadius);
+        fogRadius = Math.max(Mathf.round(range / tilesize * fogRadiusMultiuplier), fogRadius);
         super.init();
     }
 
@@ -82,6 +83,10 @@ public class BaseTurret extends Block{
         @Override
         public void drawSelect(){
             Drawf.dashCircle(x, y, range(), team.color);
+        }
+
+        public float estimateDps(){
+            return 0f;
         }
     }
 }

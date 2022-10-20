@@ -7,6 +7,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.ai.types.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
@@ -16,7 +17,7 @@ import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.ui.*;
 import mindustry.world.*;
-import mindustry.world.blocks.defense.turrets.Turret.*;
+import mindustry.world.blocks.defense.turrets.BaseTurret.*;
 import mindustry.world.blocks.storage.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 import mindustry.world.meta.*;
@@ -25,9 +26,9 @@ public class RtsAI{
     static final Seq<Building> targets = new Seq<>();
     static final Seq<Unit> squad = new Seq<>(false);
     static final IntSet used = new IntSet();
-    static final IntSet assignedTargets = new IntSet();
-    static final float squadRadius = 120f;
-    static final int timeUpdate = 0, timerSpawn = 1;
+    static final IntSet assignedTargets = new IntSet(), invalidTarget = new IntSet();
+    static final float squadRadius = 140f;
+    static final int timeUpdate = 0, timerSpawn = 1, maxTargetsChecked = 15;
 
     //in order of priority??
     static final BlockFlag[] flags = {BlockFlag.generator, BlockFlag.factory, BlockFlag.core, BlockFlag.battery};
@@ -109,8 +110,11 @@ public class RtsAI{
             if(unit.isCommandable() && !unit.command().hasCommand() && used.add(unit.id)){
                 squad.clear();
                 data.tree().intersect(unit.x - squadRadius/2f, unit.y - squadRadius/2f, squadRadius, squadRadius, squad);
+
+                squad.truncate(data.team.rules().rtsMaxSquad);
+
                 //remove overlapping squads
-                squad.removeAll(u -> (u != unit && used.contains(u.id)) || !u.isCommandable() || u.command().hasCommand());
+                squad.removeAll(u -> (u != unit && used.contains(u.id)) || !u.isCommandable() || u.command().hasCommand() || ((u.flag == 0) != (unit.flag == 0)));
                 //mark used so other squads can't steal them
                 for(var item : squad){
                     used.add(item.id);
@@ -127,10 +131,16 @@ public class RtsAI{
     }
 
     boolean handleSquad(Seq<Unit> units, boolean noDefenders){
+        if(units.isEmpty()) return false;
+
         float health = 0f, dps = 0f;
         float ax = 0f, ay = 0f;
+        boolean targetAir = true, targetGround = true;
 
         for(var unit : units){
+            if(!unit.type.targetAir) targetAir = false;
+            if(!unit.type.targetGround) targetGround = false;
+
             ax += unit.x;
             ay += unit.y;
             health += unit.health;
@@ -144,6 +154,7 @@ public class RtsAI{
         }
 
         Building defend = null;
+        boolean defendingCore = false;
 
         //there is something to defend, see if it's worth the time
         if(damaged.size > 0){
@@ -167,14 +178,20 @@ public class RtsAI{
 
             //defend when close, or this is the only squad defending
             //TODO will always rush to defense no matter what
-            if(best instanceof CoreBuild || units.size >= data.team.rules().rtsMinSquad || best.within(ax, ay, 500f)){
+            if(best != null && (best instanceof CoreBuild || (units.size >= data.team.rules().rtsMinSquad || (units.size > 0 && units.first().flag != 0)) || best.within(ax, ay, 500f))){
                 defend = best;
 
                 if(debug){
                     Vars.ui.showLabel("Defend, dst = " + (int)(best.dst(ax, ay)), 8f, best.x, best.y);
                 }
+
+                if(best instanceof CoreBuild){
+                    defendingCore = true;
+                }
             }
         }
+
+        boolean tair = targetAir, tground = targetGround;
 
         //find aggressor, or else, the thing being attacked
         Vec2 defendPos = null;
@@ -183,9 +200,11 @@ public class RtsAI{
             float checkRange = 260f;
 
             //TODO could be made faster by storing bullet shooter
-            Unit aggressor = Units.closestEnemy(data.team, defend.x, defend.y, checkRange, u -> true);
+            Unit aggressor = Units.closestEnemy(data.team, defend.x, defend.y, checkRange, u -> u.checkTarget(tair, tground));
             if(aggressor != null){
-                defendTarget = aggressor;
+                //do not target it directly - target the position?
+                //defendTarget = aggressor;
+                defendPos = new Vec2(aggressor.x, aggressor.y);
             }else if(false){ //TODO currently ignored, no use defending against nothing
                 //should it even go there if there's no aggressor found?
                 Tile closest = defend.findClosestEdge(units.first(), Tile::solid);
@@ -215,7 +234,15 @@ public class RtsAI{
 
         boolean anyDefend = defendPos != null || defendTarget != null;
 
-        var build = anyDefend ? null : findTarget(ax, ay, units.size, dps, health);
+        invalidTarget.clear();
+
+        for(var unit : squad){
+            if(unit.controller() instanceof CommandAI ai){
+                invalidTarget.addAll(ai.unreachableBuildings);
+            }
+        }
+
+        var build = anyDefend ? null : findTarget(ax, ay, units.size, dps, health, units.first().flag == 0);
 
         if(build != null || anyDefend){
             for(var unit : units){
@@ -226,6 +253,11 @@ public class RtsAI{
                         //TODO stopAtTarget parameter could be false, could be tweaked
                         unit.command().commandTarget(defendTarget == null ? build : defendTarget, defendTarget != null);
                     }
+
+                    //assign a flag, so it will be "mobilized" more easily later
+                    if(!defendingCore){
+                        unit.flag = 1;
+                    }
                 }
             }
         }
@@ -233,7 +265,7 @@ public class RtsAI{
         return anyDefend;
     }
 
-    @Nullable Building findTarget(float x, float y, int total, float dps, float health){
+    @Nullable Building findTarget(float x, float y, int total, float dps, float health, boolean checkWeight){
         if(total < data.team.rules().rtsMinSquad) return null;
 
         //flag priority?
@@ -244,11 +276,15 @@ public class RtsAI{
         for(var flag : flags){
             targets.addAll(Vars.indexer.getEnemy(data.team, flag));
         }
-        targets.removeAll(b -> assignedTargets.contains(b.id));
+        targets.removeAll(b -> assignedTargets.contains(b.id) || invalidTarget.contains(b.pos()));
 
         if(targets.size == 0) return null;
 
         weights.clear();
+
+        //only check a maximum number of targets to prevent hammering the CPU with estimateStats calls
+        targets.shuffle();
+        targets.truncate(maxTargetsChecked);
 
         for(var target : targets){
             weights.put(target, estimateStats(x, y, target.x, target.y, dps, health));
@@ -264,7 +300,7 @@ public class RtsAI{
         );
 
         float weight = weights.get(result, 0f);
-        if(weight < data.team.rules().rtsMinWeight && total < Units.getCap(data.team)){
+        if(checkWeight && weight < data.team.rules().rtsMinWeight && total < Units.getCap(data.team)){
             return null;
         }
 
@@ -272,14 +308,15 @@ public class RtsAI{
         return result;
     }
 
+    //TODO extremely slow especially with many squads.
     float estimateStats(float fromX, float fromY, float x, float y, float selfDps, float selfHealth){
         float[] health = {0f}, dps = {0f};
         float extraRadius = 50f;
 
         for(var turret : Vars.indexer.getEnemy(data.team, BlockFlag.turret)){
-            if(Intersector.distanceSegmentPoint(fromX, fromY,  x, y, turret.x, turret.y) <= ((TurretBuild)turret).range() + extraRadius){
-                health[0] += turret.health;
-                dps[0] += ((TurretBuild)turret).estimateDps();
+            if(turret instanceof BaseTurretBuild t && Intersector.distanceSegmentPoint(fromX, fromY,  x, y, t.x, t.y) <= t.range() + extraRadius){
+                health[0] += t.health;
+                dps[0] += t.estimateDps();
             }
         }
 
@@ -299,9 +336,9 @@ public class RtsAI{
         float timeDestroySelf = Mathf.zero(dp) ? Float.POSITIVE_INFINITY : selfHealth / dp;
 
         //other can never be destroyed | other destroys self instantly
-        if(Float.isInfinite(timeDestroyOther) | Mathf.zero(timeDestroySelf)) return 0f;
+        if(Float.isInfinite(timeDestroyOther) || Mathf.zero(timeDestroySelf)) return 0f;
         //self can never be destroyed | self destroys other instantly
-        if(Float.isInfinite(timeDestroySelf) | Mathf.zero(timeDestroyOther)) return 1f;
+        if(Float.isInfinite(timeDestroySelf) || Mathf.zero(timeDestroyOther)) return 1f;
 
         //examples:
         // self 10 sec / other 10 sec -> can destroy target with 100 % losses -> returns 1

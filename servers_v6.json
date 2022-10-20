@@ -4,28 +4,36 @@
     "address": ["sectorized.ddns.net"]
   },
   {
+    "name": "generic survival",
+    "address": ["212.192.29.92:25554"]
+  },
+  {
     "name": "{AA}",
     "address": ["recessive.net"]
   },
   {
-    "name": "Yeet Hosting",
-    "address": ["node2.crewcraft.cc:25568", "node2.crewcraft.cc:25570","node2.crewcraft.cc:25568" , "node5.crewcraft.cc:25567" ,"node5.crewcraft.cc:25566", "node3.crewcraft.cc:25568"]
+    "name": "Omega Hub",
+    "address": ["n1.mindustry.me:6614","n1.mindustry.me:6568","n1.mindustry.me:6612","n1.mindustry.me:6570","n1.mindustry.me:6609"]
   },
   {
-    "name": "RCM",
+    "name": "EasyPlay",
     "address": ["easyplay.su"]
   },
     {
     "name": "Tendhost",
-    "address": ["tendhost.ddns.net"]
+    "address": ["tendhost.ddns.net", "smokeofanarchy.ru:7576"]
   },
   {
-    "name": "Atanner",
-    "address": ["atannergaming.com:13000"]
+    "name": "SMokeOfAnarchy",
+    "address": ["smokeofanarchy.ru:6566", "2.smokeofanarchy.ru:7656"]
+  },
+  {
+    "name": "Atanner Gaming",
+    "address": ["mindustry.atannergaming.com:6567", "mindustry.atannergaming.com:6700", "mindustry.atannergaming.com:9000"]
   },
   {
     "name": "C.A.M.S.",
-    "address": ["0.baseduser.eu.org:42000", "nikochio.ddns.net", "play.thedimas.pp.ua"]
+    "address": ["0.baseduser.eu.org:42000", "nikochio.ddns.net"]
   },
   {
     "name": "ECAN",
@@ -64,10 +72,6 @@
     "address": ["mindustry.initd.kr","mindustry.kr:7100"]
   },
   {
-    "name": "Omega",
-    "address": ["omegav.mindustry.me:6572"] 
-  },
-  {
     "name": "Obvilion Network",
     "address": ["obvilion.ru", "obvilion.ru:7001", "obvilion.ru:7002", "obvilion.ru:7003"]
   },
@@ -81,11 +85,11 @@
   },
   {
     "name": "TSR", 
-    "address": ["fi01.optik.host:28301", "uk01.optik.host:26164"]
+    "address": ["uk01.optik.host:26175", "uk01.optik.host:26164"]
   },
   {
     "name": "Sakura", 
-    "address": ["160.16.207.141", "160.16.207.141:21527", "160.16.207.141:31587", "160.16.207.141:26810"]
+    "address": ["160.16.207.141", "160.16.207.141:21527", "160.16.207.141:31587", "160.16.207.141:26810", "160.16.207.141:4848"]
   },
   {
     "name": "MeowLand",
@@ -101,19 +105,15 @@
   },
   {
     "name": "Xpdustry",
-    "address": ["xpdustry.fr"]
+    "address": ["n2.xpdustry.fr:6000", "n2.xpdustry.fr:6002"]
   },
   {
     "name": "CxZx",
     "address": ["usfr2.forcehost.net:25578"]
   },
   {
-    "name": "Mindustry Español",
-    "address": ["xpdustry.fr:9000"]
-  },
-  {
     "name": "CreateDustry",
-    "address": ["129.151.66.139:26032"]
+    "address": ["129.151.64.81:26032"]
   },
   {
     "name": "NukeDustry",
@@ -132,11 +132,11 @@
     "address": ["59.12.120.171"]
   },
   {
-    "name": "OMNIDUSTRY",
-    "address": ["109.94.209.233"]
+    "name": "New Campaign Like",
+    "address": ["n5.yeet.ml:6568"]
   },
   {
-    "name": "Fish",
-    "address": ["170.187.144.235"]
+    "name": "AlternightBR",
+    "address": ["mindustrypt.ga:8300"]
   }
 ]

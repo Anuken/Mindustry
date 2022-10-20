@@ -57,7 +57,7 @@ public class LoadoutDialog extends BaseDialog{
         }).size(210f, 64f);
     }
 
-    public void maxItems() {
+    public void maxItems(){
         for(ItemStack stack : stacks){
             stack.amount = total == null ? capacity : Math.max(Math.min(capacity, total.get(stack.item)), 0);
         }

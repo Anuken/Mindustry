@@ -7,7 +7,6 @@ import arc.math.Interp.*;
 import arc.util.*;
 import mindustry.gen.*;
 
-/** Not standalone. */
 public class DrawParticles extends DrawBlock{
     public Color color = Color.valueOf("f2d585");
 
