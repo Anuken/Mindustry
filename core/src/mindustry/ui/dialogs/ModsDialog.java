@@ -254,8 +254,13 @@ public class ModsDialog extends BaseDialog{
 
                                     text.row();
 
+                                    String tooltip = null;
+
                                     if(item.isOutdated()){
                                         text.labelWrap("@mod.outdatedv7").growX();
+                                        text.row();
+                                    }else if(item.isBlacklisted()){
+                                        text.labelWrap("@mod.blacklisted").growX();
                                         text.row();
                                     }else if(!item.isSupported()){
                                         text.labelWrap(Core.bundle.format("mod.requiresversion", item.meta.minGameVersion)).growX();
