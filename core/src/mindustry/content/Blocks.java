@@ -1337,7 +1337,7 @@ public class Blocks{
             requirements(Category.crafting, with(Items.tungsten, 110, Items.thorium, 150, Items.oxide, 60));
             craftEffect = Fx.none;
             outputItem = new ItemStack(Items.carbide, 1);
-            craftTime = 60f * 3f;
+            craftTime = 60f * 2.25f;
             size = 3;
             itemCapacity = 20;
             hasPower = hasItems = true;
@@ -2524,7 +2524,7 @@ public class Blocks{
                 color = Pal.slagOrange;
             }});
 
-            consumeLiquids(LiquidStack.with(Liquids.slag, 20f / 60f, Liquids.arkycite, 30f / 60f));
+            consumeLiquids(LiquidStack.with(Liquids.slag, 20f / 60f, Liquids.arkycite, 40f / 60f));
             size = 3;
 
             liquidCapacity = 30f * 5;
@@ -2535,6 +2535,8 @@ public class Blocks{
 
             ambientSound = Sounds.smelter;
             ambientSoundVolume = 0.06f;
+
+            researchCostMultiplier = 0.4f;
         }};
 
         //TODO stats
@@ -2932,7 +2934,7 @@ public class Blocks{
         }};
 
         coreCitadel = new CoreBlock("core-citadel"){{
-            requirements(Category.effect, with(Items.silicon, 7000, Items.beryllium, 7000, Items.tungsten, 4000, Items.oxide, 2500));
+            requirements(Category.effect, with(Items.silicon, 4000, Items.beryllium, 5000, Items.tungsten, 3000, Items.oxide, 2000));
 
             unitType = UnitTypes.incite;
             health = 16000;
@@ -2943,13 +2945,12 @@ public class Blocks{
             incinerateNonBuildable = true;
 
             unitCapModifier = 15;
-            researchCostMultipliers.put(Items.silicon, 0.4f);
-            researchCostMultiplier = 0.14f;
+            researchCostMultipliers.put(Items.silicon, 0.5f);
+            researchCostMultiplier = 0.17f;
         }};
 
         coreAcropolis = new CoreBlock("core-acropolis"){{
-            //TODO cost
-            requirements(Category.effect, with(Items.beryllium, 12000, Items.silicon, 11000, Items.tungsten, 9000, Items.carbide, 10000, Items.oxide, 8000));
+            requirements(Category.effect, with(Items.beryllium, 8000, Items.silicon, 8000, Items.tungsten, 6000, Items.carbide, 5000, Items.oxide, 5000));
 
             unitType = UnitTypes.emanate;
             health = 30000;
@@ -2960,8 +2961,8 @@ public class Blocks{
             incinerateNonBuildable = true;
 
             unitCapModifier = 15;
-            researchCostMultipliers.put(Items.silicon, 0.3f);
-            researchCostMultiplier = 0.2f;
+            researchCostMultipliers.put(Items.silicon, 0.4f);
+            researchCostMultiplier = 0.1f;
         }};
 
         container = new StorageBlock("container"){{
@@ -4459,7 +4460,7 @@ public class Blocks{
         }};
 
         scathe = new ItemTurret("scathe"){{
-            requirements(Category.turret, with(Items.silicon, 300, Items.graphite, 400, Items.tungsten, 450, Items.carbide, 250));
+            requirements(Category.turret, with(Items.silicon, 450, Items.graphite, 400, Items.tungsten, 500, Items.carbide, 300));
 
             ammo(
             Items.carbide, new BasicBulletType(0f, 1){{
@@ -4496,7 +4497,7 @@ public class Blocks{
                         deathExplosionEffect = Fx.massiveExplosion;
                         shootOnDeath = true;
                         shake = 10f;
-                        bullet = new ExplosionBulletType(600f, 65f){{
+                        bullet = new ExplosionBulletType(60f, 65f){{
                             hitColor = Pal.redLight;
                             shootEffect = new MultiEffect(Fx.massiveExplosion, Fx.scatheExplosion, Fx.scatheLight, new WaveEffect(){{
                                 lifetime = 10f;
@@ -4510,7 +4511,7 @@ public class Blocks{
                             ammoMultiplier = 1f;
                             fragLifeMin = 0.1f;
                             fragBullets = 7;
-                            fragBullet = new ArtilleryBulletType(3.4f, 30){{
+                            fragBullet = new ArtilleryBulletType(3.4f, 32){{
                                 buildingDamageMultiplier = 0.3f;
                                 drag = 0.02f;
                                 hitEffect = Fx.massiveExplosion;
@@ -4592,6 +4593,7 @@ public class Blocks{
 
             recoil = 0.5f;
 
+            fogRadiusMultiuplier = 0.45f;
             coolantMultiplier = 6f;
             shootSound = Sounds.missileLaunch;
 
@@ -5484,7 +5486,7 @@ public class Blocks{
             researchCostMultiplier = 0.4f;
 
             consumePower(3f);
-            consumeLiquid(Liquids.nitrogen, 24f / 60f);
+            consumeLiquid(Liquids.cyanogen, 24f / 60f);
         }};
 
         //TODO requirements
@@ -5512,9 +5514,9 @@ public class Blocks{
             new AssemblerUnitPlan(UnitTypes.tecta, 60f * 60f, PayloadStack.list(UnitTypes.merui, 4, Blocks.tungstenWallLarge, 10)),
             new AssemblerUnitPlan(UnitTypes.collaris, 60f * 60f * 3f, PayloadStack.list(UnitTypes.cleroi, 6, Blocks.carbideWallLarge, 20))
             );
-            consumePower(3f);
             areaSize = 13;
 
+            consumePower(3f);
             consumeLiquid(Liquids.cyanogen, 9f / 60f);
         }};
 
