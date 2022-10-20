@@ -2524,7 +2524,7 @@ public class Blocks{
                 color = Pal.slagOrange;
             }});
 
-            consumeLiquids(LiquidStack.with(Liquids.slag, 20f / 60f, Liquids.arkycite, 30f / 60f));
+            consumeLiquids(LiquidStack.with(Liquids.slag, 20f / 60f, Liquids.arkycite, 40f / 60f));
             size = 3;
 
             liquidCapacity = 30f * 5;
