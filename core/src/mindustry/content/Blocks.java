@@ -2963,7 +2963,7 @@ public class Blocks{
 
             unitCapModifier = 15;
             researchCostMultipliers.put(Items.silicon, 0.3f);
-            researchCostMultiplier = 0.2f;
+            researchCostMultiplier = 0.1f;
         }};
 
         container = new StorageBlock("container"){{
