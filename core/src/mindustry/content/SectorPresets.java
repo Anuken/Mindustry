@@ -178,6 +178,7 @@ public class SectorPresets{
 
         karst = new SectorPreset("karst", erekir, 5){{
             difficulty = 5;
+            captureWave = 51;
         }};
 
         //endregion
