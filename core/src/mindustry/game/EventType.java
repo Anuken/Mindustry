@@ -28,6 +28,7 @@ public class EventType{
         newGame,
         tutorialComplete,
         flameAmmo,
+        resupplyTurret,
         turretCool,
         enablePixelation,
         exclusionDeath,
@@ -177,6 +178,15 @@ public class EventType{
 
         public PlayerChatEvent(Player player, String message){
             this.player = player;
+            this.message = message;
+        }
+    }
+
+    /** Called when the client sends a chat message. This only fires clientside! */
+    public static class ClientChatEvent{
+        public final String message;
+
+        public ClientChatEvent(String message){
             this.message = message;
         }
     }

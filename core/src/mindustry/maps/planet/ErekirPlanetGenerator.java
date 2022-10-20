@@ -31,6 +31,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
 
     {
         baseSeed = 2;
+        defaultLoadout = Loadouts.basicBastion;
     }
 
     @Override
@@ -59,11 +60,6 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
     public float getSizeScl(){
         //TODO should sectors be 600, or 500 blocks?
         return 2000 * 1.07f * 6f / 5f;
-    }
-
-    @Override
-    public Schematic getDefaultLoadout(){
-        return Loadouts.basicBastion;
     }
 
     @Override

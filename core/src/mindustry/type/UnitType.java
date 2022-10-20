@@ -215,6 +215,8 @@ public class UnitType extends UnlockableContent{
     /** if false, RTS AI controlled units do not automatically attack things while moving. This is automatically assigned. */
     autoFindTarget = true,
 
+    /** whether this unit has a hover tooltip */
+    hoverable = true,
     /** if true, this modded unit always has a -outline region generated for its base. Normally, outlines are ignored if there are no top = false weapons. */
     alwaysCreateOutline = false,
     /** if true, this unit has a square shadow. */
@@ -589,7 +591,7 @@ public class UnitType extends UnlockableContent{
         stats.add(Stat.health, health);
         stats.add(Stat.armor, armor);
         stats.add(Stat.speed, speed * 60f / tilesize, StatUnit.tilesSecond);
-        stats.add(Stat.size, StatValues.squared(hitSize / tilesize, StatUnit.blocksSquared));
+        stats.add(Stat.size, StatValues.squared(hitSize / tilesize, StatUnit.blocks));
         stats.add(Stat.itemCapacity, itemCapacity);
         stats.add(Stat.range, (int)(maxRange / tilesize), StatUnit.blocks);
 
@@ -621,7 +623,7 @@ public class UnitType extends UnlockableContent{
             stats.addPercent(Stat.buildSpeed, buildSpeed);
         }
         if(sample instanceof Payloadc){
-            stats.add(Stat.payloadCapacity, StatValues.squared(Mathf.sqrt(payloadCapacity / (tilesize * tilesize)), StatUnit.blocksSquared));
+            stats.add(Stat.payloadCapacity, StatValues.squared(Mathf.sqrt(payloadCapacity / (tilesize * tilesize)), StatUnit.blocks));
         }
 
         var reqs = getFirstRequirements();

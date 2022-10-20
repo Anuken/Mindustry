@@ -1,5 +1,6 @@
 package mindustry.world.blocks.logic;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.input.*;
@@ -142,6 +143,10 @@ public class CanvasBlock extends Block{
                 int[] curColor = {palette[0]};
                 boolean[] modified = {false};
 
+                dialog.resized(() -> {
+                    dialog.hide();
+                });
+
                 dialog.cont.table(Tex.pane, body -> {
                     body.stack(new Element(){
                         int lastX, lastY;
@@ -191,7 +196,7 @@ public class CanvasBlock extends Block{
                         }
                     }, new GridImage(canvasSize, canvasSize){{
                         touchable = Touchable.disabled;
-                    }}).size(500f);
+                    }}).size(mobile && !Core.graphics.isPortrait() ? 290f : 480f);
                 });
 
                 dialog.cont.row();

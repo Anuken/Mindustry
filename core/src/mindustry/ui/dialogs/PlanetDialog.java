@@ -199,7 +199,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                     diag.hide();
                 }).size(300f, 64f).disabled(b -> selected[0] == null);
 
-                app.post(() -> diag.show());
+                app.post(diag::show);
             }
         });
 
@@ -215,7 +215,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
         //unlock defaults for older campaign saves (TODO move? where to?)
         if(content.planets().contains(p -> p.sectors.contains(s -> s.hasBase())) || Blocks.scatter.unlocked() || Blocks.router.unlocked()){
-            Seq.with(Blocks.junction, Blocks.mechanicalDrill, Blocks.duo, Items.copper, Items.lead).each(UnlockableContent::quietUnlock);
+            Seq.with(Blocks.junction, Blocks.mechanicalDrill, Blocks.conveyor, Blocks.duo, Items.copper, Items.lead).each(UnlockableContent::quietUnlock);
         }
     }
 

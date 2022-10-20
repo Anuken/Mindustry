@@ -83,10 +83,11 @@ public class Universe{
         }
 
         if(state.hasSector() && state.getSector().planet.updateLighting){
+            boolean disable = state.getSector().preset != null && state.getSector().preset.noLighting;
             var planet = state.getSector().planet;
             //update sector light
             float light = state.getSector().getLight();
-            float alpha = Mathf.clamp(Mathf.map(light, planet.lightSrcFrom, planet.lightSrcTo, planet.lightDstFrom, planet.lightDstTo));
+            float alpha = disable ? 1f : Mathf.clamp(Mathf.map(light, planet.lightSrcFrom, planet.lightSrcTo, planet.lightDstFrom, planet.lightDstTo));
 
             //assign and map so darkness is not 100% dark
             state.rules.ambientLight.a = 1f - alpha;
@@ -120,7 +121,7 @@ public class Universe{
     }
 
     public Schematic getLastLoadout(){
-        if(lastLoadout == null) lastLoadout = state.rules.sector == null || state.rules.sector.planet.generator == null ? Loadouts.basicShard : state.rules.sector.planet.generator.getDefaultLoadout();
+        if(lastLoadout == null) lastLoadout = state.rules.sector == null || state.rules.sector.planet.generator == null ? Loadouts.basicShard : state.rules.sector.planet.generator.defaultLoadout;
         return lastLoadout;
     }
 
