@@ -50,19 +50,19 @@ public class BuildTurret extends BaseTurret{
         if(elevation < 0) elevation = size / 2f;
 
         //this is super hacky, but since blocks are initialized before units it does not run into init/concurrent modification issues
-        unitType = new UnitType("turret-unit-" + name){{
-            hidden = true;
-            internal = true;
-            speed = 0f;
-            hitSize = 0f;
-            health = 1;
-            itemCapacity = 0;
-            rotateSpeed = BuildTurret.this.rotateSpeed;
-            buildBeamOffset = BuildTurret.this.buildBeamOffset;
-            buildRange = BuildTurret.this.range;
-            buildSpeed = BuildTurret.this.buildSpeed;
-            constructor = BlockUnitUnit::create;
-        }};
+        if(unitType == null) unitType = new UnitType("turret-unit-" + name);
+        
+        unitType.hidden = true;
+        unitType.internal = true;
+        unitType.speed = 0f;
+        unitType.hitSize = 0f;
+        unitType.health = 1;
+        unitType.itemCapacity = 0;
+        unitType.rotateSpeed = BuildTurret.this.rotateSpeed;
+        unitType.buildBeamOffset = BuildTurret.this.buildBeamOffset;
+        unitType.buildRange = BuildTurret.this.range;
+        unitType.buildSpeed = BuildTurret.this.buildSpeed;
+        unitType.constructor = BlockUnitUnit::create;
     }
 
     @Override
