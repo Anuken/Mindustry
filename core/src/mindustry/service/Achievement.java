@@ -51,7 +51,7 @@ public enum Achievement{
     circleConveyor,
     becomeRouter,
     create20Schematics(SStat.schematicsCreated, 20),
-    create500Schematics(SStat.schematicsCreated, 50), //TODO - Steam
+    create500Schematics(SStat.schematicsCreated, 50), //TODO - Steam - icon done
     survive10WavesNoBlocks,
     captureNoBlocksBroken,
     useFlameAmmo,
@@ -63,24 +63,24 @@ public enum Achievement{
 
     //TODO new ones
 
-    allTransportOneMap, //TODO - Steam
-    buildOverdrive, //TODO - Steam
-    buildMendProjector, //TODO - Steam
-    buildWexWater, //TODO - Steam
+    allTransportOneMap, //TODO - Steam - icon done
+    buildOverdriveProjector, //TODO - Steam - icon done
+    buildMendProjector, //TODO - Steam - icon done
+    buildWexWater, //TODO - Steam - icon done
 
-    have10mItems(SStat.totalCampaignItems, 10_000_000), //TODO - Steam
-    killEclipseDuo, //TODO - Steam
+    have10mItems(SStat.totalCampaignItems, 10_000_000), //TODO - Steam - icon done
+    killEclipseDuo, //TODO - Steam - icon done
 
-    allPresetsErekir, //TODO - Steam
+    allPresetsErekir, //TODO - Steam - icon done
 
-    launchCoreSchematic, //TODO - Steam
-    nucleusGroundZero, //TODO - Steam
+    launchCoreSchematic, //TODO - Steam - icon done
+    nucleusGroundZero, //TODO - Steam - icon done
 
-    neoplasmWater, //TODO - Steam
-    blastFrozenUnit, //TODO - Steam
+    neoplasmWater, //TODO - Steam - icon done
+    blastFrozenUnit, //TODO - Steam - icon done
 
-    allBlocksSerpulo, //TODO - Steam
-    allBlocksErekir, //TODO - Steam
+    allBlocksSerpulo, //TODO - Steam - icon done
+    allBlocksErekir, //TODO - Steam - icon done
 
     //TODO are these necessary?
     //allTurretsSerpulo, //TODO
@@ -88,20 +88,20 @@ public enum Achievement{
     //allTechSerpulo, //TODO
     //allTechErekir, //TODO
 
-    breakForceProjector, //TODO - Steam
-    researchLogic, //TODO - Steam
+    breakForceProjector, //TODO - Steam - icon done
+    researchLogic, //TODO - Steam - icon done
 
-    negative10kPower, //TODO - Steam
-    positive100kPower, //TODO - Steam
-    store1milPower, //TODO - Steam
+    negative10kPower, //TODO - Steam - icon done
+    positive100kPower, //TODO - Steam - icon done
+    store1milPower, //TODO - Steam - icon done
 
-    blastGenerator, //TODO - Steam
-    neoplasiaExplosion, //TODO - Steam
+    blastGenerator, //TODO - Steam - icon done
+    neoplasiaExplosion, //TODO - Steam - icon done
 
-    installMod, //TODO - Steam
-    routerLanguage, //TODO - Steam
-    joinCommunityServer, //TODO - Steam
-    openConsole, //TODO - Steam
+    installMod, //TODO - Steam - icon done
+    routerLanguage, //TODO - Steam - icon done
+    joinCommunityServer, //TODO - Steam - icon done
+    openConsole, //TODO - Steam - icon done
 
     controlTurret, //TODO - Steam - icon done
     dropUnitsCoreZone, //TODO - Steam - icon done
@@ -115,6 +115,8 @@ public enum Achievement{
     break10000Boulders(SStat.bouldersDeconstructed, 10_000), //TODO - Steam - icon done
 
     shockwaveTowerUse, //TODO - Steam - icon done
+
+    useAnimdustryEmoji, //TODO - Steam - icon done
 
     ;
 

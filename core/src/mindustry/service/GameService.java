@@ -204,7 +204,7 @@ public class GameService{
                 }
 
                 if(e.tile.block() instanceof MendProjector || e.tile.block() instanceof RegenProjector) buildMendProjector.complete();
-                if(e.tile.block() instanceof OverdriveProjector) buildOverdrive.complete();
+                if(e.tile.block() instanceof OverdriveProjector) buildOverdriveProjector.complete();
 
                 if(e.tile.block() == Blocks.waterExtractor){
                     if(e.tile.getLinkedTiles(tmpTiles).contains(t -> t.floor().liquidDrop == Liquids.water)){
@@ -483,6 +483,12 @@ public class GameService{
         Events.on(PayloadDropEvent.class, e -> {
             if(campaign() && e.unit != null && e.carrier.team == state.rules.defaultTeam && state.rules.waveTeam.cores().contains(c -> c.within(e.unit, state.rules.enemyCoreBuildRadius))){
                 dropUnitsCoreZone.complete();
+            }
+        });
+
+        Events.on(ClientChatEvent.class, e -> {
+            if(e.message.contains(Iconc.alphaaaa + "")){
+                useAnimdustryEmoji.complete();
             }
         });
     }
