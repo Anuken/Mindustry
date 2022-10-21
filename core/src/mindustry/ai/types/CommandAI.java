@@ -21,7 +21,7 @@ public class CommandAI extends AIController{
     /** All encountered unreachable buildings of this AI. Why a sequence? Because contains() is very rarely called on it. */
     public IntSeq unreachableBuildings = new IntSeq(8);
 
-    protected boolean stopAtTarget;
+    protected boolean stopAtTarget, stopWhenInRange;
     protected Vec2 lastTargetPos;
     protected int pathId = -1;
     protected Seq<Unit> local = new Seq<>(false);
@@ -194,6 +194,11 @@ public class CommandAI extends AIController{
                 }
             }
 
+            if(stopWhenInRange && targetPos != null && unit.within(targetPos, engageRange - 1f)){
+                targetPos = null;
+                stopWhenInRange = false;
+            }
+
         }else if(target != null){
             faceTarget();
         }
@@ -240,10 +245,15 @@ public class CommandAI extends AIController{
     }
 
     public void commandPosition(Vec2 pos){
+        commandPosition(pos, false);
+    }
+
+    public void commandPosition(Vec2 pos, boolean stopWhenInRange){
         targetPos = pos;
         lastTargetPos = pos;
         attackTarget = null;
         pathId = Vars.controlPath.nextTargetId();
+        this.stopWhenInRange = stopWhenInRange;
     }
 
     public void commandTarget(Teamc moveTo){

@@ -2543,7 +2543,7 @@ public class Blocks{
         fluxReactor = new VariableReactor("flux-reactor"){{
             requirements(Category.power, with(Items.graphite, 300, Items.carbide, 200, Items.oxide, 100, Items.silicon, 600, Items.surgeAlloy, 300));
             powerProduction = 120f;
-            maxHeat = 150f;
+            maxHeat = 140f;
 
             consumeLiquid(Liquids.cyanogen, 9f / 60f);
             liquidCapacity = 30f;
@@ -2934,7 +2934,7 @@ public class Blocks{
         }};
 
         coreCitadel = new CoreBlock("core-citadel"){{
-            requirements(Category.effect, with(Items.silicon, 4000, Items.beryllium, 5000, Items.tungsten, 3000, Items.oxide, 1000));
+            requirements(Category.effect, with(Items.silicon, 4000, Items.beryllium, 4000, Items.tungsten, 3000, Items.oxide, 1000));
 
             unitType = UnitTypes.incite;
             health = 16000;

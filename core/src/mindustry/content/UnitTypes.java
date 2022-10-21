@@ -3055,7 +3055,6 @@ public class UnitTypes{
                     trailWidth = 2f;
                     trailLength = 4;
                     shake = 1f;
-                    recoil = 0.1f;
 
                     trailEffect = Fx.missileTrail;
                     trailParam = 1.8f;
@@ -3093,6 +3092,7 @@ public class UnitTypes{
                 recoil = 0.5f;
 
                 bullet = new BulletType(){{
+                    shootSound = Sounds.lasershoot;
                     shootEffect = Fx.sparkShoot;
                     hitEffect = Fx.pointHit;
                     maxRange = 100f;
