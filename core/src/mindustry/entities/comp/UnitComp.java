@@ -77,7 +77,6 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             rotateMove(movement);
         }
     }
-
     public void moveAt(Vec2 vector){
         moveAt(vector, type.accel);
     }
@@ -85,7 +84,6 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     public void approach(Vec2 vector){
         vel.approachDelta(vector, type.accel * speed());
     }
-
     public void rotateMove(Vec2 vec){
         moveAt(Tmp.v2.trns(rotation, vec.len()));
 
@@ -103,6 +101,11 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         aim(x, y);
         lookAt(x, y);
     }
+
+    public boolean isPathImpassable(int tileX, int tileY){
+        return !type.flying && type.pathCost.getCost(team.id, pathfinder.get(tileX, tileY)) == -1;
+    }
+
 
     /** @return approx. square size of the physical hitbox for physics */
     public float physicSize(){

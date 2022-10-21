@@ -6,6 +6,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.ai.*;
+import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -46,6 +47,10 @@ public class CommandAI extends AIController{
             unit.clearBuilding();
             this.command = command;
         }
+    }
+
+    public boolean isAttacking(){
+        return target != null && unit.within(target, unit.range() + 10f);
     }
 
     @Override
@@ -139,7 +144,7 @@ public class CommandAI extends AIController{
                 move = Vars.controlPath.getPathPosition(unit, pathId, targetPos, vecOut, noFound);
 
                 //if the path is invalid, stop trying and record the end as unreachable
-                if(unit.team.isAI() && noFound[0]){
+                if(unit.team.isAI() && (noFound[0] || unit.isPathImpassable(World.toTile(targetPos.x), World.toTile(targetPos.y)) )){
                     if(attackTarget instanceof Building build){
                         unreachableBuildings.addUnique(build.pos());
                     }
@@ -194,7 +199,7 @@ public class CommandAI extends AIController{
                 }
             }
 
-            if(stopWhenInRange && targetPos != null && unit.within(targetPos, engageRange - 1f)){
+            if(stopWhenInRange && targetPos != null && unit.within(targetPos, engageRange * 0.9f)){
                 targetPos = null;
                 stopWhenInRange = false;
             }
