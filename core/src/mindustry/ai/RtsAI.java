@@ -248,7 +248,7 @@ public class RtsAI{
             for(var unit : units){
                 if(unit.isCommandable() && !unit.command().hasCommand()){
                     if(defendPos != null){
-                        unit.command().commandPosition(defendPos);
+                        unit.command().commandPosition(defendPos, true);
                     }else{
                         //TODO stopAtTarget parameter could be false, could be tweaked
                         unit.command().commandTarget(defendTarget == null ? build : defendTarget, defendTarget != null);
