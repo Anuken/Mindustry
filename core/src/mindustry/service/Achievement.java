@@ -1,5 +1,7 @@
 package mindustry.service;
 
+import arc.util.*;
+
 import static mindustry.Vars.*;
 
 public enum Achievement{
@@ -138,8 +140,12 @@ public enum Achievement{
 
     public void complete(){
         if(!isAchieved()){
+            //can't complete achievements with the dev console shown.
+            if(ui != null && ui.consolefrag != null && ui.consolefrag.shown() && !OS.username.equals("anuke")) return;
+
             service.completeAchievement(name());
             service.storeStats();
+            completed = true;
         }
     }
 

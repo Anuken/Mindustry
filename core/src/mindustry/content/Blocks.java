@@ -4499,7 +4499,7 @@ public class Blocks{
                         deathExplosionEffect = Fx.massiveExplosion;
                         shootOnDeath = true;
                         shake = 10f;
-                        bullet = new ExplosionBulletType(60f, 65f){{
+                        bullet = new ExplosionBulletType(620f, 65f){{
                             hitColor = Pal.redLight;
                             shootEffect = new MultiEffect(Fx.massiveExplosion, Fx.scatheExplosion, Fx.scatheLight, new WaveEffect(){{
                                 lifetime = 10f;
