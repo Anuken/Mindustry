@@ -31,7 +31,7 @@ public class RtsAI{
     static final int timeUpdate = 0, timerSpawn = 1, maxTargetsChecked = 15;
 
     //in order of priority??
-    static final BlockFlag[] flags = {BlockFlag.generator, BlockFlag.factory, BlockFlag.core, BlockFlag.battery};
+    static final BlockFlag[] flags = {BlockFlag.generator, BlockFlag.factory, BlockFlag.core, BlockFlag.battery, BlockFlag.drill};
     static final ObjectFloatMap<Building> weights = new ObjectFloatMap<>();
     static final boolean debug = OS.hasProp("mindustry.debug");
 
