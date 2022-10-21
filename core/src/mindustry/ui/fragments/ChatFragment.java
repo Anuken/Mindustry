@@ -14,6 +14,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.input.*;
 import mindustry.ui.*;
@@ -180,6 +181,8 @@ public class ChatFragment extends Table{
         if(message.isEmpty() || (message.startsWith(mode.prefix) && message.substring(mode.prefix.length()).isEmpty())) return;
 
         history.insert(1, message);
+
+        Events.fire(new ClientChatEvent(message));
 
         Call.sendChatMessage(message);
     }

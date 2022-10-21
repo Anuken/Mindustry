@@ -2459,7 +2459,7 @@ public class UnitTypes{
             treadPullOffset = 3;
             speed = 0.75f;
             rotateSpeed = 3.5f;
-            health = 800;
+            health = 840;
             armor = 5f;
             itemCapacity = 0;
             treadRects = new Rect[]{new Rect(12 - 32f, 7 - 32f, 14, 51)};
@@ -3572,7 +3572,7 @@ public class UnitTypes{
 
                 shoot = new ShootSpread(2, 11f);
 
-                bullet = new BasicBulletType(5f, 24){{
+                bullet = new BasicBulletType(5f, 20){{
                     homingPower = 0.19f;
                     homingDelay = 4f;
                     width = 7f;

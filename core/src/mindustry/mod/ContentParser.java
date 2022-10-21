@@ -998,6 +998,10 @@ public class ContentParser{
                     node.setupRequirements(unlock.researchRequirements());
                 }
 
+                if(research.has("planet")){
+                    node.planet = find(ContentType.planet, research.getString("planet"));
+                }
+
                 if(research.getBoolean("root", false)){
                     node.name = research.getString("name", unlock.name);
                     node.requiresUnlock = research.getBoolean("requiresUnlock", false);

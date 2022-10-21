@@ -142,6 +142,11 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     }
 
     @Override
+    public boolean displayable(){
+        return type.hoverable;
+    }
+
+    @Override
     @Replace
     public boolean isSyncHidden(Player player){
         //shooting reveals position so bullets can be seen

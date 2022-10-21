@@ -182,6 +182,15 @@ public class EventType{
         }
     }
 
+    /** Called when the client sends a chat message. This only fires clientside! */
+    public static class ClientChatEvent{
+        public final String message;
+
+        public ClientChatEvent(String message){
+            this.message = message;
+        }
+    }
+
     /** Called when a sector is conquered, e.g. a boss or base is defeated. */
     public static class SectorCaptureEvent{
         public final Sector sector;
