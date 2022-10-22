@@ -28,7 +28,7 @@ public class HeatConductor extends Block{
         super.setBars();
 
         //TODO show number
-        addBar("heat", (HeatConductorBuild entity) -> new Bar(() -> Core.bundle.format("bar.heatamount", (int)entity.heat), () -> Pal.lightOrange, () -> entity.heat / visualMaxHeat));
+        addBar("heat", (HeatConductorBuild entity) -> new Bar(() -> Core.bundle.format("bar.heatamount", (int)(entity.heat + 0.001f)), () -> Pal.lightOrange, () -> entity.heat / visualMaxHeat));
     }
 
     @Override
