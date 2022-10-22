@@ -5,6 +5,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
@@ -64,6 +65,7 @@ public class BeamDrill extends Block{
         ambientSound = Sounds.minebeam;
 
         envEnabled |= Env.space;
+        flags = EnumSet.of(BlockFlag.drill);
     }
 
     @Override

@@ -556,11 +556,21 @@ public class ContentParser{
 
             if(!value.has("sector") || !value.get("sector").isNumber()) throw new RuntimeException("SectorPresets must have a sector number.");
 
-            SectorPreset out = new SectorPreset(name, locate(ContentType.planet, value.getString("planet", "serpulo")), value.getInt("sector"));
-            value.remove("sector");
-            value.remove("planet");
+            SectorPreset out = new SectorPreset(name);
+
             currentContent = out;
-            read(() -> readFields(out, value));
+            read(() -> {
+                Planet planet = locate(ContentType.planet, value.getString("planet", "serpulo"));
+
+                if(planet == null) throw new RuntimeException("Planet '" + value.getString("planet") + "' not found.");
+
+                out.initialize(planet, value.getInt("sector", 0));
+
+                value.remove("sector");
+                value.remove("planet");
+
+                readFields(out, value);
+            });
             return out;
         },
         ContentType.planet, (TypeParser<Planet>)(mod, name, value) -> {
@@ -986,6 +996,10 @@ public class ContentParser{
 
                 if(customRequirements == null){
                     node.setupRequirements(unlock.researchRequirements());
+                }
+
+                if(research.has("planet")){
+                    node.planet = find(ContentType.planet, research.getString("planet"));
                 }
 
                 if(research.getBoolean("root", false)){

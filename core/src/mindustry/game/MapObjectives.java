@@ -139,6 +139,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         return all.count(MapObjective::qualified) > 0;
     }
 
+    public void clear(){
+        if(all.size > 0) changed = true;
+        all.clear();
+    }
+
     /** Iterates over all qualified in-map objectives. */
     public void eachRunning(Cons<MapObjective> cons){
         all.each(MapObjective::qualified, cons);
