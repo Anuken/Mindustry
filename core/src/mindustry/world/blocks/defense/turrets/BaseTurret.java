@@ -63,6 +63,10 @@ public class BaseTurret extends Block{
         super.drawPlace(x, y, rotation, valid);
 
         Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range, Pal.placing);
+
+        if(fogRadiusMultiuplier < 0.99f && state.rules.fog){
+            Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range * fogRadiusMultiuplier, Pal.lightishGray);
+        }
     }
 
     @Override

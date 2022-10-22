@@ -271,6 +271,19 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     //endregion
     //region utility methods
 
+    public boolean isDiscovered(Team viewer){
+        if(block.size <= 2){
+            return fogControl.isDiscovered(viewer, tile.x, tile.y);
+        }else{
+            int s = block.size / 2;
+            return fogControl.isDiscovered(viewer, tile.x, tile.y) ||
+                fogControl.isDiscovered(viewer, tile.x - s, tile.y - s) ||
+                fogControl.isDiscovered(viewer, tile.x - s, tile.y + s) ||
+                fogControl.isDiscovered(viewer, tile.x + s, tile.y + s) ||
+                fogControl.isDiscovered(viewer, tile.x + s, tile.y - s);
+        }
+    }
+
     public void addPlan(boolean checkPrevious){
         addPlan(checkPrevious, false);
     }
