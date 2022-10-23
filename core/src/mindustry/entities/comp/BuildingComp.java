@@ -272,6 +272,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     //region utility methods
 
     public boolean isDiscovered(Team viewer){
+        if(state.rules.borderDarkness && world.getDarkness(tile.x, tile.y) >= 3){
+            return false;
+        }
+
         if(viewer == null) return true;
         if(block.size <= 2){
             return fogControl.isDiscovered(viewer, tile.x, tile.y);
@@ -1939,6 +1943,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if(team == viewer || !state.rules.fog) return false;
 
         int size = block.size, of = block.sizeOffset, tx = tile.x, ty = tile.y;
+
+        if(!isDiscovered(viewer)) return true;
 
         for(int x = 0; x < size; x++){
             for(int y = 0; y < size; y++){
