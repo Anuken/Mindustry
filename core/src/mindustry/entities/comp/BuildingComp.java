@@ -272,6 +272,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     //region utility methods
 
     public boolean isDiscovered(Team viewer){
+        if(viewer == null) return true;
         if(block.size <= 2){
             return fogControl.isDiscovered(viewer, tile.x, tile.y);
         }else{

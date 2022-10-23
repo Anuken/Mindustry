@@ -5488,10 +5488,9 @@ public class Blocks{
             researchCostMultiplier = 0.4f;
 
             consumePower(3f);
-            consumeLiquid(Liquids.cyanogen, 24f / 60f);
+            consumeLiquid(Liquids.cyanogen, 9f / 60f);
         }};
 
-        //TODO requirements
         shipAssembler = new UnitAssembler("ship-assembler"){{
             requirements(Category.units, with(Items.carbide, 100, Items.oxide, 200, Items.tungsten, 500, Items.silicon, 800, Items.thorium, 400));
             regionSuffix = "-dark";
@@ -5503,23 +5502,22 @@ public class Blocks{
             areaSize = 13;
 
             consumePower(3f);
-            consumeLiquid(Liquids.cyanogen, 6f / 60f);
+            consumeLiquid(Liquids.cyanogen, 12f / 60f);
         }};
 
-        //TODO requirements
         mechAssembler = new UnitAssembler("mech-assembler"){{
             requirements(Category.units, with(Items.carbide, 200, Items.thorium, 600, Items.oxide, 200, Items.tungsten, 500, Items.silicon, 900));
             regionSuffix = "-dark";
             size = 5;
             //TODO different reqs
             plans.add(
-            new AssemblerUnitPlan(UnitTypes.tecta, 60f * 60f, PayloadStack.list(UnitTypes.merui, 4, Blocks.tungstenWallLarge, 10)),
+            new AssemblerUnitPlan(UnitTypes.tecta, 60f * 70f, PayloadStack.list(UnitTypes.merui, 6, Blocks.tungstenWallLarge, 12)),
             new AssemblerUnitPlan(UnitTypes.collaris, 60f * 60f * 3f, PayloadStack.list(UnitTypes.cleroi, 6, Blocks.carbideWallLarge, 20))
             );
             areaSize = 13;
 
-            consumePower(3f);
-            consumeLiquid(Liquids.cyanogen, 9f / 60f);
+            consumePower(3.5f);
+            consumeLiquid(Liquids.cyanogen, 12f / 60f);
         }};
 
         //TODO requirements / only accept inputs
