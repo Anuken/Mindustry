@@ -2436,20 +2436,21 @@ public class Blocks{
             requirements(Category.power, with(Items.beryllium, 8));
             consumesPower = outputsPower = true;
             health = 90;
-            consumePowerBuffered(1000f);
             range = 10;
             fogRadius = 1;
             researchCost = with(Items.beryllium, 5);
+
+            consumePowerBuffered(1000f);
         }};
 
-        //TODO requirements
         beamTower = new BeamNode("beam-tower"){{
-            requirements(Category.power, with(Items.beryllium, 30, Items.oxide, 20, Items.silicon, 10));
+            requirements(Category.power, with(Items.beryllium, 30, Items.oxide, 10, Items.silicon, 10));
             size = 3;
             consumesPower = outputsPower = true;
-            consumePowerBuffered(40000f);
             range = 23;
             scaledHealth = 90;
+
+            consumePowerBuffered(40000f);
         }};
 
         beamLink = new LongPowerNode("beam-link"){{
@@ -2754,7 +2755,6 @@ public class Blocks{
             consumeLiquid(Liquids.water, 0.15f);
         }};
 
-        //TODO output heat?
         ventCondenser = new AttributeCrafter("vent-condenser"){{
             requirements(Category.production, with(Items.graphite, 20, Items.beryllium, 60));
             attribute = Attribute.steam;
