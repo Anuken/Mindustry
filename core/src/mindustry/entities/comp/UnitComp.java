@@ -104,6 +104,11 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         lookAt(x, y);
     }
 
+    public boolean isPathImpassable(int tileX, int tileY){
+        return !type.flying && type.pathCost.getCost(team.id, pathfinder.get(tileX, tileY)) == -1;
+    }
+
+
     /** @return approx. square size of the physical hitbox for physics */
     public float physicSize(){
         return hitSize * 0.7f;

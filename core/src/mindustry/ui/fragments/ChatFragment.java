@@ -105,6 +105,8 @@ public class ChatFragment extends Table{
         chatfield.getStyle().fontColor = Color.white;
         chatfield.setStyle(chatfield.getStyle());
 
+        chatfield.typed(this::handleType);
+
         bottom().left().marginBottom(offsety).marginLeft(offsetx * 2).add(fieldlabel).padBottom(6f);
 
         add(chatfield).padBottom(offsety).padLeft(offsetx).growX().padRight(offsetx).height(28);
@@ -112,6 +114,22 @@ public class ChatFragment extends Table{
         if(Vars.mobile){
             marginBottom(105f);
             marginRight(240f);
+        }
+    }
+
+    //no mobile support.
+    private void handleType(char c){
+        int cursor = chatfield.getCursorPosition();
+        if(c == ':'){
+            int index = chatfield.getText().lastIndexOf(':', cursor - 2);
+            if(index >= 0 && index < cursor){
+                String text = chatfield.getText().substring(index + 1, cursor - 1);
+                String uni = Fonts.getUnicodeStr(text);
+                if(uni != null && uni.length() > 0){
+                    chatfield.setText(chatfield.getText().substring(0, index) + uni + chatfield.getText().substring(cursor));
+                    chatfield.setCursorPosition(index + uni.length());
+                }
+            }
         }
     }
 

@@ -101,7 +101,7 @@ public class EnergyFieldAbility extends Ability{
 
             if(hitUnits){
                 Units.nearby(null, rx, ry, range, other -> {
-                    if(other != unit && other.checkTarget(targetAir, targetGround) && other.targetable(unit.team)){
+                    if(other != unit && other.checkTarget(targetAir, targetGround) && other.targetable(unit.team) && (other.team != unit.team || other.damaged())){
                         all.add(other);
                     }
                 });
@@ -109,7 +109,7 @@ public class EnergyFieldAbility extends Ability{
 
             if(hitBuildings && targetGround){
                 Units.nearbyBuildings(rx, ry, range, b -> {
-                    if(b.team != Team.derelict || state.rules.coreCapture){
+                    if((b.team != Team.derelict || state.rules.coreCapture) && (b.team != unit.team || b.damaged())){
                         all.add(b);
                     }
                 });

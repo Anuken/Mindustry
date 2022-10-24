@@ -109,6 +109,10 @@ public class GameService{
             routerLanguage.complete();
         }
 
+        if(!Planets.serpulo.sectors.contains(s -> !s.isCaptured())){
+            captureAllSectors.complete();
+        }
+
         Events.on(UnitDestroyEvent.class, e -> {
             if(campaign()){
                 if(e.unit.team != Vars.player.team()){
@@ -477,7 +481,9 @@ public class GameService{
                 allPresetsErekir.complete();
             }
 
-            SStat.sectorsControlled.set(e.sector.planet.sectors.count(Sector::hasBase));
+            if(e.sector.planet == Planets.serpulo){
+                SStat.sectorsControlled.set(e.sector.planet.sectors.count(Sector::hasBase));
+            }
         });
 
         Events.on(PayloadDropEvent.class, e -> {

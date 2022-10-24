@@ -160,25 +160,25 @@ public class SectorPresets{
         }};
 
         stronghold = new SectorPreset("stronghold", erekir, 18){{
-            difficulty = 6;
+            difficulty = 7;
         }};
 
         crevice = new SectorPreset("crevice", erekir, 3){{
-            difficulty = 4;
+            difficulty = 6;
             captureWave = 46;
         }};
 
         siege = new SectorPreset("siege", erekir, 58){{
-            difficulty = 4;
+            difficulty = 8;
         }};
 
         crossroads = new SectorPreset("crossroads", erekir, 37){{
-            difficulty = 5;
+            difficulty = 7;
         }};
 
         karst = new SectorPreset("karst", erekir, 5){{
-            difficulty = 5;
-            captureWave = 51;
+            difficulty = 9;
+            captureWave = 10;
         }};
 
         //endregion
