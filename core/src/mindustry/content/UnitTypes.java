@@ -2509,7 +2509,7 @@ public class UnitTypes{
             weapons.add(new Weapon("locus-weapon"){{
                 shootSound = Sounds.bolt;
                 layerOffset = 0.0001f;
-                reload = 12f;
+                reload = 18f;
                 shootY = 10f;
                 recoil = 1f;
                 rotate = true;
@@ -2579,7 +2579,7 @@ public class UnitTypes{
             speed = 0.64f;
             rotateSpeed = 1.5f;
             health = 4800;
-            armor = 10f;
+            armor = 12f;
             itemCapacity = 0;
             treadRects = new Rect[]{new Rect(16 - 60f, 48 - 70f, 30, 75), new Rect(44 - 60f, 17 - 70f, 17, 60)};
             researchCostMultiplier = 0f;
@@ -2623,7 +2623,7 @@ public class UnitTypes{
 
                     fragBullets = 4;
 
-                    fragBullet = new BasicBulletType(5f, 25){{
+                    fragBullet = new BasicBulletType(5f, 40){{
                         sprite = "missile-large";
                         width = 5f;
                         height = 7f;
@@ -3096,7 +3096,7 @@ public class UnitTypes{
                     shootEffect = Fx.sparkShoot;
                     hitEffect = Fx.pointHit;
                     maxRange = 100f;
-                    damage = 38f;
+                    damage = 35f;
                 }};
             }});
         }};
@@ -3214,7 +3214,7 @@ public class UnitTypes{
                         trailColor = engineColor = Pal.techBlue;
                         engineSize = 1.75f;
                         engineLayer = Layer.effect;
-                        speed = 3.7f;
+                        speed = 3.2f;
                         maxRange = 6f;
                         lifetime = 60f * 1.7f;
                         outlineColor = Pal.darkOutline;
@@ -3469,7 +3469,7 @@ public class UnitTypes{
                     splashDamage = 90f;
                     splashDamageRadius = 20f;
 
-                    fragBullets = 15;
+                    fragBullets = 10;
                     fragVelocityMin = 0.5f;
                     fragRandomSpread = 130f;
                     fragLifeMin = 0.3f;
@@ -3767,7 +3767,7 @@ public class UnitTypes{
             speed = 1.1f;
             rotateSpeed = 3.2f;
             accel = 0.1f;
-            health = 8000f;
+            health = 5500f;
             armor = 5f;
             hitSize = 36f;
             payloadCapacity = Mathf.sqr(3f) * tilePayload;
@@ -3806,7 +3806,7 @@ public class UnitTypes{
                         outlineColor = Pal.darkOutline;
                         engineColor = trailColor = Pal.sapBulletBack;
                         engineLayer = Layer.effect;
-                        health = 45;
+                        health = 35;
                         loopSoundVolume = 0.1f;
 
                         weapons.add(new Weapon(){{
@@ -4258,7 +4258,7 @@ public class UnitTypes{
             lowAltitude = false;
             flying = true;
             drag = 0.06f;
-            speed = 2f;
+            speed = 4f;
             rotateSpeed = 9f;
             accel = 0.1f;
             itemCapacity = 100;
