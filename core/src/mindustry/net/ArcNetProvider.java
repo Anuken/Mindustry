@@ -11,6 +11,7 @@ import arc.util.*;
 import arc.util.Log.*;
 import arc.util.io.*;
 import mindustry.*;
+import mindustry.game.EventType.*;
 import mindustry.net.Net.*;
 import mindustry.net.Packets.*;
 import net.jpountz.lz4.*;
@@ -19,7 +20,6 @@ import java.io.*;
 import java.net.*;
 import java.nio.*;
 import java.nio.channels.*;
-import java.util.*;
 import java.util.concurrent.*;
 
 import static mindustry.Vars.*;
@@ -35,12 +35,19 @@ public class ArcNetProvider implements NetProvider{
     private static final LZ4FastDecompressor decompressor = LZ4Factory.fastestInstance().fastDecompressor();
     private static final LZ4Compressor compressor = LZ4Factory.fastestInstance().fastCompressor();
 
+    private volatile int playerLimitCache;
+
     public ArcNetProvider(){
         ArcNet.errorHandler = e -> {
             if(Log.level == LogLevel.debug){
                 Log.debug(Strings.getStackTrace(e));
             }
         };
+
+        //fetch this in the main thread to prevent threading issues
+        Events.run(Trigger.update, () -> {
+            playerLimitCache = netServer.admins.getPlayerLimit();
+        });
 
         client = new Client(8192, 8192, new PacketSerializer());
         client.setDiscoveryPacket(packetSupplier);
@@ -93,6 +100,12 @@ public class ArcNetProvider implements NetProvider{
             @Override
             public void connected(Connection connection){
                 String ip = connection.getRemoteAddressTCP().getAddress().getHostAddress();
+
+                //kill connections above the limit to prevent spam
+                if((playerLimitCache > 0 && server.getConnections().length > playerLimitCache) || netServer.admins.isDosBlacklisted(ip)){
+                    connection.close(DcReason.closed);
+                    return;
+                }
 
                 ArcConnection kn = new ArcConnection(ip, connection);
 

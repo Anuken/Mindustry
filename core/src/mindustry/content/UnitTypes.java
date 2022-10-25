@@ -3497,6 +3497,8 @@ public class UnitTypes{
                         trailWidth = 2.2f;
                         trailLength = 7;
                         trailChance = -1f;
+                        
+                        collidesAir = false;
 
                         despawnEffect = Fx.none;
                         splashDamage = 50f;
@@ -3624,7 +3626,7 @@ public class UnitTypes{
                 bullet = new BasicBulletType(5f, 34){{
                     width = 7f;
                     height = 12f;
-                    lifetime = 21f;
+                    lifetime = 18f;
                     shootEffect = Fx.sparkShoot;
                     smokeEffect = Fx.shootBigSmoke;
                     hitColor = backColor = trailColor = Pal.suppress;
@@ -3706,7 +3708,7 @@ public class UnitTypes{
                     trailParam = 4f;
                     speed = 3f;
                     damage = 75f;
-                    lifetime = 68f;
+                    lifetime = 60f;
                     width = height = 15f;
                     backColor = Pal.sapBulletBack;
                     frontColor = Pal.sapBullet;
