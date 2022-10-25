@@ -3497,6 +3497,8 @@ public class UnitTypes{
                         trailWidth = 2.2f;
                         trailLength = 7;
                         trailChance = -1f;
+                        
+                        collidesAir = false;
 
                         despawnEffect = Fx.none;
                         splashDamage = 50f;
