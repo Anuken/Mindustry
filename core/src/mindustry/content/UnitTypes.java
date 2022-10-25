@@ -3356,7 +3356,7 @@ public class UnitTypes{
 
         collaris = new ErekirUnitType("collaris"){{
             drag = 0.1f;
-            speed = 0.7f;
+            speed = 1.1f;
             hitSize = 44f;
             health = 18000;
             armor = 9f;
