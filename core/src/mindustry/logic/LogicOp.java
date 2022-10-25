@@ -10,6 +10,7 @@ public enum LogicOp{
     mul("*", (a, b) -> a * b),
     div("/", (a, b) -> a / b),
     idiv("//", (a, b) -> Math.floor(a / b)),
+    char("char", (a, b) -> toString(a).charAt(b+1)),
     mod("%", (a, b) -> a % b),
     pow("^", Math::pow),
 
