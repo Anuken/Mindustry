@@ -12,7 +12,7 @@ public enum LogicOp{
     idiv("//", (a, b) -> Math.floor(a / b)),
     mod("%", (a, b) -> a % b),
     pow("^", Math::pow),
-
+    charx("char", (a, b) -> toString(a).charAt(b+1)),
     equal("==", (a, b) -> Math.abs(a - b) < 0.000001 ? 1 : 0, (a, b) -> Structs.eq(a, b) ? 1 : 0),
     notEqual("not", (a, b) -> Math.abs(a - b) < 0.000001 ? 0 : 1, (a, b) -> !Structs.eq(a, b) ? 1 : 0),
     land("and", (a, b) -> a != 0 && b != 0 ? 1 : 0),
