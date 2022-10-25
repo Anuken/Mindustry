@@ -2459,7 +2459,7 @@ public class UnitTypes{
             treadPullOffset = 3;
             speed = 0.75f;
             rotateSpeed = 3.5f;
-            health = 800;
+            health = 840;
             armor = 5f;
             itemCapacity = 0;
             treadRects = new Rect[]{new Rect(12 - 32f, 7 - 32f, 14, 51)};
@@ -2666,7 +2666,7 @@ public class UnitTypes{
                 heatColor = Color.valueOf("f9350f");
                 cooldownTime = 80f;
 
-                bullet = new BasicBulletType(8f, 150){{
+                bullet = new BasicBulletType(8f, 160){{
                     sprite = "missile-large";
                     width = 9.5f;
                     height = 13f;
@@ -3055,7 +3055,6 @@ public class UnitTypes{
                     trailWidth = 2f;
                     trailLength = 4;
                     shake = 1f;
-                    recoil = 0.1f;
 
                     trailEffect = Fx.missileTrail;
                     trailParam = 1.8f;
@@ -3093,6 +3092,7 @@ public class UnitTypes{
                 recoil = 0.5f;
 
                 bullet = new BulletType(){{
+                    shootSound = Sounds.lasershoot;
                     shootEffect = Fx.sparkShoot;
                     hitEffect = Fx.pointHit;
                     maxRange = 100f;
@@ -3254,7 +3254,7 @@ public class UnitTypes{
             drag = 0.1f;
             speed = 0.6f;
             hitSize = 23f;
-            health = 7000;
+            health = 6700;
             armor = 5f;
 
             lockLegBase = true;
@@ -3315,7 +3315,7 @@ public class UnitTypes{
                 velocityRnd = 0.33f;
                 heatColor = Color.red;
 
-                bullet = new MissileBulletType(4.2f, 50){{
+                bullet = new MissileBulletType(4.2f, 47){{
                     homingPower = 0.2f;
                     weaveMag = 4;
                     weaveScale = 4;
@@ -3572,7 +3572,7 @@ public class UnitTypes{
 
                 shoot = new ShootSpread(2, 11f);
 
-                bullet = new BasicBulletType(5f, 24){{
+                bullet = new BasicBulletType(5f, 20){{
                     homingPower = 0.19f;
                     homingDelay = 4f;
                     width = 7f;
@@ -3624,7 +3624,7 @@ public class UnitTypes{
                 bullet = new BasicBulletType(5f, 34){{
                     width = 7f;
                     height = 12f;
-                    lifetime = 25f;
+                    lifetime = 18f;
                     shootEffect = Fx.sparkShoot;
                     smokeEffect = Fx.shootBigSmoke;
                     hitColor = backColor = trailColor = Pal.suppress;
@@ -3706,7 +3706,7 @@ public class UnitTypes{
                     trailParam = 4f;
                     speed = 3f;
                     damage = 75f;
-                    lifetime = 75f;
+                    lifetime = 60f;
                     width = height = 15f;
                     backColor = Pal.sapBulletBack;
                     frontColor = Pal.sapBullet;
@@ -3839,7 +3839,7 @@ public class UnitTypes{
             rotateSpeed = 2f;
             accel = 0.1f;
             health = 12000f;
-            armor = 7f;
+            armor = 9f;
             hitSize = 46f;
             payloadCapacity = Mathf.sqr(6f) * tilePayload;
 

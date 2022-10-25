@@ -109,6 +109,10 @@ public class GameService{
             routerLanguage.complete();
         }
 
+        if(!Planets.serpulo.sectors.contains(s -> !s.isCaptured())){
+            captureAllSectors.complete();
+        }
+
         Events.on(UnitDestroyEvent.class, e -> {
             if(campaign()){
                 if(e.unit.team != Vars.player.team()){
@@ -204,7 +208,7 @@ public class GameService{
                 }
 
                 if(e.tile.block() instanceof MendProjector || e.tile.block() instanceof RegenProjector) buildMendProjector.complete();
-                if(e.tile.block() instanceof OverdriveProjector) buildOverdrive.complete();
+                if(e.tile.block() instanceof OverdriveProjector) buildOverdriveProjector.complete();
 
                 if(e.tile.block() == Blocks.waterExtractor){
                     if(e.tile.getLinkedTiles(tmpTiles).contains(t -> t.floor().liquidDrop == Liquids.water)){
@@ -477,12 +481,20 @@ public class GameService{
                 allPresetsErekir.complete();
             }
 
-            SStat.sectorsControlled.set(e.sector.planet.sectors.count(Sector::hasBase));
+            if(e.sector.planet == Planets.serpulo){
+                SStat.sectorsControlled.set(e.sector.planet.sectors.count(Sector::hasBase));
+            }
         });
 
         Events.on(PayloadDropEvent.class, e -> {
-            if(e.unit != null && e.carrier.team == state.rules.defaultTeam && state.rules.waveTeam.cores().contains(c -> c.within(e.unit, state.rules.enemyCoreBuildRadius))){
+            if(campaign() && e.unit != null && e.carrier.team == state.rules.defaultTeam && state.rules.waveTeam.cores().contains(c -> c.within(e.unit, state.rules.enemyCoreBuildRadius))){
                 dropUnitsCoreZone.complete();
+            }
+        });
+
+        Events.on(ClientChatEvent.class, e -> {
+            if(e.message.contains(Iconc.alphaaaa + "")){
+                useAnimdustryEmoji.complete();
             }
         });
     }

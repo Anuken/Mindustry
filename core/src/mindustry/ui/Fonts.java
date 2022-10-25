@@ -140,6 +140,8 @@ public class Fonts{
             }
         }
 
+        stringIcons.put("alphachan", stringIcons.get("alphaaaa"));
+
         iconTable = new TextureRegion[512];
         iconTable[0] = Core.atlas.find("error");
         lastCid = 1;

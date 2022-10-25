@@ -120,7 +120,7 @@ public class Accelerator extends Block{
                 consume();
 
                 universe.clearLoadoutInfo();
-                universe.updateLoadout(sector.planet.generator.getDefaultLoadout().findCore(), sector.planet.generator.getDefaultLoadout());
+                universe.updateLoadout(sector.planet.generator.defaultLoadout.findCore(), sector.planet.generator.defaultLoadout);
             });
 
             Events.fire(Trigger.acceleratorUse);

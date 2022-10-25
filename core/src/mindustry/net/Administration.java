@@ -21,6 +21,7 @@ public class Administration{
     public Seq<ChatFilter> chatFilters = new Seq<>();
     public Seq<ActionFilter> actionFilters = new Seq<>();
     public Seq<String> subnetBans = new Seq<>();
+    public ObjectSet<String> dosBlacklist = new ObjectSet<>();
     public ObjectMap<String, Long> kickedIPs = new ObjectMap<>();
 
     /** All player info. Maps UUIDs to info. This persists throughout restarts. Do not access directly. */
@@ -81,6 +82,14 @@ public class Administration{
             }
             return true;
         });
+    }
+
+    public synchronized void blacklistDos(String address){
+        dosBlacklist.add(address);
+    }
+
+    public synchronized boolean isDosBlacklisted(String address){
+        return dosBlacklist.contains(address);
     }
 
     /** @return time at which a player would be pardoned for a kick (0 means they were never kicked) */
@@ -162,7 +171,7 @@ public class Administration{
     }
 
     public int getPlayerLimit(){
-        return Core.settings.getInt("playerlimit", 0);
+        return Core.settings.getInt("playerlimit", headless ? 30 : 0);
     }
 
     public void setPlayerLimit(int limit){

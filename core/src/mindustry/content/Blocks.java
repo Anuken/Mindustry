@@ -1337,7 +1337,7 @@ public class Blocks{
             requirements(Category.crafting, with(Items.tungsten, 110, Items.thorium, 150, Items.oxide, 60));
             craftEffect = Fx.none;
             outputItem = new ItemStack(Items.carbide, 1);
-            craftTime = 60f * 3f;
+            craftTime = 60f * 2.25f;
             size = 3;
             itemCapacity = 20;
             hasPower = hasItems = true;
@@ -2436,20 +2436,21 @@ public class Blocks{
             requirements(Category.power, with(Items.beryllium, 8));
             consumesPower = outputsPower = true;
             health = 90;
-            consumePowerBuffered(1000f);
             range = 10;
             fogRadius = 1;
             researchCost = with(Items.beryllium, 5);
+
+            consumePowerBuffered(1000f);
         }};
 
-        //TODO requirements
         beamTower = new BeamNode("beam-tower"){{
-            requirements(Category.power, with(Items.beryllium, 30, Items.oxide, 20, Items.silicon, 10));
+            requirements(Category.power, with(Items.beryllium, 30, Items.oxide, 10, Items.silicon, 10));
             size = 3;
             consumesPower = outputsPower = true;
-            consumePowerBuffered(40000f);
             range = 23;
             scaledHealth = 90;
+
+            consumePowerBuffered(40000f);
         }};
 
         beamLink = new LongPowerNode("beam-link"){{
@@ -2524,7 +2525,7 @@ public class Blocks{
                 color = Pal.slagOrange;
             }});
 
-            consumeLiquids(LiquidStack.with(Liquids.slag, 20f / 60f, Liquids.arkycite, 30f / 60f));
+            consumeLiquids(LiquidStack.with(Liquids.slag, 20f / 60f, Liquids.arkycite, 40f / 60f));
             size = 3;
 
             liquidCapacity = 30f * 5;
@@ -2535,13 +2536,15 @@ public class Blocks{
 
             ambientSound = Sounds.smelter;
             ambientSoundVolume = 0.06f;
+
+            researchCostMultiplier = 0.4f;
         }};
 
         //TODO stats
         fluxReactor = new VariableReactor("flux-reactor"){{
             requirements(Category.power, with(Items.graphite, 300, Items.carbide, 200, Items.oxide, 100, Items.silicon, 600, Items.surgeAlloy, 300));
             powerProduction = 120f;
-            maxHeat = 150f;
+            maxHeat = 140f;
 
             consumeLiquid(Liquids.cyanogen, 9f / 60f);
             liquidCapacity = 30f;
@@ -2752,7 +2755,6 @@ public class Blocks{
             consumeLiquid(Liquids.water, 0.15f);
         }};
 
-        //TODO output heat?
         ventCondenser = new AttributeCrafter("vent-condenser"){{
             requirements(Category.production, with(Items.graphite, 20, Items.beryllium, 60));
             attribute = Attribute.steam;
@@ -2932,7 +2934,7 @@ public class Blocks{
         }};
 
         coreCitadel = new CoreBlock("core-citadel"){{
-            requirements(Category.effect, with(Items.silicon, 7000, Items.beryllium, 7000, Items.tungsten, 4000, Items.oxide, 2500));
+            requirements(Category.effect, with(Items.silicon, 4000, Items.beryllium, 4000, Items.tungsten, 3000, Items.oxide, 1000));
 
             unitType = UnitTypes.incite;
             health = 16000;
@@ -2941,15 +2943,15 @@ public class Blocks{
             thrusterLength = 40/4f;
             armor = 10f;
             incinerateNonBuildable = true;
+            buildCostMultiplier = 0.7f;
 
             unitCapModifier = 15;
-            researchCostMultipliers.put(Items.silicon, 0.4f);
-            researchCostMultiplier = 0.14f;
+            researchCostMultipliers.put(Items.silicon, 0.5f);
+            researchCostMultiplier = 0.17f;
         }};
 
         coreAcropolis = new CoreBlock("core-acropolis"){{
-            //TODO cost
-            requirements(Category.effect, with(Items.beryllium, 12000, Items.silicon, 11000, Items.tungsten, 9000, Items.carbide, 10000, Items.oxide, 8000));
+            requirements(Category.effect, with(Items.beryllium, 8000, Items.silicon, 7000, Items.tungsten, 6000, Items.carbide, 5000, Items.oxide, 4000));
 
             unitType = UnitTypes.emanate;
             health = 30000;
@@ -2958,10 +2960,11 @@ public class Blocks{
             thrusterLength = 48/4f;
             armor = 15f;
             incinerateNonBuildable = true;
+            buildCostMultiplier = 0.7f;
 
             unitCapModifier = 15;
-            researchCostMultipliers.put(Items.silicon, 0.3f);
-            researchCostMultiplier = 0.2f;
+            researchCostMultipliers.put(Items.silicon, 0.4f);
+            researchCostMultiplier = 0.1f;
         }};
 
         container = new StorageBlock("container"){{
@@ -4459,7 +4462,7 @@ public class Blocks{
         }};
 
         scathe = new ItemTurret("scathe"){{
-            requirements(Category.turret, with(Items.silicon, 300, Items.graphite, 400, Items.tungsten, 450, Items.carbide, 250));
+            requirements(Category.turret, with(Items.silicon, 450, Items.graphite, 400, Items.tungsten, 500, Items.carbide, 300));
 
             ammo(
             Items.carbide, new BasicBulletType(0f, 1){{
@@ -4496,7 +4499,7 @@ public class Blocks{
                         deathExplosionEffect = Fx.massiveExplosion;
                         shootOnDeath = true;
                         shake = 10f;
-                        bullet = new ExplosionBulletType(600f, 65f){{
+                        bullet = new ExplosionBulletType(620f, 65f){{
                             hitColor = Pal.redLight;
                             shootEffect = new MultiEffect(Fx.massiveExplosion, Fx.scatheExplosion, Fx.scatheLight, new WaveEffect(){{
                                 lifetime = 10f;
@@ -4510,7 +4513,7 @@ public class Blocks{
                             ammoMultiplier = 1f;
                             fragLifeMin = 0.1f;
                             fragBullets = 7;
-                            fragBullet = new ArtilleryBulletType(3.4f, 30){{
+                            fragBullet = new ArtilleryBulletType(3.4f, 32){{
                                 buildingDamageMultiplier = 0.3f;
                                 drag = 0.02f;
                                 hitEffect = Fx.massiveExplosion;
@@ -4592,6 +4595,7 @@ public class Blocks{
 
             recoil = 0.5f;
 
+            fogRadiusMultiuplier = 0.45f;
             coolantMultiplier = 6f;
             shootSound = Sounds.missileLaunch;
 
@@ -5484,10 +5488,9 @@ public class Blocks{
             researchCostMultiplier = 0.4f;
 
             consumePower(3f);
-            consumeLiquid(Liquids.nitrogen, 24f / 60f);
+            consumeLiquid(Liquids.cyanogen, 9f / 60f);
         }};
 
-        //TODO requirements
         shipAssembler = new UnitAssembler("ship-assembler"){{
             requirements(Category.units, with(Items.carbide, 100, Items.oxide, 200, Items.tungsten, 500, Items.silicon, 800, Items.thorium, 400));
             regionSuffix = "-dark";
@@ -5499,23 +5502,22 @@ public class Blocks{
             areaSize = 13;
 
             consumePower(3f);
-            consumeLiquid(Liquids.cyanogen, 6f / 60f);
+            consumeLiquid(Liquids.cyanogen, 12f / 60f);
         }};
 
-        //TODO requirements
         mechAssembler = new UnitAssembler("mech-assembler"){{
             requirements(Category.units, with(Items.carbide, 200, Items.thorium, 600, Items.oxide, 200, Items.tungsten, 500, Items.silicon, 900));
             regionSuffix = "-dark";
             size = 5;
             //TODO different reqs
             plans.add(
-            new AssemblerUnitPlan(UnitTypes.tecta, 60f * 60f, PayloadStack.list(UnitTypes.merui, 4, Blocks.tungstenWallLarge, 10)),
+            new AssemblerUnitPlan(UnitTypes.tecta, 60f * 70f, PayloadStack.list(UnitTypes.merui, 6, Blocks.tungstenWallLarge, 12)),
             new AssemblerUnitPlan(UnitTypes.collaris, 60f * 60f * 3f, PayloadStack.list(UnitTypes.cleroi, 6, Blocks.carbideWallLarge, 20))
             );
-            consumePower(3f);
             areaSize = 13;
 
-            consumeLiquid(Liquids.cyanogen, 9f / 60f);
+            consumePower(3.5f);
+            consumeLiquid(Liquids.cyanogen, 12f / 60f);
         }};
 
         //TODO requirements / only accept inputs

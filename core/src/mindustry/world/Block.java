@@ -828,6 +828,10 @@ public class Block extends UnlockableContent implements Senseable{
         return generatedIcons == null ? (generatedIcons = icons()) : generatedIcons;
     }
 
+    public void resetGeneratedIcons(){
+        generatedIcons = null;
+    }
+
     public TextureRegion[] variantRegions(){
         return variantRegions == null ? (variantRegions = new TextureRegion[]{fullIcon}) : variantRegions;
     }
