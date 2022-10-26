@@ -9,6 +9,7 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.ai.types.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.Teams.*;
@@ -31,7 +32,7 @@ public class RtsAI{
     static final int timeUpdate = 0, timerSpawn = 1, maxTargetsChecked = 15;
 
     //in order of priority??
-    static final BlockFlag[] flags = {BlockFlag.generator, BlockFlag.factory, BlockFlag.core, BlockFlag.battery};
+    static final BlockFlag[] flags = {BlockFlag.generator, BlockFlag.factory, BlockFlag.core, BlockFlag.battery, BlockFlag.drill};
     static final ObjectFloatMap<Building> weights = new ObjectFloatMap<>();
     static final boolean debug = OS.hasProp("mindustry.debug");
 
@@ -107,7 +108,7 @@ public class RtsAI{
         boolean didDefend = false;
 
         for(var unit : data.units){
-            if(unit.isCommandable() && !unit.command().hasCommand() && used.add(unit.id)){
+            if(used.add(unit.id) && unit.isCommandable() && !unit.command().hasCommand() && !unit.command().isAttacking()){
                 squad.clear();
                 data.tree().intersect(unit.x - squadRadius/2f, unit.y - squadRadius/2f, squadRadius, squadRadius, squad);
 
@@ -178,7 +179,7 @@ public class RtsAI{
 
             //defend when close, or this is the only squad defending
             //TODO will always rush to defense no matter what
-            if(best != null && (best instanceof CoreBuild || (units.size >= data.team.rules().rtsMinSquad || (units.size > 0 && units.first().flag != 0)) || best.within(ax, ay, 500f))){
+            if(best != null && (best instanceof CoreBuild || (units.size >= data.team.rules().rtsMinSquad || (units.size > 0 && units.first().flag != 0)) || best.within(ax, ay, 1000f))){
                 defend = best;
 
                 if(debug){
@@ -197,7 +198,7 @@ public class RtsAI{
         Vec2 defendPos = null;
         Teamc defendTarget = null;
         if(defend != null){
-            float checkRange = 260f;
+            float checkRange = 350f;
 
             //TODO could be made faster by storing bullet shooter
             Unit aggressor = Units.closestEnemy(data.team, defend.x, defend.y, checkRange, u -> u.checkTarget(tair, tground));
@@ -205,6 +206,7 @@ public class RtsAI{
                 //do not target it directly - target the position?
                 //defendTarget = aggressor;
                 defendPos = new Vec2(aggressor.x, aggressor.y);
+                defendTarget = aggressor;
             }else if(false){ //TODO currently ignored, no use defending against nothing
                 //should it even go there if there's no aggressor found?
                 Tile closest = defend.findClosestEdge(units.first(), Tile::solid);
@@ -247,8 +249,8 @@ public class RtsAI{
         if(build != null || anyDefend){
             for(var unit : units){
                 if(unit.isCommandable() && !unit.command().hasCommand()){
-                    if(defendPos != null){
-                        unit.command().commandPosition(defendPos);
+                    if(defendPos != null && !unit.isPathImpassable(World.toTile(defendPos.x), World.toTile(defendPos.y))){
+                        unit.command().commandPosition(defendPos, true);
                     }else{
                         //TODO stopAtTarget parameter could be false, could be tweaked
                         unit.command().commandTarget(defendTarget == null ? build : defendTarget, defendTarget != null);

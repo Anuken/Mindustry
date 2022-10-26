@@ -62,7 +62,7 @@ abstract class TankComp implements Posc, Flyingc, Hitboxc, Unitc, ElevationMovec
                 }
 
                 //TODO should this apply to the player team(s)? currently PvE due to balancing
-                if(type.crushDamage > 0 && walked && t != null && t.build != null && t.build.team != team
+                if(type.crushDamage > 0 && (walked || deltaLen() >= 0.01f) && t != null && t.build != null && t.build.team != team
                     //damage radius is 1 tile smaller to prevent it from just touching walls as it passes
                     && Math.max(Math.abs(dx), Math.abs(dy)) <= r - 1){
 

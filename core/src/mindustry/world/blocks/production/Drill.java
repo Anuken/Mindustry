@@ -79,6 +79,7 @@ public class Drill extends Block{
         ambientSoundVolume = 0.018f;
         //drills work in space I guess
         envEnabled |= Env.space;
+        flags = EnumSet.of(BlockFlag.drill);
     }
 
     @Override
