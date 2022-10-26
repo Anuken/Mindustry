@@ -2823,7 +2823,7 @@ public class UnitTypes{
                     }});
                 }
 
-                bullet = new BasicBulletType(8f, 280f){{
+                bullet = new BasicBulletType(8f, 330f){{
                     sprite = "missile-large";
                     width = 12f;
                     height = 20f;
@@ -2879,8 +2879,8 @@ public class UnitTypes{
                                 weaveScale = (3f + s/2f) / 1.2f;
                                 weaveMag = i * (4f - fin * 2f);
 
-                                splashDamage = 40f;
-                                splashDamageRadius = 25f;
+                                splashDamage = 60f;
+                                splashDamageRadius = 30f;
                                 despawnEffect = new ExplosionEffect(){{
                                     lifetime = 50f;
                                     waveStroke = 4f;
@@ -3431,7 +3431,7 @@ public class UnitTypes{
                     }});
                 }
 
-                bullet = new ArtilleryBulletType(5.5f, 300){{
+                bullet = new ArtilleryBulletType(5.5f, 280){{
                     collidesTiles = collides = true;
                     lifetime = 75f;
                     shootEffect = Fx.shootBigColor;
@@ -3466,7 +3466,7 @@ public class UnitTypes{
                         sparkStroke = 3f;
                     }};
 
-                    splashDamage = 90f;
+                    splashDamage = 85f;
                     splashDamageRadius = 20f;
 
                     fragBullets = 15;
@@ -3475,7 +3475,7 @@ public class UnitTypes{
                     fragLifeMin = 0.3f;
                     despawnShake = 5f;
 
-                    fragBullet = new BasicBulletType(5.5f, 55){{
+                    fragBullet = new BasicBulletType(5.5f, 50){{
                         pierceCap = 2;
                         pierceBuilding = true;
 
@@ -3501,7 +3501,7 @@ public class UnitTypes{
                         collidesAir = false;
 
                         despawnEffect = Fx.none;
-                        splashDamage = 50f;
+                        splashDamage = 46f;
                         splashDamageRadius = 30f;
 
                         hitEffect = despawnEffect = new MultiEffect(new ExplosionEffect(){{
@@ -3571,7 +3571,7 @@ public class UnitTypes{
 
                 shoot = new ShootSpread(2, 11f);
 
-                bullet = new BasicBulletType(5f, 18){{
+                bullet = new BasicBulletType(5f, 17){{
                     homingPower = 0.19f;
                     homingDelay = 4f;
                     width = 7f;
