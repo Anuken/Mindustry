@@ -107,10 +107,9 @@ public class ErekirTechTree{
                         //TODO further limitations
                         node(payloadLoader, () -> {
                             node(payloadUnloader, () -> {
-                                //TODO replace.
-                                //node(payloadPropulsionTower, () -> {
+                                node(largePayloadMassDriver, () -> {
 
-                                //});
+                                });
                             });
                         });
 
