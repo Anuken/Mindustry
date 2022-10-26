@@ -827,6 +827,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                     ids[i] = selectedUnits.get(i).id;
                 }
 
+                if(attack != null){
+                    Events.fire(Trigger.unitCommandAttack);
+                }
+
                 Call.commandUnits(player, ids, attack instanceof Building b ? b : null, attack instanceof Unit u ? u : null, target);
             }
 

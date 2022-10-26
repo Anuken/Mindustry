@@ -146,9 +146,15 @@ public class Universe{
         turn++;
 
         int newSecondsPassed = (int)(turnDuration / 60);
+        Planet current = state.getPlanet();
 
         //update relevant sectors
         for(Planet planet : content.planets()){
+
+            //planets with different wave simulation status are not updated
+            if(current != null && current.allowWaveSimulation != planet.allowWaveSimulation){
+                continue;
+            }
 
             //first pass: clear import stats
             for(Sector sector : planet.sectors){
