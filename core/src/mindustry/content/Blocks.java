@@ -4296,7 +4296,7 @@ public class Blocks{
                 pierceCap = 2;
                 fragOnHit = false;
                 speed = 5f;
-                damage = 170f;
+                damage = 180f;
                 lifetime = 80f;
                 width = height = 16f;
                 backColor = Pal.surge;
@@ -4398,10 +4398,10 @@ public class Blocks{
         lustre = new ContinuousTurret("lustre"){{
             requirements(Category.turret, with(Items.silicon, 250, Items.graphite, 200, Items.oxide, 50, Items.carbide, 90));
 
-            range = 130f;
+            range = 140f;
 
             shootType = new PointLaserBulletType(){{
-                damage = 180f;
+                damage = 190f;
                 buildingDamageMultiplier = 0.3f;
                 hitColor = Color.valueOf("fda981");
             }};
