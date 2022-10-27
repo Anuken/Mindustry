@@ -155,7 +155,7 @@ public class Blocks{
     unitRepairTower,
 
     //payloads
-    payloadConveyor, payloadRouter, reinforcedPayloadConveyor, reinforcedPayloadRouter, payloadMassDriver, payloadPropulsionTower, smallDeconstructor, deconstructor, constructor, largeConstructor, payloadLoader, payloadUnloader,
+    payloadConveyor, payloadRouter, reinforcedPayloadConveyor, reinforcedPayloadRouter, payloadMassDriver, largePayloadMassDriver, smallDeconstructor, deconstructor, constructor, largeConstructor, payloadLoader, payloadUnloader,
     
     //logic
     message, switchBlock, microProcessor, logicProcessor, hyperProcessor, largeLogicDisplay, logicDisplay, memoryCell, memoryBank,
@@ -4296,7 +4296,7 @@ public class Blocks{
                 pierceCap = 2;
                 fragOnHit = false;
                 speed = 5f;
-                damage = 170f;
+                damage = 180f;
                 lifetime = 80f;
                 width = height = 16f;
                 backColor = Pal.surge;
@@ -4398,10 +4398,10 @@ public class Blocks{
         lustre = new ContinuousTurret("lustre"){{
             requirements(Category.turret, with(Items.silicon, 250, Items.graphite, 200, Items.oxide, 50, Items.carbide, 90));
 
-            range = 130f;
+            range = 140f;
 
             shootType = new PointLaserBulletType(){{
-                damage = 180f;
+                damage = 190f;
                 buildingDamageMultiplier = 0.3f;
                 hitColor = Color.valueOf("fda981");
             }};
@@ -5583,15 +5583,15 @@ public class Blocks{
             consumePower(0.5f);
         }};
 
-        payloadPropulsionTower = new PayloadMassDriver("payload-propulsion-tower"){{
-            requirements(Category.units, with(Items.thorium, 300, Items.silicon, 200, Items.plastanium, 200, Items.phaseFabric, 50));
+        largePayloadMassDriver = new PayloadMassDriver("large-payload-mass-driver"){{
+            requirements(Category.units, with(Items.thorium, 200, Items.tungsten, 200, Items.silicon, 200, Items.graphite, 100, Items.oxide, 30));
             regionSuffix = "-dark";
             size = 5;
             reload = 130f;
             chargeTime = 100f;
             range = 1100f;
             maxPayloadSize = 3.5f;
-            consumePower(6f);
+            consumePower(3f);
         }};
 
         smallDeconstructor = new PayloadDeconstructor("small-deconstructor"){{

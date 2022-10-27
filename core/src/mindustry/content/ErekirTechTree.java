@@ -63,9 +63,6 @@ public class ErekirTechTree{
         costMultipliers.put(Items.oxide, 0.5f);
         costMultipliers.put(Items.carbide, 0.4f);
 
-        //TODO remove
-        Objective tmpNever = new Research(Items.fissileMatter);
-
         //TODO gate behind capture
 
         Planets.erekir.techTree = nodeRoot("erekir", coreBastion, true, () -> {
@@ -107,20 +104,19 @@ public class ErekirTechTree{
                         //TODO further limitations
                         node(payloadLoader, () -> {
                             node(payloadUnloader, () -> {
-                                //TODO replace.
-                                //node(payloadPropulsionTower, () -> {
+                                node(largePayloadMassDriver, () -> {
 
-                                //});
+                                });
                             });
                         });
 
                         node(constructor, Seq.with(new OnSector(split)), () -> {
                             node(smallDeconstructor, Seq.with(new OnSector(peaks)), () -> {
-                                node(largeConstructor, Seq.with(tmpNever), () -> {
+                                node(largeConstructor, Seq.with(new OnSector(siege)), () -> {
 
                                 });
 
-                                node(deconstructor, Seq.with(tmpNever), () -> {
+                                node(deconstructor, Seq.with(new OnSector(siege)), () -> {
 
                                 });
                             });
@@ -285,7 +281,7 @@ public class ErekirTechTree{
 
                     node(disperse, Seq.with(new OnSector(stronghold)), () -> {
                         node(scathe, Seq.with(new OnSector(siege)), () -> {
-                            node(malign, Seq.with(tmpNever), () -> {
+                            node(malign, Seq.with(new OnSector(karst)), () -> {
 
                             });
                         });
@@ -336,14 +332,14 @@ public class ErekirTechTree{
                                     node(tankAssembler, Seq.with(new OnSector(siege), new Research(constructor), new Research(atmosphericConcentrator)), () -> {
 
                                         node(UnitTypes.vanquish, () -> {
-                                            node(UnitTypes.conquer, Seq.with(tmpNever), () -> {
+                                            node(UnitTypes.conquer, Seq.with(new OnSector(karst)), () -> {
 
                                             });
                                         });
 
                                         node(shipAssembler, Seq.with(new OnSector(crossroads)), () -> {
                                             node(UnitTypes.quell, () -> {
-                                                node(UnitTypes.disrupt, Seq.with(tmpNever), () -> {
+                                                node(UnitTypes.disrupt, Seq.with(new OnSector(karst)), () -> {
 
                                                 });
                                             });
@@ -351,13 +347,13 @@ public class ErekirTechTree{
 
                                         node(mechAssembler, Seq.with(new OnSector(crossroads)), () -> {
                                             node(UnitTypes.tecta, () -> {
-                                                node(UnitTypes.collaris, Seq.with(tmpNever), () -> {
+                                                node(UnitTypes.collaris, Seq.with(new OnSector(karst)), () -> {
 
                                                 });
                                             });
                                         });
 
-                                        node(basicAssemblerModule, Seq.with(tmpNever), () -> {
+                                        node(basicAssemblerModule, Seq.with(new OnSector(karst)), () -> {
 
                                         });
                                     });

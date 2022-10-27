@@ -141,6 +141,8 @@ public class BulletType extends Content implements Cloneable{
     public boolean despawnHit = false;
     /** If true, this bullet will create bullets when it hits anything, not just when it despawns. */
     public boolean fragOnHit = true;
+    /** If false, this bullet will not create fraags when absorbed by a shield. */
+    public boolean fragOnAbsorb = true;
     /** If true, unit armor is ignored in damage calculations. Ignored for building armor. */
     public boolean pierceArmor = false;
     /** Whether status and despawnHit should automatically be set. */
@@ -452,7 +454,7 @@ public class BulletType extends Content implements Cloneable{
     }
 
     public void createFrags(Bullet b, float x, float y){
-        if(fragBullet != null){
+        if(fragBullet != null && (fragOnAbsorb || !b.absorbed)){
             for(int i = 0; i < fragBullets; i++){
                 float len = Mathf.random(1f, 7f);
                 float a = b.rotation() + Mathf.range(fragRandomSpread / 2) + fragAngle + ((i - fragBullets/2) * fragSpread);
