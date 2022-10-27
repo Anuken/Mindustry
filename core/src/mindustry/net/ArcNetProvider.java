@@ -137,6 +137,13 @@ public class ArcNetProvider implements NetProvider{
                 ArcConnection k = getByArcID(connection.getID());
                 if(!(object instanceof Packet pack) || k == null) return;
 
+                if(!k.packetRate.allow(3000, 270)){
+                    Log.warn("Blacklisting IP '@' as potential DOS attack - packet spam.", k.address);
+                    connection.close(DcReason.closed);
+                    netServer.admins.blacklistDos(k.address);
+                    return;
+                }
+
                 Core.app.post(() -> {
                     try{
                         net.handleServerReceived(k, pack);
