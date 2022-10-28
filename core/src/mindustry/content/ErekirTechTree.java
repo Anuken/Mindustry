@@ -377,8 +377,8 @@ public class ErekirTechTree{
                             });
 
                             node(basin, Seq.with(new SectorComplete(atlas)), () -> {
-                                node(marsh, Seq.with(new SectorComplete(basin)), () ->{
-                                    node(ravine, Seq.with(new SectorComplete(marsh), new Research(Liquids.slag)), () ->{
+                                node(marsh, Seq.with(new SectorComplete(basin)), () -> {
+                                    node(ravine, Seq.with(new SectorComplete(marsh), new Research(Liquids.slag)), () -> {
                                         node(caldera, Seq.with(new SectorComplete(peaks), new Research(heatRedirector)), () -> {
                                             node(stronghold, Seq.with(new SectorComplete(caldera), new Research(coreCitadel)), () -> {
                                                 node(crevice, Seq.with(new SectorComplete(stronghold)), () -> {
