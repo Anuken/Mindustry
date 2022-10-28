@@ -1062,7 +1062,7 @@ public class Mods implements Loadable{
         /** Some mods are known to cause issues with the game; this detects and returns whether a mod is manually blacklisted. */
         public boolean isBlacklisted(){
         	var version = blacklistedMods.get(name);
-        	if (version == null) return false;
+        	if(version == null) return false;
 
         	//check if using patched version
             return Version.isAtLeast(version, 0, meta.version);
