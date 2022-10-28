@@ -2578,8 +2578,8 @@ public class UnitTypes{
             treadPullOffset = 5;
             speed = 0.64f;
             rotateSpeed = 1.5f;
-            health = 4800;
-            armor = 10f;
+            health = 5000;
+            armor = 11f;
             itemCapacity = 0;
             treadRects = new Rect[]{new Rect(16 - 60f, 48 - 70f, 30, 75), new Rect(44 - 60f, 17 - 70f, 17, 60)};
             researchCostMultiplier = 0f;
@@ -2623,7 +2623,7 @@ public class UnitTypes{
 
                     fragBullets = 4;
 
-                    fragBullet = new BasicBulletType(5f, 25){{
+                    fragBullet = new BasicBulletType(5f, 35){{
                         sprite = "missile-large";
                         width = 5f;
                         height = 7f;
@@ -2741,7 +2741,7 @@ public class UnitTypes{
             treadPullOffset = 1;
             speed = 0.48f;
             health = 22000;
-            armor = 25f;
+            armor = 26f;
             crushDamage = 25f / 5f;
             rotateSpeed = 0.8f;
 
@@ -4257,7 +4257,7 @@ public class UnitTypes{
             lowAltitude = false;
             flying = true;
             drag = 0.06f;
-            speed = 2f;
+            speed = 3f;
             rotateSpeed = 9f;
             accel = 0.1f;
             itemCapacity = 100;
