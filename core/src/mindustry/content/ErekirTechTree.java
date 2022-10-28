@@ -281,7 +281,7 @@ public class ErekirTechTree{
 
                     node(disperse, Seq.with(new OnSector(stronghold)), () -> {
                         node(scathe, Seq.with(new OnSector(siege)), () -> {
-                            node(malign, Seq.with(new OnSector(karst)), () -> {
+                            node(malign, Seq.with(new SectorComplete(karst)), () -> {
 
                             });
                         });
@@ -353,7 +353,7 @@ public class ErekirTechTree{
                                             });
                                         });
 
-                                        node(basicAssemblerModule, Seq.with(new OnSector(karst)), () -> {
+                                        node(basicAssemblerModule, Seq.with(new SectorComplete(karst)), () -> {
 
                                         });
                                     });
@@ -385,7 +385,7 @@ public class ErekirTechTree{
                                                     node(siege, Seq.with(new SectorComplete(crevice)), () -> {
                                                         node(crossroads, Seq.with(new SectorComplete(siege)), () -> {
                                                             node(karst, Seq.with(new SectorComplete(crossroads), new Research(coreAcropolis)), () -> {
-                                                                node(origin, Seq.with(new SectorComplete(karst), new Research(coreAcropolis), new Research(UnitTypes.vanquish), new Research(UnitTypes.disrupt), new Research(UnitTypes.collaris)), () -> {
+                                                                node(origin, Seq.with(new SectorComplete(karst), new Research(coreAcropolis), new Research(UnitTypes.vanquish), new Research(UnitTypes.disrupt), new Research(UnitTypes.collaris), new Research(malign), new Research(basicAssemblerModule)), () -> {
 
                                                                 });
                                                             });
