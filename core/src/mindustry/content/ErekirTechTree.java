@@ -385,7 +385,9 @@ public class ErekirTechTree{
                                                     node(siege, Seq.with(new SectorComplete(crevice)), () -> {
                                                         node(crossroads, Seq.with(new SectorComplete(siege)), () -> {
                                                             node(karst, Seq.with(new SectorComplete(crossroads), new Research(coreAcropolis)), () -> {
+                                                                node(origin, Seq.with(new SectorComplete(karst), new Research(coreAcropolis), new Research(UnitTypes.vanquish), new Research(UnitTypes.disrupt), new Research(UnitTypes.collaris)), () -> {
 
+                                                                });
                                                             });
                                                         });
                                                     });
