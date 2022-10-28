@@ -32,7 +32,7 @@ public class Administration{
 
         //anti-spam
         addChatFilter((player, message) -> {
-            long resetTime = Config.messageRateLimit.num() * 1000;
+            long resetTime = Config.messageRateLimit.num() * 1000L;
             if(Config.antiSpam.bool() && !player.isLocal() && !player.admin){
                 //prevent people from spamming messages quickly
                 if(resetTime > 0 && Time.timeSinceMillis(player.getInfo().lastMessageTime) < resetTime){
@@ -68,7 +68,7 @@ public class Administration{
                 Config.antiSpam.bool()){
 
                 Ratekeeper rate = action.player.getInfo().rate;
-                if(rate.allow(Config.interactRateWindow.num() * 1000, Config.interactRateLimit.num())){
+                if(rate.allow(Config.interactRateWindow.num() * 1000L, Config.interactRateLimit.num())){
                     return true;
                 }else{
                     if(rate.occurences > Config.interactRateKick.num()){
@@ -486,6 +486,7 @@ public class Administration{
         interactRateKick = new Config("interactRateKick", "How many times a player must interact inside the window to get kicked.", 60),
         messageRateLimit = new Config("messageRateLimit", "Message rate limit in seconds. 0 to disable.", 0),
         messageSpamKick = new Config("messageSpamKick", "How many times a player must send a message before the cooldown to get kicked. 0 to disable.", 3),
+        packetSpamLimit = new Config("packetSpamLimit", "Limit for packet count sent within 3sec that will lead to a blacklist + kick.", 270),
         socketInput = new Config("socketInput", "Allows a local application to control this server through a local TCP socket.", false, "socket", () -> Events.fire(Trigger.socketConfigChanged)),
         socketInputPort = new Config("socketInputPort", "The port for socket input.", 6859, () -> Events.fire(Trigger.socketConfigChanged)),
         socketInputAddress = new Config("socketInputAddress", "The bind address for socket input.", "localhost", () -> Events.fire(Trigger.socketConfigChanged)),
@@ -495,7 +496,7 @@ public class Administration{
         autosave = new Config("autosave", "Whether the periodically save the map when playing.", false),
         autosaveAmount = new Config("autosaveAmount", "The maximum amount of autosaves. Older ones get replaced.", 10),
         autosaveSpacing = new Config("autosaveSpacing", "Spacing between autosaves in seconds.", 60 * 5),
-        debug = new Config("debug", "Enable debug logging", false, () -> Log.level = debug() ? LogLevel.debug : LogLevel.info),
+        debug = new Config("debug", "Enable debug logging.", false, () -> Log.level = debug() ? LogLevel.debug : LogLevel.info),
         snapshotInterval = new Config("snapshotInterval", "Client entity snapshot interval in ms.", 200),
         autoPause = new Config("autoPause", "Whether the game should pause when nobody is online.", false);
 

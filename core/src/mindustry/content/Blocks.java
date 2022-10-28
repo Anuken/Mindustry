@@ -4317,7 +4317,7 @@ public class Blocks{
                 //TODO shoot sound
                 shootSound = Sounds.cannon;
 
-                fragBullet = intervalBullet = new BasicBulletType(3f, 30){{
+                fragBullet = intervalBullet = new BasicBulletType(3f, 35){{
                     width = 9f;
                     hitSize = 5f;
                     height = 15f;
@@ -4383,10 +4383,10 @@ public class Blocks{
             outlineColor = Pal.darkOutline;
             size = 4;
             envEnabled |= Env.space;
-            reload = 110f;
+            reload = 100f;
             cooldownTime = reload;
             recoil = 3f;
-            range = 340;
+            range = 350;
             shootCone = 20f;
             scaledHealth = 220;
             rotateSpeed = 1.5f;
@@ -4401,7 +4401,7 @@ public class Blocks{
             range = 140f;
 
             shootType = new PointLaserBulletType(){{
-                damage = 190f;
+                damage = 200f;
                 buildingDamageMultiplier = 0.3f;
                 hitColor = Color.valueOf("fda981");
             }};

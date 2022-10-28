@@ -12,6 +12,7 @@ import arc.util.Log.*;
 import arc.util.io.*;
 import mindustry.*;
 import mindustry.game.EventType.*;
+import mindustry.net.Administration.*;
 import mindustry.net.Net.*;
 import mindustry.net.Packets.*;
 import net.jpountz.lz4.*;
@@ -35,7 +36,7 @@ public class ArcNetProvider implements NetProvider{
     private static final LZ4FastDecompressor decompressor = LZ4Factory.fastestInstance().fastDecompressor();
     private static final LZ4Compressor compressor = LZ4Factory.fastestInstance().fastCompressor();
 
-    private volatile int playerLimitCache;
+    private volatile int playerLimitCache, packetSpamLimit;
 
     public ArcNetProvider(){
         ArcNet.errorHandler = e -> {
@@ -47,6 +48,7 @@ public class ArcNetProvider implements NetProvider{
         //fetch this in the main thread to prevent threading issues
         Events.run(Trigger.update, () -> {
             playerLimitCache = netServer.admins.getPlayerLimit();
+            packetSpamLimit = Config.packetSpamLimit.num();
         });
 
         client = new Client(8192, 8192, new PacketSerializer());
@@ -137,7 +139,7 @@ public class ArcNetProvider implements NetProvider{
                 ArcConnection k = getByArcID(connection.getID());
                 if(!(object instanceof Packet pack) || k == null) return;
 
-                if(!k.packetRate.allow(3000, 270)){
+                if(packetSpamLimit > 0 && !k.packetRate.allow(3000, packetSpamLimit)){
                     Log.warn("Blacklisting IP '@' as potential DOS attack - packet spam.", k.address);
                     connection.close(DcReason.closed);
                     netServer.admins.blacklistDos(k.address);
