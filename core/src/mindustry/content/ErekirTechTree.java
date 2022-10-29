@@ -56,8 +56,10 @@ public class ErekirTechTree{
         var costMultipliers = new ObjectFloatMap<Item>();
         //these are hard to make
         costMultipliers.put(Items.oxide, 0.5f);
-        costMultipliers.put(Items.surgeAlloy, 0.8f);
-        costMultipliers.put(Items.carbide, 0.35f);
+        costMultipliers.put(Items.surgeAlloy, 0.7f);
+        costMultipliers.put(Items.carbide, 0.3f);
+
+        for(var item : content.items()) costMultipliers.put(item, 0.9f);
 
         Planets.erekir.techTree = nodeRoot("erekir", coreBastion, true, () -> {
             context().researchCostMultipliers = costMultipliers;

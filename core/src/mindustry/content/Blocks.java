@@ -2951,7 +2951,7 @@ public class Blocks{
         }};
 
         coreAcropolis = new CoreBlock("core-acropolis"){{
-            requirements(Category.effect, with(Items.beryllium, 8000, Items.silicon, 7000, Items.tungsten, 6000, Items.carbide, 5000, Items.oxide, 4000));
+            requirements(Category.effect, with(Items.beryllium, 6000, Items.silicon, 5000, Items.tungsten, 5000, Items.carbide, 3000, Items.oxide, 3000));
 
             unitType = UnitTypes.emanate;
             health = 30000;

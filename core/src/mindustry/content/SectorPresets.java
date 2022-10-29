@@ -105,6 +105,7 @@ public class SectorPresets{
 
         planetaryTerminal = new SectorPreset("planetaryTerminal", serpulo, 93){{
             difficulty = 10;
+            isLastSector = true;
         }};
 
         //endregion
@@ -183,6 +184,7 @@ public class SectorPresets{
 
         origin = new SectorPreset("origin", erekir, 12){{
             difficulty = 10;
+            isLastSector = true;
         }};
 
         //endregion
