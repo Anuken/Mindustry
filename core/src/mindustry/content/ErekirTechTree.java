@@ -59,7 +59,6 @@ public class ErekirTechTree{
         costMultipliers.put(Items.surgeAlloy, 0.8f);
         costMultipliers.put(Items.carbide, 0.35f);
 
-
         Planets.erekir.techTree = nodeRoot("erekir", coreBastion, true, () -> {
             context().researchCostMultipliers = costMultipliers;
 
