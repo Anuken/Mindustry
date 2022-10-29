@@ -54,19 +54,14 @@ public class ErekirTechTree{
         Seq<Objective> erekirSector = Seq.with(new OnPlanet(Planets.erekir));
 
         var costMultipliers = new ObjectFloatMap<Item>();
-        costMultipliers.put(Items.silicon, 9);
-        costMultipliers.put(Items.surgeAlloy, 4);
-        costMultipliers.put(Items.phaseFabric, 4);
-        costMultipliers.put(Items.thorium, 9);
-        costMultipliers.put(Items.graphite, 9);
-        //oxide is hard to make
+        //these are hard to make
         costMultipliers.put(Items.oxide, 0.5f);
-        costMultipliers.put(Items.carbide, 0.4f);
+        costMultipliers.put(Items.surgeAlloy, 0.8f);
+        costMultipliers.put(Items.carbide, 0.35f);
 
-        //TODO gate behind capture
 
         Planets.erekir.techTree = nodeRoot("erekir", coreBastion, true, () -> {
-            //context().researchCostMultipliers = costMultipliers;
+            context().researchCostMultipliers = costMultipliers;
 
             node(duct, erekirSector, () -> {
                 node(ductRouter, () -> {
