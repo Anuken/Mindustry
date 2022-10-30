@@ -60,7 +60,7 @@ public enum Achievement{
     coolTurret,
     enablePixelation,
     openWiki,
-    useAccelerator,
+    //useAccelerator, //TODO remove from steam
     unlockAllZones,
 
     //TODO new ones

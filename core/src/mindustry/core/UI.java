@@ -73,6 +73,7 @@ public class UI implements ApplicationListener, Loadable{
     public ColorPicker picker;
     public LogicDialog logic;
     public FullTextDialog fullText;
+    public CampaignCompleteDialog campaignComplete;
 
     public Cursor drillCursor, unloadCursor, targetCursor;
 
@@ -199,6 +200,7 @@ public class UI implements ApplicationListener, Loadable{
         schematics = new SchematicsDialog();
         logic = new LogicDialog();
         fullText = new FullTextDialog();
+        campaignComplete = new CampaignCompleteDialog();
 
         Group group = Core.scene.root;
 
