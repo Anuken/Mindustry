@@ -32,7 +32,7 @@ import static mindustry.Vars.*;
 
 public class Mods implements Loadable{
     private static final String[] metaFiles = {"mod.json", "mod.hjson", "plugin.json", "plugin.hjson"};
-    private static final ObjectIntMap<String> blacklistedMods = ObjectIntMap.of("ui-lib", 4);
+    private static final ObjectMap<String, Integer> blacklistedMods = ObjectMap.of("ui-lib", 4);
 
     private Json json = new Json();
     private @Nullable Scripts scripts;
@@ -1061,7 +1061,7 @@ public class Mods implements Loadable{
 
         /** Some mods are known to cause issues with the game; this detects and returns whether a mod is manually blacklisted. */
         public boolean isBlacklisted(){
-        	if(!blacklistedMods.contains(name)) return false;
+        	if(!blacklistedMods.containsKey(name)) return false;
 
         	//mod is blacklisted, check if using patched version
         	var version = blacklistedMods.get(name);
