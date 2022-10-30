@@ -556,6 +556,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public static void unitClear(Player player){
         if(player == null) return;
 
+        //make sure player is allowed to control the building
+        if(net.server() && !netServer.admins.allowAction(player, ActionType.respawn, action -> {})){
+            throw new ValidateException(player, "Player cannot respawn.");
+        }
+
         if(!player.dead() && !player.unit().spawnedByCore){
             var docked = player.unit().dockedType;
 
@@ -825,6 +830,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 int[] ids = new int[selectedUnits.size];
                 for(int i = 0; i < ids.length; i++){
                     ids[i] = selectedUnits.get(i).id;
+                }
+
+                if(attack != null){
+                    Events.fire(Trigger.unitCommandAttack);
                 }
 
                 Call.commandUnits(player, ids, attack instanceof Building b ? b : null, attack instanceof Unit u ? u : null, target);

@@ -66,6 +66,7 @@ public class Planets{
             defaultCore = Blocks.coreBastion;
             iconColor = Color.valueOf("ff9266");
             hiddenItems.addAll(Items.serpuloItems).removeAll(Items.erekirItems);
+            enemyBuildSpeedMultiplier = 0.4f;
 
             //TODO SHOULD there be lighting?
             updateLighting = false;

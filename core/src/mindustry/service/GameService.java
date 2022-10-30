@@ -113,6 +113,12 @@ public class GameService{
             captureAllSectors.complete();
         }
 
+        Events.run(Trigger.unitCommandAttack, () -> {
+            if(campaign()){
+                issueAttackCommand.complete();
+            }
+        });
+
         Events.on(UnitDestroyEvent.class, e -> {
             if(campaign()){
                 if(e.unit.team != Vars.player.team()){
@@ -335,8 +341,6 @@ public class GameService{
                 drown.complete();
             }
         });
-
-        trigger(Trigger.acceleratorUse, useAccelerator);
 
         trigger(Trigger.impactPower, powerupImpactReactor);
 

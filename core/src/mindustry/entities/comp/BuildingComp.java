@@ -2016,5 +2016,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         out.setCentered(x, y, block.size * tilesize, block.size * tilesize);
     }
 
+    @Override
+    @Replace
+    public String toString(){
+        return "Building#" + id() + "[" + tileX() + "," + tileY() + "]:" + block;
+    }
+
     //endregion
 }

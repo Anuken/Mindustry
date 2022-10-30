@@ -12,6 +12,7 @@ import static mindustry.Vars.*;
 
 public class BaseDialog extends Dialog{
     protected boolean wasPaused;
+    /** If true, this dialog will pause the game while open. */
     protected boolean shouldPause;
 
     public BaseDialog(String title, DialogStyle style){

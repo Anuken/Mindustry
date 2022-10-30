@@ -2459,8 +2459,8 @@ public class UnitTypes{
             treadPullOffset = 3;
             speed = 0.75f;
             rotateSpeed = 3.5f;
-            health = 840;
-            armor = 5f;
+            health = 850;
+            armor = 6f;
             itemCapacity = 0;
             treadRects = new Rect[]{new Rect(12 - 32f, 7 - 32f, 14, 51)};
             researchCostMultiplier = 0f;
@@ -2471,7 +2471,7 @@ public class UnitTypes{
                 shootY = 4.5f;
                 recoil = 1f;
                 rotate = true;
-                rotateSpeed = 1.7f;
+                rotateSpeed = 2.2f;
                 mirror = false;
                 x = 0f;
                 y = -0.75f;
@@ -2509,7 +2509,7 @@ public class UnitTypes{
             weapons.add(new Weapon("locus-weapon"){{
                 shootSound = Sounds.bolt;
                 layerOffset = 0.0001f;
-                reload = 12f;
+                reload = 14f;
                 shootY = 10f;
                 recoil = 1f;
                 rotate = true;
@@ -2578,8 +2578,8 @@ public class UnitTypes{
             treadPullOffset = 5;
             speed = 0.64f;
             rotateSpeed = 1.5f;
-            health = 4800;
-            armor = 10f;
+            health = 5000;
+            armor = 11f;
             itemCapacity = 0;
             treadRects = new Rect[]{new Rect(16 - 60f, 48 - 70f, 30, 75), new Rect(44 - 60f, 17 - 70f, 17, 60)};
             researchCostMultiplier = 0f;
@@ -2587,7 +2587,7 @@ public class UnitTypes{
             weapons.add(new Weapon("precept-weapon"){{
                 shootSound = Sounds.dullExplosion;
                 layerOffset = 0.0001f;
-                reload = 85f;
+                reload = 80f;
                 shootY = 16f;
                 recoil = 3f;
                 rotate = true;
@@ -2598,7 +2598,7 @@ public class UnitTypes{
                 y = -1f;
                 heatColor = Color.valueOf("f9350f");
                 cooldownTime = 30f;
-                bullet = new BasicBulletType(7f, 110){{
+                bullet = new BasicBulletType(7f, 120){{
                     sprite = "missile-large";
                     width = 7.5f;
                     height = 13f;
@@ -2623,7 +2623,7 @@ public class UnitTypes{
 
                     fragBullets = 4;
 
-                    fragBullet = new BasicBulletType(5f, 25){{
+                    fragBullet = new BasicBulletType(5f, 35){{
                         sprite = "missile-large";
                         width = 5f;
                         height = 7f;
@@ -2653,7 +2653,7 @@ public class UnitTypes{
             weapons.add(new Weapon("vanquish-weapon"){{
                 shootSound = Sounds.mediumCannon;
                 layerOffset = 0.0001f;
-                reload = 110f;
+                reload = 90f;
                 shootY = 71f / 4f;
                 shake = 5f;
                 recoil = 4f;
@@ -2741,7 +2741,7 @@ public class UnitTypes{
             treadPullOffset = 1;
             speed = 0.48f;
             health = 22000;
-            armor = 25f;
+            armor = 26f;
             crushDamage = 25f / 5f;
             rotateSpeed = 0.8f;
 
@@ -2823,7 +2823,7 @@ public class UnitTypes{
                     }});
                 }
 
-                bullet = new BasicBulletType(8f, 280f){{
+                bullet = new BasicBulletType(8f, 330f){{
                     sprite = "missile-large";
                     width = 12f;
                     height = 20f;
@@ -2879,8 +2879,8 @@ public class UnitTypes{
                                 weaveScale = (3f + s/2f) / 1.2f;
                                 weaveMag = i * (4f - fin * 2f);
 
-                                splashDamage = 40f;
-                                splashDamageRadius = 25f;
+                                splashDamage = 60f;
+                                splashDamageRadius = 30f;
                                 despawnEffect = new ExplosionEffect(){{
                                     lifetime = 50f;
                                     waveStroke = 4f;
@@ -3431,7 +3431,7 @@ public class UnitTypes{
                     }});
                 }
 
-                bullet = new ArtilleryBulletType(5.5f, 300){{
+                bullet = new ArtilleryBulletType(5.5f, 280){{
                     collidesTiles = collides = true;
                     lifetime = 75f;
                     shootEffect = Fx.shootBigColor;
@@ -3466,7 +3466,7 @@ public class UnitTypes{
                         sparkStroke = 3f;
                     }};
 
-                    splashDamage = 90f;
+                    splashDamage = 85f;
                     splashDamageRadius = 20f;
 
                     fragBullets = 15;
@@ -3475,7 +3475,7 @@ public class UnitTypes{
                     fragLifeMin = 0.3f;
                     despawnShake = 5f;
 
-                    fragBullet = new BasicBulletType(5.5f, 55){{
+                    fragBullet = new BasicBulletType(5.5f, 50){{
                         pierceCap = 2;
                         pierceBuilding = true;
 
@@ -3501,7 +3501,7 @@ public class UnitTypes{
                         collidesAir = false;
 
                         despawnEffect = Fx.none;
-                        splashDamage = 50f;
+                        splashDamage = 46f;
                         splashDamageRadius = 30f;
 
                         hitEffect = despawnEffect = new MultiEffect(new ExplosionEffect(){{
@@ -3529,21 +3529,18 @@ public class UnitTypes{
             shadowElevation = 0.1f;
 
             drag = 0.07f;
-            speed = 2f;
+            speed = 1.8f;
             rotateSpeed = 5f;
 
             accel = 0.09f;
             health = 600f;
-            armor = 3f;
+            armor = 1f;
             hitSize = 11f;
             engineOffset = 7f;
             engineSize = 2f;
             itemCapacity = 0;
             useEngineElevation = false;
             researchCostMultiplier = 0f;
-
-            //does this look better?
-            //engineColor = Pal.sapBullet;
 
             abilities.add(new MoveEffectAbility(0f, -7f, Pal.sapBulletBack, Fx.missileTrailShort, 4f){{
                 teamColor = true;
@@ -3574,7 +3571,7 @@ public class UnitTypes{
 
                 shoot = new ShootSpread(2, 11f);
 
-                bullet = new BasicBulletType(5f, 20){{
+                bullet = new BasicBulletType(5f, 17){{
                     homingPower = 0.19f;
                     homingDelay = 4f;
                     width = 7f;
@@ -4260,7 +4257,7 @@ public class UnitTypes{
             lowAltitude = false;
             flying = true;
             drag = 0.06f;
-            speed = 2f;
+            speed = 3f;
             rotateSpeed = 9f;
             accel = 0.1f;
             itemCapacity = 100;
