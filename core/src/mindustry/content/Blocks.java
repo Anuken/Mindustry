@@ -5525,6 +5525,7 @@ public class Blocks{
             requirements(Category.units, with(Items.carbide, 300, Items.thorium, 500, Items.oxide, 200, Items.phaseFabric, 400));
             consumePower(4f);
             regionSuffix = "-dark";
+            researchCostMultiplier = 0.75f;
 
             size = 5;
         }};
