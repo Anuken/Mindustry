@@ -13,9 +13,12 @@ public class CampaignCompleteDialog extends BaseDialog{
         shouldPause = true;
 
         buttons.defaults().size(210f, 64f);
-        buttons.button("@menu", Icon.left, () -> Vars.ui.paused.runExitSave());
+        buttons.button("@menu", Icon.left, () -> {
+            hide();
+            Vars.ui.paused.runExitSave();
+        });
 
-        buttons.button("@continue", Icon.left, this::hide);
+        buttons.button("@continue", Icon.ok, this::hide);
     }
 
     public void show(Planet planet){
@@ -23,6 +26,9 @@ public class CampaignCompleteDialog extends BaseDialog{
         cont.clear();
 
         cont.add("[accent]Congrations. You done it.[]\n\nThe enemy on " + planet.localizedName + " has been defeated.");
+
+        float playtime = planet.sectors.sumf(s -> s.hasSave() ? s.save.meta.timePlayed : 0) / 1000f;
+
 
         show();
     }

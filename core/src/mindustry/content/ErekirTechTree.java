@@ -93,6 +93,10 @@ public class ErekirTechTree{
                             });
                         });
                     });
+
+                    node(reinforcedMessage, Seq.with(new OnSector(aegis)), () -> {
+                        node(canvas);
+                    });
                 });
 
                 node(reinforcedPayloadConveyor, Seq.with(new OnSector(atlas)), () -> {

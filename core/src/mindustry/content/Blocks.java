@@ -159,8 +159,8 @@ public class Blocks{
     
     //logic
     message, switchBlock, microProcessor, logicProcessor, hyperProcessor, largeLogicDisplay, logicDisplay, memoryCell, memoryBank,
-    canvas,
-    worldProcessor, worldCell,
+    canvas, reinforcedMessage,
+    worldProcessor, worldCell, worldMessage,
 
     //campaign
     launchPad, interplanetaryAccelerator
@@ -5834,6 +5834,11 @@ public class Blocks{
             size = 2;
         }};
 
+        reinforcedMessage = new MessageBlock("reinforced-message"){{
+            requirements(Category.logic, with(Items.graphite, 10, Items.beryllium, 5));
+            health = 100;
+        }};
+
         worldProcessor = new LogicBlock("world-processor"){{
             requirements(Category.logic, BuildVisibility.editorOnly, with());
 
@@ -5854,6 +5859,11 @@ public class Blocks{
             privileged = true;
             memoryCapacity = 128;
             forceDark = true;
+        }};
+
+        worldMessage = new MessageBlock("world-message"){{
+            requirements(Category.logic, BuildVisibility.editorOnly, with());
+            privileged = true;
         }};
 
         //endregion

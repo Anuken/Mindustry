@@ -163,7 +163,9 @@ public class Control implements ApplicationListener, Loadable{
             app.post(this::checkAutoUnlocks);
 
             if(e.sector.preset != null && e.sector.preset.isLastSector && e.initialCapture){
-                ui.campaignComplete.show(e.sector.planet);
+                Time.run(60f * 2f, () -> {
+                    ui.campaignComplete.show(e.sector.planet);
+                });
             }
         });
 
