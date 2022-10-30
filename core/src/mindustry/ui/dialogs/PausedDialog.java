@@ -100,8 +100,6 @@ public class PausedDialog extends BaseDialog{
 
     void showQuitConfirm(){
         Runnable quit = () -> {
-            wasClient = net.client();
-            if(net.client()) netClient.disconnectQuietly();
             runExitSave();
             hide();
         };
@@ -125,6 +123,9 @@ public class PausedDialog extends BaseDialog{
     }
 
     public void runExitSave(){
+        wasClient = net.client();
+        if(net.client()) netClient.disconnectQuietly();
+
         if(state.isEditor() && !wasClient){
             ui.editor.resumeEditing();
             return;

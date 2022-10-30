@@ -155,12 +155,12 @@ public class Blocks{
     unitRepairTower,
 
     //payloads
-    payloadConveyor, payloadRouter, reinforcedPayloadConveyor, reinforcedPayloadRouter, payloadMassDriver, payloadPropulsionTower, smallDeconstructor, deconstructor, constructor, largeConstructor, payloadLoader, payloadUnloader,
+    payloadConveyor, payloadRouter, reinforcedPayloadConveyor, reinforcedPayloadRouter, payloadMassDriver, largePayloadMassDriver, smallDeconstructor, deconstructor, constructor, largeConstructor, payloadLoader, payloadUnloader,
     
     //logic
     message, switchBlock, microProcessor, logicProcessor, hyperProcessor, largeLogicDisplay, logicDisplay, memoryCell, memoryBank,
-    canvas,
-    worldProcessor, worldCell,
+    canvas, reinforcedMessage,
+    worldProcessor, worldCell, worldMessage,
 
     //campaign
     launchPad, interplanetaryAccelerator
@@ -2951,7 +2951,7 @@ public class Blocks{
         }};
 
         coreAcropolis = new CoreBlock("core-acropolis"){{
-            requirements(Category.effect, with(Items.beryllium, 8000, Items.silicon, 7000, Items.tungsten, 6000, Items.carbide, 5000, Items.oxide, 4000));
+            requirements(Category.effect, with(Items.beryllium, 6000, Items.silicon, 5000, Items.tungsten, 5000, Items.carbide, 3000, Items.oxide, 3000));
 
             unitType = UnitTypes.emanate;
             health = 30000;
@@ -4317,7 +4317,7 @@ public class Blocks{
                 //TODO shoot sound
                 shootSound = Sounds.cannon;
 
-                fragBullet = intervalBullet = new BasicBulletType(3f, 30){{
+                fragBullet = intervalBullet = new BasicBulletType(3f, 35){{
                     width = 9f;
                     hitSize = 5f;
                     height = 15f;
@@ -4383,10 +4383,10 @@ public class Blocks{
             outlineColor = Pal.darkOutline;
             size = 4;
             envEnabled |= Env.space;
-            reload = 110f;
+            reload = 100f;
             cooldownTime = reload;
             recoil = 3f;
-            range = 340;
+            range = 350;
             shootCone = 20f;
             scaledHealth = 220;
             rotateSpeed = 1.5f;
@@ -4401,7 +4401,7 @@ public class Blocks{
             range = 140f;
 
             shootType = new PointLaserBulletType(){{
-                damage = 190f;
+                damage = 200f;
                 buildingDamageMultiplier = 0.3f;
                 hitColor = Color.valueOf("fda981");
             }};
@@ -5525,6 +5525,7 @@ public class Blocks{
             requirements(Category.units, with(Items.carbide, 300, Items.thorium, 500, Items.oxide, 200, Items.phaseFabric, 400));
             consumePower(4f);
             regionSuffix = "-dark";
+            researchCostMultiplier = 0.75f;
 
             size = 5;
         }};
@@ -5583,15 +5584,15 @@ public class Blocks{
             consumePower(0.5f);
         }};
 
-        payloadPropulsionTower = new PayloadMassDriver("payload-propulsion-tower"){{
-            requirements(Category.units, with(Items.thorium, 300, Items.silicon, 200, Items.plastanium, 200, Items.phaseFabric, 50));
+        largePayloadMassDriver = new PayloadMassDriver("large-payload-mass-driver"){{
+            requirements(Category.units, with(Items.thorium, 200, Items.tungsten, 200, Items.silicon, 200, Items.graphite, 100, Items.oxide, 30));
             regionSuffix = "-dark";
             size = 5;
             reload = 130f;
             chargeTime = 100f;
             range = 1100f;
             maxPayloadSize = 3.5f;
-            consumePower(6f);
+            consumePower(3f);
         }};
 
         smallDeconstructor = new PayloadDeconstructor("small-deconstructor"){{
@@ -5833,6 +5834,11 @@ public class Blocks{
             size = 2;
         }};
 
+        reinforcedMessage = new MessageBlock("reinforced-message"){{
+            requirements(Category.logic, with(Items.graphite, 10, Items.beryllium, 5));
+            health = 100;
+        }};
+
         worldProcessor = new LogicBlock("world-processor"){{
             requirements(Category.logic, BuildVisibility.editorOnly, with());
 
@@ -5853,6 +5859,11 @@ public class Blocks{
             privileged = true;
             memoryCapacity = 128;
             forceDark = true;
+        }};
+
+        worldMessage = new MessageBlock("world-message"){{
+            requirements(Category.logic, BuildVisibility.editorOnly, with());
+            privileged = true;
         }};
 
         //endregion

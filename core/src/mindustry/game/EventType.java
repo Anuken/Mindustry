@@ -195,9 +195,11 @@ public class EventType{
     /** Called when a sector is conquered, e.g. a boss or base is defeated. */
     public static class SectorCaptureEvent{
         public final Sector sector;
+        public final boolean initialCapture;
 
-        public SectorCaptureEvent(Sector sector){
+        public SectorCaptureEvent(Sector sector, boolean initialCapture){
             this.sector = sector;
+            this.initialCapture = initialCapture;
         }
     }
 

@@ -342,8 +342,6 @@ public class GameService{
             }
         });
 
-        trigger(Trigger.acceleratorUse, useAccelerator);
-
         trigger(Trigger.impactPower, powerupImpactReactor);
 
         trigger(Trigger.flameAmmo, useFlameAmmo);
