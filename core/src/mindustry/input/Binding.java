@@ -31,6 +31,7 @@ public enum Binding implements KeyBind{
     diagonal_placement(KeyCode.controlLeft),
     pick(KeyCode.mouseMiddle),
 
+    rebuild_select(KeyCode.b),
     schematic_select(KeyCode.f),
     schematic_flip_x(KeyCode.z),
     schematic_flip_y(KeyCode.x),
