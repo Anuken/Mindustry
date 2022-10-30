@@ -102,7 +102,7 @@ public enum Achievement{
     installMod, //TODO - test
     routerLanguage, //TODO - test
     joinCommunityServer, //TODO - test
-    openConsole, //TODO - Steam - icon done
+    openConsole, //TODO - test
 
     controlTurret, //TODO - Steam - icon done
     dropUnitsCoreZone, //TODO - Steam - icon done
