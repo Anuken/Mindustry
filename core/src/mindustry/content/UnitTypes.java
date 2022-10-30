@@ -3571,7 +3571,7 @@ public class UnitTypes{
 
                 shoot = new ShootSpread(2, 11f);
 
-                bullet = new BasicBulletType(5f, 17){{
+                bullet = new BasicBulletType(5f, 16){{
                     homingPower = 0.19f;
                     homingDelay = 4f;
                     width = 7f;

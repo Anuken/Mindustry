@@ -36,7 +36,7 @@ public enum Achievement{
     obtainTitanium,
     suicideBomb,
     buildGroundFactory,
-    issueAttackCommand, //TODO change desc
+    issueAttackCommand, //TODO - test
     active100Units(SStat.maxUnitActive, 100),
     build1000Units(SStat.unitsBuilt, 1000),
     buildAllUnits(SStat.unitTypesBuilt, 30),
@@ -53,36 +53,35 @@ public enum Achievement{
     circleConveyor,
     becomeRouter,
     create20Schematics(SStat.schematicsCreated, 20),
-    create500Schematics(SStat.schematicsCreated, 50), //TODO - Steam - icon done
+    create500Schematics(SStat.schematicsCreated, 500), //TODO - test
     survive10WavesNoBlocks,
     captureNoBlocksBroken,
     useFlameAmmo,
     coolTurret,
     enablePixelation,
     openWiki,
-    //useAccelerator, //TODO remove from steam
-    unlockAllZones,
 
     //TODO new ones
 
-    allTransportOneMap, //TODO - Steam - icon done
-    buildOverdriveProjector, //TODO - Steam - icon done
-    buildMendProjector, //TODO - Steam - icon done
-    buildWexWater, //TODO - Steam - icon done
+    allTransportOneMap, //TODO - test
+    buildOverdriveProjector, //TODO - test
+    buildMendProjector, //TODO - test
+    buildWexWater, //TODO - test
 
-    have10mItems(SStat.totalCampaignItems, 10_000_000), //TODO - Steam - icon done
-    killEclipseDuo, //TODO - Steam - icon done
+    have10mItems(SStat.totalCampaignItems, 10_000_000), //TODO - test
+    killEclipseDuo, //TODO - test
 
-    allPresetsErekir, //TODO - Steam - icon done
+    completeErekir, //TODO - test
+    completeSerpulo, //TODO - test
 
-    launchCoreSchematic, //TODO - Steam - icon done
-    nucleusGroundZero, //TODO - Steam - icon done
+    launchCoreSchematic, //TODO - test
+    nucleusGroundZero, //TODO - test
 
-    neoplasmWater, //TODO - Steam - icon done
-    blastFrozenUnit, //TODO - Steam - icon done
+    neoplasmWater, //TODO - test
+    blastFrozenUnit, //TODO - test
 
-    allBlocksSerpulo, //TODO - Steam - icon done
-    allBlocksErekir, //TODO - Steam - icon done
+    allBlocksSerpulo, //TODO - test
+    allBlocksErekir, //TODO - test
 
     //TODO are these necessary?
     //allTurretsSerpulo, //TODO
@@ -90,19 +89,19 @@ public enum Achievement{
     //allTechSerpulo, //TODO
     //allTechErekir, //TODO
 
-    breakForceProjector, //TODO - Steam - icon done
-    researchLogic, //TODO - Steam - icon done
+    breakForceProjector, //TODO - test
+    researchLogic, //TODO - Steam - test
 
-    negative10kPower, //TODO - Steam - icon done
-    positive100kPower, //TODO - Steam - icon done
-    store1milPower, //TODO - Steam - icon done
+    negative10kPower, //TODO - test
+    positive100kPower, //TODO - test
+    store1milPower, //TODO - test
 
-    blastGenerator, //TODO - Steam - icon done
-    neoplasiaExplosion, //TODO - Steam - icon done
+    blastGenerator, //TODO - test
+    neoplasiaExplosion, //TODO - test
 
-    installMod, //TODO - Steam - icon done
-    routerLanguage, //TODO - Steam - icon done
-    joinCommunityServer, //TODO - Steam - icon done
+    installMod, //TODO - test
+    routerLanguage, //TODO - test
+    joinCommunityServer, //TODO - test
     openConsole, //TODO - Steam - icon done
 
     controlTurret, //TODO - Steam - icon done
