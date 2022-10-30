@@ -19,6 +19,8 @@ public enum Binding implements KeyBind{
     deselect(KeyCode.mouseRight),
     break_block(KeyCode.mouseRight),
 
+    select_all_units(KeyCode.g),
+
     pickupCargo(KeyCode.leftBracket),
     dropCargo(KeyCode.rightBracket),
 

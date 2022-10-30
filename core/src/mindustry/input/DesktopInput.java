@@ -254,6 +254,15 @@ public class DesktopInput extends InputHandler{
         //validate commanding units
         selectedUnits.removeAll(u -> !u.isCommandable() || !u.isValid());
 
+        if(commandMode && input.keyTap(Binding.select_all_units) && !scene.hasField() && !scene.hasDialog()){
+            selectedUnits.clear();
+            for(var unit : player.team().data().units){
+                if(unit.isCommandable()){
+                    selectedUnits.add(unit);
+                }
+            }
+        }
+
         if(!scene.hasMouse() && !locked && state.rules.possessionAllowed){
             if(Core.input.keyDown(Binding.control) && Core.input.keyTap(Binding.select)){
                 Unit on = selectedUnit();
