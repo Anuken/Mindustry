@@ -486,7 +486,7 @@ public class Administration{
         interactRateKick = new Config("interactRateKick", "How many times a player must interact inside the window to get kicked.", 60),
         messageRateLimit = new Config("messageRateLimit", "Message rate limit in seconds. 0 to disable.", 0),
         messageSpamKick = new Config("messageSpamKick", "How many times a player must send a message before the cooldown to get kicked. 0 to disable.", 3),
-        packetSpamLimit = new Config("packetSpamLimit", "Limit for packet count sent within 3sec that will lead to a blacklist + kick.", 270),
+        packetSpamLimit = new Config("packetSpamLimit", "Limit for packet count sent within 3sec that will lead to a blacklist + kick.", 300),
         socketInput = new Config("socketInput", "Allows a local application to control this server through a local TCP socket.", false, "socket", () -> Events.fire(Trigger.socketConfigChanged)),
         socketInputPort = new Config("socketInputPort", "The port for socket input.", 6859, () -> Events.fire(Trigger.socketConfigChanged)),
         socketInputAddress = new Config("socketInputAddress", "The bind address for socket input.", "localhost", () -> Events.fire(Trigger.socketConfigChanged)),

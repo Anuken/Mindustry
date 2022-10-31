@@ -501,6 +501,10 @@ public class Block extends UnlockableContent implements Senseable{
         return update || destructible;
     }
 
+    public boolean checkForceDark(Tile tile){
+        return forceDark;
+    }
+
     @Override
     public void setStats(){
         super.setStats();

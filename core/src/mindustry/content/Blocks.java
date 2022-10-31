@@ -4398,8 +4398,6 @@ public class Blocks{
         lustre = new ContinuousTurret("lustre"){{
             requirements(Category.turret, with(Items.silicon, 250, Items.graphite, 200, Items.oxide, 50, Items.carbide, 90));
 
-            range = 140f;
-
             shootType = new PointLaserBulletType(){{
                 damage = 200f;
                 buildingDamageMultiplier = 0.3f;
@@ -4595,7 +4593,7 @@ public class Blocks{
 
             recoil = 0.5f;
 
-            fogRadiusMultiuplier = 0.45f;
+            fogRadiusMultiuplier = 0.5f;
             coolantMultiplier = 6f;
             shootSound = Sounds.missileLaunch;
 
