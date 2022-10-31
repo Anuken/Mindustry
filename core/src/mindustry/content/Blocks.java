@@ -5617,7 +5617,7 @@ public class Blocks{
             requirements(Category.units, with(Items.silicon, 100, Items.beryllium, 150, Items.tungsten, 80));
             regionSuffix = "-dark";
             hasPower = true;
-            buildSpeed = 0.3f;
+            buildSpeed = 0.5f;
             consumePower(2f);
             size = 3;
             //TODO expand this list
@@ -5629,7 +5629,7 @@ public class Blocks{
             requirements(Category.units, with(Items.silicon, 150, Items.oxide, 150, Items.tungsten, 200, Items.phaseFabric, 40));
             regionSuffix = "-dark";
             hasPower = true;
-            buildSpeed = 0.3f;
+            buildSpeed = 0.6f;
             maxBlockSize = 4;
             minBlockSize = 3;
             size = 5;
