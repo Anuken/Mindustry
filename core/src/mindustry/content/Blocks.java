@@ -4458,7 +4458,7 @@ public class Blocks{
             //TODO is this a good idea to begin with?
             unitSort = UnitSorts.strongest;
 
-            consumeLiquid(Liquids.nitrogen, 5f / 60f);
+            consumeLiquid(Liquids.nitrogen, 6f / 60f);
         }};
 
         scathe = new ItemTurret("scathe"){{

@@ -1,6 +1,7 @@
 package mindustry.ui.dialogs;
 
 import mindustry.*;
+import mindustry.core.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 
@@ -25,10 +26,12 @@ public class CampaignCompleteDialog extends BaseDialog{
         //TODO obviously needs different text.
         cont.clear();
 
-        cont.add("[accent]Congrations. You done it.[]\n\nThe enemy on " + planet.localizedName + " has been defeated.");
+        cont.add("[accent]Congratulations.\nThe enemy on " + planet.localizedName + " has been defeated.\n\nThe final sector has been conquered.").row();
 
         float playtime = planet.sectors.sumf(s -> s.hasSave() ? s.save.meta.timePlayed : 0) / 1000f;
 
+        //TODO needs more info
+        cont.add("Total Playtime: " + UI.formatTime(playtime)).left().row();
 
         show();
     }
