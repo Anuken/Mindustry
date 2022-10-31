@@ -54,13 +54,13 @@ public class ErekirTechTree{
         Seq<Objective> erekirSector = Seq.with(new OnPlanet(Planets.erekir));
 
         var costMultipliers = new ObjectFloatMap<Item>();
+        for(var item : content.items()) costMultipliers.put(item, 0.9f);
+
         //these are hard to make
         costMultipliers.put(Items.oxide, 0.5f);
         costMultipliers.put(Items.surgeAlloy, 0.7f);
         costMultipliers.put(Items.carbide, 0.3f);
-        costMultipliers.put(Items.carbide, 0.2f);
-
-        for(var item : content.items()) costMultipliers.put(item, 0.9f);
+        costMultipliers.put(Items.phaseFabric, 0.2f);
 
         Planets.erekir.techTree = nodeRoot("erekir", coreBastion, true, () -> {
             context().researchCostMultipliers = costMultipliers;
@@ -92,6 +92,10 @@ public class ErekirTechTree{
 
                             });
                         });
+                    });
+
+                    node(reinforcedMessage, Seq.with(new OnSector(aegis)), () -> {
+                        node(canvas);
                     });
                 });
 
@@ -382,7 +386,7 @@ public class ErekirTechTree{
                                                     node(siege, Seq.with(new SectorComplete(crevice)), () -> {
                                                         node(crossroads, Seq.with(new SectorComplete(siege)), () -> {
                                                             node(karst, Seq.with(new SectorComplete(crossroads), new Research(coreAcropolis)), () -> {
-                                                                node(origin, Seq.with(new SectorComplete(karst), new Research(coreAcropolis), new Research(UnitTypes.vanquish), new Research(UnitTypes.disrupt), new Research(UnitTypes.collaris), new Research(malign), new Research(basicAssemblerModule)), () -> {
+                                                                node(origin, Seq.with(new SectorComplete(karst), new Research(coreAcropolis), new Research(UnitTypes.vanquish), new Research(UnitTypes.disrupt), new Research(UnitTypes.collaris), new Research(malign), new Research(basicAssemblerModule), new Research(neoplasiaReactor)), () -> {
 
                                                                 });
                                                             });
