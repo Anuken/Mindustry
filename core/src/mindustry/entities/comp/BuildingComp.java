@@ -271,6 +271,24 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     //endregion
     //region utility methods
 
+    public boolean isDiscovered(Team viewer){
+        if(state.rules.borderDarkness && world.getDarkness(tile.x, tile.y) >= 3){
+            return false;
+        }
+
+        if(viewer == null) return true;
+        if(block.size <= 2){
+            return fogControl.isDiscovered(viewer, tile.x, tile.y);
+        }else{
+            int s = block.size / 2;
+            return fogControl.isDiscovered(viewer, tile.x, tile.y) ||
+                fogControl.isDiscovered(viewer, tile.x - s, tile.y - s) ||
+                fogControl.isDiscovered(viewer, tile.x - s, tile.y + s) ||
+                fogControl.isDiscovered(viewer, tile.x + s, tile.y + s) ||
+                fogControl.isDiscovered(viewer, tile.x + s, tile.y - s);
+        }
+    }
+
     public void addPlan(boolean checkPrevious){
         addPlan(checkPrevious, false);
     }
@@ -351,7 +369,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return calculateHeat(sideHeat, null);
     }
 
-    //TODO can cameFrom be an IntSet?
     public float calculateHeat(float[] sideHeat, @Nullable IntSet cameFrom){
         Arrays.fill(sideHeat, 0f);
         if(cameFrom != null) cameFrom.clear();
@@ -360,22 +377,31 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         for(var edge : block.getEdges()){
             Building build = nearby(edge.x, edge.y);
-            if(build != null && build.team == team && build instanceof HeatBlock heater && (!build.block.rotate || (relativeTo(build) + 2) % 4 == build.rotation)){ //TODO hacky
+            if(build != null && build.team == team && build instanceof HeatBlock heater){
 
-                //if there's a cycle, ignore its heat
-                if(!(build instanceof HeatConductorBuild hc && hc.cameFrom.contains(id()))){
-                    //heat is distributed across building size
-                    float add = heater.heat() / build.block.size;
+                boolean split = build.block instanceof HeatConductor cond && cond.splitHeat;
+                // non-routers must face us, routers must face away - next to a redirector, they're forced to face away due to cycles anyway
+                if(!build.block.rotate || (!split && (relativeTo(build) + 2) % 4 == build.rotation) || (split && relativeTo(build) != build.rotation)){ //TODO hacky
 
-                    sideHeat[Mathf.mod(relativeTo(build), 4)] += add;
-                    heat += add;
-                }
+                    //if there's a cycle, ignore its heat
+                    if(!(build instanceof HeatConductorBuild hc && hc.cameFrom.contains(id()))){
+                        //heat is distributed across building size
+                        float add = heater.heat() / build.block.size;
+                        if(split){
+                            //heat routers split heat across 3 surfaces
+                            add /= 3f;
+                        }
 
-                //register traversed cycles
-                if(cameFrom != null){
-                    cameFrom.add(build.id);
-                    if(build instanceof HeatConductorBuild hc){
-                        cameFrom.addAll(hc.cameFrom);
+                        sideHeat[Mathf.mod(relativeTo(build), 4)] += add;
+                        heat += add;
+                    }
+
+                    //register traversed cycles
+                    if(cameFrom != null){
+                        cameFrom.add(build.id);
+                        if(build instanceof HeatConductorBuild hc){
+                            cameFrom.addAll(hc.cameFrom);
+                        }
                     }
                 }
             }
@@ -1562,8 +1588,14 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     /** Handle a bullet collision.
      * @return whether the bullet should be removed. */
     public boolean collision(Bullet other){
+        boolean wasDead = dead();
+
         damage(other.team, other.damage() * other.type().buildingDamageMultiplier);
         Events.fire(bulletDamageEvent.set(self(), other));
+
+        if(dead() && !wasDead){
+            Events.fire(new BuildingBulletDestroyEvent(self(), other));
+        }
 
         return true;
     }
@@ -1912,6 +1944,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         int size = block.size, of = block.sizeOffset, tx = tile.x, ty = tile.y;
 
+        if(!isDiscovered(viewer)) return true;
+
         for(int x = 0; x < size; x++){
             for(int y = 0; y < size; y++){
                 if(fogControl.isVisibleTile(viewer, tx + x + of, ty + y + of)){
@@ -1980,6 +2014,12 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     @Override
     public void hitbox(Rect out){
         out.setCentered(x, y, block.size * tilesize, block.size * tilesize);
+    }
+
+    @Override
+    @Replace
+    public String toString(){
+        return "Building#" + id() + "[" + tileX() + "," + tileY() + "]:" + block;
     }
 
     //endregion

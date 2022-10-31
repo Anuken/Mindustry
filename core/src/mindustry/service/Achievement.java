@@ -1,5 +1,7 @@
 package mindustry.service;
 
+import arc.util.*;
+
 import static mindustry.Vars.*;
 
 public enum Achievement{
@@ -15,7 +17,7 @@ public enum Achievement{
     launch30Times(SStat.timesLaunched, 30),
     captureBackground,
     survive100Waves(SStat.maxWavesSurvived, 100),
-    researchAll,
+    researchAll, //TODO - remake/change?
     shockWetEnemy,
     killEnemyPhaseWall,
     researchRouter,
@@ -34,7 +36,7 @@ public enum Achievement{
     obtainTitanium,
     suicideBomb,
     buildGroundFactory,
-    issueAttackCommand,
+    issueAttackCommand, //TODO - test
     active100Units(SStat.maxUnitActive, 100),
     build1000Units(SStat.unitsBuilt, 1000),
     buildAllUnits(SStat.unitTypesBuilt, 30),
@@ -51,14 +53,71 @@ public enum Achievement{
     circleConveyor,
     becomeRouter,
     create20Schematics(SStat.schematicsCreated, 20),
+    create500Schematics(SStat.schematicsCreated, 500), //TODO - test
     survive10WavesNoBlocks,
     captureNoBlocksBroken,
     useFlameAmmo,
     coolTurret,
     enablePixelation,
     openWiki,
-    useAccelerator,
-    unlockAllZones,
+
+    //TODO new ones
+
+    allTransportOneMap, //TODO - test
+    buildOverdriveProjector, //TODO - test
+    buildMendProjector, //TODO - test
+    buildWexWater, //TODO - test
+
+    have10mItems(SStat.totalCampaignItems, 10_000_000), //TODO - test
+    killEclipseDuo, //TODO - test
+
+    completeErekir, //TODO - test
+    completeSerpulo, //TODO - test
+
+    launchCoreSchematic, //TODO - test
+    nucleusGroundZero, //TODO - test
+
+    neoplasmWater, //TODO - test
+    blastFrozenUnit, //TODO - test
+
+    allBlocksSerpulo, //TODO - test
+    allBlocksErekir, //TODO - test
+
+    //TODO are these necessary?
+    //allTurretsSerpulo, //TODO
+    //allTurretsErekir, //TODO
+    //allTechSerpulo, //TODO
+    //allTechErekir, //TODO
+
+    breakForceProjector, //TODO - test
+    researchLogic, //TODO - Steam - test
+
+    negative10kPower, //TODO - test
+    positive100kPower, //TODO - test
+    store1milPower, //TODO - test
+
+    blastGenerator, //TODO - test
+    neoplasiaExplosion, //TODO - test
+
+    installMod, //TODO - test
+    routerLanguage, //TODO - test
+    joinCommunityServer, //TODO - test
+    openConsole, //TODO - test
+
+    controlTurret, //TODO - test
+    dropUnitsCoreZone, //TODO - test
+    destroyScatterFlare, //TODO - test
+    boostUnit, //TODO - test
+    boostBuildingFloor, //TODO - test
+
+    hoverUnitLiquid, //TODO - test
+
+    break100Boulders(SStat.bouldersDeconstructed, 100), //TODO - test
+    break10000Boulders(SStat.bouldersDeconstructed, 10_000), //TODO - test
+
+    shockwaveTowerUse, //TODO - test
+
+    useAnimdustryEmoji, //TODO - Steam - icon done
 
     ;
 
@@ -80,8 +139,12 @@ public enum Achievement{
 
     public void complete(){
         if(!isAchieved()){
+            //can't complete achievements with the dev console shown.
+            if(ui != null && ui.consolefrag != null && ui.consolefrag.shown() && !OS.username.equals("anuke")) return;
+
             service.completeAchievement(name());
             service.storeStats();
+            completed = true;
         }
     }
 

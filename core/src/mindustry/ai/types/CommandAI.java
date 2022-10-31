@@ -6,6 +6,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.ai.*;
+import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -14,11 +15,14 @@ import mindustry.world.*;
 public class CommandAI extends AIController{
     protected static final float localInterval = 40f;
     protected static final Vec2 vecOut = new Vec2(), flockVec = new Vec2(), separation = new Vec2(), cohesion = new Vec2(), massCenter = new Vec2();
+    protected static final boolean[] noFound = {false};
 
     public @Nullable Vec2 targetPos;
     public @Nullable Teamc attackTarget;
+    /** All encountered unreachable buildings of this AI. Why a sequence? Because contains() is very rarely called on it. */
+    public IntSeq unreachableBuildings = new IntSeq(8);
 
-    protected boolean stopAtTarget;
+    protected boolean stopAtTarget, stopWhenInRange;
     protected Vec2 lastTargetPos;
     protected int pathId = -1;
     protected Seq<Unit> local = new Seq<>(false);
@@ -43,6 +47,10 @@ public class CommandAI extends AIController{
             unit.clearBuilding();
             this.command = command;
         }
+    }
+
+    public boolean isAttacking(){
+        return target != null && unit.within(target, unit.range() + 10f);
     }
 
     @Override
@@ -78,7 +86,7 @@ public class CommandAI extends AIController{
 
         updateVisuals();
         //only autotarget if the unit supports it
-        if(targetPos == null || unit.type.autoFindTarget){
+        if((targetPos == null || nearAttackTarget(unit.x, unit.y, unit.range())) || unit.type.autoFindTarget){
             updateTargeting();
         }else if(attackTarget == null){
             //if the unit does not have an attack target, is currently moving, and does not have autotargeting, stop attacking stuff
@@ -133,7 +141,17 @@ public class CommandAI extends AIController{
             vecOut.set(targetPos);
 
             if(unit.isGrounded()){
-                move = Vars.controlPath.getPathPosition(unit, pathId, targetPos, vecOut);
+                move = Vars.controlPath.getPathPosition(unit, pathId, targetPos, vecOut, noFound);
+
+                //if the path is invalid, stop trying and record the end as unreachable
+                if(unit.team.isAI() && (noFound[0] || unit.isPathImpassable(World.toTile(targetPos.x), World.toTile(targetPos.y)) )){
+                    if(attackTarget instanceof Building build){
+                        unreachableBuildings.addUnique(build.pos());
+                    }
+                    attackTarget = null;
+                    targetPos = null;
+                    return;
+                }
             }
 
             float engageRange = unit.type.range - 10f;
@@ -175,15 +193,23 @@ public class CommandAI extends AIController{
                     }
 
                     //others have arrived at destination, so this one will too
-                    if(count >= Math.max(2, local.size / 2)){
+                    if(count >= Math.max(3, local.size / 2)){
                         targetPos = null;
                     }
                 }
             }
 
+            if(stopWhenInRange && targetPos != null && unit.within(targetPos, engageRange * 0.9f)){
+                targetPos = null;
+                stopWhenInRange = false;
+            }
+
         }else if(target != null){
             faceTarget();
         }
+
+        //boosting control is not supported, so just don't.
+        unit.updateBoosting(false);
     }
 
     @Override
@@ -202,7 +228,11 @@ public class CommandAI extends AIController{
 
     @Override
     public Teamc findTarget(float x, float y, float range, boolean air, boolean ground){
-        return attackTarget == null || !attackTarget.within(x, y, range + 3f + (attackTarget instanceof Sized s ? s.hitSize()/2f : 0f)) ? super.findTarget(x, y, range, air, ground) : attackTarget;
+        return !nearAttackTarget(x, y, range) ? super.findTarget(x, y, range, air, ground) : attackTarget;
+    }
+
+    public boolean nearAttackTarget(float x, float y, float range){
+        return attackTarget != null && attackTarget.within(x, y, range + 3f + (attackTarget instanceof Sized s ? s.hitSize()/2f : 0f));
     }
 
     @Override
@@ -220,10 +250,15 @@ public class CommandAI extends AIController{
     }
 
     public void commandPosition(Vec2 pos){
+        commandPosition(pos, false);
+    }
+
+    public void commandPosition(Vec2 pos, boolean stopWhenInRange){
         targetPos = pos;
         lastTargetPos = pos;
         attackTarget = null;
         pathId = Vars.controlPath.nextTargetId();
+        this.stopWhenInRange = stopWhenInRange;
     }
 
     public void commandTarget(Teamc moveTo){
@@ -235,8 +270,6 @@ public class CommandAI extends AIController{
         this.stopAtTarget = stopAtTarget;
         pathId = Vars.controlPath.nextTargetId();
     }
-
-
 
     /*
 

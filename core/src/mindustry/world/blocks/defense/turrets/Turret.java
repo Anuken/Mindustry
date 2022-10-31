@@ -558,7 +558,7 @@ public class Turret extends ReloadTurret{
             xSpread = Mathf.range(xRand),
             bulletX = x + Angles.trnsx(rotation - 90, shootX + xOffset + xSpread, shootY + yOffset),
             bulletY = y + Angles.trnsy(rotation - 90, shootX + xOffset + xSpread, shootY + yOffset),
-            shootAngle = rotation + angleOffset + Mathf.range(inaccuracy);
+            shootAngle = rotation + angleOffset + Mathf.range(inaccuracy + type.inaccuracy);
 
             float lifeScl = type.scaleLife ? Mathf.clamp(Mathf.dst(bulletX, bulletY, targetPos.x, targetPos.y) / type.range, minRange / type.range, range() / type.range) : 1f;
 

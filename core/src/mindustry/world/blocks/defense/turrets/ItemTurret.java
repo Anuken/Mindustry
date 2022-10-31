@@ -76,6 +76,8 @@ public class ItemTurret extends Turret{
             }
         });
 
+        ammoTypes.each((item, type) -> placeOverlapRange = Math.max(placeOverlapRange, range + type.rangeChange + placeOverlapMargin));
+
         super.init();
     }
 
@@ -134,6 +136,10 @@ public class ItemTurret extends Turret{
 
             if(item == Items.pyratite){
                 Events.fire(Trigger.flameAmmo);
+            }
+
+            if(totalAmmo == 0){
+                Events.fire(Trigger.resupplyTurret);
             }
 
             BulletType type = ammoTypes.get(item);

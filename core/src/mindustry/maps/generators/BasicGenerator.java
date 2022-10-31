@@ -26,6 +26,8 @@ public abstract class BasicGenerator implements WorldGenerator{
     //for drawing
     protected @Nullable Block floor, block, ore;
 
+    public Schematic defaultLoadout = Loadouts.basicShard;
+
     @Override
     public void generate(Tiles tiles){
         this.tiles = tiles;
@@ -33,10 +35,6 @@ public abstract class BasicGenerator implements WorldGenerator{
         this.height = tiles.height;
 
         generate();
-    }
-
-    public Schematic getDefaultLoadout(){
-        return Loadouts.basicShard;
     }
 
     protected void generate(){

@@ -262,7 +262,7 @@ public class BlockRenderer{
     public void drawDestroyed(){
         if(!Core.settings.getBool("destroyedblocks")) return;
 
-        if(control.input.isPlacing() || control.input.isBreaking()){
+        if(control.input.isPlacing() || control.input.isBreaking() || control.input.isRebuildSelecting()){
             brokenFade = Mathf.lerpDelta(brokenFade, 1f, 0.1f);
         }else{
             brokenFade = Mathf.lerpDelta(brokenFade, 0f, 0.1f);
@@ -424,12 +424,12 @@ public class BlockRenderer{
 
                 if(build != null){
                     if(visible){
+                        build.visibleFlags |= (1L << pteam.id);
                         if(!build.wasVisible){
+                            build.wasVisible = true;
                             updateShadow(build);
                             renderer.minimap.update(tile);
                         }
-                        build.visibleFlags |= (1L << pteam.id);
-                        build.wasVisible = true;
                     }
 
                     if(build.damaged()){

@@ -161,6 +161,12 @@ public class Control implements ApplicationListener, Loadable{
 
         Events.on(SectorCaptureEvent.class, e -> {
             app.post(this::checkAutoUnlocks);
+
+            if(e.sector.preset != null && e.sector.preset.isLastSector && e.initialCapture){
+                Time.run(60f * 2f, () -> {
+                    ui.campaignComplete.show(e.sector.planet);
+                });
+            }
         });
 
         //delete save on campaign game over
