@@ -4488,7 +4488,7 @@ public class Blocks{
 
                     fogRadius = 6f;
 
-                    health = 190;
+                    health = 210;
 
                     weapons.add(new Weapon(){{
                         shootCone = 360f;
@@ -4497,7 +4497,7 @@ public class Blocks{
                         deathExplosionEffect = Fx.massiveExplosion;
                         shootOnDeath = true;
                         shake = 10f;
-                        bullet = new ExplosionBulletType(620f, 65f){{
+                        bullet = new ExplosionBulletType(640f, 65f){{
                             hitColor = Pal.redLight;
                             shootEffect = new MultiEffect(Fx.massiveExplosion, Fx.scatheExplosion, Fx.scatheLight, new WaveEffect(){{
                                 lifetime = 10f;
@@ -4593,7 +4593,7 @@ public class Blocks{
 
             recoil = 0.5f;
 
-            fogRadiusMultiuplier = 0.5f;
+            fogRadiusMultiuplier = 0.75f;
             coolantMultiplier = 6f;
             shootSound = Sounds.missileLaunch;
 
@@ -4602,7 +4602,7 @@ public class Blocks{
             targetAir = false;
 
             shake = 6f;
-            ammoPerShot = 30;
+            ammoPerShot = 20;
             maxAmmo = 30;
             shootY = -1;
             outlineColor = Pal.darkOutline;
