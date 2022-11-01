@@ -1,5 +1,6 @@
 package mindustry.world.blocks.power;
 
+import arc.Core;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -22,8 +23,7 @@ import static mindustry.Vars.*;
 public class BeamNode extends PowerBlock{
     public int range = 5;
 
-    public @Load("power-beam") TextureRegion laser;
-    public @Load("power-beam-end") TextureRegion laserEnd;
+    public TextureRegion laser, laserEnd;
 
     public Color laserColor1 = Color.white;
     public Color laserColor2 = Color.valueOf("ffd9c2");
@@ -60,6 +60,14 @@ public class BeamNode extends PowerBlock{
         super.init();
 
         updateClipRadius((range + 1) * tilesize);
+    }
+
+    @Override
+    public void load(){
+        super.load();
+
+        laser = Core.atlas.find(name + "-beam", Core.atlas.find("power-beam"));
+        laserEnd = Core.atlas.find(name + "-beam-end", Core.atlas.find("power-beam-end"));
     }
 
     @Override
