@@ -638,12 +638,12 @@ public class Control implements ApplicationListener, Loadable{
             }
 
             //cannot launch while paused
-            if(state.is(State.paused) && renderer.isCutscene()){
+            if(state.isPaused() && renderer.isCutscene()){
                 state.set(State.playing);
             }
 
             if(Core.input.keyTap(Binding.pause) && !renderer.isCutscene() && !scene.hasDialog() && !scene.hasKeyboard() && !ui.restart.isShown() && (state.is(State.paused) || state.is(State.playing))){
-                state.set(state.is(State.playing) ? State.paused : State.playing);
+                state.set(state.isPaused() ? State.playing : State.paused);
             }
 
             if(Core.input.keyTap(Binding.menu) && !ui.restart.isShown() && !ui.minimapfrag.shown()){

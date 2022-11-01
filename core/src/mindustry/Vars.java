@@ -115,6 +115,8 @@ public class Vars implements Loadable{
     public static final float iconXLarge = 8*6f, iconLarge = 8*5f, iconMed = 8*4f, iconSmall = 8*3f;
     /** for map generator dialog */
     public static boolean updateEditorOnChange = false;
+    /** Experimental flag for multiplayer pausing. DO NOT USE YET! */
+    public static boolean multiplayerPausing = false;
     /** all choosable player colors in join/host dialog */
     public static final Color[] playerColors = {
         Color.valueOf("82759a"),

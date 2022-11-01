@@ -24,7 +24,7 @@ public class BaseDialog extends Dialog{
         .growX().height(3f).pad(4f);
 
         hidden(() -> {
-            if(shouldPause && state.isGame()){
+            if(shouldPause && state.isGame() && !net.active()){
                 if(!wasPaused || net.active()){
                     state.set(State.playing);
                 }
@@ -33,7 +33,7 @@ public class BaseDialog extends Dialog{
         });
 
         shown(() -> {
-            if(shouldPause && state.isGame()){
+            if(shouldPause && state.isGame() && !net.active()){
                 wasPaused = state.is(State.paused);
                 state.set(State.paused);
             }
