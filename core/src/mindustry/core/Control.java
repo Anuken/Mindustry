@@ -651,7 +651,9 @@ public class Control implements ApplicationListener, Loadable{
                     ui.chatfrag.hide();
                 }else if(!ui.paused.isShown() && !scene.hasDialog()){
                     ui.paused.show();
-                    state.set(State.paused);
+                    if(!net.active()){
+                        state.set(State.paused);
+                    }
                 }
             }
 
