@@ -1808,7 +1808,7 @@ public class Blocks{
             requirements(Category.effect, with(Items.silicon, 150, Items.oxide, 40, Items.thorium, 60));
             outlineColor = Pal.darkOutline;
 
-            range = 180f;
+            range = 200f;
             size = 3;
             buildSpeed = 1.5f;
 
@@ -5615,7 +5615,7 @@ public class Blocks{
             requirements(Category.units, with(Items.silicon, 100, Items.beryllium, 150, Items.tungsten, 80));
             regionSuffix = "-dark";
             hasPower = true;
-            buildSpeed = 0.5f;
+            buildSpeed = 0.6f;
             consumePower(2f);
             size = 3;
             //TODO expand this list
@@ -5627,7 +5627,7 @@ public class Blocks{
             requirements(Category.units, with(Items.silicon, 150, Items.oxide, 150, Items.tungsten, 200, Items.phaseFabric, 40));
             regionSuffix = "-dark";
             hasPower = true;
-            buildSpeed = 0.6f;
+            buildSpeed = 0.75f;
             maxBlockSize = 4;
             minBlockSize = 3;
             size = 5;
