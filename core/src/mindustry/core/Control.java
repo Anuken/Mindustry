@@ -269,6 +269,9 @@ public class Control implements ApplicationListener, Loadable{
 
         Events.on(SaveWriteEvent.class, e -> forcePlaceAll());
         Events.on(HostEvent.class, e -> forcePlaceAll());
+        Events.on(HostEvent.class, e -> {
+            state.set(State.playing);
+        });
     }
 
     private void forcePlaceAll(){
