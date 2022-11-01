@@ -72,6 +72,11 @@ public class Radar extends Block{
         }
 
         @Override
+        public boolean canPickup(){
+            return false;
+        }
+
+        @Override
         public void drawSelect(){
             Drawf.dashCircle(x, y, fogRadius() * tilesize, Pal.accent);
         }

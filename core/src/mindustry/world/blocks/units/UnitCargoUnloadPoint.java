@@ -34,6 +34,11 @@ public class UnitCargoUnloadPoint extends Block{
         configClear((UnitCargoUnloadPointBuild build) -> build.item = null);
     }
 
+    @Override
+    public boolean outputsItems(){
+        return false;
+    }
+
     public class UnitCargoUnloadPointBuild extends Building{
         public Item item;
         public float staleTimer;
