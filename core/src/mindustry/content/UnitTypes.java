@@ -4257,7 +4257,7 @@ public class UnitTypes{
             lowAltitude = false;
             flying = true;
             drag = 0.06f;
-            speed = 3f;
+            speed = 3.5f;
             rotateSpeed = 9f;
             accel = 0.1f;
             itemCapacity = 100;

@@ -52,8 +52,8 @@ public class GameState{
 
     public void set(State astate){
         //horrible horrible horrible
-        if(astate == State.paused && net.active() && !headless) serverPaused = true;
-        if(astate != State.paused && net.active() && !headless) serverPaused = false;
+        if(astate == State.paused && net.server() && !headless) serverPaused = true;
+        if(astate != State.paused && net.server() && !headless) serverPaused = false;
 
         //cannot pause when in multiplayer
         if(astate == State.paused && net.active()) return;
