@@ -15,6 +15,7 @@ public class Liquids{
             effect = StatusEffects.wet;
             boilPoint = 0.5f;
             gasColor = Color.grays(0.9f);
+            alwaysUnlocked = true;
         }};
 
         slag = new Liquid("slag", Color.valueOf("ffa166")){{

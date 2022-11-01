@@ -1081,13 +1081,15 @@ public class Block extends UnlockableContent implements Senseable{
                 for(ItemStack stack : i.items){
                     cons.get(stack.item);
                 }
-            }else if(c instanceof ConsumeLiquid i){
+            }
+            //TODO: requiring liquid dependencies is usually a bad idea, because there is no reason to pump/produce something until you actually need it.
+            /*else if(c instanceof ConsumeLiquid i){
                 cons.get(i.liquid);
             }else if(c instanceof ConsumeLiquids i){
                 for(var stack : i.liquids){
                     cons.get(stack.liquid);
                 }
-            }
+            }*/
         }
     }
 
