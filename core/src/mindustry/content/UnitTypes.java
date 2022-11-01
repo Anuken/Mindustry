@@ -4285,6 +4285,7 @@ public class UnitTypes{
             engineOffset = 6.5f;
             payloadCapacity = 0f;
             targetable = false;
+            bounded = false;
 
             outlineColor = Pal.darkOutline;
             isEnemy = false;
