@@ -29,7 +29,8 @@ public class PowerNode extends PowerBlock{
     /** The maximum range of all power nodes on the map */
     protected static float maxRange;
 
-    public TextureRegion laser, laserEnd;
+    public @Load(value = "@-laser", fallback = "laser") TextureRegion laser;
+    public @Load(value = "@-laser-end", fallback = "laser-end") TextureRegion laserEnd;
     public float laserRange = 6;
     public int maxNodes = 3;
     public boolean autolink = true, drawRange = true;
@@ -144,14 +145,6 @@ public class PowerNode extends PowerBlock{
         super.init();
 
         clipSize = Math.max(clipSize, laserRange * tilesize);
-    }
-
-    @Override
-    public void load(){
-        super.load();
-
-        laser = Core.atlas.find(name + "-laser", Core.atlas.find("laser"));
-        laserEnd = Core.atlas.find(name + "-laser-end", Core.atlas.find("laser-end"));
     }
 
     @Override
