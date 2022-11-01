@@ -3216,7 +3216,7 @@ public class UnitTypes{
                         engineLayer = Layer.effect;
                         speed = 3.7f;
                         maxRange = 6f;
-                        lifetime = 60f * 1.7f;
+                        lifetime = 60f * 1.5f;
                         outlineColor = Pal.darkOutline;
                         health = 55;
                         lowAltitude = true;

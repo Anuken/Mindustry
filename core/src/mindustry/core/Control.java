@@ -642,7 +642,7 @@ public class Control implements ApplicationListener, Loadable{
                 state.set(State.playing);
             }
 
-            if(Core.input.keyTap(Binding.pause) && !renderer.isCutscene() && !scene.hasDialog() && !scene.hasKeyboard() && !ui.restart.isShown() && (state.is(State.paused) || state.is(State.playing))){
+            if(!net.client() && Core.input.keyTap(Binding.pause) && !renderer.isCutscene() && !scene.hasDialog() && !scene.hasKeyboard() && !ui.restart.isShown() && (state.is(State.paused) || state.is(State.playing))){
                 state.set(state.isPaused() ? State.playing : State.paused);
             }
 
