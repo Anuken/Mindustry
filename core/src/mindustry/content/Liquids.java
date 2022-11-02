@@ -73,7 +73,6 @@ public class Liquids{
             hidden = true;
         }};
 
-        //TODO reactivity, etc
         ozone = new Liquid("ozone", Color.valueOf("fc81dd")){{
             gas = true;
             barColor = Color.valueOf("d699f0");
@@ -81,7 +80,6 @@ public class Liquids{
             flammability = 1f;
         }};
 
-        //TODO combustion
         hydrogen = new Liquid("hydrogen", Color.valueOf("9eabf7")){{
             gas = true;
             flammability = 1f;
