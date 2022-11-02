@@ -526,7 +526,7 @@ public class GameService{
 
             for(var up : Groups.powerGraph){
                 var graph = up.graph();
-                if(graph.all.size > 0 && graph.all.first().team == player.team()){
+                if(graph.all.size > 0 && graph.all.first().team == player.team() && graph.hasPowerBalanceSamples()){
                     float balance = graph.getPowerBalance() * 60f;
                     if(balance < 10_000) negative10kPower.complete();
                     if(balance > 100_000) positive100kPower.complete();

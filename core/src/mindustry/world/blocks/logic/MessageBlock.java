@@ -181,11 +181,6 @@ public class MessageBlock extends Block{
         }
 
         @Override
-        public boolean displayable(){
-            return accessible();
-        }
-
-        @Override
         public void handleString(Object value){
             message.setLength(0);
             message.append(value);

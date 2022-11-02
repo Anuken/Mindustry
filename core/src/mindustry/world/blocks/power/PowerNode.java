@@ -29,8 +29,8 @@ public class PowerNode extends PowerBlock{
     /** The maximum range of all power nodes on the map */
     protected static float maxRange;
 
-    public @Load("laser") TextureRegion laser;
-    public @Load("laser-end") TextureRegion laserEnd;
+    public @Load(value = "@-laser", fallback = "laser") TextureRegion laser;
+    public @Load(value = "@-laser-end", fallback = "laser-end") TextureRegion laserEnd;
     public float laserRange = 6;
     public int maxNodes = 3;
     public boolean autolink = true, drawRange = true;

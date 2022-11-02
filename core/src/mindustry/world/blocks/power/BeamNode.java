@@ -1,5 +1,6 @@
 package mindustry.world.blocks.power;
 
+import arc.Core;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -22,8 +23,8 @@ import static mindustry.Vars.*;
 public class BeamNode extends PowerBlock{
     public int range = 5;
 
-    public @Load("power-beam") TextureRegion laser;
-    public @Load("power-beam-end") TextureRegion laserEnd;
+    public @Load(value = "@-beam", fallback = "power-beam") TextureRegion laser;
+    public @Load(value = "@-beam-end", fallback = "power-beam-end") TextureRegion laserEnd;
 
     public Color laserColor1 = Color.white;
     public Color laserColor2 = Color.valueOf("ffd9c2");
