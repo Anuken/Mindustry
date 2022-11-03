@@ -1004,6 +1004,7 @@ public class Blocks{
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(Liquids.water), new DrawLiquidTile(Liquids.cryofluid){{drawLiquidLight = true;}}, new DrawDefault());
             liquidCapacity = 24f;
             craftTime = 120;
+            lightLiquid = Liquids.cryofluid;
 
             consumePower(1f);
             consumeItem(Items.titanium);
@@ -1863,6 +1864,8 @@ public class Blocks{
             size = 3;
             consumeLiquids(LiquidStack.with(Liquids.cyanogen, 1.5f / 60f));
             consumePower(100f / 60f);
+            range = 170f;
+            reload = 80f;
         }};
 
         //TODO 5x5??
@@ -2550,6 +2553,9 @@ public class Blocks{
             liquidCapacity = 30f;
             explosionMinWarmup = 0.5f;
 
+            explosionRadius = 17;
+            explosionDamage = 2500;
+
             ambientSound = Sounds.flux;
             ambientSoundVolume = 0.13f;
 
@@ -2592,8 +2598,8 @@ public class Blocks{
             itemDuration = 60f * 3f;
             itemCapacity = 10;
 
-            explosionRadius = 7;
-            explosionDamage = 1000;
+            explosionRadius = 9;
+            explosionDamage = 2000;
             explodeEffect = new MultiEffect(Fx.bigShockwave, new WrapEffect(Fx.titanSmoke, Liquids.neoplasm.color), Fx.neoplasmSplat);
             explodeSound = Sounds.largeExplosion;
 

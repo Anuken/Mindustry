@@ -1201,10 +1201,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public void drawLight(){
-        if(block.hasLiquids && block.drawLiquidLight && liquids.current().lightColor.a > 0.001f){
+        Liquid liq = block.hasLiquids && block.lightLiquid == null ? liquids.current() : block.lightLiquid;
+        if(block.hasLiquids && block.drawLiquidLight && liq.lightColor.a > 0.001f){
             //yes, I am updating in draw()... but this is purely visual anyway, better have it here than in update() where it wastes time
-            visualLiquid = Mathf.lerpDelta(visualLiquid, liquids.currentAmount(), 0.07f);
-            drawLiquidLight(liquids.current(), visualLiquid);
+            visualLiquid = Mathf.lerpDelta(visualLiquid, liquids.get(liq)>= 0.01f ? 1f : 0f, 0.06f);
+            drawLiquidLight(liq, visualLiquid);
         }
     }
 
@@ -1214,7 +1215,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             float fract = 1f;
             float opacity = color.a * fract;
             if(opacity > 0.001f){
-                Drawf.light(x, y, block.size * 30f * fract, color, opacity);
+                Drawf.light(x, y, block.size * 30f * fract, color, opacity * amount);
             }
         }
     }
@@ -1590,12 +1591,12 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     /** Handle a bullet collision.
      * @return whether the bullet should be removed. */
     public boolean collision(Bullet other){
-        boolean wasDead = dead();
+        boolean wasDead = health <= 0;
 
         damage(other.team, other.damage() * other.type().buildingDamageMultiplier);
         Events.fire(bulletDamageEvent.set(self(), other));
 
-        if(dead() && !wasDead){
+        if(health <= 0 && !wasDead){
             Events.fire(new BuildingBulletDestroyEvent(self(), other));
         }
 
