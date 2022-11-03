@@ -5,7 +5,6 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
-import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.game.SectorInfo.*;
 import mindustry.gen.*;
@@ -97,8 +96,13 @@ public class GameService{
 
         if(Items.thorium.unlocked()) obtainThorium.complete();
         if(Items.titanium.unlocked()) obtainTitanium.complete();
-        if(!content.sectors().contains(UnlockableContent::locked)){
-            unlockAllZones.complete();
+
+        if(SectorPresets.origin.sector.isCaptured()){
+            completeErekir.complete();
+        }
+
+        if(SectorPresets.planetaryTerminal.sector.isCaptured()){
+            completeSerpulo.complete();
         }
 
         if(mods.list().size > 0){
@@ -108,6 +112,18 @@ public class GameService{
         if(Core.bundle.get("yes").equals("router")){
             routerLanguage.complete();
         }
+
+        if(!Planets.serpulo.sectors.contains(s -> !s.isCaptured())){
+            captureAllSectors.complete();
+        }
+
+        Events.run(Trigger.openConsole, () -> openConsole.complete());
+
+        Events.run(Trigger.unitCommandAttack, () -> {
+            if(campaign()){
+                issueAttackCommand.complete();
+            }
+        });
 
         Events.on(UnitDestroyEvent.class, e -> {
             if(campaign()){
@@ -204,7 +220,7 @@ public class GameService{
                 }
 
                 if(e.tile.block() instanceof MendProjector || e.tile.block() instanceof RegenProjector) buildMendProjector.complete();
-                if(e.tile.block() instanceof OverdriveProjector) buildOverdrive.complete();
+                if(e.tile.block() instanceof OverdriveProjector) buildOverdriveProjector.complete();
 
                 if(e.tile.block() == Blocks.waterExtractor){
                     if(e.tile.getLinkedTiles(tmpTiles).contains(t -> t.floor().liquidDrop == Liquids.water)){
@@ -315,9 +331,6 @@ public class GameService{
         Events.on(UnlockEvent.class, e -> {
             if(e.content == Items.thorium) obtainThorium.complete();
             if(e.content == Items.titanium) obtainTitanium.complete();
-            if(e.content instanceof SectorPreset && !content.sectors().contains(s -> s.locked())){
-                unlockAllZones.complete();
-            }
         });
 
         Events.run(Trigger.openWiki, openWiki::complete);
@@ -331,8 +344,6 @@ public class GameService{
                 drown.complete();
             }
         });
-
-        trigger(Trigger.acceleratorUse, useAccelerator);
 
         trigger(Trigger.impactPower, powerupImpactReactor);
 
@@ -469,20 +480,33 @@ public class GameService{
                 captureBackground.complete();
             }
 
-            if(!e.sector.planet.sectors.contains(s -> !s.hasBase())){
+            if(e.sector.planet == Planets.serpulo && !e.sector.planet.sectors.contains(s -> !s.hasBase())){
                 captureAllSectors.complete();
             }
 
-            if(!e.sector.planet.sectors.contains(s -> s.preset != null && !s.hasBase())){
-                allPresetsErekir.complete();
+            if(e.sector.planet == Planets.erekir && e.sector.preset != null && e.sector.preset.isLastSector){
+                completeErekir.complete();
             }
 
-            SStat.sectorsControlled.set(e.sector.planet.sectors.count(Sector::hasBase));
+            if(e.sector.planet == Planets.serpulo && e.sector.preset != null && e.sector.preset.isLastSector){
+                completeSerpulo.complete();
+            }
+
+            //TODO wrong
+            if(e.sector.planet == Planets.serpulo){
+                SStat.sectorsControlled.set(e.sector.planet.sectors.count(Sector::hasBase));
+            }
         });
 
         Events.on(PayloadDropEvent.class, e -> {
-            if(e.unit != null && e.carrier.team == state.rules.defaultTeam && state.rules.waveTeam.cores().contains(c -> c.within(e.unit, state.rules.enemyCoreBuildRadius))){
+            if(campaign() && e.unit != null && e.carrier.team == state.rules.defaultTeam && state.rules.waveTeam.cores().contains(c -> c.within(e.unit, state.rules.enemyCoreBuildRadius))){
                 dropUnitsCoreZone.complete();
+            }
+        });
+
+        Events.on(ClientChatEvent.class, e -> {
+            if(e.message.contains(Iconc.alphaaaa + "")){
+                useAnimdustryEmoji.complete();
             }
         });
     }
@@ -504,17 +528,13 @@ public class GameService{
 
             for(var up : Groups.powerGraph){
                 var graph = up.graph();
-                if(graph.all.size > 0 && graph.all.first().team == player.team()){
-                    float balance = graph.getPowerBalance();
+                if(graph.all.size > 0 && graph.all.first().team == player.team() && graph.hasPowerBalanceSamples()){
+                    float balance = graph.getPowerBalance() * 60f;
                     if(balance < 10_000) negative10kPower.complete();
                     if(balance > 100_000) positive100kPower.complete();
                     if(graph.getBatteryStored() > 1_000_000) store1milPower.complete();
                 }
             }
-        }
-
-        if(ui.consolefrag.shown()){
-            openConsole.complete();
         }
     }
 

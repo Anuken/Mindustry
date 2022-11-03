@@ -228,6 +228,11 @@ public class ModsDialog extends BaseDialog{
                             t.top().left();
                             t.margin(12f);
 
+                            String stateDetails = getStateDetails(item);
+                            if(stateDetails != null){
+                                t.addListener(new Tooltip(f -> f.background(Styles.black8).margin(4f).add(stateDetails).growX().width(400f).wrap()));
+                            }
+
                             t.defaults().left().top();
                             t.table(title1 -> {
                                 title1.left();
@@ -254,21 +259,9 @@ public class ModsDialog extends BaseDialog{
 
                                     text.row();
 
-                                    if(item.isOutdated()){
-                                        text.labelWrap("@mod.outdatedv7").growX();
-                                        text.row();
-                                    }else if(!item.isSupported()){
-                                        text.labelWrap(Core.bundle.format("mod.requiresversion", item.meta.minGameVersion)).growX();
-                                        text.row();
-                                    }else if(item.hasUnmetDependencies()){
-                                        text.labelWrap(Core.bundle.format("mod.missingdependencies", item.missingDependencies.toString(", "))).growX();
-                                        t.row();
-                                    }else if(item.hasContentErrors()){
-                                        text.labelWrap("@mod.erroredcontent").growX();
-                                        text.row();
-                                    }else if(item.meta.hidden){
-                                        text.labelWrap("@mod.multiplayer.compatible").growX();
-                                        text.row();
+                                    String state = getStateText(item);
+                                    if(state != null){
+                                        text.labelWrap(state).growX().row();
                                     }
                                 }).top().growX();
 
@@ -329,6 +322,38 @@ public class ModsDialog extends BaseDialog{
         cont.row();
     }
 
+    private @Nullable String getStateText(LoadedMod item){
+        if(item.isOutdated()){
+            return "@mod.incompatiblemod";
+        }else if(item.isBlacklisted()){
+            return "@mod.blacklisted";
+        }else if(!item.isSupported()){
+            return "@mod.incompatiblegame";
+        }else if(item.hasUnmetDependencies()){
+            return "@mod.unmetdependencies";
+        }else if(item.hasContentErrors()){
+            return "@mod.erroredcontent";
+        }else if(item.meta.hidden){
+            return "@mod.multiplayer.compatible";
+        }
+        return null;
+    }
+
+    private @Nullable String getStateDetails(LoadedMod item){
+        if(item.isOutdated()){
+            return "@mod.outdatedv7.details";
+        }else if(item.isBlacklisted()){
+            return "@mod.blacklisted.details";
+        }else if(!item.isSupported()){
+            return Core.bundle.format("mod.requiresversion.details", item.meta.minGameVersion);
+        }else if(item.hasUnmetDependencies()){
+            return Core.bundle.format("mod.missingdependencies.details", item.missingDependencies.toString(", "));
+        }else if(item.hasContentErrors()){
+            return "@mod.erroredcontent.details";
+        }
+        return null;
+    }
+
     private void reload(){
         ui.showInfoOnHidden("@mods.reloadexit", () -> {
             Log.info("Exiting to reload mods.");
@@ -371,6 +396,13 @@ public class ModsDialog extends BaseDialog{
                 desc.row();
                 desc.add(mod.meta.description).growX().wrap().padTop(2);
                 desc.row();
+            }
+
+            String state = getStateDetails(mod);
+
+            if(state != null){
+                desc.add("@mod.disabled").padTop(13f).padBottom(-6f).row();
+                desc.add(state).growX().wrap().row();
             }
 
         }).width(400f);

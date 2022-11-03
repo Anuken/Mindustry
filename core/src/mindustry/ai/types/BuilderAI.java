@@ -158,8 +158,7 @@ public class BuilderAI extends AIController{
                 }
             }
 
-            //TODO this is bad, rebuild time should not depend on AI here
-            float rebuildTime = (unit.team.rules().rtsAi ? 12f : 2f) * 60f;
+            float rebuildTime = 2f * 60f;
 
             //find new plan
             if(!onlyAssist && !unit.team.data().plans.isEmpty() && following == null && timer.get(timerTarget3, rebuildTime)){
