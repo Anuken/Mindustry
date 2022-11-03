@@ -5861,6 +5861,8 @@ public class Blocks{
 
         worldMessage = new MessageBlock("world-message"){{
             requirements(Category.logic, BuildVisibility.editorOnly, with());
+            
+            targetable = false;
             privileged = true;
         }};
 
