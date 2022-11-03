@@ -117,6 +117,8 @@ public class GameService{
             captureAllSectors.complete();
         }
 
+        Events.run(Trigger.openConsole, () -> openConsole.complete());
+
         Events.run(Trigger.unitCommandAttack, () -> {
             if(campaign()){
                 issueAttackCommand.complete();
@@ -533,10 +535,6 @@ public class GameService{
                     if(graph.getBatteryStored() > 1_000_000) store1milPower.complete();
                 }
             }
-        }
-
-        if(ui.consolefrag.shown()){
-            openConsole.complete();
         }
     }
 
