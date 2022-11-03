@@ -96,8 +96,6 @@ public class GameService{
         checkAllBlocks(allBlocksErekir, allErekirBlocks);
         checkAllBlocks(allBlocksSerpulo, allSerpuloBlocks);
 
-        Log.info(Structs.find(allSerpuloBlocks, b -> !blocksBuilt.contains(b.name)));
-
         //periodically check for various conditions
         float updateInterval = 2f;
         Timer.schedule(this::checkUpdate, updateInterval, updateInterval);
