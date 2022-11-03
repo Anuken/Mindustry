@@ -49,7 +49,7 @@ public class StatValues{
 
     public static StatValue number(float value, StatUnit unit, boolean merge){
         return table -> {
-            String l1 = fixValue(value), l2 = (unit.space ? " " : "") + unit.localized();
+            String l1 = (unit.icon == null ? "" : unit.icon + " ") + fixValue(value), l2 = (unit.space ? " " : "") + unit.localized();
 
             if(merge){
                 table.add(l1 + l2);

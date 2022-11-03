@@ -214,7 +214,11 @@ public class UnitType extends UnlockableContent{
     naval = false,
     /** if false, RTS AI controlled units do not automatically attack things while moving. This is automatically assigned. */
     autoFindTarget = true,
+    /** if true, this unit will always shoot while moving regardless of slowdown */
+    alwaysShootWhenMoving = false,
 
+    /** whether this unit has a hover tooltip */
+    hoverable = true,
     /** if true, this modded unit always has a -outline region generated for its base. Normally, outlines are ignored if there are no top = false weapons. */
     alwaysCreateOutline = false,
     /** if true, this unit has a square shadow. */
@@ -691,7 +695,7 @@ public class UnitType extends UnlockableContent{
         }
 
         //if a status effects slows a unit when firing, don't shoot while moving.
-        autoFindTarget = !weapons.contains(w -> w.shootStatus.speedMultiplier < 0.99f);
+        autoFindTarget = !weapons.contains(w -> w.shootStatus.speedMultiplier < 0.99f) || alwaysShootWhenMoving;
 
         clipSize = Math.max(clipSize, lightRadius * 1.1f);
         singleTarget = weapons.size <= 1 && !forceMultiTarget;

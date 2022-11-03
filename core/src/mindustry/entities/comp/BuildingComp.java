@@ -271,6 +271,24 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     //endregion
     //region utility methods
 
+    public boolean isDiscovered(Team viewer){
+        if(state.rules.borderDarkness && world.getDarkness(tile.x, tile.y) >= 3){
+            return false;
+        }
+
+        if(viewer == null) return true;
+        if(block.size <= 2){
+            return fogControl.isDiscovered(viewer, tile.x, tile.y);
+        }else{
+            int s = block.size / 2;
+            return fogControl.isDiscovered(viewer, tile.x, tile.y) ||
+                fogControl.isDiscovered(viewer, tile.x - s, tile.y - s) ||
+                fogControl.isDiscovered(viewer, tile.x - s, tile.y + s) ||
+                fogControl.isDiscovered(viewer, tile.x + s, tile.y + s) ||
+                fogControl.isDiscovered(viewer, tile.x + s, tile.y - s);
+        }
+    }
+
     public void addPlan(boolean checkPrevious){
         addPlan(checkPrevious, false);
     }
@@ -1926,6 +1944,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         int size = block.size, of = block.sizeOffset, tx = tile.x, ty = tile.y;
 
+        if(!isDiscovered(viewer)) return true;
+
         for(int x = 0; x < size; x++){
             for(int y = 0; y < size; y++){
                 if(fogControl.isVisibleTile(viewer, tx + x + of, ty + y + of)){
@@ -1994,6 +2014,12 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     @Override
     public void hitbox(Rect out){
         out.setCentered(x, y, block.size * tilesize, block.size * tilesize);
+    }
+
+    @Override
+    @Replace
+    public String toString(){
+        return "Building#" + id() + "[" + tileX() + "," + tileY() + "]:" + block;
     }
 
     //endregion

@@ -356,7 +356,7 @@ public class BlockIndexer{
             if(enemy == team || (enemy == Team.derelict && !state.rules.coreCapture)) continue;
 
             Building candidate = indexer.findTile(enemy, x, y, range, pred, true);
-            if(candidate == null) continue;
+            if(candidate == null || !candidate.isDiscovered(team)) continue;
 
             //if a block has the same priority, the closer one should be targeted
             float dist = candidate.dst(x, y) - candidate.hitSize() / 2f;

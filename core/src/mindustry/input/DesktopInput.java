@@ -12,14 +12,19 @@ import arc.scene.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
+import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.input.Placement.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+
+import java.util.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
@@ -109,9 +114,27 @@ public class DesktopInput extends InputHandler{
             drawBreakSelection(selectX, selectY, cursorX, cursorY, !Core.input.keyDown(Binding.schematic_select) ? maxLength : Vars.maxSchematicSize);
         }
 
-        if(Core.input.keyDown(Binding.schematic_select) && !Core.scene.hasKeyboard() && mode != breaking){
-            drawSelection(schemX, schemY, cursorX, cursorY, Vars.maxSchematicSize);
+        if(!Core.scene.hasKeyboard() && mode != breaking){
+
+            if(Core.input.keyDown(Binding.schematic_select)){
+                drawSelection(schemX, schemY, cursorX, cursorY, Vars.maxSchematicSize);
+            }else if(Core.input.keyDown(Binding.rebuild_select)){
+                //TODO color?
+                drawSelection(schemX, schemY, cursorX, cursorY, 0, Pal.sapBulletBack, Pal.sapBullet);
+
+                NormalizeDrawResult result = Placement.normalizeDrawArea(Blocks.air, schemX, schemY, cursorX, cursorY, false, 0, 1f);
+
+                Tmp.r1.set(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
+
+                for(BlockPlan plan : player.team().data().plans){
+                    Block block = content.block(plan.block);
+                    if(block.bounds(plan.x, plan.y, Tmp.r2).overlaps(Tmp.r1)){
+                        drawSelected(plan.x, plan.y, content.block(plan.block), Pal.sapBullet);
+                    }
+                }
+            }
         }
+
 
         drawCommanded();
 
@@ -253,6 +276,15 @@ public class DesktopInput extends InputHandler{
 
         //validate commanding units
         selectedUnits.removeAll(u -> !u.isCommandable() || !u.isValid());
+
+        if(commandMode && input.keyTap(Binding.select_all_units) && !scene.hasField() && !scene.hasDialog()){
+            selectedUnits.clear();
+            for(var unit : player.team().data().units){
+                if(unit.isCommandable()){
+                    selectedUnits.add(unit);
+                }
+            }
+        }
 
         if(!scene.hasMouse() && !locked && state.rules.possessionAllowed){
             if(Core.input.keyDown(Binding.control) && Core.input.keyTap(Binding.select)){
@@ -458,7 +490,7 @@ public class DesktopInput extends InputHandler{
             player.unit().clearBuilding();
         }
 
-        if(Core.input.keyTap(Binding.schematic_select) && !Core.scene.hasKeyboard() && mode != breaking){
+        if((Core.input.keyTap(Binding.schematic_select) || Core.input.keyTap(Binding.rebuild_select)) && !Core.scene.hasKeyboard() && mode != breaking){
             schemX = rawCursorX;
             schemY = rawCursorY;
         }
@@ -476,14 +508,33 @@ public class DesktopInput extends InputHandler{
             selectPlans.clear();
         }
 
-        if(Core.input.keyRelease(Binding.schematic_select) && !Core.scene.hasKeyboard() && selectX == -1 && selectY == -1 && schemX != -1 && schemY != -1){
-            lastSchematic = schematics.create(schemX, schemY, rawCursorX, rawCursorY);
-            useSchematic(lastSchematic);
-            if(selectPlans.isEmpty()){
-                lastSchematic = null;
+        if( !Core.scene.hasKeyboard() && selectX == -1 && selectY == -1 && schemX != -1 && schemY != -1){
+            if(Core.input.keyRelease(Binding.schematic_select)){
+                lastSchematic = schematics.create(schemX, schemY, rawCursorX, rawCursorY);
+                useSchematic(lastSchematic);
+                if(selectPlans.isEmpty()){
+                    lastSchematic = null;
+                }
+                schemX = -1;
+                schemY = -1;
+            }else if(input.keyRelease(Binding.rebuild_select)){
+                //TODO rebuild!!!
+
+                NormalizeResult result = Placement.normalizeArea(schemX, schemY, rawCursorX, rawCursorY, rotation, false, 999999999);
+                Tmp.r1.set(result.x * tilesize, result.y * tilesize, (result.x2 - result.x) * tilesize, (result.y2 - result.y) * tilesize);
+
+                Iterator<BlockPlan> broken = player.team().data().plans.iterator();
+                while(broken.hasNext()){
+                    BlockPlan plan = broken.next();
+                    Block block = content.block(plan.block);
+                    if(block.bounds(plan.x, plan.y, Tmp.r2).overlaps(Tmp.r1)){
+                        player.unit().addBuild(new BuildPlan(plan.x, plan.y, plan.rotation, content.block(plan.block), plan.config));
+                    }
+                }
+
+                schemX = -1;
+                schemY = -1;
             }
-            schemX = -1;
-            schemY = -1;
         }
 
         if(!selectPlans.isEmpty()){
