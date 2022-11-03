@@ -34,15 +34,13 @@ public class StatValues{
         return table ->  table.add(!value ? "@no" : "@yes");
     }
 
-    /** @deprecated Use Strings.autoFixed(value, 2) instead. */
-    @Deprecated
     public static String fixValue(float value){
         return Strings.autoFixed(value, 2);
     }
 
     public static StatValue squared(float value, StatUnit unit){
         return table -> {
-            String fixed = Strings.autoFixed(value, 2);
+            String fixed = fixValue(value);
             table.add(fixed + "x" + fixed);
             table.add((unit.space ? " " : "") + unit.localized());
         };
@@ -50,7 +48,7 @@ public class StatValues{
 
     public static StatValue number(float value, StatUnit unit, boolean merge){
         return table -> {
-            String l1 = (unit.icon == null ? "" : unit.icon + " ") + Strings.autoFixed(value, 2), l2 = (unit.space ? " " : "") + unit.localized();
+            String l1 = (unit.icon == null ? "" : unit.icon + " ") + fixValue(value), l2 = (unit.space ? " " : "") + unit.localized();
 
             if(merge){
                 table.add(l1 + l2);
