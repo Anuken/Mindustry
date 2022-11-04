@@ -289,6 +289,7 @@ public class BlockRenderer{
             Draw.proj().setOrtho(0, 0, shadows.getWidth(), shadows.getHeight());
 
             for(Tile tile : shadowEvents){
+                if(tile == null) continue;
                 //draw white/shadow color depending on blend
                 Draw.color((!tile.block().hasShadow || (state.rules.fog && tile.build != null && !tile.build.wasVisible)) ? Color.white : blendShadowColor);
                 Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
