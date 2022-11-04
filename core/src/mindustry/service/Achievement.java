@@ -17,7 +17,7 @@ public enum Achievement{
     launch30Times(SStat.timesLaunched, 30),
     captureBackground,
     survive100Waves(SStat.maxWavesSurvived, 100),
-    researchAll, //TODO - remake/change?
+    researchAll,
     shockWetEnemy,
     killEnemyPhaseWall,
     researchRouter,
@@ -36,7 +36,7 @@ public enum Achievement{
     obtainTitanium,
     suicideBomb,
     buildGroundFactory,
-    issueAttackCommand, //TODO - test
+    issueAttackCommand,
     active100Units(SStat.maxUnitActive, 100),
     build1000Units(SStat.unitsBuilt, 1000),
     buildAllUnits(SStat.unitTypesBuilt, 30),
@@ -53,71 +53,62 @@ public enum Achievement{
     circleConveyor,
     becomeRouter,
     create20Schematics(SStat.schematicsCreated, 20),
-    create500Schematics(SStat.schematicsCreated, 500), //TODO - test
+    create500Schematics(SStat.schematicsCreated, 500),
     survive10WavesNoBlocks,
     captureNoBlocksBroken,
     useFlameAmmo,
     coolTurret,
     enablePixelation,
     openWiki,
+    allTransportOneMap,
+    buildOverdriveProjector,
+    buildMendProjector,
+    buildWexWater,
 
-    //TODO new ones
+    have10mItems(SStat.totalCampaignItems, 10_000_000),
+    killEclipseDuo,
 
-    allTransportOneMap, //TODO - test
-    buildOverdriveProjector, //TODO - test
-    buildMendProjector, //TODO - test
-    buildWexWater, //TODO - test
+    completeErekir,
+    completeSerpulo,
 
-    have10mItems(SStat.totalCampaignItems, 10_000_000), //TODO - test
-    killEclipseDuo, //TODO - test
+    launchCoreSchematic,
+    nucleusGroundZero,
 
-    completeErekir, //TODO - test
-    completeSerpulo, //TODO - test
+    neoplasmWater,
+    blastFrozenUnit,
 
-    launchCoreSchematic, //TODO - test
-    nucleusGroundZero, //TODO - test
+    allBlocksSerpulo,
+    allBlocksErekir,
 
-    neoplasmWater, //TODO - test
-    blastFrozenUnit, //TODO - test
+    breakForceProjector,
+    researchLogic,
 
-    allBlocksSerpulo, //TODO - test
-    allBlocksErekir, //TODO - test
+    negative10kPower,
+    positive100kPower,
+    store1milPower,
 
-    //TODO are these necessary?
-    //allTurretsSerpulo, //TODO
-    //allTurretsErekir, //TODO
-    //allTechSerpulo, //TODO
-    //allTechErekir, //TODO
+    blastGenerator,
+    neoplasiaExplosion,
 
-    breakForceProjector, //TODO - test
-    researchLogic, //TODO - Steam - test
+    installMod,
+    routerLanguage,
+    joinCommunityServer,
+    openConsole,
 
-    negative10kPower, //TODO - test
-    positive100kPower, //TODO - test
-    store1milPower, //TODO - test
+    controlTurret,
+    dropUnitsCoreZone,
+    destroyScatterFlare,
+    boostUnit,
+    boostBuildingFloor,
 
-    blastGenerator, //TODO - test
-    neoplasiaExplosion, //TODO - test
+    hoverUnitLiquid,
 
-    installMod, //TODO - test
-    routerLanguage, //TODO - test
-    joinCommunityServer, //TODO - test
-    openConsole, //TODO - test
+    break100Boulders(SStat.bouldersDeconstructed, 100),
+    break10000Boulders(SStat.bouldersDeconstructed, 10_000),
 
-    controlTurret, //TODO - test
-    dropUnitsCoreZone, //TODO - test
-    destroyScatterFlare, //TODO - test
-    boostUnit, //TODO - test
-    boostBuildingFloor, //TODO - test
+    shockwaveTowerUse,
 
-    hoverUnitLiquid, //TODO - test
-
-    break100Boulders(SStat.bouldersDeconstructed, 100), //TODO - test
-    break10000Boulders(SStat.bouldersDeconstructed, 10_000), //TODO - test
-
-    shockwaveTowerUse, //TODO - test
-
-    useAnimdustryEmoji, //TODO - Steam - icon done
+    useAnimdustryEmoji,
 
     ;
 
@@ -140,11 +131,18 @@ public enum Achievement{
     public void complete(){
         if(!isAchieved()){
             //can't complete achievements with the dev console shown.
-            if(ui != null && ui.consolefrag != null && ui.consolefrag.shown() && !OS.username.equals("anuke")) return;
+            if(ui != null && ui.consolefrag != null && ui.consolefrag.shown() && !OS.username.equals("anuke") && this != openConsole) return;
 
             service.completeAchievement(name());
             service.storeStats();
             completed = true;
+        }
+    }
+
+    public void uncomplete(){
+        if(isAchieved()){
+            service.clearAchievement(name());
+            completed = false;
         }
     }
 
