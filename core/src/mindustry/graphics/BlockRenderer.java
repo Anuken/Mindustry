@@ -485,7 +485,7 @@ public class BlockRenderer{
         }
     }
 
-    void updateShadow(Building build){
+    public void updateShadow(Building build){
         int size = build.block.size, of = build.block.sizeOffset, tx = build.tile.x, ty = build.tile.y;
 
         for(int x = 0; x < size; x++){
