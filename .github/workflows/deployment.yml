@@ -76,7 +76,7 @@ jobs:
         git commit -m "Updating to build ${RELEASE_VERSION:1}"
         git push https://Anuken:${{ secrets.API_TOKEN_GITHUB }}@github.com/Anuken/MindustryBuilds
         cd ../Mindustry
-    - name: Upload client artifacts
+    - name: Upload client artifacts //
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
