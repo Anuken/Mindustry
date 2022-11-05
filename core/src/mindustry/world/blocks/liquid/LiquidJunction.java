@@ -48,6 +48,4 @@ public class LiquidJunction extends LiquidBlock{
             return next.getLiquidDestination(this, liquid);
         }
     }
-
-
 }
