@@ -38,7 +38,7 @@ public class LanguageDialog extends BaseDialog{
     "tk", "Türkmen dili",
     "tr", "Türkçe",
     "cs", "Čeština",
-    "be", "Беларуская",
+    "by", "Беларуская",
     "bg", "Български",
     "ru", "Русский",
     "sr", "Српски",
