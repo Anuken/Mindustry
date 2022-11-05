@@ -20,6 +20,7 @@ public enum Binding implements KeyBind{
     break_block(KeyCode.mouseRight),
 
     select_all_units(KeyCode.g),
+    select_all_unit_factories(KeyCode.h),
 
     pickupCargo(KeyCode.leftBracket),
     dropCargo(KeyCode.rightBracket),
