@@ -35,8 +35,7 @@ public class StatValues{
     }
 
     public static String fixValue(float value){
-        int precision = Math.abs((int)value - value) <= 0.001f ? 0 : Math.abs((int)(value * 10) - value * 10) <= 0.001f ? 1 : 2;
-        return Strings.fixed(value, precision);
+        return Strings.autoFixed(value, 2);
     }
 
     public static StatValue squared(float value, StatUnit unit){

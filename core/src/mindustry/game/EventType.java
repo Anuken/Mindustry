@@ -16,6 +16,7 @@ public class EventType{
     //events that occur very often
     public enum Trigger{
         shock,
+        openConsole,
         blastFreeze,
         impactPower,
         blastGenerator,

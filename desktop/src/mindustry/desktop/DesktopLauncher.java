@@ -148,6 +148,12 @@ public class DesktopLauncher extends ClientLauncher{
             }
 
             @Override
+            public void clearAchievement(String name){
+                SVars.stats.stats.clearAchievement(name);
+                SVars.stats.stats.storeStats();
+            }
+
+            @Override
             public boolean isAchieved(String name){
                 return SVars.stats.stats.isAchieved(name, false);
             }

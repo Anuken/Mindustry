@@ -16,6 +16,7 @@ import mindustry.world.blocks.defense.turrets.Turret.*;
 import mindustry.world.blocks.distribution.*;
 import mindustry.world.blocks.production.AttributeCrafter.*;
 import mindustry.world.blocks.production.SolidPump.*;
+import mindustry.world.blocks.storage.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -54,6 +55,10 @@ public class GameService{
 
     }
 
+    public void clearAchievement(String name){
+
+    }
+
     public boolean isAchieved(String name){
         return false;
     }
@@ -80,8 +85,9 @@ public class GameService{
         allTransportSerpulo = content.blocks().select(b -> b.category == Category.distribution && b.isVisibleOn(Planets.serpulo) && b.isVanilla() && b.buildVisibility == BuildVisibility.shown).toArray(Block.class);
         allTransportErekir = content.blocks().select(b -> b.category == Category.distribution && b.isVisibleOn(Planets.erekir) && b.isVanilla() && b.buildVisibility == BuildVisibility.shown).toArray(Block.class);
 
-        allSerpuloBlocks = content.blocks().select(b -> b.synthetic() && b.isVisibleOn(Planets.serpulo) && b.isVanilla() && b.buildVisibility == BuildVisibility.shown).toArray(Block.class);
-        allErekirBlocks = content.blocks().select(b -> b.synthetic() && b.isVisibleOn(Planets.erekir) && b.isVanilla() && b.buildVisibility == BuildVisibility.shown).toArray(Block.class);
+        //cores are ignored since they're upgrades and can be skipped
+        allSerpuloBlocks = content.blocks().select(b -> b.synthetic() && b.isVisibleOn(Planets.serpulo) && b.isVanilla() && !(b instanceof CoreBlock) && b.buildVisibility == BuildVisibility.shown).toArray(Block.class);
+        allErekirBlocks = content.blocks().select(b -> b.synthetic() && b.isVisibleOn(Planets.erekir) && b.isVanilla() && !(b instanceof CoreBlock) && b.buildVisibility == BuildVisibility.shown).toArray(Block.class);
 
         unitsBuilt = Core.settings.getJson("units-built" , ObjectSet.class, String.class, ObjectSet::new);
         blocksBuilt = Core.settings.getJson("blocks-built" , ObjectSet.class, String.class, ObjectSet::new);
@@ -116,6 +122,8 @@ public class GameService{
         if(!Planets.serpulo.sectors.contains(s -> !s.isCaptured())){
             captureAllSectors.complete();
         }
+
+        Events.run(Trigger.openConsole, () -> openConsole.complete());
 
         Events.run(Trigger.unitCommandAttack, () -> {
             if(campaign()){
@@ -526,17 +534,14 @@ public class GameService{
 
             for(var up : Groups.powerGraph){
                 var graph = up.graph();
-                if(graph.all.size > 0 && graph.all.first().team == player.team() && graph.hasPowerBalanceSamples()){
+                if(graph.all.size > 1 && graph.all.first().team == player.team() && graph.hasPowerBalanceSamples()){
                     float balance = graph.getPowerBalance() * 60f;
-                    if(balance < 10_000) negative10kPower.complete();
+
+                    if(balance < -10_000) negative10kPower.complete();
                     if(balance > 100_000) positive100kPower.complete();
                     if(graph.getBatteryStored() > 1_000_000) store1milPower.complete();
                 }
             }
-        }
-
-        if(ui.consolefrag.shown()){
-            openConsole.complete();
         }
     }
 
