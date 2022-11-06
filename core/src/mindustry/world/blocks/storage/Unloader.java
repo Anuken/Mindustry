@@ -89,11 +89,11 @@ public class Unloader extends Block{
             //sort so it gives priority for blocks that can only either receive or give (not both), and then by load, and then by last use
             //highest = unload from, lowest = unload to
             int unloadPriority = Boolean.compare(x.canUnload && !x.canLoad, y.canUnload && !y.canLoad); //priority to receive if it cannot give
-            if (unloadPriority != 0) return unloadPriority;
+            if(unloadPriority != 0) return unloadPriority;
             int loadPriority = Boolean.compare(x.canUnload || !x.canLoad, y.canUnload || !y.canLoad); //priority to give if it cannot receive
-            if (loadPriority != 0) return loadPriority;
+            if(loadPriority != 0) return loadPriority;
             int loadFactor = Float.compare(x.loadFactor, y.loadFactor);
-            if (loadFactor != 0) return loadFactor;
+            if(loadFactor != 0) return loadFactor;
             return Integer.compare(y.lastUsed, x.lastUsed); //inverted
         };
 
@@ -224,7 +224,7 @@ public class Unloader extends Block{
 
         @Override
         public void buildConfiguration(Table table){
-            ItemSelection.buildTable(Unloader.this, table, content.items(), () -> sortItem, this::configure);
+            ItemSelection.buildTable(Unloader.this, table, content.items(), () -> sortItem, this::configure, selectionRows, selectionColumns);
         }
 
         @Override

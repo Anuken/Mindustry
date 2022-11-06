@@ -39,6 +39,11 @@ public class UnitCargoLoader extends Block{
     }
 
     @Override
+    public boolean outputsItems(){
+        return false;
+    }
+
+    @Override
     public void setBars(){
         super.setBars();
 
@@ -91,7 +96,9 @@ public class UnitCargoLoader extends Block{
 
             if(readUnitId != -1){
                 unit = Groups.unit.getByID(readUnitId);
-                readUnitId = -1;
+                if(unit != null || !net.client()){
+                    readUnitId = -1;
+                }
             }
 
             warmup = Mathf.approachDelta(warmup, efficiency, 1f / 60f);

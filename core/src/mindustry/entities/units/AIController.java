@@ -147,6 +147,11 @@ public class AIController implements UnitController{
             //let uncontrollable weapons do their own thing
             if(!weapon.controllable || weapon.noAttack) continue;
 
+            if(!weapon.aiControllable){
+                mount.rotate = false;
+                continue;
+            }
+
             float mountX = unit.x + Angles.trnsx(rotation, weapon.x, weapon.y),
                 mountY = unit.y + Angles.trnsy(rotation, weapon.x, weapon.y);
 
@@ -174,9 +179,9 @@ public class AIController implements UnitController{
 
             unit.isShooting |= (mount.shoot = mount.rotate = shoot);
 
-            if(mount.target == null && !shoot && !Angles.within(mount.rotation, 0f, 0.01f) && noTargetTime >= rotateBackTimer){
+            if(mount.target == null && !shoot && !Angles.within(mount.rotation, mount.weapon.baseRotation, 0.01f) && noTargetTime >= rotateBackTimer){
                 mount.rotate = true;
-                Tmp.v1.trns(unit.rotation, 5f);
+                Tmp.v1.trns(unit.rotation + mount.weapon.baseRotation, 5f);
                 mount.aimX = mountX + Tmp.v1.x;
                 mount.aimY = mountY + Tmp.v1.y;
             }

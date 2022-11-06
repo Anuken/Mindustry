@@ -37,6 +37,7 @@ public class ArmorPlateAbility extends Ability{
                 Shaders.armor.progress = warmup;
                 Shaders.armor.time = -Time.time / 20f;
 
+                Draw.rect(Shaders.armor.region, unit.x, unit.y, unit.rotation - 90f);
                 Draw.color(color);
                 Draw.shader(Shaders.armor);
                 Draw.rect(Shaders.armor.region, unit.x, unit.y, unit.rotation - 90f);

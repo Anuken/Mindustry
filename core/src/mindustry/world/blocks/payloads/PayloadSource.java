@@ -29,6 +29,7 @@ public class PayloadSource extends PayloadBlock{
         hasPower = false;
         rotate = true;
         configurable = true;
+        selectionRows = selectionColumns = 8;
         //make sure to display large units.
         clipSize = 120;
         noUpdateDisabled = true;
@@ -75,7 +76,7 @@ public class PayloadSource extends PayloadBlock{
     }
 
     public boolean canProduce(Block b){
-        return b.isVisible() && b.size < size && !(b instanceof CoreBlock) && !state.rules.bannedBlocks.contains(b) && b.environmentBuildable();
+        return b.isVisible() && b.size < size && !(b instanceof CoreBlock) && !state.rules.isBanned(b) && b.environmentBuildable();
     }
 
     public boolean canProduce(UnitType t){
@@ -103,7 +104,7 @@ public class PayloadSource extends PayloadBlock{
             ItemSelection.buildTable(PayloadSource.this, table,
                 content.blocks().select(PayloadSource.this::canProduce).<UnlockableContent>as()
                 .add(content.units().select(PayloadSource.this::canProduce).as()),
-            () -> (UnlockableContent)config(), this::configure);
+            () -> (UnlockableContent)config(), this::configure, selectionRows, selectionColumns);
         }
 
         @Override
