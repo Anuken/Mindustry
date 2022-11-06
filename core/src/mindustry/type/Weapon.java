@@ -43,7 +43,7 @@ public class Weapon implements Cloneable{
     public boolean alternate = true;
     /** whether to rotate toward the target independently of unit */
     public boolean rotate = false;
-    /** rotation at which this weapon is locked to if rotate = false. TODO buggy!*/
+    /** rotation at which this weapon starts at. TODO buggy!*/
     public float baseRotation = 0f;
     /** whether to draw the outline on top. */
     public boolean top = true;
@@ -282,9 +282,9 @@ public class Weapon implements Cloneable{
             mount.targetRotation = Angles.angle(axisX, axisY, mount.aimX, mount.aimY) - unit.rotation;
             mount.rotation = Angles.moveToward(mount.rotation, mount.targetRotation, rotateSpeed * Time.delta);
             if(rotationLimit < 360){
-                float dst = Angles.angleDist(mount.rotation, 0f);
+                float dst = Angles.angleDist(mount.rotation, baseRotation);
                 if(dst > rotationLimit/2f){
-                    mount.rotation = Angles.moveToward(mount.rotation, 0, dst - rotationLimit/2f);
+                    mount.rotation = Angles.moveToward(mount.rotation, baseRotation, dst - rotationLimit/2f);
                 }
             }
         }else if(!rotate){

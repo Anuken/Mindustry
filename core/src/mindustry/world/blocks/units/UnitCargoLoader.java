@@ -39,6 +39,11 @@ public class UnitCargoLoader extends Block{
     }
 
     @Override
+    public boolean outputsItems(){
+        return false;
+    }
+
+    @Override
     public void setBars(){
         super.setBars();
 

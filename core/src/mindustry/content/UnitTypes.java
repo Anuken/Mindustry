@@ -3216,7 +3216,7 @@ public class UnitTypes{
                         engineLayer = Layer.effect;
                         speed = 3.7f;
                         maxRange = 6f;
-                        lifetime = 60f * 1.7f;
+                        lifetime = 60f * 1.5f;
                         outlineColor = Pal.darkOutline;
                         health = 55;
                         lowAltitude = true;
@@ -3389,6 +3389,7 @@ public class UnitTypes{
             groundLayer = Layer.legUnit;
 
             targetAir = false;
+            alwaysShootWhenMoving = true;
 
             weapons.add(new Weapon("collaris-weapon"){{
                 shootSound = Sounds.pulseBlast;
@@ -4257,7 +4258,7 @@ public class UnitTypes{
             lowAltitude = false;
             flying = true;
             drag = 0.06f;
-            speed = 3f;
+            speed = 3.5f;
             rotateSpeed = 9f;
             accel = 0.1f;
             itemCapacity = 100;
@@ -4284,6 +4285,7 @@ public class UnitTypes{
             engineOffset = 6.5f;
             payloadCapacity = 0f;
             targetable = false;
+            bounded = false;
 
             outlineColor = Pal.darkOutline;
             isEnemy = false;

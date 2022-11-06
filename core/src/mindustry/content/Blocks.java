@@ -1004,6 +1004,7 @@ public class Blocks{
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(Liquids.water), new DrawLiquidTile(Liquids.cryofluid){{drawLiquidLight = true;}}, new DrawDefault());
             liquidCapacity = 24f;
             craftTime = 120;
+            lightLiquid = Liquids.cryofluid;
 
             consumePower(1f);
             consumeItem(Items.titanium);
@@ -1808,7 +1809,7 @@ public class Blocks{
             requirements(Category.effect, with(Items.silicon, 150, Items.oxide, 40, Items.thorium, 60));
             outlineColor = Pal.darkOutline;
 
-            range = 180f;
+            range = 200f;
             size = 3;
             buildSpeed = 1.5f;
 
@@ -1863,6 +1864,8 @@ public class Blocks{
             size = 3;
             consumeLiquids(LiquidStack.with(Liquids.cyanogen, 1.5f / 60f));
             consumePower(100f / 60f);
+            range = 170f;
+            reload = 80f;
         }};
 
         //TODO 5x5??
@@ -2550,6 +2553,9 @@ public class Blocks{
             liquidCapacity = 30f;
             explosionMinWarmup = 0.5f;
 
+            explosionRadius = 17;
+            explosionDamage = 2500;
+
             ambientSound = Sounds.flux;
             ambientSoundVolume = 0.13f;
 
@@ -2592,8 +2598,8 @@ public class Blocks{
             itemDuration = 60f * 3f;
             itemCapacity = 10;
 
-            explosionRadius = 7;
-            explosionDamage = 1000;
+            explosionRadius = 9;
+            explosionDamage = 2000;
             explodeEffect = new MultiEffect(Fx.bigShockwave, new WrapEffect(Fx.titanSmoke, Liquids.neoplasm.color), Fx.neoplasmSplat);
             explodeSound = Sounds.largeExplosion;
 
@@ -4398,8 +4404,6 @@ public class Blocks{
         lustre = new ContinuousTurret("lustre"){{
             requirements(Category.turret, with(Items.silicon, 250, Items.graphite, 200, Items.oxide, 50, Items.carbide, 90));
 
-            range = 140f;
-
             shootType = new PointLaserBulletType(){{
                 damage = 200f;
                 buildingDamageMultiplier = 0.3f;
@@ -4458,7 +4462,7 @@ public class Blocks{
             //TODO is this a good idea to begin with?
             unitSort = UnitSorts.strongest;
 
-            consumeLiquid(Liquids.nitrogen, 5f / 60f);
+            consumeLiquid(Liquids.nitrogen, 6f / 60f);
         }};
 
         scathe = new ItemTurret("scathe"){{
@@ -4490,7 +4494,7 @@ public class Blocks{
 
                     fogRadius = 6f;
 
-                    health = 190;
+                    health = 210;
 
                     weapons.add(new Weapon(){{
                         shootCone = 360f;
@@ -4499,7 +4503,7 @@ public class Blocks{
                         deathExplosionEffect = Fx.massiveExplosion;
                         shootOnDeath = true;
                         shake = 10f;
-                        bullet = new ExplosionBulletType(620f, 65f){{
+                        bullet = new ExplosionBulletType(640f, 65f){{
                             hitColor = Pal.redLight;
                             shootEffect = new MultiEffect(Fx.massiveExplosion, Fx.scatheExplosion, Fx.scatheLight, new WaveEffect(){{
                                 lifetime = 10f;
@@ -4595,7 +4599,7 @@ public class Blocks{
 
             recoil = 0.5f;
 
-            fogRadiusMultiuplier = 0.45f;
+            fogRadiusMultiuplier = 0.75f;
             coolantMultiplier = 6f;
             shootSound = Sounds.missileLaunch;
 
@@ -4604,7 +4608,7 @@ public class Blocks{
             targetAir = false;
 
             shake = 6f;
-            ammoPerShot = 30;
+            ammoPerShot = 20;
             maxAmmo = 30;
             shootY = -1;
             outlineColor = Pal.darkOutline;
@@ -5617,7 +5621,7 @@ public class Blocks{
             requirements(Category.units, with(Items.silicon, 100, Items.beryllium, 150, Items.tungsten, 80));
             regionSuffix = "-dark";
             hasPower = true;
-            buildSpeed = 0.3f;
+            buildSpeed = 0.6f;
             consumePower(2f);
             size = 3;
             //TODO expand this list
@@ -5629,7 +5633,7 @@ public class Blocks{
             requirements(Category.units, with(Items.silicon, 150, Items.oxide, 150, Items.tungsten, 200, Items.phaseFabric, 40));
             regionSuffix = "-dark";
             hasPower = true;
-            buildSpeed = 0.3f;
+            buildSpeed = 0.75f;
             maxBlockSize = 4;
             minBlockSize = 3;
             size = 5;
@@ -5863,6 +5867,8 @@ public class Blocks{
 
         worldMessage = new MessageBlock("world-message"){{
             requirements(Category.logic, BuildVisibility.editorOnly, with());
+            
+            targetable = false;
             privileged = true;
         }};
 
