@@ -72,10 +72,14 @@ public class TechTree{
         return nodeProduce(content, new Seq<>(), children);
     }
 
-    public static void setContext(String root, UnlockableContent parent){
-        context = all.find(r -> r.root.equals(root) && r.content == parent);
+    public static TechNode findNode(String root, UnlockableContent content){
+        return all.find(r -> r.root.equals(root) && r.content == content);
+    }
+
+    public static void setContext(String root, UnlockableContent content){
+        context = findNode(root, content);
         if(context == null){
-            throw new RuntimeException("Cannot find TechNode with a root of '" + root + "' with content '" + parent + "'!");
+            throw new RuntimeException("Cannot find TechNode with a root of '" + root + "' with content '" + content + "'!");
         }
     }
 
