@@ -969,7 +969,7 @@ public class ContentParser{
             String finalRootName = rootName; //Amazing language design
 
             //remove old node
-            TechNode lastNode = TechTree.findNode(unlock.name, finalRootName);
+            TechNode lastNode = TechTree.findNode(finalRootName, unlock);
             if(lastNode != null){
                 lastNode.remove();
             }
