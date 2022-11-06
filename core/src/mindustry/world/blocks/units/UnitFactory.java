@@ -25,6 +25,8 @@ import mindustry.world.blocks.payloads.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
+import static mindustry.Vars.*;
+
 public class UnitFactory extends UnitBlock{
     public int[] capacities = {};
 
@@ -42,6 +44,7 @@ public class UnitFactory extends UnitBlock{
         rotate = true;
         regionRotated1 = 1;
         commandable = true;
+        ambientSound = Sounds.respawning;
 
         config(Integer.class, (UnitFactoryBuild tile, Integer i) -> {
             if(!configurable) return;
@@ -60,7 +63,7 @@ public class UnitFactory extends UnitBlock{
             tile.progress = 0;
         });
 
-        consume(new ConsumeItemDynamic((UnitFactoryBuild e) -> e.currentPlan != -1 ? plans.get(e.currentPlan).requirements : ItemStack.empty));
+        consume(new ConsumeItemDynamic((UnitFactoryBuild e) -> e.currentPlan != -1 ? plans.get(Math.min(e.currentPlan, plans.size - 1)).requirements : ItemStack.empty));
     }
 
     @Override
@@ -72,6 +75,8 @@ public class UnitFactory extends UnitBlock{
                 itemCapacity = Math.max(itemCapacity, stack.amount * 2);
             }
         }
+
+        consumeBuilder.each(c -> c.multiplier = b -> state.rules.unitCost(b.team));
 
         super.init();
     }
@@ -106,15 +111,40 @@ public class UnitFactory extends UnitBlock{
         stats.remove(Stat.itemCapacity);
 
         stats.add(Stat.output, table -> {
-            Seq<UnitPlan> p = plans.select(u -> u.unit.unlockedNow());
             table.row();
-            for(var plan : p){
-                if(plan.unit.unlockedNow()){
-                    table.image(plan.unit.uiIcon).size(8 * 3).padRight(2).right();
-                    table.add(plan.unit.localizedName).left();
-                    table.add(Strings.autoFixed(plan.time / 60f, 1) + " " + Core.bundle.get("unit.seconds")).color(Color.lightGray).padLeft(12).left();
-                    table.row();
-                }
+
+            for(var plan : plans){
+                table.table(Styles.grayPanel, t -> {
+
+                    if(plan.unit.isBanned()){
+                        t.image(Icon.cancel).color(Pal.remove).size(40);
+                        return;
+                    }
+
+                    if(plan.unit.unlockedNow()){
+                        t.image(plan.unit.uiIcon).size(40).pad(10f).left().scaling(Scaling.fit);
+                        t.table(info -> {
+                            info.add(plan.unit.localizedName).left();
+                            info.row();
+                            info.add(Strings.autoFixed(plan.time / 60f, 1) + " " + Core.bundle.get("unit.seconds")).color(Color.lightGray);
+                        }).left();
+
+                        t.table(req -> {
+                            req.right();
+                            for(int i = 0; i < plan.requirements.length; i++){
+                                if(i % 6 == 0){
+                                    req.row();
+                                }
+
+                                ItemStack stack = plan.requirements[i];
+                                req.add(new ItemDisplay(stack.item, stack.amount, false)).pad(5);
+                            }
+                        }).right().grow().pad(10f);
+                    }else{
+                        t.image(Icon.lock).color(Pal.darkerGray).size(40);
+                    }
+                }).growX().pad(5);
+                table.row();
             }
         });
     }
@@ -170,6 +200,11 @@ public class UnitFactory extends UnitBlock{
         }
 
         @Override
+        public boolean shouldActiveSound(){
+            return shouldConsume();
+        }
+
+        @Override
         public double sense(LAccess sensor){
             if(sensor == LAccess.progress) return Mathf.clamp(fraction());
             return super.sense(sensor);
@@ -180,7 +215,7 @@ public class UnitFactory extends UnitBlock{
             Seq<UnitType> units = Seq.with(plans).map(u -> u.unit).filter(u -> u.unlockedNow() && !u.isBanned());
 
             if(units.any()){
-                ItemSelection.buildTable(UnitFactory.this, table, units, () -> currentPlan == -1 ? null : plans.get(currentPlan).unit, unit -> configure(plans.indexOf(u -> u.unit == unit)));
+                ItemSelection.buildTable(UnitFactory.this, table, units, () -> currentPlan == -1 ? null : plans.get(currentPlan).unit, unit -> configure(plans.indexOf(u -> u.unit == unit)), selectionRows, selectionColumns);
             }else{
                 table.table(Styles.black3, t -> t.add("@none").color(Color.lightGray));
             }

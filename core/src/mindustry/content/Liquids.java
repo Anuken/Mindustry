@@ -15,6 +15,7 @@ public class Liquids{
             effect = StatusEffects.wet;
             boilPoint = 0.5f;
             gasColor = Color.grays(0.9f);
+            alwaysUnlocked = true;
         }};
 
         slag = new Liquid("slag", Color.valueOf("ffa166")){{
@@ -33,6 +34,7 @@ public class Liquids{
             effect = StatusEffects.tarred;
             boilPoint = 0.65f;
             gasColor = Color.grays(0.4f);
+            canStayOn.add(water);
         }};
 
         cryofluid = new Liquid("cryofluid", Color.valueOf("6ecdec")){{
@@ -44,21 +46,26 @@ public class Liquids{
             gasColor = Color.valueOf("c1e8f5");
         }};
 
-        neoplasm = new CellLiquid("neoplasm", Color.valueOf("e05438")){{
+        neoplasm = new CellLiquid("neoplasm", Color.valueOf("c33e2b")){{
             heatCapacity = 0.4f;
             temperature = 0.54f;
             viscosity = 0.85f;
-            flammability = 0.1f;
+            flammability = 0f;
             capPuddles = false;
-            hidden = true;
+            spreadTarget = Liquids.water;
+            moveThroughBlocks = true;
+            incinerable = true;
+            blockReactive = false;
+            canStayOn.addAll(water, oil, cryofluid);
 
-            colorFrom = Color.valueOf("f98f4a");
-            colorTo = Color.valueOf("9e172c");
+            colorFrom = Color.valueOf("e8803f");
+            colorTo = Color.valueOf("8c1225");
         }};
 
         arkycite = new Liquid("arkycite", Color.valueOf("84a94b")){{
             flammability = 0.4f;
             viscosity = 0.7f;
+            neoplasm.canStayOn.add(this);
         }};
 
         gallium = new Liquid("gallium", Color.valueOf("9a9dbf")){{
@@ -66,7 +73,6 @@ public class Liquids{
             hidden = true;
         }};
 
-        //TODO reactivity, etc
         ozone = new Liquid("ozone", Color.valueOf("fc81dd")){{
             gas = true;
             barColor = Color.valueOf("d699f0");
@@ -74,7 +80,6 @@ public class Liquids{
             flammability = 1f;
         }};
 
-        //TODO combustion
         hydrogen = new Liquid("hydrogen", Color.valueOf("9eabf7")){{
             gas = true;
             flammability = 1f;

@@ -16,7 +16,6 @@ buildscript{
     }
 
     dependencies{
-        classpath "com.mobidevelop.robovm:robovm-gradle-plugin:2.3.15"
         classpath "com.github.Anuken.Arc:packer:$arcHash"
         classpath "com.github.Anuken.Arc:arc-core:$arcHash"
     }
@@ -35,7 +34,7 @@ allprojects{
 
     ext{
         versionNumber = '7'
-        if(!project.hasProperty("versionModifier")) versionModifier = 'alpha'
+        if(!project.hasProperty("versionModifier")) versionModifier = 'beta'
         if(!project.hasProperty("versionType")) versionType = 'official'
         appName = 'Mindustry'
         steamworksVersion = '0b86023401880bb5e586bc404bedbaae9b1f1c94'
@@ -232,6 +231,7 @@ configure(subprojects - project(":annotations")){
         options{
             addStringOption('Xdoclint:none', '-quiet')
             addStringOption('-release', '16')
+            encoding('UTF-8')
         }
     }
 }
@@ -252,42 +252,6 @@ project(":desktop"){
         implementation "com.github.Anuken:steamworks4j:$steamworksVersion"
 
         implementation arcModule("backends:backend-sdl")
-    }
-}
-
-project(":ios"){
-    apply plugin: "java"
-    apply plugin: "robovm"
-
-    task incrementConfig{
-        def vfile = file('robovm.properties')
-        def bversion = getBuildVersion()
-        def props = new Properties()
-        if(vfile.exists()){
-            props.load(new FileInputStream(vfile))
-        }else{
-            props['app.id'] = 'io.anuke.mindustry'
-            props['app.version'] = '7.0'
-            props['app.mainclass'] = 'mindustry.IOSLauncher'
-            props['app.executable'] = 'IOSLauncher'
-            props['app.name'] = 'Mindustry'
-        }
-        
-        props['app.build'] = (!props.containsKey("app.build") ? 40 : props['app.build'].toInteger() + 1) + ""
-        if(bversion != "custom build"){
-            props['app.version'] = versionNumber + "." + bversion + (bversion.contains(".") ? "" : ".0")
-        }
-        props.store(vfile.newWriter(), null)
-    }
-
-    dependencies{
-        implementation project(":core")
-
-        implementation arcModule("natives:natives-ios")
-        implementation arcModule("natives:natives-freetype-ios")
-        implementation arcModule("backends:backend-robovm")
-
-        compileOnly project(":annotations")
     }
 }
 
@@ -364,7 +328,7 @@ project(":core"){
     dependencies{
         compileJava.dependsOn(preGen)
 
-        api "org.lz4:lz4-java:1.7.1"
+        api "org.lz4:lz4-java:1.8.0"
         api arcModule("arc-core")
         api arcModule("extensions:flabel")
         api arcModule("extensions:freetype")
@@ -375,7 +339,7 @@ project(":core"){
         if(localArc() && debugged()) api arcModule("extensions:recorder")
         if(localArc()) api arcModule(":extensions:packer")
 
-        annotationProcessor 'com.github.Anuken:jabel:0.6.0'
+        annotationProcessor 'com.github.Anuken:jabel:0.9.0'
         compileOnly project(":annotations")
         kapt project(":annotations")
     }
@@ -400,6 +364,13 @@ project(":core"){
             })
             destinationDir = new File(buildDir, 'javadoc')
         }
+    }
+
+    gradle.taskGraph.whenReady{
+        //these are completely unnecessary
+        tasks.kaptGenerateStubsKotlin.onlyIf{ false }
+        tasks.compileKotlin.onlyIf{ false }
+        tasks.inspectClassesForKotlinIC.onlyIf{ false }
     }
 
     //comp** classes are only used for code generation

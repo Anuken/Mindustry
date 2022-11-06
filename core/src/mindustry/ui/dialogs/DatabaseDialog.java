@@ -17,6 +17,7 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 
+import static arc.Core.*;
 import static mindustry.Vars.*;
 
 public class DatabaseDialog extends BaseDialog{
@@ -73,7 +74,7 @@ public class DatabaseDialog extends BaseDialog{
                     Image image = unlocked(unlock) ? new Image(unlock.uiIcon).setScaling(Scaling.fit) : new Image(Icon.lock, Pal.gray);
 
                     //banned cross
-                    if(state.isGame() && (unlock instanceof UnitType u && u.isBanned() || unlock instanceof Block b && state.rules.bannedBlocks.contains(b))){
+                    if(state.isGame() && (unlock instanceof UnitType u && u.isBanned() || unlock instanceof Block b && state.rules.isBanned(b))){
                         list.stack(image, new Image(Icon.cancel){{
                             setColor(Color.scarlet);
                             touchable = Touchable.disabled;
@@ -98,7 +99,7 @@ public class DatabaseDialog extends BaseDialog{
                                 ui.content.show(unlock);
                             }
                         });
-                        image.addListener(new Tooltip(t -> t.background(Tex.button).add(unlock.localizedName + (enableConsole ? "\n[gray]" + unlock.name : ""))));
+                        image.addListener(new Tooltip(t -> t.background(Tex.button).add(unlock.localizedName + (settings.getBool("console") ? "\n[gray]" + unlock.name : ""))));
                     }
 
                     if((++count) % cols == 0){

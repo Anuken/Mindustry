@@ -26,9 +26,11 @@ public class PowerNode extends PowerBlock{
     protected static BuildPlan otherReq;
     protected static int returnInt = 0;
     protected final static ObjectSet<PowerGraph> graphs = new ObjectSet<>();
+    /** The maximum range of all power nodes on the map */
+    protected static float maxRange;
 
-    public @Load("laser") TextureRegion laser;
-    public @Load("laser-end") TextureRegion laserEnd;
+    public @Load(value = "@-laser", fallback = "laser") TextureRegion laser;
+    public @Load(value = "@-laser-end", fallback = "laser-end") TextureRegion laserEnd;
     public float laserRange = 6;
     public int maxNodes = 3;
     public boolean autolink = true, drawRange = true;
@@ -89,14 +91,12 @@ public class PowerNode extends PowerBlock{
 
             //clear old
             for(int i = 0; i < old.size; i++){
-                int cur = old.get(i);
-                configurations.get(Integer.class).get(tile, cur);
+                configurations.get(Integer.class).get(tile, old.get(i));
             }
 
             //set new
             for(Point2 p : value){
-                int newPos = Point2.pack(p.x + tile.tileX(), p.y + tile.tileY());
-                configurations.get(Integer.class).get(tile, newPos);
+                configurations.get(Integer.class).get(tile, Point2.pack(p.x + tile.tileX(), p.y + tile.tileY()));
             }
         });
     }
@@ -236,12 +236,15 @@ public class PowerNode extends PowerBlock{
             graphs.add(tile.build.power.graph);
         }
 
-        Geometry.circle(tile.x, tile.y, (int)(laserRange + 2), (x, y) -> {
-            Building other = world.build(x, y);
-            if(valid.get(other) && !tempBuilds.contains(other)){
-                tempBuilds.add(other);
-            }
-        });
+        var worldRange = laserRange * tilesize;
+        var tree = team.data().buildingTree;
+        if(tree != null){
+            tree.intersect(tile.worldx() - worldRange, tile.worldy() - worldRange, worldRange * 2, worldRange * 2, build -> {
+                if(valid.get(build) && !tempBuilds.contains(build)){
+                    tempBuilds.add(build);
+                }
+            });
+        }
 
         tempBuilds.sort((a, b) -> {
             int type = -Boolean.compare(a.block instanceof PowerNode, b.block instanceof PowerNode);
@@ -289,12 +292,15 @@ public class PowerNode extends PowerBlock{
             graphs.add(tile.build.power.graph);
         }
 
-        Geometry.circle(tile.x, tile.y, 13, (x, y) -> {
-            Building other = world.build(x, y);
-            if(valid.get(other) && !tempBuilds.contains(other)){
-                tempBuilds.add(other);
-            }
-        });
+        var rangeWorld = maxRange * tilesize;
+        var tree = team.data().buildingTree;
+        if(tree != null){
+            tree.intersect(tile.worldx() - rangeWorld, tile.worldy() - rangeWorld, rangeWorld * 2, rangeWorld * 2, build -> {
+                if(valid.get(build) && !tempBuilds.contains(build)){
+                    tempBuilds.add(build);
+                }
+            });
+        }
 
         tempBuilds.sort((a, b) -> {
             int type = -Boolean.compare(a.block instanceof PowerNode, b.block instanceof PowerNode);
@@ -363,6 +369,14 @@ public class PowerNode extends PowerBlock{
     }
 
     public class PowerNodeBuild extends Building{
+
+        @Override
+        public void created(){ // Called when one is placed/loaded in the world
+            if(autolink && laserRange > maxRange) maxRange = laserRange;
+
+            super.created();
+        }
+
 
         @Override
         public void placed(){

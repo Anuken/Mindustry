@@ -37,8 +37,4 @@ public class PlanetParams{
     public transient int viewW = -1, viewH = -1;
     /** If true, atmosphere will be drawn regardless of player options. */
     public transient boolean alwaysDrawAtmosphere = false;
-
-    //TODO:
-    //- blur
-    //- darken
 }

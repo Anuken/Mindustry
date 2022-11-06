@@ -260,6 +260,10 @@ public class SettingsMenuDialog extends BaseDialog{
     public void addCategory(String name, Cons<SettingsTable> builder){
         addCategory(name, (Drawable)null, builder);
     }
+    
+    public Seq<SettingsCategory> getCategories(){
+        return categories;
+    }
 
     void rebuildMenu(){
         menu.clearChildren();
@@ -356,6 +360,10 @@ public class SettingsMenuDialog extends BaseDialog{
                     platform.updateLobby();
                 });
             }
+        }
+
+        if(!mobile){
+            game.checkPref("console", false);
         }
 
         int[] lastUiScale = {settings.getInt("uiscale", 100)};
@@ -493,7 +501,6 @@ public class SettingsMenuDialog extends BaseDialog{
         files.add(Core.settings.getSettingsFile());
         files.addAll(customMapDirectory.list());
         files.addAll(saveDirectory.list());
-        files.addAll(screenshotDirectory.list());
         files.addAll(modDirectory.list());
         files.addAll(schematicDirectory.list());
         String base = Core.settings.getDataDirectory().path();

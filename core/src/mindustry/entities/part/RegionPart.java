@@ -3,6 +3,7 @@ package mindustry.entities.part;
 import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.graphics.*;
@@ -31,12 +32,12 @@ public class RegionPart extends DrawPart{
     /** Progress function for heat alpha. */
     public PartProgress heatProgress = PartProgress.heat;
     public Blending blending = Blending.normal;
-    public float layer = -1, layerOffset = 0f, heatLayerOffset = 1f;
+    public float layer = -1, layerOffset = 0f, heatLayerOffset = 1f, turretHeatLayer = Layer.turretHeat;
     public float outlineLayerOffset = -0.001f;
     public float x, y, rotation;
     public float moveX, moveY, moveRot;
     public float heatLightOpacity = 0.3f;
-    public @Nullable Color color, colorTo;
+    public @Nullable Color color, colorTo, mixColor, mixColorTo;
     public Color heatColor = Pal.turretHeat.cpy();
     public Seq<DrawPart> children = new Seq<>();
     public Seq<PartMove> moves = new Seq<>();
@@ -86,14 +87,14 @@ public class RegionPart extends DrawPart{
             //can be null
             var region = drawRegion ? regions[Math.min(i, regions.length - 1)] : null;
             float sign = (i == 0 ? 1 : -1) * params.sideMultiplier;
-            Tmp.v1.set((x + mx) * sign, y + my).rotate(params.rotation - 90);
+            Tmp.v1.set((x + mx) * sign * Draw.xscl, (y + my) * Draw.yscl).rotateRadExact((params.rotation - 90) * Mathf.degRad);
 
             float
                 rx = params.x + Tmp.v1.x,
                 ry = params.y + Tmp.v1.y,
                 rot = mr * sign + params.rotation - 90;
 
-            Draw.xscl = sign;
+            Draw.xscl *= sign;
 
             if(outline && drawRegion){
                 Draw.z(prevZ + outlineLayerOffset);
@@ -107,6 +108,13 @@ public class RegionPart extends DrawPart{
                 }else if(color != null){
                     Draw.color(color);
                 }
+
+                if(mixColor != null && mixColorTo != null){
+                    Draw.mixcol(mixColor, mixColorTo, prog);
+                }else if(mixColor != null){
+                    Draw.mixcol(mixColor, mixColor.a);
+                }
+
                 Draw.blend(blending);
                 Draw.rect(region, rx, ry, rot);
                 Draw.blend();
@@ -116,12 +124,15 @@ public class RegionPart extends DrawPart{
             if(heat.found()){
                 float hprog = heatProgress.getClamp(params);
                 heatColor.write(Tmp.c1).a(hprog * heatColor.a);
-                Drawf.additive(heat, Tmp.c1, rx, ry, rot, turretShading ? Layer.turretHeat : Draw.z() + heatLayerOffset);
+                Drawf.additive(heat, Tmp.c1, rx, ry, rot, turretShading ? turretHeatLayer : Draw.z() + heatLayerOffset);
                 if(heatLight) Drawf.light(rx, ry, heat, rot, Tmp.c1, heatLightOpacity * hprog);
             }
 
-            Draw.xscl = 1f;
+            Draw.xscl *= sign;
         }
+
+        Draw.color();
+        Draw.mixcol();
 
         Draw.z(z);
 
@@ -131,9 +142,9 @@ public class RegionPart extends DrawPart{
             for(int s = 0; s < len; s++){
                 int i = (params.sideOverride == -1 ? s : params.sideOverride);
                 float sign = (i == 1 ? -1 : 1) * params.sideMultiplier;
-                Tmp.v1.set((x + mx) * sign, y + my).rotate(params.rotation - 90);
+                Tmp.v1.set((x + mx) * sign, y + my).rotateRadExact((params.rotation - 90) * Mathf.degRad);
 
-                childParam.set(params.warmup, params.reload, params.smoothReload, params.heat, params.x + Tmp.v1.x, params.y + Tmp.v1.y, i * sign + mr * sign + params.rotation);
+                childParam.set(params.warmup, params.reload, params.smoothReload, params.heat, params.recoil, params.charge, params.x + Tmp.v1.x, params.y + Tmp.v1.y, i * sign + mr * sign + params.rotation);
                 childParam.sideMultiplier = params.sideMultiplier;
                 childParam.life = params.life;
                 childParam.sideOverride = i;
@@ -149,7 +160,6 @@ public class RegionPart extends DrawPart{
         String realName = this.name == null ? name + suffix : this.name;
 
         if(drawRegion){
-            //TODO l/r
             if(mirror && turretShading){
                 regions = new TextureRegion[]{
                 Core.atlas.find(realName + "-r"),
@@ -168,6 +178,7 @@ public class RegionPart extends DrawPart{
 
         heat = Core.atlas.find(realName + "-heat");
         for(var child : children){
+            child.turretShading = turretShading;
             child.load(name);
         }
     }

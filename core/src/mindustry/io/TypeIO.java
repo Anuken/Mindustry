@@ -6,6 +6,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.ai.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.TechTree.*;
@@ -141,7 +142,8 @@ public class TypeIO{
             case 5 -> content.getByID(ContentType.all[read.b()], read.s());
             case 6 -> {
                 short length = read.s();
-                IntSeq arr = new IntSeq(); for(int i = 0; i < length; i ++) arr.add(read.i());
+                IntSeq arr = new IntSeq(length);
+                for(int i = 0; i < length; i ++) arr.add(read.i());
                 yield arr;
             }
             case 7 -> new Point2(read.i(), read.i());
@@ -281,6 +283,14 @@ public class TypeIO{
             return tile instanceof ControlBlock cont ? cont.unit() : Nulls.unit;
         }
         return Nulls.unit;
+    }
+
+    public static void writeCommand(Writes write, UnitCommand command){
+        write.b(command.id);
+    }
+
+    public static UnitCommand readCommand(Reads read){
+        return UnitCommand.all.get(read.ub());
     }
 
     public static void writeEntity(Writes write, Entityc entity){
@@ -441,7 +451,7 @@ public class TypeIO{
             write.b(3);
             write.i(logic.controller.pos());
         }else if(control instanceof CommandAI ai){
-            write.b(4);
+            write.b(6);
             write.bool(ai.attackTarget != null);
             write.bool(ai.targetPos != null);
 
@@ -457,6 +467,7 @@ public class TypeIO{
                     write.i(((Unit)ai.attackTarget).id);
                 }
             }
+            write.b(ai.command == null ? -1 : ai.command.id);
         }else if(control instanceof AssemblerAI){  //hate
             write.b(5);
         }else{
@@ -488,7 +499,8 @@ public class TypeIO{
                 out.controller = world.build(pos);
                 return out;
             }
-        }else if(type == 4){
+            //type 4 is the old CommandAI with no commandIndex, type 6 is the new one with the index as a single byte.
+        }else if(type == 4 || type == 6){
             CommandAI ai = prev instanceof CommandAI pai ? pai : new CommandAI();
 
             boolean hasAttack = read.bool(), hasPos = read.bool();
@@ -509,6 +521,11 @@ public class TypeIO{
                 }
             }else{
                 ai.attackTarget = null;
+            }
+
+            if(type == 6){
+                byte id = read.b();
+                ai.command = id < 0 ? null : UnitCommand.all.get(id);
             }
 
             return ai;
@@ -544,6 +561,19 @@ public class TypeIO{
         int length = read.i();
         String string = new String(read.b(new byte[length]), charset);
         return JsonIO.read(Rules.class, string);
+    }
+
+    public static void writeObjectives(Writes write, MapObjectives executor){
+        String string = JsonIO.write(executor);
+        byte[] bytes = string.getBytes(charset);
+        write.i(bytes.length);
+        write.b(bytes);
+    }
+
+    public static MapObjectives readObjectives(Reads read){
+        int length = read.i();
+        String string = new String(read.b(new byte[length]), charset);
+        return JsonIO.read(MapObjectives.class, string);
     }
 
     public static void writeVecNullable(Writes write, @Nullable Vec2 v){

@@ -82,10 +82,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
 
     @Override
     public float damageMultiplier(){
-        if(owner instanceof Unit u) return u.damageMultiplier() * state.rules.unitDamage(team);
-        if(owner instanceof Building) return state.rules.blockDamage(team);
-
-        return 1f;
+        return type.damageMultiplier(self());
     }
 
     @Override
@@ -166,8 +163,12 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
             (!build.block.underBullets ||
             //direct hit on correct tile
             (aimTile != null && aimTile.build == build) ||
+            //same team has no 'under build' mechanics
+            (build.team == team) ||
             //a piercing bullet overshot the aim tile, it's fine to hit things now
-            (type.pierce && aimTile != null && Mathf.dst(x, y, originX, originY) > aimTile.dst(originX, originY) + 2f));
+            (type.pierce && aimTile != null && Mathf.dst(x, y, originX, originY) > aimTile.dst(originX, originY) + 2f) ||
+            //there was nothing to aim at
+            (aimX == -1f && aimY == -1f));
     }
 
     //copy-paste of World#raycastEach, inlined for lambda capture performance.

@@ -35,8 +35,7 @@ public class StatValues{
     }
 
     public static String fixValue(float value){
-        int precision = Math.abs((int)value - value) <= 0.001f ? 0 : Math.abs((int)(value * 10) - value * 10) <= 0.001f ? 1 : 2;
-        return Strings.fixed(value, precision);
+        return Strings.autoFixed(value, 2);
     }
 
     public static StatValue squared(float value, StatUnit unit){
@@ -49,7 +48,7 @@ public class StatValues{
 
     public static StatValue number(float value, StatUnit unit, boolean merge){
         return table -> {
-            String l1 = fixValue(value), l2 = (unit.space ? " " : "") + unit.localized();
+            String l1 = (unit.icon == null ? "" : unit.icon + " ") + fixValue(value), l2 = (unit.space ? " " : "") + unit.localized();
 
             if(merge){
                 table.add(l1 + l2);
@@ -70,7 +69,7 @@ public class StatValues{
 
     public static StatValue liquids(Boolf<Liquid> filter, float amount, boolean perSecond){
         return table -> {
-            Seq<Liquid> list = content.liquids().select(i -> filter.get(i) && i.unlockedNow());
+            Seq<Liquid> list = content.liquids().select(i -> filter.get(i) && i.unlockedNow() && !i.isHidden());
 
             for(int i = 0; i < list.size; i++){
                 table.add(new LiquidDisplay(list.get(i), amount, perSecond)).padRight(5);
@@ -120,7 +119,7 @@ public class StatValues{
 
     public static StatValue items(float timePeriod, Boolf<Item> filter){
         return table -> {
-            Seq<Item> list = content.items().select(i -> filter.get(i) && i.unlockedNow());
+            Seq<Item> list = content.items().select(i -> filter.get(i) && i.unlockedNow() && !i.isHidden());
 
             for(int i = 0; i < list.size; i++){
                 Item item = list.get(i);
@@ -196,30 +195,43 @@ public class StatValues{
             });
         });
     }
-
     public static StatValue content(Seq<UnlockableContent> list){
+        return content(list, i -> true);
+    }
+
+    public static <T extends UnlockableContent> StatValue content(Seq<T> list, Boolf<T> check){
         return table -> table.table(l -> {
             l.left();
 
+            boolean any = false;
             for(int i = 0; i < list.size; i++){
                 var item = list.get(i);
 
-                if(item instanceof Block block && block.itemDrop != null && !block.itemDrop.unlocked()) continue;
+                if(!check.get(item)) continue;
+                any = true;
 
-                l.image(item.uiIcon).size(iconSmall).padRight(2).padLeft(2).padTop(3).padBottom(3);
-                l.add(item.localizedName).left().padLeft(1).padRight(4);
+                if(item.uiIcon.found()) l.image(item.uiIcon).size(iconSmall).padRight(2).padLeft(2).padTop(3).padBottom(3);
+                l.add(item.localizedName).left().padLeft(1).padRight(4).colspan(item.uiIcon.found() ? 1 : 2);
                 if(i % 5 == 4){
                     l.row();
                 }
+            }
+
+            if(!any){
+                l.add("@none.inmap");
             }
         });
     }
 
     public static StatValue blocks(Boolf<Block> pred){
-        return blocks(content.blocks().select(pred));
+        return content(content.blocks(), pred);
     }
 
     public static StatValue blocks(Seq<Block> list){
+        return content(list.as());
+    }
+
+    public static StatValue statusEffects(Seq<StatusEffect> list){
         return content(list.as());
     }
 
@@ -230,7 +242,7 @@ public class StatValues{
                 for(Liquid liquid : content.liquids()){
                     if(!filter.get(liquid)) continue;
 
-                    c.image(liquid.uiIcon).size(3 * 8).padRight(4).right().top();
+                    c.image(liquid.uiIcon).size(3 * 8).scaling(Scaling.fit).padRight(4).right().top();
                     c.add(liquid.localizedName).padRight(10).left().top();
                     c.table(Tex.underline, bt -> {
                         bt.left().defaults().padRight(3).left();
@@ -254,7 +266,7 @@ public class StatValues{
                 for(Liquid liquid : content.liquids()){
                     if(!filter.get(liquid)) continue;
 
-                    c.image(liquid.uiIcon).size(3 * 8).padRight(4).right().top();
+                    c.image(liquid.uiIcon).size(3 * 8).scaling(Scaling.fit).padRight(4).right().top();
                     c.add(liquid.localizedName).padRight(10).left().top();
                     c.table(Tex.underline, bt -> {
                         bt.left().defaults().padRight(3).left();
@@ -295,10 +307,14 @@ public class StatValues{
     }
 
     public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map){
-        return ammo(map, 0);
+        return ammo(map, 0, false);
     }
 
-    public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map, int indent){
+    public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map, boolean showUnit){
+        return ammo(map, 0, showUnit);
+    }
+
+    public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map, int indent, boolean showUnit){
         return table -> {
 
             table.row();
@@ -307,12 +323,17 @@ public class StatValues{
             orderedKeys.sort();
 
             for(T t : orderedKeys){
-                boolean compact = t instanceof UnitType || indent > 0;
+                boolean compact = t instanceof UnitType && !showUnit || indent > 0;
 
                 BulletType type = map.get(t);
 
+                if(type.spawnUnit != null && type.spawnUnit.weapons.size > 0){
+                    ammo(ObjectMap.of(t, type.spawnUnit.weapons.first().bullet), indent, false).display(table);
+                    return;
+                }
+
                 //no point in displaying unit icon twice
-                if(!compact && !(t instanceof PowerTurret)){
+                if(!compact && !(t instanceof Turret)){
                     table.image(icon(t)).size(3 * 8).padRight(4).right().top();
                     table.add(t.localizedName).padRight(10).left().top();
                 }
@@ -381,14 +402,14 @@ public class StatValues{
                     }
 
                     if(type.status != StatusEffects.none){
-                        sep(bt, (type.status.minfo.mod == null ? type.status.emoji() : "") + "[stat]" + type.status.localizedName);
+                        sep(bt, (type.status.minfo.mod == null ? type.status.emoji() : "") + "[stat]" + type.status.localizedName + (type.status.reactive ? "" : "[lightgray] ~ [stat]" + ((int)(type.statusDuration / 60f)) + "[lightgray] " + Core.bundle.get("unit.seconds")));
                     }
 
                     if(type.fragBullet != null){
                         sep(bt, Core.bundle.format("bullet.frags", type.fragBullets));
                         bt.row();
 
-                        ammo(ObjectMap.of(t, type.fragBullet), indent + 1).display(bt);
+                        ammo(ObjectMap.of(t, type.fragBullet), indent + 1, false).display(bt);
                     }
                 }).padTop(compact ? 0 : -9).padLeft(indent * 8).left().get().background(compact ? null : Tex.underline);
 

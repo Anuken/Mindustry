@@ -284,14 +284,17 @@ public class MapEditor{
         }
     }
 
-    public void resize(int width, int height){
+    public void resize(int width, int height, int shiftX, int shiftY){
         clearOp();
 
         Tiles previous = world.tiles;
-        int offsetX = (width() - width) / 2, offsetY = (height() - height) / 2;
+        int offsetX = (width() - width) / 2 - shiftX, offsetY = (height() - height) / 2 - shiftY;
         loading = true;
 
-        Tiles tiles = world.resize(width, height);
+        world.clearBuildings();
+
+        Tiles tiles = world.tiles = new Tiles(width, height);
+
         for(int x = 0; x < width; x++){
             for(int y = 0; y < height; y++){
                 int px = offsetX + x, py = offsetY + y;

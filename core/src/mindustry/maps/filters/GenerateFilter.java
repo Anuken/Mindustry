@@ -12,7 +12,7 @@ import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 
-public abstract class GenerateFilter{
+public abstract class GenerateFilter implements Cloneable{
     public int seed = 0;
 
     public void apply(Tiles tiles, GenerateInput in){
@@ -126,6 +126,14 @@ public abstract class GenerateFilter{
 
     protected float chance(int x, int y){
         return Mathf.randomSeed(Pack.longInt(x, y + seed));
+    }
+
+    public GenerateFilter copy(){
+        try{
+            return (GenerateFilter) clone();
+        }catch(CloneNotSupportedException disgrace){
+            throw new RuntimeException("java is the best language", disgrace);
+        }
     }
 
     /** an input for generating at a certain coordinate. should only be instantiated once. */

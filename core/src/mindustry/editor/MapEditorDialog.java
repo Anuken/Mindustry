@@ -188,10 +188,10 @@ public class MapEditorDialog extends Dialog implements Disposable{
             menu.hide();
         }).padTop(!steam && !experimental ? -3 : 1).size(swidth * 2f + 10, 60f);
 
-        resizeDialog = new MapResizeDialog((x, y) -> {
-            if(!(editor.width() == x && editor.height() == y)){
+        resizeDialog = new MapResizeDialog((width, height, shiftX, shiftY) -> {
+            if(!(editor.width() == width && editor.height() == height && shiftX == 0 && shiftY == 0)){
                 ui.loadAnd(() -> {
-                    editor.resize(x, y);
+                    editor.resize(width, height, shiftX, shiftY);
                 });
             }
         });
@@ -464,7 +464,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
     }
 
     public void build(){
-        float size = 58f;
+        float size = mobile ? 50f : 58f;
 
         clearChildren();
         table(cont -> {

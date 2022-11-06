@@ -112,6 +112,8 @@ public class Block extends UnlockableContent implements Senseable{
     public int variants = 0;
     /** whether to draw a rotation arrow - this does not apply to lines of blocks */
     public boolean drawArrow = true;
+    /** whether to draw the team corner by default */
+    public boolean drawTeamOverlay = true;
     /** for static blocks only: if true, tile data() is saved in world data. */
     public boolean saveData;
     /** whether you can break this with rightclick */
@@ -164,6 +166,12 @@ public class Block extends UnlockableContent implements Senseable{
     public float baseExplosiveness = 0f;
     /** bullet that this block spawns when destroyed */
     public @Nullable BulletType destroyBullet = null;
+    /** liquid used for lighting */
+    public @Nullable Liquid lightLiquid;
+    /** whether cracks are drawn when this block is damaged */
+    public boolean drawCracks = true;
+    /** whether rubble is created when this block is destroyed */
+    public boolean createRubble = true;
     /** whether this block can be placed on edges of liquids. */
     public boolean floating = false;
     /** multiblock size */
@@ -205,6 +213,8 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean commandable;
     /** If true, the building inventory can be shown with the config. */
     public boolean allowConfigInventory = true;
+    /** Defines how large selection menus, such as that of sorters, should be. */
+    public int selectionRows = 5, selectionColumns = 4;
     /** If true, this block can be configured by logic. */
     public boolean logicConfigurable = false;
     /** Whether this block consumes touchDown events when tapped. */
@@ -318,8 +328,6 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean quickRotate = true;
     /** Main subclass. Non-anonymous. */
     public @Nullable Class<?> subclass;
-    /** Determines if this block gets a higher unloader priority. */
-    public boolean highUnloadPriority = false;
     /** Scroll position for certain blocks. */
     public float selectScroll;
     /** Building that is created for this block. Initialized in init() via reflection. Set manually if modded. */
@@ -361,6 +369,7 @@ public class Block extends UnlockableContent implements Senseable{
     public Block(String name){
         super(name);
         initBuilding();
+        selectionSize = 28f;
     }
 
     public void drawBase(Tile tile){
@@ -478,14 +487,10 @@ public class Block extends UnlockableContent implements Senseable{
 
     /** @return whether this block can be placed on the specified tile. */
     public boolean canPlaceOn(Tile tile, Team team, int rotation){
-        return canPlaceOn(tile, team);
-    }
-
-    /** Legacy canPlaceOn implementation, override {@link #canPlaceOn(Tile, Team, int)} instead.*/
-    public boolean canPlaceOn(Tile tile, Team team){
         return true;
     }
-    
+
+    /** @return whether this block can be broken on the specified tile. */
     public boolean canBreak(Tile tile){
         return true;
     }
@@ -496,6 +501,10 @@ public class Block extends UnlockableContent implements Senseable{
 
     public boolean synthetic(){
         return update || destructible;
+    }
+
+    public boolean checkForceDark(Tile tile){
+        return forceDark;
     }
 
     @Override
@@ -542,7 +551,7 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     public void addLiquidBar(Liquid liq){
-        addBar("liquid-" + liq.name, entity -> !liq.unlocked() ? null : new Bar(
+        addBar("liquid-" + liq.name, entity -> !liq.unlockedNow() ? null : new Bar(
             () -> liq.localizedName,
             liq::barColor,
             () -> entity.liquids.get(liq) / liquidCapacity
@@ -825,6 +834,10 @@ public class Block extends UnlockableContent implements Senseable{
         return generatedIcons == null ? (generatedIcons = icons()) : generatedIcons;
     }
 
+    public void resetGeneratedIcons(){
+        generatedIcons = null;
+    }
+
     public TextureRegion[] variantRegions(){
         return variantRegions == null ? (variantRegions = new TextureRegion[]{fullIcon}) : variantRegions;
     }
@@ -850,11 +863,15 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     public boolean isVisible(){
-        return !isHidden();
+        return !isHidden() && (state.rules.editor || (!state.rules.hideBannedBlocks || !state.rules.isBanned(this)));
+    }
+
+    public boolean isVisibleOn(Planet planet){
+        return !Structs.contains(requirements, i -> planet.hiddenItems.contains(i.item));
     }
 
     public boolean isPlaceable(){
-        return isVisible() && (!state.rules.bannedBlocks.contains(this) || state.rules.editor) && supportsEnv(state.rules.env);
+        return isVisible() && (!state.rules.isBanned(this) || state.rules.editor) && supportsEnv(state.rules.env);
     }
 
     /** @return whether this block supports a specific environment. */
@@ -1066,13 +1083,15 @@ public class Block extends UnlockableContent implements Senseable{
                 for(ItemStack stack : i.items){
                     cons.get(stack.item);
                 }
-            }else if(c instanceof ConsumeLiquid i){
+            }
+            //TODO: requiring liquid dependencies is usually a bad idea, because there is no reason to pump/produce something until you actually need it.
+            /*else if(c instanceof ConsumeLiquid i){
                 cons.get(i.liquid);
             }else if(c instanceof ConsumeLiquids i){
                 for(var stack : i.liquids){
                     cons.get(stack.liquid);
                 }
-            }
+            }*/
         }
     }
 
@@ -1288,7 +1307,7 @@ public class Block extends UnlockableContent implements Senseable{
             }
         }
 
-        var editorBase = Core.atlas.getPixmap(fullIcon);
+        PixmapRegion editorBase;
 
         if(gen.length > 1){
             Pixmap base = Core.atlas.getPixmap(gen[0]).crop();
@@ -1302,6 +1321,8 @@ public class Block extends UnlockableContent implements Senseable{
             packer.add(PageType.main, "block-" + name + "-full", base);
 
             editorBase = new PixmapRegion(base);
+        }else{
+            editorBase = gen[0] == null ? Core.atlas.getPixmap(fullIcon) : Core.atlas.getPixmap(gen[0]);
         }
 
         packer.add(PageType.editor, name + "-icon-editor", editorBase);

@@ -35,6 +35,12 @@ public class UnitCargoLoader extends Block{
         update = true;
         hasItems = true;
         itemCapacity = 200;
+        ambientSound = Sounds.respawning;
+    }
+
+    @Override
+    public boolean outputsItems(){
+        return false;
     }
 
     @Override
@@ -90,7 +96,9 @@ public class UnitCargoLoader extends Block{
 
             if(readUnitId != -1){
                 unit = Groups.unit.getByID(readUnitId);
-                readUnitId = -1;
+                if(unit != null || !net.client()){
+                    readUnitId = -1;
+                }
             }
 
             warmup = Mathf.approachDelta(warmup, efficiency, 1f / 60f);
@@ -131,6 +139,11 @@ public class UnitCargoLoader extends Block{
         @Override
         public boolean shouldConsume(){
             return unit == null;
+        }
+
+        @Override
+        public boolean shouldActiveSound(){
+            return shouldConsume() && warmup > 0.01f;
         }
 
         @Override

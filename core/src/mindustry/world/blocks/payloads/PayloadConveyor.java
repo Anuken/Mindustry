@@ -128,7 +128,7 @@ public class PayloadConveyor extends Block{
             if(!enabled) return;
 
             if(item != null){
-                item.update(false);
+                item.update(null, this);
             }
 
             lastInterp = curInterp;
@@ -197,26 +197,28 @@ public class PayloadConveyor extends Block{
             float glow = Math.max((dst - (Math.abs(fract() - 0.5f) * 2)) / dst, 0);
             Draw.mixcol(team.color, glow);
 
-            float trnext = fract() * size * tilesize, trprev = size * tilesize * (fract() - 1), rot = rotdeg();
-
-            TextureRegion clipped = clipRegion(tile.getHitbox(Tmp.r1), tile.getHitbox(Tmp.r2).move(trnext, 0), topRegion);
             float s = tilesize * size;
+            float trnext = s * fract(), trprev = s * (fract() - 1), rot = rotdeg();
 
             //next
-            Tmp.v1.set((s- clipped.width *Draw.scl) + clipped.width /2f*Draw.scl - s/2f, s- clipped.height *Draw.scl + clipped.height /2f*Draw.scl - s/2f).rotate(rot);
+            TextureRegion clipped = clipRegion(tile.getHitbox(Tmp.r1), tile.getHitbox(Tmp.r2).move(trnext, 0), topRegion);
+            float widthNext = (s - clipped.width * clipped.scl()) * 0.5f;
+            float heightNext = (s - clipped.height * clipped.scl()) * 0.5f;
+            Tmp.v1.set(widthNext, heightNext).rotate(rot);
             Draw.rect(clipped, x + Tmp.v1.x, y + Tmp.v1.y, rot);
 
-            clipped = clipRegion(tile.getHitbox(Tmp.r1), tile.getHitbox(Tmp.r2).move(trprev, 0), topRegion);
-
             //prev
-            Tmp.v1.set(- s/2f + clipped.width /2f*Draw.scl,  - s/2f + clipped.height /2f*Draw.scl).rotate(rot);
+            clipped = clipRegion(tile.getHitbox(Tmp.r1), tile.getHitbox(Tmp.r2).move(trprev, 0), topRegion);
+            float widthPrev = (clipped.width * clipped.scl() - s) * 0.5f;
+            float heightPrev = (clipped.height * clipped.scl() - s) * 0.5f;
+            Tmp.v1.set(widthPrev, heightPrev).rotate(rot);
             Draw.rect(clipped, x + Tmp.v1.x, y + Tmp.v1.y, rot);
 
             for(int i = 0; i < 4; i++){
                 if(blends(i) && i != rotation){
                     Draw.alpha(1f - Interp.pow5In.apply(fract()));
                     //prev from back
-                    Tmp.v1.set(- s/2f + clipped.width /2f*Draw.scl,  - s/2f + clipped.height /2f*Draw.scl).rotate(i * 90 + 180);
+                    Tmp.v1.set(widthPrev, heightPrev).rotate(i * 90 + 180);
                     Draw.rect(clipped, x + Tmp.v1.x, y + Tmp.v1.y, i * 90 + 180);
                 }
             }
@@ -331,6 +333,7 @@ public class PayloadConveyor extends Block{
 
             TextureRegion out = Tmp.tr1;
             out.set(region.texture);
+            out.scale = region.scale;
 
             if(overlaps){
                 float w = region.u2 - region.u;

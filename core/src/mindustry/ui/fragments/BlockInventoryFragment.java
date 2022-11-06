@@ -70,6 +70,8 @@ public class BlockInventoryFragment{
     }
 
     private void takeItem(int requested){
+        if(!build.canWithdraw()) return;
+
         //take everything
         int amount = Math.min(requested, player.unit().maxAccepted(lastItem));
 

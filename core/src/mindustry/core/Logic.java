@@ -34,6 +34,9 @@ public class Logic implements ApplicationListener{
     public Logic(){
 
         Events.on(BlockDestroyEvent.class, event -> {
+            //skip if rule is off
+            if(!state.rules.ghostBlocks) return;
+
             //blocks that get broken are appended to the team's broken block queue
             Tile tile = event.tile;
             //skip null entities or un-rebuildables, for obvious reasons
@@ -130,6 +133,7 @@ public class Logic implements ApplicationListener{
 
                 state.rules.coreIncinerates = true;
                 state.rules.waveTeam.rules().infiniteResources = true;
+                state.rules.waveTeam.rules().buildSpeedMultiplier *= state.getPlanet().enemyBuildSpeedMultiplier;
 
                 //fill enemy cores by default? TODO decide
                 for(var core : state.rules.waveTeam.cores()){
@@ -165,18 +169,6 @@ public class Logic implements ApplicationListener{
                 Core.app.post(() -> {
                     core.team.data().timeDestroy(core.x, core.y, state.rules.enemyCoreBuildRadius);
                 });
-            }
-        });
-
-        //send out items to each client
-        Events.on(TurnEvent.class, e -> {
-            if(net.server() && state.isCampaign()){
-                int[] out = new int[content.items().size];
-                state.getSector().info.production.each((item, stat) -> {
-                    out[item.id] = Math.max(0, (int)(stat.mean * turnDuration / 60));
-                });
-
-                Call.sectorProduced(out);
             }
         });
 
@@ -224,11 +216,12 @@ public class Logic implements ApplicationListener{
         Events.fire(new PlayEvent());
 
         //add starting items
-        if(!state.isCampaign()){
+        if(!state.isCampaign() || !state.rules.sector.planet.allowLaunchLoadout || (state.rules.sector.preset != null && state.rules.sector.preset.addStartingItems)){
             for(TeamData team : state.teams.getActive()){
                 if(team.hasCore()){
                     CoreBuild entity = team.core();
                     entity.items.clear();
+
                     for(ItemStack stack : state.rules.loadout){
                         //make sure to cap storage
                         entity.items.add(stack.item, Math.min(stack.amount, entity.storageCapacity - entity.items.get(stack.item)));
@@ -291,7 +284,14 @@ public class Logic implements ApplicationListener{
             if(state.rules.waves && (state.enemies == 0 && state.rules.winWave > 0 && state.wave >= state.rules.winWave && !spawner.isSpawning()) ||
                 (state.rules.attackMode && state.rules.waveTeam.cores().isEmpty())){
 
-                Call.sectorCapture();
+                if(state.rules.sector.preset != null && state.rules.sector.preset.attackAfterWaves && !state.rules.attackMode){
+                    //activate attack mode to destroy cores after waves are done.
+                    state.rules.attackMode = true;
+                    state.rules.waves = false;
+                    Call.setRules(state.rules);
+                }else{
+                    Call.sectorCapture();
+                }
             }
         }else{
             if(!state.rules.attackMode && state.teams.playerCores().size == 0 && !state.gameOver){
@@ -328,52 +328,6 @@ public class Logic implements ApplicationListener{
         }
     }
 
-    protected void updateObjectives(){
-        //update objectives; do not get completed clientside
-        if(state.rules.objectives.size > 0){
-            var first = state.rules.objectives.first();
-            first.update();
-
-            //initialize markers
-            for(var marker : first.markers){
-                if(!marker.wasAdded){
-                    marker.wasAdded = true;
-                    marker.added();
-                }
-            }
-
-            boolean completed = false;
-
-            //multiple objectives can be updated in the same frame
-            while(!net.client() && first != null && first.complete()){
-                state.rules.objectives.remove(0);
-                first.completed();
-                //apply flags.
-                state.rules.objectiveFlags.removeAll(first.flagsRemoved);
-                state.rules.objectiveFlags.addAll(first.flagsAdded);
-                if(!headless){
-                    //delete markers
-                    for(var marker : first.markers){
-                        if(marker.wasAdded){
-                            marker.removed();
-                            marker.wasAdded = false;
-                        }
-                    }
-                }
-
-                first = state.rules.objectives.firstOpt();
-                completed = true;
-            }
-
-            if(completed){
-                //TODO call packet for this?
-                if(net.server()){
-                    Call.setRules(state.rules);
-                }
-            }
-        }
-    }
-
     @Remote(called = Loc.server)
     public static void sectorCapture(){
         //the sector has been conquered - waves get disabled
@@ -385,13 +339,19 @@ public class Logic implements ApplicationListener{
             return;
         }
 
+        boolean initial = !state.rules.sector.info.wasCaptured;
+
         state.rules.sector.info.wasCaptured = true;
 
         //fire capture event
-        Events.fire(new SectorCaptureEvent(state.rules.sector));
+        Events.fire(new SectorCaptureEvent(state.rules.sector, initial));
 
         //disable attack mode
         state.rules.attackMode = false;
+
+        //map is over, no more world processor objective stuff
+        state.rules.disableWorldProcessors = true;
+        state.rules.objectives.clear();
 
         //save, just in case
         if(!headless && !net.client()){
@@ -411,9 +371,7 @@ public class Logic implements ApplicationListener{
     public static void gameOver(Team winner){
         state.stats.wavesLasted = state.wave;
         state.won = player.team() == winner;
-        Time.run(60f * 3f, () -> {
-            ui.restart.show(winner);
-        });
+        Time.run(60f * 3f, () -> ui.restart.show(winner));
         netClient.setQuiet();
     }
 
@@ -422,6 +380,7 @@ public class Logic implements ApplicationListener{
     public static void researched(Content content){
         if(!(content instanceof UnlockableContent u)) return;
 
+        //TODO node is wrong for shared tech nodes
         var node = u.techNode;
 
         //unlock all direct dependencies on client, permanently
@@ -431,37 +390,6 @@ public class Logic implements ApplicationListener{
         }
 
         state.rules.researched.add(u.name);
-    }
-
-    //called when the remote server runs a turn and produces something
-    @Remote
-    public static void sectorProduced(int[] amounts){
-        if(!state.isCampaign()) return;
-        Planet planet = state.rules.sector.planet;
-        boolean any = false;
-
-        for(Item item : content.items()){
-            int am = amounts[item.id];
-            if(am > 0){
-                int sumMissing = planet.sectors.sum(s -> s.hasBase() ? s.info.storageCapacity - s.info.items.get(item) : 0);
-                if(sumMissing == 0) continue;
-                //how much % to add
-                double percent = Math.min((double)am / sumMissing, 1);
-                for(Sector sec : planet.sectors){
-                    if(sec.hasBase()){
-                        int added = (int)Math.ceil(((sec.info.storageCapacity - sec.info.items.get(item)) * percent));
-                        sec.info.items.add(item, added);
-                        any = true;
-                    }
-                }
-            }
-        }
-
-        if(any){
-            for(Sector sec : planet.sectors){
-                sec.saveInfo();
-            }
-        }
     }
 
     @Override
@@ -520,7 +448,10 @@ public class Logic implements ApplicationListener{
 
                 //TODO objectives clientside???
                 if(!state.isEditor()){
-                    updateObjectives();
+                    state.rules.objectives.update();
+                    if(state.rules.objectives.checkChanged() && net.server()){
+                        Call.setObjectives(state.rules.objectives);
+                    }
                 }
 
                 if(state.rules.waves && state.rules.waveTimer && !state.gameOver){

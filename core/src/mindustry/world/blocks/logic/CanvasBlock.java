@@ -1,5 +1,6 @@
 package mindustry.world.blocks.logic;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.input.*;
@@ -21,7 +22,7 @@ import static mindustry.Vars.*;
 public class CanvasBlock extends Block{
     public float padding = 0f;
     public int canvasSize = 8;
-    public int[] palette = {0x634b7dff, 0xc45d9f_ff, 0xe39aac_ff, 0xf0dab1_ff, 0x6461c2_ff, 0x2ba9b4_ff, 0x93d4b5_ff, 0xf0f6e8_ff};
+    public int[] palette = {0x362944_ff, 0xc45d9f_ff, 0xe39aac_ff, 0xf0dab1_ff, 0x6461c2_ff, 0x2ba9b4_ff, 0x93d4b5_ff, 0xf0f6e8_ff};
     public int bitsPerPixel;
     public IntIntMap colorToIndex = new IntIntMap();
 
@@ -56,6 +57,8 @@ public class CanvasBlock extends Block{
         public byte[] data = new byte[Mathf.ceil(canvasSize * canvasSize * bitsPerPixel / 8f)];
 
         public void updateTexture(){
+            if(headless) return;
+
             Pixmap pix = makePixmap();
             if(texture != null){
                 texture.draw(pix);
@@ -140,6 +143,10 @@ public class CanvasBlock extends Block{
                 int[] curColor = {palette[0]};
                 boolean[] modified = {false};
 
+                dialog.resized(() -> {
+                    dialog.hide();
+                });
+
                 dialog.cont.table(Tex.pane, body -> {
                     body.stack(new Element(){
                         int lastX, lastY;
@@ -189,7 +196,7 @@ public class CanvasBlock extends Block{
                         }
                     }, new GridImage(canvasSize, canvasSize){{
                         touchable = Touchable.disabled;
-                    }}).size(500f);
+                    }}).size(mobile && !Core.graphics.isPortrait() ? Math.min(290f, Core.graphics.getHeight() / Scl.scl(1f) - 75f / Scl.scl(1f)) : 480f);
                 });
 
                 dialog.cont.row();
@@ -220,6 +227,16 @@ public class CanvasBlock extends Block{
 
                 dialog.show();
             }).size(40f);
+        }
+
+        @Override
+        public boolean onConfigureBuildTapped(Building other){
+            if(this == other){
+                deselect();
+                return false;
+            }
+
+            return true;
         }
 
         @Override

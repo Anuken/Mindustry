@@ -45,13 +45,16 @@ public class StatusEffects{
 
                 affinity(blasted, (unit, result, time) -> {
                     unit.damagePierce(transitionDamage);
+                    if(unit.team == state.rules.waveTeam){
+                        Events.fire(Trigger.blastFreeze);
+                    }
                 });
             });
         }};
 
         unmoving = new StatusEffect("unmoving"){{
             color = Pal.gray;
-            speedMultiplier = 0.001f;
+            speedMultiplier = 0f;
         }};
 
         slow = new StatusEffect("slow"){{

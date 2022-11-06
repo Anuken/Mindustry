@@ -32,7 +32,7 @@ import java.util.zip.*;
 import static mindustry.Vars.*;
 
 public class NetClient implements ApplicationListener{
-    private static final float dataTimeout = 60 * 20;
+    private static final float dataTimeout = 60 * 30;
     /** ticks between syncs, e.g. 5 means 60/5 = 12 syncs/sec*/
     private static final float playerSyncTime = 4;
     private static final Reads dataReads = new Reads(null);
@@ -198,6 +198,7 @@ public class NetClient implements ApplicationListener{
     public static void sendMessage(String message, @Nullable String unformatted, @Nullable Player playersender){
         if(Vars.ui != null){
             Vars.ui.chatfrag.addMessage(message);
+            Sounds.chatMessage.play();
         }
 
         //display raw unformatted text above player head
@@ -212,6 +213,7 @@ public class NetClient implements ApplicationListener{
     public static void sendMessage(String message){
         if(Vars.ui != null){
             Vars.ui.chatfrag.addMessage(message);
+            Sounds.chatMessage.play();
         }
     }
 
@@ -221,6 +223,13 @@ public class NetClient implements ApplicationListener{
 
         //do not receive chat messages from clients that are too young or not registered
         if(net.server() && player != null && player.con != null && (Time.timeSinceMillis(player.con.connectTime) < 500 || !player.con.hasConnected || !player.isAdded())) return;
+
+        //detect and kick for foul play
+        if(player != null && player.con != null && !player.con.chatRate.allow(2000, 20)){
+            player.con.kick(KickReason.kick);
+            netServer.admins.blacklistDos(player.con.address);
+            return;
+        }
 
         if(message.length() > maxTextLength){
             throw new ValidateException(player, "Player has sent a message above the text limit.");
@@ -325,6 +334,21 @@ public class NetClient implements ApplicationListener{
     @Remote(variants = Variant.both)
     public static void setRules(Rules rules){
         state.rules = rules;
+    }
+
+    @Remote(variants = Variant.both)
+    public static void setObjectives(MapObjectives executor){
+        //clear old markers
+        for(var objective : state.rules.objectives){
+            for(var marker : objective.markers){
+                if(marker.wasAdded){
+                    marker.removed();
+                    marker.wasAdded = false;
+                }
+            }
+        }
+
+        state.rules.objectives = executor;
     }
 
     @Remote(variants = Variant.both)
@@ -464,7 +488,9 @@ public class NetClient implements ApplicationListener{
             state.wavetime = waveTime;
             state.wave = wave;
             state.enemies = enemies;
-            state.serverPaused = paused;
+            if(!state.isMenu()){
+                state.set(paused ? State.paused : State.playing);
+            }
             state.serverTps = tps & 0xff;
 
             //note that this is far from a guarantee that random state is synced - tiny changes in delta and ping can throw everything off again.

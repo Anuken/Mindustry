@@ -57,7 +57,7 @@ public class LoadoutDialog extends BaseDialog{
         }).size(210f, 64f);
     }
 
-    public void maxItems() {
+    public void maxItems(){
         for(ItemStack stack : stacks){
             stack.amount = total == null ? capacity : Math.max(Math.min(capacity, total.get(stack.item)), 0);
         }
@@ -124,7 +124,7 @@ public class LoadoutDialog extends BaseDialog{
 
     private void reseed(){
         this.stacks = originalStacks.map(ItemStack::copy);
-        this.stacks.addAll(content.items().select(i -> validator.get(i) && !stacks.contains(stack -> stack.item == i)).map(i -> new ItemStack(i, 0)));
+        this.stacks.addAll(content.items().select(i -> validator.get(i) && !i.isHidden() && !stacks.contains(stack -> stack.item == i)).map(i -> new ItemStack(i, 0)));
         this.stacks.sort(Structs.comparingInt(s -> s.item.id));
     }
 

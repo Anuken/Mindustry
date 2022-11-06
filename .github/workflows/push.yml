@@ -2,8 +2,12 @@ name: Tests
 
 on: [push, workflow_dispatch]
 
+permissions: {}
 jobs:
   runPush:
+    permissions:
+      contents: write # for Update bundles
+
     runs-on: ubuntu-latest
 
     steps:
@@ -34,6 +38,7 @@ jobs:
           git push
         fi
     - name: Update JITpack repo
+      if: ${{ github.repository == 'Anuken/Mindustry' }}
       run: |
         cd ../
         cp -r ./Mindustry ./MindustryJitpack

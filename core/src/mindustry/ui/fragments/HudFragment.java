@@ -99,7 +99,7 @@ public class HudFragment{
         //"waiting for players"
         parent.fill(t -> {
             t.name = "waiting";
-            t.visible(() -> netServer.isWaitingForPlayers()).touchable = Touchable.disabled;
+            t.visible(() -> netServer.isWaitingForPlayers() && state.isPaused() && shown).touchable = Touchable.disabled;
             t.table(Styles.black6, top -> top.add("@waiting.players").style(Styles.outlineLabel).pad(18f));
         });
 
@@ -147,14 +147,14 @@ public class HudFragment{
                         if(net.active()){
                             ui.listfrag.toggle();
                         }else{
-                            state.set(state.is(State.paused) ? State.playing : State.paused);
+                            state.set(state.isPaused() ? State.playing : State.paused);
                         }
                     }).name("pause").update(i -> {
                         if(net.active()){
                             i.getStyle().imageUp = Icon.players;
                         }else{
                             i.setDisabled(false);
-                            i.getStyle().imageUp = state.is(State.paused) ? Icon.play : Icon.pause;
+                            i.getStyle().imageUp = state.isPaused() ? Icon.play : Icon.pause;
                         }
                     });
 
@@ -775,13 +775,21 @@ public class HudFragment{
             builder.setLength(0);
 
             //objectives override mission?
-            if(state.rules.objectives.size > 0){
-                var first = state.rules.objectives.first();
-                String text = first.text();
-                if(text != null){
-                    builder.append(text);
-                    return builder;
+            if(state.rules.objectives.any()){
+                boolean first = true;
+                for(var obj : state.rules.objectives){
+                    if(!obj.qualified()) continue;
+
+                    String text = obj.text();
+                    if(text != null){
+                        if(!first) builder.append("\n[white]");
+                        builder.append(text);
+
+                        first = false;
+                    }
                 }
+
+                return builder;
             }
 
             //mission overrides everything
@@ -831,16 +839,29 @@ public class HudFragment{
 
         table.row();
 
+        //TODO nobody reads details anyway.
+        /*
         table.clicked(() -> {
-            if(state.rules.objectives.size > 0){
-                var first = state.rules.objectives.first();
-                var details = first.details();
-                if(details != null){
-                    //TODO this could be much better.
-                    ui.showInfo(details);
+            if(state.rules.objectives.any()){
+                StringBuilder text = new StringBuilder();
+
+                boolean first = true;
+                for(var obj : state.rules.objectives){
+                    if(!obj.qualified()) continue;
+
+                    String details = obj.details();
+                    if(details != null){
+                        if(!first) text.append('\n');
+                        text.append(details);
+
+                        first = false;
+                    }
                 }
+
+                //TODO this, as said before, could be much better.
+                ui.showInfo(text.toString());
             }
-        });
+        });*/
 
         return table;
     }
@@ -887,7 +908,7 @@ public class HudFragment{
     }
 
     private boolean canSkipWave(){
-        return state.rules.waves && ((net.server() || player.admin) || !net.active()) && state.enemies == 0 && !spawner.isSpawning();
+        return state.rules.waves && state.rules.waveSending && ((net.server() || player.admin) || !net.active()) && state.enemies == 0 && !spawner.isSpawning();
     }
 
 }
