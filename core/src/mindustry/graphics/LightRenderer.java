@@ -42,6 +42,10 @@ public class LightRenderer{
 
         circleIndex ++;
     }
+    
+    public void add(float x, float y, TextureRegion region, Color color, float opacity){
+        add(x, y, region, 0f, color, opacity);
+    }
 
     public void add(float x, float y, TextureRegion region, float rotation, Color color, float opacity){
         if(!enabled()) return;
