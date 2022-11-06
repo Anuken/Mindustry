@@ -1,5 +1,7 @@
 package mindustry.service;
 
+import arc.util.*;
+
 import static mindustry.Vars.*;
 
 public enum Achievement{
@@ -51,14 +53,62 @@ public enum Achievement{
     circleConveyor,
     becomeRouter,
     create20Schematics(SStat.schematicsCreated, 20),
+    create500Schematics(SStat.schematicsCreated, 500),
     survive10WavesNoBlocks,
     captureNoBlocksBroken,
     useFlameAmmo,
     coolTurret,
     enablePixelation,
     openWiki,
-    useAccelerator,
-    unlockAllZones,
+    allTransportOneMap,
+    buildOverdriveProjector,
+    buildMendProjector,
+    buildWexWater,
+
+    have10mItems(SStat.totalCampaignItems, 10_000_000),
+    killEclipseDuo,
+
+    completeErekir,
+    completeSerpulo,
+
+    launchCoreSchematic,
+    nucleusGroundZero,
+
+    neoplasmWater,
+    blastFrozenUnit,
+
+    allBlocksSerpulo,
+    allBlocksErekir,
+
+    breakForceProjector,
+    researchLogic,
+
+    negative10kPower,
+    positive100kPower,
+    store1milPower,
+
+    blastGenerator,
+    neoplasiaExplosion,
+
+    installMod,
+    routerLanguage,
+    joinCommunityServer,
+    openConsole,
+
+    controlTurret,
+    dropUnitsCoreZone,
+    destroyScatterFlare,
+    boostUnit,
+    boostBuildingFloor,
+
+    hoverUnitLiquid,
+
+    break100Boulders(SStat.bouldersDeconstructed, 100),
+    break10000Boulders(SStat.bouldersDeconstructed, 10_000),
+
+    shockwaveTowerUse,
+
+    useAnimdustryEmoji,
 
     ;
 
@@ -80,8 +130,19 @@ public enum Achievement{
 
     public void complete(){
         if(!isAchieved()){
+            //can't complete achievements with the dev console shown.
+            if(ui != null && ui.consolefrag != null && ui.consolefrag.shown() && !OS.username.equals("anuke") && this != openConsole) return;
+
             service.completeAchievement(name());
             service.storeStats();
+            completed = true;
+        }
+    }
+
+    public void uncomplete(){
+        if(isAchieved()){
+            service.clearAchievement(name());
+            completed = false;
         }
     }
 

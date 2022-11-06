@@ -17,6 +17,7 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 //TODO visuals!
+/** Do not use this class! */
 public class PayloadAmmoTurret extends Turret{
     public ObjectMap<UnlockableContent, BulletType> ammoTypes = new ObjectMap<>();
 

@@ -47,5 +47,6 @@ public class WeaponMount{
 
     public WeaponMount(Weapon weapon){
         this.weapon = weapon;
+        this.rotation = weapon.baseRotation;
     }
 }

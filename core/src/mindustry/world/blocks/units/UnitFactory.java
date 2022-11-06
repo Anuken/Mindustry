@@ -25,6 +25,8 @@ import mindustry.world.blocks.payloads.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
+import static mindustry.Vars.*;
+
 public class UnitFactory extends UnitBlock{
     public int[] capacities = {};
 
@@ -74,6 +76,8 @@ public class UnitFactory extends UnitBlock{
             }
         }
 
+        consumeBuilder.each(c -> c.multiplier = b -> state.rules.unitCost(b.team));
+
         super.init();
     }
 
@@ -118,7 +122,7 @@ public class UnitFactory extends UnitBlock{
                     }
 
                     if(plan.unit.unlockedNow()){
-                        t.image(plan.unit.uiIcon).size(40).pad(10f).left();
+                        t.image(plan.unit.uiIcon).size(40).pad(10f).left().scaling(Scaling.fit);
                         t.table(info -> {
                             info.add(plan.unit.localizedName).left();
                             info.row();

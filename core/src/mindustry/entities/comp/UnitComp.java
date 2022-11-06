@@ -63,6 +63,12 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     }
 
+    public void updateBoosting(boolean boost){
+        if(!type.canBoost) return;
+
+        elevation = Mathf.approachDelta(elevation, type.canBoost ? Mathf.num(boost || onSolid() || (isFlying() && !canLand())) : 0f, type.riseSpeed);
+    }
+
     /** Move based on preferred unit movement type. */
     public void movePref(Vec2 movement){
         if(type.omniMovement){
@@ -97,6 +103,11 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         aim(x, y);
         lookAt(x, y);
     }
+
+    public boolean isPathImpassable(int tileX, int tileY){
+        return !type.flying && type.pathCost.getCost(team.id, pathfinder.get(tileX, tileY)) == -1;
+    }
+
 
     /** @return approx. square size of the physical hitbox for physics */
     public float physicSize(){
@@ -133,6 +144,11 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             return vel().angle();
         }
         return rotation;
+    }
+
+    @Override
+    public boolean displayable(){
+        return type.hoverable;
     }
 
     @Override
@@ -671,5 +687,11 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
         //deaths are synced; this calls killed()
         Call.unitDeath(id);
+    }
+
+    @Override
+    @Replace
+    public String toString(){
+        return "Unit#" + id() + ":" + type;
     }
 }

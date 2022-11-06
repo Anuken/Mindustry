@@ -29,6 +29,10 @@ task run(dependsOn: classes, type: JavaExec){
         jvmArgs((List<String>)Eval.me(project.getProperties()["jvmArgs"]))
     }
 
+    if(project.hasProperty("dataDir")){
+        environment("MINDUSTRY_DATA_DIR", project.getProperties()["dataDir"])
+    }
+
     if(args.contains("debug")){
         mainClass = "mindustry.debug.DebugLauncher"
     }

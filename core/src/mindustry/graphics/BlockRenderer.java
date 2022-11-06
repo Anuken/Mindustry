@@ -262,7 +262,7 @@ public class BlockRenderer{
     public void drawDestroyed(){
         if(!Core.settings.getBool("destroyedblocks")) return;
 
-        if(control.input.isPlacing() || control.input.isBreaking()){
+        if(control.input.isPlacing() || control.input.isBreaking() || control.input.isRebuildSelecting()){
             brokenFade = Mathf.lerpDelta(brokenFade, 1f, 0.1f);
         }else{
             brokenFade = Mathf.lerpDelta(brokenFade, 0f, 0.1f);
@@ -289,6 +289,7 @@ public class BlockRenderer{
             Draw.proj().setOrtho(0, 0, shadows.getWidth(), shadows.getHeight());
 
             for(Tile tile : shadowEvents){
+                if(tile == null) continue;
                 //draw white/shadow color depending on blend
                 Draw.color((!tile.block().hasShadow || (state.rules.fog && tile.build != null && !tile.build.wasVisible)) ? Color.white : blendShadowColor);
                 Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
@@ -424,12 +425,12 @@ public class BlockRenderer{
 
                 if(build != null){
                     if(visible){
+                        build.visibleFlags |= (1L << pteam.id);
                         if(!build.wasVisible){
+                            build.wasVisible = true;
                             updateShadow(build);
                             renderer.minimap.update(tile);
                         }
-                        build.visibleFlags |= (1L << pteam.id);
-                        build.wasVisible = true;
                     }
 
                     if(build.damaged()){
@@ -485,7 +486,8 @@ public class BlockRenderer{
         }
     }
 
-    void updateShadow(Building build){
+    public void updateShadow(Building build){
+        if(build.tile == null) return;
         int size = build.block.size, of = build.block.sizeOffset, tx = build.tile.x, ty = build.tile.y;
 
         for(int x = 0; x < size; x++){

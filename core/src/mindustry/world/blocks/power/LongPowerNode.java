@@ -22,8 +22,8 @@ public class LongPowerNode extends PowerNode{
     public void load(){
         super.load();
 
-        laser = Core.atlas.find("power-beam");
-        laserEnd = Core.atlas.find("power-beam-end");
+        laser = Core.atlas.find(name + "-beam", Core.atlas.find("power-beam"));
+        laserEnd = Core.atlas.find(name + "-beam-end", Core.atlas.find("power-beam-end"));
     }
 
     public class LongPowerNodeBuild extends PowerNodeBuild{

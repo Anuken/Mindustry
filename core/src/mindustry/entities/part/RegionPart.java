@@ -25,6 +25,8 @@ public class RegionPart extends DrawPart{
     public boolean outline = true;
     /** If true, the base + outline regions are drawn. Set to false for heat-only regions. */
     public boolean drawRegion = true;
+    /** If true, the heat region produces light. */
+    public boolean heatLight = false;
     /** Progress function for determining position/rotation. */
     public PartProgress progress = PartProgress.warmup;
     /** Progress function for heat alpha. */
@@ -34,6 +36,7 @@ public class RegionPart extends DrawPart{
     public float outlineLayerOffset = -0.001f;
     public float x, y, rotation;
     public float moveX, moveY, moveRot;
+    public float heatLightOpacity = 0.3f;
     public @Nullable Color color, colorTo, mixColor, mixColorTo;
     public Color heatColor = Pal.turretHeat.cpy();
     public Seq<DrawPart> children = new Seq<>();
@@ -119,7 +122,10 @@ public class RegionPart extends DrawPart{
             }
 
             if(heat.found()){
-                Drawf.additive(heat, heatColor.write(Tmp.c1).a(heatProgress.getClamp(params) * heatColor.a), rx, ry, rot, turretShading ? turretHeatLayer : Draw.z() + heatLayerOffset);
+                float hprog = heatProgress.getClamp(params);
+                heatColor.write(Tmp.c1).a(hprog * heatColor.a);
+                Drawf.additive(heat, Tmp.c1, rx, ry, rot, turretShading ? turretHeatLayer : Draw.z() + heatLayerOffset);
+                if(heatLight) Drawf.light(rx, ry, heat, rot, Tmp.c1, heatLightOpacity * hprog);
             }
 
             Draw.xscl *= sign;

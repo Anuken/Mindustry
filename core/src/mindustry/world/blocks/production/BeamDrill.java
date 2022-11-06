@@ -5,6 +5,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
@@ -64,6 +65,7 @@ public class BeamDrill extends Block{
         ambientSound = Sounds.minebeam;
 
         envEnabled |= Env.space;
+        flags = EnumSet.of(BlockFlag.drill);
     }
 
     @Override
@@ -298,7 +300,7 @@ public class BeamDrill extends Block{
                     Point2 p = lasers[i];
                     float lx = face.worldx() - (dir.x/2f)*tilesize, ly = face.worldy() - (dir.y/2f)*tilesize;
 
-                    float width = (laserWidth + Mathf.absin(Time.time + i*5 + id*9, glowScl, pulseIntensity)) * warmup;
+                    float width = (laserWidth + Mathf.absin(Time.time + i*5 + (id % 9)*9, glowScl, pulseIntensity)) * warmup;
 
                     Draw.z(Layer.power - 1);
                     Draw.mixcol(glowColor, Mathf.absin(Time.time + i*5 + id*9, glowScl, glowIntensity));

@@ -141,7 +141,7 @@ public class MinimapRenderer{
                     float rx = player.x / (world.width() * tilesize) * w;
                     float ry = player.y / (world.height() * tilesize) * h;
 
-                    drawLabel(x + rx, y + ry, player.name, player.team().color);
+                    drawLabel(x + rx, y + ry, player.name, player.color);
                 }
             }
         }
@@ -224,7 +224,7 @@ public class MinimapRenderer{
         if(!worldSpace){
             position.sub(rect.x, rect.y).scl(lastW / rect.width, lastH / rect.height);
         }else{
-            position.scl(1f / world.unitWidth(), 1f / world.unitHeight()).scl(lastW, lastH);
+            position.scl(lastW / world.unitWidth(), lastH / world.unitHeight());
         }
 
         return position.add(lastX, lastY);
