@@ -9,6 +9,8 @@ import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
 
+import static mindustry.Vars.*;
+
 public class Router extends Block{
     public float speed = 8f;
 
