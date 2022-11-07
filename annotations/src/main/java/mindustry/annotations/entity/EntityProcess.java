@@ -381,12 +381,14 @@ public class EntityProcess extends BaseProcessor{
 
                 syncedFields.sortComparing(Selement::name);
 
-                //override toString method
-                builder.addMethod(MethodSpec.methodBuilder("toString")
+                if(!methods.containsKey("toString()")){
+                    //override toString method
+                    builder.addMethod(MethodSpec.methodBuilder("toString")
                     .addAnnotation(Override.class)
                     .returns(String.class)
                     .addModifiers(Modifier.PUBLIC)
                     .addStatement("return $S + $L", name + "#", "id").build());
+                }
 
                 EntityIO io = new EntityIO(type.name(), builder, allFieldSpecs, serializer, rootDirectory.child("annotations/src/main/resources/revisions").child(type.name()));
                 //entities with no sync comp and no serialization gen no code

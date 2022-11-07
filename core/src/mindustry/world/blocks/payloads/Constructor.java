@@ -45,7 +45,7 @@ public class Constructor extends BlockProducer{
     }
 
     public boolean canProduce(Block b){
-        return b.isVisible() && b.size >= minBlockSize && b.size <= maxBlockSize && !(b instanceof CoreBlock) && !state.rules.bannedBlocks.contains(b) && b.environmentBuildable() && (filter.isEmpty() || filter.contains(b));
+        return b.isVisible() && b.size >= minBlockSize && b.size <= maxBlockSize && !(b instanceof CoreBlock) && !state.rules.isBanned(b) && b.environmentBuildable() && (filter.isEmpty() || filter.contains(b));
     }
     
     public class ConstructorBuild extends BlockProducerBuild{
@@ -58,7 +58,7 @@ public class Constructor extends BlockProducer{
 
         @Override
         public void buildConfiguration(Table table){
-            ItemSelection.buildTable(Constructor.this, table, filter.isEmpty() ? content.blocks().select(Constructor.this::canProduce) : filter, () -> recipe, this::configure);
+            ItemSelection.buildTable(Constructor.this, table, filter.isEmpty() ? content.blocks().select(Constructor.this::canProduce) : filter, () -> recipe, this::configure, selectionRows, selectionColumns);
         }
 
         @Override

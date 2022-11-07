@@ -25,6 +25,8 @@ import mindustry.world.blocks.payloads.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
+import static mindustry.Vars.*;
+
 public class UnitFactory extends UnitBlock{
     public int[] capacities = {};
 
@@ -42,6 +44,7 @@ public class UnitFactory extends UnitBlock{
         rotate = true;
         regionRotated1 = 1;
         commandable = true;
+        ambientSound = Sounds.respawning;
 
         config(Integer.class, (UnitFactoryBuild tile, Integer i) -> {
             if(!configurable) return;
@@ -72,6 +75,8 @@ public class UnitFactory extends UnitBlock{
                 itemCapacity = Math.max(itemCapacity, stack.amount * 2);
             }
         }
+
+        consumeBuilder.each(c -> c.multiplier = b -> state.rules.unitCost(b.team));
 
         super.init();
     }
@@ -117,7 +122,7 @@ public class UnitFactory extends UnitBlock{
                     }
 
                     if(plan.unit.unlockedNow()){
-                        t.image(plan.unit.uiIcon).size(40).pad(10f).left();
+                        t.image(plan.unit.uiIcon).size(40).pad(10f).left().scaling(Scaling.fit);
                         t.table(info -> {
                             info.add(plan.unit.localizedName).left();
                             info.row();
@@ -195,6 +200,11 @@ public class UnitFactory extends UnitBlock{
         }
 
         @Override
+        public boolean shouldActiveSound(){
+            return shouldConsume();
+        }
+
+        @Override
         public double sense(LAccess sensor){
             if(sensor == LAccess.progress) return Mathf.clamp(fraction());
             return super.sense(sensor);
@@ -205,7 +215,7 @@ public class UnitFactory extends UnitBlock{
             Seq<UnitType> units = Seq.with(plans).map(u -> u.unit).filter(u -> u.unlockedNow() && !u.isBanned());
 
             if(units.any()){
-                ItemSelection.buildTable(UnitFactory.this, table, units, () -> currentPlan == -1 ? null : plans.get(currentPlan).unit, unit -> configure(plans.indexOf(u -> u.unit == unit)));
+                ItemSelection.buildTable(UnitFactory.this, table, units, () -> currentPlan == -1 ? null : plans.get(currentPlan).unit, unit -> configure(plans.indexOf(u -> u.unit == unit)), selectionRows, selectionColumns);
             }else{
                 table.table(Styles.black3, t -> t.add("@none").color(Color.lightGray));
             }

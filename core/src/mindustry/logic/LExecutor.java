@@ -510,12 +510,21 @@ public class LExecutor{
                         if(!unit.within(x1, y1, range)){
                             exec.setobj(p3, null);
                             exec.setobj(p4, null);
+                            exec.setobj(p5, null);
                         }else{
                             Tile tile = world.tileWorld(x1, y1);
-                            //any environmental solid block is returned as StoneWall, aka "@solid"
-                            Block block = tile == null ? null : !tile.synthetic() ? (tile.solid() ? Blocks.stoneWall : Blocks.air) : tile.block();
-                            exec.setobj(p3, block);
-                            exec.setobj(p4, tile != null && tile.build != null ? tile.build : null);
+                            if(tile == null){
+                                exec.setobj(p3, null);
+                                exec.setobj(p4, null);
+                                exec.setobj(p5, null);
+                            }else{
+                                //any environmental solid block is returned as StoneWall, aka "@solid"
+                                Block block = !tile.synthetic() ? (tile.solid() ? Blocks.stoneWall : Blocks.air) : tile.block();
+                                exec.setobj(p3, block);
+                                exec.setobj(p4, tile.build != null ? tile.build : null);
+                                //Allows reading of ore tiles if they are present (overlay is not air) otherwise returns the floor
+                                exec.setobj(p5, tile.overlay() == Blocks.air ? tile.floor() : tile.overlay());
+                            }
                         }
                     }
                     case itemDrop -> {
@@ -588,6 +597,10 @@ public class LExecutor{
                     b.lastDisabler = exec.build;
                 }
 
+                if(type == LAccess.enabled && exec.bool(p1)){
+                    b.noSleep();
+                }
+
                 if(type.isObj && exec.var(p1).isobj){
                     b.control(type, exec.obj(p1), exec.num(p2), exec.num(p3), exec.num(p4));
                 }else{
@@ -657,12 +670,8 @@ public class LExecutor{
             int address = exec.numi(position);
             Building from = exec.building(target);
 
-            if(from instanceof MemoryBuild mem && (exec.privileged || from.team == exec.team)){
-
-                if(address >= 0 && address < mem.memory.length){
-                    mem.memory[address] = exec.num(value);
-                }
-
+            if(from instanceof MemoryBuild mem && (exec.privileged || from.team == exec.team) && address >= 0 && address < mem.memory.length){
+                mem.memory[address] = exec.num(value);
             }
         }
     }
@@ -860,7 +869,7 @@ public class LExecutor{
         public void run(LExecutor exec){
             if(op == LogicOp.strictEqual){
                 Var v = exec.var(a), v2 = exec.var(b);
-                exec.setnum(dest, v.isobj == v2.isobj && ((v.isobj && v.objval == v2.objval) || (!v.isobj && v.numval == v2.numval)) ? 1 : 0);
+                exec.setnum(dest, v.isobj == v2.isobj && ((v.isobj && Structs.eq(v.objval, v2.objval)) || (!v.isobj && v.numval == v2.numval)) ? 1 : 0);
             }else if(op.unary){
                 exec.setnum(dest, op.function1.get(exec.num(a)));
             }else{
@@ -1084,7 +1093,6 @@ public class LExecutor{
         public int value;
 
         public float curTime;
-        public double wait;
         public long frameId;
 
         public WaitI(int value){
@@ -1107,6 +1115,15 @@ public class LExecutor{
                 curTime += Time.delta / 60f;
                 frameId = state.updateId;
             }
+        }
+    }
+
+    public static class StopI implements LInstruction{
+
+        @Override
+        public void run(LExecutor exec){
+            //skip back to self.
+            exec.var(varCounter).numval --;
         }
     }
 
@@ -1298,7 +1315,7 @@ public class LExecutor{
                 //TODO this can be quite laggy...
                 switch(layer){
                     case ore -> {
-                        if(b instanceof OverlayFloor o && tile.overlay() != o) tile.setOverlayNet(o);
+                        if((b instanceof OverlayFloor || b == Blocks.air) && tile.overlay() != b) tile.setOverlayNet(b);
                     }
                     case floor -> {
                         if(b instanceof Floor f && tile.floor() != f && !f.isOverlay()) tile.setFloorNet(f);
@@ -1401,6 +1418,7 @@ public class LExecutor{
                 case wave -> state.wave = exec.numi(value);
                 case currentWaveTime -> state.wavetime = exec.numf(value) * 60f;
                 case waves -> state.rules.waves = exec.bool(value);
+                case waveSending -> state.rules.waveSending = exec.bool(value);
                 case attackMode -> state.rules.attackMode = exec.bool(value);
                 case waveSpacing -> state.rules.waveSpacing = exec.numf(value) * 60f;
                 case enemyCoreBuildRadius -> state.rules.enemyCoreBuildRadius = exec.numf(value) * 8f;
@@ -1415,13 +1433,14 @@ public class LExecutor{
                 }
                 case ambientLight -> state.rules.ambientLight.fromDouble(exec.num(value));
                 case solarMultiplier -> state.rules.solarMultiplier = exec.numf(value);
-                case unitBuildSpeed, unitDamage, blockHealth, blockDamage, buildSpeed, rtsMinSquad, rtsMinWeight -> {
+                case unitBuildSpeed, unitCost, unitDamage, blockHealth, blockDamage, buildSpeed, rtsMinSquad, rtsMinWeight -> {
                     Team team = exec.team(p1);
                     if(team != null){
                         float num = exec.numf(value);
                         switch(rule){
                             case buildSpeed -> team.rules().buildSpeedMultiplier = Mathf.clamp(num, 0.001f, 50f);
                             case unitBuildSpeed -> team.rules().unitBuildSpeedMultiplier = Mathf.clamp(num, 0f, 50f);
+                            case unitCost -> team.rules().unitCostMultiplier = Math.max(num, 0f);
                             case unitDamage -> team.rules().unitDamageMultiplier = Math.max(num, 0f);
                             case blockHealth -> team.rules().blockHealthMultiplier = Math.max(num, 0.001f);
                             case blockDamage -> team.rules().blockDamageMultiplier = Math.max(num, 0f);
@@ -1633,12 +1652,14 @@ public class LExecutor{
     }
 
     public static class SpawnWaveI implements LInstruction{
+        public int natural;
         public int x, y;
 
         public SpawnWaveI(){
         }
 
-        public SpawnWaveI(int x, int y){
+        public SpawnWaveI(int natural, int x, int y){
+            this.natural = natural;
             this.x = x;
             this.y = y;
         }
@@ -1647,9 +1668,14 @@ public class LExecutor{
         public void run(LExecutor exec){
             if(net.client()) return;
 
+            if(exec.bool(natural)){
+                logic.skipWave();
+                return;
+            }
+
             float
-            spawnX = World.unconv(exec.numf(x)),
-            spawnY = World.unconv(exec.numf(y));
+                spawnX = World.unconv(exec.numf(x)),
+                spawnY = World.unconv(exec.numf(y));
             int packed = Point2.pack(exec.numi(x), exec.numi(y));
 
             for(SpawnGroup group : state.rules.spawns){

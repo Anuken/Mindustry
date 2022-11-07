@@ -50,6 +50,8 @@ public class Drill extends Block{
     public Effect drillEffect = Fx.mine;
     /** Drill effect randomness. Block size by default. */
     public float drillEffectRnd = -1f;
+    /** Chance of displaying the effect. Useful for extremely fast drills. */
+    public float drillEffectChance = 1f;
     /** Speed the drill bit rotates at. */
     public float rotateSpeed = 2f;
     /** Effect randomly played while drilling. */
@@ -77,6 +79,7 @@ public class Drill extends Block{
         ambientSoundVolume = 0.018f;
         //drills work in space I guess
         envEnabled |= Env.space;
+        flags = EnumSet.of(BlockFlag.drill);
     }
 
     @Override
@@ -267,13 +270,19 @@ public class Drill extends Block{
         }
 
         @Override
+        public Object senseObject(LAccess sensor){
+            if(sensor == LAccess.firstItem) return dominantItem;
+            return super.senseObject(sensor);
+        }
+
+        @Override
         public void updateTile(){
-            if(dominantItem == null){
-                return;
+            if(timer(timerDump, dumpTime)){
+                dump(dominantItem != null && items.has(dominantItem) ? dominantItem : null);
             }
 
-            if(timer(timerDump, dumpTime)){
-                dump(items.has(dominantItem) ? dominantItem : null);
+            if(dominantItem == null){
+                return;
             }
 
             timeDrilled += warmup * delta();
@@ -300,7 +309,7 @@ public class Drill extends Block{
 
                 progress %= delay;
 
-                if(wasVisible) drillEffect.at(x + Mathf.range(drillEffectRnd), y + Mathf.range(drillEffectRnd), dominantItem.color);
+                if(wasVisible && Mathf.chanceDelta(updateEffectChance * warmup)) drillEffect.at(x + Mathf.range(drillEffectRnd), y + Mathf.range(drillEffectRnd), dominantItem.color);
             }
         }
 

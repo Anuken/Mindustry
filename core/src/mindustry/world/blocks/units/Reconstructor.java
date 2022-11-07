@@ -34,6 +34,7 @@ public class Reconstructor extends UnitBlock{
         regionRotated1 = 1;
         regionRotated2 = 2;
         commandable = true;
+        ambientSound = Sounds.respawning;
     }
 
     @Override
@@ -80,7 +81,7 @@ public class Reconstructor extends UnitBlock{
                     table.table(Styles.grayPanel, t -> {
                         t.left();
 
-                        t.image(upgrade[0].uiIcon).size(40).pad(10f).left();
+                        t.image(upgrade[0].uiIcon).size(40).pad(10f).left().scaling(Scaling.fit);
                         t.table(info -> {
                             info.add(upgrade[0].localizedName).left();
                             info.row();
@@ -95,7 +96,7 @@ public class Reconstructor extends UnitBlock{
                     table.table(Styles.grayPanel, t -> {
                         t.left();
 
-                        t.image(upgrade[1].uiIcon).size(40).pad(10f).right();
+                        t.image(upgrade[1].uiIcon).size(40).pad(10f).right().scaling(Scaling.fit);
                         t.table(info -> {
                             info.add(upgrade[1].localizedName).right();
                             info.row();
@@ -120,6 +121,8 @@ public class Reconstructor extends UnitBlock{
             }
         }
 
+        consumeBuilder.each(c -> c.multiplier = b -> state.rules.unitCost(b.team));
+
         super.init();
     }
 
@@ -132,6 +135,11 @@ public class Reconstructor extends UnitBlock{
 
         public float fraction(){
             return progress / constructTime;
+        }
+
+        @Override
+        public boolean shouldActiveSound(){
+            return shouldConsume();
         }
 
         @Override

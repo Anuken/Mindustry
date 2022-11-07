@@ -5,8 +5,12 @@ on:
     tags:
       - 'v*'
 
+permissions: {}
 jobs:
   deploy:
+    permissions:
+      contents: write # for release creation (svenstaro/upload-release-action)
+
     runs-on: ubuntu-latest
 
     steps:

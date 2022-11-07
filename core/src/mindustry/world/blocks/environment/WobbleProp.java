@@ -18,7 +18,7 @@ public class WobbleProp extends Prop{
     public void drawBase(Tile tile){
         var region = variants > 0 ? variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))] : this.region;
 
-        Draw.rectv(region, tile.worldx(), tile.worldy(), region.width * Draw.scl, region.height * Draw.scl, 0, vec -> vec.add(
+        Draw.rectv(region, tile.worldx(), tile.worldy(), region.width * region.scl(), region.height * region.scl(), 0, vec -> vec.add(
         Mathf.sin(vec.y*3 + Time.time, wscl, wmag) + Mathf.sin(vec.x*3 - Time.time, 70 * wtscl, 0.8f * wmag2),
         Mathf.cos(vec.x*3 + Time.time + 8, wscl + 6f, wmag * 1.1f) + Mathf.sin(vec.y*3 - Time.time, 50 * wtscl, 0.2f * wmag2)
         ));

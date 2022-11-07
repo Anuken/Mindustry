@@ -376,12 +376,14 @@ public class Placement{
             }
         }
 
-        if(Math.abs(endx - tilex) > maxLength){
-            endx = Mathf.sign(endx - tilex) * maxLength + tilex;
-        }
+        if(maxLength > 0){
+            if(Math.abs(endx - tilex) > maxLength){
+                endx = Mathf.sign(endx - tilex) * maxLength + tilex;
+            }
 
-        if(Math.abs(endy - tiley) > maxLength){
-            endy = Mathf.sign(endy - tiley) * maxLength + tiley;
+            if(Math.abs(endy - tiley) > maxLength){
+                endy = Mathf.sign(endy - tiley) * maxLength + tiley;
+            }
         }
 
         int dx = endx - tilex, dy = endy - tiley;

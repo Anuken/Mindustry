@@ -35,8 +35,7 @@ public class StatValues{
     }
 
     public static String fixValue(float value){
-        int precision = Math.abs((int)value - value) <= 0.001f ? 0 : Math.abs((int)(value * 10) - value * 10) <= 0.001f ? 1 : 2;
-        return Strings.fixed(value, precision);
+        return Strings.autoFixed(value, 2);
     }
 
     public static StatValue squared(float value, StatUnit unit){
@@ -49,7 +48,7 @@ public class StatValues{
 
     public static StatValue number(float value, StatUnit unit, boolean merge){
         return table -> {
-            String l1 = fixValue(value), l2 = (unit.space ? " " : "") + unit.localized();
+            String l1 = (unit.icon == null ? "" : unit.icon + " ") + fixValue(value), l2 = (unit.space ? " " : "") + unit.localized();
 
             if(merge){
                 table.add(l1 + l2);
@@ -335,7 +334,7 @@ public class StatValues{
 
                 //no point in displaying unit icon twice
                 if(!compact && !(t instanceof Turret)){
-                    table.image(icon(t)).size(3 * 8).padRight(4).right().top();
+                    table.image(icon(t)).size(3 * 8).padRight(4).right().scaling(Scaling.fit).top();
                     table.add(t.localizedName).padRight(10).left().top();
                 }
 
@@ -404,7 +403,7 @@ public class StatValues{
                     }
 
                     if(type.status != StatusEffects.none){
-                        sep(bt, (type.status.minfo.mod == null ? type.status.emoji() : "") + "[stat]" + type.status.localizedName + "[lightgray] ~ [stat]" + ((int)(type.statusDuration / 60f)) + "[lightgray] " + Core.bundle.get("unit.seconds"));
+                        sep(bt, (type.status.minfo.mod == null ? type.status.emoji() : "") + "[stat]" + type.status.localizedName + (type.status.reactive ? "" : "[lightgray] ~ [stat]" + ((int)(type.statusDuration / 60f)) + "[lightgray] " + Core.bundle.get("unit.seconds")));
                     }
 
                     if(type.fragBullet != null){

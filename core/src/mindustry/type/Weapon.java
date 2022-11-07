@@ -31,6 +31,8 @@ public class Weapon implements Cloneable{
     public BulletType bullet = Bullets.placeholder;
     /** shell ejection effect */
     public Effect ejectEffect = Fx.none;
+    /** whether weapon should appear in the stats of a unit with this weapon */
+    public boolean display = true;
     /** whether to consume ammo when ammo is enabled in rules */
     public boolean useAmmo = true;
     /** whether to create a flipped copy of this weapon upon initialization. default: true */
@@ -41,7 +43,7 @@ public class Weapon implements Cloneable{
     public boolean alternate = true;
     /** whether to rotate toward the target independently of unit */
     public boolean rotate = false;
-    /** rotation at which this weapon is locked to if rotate = false. TODO buggy!*/
+    /** rotation at which this weapon starts at. TODO buggy!*/
     public float baseRotation = 0f;
     /** whether to draw the outline on top. */
     public boolean top = true;
@@ -51,6 +53,10 @@ public class Weapon implements Cloneable{
     public boolean alwaysContinuous;
     /** whether this weapon can be aimed manually by players */
     public boolean controllable = true;
+    /** whether this weapon can be automatically aimed by the unit */
+    public boolean aiControllable = true;
+    /** whether this weapon is always shooting, regardless of targets ore cone */
+    public boolean alwaysShooting = false;
     /** whether to automatically target relevant units in update(); only works when controllable = false. */
     public boolean autoTarget = false;
     /** whether to perform target trajectory prediction */
@@ -145,7 +151,7 @@ public class Weapon implements Cloneable{
     }
 
     public boolean hasStats(UnitType u){
-        return true;
+        return display;
     }
 
     public void addStats(UnitType u, Table t){
@@ -215,6 +221,9 @@ public class Weapon implements Cloneable{
 
         Draw.xscl = -Mathf.sign(flipSprite);
 
+        //fix color
+        unit.type.applyColor(unit);
+
         if(region.found()) Draw.rect(region, wx, wy, weaponRotation);
 
         if(cellRegion.found()){
@@ -273,9 +282,9 @@ public class Weapon implements Cloneable{
             mount.targetRotation = Angles.angle(axisX, axisY, mount.aimX, mount.aimY) - unit.rotation;
             mount.rotation = Angles.moveToward(mount.rotation, mount.targetRotation, rotateSpeed * Time.delta);
             if(rotationLimit < 360){
-                float dst = Angles.angleDist(mount.rotation, 0f);
+                float dst = Angles.angleDist(mount.rotation, baseRotation);
                 if(dst > rotationLimit/2f){
-                    mount.rotation = Angles.moveToward(mount.rotation, 0, dst - rotationLimit/2f);
+                    mount.rotation = Angles.moveToward(mount.rotation, baseRotation, dst - rotationLimit/2f);
                 }
             }
         }else if(!rotate){
@@ -323,6 +332,8 @@ public class Weapon implements Cloneable{
             //logic will return shooting as false even if these return true, which is fine
         }
 
+        if(alwaysShooting) mount.shoot = true;
+
         //update continuous state
         if(continuous && mount.bullet != null){
             if(!mount.bullet.isAdded() || mount.bullet.time >= mount.bullet.lifetime || mount.bullet.type != bullet){
@@ -332,7 +343,7 @@ public class Weapon implements Cloneable{
                 mount.bullet.set(bulletX, bulletY);
                 mount.reload = reload;
                 mount.recoil = 1f;
-                unit.vel.add(Tmp.v1.trns(unit.rotation + 180f, mount.bullet.type.recoil));
+                unit.vel.add(Tmp.v1.trns(unit.rotation + 180f, mount.bullet.type.recoil * Time.delta));
                 if(shootSound != Sounds.none && !headless){
                     if(mount.sound == null) mount.sound = new SoundLoop(shootSound, 1f);
                     mount.sound.update(bulletX, bulletY, true);
@@ -404,12 +415,12 @@ public class Weapon implements Cloneable{
         }
 
         shoot.shoot(mount.totalShots, (xOffset, yOffset, angle, delay, mover) -> {
+            mount.totalShots++;
             if(delay > 0f){
                 Time.run(delay, () -> bullet(unit, mount, xOffset, yOffset, angle, mover));
             }else{
                 bullet(unit, mount, xOffset, yOffset, angle, mover);
             }
-            mount.totalShots++;
         });
     }
 
@@ -426,7 +437,7 @@ public class Weapon implements Cloneable{
         bulletY = mountY + Angles.trnsy(weaponRotation, this.shootX + xOffset + xSpread, this.shootY + yOffset),
         shootAngle = bulletRotation(unit, mount, bulletX, bulletY) + angleOffset,
         lifeScl = bullet.scaleLife ? Mathf.clamp(Mathf.dst(bulletX, bulletY, mount.aimX, mount.aimY) / bullet.range) : 1f,
-        angle = angleOffset + shootAngle + Mathf.range(inaccuracy);
+        angle = angleOffset + shootAngle + Mathf.range(inaccuracy + bullet.inaccuracy);
 
         mount.bullet = bullet.create(unit, unit.team, bulletX, bulletY, angle, -1f, (1f - velocityRnd) + Mathf.random(velocityRnd), lifeScl, null, mover, mount.aimX, mount.aimY);
         handleBullet(unit, mount, mount.bullet);
