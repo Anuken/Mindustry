@@ -5,6 +5,8 @@ import arc.func.*;
 import arc.net.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.net.Packets.*;
 import mindustry.net.Streamable.*;
@@ -28,6 +30,7 @@ public class Net{
     private boolean active;
     private boolean clientLoaded;
     private @Nullable StreamBuilder currentStream;
+    private @Nullable String currentServerAddress;
 
     private final Seq<Packet> packetQueue = new Seq<>();
     private final ObjectMap<Class<?>, Cons> clientListeners = new ObjectMap<>();
@@ -152,9 +155,24 @@ public class Net{
      * Connect to an address.
      */
     public void connect(String ip, int port, Runnable success){
+        //same as JoinDialog.formatIp, may move to ARC?
+        String ipPort = ip.contains(":") ? ("[" + ip + "]") : ip;
+        if(Vars.port != port) ipPort = ipPort + ":" + port;
+        String finalIpPort = ipPort;
+
+        pingHost(ip, port, (host -> connect(finalIpPort, host, success)), this::showError);
+    }
+
+    /**
+     * Connect to an address with given host.
+     */
+    public void connect(String hostname, Host host, Runnable success){
+        Log.info("Connecting to hostname: @", hostname);
+        currentServerAddress = hostname;
+        Events.fire(new ClientPreConnectEvent(host));
         try{
             if(!active){
-                provider.connectClient(ip, port, success);
+                provider.connectClient(host.address, host.port, success);
                 active = true;
                 server = false;
             }else{
@@ -201,6 +219,7 @@ public class Net{
         provider.disconnectClient();
         server = false;
         active = false;
+        currentServerAddress = null;
     }
 
     /**
@@ -350,6 +369,13 @@ public class Net{
      */
     public boolean client(){
         return !server && active;
+    }
+
+    /**
+     * The server address currently connected to.
+     */
+    public String currentServerAddress(){
+        return currentServerAddress;
     }
 
     public void dispose(){

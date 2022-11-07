@@ -133,12 +133,7 @@ public class JoinDialog extends BaseDialog{
 
             Button button = buttons[0] = remote.button(b -> {}, style, () -> {
                 if(!buttons[0].childrenPressed()){
-                    if(server.lastHost != null){
-                        Events.fire(new ClientPreConnectEvent(server.lastHost));
-                        safeConnect(server.lastHost.address, server.lastHost.port, server.lastHost.version);
-                    }else{
-                        connect(server.ip, server.port);
-                    }
+                    connect(server.ip, server.port, (server.lastHost != null ? server.lastHost.version : -1), server.lastHost);
                 }
             }).width(targetWidth()).pad(4f).get();
 
@@ -417,9 +412,10 @@ public class JoinDialog extends BaseDialog{
 
             //table containing all groups
             for(String address : group.addresses){
-                String resaddress = address.contains(":") ? address.split(":")[0] : address;
-                int resport = address.contains(":") ? Strings.parseInt(address.split(":")[1]) : port;
-                net.pingHost(resaddress, resport, res -> {
+                // support IPV6
+                Server serverParser = new Server();
+                serverParser.setIP(address);
+                net.pingHost(serverParser.ip, serverParser.port, res -> {
                     if(refreshes != cur) return;
 
                     if(!serverSearch.isEmpty() && !(group.name.toLowerCase().contains(serverSearch)
@@ -451,7 +447,7 @@ public class JoinDialog extends BaseDialog{
                         }).width(targetWidth()).padBottom(-2).row();
                     }
 
-                    addCommunityHost(res, groupTable[0]);
+                    addCommunityHost(serverParser, res, groupTable[0]);
 
                     groupTable[0].margin(5f);
                     groupTable[0].pack();
@@ -460,22 +456,21 @@ public class JoinDialog extends BaseDialog{
         }
     }
 
-    void addCommunityHost(Host host, Table container){
+    void addCommunityHost(Server server, Host host, Table container){
         global.background(null);
         float w = targetWidth();
 
         //TODO looks bad
         container.button(b -> buildServer(host, b), style, () -> {
-            Events.fire(new ClientPreConnectEvent(host));
             if(!Core.settings.getBool("server-disclaimer", false)){
                 ui.showCustomConfirm("@warning", "@servers.disclaimer", "@ok", "@back", () -> {
                     Core.settings.put("server-disclaimer", true);
-                    safeConnect(host.address, host.port, host.version);
+                    connect(server.ip, server.port, host.version, null);
                 }, () -> {
                     Core.settings.put("server-disclaimer", false);
                 });
             }else{
-                safeConnect(host.address, host.port, host.version);
+                connect(server.ip, server.port, host.version, null);
             }
         }).width(w).padBottom(7).row();
     }
@@ -503,14 +498,24 @@ public class JoinDialog extends BaseDialog{
         local.row();
 
         local.button(b -> buildServer(host, b), style, () -> {
-            Events.fire(new ClientPreConnectEvent(host));
-            safeConnect(host.address, host.port, host.version);
+            connect(host.address, host.port, host.version, null);
         }).width(w);
     }
 
+    //Back compatibility
     public void connect(String ip, int port){
+        connect(ip, port, -1, null);
+    }
+
+    public void connect(String ip, int port, int version, @Nullable Host host){
         if(player.name.trim().isEmpty()){
             ui.showInfo("@noname");
+            return;
+        }
+
+        if(version != Version.build && Version.build != -1 && version != -1){
+            ui.showInfo("[scarlet]" + (version > Version.build ? KickReason.clientOutdated : KickReason.serverOutdated) + "\n[]" +
+                Core.bundle.format("server.versions", Version.build, version));
             return;
         }
 
@@ -525,12 +530,16 @@ public class JoinDialog extends BaseDialog{
             logic.reset();
             net.reset();
             Vars.netClient.beginConnecting();
-            net.connect(lastIp = ip, lastPort = port, () -> {
+            Runnable success = () -> {
                 if(net.client()){
                     hide();
                     add.hide();
                 }
-            });
+            };
+            if(host == null)
+                net.connect(lastIp = ip, lastPort = port, success);
+            else
+                net.connect(formatIp(lastIp = ip, lastPort = port), host, success);
         });
     }
 
@@ -555,13 +564,10 @@ public class JoinDialog extends BaseDialog{
         });
     }
 
+    //Back compatibility
+    @Deprecated
     void safeConnect(String ip, int port, int version){
-        if(version != Version.build && Version.build != -1 && version != -1){
-            ui.showInfo("[scarlet]" + (version > Version.build ? KickReason.clientOutdated : KickReason.serverOutdated) + "\n[]" +
-                Core.bundle.format("server.versions", Version.build, version));
-        }else{
-            connect(ip, port);
-        }
+        connect(ip, port, version, null);
     }
 
     float targetWidth(){
@@ -609,6 +615,15 @@ public class JoinDialog extends BaseDialog{
         Core.settings.putJson("servers", Server.class, servers);
     }
 
+    //May move to ARC?
+    private static String formatIp(String ip,int port){
+        if(Strings.count(ip, ':') > 1){
+            return port != Vars.port ? "[" + ip + "]:" + port : ip;
+        }else{
+            return ip + (port != Vars.port ? ":" + port : "");
+        }
+    }
+
     public static class Server{
         public String ip;
         public int port;
@@ -638,11 +653,7 @@ public class JoinDialog extends BaseDialog{
         }
 
         String displayIP(){
-            if(Strings.count(ip, ':') > 1){
-                return port != Vars.port ? "[" + ip + "]:" + port : ip;
-            }else{
-                return ip + (port != Vars.port ? ":" + port : "");
-            }
+            return formatIp(ip, port);
         }
 
         public Server(){

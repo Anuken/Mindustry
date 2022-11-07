@@ -639,19 +639,28 @@ public class NetClient implements ApplicationListener{
     }
 
     String getUsid(String ip){
-        //consistently use the latter part of an IP, if possible
-        if(ip.contains("/")){
-            ip = ip.substring(ip.indexOf("/") + 1);
+        //todo this should be not null, but how to handle?
+        String host = net.currentServerAddress() != null ? net.currentServerAddress() : "NULL";
+
+        String result = Core.settings.getString("usid-" + host, null);
+        if(result != null) return result;
+
+        // provide back compatibility until 2023.
+        if(Calendar.getInstance().get(Calendar.YEAR) < 2023){
+            //consistently use the latter part of an IP, if possible
+            if(ip.contains("/")){
+                ip = ip.substring(ip.indexOf("/") + 1);
+            }
+            result = Core.settings.getString("usid-" + ip, null);
+            Core.settings.put("usid-" + host, result);
         }
 
-        if(Core.settings.getString("usid-" + ip, null) != null){
-            return Core.settings.getString("usid-" + ip, null);
-        }else{
+        if(result == null){
             byte[] bytes = new byte[8];
             new Rand().nextBytes(bytes);
-            String result = new String(Base64Coder.encode(bytes));
-            Core.settings.put("usid-" + ip, result);
-            return result;
+            result = new String(Base64Coder.encode(bytes));
+            Core.settings.put("usid-" + host, result);
         }
+        return result;
     }
 }
