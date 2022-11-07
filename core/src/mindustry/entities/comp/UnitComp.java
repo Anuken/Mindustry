@@ -688,4 +688,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         //deaths are synced; this calls killed()
         Call.unitDeath(id);
     }
+
+    @Override
+    @Replace
+    public String toString(){
+        return "Unit#" + id() + ":" + type;
+    }
 }

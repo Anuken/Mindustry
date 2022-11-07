@@ -5,7 +5,6 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
-import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.game.SectorInfo.*;
 import mindustry.gen.*;
@@ -17,6 +16,7 @@ import mindustry.world.blocks.defense.turrets.Turret.*;
 import mindustry.world.blocks.distribution.*;
 import mindustry.world.blocks.production.AttributeCrafter.*;
 import mindustry.world.blocks.production.SolidPump.*;
+import mindustry.world.blocks.storage.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -55,6 +55,10 @@ public class GameService{
 
     }
 
+    public void clearAchievement(String name){
+
+    }
+
     public boolean isAchieved(String name){
         return false;
     }
@@ -81,8 +85,9 @@ public class GameService{
         allTransportSerpulo = content.blocks().select(b -> b.category == Category.distribution && b.isVisibleOn(Planets.serpulo) && b.isVanilla() && b.buildVisibility == BuildVisibility.shown).toArray(Block.class);
         allTransportErekir = content.blocks().select(b -> b.category == Category.distribution && b.isVisibleOn(Planets.erekir) && b.isVanilla() && b.buildVisibility == BuildVisibility.shown).toArray(Block.class);
 
-        allSerpuloBlocks = content.blocks().select(b -> b.synthetic() && b.isVisibleOn(Planets.serpulo) && b.isVanilla() && b.buildVisibility == BuildVisibility.shown).toArray(Block.class);
-        allErekirBlocks = content.blocks().select(b -> b.synthetic() && b.isVisibleOn(Planets.erekir) && b.isVanilla() && b.buildVisibility == BuildVisibility.shown).toArray(Block.class);
+        //cores are ignored since they're upgrades and can be skipped
+        allSerpuloBlocks = content.blocks().select(b -> b.synthetic() && b.isVisibleOn(Planets.serpulo) && b.isVanilla() && !(b instanceof CoreBlock) && b.buildVisibility == BuildVisibility.shown).toArray(Block.class);
+        allErekirBlocks = content.blocks().select(b -> b.synthetic() && b.isVisibleOn(Planets.erekir) && b.isVanilla() && !(b instanceof CoreBlock) && b.buildVisibility == BuildVisibility.shown).toArray(Block.class);
 
         unitsBuilt = Core.settings.getJson("units-built" , ObjectSet.class, String.class, ObjectSet::new);
         blocksBuilt = Core.settings.getJson("blocks-built" , ObjectSet.class, String.class, ObjectSet::new);
@@ -97,8 +102,13 @@ public class GameService{
 
         if(Items.thorium.unlocked()) obtainThorium.complete();
         if(Items.titanium.unlocked()) obtainTitanium.complete();
-        if(!content.sectors().contains(UnlockableContent::locked)){
-            unlockAllZones.complete();
+
+        if(SectorPresets.origin.sector.isCaptured()){
+            completeErekir.complete();
+        }
+
+        if(SectorPresets.planetaryTerminal.sector.isCaptured()){
+            completeSerpulo.complete();
         }
 
         if(mods.list().size > 0){
@@ -112,6 +122,14 @@ public class GameService{
         if(!Planets.serpulo.sectors.contains(s -> !s.isCaptured())){
             captureAllSectors.complete();
         }
+
+        Events.run(Trigger.openConsole, () -> openConsole.complete());
+
+        Events.run(Trigger.unitCommandAttack, () -> {
+            if(campaign()){
+                issueAttackCommand.complete();
+            }
+        });
 
         Events.on(UnitDestroyEvent.class, e -> {
             if(campaign()){
@@ -319,9 +337,6 @@ public class GameService{
         Events.on(UnlockEvent.class, e -> {
             if(e.content == Items.thorium) obtainThorium.complete();
             if(e.content == Items.titanium) obtainTitanium.complete();
-            if(e.content instanceof SectorPreset && !content.sectors().contains(s -> s.locked())){
-                unlockAllZones.complete();
-            }
         });
 
         Events.run(Trigger.openWiki, openWiki::complete);
@@ -335,8 +350,6 @@ public class GameService{
                 drown.complete();
             }
         });
-
-        trigger(Trigger.acceleratorUse, useAccelerator);
 
         trigger(Trigger.impactPower, powerupImpactReactor);
 
@@ -473,14 +486,19 @@ public class GameService{
                 captureBackground.complete();
             }
 
-            if(!e.sector.planet.sectors.contains(s -> !s.hasBase())){
+            if(e.sector.planet == Planets.serpulo && !e.sector.planet.sectors.contains(s -> !s.hasBase())){
                 captureAllSectors.complete();
             }
 
-            if(!e.sector.planet.sectors.contains(s -> s.preset != null && !s.hasBase())){
-                allPresetsErekir.complete();
+            if(e.sector.planet == Planets.erekir && e.sector.preset != null && e.sector.preset.isLastSector){
+                completeErekir.complete();
             }
 
+            if(e.sector.planet == Planets.serpulo && e.sector.preset != null && e.sector.preset.isLastSector){
+                completeSerpulo.complete();
+            }
+
+            //TODO wrong
             if(e.sector.planet == Planets.serpulo){
                 SStat.sectorsControlled.set(e.sector.planet.sectors.count(Sector::hasBase));
             }
@@ -516,17 +534,14 @@ public class GameService{
 
             for(var up : Groups.powerGraph){
                 var graph = up.graph();
-                if(graph.all.size > 0 && graph.all.first().team == player.team()){
-                    float balance = graph.getPowerBalance();
-                    if(balance < 10_000) negative10kPower.complete();
+                if(graph.all.size > 1 && graph.all.first().team == player.team() && graph.hasPowerBalanceSamples()){
+                    float balance = graph.getPowerBalance() * 60f;
+
+                    if(balance < -10_000) negative10kPower.complete();
                     if(balance > 100_000) positive100kPower.complete();
                     if(graph.getBatteryStored() > 1_000_000) store1milPower.complete();
                 }
             }
-        }
-
-        if(ui.consolefrag.shown()){
-            openConsole.complete();
         }
     }
 

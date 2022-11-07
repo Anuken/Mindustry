@@ -133,6 +133,7 @@ public class Logic implements ApplicationListener{
 
                 state.rules.coreIncinerates = true;
                 state.rules.waveTeam.rules().infiniteResources = true;
+                state.rules.waveTeam.rules().buildSpeedMultiplier *= state.getPlanet().enemyBuildSpeedMultiplier;
 
                 //fill enemy cores by default? TODO decide
                 for(var core : state.rules.waveTeam.cores()){
@@ -338,10 +339,12 @@ public class Logic implements ApplicationListener{
             return;
         }
 
+        boolean initial = !state.rules.sector.info.wasCaptured;
+
         state.rules.sector.info.wasCaptured = true;
 
         //fire capture event
-        Events.fire(new SectorCaptureEvent(state.rules.sector));
+        Events.fire(new SectorCaptureEvent(state.rules.sector, initial));
 
         //disable attack mode
         state.rules.attackMode = false;

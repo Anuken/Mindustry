@@ -99,7 +99,7 @@ public class HudFragment{
         //"waiting for players"
         parent.fill(t -> {
             t.name = "waiting";
-            t.visible(() -> netServer.isWaitingForPlayers()).touchable = Touchable.disabled;
+            t.visible(() -> netServer.isWaitingForPlayers() && state.isPaused() && shown).touchable = Touchable.disabled;
             t.table(Styles.black6, top -> top.add("@waiting.players").style(Styles.outlineLabel).pad(18f));
         });
 
@@ -147,14 +147,14 @@ public class HudFragment{
                         if(net.active()){
                             ui.listfrag.toggle();
                         }else{
-                            state.set(state.is(State.paused) ? State.playing : State.paused);
+                            state.set(state.isPaused() ? State.playing : State.paused);
                         }
                     }).name("pause").update(i -> {
                         if(net.active()){
                             i.getStyle().imageUp = Icon.players;
                         }else{
                             i.setDisabled(false);
-                            i.getStyle().imageUp = state.is(State.paused) ? Icon.play : Icon.pause;
+                            i.getStyle().imageUp = state.isPaused() ? Icon.play : Icon.pause;
                         }
                     });
 
