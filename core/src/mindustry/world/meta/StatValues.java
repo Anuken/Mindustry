@@ -35,8 +35,7 @@ public class StatValues{
     }
 
     public static String fixValue(float value){
-        int precision = Math.abs((int)value - value) <= 0.001f ? 0 : Math.abs((int)(value * 10) - value * 10) <= 0.001f ? 1 : 2;
-        return Strings.fixed(value, precision);
+        return Strings.autoFixed(value, 2);
     }
 
     public static StatValue squared(float value, StatUnit unit){
@@ -335,7 +334,7 @@ public class StatValues{
 
                 //no point in displaying unit icon twice
                 if(!compact && !(t instanceof Turret)){
-                    table.image(icon(t)).size(3 * 8).padRight(4).right().top();
+                    table.image(icon(t)).size(3 * 8).padRight(4).right().scaling(Scaling.fit).top();
                     table.add(t.localizedName).padRight(10).left().top();
                 }
 

@@ -179,9 +179,9 @@ public class AIController implements UnitController{
 
             unit.isShooting |= (mount.shoot = mount.rotate = shoot);
 
-            if(mount.target == null && !shoot && !Angles.within(mount.rotation, 0f, 0.01f) && noTargetTime >= rotateBackTimer){
+            if(mount.target == null && !shoot && !Angles.within(mount.rotation, mount.weapon.baseRotation, 0.01f) && noTargetTime >= rotateBackTimer){
                 mount.rotate = true;
-                Tmp.v1.trns(unit.rotation, 5f);
+                Tmp.v1.trns(unit.rotation + mount.weapon.baseRotation, 5f);
                 mount.aimX = mountX + Tmp.v1.x;
                 mount.aimY = mountY + Tmp.v1.y;
             }

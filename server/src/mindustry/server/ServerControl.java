@@ -489,7 +489,7 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("pause", "<on/off>", "Pause or unpause the game.", arg -> {
-            if(!state.isMenu()){
+            if(state.isMenu()){
                 err("Cannot pause without a game running.");
                 return;
             }

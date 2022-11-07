@@ -314,6 +314,10 @@ public class BulletType extends Content implements Cloneable{
 
     /** @return estimated damage per shot. this can be very inaccurate. */
     public float estimateDPS(){
+        if(spawnUnit != null){
+            return spawnUnit.estimateDps();
+        }
+
         float sum = damage + splashDamage*0.75f;
         if(fragBullet != null && fragBullet != this){
             sum += fragBullet.estimateDPS() * fragBullets / 2f;
