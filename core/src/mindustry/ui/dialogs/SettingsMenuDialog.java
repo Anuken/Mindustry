@@ -501,7 +501,6 @@ public class SettingsMenuDialog extends BaseDialog{
         files.add(Core.settings.getSettingsFile());
         files.addAll(customMapDirectory.list());
         files.addAll(saveDirectory.list());
-        files.addAll(screenshotDirectory.list());
         files.addAll(modDirectory.list());
         files.addAll(schematicDirectory.list());
         String base = Core.settings.getDataDirectory().path();

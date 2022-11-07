@@ -225,10 +225,11 @@ public class Universe{
                         }else if(attacked && wavesPassed > 0 && sector.info.winWave > 1 && sector.info.wave + wavesPassed >= sector.info.winWave && !sector.hasEnemyBase()){
                             //autocapture the sector
                             sector.info.waves = false;
+                            boolean was = sector.info.wasCaptured;
                             sector.info.wasCaptured = true;
 
                             //fire the event
-                            Events.fire(new SectorCaptureEvent(sector));
+                            Events.fire(new SectorCaptureEvent(sector, !was));
                         }
 
                         float scl = sector.getProductionScale();

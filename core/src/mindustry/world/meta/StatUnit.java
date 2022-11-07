@@ -1,6 +1,8 @@
 package mindustry.world.meta;
 
 import arc.*;
+import arc.util.*;
+import mindustry.gen.*;
 
 import java.util.*;
 
@@ -18,7 +20,7 @@ public class StatUnit{
     itemsSecond = new StatUnit("itemsSecond"),
     liquidUnits = new StatUnit("liquidUnits"),
     powerUnits = new StatUnit("powerUnits"),
-    heatUnits = new StatUnit("heatUnits"),
+    heatUnits = new StatUnit("heatUnits", "[red]" + Iconc.waves + "[]"),
     degrees = new StatUnit("degrees"),
     seconds = new StatUnit("seconds"),
     minutes = new StatUnit("minutes"),
@@ -33,6 +35,7 @@ public class StatUnit{
 
     public final boolean space;
     public final String name;
+    public @Nullable String icon;
 
     public StatUnit(String name, boolean space){
         this.name = name;
@@ -41,6 +44,11 @@ public class StatUnit{
 
     public StatUnit(String name){
         this(name, true);
+    }
+
+    public StatUnit(String name, String icon){
+        this(name, true);
+        this.icon = icon;
     }
 
     public String localized(){

@@ -18,6 +18,8 @@ public class SectorPreset extends UnlockableContent{
     public float startWaveTimeMultiplier = 2f;
     public boolean addStartingItems = false;
     public boolean noLighting = false;
+    /** If true, this is the last sector in its planetary campaign. */
+    public boolean isLastSector;
     public boolean showSectorLandInfo = true;
     /** If true, uses this sector's launch fields instead */
     public boolean overrideLaunchDefaults = false;

@@ -17,7 +17,7 @@ public enum Achievement{
     launch30Times(SStat.timesLaunched, 30),
     captureBackground,
     survive100Waves(SStat.maxWavesSurvived, 100),
-    researchAll, //TODO - remake/change?
+    researchAll,
     shockWetEnemy,
     killEnemyPhaseWall,
     researchRouter,
@@ -36,7 +36,7 @@ public enum Achievement{
     obtainTitanium,
     suicideBomb,
     buildGroundFactory,
-    issueAttackCommand, //TODO change desc
+    issueAttackCommand,
     active100Units(SStat.maxUnitActive, 100),
     build1000Units(SStat.unitsBuilt, 1000),
     buildAllUnits(SStat.unitTypesBuilt, 30),
@@ -53,72 +53,62 @@ public enum Achievement{
     circleConveyor,
     becomeRouter,
     create20Schematics(SStat.schematicsCreated, 20),
-    create500Schematics(SStat.schematicsCreated, 50), //TODO - Steam - icon done
+    create500Schematics(SStat.schematicsCreated, 500),
     survive10WavesNoBlocks,
     captureNoBlocksBroken,
     useFlameAmmo,
     coolTurret,
     enablePixelation,
     openWiki,
-    useAccelerator,
-    unlockAllZones,
+    allTransportOneMap,
+    buildOverdriveProjector,
+    buildMendProjector,
+    buildWexWater,
 
-    //TODO new ones
+    have10mItems(SStat.totalCampaignItems, 10_000_000),
+    killEclipseDuo,
 
-    allTransportOneMap, //TODO - Steam - icon done
-    buildOverdriveProjector, //TODO - Steam - icon done
-    buildMendProjector, //TODO - Steam - icon done
-    buildWexWater, //TODO - Steam - icon done
+    completeErekir,
+    completeSerpulo,
 
-    have10mItems(SStat.totalCampaignItems, 10_000_000), //TODO - Steam - icon done
-    killEclipseDuo, //TODO - Steam - icon done
+    launchCoreSchematic,
+    nucleusGroundZero,
 
-    allPresetsErekir, //TODO - Steam - icon done
+    neoplasmWater,
+    blastFrozenUnit,
 
-    launchCoreSchematic, //TODO - Steam - icon done
-    nucleusGroundZero, //TODO - Steam - icon done
+    allBlocksSerpulo,
+    allBlocksErekir,
 
-    neoplasmWater, //TODO - Steam - icon done
-    blastFrozenUnit, //TODO - Steam - icon done
+    breakForceProjector,
+    researchLogic,
 
-    allBlocksSerpulo, //TODO - Steam - icon done
-    allBlocksErekir, //TODO - Steam - icon done
+    negative10kPower,
+    positive100kPower,
+    store1milPower,
 
-    //TODO are these necessary?
-    //allTurretsSerpulo, //TODO
-    //allTurretsErekir, //TODO
-    //allTechSerpulo, //TODO
-    //allTechErekir, //TODO
+    blastGenerator,
+    neoplasiaExplosion,
 
-    breakForceProjector, //TODO - Steam - icon done
-    researchLogic, //TODO - Steam - icon done
+    installMod,
+    routerLanguage,
+    joinCommunityServer,
+    openConsole,
 
-    negative10kPower, //TODO - Steam - icon done
-    positive100kPower, //TODO - Steam - icon done
-    store1milPower, //TODO - Steam - icon done
+    controlTurret,
+    dropUnitsCoreZone,
+    destroyScatterFlare,
+    boostUnit,
+    boostBuildingFloor,
 
-    blastGenerator, //TODO - Steam - icon done
-    neoplasiaExplosion, //TODO - Steam - icon done
+    hoverUnitLiquid,
 
-    installMod, //TODO - Steam - icon done
-    routerLanguage, //TODO - Steam - icon done
-    joinCommunityServer, //TODO - Steam - icon done
-    openConsole, //TODO - Steam - icon done
+    break100Boulders(SStat.bouldersDeconstructed, 100),
+    break10000Boulders(SStat.bouldersDeconstructed, 10_000),
 
-    controlTurret, //TODO - Steam - icon done
-    dropUnitsCoreZone, //TODO - Steam - icon done
-    destroyScatterFlare, //TODO - Steam - icon done
-    boostUnit, //TODO - Steam - icon done
-    boostBuildingFloor, //TODO - Steam - icon done
+    shockwaveTowerUse,
 
-    hoverUnitLiquid, //TODO - Steam - icon done
-
-    break100Boulders(SStat.bouldersDeconstructed, 100), //TODO - Steam - icon done
-    break10000Boulders(SStat.bouldersDeconstructed, 10_000), //TODO - Steam - icon done
-
-    shockwaveTowerUse, //TODO - Steam - icon done
-
-    useAnimdustryEmoji, //TODO - Steam - icon done
+    useAnimdustryEmoji,
 
     ;
 
@@ -141,11 +131,18 @@ public enum Achievement{
     public void complete(){
         if(!isAchieved()){
             //can't complete achievements with the dev console shown.
-            if(ui != null && ui.consolefrag != null && ui.consolefrag.shown() && !OS.username.equals("anuke")) return;
+            if(ui != null && ui.consolefrag != null && ui.consolefrag.shown() && !OS.username.equals("anuke") && this != openConsole) return;
 
             service.completeAchievement(name());
             service.storeStats();
             completed = true;
+        }
+    }
+
+    public void uncomplete(){
+        if(isAchieved()){
+            service.clearAchievement(name());
+            completed = false;
         }
     }
 

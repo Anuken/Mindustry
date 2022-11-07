@@ -35,7 +35,8 @@ public class Team implements Comparable<Team>{
 
         //TODO temporarily no palettes for these teams.
         green = new Team(4, "green", Color.valueOf("54d67d")),//Color.valueOf("96f58c"), Color.valueOf("54d67d"), Color.valueOf("28785c")),
-        blue = new Team(5, "blue", Color.valueOf("6c87fd")); //Color.valueOf("85caf9"), Color.valueOf("6c87fd"), Color.valueOf("3b3392")
+        blue = new Team(5, "blue", Color.valueOf("6c87fd")), //Color.valueOf("85caf9"), Color.valueOf("6c87fd"), Color.valueOf("3b3392")
+        neoplastic = new Team(6, "neoplastic", Color.valueOf("e05438")); //yes, it looks very similar to crux, you're not supposed to use this team for block regions anyway
 
     static{
         Mathf.rand.setSeed(8);

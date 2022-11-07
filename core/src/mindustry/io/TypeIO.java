@@ -142,7 +142,8 @@ public class TypeIO{
             case 5 -> content.getByID(ContentType.all[read.b()], read.s());
             case 6 -> {
                 short length = read.s();
-                IntSeq arr = new IntSeq(); for(int i = 0; i < length; i ++) arr.add(read.i());
+                IntSeq arr = new IntSeq(length);
+                for(int i = 0; i < length; i ++) arr.add(read.i());
                 yield arr;
             }
             case 7 -> new Point2(read.i(), read.i());
