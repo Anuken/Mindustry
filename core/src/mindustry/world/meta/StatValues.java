@@ -350,7 +350,8 @@ public class StatValues{
                     }
 
                     if(type.buildingDamageMultiplier != 1){
-                        sep(bt, Core.bundle.format("bullet.buildingdamage", (int)(type.buildingDamageMultiplier * 100)));
+                        int val = (int)(type.buildingDamageMultiplier * 100 - 100);
+                        sep(bt, Core.bundle.format("bullet.buildingdamage", (val > 0 ? "+" : "") + val));
                     }
 
                     if(type.rangeChange != 0 && !compact){
