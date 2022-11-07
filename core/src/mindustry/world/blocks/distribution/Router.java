@@ -41,7 +41,7 @@ public class Router extends Block{
 
         @Override
         public boolean canControl(){
-            return size == 1;
+            return true;
         }
 
         @Override
@@ -102,10 +102,12 @@ public class Router extends Block{
                 unit.team(team);
                 unit.set(x, y);
 
-                int angle = Mathf.mod((int)((angleTo(unit.aimX(), unit.aimY()) + 45) / 90), 4);
-
                 if(unit.isShooting()){
-                    Building other = nearby(rotation = angle);
+                    float angle = angleTo(unit.aimX(), unit.aimY());
+                    rotation = Mathf.mod((int)((angle + 45) / 90), 4);
+
+                    Tmp.v1.set(block.size * tilesize, 0f).rotate(angle).add(this);
+                    Building other = world.buildWorld(Tmp.v1.x, Tmp.v1.y);
                     if(other != null && other.acceptItem(this, item)){
                         return other;
                     }
