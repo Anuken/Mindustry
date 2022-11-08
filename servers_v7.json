@@ -5,7 +5,7 @@
   },
   {
     "name": "mindustry.pl",
-    "address": ["0.baseduser.eu.org:6966", "0.baseduser.eu.org:6666", "0.baseduser.eu.org:6000"]
+    "address": ["0.baseduser.eu.org:6966", "0.baseduser.eu.org:6666", "0.baseduser.eu.org:6000", "1.baseduser.eu.org:6966", "1.baseduser.eu.org:6666", "1.baseduser.eu.org:6000"]
   },
   {
     "name": "SynapseOS",
@@ -138,5 +138,13 @@
   {
     "name": "Conservatory",
     "address": ["165.232.137.170:6567","165.232.137.170:6568"]
+  },
+  {
+    "name": "mindustry.ddns.net",
+    "address": ["mindustry.ddns.net:1000", "mindustry.ddns.net:2000", "mindustry.ddns.net:3000", "mindustry.ddns.net:4000"]
+  },
+  {
+    "name": "EasyPlay.su",
+    "address": ["easyplay.su"]
   }
 ]

@@ -75,6 +75,7 @@ public class Pal{
     bar = Color.slate,
     accent = Color.valueOf("ffd37f"),
     stat = Color.valueOf("ffd37f"),
+    negativeStat = Color.valueOf("e55454"),
     gray = Color.valueOf("454545"),
     metalGrayDark = Color.valueOf("6e7080"),
     accentBack = Color.valueOf("d4816b"),

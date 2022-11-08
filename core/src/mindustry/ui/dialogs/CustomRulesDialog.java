@@ -250,6 +250,8 @@ public class CustomRulesDialog extends BaseDialog{
             for(Planet planet : new Planet[]{Planets.serpulo, Planets.erekir}){
                 t.button(planet.localizedName, style, () -> {
                     rules.env = planet.defaultEnv;
+                    rules.attributes.clear();
+                    rules.attributes.add(planet.defaultAttributes);
                     rules.hiddenBuildItems.clear();
                     rules.hiddenBuildItems.addAll(planet.hiddenItems);
                 }).group(group).checked(b -> rules.env == planet.defaultEnv);
