@@ -24,8 +24,6 @@ public class GameState{
     public boolean gameOver = false;
     /** Whether the player's team won the match. */
     public boolean won = false;
-    /** If true, the server has been put into the paused state on multiplayer. This is synced. */
-    public boolean serverPaused = false;
     /** Server ticks/second. Only valid in multiplayer. */
     public int serverTps = -1;
     /** Map that is currently being played on. */
@@ -51,8 +49,8 @@ public class GameState{
     }
 
     public void set(State astate){
-        //cannot pause when in multiplayer
-        if(astate == State.paused && net.active()) return;
+        //nothing to change.
+        if(state == astate) return;
 
         Events.fire(new StateChangeEvent(state, astate));
         state = astate;
@@ -71,9 +69,12 @@ public class GameState{
         return rules.sector != null;
     }
 
-    @Nullable
-    public Sector getSector(){
+    public @Nullable Sector getSector(){
         return rules.sector;
+    }
+
+    public @Nullable Planet getPlanet(){
+        return rules.sector != null ? rules.sector.planet : null;
     }
 
     public boolean isEditor(){
@@ -81,7 +82,7 @@ public class GameState{
     }
 
     public boolean isPaused(){
-        return (is(State.paused) && !net.active()) || (serverPaused && !isMenu());
+        return is(State.paused);
     }
 
     public boolean isPlaying(){

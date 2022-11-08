@@ -13,7 +13,7 @@
   },
   {
     "name": "Omega Hub",
-    "address": ["n1.mindustry.me:6614","n1.mindustry.me:6568","n1.mindustry.me:6612","n1.mindustry.me:6570","n1.mindustry.me:6609"]
+    "address": ["n7.mindustry.me:6567","n1.mindustry.me:6568","n7.mindustry.me:6570","n1.mindustry.me:6570","n1.mindustry.me:6609", "n1.mindustry.me:6577"]
   },
   {
     "name": "EasyPlay",
@@ -25,7 +25,7 @@
   },
   {
     "name": "SMokeOfAnarchy",
-    "address": ["smokeofanarchy.ru:6566", "strider.smokeofanarchy.ru:6566"]
+    "address": ["smokeofanarchy.ru:6566", "2.smokeofanarchy.ru:7656"]
   },
   {
     "name": "Atanner Gaming",
@@ -53,7 +53,7 @@
   },
   {
     "name": "mindustry.ddns.net",
-    "address": ["mindustry.ddns.net", "mindustry.ddns.net:1000", "mindustry.ddns.net:2000", "mindustry.ddns.net:3000", "mindustry.ddns.net:4000"]
+    "address": ["mindustry.ddns.net:2500"]
   },
   {
     "name": "Surrealment v6",
