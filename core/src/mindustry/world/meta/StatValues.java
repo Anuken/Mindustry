@@ -350,11 +350,12 @@ public class StatValues{
                     }
 
                     if(type.buildingDamageMultiplier != 1){
-                        sep(bt, Core.bundle.format("bullet.buildingdamage", (int)(type.buildingDamageMultiplier * 100)));
+                        int val = (int)(type.buildingDamageMultiplier * 100 - 100);
+                        sep(bt, Core.bundle.format("bullet.buildingdamage", ammoStat(val)));
                     }
 
                     if(type.rangeChange != 0 && !compact){
-                        sep(bt, Core.bundle.format("bullet.range", (type.rangeChange > 0 ? "+" : "-") + Strings.autoFixed(type.rangeChange / tilesize, 1)));
+                        sep(bt, Core.bundle.format("bullet.range", ammoStat(type.rangeChange / tilesize)));
                     }
 
                     if(type.splashDamage > 0){
@@ -366,7 +367,8 @@ public class StatValues{
                     }
 
                     if(!compact && !Mathf.equal(type.reloadMultiplier, 1f)){
-                        sep(bt, Core.bundle.format("bullet.reload", Strings.autoFixed(type.reloadMultiplier, 2)));
+                        int val = (int)(type.reloadMultiplier * 100 - 100);
+                        sep(bt, Core.bundle.format("bullet.reload", ammoStat(val)));
                     }
 
                     if(type.knockback > 0){
@@ -422,6 +424,11 @@ public class StatValues{
     private static void sep(Table table, String text){
         table.row();
         table.add(text);
+    }
+
+    //for AmmoListValue
+    private static String ammoStat(float val){
+        return (val > 0 ? "[stat]+" : "[negstat]") + Strings.autoFixed(val, 1);
     }
 
     private static TextureRegion icon(UnlockableContent t){
