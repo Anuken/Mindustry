@@ -493,7 +493,7 @@ public class DesktopInput extends InputHandler{
             schematicY += shiftY;
         }
 
-        if(Core.input.keyTap(Binding.deselect) && !isPlacing()){
+        if(Core.input.keyTap(Binding.deselect) && !isPlacing() && !commandMode){
             player.unit().mineTile = null;
         }
 
