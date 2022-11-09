@@ -142,5 +142,9 @@
   {
     "name": "mindustry.ddns.net",
     "address": ["mindustry.ddns.net:1000", "mindustry.ddns.net:2000", "mindustry.ddns.net:3000", "mindustry.ddns.net:4000"]
+  },
+  {
+    "name": "EasyPlay.su",
+    "address": ["easyplay.su"]
   }
 ]

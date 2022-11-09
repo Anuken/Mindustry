@@ -234,7 +234,7 @@ public class Planet extends UnlockableContent{
         return (orbitOffset + universe.secondsf() / (orbitTime / 360f)) % 360f;
     }
 
-    /** Calulates rotation on own axis based on universe time.*/
+    /** Calculates rotation on own axis based on universe time.*/
     public float getRotation(){
         //tidally locked planets always face toward parents
         if(tidalLock){
