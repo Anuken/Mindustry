@@ -70,6 +70,12 @@ public class MenuFragment{
                 fontColor = Color.white;
                 up = infoBanner;
             }}, ui.about::show).size(84, 45).name("info"));
+
+            parent.fill((x, y, w, h) -> {
+                if(Core.scene.marginBottom > 0){
+                    Tex.paneTop.draw(0, 0, Core.graphics.getWidth(), Core.scene.marginBottom);
+                }
+            });
         }else if(becontrol.active()){
             parent.fill(c -> c.bottom().right().button("@be.check", Icon.refresh, () -> {
                 ui.loadfrag.show();
