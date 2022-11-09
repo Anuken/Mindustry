@@ -36,7 +36,7 @@ public class Maps{
     };
 
     /** List of all built-in maps. Filenames only. */
-    private static String[] defaultMapNames = {"maze", "fortress", "labyrinth", "islands", "tendrils", "caldera", "wasteland", "shattered", "fork", "triad", "mudFlats", "moltenLake", "archipelago", "debrisField", "erekirwavemap", "veins", "glacier", "passage"};
+    private static String[] defaultMapNames = {"maze", "fortress", "labyrinth", "islands", "tendrils", "caldera", "wasteland", "shattered", "fork", "triad", "mudFlats", "moltenLake", "archipelago", "debrisField", "domain", "veins", "glacier", "passage"};
     /** Maps tagged as PvP */
     private static String[] pvpMaps = {"veins", "glacier", "passage"};
 
