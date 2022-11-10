@@ -17,6 +17,7 @@ import static mindustry.Vars.*;
 
 public class Sorter extends Block{
     public boolean invert;
+    public TextureRegion cross;
 
     public Sorter(String name){
         super(name);
@@ -54,6 +55,13 @@ public class Sorter extends Block{
     protected TextureRegion[] icons(){
         return new TextureRegion[]{Core.atlas.find("source-bottom"), region};
     }
+    
+    @Override
+    public void load(){
+        super.load()
+            
+        cross = Core.atlas.find(name + "-cross", Core.atlas.find("cross-full"));
+    }
 
     public class SorterBuild extends Building{
         public @Nullable Item sortItem;
@@ -71,7 +79,7 @@ public class Sorter extends Block{
         public void draw(){
 
             if(sortItem == null){
-                Draw.rect("cross-full", x, y);
+                Draw.rect(cross, x, y);
             }else{
                 Draw.color(sortItem.color);
                 Fill.square(x, y, tilesize/2f - 0.00001f);
