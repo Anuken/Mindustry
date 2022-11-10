@@ -28,14 +28,13 @@ public class CampaignCompleteDialog extends BaseDialog{
     }
 
     public void show(Planet planet){
-        //TODO obviously needs different text.
         cont.clear();
 
         cont.add(Core.bundle.format("campaign.complete", "[#" + planet.iconColor + "]" + planet.localizedName + "[]")).row();
 
         float playtime = planet.sectors.sumf(s -> s.hasSave() ? s.save.meta.timePlayed : 0) / 1000f;
 
-        //TODO needs more info
+        //TODO needs more info?
         cont.add(Core.bundle.format("campaign.playtime", UI.formatTime(playtime))).left().row();
 
         setTranslation(0f, -Core.graphics.getHeight());

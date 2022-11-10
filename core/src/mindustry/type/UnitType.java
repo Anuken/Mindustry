@@ -472,6 +472,10 @@ public class UnitType extends UnlockableContent{
         return spawn(state.rules.defaultTeam, pos);
     }
 
+    public Unit spawn(Position pos, Team team){
+        return spawn(team, pos);
+    }
+
     public boolean hasWeapons(){
         return weapons.size > 0;
     }
