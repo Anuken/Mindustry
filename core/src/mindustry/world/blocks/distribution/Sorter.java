@@ -58,7 +58,7 @@ public class Sorter extends Block{
     
     @Override
     public void load(){
-        super.load()
+        super.load();
             
         cross = Core.atlas.find(name + "-cross", Core.atlas.find("cross-full"));
     }
