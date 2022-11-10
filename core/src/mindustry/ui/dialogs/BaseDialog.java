@@ -12,6 +12,7 @@ import static mindustry.Vars.*;
 
 public class BaseDialog extends Dialog{
     protected boolean wasPaused;
+    /** If true, this dialog will pause the game while open. */
     protected boolean shouldPause;
 
     public BaseDialog(String title, DialogStyle style){
@@ -23,16 +24,14 @@ public class BaseDialog extends Dialog{
         .growX().height(3f).pad(4f);
 
         hidden(() -> {
-            if(shouldPause && state.isGame()){
-                if(!wasPaused || net.active()){
-                    state.set(State.playing);
-                }
+            if(shouldPause && state.isGame() && !net.active() && !wasPaused){
+                state.set(State.playing);
             }
             Sounds.back.play();
         });
 
         shown(() -> {
-            if(shouldPause && state.isGame()){
+            if(shouldPause && state.isGame() && !net.active()){
                 wasPaused = state.is(State.paused);
                 state.set(State.paused);
             }

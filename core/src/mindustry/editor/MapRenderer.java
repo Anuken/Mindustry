@@ -119,7 +119,7 @@ public class MapRenderer implements Disposable{
         if(wall != Blocks.air && useSyntheticWall){
             region = !center ? clearEditor : getIcon(wall, idxWall);
 
-            float width = region.width * Draw.scl, height = region.height * Draw.scl, ox = wall.offset + (tilesize - width) / 2f, oy = wall.offset + (tilesize - height) / 2f;
+            float width = region.width * region.scl(), height = region.height * region.scl(), ox = wall.offset + (tilesize - width) / 2f, oy = wall.offset + (tilesize - height) / 2f;
 
             //force fit to tile
             if(overlay.wallOre && !wall.synthetic()){
@@ -152,8 +152,8 @@ public class MapRenderer implements Disposable{
                 region = ((Cliff)Blocks.cliff).editorCliffs[tile.data & 0xff];
             }
 
-            offsetX = tilesize / 2f - region.width / 2f * Draw.scl;
-            offsetY = tilesize / 2f - region.height / 2f * Draw.scl;
+            offsetX = tilesize / 2f - region.width * region.scl() / 2f;
+            offsetY = tilesize / 2f - region.height * region.scl() / 2f;
         }else if((wall == Blocks.air || overlay.wallOre) && !overlay.isAir()){
             if(floor.isLiquid){
                 mesh.setColor(Tmp.c1.set(1f, 1f, 1f, floor.overlayAlpha));
@@ -163,7 +163,7 @@ public class MapRenderer implements Disposable{
             region = clearEditor;
         }
 
-        float width = region.width * Draw.scl, height = region.height * Draw.scl;
+        float width = region.width * region.scl(), height = region.height * region.scl();
         if(!wall.synthetic() && wall != Blocks.air && !wall.isMultiblock()){
             offsetX = offsetY = 0f;
             width = height = tilesize;

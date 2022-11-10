@@ -39,8 +39,7 @@ public class LiquidJunction extends LiquidBlock{
         public Building getLiquidDestination(Building source, Liquid liquid){
             if(!enabled) return this;
 
-            int dir = source.relativeTo(tile.x, tile.y);
-            dir = (dir + 4) % 4;
+            int dir = (source.relativeTo(tile.x, tile.y) + 4) % 4;
             Building next = nearby(dir);
             if(next == null || (!next.acceptLiquid(this, liquid) && !(next.block instanceof LiquidJunction))){
                 return this;
@@ -48,6 +47,4 @@ public class LiquidJunction extends LiquidBlock{
             return next.getLiquidDestination(this, liquid);
         }
     }
-
-
 }

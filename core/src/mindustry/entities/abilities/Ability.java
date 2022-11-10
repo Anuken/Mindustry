@@ -31,6 +31,7 @@ public abstract class Ability implements Cloneable{
 
     /** @return localized ability name; mods should override this. */
     public String localized(){
-        return Core.bundle.get("ability." + getClass().getSimpleName().replace("Ability", "").toLowerCase());
+        var type = getClass();
+        return Core.bundle.get("ability." + (type.isAnonymousClass() ? type.getSuperclass() : type).getSimpleName().replace("Ability", "").toLowerCase());
     }
 }

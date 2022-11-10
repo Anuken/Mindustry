@@ -166,6 +166,8 @@ public class Block extends UnlockableContent implements Senseable{
     public float baseExplosiveness = 0f;
     /** bullet that this block spawns when destroyed */
     public @Nullable BulletType destroyBullet = null;
+    /** liquid used for lighting */
+    public @Nullable Liquid lightLiquid;
     /** whether cracks are drawn when this block is damaged */
     public boolean drawCracks = true;
     /** whether rubble is created when this block is destroyed */
@@ -501,6 +503,10 @@ public class Block extends UnlockableContent implements Senseable{
         return update || destructible;
     }
 
+    public boolean checkForceDark(Tile tile){
+        return forceDark;
+    }
+
     @Override
     public void setStats(){
         super.setStats();
@@ -828,6 +834,10 @@ public class Block extends UnlockableContent implements Senseable{
         return generatedIcons == null ? (generatedIcons = icons()) : generatedIcons;
     }
 
+    public void resetGeneratedIcons(){
+        generatedIcons = null;
+    }
+
     public TextureRegion[] variantRegions(){
         return variantRegions == null ? (variantRegions = new TextureRegion[]{fullIcon}) : variantRegions;
     }
@@ -853,11 +863,15 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     public boolean isVisible(){
-        return !isHidden();
+        return !isHidden() && (state.rules.editor || (!state.rules.hideBannedBlocks || !state.rules.isBanned(this)));
+    }
+
+    public boolean isVisibleOn(Planet planet){
+        return !Structs.contains(requirements, i -> planet.hiddenItems.contains(i.item));
     }
 
     public boolean isPlaceable(){
-        return isVisible() && (!state.rules.bannedBlocks.contains(this) || state.rules.editor) && supportsEnv(state.rules.env);
+        return isVisible() && (!state.rules.isBanned(this) || state.rules.editor) && supportsEnv(state.rules.env);
     }
 
     /** @return whether this block supports a specific environment. */
@@ -1069,13 +1083,15 @@ public class Block extends UnlockableContent implements Senseable{
                 for(ItemStack stack : i.items){
                     cons.get(stack.item);
                 }
-            }else if(c instanceof ConsumeLiquid i){
+            }
+            //TODO: requiring liquid dependencies is usually a bad idea, because there is no reason to pump/produce something until you actually need it.
+            /*else if(c instanceof ConsumeLiquid i){
                 cons.get(i.liquid);
             }else if(c instanceof ConsumeLiquids i){
                 for(var stack : i.liquids){
                     cons.get(stack.liquid);
                 }
-            }
+            }*/
         }
     }
 

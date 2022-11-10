@@ -14,6 +14,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
+import mindustry.entities.part.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -21,11 +22,12 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
-import mindustry.world.blocks.defense.Wall.*;
 
 import static mindustry.Vars.*;
 
 public class BulletType extends Content implements Cloneable{
+    static final UnitDamageEvent bulletDamageEvent = new UnitDamageEvent();
+
     /** Lifetime in ticks. */
     public float lifetime = 40f;
     /** Speed in units/tick. */
@@ -139,6 +141,8 @@ public class BulletType extends Content implements Cloneable{
     public boolean despawnHit = false;
     /** If true, this bullet will create bullets when it hits anything, not just when it despawns. */
     public boolean fragOnHit = true;
+    /** If false, this bullet will not create fraags when absorbed by a shield. */
+    public boolean fragOnAbsorb = true;
     /** If true, unit armor is ignored in damage calculations. Ignored for building armor. */
     public boolean pierceArmor = false;
     /** Whether status and despawnHit should automatically be set. */
@@ -190,6 +194,8 @@ public class BulletType extends Content implements Cloneable{
     public int despawnUnitCount = 1;
     /** Random offset distance from the original bullet despawn/hit coordinate. */
     public float despawnUnitRadius = 0.1f;
+    /** Extra visual parts for this bullet. */
+    public Seq<DrawPart> parts = new Seq<>();
 
     /** Color of trail behind bullet. */
     public Color trailColor = Pal.missileYellowBack;
@@ -298,8 +304,20 @@ public class BulletType extends Content implements Cloneable{
         }
     }
 
+    @Override
+    public void load(){
+        for(var part : parts){
+            part.turretShading = false;
+            part.load(null);
+        }
+    }
+
     /** @return estimated damage per shot. this can be very inaccurate. */
     public float estimateDPS(){
+        if(spawnUnit != null){
+            return spawnUnit.estimateDps();
+        }
+
         float sum = damage + splashDamage*0.75f;
         if(fragBullet != null && fragBullet != this){
             sum += fragBullet.estimateDPS() * fragBullets / 2f;
@@ -343,6 +361,8 @@ public class BulletType extends Content implements Cloneable{
     }
 
     public void hitEntity(Bullet b, Hitboxc entity, float health){
+        boolean wasDead = entity instanceof Unit u && u.dead;
+
         if(entity instanceof Healthc h){
             if(pierceArmor){
                 h.damagePierce(b.damage);
@@ -356,11 +376,12 @@ public class BulletType extends Content implements Cloneable{
             if(impact) Tmp.v3.setAngle(b.rotation() + (knockback < 0 ? 180f : 0f));
             unit.impulse(Tmp.v3);
             unit.apply(status, statusDuration);
+
+            Events.fire(bulletDamageEvent.set(unit, b));
         }
 
-        //for achievements
-        if(b.owner instanceof WallBuild && player != null && b.team == player.team() && entity instanceof Unit unit && unit.dead){
-            Events.fire(Trigger.phaseDeflectHit);
+        if(!wasDead && entity instanceof Unit unit && unit.dead){
+            Events.fire(new UnitBulletDestroyEvent(unit, b));
         }
     }
 
@@ -437,7 +458,7 @@ public class BulletType extends Content implements Cloneable{
     }
 
     public void createFrags(Bullet b, float x, float y){
-        if(fragBullet != null){
+        if(fragBullet != null && (fragOnAbsorb || !b.absorbed)){
             for(int i = 0; i < fragBullets; i++){
                 float len = Mathf.random(1f, 7f);
                 float a = b.rotation() + Mathf.range(fragRandomSpread / 2) + fragAngle + ((i - fragBullets/2) * fragSpread);
@@ -481,6 +502,7 @@ public class BulletType extends Content implements Cloneable{
 
     public void draw(Bullet b){
         drawTrail(b);
+        drawParts(b);
     }
 
     public void drawTrail(Bullet b){
@@ -490,6 +512,17 @@ public class BulletType extends Content implements Cloneable{
             Draw.z(z - 0.0001f);
             b.trail.draw(trailColor, trailWidth);
             Draw.z(z);
+        }
+    }
+
+    public void drawParts(Bullet b){
+        if(parts.size > 0){
+            DrawPart.params.set(b.fin(), 0f, 0f, 0f, 0f, 0f, b.x, b.y, b.rotation());
+            DrawPart.params.life = b.fin();
+
+            for(int i = 0; i < parts.size; i++){
+                parts.get(i).draw(DrawPart.params);
+            }
         }
     }
 

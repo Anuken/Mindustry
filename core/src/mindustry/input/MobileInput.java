@@ -279,7 +279,14 @@ public class MobileInput extends InputHandler implements GestureListener{
             t.bottom().left();
             t.button("@command", Icon.units, Styles.squareTogglet, () -> {
                 commandMode = !commandMode;
-            }).width(155f).height(50f).margin(12f).checked(b -> commandMode);
+            }).width(155f).height(50f).margin(12f).checked(b -> commandMode).row();
+
+            //for better looking insets
+            t.rect((x, y, w, h) -> {
+                if(Core.scene.marginBottom > 0){
+                    Tex.paneRight.draw(x, 0, w, y);
+                }
+            }).fillX().row();
         });
 
         group.fill(t -> {
@@ -646,7 +653,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }else if(mode == breaking && validBreak(linked.x,linked.y) && !hasPlan(linked)){
             //add to selection queue if it's a valid BREAK position
             selectPlans.add(new BuildPlan(linked.x, linked.y));
-        }else if((commandMode && selectedUnits.size > 0) || commandBuild != null){
+        }else if((commandMode && selectedUnits.size > 0) || commandBuildings.size > 0){
             //handle selecting units with command mode
             commandTap(x, y);
         }else if(commandMode){
@@ -715,7 +722,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         selectedUnits.removeAll(u -> !u.isCommandable() || !u.isValid());
 
         if(!commandMode){
-            commandBuild = null;
+            commandBuildings.clear();
             selectedUnits.clear();
         }
 

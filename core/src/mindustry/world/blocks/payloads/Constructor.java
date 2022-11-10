@@ -45,7 +45,7 @@ public class Constructor extends BlockProducer{
     }
 
     public boolean canProduce(Block b){
-        return b.isVisible() && b.size >= minBlockSize && b.size <= maxBlockSize && !(b instanceof CoreBlock) && !state.rules.bannedBlocks.contains(b) && b.environmentBuildable() && (filter.isEmpty() || filter.contains(b));
+        return b.isVisible() && b.size >= minBlockSize && b.size <= maxBlockSize && !(b instanceof CoreBlock) && !state.rules.isBanned(b) && b.environmentBuildable() && (filter.isEmpty() || filter.contains(b));
     }
     
     public class ConstructorBuild extends BlockProducerBuild{

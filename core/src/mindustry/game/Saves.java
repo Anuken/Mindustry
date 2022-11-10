@@ -205,9 +205,7 @@ public class Saves{
         }
 
         public void save(){
-            long time = totalPlaytime;
             long prev = totalPlaytime;
-            totalPlaytime = time;
 
             SaveIO.save(file);
             meta = SaveIO.getMeta(file);

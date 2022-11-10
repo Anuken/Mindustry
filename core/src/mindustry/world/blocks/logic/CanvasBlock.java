@@ -1,5 +1,6 @@
 package mindustry.world.blocks.logic;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.input.*;
@@ -12,6 +13,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.ui.*;
 import mindustry.world.*;
@@ -21,9 +23,15 @@ import static mindustry.Vars.*;
 public class CanvasBlock extends Block{
     public float padding = 0f;
     public int canvasSize = 8;
-    public int[] palette = {0x634b7dff, 0xc45d9f_ff, 0xe39aac_ff, 0xf0dab1_ff, 0x6461c2_ff, 0x2ba9b4_ff, 0x93d4b5_ff, 0xf0f6e8_ff};
+    public int[] palette = {0x362944_ff, 0xc45d9f_ff, 0xe39aac_ff, 0xf0dab1_ff, 0x6461c2_ff, 0x2ba9b4_ff, 0x93d4b5_ff, 0xf0f6e8_ff};
     public int bitsPerPixel;
     public IntIntMap colorToIndex = new IntIntMap();
+
+    public @Load("@-side1") TextureRegion side1;
+    public @Load("@-side2") TextureRegion side2;
+
+    public @Load("@-corner1") TextureRegion corner1;
+    public @Load("@-corner2") TextureRegion corner2;
 
     public CanvasBlock(String name){
         super(name);
@@ -54,6 +62,7 @@ public class CanvasBlock extends Block{
     public class CanvasBuild extends Building{
         public @Nullable Texture texture;
         public byte[] data = new byte[Mathf.ceil(canvasSize * canvasSize * bitsPerPixel / 8f)];
+        public int blending;
 
         public void updateTexture(){
             if(headless) return;
@@ -113,14 +122,47 @@ public class CanvasBlock extends Block{
         }
 
         @Override
+        public void onProximityUpdate(){
+            super.onProximityUpdate();
+
+            blending = 0;
+            for(int i = 0; i < 4; i++){
+                if(blends(world.tile(tile.x + Geometry.d4[i].x * size, tile.y + Geometry.d4[i].y * size))) blending |= (1 << i);
+            }
+        }
+
+        boolean blends(Tile other){
+            return other != null && other.build != null && other.build.block == block && other.build.tileX() == other.x && other.build.tileY() == other.y;
+        }
+
+        @Override
         public void draw(){
-            super.draw();
+            if(blending == 0){
+                super.draw();
+            }
 
             if(texture == null){
                 updateTexture();
             }
             Tmp.tr1.set(texture);
-            Draw.rect(Tmp.tr1, x, y, size * tilesize - padding, size * tilesize - padding);
+            float pad = blending == 0 ? padding : 0f;
+
+            Draw.rect(Tmp.tr1, x, y, size * tilesize - pad, size * tilesize - pad);
+            for(int i = 0; i < 4; i ++){
+                if((blending & (1 << i)) == 0){
+                    Draw.rect(i >= 2 ? side2 : side1, x, y, i * 90);
+
+                    if((blending & (1 << ((i + 1) % 4))) != 0){
+                        Draw.rect(i >= 2 ? corner2 : corner1, x, y, i * 90);
+                    }
+
+                    if((blending & (1 << (Mathf.mod(i - 1, 4)))) != 0){
+                        Draw.yscl = -1f;
+                        Draw.rect(i >= 2 ? corner2 : corner1, x, y, i * 90);
+                        Draw.yscl = 1f;
+                    }
+                }
+            }
         }
 
         @Override
@@ -141,6 +183,8 @@ public class CanvasBlock extends Block{
                 Texture texture = new Texture(pix);
                 int[] curColor = {palette[0]};
                 boolean[] modified = {false};
+
+                dialog.resized(dialog::hide);
 
                 dialog.cont.table(Tex.pane, body -> {
                     body.stack(new Element(){
@@ -191,7 +235,7 @@ public class CanvasBlock extends Block{
                         }
                     }, new GridImage(canvasSize, canvasSize){{
                         touchable = Touchable.disabled;
-                    }}).size(500f);
+                    }}).size(mobile && !Core.graphics.isPortrait() ? Math.min(290f, Core.graphics.getHeight() / Scl.scl(1f) - 75f / Scl.scl(1f)) : 480f);
                 });
 
                 dialog.cont.row();

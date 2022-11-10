@@ -2,6 +2,9 @@ name: Pull Request Tests
 
 on: [pull_request, workflow_dispatch]
 
+permissions:
+  contents: read # to fetch code (actions/checkout)
+
 jobs:
   testPR:
     runs-on: ubuntu-latest

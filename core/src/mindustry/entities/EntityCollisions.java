@@ -16,11 +16,8 @@ public class EntityCollisions{
     private static final float seg = 1f;
 
     //tile collisions
-    private Rect tmp = new Rect();
-    private Vec2 vector = new Vec2();
-    private Vec2 l1 = new Vec2();
-    private Rect r1 = new Rect();
-    private Rect r2 = new Rect();
+    private Vec2 vector = new Vec2(), l1 = new Vec2();
+    private Rect r1 = new Rect(), r2 = new Rect(), tmp = new Rect();
 
     //entity collisions
     private Seq<Hitboxc> arrOut = new Seq<>(Hitboxc.class);

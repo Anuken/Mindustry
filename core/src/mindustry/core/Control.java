@@ -161,6 +161,12 @@ public class Control implements ApplicationListener, Loadable{
 
         Events.on(SectorCaptureEvent.class, e -> {
             app.post(this::checkAutoUnlocks);
+
+            if(!net.client() && e.sector.preset != null && e.sector.preset.isLastSector && e.initialCapture){
+                Time.run(60f * 2f, () -> {
+                    ui.campaignComplete.show(e.sector.planet);
+                });
+            }
         });
 
         //delete save on campaign game over
@@ -263,6 +269,9 @@ public class Control implements ApplicationListener, Loadable{
 
         Events.on(SaveWriteEvent.class, e -> forcePlaceAll());
         Events.on(HostEvent.class, e -> forcePlaceAll());
+        Events.on(HostEvent.class, e -> {
+            state.set(State.playing);
+        });
     }
 
     private void forcePlaceAll(){
@@ -632,12 +641,12 @@ public class Control implements ApplicationListener, Loadable{
             }
 
             //cannot launch while paused
-            if(state.is(State.paused) && renderer.isCutscene()){
+            if(state.isPaused() && renderer.isCutscene()){
                 state.set(State.playing);
             }
 
-            if(Core.input.keyTap(Binding.pause) && !renderer.isCutscene() && !scene.hasDialog() && !scene.hasKeyboard() && !ui.restart.isShown() && (state.is(State.paused) || state.is(State.playing))){
-                state.set(state.is(State.playing) ? State.paused : State.playing);
+            if(!net.client() && Core.input.keyTap(Binding.pause) && !renderer.isCutscene() && !scene.hasDialog() && !scene.hasKeyboard() && !ui.restart.isShown() && (state.is(State.paused) || state.is(State.playing))){
+                state.set(state.isPaused() ? State.playing : State.paused);
             }
 
             if(Core.input.keyTap(Binding.menu) && !ui.restart.isShown() && !ui.minimapfrag.shown()){
@@ -645,7 +654,9 @@ public class Control implements ApplicationListener, Loadable{
                     ui.chatfrag.hide();
                 }else if(!ui.paused.isShown() && !scene.hasDialog()){
                     ui.paused.show();
-                    state.set(State.paused);
+                    if(!net.active()){
+                        state.set(State.paused);
+                    }
                 }
             }
 
