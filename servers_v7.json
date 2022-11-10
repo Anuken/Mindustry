@@ -146,5 +146,9 @@
   {
     "name": "EasyPlay.su",
     "address": ["easyplay.su"]
+  },
+  {
+    "name": "Sectorized",
+    "address": ["sectorized.freeddns.org"]
   }
 ]
