@@ -279,7 +279,14 @@ public class MobileInput extends InputHandler implements GestureListener{
             t.bottom().left();
             t.button("@command", Icon.units, Styles.squareTogglet, () -> {
                 commandMode = !commandMode;
-            }).width(155f).height(50f).margin(12f).checked(b -> commandMode);
+            }).width(155f).height(50f).margin(12f).checked(b -> commandMode).row();
+
+            //for better looking insets
+            t.rect((x, y, w, h) -> {
+                if(Core.scene.marginBottom > 0){
+                    Tex.paneRight.draw(x, 0, w, y);
+                }
+            }).fillX().row();
         });
 
         group.fill(t -> {

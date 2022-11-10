@@ -421,6 +421,15 @@ public class PlacementFragment{
 
                 frame.add(mainStack).colspan(3).fill();
 
+                frame.row();
+
+                //for better inset visuals at the bottom
+                frame.rect((x, y, w, h) -> {
+                    if(Core.scene.marginBottom > 0){
+                        Tex.paneLeft.draw(x, 0, w, y);
+                    }
+                }).colspan(3).fillX().row();
+
                 //commandTable: commanded units
                 {
                     commandTable.touchable = Touchable.enabled;
