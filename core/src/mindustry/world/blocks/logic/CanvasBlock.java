@@ -196,7 +196,7 @@ public class CanvasBlock extends Block{
                         }
                     }, new GridImage(canvasSize, canvasSize){{
                         touchable = Touchable.disabled;
-                    }}).size(mobile && !Core.graphics.isPortrait() ? 290f : 480f);
+                    }}).size(mobile && !Core.graphics.isPortrait() ? Math.min(290f, Core.graphics.getHeight() / Scl.scl(1f) - 75f / Scl.scl(1f)) : 480f);
                 });
 
                 dialog.cont.row();

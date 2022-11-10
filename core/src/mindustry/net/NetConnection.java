@@ -30,6 +30,8 @@ public abstract class NetConnection{
     public Seq<BuildPlan> rejectedRequests = new Seq<>();
     /** Handles chat spam rate limits. */
     public Ratekeeper chatRate = new Ratekeeper();
+    /** Handles packet spam rate limits. */
+    public Ratekeeper packetRate = new Ratekeeper();
 
     public boolean hasConnected, hasBegunConnecting, hasDisconnected;
     public float viewWidth, viewHeight, viewX, viewY;

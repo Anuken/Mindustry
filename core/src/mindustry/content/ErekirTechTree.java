@@ -54,19 +54,16 @@ public class ErekirTechTree{
         Seq<Objective> erekirSector = Seq.with(new OnPlanet(Planets.erekir));
 
         var costMultipliers = new ObjectFloatMap<Item>();
-        costMultipliers.put(Items.silicon, 9);
-        costMultipliers.put(Items.surgeAlloy, 4);
-        costMultipliers.put(Items.phaseFabric, 4);
-        costMultipliers.put(Items.thorium, 9);
-        costMultipliers.put(Items.graphite, 9);
-        //oxide is hard to make
-        costMultipliers.put(Items.oxide, 0.5f);
-        costMultipliers.put(Items.carbide, 0.4f);
+        for(var item : content.items()) costMultipliers.put(item, 0.9f);
 
-        //TODO gate behind capture
+        //these are hard to make
+        costMultipliers.put(Items.oxide, 0.5f);
+        costMultipliers.put(Items.surgeAlloy, 0.7f);
+        costMultipliers.put(Items.carbide, 0.3f);
+        costMultipliers.put(Items.phaseFabric, 0.2f);
 
         Planets.erekir.techTree = nodeRoot("erekir", coreBastion, true, () -> {
-            //context().researchCostMultipliers = costMultipliers;
+            context().researchCostMultipliers = costMultipliers;
 
             node(duct, erekirSector, () -> {
                 node(ductRouter, () -> {
@@ -95,6 +92,10 @@ public class ErekirTechTree{
 
                             });
                         });
+                    });
+
+                    node(reinforcedMessage, Seq.with(new OnSector(aegis)), () -> {
+                        node(canvas);
                     });
                 });
 
@@ -281,7 +282,7 @@ public class ErekirTechTree{
 
                     node(disperse, Seq.with(new OnSector(stronghold)), () -> {
                         node(scathe, Seq.with(new OnSector(siege)), () -> {
-                            node(malign, Seq.with(new OnSector(karst)), () -> {
+                            node(malign, Seq.with(new SectorComplete(karst)), () -> {
 
                             });
                         });
@@ -353,7 +354,7 @@ public class ErekirTechTree{
                                             });
                                         });
 
-                                        node(basicAssemblerModule, Seq.with(new OnSector(karst)), () -> {
+                                        node(basicAssemblerModule, Seq.with(new SectorComplete(karst)), () -> {
 
                                         });
                                     });
@@ -377,15 +378,17 @@ public class ErekirTechTree{
                             });
 
                             node(basin, Seq.with(new SectorComplete(atlas)), () -> {
-                                node(marsh, Seq.with(new SectorComplete(basin)), () ->{
-                                    node(ravine, Seq.with(new SectorComplete(marsh), new Research(Liquids.slag)), () ->{
+                                node(marsh, Seq.with(new SectorComplete(basin)), () -> {
+                                    node(ravine, Seq.with(new SectorComplete(marsh), new Research(Liquids.slag)), () -> {
                                         node(caldera, Seq.with(new SectorComplete(peaks), new Research(heatRedirector)), () -> {
                                             node(stronghold, Seq.with(new SectorComplete(caldera), new Research(coreCitadel)), () -> {
                                                 node(crevice, Seq.with(new SectorComplete(stronghold)), () -> {
                                                     node(siege, Seq.with(new SectorComplete(crevice)), () -> {
                                                         node(crossroads, Seq.with(new SectorComplete(siege)), () -> {
                                                             node(karst, Seq.with(new SectorComplete(crossroads), new Research(coreAcropolis)), () -> {
+                                                                node(origin, Seq.with(new SectorComplete(karst), new Research(coreAcropolis), new Research(UnitTypes.vanquish), new Research(UnitTypes.disrupt), new Research(UnitTypes.collaris), new Research(malign), new Research(basicAssemblerModule), new Research(neoplasiaReactor)), () -> {
 
+                                                                });
                                                             });
                                                         });
                                                     });

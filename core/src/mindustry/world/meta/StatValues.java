@@ -35,8 +35,7 @@ public class StatValues{
     }
 
     public static String fixValue(float value){
-        int precision = Math.abs((int)value - value) <= 0.001f ? 0 : Math.abs((int)(value * 10) - value * 10) <= 0.001f ? 1 : 2;
-        return Strings.fixed(value, precision);
+        return Strings.autoFixed(value, 2);
     }
 
     public static StatValue squared(float value, StatUnit unit){
@@ -49,7 +48,7 @@ public class StatValues{
 
     public static StatValue number(float value, StatUnit unit, boolean merge){
         return table -> {
-            String l1 = fixValue(value), l2 = (unit.space ? " " : "") + unit.localized();
+            String l1 = (unit.icon == null ? "" : unit.icon + " ") + fixValue(value), l2 = (unit.space ? " " : "") + unit.localized();
 
             if(merge){
                 table.add(l1 + l2);

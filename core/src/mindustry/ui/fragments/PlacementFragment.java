@@ -370,10 +370,10 @@ public class PlacementFragment{
                                         line.add(stack.item.localizedName).maxWidth(140f).fillX().color(Color.lightGray).padLeft(2).left().get().setEllipsis(true);
                                         line.labelWrap(() -> {
                                             Building core = player.core();
-                                            if(core == null || state.rules.infiniteResources) return "*/*";
+                                            int stackamount = Math.round(stack.amount * state.rules.buildCostMultiplier);
+                                            if(core == null || state.rules.infiniteResources) return "*/" + stackamount;
 
                                             int amount = core.items.get(stack.item);
-                                            int stackamount = Math.round(stack.amount * state.rules.buildCostMultiplier);
                                             String color = (amount < stackamount / 2f ? "[scarlet]" : amount < stackamount ? "[accent]" : "[white]");
 
                                             return color + UI.formatAmount(amount) + "[white]/" + stackamount;

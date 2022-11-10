@@ -272,8 +272,8 @@ public class ServerControl implements ApplicationListener{
         });
 
         Events.on(PlayerJoin.class, e -> {
-            if(state.serverPaused && autoPaused && Config.autoPause.bool()){
-                state.serverPaused = false;
+            if(state.isPaused() && autoPaused && Config.autoPause.bool()){
+                state.set(State.playing);
                 autoPaused = false;
             }
         });
@@ -281,8 +281,8 @@ public class ServerControl implements ApplicationListener{
         Events.on(PlayerLeave.class, e -> {
             // The player list length is compared with 1 and not 0 here,
             // because when PlayerLeave gets fired, the player hasn't been removed from the player list yet
-            if(!state.serverPaused && Config.autoPause.bool() && Groups.player.size() == 1){
-                state.serverPaused = true;
+            if(!state.isPaused() && Config.autoPause.bool() && Groups.player.size() == 1){
+                state.set(State.paused);
                 autoPaused = true;
             }
         });
@@ -372,7 +372,7 @@ public class ServerControl implements ApplicationListener{
                 netServer.openServer();
 
                 if(Config.autoPause.bool()){
-                    state.serverPaused = true;
+                    state.set(State.paused);
                     autoPaused = true;
                 }
             }catch(MapException e){
@@ -489,9 +489,13 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("pause", "<on/off>", "Pause or unpause the game.", arg -> {
+            if(state.isMenu()){
+                err("Cannot pause without a game running.");
+                return;
+            }
             boolean pause = arg[0].equals("on");
             autoPaused = false;
-            state.serverPaused = pause;
+            state.set(state.isPaused() ? State.playing : State.paused);
             info(pause ? "Game paused." : "Game unpaused.");
         });
 

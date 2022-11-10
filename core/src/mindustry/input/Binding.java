@@ -19,6 +19,9 @@ public enum Binding implements KeyBind{
     deselect(KeyCode.mouseRight),
     break_block(KeyCode.mouseRight),
 
+    select_all_units(KeyCode.g),
+    select_all_unit_factories(KeyCode.h),
+
     pickupCargo(KeyCode.leftBracket),
     dropCargo(KeyCode.rightBracket),
 
@@ -29,6 +32,7 @@ public enum Binding implements KeyBind{
     diagonal_placement(KeyCode.controlLeft),
     pick(KeyCode.mouseMiddle),
 
+    rebuild_select(KeyCode.b),
     schematic_select(KeyCode.f),
     schematic_flip_x(KeyCode.z),
     schematic_flip_y(KeyCode.x),
@@ -57,7 +61,7 @@ public enum Binding implements KeyBind{
     fullscreen(KeyCode.f11),
     pause(KeyCode.space),
     minimap(KeyCode.m),
-    research(KeyCode.b),
+    research(KeyCode.j),
     planet_map(KeyCode.n),
     block_info(KeyCode.f1),
     toggle_menus(KeyCode.c),

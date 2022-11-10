@@ -241,8 +241,12 @@ public class Drawf{
     }
 
     public static void light(float x, float y, TextureRegion region, Color color, float opacity){
+        light(x, y, region, 0f, color, opacity);
+    }
+
+    public static void light(float x, float y, TextureRegion region, float rotation, Color color, float opacity){
         if(renderer == null) return;
-        renderer.lights.add(x, y, region, color, opacity);
+        renderer.lights.add(x, y, region, rotation, color, opacity);
     }
 
     public static void light(float x, float y, float x2, float y2){
