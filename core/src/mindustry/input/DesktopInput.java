@@ -510,10 +510,15 @@ public class DesktopInput extends InputHandler{
 
         if( !Core.scene.hasKeyboard() && selectX == -1 && selectY == -1 && schemX != -1 && schemY != -1){
             if(Core.input.keyRelease(Binding.schematic_select)){
-                lastSchematic = schematics.create(schemX, schemY, rawCursorX, rawCursorY);
-                useSchematic(lastSchematic);
-                if(selectPlans.isEmpty()){
-                    lastSchematic = null;
+                if(fogControl.isVisibleTile(player.team(), rawCursorX, rawCursorY) &&
+                    fogControl.isVisibleTile(player.team(), schemX, rawCursorY) &&
+                    fogControl.isVisibleTile(player.team(), rawCursorX, schemY) &&
+                    fogControl.isVisibleTile(player.team(), schemX, schemY)){
+                    lastSchematic = schematics.create(schemX, schemY, rawCursorX, rawCursorY);
+                    useSchematic(lastSchematic);
+                    if(selectPlans.isEmpty()){
+                        lastSchematic = null;
+                    }
                 }
                 schemX = -1;
                 schemY = -1;

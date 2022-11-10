@@ -527,8 +527,13 @@ public class MobileInput extends InputHandler implements GestureListener{
             lineMode = false;
         }else if(mode == schematicSelect){
             selectPlans.clear();
-            lastSchematic = schematics.create(lineStartX, lineStartY, lastLineX, lastLineY);
-            useSchematic(lastSchematic);
+            if(fogControl.isVisibleTile(player.team(), lineStartX, lineStartY) &&
+                    fogControl.isVisibleTile(player.team(), lastLineX, lineStartY) &&
+                    fogControl.isVisibleTile(player.team(), lineStartX, lastLineY) &&
+                    fogControl.isVisibleTile(player.team(), lastLineX, lastLineY)){
+                lastSchematic = schematics.create(lineStartX, lineStartY, lastLineX, lastLineY);
+                useSchematic(lastSchematic);
+            }
             if(selectPlans.isEmpty()){
                 lastSchematic = null;
             }
