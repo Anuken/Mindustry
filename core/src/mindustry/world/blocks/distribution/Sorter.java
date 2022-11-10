@@ -6,6 +6,7 @@ import arc.math.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -16,8 +17,8 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class Sorter extends Block{
+    public @Load(value = "@-cross", fallback = "cross-full") TextureRegion cross;
     public boolean invert;
-    public TextureRegion cross;
 
     public Sorter(String name){
         super(name);
@@ -54,13 +55,6 @@ public class Sorter extends Block{
     @Override
     protected TextureRegion[] icons(){
         return new TextureRegion[]{Core.atlas.find("source-bottom"), region};
-    }
-    
-    @Override
-    public void load(){
-        super.load();
-            
-        cross = Core.atlas.find(name + "-cross", Core.atlas.find("cross-full"));
     }
 
     public class SorterBuild extends Building{
