@@ -45,7 +45,7 @@
   },
   {
     "name": "Chaotic Neutral",
-    "address": ["c-n.ddns.net:5555", "c-n.ddns.net:6666"]
+    "address": ["c-n.ddns.net:5555", "c-n.ddns.net:6666", "c-n.ddns.net:7777", "c-n.ddns.net:8888"]
   },
   {
     "name": "XCore",
