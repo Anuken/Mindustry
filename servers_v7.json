@@ -1,5 +1,9 @@
 [
   {
+    "name": "Mindustry Español",
+    "address": ["mes.xpdustry.fr"]
+  },
+  {
     "name": "mindustry.pl",
     "address": ["0.baseduser.eu.org:6966", "0.baseduser.eu.org:6666", "0.baseduser.eu.org:6000", "1.baseduser.eu.org:6966", "1.baseduser.eu.org:6666", "1.baseduser.eu.org:6000"]
   },
@@ -25,7 +29,7 @@
   },
   {
     "name": "Omega Hub",
-    "address": ["n1.mindustry.me:6572","n1.mindustry.me:6573","n1.mindustry.me:6574","n1.mindustry.me:6604","n1.mindustry.me:6569","n1.mindustry.me:6611","n1.mindustry.me:6610","n1.mindustry.me:6599","n1.mindustry.me","n1.mindustry.me:6608"]
+    "address": ["n7.mindustry.me", "n7.mindustry.me:6570", "n1.mindustry.me:6568", "n1.mindustry.me:6570", "n1.mindustry.me:6571", "n1.mindustry.me:6573", "n1.mindustry.me", "n1.mindustry.me:6599", "n1.mindustry.me:6774", "n1.mindustry.me:6608", "n1.mindustry.me:6572"]
   },
   {
     "name": "KMWStudios",
@@ -50,6 +54,10 @@
   {
     "name": "Phoenix Network",
     "address": ["phoenix-network.dev", "phoenix-network.dev:6464"]
+  },
+  {
+    "name": "Xpdustry",
+    "address": ["play.xpdustry.fr", "event.xpdustry.fr"]
   },
   {
     "name": "Pandorum",
@@ -90,5 +98,5 @@
   {
     "name": "Sakura", 
     "address": ["160.16.207.141:22527", "160.16.207.141:23527", "160.16.207.141:24527", "160.16.207.141:25527", "160.16.207.141:26527"]
-  },
+  }
 ]

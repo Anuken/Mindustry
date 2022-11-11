@@ -12,10 +12,6 @@
     "address": ["recessive.net"]
   },
   {
-    "name": "Omega Hub",
-    "address": ["n7.mindustry.me:6567","n1.mindustry.me:6568","n7.mindustry.me:6570","n1.mindustry.me:6570","n1.mindustry.me:6609", "n1.mindustry.me:6577"]
-  },
-  {
     "name": "EasyPlay",
     "address": ["easyplay.su"]
   },
@@ -124,19 +120,11 @@
     "address": ["mindustryptbr.ddns.net:25579"]
   },
   {
-    "name": "Conservatory",
-    "address": ["143.198.71.232"]
-  },
-  {
     "name": "Shard",
     "address": ["59.12.120.171"]
   },
   {
     "name": "New Campaign Like",
     "address": ["n5.yeet.ml:6568"]
-  },
-  {
-    "name": "AlternightBR",
-    "address": ["mindustrypt.ga:8300"]
   }
 ]
