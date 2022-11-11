@@ -38,6 +38,7 @@ public class PayloadLoader extends PayloadBlock{
         outputsPayload = true;
         size = 3;
         rotate = true;
+        canOverdrive = false;
     }
 
     @Override

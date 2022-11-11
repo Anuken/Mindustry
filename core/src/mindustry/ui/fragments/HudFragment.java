@@ -129,6 +129,13 @@ public class HudFragment{
             cont.top().left();
 
             if(mobile){
+                //for better inset visuals
+                cont.rect((x, y, w, h) -> {
+                    if(Core.scene.marginTop > 0){
+                        Tex.paneRight.draw(x, y, w, Core.scene.marginTop);
+                    }
+                }).fillX().row();
+
                 cont.table(select -> {
                     select.name = "mobile buttons";
                     select.left();

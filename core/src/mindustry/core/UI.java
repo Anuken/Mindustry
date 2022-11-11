@@ -127,6 +127,7 @@ public class UI implements ApplicationListener, Loadable{
         Colors.put("unlaunched", Color.valueOf("8982ed"));
         Colors.put("highlight", Pal.accent.cpy().lerp(Color.white, 0.3f));
         Colors.put("stat", Pal.stat);
+        Colors.put("negstat", Pal.negativeStat);
 
         drillCursor = Core.graphics.newCursor("drill", Fonts.cursorScale());
         unloadCursor = Core.graphics.newCursor("unload", Fonts.cursorScale());
