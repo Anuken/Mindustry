@@ -586,7 +586,7 @@ public class Schematics implements Loadable{
             schematic.tags.put("labels", JsonIO.write(schematic.labels.toArray(String.class)));
 
             stream.writeByte(schematic.tags.size);
-            for(ObjectMap.Entry<String, String> e : schematic.tags.entries()){
+            for(var e : schematic.tags.entries()){
                 stream.writeUTF(e.key);
                 stream.writeUTF(e.value);
             }
