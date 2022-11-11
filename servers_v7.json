@@ -1,5 +1,9 @@
 [
   {
+    "name": "Mindustry Español",
+    "address": ["mes.xpdustry.fr"]
+  },
+  {
     "name": "mindustry.pl",
     "address": ["0.baseduser.eu.org:6966", "0.baseduser.eu.org:6666", "0.baseduser.eu.org:6000", "1.baseduser.eu.org:6966", "1.baseduser.eu.org:6666", "1.baseduser.eu.org:6000"]
   },
@@ -52,6 +56,10 @@
     "address": ["phoenix-network.dev", "phoenix-network.dev:6464"]
   },
   {
+    "name": "Xpdustry",
+    "address": ["play.xpdustry.fr", "event.xpdustry.fr"]
+  },
+  {
     "name": "Pandorum",
     "address": ["pandorum.su:5018", "pandorum.su:5019", "pandorum.su:5020"]
   },
@@ -90,5 +98,5 @@
   {
     "name": "Sakura", 
     "address": ["160.16.207.141:22527", "160.16.207.141:23527", "160.16.207.141:24527", "160.16.207.141:25527", "160.16.207.141:26527"]
-  },
+  }
 ]
