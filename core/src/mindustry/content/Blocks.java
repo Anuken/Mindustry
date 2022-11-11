@@ -5500,7 +5500,7 @@ public class Blocks{
             regionSuffix = "-dark";
             size = 5;
             plans.add(
-            new AssemblerUnitPlan(UnitTypes.quell, 60f * 60f, PayloadStack.list(UnitTypes.elude, 4, Blocks.berylliumWallLarge, 8)),
+            new AssemblerUnitPlan(UnitTypes.quell, 60f * 60f, PayloadStack.list(UnitTypes.elude, 4, Blocks.tungstenWallLarge, 8)),
             new AssemblerUnitPlan(UnitTypes.disrupt, 60f * 60f * 3f, PayloadStack.list(UnitTypes.avert, 6, Blocks.carbideWallLarge, 20))
             );
             areaSize = 13;
