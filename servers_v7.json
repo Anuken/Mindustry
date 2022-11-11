@@ -1,9 +1,5 @@
 [
   {
-    "name": "Mindustry Español",
-    "address": ["n1.xpdustry.fr:6001"]
-  },
-  {
     "name": "mindustry.pl",
     "address": ["0.baseduser.eu.org:6966", "0.baseduser.eu.org:6666", "0.baseduser.eu.org:6000", "1.baseduser.eu.org:6966", "1.baseduser.eu.org:6666", "1.baseduser.eu.org:6000"]
   },
@@ -22,10 +18,6 @@
   {
     "name": "thedimas",
     "address": ["play.thedimas.pp.ua", "play.thedimas.pp.ua:6510", "play.thedimas.pp.ua:6511", "play.thedimas.pp.ua:6509", "play.thedimas.pp.ua:6508"]
-  },
-  {
-    "name": "SMokeOfAnarchy",
-    "address": ["SMokeOfAnarchy.ru", "strider.smokeofanarchy.ru"]
   },
   {
     "name": "HexPvP Network",
@@ -48,14 +40,6 @@
     "address": ["c-n.ddns.net:5555", "c-n.ddns.net:6666", "c-n.ddns.net:7777", "c-n.ddns.net:8888"]
   },
   {
-    "name": "XCore",
-    "address": ["185.187.170.159:28221"]
-  },
-  {
-    "name": "Obvilion Network",
-    "address": ["obvilion.ru:7004", "obvilion.ru:7005"]
-  },
-  {
     "name": "io",
     "address": ["mindustry.io.community", "mindustry.io.community:1000", "mindustry.io.community:2000", "mindustry.io.community:3000", "mindustry.io.community:4000", "labs.io.community"]
   },
@@ -68,44 +52,12 @@
     "address": ["phoenix-network.dev", "phoenix-network.dev:6464"]
   },
   {
-    "name": "Xpdustry",
-    "address": ["play.xpdustry.fr"]
-  },
-  {
     "name": "Pandorum",
     "address": ["pandorum.su:5018", "pandorum.su:5019", "pandorum.su:5020"]
   },
   {
-    "name": "LostDustry",
-    "address": ["lostdustry.northeurope.cloudapp.azure.com:6568", "lostdustry.northeurope.cloudapp.azure.com:6569", "lostdustry.northeurope.cloudapp.azure.com:6570"]
-  },
-  {
-    "name": "Doge Multiverse",
-    "address": ["v7.servegame.com:25578"]
-  },
-  {
-    "name": "Beyond Anarchy",
-    "address": ["45.156.25.49"]
-  },
-  {
-    "name": "M-DE",
-    "address": ["mindustry.inc.li:6569", "mindustry.inc.li:6560"]
-  },
-  {
-    "name": "Surrealment v7",
-    "address": ["md.surrealment.com:6567"]
-  },
-  {
-    "name": "TinyLake",
-    "address": ["mindustry.top"]
-  },
-  {
     "name": "Fish",
     "address": ["170.187.144.235", "45.79.203.155"]
-  },
-  {
-    "name": "Harders",
-    "address": ["212.20.42.61:6567", "212.20.42.61:6568", "212.20.42.61:6569", "212.20.42.61:6570", "212.20.42.61:6571", "212.20.42.61:6572", "212.20.42.61:6573", "212.20.42.61:6574"]
   },
   {
     "name": "OMNIDUSTRY",
@@ -115,25 +67,9 @@
     "name": "The Devil",
     "address": ["dc8.i8mc.cn:8169", "dc8.i8mc.cn:8920", "other.xem8k5.top:10530"]
   },
-    {
+  {
     "name": "Eradicationdustry",
     "address": ["eradicationmindustry.mindustry.me:6569", "eradicationmindustry.mindustry.me:9547", "eradicationmindustry.mindustry.me:6572", "eradicationmindustry.yeet.ml:6570", "eradicationmindustry.mindustry.me:6571", "eradicationmindustry.mindustry.me:6574", "eradicationmindustry.mindustry.me:6573", "eradicationmindustry2.mindustry.me:6567"]
-  },
-    {
-    "name": "AlternightBrasil",
-    "address": ["mindustrypt.ga:6567","mindustrypt.ga:6565","mindustrypt.ga:7770","mindustrypt.ga:6564","mindustrypt.ga:6566","mindustrypt.ga:6568"]
-  },
-    {
-    "name": "Vanilla",
-    "address": ["130.162.228.202"]
-  },
-  {
-    "name": "LightDustry",
-    "address": ["own-formerly.craft.playit.gg:26618", "lightdusy.ddns.net:6567", "lightdusy.ddns.net:6568", "209.25.142.180:39065"]
-  },
-  {
-    "name": "Simply",
-    "address": ["178.203.202.107"]
   },
   {
     "name": "Conservatory",
