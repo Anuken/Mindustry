@@ -82,6 +82,8 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean saveConfig = false;
     /** whether to allow copying the config through middle click */
     public boolean copyConfig = true;
+    /** Used to determine whether copying a selection with only one block should select the block or treat it as a schematic */
+    public boolean oneBlockSchematic = false;
     /** if true, double-tapping this configurable block clears configuration. */
     public boolean clearOnDoubleTap = false;
     /** whether this block has a tile entity that updates */

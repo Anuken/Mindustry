@@ -21,6 +21,7 @@ import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.Placement.*;
+import mindustry.type.Category;
 import mindustry.ui.*;
 import mindustry.world.*;
 
@@ -512,6 +513,16 @@ public class DesktopInput extends InputHandler{
             if(Core.input.keyRelease(Binding.schematic_select)){
                 lastSchematic = schematics.create(schemX, schemY, rawCursorX, rawCursorY);
                 useSchematic(lastSchematic);
+                if(selectPlans.size == 1){
+                    BuildPlan build = selectPlans.get(0);
+                    //check if we might want the one block to be a schematic instead
+                    if(!build.block.oneBlockSchematic){
+                        selectPlans.clear();
+                        block = build.block;
+                        block.lastConfig = build.config;
+                    }
+                    //currentCategory = input.block.category;
+                }
                 if(selectPlans.isEmpty()){
                     lastSchematic = null;
                 }

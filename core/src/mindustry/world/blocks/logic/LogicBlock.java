@@ -45,6 +45,7 @@ public class LogicBlock extends Block{
         configurable = true;
         group = BlockGroup.logic;
         schematicPriority = 5;
+        oneBlockSchematic = true;
 
         //universal, no real requirements
         envEnabled = Env.any;

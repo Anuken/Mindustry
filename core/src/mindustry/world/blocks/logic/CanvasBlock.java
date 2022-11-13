@@ -33,6 +33,7 @@ public class CanvasBlock extends Block{
         destructible = true;
         canOverdrive = false;
         solid = true;
+        oneBlockSchematic = true;
 
         config(byte[].class, (CanvasBuild build, byte[] bytes) -> {
             if(build.data.length == bytes.length){

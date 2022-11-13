@@ -34,6 +34,7 @@ public class MessageBlock extends Block{
         group = BlockGroup.logic;
         drawDisabled = false;
         envEnabled = Env.any;
+        oneBlockSchematic = true;
 
         config(String.class, (MessageBuild tile, String text) -> {
             if(text.length() > maxTextLength || !accessible()){
