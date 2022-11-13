@@ -225,7 +225,7 @@ public class NetClient implements ApplicationListener{
         if(net.server() && player != null && player.con != null && (Time.timeSinceMillis(player.con.connectTime) < 500 || !player.con.hasConnected || !player.isAdded())) return;
 
         //detect and kick for foul play
-        if(player != null && player.con != null && !player.con.chatRate.allow(2000, 20)){
+        if(player != null && player.con != null && !player.con.chatRate.allow(2000, Config.chatSpamLimit.num())){
             player.con.kick(KickReason.kick);
             netServer.admins.blacklistDos(player.con.address);
             return;

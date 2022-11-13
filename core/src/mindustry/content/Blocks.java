@@ -3956,6 +3956,7 @@ public class Blocks{
             coolantMultiplier = 6f;
             shootSound = Sounds.shootAlt;
 
+            targetUnderBlocks = false;
             shake = 1f;
             ammoPerShot = 2;
             drawer = new DrawTurret("reinforced-");
@@ -4006,6 +4007,7 @@ public class Blocks{
             ammoPerShot = 3;
             maxAmmo = 30;
             consumeAmmoOnce = true;
+            targetUnderBlocks = false;
 
             shootSound = Sounds.shootAltLong;
 
@@ -4606,6 +4608,7 @@ public class Blocks{
             minWarmup = 0.94f;
             shootWarmupSpeed = 0.03f;
             targetAir = false;
+            targetUnderBlocks = false;
 
             shake = 6f;
             ammoPerShot = 20;
