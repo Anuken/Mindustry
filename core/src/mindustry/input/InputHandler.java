@@ -1579,7 +1579,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public void add(){
         Core.input.getInputProcessors().remove(i -> i instanceof InputHandler || (i instanceof GestureDetector && ((GestureDetector)i).getListener() instanceof InputHandler));
-        Core.input.addProcessor(detector = new GestureDetector(20, 0.5f, 0.45f, 0.15f, this));
+        Core.input.addProcessor(detector = new GestureDetector(20, 0.5f, 0.3f, 0.15f, this));
         Core.input.addProcessor(this);
         if(Core.scene != null){
             Table table = (Table)Core.scene.find("inputTable");
