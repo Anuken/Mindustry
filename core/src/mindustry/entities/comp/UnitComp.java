@@ -453,6 +453,11 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         healTime -= Time.delta / 20f;
         wasHealed = false;
 
+        //die on captured sectors immediately
+        if(team.isOnlyAI() && state.isCampaign() && state.getSector().isCaptured()){
+            kill();
+        }
+
         if(!headless && type.loopSound != Sounds.none){
             control.sound.loop(type.loopSound, this, type.loopSoundVolume);
         }
