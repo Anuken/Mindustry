@@ -650,6 +650,9 @@ public class Administration{
         /** valid only for command unit events */
         public @Nullable int[] unitIDs;
 
+        /** valid only for command building events */
+        public @Nullable int[] buildingPositions;
+
         public PlayerAction set(Player player, ActionType type, Tile tile){
             this.player = player;
             this.type = type;
