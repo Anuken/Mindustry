@@ -388,7 +388,7 @@ public class Logic implements ApplicationListener{
             node.content.unlock();
             node = node.parent;
 
-            if((node.content instanceof Item item && state.rules.hiddenBuildItems.contains(item))){
+            if(node != null && (node.content instanceof Item item && state.rules.hiddenBuildItems.contains(item))){
                 break;
             }
         }
