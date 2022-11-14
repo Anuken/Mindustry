@@ -122,12 +122,8 @@ public class UI implements ApplicationListener, Loadable{
         });
 
         ClickListener.clicked = () -> Sounds.press.play();
-
-        Colors.put("accent", Pal.accent);
-        Colors.put("unlaunched", Color.valueOf("8982ed"));
-        Colors.put("highlight", Pal.accent.cpy().lerp(Color.white, 0.3f));
-        Colors.put("stat", Pal.stat);
-        Colors.put("negstat", Pal.negativeStat);
+        
+        loadColors();
 
         drillCursor = Core.graphics.newCursor("drill", Fonts.cursorScale());
         unloadCursor = Core.graphics.newCursor("unload", Fonts.cursorScale());
@@ -655,5 +651,13 @@ public class UI implements ApplicationListener, Loadable{
         }else{
             return number;
         }
+    }
+    
+    public static void loadColors() {
+        Colors.put("accent", Pal.accent);
+        Colors.put("unlaunched", Color.valueOf("8982ed"));
+        Colors.put("highlight", Pal.accent.cpy().lerp(Color.white, 0.3f));
+        Colors.put("stat", Pal.stat);
+        Colors.put("negstat", Pal.negativeStat);
     }
 }
