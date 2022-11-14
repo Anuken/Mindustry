@@ -19,6 +19,7 @@ public enum LAccess{
     ammoCapacity,
     health,
     maxHealth,
+    shield,
     heat,
     efficiency,
     progress,

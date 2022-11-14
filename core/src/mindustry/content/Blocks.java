@@ -5866,6 +5866,7 @@ public class Blocks{
             privileged = true;
             memoryCapacity = 128;
             forceDark = true;
+            sync = true;
         }};
 
         worldMessage = new MessageBlock("world-message"){{
