@@ -413,7 +413,7 @@ public class StatValues{
 
                         ammo(ObjectMap.of(t, type.fragBullet), indent + 1, false).display(bt);
                     }
-                }).padTop(compact ? 0 : -9).padLeft(indent * 8).left().get().background(compact ? null : Tex.underline);
+                }).padTop(compact ? 0 : -9).padLeft(8).left().get().background(compact ? null : Tex.underline);
 
                 table.row();
             }
