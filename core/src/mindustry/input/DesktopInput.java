@@ -21,7 +21,6 @@ import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.Placement.*;
-import mindustry.type.Category;
 import mindustry.ui.*;
 import mindustry.world.*;
 
@@ -519,9 +518,8 @@ public class DesktopInput extends InputHandler{
                     if(!build.block.oneBlockSchematic){
                         selectPlans.clear();
                         block = build.block;
-                        block.lastConfig = build.config;
+                        block.lastConfig = !build.block.copyConfig ? null : build.config;
                     }
-                    //currentCategory = input.block.category;
                 }
                 if(selectPlans.isEmpty()){
                     lastSchematic = null;
