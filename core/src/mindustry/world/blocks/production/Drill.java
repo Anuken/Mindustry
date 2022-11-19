@@ -142,6 +142,7 @@ public class Drill extends Block{
             Draw.rect(returnItem.fullIcon, dx, dy - 1, s, s);
             Draw.reset();
             Draw.rect(returnItem.fullIcon, dx, dy, s, s);
+            drawPreviewItem(x, y);
         }else{
             Tile to = tile.getLinkedTilesAs(this, tempTiles).find(t -> t.drop() != null && (t.drop().hardness > tier || t.drop() == blockedItem));
             Item item = to == null ? null : to.drop();
@@ -149,8 +150,6 @@ public class Drill extends Block{
                 drawPlaceText(Core.bundle.get("bar.drilltierreq"), x, y, valid);
             }
         }
-
-        drawPreviewItem(x, y);
     }
 
     @Override
