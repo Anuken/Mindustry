@@ -44,8 +44,6 @@ public class Drill extends Block{
     protected @Nullable Item returnItem;
     protected int returnCount;
 
-    /** Whether to draw the item this drill is mining. */
-    public boolean drawMineItem = true; //todo this is just for the preview item regions, I don't know how to make it draw that through the drawer
     /** Effect played when an item is produced. This is colored. */
     public Effect drillEffect = Fx.mine;
     /** Drill effect randomness. Block size by default. */
