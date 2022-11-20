@@ -1833,7 +1833,7 @@ public class Blocks{
 
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(Liquids.hydrogen, 9f / 4f), new DrawDefault(), new DrawGlowRegion(){{
                 color = Color.sky;
-            }}, new DrawPulseShape(false){{
+            }}, new DrawProjectorPulse(false){{
                 layer = Layer.effect;
                 color = col;
             }}, new DrawShape(){{

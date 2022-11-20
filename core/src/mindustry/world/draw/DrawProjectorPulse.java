@@ -1,5 +1,6 @@
 package mindustry.world.draw;
 
+import arc.Core;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -7,22 +8,38 @@ import arc.math.geom.*;
 import arc.util.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.world.Block;
+import mindustry.world.blocks.defense.OverdriveProjector.*;
 
 import static mindustry.Vars.*;
 
-public class DrawPulseShape extends DrawBlock{
+public class DrawProjectorPulse extends DrawBlock{
     public Color color = Pal.accent.cpy();
     public float stroke = 2f, timeScl = 100f, minStroke = 0.2f;
     public float radiusScl = 1f;
     public float layer = -1f;
     public boolean square = true;
 
-    public DrawPulseShape(boolean square){
+    public boolean drawRegion = true;
+    public String suffix = "-top";
+    public TextureRegion pulseRegion;
+
+    public DrawProjectorPulse(boolean square, Color color, boolean drawRegion){
+        this.square = square;
+        this.color = color;
+        this.drawRegion = drawRegion;
+    }
+
+    public DrawProjectorPulse(boolean square, Color color){
+        this.square = square;
+        this.color = color;
+    }
+
+    public DrawProjectorPulse(boolean square){
         this.square = square;
     }
 
-    public DrawPulseShape(){
-    }
+    public DrawProjectorPulse(){}
 
     @Override
     public void draw(Building build){
@@ -33,8 +50,14 @@ public class DrawPulseShape extends DrawBlock{
         float rad = build.block.size * tilesize / 2f * radiusScl;
 
         Draw.color(color);
-        Lines.stroke((stroke * f + minStroke) * build.warmup());
 
+        if(pulseRegion != null || pulseRegion.found()){
+            Draw.alpha(build.warmup() * Mathf.absin(Time.time, 50f / Mathf.PI2, 1f) * 0.5f);
+            Draw.rect(pulseRegion, build.x, build.y);
+            Draw.alpha(1f);
+        }
+
+        Lines.stroke((stroke * f + minStroke) * build.warmup());
         if(square){
             Lines.square(build.x, build.y, Math.min(1f + (1f - f) * rad, rad));
         }else{
@@ -47,9 +70,12 @@ public class DrawPulseShape extends DrawBlock{
             Lines.endLine(true);
         }
 
-
-
         Draw.reset();
         Draw.z(pz);
+    }
+
+    @Override
+    public void load(Block block){
+        pulseRegion = Core.atlas.find(block.name + suffix);
     }
 }

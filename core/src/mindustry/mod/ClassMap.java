@@ -1,6 +1,8 @@
 package mindustry.mod;
 
 import arc.struct.*;
+import mindustry.world.draw.DrawProjectorPulse;
+
 /** Generated class. Maps simple class names to concrete classes. For use in JSON mods. */
 @SuppressWarnings("deprecation")
 public class ClassMap{
@@ -448,7 +450,7 @@ public class ClassMap{
         classes.put("DrawParticles", mindustry.world.draw.DrawParticles.class);
         classes.put("DrawPistons", mindustry.world.draw.DrawPistons.class);
         classes.put("DrawPlasma", mindustry.world.draw.DrawPlasma.class);
-        classes.put("DrawPulseShape", mindustry.world.draw.DrawPulseShape.class);
+        classes.put("DrawPulseShape", DrawProjectorPulse.class);
         classes.put("DrawPumpLiquid", mindustry.world.draw.DrawPumpLiquid.class);
         classes.put("DrawRegion", mindustry.world.draw.DrawRegion.class);
         classes.put("DrawShape", mindustry.world.draw.DrawShape.class);

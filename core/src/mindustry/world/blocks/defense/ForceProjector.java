@@ -19,6 +19,7 @@ import mindustry.logic.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
+import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -38,7 +39,12 @@ public class ForceProjector extends Block{
     public boolean consumeCoolant = true;
     public Effect absorbEffect = Fx.absorb;
     public Effect shieldBreakEffect = Fx.shieldBreak;
-    public @Load("@-top") TextureRegion topRegion;
+
+    public DrawBlock drawer = new DrawMulti(
+        new DrawDefault(),
+        new DrawTeamRegion(),
+        new DrawForceHeat()
+    );
 
     //TODO json support
     public @Nullable Consume itemConsumer, coolantConsumer;
@@ -69,6 +75,13 @@ public class ForceProjector extends Block{
         if(consumeCoolant){
             consume(coolantConsumer = new ConsumeCoolant(coolantConsumption)).boost().update(false);
         }
+    }
+
+    @Override
+    public void load() {
+        super.load();
+
+        drawer.load(this);
     }
 
     @Override
@@ -118,7 +131,7 @@ public class ForceProjector extends Block{
 
     public class ForceBuild extends Building implements Ranged{
         public boolean broken = true;
-        public float buildup, radscl, hit, warmup, phaseHeat;
+        public float buildup, radscl, hit, warmup, totalProgress, phaseHeat;
 
         @Override
         public float range(){
@@ -165,6 +178,7 @@ public class ForceProjector extends Block{
             }
 
             warmup = Mathf.lerpDelta(warmup, efficiency, 0.1f);
+            totalProgress += warmup * Time.delta;
 
             if(buildup > 0){
                 float scale = !broken ? cooldownNormal : cooldownBrokenBase;
@@ -221,19 +235,19 @@ public class ForceProjector extends Block{
         }
 
         @Override
-        public void draw(){
-            super.draw();
+        public float warmup(){
+            return warmup;
+        }
 
-            if(buildup > 0f){
-                Draw.alpha(buildup / shieldHealth * 0.75f);
-                Draw.z(Layer.blockAdditive);
-                Draw.blend(Blending.additive);
-                Draw.rect(topRegion, x, y);
-                Draw.blend();
-                Draw.z(Layer.block);
-                Draw.reset();
-            }
-            
+        @Override
+        public float totalProgress(){
+            return totalProgress;
+        }
+
+        @Override
+        public void draw(){
+            drawer.draw(this);
+
             drawShield();
         }
 
@@ -258,6 +272,12 @@ public class ForceProjector extends Block{
             }
 
             Draw.reset();
+        }
+
+        @Override
+        public void drawLight(){
+            super.drawLight();
+            drawer.drawLight(this);
         }
 
         @Override
