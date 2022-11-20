@@ -1,32 +1,17 @@
 package mindustry.world.blocks.production;
 
 import arc.audio.*;
-import arc.graphics.*;
-import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
-import arc.util.*;
-import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
-import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.world.draw.*;
 
 public class BurstDrill extends Drill{
     public float shake = 2f;
     public Interp speedCurve = Interp.pow2In;
-
-    public @Load("@-top-invert") TextureRegion topInvertRegion;
-    public @Load("@-glow") TextureRegion glowRegion;
-    public @Load("@-arrow") TextureRegion arrowRegion;
-    public @Load("@-arrow-blur") TextureRegion arrowBlurRegion;
-
-    public float invertedTime = 200f;
-    public float arrowSpacing = 4f, arrowOffset = 0f;
-    public int arrows = 3;
-    public Color arrowColor = Color.valueOf("feb380"), baseArrowColor = Color.valueOf("6e7080");
-    public Color glowColor = arrowColor.cpy();
 
     public Sound drillSound = Sounds.drillImpact;
     public float drillSoundVolume = 0.6f, drillSoundPitchRand = 0.1f;
@@ -45,11 +30,12 @@ public class BurstDrill extends Drill{
         drillEffect = Fx.shockwave;
         ambientSoundVolume = 0.18f;
         ambientSound = Sounds.drillCharge;
-    }
-
-    @Override
-    public TextureRegion[] icons(){
-        return new TextureRegion[]{region, topRegion};
+        drawer = new DrawMulti(
+            new DrawDefault(),
+            new DrawRegion("-top"),
+            new DrawBurstArrows(),
+            new DrawDrillItem()
+        );
     }
 
     @Override
@@ -60,15 +46,12 @@ public class BurstDrill extends Drill{
     public class BurstDrillBuild extends DrillBuild{
         //used so the lights don't fade out immediately
         public float smoothProgress = 0f;
-        public float invertTime = 0f;
 
         @Override
         public void updateTile(){
             if(dominantItem == null){
                 return;
             }
-
-            if(invertTime > 0f) invertTime -= delta() / invertedTime;
 
             if(timer(timerDump, dumpTime)){
                 dump(items.has(dominantItem) ? dominantItem : null);
@@ -83,7 +66,7 @@ public class BurstDrill extends Drill{
 
                 float speed = efficiency;
 
-                timeDrilled += speedCurve.apply(progress / drillTime) * speed;
+                totalProgress += speedCurve.apply(progress / drillTime) * speed;
 
                 lastDrillSpeed = 1f / drillTime * speed * dominantItems;
                 progress += delta() * speed;
@@ -98,7 +81,6 @@ public class BurstDrill extends Drill{
                     offload(dominantItem);
                 }
 
-                invertTime = 1f;
                 progress %= drillTime;
 
                 if(wasVisible){
@@ -121,51 +103,7 @@ public class BurstDrill extends Drill{
 
         @Override
         public void draw(){
-            Draw.rect(region, x, y);
-            drawDefaultCracks();
-
-            Draw.rect(topRegion, x, y);
-            if(invertTime > 0 && topInvertRegion.found()){
-                Draw.alpha(Interp.pow3Out.apply(invertTime));
-                Draw.rect(topInvertRegion, x, y);
-                Draw.color();
-            }
-
-            if(dominantItem != null && drawMineItem){
-                Draw.color(dominantItem.color);
-                Draw.rect(itemRegion, x, y);
-                Draw.color();
-            }
-
-            float fract = smoothProgress;
-            Draw.color(arrowColor);
-            for(int i = 0; i < 4; i++){
-                for(int j = 0; j < arrows; j++){
-                    float arrowFract = (arrows - 1 - j);
-                    float a = Mathf.clamp(fract * arrows - arrowFract);
-                    Tmp.v1.trns(i * 90 + 45, j * arrowSpacing + arrowOffset);
-
-                    //TODO maybe just use arrow alpha and draw gray on the base?
-                    Draw.z(Layer.block);
-                    Draw.color(baseArrowColor, arrowColor, a);
-                    Draw.rect(arrowRegion, x + Tmp.v1.x, y + Tmp.v1.y, i * 90);
-
-                    Draw.color(arrowColor);
-
-                    if(arrowBlurRegion.found()){
-                        Draw.z(Layer.blockAdditive);
-                        Draw.blend(Blending.additive);
-                        Draw.alpha(Mathf.pow(a, 10f));
-                        Draw.rect(arrowBlurRegion, x + Tmp.v1.x, y + Tmp.v1.y, i * 90);
-                        Draw.blend();
-                    }
-                }
-            }
-            Draw.color();
-
-            if(glowRegion.found()){
-                Drawf.additive(glowRegion, Tmp.c2.set(glowColor).a(Mathf.pow(fract, 3f) * glowColor.a), x, y);
-            }
+            drawer.draw(this);
         }
     }
 }
