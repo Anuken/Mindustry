@@ -104,14 +104,6 @@ public class Drill extends Block{
         return tile.drop();
     }
 
-    public void drawPreviewItem(float x, float y){
-        if(returnItem == null || !drawMineItem) return;
-
-        Draw.color(returnItem.color);
-        Draw.rect(Core.atlas.find(name + "-item", Core.atlas.find("drill-item-" + size)), x, y); //avoiding a @Load, don't know if I shouldn't be
-        Draw.color();
-    }
-
     @Override
     public boolean canPlaceOn(Tile tile, Team team, int rotation){
         if(isMultiblock()){
@@ -142,7 +134,6 @@ public class Drill extends Block{
             Draw.rect(returnItem.fullIcon, dx, dy - 1, s, s);
             Draw.reset();
             Draw.rect(returnItem.fullIcon, dx, dy, s, s);
-            drawPreviewItem(x, y);
         }else{
             Tile to = tile.getLinkedTilesAs(this, tempTiles).find(t -> t.drop() != null && (t.drop().hardness > tier || t.drop() == blockedItem));
             Item item = to == null ? null : to.drop();
@@ -150,16 +141,6 @@ public class Drill extends Block{
                 drawPlaceText(Core.bundle.get("bar.drilltierreq"), x, y, valid);
             }
         }
-    }
-
-    @Override
-    public void drawPlanConfigTop(BuildPlan plan, Eachable<BuildPlan> list){
-        if(!plan.worldContext) return;
-        Tile tile = plan.tile();
-        if(tile == null) return;
-
-        countOre(tile);
-        drawPreviewItem(tile.drawx(), tile.drawy());
     }
 
     @Override
