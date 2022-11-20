@@ -427,12 +427,15 @@ public class ClassMap{
         classes.put("DrawArcSmelt", mindustry.world.draw.DrawArcSmelt.class);
         classes.put("DrawBlock", mindustry.world.draw.DrawBlock.class);
         classes.put("DrawBlurSpin", mindustry.world.draw.DrawBlurSpin.class);
+        classes.put("DrawBurstArrows", mindustry.world.draw.DrawBurstArrows.class);
         classes.put("DrawBubbles", mindustry.world.draw.DrawBubbles.class);
         classes.put("DrawCells", mindustry.world.draw.DrawCells.class);
         classes.put("DrawCircles", mindustry.world.draw.DrawCircles.class);
         classes.put("DrawCrucibleFlame", mindustry.world.draw.DrawCrucibleFlame.class);
         classes.put("DrawCultivator", mindustry.world.draw.DrawCultivator.class);
         classes.put("DrawDefault", mindustry.world.draw.DrawDefault.class);
+        classes.put("DrawDrillItem", mindustry.world.draw.DrawDrillItem.class);
+        classes.put("DrawDrillRim", mindustry.world.draw.DrawDrillRim.class);
         classes.put("DrawFade", mindustry.world.draw.DrawFade.class);
         classes.put("DrawFlame", mindustry.world.draw.DrawFlame.class);
         classes.put("DrawFrames", mindustry.world.draw.DrawFrames.class);
@@ -448,7 +451,7 @@ public class ClassMap{
         classes.put("DrawParticles", mindustry.world.draw.DrawParticles.class);
         classes.put("DrawPistons", mindustry.world.draw.DrawPistons.class);
         classes.put("DrawPlasma", mindustry.world.draw.DrawPlasma.class);
-        classes.put("DrawPulseShape", mindustry.world.draw.DrawPulseShape.class);
+        classes.put("DrawProjectorPulse", mindustry.world.draw.DrawProjectorPulse.class);
         classes.put("DrawPumpLiquid", mindustry.world.draw.DrawPumpLiquid.class);
         classes.put("DrawRegion", mindustry.world.draw.DrawRegion.class);
         classes.put("DrawShape", mindustry.world.draw.DrawShape.class);
