@@ -7,7 +7,6 @@ import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
-import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
@@ -19,6 +18,7 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
+import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -44,28 +44,23 @@ public class Drill extends Block{
     protected @Nullable Item returnItem;
     protected int returnCount;
 
-    /** Whether to draw the item this drill is mining. */
-    public boolean drawMineItem = true;
     /** Effect played when an item is produced. This is colored. */
     public Effect drillEffect = Fx.mine;
     /** Drill effect randomness. Block size by default. */
     public float drillEffectRnd = -1f;
-    /** Chance of displaying the effect. Useful for extremely fast drills. */
-    public float drillEffectChance = 1f;
-    /** Speed the drill bit rotates at. */
+    /** Speed the drill bit rotates at. Only used for the default drawer.*/
     public float rotateSpeed = 2f;
     /** Effect randomly played while drilling. */
     public Effect updateEffect = Fx.pulverizeSmall;
     /** Chance the update effect will appear. */
     public float updateEffectChance = 0.02f;
 
-    public boolean drawRim = false;
-    public boolean drawSpinSprite = true;
-    public Color heatColor = Color.valueOf("ff5512");
-    public @Load("@-rim") TextureRegion rimRegion;
-    public @Load("@-rotator") TextureRegion rotatorRegion;
-    public @Load("@-top") TextureRegion topRegion;
-    public @Load(value = "@-item", fallback = "drill-item-@size") TextureRegion itemRegion;
+    public DrawBlock drawer = new DrawMulti(
+        new DrawDefault(),
+        new DrawRegion("-rotator", rotateSpeed, true), //rotateSpeed is kept to avoid changing drawers just for it, remove if needed
+        new DrawRegion("-top"),
+        new DrawDrillItem()
+    );
 
     public Drill(String name){
         super(name);
@@ -89,17 +84,10 @@ public class Drill extends Block{
     }
 
     @Override
-    public void drawPlanConfigTop(BuildPlan plan, Eachable<BuildPlan> list){
-        if(!plan.worldContext) return;
-        Tile tile = plan.tile();
-        if(tile == null) return;
+    public void load(){
+        super.load();
 
-        countOre(tile);
-        if(returnItem == null || !drawMineItem) return;
-
-        Draw.color(returnItem.color);
-        Draw.rect(itemRegion, plan.drawx(), plan.drawy());
-        Draw.color();
+        drawer.load(this);
     }
 
     @Override
@@ -144,12 +132,6 @@ public class Drill extends Block{
             Draw.rect(returnItem.fullIcon, dx, dy - 1, s, s);
             Draw.reset();
             Draw.rect(returnItem.fullIcon, dx, dy, s, s);
-
-            if(drawMineItem){
-                Draw.color(returnItem.color);
-                Draw.rect(itemRegion, tile.worldx() + offset, tile.worldy() + offset);
-                Draw.color();
-            }
         }else{
             Tile to = tile.getLinkedTilesAs(this, tempTiles).find(t -> t.drop() != null && (t.drop().hardness > tier || t.drop() == blockedItem));
             Item item = to == null ? null : to.drop();
@@ -157,6 +139,21 @@ public class Drill extends Block{
                 drawPlaceText(Core.bundle.get("bar.drilltierreq"), x, y, valid);
             }
         }
+    }
+
+    @Override
+    public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
+        drawer.drawPlan(this, plan, list);
+    }
+
+    @Override
+    public void getRegionsToOutline(Seq<TextureRegion> out){
+        drawer.getRegionsToOutline(this, out);
+    }
+
+    @Override
+    public TextureRegion[] icons(){
+        return drawer.finalIcons(this);
     }
 
     public float getDrillTime(Item item){
@@ -174,11 +171,6 @@ public class Drill extends Block{
         if(liquidBoostIntensity != 1){
             stats.add(Stat.boostEffect, liquidBoostIntensity * liquidBoostIntensity, StatUnit.timesSpeed);
         }
-    }
-
-    @Override
-    public TextureRegion[] icons(){
-        return new TextureRegion[]{region, rotatorRegion, topRegion};
     }
 
     protected void countOre(Tile tile){
@@ -223,7 +215,7 @@ public class Drill extends Block{
     public class DrillBuild extends Building{
         public float progress;
         public float warmup;
-        public float timeDrilled;
+        public float totalProgress;
         public float lastDrillSpeed;
 
         public int dominantItems;
@@ -285,7 +277,7 @@ public class Drill extends Block{
                 return;
             }
 
-            timeDrilled += warmup * delta();
+            totalProgress += warmup * delta();
 
             float delay = getDrillTime(dominantItem);
 
@@ -319,50 +311,25 @@ public class Drill extends Block{
         }
 
         @Override
+        public float totalProgress(){
+            return totalProgress;
+        }
+
+        @Override
         public double sense(LAccess sensor){
             if(sensor == LAccess.progress && dominantItem != null) return progress;
             return super.sense(sensor);
         }
 
         @Override
-        public void drawCracks(){}
-
-        public void drawDefaultCracks(){
-            super.drawCracks();
+        public void draw(){
+            drawer.draw(this);
         }
 
         @Override
-        public void draw(){
-            float s = 0.3f;
-            float ts = 0.6f;
-
-            Draw.rect(region, x, y);
-            Draw.z(Layer.blockCracks);
-            drawDefaultCracks();
-
-            Draw.z(Layer.blockAfterCracks);
-            if(drawRim){
-                Draw.color(heatColor);
-                Draw.alpha(warmup * ts * (1f - s + Mathf.absin(Time.time, 3f, s)));
-                Draw.blend(Blending.additive);
-                Draw.rect(rimRegion, x, y);
-                Draw.blend();
-                Draw.color();
-            }
-
-            if(drawSpinSprite){
-                Drawf.spinSprite(rotatorRegion, x, y, timeDrilled * rotateSpeed);
-            }else{
-                Draw.rect(rotatorRegion, x, y, timeDrilled * rotateSpeed);
-            }
-
-            Draw.rect(topRegion, x, y);
-
-            if(dominantItem != null && drawMineItem){
-                Draw.color(dominantItem.color);
-                Draw.rect(itemRegion, x, y);
-                Draw.color();
-            }
+        public void drawLight(){
+            super.drawLight();
+            drawer.drawLight(this);
         }
 
         @Override
@@ -386,5 +353,4 @@ public class Drill extends Block{
             }
         }
     }
-
 }

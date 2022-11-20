@@ -1833,9 +1833,8 @@ public class Blocks{
 
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(Liquids.hydrogen, 9f / 4f), new DrawDefault(), new DrawGlowRegion(){{
                 color = Color.sky;
-            }}, new DrawPulseShape(false){{
+            }}, new DrawProjectorPulse(false, col, false){{
                 layer = Layer.effect;
-                color = col;
             }}, new DrawShape(){{
                 layer = Layer.effect;
                 radius = 3.5f;
@@ -2687,13 +2686,11 @@ public class Blocks{
             requirements(Category.production, with(Items.copper, 65, Items.silicon, 60, Items.titanium, 50, Items.thorium, 75));
             drillTime = 280;
             size = 4;
-            drawRim = true;
             hasPower = true;
             tier = 5;
             updateEffect = Fx.pulverizeRed;
             updateEffectChance = 0.03f;
             drillEffect = Fx.mineHuge;
-            rotateSpeed = 6f;
             warmupSpeed = 0.01f;
             itemCapacity = 20;
 
@@ -2702,6 +2699,14 @@ public class Blocks{
 
             consumePower(3f);
             consumeLiquid(Liquids.water, 0.1f).boost();
+
+            drawer = new DrawMulti(
+                new DrawDefault(),
+                new DrawDrillRim(),
+                new DrawRegion("-rotator", 6f, true),
+                new DrawRegion("-top"),
+                new DrawDrillItem()
+            );
         }};
 
         waterExtractor = new SolidPump("water-extractor"){{
@@ -2863,10 +2868,6 @@ public class Blocks{
             );
             shake = 4f;
             itemCapacity = 50;
-            arrowOffset = 2f;
-            arrowSpacing = 5f;
-            arrows = 2;
-            glowColor.a = 0.6f;
             fogRadius = 5;
 
             drillMultipliers.put(Items.beryllium, 2.5f);
@@ -2874,6 +2875,13 @@ public class Blocks{
             //TODO different requirements
             consumePower(6f);
             consumeLiquids(LiquidStack.with(Liquids.hydrogen, 4f / 60f));
+
+            drawer = new DrawMulti(
+                new DrawDefault(),
+                new DrawRegion("-top"),
+                new DrawBurstArrows(2, 5f, 2f),
+                new DrawDrillItem()
+            );
         }};
 
         //endregion
