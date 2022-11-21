@@ -176,7 +176,7 @@ public class Conveyor extends Block implements Autotiler{
 
         @Override
         public void payloadDraw(){
-            Draw.rect(block.fullIcon,x, y);
+            Draw.rect(block.fullIcon, x, y);
         }
 
         @Override
@@ -350,6 +350,7 @@ public class Conveyor extends Block implements Autotiler{
         public boolean acceptItem(Building source, Item item){
             if(len >= capacity) return false;
             Tile facing = Edges.getFacingEdge(source.tile, tile);
+            if(facing == null) return false;
             int direction = Math.abs(facing.relativeTo(tile.x, tile.y) - rotation);
             return (((direction == 0) && minitem >= itemSpace) || ((direction % 2 == 1) && minitem > 0.7f)) && !(source.block.rotate && next == source);
         }

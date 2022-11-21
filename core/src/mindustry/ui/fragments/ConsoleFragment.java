@@ -12,6 +12,7 @@ import arc.scene.ui.TextField.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.game.EventType.*;
 import mindustry.input.*;
 import mindustry.ui.*;
 
@@ -175,6 +176,7 @@ public class ConsoleFragment extends Table{
     public void toggle(){
 
         if(!open){
+            Events.fire(Trigger.openConsole);
             scene.setKeyboardFocus(chatfield);
             open = !open;
             if(mobile){

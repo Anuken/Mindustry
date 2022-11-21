@@ -15,6 +15,7 @@ public class PayloadUnloader extends PayloadLoader{
         outputsPower = true;
         consumesPower = true;
         loadPowerDynamic = false;
+        canOverdrive = false;
     }
 
     @Override

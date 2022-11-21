@@ -225,7 +225,7 @@ public class NetClient implements ApplicationListener{
         if(net.server() && player != null && player.con != null && (Time.timeSinceMillis(player.con.connectTime) < 500 || !player.con.hasConnected || !player.isAdded())) return;
 
         //detect and kick for foul play
-        if(player != null && player.con != null && !player.con.chatRate.allow(2000, 20)){
+        if(player != null && player.con != null && !player.con.chatRate.allow(2000, Config.chatSpamLimit.num())){
             player.con.kick(KickReason.kick);
             netServer.admins.blacklistDos(player.con.address);
             return;
@@ -488,7 +488,9 @@ public class NetClient implements ApplicationListener{
             state.wavetime = waveTime;
             state.wave = wave;
             state.enemies = enemies;
-            state.serverPaused = paused;
+            if(!state.isMenu()){
+                state.set(paused ? State.paused : State.playing);
+            }
             state.serverTps = tps & 0xff;
 
             //note that this is far from a guarantee that random state is synced - tiny changes in delta and ping can throw everything off again.

@@ -214,6 +214,8 @@ public class UnitType extends UnlockableContent{
     naval = false,
     /** if false, RTS AI controlled units do not automatically attack things while moving. This is automatically assigned. */
     autoFindTarget = true,
+    /** if true, this unit will always shoot while moving regardless of slowdown */
+    alwaysShootWhenMoving = false,
 
     /** whether this unit has a hover tooltip */
     hoverable = true,
@@ -470,6 +472,10 @@ public class UnitType extends UnlockableContent{
         return spawn(state.rules.defaultTeam, pos);
     }
 
+    public Unit spawn(Position pos, Team team){
+        return spawn(team, pos);
+    }
+
     public boolean hasWeapons(){
         return weapons.size > 0;
     }
@@ -693,7 +699,7 @@ public class UnitType extends UnlockableContent{
         }
 
         //if a status effects slows a unit when firing, don't shoot while moving.
-        autoFindTarget = !weapons.contains(w -> w.shootStatus.speedMultiplier < 0.99f);
+        autoFindTarget = !weapons.contains(w -> w.shootStatus.speedMultiplier < 0.99f) || alwaysShootWhenMoving;
 
         clipSize = Math.max(clipSize, lightRadius * 1.1f);
         singleTarget = weapons.size <= 1 && !forceMultiTarget;
@@ -826,6 +832,13 @@ public class UnitType extends UnlockableContent{
             ammoCapacity = Math.max(1, (int)(shotsPerSecond * targetSeconds));
         }
 
+        estimateDps();
+
+        //only do this after everything else was initialized
+        sample = constructor.get();
+    }
+    
+    public float estimateDps(){
         //calculate estimated DPS for one target based on weapons
         if(dpsEstimate < 0){
             dpsEstimate = weapons.sumf(Weapon::dps);
@@ -836,9 +849,8 @@ public class UnitType extends UnlockableContent{
                 dpsEstimate /= 25f;
             }
         }
-
-        //only do this after everything else was initialized
-        sample = constructor.get();
+        
+        return dpsEstimate;
     }
 
     @CallSuper
