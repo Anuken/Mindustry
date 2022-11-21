@@ -48,8 +48,6 @@ public class Drill extends Block{
     public Effect drillEffect = Fx.mine;
     /** Drill effect randomness. Block size by default. */
     public float drillEffectRnd = -1f;
-    /** Speed the drill bit rotates at. Only used for the default drawer.*/
-    public float rotateSpeed = 2f;
     /** Effect randomly played while drilling. */
     public Effect updateEffect = Fx.pulverizeSmall;
     /** Chance the update effect will appear. */
@@ -57,7 +55,7 @@ public class Drill extends Block{
 
     public DrawBlock drawer = new DrawMulti(
         new DrawDefault(),
-        new DrawRegion("-rotator", rotateSpeed, true), //rotateSpeed is kept to avoid changing drawers just for it, remove if needed
+        new DrawRegion("-rotator", 2, true),
         new DrawRegion("-top"),
         new DrawDrillItem()
     );
@@ -303,6 +301,11 @@ public class Drill extends Block{
 
                 if(wasVisible && Mathf.chanceDelta(updateEffectChance * warmup)) drillEffect.at(x + Mathf.range(drillEffectRnd), y + Mathf.range(drillEffectRnd), dominantItem.color);
             }
+        }
+
+        @Override
+        public float warmup(){
+            return warmup;
         }
 
         @Override

@@ -12,8 +12,6 @@ import mindustry.world.draw.*;
 public class BurstDrill extends Drill{
     public float shake = 2f;
     public Interp speedCurve = Interp.pow2In;
-    public int arrows = 3;
-    public float arrowSpacing = 4f, arrowOffset = 0f;
 
     public Sound drillSound = Sounds.drillImpact;
     public float drillSoundVolume = 0.6f, drillSoundPitchRand = 0.1f;
@@ -35,7 +33,7 @@ public class BurstDrill extends Drill{
         drawer = new DrawMulti(
             new DrawDefault(),
             new DrawRegion("-top"),
-            new DrawBurstArrows(arrows, arrowSpacing, arrowOffset),
+            new DrawBurstArrows(3, 4f, 0f),
             new DrawDrillItem()
         );
     }

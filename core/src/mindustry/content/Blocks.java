@@ -2704,6 +2704,8 @@ public class Blocks{
                 new DrawDefault(),
                 new DrawGlowRegion("-rim"){{
                 color = Color.valueOf("ff5512");
+                layer = -1f;
+                alpha = 0.7f;
                 }},
                 new DrawRegion("-rotator", 6f, true),
                 new DrawRegion("-top"),
@@ -2861,9 +2863,6 @@ public class Blocks{
             size = 5;
             hasPower = true;
             tier = 7;
-            arrows = 3;
-            arrowSpacing = 4f;
-            arrowOffset = 0f;
             //TODO better effect
             drillEffect = new MultiEffect(
                 Fx.mineImpact,
