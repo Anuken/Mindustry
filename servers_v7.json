@@ -40,10 +40,6 @@
     "address": ["meowland.ru"]
   },
   {
-    "name": "Darkdustry",
-    "address": ["darkdustry.tk", "darkdustry.tk:1500", "darkdustry.tk:2000", "darkdustry.tk:3000", "darkdustry.tk:4000", "darkdustry.tk:5000", "darkdustry.tk:6000", "darkdustry.tk:7000", "darkdustry.tk:8000", "darkdustry.tk:9000"] 
-  },
-  {
     "name": "Chaotic Neutral",
     "address": ["c-n.ddns.net:5555", "c-n.ddns.net:6666", "c-n.ddns.net:7777", "c-n.ddns.net:8888"]
   },
@@ -90,10 +86,6 @@
   {
     "name": "mindustry.ddns.net",
     "address": ["mindustry.ddns.net:1000", "mindustry.ddns.net:2000", "mindustry.ddns.net:3000", "mindustry.ddns.net:4000"]
-  },
-  {
-    "name": "EasyPlay.su",
-    "address": ["easyplay.su"]
   },
   {
     "name": "Sectorized",
