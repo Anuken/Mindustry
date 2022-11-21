@@ -22,9 +22,5 @@
   {
     "name": "Phoenix-Network",
     "address": ["be.phoenix-network.dev"]
-  },
-  {
-    "name": "Darkdustry",
-    "address": ["darkdustry.tk"]
   }
 ]
