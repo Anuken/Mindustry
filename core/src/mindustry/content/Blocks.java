@@ -2879,6 +2879,13 @@ public class Blocks{
             //TODO different requirements
             consumePower(6f);
             consumeLiquids(LiquidStack.with(Liquids.hydrogen, 4f / 60f));
+
+            drawer = new DrawMulti(
+                    new DrawDefault(),
+                    new DrawRegion("-top"),
+                    new DrawBurstArrows(2, 5f, 2f),
+                    new DrawDrillItem()
+            );
         }};
 
         //endregion
