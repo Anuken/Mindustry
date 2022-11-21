@@ -435,7 +435,6 @@ public class ClassMap{
         classes.put("DrawCultivator", mindustry.world.draw.DrawCultivator.class);
         classes.put("DrawDefault", mindustry.world.draw.DrawDefault.class);
         classes.put("DrawDrillItem", mindustry.world.draw.DrawDrillItem.class);
-        classes.put("DrawDrillRim", mindustry.world.draw.DrawDrillRim.class);
         classes.put("DrawFade", mindustry.world.draw.DrawFade.class);
         classes.put("DrawFlame", mindustry.world.draw.DrawFlame.class);
         classes.put("DrawFrames", mindustry.world.draw.DrawFrames.class);

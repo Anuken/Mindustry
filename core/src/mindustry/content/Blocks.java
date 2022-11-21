@@ -2702,7 +2702,9 @@ public class Blocks{
 
             drawer = new DrawMulti(
                 new DrawDefault(),
-                new DrawDrillRim(),
+                new DrawGlowRegion("-rim"){{
+                color = Color.valueOf("ff5512");
+                }},
                 new DrawRegion("-rotator", 6f, true),
                 new DrawRegion("-top"),
                 new DrawDrillItem()
@@ -2859,6 +2861,9 @@ public class Blocks{
             size = 5;
             hasPower = true;
             tier = 7;
+            arrows = 3;
+            arrowSpacing = 4f;
+            arrowOffset = 0f;
             //TODO better effect
             drillEffect = new MultiEffect(
                 Fx.mineImpact,
@@ -2875,13 +2880,6 @@ public class Blocks{
             //TODO different requirements
             consumePower(6f);
             consumeLiquids(LiquidStack.with(Liquids.hydrogen, 4f / 60f));
-
-            drawer = new DrawMulti(
-                new DrawDefault(),
-                new DrawRegion("-top"),
-                new DrawBurstArrows(2, 5f, 2f),
-                new DrawDrillItem()
-            );
         }};
 
         //endregion
