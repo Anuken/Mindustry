@@ -1136,19 +1136,27 @@ public class Mods implements Loadable{
             int dot = ver.indexOf(".");
             return dot != -1 ? Strings.parseInt(ver.substring(0, dot), 0) : Strings.parseInt(ver, 0);
         }
-        
+
         @Override
         public String toString(){
             return "ModMeta{" +
-                    "name='" + name + '\'' +
-                    ", author='" + author + '\'' +
-                    ", version='" + version + '\'' +
-                    ", main='" + main + '\'' +
-                    ", minGameVersion='" + minGameVersion + '\'' +
-                    ", hidden=" + hidden +
-                    ", repo=" + repo +
-                    ", texturescale=" + texturescale +
-                    '}';
+            "name='" + name + '\'' +
+            ", minGameVersion='" + minGameVersion + '\'' +
+            ", displayName='" + displayName + '\'' +
+            ", author='" + author + '\'' +
+            ", description='" + description + '\'' +
+            ", subtitle='" + subtitle + '\'' +
+            ", version='" + version + '\'' +
+            ", main='" + main + '\'' +
+            ", repo='" + repo + '\'' +
+            ", dependencies=" + dependencies +
+            ", softDependencies=" + softDependencies +
+            ", hidden=" + hidden +
+            ", java=" + java +
+            ", keepOutlines=" + keepOutlines +
+            ", texturescale=" + texturescale +
+            ", pregenerated=" + pregenerated +
+            '}';
         }
     }
 
