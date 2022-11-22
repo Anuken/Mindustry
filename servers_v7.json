@@ -61,7 +61,7 @@
   },
   {
     "name": "Xpdustry",
-    "address": ["play.xpdustry.fr", "event.xpdustry.fr"]
+    "address": ["survival.md.xpdustry.fr", "pvp.md.xpdustry.fr", "attack.md.xpdustry.fr", "sandbox.md.xpdustry.fr", "event.md.xpdustry.fr"]
   },
   {
     "name": "Pandorum",
