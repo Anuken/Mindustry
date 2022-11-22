@@ -63,7 +63,7 @@ public class MapPlayDialog extends BaseDialog{
                 modes.button(mode.toString(), Styles.flatToggleMenut, () -> {
                     selectedGamemode = mode;
                     rules = map.applyRules(mode);
-                }).update(b -> b.setChecked(selectedGamemode == mode)).size(140f, 54f).disabled(!mode.valid(map));
+                }).update(b -> b.setChecked(selectedGamemode == mode)).size(140f, mobile ? 44f : 54f).disabled(!mode.valid(map));
                 if(i++ % 2 == 1) modes.row();
             }
         });

@@ -271,6 +271,26 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     //endregion
     //region utility methods
 
+    public boolean isDiscovered(Team viewer){
+        if(state.rules.limitMapArea && world.getDarkness(tile.x, tile.y) >= 3){
+            return false;
+        }
+
+        if(viewer == null || !state.rules.staticFog || !state.rules.fog){
+            return true;
+        }
+        if(block.size <= 2){
+            return fogControl.isDiscovered(viewer, tile.x, tile.y);
+        }else{
+            int s = block.size / 2;
+            return fogControl.isDiscovered(viewer, tile.x, tile.y) ||
+                fogControl.isDiscovered(viewer, tile.x - s, tile.y - s) ||
+                fogControl.isDiscovered(viewer, tile.x - s, tile.y + s) ||
+                fogControl.isDiscovered(viewer, tile.x + s, tile.y + s) ||
+                fogControl.isDiscovered(viewer, tile.x + s, tile.y - s);
+        }
+    }
+
     public void addPlan(boolean checkPrevious){
         addPlan(checkPrevious, false);
     }
@@ -1181,10 +1201,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public void drawLight(){
-        if(block.hasLiquids && block.drawLiquidLight && liquids.current().lightColor.a > 0.001f){
+        Liquid liq = block.hasLiquids && block.lightLiquid == null ? liquids.current() : block.lightLiquid;
+        if(block.hasLiquids && block.drawLiquidLight && liq.lightColor.a > 0.001f){
             //yes, I am updating in draw()... but this is purely visual anyway, better have it here than in update() where it wastes time
-            visualLiquid = Mathf.lerpDelta(visualLiquid, liquids.currentAmount(), 0.07f);
-            drawLiquidLight(liquids.current(), visualLiquid);
+            visualLiquid = Mathf.lerpDelta(visualLiquid, liquids.get(liq)>= 0.01f ? 1f : 0f, 0.06f);
+            drawLiquidLight(liq, visualLiquid);
         }
     }
 
@@ -1194,7 +1215,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             float fract = 1f;
             float opacity = color.a * fract;
             if(opacity > 0.001f){
-                Drawf.light(x, y, block.size * 30f * fract, color, opacity);
+                Drawf.light(x, y, block.size * 30f * fract, color, opacity * amount);
             }
         }
     }
@@ -1570,12 +1591,12 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     /** Handle a bullet collision.
      * @return whether the bullet should be removed. */
     public boolean collision(Bullet other){
-        boolean wasDead = dead();
+        boolean wasDead = health <= 0;
 
         damage(other.team, other.damage() * other.type().buildingDamageMultiplier);
         Events.fire(bulletDamageEvent.set(self(), other));
 
-        if(dead() && !wasDead){
+        if(health <= 0 && !wasDead){
             Events.fire(new BuildingBulletDestroyEvent(self(), other));
         }
 
@@ -1951,6 +1972,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         int size = block.size, of = block.sizeOffset, tx = tile.x, ty = tile.y;
 
+        if(!isDiscovered(viewer)) return true;
+
         for(int x = 0; x < size; x++){
             for(int y = 0; y < size; y++){
                 if(fogControl.isVisibleTile(viewer, tx + x + of, ty + y + of)){
@@ -1997,6 +2020,13 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             enabled = false;
         }
 
+        if(!headless && !wasVisible && state.rules.fog && !inFogTo(player.team())){
+            visibleFlags |= (1L << player.team().id);
+            wasVisible = true;
+            renderer.blocks.updateShadow(self());
+            renderer.minimap.update(tile);
+        }
+
         //TODO separate system for sound? AudioSource, etc
         if(!headless){
             if(sound != null){
@@ -2019,6 +2049,12 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     @Override
     public void hitbox(Rect out){
         out.setCentered(x, y, block.size * tilesize, block.size * tilesize);
+    }
+
+    @Override
+    @Replace
+    public String toString(){
+        return "Building#" + id() + "[" + tileX() + "," + tileY() + "]:" + block;
     }
 
     //endregion

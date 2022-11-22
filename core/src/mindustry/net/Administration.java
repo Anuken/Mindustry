@@ -21,6 +21,7 @@ public class Administration{
     public Seq<ChatFilter> chatFilters = new Seq<>();
     public Seq<ActionFilter> actionFilters = new Seq<>();
     public Seq<String> subnetBans = new Seq<>();
+    public ObjectSet<String> dosBlacklist = new ObjectSet<>();
     public ObjectMap<String, Long> kickedIPs = new ObjectMap<>();
 
     /** All player info. Maps UUIDs to info. This persists throughout restarts. Do not access directly. */
@@ -31,7 +32,7 @@ public class Administration{
 
         //anti-spam
         addChatFilter((player, message) -> {
-            long resetTime = Config.messageRateLimit.num() * 1000;
+            long resetTime = Config.messageRateLimit.num() * 1000L;
             if(Config.antiSpam.bool() && !player.isLocal() && !player.admin){
                 //prevent people from spamming messages quickly
                 if(resetTime > 0 && Time.timeSinceMillis(player.getInfo().lastMessageTime) < resetTime){
@@ -64,10 +65,11 @@ public class Administration{
         addActionFilter(action -> {
             if(action.type != ActionType.breakBlock &&
                 action.type != ActionType.placeBlock &&
+                action.type != ActionType.commandUnits &&
                 Config.antiSpam.bool()){
 
                 Ratekeeper rate = action.player.getInfo().rate;
-                if(rate.allow(Config.interactRateWindow.num() * 1000, Config.interactRateLimit.num())){
+                if(rate.allow(Config.interactRateWindow.num() * 1000L, Config.interactRateLimit.num())){
                     return true;
                 }else{
                     if(rate.occurences > Config.interactRateKick.num()){
@@ -81,6 +83,14 @@ public class Administration{
             }
             return true;
         });
+    }
+
+    public synchronized void blacklistDos(String address){
+        dosBlacklist.add(address);
+    }
+
+    public synchronized boolean isDosBlacklisted(String address){
+        return dosBlacklist.contains(address);
     }
 
     /** @return time at which a player would be pardoned for a kick (0 means they were never kicked) */
@@ -162,7 +172,7 @@ public class Administration{
     }
 
     public int getPlayerLimit(){
-        return Core.settings.getInt("playerlimit", 0);
+        return Core.settings.getInt("playerlimit", headless ? 30 : 0);
     }
 
     public void setPlayerLimit(int limit){
@@ -477,6 +487,8 @@ public class Administration{
         interactRateKick = new Config("interactRateKick", "How many times a player must interact inside the window to get kicked.", 60),
         messageRateLimit = new Config("messageRateLimit", "Message rate limit in seconds. 0 to disable.", 0),
         messageSpamKick = new Config("messageSpamKick", "How many times a player must send a message before the cooldown to get kicked. 0 to disable.", 3),
+        packetSpamLimit = new Config("packetSpamLimit", "Limit for packet count sent within 3sec that will lead to a blacklist + kick.", 300),
+        chatSpamLimit = new Config("packetSpamLimit", "Limit for chat packet count sent within 2sec that will lead to a blacklist + kick. Not the same as a rate limit.", 20),
         socketInput = new Config("socketInput", "Allows a local application to control this server through a local TCP socket.", false, "socket", () -> Events.fire(Trigger.socketConfigChanged)),
         socketInputPort = new Config("socketInputPort", "The port for socket input.", 6859, () -> Events.fire(Trigger.socketConfigChanged)),
         socketInputAddress = new Config("socketInputAddress", "The bind address for socket input.", "localhost", () -> Events.fire(Trigger.socketConfigChanged)),
@@ -486,7 +498,7 @@ public class Administration{
         autosave = new Config("autosave", "Whether the periodically save the map when playing.", false),
         autosaveAmount = new Config("autosaveAmount", "The maximum amount of autosaves. Older ones get replaced.", 10),
         autosaveSpacing = new Config("autosaveSpacing", "Spacing between autosaves in seconds.", 60 * 5),
-        debug = new Config("debug", "Enable debug logging", false, () -> Log.level = debug() ? LogLevel.debug : LogLevel.info),
+        debug = new Config("debug", "Enable debug logging.", false, () -> Log.level = debug() ? LogLevel.debug : LogLevel.info),
         snapshotInterval = new Config("snapshotInterval", "Client entity snapshot interval in ms.", 200),
         autoPause = new Config("autoPause", "Whether the game should pause when nobody is online.", false);
 
@@ -638,6 +650,9 @@ public class Administration{
         /** valid only for command unit events */
         public @Nullable int[] unitIDs;
 
+        /** valid only for command building events */
+        public @Nullable int[] buildingPositions;
+
         public PlayerAction set(Player player, ActionType type, Tile tile){
             this.player = player;
             this.type = type;
@@ -667,7 +682,7 @@ public class Administration{
     }
 
     public enum ActionType{
-        breakBlock, placeBlock, rotate, configure, withdrawItem, depositItem, control, buildSelect, command, removePlanned, commandUnits, commandBuilding
+        breakBlock, placeBlock, rotate, configure, withdrawItem, depositItem, control, buildSelect, command, removePlanned, commandUnits, commandBuilding, respawn
     }
 
 }

@@ -81,12 +81,14 @@ public class Turret extends ReloadTurret{
     public boolean playerControllable = true;
     /** If true, this block will display ammo multipliers in its stats (irrelevant for certain types of turrets). */
     public boolean displayAmmoMultiplier = true;
+    /** If false, 'under' blocks like conveyors are not targeted. */
+    public boolean targetUnderBlocks = true;
     /** Function for choosing which unit to target. */
     public Sortf unitSort = UnitSorts.closest;
     /** Filter for types of units to attack. */
     public Boolf<Unit> unitFilter = u -> true;
     /** Filter for types of buildings to attack. */
-    public Boolf<Building> buildingFilter = b -> !b.block.underBullets;
+    public Boolf<Building> buildingFilter = b -> targetUnderBlocks || !b.block.underBullets;
 
     /** Color of heat region drawn on top (if found) */
     public Color heatColor = Pal.turretHeat;

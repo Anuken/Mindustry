@@ -83,10 +83,11 @@ public class Universe{
         }
 
         if(state.hasSector() && state.getSector().planet.updateLighting){
+            boolean disable = state.getSector().preset != null && state.getSector().preset.noLighting;
             var planet = state.getSector().planet;
             //update sector light
             float light = state.getSector().getLight();
-            float alpha = Mathf.clamp(Mathf.map(light, planet.lightSrcFrom, planet.lightSrcTo, planet.lightDstFrom, planet.lightDstTo));
+            float alpha = disable ? 1f : Mathf.clamp(Mathf.map(light, planet.lightSrcFrom, planet.lightSrcTo, planet.lightDstFrom, planet.lightDstTo));
 
             //assign and map so darkness is not 100% dark
             state.rules.ambientLight.a = 1f - alpha;
@@ -120,7 +121,7 @@ public class Universe{
     }
 
     public Schematic getLastLoadout(){
-        if(lastLoadout == null) lastLoadout = state.rules.sector == null || state.rules.sector.planet.generator == null ? Loadouts.basicShard : state.rules.sector.planet.generator.getDefaultLoadout();
+        if(lastLoadout == null) lastLoadout = state.rules.sector == null || state.rules.sector.planet.generator == null ? Loadouts.basicShard : state.rules.sector.planet.generator.defaultLoadout;
         return lastLoadout;
     }
 
@@ -145,9 +146,15 @@ public class Universe{
         turn++;
 
         int newSecondsPassed = (int)(turnDuration / 60);
+        Planet current = state.getPlanet();
 
         //update relevant sectors
         for(Planet planet : content.planets()){
+
+            //planets with different wave simulation status are not updated
+            if(current != null && current.allowWaveSimulation != planet.allowWaveSimulation){
+                continue;
+            }
 
             //first pass: clear import stats
             for(Sector sector : planet.sectors){
@@ -218,10 +225,11 @@ public class Universe{
                         }else if(attacked && wavesPassed > 0 && sector.info.winWave > 1 && sector.info.wave + wavesPassed >= sector.info.winWave && !sector.hasEnemyBase()){
                             //autocapture the sector
                             sector.info.waves = false;
+                            boolean was = sector.info.wasCaptured;
                             sector.info.wasCaptured = true;
 
                             //fire the event
-                            Events.fire(new SectorCaptureEvent(sector));
+                            Events.fire(new SectorCaptureEvent(sector, !was));
                         }
 
                         float scl = sector.getProductionScale();

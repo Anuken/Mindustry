@@ -18,6 +18,7 @@ import mindustry.graphics.g3d.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
 import mindustry.maps.generators.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -69,6 +70,8 @@ public class Planet extends UnlockableContent{
     public boolean accessible = true;
     /** Environment flags for sectors on this planet. */
     public int defaultEnv = Env.terrestrial | Env.spores | Env.groundOil | Env.groundWater | Env.oxygen;
+    /** Environment attributes. */
+    public Attributes defaultAttributes = new Attributes();
     /** If true, a day/night cycle is simulated. */
     public boolean updateLighting = true;
     /** Day/night cycle parameters. */
@@ -103,6 +106,8 @@ public class Planet extends UnlockableContent{
     public boolean allowSectorInvasion = false;
     /** If true, sectors saves are cleared when lost. */
     public boolean clearSectorOnLose = false;
+    /** Multiplier for enemy rebuild speeds; only applied in campaign (not standard rules) */
+    public float enemyBuildSpeedMultiplier = 1f;
     /** If true, enemy cores are replaced with spawnpoints on this planet (for invasions) */
     public boolean enemyCoreSpawnReplace = false;
     /** If true, blocks in the radius of the core will be removed and "built up" in a shockwave upon landing. */
@@ -180,6 +185,8 @@ public class Planet extends UnlockableContent{
     public void applyRules(Rules rules){
         ruleSetter.get(rules);
 
+        rules.attributes.clear();
+        rules.attributes.add(defaultAttributes);
         rules.env = defaultEnv;
         rules.hiddenBuildItems.clear();
         rules.hiddenBuildItems.addAll(hiddenItems);
@@ -227,7 +234,7 @@ public class Planet extends UnlockableContent{
         return (orbitOffset + universe.secondsf() / (orbitTime / 360f)) % 360f;
     }
 
-    /** Calulates rotation on own axis based on universe time.*/
+    /** Calculates rotation on own axis based on universe time.*/
     public float getRotation(){
         //tidally locked planets always face toward parents
         if(tidalLock){
@@ -298,6 +305,10 @@ public class Planet extends UnlockableContent{
 
     @Override
     public void init(){
+
+        if(techTree == null){
+            techTree = TechTree.roots.find(n -> n.planet == this);
+        }
 
         for(Sector sector : sectors){
             sector.loadInfo();

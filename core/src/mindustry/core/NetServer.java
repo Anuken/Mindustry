@@ -96,7 +96,7 @@ public class NetServer implements ApplicationListener{
         }
     };
 
-    private boolean closing = false;
+    private boolean closing = false, pvpAutoPaused = true;
     private Interval timer = new Interval(10);
     private IntSet buildHealthChanged = new IntSet();
 
@@ -225,6 +225,14 @@ public class NetServer implements ApplicationListener{
                     con.uuid = packet.uuid;
                     con.kick(KickReason.idInUse);
                     return;
+                }
+
+                for(var otherCon : net.getConnections()){
+                    if(otherCon != con && uuid.equals(otherCon.uuid)){
+                        con.uuid = packet.uuid;
+                        con.kick(KickReason.idInUse);
+                        return;
+                    }
                 }
             }
 
@@ -862,7 +870,18 @@ public class NetServer implements ApplicationListener{
 
         if(state.isGame() && net.server()){
             if(state.rules.pvp){
-                state.serverPaused = isWaitingForPlayers();
+                boolean waiting = isWaitingForPlayers(), paused = state.isPaused();
+                if(waiting != paused){
+                    if(waiting){
+                        //is now waiting, enable pausing, flag it correctly
+                        pvpAutoPaused = true;
+                        state.set(State.paused);
+                    }else if(pvpAutoPaused){
+                        //no longer waiting, stop pausing
+                        state.set(State.playing);
+                        pvpAutoPaused = false;
+                    }
+                }
             }
 
             sync();
@@ -941,7 +960,7 @@ public class NetServer implements ApplicationListener{
         dataStream.close();
 
         //write basic state data.
-        Call.stateSnapshot(player.con, state.wavetime, state.wave, state.enemies, state.serverPaused, state.gameOver,
+        Call.stateSnapshot(player.con, state.wavetime, state.wave, state.enemies, state.isPaused(), state.gameOver,
         universe.seconds(), tps, GlobalVars.rand.seed0, GlobalVars.rand.seed1, syncStream.toByteArray());
 
         syncStream.reset();

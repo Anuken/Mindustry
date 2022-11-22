@@ -6,6 +6,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.ai.*;
+import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -21,7 +22,7 @@ public class CommandAI extends AIController{
     /** All encountered unreachable buildings of this AI. Why a sequence? Because contains() is very rarely called on it. */
     public IntSeq unreachableBuildings = new IntSeq(8);
 
-    protected boolean stopAtTarget;
+    protected boolean stopAtTarget, stopWhenInRange;
     protected Vec2 lastTargetPos;
     protected int pathId = -1;
     protected Seq<Unit> local = new Seq<>(false);
@@ -46,6 +47,10 @@ public class CommandAI extends AIController{
             unit.clearBuilding();
             this.command = command;
         }
+    }
+
+    public boolean isAttacking(){
+        return target != null && unit.within(target, unit.range() + 10f);
     }
 
     @Override
@@ -139,7 +144,7 @@ public class CommandAI extends AIController{
                 move = Vars.controlPath.getPathPosition(unit, pathId, targetPos, vecOut, noFound);
 
                 //if the path is invalid, stop trying and record the end as unreachable
-                if(unit.team.isAI() && noFound[0]){
+                if(unit.team.isAI() && (noFound[0] || unit.isPathImpassable(World.toTile(targetPos.x), World.toTile(targetPos.y)) )){
                     if(attackTarget instanceof Building build){
                         unreachableBuildings.addUnique(build.pos());
                     }
@@ -194,6 +199,11 @@ public class CommandAI extends AIController{
                 }
             }
 
+            if(stopWhenInRange && targetPos != null && unit.within(targetPos, engageRange * 0.9f)){
+                targetPos = null;
+                stopWhenInRange = false;
+            }
+
         }else if(target != null){
             faceTarget();
         }
@@ -240,10 +250,15 @@ public class CommandAI extends AIController{
     }
 
     public void commandPosition(Vec2 pos){
+        commandPosition(pos, false);
+    }
+
+    public void commandPosition(Vec2 pos, boolean stopWhenInRange){
         targetPos = pos;
         lastTargetPos = pos;
         attackTarget = null;
         pathId = Vars.controlPath.nextTargetId();
+        this.stopWhenInRange = stopWhenInRange;
     }
 
     public void commandTarget(Teamc moveTo){

@@ -16,6 +16,7 @@ public class EventType{
     //events that occur very often
     public enum Trigger{
         shock,
+        openConsole,
         blastFreeze,
         impactPower,
         blastGenerator,
@@ -28,6 +29,7 @@ public class EventType{
         newGame,
         tutorialComplete,
         flameAmmo,
+        resupplyTurret,
         turretCool,
         enablePixelation,
         exclusionDeath,
@@ -37,6 +39,7 @@ public class EventType{
         socketConfigChanged,
         update,
         unitCommandChange,
+        unitCommandAttack,
         importMod,
         draw,
         drawOver,
@@ -181,12 +184,23 @@ public class EventType{
         }
     }
 
+    /** Called when the client sends a chat message. This only fires clientside! */
+    public static class ClientChatEvent{
+        public final String message;
+
+        public ClientChatEvent(String message){
+            this.message = message;
+        }
+    }
+
     /** Called when a sector is conquered, e.g. a boss or base is defeated. */
     public static class SectorCaptureEvent{
         public final Sector sector;
+        public final boolean initialCapture;
 
-        public SectorCaptureEvent(Sector sector){
+        public SectorCaptureEvent(Sector sector, boolean initialCapture){
             this.sector = sector;
+            this.initialCapture = initialCapture;
         }
     }
 

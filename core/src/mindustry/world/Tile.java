@@ -164,7 +164,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     public boolean isDarkened(){
-        return block.solid && ((!block.synthetic() && block.fillsTile) || block.forceDark);
+        return block.solid && ((!block.synthetic() && block.fillsTile) || block.checkForceDark(this));
     }
 
     public Floor floor(){
