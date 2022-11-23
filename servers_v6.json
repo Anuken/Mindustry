@@ -28,10 +28,6 @@
     "address": ["0.baseduser.eu.org:42000", "nikochio.ddns.net"]
   },
   {
-    "name": "ECAN",
-    "address": ["mindustry.ecansol.com:6597", "mindustry.ecansol.com:6499", "mindustry.ecansol.com:6599"]
-  },
-  {
     "name": "Chaotic Neutral",
     "address": ["c-n.ddns.net:1111", "c-n.ddns.net:2222", "c-n.ddns.net:3333", "c-n.ddns.net:4444"]
   },
