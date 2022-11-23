@@ -4,6 +4,10 @@
     "address": ["212.192.29.92:25554"]
   },
   {
+    "name": "ECAN",
+    "address": ["mindustry.ecansol.com:6597", "mindustry.ecansol.com:6499", "mindustry.ecansol.com:6599"]
+  },
+  {
     "name": "Mindustry Español",
     "address": ["mes.xpdustry.fr"]
   },
