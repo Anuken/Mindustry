@@ -24,7 +24,7 @@ public class PayloadConveyor extends Block{
 
     public PayloadConveyor(String name){
         super(name);
-        group = BlockGroup.transportation;
+        group = BlockGroup.payloads;
         size = 3;
         rotate = true;
         update = true;

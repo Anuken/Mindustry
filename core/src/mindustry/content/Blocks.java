@@ -2470,6 +2470,7 @@ public class Blocks{
         turbineCondenser = new ThermalGenerator("turbine-condenser"){{
             requirements(Category.power, with(Items.beryllium, 60));
             attribute = Attribute.steam;
+            group = BlockGroup.liquids;
             displayEfficiencyScale = 1f / 9f;
             minEfficiency = 9f - 0.0001f;
             powerProduction = 3f / 9f;
@@ -2764,6 +2765,7 @@ public class Blocks{
         ventCondenser = new AttributeCrafter("vent-condenser"){{
             requirements(Category.production, with(Items.graphite, 20, Items.beryllium, 60));
             attribute = Attribute.steam;
+            group = BlockGroup.liquids;
             minEfficiency = 9f - 0.0001f;
             baseEfficiency = 0f;
             displayEfficiency = false;
