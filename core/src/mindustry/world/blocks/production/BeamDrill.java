@@ -223,6 +223,8 @@ public class BeamDrill extends Block{
             if(lasers[0] == null) updateLasers();
 
             warmup = Mathf.approachDelta(warmup, Mathf.num(efficiency > 0), 1f / 60f);
+            
+            updateFacing();
 
             float multiplier = Mathf.lerp(1f, optionalBoostIntensity, optionalEfficiency);
             boostWarmup = Mathf.lerpDelta(boostWarmup, optionalEfficiency, 0.1f);
