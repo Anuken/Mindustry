@@ -24,13 +24,13 @@ import static mindustry.Vars.*;
 public class BeamDrill extends Block{
     protected Rand rand = new Rand();
 
-    public @Load("drill-laser") TextureRegion laser;
-    public @Load("drill-laser-end") TextureRegion laserEnd;
-    public @Load("drill-laser-center") TextureRegion laserCenter;
+    public @Load(value = "@-beam", fallback = "drill-laser") TextureRegion laser;
+    public @Load(value = "@-beam-end", fallback = "drill-laser-end") TextureRegion laserEnd;
+    public @Load(value = "@-beam-center", fallback = "drill-laser-center") TextureRegion laserCenter;
 
-    public @Load("drill-laser-boost") TextureRegion laserBoost;
-    public @Load("drill-laser-boost-end") TextureRegion laserEndBoost;
-    public @Load("drill-laser-boost-center") TextureRegion laserCenterBoost;
+    public @Load(value = "@-beam-boost", fallback = "drill-laser-boost") TextureRegion laserBoost;
+    public @Load(value = "@-beam-boost-end", fallback = "drill-laser-boost-end") TextureRegion laserEndBoost;
+    public @Load(alue = "@-beam-boost-center", fallback = "drill-laser-boost-center") TextureRegion laserCenterBoost;
 
     public @Load("@-top") TextureRegion topRegion;
     public @Load("@-glow") TextureRegion glowRegion;
