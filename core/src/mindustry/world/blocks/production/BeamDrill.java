@@ -30,7 +30,7 @@ public class BeamDrill extends Block{
 
     public @Load(value = "@-beam-boost", fallback = "drill-laser-boost") TextureRegion laserBoost;
     public @Load(value = "@-beam-boost-end", fallback = "drill-laser-boost-end") TextureRegion laserEndBoost;
-    public @Load(alue = "@-beam-boost-center", fallback = "drill-laser-boost-center") TextureRegion laserCenterBoost;
+    public @Load(value = "@-beam-boost-center", fallback = "drill-laser-boost-center") TextureRegion laserCenterBoost;
 
     public @Load("@-top") TextureRegion topRegion;
     public @Load("@-glow") TextureRegion glowRegion;
