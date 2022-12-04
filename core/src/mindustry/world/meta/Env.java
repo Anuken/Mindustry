@@ -62,9 +62,16 @@ public class Env{
         for(int i = 0; i < 32; i++){
             int key = 1 << i;
             if((mask & key) == key){
-                int id = nameToId.get(idToName.get(key), -1);
+                String name = idToName.get(key);
+                if(name == null){
+                    //if it's unmapped it's probably just some mods using constant value
+                    out |= key;
+                    continue;
+                }
+
+                int id = nameToId.get(name, -1);
                 if(id == -1){
-                    Log.warn("Ignoring '@' env key.", idToName.get(key));
+                    Log.warn("Ignoring '@' env key.", name);
                 }else{
                     out |= id;
                 }
