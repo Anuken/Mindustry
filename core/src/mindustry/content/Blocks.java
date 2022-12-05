@@ -1180,6 +1180,7 @@ public class Blocks{
             craftTime = 10f;
             rotate = true;
             invertFlip = true;
+            group = BlockGroup.liquids;
 
             liquidCapacity = 50f;
 
