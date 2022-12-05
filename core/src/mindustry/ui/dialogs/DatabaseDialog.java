@@ -54,6 +54,7 @@ public class DatabaseDialog extends BaseDialog{
 
             Seq<Content> array = allContent[j]
                 .select(c -> c instanceof UnlockableContent u &&
+                    !u.hideDatabase &&
                     (!u.isHidden() || u.techNode != null) &&
                     (text.isEmpty() || u.localizedName.toLowerCase().contains(text.toLowerCase())));
             if(array.size == 0) continue;

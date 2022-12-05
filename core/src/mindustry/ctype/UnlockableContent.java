@@ -30,8 +30,10 @@ public abstract class UnlockableContent extends MappableContent{
     public boolean alwaysUnlocked = false;
     /** Whether to show the description in the research dialog preview. */
     public boolean inlineDescription = true;
-    /** Whether details of blocks are hidden in custom games if they haven't been unlocked in campaign mode. */
+    /** Whether details are hidden in custom games if this hasn't been unlocked in campaign mode. */
     public boolean hideDetails = true;
+    /** Whether this is hidden from the Core Database. */
+    public boolean hideDatabase = false;
     /** If false, all icon generation is disabled for this content; createIcons is not called. */
     public boolean generateIcons = true;
     /** Special logic icon ID. */
