@@ -1962,6 +1962,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     @Override
     public void remove(){
+        stopSound();
+    }
+
+    public void stopSound(){
         if(sound != null){
             sound.stop();
         }

@@ -78,7 +78,7 @@ public class BuildPayload implements Payload{
 
     @Override
     public void remove(){
-        build.remove();
+        build.stopSound();
     }
 
     @Override

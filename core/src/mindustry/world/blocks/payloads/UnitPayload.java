@@ -95,11 +95,6 @@ public class UnitPayload implements Payload{
     }
 
     @Override
-    public void remove(){
-        unit.remove();
-    }
-
-    @Override
     public boolean dump(){
         //TODO should not happen
         if(unit.type == null) return true;

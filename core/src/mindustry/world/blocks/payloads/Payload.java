@@ -30,8 +30,6 @@ public interface Payload extends Position{
 
     float y();
 
-    void remove();
-
     /** @return the items needed to make this payload; may be empty. */
     ItemStack[] requirements();
 
@@ -74,6 +72,8 @@ public interface Payload extends Position{
     default float getY(){
         return y();
     }
+
+    default void remove(){}
 
     static void write(@Nullable Payload payload, Writes write){
         if(payload == null){
