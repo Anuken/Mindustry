@@ -60,8 +60,8 @@ public class CargoAI extends AIController{
                 }
             }else{
 
-                //what if some prankster reconfigures the source while the unit is moving? we can't have that!
-                if(unloadTarget.item != itemTarget){
+                //what if some prankster reconfigures or picks up the target while the unit is moving? we can't have that!
+                if(unloadTarget.item != itemTarget || unloadTarget.isPayload()){
                     unloadTarget = null;
                     return;
                 }
