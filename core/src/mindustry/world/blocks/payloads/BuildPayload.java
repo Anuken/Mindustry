@@ -77,6 +77,11 @@ public class BuildPayload implements Payload{
     }
 
     @Override
+    public void remove(){
+        build.remove();
+    }
+
+    @Override
     public void write(Writes write){
         write.b(payloadBlock);
         write.s(build.block.id);

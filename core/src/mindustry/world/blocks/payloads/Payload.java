@@ -30,6 +30,8 @@ public interface Payload extends Position{
 
     float y();
 
+    void remove();
+
     /** @return the items needed to make this payload; may be empty. */
     ItemStack[] requirements();
 
