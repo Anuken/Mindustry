@@ -10,6 +10,8 @@ import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 
+import static mindustry.Vars.*;
+
 /** A continuous bullet type that only damages in a point. */
 public class PointLaserBulletType extends BulletType{
     public String sprite = "point-laser";
