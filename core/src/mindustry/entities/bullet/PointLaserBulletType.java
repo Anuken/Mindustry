@@ -82,4 +82,30 @@ public class PointLaserBulletType extends BulletType{
             Effect.shake(shake, shake, b);
         }
     }
+
+    @Override
+    public void updateTrailEffects(Bullet b){
+        if(trailChance > 0){
+            if(Mathf.chanceDelta(trailChance)){
+                trailEffect.at(b.aimX, b.aimY, trailRotation ? b.angleTo(b.aimX, b.aimY) : trailParam, trailColor);
+            }
+        }
+
+        if(trailInterval > 0f){
+            if(b.timer(0, trailInterval)){
+                trailEffect.at(b.aimX, b.aimY, trailRotation ? b.angleTo(b.aimX, b.aimY) : trailParam, trailColor);
+            }
+        }
+    }
+
+    @Override
+    public void updateTrail(Bullet b){
+        if(!headless && trailLength > 0){
+            if(b.trail == null){
+                b.trail = new Trail(trailLength);
+            }
+            b.trail.length = trailLength;
+            b.trail.update(b.aimX, b.aimY, b.fslope() * (1f - (trailSinMag > 0 ? Mathf.absin(Time.time, trailSinScl, trailSinMag) : 0f)));
+        }
+    }
 }
