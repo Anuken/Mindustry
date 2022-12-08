@@ -40,6 +40,7 @@ public class PointLaserBulletType extends BulletType{
         hittable = false;
         absorbable = false;
         optimalLifeFract = 0.5f;
+        shootEffect = smokeEffect = Fx.none;
 
         //just make it massive, users of this bullet can adjust as necessary
         drawSize = 1000f;
