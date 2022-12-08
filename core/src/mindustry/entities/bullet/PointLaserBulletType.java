@@ -87,7 +87,7 @@ public class PointLaserBulletType extends BulletType{
     public void updateTrailEffects(Bullet b){
         if(trailChance > 0){
             if(Mathf.chanceDelta(trailChance)){
-                trailEffect.at(b.aimX, b.aimY, trailRotation ? b.angleTo(b.aimX, b.aimY) : ((trailParam * b.fslope()), trailColor);
+                trailEffect.at(b.aimX, b.aimY, trailRotation ? b.angleTo(b.aimX, b.aimY) : (trailParam * b.fslope()), trailColor);
             }
         }
 
