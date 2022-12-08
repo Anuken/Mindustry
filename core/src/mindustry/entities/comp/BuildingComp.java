@@ -1073,7 +1073,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public void updatePowerGraph(){
         for(Building other : getPowerConnections(tempBuilds)){
             if(other.power != null){
-                other.power.graph.addGraph(power.graph);
+                if(other.power.graph.all.size > power.graph.all.size) other.power.graph.addGraph(power.graph);
+                else power.graph.addGraph(other.power.graph);
             }
         }
     }
