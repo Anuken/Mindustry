@@ -173,7 +173,7 @@ public class Renderer implements ApplicationListener{
         laserOpacity = settings.getInt("lasersopacity") / 100f;
         bridgeOpacity = settings.getInt("bridgeopacity") / 100f;
         animateShields = settings.getBool("animatedshields");
-        drawStatus = Core.settings.getBool("blockstatus");
+        drawStatus = settings.getBool("blockstatus");
         enableEffects = settings.getBool("effects");
         drawDisplays = !settings.getBool("hidedisplays");
 
