@@ -471,11 +471,8 @@ public class Renderer implements ApplicationListener{
             });
             Draw.color();
 
-            if(launching && launchCoreType != null){
-                launchCoreType.drawLaunch(build, build.x, build.y);
-            }else{
-                build.drawLanding();
-            }
+            CoreBlock block = launching && launchCoreType != null ? launchCoreType : (CoreBlock)build.block;
+            block.drawLanding(build, build.x, build.y);
 
             Draw.color();
             Draw.mixcol(Color.white, Interp.pow5In.apply(fout));

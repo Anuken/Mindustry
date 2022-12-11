@@ -200,7 +200,7 @@ public class CoreBlock extends StorageBlock{
         }
     }
 
-    public void drawLaunch(CoreBuild build, float x, float y){
+    public void drawLanding(CoreBuild build, float x, float y){
         float fout = renderer.getLandTime() / coreLandDuration;
 
         if(renderer.isLaunching()) fout = 1f - fout;
@@ -322,10 +322,6 @@ public class CoreBlock extends StorageBlock{
                 float dx = Geometry.d4x[i] * length, dy = Geometry.d4y[i] * length;
                 Draw.rect(reg, x + dx, y + dy, i * 90);
             }
-        }
-
-        public void drawLanding(){
-            drawLaunch(this, x, y);
         }
 
         @Override
