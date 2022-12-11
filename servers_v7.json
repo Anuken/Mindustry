@@ -12,6 +12,10 @@
     "address": ["0.baseduser.eu.org:6966", "0.baseduser.eu.org:6666", "0.baseduser.eu.org:6000", "1.baseduser.eu.org:6966", "1.baseduser.eu.org:6666", "1.baseduser.eu.org:6000"]
   },
   {
+    "name": "Tendhost v7",
+    "address": ["tendhost.ddns.net:7576"]
+  },
+  {
     "name": "SynapseOS",
     "address": ["0nera.ru:7777"]
   },
