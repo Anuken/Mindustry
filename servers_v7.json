@@ -13,7 +13,7 @@
   },
   {
     "name": "Tendhost",
-    "address": ["tendhost.ddns.net:7576"]
+    "address": ["tendhost.ddns.net:7576", "smokeofanarchy.ru:7580"]
   },
   {
     "name": "SynapseOS",
