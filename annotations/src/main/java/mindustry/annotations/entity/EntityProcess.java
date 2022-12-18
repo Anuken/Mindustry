@@ -866,8 +866,8 @@ public class EntityProcess extends BaseProcessor{
                     builder.addAnnotation(OverrideCallSuper.class); //just in case
 
                     if(!method.isVoid()){
-                        String name = method.name();
-                        switch(name){
+                        String methodName = method.name();
+                        switch(methodName){
                             case "isNull":
                                 builder.addStatement("return true");
                                 break;
@@ -878,7 +878,6 @@ public class EntityProcess extends BaseProcessor{
                                 builder.addStatement("return $S", className);
                                 break;
                             default:
-                                String methodName = method.name();
                                 Svar variable = compType == null || method.params().size > 0 ? null : compType.fields().find(v -> v.name().equals(methodName));
                                 String desc = variable == null ? null : variable.descString();
                                 if(variable == null || !varInitializers.containsKey(desc)){
