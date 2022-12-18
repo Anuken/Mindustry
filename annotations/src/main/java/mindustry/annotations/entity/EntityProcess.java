@@ -855,7 +855,7 @@ public class EntityProcess extends BaseProcessor{
 
                 for(Smethod method : methods){
                     String signature = method.toString();
-                    if(signatures.contains(signature)) continue;
+                    if(!signatures.add(signature)) continue;
 
                     Stype compType = interfaceToComp(method.type());
                     MethodSpec.Builder builder = MethodSpec.overriding(method.e).addModifiers(Modifier.PUBLIC, Modifier.FINAL);
@@ -866,25 +866,30 @@ public class EntityProcess extends BaseProcessor{
                     builder.addAnnotation(OverrideCallSuper.class); //just in case
 
                     if(!method.isVoid()){
-                        if(method.name().equals("isNull")){
-                            builder.addStatement("return true");
-                        }else if(method.name().equals("id")){
+                        String name = method.name();
+                        switch(name){
+                            case "isNull":
+                                builder.addStatement("return true");
+                                break;
+                            case "id":
                                 builder.addStatement("return -1");
-                        }else{
-                            Svar variable = compType == null || method.params().size > 0 ? null : compType.fields().find(v -> v.name().equals(method.name()));
-                            String desc = variable == null ? null : variable.descString();
-                            if(variable == null || !varInitializers.containsKey(desc)){
-                                builder.addStatement("return " + getDefault(method.ret().toString()));
-                            }else{
-                                String init = varInitializers.get(desc);
-                                builder.addStatement("return " + (init.equals("{}") ? "new " + variable.mirror().toString() : "") + init);
-                            }
+                                break;
+                            case "toString":
+                                builder.addStatement("return $S", className);
+                                break;
+                            default:
+                                String methodName = method.name();
+                                Svar variable = compType == null || method.params().size > 0 ? null : compType.fields().find(v -> v.name().equals(methodName));
+                                String desc = variable == null ? null : variable.descString();
+                                if(variable == null || !varInitializers.containsKey(desc)){
+                                    builder.addStatement("return " + getDefault(method.ret().toString()));
+                                }else{
+                                    String init = varInitializers.get(desc);
+                                    builder.addStatement("return " + (init.equals("{}") ? "new " + variable.mirror().toString() : "") + init);
+                                }
                         }
                     }
-
                     nullBuilder.addMethod(builder.build());
-
-                    signatures.add(signature);
                 }
 
                 nullsBuilder.addField(FieldSpec.builder(type, Strings.camelize(baseName)).initializer("new " + className + "()").addModifiers(Modifier.FINAL, Modifier.STATIC, Modifier.PUBLIC).build());
