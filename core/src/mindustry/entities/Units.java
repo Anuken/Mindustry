@@ -8,6 +8,7 @@ import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.game.*;
+import mindustry.game.EventType.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -23,6 +24,13 @@ public class Units{
     private static boolean boolResult;
     private static int intResult;
     private static Building buildResult;
+
+    static{
+        Events.on(ResetEvent.class, event -> {
+            result = null;
+            buildResult = null;
+        });
+    }
 
     //prevents allocations in anyEntities
     private static boolean anyEntityGround;

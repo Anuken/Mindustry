@@ -1,5 +1,6 @@
 package mindustry.entities.comp;
 
+import arc.*;
 import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -8,6 +9,7 @@ import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -22,6 +24,11 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc{
     private static final Rect rect = new Rect(), rect2 = new Rect();
 
     private static Puddle paramPuddle;
+    static{
+        Events.on(ResetEvent.class, event -> {
+            paramPuddle = null;
+        });
+    }
     private static Cons<Unit> unitCons = unit -> {
         if(unit.isGrounded() && !unit.hovering){
             unit.hitbox(rect2);

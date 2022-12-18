@@ -1,5 +1,6 @@
 package mindustry.world.blocks.defense;
 
+import arc.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -9,6 +10,7 @@ import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
@@ -25,6 +27,12 @@ public class DirectionalForceProjector extends Block{
     protected static final Vec2 intersectOut = new Vec2(), p1 = new Vec2(), p2 = new Vec2();
     protected static DirectionalForceProjectorBuild paramEntity;
     protected static Effect paramEffect;
+    static{
+        Events.on(ResetEvent.class, event -> {
+            paramEntity = null;
+            paramEffect = null;
+        });
+    }
     protected static final Cons<Bullet> dirShieldConsumer = b -> {
         if(b.team != paramEntity.team && b.type.absorbable){
             //just in case

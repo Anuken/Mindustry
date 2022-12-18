@@ -14,6 +14,7 @@ import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.game.*;
+import mindustry.game.EventType.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -732,6 +733,11 @@ public class LExecutor{
 
         static float bestValue = 0f;
         static Unit best = null;
+        static{
+            Events.on(ResetEvent.class, event -> {
+                best = null;
+            });
+        }
 
         public RadarI(RadarTarget target1, RadarTarget target2, RadarTarget target3, RadarSort sort, int radar, int sortOrder, int output){
             this.target1 = target1;

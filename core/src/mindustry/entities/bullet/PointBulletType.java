@@ -1,14 +1,22 @@
 package mindustry.entities.bullet;
 
+import arc.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.entities.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 
 public class PointBulletType extends BulletType{
      private static float cdist = 0f;
      private static Unit result;
+
+    static{
+        Events.on(ResetEvent.class, event -> {
+            result = null;
+        });
+    }
 
      public float trailSpacing = 10f;
 

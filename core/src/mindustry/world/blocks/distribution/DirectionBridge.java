@@ -1,5 +1,6 @@
 package mindustry.world.blocks.distribution;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -10,6 +11,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
@@ -20,6 +22,11 @@ import static mindustry.Vars.*;
 
 public class DirectionBridge extends Block{
     private static BuildPlan otherReq;
+    static{
+        Events.on(ResetEvent.class, event -> {
+            otherReq = null;
+        });
+    }
     private int otherDst = 0;
 
     public @Load("@-bridge") TextureRegion bridgeRegion;

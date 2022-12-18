@@ -1,5 +1,6 @@
 package mindustry.entities.abilities;
 
+import arc.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -9,6 +10,7 @@ import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -17,6 +19,11 @@ import mindustry.ui.*;
 public class ShieldArcAbility extends Ability{
     private static Unit paramUnit;
     private static ShieldArcAbility paramField;
+    static{
+        Events.on(ResetEvent.class, event -> {
+            paramField = null;
+        });
+    }
     private static Vec2 paramPos = new Vec2();
     private static final Cons<Bullet> shieldConsumer = b -> {
         if(b.team != paramUnit.team && b.type.absorbable && paramField.data > 0 &&

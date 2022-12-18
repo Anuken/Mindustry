@@ -1,5 +1,6 @@
 package mindustry.world.blocks.defense;
 
+import arc.*;
 import arc.Graphics.*;
 import arc.Graphics.Cursor.*;
 import arc.audio.*;
@@ -13,6 +14,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.logic.*;
 
@@ -21,6 +23,11 @@ import static mindustry.Vars.*;
 public class Door extends Wall{
     protected final static Rect rect = new Rect();
     protected final static Queue<DoorBuild> doorQueue = new Queue<>();
+    static{
+        Events.on(ResetEvent.class, event -> {
+            doorQueue.clear();
+        });
+    }
 
     public final int timerToggle = timers++;
     public Effect openfx = Fx.dooropen;

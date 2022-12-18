@@ -1,9 +1,11 @@
 package mindustry.ai.types;
 
+import arc.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.entities.units.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.blocks.units.UnitCargoUnloadPoint.*;
@@ -14,6 +16,12 @@ import static mindustry.Vars.*;
 public class CargoAI extends AIController{
     static Seq<Item> orderedItems = new Seq<>();
     static Seq<UnitCargoUnloadPointBuild> targets = new Seq<>();
+
+    static{
+        Events.on(ResetEvent.class, event -> {
+            targets.clear();
+        });
+    }
 
     public static float emptyWaitTime = 60f * 2f, dropSpacing = 60f * 1.5f;
     public static float transferRange = 20f, moveRange = 6f, moveSmoothing = 20f;

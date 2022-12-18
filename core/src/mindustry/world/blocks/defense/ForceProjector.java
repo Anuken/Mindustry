@@ -45,6 +45,12 @@ public class ForceProjector extends Block{
 
     protected static ForceBuild paramEntity;
     protected static Effect paramEffect;
+    static{
+        Events.on(ResetEvent.class, event -> {
+            paramEntity = null;
+            paramEffect = null;
+        });
+    }
     protected static final Cons<Bullet> shieldConsumer = bullet -> {
         if(bullet.team != paramEntity.team && bullet.type.absorbable && Intersector.isInsideHexagon(paramEntity.x, paramEntity.y, paramEntity.realRadius() * 2f, bullet.x, bullet.y)){
             bullet.absorb();

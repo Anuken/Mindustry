@@ -1,5 +1,6 @@
 package mindustry.world.blocks.defense;
 
+import arc.*;
 import arc.audio.*;
 import arc.func.*;
 import arc.graphics.g2d.*;
@@ -10,6 +11,7 @@ import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.logic.*;
 import mindustry.world.*;
@@ -19,6 +21,11 @@ import static mindustry.Vars.*;
 public class AutoDoor extends Wall{
     protected final static Rect rect = new Rect();
     protected final static Seq<Unit> units = new Seq<>();
+    static{
+        Events.on(ResetEvent.class, event -> {
+            units.clear();
+        });
+    }
     protected final static Boolf<Unit> groundCheck = u -> u.isGrounded() && !u.type.allowLegStep;
 
     public final int timerToggle = timers++;

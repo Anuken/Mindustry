@@ -12,6 +12,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.core.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
@@ -24,6 +25,11 @@ import static mindustry.Vars.*;
 
 public class PowerNode extends PowerBlock{
     protected static BuildPlan otherReq;
+    static{
+        Events.on(ResetEvent.class, event -> {
+            otherReq = null;
+        });
+    }
     protected static int returnInt = 0;
     protected final static ObjectSet<PowerGraph> graphs = new ObjectSet<>();
     /** The maximum range of all power nodes on the map */

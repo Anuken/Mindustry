@@ -1,5 +1,6 @@
 package mindustry.world.blocks.defense;
 
+import arc.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -9,6 +10,7 @@ import arc.util.io.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.game.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
@@ -21,6 +23,12 @@ public class BaseShield extends Block{
     public int sides = 24;
 
     protected static BaseShieldBuild paramBuild;
+
+    static{
+        Events.on(ResetEvent.class, event -> {
+            paramBuild = null;
+        });
+    }
     //protected static Effect paramEffect;
     protected static final Cons<Bullet> bulletConsumer = bullet -> {
         if(bullet.team != paramBuild.team && bullet.type.absorbable && bullet.within(paramBuild, paramBuild.radius())){
