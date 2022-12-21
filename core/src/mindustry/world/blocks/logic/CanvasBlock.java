@@ -13,6 +13,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.ui.*;
@@ -63,6 +64,7 @@ public class CanvasBlock extends Block{
         public @Nullable Texture texture;
         public byte[] data = new byte[Mathf.ceil(canvasSize * canvasSize * bitsPerPixel / 8f)];
         public int blending;
+        protected Texture blankTexture; //Used for people who disabled displays
 
         public void updateTexture(){
             if(headless) return;
@@ -86,6 +88,18 @@ public class CanvasBlock extends Block{
                 pix.set(i % canvasSize, i / canvasSize, palette[pal]);
             }
             return pix;
+        }
+
+        public Texture getBlankTexture(){
+            if(blankTexture == null){
+                Pixmap pix = new Pixmap(canvasSize, canvasSize);
+                int pixels = canvasSize * canvasSize;
+                for(int i = 0; i < pixels; i++){
+                    pix.set(i % canvasSize, i / canvasSize, palette[0]);
+                }
+                blankTexture = new Texture(pix);
+            }
+            return blankTexture;
         }
 
         public byte[] packPixmap(Pixmap pixmap){
@@ -144,7 +158,10 @@ public class CanvasBlock extends Block{
             if(texture == null){
                 updateTexture();
             }
-            Tmp.tr1.set(texture);
+            if(Vars.renderer.drawDisplays)
+                Tmp.tr1.set(texture);
+            else
+                Tmp.tr1.set(getBlankTexture());
             float pad = blending == 0 ? padding : 0f;
 
             Draw.rect(Tmp.tr1, x, y, size * tilesize - pad, size * tilesize - pad);
