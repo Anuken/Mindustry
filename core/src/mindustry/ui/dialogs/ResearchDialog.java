@@ -93,21 +93,11 @@ public class ResearchDialog extends BaseDialog{
 
         shouldPause = true;
 
-        Runnable checkMargin = () -> {
-            if(Core.graphics.isPortrait() && showTechSelect){
-                itemDisplay.marginTop(60f);
-            }else{
-                itemDisplay.marginTop(0f);
-            }
-            itemDisplay.invalidate();
-            itemDisplay.layout();
-        };
-
-        onResize(checkMargin);
+        onResize(this::checkMargin);
 
         shown(() -> {
-            checkMargin.run();
-            Core.app.post(checkMargin);
+            checkMargin();
+            Core.app.post(this::checkMargin);
 
             Planet currPlanet = ui.planet.isShown() ?
                 ui.planet.state.planet :
@@ -185,6 +175,16 @@ public class ResearchDialog extends BaseDialog{
                 view.clamp();
             }
         });
+    }
+
+    void checkMargin(){
+        if(Core.graphics.isPortrait() && showTechSelect){
+            itemDisplay.marginTop(60f);
+        }else{
+            itemDisplay.marginTop(0f);
+        }
+        itemDisplay.invalidate();
+        itemDisplay.layout();
     }
 
     public void rebuildItems(){
@@ -698,6 +698,10 @@ public class ResearchDialog extends BaseDialog{
             }
 
             addChild(infoTable);
+
+            checkMargin();
+            Core.app.post(() -> checkMargin());
+
             infoTable.pack();
             infoTable.act(Core.graphics.getDeltaTime());
         }

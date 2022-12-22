@@ -104,6 +104,11 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         lookAt(x, y);
     }
 
+    public boolean isPathImpassable(int tileX, int tileY){
+        return !type.flying && type.pathCost.getCost(team.id, pathfinder.get(tileX, tileY)) == -1;
+    }
+
+
     /** @return approx. square size of the physical hitbox for physics */
     public float physicSize(){
         return hitSize * 0.7f;
@@ -139,6 +144,11 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             return vel().angle();
         }
         return rotation;
+    }
+
+    @Override
+    public boolean displayable(){
+        return type.hoverable;
     }
 
     @Override
@@ -443,6 +453,11 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         healTime -= Time.delta / 20f;
         wasHealed = false;
 
+        //die on captured sectors immediately
+        if(team.isOnlyAI() && state.isCampaign() && state.getSector().isCaptured()){
+            kill();
+        }
+
         if(!headless && type.loopSound != Sounds.none){
             control.sound.loop(type.loopSound, this, type.loopSoundVolume);
         }
@@ -677,5 +692,11 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
         //deaths are synced; this calls killed()
         Call.unitDeath(id);
+    }
+
+    @Override
+    @Replace
+    public String toString(){
+        return "Unit#" + id() + ":" + type;
     }
 }
