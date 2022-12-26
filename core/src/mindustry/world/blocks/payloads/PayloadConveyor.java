@@ -155,7 +155,7 @@ public class PayloadConveyor extends Block{
                         next.updateTile();
 
                         //TODO add self to queue of next conveyor, then check if this conveyor was selected next frame - selection happens deterministically
-                        if(next.acceptPayload(this, item)){
+                        if((next != null) && next.acceptPayload(this, item)){
                             //move forward.
                             next.handlePayload(this, item);
                             item = null;
