@@ -150,10 +150,11 @@ public class PayloadConveyor extends Block{
                 boolean had = item != null;
 
                 if(valid && stepAccepted != curStep && item != null){
-                    if(next != null){
-                        //trigger update forward
-                        next.updateTile();
+                    //trigger update forward
+                    if(next != null) next.updateTile();
 
+                    // next could be a LogicBlock and can config this building, potentially causing `next` to be null.
+                    if(next != null){
                         //TODO add self to queue of next conveyor, then check if this conveyor was selected next frame - selection happens deterministically
                         if(next.acceptPayload(this, item)){
                             //move forward.
