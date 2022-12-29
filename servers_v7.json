@@ -1,5 +1,9 @@
 [
   {
+    "name": "RCRM",
+    "address": ["rcrms.ru:6567"]
+  },
+  {
     "name": "generic survival",
     "address": ["212.192.29.92:25554"]
   },
