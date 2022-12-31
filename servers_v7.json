@@ -64,6 +64,10 @@
     "address": ["play.xpdustry.fr", "event.xpdustry.fr"]
   },
   {
+    "name": "LatamDustry",
+    "address": ["n2.xpdustry.fr:7008"]
+  },
+  {
     "name": "Pandorum",
     "address": ["pandorum.su:5018", "pandorum.su:5019", "pandorum.su:5020"]
   },
