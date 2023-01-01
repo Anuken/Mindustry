@@ -9,20 +9,20 @@ import mindustry.mod.Mods.*;
 public class ModResolver{
 
     public ResolutionContext resolveDependencies(Seq<ModMeta> metas){
-        ResolutionContext context = new ResolutionContext();
+        var context = new ResolutionContext();
 
-        for(ModMeta meta : metas){
+        for(var meta : metas){
             Seq<Dependency> dependencies = new Seq<>();
-            for(String dependency : meta.dependencies){
+            for(var dependency : meta.dependencies){
                 dependencies.add(new Dependency(dependency, true));
             }
-            for(String dependency : meta.softDependencies){
+            for(var dependency : meta.softDependencies){
                 dependencies.add(new Dependency(dependency, false));
             }
             context.dependencies.put(meta.name, dependencies);
         }
 
-        for (String key : context.dependencies.keys()) {
+        for (var key : context.dependencies.keys()) {
             if (context.ordered.contains(key)) {
                 continue;
             }
@@ -40,13 +40,13 @@ public class ModResolver{
             if (context.visited.contains(dependency.name) && !context.ordered.contains(dependency.name)) {
                 context.invalid.put(dependency.name, InvalidReason.circular);
                 return false;
-                // If dependency present, resolve it, or if it's not required, ignore it
+            // If dependency present, resolve it, or if it's not required, ignore it
             } else if (context.dependencies.containsKey(dependency.name)) {
                 if (!context.ordered.contains(dependency.name) && !resolve(dependency.name, context) && dependency.required) {
                     context.invalid.put(element, InvalidReason.incomplete);
                     return false;
                 }
-                // The dependency is missing, but if not required, skip
+            // The dependency is missing, but if not required, skip
             } else if (dependency.required) {
                 context.invalid.put(element, InvalidReason.incomplete);
                 context.invalid.put(dependency.name, InvalidReason.missing);
