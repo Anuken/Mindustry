@@ -315,8 +315,8 @@ public class AIController implements UnitController{
             vec.setLength(unit.speed() * length);
         }
 
-        //do not move when infinite vectors are used.
-        if(vec.isNaN() || vec.isInfinite()) return;
+        //do not move when infinite vectors are used or if its zero.
+        if(vec.isNaN() || vec.isInfinite() || vec.isZero()) return;
 
         if(!unit.type.omniMovement && unit.type.rotateMoveFirst){
             float angle = vec.angle();
