@@ -64,6 +64,10 @@
     "address": ["lobby.md.xpdustry.fr", "survival.md.xpdustry.fr", "router.md.xpdustry.fr", "pvp.md.xpdustry.fr", "sandbox.md.xpdustry.fr", "attack.md.xpdustry.fr", "event.md.xpdustry.fr"]
   },
   {
+    "name": "LatamDustry",
+    "address": ["n1.xpdustry.fr:7003", "n1.xpdustry.fr:7004", "n1.xpdustry.fr:7005", "n1.xpdustry.fr:7006", "n1.xpdustry.fr:7007"]
+  },
+  {
     "name": "Pandorum",
     "address": ["pandorum.su:5018", "pandorum.su:5019", "pandorum.su:5020"]
   },
