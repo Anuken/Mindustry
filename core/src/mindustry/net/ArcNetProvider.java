@@ -264,7 +264,7 @@ public class ArcNetProvider implements NetProvider{
                     callback.get(host);
                     foundAddresses.add(packet.getAddress());
                 }catch(Exception e){
-                    //don't crash when there's an error pinging a a server or parsing data
+                    //don't crash when there's an error pinging a server or parsing data
                     e.printStackTrace();
                 }
             }
