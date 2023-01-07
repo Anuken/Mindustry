@@ -9,8 +9,9 @@ import mindustry.gen.*;
 import mindustry.world.*;
 
 public class DrawPistons extends DrawBlock{
-    public float sinMag = 4f, sinScl = 6f, sinOffset = 50f, sideOffset = 0f, lenOffset = -1f;
+    public float sinMag = 4f, sinScl = 6f, sinOffset = 50f, sideOffset = 0f, lenOffset = -1f, angleOffset = 0f;
     public int sides = 4;
+    public String suffix = "-piston";
     public TextureRegion region1, region2, regiont;
 
     @Override
@@ -22,7 +23,7 @@ public class DrawPistons extends DrawBlock{
     public void draw(Building build){
         for(int i = 0; i < sides; i++){
             float len = Mathf.absin(build.totalProgress() + sinOffset + sideOffset * sinScl * i, sinScl, sinMag) + lenOffset;
-            float angle = i * 360f / sides;
+            float angle = angleOffset + i * 360f / sides;
             TextureRegion reg =
                 regiont.found() && (Mathf.equal(angle, 315) || Mathf.equal(angle, 135)) ? regiont :
                 angle >= 135 && angle < 315 ? region2 : region1;
@@ -41,8 +42,8 @@ public class DrawPistons extends DrawBlock{
     public void load(Block block){
         super.load(block);
 
-        region1 = Core.atlas.find(block.name + "-piston0", block.name + "-piston");
-        region2 = Core.atlas.find(block.name + "-piston1", block.name + "-piston");
-        regiont = Core.atlas.find(block.name + "-piston-t");
+        region1 = Core.atlas.find(block.name + suffix + "0", block.name + suffix);
+        region2 = Core.atlas.find(block.name + suffix + "1", block.name + suffix);
+        regiont = Core.atlas.find(block.name + suffix + "-t");
     }
 }
