@@ -462,7 +462,7 @@ public class World{
     public void checkMapArea(){
         for(var build : Groups.build){
             //reset map-area-based disabled blocks.
-            if(build.allowUpdate() && !build.enabled && build.block.autoResetEnabled){
+            if(!build.enabled && build.block.autoResetEnabled){
                 build.enabled = true;
             }
         }
