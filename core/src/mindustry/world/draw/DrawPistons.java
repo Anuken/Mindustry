@@ -11,6 +11,7 @@ import mindustry.world.*;
 public class DrawPistons extends DrawBlock{
     public float sinMag = 4f, sinScl = 6f, sinOffset = 50f, sideOffset = 0f, lenOffset = -1f;
     public int sides = 4;
+    public String suffix = "-piston";
     public TextureRegion region1, region2, regiont;
 
     @Override
@@ -41,8 +42,8 @@ public class DrawPistons extends DrawBlock{
     public void load(Block block){
         super.load(block);
 
-        region1 = Core.atlas.find(block.name + "-piston0", block.name + "-piston");
-        region2 = Core.atlas.find(block.name + "-piston1", block.name + "-piston");
-        regiont = Core.atlas.find(block.name + "-piston-t");
+        region1 = Core.atlas.find(block.name + suffix + "0", block.name + suffix);
+        region2 = Core.atlas.find(block.name + suffix + "1", block.name + suffix);
+        regiont = Core.atlas.find(block.name + suffix + "-t");
     }
 }
