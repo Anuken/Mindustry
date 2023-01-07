@@ -154,12 +154,14 @@ public class PayloadConveyor extends Block{
                         //trigger update forward
                         next.updateTile();
 
-                        //TODO add self to queue of next conveyor, then check if this conveyor was selected next frame - selection happens deterministically
-                        if(next.acceptPayload(this, item)){
-                            //move forward.
-                            next.handlePayload(this, item);
-                            item = null;
-                            moved();
+                        if(next != null){
+                            //TODO add self to queue of next conveyor, then check if this conveyor was selected next frame - selection happens deterministically
+                            if(next.acceptPayload(this, item)){
+                                //move forward.
+                                next.handlePayload(this, item);
+                                item = null;
+                                moved();
+                            }
                         }
                     }else if(!blocked){
                         //dump item forward
