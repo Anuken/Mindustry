@@ -11,13 +11,9 @@
     "name": "EasyPlay",
     "address": ["easyplay.su"]
   },
-    {
+  {
     "name": "Tendhost",
     "address": ["tendhost.ddns.net", "smokeofanarchy.ru:7576"]
-  },
-  {
-    "name": "SMokeOfAnarchy",
-    "address": ["smokeofanarchy.ru:6566", "2.smokeofanarchy.ru:7656"]
   },
   {
     "name": "Atanner Gaming",
@@ -33,7 +29,7 @@
   },
   {
     "name": "Chaotic Neutral",
-    "address": ["c-n.ddns.net:1111", "c-n.ddns.net:2222", "c-n.ddns.net:3333", "c-n.ddns.net:4444"]
+    "address": ["c-n.ddns.net:1111", "c-n.ddns.net:2222", "c-n.ddns.net:3333"]
   },
   {
     "name": "Ranked",
