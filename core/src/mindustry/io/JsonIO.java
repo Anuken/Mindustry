@@ -90,7 +90,7 @@ public class JsonIO{
 
             @Override
             public Rules read(Json json, JsonValue jsonData, Class type){
-                Rules out = new Rules();
+                Rules out = baseObject instanceof Rules rules ? rules : new Rules();
                 json.readFields(out, jsonData);
 
                 // Older Rules data doesn't have env mapping.
@@ -354,8 +354,9 @@ public class JsonIO{
         }
     }
 
+    private static Object baseObject;
+
     static class CustomJson extends Json{
-        private Object baseObject;
 
         { apply(this); }
 
@@ -365,7 +366,7 @@ public class JsonIO{
         }
 
         public <T> T fromBaseJson(Class<T> type, T base, String json){
-            this.baseObject = base;
+            baseObject = base;
             return readValue(type, null, new JsonReader().parse(json));
         }
 
