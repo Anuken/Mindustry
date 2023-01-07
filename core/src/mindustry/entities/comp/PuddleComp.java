@@ -50,6 +50,11 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc, Syncc{
 
     @Override
     public void update(){
+        if(liquid == null || tile == null){
+            remove();
+            return;
+        }
+
         float addSpeed = accepting > 0 ? 3f : 0f;
 
         amount -= Time.delta * (1f - liquid.viscosity) / (5f + addSpeed);
