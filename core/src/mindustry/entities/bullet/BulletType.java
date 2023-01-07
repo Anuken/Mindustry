@@ -581,7 +581,9 @@ public class BulletType extends Content implements Cloneable{
                 if(b.aimTile != null && b.aimTile.build != null && b.aimTile.build.team != b.team && collidesGround && !b.hasCollided(b.aimTile.build.id)){
                     target = b.aimTile.build;
                 }else{
-                    target = Units.closestTarget(b.team, realAimX, realAimY, homingRange, e -> e.checkTarget(collidesAir, collidesGround) && !b.hasCollided(e.id), t -> collidesGround && !b.hasCollided(t.id));
+                    target = Units.closestTarget(b.team, realAimX, realAimY, homingRange,
+                        e -> e != null && e.checkTarget(collidesAir, collidesGround) && !b.hasCollided(e.id),
+                        t -> t != null && collidesGround && !b.hasCollided(t.id));
                 }
             }
 

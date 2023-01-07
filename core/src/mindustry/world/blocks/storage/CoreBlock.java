@@ -150,7 +150,7 @@ public class CoreBlock extends StorageBlock{
         //finish placement immediately when a block is replaced.
         if(previous instanceof CoreBlock){
             tile.setBlock(this, tile.team());
-            Fx.placeBlock.at(tile, tile.block().size);
+            tile.block().placeEffect.at(tile, tile.block().size);
             Fx.upgradeCore.at(tile.drawx(), tile.drawy(), 0f, tile.block());
             Fx.upgradeCoreBloom.at(tile, tile.block().size);
 

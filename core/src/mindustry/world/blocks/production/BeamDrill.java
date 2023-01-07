@@ -24,13 +24,13 @@ import static mindustry.Vars.*;
 public class BeamDrill extends Block{
     protected Rand rand = new Rand();
 
-    public @Load("drill-laser") TextureRegion laser;
-    public @Load("drill-laser-end") TextureRegion laserEnd;
-    public @Load("drill-laser-center") TextureRegion laserCenter;
+    public @Load(value = "@-beam", fallback = "drill-laser") TextureRegion laser;
+    public @Load(value = "@-beam-end", fallback = "drill-laser-end") TextureRegion laserEnd;
+    public @Load(value = "@-beam-center", fallback = "drill-laser-center") TextureRegion laserCenter;
 
-    public @Load("drill-laser-boost") TextureRegion laserBoost;
-    public @Load("drill-laser-boost-end") TextureRegion laserEndBoost;
-    public @Load("drill-laser-boost-center") TextureRegion laserCenterBoost;
+    public @Load(value = "@-beam-boost", fallback = "drill-laser-boost") TextureRegion laserBoost;
+    public @Load(value = "@-beam-boost-end", fallback = "drill-laser-boost-end") TextureRegion laserEndBoost;
+    public @Load(value = "@-beam-boost-center", fallback = "drill-laser-boost-center") TextureRegion laserCenterBoost;
 
     public @Load("@-top") TextureRegion topRegion;
     public @Load("@-glow") TextureRegion glowRegion;
@@ -202,6 +202,7 @@ public class BeamDrill extends Block{
         public float time;
         public float warmup, boostWarmup;
         public float lastDrillSpeed;
+        public int facingAmount;
 
         @Override
         public void drawSelect(){
@@ -222,40 +223,8 @@ public class BeamDrill extends Block{
             if(lasers[0] == null) updateLasers();
 
             warmup = Mathf.approachDelta(warmup, Mathf.num(efficiency > 0), 1f / 60f);
-            lastItem = null;
-            boolean multiple = false;
-            int dx = Geometry.d4x(rotation), dy = Geometry.d4y(rotation), facingAmount = 0;
-
-            //update facing tiles
-            for(int p = 0; p < size; p++){
-                Point2 l = lasers[p];
-                Tile dest = null;
-                for(int i = 0; i < range; i++){
-                    int rx = l.x + dx*i, ry = l.y + dy*i;
-                    Tile other = world.tile(rx, ry);
-                    if(other != null){
-                        if(other.solid()){
-                            Item drop = other.wallDrop();
-                            if(drop != null && drop.hardness <= tier){
-                                facingAmount ++;
-                                if(lastItem != drop && lastItem != null){
-                                    multiple = true;
-                                }
-                                lastItem = drop;
-                                dest = other;
-                            }
-                            break;
-                        }
-                    }
-                }
-
-                facing[p] = dest;
-            }
-
-            //when multiple items are present, count that as no item
-            if(multiple){
-                lastItem = null;
-            }
+            
+            updateFacing();
 
             float multiplier = Mathf.lerp(1f, optionalBoostIntensity, optionalEfficiency);
             boostWarmup = Mathf.lerpDelta(boostWarmup, optionalEfficiency, 0.1f);
@@ -281,7 +250,7 @@ public class BeamDrill extends Block{
 
         @Override
         public boolean shouldConsume(){
-            return items.total() < itemCapacity && enabled;
+            return items.total() < itemCapacity && lastItem != null && enabled;
         }
 
         @Override
@@ -369,12 +338,51 @@ public class BeamDrill extends Block{
         public void onProximityUpdate(){
             //when rotated.
             updateLasers();
+            updateFacing();
         }
 
-        void updateLasers(){
+        protected void updateLasers(){
             for(int i = 0; i < size; i++){
                 if(lasers[i] == null) lasers[i] = new Point2();
                 nearbySide(tileX(), tileY(), rotation, i, lasers[i]);
+            }
+        }
+
+        protected void updateFacing(){
+            lastItem = null;
+            boolean multiple = false;
+            int dx = Geometry.d4x(rotation), dy = Geometry.d4y(rotation);
+            facingAmount = 0;
+
+            //update facing tiles
+            for(int p = 0; p < size; p++){
+                Point2 l = lasers[p];
+                Tile dest = null;
+                for(int i = 0; i < range; i++){
+                    int rx = l.x + dx*i, ry = l.y + dy*i;
+                    Tile other = world.tile(rx, ry);
+                    if(other != null){
+                        if(other.solid()){
+                            Item drop = other.wallDrop();
+                            if(drop != null && drop.hardness <= tier){
+                                facingAmount ++;
+                                if(lastItem != drop && lastItem != null){
+                                    multiple = true;
+                                }
+                                lastItem = drop;
+                                dest = other;
+                            }
+                            break;
+                        }
+                    }
+                }
+
+                facing[p] = dest;
+            }
+
+            //when multiple items are present, count that as no item
+            if(multiple){
+                lastItem = null;
             }
         }
 
