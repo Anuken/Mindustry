@@ -120,6 +120,7 @@ public class CargoAI extends AIController{
                     lastStale = target;
                 }else{
                     unloadTarget = target;
+                    targets.clear();
                     return i;
                 }
             }
@@ -133,6 +134,7 @@ public class CargoAI extends AIController{
             unloadTarget = lastStale;
         }
 
+        targets.clear();
         return -1;
     }
 
@@ -179,6 +181,8 @@ public class CargoAI extends AIController{
         if(unloadTarget == null && lastStale != null){
             unloadTarget = lastStale;
         }
+
+        targets.clear();
     }
 
     //unused, might change later
