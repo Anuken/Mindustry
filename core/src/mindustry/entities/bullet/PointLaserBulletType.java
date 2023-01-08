@@ -31,7 +31,6 @@ public class PointLaserBulletType extends BulletType{
         removeAfterPierce = false;
         speed = 0f;
         despawnEffect = Fx.none;
-        shootEffect = Fx.none;
         lifetime = 20f;
         impact = true;
         keepVelocity = false;
