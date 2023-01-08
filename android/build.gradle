@@ -122,8 +122,14 @@ dependencies{
     natives "com.github.Anuken.Arc:natives-android:${getArcHash()}"
     natives "com.github.Anuken.Arc:natives-freetype-android:${getArcHash()}"
 
-    //TODO dynamically find best android platform jar instead of hard-coding to 30
-    def sdkFile = new File((String)findSdkDir(), "/platforms/android-30/android.jar")
+    def version;
+    def highestVersion;
+    new File((String)findSdkDir(), "/platforms").eachFileMatch ~/android-\d+/, {
+        version = it.name.find(/\d+/).toInteger();
+        highestVersion = version > highestVersion ? version : highestVersion;
+    }
+
+    def sdkFile = new File((String)findSdkDir(), "/platforms/android-${highestVersion}/android.jar")
     if(sdkFile.exists()) compileOnly files(sdkFile.absolutePath)
 }
 

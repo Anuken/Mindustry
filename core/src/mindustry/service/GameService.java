@@ -447,7 +447,7 @@ public class GameService{
                 researchAll.complete();
             }
 
-            if(Blocks.logicProcessor.unlocked()) researchLogic.complete();
+            if(Blocks.microProcessor.unlocked()) researchLogic.complete();
         };
 
         //check unlocked stuff on load as well

@@ -1,11 +1,19 @@
 [
   {
-    "name": "generic survival",
-    "address": ["212.192.29.92:25554"]
+    "name": "generic mindustry",
+    "address": ["212.192.29.92:25554", "212.192.29.24:25298"]
+  },
+  {
+    "name": "ECAN",
+    "address": ["mindustry.ecansol.com:6597", "mindustry.ecansol.com:6499", "mindustry.ecansol.com:6599"]
   },
   {
     "name": "Mindustry Español",
     "address": ["mes.xpdustry.fr"]
+  },
+  {
+    "name": "SMoke of Anarchy",
+    "address": ["smokeofanarchy.ru, backup.smokeofanarchy.ru"]
   },
   {
     "name": "Mindustry.pl",
@@ -33,7 +41,7 @@
   },
   {
     "name": "Omega Hub",
-    "address": ["n7.mindustry.me", "n7.mindustry.me:6570", "n1.mindustry.me:6568", "n1.mindustry.me:6570", "n1.mindustry.me:6571", "n1.mindustry.me:6573", "n1.mindustry.me", "n1.mindustry.me:6599", "n1.mindustry.me:6774", "n1.mindustry.me:6608", "n1.mindustry.me:6572"]
+    "address": ["omegahub.xyz", "rush.omegahub.xyz", "annexation.omegahub.xyz", "2r2t.omegahub.xyz", "3r3t.omegahub.xyz", "campaign.omegahub.xyz", "rapid.omegahub.xyz", "survivalattack.omegahub.xyz", "castlewars.omegahub.xyz", "skyblock.omegahub.xyz", "skywarsranked.omegahub.xyz", "colonization.omegahub.xyz"]
   },
   {
     "name": "KMWStudios",
@@ -41,11 +49,11 @@
   },
   {
     "name": "Darkdustry",
-    "address": ["darkdustry.tk", "darkdustry.tk:1500", "darkdustry.tk:2000", "darkdustry.tk:3000", "darkdustry.tk:4000", "darkdustry.tk:5000", "darkdustry.tk:6000", "darkdustry.tk:7000", "darkdustry.tk:8000", "darkdustry.tk:9000"] 
+    "address": ["darkdustry.net", "darkdustry.net:1500", "darkdustry.net:2000", "darkdustry.net:3000", "darkdustry.net:4000", "darkdustry.net:5000", "darkdustry.net:6000", "darkdustry.net:7000", "darkdustry.net:8000", "darkdustry.net:9000", "darkdustry.net:10000"] 
   },
   {
     "name": "Chaotic Neutral",
-    "address": ["c-n.ddns.net:5555", "c-n.ddns.net:6666", "c-n.ddns.net:7777", "c-n.ddns.net:8888"]
+    "address": ["c-n.ddns.net:1111", "c-n.ddns.net:2222", "c-n.ddns.net:3333", "c-n.ddns.net:4444", "c-n.ddns.net:5555", "c-n.ddns.net:6666", "c-n.ddns.net:7777", "c-n.ddns.net:8888"]
   },
   {
     "name": "io",
@@ -61,7 +69,11 @@
   },
   {
     "name": "Xpdustry",
-    "address": ["play.xpdustry.fr", "event.xpdustry.fr"]
+    "address": ["lobby.md.xpdustry.fr", "survival.md.xpdustry.fr", "router.md.xpdustry.fr", "pvp.md.xpdustry.fr", "sandbox.md.xpdustry.fr", "attack.md.xpdustry.fr", "event.md.xpdustry.fr"]
+  },
+  {
+    "name": "LatamDustry",
+    "address": ["n1.xpdustry.fr:7003", "n1.xpdustry.fr:7004", "n1.xpdustry.fr:7005", "n1.xpdustry.fr:7006", "n1.xpdustry.fr:7007"]
   },
   {
     "name": "Pandorum",
@@ -69,15 +81,15 @@
   },
   {
     "name": "Fish",
-    "address": ["170.187.144.235", "45.79.203.155"]
+    "address": ["170.187.144.235", "162.248.100.98"]
   },
   {
     "name": "OMNIDUSTRY",
-    "address": ["109.94.209.233","109.94.209.233:6568","109.94.209.233:6569","109.94.209.233:6570","109.94.209.233:6571","109.94.209.233:6572","109.94.209.233:6573"]
+    "address": ["109.94.209.233","109.94.209.233:6568","109.94.209.233:6569","109.94.209.233:6570","109.94.209.233:6571","109.94.209.233:6572","109.94.209.233:6573","109.94.209.233:6574"]
   },
   {
     "name": "The Devil",
-    "address": ["dc8.i8mc.cn:8169", "dc8.i8mc.cn:8920", "other.xem8k5.top:10530"]
+    "address": ["xem8k5.mindustry.top:8169", "test.xem8k5.top:8920", "other.xem8k5.top:10936", "n2.akiracloud.net:10404"]
   },
   {
     "name": "Eradicationdustry",
@@ -89,7 +101,7 @@
   },
   {
     "name": "mindustry.ddns.net",
-    "address": ["mindustry.ddns.net:1000", "mindustry.ddns.net:2000", "mindustry.ddns.net:3000", "mindustry.ddns.net:4000"]
+    "address": ["mindustry.ddns.net", "mindustry.ddns.net:1000", "mindustry.ddns.net:2000", "mindustry.ddns.net:3000", "mindustry.ddns.net:4000"]
   },
   {
     "name": "EasyPlay.su",
@@ -106,5 +118,13 @@
   {
     "name": "Sakura", 
     "address": ["160.16.207.141:22527", "160.16.207.141:23527", "160.16.207.141:24527", "160.16.207.141:25527", "160.16.207.141:26527"]
+  },
+  {
+    "name": "|RussianServers|[]",
+    "address": ["2p2g.ml:6568","2p2g.ml:6569","2p2g.ml:6570","2p2g.ml:6571","2p2g.ml:6572","2p2g.ml:6573"]
+  },
+  {
+    "name": "Hungarian",
+    "address": ["play.hudustry.tk"]
   }
 ]
