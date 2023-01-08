@@ -345,8 +345,6 @@ public class JsonIO{
             }
         });
 
-        
-
         //use short names for all filter types
         for(var filter : Maps.allFilterTypes){
             var i = filter.get();

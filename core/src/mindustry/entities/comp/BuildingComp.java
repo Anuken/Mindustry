@@ -69,6 +69,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     transient String lastAccessed;
     transient boolean wasDamaged; //used only by the indexer
     transient float visualLiquid;
+    private transient float statusTimer;
 
     /** TODO Each bit corresponds to a team ID. Only 64 are supported. Does not work on servers. */
     transient long visibleFlags;
@@ -580,7 +581,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             return BlockStatus.noInput;
         }
 
-        return BlockStatus.active;
+        return statusTimer < efficiency ? BlockStatus.active : BlockStatus.noInput;
     }
 
     /** Call when nothing is happening to the entity. This increments the internal sleep timer. */
@@ -2022,6 +2023,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         //TODO just handle per-block instead
         if(enabled || !block.noUpdateDisabled){
             updateTile();
+
+            statusTimer = (statusTimer + efficiency/4f * Time.delta) % 1f;
         }
     }
 
