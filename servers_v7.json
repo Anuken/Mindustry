@@ -118,5 +118,9 @@
   {
     "name": "|RussianServers|[]",
     "address": ["2p2g.ml:6568","2p2g.ml:6569","2p2g.ml:6570","2p2g.ml:6571","2p2g.ml:6572","2p2g.ml:6573"]
+  },
+  {
+    "name": "Hungarian",
+    "address": ["play.hudustry.tk"]
   }
 ]
