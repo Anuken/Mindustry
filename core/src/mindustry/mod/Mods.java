@@ -813,7 +813,7 @@ public class Mods implements Loadable{
             }catch(Throwable ignored){
             }
 
-            if(meta == null) continue;
+            if(meta == null || meta.name == null) continue;
             dependencies.put(meta.name, meta.dependencies);
             fileMapping.put(meta.name, file);
         }

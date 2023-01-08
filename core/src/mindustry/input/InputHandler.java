@@ -282,16 +282,16 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public static void commandBuilding(Player player, int[] buildings, Vec2 target){
         if(player == null  || target == null) return;
 
+        if(net.server() && !netServer.admins.allowAction(player, ActionType.commandBuilding, event -> {
+            event.buildingPositions = buildings;
+        })){
+            throw new ValidateException(player, "Player cannot command buildings.");
+        }
+
         for(int pos : buildings){
             var build = world.build(pos);
 
             if(build == null || build.team() != player.team() || !build.block.commandable) continue;
-
-            if(net.server() && !netServer.admins.allowAction(player, ActionType.commandBuilding, event -> {
-                event.tile = build.tile;
-            })){
-                throw new ValidateException(player, "Player cannot command building.");
-            }
 
             build.onCommand(target);
             if(!state.isPaused() && player == Vars.player){
@@ -415,7 +415,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(targets = Loc.both, called = Loc.server)
     public static void requestDropPayload(Player player, float x, float y){
-        if(player == null || net.client()) return;
+        if(player == null || net.client() || player.dead()) return;
 
         Payloadc pay = (Payloadc)player.unit();
 

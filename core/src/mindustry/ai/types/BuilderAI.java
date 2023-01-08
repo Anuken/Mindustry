@@ -145,7 +145,7 @@ public class BuilderAI extends AIController{
                     float minDst = Float.MAX_VALUE;
                     Player closest = null;
                     for(var player : Groups.player){
-                        if(player.unit().canBuild() && !player.dead()){
+                        if(player.unit().canBuild() && !player.dead() && player.team() == unit.team){
                             float dst = player.dst2(unit);
                             if(dst < minDst){
                                 closest = player;

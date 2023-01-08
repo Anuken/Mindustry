@@ -192,12 +192,18 @@ public class LoadDialog extends BaseDialog{
         buttons.button("@save.import", Icon.add, () -> {
             platform.showFileChooser(true, saveExtension, file -> {
                 if(SaveIO.isSaveValid(file)){
-                    try{
-                        control.saves.importSave(file);
-                        rebuild();
-                    }catch(IOException e){
-                        e.printStackTrace();
-                        ui.showException("@save.import.fail", e);
+                    var meta = SaveIO.getMeta(file);
+
+                    if(meta.rules.sector != null){
+                        ui.showErrorMessage("@save.nocampaign");
+                    }else{
+                        try{
+                            control.saves.importSave(file);
+                            rebuild();
+                        }catch(IOException e){
+                            e.printStackTrace();
+                            ui.showException("@save.import.fail", e);
+                        }
                     }
                 }else{
                     ui.showErrorMessage("@save.import.invalid");

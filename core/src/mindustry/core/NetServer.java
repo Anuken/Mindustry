@@ -226,6 +226,14 @@ public class NetServer implements ApplicationListener{
                     con.kick(KickReason.idInUse);
                     return;
                 }
+
+                for(var otherCon : net.getConnections()){
+                    if(otherCon != con && uuid.equals(otherCon.uuid)){
+                        con.uuid = packet.uuid;
+                        con.kick(KickReason.idInUse);
+                        return;
+                    }
+                }
             }
 
             packet.name = fixName(packet.name);
