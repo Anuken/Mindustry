@@ -1,4 +1,8 @@
 [
+ {
+    "name": "Explosive corp",
+    "address": ["94.103.91.96:4545"]
+  },
   {
     "name": "RCM",
     "address": ["rcrms.ru:6567"]
