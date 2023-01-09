@@ -1453,7 +1453,7 @@ public class LStatements{
     @RegisterStatement("cutscene")
     public static class CutsceneStatement extends LStatement{
         public CutsceneAction action = CutsceneAction.pan;
-        public String p1 = "100", p2 = "100", p3 = " 0.06", p4 = "0";
+        public String p1 = "100", p2 = "100", p3 = "0.06", p4 = "0";
 
         @Override
         public void build(Table table){

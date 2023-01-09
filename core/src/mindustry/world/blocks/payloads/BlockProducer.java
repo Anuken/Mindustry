@@ -96,7 +96,7 @@ public abstract class BlockProducer extends PayloadBlock{
                 if(progress >= recipe.buildCost){
                     consume();
                     payload = new BuildPayload(recipe, team);
-                    Fx.placeBlock.at(x, y, payload.size() / tilesize);
+                    payload.block().placeEffect.at(x, y, payload.size() / tilesize);
                     payVector.setZero();
                     progress %= 1f;
                 }

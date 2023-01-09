@@ -1468,7 +1468,7 @@ public class UnitTypes{
             buildBeamOffset = 43;
             ammoCapacity = 1;
 
-            abilities.add(new ForceFieldAbility(140f, 4f, 7000f, 60f * 8), new RepairFieldAbility(130f, 60f * 2, 140f));
+            abilities.add(new ForceFieldAbility(140f, 4f, 7000f, 60f * 8, 8, 0f), new RepairFieldAbility(130f, 60f * 2, 140f));
         }};
 
         //endregion
