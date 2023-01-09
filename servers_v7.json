@@ -1,4 +1,8 @@
 [
+ {
+    "name": "Explosive corp",
+    "address": ["94.103.91.96:4545"]
+  },
   {
     "name": "generic mindustry",
     "address": ["212.192.29.92:25554", "212.192.29.24:25298"]
