@@ -1,5 +1,9 @@
 [
   {
+    "name": "RCM",
+    "address": ["rcrms.ru:6567"]
+  },
+  {
     "name": "generic mindustry",
     "address": ["212.192.29.92:25554", "212.192.29.24:25298"]
   },
