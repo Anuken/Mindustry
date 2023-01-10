@@ -513,7 +513,7 @@ public class Mods implements Loadable{
 
     /** @return mods ordered in the correct way needed for dependencies. */
     public Seq<LoadedMod> orderedMods(){
-        var mapping = mods.asMap(m -> m.name);
+        var mapping = mods.asMap(m -> m.meta.name);
         return resolver.resolveDependencies(mods.map(m -> m.meta)).orderedKeys().map(mapping::get);
     }
 
