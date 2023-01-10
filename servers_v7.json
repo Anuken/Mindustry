@@ -1,4 +1,12 @@
 [
+ {
+    "name": "Explosive corp",
+    "address": ["94.103.91.96:4545", "94.103.91.96:4848"]
+  },
+  {
+    "name": "RCM",
+    "address": ["rcrms.ru:6567"]
+  },
   {
     "name": "generic mindustry",
     "address": ["212.192.29.92:25554", "212.192.29.24:25298"]
@@ -13,7 +21,7 @@
   },
   {
     "name": "SMoke of Anarchy",
-    "address": ["smokeofanarchy.ru, backup.smokeofanarchy.ru"]
+    "address": ["smokeofanarchy.ru", "backup.smokeofanarchy.ru"]
   },
   {
     "name": "Mindustry.pl",
@@ -41,7 +49,7 @@
   },
   {
     "name": "Omega Hub",
-    "address": ["omegahub.xyz", "rush.omegahub.xyz", "annexation.omegahub.xyz", "2r2t.omegahub.xyz", "3r3t.omegahub.xyz", "campaign.omegahub.xyz", "rapid.omegahub.xyz", "survivalattack.omegahub.xyz", "castlewars.omegahub.xyz", "skyblock.omegahub.xyz", "skywarsranked.omegahub.xyz", "colonization.omegahub.xyz"]
+    "address": ["n1.mindustry.me:6608", "n7.mindustry.me:6567", "n7.mindustry.me:6570", "n1.mindustry.me:6568", "n1.mindustry.me:6671", "n1.mindustry.me:6570", "n1.mindustry.me:6573", "n1.mindustry.me:6610", "n1.mindustry.me:6567", "n1.mindustry.me:6599", "n1.mindustry.me:6774", "n1.mindustry.me:6571"]
   },
   {
     "name": "KMWStudios",
@@ -126,5 +134,9 @@
   {
     "name": "Hungarian",
     "address": ["play.hudustry.tk"]
+  },
+  {
+    "name": "SubZero", 
+    "address": ["mintyserver.net"]
   }
 ]
