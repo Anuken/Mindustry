@@ -44,7 +44,7 @@ public class Mods implements Loadable{
     private static ObjectFloatMap<String> textureResize = new ObjectFloatMap<>();
     private MultiPacker packer;
 
-    private ModResolver resolver = new ModResolver();
+    private ModDependencyResolver resolver = new ModDependencyResolver();
     private ModClassLoader mainLoader = new ModClassLoader(getClass().getClassLoader());
 
     Seq<LoadedMod> mods = new Seq<>();
@@ -105,7 +105,7 @@ public class Mods implements Loadable{
 
         file.copyTo(dest);
         try{
-            var loaded = loadMod(dest, true);
+            var loaded = loadMod(dest, true, true);
             mods.add(loaded);
             requiresReload = true;
             //enable the mod on import
@@ -453,15 +453,16 @@ public class Mods implements Loadable{
             mapping.put(meta.name, file);
         }
 
-        var context = resolver.resolveDependencies(metas);
-        for(var resolved : context.ordered){
-            var file = mapping.get(resolved);
+        var resolved = resolver.resolveDependencies(metas);
+        for(var entry : resolved){
+            var file = mapping.get(entry.key);
             var steam = platform.getWorkshopContent(LoadedMod.class).contains(file);
 
             Log.debug("[Mods] Loading mod @", file);
 
             try{
-                LoadedMod mod = loadMod(file);
+                LoadedMod mod = loadMod(file, false, entry.value == ModState.enabled);
+                mod.state = entry.value;
                 mods.add(mod);
                 if(steam) mod.addSteamID(file.name());
             }catch(Throwable e){
@@ -477,7 +478,18 @@ public class Mods implements Loadable{
             }
         }
 
-        resolveModState();
+        // Resolve the state
+        mods.each(this::updateDependencies);
+        for(var mod : mods){
+            // Skip mods where the state has already been resolved
+            if(mod.state != ModState.enabled)continue;
+            if(!mod.isSupported()){
+                mod.state = ModState.unsupported;
+            }else if(!mod.shouldBeEnabled()){
+                mod.state = ModState.disabled;
+            }
+        }
+
         sortMods();
         buildFiles();
     }
@@ -485,18 +497,6 @@ public class Mods implements Loadable{
     private void sortMods(){
         //sort mods to make sure servers handle them properly and they appear correctly in the dialog
         mods.sort(Structs.comps(Structs.comparingInt(m -> m.state.ordinal()), Structs.comparing(m -> m.name)));
-    }
-
-    private void resolveModState(){
-        mods.each(this::updateDependencies);
-
-        for(LoadedMod mod : mods){
-            mod.state =
-                !mod.isSupported() ? ModState.unsupported :
-                mod.hasUnmetDependencies() ? ModState.missingDependencies :
-                !mod.shouldBeEnabled() ? ModState.disabled :
-                ModState.enabled;
-        }
     }
 
     private void updateDependencies(LoadedMod mod){
@@ -513,8 +513,8 @@ public class Mods implements Loadable{
 
     /** @return mods ordered in the correct way needed for dependencies. */
     public Seq<LoadedMod> orderedMods(){
-        final var mapping = mods.asMap(m -> m.name);
-        return resolver.resolveDependencies(mods.map(m -> m.meta)).ordered.orderedItems().map(mapping::get);
+        var mapping = mods.asMap(m -> m.name);
+        return resolver.resolveDependencies(mods.map(m -> m.meta)).orderedKeys().map(mapping::get);
     }
 
     public LoadedMod locateMod(String name){
@@ -810,12 +810,12 @@ public class Mods implements Loadable{
     /** Loads a mod file+meta, but does not add it to the list.
      * Note that directories can be loaded as mods. */
     private LoadedMod loadMod(Fi sourceFile) throws Exception{
-        return loadMod(sourceFile, false);
+        return loadMod(sourceFile, false, true);
     }
 
     /** Loads a mod file+meta, but does not add it to the list.
      * Note that directories can be loaded as mods. */
-    private LoadedMod loadMod(Fi sourceFile, boolean overwrite) throws Exception{
+    private LoadedMod loadMod(Fi sourceFile, boolean overwrite, boolean initialize) throws Exception{
         Time.mark();
 
         ZipFi rootZip = null;
@@ -881,7 +881,8 @@ public class Mods implements Loadable{
                 !skipModLoading() &&
                 Core.settings.getBool("mod-" + baseName + "-enabled", true) &&
                 Version.isAtLeast(meta.minGameVersion) &&
-                (meta.getMinMajor() >= 136 || headless)
+                (meta.getMinMajor() >= 136 || headless) &&
+                initialize
             ){
                 if(ios){
                     throw new ModLoadException("Java class mods are not supported on iOS.");
@@ -1170,6 +1171,8 @@ public class Mods implements Loadable{
         enabled,
         contentErrors,
         missingDependencies,
+        incompleteDependencies,
+        circularDependencies,
         unsupported,
         disabled,
     }
