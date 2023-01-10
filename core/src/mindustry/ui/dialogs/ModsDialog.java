@@ -329,16 +329,16 @@ public class ModsDialog extends BaseDialog{
             return "@mod.blacklisted";
         }else if(!item.isSupported()){
             return "@mod.incompatiblegame";
+        }else if(item.state == ModState.circularDependencies){
+            return "@mod.circulardependencies";
+        }else if(item.state == ModState.incompleteDependencies){
+            return "@mod.incompletedependencies";
         }else if(item.hasUnmetDependencies()){
             return "@mod.unmetdependencies";
         }else if(item.hasContentErrors()){
             return "@mod.erroredcontent";
         }else if(item.meta.hidden){
             return "@mod.multiplayer.compatible";
-        }else if(item.state == ModState.circularDependencies){
-            return "@mod.circulardependencies";
-        }else if(item.state == ModState.incompleteDependencies){
-            return "@mod.incompletedependencies";
         }
         return null;
     }
@@ -350,14 +350,14 @@ public class ModsDialog extends BaseDialog{
             return "@mod.blacklisted.details";
         }else if(!item.isSupported()){
             return Core.bundle.format("mod.requiresversion.details", item.meta.minGameVersion);
+        }else if(item.state == ModState.circularDependencies){
+            return "@mod.circulardependencies.details";
+        }else if(item.state == ModState.incompleteDependencies){
+            return Core.bundle.format("mod.incompletedependencies.details", item.missingDependencies.toString(", "));
         }else if(item.hasUnmetDependencies()){
             return Core.bundle.format("mod.missingdependencies.details", item.missingDependencies.toString(", "));
         }else if(item.hasContentErrors()){
             return "@mod.erroredcontent.details";
-        }else if(item.state == ModState.circularDependencies){
-            return "@mod.circulardependencies.details";
-        }else if(item.state == ModState.incompleteDependencies){
-            return "@mod.incompletedependencies.details";
         }
         return null;
     }
