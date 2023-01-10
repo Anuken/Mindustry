@@ -1,4 +1,12 @@
 [
+ {
+    "name": "Explosive corp",
+    "address": ["94.103.91.96:4545", "94.103.91.96:4848"]
+  },
+  {
+    "name": "RCM",
+    "address": ["rcrms.ru:6567"]
+  },
   {
     "name": "generic mindustry",
     "address": ["212.192.29.92:25554", "212.192.29.24:25298"]
@@ -13,7 +21,7 @@
   },
   {
     "name": "SMoke of Anarchy",
-    "address": ["smokeofanarchy.ru, backup.smokeofanarchy.ru"]
+    "address": ["smokeofanarchy.ru", "backup.smokeofanarchy.ru"]
   },
   {
     "name": "Mindustry.pl",
@@ -130,5 +138,9 @@
   {
     "name": "Router Pi",
     "address":["a55c81b7c4d6e6d604651a93f8af5cd83.asuscomm.com"]
+  }
+  {
+    "name": "SubZero", 
+    "address": ["mintyserver.net"]
   }
 ]
