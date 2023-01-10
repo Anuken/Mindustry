@@ -190,7 +190,7 @@ public class ApplicationTests{
 
     @Test
     void writeRules(){
-        ByteBuffer buffer = ByteBuffer.allocate(500);
+        ByteBuffer buffer = ByteBuffer.allocate(1000);
 
         Rules rules = new Rules();
         rules.attackMode = true;

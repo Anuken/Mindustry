@@ -503,7 +503,7 @@ public class LogicBlock extends Block{
             if(state.rules.disableWorldProcessors && privileged) return;
 
             if(enabled && executor.initialized()){
-                accumulator += edelta() * ipt * efficiency;
+                accumulator += edelta() * ipt;
 
                 if(accumulator > maxInstructionScale * ipt) accumulator = maxInstructionScale * ipt;
 

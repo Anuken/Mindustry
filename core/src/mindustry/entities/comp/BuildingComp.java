@@ -380,6 +380,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         for(var edge : block.getEdges()){
             Building build = nearby(edge.x, edge.y);
             if(build != null && build.team == team && build instanceof HeatBlock heater){
+                //massive hack but I don't really care anymore
+                if(heater instanceof HeatConductorBuild cond){
+                    cond.updateHeat();
+                }
 
                 boolean split = build.block instanceof HeatConductor cond && cond.splitHeat;
                 // non-routers must face us, routers must face away - next to a redirector, they're forced to face away due to cycles anyway
@@ -576,7 +580,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             return BlockStatus.noInput;
         }
 
-        return BlockStatus.active;
+        return ((state.tick / 30f) % 1f) < efficiency ? BlockStatus.active : BlockStatus.noInput;
     }
 
     /** Call when nothing is happening to the entity. This increments the internal sleep timer. */

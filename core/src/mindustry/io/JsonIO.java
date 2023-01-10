@@ -2,6 +2,7 @@ package mindustry.io;
 
 import arc.graphics.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
@@ -77,6 +78,30 @@ public class JsonIO{
     static void apply(Json json){
         json.setElementType(Rules.class, "spawns", SpawnGroup.class);
         json.setElementType(Rules.class, "loadout", ItemStack.class);
+
+        json.setSerializer(Rules.class, new Serializer<>(){
+            @Override
+            public void write(Json json, Rules object, Class knownType){
+                json.writeObjectStart();
+                json.writeFields(object);
+                json.writeValue("envMapping", Env.idToName, IntMap.class);
+                json.writeObjectEnd();
+            }
+
+            @Override
+            public Rules read(Json json, JsonValue jsonData, Class type){
+                Rules out = baseObject instanceof Rules rules ? rules : new Rules();
+                json.readFields(out, jsonData);
+
+                // Older Rules data doesn't have env mapping.
+                if(jsonData.has("envMapping")){
+                    IntMap<String> idToName = json.readValue(IntMap.class, jsonData.get("envMapping"));
+                    out.env = Env.remap(out.env, idToName);
+                }
+
+                return out;
+            }
+        });
 
         json.setSerializer(Color.class, new Serializer<>(){
             @Override
@@ -320,8 +345,6 @@ public class JsonIO{
             }
         });
 
-        
-
         //use short names for all filter types
         for(var filter : Maps.allFilterTypes){
             var i = filter.get();
@@ -329,8 +352,9 @@ public class JsonIO{
         }
     }
 
+    private static Object baseObject;
+
     static class CustomJson extends Json{
-        private Object baseObject;
 
         { apply(this); }
 
@@ -340,7 +364,7 @@ public class JsonIO{
         }
 
         public <T> T fromBaseJson(Class<T> type, T base, String json){
-            this.baseObject = base;
+            baseObject = base;
             return readValue(type, null, new JsonReader().parse(json));
         }
 

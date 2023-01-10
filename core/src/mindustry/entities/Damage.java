@@ -26,6 +26,7 @@ public class Damage{
     private static final Seq<Unit> units = new Seq<>();
     private static final IntSet collidedBlocks = new IntSet();
     private static final IntFloatMap damages = new IntFloatMap();
+    private static final Seq<Collided> collided = new Seq<>();
     private static final Seq<Building> builds = new Seq<>();
     private static final FloatSeq distances = new FloatSeq();
 
@@ -184,7 +185,7 @@ public class Damage{
         return Math.min(distances.size < pierceCap || pierceCap < 0 ? length : Math.max(6f, distances.get(pierceCap - 1)), maxDst);
     }
 
-    /** TODO Collides a bullet with blocks in a laser, taking into account absorption blocks. Resulting length is stored in the bullet's fdata. */
+    /** Collides a bullet with blocks in a laser, taking into account absorption blocks. Resulting length is stored in the bullet's fdata. */
     public static float collideLaser(Bullet b, float length, boolean large, boolean laser, int pierceCap){
         float resultLength = findPierceLength(b, pierceCap, length);
 
@@ -226,40 +227,28 @@ public class Damage{
             length = findPierceLength(hitter, pierceCap, length);
         }
 
-        //TODO pierceCount ++ should happen in blocks AND units!
+        collided.clear();
 
         collidedBlocks.clear();
         vec.trnsExact(angle, length);
-
-        Intc2 collider = (cx, cy) -> {
-            Building tile = world.build(cx, cy);
-            boolean collide = tile != null && hitter.checkUnderBuild(tile, cx * tilesize, cy * tilesize) && collidedBlocks.add(tile.pos());
-
-            if(hitter.damage > 0){
-                float health = !collide ? 0 : tile.health;
-
-                if(collide && tile.team != team && tile.collide(hitter)){
-                    tile.collision(hitter);
-                    hitter.type.hit(hitter, cx * tilesize, cy * tilesize);
-                }
-
-                //try to heal the tile
-                if(collide && hitter.type.testCollision(hitter, tile)){
-                    hitter.type.hitTile(hitter, tile, cx * tilesize, cy * tilesize, health, false);
-                }
-            }
-        };
 
         if(hitter.type.collidesGround){
             seg1.set(x, y);
             seg2.set(seg1).add(vec);
             World.raycastEachWorld(x, y, seg2.x, seg2.y, (cx, cy) -> {
-                collider.get(cx, cy);
+                Building tile = world.build(cx, cy);
+                boolean collide = tile != null && hitter.checkUnderBuild(tile, cx * tilesize, cy * tilesize) && collidedBlocks.add(tile.pos());
+                if(collide){
+                    collided.add(new Collided(cx * tilesize, cy * tilesize, tile));
 
-                for(Point2 p : Geometry.d4){
-                    Tile other = world.tile(p.x + cx, p.y + cy);
-                    if(other != null && (large || Intersector.intersectSegmentRectangle(seg1, seg2, other.getBounds(Tmp.r1)))){
-                        collider.get(cx + p.x, cy + p.y);
+                    for(Point2 p : Geometry.d4){
+                        Tile other = world.tile(p.x + cx, p.y + cy);
+                        if(other != null && (large || Intersector.intersectSegmentRectangle(seg1, seg2, other.getBounds(Tmp.r1)))){
+                            Building build = other.build;
+                            if(build != null && hitter.checkUnderBuild(build, cx * tilesize, cy * tilesize) && collidedBlocks.add(build.pos())){
+                                collided.add(new Collided((p.x + cx * tilesize), (p.y + cy) * tilesize, build));
+                            }
+                        }
                     }
                 }
                 return false;
@@ -271,32 +260,41 @@ public class Damage{
         rect.setPosition(x, y).setSize(vec.x, vec.y).normalize().grow(expand * 2f);
         float x2 = vec.x + x, y2 = vec.y + y;
 
-        Cons<Unit> cons = e -> {
-            if(!e.hittable()) return;
-            //the peirce cap works for units, but really terribly, I'm just disabling it for now.
-            //if(pierceCap > 0 && pierceCount > pierceCap) return;
-
-            e.hitbox(hitrect);
-
-            Vec2 vec = Geometry.raycastRect(x, y, x2, y2, hitrect.grow(expand * 2));
-
-            if(vec != null && hitter.damage > 0){
-                effect.at(vec.x, vec.y);
-                e.collision(hitter, vec.x, vec.y);
-                hitter.collision(e, vec.x, vec.y);
-            }
-        };
-
-        units.clear();
-
         Units.nearbyEnemies(team, rect, u -> {
-            if(u.checkTarget(hitter.type.collidesAir, hitter.type.collidesGround)){
-                units.add(u);
+            if(u.checkTarget(hitter.type.collidesAir, hitter.type.collidesGround) && u.hittable()){
+                u.hitbox(hitrect);
+
+                Vec2 vec = Geometry.raycastRect(x, y, x2, y2, hitrect.grow(expand * 2));
+
+                if(vec != null){
+                    collided.add(new Collided(vec.x, vec.y, u));
+                }
             }
         });
 
-        units.sort(u -> u.dst2(hitter));
-        units.each(cons);
+        int[] collideCount = {0};
+        collided.sort(c -> hitter.dst2(c.x, c.y));
+        collided.each(c -> {
+            if(hitter.damage > 0 && (pierceCap <= 0 || collideCount[0]++ < pierceCap)){
+                if(c.target instanceof Unit u){
+                    effect.at(c.x, c.y);
+                    u.collision(hitter, c.x, c.y);
+                    hitter.collision(u, c.x, c.y);
+                }else if(c.target instanceof Building tile){
+                    float health = tile.health;
+
+                    if(tile.team != team && tile.collide(hitter)){
+                        tile.collision(hitter);
+                        hitter.type.hit(hitter, c.x, c.y);
+                    }
+
+                    //try to heal the tile
+                    if(hitter.type.testCollision(hitter, tile)){
+                        hitter.type.hitTile(hitter, tile, c.x, c.y, health, false);
+                    }
+                }
+            }
+        });
     }
 
     /**
@@ -612,5 +610,16 @@ public class Damage{
     /** @return resulting armor calculated based off of damage */
     public static float applyArmor(float damage, float armor){
         return Math.max(damage - armor, minArmorDamage * damage);
+    }
+
+    public static class Collided{
+        public float x, y;
+        public Teamc target;
+
+        public Collided(float x, float y, Teamc target){
+            this.x = x;
+            this.y = y;
+            this.target = target;
+        }
     }
 }

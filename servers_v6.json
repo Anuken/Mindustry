@@ -11,13 +11,9 @@
     "name": "EasyPlay",
     "address": ["easyplay.su"]
   },
-    {
+  {
     "name": "Tendhost",
     "address": ["tendhost.ddns.net", "smokeofanarchy.ru:7576"]
-  },
-  {
-    "name": "SMokeOfAnarchy",
-    "address": ["smokeofanarchy.ru:6566", "2.smokeofanarchy.ru:7656"]
   },
   {
     "name": "Atanner Gaming",
@@ -28,12 +24,8 @@
     "address": ["0.baseduser.eu.org:42000", "nikochio.ddns.net"]
   },
   {
-    "name": "ECAN",
-    "address": ["mindustry.ecansol.com:6597", "mindustry.ecansol.com:6499", "mindustry.ecansol.com:6599"]
-  },
-  {
     "name": "Chaotic Neutral",
-    "address": ["c-n.ddns.net:1111", "c-n.ddns.net:2222", "c-n.ddns.net:3333", "c-n.ddns.net:4444"]
+    "address": ["c-n.ddns.net:1111", "c-n.ddns.net:2222", "c-n.ddns.net:3333"]
   },
   {
     "name": "Ranked",
@@ -90,14 +82,6 @@
   {
     "name": "M-DE",
     "address": ["mindustry.inc.li", "mindustry.inc.li:6568"]
-  },
-  {
-    "name": "Hungarian",
-    "address": ["play.hudustry.tk"]
-  },
-  {
-    "name": "Xpdustry",
-    "address": ["n2.xpdustry.fr:6000", "n2.xpdustry.fr:6002"]
   },
   {
     "name": "CxZx",

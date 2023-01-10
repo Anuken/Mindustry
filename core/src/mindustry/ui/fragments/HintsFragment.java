@@ -175,7 +175,7 @@ public class HintsFragment{
         waveFire(() -> Groups.fire.size() > 0 && Blocks.wave.unlockedNow(), () -> indexer.getFlagged(state.rules.defaultTeam, BlockFlag.extinguisher).size > 0),
         generator(() -> control.input.block == Blocks.combustionGenerator, () -> ui.hints.placedBlocks.contains(Blocks.combustionGenerator)),
         rebuildSelect(visibleDesktop, () -> state.rules.defaultTeam.data().plans.size >= 10, () -> Core.input.keyDown(Binding.rebuild_select)),
-        guardian(() -> state.boss() != null && state.boss().armor >= 4, () -> state.boss() == null),
+        guardian(() -> state.boss() != null && isSerpulo() && state.boss().armor >= 4, () -> state.boss() == null),
         factoryControl(() -> !(state.isCampaign() && state.rules.sector.preset == SectorPresets.onset) &&
             state.rules.defaultTeam.data().getBuildings(Blocks.tankFabricator).size + state.rules.defaultTeam.data().getBuildings(Blocks.groundFactory).size > 0, () -> ui.hints.events.contains("factorycontrol")),
         coreUpgrade(() -> state.isCampaign() && state.rules.sector.planet == Planets.serpulo && Blocks.coreFoundation.unlocked()
