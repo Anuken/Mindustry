@@ -2509,7 +2509,7 @@ public class UnitTypes{
             weapons.add(new Weapon("locus-weapon"){{
                 shootSound = Sounds.bolt;
                 layerOffset = 0.0001f;
-                reload = 14f;
+                reload = 18f;
                 shootY = 10f;
                 recoil = 1f;
                 rotate = true;
@@ -2532,7 +2532,7 @@ public class UnitTypes{
 
                     smokeEffect = Fx.colorSpark;
 
-                    endEffect = new Effect(14f, e-> {
+                    endEffect = new Effect(14f, e -> {
                         color(e.color);
                         Drawf.tri(e.x, e.y, e.fout() * 1.5f, 5f, e.rotation);
                     });
@@ -2653,7 +2653,7 @@ public class UnitTypes{
             weapons.add(new Weapon("vanquish-weapon"){{
                 shootSound = Sounds.mediumCannon;
                 layerOffset = 0.0001f;
-                reload = 90f;
+                reload = 70f;
                 shootY = 71f / 4f;
                 shake = 5f;
                 recoil = 4f;
@@ -2666,7 +2666,7 @@ public class UnitTypes{
                 heatColor = Color.valueOf("f9350f");
                 cooldownTime = 80f;
 
-                bullet = new BasicBulletType(8f, 160){{
+                bullet = new BasicBulletType(8f, 190){{
                     sprite = "missile-large";
                     width = 9.5f;
                     height = 13f;
@@ -2692,7 +2692,7 @@ public class UnitTypes{
                     fragVelocityMin = 1f;
                     despawnSound = Sounds.dullExplosion;
 
-                    fragBullet = new BasicBulletType(8f, 25){{
+                    fragBullet = new BasicBulletType(8f, 35){{
                         sprite = "missile-large";
                         width = 8f;
                         height = 12f;
@@ -2751,7 +2751,7 @@ public class UnitTypes{
             weapons.add(new Weapon("conquer-weapon"){{
                 shootSound = Sounds.largeCannon;
                 layerOffset = 0.1f;
-                reload = 120f;
+                reload = 110f;
                 shootY = 32.5f;
                 shake = 5f;
                 recoil = 5f;
@@ -3046,7 +3046,7 @@ public class UnitTypes{
                 smoothReloadSpeed = 0.15f;
                 recoil = 2f;
 
-                bullet = new BasicBulletType(3.5f, 27){{
+                bullet = new BasicBulletType(3.5f, 30){{
                     backColor = trailColor = hitColor = Pal.techBlue;
                     frontColor = Color.white;
                     width = 7.5f;
@@ -3060,8 +3060,8 @@ public class UnitTypes{
                     trailParam = 1.8f;
                     trailInterval = 6f;
 
-                    splashDamageRadius = 23f;
-                    splashDamage = 40f;
+                    splashDamageRadius = 30f;
+                    splashDamage = 43f;
 
                     hitEffect = despawnEffect = new MultiEffect(Fx.hitBulletColor, new WaveEffect(){{
                         colorFrom = colorTo = Pal.techBlue;
