@@ -134,5 +134,9 @@
   {
     "name": "Hungarian",
     "address": ["play.hudustry.tk"]
+  },
+  {
+    "name": "SubZero", 
+    "address": ["mintyserver.net"]
   }
 ]
