@@ -9,9 +9,7 @@ import mindustry.io.*;
 
 import java.util.zip.*;
 
-/**
- * Class for storing all packets.
- */
+/** Class for storing all packets. */
 public class Packets{
 
     public enum KickReason{
