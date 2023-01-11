@@ -51,6 +51,8 @@ public class Rules{
     public boolean damageExplosions = true;
     /** Whether fire (and neoplasm spread) is enabled. */
     public boolean fire = true;
+    /** Whether unit crash damage is enabled. */
+    public boolean unitCrashDamage = true;
     /** Whether units use and require ammo. */
     public boolean unitAmmo = false;
     /** EXPERIMENTAL! If true, blocks will update in units and share power. */

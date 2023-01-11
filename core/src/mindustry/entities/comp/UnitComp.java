@@ -617,7 +617,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         }
 
         //if this unit crash landed (was flying), damage stuff in a radius
-        if(type.flying && !spawnedByCore && type.createWreck){
+        if(type.flying && !spawnedByCore && type.createWreck && state.rules.unitCrashDamage){
             Damage.damage(team, x, y, Mathf.pow(hitSize, 0.94f) * 1.25f, Mathf.pow(hitSize, 0.75f) * type.crashDamageMultiplier * 5f * state.rules.unitDamage(team), true, false, true);
         }
 
