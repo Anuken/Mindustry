@@ -4496,6 +4496,7 @@ public class Blocks{
                     loopSoundVolume = 0.6f;
                     deathSound = Sounds.largeExplosion;
                     targetAir = false;
+                    targetUnderBlocks = false;
 
                     fogRadius = 6f;
 
