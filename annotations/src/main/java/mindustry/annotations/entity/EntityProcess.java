@@ -629,7 +629,7 @@ public class EntityProcess extends BaseProcessor{
                 groupsBuilder.addField(ParameterizedTypeName.get(
                     ClassName.bestGuess("mindustry.entities.EntityGroup"), itype), group.name, Modifier.PUBLIC, Modifier.STATIC);
 
-                groupInit.addStatement("$L = new $T<>($L.class, $L, $L, (e, pos) -> (($L.IndexableEntity__$L)e).setIndex__$L(pos))", group.name, groupc, itype, group.spatial, group.mapping, packageName, group.name, group.name);
+                groupInit.addStatement("$L = new $T<>($L.class, $L, $L, (e, pos) -> { if(e instanceof $L.IndexableEntity__$L ix) ix.setIndex__$L(pos); })", group.name, groupc, itype, group.spatial, group.mapping, packageName, group.name, group.name);
             }
 
             //write the groups
