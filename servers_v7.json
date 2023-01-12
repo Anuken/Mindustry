@@ -56,6 +56,10 @@
     "address": ["meowland.ru"]
   },
   {
+    "name": "XCore",
+    "address": ["185.13.47.146:19000", "185.13.47.146:19001"]
+  },
+  {
     "name": "Darkdustry",
     "address": ["darkdustry.net", "darkdustry.net:1500", "darkdustry.net:2000", "darkdustry.net:3000", "darkdustry.net:4000", "darkdustry.net:5000", "darkdustry.net:6000", "darkdustry.net:7000", "darkdustry.net:8000", "darkdustry.net:9000", "darkdustry.net:10000"] 
   },
