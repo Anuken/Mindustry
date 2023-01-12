@@ -449,7 +449,7 @@ public class Administration{
 
     public void save(){
         Core.settings.putJson("player-data", playerInfo);
-        Core.settings.putJson("ip-kicks", String.class, kickedIPs);
+        Core.settings.putJson("ip-kicks", kickedIPs);
         Core.settings.putJson("ip-bans", String.class, bannedIPs);
         Core.settings.putJson("whitelist-ids", String.class, whitelist);
         Core.settings.putJson("banned-subnets", String.class, subnetBans);
