@@ -61,7 +61,9 @@ public class GenericCrafter extends Block{
     public void setStats(){
         stats.timePeriod = craftTime;
         super.setStats();
-        stats.add(Stat.productionTime, craftTime / 60f, StatUnit.seconds);
+        if((hasItems && itemCapacity > 0) || outputItems != null){
+            stats.add(Stat.productionTime, craftTime / 60f, StatUnit.seconds);
+        }
 
         if(outputItems != null){
             stats.add(Stat.output, StatValues.items(craftTime, outputItems));

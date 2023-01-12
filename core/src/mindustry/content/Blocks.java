@@ -1277,6 +1277,7 @@ public class Blocks{
             heatOutput = 3f;
             regionRotated1 = 1;
             ambientSound = Sounds.hum;
+            itemCapacity = 0;
             consumePower(100f / 60f);
         }};
         
@@ -1287,6 +1288,7 @@ public class Blocks{
 
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(Liquids.slag), new DrawDefault(), new DrawHeatOutput());
             size = 3;
+            itemCapacity = 0;
             liquidCapacity = 40f;
             rotateDraw = false;
             regionRotated1 = 1;
