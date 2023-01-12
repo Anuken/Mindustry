@@ -1180,6 +1180,7 @@ public class Blocks{
             craftTime = 10f;
             rotate = true;
             invertFlip = true;
+            group = BlockGroup.liquids;
 
             liquidCapacity = 50f;
 
@@ -2470,6 +2471,7 @@ public class Blocks{
         turbineCondenser = new ThermalGenerator("turbine-condenser"){{
             requirements(Category.power, with(Items.beryllium, 60));
             attribute = Attribute.steam;
+            group = BlockGroup.liquids;
             displayEfficiencyScale = 1f / 9f;
             minEfficiency = 9f - 0.0001f;
             powerProduction = 3f / 9f;
@@ -2764,6 +2766,7 @@ public class Blocks{
         ventCondenser = new AttributeCrafter("vent-condenser"){{
             requirements(Category.production, with(Items.graphite, 20, Items.beryllium, 60));
             attribute = Attribute.steam;
+            group = BlockGroup.liquids;
             minEfficiency = 9f - 0.0001f;
             baseEfficiency = 0f;
             displayEfficiency = false;
@@ -4601,7 +4604,7 @@ public class Blocks{
 
             recoil = 0.5f;
 
-            fogRadiusMultiuplier = 0.75f;
+            fogRadiusMultiuplier = 0.5f;
             coolantMultiplier = 6f;
             shootSound = Sounds.missileLaunch;
 
@@ -5503,7 +5506,7 @@ public class Blocks{
             regionSuffix = "-dark";
             size = 5;
             plans.add(
-            new AssemblerUnitPlan(UnitTypes.quell, 60f * 60f, PayloadStack.list(UnitTypes.elude, 4, Blocks.berylliumWallLarge, 8)),
+            new AssemblerUnitPlan(UnitTypes.quell, 60f * 60f, PayloadStack.list(UnitTypes.elude, 4, Blocks.berylliumWallLarge, 12)),
             new AssemblerUnitPlan(UnitTypes.disrupt, 60f * 60f * 3f, PayloadStack.list(UnitTypes.avert, 6, Blocks.carbideWallLarge, 20))
             );
             areaSize = 13;
@@ -5518,7 +5521,7 @@ public class Blocks{
             size = 5;
             //TODO different reqs
             plans.add(
-            new AssemblerUnitPlan(UnitTypes.tecta, 60f * 70f, PayloadStack.list(UnitTypes.merui, 6, Blocks.tungstenWallLarge, 12)),
+            new AssemblerUnitPlan(UnitTypes.tecta, 60f * 70f, PayloadStack.list(UnitTypes.merui, 5, Blocks.tungstenWallLarge, 12)),
             new AssemblerUnitPlan(UnitTypes.collaris, 60f * 60f * 3f, PayloadStack.list(UnitTypes.cleroi, 6, Blocks.carbideWallLarge, 20))
             );
             areaSize = 13;

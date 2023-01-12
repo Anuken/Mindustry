@@ -46,6 +46,9 @@ public class ConsoleFragment extends Table{
                 }
                 if(shown){
                     chatfield.requestKeyboard();
+                }else if(scene.getKeyboardFocus() == chatfield){
+                    scene.setKeyboardFocus(null);
+                    scene.setScrollFocus(null);
                 }
                 clearChatInput();
             }
