@@ -201,7 +201,17 @@ public class Units{
 
     /** Returns the nearest enemy tile in a range. */
     public static Building findEnemyTile(Team team, float x, float y, float range, Boolf<Building> pred){
+        return findEnemyTile(team, x, y, range, false, pred);
+    }
+
+    /** Returns the nearest enemy tile in a range. */
+    public static Building findEnemyTile(Team team, float x, float y, float range, boolean checkUnder, Boolf<Building> pred){
         if(team == Team.derelict) return null;
+
+        if(checkUnder){
+            Building target = indexer.findEnemyTile(team, x, y, range, build -> !build.block.underBullets && pred.get(build));
+            if(target != null) return target;
+        }
 
         return indexer.findEnemyTile(team, x, y, range, pred);
     }
@@ -249,7 +259,7 @@ public class Units{
         if(unit != null){
             return unit;
         }else{
-            return findEnemyTile(team, x, y, range, tilePred);
+            return findEnemyTile(team, x, y, range, true, tilePred);
         }
     }
 
@@ -261,7 +271,7 @@ public class Units{
         if(unit != null){
             return unit;
         }else{
-            return findEnemyTile(team, x, y, range, tilePred);
+            return findEnemyTile(team, x, y, range, true, tilePred);
         }
     }
 
