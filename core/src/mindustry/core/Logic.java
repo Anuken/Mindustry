@@ -70,6 +70,9 @@ public class Logic implements ApplicationListener{
             if(state.isCampaign()){
                 state.rules.coreIncinerates = true;
 
+                //TODO why is this even a thing?
+                state.rules.canGameOver = true;
+
                 //fresh map has no sector info
                 if(!e.isMap){
                     SectorInfo info = state.rules.sector.info;
