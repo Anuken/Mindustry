@@ -48,8 +48,8 @@ public class Administration{
                     player.getInfo().messageInfractions = 0;
                 }
 
-                //prevent players from sending the same message twice in the span of 50 seconds
-                if(message.equals(player.getInfo().lastSentMessage) && Time.timeSinceMillis(player.getInfo().lastMessageTime) < 1000 * 50){
+                //prevent players from sending the same message twice in the span of 10 seconds
+                if(message.equals(player.getInfo().lastSentMessage) && Time.timeSinceMillis(player.getInfo().lastMessageTime) < 1000 * 10){
                     player.sendMessage("[scarlet]You may not send the same message twice.");
                     return null;
                 }
@@ -449,6 +449,7 @@ public class Administration{
 
     public void save(){
         Core.settings.putJson("player-data", playerInfo);
+        Core.settings.putJson("ip-kicks", kickedIPs);
         Core.settings.putJson("ip-bans", String.class, bannedIPs);
         Core.settings.putJson("whitelist-ids", String.class, whitelist);
         Core.settings.putJson("banned-subnets", String.class, subnetBans);
@@ -458,6 +459,7 @@ public class Administration{
     private void load(){
         //load default data
         playerInfo = Core.settings.getJson("player-data", ObjectMap.class, ObjectMap::new);
+        kickedIPs = Core.settings.getJson("ip-kicks", ObjectMap.class, ObjectMap::new);
         bannedIPs = Core.settings.getJson("ip-bans", Seq.class, Seq::new);
         whitelist = Core.settings.getJson("whitelist-ids", Seq.class, Seq::new);
         subnetBans = Core.settings.getJson("banned-subnets", Seq.class, Seq::new);
@@ -488,7 +490,7 @@ public class Administration{
         messageRateLimit = new Config("messageRateLimit", "Message rate limit in seconds. 0 to disable.", 0),
         messageSpamKick = new Config("messageSpamKick", "How many times a player must send a message before the cooldown to get kicked. 0 to disable.", 3),
         packetSpamLimit = new Config("packetSpamLimit", "Limit for packet count sent within 3sec that will lead to a blacklist + kick.", 300),
-        chatSpamLimit = new Config("packetSpamLimit", "Limit for chat packet count sent within 2sec that will lead to a blacklist + kick. Not the same as a rate limit.", 20),
+        chatSpamLimit = new Config("chatSpamLimit", "Limit for chat packet count sent within 2sec that will lead to a blacklist + kick. Not the same as a rate limit.", 20),
         socketInput = new Config("socketInput", "Allows a local application to control this server through a local TCP socket.", false, "socket", () -> Events.fire(Trigger.socketConfigChanged)),
         socketInputPort = new Config("socketInputPort", "The port for socket input.", 6859, () -> Events.fire(Trigger.socketConfigChanged)),
         socketInputAddress = new Config("socketInputAddress", "The bind address for socket input.", "localhost", () -> Events.fire(Trigger.socketConfigChanged)),
