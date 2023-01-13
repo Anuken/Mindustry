@@ -237,7 +237,8 @@ public class Damage{
             seg2.set(seg1).add(vec);
             World.raycastEachWorld(x, y, seg2.x, seg2.y, (cx, cy) -> {
                 Building tile = world.build(cx, cy);
-                boolean collide = tile != null && hitter.checkUnderBuild(tile, cx * tilesize, cy * tilesize) && collidedBlocks.add(tile.pos());
+                boolean collide = tile != null && hitter.checkUnderBuild(tile, cx * tilesize, cy * tilesize)
+                    && ((tile.team != team && tile.collide(hitter)) || hitter.type.testCollision(hitter, tile)) && collidedBlocks.add(tile.pos());
                 if(collide){
                     collided.add(collidePool.obtain().set(cx * tilesize, cy * tilesize, tile));
 
