@@ -91,7 +91,7 @@ public class TractorBeamTurret extends BaseTurret{
 
                 float used = Math.min(Math.min(liquids.get(liquid), maxUsed * Time.delta), Math.max(0, (1f / coolantMultiplier) / liquid.heatCapacity));
 
-                liquids.remove(liquid, used);
+                if(!cheating()) liquids.remove(liquid, used);
 
                 if(Mathf.chance(0.06 * used)){
                     coolEffect.at(x + Mathf.range(size * tilesize / 2f), y + Mathf.range(size * tilesize / 2f));
