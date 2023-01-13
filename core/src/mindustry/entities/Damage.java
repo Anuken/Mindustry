@@ -276,17 +276,19 @@ public class Damage{
         int[] collideCount = {0};
         collided.sort(c -> hitter.dst2(c.x, c.y));
         collided.each(c -> {
-            if(hitter.damage > 0 && (pierceCap <= 0 || collideCount[0]++ < pierceCap)){
+            if(hitter.damage > 0 && (pierceCap <= 0 || collideCount[0] < pierceCap)){
                 if(c.target instanceof Unit u){
                     effect.at(c.x, c.y);
                     u.collision(hitter, c.x, c.y);
                     hitter.collision(u, c.x, c.y);
+                    collideCount[0]++;
                 }else if(c.target instanceof Building tile){
                     float health = tile.health;
 
                     if(tile.team != team && tile.collide(hitter)){
                         tile.collision(hitter);
                         hitter.type.hit(hitter, c.x, c.y);
+                        collideCount[0]++;
                     }
 
                     //try to heal the tile
