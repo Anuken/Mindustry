@@ -9,21 +9,17 @@ import mindustry.type.*;
 
 /** Purely visual turret. Does not shoot anything. */
 public class BuildWeapon extends Weapon{
-
-    public BuildWeapon(){
-
-    }
-
     public BuildWeapon(String name){
         super(name);
-    }
-
-    {
         rotate = true;
         noAttack = true;
         predictTarget = false;
         display = false;
         bullet = new BulletType();
+    }
+
+    public BuildWeapon(){
+        this("");
     }
 
     @Override

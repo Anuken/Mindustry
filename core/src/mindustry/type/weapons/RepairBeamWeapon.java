@@ -44,12 +44,7 @@ public class RepairBeamWeapon extends Weapon{
 
     public RepairBeamWeapon(String name){
         super(name);
-    }
 
-    public RepairBeamWeapon(){
-    }
-
-    {
         //must be >0 to prevent various bugs
         reload = 1f;
         predictTarget = false;
@@ -60,6 +55,10 @@ public class RepairBeamWeapon extends Weapon{
         mountType = HealBeamMount::new;
         recoil = 0f;
         noAttack = true;
+    }
+
+    public RepairBeamWeapon(){
+        this("");
     }
 
     @Override

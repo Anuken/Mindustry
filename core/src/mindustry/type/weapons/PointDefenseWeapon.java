@@ -21,17 +21,15 @@ public class PointDefenseWeapon extends Weapon{
 
     public PointDefenseWeapon(String name){
         super(name);
-    }
-
-    public PointDefenseWeapon(){
-    }
-
-    {
         predictTarget = false;
         autoTarget = true;
         controllable = false;
         rotate = true;
         useAmmo = false;
+    }
+
+    public PointDefenseWeapon(){
+        this("");
     }
 
     @Override

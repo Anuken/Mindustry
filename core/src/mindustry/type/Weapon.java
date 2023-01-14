@@ -275,9 +275,24 @@ public class Weapon implements Cloneable{
         }
 
         //rotate if applicable
+        updateRotation(unit, mount);
+
+        //find a new target
+        updateTargeting(unit, mount);
+
+        if(alwaysShooting) mount.shoot = true;
+
+        //update continuous state
+        updateContinuous(unit, mount);
+
+        updateShooting(unit, mount, lastReload);
+    }
+
+    protected void updateRotation(Unit unit, WeaponMount mount){
+        boolean can = unit.canShoot();
         if(rotate && (mount.rotate || mount.shoot) && can){
             float axisX = unit.x + Angles.trnsx(unit.rotation - 90,  x, y),
-            axisY = unit.y + Angles.trnsy(unit.rotation - 90,  x, y);
+                axisY = unit.y + Angles.trnsy(unit.rotation - 90,  x, y);
 
             mount.targetRotation = Angles.angle(axisX, axisY, mount.aimX, mount.aimY) - unit.rotation;
             mount.rotation = Angles.moveToward(mount.rotation, mount.targetRotation, rotateSpeed * Time.delta);
@@ -291,16 +306,14 @@ public class Weapon implements Cloneable{
             mount.rotation = baseRotation;
             mount.targetRotation = unit.angleTo(mount.aimX, mount.aimY);
         }
+    }
 
+    protected void updateTargeting(Unit unit, WeaponMount mount){
         float
-        weaponRotation = unit.rotation - 90 + (rotate ? mount.rotation : baseRotation),
-        mountX = unit.x + Angles.trnsx(unit.rotation - 90, x, y),
-        mountY = unit.y + Angles.trnsy(unit.rotation - 90, x, y),
-        bulletX = mountX + Angles.trnsx(weaponRotation, this.shootX, this.shootY),
-        bulletY = mountY + Angles.trnsy(weaponRotation, this.shootX, this.shootY),
-        shootAngle = bulletRotation(unit, mount, bulletX, bulletY);
+            mountX = unit.x + Angles.trnsx(unit.rotation - 90, x, y),
+            mountY = unit.y + Angles.trnsy(unit.rotation - 90, x, y);
+        boolean can = unit.canShoot();
 
-        //find a new target
         if(!controllable && autoTarget){
             if((mount.retarget -= Time.delta) <= 0f){
                 mount.target = findTarget(unit, mountX, mountY, bullet.range, bullet.collidesAir, bullet.collidesGround);
@@ -331,10 +344,16 @@ public class Weapon implements Cloneable{
             //note that shooting state is not affected, as these cannot be controlled
             //logic will return shooting as false even if these return true, which is fine
         }
+    }
 
-        if(alwaysShooting) mount.shoot = true;
+    protected void updateContinuous(Unit unit, WeaponMount mount){
+        float
+            weaponRotation = unit.rotation - 90 + (rotate ? mount.rotation : baseRotation),
+            mountX = unit.x + Angles.trnsx(unit.rotation - 90, x, y),
+            mountY = unit.y + Angles.trnsy(unit.rotation - 90, x, y),
+            bulletX = mountX + Angles.trnsx(weaponRotation, this.shootX, this.shootY),
+            bulletY = mountY + Angles.trnsy(weaponRotation, this.shootX, this.shootY);
 
-        //update continuous state
         if(continuous && mount.bullet != null){
             if(!mount.bullet.isAdded() || mount.bullet.time >= mount.bullet.lifetime || mount.bullet.type != bullet){
                 mount.bullet = null;
@@ -364,6 +383,17 @@ public class Weapon implements Cloneable{
                 mount.sound.update(bulletX, bulletY, false);
             }
         }
+    }
+
+    protected void updateShooting(Unit unit, WeaponMount mount, float lastReload){
+        float
+            weaponRotation = unit.rotation - 90 + (rotate ? mount.rotation : baseRotation),
+            mountX = unit.x + Angles.trnsx(unit.rotation - 90, x, y),
+            mountY = unit.y + Angles.trnsy(unit.rotation - 90, x, y),
+            bulletX = mountX + Angles.trnsx(weaponRotation, this.shootX, this.shootY),
+            bulletY = mountY + Angles.trnsy(weaponRotation, this.shootX, this.shootY),
+            shootAngle = bulletRotation(unit, mount, bulletX, bulletY);
+        boolean can = unit.canShoot();
 
         //flip weapon shoot side for alternating weapons
         boolean wasFlipped = mount.side;
@@ -374,13 +404,13 @@ public class Weapon implements Cloneable{
 
         //shoot if applicable
         if(mount.shoot && //must be shooting
-        can && //must be able to shoot
-        (!useAmmo || unit.ammo > 0 || !state.rules.unitAmmo || unit.team.rules().infiniteAmmo) && //check ammo
-        (!alternate || wasFlipped == flipSprite) &&
-        mount.warmup >= minWarmup && //must be warmed up
-        unit.vel.len() >= minShootVelocity && //check velocity requirements
-        (mount.reload <= 0.0001f || (alwaysContinuous && mount.bullet == null)) && //reload has to be 0, or it has to be an always-continuous weapon
-        Angles.within(rotate ? mount.rotation : unit.rotation + baseRotation, mount.targetRotation, shootCone) //has to be within the cone
+            can && //must be able to shoot
+            (!useAmmo || unit.ammo > 0 || !state.rules.unitAmmo || unit.team.rules().infiniteAmmo) && //check ammo
+            (!alternate || wasFlipped == flipSprite) &&
+            mount.warmup >= minWarmup && //must be warmed up
+            unit.vel.len() >= minShootVelocity && //check velocity requirements
+            (mount.reload <= 0.0001f || (alwaysContinuous && mount.bullet == null)) && //reload has to be 0, or it has to be an always-continuous weapon
+            Angles.within(rotate ? mount.rotation : unit.rotation + baseRotation, mount.targetRotation, shootCone) //has to be within the cone
         ){
             shoot(unit, mount, bulletX, bulletY, shootAngle);
 
