@@ -44,7 +44,6 @@ public class Mods implements Loadable{
     private static ObjectFloatMap<String> textureResize = new ObjectFloatMap<>();
     private MultiPacker packer;
 
-    private ModDependencyResolver resolver = new ModDependencyResolver();
     private ModClassLoader mainLoader = new ModClassLoader(getClass().getClassLoader());
 
     Seq<LoadedMod> mods = new Seq<>();
@@ -453,7 +452,7 @@ public class Mods implements Loadable{
             mapping.put(meta.name, file);
         }
 
-        var resolved = resolver.resolveDependencies(metas);
+        var resolved = resolveDependencies(metas);
         for(var entry : resolved){
             var file = mapping.get(entry.key);
             var steam = platform.getWorkshopContent(LoadedMod.class).contains(file);
@@ -514,7 +513,7 @@ public class Mods implements Loadable{
     /** @return mods ordered in the correct way needed for dependencies. */
     public Seq<LoadedMod> orderedMods(){
         var mapping = mods.asMap(m -> m.meta.name);
-        return resolver.resolveDependencies(mods.map(m -> m.meta)).orderedKeys().map(mapping::get);
+        return resolveDependencies(mods.map(m -> m.meta)).orderedKeys().map(mapping::get);
     }
 
     public LoadedMod locateMod(String name){
@@ -805,6 +804,62 @@ public class Mods implements Loadable{
         ModMeta meta = json.fromJson(ModMeta.class, Jval.read(metaFile.readString()).toString(Jformat.plain));
         meta.cleanup();
         return meta;
+    }
+
+    /** Resolves the loading order of a list mods/plugins using their internal names. */
+    public OrderedMap<String, ModState> resolveDependencies(Seq<ModMeta> metas){
+        var context = new ModResolutionContext();
+
+        for(var meta : metas){
+            Seq<ModDependency> dependencies = new Seq<>();
+            for(var dependency : meta.dependencies){
+                dependencies.add(new ModDependency(dependency, true));
+            }
+            for(var dependency : meta.softDependencies){
+                dependencies.add(new ModDependency(dependency, false));
+            }
+            context.dependencies.put(meta.name, dependencies);
+        }
+
+        for(var key : context.dependencies.keys()){
+            if (context.ordered.contains(key)) {
+                continue;
+            }
+            resolve(key, context);
+            context.visited.clear();
+        }
+
+        var result = new OrderedMap<String, ModState>();
+        for(var name : context.ordered){
+            result.put(name, ModState.enabled);
+        }
+        result.putAll(context.invalid);
+        return result;
+    }
+
+    private boolean resolve(String element, ModResolutionContext context){
+        context.visited.add(element);
+        for(final var dependency : context.dependencies.get(element)){
+            // Circular dependencies ?
+            if(context.visited.contains(dependency.name) && !context.ordered.contains(dependency.name)){
+                context.invalid.put(dependency.name, ModState.circularDependencies);
+                return false;
+                // If dependency present, resolve it, or if it's not required, ignore it
+            }else if(context.dependencies.containsKey(dependency.name)){
+                if(!context.ordered.contains(dependency.name) && !resolve(dependency.name, context) && dependency.required){
+                    context.invalid.put(element, ModState.incompleteDependencies);
+                    return false;
+                }
+                // The dependency is missing, but if not required, skip
+            }else if(dependency.required){
+                context.invalid.put(element, ModState.missingDependencies);
+                return false;
+            }
+        }
+        if(!context.ordered.contains(element)){
+            context.ordered.add(element);
+        }
+        return true;
     }
 
     /** Loads a mod file+meta, but does not add it to the list.
@@ -1175,5 +1230,22 @@ public class Mods implements Loadable{
         circularDependencies,
         unsupported,
         disabled,
+    }
+
+    public static class ModResolutionContext {
+        public final ObjectMap<String, Seq<ModDependency>> dependencies = new ObjectMap<>();
+        public final ObjectSet<String> visited = new ObjectSet<>();
+        public final OrderedSet<String> ordered = new OrderedSet<>();
+        public final ObjectMap<String, ModState> invalid = new OrderedMap<>();
+    }
+
+    public static final class ModDependency{
+        public final String name;
+        public final boolean required;
+
+        public ModDependency(String name, boolean required){
+            this.name = name;
+            this.required = required;
+        }
     }
 }
