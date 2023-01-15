@@ -142,5 +142,9 @@
   {
     "name": "SubZero", 
     "address": ["mintyserver.net"]
+  },
+  {
+    "name": "Vndustry",
+    "address": ["vndustry.ddns.net","vndustry.ddns.net:6568"]
   }
 ]
