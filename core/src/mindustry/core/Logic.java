@@ -406,6 +406,8 @@ public class Logic implements ApplicationListener{
             Core.settings.forceSave();
         }
 
+        boolean runStateCheck = !net.client() && !world.isInvalidMap() && !state.isEditor() && state.rules.canGameOver;
+
         if(state.isGame()){
             if(!net.client()){
                 state.enemies = Groups.unit.count(u -> u.team() == state.rules.waveTeam && u.isEnemy());
@@ -471,9 +473,11 @@ public class Logic implements ApplicationListener{
                 Groups.update();
             }
 
-            if(!net.client() && !world.isInvalidMap() && !state.isEditor() && state.rules.canGameOver){
+            if(runStateCheck){
                 checkGameState();
             }
+        }else if(netServer.isWaitingForPlayers() && runStateCheck){
+            checkGameState();
         }
     }
 
