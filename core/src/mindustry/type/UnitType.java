@@ -1511,10 +1511,10 @@ public class UnitType extends UnlockableContent{
                 case 0 -> segmentOutlineRegions;
                 case 2 -> segmentCells;
                 default -> segmentRegions;
-            }
+            };
 
             for(int i = 0; i < segments; i++){
-                if(!regions[i].isFound()) continue;
+                if(!regions[i].found()) continue;
 
                 float trns = Mathf.sin(crawl.crawlTime() + i * segmentPhase, segmentScl, segmentMag);
 
