@@ -728,6 +728,11 @@ public class Mods implements Loadable{
         return mods.select(l -> !l.meta.hidden && l.enabled()).map(l -> l.name + ":" + l.meta.version);
     }
 
+    /** @return a list of all mods (include hidden mods) and versions, in the format name:version. */
+    public Seq<String> getAllModStrings(){
+        return mods.select(LoadedMod::enabled).map(l -> l.name + ":" + l.meta.version);
+    }
+
     /** Makes a mod enabled or disabled. shifts it.*/
     public void setEnabled(LoadedMod mod, boolean enabled){
         if(mod.enabled() != enabled){

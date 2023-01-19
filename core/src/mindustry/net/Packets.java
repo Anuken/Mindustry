@@ -110,6 +110,7 @@ public class Packets{
         public int version;
         public String versionType;
         public Seq<String> mods;
+        public Seq<String> allMods;
         public String name, locale, uuid, usid;
         public boolean mobile;
         public int color;

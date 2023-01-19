@@ -197,6 +197,8 @@ public class NetServer implements ApplicationListener{
                 con.kick(result.toString(), 0);
             }
 
+            Events.fire(new PlayerMods(player, packet.allMods.copy()));
+
             if(!admins.isWhitelisted(packet.uuid, packet.usid)){
                 info.adminUsid = packet.usid;
                 info.lastName = packet.name;

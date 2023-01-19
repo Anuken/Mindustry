@@ -91,6 +91,7 @@ public class NetClient implements ApplicationListener{
             c.name = player.name;
             c.locale = locale;
             c.mods = mods.getModStrings();
+            c.allMods = mods.getAllModStrings();
             c.mobile = mobile;
             c.versionType = Version.type;
             c.color = player.color.rgba();
