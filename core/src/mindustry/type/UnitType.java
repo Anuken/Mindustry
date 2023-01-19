@@ -1506,7 +1506,7 @@ public class UnitType extends UnlockableContent{
         applyColor(unit);
 
         //change to 2 TODO
-        for(int p = 0; p < 3; p++){
+        for(int p = 0; p < (drawCell ? 3 : 2); p++){
             TextureRegion[] regions = switch(p){
                 case 0 -> segmentOutlineRegions;
                 case 2 -> segmentCells;
@@ -1514,6 +1514,8 @@ public class UnitType extends UnlockableContent{
             }
 
             for(int i = 0; i < segments; i++){
+                if(!regions[i].isFound()) continue;
+
                 float trns = Mathf.sin(crawl.crawlTime() + i * segmentPhase, segmentScl, segmentMag);
 
                 //at segment 0, rotation = segmentRot, but at the last segment it is rotation
