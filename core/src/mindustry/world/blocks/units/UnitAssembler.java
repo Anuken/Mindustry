@@ -479,6 +479,8 @@ public class UnitAssembler extends PayloadBlock{
 
             Draw.rect(topRegion, x, y);
 
+            if(isPayload()) return;
+
             //draw drone construction
             if(droneWarmup > 0.001f){
                 Draw.draw(Layer.blockOver + 0.2f, () -> {

@@ -261,7 +261,7 @@ public class ArcNetProvider implements NetProvider{
                     }
                     ByteBuffer buffer = ByteBuffer.wrap(packet.getData());
                     Host host = NetworkIO.readServerData((int)Time.timeSinceMillis(time), packet.getAddress().getHostAddress(), buffer);
-                    callback.get(host);
+                    Core.app.post(() -> callback.get(host));
                     foundAddresses.add(packet.getAddress());
                 }catch(Exception e){
                     //don't crash when there's an error pinging a server or parsing data

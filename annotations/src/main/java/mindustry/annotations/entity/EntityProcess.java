@@ -42,6 +42,7 @@ public class EntityProcess extends BaseProcessor{
     Seq<Selement> allDefs = new Seq<>();
     Seq<Stype> allInterfaces = new Seq<>();
     Seq<TypeSpec.Builder> baseClasses = new Seq<>();
+    ObjectSet<TypeSpec.Builder> baseClassIndexers = new ObjectSet<>();
     ClassSerializer serializer;
 
     {
@@ -266,6 +267,8 @@ public class EntityProcess extends BaseProcessor{
                 //get base class type name for extension
                 Stype baseClassType = baseClasses.any() ? baseClasses.first() : null;
                 @Nullable TypeName baseClass = baseClasses.any() ? tname(packageName + "." + baseName(baseClassType)) : null;
+                @Nullable TypeSpec.Builder baseClassBuilder = baseClassType == null ? null : this.baseClasses.find(b -> Reflect.<String>get(b, "name").equals(baseName(baseClassType)));
+                boolean addIndexToBase = baseClassBuilder != null && baseClassIndexers.add(baseClassBuilder);
                 //whether the main class is the base itself
                 boolean typeIsBase = baseClassType != null && type.has(Component.class) && type.annotation(Component.class).base();
 
@@ -400,11 +403,15 @@ public class EntityProcess extends BaseProcessor{
                 //entities with no sync comp and no serialization gen no code
                 boolean hasIO = ann.genio() && (components.contains(s -> s.name().contains("Sync")) || ann.serialize());
 
-                //implement indexable interfaces.
-                for(GroupDefinition def : groups){
-                    builder.addSuperinterface(tname(packageName + ".IndexableEntity__" + def.name));
-                    builder.addMethod(MethodSpec.methodBuilder("setIndex__" + def.name).addParameter(int.class, "index").addModifiers(Modifier.PUBLIC).addAnnotation(Override.class)
-                    .addCode("index__$L = index;", def.name).build());
+                TypeSpec.Builder indexBuilder = baseClassBuilder == null ? builder : baseClassBuilder;
+
+                if(baseClassBuilder == null || addIndexToBase){
+                    //implement indexable interfaces.
+                    for(GroupDefinition def : groups){
+                        indexBuilder.addSuperinterface(tname(packageName + ".IndexableEntity__" + def.name));
+                        indexBuilder.addMethod(MethodSpec.methodBuilder("setIndex__" + def.name).addParameter(int.class, "index").addModifiers(Modifier.PUBLIC).addAnnotation(Override.class)
+                        .addCode("index__$L = index;", def.name).build());
+                    }
                 }
 
                 //add all methods from components
@@ -598,9 +605,12 @@ public class EntityProcess extends BaseProcessor{
                 skipDeprecated(builder);
 
                 if(!legacy){
-                    //add group index int variables
-                    for(GroupDefinition def : groups){
-                        builder.addField(FieldSpec.builder(int.class, "index__" + def.name, Modifier.PROTECTED).initializer("-1").build());
+                    TypeSpec.Builder fieldBuilder = baseClassBuilder != null ? baseClassBuilder : builder;
+                    if(addIndexToBase || baseClassBuilder == null){
+                        //add group index int variables
+                        for(GroupDefinition def : groups){
+                            fieldBuilder.addField(FieldSpec.builder(int.class, "index__" + def.name, Modifier.PROTECTED, Modifier.TRANSIENT).initializer("-1").build());
+                        }
                     }
                 }
 
@@ -619,7 +629,7 @@ public class EntityProcess extends BaseProcessor{
                 groupsBuilder.addField(ParameterizedTypeName.get(
                     ClassName.bestGuess("mindustry.entities.EntityGroup"), itype), group.name, Modifier.PUBLIC, Modifier.STATIC);
 
-                groupInit.addStatement("$L = new $T<>($L.class, $L, $L, (e, pos) -> (($L.IndexableEntity__$L)e).setIndex__$L(pos))", group.name, groupc, itype, group.spatial, group.mapping, packageName, group.name, group.name);
+                groupInit.addStatement("$L = new $T<>($L.class, $L, $L, (e, pos) -> { if(e instanceof $L.IndexableEntity__$L ix) ix.setIndex__$L(pos); })", group.name, groupc, itype, group.spatial, group.mapping, packageName, group.name, group.name);
             }
 
             //write the groups

@@ -142,6 +142,8 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc, Syncc{
 
     @Override
     public void afterSync(){
-        Puddles.register(self());
+        if(liquid != null){
+            Puddles.register(self());
+        }
     }
 }

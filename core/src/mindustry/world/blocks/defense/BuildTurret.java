@@ -105,7 +105,9 @@ public class BuildTurret extends BaseTurret{
                 unit.lookAt(angleTo(unit.buildPlan()));
             }
 
-            checkSuppression();
+            if(checkSuppression()){
+                efficiency = potentialEfficiency = 0f;
+            }
 
             unit.buildSpeedMultiplier(potentialEfficiency * timeScale);
             unit.speedMultiplier(potentialEfficiency * timeScale);

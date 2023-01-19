@@ -6,6 +6,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.pooling.*;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.game.EventType.*;
@@ -27,6 +28,7 @@ public class Damage{
     private static final IntSet collidedBlocks = new IntSet();
     private static final IntFloatMap damages = new IntFloatMap();
     private static final Seq<Collided> collided = new Seq<>();
+    private static final Pool<Collided> collidePool = Pools.get(Collided.class, Collided::new);
     private static final Seq<Building> builds = new Seq<>();
     private static final FloatSeq distances = new FloatSeq();
 
@@ -227,8 +229,6 @@ public class Damage{
             length = findPierceLength(hitter, pierceCap, length);
         }
 
-        collided.clear();
-
         collidedBlocks.clear();
         vec.trnsExact(angle, length);
 
@@ -237,16 +237,17 @@ public class Damage{
             seg2.set(seg1).add(vec);
             World.raycastEachWorld(x, y, seg2.x, seg2.y, (cx, cy) -> {
                 Building tile = world.build(cx, cy);
-                boolean collide = tile != null && hitter.checkUnderBuild(tile, cx * tilesize, cy * tilesize) && collidedBlocks.add(tile.pos());
+                boolean collide = tile != null && hitter.checkUnderBuild(tile, cx * tilesize, cy * tilesize)
+                    && ((tile.team != team && tile.collide(hitter)) || hitter.type.testCollision(hitter, tile)) && collidedBlocks.add(tile.pos());
                 if(collide){
-                    collided.add(new Collided(cx * tilesize, cy * tilesize, tile));
+                    collided.add(collidePool.obtain().set(cx * tilesize, cy * tilesize, tile));
 
                     for(Point2 p : Geometry.d4){
                         Tile other = world.tile(p.x + cx, p.y + cy);
                         if(other != null && (large || Intersector.intersectSegmentRectangle(seg1, seg2, other.getBounds(Tmp.r1)))){
                             Building build = other.build;
                             if(build != null && hitter.checkUnderBuild(build, cx * tilesize, cy * tilesize) && collidedBlocks.add(build.pos())){
-                                collided.add(new Collided((p.x + cx * tilesize), (p.y + cy) * tilesize, build));
+                                collided.add(collidePool.obtain().set((p.x + cx * tilesize), (p.y + cy) * tilesize, build));
                             }
                         }
                     }
@@ -267,7 +268,7 @@ public class Damage{
                 Vec2 vec = Geometry.raycastRect(x, y, x2, y2, hitrect.grow(expand * 2));
 
                 if(vec != null){
-                    collided.add(new Collided(vec.x, vec.y, u));
+                    collided.add(collidePool.obtain().set(vec.x, vec.y, u));
                 }
             }
         });
@@ -275,17 +276,19 @@ public class Damage{
         int[] collideCount = {0};
         collided.sort(c -> hitter.dst2(c.x, c.y));
         collided.each(c -> {
-            if(hitter.damage > 0 && (pierceCap <= 0 || collideCount[0]++ < pierceCap)){
+            if(hitter.damage > 0 && (pierceCap <= 0 || collideCount[0] < pierceCap)){
                 if(c.target instanceof Unit u){
                     effect.at(c.x, c.y);
                     u.collision(hitter, c.x, c.y);
                     hitter.collision(u, c.x, c.y);
+                    collideCount[0]++;
                 }else if(c.target instanceof Building tile){
                     float health = tile.health;
 
                     if(tile.team != team && tile.collide(hitter)){
                         tile.collision(hitter);
                         hitter.type.hit(hitter, c.x, c.y);
+                        collideCount[0]++;
                     }
 
                     //try to heal the tile
@@ -295,6 +298,9 @@ public class Damage{
                 }
             }
         });
+
+        collidePool.freeAll(collided);
+        collided.clear();
     }
 
     /**
@@ -616,10 +622,11 @@ public class Damage{
         public float x, y;
         public Teamc target;
 
-        public Collided(float x, float y, Teamc target){
+        public Collided set(float x, float y, Teamc target){
             this.x = x;
             this.y = y;
             this.target = target;
+            return this;
         }
     }
 }

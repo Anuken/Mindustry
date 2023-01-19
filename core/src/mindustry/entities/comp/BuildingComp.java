@@ -1597,7 +1597,12 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public boolean collision(Bullet other){
         boolean wasDead = health <= 0;
 
-        damage(other.team, other.damage() * other.type().buildingDamageMultiplier);
+        float damage = other.damage() * other.type().buildingDamageMultiplier;
+        if(!other.type.pierceArmor){
+            damage = Damage.applyArmor(damage, block.armor);
+        }
+
+        damage(other.team, damage);
         Events.fire(bulletDamageEvent.set(self(), other));
 
         if(health <= 0 && !wasDead){
@@ -1741,7 +1746,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public void updateConsumption(){
         //everything is valid when cheating
         if(!block.hasConsumers || cheating()){
-            potentialEfficiency = efficiency = optionalEfficiency = enabled ? 1f : 0f;
+            potentialEfficiency = efficiency = optionalEfficiency = enabled && shouldConsume() && productionValid() ? 1f : 0f;
             return;
         }
 
@@ -1853,7 +1858,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if(Mathf.zero(dm)){
             damage = health + 1;
         }else{
-            damage = Damage.applyArmor(damage, block.armor) / dm;
+            damage /= dm;
         }
 
         //TODO handle this better on the client.
