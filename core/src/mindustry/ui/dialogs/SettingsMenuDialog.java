@@ -340,6 +340,7 @@ public class SettingsMenuDialog extends BaseDialog{
         if(!mobile){
             game.checkPref("backgroundpause", true);
             game.checkPref("buildautopause", false);
+            game.checkPref("distinctcontrolgroups", true);
         }
 
         game.checkPref("doubletapmine", false);

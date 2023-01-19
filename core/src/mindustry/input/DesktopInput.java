@@ -10,6 +10,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
@@ -21,6 +22,7 @@ import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.Placement.*;
+import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 
@@ -52,6 +54,27 @@ public class DesktopInput extends InputHandler{
     public long selectMillis = 0;
     /** Previously selected tile. */
     public Tile prevSelected;
+    /** Control Group Buttons */
+    public Binding[] controlGroupBindings = {
+        Binding.control_group_01,
+        Binding.control_group_02,
+        Binding.control_group_03,
+        Binding.control_group_04,
+        Binding.control_group_05,
+        Binding.control_group_06,
+        Binding.control_group_07,
+        Binding.control_group_08,
+        Binding.control_group_09,
+        Binding.control_group_10
+    };
+    /** Groups of units saved to different hotkeys */
+    public Seq<Unit>[] controlGroups = new Seq[controlGroupBindings.length];
+    /** Groups of unit types saved to different hotkeys */
+    public ObjectSet<UnitType>[] autoControlGroups = new ObjectSet[controlGroupBindings.length];
+    /** Most recently selected control group by index */
+    public int lastCtrlGroup;
+    /** Time of most recent control group selection */
+    public long lastCtrlGroupSelectMillis;
 
     boolean showHint(){
         return ui.hudfrag.shown && Core.settings.getBool("hints") && selectPlans.isEmpty() &&
@@ -276,23 +299,78 @@ public class DesktopInput extends InputHandler{
 
         //validate commanding units
         selectedUnits.removeAll(u -> !u.isCommandable() || !u.isValid());
+        for(Seq<Unit> cg : controlGroups)
+            if(cg != null)
+                cg.removeAll(u -> !u.isCommandable() || !u.isValid());
 
-        if(commandMode && input.keyTap(Binding.select_all_units) && !scene.hasField() && !scene.hasDialog()){
-            selectedUnits.clear();
-            commandBuildings.clear();
-            for(var unit : player.team().data().units){
-                if(unit.isCommandable()){
-                    selectedUnits.add(unit);
+        if(commandMode && !scene.hasField() && !scene.hasDialog()){
+
+            if(input.keyTap(Binding.select_all_units)){
+                selectedUnits.clear();
+                commandBuildings.clear();
+                for(var unit : player.team().data().units){
+                    if(unit.isCommandable()){
+                        selectedUnits.add(unit);
+                    }
                 }
             }
-        }
 
-        if(commandMode && input.keyTap(Binding.select_all_unit_factories) && !scene.hasField() && !scene.hasDialog()){
-            selectedUnits.clear();
-            commandBuildings.clear();
-            for(var build : player.team().data().buildings){
-                if(build.block.commandable){
-                    commandBuildings.add(build);
+            if(input.keyTap(Binding.select_all_unit_factories)){
+                selectedUnits.clear();
+                commandBuildings.clear();
+                for(var build : player.team().data().buildings){
+                    if(build.block.commandable){
+                        commandBuildings.add(build);
+                    }
+                }
+            }
+
+            for(int i = 0; i < controlGroupBindings.length; i++){
+                if(input.keyTap(controlGroupBindings[i])){
+                    if(controlGroups[i] == null){
+                        controlGroups[i] = new Seq();
+                        autoControlGroups[i] = new ObjectSet();
+                    }
+                    if(input.keyDown(Binding.create_control_group)){
+                        controlGroups[i].clear();
+                        autoControlGroups[i].clear();
+                    }
+                    //if any of the control group edit buttons are pressed take the current selection
+                    if(input.keyDown(Binding.create_control_group) || input.keyDown(Binding.add_to_control_group) || input.keyDown(Binding.auto_control_group)){
+                        if(Core.settings.getBool("distinctcontrolgroups"))
+                            for(Seq<Unit> cg : controlGroups)
+                                if(cg != null)
+                                    cg.removeAll(selectedUnits);
+                        controlGroups[i].addAll(selectedUnits);
+                    }
+                    if(input.keyDown(Binding.auto_control_group)){
+                        for(Unit u : selectedUnits)
+                            autoControlGroups[i].add(u.type);
+                    }
+                    if(!controlGroups[i].isEmpty() || !autoControlGroups[i].isEmpty()){
+                        selectedUnits.clear();
+                        commandBuildings.clear();
+                        ObjectSet<UnitType> unitTypes = autoControlGroups[i]; //compiler would get mad w/o this bc non final types in the lambda
+                        selectedUnits.addAll(player.team().data().units.filter(u -> unitTypes.contains(u.type)));
+                        //filter out any auto selected units if theyre in a different group(if the player wants that)
+                        if(Core.settings.getBool("distinctcontrolgroups"))
+                            for(Seq<Unit> cg : controlGroups)
+                                if(cg != null)
+                                    selectedUnits.removeAll(cg);
+                        selectedUnits.addAll(controlGroups[i]);
+                        //double tap to center camera
+                        if(lastCtrlGroup == i && Time.timeSinceMillis(lastCtrlGroupSelectMillis) < 400){
+                            float totalX = 0, totalY = 0;
+                            for(Unit unit : selectedUnits){
+                                totalX += unit.x;
+                                totalY += unit.y;
+                            }
+                            panning = true;
+                            Core.camera.position.set(totalX/selectedUnits.size, totalY/selectedUnits.size);
+                        }
+                        lastCtrlGroup = i;
+                        lastCtrlGroupSelectMillis = Time.millis();
+                    }
                 }
             }
         }

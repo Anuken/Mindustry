@@ -75,6 +75,20 @@ public enum Binding implements KeyBind{
     chat_scroll(new Axis(KeyCode.scroll)),
     chat_mode(KeyCode.tab),
     console(KeyCode.f8),
+
+    create_control_group(KeyCode.controlLeft, "control groups"),
+    add_to_control_group(KeyCode.unset),
+    auto_control_group(KeyCode.altLeft),
+    control_group_01(KeyCode.num1),
+    control_group_02(KeyCode.num2),
+    control_group_03(KeyCode.num3),
+    control_group_04(KeyCode.num4),
+    control_group_05(KeyCode.num5),
+    control_group_06(KeyCode.num6),
+    control_group_07(KeyCode.num7),
+    control_group_08(KeyCode.num8),
+    control_group_09(KeyCode.num9),
+    control_group_10(KeyCode.num0),
     ;
 
     private final KeybindValue defaultValue;
