@@ -423,7 +423,7 @@ public class UnitType extends UnlockableContent{
     //(undocumented, you shouldn't need to use these, and if you do just check how they're drawn and copy that)
     public TextureRegion baseRegion, legRegion, region, previewRegion, shadowRegion, cellRegion, itemCircleRegion,
         softShadowRegion, jointRegion, footRegion, legBaseRegion, baseJointRegion, outlineRegion, treadRegion;
-    public TextureRegion[] wreckRegions, segmentRegions, segmentOutlineRegions;
+    public TextureRegion[] wreckRegions, segmentRegions, segmentOutlineRegions, segmentCells;
     public TextureRegion[][] treadRegions;
 
     protected float buildTime = -1f;
@@ -899,9 +899,11 @@ public class UnitType extends UnlockableContent{
 
         segmentRegions = new TextureRegion[segments];
         segmentOutlineRegions = new TextureRegion[segments];
+        segmentCells = new TextureRegion[segments];
         for(int i = 0; i < segments; i++){
             segmentRegions[i] = Core.atlas.find(name + "-segment" + i);
             segmentOutlineRegions[i] = Core.atlas.find(name + "-segment-outline" + i);
+            segmentCells[i] = Core.atlas.find(name + "-segment-cell" + i);
         }
 
         clipSize = Math.max(region.width * 2f, clipSize);
@@ -1504,8 +1506,12 @@ public class UnitType extends UnlockableContent{
         applyColor(unit);
 
         //change to 2 TODO
-        for(int p = 0; p < 2; p++){
-            TextureRegion[] regions = p == 0 ? segmentOutlineRegions : segmentRegions;
+        for(int p = 0; p < 3; p++){
+            TextureRegion[] regions = switch(p){
+                case 0 -> segmentOutlineRegions;
+                case 2 -> segmentCells;
+                default -> segmentRegions;
+            }
 
             for(int i = 0; i < segments; i++){
                 float trns = Mathf.sin(crawl.crawlTime() + i * segmentPhase, segmentScl, segmentMag);
@@ -1519,6 +1525,7 @@ public class UnitType extends UnlockableContent{
                 //Draw.rect(regions[i], unit.x + tx + 2f, unit.y + ty - 2f, rot - 90);
 
                 applyColor(unit);
+                if(p == 2) Draw.color(cellColor(unit));
 
                 //TODO merge outlines?
                 Draw.rect(regions[i], unit.x + tx, unit.y + ty, rot - 90);
