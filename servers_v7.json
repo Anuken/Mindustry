@@ -148,6 +148,10 @@
     "address": ["mintyserver.net"]
   },
   {
+    "name": "Router Pi",
+    "address": ["a55c81b7c4d6e6d604651a93f8af5cd83.asuscomm.com"]
+  },
+  {
     "name": "Vndustry",
     "address": ["vndustry.ddns.net","vndustry.ddns.net:6568"]
   }
