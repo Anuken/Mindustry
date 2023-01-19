@@ -1395,6 +1395,8 @@ public class UnitType extends UnlockableContent{
     }
 
     public void drawCell(Unit unit){
+        if(unit instanceof Crawlc) return;
+
         applyColor(unit);
 
         Draw.color(cellColor(unit));
@@ -1523,7 +1525,7 @@ public class UnitType extends UnlockableContent{
                 float tx = Angles.trnsx(rot, trns), ty = Angles.trnsy(rot, trns);
 
                 //shadow
-                Draw.color(0f, 0f, 0f, 0.2f);
+                //Draw.color(Pal.shadow);
                 //Draw.rect(regions[i], unit.x + tx + 2f, unit.y + ty - 2f, rot - 90);
 
                 applyColor(unit);
