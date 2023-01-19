@@ -68,7 +68,7 @@ public class DesktopInput extends InputHandler{
         Binding.control_group_10
     };
     /** Groups of units saved to different hotkeys */
-    public Seq<Unit>[] controlGroups = new Seq[controlGroupBindings.length];
+    public Seq<Integer>[] controlGroups = new Seq[controlGroupBindings.length];
     /** Groups of unit types saved to different hotkeys */
     public ObjectSet<UnitType>[] autoControlGroups = new ObjectSet[controlGroupBindings.length];
     /** Most recently selected control group by index */
@@ -299,9 +299,9 @@ public class DesktopInput extends InputHandler{
 
         //validate commanding units
         selectedUnits.removeAll(u -> !u.isCommandable() || !u.isValid());
-        for(Seq<Unit> cg : controlGroups)
+        for(Seq<Integer> cg : controlGroups)
             if(cg != null)
-                cg.removeAll(u -> !u.isCommandable() || !u.isValid());
+                cg.removeAll(id -> {Unit u = Groups.unit.getByID(id); return !u.isCommandable() || !u.isValid();});
 
         if(commandMode && !scene.hasField() && !scene.hasDialog()){
 
@@ -337,11 +337,12 @@ public class DesktopInput extends InputHandler{
                     }
                     //if any of the control group edit buttons are pressed take the current selection
                     if(input.keyDown(Binding.create_control_group) || input.keyDown(Binding.add_to_control_group) || input.keyDown(Binding.auto_control_group)){
+                        Seq<Integer> selectedUnitIds = selectedUnits.map(u -> u.id);
                         if(Core.settings.getBool("distinctcontrolgroups"))
-                            for(Seq<Unit> cg : controlGroups)
+                            for(Seq<Integer> cg : controlGroups)
                                 if(cg != null)
-                                    cg.removeAll(selectedUnits);
-                        controlGroups[i].addAll(selectedUnits);
+                                    cg.removeAll(selectedUnitIds);
+                        controlGroups[i].addAll(selectedUnitIds);
                     }
                     if(input.keyDown(Binding.auto_control_group)){
                         for(Unit u : selectedUnits)
@@ -354,10 +355,10 @@ public class DesktopInput extends InputHandler{
                         selectedUnits.addAll(player.team().data().units.filter(u -> unitTypes.contains(u.type)));
                         //filter out any auto selected units if theyre in a different group(if the player wants that)
                         if(Core.settings.getBool("distinctcontrolgroups"))
-                            for(Seq<Unit> cg : controlGroups)
+                            for(Seq<Integer> cg : controlGroups)
                                 if(cg != null)
-                                    selectedUnits.removeAll(cg);
-                        selectedUnits.addAll(controlGroups[i]);
+                                    selectedUnits.removeAll(cg.map(id -> Groups.unit.getByID(id)));
+                        selectedUnits.addAll(controlGroups[i].map(id -> Groups.unit.getByID(id)));
                         //double tap to center camera
                         if(lastCtrlGroup == i && Time.timeSinceMillis(lastCtrlGroupSelectMillis) < 400){
                             float totalX = 0, totalY = 0;
