@@ -1747,6 +1747,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         //everything is valid when cheating
         if(!block.hasConsumers || cheating()){
             potentialEfficiency = efficiency = optionalEfficiency = enabled && shouldConsume() && productionValid() ? 1f : 0f;
+            updateEfficiencyMultiplier();
             return;
         }
 
