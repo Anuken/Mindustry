@@ -179,6 +179,7 @@ public class ApplicationTests{
         con.uuid = "AAAAAAAA";
         con.usid = "AAAAAAAA";
         con.mods = new Seq<>();
+        con.hiddenMods = new Seq<>();
         con.write(new Writes(new ByteBufferOutput(buffer)));
 
         con.name = "INVALID";
