@@ -134,6 +134,10 @@ public class Packets{
             for(int i = 0; i < mods.size; i++){
                 TypeIO.writeString(buffer, mods.get(i));
             }
+            buffer.b((byte)hiddenMods.size);
+            for(int i = 0; i < hiddenMods.size; i++){
+                TypeIO.writeString(buffer, hiddenMods.get(i));
+            }
         }
 
         @Override
@@ -151,6 +155,11 @@ public class Packets{
             mods = new Seq<>(totalMods);
             for(int i = 0; i < totalMods; i++){
                 mods.add(TypeIO.readString(buffer));
+            }
+            int totalHiddenMods = buffer.b();
+            hiddenMods = new Seq<>(totalHiddenMods);
+            for(int i = 0; i < totalHiddenMods; i++){
+                hiddenMods.add(TypeIO.readString(buffer));
             }
         }
     }
