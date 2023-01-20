@@ -728,7 +728,7 @@ public class Mods implements Loadable{
         return mods.select(l -> !l.meta.hidden && l.enabled()).map(l -> l.name + ":" + l.meta.version);
     }
 
-    /** @return a list of mods and versions, in the format name:version. */
+    /** @return a list of all mods (include hidden mods) and versions, in the format name:version. */
     public Seq<String> getHiddenModStrings(){
         return mods.select(l -> l.meta.hidden && l.enabled()).map(l -> l.name + ":" + l.meta.version);
     }

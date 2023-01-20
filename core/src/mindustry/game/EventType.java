@@ -1,7 +1,6 @@
 package mindustry.game;
 
 import arc.math.geom.*;
-import arc.struct.Seq;
 import arc.util.*;
 import mindustry.core.GameState.*;
 import mindustry.ctype.*;
@@ -686,16 +685,6 @@ public class EventType{
 
         public PlayerIpUnbanEvent(String ip){
             this.ip = ip;
-        }
-    }
-
-    public static class PlayerMods{
-        public final Player player;
-        public final Seq<String> mods;
-
-        public PlayerMods(Player player, Seq<String> mods){
-            this.player = player;
-            this.mods = mods;
         }
     }
 
