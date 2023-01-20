@@ -109,8 +109,7 @@ public class Packets{
     public static class ConnectPacket extends Packet{
         public int version;
         public String versionType;
-        public Seq<String> mods;
-        public Seq<String> allMods;
+        public Seq<String> mods, hiddenMods;
         public String name, locale, uuid, usid;
         public boolean mobile;
         public int color;
