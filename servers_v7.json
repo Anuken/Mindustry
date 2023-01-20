@@ -8,6 +8,10 @@
     "address": ["rcrms.ru:6567"]
   },
   {
+    "name": "Tendhost",
+    "address": ["tendhost.ddns.net:7576"]
+  },
+  {
     "name": "generic mindustry",
     "address": ["212.192.29.92:25554", "212.192.29.24:25298"]
   },
@@ -142,6 +146,10 @@
   {
     "name": "SubZero", 
     "address": ["mintyserver.net"]
+  },
+  {
+    "name": "Router Pi",
+    "address": ["a55c81b7c4d6e6d604651a93f8af5cd83.asuscomm.com"]
   },
   {
     "name": "Vndustry",
