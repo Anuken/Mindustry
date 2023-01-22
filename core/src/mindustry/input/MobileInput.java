@@ -306,7 +306,13 @@ public class MobileInput extends InputHandler implements GestureListener{
                 b.button(Icon.flipX, style, () -> flipPlans(selectPlans, true));
                 b.button(Icon.flipY, style, () -> flipPlans(selectPlans, false));
                 b.row();
-                b.button(Icon.rotate, style, () -> rotatePlans(selectPlans, 1));
+                b.button(Icon.rotate, style, () -> rotatePlans(selectPlans, 1)).update(i -> {
+                    var img = i.getCells().first().get();
+
+                    img.setScale(-1f, 1f);
+                    //why the heck doesn't setOrigin work for scaling
+                    img.setTranslation(img.getWidth(), 0f);
+                });
 
             }).margin(4f);
         });
