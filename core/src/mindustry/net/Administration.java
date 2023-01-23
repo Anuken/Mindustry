@@ -321,7 +321,7 @@ public class Administration{
     /**
      * Returns all kicked IPs. This does not include the IPs of ID-kicked players.
      */
-    public Seq<String> getKickedIPs(){
+    public ObjectMap<String, Long> getKickedIPs(){
         // Remove all expired kicks
         kickedIPs.each((ip, time) -> {
             if (time <= Time.millis())
