@@ -304,6 +304,32 @@ public class Administration{
     public Seq<String> getBannedIPs(){
         return bannedIPs;
     }
+    
+    /**
+     * Returns list of all players which are kicked
+     */
+    public Seq<PlayerInfo> getKicked(){
+        Seq<PlayerInfo> result = new Seq<>();
+        for(PlayerInfo info : playerInfo.values()){
+            if(info.lastKicked > Time.millis()){
+                result.add(info);
+            }
+        }
+        return result;
+    }
+    
+    /**
+     * Returns all kicked IPs. This does not include the IPs of ID-kicked players.
+     */
+    public Seq<String> getKickedIPs(){
+        // Remove all expired kicks
+        kickedIPs.each((ip, time) -> {
+            if (time <= Time.millis())
+                kickedIPs.remove(ip);
+        });
+        
+        return kickedIPs;
+    }
 
     /**
      * Makes a player an admin.
