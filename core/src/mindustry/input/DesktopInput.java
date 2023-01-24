@@ -299,9 +299,6 @@ public class DesktopInput extends InputHandler{
 
         //validate commanding units
         selectedUnits.removeAll(u -> !u.isCommandable() || !u.isValid());
-        for(Seq<Integer> cg : controlGroups)
-            if(cg != null)
-                cg.removeAll(id -> {Unit u = Groups.unit.getByID(id); return !u.isCommandable() || !u.isValid();});
 
         if(commandMode && !scene.hasField() && !scene.hasDialog()){
 
@@ -327,10 +324,12 @@ public class DesktopInput extends InputHandler{
 
             for(int i = 0; i < controlGroupBindings.length; i++){
                 if(input.keyTap(controlGroupBindings[i])){
+                    //create control group if it doesnt exist yet
                     if(controlGroups[i] == null){
                         controlGroups[i] = new Seq();
                         autoControlGroups[i] = new ObjectSet();
                     }
+                    //clear existing if making a new control group
                     if(input.keyDown(Binding.create_control_group)){
                         controlGroups[i].clear();
                         autoControlGroups[i].clear();
@@ -348,6 +347,9 @@ public class DesktopInput extends InputHandler{
                         for(Unit u : selectedUnits)
                             autoControlGroups[i].add(u.type);
                     }
+                    //remove invalid units
+                    controlGroups[i].removeAll(id -> {Unit u = Groups.unit.getByID(id); return u == null || !u.isCommandable() || !u.isValid();});
+                    //replace the selected units with the current control group
                     if(!controlGroups[i].isEmpty() || !autoControlGroups[i].isEmpty()){
                         selectedUnits.clear();
                         commandBuildings.clear();
