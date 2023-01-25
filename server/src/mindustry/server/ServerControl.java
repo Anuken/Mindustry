@@ -202,6 +202,11 @@ public class ServerControl implements ApplicationListener{
         //reset autosave on world load
         Events.on(WorldLoadEvent.class, e -> {
             autosaveCount.reset(0, Config.autosaveSpacing.num() * 60);
+            
+            //auto server pause when no players online
+            if(!state.isPaused() && Config.autoPause.bool() && Groups.player.size() == 1){
+                state.set(State.paused);
+            }
         });
 
         //autosave periodically
