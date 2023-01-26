@@ -1173,6 +1173,7 @@ public class Mods implements Loadable{
 
         //removes all colors
         public void cleanup(){
+            if(name != null) name = Strings.stripColors(name);
             if(displayName != null) displayName = Strings.stripColors(displayName);
             if(author != null) author = Strings.stripColors(author);
             if(description != null) description = Strings.stripColors(description);
