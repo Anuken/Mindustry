@@ -21,6 +21,8 @@ import mindustry.mod.*;
 import mindustry.net.*;
 import mindustry.ui.*;
 
+import java.io.File;
+
 import static arc.Core.*;
 import static mindustry.Vars.*;
 
@@ -35,6 +37,15 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
     @Override
     public void setup(){
         String dataDir = OS.env("MINDUSTRY_DATA_DIR");
+
+        //if gameData directory exists, save game data to that folder.
+        String stringCustomDataDir = "gameData";
+        File fileCustomDataDir = new File(stringCustomDataDir);
+        boolean customDataDirExists = fileCustomDataDir.exists();
+        if(customDataDirExists){
+            dataDir = stringCustomDataDir ;
+        }
+
         if(dataDir != null){
             Core.settings.setDataDirectory(files.absolute(dataDir));
         }
