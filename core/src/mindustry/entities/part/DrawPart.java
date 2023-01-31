@@ -45,13 +45,18 @@ public abstract class DrawPart{
 
     public static class PartMove{
         public PartProgress progress = PartProgress.warmup;
-        public float x, y, rot;
+        public float x, y, gx, gy, rot;
 
-        public PartMove(PartProgress progress, float x, float y, float rot){
+        public PartMove(PartProgress progress, float x, float y, float gx, float gy, float rot){
             this.progress = progress;
             this.x = x;
             this.y = y;
+            this.gx = gx;
+            this.gy = gy;
             this.rot = rot;
+        }
+        public PartMove(PartProgress progress, float x, float y, float rot){
+            this(progress, x, y, 0, 0, rot);
         }
 
         public PartMove(){
