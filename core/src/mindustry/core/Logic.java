@@ -394,6 +394,7 @@ public class Logic implements ApplicationListener{
     @Override
     public void dispose(){
         //save the settings before quitting
+        netServer.admins.forceSave();
         Core.settings.manualSave();
     }
 
@@ -403,6 +404,7 @@ public class Logic implements ApplicationListener{
         universe.updateGlobal();
 
         if(Core.settings.modified() && !state.isPlaying()){
+            netServer.admins.forceSave();
             Core.settings.forceSave();
         }
 

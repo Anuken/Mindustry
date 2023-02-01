@@ -116,6 +116,8 @@ public class ServerControl implements ApplicationListener{
 
         registerCommands();
 
+
+
         Core.app.post(() -> {
             //try to load auto-update save if possible
             if(Config.autoUpdate.bool()){
@@ -255,7 +257,10 @@ public class ServerControl implements ApplicationListener{
 
         //autosave settings once a minute
         float saveInterval = 60;
-        Timer.schedule(() -> Core.settings.forceSave(), saveInterval, saveInterval);
+        Timer.schedule(() -> {
+            netServer.admins.forceSave();
+            Core.settings.forceSave();
+        }, saveInterval, saveInterval);
 
         if(!mods.list().isEmpty()){
             info("@ mods loaded.", mods.list().size);
