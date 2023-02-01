@@ -4081,6 +4081,7 @@ public class Blocks{
 
             liquidConsumed = 10f / 60f;
             targetInterval = 5f;
+            targetUnderBlocks = false;
 
             float r = range = 130f;
 
