@@ -362,9 +362,9 @@ public class JoinDialog extends BaseDialog{
 
             if(eye){
                 name.button(Icon.eyeSmall, Styles.emptyi, () -> {
-                            showHidden = !showHidden;
-                            refreshCommunity();
-                        }).update(i -> i.getStyle().imageUp = (showHidden ? Icon.eyeSmall : Icon.eyeOffSmall))
+                    showHidden = !showHidden;
+                    refreshCommunity();
+                }).update(i -> i.getStyle().imageUp = (showHidden ? Icon.eyeSmall : Icon.eyeOffSmall))
                         .size(40f).right().padRight(3).tooltip("@servers.showhidden");
             }
 
