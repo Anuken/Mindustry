@@ -116,8 +116,6 @@ public class ServerControl implements ApplicationListener{
 
         registerCommands();
 
-
-
         Core.app.post(() -> {
             //try to load auto-update save if possible
             if(Config.autoUpdate.bool()){
