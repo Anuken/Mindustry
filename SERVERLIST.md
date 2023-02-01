@@ -9,7 +9,7 @@ You may want to add your server to this list. The steps for getting this done ar
 1. **Ensure your server is properly moderated.** For the most part, this applies to survival servers, but PvP servers can be affected as well.
 You'll need to either hire some moderators, or make use of (currently non-existent) anti-grief and anti-curse plugins.
 *Consider enabling a rate limit:* `config messageRateLimit 2` will make it so that players can only send messages every 2 seconds, for example.
-2. Make sure that your server is able to handle inappropriate content - this includes NSFW display/sorter art and abusive messages. **Servers that allow such content will be removed immediately.** Consider banning display blocks if it is a problem for your server: `rules add bannedBlocks ["logic-display", "large-logic-display"]`.
+2. Make sure that your server is able to handle inappropriate content - this includes NSFW display/sorter art and abusive messages. **Servers that allow such content will be removed immediately.** Consider banning display blocks if it is a problem for your server: `rules add bannedBlocks ["canvas", "logic-display", "large-logic-display"]`.
 3. **Set an appropriate MOTD, name and description.** This is set with `config <name/desc/motd> <value>`. "Appropriate" means that:
   - Your name or description must reflect the type of server you're hosting. 
   Since new players may be exposed to the server list early on, put in a phrase like "Co-op survival" or "PvP" so players know what they're getting into. Yes, this is also displayed in the server mode info text, but having extra info in the name doesn't hurt.
