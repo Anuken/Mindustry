@@ -303,7 +303,7 @@ public class DesktopLauncher extends ClientLauncher{
             if(state.rules.waves){
                 gameMapWithWave += " | Wave " + state.wave;
             }
-            gameMode = state.rules.pvp ? "PvP" : state.rules.attackMode ? "Attack" : "Survival";
+            gameMode = state.rules.pvp ? "PvP" : state.rules.attackMode ? "Attack" : state.rules.infiniteResources ? "Sandbox" : "Survival";
             if(net.active() && Groups.player.size() > 1){
                 gamePlayersSuffix = " | " + Groups.player.size() + " Players";
             }
