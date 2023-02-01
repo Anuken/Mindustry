@@ -1,7 +1,7 @@
 [
  {
     "name": "Explosive corp",
-    "address": ["94.103.91.96:4545", "94.103.91.96:4848", "94.103.91.96:4949", "94.103.91.96:5050", "94.103.91.96:5151"]
+    "address": ["94.103.91.96:4545", "94.103.91.96:4848", "94.103.91.96:4949", "94.103.91.96:5050", "94.103.91.96:5151", "94.103.91.96:1551"]
   },
   {
     "name": "RCM",
@@ -57,11 +57,11 @@
   },
   {
     "name": "KMWStudios",
-    "address": ["meowland.ru"]
+    "address": ["46.151.26.232:1024", "46.151.26.232:2000", "46.151.26.232:3000", "46.151.26.232:4000", "46.151.26.232:6000", "46.151.26.232:7000", "46.151.26.232:8000"]
   },
   {
     "name": "XCore",
-    "address": ["185.13.47.146:19000", "185.13.47.146:19001"]
+    "address": ["185.13.47.146:19000", "185.13.47.146:19001", "185.13.47.146:19002"]
   },
   {
     "name": "Darkdustry",
@@ -96,6 +96,10 @@
     "address": ["pandorum.su:5018", "pandorum.su:5019", "pandorum.su:5020"]
   },
   {
+    "name": "Tinylake",
+    "address": ["mindustry.top", "cn.mindustry.top", "g.mindustry.top"]
+  },
+  {
     "name": "Fish",
     "address": ["170.187.144.235", "162.248.100.98"]
   },
@@ -105,7 +109,7 @@
   },
   {
     "name": "Eradicationdustry",
-    "address": ["eradicationmindustry.mindustry.me:6569", "eradicationmindustry.mindustry.me:9547", "eradicationmindustry.mindustry.me:6572", "eradicationmindustry.yeet.ml:6570", "eradicationmindustry.mindustry.me:6571", "eradicationmindustry.mindustry.me:6574", "eradicationmindustry.mindustry.me:6573", "eradicationmindustry2.mindustry.me:6567"]
+    "address": ["eradicationmindustry.mindustry.me:6569", "eradicationmindustry.mindustry.me:9547", "eradicationmindustry.mindustry.me:6572", "eradicationmindustry.yeet.ml:6570", "eradicationmindustry.mindustry.me:6571", "eradicationmindustry.mindustry.me:6574", "eradicationmindustry.mindustry.me:6573", "eradicationmindustry2.mindustry.me:6567", "eradicationmindustry.mindustry.me:6568"]
   },
   {
     "name": "Conservatory",
@@ -129,7 +133,7 @@
   },
   {
     "name": "Sakura", 
-    "address": ["160.16.207.141:22527", "160.16.207.141:23527", "160.16.207.141:24527", "160.16.207.141:25527", "160.16.207.141:26527"]
+    "address": ["160.16.207.141:22527", "160.16.207.141:23527", "160.16.207.141:24527", "160.16.207.141:25527", "160.16.207.141:26527", "160.16.207.141:27527", "160.16.207.141:28527"]
   },
   {
     "name": "|RussianServers|[]",

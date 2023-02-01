@@ -470,7 +470,7 @@ public class Turret extends ReloadTurret{
         @Override
         public void updateEfficiencyMultiplier(){
             if(heatRequirement > 0){
-                efficiency *= Math.min(heatReq / heatRequirement, maxHeatEfficiency);
+                efficiency *= Math.min(Math.max(heatReq / heatRequirement, cheating() ? 1f : 0f), maxHeatEfficiency);
             }
         }
 
