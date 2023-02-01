@@ -598,7 +598,8 @@ public class JoinDialog extends BaseDialog{
             });
             //modify default servers on main thread
             Core.app.post(() -> {
-                defaultServers.addAll(servers);
+                //random order for fetched servers
+                defaultServers.addAll(servers.shuffle()); 
                 Log.info("Fetched @ community servers.", defaultServers.size);
             });
         });
