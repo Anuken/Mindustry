@@ -406,7 +406,7 @@ public class JoinDialog extends BaseDialog{
             t.button(Icon.zoom, Styles.emptyi, this::refreshCommunity).size(54f);
         }).width(targetWidth()).height(70f).pad(4).row();
 
-        for(ServerGroup group : defaultServers.shuffle()){
+        for(ServerGroup group : defaultServers){
             boolean hidden = group.hidden();
             if(hidden && !showHidden){
                 continue;
