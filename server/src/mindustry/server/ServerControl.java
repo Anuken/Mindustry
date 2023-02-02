@@ -191,7 +191,12 @@ public class ServerControl implements ApplicationListener{
 
                 info("Selected next map to be @.", Strings.stripColors(map.name()));
 
-                play(true, () -> world.loadMap(map, map.applyRules(lastMode)));
+                play(true, () -> {
+                    world.loadMap(map, map.applyRules(lastMode));
+                    if(Config.autoPause.bool() && Groups.player.isEmpty()){
+                        Core.app.post(() -> state.set(State.paused));
+                    }
+                });
             }else{
                 netServer.kickAll(KickReason.gameover);
                 state.set(State.menu);
@@ -202,12 +207,6 @@ public class ServerControl implements ApplicationListener{
         //reset autosave on world load
         Events.on(WorldLoadEvent.class, e -> {
             autosaveCount.reset(0, Config.autosaveSpacing.num() * 60);
-            
-            //auto server pause when no players online
-            if(!state.isPaused() && Config.autoPause.bool() && Groups.player.size() == 1){
-                state.set(State.paused);
-                autoPaused = true;
-            }
         });
 
         //autosave periodically
