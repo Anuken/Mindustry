@@ -206,6 +206,7 @@ public class ServerControl implements ApplicationListener{
             //auto server pause when no players online
             if(!state.isPaused() && Config.autoPause.bool() && Groups.player.size() == 1){
                 state.set(State.paused);
+                autoPaused = true;
             }
         });
 
