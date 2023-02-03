@@ -104,8 +104,8 @@
     "address": ["170.187.144.235", "162.248.100.98"]
   },
   {
-    "name": "OMNIDUSTRY",
-    "address": ["92.255.108.134","92.255.108.134:6568","92.255.108.134:6569","92.255.108.134:6570","92.255.108.134:6571","92.255.108.134:6572","92.255.108.134:6573","92.255.108.134:6574"]
+    "name": "OMNICORP",
+    "address": ["hub.omnidustry.su", "attack.erekir.omnidustry.su", "pvp.erekir.omnidustry.su", "survival.erekir.omnidustry.su", "attack.serpulo.omnidustry.su", "pvp.serpulo.omnidustry.su", "survival.serpulo.omnidustry.su", "sandbox.omnidustry.su"]
   },
   {
     "name": "The Devil",
