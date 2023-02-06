@@ -52,6 +52,10 @@
     "address": ["46.151.26.232:1024", "46.151.26.232:2000", "46.151.26.232:3000", "46.151.26.232:4000", "46.151.26.232:6000", "46.151.26.232:7000", "46.151.26.232:8000"]
   },
   {
+    "name": "XCore",
+    "address": ["185.13.47.146:19000", "185.13.47.146:19001", "185.13.47.146:19002"]
+  },
+  {
     "name": "Darkdustry",
     "address": ["darkdustry.net", "darkdustry.net:1500", "darkdustry.net:2000", "darkdustry.net:3000", "darkdustry.net:4000", "darkdustry.net:5000", "darkdustry.net:6000", "darkdustry.net:7000", "darkdustry.net:8000", "darkdustry.net:9000", "darkdustry.net:10000"] 
   },
