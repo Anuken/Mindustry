@@ -4,14 +4,6 @@
     "address": ["94.103.91.96:4545", "94.103.91.96:4848", "94.103.91.96:4949", "94.103.91.96:5050", "94.103.91.96:5151", "94.103.91.96:1551"]
   },
   {
-    "name": "RCM",
-    "address": ["rcrms.ru:6567"]
-  },
-  {
-    "name": "Tendhost",
-    "address": ["tendhost.ddns.net:7576"]
-  },
-  {
     "name": "generic mindustry",
     "address": ["212.192.29.92:25554", "212.192.29.24:25298"]
   },
@@ -60,10 +52,6 @@
     "address": ["46.151.26.232:1024", "46.151.26.232:2000", "46.151.26.232:3000", "46.151.26.232:4000", "46.151.26.232:6000", "46.151.26.232:7000", "46.151.26.232:8000"]
   },
   {
-    "name": "XCore",
-    "address": ["185.13.47.146:19000", "185.13.47.146:19001", "185.13.47.146:19002"]
-  },
-  {
     "name": "Darkdustry",
     "address": ["darkdustry.net", "darkdustry.net:1500", "darkdustry.net:2000", "darkdustry.net:3000", "darkdustry.net:4000", "darkdustry.net:5000", "darkdustry.net:6000", "darkdustry.net:7000", "darkdustry.net:8000", "darkdustry.net:9000", "darkdustry.net:10000"] 
   },
@@ -90,10 +78,6 @@
   {
     "name": "LatamDustry",
     "address": ["n1.xpdustry.fr:7003", "n1.xpdustry.fr:7004", "n1.xpdustry.fr:7005", "n1.xpdustry.fr:7006", "n1.xpdustry.fr:7007"]
-  },
-  {
-    "name": "Pandorum",
-    "address": ["pandorum.su:5018", "pandorum.su:5019", "pandorum.su:5020"]
   },
   {
     "name": "Tinylake",
@@ -148,15 +132,7 @@
     "address": ["play.hudustry.tk"]
   },
   {
-    "name": "SubZero", 
-    "address": ["mintyserver.net"]
-  },
-  {
     "name": "Router Pi",
     "address": ["a55c81b7c4d6e6d604651a93f8af5cd83.asuscomm.com"]
-  },
-  {
-    "name": "Vndustry",
-    "address": ["vndustry.ddns.net","vndustry.ddns.net:6568"]
   }
 ]
