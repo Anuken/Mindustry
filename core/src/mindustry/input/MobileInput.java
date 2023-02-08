@@ -661,7 +661,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             selectPlans.add(new BuildPlan(linked.x, linked.y));
         }else if((commandMode && selectedUnits.size > 0) || commandBuildings.size > 0){
             //handle selecting units with command mode
-            commandTap(x, y);
+            commandTap(x, y, false);
         }else if(commandMode){
             tapCommandUnit();
         }else{

@@ -735,7 +735,7 @@ public class DesktopInput extends InputHandler{
         if(scene.hasMouse() || !commandMode) return false;
 
         if(button == KeyCode.mouseRight){
-            commandTap(x, y);
+            commandTap(x, y, input.keyDown(Binding.control));
         }
 
         return super.touchDown(x, y, pointer, button);
