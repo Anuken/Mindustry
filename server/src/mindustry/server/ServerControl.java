@@ -191,7 +191,12 @@ public class ServerControl implements ApplicationListener{
 
                 info("Selected next map to be @.", Strings.stripColors(map.name()));
 
-                play(true, () -> world.loadMap(map, map.applyRules(lastMode)));
+                play(true, () -> {
+                    world.loadMap(map, map.applyRules(lastMode));
+                    if(Config.autoPause.bool() && Groups.player.isEmpty()){
+                        Core.app.post(() -> state.set(State.paused));
+                    }
+                });
             }else{
                 netServer.kickAll(KickReason.gameover);
                 state.set(State.menu);
