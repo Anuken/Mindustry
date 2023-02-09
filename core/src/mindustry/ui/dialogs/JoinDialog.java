@@ -599,7 +599,7 @@ public class JoinDialog extends BaseDialog{
             });
             //modify default servers on main thread
             Core.app.post(() -> {
-                servers.sort(s -> s.name == null ? Integer.MAX_VALUE : s.name.hashCode());
+                servers.sort(s -> Mathf.random());
                 defaultServers.addAll(servers);
                 Log.info("Fetched @ community servers.", defaultServers.size);
             });
