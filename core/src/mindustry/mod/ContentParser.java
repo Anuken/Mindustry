@@ -461,12 +461,13 @@ public class ContentParser{
                 }
 
                 var typeVal = value.get("type");
+                if(unit.constructor == null || typeVal != null){
+                    if(typeVal != null && !typeVal.isString()){
+                        throw new RuntimeException("Unit '" + name + "' has an incorrect type. Types must be strings.");
+                    }
 
-                if(typeVal != null && !typeVal.isString()){
-                    throw new RuntimeException("Unit '" + name + "' has an incorrect type. Types must be strings.");
+                    unit.constructor = unitType(typeVal);
                 }
-
-                unit.constructor = unitType(typeVal);
             }else{
                 unit = locate(ContentType.unit, name);
             }
