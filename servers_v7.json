@@ -1,7 +1,7 @@
 [
  {
     "name": "Explosive corp",
-    "address": ["94.103.91.96:4545", "94.103.91.96:4848", "94.103.91.96:4949", "94.103.91.96:5050", "94.103.91.96:5151", "94.103.91.96:1551"]
+    "address": ["94.103.91.96:4545", "94.103.91.96:4848", "94.103.91.96:4949", "94.103.91.96:5151", "94.103.91.96:1551"]
   },
   {
     "name": "RCM",
@@ -53,7 +53,7 @@
   },
   {
     "name": "Omega Hub",
-    "address": ["n1.mindustry.me:6608", "n7.mindustry.me:6567", "n7.mindustry.me:6570", "n1.mindustry.me:6568", "n1.mindustry.me:6671", "n1.mindustry.me:6570", "n1.mindustry.me:6573", "n1.mindustry.me:6610", "n1.mindustry.me:6567", "n1.mindustry.me:6599", "n1.mindustry.me:6774", "n1.mindustry.me:6571"]
+    "address": ["n1.mindustry.me:6608", "n7.mindustry.me:6567", "n7.mindustry.me:6570", "n1.mindustry.me:6568", "n1.mindustry.me:6671", "n1.mindustry.me:6570", "n1.mindustry.me:6573", "n1.mindustry.me:6610", "n1.mindustry.me:6567", "n1.mindustry.me:6599", "n1.mindustry.me:6774", "n1.mindustry.me:6571", "n1.mindustry.me:6589"]
   },
   {
     "name": "KMWStudios",
@@ -105,7 +105,7 @@
   },
   {
     "name": "OMNIDUSTRY",
-    "address": ["92.255.108.134","92.255.108.134:6568","92.255.108.134:6569","92.255.108.134:6570","92.255.108.134:6571","92.255.108.134:6572","92.255.108.134:6573","92.255.108.134:6574"]
+    "address": ["omnidustry.su", "omnidustry.su:6568", "omnidustry.su:6569", "omnidustry.su:6570", "omnidustry.su:6571", "omnidustry.su:6572", "omnidustry.su:6573", "omnidustry.su:6574"]
   },
   {
     "name": "The Devil",
