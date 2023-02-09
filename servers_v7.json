@@ -105,7 +105,7 @@
   },
   {
     "name": "OMNIDUSTRY",
-    "address": ["hub.omnidustry.su", "attack.erekir.omnidustry.su", "pvp.erekir.omnidustry.su", "survival.erekir.omnidustry.su", "attack.serpulo.omnidustry.su", "pvp.serpulo.omnidustry.su", "survival.serpulo.omnidustry.su", "sandbox.omnidustry.su"]
+    "address": ["omnidustry.su", "omnidustry.su:6568", "omnidustry.su:6569", "omnidustry.su:6570", "omnidustry.su:6571", "omnidustry.su:6572", "omnidustry.su:6573", "omnidustry.su:6574"]
   },
   {
     "name": "The Devil",
