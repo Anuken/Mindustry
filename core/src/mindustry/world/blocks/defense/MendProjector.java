@@ -11,6 +11,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.world.*;
+import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -18,14 +19,17 @@ import static mindustry.Vars.*;
 public class MendProjector extends Block{
     public final int timerUse = timers++;
     public Color baseColor = Color.valueOf("84f491");
-    public Color phaseColor = baseColor;
-    public @Load("@-top") TextureRegion topRegion;
     public float reload = 250f;
     public float range = 60f;
     public float healPercent = 12f;
     public float phaseBoost = 12f;
     public float phaseRangeBoost = 50f;
     public float useTime = 400f;
+
+    public DrawBlock drawer = new DrawMulti(
+        new DrawDefault(),
+        new DrawProjectorPulse(true, baseColor)
+    );
 
     public MendProjector(String name){
         super(name);
@@ -38,6 +42,12 @@ public class MendProjector extends Block{
         lightRadius = 50f;
         suppressable = true;
         envEnabled |= Env.space;
+    }
+
+    public void load() {
+        super.load();
+
+        drawer.load(this);
     }
 
     @Override
@@ -67,7 +77,7 @@ public class MendProjector extends Block{
     }
 
     public class MendBuild extends Building implements Ranged{
-        public float heat, charge = Mathf.random(reload), phaseHeat, smoothEfficiency;
+        public float warmup, progress = Mathf.random(reload), totalProgress, phaseHeat, smoothEfficiency;
 
         @Override
         public float range(){
@@ -79,8 +89,9 @@ public class MendProjector extends Block{
             boolean canHeal = !checkSuppression();
 
             smoothEfficiency = Mathf.lerpDelta(smoothEfficiency, efficiency, 0.08f);
-            heat = Mathf.lerpDelta(heat, efficiency > 0 && canHeal ? 1f : 0f, 0.08f);
-            charge += heat * delta();
+            warmup = Mathf.lerpDelta(warmup, efficiency > 0 && canHeal ? 1f : 0f, 0.08f);
+            progress += warmup * delta();
+            totalProgress += warmup * Time.delta;
 
             phaseHeat = Mathf.lerpDelta(phaseHeat, optionalEfficiency, 0.1f);
 
@@ -88,9 +99,9 @@ public class MendProjector extends Block{
                 consume();
             }
 
-            if(charge >= reload && canHeal){
+            if(progress >= reload && canHeal){
                 float realRange = range + phaseHeat * phaseRangeBoost;
-                charge = 0f;
+                progress = 0f;
 
                 indexer.eachBlock(this, realRange, b -> b.damaged() && !b.isHealSuppressed(), other -> {
                     other.heal(other.maxHealth() * (healPercent + phaseHeat * phaseBoost) / 100f * efficiency);
@@ -102,7 +113,7 @@ public class MendProjector extends Block{
 
         @Override
         public double sense(LAccess sensor){
-            if(sensor == LAccess.progress) return Mathf.clamp(charge / reload);
+            if(sensor == LAccess.progress) return Mathf.clamp(progress / reload);
             return super.sense(sensor);
         }
 
@@ -116,37 +127,37 @@ public class MendProjector extends Block{
         }
 
         @Override
+        public float warmup(){
+            return warmup;
+        }
+
+        @Override
+        public float totalProgress(){
+            return totalProgress;
+        }
+
+        @Override
         public void draw(){
-            super.draw();
-
-            float f = 1f - (Time.time / 100f) % 1f;
-
-            Draw.color(baseColor, phaseColor, phaseHeat);
-            Draw.alpha(heat * Mathf.absin(Time.time, 50f / Mathf.PI2, 1f) * 0.5f);
-            Draw.rect(topRegion, x, y);
-            Draw.alpha(1f);
-            Lines.stroke((2f * f + 0.2f) * heat);
-            Lines.square(x, y, Math.min(1f + (1f - f) * size * tilesize / 2f, size * tilesize/2f));
-
-            Draw.reset();
+            drawer.draw(this);
         }
 
         @Override
         public void drawLight(){
-            Drawf.light(x, y, lightRadius * smoothEfficiency, baseColor, 0.7f * smoothEfficiency);
+            super.drawLight();
+            drawer.drawLight(this);
         }
 
         @Override
         public void write(Writes write){
             super.write(write);
-            write.f(heat);
+            write.f(warmup);
             write.f(phaseHeat);
         }
 
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
-            heat = read.f();
+            warmup = read.f();
             phaseHeat = read.f();
         }
     }
