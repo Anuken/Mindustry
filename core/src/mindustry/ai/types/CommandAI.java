@@ -143,6 +143,7 @@ public class CommandAI extends AIController{
             vecOut.set(targetPos);
 
             if (force) {
+                //if the move command is forcible, then move to the target directly
                 moveTo(Tmp.v1.set(targetPos), 1f, 30f);
             }else if(unit.isGrounded()) {
                 move = Vars.controlPath.getPathPosition(unit, pathId, targetPos, vecOut, noFound);
@@ -260,6 +261,12 @@ public class CommandAI extends AIController{
     public void commandPosition(Vec2 pos, boolean stopWhenInRange){
         commandPosition(pos, stopWhenInRange, false);
     }
+    /**
+     * Commands this unit to move to the given position.
+     * @param pos The target position
+     * @param stopWhenInRange Whether to stop when in range
+     * @param force Whether this move command is forcible
+     */
     public void commandPosition(Vec2 pos, boolean stopWhenInRange, boolean force) {
         targetPos = pos;
         lastTargetPos = pos;

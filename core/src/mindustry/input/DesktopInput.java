@@ -735,6 +735,7 @@ public class DesktopInput extends InputHandler{
         if(scene.hasMouse() || !commandMode) return false;
 
         if(button == KeyCode.mouseRight){
+            //when left control is down, make the move command forcible
             commandTap(x, y, input.keyDown(Binding.control));
         }
 
