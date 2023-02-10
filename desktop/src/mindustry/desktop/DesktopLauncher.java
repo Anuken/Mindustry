@@ -41,15 +41,22 @@ public class DesktopLauncher extends ClientLauncher{
                 maximized = true;
                 width = 900;
                 height = 700;
-                //enable gl3 with command-line argument (slower performance, apparently)
-                if(Structs.contains(arg, "-gl3")){
-                    gl30 = true;
-                }
-                if(Structs.contains(arg, "-antialias")){
-                    samples = 16;
-                }
-                if(Structs.contains(arg, "-debug")){
-                    Log.level = LogLevel.debug;
+                for (int i = 0;i<arg.length;i++) {
+                    if (arg[i].charAt(0) == '-') {
+                        String name = arg[i].substring(1);
+                        try {
+                            switch (name) {
+                                case "width" : width = Integer.parseInt(arg[i + 1]);
+                                case "height" : height = Integer.parseInt(arg[i + 1]);
+                                case "gl3" : gl30 = true;
+                                case "antialias" : samples = 16;
+                                case "debug" : Log.level = LogLevel.debug;
+                                case "maximized" : maximized = Boolean.parseBoolean(arg[i + 1]);
+                            }
+                        } catch (NumberFormatException number){
+                            throw new NumberFormatException("Invalid parameter number value.");
+                        }
+                    }
                 }
                 setWindowIcon(FileType.internal, "icons/icon_64.png");
             }});
