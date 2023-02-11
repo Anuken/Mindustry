@@ -222,6 +222,10 @@ public class AIController implements UnitController{
         return target(x, y, range, air, ground);
     }
 
+    public void commandTarget(Teamc moveTo){}
+
+    public void commandPosition(Vec2 pos){}
+
     /** Called after this controller is assigned a unit. */
     public void init(){
 

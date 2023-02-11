@@ -35,8 +35,8 @@ public class CommandAI extends AIController{
     /** Last command type assigned. Used for detecting command changes. */
     protected @Nullable UnitCommand lastCommand;
 
-    public @Nullable UnitCommand currentCommand(){
-        return command;
+    public UnitCommand currentCommand(){
+        return command == null ? UnitCommand.moveCommand : command;
     }
 
     /** Attempts to assign a command to this unit. If not supported by the unit type, does nothing. */
@@ -62,7 +62,7 @@ public class CommandAI extends AIController{
         }
 
         //update command controller based on index.
-        var curCommand = currentCommand();
+        var curCommand = command;
         if(lastCommand != curCommand){
             lastCommand = curCommand;
             commandController = (curCommand == null ? null : curCommand.controller.get(unit));
@@ -72,8 +72,14 @@ public class CommandAI extends AIController{
         if(commandController != null){
             if(commandController.unit() != unit) commandController.unit(unit);
             commandController.updateUnit();
-            return;
+        }else{
+            defaultBehavior();
+            //boosting control is not supported, so just don't.
+            unit.updateBoosting(false);
         }
+    }
+
+    public void defaultBehavior(){
 
         //acquiring naval targets isn't supported yet, so use the fallback dumb AI
         if(unit.team.isAI() && unit.team.rules().rtsAi && unit.type.naval){
@@ -162,10 +168,10 @@ public class CommandAI extends AIController{
                     circleAttack(80f);
                 }else{
                     moveTo(vecOut,
-                        attackTarget != null && unit.within(attackTarget, engageRange) ? engageRange :
-                        unit.isGrounded() ? 0f :
-                        attackTarget != null ? engageRange :
-                        0f, unit.isFlying() ? 40f : 100f, false, null, targetPos.epsilonEquals(vecOut, 4.1f));
+                    attackTarget != null && unit.within(attackTarget, engageRange) ? engageRange :
+                    unit.isGrounded() ? 0f :
+                    attackTarget != null ? engageRange :
+                    0f, unit.isFlying() ? 40f : 100f, false, null, targetPos.epsilonEquals(vecOut, 4.1f));
                 }
             }
 
@@ -207,9 +213,6 @@ public class CommandAI extends AIController{
         }else if(target != null){
             faceTarget();
         }
-
-        //boosting control is not supported, so just don't.
-        unit.updateBoosting(false);
     }
 
     @Override
@@ -249,8 +252,12 @@ public class CommandAI extends AIController{
         lastTargetPos = targetPos;
     }
 
+    @Override
     public void commandPosition(Vec2 pos){
         commandPosition(pos, false);
+        if(commandController != null){
+            commandController.commandPosition(pos);
+        }
     }
 
     public void commandPosition(Vec2 pos, boolean stopWhenInRange){
@@ -261,8 +268,12 @@ public class CommandAI extends AIController{
         this.stopWhenInRange = stopWhenInRange;
     }
 
+    @Override
     public void commandTarget(Teamc moveTo){
         commandTarget(moveTo, false);
+        if(commandController != null){
+            commandController.commandTarget(moveTo);
+        }
     }
 
     public void commandTarget(Teamc moveTo, boolean stopAtTarget){

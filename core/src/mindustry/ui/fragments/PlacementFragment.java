@@ -514,7 +514,7 @@ public class PlacementFragment{
                             //find the command that all units have, or null if they do not share one
                             for(var unit : control.input.selectedUnits){
                                 if(unit.isCommandable()){
-                                    var nextCommand = unit.command().currentCommand();
+                                    var nextCommand = unit.command().command;
 
                                     if(hadCommand){
                                         if(shareCommand != nextCommand){
