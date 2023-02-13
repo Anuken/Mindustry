@@ -65,7 +65,7 @@
   },
   {
     "name": "Darkdustry",
-    "address": ["darkdustry.net", "darkdustry.net:1500", "darkdustry.net:2000", "darkdustry.net:3000", "darkdustry.net:4000", "darkdustry.net:5000", "darkdustry.net:6000", "darkdustry.net:7000", "darkdustry.net:8000", "darkdustry.net:9000", "darkdustry.net:10000"] 
+    "address": ["45.82.176.157", "45.82.176.157:1500", "45.82.176.157:2000", "45.82.176.157:3000", "45.82.176.157:4000", "45.82.176.157:5000", "45.82.176.157:6000", "45.82.176.157:7000", "45.82.176.157:8000", "45.82.176.157:9000", "45.82.176.157:10000"] 
   },
   {
     "name": "Chaotic Neutral",
@@ -117,7 +117,7 @@
   },
   {
     "name": "Conservatory",
-    "address": ["165.232.137.170:6567","165.232.137.170:6568"]
+    "address": ["165.232.137.170:6567", "165.232.137.170:6568"]
   },
   {
     "name": "mindustry.ddns.net",
@@ -141,7 +141,7 @@
   },
   {
     "name": "|RussianServers|[]",
-    "address": ["2p2g.ml:6568","2p2g.ml:6569","2p2g.ml:6570","2p2g.ml:6571","2p2g.ml:6572","2p2g.ml:6573"]
+    "address": ["2p2g.ml:6568", "2p2g.ml:6569", "2p2g.ml:6570", "2p2g.ml:6571", "2p2g.ml:6572", "2p2g.ml:6573"]
   },
   {
     "name": "Hungarian",
@@ -157,6 +157,6 @@
   },
   {
     "name": "Vndustry",
-    "address": ["vndustry.ddns.net","vndustry.ddns.net:6568"]
+    "address": ["vndustry.ddns.net", "vndustry.ddns.net:6568"]
   }
 ]
