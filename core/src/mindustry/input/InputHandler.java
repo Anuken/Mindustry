@@ -884,7 +884,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
                 Drawf.square(unit.x, unit.y, unit.hitSize / 1.4f + 1f);
 
-                //TODO when to draw, when to not?
                 if(ai.attackTarget != null && ai.currentCommand().drawTarget){
                     Drawf.target(ai.attackTarget.getX(), ai.attackTarget.getY(), 6f, Pal.remove);
                 }

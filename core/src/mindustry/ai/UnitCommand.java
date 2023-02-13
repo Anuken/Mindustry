@@ -59,4 +59,9 @@ public class UnitCommand{
     public String localized(){
         return Core.bundle.get("command." + name);
     }
+
+    @Override
+    public String toString(){
+        return "UnitCommand:" + name;
+    }
 }

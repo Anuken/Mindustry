@@ -3769,11 +3769,12 @@ public class UnitTypes{
             speed = 1.1f;
             rotateSpeed = 3.2f;
             accel = 0.1f;
-            health = 8000f;
-            armor = 5f;
+            health = 6000f;
+            armor = 4f;
             hitSize = 36f;
             payloadCapacity = Mathf.sqr(3f) * tilePayload;
             researchCostMultiplier = 0f;
+            targetAir = false;
 
             engineSize = 4.8f;
             engineOffset = 61 / 4f;
@@ -3800,11 +3801,13 @@ public class UnitTypes{
                     shake = 1f;
                     speed = 0f;
                     keepVelocity = false;
+                    collidesAir = false;
 
                     spawnUnit = new MissileUnitType("quell-missile"){{
+                        targetAir = false;
                         speed = 4.3f;
                         maxRange = 6f;
-                        lifetime = 60f * 1.6f;
+                        lifetime = 60f * 1.4f;
                         outlineColor = Pal.darkOutline;
                         engineColor = trailColor = Pal.sapBulletBack;
                         engineLayer = Layer.effect;
@@ -3818,6 +3821,7 @@ public class UnitTypes{
                             shootOnDeath = true;
                             bullet = new ExplosionBulletType(110f, 25f){{
                                 shootEffect = Fx.massiveExplosion;
+                                collidesAir = false;
                             }};
                         }});
                     }};
