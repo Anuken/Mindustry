@@ -3848,6 +3848,7 @@ public class UnitTypes{
             armor = 9f;
             hitSize = 46f;
             payloadCapacity = Mathf.sqr(6f) * tilePayload;
+            targetAir = false;
 
             engineSize = 6f;
             engineOffset = 25.25f;
@@ -3913,8 +3914,10 @@ public class UnitTypes{
                     shake = 1f;
                     speed = 0f;
                     keepVelocity = false;
+                    collidesAir = false;
 
                     spawnUnit = new MissileUnitType("disrupt-missile"){{
+                        targetAir = false;
                         speed = 4.6f;
                         maxRange = 5f;
                         outlineColor = Pal.darkOutline;
@@ -3953,6 +3956,7 @@ public class UnitTypes{
                             reload = 1f;
                             shootOnDeath = true;
                             bullet = new ExplosionBulletType(140f, 25f){{
+                                collidesAir = false;
                                 suppressionRange = 140f;
                                 shootEffect = new ExplosionEffect(){{
                                     lifetime = 50f;
