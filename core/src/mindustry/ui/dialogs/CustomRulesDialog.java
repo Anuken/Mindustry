@@ -247,8 +247,7 @@ public class CustomRulesDialog extends BaseDialog{
 
             t.defaults().size(140f, 50f);
 
-            //TODO dynamic selection of planets
-            for(Planet planet : new Planet[]{Planets.serpulo, Planets.erekir}){
+            for(Planet planet : content.planets().select(p -> p.accessible)){
                 t.button(planet.localizedName, style, () -> {
                     rules.env = planet.defaultEnv;
                     rules.attributes.clear();
