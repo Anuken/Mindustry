@@ -1125,15 +1125,15 @@ public class Block extends UnlockableContent implements Senseable{
             boolean round = false;
             if(scaledHealth < 0){
                 scaledHealth = 40;
-
-                float scaling = 1f;
-                for(var stack : requirements){
-                    scaling += stack.item.healthScaling;
-                }
-
-                scaledHealth *= scaling;
-                round = true;
             }
+            
+            float scaling = 1f;
+            for(var stack : requirements){
+                scaling += stack.item.healthScaling;
+            }
+
+            scaledHealth *= scaling;
+            round = true;
 
             health = round ?
                 Mathf.round(size * size * scaledHealth, 5) :
