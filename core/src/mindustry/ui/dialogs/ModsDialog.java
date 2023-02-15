@@ -415,7 +415,7 @@ public class ModsDialog extends BaseDialog{
 
         }).width(400f);
 
-        Seq<UnlockableContent> all = Seq.with(content.getContentMap()).<Content>flatten().select(c -> c.minfo.mod == mod && c instanceof UnlockableContent).as();
+        Seq<UnlockableContent> all = Seq.with(content.getContentMap()).<Content>flatten().select(c -> c.minfo.mod == mod && c instanceof UnlockableContent u && !u.isHidden()).as();
         if(all.any()){
             dialog.cont.row();
             dialog.cont.button("@mods.viewcontent", Icon.book, () -> {
