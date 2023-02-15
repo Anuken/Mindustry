@@ -52,6 +52,19 @@ public class ItemTurret extends Turret{
     }
 
     @Override
+    public void setBars(){
+        super.setBars();
+
+        addBar("ammo", (ItemTurretBuild entity) ->
+            new Bar(
+                "stat.ammo",
+                Pal.ammo,
+                () -> (float)entity.totalAmmo / maxAmmo
+            )
+        );
+    }
+
+    @Override
     public void init(){
         consume(new ConsumeItemFilter(i -> ammoTypes.containsKey(i)){
             @Override
@@ -98,14 +111,6 @@ public class ItemTurret extends Turret{
             unit.ammo((float)unit.type().ammoCapacity * totalAmmo / maxAmmo);
 
             super.updateTile();
-        }
-
-        @Override
-        public void displayBars(Table bars){
-            super.displayBars(bars);
-
-            bars.add(new Bar("stat.ammo", Pal.ammo, () -> (float)totalAmmo / maxAmmo)).growX();
-            bars.row();
         }
 
         @Override
