@@ -179,7 +179,7 @@ public class BeamNode extends PowerBlock{
                     }
 
                     //power nodes do NOT play nice with beam nodes, do not touch them as that forcefully modifies their links
-                    if(other != null && other.block.hasPower && other.team == team && !(other.block instanceof PowerNode)){
+                    if(other != null && other.block.hasPower && other.block.connectedPower && other.team == team && !(other.block instanceof PowerNode)){
                         links[i] = other;
                         dests[i] = world.tile(tile.x + j * dir.x, tile.y + j * dir.y);
                         break;
