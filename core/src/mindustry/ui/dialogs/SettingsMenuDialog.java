@@ -301,6 +301,7 @@ public class SettingsMenuDialog extends BaseDialog{
         sound.sliderPref("ambientvol", 100, 0, 100, 1, i -> i + "%");
 
         game.sliderPref("saveinterval", 60, 10, 5 * 120, 10, i -> Core.bundle.format("setting.seconds", i));
+        game.addRow();
 
         if(mobile){
             game.checkPref("autotarget", true);
@@ -327,27 +328,26 @@ public class SettingsMenuDialog extends BaseDialog{
             }
         }*/
 
-        if(!mobile){
-            game.checkPref("crashreport", true);
-        }
+        if(!mobile) game.checkPref("crashreport", true);
 
         game.checkPref("savecreate", true);
         game.checkPref("blockreplace", true);
         game.checkPref("conveyorpathfinding", true);
+        if(mobile) game.addRow();
         game.checkPref("hints", true);
         game.checkPref("logichints", true);
 
         if(!mobile){
+            game.addRow();
             game.checkPref("backgroundpause", true);
             game.checkPref("buildautopause", false);
         }
 
         game.checkPref("doubletapmine", false);
         game.checkPref("commandmodehold", true);
-      
-        if(!ios){
-            game.checkPref("modcrashdisable", true);
-        }
+        if(!mobile) game.addRow();
+
+        if(!ios) game.checkPref("modcrashdisable", true);
 
         if(steam){
             game.sliderPref("playerlimit", 16, 2, 32, i -> {
@@ -362,9 +362,7 @@ public class SettingsMenuDialog extends BaseDialog{
             }
         }
 
-        if(!mobile){
-            game.checkPref("console", false);
-        }
+        if(!mobile) game.checkPref("console", false);
 
         int[] lastUiScale = {settings.getInt("uiscale", 100)};
 
@@ -375,11 +373,12 @@ public class SettingsMenuDialog extends BaseDialog{
         });
 
         graphics.sliderPref("screenshake", 4, 0, 8, i -> (i / 4f) + "x");
-
+        graphics.addRow();
         graphics.sliderPref("bloomintensity", 6, 0, 16, i -> (int)(i/4f * 100f) + "%");
         graphics.sliderPref("bloomblur", 2, 1, 16, i -> i + "x");
-
+        graphics.addRow();
         graphics.sliderPref("fpscap", 240, 10, 245, 5, s -> (s > 240 ? Core.bundle.get("setting.fpscap.none") : Core.bundle.format("setting.fpscap.text", s)));
+        graphics.addRow();
         graphics.sliderPref("chatopacity", 100, 0, 100, 5, s -> s + "%");
         graphics.sliderPref("lasersopacity", 100, 0, 100, 5, s -> {
             if(ui.settings != null){
@@ -390,6 +389,7 @@ public class SettingsMenuDialog extends BaseDialog{
         graphics.sliderPref("bridgeopacity", 100, 0, 100, 5, s -> s + "%");
 
         if(!mobile){
+            graphics.addRow();
             graphics.checkPref("vsync", true, b -> Core.graphics.setVSync(b));
             graphics.checkPref("fullscreen", false, b -> {
                 if(b && settings.getBool("borderlesswindow")){
@@ -437,30 +437,28 @@ public class SettingsMenuDialog extends BaseDialog{
             }
         }
 
+        graphics.addRow();
         graphics.checkPref("effects", true);
-        graphics.checkPref("atmosphere", !mobile);
         graphics.checkPref("destroyedblocks", true);
         graphics.checkPref("blockstatus", false);
         graphics.checkPref("playerchat", true);
-        if(!mobile){
-            graphics.checkPref("coreitems", true);
-        }
-        graphics.checkPref("minimap", !mobile);
+        if(!mobile) graphics.checkPref("coreitems", true);
+        graphics.addRow();
         graphics.checkPref("smoothcamera", true);
+        graphics.checkPref("minimap", !mobile);
         graphics.checkPref("position", false);
-        if(!mobile){
-            graphics.checkPref("mouseposition", false);
-        }
+        if(!mobile) graphics.checkPref("mouseposition", false);
         graphics.checkPref("fps", false);
         graphics.checkPref("playerindicators", true);
         graphics.checkPref("indicators", true);
+        graphics.addRow();
+        graphics.checkPref("atmosphere", !mobile);
         graphics.checkPref("showweather", true);
         graphics.checkPref("animatedwater", true);
 
-        if(Shaders.shield != null){
-            graphics.checkPref("animatedshields", !mobile);
-        }
+        if(Shaders.shield != null) graphics.checkPref("animatedshields", !mobile);
 
+        graphics.addRow();
         graphics.checkPref("bloom", true, val -> renderer.toggleBloom(val));
 
         graphics.checkPref("pixelate", false, val -> {
@@ -491,9 +489,7 @@ public class SettingsMenuDialog extends BaseDialog{
         graphics.checkPref("skipcoreanimation", false);
         graphics.checkPref("hidedisplays", false);
 
-        if(!mobile){
-            Core.settings.put("swapdiagonal", false);
-        }
+        if(!mobile) Core.settings.put("swapdiagonal", false);
     }
 
     public void exportData(Fi file) throws IOException{
@@ -620,7 +616,7 @@ public class SettingsMenuDialog extends BaseDialog{
         }
 
         public Seq<Setting> getSettings(){
-            return list;
+            return list.copy().removeAll(s -> s.name.equals("newrow"));
         }
 
         public void pref(Setting setting){
@@ -676,6 +672,20 @@ public class SettingsMenuDialog extends BaseDialog{
             rebuild();
         }
 
+        public void addText(String name, String text){
+            list.add(new Setting(name){
+                @Override
+                public void add(SettingsTable table){
+                    table.add(text).row();
+                }
+            });
+            rebuild();
+        }
+
+        public void addRow(){
+            addText("newrow", "");
+        }
+
         public void rebuild(){
             clearChildren();
 
@@ -685,7 +695,7 @@ public class SettingsMenuDialog extends BaseDialog{
 
             button(bundle.get("settings.reset", "Reset to Defaults"), () -> {
                 for(Setting setting : list){
-                    if(setting.name == null || setting.title == null) continue;
+                    if(setting.name == null || setting.title == null || setting.name.equals("newrow")) continue;
                     settings.remove(setting.name);
                 }
                 rebuild();
