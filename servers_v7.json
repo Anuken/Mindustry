@@ -162,5 +162,9 @@
   {
     "name": "Vortex",
     "address": ["vortex.org.ru", "vortex.org.ru:6568", "vortex.org.ru:6569", "vortex.org.ru:6570", "vortex.org.ru:6571"]
+  },
+  {
+    "name": "Botipont",
+    "address": ["217.144.54.208:6568", "217.144.54.208:6567", "217.144.54.208:6569"]
   }
 ]
