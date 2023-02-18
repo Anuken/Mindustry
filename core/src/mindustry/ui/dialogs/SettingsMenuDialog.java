@@ -301,7 +301,7 @@ public class SettingsMenuDialog extends BaseDialog{
         sound.sliderPref("ambientvol", 100, 0, 100, 1, i -> i + "%");
 
         game.sliderPref("saveinterval", 60, 10, 5 * 120, 10, i -> Core.bundle.format("setting.seconds", i));
-        game.sep();
+        game.separator();
 
         if(mobile){
             game.checkPref("autotarget", true);
@@ -333,19 +333,19 @@ public class SettingsMenuDialog extends BaseDialog{
         game.checkPref("savecreate", true);
         game.checkPref("blockreplace", true);
         game.checkPref("conveyorpathfinding", true);
-        if(mobile) game.sep();
+        if(mobile) game.separator();
         game.checkPref("hints", true);
         game.checkPref("logichints", true);
 
         if(!mobile){
-            game.sep();
+            game.separator();
             game.checkPref("backgroundpause", true);
             game.checkPref("buildautopause", false);
         }
 
         game.checkPref("doubletapmine", false);
         game.checkPref("commandmodehold", true);
-        if(!mobile) game.sep();
+        if(!mobile) game.separator();
 
         if(!ios) game.checkPref("modcrashdisable", true);
 
@@ -373,12 +373,12 @@ public class SettingsMenuDialog extends BaseDialog{
         });
 
         graphics.sliderPref("screenshake", 4, 0, 8, i -> (i / 4f) + "x");
-        graphics.sep();
+        graphics.separator();
         graphics.sliderPref("bloomintensity", 6, 0, 16, i -> (int)(i/4f * 100f) + "%");
         graphics.sliderPref("bloomblur", 2, 1, 16, i -> i + "x");
-        graphics.sep();
+        graphics.separator();
         graphics.sliderPref("fpscap", 240, 10, 245, 5, s -> (s > 240 ? Core.bundle.get("setting.fpscap.none") : Core.bundle.format("setting.fpscap.text", s)));
-        graphics.sep();
+        graphics.separator();
         graphics.sliderPref("chatopacity", 100, 0, 100, 5, s -> s + "%");
         graphics.sliderPref("lasersopacity", 100, 0, 100, 5, s -> {
             if(ui.settings != null){
@@ -389,7 +389,7 @@ public class SettingsMenuDialog extends BaseDialog{
         graphics.sliderPref("bridgeopacity", 100, 0, 100, 5, s -> s + "%");
 
         if(!mobile){
-            graphics.sep();
+            graphics.separator();
             graphics.checkPref("vsync", true, b -> Core.graphics.setVSync(b));
             graphics.checkPref("fullscreen", false, b -> {
                 if(b && settings.getBool("borderlesswindow")){
@@ -424,6 +424,7 @@ public class SettingsMenuDialog extends BaseDialog{
                 Core.app.post(() -> Core.graphics.setBorderless(true));
             }
         }else if(!ios){
+            graphics.separator();
             graphics.checkPref("landscape", false, b -> {
                 if(b){
                     platform.beginForceLandscape();
@@ -437,13 +438,13 @@ public class SettingsMenuDialog extends BaseDialog{
             }
         }
 
-        graphics.sep();
+        graphics.separator();
         graphics.checkPref("effects", true);
         graphics.checkPref("destroyedblocks", true);
         graphics.checkPref("blockstatus", false);
         graphics.checkPref("playerchat", true);
         if(!mobile) graphics.checkPref("coreitems", true);
-        graphics.sep();
+        graphics.separator();
         graphics.checkPref("smoothcamera", true);
         graphics.checkPref("minimap", !mobile);
         graphics.checkPref("position", false);
@@ -451,14 +452,14 @@ public class SettingsMenuDialog extends BaseDialog{
         graphics.checkPref("fps", false);
         graphics.checkPref("playerindicators", true);
         graphics.checkPref("indicators", true);
-        graphics.sep();
+        graphics.separator();
         graphics.checkPref("atmosphere", !mobile);
         graphics.checkPref("showweather", true);
         graphics.checkPref("animatedwater", true);
 
         if(Shaders.shield != null) graphics.checkPref("animatedshields", !mobile);
 
-        graphics.sep();
+        graphics.separator();
         graphics.checkPref("bloom", true, val -> renderer.toggleBloom(val));
 
         graphics.checkPref("pixelate", false, val -> {
@@ -672,13 +673,13 @@ public class SettingsMenuDialog extends BaseDialog{
             rebuild();
         }
 
-        public void separator(String name, Drawable background){
-            list.add(new Separator(name, background));
+        public void separator(){
+            list.add(new Separator("", Tex.clear));
             rebuild();
         }
 
-        public void sep(){
-            list.add(new Separator());
+        public void separator(String name, Drawable background){
+            list.add(new Separator(name, background));
             rebuild();
         }
 
@@ -863,14 +864,6 @@ public class SettingsMenuDialog extends BaseDialog{
             public Separator(String name, Drawable background){
                 super(name);
                 this.background = background;
-            }
-
-            public Separator(String name){
-                this(name, Tex.clear);
-            }
-
-            public Separator(){
-                this("");
             }
 
             @Override
