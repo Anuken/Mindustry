@@ -522,6 +522,8 @@ public class Mods implements Loadable{
 
     private void buildFiles(){
         for(LoadedMod mod : orderedMods()){
+            if(!mod.shouldBeEnabled()) continue;
+
             boolean zipFolder = !mod.file.isDirectory() && mod.root.parent() != null;
             String parentName = zipFolder ? mod.root.name() : null;
             for(Fi file : mod.root.list()){
