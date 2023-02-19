@@ -46,12 +46,12 @@ public class DesktopLauncher extends ClientLauncher{
                         String name = arg[i].substring(1);
                         try{
                             switch(name){
-                                case "width": width = Integer.parseInt(arg[i + 1]);
-                                case "height": height = Integer.parseInt(arg[i + 1]);
-                                case "gl3": gl30 = true;
-                                case "antialias": samples = 16;
-                                case "debug": Log.level = LogLevel.debug;
-                                case "maximized": maximized = Boolean.parseBoolean(arg[i + 1]);
+                                case "width": width = Integer.parseInt(arg[i + 1]); break;
+                                case "height": height = Integer.parseInt(arg[i + 1]); break;
+                                case "gl3": gl30 = true; break;
+                                case "antialias": samples = 16; break;
+                                case "debug": Log.level = LogLevel.debug; break;
+                                case "maximized": maximized = Boolean.parseBoolean(arg[i + 1]); break;
                             }
                         }catch(NumberFormatException number){
                             Log.warn("Invalid parameter number value.");
