@@ -644,7 +644,11 @@ public class ModsDialog extends BaseDialog{
         Core.app.post(() -> modError(t));
     }
 
-    private void githubImportMod(String repo, boolean isJava, @Nullable String release){
+    public void githubImportMod(String repo, boolean isJava){
+        githubImportMod(repo, isJava, null);
+    }
+
+    public void githubImportMod(String repo, boolean isJava, @Nullable String release){
         modImportProgress = 0f;
         ui.loadfrag.show("@downloading");
         ui.loadfrag.setProgress(() -> modImportProgress);
