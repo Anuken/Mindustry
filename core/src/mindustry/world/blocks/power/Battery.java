@@ -14,7 +14,10 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class Battery extends PowerDistributor{
-    public DrawBlock drawer = new DrawMulti(new DrawDefault(), new DrawPower(), new DrawRegion("-top"));
+    public DrawBlock drawer;
+
+    public Color emptyLightColor = Color.valueOf("f8c266");
+    public Color fullLightColor = Color.valueOf("fb9567");
 
     public Battery(String name){
         super(name);
@@ -27,6 +30,18 @@ public class Battery extends PowerDistributor{
         destructible = true;
         //batteries don't need to update
         update = false;
+    }
+
+    @Override
+    public void init(){
+        super.init();
+
+        if(drawer == null){
+            drawer = new DrawMulti(new DrawDefault(), new DrawPower(){{
+                emptyLightColor = Battery.this.emptyLightColor;
+                fullLightColor = Battery.this.fullLightColor;
+            }}, new DrawRegion("-top"));
+        }
     }
 
     @Override
