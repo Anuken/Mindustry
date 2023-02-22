@@ -193,7 +193,7 @@ public class ServerControl implements ApplicationListener{
 
                 play(true, () -> {
                     world.loadMap(map, map.applyRules(lastMode));
-                    if(Config.autoPause.bool() && Groups.player.isEmpty()){
+                    if(Config.autoPause.bool() && autoPaused){
                         Core.app.post(() -> state.set(State.paused));
                     }
                 });
