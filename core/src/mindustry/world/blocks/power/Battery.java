@@ -19,6 +19,9 @@ public class Battery extends PowerDistributor{
     public Color emptyLightColor = Color.valueOf("f8c266");
     public Color fullLightColor = Color.valueOf("fb9567");
 
+    @Deprecated
+    public @Load("@-top") TextureRegion topRegion;
+
     public Battery(String name){
         super(name);
         outputsPower = true;
