@@ -93,6 +93,11 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         return isAdded();
     }
 
+    @Override
+    public boolean isLogicControllable(){
+        return false;
+    }
+
     @Replace
     public float clipSize(){
         return unit.isNull() ? 20 : unit.type.hitSize * 2f;
