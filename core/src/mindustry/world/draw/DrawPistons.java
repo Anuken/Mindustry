@@ -12,11 +12,11 @@ public class DrawPistons extends DrawBlock{
     public float sinMag = 4f, sinScl = 6f, sinOffset = 50f, sideOffset = 0f, lenOffset = -1f, horiOffset = 0f, angleOffset = 0f;
     public int sides = 4;
     public String suffix = "-piston";
-    public TextureRegion region1, region2, regiont;
+    public TextureRegion region1, region2, regiont, iconRegion;
 
     @Override
     public void drawPlan(Block block, BuildPlan plan, Eachable<BuildPlan> list){
-
+        Draw.rect(iconRegion, plan.drawx(), plan.drawy());
     }
 
     @Override
@@ -46,5 +46,11 @@ public class DrawPistons extends DrawBlock{
         region1 = Core.atlas.find(block.name + suffix + "0", block.name + suffix);
         region2 = Core.atlas.find(block.name + suffix + "1", block.name + suffix);
         regiont = Core.atlas.find(block.name + suffix + "-t");
+        iconRegion = Core.atlas.find(block.name + suffix + "-icon");
+    }
+
+    @Override
+    public TextureRegion[] icons(Block block){
+        return new TextureRegion[]{iconRegion};
     }
 }
