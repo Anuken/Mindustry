@@ -9,7 +9,7 @@ import mindustry.gen.*;
 import mindustry.world.*;
 
 public class DrawPistons extends DrawBlock{
-    public float sinMag = 4f, sinScl = 6f, sinOffset = 50f, sideOffset = 0f, lenOffset = -1f, angleOffset = 0f;
+    public float sinMag = 4f, sinScl = 6f, sinOffset = 50f, sideOffset = 0f, lenOffset = -1f, horiOffset = 0f, angleOffset = 0f;
     public int sides = 4;
     public String suffix = "-piston";
     public TextureRegion region1, region2, regiont;
@@ -32,7 +32,8 @@ public class DrawPistons extends DrawBlock{
                 Draw.yscl = -1f;
             }
 
-            Draw.rect(reg, build.x + Angles.trnsx(angle, len), build.y + Angles.trnsy(angle, len), angle);
+            Tmp.v1.trns(angle, len, horiOffset);
+            Draw.rect(reg, build.x + Tmp.v1.x, build.y + Tmp.v1.y, angle);
 
             Draw.yscl = 1f;
         }
