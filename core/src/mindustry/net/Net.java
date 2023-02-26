@@ -14,7 +14,6 @@ import net.jpountz.lz4.*;
 import java.io.*;
 import java.nio.*;
 import java.nio.channels.*;
-import java.util.concurrent.*;
 
 import static arc.util.Log.*;
 import static mindustry.Vars.*;
@@ -34,7 +33,6 @@ public class Net{
     private final ObjectMap<Class<?>, Cons> clientListeners = new ObjectMap<>();
     private final ObjectMap<Class<?>, Cons2<NetConnection, Object>> serverListeners = new ObjectMap<>();
     private final IntMap<StreamBuilder> streams = new IntMap<>();
-    private final ExecutorService pingExecutor = OS.isWindows && !OS.is64Bit ? Threads.boundedExecutor("Ping Servers", 5) : Threads.unboundedExecutor();
 
     private final NetProvider provider;
 
@@ -330,7 +328,7 @@ public class Net{
      * If the port is the default mindustry port, SRV records are checked too.
      */
     public void pingHost(String address, int port, Cons<Host> valid, Cons<Exception> failed){
-        pingExecutor.submit(() -> provider.pingHost(address, port, valid, failed));
+        provider.pingHost(address, port, valid, failed);
     }
 
     /**
