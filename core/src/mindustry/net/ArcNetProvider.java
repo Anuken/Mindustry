@@ -209,17 +209,13 @@ public class ArcNetProvider implements NetProvider{
         }
     }
 
-
-    //TODO remove
-    static AsyncUdp udp = new AsyncUdp();
-
     @Override
     public void pingHost(String address, int port, Cons<Host> valid, Cons<Exception> invalid){
         long time = Time.millis();
         var socket = new InetSocketAddress(address, port);
         Log.info("Time to resolve @: @", address, Time.timeSinceMillis(time));
 
-        udp.send(socket, 2000, 512, ByteBuffer.wrap(new byte[]{-2, 1}), data ->  {
+        AsyncUdp.send(socket, 2000, 512, ByteBuffer.wrap(new byte[]{-2, 1}), data ->  {
             Host host = NetworkIO.readServerData((int)Time.timeSinceMillis(time), socket.getAddress().getHostAddress(), data);
             host.port = port;
             Core.app.post(() -> valid.get(host));
