@@ -54,15 +54,14 @@ public class AsyncUdp{
 
                                     request.received.get(buffer);
                                     request.close();
-                                }catch(IOException error){
+                                }catch(Exception error){
                                     request.fail(error);
-                                    //TODO remove logging, this is not needed outside of debugging
-                                    Log.err(error);
                                 }
                             }
 
                         }
-                    }catch(IOException e){
+                    }catch(Throwable e){
+                        //should not happen
                         Log.err(e);
                     }
                 }
@@ -98,7 +97,6 @@ public class AsyncUdp{
 
                 removals.offer(req);
             }catch(Exception e){
-                Log.err(e);
                 failed.get(e);
             }
         });
@@ -115,6 +113,8 @@ public class AsyncUdp{
         final DatagramChannel channel;
         final SelectionKey key;
 
+        boolean closed = false;
+
         public Request(InetSocketAddress address, long timeout, int bufferSize, ByteBuffer data, DatagramChannel channel, SelectionKey key, Cons<ByteBuffer> received, Cons<Exception> failed){
             this.address = address;
             this.timeout = timeout;
@@ -128,8 +128,8 @@ public class AsyncUdp{
         }
 
         void close(){
-            if(!key.isValid()) return;
             try{
+                closed = true;
                 key.cancel();
                 channel.close();
             }catch(Exception close){
@@ -138,9 +138,10 @@ public class AsyncUdp{
         }
 
         void fail(Exception error){
-            if(!key.isValid()) return;
-            failed.get(error);
-            close();
+            if(!closed){
+                failed.get(error);
+                close();
+            }
         }
 
         @Override
