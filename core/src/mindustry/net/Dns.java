@@ -119,7 +119,7 @@ public class Dns{
                 result.getShort();                           // OFFSET
                 int answerType = result.getShort() & 0xFFFF; // Type
                 result.getShort();                           // Class
-                long ttl = result.getInt() & 0xFFFFFFFFL;    // TTL
+                result.getInt();                             // TTL
                 int length = result.getShort() & 0xFFFF;     // Data length
 
                 // Optionally CNAME results will be returned with the A results, skip those
