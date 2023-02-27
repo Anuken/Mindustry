@@ -433,7 +433,7 @@ public class PlacementFragment{
                 //commandTable: commanded units
                 {
                     commandTable.touchable = Touchable.enabled;
-                    commandTable.add("[accent]Command Mode").fill().center().labelAlign(Align.center).row();
+                    commandTable.add(Core.bundle.get("commandmode.name")).fill().center().labelAlign(Align.center).row();
                     commandTable.image().color(Pal.accent).growX().pad(20f).padTop(0f).padBottom(4f).row();
                     commandTable.table(u -> {
                         u.left();
@@ -503,7 +503,7 @@ public class PlacementFragment{
                                     }).fillX().padTop(4f).left();
                                 }
                             }else{
-                                u.add("[no units]").color(Color.lightGray).growX().center().labelAlign(Align.center).pad(6);
+                                u.add(Core.bundle.get("commandmode.nounits")).color(Color.lightGray).growX().center().labelAlign(Align.center).pad(6);
                             }
                         };
 
@@ -514,7 +514,7 @@ public class PlacementFragment{
                             //find the command that all units have, or null if they do not share one
                             for(var unit : control.input.selectedUnits){
                                 if(unit.isCommandable()){
-                                    var nextCommand = unit.command().currentCommand();
+                                    var nextCommand = unit.command().command;
 
                                     if(hadCommand){
                                         if(shareCommand != nextCommand){

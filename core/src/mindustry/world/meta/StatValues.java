@@ -250,7 +250,7 @@ public class StatValues{
                         float reloadRate = (baseReload ? 1f : 0f) + maxUsed * multiplier * liquid.heatCapacity;
                         float standardReload = baseReload ? reload : reload / (maxUsed * multiplier * 0.4f);
                         float result = standardReload / (reload / reloadRate);
-                        bt.add(Core.bundle.format("bullet.reload", Strings.autoFixed(result, 2)));
+                        bt.add(Core.bundle.format("bullet.reload", Strings.autoFixed(result * 100, 1)));
                     }).left().padTop(-9);
                     c.row();
                 }
@@ -329,7 +329,7 @@ public class StatValues{
 
                 if(type.spawnUnit != null && type.spawnUnit.weapons.size > 0){
                     ammo(ObjectMap.of(t, type.spawnUnit.weapons.first().bullet), indent, false).display(table);
-                    return;
+                    continue;
                 }
 
                 //no point in displaying unit icon twice

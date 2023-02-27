@@ -31,6 +31,8 @@ public class Rules{
     public boolean waves;
     /** Whether the game objective is PvP. Note that this enables automatic hosting. */
     public boolean pvp;
+    /** Whether is waiting for players enabled in PvP. */
+    public boolean pvpAutoPause = true;
     /** Whether to pause the wave timer until all enemies are destroyed. */
     public boolean waitEnemies = false;
     /** Determines if gamemode is attack mode. */
@@ -65,8 +67,10 @@ public class Rules{
     public float unitBuildSpeedMultiplier = 1f;
     /** Multiplier of resources that units take to build. */
     public float unitCostMultiplier = 1f;
-    /** How much damage any other units deal. */
+    /** How much damage units deal. */
     public float unitDamageMultiplier = 1f;
+    /** How much damage unit crash damage deals. (Compounds with unitDamageMultiplier) */
+    public float unitCrashDamageMultiplier = 1f;
     /** If true, ghost blocks will appear upon destruction, letting builder blocks/units rebuild them. */
     public boolean ghostBlocks = true;
     /** Whether to allow units to build with logic. */
@@ -222,6 +226,10 @@ public class Rules{
         return unitDamageMultiplier * teams.get(team).unitDamageMultiplier;
     }
 
+    public float unitCrashDamage(Team team){
+        return unitDamage(team) * unitCrashDamageMultiplier * teams.get(team).unitCrashDamageMultiplier;
+    }
+
     public float blockHealth(Team team){
         return blockHealthMultiplier * teams.get(team).blockHealthMultiplier;
     }
@@ -264,8 +272,10 @@ public class Rules{
 
         /** How fast unit factories build units. */
         public float unitBuildSpeedMultiplier = 1f;
-        /** How much damage any other units deal. */
+        /** How much damage units deal. */
         public float unitDamageMultiplier = 1f;
+        /** How much damage unit crash damage deals. (Compounds with unitDamageMultiplier) */
+        public float unitCrashDamageMultiplier = 1f;
         /** Multiplier of resources that units take to build. */
         public float unitCostMultiplier = 1f;
         /** How much health blocks start with. */

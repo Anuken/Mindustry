@@ -5,6 +5,7 @@ import arc.func.*;
 import arc.net.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.net.Packets.*;
 import mindustry.net.Streamable.*;
@@ -33,7 +34,7 @@ public class Net{
     private final ObjectMap<Class<?>, Cons> clientListeners = new ObjectMap<>();
     private final ObjectMap<Class<?>, Cons2<NetConnection, Object>> serverListeners = new ObjectMap<>();
     private final IntMap<StreamBuilder> streams = new IntMap<>();
-    private final ExecutorService pingExecutor = Threads.unboundedExecutor();
+    private final ExecutorService pingExecutor = OS.isWindows && !OS.is64Bit ? Threads.boundedExecutor("Ping Servers", 5) : Threads.unboundedExecutor();
 
     private final NetProvider provider;
 
@@ -154,6 +155,7 @@ public class Net{
     public void connect(String ip, int port, Runnable success){
         try{
             if(!active){
+                Events.fire(new ClientServerConnectEvent(ip, port));
                 provider.connectClient(ip, port, success);
                 active = true;
                 server = false;

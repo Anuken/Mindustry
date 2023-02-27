@@ -191,7 +191,12 @@ public class ServerControl implements ApplicationListener{
 
                 info("Selected next map to be @.", Strings.stripColors(map.name()));
 
-                play(true, () -> world.loadMap(map, map.applyRules(lastMode)));
+                play(true, () -> {
+                    world.loadMap(map, map.applyRules(lastMode));
+                    if(Config.autoPause.bool() && autoPaused){
+                        Core.app.post(() -> state.set(State.paused));
+                    }
+                });
             }else{
                 netServer.kickAll(KickReason.gameover);
                 state.set(State.menu);
@@ -255,10 +260,22 @@ public class ServerControl implements ApplicationListener{
 
         //autosave settings once a minute
         float saveInterval = 60;
-        Timer.schedule(() -> Core.settings.forceSave(), saveInterval, saveInterval);
+        Timer.schedule(() -> {
+            netServer.admins.forceSave();
+            Core.settings.forceSave();
+        }, saveInterval, saveInterval);
 
-        if(!mods.list().isEmpty()){
-            info("@ mods loaded.", mods.list().size);
+        if(!mods.orderedMods().isEmpty()){
+            info("@ mods loaded.", mods.orderedMods().size);
+        }
+
+        int unsupported = mods.list().count(l -> !l.enabled());
+
+        if(unsupported > 0){
+            Log.err("There were errors loading @ mod(s):", unsupported);
+            for(LoadedMod mod : mods.list().select(l -> !l.enabled())){
+                Log.err("- @ &ly(" + mod.state + ")", mod.meta.name);
+            }
         }
 
         toggleSocket(Config.socketInput.bool());
@@ -451,7 +468,7 @@ public class ServerControl implements ApplicationListener{
             if(!mods.list().isEmpty()){
                 info("Mods:");
                 for(LoadedMod mod : mods.list()){
-                    info("  @ &fi@", mod.meta.displayName(), mod.meta.version);
+                    info("  @ &fi@ " + (mod.enabled() ? "" : " &lr(" + mod.state + ")"), mod.meta.displayName(), mod.meta.version);
                 }
             }else{
                 info("No mods found.");

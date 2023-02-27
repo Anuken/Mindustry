@@ -419,6 +419,8 @@ public class UI implements ApplicationListener, Loadable{
     }
 
     public void showException(String text, Throwable exc){
+        if(loadfrag == null) return;
+
         loadfrag.hide();
         new Dialog(""){{
             String message = Strings.getFinalMessage(exc);

@@ -54,6 +54,13 @@ public class LaserTurret extends PowerTurret{
         }
 
         @Override
+        public void placed(){
+            super.placed();
+
+            reloadCounter = reload;
+        }
+
+        @Override
         public void updateTile(){
             super.updateTile();
 

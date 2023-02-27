@@ -81,12 +81,14 @@ public class Turret extends ReloadTurret{
     public boolean playerControllable = true;
     /** If true, this block will display ammo multipliers in its stats (irrelevant for certain types of turrets). */
     public boolean displayAmmoMultiplier = true;
+    /** If false, 'under' blocks like conveyors are not targeted. */
+    public boolean targetUnderBlocks = true;
     /** Function for choosing which unit to target. */
     public Sortf unitSort = UnitSorts.closest;
     /** Filter for types of units to attack. */
     public Boolf<Unit> unitFilter = u -> true;
     /** Filter for types of buildings to attack. */
-    public Boolf<Building> buildingFilter = b -> !b.block.underBullets;
+    public Boolf<Building> buildingFilter = b -> targetUnderBlocks || !b.block.underBullets;
 
     /** Color of heat region drawn on top (if found) */
     public Color heatColor = Pal.turretHeat;
@@ -468,7 +470,7 @@ public class Turret extends ReloadTurret{
         @Override
         public void updateEfficiencyMultiplier(){
             if(heatRequirement > 0){
-                efficiency *= Math.min(heatReq / heatRequirement, maxHeatEfficiency);
+                efficiency *= Math.min(Math.max(heatReq / heatRequirement, cheating() ? 1f : 0f), maxHeatEfficiency);
             }
         }
 
@@ -498,7 +500,8 @@ public class Turret extends ReloadTurret{
             if(ammo.size >= 2 && ammo.peek().amount < ammoPerShot && ammo.get(ammo.size - 2).amount >= ammoPerShot){
                 ammo.swap(ammo.size - 1, ammo.size - 2);
             }
-            return ammo.size > 0 && ammo.peek().amount >= ammoPerShot;
+
+            return ammo.size > 0 && (ammo.peek().amount >= ammoPerShot || cheating());
         }
 
         public boolean charging(){

@@ -70,6 +70,9 @@ public class Logic implements ApplicationListener{
             if(state.isCampaign()){
                 state.rules.coreIncinerates = true;
 
+                //TODO why is this even a thing?
+                state.rules.canGameOver = true;
+
                 //fresh map has no sector info
                 if(!e.isMap){
                     SectorInfo info = state.rules.sector.info;
@@ -380,21 +383,18 @@ public class Logic implements ApplicationListener{
     public static void researched(Content content){
         if(!(content instanceof UnlockableContent u)) return;
 
-        //TODO node is wrong for shared tech nodes
-        var node = u.techNode;
-
-        //unlock all direct dependencies on client, permanently
-        while(node != null){
-            node.content.unlock();
-            node = node.parent;
-        }
-
+        boolean was = u.unlockedNow();
         state.rules.researched.add(u.name);
+
+        if(!was){
+            Events.fire(new UnlockEvent(u));
+        }
     }
 
     @Override
     public void dispose(){
         //save the settings before quitting
+        netServer.admins.forceSave();
         Core.settings.manualSave();
     }
 
@@ -404,8 +404,11 @@ public class Logic implements ApplicationListener{
         universe.updateGlobal();
 
         if(Core.settings.modified() && !state.isPlaying()){
+            netServer.admins.forceSave();
             Core.settings.forceSave();
         }
+
+        boolean runStateCheck = !net.client() && !world.isInvalidMap() && !state.isEditor() && state.rules.canGameOver;
 
         if(state.isGame()){
             if(!net.client()){
@@ -472,9 +475,11 @@ public class Logic implements ApplicationListener{
                 Groups.update();
             }
 
-            if(!net.client() && !world.isInvalidMap() && !state.isEditor() && state.rules.canGameOver){
+            if(runStateCheck){
                 checkGameState();
             }
+        }else if(netServer.isWaitingForPlayers() && runStateCheck){
+            checkGameState();
         }
     }
 

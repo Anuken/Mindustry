@@ -24,6 +24,8 @@ public class Administration{
     public ObjectSet<String> dosBlacklist = new ObjectSet<>();
     public ObjectMap<String, Long> kickedIPs = new ObjectMap<>();
 
+
+    private boolean modified, loaded;
     /** All player info. Maps UUIDs to info. This persists throughout restarts. Do not access directly. */
     private ObjectMap<String, PlayerInfo> playerInfo = new ObjectMap<>();
 
@@ -48,8 +50,8 @@ public class Administration{
                     player.getInfo().messageInfractions = 0;
                 }
 
-                //prevent players from sending the same message twice in the span of 50 seconds
-                if(message.equals(player.getInfo().lastSentMessage) && Time.timeSinceMillis(player.getInfo().lastMessageTime) < 1000 * 50){
+                //prevent players from sending the same message twice in the span of 10 seconds
+                if(message.equals(player.getInfo().lastSentMessage) && Time.timeSinceMillis(player.getInfo().lastMessageTime) < 1000 * 10){
                     player.sendMessage("[scarlet]You may not send the same message twice.");
                     return null;
                 }
@@ -65,6 +67,7 @@ public class Administration{
         addActionFilter(action -> {
             if(action.type != ActionType.breakBlock &&
                 action.type != ActionType.placeBlock &&
+                action.type != ActionType.commandUnits &&
                 Config.antiSpam.bool()){
 
                 Ratekeeper rate = action.player.getInfo().rate;
@@ -447,16 +450,26 @@ public class Administration{
     }
 
     public void save(){
-        Core.settings.putJson("player-data", playerInfo);
-        Core.settings.putJson("ip-bans", String.class, bannedIPs);
-        Core.settings.putJson("whitelist-ids", String.class, whitelist);
-        Core.settings.putJson("banned-subnets", String.class, subnetBans);
+        modified = true;
+    }
+
+    public void forceSave(){
+        if(modified && loaded){
+            Core.settings.putJson("player-data", playerInfo);
+            Core.settings.putJson("ip-kicks", kickedIPs);
+            Core.settings.putJson("ip-bans", String.class, bannedIPs);
+            Core.settings.putJson("whitelist-ids", String.class, whitelist);
+            Core.settings.putJson("banned-subnets", String.class, subnetBans);
+            modified = false;
+        }
     }
 
     @SuppressWarnings("unchecked")
     private void load(){
+        loaded = true;
         //load default data
         playerInfo = Core.settings.getJson("player-data", ObjectMap.class, ObjectMap::new);
+        kickedIPs = Core.settings.getJson("ip-kicks", ObjectMap.class, ObjectMap::new);
         bannedIPs = Core.settings.getJson("ip-bans", Seq.class, Seq::new);
         whitelist = Core.settings.getJson("whitelist-ids", Seq.class, Seq::new);
         subnetBans = Core.settings.getJson("banned-subnets", Seq.class, Seq::new);
@@ -487,6 +500,7 @@ public class Administration{
         messageRateLimit = new Config("messageRateLimit", "Message rate limit in seconds. 0 to disable.", 0),
         messageSpamKick = new Config("messageSpamKick", "How many times a player must send a message before the cooldown to get kicked. 0 to disable.", 3),
         packetSpamLimit = new Config("packetSpamLimit", "Limit for packet count sent within 3sec that will lead to a blacklist + kick.", 300),
+        chatSpamLimit = new Config("chatSpamLimit", "Limit for chat packet count sent within 2sec that will lead to a blacklist + kick. Not the same as a rate limit.", 20),
         socketInput = new Config("socketInput", "Allows a local application to control this server through a local TCP socket.", false, "socket", () -> Events.fire(Trigger.socketConfigChanged)),
         socketInputPort = new Config("socketInputPort", "The port for socket input.", 6859, () -> Events.fire(Trigger.socketConfigChanged)),
         socketInputAddress = new Config("socketInputAddress", "The bind address for socket input.", "localhost", () -> Events.fire(Trigger.socketConfigChanged)),
@@ -647,6 +661,9 @@ public class Administration{
 
         /** valid only for command unit events */
         public @Nullable int[] unitIDs;
+
+        /** valid only for command building events */
+        public @Nullable int[] buildingPositions;
 
         public PlayerAction set(Player player, ActionType type, Tile tile){
             this.player = player;

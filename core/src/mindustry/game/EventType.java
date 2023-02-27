@@ -162,6 +162,16 @@ public class EventType{
         }
     }
 
+    public static class ClientServerConnectEvent{
+        public final String ip;
+        public final int port;
+
+        public ClientServerConnectEvent(String ip, int port){
+            this.ip = ip;
+            this.port = port;
+        }
+    }
+
     /** Consider using Menus.registerMenu instead. */
     public static class MenuOptionChooseEvent{
         public final Player player;

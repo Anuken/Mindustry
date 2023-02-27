@@ -23,6 +23,8 @@ jobs:
       run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
     - name: Add Arc release
       run: |
+        git config --global user.email "actions@github.com"
+        git config --global user.name "Github Actions"
         git clone --depth=1 --branch=master https://github.com/Anuken/Arc ../Arc
         cd ../Arc
         git tag ${RELEASE_VERSION}

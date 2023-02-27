@@ -137,6 +137,12 @@ public class CanvasBlock extends Block{
 
         @Override
         public void draw(){
+            if(!renderer.drawDisplays){
+                super.draw();
+
+                return;
+            }
+
             if(blending == 0){
                 super.draw();
             }

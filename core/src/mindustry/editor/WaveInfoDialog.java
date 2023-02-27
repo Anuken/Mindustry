@@ -141,7 +141,7 @@ public class WaveInfoDialog extends BaseDialog{
         });
 
         if(experimental){
-            buttons.button("Random", Icon.refresh, () -> {
+            buttons.button(Core.bundle.get("waves.random"), Icon.refresh, () -> {
                 groups.clear();
                 groups = Waves.generate(1f / 10f);
                 updateWaves();
