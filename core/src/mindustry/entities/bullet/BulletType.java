@@ -533,7 +533,7 @@ public class BulletType extends Content implements Cloneable{
 
     public void init(Bullet b){
 
-        if(killShooter && b.owner() instanceof Healthc h){
+        if(killShooter && b.owner() instanceof Healthc h && !h.dead()){
             h.kill();
         }
 
