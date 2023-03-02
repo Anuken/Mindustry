@@ -278,12 +278,15 @@ public class UI implements ApplicationListener, Loadable{
                 TextField field = cont.field(def, t -> {}).size(330f, 50f).get();
                 field.setFilter((f, c) -> field.getText().length() < textLength && filter.acceptChar(f, c));
                 buttons.defaults().size(120, 54).pad(4);
-                buttons.button("@cancel", this::hide);
+                buttons.button("@cancel", () -> {
+                    closed.run();
+                    hide();
+                });
                 buttons.button("@ok", () -> {
                     confirmed.get(field.getText());
                     hide();
                 }).disabled(b -> field.getText().isEmpty());
-                
+
                 keyDown(KeyCode.enter, () -> {
                     String text = field.getText();
                     if(!text.isEmpty()){
@@ -291,12 +294,10 @@ public class UI implements ApplicationListener, Loadable{
                         hide();
                     }
                 });
-                
-                hidden(closed);
+
                 closeOnBack(closed);
-                
                 show();
-                
+
                 Core.scene.setKeyboardFocus(field);
                 field.setCursorPosition(def.length());
             }};
