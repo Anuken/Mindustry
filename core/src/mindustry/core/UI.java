@@ -283,6 +283,7 @@ public class UI implements ApplicationListener, Loadable{
                     confirmed.get(field.getText());
                     hide();
                 }).disabled(b -> field.getText().isEmpty());
+                
                 keyDown(KeyCode.enter, () -> {
                     String text = field.getText();
                     if(!text.isEmpty()){
@@ -290,8 +291,12 @@ public class UI implements ApplicationListener, Loadable{
                         hide();
                     }
                 });
+                
+                hidden(closed);
                 closeOnBack(closed);
+                
                 show();
+                
                 Core.scene.setKeyboardFocus(field);
                 field.setCursorPosition(def.length());
             }};
