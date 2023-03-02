@@ -261,20 +261,20 @@ public class UI implements ApplicationListener, Loadable{
         });
     }
 
-    public void showTextInput(String titleText, String dtext, int textLength, String def, boolean inumeric, Cons<String> confirmed){
+    public void showTextInput(String titleText, String text, int textLength, String def, boolean numbers, Cons<String> confirmed, Runnable closed){
         if(mobile){
             Core.input.getTextInput(new TextInput(){{
                 this.title = (titleText.startsWith("@") ? Core.bundle.get(titleText.substring(1)) : titleText);
                 this.text = def;
-                this.numeric = inumeric;
+                this.numeric = numbers;
                 this.maxLength = textLength;
                 this.accepted = confirmed;
                 this.allowEmpty = false;
             }});
         }else{
             new Dialog(titleText){{
-                cont.margin(30).add(dtext).padRight(6f);
-                TextFieldFilter filter = inumeric ? TextFieldFilter.digitsOnly : (f, c) -> true;
+                cont.margin(30).add(text).padRight(6f);
+                TextFieldFilter filter = numbers ? TextFieldFilter.digitsOnly : (f, c) -> true;
                 TextField field = cont.field(def, t -> {}).size(330f, 50f).get();
                 field.setFilter((f, c) -> field.getText().length() < textLength && filter.acceptChar(f, c));
                 buttons.defaults().size(120, 54).pad(4);
@@ -290,8 +290,7 @@ public class UI implements ApplicationListener, Loadable{
                         hide();
                     }
                 });
-                keyDown(KeyCode.escape, this::hide);
-                keyDown(KeyCode.back, this::hide);
+                closeOnBack(closed);
                 show();
                 Core.scene.setKeyboardFocus(field);
                 field.setCursorPosition(def.length());
@@ -303,8 +302,12 @@ public class UI implements ApplicationListener, Loadable{
         showTextInput(title, text, 32, def, confirmed);
     }
 
-    public void showTextInput(String titleText, String text, int textLength, String def, Cons<String> confirmed){
-        showTextInput(titleText, text, textLength, def, false, confirmed);
+    public void showTextInput(String title, String text, int textLength, String def, Cons<String> confirmed){
+        showTextInput(title, text, textLength, def, false, confirmed);
+    }
+
+    public void showTextInput(String title, String text, int textLength, String def, boolean numeric, Cons<String> confirmed){
+        showTextInput(title, text, textLength, def, numeric, confirmed, () -> {});
     }
 
     public void showInfoFade(String info){
@@ -419,8 +422,6 @@ public class UI implements ApplicationListener, Loadable{
     }
 
     public void showException(String text, Throwable exc){
-        if(loadfrag == null) return;
-
         loadfrag.hide();
         new Dialog(""){{
             String message = Strings.getFinalMessage(exc);
@@ -566,14 +567,10 @@ public class UI implements ApplicationListener, Loadable{
 
     /** Shows a menu that fires a callback when an option is selected. If nothing is selected, -1 is returned. */
     public void showMenu(String title, String message, String[][] options, Intc callback){
-        new Dialog("[accent]" + title){{
+        new Dialog(title){{
             setFillParent(true);
             removeChild(titleTable);
             cont.add(titleTable).width(400f);
-
-            getStyle().titleFontColor = Color.white;
-            title.getStyle().fontColor = Color.white;
-            title.setStyle(title.getStyle());
 
             cont.row();
             cont.image().width(400f).pad(2).colspan(2).height(4f).color(Pal.accent).bottom();
