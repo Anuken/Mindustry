@@ -39,7 +39,7 @@ public class ForceProjector extends Block{
     public Effect absorbEffect = Fx.absorb;
     public Effect shieldBreakEffect = Fx.shieldBreak;
     public int sides = 6;
-    public float rotation = 0f;
+    public float polyRotation = 0f;
     public @Load("@-top") TextureRegion topRegion;
 
     //TODO json support
@@ -48,7 +48,7 @@ public class ForceProjector extends Block{
     protected static ForceBuild paramEntity;
     protected static Effect paramEffect;
     protected static final Cons<Bullet> shieldConsumer = bullet -> {
-        if(bullet.team != paramEntity.team && bullet.type.absorbable && Intersector.isInRegularPolygon(((ForceProjector)paramEntity.block).sides, paramEntity.x, paramEntity.y, paramEntity.realRadius(), ((ForceProjector)paramEntity.block).rotation, bullet.x, bullet.y)){
+        if(bullet.team != paramEntity.team && bullet.type.absorbable && Intersector.isInRegularPolygon(((ForceProjector)paramEntity.block).sides, paramEntity.x, paramEntity.y, paramEntity.realRadius(), ((ForceProjector)paramEntity.block).polyRotation, bullet.x, bullet.y)){
             bullet.absorb();
             paramEffect.at(bullet);
             paramEntity.hit = 1f;
@@ -111,10 +111,10 @@ public class ForceProjector extends Block{
 
         Draw.color(Pal.gray);
         Lines.stroke(3f);
-        Lines.poly(x * tilesize + offset, y * tilesize + offset, sides, radius, rotation);
+        Lines.poly(x * tilesize + offset, y * tilesize + offset, sides, radius, polyRotation);
         Draw.color(player.team().color);
         Lines.stroke(1f);
-        Lines.poly(x * tilesize + offset, y * tilesize + offset, sides, radius, rotation);
+        Lines.poly(x * tilesize + offset, y * tilesize + offset, sides, radius, polyRotation);
         Draw.color();
     }
 
@@ -248,13 +248,13 @@ public class ForceProjector extends Block{
                 Draw.color(team.color, Color.white, Mathf.clamp(hit));
 
                 if(renderer.animateShields){
-                    Fill.poly(x, y, sides, radius, rotation);
+                    Fill.poly(x, y, sides, radius, polyRotation);
                 }else{
                     Lines.stroke(1.5f);
                     Draw.alpha(0.09f + Mathf.clamp(0.08f * hit));
-                    Fill.poly(x, y, sides, radius, rotation);
+                    Fill.poly(x, y, sides, radius, polyRotation);
                     Draw.alpha(1f);
-                    Lines.poly(x, y, sides, radius, rotation);
+                    Lines.poly(x, y, sides, radius, polyRotation);
                     Draw.reset();
                 }
             }
