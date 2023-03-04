@@ -5,5 +5,5 @@ import mindustry.gen.*;
 
 @Component
 class OwnerComp{
-    Entityc owner;
+    Entityc owner, shooter;
 }
