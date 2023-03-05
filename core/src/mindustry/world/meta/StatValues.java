@@ -408,17 +408,39 @@ public class StatValues{
                     }
 
                     if(type.intervalBullet != null){
-                        sep(bt, Core.bundle.format("bullet.interval", Strings.autoFixed(type.intervalBullets / type.bulletInterval * 60, 2)));
                         bt.row();
+                        bt.table(it -> {
+                            it.left().defaults().left();
 
-                        ammo(ObjectMap.of(t, type.intervalBullet), indent + 1, false).display(bt);
+                            it.add(Core.bundle.format("bullet.interval", Strings.autoFixed(type.intervalBullets / type.bulletInterval * 60, 2)));
+
+                            Table ic = new Table();
+                            ammo(ObjectMap.of(t, type.intervalBullet), indent + 1, false).display(ic);
+                            Collapser coll = new Collapser(ic, true);
+                            coll.setDuration(0.1f);
+
+                            it.button(Icon.downOpen, Styles.emptyi, () -> coll.toggle(false)).update(i -> i.getStyle().imageUp = (!coll.isCollapsed() ? Icon.upOpen : Icon.downOpen)).size(8).padLeft(16f).expandX();
+                            it.row();
+                            it.add(coll).colspan(2);
+                        });
                     }
 
                     if(type.fragBullet != null){
-                        sep(bt, Core.bundle.format("bullet.frags", type.fragBullets));
                         bt.row();
+                        bt.table(ft -> {
+                            ft.left().defaults().left();
 
-                        ammo(ObjectMap.of(t, type.fragBullet), indent + 1, false).display(bt);
+                            ft.add(Core.bundle.format("bullet.frags", type.fragBullets));
+
+                            Table fc = new Table();
+                            ammo(ObjectMap.of(t, type.fragBullet), indent + 1, false).display(fc);
+                            Collapser coll = new Collapser(fc, true);
+                            coll.setDuration(0.1f);
+
+                            ft.button(Icon.downOpen, Styles.emptyi, () -> coll.toggle(false)).update(i -> i.getStyle().imageUp = (!coll.isCollapsed() ? Icon.upOpen : Icon.downOpen)).size(8).padLeft(16f).expandX();
+                            ft.row();
+                            ft.add(coll).colspan(2);
+                        });
                     }
                 }).padTop(compact ? 0 : -9).padLeft(indent * 8).left().get().background(compact ? null : Tex.underline);
 
