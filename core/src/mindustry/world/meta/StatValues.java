@@ -407,6 +407,13 @@ public class StatValues{
                         sep(bt, (type.status.minfo.mod == null ? type.status.emoji() : "") + "[stat]" + type.status.localizedName + (type.status.reactive ? "" : "[lightgray] ~ [stat]" + ((int)(type.statusDuration / 60f)) + "[lightgray] " + Core.bundle.get("unit.seconds")));
                     }
 
+                    if(type.intervalBullet != null){
+                        sep(bt, Core.bundle.format("bullet.interval", Strings.autoFixed(type.intervalBullets / type.bulletInterval * 60, 2)));
+                        bt.row();
+
+                        ammo(ObjectMap.of(t, type.intervalBullet), indent + 1, false).display(bt);
+                    }
+
                     if(type.fragBullet != null){
                         sep(bt, Core.bundle.format("bullet.frags", type.fragBullets));
                         bt.row();
