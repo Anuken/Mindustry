@@ -177,6 +177,8 @@ public class BulletType extends Content implements Cloneable{
     public float intervalSpread = 0f;
     /** Angle offset for interval bullets. */
     public float intervalAngle = 0f;
+    /** Use a negative value to disable interval bullet delay. */
+    public float intervalDelay = -1f;
 
     /** Color used for hit/despawn effects. */
     public Color hitColor = Color.white;
@@ -557,7 +559,7 @@ public class BulletType extends Content implements Cloneable{
     }
 
     public void updateBulletInterval(Bullet b){
-        if(intervalBullet != null && b.timer.get(2, bulletInterval)){
+        if(intervalBullet != null && b.time >= intervalDelay && b.timer.get(2, bulletInterval)){
             float ang = b.rotation();
             for(int i = 0; i < intervalBullets; i++){
                 intervalBullet.create(b, b.x, b.y, ang + Mathf.range(intervalRandomSpread) + intervalAngle + ((i - (intervalBullets - 1f)/2f) * intervalSpread));
