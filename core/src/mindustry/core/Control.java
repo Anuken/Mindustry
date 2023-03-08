@@ -193,7 +193,7 @@ public class Control implements ApplicationListener, Loadable{
             if(!settings.getBool("skipcoreanimation") && !state.rules.pvp){
                 coreDelay = coreLandDuration;
                 //delay player respawn so animation can play.
-                player.deathTimer = -80f;
+                player.deathTimer = Player.deathDelay - coreLandDuration;
                 //TODO this sounds pretty bad due to conflict
                 if(settings.getInt("musicvol") > 0){
                     Musics.land.stop();
