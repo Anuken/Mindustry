@@ -79,7 +79,11 @@ public class ContentParser{
         put(Interp.class, (type, data) -> field(Interp.class, data));
         put(Blending.class, (type, data) -> field(Blending.class, data));
         put(CacheLayer.class, (type, data) -> field(CacheLayer.class, data));
-        put(Attribute.class, (type, data) -> Attribute.get(data.asString()));
+        put(Attribute.class, (type, data) -> {
+            String attr = data.asString();
+            if(Attribute.exists(attr)) return Attribute.get(attr);
+            return Attribute.add(attr);
+        });
         put(BuildVisibility.class, (type, data) -> field(BuildVisibility.class, data));
         put(Schematic.class, (type, data) -> {
             Object result = fieldOpt(Loadouts.class, data);
