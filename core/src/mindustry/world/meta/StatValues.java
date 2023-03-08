@@ -339,7 +339,7 @@ public class StatValues{
                 }
 
                 table.table(bt -> {
-                    bt.left().defaults().padRight(3).left();
+                    bt.left().top().defaults().padRight(3).left();
 
                     if(type.damage > 0 && (type.collides || type.splashDamage <= 0)){
                         if(type.continuousDamage() > 0){
@@ -407,11 +407,40 @@ public class StatValues{
                         sep(bt, (type.status.minfo.mod == null ? type.status.emoji() : "") + "[stat]" + type.status.localizedName + (type.status.reactive ? "" : "[lightgray] ~ [stat]" + ((int)(type.statusDuration / 60f)) + "[lightgray] " + Core.bundle.get("unit.seconds")));
                     }
 
-                    if(type.fragBullet != null){
-                        sep(bt, Core.bundle.format("bullet.frags", type.fragBullets));
+                    if(type.intervalBullet != null){
                         bt.row();
 
-                        ammo(ObjectMap.of(t, type.fragBullet), indent + 1, false).display(bt);
+                        Table ic = new Table();
+                        ammo(ObjectMap.of(t, type.intervalBullet), indent + 1, false).display(ic);
+                        Collapser coll = new Collapser(ic, true);
+                        coll.setDuration(0.1f);
+
+                        bt.table(it -> {
+                            it.left().defaults().left();
+
+                            it.add(Core.bundle.format("bullet.interval", Strings.autoFixed(type.intervalBullets / type.bulletInterval * 60, 2)));
+                            it.button(Icon.downOpen, Styles.emptyi, () -> coll.toggle(false)).update(i -> i.getStyle().imageUp = (!coll.isCollapsed() ? Icon.upOpen : Icon.downOpen)).size(8).padLeft(16f).expandX();
+                        });
+                        bt.row();
+                        bt.add(coll);
+                    }
+
+                    if(type.fragBullet != null){
+                        bt.row();
+
+                        Table fc = new Table();
+                        ammo(ObjectMap.of(t, type.fragBullet), indent + 1, false).display(fc);
+                        Collapser coll = new Collapser(fc, true);
+                        coll.setDuration(0.1f);
+
+                        bt.table(ft -> {
+                            ft.left().defaults().left();
+
+                            ft.add(Core.bundle.format("bullet.frags", type.fragBullets));
+                            ft.button(Icon.downOpen, Styles.emptyi, () -> coll.toggle(false)).update(i -> i.getStyle().imageUp = (!coll.isCollapsed() ? Icon.upOpen : Icon.downOpen)).size(8).padLeft(16f).expandX();
+                        });
+                        bt.row();
+                        bt.add(coll);
                     }
                 }).padTop(compact ? 0 : -9).padLeft(indent * 8).left().get().background(compact ? null : Tex.underline);
 
