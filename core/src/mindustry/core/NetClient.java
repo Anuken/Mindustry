@@ -435,8 +435,9 @@ public class NetClient implements ApplicationListener{
             for(int j = 0; j < amount; j++){
                 readSyncEntity(input, Reads.get(input));
             }
-        }catch(IOException e){
-            throw new RuntimeException(e);
+        }catch(Exception e){
+            //don't disconnect, just log it
+            Log.err("Error reading entity snapshot", e);
         }
     }
 
