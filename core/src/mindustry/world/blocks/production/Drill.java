@@ -59,6 +59,9 @@ public class Drill extends Block{
     /** Chance the update effect will appear. */
     public float updateEffectChance = 0.02f;
 
+    /** Multipliers of drill speed for each item. Defaults to 1. */
+    public ObjectFloatMap<Item> drillMultipliers = new ObjectFloatMap<>();
+
     public boolean drawRim = false;
     public boolean drawSpinSprite = true;
     public Color heatColor = Color.valueOf("ff5512");
@@ -160,7 +163,7 @@ public class Drill extends Block{
     }
 
     public float getDrillTime(Item item){
-        return drillTime + hardnessDrillMultiplier * item.hardness;
+        return (drillTime + hardnessDrillMultiplier * item.hardness) / drillMultipliers.get(item, 1f);
     }
 
     @Override

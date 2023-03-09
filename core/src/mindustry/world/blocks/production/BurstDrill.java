@@ -31,9 +31,6 @@ public class BurstDrill extends Drill{
     public Sound drillSound = Sounds.drillImpact;
     public float drillSoundVolume = 0.6f, drillSoundPitchRand = 0.1f;
 
-    /** Multipliers of drill speed for each item. Defaults to 1. */
-    public ObjectFloatMap<Item> drillMultipliers = new ObjectFloatMap<>();
-
     public BurstDrill(String name){
         super(name);
 
