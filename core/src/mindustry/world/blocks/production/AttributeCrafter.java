@@ -39,9 +39,9 @@ public class AttributeCrafter extends GenericCrafter{
 
         addBar("efficiency", (AttributeCrafterBuild entity) ->
             new Bar(
-            () -> Core.bundle.format("bar.efficiency", (int)(entity.efficiencyMultiplier() * 100 * displayEfficiencyScale)),
+            () -> Core.bundle.format("bar.efficiency", (int)(entity.efficiencyScale() * 100 * displayEfficiencyScale)),
             () -> Pal.lightOrange,
-            entity::efficiencyMultiplier));
+            entity::efficiencyScale));
     }
 
     @Override
@@ -62,10 +62,11 @@ public class AttributeCrafter extends GenericCrafter{
 
         @Override
         public float getProgressIncrease(float base){
-            return super.getProgressIncrease(base) * efficiencyMultiplier();
+            return super.getProgressIncrease(base) * efficiencyScale();
         }
 
-        public float efficiencyMultiplier(){
+        @Override
+        public float efficiencyScale(){
             return baseEfficiency + Math.min(maxBoost, boostScale * attrsum) + attribute.env();
         }
 
