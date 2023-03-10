@@ -78,14 +78,13 @@ public class BlockIndexer{
             for(Tile tile : world.tiles){
                 process(tile);
 
-                var drop = tile.drop();
-
+                var drop = tile.itemDrop();
                 if(drop != null){
                     int qx = (tile.x / quadrantSize);
                     int qy = (tile.y / quadrantSize);
 
                     //add position of quadrant to list
-                    if(tile.block() == Blocks.air){
+                    if(tile.block() == Blocks.air || tile.wallDrop() != null){
                         if(ores[drop.id] == null){
                             ores[drop.id] = new IntSeq[quadWidth][quadHeight];
                         }
@@ -143,7 +142,7 @@ public class BlockIndexer{
     public void addIndex(Tile tile){
         process(tile);
 
-        var drop = tile.drop();
+        var drop = tile.itemDrop();
         if(drop != null && ores != null){
             int qx = tile.x / quadrantSize;
             int qy = tile.y / quadrantSize;
@@ -159,7 +158,7 @@ public class BlockIndexer{
             var seq = ores[drop.id][qx][qy];
 
             //when the drop can be mined, record the ore position
-            if(tile.block() == Blocks.air && !seq.contains(pos)){
+            if((tile.block() == Blocks.air || tile.wallDrop() != null) && !seq.contains(pos)){
                 seq.add(pos);
                 allOres.increment(drop);
             }else{
@@ -406,7 +405,7 @@ public class BlockIndexer{
     }
 
     /** Find the closest ore block relative to a position. */
-    public Tile findClosestOre(float xp, float yp, Item item){
+    public Tile findClosestOre(float xp, float yp, Item item, boolean floor, boolean wall){
         if(ores[item.id] != null){
             float minDst = 0f;
             Tile closest = null;
@@ -415,7 +414,7 @@ public class BlockIndexer{
                     var arr = ores[item.id][qx][qy];
                     if(arr != null && arr.size > 0){
                         Tile tile = world.tile(arr.first());
-                        if(tile.block() == Blocks.air){
+                        if((floor && tile.block() == Blocks.air) || (wall && tile.block() != Blocks.air)){
                             float dst = Mathf.dst2(xp, yp, tile.worldx(), tile.worldy());
                             if(closest == null || dst < minDst){
                                 closest = tile;
@@ -432,8 +431,13 @@ public class BlockIndexer{
     }
 
     /** Find the closest ore block relative to a position. */
+    public Tile findClosestOre(float xp, float yp, Item item){
+        return findClosestOre(xp, yp, item, true, true);
+    }
+
+    /** Find the closest ore block relative to a position. */
     public Tile findClosestOre(Unit unit, Item item){
-        return findClosestOre(unit.x, unit.y, item);
+        return findClosestOre(unit.x, unit.y, item, unit.type.mineFloor, unit.type.mineWalls);
     }
 
     private void process(Tile tile){

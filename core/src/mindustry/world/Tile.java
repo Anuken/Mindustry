@@ -530,6 +530,10 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         return state.teams.canInteract(team, team());
     }
 
+    public @Nullable Item itemDrop(){
+        return block != Blocks.air ? wallDrop() : drop();
+    }
+
     public @Nullable Item drop(){
         return overlay == Blocks.air || overlay.itemDrop == null ? floor.itemDrop : overlay.itemDrop;
     }
