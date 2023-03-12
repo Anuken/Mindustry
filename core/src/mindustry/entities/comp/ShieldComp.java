@@ -34,7 +34,7 @@ abstract class ShieldComp implements Healthc, Posc{
     public void damagePierce(float amount, boolean withEffect){
         float pre = hitTime;
 
-        rawDamage(amount);
+        rawDamage(amount / healthMultiplier);
 
         if(!withEffect){
             hitTime = pre;
