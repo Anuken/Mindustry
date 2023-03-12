@@ -41,7 +41,7 @@ abstract class ShieldComp implements Healthc, Posc{
         }
     }
 
-    private void rawDamage(float amount){
+    protected void rawDamage(float amount){
         boolean hadShields = shield > 0.0001f;
 
         if(hadShields){
