@@ -326,9 +326,9 @@ public class Drawf{
     }
 
     public static void dashCircle(float x, float y, float rad, Color color, float alpha){
-        Lines.stroke(3f, Tmp.c1.set(Pal.gray).a(alpha));
+        Lines.stroke(3f, Tmp.c1.set(Pal.gray).mulA(alpha));
         Lines.dashCircle(x, y, rad);
-        Lines.stroke(1f, Tmp.c1.set(color).a(alpha));
+        Lines.stroke(1f, Tmp.c1.set(color).mulA(alpha));
         Lines.dashCircle(x, y, rad);
         Draw.reset();
     }
@@ -378,9 +378,9 @@ public class Drawf{
     }
 
     public static void polygon(float x, float y, int sides, float radius, float rotation, Color color, float alpha){
-        Lines.stroke(3f, Tmp.c1.set(Pal.gray).a(alpha));
+        Lines.stroke(3f, Tmp.c1.set(Pal.gray).mulA(alpha));
         Lines.poly(x, y, sides, radius, rotation);
-        Lines.stroke(1f, Tmp.c1.set(color).a(alpha));
+        Lines.stroke(1f, Tmp.c1.set(color).mulA(alpha));
         Lines.poly(x, y, sides, radius, rotation);
         Draw.reset();
     }
