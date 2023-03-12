@@ -143,7 +143,7 @@ public class BulletType extends Content implements Cloneable{
     public boolean fragOnHit = true;
     /** If false, this bullet will not create fraags when absorbed by a shield. */
     public boolean fragOnAbsorb = true;
-    /** If true, unit armor is ignored in damage calculations. Ignored for building armor. */
+    /** If true, unit armor is ignored in damage calculations. */
     public boolean pierceArmor = false;
     /** Whether status and despawnHit should automatically be set. */
     public boolean setDefaults = true;
