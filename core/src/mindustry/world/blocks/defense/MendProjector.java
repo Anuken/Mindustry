@@ -25,6 +25,7 @@ public class MendProjector extends Block{
     public float healPercent = 12f;
     public float phaseBoost = 12f;
     public float phaseRangeBoost = 50f;
+    public boolean hasBoost = true;
     public float useTime = 400f;
 
     public MendProjector(String name){
@@ -53,8 +54,10 @@ public class MendProjector extends Block{
         stats.add(Stat.repairTime, (int)(100f / healPercent * reload / 60f), StatUnit.seconds);
         stats.add(Stat.range, range / tilesize, StatUnit.blocks);
 
-        stats.add(Stat.boostEffect, phaseRangeBoost / tilesize, StatUnit.blocks);
-        stats.add(Stat.boostEffect, (phaseBoost + healPercent) / healPercent, StatUnit.timesSpeed);
+        if(hasBoost){
+            stats.add(Stat.boostEffect, phaseRangeBoost / tilesize, StatUnit.blocks);
+            stats.add(Stat.boostEffect, (phaseBoost + healPercent) / healPercent, StatUnit.timesSpeed);
+        }
     }
 
     @Override
@@ -62,7 +65,7 @@ public class MendProjector extends Block{
         super.drawPlace(x, y, rotation, valid);
         float wx = x * tilesize + offset, wy = y * tilesize + offset;
 
-        if(boosterUnlocked()){
+        if(hasBoost){
             indexer.eachBlock(player.team(), wx, wy, range + phaseRangeBoost, other -> Mathf.dst(x * tilesize + offset, y * tilesize + offset, other.x, other.y) >= range, other -> Drawf.selected(other, Tmp.c1.set(phaseColor).a(Mathf.absin(4f, 1f) / 2f)));
 
             Drawf.dashCircle(wx, wy, range + phaseRangeBoost, phaseColor, 0.5f);
@@ -89,7 +92,9 @@ public class MendProjector extends Block{
             heat = Mathf.lerpDelta(heat, efficiency > 0 && canHeal ? 1f : 0f, 0.08f);
             charge += heat * delta();
 
-            phaseHeat = Mathf.lerpDelta(phaseHeat, optionalEfficiency, 0.1f);
+            if(hasBoost){
+                phaseHeat = Mathf.lerpDelta(phaseHeat, optionalEfficiency, 0.1f);
+            }
 
             if(optionalEfficiency > 0 && timer(timerUse, useTime) && canHeal){
                 consume();
@@ -117,7 +122,7 @@ public class MendProjector extends Block{
         public void drawSelect(){
             float realRange = range + phaseHeat * phaseRangeBoost;
 
-            if(phaseHeat <= 0.999f && boosterUnlocked()){
+            if(hasBoost && phaseHeat <= 0.999f){
                 float a = 0.5f - Mathf.curve(phaseHeat, 0.9f, 1f)  / 2f;
                 indexer.eachBlock(this, range + phaseRangeBoost, other -> dst(other) >= range, other -> Drawf.selected(other, Tmp.c1.set(phaseColor).a(Mathf.absin(4f, 1f) * a)));
 

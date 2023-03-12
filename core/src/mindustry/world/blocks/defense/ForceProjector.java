@@ -110,7 +110,7 @@ public class ForceProjector extends Block{
         super.drawPlace(x, y, rotation, valid);
         float wx = x * tilesize + offset, wy = y * tilesize + offset;
 
-        if(boosterUnlocked()) Drawf.hexagon(wx, wy, radius + phaseRadiusBoost, player.team().color, 0.5f);
+        if(itemConsumer != null) Drawf.hexagon(wx, wy, radius + phaseRadiusBoost, player.team().color, 0.5f);
 
         Drawf.hexagon(wx, wy, radius, player.team().color);
     }
@@ -263,7 +263,7 @@ public class ForceProjector extends Block{
         public void drawSelect(){
             super.drawSelect();
 
-            if(phaseHeat <= 0.999f && boosterUnlocked()) Drawf.hexagon(x, y, radius + phaseRadiusBoost, team.color, 0.5f - Mathf.curve(phaseHeat, 0.9f, 1f)  / 2f);
+            if(phaseHeat <= 0.999f && itemConsumer != null) Drawf.hexagon(x, y, radius + phaseRadiusBoost, team.color, 0.5f - Mathf.curve(phaseHeat, 0.9f, 1f)  / 2f);
 
             float r = radius * radscl;
             if(r <= radius * 0.999f) Drawf.hexagon(x, y, radius, team.color, 1f - Mathf.curve(r, radius * 0.9f, radius));
