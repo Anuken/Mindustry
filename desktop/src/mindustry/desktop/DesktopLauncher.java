@@ -41,12 +41,22 @@ public class DesktopLauncher extends ClientLauncher{
                 maximized = true;
                 width = 900;
                 height = 700;
-                //enable gl3 with command-line argument
-                if(Structs.contains(arg, "-gl3")){
-                    gl30 = true;
-                }
-                if(Structs.contains(arg, "-debug")){
-                    Log.level = LogLevel.debug;
+                for(int i = 0; i < arg.length; i++){
+                    if(arg[i].charAt(0) == '-'){
+                        String name = arg[i].substring(1);
+                        try{
+                            switch(name){
+                                case "width": width = Integer.parseInt(arg[i + 1]); break;
+                                case "height": height = Integer.parseInt(arg[i + 1]); break;
+                                case "gl3": gl30 = true; break;
+                                case "antialias": samples = 16; break;
+                                case "debug": Log.level = LogLevel.debug; break;
+                                case "maximized": maximized = Boolean.parseBoolean(arg[i + 1]); break;
+                            }
+                        }catch(NumberFormatException number){
+                            Log.warn("Invalid parameter number value.");
+                        }
+                    }
                 }
                 setWindowIcon(FileType.internal, "icons/icon_64.png");
             }});
@@ -141,6 +151,12 @@ public class DesktopLauncher extends ClientLauncher{
             @Override
             public void completeAchievement(String name){
                 SVars.stats.stats.setAchievement(name);
+                SVars.stats.stats.storeStats();
+            }
+
+            @Override
+            public void clearAchievement(String name){
+                SVars.stats.stats.clearAchievement(name);
                 SVars.stats.stats.storeStats();
             }
 
@@ -294,7 +310,7 @@ public class DesktopLauncher extends ClientLauncher{
             if(state.rules.waves){
                 gameMapWithWave += " | Wave " + state.wave;
             }
-            gameMode = state.rules.pvp ? "PvP" : state.rules.attackMode ? "Attack" : "Survival";
+            gameMode = state.rules.pvp ? "PvP" : state.rules.attackMode ? "Attack" : state.rules.infiniteResources ? "Sandbox" : "Survival";
             if(net.active() && Groups.player.size() > 1){
                 gamePlayersSuffix = " | " + Groups.player.size() + " Players";
             }
@@ -357,12 +373,5 @@ public class DesktopLauncher extends ClientLauncher{
 
     private static void message(String message){
         SDL.SDL_ShowSimpleMessageBox(SDL.SDL_MESSAGEBOX_ERROR, "oh no", message);
-    }
-
-    private boolean validAddress(byte[] bytes){
-        if(bytes == null) return false;
-        byte[] result = new byte[8];
-        System.arraycopy(bytes, 0, result, 0, bytes.length);
-        return !new String(Base64Coder.encode(result)).equals("AAAAAAAAAOA=") && !new String(Base64Coder.encode(result)).equals("AAAAAAAAAAA=");
     }
 }

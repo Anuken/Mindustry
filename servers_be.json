@@ -1,14 +1,27 @@
 [
   {
-    "address": "be.mindustry.nydus.app:6567"
+    "name": "Nydus",
+    "address": ["be.mindustry.nydus.app:6567", "be.mindustry.nydus.app:6568"]
   },
   {
-    "address": "46.105.36.238:7777"
+    "name": "mindustry.pl",
+    "address": ["130.61.190.181:6567", "130.61.190.181:7777", "0.baseduser.eu.org:7777", "0.baseduser.eu.org:42001"]
   },
   {
     "address": "v7.mindurka.tk:9999"
   },
   {
     "address": "c-n.ddns.net:6567"
+  },
+  {
+    "address": "n1.yeet.ml:6574"
+  },
+  {
+    "name": "Phoenix-Network",
+    "address": ["be.phoenix-network.dev"]
+  },
+  {
+    "name": "Darkdustry",
+    "address": ["darkdustry.tk"]
   }
 ]

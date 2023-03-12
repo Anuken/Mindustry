@@ -11,11 +11,12 @@ import static mindustry.Vars.*;
 
 /** Class for handling menus and notifications across the network. Unstable API! */
 public class Menus{
-    private static IntMap<MenuListener> menuListeners = new IntMap<>();
+    private static final Seq<MenuListener> menuListeners = new Seq<>();
 
     /** Register a *global* menu listener. If no option is chosen, the option is returned as -1. */
-    public static void registerMenu(int id, MenuListener listener){
-        menuListeners.put(id, listener);
+    public static int registerMenu(MenuListener listener){
+        menuListeners.add(listener);
+        return menuListeners.size - 1;
     }
 
     //do not invoke any of the methods below directly, use Call
@@ -30,9 +31,11 @@ public class Menus{
 
     @Remote(targets = Loc.both, called = Loc.both)
     public static void menuChoose(@Nullable Player player, int menuId, int option){
-        if(player != null && menuListeners.containsKey(menuId)){
+        if(player != null){
             Events.fire(new MenuOptionChooseEvent(player, menuId, option));
-            menuListeners.get(menuId).get(player, option);
+            if(menuId >= 0 && menuId < menuListeners.size){
+                menuListeners.get(menuId).get(player, option);
+            }
         }
     }
 
@@ -68,18 +71,30 @@ public class Menus{
         ui.showText("", message);
     }
 
-    @Remote(variants = Variant.both)
+    @Remote(variants = Variant.both, unreliable = true)
     public static void infoPopup(String message, float duration, int align, int top, int left, int bottom, int right){
         if(message == null) return;
 
         ui.showInfoPopup(message, duration, align, top, left, bottom, right);
     }
 
-    @Remote(variants = Variant.both)
+    @Remote(variants = Variant.both, unreliable = true)
     public static void label(String message, float duration, float worldx, float worldy){
         if(message == null) return;
 
         ui.showLabel(message, duration, worldx, worldy);
+    }
+
+    @Remote(variants = Variant.both)
+    public static void infoPopupReliable(String message, float duration, int align, int top, int left, int bottom, int right){
+        if(message == null) return;
+
+        ui.showInfoPopup(message, duration, align, top, left, bottom, right);
+    }
+
+    @Remote(variants = Variant.both)
+    public static void labelReliable(String message, float duration, float worldx, float worldy){
+        label(message, duration, worldx, worldy);
     }
 
     @Remote(variants = Variant.both)
@@ -94,6 +109,22 @@ public class Menus{
         if(text == null || Fonts.icon.getData().getGlyph((char)unicode) == null) return;
 
         ui.hudfrag.showToast(Fonts.getGlyph(Fonts.icon, (char)unicode), text);
+    }
+
+    @Remote(variants = Variant.both)
+    public static void openURI(String uri){
+        if(uri == null) return;
+
+        ui.showConfirm(Core.bundle.format("linkopen", uri), () -> Core.app.openURI(uri));
+    }
+
+    //internal use only
+    @Remote
+    public static void removeWorldLabel(int id){
+        var label = Groups.label.getByID(id);
+        if(label != null){
+            label.remove();
+        }
     }
 
     public interface MenuListener{

@@ -12,48 +12,56 @@ import java.util.*;
 import static mindustry.Vars.*;
 
 public class LanguageDialog extends BaseDialog{
-    private Locale lastLocale;
-    private ObjectMap<String, String> displayNames = ObjectMap.of(
-        "in_ID", "Bahasa Indonesia (Indonesia)",
-        "da", "Dansk",
-        "de", "Deutsch",
-        "et", "Eesti",
-        "en", "English",
-        "es", "Español",
-        "eu", "Euskara",
-        "fil", "Filipino",
-        "fr", "Français",
-        "it", "Italiano",
-        "lt", "Lietuvių",
-        "hu", "Magyar",
-        "nl", "Nederlands",
-        "nl_BE", "Nederlands (België)",
-        "pl", "Polski",
-        "pt_BR", "Português (Brasil)",
-        "pt_PT", "Português (Portugal)",
-        "ro", "Română",
-        "fi", "Suomi",
-        "sv", "Svenska",
-        "vi", "Tiếng Việt",
-        "tk", "Türkmen dili",
-        "tr", "Türkçe",
-        "cs", "Čeština",
-        "be", "Беларуская",
-        "bg", "Български",
-        "ru", "Русский",
-        "uk_UA", "Українська (Україна)",
-        "th", "ไทย",
-        "zh_CN", "简体中文",
-        "zh_TW", "正體中文",
-        "ja", "日本語",
-        "ko", "한국어",
-        "router", "router"
+    public static final ObjectMap<String, String> displayNames = ObjectMap.of(
+    "ca", "Català",
+    "id_ID", "Bahasa Indonesia",
+    "da", "Dansk",
+    "de", "Deutsch",
+    "et", "Eesti",
+    "en", "English",
+    "es", "Español",
+    "eu", "Euskara",
+    "fil", "Filipino",
+    "fr", "Français",
+    "it", "Italiano",
+    "lt", "Lietuvių",
+    "hu", "Magyar",
+    "nl", "Nederlands",
+    "nl_BE", "Nederlands (België)",
+    "pl", "Polski",
+    "pt_BR", "Português (Brasil)",
+    "pt_PT", "Português (Portugal)",
+    "ro", "Română",
+    "fi", "Suomi",
+    "sv", "Svenska",
+    "vi", "Tiếng Việt",
+    "tk", "Türkmen dili",
+    "tr", "Türkçe",
+    "cs", "Čeština",
+    "be", "Беларуская",
+    "bg", "Български",
+    "ru", "Русский",
+    "sr", "Српски",
+    "uk_UA", "Українська",
+    "th", "ไทย",
+    "zh_CN", "简体中文",
+    "zh_TW", "正體中文",
+    "ja", "日本語",
+    "ko", "한국어",
+    "router", "router"
     );
+
+    private Locale lastLocale;
 
     public LanguageDialog(){
         super("@settings.language");
         addCloseButton();
         setup();
+    }
+
+    public static String getDisplayName(Locale locale){
+        String str = locale.toString().replace("in_ID", "id_ID");
+        return displayNames.get(str, str);
     }
 
     private void setup(){
@@ -65,7 +73,7 @@ public class LanguageDialog extends BaseDialog{
         ButtonGroup<TextButton> group = new ButtonGroup<>();
 
         for(Locale loc : locales){
-            TextButton button = new TextButton(displayNames.get(loc.toString(), loc.getDisplayName(Locale.ROOT)), Styles.clearTogglet);
+            TextButton button = new TextButton(getDisplayName(loc), Styles.flatTogglet);
             button.clicked(() -> {
                 if(getLocale().equals(loc)) return;
                 Core.settings.put("locale", loc.toString());

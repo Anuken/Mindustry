@@ -9,6 +9,7 @@ public class ShieldRegenFieldAbility extends Ability{
     public float amount = 1, max = 100f, reload = 100, range = 60;
     public Effect applyEffect = Fx.shieldApply;
     public Effect activeEffect = Fx.shieldWave;
+    public boolean parentizeEffects;
 
     protected float timer;
     protected boolean applied = false;
@@ -31,9 +32,9 @@ public class ShieldRegenFieldAbility extends Ability{
 
             Units.nearby(unit.team, unit.x, unit.y, range, other -> {
                 if(other.shield < max){
-                    other.shield = Math.max(other.shield + amount, max);
+                    other.shield = Math.min(other.shield + amount, max);
                     other.shieldAlpha = 1f; //TODO may not be necessary
-                    applyEffect.at(unit.x, unit.y, unit.team.color);
+                    applyEffect.at(unit.x, unit.y, 0f, unit.team.color, parentizeEffects ? other : null);
                     applied = true;
                 }
             });

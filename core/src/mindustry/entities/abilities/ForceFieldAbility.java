@@ -1,6 +1,5 @@
 package mindustry.entities.abilities;
 
-import arc.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -8,6 +7,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -22,6 +22,10 @@ public class ForceFieldAbility extends Ability{
     public float max = 200f;
     /** Cooldown after the shield is broken, in ticks. */
     public float cooldown = 60f * 5;
+    /** Sides of shield polygon. */
+    public int sides = 6;
+    /** Rotation of shield. */
+    public float rotation = 0f;
 
     /** State. */
     protected float radiusScale, alpha;
@@ -30,7 +34,7 @@ public class ForceFieldAbility extends Ability{
     private static Unit paramUnit;
     private static ForceFieldAbility paramField;
     private static final Cons<Bullet> shieldConsumer = trait -> {
-        if(trait.team != paramUnit.team && trait.type.absorbable && Intersector.isInsideHexagon(paramUnit.x, paramUnit.y, realRad * 2f, trait.x(), trait.y()) && paramUnit.shield > 0){
+        if(trait.team != paramUnit.team && trait.type.absorbable && Intersector.isInRegularPolygon(paramField.sides, paramUnit.x, paramUnit.y, realRad, paramField.rotation, trait.x(), trait.y()) && paramUnit.shield > 0){
             trait.absorb();
             Fx.absorb.at(trait);
 
@@ -38,7 +42,7 @@ public class ForceFieldAbility extends Ability{
             if(paramUnit.shield <= trait.damage()){
                 paramUnit.shield -= paramField.cooldown * paramField.regen;
 
-                Fx.shieldBreak.at(paramUnit.x, paramUnit.y, paramField.radius, paramUnit.team.color);
+                Fx.shieldBreak.at(paramUnit.x, paramUnit.y, paramField.radius, paramUnit.team.color, paramUnit);
             }
 
             paramUnit.shield -= trait.damage();
@@ -51,6 +55,15 @@ public class ForceFieldAbility extends Ability{
         this.regen = regen;
         this.max = max;
         this.cooldown = cooldown;
+    }
+
+    public ForceFieldAbility(float radius, float regen, float max, float cooldown, int sides, float rotation){
+        this.radius = radius;
+        this.regen = regen;
+        this.max = max;
+        this.cooldown = cooldown;
+        this.sides = sides;
+        this.rotation = rotation;
     }
 
     ForceFieldAbility(){}
@@ -80,18 +93,18 @@ public class ForceFieldAbility extends Ability{
         checkRadius(unit);
 
         if(unit.shield > 0){
-            Draw.z(Layer.shields);
-
             Draw.color(unit.team.color, Color.white, Mathf.clamp(alpha));
 
-            if(Core.settings.getBool("animatedshields")){
-                Fill.poly(unit.x, unit.y, 6, realRad);
+            if(Vars.renderer.animateShields){
+                Draw.z(Layer.shields + 0.001f * alpha);
+                Fill.poly(unit.x, unit.y, sides, realRad, rotation);
             }else{
+                Draw.z(Layer.shields);
                 Lines.stroke(1.5f);
                 Draw.alpha(0.09f);
-                Fill.poly(unit.x, unit.y, 6, radius);
+                Fill.poly(unit.x, unit.y, sides, radius, rotation);
                 Draw.alpha(1f);
-                Lines.poly(unit.x, unit.y, 6, radius);
+                Lines.poly(unit.x, unit.y, sides, radius, rotation);
             }
         }
     }

@@ -10,6 +10,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.meta.*;
 
+import static arc.Core.*;
 import static mindustry.Vars.*;
 
 public class ContentInfoDialog extends BaseDialog{
@@ -31,7 +32,7 @@ public class ContentInfoDialog extends BaseDialog{
 
         table.table(title1 -> {
             title1.image(content.uiIcon).size(iconXLarge).scaling(Scaling.fit);
-            title1.add("[accent]" + content.localizedName).padLeft(5);
+            title1.add("[accent]" + content.localizedName + (settings.getBool("console") ? "\n[gray]" + content.name : "")).padLeft(5);
         });
 
         table.row();
@@ -61,7 +62,7 @@ public class ContentInfoDialog extends BaseDialog{
             if(map.size == 0) continue;
 
             if(stats.useCategories){
-                table.add("@category." + cat.name()).color(Pal.accent).fillX();
+                table.add("@category." + cat.name).color(Pal.accent).fillX();
                 table.row();
             }
 
@@ -84,6 +85,8 @@ public class ContentInfoDialog extends BaseDialog{
             table.add("[gray]" + (content.unlocked() || !content.hideDetails ? content.details : Iconc.lock + " " + Core.bundle.get("unlock.incampaign"))).pad(6).padTop(20).width(400f).wrap().fillX();
             table.row();
         }
+
+        content.displayExtra(table);
 
         ScrollPane pane = new ScrollPane(table);
         cont.add(pane);

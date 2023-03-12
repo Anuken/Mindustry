@@ -6,7 +6,7 @@ import mindustry.*;
 import mindustry.mod.Mods.*;
 
 /** Base class for a content type that is loaded in {@link mindustry.core.ContentLoader}. */
-public abstract class Content implements Comparable<Content>, Disposable{
+public abstract class Content implements Comparable<Content>{
     public short id;
     /** Info on which mod this content was loaded from. */
     public ModContentInfo minfo = new ModContentInfo();
@@ -31,7 +31,7 @@ public abstract class Content implements Comparable<Content>, Disposable{
      */
     public void load(){}
 
-    /** Called right after load(). */
+    /** Called right before load(). */
     public void loadIcon(){}
 
     /** @return whether an error occurred during mod loading. */
@@ -39,9 +39,9 @@ public abstract class Content implements Comparable<Content>, Disposable{
         return minfo.error != null;
     }
 
-    @Override
-    public void dispose(){
-        //does nothing by default
+    /** @return whether this is content from the base game. */
+    public boolean isVanilla(){
+        return minfo.mod == null;
     }
 
     @Override

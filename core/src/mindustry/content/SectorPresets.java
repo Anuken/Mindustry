@@ -1,19 +1,21 @@
 package mindustry.content;
 
-import mindustry.ctype.*;
 import mindustry.type.*;
 
 import static mindustry.content.Planets.*;
 
-public class SectorPresets implements ContentList{
+public class SectorPresets{
     public static SectorPreset
     groundZero,
     craters, biomassFacility, frozenForest, ruinousShores, windsweptIslands, stainedMountains, tarFields,
     fungalPass, extractionOutpost, saltFlats, overgrowth,
-    impact0078, desolateRift, nuclearComplex, planetaryTerminal;
+    impact0078, desolateRift, nuclearComplex, planetaryTerminal,
+    coastline, navalFortress,
 
-    @Override
-    public void load(){
+    onset, aegis, lake, intersect, basin, atlas, split, marsh, peaks, ravine, caldera,
+    stronghold, crevice, siege, crossroads, karst, origin;
+
+    public static void load(){
         //region serpulo
 
         groundZero = new SectorPreset("groundZero", serpulo, 15){{
@@ -21,12 +23,13 @@ public class SectorPresets implements ContentList{
             addStartingItems = true;
             captureWave = 10;
             difficulty = 1;
+            overrideLaunchDefaults = true;
+            noLighting = true;
             startWaveTimeMultiplier = 3f;
         }};
 
         saltFlats = new SectorPreset("saltFlats", serpulo, 101){{
             difficulty = 5;
-            useAI = false;
         }};
 
         frozenForest = new SectorPreset("frozenForest", serpulo, 86){{
@@ -61,17 +64,23 @@ public class SectorPresets implements ContentList{
 
         extractionOutpost = new SectorPreset("extractionOutpost", serpulo, 165){{
             difficulty = 5;
-            useAI = false;
+        }};
+
+        coastline = new SectorPreset("coastline", serpulo, 108){{
+            captureWave = 30;
+            difficulty = 5;
+        }};
+
+        navalFortress = new SectorPreset("navalFortress", serpulo, 216){{
+            difficulty = 9;
         }};
 
         fungalPass = new SectorPreset("fungalPass", serpulo, 21){{
             difficulty = 4;
-            useAI = false;
         }};
 
         overgrowth = new SectorPreset("overgrowth", serpulo, 134){{
             difficulty = 5;
-            useAI = false;
         }};
 
         tarFields = new SectorPreset("tarFields", serpulo, 23){{
@@ -96,6 +105,86 @@ public class SectorPresets implements ContentList{
 
         planetaryTerminal = new SectorPreset("planetaryTerminal", serpulo, 93){{
             difficulty = 10;
+            isLastSector = true;
+        }};
+
+        //endregion
+        //region erekir
+
+        onset = new SectorPreset("onset", erekir, 10){{
+            addStartingItems = true;
+            alwaysUnlocked = true;
+            difficulty = 1;
+        }};
+
+        aegis = new SectorPreset("aegis", erekir, 88){{
+            difficulty = 3;
+        }};
+
+        lake = new SectorPreset("lake", erekir, 41){{
+            difficulty = 4;
+        }};
+
+        intersect = new SectorPreset("intersect", erekir, 36){{
+            difficulty = 5;
+            captureWave = 9;
+            attackAfterWaves = true;
+        }};
+
+        atlas = new SectorPreset("atlas", erekir, 14){{ //TODO random sector, pick a better one
+            difficulty = 5;
+        }};
+
+        split = new SectorPreset("split", erekir, 19){{ //TODO random sector, pick a better one
+            difficulty = 2;
+        }};
+
+        basin = new SectorPreset("basin", erekir, 29){{
+            difficulty = 6;
+        }};
+
+        marsh = new SectorPreset("marsh", erekir, 25){{
+            difficulty = 4;
+        }};
+
+        peaks = new SectorPreset("peaks", erekir, 30){{
+            difficulty = 3;
+        }};
+
+        ravine = new SectorPreset("ravine", erekir, 39){{
+            difficulty = 4;
+            captureWave = 24;
+        }};
+
+        caldera = new SectorPreset("caldera-erekir", erekir, 43){{
+            difficulty = 4;
+        }};
+
+        stronghold = new SectorPreset("stronghold", erekir, 18){{
+            difficulty = 7;
+        }};
+
+        crevice = new SectorPreset("crevice", erekir, 3){{
+            difficulty = 6;
+            captureWave = 46;
+        }};
+
+        siege = new SectorPreset("siege", erekir, 58){{
+            difficulty = 8;
+        }};
+
+        crossroads = new SectorPreset("crossroads", erekir, 37){{
+            difficulty = 7;
+        }};
+
+        karst = new SectorPreset("karst", erekir, 5){{
+            difficulty = 9;
+            captureWave = 10;
+        }};
+
+        origin = new SectorPreset("origin", erekir, 12){{
+            difficulty = 10;
+            isLastSector = true;
         }};
 
         //endregion

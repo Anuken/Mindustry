@@ -1,0 +1,51 @@
+Taretlerinize cephane göndermek için ayrıntılı yol zincirleri oluşturun, yapı yapmak için materyaller üretin, ve yapılarınızı dalgalar halinde gelen düşmanlardan koruyun. Cross-platform çok oyunculu oyunlarda arkadaşlarınızla oynayın, ya da takım-bazlı PvP maçlarında onlara meydan okuyun.
+
+<h2>Oynanış Özellikleri</h2>
+ 
+- Geniş kapsamlı materyaller oluşturmak için üretim bloklarını kullanın
+- Yapılarınızı dalgalar halindeki düşmanlardan koruyun
+- Cross-platform çok oyunculu oyunlarda arkadaşlarınızla oynayın, ya da takım-bazlı PvP maçlarında onlara meydan okuyun	
+- Sıvıları yönetin ve ortaya çıkan zorluklarla mücadele edin, ateş kaçakları ya da düşman uçak baskınları gibi
+- İsteğe bağlı soğutucu ve yağlayıcı sağlayarak üretimden en iyi şekilde yararlanın
+- Üssünüzün otomatik kontrolü veya düşman üslerine saldırı için geniş çaplı birimler üretin
+
+
+<h2>Mücadele</h2>
+
+- Serpulo gezegenini 250'den fazla rastgele oluşmuş ve 16 elle-yapılmış sektörü kontrol ederek ele geçirin
+- Diğer sektörlerde oynarken kaynak üretmek için arazi ele geçirin ve fabrikalar kurun
+- Ardarda gelen saldırılardan üssünüzü koruyun
+- Kalkış-rampaları aracılığıyla sektörler arasında kaynak dağıtımını koordine edin
+- Daha da yol katetmek için blok araştırın
+- Görevleri beraber tamamlamak için arkadaşlarınızı davet edin
+- 130+ teknoloji bloğu
+- 33 farklı drone, robot, ve gemi
+
+<h2>Oyun modları</h2>
+
+- <b>Hayatta Kalma</b>: Kule-savunma temelli oynanışta düşmanlara karşı savunmak için taretler kurun. Mümkün olduğunca uzun süre hayatta kalın, isteğe bağlı araştırmalar için toplanan kaynaklarınızı kullanmak üzere çekirdeğiniz ile kalkış gerçekleştirerek. Üssünüzü aralıklı hava saldırıları için hazırlayın.
+- <b>Saldırı</b>: Düşman çekirdeklerini yok etmek için birim fabrikaları üretin ve aynı zamanda üssünüzü düşman dalgalarından savunun. Hedefinizde size yoldaş olmaları için çeşitli saldırgan ve dost birimler üretin. İsteğe bağlı savunma yapıları üreten yapay zekayı aktifleştirip farklı bir zorluk deneyin.
+- <b>PvP</b>: 4'e kadar farklı takım içerisinde diğer oyuncuların çekirdeklerini yok etmeye çalışın. Birimler üretin, ya da diğer üslere kendiniz saldırın.
+- <b>Sandbox</b>: Düşman tehlikesi olmadan sonsuz kaynaklarla oynayın. Tasarımları denemek için sandbox-özel eşya ve sıvı kaynak bloklarını kullanın, ve isteğe bağlı düşman çağırın.
+
+
+<h2>Özel Oyunlar &amp; Cross-Platform Çok Oyunculu</h2>
+
+- Mücadele'ye ek olarak özel oyunlar için 16 harita daha
+- Co-op, PvP ya da Sandbox oynayın.
+- Herkese açık bir sunucuya katılın, ya da kendi özel oyununuza arkadaşlarınızı davet edin.
+- Özelleştirilebilir oyun kuralları: Blok değerlerini, düşman özelliklerini, başlangıç eşyalarını, dalga zamanlamasını ve daha fazlasını özelleştirin
+- Karışık oyun modları: PvP ve PvE oyun modlarını bir araya getirin
+
+
+<h2>Özel Harita Düzenleyicisi</h2>
+
+- Bir düzenleyici kullanıcı arayüzü ile kendi arazinizi çizin
+- Oyun içinde yapılarınızı önizleyin
+- Ayarlanabilir araçlar: Her aracın çalışışını değiştirin
+- Güçlü oluşum sistemi, arazinin prosedürel manipülasyonu için birçok farklı filtre türü ile
+- Haritalarınıza ses, bozulma, yumuşatma, erozyon, simetri, maden üretimi ve rastgele arazi ekleyin
+- Cevher oluşumunun yanı sıra nehir ve kaynakların yerleştirilmesini rastgele hale getirin ve yapılandırın
+- Düşman dalgalarını özelleştirin
+- Temel harita kurallarını özelleştirin
+- 80'den fazla blok

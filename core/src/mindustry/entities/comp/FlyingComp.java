@@ -8,6 +8,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
+import mindustry.type.*;
 import mindustry.world.blocks.environment.*;
 
 import static mindustry.Vars.*;
@@ -16,14 +17,16 @@ import static mindustry.Vars.*;
 abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
     private static final Vec2 tmp1 = new Vec2(), tmp2 = new Vec2();
 
-    @Import float x, y, speedMultiplier;
+    @Import float x, y, speedMultiplier, hitSize;
     @Import Vec2 vel;
+    @Import UnitType type;
 
     @SyncLocal float elevation;
     private transient boolean wasFlying;
     transient boolean hovering;
     transient float drownTime;
     transient float splashTimer;
+    transient @Nullable Floor lastDrownFloor;
 
     boolean checkTarget(boolean targetAir, boolean targetGround){
         return (isGrounded() && targetGround) || (isFlying() && targetAir);
@@ -39,6 +42,10 @@ abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
 
     boolean canDrown(){
         return isGrounded() && !hovering;
+    }
+
+    @Nullable Floor drownFloor(){
+        return canDrown() ? floorOn() : null;
     }
 
     boolean emitWalkSound(){
@@ -90,20 +97,27 @@ abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
             }
         }
 
-        if(canDrown() && floor.isLiquid && floor.drownTime > 0){
-            drownTime += Time.delta / floor.drownTime;
-            drownTime = Mathf.clamp(drownTime);
+        updateDrowning();
+    }
+
+    public void updateDrowning(){
+        Floor floor = drownFloor();
+
+        if(floor != null && floor.isLiquid && floor.drownTime > 0){
+            lastDrownFloor = floor;
+            drownTime += Time.delta / floor.drownTime / type.drownTimeMultiplier;
             if(Mathf.chanceDelta(0.05f)){
-                floor.drownUpdateEffect.at(x, y, 1f, floor.mapColor);
+                floor.drownUpdateEffect.at(x, y, hitSize, floor.mapColor);
             }
 
-            //TODO is the netClient check necessary?
             if(drownTime >= 0.999f && !net.client()){
                 kill();
                 Events.fire(new UnitDrownEvent(self()));
             }
         }else{
-            drownTime = Mathf.lerpDelta(drownTime, 0f, 0.03f);
+            drownTime -= Time.delta / 50f;
         }
+
+        drownTime = Mathf.clamp(drownTime);
     }
 }

@@ -141,11 +141,12 @@ public class IOSLauncher extends IOSApplication.Delegate{
             public void shareFile(Fi file){
                 try{
                     Log.info("Attempting to share file " + file);
-                    Fi to = Core.files.absolute(getDocumentsDirectory()).child(file.name());
-                    file.copyTo(to);
+                    List<Object> list = new ArrayList<>();
 
-                    NSURL url = new NSURL(to.file());
-                    UIActivityViewController p = new UIActivityViewController(Collections.singletonList(url), null);
+                    //better choice?
+                    list.add(new NSURL(file.file()));
+
+                    UIActivityViewController p = new UIActivityViewController(list, null);
                     UIViewController rootVc = UIApplication.getSharedApplication().getKeyWindow().getRootViewController();
                     if(UIDevice.getCurrentDevice().getUserInterfaceIdiom() == UIUserInterfaceIdiom.Pad){
                         // Set up the pop-over for iPad
@@ -156,7 +157,7 @@ public class IOSLauncher extends IOSApplication.Delegate{
                         pop.setSourceRect(targetRect);
                         pop.setPermittedArrowDirections(UIPopoverArrowDirection.None);
                     }
-                    rootVc.presentViewController(p, true, () -> Log.info("Success! Presented @", to));
+                    rootVc.presentViewController(p, true, () -> Log.info("Success! Presented @", file));
                 }catch(Throwable t){
                     ui.showException(t);
                 }
@@ -217,8 +218,8 @@ public class IOSLauncher extends IOSApplication.Delegate{
 
             if(file.extension().equalsIgnoreCase(saveExtension)){ //open save
 
-                if(SaveIO.isSaveValid(file)){
-                    try{
+                try{
+                    if(SaveIO.isSaveValid(file)){
                         SaveMeta meta = SaveIO.getMeta(new DataInputStream(new InflaterInputStream(file.read(Streams.defaultBufferSize))));
                         if(meta.tags.containsKey("name")){
                             //is map
@@ -231,13 +232,12 @@ public class IOSLauncher extends IOSApplication.Delegate{
                             SaveSlot slot = control.saves.importSave(file);
                             ui.load.runLoadSave(slot);
                         }
-                    }catch(IOException e){
-                        ui.showException("@save.import.fail", e);
+                    }else{
+                        ui.showErrorMessage("@save.import.invalid");
                     }
-                }else{
-                    ui.showErrorMessage("@save.import.invalid");
+                }catch(Throwable e){
+                    ui.showException("@save.import.fail", e);
                 }
-
             }
         }));
     }

@@ -82,10 +82,12 @@ public class Universe{
             }
         }
 
-        if(state.hasSector()){
+        if(state.hasSector() && state.getSector().planet.updateLighting){
+            boolean disable = state.getSector().preset != null && state.getSector().preset.noLighting;
+            var planet = state.getSector().planet;
             //update sector light
             float light = state.getSector().getLight();
-            float alpha = Mathf.clamp(Mathf.map(light, 0f, 0.8f, 0.3f, 1f));
+            float alpha = disable ? 1f : Mathf.clamp(Mathf.map(light, planet.lightSrcFrom, planet.lightSrcTo, planet.lightDstFrom, planet.lightDstTo));
 
             //assign and map so darkness is not 100% dark
             state.rules.ambientLight.a = 1f - alpha;
@@ -119,7 +121,7 @@ public class Universe{
     }
 
     public Schematic getLastLoadout(){
-        if(lastLoadout == null) lastLoadout = Loadouts.basicShard;
+        if(lastLoadout == null) lastLoadout = state.rules.sector == null || state.rules.sector.planet.generator == null ? Loadouts.basicShard : state.rules.sector.planet.generator.defaultLoadout;
         return lastLoadout;
     }
 
@@ -144,9 +146,15 @@ public class Universe{
         turn++;
 
         int newSecondsPassed = (int)(turnDuration / 60);
+        Planet current = state.getPlanet();
 
         //update relevant sectors
         for(Planet planet : content.planets()){
+
+            //planets with different wave simulation status are not updated
+            if(current != null && current.allowWaveSimulation != planet.allowWaveSimulation){
+                continue;
+            }
 
             //first pass: clear import stats
             for(Sector sector : planet.sectors){
@@ -162,7 +170,7 @@ public class Universe{
                     //export to another sector
                     if(sector.info.destination != null){
                         Sector to = sector.info.destination;
-                        if(to.hasBase()){
+                        if(to.hasBase() && to.planet == planet){
                             ItemSeq items = new ItemSeq();
                             //calculated exported items to this sector
                             sector.info.export.each((item, stat) -> items.add(item, (int)(stat.mean * newSecondsPassed * sector.getProductionScale())));
@@ -193,7 +201,7 @@ public class Universe{
                         }
 
                         int wavesPassed = (int)(sector.info.secondsPassed*60f / sector.info.waveSpacing);
-                        boolean attacked = sector.info.waves;
+                        boolean attacked = sector.info.waves && sector.planet.allowWaveSimulation;
 
                         if(attacked){
                             sector.info.wavesPassed = wavesPassed;
@@ -217,10 +225,11 @@ public class Universe{
                         }else if(attacked && wavesPassed > 0 && sector.info.winWave > 1 && sector.info.wave + wavesPassed >= sector.info.winWave && !sector.hasEnemyBase()){
                             //autocapture the sector
                             sector.info.waves = false;
+                            boolean was = sector.info.wasCaptured;
                             sector.info.wasCaptured = true;
 
                             //fire the event
-                            Events.fire(new SectorCaptureEvent(sector));
+                            Events.fire(new SectorCaptureEvent(sector, !was));
                         }
 
                         float scl = sector.getProductionScale();
@@ -242,7 +251,7 @@ public class Universe{
                     }
 
                     //queue random invasions
-                    if(!sector.isAttacked() && sector.info.minutesCaptured > invasionGracePeriod && sector.info.hasSpawns){
+                    if(!sector.isAttacked() && sector.planet.allowSectorInvasion && sector.info.minutesCaptured > invasionGracePeriod && sector.info.hasSpawns){
                         int count = sector.near().count(Sector::hasEnemyBase);
 
                         //invasion chance depends on # of nearby bases
@@ -275,21 +284,6 @@ public class Universe{
         Events.fire(new TurnEvent());
 
         save();
-    }
-
-    /** This method is expensive to call; only do so sparingly. */
-    public ItemSeq getGlobalResources(){
-        ItemSeq count = new ItemSeq();
-
-        for(Planet planet : content.planets()){
-            for(Sector sector : planet.sectors){
-                if(sector.hasSave()){
-                    count.add(sector.items());
-                }
-            }
-        }
-
-        return count;
     }
 
     public void updateNetSeconds(int value){

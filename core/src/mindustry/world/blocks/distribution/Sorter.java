@@ -1,10 +1,12 @@
 package mindustry.world.blocks.distribution;
 
+import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -15,25 +17,28 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class Sorter extends Block{
+    public @Load(value = "@-cross", fallback = "cross-full") TextureRegion cross;
     public boolean invert;
 
     public Sorter(String name){
         super(name);
-        update = true;
-        solid = true;
+        update = false;
+        destructible = true;
+        underBullets = true;
         instantTransfer = true;
         group = BlockGroup.transportation;
         configurable = true;
         unloadable = false;
         saveConfig = true;
+        clearOnDoubleTap = true;
 
         config(Item.class, (SorterBuild tile, Item item) -> tile.sortItem = item);
         configClear((SorterBuild tile) -> tile.sortItem = null);
     }
 
     @Override
-    public void drawRequestConfig(BuildPlan req, Eachable<BuildPlan> list){
-        drawRequestConfigCenter(req, req.config, "center", true);
+    public void drawPlanConfig(BuildPlan plan, Eachable<BuildPlan> list){
+        drawPlanConfigCenter(plan, plan.config, "center", true);
     }
 
     @Override
@@ -45,6 +50,11 @@ public class Sorter extends Block{
     public int minimapColor(Tile tile){
         var build = (SorterBuild)tile.build;
         return build == null || build.sortItem == null ? 0 : build.sortItem.color.rgba();
+    }
+
+    @Override
+    protected TextureRegion[] icons(){
+        return new TextureRegion[]{Core.atlas.find("source-bottom"), region};
     }
 
     public class SorterBuild extends Building{
@@ -61,15 +71,16 @@ public class Sorter extends Block{
 
         @Override
         public void draw(){
-            super.draw();
 
             if(sortItem == null){
-                Draw.rect("cross", x, y);
+                Draw.rect(cross, x, y);
             }else{
                 Draw.color(sortItem.color);
-                Draw.rect("center", x, y);
+                Fill.square(x, y, tilesize/2f - 0.00001f);
                 Draw.color();
             }
+
+            super.draw();
         }
 
         @Override
@@ -114,13 +125,8 @@ public class Sorter extends Block{
                 }else if(!bc){
                     return null;
                 }else{
-                    if(rotation == 0){
-                        to = a;
-                        if(flip) this.rotation = (byte)1;
-                    }else{
-                        to = b;
-                        if(flip) this.rotation = (byte)0;
-                    }
+                    to = (rotation & (1 << dir)) == 0 ? a : b;
+                    if(flip) rotation ^= (1 << dir);
                 }
             }
 
@@ -129,18 +135,7 @@ public class Sorter extends Block{
 
         @Override
         public void buildConfiguration(Table table){
-            ItemSelection.buildTable(table, content.items(), () -> sortItem, this::configure);
-        }
-
-        @Override
-        public boolean onConfigureTileTapped(Building other){
-            if(this == other){
-                deselect();
-                configure(null);
-                return false;
-            }
-
-            return true;
+            ItemSelection.buildTable(Sorter.this, table, content.items(), () -> sortItem, this::configure, selectionRows, selectionColumns);
         }
 
         @Override

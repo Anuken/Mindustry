@@ -2,15 +2,18 @@ package mindustry.world.blocks.storage;
 
 import arc.*;
 import arc.func.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.*;
+import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -28,10 +31,13 @@ import static mindustry.Vars.*;
 public class CoreBlock extends StorageBlock{
     //hacky way to pass item modules between methods
     private static ItemModule nextItems;
+    protected static final float[] thrusterSizes = {0f, 0f, 0f, 0f, 0.3f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 0f};
 
     public @Load(value = "@-thruster1", fallback = "clear-effect") TextureRegion thruster1; //top right
     public @Load(value = "@-thruster2", fallback = "clear-effect") TextureRegion thruster2; //bot left
     public float thrusterLength = 14f/4f;
+    public boolean isFirstTier;
+    public boolean incinerateNonBuildable = false;
 
     public UnitType unitType = UnitTypes.alpha;
 
@@ -50,12 +56,12 @@ public class CoreBlock extends StorageBlock{
         loopSoundVolume = 1f;
         drawDisabled = false;
         canOverdrive = false;
+        envEnabled |= Env.space;
 
         //support everything
-        envEnabled = Env.any;
-        drawDisabled = false;
         replaceable = false;
-        rebuildable = false;
+        //TODO should AI ever rebuild this?
+        //rebuildable = false;
     }
 
     @Remote(called = Loc.server)
@@ -63,7 +69,9 @@ public class CoreBlock extends StorageBlock{
         if(player == null || tile == null || !(tile.build instanceof CoreBuild entity)) return;
 
         CoreBlock block = (CoreBlock)tile.block();
-        Fx.spawn.at(entity);
+        if(entity.wasVisible){
+            Fx.spawn.at(entity);
+        }
 
         player.set(entity);
 
@@ -93,10 +101,10 @@ public class CoreBlock extends StorageBlock{
     public void setBars(){
         super.setBars();
 
-        bars.add("capacity", (CoreBuild e) -> new Bar(
+        addBar("capacity", (CoreBuild e) -> new Bar(
             () -> Core.bundle.format("bar.capacity", UI.formatAmount(e.storageCapacity)),
             () -> Pal.items,
-            () -> e.items.total() / ((float)e.storageCapacity * content.items().count(i -> i.unlockedNow()))
+            () -> e.items.total() / ((float)e.storageCapacity * content.items().count(UnlockableContent::unlockedNow))
         ));
     }
 
@@ -104,6 +112,7 @@ public class CoreBlock extends StorageBlock{
     public void init(){
         //assign to update clipSize internally
         lightRadius = 30f + 20f * size;
+        fogRadius = Math.max(fogRadius, (int)(lightRadius / 8f * 3f) + 13);
         emitLight = true;
 
         super.init();
@@ -111,21 +120,32 @@ public class CoreBlock extends StorageBlock{
 
     @Override
     public boolean canBreak(Tile tile){
-        return false;
+        return state.isEditor();
     }
 
     @Override
     public boolean canReplace(Block other){
         //coreblocks can upgrade smaller cores
-        return super.canReplace(other) || (other instanceof CoreBlock && size > other.size);
+        return super.canReplace(other) || (other instanceof CoreBlock && size >= other.size && other != this);
     }
 
     @Override
-    public boolean canPlaceOn(Tile tile, Team team){
+    public boolean canPlaceOn(Tile tile, Team team, int rotation){
         if(tile == null) return false;
+        //in the editor, you can place them anywhere for convenience
+        if(state.isEditor()) return true;
+
         CoreBuild core = team.core();
+
+        //special floor upon which cores can be placed
+        tile.getLinkedTilesAs(this, tempTiles);
+        if(!tempTiles.contains(o -> !o.floor().allowCorePlacement || o.block() instanceof CoreBlock)){
+            return true;
+        }
+
         //must have all requirements
         if(core == null || (!state.rules.infiniteResources && !core.items.has(requirements, state.rules.buildCostMultiplier))) return false;
+
         return tile.block() instanceof CoreBlock && size > tile.block().size;
     }
 
@@ -134,8 +154,9 @@ public class CoreBlock extends StorageBlock{
         //finish placement immediately when a block is replaced.
         if(previous instanceof CoreBlock){
             tile.setBlock(this, tile.team());
-            Fx.placeBlock.at(tile, tile.block().size);
-            Fx.upgradeCore.at(tile, tile.block().size);
+            tile.block().placeEffect.at(tile, tile.block().size);
+            Fx.upgradeCore.at(tile.drawx(), tile.drawy(), 0f, tile.block());
+            Fx.upgradeCoreBloom.at(tile, tile.block().size);
 
             //set up the correct items
             if(nextItems != null){
@@ -166,14 +187,106 @@ public class CoreBlock extends StorageBlock{
     public void drawPlace(int x, int y, int rotation, boolean valid){
         if(world.tile(x, y) == null) return;
 
-        if(!canPlaceOn(world.tile(x, y), player.team())){
+        if(!canPlaceOn(world.tile(x, y), player.team(), rotation)){
 
             drawPlaceText(Core.bundle.get(
-                (player.team().core() != null && player.team().core().items.has(requirements, state.rules.buildCostMultiplier)) || state.rules.infiniteResources ?
-                "bar.corereq" :
-                "bar.noresources"
+                isFirstTier ?
+                    //TODO better message
+                    "bar.corefloor" :
+                    (player.team().core() != null && player.team().core().items.has(requirements, state.rules.buildCostMultiplier)) || state.rules.infiniteResources ?
+                    "bar.corereq" :
+                    "bar.noresources"
             ), x, y, valid);
         }
+    }
+
+    public void drawLanding(CoreBuild build, float x, float y){
+        float fout = renderer.getLandTime() / coreLandDuration;
+
+        if(renderer.isLaunching()) fout = 1f - fout;
+
+        float fin = 1f - fout;
+
+        float scl = Scl.scl(4f) / renderer.getDisplayScale();
+        float shake = 0f;
+        float s = region.width * region.scl() * scl * 3.6f * Interp.pow2Out.apply(fout);
+        float rotation = Interp.pow2In.apply(fout) * 135f;
+        x += Mathf.range(shake);
+        y += Mathf.range(shake);
+        float thrustOpen = 0.25f;
+        float thrusterFrame = fin >= thrustOpen ? 1f : fin / thrustOpen;
+        float thrusterSize = Mathf.sample(thrusterSizes, fin);
+
+        //when launching, thrusters stay out the entire time.
+        if(renderer.isLaunching()){
+            Interp i = Interp.pow2Out;
+            thrusterFrame = i.apply(Mathf.clamp(fout*13f));
+            thrusterSize = i.apply(Mathf.clamp(fout*9f));
+        }
+
+        Draw.color(Pal.lightTrail);
+        //TODO spikier heat
+        Draw.rect("circle-shadow", x, y, s, s);
+
+        Draw.scl(scl);
+
+        //draw thruster flame
+        float strength = (1f + (size - 3)/2.5f) * scl * thrusterSize * (0.95f + Mathf.absin(2f, 0.1f));
+        float offset = (size - 3) * 3f * scl;
+
+        for(int i = 0; i < 4; i++){
+            Tmp.v1.trns(i * 90 + rotation, 1f);
+
+            Tmp.v1.setLength((size * tilesize/2f + 1f)*scl + strength*2f + offset);
+            Draw.color(build.team.color);
+            Fill.circle(Tmp.v1.x + x, Tmp.v1.y + y, 6f * strength);
+
+            Tmp.v1.setLength((size * tilesize/2f + 1f)*scl + strength*0.5f + offset);
+            Draw.color(Color.white);
+            Fill.circle(Tmp.v1.x + x, Tmp.v1.y + y, 3.5f * strength);
+        }
+
+        drawLandingThrusters(x, y, rotation, thrusterFrame);
+
+        Drawf.spinSprite(region, x, y, rotation);
+
+        Draw.alpha(Interp.pow4In.apply(thrusterFrame));
+        drawLandingThrusters(x, y, rotation, thrusterFrame);
+        Draw.alpha(1f);
+
+        if(teamRegions[build.team.id] == teamRegion) Draw.color(build.team.color);
+
+        Drawf.spinSprite(teamRegions[build.team.id], x, y, rotation);
+
+        Draw.color();
+        Draw.scl();
+        Draw.reset();
+    }
+
+    protected void drawLandingThrusters(float x, float y, float rotation, float frame){
+        float length = thrusterLength * (frame - 1f) - 1f/4f;
+        float alpha = Draw.getColor().a;
+
+        //two passes for consistent lighting
+        for(int j = 0; j < 2; j++){
+            for(int i = 0; i < 4; i++){
+                var reg = i >= 2 ? thruster2 : thruster1;
+                float rot = (i * 90) + rotation % 90f;
+                Tmp.v1.trns(rot, length * Draw.xscl);
+
+                //second pass applies extra layer of shading
+                if(j == 1){
+                    Tmp.v1.rotate(-90f);
+                    Draw.alpha((rotation % 90f) / 90f * alpha);
+                    rot -= 90f;
+                    Draw.rect(reg, x + Tmp.v1.x, y + Tmp.v1.y, rot);
+                }else{
+                    Draw.alpha(alpha);
+                    Draw.rect(reg, x + Tmp.v1.x, y + Tmp.v1.y, rot);
+                }
+            }
+        }
+        Draw.alpha(1f);
     }
 
     public class CoreBuild extends Building{
@@ -242,12 +355,15 @@ public class CoreBlock extends StorageBlock{
         }
 
         @Override
-        public boolean canControlSelect(Player player){
-            return true;
+        public boolean canControlSelect(Unit player){
+            return player.isPlayer();
         }
 
         @Override
-        public void onControlSelect(Player player){
+        public void onControlSelect(Unit unit){
+            if(!unit.isPlayer()) return;
+            Player player = unit.getPlayer();
+
             Fx.spawn.at(player);
             if(net.client() && player == Vars.player){
                 control.input.controlledType = null;
@@ -260,7 +376,7 @@ public class CoreBlock extends StorageBlock{
 
         public void requestSpawn(Player player){
             //do not try to respawn in unsupported environments at all
-            if(!unitType.supportsEnv(state.rules.environment)) return;
+            if(!unitType.supportsEnv(state.rules.env)) return;
 
             Call.playerSpawn(tile, player);
         }
@@ -269,6 +385,22 @@ public class CoreBlock extends StorageBlock{
         public void updateTile(){
             iframes -= Time.delta;
             thrusterTime -= Time.delta/90f;
+        }
+
+        public void updateLandParticles(){
+            float time = renderer.isLaunching() ? coreLandDuration - renderer.getLandTime() : renderer.getLandTime();
+            float tsize = Mathf.sample(thrusterSizes, (time + 35f) / coreLandDuration);
+
+            renderer.setLandPTimer(renderer.getLandPTimer() + tsize * Time.delta);
+            if(renderer.getLandTime() >= 1f){
+                tile.getLinkedTiles(t -> {
+                    if(Mathf.chance(0.4f)){
+                        Fx.coreLandDust.at(t.worldx(), t.worldy(), angleTo(t.worldx(), t.worldy()) + Mathf.range(30f), Tmp.c1.set(t.floor().mapColor).mul(1.5f + Mathf.range(0.15f)));
+                    }
+                });
+
+                renderer.setLandPTimer(0f);
+            }
         }
 
         @Override
@@ -288,7 +420,7 @@ public class CoreBlock extends StorageBlock{
             }
 
             //add a spawn to the map for future reference - waves should be disabled, so it shouldn't matter
-            if(state.isCampaign() && team == state.rules.waveTeam && team.cores().size <= 1){
+            if(state.isCampaign() && team == state.rules.waveTeam && team.cores().size <= 1 && state.rules.sector.planet.enemyCoreSpawnReplace){
                 //do not recache
                 tile.setOverlayQuiet(Blocks.spawn);
 
@@ -320,7 +452,7 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public void drawLight(){
-            Drawf.light(team, x, y, lightRadius, Pal.accent, 0.65f + Mathf.absin(20f, 0.1f));
+            Drawf.light(x, y, lightRadius, Pal.accent, 0.65f + Mathf.absin(20f, 0.1f));
         }
 
         @Override
@@ -330,7 +462,7 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public int getMaximumAccepted(Item item){
-            return state.rules.coreIncinerates ? storageCapacity * 2 : storageCapacity;
+            return state.rules.coreIncinerates ? storageCapacity * 20 : storageCapacity;
         }
 
         @Override
@@ -345,7 +477,7 @@ public class CoreBlock extends StorageBlock{
             state.teams.registerCore(this);
 
             storageCapacity = itemCapacity + proximity().sum(e -> owns(e) ? e.block.itemCapacity : 0);
-            proximity.each(e -> owns(e), t -> {
+            proximity.each(this::owns, t -> {
                 t.items = items;
                 ((StorageBuild)t).linkedCore = this;
             });
@@ -369,13 +501,16 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public void handleStack(Item item, int amount, Teamc source){
-            int realAmount = Math.min(amount, storageCapacity - items.get(item));
+            boolean incinerate = incinerateNonBuildable && !item.buildable;
+            int realAmount = incinerate ? 0 : Math.min(amount, storageCapacity - items.get(item));
             super.handleStack(item, realAmount, source);
 
             if(team == state.rules.defaultTeam && state.isCampaign()){
-                state.rules.sector.info.handleCoreItem(item, amount);
+                if(!incinerate){
+                    state.rules.sector.info.handleCoreItem(item, amount);
+                }
 
-                if(realAmount == 0){
+                if(realAmount == 0 && wasVisible){
                     Fx.coreBurn.at(x, y);
                 }
             }
@@ -394,6 +529,9 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public void drawSelect(){
+            //do not draw a pointless single outline when there's no storage
+            if(team.cores().size <= 1 && !proximity.contains(storage -> storage.items == items)) return;
+
             Lines.stroke(1f, Pal.accent);
             Cons<Building> outline = b -> {
                 for(int i = 0; i < 4; i++){
@@ -414,15 +552,15 @@ public class CoreBlock extends StorageBlock{
         }
 
         public boolean owns(Building core, Building tile){
-            return tile instanceof StorageBuild b && (b.linkedCore == core || b.linkedCore == null);
+            return tile instanceof StorageBuild b && ((StorageBlock)b.block).coreMerge && (b.linkedCore == core || b.linkedCore == null);
         }
 
         @Override
-        public float handleDamage(float amount){
+        public void damage(float amount){
             if(player != null && team == player.team()){
                 Events.fire(Trigger.teamCoreDamage);
             }
-            return amount;
+            super.damage(amount);
         }
 
         @Override
@@ -467,12 +605,18 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public void handleItem(Building source, Item item){
+            boolean incinerate = incinerateNonBuildable && !item.buildable;
+
+            if(team == state.rules.defaultTeam){
+                state.stats.coreItemCount.increment(item);
+            }
+
             if(net.server() || !net.active()){
-                if(team == state.rules.defaultTeam && state.isCampaign()){
+                if(team == state.rules.defaultTeam && state.isCampaign() && !incinerate){
                     state.rules.sector.info.handleCoreItem(item, 1);
                 }
 
-                if(items.get(item) >= storageCapacity){
+                if(items.get(item) >= storageCapacity || incinerate){
                     //create item incineration effect at random intervals
                     if(!noEffect){
                         incinerateEffect(this, source);
@@ -481,7 +625,7 @@ public class CoreBlock extends StorageBlock{
                 }else{
                     super.handleItem(source, item);
                 }
-            }else if(state.rules.coreIncinerates && items.get(item) >= storageCapacity && !noEffect){
+            }else if(((state.rules.coreIncinerates && items.get(item) >= storageCapacity) || incinerate) && !noEffect){
                 //create item incineration effect at random intervals
                 incinerateEffect(this, source);
                 noEffect = false;

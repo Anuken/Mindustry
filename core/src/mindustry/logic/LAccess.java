@@ -36,12 +36,12 @@ public enum LAccess{
     mineX,
     mineY,
     mining,
+    speed,
     team,
     type,
     flag,
     controlled,
     controller,
-    commanded,
     name,
     payloadCount,
     payloadType,
@@ -51,7 +51,7 @@ public enum LAccess{
     shoot("x", "y", "shoot"),
     shootp(true, "unit", "shoot"),
     config(true, "to"),
-    color("r", "g", "b");
+    color("to");
 
     public final String[] params;
     public final boolean isObj;
@@ -59,7 +59,8 @@ public enum LAccess{
     public static final LAccess[]
         all = values(),
         senseable = Seq.select(all, t -> t.params.length <= 1).toArray(LAccess.class),
-        controls = Seq.select(all, t -> t.params.length > 0).toArray(LAccess.class);
+        controls = Seq.select(all, t -> t.params.length > 0).toArray(LAccess.class),
+        settable = {x, y, rotation, team, flag, health, totalPower, payloadType}; //TODO
 
     LAccess(String... params){
         this.params = params;

@@ -57,7 +57,7 @@ public class LoadoutDialog extends BaseDialog{
         }).size(210f, 64f);
     }
 
-    public void maxItems() {
+    public void maxItems(){
         for(ItemStack stack : stacks){
             stack.amount = total == null ? capacity : Math.max(Math.min(capacity, total.get(stack.item)), 0);
         }
@@ -89,17 +89,17 @@ public class LoadoutDialog extends BaseDialog{
         for(ItemStack stack : stacks){
             items.table(Tex.pane, t -> {
                 t.margin(4).marginRight(8).left();
-                t.button("-", Styles.cleart, () -> {
+                t.button("-", Styles.flatt, () -> {
                     stack.amount = Math.max(stack.amount - step(stack.amount), 0);
                     updater.run();
                 }).size(bsize);
 
-                t.button("+", Styles.cleart, () -> {
+                t.button("+", Styles.flatt, () -> {
                     stack.amount = Math.min(stack.amount + step(stack.amount), capacity);
                     updater.run();
                 }).size(bsize);
 
-                t.button(Icon.pencil, Styles.cleari, () -> ui.showTextInput("@configure", stack.item.localizedName, 10, stack.amount + "", true, str -> {
+                t.button(Icon.pencil, Styles.flati, () -> ui.showTextInput("@configure", stack.item.localizedName, 10, stack.amount + "", true, str -> {
                     if(Strings.canParsePositiveInt(str)){
                         int amount = Strings.parseInt(str);
                         if(amount >= 0 && amount <= capacity){
@@ -124,7 +124,7 @@ public class LoadoutDialog extends BaseDialog{
 
     private void reseed(){
         this.stacks = originalStacks.map(ItemStack::copy);
-        this.stacks.addAll(content.items().select(i -> validator.get(i) && !stacks.contains(stack -> stack.item == i)).map(i -> new ItemStack(i, 0)));
+        this.stacks.addAll(content.items().select(i -> validator.get(i) && !i.isHidden() && !stacks.contains(stack -> stack.item == i)).map(i -> new ItemStack(i, 0)));
         this.stacks.sort(Structs.comparingInt(s -> s.item.id));
     }
 

@@ -9,6 +9,7 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.core.*;
+import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -35,6 +36,7 @@ public class ItemBridge extends Block{
     public boolean pulse = false;
     public float arrowSpacing = 4f, arrowOffset = 2f, arrowPeriod = 0.4f;
     public float arrowTimeScl = 6.2f;
+    public float bridgeWidth = 6.5f;
 
     //for autolink
     public @Nullable ItemBridgeBuild lastBuild;
@@ -43,6 +45,7 @@ public class ItemBridge extends Block{
         super(name);
         update = true;
         solid = true;
+        underBullets = true;
         hasPower = true;
         itemCapacity = 10;
         configurable = true;
@@ -53,6 +56,7 @@ public class ItemBridge extends Block{
         copyConfig = false;
         //disabled as to not be annoying
         allowConfigInventory = false;
+        priority = TargetPriority.transport;
 
         //point2 config is relative
         config(Point2.class, (ItemBridgeBuild tile, Point2 i) -> tile.link = Point2.pack(i.x + tile.tileX(), i.y + tile.tileY()));
@@ -61,16 +65,16 @@ public class ItemBridge extends Block{
     }
 
     @Override
-    public void drawRequestConfigTop(BuildPlan req, Eachable<BuildPlan> list){
+    public void drawPlanConfigTop(BuildPlan plan, Eachable<BuildPlan> list){
         otherReq = null;
         list.each(other -> {
-            if(other.block == this && req != other && req.config instanceof Point2 p && p.equals(other.x - req.x, other.y - req.y)){
+            if(other.block == this && plan != other && plan.config instanceof Point2 p && p.equals(other.x - plan.x, other.y - plan.y)){
                 otherReq = other;
             }
         });
 
         if(otherReq != null){
-            drawBridge(req, otherReq.drawx(), otherReq.drawy(), 0);
+            drawBridge(plan, otherReq.drawx(), otherReq.drawy(), 0);
         }
     }
 
@@ -78,7 +82,7 @@ public class ItemBridge extends Block{
         if(Mathf.zero(Renderer.bridgeOpacity)) return;
         Draw.alpha(Renderer.bridgeOpacity);
 
-        Lines.stroke(8f);
+        Lines.stroke(bridgeWidth);
 
         Tmp.v1.set(ox, oy).sub(req.drawx(), req.drawy()).setLength(tilesize/2f);
 
@@ -157,7 +161,7 @@ public class ItemBridge extends Block{
     @Override
     public void init(){
         super.init();
-        clipSize = Math.max(clipSize, (range + 0.5f) * tilesize * 2);
+        updateClipRadius((range + 0.5f) * tilesize);
     }
 
     @Override
@@ -183,6 +187,11 @@ public class ItemBridge extends Block{
         public float time = -8f, timeSpeed;
         public boolean wasMoved, moved;
         public float transportCounter;
+
+        @Override
+        public void pickedUp(){
+            link = -1;
+        }
 
         @Override
         public void playerPlaced(Object config){
@@ -258,7 +267,7 @@ public class ItemBridge extends Block{
         }
 
         @Override
-        public boolean onConfigureTileTapped(Building other){
+        public boolean onConfigureBuildTapped(Building other){
             //reverse connection
             if(other instanceof ItemBridgeBuild b && b.link == pos()){
                 configure(other.pos());
@@ -315,7 +324,7 @@ public class ItemBridge extends Block{
                     inc.add(pos);
                 }
 
-                warmup = Mathf.approachDelta(warmup, efficiency(), 1f / 30f);
+                warmup = Mathf.approachDelta(warmup, efficiency, 1f / 30f);
                 updateTransport(other.build);
             }
         }
@@ -364,7 +373,7 @@ public class ItemBridge extends Block{
             Draw.rect(endRegion, x, y, i * 90 + 90);
             Draw.rect(endRegion, other.drawx(), other.drawy(), i * 90 + 270);
 
-            Lines.stroke(8f);
+            Lines.stroke(bridgeWidth);
 
             Tmp.v1.set(x, y).sub(other.worldx(), other.worldy()).setLength(tilesize/2f).scl(-1f);
 
@@ -410,7 +419,7 @@ public class ItemBridge extends Block{
         }
 
         protected boolean checkAccept(Building source, Tile other){
-            if(linked(source)) return true;
+            if(tile == null || linked(source)) return true;
 
             if(linkValid(tile, other)){
                 int rel = relativeTo(other);

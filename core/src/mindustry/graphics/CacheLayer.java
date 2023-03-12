@@ -3,6 +3,7 @@ package mindustry.graphics;
 import arc.*;
 import arc.graphics.*;
 import arc.graphics.gl.*;
+import arc.math.*;
 import arc.util.*;
 
 import static mindustry.Vars.*;
@@ -10,7 +11,8 @@ import static mindustry.Vars.*;
 public class CacheLayer{
     public static CacheLayer
 
-    water, mud, tar, slag, space, normal, walls;
+    water, mud, cryofluid, tar, slag, arkycite,
+    space, normal, walls;
 
     public static CacheLayer[] all = {};
 
@@ -30,6 +32,19 @@ public class CacheLayer{
         }
     }
 
+    /** Adds a cache layer at a certain position. All layers >= this index are shifted upwards.*/
+    public static void add(int index, CacheLayer layer){
+        index = Mathf.clamp(index, 0, all.length - 1);
+
+        var prev = all;
+        all = new CacheLayer[all.length + 1];
+
+        System.arraycopy(prev, 0, all, 0, index);
+        System.arraycopy(prev, index, all, index + 1, prev.length - index);
+
+        all[index] = layer;
+    }
+
     /** Loads default cache layers. */
     public static void init(){
         add(
@@ -37,6 +52,8 @@ public class CacheLayer{
             mud = new ShaderLayer(Shaders.mud),
             tar = new ShaderLayer(Shaders.tar),
             slag = new ShaderLayer(Shaders.slag),
+            arkycite = new ShaderLayer(Shaders.arkycite),
+            cryofluid = new ShaderLayer(Shaders.cryofluid),
             space = new ShaderLayer(Shaders.space),
             normal = new CacheLayer(),
             walls = new CacheLayer()

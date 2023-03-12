@@ -130,12 +130,18 @@ public class SectorInfo{
         //enable attack mode when there's a core.
         if(state.rules.waveTeam.core() != null){
             attack = true;
-            winWave = 0;
+            if(!state.rules.sector.planet.allowWaves){
+                winWave = 0;
+            }
         }
 
         //if there are infinite waves and no win wave, add a win wave.
-        if(winWave <= 0 && !attack){
+        if(winWave <= 0 && !attack && state.rules.sector.planet.allowWaves){
             winWave = 30;
+        }
+
+        if(state.rules.sector != null && state.rules.sector.preset != null && state.rules.sector.preset.captureWave > 0 && !state.rules.sector.planet.allowWaves){
+            winWave = state.rules.sector.preset.captureWave;
         }
 
         state.wave = wave;
@@ -193,10 +199,10 @@ public class SectorInfo{
             stat.mean = Math.min(stat.mean, rawProduction.get(item, ExportStat::new).mean);
         });
 
-        var pads = indexer.getAllied(state.rules.defaultTeam, BlockFlag.launchPad);
+        var pads = indexer.getFlagged(state.rules.defaultTeam, BlockFlag.launchPad);
 
         //disable export when launch pads are disabled, or there aren't any active ones
-        if(pads.size() == 0 || !Seq.with(pads).contains(t -> t.build.consValid())){
+        if(pads.size == 0 || !pads.contains(t -> t.efficiency > 0)){
             export.clear();
         }
 
@@ -204,7 +210,9 @@ public class SectorInfo{
             state.rules.sector.saveInfo();
         }
 
-        SectorDamage.writeParameters(this);
+        if(state.rules.sector != null && state.rules.sector.planet.allowWaveSimulation){
+            SectorDamage.writeParameters(this);
+        }
     }
 
     /** Update averages of various stats, updates some special sector logic.
@@ -242,7 +250,8 @@ public class SectorInfo{
                 production.get(item).mean = Math.min(production.get(item).mean, rawProduction.get(item).mean);
 
                 if(export.containsKey(item)){
-                    export.get(item).mean = Math.min(export.get(item).mean, Math.max(rawProduction.get(item).mean, -production.get(item).mean));
+                    //export can, at most, be the raw items being produced from factories + the items being taken from the core
+                    export.get(item).mean = Math.min(export.get(item).mean, rawProduction.get(item).mean + Math.max(-production.get(item).mean, 0));
                 }
             }
 

@@ -21,8 +21,11 @@ public class Administration{
     public Seq<ChatFilter> chatFilters = new Seq<>();
     public Seq<ActionFilter> actionFilters = new Seq<>();
     public Seq<String> subnetBans = new Seq<>();
+    public ObjectSet<String> dosBlacklist = new ObjectSet<>();
     public ObjectMap<String, Long> kickedIPs = new ObjectMap<>();
 
+
+    private boolean modified, loaded;
     /** All player info. Maps UUIDs to info. This persists throughout restarts. Do not access directly. */
     private ObjectMap<String, PlayerInfo> playerInfo = new ObjectMap<>();
 
@@ -31,7 +34,7 @@ public class Administration{
 
         //anti-spam
         addChatFilter((player, message) -> {
-            long resetTime = Config.messageRateLimit.num() * 1000;
+            long resetTime = Config.messageRateLimit.num() * 1000L;
             if(Config.antiSpam.bool() && !player.isLocal() && !player.admin){
                 //prevent people from spamming messages quickly
                 if(resetTime > 0 && Time.timeSinceMillis(player.getInfo().lastMessageTime) < resetTime){
@@ -47,8 +50,8 @@ public class Administration{
                     player.getInfo().messageInfractions = 0;
                 }
 
-                //prevent players from sending the same message twice in the span of 50 seconds
-                if(message.equals(player.getInfo().lastSentMessage) && Time.timeSinceMillis(player.getInfo().lastMessageTime) < 1000 * 50){
+                //prevent players from sending the same message twice in the span of 10 seconds
+                if(message.equals(player.getInfo().lastSentMessage) && Time.timeSinceMillis(player.getInfo().lastMessageTime) < 1000 * 10){
                     player.sendMessage("[scarlet]You may not send the same message twice.");
                     return null;
                 }
@@ -64,10 +67,11 @@ public class Administration{
         addActionFilter(action -> {
             if(action.type != ActionType.breakBlock &&
                 action.type != ActionType.placeBlock &&
+                action.type != ActionType.commandUnits &&
                 Config.antiSpam.bool()){
 
                 Ratekeeper rate = action.player.getInfo().rate;
-                if(rate.allow(Config.interactRateWindow.num() * 1000, Config.interactRateLimit.num())){
+                if(rate.allow(Config.interactRateWindow.num() * 1000L, Config.interactRateLimit.num())){
                     return true;
                 }else{
                     if(rate.occurences > Config.interactRateKick.num()){
@@ -81,6 +85,14 @@ public class Administration{
             }
             return true;
         });
+    }
+
+    public synchronized void blacklistDos(String address){
+        dosBlacklist.add(address);
+    }
+
+    public synchronized boolean isDosBlacklisted(String address){
+        return dosBlacklist.contains(address);
     }
 
     /** @return time at which a player would be pardoned for a kick (0 means they were never kicked) */
@@ -162,7 +174,7 @@ public class Administration{
     }
 
     public int getPlayerLimit(){
-        return Core.settings.getInt("playerlimit", 0);
+        return Core.settings.getInt("playerlimit", headless ? 30 : 0);
     }
 
     public void setPlayerLimit(int limit){
@@ -302,11 +314,13 @@ public class Administration{
     public boolean adminPlayer(String id, String usid){
         PlayerInfo info = getCreateInfo(id);
 
+        var wasAdmin = info.admin;
+
         info.adminUsid = usid;
         info.admin = true;
         save();
 
-        return true;
+        return wasAdmin;
     }
 
     /**
@@ -436,73 +450,95 @@ public class Administration{
     }
 
     public void save(){
-        Core.settings.putJson("player-data", playerInfo);
-        Core.settings.putJson("ip-bans", String.class, bannedIPs);
-        Core.settings.putJson("whitelist-ids", String.class, whitelist);
-        Core.settings.putJson("banned-subnets", String.class, subnetBans);
+        modified = true;
+    }
+
+    public void forceSave(){
+        if(modified && loaded){
+            Core.settings.putJson("player-data", playerInfo);
+            Core.settings.putJson("ip-kicks", kickedIPs);
+            Core.settings.putJson("ip-bans", String.class, bannedIPs);
+            Core.settings.putJson("whitelist-ids", String.class, whitelist);
+            Core.settings.putJson("banned-subnets", String.class, subnetBans);
+            modified = false;
+        }
     }
 
     @SuppressWarnings("unchecked")
     private void load(){
+        loaded = true;
         //load default data
         playerInfo = Core.settings.getJson("player-data", ObjectMap.class, ObjectMap::new);
+        kickedIPs = Core.settings.getJson("ip-kicks", ObjectMap.class, ObjectMap::new);
         bannedIPs = Core.settings.getJson("ip-bans", Seq.class, Seq::new);
         whitelist = Core.settings.getJson("whitelist-ids", Seq.class, Seq::new);
         subnetBans = Core.settings.getJson("banned-subnets", Seq.class, Seq::new);
     }
 
-    /** Server configuration definition. Each config value can be a string, boolean or number. */
-    public enum Config{
-        name("The server name as displayed on clients.", "Server", "servername"),
-        desc("The server description, displayed under the name. Max 100 characters.", "off"),
-        port("The port to host on.", Vars.port),
-        autoUpdate("Whether to auto-update and exit when a new bleeding-edge update arrives.", false),
-        showConnectMessages("Whether to display connect/disconnect messages.", true),
-        enableVotekick("Whether votekick is enabled.", true),
-        startCommands("Commands run at startup. This should be a comma-separated list.", ""),
-        crashReport("Whether to send crash reports.", false, "crashreport"),
-        logging("Whether to log everything to files.", true),
-        strict("Whether strict mode is on - corrects positions and prevents duplicate UUIDs.", true),
-        antiSpam("Whether spammers are automatically kicked and rate-limited.", headless),
-        interactRateWindow("Block interaction rate limit window, in seconds.", 6),
-        interactRateLimit("Block interaction rate limit.", 25),
-        interactRateKick("How many times a player must interact inside the window to get kicked.", 60),
-        messageRateLimit("Message rate limit in seconds. 0 to disable.", 0),
-        messageSpamKick("How many times a player must send a message before the cooldown to get kicked. 0 to disable.", 3),
-        socketInput("Allows a local application to control this server through a local TCP socket.", false, "socket", () -> Events.fire(Trigger.socketConfigChanged)),
-        socketInputPort("The port for socket input.", 6859, () -> Events.fire(Trigger.socketConfigChanged)),
-        socketInputAddress("The bind address for socket input.", "localhost", () -> Events.fire(Trigger.socketConfigChanged)),
-        allowCustomClients("Whether custom clients are allowed to connect.", !headless, "allow-custom"),
-        whitelist("Whether the whitelist is used.", false),
-        motd("The message displayed to people on connection.", "off"),
-        autosave("Whether the periodically save the map when playing.", false),
-        autosaveAmount("The maximum amount of autosaves. Older ones get replaced.", 10),
-        autosaveSpacing("Spacing between autosaves in seconds.", 60 * 5),
-        debug("Enable debug logging", false, () -> Log.level = debug() ? LogLevel.debug : LogLevel.info);
+    /**
+     * Server configuration definition. Each config value can be a string, boolean or number.
+     * Creating a new Config instance implicitly adds it to the list of server configs. This can be used for custom plugin configuration.
+     * */
+    public static class Config{
+        public static final Seq<Config> all = new Seq<>();
 
-        public static final Config[] all = values();
+        public static final Config
+
+        serverName = new Config("name", "The server name as displayed on clients.", "Server", "servername"),
+        desc = new Config("desc", "The server description, displayed under the name. Max 100 characters.", "off"),
+        port = new Config("port", "The port to host on.", Vars.port),
+        autoUpdate = new Config("autoUpdate", "Whether to auto-update and exit when a new bleeding-edge update arrives.", false),
+        showConnectMessages = new Config("showConnectMessages", "Whether to display connect/disconnect messages.", true),
+        enableVotekick = new Config("enableVotekick", "Whether votekick is enabled.", true),
+        startCommands = new Config("startCommands", "Commands run at startup. This should be a comma-separated list.", ""),
+        logging = new Config("logging", "Whether to log everything to files.", true),
+        strict = new Config("strict", "Whether strict mode is on - corrects positions and prevents duplicate UUIDs.", true),
+        antiSpam = new Config("antiSpam", "Whether spammers are automatically kicked and rate-limited.", headless),
+        interactRateWindow = new Config("interactRateWindow", "Block interaction rate limit window, in seconds.", 6),
+        interactRateLimit = new Config("interactRateLimit", "Block interaction rate limit.", 25),
+        interactRateKick = new Config("interactRateKick", "How many times a player must interact inside the window to get kicked.", 60),
+        messageRateLimit = new Config("messageRateLimit", "Message rate limit in seconds. 0 to disable.", 0),
+        messageSpamKick = new Config("messageSpamKick", "How many times a player must send a message before the cooldown to get kicked. 0 to disable.", 3),
+        packetSpamLimit = new Config("packetSpamLimit", "Limit for packet count sent within 3sec that will lead to a blacklist + kick.", 300),
+        chatSpamLimit = new Config("chatSpamLimit", "Limit for chat packet count sent within 2sec that will lead to a blacklist + kick. Not the same as a rate limit.", 20),
+        socketInput = new Config("socketInput", "Allows a local application to control this server through a local TCP socket.", false, "socket", () -> Events.fire(Trigger.socketConfigChanged)),
+        socketInputPort = new Config("socketInputPort", "The port for socket input.", 6859, () -> Events.fire(Trigger.socketConfigChanged)),
+        socketInputAddress = new Config("socketInputAddress", "The bind address for socket input.", "localhost", () -> Events.fire(Trigger.socketConfigChanged)),
+        allowCustomClients = new Config("allowCustomClients", "Whether custom clients are allowed to connect.", !headless, "allow-custom"),
+        whitelist = new Config("whitelist", "Whether the whitelist is used.", false),
+        motd = new Config("motd", "The message displayed to people on connection.", "off"),
+        autosave = new Config("autosave", "Whether the periodically save the map when playing.", false),
+        autosaveAmount = new Config("autosaveAmount", "The maximum amount of autosaves. Older ones get replaced.", 10),
+        autosaveSpacing = new Config("autosaveSpacing", "Spacing between autosaves in seconds.", 60 * 5),
+        debug = new Config("debug", "Enable debug logging.", false, () -> Log.level = debug() ? LogLevel.debug : LogLevel.info),
+        snapshotInterval = new Config("snapshotInterval", "Client entity snapshot interval in ms.", 200),
+        autoPause = new Config("autoPause", "Whether the game should pause when nobody is online.", false);
 
         public final Object defaultValue;
-        public final String key, description;
+        public final String name, key, description;
+
         final Runnable changed;
 
-        Config(String description, Object def){
-            this(description, def, null, null);
+        public Config(String name, String description, Object def){
+            this(name, description, def, null, null);
         }
 
-        Config(String description, Object def, String key){
-            this(description, def, key, null);
+        public Config(String name, String description, Object def, String key){
+            this(name, description, def, key, null);
         }
 
-        Config(String description, Object def, Runnable changed){
-            this(description, def, null, changed);
+        public Config(String name, String description, Object def, Runnable changed){
+            this(name, description, def, null, changed);
         }
 
-        Config(String description, Object def, String key, Runnable changed){
+        public Config(String name, String description, Object def, String key, Runnable changed){
+            this.name = name;
             this.description = description;
-            this.key = key == null ? name() : key;
+            this.key = key == null ? name : key;
             this.defaultValue = def;
             this.changed = changed == null ? () -> {} : changed;
+
+            all.add(this);
         }
 
         public boolean isNum(){
@@ -566,6 +602,10 @@ public class Administration{
 
         public PlayerInfo(){
         }
+
+        public String plainLastName(){
+            return Strings.stripColors(lastName);
+        }
     }
 
     /** Handles chat messages from players and changes their contents. */
@@ -619,6 +659,12 @@ public class Administration{
         /** valid only for removePlanned events only; contains packed positions. */
         public @Nullable int[] plans;
 
+        /** valid only for command unit events */
+        public @Nullable int[] unitIDs;
+
+        /** valid only for command building events */
+        public @Nullable int[] buildingPositions;
+
         public PlayerAction set(Player player, ActionType type, Tile tile){
             this.player = player;
             this.type = type;
@@ -648,7 +694,7 @@ public class Administration{
     }
 
     public enum ActionType{
-        breakBlock, placeBlock, rotate, configure, withdrawItem, depositItem, control, buildSelect, command, removePlanned
+        breakBlock, placeBlock, rotate, configure, withdrawItem, depositItem, control, buildSelect, command, removePlanned, commandUnits, commandBuilding, respawn
     }
 
 }

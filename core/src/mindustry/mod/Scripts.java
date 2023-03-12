@@ -1,15 +1,9 @@
 package mindustry.mod;
 
 import arc.*;
-import arc.assets.*;
-import arc.assets.loaders.MusicLoader.*;
-import arc.assets.loaders.SoundLoader.*;
-import arc.audio.*;
 import arc.files.*;
-import arc.func.*;
 import arc.util.*;
 import arc.util.Log.*;
-import arc.util.io.*;
 import mindustry.*;
 import mindustry.mod.Mods.*;
 import rhino.*;
@@ -51,8 +45,10 @@ public class Scripts implements Disposable{
         try{
             Object o = context.evaluateString(scope, text, "console.js", 1);
             if(o instanceof NativeJavaObject n) o = n.unwrap();
-            if(o instanceof Undefined) o = "undefined";
-            return String.valueOf(o);
+            if(o == null) o = "null";
+            else if(o instanceof Undefined) o = "undefined";
+            var out = o.toString();
+            return out == null ? "null" : out;
         }catch(Throwable t){
             return getError(t, false);
         }
@@ -71,85 +67,9 @@ public class Scripts implements Disposable{
         Log.log(level, "[@]: @", source, message);
     }
 
-    //region utility mod functions
-
     public float[] newFloats(int capacity){
         return new float[capacity];
     }
-
-    public String readString(String path){
-        return Vars.tree.get(path, true).readString();
-    }
-
-    public byte[] readBytes(String path){
-        return Vars.tree.get(path, true).readBytes();
-    }
-
-    public Sound loadSound(String soundName){
-        if(Vars.headless) return new Sound();
-
-        String name = "sounds/" + soundName;
-        String path = Vars.tree.get(name + ".ogg").exists() ? name + ".ogg" : name + ".mp3";
-
-        var sound = new Sound();
-        AssetDescriptor<?> desc = Core.assets.load(path, Sound.class, new SoundParameter(sound));
-        desc.errored = Throwable::printStackTrace;
-
-        return sound;
-    }
-
-    public Music loadMusic(String soundName){
-        if(Vars.headless) return new Music();
-
-        String name = "music/" + soundName;
-        String path = Vars.tree.get(name + ".ogg").exists() ? name + ".ogg" : name + ".mp3";
-
-        var music = new Music();
-        AssetDescriptor<?> desc = Core.assets.load(path, Music.class, new MusicParameter(music));
-        desc.errored = Throwable::printStackTrace;
-
-        return music;
-    }
-
-    /** Ask the user to select a file to read for a certain purpose like "Please upload a sprite" */
-    public void readFile(String purpose, String ext, Cons<String> cons){
-        selectFile(true, purpose, ext, fi -> cons.get(fi.readString()));
-    }
-
-    /** readFile but for a byte[] */
-    public void readBinFile(String purpose, String ext, Cons<byte[]> cons){
-        selectFile(true, purpose, ext, fi -> cons.get(fi.readBytes()));
-    }
-
-    /** Ask the user to write a file. */
-    public void writeFile(String purpose, String ext, String contents){
-        if(contents == null) contents = "";
-        final String fContents = contents;
-        selectFile(false, purpose, ext, fi -> fi.writeString(fContents));
-    }
-
-    /** writeFile but for a byte[] */
-    public void writeBinFile(String purpose, String ext, byte[] contents){
-        if(contents == null) contents = Streams.emptyBytes;
-        final byte[] fContents = contents;
-        selectFile(false, purpose, ext, fi -> fi.writeBytes(fContents));
-    }
-
-    private void selectFile(boolean open, String purpose, String ext, Cons<Fi> cons){
-        purpose = purpose.startsWith("@") ? Core.bundle.get(purpose.substring(1)) : purpose;
-        //add purpose and extension at the top
-        String title = Core.bundle.get(open ? "open" : "save") + " - " + purpose + " (." + ext + ")";
-        Vars.platform.showFileChooser(open, title, ext, fi -> {
-            try{
-                cons.get(fi);
-            }catch(Exception e){
-                Log.err("Failed to select file '@' for a mod", fi);
-                Log.err(e);
-            }
-        });
-    }
-
-    //endregion
 
     public void run(LoadedMod mod, Fi file){
         currentMod = mod;

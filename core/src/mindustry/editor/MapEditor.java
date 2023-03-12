@@ -18,7 +18,7 @@ import mindustry.world.*;
 import static mindustry.Vars.*;
 
 public class MapEditor{
-    public static final int[] brushSizes = {1, 2, 3, 4, 5, 9, 15, 20};
+    public static final float[] brushSizes = {1, 1.5f, 2, 3, 4, 5, 9, 15, 20};
 
     public StringMap tags = new StringMap();
     public MapRenderer renderer = new MapRenderer();
@@ -28,7 +28,7 @@ public class MapEditor{
     private DrawOperation currentOp;
     private boolean loading;
 
-    public int brushSize = 1;
+    public float brushSize = 1;
     public int rotation;
     public Block drawBlock = Blocks.stone;
     public Team drawTeam = Team.sharded;
@@ -64,6 +64,26 @@ public class MapEditor{
 
         createTiles(pixmap.width, pixmap.height);
         load(() -> MapIO.readImage(pixmap, tiles()));
+        renderer.resize(width(), height());
+    }
+
+    public void updateRenderer(){
+        Tiles tiles = world.tiles;
+        Seq<Building> builds = new Seq<>();
+
+        for(int i = 0; i < tiles.width * tiles.height; i++){
+            Tile tile = tiles.geti(i);
+            var build = tile.build;
+            if(build != null){
+                builds.add(build);
+            }
+            tiles.seti(i, new EditorTile(tile.x, tile.y, tile.floorID(), tile.overlayID(), build == null ? tile.blockID() : 0));
+        }
+
+        for(var build : builds){
+            tiles.get(build.tileX(), build.tileY()).setBlock(build.block, build.team, build.rotation, () -> build);
+        }
+
         renderer.resize(width(), height());
     }
 
@@ -116,14 +136,14 @@ public class MapEditor{
     }
 
     public void drawBlocks(int x, int y){
-        drawBlocks(x, y, false, tile -> true);
+        drawBlocks(x, y, false, false, tile -> true);
     }
 
     public void drawBlocks(int x, int y, Boolf<Tile> tester){
-        drawBlocks(x, y, false, tester);
+        drawBlocks(x, y, false, false, tester);
     }
 
-    public void drawBlocks(int x, int y, boolean square, Boolf<Tile> tester){
+    public void drawBlocks(int x, int y, boolean square, boolean forceOverlay, Boolf<Tile> tester){
         if(drawBlock.isMultiblock()){
             x = Mathf.clamp(x, (drawBlock.size - 1) / 2, width() - drawBlock.size / 2 - 1);
             y = Mathf.clamp(y, (drawBlock.size - 1) / 2, height() - drawBlock.size / 2 - 1);
@@ -137,7 +157,13 @@ public class MapEditor{
                 if(!tester.get(tile)) return;
 
                 if(isFloor){
-                    tile.setFloor(drawBlock.asFloor());
+                    if(forceOverlay){
+                        tile.setOverlay(drawBlock.asFloor());
+                    }else{
+                        if(!(drawBlock.asFloor().wallOre && !tile.block().solid)){
+                            tile.setFloor(drawBlock.asFloor());
+                        }
+                    }
                 }else if(!(tile.block().isMultiblock() && !drawBlock.isMultiblock())){
                     if(drawBlock.rotate && tile.build != null && tile.build.rotation != rotation){
                         addTileOp(TileOp.get(tile.x, tile.y, (byte)OpType.rotation.ordinal(), (byte)rotation));
@@ -227,8 +253,9 @@ public class MapEditor{
     }
 
     public void drawCircle(int x, int y, Cons<Tile> drawer){
-        for(int rx = -brushSize; rx <= brushSize; rx++){
-            for(int ry = -brushSize; ry <= brushSize; ry++){
+        int clamped = (int)brushSize;
+        for(int rx = -clamped; rx <= clamped; rx++){
+            for(int ry = -clamped; ry <= clamped; ry++){
                 if(Mathf.within(rx, ry, brushSize - 0.5f + 0.0001f)){
                     int wx = x + rx, wy = y + ry;
 
@@ -243,8 +270,9 @@ public class MapEditor{
     }
 
     public void drawSquare(int x, int y, Cons<Tile> drawer){
-        for(int rx = -brushSize; rx <= brushSize; rx++){
-            for(int ry = -brushSize; ry <= brushSize; ry++){
+        int clamped = (int)brushSize;
+        for(int rx = -clamped; rx <= clamped; rx++){
+            for(int ry = -clamped; ry <= clamped; ry++){
                 int wx = x + rx, wy = y + ry;
 
                 if(wx < 0 || wy < 0 || wx >= width() || wy >= height()){
@@ -256,14 +284,17 @@ public class MapEditor{
         }
     }
 
-    public void resize(int width, int height){
+    public void resize(int width, int height, int shiftX, int shiftY){
         clearOp();
 
         Tiles previous = world.tiles;
-        int offsetX = (width() - width) / 2, offsetY = (height() - height) / 2;
+        int offsetX = (width() - width) / 2 - shiftX, offsetY = (height() - height) / 2 - shiftY;
         loading = true;
 
-        Tiles tiles = world.resize(width, height);
+        world.clearBuildings();
+
+        Tiles tiles = world.tiles = new Tiles(width, height);
+
         for(int x = 0; x < width; x++){
             for(int y = 0; y < height; y++){
                 int px = offsetX + x, py = offsetY + y;

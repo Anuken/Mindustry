@@ -181,7 +181,7 @@ public class WaveGraph extends Table{
 
         colors.clear();
         colors.left();
-        colors.button("@waves.units.hide", Styles.cleart, () -> {
+        colors.button("@waves.units.hide", Styles.flatt, () -> {
             if(hidden.size == usedCopy.size){
                 hidden.clear();
             }else{

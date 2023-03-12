@@ -19,13 +19,13 @@ public class MinerAI extends AIController{
 
         if(!(unit.canMine()) || core == null) return;
 
-        if(unit.mineTile != null && !unit.mineTile.within(unit, unit.type.miningRange)){
+        if(unit.mineTile != null && !unit.mineTile.within(unit, unit.type.mineRange)){
             unit.mineTile(null);
         }
 
         if(mining){
             if(timer.get(timerTarget2, 60 * 4) || targetItem == null){
-                targetItem = unit.team.data().mineItems.min(i -> indexer.hasOre(i) && unit.canMine(i), i -> core.items.get(i));
+                targetItem = unit.type.mineItems.min(i -> indexer.hasOre(i) && unit.canMine(i), i -> core.items.get(i));
             }
 
             //core full of the target item, do nothing
@@ -44,9 +44,9 @@ public class MinerAI extends AIController{
                 }
 
                 if(ore != null){
-                    moveTo(ore, unit.type.miningRange / 2f, 20f);
+                    moveTo(ore, unit.type.mineRange / 2f, 20f);
 
-                    if(ore.block() == Blocks.air && unit.within(ore, unit.type.miningRange)){
+                    if(ore.block() == Blocks.air && unit.within(ore, unit.type.mineRange)){
                         unit.mineTile = ore;
                     }
 

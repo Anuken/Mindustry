@@ -14,7 +14,6 @@ import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.defense.*;
-import mindustry.world.blocks.distribution.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.production.*;
@@ -30,6 +29,15 @@ public class BaseGenerator{
     private Tiles tiles;
     private Seq<Tile> cores;
 
+    public static Block getDifficultyWall(int size, float difficulty){
+        Seq<Block> wallsSmall = content.blocks().select(b -> b instanceof Wall && b.size == size
+            && !b.insulated && b.buildVisibility == BuildVisibility.shown
+            && !(b instanceof Door)
+            && !(Structs.contains(b.requirements, i -> state.rules.hiddenBuildItems.contains(i.item))));
+        wallsSmall.sort(b -> b.buildCost);
+        return wallsSmall.getFrac(difficulty * 0.91f);
+    }
+
     public void generate(Tiles tiles, Seq<Tile> cores, Tile spawn, Team team, Sector sector, float difficulty){
         this.tiles = tiles;
         this.cores = cores;
@@ -39,26 +47,19 @@ public class BaseGenerator{
 
         Mathf.rand.setSeed(sector.id);
 
-        Seq<Block> wallsSmall = content.blocks().select(b -> b instanceof Wall && b.size == 1 && !b.insulated && b.buildVisibility == BuildVisibility.shown && !(b instanceof Door));
-        Seq<Block> wallsLarge = content.blocks().select(b -> b instanceof Wall && b.size == 2 && !b.insulated && b.buildVisibility == BuildVisibility.shown && !(b instanceof Door));
-
-        //sort by cost for correct fraction
-        wallsSmall.sort(b -> b.buildCost);
-        wallsLarge.sort(b -> b.buildCost);
-
-        float bracketRange = 0.2f;
-        float baseChance = Mathf.lerp(0.7f, 1.9f, difficulty);
+        float bracketRange = 0.17f;
+        float baseChance = Mathf.lerp(0.7f, 2.1f, difficulty);
         int wallAngle = 70; //180 for full coverage
         double resourceChance = 0.5 * baseChance;
         double nonResourceChance = 0.0005 * baseChance;
         BasePart coreschem = bases.cores.getFrac(difficulty);
         int passes = difficulty < 0.4 ? 1 : difficulty < 0.8 ? 2 : 3;
 
-        Block wall = wallsSmall.getFrac(difficulty * 0.91f), wallLarge = wallsLarge.getFrac(difficulty * 0.91f);
+        Block wall = getDifficultyWall(1, difficulty), wallLarge = getDifficultyWall(2, difficulty);
 
         for(Tile tile : cores){
             tile.clearOverlay();
-            Schematics.placeLoadout(coreschem.schematic, tile.x, tile.y, team, coreschem.required instanceof Item ? bases.ores.get((Item)coreschem.required) : Blocks.oreCopper, false);
+            Schematics.placeLoadout(coreschem.schematic, tile.x, tile.y, team, false);
 
             //fill core with every type of item (even non-material)
             Building entity = tile.build;

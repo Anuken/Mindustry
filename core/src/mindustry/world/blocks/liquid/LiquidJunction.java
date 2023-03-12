@@ -5,6 +5,7 @@ import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.meta.*;
 
+//TODO should leak!
 public class LiquidJunction extends LiquidBlock{
 
     public LiquidJunction(String name){
@@ -20,7 +21,7 @@ public class LiquidJunction extends LiquidBlock{
     @Override
     public void setBars(){
         super.setBars();
-        bars.remove("liquid");
+        removeBar("liquid");
     }
 
     @Override
@@ -38,8 +39,7 @@ public class LiquidJunction extends LiquidBlock{
         public Building getLiquidDestination(Building source, Liquid liquid){
             if(!enabled) return this;
 
-            int dir = source.relativeTo(tile.x, tile.y);
-            dir = (dir + 4) % 4;
+            int dir = (source.relativeTo(tile.x, tile.y) + 4) % 4;
             Building next = nearby(dir);
             if(next == null || (!next.acceptLiquid(this, liquid) && !(next.block instanceof LiquidJunction))){
                 return this;
@@ -47,6 +47,4 @@ public class LiquidJunction extends LiquidBlock{
             return next.getLiquidDestination(this, liquid);
         }
     }
-
-
 }

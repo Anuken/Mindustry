@@ -9,32 +9,34 @@ import arc.util.*;
 public class IndexedRenderer implements Disposable{
     private static final int vsize = 5;
 
-    private final Shader program = new Shader(
-    "attribute vec4 a_position;\n" +
-    "attribute vec4 a_color;\n" +
-    "attribute vec2 a_texCoord0;\n" +
-    "uniform mat4 u_projTrans;\n" +
-    "varying vec4 v_color;\n" +
-    "varying vec2 v_texCoords;\n" +
+    private final static Shader program = new Shader(
+    """
+    attribute vec4 a_position;
+    attribute vec4 a_color;
+    attribute vec2 a_texCoord0;
+    uniform mat4 u_projTrans;
+    varying vec4 v_color;
+    varying vec2 v_texCoords;
+    void main(){
+       v_color = a_color;
+       v_color.a = v_color.a * (255.0/254.0);
+       v_texCoords = a_texCoord0;
+       gl_Position = u_projTrans * a_position;
+    }
+    """,
 
-    "void main(){\n" +
-    "   v_color = a_color;\n" +
-    "   v_color.a = v_color.a * (255.0/254.0);\n" +
-    "   v_texCoords = a_texCoord0;\n" +
-    "   gl_Position = u_projTrans * a_position;\n" +
-    "}",
-
-    "varying lowp vec4 v_color;\n" +
-    "varying vec2 v_texCoords;\n" +
-    "uniform sampler2D u_texture;\n" +
-
-    "void main(){\n" +
-    "  gl_FragColor = v_color * texture2D(u_texture, v_texCoords);\n" +
-    "}"
+    """
+    varying lowp vec4 v_color;
+    varying vec2 v_texCoords;
+    uniform sampler2D u_texture;
+    void main(){
+      gl_FragColor = v_color * texture2D(u_texture, v_texCoords);
+    }
+    """
     );
+    private static final float[] tmpVerts = new float[vsize * 6];
+
     private Mesh mesh;
-    private float[] tmpVerts = new float[vsize * 6];
-    private float[] vertices;
 
     private Mat projMatrix = new Mat();
     private Mat transMatrix = new Mat();
@@ -54,9 +56,8 @@ public class IndexedRenderer implements Disposable{
         texture.bind();
 
         program.setUniformMatrix4("u_projTrans", combined);
-        program.setUniformi("u_texture", 0);
 
-        mesh.render(program, Gl.triangles, 0, vertices.length / vsize);
+        mesh.render(program, Gl.triangles, 0, mesh.getMaxVertices());
     }
 
     public void setColor(Color color){
@@ -202,8 +203,9 @@ public class IndexedRenderer implements Disposable{
         VertexAttribute.position,
         VertexAttribute.color,
         VertexAttribute.texCoords);
-        vertices = new float[6 * sprites * vsize];
-        mesh.setVertices(vertices);
+
+        //TODO why is this the only way to get it working properly? it should not need an array
+        mesh.setVertices(new float[6 * sprites * vsize]);
     }
 
     private void updateMatrix(){
@@ -213,6 +215,5 @@ public class IndexedRenderer implements Disposable{
     @Override
     public void dispose(){
         mesh.dispose();
-        program.dispose();
     }
 }

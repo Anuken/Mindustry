@@ -7,9 +7,9 @@ import arc.math.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.pooling.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
-import mindustry.core.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -39,11 +39,11 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     boolean admin;
     String name = "frog";
     Color color = new Color();
-    //locale should not be synced.
     transient String locale = "en";
     transient float deathTimer;
     transient String lastText = "";
     transient float textFadeTime;
+
     transient private Unit lastReadUnit = Nulls.unit;
     transient private int wrongReadUnits;
     transient @Nullable Unit justSwitchFrom, justSwitchTo;
@@ -68,7 +68,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
     public TextureRegion icon(){
         //display default icon for dead players
-        if(dead()) return core() == null ? UnitTypes.alpha.fullIcon : ((CoreBlock)core().block).unitType.fullIcon;
+        if(dead()) return core() == null ? UnitTypes.alpha.fullIcon : ((CoreBlock)bestCore().block).unitType.fullIcon;
 
         return unit.icon();
     }
@@ -83,7 +83,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         textFadeTime = 0f;
         x = y = 0f;
         if(!dead()){
-            unit.controller(unit.type.createController());
+            unit.resetController();
             unit = Nulls.unit;
         }
     }
@@ -91,6 +91,11 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     @Override
     public boolean isValidController(){
         return isAdded();
+    }
+
+    @Override
+    public boolean isLogicControllable(){
+        return false;
     }
 
     @Replace
@@ -125,12 +130,8 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         unit.aim(mouseX, mouseY);
         //this is only necessary when the thing being controlled isn't synced
         unit.controlWeapons(shooting, shooting);
-        //save previous formation to prevent reset
-        var formation = unit.formation;
         //extra precaution, necessary for non-synced things
         unit.controller(this);
-        //keep previous formation
-        unit.formation = formation;
     }
 
     @Override
@@ -204,7 +205,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
         if(this.unit != Nulls.unit){
             //un-control the old unit
-            this.unit.controller(this.unit.type.createController());
+            this.unit.resetController();
         }
         this.unit = unit;
         if(unit != Nulls.unit){
@@ -259,10 +260,12 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
     @Override
     public void draw(){
+        if(unit != null && unit.inFogTo(Vars.player.team())) return;
+
         Draw.z(Layer.playerName);
         float z = Drawf.text();
 
-        Font font = Fonts.def;
+        Font font = Fonts.outline;
         GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
         final float nameHeight = 11;
         final float textHeight = 15;
@@ -310,10 +313,19 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         Draw.z(z);
     }
 
+    /** @return name with a markup color prefix */
+    String coloredName(){
+        return  "[#" + color.toString().toUpperCase() + "]" + name;
+    }
+
+    String plainName(){
+        return Strings.stripColors(name);
+    }
+
     void sendMessage(String text){
         if(isLocal()){
             if(ui != null){
-                ui.chatfrag.addMessage(text, null);
+                ui.chatfrag.addMessage(text);
             }
         }else{
             Call.sendMessage(con, text, null, null);
@@ -321,16 +333,16 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     }
 
     void sendMessage(String text, Player from){
-        sendMessage(text, from, NetClient.colorizeName(from.id(), from.name));
+        sendMessage(text, from, null);
     }
 
-    void sendMessage(String text, Player from, String fromName){
+    void sendMessage(String text, Player from, String unformatted){
         if(isLocal()){
             if(ui != null){
-                ui.chatfrag.addMessage(text, fromName);
+                ui.chatfrag.addMessage(text);
             }
         }else{
-            Call.sendMessage(con, text, fromName, from);
+            Call.sendMessage(con, text, unformatted, from);
         }
     }
 

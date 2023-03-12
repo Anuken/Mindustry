@@ -9,10 +9,12 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
 import mindustry.core.*;
+import mindustry.ctype.*;
 import mindustry.entities.EntityCollisions.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
+import mindustry.type.*;
 
 import static mindustry.Vars.*;
 
@@ -37,6 +39,26 @@ public class UnitPayload implements Payload{
     public void showOverlay(TextureRegionDrawable icon){
         if(icon == null || headless) return;
         showOverlay(icon.getRegion());
+    }
+
+    @Override
+    public void update(@Nullable Unit unitHolder, @Nullable Building buildingHolder){
+        unit.type.updatePayload(unit, unitHolder, buildingHolder);
+    }
+
+    @Override
+    public UnlockableContent content(){
+        return unit.type;
+    }
+
+    @Override
+    public ItemStack[] requirements(){
+        return unit.type.getTotalRequirements();
+    }
+
+    @Override
+    public float buildTime(){
+        return unit.type.getBuildTime();
     }
 
     @Override
@@ -105,15 +127,34 @@ public class UnitPayload implements Payload{
         //prevents stacking
         unit.vel.add(Mathf.range(0.5f), Mathf.range(0.5f));
         unit.add();
+        unit.unloaded();
         Events.fire(new UnitUnloadEvent(unit));
 
         return true;
     }
 
     @Override
+    public void drawShadow(float alpha){
+        //TODO should not happen
+        if(unit.type == null) return;
+
+        unit.type.drawSoftShadow(unit, alpha);
+    }
+
+    @Override
     public void draw(){
         //TODO should not happen
         if(unit.type == null) return;
+
+        //TODO this would be more accurate but has all sorts of associated problems (?)
+        if(false){
+            float e = unit.elevation;
+            unit.elevation = 0f;
+            //avoids drawing mining or building
+            unit.type.draw(unit);
+            unit.elevation = e;
+            return;
+        }
 
         unit.type.drawSoftShadow(unit);
         Draw.rect(unit.type.fullIcon, unit.x, unit.y, unit.rotation - 90);

@@ -32,6 +32,12 @@ public class PausedDialog extends BaseDialog{
             float dw = 220f;
             cont.defaults().width(dw).height(55).pad(5f);
 
+            cont.button("@objective", Icon.info, () -> ui.fullText.show("@objective", state.rules.sector.preset.description))
+            .visible(() -> state.rules.sector != null && state.rules.sector.preset != null && state.rules.sector.preset.description != null).padTop(-60f);
+
+            cont.button("@abandon", Icon.cancel, () -> ui.planet.abandonSectorConfirm(state.rules.sector, this::hide)).padTop(-60f)
+            .disabled(b -> net.client()).visible(() -> state.rules.sector != null).row();
+
             cont.button("@back", Icon.left, this::hide).name("back");
             cont.button("@settings", Icon.settings, ui.settings::show).name("settings");
 
@@ -94,8 +100,6 @@ public class PausedDialog extends BaseDialog{
 
     void showQuitConfirm(){
         Runnable quit = () -> {
-            wasClient = net.client();
-            if(net.client()) netClient.disconnectQuietly();
             runExitSave();
             hide();
         };
@@ -105,16 +109,31 @@ public class PausedDialog extends BaseDialog{
         }else{
             quit.run();
         }
+    }
 
+    public boolean checkPlaytest(){
+        if(state.playtestingMap != null){
+            //no exit save here
+            var testing = state.playtestingMap;
+            logic.reset();
+            ui.editor.resumeAfterPlaytest(testing);
+            return true;
+        }
+        return false;
     }
 
     public void runExitSave(){
+        wasClient = net.client();
+        if(net.client()) netClient.disconnectQuietly();
+
         if(state.isEditor() && !wasClient){
             ui.editor.resumeEditing();
             return;
+        }else if(checkPlaytest()){
+            return;
         }
 
-        if(control.saves.getCurrent() == null || !control.saves.getCurrent().isAutosave() || wasClient){
+        if(control.saves.getCurrent() == null || !control.saves.getCurrent().isAutosave() || wasClient || state.gameOver){
             logic.reset();
             return;
         }
