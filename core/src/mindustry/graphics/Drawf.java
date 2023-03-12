@@ -377,24 +377,16 @@ public class Drawf{
         square(x, y, radius, 45);
     }
 
-    public static void hexagon(float x, float y, float radius, float rotation, Color color, float alpha){
+    public static void polygon(float x, float y, int sides, float radius, float rotation, Color color, float alpha){
         Lines.stroke(3f, Tmp.c1.set(Pal.gray).a(alpha));
-        Lines.poly(x, y, 6, radius, rotation);
+        Lines.poly(x, y, sides, radius, rotation);
         Lines.stroke(1f, Tmp.c1.set(color).a(alpha));
-        Lines.poly(x, y, 6, radius, rotation);
+        Lines.poly(x, y, sides, radius, rotation);
         Draw.reset();
     }
 
-    public static void hexagon(float x, float y, float radius, float rotation, Color color){
-        hexagon(x, y, radius, rotation, color, 1f);
-    }
-
-    public static void hexagon(float x, float y, float radius, Color color, float alpha){
-        hexagon(x, y, radius, 0f, color, alpha);
-    }
-
-    public static void hexagon(float x, float y, float radius, Color color){
-        hexagon(x, y, radius, 0f, color);
+    public static void polygon(float x, float y, int sides, float radius, float rotation, Color color){
+        polygon(x, y, sides, radius, rotation, color, 1f);
     }
 
     public static void arrow(float x, float y, float x2, float y2, float length, float radius){

@@ -110,9 +110,9 @@ public class ForceProjector extends Block{
         super.drawPlace(x, y, rotation, valid);
         float wx = x * tilesize + offset, wy = y * tilesize + offset;
 
-        if(itemConsumer != null) Drawf.hexagon(wx, wy, radius + phaseRadiusBoost, player.team().color, 0.5f);
+        if(itemConsumer != null) Drawf.polygon(wx, wy, sides, radius + phaseRadiusBoost, shieldRotation, player.team().color, 0.5f);
 
-        Drawf.hexagon(wx, wy, radius, player.team().color);
+        Drawf.polygon(wx, wy, sides, radius, shieldRotation, player.team().color);
     }
 
     public class ForceBuild extends Building implements Ranged{
@@ -266,10 +266,10 @@ public class ForceProjector extends Block{
 
             float boostRad = radius + phaseRadiusBoost;
             if(realRad < boostRad && itemConsumer != null){
-                Drawf.hexagon(x, y, boostRad, team.color, 0.5f - Mathf.curve(realRad, radius + phaseRadiusBoost * 0.9f, boostRad)  / 2f);
+                Drawf.polygon(x, y, sides, boostRad, shieldRotation, team.color, 0.5f - Mathf.curve(realRad, radius + phaseRadiusBoost * 0.9f, boostRad)  / 2f);
             }
 
-            if(realRad < radius) Drawf.hexagon(x, y, radius, team.color, 1f - Mathf.curve(realRad, radius * 0.9f, radius));
+            if(realRad < radius) Drawf.polygon(x, y, sides, radius, shieldRotation, team.color, 1f - Mathf.curve(realRad, radius * 0.9f, radius));
         }
 
         @Override
