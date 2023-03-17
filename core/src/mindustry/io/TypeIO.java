@@ -93,6 +93,9 @@ public class TypeIO{
             write.b((byte)14);
             write.i(b.length);
             write.b(b);
+        }else if(object instanceof int[] i){
+            write.b((byte)21);
+            writeInts(write, i);
         }else if(object instanceof boolean[] b){
             write.b(16);
             write.i(b.length);
@@ -184,6 +187,7 @@ public class TypeIO{
             }
             case 19 -> new Vec2(read.f(), read.f());
             case 20 -> Team.all[read.ub()];
+            case 21 -> readInts(read);
             default -> throw new IllegalArgumentException("Unknown object type: " + type);
         };
     }
