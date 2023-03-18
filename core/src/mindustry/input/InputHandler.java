@@ -212,7 +212,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     @Remote(called = Loc.server, targets = Loc.both, forward = true)
-    public static void commandUnits(Player player, int[] unitIds, @Nullable Building buildTarget, @Nullable Unit unitTarget, @Nullable Vec2 posTarget){
+    public static void commandUnits(Player player, int[] unitIds, @Nullable Building buildTarget, @Nullable Unit unitTarget, @Nullable Vec2 posTarget, boolean force){
         if(player == null || unitIds == null) return;
 
         //why did I ever think this was a good idea
@@ -239,7 +239,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                     ai.commandTarget(teamTarget);
 
                 }else if(posTarget != null){
-                    ai.commandPosition(posTarget);
+                    ai.commandPosition(posTarget, false, force);
                 }
                 unit.lastCommanded = player.coloredName();
                 
@@ -827,7 +827,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
     }
 
-    public void commandTap(float screenX, float screenY){
+    public void commandTap(float screenX, float screenY, boolean force){
         if(commandMode){
             //right click: move to position
 
@@ -851,7 +851,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                     Events.fire(Trigger.unitCommandAttack);
                 }
 
-                Call.commandUnits(player, ids, attack instanceof Building b ? b : null, attack instanceof Unit u ? u : null, target);
+                Call.commandUnits(player, ids, attack instanceof Building b ? b : null, attack instanceof Unit u ? u : null, target, force);
             }
 
             if(commandBuildings.size > 0){

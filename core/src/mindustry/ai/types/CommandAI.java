@@ -18,6 +18,8 @@ public class CommandAI extends AIController{
     protected static final boolean[] noFound = {false};
 
     public @Nullable Vec2 targetPos;
+    /** Whether this moving to position command should be executed forcibly */
+    protected boolean force;
     public @Nullable Teamc attackTarget;
     /** All encountered unreachable buildings of this AI. Why a sequence? Because contains() is very rarely called on it. */
     public IntSeq unreachableBuildings = new IntSeq(8);
@@ -151,7 +153,10 @@ public class CommandAI extends AIController{
             boolean move = true;
             vecOut.set(targetPos);
 
-            if(unit.isGrounded()){
+            if (force) {
+                //if the move command is forcible, then move to the target directly
+                moveTo(Tmp.v1.set(targetPos), 1f, 30f);
+            }else if(unit.isGrounded()) {
                 move = Vars.controlPath.getPathPosition(unit, pathId, targetPos, vecOut, noFound);
 
                 //if the path is invalid, stop trying and record the end as unreachable
@@ -266,11 +271,21 @@ public class CommandAI extends AIController{
     }
 
     public void commandPosition(Vec2 pos, boolean stopWhenInRange){
+        commandPosition(pos, stopWhenInRange, false);
+    }
+    /**
+     * Commands this unit to move to the given position.
+     * @param pos The target position
+     * @param stopWhenInRange Whether to stop when in range
+     * @param force Whether this move command is forcible
+     */
+    public void commandPosition(Vec2 pos, boolean stopWhenInRange, boolean force) {
         targetPos = pos;
         lastTargetPos = pos;
         attackTarget = null;
         pathId = Vars.controlPath.nextTargetId();
         this.stopWhenInRange = stopWhenInRange;
+        this.force = force;
     }
 
     @Override
