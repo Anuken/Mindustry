@@ -60,7 +60,7 @@ public enum LAccess{
         all = values(),
         senseable = Seq.select(all, t -> t.params.length <= 1).toArray(LAccess.class),
         controls = Seq.select(all, t -> t.params.length > 0).toArray(LAccess.class),
-        settable = {x, y, rotation, team, flag, health, totalPower, payloadType}; //TODO
+        settable = {x, y, rotation, team, flag, health, totalPower, payloadType};
 
     LAccess(String... params){
         this.params = params;

@@ -19,7 +19,7 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class Pathfinder implements Runnable{
-    private static final long maxUpdate = Time.millisToNanos(7);
+    private static final long maxUpdate = Time.millisToNanos(8);
     private static final int updateFPS = 60;
     private static final int updateInterval = 1000 / updateFPS;
 
@@ -219,8 +219,6 @@ public class Pathfinder implements Runnable{
     public void updateTile(Tile tile){
         if(net.client()) return;
 
-        int x = tile.x, y = tile.y;
-
         tile.getLinkedTiles(t -> {
             int pos = t.array();
             if(pos < tiles.length){
@@ -238,9 +236,10 @@ public class Pathfinder implements Runnable{
             }
         }
 
+        //mark every flow field as dirty, so it updates when it's done
         queue.post(() -> {
             for(Flowfield data : threadList){
-                updateTargets(data, x, y);
+                data.dirty = true;
             }
         });
     }
@@ -257,6 +256,13 @@ public class Pathfinder implements Runnable{
 
                     //each update time (not total!) no longer than maxUpdate
                     for(Flowfield data : threadList){
+
+                        //if it's dirty and there is nothing to update, begin updating once more
+                        if(data.dirty && data.frontier.size == 0){
+                            updateTargets(data);
+                            data.dirty = false;
+                        }
+
                         updateFrontier(data, maxUpdate);
                     }
                 }
@@ -315,7 +321,8 @@ public class Pathfinder implements Runnable{
             }
         }
 
-        int[] values = path.weights;
+        //use complete weights if possible; these contain a complete flow field that is not being updated
+        int[] values = path.hasComplete ? path.completeWeights : path.weights;
         int apos = tile.array();
         int value = values[apos];
 
@@ -339,32 +346,6 @@ public class Pathfinder implements Runnable{
         if(current == null || tl == impassable || (path.cost == costTypes.items[costGround] && current.dangerous() && !tile.dangerous())) return tile;
 
         return current;
-    }
-
-    /**
-     * Clears the frontier, increments the search and sets up all flow sources.
-     * This only occurs for active teams.
-     */
-    private void updateTargets(Flowfield path, int x, int y){
-        int packed = world.packArray(x, y);
-
-        if(packed > path.weights.length) return;
-
-        if(path.weights[packed] == 0){
-            //this was a previous target
-            path.frontier.clear();
-        }else if(!path.frontier.isEmpty()){
-            //skip if this path is processing
-            return;
-        }
-
-        //update cost of the tile TODO maybe only update the cost when it's not passable
-        path.weights[packed] = path.cost.getCost(path.team.id, tiles[packed]);
-
-        //clear frontier to prevent contamination
-        path.frontier.clear();
-
-        updateTargets(path);
     }
 
     /** Increments the search and sets up flow sources. Does not change the frontier. */
@@ -421,6 +402,7 @@ public class Pathfinder implements Runnable{
 
     /** Update the frontier for a path. Pathfinding thread only. */
     private void updateFrontier(Flowfield path, long nsToRun){
+        boolean hadAny = path.frontier.size > 0;
         long start = Time.nanos();
 
         int counter = 0;
@@ -461,6 +443,12 @@ public class Pathfinder implements Runnable{
                     return;
                 }
             }
+        }
+
+        //there WERE some things in the frontier, but now they are gone, so the path is done; copy over latest data
+        if(hadAny && path.frontier.size == 0){
+            System.arraycopy(path.weights, 0, path.completeWeights, 0, path.weights.length);
+            path.hasComplete = true;
         }
     }
 
@@ -505,11 +493,18 @@ public class Pathfinder implements Runnable{
         protected Team team = Team.derelict;
         /** Function for calculating path cost. Set before using. */
         protected PathCost cost = costTypes.get(costGround);
+        /** If true, this flow field needs updating. This flag is only set to false once the flow field finishes and the weights are copied over. */
+        protected boolean dirty = false;
+        /** Whether there are valid weights in the complete array. */
+        protected volatile boolean hasComplete;
 
         /** costs of getting to a specific tile */
         public int[] weights;
         /** search IDs of each position - the highest, most recent search is prioritized and overwritten */
         public int[] searches;
+        /** the last "complete" weights of this tilemap. */
+        public int[] completeWeights;
+
         /** search frontier, these are Pos objects */
         IntQueue frontier = new IntQueue();
         /** all target positions; these positions have a cost of 0, and must be synchronized on! */
@@ -524,6 +519,7 @@ public class Pathfinder implements Runnable{
         void setup(int length){
             this.weights = new int[length];
             this.searches = new int[length];
+            this.completeWeights = new int[length];
             this.frontier.ensureCapacity((length) / 4);
             this.initialized = true;
         }

@@ -119,7 +119,7 @@ public class BuilderAI extends AIController{
             }
 
             //follow someone and help them build
-            if(timer.get(timerTarget2, 60f)){
+            if(timer.get(timerTarget2, 20f)){
                 found = false;
 
                 Units.nearby(unit.team, unit.x, unit.y, buildRadius, u -> {
