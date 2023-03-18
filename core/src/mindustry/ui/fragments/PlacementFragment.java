@@ -49,7 +49,7 @@ public class PlacementFragment{
     Stack mainStack;
     ScrollPane blockPane;
     Runnable rebuildCommand;
-    boolean blockSelectEnd, wasCommandMode;
+    boolean blockSelectEnd, wasCommandMode, fireInRebuildCommand;
     int blockSelectSeq;
     long blockSelectSeqMillis;
     Binding[] blockSelect = {
@@ -79,9 +79,10 @@ public class PlacementFragment{
         });
 
         Events.run(Trigger.unitCommandChange, () -> {
-            if(rebuildCommand != null){
+            if(rebuildCommand != null && !fireInRebuildCommand){
                 rebuildCommand.run();
             }
+            fireInRebuildCommand = false;
         });
 
         Events.on(UnlockEvent.class, event -> {
@@ -462,9 +463,17 @@ public class PlacementFragment{
                                             var listener = new ClickListener();
 
                                             //left click -> select
-                                            b.clicked(KeyCode.mouseLeft, () -> control.input.selectedUnits.removeAll(unit -> unit.type != type));
+                                            b.clicked(KeyCode.mouseLeft, () -> {
+                                                control.input.selectedUnits.removeAll(unit -> unit.type != type);
+                                                fireInRebuildCommand = true;
+                                                Events.fire(Trigger.unitCommandChange);
+                                            });
                                             //right click -> remove
-                                            b.clicked(KeyCode.mouseRight, () -> control.input.selectedUnits.removeAll(unit -> unit.type == type));
+                                            b.clicked(KeyCode.mouseRight, () -> {
+                                                control.input.selectedUnits.removeAll(unit -> unit.type == type);
+                                                fireInRebuildCommand = true;
+                                                Events.fire(Trigger.unitCommandChange);
+                                            });
 
                                             b.addListener(listener);
                                             b.addListener(new HandCursorListener());
