@@ -618,7 +618,7 @@ public class Damage{
         return Math.max(damage - armor, minArmorDamage * damage);
     }
 
-    public static class Collided{
+    public static class Collided implements Pool.Poolable{
         public float x, y;
         public Teamc target;
 
@@ -627,6 +627,11 @@ public class Damage{
             this.y = y;
             this.target = target;
             return this;
+        }
+        
+        @Override
+        public void reset(){
+            target = null;
         }
     }
 }
