@@ -49,7 +49,7 @@ public class PlacementFragment{
     Stack mainStack;
     ScrollPane blockPane;
     Runnable rebuildCommand;
-    boolean blockSelectEnd, wasCommandMode, fireInRebuildCommand;
+    boolean blockSelectEnd, wasCommandMode;
     int blockSelectSeq;
     long blockSelectSeqMillis;
     Binding[] blockSelect = {
@@ -79,10 +79,9 @@ public class PlacementFragment{
         });
 
         Events.run(Trigger.unitCommandChange, () -> {
-            if(rebuildCommand != null && !fireInRebuildCommand){
+            if(rebuildCommand != null){
                 rebuildCommand.run();
             }
-            fireInRebuildCommand = false;
         });
 
         Events.on(UnlockEvent.class, event -> {
@@ -465,13 +464,11 @@ public class PlacementFragment{
                                             //left click -> select
                                             b.clicked(KeyCode.mouseLeft, () -> {
                                                 control.input.selectedUnits.removeAll(unit -> unit.type != type);
-                                                fireInRebuildCommand = true;
                                                 Events.fire(Trigger.unitCommandChange);
                                             });
                                             //right click -> remove
                                             b.clicked(KeyCode.mouseRight, () -> {
                                                 control.input.selectedUnits.removeAll(unit -> unit.type == type);
-                                                fireInRebuildCommand = true;
                                                 Events.fire(Trigger.unitCommandChange);
                                             });
 
