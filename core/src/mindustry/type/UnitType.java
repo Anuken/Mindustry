@@ -108,8 +108,10 @@ public class UnitType extends UnlockableContent{
     buildSpeed = -1f,
     /** Minimum distance from this unit that weapons can target. Prevents units from firing "inside" the unit. */
     aimDst = -1f,
-    /** Visual offset of build beam from front. */
+    /** Visual offset of the build beam from the front. */
     buildBeamOffset = 3.8f,
+    /** Visual offset of the mining beam from the front. */
+    mineBeamOffset = Float.NEGATIVE_INFINITY,
     /** WIP: Units of low priority will always be ignored in favor of those with higher priority, regardless of distance. */
     targetPriority = 0f,
     /** Elevation of shadow drawn under this (ground) unit. Visual only. */
@@ -225,6 +227,8 @@ public class UnitType extends UnlockableContent{
     squareShape = false,
     /** if true, this unit will draw its building beam towards blocks. */
     drawBuildBeam = true,
+    /** if true, this unit will draw its mining beam towards blocks */
+    drawMineBeam = true,
     /** if false, the team indicator/cell is not drawn. */
     drawCell = true,
     /** if false, carried items are not drawn. */
@@ -764,6 +768,8 @@ public class UnitType extends UnlockableContent{
                 }
             }).layer(Layer.debris);
         }
+
+        if(mineBeamOffset == Float.NEGATIVE_INFINITY) mineBeamOffset = hitSize / 2;
 
         for(Ability ab : abilities){
             ab.init(this);
