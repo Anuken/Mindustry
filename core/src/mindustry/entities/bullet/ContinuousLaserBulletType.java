@@ -10,7 +10,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 
 public class ContinuousLaserBulletType extends ContinuousBulletType{
-    public float fadeTime = 16f;
+    public float growTime = 0f, fadeTime = 16f;
     public float lightStroke = 40f;
     public int divisions = 13;
     public Color[] colors = {Color.valueOf("ec745855"), Color.valueOf("ec7458aa"), Color.valueOf("ff9c5a"), Color.white};
@@ -42,7 +42,11 @@ public class ContinuousLaserBulletType extends ContinuousBulletType{
     @Override
     public void draw(Bullet b){
         float realLength = Damage.findLaserLength(b, length);
-        float fout = Mathf.clamp(b.time > b.lifetime - fadeTime ? 1f - (b.time - (lifetime - fadeTime)) / fadeTime : 1f);
+        float fout = Mathf.clamp(
+            b.time < growTime ? (b.time / growTime) :
+            b.time > b.lifetime - fadeTime ? 1f - (b.time - (lifetime - fadeTime)) / fadeTime :
+            1f
+        );
         float baseLen = realLength * fout;
         float rot = b.rotation();
 

@@ -69,15 +69,15 @@ public class LaserTurret extends PowerTurret{
             if(bullets.any()){
 
                 for(var entry : bullets){
-                    float
-                    bulletX = x + Angles.trnsx(rotation - 90, shootX + entry.x, shootY + entry.y),
-                    bulletY = y + Angles.trnsy(rotation - 90, shootX + entry.x, shootY + entry.y),
-                    angle = rotation + entry.rotation;
+                    float bulletX = x + Angles.trnsx(rotation - 90, shootX + entry.x, shootY + entry.y),
+                        bulletY = y + Angles.trnsy(rotation - 90, shootX + entry.x, shootY + entry.y),
+                        angle = rotation + entry.rotation;
 
                     entry.bullet.rotation(angle);
                     entry.bullet.set(bulletX, bulletY);
-                    entry.bullet.time = entry.bullet.type.lifetime * entry.bullet.type.optimalLifeFract;
-                    entry.bullet.keepAlive = true;
+                    float optLife = entry.bullet.type.lifetime * entry.bullet.type.optimalLifeFract;
+                    entry.bullet.time = Math.min(entry.bullet.time, optLife);
+                    if(entry.bullet.time >= optLife) entry.bullet.keepAlive = true;
                     entry.life -= Time.delta / Math.max(efficiency, 0.00001f);
                 }
 
