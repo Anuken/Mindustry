@@ -42,12 +42,12 @@ public class ContinuousLaserBulletType extends ContinuousBulletType{
     @Override
     public void draw(Bullet b){
         float realLength = Damage.findLaserLength(b, length);
-        float fout = Mathf.clamp(
+        float lenScl = Mathf.clamp(
             b.time < growTime ? (b.time / growTime) :
             b.time > b.lifetime - fadeTime ? 1f - (b.time - (lifetime - fadeTime)) / fadeTime :
             1f
         );
-        float baseLen = realLength * fout;
+        float baseLen = realLength * lenScl;
         float rot = b.rotation();
 
         for(int i = 0; i < colors.length; i++){
@@ -55,7 +55,7 @@ public class ContinuousLaserBulletType extends ContinuousBulletType{
 
             float colorFin = i / (float)(colors.length - 1);
             float baseStroke = Mathf.lerp(strokeFrom, strokeTo, colorFin);
-            float stroke = (width + Mathf.absin(Time.time, oscScl, oscMag)) * fout * baseStroke;
+            float stroke = (width + Mathf.absin(Time.time, oscScl, oscMag)) * lenScl * baseStroke;
             float ellipseLenScl = Mathf.lerp(1 - i / (float)(colors.length), 1f, pointyScaling);
 
             Lines.stroke(stroke);
@@ -73,6 +73,16 @@ public class ContinuousLaserBulletType extends ContinuousBulletType{
 
         Drawf.light(b.x, b.y, b.x + Tmp.v1.x, b.y + Tmp.v1.y, lightStroke, lightColor, 0.7f);
         Draw.reset();
+    }
+
+    @Override
+    public float currentLength(Bullet b){
+        float lenScl = Mathf.clamp(
+            b.time < growTime ? (b.time / growTime) :
+            b.time > b.lifetime - fadeTime ? 1f - (b.time - (lifetime - fadeTime)) / fadeTime :
+            1f
+        );
+        return length * lenScl;
     }
 
     @Override
