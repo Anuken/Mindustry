@@ -46,6 +46,11 @@ public class PointLaserBulletType extends BulletType{
     }
 
     @Override
+    public float continuousDamage(){
+        return damage / damageInterval * 60f;
+    }
+
+    @Override
     public float estimateDPS(){
         return damage * 100f / damageInterval * 3f;
     }
