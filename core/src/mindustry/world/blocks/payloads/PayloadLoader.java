@@ -225,6 +225,11 @@ public class PayloadLoader extends PayloadBlock{
         }
 
         @Override
+        public boolean shouldConsume(){
+            return payload != null;
+        }
+
+        @Override
         public byte version(){
             return 1;
         }
