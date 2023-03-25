@@ -322,6 +322,24 @@ public class UI implements ApplicationListener, Loadable{
         Core.scene.add(table);
     }
 
+    public void addDescTooltip(Element elem, String description){
+        if(description == null) return;
+
+        elem.addListener(new Tooltip(t -> t.background(Styles.black8).margin(4f).add(description).color(Color.lightGray)){
+            {
+                allowMobile = true;
+            }
+            @Override
+            protected void setContainerPosition(Element element, float x, float y){
+                this.targetActor = element;
+                Vec2 pos = element.localToStageCoordinates(Tmp.v1.set(0, 0));
+                container.pack();
+                container.setPosition(pos.x, pos.y, Align.topLeft);
+                container.setOrigin(0, element.getHeight());
+            }
+        });
+    }
+
     /** Shows a fading label at the top of the screen. */
     public void showInfoToast(String info, float duration){
         var cinfo = Core.scene.find("coreinfo");
