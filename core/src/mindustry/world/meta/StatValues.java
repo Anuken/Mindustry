@@ -403,6 +403,10 @@ public class StatValues{
                         sep(bt, "@bullet.armorpierce");
                     }
 
+                    if(type.suppressionRange > 0){
+                        sep(bt, Core.bundle.format("bullet.suppression", Strings.fixed(type.suppressionDuration / 60f, 2), Strings.fixed(type.suppressionRange / tilesize, 1)));
+                    }
+
                     if(type.status != StatusEffects.none){
                         sep(bt, (type.status.minfo.mod == null ? type.status.emoji() : "") + "[stat]" + type.status.localizedName + (type.status.reactive ? "" : "[lightgray] ~ [stat]" + ((int)(type.statusDuration / 60f)) + "[lightgray] " + Core.bundle.get("unit.seconds")));
                     }
