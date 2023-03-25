@@ -1,5 +1,9 @@
 [
   {
+    "name": "Tamazia",
+    "address": ["srv1.godlike.club:26705"]
+  },
+  {
     "name": "RCM",
     "address": ["rcrms.ru:6567"]
   },
