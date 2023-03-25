@@ -273,7 +273,7 @@ public class ControlPathfinder{
                     req.raycastTimer = 0;
                 }
 
-                if(req.rayPathIndex < len){
+                if(req.rayPathIndex < len && req.rayPathIndex >= 0){
                     Tile tile = tile(items[req.rayPathIndex]);
                     out.set(tile);
 
