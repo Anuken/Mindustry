@@ -80,8 +80,8 @@ public class CoreBlock extends StorageBlock{
             unit.set(entity);
             unit.rotation(90f);
             unit.impulse(0f, 3f);
-            unit.controller(player);
             unit.spawnedByCore(true);
+            unit.controller(player);
             unit.add();
         }
 
