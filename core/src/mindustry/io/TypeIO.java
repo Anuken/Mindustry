@@ -93,9 +93,6 @@ public class TypeIO{
             write.b((byte)14);
             write.i(b.length);
             write.b(b);
-        }else if(object instanceof int[] i){
-            write.b((byte)21);
-            writeInts(write, i);
         }else if(object instanceof boolean[] b){
             write.b(16);
             write.i(b.length);
@@ -122,6 +119,9 @@ public class TypeIO{
         }else if(object instanceof Team t){
             write.b((byte)20);
             write.b(t.id);
+        }else if(object instanceof int[] i){
+            write.b((byte)21);
+            writeInts(write, i);
         }else if(object instanceof Object[] objs){
             write.b((byte)22);
             write.i(objs.length);
