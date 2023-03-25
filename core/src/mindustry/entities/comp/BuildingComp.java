@@ -1990,7 +1990,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             if(items.get(item) != amount){
                 if(items.get(item) < amount){
                     handleStack(item, acceptStack(item, amount - items.get(item), null), null);
-                }else if(amount > 0){
+                }else if(amount >= 0){
                     removeStack(item, items.get(item) - amount);
                 }
             }
