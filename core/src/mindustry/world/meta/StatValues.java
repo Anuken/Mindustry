@@ -292,15 +292,13 @@ public class StatValues{
                     continue;
                 }
 
-                TextureRegion region = !weapon.name.equals("") && weapon.region.found() ? weapon.region : Core.atlas.find("clear");
-
-                table.image(region).size(60).scaling(Scaling.bounded).right().top();
-
-                table.table(Tex.underline, w -> {
-                    w.left().defaults().padRight(3).left();
+                table.table(Styles.grayPanel, w -> {
+                    w.left().top().defaults().padRight(3).left();
+                    if(!weapon.name.equals("") && weapon.region.found()) w.image(weapon.region).size(60).scaling(Scaling.bounded).left().top();
+                    w.row();
 
                     weapon.addStats(unit, w);
-                }).padTop(-9).left();
+                }).growX().pad(5).margin(10);
                 table.row();
             }
         };
@@ -332,14 +330,16 @@ public class StatValues{
                     continue;
                 }
 
-                //no point in displaying unit icon twice
-                if(!compact && !(t instanceof Turret)){
-                    table.image(icon(t)).size(3 * 8).padRight(4).right().scaling(Scaling.fit).top();
-                    table.add(t.localizedName).padRight(10).left().top();
-                }
-
-                table.table(bt -> {
+                table.table(Styles.grayPanel, bt -> {
                     bt.left().top().defaults().padRight(3).left();
+                    //no point in displaying unit icon twice
+                    if(!compact && !(t instanceof Turret)){
+                        bt.table(title -> {
+                            title.image(icon(t)).size(3 * 8).padRight(4).right().scaling(Scaling.fit).top();
+                            title.add(t.localizedName).padRight(10).left().top();
+                        });
+                        bt.row();
+                    }
 
                     if(type.damage > 0 && (type.collides || type.splashDamage <= 0)){
                         if(type.continuousDamage() > 0){
@@ -442,8 +442,7 @@ public class StatValues{
                         bt.row();
                         bt.add(coll);
                     }
-                }).padTop(compact ? 0 : -9).padLeft(indent * 8).left().get().background(compact ? null : Tex.underline);
-
+                }).padLeft(indent * 8).growX().pad(5).margin(compact ? 0 : 10);
                 table.row();
             }
         };
