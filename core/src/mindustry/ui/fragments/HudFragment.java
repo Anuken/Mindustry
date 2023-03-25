@@ -782,7 +782,7 @@ public class HudFragment{
             builder.setLength(0);
 
             //mission overrides everything
-            if(state.rules.mission != null){
+            if(state.rules.mission != null && state.rules.mission.length() > 0){
                 builder.append(state.rules.mission);
                 return builder;
             }
