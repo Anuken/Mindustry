@@ -406,7 +406,7 @@ public class StatValues{
                     }
 
                     if(type.suppressionRange > 0){
-                        sep(bt, Core.bundle.format("bullet.suppression", Strings.fixed(type.suppressionDuration / 60f, 2), Strings.fixed(type.suppressionRange / tilesize, 1)));
+                        sep(bt, Core.bundle.format("bullet.suppression", Strings.autoFixed(type.suppressionDuration / 60f, 2), Strings.fixed(type.suppressionRange / tilesize, 1)));
                     }
 
                     if(type.status != StatusEffects.none){
