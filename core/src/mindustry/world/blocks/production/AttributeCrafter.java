@@ -72,7 +72,7 @@ public class AttributeCrafter extends GenericCrafter{
         
         @Override
         public float efficiencyScale(){
-            return scaleLiquidConsumption ? efficiencyMultiplier() : 1;
+            return scaleLiquidConsumption ? efficiencyMultiplier() : super.efficiencyScale();
         }
 
         @Override
