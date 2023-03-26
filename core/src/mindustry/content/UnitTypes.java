@@ -2949,10 +2949,10 @@ public class UnitTypes{
                 shootSound = Sounds.missile;
                 mirror = false;
                 x = 0f;
-                y = 1f;
                 shootY = 4f;
                 reload = 60f;
                 cooldownTime = 42f;
+                recoil = 0f;
                 heatColor = Pal.turretHeat;
 
                 bullet = new ArtilleryBulletType(3f, 40){{
