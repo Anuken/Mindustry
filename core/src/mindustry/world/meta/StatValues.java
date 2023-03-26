@@ -292,9 +292,11 @@ public class StatValues{
                     continue;
                 }
 
+                TextureRegion region = !weapon.name.isEmpty() ? Core.atlas.find(weapon.name + "-preview", weapon.region) : null;
+
                 table.table(Styles.grayPanel, w -> {
                     w.left().top().defaults().padRight(3).left();
-                    if(!weapon.name.equals("") && weapon.region.found()) w.image(weapon.region).size(60).scaling(Scaling.bounded).left().top();
+                    if(region != null && region.found()) w.image(region).size(60).scaling(Scaling.bounded).left().top();
                     w.row();
 
                     weapon.addStats(unit, w);
