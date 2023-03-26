@@ -75,9 +75,8 @@ public class LaserTurret extends PowerTurret{
 
                     entry.bullet.rotation(angle);
                     entry.bullet.set(bulletX, bulletY);
-                    float optLife = entry.bullet.type.lifetime * entry.bullet.type.optimalLifeFract;
-                    entry.bullet.time = Math.min(entry.bullet.time, optLife);
-                    if(entry.bullet.time >= optLife) entry.bullet.keepAlive = true;
+                    entry.bullet.time = Math.min(entry.bullet.time + Time.delta, entry.bullet.type.lifetime * entry.bullet.type.optimalLifeFract);
+                    entry.bullet.keepAlive = true;
                     entry.life -= Time.delta / Math.max(efficiency, 0.00001f);
                 }
 
