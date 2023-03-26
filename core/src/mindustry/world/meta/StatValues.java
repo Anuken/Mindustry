@@ -448,7 +448,7 @@ public class StatValues{
                         bt.row();
                         bt.add(coll);
                     }
-                }).padLeft(indent * 8).growX().pad(5).margin(compact ? 0 : 10);
+                }).padLeft(indent * 5).padTop(5).growX().margin(compact ? 0 : 10);
                 table.row();
             }
         };
