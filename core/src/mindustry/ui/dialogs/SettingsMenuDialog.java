@@ -642,11 +642,7 @@ public class SettingsMenuDialog extends BaseDialog{
         }
 
         public CheckSetting checkPref(String name, boolean def){
-            CheckSetting res;
-            list.add(res = new CheckSetting(name, def, null));
-            settings.defaults(name, def);
-            rebuild();
-            return res;
+            return checkPref(name, def, null);
         }
 
         public CheckSetting checkPref(String name, boolean def, Boolc changed){
@@ -658,10 +654,7 @@ public class SettingsMenuDialog extends BaseDialog{
         }
 
         public TextSetting textPref(String name, String def){
-            TextSetting res;
-            list.add(res = new TextSetting(name, def, null));
-            settings.defaults(name, def);
-            rebuild();
+            return textPref(name, def, null);
         }
 
         public TextSetting textPref(String name, String def, Cons<String> changed){
@@ -673,11 +666,7 @@ public class SettingsMenuDialog extends BaseDialog{
         }
 
         public AreaTextSetting areaTextPref(String name, String def){
-            AreaTextSetting res;
-            list.add(res = new AreaTextSetting(name, def, null));
-            settings.defaults(name, def);
-            rebuild();
-            return res;
+            return areaTextPref(name, def, null);
         }
 
         public AreaTextSetting areaTextPref(String name, String def, Cons<String> changed){
