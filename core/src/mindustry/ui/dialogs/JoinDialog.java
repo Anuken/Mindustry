@@ -472,7 +472,7 @@ public class JoinDialog extends BaseDialog{
     }
 
     int columns(){
-        return Mathf.clamp((int)((Core.graphics.getWidth() * 0.85f) / targetWidth()), 1, 3);
+        return Mathf.clamp((int)((Core.graphics.getWidth() / Scl.scl() * 0.85f) / targetWidth()), 1, 3);
     }
 
     void addCommunityHost(Host host, Table container){
@@ -520,12 +520,14 @@ public class JoinDialog extends BaseDialog{
         totalHosts++;
         float w = targetWidth();
 
-        local.row();
+        if((local.getChildren().size) % columns() == 0){
+            local.row();
+        }
 
         local.button(b -> buildServer(host, b), style, () -> {
             Events.fire(new ClientPreConnectEvent(host));
             safeConnect(host.address, host.port, host.version);
-        }).width(w);
+        }).width(w).top().left().growY();
     }
 
     public void connect(String ip, int port){
