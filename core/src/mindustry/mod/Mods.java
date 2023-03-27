@@ -32,7 +32,7 @@ import static mindustry.Vars.*;
 
 public class Mods implements Loadable{
     private static final String[] metaFiles = {"mod.json", "mod.hjson", "plugin.json", "plugin.hjson"};
-    private static final ObjectSet<String> blacklistedMods = ObjectSet.with("ui-lib");
+    private static final ObjectSet<String> blacklistedMods = ObjectSet.with("ui-lib", "braindustry");
 
     private Json json = new Json();
     private @Nullable Scripts scripts;
