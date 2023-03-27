@@ -16,6 +16,7 @@ public class AttributeCrafter extends GenericCrafter{
     public float minEfficiency = -1f;
     public float displayEfficiencyScale = 1f;
     public boolean displayEfficiency = true;
+    public boolean scaleLiquidConsumption = false;
 
     public AttributeCrafter(String name){
         super(name);
@@ -67,6 +68,11 @@ public class AttributeCrafter extends GenericCrafter{
 
         public float efficiencyMultiplier(){
             return baseEfficiency + Math.min(maxBoost, boostScale * attrsum) + attribute.env();
+        }
+        
+        @Override
+        public float efficiencyScale(){
+            return scaleLiquidConsumption ? efficiencyMultiplier() : super.efficiencyScale();
         }
 
         @Override
