@@ -623,9 +623,10 @@ public class SettingsMenuDialog extends BaseDialog{
             return list;
         }
 
-        public void pref(Setting setting){
+        public Setting pref(Setting setting){
             list.add(setting);
             rebuild();
+            return setting;
         }
 
         public SliderSetting sliderPref(String name, int def, int min, int max, StringProcessor s){
@@ -640,40 +641,51 @@ public class SettingsMenuDialog extends BaseDialog{
             return res;
         }
 
-        public void checkPref(String name, boolean def){
-            list.add(new CheckSetting(name, def, null));
+        public CheckSetting checkPref(String name, boolean def){
+            CheckSetting res;
+            list.add(res = new CheckSetting(name, def, null));
+            settings.defaults(name, def);
+            rebuild();
+            return res;
+        }
+
+        public CheckSetting checkPref(String name, boolean def, Boolc changed){
+            CheckSetting res;
+            list.add(res = new CheckSetting(name, def, changed));
+            settings.defaults(name, def);
+            rebuild();
+            return res;
+        }
+
+        public TextSetting textPref(String name, String def){
+            TextSetting res;
+            list.add(res = new TextSetting(name, def, null));
             settings.defaults(name, def);
             rebuild();
         }
 
-        public void checkPref(String name, boolean def, Boolc changed){
-            list.add(new CheckSetting(name, def, changed));
+        public TextSetting textPref(String name, String def, Cons<String> changed){
+            TextSetting res;
+            list.add(res = new TextSetting(name, def, changed));
             settings.defaults(name, def);
             rebuild();
+            return res;
         }
 
-        public void textPref(String name, String def){
-            list.add(new TextSetting(name, def, null));
+        public AreaTextSetting areaTextPref(String name, String def){
+            AreaTextSetting res;
+            list.add(res = new AreaTextSetting(name, def, null));
             settings.defaults(name, def);
             rebuild();
+            return res;
         }
 
-        public void textPref(String name, String def, Cons<String> changed){
-            list.add(new TextSetting(name, def, changed));
+        public AreaTextSetting areaTextPref(String name, String def, Cons<String> changed){
+            AreaTextSetting res;
+            list.add(res = new AreaTextSetting(name, def, changed));
             settings.defaults(name, def);
             rebuild();
-        }
-
-        public void areaTextPref(String name, String def){
-            list.add(new AreaTextSetting(name, def, null));
-            settings.defaults(name, def);
-            rebuild();
-        }
-
-        public void areaTextPref(String name, String def, Cons<String> changed){
-            list.add(new AreaTextSetting(name, def, changed));
-            settings.defaults(name, def);
-            rebuild();
+            return res;
         }
 
         public void rebuild(){
