@@ -25,13 +25,13 @@ public class RadialEffect extends Effect{
     }
 
     @Override
-    public void create(float x, float y, float rotation, Color color, Object data){
+    public void create(float x, float y, float rotation, Color color, float fdata, Object data){
         if(!shouldCreate()) return;
 
         rotation += rotationOffset;
 
         for(int i = 0; i < amount; i++){
-            effect.create(x + Angles.trnsx(rotation, lengthOffset), y + Angles.trnsy(rotation, lengthOffset), rotation, color, data);
+            effect.create(x + Angles.trnsx(rotation, lengthOffset), y + Angles.trnsy(rotation, lengthOffset), rotation, color, fdata, data);
             rotation += rotationSpacing;
         }
     }
