@@ -476,8 +476,9 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         controller.removed(self());
 
         //make sure trail doesn't just go poof
-        if(trail != null && trail.size() > 0){
-            Fx.trailFade.at(x, y, trail.width(), type.trailColor == null ? team.color : type.trailColor, trail.copy());
+        float tWidth = type.trailWidth(self());
+        if(trail != null && trail.size() > 0 && tWidth > 0.001f){
+            Fx.trailFade.at(x, y, tWidth, type.trailColor == null ? team.color : type.trailColor, trail.copy());
         }
     }
 
@@ -540,10 +541,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         if(trail != null){
             trail.length = type.trailLength;
 
-            float scale = type.useEngineElevation ? elevation : 1f;
-            float offset = type.engineOffset/2f + type.engineOffset/2f*scale;
-
-            float cx = x + Angles.trnsx(rotation + 180, offset), cy = y + Angles.trnsy(rotation + 180, offset);
+            float cx = x + Angles.trnsx(rotation + 180, type.engineOffset),
+                cy = y + Angles.trnsy(rotation + 180, type.engineOffset);
             trail.update(cx, cy);
         }
 

@@ -1341,7 +1341,11 @@ public class UnitType extends UnlockableContent{
             unit.trail = new Trail(trailLength);
         }
         Trail trail = unit.trail;
-        trail.draw(trailColor == null ? unit.team.color : trailColor, (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f) * (useEngineElevation ? unit.elevation : 1f)) * trailScl);
+        trail.draw(trailColor == null ? unit.team.color : trailColor, trailWidth(unit));
+    }
+
+    public float trailWidth(Unit unit){
+        return (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f)) * (useEngineElevation ? unit.elevation : 1f) * trailScl;
     }
 
     public void drawEngines(Unit unit){
