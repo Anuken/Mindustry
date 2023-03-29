@@ -1,5 +1,9 @@
 [
   {
+    "name": "Tamazia",
+    "address": ["srv1.godlike.club:26705"]
+  },
+  {
     "name": "RCM",
     "address": ["rcrms.ru:6567"]
   },
@@ -41,7 +45,7 @@
   },
   {
     "name": "thedimas",
-    "address": ["play.thedimas.pp.ua", "play.thedimas.pp.ua:6510", "play.thedimas.pp.ua:6511", "play.thedimas.pp.ua:6509", "play.thedimas.pp.ua:6508"]
+    "address": ["91.209.226.11", "91.209.226.11:6510", "91.209.226.11:6511", "91.209.226.11:6509", "91.209.226.11:6508", "91.209.226.11:6512", "91.209.226.11:6513"]
   },
   {
     "name": "HexPvP Network",
@@ -49,7 +53,7 @@
   },
   {
     "name": "Omega Hub",
-    "address": ["n1.mindustry.me:6608", "n7.mindustry.me:6567", "n7.mindustry.me:6570", "n1.mindustry.me:6568", "n1.mindustry.me:6671", "n1.mindustry.me:6570", "n1.mindustry.me:6573", "n1.mindustry.me:6610", "n1.mindustry.me:6567", "n1.mindustry.me:6599", "n1.mindustry.me:6774", "n1.mindustry.me:6571", "n1.mindustry.me:6589"]
+    "address": ["n1.mindustry.me:6608", "n7.mindustry.me:6767", "n7.mindustry.me:6768", "n1.mindustry.me:6568", "n1.mindustry.me:6671", "n1.mindustry.me:6570", "n1.mindustry.me:6573", "n1.mindustry.me:6610", "n1.mindustry.me:6567", "n1.mindustry.me:6599", "n1.mindustry.me:6774", "n1.mindustry.me:6571", "n1.mindustry.me:6589"]
   },
   {
     "name": "KMWStudios",
@@ -97,7 +101,7 @@
   },
   {
     "name": "Fish",
-    "address": ["170.187.144.235", "162.248.100.98"]
+    "address": ["170.187.144.235", "162.248.100.98", "162.248.100.133"]
   },
   {
     "name": "OMNIDUSTRY",
@@ -110,7 +114,7 @@
   },
   {
     "name": "Eradicationdustry",
-    "address": ["eradicationmindustry.mindustry.me:6569", "eradicationmindustry.mindustry.me:9547", "eradicationmindustry.mindustry.me:6572", "eradicationmindustry.yeet.ml:6570", "eradicationmindustry.mindustry.me:6571", "eradicationmindustry.mindustry.me:6574", "eradicationmindustry.mindustry.me:6573", "eradicationmindustry2.mindustry.me:6567", "eradicationmindustry.mindustry.me:6568"]
+    "address": ["eradicationmindustry.mindustry.me:6569", "eradicationmindustry.mindustry.me:9547", "eradicationmindustry.mindustry.me:6572", "eradicationmindustry.yeet.ml:6570", "eradicationmindustry.mindustry.me:6571", "eradicationmindustry.mindustry.me:6574", "eradicationmindustry.mindustry.me:6573", "eradicationmindustry2.mindustry.me:6567", "eradicationmindustry.mindustry.me:6568", "eradicationmindustry.mindustry.me:6677", "eradicationmindustry.mindustry.me:6678"]
   },
   {
     "name": "Conservatory",
@@ -167,5 +171,9 @@
   {
     "name": "Botipont",
     "address": ["217.144.54.208:6567", "217.144.54.208:6568", "217.144.54.208:6569"]
+  },
+  {
+    "name": "Exploding Cowards",
+    "address": ["193.31.31.165:25778", "193.31.31.165:25790"]
   }
 ]

@@ -13,8 +13,6 @@ public class RailBulletType extends BulletType{
 
     public Effect pierceEffect = Fx.hitBulletSmall, pointEffect = Fx.none, lineEffect = Fx.none;
     public Effect endEffect = Fx.none;
-    /** Multiplier of damage decreased per health pierced. */
-    public float pierceDamageFactor = 1f;
 
     public float length = 100f;
 
@@ -37,8 +35,9 @@ public class RailBulletType extends BulletType{
         return length;
     }
 
-    void handle(Bullet b, float initialHealth, float x, float y){
-        float sub = Math.max(initialHealth*pierceDamageFactor, 0);
+    @Override
+    public void handlePierce(Bullet b, float initialHealth, float x, float y){
+        float sub = Math.max(initialHealth * pierceDamageFactor, 0);
 
         if(b.damage <= 0){
             b.fdata = Math.min(b.fdata, b.dst(x, y));
@@ -94,13 +93,7 @@ public class RailBulletType extends BulletType{
     }
 
     @Override
-    public void hitEntity(Bullet b, Hitboxc entity, float health){
-        super.hitEntity(b, entity, health);
-        handle(b, health, entity.getX(), entity.getY());
-    }
-
-    @Override
     public void hitTile(Bullet b, Building build, float x, float y, float initialHealth, boolean direct){
-        handle(b, initialHealth, x, y);
+        handlePierce(b, initialHealth, x, y);
     }
 }

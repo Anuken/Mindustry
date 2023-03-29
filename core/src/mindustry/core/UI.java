@@ -261,28 +261,32 @@ public class UI implements ApplicationListener, Loadable{
         });
     }
 
-    public void showTextInput(String titleText, String dtext, int textLength, String def, boolean inumeric, Cons<String> confirmed){
+    public void showTextInput(String titleText, String text, int textLength, String def, boolean numbers, Cons<String> confirmed, Runnable closed){
         if(mobile){
             Core.input.getTextInput(new TextInput(){{
                 this.title = (titleText.startsWith("@") ? Core.bundle.get(titleText.substring(1)) : titleText);
                 this.text = def;
-                this.numeric = inumeric;
+                this.numeric = numbers;
                 this.maxLength = textLength;
                 this.accepted = confirmed;
                 this.allowEmpty = false;
             }});
         }else{
             new Dialog(titleText){{
-                cont.margin(30).add(dtext).padRight(6f);
-                TextFieldFilter filter = inumeric ? TextFieldFilter.digitsOnly : (f, c) -> true;
+                cont.margin(30).add(text).padRight(6f);
+                TextFieldFilter filter = numbers ? TextFieldFilter.digitsOnly : (f, c) -> true;
                 TextField field = cont.field(def, t -> {}).size(330f, 50f).get();
                 field.setFilter((f, c) -> field.getText().length() < textLength && filter.acceptChar(f, c));
                 buttons.defaults().size(120, 54).pad(4);
-                buttons.button("@cancel", this::hide);
+                buttons.button("@cancel", () -> {
+                    closed.run();
+                    hide();
+                });
                 buttons.button("@ok", () -> {
                     confirmed.get(field.getText());
                     hide();
                 }).disabled(b -> field.getText().isEmpty());
+
                 keyDown(KeyCode.enter, () -> {
                     String text = field.getText();
                     if(!text.isEmpty()){
@@ -290,9 +294,10 @@ public class UI implements ApplicationListener, Loadable{
                         hide();
                     }
                 });
-                keyDown(KeyCode.escape, this::hide);
-                keyDown(KeyCode.back, this::hide);
+
+                closeOnBack(closed);
                 show();
+
                 Core.scene.setKeyboardFocus(field);
                 field.setCursorPosition(def.length());
             }};
@@ -303,8 +308,12 @@ public class UI implements ApplicationListener, Loadable{
         showTextInput(title, text, 32, def, confirmed);
     }
 
-    public void showTextInput(String titleText, String text, int textLength, String def, Cons<String> confirmed){
-        showTextInput(titleText, text, textLength, def, false, confirmed);
+    public void showTextInput(String title, String text, int textLength, String def, Cons<String> confirmed){
+        showTextInput(title, text, textLength, def, false, confirmed);
+    }
+
+    public void showTextInput(String title, String text, int textLength, String def, boolean numeric, Cons<String> confirmed){
+        showTextInput(title, text, textLength, def, numeric, confirmed, () -> {});
     }
 
     public void showInfoFade(String info){
@@ -320,6 +329,24 @@ public class UI implements ApplicationListener, Loadable{
         table.actions(Actions.fadeOut(duration, Interp.fade), Actions.remove());
         table.top().add(info).style(Styles.outlineLabel).padTop(10);
         Core.scene.add(table);
+    }
+
+    public void addDescTooltip(Element elem, String description){
+        if(description == null) return;
+
+        elem.addListener(new Tooltip(t -> t.background(Styles.black8).margin(4f).add(description).color(Color.lightGray)){
+            {
+                allowMobile = true;
+            }
+            @Override
+            protected void setContainerPosition(Element element, float x, float y){
+                this.targetActor = element;
+                Vec2 pos = element.localToStageCoordinates(Tmp.v1.set(0, 0));
+                container.pack();
+                container.setPosition(pos.x, pos.y, Align.topLeft);
+                container.setOrigin(0, element.getHeight());
+            }
+        });
     }
 
     /** Shows a fading label at the top of the screen. */
@@ -566,14 +593,10 @@ public class UI implements ApplicationListener, Loadable{
 
     /** Shows a menu that fires a callback when an option is selected. If nothing is selected, -1 is returned. */
     public void showMenu(String title, String message, String[][] options, Intc callback){
-        new Dialog("[accent]" + title){{
+        new Dialog(title){{
             setFillParent(true);
             removeChild(titleTable);
             cont.add(titleTable).width(400f);
-
-            getStyle().titleFontColor = Color.white;
-            title.getStyle().fontColor = Color.white;
-            title.setStyle(title.getStyle());
 
             cont.row();
             cont.image().width(400f).pad(2).colspan(2).height(4f).color(Pal.accent).bottom();

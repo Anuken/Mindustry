@@ -16,6 +16,7 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 
 import static mindustry.Vars.*;
 
@@ -75,12 +76,12 @@ public class UnitCargoLoader extends Block{
     }
 
     @Remote(called = Loc.server)
-    public static void cargoLoaderDroneSpawned(Tile tile, int id){
-        if(tile == null || !(tile.build instanceof UnitTransportSourceBuild build)) return;
+    public static void unitTetherBlockSpawned(Tile tile, int id){
+        if(tile == null || !(tile.build instanceof UnitTetherBlock build)) return;
         build.spawned(id);
     }
 
-    public class UnitTransportSourceBuild extends Building{
+    public class UnitTransportSourceBuild extends Building implements UnitTetherBlock{
         //needs to be "unboxed" after reading, since units are read after buildings.
         public int readUnitId = -1;
         public float buildProgress, totalProgress;
@@ -117,7 +118,7 @@ public class UnitCargoLoader extends Block{
                         unit.set(x, y);
                         unit.rotation = 90f;
                         unit.add();
-                        Call.cargoLoaderDroneSpawned(tile, unit.id);
+                        Call.unitTetherBlockSpawned(tile, unit.id);
                     }
                 }
             }

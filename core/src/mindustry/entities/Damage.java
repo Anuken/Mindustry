@@ -160,7 +160,7 @@ public class Damage{
             //add distance to list so it can be processed
             var build = world.build(x, y);
 
-            if(build != null && build.team != b.team && b.checkUnderBuild(build, x * tilesize, y * tilesize)){
+            if(build != null && build.team != b.team && build.collide(b) && b.checkUnderBuild(build, x * tilesize, y * tilesize)){
                 distances.add(b.dst(build));
 
                 if(b.type.laserAbsorb && build.absorbLasers()){
@@ -237,7 +237,7 @@ public class Damage{
             seg2.set(seg1).add(vec);
             World.raycastEachWorld(x, y, seg2.x, seg2.y, (cx, cy) -> {
                 Building tile = world.build(cx, cy);
-                boolean collide = tile != null && hitter.checkUnderBuild(tile, cx * tilesize, cy * tilesize)
+                boolean collide = tile != null && tile.collide(hitter) && hitter.checkUnderBuild(tile, cx * tilesize, cy * tilesize)
                     && ((tile.team != team && tile.collide(hitter)) || hitter.type.testCollision(hitter, tile)) && collidedBlocks.add(tile.pos());
                 if(collide){
                     collided.add(collidePool.obtain().set(cx * tilesize, cy * tilesize, tile));
@@ -618,7 +618,7 @@ public class Damage{
         return Math.max(damage - armor, minArmorDamage * damage);
     }
 
-    public static class Collided{
+    public static class Collided implements Pool.Poolable{
         public float x, y;
         public Teamc target;
 
@@ -627,6 +627,11 @@ public class Damage{
             this.y = y;
             this.target = target;
             return this;
+        }
+        
+        @Override
+        public void reset(){
+            target = null;
         }
     }
 }

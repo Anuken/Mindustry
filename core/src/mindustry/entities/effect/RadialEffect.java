@@ -1,5 +1,6 @@
 package mindustry.entities.effect;
 
+import arc.graphics.*;
 import arc.math.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -24,26 +25,14 @@ public class RadialEffect extends Effect{
     }
 
     @Override
-    public void init(){
-        effect.init();
-        clip = Math.max(clip, effect.clip);
-        lifetime = effect.lifetime;
-    }
+    public void create(float x, float y, float rotation, Color color, Object data){
+        if(!shouldCreate()) return;
 
-    @Override
-    public void render(EffectContainer e){
-        float x = e.x, y = e.y;
-
-        e.rotation += rotationOffset;
+        rotation += rotationOffset;
 
         for(int i = 0; i < amount; i++){
-            e.x = x + Angles.trnsx(e.rotation, lengthOffset);
-            e.y = y + Angles.trnsy(e.rotation, lengthOffset);
-            effect.render(e);
-            e.rotation += rotationSpacing;
-            e.id ++;
+            effect.create(x + Angles.trnsx(rotation, lengthOffset), y + Angles.trnsy(rotation, lengthOffset), rotation, color, data);
+            rotation += rotationSpacing;
         }
-
-        clip = Math.max(clip, effect.clip);
     }
 }

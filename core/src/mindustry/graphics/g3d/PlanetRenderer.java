@@ -188,9 +188,10 @@ public class PlanetRenderer implements Disposable{
         }
 
         //render sector grid
-        Mesh mesh = outline(planet.grid.size);
+        float scaledOutlineRad = outlineRad * planet.radius;
+        Mesh mesh = outline(planet.grid.size, planet.radius);
         Shader shader = Shaders.planetGrid;
-        Vec3 tile = planet.intersect(cam.getMouseRay(), outlineRad);
+        Vec3 tile = planet.intersect(cam.getMouseRay(), scaledOutlineRad);
         Shaders.planetGrid.mouse.lerp(tile == null ? Vec3.Zero : tile.sub(planet.position).rotate(Vec3.Y, planet.getRotation()), 0.2f);
 
         shader.bind();
@@ -210,13 +211,14 @@ public class PlanetRenderer implements Disposable{
 
     public void drawArc(Planet planet, Vec3 a, Vec3 b, Color from, Color to, float length, float timeScale, int pointCount){
         //increase curve height when on opposite side of planet, so it doesn't tunnel through
+        float scaledOutlineRad = outlineRad * planet.radius;
         float dot = 1f - (Tmp.v32.set(a).nor().dot(Tmp.v33.set(b).nor()) + 1f)/2f;
 
         Vec3 avg = Tmp.v31.set(b).add(a).scl(0.5f);
         avg.setLength(planet.radius*(1f+length) + dot * 1.35f);
 
         points.clear();
-        points.addAll(Tmp.v33.set(b).setLength(outlineRad), Tmp.v31, Tmp.v34.set(a).setLength(outlineRad));
+        points.addAll(Tmp.v33.set(b).setLength(scaledOutlineRad), Tmp.v31, Tmp.v34.set(a).setLength(scaledOutlineRad));
         Tmp.bz3.set(points);
 
         for(int i = 0; i < pointCount + 1; i++){
@@ -231,8 +233,8 @@ public class PlanetRenderer implements Disposable{
     public void drawBorders(Sector sector, Color base, float alpha){
         Color color = Tmp.c1.set(base).a((base.a + 0.3f + Mathf.absin(Time.globalTime, 5f, 0.3f)) * alpha);
 
-        float r1 = 1f;
-        float r2 = outlineRad + 0.001f;
+        float r1 = 1f * sector.planet.radius;
+        float r2 = outlineRad * sector.planet.radius + 0.001f;
 
         for(int i = 0; i < sector.tile.corners.length; i++){
             Corner c = sector.tile.corners[i], next = sector.tile.corners[(i+1) % sector.tile.corners.length];
@@ -268,16 +270,16 @@ public class PlanetRenderer implements Disposable{
 
         projector.setPlane(
         //origin on sector position
-        Tmp.v33.set(sector.tile.v).setLength(outlineRad + length).rotate(Vec3.Y, rotation).add(sector.planet.position),
+        Tmp.v33.set(sector.tile.v).setLength((outlineRad + length) * sector.planet.radius).rotate(Vec3.Y, rotation).add(sector.planet.position),
         //face up
-        sector.plane.project(Tmp.v32.set(sector.tile.v).add(Vec3.Y)).sub(sector.tile.v).rotate(Vec3.Y, rotation).nor(),
+        sector.plane.project(Tmp.v32.set(sector.tile.v).add(Vec3.Y)).sub(sector.tile.v, sector.planet.radius).rotate(Vec3.Y, rotation).nor(),
         //right vector
         Tmp.v31.set(Tmp.v32).rotate(Vec3.Y, -rotation).add(sector.tile.v).rotate(sector.tile.v, 90).sub(sector.tile.v).rotate(Vec3.Y, rotation).nor()
         );
     }
 
     public void fill(Sector sector, Color color, float offset){
-        float rr = outlineRad + offset;
+        float rr = outlineRad * sector.planet.radius + offset;
         for(int i = 0; i < sector.tile.corners.length; i++){
             Corner c = sector.tile.corners[i], next = sector.tile.corners[(i+1) % sector.tile.corners.length];
             batch.tri(Tmp.v31.set(c.v).setLength(rr), Tmp.v32.set(next.v).setLength(rr), Tmp.v33.set(sector.tile.v).setLength(rr), color);
@@ -289,7 +291,7 @@ public class PlanetRenderer implements Disposable{
     }
 
     public void drawSelection(Sector sector, Color color, float stroke, float length){
-        float arad = outlineRad + length;
+        float arad = (outlineRad + length) * sector.planet.radius;
 
         for(int i = 0; i < sector.tile.corners.length; i++){
             Corner next = sector.tile.corners[(i + 1) % sector.tile.corners.length];
@@ -311,7 +313,7 @@ public class PlanetRenderer implements Disposable{
         }
     }
 
-    public Mesh outline(int size){
+    public Mesh outline(int size, float radiusScale){
         if(outlines[size] == null){
             outlines[size] = MeshBuilder.buildHex(new HexMesher(){
                 @Override
@@ -323,7 +325,7 @@ public class PlanetRenderer implements Disposable{
                 public Color getColor(Vec3 position){
                     return outlineColor;
                 }
-            }, size, true, outlineRad, 0.2f);
+            }, size, true, outlineRad * radiusScale, 0.2f);
         }
         return outlines[size];
     }

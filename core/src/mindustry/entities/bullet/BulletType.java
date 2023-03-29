@@ -46,6 +46,8 @@ public class BulletType extends Content implements Cloneable{
     public boolean pierceBuilding;
     /** Maximum # of pierced objects. */
     public int pierceCap = -1;
+    /** Multiplier of damage decreased per health pierced. */
+    public float pierceDamageFactor = 0f;
     /** If false, this bullet isn't removed after pierceCap is exceeded. Expert usage only. */
     public boolean removeAfterPierce = true;
     /** For piercing lasers, setting this to true makes it get absorbed by plastanium walls. */
@@ -143,7 +145,7 @@ public class BulletType extends Content implements Cloneable{
     public boolean fragOnHit = true;
     /** If false, this bullet will not create fraags when absorbed by a shield. */
     public boolean fragOnAbsorb = true;
-    /** If true, unit armor is ignored in damage calculations. Ignored for building armor. */
+    /** If true, unit armor is ignored in damage calculations. */
     public boolean pierceArmor = false;
     /** Whether status and despawnHit should automatically be set. */
     public boolean setDefaults = true;
@@ -360,6 +362,8 @@ public class BulletType extends Content implements Cloneable{
         }else if(build.team != b.team && direct){
             hit(b);
         }
+
+        handlePierce(b, initialHealth, x, y);
     }
 
     public void hitEntity(Bullet b, Hitboxc entity, float health){
@@ -384,6 +388,19 @@ public class BulletType extends Content implements Cloneable{
 
         if(!wasDead && entity instanceof Unit unit && unit.dead){
             Events.fire(new UnitBulletDestroyEvent(unit, b));
+        }
+
+        handlePierce(b, health, entity.x(), entity.y());
+    }
+
+    public void handlePierce(Bullet b, float initialHealth, float x, float y){
+        float sub = Math.max(initialHealth*pierceDamageFactor, 0);
+        //subtract health from each consecutive pierce
+        b.damage -= Math.min(b.damage, sub);
+
+        if(removeAfterPierce && b.damage <= 0){
+            b.hit = true;
+            b.remove();
         }
     }
 

@@ -42,6 +42,9 @@ public class ServerControl implements ApplicationListener{
     protected static DateTimeFormatter dateTime = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss"),
         autosaveDate = DateTimeFormatter.ofPattern("MM-dd-yyyy_HH-mm-ss");
 
+    /** Global instance of ServerControl, initialized when the server is created. Should never be null on a dedicated server. */
+    public static ServerControl instance;
+
     public final CommandHandler handler = new CommandHandler("");
     public final Fi logFolder = Core.settings.getDataDirectory().child("logs/");
 
@@ -68,6 +71,7 @@ public class ServerControl implements ApplicationListener{
 
     public ServerControl(String[] args){
         setup(args);
+        instance = this;
     }
 
     protected void setup(String[] args){
