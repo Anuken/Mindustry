@@ -13,11 +13,12 @@ abstract class EffectStateComp implements Posc, Drawc, Timedc, Rotc, Childc{
 
     Color color = new Color(Color.white);
     Effect effect;
+    float fdata;
     Object data;
 
     @Override
     public void draw(){
-        lifetime = effect.render(id, color, time, lifetime, rotation, x, y, data);
+        lifetime = effect.render(id, color, time, lifetime, rotation, x, y, fdata, data);
     }
 
     @Replace

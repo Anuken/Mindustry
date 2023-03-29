@@ -478,7 +478,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         //make sure trail doesn't just go poof
         float tWidth = type.trailWidth(self());
         if(trail != null && trail.size() > 0 && tWidth > 0.001f){
-            Fx.trailFade.at(x, y, tWidth, type.trailColor == null ? team.color : type.trailColor, trail.copy());
+            Fx.trailFade.at(x, y, tWidth, type.trailColor == null ? team.color : type.trailColor, type.engineLayer > 0 ? type.engineLayer : (elevation > 0.5f ? (type.lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit) : type.groundLayer + Mathf.clamp(hitSize / 4000f, 0, 0.01f)), trail.copy());
         }
     }
 

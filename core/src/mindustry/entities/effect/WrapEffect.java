@@ -36,7 +36,7 @@ public class WrapEffect extends Effect{
     }
 
     @Override
-    public void create(float x, float y, float rotation, Color color, Object data){
-        effect.create(x, y, this.rotation, this.color, data);
+    public void create(float x, float y, float rotation, Color color, float fdata, Object data){
+        effect.create(x, y, this.rotation, this.color, fdata, data);
     }
 }

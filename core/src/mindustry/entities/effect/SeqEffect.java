@@ -36,7 +36,7 @@ public class SeqEffect extends Effect{
         for(int i = 0; i < effects.length; i++){
             var fx = effects[i];
             if(life <= fx.lifetime + sum){
-                cont.set(e.id + i, e.color, life - sum, fx.lifetime, e.rotation, e.x, e.y, e.data);
+                cont.set(e.id + i, e.color, life - sum, fx.lifetime, e.rotation, e.x, e.y, e.fdata, e.data);
                 fx.render(cont);
                 clip = Math.max(clip, fx.clip);
                 break;

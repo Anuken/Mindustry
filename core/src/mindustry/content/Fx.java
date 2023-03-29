@@ -45,24 +45,14 @@ public class Fx{
         //lifetime is how many frames it takes to fade out the trail
         e.lifetime = trail.length * 1.4f;
 
+        if(e.fdata != -1) Draw.z(e.fdata);
+
         if(!state.isPaused()){
             trail.shorten();
         }
         trail.drawCap(e.color, e.rotation);
         trail.draw(e.color, e.rotation);
     }),
-
-    groundTrailFade = new Effect(400f, e -> {
-        if(!(e.data instanceof Trail trail)) return;
-        //lifetime is how many frames it takes to fade out the trail
-        e.lifetime = trail.length * 1.4f;
-
-        if(!state.isPaused()){
-            trail.shorten();
-        }
-        trail.drawCap(e.color, e.rotation);
-        trail.draw(e.color, e.rotation);
-    }).layer(Layer.debris),
 
     unitSpawn = new Effect(30f, e -> {
         if(!(e.data instanceof UnitType unit)) return;

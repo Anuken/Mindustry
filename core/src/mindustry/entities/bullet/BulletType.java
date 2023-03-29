@@ -498,7 +498,7 @@ public class BulletType extends Content implements Cloneable{
     /** Called when the bullet is removed for any reason. */
     public void removed(Bullet b){
         if(trailLength > 0 && b.trail != null && b.trail.size() > 0){
-            Fx.trailFade.at(b.x, b.y, trailWidth, trailColor, b.trail.copy());
+            Fx.trailFade.at(b.x, b.y, trailWidth, trailColor, layer - 0.0001f, b.trail.copy());
         }
     }
 

@@ -15,11 +15,11 @@ public class MultiEffect extends Effect{
     }
 
     @Override
-    public void create(float x, float y, float rotation, Color color, Object data){
+    public void create(float x, float y, float rotation, Color color, float fdata, Object data){
         if(!shouldCreate()) return;
 
         for(var effect : effects){
-            effect.create(x, y, rotation, color, data);
+            effect.create(x, y, rotation, color, fdata, data);
         }
     }
 }

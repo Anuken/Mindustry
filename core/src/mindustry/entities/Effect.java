@@ -103,46 +103,50 @@ public class Effect{
     }
 
     public void at(Position pos){
-        create(pos.getX(), pos.getY(), 0, Color.white, null);
+        create(pos.getX(), pos.getY(), 0, Color.white, -1, null);
     }
 
     public void at(Position pos, boolean parentize){
-        create(pos.getX(), pos.getY(), 0, Color.white, parentize ? pos : null);
+        create(pos.getX(), pos.getY(), 0, Color.white, -1, parentize ? pos : null);
     }
 
     public void at(Position pos, float rotation){
-        create(pos.getX(), pos.getY(), rotation, Color.white, null);
+        create(pos.getX(), pos.getY(), rotation, Color.white, -1, null);
     }
 
     public void at(float x, float y){
-        create(x, y, 0, Color.white, null);
+        create(x, y, 0, Color.white, -1, null);
     }
 
     public void at(float x, float y, float rotation){
-        create(x, y, rotation, Color.white, null);
+        create(x, y, rotation, Color.white, -1, null);
     }
 
     public void at(float x, float y, float rotation, Color color){
-        create(x, y, rotation, color, null);
+        create(x, y, rotation, color, -1, null);
     }
 
     public void at(float x, float y, Color color){
-        create(x, y, 0, color, null);
+        create(x, y, 0, color, -1, null);
     }
 
     public void at(float x, float y, float rotation, Color color, Object data){
-        create(x, y, rotation, color, data);
+        create(x, y, rotation, color, -1, data);
     }
 
     public void at(float x, float y, float rotation, Object data){
-        create(x, y, rotation, Color.white, data);
+        create(x, y, rotation, Color.white, -1, data);
+    }
+
+    public void at(float x, float y, float rotation, Color color, float fdata, Object data){
+        create(x, y, rotation, color, fdata, data);
     }
 
     public boolean shouldCreate(){
         return !headless && this != Fx.none && Vars.renderer.enableEffects;
     }
 
-    public void create(float x, float y, float rotation, Color color, Object data){
+    public void create(float x, float y, float rotation, Color color, float fdata, Object data){
         if(!shouldCreate()) return;
 
         if(Core.camera.bounds(Tmp.r1).overlaps(Tmp.r2.setCentered(x, y, clip))){
@@ -152,17 +156,18 @@ public class Effect{
             }
 
             if(startDelay <= 0f){
-                add(x, y, rotation, color, data);
+                add(x, y, rotation, color, fdata, data);
             }else{
-                Time.run(startDelay, () -> add(x, y, rotation, color, data));
+                Time.run(startDelay, () -> add(x, y, rotation, color, fdata, data));
             }
         }
     }
 
-    protected void add(float x, float y, float rotation, Color color, Object data){
+    protected void add(float x, float y, float rotation, Color color, float fdata, Object data){
         var entity = EffectState.create();
         entity.effect = this;
         entity.rotation = baseRotation + rotation;
+        entity.fdata = fdata;
         entity.data = data;
         entity.lifetime = lifetime;
         entity.set(x, y);
@@ -174,8 +179,8 @@ public class Effect{
         entity.add();
     }
 
-    public float render(int id, Color color, float life, float lifetime, float rotation, float x, float y, Object data){
-        container.set(id, color, life, lifetime, rotation, x, y, data);
+    public float render(int id, Color color, float life, float lifetime, float rotation, float x, float y, float fdata, Object data){
+        container.set(id, color, life, lifetime, rotation, x, y, fdata, data);
         Draw.z(layer);
         Draw.reset();
         render(container);
@@ -266,10 +271,11 @@ public class Effect{
         public float x, y, time, lifetime, rotation;
         public Color color;
         public int id;
+        public float fdata;
         public Object data;
         private EffectContainer innerContainer;
 
-        public void set(int id, Color color, float life, float lifetime, float rotation, float x, float y, Object data){
+        public void set(int id, Color color, float life, float lifetime, float rotation, float x, float y, float fdata, Object data){
             this.x = x;
             this.y = y;
             this.color = color;
@@ -277,6 +283,7 @@ public class Effect{
             this.lifetime = lifetime;
             this.id = id;
             this.rotation = rotation;
+            this.fdata = fdata;
             this.data = data;
         }
 
@@ -291,7 +298,7 @@ public class Effect{
         public void scaled(float lifetime, Cons<EffectContainer> cons){
             if(innerContainer == null) innerContainer = new EffectContainer();
             if(time <= lifetime){
-                innerContainer.set(id, color, time, lifetime, rotation, x, y, data);
+                innerContainer.set(id, color, time, lifetime, rotation, x, y, fdata, data);
                 cons.get(innerContainer);
             }
         }

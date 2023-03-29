@@ -75,8 +75,8 @@ abstract class WaterMoveComp implements Posc, Velc, Hitboxc, Flyingc, Unitc{
 
     @Override
     public void remove(){
-        Fx.groundTrailFade.at(x, y, type.trailScl, trailColor, tleft.copy());
-        Fx.groundTrailFade.at(x, y, type.trailScl, trailColor, tright.copy());
+        Fx.trailFade.at(x, y, type.trailScl, trailColor, Layer.debris, tleft.copy());
+        Fx.trailFade.at(x, y, type.trailScl, trailColor, Layer.debris, tright.copy());
     }
 
     @Replace
