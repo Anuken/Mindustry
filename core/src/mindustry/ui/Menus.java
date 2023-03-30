@@ -19,6 +19,11 @@ public class Menus{
         menuListeners.add(listener);
         return menuListeners.size - 1;
     }
+    
+    /** Remove a *global* menu listener */
+    public static void removeMenu(MenuListener listener){
+        menuListeners.remove(listener);
+    }
 
     /** Register a *global* text input listener. If no text is provided, the text is returned as null. */
     public static int registerTextInput(TextInputListener listener){
