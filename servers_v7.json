@@ -20,10 +20,6 @@
     "address": ["mindustry.ecansol.com:6597", "mindustry.ecansol.com:6499", "mindustry.ecansol.com:6599"]
   },
   {
-    "name": "Mindustry Español",
-    "address": ["mes.xpdustry.fr"]
-  },
-  {
     "name": "SMoke of Anarchy",
     "address": ["smokeofanarchy.ru", "backup.smokeofanarchy.ru"]
   },
@@ -85,11 +81,11 @@
   },
   {
     "name": "Xpdustry",
-    "address": ["lobby.md.xpdustry.fr", "survival.md.xpdustry.fr", "router.md.xpdustry.fr", "pvp.md.xpdustry.fr", "sandbox.md.xpdustry.fr", "attack.md.xpdustry.fr", "event.md.xpdustry.fr"]
+    "address": ["37.187.73.180:6567", "37.187.73.180:7000", "37.187.73.180:7001", "37.187.73.180:7002", "37.187.73.180:7003", "37.187.73.180:7004", "37.187.73.180:7005"]
   },
   {
     "name": "LatamDustry",
-    "address": ["n1.xpdustry.fr:7003", "n1.xpdustry.fr:7004", "n1.xpdustry.fr:7005", "n1.xpdustry.fr:7006", "n1.xpdustry.fr:7007", "uk-prem-01.optik.host:5894"]
+    "address": ["37.187.73.180:7010", "37.187.73.180:7011", "37.187.73.180:7012", "37.187.73.180:7013", "37.187.73.180:7014", "uk-prem-01.optik.host:5894"]
   },
   {
     "name": "Pandorum",
