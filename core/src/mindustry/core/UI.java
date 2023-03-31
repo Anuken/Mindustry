@@ -75,7 +75,7 @@ public class UI implements ApplicationListener, Loadable{
     public FullTextDialog fullText;
     public CampaignCompleteDialog campaignComplete;
 
-    public IntMap<Dialog> followedMenus;
+    public IntMap<Dialog> followUpMenus;
 
     public Cursor drillCursor, unloadCursor, targetCursor;
 
@@ -204,7 +204,7 @@ public class UI implements ApplicationListener, Loadable{
         logic = new LogicDialog();
         fullText = new FullTextDialog();
         campaignComplete = new CampaignCompleteDialog();
-        followedMenus = new IntMap<>();
+        followUpMenus = new IntMap<>();
 
         Group group = Core.scene.root;
 
@@ -632,9 +632,9 @@ public class UI implements ApplicationListener, Loadable{
         }}.show();
     }
 
-    /** Shows a menu that hides when another followed-menu is shown or when nothing is selected.
+    /** Shows a menu that hides when another followUp-menu is shown or when nothing is selected.
      * @see UI#showMenu(String, String, String[][], Intc) */
-    public void showFollowedMenu(int menuId, String title, String message, String[][] options, Intc callback) {
+    public void showFollowUpMenu(int menuId, String title, String message, String[][] options, Intc callback) {
         Dialog dialog = new Dialog("[accent]" + title){{
             setFillParent(true);
             removeChild(titleTable);
@@ -663,31 +663,29 @@ public class UI implements ApplicationListener, Loadable{
 
                         String optionName = optionsRow[i];
                         int finalOption = option;
-                        buttonRow.button(optionName, () -> {
-                            if(followedMenus.containsKey(menuId)) return; // avoids a button getting clicked twice
-                            callback.get(finalOption);
-                        }).size(i == optionsRow.length - 1 ? lastWidth : width, 50).pad(4);
+                        buttonRow.button(optionName, () -> callback.get(finalOption))
+                            .size(i == optionsRow.length - 1 ? lastWidth : width, 50).pad(4);
                         option++;
                     }
                 }
             }).growX();
             closeOnBack(() -> {
-                followedMenus.remove(menuId);
+                followUpMenus.remove(menuId);
                 callback.get(-1);
             });
         }};
 
-        Dialog oldDialog = followedMenus.remove(menuId);
+        Dialog oldDialog = followUpMenus.remove(menuId);
         if(oldDialog != null){
             dialog.show(Core.scene, null);
             oldDialog.hide(null);
         }else dialog.show();
-        followedMenus.put(menuId, dialog);
+        followUpMenus.put(menuId, dialog);
     }
 
-    public void hideFollowedMenu(int menuId) {
-        if(!followedMenus.containsKey(menuId)) return;
-        followedMenus.remove(menuId).hide();
+    public void hideFollowUpMenu(int menuId) {
+        if(!followUpMenus.containsKey(menuId)) return;
+        followUpMenus.remove(menuId).hide();
     }
 
     /** Formats time with hours:minutes:seconds. */
