@@ -594,9 +594,8 @@ public class UI implements ApplicationListener, Loadable{
         dialog.show();
     }
 
-    /** Shows a menu that fires a callback when an option is selected. If nothing is selected, -1 is returned. */
-    public void showMenu(String title, String message, String[][] options, Intc callback){
-        new Dialog(title){{
+    public Dialog newMenuDialog(String title, String message, String[][] options, Intc buttonListener, Runnable closeOnBack){
+        return new Dialog(title){{
             setFillParent(true);
             removeChild(titleTable);
             cont.add(titleTable).width(400f);
@@ -620,62 +619,40 @@ public class UI implements ApplicationListener, Loadable{
 
                         String optionName = optionsRow[i];
                         int finalOption = option;
-                        buttonRow.button(optionName, () -> {
-                            callback.get(finalOption);
-                            hide();
-                        }).size(i == optionsRow.length - 1 ? lastWidth : width, 50).pad(4);
+                        buttonRow.button(optionName, () -> buttonListener.get(finalOption))
+                                .size(i == optionsRow.length - 1 ? lastWidth : width, 50).pad(4);
                         option++;
                     }
                 }
             }).growX();
-            closeOnBack(() -> callback.get(-1));
-        }}.show();
+            closeOnBack(closeOnBack);
+        }};
+    }
+
+    /** Shows a menu that fires a callback when an option is selected. If nothing is selected, -1 is returned. */
+    public void showMenu(String title, String message, String[][] options, Intc callback){
+        newMenuDialog(title, message, options, option -> {
+            callback.get(option);
+            hide();
+        }, () -> callback.get(-1)).show();
     }
 
     /** Shows a menu that hides when another followUp-menu is shown or when nothing is selected.
      * @see UI#showMenu(String, String, String[][], Intc) */
     public void showFollowUpMenu(int menuId, String title, String message, String[][] options, Intc callback) {
-        Dialog dialog = new Dialog(title){{
-            setFillParent(true);
-            removeChild(titleTable);
-            cont.add(titleTable).width(400f);
 
-            cont.row();
-            cont.image().width(400f).pad(2).colspan(2).height(4f).color(Pal.accent).bottom();
-            cont.row();
-            cont.pane(table -> {
-                table.add(message).width(400f).wrap().get().setAlignment(Align.center);
-                table.row();
-
-                int option = 0;
-                for(var optionsRow : options){
-                    Table buttonRow = table.row().table().get().row();
-                    int fullWidth = 400 - (optionsRow.length - 1) * 8; // adjust to count padding as well
-                    int width = fullWidth / optionsRow.length;
-                    int lastWidth = fullWidth - width * (optionsRow.length - 1); // take the rest of space for uneven table
-
-                    for(int i = 0; i < optionsRow.length; i++){
-                        if(optionsRow[i] == null) continue;
-
-                        String optionName = optionsRow[i];
-                        int finalOption = option;
-                        buttonRow.button(optionName, () -> callback.get(finalOption))
-                            .size(i == optionsRow.length - 1 ? lastWidth : width, 50).pad(4);
-                        option++;
-                    }
-                }
-            }).growX();
-            closeOnBack(() -> {
-                followUpMenus.remove(menuId);
-                callback.get(-1);
-            });
-        }};
+        Dialog dialog = newMenuDialog(title, message, options, callback, () -> {
+            followUpMenus.remove(menuId);
+            callback.get(-1);
+        });
 
         Dialog oldDialog = followUpMenus.remove(menuId);
         if(oldDialog != null){
             dialog.show(Core.scene, null);
             oldDialog.hide(null);
-        }else dialog.show();
+        }else{
+            dialog.show();
+        }
         followUpMenus.put(menuId, dialog);
     }
 
