@@ -635,14 +635,10 @@ public class UI implements ApplicationListener, Loadable{
     /** Shows a menu that hides when another followUp-menu is shown or when nothing is selected.
      * @see UI#showMenu(String, String, String[][], Intc) */
     public void showFollowUpMenu(int menuId, String title, String message, String[][] options, Intc callback) {
-        Dialog dialog = new Dialog("[accent]" + title){{
+        Dialog dialog = new Dialog(title){{
             setFillParent(true);
             removeChild(titleTable);
             cont.add(titleTable).width(400f);
-
-            getStyle().titleFontColor = Color.white;
-            title.getStyle().fontColor = Color.white;
-            title.setStyle(title.getStyle());
 
             cont.row();
             cont.image().width(400f).pad(2).colspan(2).height(4f).color(Pal.accent).bottom();
