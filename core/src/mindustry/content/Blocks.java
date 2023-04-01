@@ -2709,9 +2709,9 @@ public class Blocks{
         }};
 
         waterExtractor = new SolidPump("water-extractor"){{
-            requirements(Category.production, with(Items.metaglass, 30, Items.graphite, 30, Items.lead, 30, Items.copper, 30));
+            requirements(Category.production, with(Items.metaglass, 30, Items.graphite, 30, Items.lead, 30, Items.copper, 30, Items.silicon, 5));
             result = Liquids.water;
-            pumpAmount = 0.11f;
+            pumpAmount = 5.95f / 60f;
             size = 2;
             liquidCapacity = 30f;
             rotateSpeed = 1.4f;
@@ -2724,7 +2724,7 @@ public class Blocks{
         cultivator = new AttributeCrafter("cultivator"){{
             requirements(Category.production, with(Items.copper, 25, Items.lead, 25, Items.silicon, 10));
             outputItem = new ItemStack(Items.sporePod, 1);
-            craftTime = 100;
+            craftTime = 104;
             size = 2;
             hasLiquids = true;
             hasPower = true;
@@ -2745,7 +2745,7 @@ public class Blocks{
             maxBoost = 2f;
 
             consumePower(80f / 60f);
-            consumeLiquid(Liquids.water, 18f / 60f);
+            consumeLiquid(Liquids.water, 17f / 60f);
         }};
 
         oilExtractor = new Fracker("oil-extractor"){{
