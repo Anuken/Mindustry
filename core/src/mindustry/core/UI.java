@@ -594,7 +594,8 @@ public class UI implements ApplicationListener, Loadable{
         dialog.show();
     }
 
-    public Dialog newMenuDialog(String title, String message, String[][] options, Intc buttonListener, Runnable closeOnBack){
+    // TODO REPLACE INTEGER WITH arc.fun.IntCons(int, T) or something like that.
+    public Dialog newMenuDialog(String title, String message, String[][] options, Cons2<Integer, Dialog> buttonListener){
         return new Dialog(title){{
             setFillParent(true);
             removeChild(titleTable);
@@ -619,29 +620,30 @@ public class UI implements ApplicationListener, Loadable{
 
                         String optionName = optionsRow[i];
                         int finalOption = option;
-                        buttonRow.button(optionName, () -> buttonListener.get(finalOption))
+                        buttonRow.button(optionName, () -> buttonListener.get(finalOption, this))
                                 .size(i == optionsRow.length - 1 ? lastWidth : width, 50).pad(4);
                         option++;
                     }
                 }
             }).growX();
-            closeOnBack(closeOnBack);
         }};
     }
 
     /** Shows a menu that fires a callback when an option is selected. If nothing is selected, -1 is returned. */
     public void showMenu(String title, String message, String[][] options, Intc callback){
-        newMenuDialog(title, message, options, option -> {
+        Dialog dialog = newMenuDialog(title, message, options, (option, myself) -> {
             callback.get(option);
-            hide();
-        }, () -> callback.get(-1)).show();
+            myself.hide();
+        });
+        dialog.closeOnBack(() -> callback.get(-1));
+        dialog.show();
     }
 
     /** Shows a menu that hides when another followUp-menu is shown or when nothing is selected.
      * @see UI#showMenu(String, String, String[][], Intc) */
     public void showFollowUpMenu(int menuId, String title, String message, String[][] options, Intc callback) {
-
-        Dialog dialog = newMenuDialog(title, message, options, callback, () -> {
+        Dialog dialog = newMenuDialog(title, message, options, (option, myself) -> callback.get(option));
+        dialog.closeOnBack(() -> {
             followUpMenus.remove(menuId);
             callback.get(-1);
         });
