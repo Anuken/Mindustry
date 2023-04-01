@@ -296,7 +296,7 @@ public class StatValues{
 
                 table.table(Styles.grayPanel, w -> {
                     w.left().top().defaults().padRight(3).left();
-                    if(region != null && region.found()) w.image(region).size(60).scaling(Scaling.bounded).left().top();
+                    if(region != null && region.found() && weapon.showStatSprite) w.image(region).size(60).scaling(Scaling.bounded).left().top();
                     w.row();
 
                     weapon.addStats(unit, w);

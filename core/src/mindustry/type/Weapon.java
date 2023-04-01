@@ -43,6 +43,8 @@ public class Weapon implements Cloneable{
     public boolean alternate = true;
     /** whether to rotate toward the target independently of unit */
     public boolean rotate = false;
+    /** Whether to show the sprite of the weapon in the database. */
+    public boolean showStatSprite = true;
     /** rotation at which this weapon starts at. TODO buggy!*/
     public float baseRotation = 0f;
     /** whether to draw the outline on top. */
