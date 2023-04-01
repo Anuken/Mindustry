@@ -599,6 +599,21 @@ public class ContentParser{
                 };
             }
 
+            if(value.has("cloudMesh")){
+                var mesh = value.get("cloudMesh");
+                if(!mesh.isObject()) throw new RuntimeException("Meshes must be objects.");
+                value.remove("cloudMesh");
+                planet.cloudMeshLoader = () -> {
+                    //don't crash, just log an error
+                    try{
+                        return parseMesh(planet, mesh);
+                    }catch(Exception e){
+                        Log.err(e);
+                        return null;
+                    }
+                };
+            }
+
             //always one sector right now...
             planet.sectors.add(new Sector(planet, Ptile.empty));
 
@@ -835,6 +850,10 @@ public class ContentParser{
             Color.valueOf(data.getString("color2", data.getString("color", "ffffff"))),
             data.getInt("colorOct", 1), data.getFloat("colorPersistence", 0.5f), data.getFloat("colorScale", 1f),
             data.getFloat("colorThreshold", 0.5f));
+            case "HexSkyMesh" -> new HexSkyMesh(planet,
+            data.getInt("seed", 0), data.getFloat("speed", 0), data.getFloat("radius", 1f),
+            data.getInt("divisions", 3), Color.valueOf(data.getString("color", "ffffff")), data.getInt("octaves", 1),
+            data.getFloat("persistence", 0.5f), data.getFloat("scale", 1f), data.getFloat("thresh", 0.5f));
             case "MultiMesh" -> new MultiMesh(parser.readValue(GenericMesh[].class, data.get("meshes")));
             case "MatMesh" -> new MatMesh(parser.readValue(GenericMesh.class, data.get("mesh")), parser.readValue(Mat3D.class, data.get("mat")));
             default -> throw new RuntimeException("Unknown mesh type: " + tname);
