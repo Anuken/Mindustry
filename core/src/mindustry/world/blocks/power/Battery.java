@@ -12,7 +12,7 @@ import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
 public class Battery extends PowerDistributor{
-    public DrawBlock drawer;
+    public @Nullable DrawBlock drawer;
 
     public Color emptyLightColor = Color.valueOf("f8c266");
     public Color fullLightColor = Color.valueOf("fb9567");

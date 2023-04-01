@@ -472,7 +472,7 @@ public class JoinDialog extends BaseDialog{
     }
 
     int columns(){
-        return Mathf.clamp((int)((Core.graphics.getWidth() / Scl.scl() * 0.85f) / targetWidth()), 1, 3);
+        return Mathf.clamp((int)((Core.graphics.getWidth() / Scl.scl() * 0.9f) / targetWidth()), 1, 4);
     }
 
     void addCommunityHost(Host host, Table container){
