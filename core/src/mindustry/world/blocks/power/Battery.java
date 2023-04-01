@@ -11,8 +11,6 @@ import mindustry.gen.*;
 import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
-import static mindustry.Vars.*;
-
 public class Battery extends PowerDistributor{
     public DrawBlock drawer;
 
@@ -39,6 +37,10 @@ public class Battery extends PowerDistributor{
     public void init(){
         super.init();
 
+        checkDrawDefault();
+    }
+
+    void checkDrawDefault(){
         if(drawer == null){
             drawer = new DrawMulti(new DrawDefault(), new DrawPower(){{
                 emptyLightColor = Battery.this.emptyLightColor;
@@ -49,6 +51,8 @@ public class Battery extends PowerDistributor{
 
     @Override
     public void load(){
+        checkDrawDefault();
+
         super.load();
         drawer.load(this);
     }
