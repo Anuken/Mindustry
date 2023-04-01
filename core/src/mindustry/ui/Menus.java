@@ -36,6 +36,19 @@ public class Menus{
         ui.showMenu(title, message, options, (option) -> Call.menuChoose(player, menuId, option));
     }
 
+    @Remote(variants = Variant.both)
+    public static void followUpMenu(int menuId, String title, String message, String[][] options){
+        if(title == null) title = "";
+        if(options == null) options = new String[0][0];
+
+        ui.showFollowUpMenu(menuId, title, message, options, (option) -> Call.menuChoose(player, menuId, option));
+    }
+
+    @Remote(variants = Variant.both)
+    public static void hideFollowUpMenu(int menuId) {
+        ui.hideFollowUpMenu(menuId);
+    }
+
     @Remote(targets = Loc.both, called = Loc.both)
     public static void menuChoose(@Nullable Player player, int menuId, int option){
         if(player != null){

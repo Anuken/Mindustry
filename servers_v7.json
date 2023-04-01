@@ -20,10 +20,6 @@
     "address": ["mindustry.ecansol.com:6597", "mindustry.ecansol.com:6499", "mindustry.ecansol.com:6599"]
   },
   {
-    "name": "Mindustry Español",
-    "address": ["mes.xpdustry.fr"]
-  },
-  {
     "name": "SMoke of Anarchy",
     "address": ["smokeofanarchy.ru", "backup.smokeofanarchy.ru"]
   },
@@ -53,7 +49,7 @@
   },
   {
     "name": "Omega Hub",
-    "address": ["n1.mindustry.me:6608", "n7.mindustry.me:6567", "n7.mindustry.me:6570", "n1.mindustry.me:6568", "n1.mindustry.me:6671", "n1.mindustry.me:6570", "n1.mindustry.me:6573", "n1.mindustry.me:6610", "n1.mindustry.me:6567", "n1.mindustry.me:6599", "n1.mindustry.me:6774", "n1.mindustry.me:6571", "n1.mindustry.me:6589"]
+    "address": ["n1.mindustry.me:6608", "n7.mindustry.me:6767", "n7.mindustry.me:6768", "n1.mindustry.me:6568", "n1.mindustry.me:6671", "n1.mindustry.me:6570", "n1.mindustry.me:6573", "n1.mindustry.me:6610", "n1.mindustry.me:6567", "n1.mindustry.me:6599", "n1.mindustry.me:6774", "n1.mindustry.me:6571", "n1.mindustry.me:6589"]
   },
   {
     "name": "KMWStudios",
@@ -85,11 +81,11 @@
   },
   {
     "name": "Xpdustry",
-    "address": ["lobby.md.xpdustry.fr", "survival.md.xpdustry.fr", "router.md.xpdustry.fr", "pvp.md.xpdustry.fr", "sandbox.md.xpdustry.fr", "attack.md.xpdustry.fr", "event.md.xpdustry.fr"]
+    "address": ["37.187.73.180", "37.187.73.180:7000", "37.187.73.180:7001", "37.187.73.180:7002", "37.187.73.180:7003", "37.187.73.180:7004", "37.187.73.180:7005"]
   },
   {
     "name": "LatamDustry",
-    "address": ["n1.xpdustry.fr:7003", "n1.xpdustry.fr:7004", "n1.xpdustry.fr:7005", "n1.xpdustry.fr:7006", "n1.xpdustry.fr:7007", "uk-prem-01.optik.host:5894"]
+    "address": ["uk-prem-01.optik.host:5894"]
   },
   {
     "name": "Pandorum",
@@ -174,6 +170,6 @@
   },
   {
     "name": "Exploding Cowards",
-    "address": ["193.31.31.165:25778"]
+    "address": ["193.31.31.165:25778", "193.31.31.165:25790"]
   }
 ]

@@ -25,6 +25,6 @@ For example, if your server address is `example.com:6000`, you would add a comma
         "address": "example.com:6000"
       }
     ```
-    > Note that Mindustry also support SRV records. This allows you to use a subdomain for your server address instead of specifying the port. For example, if you want to use `play.example.com` instead of `example.com:6000`, in the dns settings of your domain, add an SRV record with `_mindustry` as the service, `tcp` as the protocol, `play` as the target and `6000` as the port. You can also setup fallback servers by modifing the weight or priority of the record.
+    > Note that Mindustry also support SRV records. This allows you to use a subdomain for your server address instead of specifying the port. For example, if you want to use `play.example.com` instead of `example.com:6000`, in the dns settings of your domain, add an SRV record with `_mindustry` as the service, `tcp` as the protocol, `play` as the target and `6000` as the port. You can also setup fallback servers by modifying the weight or priority of the record. Although SRV records are very convenient, keep in mind they are slower than regular addresses. Avoid using them in the server list, but rather as an easy way to share your server address.
 
     Then, press the *'submit pull request'* button and I'll take a look at your server. If I have any issues with it, I'll let you know in the PR comments.
