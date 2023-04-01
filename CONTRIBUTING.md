@@ -9,7 +9,7 @@ Specifically, IntelliJ IDEA. Download the (free) Community Edition of it [here](
 
 ### Always test your changes.
 Do not submit something without at least running the game to see if it compiles.  
-If you are submitting a new block, make sure it has a name and description, and that it works correctly in-game. If you are changing existing block mechanics, test them out first. Prefer to also mention [people who can also test your code](https://github.com/Anuken/Industry/blob/master/TESTERS.md)
+If you are submitting a new block, make sure it has a name and description, and that it works correctly in-game. If you are changing existing block mechanics, test them out first. Prefer to also mention [people who can also test your code](https://github.com/Anuken/Mindustry/blob/master/TESTERS.md)
 
 ### Do not make large changes before discussing them first.
 If you are interested in adding a large mechanic/feature or changing large amounts of code, first contact me (Anuken) via [Discord](https://discord.gg/mindustry) - either via PM or by posting in the `#pulls` channel.
