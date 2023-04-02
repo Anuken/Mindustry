@@ -647,8 +647,8 @@ public class TypeIO{
         return new ItemStack(readItem(read), read.i());
     }
 
-    public static void writeTeam(Writes write, Team reason){
-        write.b(reason.id);
+    public static void writeTeam(Writes write, Team team){
+        write.b(team == null ? 0 : team.id);
     }
 
     public static Team readTeam(Reads read){
