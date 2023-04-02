@@ -173,6 +173,10 @@ public class Weapon implements Cloneable{
         return (bullet.estimateDPS() / reload) * shoot.shots * 60f;
     }
 
+    public float shotsPerSec(){
+        return shoot.shots * 60f / reload;
+    }
+
     //TODO copy-pasted code
     public void drawOutline(Unit unit, WeaponMount mount){
         if(!outlineRegion.found()) return;
