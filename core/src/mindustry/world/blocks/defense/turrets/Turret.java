@@ -212,6 +212,7 @@ public class Turret extends ReloadTurret{
         public float curRecoil, heat, logicControlTime = -1;
         public float shootWarmup, charge, warmupHold = 0f;
         public int totalShots;
+        public int totalShots, barrelCounter;
         public boolean logicShooting = false;
         public @Nullable Posc target;
         public Vec2 targetPos = new Vec2();
@@ -539,13 +540,13 @@ public class Turret extends ReloadTurret{
 
             shoot.shoot(totalShots, (xOffset, yOffset, angle, delay, mover) -> {
                 queuedBullets ++;
+            shoot.shoot(barrelCounter, (xOffset, yOffset, angle, delay, mover) -> {
                 if(delay > 0f){
                     Time.run(delay, () -> bullet(type, xOffset, yOffset, angle, mover));
                 }else{
                     bullet(type, xOffset, yOffset, angle, mover);
                 }
-                totalShots ++;
-            });
+            }, () -> barrelCounter++);
 
             if(consumeAmmoOnce){
                 useAmmo();
@@ -584,6 +585,7 @@ public class Turret extends ReloadTurret{
 
             curRecoil = 1f;
             heat = 1f;
+            totalShots++;
 
             if(!consumeAmmoOnce){
                 useAmmo();

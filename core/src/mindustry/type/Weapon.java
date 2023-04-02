@@ -416,14 +416,13 @@ public class Weapon implements Cloneable{
             bullet.chargeEffect.at(shootX, shootY, rotation, bullet.keepVelocity || parentizeEffects ? unit : null);
         }
 
-        shoot.shoot(mount.totalShots, (xOffset, yOffset, angle, delay, mover) -> {
-            mount.totalShots++;
+        shoot.shoot(mount.barrelCounter, (xOffset, yOffset, angle, delay, mover) -> {
             if(delay > 0f){
                 Time.run(delay, () -> bullet(unit, mount, xOffset, yOffset, angle, mover));
             }else{
                 bullet(unit, mount, xOffset, yOffset, angle, mover);
             }
-        });
+        }, () -> mount.barrelCounter++);
     }
 
     protected void bullet(Unit unit, WeaponMount mount, float xOffset, float yOffset, float angleOffset, Mover mover){
@@ -456,6 +455,7 @@ public class Weapon implements Cloneable{
         Effect.shake(shake, shake, bulletX, bulletY);
         mount.recoil = 1f;
         mount.heat = 1f;
+        mount.totalShots++;
     }
 
     //override to do special things to a bullet after spawning
