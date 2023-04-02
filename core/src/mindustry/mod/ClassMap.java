@@ -459,6 +459,8 @@ public class ClassMap{
         classes.put("DrawTurret", mindustry.world.draw.DrawTurret.class);
         classes.put("DrawWarmupRegion", mindustry.world.draw.DrawWarmupRegion.class);
         classes.put("DrawWeave", mindustry.world.draw.DrawWeave.class);
+        classes.put("ConsumeCoolant", mindustry.world.consumers.ConsumeCoolant.class);
+        classes.put("ConsumeLiquidFlammable", mindustry.world.consumers.ConsumeLiquidFlammable.class);
         classes.put("Block", mindustry.world.Block.class);
     }
 }

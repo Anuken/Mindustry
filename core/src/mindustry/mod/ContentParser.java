@@ -296,6 +296,20 @@ public class ContentParser{
             weapon.name = currentMod.name + "-" + weapon.name;
             return weapon;
         });
+        put(Consume.class, (type, data) -> {
+            var oc = resolve(data.getString("type", ""), Consume.class);
+            data.remove("type");
+            var consume = make(oc);
+            readFields(consume, data);
+            return consume;
+        });
+        put(ConsumeLiquidBase.class, (type, data) -> {
+            var oc = resolve(data.getString("type", ""), ConsumeLiquidBase.class);
+            data.remove("type");
+            var consume = make(oc);
+            readFields(consume, data);
+            return consume;
+        });
     }};
     /** Stores things that need to be parsed fully, e.g. reading fields of content.
      * This is done to accommodate binding of content names first.*/
