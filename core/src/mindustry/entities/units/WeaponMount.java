@@ -14,6 +14,8 @@ public class WeaponMount{
     public float rotation;
     /** weapon recoil */
     public float recoil;
+    /** weapon barrel recoil */
+    public float[] recoils;
     /** destination rotation; do not modify! */
     public float targetRotation;
     /** current heat, 0 to 1*/

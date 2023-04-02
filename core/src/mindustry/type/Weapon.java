@@ -75,6 +75,8 @@ public class Weapon implements Cloneable{
     public float shake = 0f;
     /** visual weapon knockback. */
     public float recoil = 1.5f;
+    /** Number of additional counters for recoil. */
+    public int recoils = -1;
     /** time taken for weapon to return to starting position in ticks. uses reload time by default */
     public float recoilTime = -1f;
     /** power curve applied to visual recoil */
@@ -215,6 +217,7 @@ public class Weapon implements Cloneable{
 
             for(int i = 0; i < parts.size; i++){
                 var part = parts.get(i);
+                DrawPart.params.setRecoil(part.recoilIndex >= 0 ? mount.recoils[part.recoilIndex] : mount.recoil);
                 if(part.under){
                     part.draw(DrawPart.params);
                 }
@@ -246,6 +249,7 @@ public class Weapon implements Cloneable{
             //TODO does it need an outline?
             for(int i = 0; i < parts.size; i++){
                 var part = parts.get(i);
+                DrawPart.params.setRecoil(part.recoilIndex >= 0 ? mount.recoils[part.recoilIndex] : mount.recoil);
                 if(!part.under){
                     part.draw(DrawPart.params);
                 }
@@ -266,6 +270,12 @@ public class Weapon implements Cloneable{
         float lastReload = mount.reload;
         mount.reload = Math.max(mount.reload - Time.delta * unit.reloadMultiplier, 0);
         mount.recoil = Mathf.approachDelta(mount.recoil, 0, unit.reloadMultiplier / recoilTime);
+        if(recoils > 0){
+            if(mount.recoils == null) mount.recoils = new float[recoils];
+            for(int i = 0; i < recoils; i++){
+                mount.recoils[i] = Mathf.approachDelta(mount.recoils[i], 0, unit.reloadMultiplier / recoilTime);
+            }
+        }
         mount.smoothReload = Mathf.lerpDelta(mount.smoothReload, mount.reload / reload, smoothReloadSpeed);
         mount.charge = mount.charging && shoot.firstShotDelay > 0 ? Mathf.approachDelta(mount.charge, 1, 1 / shoot.firstShotDelay) : 0;
         
@@ -454,6 +464,9 @@ public class Weapon implements Cloneable{
         unit.vel.add(Tmp.v1.trns(shootAngle + 180f, bullet.recoil));
         Effect.shake(shake, shake, bulletX, bulletY);
         mount.recoil = 1f;
+        if(recoils > 0){
+            mount.recoils[mount.barrelCounter % recoils] = 1f;
+        }
         mount.heat = 1f;
         mount.totalShots++;
     }
