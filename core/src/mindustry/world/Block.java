@@ -1144,6 +1144,10 @@ public class Block extends UnlockableContent implements Senseable{
 
         clipSize = Math.max(clipSize, size * tilesize);
 
+        if(hasLiquids && drawLiquidLight){
+            clipSize = Math.max(size * 30f * 2f, clipSize);
+        }
+
         if(emitLight){
             clipSize = Math.max(clipSize, lightRadius * 2f);
         }
