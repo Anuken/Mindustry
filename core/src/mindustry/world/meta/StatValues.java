@@ -51,10 +51,10 @@ public class StatValues{
             String l1 = (unit.icon == null ? "" : unit.icon + " ") + fixValue(value), l2 = (unit.space ? " " : "") + unit.localized();
 
             if(merge){
-                table.add(l1 + l2);
+                table.add(l1 + l2).left();
             }else{
-                table.add(l1);
-                table.add(l2);
+                table.add(l1).left();
+                table.add(l2).left();
             }
         };
     }
