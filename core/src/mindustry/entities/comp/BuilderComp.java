@@ -10,7 +10,6 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
-import mindustry.core.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -333,7 +332,7 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
         Lines.stroke(1f, plan.breaking ? Pal.remove : Pal.accent);
         Draw.z(Layer.buildBeam);
 
-        Draw.alpha(buildAlpha * Renderer.unitLaserOpacity);
+        Draw.alpha(buildAlpha);
 
         if(!active && !(tile.build instanceof ConstructBuild)){
             Fill.square(plan.drawx(), plan.drawy(), size * tilesize/2f);
