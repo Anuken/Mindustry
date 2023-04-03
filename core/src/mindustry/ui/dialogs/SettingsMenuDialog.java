@@ -386,6 +386,7 @@ public class SettingsMenuDialog extends BaseDialog{
             }
             return s + "%";
         });
+        graphics.sliderPref("unitlaseropacity", 100, 0, 100, 5, s -> s + "%");
         graphics.sliderPref("bridgeopacity", 100, 0, 100, 5, s -> s + "%");
 
         if(!mobile){

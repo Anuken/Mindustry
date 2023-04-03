@@ -7,6 +7,7 @@ import arc.math.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
@@ -141,7 +142,9 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc{
 
         Draw.color(Color.lightGray, Color.white, 1f - flashScl + Mathf.absin(Time.time, 0.5f, flashScl));
 
+        Draw.alpha(Renderer.unitLaserOpacity);
         Drawf.laser(Core.atlas.find("minelaser"), Core.atlas.find("minelaser-end"), px, py, ex, ey, 0.75f);
+        Draw.alpha(1);
 
         if(isLocal()){
             Lines.stroke(1f, Pal.accent);
