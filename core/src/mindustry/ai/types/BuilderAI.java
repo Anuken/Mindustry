@@ -19,7 +19,7 @@ public class BuilderAI extends AIController{
     public @Nullable Teamc enemy;
     public @Nullable BlockPlan lastPlan;
 
-    public float fleeRange = 370f;
+    public float fleeRange = 370f, rebuildPeriod = 60f * 2f;
     public boolean alwaysFlee;
     public boolean onlyAssist;
 
@@ -158,10 +158,8 @@ public class BuilderAI extends AIController{
                 }
             }
 
-            float rebuildTime = 2f * 60f;
-
             //find new plan
-            if(!onlyAssist && !unit.team.data().plans.isEmpty() && following == null && timer.get(timerTarget3, rebuildTime)){
+            if(!onlyAssist && !unit.team.data().plans.isEmpty() && following == null && timer.get(timerTarget3, rebuildPeriod)){
                 Queue<BlockPlan> blocks = unit.team.data().plans;
                 BlockPlan block = blocks.first();
 

@@ -221,7 +221,7 @@ public class Weapon implements Cloneable{
 
             for(int i = 0; i < parts.size; i++){
                 var part = parts.get(i);
-                DrawPart.params.setRecoil(part.recoilIndex >= 0 ? mount.recoils[part.recoilIndex] : mount.recoil);
+                DrawPart.params.setRecoil(part.recoilIndex >= 0 && mount.recoils != null ? mount.recoils[part.recoilIndex] : mount.recoil);
                 if(part.under){
                     part.draw(DrawPart.params);
                 }
@@ -253,7 +253,7 @@ public class Weapon implements Cloneable{
             //TODO does it need an outline?
             for(int i = 0; i < parts.size; i++){
                 var part = parts.get(i);
-                DrawPart.params.setRecoil(part.recoilIndex >= 0 ? mount.recoils[part.recoilIndex] : mount.recoil);
+                DrawPart.params.setRecoil(part.recoilIndex >= 0 && mount.recoils != null ? mount.recoils[part.recoilIndex] : mount.recoil);
                 if(!part.under){
                     part.draw(DrawPart.params);
                 }
