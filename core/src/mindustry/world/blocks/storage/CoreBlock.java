@@ -106,7 +106,7 @@ public class CoreBlock extends StorageBlock{
                         info.add(unitType.name).left().color(Color.lightGray);
                     }
                 });
-                b.button("?", Styles.flatBordert, () -> ui.content.show(unitType)).size(40f).pad(10).right().grow();
+                b.button("?", Styles.flatBordert, () -> ui.content.show(unitType)).size(40f).pad(10).right().grow().visible(() -> unitType.unlockedNow());
             }).growX().pad(5).row();
         });
     }

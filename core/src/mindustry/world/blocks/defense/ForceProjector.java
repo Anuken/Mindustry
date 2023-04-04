@@ -102,7 +102,7 @@ public class ForceProjector extends Block{
         if(consItems){
             stats.remove(Stat.booster);
             stats.add(Stat.booster, StatValues.itemBoosters("+{0} " + StatUnit.shieldHealth.localized(), stats.timePeriod, phaseShieldBoost, phaseRadiusBoost, ((ConsumeItems)findConsumer(f -> f instanceof ConsumeItems)).items, this::consumesItem));
-            stats.add(Stat.booster, StatValues.speedBoosters("{0}" + StatUnit.timesSpeed.localized(), coolantConsumption, cooldownLiquid, true, this::consumesLiquid));
+            stats.add(Stat.booster, StatValues.speedBoosters("", coolantConsumption, Float.MAX_VALUE, true, this::consumesLiquid));
         }
     }
 
