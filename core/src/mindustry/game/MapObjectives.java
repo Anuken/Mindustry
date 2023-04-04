@@ -761,7 +761,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                 Lines.poly(pos.x, pos.y, sides, radius + 1f, rotation);
             }else{
                 Draw.color(color);
-                Fill.poly(pos.x, pos.y, sides, radius);
+                Fill.poly(pos.x, pos.y, sides, radius, rotation);
             }
 
             Draw.reset();

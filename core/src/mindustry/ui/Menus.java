@@ -12,11 +12,18 @@ import static mindustry.Vars.*;
 /** Class for handling menus and notifications across the network. Unstable API! */
 public class Menus{
     private static final Seq<MenuListener> menuListeners = new Seq<>();
+    private static final Seq<TextInputListener> textInputListeners = new Seq<>();
 
     /** Register a *global* menu listener. If no option is chosen, the option is returned as -1. */
     public static int registerMenu(MenuListener listener){
         menuListeners.add(listener);
         return menuListeners.size - 1;
+    }
+
+    /** Register a *global* text input listener. If no text is provided, the text is returned as null. */
+    public static int registerTextInput(TextInputListener listener){
+        textInputListeners.add(listener);
+        return textInputListeners.size - 1;
     }
 
     //do not invoke any of the methods below directly, use Call
@@ -29,12 +36,46 @@ public class Menus{
         ui.showMenu(title, message, options, (option) -> Call.menuChoose(player, menuId, option));
     }
 
+    @Remote(variants = Variant.both)
+    public static void followUpMenu(int menuId, String title, String message, String[][] options){
+        if(title == null) title = "";
+        if(options == null) options = new String[0][0];
+
+        ui.showFollowUpMenu(menuId, title, message, options, (option) -> Call.menuChoose(player, menuId, option));
+    }
+
+    @Remote(variants = Variant.both)
+    public static void hideFollowUpMenu(int menuId) {
+        ui.hideFollowUpMenu(menuId);
+    }
+
     @Remote(targets = Loc.both, called = Loc.both)
     public static void menuChoose(@Nullable Player player, int menuId, int option){
         if(player != null){
             Events.fire(new MenuOptionChooseEvent(player, menuId, option));
             if(menuId >= 0 && menuId < menuListeners.size){
                 menuListeners.get(menuId).get(player, option);
+            }
+        }
+    }
+
+    @Remote(variants = Variant.both)
+    public static void textInput(int textInputId, String title, String message, int textLength, String def, boolean numeric){
+        if(title == null) title = "";
+
+        ui.showTextInput(title, message, textLength, def, numeric, (text) -> {
+            Call.textInputResult(player, textInputId, text);
+        }, () -> {
+            Call.textInputResult(player, textInputId, null);
+        });
+    }
+
+    @Remote(targets = Loc.both, called = Loc.both)
+    public static void textInputResult(@Nullable Player player, int textInputId, @Nullable String text){
+        if(player != null){
+            Events.fire(new TextInputEvent(player, textInputId, text));
+            if(textInputId >= 0 && textInputId < textInputListeners.size){
+                textInputListeners.get(textInputId).get(player, text);
             }
         }
     }
@@ -129,5 +170,9 @@ public class Menus{
 
     public interface MenuListener{
         void get(Player player, int option);
+    }
+
+    public interface TextInputListener{
+        void get(Player player, @Nullable String text);
     }
 }

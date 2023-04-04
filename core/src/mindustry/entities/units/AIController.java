@@ -55,6 +55,11 @@ public class AIController implements UnitController{
         return false;
     }
 
+    @Override
+    public boolean isLogicControllable(){
+        return true;
+    }
+
     public void stopShooting(){
         for(var mount : unit.mounts){
             //ignore mount controllable stats too, they should not shoot either
@@ -222,6 +227,10 @@ public class AIController implements UnitController{
         return target(x, y, range, air, ground);
     }
 
+    public void commandTarget(Teamc moveTo){}
+
+    public void commandPosition(Vec2 pos){}
+
     /** Called after this controller is assigned a unit. */
     public void init(){
 
@@ -315,8 +324,8 @@ public class AIController implements UnitController{
             vec.setLength(unit.speed() * length);
         }
 
-        //do not move when infinite vectors are used.
-        if(vec.isNaN() || vec.isInfinite()) return;
+        //do not move when infinite vectors are used or if its zero.
+        if(vec.isNaN() || vec.isInfinite() || vec.isZero()) return;
 
         if(!unit.type.omniMovement && unit.type.rotateMoveFirst){
             float angle = vec.angle();

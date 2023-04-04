@@ -30,6 +30,8 @@ public class ForceProjector extends Block{
     public float phaseRadiusBoost = 80f;
     public float phaseShieldBoost = 400f;
     public float radius = 101.7f;
+    public int sides = 6;
+    public float shieldRotation = 0f;
     public float shieldHealth = 700f;
     public float cooldownNormal = 1.75f;
     public float cooldownLiquid = 1.5f;
@@ -46,7 +48,7 @@ public class ForceProjector extends Block{
     protected static ForceBuild paramEntity;
     protected static Effect paramEffect;
     protected static final Cons<Bullet> shieldConsumer = bullet -> {
-        if(bullet.team != paramEntity.team && bullet.type.absorbable && Intersector.isInsideHexagon(paramEntity.x, paramEntity.y, paramEntity.realRadius() * 2f, bullet.x, bullet.y)){
+        if(bullet.team != paramEntity.team && bullet.type.absorbable && Intersector.isInRegularPolygon(((ForceProjector)(paramEntity.block)).sides, paramEntity.x, paramEntity.y, paramEntity.realRadius() * 2f, ((ForceProjector)(paramEntity.block)).shieldRotation, bullet.x, bullet.y)){
             bullet.absorb();
             paramEffect.at(bullet);
             paramEntity.hit = 1f;
@@ -109,10 +111,10 @@ public class ForceProjector extends Block{
 
         Draw.color(Pal.gray);
         Lines.stroke(3f);
-        Lines.poly(x * tilesize + offset, y * tilesize + offset, 6, radius);
+        Lines.poly(x * tilesize + offset, y * tilesize + offset, sides, radius, shieldRotation);
         Draw.color(player.team().color);
         Lines.stroke(1f);
-        Lines.poly(x * tilesize + offset, y * tilesize + offset, 6, radius);
+        Lines.poly(x * tilesize + offset, y * tilesize + offset, sides, radius, shieldRotation);
         Draw.color();
     }
 
@@ -241,18 +243,18 @@ public class ForceProjector extends Block{
             if(!broken){
                 float radius = realRadius();
 
-                Draw.z(Layer.shields);
-
                 Draw.color(team.color, Color.white, Mathf.clamp(hit));
 
                 if(renderer.animateShields){
-                    Fill.poly(x, y, 6, radius);
+                    Draw.z(Layer.shields + 0.001f * hit);
+                    Fill.poly(x, y, sides, radius, shieldRotation);
                 }else{
+                    Draw.z(Layer.shields);
                     Lines.stroke(1.5f);
                     Draw.alpha(0.09f + Mathf.clamp(0.08f * hit));
-                    Fill.poly(x, y, 6, radius);
+                    Fill.poly(x, y, sides, radius, shieldRotation);
                     Draw.alpha(1f);
-                    Lines.poly(x, y, 6, radius);
+                    Lines.poly(x, y, sides, radius, shieldRotation);
                     Draw.reset();
                 }
             }

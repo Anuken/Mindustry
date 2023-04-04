@@ -51,10 +51,10 @@ public class StatValues{
             String l1 = (unit.icon == null ? "" : unit.icon + " ") + fixValue(value), l2 = (unit.space ? " " : "") + unit.localized();
 
             if(merge){
-                table.add(l1 + l2);
+                table.add(l1 + l2).left();
             }else{
-                table.add(l1);
-                table.add(l2);
+                table.add(l1).left();
+                table.add(l2).left();
             }
         };
     }
@@ -292,15 +292,15 @@ public class StatValues{
                     continue;
                 }
 
-                TextureRegion region = !weapon.name.equals("") && weapon.region.found() ? weapon.region : Core.atlas.find("clear");
+                TextureRegion region = !weapon.name.isEmpty() ? Core.atlas.find(weapon.name + "-preview", weapon.region) : null;
 
-                table.image(region).size(60).scaling(Scaling.bounded).right().top();
-
-                table.table(Tex.underline, w -> {
-                    w.left().defaults().padRight(3).left();
+                table.table(Styles.grayPanel, w -> {
+                    w.left().top().defaults().padRight(3).left();
+                    if(region != null && region.found() && weapon.showStatSprite) w.image(region).size(60).scaling(Scaling.bounded).left().top();
+                    w.row();
 
                     weapon.addStats(unit, w);
-                }).padTop(-9).left();
+                }).growX().pad(5).margin(10);
                 table.row();
             }
         };
@@ -329,17 +329,19 @@ public class StatValues{
 
                 if(type.spawnUnit != null && type.spawnUnit.weapons.size > 0){
                     ammo(ObjectMap.of(t, type.spawnUnit.weapons.first().bullet), indent, false).display(table);
-                    return;
+                    continue;
                 }
 
-                //no point in displaying unit icon twice
-                if(!compact && !(t instanceof Turret)){
-                    table.image(icon(t)).size(3 * 8).padRight(4).right().scaling(Scaling.fit).top();
-                    table.add(t.localizedName).padRight(10).left().top();
-                }
-
-                table.table(bt -> {
-                    bt.left().defaults().padRight(3).left();
+                table.table(Styles.grayPanel, bt -> {
+                    bt.left().top().defaults().padRight(3).left();
+                    //no point in displaying unit icon twice
+                    if(!compact && !(t instanceof Turret)){
+                        bt.table(title -> {
+                            title.image(icon(t)).size(3 * 8).padRight(4).right().scaling(Scaling.fit).top();
+                            title.add(t.localizedName).padRight(10).left().top();
+                        });
+                        bt.row();
+                    }
 
                     if(type.damage > 0 && (type.collides || type.splashDamage <= 0)){
                         if(type.continuousDamage() > 0){
@@ -403,18 +405,50 @@ public class StatValues{
                         sep(bt, "@bullet.armorpierce");
                     }
 
+                    if(type.suppressionRange > 0){
+                        sep(bt, Core.bundle.format("bullet.suppression", Strings.autoFixed(type.suppressionDuration / 60f, 2), Strings.fixed(type.suppressionRange / tilesize, 1)));
+                    }
+
                     if(type.status != StatusEffects.none){
                         sep(bt, (type.status.minfo.mod == null ? type.status.emoji() : "") + "[stat]" + type.status.localizedName + (type.status.reactive ? "" : "[lightgray] ~ [stat]" + ((int)(type.statusDuration / 60f)) + "[lightgray] " + Core.bundle.get("unit.seconds")));
                     }
 
-                    if(type.fragBullet != null){
-                        sep(bt, Core.bundle.format("bullet.frags", type.fragBullets));
+                    if(type.intervalBullet != null){
                         bt.row();
 
-                        ammo(ObjectMap.of(t, type.fragBullet), indent + 1, false).display(bt);
-                    }
-                }).padTop(compact ? 0 : -9).padLeft(indent * 8).left().get().background(compact ? null : Tex.underline);
+                        Table ic = new Table();
+                        ammo(ObjectMap.of(t, type.intervalBullet), indent + 1, false).display(ic);
+                        Collapser coll = new Collapser(ic, true);
+                        coll.setDuration(0.1f);
 
+                        bt.table(it -> {
+                            it.left().defaults().left();
+
+                            it.add(Core.bundle.format("bullet.interval", Strings.autoFixed(type.intervalBullets / type.bulletInterval * 60, 2)));
+                            it.button(Icon.downOpen, Styles.emptyi, () -> coll.toggle(false)).update(i -> i.getStyle().imageUp = (!coll.isCollapsed() ? Icon.upOpen : Icon.downOpen)).size(8).padLeft(16f).expandX();
+                        });
+                        bt.row();
+                        bt.add(coll);
+                    }
+
+                    if(type.fragBullet != null){
+                        bt.row();
+
+                        Table fc = new Table();
+                        ammo(ObjectMap.of(t, type.fragBullet), indent + 1, false).display(fc);
+                        Collapser coll = new Collapser(fc, true);
+                        coll.setDuration(0.1f);
+
+                        bt.table(ft -> {
+                            ft.left().defaults().left();
+
+                            ft.add(Core.bundle.format("bullet.frags", type.fragBullets));
+                            ft.button(Icon.downOpen, Styles.emptyi, () -> coll.toggle(false)).update(i -> i.getStyle().imageUp = (!coll.isCollapsed() ? Icon.upOpen : Icon.downOpen)).size(8).padLeft(16f).expandX();
+                        });
+                        bt.row();
+                        bt.add(coll);
+                    }
+                }).padLeft(indent * 5).padTop(5).padBottom(compact ? 0 : 5).growX().margin(compact ? 0 : 10);
                 table.row();
             }
         };

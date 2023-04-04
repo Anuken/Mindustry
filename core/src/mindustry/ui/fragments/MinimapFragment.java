@@ -115,11 +115,14 @@ public class MinimapFragment{
     }
 
     public void toggle(){
-        float size = baseSize * zoom * world.width();
-        float ratio = (float)renderer.minimap.getTexture().height / renderer.minimap.getTexture().width;
-        float px = player.dead() ? Core.camera.position.x : player.x, py = player.dead() ? Core.camera.position.y : player.y;
-        panx = (size/2f - px / (world.width() * tilesize) * size) / zoom;
-        pany = (size*ratio/2f - py / (world.height() * tilesize) * size*ratio) / zoom;
+        if(renderer.minimap.getTexture() != null){
+            float size = baseSize * zoom * world.width();
+            float ratio = (float)renderer.minimap.getTexture().height / renderer.minimap.getTexture().width;
+            float px = player.dead() ? Core.camera.position.x : player.x, py = player.dead() ? Core.camera.position.y : player.y;
+            panx = (size/2f - px / (world.width() * tilesize) * size) / zoom;
+            pany = (size*ratio/2f - py / (world.height() * tilesize) * size*ratio) / zoom;
+        }
+
         shown = !shown;
     }
 }

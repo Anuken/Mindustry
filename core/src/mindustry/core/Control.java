@@ -193,7 +193,7 @@ public class Control implements ApplicationListener, Loadable{
             if(!settings.getBool("skipcoreanimation") && !state.rules.pvp){
                 coreDelay = coreLandDuration;
                 //delay player respawn so animation can play.
-                player.deathTimer = -80f;
+                player.deathTimer = Player.deathDelay - coreLandDuration;
                 //TODO this sounds pretty bad due to conflict
                 if(settings.getInt("musicvol") > 0){
                     Musics.land.stop();
@@ -250,7 +250,7 @@ public class Control implements ApplicationListener, Loadable{
                                 }else{
                                     //when already hosting, instantly build everything. this looks bad but it's better than a desync
                                     Fx.coreBuildBlock.at(build.x, build.y, 0f, build.block);
-                                    Fx.placeBlock.at(build.x, build.y, build.block.size);
+                                    build.block.placeEffect.at(build.x, build.y, build.block.size);
                                 }
                             }
                         }
@@ -288,7 +288,7 @@ public class Control implements ApplicationListener, Loadable{
         build.dropped();
 
         Fx.coreBuildBlock.at(build.x, build.y, 0f, build.block);
-        Fx.placeBlock.at(build.x, build.y, build.block.size);
+        build.block.placeEffect.at(build.x, build.y, build.block.size);
     }
 
     @Override

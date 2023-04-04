@@ -1,6 +1,5 @@
 package mindustry.world.blocks.power;
 
-import arc.Core;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -140,7 +139,7 @@ public class BeamNode extends PowerBlock{
             float w = laserWidth + Mathf.absin(pulseScl, pulseMag);
 
             for(int i = 0; i < 4; i ++){
-                if(dests[i] != null && (!(links[i].block instanceof BeamNode node) ||
+                if(dests[i] != null && links[i].wasVisible && (!(links[i].block instanceof BeamNode node) ||
                     (links[i].tileX() != tileX() && links[i].tileY() != tileY()) ||
                     (links[i].id > id && range >= node.range) || range > node.range)){
 
@@ -180,7 +179,7 @@ public class BeamNode extends PowerBlock{
                     }
 
                     //power nodes do NOT play nice with beam nodes, do not touch them as that forcefully modifies their links
-                    if(other != null && other.block.hasPower && other.team == team && !(other.block instanceof PowerNode)){
+                    if(other != null && other.block.hasPower && other.block.connectedPower && other.team == team && !(other.block instanceof PowerNode)){
                         links[i] = other;
                         dests[i] = world.tile(tile.x + j * dir.x, tile.y + j * dir.y);
                         break;

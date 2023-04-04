@@ -24,7 +24,6 @@ public class MessageBlock extends Block{
     //don't change this too much unless you want to run into issues with packet sizes
     public int maxTextLength = 220;
     public int maxNewlines = 24;
-    public boolean privileged = false;
 
     public MessageBlock(String name){
         super(name);
