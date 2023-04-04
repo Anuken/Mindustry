@@ -18,6 +18,7 @@ public class ReloadTurret extends BaseTurret{
         super.setStats();
 
         if(coolant != null){
+            stats.remove(Stat.booster);
             stats.add(Stat.booster, StatValues.boosters(reload, coolant.amount, coolantMultiplier, true, l -> l.coolant && consumesLiquid(l)));
         }
     }

@@ -1,5 +1,6 @@
 package mindustry.world.blocks.units;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -70,7 +71,8 @@ public class RepairTurret extends Block{
         stats.add(Stat.repairSpeed, repairSpeed * 60f, StatUnit.perSecond);
 
         if(acceptCoolant){
-            stats.add(Stat.booster, StatValues.strengthBoosters(coolantMultiplier, this::consumesLiquid));
+            stats.remove(Stat.booster);
+            stats.add(Stat.booster, StatValues.speedBoosters(Core.bundle.get("bar.strength"), coolantUse, coolantMultiplier, true, this::consumesLiquid));
         }
     }
 
