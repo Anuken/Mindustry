@@ -48,7 +48,7 @@ public class ForceProjector extends Block{
     protected static ForceBuild paramEntity;
     protected static Effect paramEffect;
     protected static final Cons<Bullet> shieldConsumer = bullet -> {
-        if(bullet.team != paramEntity.team && bullet.type.absorbable && Intersector.isInRegularPolygon(((ForceProjector)(paramEntity.block)).sides, paramEntity.x, paramEntity.y, paramEntity.realRadius() * 2f, ((ForceProjector)(paramEntity.block)).shieldRotation, bullet.x, bullet.y)){
+        if(bullet.team != paramEntity.team && bullet.type.absorbable && Intersector.isInRegularPolygon(((ForceProjector)(paramEntity.block)).sides, paramEntity.x, paramEntity.y, paramEntity.realRadius(), ((ForceProjector)(paramEntity.block)).shieldRotation, bullet.x, bullet.y)){
             bullet.absorb();
             paramEffect.at(bullet);
             paramEntity.hit = 1f;
