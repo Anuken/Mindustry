@@ -259,7 +259,7 @@ public class SettingsMenuDialog extends BaseDialog{
     public void addCategory(String name, Cons<SettingsTable> builder){
         addCategory(name, (Drawable)null, builder);
     }
-    
+
     public Seq<SettingsCategory> getCategories(){
         return categories;
     }
@@ -343,7 +343,7 @@ public class SettingsMenuDialog extends BaseDialog{
 
         game.checkPref("doubletapmine", false);
         game.checkPref("commandmodehold", true);
-      
+
         if(!ios){
             game.checkPref("modcrashdisable", true);
         }
@@ -776,7 +776,7 @@ public class SettingsMenuDialog extends BaseDialog{
                 table.row();
             }
         }
-        
+
         public static class TextSetting extends Setting{
             String def;
             Cons<String> changed;

@@ -1,7 +1,6 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
-import arc.util.Http.*;
 import arc.files.*;
 import arc.func.*;
 import arc.graphics.*;
@@ -14,6 +13,7 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.Http.*;
 import arc.util.io.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Jval.*;

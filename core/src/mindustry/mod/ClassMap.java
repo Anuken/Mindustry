@@ -5,7 +5,7 @@ import arc.struct.*;
 @SuppressWarnings("deprecation")
 public class ClassMap{
     public static final ObjectMap<String, Class<?>> classes = new ObjectMap<>();
-    
+
     static{
         classes.put("AssemblerAI", mindustry.ai.types.AssemblerAI.class);
         classes.put("BoostAI", mindustry.ai.types.BoostAI.class);

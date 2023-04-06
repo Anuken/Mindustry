@@ -220,7 +220,7 @@ public class RepairTurret extends Block{
         @Override
         public void write(Writes write){
             super.write(write);
-            
+
             write.f(rotation);
         }
 

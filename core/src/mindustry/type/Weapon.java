@@ -282,7 +282,7 @@ public class Weapon implements Cloneable{
         }
         mount.smoothReload = Mathf.lerpDelta(mount.smoothReload, mount.reload / reload, smoothReloadSpeed);
         mount.charge = mount.charging && shoot.firstShotDelay > 0 ? Mathf.approachDelta(mount.charge, 1, 1 / shoot.firstShotDelay) : 0;
-        
+
         float warmupTarget = (can && mount.shoot) || (continuous && mount.bullet != null) || mount.charging ? 1f : 0f;
         if(linearWarmup){
             mount.warmup = Mathf.approachDelta(mount.warmup, warmupTarget, shootWarmupSpeed);

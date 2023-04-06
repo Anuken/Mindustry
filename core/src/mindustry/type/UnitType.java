@@ -841,7 +841,7 @@ public class UnitType extends UnlockableContent{
         //only do this after everything else was initialized
         sample = constructor.get();
     }
-    
+
     public float estimateDps(){
         //calculate estimated DPS for one target based on weapons
         if(dpsEstimate < 0){
@@ -853,7 +853,7 @@ public class UnitType extends UnlockableContent{
                 dpsEstimate /= 25f;
             }
         }
-        
+
         return dpsEstimate;
     }
 

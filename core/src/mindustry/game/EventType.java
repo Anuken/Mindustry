@@ -161,7 +161,7 @@ public class EventType{
             this.host = host;
         }
     }
-    
+
     public static class ClientServerConnectEvent{
         public final String ip;
         public final int port;

@@ -19,7 +19,7 @@ import static mindustry.Vars.*;
 public class TractorBeamTurret extends BaseTurret{
     public final int timerTarget = timers++;
     public float retargetTime = 5f;
-    
+
     public float shootCone = 6f;
     public float shootLength = 5f;
     public float laserWidth = 0.6f;
