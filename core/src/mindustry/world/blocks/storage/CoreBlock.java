@@ -95,6 +95,20 @@ public class CoreBlock extends StorageBlock{
         super.setStats();
 
         stats.remove(Stat.buildTime);
+        stats.add(Stat.unitType, table -> {
+            table.row();
+            table.table(Styles.grayPanel, b -> {
+                b.image(unitType.uiIcon).size(40).pad(10f).left().scaling(Scaling.fit);
+                b.table(info -> {
+                    info.add(unitType.localizedName).left();
+                    if(Core.settings.getBool("console")){
+                        info.row();
+                        info.add(unitType.name).left().color(Color.lightGray);
+                    }
+                });
+                b.button("?", Styles.flatBordert, () -> ui.content.show(unitType)).size(40f).pad(10).right().grow().visible(() -> unitType.unlockedNow());
+            }).growX().pad(5).row();
+        });
     }
 
     @Override

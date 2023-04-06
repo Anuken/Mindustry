@@ -619,7 +619,7 @@ public class UnitType extends UnlockableContent{
 
         if(mineTier >= 1){
             stats.addPercent(Stat.mineSpeed, mineSpeed);
-            stats.add(Stat.mineTier, StatValues.blocks(b ->
+            stats.add(Stat.mineTier, StatValues.drillables(mineSpeed, 1f, 1, null, b ->
                 b.itemDrop != null &&
                 (b instanceof Floor f && (((f.wallOre && mineWalls) || (!f.wallOre && mineFloor))) ||
                 (!(b instanceof Floor) && mineWalls)) &&

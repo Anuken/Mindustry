@@ -2,6 +2,7 @@ package mindustry.world.meta;
 
 import arc.*;
 import arc.func.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.ui.*;
@@ -235,6 +236,32 @@ public class StatValues{
         return content(list.as());
     }
 
+    public static StatValue drillables(float drillTime, float drillMultiplier, float size, ObjectFloatMap<Item> multipliers, Boolf<Block> filter){
+        return table -> {
+            table.row();
+            table.table(c -> {
+                int i = 0;
+                for(Block block : content.blocks()){
+                    if(!filter.get(block)) continue;
+
+                    c.table(Styles.grayPanel, b -> {
+                        b.image(block.uiIcon).size(40).pad(10f).left().scaling(Scaling.fit);
+                        b.table(info -> {
+                            info.left();
+                            info.add(block.localizedName).left().row();
+                            info.add(block.itemDrop.emoji()).left();
+                        }).grow();
+                        if(multipliers != null){
+                            b.add(Strings.autoFixed(60f / (Math.max(drillTime + drillMultiplier * block.itemDrop.hardness, drillTime) / multipliers.get(block.itemDrop, 1f)) * size, 2) + StatUnit.perSecond.localized())
+                            .right().pad(10f).padRight(15f).color(Color.lightGray);
+                        }
+                    }).growX().pad(5);
+                    if(++i % 2 == 0) c.row();
+                }
+            }).growX().colspan(table.getColumns());
+        };
+    }
+
     public static StatValue boosters(float reload, float maxUsed, float multiplier, boolean baseReload, Boolf<Liquid> filter){
         return table -> {
             table.row();
@@ -242,41 +269,78 @@ public class StatValues{
                 for(Liquid liquid : content.liquids()){
                     if(!filter.get(liquid)) continue;
 
-                    c.image(liquid.uiIcon).size(3 * 8).scaling(Scaling.fit).padRight(4).right().top();
-                    c.add(liquid.localizedName).padRight(10).left().top();
-                    c.table(Tex.underline, bt -> {
-                        bt.left().defaults().padRight(3).left();
+                    c.table(Styles.grayPanel, b -> {
+                        b.image(liquid.uiIcon).size(40).pad(10f).left().scaling(Scaling.fit);
+                        b.table(info -> {
+                            info.add(liquid.localizedName).left().row();
+                            info.add(Strings.autoFixed(maxUsed * 60f, 1) + StatUnit.perSecond.localized()).left().color(Color.lightGray);
+                        });
 
-                        float reloadRate = (baseReload ? 1f : 0f) + maxUsed * multiplier * liquid.heatCapacity;
-                        float standardReload = baseReload ? reload : reload / (maxUsed * multiplier * 0.4f);
-                        float result = standardReload / (reload / reloadRate);
-                        bt.add(Core.bundle.format("bullet.reload", Strings.autoFixed(result * 100, 1)));
-                    }).left().padTop(-9);
-                    c.row();
+                        b.table(bt -> {
+                            bt.right().defaults().padRight(3).left();
+
+                            float reloadRate = (baseReload ? 1f : 0f) + maxUsed * multiplier * liquid.heatCapacity;
+                            float standardReload = baseReload ? reload : reload / (maxUsed * multiplier * 0.4f);
+                            float result = standardReload / (reload / reloadRate);
+                            bt.add(Core.bundle.format("bullet.reload", Strings.autoFixed(result * 100, 1))).pad(5);
+                        }).right().grow().pad(10f).padRight(15f);
+                    }).growX().pad(5).row();
                 }
-            }).colspan(table.getColumns());
+            }).growX().colspan(table.getColumns());
             table.row();
         };
     }
 
-    public static StatValue strengthBoosters(float multiplier, Boolf<Liquid> filter){
+    public static StatValue speedBoosters(String unit, float amount, float speed, boolean strength, Boolf<Liquid> filter){
         return table -> {
             table.row();
             table.table(c -> {
                 for(Liquid liquid : content.liquids()){
                     if(!filter.get(liquid)) continue;
 
-                    c.image(liquid.uiIcon).size(3 * 8).scaling(Scaling.fit).padRight(4).right().top();
-                    c.add(liquid.localizedName).padRight(10).left().top();
-                    c.table(Tex.underline, bt -> {
-                        bt.left().defaults().padRight(3).left();
+                    c.table(Styles.grayPanel, b -> {
+                        b.image(liquid.uiIcon).size(40).pad(10f).left().scaling(Scaling.fit);
+                        b.table(info -> {
+                            info.add(liquid.localizedName).left().row();
+                            info.add(Strings.autoFixed(amount * 60f, 1) + StatUnit.perSecond.localized()).left().color(Color.lightGray);
+                        });
 
-                        float newRate = (1f + multiplier * liquid.heatCapacity);
-                        bt.add(Core.bundle.format("bar.strength", Strings.autoFixed(newRate, 2)));
-                    }).left().padTop(-9);
-                    c.row();
+                        b.table(bt -> {
+                            bt.right().defaults().padRight(3).left();
+                            if(speed != Float.MAX_VALUE) bt.add(unit.replace("{0}", "[stat]" + Strings.autoFixed(speed * (strength ? liquid.heatCapacity : 1f) + (strength ? 1f : 0f), 2) + "[lightgray]")).pad(5);
+                        }).right().grow().pad(10f).padRight(15f);
+                    }).growX().pad(5).row();
                 }
-            }).colspan(table.getColumns());
+            }).growX().colspan(table.getColumns());
+            table.row();
+        };
+    }
+
+    public static StatValue itemBoosters(String unit, float timePeriod, float speedBoost, float rangeBoost, ItemStack[] items, Boolf<Item> filter){
+        return table -> {
+            table.row();
+            table.table(c -> {
+                for(Item item : content.items()){
+                    if(!filter.get(item)) continue;
+
+                    c.table(Styles.grayPanel, b -> {
+                        for(ItemStack stack : items){
+                            if(timePeriod < 0){
+                                b.add(new ItemDisplay(stack.item, stack.amount, true)).pad(20f).left();
+                            }else{
+                                b.add(new ItemDisplay(stack.item, stack.amount, timePeriod, true)).pad(20f).left();
+                            }
+                            if(items.length > 1) b.row();
+                        }
+
+                        b.table(bt -> {
+                            bt.right().defaults().padRight(3).left();
+                            if(rangeBoost != 0) bt.add("[lightgray]+[stat]" + Strings.autoFixed(rangeBoost / tilesize, 2) + "[lightgray] " + StatUnit.blocks.localized()).row();
+                            if(speedBoost != 0) bt.add("[lightgray]" + unit.replace("{0}", "[stat]" + Strings.autoFixed(speedBoost, 2) + "[lightgray]"));
+                        }).right().grow().pad(10f).padRight(15f);
+                    }).growX().pad(5).padBottom(-5).row();
+                }
+            }).growX().colspan(table.getColumns());
             table.row();
         };
     }
