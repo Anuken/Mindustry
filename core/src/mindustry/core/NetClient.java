@@ -201,10 +201,12 @@ public class NetClient implements ApplicationListener{
             Sounds.chatMessage.play();
         }
 
-        //display raw unformatted text above player head
         if(playersender != null && unformatted != null){
+            //display raw unformatted text above player head
             playersender.lastText(unformatted);
             playersender.textFadeTime(1f);
+
+            Events.fire(new PlayerChatEvent(playersender, unformatted));
         }
     }
 
