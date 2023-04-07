@@ -431,7 +431,7 @@ public class Vars implements Loadable{
         settings.setAutosave(false);
         settings.load();
 
-        Scl.setProduct(settings.getInt("uiscale", 100) / 100f);
+        Scl.setProduct(Math.max(settings.getInt("uiscale", 100), 25) / 100f);
 
         if(!loadLocales) return;
 
