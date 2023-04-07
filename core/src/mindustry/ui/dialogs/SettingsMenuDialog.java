@@ -367,7 +367,7 @@ public class SettingsMenuDialog extends BaseDialog{
 
         int[] lastUiScale = {settings.getInt("uiscale", 100)};
 
-        graphics.sliderPref("uiscale", 100, 5, 300, 5, s -> {
+        graphics.sliderPref("uiscale", 100, 25, 300, 5, s -> {
             //if the user changed their UI scale, but then put it back, don't consider it 'changed'
             Core.settings.put("uiscalechanged", s != lastUiScale[0]);
             return s + "%";
