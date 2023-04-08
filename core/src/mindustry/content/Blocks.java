@@ -4721,8 +4721,9 @@ public class Blocks{
                 spread = 3.3f * 1.9f;
                 shots = barrels = 5;
             }}, new ShootHelix(){{
-                scl = 4f;
                 mag = 3f;
+                scl = 4f;
+                offset = scl * Mathf.halfPi;
             }});
 
             shootSound = Sounds.shootSmite;

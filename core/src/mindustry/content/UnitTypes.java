@@ -3692,6 +3692,7 @@ public class UnitTypes{
                     shoot = new ShootHelix(){{
                         mag = 1f;
                         scl = 5f;
+                        offset = scl * Mathf.halfPi;
                     }};
 
                     shootEffect = new MultiEffect(Fx.shootTitan, new WaveEffect(){{

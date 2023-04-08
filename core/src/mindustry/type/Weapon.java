@@ -43,6 +43,8 @@ public class Weapon implements Cloneable{
     public boolean alternate = true;
     /** whether to rotate toward the target independently of unit */
     public boolean rotate = false;
+    /** whether bullets shouldn't angle away from the shooting point; only works when rotate = false. */
+    public boolean shootForward = false;
     /** Whether to show the sprite of the weapon in the database. */
     public boolean showStatSprite = true;
     /** rotation at which this weapon starts at. TODO buggy!*/
@@ -444,15 +446,26 @@ public class Weapon implements Cloneable{
 
         mount.charging = false;
         float
-        xSpread = Mathf.range(xRand),
-        weaponRotation = unit.rotation - 90 + (rotate ? mount.rotation : baseRotation),
-        mountX = unit.x + Angles.trnsx(unit.rotation - 90, x, y),
-        mountY = unit.y + Angles.trnsy(unit.rotation - 90, x, y),
-        bulletX = mountX + Angles.trnsx(weaponRotation, this.shootX + xOffset + xSpread, this.shootY + yOffset),
-        bulletY = mountY + Angles.trnsy(weaponRotation, this.shootX + xOffset + xSpread, this.shootY + yOffset),
-        shootAngle = bulletRotation(unit, mount, bulletX, bulletY) + angleOffset,
-        lifeScl = bullet.scaleLife ? Mathf.clamp(Mathf.dst(bulletX, bulletY, mount.aimX, mount.aimY) / bullet.range) : 1f,
-        angle = angleOffset + shootAngle + Mathf.range(inaccuracy + bullet.inaccuracy);
+            xSpread = Mathf.range(xRand),
+            weaponRotation = unit.rotation - 90 + (rotate ? mount.rotation : baseRotation),
+            mountX = unit.x + Angles.trnsx(unit.rotation - 90, x, y),
+            mountY = unit.y + Angles.trnsy(unit.rotation - 90, x, y),
+            bulletX = mountX + Angles.trnsx(weaponRotation, this.shootX, this.shootY),
+            bulletY = mountY + Angles.trnsy(weaponRotation, this.shootX, this.shootY);
+
+        if(rotate || !shootForward){
+            bulletX += Angles.trnsx(weaponRotation, xOffset + xSpread, yOffset);
+            bulletY += Angles.trnsy(weaponRotation, xOffset + xSpread, yOffset);
+        }
+        float
+            shootAngle = bulletRotation(unit, mount, bulletX, bulletY) + angleOffset,
+            lifeScl = bullet.scaleLife ? Mathf.clamp(Mathf.dst(bulletX, bulletY, mount.aimX, mount.aimY) / bullet.range) : 1f,
+            angle = angleOffset + shootAngle + Mathf.range(inaccuracy + bullet.inaccuracy);
+
+        if(!(rotate || !shootForward)){
+            bulletX += Angles.trnsx(weaponRotation, xOffset + xSpread, yOffset);
+            bulletY += Angles.trnsy(weaponRotation, xOffset + xSpread, yOffset);
+        }
 
         mount.bullet = bullet.create(unit, unit.team, bulletX, bulletY, angle, -1f, (1f - velocityRnd) + Mathf.random(velocityRnd), lifeScl, null, mover, mount.aimX, mount.aimY);
         handleBullet(unit, mount, mount.bullet);
