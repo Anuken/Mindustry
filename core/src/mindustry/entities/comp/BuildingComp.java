@@ -1433,7 +1433,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                             l.left();
                             for(Item item : content.items()){
                                 if(flowItems.hasFlowItem(item)){
-                                    l.image(item.uiIcon).padRight(3f);
+                                    l.image(item.uiIcon).scaling(Scaling.fit).padRight(3f);
                                     l.label(() -> flowItems.getFlowRate(item) < 0 ? "..." : Strings.fixed(flowItems.getFlowRate(item), 1) + ps).color(Color.lightGray);
                                     l.row();
                                 }
@@ -1463,7 +1463,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                             l.left();
                             for(var liquid : content.liquids()){
                                 if(liquids.hasFlowLiquid(liquid)){
-                                    l.image(liquid.uiIcon).padRight(3f);
+                                    l.image(liquid.uiIcon).scaling(Scaling.fit).size(32f).padRight(3f);
                                     l.label(() -> liquids.getFlowRate(liquid) < 0 ? "..." : Strings.fixed(liquids.getFlowRate(liquid), 1) + ps).color(Color.lightGray);
                                     l.row();
                                 }

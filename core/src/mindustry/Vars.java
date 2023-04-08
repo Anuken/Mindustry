@@ -431,6 +431,11 @@ public class Vars implements Loadable{
         settings.setAutosave(false);
         settings.load();
 
+        //https://github.com/Anuken/Mindustry/issues/8483
+        if(settings.getInt("uiscale") == 5){
+            settings.put("uiscale", 100);
+        }
+
         Scl.setProduct(Math.max(settings.getInt("uiscale", 100), 25) / 100f);
 
         if(!loadLocales) return;
