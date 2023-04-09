@@ -479,6 +479,7 @@ public class ClassMap{
         classes.put("DrawSideRegion", mindustry.world.draw.DrawSideRegion.class);
         classes.put("DrawSoftParticles", mindustry.world.draw.DrawSoftParticles.class);
         classes.put("DrawSpikes", mindustry.world.draw.DrawSpikes.class);
+        classes.put("DrawTeam", mindustry.world.draw.DrawTeam.class);
         classes.put("DrawTurret", mindustry.world.draw.DrawTurret.class);
         classes.put("DrawWarmupRegion", mindustry.world.draw.DrawWarmupRegion.class);
         classes.put("DrawWeave", mindustry.world.draw.DrawWeave.class);

@@ -82,6 +82,12 @@ public class PowerGenerator extends PowerDistributor{
     }
 
     @Override
+    public void createIcons(MultiPacker packer){
+        super.createIcons(packer);
+        drawer.createIcons(this, packer);
+    }
+
+    @Override
     public boolean outputsItems(){
         return false;
     }

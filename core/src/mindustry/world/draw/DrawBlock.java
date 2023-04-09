@@ -7,6 +7,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.blocks.production.*;
 
@@ -39,6 +40,11 @@ public abstract class DrawBlock{
 
     /** Load any relevant texture regions. */
     public void load(Block block){
+
+    }
+
+    /** Special icon loading. */
+    public void createIcons(Block block, MultiPacker packer){
 
     }
 

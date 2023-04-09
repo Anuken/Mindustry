@@ -1262,35 +1262,7 @@ public class Block extends UnlockableContent implements Senseable{
 
         //generate paletted team regions
         if(teamRegion != null && teamRegion.found()){
-            for(Team team : Team.all){
-                //if there's an override, don't generate anything
-                if(team.hasPalette && !Core.atlas.has(name + "-team-" + team.name)){
-                    var base = Core.atlas.getPixmap(teamRegion);
-                    Pixmap out = new Pixmap(base.width, base.height);
-
-                    for(int x = 0; x < base.width; x++){
-                        for(int y = 0; y < base.height; y++){
-                            int color = base.get(x, y);
-                            int index = switch(color){
-                                case 0xffffffff -> 0;
-                                case 0xdcc6c6ff, 0xdbc5c5ff -> 1;
-                                case 0x9d7f7fff, 0x9e8080ff -> 2;
-                                default -> -1;
-                            };
-                            out.setRaw(x, y, index == -1 ? base.get(x, y) : team.palettei[index]);
-                        }
-                    }
-
-                    Drawf.checkBleed(out);
-
-                    packer.add(PageType.main, name + "-team-" + team.name, out);
-                }
-            }
-
-            teamRegions = new TextureRegion[Team.all.length];
-            for(Team team : Team.all){
-                teamRegions[team.id] = teamRegion.found() && team.hasPalette ? Core.atlas.find(name + "-team-" + team.name, teamRegion) : teamRegion;
-            }
+            teamRegions = colorTeams(packer, teamRegion, "-team");
         }
 
         Pixmap last = null;
@@ -1339,6 +1311,39 @@ public class Block extends UnlockableContent implements Senseable{
         }
 
         packer.add(PageType.editor, name + "-icon-editor", editorBase);
+    }
+
+    public TextureRegion[] colorTeams(MultiPacker packer, TextureRegion baseRegion, String suffix){
+        for(Team team : Team.all){
+            //if there's an override, don't generate anything
+            if(team.hasPalette && !Core.atlas.has(name + suffix + "-" + team.name)){
+                var base = Core.atlas.getPixmap(baseRegion);
+                Pixmap out = new Pixmap(base.width, base.height);
+
+                for(int x = 0; x < base.width; x++){
+                    for(int y = 0; y < base.height; y++){
+                        int color = base.get(x, y);
+                        int index = switch(color){
+                            case 0xffffffff -> 0;
+                            case 0xdcc6c6ff, 0xdbc5c5ff -> 1;
+                            case 0x9d7f7fff, 0x9e8080ff -> 2;
+                            default -> -1;
+                        };
+                        out.setRaw(x, y, index == -1 ? base.get(x, y) : team.palettei[index]);
+                    }
+                }
+
+                Drawf.checkBleed(out);
+
+                packer.add(PageType.main, name + suffix + "-" + team.name, out);
+            }
+        }
+
+        TextureRegion[] out = new TextureRegion[Team.all.length];
+        for(Team team : Team.all){
+            out[team.id] = baseRegion.found() && team.hasPalette ? Core.atlas.find(name + suffix + "-" + team.name, baseRegion) : baseRegion;
+        }
+        return out;
     }
 
     public void flipRotation(BuildPlan req, boolean x){

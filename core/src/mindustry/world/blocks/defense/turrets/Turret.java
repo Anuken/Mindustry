@@ -192,6 +192,12 @@ public class Turret extends ReloadTurret{
         drawer.getRegionsToOutline(this, out);
     }
 
+    @Override
+    public void createIcons(MultiPacker packer){
+        super.createIcons(packer);
+        drawer.createIcons(this, packer);
+    }
+
     public void limitRange(BulletType bullet, float margin){
         float realRange = bullet.rangeChange + range;
         //doesn't handle drag
