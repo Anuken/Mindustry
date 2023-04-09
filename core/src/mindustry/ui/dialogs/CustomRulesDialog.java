@@ -266,7 +266,7 @@ public class CustomRulesDialog extends BaseDialog{
                     rules.env = Vars.defaultEnv;
                     rules.hiddenBuildItems.clear();
                 }
-            }).group(group).checked(b -> rules.hiddenBuildItems.size == 0).update(b -> b.getLabel().setColor(!rules.infiniteResources ? Color.gray : Color.white));
+            }).group(group).checked(b -> rules.hiddenBuildItems.size == 0);
         }).left().fill(false).expand(false, false).row();
 
         title("@rules.title.teams");
