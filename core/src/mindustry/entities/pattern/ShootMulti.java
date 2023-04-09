@@ -35,7 +35,7 @@ public class ShootMulti extends ShootPattern{
                         if(move != null) move.move(b);
                         if(mover != null) mover.move(b);
                     });
-                });
+                }, null);
             }
         }, barrelIncrementer);
     }
