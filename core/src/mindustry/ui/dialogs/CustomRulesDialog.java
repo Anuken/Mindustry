@@ -247,7 +247,7 @@ public class CustomRulesDialog extends BaseDialog{
 
             t.defaults().size(140f, 50f);
 
-            for(Planet planet : content.planets().copy().filter(p -> p.accessible && p.visible && p.isLandable())){
+            for(Planet planet : content.planets().select(p -> p.accessible && p.visible && p.isLandable())){
                 t.button(planet.localizedName, style, () -> {
                     rules.env = planet.defaultEnv;
                     rules.attributes.clear();
