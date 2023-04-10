@@ -118,7 +118,7 @@ public class SpawnGroup implements JsonSerializable, Cloneable{
         if(unitAmount != 1) json.writeValue("amount", unitAmount);
         if(effect != null) json.writeValue("effect", effect.name);
         if(spawn != -1) json.writeValue("spawn", spawn);
-        if(payloads != null && payloads.size > 0) json.writeValue("payloads", payloads.map(u -> u.name).toArray(String.class));
+        if(payloads != null && payloads.any()) json.writeValue("payloads", payloads.map(u -> u.name).toArray(String.class));
         if(items != null && items.amount > 0) json.writeValue("items", items);
 
     }
@@ -127,7 +127,7 @@ public class SpawnGroup implements JsonSerializable, Cloneable{
     public void read(Json json, JsonValue data){
         String tname = data.getString("type", "dagger");
 
-        type = content.getByName(ContentType.unit, LegacyIO.unitMap.get(tname, tname));
+        type = content.unit(LegacyIO.unitMap.get(tname, tname));
         if(type == null) type = UnitTypes.dagger;
         begin = data.getInt("begin", 0);
         end = data.getInt("end", never);
@@ -138,7 +138,7 @@ public class SpawnGroup implements JsonSerializable, Cloneable{
         shieldScaling = data.getFloat("shieldScaling", 0);
         unitAmount = data.getInt("amount", 1);
         spawn = data.getInt("spawn", -1);
-        if(data.has("payloads")) payloads = Seq.with(json.readValue(String[].class, data.get("payloads"))).map(s -> content.getByName(ContentType.unit, s));
+        if(data.has("payloads")) payloads = Seq.with(json.readValue(String[].class, data.get("payloads"))).map(s -> content.unit(s));
         if(data.has("items")) items = json.readValue(ItemStack.class, data.get("items"));
 
 
@@ -146,7 +146,7 @@ public class SpawnGroup implements JsonSerializable, Cloneable{
         if(data.has("effect") && data.get("effect").isNumber() && data.getInt("effect", -1) == 8){
             effect = StatusEffects.boss;
         }else{
-            effect = content.getByName(ContentType.status, data.has("effect") && data.get("effect").isString() ? data.getString("effect", "none") : "none");
+            effect = content.statusEffect(data.has("effect") && data.get("effect").isString() ? data.getString("effect", "none") : "none");
         }
     }
 
