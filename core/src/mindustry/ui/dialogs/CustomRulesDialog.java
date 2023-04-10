@@ -271,7 +271,7 @@ public class CustomRulesDialog extends BaseDialog{
                     rules.hiddenBuildItems.clear();
                     rules.planet = Planets.sun;
                 }
-            }).group(group).checked(b -> rules.planet == Planets.sun).update(b -> b.getLabel().setColor(!rules.infiniteResources ? Color.gray : Color.white));
+            }).group(group).checked(b -> rules.planet == Planets.sun);
         }).left().fill(false).expand(false, false).row();
 
         title("@rules.title.teams");
