@@ -14,14 +14,15 @@ public class ShootPattern implements Cloneable{
 
     /** Called on a single "trigger pull". This function should call the handler with any bullets that result. */
     public void shoot(int totalShots, BulletHandler handler, @Nullable Runnable barrelIncrementer){
-        for(int i = 0; i < shots; i++){
-            handler.shoot(0, 0, 0, firstShotDelay + shotDelay * i);
-        }
+        //the default implementation calls the "soft deprecated" variant for mod compatibility, so overrides from older mods can function properly
+        shoot(totalShots, handler);
     }
 
     /** Called on a single "trigger pull". This function should call the handler with any bullets that result. */
     public void shoot(int totalShots, BulletHandler handler){
-        shoot(totalShots, handler, null);
+        for(int i = 0; i < shots; i++){
+            handler.shoot(0, 0, 0, firstShotDelay + shotDelay * i);
+        }
     }
 
     /** Subclasses should override this to flip its sides. */

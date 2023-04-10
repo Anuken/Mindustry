@@ -114,9 +114,14 @@ public class BeamDrill extends Block{
         stats.add(Stat.drillTier, StatValues.drillables(drillTime, 0f, size, drillMultipliers, b -> (b instanceof Floor f && f.wallOre && f.itemDrop != null && f.itemDrop.hardness <= tier) || (b instanceof StaticWall w && w.itemDrop != null && w.itemDrop.hardness <= tier)));
 
         stats.add(Stat.drillSpeed, 60f / drillTime * size, StatUnit.itemsSecond);
-        if(optionalBoostIntensity != 1){
+
+        if(optionalBoostIntensity != 1 && findConsumer(f -> f instanceof ConsumeLiquidBase) instanceof ConsumeLiquidBase consBase){
             stats.remove(Stat.booster);
-            stats.add(Stat.booster, StatValues.speedBoosters("{0}" + StatUnit.timesSpeed.localized(), ((ConsumeLiquidBase)findConsumer(f -> f instanceof ConsumeLiquidBase)).amount, optionalBoostIntensity, false, l -> (consumesLiquid(l) && (findConsumer(f -> f instanceof ConsumeLiquid).booster || ((ConsumeLiquid)findConsumer(f -> f instanceof ConsumeLiquid)).liquid != l))));
+            stats.add(Stat.booster,
+                StatValues.speedBoosters("{0}" + StatUnit.timesSpeed.localized(),
+                consBase.amount, optionalBoostIntensity, false,
+                l -> (consumesLiquid(l) && (findConsumer(f -> f instanceof ConsumeLiquid).booster || ((ConsumeLiquid)findConsumer(f -> f instanceof ConsumeLiquid)).liquid != l)))
+            );
         }
     }
 

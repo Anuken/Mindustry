@@ -54,8 +54,14 @@ public class MendProjector extends Block{
         stats.add(Stat.repairTime, (int)(100f / healPercent * reload / 60f), StatUnit.seconds);
         stats.add(Stat.range, range / tilesize, StatUnit.blocks);
 
-        stats.remove(Stat.booster);
-        stats.add(Stat.booster, StatValues.itemBoosters("{0}" + StatUnit.timesSpeed.localized(), stats.timePeriod, (phaseBoost + healPercent) / healPercent, phaseRangeBoost, ((ConsumeItems)findConsumer(f -> f instanceof ConsumeItems)).items, this::consumesItem));
+        if(findConsumer(c -> c instanceof ConsumeItems) instanceof ConsumeItems cons){
+            stats.remove(Stat.booster);
+            stats.add(Stat.booster, StatValues.itemBoosters(
+                "{0}" + StatUnit.timesSpeed.localized(),
+                stats.timePeriod, (phaseBoost + healPercent) / healPercent, phaseRangeBoost,
+                cons.items, this::consumesItem)
+            );
+        }
     }
 
     @Override
