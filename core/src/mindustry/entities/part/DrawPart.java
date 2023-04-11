@@ -14,6 +14,8 @@ public abstract class DrawPart{
     public boolean under = false;
     /** For units, this is the index of the weapon this part gets its progress for. */
     public int weaponIndex = 0;
+    /** Which recoil counter to use. < 0 to use base recoil.  */
+    public int recoilIndex = -1;
 
     public abstract void draw(PartParams params);
     public abstract void load(String name);
@@ -41,17 +43,27 @@ public abstract class DrawPart{
             this.sideMultiplier = 1;
             return this;
         }
+
+        public PartParams setRecoil(float recoils){
+            this.recoil = recoils;
+            return this;
+        }
     }
 
     public static class PartMove{
         public PartProgress progress = PartProgress.warmup;
-        public float x, y, rot;
+        public float x, y, gx, gy, rot;
 
-        public PartMove(PartProgress progress, float x, float y, float rot){
+        public PartMove(PartProgress progress, float x, float y, float gx, float gy, float rot){
             this.progress = progress;
             this.x = x;
             this.y = y;
+            this.gx = gx;
+            this.gy = gy;
             this.rot = rot;
+        }
+        public PartMove(PartProgress progress, float x, float y, float rot){
+            this(progress, x, y, 0, 0, rot);
         }
 
         public PartMove(){

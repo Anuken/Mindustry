@@ -44,6 +44,17 @@ public class LaunchLoadoutDialog extends BaseDialog{
 
         ItemSeq sitems = sector.items();
 
+        //hide nonsensical items
+        ItemSeq launch = universe.getLaunchResources();
+        if(sector.planet.allowLaunchLoadout){
+            for(var item : content.items()){
+                if(sector.planet.hiddenItems.contains(item)){
+                    launch.set(item, 0);
+                }
+            }
+            universe.updateLaunchResources(launch);
+        }
+
         //updates sum requirements
         Runnable update = () -> {
             int cap = lastCapacity = (int)(sector.planet.launchCapacityMultiplier * selected.findCore().itemCapacity);

@@ -22,6 +22,7 @@ import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
+import mindustry.game.EventType.*;
 import mindustry.game.Objectives.*;
 import mindustry.game.SectorInfo.*;
 import mindustry.game.*;
@@ -198,7 +199,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                     diag.hide();
                 }).size(300f, 64f).disabled(b -> selected[0] == null);
 
-                app.post(() -> diag.show());
+                app.post(diag::show);
             }
         });
 
@@ -210,6 +211,11 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 minFilter = magFilter = TextureFilter.linear;
             }}).loaded = t -> planetTextures[fi] = t;
             assets.finishLoadingAsset(names[i]);
+        }
+
+        //unlock defaults for older campaign saves (TODO move? where to?)
+        if(content.planets().contains(p -> p.sectors.contains(s -> s.hasBase())) || Blocks.scatter.unlocked() || Blocks.router.unlocked()){
+            Seq.with(Blocks.junction, Blocks.mechanicalDrill, Blocks.conveyor, Blocks.duo, Items.copper, Items.lead).each(UnlockableContent::quietUnlock);
         }
     }
 
@@ -779,7 +785,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             hoverLabel.touchable = Touchable.disabled;
             hoverLabel.color.a = state.uiAlpha;
 
-            Vec3 pos = planets.cam.project(Tmp.v31.set(hovered.tile.v).setLength(PlanetRenderer.outlineRad).rotate(Vec3.Y, -state.planet.getRotation()).add(state.planet.position));
+            Vec3 pos = planets.cam.project(Tmp.v31.set(hovered.tile.v).setLength(PlanetRenderer.outlineRad * state.planet.radius).rotate(Vec3.Y, -state.planet.getRotation()).add(state.planet.position));
             hoverLabel.setPosition(pos.x - Core.scene.marginLeft, pos.y - Core.scene.marginBottom, Align.center);
 
             hoverLabel.getText().setLength(0);
@@ -825,7 +831,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         }
 
         if(state.planet.hasGrid()){
-            hovered = Core.scene.getDialog() == this ? state.planet.getSector(planets.cam.getMouseRay(), PlanetRenderer.outlineRad) : null;
+            hovered = Core.scene.getDialog() == this ? state.planet.getSector(planets.cam.getMouseRay(), PlanetRenderer.outlineRad * state.planet.radius) : null;
         }else if(state.planet.isLandable()){
             boolean wasNull = selected == null;
             //always have the first sector selected.
@@ -951,31 +957,33 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         dialog.addCloseButton();
 
         if(sector.hasBase()){
-            dialog.buttons.button("@sector.abandon", Icon.cancel, () -> {
-                ui.showConfirm("@sector.abandon.confirm", () -> {
-                    dialog.hide();
-
-                    if(sector.isBeingPlayed()){
-                        hide();
-                        //after dialog is hidden
-                        Time.runTask(7f, () -> {
-                            //force game over in a more dramatic fashion
-                            for(var core : player.team().cores().copy()){
-                                core.kill();
-                            }
-                        });
-                    }else{
-                        if(sector.save != null){
-                            sector.save.delete();
-                        }
-                        sector.save = null;
-                    }
-                    updateSelected();
-                });
-            });
+            dialog.buttons.button("@sector.abandon", Icon.cancel, () -> abandonSectorConfirm(sector, dialog::hide));
         }
 
         dialog.show();
+    }
+
+    public void abandonSectorConfirm(Sector sector, Runnable listener){
+        ui.showConfirm("@sector.abandon.confirm", () -> {
+            if(listener != null) listener.run();
+
+            if(sector.isBeingPlayed()){
+                hide();
+                //after dialog is hidden
+                Time.runTask(7f, () -> {
+                    //force game over in a more dramatic fashion
+                    for(var core : player.team().cores().copy()){
+                        core.kill();
+                    }
+                });
+            }else{
+                if(sector.save != null){
+                    sector.save.delete();
+                }
+                sector.save = null;
+            }
+            updateSelected();
+        });
     }
 
     void addSurvivedInfo(Sector sector, Table table, boolean wrap){
@@ -1128,7 +1136,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 t.add("@sectors.resources").padRight(4);
                 for(UnlockableContent c : sector.info.resources){
                     if(c == null) continue; //apparently this is possible.
-                    t.image(c.uiIcon).padRight(3).size(iconSmall);
+                    t.image(c.uiIcon).padRight(3).scaling(Scaling.fit).size(iconSmall);
                 }
             }).padLeft(10f).fillX().row();
         }
@@ -1171,7 +1179,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
         //make sure there are no under-attack sectors (other than this one)
         for(Planet planet : content.planets()){
-            if(!planet.allowWaveSimulation && !debugSelect){
+            if(!planet.allowWaveSimulation && !debugSelect && planet.allowWaveSimulation == sector.planet.allowWaveSimulation){
                 //if there are two or more attacked sectors... something went wrong, don't show the dialog to prevent softlock
                 Sector attacked = planet.sectors.find(s -> s.isAttacked() && s != sector);
                 if(attacked != null &&  planet.sectors.count(s -> s.isAttacked()) < 2){
@@ -1215,9 +1223,12 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 CoreBlock block = sector.allowLaunchSchematics() ? (from.info.bestCoreType instanceof CoreBlock b ? b : (CoreBlock)from.planet.defaultCore) : (CoreBlock)from.planet.defaultCore;
 
                 loadouts.show(block, from, sector, () -> {
-                    var schemCore = universe.getLastLoadout().findCore();
-                    from.removeItems(universe.getLastLoadout().requirements());
+                    var loadout = universe.getLastLoadout();
+                    var schemCore = loadout.findCore();
+                    from.removeItems(loadout.requirements());
                     from.removeItems(universe.getLaunchResources());
+
+                    Events.fire(new SectorLaunchLoadoutEvent(sector, from, loadout));
 
                     if(settings.getBool("skipcoreanimation")){
                         //just... go there

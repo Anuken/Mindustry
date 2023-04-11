@@ -39,6 +39,13 @@ public class GlobalVars{
         put("true", 1);
         put("null", null);
 
+        //math
+        put("@pi", Mathf.PI);
+        put("π", Mathf.PI); //for the "cool" kids
+        put("@e", Mathf.E);
+        put("@degToRad", Mathf.degRad);
+        put("@radToDeg", Mathf.radDeg);
+
         //time
         varTime = put("@time", 0);
         varTick = put("@tick", 0);
@@ -48,7 +55,6 @@ public class GlobalVars{
         varWaveTime = put("@waveTime", 0);
 
         //special enums
-
         put("@ctrlProcessor", ctrlProcessor);
         put("@ctrlPlayer", ctrlPlayer);
         put("@ctrlCommand", ctrlCommand);

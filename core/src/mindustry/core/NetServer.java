@@ -9,7 +9,6 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.CommandHandler.*;
 import arc.util.io.*;
-import arc.util.serialization.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
@@ -46,8 +45,8 @@ public class NetServer implements ApplicationListener{
     /** If a player goes away of their server-side coordinates by this distance, they get teleported back. */
     private static final float correctDist = tilesize * 14f;
 
-    public final Administration admins = new Administration();
-    public final CommandHandler clientCommands = new CommandHandler("/");
+    public Administration admins = new Administration();
+    public CommandHandler clientCommands = new CommandHandler("/");
     public TeamAssigner assigner = (player, players) -> {
         if(state.rules.pvp){
             //find team with minimum amount of players and auto-assign player to that.
@@ -96,7 +95,7 @@ public class NetServer implements ApplicationListener{
         }
     };
 
-    private boolean closing = false;
+    private boolean closing = false, pvpAutoPaused = true;
     private Interval timer = new Interval(10);
     private IntSet buildHealthChanged = new IntSet();
 
@@ -138,15 +137,6 @@ public class NetServer implements ApplicationListener{
             con.connectTime = Time.millis();
 
             String uuid = packet.uuid;
-            byte[] buuid = Base64Coder.decode(uuid);
-            CRC32 crc = new CRC32();
-            crc.update(buuid, 0, 8);
-            ByteBuffer buff = ByteBuffer.allocate(8);
-            buff.put(buuid, 8, 8);
-            if(crc.getValue() != buff.getLong(0)){
-                con.kick(KickReason.clientOutdated);
-                return;
-            }
 
             if(admins.isIPBanned(con.address) || admins.isSubnetBanned(con.address)) return;
 
@@ -195,6 +185,7 @@ public class NetServer implements ApplicationListener{
                     result.append("Unnecessary mods:[lightgray]\n").append("> ").append(extraMods.toString("\n> "));
                 }
                 con.kick(result.toString(), 0);
+                return;
             }
 
             if(!admins.isWhitelisted(packet.uuid, packet.usid)){
@@ -225,6 +216,14 @@ public class NetServer implements ApplicationListener{
                     con.uuid = packet.uuid;
                     con.kick(KickReason.idInUse);
                     return;
+                }
+
+                for(var otherCon : net.getConnections()){
+                    if(otherCon != con && uuid.equals(otherCon.uuid)){
+                        con.uuid = packet.uuid;
+                        con.kick(KickReason.idInUse);
+                        return;
+                    }
                 }
             }
 
@@ -861,8 +860,19 @@ public class NetServer implements ApplicationListener{
         }
 
         if(state.isGame() && net.server()){
-            if(state.rules.pvp){
-                state.serverPaused = isWaitingForPlayers();
+            if(state.rules.pvp && state.rules.pvpAutoPause){
+                boolean waiting = isWaitingForPlayers(), paused = state.isPaused();
+                if(waiting != paused){
+                    if(waiting){
+                        //is now waiting, enable pausing, flag it correctly
+                        pvpAutoPaused = true;
+                        state.set(State.paused);
+                    }else if(pvpAutoPaused){
+                        //no longer waiting, stop pausing
+                        state.set(State.playing);
+                        pvpAutoPaused = false;
+                    }
+                }
             }
 
             sync();
@@ -941,7 +951,7 @@ public class NetServer implements ApplicationListener{
         dataStream.close();
 
         //write basic state data.
-        Call.stateSnapshot(player.con, state.wavetime, state.wave, state.enemies, state.serverPaused, state.gameOver,
+        Call.stateSnapshot(player.con, state.wavetime, state.wave, state.enemies, state.isPaused(), state.gameOver,
         universe.seconds(), tps, GlobalVars.rand.seed0, GlobalVars.rand.seed1, syncStream.toByteArray());
 
         syncStream.reset();
@@ -984,7 +994,7 @@ public class NetServer implements ApplicationListener{
         player.con.snapshotsSent++;
     }
 
-    String fixName(String name){
+    public String fixName(String name){
         name = name.trim().replace("\n", "").replace("\t", "");
         if(name.equals("[") || name.equals("]")){
             return "";
@@ -1008,7 +1018,7 @@ public class NetServer implements ApplicationListener{
         return result.toString();
     }
 
-    static String checkColor(String str){
+    public String checkColor(String str){
         for(int i = 1; i < str.length(); i++){
             if(str.charAt(i) == ']'){
                 String color = str.substring(1, i);

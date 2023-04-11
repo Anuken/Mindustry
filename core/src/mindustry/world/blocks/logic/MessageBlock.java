@@ -1,6 +1,8 @@
 package mindustry.world.blocks.logic;
 
 import arc.*;
+import arc.Graphics.*;
+import arc.Graphics.Cursor.*;
 import arc.Input.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -33,7 +35,7 @@ public class MessageBlock extends Block{
         envEnabled = Env.any;
 
         config(String.class, (MessageBuild tile, String text) -> {
-            if(text.length() > maxTextLength){
+            if(text.length() > maxTextLength || !accessible()){
                 return; //no.
             }
 
@@ -53,6 +55,15 @@ public class MessageBlock extends Block{
                 }
             }
         });
+    }
+
+    public boolean accessible(){
+        return !privileged || state.rules.editor;
+    }
+
+    @Override
+    public boolean canBreak(Tile tile){
+        return accessible();
     }
 
     public class MessageBuild extends Building{
@@ -87,6 +98,11 @@ public class MessageBlock extends Block{
 
         @Override
         public void buildConfiguration(Table table){
+            if(!accessible()){
+                deselect();
+                return;
+            }
+
             table.button(Icon.pencil, Styles.cleari, () -> {
                 if(mobile){
                     Core.input.getTextInput(new TextInput(){{
@@ -134,12 +150,33 @@ public class MessageBlock extends Block{
 
         @Override
         public boolean onConfigureBuildTapped(Building other){
-            if(this == other){
+            if(this == other || !accessible()){
                 deselect();
                 return false;
             }
 
             return true;
+        }
+
+        @Override
+        public Cursor getCursor(){
+            return !accessible() ? SystemCursor.arrow : super.getCursor();
+        }
+
+        @Override
+        public void damage(float damage){
+            if(privileged) return;
+            super.damage(damage);
+        }
+
+        @Override
+        public boolean canPickup(){
+            return false;
+        }
+
+        @Override
+        public boolean collide(Bullet other){
+            return !privileged;
         }
 
         @Override

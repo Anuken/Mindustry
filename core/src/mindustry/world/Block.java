@@ -18,6 +18,7 @@ import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
+import mindustry.entities.bullet.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -30,7 +31,6 @@ import mindustry.world.blocks.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.consumers.*;
-import mindustry.entities.bullet.*;
 import mindustry.world.meta.*;
 
 import java.lang.reflect.*;
@@ -51,6 +51,8 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean consumesPower = true;
     /** If true, this block is a generator that can produce power. */
     public boolean outputsPower = false;
+    /** If false, power nodes cannot connect to this block. */
+    public boolean connectedPower = true;
     /** If true, this block can conduct power like a cable. */
     public boolean conductivePower = false;
     /** If true, this block can output payloads; affects blending. */
@@ -166,6 +168,8 @@ public class Block extends UnlockableContent implements Senseable{
     public float baseExplosiveness = 0f;
     /** bullet that this block spawns when destroyed */
     public @Nullable BulletType destroyBullet = null;
+    /** liquid used for lighting */
+    public @Nullable Liquid lightLiquid;
     /** whether cracks are drawn when this block is damaged */
     public boolean drawCracks = true;
     /** whether rubble is created when this block is destroyed */
@@ -310,6 +314,8 @@ public class Block extends UnlockableContent implements Senseable{
     public float deconstructThreshold = 0f;
     /** If true, this block deconstructs immediately. Instant deconstruction implies no resource refund. */
     public boolean instantDeconstruct = false;
+    /** Effect for placing the block. Passes size as rotation. */
+    public Effect placeEffect = Fx.placeBlock;
     /** Effect for breaking the block. Passes size as rotation. */
     public Effect breakEffect = Fx.breakBlock;
     /** Effect for destroying the block. */
@@ -409,7 +415,7 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     public void drawPotentialLinks(int x, int y){
-        if((consumesPower || outputsPower) && hasPower){
+        if((consumesPower || outputsPower) && hasPower && connectedPower){
             Tile tile = world.tile(x, y);
             if(tile != null){
                 PowerNode.getNodeLinks(tile, this, player.team(), other -> {
@@ -499,6 +505,10 @@ public class Block extends UnlockableContent implements Senseable{
 
     public boolean synthetic(){
         return update || destructible;
+    }
+
+    public boolean checkForceDark(Tile tile){
+        return forceDark;
     }
 
     @Override
@@ -828,6 +838,10 @@ public class Block extends UnlockableContent implements Senseable{
         return generatedIcons == null ? (generatedIcons = icons()) : generatedIcons;
     }
 
+    public void resetGeneratedIcons(){
+        generatedIcons = null;
+    }
+
     public TextureRegion[] variantRegions(){
         return variantRegions == null ? (variantRegions = new TextureRegion[]{fullIcon}) : variantRegions;
     }
@@ -853,11 +867,15 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     public boolean isVisible(){
-        return !isHidden();
+        return !isHidden() && (state.rules.editor || (!state.rules.hideBannedBlocks || !state.rules.isBanned(this)));
+    }
+
+    public boolean isVisibleOn(Planet planet){
+        return !Structs.contains(requirements, i -> planet.hiddenItems.contains(i.item));
     }
 
     public boolean isPlaceable(){
-        return isVisible() && (!state.rules.bannedBlocks.contains(this) || state.rules.editor) && supportsEnv(state.rules.env);
+        return isVisible() && (!state.rules.isBanned(this) || state.rules.editor) && supportsEnv(state.rules.env);
     }
 
     /** @return whether this block supports a specific environment. */
@@ -905,6 +923,10 @@ public class Block extends UnlockableContent implements Senseable{
 
     public <T extends Consume> T findConsumer(Boolf<Consume> filter){
         return consumers.length == 0 ? (T)consumeBuilder.find(filter) : (T)Structs.find(consumers, filter);
+    }
+
+    public boolean hasConsumer(Consume cons){
+        return consumeBuilder.contains(cons);
     }
 
     public void removeConsumer(Consume cons){
@@ -1069,13 +1091,15 @@ public class Block extends UnlockableContent implements Senseable{
                 for(ItemStack stack : i.items){
                     cons.get(stack.item);
                 }
-            }else if(c instanceof ConsumeLiquid i){
+            }
+            //TODO: requiring liquid dependencies is usually a bad idea, because there is no reason to pump/produce something until you actually need it.
+            /*else if(c instanceof ConsumeLiquid i){
                 cons.get(i.liquid);
             }else if(c instanceof ConsumeLiquids i){
                 for(var stack : i.liquids){
                     cons.get(stack.liquid);
                 }
-            }
+            }*/
         }
     }
 
@@ -1123,6 +1147,10 @@ public class Block extends UnlockableContent implements Senseable{
         }
 
         clipSize = Math.max(clipSize, size * tilesize);
+
+        if(hasLiquids && drawLiquidLight){
+            clipSize = Math.max(size * 30f * 2f, clipSize);
+        }
 
         if(emitLight){
             clipSize = Math.max(clipSize, lightRadius * 2f);
@@ -1306,6 +1334,7 @@ public class Block extends UnlockableContent implements Senseable{
 
             editorBase = new PixmapRegion(base);
         }else{
+            if(gen[0] != null) packer.add(PageType.main, "block-" + name + "-full", Core.atlas.getPixmap(gen[0]));
             editorBase = gen[0] == null ? Core.atlas.getPixmap(fullIcon) : Core.atlas.getPixmap(gen[0]);
         }
 

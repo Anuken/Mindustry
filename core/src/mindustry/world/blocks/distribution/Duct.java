@@ -30,6 +30,8 @@ public class Duct extends Block implements Autotiler{
     public @Load(value = "@-top-#", length = 5) TextureRegion[] topRegions;
     public @Load(value = "@-bottom-#", length = 5, fallback = "duct-bottom-#") TextureRegion[] botRegions;
 
+    public @Nullable Block bridgeReplacement;
+
     public Duct(String name){
         super(name);
 
@@ -54,6 +56,13 @@ public class Duct extends Block implements Autotiler{
         super.setStats();
 
         stats.add(Stat.itemsMoved, 60f / speed, StatUnit.itemsSecond);
+    }
+
+    @Override
+    public void init(){
+        super.init();
+
+        if(bridgeReplacement == null || !(bridgeReplacement instanceof DuctBridge)) bridgeReplacement = Blocks.ductBridge;
     }
 
     @Override
@@ -96,7 +105,9 @@ public class Duct extends Block implements Autotiler{
 
     @Override
     public void handlePlacementLine(Seq<BuildPlan> plans){
-        Placement.calculateBridges(plans, (DuctBridge)Blocks.ductBridge, false, b -> b instanceof Duct || b instanceof StackConveyor || b instanceof Conveyor);
+        if(bridgeReplacement == null) return;
+
+        Placement.calculateBridges(plans, (DuctBridge)bridgeReplacement, false, b -> b instanceof Duct || b instanceof StackConveyor || b instanceof Conveyor);
     }
 
     public class DuctBuild extends Building{
@@ -179,7 +190,7 @@ public class Duct extends Block implements Autotiler{
                     ((source.block.rotate && source.front() == this && source.block.hasItems && source.block.isDuct) ||
                     Edges.getFacingEdge(source.tile(), tile).relativeTo(tile) == rotation) :
                     //standard acceptance - do not accept from front
-                    !(source.block.rotate && next == source) && Math.abs(Edges.getFacingEdge(source.tile, tile).relativeTo(tile.x, tile.y) - rotation) != 2
+                    !(source.block.rotate && next == source) && Edges.getFacingEdge(source.tile, tile) != null && Math.abs(Edges.getFacingEdge(source.tile, tile).relativeTo(tile.x, tile.y) - rotation) != 2
                 );
         }
 

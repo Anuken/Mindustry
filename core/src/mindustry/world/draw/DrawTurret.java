@@ -40,6 +40,8 @@ public class DrawTurret extends DrawBlock{
         if(block.region.found() && !(block.outlinedIcon > 0 && block.getGeneratedIcons()[block.outlinedIcon].equals(block.region))){
             out.add(block.region);
         }
+
+        block.resetGeneratedIcons();
     }
 
     @Override
@@ -73,6 +75,7 @@ public class DrawTurret extends DrawBlock{
             var params = DrawPart.params.set(build.warmup(), 1f - progress, 1f - progress, tb.heat, tb.curRecoil, tb.charge, tb.x + tb.recoilOffset.x, tb.y + tb.recoilOffset.y, tb.rotation);
 
             for(var part : parts){
+                params.setRecoil(part.recoilIndex >= 0 && tb.curRecoils != null ? tb.curRecoils[part.recoilIndex] : tb.curRecoil);
                 part.draw(params);
             }
         }

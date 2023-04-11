@@ -464,7 +464,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
     }
 
     public void build(){
-        float size = 58f;
+        float size = mobile ? 50f : 58f;
 
         clearChildren();
         table(cont -> {

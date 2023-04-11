@@ -11,6 +11,8 @@ import arc.util.*;
 import arc.util.Log.*;
 import arc.util.io.*;
 import mindustry.*;
+import mindustry.game.EventType.*;
+import mindustry.net.Administration.*;
 import mindustry.net.Net.*;
 import mindustry.net.Packets.*;
 import net.jpountz.lz4.*;
@@ -19,7 +21,6 @@ import java.io.*;
 import java.net.*;
 import java.nio.*;
 import java.nio.channels.*;
-import java.util.*;
 import java.util.concurrent.*;
 
 import static mindustry.Vars.*;
@@ -35,12 +36,20 @@ public class ArcNetProvider implements NetProvider{
     private static final LZ4FastDecompressor decompressor = LZ4Factory.fastestInstance().fastDecompressor();
     private static final LZ4Compressor compressor = LZ4Factory.fastestInstance().fastCompressor();
 
+    private volatile int playerLimitCache, packetSpamLimit;
+
     public ArcNetProvider(){
         ArcNet.errorHandler = e -> {
             if(Log.level == LogLevel.debug){
                 Log.debug(Strings.getStackTrace(e));
             }
         };
+
+        //fetch this in the main thread to prevent threading issues
+        Events.run(Trigger.update, () -> {
+            playerLimitCache = netServer.admins.getPlayerLimit();
+            packetSpamLimit = Config.packetSpamLimit.num();
+        });
 
         client = new Client(8192, 8192, new PacketSerializer());
         client.setDiscoveryPacket(packetSupplier);
@@ -80,7 +89,7 @@ public class ArcNetProvider implements NetProvider{
             }
         });
 
-        server = new Server(32768, 8192, new PacketSerializer());
+        server = new Server(32768, 16384, new PacketSerializer());
         server.setMulticast(multicastGroup, multicastPort);
         server.setDiscoveryHandler((address, handler) -> {
             ByteBuffer buffer = NetworkIO.writeServerData();
@@ -93,6 +102,12 @@ public class ArcNetProvider implements NetProvider{
             @Override
             public void connected(Connection connection){
                 String ip = connection.getRemoteAddressTCP().getAddress().getHostAddress();
+
+                //kill connections above the limit to prevent spam
+                if((playerLimitCache > 0 && server.getConnections().length > playerLimitCache) || netServer.admins.isDosBlacklisted(ip)){
+                    connection.close(DcReason.closed);
+                    return;
+                }
 
                 ArcConnection kn = new ArcConnection(ip, connection);
 
@@ -123,6 +138,13 @@ public class ArcNetProvider implements NetProvider{
             public void received(Connection connection, Object object){
                 ArcConnection k = getByArcID(connection.getID());
                 if(!(object instanceof Packet pack) || k == null) return;
+
+                if(packetSpamLimit > 0 && !k.packetRate.allow(3000, packetSpamLimit)){
+                    Log.warn("Blacklisting IP '@' as potential DOS attack - packet spam.", k.address);
+                    connection.close(DcReason.closed);
+                    netServer.admins.blacklistDos(k.address);
+                    return;
+                }
 
                 Core.app.post(() -> {
                     try{
@@ -230,21 +252,22 @@ public class ArcNetProvider implements NetProvider{
     public void discoverServers(Cons<Host> callback, Runnable done){
         Seq<InetAddress> foundAddresses = new Seq<>();
         long time = Time.millis();
+
         client.discoverHosts(port, multicastGroup, multicastPort, 3000, packet -> {
-            Core.app.post(() -> {
+            synchronized(foundAddresses){
                 try{
                     if(foundAddresses.contains(address -> address.equals(packet.getAddress()) || (isLocal(address) && isLocal(packet.getAddress())))){
                         return;
                     }
                     ByteBuffer buffer = ByteBuffer.wrap(packet.getData());
                     Host host = NetworkIO.readServerData((int)Time.timeSinceMillis(time), packet.getAddress().getHostAddress(), buffer);
-                    callback.get(host);
+                    Core.app.post(() -> callback.get(host));
                     foundAddresses.add(packet.getAddress());
                 }catch(Exception e){
-                    //don't crash when there's an error pinging a a server or parsing data
+                    //don't crash when there's an error pinging a server or parsing data
                     e.printStackTrace();
                 }
-            });
+            }
         }, () -> Core.app.post(done));
     }
 

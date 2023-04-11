@@ -59,7 +59,7 @@ public class Build{
             tile.build.lastAccessed = unit.getControllerName();
         }
 
-        Core.app.post(() -> Events.fire(new BlockBuildBeginEvent(tile, team, unit, true)));
+        Events.fire(new BlockBuildBeginEvent(tile, team, unit, true));
     }
 
     /** Places a ConstructBlock at this location. */
@@ -115,7 +115,7 @@ public class Build{
 
         result.placeBegan(tile, previous);
 
-        Core.app.post(() -> Events.fire(new BlockBuildBeginEvent(tile, team, unit, false)));
+        Events.fire(new BlockBuildBeginEvent(tile, team, unit, false));
     }
 
     /** Returns whether a tile can be placed at this location by this team. */
@@ -192,10 +192,6 @@ public class Build{
                 !check.floor().placeableOn || //solid wall
                 (!checkVisible && !check.block().alwaysReplace) || //replacing a block that should be replaced (e.g. payload placement)
                     !((type.canReplace(check.block()) || //can replace type
-                        //controversial change: allow rebuilding damaged blocks
-                        //this could be buggy and abuse-able, so I'm not enabling it yet
-                        //note that this requires a change in BuilderComp as well
-                        //(type == check.block() && check.centerX() == x && check.centerY() == y && check.build != null && check.build.health < check.build.maxHealth - 0.0001f) ||
                         (check.build instanceof ConstructBuild build && build.current == type && check.centerX() == tile.x && check.centerY() == tile.y)) && //same type in construction
                     type.bounds(tile.x, tile.y, Tmp.r1).grow(0.01f).contains(check.block.bounds(check.centerX(), check.centerY(), Tmp.r2))) || //no replacement
                 (type.requiresWater && check.floor().liquidDrop != Liquids.water) //requires water but none found

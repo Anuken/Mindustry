@@ -4,8 +4,8 @@ import arc.struct.*;
 import mindustry.game.Objectives.*;
 
 import static mindustry.content.Blocks.*;
-import static mindustry.content.SectorPresets.*;
 import static mindustry.content.SectorPresets.craters;
+import static mindustry.content.SectorPresets.*;
 import static mindustry.content.TechTree.*;
 import static mindustry.content.UnitTypes.*;
 
@@ -19,9 +19,10 @@ public class SerpuloTechTree{
                 node(junction, () -> {
                     node(router, () -> {
                         node(launchPad, Seq.with(new SectorComplete(extractionOutpost)), () -> {
-                            node(interplanetaryAccelerator, Seq.with(new SectorComplete(planetaryTerminal)), () -> {
+                            //no longer necessary to beat the campaign
+                            //node(interplanetaryAccelerator, Seq.with(new SectorComplete(planetaryTerminal)), () -> {
 
-                            });
+                            //});
                         });
 
                         node(distributor);
@@ -519,6 +520,7 @@ public class SerpuloTechTree{
                                 ), () -> {
                                     node(coastline, Seq.with(
                                     new SectorComplete(windsweptIslands),
+                                    new SectorComplete(saltFlats),
                                     new Research(navalFactory),
                                     new Research(payloadConveyor)
                                     ), () -> {

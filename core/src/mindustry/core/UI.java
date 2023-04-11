@@ -73,6 +73,9 @@ public class UI implements ApplicationListener, Loadable{
     public ColorPicker picker;
     public LogicDialog logic;
     public FullTextDialog fullText;
+    public CampaignCompleteDialog campaignComplete;
+
+    public IntMap<Dialog> followUpMenus;
 
     public Cursor drillCursor, unloadCursor, targetCursor;
 
@@ -126,6 +129,7 @@ public class UI implements ApplicationListener, Loadable{
         Colors.put("unlaunched", Color.valueOf("8982ed"));
         Colors.put("highlight", Pal.accent.cpy().lerp(Color.white, 0.3f));
         Colors.put("stat", Pal.stat);
+        Colors.put("negstat", Pal.negativeStat);
 
         drillCursor = Core.graphics.newCursor("drill", Fonts.cursorScale());
         unloadCursor = Core.graphics.newCursor("unload", Fonts.cursorScale());
@@ -199,6 +203,8 @@ public class UI implements ApplicationListener, Loadable{
         schematics = new SchematicsDialog();
         logic = new LogicDialog();
         fullText = new FullTextDialog();
+        campaignComplete = new CampaignCompleteDialog();
+        followUpMenus = new IntMap<>();
 
         Group group = Core.scene.root;
 
@@ -258,28 +264,32 @@ public class UI implements ApplicationListener, Loadable{
         });
     }
 
-    public void showTextInput(String titleText, String dtext, int textLength, String def, boolean inumeric, Cons<String> confirmed){
+    public void showTextInput(String titleText, String text, int textLength, String def, boolean numbers, Cons<String> confirmed, Runnable closed){
         if(mobile){
             Core.input.getTextInput(new TextInput(){{
                 this.title = (titleText.startsWith("@") ? Core.bundle.get(titleText.substring(1)) : titleText);
                 this.text = def;
-                this.numeric = inumeric;
+                this.numeric = numbers;
                 this.maxLength = textLength;
                 this.accepted = confirmed;
                 this.allowEmpty = false;
             }});
         }else{
             new Dialog(titleText){{
-                cont.margin(30).add(dtext).padRight(6f);
-                TextFieldFilter filter = inumeric ? TextFieldFilter.digitsOnly : (f, c) -> true;
+                cont.margin(30).add(text).padRight(6f);
+                TextFieldFilter filter = numbers ? TextFieldFilter.digitsOnly : (f, c) -> true;
                 TextField field = cont.field(def, t -> {}).size(330f, 50f).get();
                 field.setFilter((f, c) -> field.getText().length() < textLength && filter.acceptChar(f, c));
                 buttons.defaults().size(120, 54).pad(4);
-                buttons.button("@cancel", this::hide);
+                buttons.button("@cancel", () -> {
+                    closed.run();
+                    hide();
+                });
                 buttons.button("@ok", () -> {
                     confirmed.get(field.getText());
                     hide();
                 }).disabled(b -> field.getText().isEmpty());
+
                 keyDown(KeyCode.enter, () -> {
                     String text = field.getText();
                     if(!text.isEmpty()){
@@ -287,9 +297,10 @@ public class UI implements ApplicationListener, Loadable{
                         hide();
                     }
                 });
-                keyDown(KeyCode.escape, this::hide);
-                keyDown(KeyCode.back, this::hide);
+
+                closeOnBack(closed);
                 show();
+
                 Core.scene.setKeyboardFocus(field);
                 field.setCursorPosition(def.length());
             }};
@@ -300,8 +311,12 @@ public class UI implements ApplicationListener, Loadable{
         showTextInput(title, text, 32, def, confirmed);
     }
 
-    public void showTextInput(String titleText, String text, int textLength, String def, Cons<String> confirmed){
-        showTextInput(titleText, text, textLength, def, false, confirmed);
+    public void showTextInput(String title, String text, int textLength, String def, Cons<String> confirmed){
+        showTextInput(title, text, textLength, def, false, confirmed);
+    }
+
+    public void showTextInput(String title, String text, int textLength, String def, boolean numeric, Cons<String> confirmed){
+        showTextInput(title, text, textLength, def, numeric, confirmed, () -> {});
     }
 
     public void showInfoFade(String info){
@@ -317,6 +332,24 @@ public class UI implements ApplicationListener, Loadable{
         table.actions(Actions.fadeOut(duration, Interp.fade), Actions.remove());
         table.top().add(info).style(Styles.outlineLabel).padTop(10);
         Core.scene.add(table);
+    }
+
+    public void addDescTooltip(Element elem, String description){
+        if(description == null) return;
+
+        elem.addListener(new Tooltip(t -> t.background(Styles.black8).margin(4f).add(description).color(Color.lightGray)){
+            {
+                allowMobile = true;
+            }
+            @Override
+            protected void setContainerPosition(Element element, float x, float y){
+                this.targetActor = element;
+                Vec2 pos = element.localToStageCoordinates(Tmp.v1.set(0, 0));
+                container.pack();
+                container.setPosition(pos.x, pos.y, Align.topLeft);
+                container.setOrigin(0, element.getHeight());
+            }
+        });
     }
 
     /** Shows a fading label at the top of the screen. */
@@ -416,6 +449,8 @@ public class UI implements ApplicationListener, Loadable{
     }
 
     public void showException(String text, Throwable exc){
+        if(loadfrag == null) return;
+
         loadfrag.hide();
         new Dialog(""){{
             String message = Strings.getFinalMessage(exc);
@@ -559,43 +594,88 @@ public class UI implements ApplicationListener, Loadable{
         dialog.show();
     }
 
-    /** Shows a menu that fires a callback when an option is selected. If nothing is selected, -1 is returned. */
-    public void showMenu(String title, String message, String[][] options, Intc callback){
-        new Dialog(title){{
-            cont.row();
-            cont.image().width(400f).pad(2).colspan(2).height(4f).color(Pal.accent);
-            cont.row();
-            cont.add(message).width(400f).wrap().get().setAlignment(Align.center);
-            cont.row();
+    // TODO REPLACE INTEGER WITH arc.fun.IntCons(int, T) or something like that.
+    public Dialog newMenuDialog(String title, String message, String[][] options, Cons2<Integer, Dialog> buttonListener){
+        return new Dialog(title){{
+            setFillParent(true);
+            removeChild(titleTable);
+            cont.add(titleTable).width(400f);
 
-            int option = 0;
-            for(var optionsRow : options){
-                Table buttonRow = buttons.row().table().get().row();
-                int fullWidth = 400 - (optionsRow.length - 1) * 8; // adjust to count padding as well
-                int width = fullWidth / optionsRow.length;
-                int lastWidth = fullWidth - width * (optionsRow.length - 1); // take the rest of space for uneven table
+            cont.row();
+            cont.image().width(400f).pad(2).colspan(2).height(4f).color(Pal.accent).bottom();
+            cont.row();
+            cont.pane(table -> {
+                table.add(message).width(400f).wrap().get().setAlignment(Align.center);
+                table.row();
 
-                for(int i = 0; i < optionsRow.length; i++){
-                    if(optionsRow[i] == null) continue;
+                int option = 0;
+                for(var optionsRow : options){
+                    Table buttonRow = table.row().table().get().row();
+                    int fullWidth = 400 - (optionsRow.length - 1) * 8; // adjust to count padding as well
+                    int width = fullWidth / optionsRow.length;
+                    int lastWidth = fullWidth - width * (optionsRow.length - 1); // take the rest of space for uneven table
 
-                    String optionName = optionsRow[i];
-                    int finalOption = option;
-                    buttonRow.button(optionName, () -> {
-                        callback.get(finalOption);
-                        hide();
-                    }).size(i == optionsRow.length - 1 ? lastWidth : width, 50).pad(4);
-                    option++;
+                    for(int i = 0; i < optionsRow.length; i++){
+                        if(optionsRow[i] == null) continue;
+
+                        String optionName = optionsRow[i];
+                        int finalOption = option;
+                        buttonRow.button(optionName, () -> buttonListener.get(finalOption, this))
+                                .size(i == optionsRow.length - 1 ? lastWidth : width, 50).pad(4);
+                        option++;
+                    }
                 }
-            }
-            closeOnBack(() -> callback.get(-1));
-        }}.show();
+            }).growX();
+        }};
     }
 
+    /** Shows a menu that fires a callback when an option is selected. If nothing is selected, -1 is returned. */
+    public void showMenu(String title, String message, String[][] options, Intc callback){
+        Dialog dialog = newMenuDialog(title, message, options, (option, myself) -> {
+            callback.get(option);
+            myself.hide();
+        });
+        dialog.closeOnBack(() -> callback.get(-1));
+        dialog.show();
+    }
+
+    /** Shows a menu that hides when another followUp-menu is shown or when nothing is selected.
+     * @see UI#showMenu(String, String, String[][], Intc) */
+    public void showFollowUpMenu(int menuId, String title, String message, String[][] options, Intc callback) {
+        Dialog dialog = newMenuDialog(title, message, options, (option, myself) -> callback.get(option));
+        dialog.closeOnBack(() -> {
+            followUpMenus.remove(menuId);
+            callback.get(-1);
+        });
+
+        Dialog oldDialog = followUpMenus.remove(menuId);
+        if(oldDialog != null){
+            dialog.show(Core.scene, null);
+            oldDialog.hide(null);
+        }else{
+            dialog.show();
+        }
+        followUpMenus.put(menuId, dialog);
+    }
+
+    public void hideFollowUpMenu(int menuId) {
+        if(!followUpMenus.containsKey(menuId)) return;
+        followUpMenus.remove(menuId).hide();
+    }
+
+    /** Formats time with hours:minutes:seconds. */
     public static String formatTime(float ticks){
-        int time = (int)(ticks / 60);
-        if(time < 60) return "0:" + (time < 10 ? "0" : "") + time;
-        int mod = time % 60;
-        return (time / 60) + ":" + (mod < 10 ? "0" : "") + mod;
+        int seconds = (int)(ticks / 60);
+        if(seconds < 60) return "0:" + (seconds < 10 ? "0" : "") + seconds;
+
+        int minutes = seconds / 60;
+        int modSec = seconds % 60;
+        if(minutes < 60) return minutes + ":" + (modSec < 10 ? "0" : "") + modSec;
+
+        int hours = minutes / 60;
+        int modMinute = minutes % 60;
+
+        return hours + ":" + (modMinute < 10 ? "0" : "") + modMinute + ":" + (modSec < 10 ? "0" : "") + modSec;
     }
 
     public static String formatAmount(long number){
@@ -606,7 +686,7 @@ public class UI implements ApplicationListener, Loadable{
         long mag = Math.abs(number);
         String sign = number < 0 ? "-" : "";
         if(mag >= 1_000_000_000){
-            return sign + Strings.fixed(mag / 1_000_000_000f, 1) + "[gray]" + billions+ "[]";
+            return sign + Strings.fixed(mag / 1_000_000_000f, 1) + "[gray]" + billions + "[]";
         }else if(mag >= 1_000_000){
             return sign + Strings.fixed(mag / 1_000_000f, 1) + "[gray]" + millions + "[]";
         }else if(mag >= 10_000){

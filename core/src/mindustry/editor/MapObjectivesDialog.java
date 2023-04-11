@@ -425,6 +425,7 @@ public class MapObjectivesDialog extends BaseDialog{
         margin(0f);
 
         stack(
+            new Image(Styles.black5),
             canvas = new MapObjectivesCanvas(),
             new Table(){{
                 buttons.defaults().size(160f, 64f).pad(2f);
@@ -481,7 +482,9 @@ public class MapObjectivesDialog extends BaseDialog{
             loop:
             for(int y = 0; y < rows; y++){
                 for(int x = 0; x < columns; x++){
-                    canvas.tilemap.createTile(x * w, bounds - 1 - y * 2, objectives.get(i++));
+                    if(canvas.tilemap.createTile(x * w, y, objectives.get(i))){
+                        i++;
+                    }
                     if(i >= objectives.size) break loop;
                 }
             }

@@ -8,8 +8,8 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.core.*;
-import mindustry.game.*;
 import mindustry.game.EventType.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
@@ -164,6 +164,19 @@ public class ControlPathfinder{
      * @param pathId a unique ID for this location query, which should change every time the 'destination' vector is modified.
      * */
     public boolean getPathPosition(Unit unit, int pathId, Vec2 destination, Vec2 out){
+        return getPathPosition(unit, pathId, destination, out, null);
+    }
+
+    /**
+     * @return whether a path is ready.
+     * @param pathId a unique ID for this location query, which should change every time the 'destination' vector is modified.
+     * @param noResultFound extra return value for storing whether no valid path to the destination exists (thanks java!)
+     * */
+    public boolean getPathPosition(Unit unit, int pathId, Vec2 destination, Vec2 out, @Nullable boolean[] noResultFound){
+        if(noResultFound != null){
+            noResultFound[0] = false;
+        }
+
         //uninitialized
         if(threads == null || !world.tiles.in(World.toTile(destination.x), World.toTile(destination.y))) return false;
 
@@ -260,7 +273,7 @@ public class ControlPathfinder{
                     req.raycastTimer = 0;
                 }
 
-                if(req.rayPathIndex < len){
+                if(req.rayPathIndex < len && req.rayPathIndex >= 0){
                     Tile tile = tile(items[req.rayPathIndex]);
                     out.set(tile);
 
@@ -271,6 +284,10 @@ public class ControlPathfinder{
                     //implicit done
                     out.set(unit);
                     //end of path, we're done here? reset path? what???
+                }
+
+                if(noResultFound != null){
+                    noResultFound[0] = !req.foundEnd;
                 }
             }
 
@@ -286,7 +303,7 @@ public class ControlPathfinder{
         if(net.client()) return;
 
         //TODO currently capped at 6 threads, might be a good idea to make it more?
-        threads = new PathfindThread[Mathf.clamp(Runtime.getRuntime().availableProcessors() - 2, 1, 6)];
+        threads = new PathfindThread[Mathf.clamp(Runtime.getRuntime().availableProcessors() - 1, 1, 6)];
         for(int i = 0; i < threads.length; i ++){
             threads[i] = new PathfindThread("ControlPathfindThread-" + i);
             threads[i].setPriority(Thread.MIN_PRIORITY);
@@ -578,9 +595,12 @@ public class ControlPathfinder{
                 smoothPath();
             }
 
-            done = true;
+            //don't keep this around in memory, better to dump entirely - using clear() keeps around massive arrays for paths
+            frontier = new PathfindQueue();
+            cameFrom = new IntIntMap();
+            costs = new IntFloatMap();
 
-            //TODO free resources?
+            done = true;
         }
 
         void smoothPath(){

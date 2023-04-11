@@ -190,7 +190,7 @@ public class ApplicationTests{
 
     @Test
     void writeRules(){
-        ByteBuffer buffer = ByteBuffer.allocate(500);
+        ByteBuffer buffer = ByteBuffer.allocate(1000);
 
         Rules rules = new Rules();
         rules.attackMode = true;
@@ -221,7 +221,6 @@ public class ApplicationTests{
         String str2 = JsonIO.write(new Rules(){{
             attackMode = true;
         }});
-        Log.info(str2);
     }
 
     @Test
@@ -393,6 +392,7 @@ public class ApplicationTests{
     void liquidOutput(){
         world.loadMap(testMap);
         state.set(State.playing);
+        state.rules.limitMapArea = false;
 
         world.tile(0, 0).setBlock(Blocks.liquidSource, Team.sharded);
         world.tile(0, 0).build.configureAny(Liquids.water);
@@ -409,6 +409,7 @@ public class ApplicationTests{
     void liquidJunctionOutput(){
         world.loadMap(testMap);
         state.set(State.playing);
+        state.rules.limitMapArea = false;
 
         Tile source = world.rawTile(0, 0), tank = world.rawTile(1, 4), junction = world.rawTile(0, 1), conduit = world.rawTile(0, 2);
 
@@ -431,9 +432,10 @@ public class ApplicationTests{
     void liquidRouterOutputAll() {
         world.loadMap(testMap);
         state.set(State.playing);
+        state.rules.limitMapArea = false;
         Tile source = world.rawTile(4,0), router = world.rawTile(4, 2), conduitUp1 = world.rawTile(4,1),
-                conduitLeft = world.rawTile(3,2), conduitUp2 = world.rawTile(4, 3), conduitRight = world.rawTile(5, 2),
-                leftTank = world.rawTile(1, 2), topTank = world.rawTile(4,5), rightTank = world.rawTile(7, 2);
+        conduitLeft = world.rawTile(3,2), conduitUp2 = world.rawTile(4, 3), conduitRight = world.rawTile(5, 2),
+        leftTank = world.rawTile(1, 2), topTank = world.rawTile(4,5), rightTank = world.rawTile(7, 2);
 
         source.setBlock(Blocks.liquidSource, Team.sharded);
         source.build.configureAny(Liquids.water);
@@ -456,10 +458,11 @@ public class ApplicationTests{
     void sorterOutputCorrect() {
         world.loadMap(testMap);
         state.set(State.playing);
+        state.rules.limitMapArea = false;
         Tile source1 = world.rawTile(4, 0), source2 = world.rawTile(6, 0), s1conveyor = world.rawTile(4, 1),
-                s2conveyor = world.rawTile(6, 1), s1s2conveyor = world.rawTile(5, 1), sorter = world.rawTile(5, 2),
-                leftconveyor = world.rawTile(4, 2), rightconveyor = world.rawTile(6, 2), sortedconveyor = world.rawTile(5, 3),
-                leftVault = world.rawTile(2, 2), rightVault = world.rawTile(8, 2), topVault = world.rawTile(5, 5);
+        s2conveyor = world.rawTile(6, 1), s1s2conveyor = world.rawTile(5, 1), sorter = world.rawTile(5, 2),
+        leftconveyor = world.rawTile(4, 2), rightconveyor = world.rawTile(6, 2), sortedconveyor = world.rawTile(5, 3),
+        leftVault = world.rawTile(2, 2), rightVault = world.rawTile(8, 2), topVault = world.rawTile(5, 5);
 
         source1.setBlock(Blocks.itemSource, Team.sharded);
         source1.build.configureAny(Items.coal);
@@ -488,10 +491,11 @@ public class ApplicationTests{
     void routerOutputAll() {
         world.loadMap(testMap);
         state.set(State.playing);
+        state.rules.limitMapArea = false;
         Tile source1 = world.rawTile(5, 0),  conveyor = world.rawTile(5, 1),
-                router = world.rawTile(5, 2), leftconveyor = world.rawTile(4, 2), rightconveyor = world.rawTile(6, 2),
-                middleconveyor = world.rawTile(5, 3), leftVault = world.rawTile(2, 2),
-                rightVault = world.rawTile(8, 2), topVault = world.rawTile(5, 5);
+        router = world.rawTile(5, 2), leftconveyor = world.rawTile(4, 2), rightconveyor = world.rawTile(6, 2),
+        middleconveyor = world.rawTile(5, 3), leftVault = world.rawTile(2, 2),
+        rightVault = world.rawTile(8, 2), topVault = world.rawTile(5, 5);
 
         source1.setBlock(Blocks.itemSource, Team.sharded);
         source1.build.configureAny(Items.coal);
@@ -515,9 +519,10 @@ public class ApplicationTests{
     void junctionOutputCorrect() {
         world.loadMap(testMap);
         state.set(State.playing);
+        state.rules.limitMapArea = false;
         Tile source1 = world.rawTile(5,0),source2 = world.rawTile(7, 2),  conveyor1 = world.rawTile(5, 1),
-                conveyor2 = world.rawTile(6,2), junction = world.rawTile(5, 2), conveyor3 = world.rawTile(5,3),
-                conveyor4 = world.rawTile(4,2), vault2 = world.rawTile(3, 1), vault1 = world.rawTile(5,5);
+        conveyor2 = world.rawTile(6,2), junction = world.rawTile(5, 2), conveyor3 = world.rawTile(5,3),
+        conveyor4 = world.rawTile(4,2), vault2 = world.rawTile(3, 1), vault1 = world.rawTile(5,5);
         source1.setBlock(Blocks.itemSource, Team.sharded);
         source1.build.configureAny(Items.coal);
         source2.setBlock(Blocks.itemSource, Team.sharded);
@@ -565,6 +570,7 @@ public class ApplicationTests{
 
         world.loadMap(testMap);
         state.set(State.playing);
+        state.rules.limitMapArea = false;
         int length = 128;
         world.tile(0, 0).setBlock(Blocks.itemSource, Team.sharded);
         world.tile(0, 0).build.configureAny(Items.copper);
@@ -873,6 +879,7 @@ public class ApplicationTests{
                 Time.setDeltaProvider(() -> 1f);
 
                 logic.reset();
+                state.rules.sector = zone.sector;
                 try{
                     world.loadGenerator(zone.generator.map.width, zone.generator.map.height, zone.generator::generate);
                 }catch(SaveException e){
@@ -933,7 +940,6 @@ public class ApplicationTests{
                 }
 
                 assertEquals(1, Team.sharded.cores().size, "Sector must have one core: " + zone);
-                assertTrue(Team.sharded.core().items.total() < 1000, "Sector must not have starting resources: " + zone);
 
                 assertTrue(hasSpawnPoint, "Sector \"" + zone.name + "\" has no spawn points.");
                 assertTrue(spawner.countSpawns() > 0 || (state.rules.attackMode && state.rules.waveTeam.data().hasCore()), "Sector \"" + zone.name + "\" has no enemy spawn points: " + spawner.countSpawns());

@@ -5,6 +5,7 @@ import arc.util.*;
 import mindustry.*;
 
 public abstract class Mod{
+
     /** @return the config file for this plugin, as the file 'mods/[plugin-name]/config.json'.*/
     public Fi getConfig(){
         return Vars.mods.getConfig(this);

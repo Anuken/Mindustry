@@ -10,7 +10,7 @@ import mindustry.type.*;
 import static mindustry.content.UnitTypes.*;
 
 public class Waves{
-    public static final int waveVersion = 5;
+    public static final int waveVersion = 6;
 
     private Seq<SpawnGroup> spawns;
 

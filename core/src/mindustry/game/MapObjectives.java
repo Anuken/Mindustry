@@ -139,6 +139,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         return all.count(MapObjective::qualified) > 0;
     }
 
+    public void clear(){
+        if(all.size > 0) changed = true;
+        all.clear();
+    }
+
     /** Iterates over all qualified in-map objectives. */
     public void eachRunning(Cons<MapObjective> cons){
         all.each(MapObjective::qualified, cons);
@@ -473,7 +478,13 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                 if(text.startsWith("@")){
                     return Core.bundle.format(text.substring(1), timeString.toString());
                 }else{
-                    return Core.bundle.formatString(text, timeString.toString());
+                    try{
+                        return Core.bundle.formatString(text, timeString.toString());
+                    }catch(IllegalArgumentException e){
+                        //illegal text.
+                        text = "";
+                    }
+
                 }
             }
 
@@ -674,7 +685,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                 fetchedText = fetchText(text);
             }
 
-            WorldLabel.drawAt(text, pos.x, pos.y + radius + textHeight, Draw.z(), flags, fontSize);
+            WorldLabel.drawAt(fetchedText, pos.x, pos.y + radius + textHeight, Draw.z(), flags, fontSize);
         }
     }
 
@@ -750,7 +761,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                 Lines.poly(pos.x, pos.y, sides, radius + 1f, rotation);
             }else{
                 Draw.color(color);
-                Fill.poly(pos.x, pos.y, sides, radius);
+                Fill.poly(pos.x, pos.y, sides, radius, rotation);
             }
 
             Draw.reset();

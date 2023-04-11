@@ -292,6 +292,10 @@ public class Schematics implements Loadable{
         return defaultLoadouts.get(block);
     }
 
+    public boolean isDefaultLoadout(Schematic schem){
+        return defaultLoadouts.containsValue(schem, true);
+    }
+
     /** Checks a schematic for deployment validity and adds it to the cache. */
     private void checkLoadout(Schematic s, boolean customSchem){
         Stile core = s.tiles.find(t -> t.block instanceof CoreBlock);
@@ -348,6 +352,7 @@ public class Schematics implements Loadable{
 
     /** Creates a schematic from a world selection. */
     public Schematic create(int x, int y, int x2, int y2){
+        Team team = headless ? null : Vars.player.team();
         NormalizeResult result = Placement.normalizeArea(x, y, x2, y2, 0, false, maxSchematicSize);
         x = result.x;
         y = result.y;
@@ -363,7 +368,7 @@ public class Schematics implements Loadable{
         for(int cx = x; cx <= x2; cx++){
             for(int cy = y; cy <= y2; cy++){
                 Building linked = world.build(cx, cy);
-                if(linked != null && !linked.wasVisible) continue;
+                if(linked != null && (!linked.isDiscovered(team) || !linked.wasVisible)) continue;
 
                 Block realBlock = linked == null ? null : linked instanceof ConstructBuild cons ? cons.current : linked.block;
 
@@ -394,6 +399,7 @@ public class Schematics implements Loadable{
         for(int cx = ox; cx <= ox2; cx++){
             for(int cy = oy; cy <= oy2; cy++){
                 Building tile = world.build(cx, cy);
+                if(tile != null && (!tile.isDiscovered(team) || !tile.wasVisible)) continue;
                 Block realBlock = tile == null ? null : tile instanceof ConstructBuild cons ? cons.current : tile.block;
 
                 if(tile != null && !counted.contains(tile.pos()) && realBlock != null
@@ -580,7 +586,7 @@ public class Schematics implements Loadable{
             schematic.tags.put("labels", JsonIO.write(schematic.labels.toArray(String.class)));
 
             stream.writeByte(schematic.tags.size);
-            for(ObjectMap.Entry<String, String> e : schematic.tags.entries()){
+            for(var e : schematic.tags.entries()){
                 stream.writeUTF(e.key);
                 stream.writeUTF(e.value);
             }

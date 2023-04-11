@@ -37,7 +37,7 @@ public class Teams{
     public CoreBuild closestEnemyCore(float x, float y, Team team){
         CoreBuild closest = null;
         float closestDst = Float.MAX_VALUE;
-        
+
         for(Team enemy : team.data().coreEnemies){
             for(CoreBuild core : enemy.cores()){
                 float dst = Mathf.dst2(x, y, core.getX(), core.getY());
@@ -286,6 +286,11 @@ public class Teams{
             return buildingTypes.get(block, () -> new Seq<>(false));
         }
 
+        public int getCount(Block block){
+            var res = buildingTypes.get(block);
+            return res == null ? 0 : res.size;
+        }
+
         /** Destroys this team's presence on the map, killing part of its buildings and converting everything to 'derelict'. */
         public void destroyToDerelict(){
 
@@ -353,6 +358,12 @@ public class Teams{
             if(Mathf.chance(0.25)){
                 Time.run(Mathf.random(0f, 60f * 6f), build::kill);
             }
+        }
+
+        //this is just an alias for consistency
+        @Nullable
+        public Seq<Unit> getUnits(UnitType type){
+            return unitCache(type);
         }
 
         @Nullable

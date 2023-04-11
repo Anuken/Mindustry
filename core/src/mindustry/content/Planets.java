@@ -66,20 +66,22 @@ public class Planets{
             defaultCore = Blocks.coreBastion;
             iconColor = Color.valueOf("ff9266");
             hiddenItems.addAll(Items.serpuloItems).removeAll(Items.erekirItems);
+            enemyBuildSpeedMultiplier = 0.4f;
 
             //TODO SHOULD there be lighting?
             updateLighting = false;
 
+            defaultAttributes.set(Attribute.heat, 0.8f);
+
             ruleSetter = r -> {
                 r.waveTeam = Team.malis;
-                r.placeRangeCheck = false; //TODO true or false?
-                r.attributes.set(Attribute.heat, 0.8f);
+                r.placeRangeCheck = false;
                 r.showSpawns = true;
                 r.fog = true;
                 r.staticFog = true;
                 r.lighting = false;
                 r.coreDestroyClear = true;
-                r.onlyDepositCore = true; //TODO not sure
+                r.onlyDepositCore = true;
             };
 
             unlockedOnLand.add(Blocks.coreBastion);
@@ -107,6 +109,7 @@ public class Planets{
             accessible = false;
             visible = false;
             atmosphereColor = Color.valueOf("3db899");
+            iconColor = Color.valueOf("597be3");
             startSector = 10;
             atmosphereRadIn = -0.01f;
             atmosphereRadOut = 0.3f;
@@ -116,7 +119,6 @@ public class Planets{
             };
         }};
 
-        //TODO hide beryllium and others on load in rules
         serpulo = new Planet("serpulo", sun, 1f, 3){{
             generator = new SerpuloPlanetGenerator();
             meshLoader = () -> new HexMesh(this, 6);
@@ -138,7 +140,6 @@ public class Planets{
             ruleSetter = r -> {
                 r.waveTeam = Team.crux;
                 r.placeRangeCheck = false;
-                r.attributes.clear();
                 r.showSpawns = false;
             };
             iconColor = Color.valueOf("7d4dff");
@@ -157,10 +158,6 @@ public class Planets{
             gen.carbonChance = 0.1f;
             gen.ferricChance = 0f;
         });
-
-        //define launch candidates after all planets initialize
-        //TODO how will it use the nucleus???
-        serpulo.launchCandidates.add(erekir);
     }
 
     private static Planet makeAsteroid(String name, Planet parent, Block base, Block tint, float tintThresh, int pieces, float scale, Cons<AsteroidGenerator> cgen){
@@ -174,11 +171,12 @@ public class Planets{
             accessible = false;
             clipRadius = 2f;
             defaultEnv = Env.space;
-
+            icon = "commandRally";
             generator = new AsteroidGenerator();
             cgen.get((AsteroidGenerator)generator);
 
             meshLoader = () -> {
+                iconColor = tint.mapColor;
                 Color tinted = tint.mapColor.cpy().a(1f - tint.mapColor.a);
                 Seq<GenericMesh> meshes = new Seq<>();
                 Color color = base.mapColor;

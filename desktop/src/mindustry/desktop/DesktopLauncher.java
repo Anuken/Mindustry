@@ -41,15 +41,22 @@ public class DesktopLauncher extends ClientLauncher{
                 maximized = true;
                 width = 900;
                 height = 700;
-                //enable gl3 with command-line argument (slower performance, apparently)
-                if(Structs.contains(arg, "-gl3")){
-                    gl30 = true;
-                }
-                if(Structs.contains(arg, "-antialias")){
-                    samples = 16;
-                }
-                if(Structs.contains(arg, "-debug")){
-                    Log.level = LogLevel.debug;
+                for(int i = 0; i < arg.length; i++){
+                    if(arg[i].charAt(0) == '-'){
+                        String name = arg[i].substring(1);
+                        try{
+                            switch(name){
+                                case "width": width = Integer.parseInt(arg[i + 1]); break;
+                                case "height": height = Integer.parseInt(arg[i + 1]); break;
+                                case "gl3": gl30 = true; break;
+                                case "antialias": samples = 16; break;
+                                case "debug": Log.level = LogLevel.debug; break;
+                                case "maximized": maximized = Boolean.parseBoolean(arg[i + 1]); break;
+                            }
+                        }catch(NumberFormatException number){
+                            Log.warn("Invalid parameter number value.");
+                        }
+                    }
                 }
                 setWindowIcon(FileType.internal, "icons/icon_64.png");
             }});
@@ -78,12 +85,6 @@ public class DesktopLauncher extends ClientLauncher{
         }
 
         if(useSteam){
-            //delete leftover dlls
-            for(Fi other : new Fi(".").parent().list()){
-                if(other.name().contains("steam") && (other.extension().equals("dll") || other.extension().equals("so") || other.extension().equals("dylib"))){
-                    other.delete();
-                }
-            }
 
             Events.on(ClientLoadEvent.class, event -> {
                 if(steamError != null){
@@ -144,6 +145,12 @@ public class DesktopLauncher extends ClientLauncher{
             @Override
             public void completeAchievement(String name){
                 SVars.stats.stats.setAchievement(name);
+                SVars.stats.stats.storeStats();
+            }
+
+            @Override
+            public void clearAchievement(String name){
+                SVars.stats.stats.clearAchievement(name);
                 SVars.stats.stats.storeStats();
             }
 
@@ -297,7 +304,7 @@ public class DesktopLauncher extends ClientLauncher{
             if(state.rules.waves){
                 gameMapWithWave += " | Wave " + state.wave;
             }
-            gameMode = state.rules.pvp ? "PvP" : state.rules.attackMode ? "Attack" : "Survival";
+            gameMode = state.rules.pvp ? "PvP" : state.rules.attackMode ? "Attack" : state.rules.infiniteResources ? "Sandbox" : "Survival";
             if(net.active() && Groups.player.size() > 1){
                 gamePlayersSuffix = " | " + Groups.player.size() + " Players";
             }

@@ -8,6 +8,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.entities.*;
+import mindustry.entities.abilities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -54,9 +55,9 @@ public class Fx{
     unitSpawn = new Effect(30f, e -> {
         if(!(e.data instanceof UnitType unit)) return;
 
-        float scl = 1f + e.fout() * 2f;
-
         TextureRegion region = unit.fullIcon;
+
+        float scl = (1f + e.fout() * 2f) * region.scl();
 
         alpha(e.fout());
         mixcol(Color.white, e.fin());
@@ -67,7 +68,7 @@ public class Fx{
 
         alpha(e.fin());
 
-        rect(region, e.x, e.y, region.width * Draw.scl * scl, region.height * Draw.scl * scl, e.rotation - 90);
+        rect(region, e.x, e.y, region.width * scl, region.height * scl, e.rotation - 90);
     }),
 
     unitCapKill = new Effect(80f, e -> {
@@ -2404,6 +2405,14 @@ public class Fx{
     shieldBreak = new Effect(40, e -> {
         color(e.color);
         stroke(3f * e.fout());
+        if(e.data instanceof Unit u){
+            var ab = (ForceFieldAbility)Structs.find(u.abilities, a -> a instanceof ForceFieldAbility);
+            if(ab != null){
+                Lines.poly(e.x, e.y, ab.sides, e.rotation + e.fin(), ab.rotation);
+                return;
+            }
+        }
+
         Lines.poly(e.x, e.y, 6, e.rotation + e.fin());
     }).followParent(true),
 

@@ -202,7 +202,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
                     if(Mathf.dst2(t.x, t.y, x2, y2) <= avoid * avoid){
                         return;
                     }
-                    
+
                     for(int x = -rad; x <= rad; x++){
                         for(int y = -rad; y <= rad; y++){
                             int wx = t.x + x, wy = t.y + y;
@@ -656,6 +656,11 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
     public void postGenerate(Tiles tiles){
         if(sector.hasEnemyBase()){
             basegen.postGenerate();
+
+            //spawn air enemies
+            if(spawner.countGroundSpawns() == 0){
+                state.rules.spawns = Waves.generate(sector.threat, new Rand(sector.id), state.rules.attackMode, true, false);
+            }
         }
     }
 }

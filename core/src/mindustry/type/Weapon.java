@@ -43,7 +43,9 @@ public class Weapon implements Cloneable{
     public boolean alternate = true;
     /** whether to rotate toward the target independently of unit */
     public boolean rotate = false;
-    /** rotation at which this weapon is locked to if rotate = false. TODO buggy!*/
+    /** Whether to show the sprite of the weapon in the database. */
+    public boolean showStatSprite = true;
+    /** rotation at which this weapon starts at. TODO buggy!*/
     public float baseRotation = 0f;
     /** whether to draw the outline on top. */
     public boolean top = true;
@@ -53,6 +55,8 @@ public class Weapon implements Cloneable{
     public boolean alwaysContinuous;
     /** whether this weapon can be aimed manually by players */
     public boolean controllable = true;
+    /** whether this weapon can be automatically aimed by the unit */
+    public boolean aiControllable = true;
     /** whether this weapon is always shooting, regardless of targets ore cone */
     public boolean alwaysShooting = false;
     /** whether to automatically target relevant units in update(); only works when controllable = false. */
@@ -71,6 +75,8 @@ public class Weapon implements Cloneable{
     public float shake = 0f;
     /** visual weapon knockback. */
     public float recoil = 1.5f;
+    /** Number of additional counters for recoil. */
+    public int recoils = -1;
     /** time taken for weapon to return to starting position in ticks. uses reload time by default */
     public float recoilTime = -1f;
     /** power curve applied to visual recoil */
@@ -169,6 +175,10 @@ public class Weapon implements Cloneable{
         return (bullet.estimateDPS() / reload) * shoot.shots * 60f;
     }
 
+    public float shotsPerSec(){
+        return shoot.shots * 60f / reload;
+    }
+
     //TODO copy-pasted code
     public void drawOutline(Unit unit, WeaponMount mount){
         if(!outlineRegion.found()) return;
@@ -211,6 +221,7 @@ public class Weapon implements Cloneable{
 
             for(int i = 0; i < parts.size; i++){
                 var part = parts.get(i);
+                DrawPart.params.setRecoil(part.recoilIndex >= 0 && mount.recoils != null ? mount.recoils[part.recoilIndex] : mount.recoil);
                 if(part.under){
                     part.draw(DrawPart.params);
                 }
@@ -218,6 +229,9 @@ public class Weapon implements Cloneable{
         }
 
         Draw.xscl = -Mathf.sign(flipSprite);
+
+        //fix color
+        unit.type.applyColor(unit);
 
         if(region.found()) Draw.rect(region, wx, wy, weaponRotation);
 
@@ -239,6 +253,7 @@ public class Weapon implements Cloneable{
             //TODO does it need an outline?
             for(int i = 0; i < parts.size; i++){
                 var part = parts.get(i);
+                DrawPart.params.setRecoil(part.recoilIndex >= 0 && mount.recoils != null ? mount.recoils[part.recoilIndex] : mount.recoil);
                 if(!part.under){
                     part.draw(DrawPart.params);
                 }
@@ -259,9 +274,15 @@ public class Weapon implements Cloneable{
         float lastReload = mount.reload;
         mount.reload = Math.max(mount.reload - Time.delta * unit.reloadMultiplier, 0);
         mount.recoil = Mathf.approachDelta(mount.recoil, 0, unit.reloadMultiplier / recoilTime);
+        if(recoils > 0){
+            if(mount.recoils == null) mount.recoils = new float[recoils];
+            for(int i = 0; i < recoils; i++){
+                mount.recoils[i] = Mathf.approachDelta(mount.recoils[i], 0, unit.reloadMultiplier / recoilTime);
+            }
+        }
         mount.smoothReload = Mathf.lerpDelta(mount.smoothReload, mount.reload / reload, smoothReloadSpeed);
         mount.charge = mount.charging && shoot.firstShotDelay > 0 ? Mathf.approachDelta(mount.charge, 1, 1 / shoot.firstShotDelay) : 0;
-        
+
         float warmupTarget = (can && mount.shoot) || (continuous && mount.bullet != null) || mount.charging ? 1f : 0f;
         if(linearWarmup){
             mount.warmup = Mathf.approachDelta(mount.warmup, warmupTarget, shootWarmupSpeed);
@@ -277,9 +298,9 @@ public class Weapon implements Cloneable{
             mount.targetRotation = Angles.angle(axisX, axisY, mount.aimX, mount.aimY) - unit.rotation;
             mount.rotation = Angles.moveToward(mount.rotation, mount.targetRotation, rotateSpeed * Time.delta);
             if(rotationLimit < 360){
-                float dst = Angles.angleDist(mount.rotation, 0f);
+                float dst = Angles.angleDist(mount.rotation, baseRotation);
                 if(dst > rotationLimit/2f){
-                    mount.rotation = Angles.moveToward(mount.rotation, 0, dst - rotationLimit/2f);
+                    mount.rotation = Angles.moveToward(mount.rotation, baseRotation, dst - rotationLimit/2f);
                 }
             }
         }else if(!rotate){
@@ -338,7 +359,7 @@ public class Weapon implements Cloneable{
                 mount.bullet.set(bulletX, bulletY);
                 mount.reload = reload;
                 mount.recoil = 1f;
-                unit.vel.add(Tmp.v1.trns(unit.rotation + 180f, mount.bullet.type.recoil));
+                unit.vel.add(Tmp.v1.trns(unit.rotation + 180f, mount.bullet.type.recoil * Time.delta));
                 if(shootSound != Sounds.none && !headless){
                     if(mount.sound == null) mount.sound = new SoundLoop(shootSound, 1f);
                     mount.sound.update(bulletX, bulletY, true);
@@ -375,7 +396,7 @@ public class Weapon implements Cloneable{
         mount.warmup >= minWarmup && //must be warmed up
         unit.vel.len() >= minShootVelocity && //check velocity requirements
         (mount.reload <= 0.0001f || (alwaysContinuous && mount.bullet == null)) && //reload has to be 0, or it has to be an always-continuous weapon
-        Angles.within(rotate ? mount.rotation : unit.rotation + baseRotation, mount.targetRotation, shootCone) //has to be within the cone
+        (alwaysShooting || Angles.within(rotate ? mount.rotation : unit.rotation + baseRotation, mount.targetRotation, shootCone)) //has to be within the cone
         ){
             shoot(unit, mount, bulletX, bulletY, shootAngle);
 
@@ -409,14 +430,13 @@ public class Weapon implements Cloneable{
             bullet.chargeEffect.at(shootX, shootY, rotation, bullet.keepVelocity || parentizeEffects ? unit : null);
         }
 
-        shoot.shoot(mount.totalShots, (xOffset, yOffset, angle, delay, mover) -> {
-            mount.totalShots++;
+        shoot.shoot(mount.barrelCounter, (xOffset, yOffset, angle, delay, mover) -> {
             if(delay > 0f){
                 Time.run(delay, () -> bullet(unit, mount, xOffset, yOffset, angle, mover));
             }else{
                 bullet(unit, mount, xOffset, yOffset, angle, mover);
             }
-        });
+        }, () -> mount.barrelCounter++);
     }
 
     protected void bullet(Unit unit, WeaponMount mount, float xOffset, float yOffset, float angleOffset, Mover mover){
@@ -432,7 +452,7 @@ public class Weapon implements Cloneable{
         bulletY = mountY + Angles.trnsy(weaponRotation, this.shootX + xOffset + xSpread, this.shootY + yOffset),
         shootAngle = bulletRotation(unit, mount, bulletX, bulletY) + angleOffset,
         lifeScl = bullet.scaleLife ? Mathf.clamp(Mathf.dst(bulletX, bulletY, mount.aimX, mount.aimY) / bullet.range) : 1f,
-        angle = angleOffset + shootAngle + Mathf.range(inaccuracy);
+        angle = angleOffset + shootAngle + Mathf.range(inaccuracy + bullet.inaccuracy);
 
         mount.bullet = bullet.create(unit, unit.team, bulletX, bulletY, angle, -1f, (1f - velocityRnd) + Mathf.random(velocityRnd), lifeScl, null, mover, mount.aimX, mount.aimY);
         handleBullet(unit, mount, mount.bullet);
@@ -448,7 +468,11 @@ public class Weapon implements Cloneable{
         unit.vel.add(Tmp.v1.trns(shootAngle + 180f, bullet.recoil));
         Effect.shake(shake, shake, bulletX, bulletY);
         mount.recoil = 1f;
+        if(recoils > 0){
+            mount.recoils[mount.barrelCounter % recoils] = 1f;
+        }
         mount.heat = 1f;
+        mount.totalShots++;
     }
 
     //override to do special things to a bullet after spawning

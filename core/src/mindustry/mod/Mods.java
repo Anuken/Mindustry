@@ -32,6 +32,7 @@ import static mindustry.Vars.*;
 
 public class Mods implements Loadable{
     private static final String[] metaFiles = {"mod.json", "mod.hjson", "plugin.json", "plugin.hjson"};
+    private static final ObjectSet<String> blacklistedMods = ObjectSet.with("ui-lib", "braindustry");
 
     private Json json = new Json();
     private @Nullable Scripts scripts;
@@ -40,7 +41,12 @@ public class Mods implements Loadable{
     private ObjectSet<String> specialFolders = ObjectSet.with("bundles", "sprites", "sprites-override");
 
     private int totalSprites;
+    private ObjectFloatMap<String> textureResize = new ObjectFloatMap<>();
     private MultiPacker packer;
+
+    /** Ordered mods cache. Set to null to invalidate. */
+    private @Nullable Seq<LoadedMod> lastOrderedMods = new Seq<>();
+
     private ModClassLoader mainLoader = new ModClassLoader(getClass().getClassLoader());
 
     Seq<LoadedMod> mods = new Seq<>();
@@ -83,7 +89,7 @@ public class Mods implements Loadable{
 
     /** @return the loaded mod found by class, or null if not found. */
     public @Nullable LoadedMod getMod(Class<? extends Mod> type){
-        return mods.find(m -> m.enabled() && m.main != null && m.main.getClass() == type);
+        return mods.find(m -> m.main != null && m.main.getClass() == type);
     }
 
     /** Imports an external mod file. Folders are not supported here. */
@@ -101,14 +107,19 @@ public class Mods implements Loadable{
 
         file.copyTo(dest);
         try{
-            var loaded = loadMod(dest, true);
+            var loaded = loadMod(dest, true, true);
             mods.add(loaded);
+            //invalidate ordered mods cache
+            lastOrderedMods = null;
             requiresReload = true;
             //enable the mod on import
             Core.settings.put("mod-" + loaded.name + "-enabled", true);
             sortMods();
             //try to load the mod's icon so it displays on import
             Core.app.post(() -> loadIcon(loaded));
+
+            Events.fire(Trigger.importMod);
+
             return loaded;
         }catch(IOException e){
             dest.delete();
@@ -180,7 +191,8 @@ public class Mods implements Loadable{
     }
 
     private void packSprites(Seq<Fi> sprites, LoadedMod mod, boolean prefix, Seq<Future<Runnable>> tasks){
-        boolean linear = Core.settings.getBool("linear", true);
+        boolean bleed = Core.settings.getBool("linear", true) && !mod.meta.pregenerated;
+        float textureScale = mod.meta.texturescale;
 
         for(Fi file : sprites){
             String name = file.nameWithoutExtension();
@@ -204,12 +216,16 @@ public class Mods implements Loadable{
                 try{
                     Pixmap pix = new Pixmap(file.readBytes());
                     //only bleeds when linear filtering is on at startup
-                    if(linear){
+                    if(bleed){
                         Pixmaps.bleed(pix, 2);
                     }
                     //this returns a *runnable* which actually packs the resulting pixmap; this has to be done synchronously outside the method
                     return () -> {
-                        packer.add(getPage(file), (prefix ? mod.name + "-" : "") + name, new PixmapRegion(pix));
+                        String fullName = (prefix ? mod.name + "-" : "") + name;
+                        packer.add(getPage(file), fullName, new PixmapRegion(pix));
+                        if(textureScale != 1.0f){
+                            textureResize.put(fullName, textureScale);
+                        }
                         pix.dispose();
                     };
                 }catch(Exception e){
@@ -336,7 +352,7 @@ public class Mods implements Loadable{
                     if(c instanceof UnlockableContent u && c.minfo.mod != null){
                         u.load();
                         u.loadIcon();
-                        if(u.generateIcons){
+                        if(u.generateIcons && !c.minfo.mod.meta.pregenerated){
                             u.createIcons(packer);
                         }
                     }
@@ -344,13 +360,15 @@ public class Mods implements Loadable{
             }
             Log.debug("Time to generate icons: @", Time.elapsed());
 
-            packer.printStats();
-
             //dispose old atlas data
             Core.atlas = packer.flush(filter, new TextureAtlas());
 
+            textureResize.each(e -> Core.atlas.find(e.key).scale = e.value);
+
             Core.atlas.setErrorRegion("error");
             Log.debug("Total pages: @", Core.atlas.getTextures().size);
+
+            packer.printStats();
         }
 
         packer.dispose();
@@ -406,19 +424,59 @@ public class Mods implements Loadable{
 
     /** Loads all mods from the folder, but does not call any methods on them.*/
     public void load(){
-        var files = resolveDependencies(Seq.with(modDirectory.list()).filter(f ->
-            f.extEquals("jar") || f.extEquals("zip") || (f.isDirectory() && (f.child("mod.json").exists() || f.child("mod.hjson").exists()))
-        ));
+        var candidates = new Seq<Fi>();
 
-        for(Fi file : files){
+        // Add local mods
+        Seq.with(modDirectory.list())
+        .filter(f -> f.extEquals("jar") || f.extEquals("zip") || (f.isDirectory() && Structs.contains(metaFiles, meta -> f.child(meta).exists())))
+        .each(candidates::add);
+
+        // Add Steam workshop mods
+        platform.getWorkshopContent(LoadedMod.class)
+        .each(candidates::add);
+
+        var mapping = new ObjectMap<String, Fi>();
+        var metas = new Seq<ModMeta>();
+
+        for(Fi file : candidates){
+            ModMeta meta = null;
+
+            try{
+                Fi zip = file.isDirectory() ? file : new ZipFi(file);
+
+                if(zip.list().length == 1 && zip.list()[0].isDirectory()){
+                    zip = zip.list()[0];
+                }
+
+                meta = findMeta(zip);
+            }catch(Throwable ignored){
+            }
+
+            if(meta == null || meta.name == null) continue;
+            metas.add(meta);
+            mapping.put(meta.name, file);
+        }
+
+        var resolved = resolveDependencies(metas);
+        for(var entry : resolved){
+            var file = mapping.get(entry.key);
+            var steam = platform.getWorkshopContent(LoadedMod.class).contains(file);
+
             Log.debug("[Mods] Loading mod @", file);
 
             try{
-                LoadedMod mod = loadMod(file);
+                LoadedMod mod = loadMod(file, false, entry.value == ModState.enabled);
+                mod.state = entry.value;
                 mods.add(mod);
+                //invalidate ordered mods cache
+                lastOrderedMods = null;
+                if(steam) mod.addSteamID(file.name());
             }catch(Throwable e){
                 if(e instanceof ClassNotFoundException && e.getMessage().contains("mindustry.plugin.Plugin")){
                     Log.info("Plugin '@' is outdated and needs to be ported to 6.0! Update its main class to inherit from 'mindustry.mod.Plugin'. See https://mindustrygame.github.io/wiki/modding/6-migrationv6/", file.name());
+                }else if(steam){
+                    Log.err("Failed to load mod workshop file @. Skipping.", file);
+                    Log.err(e);
                 }else{
                     Log.err("Failed to load mod file @. Skipping.", file);
                     Log.err(e);
@@ -426,39 +484,25 @@ public class Mods implements Loadable{
             }
         }
 
-        //load workshop mods now
-        for(Fi file : resolveDependencies(platform.getWorkshopContent(LoadedMod.class))){
-            try{
-                LoadedMod mod = loadMod(file);
-                mods.add(mod);
-                mod.addSteamID(file.name());
-            }catch(Throwable e){
-                Log.err("Failed to load mod workshop file @. Skipping.", file);
-                Log.err(e);
+        // Resolve the state
+        mods.each(this::updateDependencies);
+        for(var mod : mods){
+            // Skip mods where the state has already been resolved
+            if(mod.state != ModState.enabled) continue;
+            if(!mod.isSupported()){
+                mod.state = ModState.unsupported;
+            }else if(!mod.shouldBeEnabled()){
+                mod.state = ModState.disabled;
             }
         }
 
-        resolveModState();
         sortMods();
-
         buildFiles();
     }
 
     private void sortMods(){
         //sort mods to make sure servers handle them properly and they appear correctly in the dialog
         mods.sort(Structs.comps(Structs.comparingInt(m -> m.state.ordinal()), Structs.comparing(m -> m.name)));
-    }
-
-    private void resolveModState(){
-        mods.each(this::updateDependencies);
-
-        for(LoadedMod mod : mods){
-            mod.state =
-                !mod.isSupported() ? ModState.unsupported :
-                mod.hasUnmetDependencies() ? ModState.missingDependencies :
-                !mod.shouldBeEnabled() ? ModState.disabled :
-                ModState.enabled;
-        }
     }
 
     private void updateDependencies(LoadedMod mod){
@@ -473,22 +517,17 @@ public class Mods implements Loadable{
         }
     }
 
-    private void topoSort(LoadedMod mod, Seq<LoadedMod> stack, ObjectSet<LoadedMod> visited){
-        visited.add(mod);
-        mod.dependencies.each(m -> !visited.contains(m), m -> topoSort(m, stack, visited));
-        stack.add(mod);
-    }
-
     /** @return mods ordered in the correct way needed for dependencies. */
-    private Seq<LoadedMod> orderedMods(){
-        ObjectSet<LoadedMod> visited = new ObjectSet<>();
-        Seq<LoadedMod> result = new Seq<>();
-        eachEnabled(mod -> {
-            if(!visited.contains(mod)){
-                topoSort(mod, result, visited);
-            }
-        });
-        return result;
+    public Seq<LoadedMod> orderedMods(){
+        //update cache if it's "dirty"/empty
+        if(lastOrderedMods == null){
+            //only enabled mods participate; this state is resolved in load()
+            Seq<LoadedMod> enabled = mods.select(LoadedMod::enabled);
+
+            var mapping = enabled.asMap(m -> m.meta.name);
+            lastOrderedMods = resolveDependencies(enabled.map(m -> m.meta)).orderedKeys().map(mapping::get);
+        }
+        return lastOrderedMods;
     }
 
     public LoadedMod locateMod(String name){
@@ -746,12 +785,12 @@ public class Mods implements Loadable{
 
     /** Iterates through each mod with a main class. */
     public void eachClass(Cons<Mod> cons){
-        mods.each(p -> p.main != null, p -> contextRun(p, () -> cons.get(p.main)));
+        orderedMods().each(p -> p.main != null, p -> contextRun(p, () -> cons.get(p.main)));
     }
 
     /** Iterates through each enabled mod. */
     public void eachEnabled(Cons<LoadedMod> cons){
-        mods.each(LoadedMod::enabled, cons);
+        orderedMods().each(LoadedMod::enabled, cons);
     }
 
     public void contextRun(LoadedMod mod, Runnable run){
@@ -781,78 +820,71 @@ public class Mods implements Loadable{
         return meta;
     }
 
-    /** Resolves the loading order of a list mods/plugins using their internal names.
-     * It also skips non-mods files or folders. */
-    public Seq<Fi> resolveDependencies(Seq<Fi> files){
-        ObjectMap<String, Fi> fileMapping = new ObjectMap<>();
-        ObjectMap<String, Seq<String>> dependencies = new ObjectMap<>();
+    /** Resolves the loading order of a list mods/plugins using their internal names. */
+    public OrderedMap<String, ModState> resolveDependencies(Seq<ModMeta> metas){
+        var context = new ModResolutionContext();
 
-        for(Fi file : files){
-            ModMeta meta = null;
-
-            try{
-                Fi zip = file.isDirectory() ? file : new ZipFi(file);
-
-                if(zip.list().length == 1 && zip.list()[0].isDirectory()){
-                    zip = zip.list()[0];
-                }
-
-                meta = findMeta(zip);
-            }catch(Throwable ignored){
+        for(var meta : metas){
+            Seq<ModDependency> dependencies = new Seq<>();
+            for(var dependency : meta.dependencies){
+                dependencies.add(new ModDependency(dependency, true));
             }
-
-            if(meta == null) continue;
-            dependencies.put(meta.name, meta.dependencies);
-            fileMapping.put(meta.name, file);
-        }
-
-        ObjectSet<String> visited = new ObjectSet<>();
-        OrderedSet<String> ordered = new OrderedSet<>();
-
-        for(String modName : dependencies.keys()){
-            if(!ordered.contains(modName)){
-                // Adds the loaded mods at the beginning of the list
-                ordered.add(modName, 0);
-                resolveDependencies(modName, dependencies, ordered, visited);
-                visited.clear();
+            for(var dependency : meta.softDependencies){
+                dependencies.add(new ModDependency(dependency, false));
             }
+            context.dependencies.put(meta.name, dependencies);
         }
 
-        // Adds the invalid mods
-        for(String missingMod : dependencies.keys()){
-            if(!ordered.contains(missingMod)) ordered.add(missingMod, 0);
+        for(var key : context.dependencies.keys()){
+            if (context.ordered.contains(key)) {
+                continue;
+            }
+            resolve(key, context);
+            context.visited.clear();
         }
 
-        Seq<Fi> resolved = ordered.orderedItems().map(fileMapping::get);
-        // Since the resolver explores the dependencies from leaves to the root, reverse the seq
-        resolved.reverse();
-        return resolved;
+        var result = new OrderedMap<String, ModState>();
+        for(var name : context.ordered){
+            result.put(name, ModState.enabled);
+        }
+        result.putAll(context.invalid);
+        return result;
     }
 
-    /** Recursive search of dependencies */
-    public void resolveDependencies(String modName, ObjectMap<String, Seq<String>> dependencies, OrderedSet<String> ordered, ObjectSet<String> visited){
-        visited.add(modName);
-
-        for(String dependency : dependencies.get(modName)){
-            // Checks if the dependency tree isn't circular and that the dependency is not missing
-            if(!visited.contains(dependency) && dependencies.containsKey(dependency)){
-                // Skips if the dependency was already explored in a separate tree
-                if(ordered.contains(dependency)) continue;
-                ordered.add(dependency);
-                resolveDependencies(dependency, dependencies, ordered, visited);
+    private boolean resolve(String element, ModResolutionContext context){
+        context.visited.add(element);
+        for(final var dependency : context.dependencies.get(element)){
+            // Circular dependencies ?
+            if(context.visited.contains(dependency.name) && !context.ordered.contains(dependency.name)){
+                context.invalid.put(dependency.name, ModState.circularDependencies);
+                return false;
+                // If dependency present, resolve it, or if it's not required, ignore it
+            }else if(context.dependencies.containsKey(dependency.name)){
+                if(!context.ordered.contains(dependency.name) && !resolve(dependency.name, context) && dependency.required){
+                    context.invalid.put(element, ModState.incompleteDependencies);
+                    return false;
+                }
+                // The dependency is missing, but if not required, skip
+            }else if(dependency.required){
+                context.invalid.put(element, ModState.missingDependencies);
+                return false;
             }
         }
+        if(!context.ordered.contains(element)){
+            context.ordered.add(element);
+        }
+        return true;
     }
 
     /** Loads a mod file+meta, but does not add it to the list.
      * Note that directories can be loaded as mods. */
     private LoadedMod loadMod(Fi sourceFile) throws Exception{
-        return loadMod(sourceFile, false);
+        return loadMod(sourceFile, false, true);
     }
 
     /** Loads a mod file+meta, but does not add it to the list.
      * Note that directories can be loaded as mods. */
-    private LoadedMod loadMod(Fi sourceFile, boolean overwrite) throws Exception{
+    private LoadedMod loadMod(Fi sourceFile, boolean overwrite, boolean initialize) throws Exception{
         Time.mark();
 
         ZipFi rootZip = null;
@@ -918,7 +950,8 @@ public class Mods implements Loadable{
                 !skipModLoading() &&
                 Core.settings.getBool("mod-" + baseName + "-enabled", true) &&
                 Version.isAtLeast(meta.minGameVersion) &&
-                (meta.getMinMajor() >= 136 || headless)
+                (meta.getMinMajor() >= 136 || headless) &&
+                initialize
             ){
                 if(ios){
                     throw new ModLoadException("Java class mods are not supported on iOS.");
@@ -1042,9 +1075,17 @@ public class Mods implements Loadable{
 
         /** @return whether this mod is supported by the game version */
         public boolean isSupported(){
-            if(isOutdated()) return false;
+            //no unsupported mods on servers
+            if(headless) return true;
+
+            if(isOutdated() || isBlacklisted()) return false;
 
             return Version.isAtLeast(meta.minGameVersion);
+        }
+
+        /** Some mods are known to cause issues with the game; this detects and returns whether a mod is manually blacklisted. */
+        public boolean isBlacklisted(){
+            return blacklistedMods.contains(name);
         }
 
         /** @return whether this mod is outdated, e.g. not compatible with v7. */
@@ -1135,12 +1176,17 @@ public class Mods implements Loadable{
         public String name, minGameVersion = "0";
         public @Nullable String displayName, author, description, subtitle, version, main, repo;
         public Seq<String> dependencies = Seq.with();
+        public Seq<String> softDependencies = Seq.with();
         /** Hidden mods are only server-side or client-side, and do not support adding new content. */
         public boolean hidden;
         /** If true, this mod should be loaded as a Java class mod. This is technically optional, but highly recommended. */
         public boolean java;
         /** If true, -outline regions for units are kept when packing. Only use if you know exactly what you are doing. */
         public boolean keepOutlines;
+        /** To rescale textures with a different size. Represents the size in pixels of the sprite of a 1x1 block. */
+        public float texturescale = 1.0f;
+        /** If true, bleeding is skipped and no content icons are generated. */
+        public boolean pregenerated;
 
         public String displayName(){
             return displayName == null ? name : displayName;
@@ -1152,6 +1198,7 @@ public class Mods implements Loadable{
 
         //removes all colors
         public void cleanup(){
+            if(name != null) name = Strings.stripColors(name);
             if(displayName != null) displayName = Strings.stripColors(displayName);
             if(author != null) author = Strings.stripColors(author);
             if(description != null) description = Strings.stripColors(description);
@@ -1163,18 +1210,27 @@ public class Mods implements Loadable{
             int dot = ver.indexOf(".");
             return dot != -1 ? Strings.parseInt(ver.substring(0, dot), 0) : Strings.parseInt(ver, 0);
         }
-        
+
         @Override
         public String toString(){
             return "ModMeta{" +
-                    "name='" + name + '\'' +
-                    ", author='" + author + '\'' +
-                    ", version='" + version + '\'' +
-                    ", main='" + main + '\'' +
-                    ", minGameVersion='" + minGameVersion + '\'' +
-                    ", hidden=" + hidden +
-                    ", repo=" + repo +
-                    '}';
+            "name='" + name + '\'' +
+            ", minGameVersion='" + minGameVersion + '\'' +
+            ", displayName='" + displayName + '\'' +
+            ", author='" + author + '\'' +
+            ", description='" + description + '\'' +
+            ", subtitle='" + subtitle + '\'' +
+            ", version='" + version + '\'' +
+            ", main='" + main + '\'' +
+            ", repo='" + repo + '\'' +
+            ", dependencies=" + dependencies +
+            ", softDependencies=" + softDependencies +
+            ", hidden=" + hidden +
+            ", java=" + java +
+            ", keepOutlines=" + keepOutlines +
+            ", texturescale=" + texturescale +
+            ", pregenerated=" + pregenerated +
+            '}';
         }
     }
 
@@ -1188,7 +1244,26 @@ public class Mods implements Loadable{
         enabled,
         contentErrors,
         missingDependencies,
+        incompleteDependencies,
+        circularDependencies,
         unsupported,
         disabled,
+    }
+
+    public static class ModResolutionContext {
+        public final ObjectMap<String, Seq<ModDependency>> dependencies = new ObjectMap<>();
+        public final ObjectSet<String> visited = new ObjectSet<>();
+        public final OrderedSet<String> ordered = new OrderedSet<>();
+        public final ObjectMap<String, ModState> invalid = new OrderedMap<>();
+    }
+
+    public static final class ModDependency{
+        public final String name;
+        public final boolean required;
+
+        public ModDependency(String name, boolean required){
+            this.name = name;
+            this.required = required;
+        }
     }
 }

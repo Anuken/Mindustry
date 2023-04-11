@@ -5,6 +5,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -23,6 +24,8 @@ public class PayloadLoader extends PayloadBlock{
     public float maxPowerConsumption = 40f;
     public boolean loadPowerDynamic = true;
 
+    public @Load("@-over") TextureRegion overRegion;
+
     //initialized in init(), do not touch
     protected float basePowerUse = 0f;
 
@@ -38,6 +41,7 @@ public class PayloadLoader extends PayloadBlock{
         outputsPayload = true;
         size = 3;
         rotate = true;
+        canOverdrive = false;
     }
 
     @Override
@@ -131,6 +135,11 @@ public class PayloadLoader extends PayloadBlock{
 
             Draw.z(Layer.blockOver);
             drawPayload();
+
+            if(overRegion.found()){
+                Draw.z(Layer.blockOver + 0.1f);
+                Draw.rect(overRegion, x, y);
+            }
         }
 
         @Override
@@ -213,6 +222,11 @@ public class PayloadLoader extends PayloadBlock{
 
         public boolean hasBattery(){
             return payload != null && payload.block().consPower != null && payload.block().consPower.buffered;
+        }
+
+        @Override
+        public boolean shouldConsume(){
+            return payload != null;
         }
 
         @Override

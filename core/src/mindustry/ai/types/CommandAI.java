@@ -6,6 +6,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.ai.*;
+import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -14,11 +15,14 @@ import mindustry.world.*;
 public class CommandAI extends AIController{
     protected static final float localInterval = 40f;
     protected static final Vec2 vecOut = new Vec2(), flockVec = new Vec2(), separation = new Vec2(), cohesion = new Vec2(), massCenter = new Vec2();
+    protected static final boolean[] noFound = {false};
 
     public @Nullable Vec2 targetPos;
     public @Nullable Teamc attackTarget;
+    /** All encountered unreachable buildings of this AI. Why a sequence? Because contains() is very rarely called on it. */
+    public IntSeq unreachableBuildings = new IntSeq(8);
 
-    protected boolean stopAtTarget;
+    protected boolean stopAtTarget, stopWhenInRange;
     protected Vec2 lastTargetPos;
     protected int pathId = -1;
     protected Seq<Unit> local = new Seq<>(false);
@@ -31,8 +35,8 @@ public class CommandAI extends AIController{
     /** Last command type assigned. Used for detecting command changes. */
     protected @Nullable UnitCommand lastCommand;
 
-    public @Nullable UnitCommand currentCommand(){
-        return command;
+    public UnitCommand currentCommand(){
+        return command == null ? UnitCommand.moveCommand : command;
     }
 
     /** Attempts to assign a command to this unit. If not supported by the unit type, does nothing. */
@@ -46,6 +50,15 @@ public class CommandAI extends AIController{
     }
 
     @Override
+    public boolean isLogicControllable(){
+        return !hasCommand();
+    }
+
+    public boolean isAttacking(){
+        return target != null && unit.within(target, unit.range() + 10f);
+    }
+
+    @Override
     public void updateUnit(){
 
         //assign defaults
@@ -54,7 +67,7 @@ public class CommandAI extends AIController{
         }
 
         //update command controller based on index.
-        var curCommand = currentCommand();
+        var curCommand = command;
         if(lastCommand != curCommand){
             lastCommand = curCommand;
             commandController = (curCommand == null ? null : curCommand.controller.get(unit));
@@ -64,11 +77,37 @@ public class CommandAI extends AIController{
         if(commandController != null){
             if(commandController.unit() != unit) commandController.unit(unit);
             commandController.updateUnit();
+        }else{
+            defaultBehavior();
+            //boosting control is not supported, so just don't.
+            unit.updateBoosting(false);
+        }
+    }
+
+    public void defaultBehavior(){
+
+        //acquiring naval targets isn't supported yet, so use the fallback dumb AI
+        if(unit.team.isAI() && unit.team.rules().rtsAi && unit.type.naval){
+            if(fallback == null) fallback = new GroundAI();
+
+            if(fallback.unit() != unit) fallback.unit(unit);
+            fallback.updateUnit();
             return;
         }
 
         updateVisuals();
-        updateTargeting();
+        //only autotarget if the unit supports it
+        if((targetPos == null || nearAttackTarget(unit.x, unit.y, unit.range())) || unit.type.autoFindTarget){
+            updateTargeting();
+        }else if(attackTarget == null){
+            //if the unit does not have an attack target, is currently moving, and does not have autotargeting, stop attacking stuff
+            target = null;
+            for(var mount : unit.mounts){
+                if(mount.weapon.controllable){
+                    mount.target = null;
+                }
+            }
+        }
 
         if(attackTarget != null && invalid(attackTarget)){
             attackTarget = null;
@@ -113,7 +152,17 @@ public class CommandAI extends AIController{
             vecOut.set(targetPos);
 
             if(unit.isGrounded()){
-                move = Vars.controlPath.getPathPosition(unit, pathId, targetPos, vecOut);
+                move = Vars.controlPath.getPathPosition(unit, pathId, targetPos, vecOut, noFound);
+
+                //if the path is invalid, stop trying and record the end as unreachable
+                if(unit.team.isAI() && (noFound[0] || unit.isPathImpassable(World.toTile(targetPos.x), World.toTile(targetPos.y)) )){
+                    if(attackTarget instanceof Building build){
+                        unreachableBuildings.addUnique(build.pos());
+                    }
+                    attackTarget = null;
+                    targetPos = null;
+                    return;
+                }
             }
 
             float engageRange = unit.type.range - 10f;
@@ -124,10 +173,10 @@ public class CommandAI extends AIController{
                     circleAttack(80f);
                 }else{
                     moveTo(vecOut,
-                        attackTarget != null && unit.within(attackTarget, engageRange) ? engageRange :
-                        unit.isGrounded() ? 0f :
-                        attackTarget != null ? engageRange :
-                        0f, unit.isFlying() ? 40f : 100f, false, null, targetPos.epsilonEquals(vecOut, 4.1f));
+                    attackTarget != null && unit.within(attackTarget, engageRange) ? engageRange :
+                    unit.isGrounded() ? 0f :
+                    attackTarget != null ? engageRange :
+                    0f, unit.isFlying() ? 40f : 100f, false, null, targetPos.epsilonEquals(vecOut, 4.1f));
                 }
             }
 
@@ -155,10 +204,15 @@ public class CommandAI extends AIController{
                     }
 
                     //others have arrived at destination, so this one will too
-                    if(count >= Math.max(2, local.size / 2)){
+                    if(count >= Math.max(3, local.size / 2)){
                         targetPos = null;
                     }
                 }
+            }
+
+            if(stopWhenInRange && targetPos != null && unit.within(targetPos, engageRange * 0.9f)){
+                targetPos = null;
+                stopWhenInRange = false;
             }
 
         }else if(target != null){
@@ -170,7 +224,7 @@ public class CommandAI extends AIController{
     public void hit(Bullet bullet){
         if(unit.team.isAI() && bullet.owner instanceof Teamc teamc && teamc.team() != unit.team && attackTarget == null &&
             //can only counter-attack every few seconds to prevent rapidly changing targets
-            !(teamc instanceof Unit u && !u.checkTarget(unit.type.targetAir, unit.type.targetGround)) && timer.get(timerTarget4, 60f * 12f)){
+            !(teamc instanceof Unit u && !u.checkTarget(unit.type.targetAir, unit.type.targetGround)) && timer.get(timerTarget4, 60f * 10f)){
             commandTarget(teamc, true);
         }
     }
@@ -182,7 +236,11 @@ public class CommandAI extends AIController{
 
     @Override
     public Teamc findTarget(float x, float y, float range, boolean air, boolean ground){
-        return attackTarget == null || !attackTarget.within(x, y, range + 3f + (attackTarget instanceof Sized s ? s.hitSize()/2f : 0f)) ? super.findTarget(x, y, range, air, ground) : attackTarget;
+        return !nearAttackTarget(x, y, range) ? super.findTarget(x, y, range, air, ground) : attackTarget;
+    }
+
+    public boolean nearAttackTarget(float x, float y, float range){
+        return attackTarget != null && attackTarget.within(x, y, range + 3f + (attackTarget instanceof Sized s ? s.hitSize()/2f : 0f));
     }
 
     @Override
@@ -199,15 +257,28 @@ public class CommandAI extends AIController{
         lastTargetPos = targetPos;
     }
 
+    @Override
     public void commandPosition(Vec2 pos){
+        commandPosition(pos, false);
+        if(commandController != null){
+            commandController.commandPosition(pos);
+        }
+    }
+
+    public void commandPosition(Vec2 pos, boolean stopWhenInRange){
         targetPos = pos;
         lastTargetPos = pos;
         attackTarget = null;
         pathId = Vars.controlPath.nextTargetId();
+        this.stopWhenInRange = stopWhenInRange;
     }
 
+    @Override
     public void commandTarget(Teamc moveTo){
         commandTarget(moveTo, false);
+        if(commandController != null){
+            commandController.commandTarget(moveTo);
+        }
     }
 
     public void commandTarget(Teamc moveTo, boolean stopAtTarget){

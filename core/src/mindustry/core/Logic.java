@@ -34,6 +34,9 @@ public class Logic implements ApplicationListener{
     public Logic(){
 
         Events.on(BlockDestroyEvent.class, event -> {
+            //skip if rule is off
+            if(!state.rules.ghostBlocks) return;
+
             //blocks that get broken are appended to the team's broken block queue
             Tile tile = event.tile;
             //skip null entities or un-rebuildables, for obvious reasons
@@ -66,6 +69,9 @@ public class Logic implements ApplicationListener{
         Events.on(SaveLoadEvent.class, e -> {
             if(state.isCampaign()){
                 state.rules.coreIncinerates = true;
+
+                //TODO why is this even a thing?
+                state.rules.canGameOver = true;
 
                 //fresh map has no sector info
                 if(!e.isMap){
@@ -130,6 +136,7 @@ public class Logic implements ApplicationListener{
 
                 state.rules.coreIncinerates = true;
                 state.rules.waveTeam.rules().infiniteResources = true;
+                state.rules.waveTeam.rules().buildSpeedMultiplier *= state.getPlanet().enemyBuildSpeedMultiplier;
 
                 //fill enemy cores by default? TODO decide
                 for(var core : state.rules.waveTeam.cores()){
@@ -212,11 +219,12 @@ public class Logic implements ApplicationListener{
         Events.fire(new PlayEvent());
 
         //add starting items
-        if(!state.isCampaign()){
+        if(!state.isCampaign() || !state.rules.sector.planet.allowLaunchLoadout || (state.rules.sector.preset != null && state.rules.sector.preset.addStartingItems)){
             for(TeamData team : state.teams.getActive()){
                 if(team.hasCore()){
                     CoreBuild entity = team.core();
                     entity.items.clear();
+
                     for(ItemStack stack : state.rules.loadout){
                         //make sure to cap storage
                         entity.items.add(stack.item, Math.min(stack.amount, entity.storageCapacity - entity.items.get(stack.item)));
@@ -334,13 +342,19 @@ public class Logic implements ApplicationListener{
             return;
         }
 
+        boolean initial = !state.rules.sector.info.wasCaptured;
+
         state.rules.sector.info.wasCaptured = true;
 
         //fire capture event
-        Events.fire(new SectorCaptureEvent(state.rules.sector));
+        Events.fire(new SectorCaptureEvent(state.rules.sector, initial));
 
         //disable attack mode
         state.rules.attackMode = false;
+
+        //map is over, no more world processor objective stuff
+        state.rules.disableWorldProcessors = true;
+        state.rules.objectives.clear();
 
         //save, just in case
         if(!headless && !net.client()){
@@ -360,9 +374,7 @@ public class Logic implements ApplicationListener{
     public static void gameOver(Team winner){
         state.stats.wavesLasted = state.wave;
         state.won = player.team() == winner;
-        Time.run(60f * 3f, () -> {
-            ui.restart.show(winner);
-        });
+        Time.run(60f * 3f, () -> ui.restart.show(winner));
         netClient.setQuiet();
     }
 
@@ -371,53 +383,18 @@ public class Logic implements ApplicationListener{
     public static void researched(Content content){
         if(!(content instanceof UnlockableContent u)) return;
 
-        var node = u.techNode;
-
-        //unlock all direct dependencies on client, permanently
-        while(node != null){
-            node.content.unlock();
-            node = node.parent;
-        }
-
+        boolean was = u.unlockedNow();
         state.rules.researched.add(u.name);
-    }
 
-    //called when the remote server runs a turn and produces something
-    @Remote
-    public static void sectorProduced(int[] amounts){
-        //TODO currently disabled.
-        if(!state.isCampaign() || true) return;
-
-        Planet planet = state.rules.sector.planet;
-        boolean any = false;
-
-        for(Item item : content.items()){
-            int am = amounts[item.id];
-            if(am > 0){
-                int sumMissing = planet.sectors.sum(s -> s.hasBase() ? s.info.storageCapacity - s.info.items.get(item) : 0);
-                if(sumMissing == 0) continue;
-                //how much % to add
-                double percent = Math.min((double)am / sumMissing, 1);
-                for(Sector sec : planet.sectors){
-                    if(sec.hasBase()){
-                        int added = (int)Math.ceil(((sec.info.storageCapacity - sec.info.items.get(item)) * percent));
-                        sec.info.items.add(item, added);
-                        any = true;
-                    }
-                }
-            }
-        }
-
-        if(any){
-            for(Sector sec : planet.sectors){
-                sec.saveInfo();
-            }
+        if(!was){
+            Events.fire(new UnlockEvent(u));
         }
     }
 
     @Override
     public void dispose(){
         //save the settings before quitting
+        netServer.admins.forceSave();
         Core.settings.manualSave();
     }
 
@@ -427,8 +404,11 @@ public class Logic implements ApplicationListener{
         universe.updateGlobal();
 
         if(Core.settings.modified() && !state.isPlaying()){
+            netServer.admins.forceSave();
             Core.settings.forceSave();
         }
+
+        boolean runStateCheck = !net.client() && !world.isInvalidMap() && !state.isEditor() && state.rules.canGameOver;
 
         if(state.isGame()){
             if(!net.client()){
@@ -495,9 +475,11 @@ public class Logic implements ApplicationListener{
                 Groups.update();
             }
 
-            if(!net.client() && !world.isInvalidMap() && !state.isEditor() && state.rules.canGameOver){
+            if(runStateCheck){
                 checkGameState();
             }
+        }else if(netServer.isWaitingForPlayers() && runStateCheck){
+            checkGameState();
         }
     }
 

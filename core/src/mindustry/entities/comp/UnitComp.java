@@ -31,7 +31,7 @@ import static mindustry.Vars.*;
 import static mindustry.logic.GlobalVars.*;
 
 @Component(base = true)
-abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Boundedc, Syncc, Shieldc, Displayable, Senseable, Ranged, Minerc, Builderc{
+abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Boundedc, Syncc, Shieldc, Displayable, Ranged, Minerc, Builderc, Senseable, Settable{
 
     @Import boolean hovering, dead, disarmed;
     @Import float x, y, rotation, elevation, maxHealth, drag, armor, hitSize, health, ammo, dragMultiplier;
@@ -40,6 +40,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     @Import @Nullable Tile mineTile;
     @Import Vec2 vel;
     @Import WeaponMount[] mounts;
+    @Import ItemStack stack;
 
     private UnitController controller;
     Ability[] abilities = {};
@@ -61,6 +62,12 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     /** Called when this unit was unloaded from a factory or spawn point. */
     public void unloaded(){
 
+    }
+
+    public void updateBoosting(boolean boost){
+        if(!type.canBoost || dead) return;
+
+        elevation = Mathf.approachDelta(elevation, type.canBoost ? Mathf.num(boost || onSolid() || (isFlying() && !canLand())) : 0f, type.riseSpeed);
     }
 
     /** Move based on preferred unit movement type. */
@@ -98,6 +105,11 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         lookAt(x, y);
     }
 
+    public boolean isPathImpassable(int tileX, int tileY){
+        return !type.flying && world.tiles.in(tileX, tileY) && type.pathCost.getCost(team.id, pathfinder.get(tileX, tileY)) == -1;
+    }
+
+
     /** @return approx. square size of the physical hitbox for physics */
     public float physicSize(){
         return hitSize * 0.7f;
@@ -133,6 +145,11 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             return vel().angle();
         }
         return rotation;
+    }
+
+    @Override
+    public boolean displayable(){
+        return type.hoverable;
     }
 
     @Override
@@ -239,6 +256,60 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     public double sense(Content content){
         if(content == stack().item) return stack().amount;
         return Float.NaN;
+    }
+
+    @Override
+    public void setProp(LAccess prop, double value){
+        switch(prop){
+            case health -> health = (float)Mathf.clamp(value, 0, maxHealth);
+            case x -> x = World.unconv((float)value);
+            case y -> y = World.unconv((float)value);
+            case rotation -> rotation = (float)value;
+            case team -> {
+                if(!net.client()){
+                    Team team = Team.get((int)value);
+                    if(controller instanceof Player p){
+                        p.team(team);
+                    }
+                    this.team = team;
+                }
+            }
+            case flag -> flag = value;
+        }
+    }
+
+    @Override
+    public void setProp(LAccess prop, Object value){
+        switch(prop){
+            case team -> {
+                if(value instanceof Team t && !net.client()){
+                    if(controller instanceof Player p) p.team(t);
+                    team = t;
+                }
+            }
+            case payloadType -> {
+                //only serverside
+                if(((Object)this) instanceof Payloadc pay && !net.client()){
+                    if(value instanceof Block b){
+                        Building build = b.newBuilding().create(b, team());
+                        if(pay.canPickup(build)) pay.addPayload(new BuildPayload(build));
+                    }else if(value instanceof UnitType ut){
+                        Unit unit = ut.create(team());
+                        if(pay.canPickup(unit)) pay.addPayload(new UnitPayload(unit));
+                    }else if(value == null && pay.payloads().size > 0){
+                        pay.dropLastPayload();
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void setProp(UnlockableContent content, double value){
+        if(content instanceof Item item){
+            stack.item = item;
+            stack.amount = Mathf.clamp((int)value, 0, type.itemCapacity);
+        }
     }
 
     @Override
@@ -437,6 +508,11 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         healTime -= Time.delta / 20f;
         wasHealed = false;
 
+        //die on captured sectors immediately
+        if(team.isOnlyAI() && state.isCampaign() && state.getSector().isCaptured()){
+            kill();
+        }
+
         if(!headless && type.loopSound != Sounds.none){
             control.sound.loop(type.loopSound, this, type.loopSoundVolume);
         }
@@ -568,7 +644,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         float power = item().charge * Mathf.pow(stack().amount, 1.11f) * 160f;
 
         if(!spawnedByCore){
-            Damage.dynamicExplosion(x, y, flammability, explosiveness, power, (bounds() + type.legLength/1.7f) / 2f, state.rules.damageExplosions, item().flammability > 1, team, type.deathExplosionEffect);
+            Damage.dynamicExplosion(x, y, flammability, explosiveness, power, (bounds() + type.legLength/1.7f) / 2f, state.rules.damageExplosions && state.rules.unitCrashDamage(team) > 0, item().flammability > 1, team, type.deathExplosionEffect);
         }else{
             type.deathExplosionEffect.at(x, y, bounds() / 2f / 8f);
         }
@@ -596,8 +672,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         }
 
         //if this unit crash landed (was flying), damage stuff in a radius
-        if(type.flying && !spawnedByCore && type.createWreck){
-            Damage.damage(team, x, y, Mathf.pow(hitSize, 0.94f) * 1.25f, Mathf.pow(hitSize, 0.75f) * type.crashDamageMultiplier * 5f, true, false, true);
+        if(type.flying && !spawnedByCore && type.createWreck && state.rules.unitCrashDamage(team) > 0){
+            Damage.damage(team, x, y, Mathf.pow(hitSize, 0.94f) * 1.25f, Mathf.pow(hitSize, 0.75f) * type.crashDamageMultiplier * 5f * state.rules.unitCrashDamage(team), true, false, true);
         }
 
         if(!headless && type.createScorch){
@@ -671,5 +747,11 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
         //deaths are synced; this calls killed()
         Call.unitDeath(id);
+    }
+
+    @Override
+    @Replace
+    public String toString(){
+        return "Unit#" + id() + ":" + type;
     }
 }

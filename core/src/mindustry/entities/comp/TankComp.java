@@ -30,7 +30,7 @@ abstract class TankComp implements Posc, Flyingc, Hitboxc, Unitc, ElevationMovec
     @Override
     public void update(){
         //dust
-        if(walked && !headless && !inFogTo(player.team())){
+        if((walked || (net.client() && deltaLen() >= 0.01f)) && !headless && !inFogTo(player.team())){
             treadEffectTime += Time.delta;
             if(treadEffectTime >= 6f && type.treadRects.length > 0){
                 //first rect should always be at the back
@@ -62,11 +62,11 @@ abstract class TankComp implements Posc, Flyingc, Hitboxc, Unitc, ElevationMovec
                 }
 
                 //TODO should this apply to the player team(s)? currently PvE due to balancing
-                if(type.crushDamage > 0 && walked && t != null && t.build != null && t.build.team != team
+                if(type.crushDamage > 0 && (walked || deltaLen() >= 0.01f) && t != null && t.build != null && t.build.team != team
                     //damage radius is 1 tile smaller to prevent it from just touching walls as it passes
                     && Math.max(Math.abs(dx), Math.abs(dy)) <= r - 1){
 
-                    t.build.damage(team, type.crushDamage * Time.delta * t.block().crushDamageMultiplier);
+                    t.build.damage(team, type.crushDamage * Time.delta * t.block().crushDamageMultiplier * state.rules.unitDamage(team));
                 }
             }
         }

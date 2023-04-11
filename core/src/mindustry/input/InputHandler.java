@@ -82,7 +82,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     //for RTS controls
     public Seq<Unit> selectedUnits = new Seq<>();
-    public @Nullable Building commandBuild;
+    public Seq<Building> commandBuildings = new Seq<>(false);
     public boolean commandMode = false;
     public boolean commandRect = false;
     public boolean tappedOne = false;
@@ -231,14 +231,22 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             if(unit != null && unit.team == player.team() && unit.controller() instanceof CommandAI ai){
 
                 //implicitly order it to move
-                ai.command(UnitCommand.moveCommand);
+                if(ai.command == null || ai.command.switchToMove){
+                    ai.command(UnitCommand.moveCommand);
+                }
 
                 if(teamTarget != null && teamTarget.team() != player.team()){
                     ai.commandTarget(teamTarget);
+
                 }else if(posTarget != null){
                     ai.commandPosition(posTarget);
                 }
                 unit.lastCommanded = player.coloredName();
+                
+                //remove when other player command
+                if(!headless && player != Vars.player){
+                    control.input.selectedUnits.remove(unit);
+                }
             }
         }
 
@@ -264,31 +272,40 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         for(int id : unitIds){
             Unit unit = Groups.unit.getByID(id);
             if(unit != null && unit.team == player.team() && unit.controller() instanceof CommandAI ai){
+                boolean reset = command.resetTarget || ai.currentCommand().resetTarget;
                 ai.command(command);
-                //reset targeting
-                ai.targetPos = null;
-                ai.attackTarget = null;
+                if(reset){
+                    ai.targetPos = null;
+                    ai.attackTarget = null;
+                }
                 unit.lastCommanded = player.coloredName();
             }
         }
     }
 
     @Remote(called = Loc.server, targets = Loc.both, forward = true)
-    public static void commandBuilding(Player player, Building build, Vec2 target){
-        if(player == null || build == null || build.team != player.team() || !build.block.commandable || target == null) return;
+    public static void commandBuilding(Player player, int[] buildings, Vec2 target){
+        if(player == null  || target == null) return;
 
         if(net.server() && !netServer.admins.allowAction(player, ActionType.commandBuilding, event -> {
-            event.tile = build.tile;
+            event.buildingPositions = buildings;
         })){
-            throw new ValidateException(player, "Player cannot command building.");
+            throw new ValidateException(player, "Player cannot command buildings.");
         }
 
-        build.onCommand(target);
-        if(!state.isPaused() && player == Vars.player){
-            Fx.moveCommand.at(target);
+        for(int pos : buildings){
+            var build = world.build(pos);
+
+            if(build == null || build.team() != player.team() || !build.block.commandable) continue;
+
+            build.onCommand(target);
+            if(!state.isPaused() && player == Vars.player){
+                Fx.moveCommand.at(target);
+            }
+
+            Events.fire(new BuildingCommandEvent(player, build, target));
         }
 
-        Events.fire(new BuildingCommandEvent(player, build, target));
     }
 
     @Remote(called = Loc.server, targets = Loc.both, forward = true)
@@ -403,7 +420,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(targets = Loc.both, called = Loc.server)
     public static void requestDropPayload(Player player, float x, float y){
-        if(player == null || net.client()) return;
+        if(player == null || net.client() || player.dead()) return;
 
         Payloadc pay = (Payloadc)player.unit();
 
@@ -551,6 +568,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public static void unitClear(Player player){
         if(player == null) return;
 
+        //make sure player is allowed to control the building
+        if(net.server() && !netServer.admins.allowAction(player, ActionType.respawn, action -> {})){
+            throw new ValidateException(player, "Player cannot respawn.");
+        }
+
         if(!player.dead() && !player.unit().spawnedByCore){
             var docked = player.unit().dockedType;
 
@@ -623,9 +645,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             logicCutsceneZoom = -1f;
         }
 
-        if(commandBuild != null && !commandBuild.isValid()){
-            commandBuild = null;
-        }
+        commandBuildings.removeAll(b -> !b.isValid());
 
         if(!commandMode){
             commandRect = false;
@@ -758,7 +778,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 }
                 selectedUnits.addAll(units);
                 Events.fire(Trigger.unitCommandChange);
-                commandBuild = null;
+                commandBuildings.clear();
             }
             commandRect = false;
         }
@@ -787,15 +807,20 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 }else{
                     selectedUnits.remove(unit);
                 }
-                commandBuild = null;
+                commandBuildings.clear();
             }else{
                 //deselect
                 selectedUnits.clear();
 
                 if(build != null && build.team == player.team() && build.block.commandable){
-                    commandBuild = (commandBuild == build ? null : build);
+                    if(commandBuildings.contains(build)){
+                        commandBuildings.remove(build);
+                    }else{
+                        commandBuildings.add(build);
+                    }
+
                 }else{
-                    commandBuild = null;
+                    commandBuildings.clear();
                 }
             }
             Events.fire(Trigger.unitCommandChange);
@@ -822,11 +847,15 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                     ids[i] = selectedUnits.get(i).id;
                 }
 
+                if(attack != null){
+                    Events.fire(Trigger.unitCommandAttack);
+                }
+
                 Call.commandUnits(player, ids, attack instanceof Building b ? b : null, attack instanceof Unit u ? u : null, target);
             }
 
-            if(commandBuild != null){
-                Call.commandBuilding(player, commandBuild, target);
+            if(commandBuildings.size > 0){
+                Call.commandBuilding(player, commandBuildings.mapInt(b -> b.pos()).toArray(), target);
             }
         }
     }
@@ -844,7 +873,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             for(Unit unit : selectedUnits){
                 CommandAI ai = unit.command();
                 //draw target line
-                if(ai.targetPos != null && ai.command == UnitCommand.moveCommand){
+                if(ai.targetPos != null && ai.currentCommand().drawTarget){
                     Position lineDest = ai.attackTarget != null ? ai.attackTarget : ai.targetPos;
                     Drawf.limitLine(unit, lineDest, unit.hitSize / 2f, 3.5f);
 
@@ -855,19 +884,20 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
                 Drawf.square(unit.x, unit.y, unit.hitSize / 1.4f + 1f);
 
-                //TODO when to draw, when to not?
-                if(ai.attackTarget != null && ai.command == UnitCommand.moveCommand){
+                if(ai.attackTarget != null && ai.currentCommand().drawTarget){
                     Drawf.target(ai.attackTarget.getX(), ai.attackTarget.getY(), 6f, Pal.remove);
                 }
             }
 
-            if(commandBuild != null){
-                Drawf.square(commandBuild.x, commandBuild.y, commandBuild.hitSize() / 1.4f + 1f);
-                var cpos = commandBuild.getCommandPosition();
+            for(var commandBuild : commandBuildings){
+                if(commandBuild != null){
+                    Drawf.square(commandBuild.x, commandBuild.y, commandBuild.hitSize() / 1.4f + 1f);
+                    var cpos = commandBuild.getCommandPosition();
 
-                if(cpos != null){
-                    Drawf.limitLine(commandBuild, cpos, commandBuild.hitSize() / 2f, 3.5f);
-                    Drawf.square(cpos.x, cpos.y, 3.5f);
+                    if(cpos != null){
+                        Drawf.limitLine(commandBuild, cpos, commandBuild.hitSize() / 2f, 3.5f);
+                        Drawf.square(cpos.x, cpos.y, 3.5f);
+                    }
                 }
             }
 
@@ -1139,13 +1169,17 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     protected void drawSelection(int x1, int y1, int x2, int y2, int maxLength){
+        drawSelection(x1, y1, x2, y2, maxLength, Pal.accentBack, Pal.accent);
+    }
+
+    protected void drawSelection(int x1, int y1, int x2, int y2, int maxLength, Color col1, Color col2){
         NormalizeDrawResult result = Placement.normalizeDrawArea(Blocks.air, x1, y1, x2, y2, false, maxLength, 1f);
 
         Lines.stroke(2f);
 
-        Draw.color(Pal.accentBack);
+        Draw.color(col1);
         Lines.rect(result.x, result.y - 1, result.x2 - result.x, result.y2 - result.y);
-        Draw.color(Pal.accent);
+        Draw.color(col2);
         Lines.rect(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
     }
 
@@ -1320,7 +1354,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(build == null){
             inv.hide();
             config.hideConfig();
-            commandBuild = null;
+            commandBuildings.clear();
             return false;
         }
         boolean consumed = false, showedInventory = false;
@@ -1458,6 +1492,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public boolean isBreaking(){
         return false;
+    }
+
+    public boolean isRebuildSelecting(){
+        return input.keyDown(Binding.rebuild_select);
     }
 
     public float mouseAngle(float x, float y){
@@ -1653,20 +1691,26 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public void drawArrow(Block block, int x, int y, int rotation, boolean valid){
         float trns = (block.size / 2) * tilesize;
         int dx = Geometry.d4(rotation).x, dy = Geometry.d4(rotation).y;
+        float offsetx = x * tilesize + block.offset + dx*trns;
+        float offsety = y * tilesize + block.offset + dy*trns;
 
         Draw.color(!valid ? Pal.removeBack : Pal.accentBack);
-        Draw.rect(Core.atlas.find("place-arrow"),
-        x * tilesize + block.offset + dx*trns,
-        y * tilesize + block.offset - 1 + dy*trns,
-        Core.atlas.find("place-arrow").width * Draw.scl,
-        Core.atlas.find("place-arrow").height * Draw.scl, rotation * 90 - 90);
+        TextureRegion regionArrow = Core.atlas.find("place-arrow");
+
+        Draw.rect(regionArrow,
+        offsetx,
+        offsety - 1,
+        regionArrow.width * regionArrow.scl(),
+        regionArrow.height * regionArrow.scl(),
+        rotation * 90 - 90);
 
         Draw.color(!valid ? Pal.remove : Pal.accent);
-        Draw.rect(Core.atlas.find("place-arrow"),
-        x * tilesize + block.offset + dx*trns,
-        y * tilesize + block.offset + dy*trns,
-        Core.atlas.find("place-arrow").width * Draw.scl,
-        Core.atlas.find("place-arrow").height * Draw.scl, rotation * 90 - 90);
+        Draw.rect(regionArrow,
+        offsetx,
+        offsety,
+        regionArrow.width * regionArrow.scl(),
+        regionArrow.height * regionArrow.scl(),
+        rotation * 90 - 90);
     }
 
     void iterateLine(int startX, int startY, int endX, int endY, Cons<PlaceLine> cons){

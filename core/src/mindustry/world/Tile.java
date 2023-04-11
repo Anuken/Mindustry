@@ -11,8 +11,8 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
-import mindustry.game.*;
 import mindustry.game.EventType.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -164,7 +164,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     public boolean isDarkened(){
-        return block.solid && ((!block.synthetic() && block.fillsTile) || block.forceDark);
+        return block.solid && ((!block.synthetic() && block.fillsTile) || block.checkForceDark(this));
     }
 
     public Floor floor(){

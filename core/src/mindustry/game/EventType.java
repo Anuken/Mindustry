@@ -16,14 +16,20 @@ public class EventType{
     //events that occur very often
     public enum Trigger{
         shock,
-        phaseDeflectHit,
+        openConsole,
+        blastFreeze,
         impactPower,
+        blastGenerator,
+        shockwaveTowerUse,
+        forceProjectorBreak,
         thoriumReactorOverheat,
+        neoplasmReact,
         fireExtinguish,
         acceleratorUse,
         newGame,
         tutorialComplete,
         flameAmmo,
+        resupplyTurret,
         turretCool,
         enablePixelation,
         exclusionDeath,
@@ -33,6 +39,8 @@ public class EventType{
         socketConfigChanged,
         update,
         unitCommandChange,
+        unitCommandAttack,
+        importMod,
         draw,
         drawOver,
         preDraw,
@@ -127,6 +135,17 @@ public class EventType{
         }
     }
 
+    public static class SectorLaunchLoadoutEvent{
+        public final Sector sector, from;
+        public final Schematic loadout;
+
+        public SectorLaunchLoadoutEvent(Sector sector, Sector from, Schematic loadout){
+            this.sector = sector;
+            this.from = from;
+            this.loadout = loadout;
+        }
+    }
+
     public static class SchematicCreateEvent{
         public final Schematic schematic;
 
@@ -143,6 +162,16 @@ public class EventType{
         }
     }
 
+    public static class ClientServerConnectEvent{
+        public final String ip;
+        public final int port;
+
+        public ClientServerConnectEvent(String ip, int port){
+            this.ip = ip;
+            this.port = port;
+        }
+    }
+
     /** Consider using Menus.registerMenu instead. */
     public static class MenuOptionChooseEvent{
         public final Player player;
@@ -150,8 +179,21 @@ public class EventType{
 
         public MenuOptionChooseEvent(Player player, int menuId, int option){
             this.player = player;
-            this.option = option;
             this.menuId = menuId;
+            this.option = option;
+        }
+    }
+
+    /** Consider using Menus.registerTextInput instead. */
+    public static class TextInputEvent{
+        public final Player player;
+        public final int textInputId;
+        public final @Nullable String text;
+
+        public TextInputEvent(Player player, int textInputId, String text){
+            this.player = player;
+            this.textInputId = textInputId;
+            this.text = text;
         }
     }
 
@@ -165,12 +207,23 @@ public class EventType{
         }
     }
 
+    /** Called when the client sends a chat message. This only fires clientside! */
+    public static class ClientChatEvent{
+        public final String message;
+
+        public ClientChatEvent(String message){
+            this.message = message;
+        }
+    }
+
     /** Called when a sector is conquered, e.g. a boss or base is defeated. */
     public static class SectorCaptureEvent{
         public final Sector sector;
+        public final boolean initialCapture;
 
-        public SectorCaptureEvent(Sector sector){
+        public SectorCaptureEvent(Sector sector, boolean initialCapture){
             this.sector = sector;
+            this.initialCapture = initialCapture;
         }
     }
 
@@ -448,11 +501,63 @@ public class EventType{
         }
     }
 
+    /** Called when a neoplasia (or other pressure-based block, from mods) reactor explodes due to pressure.*/
+    public static class GeneratorPressureExplodeEvent{
+        public final Building build;
+
+        public GeneratorPressureExplodeEvent(Building build){
+            this.build = build;
+        }
+    }
+
+    /** Called when a building is directly killed by a bullet. May not fire in all circumstances. */
+    public static class BuildingBulletDestroyEvent{
+        public Building build;
+        public Bullet bullet;
+
+        public BuildingBulletDestroyEvent(Building build, Bullet bullet){
+            this.build = build;
+            this.bullet = bullet;
+        }
+
+        public BuildingBulletDestroyEvent(){
+        }
+    }
+
     public static class UnitDestroyEvent{
         public final Unit unit;
 
         public UnitDestroyEvent(Unit unit){
             this.unit = unit;
+        }
+    }
+
+    /** Called when a unit is directly killed by a bullet. May not fire in all circumstances. */
+    public static class UnitBulletDestroyEvent{
+        public Unit unit;
+        public Bullet bullet;
+
+        public UnitBulletDestroyEvent(Unit unit, Bullet bullet){
+            this.unit = unit;
+            this.bullet = bullet;
+        }
+
+        public UnitBulletDestroyEvent(){
+        }
+    }
+
+    /**
+     * Called when a unit is hit by a bullet.
+     * This event is REUSED, do not nest invocations of it (e.g. damage units in its event handler)
+     * */
+    public static class UnitDamageEvent{
+        public Unit unit;
+        public Bullet bullet;
+
+        public UnitDamageEvent set(Unit unit, Bullet bullet){
+            this.unit = unit;
+            this.bullet = bullet;
+            return this;
         }
     }
 

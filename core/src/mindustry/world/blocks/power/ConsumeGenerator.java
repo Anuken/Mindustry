@@ -1,10 +1,12 @@
 package mindustry.world.blocks.power;
 
+import arc.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.game.EventType.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.consumers.*;
@@ -115,6 +117,7 @@ public class ConsumeGenerator extends PowerGenerator{
 
                 if(explodeOnFull && liquids.get(outputLiquid.liquid) >= liquidCapacity - 0.0001f){
                     kill();
+                    Events.fire(new GeneratorPressureExplodeEvent(this));
                 }
             }
 

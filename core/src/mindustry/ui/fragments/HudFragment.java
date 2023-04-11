@@ -99,7 +99,7 @@ public class HudFragment{
         //"waiting for players"
         parent.fill(t -> {
             t.name = "waiting";
-            t.visible(() -> netServer.isWaitingForPlayers()).touchable = Touchable.disabled;
+            t.visible(() -> netServer.isWaitingForPlayers() && state.isPaused() && shown).touchable = Touchable.disabled;
             t.table(Styles.black6, top -> top.add("@waiting.players").style(Styles.outlineLabel).pad(18f));
         });
 
@@ -129,6 +129,13 @@ public class HudFragment{
             cont.top().left();
 
             if(mobile){
+                //for better inset visuals
+                cont.rect((x, y, w, h) -> {
+                    if(Core.scene.marginTop > 0){
+                        Tex.paneRight.draw(x, y, w, Core.scene.marginTop);
+                    }
+                }).fillX().row();
+
                 cont.table(select -> {
                     select.name = "mobile buttons";
                     select.left();
@@ -147,14 +154,14 @@ public class HudFragment{
                         if(net.active()){
                             ui.listfrag.toggle();
                         }else{
-                            state.set(state.is(State.paused) ? State.playing : State.paused);
+                            state.set(state.isPaused() ? State.playing : State.paused);
                         }
                     }).name("pause").update(i -> {
                         if(net.active()){
                             i.getStyle().imageUp = Icon.players;
                         }else{
                             i.setDisabled(false);
-                            i.getStyle().imageUp = state.is(State.paused) ? Icon.play : Icon.pause;
+                            i.getStyle().imageUp = state.isPaused() ? Icon.play : Icon.pause;
                         }
                     });
 
@@ -774,6 +781,12 @@ public class HudFragment{
 
             builder.setLength(0);
 
+            //mission overrides everything
+            if(state.rules.mission != null && state.rules.mission.length() > 0){
+                builder.append(state.rules.mission);
+                return builder;
+            }
+
             //objectives override mission?
             if(state.rules.objectives.any()){
                 boolean first = true;
@@ -781,7 +794,7 @@ public class HudFragment{
                     if(!obj.qualified()) continue;
 
                     String text = obj.text();
-                    if(text != null){
+                    if(text != null && !text.isEmpty()){
                         if(!first) builder.append("\n[white]");
                         builder.append(text);
 
@@ -789,13 +802,10 @@ public class HudFragment{
                     }
                 }
 
-                return builder;
-            }
-
-            //mission overrides everything
-            if(state.rules.mission != null){
-                builder.append(state.rules.mission);
-                return builder;
+                //TODO: display standard status when empty objective?
+                if(builder.length() > 0){
+                    return builder;
+                }
             }
 
             if(!state.rules.waves && state.rules.attackMode){
