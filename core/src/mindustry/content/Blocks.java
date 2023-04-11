@@ -5577,11 +5577,13 @@ public class Blocks{
         payloadConveyor = new PayloadConveyor("payload-conveyor"){{
             requirements(Category.units, with(Items.graphite, 10, Items.copper, 10));
             canOverdrive = false;
+            underBullets = true;
         }};
 
         payloadRouter = new PayloadRouter("payload-router"){{
             requirements(Category.units, with(Items.graphite, 15, Items.copper, 10));
             canOverdrive = false;
+            underBullets = true;
         }};
 
         reinforcedPayloadConveyor = new PayloadConveyor("reinforced-payload-conveyor"){{
