@@ -462,9 +462,15 @@ public class PlacementFragment{
                                             var listener = new ClickListener();
 
                                             //left click -> select
-                                            b.clicked(KeyCode.mouseLeft, () -> control.input.selectedUnits.removeAll(unit -> unit.type != type));
+                                            b.clicked(KeyCode.mouseLeft, () -> {
+                                                control.input.selectedUnits.removeAll(unit -> unit.type != type);
+                                                Events.fire(Trigger.unitCommandChange);
+                                            });
                                             //right click -> remove
-                                            b.clicked(KeyCode.mouseRight, () -> control.input.selectedUnits.removeAll(unit -> unit.type == type));
+                                            b.clicked(KeyCode.mouseRight, () -> {
+                                                control.input.selectedUnits.removeAll(unit -> unit.type == type);
+                                                Events.fire(Trigger.unitCommandChange);
+                                            });
 
                                             b.addListener(listener);
                                             b.addListener(new HandCursorListener());

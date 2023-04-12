@@ -51,6 +51,9 @@ public class BaseTurret extends Block{
             coolant.update = false;
             coolant.booster = true;
             coolant.optional = true;
+
+            //json parsing does not add to consumes
+            if(!hasConsumer(coolant)) consume(coolant);
         }
 
         placeOverlapRange = Math.max(placeOverlapRange, range + placeOverlapMargin);

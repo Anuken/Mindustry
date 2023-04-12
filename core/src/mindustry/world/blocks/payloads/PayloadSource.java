@@ -84,7 +84,7 @@ public class PayloadSource extends PayloadBlock{
     public boolean canProduce(UnitType t){
         return !t.isHidden() && !t.isBanned() && t.supportsEnv(state.rules.env);
     }
-    
+
     public class PayloadSourceBuild extends PayloadBlockBuild<Payload>{
         public UnitType unit;
         public Block block;

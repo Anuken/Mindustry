@@ -36,7 +36,7 @@ public class DrawFlame extends DrawBlock{
             float cr = Mathf.random(0.1f);
 
             Draw.z(Layer.block + 0.01f);
-            
+
             Draw.alpha(build.warmup());
             Draw.rect(top, build.x, build.y);
 

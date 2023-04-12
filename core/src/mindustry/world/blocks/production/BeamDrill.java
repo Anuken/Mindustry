@@ -17,6 +17,7 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
+import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -110,11 +111,17 @@ public class BeamDrill extends Block{
     public void setStats(){
         super.setStats();
 
-        stats.add(Stat.drillTier, StatValues.blocks(b -> (b instanceof Floor f && f.wallOre && f.itemDrop != null && f.itemDrop.hardness <= tier) || (b instanceof StaticWall w && w.itemDrop != null && w.itemDrop.hardness <= tier)));
+        stats.add(Stat.drillTier, StatValues.drillables(drillTime, 0f, size, drillMultipliers, b -> (b instanceof Floor f && f.wallOre && f.itemDrop != null && f.itemDrop.hardness <= tier) || (b instanceof StaticWall w && w.itemDrop != null && w.itemDrop.hardness <= tier)));
 
         stats.add(Stat.drillSpeed, 60f / drillTime * size, StatUnit.itemsSecond);
-        if(optionalBoostIntensity != 1){
-            stats.add(Stat.boostEffect, optionalBoostIntensity, StatUnit.timesSpeed);
+
+        if(optionalBoostIntensity != 1 && findConsumer(f -> f instanceof ConsumeLiquidBase) instanceof ConsumeLiquidBase consBase){
+            stats.remove(Stat.booster);
+            stats.add(Stat.booster,
+                StatValues.speedBoosters("{0}" + StatUnit.timesSpeed.localized(),
+                consBase.amount, optionalBoostIntensity, false,
+                l -> (consumesLiquid(l) && (findConsumer(f -> f instanceof ConsumeLiquid).booster || ((ConsumeLiquid)findConsumer(f -> f instanceof ConsumeLiquid)).liquid != l)))
+            );
         }
     }
 

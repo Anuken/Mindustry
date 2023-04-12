@@ -202,7 +202,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
                     if(Mathf.dst2(t.x, t.y, x2, y2) <= avoid * avoid){
                         return;
                     }
-                    
+
                     for(int x = -rad; x <= rad; x++){
                         for(int y = -rad; y <= rad; y++){
                             int wx = t.x + x, wy = t.y + y;

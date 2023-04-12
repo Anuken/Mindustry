@@ -230,8 +230,7 @@ public class Pathfinder implements Runnable{
         for(Flowfield path : mainList){
             if(path != null){
                 synchronized(path.targets){
-                    path.targets.clear();
-                    path.getPositions(path.targets);
+                    path.updateTargetPositions();
                 }
             }
         }
@@ -312,8 +311,7 @@ public class Pathfinder implements Runnable{
             synchronized(path.targets){
                 //make sure the position actually changed
                 if(!(path.targets.size == 1 && tmpArray.size == 1 && path.targets.first() == tmpArray.first())){
-                    path.targets.clear();
-                    path.getPositions(path.targets);
+                    path.updateTargetPositions();
 
                     //queue an update
                     queue.post(() -> updateTargets(path));
@@ -367,8 +365,7 @@ public class Pathfinder implements Runnable{
     }
 
     private void preloadPath(Flowfield path){
-        path.targets.clear();
-        path.getPositions(path.targets);
+        path.updateTargetPositions();
         registerPath(path);
         updateFrontier(path, -1);
     }
@@ -493,10 +490,10 @@ public class Pathfinder implements Runnable{
         protected Team team = Team.derelict;
         /** Function for calculating path cost. Set before using. */
         protected PathCost cost = costTypes.get(costGround);
-        /** If true, this flow field needs updating. This flag is only set to false once the flow field finishes and the weights are copied over. */
-        protected boolean dirty = false;
         /** Whether there are valid weights in the complete array. */
         protected volatile boolean hasComplete;
+        /** If true, this flow field needs updating. This flag is only set to false once the flow field finishes and the weights are copied over. */
+        protected boolean dirty = false;
 
         /** costs of getting to a specific tile */
         public int[] weights;
@@ -522,6 +519,11 @@ public class Pathfinder implements Runnable{
             this.completeWeights = new int[length];
             this.frontier.ensureCapacity((length) / 4);
             this.initialized = true;
+        }
+
+        public void updateTargetPositions(){
+            targets.clear();
+            getPositions(targets);
         }
 
         protected boolean passable(int pos){

@@ -1,5 +1,6 @@
 package mindustry.net;
 
+import arc.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.entities.units.*;
@@ -76,7 +77,12 @@ public abstract class NetConnection{
             Call.kick(this, reason);
         }
 
-        close();
+        if(uuid.startsWith("steam:")){
+            //run with a 2-frame delay so there is time to send the kick packet, steam handles this weirdly
+            Core.app.post(() -> Core.app.post(this::close));
+        }else{
+            close();
+        }
 
         netServer.admins.save();
         kicked = true;

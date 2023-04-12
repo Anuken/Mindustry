@@ -781,6 +781,12 @@ public class HudFragment{
 
             builder.setLength(0);
 
+            //mission overrides everything
+            if(state.rules.mission != null && state.rules.mission.length() > 0){
+                builder.append(state.rules.mission);
+                return builder;
+            }
+
             //objectives override mission?
             if(state.rules.objectives.any()){
                 boolean first = true;
@@ -788,7 +794,7 @@ public class HudFragment{
                     if(!obj.qualified()) continue;
 
                     String text = obj.text();
-                    if(text != null){
+                    if(text != null && !text.isEmpty()){
                         if(!first) builder.append("\n[white]");
                         builder.append(text);
 
@@ -796,13 +802,10 @@ public class HudFragment{
                     }
                 }
 
-                return builder;
-            }
-
-            //mission overrides everything
-            if(state.rules.mission != null){
-                builder.append(state.rules.mission);
-                return builder;
+                //TODO: display standard status when empty objective?
+                if(builder.length() > 0){
+                    return builder;
+                }
             }
 
             if(!state.rules.waves && state.rules.attackMode){
