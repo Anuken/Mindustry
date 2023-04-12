@@ -171,5 +171,9 @@
   {
     "name": "Exploding Cowards",
     "address": ["193.31.31.165:25778", "193.31.31.165:25790"]
+  },
+  {
+    "name": "ProstoServers",
+    "address": ["2p2g.ml:6567", "2p2g.ml:6568", "2p2g.ml:6569", "2p2g.ml:6570"]
   }
 ]
