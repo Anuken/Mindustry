@@ -49,7 +49,7 @@ public class MapLoadDialog extends BaseDialog{
         table.defaults().size(200f, 90f).pad(4f);
         table.margin(10f);
 
-        ScrollPane pane = new ScrollPane(table, Styles.horizontalPane);
+        ScrollPane pane = new ScrollPane(table);
         pane.setFadeScrollBars(false);
 
         for(Map map : maps.all()){
@@ -64,14 +64,12 @@ public class MapLoadDialog extends BaseDialog{
             if(++i % maxcol == 0) table.row();
         }
 
-        if(maps.all().size == 0){
+        if(maps.all().isEmpty()){
             table.add("@maps.none").center();
-        }else{
-            cont.add("@editor.loadmap");
         }
 
         cont.row();
-        cont.add(pane);
+        cont.add(pane).growX();
     }
 
 }

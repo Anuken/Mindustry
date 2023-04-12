@@ -280,7 +280,7 @@ public class CustomRulesDialog extends BaseDialog{
 
             main.button("[#" + team.color +  "]" + team.localized() + (team.emoji.isEmpty() ? "" : "[] " + team.emoji), Icon.downOpen, Styles.togglet, () -> {
                 shown[0] = !shown[0];
-            }).marginLeft(14f).width(260f).height(55f).checked(a -> shown[0]).row();
+            }).marginLeft(14f).width(260f).height(55f).checked(a -> shown[0]).update(t -> ((Image)t.getChildren().get(1)).setDrawable(shown[0] ? Icon.upOpen : Icon.downOpen)).row();
 
             main.collapser(t -> {
                 t.left().defaults().fillX().left().pad(5);
