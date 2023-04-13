@@ -171,5 +171,9 @@
   {
     "name": "Exploding Cowards",
     "address": ["193.31.31.165:25778", "193.31.31.165:25790"]
+  },
+  {
+    "name": "Realm of Serene Lime",
+    "address": ["43.248.185.167:8517"]
   }
 ]
