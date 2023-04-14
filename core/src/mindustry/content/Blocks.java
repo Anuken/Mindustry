@@ -1494,9 +1494,10 @@ public class Blocks{
             craftEffect = new RadialEffect(Fx.heatReactorSmoke, 4, 90f, 7f);
 
             itemCapacity = 20;
+            outputItem = new ItemStack(Items.fissileMatter, 1);
+
             consumeItem(Items.thorium, 3);
             consumeLiquid(Liquids.nitrogen, 1f / 60f);
-            outputItem = new ItemStack(Items.fissileMatter, 1);
         }};
 
         //endregion
@@ -3046,6 +3047,20 @@ public class Blocks{
 
             shoot = new ShootAlternate(3.5f);
 
+            recoils = 2;
+            drawer = new DrawTurret(){{
+                for(int i = 0; i < 2; i ++){
+                    int f = i;
+                    parts.add(new RegionPart("-barrel-" + (i == 0 ? "l" : "r")){{
+                        progress = PartProgress.recoil;
+                        recoilIndex = f;
+                        under = true;
+                        moves.add(new PartMove(PartProgress.recoil, 0f, -1.5f, 0f));
+                    }});
+                }
+            }};
+
+            recoil = 0.5f;
             shootY = 3f;
             reload = 20f;
             range = 110;

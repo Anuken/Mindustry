@@ -361,7 +361,7 @@ public class LExecutor{
         /** Checks is a unit is valid for logic AI control, and returns the controller. */
         @Nullable
         public static LogicAI checkLogicAI(LExecutor exec, Object unitObj){
-            if(unitObj instanceof Unit unit && unit.isValid() && exec.obj(varUnit) == unit && (unit.team == exec.team || exec.privileged) && !unit.isPlayer() && !(unit.isCommandable() && unit.command().hasCommand())){
+            if(unitObj instanceof Unit unit && unit.isValid() && exec.obj(varUnit) == unit && (unit.team == exec.team || exec.privileged) && unit.controller().isLogicControllable()){
                 if(unit.controller() instanceof LogicAI la){
                     la.controller = exec.building(varThis);
                     return la;
@@ -1040,7 +1040,7 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            
+
             if(exec.building(target) instanceof MessageBuild d && (d.team == exec.team || exec.privileged)){
 
                 d.message.setLength(0);
@@ -1690,6 +1690,38 @@ public class LExecutor{
                     Unit unit = group.createUnit(state.rules.waveTeam, state.wave - 1);
                     unit.set(spawnX + Tmp.v1.x, spawnY + Tmp.v1.y);
                     Vars.spawner.spawnEffect(unit);
+                }
+            }
+        }
+    }
+
+    public static class SetPropI implements LInstruction{
+        public int type, of, value;
+
+        public SetPropI(int type, int of, int value){
+            this.type = type;
+            this.of = of;
+            this.value = value;
+        }
+
+        public SetPropI(){
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            Object target = exec.obj(of);
+            Object key = exec.obj(type);
+
+            if(target instanceof Settable sp){
+                if(key instanceof LAccess property){
+                    Var var = exec.var(value);
+                    if(var.isobj){
+                        sp.setProp(property, var.objval);
+                    }else{
+                        sp.setProp(property, var.numval);
+                    }
+                }else if(key instanceof UnlockableContent content){
+                    sp.setProp(content, exec.num(value));
                 }
             }
         }

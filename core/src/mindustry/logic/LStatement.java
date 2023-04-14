@@ -2,7 +2,6 @@ package mindustry.logic;
 
 import arc.*;
 import arc.func.*;
-import arc.graphics.*;
 import arc.math.*;
 import arc.scene.*;
 import arc.scene.actions.*;

@@ -32,7 +32,7 @@ import static mindustry.Vars.*;
 
 public class Mods implements Loadable{
     private static final String[] metaFiles = {"mod.json", "mod.hjson", "plugin.json", "plugin.hjson"};
-    private static final ObjectSet<String> blacklistedMods = ObjectSet.with("ui-lib");
+    private static final ObjectSet<String> blacklistedMods = ObjectSet.with("ui-lib", "braindustry");
 
     private Json json = new Json();
     private @Nullable Scripts scripts;
@@ -41,8 +41,11 @@ public class Mods implements Loadable{
     private ObjectSet<String> specialFolders = ObjectSet.with("bundles", "sprites", "sprites-override");
 
     private int totalSprites;
-    private static ObjectFloatMap<String> textureResize = new ObjectFloatMap<>();
+    private ObjectFloatMap<String> textureResize = new ObjectFloatMap<>();
     private MultiPacker packer;
+
+    /** Ordered mods cache. Set to null to invalidate. */
+    private @Nullable Seq<LoadedMod> lastOrderedMods = new Seq<>();
 
     private ModClassLoader mainLoader = new ModClassLoader(getClass().getClassLoader());
 
@@ -106,6 +109,8 @@ public class Mods implements Loadable{
         try{
             var loaded = loadMod(dest, true, true);
             mods.add(loaded);
+            //invalidate ordered mods cache
+            lastOrderedMods = null;
             requiresReload = true;
             //enable the mod on import
             Core.settings.put("mod-" + loaded.name + "-enabled", true);
@@ -423,7 +428,7 @@ public class Mods implements Loadable{
 
         // Add local mods
         Seq.with(modDirectory.list())
-        .filter(f -> f.extEquals("jar") || f.extEquals("zip") || (f.isDirectory() && (f.child("mod.json").exists() || f.child("mod.hjson").exists())))
+        .filter(f -> f.extEquals("jar") || f.extEquals("zip") || (f.isDirectory() && Structs.contains(metaFiles, meta -> f.child(meta).exists())))
         .each(candidates::add);
 
         // Add Steam workshop mods
@@ -463,6 +468,8 @@ public class Mods implements Loadable{
                 LoadedMod mod = loadMod(file, false, entry.value == ModState.enabled);
                 mod.state = entry.value;
                 mods.add(mod);
+                //invalidate ordered mods cache
+                lastOrderedMods = null;
                 if(steam) mod.addSteamID(file.name());
             }catch(Throwable e){
                 if(e instanceof ClassNotFoundException && e.getMessage().contains("mindustry.plugin.Plugin")){
@@ -481,7 +488,7 @@ public class Mods implements Loadable{
         mods.each(this::updateDependencies);
         for(var mod : mods){
             // Skip mods where the state has already been resolved
-            if(mod.state != ModState.enabled)continue;
+            if(mod.state != ModState.enabled) continue;
             if(!mod.isSupported()){
                 mod.state = ModState.unsupported;
             }else if(!mod.shouldBeEnabled()){
@@ -512,8 +519,15 @@ public class Mods implements Loadable{
 
     /** @return mods ordered in the correct way needed for dependencies. */
     public Seq<LoadedMod> orderedMods(){
-        var mapping = mods.asMap(m -> m.meta.name);
-        return resolveDependencies(mods.map(m -> m.meta)).orderedKeys().map(mapping::get);
+        //update cache if it's "dirty"/empty
+        if(lastOrderedMods == null){
+            //only enabled mods participate; this state is resolved in load()
+            Seq<LoadedMod> enabled = mods.select(LoadedMod::enabled);
+
+            var mapping = enabled.asMap(m -> m.meta.name);
+            lastOrderedMods = resolveDependencies(enabled.map(m -> m.meta)).orderedKeys().map(mapping::get);
+        }
+        return lastOrderedMods;
     }
 
     public LoadedMod locateMod(String name){
@@ -1061,6 +1075,9 @@ public class Mods implements Loadable{
 
         /** @return whether this mod is supported by the game version */
         public boolean isSupported(){
+            //no unsupported mods on servers
+            if(headless) return true;
+
             if(isOutdated() || isBlacklisted()) return false;
 
             return Version.isAtLeast(meta.minGameVersion);

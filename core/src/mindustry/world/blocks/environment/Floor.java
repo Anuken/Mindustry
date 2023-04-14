@@ -161,6 +161,8 @@ public class Floor extends Block{
             return;
         }
 
+        if(Core.atlas.has(name + "-edge")) return;
+
         var image = Core.atlas.getPixmap(icons()[0]);
         var edge = Core.atlas.getPixmap(Core.atlas.find(name + "-edge-stencil", "edge-stencil"));
         Pixmap result = new Pixmap(edge.width, edge.height);

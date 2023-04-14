@@ -49,6 +49,11 @@ public class CommandAI extends AIController{
         }
     }
 
+    @Override
+    public boolean isLogicControllable(){
+        return !hasCommand();
+    }
+
     public boolean isAttacking(){
         return target != null && unit.within(target, unit.range() + 10f);
     }

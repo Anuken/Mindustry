@@ -48,7 +48,7 @@ import static mindustry.Vars.*;
 
 @EntityDef(value = {Buildingc.class}, isFinal = false, genio = false, serialize = false)
 @Component(base = true)
-abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, QuadTreeObject, Displayable, Senseable, Controllable, Sized{
+abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, QuadTreeObject, Displayable, Sized, Senseable, Controllable, Settable{
     //region vars and initialization
     static final float timeToSleep = 60f * 1, recentDamageTime = 60f * 5f;
     static final ObjectSet<Building> tmpTiles = new ObjectSet<>();
@@ -1433,7 +1433,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                             l.left();
                             for(Item item : content.items()){
                                 if(flowItems.hasFlowItem(item)){
-                                    l.image(item.uiIcon).padRight(3f);
+                                    l.image(item.uiIcon).scaling(Scaling.fit).padRight(3f);
                                     l.label(() -> flowItems.getFlowRate(item) < 0 ? "..." : Strings.fixed(flowItems.getFlowRate(item), 1) + ps).color(Color.lightGray);
                                     l.row();
                                 }
@@ -1463,7 +1463,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                             l.left();
                             for(var liquid : content.liquids()){
                                 if(liquids.hasFlowLiquid(liquid)){
-                                    l.image(liquid.uiIcon).padRight(3f);
+                                    l.image(liquid.uiIcon).scaling(Scaling.fit).size(32f).padRight(3f);
                                     l.label(() -> liquids.getFlowRate(liquid) < 0 ? "..." : Strings.fixed(liquids.getFlowRate(liquid), 1) + ps).color(Color.lightGray);
                                     l.row();
                                 }
@@ -1948,6 +1948,58 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if(type == LAccess.config && block.logicConfigurable && !(p1 instanceof LogicBuild)){
             //change config only if it's new
             configured(null, p1);
+        }
+    }
+
+    @Override
+    public void setProp(LAccess prop, double value){
+        switch(prop){
+            case health -> {
+                health = (float)Mathf.clamp(value, 0, maxHealth);
+                healthChanged();
+            }
+            case team -> {
+                Team team = Team.get((int)value);
+                if(this.team != team){
+                    changeTeam(team);
+                }
+            }
+            case totalPower -> {
+                if(power != null && block.consPower != null && block.consPower.buffered){
+                    power.status = Mathf.clamp((float)(value / block.consPower.capacity));
+                }
+            }
+        }
+    }
+
+    @Override
+    public void setProp(LAccess prop, Object value){
+        switch(prop){
+            case team -> {
+                if(value instanceof Team team && this.team != team){
+                    changeTeam(team);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void setProp(UnlockableContent content, double value){
+        if(content instanceof Item item && items != null){
+            int amount = (int)value;
+            if(items.get(item) != amount){
+                if(items.get(item) < amount){
+                    handleStack(item, acceptStack(item, amount - items.get(item), null), null);
+                }else if(amount >= 0){
+                    removeStack(item, items.get(item) - amount);
+                }
+            }
+        }else if(content instanceof Liquid liquid && liquids != null){
+            float amount = Mathf.clamp((float)value, 0f, block.liquidCapacity);
+            //decreasing amount is always allowed
+            if(amount < liquids.get(liquid) || (acceptLiquid(self(), liquid) && (liquids.current() == liquid || liquids.currentAmount() <= 0.1f))){
+                liquids.set(liquid, amount);
+            }
         }
     }
 

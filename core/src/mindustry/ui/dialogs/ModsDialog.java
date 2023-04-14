@@ -1,7 +1,6 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
-import arc.util.Http.*;
 import arc.files.*;
 import arc.func.*;
 import arc.graphics.*;
@@ -14,6 +13,7 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.Http.*;
 import arc.util.io.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Jval.*;
@@ -644,7 +644,11 @@ public class ModsDialog extends BaseDialog{
         Core.app.post(() -> modError(t));
     }
 
-    private void githubImportMod(String repo, boolean isJava, @Nullable String release){
+    public void githubImportMod(String repo, boolean isJava){
+        githubImportMod(repo, isJava, null);
+    }
+
+    public void githubImportMod(String repo, boolean isJava, @Nullable String release){
         modImportProgress = 0f;
         ui.loadfrag.show("@downloading");
         ui.loadfrag.setProgress(() -> modImportProgress);

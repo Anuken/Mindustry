@@ -55,6 +55,11 @@ public class AIController implements UnitController{
         return false;
     }
 
+    @Override
+    public boolean isLogicControllable(){
+        return true;
+    }
+
     public void stopShooting(){
         for(var mount : unit.mounts){
             //ignore mount controllable stats too, they should not shoot either

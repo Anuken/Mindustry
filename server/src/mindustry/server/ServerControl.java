@@ -42,6 +42,9 @@ public class ServerControl implements ApplicationListener{
     protected static DateTimeFormatter dateTime = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss"),
         autosaveDate = DateTimeFormatter.ofPattern("MM-dd-yyyy_HH-mm-ss");
 
+    /** Global instance of ServerControl, initialized when the server is created. Should never be null on a dedicated server. */
+    public static ServerControl instance;
+
     public final CommandHandler handler = new CommandHandler("");
     public final Fi logFolder = Core.settings.getDataDirectory().child("logs/");
 
@@ -68,6 +71,7 @@ public class ServerControl implements ApplicationListener{
 
     public ServerControl(String[] args){
         setup(args);
+        instance = this;
     }
 
     protected void setup(String[] args){
@@ -191,12 +195,7 @@ public class ServerControl implements ApplicationListener{
 
                 info("Selected next map to be @.", Strings.stripColors(map.name()));
 
-                play(true, () -> {
-                    world.loadMap(map, map.applyRules(lastMode));
-                    if(Config.autoPause.bool() && Groups.player.isEmpty()){
-                        Core.app.post(() -> state.set(State.paused));
-                    }
-                });
+                play(true, () -> world.loadMap(map, map.applyRules(lastMode)));
             }else{
                 netServer.kickAll(KickReason.gameover);
                 state.set(State.menu);
@@ -265,8 +264,17 @@ public class ServerControl implements ApplicationListener{
             Core.settings.forceSave();
         }, saveInterval, saveInterval);
 
-        if(!mods.list().isEmpty()){
-            info("@ mods loaded.", mods.list().size);
+        if(!mods.orderedMods().isEmpty()){
+            info("@ mods loaded.", mods.orderedMods().size);
+        }
+
+        int unsupported = mods.list().count(l -> !l.enabled());
+
+        if(unsupported > 0){
+            Log.err("There were errors loading @ mod(s):", unsupported);
+            for(LoadedMod mod : mods.list().select(l -> !l.enabled())){
+                Log.err("- @ &ly(" + mod.state + ")", mod.meta.name);
+            }
         }
 
         toggleSocket(Config.socketInput.bool());
@@ -459,7 +467,7 @@ public class ServerControl implements ApplicationListener{
             if(!mods.list().isEmpty()){
                 info("Mods:");
                 for(LoadedMod mod : mods.list()){
-                    info("  @ &fi@", mod.meta.displayName(), mod.meta.version);
+                    info("  @ &fi@ " + (mod.enabled() ? "" : " &lr(" + mod.state + ")"), mod.meta.displayName(), mod.meta.version);
                 }
             }else{
                 info("No mods found.");
