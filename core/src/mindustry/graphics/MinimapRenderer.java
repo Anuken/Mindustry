@@ -201,6 +201,34 @@ public class MinimapRenderer{
             }
         }
 
+        LongSeq indicators = control.indicators.list();
+        float fin = ((Time.globalTime / 30f) % 1f);
+        float rad = scale(fin * 5f + tilesize - 2f);
+        Lines.stroke(Scl.scl((1f - fin) * 4f + 0.5f));
+
+        for(int i = 0; i < indicators.size; i++){
+            long ind = indicators.items[i];
+            int
+                pos = Indicator.pos(ind),
+                ix = Point2.x(pos),
+                iy = Point2.y(pos);
+            float time = Indicator.time(ind), offset = 0f;
+
+            //fix multiblock offset - this is suboptimal
+            Building build = world.build(pos);
+            if(build != null){
+                offset = build.block.offset / tilesize;
+            }
+
+            Vec2 v = transform(Tmp.v1.set((ix + 0.5f + offset) * tilesize, (iy + 0.5f + offset) * tilesize));
+
+            Draw.color(Color.orange, Color.scarlet, Mathf.clamp(time / 50f));
+
+            Lines.square(v.x, v.y, rad);
+        }
+
+        Draw.reset();
+
         state.rules.objectives.eachRunning(obj -> {
             for(var marker : obj.markers){
                 marker.drawMinimap(this);

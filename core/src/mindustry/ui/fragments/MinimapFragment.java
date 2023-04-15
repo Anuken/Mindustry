@@ -86,15 +86,16 @@ public class MinimapFragment{
                     panx += deltaX / zoom;
                     pany += deltaY / zoom;
                 }else{
-                    Rect r = getRectBounds();
-                    Tmp.v1.set(x, y).sub(r.x, r.y).scl(1f / r.width, 1f / r.height).scl(world.unitWidth(), world.unitHeight());
-                    control.input.panCamera(Tmp.v1);
+                    panTo(x, y);
                 }
             }
 
             @Override
             public void touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
                 super.touchDown(event, x, y, pointer, button);
+                if(button == KeyCode.mouseRight){
+                    panTo(x, y);
+                }
             }
 
             @Override
@@ -123,6 +124,12 @@ public class MinimapFragment{
             t.row();
             t.button("@back", Icon.leftOpen, () -> shown = false).size(220f, 60f).pad(10f);
         });
+    }
+
+    public void panTo(float relativeX, float relativeY){
+        Rect r = getRectBounds();
+        Tmp.v1.set(relativeX, relativeY).sub(r.x, r.y).scl(1f / r.width, 1f / r.height).scl(world.unitWidth(), world.unitHeight());
+        control.input.panCamera(Tmp.v1);
     }
 
     public boolean shown(){
