@@ -134,7 +134,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         }else if(build != null){
             float result = 0f;
 
-            if(block.hasItems){
+            if(block.hasItems && build.items.total() > 0){
                 result += build.items.sum((item, amount) -> item.flammability * amount) / Math.max(block.itemCapacity, 1) * Mathf.clamp(block.itemCapacity / 2.4f, 1f, 3f);
             }
 

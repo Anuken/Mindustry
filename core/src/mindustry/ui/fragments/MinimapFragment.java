@@ -129,7 +129,7 @@ public class MinimapFragment{
     public void panTo(float relativeX, float relativeY){
         Rect r = getRectBounds();
         Tmp.v1.set(relativeX, relativeY).sub(r.x, r.y).scl(1f / r.width, 1f / r.height).scl(world.unitWidth(), world.unitHeight());
-        control.input.panCamera(Tmp.v1);
+        control.input.panCamera(Tmp.v1.clamp(-tilesize/2f, -tilesize/2f, world.unitWidth() + tilesize/2f, world.unitHeight() + tilesize/2f));
     }
 
     public boolean shown(){
