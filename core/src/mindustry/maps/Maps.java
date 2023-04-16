@@ -190,7 +190,7 @@ public class Maps{
                 maps.remove(other);
                 file = other.file;
             }else{
-                file = findFile();
+                file = findFile(name);
             }
 
             //create map, write it, etc etc etc
@@ -239,7 +239,7 @@ public class Maps{
 
     /** Import a map, then save it. This updates all values and stored data necessary. */
     public void importMap(Fi file) throws IOException{
-        Fi dest = findFile();
+        Fi dest = findFile(file.name());
         file.copyTo(dest);
 
         Map map = loadMap(dest, true);
@@ -429,13 +429,19 @@ public class Maps{
     }
 
     /** Find a new filename to put a map to. */
-    private Fi findFile(){
-        //find a map name that isn't used.
-        int i = maps.size;
-        while(customMapDirectory.child("map_" + i + "." + mapExtension).exists()){
-            i++;
+    private Fi findFile(String unsanitizedName){
+        String name = Strings.sanitizeFilename(unsanitizedName);
+        if(name.isEmpty()) name = "blank";
+
+        Fi result = null;
+        int index = 0;
+
+        while(result == null || result.exists()){
+            result = customMapDirectory.child(name + (index == 0 ? "" : "_" + index) + "." + mapExtension);
+            index ++;
         }
-        return customMapDirectory.child("map_" + i + "." + mapExtension);
+
+        return result;
     }
 
     private Map loadMap(Fi file, boolean custom) throws IOException{
