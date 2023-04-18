@@ -614,23 +614,23 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             Table starsTable = new Table(Styles.black);
             pane.setWidget(starsTable);
             pane.setScrollingDisabled(true, false);
-            int starCount = 0;
-            for (Planet star : content.planets()) {
-                if (star.solarSystem != star) continue;
+            int starCount=0;
+            for(Planet star : content.planets()){
+                if(star.solarSystem != star) continue;
                 boolean hasSelectablePlanets = false;
                 for (Planet planet : content.planets()) {
-                    if (planet.solarSystem == star && selectable(planet)) {
+                    if(planet.solarSystem == star && selectable(planet)){
                         hasSelectablePlanets = true;
                         break;
                     }
                 }
-                if (!hasSelectablePlanets) continue;
+                if(!hasSelectablePlanets) continue;
                 starCount++;
-                if (starCount > 1) starsTable.add(new Label(star.localizedName)).padLeft(10f).padBottom(10f).padTop(10f).left().width(190f).row();
+                if(starCount > 1) starsTable.add(star.localizedName).padLeft(10f).padBottom(10f).padTop(10f).left().width(190f).row();
                 Table planetTable = new Table();
                 starsTable.add(planetTable).left().row();
-                for (Planet planet : content.planets()) {
-                    if (planet.solarSystem == star && selectable(planet)) {
+                for(Planet planet : content.planets()){
+                    if(planet.solarSystem == star && selectable(planet)){
                         Button planetButton = planetTable.button(planet.localizedName, Icon.icons.get(planet.icon + "Small", Icon.icons.get(planet.icon, Icon.commandRallySmall)), Styles.flatTogglet, () -> {
                             selected = null;
                             launchSector = null;
