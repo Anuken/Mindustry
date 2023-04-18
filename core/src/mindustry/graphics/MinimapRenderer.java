@@ -99,15 +99,15 @@ public class MinimapRenderer{
         region = new TextureRegion(texture);
     }
 
-    public void drawEntities(float x, float y, float w, float h, float scaling, boolean withLabels){
+    public void drawEntities(float x, float y, float w, float h, float scaling, boolean fullView){
         lastX = x;
         lastY = y;
         lastW = w;
         lastH = h;
         lastScl = scaling;
-        worldSpace = withLabels;
+        worldSpace = fullView;
 
-        if(!withLabels){
+        if(!fullView){
             updateUnitArray();
         }else{
             units.clear();
@@ -125,8 +125,8 @@ public class MinimapRenderer{
         for(Unit unit : units){
             if(unit.inFogTo(player.team()) || !unit.type.drawMinimap) continue;
 
-            float rx = !withLabels ? (unit.x - rect.x) / rect.width * w : unit.x / (world.width() * tilesize) * w;
-            float ry = !withLabels ? (unit.y - rect.y) / rect.width * h : unit.y / (world.height() * tilesize) * h;
+            float rx = !fullView ? (unit.x - rect.x) / rect.width * w : unit.x / (world.width() * tilesize) * w;
+            float ry = !fullView ? (unit.y - rect.y) / rect.width * h : unit.y / (world.height() * tilesize) * h;
 
             Draw.mixcol(unit.team.color, 1f);
             float scale = Scl.scl(1f) / 2f * scaling * 32f;
@@ -135,7 +135,7 @@ public class MinimapRenderer{
             Draw.reset();
         }
 
-        if(withLabels && net.active()){
+        if(fullView && net.active()){
             for(Player player : Groups.player){
                 if(!player.dead()){
                     float rx = player.x / (world.width() * tilesize) * w;
@@ -149,7 +149,7 @@ public class MinimapRenderer{
         Draw.reset();
 
         if(state.rules.fog){
-            if(withLabels){
+            if(fullView){
                 float z = zoom;
                 //max zoom out fixes everything, somehow?
                 setZoom(99999f);
@@ -186,12 +186,53 @@ public class MinimapRenderer{
         }
 
         //TODO might be useful in the standard minimap too
-        if(withLabels){
+        if(fullView){
             drawSpawns(x, y, w, h, scaling);
+
+            if(!mobile){
+                //draw bounds for camera - not drawn on mobile because you can't shift it by tapping anyway
+                Rect r = Core.camera.bounds(Tmp.r1);
+                Vec2 bot = transform(Tmp.v1.set(r.x, r.y));
+                Vec2 top = transform(Tmp.v2.set(r.x + r.width, r.y + r.height));
+                Lines.stroke(Scl.scl(3f));
+                Draw.color(Pal.accent);
+                Lines.rect(bot.x,bot.y, top.x - bot.x, top.y - bot.y);
+                Draw.reset();
+            }
         }
 
+        LongSeq indicators = control.indicators.list();
+        float fin = ((Time.globalTime / 30f) % 1f);
+        float rad = scale(fin * 5f + tilesize - 2f);
+        Lines.stroke(Scl.scl((1f - fin) * 4f + 0.5f));
+
+        for(int i = 0; i < indicators.size; i++){
+            long ind = indicators.items[i];
+            int
+                pos = Indicator.pos(ind),
+                ix = Point2.x(pos),
+                iy = Point2.y(pos);
+            float time = Indicator.time(ind), offset = 0f;
+
+            //fix multiblock offset - this is suboptimal
+            Building build = world.build(pos);
+            if(build != null){
+                offset = build.block.offset / tilesize;
+            }
+
+            Vec2 v = transform(Tmp.v1.set((ix + 0.5f + offset) * tilesize, (iy + 0.5f + offset) * tilesize));
+
+            Draw.color(Color.orange, Color.scarlet, Mathf.clamp(time / 50f));
+
+            Lines.square(v.x, v.y, rad);
+        }
+
+        Draw.reset();
+
         state.rules.objectives.eachRunning(obj -> {
-            for(var marker : obj.markers) marker.drawMinimap(this);
+            for(var marker : obj.markers){
+                marker.drawMinimap(this);
+            }
         });
     }
 

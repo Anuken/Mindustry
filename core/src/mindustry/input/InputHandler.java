@@ -1482,6 +1482,13 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         return World.toTile(vec.y);
     }
 
+    /** Forces the camera to a position and enables panning on desktop. */
+    public void panCamera(Vec2 position){
+        if(!locked()){
+            camera.position.set(position);
+        }
+    }
+
     public boolean selectedBlock(){
         return isPlacing();
     }

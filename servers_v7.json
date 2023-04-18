@@ -65,7 +65,7 @@
   },
   {
     "name": "Chaotic Neutral",
-    "address": ["c-n.ddns.net:1111", "c-n.ddns.net:2222", "c-n.ddns.net:3333", "c-n.ddns.net:4444", "c-n.ddns.net:5555", "c-n.ddns.net:6666", "c-n.ddns.net:7777", "c-n.ddns.net:8888"]
+    "address": ["c-n.ddns.net:1111", "c-n.ddns.net:2222", "c-n.ddns.net:3333", "c-n.ddns.net:4444", "c-n.ddns.net:5555", "c-n.ddns.net:6666", "c-n.ddns.net:7777", "c-n.ddns.net:9999", "c-n.ddns.net:1000"]
   },
   {
     "name": "io",
@@ -97,7 +97,7 @@
   },
   {
     "name": "Fish",
-    "address": ["170.187.144.235", "162.248.100.98", "162.248.100.133"]
+    "address": ["170.187.144.235", "162.248.100.98", "162.248.100.133", "162.248.102.204"]
   },
   {
     "name": "OMNIDUSTRY",
@@ -166,10 +166,14 @@
   },
   {
     "name": "Botipont",
-    "address": ["217.144.54.208:6567", "217.144.54.208:6568", "217.144.54.208:6569"]
+    "address": ["213.181.206.126:6567", "213.181.206.126:6568", "213.181.206.126:6569"]
   },
   {
     "name": "Exploding Cowards",
     "address": ["193.31.31.165:25778", "193.31.31.165:25790"]
+  },
+  {
+    "name": "Realm of Serene Lime",
+    "address": ["43.248.185.167:8517","n2.akiracloud.net:10686"]
   }
 ]

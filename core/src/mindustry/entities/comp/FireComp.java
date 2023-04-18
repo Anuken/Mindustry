@@ -30,9 +30,8 @@ abstract class FireComp implements Timedc, Posc, Syncc, Drawc{
     @Import float time, lifetime, x, y;
 
     Tile tile;
-    private transient Block block;
     private transient float
-        baseFlammability = -1, puddleFlammability, damageTimer = Mathf.random(40f),
+        puddleFlammability, damageTimer = Mathf.random(40f),
         spreadTimer = Mathf.random(spreadDelay), fireballTimer = Mathf.random(fireballDelay),
         warmup = 0f,
         animation = Mathf.random(frames - 1);
@@ -64,12 +63,7 @@ abstract class FireComp implements Timedc, Posc, Syncc, Drawc{
         Building entity = tile.build;
         boolean damage = entity != null;
 
-        if(baseFlammability < 0 || block != tile.block()){
-            baseFlammability = tile.getFlammability();
-            block = tile.block();
-        }
-
-        float flammability = baseFlammability + puddleFlammability;
+        float flammability = tile.getFlammability() + puddleFlammability;
 
         if(!damage && flammability <= 0){
             time += Time.delta * 8;

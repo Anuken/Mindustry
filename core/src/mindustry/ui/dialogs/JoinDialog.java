@@ -224,13 +224,13 @@ public class JoinDialog extends BaseDialog{
 
         server.content.background(Tex.whitePane).setColor(Pal.gray);
 
-        server.content.label(() -> Core.bundle.get("server.refreshing") + Strings.animated(Time.time, 4, 11, ".")).padBottom(4);
+        server.content.label(() -> Core.bundle.get("server.refreshing") + Strings.animated(Time.time, 4, 11, ".")).grow().center().labelAlign(Align.center).padBottom(4);
 
         net.pingHost(server.ip, server.port, host -> setupServer(server, host), e -> {
             server.content.clear();
 
             server.content.background(Tex.whitePane).setColor(Pal.gray);
-            server.content.add("@host.invalid");
+            server.content.add("@host.invalid").grow().center().labelAlign(Align.center);
         });
     }
 

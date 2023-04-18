@@ -85,6 +85,10 @@ public class BlockRenderer{
                     updateFloors.add(new UpdateRenderState(tile, tile.floor()));
                 }
 
+                if(tile.overlay().updateRender(tile)){
+                    updateFloors.add(new UpdateRenderState(tile, tile.overlay()));
+                }
+
                 if(tile.build != null && (tile.team() == player.team() || !state.rules.fog || (tile.build.visibleFlags & (1L << player.team().id)) != 0)){
                     tile.build.wasVisible = true;
                 }
