@@ -772,8 +772,10 @@ public class DesktopInput extends InputHandler{
 
     @Override
     public void panCamera(Vec2 position){
-        panning = true;
-        camera.position.set(position);
+        if(!locked()){
+            panning = true;
+            camera.position.set(position);
+        }
     }
 
     protected void updateMovement(Unit unit){
