@@ -468,10 +468,10 @@ public class Turret extends ReloadTurret{
                 target = Units.bestEnemy(team, x, y, range, e -> !e.dead() && !e.isGrounded() && unitFilter.get(e), unitSort);
             }else{
                 target = Units.bestTarget(team, x, y, range, e -> !e.dead() && unitFilter.get(e) && (e.isGrounded() || targetAir) && (!e.isGrounded() || targetGround), b -> targetGround && buildingFilter.get(b), unitSort);
+            }
 
-                if(target == null && canHeal()){
-                    target = Units.findAllyTile(team, x, y, range, b -> b.damaged() && b != this);
-                }
+            if(target == null && canHeal()){
+                target = Units.findAllyTile(team, x, y, range, b -> b.damaged() && b != this);
             }
         }
 
