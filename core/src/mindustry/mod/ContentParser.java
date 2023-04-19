@@ -607,10 +607,9 @@ public class ContentParser{
                 value.remove("planet");
 
                 if(value.has("rules")){
-                    JsonValue r = value.get("rules");
+                    JsonValue r = value.remove("rules");
+                    if(!r.isObject()) throw new RuntimeException("Rules must be an object!");
                     out.rules = rules -> readFields(rules, r); //TODO is there a way to make it only need to read fields once?
-
-                    value.remove("rules");
                 }
 
                 readFields(out, value);
