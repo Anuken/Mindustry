@@ -29,6 +29,7 @@ import mindustry.entities.effect.*;
 import mindustry.entities.part.*;
 import mindustry.entities.part.DrawPart.*;
 import mindustry.entities.pattern.*;
+import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.game.Objectives.*;
 import mindustry.gen.*;
@@ -512,13 +513,30 @@ public class ContentParser{
                 }
 
                 if(value.has("controller") || value.has("aiController")){
-                    unit.aiController = supply(resolve(value.getString("controller", value.getString("aiController", "")), FlyingAI.class));
+                    JsonValue con = value.has("controller") ? value.get("controller") : value.get("aicontroller");
+                    if(con.isObject()){
+                        AIController ai = parser.readValue(AIController.class, con);
+                        unit.aiController = () -> ai;
+                    }else{
+                        unit.aiController = supply(resolve(con.isString() ? con.asString() : "", FlyingAI.class));
+                    }
                     value.remove("controller");
                 }
 
                 if(value.has("defaultController")){
-                    var sup = supply(resolve(value.getString("defaultController"), FlyingAI.class));
-                    unit.controller = u -> sup.get();
+                    JsonValue con = value.get("defaultController");
+                    if(con.isObject()){
+                        var sup = supply(resolve(con.getString("type"), FlyingAI.class));
+                        con.remove("type");
+                        unit.controller = u -> {
+                            AIController ai = sup.get();
+                            readFields(ai, con); //TODO is there a way to make it only need to read fields once?
+                            return ai;
+                        };
+                    }else{
+                        var sup = supply(resolve(con.asString(), FlyingAI.class));
+                        unit.controller = u -> sup.get();
+                    }
                     value.remove("defaultController");
                 }
 
