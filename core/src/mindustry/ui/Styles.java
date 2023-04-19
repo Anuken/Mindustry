@@ -83,6 +83,8 @@ public class Styles{
     cleari,
     /** Toggleable variant of cleari. */
     clearTogglei,
+    /** Toggleable variant of cleari. */
+    clearToggleClearDisi,
     /** clearNone, but toggleable. */
     clearNoneTogglei;
 
@@ -312,6 +314,12 @@ public class Styles{
             down = flatDown;
             checked = flatDown;
             up = black6;
+            over = flatOver;
+        }};
+        clearToggleClearDisi = new ImageButtonStyle(){{
+            down = flatDown;
+            checked = flatDown;
+            up = clear;
             over = flatOver;
         }};
         clearNoneTogglei = new ImageButtonStyle(){{

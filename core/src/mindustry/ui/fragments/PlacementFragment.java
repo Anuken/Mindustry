@@ -36,7 +36,7 @@ public class PlacementFragment{
 
     Seq<Block> returnArray = new Seq<>(), returnArray2 = new Seq<>();
     Seq<Category> returnCatArray = new Seq<>();
-    boolean[] categoryEmpty = new boolean[Category.all.length];
+    ObjectMap<Category, Boolean> categoryEmpty = new ObjectMap<>();
     ObjectMap<Category,Block> selectedBlocks = new ObjectMap<>();
     ObjectFloatMap<Category> scrollPositions = new ObjectFloatMap<>();
     @Nullable Block menuHoverBlock;
@@ -45,9 +45,10 @@ public class PlacementFragment{
     @Nullable Object lastDisplayState;
     @Nullable Team lastTeam;
     boolean wasHovered;
-    Table blockTable, toggler, topTable, blockCatTable, commandTable;
+    Table blockTable, categoryTable, toggler, topTable, blockCatTable, commandTable;
     Stack mainStack;
-    ScrollPane blockPane;
+    ScrollPane blockPane, categoryPane;
+    TextField blockSearch, categorySearch;
     Runnable rebuildCommand;
     boolean blockSelectEnd, wasCommandMode;
     int blockSelectSeq;
@@ -182,8 +183,8 @@ public class PlacementFragment{
                     }
                 }else if(blockSelectEnd || Time.timeSinceMillis(blockSelectSeqMillis) > 400){ //1st number of combo, select category
                     //select only visible categories
-                    if(!getUnlockedByCategory(Category.all[i]).isEmpty()){
-                        currentCategory = Category.all[i];
+                    if(!getUnlockedByCategory(Category.all.get(i)).isEmpty()){
+                        currentCategory = Category.all.get(i);
                         if(input.block != null){
                             input.block = getSelectedBlock(currentCategory);
                         }
@@ -212,7 +213,7 @@ public class PlacementFragment{
         if(Core.input.keyTap(Binding.category_prev)){
             do{
                 currentCategory = currentCategory.prev();
-            }while(categoryEmpty[currentCategory.ordinal()]);
+            }while(categoryEmpty.get(currentCategory, false));
             input.block = getSelectedBlock(currentCategory);
             return true;
         }
@@ -220,7 +221,7 @@ public class PlacementFragment{
         if(Core.input.keyTap(Binding.category_next)){
             do{
                 currentCategory = currentCategory.next();
-            }while(categoryEmpty[currentCategory.ordinal()]);
+            }while(categoryEmpty.get(currentCategory, false));
             input.block = getSelectedBlock(currentCategory);
             return true;
         }
@@ -244,69 +245,6 @@ public class PlacementFragment{
             full.bottom().right().visible(() -> ui.hudfrag.shown);
 
             full.table(frame -> {
-
-                //rebuilds the category table with the correct recipes
-                Runnable rebuildCategory = () -> {
-                    blockTable.clear();
-                    blockTable.top().margin(5);
-
-                    int index = 0;
-
-                    ButtonGroup<ImageButton> group = new ButtonGroup<>();
-                    group.setMinCheckCount(0);
-
-                    for(Block block : getUnlockedByCategory(currentCategory)){
-                        if(!unlocked(block)) continue;
-                        if(index++ % rowWidth == 0){
-                            blockTable.row();
-                        }
-
-                        ImageButton button = blockTable.button(new TextureRegionDrawable(block.uiIcon), Styles.selecti, () -> {
-                            if(unlocked(block)){
-                                if((Core.input.keyDown(KeyCode.shiftLeft) || Core.input.keyDown(KeyCode.controlLeft)) && Fonts.getUnicode(block.name) != 0){
-                                    Core.app.setClipboardText((char)Fonts.getUnicode(block.name) + "");
-                                    ui.showInfoFade("@copied");
-                                }else{
-                                    control.input.block = control.input.block == block ? null : block;
-                                    selectedBlocks.put(currentCategory, control.input.block);
-                                }
-                            }
-                        }).size(46f).group(group).name("block-" + block.name).get();
-                        button.resizeImage(iconMed);
-
-                        button.update(() -> { //color unplacable things gray
-                            Building core = player.core();
-                            Color color = (state.rules.infiniteResources || (core != null && (core.items.has(block.requirements, state.rules.buildCostMultiplier) || state.rules.infiniteResources))) && player.isBuilder() ? Color.white : Color.gray;
-                            button.forEach(elem -> elem.setColor(color));
-                            button.setChecked(control.input.block == block);
-
-                            if(!block.isPlaceable()){
-                                button.forEach(elem -> elem.setColor(Color.darkGray));
-                            }
-                        });
-
-                        button.hovered(() -> menuHoverBlock = block);
-                        button.exited(() -> {
-                            if(menuHoverBlock == block){
-                                menuHoverBlock = null;
-                            }
-                        });
-                    }
-                    //add missing elements to even out table size
-                    if(index < 4){
-                        for(int i = 0; i < 4-index; i++){
-                            blockTable.add().size(46f);
-                        }
-                    }
-                    blockTable.act(0f);
-                    blockPane.setScrollYForce(scrollPositions.get(currentCategory, 0));
-                    Core.app.post(() -> {
-                        blockPane.setScrollYForce(scrollPositions.get(currentCategory, 0));
-                        blockPane.act(0f);
-                        blockPane.layout();
-                    });
-                };
-
                 //top table with hover info
                 frame.table(Tex.buttonEdge2,top -> {
                     topTable = top;
@@ -545,80 +483,161 @@ public class PlacementFragment{
                     }).grow();
                 }
 
-                //blockCatTable: all blocks | all categories
-                {
-                    blockCatTable.table(Tex.pane2, blocksSelect -> {
-                        blocksSelect.margin(4).marginTop(0);
-                        blockPane = blocksSelect.pane(blocks -> blockTable = blocks).height(194f).update(pane -> {
-                            if(pane.hasScroll()){
-                                Element result = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
-                                if(result == null || !result.isDescendantOf(pane)){
-                                    Core.scene.setScrollFocus(null);
-                                }
-                            }
-                        }).grow().get();
-                        blockPane.setStyle(Styles.smallPane);
-                        blocksSelect.row();
-                        blocksSelect.table(control.input::buildPlacementUI).name("inputTable").growX();
-                    }).fillY().bottom().touchable(Touchable.enabled);
-                    blockCatTable.table(categories -> {
-                        categories.bottom();
-                        categories.add(new Image(Styles.black6){
-                            @Override
-                            public void draw(){
-                                if(height <= Scl.scl(3f)) return;
-                                getDrawable().draw(x, y, width, height - Scl.scl(3f));
-                            }
-                        }).colspan(2).growX().growY().padTop(-3f).row();
-                        categories.defaults().size(50f);
+                //rebuilds the blocks table with the correct recipes
+                Runnable rebuildBlocks = () -> {
+                    blockTable.clear();
+                    blockTable.top();
 
-                        ButtonGroup<ImageButton> group = new ButtonGroup<>();
+                    int index = 0;
 
-                        //update category empty values
-                        for(Category cat : Category.all){
-                            Seq<Block> blocks = getUnlockedByCategory(cat);
-                            categoryEmpty[cat.ordinal()] = blocks.isEmpty();
+                    ButtonGroup<ImageButton> group = new ButtonGroup<>();
+                    group.setMinCheckCount(0);
+
+                    String searchText = blockSearch != null ? blockSearch.getText().toLowerCase() : "";
+
+                    for(Block block : getUnlockedByCategory(currentCategory)){
+                        if(!block.localizedName.toLowerCase().contains(searchText)) continue;
+                        if(!unlocked(block)) continue;
+                        if(index++ % rowWidth == 0){
+                            blockTable.row();
                         }
 
-                        boolean needsAssign = categoryEmpty[currentCategory.ordinal()];
-
-                        int f = 0;
-                        for(Category cat : getCategories()){
-                            if(f++ % 2 == 0) categories.row();
-
-                            if(categoryEmpty[cat.ordinal()]){
-                                categories.image(Styles.black6);
-                                continue;
-                            }
-
-                            if(needsAssign){
-                                currentCategory = cat;
-                                needsAssign = false;
-                            }
-
-                            categories.button(ui.getIcon(cat.name()), Styles.clearTogglei, () -> {
-                                currentCategory = cat;
-                                if(control.input.block != null){
-                                    control.input.block = getSelectedBlock(currentCategory);
+                        ImageButton button = blockTable.button(new TextureRegionDrawable(block.uiIcon), Styles.selecti, () -> {
+                            if(unlocked(block)){
+                                if((Core.input.keyDown(KeyCode.shiftLeft) || Core.input.keyDown(KeyCode.controlLeft)) && Fonts.getUnicode(block.name) != 0){
+                                    Core.app.setClipboardText((char)Fonts.getUnicode(block.name) + "");
+                                    ui.showInfoFade("@copied");
+                                }else{
+                                    control.input.block = control.input.block == block ? null : block;
+                                    selectedBlocks.put(currentCategory, control.input.block);
                                 }
-                                rebuildCategory.run();
-                            }).group(group).update(i -> i.setChecked(currentCategory == cat)).name("category-" + cat.name());
-                        }
-                    }).fillY().bottom().touchable(Touchable.enabled);
-                }
+                            }
+                        }).size(46f).group(group).name("block-" + block.name).get();
+                        button.resizeImage(iconMed);
 
+                        button.update(() -> { //color unplacable things gray
+                            Building core = player.core();
+                            Color color = (state.rules.infiniteResources || (core != null && (core.items.has(block.requirements, state.rules.buildCostMultiplier) || state.rules.infiniteResources))) && player.isBuilder() ? Color.white : Color.gray;
+                            button.forEach(elem -> elem.setColor(color));
+                            button.setChecked(control.input.block == block);
+
+                            if(!block.isPlaceable()){
+                                button.forEach(elem -> elem.setColor(Color.darkGray));
+                            }
+                        });
+
+                        button.hovered(() -> menuHoverBlock = block);
+                        button.exited(() -> {
+                            if(menuHoverBlock == block){
+                                menuHoverBlock = null;
+                            }
+                        });
+                    }
+                    //add missing elements to even out table size
+                    if(index < 4){
+                        for(int i = 0; i < 4-index; i++){
+                            blockTable.add().size(46f);
+                        }
+                    }
+                    blockTable.act(0f);
+                    blockPane.setScrollYForce(scrollPositions.get(currentCategory, 0));
+                    Core.app.post(() -> {
+                        blockPane.setScrollYForce(scrollPositions.get(currentCategory, 0));
+                        blockPane.act(0f);
+                        blockPane.layout();
+                    });
+                };
+                Runnable rebuildCategories = () -> {
+                    categoryTable.clear();
+                    categoryTable.setFillParent(true);
+                    categoryTable.setBackground(Styles.black6);
+                    categoryTable.defaults().size(51f);
+                    categoryTable.top().left().margin(5);
+
+                    ButtonGroup<ImageButton> group = new ButtonGroup<>();
+
+                    //update category empty values
+                    for(Category cat : Category.all){
+                        Seq<Block> blocks = getUnlockedByCategory(cat);
+                        categoryEmpty.put(cat, blocks.isEmpty());
+                    }
+
+                    int categoriesRows = 4;
+
+                    String searchText = categorySearch != null ? categorySearch.getText().toLowerCase() : "";
+
+                    int f = 0;
+                    for(Category cat : getCategories()){
+                        if (!cat.name.toLowerCase().contains(searchText)) continue;
+
+                        if(f++ % categoriesRows == 0) categoryTable.row();
+
+                        categoryTable.button(cat.icon == null ? ui.getIcon(cat.name) : cat.icon, Styles.clearToggleClearDisi, () -> {
+                            currentCategory = cat;
+                            if(control.input.block != null){
+                                control.input.block = getSelectedBlock(currentCategory);
+                            }
+                            rebuildBlocks.run();
+                        }).group(group).update(i -> i.setChecked(currentCategory == cat)).name("category-" + cat.name);
+                    }
+
+                    Core.app.post(() -> {
+                        categoryPane.setScrollYForce(scrollPositions.get(currentCategory, 0));
+                        categoryPane.act(0f);
+                        categoryPane.layout();
+                    });
+                };
+
+                // blockCatTable:
+                //  search blocks  | search categories
+                //-----------------#------------------
+                // category blocks |  all categories
+                blockCatTable.table(Tex.pane2, t -> blockSearch = t.field(null, text -> rebuildBlocks.run()).fillX().get()).fillX();
+                blockSearch.setMessageText("@players.search");
+                blockCatTable.table(Tex.paneBottom, t -> categorySearch = t.field(null, text -> rebuildCategories.run()).fillX().get()).fillX();
+                categorySearch.setMessageText("@players.search");
+                blockCatTable.row();
+                blockCatTable.table(Tex.pane2, blocksSelect -> {
+                    blocksSelect.margin(4).marginTop(0);
+                    blockPane = blocksSelect.pane(blocks -> blockTable = blocks).height(194f).update(pane -> {
+                        if(pane.hasScroll()){
+                            Element result = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
+                            if(result == null || !result.isDescendantOf(pane)){
+                                Core.scene.setScrollFocus(null);
+                            }
+                        }
+                    }).grow().top().get();
+                    blockPane.setStyle(Styles.smallPane);
+                    blocksSelect.row();
+                    blocksSelect.table(control.input::buildPlacementUI).name("inputTable").growX();
+                }).fill().bottom().touchable(Touchable.enabled);
+                blockCatTable.table(Tex.clear, categoriesSelect -> {
+                    categoryPane = categoriesSelect.pane(cats -> categoryTable = cats).update(pane -> {
+                        if(pane.hasScroll()){
+                            Element result = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
+                            if(result == null || !result.isDescendantOf(pane)){
+                                Core.scene.setScrollFocus(null);
+                            }
+                        }
+                    }).grow().top().get();
+                    categoryPane.setStyle(Styles.smallPane);
+                }).fill().bottom().touchable(Touchable.enabled);
+
+                categoryPane.setStyle(Styles.smallPane);
                 mainStack.add(blockCatTable);
 
-                rebuildCategory.run();
+                rebuildBlocks.run();
+                rebuildCategories.run();
+
                 frame.update(() -> {
-                    if(gridUpdate(control.input)) rebuildCategory.run();
+                    if(gridUpdate(control.input)) rebuildBlocks.run();
                 });
             });
         });
     }
 
     Seq<Category> getCategories(){
-        return returnCatArray.clear().addAll(Category.all).sort((c1, c2) -> Boolean.compare(categoryEmpty[c1.ordinal()], categoryEmpty[c2.ordinal()]));
+        return returnCatArray.clear().addAll(Category.all).sort((c1, c2) -> Boolean.compare(categoryEmpty.get(c1, false), categoryEmpty.get(c2, false)));
     }
 
     Seq<Block> getByCategory(Category cat){
