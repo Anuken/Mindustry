@@ -122,7 +122,7 @@
   },
   {
     "name": "EasyPlay.su",
-    "address": ["easyplay.su"]
+    "address": ["easyplay.su", "s.easyplay.su:6577", "s.easyplay.su:6686", "s.easyplay.su:6567"]
   },
   {
     "name": "Sectorized",
