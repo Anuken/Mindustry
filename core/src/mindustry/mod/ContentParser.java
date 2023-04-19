@@ -606,6 +606,13 @@ public class ContentParser{
                 value.remove("sector");
                 value.remove("planet");
 
+                if(value.has("rules")){
+                    JsonValue r = value.get("rules");
+                    out.rules = rules -> readFields(rules, r); //TODO is there a way to make it only need to read fields once?
+
+                    value.remove("rules");
+                }
+
                 readFields(out, value);
             });
             return out;
