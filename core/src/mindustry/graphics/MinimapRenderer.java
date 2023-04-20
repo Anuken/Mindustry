@@ -222,7 +222,7 @@ public class MinimapRenderer{
 
             Vec2 v = transform(Tmp.v1.set((ix + 0.5f + offset) * tilesize, (iy + 0.5f + offset) * tilesize));
 
-            Draw.color(Color.orange, Color.scarlet, Mathf.clamp(time / 50f));
+            Draw.color(Color.orange, Color.scarlet, Mathf.clamp(time / 70f));
 
             Lines.square(v.x, v.y, rad);
         }
