@@ -223,10 +223,10 @@ public class Damage{
      * Only enemies of the specified team are damaged.
      */
     public static void collideLine(Bullet hitter, Team team, Effect effect, float x, float y, float angle, float length, boolean large, boolean laser, int pierceCap){
-        if(laser){
-            length = findLaserLength(hitter, length);
-        }else if(pierceCap > 0){
+        if(pierceCap > 0){
             length = findPierceLength(hitter, pierceCap, length);
+        }else if(laser){
+            length = findLaserLength(hitter, length);
         }
 
         collidedBlocks.clear();
