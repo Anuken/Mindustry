@@ -137,6 +137,16 @@ public class Damage{
         return found ? tmpBuilding : null;
     }
 
+    public static float findLength(Bullet b, float length, boolean laser, int pierceCap){
+        if(pierceCap > 0){
+            length = findPierceLength(b, pierceCap, length);
+        }else if(laser){
+            length = findLaserLength(b, length);
+        }
+
+        return length;
+    }
+
     public static float findLaserLength(Bullet b, float length){
         vec.trnsExact(b.rotation(), length);
 
@@ -223,11 +233,7 @@ public class Damage{
      * Only enemies of the specified team are damaged.
      */
     public static void collideLine(Bullet hitter, Team team, Effect effect, float x, float y, float angle, float length, boolean large, boolean laser, int pierceCap){
-        if(pierceCap > 0){
-            length = findPierceLength(hitter, pierceCap, length);
-        }else if(laser){
-            length = findLaserLength(hitter, length);
-        }
+        length = findLength(hitter, length, laser, pierceCap);
 
         collidedBlocks.clear();
         vec.trnsExact(angle, length);
