@@ -82,9 +82,7 @@ public class Universe{
             }
         }
 
-        if(state.hasSector() && state.getSector().planet.updateLighting){
-            boolean disable = state.getSector().preset != null && state.getSector().preset.noLighting;
-            if(disable) return;
+        if(state.hasSector() && state.getSector().planet.updateLighting && !(state.getSector().preset != null && state.getSector().preset.noLighting)){
             var planet = state.getSector().planet;
             //update sector light
             float light = state.getSector().getLight();
