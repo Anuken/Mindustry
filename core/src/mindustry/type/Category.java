@@ -3,6 +3,12 @@ package mindustry.type;
 import arc.scene.style.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.core.GameState;
+import mindustry.graphics.Layer;
+
+import java.awt.*;
+
+import static mindustry.Vars.ui;
 
 public class Category{
     public static Seq<Category> all = new Seq<>();
@@ -32,7 +38,7 @@ public class Category{
     public int id;
     public String name;
 
-    /** for modded categories? **/
+    /** For modded categories, if null uses {@link mindustry.core.UI#getIcon(java.lang.String)}.**/
     public TextureRegionDrawable icon;
 
     /** @param icon category ui icon <br> **/
@@ -54,5 +60,17 @@ public class Category{
 
     public Category next(){
         return all.get((ordinal() + 1) % all.size);
+    }
+
+    public Category[] values() {
+        return all.toArray();
+    }
+
+    public Category valueOf(String v) {
+        return all.find(category -> category.name.equals(v));
+    }
+
+    public TextureRegionDrawable getIcon() {
+        return icon == null ? ui.getIcon(name) : icon;
     }
 }

@@ -3,6 +3,7 @@ package mindustry.ui.fragments;
 import arc.*;
 import arc.graphics.*;
 import arc.input.*;
+import arc.math.Mathf;
 import arc.math.geom.*;
 import arc.scene.*;
 import arc.scene.event.*;
@@ -52,23 +53,29 @@ public class PlacementFragment{
     Runnable rebuildCommand;
     boolean blockSelectEnd, wasCommandMode;
     int blockSelectSeq;
+    int currentCategorySection = 0;
+    int categorySectionSize = 10;
     long blockSelectSeqMillis;
     Binding[] blockSelect = {
-        Binding.block_select_01,
-        Binding.block_select_02,
-        Binding.block_select_03,
-        Binding.block_select_04,
-        Binding.block_select_05,
-        Binding.block_select_06,
-        Binding.block_select_07,
-        Binding.block_select_08,
-        Binding.block_select_09,
-        Binding.block_select_10,
-        Binding.block_select_left,
-        Binding.block_select_right,
-        Binding.block_select_up,
-        Binding.block_select_down
+            Binding.block_select_01,
+            Binding.block_select_02,
+            Binding.block_select_03,
+            Binding.block_select_04,
+            Binding.block_select_05,
+            Binding.block_select_06,
+            Binding.block_select_07,
+            Binding.block_select_08,
+            Binding.block_select_09,
+            Binding.block_select_10,
+            Binding.block_select_left,
+            Binding.block_select_right,
+            Binding.block_select_up,
+            Binding.block_select_down,
+            Binding.block_section_prev,
+            Binding.block_section_next,
     };
+
+    boolean shouldAddSearchFields = false;
 
     public PlacementFragment(){
         Events.on(WorldLoadEvent.class, event -> {
@@ -158,12 +165,12 @@ public class PlacementFragment{
 
         for(int i = 0; i < blockSelect.length; i++){
             if(Core.input.keyTap(blockSelect[i])){
-                if(i > 9){ //select block directionally
+                if(i >= 10 && i <= 13) { //select block directionally
                     Seq<Block> blocks = getUnlockedByCategory(currentCategory);
                     Block currentBlock = getSelectedBlock(currentCategory);
-                    for(int j = 0; j < blocks.size; j++){
-                        if(blocks.get(j) == currentBlock){
-                            switch(i){
+                    for (int j = 0; j < blocks.size; j++) {
+                        if (blocks.get(j) == currentBlock) {
+                            switch (i) {
                                 //left
                                 case 10 -> j = (j - 1 + blocks.size) % blocks.size;
                                 //right
@@ -181,10 +188,21 @@ public class PlacementFragment{
                             break;
                         }
                     }
+                }else if(i == 14) { // prev category section
+                    if(!(currentCategorySection < 1)) {
+                        currentCategorySection--;
+                        currentCategory = getCategoriesInCurrentSection().first();
+                    }
+                }else if(i == 15) { // next category section
+                    if(!(currentCategorySection == Mathf.floor(((float) Category.all.size) / categorySectionSize))) {
+                        currentCategorySection++;
+                        currentCategory = getCategoriesInCurrentSection().first();
+                    }
                 }else if(blockSelectEnd || Time.timeSinceMillis(blockSelectSeqMillis) > 400){ //1st number of combo, select category
                     //select only visible categories
-                    if(!getUnlockedByCategory(Category.all.get(i)).isEmpty()){
-                        currentCategory = Category.all.get(i);
+                    Category selectedCategory = getCategoriesInCurrentSection().get(i);
+                    if(!getUnlockedByCategory(selectedCategory).isEmpty()){
+                        currentCategory = getCategoriesInCurrentSection().get(i);
                         if(input.block != null){
                             input.block = getSelectedBlock(currentCategory);
                         }
@@ -276,7 +294,7 @@ public class PlacementFragment{
                                     Seq<Block> blocks = getByCategory(currentCategory);
                                     for(int i = 0; i < blocks.size; i++){
                                         if(blocks.get(i) == displayBlock && (i + 1) / 10 - 1 < blockSelect.length){
-                                            keyCombo = Core.bundle.format("placement.blockselectkeys", Core.keybinds.get(blockSelect[currentCategory.ordinal()]).key.toString())
+                                            keyCombo = Core.bundle.format("placement.blockselectkeys", Core.keybinds.get(blockSelect[currentCategory.ordinal()-currentCategorySection*categorySectionSize]).key.toString())
                                                 + (i < 10 ? "" : Core.keybinds.get(blockSelect[(i + 1) / 10 - 1]).key.toString() + ",")
                                                 + Core.keybinds.get(blockSelect[i % 10]).key.toString() + "]";
                                             break;
@@ -541,16 +559,16 @@ public class PlacementFragment{
                     }
                     blockTable.act(0f);
                     blockPane.setScrollYForce(scrollPositions.get(currentCategory, 0));
-                    Core.app.post(() -> {
+                    /*Core.app.post(() -> {
                         blockPane.setScrollYForce(scrollPositions.get(currentCategory, 0));
                         blockPane.act(0f);
                         blockPane.layout();
-                    });
+                    });*/
                 };
                 Runnable rebuildCategories = () -> {
                     categoryTable.clear();
-                    categoryTable.setFillParent(true);
-                    categoryTable.setBackground(Styles.black6);
+                    //categoryTable.setFillParent(true);
+                    categoryTable.setBackground(Tex.clear);
                     categoryTable.defaults().size(51f);
                     categoryTable.top().left().margin(5);
 
@@ -562,17 +580,17 @@ public class PlacementFragment{
                         categoryEmpty.put(cat, blocks.isEmpty());
                     }
 
-                    int categoriesRows = 4;
+                    int categoriesRows = 2;
 
                     String searchText = categorySearch != null ? categorySearch.getText().toLowerCase() : "";
 
                     int f = 0;
-                    for(Category cat : getCategories()){
+                    for(Category cat : getCategoriesInCurrentSection()){
                         if (!cat.name.toLowerCase().contains(searchText)) continue;
 
                         if(f++ % categoriesRows == 0) categoryTable.row();
 
-                        categoryTable.button(cat.icon == null ? ui.getIcon(cat.name) : cat.icon, Styles.clearToggleClearDisi, () -> {
+                        categoryTable.button(cat.getIcon(), Styles.clearToggleClearDisi, () -> {
                             currentCategory = cat;
                             if(control.input.block != null){
                                 control.input.block = getSelectedBlock(currentCategory);
@@ -589,14 +607,16 @@ public class PlacementFragment{
                 };
 
                 // blockCatTable:
-                //  search blocks  | search categories
+                //  search blocks  | search categories } if needed
                 //-----------------#------------------
                 // category blocks |  all categories
-                blockCatTable.table(Tex.pane2, t -> blockSearch = t.field(null, text -> rebuildBlocks.run()).fillX().get()).fillX();
-                blockSearch.setMessageText("@players.search");
-                blockCatTable.table(Tex.paneBottom, t -> categorySearch = t.field(null, text -> rebuildCategories.run()).fillX().get()).fillX();
-                categorySearch.setMessageText("@players.search");
-                blockCatTable.row();
+                if (shouldAddSearchFields) {
+                    blockCatTable.table(Tex.pane2, t -> blockSearch = t.field(null, text -> rebuildBlocks.run()).fillX().get()).fillX();
+                    blockSearch.setMessageText("@players.search");
+                    blockCatTable.table(Tex.paneBottom, t -> categorySearch = t.field(null, text -> rebuildCategories.run()).fillX().get()).fillX();
+                    categorySearch.setMessageText("@players.search");
+                    blockCatTable.row();
+                }
                 blockCatTable.table(Tex.pane2, blocksSelect -> {
                     blocksSelect.margin(4).marginTop(0);
                     blockPane = blocksSelect.pane(blocks -> blockTable = blocks).height(194f).update(pane -> {
@@ -611,7 +631,7 @@ public class PlacementFragment{
                     blocksSelect.row();
                     blocksSelect.table(control.input::buildPlacementUI).name("inputTable").growX();
                 }).fill().bottom().touchable(Touchable.enabled);
-                blockCatTable.table(Tex.clear, categoriesSelect -> {
+                blockCatTable.table(Styles.black6, categoriesSelect -> {
                     categoryPane = categoriesSelect.pane(cats -> categoryTable = cats).update(pane -> {
                         if(pane.hasScroll()){
                             Element result = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
@@ -619,9 +639,9 @@ public class PlacementFragment{
                                 Core.scene.setScrollFocus(null);
                             }
                         }
-                    }).grow().top().get();
+                    }).fill().top().height(244f).get();
                     categoryPane.setStyle(Styles.smallPane);
-                }).fill().bottom().touchable(Touchable.enabled);
+                }).top().fill().touchable(Touchable.enabled);
 
                 categoryPane.setStyle(Styles.smallPane);
                 mainStack.add(blockCatTable);
@@ -630,7 +650,10 @@ public class PlacementFragment{
                 rebuildCategories.run();
 
                 frame.update(() -> {
-                    if(gridUpdate(control.input)) rebuildBlocks.run();
+                    if(gridUpdate(control.input)) {
+                        rebuildBlocks.run();
+                        rebuildCategories.run();
+                    };
                 });
             });
         });
@@ -638,6 +661,10 @@ public class PlacementFragment{
 
     Seq<Category> getCategories(){
         return returnCatArray.clear().addAll(Category.all).sort((c1, c2) -> Boolean.compare(categoryEmpty.get(c1, false), categoryEmpty.get(c2, false)));
+    }
+
+    Seq<Category> getCategoriesInCurrentSection(){
+        return getCategories().filter(category -> category.ordinal() >= currentCategorySection * categorySectionSize && category.ordinal() < (currentCategorySection+1) * categorySectionSize);
     }
 
     Seq<Block> getByCategory(Category cat){
