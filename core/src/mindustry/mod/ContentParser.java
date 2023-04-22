@@ -526,13 +526,8 @@ public class ContentParser{
                 if(value.has("defaultController")){
                     JsonValue con = value.get("defaultController");
                     if(con.isObject()){
-                        var sup = supply(resolve(con.getString("type"), FlyingAI.class));
-                        con.remove("type");
-                        unit.controller = u -> {
-                            AIController ai = sup.get();
-                            readFields(ai, con); //TODO is there a way to make it only need to read fields once?
-                            return ai;
-                        };
+                        AIController ai = parser.readValue(AIController.class, con);
+                        unit.controller = u -> ai.copy();
                     }else{
                         var sup = supply(resolve(con.asString(), FlyingAI.class));
                         unit.controller = u -> sup.get();

@@ -15,7 +15,7 @@ import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
-public class AIController implements UnitController{
+public class AIController implements UnitController, Cloneable{
     protected static final Vec2 vec = new Vec2();
     protected static final float rotateBackTimer = 60f * 5f;
     protected static final int timerTarget = 0, timerTarget2 = 1, timerTarget3 = 2, timerTarget4 = 3;
@@ -349,5 +349,13 @@ public class AIController implements UnitController{
     @Override
     public Unit unit(){
         return unit;
+    }
+
+    public AIController copy(){
+        try{
+            return (AIController)clone();
+        }catch(CloneNotSupportedException why){
+            throw new RuntimeException("god dangit", why);
+        }
     }
 }
