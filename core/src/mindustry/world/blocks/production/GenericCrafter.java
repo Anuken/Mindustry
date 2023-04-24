@@ -118,6 +118,8 @@ public class GenericCrafter extends Block{
 
         if(outputItems != null) hasItems = true;
         if(outputLiquids != null) hasLiquids = true;
+        
+        if(!rotate) lockRotation = true;
 
         super.init();
     }
