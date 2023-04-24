@@ -10,6 +10,12 @@ public class ShootHelix extends ShootPattern{
         shots = 2;
     }
 
+    public ShootHelix(float scl, float mag){
+        this();
+        this.scl = scl;
+        this.mag = mag;
+        offset = scl * Mathf.halfPi;
+    }
     @Override
     public void shoot(int totalShots, BulletHandler handler, @Nullable Runnable barrelIncrementer){
         for(int i = 0; i < shots; i++){
