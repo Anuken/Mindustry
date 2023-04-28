@@ -38,9 +38,6 @@ public class MinimapFragment{
             h = Core.graphics.getHeight();
             float size = baseSize * zoom * world.width();
 
-            Draw.color(Color.black);
-            Fill.crect(0, 0, w, h);
-
             if(renderer.minimap.getTexture() != null){
                 Draw.color();
                 float ratio = (float)renderer.minimap.getTexture().height / renderer.minimap.getTexture().width;
