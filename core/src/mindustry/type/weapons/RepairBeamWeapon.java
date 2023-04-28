@@ -60,6 +60,7 @@ public class RepairBeamWeapon extends Weapon{
         mountType = HealBeamMount::new;
         recoil = 0f;
         noAttack = true;
+        useAttackRange = false;
     }
 
     @Override
