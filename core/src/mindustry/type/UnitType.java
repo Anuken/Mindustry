@@ -715,6 +715,8 @@ public class UnitType extends UnlockableContent{
         if(range < 0){
             range = Float.MAX_VALUE;
             for(Weapon weapon : weapons){
+                if(!weapon.useAttackRange) continue;
+
                 range = Math.min(range, weapon.range() - margin);
                 maxRange = Math.max(maxRange, weapon.range() - margin);
             }
@@ -724,6 +726,8 @@ public class UnitType extends UnlockableContent{
             maxRange = Math.max(0f, range);
 
             for(Weapon weapon : weapons){
+                if(!weapon.useAttackRange) continue;
+
                 maxRange = Math.max(maxRange, weapon.range() - margin);
             }
         }
