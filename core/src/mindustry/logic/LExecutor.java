@@ -394,7 +394,7 @@ public class LExecutor{
                     case idle -> {
                         ai.control = type;
                     }
-                    case move, stop, approach -> {
+                    case move, stop, approach, pathfind -> {
                         ai.control = type;
                         ai.moveX = x1;
                         ai.moveY = y1;

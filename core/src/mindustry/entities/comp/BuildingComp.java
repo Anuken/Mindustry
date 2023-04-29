@@ -1758,8 +1758,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             return;
         }
 
-        //TODO why check for old state?
-        boolean prevValid = efficiency > 0, update = shouldConsume() && productionValid();
+        boolean update = shouldConsume() && productionValid();
 
         float minEfficiency = 1f;
 
@@ -1791,7 +1790,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         updateEfficiencyMultiplier();
 
         //second pass: update every consumer based on efficiency
-        if(update && prevValid && efficiency > 0){
+        if(update && efficiency > 0){
             for(var cons : block.updateConsumers){
                 cons.update(self());
             }
