@@ -36,7 +36,7 @@ public class PlacementFragment{
 
     Seq<Block> returnArray = new Seq<>(), returnArray2 = new Seq<>();
     Seq<Category> returnCatArray = new Seq<>();
-    boolean[] categoryEmpty = new boolean[Category.all.length];
+    boolean[] categoryEmpty = new boolean[Category.all.size];
     ObjectMap<Category,Block> selectedBlocks = new ObjectMap<>();
     ObjectFloatMap<Category> scrollPositions = new ObjectFloatMap<>();
     @Nullable Block menuHoverBlock;
@@ -182,8 +182,8 @@ public class PlacementFragment{
                     }
                 }else if(blockSelectEnd || Time.timeSinceMillis(blockSelectSeqMillis) > 400){ //1st number of combo, select category
                     //select only visible categories
-                    if(!getUnlockedByCategory(Category.all[i]).isEmpty()){
-                        currentCategory = Category.all[i];
+                    if(!getUnlockedByCategory(Category.all.get(i)).isEmpty()){
+                        currentCategory = Category.all.get(i);
                         if(input.block != null){
                             input.block = getSelectedBlock(currentCategory);
                         }
@@ -212,7 +212,7 @@ public class PlacementFragment{
         if(Core.input.keyTap(Binding.category_prev)){
             do{
                 currentCategory = currentCategory.prev();
-            }while(categoryEmpty[currentCategory.ordinal()]);
+            }while(categoryEmpty[currentCategory.id]);
             input.block = getSelectedBlock(currentCategory);
             return true;
         }
@@ -220,7 +220,7 @@ public class PlacementFragment{
         if(Core.input.keyTap(Binding.category_next)){
             do{
                 currentCategory = currentCategory.next();
-            }while(categoryEmpty[currentCategory.ordinal()]);
+            }while(categoryEmpty[currentCategory.id]);
             input.block = getSelectedBlock(currentCategory);
             return true;
         }
@@ -338,7 +338,7 @@ public class PlacementFragment{
                                     Seq<Block> blocks = getByCategory(currentCategory);
                                     for(int i = 0; i < blocks.size; i++){
                                         if(blocks.get(i) == displayBlock && (i + 1) / 10 - 1 < blockSelect.length){
-                                            keyCombo = Core.bundle.format("placement.blockselectkeys", Core.keybinds.get(blockSelect[currentCategory.ordinal()]).key.toString())
+                                            keyCombo = Core.bundle.format("placement.blockselectkeys", Core.keybinds.get(blockSelect[currentCategory.id]).key.toString())
                                                 + (i < 10 ? "" : Core.keybinds.get(blockSelect[(i + 1) / 10 - 1]).key.toString() + ",")
                                                 + Core.keybinds.get(blockSelect[i % 10]).key.toString() + "]";
                                             break;
@@ -577,16 +577,16 @@ public class PlacementFragment{
                         //update category empty values
                         for(Category cat : Category.all){
                             Seq<Block> blocks = getUnlockedByCategory(cat);
-                            categoryEmpty[cat.ordinal()] = blocks.isEmpty();
+                            categoryEmpty[cat.id] = blocks.isEmpty();
                         }
 
-                        boolean needsAssign = categoryEmpty[currentCategory.ordinal()];
+                        boolean needsAssign = categoryEmpty[currentCategory.id];
 
                         int f = 0;
                         for(Category cat : getCategories()){
                             if(f++ % 2 == 0) categories.row();
 
-                            if(categoryEmpty[cat.ordinal()]){
+                            if(categoryEmpty[cat.id]){
                                 categories.image(Styles.black6);
                                 continue;
                             }
@@ -596,13 +596,13 @@ public class PlacementFragment{
                                 needsAssign = false;
                             }
 
-                            categories.button(ui.getIcon(cat.name()), Styles.clearTogglei, () -> {
+                            categories.button(ui.getIcon(cat.name), Styles.clearTogglei, () -> {
                                 currentCategory = cat;
                                 if(control.input.block != null){
                                     control.input.block = getSelectedBlock(currentCategory);
                                 }
                                 rebuildCategory.run();
-                            }).group(group).update(i -> i.setChecked(currentCategory == cat)).name("category-" + cat.name());
+                            }).group(group).update(i -> i.setChecked(currentCategory == cat)).name("category-" + cat.name);
                         }
                     }).fillY().bottom().touchable(Touchable.enabled);
                 }
@@ -618,15 +618,15 @@ public class PlacementFragment{
     }
 
     Seq<Category> getCategories(){
-        return returnCatArray.clear().addAll(Category.all).sort((c1, c2) -> Boolean.compare(categoryEmpty[c1.ordinal()], categoryEmpty[c2.ordinal()]));
+        return returnCatArray.clear().addAll(Category.all).sort((c1, c2) -> Boolean.compare(categoryEmpty[c1.id], categoryEmpty[c2.id]));
     }
 
     Seq<Block> getByCategory(Category cat){
-        return returnArray.selectFrom(content.blocks(), block -> block.category == cat && block.isVisible() && block.environmentBuildable());
+        return returnArray.selectFrom(cat.blocks, block -> block.isVisible() && block.environmentBuildable());
     }
 
     Seq<Block> getUnlockedByCategory(Category cat){
-        return returnArray2.selectFrom(content.blocks(), block -> block.category == cat && block.isVisible() && unlocked(block)).sort((b1, b2) -> Boolean.compare(!b1.isPlaceable(), !b2.isPlaceable()));
+        return returnArray2.selectFrom(cat.blocks, block -> block.isVisible() && unlocked(block)).sort((b1, b2) -> Boolean.compare(!b1.isPlaceable(), !b2.isPlaceable()));
     }
 
     Block getSelectedBlock(Category cat){

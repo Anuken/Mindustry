@@ -304,6 +304,8 @@ public class Block extends UnlockableContent implements Senseable{
     public ItemStack[] requirements = {};
     /** Category in place menu. */
     public Category category = Category.distribution;
+    /** Arbitrary index for sorting in the place menu, defaults to NaN. If NaN, the block will assign one automatically on init() */
+    public float uiPosition = Float.NaN;
     /** Time to build this block in ticks; do not modify directly! */
     public float buildCost = 20f;
     /** Whether this block is visible and can currently be built. */
@@ -1206,6 +1208,11 @@ public class Block extends UnlockableContent implements Senseable{
         if(buildVisibility == BuildVisibility.sandboxOnly){
             hideDetails = false;
         }
+
+        if(Float.isNaN(uiPosition)){
+            uiPosition = category.blocks.size;
+        }
+        category.add(this);
     }
 
     @Override
