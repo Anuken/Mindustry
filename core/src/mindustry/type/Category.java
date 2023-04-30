@@ -3,10 +3,6 @@ package mindustry.type;
 import arc.scene.style.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.core.GameState;
-import mindustry.graphics.Layer;
-
-import java.awt.*;
 
 import static mindustry.Vars.ui;
 
