@@ -29,8 +29,8 @@ public class PowerNode extends PowerBlock{
     /** The maximum range of all power nodes on the map */
     protected static float maxRange;
 
-    public @Load("laser") TextureRegion laser;
-    public @Load("laser-end") TextureRegion laserEnd;
+    public @Load(value = "@-laser", fallback = "laser") TextureRegion laser;
+    public @Load(value = "@-laser-end", fallback = "laser-end") TextureRegion laserEnd;
     public float laserRange = 6;
     public int maxNodes = 3;
     public boolean autolink = true, drawRange = true;
@@ -210,7 +210,7 @@ public class PowerNode extends PowerBlock{
     protected void getPotentialLinks(Tile tile, Team team, Cons<Building> others){
         if(!autolink) return;
 
-        Boolf<Building> valid = other -> other != null && other.tile() != tile && other.power != null &&
+        Boolf<Building> valid = other -> other != null && other.tile() != tile && other.block.connectedPower && other.power != null &&
             (other.block.outputsPower || other.block.consumesPower || other.block instanceof PowerNode) &&
             overlaps(tile.x * tilesize + offset, tile.y * tilesize + offset, other.tile(), laserRange * tilesize) && other.team == team &&
             !graphs.contains(other.power.graph) &&
@@ -342,7 +342,7 @@ public class PowerNode extends PowerBlock{
     }
 
     public boolean linkValid(Building tile, Building link, boolean checkMaxNodes){
-        if(tile == link || link == null || !link.block.hasPower || tile.team != link.team) return false;
+        if(tile == link || link == null || !link.block.hasPower || !link.block.connectedPower || tile.team != link.team) return false;
 
         if(overlaps(tile, link, laserRange * tilesize) || (link.block instanceof PowerNode node && overlaps(link, tile, node.laserRange * tilesize))){
             if(checkMaxNodes && link.block instanceof PowerNode node){

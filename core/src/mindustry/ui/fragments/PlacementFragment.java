@@ -370,10 +370,10 @@ public class PlacementFragment{
                                         line.add(stack.item.localizedName).maxWidth(140f).fillX().color(Color.lightGray).padLeft(2).left().get().setEllipsis(true);
                                         line.labelWrap(() -> {
                                             Building core = player.core();
-                                            if(core == null || state.rules.infiniteResources) return "*/*";
+                                            int stackamount = Math.round(stack.amount * state.rules.buildCostMultiplier);
+                                            if(core == null || state.rules.infiniteResources) return "*/" + stackamount;
 
                                             int amount = core.items.get(stack.item);
-                                            int stackamount = Math.round(stack.amount * state.rules.buildCostMultiplier);
                                             String color = (amount < stackamount / 2f ? "[scarlet]" : amount < stackamount ? "[accent]" : "[white]");
 
                                             return color + UI.formatAmount(amount) + "[white]/" + stackamount;
@@ -421,10 +421,19 @@ public class PlacementFragment{
 
                 frame.add(mainStack).colspan(3).fill();
 
+                frame.row();
+
+                //for better inset visuals at the bottom
+                frame.rect((x, y, w, h) -> {
+                    if(Core.scene.marginBottom > 0){
+                        Tex.paneLeft.draw(x, 0, w, y);
+                    }
+                }).colspan(3).fillX().row();
+
                 //commandTable: commanded units
                 {
                     commandTable.touchable = Touchable.enabled;
-                    commandTable.add("[accent]Command Mode").fill().center().labelAlign(Align.center).row();
+                    commandTable.add(Core.bundle.get("commandmode.name")).fill().center().labelAlign(Align.center).row();
                     commandTable.image().color(Pal.accent).growX().pad(20f).padTop(0f).padBottom(4f).row();
                     commandTable.table(u -> {
                         u.left();
@@ -453,9 +462,15 @@ public class PlacementFragment{
                                             var listener = new ClickListener();
 
                                             //left click -> select
-                                            b.clicked(KeyCode.mouseLeft, () -> control.input.selectedUnits.removeAll(unit -> unit.type != type));
+                                            b.clicked(KeyCode.mouseLeft, () -> {
+                                                control.input.selectedUnits.removeAll(unit -> unit.type != type);
+                                                Events.fire(Trigger.unitCommandChange);
+                                            });
                                             //right click -> remove
-                                            b.clicked(KeyCode.mouseRight, () -> control.input.selectedUnits.removeAll(unit -> unit.type == type));
+                                            b.clicked(KeyCode.mouseRight, () -> {
+                                                control.input.selectedUnits.removeAll(unit -> unit.type == type);
+                                                Events.fire(Trigger.unitCommandChange);
+                                            });
 
                                             b.addListener(listener);
                                             b.addListener(new HandCursorListener());
@@ -494,7 +509,7 @@ public class PlacementFragment{
                                     }).fillX().padTop(4f).left();
                                 }
                             }else{
-                                u.add("[no units]").color(Color.lightGray).growX().center().labelAlign(Align.center).pad(6);
+                                u.add(Core.bundle.get("commandmode.nounits")).color(Color.lightGray).growX().center().labelAlign(Align.center).pad(6);
                             }
                         };
 
@@ -505,7 +520,7 @@ public class PlacementFragment{
                             //find the command that all units have, or null if they do not share one
                             for(var unit : control.input.selectedUnits){
                                 if(unit.isCommandable()){
-                                    var nextCommand = unit.command().currentCommand();
+                                    var nextCommand = unit.command().command;
 
                                     if(hadCommand){
                                         if(shareCommand != nextCommand){

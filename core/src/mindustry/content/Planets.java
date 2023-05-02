@@ -71,16 +71,17 @@ public class Planets{
             //TODO SHOULD there be lighting?
             updateLighting = false;
 
+            defaultAttributes.set(Attribute.heat, 0.8f);
+
             ruleSetter = r -> {
                 r.waveTeam = Team.malis;
-                r.placeRangeCheck = false; //TODO true or false?
-                r.attributes.set(Attribute.heat, 0.8f);
+                r.placeRangeCheck = false;
                 r.showSpawns = true;
                 r.fog = true;
                 r.staticFog = true;
                 r.lighting = false;
                 r.coreDestroyClear = true;
-                r.onlyDepositCore = true; //TODO not sure
+                r.onlyDepositCore = true;
             };
 
             unlockedOnLand.add(Blocks.coreBastion);
@@ -139,7 +140,6 @@ public class Planets{
             ruleSetter = r -> {
                 r.waveTeam = Team.crux;
                 r.placeRangeCheck = false;
-                r.attributes.clear();
                 r.showSpawns = false;
             };
             iconColor = Color.valueOf("7d4dff");

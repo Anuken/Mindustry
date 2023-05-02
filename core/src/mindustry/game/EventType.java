@@ -16,6 +16,7 @@ public class EventType{
     //events that occur very often
     public enum Trigger{
         shock,
+        openConsole,
         blastFreeze,
         impactPower,
         blastGenerator,
@@ -161,6 +162,16 @@ public class EventType{
         }
     }
 
+    public static class ClientServerConnectEvent{
+        public final String ip;
+        public final int port;
+
+        public ClientServerConnectEvent(String ip, int port){
+            this.ip = ip;
+            this.port = port;
+        }
+    }
+
     /** Consider using Menus.registerMenu instead. */
     public static class MenuOptionChooseEvent{
         public final Player player;
@@ -168,8 +179,21 @@ public class EventType{
 
         public MenuOptionChooseEvent(Player player, int menuId, int option){
             this.player = player;
-            this.option = option;
             this.menuId = menuId;
+            this.option = option;
+        }
+    }
+
+    /** Consider using Menus.registerTextInput instead. */
+    public static class TextInputEvent{
+        public final Player player;
+        public final int textInputId;
+        public final @Nullable String text;
+
+        public TextInputEvent(Player player, int textInputId, String text){
+            this.player = player;
+            this.textInputId = textInputId;
+            this.text = text;
         }
     }
 

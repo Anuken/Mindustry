@@ -24,7 +24,7 @@ public class PayloadConveyor extends Block{
 
     public PayloadConveyor(String name){
         super(name);
-        group = BlockGroup.transportation;
+        group = BlockGroup.payloads;
         size = 3;
         rotate = true;
         update = true;
@@ -33,6 +33,7 @@ public class PayloadConveyor extends Block{
         priority = TargetPriority.transport;
         envEnabled |= Env.space | Env.underwater;
         sync = true;
+        underBullets = true;
     }
 
     @Override
@@ -155,7 +156,7 @@ public class PayloadConveyor extends Block{
                         next.updateTile();
 
                         //TODO add self to queue of next conveyor, then check if this conveyor was selected next frame - selection happens deterministically
-                        if(next.acceptPayload(this, item)){
+                        if(next != null && next.acceptPayload(this, item)){
                             //move forward.
                             next.handlePayload(this, item);
                             item = null;

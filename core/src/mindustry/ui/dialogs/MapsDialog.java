@@ -227,13 +227,11 @@ public class MapsDialog extends BaseDialog{
                 t.button("@custom", Styles.flatTogglet, () -> {
                     showCustom = !showCustom;
                     Core.settings.put("editorshowcustommaps", showCustom);
-                    Core.settings.forceSave();
                     rebuildMaps();
                 }).size(150f, 60f).checked(showCustom);
                 t.button("@builtin", Styles.flatTogglet, () -> {
                     showBuiltIn = !showBuiltIn;
                     Core.settings.put("editorshowbuiltinmaps", showBuiltIn);
-                    Core.settings.forceSave();
                     rebuildMaps();
                 }).size(150f, 60f).checked(showBuiltIn);
             }).padBottom(10f);
@@ -244,13 +242,11 @@ public class MapsDialog extends BaseDialog{
                 t.button("@editor.filters.author", Styles.flatTogglet, () -> {
                     searchAuthor = !searchAuthor;
                     Core.settings.put("editorsearchauthor", searchAuthor);
-                    Core.settings.forceSave();
                     rebuildMaps();
                 }).size(150f, 60f).checked(searchAuthor);
                 t.button("@editor.filters.description", Styles.flatTogglet, () -> {
                     searchDescription = !searchDescription;
                     Core.settings.put("editorsearchdescription", searchDescription);
-                    Core.settings.forceSave();
                     rebuildMaps();
                 }).size(150f, 60f).checked(searchDescription);
             });

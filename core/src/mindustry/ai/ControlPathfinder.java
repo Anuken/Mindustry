@@ -8,8 +8,8 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.core.*;
-import mindustry.game.*;
 import mindustry.game.EventType.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
@@ -273,7 +273,7 @@ public class ControlPathfinder{
                     req.raycastTimer = 0;
                 }
 
-                if(req.rayPathIndex < len){
+                if(req.rayPathIndex < len && req.rayPathIndex >= 0){
                     Tile tile = tile(items[req.rayPathIndex]);
                     out.set(tile);
 
@@ -303,7 +303,7 @@ public class ControlPathfinder{
         if(net.client()) return;
 
         //TODO currently capped at 6 threads, might be a good idea to make it more?
-        threads = new PathfindThread[Mathf.clamp(Runtime.getRuntime().availableProcessors() - 2, 1, 6)];
+        threads = new PathfindThread[Mathf.clamp(Runtime.getRuntime().availableProcessors() - 1, 1, 6)];
         for(int i = 0; i < threads.length; i ++){
             threads[i] = new PathfindThread("ControlPathfindThread-" + i);
             threads[i].setPriority(Thread.MIN_PRIORITY);

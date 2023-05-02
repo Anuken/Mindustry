@@ -231,10 +231,13 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             if(unit != null && unit.team == player.team() && unit.controller() instanceof CommandAI ai){
 
                 //implicitly order it to move
-                ai.command(UnitCommand.moveCommand);
+                if(ai.command == null || ai.command.switchToMove){
+                    ai.command(UnitCommand.moveCommand);
+                }
 
                 if(teamTarget != null && teamTarget.team() != player.team()){
                     ai.commandTarget(teamTarget);
+
                 }else if(posTarget != null){
                     ai.commandPosition(posTarget);
                 }
@@ -269,10 +272,12 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         for(int id : unitIds){
             Unit unit = Groups.unit.getByID(id);
             if(unit != null && unit.team == player.team() && unit.controller() instanceof CommandAI ai){
+                boolean reset = command.resetTarget || ai.currentCommand().resetTarget;
                 ai.command(command);
-                //reset targeting
-                ai.targetPos = null;
-                ai.attackTarget = null;
+                if(reset){
+                    ai.targetPos = null;
+                    ai.attackTarget = null;
+                }
                 unit.lastCommanded = player.coloredName();
             }
         }
@@ -282,16 +287,16 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public static void commandBuilding(Player player, int[] buildings, Vec2 target){
         if(player == null  || target == null) return;
 
+        if(net.server() && !netServer.admins.allowAction(player, ActionType.commandBuilding, event -> {
+            event.buildingPositions = buildings;
+        })){
+            throw new ValidateException(player, "Player cannot command buildings.");
+        }
+
         for(int pos : buildings){
             var build = world.build(pos);
 
             if(build == null || build.team() != player.team() || !build.block.commandable) continue;
-
-            if(net.server() && !netServer.admins.allowAction(player, ActionType.commandBuilding, event -> {
-                event.tile = build.tile;
-            })){
-                throw new ValidateException(player, "Player cannot command building.");
-            }
 
             build.onCommand(target);
             if(!state.isPaused() && player == Vars.player){
@@ -415,7 +420,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(targets = Loc.both, called = Loc.server)
     public static void requestDropPayload(Player player, float x, float y){
-        if(player == null || net.client()) return;
+        if(player == null || net.client() || player.dead()) return;
 
         Payloadc pay = (Payloadc)player.unit();
 
@@ -868,7 +873,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             for(Unit unit : selectedUnits){
                 CommandAI ai = unit.command();
                 //draw target line
-                if(ai.targetPos != null && ai.command == UnitCommand.moveCommand){
+                if(ai.targetPos != null && ai.currentCommand().drawTarget){
                     Position lineDest = ai.attackTarget != null ? ai.attackTarget : ai.targetPos;
                     Drawf.limitLine(unit, lineDest, unit.hitSize / 2f, 3.5f);
 
@@ -879,8 +884,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
                 Drawf.square(unit.x, unit.y, unit.hitSize / 1.4f + 1f);
 
-                //TODO when to draw, when to not?
-                if(ai.attackTarget != null && ai.command == UnitCommand.moveCommand){
+                if(ai.attackTarget != null && ai.currentCommand().drawTarget){
                     Drawf.target(ai.attackTarget.getX(), ai.attackTarget.getY(), 6f, Pal.remove);
                 }
             }
@@ -1476,6 +1480,13 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             vec.sub(block.offset, block.offset);
         }
         return World.toTile(vec.y);
+    }
+
+    /** Forces the camera to a position and enables panning on desktop. */
+    public void panCamera(Vec2 position){
+        if(!locked()){
+            camera.position.set(position);
+        }
     }
 
     public boolean selectedBlock(){

@@ -196,6 +196,7 @@ public class CustomRulesDialog extends BaseDialog{
         check("@rules.unitcapvariable", b -> rules.unitCapVariable = b, () -> rules.unitCapVariable);
         numberi("@rules.unitcap", f -> rules.unitCap = f, () -> rules.unitCap, -999, 999);
         number("@rules.unitdamagemultiplier", f -> rules.unitDamageMultiplier = f, () -> rules.unitDamageMultiplier);
+        number("@rules.unitcrashdamagemultiplier", f -> rules.unitCrashDamageMultiplier = f, () -> rules.unitCrashDamageMultiplier);
         number("@rules.unitbuildspeedmultiplier", f -> rules.unitBuildSpeedMultiplier = f, () -> rules.unitBuildSpeedMultiplier, 0f, 50f);
         number("@rules.unitcostmultiplier", f -> rules.unitCostMultiplier = f, () -> rules.unitCostMultiplier);
 
@@ -250,6 +251,8 @@ public class CustomRulesDialog extends BaseDialog{
             for(Planet planet : new Planet[]{Planets.serpulo, Planets.erekir}){
                 t.button(planet.localizedName, style, () -> {
                     rules.env = planet.defaultEnv;
+                    rules.attributes.clear();
+                    rules.attributes.add(planet.defaultAttributes);
                     rules.hiddenBuildItems.clear();
                     rules.hiddenBuildItems.addAll(planet.hiddenItems);
                 }).group(group).checked(b -> rules.env == planet.defaultEnv);
@@ -258,7 +261,7 @@ public class CustomRulesDialog extends BaseDialog{
             t.button("@rules.anyenv", style, () -> {
                 if(!rules.infiniteResources){
                     //unlocalized for now
-                    ui.showInfo("[accent]'Any' environment, or 'mixed tech', is no longer allowed outside of sandbox.[]\n\nReasoning: Serpulo and Erekir tech were never meant to be used in the same map. They are not compatible or remotely balanced.\nI have received far too many complains in this regard.");
+                    ui.showInfo("The 'any' environment can only be used in sandbox mode.");
                 }else{
                     rules.env = Vars.defaultEnv;
                     rules.hiddenBuildItems.clear();
@@ -296,6 +299,7 @@ public class CustomRulesDialog extends BaseDialog{
                 number("@rules.buildspeedmultiplier", f -> teams.buildSpeedMultiplier = f, () -> teams.buildSpeedMultiplier, 0.001f, 50f);
 
                 number("@rules.unitdamagemultiplier", f -> teams.unitDamageMultiplier = f, () -> teams.unitDamageMultiplier);
+                number("@rules.unitcrashdamagemultiplier", f -> teams.unitCrashDamageMultiplier = f, () -> teams.unitCrashDamageMultiplier);
                 number("@rules.unitbuildspeedmultiplier", f -> teams.unitBuildSpeedMultiplier = f, () -> teams.unitBuildSpeedMultiplier, 0.001f, 50f);
                 number("@rules.unitcostmultiplier", f -> teams.unitCostMultiplier = f, () -> teams.unitCostMultiplier);
 

@@ -5,6 +5,7 @@ public enum LUnitControl{
     stop,
     move("x", "y"),
     approach("x", "y", "radius"),
+    pathfind("x", "y"),
     boost("enable"),
     target("x", "y", "shoot"),
     targetp("unit", "shoot"),

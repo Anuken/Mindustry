@@ -42,6 +42,9 @@ public class ServerControl implements ApplicationListener{
     protected static DateTimeFormatter dateTime = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss"),
         autosaveDate = DateTimeFormatter.ofPattern("MM-dd-yyyy_HH-mm-ss");
 
+    /** Global instance of ServerControl, initialized when the server is created. Should never be null on a dedicated server. */
+    public static ServerControl instance;
+
     public final CommandHandler handler = new CommandHandler("");
     public final Fi logFolder = Core.settings.getDataDirectory().child("logs/");
 
@@ -68,6 +71,7 @@ public class ServerControl implements ApplicationListener{
 
     public ServerControl(String[] args){
         setup(args);
+        instance = this;
     }
 
     protected void setup(String[] args){
@@ -255,10 +259,22 @@ public class ServerControl implements ApplicationListener{
 
         //autosave settings once a minute
         float saveInterval = 60;
-        Timer.schedule(() -> Core.settings.forceSave(), saveInterval, saveInterval);
+        Timer.schedule(() -> {
+            netServer.admins.forceSave();
+            Core.settings.forceSave();
+        }, saveInterval, saveInterval);
 
-        if(!mods.list().isEmpty()){
-            info("@ mods loaded.", mods.list().size);
+        if(!mods.orderedMods().isEmpty()){
+            info("@ mods loaded.", mods.orderedMods().size);
+        }
+
+        int unsupported = mods.list().count(l -> !l.enabled());
+
+        if(unsupported > 0){
+            Log.err("There were errors loading @ mod(s):", unsupported);
+            for(LoadedMod mod : mods.list().select(l -> !l.enabled())){
+                Log.err("- @ &ly(" + mod.state + ")", mod.meta.name);
+            }
         }
 
         toggleSocket(Config.socketInput.bool());
@@ -272,8 +288,8 @@ public class ServerControl implements ApplicationListener{
         });
 
         Events.on(PlayerJoin.class, e -> {
-            if(state.serverPaused && autoPaused && Config.autoPause.bool()){
-                state.serverPaused = false;
+            if(state.isPaused() && autoPaused && Config.autoPause.bool()){
+                state.set(State.playing);
                 autoPaused = false;
             }
         });
@@ -281,8 +297,8 @@ public class ServerControl implements ApplicationListener{
         Events.on(PlayerLeave.class, e -> {
             // The player list length is compared with 1 and not 0 here,
             // because when PlayerLeave gets fired, the player hasn't been removed from the player list yet
-            if(!state.serverPaused && Config.autoPause.bool() && Groups.player.size() == 1){
-                state.serverPaused = true;
+            if(!state.isPaused() && Config.autoPause.bool() && Groups.player.size() == 1){
+                state.set(State.paused);
                 autoPaused = true;
             }
         });
@@ -372,7 +388,7 @@ public class ServerControl implements ApplicationListener{
                 netServer.openServer();
 
                 if(Config.autoPause.bool()){
-                    state.serverPaused = true;
+                    state.set(State.paused);
                     autoPaused = true;
                 }
             }catch(MapException e){
@@ -451,7 +467,7 @@ public class ServerControl implements ApplicationListener{
             if(!mods.list().isEmpty()){
                 info("Mods:");
                 for(LoadedMod mod : mods.list()){
-                    info("  @ &fi@", mod.meta.displayName(), mod.meta.version);
+                    info("  @ &fi@ " + (mod.enabled() ? "" : " &lr(" + mod.state + ")"), mod.meta.displayName(), mod.meta.version);
                 }
             }else{
                 info("No mods found.");
@@ -489,9 +505,13 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("pause", "<on/off>", "Pause or unpause the game.", arg -> {
+            if(state.isMenu()){
+                err("Cannot pause without a game running.");
+                return;
+            }
             boolean pause = arg[0].equals("on");
             autoPaused = false;
-            state.serverPaused = pause;
+            state.set(state.isPaused() ? State.playing : State.paused);
             info(pause ? "Game paused." : "Game unpaused.");
         });
 

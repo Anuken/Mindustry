@@ -79,7 +79,11 @@ public class ContentParser{
         put(Interp.class, (type, data) -> field(Interp.class, data));
         put(Blending.class, (type, data) -> field(Blending.class, data));
         put(CacheLayer.class, (type, data) -> field(CacheLayer.class, data));
-        put(Attribute.class, (type, data) -> Attribute.get(data.asString()));
+        put(Attribute.class, (type, data) -> {
+            String attr = data.asString();
+            if(Attribute.exists(attr)) return Attribute.get(attr);
+            return Attribute.add(attr);
+        });
         put(BuildVisibility.class, (type, data) -> field(BuildVisibility.class, data));
         put(Schematic.class, (type, data) -> {
             Object result = fieldOpt(Loadouts.class, data);
@@ -292,6 +296,20 @@ public class ContentParser{
             weapon.name = currentMod.name + "-" + weapon.name;
             return weapon;
         });
+        put(Consume.class, (type, data) -> {
+            var oc = resolve(data.getString("type", ""), Consume.class);
+            data.remove("type");
+            var consume = make(oc);
+            readFields(consume, data);
+            return consume;
+        });
+        put(ConsumeLiquidBase.class, (type, data) -> {
+            var oc = resolve(data.getString("type", ""), ConsumeLiquidBase.class);
+            data.remove("type");
+            var consume = make(oc);
+            readFields(consume, data);
+            return consume;
+        });
     }};
     /** Stores things that need to be parsed fully, e.g. reading fields of content.
      * This is done to accommodate binding of content names first.*/
@@ -461,12 +479,13 @@ public class ContentParser{
                 }
 
                 var typeVal = value.get("type");
+                if(unit.constructor == null || typeVal != null){
+                    if(typeVal != null && !typeVal.isString()){
+                        throw new RuntimeException("Unit '" + name + "' has an incorrect type. Types must be strings.");
+                    }
 
-                if(typeVal != null && !typeVal.isString()){
-                    throw new RuntimeException("Unit '" + name + "' has an incorrect type. Types must be strings.");
+                    unit.constructor = unitType(typeVal);
                 }
-
-                unit.constructor = unitType(typeVal);
             }else{
                 unit = locate(ContentType.unit, name);
             }
@@ -590,6 +609,21 @@ public class ContentParser{
                     }catch(Exception e){
                         Log.err(e);
                         return new ShaderSphereMesh(planet, Shaders.unlit, 2);
+                    }
+                };
+            }
+
+            if(value.has("cloudMesh")){
+                var mesh = value.get("cloudMesh");
+                if(!mesh.isObject()) throw new RuntimeException("Meshes must be objects.");
+                value.remove("cloudMesh");
+                planet.cloudMeshLoader = () -> {
+                    //don't crash, just log an error
+                    try{
+                        return parseMesh(planet, mesh);
+                    }catch(Exception e){
+                        Log.err(e);
+                        return null;
                     }
                 };
             }
@@ -830,6 +864,10 @@ public class ContentParser{
             Color.valueOf(data.getString("color2", data.getString("color", "ffffff"))),
             data.getInt("colorOct", 1), data.getFloat("colorPersistence", 0.5f), data.getFloat("colorScale", 1f),
             data.getFloat("colorThreshold", 0.5f));
+            case "HexSkyMesh" -> new HexSkyMesh(planet,
+            data.getInt("seed", 0), data.getFloat("speed", 0), data.getFloat("radius", 1f),
+            data.getInt("divisions", 3), Color.valueOf(data.getString("color", "ffffff")), data.getInt("octaves", 1),
+            data.getFloat("persistence", 0.5f), data.getFloat("scale", 1f), data.getFloat("thresh", 0.5f));
             case "MultiMesh" -> new MultiMesh(parser.readValue(GenericMesh[].class, data.get("meshes")));
             case "MatMesh" -> new MatMesh(parser.readValue(GenericMesh.class, data.get("mesh")), parser.readValue(Mat3D.class, data.get("mat")));
             default -> throw new RuntimeException("Unknown mesh type: " + tname);

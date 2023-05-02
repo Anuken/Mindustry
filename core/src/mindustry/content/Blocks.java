@@ -1004,6 +1004,7 @@ public class Blocks{
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(Liquids.water), new DrawLiquidTile(Liquids.cryofluid){{drawLiquidLight = true;}}, new DrawDefault());
             liquidCapacity = 24f;
             craftTime = 120;
+            lightLiquid = Liquids.cryofluid;
 
             consumePower(1f);
             consumeItem(Items.titanium);
@@ -1179,6 +1180,7 @@ public class Blocks{
             craftTime = 10f;
             rotate = true;
             invertFlip = true;
+            group = BlockGroup.liquids;
 
             liquidCapacity = 50f;
 
@@ -1275,6 +1277,7 @@ public class Blocks{
             heatOutput = 3f;
             regionRotated1 = 1;
             ambientSound = Sounds.hum;
+            itemCapacity = 0;
             consumePower(100f / 60f);
         }};
         
@@ -1285,6 +1288,7 @@ public class Blocks{
 
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(Liquids.slag), new DrawDefault(), new DrawHeatOutput());
             size = 3;
+            itemCapacity = 0;
             liquidCapacity = 40f;
             rotateDraw = false;
             regionRotated1 = 1;
@@ -1490,9 +1494,10 @@ public class Blocks{
             craftEffect = new RadialEffect(Fx.heatReactorSmoke, 4, 90f, 7f);
 
             itemCapacity = 20;
+            outputItem = new ItemStack(Items.fissileMatter, 1);
+
             consumeItem(Items.thorium, 3);
             consumeLiquid(Liquids.nitrogen, 1f / 60f);
-            outputItem = new ItemStack(Items.fissileMatter, 1);
         }};
 
         //endregion
@@ -1808,7 +1813,7 @@ public class Blocks{
             requirements(Category.effect, with(Items.silicon, 150, Items.oxide, 40, Items.thorium, 60));
             outlineColor = Pal.darkOutline;
 
-            range = 180f;
+            range = 200f;
             size = 3;
             buildSpeed = 1.5f;
 
@@ -1863,6 +1868,8 @@ public class Blocks{
             size = 3;
             consumeLiquids(LiquidStack.with(Liquids.cyanogen, 1.5f / 60f));
             consumePower(100f / 60f);
+            range = 170f;
+            reload = 80f;
         }};
 
         //TODO 5x5??
@@ -2467,6 +2474,7 @@ public class Blocks{
         turbineCondenser = new ThermalGenerator("turbine-condenser"){{
             requirements(Category.power, with(Items.beryllium, 60));
             attribute = Attribute.steam;
+            group = BlockGroup.liquids;
             displayEfficiencyScale = 1f / 9f;
             minEfficiency = 9f - 0.0001f;
             powerProduction = 3f / 9f;
@@ -2550,6 +2558,9 @@ public class Blocks{
             liquidCapacity = 30f;
             explosionMinWarmup = 0.5f;
 
+            explosionRadius = 17;
+            explosionDamage = 2500;
+
             ambientSound = Sounds.flux;
             ambientSoundVolume = 0.13f;
 
@@ -2592,8 +2603,8 @@ public class Blocks{
             itemDuration = 60f * 3f;
             itemCapacity = 10;
 
-            explosionRadius = 7;
-            explosionDamage = 1000;
+            explosionRadius = 9;
+            explosionDamage = 2000;
             explodeEffect = new MultiEffect(Fx.bigShockwave, new WrapEffect(Fx.titanSmoke, Liquids.neoplasm.color), Fx.neoplasmSplat);
             explodeSound = Sounds.largeExplosion;
 
@@ -2758,6 +2769,7 @@ public class Blocks{
         ventCondenser = new AttributeCrafter("vent-condenser"){{
             requirements(Category.production, with(Items.graphite, 20, Items.beryllium, 60));
             attribute = Attribute.steam;
+            group = BlockGroup.liquids;
             minEfficiency = 9f - 0.0001f;
             baseEfficiency = 0f;
             displayEfficiency = false;
@@ -3035,6 +3047,20 @@ public class Blocks{
 
             shoot = new ShootAlternate(3.5f);
 
+            recoils = 2;
+            drawer = new DrawTurret(){{
+                for(int i = 0; i < 2; i ++){
+                    int f = i;
+                    parts.add(new RegionPart("-barrel-" + (i == 0 ? "l" : "r")){{
+                        progress = PartProgress.recoil;
+                        recoilIndex = f;
+                        under = true;
+                        moves.add(new PartMove(PartProgress.recoil, 0f, -1.5f, 0f));
+                    }});
+                }
+            }};
+
+            recoil = 0.5f;
             shootY = 3f;
             reload = 20f;
             range = 110;
@@ -3393,6 +3419,7 @@ public class Blocks{
             reload = 30f;
             inaccuracy = 10f;
             range = 240f;
+            consumeAmmoOnce = false;
             size = 2;
             scaledHealth = 300;
             shootSound = Sounds.missile;
@@ -3455,6 +3482,7 @@ public class Blocks{
             size = 2;
             range = 190f;
             reload = 31f;
+            consumeAmmoOnce = false;
             ammoEjectBack = 3f;
             recoil = 3f;
             shake = 1f;
@@ -3950,6 +3978,7 @@ public class Blocks{
             coolantMultiplier = 6f;
             shootSound = Sounds.shootAlt;
 
+            targetUnderBlocks = false;
             shake = 1f;
             ammoPerShot = 2;
             drawer = new DrawTurret("reinforced-");
@@ -4000,6 +4029,7 @@ public class Blocks{
             ammoPerShot = 3;
             maxAmmo = 30;
             consumeAmmoOnce = true;
+            targetUnderBlocks = false;
 
             shootSound = Sounds.shootAltLong;
 
@@ -4068,6 +4098,7 @@ public class Blocks{
 
             liquidConsumed = 10f / 60f;
             targetInterval = 5f;
+            targetUnderBlocks = false;
 
             float r = range = 130f;
 
@@ -4593,13 +4624,14 @@ public class Blocks{
 
             recoil = 0.5f;
 
-            fogRadiusMultiuplier = 0.75f;
+            fogRadiusMultiuplier = 0.4f;
             coolantMultiplier = 6f;
             shootSound = Sounds.missileLaunch;
 
             minWarmup = 0.94f;
             shootWarmupSpeed = 0.03f;
             targetAir = false;
+            targetUnderBlocks = false;
 
             shake = 6f;
             ammoPerShot = 20;
@@ -5494,7 +5526,7 @@ public class Blocks{
             regionSuffix = "-dark";
             size = 5;
             plans.add(
-            new AssemblerUnitPlan(UnitTypes.quell, 60f * 60f, PayloadStack.list(UnitTypes.elude, 4, Blocks.berylliumWallLarge, 8)),
+            new AssemblerUnitPlan(UnitTypes.quell, 60f * 60f, PayloadStack.list(UnitTypes.elude, 4, Blocks.berylliumWallLarge, 12)),
             new AssemblerUnitPlan(UnitTypes.disrupt, 60f * 60f * 3f, PayloadStack.list(UnitTypes.avert, 6, Blocks.carbideWallLarge, 20))
             );
             areaSize = 13;
@@ -5509,7 +5541,7 @@ public class Blocks{
             size = 5;
             //TODO different reqs
             plans.add(
-            new AssemblerUnitPlan(UnitTypes.tecta, 60f * 70f, PayloadStack.list(UnitTypes.merui, 6, Blocks.tungstenWallLarge, 12)),
+            new AssemblerUnitPlan(UnitTypes.tecta, 60f * 70f, PayloadStack.list(UnitTypes.merui, 5, Blocks.tungstenWallLarge, 12)),
             new AssemblerUnitPlan(UnitTypes.collaris, 60f * 60f * 3f, PayloadStack.list(UnitTypes.cleroi, 6, Blocks.carbideWallLarge, 20))
             );
             areaSize = 13;
@@ -5615,7 +5647,7 @@ public class Blocks{
             requirements(Category.units, with(Items.silicon, 100, Items.beryllium, 150, Items.tungsten, 80));
             regionSuffix = "-dark";
             hasPower = true;
-            buildSpeed = 0.5f;
+            buildSpeed = 0.6f;
             consumePower(2f);
             size = 3;
             //TODO expand this list
@@ -5627,7 +5659,7 @@ public class Blocks{
             requirements(Category.units, with(Items.silicon, 150, Items.oxide, 150, Items.tungsten, 200, Items.phaseFabric, 40));
             regionSuffix = "-dark";
             hasPower = true;
-            buildSpeed = 0.6f;
+            buildSpeed = 0.75f;
             maxBlockSize = 4;
             minBlockSize = 3;
             size = 5;
@@ -5861,6 +5893,8 @@ public class Blocks{
 
         worldMessage = new MessageBlock("world-message"){{
             requirements(Category.logic, BuildVisibility.editorOnly, with());
+            
+            targetable = false;
             privileged = true;
         }};
 

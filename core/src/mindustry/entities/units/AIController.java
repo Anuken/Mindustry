@@ -55,6 +55,11 @@ public class AIController implements UnitController{
         return false;
     }
 
+    @Override
+    public boolean isLogicControllable(){
+        return true;
+    }
+
     public void stopShooting(){
         for(var mount : unit.mounts){
             //ignore mount controllable stats too, they should not shoot either
@@ -179,9 +184,9 @@ public class AIController implements UnitController{
 
             unit.isShooting |= (mount.shoot = mount.rotate = shoot);
 
-            if(mount.target == null && !shoot && !Angles.within(mount.rotation, 0f, 0.01f) && noTargetTime >= rotateBackTimer){
+            if(mount.target == null && !shoot && !Angles.within(mount.rotation, mount.weapon.baseRotation, 0.01f) && noTargetTime >= rotateBackTimer){
                 mount.rotate = true;
-                Tmp.v1.trns(unit.rotation, 5f);
+                Tmp.v1.trns(unit.rotation + mount.weapon.baseRotation, 5f);
                 mount.aimX = mountX + Tmp.v1.x;
                 mount.aimY = mountY + Tmp.v1.y;
             }
@@ -221,6 +226,10 @@ public class AIController implements UnitController{
     public Teamc findTarget(float x, float y, float range, boolean air, boolean ground){
         return target(x, y, range, air, ground);
     }
+
+    public void commandTarget(Teamc moveTo){}
+
+    public void commandPosition(Vec2 pos){}
 
     /** Called after this controller is assigned a unit. */
     public void init(){
@@ -315,8 +324,8 @@ public class AIController implements UnitController{
             vec.setLength(unit.speed() * length);
         }
 
-        //do not move when infinite vectors are used.
-        if(vec.isNaN() || vec.isInfinite()) return;
+        //do not move when infinite vectors are used or if its zero.
+        if(vec.isNaN() || vec.isInfinite() || vec.isZero()) return;
 
         if(!unit.type.omniMovement && unit.type.rotateMoveFirst){
             float angle = vec.angle();

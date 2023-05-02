@@ -30,6 +30,8 @@ public class Duct extends Block implements Autotiler{
     public @Load(value = "@-top-#", length = 5) TextureRegion[] topRegions;
     public @Load(value = "@-bottom-#", length = 5, fallback = "duct-bottom-#") TextureRegion[] botRegions;
 
+    public @Nullable Block bridgeReplacement;
+
     public Duct(String name){
         super(name);
 
@@ -54,6 +56,13 @@ public class Duct extends Block implements Autotiler{
         super.setStats();
 
         stats.add(Stat.itemsMoved, 60f / speed, StatUnit.itemsSecond);
+    }
+
+    @Override
+    public void init(){
+        super.init();
+
+        if(bridgeReplacement == null || !(bridgeReplacement instanceof DuctBridge)) bridgeReplacement = Blocks.ductBridge;
     }
 
     @Override
@@ -96,7 +105,9 @@ public class Duct extends Block implements Autotiler{
 
     @Override
     public void handlePlacementLine(Seq<BuildPlan> plans){
-        Placement.calculateBridges(plans, (DuctBridge)Blocks.ductBridge, false, b -> b instanceof Duct || b instanceof StackConveyor || b instanceof Conveyor);
+        if(bridgeReplacement == null) return;
+
+        Placement.calculateBridges(plans, (DuctBridge)bridgeReplacement, false, b -> b instanceof Duct || b instanceof StackConveyor || b instanceof Conveyor);
     }
 
     public class DuctBuild extends Building{
