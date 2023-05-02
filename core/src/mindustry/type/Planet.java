@@ -115,6 +115,8 @@ public class Planet extends UnlockableContent{
     public boolean prebuildBase = true;
     /** If true, waves are created on sector loss. TODO remove. */
     public boolean allowWaves = false;
+    /** If false, players are unable to land on this planet's numbered sectors. */
+    public boolean allowLaunchToNumbered = true;
     /** Icon as displayed in the planet selection dialog. This is a string, as drawables are null at load time. */
     public String icon = "planet";
     /** Default core block for launching. */
