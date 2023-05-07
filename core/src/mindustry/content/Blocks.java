@@ -3124,7 +3124,7 @@ public class Blocks{
             );
 
             drawer = new DrawTurret(){{
-                parts.add(new RegionPart("-barrel"){{
+                parts.add(new RegionPart("-mid"){{
                     progress = PartProgress.recoil;
                     under = true;
                     moveY = -1.5f;
