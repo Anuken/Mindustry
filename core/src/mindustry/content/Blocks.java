@@ -3490,7 +3490,7 @@ public class Blocks{
 
             drawer = new DrawTurret(){{
                 parts.add(new RegionPart("-barrel"){{
-                    progress = PartProgress.recoil;
+                    progress = PartProgress.recoil.delay(0.5f); //Since recoil is 1-0, cut from the start instead of the end.
                     under = true;
                     turretHeatLayer = Layer.turret - 0.0001f;
                     moveY = -1.5f;
