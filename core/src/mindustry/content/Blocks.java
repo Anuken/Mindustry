@@ -3488,12 +3488,21 @@ public class Blocks{
                 }}
             );
 
+            drawer = new DrawTurret(){{
+                parts.add(new RegionPart("-barrel"){{
+                    progress = PartProgress.recoil;
+                    under = true;
+                    turretHeatLayer = Layer.turret - 0.0001f;
+                    moveY = -1.5f;
+                }});
+            }};
+
             size = 2;
             range = 190f;
             reload = 31f;
             consumeAmmoOnce = false;
             ammoEjectBack = 3f;
-            recoil = 3f;
+            recoil = 2f;
             shake = 1f;
             shoot.shots = 4;
             shoot.shotDelay = 3f;
