@@ -101,7 +101,7 @@ public class CustomRulesDialog extends BaseDialog{
 
                 dialog.addCloseButton();
                 dialog.show();
-            }).size(300f, 64f).disabled(b -> set.size == content.<T>getBy(type).select(pred).size);
+            }).size(300f, 64f).disabled(b -> set.size == content.<T>getBy(type).count(pred));
         };
 
         bd.shown(rebuild[0]);
@@ -281,7 +281,10 @@ public class CustomRulesDialog extends BaseDialog{
 
             main.button("[#" + team.color +  "]" + team.localized() + (team.emoji.isEmpty() ? "" : "[] " + team.emoji), Icon.downOpen, Styles.togglet, () -> {
                 shown[0] = !shown[0];
-            }).marginLeft(14f).width(260f).height(55f).checked(a -> shown[0]).update(t -> ((Image)t.getChildren().get(1)).setDrawable(shown[0] ? Icon.upOpen : Icon.downOpen)).row();
+            }).marginLeft(14f).width(260f).height(55f).update(t -> {
+                ((Image)t.getChildren().get(1)).setDrawable(shown[0] ? Icon.upOpen : Icon.downOpen);
+                t.setChecked(shown[0]);
+            }).row();
 
             main.collapser(t -> {
                 t.left().defaults().fillX().left().pad(5);
