@@ -167,7 +167,7 @@ public class Planet extends UnlockableContent{
         //if an item whitelist exists, add everything else not in that whitelist to hidden items
         Events.on(ContentInitEvent.class, e -> {
             if (itemWhitelist.size > 0){
-                hiddenItems.addAll(content.items().copy().filter(i -> !itemWhitelist.contains(i)));
+                hiddenItems.addAll(content.items().select(i -> !itemWhitelist.contains(i)));
             }
         });
 
