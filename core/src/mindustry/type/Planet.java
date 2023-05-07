@@ -13,6 +13,7 @@ import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
+import mindustry.game.EventType.ContentInitEvent;
 import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
@@ -114,6 +115,8 @@ public class Planet extends UnlockableContent{
     public boolean prebuildBase = true;
     /** If true, waves are created on sector loss. TODO remove. */
     public boolean allowWaves = false;
+    /** If false, players are unable to land on this planet's numbered sectors. */
+    public boolean allowLaunchToNumbered = true;
     /** Icon as displayed in the planet selection dialog. This is a string, as drawables are null at load time. */
     public String icon = "planet";
     /** Default core block for launching. */
@@ -130,8 +133,10 @@ public class Planet extends UnlockableContent{
     public @Nullable TechNode techTree;
     /** TODO remove? Planets that can be launched to from this one. Made mutual in init(). */
     public Seq<Planet> launchCandidates = new Seq<>();
-    /** Items not available on this planet. */
+    /** Items not available on this planet. Left out for backwards compatibility. */
     public Seq<Item> hiddenItems = new Seq<>();
+    /** The only items available on this planet, if defined. */
+    public Seq<Item> itemWhitelist = new Seq<>();
     /** Content (usually planet-specific) that is unlocked upon landing here. */
     public Seq<UnlockableContent> unlockedOnLand = new Seq<>();
     /** Loads the mesh. Clientside only. Defaults to a boring sphere mesh. */
@@ -158,6 +163,13 @@ public class Planet extends UnlockableContent{
             parent.children.add(this);
             parent.updateTotalRadius();
         }
+
+        //if an item whitelist exists, add everything else not in that whitelist to hidden items
+        Events.on(ContentInitEvent.class, e -> {
+            if(itemWhitelist.size > 0){
+                hiddenItems.addAll(content.items().select(i -> !itemWhitelist.contains(i)));
+            }
+        });
 
         //calculate solar system
         for(solarSystem = this; solarSystem.parent != null; solarSystem = solarSystem.parent);
