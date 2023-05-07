@@ -3055,7 +3055,7 @@ public class Blocks{
                         progress = PartProgress.recoil;
                         recoilIndex = f;
                         under = true;
-                        moves.add(new PartMove(PartProgress.recoil, 0f, -1.5f, 0f));
+                        moveY = -1.5f;
                     }});
                 }
             }};
@@ -3122,6 +3122,15 @@ public class Blocks{
                     }};
                 }}
             );
+
+            drawer = new DrawTurret(){{
+                parts.add(new RegionPart("-barrel"){{
+                    progress = PartProgress.recoil;
+                    under = true;
+                    moveY = -1.5f;
+                }});
+            }};
+
             reload = 18f;
             range = 220f;
             size = 2;
@@ -3130,7 +3139,7 @@ public class Blocks{
             shoot.shotDelay = 5f;
             shoot.shots = 2;
 
-            recoil = 2f;
+            recoil = 1f;
             rotateSpeed = 15f;
             inaccuracy = 17f;
             shootCone = 35f;
