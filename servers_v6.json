@@ -30,9 +30,5 @@
   {
     "name": "ALEX",
     "address": ["alexmindustryhub.ddns.net:6568", "dogemindustry.ddns.net:25586", "alexmindustry.ddns.net:25587", "alexmindustryattac.ddns.net:25800","alexmindustryturbo.ddns.net:25581","alexmindustryhex.ddns.net:25583"]
-  },
-  {
-    "name": "Mindustry.Party",
-    "address": ["game.mindustry.party"]
   }
 ]

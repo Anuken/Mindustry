@@ -1370,7 +1370,7 @@ public class LStatements{
                     fields(table, "w", p3, s -> p3 = s);
                     fields(table, "h", p4, s -> p4 = s);
                 }
-                case buildSpeed, unitBuildSpeed, unitCost, unitDamage, blockHealth, blockDamage, rtsMinSquad, rtsMinWeight -> {
+                case buildSpeed, unitHealth, unitBuildSpeed, unitCost, unitDamage, blockHealth, blockDamage, rtsMinSquad, rtsMinWeight -> {
                     if(p1.equals("0")){
                         p1 = "@sharded";
                     }

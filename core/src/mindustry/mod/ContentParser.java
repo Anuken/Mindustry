@@ -575,7 +575,7 @@ public class ContentParser{
 
             if(!value.has("sector") || !value.get("sector").isNumber()) throw new RuntimeException("SectorPresets must have a sector number.");
 
-            SectorPreset out = new SectorPreset(name);
+            SectorPreset out = new SectorPreset(mod + "-" + name);
 
             currentContent = out;
             read(() -> {
@@ -596,7 +596,7 @@ public class ContentParser{
             if(value.isString()) return locate(ContentType.planet, name);
 
             Planet parent = locate(ContentType.planet, value.getString("parent"));
-            Planet planet = new Planet(name, parent, value.getFloat("radius", 1f), value.getInt("sectorSize", 0));
+            Planet planet = new Planet(mod + "-" + name, parent, value.getFloat("radius", 1f), value.getInt("sectorSize", 0));
 
             if(value.has("mesh")){
                 var mesh = value.get("mesh");
