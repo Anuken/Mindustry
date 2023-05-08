@@ -68,7 +68,7 @@ public class CustomRulesDialog extends BaseDialog{
                         b.image(con.uiIcon).size(iconMed).padRight(3);
                         b.add(con.localizedName).color(Color.lightGray).padLeft(3).growX().left().wrap();
 
-                        b.button(Icon.cancel, Styles.clearNonei, () -> {
+                        b.button(Icon.cancel, Styles.emptyi, () -> {
                             set.remove(con);
                             rebuild[0].run();
                         }).size(70f).pad(-4f).padLeft(0f);
@@ -91,7 +91,7 @@ public class CustomRulesDialog extends BaseDialog{
                             set.add(b);
                             rebuild[0].run();
                             dialog.hide();
-                        }).size(60f);
+                        }).size(60f).tooltip(b.localizedName);
 
                         if(++i[0] % cols == 0){
                             t.row();
@@ -101,7 +101,7 @@ public class CustomRulesDialog extends BaseDialog{
 
                 dialog.addCloseButton();
                 dialog.show();
-            }).size(300f, 64f);
+            }).size(300f, 64f).disabled(b -> set.size == content.<T>getBy(type).count(pred));
         };
 
         bd.shown(rebuild[0]);
@@ -139,15 +139,16 @@ public class CustomRulesDialog extends BaseDialog{
 
         title("@rules.title.waves");
         check("@rules.waves", b -> rules.waves = b, () -> rules.waves);
-        check("@rules.wavetimer", b -> rules.waveTimer = b, () -> rules.waveTimer);
-        check("@rules.wavesending", b -> rules.waveSending = b, () -> rules.waveSending);
-        check("@rules.waitForWaveToEnd", b -> rules.waitEnemies = b, () -> rules.waitEnemies);
-        number("@rules.wavespacing", false, f -> rules.waveSpacing = f * 60f, () -> rules.waveSpacing / 60f, () -> rules.waveTimer, 1, Float.MAX_VALUE);
+        check("@rules.wavesending", b -> rules.waveSending = b, () -> rules.waveSending, () -> rules.waves);
+        check("@rules.wavetimer", b -> rules.waveTimer = b, () -> rules.waveTimer, () -> rules.waves);
+        check("@rules.waitForWaveToEnd", b -> rules.waitEnemies = b, () -> rules.waitEnemies, () -> rules.waves && rules.waveTimer);
+        numberi("@rules.wavelimit", f -> rules.winWave = f, () -> rules.winWave, () -> rules.waves, 0, Integer.MAX_VALUE);
+        number("@rules.wavespacing", false, f -> rules.waveSpacing = f * 60f, () -> rules.waveSpacing / 60f, () -> rules.waves && rules.waveTimer, 1, Float.MAX_VALUE);
         //this is experimental, because it's not clear that 0 makes it default.
         if(experimental){
-            number("@rules.initialwavespacing", false, f -> rules.initialWaveSpacing = f * 60f, () -> rules.initialWaveSpacing / 60f, () -> true, 0, Float.MAX_VALUE);
+            number("@rules.initialwavespacing", false, f -> rules.initialWaveSpacing = f * 60f, () -> rules.initialWaveSpacing / 60f, () -> rules.waves && rules.waveTimer, 0, Float.MAX_VALUE);
         }
-        number("@rules.dropzoneradius", false, f -> rules.dropZoneRadius = f * tilesize, () -> rules.dropZoneRadius / tilesize, () -> true);
+        number("@rules.dropzoneradius", false, f -> rules.dropZoneRadius = f * tilesize, () -> rules.dropZoneRadius / tilesize, () -> rules.waves);
 
         title("@rules.title.resourcesbuilding");
         check("@rules.infiniteresources", b -> {
@@ -281,7 +282,10 @@ public class CustomRulesDialog extends BaseDialog{
 
             main.button("[#" + team.color +  "]" + team.localized() + (team.emoji.isEmpty() ? "" : "[] " + team.emoji), Icon.downOpen, Styles.togglet, () -> {
                 shown[0] = !shown[0];
-            }).marginLeft(14f).width(260f).height(55f).checked(a -> shown[0]).row();
+            }).marginLeft(14f).width(260f).height(55f).update(t -> {
+                ((Image)t.getChildren().get(1)).setDrawable(shown[0] ? Icon.upOpen : Icon.downOpen);
+                t.setChecked(shown[0]);
+            }).row();
 
             main.collapser(t -> {
                 t.left().defaults().fillX().left().pad(5);

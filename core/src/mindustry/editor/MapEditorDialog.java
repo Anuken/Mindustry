@@ -752,9 +752,9 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
         cont.table(search -> {
             search.image(Icon.zoom).padRight(8);
-            search.field("", this::rebuildBlockSelection)
+            search.field("", this::rebuildBlockSelection).growX()
             .name("editor/search").maxTextLength(maxNameLength).get().setMessageText("@players.search");
-        }).pad(-2);
+        }).growX().pad(-2).padLeft(6f);
         cont.row();
         cont.table(Tex.underline, extra -> extra.labelWrap(() -> editor.drawBlock.localizedName).width(200f).center()).growX();
         cont.row();
@@ -803,7 +803,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         }
 
         if(i == 0){
-            blockSelection.add("@none").color(Color.lightGray).padLeft(80f).padTop(10f);
+            blockSelection.add("@none.found").color(Color.lightGray).padLeft(54f).padTop(10f);
         }
     }
 }
