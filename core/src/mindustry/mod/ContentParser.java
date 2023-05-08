@@ -781,13 +781,14 @@ public class ContentParser{
             json = json.replace("#", "\\#");
         }
 
+        currentMod = mod;
+
         JsonValue value = parser.fromJson(null, Jval.read(json).toString(Jformat.plain));
 
         if(!parsers.containsKey(type)){
             throw new SerializationException("No parsers for content type '" + type + "'");
         }
 
-        currentMod = mod;
         boolean located = locate(type, name) != null;
         Content c = parsers.get(type).parse(mod.name, name, value);
         c.minfo.sourceFile = file;
