@@ -93,7 +93,7 @@ public class Renderer implements ApplicationListener{
     public void shake(float intensity, float duration){
         shakeIntensity = Math.max(shakeIntensity, Mathf.clamp(intensity, 0, 100));
         shakeTime = Math.max(shakeTime, duration);
-        shakeReduction = Math.max(shakeReduction, shakeIntensity / shakeTime);
+        shakeReduction = shakeIntensity / shakeTime;
     }
 
     public void addEnvRenderer(int mask, Runnable render){
