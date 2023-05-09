@@ -8,6 +8,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -15,17 +16,21 @@ import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.distribution.*;
+import mindustry.world.modules.*;
 
 import static mindustry.Vars.*;
 import static mindustry.type.Liquid.*;
 
 public class Conduit extends LiquidBlock implements Autotiler{
+    static final boolean debugGraphs = false;
     static final float rotatePad = 6, hpad = rotatePad / 2f / 4f;
     static final float[][] rotateOffsets = {{hpad, hpad}, {-hpad, hpad}, {-hpad, -hpad}, {hpad, -hpad}};
+    static final LiquidModule tempLiquids = new LiquidModule();
 
     public final int timerFlow = timers++;
 
@@ -51,6 +56,10 @@ public class Conduit extends LiquidBlock implements Autotiler{
         noUpdateDisabled = true;
         canOverdrive = false;
         priority = TargetPriority.transport;
+
+        //conduits don't need to update
+        update = false;
+        destructible = true;
     }
 
     @Override
@@ -155,7 +164,6 @@ public class Conduit extends LiquidBlock implements Autotiler{
         public boolean capped, backCapped = false;
 
         protected void addGraphs(){
-            graph = null;
             //connect self to every nearby graph
             getConnections(other -> {
                 if(other.graph != null){
@@ -163,6 +171,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
                 }
             });
 
+            //nothing to connect to
             if(graph == null){
                 new ConduitGraph().merge(this);
             }
@@ -172,15 +181,35 @@ public class Conduit extends LiquidBlock implements Autotiler{
             //graph is getting recalculated, no longer valid
             if(graph != null){
                 graph.checkRemove();
+                graph.remove(this);
+                graph = null; //TODO ?????
             }
 
             getConnections(other -> new ConduitGraph().reflow(this, other));
         }
 
         @Override
-        public void onProximityAdded(){
-            super.onProximityAdded();
+        public void control(LAccess type, double p1, double p2, double p3, double p4){
+            if(type == LAccess.enabled){
+                boolean shouldEnable = !Mathf.zero((float)p1);
+                if(enabled != shouldEnable){
 
+                    if(graph != null){
+                        //keep track of how many conduits are disabled, so the graph can stop working
+                        if(shouldEnable){
+                            graph.disabledConduits --;
+                        }else{
+                            graph.disabledConduits ++;
+                        }
+                    }
+
+                    enabled = shouldEnable;
+                }
+            }
+        }
+
+        @Override
+        public void onAdded(){
             addGraphs();
         }
 
@@ -222,14 +251,20 @@ public class Conduit extends LiquidBlock implements Autotiler{
             if(capped && capRegion.found()) Draw.rect(capRegion, x, y, rotdeg());
             if(backCapped && capRegion.found()) Draw.rect(capRegion, x, y, rotdeg() + 180);
 
-            //TODO this is for debuggig only
-            Mathf.rand.setSeed(graph == null ? -1 : graph.id);
-            Draw.color(Tmp.c1.rand());
-            Draw.alpha(0.4f);
+            if(debugGraphs){
+                //simple visualization that assigns random color to each graph
+                Mathf.rand.setSeed(graph == null ? -1 : graph.id);
+                Draw.color(Tmp.c1.rand());
 
-            Fill.square(x, y, 4f);
+                Drawf.selected(tileX(), tileY(), block, Tmp.c1);
+                Draw.color(Pal.accent);
 
-            Draw.color();
+                if(this == graph.head){
+                    Fill.poly(x, y, 3, 2f, rotdeg());
+                }
+
+                Draw.color();
+            }
         }
 
         protected void drawAt(float x, float y, int bits, int rotation, SliceMode slice){
@@ -253,7 +288,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
             //the drawing state machine sure was a great design choice with no downsides or hidden behavior!!!
             float xscl = Draw.xscl, yscl = Draw.yscl;
             Draw.scl(1f, 1f);
-            Drawf.liquid(sliced(liquidr, slice), x + ox, y + oy, smoothLiquid, liquids.current().color.write(Tmp.c1).a(1f));
+            Drawf.liquid(sliced(liquidr, slice), x + ox, y + oy, graph == null ? smoothLiquid : graph.smoothLiquid, liquids.current().color.write(Tmp.c1).a(1f));
             Draw.scl(xscl, yscl);
 
             Draw.rect(sliced(topRegions[bits], slice), x, y, angle);
@@ -282,15 +317,15 @@ public class Conduit extends LiquidBlock implements Autotiler{
         }
 
         @Override
-        public void updateTile(){
-            smoothLiquid = Mathf.lerpDelta(smoothLiquid, liquids.currentAmount() / liquidCapacity, 0.05f);
+        public LiquidModule writeLiquids(){
+            //"saved" liquids are based on a fraction, essentially splitting apart and re-joining
+            tempLiquids.set(liquids, graph == null ? 1f : block.liquidCapacity / graph.totalCapacity);
+            return tempLiquids;
+        }
 
-            if(liquids.currentAmount() > 0.0001f && timer(timerFlow, 1)){
-                moveLiquidForward(leaks, liquids.current());
-                noSleep();
-            }else{
-                sleep();
-            }
+        @Override
+        public float liquidCapacity(){
+            return graph == null ? block.liquidCapacity : graph.totalCapacity;
         }
 
         @Nullable
@@ -303,10 +338,15 @@ public class Conduit extends LiquidBlock implements Autotiler{
             return null;
         }
 
+        @Override
+        public void writeAll(Writes write){
+            super.writeAll(write);
+        }
+
         /** Calls callback with every conduit that transfers fluids to this one. */
         public void getConnections(Cons<ConduitBuild> cons){
             for(var other : proximity){
-                if(other instanceof ConduitBuild conduit){
+                if(other instanceof ConduitBuild conduit && other.team == team){
                     if(
                         front() == conduit ||
                         other.front() == this
@@ -320,25 +360,34 @@ public class Conduit extends LiquidBlock implements Autotiler{
 
     /*
     TODO:
-    - [ ] liquids shared as one inventory
-    - [ ] liquids merged when placing
-    - [ ] liquids split when breaking
-    - [ ] liquids saved
-    - [ ] liquids accept input
-    - [ ] liquids transfer forward
-    - [ ] liquids leak
-    - [ ] liquids display properly (including flow rate)
+    - [X] liquids shared as one inventory
+    - [X] liquids merged when placing
+    - [X] liquids split when breaking
+    - [X] liquids saved
+    - [X] liquids accept input
+    - [X] liquids transfer forward
+    - [X] liquids leak
+    - [X] liquids display properly (including flow rate)
+    - [ ] liquids merge different types correctly - ?????
+    - [X] conduits can (or can't) be disabled
      */
     public static class ConduitGraph{
-        private static final IntSet closedSet = new IntSet();
+        private static final IntSet closedSet = new IntSet(), headSet = new IntSet();
         private static final Queue<ConduitBuild> queue = new Queue<>();
 
-        static int lastId = -1;
+        static int lastId = 0;
 
         public final int id = lastId ++;
+        public float smoothLiquid;
 
+        /** if any are disabled, does not update */
+        private int disabledConduits;
         private Seq<ConduitBuild> conduits = new Seq<>();
         private final @Nullable ConduitGraphUpdater entity;
+        private LiquidModule liquids = new LiquidModule();
+        private float totalCapacity;
+
+        public @Nullable Building head;
 
         public ConduitGraph(){
             entity = ConduitGraphUpdater.create();
@@ -346,7 +395,17 @@ public class Conduit extends LiquidBlock implements Autotiler{
         }
 
         public void update(){
-            //TODO
+            smoothLiquid = Mathf.lerpDelta(smoothLiquid, liquids.currentAmount() / totalCapacity, 0.05f);
+
+            if(disabledConduits > 0) return;
+
+            if(head != null){
+
+                //move forward as the head
+                if(liquids.currentAmount() > 0.0001f && head.timer(((Conduit)head.block).timerFlow, 1)){
+                    head.moveLiquidForward(((Conduit)head.block).leaks, liquids.current());
+                }
+            }
         }
 
         public void checkAdd(){
@@ -355,6 +414,15 @@ public class Conduit extends LiquidBlock implements Autotiler{
 
         public void checkRemove(){
             if(entity != null) entity.remove();
+        }
+
+        public void remove(ConduitBuild build){
+            float fraction = build.block.liquidCapacity / totalCapacity;
+            //remove fraction of liquids based on what part this conduit constituted
+            //e.g. 70% of capacity was made up by this conduit = multiply liquids by 0.3 (remove 70%)
+            liquids.mul(1f - fraction);
+
+            totalCapacity -= build.block.liquidCapacity;
         }
 
         public void reflow(@Nullable ConduitBuild ignore, ConduitBuild conduit){
@@ -367,9 +435,10 @@ public class Conduit extends LiquidBlock implements Autotiler{
             closedSet.add(conduit.id);
             queue.add(conduit);
 
+
             while(queue.size > 0){
                 var parent = queue.removeFirst();
-                assign(parent);
+                assign(parent, ignore);
 
                 parent.getConnections(child -> {
                     if(closedSet.add(child.id)){
@@ -387,7 +456,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
 
             if(other.graph != null){
 
-                //merge graphs - TODO - flip if it is larger
+                //merge graphs - TODO - flip if it is larger, like power graphs?
                 for(var cond : other.graph.conduits){
                     assign(cond);
                 }
@@ -397,16 +466,57 @@ public class Conduit extends LiquidBlock implements Autotiler{
         }
 
         protected void assign(ConduitBuild build){
+            assign(build, null);
+        }
+
+        protected void assign(ConduitBuild build, @Nullable Building ignore){
             if(build.graph != this){
 
-                //invalidate older graph
+                //merge graph liquids - TODO - how does this react to different types
                 if(build.graph != null){
                     build.graph.checkRemove();
+
+                    //add liquids based on what fraction it made up
+                    liquids.add(build.liquids, build.block.liquidCapacity / build.graph.totalCapacity);
+                }else{
+                    //simple direct liquid merge
+                    liquids.add(build.liquids);
                 }
 
+                totalCapacity += build.block.liquidCapacity;
                 build.graph = this;
+                build.liquids = liquids;
                 conduits.add(build);
                 checkAdd();
+
+                //re-validate head
+                if(head == null){
+                    head = build;
+                }
+
+                //find the best head block
+                headSet.clear();
+                headSet.add(head.id);
+
+                while(true){
+                    var next = head.front();
+
+                    if(next instanceof ConduitBuild cond && cond.team == head.team && next != ignore){
+                        if(!headSet.add(next.id)){
+                            //there's a loop, which means a head does not exist
+                            head = null;
+                            break;
+                        }else{
+                            head = next;
+                        }
+                    }else{
+                        //found the end
+                        break;
+                    }
+                }
+
+                //snap smoothLiquid so it doesn't start at 0
+                smoothLiquid = liquids.currentAmount() / totalCapacity;
             }
         }
 

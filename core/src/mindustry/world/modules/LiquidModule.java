@@ -64,6 +64,12 @@ public class LiquidModule extends BlockModule{
         }
     }
 
+    public void mul(float amount){
+        for(int i = 0; i < liquids.length; i ++){
+            liquids[i] *= amount;
+        }
+    }
+
     public void stopFlow(){
         flow = null;
     }
@@ -105,6 +111,27 @@ public class LiquidModule extends BlockModule{
 
     public void clear(){
         Arrays.fill(liquids, 0);
+    }
+
+    public void add(LiquidModule other){
+        add(other, 1f);
+    }
+
+    public void add(LiquidModule other, float mul){
+        for(int i = 0; i < liquids.length; i ++){
+            liquids[i] += other.liquids[i] * mul;
+
+            if(liquids[i] > liquids[current.id]){
+                current = content.liquid(i);
+            }
+        }
+    }
+
+    public void set(LiquidModule other, float mul){
+        current = other.current;
+        for(int i = 0; i < liquids.length; i ++){
+            liquids[i] = other.liquids[i] * mul;
+        }
     }
 
     public void add(Liquid liquid, float amount){
@@ -178,6 +205,20 @@ public class LiquidModule extends BlockModule{
                 }
             }
         }
+    }
+
+    @Override
+    public String toString(){
+        var res = new StringBuilder();
+        res.append("LiquidModule{ current=").append(current).append(", ");
+        for(int i = 0; i < liquids.length; i++){
+            if(liquids[i] > 0){
+                res.append(content.liquid(i).name).append(":").append(liquids[i]).append(", ");
+            }
+        }
+        res.setLength(res.length() - 2);
+        res.append("}");
+        return res.toString();
     }
 
     public interface LiquidConsumer{

@@ -99,7 +99,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     private transient boolean sleeping;
     private transient float sleepTime;
-    private transient boolean initialized;
+    private transient boolean initialized, wasAdded;
 
     /** Sets this tile entity data to this and adds it if necessary. */
     public Building init(Tile tile, Team team, boolean shouldAdd, int rotation){
@@ -174,6 +174,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     //endregion
     //region io
 
+    /** certain blocks merge liquid graphs, so it is necessary to provide a fake one at write-time */
+    public LiquidModule writeLiquids(){
+        return liquids;
+    }
+
     public final void writeBase(Writes write){
         boolean writeVisibility = state.rules.fog && visibleFlags != 0;
 
@@ -186,7 +191,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         write.b(moduleBitmask());
         if(items != null) items.write(write);
         if(power != null) power.write(write);
-        if(liquids != null) liquids.write(write);
+        if(liquids != null) writeLiquids().write(write);
 
         //efficiency is written as two bytes to save space
         write.b((byte)(Mathf.clamp(efficiency) * 255f));
@@ -820,6 +825,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         if(!net.client() && state.isCampaign() && team == state.rules.defaultTeam) liquid.unlock();
 
+        float selfCapacity = liquidCapacity();
+
         for(int i = 0; i < proximity.size; i++){
             incrementDump(proximity.size);
 
@@ -829,10 +836,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             other = other.getLiquidDestination(self(), liquid);
 
             if(other != null && other.team == team && other.block.hasLiquids && canDumpLiquid(other, liquid) && other.liquids != null){
-                float ofract = other.liquids.get(liquid) / other.block.liquidCapacity;
-                float fract = liquids.get(liquid) / block.liquidCapacity;
+                float ofract = other.liquids.get(liquid) / other.liquidCapacity();
+                float fract = liquids.get(liquid) / selfCapacity;
 
-                if(ofract < fract) transferLiquid(other, (fract - ofract) * block.liquidCapacity / scaling, liquid);
+                if(ofract < fract) transferLiquid(other, (fract - ofract) * selfCapacity / scaling, liquid);
             }
         }
     }
@@ -842,7 +849,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public void transferLiquid(Building next, float amount, Liquid liquid){
-        float flow = Math.min(next.block.liquidCapacity - next.liquids.get(liquid), amount);
+        float flow = Math.min(next.liquidCapacity() - next.liquids.get(liquid), amount);
 
         if(next.acceptLiquid(self(), liquid)){
             next.handleLiquid(self(), liquid, flow);
@@ -869,19 +876,20 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if(next == null) return 0;
 
         next = next.getLiquidDestination(self(), liquid);
+        float selfCapacity = liquidCapacity(), nextCapacity = next.liquidCapacity();
 
         if(next.team == team && next.block.hasLiquids && liquids.get(liquid) > 0f){
-            float ofract = next.liquids.get(liquid) / next.block.liquidCapacity;
-            float fract = liquids.get(liquid) / block.liquidCapacity * block.liquidPressure;
-            float flow = Math.min(Mathf.clamp((fract - ofract)) * (block.liquidCapacity), liquids.get(liquid));
-            flow = Math.min(flow, next.block.liquidCapacity - next.liquids.get(liquid));
+            float ofract = next.liquids.get(liquid) / nextCapacity;
+            float fract = liquids.get(liquid) / selfCapacity * block.liquidPressure;
+            float flow = Math.min(Mathf.clamp((fract - ofract)) * selfCapacity, liquids.get(liquid));
+            flow = Math.min(flow, nextCapacity - next.liquids.get(liquid));
 
             if(flow > 0f && ofract <= fract && next.acceptLiquid(self(), liquid)){
                 next.handleLiquid(self(), liquid, flow);
                 liquids.remove(liquid, flow);
                 return flow;
                 //handle reactions between different liquid types ▼
-            }else if(!next.block.consumesLiquid(liquid) && next.liquids.currentAmount() / next.block.liquidCapacity > 0.1f && fract > 0.1f){
+            }else if(!next.block.consumesLiquid(liquid) && next.liquids.currentAmount() / nextCapacity > 0.1f && fract > 0.1f){
                 //TODO !IMPORTANT! uses current(), which is 1) wrong for multi-liquid blocks and 2) causes unwanted reactions, e.g. hydrogen + slag in pump
                 //TODO these are incorrect effect positions
                 float fx = (x + next.x) / 2f, fy = (y + next.y) / 2f;
@@ -905,6 +913,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             }
         }
         return 0;
+    }
+
+    /** Override to set a custom liquid capacity, e.g. for blocks with shared inventories. */
+    public float liquidCapacity(){
+        return block.liquidCapacity;
     }
 
     public Building getLiquidDestination(Building from, Liquid liquid){
@@ -1073,6 +1086,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public void onProximityUpdate(){
         noSleep();
     }
+
+    /** Like onProximityAdded, but only called once. Essentially does what onProximityAdded was supposed to. */
+    public void onAdded(){}
 
     public void updatePowerGraph(){
         for(Building other : getPowerConnections(tempBuilds)){
@@ -1679,6 +1695,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             other.onProximityUpdate();
         }
         proximity.clear();
+        wasAdded = false;
     }
 
     public void rotated(int prevRotation, int newRotation){
@@ -1705,6 +1722,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             proximity.add(tile);
         }
 
+        if(!wasAdded){
+            onAdded();
+            wasAdded = true;
+        }
         onProximityAdded();
         onProximityUpdate();
 

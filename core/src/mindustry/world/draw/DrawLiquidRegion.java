@@ -24,7 +24,7 @@ public class DrawLiquidRegion extends DrawBlock{
     public void draw(Building build){
         Liquid drawn = drawLiquid != null ? drawLiquid : build.liquids.current();
         Drawf.liquid(liquid, build.x, build.y,
-            build.liquids.get(drawn) / build.block.liquidCapacity * alpha,
+            build.liquids.get(drawn) / build.liquidCapacity() * alpha,
             drawn.color
         );
     }
