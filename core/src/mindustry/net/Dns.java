@@ -16,7 +16,8 @@ public class Dns{
     private static final Pattern ipPattern = Pattern.compile("^((0|1\\d?\\d?|2[0-4]?\\d?|25[0-5]?|[3-9]\\d?)\\.){3}(0|1\\d?\\d?|2[0-4]?\\d?|25[0-5]?|[3-9]\\d?)$");
     private static final int aRecord = 1, srvRecord = 33;
     private static IntMap<ObjectMap<String, Seq<?>>> cache = new IntMap<>();
-    private static Seq<InetSocketAddress> defNameservers = Seq.with(new InetSocketAddress("1.1.1.1", 53), new InetSocketAddress("8.8.8.8", 53));
+    //TODO remove these
+    //private static Seq<InetSocketAddress> defNameservers = Seq.with(new InetSocketAddress("1.1.1.1", 53), new InetSocketAddress("8.8.8.8", 53));
 
     static <T> void resolve(int type, String domain, Func<ByteBuffer, T> reader, Cons<Seq<T>> result, Cons<Exception> error){
         ObjectMap<String, Seq<?>> map;
@@ -41,6 +42,8 @@ public class Dns{
         }, error);
     }
 
+    //TODO breaks for ipv6
+    //TODO no SRV recrod support
     static void resolveAddress(String domain, Cons<InetAddress> result, Cons<Exception> error){
         if(ipPattern.matcher(domain).matches()){
             try{
