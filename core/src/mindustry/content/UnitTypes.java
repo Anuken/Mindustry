@@ -2948,6 +2948,7 @@ public class UnitTypes{
             weapons.add(new Weapon("merui-weapon"){{
                 shootSound = Sounds.missile;
                 mirror = false;
+                showStatSprite = false;
                 x = 0f;
                 y = 1f;
                 shootY = 4f;
@@ -3151,6 +3152,7 @@ public class UnitTypes{
                 x = 29f / 4f;
                 y = -11f / 4f;
                 shootY = 1.5f;
+                showStatSprite = false;
                 reload = 130f;
                 layerOffset = 0.01f;
                 heatColor = Color.red;

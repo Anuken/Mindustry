@@ -103,7 +103,7 @@ public class ImpactReactor extends PowerGenerator{
         public float ambientVolume(){
             return warmup;
         }
-        
+
         @Override
         public double sense(LAccess sensor){
             if(sensor == LAccess.heat) return warmup;

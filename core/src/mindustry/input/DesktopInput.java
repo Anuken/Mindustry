@@ -262,7 +262,7 @@ public class DesktopInput extends InputHandler{
 
         shouldShoot = !scene.hasMouse() && !locked;
 
-        if(!locked && block == null && !scene.hasField() &&
+        if(!locked && block == null && !scene.hasField() && !scene.hasDialog() &&
                 //disable command mode when player unit can boost and command mode binding is the same
                 !(!player.dead() && player.unit().type.canBoost && keybinds.get(Binding.command_mode).key == keybinds.get(Binding.boost).key)){
             if(settings.getBool("commandmodehold")){
@@ -767,6 +767,14 @@ public class DesktopInput extends InputHandler{
             block = null;
             splan = null;
             selectPlans.clear();
+        }
+    }
+
+    @Override
+    public void panCamera(Vec2 position){
+        if(!locked()){
+            panning = true;
+            camera.position.set(position);
         }
     }
 

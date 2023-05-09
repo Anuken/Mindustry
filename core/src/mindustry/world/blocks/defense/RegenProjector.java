@@ -12,6 +12,7 @@ import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
+import mindustry.world.consumers.*;
 import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
@@ -89,7 +90,15 @@ public class RegenProjector extends Block{
 
         stats.add(Stat.repairTime, (int)(1f / (healPercent / 100f) / 60f), StatUnit.seconds);
         stats.add(Stat.range, range, StatUnit.blocks);
-        stats.add(Stat.boostEffect, optionalMultiplier, StatUnit.timesSpeed);
+
+        if(findConsumer(c -> c instanceof ConsumeItems) instanceof ConsumeItems cons){
+            stats.remove(Stat.booster);
+            stats.add(Stat.booster, StatValues.itemBoosters(
+                "{0}" + StatUnit.timesSpeed.localized(),
+                stats.timePeriod, optionalMultiplier, 0f,
+                cons.items, this::consumesItem)
+            );
+        }
     }
 
     public class RegenProjectorBuild extends Building{

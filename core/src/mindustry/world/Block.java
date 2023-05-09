@@ -18,6 +18,7 @@ import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
+import mindustry.entities.bullet.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -30,7 +31,6 @@ import mindustry.world.blocks.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.consumers.*;
-import mindustry.entities.bullet.*;
 import mindustry.world.meta.*;
 
 import java.lang.reflect.*;
@@ -925,6 +925,10 @@ public class Block extends UnlockableContent implements Senseable{
         return consumers.length == 0 ? (T)consumeBuilder.find(filter) : (T)Structs.find(consumers, filter);
     }
 
+    public boolean hasConsumer(Consume cons){
+        return consumeBuilder.contains(cons);
+    }
+
     public void removeConsumer(Consume cons){
         if(consumers.length > 0){
             throw new IllegalStateException("You can only remove consumers before init(). After init(), all consumers have already been initialized.");
@@ -1143,6 +1147,10 @@ public class Block extends UnlockableContent implements Senseable{
         }
 
         clipSize = Math.max(clipSize, size * tilesize);
+
+        if(hasLiquids && drawLiquidLight){
+            clipSize = Math.max(size * 30f * 2f, clipSize);
+        }
 
         if(emitLight){
             clipSize = Math.max(clipSize, lightRadius * 2f);

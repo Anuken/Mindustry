@@ -31,7 +31,7 @@ import static mindustry.Vars.*;
 import static mindustry.logic.GlobalVars.*;
 
 @Component(base = true)
-abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Boundedc, Syncc, Shieldc, Displayable, Senseable, Ranged, Minerc, Builderc{
+abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Boundedc, Syncc, Shieldc, Displayable, Ranged, Minerc, Builderc, Senseable, Settable{
 
     @Import boolean hovering, dead, disarmed;
     @Import float x, y, rotation, elevation, maxHealth, drag, armor, hitSize, health, ammo, dragMultiplier;
@@ -40,6 +40,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     @Import @Nullable Tile mineTile;
     @Import Vec2 vel;
     @Import WeaponMount[] mounts;
+    @Import ItemStack stack;
 
     private UnitController controller;
     Ability[] abilities = {};
@@ -255,6 +256,60 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     public double sense(Content content){
         if(content == stack().item) return stack().amount;
         return Float.NaN;
+    }
+
+    @Override
+    public void setProp(LAccess prop, double value){
+        switch(prop){
+            case health -> health = (float)Mathf.clamp(value, 0, maxHealth);
+            case x -> x = World.unconv((float)value);
+            case y -> y = World.unconv((float)value);
+            case rotation -> rotation = (float)value;
+            case team -> {
+                if(!net.client()){
+                    Team team = Team.get((int)value);
+                    if(controller instanceof Player p){
+                        p.team(team);
+                    }
+                    this.team = team;
+                }
+            }
+            case flag -> flag = value;
+        }
+    }
+
+    @Override
+    public void setProp(LAccess prop, Object value){
+        switch(prop){
+            case team -> {
+                if(value instanceof Team t && !net.client()){
+                    if(controller instanceof Player p) p.team(t);
+                    team = t;
+                }
+            }
+            case payloadType -> {
+                //only serverside
+                if(((Object)this) instanceof Payloadc pay && !net.client()){
+                    if(value instanceof Block b){
+                        Building build = b.newBuilding().create(b, team());
+                        if(pay.canPickup(build)) pay.addPayload(new BuildPayload(build));
+                    }else if(value instanceof UnitType ut){
+                        Unit unit = ut.create(team());
+                        if(pay.canPickup(unit)) pay.addPayload(new UnitPayload(unit));
+                    }else if(value == null && pay.payloads().size > 0){
+                        pay.dropLastPayload();
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void setProp(UnlockableContent content, double value){
+        if(content instanceof Item item){
+            stack.item = item;
+            stack.amount = Mathf.clamp((int)value, 0, type.itemCapacity);
+        }
     }
 
     @Override

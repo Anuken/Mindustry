@@ -394,7 +394,7 @@ public class LExecutor{
                     case idle -> {
                         ai.control = type;
                     }
-                    case move, stop, approach -> {
+                    case move, stop, approach, pathfind -> {
                         ai.control = type;
                         ai.moveX = x1;
                         ai.moveY = y1;
@@ -1040,7 +1040,7 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            
+
             if(exec.building(target) instanceof MessageBuild d && (d.team == exec.team || exec.privileged)){
 
                 d.message.setLength(0);
@@ -1433,12 +1433,13 @@ public class LExecutor{
                 }
                 case ambientLight -> state.rules.ambientLight.fromDouble(exec.num(value));
                 case solarMultiplier -> state.rules.solarMultiplier = exec.numf(value);
-                case unitBuildSpeed, unitCost, unitDamage, blockHealth, blockDamage, buildSpeed, rtsMinSquad, rtsMinWeight -> {
+                case unitHealth, unitBuildSpeed, unitCost, unitDamage, blockHealth, blockDamage, buildSpeed, rtsMinSquad, rtsMinWeight -> {
                     Team team = exec.team(p1);
                     if(team != null){
                         float num = exec.numf(value);
                         switch(rule){
                             case buildSpeed -> team.rules().buildSpeedMultiplier = Mathf.clamp(num, 0.001f, 50f);
+                            case unitHealth -> team.rules().unitHealthMultiplier = Math.max(num, 0.001f);
                             case unitBuildSpeed -> team.rules().unitBuildSpeedMultiplier = Mathf.clamp(num, 0f, 50f);
                             case unitCost -> team.rules().unitCostMultiplier = Math.max(num, 0f);
                             case unitDamage -> team.rules().unitDamageMultiplier = Math.max(num, 0f);
@@ -1690,6 +1691,38 @@ public class LExecutor{
                     Unit unit = group.createUnit(state.rules.waveTeam, state.wave - 1);
                     unit.set(spawnX + Tmp.v1.x, spawnY + Tmp.v1.y);
                     Vars.spawner.spawnEffect(unit);
+                }
+            }
+        }
+    }
+
+    public static class SetPropI implements LInstruction{
+        public int type, of, value;
+
+        public SetPropI(int type, int of, int value){
+            this.type = type;
+            this.of = of;
+            this.value = value;
+        }
+
+        public SetPropI(){
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            Object target = exec.obj(of);
+            Object key = exec.obj(type);
+
+            if(target instanceof Settable sp){
+                if(key instanceof LAccess property){
+                    Var var = exec.var(value);
+                    if(var.isobj){
+                        sp.setProp(property, var.objval);
+                    }else{
+                        sp.setProp(property, var.numval);
+                    }
+                }else if(key instanceof UnlockableContent content){
+                    sp.setProp(content, exec.num(value));
                 }
             }
         }

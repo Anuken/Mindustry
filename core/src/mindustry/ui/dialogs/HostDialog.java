@@ -38,6 +38,15 @@ public class HostDialog extends BaseDialog{
             button.update(() -> button.getStyle().imageUpColor = player.color());
         }).width(w).height(70f).pad(4).colspan(3);
 
+        if(steam){
+            cont.row();
+
+            cont.add().width(65f);
+
+            cont.check("@steam.friendsonly", !Core.settings.getBool("steampublichost"), val -> Core.settings.put("steampublichost", !val)).colspan(2).left()
+                .with(c -> ui.addDescTooltip(c, "@steam.friendsonly.tooltip")).padBottom(15f).row();
+        }
+
         cont.row();
 
         cont.add().width(65f);
@@ -51,7 +60,11 @@ public class HostDialog extends BaseDialog{
             runHost();
         }).width(w).height(70f);
 
-        cont.button("?", () -> ui.showInfo("@host.info")).size(65f, 70f).padLeft(6f);
+        if(!steam){
+            cont.button("?", () -> ui.showInfo("@host.info")).size(65f, 70f).padLeft(6f);
+        }else{
+            cont.add().size(65f, 70f).padLeft(6f);
+        }
 
         shown(() -> {
             if(!steam){
@@ -68,24 +81,9 @@ public class HostDialog extends BaseDialog{
                 player.admin = true;
                 Events.fire(new HostEvent());
 
-                if(steam){
-                    Core.app.post(() -> Core.settings.getBoolOnce("steampublic3", () -> {
-                        ui.showCustomConfirm("@setting.publichost.name", "@public.confirm", "@yes", "@no", () -> {
-                            ui.showCustomConfirm("@setting.publichost.name", "@public.confirm.really", "@no", "@yes", () -> {
-                                Core.settings.put("publichost", true);
-                                platform.updateLobby();
-                            }, () -> {
-                                Core.settings.put("publichost", false);
-                                platform.updateLobby();
-                            });
-                        }, () -> {
-                            Core.settings.put("publichost", false);
-                            platform.updateLobby();
-                        });
-                    }));
-
+                if(steam && Core.settings.getBool("steampublichost")){
                     if(Version.modifier.contains("beta") || Version.modifier.contains("alpha")){
-                        Core.settings.put("publichost", false);
+                        Core.settings.put("steampublichost", false);
                         platform.updateLobby();
                         Core.settings.getBoolOnce("betapublic", () -> ui.showInfo("@public.beta"));
                     }

@@ -24,6 +24,7 @@ public class BuildWeapon extends Weapon{
         predictTarget = false;
         display = false;
         bullet = new BulletType();
+        useAttackRange = false;
     }
 
     @Override

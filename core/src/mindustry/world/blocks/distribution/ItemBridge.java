@@ -423,7 +423,8 @@ public class ItemBridge extends Block{
 
             if(linkValid(tile, other)){
                 int rel = relativeTo(other);
-                int rel2 = relativeTo(Edges.getFacingEdge(source, this));
+                var facing = Edges.getFacingEdge(source, this);
+                int rel2 = facing == null ? -1 : relativeTo(facing);
 
                 return rel != rel2;
             }

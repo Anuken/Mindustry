@@ -1,6 +1,7 @@
 package mindustry.entities.comp;
 
 import arc.util.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -26,7 +27,7 @@ abstract class ShieldComp implements Healthc, Posc{
     @Override
     public void damage(float amount){
         //apply armor and scaling effects
-        rawDamage(Damage.applyArmor(amount, armor) / healthMultiplier);
+        rawDamage(Damage.applyArmor(amount, armor) / healthMultiplier / Vars.state.rules.unitHealth(team));
     }
 
     @Replace
@@ -34,14 +35,14 @@ abstract class ShieldComp implements Healthc, Posc{
     public void damagePierce(float amount, boolean withEffect){
         float pre = hitTime;
 
-        rawDamage(amount);
+        rawDamage(amount / healthMultiplier / Vars.state.rules.unitHealth(team));
 
         if(!withEffect){
             hitTime = pre;
         }
     }
 
-    private void rawDamage(float amount){
+    protected void rawDamage(float amount){
         boolean hadShields = shield > 0.0001f;
 
         if(hadShields){

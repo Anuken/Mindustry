@@ -66,27 +66,27 @@ public class CoreBlock extends StorageBlock{
 
     @Remote(called = Loc.server)
     public static void playerSpawn(Tile tile, Player player){
-        if(player == null || tile == null || !(tile.build instanceof CoreBuild entity)) return;
+        if(player == null || tile == null || !(tile.build instanceof CoreBuild core)) return;
 
-        CoreBlock block = (CoreBlock)tile.block();
-        if(entity.wasVisible){
-            Fx.spawn.at(entity);
+        UnitType spawnType = ((CoreBlock)core.block).unitType;
+        if(core.wasVisible){
+            Fx.spawn.at(core);
         }
 
-        player.set(entity);
+        player.set(core);
 
         if(!net.client()){
-            Unit unit = block.unitType.create(tile.team());
-            unit.set(entity);
+            Unit unit = spawnType.create(tile.team());
+            unit.set(core);
             unit.rotation(90f);
             unit.impulse(0f, 3f);
-            unit.controller(player);
             unit.spawnedByCore(true);
+            unit.controller(player);
             unit.add();
         }
 
         if(state.isCampaign() && player == Vars.player){
-            block.unitType.unlock();
+            spawnType.unlock();
         }
     }
 
@@ -95,6 +95,20 @@ public class CoreBlock extends StorageBlock{
         super.setStats();
 
         stats.remove(Stat.buildTime);
+        stats.add(Stat.unitType, table -> {
+            table.row();
+            table.table(Styles.grayPanel, b -> {
+                b.image(unitType.uiIcon).size(40).pad(10f).left().scaling(Scaling.fit);
+                b.table(info -> {
+                    info.add(unitType.localizedName).left();
+                    if(Core.settings.getBool("console")){
+                        info.row();
+                        info.add(unitType.name).left().color(Color.lightGray);
+                    }
+                });
+                b.button("?", Styles.flatBordert, () -> ui.content.show(unitType)).size(40f).pad(10).right().grow().visible(() -> unitType.unlockedNow());
+            }).growX().pad(5).row();
+        });
     }
 
     @Override
@@ -395,7 +409,7 @@ public class CoreBlock extends StorageBlock{
             if(renderer.getLandTime() >= 1f){
                 tile.getLinkedTiles(t -> {
                     if(Mathf.chance(0.4f)){
-                        Fx.coreLandDust.at(t.worldx(), t.worldy(), angleTo(t) + Mathf.range(30f), Tmp.c1.set(t.floor().mapColor).mul(1.5f + Mathf.range(0.15f)));
+                        Fx.coreLandDust.at(t.worldx(), t.worldy(), angleTo(t.worldx(), t.worldy()) + Mathf.range(30f), Tmp.c1.set(t.floor().mapColor).mul(1.5f + Mathf.range(0.15f)));
                     }
                 });
 
@@ -478,6 +492,12 @@ public class CoreBlock extends StorageBlock{
 
             storageCapacity = itemCapacity + proximity().sum(e -> owns(e) ? e.block.itemCapacity : 0);
             proximity.each(this::owns, t -> {
+                //add inventory if there is something in it from a payload
+                if(t.items != items){
+                    items.add(t.items);
+                    t.items.clear();
+                }
+
                 t.items = items;
                 ((StorageBuild)t).linkedCore = this;
             });

@@ -1,5 +1,7 @@
 package mindustry.entities.pattern;
 
+import arc.util.*;
+
 public class ShootBarrel extends ShootPattern{
     /** barrels [in x, y, rotation] format. */
     public float[] barrels = {0f, 0f, 0f};
@@ -16,10 +18,11 @@ public class ShootBarrel extends ShootPattern{
     }
 
     @Override
-    public void shoot(int totalShots, BulletHandler handler){
+    public void shoot(int totalShots, BulletHandler handler, @Nullable Runnable barrelIncrementer){
         for(int i = 0; i < shots; i++){
             int index = ((i + totalShots + barrelOffset) % (barrels.length / 3)) * 3;
             handler.shoot(barrels[index], barrels[index + 1], barrels[index + 2], firstShotDelay + shotDelay * i);
+            if(barrelIncrementer != null) barrelIncrementer.run();
         }
     }
 }
