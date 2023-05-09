@@ -318,6 +318,17 @@ public class Conduit extends LiquidBlock implements Autotiler{
         }
     }
 
+    /*
+    TODO:
+    - [ ] liquids shared as one inventory
+    - [ ] liquids merged when placing
+    - [ ] liquids split when breaking
+    - [ ] liquids saved
+    - [ ] liquids accept input
+    - [ ] liquids transfer forward
+    - [ ] liquids leak
+    - [ ] liquids display properly (including flow rate)
+     */
     public static class ConduitGraph{
         private static final IntSet closedSet = new IntSet();
         private static final Queue<ConduitBuild> queue = new Queue<>();
