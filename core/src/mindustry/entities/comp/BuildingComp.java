@@ -1681,6 +1681,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         proximity.clear();
     }
 
+    public void rotated(int prevRotation, int newRotation){
+
+    }
+
     public void updateProximity(){
         tmpTiles.clear();
         proximity.clear();

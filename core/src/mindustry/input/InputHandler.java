@@ -464,8 +464,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         if(player != null) build.lastAccessed = player.name;
-        build.rotation = Mathf.mod(build.rotation + Mathf.sign(direction), 4);
+        int newRotation = Mathf.mod(build.rotation + Mathf.sign(direction), 4), prev = build.rotation;
+        build.rotation = newRotation;
         build.updateProximity();
+        build.rotated(prev, newRotation);
         build.noSleep();
         Fx.rotateBlock.at(build.x, build.y, build.block.size);
     }

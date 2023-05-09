@@ -148,9 +148,57 @@ public class Conduit extends LiquidBlock implements Autotiler{
     }
 
     public class ConduitBuild extends LiquidBuild implements ChainedBuilding{
+        public @Nullable ConduitGraph graph;
+
         public float smoothLiquid;
         public int blendbits, xscl = 1, yscl = 1, blending;
         public boolean capped, backCapped = false;
+
+        protected void addGraphs(){
+            graph = null;
+            //connect self to every nearby graph
+            getConnections(other -> {
+                if(other.graph != null){
+                    other.graph.merge(this);
+                }
+            });
+
+            if(graph == null){
+                new ConduitGraph().merge(this);
+            }
+        }
+
+        protected void removeGraphs(){
+            //graph is getting recalculated, no longer valid
+            if(graph != null){
+                graph.checkRemove();
+            }
+
+            getConnections(other -> new ConduitGraph().reflow(this, other));
+        }
+
+        @Override
+        public void onProximityAdded(){
+            super.onProximityAdded();
+
+            addGraphs();
+        }
+
+        @Override
+        public void onProximityRemoved(){
+            super.onProximityRemoved();
+
+            removeGraphs();
+        }
+
+        @Override
+        public void rotated(int prevRot, int newRot){
+            //essentially simulates the conduit being removed and re-placed - hacky, but it works
+            rotation = prevRot;
+            removeGraphs();
+            rotation = newRot;
+            addGraphs();
+        }
 
         @Override
         public void draw(){
@@ -173,6 +221,15 @@ public class Conduit extends LiquidBlock implements Autotiler{
 
             if(capped && capRegion.found()) Draw.rect(capRegion, x, y, rotdeg());
             if(backCapped && capRegion.found()) Draw.rect(capRegion, x, y, rotdeg() + 180);
+
+            //TODO this is for debuggig only
+            Mathf.rand.setSeed(graph == null ? -1 : graph.id);
+            Draw.color(Tmp.c1.rand());
+            Draw.alpha(0.4f);
+
+            Fill.square(x, y, 4f);
+
+            Draw.color();
         }
 
         protected void drawAt(float x, float y, int bits, int rotation, SliceMode slice){
@@ -245,5 +302,102 @@ public class Conduit extends LiquidBlock implements Autotiler{
             }
             return null;
         }
+
+        /** Calls callback with every conduit that transfers fluids to this one. */
+        public void getConnections(Cons<ConduitBuild> cons){
+            for(var other : proximity){
+                if(other instanceof ConduitBuild conduit){
+                    if(
+                        front() == conduit ||
+                        other.front() == this
+                    ){
+                        cons.get(conduit);
+                    }
+                }
+            }
+        }
+    }
+
+    public static class ConduitGraph{
+        private static final IntSet closedSet = new IntSet();
+        private static final Queue<ConduitBuild> queue = new Queue<>();
+
+        static int lastId = -1;
+
+        public final int id = lastId ++;
+
+        private Seq<ConduitBuild> conduits = new Seq<>();
+        private final @Nullable ConduitGraphUpdater entity;
+
+        public ConduitGraph(){
+            entity = ConduitGraphUpdater.create();
+            entity.graph = this;
+        }
+
+        public void update(){
+            //TODO
+        }
+
+        public void checkAdd(){
+            if(entity != null) entity.add();
+        }
+
+        public void checkRemove(){
+            if(entity != null) entity.remove();
+        }
+
+        public void reflow(@Nullable ConduitBuild ignore, ConduitBuild conduit){
+            closedSet.clear();
+            queue.clear();
+
+            //ignore the starting point and don't add it, as it is being removed
+            if(ignore != null) closedSet.add(ignore.id);
+
+            closedSet.add(conduit.id);
+            queue.add(conduit);
+
+            while(queue.size > 0){
+                var parent = queue.removeFirst();
+                assign(parent);
+
+                parent.getConnections(child -> {
+                    if(closedSet.add(child.id)){
+                        queue.addLast(child);
+                    }
+                });
+            }
+
+            closedSet.clear();
+            queue.clear();
+        }
+
+        public void merge(ConduitBuild other){
+            if(other.graph == this) return;
+
+            if(other.graph != null){
+
+                //merge graphs - TODO - flip if it is larger
+                for(var cond : other.graph.conduits){
+                    assign(cond);
+                }
+            }else{
+                assign(other);
+            }
+        }
+
+        protected void assign(ConduitBuild build){
+            if(build.graph != this){
+
+                //invalidate older graph
+                if(build.graph != null){
+                    build.graph.checkRemove();
+                }
+
+                build.graph = this;
+                conduits.add(build);
+                checkAdd();
+            }
+        }
+
     }
 }
