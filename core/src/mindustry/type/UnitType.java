@@ -711,10 +711,14 @@ public class UnitType extends UnlockableContent{
         //assume slight range margin
         float margin = 4f;
 
+        boolean skipWeapons = !weapons.contains(w -> !w.useAttackRange);
+
         //set up default range
         if(range < 0){
             range = Float.MAX_VALUE;
             for(Weapon weapon : weapons){
+                if(!weapon.useAttackRange && skipWeapons) continue;
+
                 range = Math.min(range, weapon.range() - margin);
                 maxRange = Math.max(maxRange, weapon.range() - margin);
             }
@@ -724,6 +728,8 @@ public class UnitType extends UnlockableContent{
             maxRange = Math.max(0f, range);
 
             for(Weapon weapon : weapons){
+                if(!weapon.useAttackRange && skipWeapons) continue;
+
                 maxRange = Math.max(maxRange, weapon.range() - margin);
             }
         }

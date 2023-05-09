@@ -21,7 +21,8 @@ import mindustry.world.*;
 import static mindustry.Vars.*;
 
 public class MinimapRenderer{
-    private static final float baseSize = 16f;
+    private static final float baseSize = 16f, updateInterval = 2f;
+
     private final Seq<Unit> units = new Seq<>();
     private Pixmap pixmap;
     private Texture texture;
@@ -31,6 +32,8 @@ public class MinimapRenderer{
 
     private float lastX, lastY, lastW, lastH, lastScl;
     private boolean worldSpace;
+    private IntSet updates = new IntSet();
+    private float updateCounter = 0f;
 
     public MinimapRenderer(){
         Events.on(WorldLoadEvent.class, event -> {
@@ -65,6 +68,26 @@ public class MinimapRenderer{
         });
 
         Events.on(BuildTeamChangeEvent.class, event -> update(event.build.tile));
+
+        Events.run(Trigger.update, () -> {
+            //updates are batched to occur every 2 frames
+            if((updateCounter += Time.delta) >= updateInterval){
+                updateCounter %= updateInterval;
+
+                updates.each(pos -> {
+                    Tile tile = world.tile(pos);
+                    if(tile == null) return;
+
+                    int color = colorFor(tile);
+                    pixmap.set(tile.x, pixmap.height - 1 - tile.y, color);
+
+                    //yes, this calls glTexSubImage2D every time, with a 1x1 region
+                    Pixmaps.drawPixel(texture, tile.x, pixmap.height - 1 - tile.y, color);
+                });
+
+                updates.clear();
+            }
+        });
     }
 
     public Pixmap getPixmap(){
@@ -89,6 +112,7 @@ public class MinimapRenderer{
     }
 
     public void reset(){
+        updates.clear();
         if(pixmap != null){
             pixmap.dispose();
             texture.dispose();
@@ -222,7 +246,7 @@ public class MinimapRenderer{
 
             Vec2 v = transform(Tmp.v1.set((ix + 0.5f + offset) * tilesize, (iy + 0.5f + offset) * tilesize));
 
-            Draw.color(Color.orange, Color.scarlet, Mathf.clamp(time / 50f));
+            Draw.color(Color.orange, Color.scarlet, Mathf.clamp(time / 70f));
 
             Lines.square(v.x, v.y, rad);
         }
@@ -319,10 +343,7 @@ public class MinimapRenderer{
     }
 
     void updatePixel(Tile tile){
-        int color = colorFor(tile);
-        pixmap.set(tile.x, pixmap.height - 1 - tile.y, color);
-
-        Pixmaps.drawPixel(texture, tile.x, pixmap.height - 1 - tile.y, color);
+        updates.add(tile.pos());
     }
 
     public void updateUnitArray(){

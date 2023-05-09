@@ -310,6 +310,9 @@ public class Logic implements ApplicationListener{
                     Events.fire(new GameOverEvent(left == null ? Team.derelict : left.team));
                     state.gameOver = true;
                 }
+            }else if(!state.gameOver && state.rules.waves && (state.enemies == 0 && state.rules.winWave > 0 && state.wave >= state.rules.winWave && !spawner.isSpawning())){
+                state.gameOver = true;
+                Events.fire(new GameOverEvent(state.rules.defaultTeam));
             }
         }
     }

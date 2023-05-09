@@ -69,6 +69,8 @@ public class Rules{
     public float unitCostMultiplier = 1f;
     /** How much damage units deal. */
     public float unitDamageMultiplier = 1f;
+    /** How much health units start with. */
+    public float unitHealthMultiplier = 1f;
     /** How much damage unit crash damage deals. (Compounds with unitDamageMultiplier) */
     public float unitCrashDamageMultiplier = 1f;
     /** If true, ghost blocks will appear upon destruction, letting builder blocks/units rebuild them. */
@@ -111,7 +113,7 @@ public class Rules{
     public float waveSpacing = 2 * Time.toMinutes;
     /** Starting wave spacing; if <=0, uses waveSpacing * 2. */
     public float initialWaveSpacing = 0f;
-    /** Wave after which the player 'wins'. Used in sectors. Use a value <= 0 to disable. */
+    /** Wave after which the player 'wins'. Use a value <= 0 to disable. */
     public int winWave = 0;
     /** Base unit cap. Can still be increased by blocks. */
     public int unitCap = 0;
@@ -226,6 +228,11 @@ public class Rules{
         return unitDamageMultiplier * teams.get(team).unitDamageMultiplier;
     }
 
+    public float unitHealth(Team team){
+        //a 0 here would be a very bad idea.
+        return Math.max(unitHealthMultiplier * teams.get(team).unitHealthMultiplier, 0.000001f);
+    }
+
     public float unitCrashDamage(Team team){
         return unitDamage(team) * unitCrashDamageMultiplier * teams.get(team).unitCrashDamageMultiplier;
     }
@@ -233,7 +240,6 @@ public class Rules{
     public float blockHealth(Team team){
         return blockHealthMultiplier * teams.get(team).blockHealthMultiplier;
     }
-
     public float blockDamage(Team team){
         return blockDamageMultiplier * teams.get(team).blockDamageMultiplier;
     }
@@ -278,6 +284,8 @@ public class Rules{
         public float unitCrashDamageMultiplier = 1f;
         /** Multiplier of resources that units take to build. */
         public float unitCostMultiplier = 1f;
+        /** How much health units start with. */
+        public float unitHealthMultiplier = 1f;
         /** How much health blocks start with. */
         public float blockHealthMultiplier = 1f;
         /** How much damage blocks (turrets) deal. */

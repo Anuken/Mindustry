@@ -63,6 +63,8 @@ public class Weapon implements Cloneable{
     public boolean autoTarget = false;
     /** whether to perform target trajectory prediction */
     public boolean predictTarget = true;
+    /** if true, this weapon is used for attack range calculations */
+    public boolean useAttackRange = true;
     /** ticks to wait in-between targets */
     public float targetInterval = 40f, targetSwitchInterval = 70f;
     /** rotation speed of weapon when rotation is enabled, in degrees/t*/

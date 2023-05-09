@@ -40,8 +40,8 @@ public class PayloadSource extends PayloadBlock{
         commandable = true;
 
         config(Block.class, (PayloadSourceBuild build, Block block) -> {
-            if(canProduce(block) && build.block != block){
-                build.block = block;
+            if(canProduce(block) && build.configBlock != block){
+                build.configBlock = block;
                 build.unit = null;
                 build.payload = null;
                 build.scl = 0f;
@@ -51,14 +51,14 @@ public class PayloadSource extends PayloadBlock{
         config(UnitType.class, (PayloadSourceBuild build, UnitType unit) -> {
             if(canProduce(unit) && build.unit != unit){
                 build.unit = unit;
-                build.block = null;
+                build.configBlock = null;
                 build.payload = null;
                 build.scl = 0f;
             }
         });
 
         configClear((PayloadSourceBuild build) -> {
-            build.block = null;
+            build.configBlock = null;
             build.unit = null;
             build.payload = null;
             build.scl = 0f;
@@ -87,7 +87,7 @@ public class PayloadSource extends PayloadBlock{
 
     public class PayloadSourceBuild extends PayloadBlockBuild<Payload>{
         public UnitType unit;
-        public Block block;
+        public Block configBlock;
         public @Nullable Vec2 commandPos;
         public float scl;
 
@@ -111,7 +111,7 @@ public class PayloadSource extends PayloadBlock{
 
         @Override
         public Object config(){
-            return unit == null ? block : unit;
+            return unit == null ? configBlock : unit;
         }
 
         @Override
@@ -133,8 +133,8 @@ public class PayloadSource extends PayloadBlock{
                     }
 
                     Events.fire(new UnitCreateEvent(p, this));
-                }else if(block != null){
-                    payload = new BuildPayload(block, team);
+                }else if(configBlock != null){
+                    payload = new BuildPayload(configBlock, team);
                 }
                 payVector.setZero();
                 payRotation = rotdeg();
@@ -159,14 +159,14 @@ public class PayloadSource extends PayloadBlock{
         public void write(Writes write){
             super.write(write);
             write.s(unit == null ? -1 : unit.id);
-            write.s(block == null ? -1 : block.id);
+            write.s(configBlock == null ? -1 : configBlock.id);
         }
 
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
             unit = Vars.content.unit(read.s());
-            block = Vars.content.block(read.s());
+            configBlock = Vars.content.block(read.s());
         }
     }
 }

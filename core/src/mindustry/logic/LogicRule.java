@@ -18,6 +18,7 @@ public enum LogicRule{
 
     //team specific
     buildSpeed,
+    unitHealth,
     unitBuildSpeed,
     unitCost,
     unitDamage,

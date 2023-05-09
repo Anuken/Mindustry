@@ -25,8 +25,10 @@ public class BuildPlan implements Position, QuadTreeObject{
 
     /** Last progress.*/
     public float progress;
-    /** Whether construction has started for this plan, and other special variables.*/
-    public boolean initialized, worldContext = true, stuck, cachedValid;
+    /** Whether construction has started for this plan. */
+    public boolean initialized, stuck, cachedValid;
+    /** If true, this plan is in the world. If false, it is being rendered in a schematic. */
+    public boolean worldContext = true;
 
     /** Visual scale. Used only for rendering.*/
     public float animScale = 0f;
