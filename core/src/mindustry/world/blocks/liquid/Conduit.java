@@ -27,7 +27,7 @@ import static mindustry.Vars.*;
 import static mindustry.type.Liquid.*;
 
 public class Conduit extends LiquidBlock implements Autotiler{
-    static final boolean debugGraphs = true;
+    static final boolean debugGraphs = false;
     static final float mergeThreshold = 0.2f;
     static final float rotatePad = 6, hpad = rotatePad / 2f / 4f;
     static final float[][] rotateOffsets = {{hpad, hpad}, {-hpad, hpad}, {-hpad, -hpad}, {hpad, -hpad}};
