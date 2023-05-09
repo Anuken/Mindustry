@@ -606,56 +606,56 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             t.label(() -> mode == select ? "@sectors.select" : "").style(Styles.outlineLabel).color(Pal.accent);
         }),
         buttons,
-        //planet selection
-        new Table(t -> {
-            t.top().left();
+                //planet selection
+                new Table(t -> {
+                    t.top().left();
 
-            ScrollPane pane = new ScrollPane(null, Styles.smallPane);
-            t.add(pane).colspan(2).row();
+                    ScrollPane pane = new ScrollPane(null, Styles.smallPane);
+                    t.add(pane).colspan(2).row();
 
-            Table starsTable = new Table(Styles.black);
-            pane.setWidget(starsTable);
-            pane.setScrollingDisabled(true, false);
+                    Table starsTable = new Table(Styles.black);
+                    pane.setWidget(starsTable);
+                    pane.setScrollingDisabled(true, false);
 
-            ButtonGroup<Button> buttonGroup = new ButtonGroup<>();
-            buttonGroup.setMaxCheckCount(1);
+                    ButtonGroup<Button> buttonGroup = new ButtonGroup<>();
+                    buttonGroup.setMaxCheckCount(1);
 
-            for (Planet star : content.planets()) {
-                if (star.solarSystem != star) {
-                    continue;
-                }
-                boolean hasSelectablePlanets = false;
-                for (Planet planet : content.planets()) {
-                    if (planet.solarSystem == star && selectable(planet)) {
-                        hasSelectablePlanets = true;
-                        break;
-                    }
-                }
-                if (hasSelectablePlanets) {
-                    Label starLabel = new Label(star.localizedName);
-                    starsTable.add(starLabel).padLeft(10f).padBottom(10f).left().width(190f).row();
+                    for (Planet star : content.planets()) {
+                        if (star.solarSystem != star) {
+                            continue;
+                        }
+                        boolean hasSelectablePlanets = false;
+                        for (Planet planet : content.planets()) {
+                            if (planet.solarSystem == star && selectable(planet)) {
+                                hasSelectablePlanets = true;
+                                break;
+                            }
+                        }
+                        if (hasSelectablePlanets) {
+                            Label starLabel = new Label(star.localizedName);
+                            starsTable.add(starLabel).padLeft(10f).padBottom(10f).left().width(190f).row();
 
-                    for (Planet planet : content.planets()) {
-                        if (planet.solarSystem == star && selectable(planet)) {
-                            Table planetTable = new Table();
-                            Button planetButton = planetTable.button(planet.localizedName, Icon.icons.get(planet.icon + "Small", Icon.icons.get(planet.icon, Icon.commandRallySmall)), Styles.flatTogglet, () ->{
-                                selected = null;
-                                launchSector = null;
-                                if(state.planet != planet){
-                                    newPresets.clear();
-                                    state.planet = planet;
-                                    rebuildExpand();
+                            for (Planet planet : content.planets()) {
+                                if (planet.solarSystem == star && selectable(planet)) {
+                                    Table planetTable = new Table();
+                                    Button planetButton = planetTable.button(planet.localizedName, Icon.icons.get(planet.icon + "Small", Icon.icons.get(planet.icon, Icon.commandRallySmall)), Styles.flatTogglet, () ->{
+                                        selected = null;
+                                        launchSector = null;
+                                        if(state.planet != planet){
+                                            newPresets.clear();
+                                            state.planet = planet;
+                                            rebuildExpand();
+                                        }
+                                        settings.put("lastplanet", planet.name);
+                                    }).width(200).height(40).update(bb -> bb.setChecked(state.planet == planet)).with(w -> w.marginLeft(10f)).get();
+                                    planetButton.getChildren().get(1).setColor(planet.iconColor);
+                                    planetButton.setColor(planet.iconColor);
+                                    starsTable.add(planetTable).left().row();
                                 }
-                                settings.put("lastplanet", planet.name);
-                            }).width(200).height(40).update(bb -> bb.setChecked(state.planet == planet)).with(w -> w.marginLeft(10f)).get();
-                            planetButton.getChildren().get(1).setColor(planet.iconColor);
-                            planetButton.setColor(planet.iconColor);
-                            starsTable.add(planetTable).left().row();
+                            }
                         }
                     }
-                }
-            }
-        }),
+                }),
 
         new Table(c -> {
             expandTable = c;
