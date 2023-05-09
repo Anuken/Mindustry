@@ -41,7 +41,7 @@ import static mindustry.Vars.*;
 import static mindustry.graphics.g3d.PlanetRenderer.*;
 import static mindustry.ui.dialogs.PlanetDialog.Mode.*;
 
-public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer {
+public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     static final String[] defaultIcons = {
             "effect", "power", "logic", "units", "liquid", "production", "defense", "turret", "distribution", "crafting",
             "settings", "cancel", "zoom", "ok", "star", "home", "pencil", "up", "down", "left", "right",
