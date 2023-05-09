@@ -27,7 +27,8 @@ import static mindustry.Vars.*;
 import static mindustry.type.Liquid.*;
 
 public class Conduit extends LiquidBlock implements Autotiler{
-    static final boolean debugGraphs = false;
+    static final boolean debugGraphs = true;
+    static final float mergeThreshold = 0.2f;
     static final float rotatePad = 6, hpad = rotatePad / 2f / 4f;
     static final float[][] rotateOffsets = {{hpad, hpad}, {-hpad, hpad}, {-hpad, -hpad}, {hpad, -hpad}};
     static final LiquidModule tempLiquids = new LiquidModule();
@@ -346,15 +347,17 @@ public class Conduit extends LiquidBlock implements Autotiler{
         /** Calls callback with every conduit that transfers fluids to this one. */
         public void getConnections(Cons<ConduitBuild> cons){
             for(var other : proximity){
-                if(other instanceof ConduitBuild conduit && other.team == team){
-                    if(
-                        front() == conduit ||
-                        other.front() == this
-                    ){
-                        cons.get(conduit);
-                    }
+                if(canMerge(other)){
+                    cons.get((ConduitBuild)other);
                 }
             }
+        }
+
+        public boolean canMerge(Building other){
+            return
+                other instanceof ConduitBuild conduit && other.team == team &&
+                (front() == conduit || other.front() == this) &&
+                (other.liquids.current() == liquids.current() || other.liquids.currentAmount() <= mergeThreshold || liquids.currentAmount() <= mergeThreshold);
         }
     }
 
@@ -368,7 +371,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
     - [X] liquids transfer forward
     - [X] liquids leak
     - [X] liquids display properly (including flow rate)
-    - [ ] liquids merge different types correctly - ?????
+    - [X] liquids merge different types correctly
     - [X] conduits can (or can't) be disabled
      */
     public static class ConduitGraph{
@@ -387,7 +390,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
         private LiquidModule liquids = new LiquidModule();
         private float totalCapacity;
 
-        public @Nullable Building head;
+        public @Nullable ConduitBuild head;
 
         public ConduitGraph(){
             entity = ConduitGraphUpdater.create();
@@ -404,6 +407,11 @@ public class Conduit extends LiquidBlock implements Autotiler{
                 //move forward as the head
                 if(liquids.currentAmount() > 0.0001f && head.timer(((Conduit)head.block).timerFlow, 1)){
                     head.moveLiquidForward(((Conduit)head.block).leaks, liquids.current());
+                }
+
+                //merge with front if one of the conduits becomes empty
+                if(head.front() instanceof ConduitBuild build && build.graph != this && head.canMerge(build)){
+                    merge(build);
                 }
             }
         }
@@ -501,13 +509,13 @@ public class Conduit extends LiquidBlock implements Autotiler{
                 while(true){
                     var next = head.front();
 
-                    if(next instanceof ConduitBuild cond && cond.team == head.team && next != ignore){
+                    if(next instanceof ConduitBuild cond && cond.team == head.team && next != ignore && cond.graph == this){
                         if(!headSet.add(next.id)){
                             //there's a loop, which means a head does not exist
                             head = null;
                             break;
                         }else{
-                            head = next;
+                            head = cond;
                         }
                     }else{
                         //found the end
