@@ -73,7 +73,10 @@ public class ConstructBlock extends Block{
         float healthf = tile.build == null ? 1f : tile.build.healthf();
         Seq<Building> prev = tile.build instanceof ConstructBuild co ? co.prevBuild : null;
 
-        if(block instanceof Floor floor){
+        if(block instanceof OverlayFloor overlay){
+            tile.setOverlay(overlay);
+            tile.setBlock(Blocks.air);
+        }else if(block instanceof Floor floor){
             tile.setFloorUnder(floor);
             tile.setBlock(Blocks.air);
         }else{

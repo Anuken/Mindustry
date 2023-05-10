@@ -54,7 +54,7 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
                 BuildPlan plan = it.next();
                 Tile tile = world.tile(plan.x, plan.y);
                 if(tile == null || (plan.breaking && tile.block() == Blocks.air) || (!plan.breaking && ((tile.build != null && tile.build.rotation == plan.rotation) || !plan.block.rotate) &&
-                    (tile.block() == plan.block || (plan.block != null && plan.block.isFloor() && plan.block == tile.floor())))){
+                    (tile.block() == plan.block || (plan.block != null && (plan.block.isOverlay() && plan.block == tile.overlay() || (plan.block.isFloor() && plan.block == tile.floor())))))){
 
                     it.remove();
                 }

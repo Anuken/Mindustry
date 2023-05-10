@@ -169,7 +169,7 @@ public class Build{
             return false;
         }
 
-        if(type.isFloor() && tile.floor == type){
+        if((type.isFloor() && tile.floor() == type) || (type.isOverlay() && tile.overlay() == type)){
             return false;
         }
 
