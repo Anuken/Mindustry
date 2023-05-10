@@ -623,6 +623,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 starCount++;
                 if(starCount > 1) starsTable.add(star.localizedName).padLeft(10f).padBottom(10f).padTop(10f).left().width(190f).row();
                 Table planetTable = new Table();
+                planetTable.margin(4f); //less padding
                 starsTable.add(planetTable).left().row();
                 for(Planet planet : content.planets()){
                     if(planet.solarSystem == star && selectable(planet)){
