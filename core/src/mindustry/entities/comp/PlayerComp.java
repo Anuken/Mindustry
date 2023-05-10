@@ -323,13 +323,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     }
 
     void sendMessage(String text){
-        if(isLocal()){
-            if(ui != null){
-                ui.chatfrag.addMessage(text);
-            }
-        }else{
-            Call.sendMessage(con, text, null, null);
-        }
+        sendMessage(text, null, null);
     }
 
     void sendMessage(String text, Player from){
@@ -344,6 +338,14 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         }else{
             Call.sendMessage(con, text, unformatted, from);
         }
+    }
+
+    void sendUnformatted(String unformatted){
+        sendUnformatted(null, unformatted);
+    }
+
+    void sendUnformatted(Player from, String unformatted){
+        sendMessage(netServer.chatFormatter.format(from, unformatted), from, unformatted);
     }
 
     PlayerInfo getInfo(){

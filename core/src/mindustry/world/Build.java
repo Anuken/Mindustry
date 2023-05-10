@@ -176,6 +176,10 @@ public class Build{
             return false;
         }
 
+        if((type.isFloor() && tile.floor() == type) || (type.isOverlay() && tile.overlay() == type)){
+            return false;
+        }
+
         if(!type.canPlaceOn(tile, team, rotation)){
             return false;
         }
