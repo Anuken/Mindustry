@@ -696,10 +696,9 @@ public class BulletType extends Content implements Cloneable{
         return create(owner, team, x, y, angle, -1, velocityScl, 1f, null);
     }
 
-    public @Nullable Bullet create(Entityc owner, Entityc shooter, Team team, float x, float y, float angle, float velocityScl, float lifetimeScl){
-        return create(owner, shooter, team, x, y, angle, -1, velocityScl, lifetimeScl, null);
+    public @Nullable Bullet create(Entityc owner, Team team, float x, float y, float angle, float velocityScl, float lifetimeScl){
+        return create(owner, team, x, y, angle, -1, velocityScl, lifetimeScl, null);
     }
-
 
     public @Nullable Bullet create(Entityc owner, Team team, float x, float y, float angle, float velocityScl, float lifetimeScl, Mover mover){
         return create(owner, team, x, y, angle, -1, velocityScl, lifetimeScl, null, mover);
@@ -710,7 +709,7 @@ public class BulletType extends Content implements Cloneable{
     }
 
     public @Nullable Bullet create(Bullet parent, float x, float y, float angle, float velocityScl, float lifeScale){
-        return create(parent.owner, parent.shooter, parent.team, x, y, angle, velocityScl, lifeScale);
+        return create(parent.owner, parent.team, x, y, angle, velocityScl, lifeScale);
     }
 
     public @Nullable Bullet create(Bullet parent, float x, float y, float angle, float velocityScl){
@@ -721,42 +720,35 @@ public class BulletType extends Content implements Cloneable{
         return create(owner, team, x, y, angle, damage, velocityScl, lifetimeScl, data, null);
     }
 
-    public @Nullable Bullet create(@Nullable Entityc owner, @Nullable Entityc shooter, Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl, Object data){
-        return create(owner, shooter, team, x, y, angle, damage, velocityScl, lifetimeScl, data, null, -1, -1);
-    }
-
     public @Nullable Bullet create(@Nullable Entityc owner, Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl, Object data, @Nullable Mover mover){
         return create(owner, team, x, y, angle, damage, velocityScl, lifetimeScl, data, mover, -1f, -1f);
     }
 
     public @Nullable Bullet create(@Nullable Entityc owner, Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl, Object data, @Nullable Mover mover, float aimX, float aimY){
-        return create(owner, owner, team, x, y, angle, damage, velocityScl, lifetimeScl, data, mover, aimX, aimY);
-    }
-
-    public @Nullable Bullet create(@Nullable Entityc owner, @Nullable Entityc shooter, Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl, Object data, @Nullable Mover mover, float aimX, float aimY){
         if(spawnUnit != null){
             //don't spawn units clientside!
             if(!net.client()){
                 Unit spawned = spawnUnit.create(team);
                 spawned.set(x, y);
                 spawned.rotation = angle;
+
                 //immediately spawn at top speed, since it was launched
                 if(spawnUnit.missileAccelTime <= 0f){
                     spawned.vel.trns(angle, spawnUnit.speed);
                 }
+                
                 //assign unit owner
                 if(spawned.controller() instanceof MissileAI ai){
-                    if(shooter instanceof Unit unit){
+                    if(owner instanceof Unit unit){
                         ai.shooter = unit;
                     }
-
-                    if(shooter instanceof ControlBlock control){
+                    if(owner instanceof ControlBlock control){
                         ai.shooter = control.unit();
                     }
-
                 }
                 spawned.add();
             }
+
             //Since bullet init is never called, handle killing shooter here
             if(killShooter && owner instanceof Healthc h && !h.dead()) h.kill();
 
@@ -767,7 +759,6 @@ public class BulletType extends Content implements Cloneable{
         Bullet bullet = Bullet.create();
         bullet.type = this;
         bullet.owner = owner;
-        bullet.shooter = shooter;
         bullet.team = team;
         bullet.time = 0f;
         bullet.originX = x;
