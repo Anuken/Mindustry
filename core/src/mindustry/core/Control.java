@@ -49,6 +49,7 @@ public class Control implements ApplicationListener, Loadable{
     public Saves saves;
     public SoundControl sound;
     public InputHandler input;
+    public AttackIndicators indicators;
 
     private Interval timer = new Interval(2);
     private boolean hiscore = false;
@@ -58,6 +59,13 @@ public class Control implements ApplicationListener, Loadable{
     public Control(){
         saves = new Saves();
         sound = new SoundControl();
+        indicators = new AttackIndicators();
+
+        Events.on(BuildDamageEvent.class, e -> {
+            if(e.build.team == Vars.player.team()){
+                indicators.add(e.build.tileX(), e.build.tileY());
+            }
+        });
 
         //show dialog saying that mod loading was skipped.
         Events.on(ClientLoadEvent.class, e -> {
@@ -100,6 +108,7 @@ public class Control implements ApplicationListener, Loadable{
         Events.on(ResetEvent.class, event -> {
             player.reset();
             toBePlaced.clear();
+            indicators.clear();
 
             hiscore = false;
             saves.resetSave();
@@ -193,7 +202,7 @@ public class Control implements ApplicationListener, Loadable{
             if(!settings.getBool("skipcoreanimation") && !state.rules.pvp){
                 coreDelay = coreLandDuration;
                 //delay player respawn so animation can play.
-                player.deathTimer = -80f;
+                player.deathTimer = Player.deathDelay - coreLandDuration;
                 //TODO this sounds pretty bad due to conflict
                 if(settings.getInt("musicvol") > 0){
                     Musics.land.stop();
@@ -628,6 +637,9 @@ public class Control implements ApplicationListener, Loadable{
 
         if(state.isGame()){
             input.update();
+            if(!state.isPaused()){
+                indicators.update();
+            }
 
             //auto-update rpc every 5 seconds
             if(timer.get(0, 60 * 5)){

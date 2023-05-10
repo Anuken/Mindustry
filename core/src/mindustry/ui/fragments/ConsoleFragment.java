@@ -73,7 +73,7 @@ public class ConsoleFragment extends Table{
                 }
             }
 
-            scrollPos = (int)Mathf.clamp(scrollPos + input.axis(Binding.chat_scroll), 0, Math.max(0, messages.size - messagesShown));
+            scrollPos = (int)Mathf.clamp(scrollPos + input.axis(Binding.chat_scroll), 0, Math.max(0, messages.size));
         });
 
         history.insert(0, "");

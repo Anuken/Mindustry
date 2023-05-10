@@ -5,9 +5,11 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.input.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.scene.*;
 import arc.scene.event.*;
 import arc.scene.ui.layout.*;
+import arc.util.*;
 import mindustry.gen.*;
 import mindustry.input.*;
 import mindustry.ui.*;
@@ -19,6 +21,16 @@ public class MinimapFragment{
     float panx, pany, zoom = 1f, lastZoom = -1;
     private float baseSize = Scl.scl(5f);
     public Element elem;
+
+    protected Rect getRectBounds(){
+        float
+            w = Core.graphics.getWidth(),
+            h = Core.graphics.getHeight(),
+            ratio = renderer.minimap.getTexture() == null ? 1f : (float)renderer.minimap.getTexture().height / renderer.minimap.getTexture().width,
+            size = baseSize * zoom * world.width();
+
+        return Tmp.r1.set(w/2f + panx*zoom - size/2f, h/2f + pany*zoom - size/2f * ratio, size, size * ratio);
+    }
 
     public void build(Group parent){
         elem = parent.fill((x, y, w, h) -> {
@@ -35,7 +47,8 @@ public class MinimapFragment{
                 TextureRegion reg = Draw.wrap(renderer.minimap.getTexture());
                 Draw.rect(reg, w/2f + panx*zoom, h/2f + pany*zoom, size, size * ratio);
 
-                renderer.minimap.drawEntities(w/2f + panx*zoom - size/2f, h/2f + pany*zoom - size/2f * ratio, size, size * ratio, zoom, true);
+                Rect bounds = getRectBounds();
+                renderer.minimap.drawEntities(bounds.x, bounds.y, bounds.width, bounds.height, zoom, true);
             }
 
             Draw.reset();
@@ -69,13 +82,20 @@ public class MinimapFragment{
 
             @Override
             public void pan(InputEvent event, float x, float y, float deltaX, float deltaY){
-                panx += deltaX / zoom;
-                pany += deltaY / zoom;
+                if(event.keyCode != KeyCode.mouseRight){
+                    panx += deltaX / zoom;
+                    pany += deltaY / zoom;
+                }else{
+                    panTo(x, y);
+                }
             }
 
             @Override
             public void touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
                 super.touchDown(event, x, y, pointer, button);
+                if(button == KeyCode.mouseRight){
+                    panTo(x, y);
+                }
             }
 
             @Override
@@ -104,6 +124,12 @@ public class MinimapFragment{
             t.row();
             t.button("@back", Icon.leftOpen, () -> shown = false).size(220f, 60f).pad(10f);
         });
+    }
+
+    public void panTo(float relativeX, float relativeY){
+        Rect r = getRectBounds();
+        Tmp.v1.set(relativeX, relativeY).sub(r.x, r.y).scl(1f / r.width, 1f / r.height).scl(world.unitWidth(), world.unitHeight());
+        control.input.panCamera(Tmp.v1.clamp(-tilesize/2f, -tilesize/2f, world.unitWidth() + tilesize/2f, world.unitHeight() + tilesize/2f));
     }
 
     public boolean shown(){

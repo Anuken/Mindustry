@@ -44,6 +44,7 @@ function extend(/*Base, ..., def*/){
 
 importPackage(Packages.arc)
 importPackage(Packages.arc.audio)
+importPackage(Packages.arc.files)
 importPackage(Packages.arc.func)
 importPackage(Packages.arc.flabel)
 importPackage(Packages.arc.graphics)

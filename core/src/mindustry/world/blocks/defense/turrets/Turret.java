@@ -83,6 +83,8 @@ public class Turret extends ReloadTurret{
     public boolean displayAmmoMultiplier = true;
     /** If false, 'under' blocks like conveyors are not targeted. */
     public boolean targetUnderBlocks = true;
+    /** If true, the turret will always shoot when it has ammo, regardless of targets in range or any control. */
+    public boolean alwaysShooting = false;
     /** Function for choosing which unit to target. */
     public Sortf unitSort = UnitSorts.closest;
     /** Filter for types of units to attack. */
@@ -112,6 +114,8 @@ public class Turret extends ReloadTurret{
     public boolean linearWarmup = false;
     /** Visual amount by which the turret recoils back per shot. */
     public float recoil = 1f;
+    /** Number of additional counters for recoil. */
+    public int recoils = -1;
     /** ticks taken for turret to return to starting position in ticks. uses reload time by default  */
     public float recoilTime = -1f;
     /** power curve applied to visual recoil */
@@ -210,8 +214,9 @@ public class Turret extends ReloadTurret{
         public Seq<AmmoEntry> ammo = new Seq<>();
         public int totalAmmo;
         public float curRecoil, heat, logicControlTime = -1;
+        public @Nullable float[] curRecoils;
         public float shootWarmup, charge, warmupHold = 0f;
-        public int totalShots;
+        public int totalShots, barrelCounter;
         public boolean logicShooting = false;
         public @Nullable Posc target;
         public Vec2 targetPos = new Vec2();
@@ -301,7 +306,7 @@ public class Turret extends ReloadTurret{
         }
 
         public boolean isShooting(){
-            return (isControlled() ? unit.isShooting() : logicControlled() ? logicShooting : target != null);
+            return alwaysShooting || (isControlled() ? unit.isShooting() : logicControlled() ? logicShooting : target != null);
         }
 
         @Override
@@ -365,6 +370,12 @@ public class Turret extends ReloadTurret{
             wasShooting = false;
 
             curRecoil = Mathf.approachDelta(curRecoil, 0, 1 / recoilTime);
+            if(recoils > 0){
+                if(curRecoils == null) curRecoils = new float[recoils];
+                for(int i = 0; i < recoils; i++){
+                    curRecoils[i] = Mathf.approachDelta(curRecoils[i], 0, 1 / recoilTime);
+                }
+            }
             heat = Mathf.approachDelta(heat, 0, 1 / cooldownTime);
             charge = charging() ? Mathf.approachDelta(charge, 1, 1 / shoot.firstShotDelay) : 0;
 
@@ -416,10 +427,15 @@ public class Turret extends ReloadTurret{
                         turnToTarget(targetRot);
                     }
 
-                    if(Angles.angleDist(rotation, targetRot) < shootCone && canShoot){
+                    if(!alwaysShooting && Angles.angleDist(rotation, targetRot) < shootCone && canShoot){
                         wasShooting = true;
                         updateShooting();
                     }
+                }
+
+                if(alwaysShooting){
+                    wasShooting = true;
+                    updateShooting();
                 }
             }
 
@@ -452,10 +468,10 @@ public class Turret extends ReloadTurret{
                 target = Units.bestEnemy(team, x, y, range, e -> !e.dead() && !e.isGrounded() && unitFilter.get(e), unitSort);
             }else{
                 target = Units.bestTarget(team, x, y, range, e -> !e.dead() && unitFilter.get(e) && (e.isGrounded() || targetAir) && (!e.isGrounded() || targetGround), b -> targetGround && buildingFilter.get(b), unitSort);
+            }
 
-                if(target == null && canHeal()){
-                    target = Units.findAllyTile(team, x, y, range, b -> b.damaged() && b != this);
-                }
+            if(target == null && canHeal()){
+                target = Units.findAllyTile(team, x, y, range, b -> b.damaged() && b != this);
             }
         }
 
@@ -537,15 +553,14 @@ public class Turret extends ReloadTurret{
                 type.chargeEffect.at(bulletX, bulletY, rotation);
             }
 
-            shoot.shoot(totalShots, (xOffset, yOffset, angle, delay, mover) -> {
-                queuedBullets ++;
+            shoot.shoot(barrelCounter, (xOffset, yOffset, angle, delay, mover) -> {
+                queuedBullets++;
                 if(delay > 0f){
                     Time.run(delay, () -> bullet(type, xOffset, yOffset, angle, mover));
                 }else{
                     bullet(type, xOffset, yOffset, angle, mover);
                 }
-                totalShots ++;
-            });
+            }, () -> barrelCounter++);
 
             if(consumeAmmoOnce){
                 useAmmo();
@@ -583,7 +598,11 @@ public class Turret extends ReloadTurret{
             }
 
             curRecoil = 1f;
+            if(recoils > 0){
+                curRecoils[barrelCounter % recoils] = 1f;
+            }
             heat = 1f;
+            totalShots++;
 
             if(!consumeAmmoOnce){
                 useAmmo();

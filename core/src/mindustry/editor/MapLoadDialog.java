@@ -30,6 +30,7 @@ public class MapLoadDialog extends BaseDialog{
         buttons.defaults().size(200f, 50f);
         buttons.button("@cancel", this::hide);
         buttons.add(button);
+        addCloseListener();
     }
 
     public void rebuild(){
@@ -48,13 +49,13 @@ public class MapLoadDialog extends BaseDialog{
         table.defaults().size(200f, 90f).pad(4f);
         table.margin(10f);
 
-        ScrollPane pane = new ScrollPane(table, Styles.horizontalPane);
+        ScrollPane pane = new ScrollPane(table);
         pane.setFadeScrollBars(false);
 
         for(Map map : maps.all()){
 
-            TextButton button = new TextButton(map.name(), Styles.togglet);
-            button.add(new BorderImage(map.safeTexture(), 2f).setScaling(Scaling.fit)).size(16 * 4f);
+            TextButton button = new TextButton(map.name(), Styles.flatTogglet);
+            button.add(new BorderImage(map.safeTexture(), 2f).setScaling(Scaling.fit)).padLeft(5f).size(16 * 4f);
             button.getCells().reverse();
             button.clicked(() -> selected = map);
             button.getLabelCell().grow().left().padLeft(5f);
@@ -63,14 +64,12 @@ public class MapLoadDialog extends BaseDialog{
             if(++i % maxcol == 0) table.row();
         }
 
-        if(maps.all().size == 0){
+        if(maps.all().isEmpty()){
             table.add("@maps.none").center();
-        }else{
-            cont.add("@editor.loadmap");
         }
 
         cont.row();
-        cont.add(pane);
+        cont.add(pane).growX();
     }
 
 }

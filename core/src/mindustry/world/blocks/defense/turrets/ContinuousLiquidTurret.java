@@ -33,7 +33,10 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
 
         stats.remove(Stat.ammo);
         //TODO looks bad
-        stats.add(Stat.ammo, StatValues.number(liquidConsumed * 60f, StatUnit.perSecond, true));
+        stats.add(Stat.ammo, table -> {
+            table.row();
+            StatValues.number(liquidConsumed * 60f, StatUnit.perSecond, true).display(table);
+        });
         stats.add(Stat.ammo, StatValues.ammo(ammoTypes));
     }
 
