@@ -478,7 +478,7 @@ public class EventType{
         public final @Nullable Unit unit;
         public final int previous;
 
-        public BuildRotateEvent(Building build, final @Nullable Unit unit, int previous){
+        public BuildRotateEvent(Building build, @Nullable Unit unit, int previous){
             this.build = build;
             this.unit = unit;
             this.previous = previous;
