@@ -16,7 +16,9 @@ public class DrawPistons extends DrawBlock{
 
     @Override
     public void drawPlan(Block block, BuildPlan plan, Eachable<BuildPlan> list){
-        Draw.rect(iconRegion, plan.drawx(), plan.drawy());
+        if(iconRegion.found()){
+            Draw.rect(iconRegion, plan.drawx(), plan.drawy());
+        }
     }
 
     @Override
