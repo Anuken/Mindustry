@@ -208,7 +208,7 @@ public class StackConveyor extends Block implements Autotiler{
             state = stateMove;
 
             int[] bits = buildBlending(tile, rotation, null, true);
-            if(bits[0] == 0 &&  blends(tile, rotation, 0) && !blends(tile, rotation, 2)) state = stateLoad;  // a 0 that faces into a conveyor with none behind it
+            if(bits[0] == 0 && blends(tile, rotation, 0) && (!blends(tile, rotation, 2) || back() instanceof StackConveyorBuild b && b.state == stateUnload)) state = stateLoad;  // a 0 that faces into a conveyor with none behind it
             if(outputRouter && bits[0] == 0 && !blends(tile, rotation, 0) && blends(tile, rotation, 2)) state = stateUnload; // a 0 that faces into none with a conveyor behind it
             if(!outputRouter && !(front() instanceof StackConveyorBuild)) state = stateUnload; // a 0 that faces into none with a conveyor behind it
 

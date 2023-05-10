@@ -1180,6 +1180,7 @@ public class Blocks{
             craftTime = 10f;
             rotate = true;
             invertFlip = true;
+            group = BlockGroup.liquids;
 
             liquidCapacity = 50f;
 
@@ -1276,6 +1277,7 @@ public class Blocks{
             heatOutput = 3f;
             regionRotated1 = 1;
             ambientSound = Sounds.hum;
+            itemCapacity = 0;
             consumePower(100f / 60f);
         }};
         
@@ -1286,6 +1288,7 @@ public class Blocks{
 
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(Liquids.slag), new DrawDefault(), new DrawHeatOutput());
             size = 3;
+            itemCapacity = 0;
             liquidCapacity = 40f;
             rotateDraw = false;
             regionRotated1 = 1;
@@ -1491,9 +1494,10 @@ public class Blocks{
             craftEffect = new RadialEffect(Fx.heatReactorSmoke, 4, 90f, 7f);
 
             itemCapacity = 20;
+            outputItem = new ItemStack(Items.fissileMatter, 1);
+
             consumeItem(Items.thorium, 3);
             consumeLiquid(Liquids.nitrogen, 1f / 60f);
-            outputItem = new ItemStack(Items.fissileMatter, 1);
         }};
 
         //endregion
@@ -2470,6 +2474,7 @@ public class Blocks{
         turbineCondenser = new ThermalGenerator("turbine-condenser"){{
             requirements(Category.power, with(Items.beryllium, 60));
             attribute = Attribute.steam;
+            group = BlockGroup.liquids;
             displayEfficiencyScale = 1f / 9f;
             minEfficiency = 9f - 0.0001f;
             powerProduction = 3f / 9f;
@@ -2764,6 +2769,7 @@ public class Blocks{
         ventCondenser = new AttributeCrafter("vent-condenser"){{
             requirements(Category.production, with(Items.graphite, 20, Items.beryllium, 60));
             attribute = Attribute.steam;
+            group = BlockGroup.liquids;
             minEfficiency = 9f - 0.0001f;
             baseEfficiency = 0f;
             displayEfficiency = false;
@@ -3041,6 +3047,20 @@ public class Blocks{
 
             shoot = new ShootAlternate(3.5f);
 
+            recoils = 2;
+            drawer = new DrawTurret(){{
+                for(int i = 0; i < 2; i ++){
+                    int f = i;
+                    parts.add(new RegionPart("-barrel-" + (i == 0 ? "l" : "r")){{
+                        progress = PartProgress.recoil;
+                        recoilIndex = f;
+                        under = true;
+                        moveY = -1.5f;
+                    }});
+                }
+            }};
+
+            recoil = 0.5f;
             shootY = 3f;
             reload = 20f;
             range = 110;
@@ -3102,6 +3122,15 @@ public class Blocks{
                     }};
                 }}
             );
+
+            drawer = new DrawTurret(){{
+                parts.add(new RegionPart("-mid"){{
+                    progress = PartProgress.recoil;
+                    under = true;
+                    moveY = -1f;
+                }});
+            }};
+
             reload = 18f;
             range = 220f;
             size = 2;
@@ -3110,7 +3139,7 @@ public class Blocks{
             shoot.shotDelay = 5f;
             shoot.shots = 2;
 
-            recoil = 2f;
+            recoil = 1f;
             rotateSpeed = 15f;
             inaccuracy = 17f;
             shootCone = 35f;
@@ -3399,6 +3428,7 @@ public class Blocks{
             reload = 30f;
             inaccuracy = 10f;
             range = 240f;
+            consumeAmmoOnce = false;
             size = 2;
             scaledHealth = 300;
             shootSound = Sounds.missile;
@@ -3458,11 +3488,21 @@ public class Blocks{
                 }}
             );
 
+            drawer = new DrawTurret(){{
+                parts.add(new RegionPart("-barrel"){{
+                    progress = PartProgress.recoil.delay(0.5f); //Since recoil is 1-0, cut from the start instead of the end.
+                    under = true;
+                    turretHeatLayer = Layer.turret - 0.0001f;
+                    moveY = -1.5f;
+                }});
+            }};
+
             size = 2;
             range = 190f;
             reload = 31f;
+            consumeAmmoOnce = false;
             ammoEjectBack = 3f;
-            recoil = 3f;
+            recoil = 2f;
             shake = 1f;
             shoot.shots = 4;
             shoot.shotDelay = 3f;
@@ -3754,7 +3794,8 @@ public class Blocks{
                     explodeRange = 20f;
                 }}
             );
-            shootY = 8.75f;
+            shootY = 10f;
+
             shoot = new ShootBarrel(){{
                 barrels = new float[]{
                 0f, 1f, 0f,
@@ -3762,10 +3803,25 @@ public class Blocks{
                 -3f, 0f, 0f,
                 };
             }};
+
+            recoils = 3;
+            drawer = new DrawTurret(){{
+                for(int i = 3; i > 0; i--){
+                    int f = i;
+                    parts.add(new RegionPart("-barrel-" + i){{
+                        progress = PartProgress.recoil;
+                        recoilIndex = f - 1;
+                        under = true;
+                        moveY = -2f;
+                    }});
+                }
+            }};
+
             reload = 8f;
             range = 200f;
             size = 3;
-            recoil = 3f;
+            recoil = 1.5f;
+            recoilTime = 10;
             rotateSpeed = 10f;
             inaccuracy = 10f;
             shootCone = 30f;
@@ -4076,6 +4132,7 @@ public class Blocks{
 
             liquidConsumed = 10f / 60f;
             targetInterval = 5f;
+            targetUnderBlocks = false;
 
             float r = range = 130f;
 
@@ -4601,7 +4658,7 @@ public class Blocks{
 
             recoil = 0.5f;
 
-            fogRadiusMultiuplier = 0.75f;
+            fogRadiusMultiuplier = 0.4f;
             coolantMultiplier = 6f;
             shootSound = Sounds.missileLaunch;
 
@@ -5503,7 +5560,7 @@ public class Blocks{
             regionSuffix = "-dark";
             size = 5;
             plans.add(
-            new AssemblerUnitPlan(UnitTypes.quell, 60f * 60f, PayloadStack.list(UnitTypes.elude, 4, Blocks.berylliumWallLarge, 8)),
+            new AssemblerUnitPlan(UnitTypes.quell, 60f * 60f, PayloadStack.list(UnitTypes.elude, 4, Blocks.berylliumWallLarge, 12)),
             new AssemblerUnitPlan(UnitTypes.disrupt, 60f * 60f * 3f, PayloadStack.list(UnitTypes.avert, 6, Blocks.carbideWallLarge, 20))
             );
             areaSize = 13;
@@ -5518,7 +5575,7 @@ public class Blocks{
             size = 5;
             //TODO different reqs
             plans.add(
-            new AssemblerUnitPlan(UnitTypes.tecta, 60f * 70f, PayloadStack.list(UnitTypes.merui, 6, Blocks.tungstenWallLarge, 12)),
+            new AssemblerUnitPlan(UnitTypes.tecta, 60f * 70f, PayloadStack.list(UnitTypes.merui, 5, Blocks.tungstenWallLarge, 12)),
             new AssemblerUnitPlan(UnitTypes.collaris, 60f * 60f * 3f, PayloadStack.list(UnitTypes.cleroi, 6, Blocks.carbideWallLarge, 20))
             );
             areaSize = 13;

@@ -32,7 +32,6 @@ public class Renderer implements ApplicationListener{
     private static final float cloudScaling = 1700f, cfinScl = -2f, cfinOffset = 0.3f, calphaFinOffset = 0.25f;
     private static final float[] cloudAlphas = {0, 0.5f, 1f, 0.1f, 0, 0f};
     private static final float cloudAlpha = 0.81f;
-    private static final float[] thrusterSizes = {0f, 0f, 0f, 0f, 0.3f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 0f};
     private static final Interp landInterp = Interp.pow3;
 
     public final BlockRenderer blocks = new BlockRenderer();
@@ -73,6 +72,8 @@ public class Renderer implements ApplicationListener{
     landPTimer,
     //intensity for screen shake
     shakeIntensity,
+    //reduction rate of screen shake
+    shakeReduction,
     //current duration of screen shake
     shakeTime;
     //for landTime > 0: if true, core is currently *launching*, otherwise landing.
@@ -84,14 +85,15 @@ public class Renderer implements ApplicationListener{
         Shaders.init();
 
         Events.on(ResetEvent.class, e -> {
-            shakeTime = shakeIntensity = 0f;
+            shakeTime = shakeIntensity = shakeReduction = 0f;
             camShakeOffset.setZero();
         });
     }
 
     public void shake(float intensity, float duration){
-        shakeIntensity = Math.max(shakeIntensity, intensity);
+        shakeIntensity = Math.max(shakeIntensity, Mathf.clamp(intensity, 0, 100));
         shakeTime = Math.max(shakeTime, duration);
+        shakeReduction = shakeIntensity / shakeTime;
     }
 
     public void addEnvRenderer(int mask, Runnable render){
@@ -174,13 +176,14 @@ public class Renderer implements ApplicationListener{
         laserOpacity = settings.getInt("lasersopacity") / 100f;
         bridgeOpacity = settings.getInt("bridgeopacity") / 100f;
         animateShields = settings.getBool("animatedshields");
-        drawStatus = Core.settings.getBool("blockstatus");
+        drawStatus = settings.getBool("blockstatus");
         enableEffects = settings.getBool("effects");
         drawDisplays = !settings.getBool("hidedisplays");
 
         if(landTime > 0){
             if(!state.isPaused()){
-                updateLandParticles();
+                CoreBuild build = landCore == null ? player.bestCore() : landCore;
+                build.updateLandParticles();
             }
 
             if(!state.isPaused()){
@@ -210,7 +213,7 @@ public class Renderer implements ApplicationListener{
                 float intensity = shakeIntensity * (settings.getInt("screenshake", 4) / 4f) * 0.75f;
                 camShakeOffset.setToRandomDirection().scl(Mathf.random(intensity));
                 camera.position.add(camShakeOffset);
-                shakeIntensity -= 0.25f * Time.delta;
+                shakeIntensity -= shakeReduction * Time.delta;
                 shakeTime -= Time.delta;
                 shakeIntensity = Mathf.clamp(shakeIntensity, 0f, 100f);
             }else{
@@ -453,63 +456,26 @@ public class Renderer implements ApplicationListener{
 
     }
 
-    void updateLandParticles(){
-        float time = launching ? coreLandDuration - landTime : landTime;
-        float tsize = Mathf.sample(thrusterSizes, (time + 35f) / coreLandDuration);
-
-        landPTimer += tsize * Time.delta;
-        if(landCore != null && landPTimer >= 1f){
-            landCore.tile.getLinkedTiles(t -> {
-                if(Mathf.chance(0.4f)){
-                    Fx.coreLandDust.at(t.worldx(), t.worldy(), landCore.angleTo(t) + Mathf.range(30f), Tmp.c1.set(t.floor().mapColor).mul(1.5f + Mathf.range(0.15f)));
-                }
-            });
-
-            landPTimer = 0f;
-        }
-    }
-
     void drawLanding(){
         CoreBuild build = landCore == null ? player.bestCore() : landCore;
         var clouds = assets.get("sprites/clouds.png", Texture.class);
         if(landTime > 0 && build != null){
             float fout = landTime / coreLandDuration;
-
             if(launching) fout = 1f - fout;
-
             float fin = 1f - fout;
-
-            //draw core
-            var block = launching && launchCoreType != null ? launchCoreType : (CoreBlock)build.block;
-            TextureRegion reg = block.fullIcon;
             float scl = Scl.scl(4f) / camerascale;
-            float shake = 0f;
-            float s = reg.width * reg.scl() * scl * 3.6f * Interp.pow2Out.apply(fout);
-            float rotation = Interp.pow2In.apply(fout) * 135f, x = build.x + Mathf.range(shake), y = build.y + Mathf.range(shake);
-            float thrustOpen = 0.25f;
-            float thrusterFrame = fin >= thrustOpen ? 1f : fin / thrustOpen;
-            float thrusterSize = Mathf.sample(thrusterSizes, fin);
-
-            //when launching, thrusters stay out the entire time.
-            if(launching){
-                Interp i = Interp.pow2Out;
-                thrusterFrame = i.apply(Mathf.clamp(fout*13f));
-                thrusterSize = i.apply(Mathf.clamp(fout*9f));
-            }
-
-            Draw.color(Pal.lightTrail);
-            //TODO spikier heat
-            Draw.rect("circle-shadow", x, y, s, s);
-
-            Draw.color(Pal.lightTrail);
-
             float pfin = Interp.pow3Out.apply(fin), pf = Interp.pow2In.apply(fout);
 
             //draw particles
+            Draw.color(Pal.lightTrail);
             Angles.randLenVectors(1, pfin, 100, 800f * scl * pfin, (ax, ay, ffin, ffout) -> {
                 Lines.stroke(scl * ffin * pf * 3f);
                 Lines.lineAngle(build.x + ax, build.y + ay, Mathf.angle(ax, ay), (ffin * 20 + 1f) * scl);
             });
+            Draw.color();
+
+            CoreBlock block = launching && launchCoreType != null ? launchCoreType : (CoreBlock)build.block;
+            block.drawLanding(build, build.x, build.y);
 
             Draw.color();
             Draw.mixcol(Color.white, Interp.pow5In.apply(fout));
@@ -521,44 +487,6 @@ public class Renderer implements ApplicationListener{
                     Draw.mixcol(Pal.accent, f);
                 }
             }
-
-            Draw.scl(scl);
-
-            Draw.alpha(1f);
-
-            //draw thruster flame
-            float strength = (1f + (block.size - 3)/2.5f) * scl * thrusterSize * (0.95f + Mathf.absin(2f, 0.1f));
-            float offset = (block.size - 3) * 3f * scl;
-
-            for(int i = 0; i < 4; i++){
-                Tmp.v1.trns(i * 90 + rotation, 1f);
-
-                Tmp.v1.setLength((block.size * tilesize/2f + 1f)*scl + strength*2f + offset);
-                Draw.color(build.team.color);
-                Fill.circle(Tmp.v1.x + x, Tmp.v1.y + y, 6f * strength);
-
-                Tmp.v1.setLength((block.size * tilesize/2f + 1f)*scl + strength*0.5f + offset);
-                Draw.color(Color.white);
-                Fill.circle(Tmp.v1.x + x, Tmp.v1.y + y, 3.5f * strength);
-            }
-
-            drawThrusters(block, x, y, rotation, thrusterFrame);
-
-            Drawf.spinSprite(block.region, x, y, rotation);
-
-            Draw.alpha(Interp.pow4In.apply(thrusterFrame));
-            drawThrusters(block, x, y, rotation, thrusterFrame);
-            Draw.alpha(1f);
-
-            if(block.teamRegions[build.team.id] == block.teamRegion) Draw.color(build.team.color);
-
-            Drawf.spinSprite(block.teamRegions[build.team.id], x, y, rotation);
-
-            Draw.color();
-
-            Draw.scl();
-
-            Draw.reset();
 
             //draw clouds
             if(state.rules.cloudColor.a > 0.0001f){
@@ -580,32 +508,6 @@ public class Renderer implements ApplicationListener{
                 Draw.reset();
             }
         }
-    }
-
-    void drawThrusters(CoreBlock block, float x, float y, float rotation, float frame){
-        float length = block.thrusterLength * (frame - 1f) - 1f/4f;
-        float alpha = Draw.getColor().a;
-
-        //two passes for consistent lighting
-        for(int j = 0; j < 2; j++){
-            for(int i = 0; i < 4; i++){
-                var reg = i >= 2 ? block.thruster2 : block.thruster1;
-                float rot = (i * 90) + rotation % 90f;
-                Tmp.v1.trns(rot, length * Draw.xscl);
-
-                //second pass applies extra layer of shading
-                if(j == 1){
-                    Tmp.v1.rotate(-90f);
-                    Draw.alpha((rotation % 90f) / 90f * alpha);
-                    rot -= 90f;
-                    Draw.rect(reg, x + Tmp.v1.x, y + Tmp.v1.y, rot);
-                }else{
-                    Draw.alpha(alpha);
-                    Draw.rect(reg, x + Tmp.v1.x, y + Tmp.v1.y, rot);
-                }
-            }
-        }
-        Draw.alpha(1f);
     }
 
     public void scaleCamera(float amount){
@@ -636,6 +538,26 @@ public class Renderer implements ApplicationListener{
     public void setScale(float scl){
         targetscale = scl;
         clampScale();
+    }
+
+    public boolean isLaunching(){
+        return launching;
+    }
+
+    public CoreBlock getLaunchCoreType(){
+        return launchCoreType;
+    }
+
+    public float getLandTime(){
+        return landTime;
+    }
+
+    public float getLandPTimer(){
+        return landPTimer;
+    }
+
+    public void setLandPTimer(float landPTimer){
+        this.landPTimer = landPTimer;
     }
 
     public void showLanding(){

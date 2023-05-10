@@ -17,6 +17,7 @@ import mindustry.type.*;
 import java.io.*;
 import java.text.*;
 import java.util.*;
+import java.util.concurrent.*;
 
 import static mindustry.Vars.*;
 
@@ -47,11 +48,24 @@ public class Saves{
     public void load(){
         saves.clear();
 
+        //read saves in parallel
+        Seq<Future<SaveSlot>> futures = new Seq<>();
+
         for(Fi file : saveDirectory.list()){
             if(!file.name().contains("backup") && SaveIO.isSaveValid(file)){
-                SaveSlot slot = new SaveSlot(file);
-                saves.add(slot);
-                slot.meta = SaveIO.getMeta(file);
+                futures.add(mainExecutor.submit(() -> {
+                    SaveSlot slot = new SaveSlot(file);
+                    slot.meta = SaveIO.getMeta(file);
+                    return slot;
+                }));
+            }
+        }
+
+        for(var future : futures){
+            try{
+                saves.add(future.get());
+            }catch(Exception e){
+                Log.err(e);
             }
         }
 

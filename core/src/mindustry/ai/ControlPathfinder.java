@@ -8,8 +8,8 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.core.*;
-import mindustry.game.*;
 import mindustry.game.EventType.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
@@ -273,7 +273,7 @@ public class ControlPathfinder{
                     req.raycastTimer = 0;
                 }
 
-                if(req.rayPathIndex < len){
+                if(req.rayPathIndex < len && req.rayPathIndex >= 0){
                     Tile tile = tile(items[req.rayPathIndex]);
                     out.set(tile);
 

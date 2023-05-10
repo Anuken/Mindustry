@@ -53,7 +53,9 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
             while(it.hasNext()){
                 BuildPlan plan = it.next();
                 Tile tile = world.tile(plan.x, plan.y);
-                if(tile == null || (plan.breaking && tile.block() == Blocks.air) || (!plan.breaking && ((tile.build != null && tile.build.rotation == plan.rotation) || !plan.block.rotate) && tile.block() == plan.block)){
+                if(tile == null || (plan.breaking && tile.block() == Blocks.air) || (!plan.breaking && ((tile.build != null && tile.build.rotation == plan.rotation) || !plan.block.rotate) &&
+                    (tile.block() == plan.block || (plan.block != null && (plan.block.isOverlay() && plan.block == tile.overlay() || (plan.block.isFloor() && plan.block == tile.floor())))))){
+
                     it.remove();
                 }
             }
@@ -144,7 +146,7 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
             }
 
             if(tile.build instanceof ConstructBuild && !current.initialized){
-                Core.app.post(() -> Events.fire(new BuildSelectEvent(tile, team, self(), current.breaking)));
+                Events.fire(new BuildSelectEvent(tile, team, self(), current.breaking));
                 current.initialized = true;
             }
 

@@ -19,7 +19,7 @@ public class BuilderAI extends AIController{
     public @Nullable Teamc enemy;
     public @Nullable BlockPlan lastPlan;
 
-    public float fleeRange = 370f;
+    public float fleeRange = 370f, rebuildPeriod = 60f * 2f;
     public boolean alwaysFlee;
     public boolean onlyAssist;
 
@@ -119,7 +119,7 @@ public class BuilderAI extends AIController{
             }
 
             //follow someone and help them build
-            if(timer.get(timerTarget2, 60f)){
+            if(timer.get(timerTarget2, 20f)){
                 found = false;
 
                 Units.nearby(unit.team, unit.x, unit.y, buildRadius, u -> {
@@ -145,7 +145,7 @@ public class BuilderAI extends AIController{
                     float minDst = Float.MAX_VALUE;
                     Player closest = null;
                     for(var player : Groups.player){
-                        if(player.unit().canBuild() && !player.dead()){
+                        if(player.unit().canBuild() && !player.dead() && player.team() == unit.team){
                             float dst = player.dst2(unit);
                             if(dst < minDst){
                                 closest = player;
@@ -158,10 +158,8 @@ public class BuilderAI extends AIController{
                 }
             }
 
-            float rebuildTime = 2f * 60f;
-
             //find new plan
-            if(!onlyAssist && !unit.team.data().plans.isEmpty() && following == null && timer.get(timerTarget3, rebuildTime)){
+            if(!onlyAssist && !unit.team.data().plans.isEmpty() && following == null && timer.get(timerTarget3, rebuildPeriod)){
                 Queue<BlockPlan> blocks = unit.team.data().plans;
                 BlockPlan block = blocks.first();
 

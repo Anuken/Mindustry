@@ -8,6 +8,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.entities.*;
+import mindustry.entities.abilities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -2404,6 +2405,14 @@ public class Fx{
     shieldBreak = new Effect(40, e -> {
         color(e.color);
         stroke(3f * e.fout());
+        if(e.data instanceof Unit u){
+            var ab = (ForceFieldAbility)Structs.find(u.abilities, a -> a instanceof ForceFieldAbility);
+            if(ab != null){
+                Lines.poly(e.x, e.y, ab.sides, e.rotation + e.fin(), ab.rotation);
+                return;
+            }
+        }
+
         Lines.poly(e.x, e.y, 6, e.rotation + e.fin());
     }).followParent(true),
 

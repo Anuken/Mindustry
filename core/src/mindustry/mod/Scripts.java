@@ -45,8 +45,10 @@ public class Scripts implements Disposable{
         try{
             Object o = context.evaluateString(scope, text, "console.js", 1);
             if(o instanceof NativeJavaObject n) o = n.unwrap();
-            if(o instanceof Undefined) o = "undefined";
-            return String.valueOf(o);
+            if(o == null) o = "null";
+            else if(o instanceof Undefined) o = "undefined";
+            var out = o.toString();
+            return out == null ? "null" : out;
         }catch(Throwable t){
             return getError(t, false);
         }

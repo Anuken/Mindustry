@@ -5,7 +5,6 @@ import arc.math.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
-import mindustry.content.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -96,7 +95,7 @@ public abstract class BlockProducer extends PayloadBlock{
                 if(progress >= recipe.buildCost){
                     consume();
                     payload = new BuildPayload(recipe, team);
-                    Fx.placeBlock.at(x, y, payload.size() / tilesize);
+                    payload.block().placeEffect.at(x, y, payload.size() / tilesize);
                     payVector.setZero();
                     progress %= 1f;
                 }

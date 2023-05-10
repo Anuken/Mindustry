@@ -51,7 +51,7 @@ public class ArcNetProvider implements NetProvider{
             packetSpamLimit = Config.packetSpamLimit.num();
         });
 
-        client = new Client(8192, 8192, new PacketSerializer());
+        client = new Client(8192, 16384, new PacketSerializer());
         client.setDiscoveryPacket(packetSupplier);
         client.addListener(new NetListener(){
             @Override
@@ -89,7 +89,7 @@ public class ArcNetProvider implements NetProvider{
             }
         });
 
-        server = new Server(32768, 8192, new PacketSerializer());
+        server = new Server(32768, 16384, new PacketSerializer());
         server.setMulticast(multicastGroup, multicastPort);
         server.setDiscoveryHandler((address, handler) -> {
             ByteBuffer buffer = NetworkIO.writeServerData();
@@ -252,21 +252,22 @@ public class ArcNetProvider implements NetProvider{
     public void discoverServers(Cons<Host> callback, Runnable done){
         Seq<InetAddress> foundAddresses = new Seq<>();
         long time = Time.millis();
+
         client.discoverHosts(port, multicastGroup, multicastPort, 3000, packet -> {
-            Core.app.post(() -> {
+            synchronized(foundAddresses){
                 try{
                     if(foundAddresses.contains(address -> address.equals(packet.getAddress()) || (isLocal(address) && isLocal(packet.getAddress())))){
                         return;
                     }
                     ByteBuffer buffer = ByteBuffer.wrap(packet.getData());
                     Host host = NetworkIO.readServerData((int)Time.timeSinceMillis(time), packet.getAddress().getHostAddress(), buffer);
-                    callback.get(host);
+                    Core.app.post(() -> callback.get(host));
                     foundAddresses.add(packet.getAddress());
                 }catch(Exception e){
-                    //don't crash when there's an error pinging a a server or parsing data
+                    //don't crash when there's an error pinging a server or parsing data
                     e.printStackTrace();
                 }
-            });
+            }
         }, () -> Core.app.post(done));
     }
 

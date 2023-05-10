@@ -59,7 +59,7 @@ public class Build{
             tile.build.lastAccessed = unit.getControllerName();
         }
 
-        Core.app.post(() -> Events.fire(new BlockBuildBeginEvent(tile, team, unit, true)));
+        Events.fire(new BlockBuildBeginEvent(tile, team, unit, true));
     }
 
     /** Places a ConstructBlock at this location. */
@@ -115,7 +115,7 @@ public class Build{
 
         result.placeBegan(tile, previous);
 
-        Core.app.post(() -> Events.fire(new BlockBuildBeginEvent(tile, team, unit, false)));
+        Events.fire(new BlockBuildBeginEvent(tile, team, unit, false));
     }
 
     /** Returns whether a tile can be placed at this location by this team. */
@@ -166,6 +166,10 @@ public class Build{
         }
 
         if(!type.requiresWater && !contactsShallows(tile.x, tile.y, type) && !type.placeableLiquid){
+            return false;
+        }
+
+        if((type.isFloor() && tile.floor() == type) || (type.isOverlay() && tile.overlay() == type)){
             return false;
         }
 

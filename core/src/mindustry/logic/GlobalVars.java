@@ -38,14 +38,14 @@ public class GlobalVars{
         put("false", 0);
         put("true", 1);
         put("null", null);
-        
+
         //math
         put("@pi", Mathf.PI);
         put("π", Mathf.PI); //for the "cool" kids
         put("@e", Mathf.E);
         put("@degToRad", Mathf.degRad);
         put("@radToDeg", Mathf.radDeg);
-        
+
         //time
         varTime = put("@time", 0);
         varTick = put("@tick", 0);
