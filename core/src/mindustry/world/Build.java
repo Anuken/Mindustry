@@ -12,8 +12,6 @@ import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
-import mindustry.net.*;
-import mindustry.net.Administration.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.ConstructBlock.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
