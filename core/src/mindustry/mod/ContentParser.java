@@ -575,7 +575,7 @@ public class ContentParser{
 
             if(!value.has("sector") || !value.get("sector").isNumber()) throw new RuntimeException("SectorPresets must have a sector number.");
 
-            SectorPreset out = new SectorPreset(mod + "-" + name);
+            SectorPreset out = new SectorPreset(mod + "-" + name, currentMod);
 
             currentContent = out;
             read(() -> {
