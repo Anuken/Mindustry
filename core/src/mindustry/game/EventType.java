@@ -257,13 +257,13 @@ public class EventType{
         }
     }
 
-    /** Called when the player configures a specific building. */
+    /** Called when a specific building has its configuration changed. */
     public static class ConfigEvent{
         public final Building tile;
         public final @Nullable Player player;
         public final Object value;
 
-        public ConfigEvent(Building tile, Player player, Object value){
+        public ConfigEvent(Building tile, @Nullable Player player, Object value){
             this.tile = tile;
             this.player = player;
             this.value = value;
