@@ -78,9 +78,6 @@ public class Build{
 
         //auto-rotate the block to the correct orientation and bail out
         if(tile.team() == team && tile.block == result && tile.build != null && tile.block.quickRotate){
-            if(unit != null && unit.isPlayer() && !netServer.admins.allowAction(unit.getPlayer(), ActionType.rotate, tile, action -> action.rotation = Mathf.mod(rotation, 4))) {
-                throw new ValidateException(unit.getPlayer(), "Player cannot rotate a block.");
-            }
             if(unit != null && unit.getControllerName() != null) tile.build.lastAccessed = unit.getControllerName();
             int previous = tile.build.rotation;
             tile.build.rotation = Mathf.mod(rotation, 4);
