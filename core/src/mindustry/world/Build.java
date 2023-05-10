@@ -12,6 +12,8 @@ import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
+import mindustry.net.*;
+import mindustry.net.Administration.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.ConstructBlock.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
@@ -76,11 +78,16 @@ public class Build{
 
         //auto-rotate the block to the correct orientation and bail out
         if(tile.team() == team && tile.block == result && tile.build != null && tile.block.quickRotate){
+            if(!netServer.admins.allowAction(player, ActionType.rotate, build.tile(), action -> action.rotation = Mathf.mod(rotation, 4))) {
+                throw new ValidateException(player, "Player cannot rotate a block.");
+            }
             if(unit != null && unit.getControllerName() != null) tile.build.lastAccessed = unit.getControllerName();
+            int previous = tile.build.rotation;
             tile.build.rotation = Mathf.mod(rotation, 4);
             tile.build.updateProximity();
             tile.build.noSleep();
             Fx.rotateBlock.at(tile.build.x, tile.build.y, tile.build.block.size);
+            Events.fire(new BuildRotateEvent(tile.build, unit, previous));
             return;
         }
 
