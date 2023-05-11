@@ -126,9 +126,10 @@ public abstract class MapListDialog extends BaseDialog{
                     mapTable.row();
                 }
 
-                TextButton button = mapTable.button("", Styles.grayt, () -> showMap(map)).width(mapsize).pad(8).get();
+                TextButton button = mapTable.button("", Styles.grayt, () -> showMap(map)).width(mapsize).bottom().growY().pad(8).get();
                 button.clearChildren();
                 button.margin(9);
+                button.bottom();
 
                 //TODO hide in editor?
                 button.table(t -> {
