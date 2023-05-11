@@ -78,8 +78,8 @@ public class RegionPart extends DrawPart{
                 mx += move.x * p;
                 my += move.y * p;
                 mr += move.rot * p;
-                gx += move.gx;
-                gy += move.gy;
+                gx += move.gx * p;
+                gy += move.gy * p;
             }
         }
 
