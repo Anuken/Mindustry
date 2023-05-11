@@ -85,6 +85,14 @@ public class UI implements ApplicationListener, Loadable{
         Fonts.loadFonts();
     }
 
+    public static void loadColors(){
+        Colors.put("accent", Pal.accent);
+        Colors.put("unlaunched", Color.valueOf("8982ed"));
+        Colors.put("highlight", Pal.accent.cpy().lerp(Color.white, 0.3f));
+        Colors.put("stat", Pal.stat);
+        Colors.put("negstat", Pal.negativeStat);
+    }
+
     @Override
     public void loadAsync(){
 
@@ -92,6 +100,8 @@ public class UI implements ApplicationListener, Loadable{
 
     @Override
     public void loadSync(){
+        loadColors();
+
         Fonts.outline.getData().markupEnabled = true;
         Fonts.def.getData().markupEnabled = true;
         Fonts.def.setOwnsTexture(false);
@@ -124,12 +134,6 @@ public class UI implements ApplicationListener, Loadable{
         });
 
         ClickListener.clicked = () -> Sounds.press.play();
-
-        Colors.put("accent", Pal.accent);
-        Colors.put("unlaunched", Color.valueOf("8982ed"));
-        Colors.put("highlight", Pal.accent.cpy().lerp(Color.white, 0.3f));
-        Colors.put("stat", Pal.stat);
-        Colors.put("negstat", Pal.negativeStat);
 
         drillCursor = Core.graphics.newCursor("drill", Fonts.cursorScale());
         unloadCursor = Core.graphics.newCursor("unload", Fonts.cursorScale());
