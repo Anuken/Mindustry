@@ -12,19 +12,14 @@ import arc.scene.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.*;
-import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
-import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.input.Placement.*;
 import mindustry.ui.*;
 import mindustry.world.*;
-
-import java.util.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
@@ -119,19 +114,7 @@ public class DesktopInput extends InputHandler{
             if(Core.input.keyDown(Binding.schematic_select)){
                 drawSelection(schemX, schemY, cursorX, cursorY, Vars.maxSchematicSize);
             }else if(Core.input.keyDown(Binding.rebuild_select)){
-                //TODO color?
-                drawSelection(schemX, schemY, cursorX, cursorY, 0, Pal.sapBulletBack, Pal.sapBullet);
-
-                NormalizeDrawResult result = Placement.normalizeDrawArea(Blocks.air, schemX, schemY, cursorX, cursorY, false, 0, 1f);
-
-                Tmp.r1.set(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
-
-                for(BlockPlan plan : player.team().data().plans){
-                    Block block = content.block(plan.block);
-                    if(block.bounds(plan.x, plan.y, Tmp.r2).overlaps(Tmp.r1)){
-                        drawSelected(plan.x, plan.y, content.block(plan.block), Pal.sapBullet);
-                    }
-                }
+                drawRebuildSelection(schemX, schemY, cursorX, cursorY);
             }
         }
 
@@ -529,20 +512,8 @@ public class DesktopInput extends InputHandler{
                 schemX = -1;
                 schemY = -1;
             }else if(input.keyRelease(Binding.rebuild_select)){
-                //TODO rebuild!!!
 
-                NormalizeResult result = Placement.normalizeArea(schemX, schemY, rawCursorX, rawCursorY, rotation, false, 999999999);
-                Tmp.r1.set(result.x * tilesize, result.y * tilesize, (result.x2 - result.x) * tilesize, (result.y2 - result.y) * tilesize);
-
-                Iterator<BlockPlan> broken = player.team().data().plans.iterator();
-                while(broken.hasNext()){
-                    BlockPlan plan = broken.next();
-                    Block block = content.block(plan.block);
-                    if(block.bounds(plan.x, plan.y, Tmp.r2).overlaps(Tmp.r1)){
-                        player.unit().addBuild(new BuildPlan(plan.x, plan.y, plan.rotation, content.block(plan.block), plan.config));
-                    }
-                }
-
+                rebuildArea(schemX, schemY, rawCursorX, rawCursorY);
                 schemX = -1;
                 schemY = -1;
             }

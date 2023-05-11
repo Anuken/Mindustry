@@ -1166,6 +1166,21 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Lines.rect(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
     }
 
+    protected void drawRebuildSelection(int x, int y, int x2, int y2){
+        drawSelection(x, y, x2, y2, 0, Pal.sapBulletBack, Pal.sapBullet);
+
+        NormalizeDrawResult result = Placement.normalizeDrawArea(Blocks.air, x, y, x2, y2, false, 0, 1f);
+
+        Tmp.r1.set(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
+
+        for(BlockPlan plan : player.team().data().plans){
+            Block block = content.block(plan.block);
+            if(block.bounds(plan.x, plan.y, Tmp.r2).overlaps(Tmp.r1)){
+                drawSelected(plan.x, plan.y, content.block(plan.block), Pal.sapBullet);
+            }
+        }
+    }
+
     protected void drawBreakSelection(int x1, int y1, int x2, int y2){
         drawBreakSelection(x1, y1, x2, y2, maxLength);
     }
@@ -1650,6 +1665,20 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
         }else{
             Call.dropItem(player.angleTo(x, y));
+        }
+    }
+
+    public void rebuildArea(int x, int y, int x2, int y2){
+        NormalizeResult result = Placement.normalizeArea(x, y, x2, y2, rotation, false, 999999999);
+        Tmp.r1.set(result.x * tilesize, result.y * tilesize, (result.x2 - result.x) * tilesize, (result.y2 - result.y) * tilesize);
+
+        Iterator<BlockPlan> broken = player.team().data().plans.iterator();
+        while(broken.hasNext()){
+            BlockPlan plan = broken.next();
+            Block block = content.block(plan.block);
+            if(block.bounds(plan.x, plan.y, Tmp.r2).overlaps(Tmp.r1)){
+                player.unit().addBuild(new BuildPlan(plan.x, plan.y, plan.rotation, content.block(plan.block), plan.config));
+            }
         }
     }
 

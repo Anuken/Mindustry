@@ -55,7 +55,7 @@ public class MobileInput extends InputHandler implements GestureListener{
     /** Whether the player is currently shifting all placed tiles. */
     public boolean selecting;
     /** Whether the player is currently in line-place mode. */
-    public boolean lineMode, schematicMode;
+    public boolean lineMode, schematicMode, rebuildMode;
     /** Current place mode. */
     public PlaceMode mode = none;
     /** Whether no recipe was available when switching to break mode. */
@@ -208,6 +208,8 @@ public class MobileInput extends InputHandler implements GestureListener{
                 if(schematicMode){
                     block = null;
                     mode = none;
+                }else{
+                    rebuildMode = false;
                 }
             }
         }).update(i -> {
@@ -219,37 +221,45 @@ public class MobileInput extends InputHandler implements GestureListener{
         });
 
         //confirm button
-        table.button(Icon.ok, Styles.clearNonei, () -> {
-            for(BuildPlan plan : selectPlans){
-                Tile tile = plan.tile();
+        table.button(Icon.ok, Styles.clearNoneTogglei, () -> {
+            if(schematicMode){
+                rebuildMode = !rebuildMode;
+            }else{
+                for(BuildPlan plan : selectPlans){
+                    Tile tile = plan.tile();
 
-                //actually place/break all selected blocks
-                if(tile != null){
-                    if(!plan.breaking){
-                        if(validPlace(plan.x, plan.y, plan.block, plan.rotation)){
-                            BuildPlan other = getPlan(plan.x, plan.y, plan.block.size, null);
-                            BuildPlan copy = plan.copy();
+                    //actually place/break all selected blocks
+                    if(tile != null){
+                        if(!plan.breaking){
+                            if(validPlace(plan.x, plan.y, plan.block, plan.rotation)){
+                                BuildPlan other = getPlan(plan.x, plan.y, plan.block.size, null);
+                                BuildPlan copy = plan.copy();
 
-                            if(other == null){
-                                player.unit().addBuild(copy);
-                            }else if(!other.breaking && other.x == plan.x && other.y == plan.y && other.block.size == plan.block.size){
-                                player.unit().plans().remove(other);
-                                player.unit().addBuild(copy);
+                                if(other == null){
+                                    player.unit().addBuild(copy);
+                                }else if(!other.breaking && other.x == plan.x && other.y == plan.y && other.block.size == plan.block.size){
+                                    player.unit().plans().remove(other);
+                                    player.unit().addBuild(copy);
+                                }
                             }
-                        }
 
-                        rotation = plan.rotation;
-                    }else{
-                        tryBreakBlock(tile.x, tile.y);
+                            rotation = plan.rotation;
+                        }else{
+                            tryBreakBlock(tile.x, tile.y);
+                        }
                     }
                 }
-            }
 
-            //move all current plans to removal array so they fade out
-            removals.addAll(selectPlans.select(r -> !r.breaking));
-            selectPlans.clear();
-            selecting = false;
-        }).visible(() -> !selectPlans.isEmpty()).name("confirmplace");
+                //move all current plans to removal array so they fade out
+                removals.addAll(selectPlans.select(r -> !r.breaking));
+                selectPlans.clear();
+                selecting = false;
+            }
+        }).visible(() -> !selectPlans.isEmpty() || schematicMode || rebuildMode).update(i -> {
+            i.getStyle().imageUp = schematicMode || rebuildMode ? Icon.wrench : Icon.ok;
+            i.setChecked(rebuildMode);
+
+        }).name("confirmplace");
     }
 
     boolean showCancel(){
@@ -369,6 +379,8 @@ public class MobileInput extends InputHandler implements GestureListener{
         //draw schematic selection
         if(mode == schematicSelect){
             drawSelection(lineStartX, lineStartY, lastLineX, lastLineY, Vars.maxSchematicSize);
+        }else if(mode == rebuildSelect){
+            drawRebuildSelection(lineStartX, lineStartY, lastLineX, lastLineY);
         }
 
         drawCommanded();
@@ -444,6 +456,11 @@ public class MobileInput extends InputHandler implements GestureListener{
     //region input events, overrides
 
     @Override
+    public boolean isRebuildSelecting(){
+        return rebuildMode;
+    }
+
+    @Override
     protected int schemOriginX(){
         Tmp.v1.setZero();
         selectPlans.each(r -> Tmp.v1.add(r.drawx(), r.drawy()));
@@ -496,7 +513,8 @@ public class MobileInput extends InputHandler implements GestureListener{
         //call tap events
         if(pointer == 0 && !selecting){
             if(schematicMode && block == null){
-                mode = schematicSelect;
+                mode = rebuildMode ? rebuildSelect : schematicSelect;
+
                 //engage schematic selection mode
                 int tileX = tileX(screenX);
                 int tileY = tileY(screenY);
@@ -545,6 +563,9 @@ public class MobileInput extends InputHandler implements GestureListener{
                 lastSchematic = null;
             }
             schematicMode = false;
+            mode = none;
+        }else if(mode == rebuildSelect){
+            rebuildArea(lineStartX, lineStartY, lastLineX, lastLineY);
             mode = none;
         }else{
             Tile tile = tileAt(screenX, screenY);
@@ -780,11 +801,15 @@ public class MobileInput extends InputHandler implements GestureListener{
         }
 
         //stop select when not in schematic mode
-        if(!schematicMode && mode == schematicSelect){
+        if(!schematicMode && (mode == schematicSelect || mode == rebuildSelect)){
             mode = none;
         }
 
-        if(mode == schematicSelect){
+        if(!rebuildMode && mode == rebuildSelect){
+            mode = none;
+        }
+
+        if(mode == schematicSelect || mode == rebuildSelect){
             lastLineX = rawTileX();
             lastLineY = rawTileY();
             autoPan();

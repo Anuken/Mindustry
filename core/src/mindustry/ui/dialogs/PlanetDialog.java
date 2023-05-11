@@ -184,7 +184,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                         b.add(planet.localizedName).color(Pal.accent).style(Styles.outlineLabel);
                         b.row();
                         b.image(new TextureRegionDrawable(tex)).grow().scaling(Scaling.fit);
-                    }, Styles.togglet, () -> selected[0] = planet).size(Core.app.isMobile() ? 220f : 320f).group(group);
+                    }, Styles.togglet, () -> selected[0] = planet).size(mobile ? 220f : 320f).group(group);
                     i ++;
                 }
 

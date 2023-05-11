@@ -59,12 +59,12 @@ public class JoinDialog extends BaseDialog{
         loadServers();
 
         //mobile players don't get information >:(
-        boolean infoButton = !steam && !Core.app.isMobile();
+        boolean infoButton = !steam && !mobile;
 
         if(infoButton) buttons.add().width(60f);
         buttons.add().growX().width(-1);
 
-        addCloseButton(Core.app.isMobile() ? 190f : 210f);
+        addCloseButton(mobile ? 190f : 210f);
 
         buttons.button("@server.add", Icon.add, () -> {
             renaming = null;
