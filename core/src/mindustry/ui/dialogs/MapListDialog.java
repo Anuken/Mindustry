@@ -60,7 +60,7 @@ public abstract class MapListDialog extends BaseDialog{
 
         searchString = null;
 
-        if(Core.graphics.isPortrait()){
+        if(Core.graphics.isPortrait() && displayType){
             buttons.button("@back", Icon.left, this::hide).size(210f * 2f, 64f).colspan(2);
             buttons.row();
         }else{
