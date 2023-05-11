@@ -50,7 +50,7 @@ public class UI implements ApplicationListener, Loadable{
 
     public AboutDialog about;
     public GameOverDialog restart;
-    public CustomMapsDialog custom;
+    public CustomGameDialog custom;
     public EditorMapsDialog maps;
     public LoadDialog load;
     public DiscordDialog discord;
@@ -185,7 +185,7 @@ public class UI implements ApplicationListener, Loadable{
         join = new JoinDialog();
         discord = new DiscordDialog();
         load = new LoadDialog();
-        custom = new CustomMapsDialog();
+        custom = new CustomGameDialog();
         language = new LanguageDialog();
         database = new DatabaseDialog();
         settings = new SettingsMenuDialog();

@@ -2,10 +2,10 @@ package mindustry.ui.dialogs;
 
 import mindustry.maps.*;
 
-public class CustomMapsDialog extends MapListDialog{
+public class CustomGameDialog extends MapListDialog{
     private MapPlayDialog dialog = new MapPlayDialog();
 
-    public CustomMapsDialog(){
+    public CustomGameDialog(){
         super("@customgame", false);
     }
 
