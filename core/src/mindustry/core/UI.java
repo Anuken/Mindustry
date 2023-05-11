@@ -50,8 +50,8 @@ public class UI implements ApplicationListener, Loadable{
 
     public AboutDialog about;
     public GameOverDialog restart;
-    public CustomGameDialog custom;
-    public MapsDialog maps;
+    public CustomMapsDialog custom;
+    public EditorMapsDialog maps;
     public LoadDialog load;
     public DiscordDialog discord;
     public JoinDialog join;
@@ -185,7 +185,7 @@ public class UI implements ApplicationListener, Loadable{
         join = new JoinDialog();
         discord = new DiscordDialog();
         load = new LoadDialog();
-        custom = new CustomGameDialog();
+        custom = new CustomMapsDialog();
         language = new LanguageDialog();
         database = new DatabaseDialog();
         settings = new SettingsMenuDialog();
@@ -195,7 +195,7 @@ public class UI implements ApplicationListener, Loadable{
         bans = new BansDialog();
         admins = new AdminsDialog();
         traces = new TraceDialog();
-        maps = new MapsDialog();
+        maps = new EditorMapsDialog();
         content = new ContentInfoDialog();
         planet = new PlanetDialog();
         research = new ResearchDialog();
