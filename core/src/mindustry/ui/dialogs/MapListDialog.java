@@ -73,6 +73,7 @@ public abstract class MapListDialog extends BaseDialog{
 
         ScrollPane pane = new ScrollPane(mapTable);
         pane.setFadeScrollBars(false);
+        pane.setScrollingDisabledX(true);
 
         Table search = new Table();
         search.image(Icon.zoom);
