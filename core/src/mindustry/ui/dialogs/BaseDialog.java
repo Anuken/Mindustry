@@ -42,6 +42,14 @@ public class BaseDialog extends Dialog{
         this(title, Core.scene.getStyle(DialogStyle.class));
     }
 
+    /** Places the buttons as an overlay on top of the content. Used when the content can be scrolled through.*/
+    protected void makeButtonOverlay(){
+        clearChildren();
+        add(titleTable).growX().row();
+        stack(cont, buttons).grow();
+        buttons.bottom();
+    }
+
     protected void onResize(Runnable run){
         Events.on(ResizeEvent.class, event -> {
             if(isShown() && Core.scene.getDialog() == this){
@@ -55,11 +63,15 @@ public class BaseDialog extends Dialog{
        closeOnBack();
     }
 
-    @Override
-    public void addCloseButton(){
-        buttons.defaults().size(210f, 64f);
-        buttons.button("@back", Icon.left, this::hide).size(210f, 64f);
+    public void addCloseButton(float width){
+        buttons.defaults().size(width, 64f);
+        buttons.button("@back", Icon.left, this::hide).size(width, 64f);
 
         addCloseListener();
+    }
+
+    @Override
+    public void addCloseButton(){
+        addCloseButton(210f);
     }
 }

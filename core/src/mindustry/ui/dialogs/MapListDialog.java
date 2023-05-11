@@ -54,6 +54,8 @@ public abstract class MapListDialog extends BaseDialog{
     abstract void showMap(Map map);
 
     void setup(){
+        makeButtonOverlay();
+
         buttons.clearChildren();
 
         searchString = null;
@@ -86,15 +88,13 @@ public abstract class MapListDialog extends BaseDialog{
 
         cont.add(search).growX();
         cont.row();
-        cont.add(pane).uniformX().growY();
-        cont.row();
-        cont.add(buttons).growX();
+        cont.add(pane).padLeft(36f).uniformX().growY();
     }
 
     void rebuildMaps(){
         mapTable.clear();
 
-        mapTable.marginRight(24);
+        mapTable.marginRight(18f);
 
         int maxwidth = Math.max((int)(Core.graphics.getWidth() / Scl.scl(230)), 1);
         float mapsize = 200f;
