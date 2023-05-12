@@ -477,11 +477,15 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(build == null) return;
         if(net.server() && (!Units.canInteract(player, build) ||
             !netServer.admins.allowAction(player, ActionType.configure, build.tile, action -> action.config = value))){
-            var packet = new TileConfigCallPacket(); //undo the config on the client
-            packet.player = player;
-            packet.build = build;
-            packet.value = build.config();
-            player.con.send(packet, true);
+
+            if(player.con != null){
+                var packet = new TileConfigCallPacket(); //undo the config on the client
+                packet.player = player;
+                packet.build = build;
+                packet.value = build.config();
+                player.con.send(packet, true);
+            }
+
             throw new ValidateException(player, "Player cannot configure a tile.");
         }
         build.configured(player == null || player.dead() ? null : player.unit(), value);

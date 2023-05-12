@@ -16,7 +16,6 @@ import mindustry.world.*;
 import mindustry.world.blocks.defense.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.power.*;
-import mindustry.world.blocks.power.PowerNode.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.meta.*;
 
@@ -173,7 +172,7 @@ public class BaseGenerator{
 
         for(Tile tile : tiles){
             if(tile.isCenter() && tile.block() instanceof PowerNode && tile.team() == state.rules.waveTeam){
-                tile.build.configure(new Point2[0]);
+                tile.build.configureAny(new Point2[0]);
                 tile.build.placed();
             }
         }
