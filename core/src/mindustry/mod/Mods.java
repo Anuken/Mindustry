@@ -1023,8 +1023,6 @@ public class Mods implements Loadable{
         public Seq<LoadedMod> dependencies = new Seq<>();
         /** All missing dependencies of this mod as strings. */
         public Seq<String> missingDependencies = new Seq<>();
-        /** Script files to run. */
-        public Seq<Fi> scripts = new Seq<>();
         /** Content with initialization code. */
         public ObjectSet<Content> erroredContent = new ObjectSet<>();
         /** Current state of this mod. */
