@@ -126,7 +126,7 @@ public abstract class MapListDialog extends BaseDialog{
                     mapTable.row();
                 }
 
-                TextButton button = mapTable.button("", Styles.grayt, () -> showMap(map)).width(mapsize).bottom().growY().pad(8).get();
+                TextButton button = mapTable.button("", Styles.grayt, () -> showMap(map)).width(mapsize).bottom().pad(8).get();
                 button.clearChildren();
                 button.margin(9);
                 button.bottom();
@@ -139,6 +139,9 @@ public abstract class MapListDialog extends BaseDialog{
                         if(mode.valid(map) && Core.atlas.isFound(icon.getRegion())){
                             t.image(icon).size(16f).pad(4f);
                         }
+                    }
+                    if(t.getChildren().size == 0){
+                        t.add().size(16f).pad(4f);
                     }
                 }).left().row();
 
