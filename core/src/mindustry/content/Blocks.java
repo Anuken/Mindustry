@@ -2548,7 +2548,6 @@ public class Blocks{
             researchCostMultiplier = 0.4f;
         }};
 
-        //TODO stats
         fluxReactor = new VariableReactor("flux-reactor"){{
             requirements(Category.power, with(Items.graphite, 300, Items.carbide, 200, Items.oxide, 100, Items.silicon, 600, Items.surgeAlloy, 300));
             powerProduction = 120f;
@@ -2585,7 +2584,6 @@ public class Blocks{
             );
         }};
 
-        //TODO stats
         neoplasiaReactor = new HeaterGenerator("neoplasia-reactor"){{
             requirements(Category.power, with(Items.tungsten, 1000, Items.carbide, 300, Items.oxide, 150, Items.silicon, 500, Items.phaseFabric, 300, Items.surgeAlloy, 200));
 
@@ -2609,7 +2607,6 @@ public class Blocks{
             explodeSound = Sounds.largeExplosion;
 
             powerProduction = 140f;
-            rebuildable = false;
 
             ambientSound = Sounds.bioLoop;
             ambientSoundVolume = 0.2f;
