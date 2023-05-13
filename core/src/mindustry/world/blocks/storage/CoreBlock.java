@@ -492,12 +492,6 @@ public class CoreBlock extends StorageBlock{
 
             storageCapacity = itemCapacity + proximity().sum(e -> owns(e) ? e.block.itemCapacity : 0);
             proximity.each(this::owns, t -> {
-                //add inventory if there is something in it from a payload
-                if(t.items != items){
-                    items.add(t.items);
-                    t.items.clear();
-                }
-
                 t.items = items;
                 ((StorageBuild)t).linkedCore = this;
             });

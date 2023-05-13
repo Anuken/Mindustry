@@ -47,6 +47,14 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
         updateBuildLogic();
     }
 
+    @Override
+    public void afterRead(){
+        //why would this happen?
+        if(plans == null){
+            plans = new Queue<>(1);
+        }
+    }
+
     public void validatePlans(){
         if(plans.size > 0){
             Iterator<BuildPlan> it = plans.iterator();
