@@ -196,7 +196,7 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
                         Damage.damage(team, l.base.x, l.base.y, type.legSplashRange, type.legSplashDamage * state.rules.unitDamage(team), false, true);
 
                         var tile = Vars.world.tileWorld(l.base.x, l.base.y);
-                        if(tile != null && tile.breakable() && tile.block() instanceof Prop){
+                        if(tile != null && tile.block().breakable && tile.block() instanceof Prop){
                             ConstructBlock.deconstructFinish(tile, tile.block(), self());
                         }
                     }
