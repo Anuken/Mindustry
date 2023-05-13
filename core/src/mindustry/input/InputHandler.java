@@ -469,7 +469,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         build.updateProximity();
         build.noSleep();
         Fx.rotateBlock.at(build.x, build.y, build.block.size);
-        Events.fire(new BuildRotateEvent(build, player.unit(), previous));
+        Events.fire(new BuildRotateEvent(build, player == null ? null : player.unit(), previous));
     }
 
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
