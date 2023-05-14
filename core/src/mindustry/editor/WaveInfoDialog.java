@@ -160,7 +160,7 @@ public class WaveInfoDialog extends BaseDialog{
                     start = Math.max(search - (displayed / 2) - (displayed % 2), 0);
                     buildGroups();
                 }).growX().maxTextLength(8).get().setMessageText("@waves.search");
-                s.button(Icon.units, Styles.emptyi, () -> showUnits(type -> filterType = type, true)).size(46f).tooltip("@waves.filter.unit")
+                s.button(Icon.units, Styles.emptyi, () -> showUnits(type -> filterType = type, true)).size(46f).tooltip("@waves.filter")
                 .update(b -> b.getStyle().imageUp = filterType != null ? new TextureRegionDrawable(filterType.uiIcon) : Icon.filter);
             }).growX().pad(6f).row();
 
@@ -415,7 +415,7 @@ public class WaveInfoDialog extends BaseDialog{
     }
 
     void showUnits(Cons<UnitType> cons, boolean reset){
-        BaseDialog dialog = new BaseDialog("");
+        BaseDialog dialog = new BaseDialog(reset ? "@waves.filter" : "");
         dialog.setFillParent(true);
         dialog.cont.pane(p -> {
             p.defaults().pad(2).fillX();
