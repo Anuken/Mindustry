@@ -4,6 +4,7 @@ import arc.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g3d.*;
+import arc.graphics.gl.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
@@ -23,14 +24,22 @@ import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
+import static mindustry.graphics.g3d.PlanetRenderer.*;
 
 public class Planet extends UnlockableContent{
     /** intersect() temp var. */
     private static final Vec3 intersectResult = new Vec3();
+    /** drawSectors() temp matrix. */
+    private static final Mat3D mat = new Mat3D();
+    /** drawArc() temp curve points. */
+    private static final Seq<Vec3> points = new Seq<>();
+
     /** Mesh used for rendering. Created on load() - will be null on the server! */
     public @Nullable GenericMesh mesh;
     /** Mesh used for rendering planet clouds. Null if no clouds are present. */
     public @Nullable GenericMesh cloudMesh;
+    /** Mesh used for rendering planet grid outlines. Null on server or if {@link #grid} is null. */
+    public @Nullable Mesh gridMesh;
     /** Position in global coordinates. Will be 0,0,0 until the Universe updates it. */
     public Vec3 position = new Vec3();
     /** Grid used for the sectors on the planet. Null if this planet can't be landed on. */
@@ -141,6 +150,8 @@ public class Planet extends UnlockableContent{
     public Seq<UnlockableContent> unlockedOnLand = new Seq<>();
     /** Loads the mesh. Clientside only. Defaults to a boring sphere mesh. */
     public Prov<GenericMesh> meshLoader = () -> new ShaderSphereMesh(this, Shaders.unlit, 2), cloudMeshLoader = () -> null;
+    /** Loads the planet grid outline mesh. Clientside only. */
+    public Prov<Mesh> gridMeshLoader = () -> MeshBuilder.buildPlanetGrid(grid, outlineColor, outlineRad * radius);
 
     public Planet(String name, Planet parent, float radius){
         super(name);
@@ -312,12 +323,12 @@ public class Planet extends UnlockableContent{
         if(!headless){
             mesh = meshLoader.get();
             cloudMesh = cloudMeshLoader.get();
+            if(grid != null) gridMesh = gridMeshLoader.get();
         }
     }
 
     @Override
     public void init(){
-
         if(techTree == null){
             techTree = TechTree.roots.find(n -> n.planet == this);
         }
@@ -417,5 +428,107 @@ public class Planet extends UnlockableContent{
         if(cloudMesh != null){
             cloudMesh.render(params, projection, transform);
         }
+    }
+
+    /** Draws sector borders. Supply the batch with {@link Gl#triangles triangle} vertices. */
+    public void drawBorders(VertexBatch3D batch, Sector sector, Color base, float alpha){
+        Color color = Tmp.c1.set(base).a((base.a + 0.3f + Mathf.absin(Time.globalTime, 5f, 0.3f)) * alpha);
+
+        float r1 = radius;
+        float r2 = outlineRad * radius + 0.001f;
+
+        for(int i = 0; i < sector.tile.corners.length; i++){
+            Corner c = sector.tile.corners[i], next = sector.tile.corners[(i+1) % sector.tile.corners.length];
+
+            Tmp.v31.set(c.v).setLength(r2);
+            Tmp.v32.set(next.v).setLength(r2);
+            Tmp.v33.set(c.v).setLength(r1);
+
+            batch.tri2(Tmp.v31, Tmp.v32, Tmp.v33, color);
+
+            Tmp.v31.set(next.v).setLength(r2);
+            Tmp.v32.set(next.v).setLength(r1);
+            Tmp.v33.set(c.v).setLength(r1);
+
+            batch.tri2(Tmp.v31, Tmp.v32, Tmp.v33, color);
+        }
+    }
+
+    /** Draws sector plane. Supply the batch with {@link Gl#triangles triangle} vertices. */
+    public void fill(VertexBatch3D batch, Sector sector, Color color, float offset){
+        float rr = outlineRad * radius + offset;
+        for(int i = 0; i < sector.tile.corners.length; i++){
+            Corner c = sector.tile.corners[i], next = sector.tile.corners[(i+1) % sector.tile.corners.length];
+            batch.tri(Tmp.v31.set(c.v).setLength(rr), Tmp.v32.set(next.v).setLength(rr), Tmp.v33.set(sector.tile.v).setLength(rr), color);
+        }
+    }
+
+    /** Draws sector when selected. Supply the batch with {@link Gl#triangles triangle} vertices. */
+    public void drawSelection(VertexBatch3D batch, Sector sector, Color color, float stroke, float length){
+        float arad = (outlineRad + length) * radius;
+
+        for(int i = 0; i < sector.tile.corners.length; i++){
+            Corner next = sector.tile.corners[(i + 1) % sector.tile.corners.length];
+            Corner curr = sector.tile.corners[i];
+
+            next.v.scl(arad);
+            curr.v.scl(arad);
+            sector.tile.v.scl(arad);
+
+            Tmp.v31.set(curr.v).sub(sector.tile.v).setLength(curr.v.dst(sector.tile.v) - stroke).add(sector.tile.v);
+            Tmp.v32.set(next.v).sub(sector.tile.v).setLength(next.v.dst(sector.tile.v) - stroke).add(sector.tile.v);
+
+            batch.tri(curr.v, next.v, Tmp.v31, color);
+            batch.tri(Tmp.v31, next.v, Tmp.v32, color);
+
+            sector.tile.v.scl(1f / arad);
+            next.v.scl(1f / arad);
+            curr.v.scl(1f /arad);
+        }
+    }
+
+    /** Renders sector outlines. */
+    public void renderSectors(VertexBatch3D batch, Camera3D cam, PlanetParams params){
+        //apply transformed position
+        batch.proj().mul(getTransform(mat));
+
+        if(params.renderer != null){
+            params.renderer.renderSectors(this);
+        }
+
+        //render sector grid
+        float scaledOutlineRad = outlineRad * radius;
+        Mesh mesh = gridMesh;
+        Shader shader = Shaders.planetGrid;
+        Vec3 tile = intersect(cam.getMouseRay(), scaledOutlineRad);
+        Shaders.planetGrid.mouse.lerp(tile == null ? Vec3.Zero : tile.sub(position).rotate(Vec3.Y, getRotation()), 0.2f);
+
+        shader.bind();
+        shader.setUniformMatrix4("u_proj", cam.combined.val);
+        shader.setUniformMatrix4("u_trans", getTransform(mat).val);
+        shader.apply();
+        mesh.render(shader, Gl.lines);
+    }
+
+    /** Draws an arc from one point to another on the planet. */
+    public void drawArc(VertexBatch3D batch, Vec3 a, Vec3 b, Color from, Color to, float length, float timeScale, int pointCount){
+        //increase curve height when on opposite side of planet, so it doesn't tunnel through
+        float scaledOutlineRad = outlineRad * radius;
+        float dot = 1f - (Tmp.v32.set(a).nor().dot(Tmp.v33.set(b).nor()) + 1f)/2f;
+
+        Vec3 avg = Tmp.v31.set(b).add(a).scl(0.5f);
+        avg.setLength(radius * (1f + length) + dot * 1.35f);
+
+        points.clear();
+        points.addAll(Tmp.v33.set(b).setLength(scaledOutlineRad), Tmp.v31, Tmp.v34.set(a).setLength(scaledOutlineRad));
+        Tmp.bz3.set(points);
+
+        for(int i = 0; i < pointCount + 1; i++){
+            float f = i / (float)pointCount;
+            Tmp.c1.set(from).lerp(to, (f + Time.globalTime / timeScale) % 1f);
+            batch.color(Tmp.c1);
+            batch.vertex(Tmp.bz3.valueAt(Tmp.v32, f));
+        }
+        batch.flush(Gl.lineStrip);
     }
 }
