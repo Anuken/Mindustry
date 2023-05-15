@@ -150,17 +150,8 @@ public class Planet extends UnlockableContent{
     public Seq<UnlockableContent> unlockedOnLand = new Seq<>();
     /** Loads the mesh. Clientside only. Defaults to a boring sphere mesh. */
     public Prov<GenericMesh> meshLoader = () -> new ShaderSphereMesh(this, Shaders.unlit, 2), cloudMeshLoader = () -> null;
-    public Prov<Mesh> gridMeshLoader = () -> MeshBuilder.buildHex(new HexMesher(){
-        @Override
-        public float getHeight(Vec3 position){
-            return 0;
-        }
-
-        @Override
-        public Color getColor(Vec3 position){
-            return outlineColor;
-        }
-    }, grid.size, true, outlineRad * radius, 0.2f);
+    /** Loads the planet grid outline mesh. Clientside only. */
+    public Prov<Mesh> gridMeshLoader = () -> MeshBuilder.buildPlanetGrid(grid, outlineColor, outlineRad * radius);
 
     public Planet(String name, Planet parent, float radius){
         super(name);
@@ -474,7 +465,7 @@ public class Planet extends UnlockableContent{
 
     /** Draws sector when selected. Supply the batch with {@link Gl#triangles triangle} vertices. */
     public void drawSelection(VertexBatch3D batch, float outlineRad, Sector sector, Color color, float stroke, float length){
-        float arad = (outlineRad + length) * sector.planet.radius;
+        float arad = (outlineRad + length) * radius;
 
         for(int i = 0; i < sector.tile.corners.length; i++){
             Corner next = sector.tile.corners[(i + 1) % sector.tile.corners.length];
