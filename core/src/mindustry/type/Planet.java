@@ -431,7 +431,7 @@ public class Planet extends UnlockableContent{
     }
 
     /** Draws sector borders. Supply the batch with {@link Gl#triangles triangle} vertices. */
-    public void drawBorders(VertexBatch3D batch, float outlineRad, Sector sector, Color base, float alpha){
+    public void drawBorders(VertexBatch3D batch, Sector sector, Color base, float alpha){
         Color color = Tmp.c1.set(base).a((base.a + 0.3f + Mathf.absin(Time.globalTime, 5f, 0.3f)) * alpha);
 
         float r1 = radius;
@@ -455,7 +455,7 @@ public class Planet extends UnlockableContent{
     }
 
     /** Draws sector plane. Supply the batch with {@link Gl#triangles triangle} vertices. */
-    public void fill(VertexBatch3D batch, float outlineRad, Sector sector, Color color, float offset){
+    public void fill(VertexBatch3D batch, Sector sector, Color color, float offset){
         float rr = outlineRad * radius + offset;
         for(int i = 0; i < sector.tile.corners.length; i++){
             Corner c = sector.tile.corners[i], next = sector.tile.corners[(i+1) % sector.tile.corners.length];
@@ -464,7 +464,7 @@ public class Planet extends UnlockableContent{
     }
 
     /** Draws sector when selected. Supply the batch with {@link Gl#triangles triangle} vertices. */
-    public void drawSelection(VertexBatch3D batch, float outlineRad, Sector sector, Color color, float stroke, float length){
+    public void drawSelection(VertexBatch3D batch, Sector sector, Color color, float stroke, float length){
         float arad = (outlineRad + length) * radius;
 
         for(int i = 0; i < sector.tile.corners.length; i++){

@@ -192,7 +192,7 @@ public class PlanetRenderer implements Disposable{
     }
 
     public void drawBorders(Sector sector, Color base, float alpha){
-        sector.planet.drawBorders(batch, outlineRad, sector, base, alpha);
+        sector.planet.drawBorders(batch, sector, base, alpha);
         if(batch.getNumVertices() >= batch.getMaxVertices() - 6 * 6){
             batch.flush(Gl.triangles);
         }
@@ -220,7 +220,7 @@ public class PlanetRenderer implements Disposable{
     }
 
     public void fill(Sector sector, Color color, float offset){
-        sector.planet.fill(batch, outlineRad, sector, color, offset);
+        sector.planet.fill(batch, sector, color, offset);
     }
 
     public void drawSelection(Sector sector, float alpha){
@@ -228,7 +228,7 @@ public class PlanetRenderer implements Disposable{
     }
 
     public void drawSelection(Sector sector, Color color, float stroke, float length){
-        sector.planet.drawSelection(batch, outlineRad, sector, color, stroke, length);
+        sector.planet.drawSelection(batch, sector, color, stroke, length);
     }
 
     @Override
