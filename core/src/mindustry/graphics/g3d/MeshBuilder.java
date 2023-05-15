@@ -29,6 +29,27 @@ public class MeshBuilder{
         return buildIcosphere(divisions, radius, Color.white);
     }
 
+    public static Mesh buildPlanetGrid(PlanetGrid grid, Color color, float scale){
+        int total = 0;
+        for(Ptile tile : grid.tiles){
+            total += tile.corners.length * 2;
+        }
+
+        begin(total * (3 + 3 + 1));
+        for(Ptile tile : grid.tiles){
+            Corner[] c = tile.corners;
+            for(int i = 0; i < c.length; i++){
+                Vec3 a = v1.set(c[i].v).scl(scale);
+                Vec3 b = v2.set(c[(i + 1) % c.length].v).scl(scale);
+
+                vert(a, Vec3.Z, color);
+                vert(b, Vec3.Z, color);
+            }
+        }
+
+        return end();
+    }
+
     public static Mesh buildHex(Color color, int divisions, boolean lines, float radius){
         return buildHex(new HexMesher(){
             @Override
