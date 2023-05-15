@@ -150,11 +150,11 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
             @Override
             public void zoom(InputEvent event, float initialDistance, float distance){
-               if(lastZoom < 0){
-                   lastZoom = zoom;
-               }
+                if(lastZoom < 0){
+                    lastZoom = zoom;
+                }
 
-               zoom = (Mathf.clamp(initialDistance / distance * lastZoom, state.planet.minZoom, 2f));
+                zoom = (Mathf.clamp(initialDistance / distance * lastZoom, state.planet.minZoom, 2f));
             }
 
             @Override
