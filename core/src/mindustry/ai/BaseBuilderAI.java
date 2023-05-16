@@ -25,7 +25,7 @@ import static mindustry.Vars.*;
 
 public class BaseBuilderAI{
     private static final Vec2 axis = new Vec2(), rotator = new Vec2();
-    private static final int attempts = 4;
+    private static final int attempts = 5, coreUnitMultiplier = 2;
     private static final float emptyChance = 0.01f;
     private static final int timerStep = 0, timerSpawn = 1, timerRefreshPath = 2;
     private static final float placeIntervalMin = 12f, placeIntervalMax = 2f;
@@ -71,7 +71,7 @@ public class BaseBuilderAI{
             int coreUnits = data.countType(block.unitType);
 
             //create AI core unit(s)
-            if(!state.isEditor() && coreUnits < data.cores.size){
+            if(!state.isEditor() && coreUnits < data.cores.size * coreUnitMultiplier){
                 Unit unit = block.unitType.create(data.team);
                 unit.set(data.cores.random());
                 unit.add();
