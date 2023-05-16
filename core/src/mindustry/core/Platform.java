@@ -173,6 +173,7 @@ public interface Platform{
 
                 String result = OS.exec(args.toArray(String.class));
 
+                //cancelled selection, ignore result
                 if(result.isEmpty() || result.equals("\n")) return;
 
                 if(result.endsWith("\n")) result = result.substring(0, result.length() - 1);
