@@ -267,6 +267,11 @@ public class Rules{
         /** If true, this team has infinite unit ammo. */
         public boolean infiniteAmmo;
 
+        /** AI that builds random schematics. */
+        public boolean buildAi;
+        /** Tier of builder AI. [0, 1] */
+        public float buildAiTier = 1f;
+
         /** Enables "RTS" unit AI. */
         public boolean rtsAi;
         /** Minimum size of attack squads. */
