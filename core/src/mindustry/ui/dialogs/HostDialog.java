@@ -10,6 +10,8 @@ import mindustry.gen.*;
 import mindustry.ui.*;
 
 import java.io.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static mindustry.Vars.*;
 
@@ -24,9 +26,17 @@ public class HostDialog extends BaseDialog{
         cont.table(t -> {
             t.add("@name").padRight(10);
             t.field(Core.settings.getString("name"), text -> {
+                Pattern pattern = Pattern.compile("#[A-Fa-f0-9]{6}");
+                Matcher matcher = pattern.matcher(text);
+                StringBuilder filteredColorCodes = new StringBuilder();
+                while (matcher.find()) {
+                    filteredColorCodes.append(matcher.group());
+                }
+                int length = filteredColorCodes.length();
+                if(length<=40){
                 player.name(text);
                 Core.settings.put("name", text);
-                ui.listfrag.rebuild();
+                ui.listfrag.rebuild();}
             }).grow().pad(8).get().setMaxLength(40);
 
             ImageButton button = t.button(Tex.whiteui, Styles.squarei, 40, () -> {

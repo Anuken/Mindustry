@@ -21,6 +21,9 @@ import mindustry.net.*;
 import mindustry.net.Packets.*;
 import mindustry.ui.*;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import static mindustry.Vars.*;
 
 public class JoinDialog extends BaseDialog{
@@ -341,8 +344,16 @@ public class JoinDialog extends BaseDialog{
         cont.table(t -> {
             t.add("@name").padRight(10);
             t.field(Core.settings.getString("name"), text -> {
+                Pattern pattern = Pattern.compile("#[A-Fa-f0-9]{6}");
+                Matcher matcher = pattern.matcher(text);
+                StringBuilder filteredColorCodes = new StringBuilder();
+                while (matcher.find()) {
+                    filteredColorCodes.append(matcher.group());
+                }
+                int length = filteredColorCodes.length();
+                if(length<=40){
                 player.name(text);
-                Core.settings.put("name", text);
+                Core.settings.put("name", text);}
             }).grow().pad(8).maxTextLength(maxNameLength);
 
             ImageButton button = t.button(Tex.whiteui, Styles.squarei, 40, () -> {
