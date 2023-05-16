@@ -367,6 +367,10 @@ public class NetServer implements ApplicationListener{
             }
 
             void vote(Player player, int d){
+                if(d==-2){
+                    Call.sendMessage(Strings.format("[lightgray]VoteSession canceled by admin.[orange] @[lightgray].", target.name));
+                    task.cancel();
+                }
                 votes += d;
                 voted.addAll(player.uuid(), admins.getInfo(player.uuid()).lastIP);
 
@@ -459,7 +463,7 @@ public class NetServer implements ApplicationListener{
             }
         });
 
-        clientCommands.<Player>register("vote", "<y/n>", "Vote to kick the current player.", (arg, player) -> {
+        clientCommands.<Player>register("vote", "<y/n>", "Vote to kick the current player. Admin can cancel the vote with c.", (arg, player) -> {
             if(currentlyKicking[0] == null){
                 player.sendMessage("[scarlet]Nobody is being voted on.");
             }else{
@@ -481,6 +485,11 @@ public class NetServer implements ApplicationListener{
 
                 if(currentlyKicking[0].target.team() != player.team()){
                     player.sendMessage("[scarlet]You can't vote for other teams.");
+                    return;
+                }
+
+                if(player.admin&&arg[0].toLowerCase().equals('c')){
+                    currentlyKicking[0].vote(player, -2);
                     return;
                 }
 
