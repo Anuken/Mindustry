@@ -177,7 +177,7 @@ public interface Platform{
                 if(result.isEmpty() || result.equals("\n")) return;
 
                 if(result.endsWith("\n")) result = result.substring(0, result.length() - 1);
-                if(result.contains("\n")) throw new IOException("invalid input");
+                if(result.contains("\n")) throw new IOException("invalid input: \"" + result + "\"");
 
                 Fi file = Core.files.absolute(result);
                 Core.app.post(() -> {
@@ -190,6 +190,7 @@ public interface Platform{
                     }
                 });
             }catch(Exception e){
+                Log.err(e);
                 Log.warn("zenity not found, using non-native file dialog. Consider installing `zenity` for native file dialogs.");
                 Core.app.post(fallback);
             }
