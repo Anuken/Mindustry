@@ -25,7 +25,7 @@ import static mindustry.Vars.*;
 
 public class BaseBuilderAI{
     private static final Vec2 axis = new Vec2(), rotator = new Vec2();
-    private static final int attempts = 5, coreUnitMultiplier = 2;
+    private static final int attempts = 6, coreUnitMultiplier = 2;
     private static final float emptyChance = 0.01f;
     private static final int timerStep = 0, timerSpawn = 1, timerRefreshPath = 2;
     private static final float placeIntervalMin = 12f, placeIntervalMax = 2f;
