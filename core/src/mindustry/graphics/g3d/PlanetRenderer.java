@@ -7,11 +7,9 @@ import arc.graphics.g3d.*;
 import arc.graphics.gl.*;
 import arc.math.*;
 import arc.math.geom.*;
-import arc.struct.*;
 import arc.util.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
-import mindustry.graphics.g3d.PlanetGrid.*;
 import mindustry.type.*;
 
 public class PlanetRenderer implements Disposable{
@@ -44,6 +42,7 @@ public class PlanetRenderer implements Disposable{
         projector.setScaling(1f / 150f);
         cam.fov = 60f;
         cam.far = 150f;
+        cam.near = 0.01f;
     }
 
     /** Render the entire planet scene to the screen. */
