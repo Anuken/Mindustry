@@ -83,6 +83,7 @@ public class ScriptMainGenerator{
         "mindustry.type.ammo",
         "mindustry.game.Objectives",
         "mindustry.world.blocks",
+        "mindustry.world.consumers",
         "mindustry.world.draw",
         "mindustry.type",
         "mindustry.entities.pattern",

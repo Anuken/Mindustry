@@ -1,5 +1,6 @@
 package mindustry.entities.pattern;
 
+import arc.util.*;
 import mindustry.entities.*;
 
 /** Handles different types of bullet patterns for shooting. */
@@ -10,6 +11,12 @@ public class ShootPattern implements Cloneable{
     public float firstShotDelay = 0;
     /** delay in ticks between shots */
     public float shotDelay = 0;
+
+    /** Called on a single "trigger pull". This function should call the handler with any bullets that result. */
+    public void shoot(int totalShots, BulletHandler handler, @Nullable Runnable barrelIncrementer){
+        //the default implementation calls the "soft deprecated" variant for mod compatibility, so overrides from older mods can function properly
+        shoot(totalShots, handler);
+    }
 
     /** Called on a single "trigger pull". This function should call the handler with any bullets that result. */
     public void shoot(int totalShots, BulletHandler handler){

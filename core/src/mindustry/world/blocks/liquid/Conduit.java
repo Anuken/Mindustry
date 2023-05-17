@@ -28,7 +28,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
     static final float[][] rotateOffsets = {{hpad, hpad}, {-hpad, hpad}, {-hpad, -hpad}, {hpad, -hpad}};
 
     public final int timerFlow = timers++;
-    
+
     public Color botColor = Color.valueOf("565656");
 
     public @Load(value = "@-top-#", length = 5) TextureRegion[] topRegions;

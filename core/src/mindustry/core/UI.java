@@ -51,7 +51,7 @@ public class UI implements ApplicationListener, Loadable{
     public AboutDialog about;
     public GameOverDialog restart;
     public CustomGameDialog custom;
-    public MapsDialog maps;
+    public EditorMapsDialog maps;
     public LoadDialog load;
     public DiscordDialog discord;
     public JoinDialog join;
@@ -75,12 +75,22 @@ public class UI implements ApplicationListener, Loadable{
     public FullTextDialog fullText;
     public CampaignCompleteDialog campaignComplete;
 
+    public IntMap<Dialog> followUpMenus;
+
     public Cursor drillCursor, unloadCursor, targetCursor;
 
     private @Nullable Element lastAnnouncement;
 
     public UI(){
         Fonts.loadFonts();
+    }
+
+    public static void loadColors(){
+        Colors.put("accent", Pal.accent);
+        Colors.put("unlaunched", Color.valueOf("8982ed"));
+        Colors.put("highlight", Pal.accent.cpy().lerp(Color.white, 0.3f));
+        Colors.put("stat", Pal.stat);
+        Colors.put("negstat", Pal.negativeStat);
     }
 
     @Override
@@ -90,6 +100,8 @@ public class UI implements ApplicationListener, Loadable{
 
     @Override
     public void loadSync(){
+        loadColors();
+
         Fonts.outline.getData().markupEnabled = true;
         Fonts.def.getData().markupEnabled = true;
         Fonts.def.setOwnsTexture(false);
@@ -122,12 +134,6 @@ public class UI implements ApplicationListener, Loadable{
         });
 
         ClickListener.clicked = () -> Sounds.press.play();
-
-        Colors.put("accent", Pal.accent);
-        Colors.put("unlaunched", Color.valueOf("8982ed"));
-        Colors.put("highlight", Pal.accent.cpy().lerp(Color.white, 0.3f));
-        Colors.put("stat", Pal.stat);
-        Colors.put("negstat", Pal.negativeStat);
 
         drillCursor = Core.graphics.newCursor("drill", Fonts.cursorScale());
         unloadCursor = Core.graphics.newCursor("unload", Fonts.cursorScale());
@@ -193,7 +199,7 @@ public class UI implements ApplicationListener, Loadable{
         bans = new BansDialog();
         admins = new AdminsDialog();
         traces = new TraceDialog();
-        maps = new MapsDialog();
+        maps = new EditorMapsDialog();
         content = new ContentInfoDialog();
         planet = new PlanetDialog();
         research = new ResearchDialog();
@@ -202,6 +208,7 @@ public class UI implements ApplicationListener, Loadable{
         logic = new LogicDialog();
         fullText = new FullTextDialog();
         campaignComplete = new CampaignCompleteDialog();
+        followUpMenus = new IntMap<>();
 
         Group group = Core.scene.root;
 
@@ -261,28 +268,33 @@ public class UI implements ApplicationListener, Loadable{
         });
     }
 
-    public void showTextInput(String titleText, String dtext, int textLength, String def, boolean inumeric, Cons<String> confirmed){
+    public void showTextInput(String titleText, String text, int textLength, String def, boolean numbers, Cons<String> confirmed, Runnable closed){
         if(mobile){
             Core.input.getTextInput(new TextInput(){{
                 this.title = (titleText.startsWith("@") ? Core.bundle.get(titleText.substring(1)) : titleText);
                 this.text = def;
-                this.numeric = inumeric;
+                this.numeric = numbers;
                 this.maxLength = textLength;
                 this.accepted = confirmed;
                 this.allowEmpty = false;
             }});
         }else{
             new Dialog(titleText){{
-                cont.margin(30).add(dtext).padRight(6f);
-                TextFieldFilter filter = inumeric ? TextFieldFilter.digitsOnly : (f, c) -> true;
+                cont.margin(30).add(text).padRight(6f);
+                TextFieldFilter filter = numbers ? TextFieldFilter.digitsOnly : (f, c) -> true;
                 TextField field = cont.field(def, t -> {}).size(330f, 50f).get();
-                field.setFilter((f, c) -> field.getText().length() < textLength && filter.acceptChar(f, c));
+                field.setMaxLength(textLength);
+                field.setFilter(filter);
                 buttons.defaults().size(120, 54).pad(4);
-                buttons.button("@cancel", this::hide);
+                buttons.button("@cancel", () -> {
+                    closed.run();
+                    hide();
+                });
                 buttons.button("@ok", () -> {
                     confirmed.get(field.getText());
                     hide();
                 }).disabled(b -> field.getText().isEmpty());
+
                 keyDown(KeyCode.enter, () -> {
                     String text = field.getText();
                     if(!text.isEmpty()){
@@ -290,9 +302,10 @@ public class UI implements ApplicationListener, Loadable{
                         hide();
                     }
                 });
-                keyDown(KeyCode.escape, this::hide);
-                keyDown(KeyCode.back, this::hide);
+
+                closeOnBack(closed);
                 show();
+
                 Core.scene.setKeyboardFocus(field);
                 field.setCursorPosition(def.length());
             }};
@@ -303,8 +316,12 @@ public class UI implements ApplicationListener, Loadable{
         showTextInput(title, text, 32, def, confirmed);
     }
 
-    public void showTextInput(String titleText, String text, int textLength, String def, Cons<String> confirmed){
-        showTextInput(titleText, text, textLength, def, false, confirmed);
+    public void showTextInput(String title, String text, int textLength, String def, Cons<String> confirmed){
+        showTextInput(title, text, textLength, def, false, confirmed);
+    }
+
+    public void showTextInput(String title, String text, int textLength, String def, boolean numeric, Cons<String> confirmed){
+        showTextInput(title, text, textLength, def, numeric, confirmed, () -> {});
     }
 
     public void showInfoFade(String info){
@@ -320,6 +337,24 @@ public class UI implements ApplicationListener, Loadable{
         table.actions(Actions.fadeOut(duration, Interp.fade), Actions.remove());
         table.top().add(info).style(Styles.outlineLabel).padTop(10);
         Core.scene.add(table);
+    }
+
+    public void addDescTooltip(Element elem, String description){
+        if(description == null) return;
+
+        elem.addListener(new Tooltip(t -> t.background(Styles.black8).margin(4f).add(description).color(Color.lightGray)){
+            {
+                allowMobile = true;
+            }
+            @Override
+            protected void setContainerPosition(Element element, float x, float y){
+                this.targetActor = element;
+                Vec2 pos = element.localToStageCoordinates(Tmp.v1.set(0, 0));
+                container.pack();
+                container.setPosition(pos.x, pos.y, Align.topLeft);
+                container.setOrigin(0, element.getHeight());
+            }
+        });
     }
 
     /** Shows a fading label at the top of the screen. */
@@ -419,6 +454,8 @@ public class UI implements ApplicationListener, Loadable{
     }
 
     public void showException(String text, Throwable exc){
+        if(loadfrag == null) return;
+
         loadfrag.hide();
         new Dialog(""){{
             String message = Strings.getFinalMessage(exc);
@@ -562,16 +599,12 @@ public class UI implements ApplicationListener, Loadable{
         dialog.show();
     }
 
-    /** Shows a menu that fires a callback when an option is selected. If nothing is selected, -1 is returned. */
-    public void showMenu(String title, String message, String[][] options, Intc callback){
-        new Dialog("[accent]" + title){{
+    // TODO REPLACE INTEGER WITH arc.fun.IntCons(int, T) or something like that.
+    public Dialog newMenuDialog(String title, String message, String[][] options, Cons2<Integer, Dialog> buttonListener){
+        return new Dialog(title){{
             setFillParent(true);
             removeChild(titleTable);
             cont.add(titleTable).width(400f);
-
-            getStyle().titleFontColor = Color.white;
-            title.getStyle().fontColor = Color.white;
-            title.setStyle(title.getStyle());
 
             cont.row();
             cont.image().width(400f).pad(2).colspan(2).height(4f).color(Pal.accent).bottom();
@@ -592,16 +625,47 @@ public class UI implements ApplicationListener, Loadable{
 
                         String optionName = optionsRow[i];
                         int finalOption = option;
-                        buttonRow.button(optionName, () -> {
-                            callback.get(finalOption);
-                            hide();
-                        }).size(i == optionsRow.length - 1 ? lastWidth : width, 50).pad(4);
+                        buttonRow.button(optionName, () -> buttonListener.get(finalOption, this))
+                                .size(i == optionsRow.length - 1 ? lastWidth : width, 50).pad(4);
                         option++;
                     }
                 }
             }).growX();
-            closeOnBack(() -> callback.get(-1));
-        }}.show();
+        }};
+    }
+
+    /** Shows a menu that fires a callback when an option is selected. If nothing is selected, -1 is returned. */
+    public void showMenu(String title, String message, String[][] options, Intc callback){
+        Dialog dialog = newMenuDialog(title, message, options, (option, myself) -> {
+            callback.get(option);
+            myself.hide();
+        });
+        dialog.closeOnBack(() -> callback.get(-1));
+        dialog.show();
+    }
+
+    /** Shows a menu that hides when another followUp-menu is shown or when nothing is selected.
+     * @see UI#showMenu(String, String, String[][], Intc) */
+    public void showFollowUpMenu(int menuId, String title, String message, String[][] options, Intc callback) {
+        Dialog dialog = newMenuDialog(title, message, options, (option, myself) -> callback.get(option));
+        dialog.closeOnBack(() -> {
+            followUpMenus.remove(menuId);
+            callback.get(-1);
+        });
+
+        Dialog oldDialog = followUpMenus.remove(menuId);
+        if(oldDialog != null){
+            dialog.show(Core.scene, null);
+            oldDialog.hide(null);
+        }else{
+            dialog.show();
+        }
+        followUpMenus.put(menuId, dialog);
+    }
+
+    public void hideFollowUpMenu(int menuId) {
+        if(!followUpMenus.containsKey(menuId)) return;
+        followUpMenus.remove(menuId).hide();
     }
 
     /** Formats time with hours:minutes:seconds. */

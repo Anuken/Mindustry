@@ -1494,9 +1494,10 @@ public class Blocks{
             craftEffect = new RadialEffect(Fx.heatReactorSmoke, 4, 90f, 7f);
 
             itemCapacity = 20;
+            outputItem = new ItemStack(Items.fissileMatter, 1);
+
             consumeItem(Items.thorium, 3);
             consumeLiquid(Liquids.nitrogen, 1f / 60f);
-            outputItem = new ItemStack(Items.fissileMatter, 1);
         }};
 
         //endregion
@@ -2547,7 +2548,6 @@ public class Blocks{
             researchCostMultiplier = 0.4f;
         }};
 
-        //TODO stats
         fluxReactor = new VariableReactor("flux-reactor"){{
             requirements(Category.power, with(Items.graphite, 300, Items.carbide, 200, Items.oxide, 100, Items.silicon, 600, Items.surgeAlloy, 300));
             powerProduction = 120f;
@@ -2584,7 +2584,6 @@ public class Blocks{
             );
         }};
 
-        //TODO stats
         neoplasiaReactor = new HeaterGenerator("neoplasia-reactor"){{
             requirements(Category.power, with(Items.tungsten, 1000, Items.carbide, 300, Items.oxide, 150, Items.silicon, 500, Items.phaseFabric, 300, Items.surgeAlloy, 200));
 
@@ -2608,7 +2607,6 @@ public class Blocks{
             explodeSound = Sounds.largeExplosion;
 
             powerProduction = 140f;
-            rebuildable = false;
 
             ambientSound = Sounds.bioLoop;
             ambientSoundVolume = 0.2f;
@@ -3046,6 +3044,20 @@ public class Blocks{
 
             shoot = new ShootAlternate(3.5f);
 
+            recoils = 2;
+            drawer = new DrawTurret(){{
+                for(int i = 0; i < 2; i ++){
+                    int f = i;
+                    parts.add(new RegionPart("-barrel-" + (i == 0 ? "l" : "r")){{
+                        progress = PartProgress.recoil;
+                        recoilIndex = f;
+                        under = true;
+                        moveY = -1.5f;
+                    }});
+                }
+            }};
+
+            recoil = 0.5f;
             shootY = 3f;
             reload = 20f;
             range = 110;
@@ -3107,6 +3119,15 @@ public class Blocks{
                     }};
                 }}
             );
+
+            drawer = new DrawTurret(){{
+                parts.add(new RegionPart("-mid"){{
+                    progress = PartProgress.recoil;
+                    under = true;
+                    moveY = -1f;
+                }});
+            }};
+
             reload = 18f;
             range = 220f;
             size = 2;
@@ -3115,7 +3136,7 @@ public class Blocks{
             shoot.shotDelay = 5f;
             shoot.shots = 2;
 
-            recoil = 2f;
+            recoil = 1f;
             rotateSpeed = 15f;
             inaccuracy = 17f;
             shootCone = 35f;
@@ -3404,6 +3425,7 @@ public class Blocks{
             reload = 30f;
             inaccuracy = 10f;
             range = 240f;
+            consumeAmmoOnce = false;
             size = 2;
             scaledHealth = 300;
             shootSound = Sounds.missile;
@@ -3463,11 +3485,21 @@ public class Blocks{
                 }}
             );
 
+            drawer = new DrawTurret(){{
+                parts.add(new RegionPart("-barrel"){{
+                    progress = PartProgress.recoil.delay(0.5f); //Since recoil is 1-0, cut from the start instead of the end.
+                    under = true;
+                    turretHeatLayer = Layer.turret - 0.0001f;
+                    moveY = -1.5f;
+                }});
+            }};
+
             size = 2;
             range = 190f;
             reload = 31f;
+            consumeAmmoOnce = false;
             ammoEjectBack = 3f;
-            recoil = 3f;
+            recoil = 2f;
             shake = 1f;
             shoot.shots = 4;
             shoot.shotDelay = 3f;
@@ -3759,7 +3791,8 @@ public class Blocks{
                     explodeRange = 20f;
                 }}
             );
-            shootY = 8.75f;
+            shootY = 10f;
+
             shoot = new ShootBarrel(){{
                 barrels = new float[]{
                 0f, 1f, 0f,
@@ -3767,10 +3800,25 @@ public class Blocks{
                 -3f, 0f, 0f,
                 };
             }};
+
+            recoils = 3;
+            drawer = new DrawTurret(){{
+                for(int i = 3; i > 0; i--){
+                    int f = i;
+                    parts.add(new RegionPart("-barrel-" + i){{
+                        progress = PartProgress.recoil;
+                        recoilIndex = f - 1;
+                        under = true;
+                        moveY = -2f;
+                    }});
+                }
+            }};
+
             reload = 8f;
             range = 200f;
             size = 3;
-            recoil = 3f;
+            recoil = 1.5f;
+            recoilTime = 10;
             rotateSpeed = 10f;
             inaccuracy = 10f;
             shootCone = 30f;
@@ -4081,6 +4129,7 @@ public class Blocks{
 
             liquidConsumed = 10f / 60f;
             targetInterval = 5f;
+            targetUnderBlocks = false;
 
             float r = range = 130f;
 

@@ -462,9 +462,15 @@ public class PlacementFragment{
                                             var listener = new ClickListener();
 
                                             //left click -> select
-                                            b.clicked(KeyCode.mouseLeft, () -> control.input.selectedUnits.removeAll(unit -> unit.type != type));
+                                            b.clicked(KeyCode.mouseLeft, () -> {
+                                                control.input.selectedUnits.removeAll(unit -> unit.type != type);
+                                                Events.fire(Trigger.unitCommandChange);
+                                            });
                                             //right click -> remove
-                                            b.clicked(KeyCode.mouseRight, () -> control.input.selectedUnits.removeAll(unit -> unit.type == type));
+                                            b.clicked(KeyCode.mouseRight, () -> {
+                                                control.input.selectedUnits.removeAll(unit -> unit.type == type);
+                                                Events.fire(Trigger.unitCommandChange);
+                                            });
 
                                             b.addListener(listener);
                                             b.addListener(new HandCursorListener());
@@ -514,7 +520,7 @@ public class PlacementFragment{
                             //find the command that all units have, or null if they do not share one
                             for(var unit : control.input.selectedUnits){
                                 if(unit.isCommandable()){
-                                    var nextCommand = unit.command().currentCommand();
+                                    var nextCommand = unit.command().command;
 
                                     if(hadCommand){
                                         if(shareCommand != nextCommand){

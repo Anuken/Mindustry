@@ -13,6 +13,7 @@ import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -68,8 +69,8 @@ public class OverdriveProjector extends Block{
         stats.add(Stat.productionTime, useTime / 60f, StatUnit.seconds);
 
         if(hasBoost){
-            stats.add(Stat.boostEffect, (range + phaseRangeBoost) / tilesize, StatUnit.blocks);
-            stats.add(Stat.boostEffect, "+" + (int)((speedBoost + speedBoostPhase) * 100f - 100) + "%");
+            stats.remove(Stat.booster);
+            stats.add(Stat.booster, StatValues.itemBoosters("+{0}%", stats.timePeriod, speedBoostPhase * 100f, phaseRangeBoost, ((ConsumeItems)findConsumer(f -> f instanceof ConsumeItems)).items, this::consumesItem));
         }
     }
     

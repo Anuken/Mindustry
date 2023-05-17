@@ -71,6 +71,12 @@ public class LightBlock extends Block{
         }
 
         @Override
+        public double sense(LAccess sensor){
+            if(sensor == LAccess.color) return Tmp.c1.set(color).toDoubleBits();
+            return super.sense(sensor);
+        }
+
+        @Override
         public void draw(){
             super.draw();
             Draw.blend(Blending.additive);

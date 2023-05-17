@@ -320,11 +320,24 @@ public class Schematics implements Loadable{
         return block.size + maxLoadoutSchematicPad*2;
     }
 
+    Fi findFile(String schematicName){
+        if(schematicName.isEmpty()) schematicName = "empty";
+        Fi result = null;
+        int index = 0;
+
+        while(result == null || result.exists()){
+            result = schematicDirectory.child(schematicName + (index == 0 ? "" : "_" + index) + "." + schematicExtension);
+            index ++;
+        }
+
+        return result;
+    }
+
     /** Adds a schematic to the list, also copying it into the files.*/
     public void add(Schematic schematic){
         all.add(schematic);
         try{
-            Fi file = schematicDirectory.child(Time.millis() + "." + schematicExtension);
+            Fi file = findFile(Strings.sanitizeFilename(schematic.name()));
             write(schematic, file);
             schematic.file = file;
         }catch(Exception e){

@@ -55,6 +55,11 @@ public class AIController implements UnitController{
         return false;
     }
 
+    @Override
+    public boolean isLogicControllable(){
+        return true;
+    }
+
     public void stopShooting(){
         for(var mount : unit.mounts){
             //ignore mount controllable stats too, they should not shoot either
@@ -221,6 +226,10 @@ public class AIController implements UnitController{
     public Teamc findTarget(float x, float y, float range, boolean air, boolean ground){
         return target(x, y, range, air, ground);
     }
+
+    public void commandTarget(Teamc moveTo){}
+
+    public void commandPosition(Vec2 pos){}
 
     /** Called after this controller is assigned a unit. */
     public void init(){

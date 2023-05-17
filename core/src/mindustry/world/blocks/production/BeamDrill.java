@@ -17,6 +17,7 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
+import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -41,6 +42,9 @@ public class BeamDrill extends Block{
     public float laserWidth = 0.65f;
     /** How many times faster the drill will progress when boosted by an optional consumer. */
     public float optionalBoostIntensity = 2.5f;
+
+    /** Multipliers of drill speed for each item. Defaults to 1. */
+    public ObjectFloatMap<Item> drillMultipliers = new ObjectFloatMap<>();
 
     public Color sparkColor = Color.valueOf("fd9e81"), glowColor = Color.white;
     public float glowIntensity = 0.2f, pulseIntensity = 0.07f;
@@ -107,11 +111,17 @@ public class BeamDrill extends Block{
     public void setStats(){
         super.setStats();
 
-        stats.add(Stat.drillTier, StatValues.blocks(b -> (b instanceof Floor f && f.wallOre && f.itemDrop != null && f.itemDrop.hardness <= tier) || (b instanceof StaticWall w && w.itemDrop != null && w.itemDrop.hardness <= tier)));
+        stats.add(Stat.drillTier, StatValues.drillables(drillTime, 0f, size, drillMultipliers, b -> (b instanceof Floor f && f.wallOre && f.itemDrop != null && f.itemDrop.hardness <= tier) || (b instanceof StaticWall w && w.itemDrop != null && w.itemDrop.hardness <= tier)));
 
         stats.add(Stat.drillSpeed, 60f / drillTime * size, StatUnit.itemsSecond);
-        if(optionalBoostIntensity != 1){
-            stats.add(Stat.boostEffect, optionalBoostIntensity, StatUnit.timesSpeed);
+
+        if(optionalBoostIntensity != 1 && findConsumer(f -> f instanceof ConsumeLiquidBase && f.booster) instanceof ConsumeLiquidBase consBase){
+            stats.remove(Stat.booster);
+            stats.add(Stat.booster,
+                StatValues.speedBoosters("{0}" + StatUnit.timesSpeed.localized(),
+                consBase.amount, optionalBoostIntensity, false,
+                l -> (consumesLiquid(l) && (findConsumer(f -> f instanceof ConsumeLiquid).booster || ((ConsumeLiquid)findConsumer(f -> f instanceof ConsumeLiquid)).liquid != l)))
+            );
         }
     }
 
@@ -161,7 +171,7 @@ public class BeamDrill extends Block{
         }
 
         if(item != null){
-            float width = drawPlaceText(Core.bundle.formatFloat("bar.drillspeed", 60f / drillTime * count, 2), x, y, valid);
+            float width = drawPlaceText(Core.bundle.formatFloat("bar.drillspeed", 60f / getDrillTime(item) * count, 2), x, y, valid);
             if(!multiple){
                 float dx = x * tilesize + offset - width/2f - 4f, dy = y * tilesize + offset + size * tilesize / 2f + 5, s = iconSmall / 4f;
                 Draw.mixcol(Color.darkGray, 1f);
@@ -192,6 +202,10 @@ public class BeamDrill extends Block{
         }
 
         return false;
+    }
+
+    public float getDrillTime(Item item){
+        return drillTime / drillMultipliers.get(item, 1f);
     }
 
     public class BeamDrillBuild extends Building{
@@ -227,6 +241,7 @@ public class BeamDrill extends Block{
             updateFacing();
 
             float multiplier = Mathf.lerp(1f, optionalBoostIntensity, optionalEfficiency);
+            float drillTime = getDrillTime(lastItem);
             boostWarmup = Mathf.lerpDelta(boostWarmup, optionalEfficiency, 0.1f);
             lastDrillSpeed = (facingAmount * multiplier * timeScale) / drillTime;
 

@@ -206,7 +206,7 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
             //fix incorrect HEAD index since it was swapped
             if(array.size > 0 && idx != array.size){
                 var swapped = array.items[idx];
-                indexer.change(swapped, idx);
+                if(indexer != null) indexer.change(swapped, idx);
             }
 
             if(map != null){
@@ -228,7 +228,7 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
             //swap head with current
             if(array.size > 1){
                 var head = array.items[array.size - 1];
-                indexer.change(head, position);
+                if(indexer != null) indexer.change(head, position);
                 array.items[position] = head;
             }
 

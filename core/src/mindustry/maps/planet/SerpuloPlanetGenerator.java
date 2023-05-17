@@ -202,7 +202,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
                     if(Mathf.dst2(t.x, t.y, x2, y2) <= avoid * avoid){
                         return;
                     }
-                    
+
                     for(int x = -rad; x <= rad; x++){
                         for(int y = -rad; y <= rad; y++){
                             int wx = t.x + x, wy = t.y + y;
@@ -476,7 +476,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
             //tar
             if(floor == Blocks.darksand){
                 if(Math.abs(0.5f - noise(x - 40, y, 2, 0.7, 80)) > 0.25f &&
-                Math.abs(0.5f - noise(x, y + sector.id*10, 1, 1, 60)) > 0.41f && !(roomseq.contains(r -> Mathf.within(x, y, r.x, r.y, 15)))){
+                Math.abs(0.5f - noise(x, y + sector.id*10, 1, 1, 60)) > 0.41f && !(roomseq.contains(r -> Mathf.within(x, y, r.x, r.y, 30)))){
                     floor = Blocks.tar;
                 }
             }

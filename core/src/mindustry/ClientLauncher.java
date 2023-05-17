@@ -102,9 +102,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         });
         assets.setLoader(Music.class, new MusicLoader(tree){
             @Override
-            public void loadAsync(AssetManager manager, String fileName, Fi file, MusicParameter parameter){
-
-            }
+            public void loadAsync(AssetManager manager, String fileName, Fi file, MusicParameter parameter){}
 
             @Override
             public Music loadSync(AssetManager manager, String fileName, Fi file, MusicParameter parameter){

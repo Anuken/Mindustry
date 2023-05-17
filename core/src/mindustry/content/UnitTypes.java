@@ -2751,7 +2751,7 @@ public class UnitTypes{
             weapons.add(new Weapon("conquer-weapon"){{
                 shootSound = Sounds.largeCannon;
                 layerOffset = 0.1f;
-                reload = 110f;
+                reload = 100f;
                 shootY = 32.5f;
                 shake = 5f;
                 recoil = 5f;
@@ -2823,7 +2823,7 @@ public class UnitTypes{
                     }});
                 }
 
-                bullet = new BasicBulletType(8f, 330f){{
+                bullet = new BasicBulletType(8f, 360f){{
                     sprite = "missile-large";
                     width = 12f;
                     height = 20f;
@@ -2862,7 +2862,7 @@ public class UnitTypes{
                             float fin = 0.05f + (j + 1) / (float)count;
                             float spd = speed;
                             float life = lifetime / Mathf.lerp(fin, 1f, 0.5f);
-                            spawnBullets.add(new BasicBulletType(spd * fin, 55){{
+                            spawnBullets.add(new BasicBulletType(spd * fin, 60){{
                                 drag = 0.002f;
                                 width = 12f;
                                 height = 11f;
@@ -2879,7 +2879,7 @@ public class UnitTypes{
                                 weaveScale = (3f + s/2f) / 1.2f;
                                 weaveMag = i * (4f - fin * 2f);
 
-                                splashDamage = 60f;
+                                splashDamage = 65f;
                                 splashDamageRadius = 30f;
                                 despawnEffect = new ExplosionEffect(){{
                                     lifetime = 50f;
@@ -2948,6 +2948,7 @@ public class UnitTypes{
             weapons.add(new Weapon("merui-weapon"){{
                 shootSound = Sounds.missile;
                 mirror = false;
+                showStatSprite = false;
                 x = 0f;
                 y = 1f;
                 shootY = 4f;
@@ -3151,6 +3152,7 @@ public class UnitTypes{
                 x = 29f / 4f;
                 y = -11f / 4f;
                 shootY = 1.5f;
+                showStatSprite = false;
                 reload = 130f;
                 layerOffset = 0.01f;
                 heatColor = Color.red;
@@ -3434,9 +3436,9 @@ public class UnitTypes{
                     }});
                 }
 
-                bullet = new ArtilleryBulletType(5.5f, 280){{
+                bullet = new ArtilleryBulletType(5.5f, 260){{
                     collidesTiles = collides = true;
-                    lifetime = 75f;
+                    lifetime = 70f;
                     shootEffect = Fx.shootBigColor;
                     smokeEffect = Fx.shootSmokeSquareBig;
                     frontColor = Color.white;
@@ -3769,11 +3771,12 @@ public class UnitTypes{
             speed = 1.1f;
             rotateSpeed = 3.2f;
             accel = 0.1f;
-            health = 8000f;
-            armor = 5f;
+            health = 6000f;
+            armor = 4f;
             hitSize = 36f;
             payloadCapacity = Mathf.sqr(3f) * tilePayload;
             researchCostMultiplier = 0f;
+            targetAir = false;
 
             engineSize = 4.8f;
             engineOffset = 61 / 4f;
@@ -3800,11 +3803,13 @@ public class UnitTypes{
                     shake = 1f;
                     speed = 0f;
                     keepVelocity = false;
+                    collidesAir = false;
 
                     spawnUnit = new MissileUnitType("quell-missile"){{
+                        targetAir = false;
                         speed = 4.3f;
                         maxRange = 6f;
-                        lifetime = 60f * 1.6f;
+                        lifetime = 60f * 1.4f;
                         outlineColor = Pal.darkOutline;
                         engineColor = trailColor = Pal.sapBulletBack;
                         engineLayer = Layer.effect;
@@ -3818,6 +3823,7 @@ public class UnitTypes{
                             shootOnDeath = true;
                             bullet = new ExplosionBulletType(110f, 25f){{
                                 shootEffect = Fx.massiveExplosion;
+                                collidesAir = false;
                             }};
                         }});
                     }};
@@ -3844,6 +3850,7 @@ public class UnitTypes{
             armor = 9f;
             hitSize = 46f;
             payloadCapacity = Mathf.sqr(6f) * tilePayload;
+            targetAir = false;
 
             engineSize = 6f;
             engineOffset = 25.25f;
@@ -3909,8 +3916,10 @@ public class UnitTypes{
                     shake = 1f;
                     speed = 0f;
                     keepVelocity = false;
+                    collidesAir = false;
 
                     spawnUnit = new MissileUnitType("disrupt-missile"){{
+                        targetAir = false;
                         speed = 4.6f;
                         maxRange = 5f;
                         outlineColor = Pal.darkOutline;
@@ -3949,6 +3958,7 @@ public class UnitTypes{
                             reload = 1f;
                             shootOnDeath = true;
                             bullet = new ExplosionBulletType(140f, 25f){{
+                                collidesAir = false;
                                 suppressionRange = 140f;
                                 shootEffect = new ExplosionEffect(){{
                                     lifetime = 50f;

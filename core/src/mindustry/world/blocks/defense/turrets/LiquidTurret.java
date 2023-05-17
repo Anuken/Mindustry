@@ -59,16 +59,6 @@ public class LiquidTurret extends Turret{
     }
 
     public class LiquidTurretBuild extends TurretBuild{
-        
-        @Override
-        public void onProximityAdded(){
-            super.onProximityAdded();
-
-            //add first ammo liquid to cheaty blocks so they can shoot properly
-            if(cheating() && ammoTypes.size > 0){
-                handleLiquid(this, ammoTypes.entries().next().key, 1f);
-            }
-        }
 
         @Override
         public boolean shouldActiveSound(){

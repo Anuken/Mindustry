@@ -1,7 +1,6 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
-import arc.util.Http.*;
 import arc.files.*;
 import arc.func.*;
 import arc.graphics.*;
@@ -14,6 +13,7 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.Http.*;
 import arc.util.io.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Jval.*;
@@ -329,6 +329,10 @@ public class ModsDialog extends BaseDialog{
             return "@mod.blacklisted";
         }else if(!item.isSupported()){
             return "@mod.incompatiblegame";
+        }else if(item.state == ModState.circularDependencies){
+            return "@mod.circulardependencies";
+        }else if(item.state == ModState.incompleteDependencies){
+            return "@mod.incompletedependencies";
         }else if(item.hasUnmetDependencies()){
             return "@mod.unmetdependencies";
         }else if(item.hasContentErrors()){
@@ -346,6 +350,10 @@ public class ModsDialog extends BaseDialog{
             return "@mod.blacklisted.details";
         }else if(!item.isSupported()){
             return Core.bundle.format("mod.requiresversion.details", item.meta.minGameVersion);
+        }else if(item.state == ModState.circularDependencies){
+            return "@mod.circulardependencies.details";
+        }else if(item.state == ModState.incompleteDependencies){
+            return Core.bundle.format("mod.incompletedependencies.details", item.missingDependencies.toString(", "));
         }else if(item.hasUnmetDependencies()){
             return Core.bundle.format("mod.missingdependencies.details", item.missingDependencies.toString(", "));
         }else if(item.hasContentErrors()){
@@ -407,7 +415,7 @@ public class ModsDialog extends BaseDialog{
 
         }).width(400f);
 
-        Seq<UnlockableContent> all = Seq.with(content.getContentMap()).<Content>flatten().select(c -> c.minfo.mod == mod && c instanceof UnlockableContent).as();
+        Seq<UnlockableContent> all = Seq.with(content.getContentMap()).<Content>flatten().select(c -> c.minfo.mod == mod && c instanceof UnlockableContent u && !u.isHidden()).as();
         if(all.any()){
             dialog.cont.row();
             dialog.cont.button("@mods.viewcontent", Icon.book, () -> {
@@ -636,7 +644,11 @@ public class ModsDialog extends BaseDialog{
         Core.app.post(() -> modError(t));
     }
 
-    private void githubImportMod(String repo, boolean isJava, @Nullable String release){
+    public void githubImportMod(String repo, boolean isJava){
+        githubImportMod(repo, isJava, null);
+    }
+
+    public void githubImportMod(String repo, boolean isJava, @Nullable String release){
         modImportProgress = 0f;
         ui.loadfrag.show("@downloading");
         ui.loadfrag.setProgress(() -> modImportProgress);

@@ -177,6 +177,15 @@ public class ResearchDialog extends BaseDialog{
         });
     }
 
+    @Override
+    public Dialog show(){
+        if(net.client()){
+            ui.showInfo("@research.multiplayer");
+            return this;
+        }
+        return show(Core.scene);
+    }
+
     void checkMargin(){
         if(Core.graphics.isPortrait() && showTechSelect){
             itemDisplay.marginTop(60f);

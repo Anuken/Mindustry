@@ -45,6 +45,7 @@ public class ServerLauncher implements ApplicationListener{
 
         Vars.loadSettings();
         Vars.init();
+        UI.loadColors();
         content.createBaseContent();
         mods.loadScripts();
         content.createModContent();

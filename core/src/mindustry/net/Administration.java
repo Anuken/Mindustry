@@ -24,6 +24,8 @@ public class Administration{
     public ObjectSet<String> dosBlacklist = new ObjectSet<>();
     public ObjectMap<String, Long> kickedIPs = new ObjectMap<>();
 
+
+    private boolean modified, loaded;
     /** All player info. Maps UUIDs to info. This persists throughout restarts. Do not access directly. */
     private ObjectMap<String, PlayerInfo> playerInfo = new ObjectMap<>();
 
@@ -448,15 +450,23 @@ public class Administration{
     }
 
     public void save(){
-        Core.settings.putJson("player-data", playerInfo);
-        Core.settings.putJson("ip-kicks", kickedIPs);
-        Core.settings.putJson("ip-bans", String.class, bannedIPs);
-        Core.settings.putJson("whitelist-ids", String.class, whitelist);
-        Core.settings.putJson("banned-subnets", String.class, subnetBans);
+        modified = true;
+    }
+
+    public void forceSave(){
+        if(modified && loaded){
+            Core.settings.putJson("player-data", playerInfo);
+            Core.settings.putJson("ip-kicks", kickedIPs);
+            Core.settings.putJson("ip-bans", String.class, bannedIPs);
+            Core.settings.putJson("whitelist-ids", String.class, whitelist);
+            Core.settings.putJson("banned-subnets", String.class, subnetBans);
+            modified = false;
+        }
     }
 
     @SuppressWarnings("unchecked")
     private void load(){
+        loaded = true;
         //load default data
         playerInfo = Core.settings.getJson("player-data", ObjectMap.class, ObjectMap::new);
         kickedIPs = Core.settings.getJson("ip-kicks", ObjectMap.class, ObjectMap::new);
