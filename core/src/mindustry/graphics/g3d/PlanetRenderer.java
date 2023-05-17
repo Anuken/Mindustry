@@ -42,7 +42,7 @@ public class PlanetRenderer implements Disposable{
         projector.setScaling(1f / 150f);
         cam.fov = 60f;
         cam.far = 150f;
-        cam.near = 0.01f;
+        cam.near = 0.1f;
     }
 
     /** Render the entire planet scene to the screen. */
