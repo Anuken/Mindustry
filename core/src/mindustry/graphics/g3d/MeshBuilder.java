@@ -11,7 +11,7 @@ public class MeshBuilder{
     private static Mesh mesh;
 
     public static Mesh buildIcosphere(int divisions, float radius, Color color){
-        begin(20 * (2 << (2 * divisions - 1)) * 7 * 3);
+        begin(20 * (2 << (2 * divisions - 1)) * 3);
 
         MeshResult result = Icosphere.create(divisions);
         for(int i = 0; i < result.indices.size; i+= 3){
@@ -35,7 +35,7 @@ public class MeshBuilder{
             total += tile.corners.length * 2;
         }
 
-        begin(total * (3 + 3 + 1));
+        begin(total);
         for(Ptile tile : grid.tiles){
             Corner[] c = tile.corners;
             for(int i = 0; i < c.length; i++){
@@ -71,7 +71,7 @@ public class MeshBuilder{
             generator.seed = generator.baseSeed;
         }
 
-        begin(grid.tiles.length * 12 * (3 + 3 + 1));
+        begin(grid.tiles.length * 12);
 
         for(Ptile tile : grid.tiles){
             if(mesher.skip(tile.v)){
@@ -124,7 +124,7 @@ public class MeshBuilder{
         VertexAttribute.color
         );
 
-        mesh.getVerticesBuffer().limit(mesh.getMaxVertices());
+        mesh.getVerticesBuffer().limit(mesh.getVerticesBuffer().capacity());
         mesh.getVerticesBuffer().position(0);
     }
 
