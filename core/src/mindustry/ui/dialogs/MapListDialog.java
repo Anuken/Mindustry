@@ -88,13 +88,13 @@ public abstract class MapListDialog extends BaseDialog{
 
         cont.add(search).growX();
         cont.row();
-        cont.add(pane).padLeft(36f).uniformX().growY();
+        cont.add(pane).padLeft(28f).uniformX().growY();
     }
 
     void rebuildMaps(){
         mapTable.clear();
 
-        mapTable.marginRight(18f);
+        mapTable.marginRight(12f);
 
         int maxwidth = Math.max((int)(Core.graphics.getWidth() / Scl.scl(230)), 1);
         float mapsize = 200f;
