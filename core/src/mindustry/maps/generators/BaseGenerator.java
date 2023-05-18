@@ -25,7 +25,7 @@ public class BaseGenerator{
     private static final Vec2 axis = new Vec2(), rotator = new Vec2();
 
     private static final int range = 180;
-    private static final boolean insanity = false;
+    private static boolean insanity = false;
 
     private Tiles tiles;
     private Seq<Tile> cores;
