@@ -492,10 +492,14 @@ public class Schematics implements Loadable{
     }
 
     public static void place(Schematic schem, int x, int y, Team team){
+        place(schem, x, y, team, true);
+    }
+
+    public static void place(Schematic schem, int x, int y, Team team, boolean overwrite){
         int ox = x - schem.width/2, oy = y - schem.height/2;
         schem.tiles.each(st -> {
             Tile tile = world.tile(st.x + ox, st.y + oy);
-            if(tile == null) return;
+            if(tile == null || (!overwrite && !Build.validPlace(st.block, team, tile.x, tile.y, st.rotation))) return;
 
             tile.setBlock(st.block, team, st.rotation);
 
