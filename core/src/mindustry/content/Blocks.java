@@ -3421,7 +3421,7 @@ public class Blocks{
                 shotDelay = 5f;
             }};
 
-            shootY = 7f;
+            shootY = 4.5f;
             reload = 30f;
             inaccuracy = 10f;
             range = 240f;
