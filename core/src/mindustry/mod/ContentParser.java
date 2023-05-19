@@ -884,9 +884,9 @@ public class ContentParser{
             JsonValue opVal = next.has("operation") ? next.get("operation") :
                 next.has("op") ? next.get("op") : null;
             if(opVal == null) throw new RuntimeException("PartProgress nextOp is missing an operation!");
-            String op = opVal.asString();
+            String nextOp = opVal.asString();
 
-            base = parseProgressOp(base, op, next);
+            base = parseProgressOp(base, nextOp, next);
         }
 
         return base;
