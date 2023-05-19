@@ -33,7 +33,7 @@ public class ContentLoader{
 
     public ContentLoader(){
         for(ContentType type : ContentType.all){
-            contentMap[type.ordinal()] = new Seq<>();
+            contentMap[type.ordinal()] = new Seq<>(type.contentClass == null ? Object.class : type.contentClass);
             contentNameMap[type.ordinal()] = new ObjectMap<>();
         }
     }
