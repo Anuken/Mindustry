@@ -1000,12 +1000,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
      * @param todump Item to dump. Can be null to dump anything.
      */
     public boolean dump(Item todump){
-        if(!block.hasItems || items.total() == 0 || (todump != null && !items.has(todump))) return false;
+        if(!block.hasItems || items.total() == 0 || proximity.size == 0 || (todump != null && !items.has(todump))) return false;
 
         int dump = this.cdump;
-
-        if(proximity.size == 0) return false;
-
         var allItems = content.items();
         int itemSize = allItems.size;
         Item[] itemArray = allItems.items;
@@ -1713,8 +1710,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             other.onProximityUpdate();
         }
     }
-
-    //TODO probably should not have a shouldConsume() check? should you even *use* consValid?
 
     public void consume(){
         for(Consume cons : block.consumers){
