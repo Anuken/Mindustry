@@ -198,24 +198,7 @@ public class ContentParser{
             //this is the name of the method to call
             String op = opval.asString();
 
-            //I have to hard-code this, no easy way of getting parameter names, unfortunately
-            return switch(op){
-                case "inv" -> base.inv();
-                case "slope" -> base.slope();
-                case "clamp" -> base.clamp();
-                case "delay" -> base.delay(data.getFloat("amount"));
-                case "sustain" -> base.sustain(data.getFloat("offset", 0f), data.getFloat("grow", 0f), data.getFloat("sustain"));
-                case "shorten" -> base.shorten(data.getFloat("amount"));
-                case "compress" -> base.compress(data.getFloat("start"), data.getFloat("end"));
-                case "add" -> data.has("amount") ? base.add(data.getFloat("amount")) : base.add(parser.readValue(PartProgress.class, data.get("other")));
-                case "blend" -> base.blend(parser.readValue(PartProgress.class, data.get("other")), data.getFloat("amount"));
-                case "mul" -> data.has("amount") ? base.mul(data.getFloat("amount")) : base.mul(parser.readValue(PartProgress.class, data.get("other")));
-                case "min" -> base.min(parser.readValue(PartProgress.class, data.get("other")));
-                case "sin" -> base.sin(data.has("offset") ? data.getFloat("offset") : 0f, data.getFloat("scl"), data.getFloat("mag"));
-                case "absin" -> base.absin(data.getFloat("scl"), data.getFloat("mag"));
-                case "curve" -> data.has("interp") ? base.curve(parser.readValue(Interp.class, data.get("interp"))) : base.curve(data.getFloat("offset"), data.getFloat("duration"));
-                default -> throw new RuntimeException("Unknown operation '" + op + "', check PartProgress class for a list of methods.");
-            };
+            return parseProgressOp(base, op, data);
         });
         put(PlanetGenerator.class, (type, data) -> {
             var result = new AsteroidGenerator(); //only one type for now
@@ -872,6 +855,27 @@ public class ContentParser{
             case "MultiMesh" -> new MultiMesh(parser.readValue(GenericMesh[].class, data.get("meshes")));
             case "MatMesh" -> new MatMesh(parser.readValue(GenericMesh.class, data.get("mesh")), parser.readValue(Mat3D.class, data.get("mat")));
             default -> throw new RuntimeException("Unknown mesh type: " + tname);
+        };
+    }
+
+    private PartProgress parseProgressOp(PartProgress base, String op, JsonValue data){
+        //I have to hard-code this, no easy way of getting parameter names, unfortunately
+        return switch(op){
+            case "inv" -> base.inv();
+            case "slope" -> base.slope();
+            case "clamp" -> base.clamp();
+            case "delay" -> base.delay(data.getFloat("amount"));
+            case "sustain" -> base.sustain(data.getFloat("offset", 0f), data.getFloat("grow", 0f), data.getFloat("sustain"));
+            case "shorten" -> base.shorten(data.getFloat("amount"));
+            case "compress" -> base.compress(data.getFloat("start"), data.getFloat("end"));
+            case "add" -> data.has("amount") ? base.add(data.getFloat("amount")) : base.add(parser.readValue(PartProgress.class, data.get("other")));
+            case "blend" -> base.blend(parser.readValue(PartProgress.class, data.get("other")), data.getFloat("amount"));
+            case "mul" -> data.has("amount") ? base.mul(data.getFloat("amount")) : base.mul(parser.readValue(PartProgress.class, data.get("other")));
+            case "min" -> base.min(parser.readValue(PartProgress.class, data.get("other")));
+            case "sin" -> base.sin(data.has("offset") ? data.getFloat("offset") : 0f, data.getFloat("scl"), data.getFloat("mag"));
+            case "absin" -> base.absin(data.getFloat("scl"), data.getFloat("mag"));
+            case "curve" -> data.has("interp") ? base.curve(parser.readValue(Interp.class, data.get("interp"))) : base.curve(data.getFloat("offset"), data.getFloat("duration"));
+            default -> throw new RuntimeException("Unknown operation '" + op + "', check PartProgress class for a list of methods.");
         };
     }
 
