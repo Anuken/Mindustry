@@ -878,7 +878,7 @@ public class ContentParser{
 
     private PartProgress parseProgressOp(PartProgress base, String op, JsonValue data){
         //I have to hard-code this, no easy way of getting parameter names, unfortunately
-        base = switch(op){
+        return switch(op){
             case "inv" -> base.inv();
             case "slope" -> base.slope();
             case "clamp" -> base.clamp();
@@ -895,8 +895,6 @@ public class ContentParser{
             case "curve" -> data.has("interp") ? base.curve(parser.readValue(Interp.class, data.get("interp"))) : base.curve(data.getFloat("offset"), data.getFloat("duration"));
             default -> throw new RuntimeException("Unknown operation '" + op + "', check PartProgress class for a list of methods.");
         };
-
-        return base;
     }
 
     <T> T make(Class<T> type){
