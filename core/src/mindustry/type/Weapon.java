@@ -251,6 +251,8 @@ public class Weapon implements Cloneable{
             Draw.color();
         }
 
+        Draw.xscl = 1f;
+
         if(parts.size > 0){
             //TODO does it need an outline?
             for(int i = 0; i < parts.size; i++){
