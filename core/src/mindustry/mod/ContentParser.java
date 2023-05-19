@@ -197,7 +197,7 @@ public class ContentParser{
                     data.has("ops") ? data.get("ops") : null;
 
                 if(opsVal != null){
-                    if(!opsVal.isArray()) throw new RuntimeException("PartProgress chained operations must be an array.");
+                    if(!opsVal.isArray()) throw new RuntimeException("Chained PartProgress operations must be an array.");
                     int i = 0;
                     while(true){
                         JsonValue val = opsVal.get(i);
