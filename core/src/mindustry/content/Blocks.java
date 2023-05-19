@@ -3413,11 +3413,14 @@ public class Blocks{
                     lightningLength = 10;
                 }}
             );
-
-            shoot = new ShootAlternate(){{
+            
+            shoot = new ShootBarrel(){{
+                barrels = new float[]{
+                    -4, -1.25f, 0,
+                    0, 0, 0,
+                    4, -1.25f, 0
+                };
                 shots = 4;
-                barrels = 3;
-                spread = 3.5f;
                 shotDelay = 5f;
             }};
 
