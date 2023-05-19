@@ -4663,7 +4663,7 @@ public class Blocks{
 
             recoil = 0.5f;
 
-            fogRadiusMultiuplier = 0.4f;
+            fogRadiusMultiplier = 0.4f;
             coolantMultiplier = 6f;
             shootSound = Sounds.missileLaunch;
 
