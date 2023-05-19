@@ -190,8 +190,26 @@ public class ContentParser{
                 data.has("operation") ? data.get("operation") :
                 data.has("op") ? data.get("op") : null;
 
-            //no operations I guess (why would you do this?)
+            //no singular operation, check for multi-operation
             if(opval == null){
+                JsonValue opsVal =
+                    data.has("operations") ? data.get("operations") :
+                    data.has("ops") ? data.get("ops") : null;
+
+                if(opsVal != null){
+                    if(!opsVal.isArray()) throw new RuntimeException("PartProgress chained operations must be an array.");
+                    int i = 0;
+                    while(true){
+                        JsonValue val = opsVal.get(i);
+                        if(val == null) break;
+                        JsonValue op = val.has("operation") ? val.get("operation") :
+                            val.has("op") ? val.get("op") : null;
+
+                        base = parseProgressOp(base, op.asString(), val);
+                        i++;
+                    }
+                }
+
                 return base;
             }
 
@@ -877,17 +895,6 @@ public class ContentParser{
             case "curve" -> data.has("interp") ? base.curve(parser.readValue(Interp.class, data.get("interp"))) : base.curve(data.getFloat("offset"), data.getFloat("duration"));
             default -> throw new RuntimeException("Unknown operation '" + op + "', check PartProgress class for a list of methods.");
         };
-
-        //Parse chained operations
-        JsonValue next = data.has("nextOp") ? data.get("nextOp") : null;
-        if(next != null){
-            JsonValue opVal = next.has("operation") ? next.get("operation") :
-                next.has("op") ? next.get("op") : null;
-            if(opVal == null) throw new RuntimeException("PartProgress nextOp is missing an operation!");
-            String nextOp = opVal.asString();
-
-            base = parseProgressOp(base, nextOp, next);
-        }
 
         return base;
     }
