@@ -54,7 +54,10 @@ public class ControlPathfinder{
     (PathTile.nearSolid(tile) || PathTile.solid(tile) ? 3 : 0),
 
     costNaval = (team, tile) ->
-    (PathTile.solid(tile) || !PathTile.liquid(tile) ? impassable : 1) +
+    //impassable same-team neutral block, or non-liquid
+    ((PathTile.solid(tile) && ((PathTile.team(tile) == team && !PathTile.teamPassable(tile)) || PathTile.team(tile) == 0)) || !PathTile.liquid(tile) ? impassable : 1) +
+    //impassable synthetic enemy block
+    ((PathTile.team(tile) != team && PathTile.team(tile) != 0) && PathTile.solid(tile) ? wallImpassableCap : 0) +
     (PathTile.nearGround(tile) || PathTile.nearSolid(tile) ? 6 : 0);
 
     public static boolean showDebug = false;

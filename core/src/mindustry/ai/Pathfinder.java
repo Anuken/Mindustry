@@ -58,7 +58,8 @@ public class Pathfinder implements Runnable{
 
         //water
         (team, tile) ->
-            (PathTile.solid(tile) || !PathTile.liquid(tile) ? 6000 : 1) +
+            (!PathTile.liquid(tile) ? 6000 : 1) +
+            PathTile.health(tile) * 5 +
             (PathTile.nearGround(tile) || PathTile.nearSolid(tile) ? 14 : 0) +
             (PathTile.deep(tile) ? 0 : 1) +
             (PathTile.damages(tile) ? 35 : 0)
@@ -527,7 +528,9 @@ public class Pathfinder implements Runnable{
         }
 
         protected boolean passable(int pos){
-            return cost.getCost(team.id, pathfinder.tiles[pos]) != impassable;
+            int amount = cost.getCost(team.id, pathfinder.tiles[pos]);
+            //edge case: naval reports costs of 6000+ for non-liquids, even though they are not technically passable
+            return amount != impassable && !(cost == costTypes.get(costNaval) && amount >= 6000);
         }
 
         /** Gets targets to pathfind towards. This must run on the main thread. */
