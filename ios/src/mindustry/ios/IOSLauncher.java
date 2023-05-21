@@ -40,8 +40,6 @@ public class IOSLauncher extends IOSApplication.Delegate{
             Scl.setAddition(-0.5f);
         }
 
-        Vars.loadFileLogger();
-
         return new IOSApplication(new ClientLauncher(){
 
             @Override
