@@ -392,9 +392,11 @@ public class Vars implements Loadable{
     }
 
     public static void loadFileLogger(){
-        if(loadedFileLogger) return;
+        if(settings != null){
+            settings.setAppName(appName);
+        }
 
-        settings.setAppName(appName);
+        if(loadedFileLogger) return;
 
         try{
             Writer writer = settings.getDataDirectory().child("last_log.txt").writer(false);
