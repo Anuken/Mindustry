@@ -423,14 +423,14 @@ public class SchematicsDialog extends BaseDialog{
                     }
 
                     for(ContentType ctype : defaultContentIcons){
-                        var contents = content.getBy(ctype).<UnlockableContent>as().filter(u -> !u.isHidden() && u.unlockedNow() && u.hasEmoji());
+                        var all = content.getBy(ctype).<UnlockableContent>as().filter(u -> !u.isHidden() && u.unlockedNow() && u.hasEmoji());
 
                         t.row();
-                        if(contents.count(u -> !tags.contains(u.emoji())) > 0) t.image().colspan(cols).growX().width(Float.NEGATIVE_INFINITY).height(3f).color(Pal.accent);
+                        if(all.count(u -> !tags.contains(u.emoji())) > 0) t.image().colspan(cols).growX().width(Float.NEGATIVE_INFINITY).height(3f).color(Pal.accent);
                         t.row();
 
                         i = 0;
-                        for(UnlockableContent u : contents){
+                        for(UnlockableContent u : all){
                             if(tags.contains(u.emoji())) continue;
                             t.button(new TextureRegionDrawable(u.uiIcon), Styles.flati, iconMed, () -> {
                                 String out = u.emoji() + "";
@@ -465,59 +465,83 @@ public class SchematicsDialog extends BaseDialog{
 
                 for(var tag : tags){
 
-                    var next = new Table(Tex.button, n -> {
-                        n.add(tag).padRight(4);
+                    var next = new Table(Styles.grayPanel, n -> {
+                        n.table(move -> {
+                            n.margin(2);
 
-                        n.add().growX();
-                        n.defaults().size(30f);
-
-                        //delete
-                        n.button(Icon.cancelSmall, Styles.emptyi, () -> {
-                            ui.showConfirm("@schematic.tagdelconfirm", () -> {
-                                for(Schematic s : schematics.all()){
-                                    if(s.labels.any()){
-                                        s.labels.remove(tag);
-                                        s.save();
-                                    }
-                                }
-                                selectedTags.remove(tag);
-                                tags.remove(tag);
-                                tagsChanged();
-                                rebuildPane.run();
-                                rebuild[0].run();
-                            });
-                        }).tooltip("@save.delete");
-                        //rename
-                        n.button(Icon.pencilSmall, Styles.emptyi, () -> {
-                            ui.showTextInput("@schematic.renametag", "@name", tag, result -> {
-                                //same tag, nothing was renamed
-                                if(result.equals(tag)) return;
-
-                                if(tags.contains(result)){
-                                    ui.showInfo("@schematic.tagexists");
-                                }else{
-                                    for(Schematic s : schematics.all()){
-                                        if(s.labels.any()){
-                                            s.labels.replace(tag, result);
-                                            s.save();
-                                        }
-                                    }
-                                    selectedTags.replace(tag, result);
-                                    tags.replace(tag, result);
+                            //move up
+                            move.button(Icon.upOpen, Styles.emptyi, () -> {
+                                int idx = tags.indexOf(tag);
+                                if(idx > 0){
+                                    tags.swap(idx, idx - 1);
                                     tagsChanged();
                                     rebuild[0].run();
                                 }
+                            }).tooltip("@editor.moveup").row();
+                            //move down
+                            move.button(Icon.downOpen, Styles.emptyi, () -> {
+                                int idx = tags.indexOf(tag);
+                                if(idx < tags.size - 1){
+                                    tags.swap(idx, idx + 1);
+                                    tagsChanged();
+                                    rebuild[0].run();
+                                }
+                            }).tooltip("@editor.movedown");
+                        }).margin(5f);
+
+                        n.table(t -> {
+                            t.add(tag).left().row();
+                            t.add(Core.bundle.format("schematic.tagged", schematics.all().count(s -> s.labels.contains(tag)))).left().color(Color.lightGray)
+                            .update(b -> b.setColor(b.hasMouse() ? Pal.accent : Color.lightGray)).get().clicked(() -> {
+                                dialog.hide();
+                                selectedTags.clear().add(tag);
+                                rebuildTags.run();
+                                rebuildPane.run();
                             });
-                        }).tooltip("@schematic.renametag");
-                        //move
-                        n.button(Icon.upSmall, Styles.emptyi, () -> {
-                            int idx = tags.indexOf(tag);
-                            if(idx > 0){
-                                tags.swap(idx, idx - 1);
-                                tagsChanged();
-                                rebuild[0].run();
-                            }
-                        }).tooltip("@editor.moveup");
+                        }).growX().pad(4);
+
+                        n.table(b -> {
+                            b.margin(2);
+
+                            //rename
+                            b.button(Icon.pencil, Styles.emptyi, () -> {
+                                ui.showTextInput("@schematic.renametag", "@name", tag, result -> {
+                                    //same tag, nothing was renamed
+                                    if(result.equals(tag)) return;
+
+                                    if(tags.contains(result)){
+                                        ui.showInfo("@schematic.tagexists");
+                                    }else{
+                                        for(Schematic s : schematics.all()){
+                                            if(s.labels.any()){
+                                                s.labels.replace(tag, result);
+                                                s.save();
+                                            }
+                                        }
+                                        selectedTags.replace(tag, result);
+                                        tags.replace(tag, result);
+                                        tagsChanged();
+                                        rebuild[0].run();
+                                    }
+                                });
+                            }).tooltip("@schematic.renametag").row();
+                            //delete
+                            b.button(Icon.trash, Styles.emptyi, () -> {
+                                ui.showConfirm("@schematic.tagdelconfirm", () -> {
+                                    for(Schematic s : schematics.all()){
+                                        if(s.labels.any()){
+                                            s.labels.remove(tag);
+                                            s.save();
+                                        }
+                                    }
+                                    selectedTags.remove(tag);
+                                    tags.remove(tag);
+                                    tagsChanged();
+                                    rebuildPane.run();
+                                    rebuild[0].run();
+                                });
+                            }).tooltip("@save.delete");
+                        }).margin(5f);
                     });
 
                     next.pack();
@@ -527,10 +551,10 @@ public class SchematicsDialog extends BaseDialog{
                         p.add(current).row();
                         current = new Table();
                         current.left();
-                        current.add(next).height(tagh).pad(2);
+                        current.add(next).minWidth(240).pad(4);
                         sum = 0;
                     }else{
-                        current.add(next).height(tagh).pad(2);
+                        current.add(next).minWidth(240).pad(4);
                     }
 
                     sum += w;
@@ -550,7 +574,7 @@ public class SchematicsDialog extends BaseDialog{
             };
 
             resized(true, rebuild[0]);
-        });
+        }).scrollX(false);
         dialog.show();
     }
 
@@ -586,6 +610,7 @@ public class SchematicsDialog extends BaseDialog{
             dialog.addCloseButton();
             dialog.cont.pane(p -> resized(true, () -> {
                 p.clearChildren();
+                p.defaults().fillX().left();
 
                 float sum = 0f;
                 Table current = new Table().left();
