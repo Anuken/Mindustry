@@ -116,14 +116,14 @@ public class ArcNetProvider implements NetProvider{
 
                 Log.debug("&bReceived connection: @", c.addressTCP);
 
+                connection.setArbitraryData(kn);
                 connections.add(kn);
                 Core.app.post(() -> net.handleServerReceived(kn, c));
             }
 
             @Override
             public void disconnected(Connection connection, DcReason reason){
-                ArcConnection k = getByArcID(connection.getID());
-                if(k == null) return;
+                if(!(connection.getArbitraryData() instanceof ArcConnection k)) return;
 
                 Disconnect c = new Disconnect();
                 c.reason = reason.toString();
@@ -136,8 +136,8 @@ public class ArcNetProvider implements NetProvider{
 
             @Override
             public void received(Connection connection, Object object){
-                ArcConnection k = getByArcID(connection.getID());
-                if(!(object instanceof Packet pack) || k == null) return;
+                if(!(connection.getArbitraryData() instanceof ArcConnection k)) return;
+                if(!(object instanceof Packet pack)) return;
 
                 if(packetSpamLimit > 0 && !k.packetRate.allow(3000, packetSpamLimit)){
                     Log.warn("Blacklisting IP '@' as potential DOS attack - packet spam.", k.address);
@@ -308,17 +308,6 @@ public class ArcNetProvider implements NetProvider{
         mainExecutor.submit(server::stop);
     }
 
-    ArcConnection getByArcID(int id){
-        for(int i = 0; i < connections.size(); i++){
-            ArcConnection con = connections.get(i);
-            if(con.connection != null && con.connection.getID() == id){
-                return con;
-            }
-        }
-
-        return null;
-    }
-
     class ArcConnection extends NetConnection{
         public final Connection connection;
 
@@ -370,8 +359,9 @@ public class ArcNetProvider implements NetProvider{
                 Log.info("Error sending packet. Disconnecting invalid client!");
                 connection.close(DcReason.error);
 
-                ArcConnection k = getByArcID(connection.getID());
-                if(k != null) connections.remove(k);
+                if(connection.getArbitraryData() instanceof ArcConnection k){
+                    connections.remove(k);
+                }
             }
         }
 
