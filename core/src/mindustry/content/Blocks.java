@@ -3184,6 +3184,7 @@ public class Blocks{
             reload = 6f;
             coolantMultiplier = 1.5f;
             range = 60f;
+            shootY = 3;
             shootCone = 50f;
             targetAir = false;
             ammoUseEffect = Fx.none;
