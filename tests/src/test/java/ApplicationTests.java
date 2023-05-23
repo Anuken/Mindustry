@@ -28,9 +28,16 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.storage.*;
+import mindustry.world.modules.ItemModule;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.*;
 import org.junit.jupiter.params.provider.*;
+import mindustry.Vars;
+import mindustry.core.ContentLoader;
+
+
+import static org.junit.jupiter.api.Assertions.*;
+
 
 import java.io.*;
 import java.nio.*;
@@ -995,4 +1002,21 @@ public class ApplicationTests{
         Events.fire(new EventType.UnitCreateEvent(UnitTypes.eclipse.create(Team.sharded), null));
         assertTrue(Achievement.buildT5.isAchieved());
     }
+
+    @Test
+    void ItemModuleTest() {
+
+        Vars.content = new ContentLoader();
+        Vars.content.items().each(i -> {
+        });
+        ItemModule itemModule = new ItemModule();
+        itemModule.set(new ItemModule());
+        ItemModule copiedModule = itemModule.copy();
+
+        assertNotSame(itemModule, copiedModule);
+        assertEquals(itemModule.total(), copiedModule.total());
+        assertEquals(itemModule.length(), copiedModule.length());
+    }
+
+
 }
