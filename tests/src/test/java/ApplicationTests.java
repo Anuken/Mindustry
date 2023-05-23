@@ -995,4 +995,24 @@ public class ApplicationTests{
         Events.fire(new EventType.UnitCreateEvent(UnitTypes.eclipse.create(Team.sharded), null));
         assertTrue(Achievement.buildT5.isAchieved());
     }
+
+    @Test
+    void inventoriesTest(){
+        createMap();
+        world.tile(1, 1).setBlock(Blocks.vault, Team.sharded, 0);
+        Tile tile = world.tile(1, 1);
+        Unit unit = UnitTypes.mono.create(Team.sharded);
+        assertEquals(tile.block().itemCapacity,1000);
+        tile.build.handleStack(Items.copper, 40, unit);
+        tile.build.items.add(Items.coal,65);
+        tile.build.items.add(Items.lead, 50);
+        tile.build.items.remove(Items.titanium, 10);
+        assertEquals(tile.build.items.total(), 155);
+        tile.build.items.remove(Items.lead, 10);
+        assertEquals(tile.build.items.total(), 145);
+        tile.build.handleStack(Items.thorium, 855, unit);
+        assertEquals(1000, tile.build.items.total());
+        int over = tile.build.acceptStack(Items.graphite, 100, unit);
+        assertEquals(100, over);
+    }
 }
