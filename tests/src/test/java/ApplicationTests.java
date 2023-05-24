@@ -1005,10 +1005,6 @@ public class ApplicationTests{
 
     @Test
     void ItemModuleTest() {
-
-        Vars.content = new ContentLoader();
-        Vars.content.items().each(i -> {
-        });
         ItemModule itemModule = new ItemModule();
         itemModule.set(new ItemModule());
         ItemModule copiedModule = itemModule.copy();
@@ -1017,6 +1013,9 @@ public class ApplicationTests{
         assertEquals(itemModule.total(), copiedModule.total());
         assertEquals(itemModule.length(), copiedModule.length());
     }
+
+
+
 
 
 }
