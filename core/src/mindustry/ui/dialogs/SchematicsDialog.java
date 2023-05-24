@@ -163,7 +163,6 @@ public class SchematicsDialog extends BaseDialog{
                                     }
                                 }).tooltip("@save.delete");
                             }
-
                         }).growX().height(50f);
                         b.row();
                         b.stack(new SchematicImage(s).setScaling(Scaling.fit), new Table(n -> {
@@ -408,7 +407,7 @@ public class SchematicsDialog extends BaseDialog{
                     int cols = (int)Math.min(20, Core.graphics.getWidth() / Scl.scl(52f));
 
                     int i = 0;
-                    for(String icon : ui.planet.defaultIcons){
+                    for(String icon : PlanetDialog.defaultIcons){
                         t.button(Icon.icons.get(icon), Styles.flati, iconMed, () -> {
                             String out = (char)Iconc.codes.get(icon) + "";
 
@@ -465,9 +464,9 @@ public class SchematicsDialog extends BaseDialog{
 
                 for(var tag : tags){
 
-                    var next = new Table(Styles.grayPanel, n -> {
-                        n.table(move -> {
-                            n.margin(2);
+                    var next = new Table(n -> {
+                        n.table(Tex.pane, move -> {
+                            move.margin(2);
 
                             //move up
                             move.button(Icon.upOpen, Styles.emptyi, () -> {
@@ -487,9 +486,10 @@ public class SchematicsDialog extends BaseDialog{
                                     rebuild[0].run();
                                 }
                             }).tooltip("@editor.movedown");
-                        }).margin(5f);
+                        }).fillY().margin(6f);
 
-                        n.table(t -> {
+                        n.table(Tex.whiteui, t -> {
+                            t.setColor(Pal.gray);
                             t.add(tag).left().row();
                             t.add(Core.bundle.format("schematic.tagged", schematics.all().count(s -> s.labels.contains(tag)))).left().color(Color.lightGray)
                             .update(b -> b.setColor(b.hasMouse() ? Pal.accent : Color.lightGray)).get().clicked(() -> {
@@ -498,9 +498,9 @@ public class SchematicsDialog extends BaseDialog{
                                 rebuildTags.run();
                                 rebuildPane.run();
                             });
-                        }).growX().pad(4);
+                        }).growX().fillY().margin(8f);
 
-                        n.table(b -> {
+                        n.table(Tex.pane, b -> {
                             b.margin(2);
 
                             //rename
@@ -541,7 +541,7 @@ public class SchematicsDialog extends BaseDialog{
                                     rebuild[0].run();
                                 });
                             }).tooltip("@save.delete");
-                        }).margin(5f);
+                        }).fillY().margin(6f);
                     });
 
                     next.pack();
