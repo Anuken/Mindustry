@@ -4,7 +4,6 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g3d.*;
-import arc.graphics.gl.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
@@ -27,7 +26,6 @@ public class PlanetRenderer implements Disposable{
 
     public final PlaneBatch3D projector = new PlaneBatch3D();
     public final Mat3D mat = new Mat3D();
-    public final FrameBuffer buffer = new FrameBuffer(2, 2, true);
 
     public final Bloom bloom = new Bloom(Core.graphics.getWidth()/4, Core.graphics.getHeight()/4, true, false){{
         setThreshold(0.8f);
@@ -235,7 +233,6 @@ public class PlanetRenderer implements Disposable{
         batch.dispose();
         projector.dispose();
         atmosphere.dispose();
-        buffer.dispose();
         bloom.dispose();
     }
 
