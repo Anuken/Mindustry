@@ -292,7 +292,7 @@ public class SchematicsDialog extends BaseDialog{
         dialog.show();
     }
 
-    void showEdit(Schematic s){
+    public void showEdit(Schematic s){
         new BaseDialog("@schematic.edit"){{
             setFillParent(true);
             addCloseListener();
@@ -401,20 +401,20 @@ public class SchematicsDialog extends BaseDialog{
             cont.pane(t -> {
                 resized(true, () -> {
                     t.clearChildren();
-                    t.marginRight(19f);
+                    t.marginRight(19f).marginLeft(12f);
                     t.defaults().size(48f);
 
                     int cols = (int)Math.min(20, Core.graphics.getWidth() / Scl.scl(52f));
 
                     int i = 0;
                     for(String icon : PlanetDialog.defaultIcons){
-                        t.button(Icon.icons.get(icon), Styles.flati, iconMed, () -> {
-                            String out = (char)Iconc.codes.get(icon) + "";
+                        String out = (char)Iconc.codes.get(icon) + "";
+                        if(tags.contains(out)) continue;
 
+                        t.button(Icon.icons.get(icon), Styles.flati, iconMed, () -> {
                             tags.add(out);
                             tagsChanged();
                             cons.get(out);
-
                             hide();
                         });
 
@@ -445,7 +445,7 @@ public class SchematicsDialog extends BaseDialog{
                         }
                     }
                 });
-            });
+            }).scrollX(false);
             buttons.button("@back", Icon.left, this::hide).size(210f, 64f);
         }}.show();
     }
@@ -457,7 +457,7 @@ public class SchematicsDialog extends BaseDialog{
         dialog.cont.pane(p -> {
             rebuild[0] = () -> {
                 p.clearChildren();
-                p.defaults().fillX().left();
+                p.margin(12f).defaults().fillX().left();
 
                 float sum = 0f;
                 Table current = new Table().left();
@@ -491,7 +491,7 @@ public class SchematicsDialog extends BaseDialog{
                         n.table(Tex.whiteui, t -> {
                             t.setColor(Pal.gray);
                             t.add(tag).left().row();
-                            t.add(Core.bundle.format("schematic.tagged", schematics.all().count(s -> s.labels.contains(tag)))).left().color(Color.lightGray)
+                            t.add(Core.bundle.format("schematic.tagged", schematics.all().count(s -> s.labels.contains(tag)))).left()
                             .update(b -> b.setColor(b.hasMouse() ? Pal.accent : Color.lightGray)).get().clicked(() -> {
                                 dialog.hide();
                                 selectedTags.clear().add(tag);
@@ -503,7 +503,7 @@ public class SchematicsDialog extends BaseDialog{
                         n.table(Tex.pane, b -> {
                             b.margin(2);
 
-                            //rename
+                            //rename tag
                             b.button(Icon.pencil, Styles.emptyi, () -> {
                                 ui.showTextInput("@schematic.renametag", "@name", tag, result -> {
                                     //same tag, nothing was renamed
@@ -525,7 +525,7 @@ public class SchematicsDialog extends BaseDialog{
                                     }
                                 });
                             }).tooltip("@schematic.renametag").row();
-                            //delete
+                            //delete tag
                             b.button(Icon.trash, Styles.emptyi, () -> {
                                 ui.showConfirm("@schematic.tagdelconfirm", () -> {
                                     for(Schematic s : schematics.all()){
@@ -748,12 +748,9 @@ public class SchematicsDialog extends BaseDialog{
             cont.clear();
             title.setText("[[" + Core.bundle.get("schematic") + "] " +schem.name());
 
-            cont.add(Core.bundle.format("schematic.info", schem.width, schem.height, schem.tiles.size)).color(Color.lightGray);
-            cont.row();
+            cont.add(Core.bundle.format("schematic.info", schem.width, schem.height, schem.tiles.size)).color(Color.lightGray).row();
             cont.table(tags -> buildTags(schem, tags)).fillX().left().row();
-            cont.row();
-            cont.add(new SchematicImage(schem)).maxSize(800f);
-            cont.row();
+            cont.add(new SchematicImage(schem)).maxSize(800f).row();
 
             ItemSeq arr = schem.requirements();
             cont.table(r -> {

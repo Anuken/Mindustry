@@ -33,7 +33,6 @@ public class WaveInfoDialog extends BaseDialog{
 
     private Table table;
     private int search = -1;
-    private UnitType lastType = UnitTypes.dagger;
     private @Nullable UnitType filterType;
     private Sort sort = Sort.begin;
     private boolean reverseSort = false;
@@ -168,10 +167,7 @@ public class WaveInfoDialog extends BaseDialog{
 
             main.table(t -> {
                 t.button("@add", () -> {
-                    SpawnGroup newGroup = new SpawnGroup(lastType);
-                    groups.add(newGroup);
-                    expandedGroup = newGroup;
-                    showUnits(type -> newGroup.type = lastType = type, false);
+                    showUnits(type -> groups.add(expandedGroup = new SpawnGroup(type)), false);
                     buildGroups();
                 }).growX().height(70f);
 
@@ -233,9 +229,7 @@ public class WaveInfoDialog extends BaseDialog{
                         b.label(() -> (group.begin + 1) + "").color(Color.lightGray).minWidth(45f).labelAlign(Align.left).left();
 
                         b.button(Icon.copySmall, Styles.emptyi, () -> {
-                            SpawnGroup copy = group.copy();
-                            expandedGroup = copy;
-                            groups.insert(groups.indexOf(group) + 1, copy);
+                            groups.insert(groups.indexOf(group) + 1, expandedGroup = group.copy());
                             buildGroups();
                         }).pad(-6).size(46f).tooltip("@editor.copy");
 
@@ -244,7 +238,7 @@ public class WaveInfoDialog extends BaseDialog{
                             Icon.logicSmall,
                         Styles.emptyi, () -> showEffects(group)).pad(-6).size(46f).scaling(Scaling.fit).tooltip(group.effect != null ? group.effect.localizedName : "@none");
 
-                        b.button(Icon.unitsSmall, Styles.emptyi, () -> showUnits(type -> group.type = lastType = type, false)).pad(-6).size(46f).tooltip("@stat.unittype");
+                        b.button(Icon.unitsSmall, Styles.emptyi, () -> showUnits(type -> group.type = type, false)).pad(-6).size(46f).tooltip("@stat.unittype");
                         b.button(Icon.cancel, Styles.emptyi, () -> {
                             groups.remove(group);
                             if(expandedGroup == group) expandedGroup = null;
@@ -253,9 +247,7 @@ public class WaveInfoDialog extends BaseDialog{
                             buildGroups();
                         }).pad(-6).size(46f).padRight(-12f).tooltip("@waves.remove");
                         b.clicked(KeyCode.mouseMiddle, () -> {
-                            SpawnGroup copy = group.copy();
-                            groups.insert(groups.indexOf(group) + 1, copy);
-                            expandedGroup = copy;
+                            groups.insert(groups.indexOf(group) + 1, expandedGroup = group.copy());
                             buildGroups();
                         });
                     }, () -> {
@@ -416,7 +408,6 @@ public class WaveInfoDialog extends BaseDialog{
 
     void showUnits(Cons<UnitType> cons, boolean reset){
         BaseDialog dialog = new BaseDialog(reset ? "@waves.filter" : "");
-        dialog.setFillParent(true);
         dialog.cont.pane(p -> {
             p.defaults().pad(2).fillX();
             if(reset){
@@ -444,40 +435,39 @@ public class WaveInfoDialog extends BaseDialog{
                 }).margin(12f);
                 if(++i % 3 == 0) p.row();
             }
-        }).growX().scrollX(false);
+        }).scrollX(false);
         dialog.addCloseButton();
         dialog.show();
     }
 
     void showEffects(SpawnGroup group){
         BaseDialog dialog = new BaseDialog("");
-        dialog.setFillParent(true);
         dialog.cont.pane(p -> {
-            int i = 0;
+            p.defaults().pad(2).fillX();
+            p.button(t -> {
+                t.left();
+                t.image(Icon.none).size(8 * 4).scaling(Scaling.fit).padRight(2f);
+                t.add("@settings.resetKey");
+            }, () -> {
+                group.effect = null;
+                dialog.hide();
+                buildGroups();
+            }).margin(12f);
+            int i = 1;
             for(StatusEffect effect : content.statusEffects()){
-                if(effect != StatusEffects.none && (effect.isHidden() || effect.reactive)) continue;
-
+                if(effect.isHidden() || effect.reactive) continue;
                 p.button(t -> {
                     t.left();
-                    if(effect.uiIcon != null && effect != StatusEffects.none){
-                        t.image(effect.uiIcon).size(8 * 4).scaling(Scaling.fit).padRight(2f);
-                    }else{
-                        t.image(Icon.none).size(8 * 4).scaling(Scaling.fit).padRight(2f);
-                    }
-
-                    if(effect != StatusEffects.none){
-                        t.add(effect.localizedName);
-                    }else{
-                        t.add("@settings.resetKey");
-                    }
+                    t.image(effect.uiIcon).size(8 * 4).scaling(Scaling.fit).padRight(2f);
+                    t.add(effect.localizedName);
                 }, () -> {
-                    group.effect = effect != StatusEffects.none ? effect : null;
+                    group.effect = effect;
                     dialog.hide();
                     buildGroups();
-                }).pad(2).margin(12f).fillX();
+                }).margin(12f);
                 if(++i % 3 == 0) p.row();
             }
-        }).growX().scrollX(false);
+        }).scrollX(false);
         dialog.addCloseButton();
         dialog.show();
     }
