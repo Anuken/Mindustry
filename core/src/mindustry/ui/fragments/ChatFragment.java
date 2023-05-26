@@ -198,11 +198,7 @@ public class ChatFragment extends Table{
         //avoid sending prefix-empty messages
         if(message.isEmpty() || (message.startsWith(mode.prefix) && message.substring(mode.prefix.length()).isEmpty())) return;
 
-        if(!mode.prefix.isEmpty() && message.length() > mode.normalizedPrefix().length()) {
-            history.insert(1, message.substring(mode.normalizedPrefix().length()));
-        } else {
-            history.insert(1, message);
-        }
+        history.insert(1, message);
 
         Events.fire(new ClientChatEvent(message));
 
