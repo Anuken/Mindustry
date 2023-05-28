@@ -38,8 +38,10 @@ public class Universe{
 
     /** Update regardless of whether the player is in the campaign. */
     public void updateGlobal(){
-        //currently only updates one solar system
-        updatePlanet(Planets.sun);
+        for(Planet planet : content.planets()){
+            //update all parentless planets (solar system root), regardless of which one the player is in
+            if(planet.parent == null) updatePlanet(planet);
+        }
     }
 
     public int turn(){
