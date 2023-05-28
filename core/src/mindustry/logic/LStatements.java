@@ -643,7 +643,7 @@ public class LStatements{
                 b.clicked(() -> showSelect(b, LogicOp.all, op, o -> {
                     op = o;
                     rebuild(parent);
-                }));
+                }, 4, c -> c.width(64f)));
             }, Styles.logict, () -> {}).size(64f, 40f).pad(4f).color(table.color);
         }
 

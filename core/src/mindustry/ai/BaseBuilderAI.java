@@ -147,7 +147,7 @@ public class BaseBuilderAI{
         }
 
         //only schedule when there's something to build.
-        if((foundPath || (!calculating && !foundPath)) && data.plans.isEmpty() && timer.get(timerStep, Mathf.lerp(placeIntervalMin, placeIntervalMax, data.team.rules().buildAiTier))){
+        if((foundPath || !calculating) && data.plans.isEmpty() && timer.get(timerStep, Mathf.lerp(placeIntervalMin, placeIntervalMax, data.team.rules().buildAiTier))){
 
             for(int i = 0; i < attempts; i++){
                 int range = 150;
