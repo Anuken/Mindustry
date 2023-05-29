@@ -156,9 +156,28 @@ public class Fonts{
         });
 
         for(Team team : Team.baseTeams){
-            if(Core.atlas.has("team-" + team.name)){
-                team.emoji = stringIcons.get(team.name, "");
+            team.emoji = stringIcons.get(team.name, "");
+        }
+    }
+    
+    public static void loadContentIconHeadless(){
+        try(Scanner scan = new Scanner(Core.files.internal("icons/icons.properties").read(512))){
+            while(scan.hasNextLine()){
+                String line = scan.nextLine();
+                String[] split = line.split("=");
+                String[] nametex = split[1].split("\\|");
+                String character = split[0];
+                int ch = Integer.parseInt(character);
+
+                unicodeIcons.put(nametex[0], ch);
+                stringIcons.put(nametex[0], ((char)ch) + "");
             }
+        }
+
+        stringIcons.put("alphachan", stringIcons.get("alphaaaa"));
+
+        for(Team team : Team.baseTeams){
+            team.emoji = stringIcons.get(team.name, "");
         }
     }
 
