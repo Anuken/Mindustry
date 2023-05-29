@@ -160,7 +160,7 @@ public class Fonts{
         }
     }
     
-    public static void loadContentIconHeadless(){
+    public static void loadContentIconsHeadless(){
         try(Scanner scan = new Scanner(Core.files.internal("icons/icons.properties").read(512))){
             while(scan.hasNextLine()){
                 String line = scan.nextLine();
