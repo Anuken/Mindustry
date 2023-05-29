@@ -45,6 +45,8 @@ task dist(type: Jar, dependsOn: configurations.runtimeClasspath){
     exclude("cursors/**")
     exclude("shaders/**")
 
+    include("icons/icons.properties")
+
     manifest{
         attributes 'Main-Class': project.mainClassName
     }
