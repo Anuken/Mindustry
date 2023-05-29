@@ -286,7 +286,7 @@ public class BlockIndexer{
         //when team data is not initialized, scan through every team. this is terrible
         if(data.isEmpty()){
             for(Team enemy : Team.all){
-                if(enemy == team) continue;
+                if(enemy == team || (enemy == Team.derelict && !state.rules.coreCapture)) continue;
                 var set = getFlagged(enemy)[type.ordinal()];
                 if(set != null){
                     breturnArray.addAll(set);
@@ -295,7 +295,7 @@ public class BlockIndexer{
         }else{
             for(int i = 0; i < data.size; i++){
                 Team enemy = data.items[i].team;
-                if(enemy == team) continue;
+                if(enemy == team || (enemy == Team.derelict && !state.rules.coreCapture)) continue;
                 var set = getFlagged(enemy)[type.ordinal()];
                 if(set != null){
                     breturnArray.addAll(set);
