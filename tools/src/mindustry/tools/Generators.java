@@ -349,7 +349,13 @@ public class Generators{
 
                         region.path.delete();
 
-                        save(out, region.name);
+                        //1 pixel of padding to prevent edges with linear filtering
+                        int padding = 1;
+                        Pixmap padded = new Pixmap(base.width + padding*2, base.height + padding*2);
+                        padded.draw(base, padding, padding);
+                        padded = padded.outline(block.outlineColor, block.outlineRadius);
+
+                        save(padded, region.name);
                     }
 
                     if(!regions[0].found()){

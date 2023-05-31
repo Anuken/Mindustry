@@ -12,10 +12,8 @@ import mindustry.game.*;
 import mindustry.game.Schematic.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
-import mindustry.maps.generators.*;
 import mindustry.type.*;
 import mindustry.world.*;
-import mindustry.world.blocks.defense.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.blocks.storage.*;
@@ -35,7 +33,7 @@ public class BaseBuilderAI{
     private static int correct = 0, incorrect = 0;
 
     private int lastX, lastY, lastW, lastH;
-    private boolean triedWalls, foundPath;
+    private boolean foundPath;
 
     final TeamData data;
     final Interval timer = new Interval(4);
@@ -46,7 +44,6 @@ public class BaseBuilderAI{
     boolean calculating, startedCalculating;
     int calcCount = 0;
     int totalCalcs = 0;
-    Block wallType;
 
     public BaseBuilderAI(TeamData data){
         this.data = data;
@@ -60,10 +57,6 @@ public class BaseBuilderAI{
             for(Item item : content.items()){
                 core.items.set(item, core.getMaximumAccepted(item));
             }
-        }
-
-        if(wallType == null){
-            wallType = BaseGenerator.getDifficultyWall(1, data.team.rules().buildAiTier / 0.8f);
         }
 
         if(data.team.rules().aiCoreSpawn && timer.get(timerSpawn, 60 * 6f) && data.hasCore()){
@@ -104,8 +97,8 @@ public class BaseBuilderAI{
             }else{
                 var field = pathfinder.getField(data.team, Pathfinder.costGround, Pathfinder.fieldCore);
 
-                if(field.weights != null){
-                    int[] weights = field.weights;
+                if(field.hasCompleteWeights()){
+                    int[] weights = field.completeWeights;
                     for(int i = 0; i < pathStep; i++){
                         int minCost = Integer.MAX_VALUE;
                         int cx = calcTile.x, cy = calcTile.y;
@@ -154,12 +147,7 @@ public class BaseBuilderAI{
         }
 
         //only schedule when there's something to build.
-        if(foundPath && data.plans.isEmpty() && timer.get(timerStep, Mathf.lerp(placeIntervalMin, placeIntervalMax, data.team.rules().buildAiTier))){
-            //TODO walls are silly, no walls
-            //if(!triedWalls){
-            //    tryWalls();
-            //    triedWalls = true;
-            //}
+        if((foundPath || !calculating) && data.plans.isEmpty() && timer.get(timerStep, Mathf.lerp(placeIntervalMin, placeIntervalMax, data.team.rules().buildAiTier))){
 
             for(int i = 0; i < attempts; i++){
                 int range = 150;
@@ -279,47 +267,6 @@ public class BaseBuilderAI{
         lastW = result.width + 2;
         lastH = result.height + 2;
 
-        triedWalls = false;
-
         return true;
-    }
-
-    private void tryWalls(){
-        Block wall = wallType;
-        Building spawnt = state.rules.defaultTeam.core() != null ? state.rules.defaultTeam.core() : data.team.core();
-        Tile spawn = spawnt == null ? null : spawnt.tile;
-
-        if(spawn == null) return;
-
-        for(int wx = lastX; wx <= lastX + lastW; wx++){
-            outer:
-            for(int wy = lastY; wy <= lastY + lastH; wy++){
-                Tile tile = world.tile(wx, wy);
-
-                if(tile == null || !tile.block().alwaysReplace) continue;
-
-                boolean any = false;
-
-                for(Point2 p : Geometry.d8){
-                    if(Angles.angleDist(Angles.angle(p.x, p.y), spawn.angleTo(tile)) > 70){
-                        continue;
-                    }
-
-                    Tile o = world.tile(tile.x + p.x, tile.y + p.y);
-                    if(o != null && (o.block() instanceof PayloadBlock || o.block() instanceof PayloadConveyor || o.block() instanceof ShockMine)){
-                        continue outer;
-                    }
-
-                    if(o != null && o.team() == data.team && !(o.block() instanceof Wall)){
-                        any = true;
-                    }
-                }
-
-                tmpTiles.clear();
-                if(any && Build.validPlace(wall, data.team, tile.x, tile.y, 0) && !tile.getLinkedTilesAs(wall, tmpTiles).contains(t -> path.contains(t.pos()))){
-                    data.plans.add(new BlockPlan(tile.x, tile.y, (short)0, wall.id, null));
-                }
-            }
-        }
     }
 }

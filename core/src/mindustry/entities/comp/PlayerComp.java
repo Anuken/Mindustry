@@ -8,6 +8,8 @@ import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.pooling.*;
 import mindustry.*;
+import mindustry.ai.*;
+import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.units.*;
@@ -36,6 +38,8 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     @ReadOnly Team team = Team.sharded;
     @SyncLocal boolean typing, shooting, boosting;
     @SyncLocal float mouseX, mouseY;
+    /** command the unit had before it was controlled. */
+    @Nullable @NoSync UnitCommand lastCommand;
     boolean admin;
     String name = "frog";
     Color color = new Color();
@@ -203,9 +207,18 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         if(unit == null) throw new IllegalArgumentException("Unit cannot be null. Use clearUnit() instead.");
         if(this.unit == unit) return;
 
+        //save last command this unit had
+        if(unit.controller() instanceof CommandAI ai){
+            lastCommand = ai.command;
+        }
+
         if(this.unit != Nulls.unit){
             //un-control the old unit
             this.unit.resetController();
+            //restore last command issued before it was controlled
+            if(lastCommand != null && this.unit.controller() instanceof CommandAI ai){
+                ai.command(lastCommand);
+            }
         }
         this.unit = unit;
         if(unit != Nulls.unit){

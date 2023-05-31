@@ -320,11 +320,6 @@ project(":core"){
         }
     }
 
-    artifacts{
-        archives sourcesJar
-        archives assetsJar
-    }
-
     dependencies{
         compileJava.dependsOn(preGen)
 
@@ -442,6 +437,9 @@ configure([":core", ":server"].collect{project(it)}){
         publications{
             maven(MavenPublication){
                 from components.java
+                if(project.name == "core"){
+                    artifact(tasks.named("assetsJar"))
+                }
             }
         }
     }

@@ -21,6 +21,8 @@ import mindustry.world.blocks.storage.*;
 import static mindustry.Vars.*;
 
 public class PayloadRouter extends PayloadConveyor{
+    public boolean invert = false;
+    
     public @Load("@-over") TextureRegion overRegion;
 
     public PayloadRouter(String name){
@@ -130,6 +132,8 @@ public class PayloadRouter extends PayloadConveyor{
             matches = sorted != null &&
                 (item instanceof BuildPayload build && build.block() == sorted) ||
                 (item instanceof UnitPayload unit && unit.unit.type == sorted);
+
+            if(invert) matches = !matches;
         }
 
         @Override
