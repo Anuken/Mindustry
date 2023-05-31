@@ -41,6 +41,8 @@ public class Reconstructor extends UnitBlock{
         commandable = true;
         ambientSound = Sounds.respawning;
         configurable = true;
+        config(UnitCommand.class, (ReconstructorBuild build, UnitCommand command) -> build.command = command);
+        configClear((ReconstructorBuild build) -> build.command = null);
     }
 
     @Override
@@ -197,11 +199,11 @@ public class Reconstructor extends UnitBlock{
             var list = unit().commands;
             for(var item : list){
                 ImageButton button = table.button(item.getIcon(), Styles.clearNoneTogglei, 40f, () -> {
-                    command = (command == item ? null : item);
+                    configure(item);
                     deselect();
                 }).tooltip(item.localized()).group(group).get();
 
-                button.update(() -> button.setChecked(command == item));
+                button.update(() -> button.setChecked(command == item || (command == null && unit.defaultCommand == item)));
 
                 if(++i % columns == 0){
                     table.row();
@@ -338,6 +340,11 @@ public class Reconstructor extends UnitBlock{
         @Override
         public boolean shouldConsume(){
             return constructing() && enabled;
+        }
+
+        @Override
+        public Object config(){
+            return command;
         }
 
         public UnitType unit(){
