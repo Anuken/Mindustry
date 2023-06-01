@@ -464,6 +464,30 @@ public class Block extends UnlockableContent implements Senseable{
     public void drawOverlay(float x, float y, int rotation){
     }
 
+    public void drawUnderText(CharSequence text, float x, float y){
+        if(renderer.pixelator.enabled()) return;
+
+        Font font = Fonts.outline;
+        GlyphLayout l = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
+        boolean ints = font.usesIntegerPositions();
+        font.getData().setScale(1 / 4f / Scl.scl(1f));
+        font.setUseIntegerPositions(false);
+
+        l.setText(font, text, Color.white, 90f, Align.left, true);
+        float offset = 1f;
+
+        Draw.color(0f, 0f, 0f, 0.2f);
+        Fill.rect(x, y - tilesize/2f - l.height/2f - offset, l.width + offset*2f, l.height + offset*2f);
+        Draw.color();
+        font.setColor(Color.white);
+        font.draw(text, x - l.width/2f, y - tilesize/2f - offset, 90f, Align.left, true);
+        font.setUseIntegerPositions(ints);
+
+        font.getData().setScale(1f);
+
+        Pools.free(l);
+    }
+
     public float sumAttribute(@Nullable Attribute attr, int x, int y){
         if(attr == null) return 0;
         Tile tile = world.tile(x, y);
