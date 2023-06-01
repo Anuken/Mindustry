@@ -36,6 +36,7 @@ public class ImpactReactor extends PowerGenerator{
         explosionShake = 6f;
         explosionShakeDuration = 16f;
         explosionDamage = 1900 * 4;
+        explosionMinWarmup = 0.3f;
         explodeEffect = Fx.impactReactorExplosion;
         explodeSound = Sounds.explosionbig;
     }
@@ -108,13 +109,6 @@ public class ImpactReactor extends PowerGenerator{
         public double sense(LAccess sensor){
             if(sensor == LAccess.heat) return warmup;
             return super.sense(sensor);
-        }
-
-        @Override
-        public void createExplosion(){
-            if(warmup >= 0.3f){
-                super.createExplosion();
-            }
         }
 
         @Override

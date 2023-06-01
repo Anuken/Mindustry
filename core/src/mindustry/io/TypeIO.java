@@ -301,12 +301,13 @@ public class TypeIO{
         return Nulls.unit;
     }
 
-    public static void writeCommand(Writes write, UnitCommand command){
-        write.b(command.id);
+    public static void writeCommand(Writes write, @Nullable UnitCommand command){
+        write.b(command == null ? 255 : command.id);
     }
 
-    public static UnitCommand readCommand(Reads read){
-        return UnitCommand.all.get(read.ub());
+    public static @Nullable UnitCommand readCommand(Reads read){
+        int val = read.ub();
+        return val == 255 ? null : UnitCommand.all.get(val);
     }
 
     public static void writeEntity(Writes write, Entityc entity){

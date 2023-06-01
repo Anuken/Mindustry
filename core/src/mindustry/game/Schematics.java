@@ -320,11 +320,24 @@ public class Schematics implements Loadable{
         return block.size + maxLoadoutSchematicPad*2;
     }
 
+    Fi findFile(String schematicName){
+        if(schematicName.isEmpty()) schematicName = "empty";
+        Fi result = null;
+        int index = 0;
+
+        while(result == null || result.exists()){
+            result = schematicDirectory.child(schematicName + (index == 0 ? "" : "_" + index) + "." + schematicExtension);
+            index ++;
+        }
+
+        return result;
+    }
+
     /** Adds a schematic to the list, also copying it into the files.*/
     public void add(Schematic schematic){
         all.add(schematic);
         try{
-            Fi file = schematicDirectory.child(Time.millis() + "." + schematicExtension);
+            Fi file = findFile(Strings.sanitizeFilename(schematic.name()));
             write(schematic, file);
             schematic.file = file;
         }catch(Exception e){
@@ -479,10 +492,14 @@ public class Schematics implements Loadable{
     }
 
     public static void place(Schematic schem, int x, int y, Team team){
+        place(schem, x, y, team, true);
+    }
+
+    public static void place(Schematic schem, int x, int y, Team team, boolean overwrite){
         int ox = x - schem.width/2, oy = y - schem.height/2;
         schem.tiles.each(st -> {
             Tile tile = world.tile(st.x + ox, st.y + oy);
-            if(tile == null) return;
+            if(tile == null || (!overwrite && !Build.validPlace(st.block, team, tile.x, tile.y, st.rotation))) return;
 
             tile.setBlock(st.block, team, st.rotation);
 

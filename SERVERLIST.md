@@ -1,7 +1,7 @@
 ### Adding a server to the list
 
 Mindustry now has a public list of servers that everyone can see and connect to. 
-This is done by letting clients `GET` a [JSON list of servers](https://github.com/Anuken/Mindustry/blob/master/servers_v6.json) in this repository.
+This is done by letting clients `GET` a [JSON list of servers](https://github.com/Anuken/Mindustry/blob/master/servers_v7.json) in this repository.
 
 You may want to add your server to this list. The steps for getting this done are as follows:
 
@@ -18,7 +18,7 @@ You'll need to either hire some moderators, or make use of (currently non-existe
 4. **Get some good maps.** *(optional, but highly recommended)*. Add some maps to your server and set the map rotation to custom-only. You can get maps from the Steam workshop by subscribing and exporting them; using the `#maps` channel on Discord is also an option.
 5. **Check your server configuration.** *(optional)* I would recommend adding a message rate limit of 1 second (`config messageRateLimit 1`), and disabling connect/disconnect messages to reduce spam (`config showConnectMessages false`).
 6. Finally, **submit a pull request** to add your server's IP to the list. 
-This should be fairly straightforward: Press the edit button on the [server file](https://github.com/Anuken/Mindustry/blob/master/servers_v6.json), then add a JSON object with a single key, indicating your server address.
+This should be fairly straightforward: Press the edit button on the [server file](https://github.com/Anuken/Mindustry/blob/master/servers_v7.json), then add a JSON object with a single key, indicating your server address.
 For example, if your server address is `example.com:6000`, you would add a comma after the last entry and insert:
     ```json
       {

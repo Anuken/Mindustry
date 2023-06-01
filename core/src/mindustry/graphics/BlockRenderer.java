@@ -85,6 +85,10 @@ public class BlockRenderer{
                     updateFloors.add(new UpdateRenderState(tile, tile.floor()));
                 }
 
+                if(tile.overlay().updateRender(tile)){
+                    updateFloors.add(new UpdateRenderState(tile, tile.overlay()));
+                }
+
                 if(tile.build != null && (tile.team() == player.team() || !state.rules.fog || (tile.build.visibleFlags & (1L << player.team().id)) != 0)){
                     tile.build.wasVisible = true;
                 }
@@ -262,7 +266,7 @@ public class BlockRenderer{
     public void drawDestroyed(){
         if(!Core.settings.getBool("destroyedblocks")) return;
 
-        if(control.input.isPlacing() || control.input.isBreaking() || control.input.isRebuildSelecting()){
+        if(control.input.isPlacing() || control.input.isBreaking() || (control.input.isRebuildSelecting() && !scene.hasKeyboard())){
             brokenFade = Mathf.lerpDelta(brokenFade, 1f, 0.1f);
         }else{
             brokenFade = Mathf.lerpDelta(brokenFade, 0f, 0.1f);

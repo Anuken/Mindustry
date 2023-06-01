@@ -49,7 +49,7 @@ allprojects{
         }
 
         localArc = {
-            return !project.hasProperty("release") && new File(projectDir.parent, '../Arc').exists()
+            return !project.hasProperty("release") && !project.hasProperty("noLocalArc") && new File(projectDir.parent, '../Arc').exists()
         }
 
         arcModule = { String name ->
@@ -320,11 +320,6 @@ project(":core"){
         }
     }
 
-    artifacts{
-        archives sourcesJar
-        archives assetsJar
-    }
-
     dependencies{
         compileJava.dependsOn(preGen)
 
@@ -442,6 +437,9 @@ configure([":core", ":server"].collect{project(it)}){
         publications{
             maven(MavenPublication){
                 from components.java
+                if(project.name == "core"){
+                    artifact(tasks.named("assetsJar"))
+                }
             }
         }
     }

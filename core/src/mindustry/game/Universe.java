@@ -38,8 +38,10 @@ public class Universe{
 
     /** Update regardless of whether the player is in the campaign. */
     public void updateGlobal(){
-        //currently only updates one solar system
-        updatePlanet(Planets.sun);
+        for(Planet planet : content.planets()){
+            //update all parentless planets (solar system root), regardless of which one the player is in
+            if(planet.parent == null) updatePlanet(planet);
+        }
     }
 
     public int turn(){
@@ -82,12 +84,11 @@ public class Universe{
             }
         }
 
-        if(state.hasSector() && state.getSector().planet.updateLighting){
-            boolean disable = state.getSector().preset != null && state.getSector().preset.noLighting;
+        if(state.hasSector() && state.getSector().planet.updateLighting && !(state.getSector().preset != null && state.getSector().preset.noLighting)){
             var planet = state.getSector().planet;
             //update sector light
             float light = state.getSector().getLight();
-            float alpha = disable ? 1f : Mathf.clamp(Mathf.map(light, planet.lightSrcFrom, planet.lightSrcTo, planet.lightDstFrom, planet.lightDstTo));
+            float alpha = Mathf.clamp(Mathf.map(light, planet.lightSrcFrom, planet.lightSrcTo, planet.lightDstFrom, planet.lightDstTo));
 
             //assign and map so darkness is not 100% dark
             state.rules.ambientLight.a = 1f - alpha;

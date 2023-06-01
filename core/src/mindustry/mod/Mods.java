@@ -202,12 +202,6 @@ public class Mods implements Loadable{
                 continue;
 
                 //(horrible code below)
-            }else if(prefix && !mod.meta.keepOutlines && name.endsWith("-outline") && file.path().contains("units") && !file.path().contains("blocks")){
-                Log.warn("Sprite '@' in mod '@' is likely to be an unnecessary unit outline. These should not be separate sprites. Ignoring.", name, mod.name);
-                //TODO !!! document this on the wiki !!!
-                //do not allow packing standard outline sprites for now, they are no longer necessary and waste space!
-                //TODO also full regions are bad:  || name.endsWith("-full")
-                continue;
             }
 
             //read and bleed pixmaps in parallel
@@ -1023,8 +1017,6 @@ public class Mods implements Loadable{
         public Seq<LoadedMod> dependencies = new Seq<>();
         /** All missing dependencies of this mod as strings. */
         public Seq<String> missingDependencies = new Seq<>();
-        /** Script files to run. */
-        public Seq<Fi> scripts = new Seq<>();
         /** Content with initialization code. */
         public ObjectSet<Content> erroredContent = new ObjectSet<>();
         /** Current state of this mod. */

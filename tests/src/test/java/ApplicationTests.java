@@ -15,6 +15,7 @@ import mindustry.ctype.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.graphics.g3d.*;
 import mindustry.io.*;
 import mindustry.io.SaveIO.*;
 import mindustry.maps.*;
@@ -22,6 +23,7 @@ import mindustry.mod.*;
 import mindustry.mod.Mods.*;
 import mindustry.net.*;
 import mindustry.net.Packets.*;
+import mindustry.service.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.payloads.*;
@@ -980,5 +982,17 @@ public class ApplicationTests{
 
         tile.build.handleStack(item, 1, unit);
         assertEquals(capacity, tile.build.items.get(item));
+    }
+
+    @Test
+    void achievementTest(){
+        clientLoaded = true;
+        state.rules.sector = new Sector(null, PlanetGrid.Ptile.empty);
+        player = Player.create();
+        service.init();
+
+        assertFalse(Achievement.buildT5.isAchieved());
+        Events.fire(new EventType.UnitCreateEvent(UnitTypes.eclipse.create(Team.sharded), null));
+        assertTrue(Achievement.buildT5.isAchieved());
     }
 }

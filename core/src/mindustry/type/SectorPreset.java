@@ -5,6 +5,7 @@ import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.maps.generators.*;
+import mindustry.mod.Mods.*;
 
 public class SectorPreset extends UnlockableContent{
     public FileMapGenerator generator;
@@ -36,9 +37,15 @@ public class SectorPreset extends UnlockableContent{
     }
 
     /** Internal use only! */
-    public SectorPreset(String name){
+    public SectorPreset(String name, LoadedMod mod){
         super(name);
+        this.minfo.mod = mod;
         this.generator = new FileMapGenerator(name, this);
+    }
+
+    /** Internal use only! */
+    public SectorPreset(String name){
+       this(name, null);
     }
 
     public void initialize(Planet planet, int sector){

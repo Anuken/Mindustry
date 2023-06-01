@@ -174,7 +174,7 @@ public class HintsFragment{
         payloadDrop(() -> !player.unit().dead && player.unit() instanceof Payloadc p && p.payloads().any(), () -> player.unit() instanceof Payloadc p && p.payloads().isEmpty()),
         waveFire(() -> Groups.fire.size() > 0 && Blocks.wave.unlockedNow(), () -> indexer.getFlagged(state.rules.defaultTeam, BlockFlag.extinguisher).size > 0),
         generator(() -> control.input.block == Blocks.combustionGenerator, () -> ui.hints.placedBlocks.contains(Blocks.combustionGenerator)),
-        rebuildSelect(visibleDesktop, () -> state.rules.defaultTeam.data().plans.size >= 10, () -> Core.input.keyDown(Binding.rebuild_select)),
+        rebuildSelect(() -> state.rules.defaultTeam.data().plans.size >= 10, () -> control.input.isRebuildSelecting()),
         guardian(() -> state.boss() != null && isSerpulo() && state.boss().armor >= 4, () -> state.boss() == null),
         factoryControl(() -> !(state.isCampaign() && state.rules.sector.preset == SectorPresets.onset) &&
             state.rules.defaultTeam.data().getBuildings(Blocks.tankFabricator).size + state.rules.defaultTeam.data().getBuildings(Blocks.groundFactory).size > 0, () -> ui.hints.events.contains("factorycontrol")),

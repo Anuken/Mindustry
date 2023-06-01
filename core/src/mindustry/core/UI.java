@@ -51,7 +51,7 @@ public class UI implements ApplicationListener, Loadable{
     public AboutDialog about;
     public GameOverDialog restart;
     public CustomGameDialog custom;
-    public MapsDialog maps;
+    public EditorMapsDialog maps;
     public LoadDialog load;
     public DiscordDialog discord;
     public JoinDialog join;
@@ -85,6 +85,14 @@ public class UI implements ApplicationListener, Loadable{
         Fonts.loadFonts();
     }
 
+    public static void loadColors(){
+        Colors.put("accent", Pal.accent);
+        Colors.put("unlaunched", Color.valueOf("8982ed"));
+        Colors.put("highlight", Pal.accent.cpy().lerp(Color.white, 0.3f));
+        Colors.put("stat", Pal.stat);
+        Colors.put("negstat", Pal.negativeStat);
+    }
+
     @Override
     public void loadAsync(){
 
@@ -92,6 +100,8 @@ public class UI implements ApplicationListener, Loadable{
 
     @Override
     public void loadSync(){
+        loadColors();
+
         Fonts.outline.getData().markupEnabled = true;
         Fonts.def.getData().markupEnabled = true;
         Fonts.def.setOwnsTexture(false);
@@ -124,12 +134,6 @@ public class UI implements ApplicationListener, Loadable{
         });
 
         ClickListener.clicked = () -> Sounds.press.play();
-
-        Colors.put("accent", Pal.accent);
-        Colors.put("unlaunched", Color.valueOf("8982ed"));
-        Colors.put("highlight", Pal.accent.cpy().lerp(Color.white, 0.3f));
-        Colors.put("stat", Pal.stat);
-        Colors.put("negstat", Pal.negativeStat);
 
         drillCursor = Core.graphics.newCursor("drill", Fonts.cursorScale());
         unloadCursor = Core.graphics.newCursor("unload", Fonts.cursorScale());
@@ -195,7 +199,7 @@ public class UI implements ApplicationListener, Loadable{
         bans = new BansDialog();
         admins = new AdminsDialog();
         traces = new TraceDialog();
-        maps = new MapsDialog();
+        maps = new EditorMapsDialog();
         content = new ContentInfoDialog();
         planet = new PlanetDialog();
         research = new ResearchDialog();
@@ -279,7 +283,8 @@ public class UI implements ApplicationListener, Loadable{
                 cont.margin(30).add(text).padRight(6f);
                 TextFieldFilter filter = numbers ? TextFieldFilter.digitsOnly : (f, c) -> true;
                 TextField field = cont.field(def, t -> {}).size(330f, 50f).get();
-                field.setFilter((f, c) -> field.getText().length() < textLength && filter.acceptChar(f, c));
+                field.setMaxLength(textLength);
+                field.setFilter(filter);
                 buttons.defaults().size(120, 54).pad(4);
                 buttons.button("@cancel", () -> {
                     closed.run();
