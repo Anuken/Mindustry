@@ -1,18 +1,22 @@
 package mindustry.world.blocks.sandbox;
 
-import arc.*;
+import arc.graphics.*;
+import arc.graphics.g2d.*;
 import arc.scene.ui.TextField.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.io.*;
+import arc.util.pooling.*;
+import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.ui.*;
-import mindustry.world.blocks.logic.LogicBlock.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.meta.*;
 
+import static mindustry.Vars.*;
+
 public class PowerSource extends PowerNode{
-    /** Kept for backwards compatibility. Defines the default power proudction amount. */
+    /** Kept for backwards compatibility. Defines the default power production amount. */
     public float powerProduction = 10000f;
 
     public PowerSource(String name){
@@ -54,12 +58,41 @@ public class PowerSource extends PowerNode{
                 t.field(String.valueOf(configPower), text -> {
                     configure(Strings.parseFloat(text));
                 }).width(120).valid(Strings::canParsePositiveFloat).get().setFilter(TextFieldFilter.floatsOnly);
-                t.add(Core.bundle.get("unit.powersecond")).left();
+                t.add(StatUnit.powerSecond.localized()).left();
             });
         }
 
         @Override
-        public Object[] config(){
+        public void drawSelect(){
+            super.drawSelect();
+
+            if(renderer.pixelator.enabled()) return;
+
+            Font font = Fonts.outline;
+            GlyphLayout l = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
+            boolean ints = font.usesIntegerPositions();
+            font.getData().setScale(1 / 4f / Scl.scl(1f));
+            font.setUseIntegerPositions(false);
+
+            CharSequence text = "[#" + Pal.powerBar.toString() + "]" + Strings.autoFixed(configPower, 2) + " " + StatUnit.powerSecond.localized();
+
+            l.setText(font, text, Color.white, 90f, Align.left, true);
+            float offset = 1f;
+
+            Draw.color(0f, 0f, 0f, 0.2f);
+            Fill.rect(x, y - tilesize/2f - l.height/2f - offset, l.width + offset*2f, l.height + offset*2f);
+            Draw.color();
+            font.setColor(Color.white);
+            font.draw(text, x - l.width/2f, y - tilesize/2f - offset, 90f, Align.left, true);
+            font.setUseIntegerPositions(ints);
+
+            font.getData().setScale(1f);
+
+            Pools.free(l);
+        }
+
+        @Override
+        public Object config(){
             return new Object[]{super.config(), configPower};
         }
 
