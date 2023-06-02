@@ -3,6 +3,7 @@ package mindustry.ai.types;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.logic.*;
@@ -36,9 +37,18 @@ public class LogicAI extends AIController{
     public PosTeam posTarget = PosTeam.create();
 
     private ObjectSet<Object> radars = new ObjectSet<>();
+    private float lastMoveX, lastMoveY;
+    private int lastPathId = 0;
 
     @Override
     public void updateMovement(){
+        if(control == LUnitControl.pathfind){
+            if(!Mathf.equal(moveX, lastMoveX, 0.1f) || !Mathf.equal(moveY, lastMoveY, 0.1f)){
+                lastPathId ++;
+                lastMoveX = moveX;
+                lastMoveY = moveY;
+            }
+        }
 
         if(targetTimer > 0f){
             targetTimer -= Time.delta;
@@ -61,6 +71,15 @@ public class LogicAI extends AIController{
             }
             case approach -> {
                 moveTo(Tmp.v1.set(moveX, moveY), moveRad - 7f, 7, true, null);
+            }
+            case pathfind -> {
+                if(unit.isFlying()){
+                    moveTo(Tmp.v1.set(moveX, moveY), 1f, 30f);
+                }else{
+                    if(Vars.controlPath.getPathPosition(unit, lastPathId, Tmp.v2.set(moveX, moveY), Tmp.v1, null)){
+                        moveTo(Tmp.v1, 1f, Tmp.v2.epsilonEquals(Tmp.v1, 4.1f) ? 30f : 0f);
+                    }
+                }
             }
             case stop -> {
                 unit.clearBuilding();

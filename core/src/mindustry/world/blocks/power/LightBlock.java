@@ -38,7 +38,8 @@ public class LightBlock extends Block{
 
     @Override
     public void init(){
-        lightRadius = radius*3f;
+        lightRadius = radius*2.5f;
+        clipSize = Math.max(clipSize, lightRadius * 3f);
         emitLight = true;
 
         super.init();
@@ -68,6 +69,12 @@ public class LightBlock extends Block{
             }
 
             super.control(type, p1, p2, p3, p4);
+        }
+
+        @Override
+        public double sense(LAccess sensor){
+            if(sensor == LAccess.color) return Tmp.c1.set(color).toDoubleBits();
+            return super.sense(sensor);
         }
 
         @Override

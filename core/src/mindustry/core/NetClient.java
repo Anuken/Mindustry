@@ -233,6 +233,8 @@ public class NetClient implements ApplicationListener{
             return;
         }
 
+        if(message == null) return;
+
         if(message.length() > maxTextLength){
             throw new ValidateException(player, "Player has sent a message above the text limit.");
         }
