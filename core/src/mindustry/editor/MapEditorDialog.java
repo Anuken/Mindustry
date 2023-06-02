@@ -803,7 +803,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         }
 
         if(i == 0){
-            blockSelection.add("@none.found").color(Color.lightGray).padLeft(54f).padTop(10f);
+            blockSelection.add("@none.found").padLeft(54f).padTop(10f);
         }
     }
 }
