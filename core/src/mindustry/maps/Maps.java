@@ -19,6 +19,7 @@ import mindustry.game.*;
 import mindustry.io.*;
 import mindustry.maps.MapPreviewLoader.*;
 import mindustry.maps.filters.*;
+import mindustry.service.*;
 import mindustry.world.*;
 import mindustry.world.blocks.storage.*;
 
@@ -134,6 +135,8 @@ public class Maps{
         //workshop
         for(Fi file : platform.getWorkshopContent(Map.class)){
             try{
+                //HACK this achievement isn't completing for some reason
+                Achievement.downloadMapWorkshop.complete();
                 Map map = loadMap(file, false);
                 map.workshop = true;
                 map.tags.put("steamid", file.parent().name());
