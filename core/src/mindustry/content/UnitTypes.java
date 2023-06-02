@@ -3258,7 +3258,7 @@ public class UnitTypes{
             drag = 0.1f;
             speed = 0.6f;
             hitSize = 23f;
-            health = 6700;
+            health = 7300;
             armor = 5f;
 
             lockLegBase = true;
@@ -3271,13 +3271,14 @@ public class UnitTypes{
 
             abilities.add(new ShieldArcAbility(){{
                 region = "tecta-shield";
-                radius = 34f;
+                radius = 36f;
                 angle = 82f;
                 regen = 0.6f;
                 cooldown = 60f * 8f;
-                max = 1500f;
+                max = 2000f;
                 y = -20f;
                 width = 6f;
+                whenShooting = false;
             }});
 
             rotateSpeed = 2.1f;
@@ -3319,14 +3320,14 @@ public class UnitTypes{
                 velocityRnd = 0.33f;
                 heatColor = Color.red;
 
-                bullet = new MissileBulletType(4.2f, 47){{
+                bullet = new MissileBulletType(4.2f, 60){{
                     homingPower = 0.2f;
                     weaveMag = 4;
                     weaveScale = 4;
                     lifetime = 55f;
                     shootEffect = Fx.shootBig2;
                     smokeEffect = Fx.shootSmokeTitan;
-                    splashDamage = 60f;
+                    splashDamage = 70f;
                     splashDamageRadius = 30f;
                     frontColor = Color.white;
                     hitSound = Sounds.none;

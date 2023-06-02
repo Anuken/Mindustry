@@ -93,6 +93,11 @@ public class VariableReactor extends PowerGenerator{
         }
 
         @Override
+        public boolean shouldExplode(){
+            return heat > 0f;
+        }
+
+        @Override
         public void draw(){
             super.draw();
 

@@ -303,7 +303,9 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     public void setFloorUnder(Floor floor){
         Block overlay = this.overlay;
         setFloor(floor);
-        setOverlay(overlay);
+        if(this.overlay != overlay){
+            setOverlay(overlay);
+        }
     }
 
     /** Sets the block to air. */
