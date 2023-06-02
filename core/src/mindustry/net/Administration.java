@@ -26,8 +26,8 @@ public class Administration{
 
 
     private boolean modified, loaded;
-    /** All player info. Maps UUIDs to info. This persists throughout restarts. Do not access directly. */
-    private ObjectMap<String, PlayerInfo> playerInfo = new ObjectMap<>();
+    /** All player info. Maps UUIDs to info. This persists throughout restarts. Do not modify directly. */
+    public ObjectMap<String, PlayerInfo> playerInfo = new ObjectMap<>();
 
     public Administration(){
         load();
