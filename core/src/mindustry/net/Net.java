@@ -399,7 +399,7 @@ public class Net{
             closeServer();
         }
 
-        /** If a connecting ip doesn't match the filter it will be kicked. */
-        void setConnectFilter(Server.ServerConnectFilter connectFilter);
+        /** Sets a connection filter by IP address. If the filter returns {@code false}, the connection will be closed. */
+        default void setConnectFilter(Server.ServerConnectFilter connectFilter){}
     }
 }
