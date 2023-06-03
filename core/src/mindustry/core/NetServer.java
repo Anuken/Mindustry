@@ -397,7 +397,7 @@ public class NetServer implements ApplicationListener{
         //current kick sessions
         VoteSession[] currentlyKicking = {null};
 
-        clientCommands.<Player>register("votekick", "[player...]", "Vote to kick a player.", (args, player) -> {
+        clientCommands.<Player>register("votekick", "[player...] [reason]", "Vote to kick a player with a valid reason.", (args, player) -> {
             if(!Config.enableVotekick.bool()){
                 player.sendMessage("[scarlet]Vote-kick is disabled on this server.");
                 return;
@@ -426,6 +426,8 @@ public class NetServer implements ApplicationListener{
                     builder.append("[lightgray] ").append(p.name).append("[accent] (#").append(p.id()).append(")\n");
                 });
                 player.sendMessage(builder.toString());
+            }else if(args.length == 1){
+                player.sendMessage("[orange]You need a valid reason to kick the player. Add a reason after the player name.");
             }else{
                 Player found;
                 if(args[0].length() > 1 && args[0].startsWith("#") && Strings.canParseInt(args[0].substring(1))){
@@ -454,6 +456,7 @@ public class NetServer implements ApplicationListener{
 
                         VoteSession session = new VoteSession(currentlyKicking, found);
                         session.vote(player, 1);
+                        Call.sendMessage(Strings.format("[lightgray]Reason:[orange] @[lightgray].", args[1]));
                         vtime.reset();
                         currentlyKicking[0] = session;
                     }
