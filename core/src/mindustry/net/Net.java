@@ -398,5 +398,8 @@ public class Net{
             disconnectClient();
             closeServer();
         }
+
+        /** If a connecting ip doesn't match the filter it will be kicked. */
+        void setConnectFilter(Server.ServerConnectFilter connectFilter);
     }
 }

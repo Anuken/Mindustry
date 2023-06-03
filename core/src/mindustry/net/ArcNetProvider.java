@@ -156,6 +156,11 @@ public class ArcNetProvider implements NetProvider{
         });
     }
 
+    @Override
+    public void setConnectFilter(Server.ServerConnectFilter connectFilter){
+        server.setConnectFilter(connectFilter);
+    }
+
     private static boolean isLocal(InetAddress addr){
         if(addr.isAnyLocalAddress() || addr.isLoopbackAddress()) return true;
 
