@@ -211,6 +211,7 @@ public class Planet extends UnlockableContent{
         rules.attributes.clear();
         rules.attributes.add(defaultAttributes);
         rules.env = defaultEnv;
+        rules.planet = this;
         rules.hiddenBuildItems.clear();
         rules.hiddenBuildItems.addAll(hiddenItems);
     }
