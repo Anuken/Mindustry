@@ -275,6 +275,9 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     public void draw(){
         if(unit != null && unit.inFogTo(Vars.player.team())) return;
 
+        //??????
+        if(name == null) return;
+
         Draw.z(Layer.playerName);
         float z = Drawf.text();
 
