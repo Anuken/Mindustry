@@ -704,7 +704,7 @@ public class LStatements{
 
         @Override
         public void build(Table table){
-            fields(table, result, str -> result = str);
+            fields(table, result, str -> result = str).width(120f);
 
             table.add(" = lookup ");
 
@@ -1632,11 +1632,13 @@ public class LStatements{
 
         @Override
         public void build(Table table){
-            fields(table, result, str -> result = str);
+            float width = LCanvas.useRows() ? 100f : 190f;
+
+            fields(table, result, str -> result = str).width(width);
 
             table.add(" = flag ");
 
-            fields(table, flag, str -> flag = str);
+            fields(table, flag, str -> flag = str).width(width);
         }
 
         @Override
@@ -1661,11 +1663,13 @@ public class LStatements{
 
         @Override
         public void build(Table table){
-            fields(table, flag, str -> flag = str);
+            float width = LCanvas.useRows() ? 100f : 190f;
+
+            fields(table, flag, str -> flag = str).width(width);
 
             table.add(" = ");
 
-            fields(table, value, str -> value = str);
+            fields(table, value, str -> value = str).width(width);
         }
 
         @Override
