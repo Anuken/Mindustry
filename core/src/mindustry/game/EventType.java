@@ -162,6 +162,16 @@ public class EventType{
         }
     }
 
+    public static class ClientServerConnectEvent{
+        public final String ip;
+        public final int port;
+
+        public ClientServerConnectEvent(String ip, int port){
+            this.ip = ip;
+            this.port = port;
+        }
+    }
+
     /** Consider using Menus.registerMenu instead. */
     public static class MenuOptionChooseEvent{
         public final Player player;
@@ -169,8 +179,21 @@ public class EventType{
 
         public MenuOptionChooseEvent(Player player, int menuId, int option){
             this.player = player;
-            this.option = option;
             this.menuId = menuId;
+            this.option = option;
+        }
+    }
+
+    /** Consider using Menus.registerTextInput instead. */
+    public static class TextInputEvent{
+        public final Player player;
+        public final int textInputId;
+        public final @Nullable String text;
+
+        public TextInputEvent(Player player, int textInputId, String text){
+            this.player = player;
+            this.textInputId = textInputId;
+            this.text = text;
         }
     }
 
@@ -234,13 +257,13 @@ public class EventType{
         }
     }
 
-    /** Called when the player configures a specific building. */
+    /** Called when a specific building has its configuration changed. */
     public static class ConfigEvent{
         public final Building tile;
-        public final Player player;
+        public final @Nullable Player player;
         public final Object value;
 
-        public ConfigEvent(Building tile, Player player, Object value){
+        public ConfigEvent(Building tile, @Nullable Player player, Object value){
             this.tile = tile;
             this.player = player;
             this.value = value;
@@ -447,6 +470,18 @@ public class EventType{
             this.unit = unit;
             this.breaking = breaking;
             this.config = config;
+        }
+    }
+
+    public static class BuildRotateEvent{
+        public final Building build;
+        public final @Nullable Unit unit;
+        public final int previous;
+
+        public BuildRotateEvent(Building build, @Nullable Unit unit, int previous){
+            this.build = build;
+            this.unit = unit;
+            this.previous = previous;
         }
     }
 

@@ -24,13 +24,14 @@ import static mindustry.Vars.*;
 public class BaseGenerator{
     private static final Vec2 axis = new Vec2(), rotator = new Vec2();
 
-    private static final int range = 160;
+    private static final int range = 180;
+    private static boolean insanity = false;
 
     private Tiles tiles;
     private Seq<Tile> cores;
 
     public static Block getDifficultyWall(int size, float difficulty){
-        Seq<Block> wallsSmall = content.blocks().select(b -> b instanceof Wall && b.size == size
+        Seq<Block> wallsSmall = content.blocks().select(b -> b instanceof Wall && b.isVanilla() && b.size == size
             && !b.insulated && b.buildVisibility == BuildVisibility.shown
             && !(b instanceof Door)
             && !(Structs.contains(b.requirements, i -> state.rules.hiddenBuildItems.contains(i.item))));
@@ -51,9 +52,9 @@ public class BaseGenerator{
         float baseChance = Mathf.lerp(0.7f, 2.1f, difficulty);
         int wallAngle = 70; //180 for full coverage
         double resourceChance = 0.5 * baseChance;
-        double nonResourceChance = 0.0005 * baseChance;
+        double nonResourceChance = 0.002 * baseChance;
         BasePart coreschem = bases.cores.getFrac(difficulty);
-        int passes = difficulty < 0.4 ? 1 : difficulty < 0.8 ? 2 : 3;
+        int passes = difficulty < 0.4 ? 1 : difficulty < 0.8 ? 3 : 5;
 
         Block wall = getDifficultyWall(1, difficulty), wallLarge = getDifficultyWall(2, difficulty);
 
@@ -80,7 +81,7 @@ public class BaseGenerator{
                         tryPlace(parts.getFrac(difficulty + Mathf.range(bracketRange)), tile.x, tile.y, team);
                     }
                 }else if(Mathf.chance(nonResourceChance)){
-                    tryPlace(bases.parts.getFrac(difficulty + Mathf.range(bracketRange)), tile.x, tile.y, team);
+                    tryPlace(bases.parts.getFrac(Mathf.random(1f)), tile.x, tile.y, team);
                 }
             });
         }
@@ -148,10 +149,13 @@ public class BaseGenerator{
             });
         }
 
+
+        float coreDst = 10f * 8;
+
         //clear path for ground units
         for(Tile tile : cores){
-            Astar.pathfind(tile, spawn, t -> t.team() == state.rules.waveTeam && !t.within(tile, 25f * 8) ? 100000 : t.floor().hasSurface() ? 1 : 10, t -> !t.block().isStatic()).each(t -> {
-                if(!t.within(tile, 25f * 8)){
+            Astar.pathfind(tile, spawn, t -> t.team() == state.rules.waveTeam && !t.within(tile, coreDst) ? 100000 : t.floor().hasSurface() ? 1 : 10, t -> !t.block().isStatic()).each(t -> {
+                if(!t.within(tile, coreDst)){
                     if(t.team() == state.rules.waveTeam){
                         t.setBlock(Blocks.air);
                     }
@@ -172,6 +176,7 @@ public class BaseGenerator{
 
         for(Tile tile : tiles){
             if(tile.isCenter() && tile.block() instanceof PowerNode && tile.team() == state.rules.waveTeam){
+                tile.build.configureAny(new Point2[0]);
                 tile.build.placed();
             }
         }
@@ -207,7 +212,7 @@ public class BaseGenerator{
 
         for(Stile tile : result.tiles){
             int realX = tile.x + cx, realY = tile.y + cy;
-            if(isTaken(tile.block, realX, realY)){
+            if(!insanity && isTaken(tile.block, realX, realY)){
                 return false;
             }
 
@@ -218,12 +223,16 @@ public class BaseGenerator{
 
         if(part.required instanceof Item item){
             for(Stile tile : result.tiles){
-                if(tile.block instanceof Drill){
+                //uncomment for extra checks if changed above
+                if(tile.block instanceof Drill && (!insanity || !isTaken(tile.block, tile.x + cx, tile.y + cy))){
 
                     tile.block.iterateTaken(tile.x + cx, tile.y + cy, (ex, ey) -> {
+                        Tile placed = world.tiles.get(ex, ey);
 
-                        if(world.tiles.getn(ex, ey).floor().hasSurface()){
-                            set(world.tiles.getn(ex, ey), item);
+                        if(placed == null) return;
+
+                        if(placed.floor().hasSurface()){
+                            set(placed, item);
                         }
 
                         Tile rand = world.tiles.getc(ex + Mathf.range(1), ey + Mathf.range(1));
@@ -236,16 +245,16 @@ public class BaseGenerator{
             }
         }
 
-        Schematics.place(result, cx + result.width/2, cy + result.height/2, team);
+        Schematics.place(result, cx + result.width/2, cy + result.height/2, team, false);
 
         //fill drills with items after placing
         if(part.required instanceof Item item){
             for(Stile tile : result.tiles){
                 if(tile.block instanceof Drill){
 
-                    Building build = world.tile(tile.x + cx, tile.y + cy).build;
+                    var build = world.build(tile.x + cx, tile.y + cy);
 
-                    if(build != null){
+                    if(build != null && build.block == tile.block){
                         build.items.add(item, build.block.itemCapacity);
                     }
                 }

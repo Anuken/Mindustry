@@ -98,7 +98,7 @@ public class MapObjectivesDialog extends BaseDialog{
         setInterpreter(UnlockableContent.class, (cont, name, type, field, remover, indexer, get, set) -> {
             name(cont, name, remover, indexer);
             cont.table(t -> t.left().button(
-                b -> b.image().size(iconSmall).update(i -> i.setDrawable(get.get().uiIcon)),
+                b -> b.image().size(iconSmall).scaling(Scaling.fit).update(i -> i.setDrawable(get.get().uiIcon)),
                 () -> showContentSelect(null, set, b -> (field != null && !field.isAnnotationPresent(Researchable.class)) || b.techNode != null)
             ).fill().pad(4)).growX().fillY();
         });
@@ -482,7 +482,9 @@ public class MapObjectivesDialog extends BaseDialog{
             loop:
             for(int y = 0; y < rows; y++){
                 for(int x = 0; x < columns; x++){
-                    canvas.tilemap.createTile(x * w, bounds - 1 - y * 2, objectives.get(i++));
+                    if(canvas.tilemap.createTile(x * w, y, objectives.get(i))){
+                        i++;
+                    }
                     if(i >= objectives.size) break loop;
                 }
             }
@@ -503,7 +505,7 @@ public class MapObjectivesDialog extends BaseDialog{
                 content.getBy(type).<UnlockableContent>as()
             )){
                 if(content.isHidden() || !check.get((T)content)) continue;
-                t.image(content == Blocks.air ? Icon.none.getRegion() : content.uiIcon).size(iconMed).pad(3)
+                t.image(content == Blocks.air ? Icon.none.getRegion() : content.uiIcon).size(iconMed).pad(3).scaling(Scaling.fit)
                     .with(b -> b.addListener(new HandCursorListener()))
                     .tooltip(content.localizedName).get().clicked(() -> {
                         cons.get((T)content);

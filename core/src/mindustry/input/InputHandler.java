@@ -168,7 +168,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(called = Loc.server, unreliable = true)
     public static void transferItemTo(@Nullable Unit unit, Item item, int amount, float x, float y, Building build){
-        if(build == null || build.items == null) return;
+        if(build == null || build.items == null || item == null) return;
 
         if(unit != null && unit.item() == item) unit.stack.amount = Math.max(unit.stack.amount - amount, 0);
 
@@ -231,10 +231,13 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             if(unit != null && unit.team == player.team() && unit.controller() instanceof CommandAI ai){
 
                 //implicitly order it to move
-                ai.command(UnitCommand.moveCommand);
+                if(ai.command == null || ai.command.switchToMove){
+                    ai.command(UnitCommand.moveCommand);
+                }
 
                 if(teamTarget != null && teamTarget.team() != player.team()){
                     ai.commandTarget(teamTarget);
+
                 }else if(posTarget != null){
                     ai.commandPosition(posTarget);
                 }
@@ -269,10 +272,12 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         for(int id : unitIds){
             Unit unit = Groups.unit.getByID(id);
             if(unit != null && unit.team == player.team() && unit.controller() instanceof CommandAI ai){
+                boolean reset = command.resetTarget || ai.currentCommand().resetTarget;
                 ai.command(command);
-                //reset targeting
-                ai.targetPos = null;
-                ai.attackTarget = null;
+                if(reset){
+                    ai.targetPos = null;
+                    ai.attackTarget = null;
+                }
                 unit.lastCommanded = player.coloredName();
             }
         }
@@ -459,10 +464,12 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         if(player != null) build.lastAccessed = player.name;
+        int previous = build.rotation;
         build.rotation = Mathf.mod(build.rotation + Mathf.sign(direction), 4);
         build.updateProximity();
         build.noSleep();
         Fx.rotateBlock.at(build.x, build.y, build.block.size);
+        Events.fire(new BuildRotateEvent(build, player == null ? null : player.unit(), previous));
     }
 
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
@@ -470,11 +477,15 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(build == null) return;
         if(net.server() && (!Units.canInteract(player, build) ||
             !netServer.admins.allowAction(player, ActionType.configure, build.tile, action -> action.config = value))){
-            var packet = new TileConfigCallPacket(); //undo the config on the client
-            packet.player = player;
-            packet.build = build;
-            packet.value = build.config();
-            player.con.send(packet, true);
+
+            if(player.con != null){
+                var packet = new TileConfigCallPacket(); //undo the config on the client
+                packet.player = player;
+                packet.build = build;
+                packet.value = build.config();
+                player.con.send(packet, true);
+            }
+
             throw new ValidateException(player, "Player cannot configure a tile.");
         }
         build.configured(player == null || player.dead() ? null : player.unit(), value);
@@ -868,7 +879,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             for(Unit unit : selectedUnits){
                 CommandAI ai = unit.command();
                 //draw target line
-                if(ai.targetPos != null && ai.command == UnitCommand.moveCommand){
+                if(ai.targetPos != null && ai.currentCommand().drawTarget){
                     Position lineDest = ai.attackTarget != null ? ai.attackTarget : ai.targetPos;
                     Drawf.limitLine(unit, lineDest, unit.hitSize / 2f, 3.5f);
 
@@ -879,8 +890,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
                 Drawf.square(unit.x, unit.y, unit.hitSize / 1.4f + 1f);
 
-                //TODO when to draw, when to not?
-                if(ai.attackTarget != null && ai.command == UnitCommand.moveCommand){
+                if(ai.attackTarget != null && ai.currentCommand().drawTarget){
                     Drawf.target(ai.attackTarget.getX(), ai.attackTarget.getY(), 6f, Pal.remove);
                 }
             }
@@ -1158,6 +1168,21 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Lines.rect(result.x, result.y - 1, result.x2 - result.x, result.y2 - result.y);
         Draw.color(Pal.remove);
         Lines.rect(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
+    }
+
+    protected void drawRebuildSelection(int x, int y, int x2, int y2){
+        drawSelection(x, y, x2, y2, 0, Pal.sapBulletBack, Pal.sapBullet);
+
+        NormalizeDrawResult result = Placement.normalizeDrawArea(Blocks.air, x, y, x2, y2, false, 0, 1f);
+
+        Tmp.r1.set(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
+
+        for(BlockPlan plan : player.team().data().plans){
+            Block block = content.block(plan.block);
+            if(block.bounds(plan.x, plan.y, Tmp.r2).overlaps(Tmp.r1)){
+                drawSelected(plan.x, plan.y, content.block(plan.block), Pal.sapBullet);
+            }
+        }
     }
 
     protected void drawBreakSelection(int x1, int y1, int x2, int y2){
@@ -1478,6 +1503,13 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         return World.toTile(vec.y);
     }
 
+    /** Forces the camera to a position and enables panning on desktop. */
+    public void panCamera(Vec2 position){
+        if(!locked()){
+            camera.position.set(position);
+        }
+    }
+
     public boolean selectedBlock(){
         return isPlacing();
     }
@@ -1637,6 +1669,20 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
         }else{
             Call.dropItem(player.angleTo(x, y));
+        }
+    }
+
+    public void rebuildArea(int x, int y, int x2, int y2){
+        NormalizeResult result = Placement.normalizeArea(x, y, x2, y2, rotation, false, 999999999);
+        Tmp.r1.set(result.x * tilesize, result.y * tilesize, (result.x2 - result.x) * tilesize, (result.y2 - result.y) * tilesize);
+
+        Iterator<BlockPlan> broken = player.team().data().plans.iterator();
+        while(broken.hasNext()){
+            BlockPlan plan = broken.next();
+            Block block = content.block(plan.block);
+            if(block.bounds(plan.x, plan.y, Tmp.r2).overlaps(Tmp.r1)){
+                player.unit().addBuild(new BuildPlan(plan.x, plan.y, plan.rotation, content.block(plan.block), plan.config));
+            }
         }
     }
 

@@ -2,10 +2,10 @@ package mindustry.world.blocks.payloads;
 
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
-import mindustry.content.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -33,7 +33,21 @@ public abstract class BlockProducer extends PayloadBlock{
         rotate = true;
         regionRotated1 = 1;
 
-        consume(new ConsumeItemDynamic((BlockProducerBuild e) -> e.recipe() != null ? e.recipe().requirements : ItemStack.empty));
+        ObjectMap<Block, ItemStack[]> stacks = new ObjectMap<>();
+
+        consume(new ConsumeItemDynamic((BlockProducerBuild e) -> {
+            Block block = e.recipe();
+
+            if(block != null){
+                ItemStack[] clone = stacks.get(block, () -> ItemStack.copy(block.requirements));
+                for(int i = 0; i < clone.length; i++){
+                    clone[i].amount = Mathf.ceil(block.requirements[i].amount * state.rules.buildCostMultiplier);
+                }
+                return clone;
+            }else{
+                return ItemStack.empty;
+            }
+        }));
     }
 
     @Override
@@ -96,7 +110,7 @@ public abstract class BlockProducer extends PayloadBlock{
                 if(progress >= recipe.buildCost){
                     consume();
                     payload = new BuildPayload(recipe, team);
-                    Fx.placeBlock.at(x, y, payload.size() / tilesize);
+                    payload.block().placeEffect.at(x, y, payload.size() / tilesize);
                     payVector.setZero();
                     progress %= 1f;
                 }

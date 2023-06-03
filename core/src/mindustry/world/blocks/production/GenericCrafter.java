@@ -61,7 +61,9 @@ public class GenericCrafter extends Block{
     public void setStats(){
         stats.timePeriod = craftTime;
         super.setStats();
-        stats.add(Stat.productionTime, craftTime / 60f, StatUnit.seconds);
+        if((hasItems && itemCapacity > 0) || outputItems != null){
+            stats.add(Stat.productionTime, craftTime / 60f, StatUnit.seconds);
+        }
 
         if(outputItems != null){
             stats.add(Stat.output, StatValues.items(craftTime, outputItems));
@@ -239,6 +241,10 @@ public class GenericCrafter extends Block{
 
         @Override
         public float getProgressIncrease(float baseTime){
+            if(ignoreLiquidFullness){
+                return super.getProgressIncrease(baseTime);
+            }
+
             //limit progress increase by maximum amount of liquid it can produce
             float scaling = 1f, max = 1f;
             if(outputLiquids != null){

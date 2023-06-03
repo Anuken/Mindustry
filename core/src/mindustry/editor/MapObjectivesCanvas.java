@@ -203,6 +203,8 @@ public class MapObjectivesCanvas extends WidgetGroup{
                 for(var parent : tile.obj.parents){
                     var parentTile = tiles.find(t -> t.obj == parent);
 
+                    if(parentTile == null) continue;
+
                     Connector
                         conFrom = parentTile.conChildren,
                         conTo = tile.conParent;

@@ -68,6 +68,9 @@ public class Planets{
             hiddenItems.addAll(Items.serpuloItems).removeAll(Items.erekirItems);
             enemyBuildSpeedMultiplier = 0.4f;
 
+            //TODO disallowed for now
+            allowLaunchToNumbered = false;
+
             //TODO SHOULD there be lighting?
             updateLighting = false;
 

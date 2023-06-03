@@ -11,7 +11,7 @@ public class MeshBuilder{
     private static Mesh mesh;
 
     public static Mesh buildIcosphere(int divisions, float radius, Color color){
-        begin(20 * (2 << (2 * divisions - 1)) * 7 * 3);
+        begin(20 * (2 << (2 * divisions - 1)) * 3);
 
         MeshResult result = Icosphere.create(divisions);
         for(int i = 0; i < result.indices.size; i+= 3){
@@ -27,6 +27,27 @@ public class MeshBuilder{
 
     public static Mesh buildIcosphere(int divisions, float radius){
         return buildIcosphere(divisions, radius, Color.white);
+    }
+
+    public static Mesh buildPlanetGrid(PlanetGrid grid, Color color, float scale){
+        int total = 0;
+        for(Ptile tile : grid.tiles){
+            total += tile.corners.length * 2;
+        }
+
+        begin(total);
+        for(Ptile tile : grid.tiles){
+            Corner[] c = tile.corners;
+            for(int i = 0; i < c.length; i++){
+                Vec3 a = v1.set(c[i].v).scl(scale);
+                Vec3 b = v2.set(c[(i + 1) % c.length].v).scl(scale);
+
+                vert(a, Vec3.Z, color);
+                vert(b, Vec3.Z, color);
+            }
+        }
+
+        return end();
     }
 
     public static Mesh buildHex(Color color, int divisions, boolean lines, float radius){
@@ -50,7 +71,7 @@ public class MeshBuilder{
             generator.seed = generator.baseSeed;
         }
 
-        begin(grid.tiles.length * 12 * (3 + 3 + 1));
+        begin(grid.tiles.length * 12);
 
         for(Ptile tile : grid.tiles){
             if(mesher.skip(tile.v)){
@@ -103,7 +124,7 @@ public class MeshBuilder{
         VertexAttribute.color
         );
 
-        mesh.getVerticesBuffer().limit(mesh.getMaxVertices());
+        mesh.getVerticesBuffer().limit(mesh.getVerticesBuffer().capacity());
         mesh.getVerticesBuffer().position(0);
     }
 

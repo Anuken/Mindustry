@@ -79,7 +79,11 @@ public class ContentParser{
         put(Interp.class, (type, data) -> field(Interp.class, data));
         put(Blending.class, (type, data) -> field(Blending.class, data));
         put(CacheLayer.class, (type, data) -> field(CacheLayer.class, data));
-        put(Attribute.class, (type, data) -> Attribute.get(data.asString()));
+        put(Attribute.class, (type, data) -> {
+            String attr = data.asString();
+            if(Attribute.exists(attr)) return Attribute.get(attr);
+            return Attribute.add(attr);
+        });
         put(BuildVisibility.class, (type, data) -> field(BuildVisibility.class, data));
         put(Schematic.class, (type, data) -> {
             Object result = fieldOpt(Loadouts.class, data);
@@ -186,32 +190,33 @@ public class ContentParser{
                 data.has("operation") ? data.get("operation") :
                 data.has("op") ? data.get("op") : null;
 
-            //no operations I guess (why would you do this?)
+            //no singular operation, check for multi-operation
             if(opval == null){
+                JsonValue opsVal =
+                    data.has("operations") ? data.get("operations") :
+                    data.has("ops") ? data.get("ops") : null;
+
+                if(opsVal != null){
+                    if(!opsVal.isArray()) throw new RuntimeException("Chained PartProgress operations must be an array.");
+                    int i = 0;
+                    while(true){
+                        JsonValue val = opsVal.get(i);
+                        if(val == null) break;
+                        JsonValue op = val.has("operation") ? val.get("operation") :
+                            val.has("op") ? val.get("op") : null;
+
+                        base = parseProgressOp(base, op.asString(), val);
+                        i++;
+                    }
+                }
+
                 return base;
             }
 
             //this is the name of the method to call
             String op = opval.asString();
 
-            //I have to hard-code this, no easy way of getting parameter names, unfortunately
-            return switch(op){
-                case "inv" -> base.inv();
-                case "slope" -> base.slope();
-                case "clamp" -> base.clamp();
-                case "delay" -> base.delay(data.getFloat("amount"));
-                case "sustain" -> base.sustain(data.getFloat("offset", 0f), data.getFloat("grow", 0f), data.getFloat("sustain"));
-                case "shorten" -> base.shorten(data.getFloat("amount"));
-                case "compress" -> base.compress(data.getFloat("start"), data.getFloat("end"));
-                case "add" -> data.has("amount") ? base.add(data.getFloat("amount")) : base.add(parser.readValue(PartProgress.class, data.get("other")));
-                case "blend" -> base.blend(parser.readValue(PartProgress.class, data.get("other")), data.getFloat("amount"));
-                case "mul" -> data.has("amount") ? base.mul(data.getFloat("amount")) : base.mul(parser.readValue(PartProgress.class, data.get("other")));
-                case "min" -> base.min(parser.readValue(PartProgress.class, data.get("other")));
-                case "sin" -> base.sin(data.has("offset") ? data.getFloat("offset") : 0f, data.getFloat("scl"), data.getFloat("mag"));
-                case "absin" -> base.absin(data.getFloat("scl"), data.getFloat("mag"));
-                case "curve" -> data.has("interp") ? base.curve(parser.readValue(Interp.class, data.get("interp"))) : base.curve(data.getFloat("offset"), data.getFloat("duration"));
-                default -> throw new RuntimeException("Unknown operation '" + op + "', check PartProgress class for a list of methods.");
-            };
+            return parseProgressOp(base, op, data);
         });
         put(PlanetGenerator.class, (type, data) -> {
             var result = new AsteroidGenerator(); //only one type for now
@@ -291,6 +296,20 @@ public class ContentParser{
             readFields(weapon, data);
             weapon.name = currentMod.name + "-" + weapon.name;
             return weapon;
+        });
+        put(Consume.class, (type, data) -> {
+            var oc = resolve(data.getString("type", ""), Consume.class);
+            data.remove("type");
+            var consume = make(oc);
+            readFields(consume, data);
+            return consume;
+        });
+        put(ConsumeLiquidBase.class, (type, data) -> {
+            var oc = resolve(data.getString("type", ""), ConsumeLiquidBase.class);
+            data.remove("type");
+            var consume = make(oc);
+            readFields(consume, data);
+            return consume;
         });
     }};
     /** Stores things that need to be parsed fully, e.g. reading fields of content.
@@ -461,12 +480,13 @@ public class ContentParser{
                 }
 
                 var typeVal = value.get("type");
+                if(unit.constructor == null || typeVal != null){
+                    if(typeVal != null && !typeVal.isString()){
+                        throw new RuntimeException("Unit '" + name + "' has an incorrect type. Types must be strings.");
+                    }
 
-                if(typeVal != null && !typeVal.isString()){
-                    throw new RuntimeException("Unit '" + name + "' has an incorrect type. Types must be strings.");
+                    unit.constructor = unitType(typeVal);
                 }
-
-                unit.constructor = unitType(typeVal);
             }else{
                 unit = locate(ContentType.unit, name);
             }
@@ -556,7 +576,7 @@ public class ContentParser{
 
             if(!value.has("sector") || !value.get("sector").isNumber()) throw new RuntimeException("SectorPresets must have a sector number.");
 
-            SectorPreset out = new SectorPreset(name);
+            SectorPreset out = new SectorPreset(mod + "-" + name, currentMod);
 
             currentContent = out;
             read(() -> {
@@ -577,7 +597,7 @@ public class ContentParser{
             if(value.isString()) return locate(ContentType.planet, name);
 
             Planet parent = locate(ContentType.planet, value.getString("parent"));
-            Planet planet = new Planet(name, parent, value.getFloat("radius", 1f), value.getInt("sectorSize", 0));
+            Planet planet = new Planet(mod + "-" + name, parent, value.getFloat("radius", 1f), value.getInt("sectorSize", 0));
 
             if(value.has("mesh")){
                 var mesh = value.get("mesh");
@@ -590,6 +610,21 @@ public class ContentParser{
                     }catch(Exception e){
                         Log.err(e);
                         return new ShaderSphereMesh(planet, Shaders.unlit, 2);
+                    }
+                };
+            }
+
+            if(value.has("cloudMesh")){
+                var mesh = value.get("cloudMesh");
+                if(!mesh.isObject()) throw new RuntimeException("Meshes must be objects.");
+                value.remove("cloudMesh");
+                planet.cloudMeshLoader = () -> {
+                    //don't crash, just log an error
+                    try{
+                        return parseMesh(planet, mesh);
+                    }catch(Exception e){
+                        Log.err(e);
+                        return null;
                     }
                 };
             }
@@ -747,13 +782,14 @@ public class ContentParser{
             json = json.replace("#", "\\#");
         }
 
+        currentMod = mod;
+
         JsonValue value = parser.fromJson(null, Jval.read(json).toString(Jformat.plain));
 
         if(!parsers.containsKey(type)){
             throw new SerializationException("No parsers for content type '" + type + "'");
         }
 
-        currentMod = mod;
         boolean located = locate(type, name) != null;
         Content c = parsers.get(type).parse(mod.name, name, value);
         c.minfo.sourceFile = file;
@@ -830,9 +866,34 @@ public class ContentParser{
             Color.valueOf(data.getString("color2", data.getString("color", "ffffff"))),
             data.getInt("colorOct", 1), data.getFloat("colorPersistence", 0.5f), data.getFloat("colorScale", 1f),
             data.getFloat("colorThreshold", 0.5f));
+            case "HexSkyMesh" -> new HexSkyMesh(planet,
+            data.getInt("seed", 0), data.getFloat("speed", 0), data.getFloat("radius", 1f),
+            data.getInt("divisions", 3), Color.valueOf(data.getString("color", "ffffff")), data.getInt("octaves", 1),
+            data.getFloat("persistence", 0.5f), data.getFloat("scale", 1f), data.getFloat("thresh", 0.5f));
             case "MultiMesh" -> new MultiMesh(parser.readValue(GenericMesh[].class, data.get("meshes")));
             case "MatMesh" -> new MatMesh(parser.readValue(GenericMesh.class, data.get("mesh")), parser.readValue(Mat3D.class, data.get("mat")));
             default -> throw new RuntimeException("Unknown mesh type: " + tname);
+        };
+    }
+
+    private PartProgress parseProgressOp(PartProgress base, String op, JsonValue data){
+        //I have to hard-code this, no easy way of getting parameter names, unfortunately
+        return switch(op){
+            case "inv" -> base.inv();
+            case "slope" -> base.slope();
+            case "clamp" -> base.clamp();
+            case "delay" -> base.delay(data.getFloat("amount"));
+            case "sustain" -> base.sustain(data.getFloat("offset", 0f), data.getFloat("grow", 0f), data.getFloat("sustain"));
+            case "shorten" -> base.shorten(data.getFloat("amount"));
+            case "compress" -> base.compress(data.getFloat("start"), data.getFloat("end"));
+            case "add" -> data.has("amount") ? base.add(data.getFloat("amount")) : base.add(parser.readValue(PartProgress.class, data.get("other")));
+            case "blend" -> base.blend(parser.readValue(PartProgress.class, data.get("other")), data.getFloat("amount"));
+            case "mul" -> data.has("amount") ? base.mul(data.getFloat("amount")) : base.mul(parser.readValue(PartProgress.class, data.get("other")));
+            case "min" -> base.min(parser.readValue(PartProgress.class, data.get("other")));
+            case "sin" -> base.sin(data.has("offset") ? data.getFloat("offset") : 0f, data.getFloat("scl"), data.getFloat("mag"));
+            case "absin" -> base.absin(data.getFloat("scl"), data.getFloat("mag"));
+            case "curve" -> data.has("interp") ? base.curve(parser.readValue(Interp.class, data.get("interp"))) : base.curve(data.getFloat("offset"), data.getFloat("duration"));
+            default -> throw new RuntimeException("Unknown operation '" + op + "', check PartProgress class for a list of methods.");
         };
     }
 

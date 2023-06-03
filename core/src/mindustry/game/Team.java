@@ -42,7 +42,7 @@ public class Team implements Comparable<Team>{
         Mathf.rand.setSeed(8);
         //create the whole 256 placeholder teams
         for(int i = 6; i < all.length; i++){
-            new Team(i, "team#" + i, Color.HSVtoRGB(360f * Mathf.random(), 100f * Mathf.random(0.6f, 1f), 100f * Mathf.random(0.8f, 1f), 1f));
+            new Team(i, "team#" + i, Color.HSVtoRGB(360f * Mathf.random(), 100f * Mathf.random(0.4f, 1f), 100f * Mathf.random(0.6f, 1f), 1f));
         }
         Mathf.rand.setSeed(new Rand().nextLong());
     }
@@ -121,6 +121,8 @@ public class Team implements Comparable<Team>{
         return isAI() && !rules().rtsAi;
     }
 
+    /** @deprecated There is absolutely no reason to use this. */
+    @Deprecated
     public boolean isEnemy(Team other){
         return this != other;
     }

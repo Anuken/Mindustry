@@ -259,6 +259,13 @@ public class PowerGraph{
 
     public void addGraph(PowerGraph graph){
         if(graph == this) return;
+
+        //merge into other graph instead.
+        if(graph.all.size > all.size){
+            graph.addGraph(this);
+            return;
+        }
+
         //other entity should be removed as the graph was merged
         if(graph.entity != null) graph.entity.remove();
 

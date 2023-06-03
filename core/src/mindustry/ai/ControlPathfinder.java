@@ -8,8 +8,8 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.core.*;
-import mindustry.game.*;
 import mindustry.game.EventType.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
@@ -54,7 +54,10 @@ public class ControlPathfinder{
     (PathTile.nearSolid(tile) || PathTile.solid(tile) ? 3 : 0),
 
     costNaval = (team, tile) ->
-    (PathTile.solid(tile) || !PathTile.liquid(tile) ? impassable : 1) +
+    //impassable same-team neutral block, or non-liquid
+    ((PathTile.solid(tile) && ((PathTile.team(tile) == team && !PathTile.teamPassable(tile)) || PathTile.team(tile) == 0)) || !PathTile.liquid(tile) ? impassable : 1) +
+    //impassable synthetic enemy block
+    ((PathTile.team(tile) != team && PathTile.team(tile) != 0) && PathTile.solid(tile) ? wallImpassableCap : 0) +
     (PathTile.nearGround(tile) || PathTile.nearSolid(tile) ? 6 : 0);
 
     public static boolean showDebug = false;
@@ -273,7 +276,7 @@ public class ControlPathfinder{
                     req.raycastTimer = 0;
                 }
 
-                if(req.rayPathIndex < len){
+                if(req.rayPathIndex < len && req.rayPathIndex >= 0){
                     Tile tile = tile(items[req.rayPathIndex]);
                     out.set(tile);
 

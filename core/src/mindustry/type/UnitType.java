@@ -619,7 +619,7 @@ public class UnitType extends UnlockableContent{
 
         if(mineTier >= 1){
             stats.addPercent(Stat.mineSpeed, mineSpeed);
-            stats.add(Stat.mineTier, StatValues.blocks(b ->
+            stats.add(Stat.mineTier, StatValues.drillables(mineSpeed, 1f, 1, null, b ->
                 b.itemDrop != null &&
                 (b instanceof Floor f && (((f.wallOre && mineWalls) || (!f.wallOre && mineFloor))) ||
                 (!(b instanceof Floor) && mineWalls)) &&
@@ -711,10 +711,14 @@ public class UnitType extends UnlockableContent{
         //assume slight range margin
         float margin = 4f;
 
+        boolean skipWeapons = !weapons.contains(w -> !w.useAttackRange);
+
         //set up default range
         if(range < 0){
             range = Float.MAX_VALUE;
             for(Weapon weapon : weapons){
+                if(!weapon.useAttackRange && skipWeapons) continue;
+
                 range = Math.min(range, weapon.range() - margin);
                 maxRange = Math.max(maxRange, weapon.range() - margin);
             }
@@ -724,6 +728,8 @@ public class UnitType extends UnlockableContent{
             maxRange = Math.max(0f, range);
 
             for(Weapon weapon : weapons){
+                if(!weapon.useAttackRange && skipWeapons) continue;
+
                 maxRange = Math.max(maxRange, weapon.range() - margin);
             }
         }
@@ -805,6 +811,10 @@ public class UnitType extends UnlockableContent{
 
             cmds.add(UnitCommand.moveCommand);
 
+            if(canBoost){
+                cmds.add(UnitCommand.boostCommand);
+            }
+
             //healing, mining and building is only supported for flying units; pathfinding to ambiguously reachable locations is hard.
             if(flying){
                 if(canHeal){
@@ -837,7 +847,7 @@ public class UnitType extends UnlockableContent{
         //only do this after everything else was initialized
         sample = constructor.get();
     }
-    
+
     public float estimateDps(){
         //calculate estimated DPS for one target based on weapons
         if(dpsEstimate < 0){
@@ -849,7 +859,7 @@ public class UnitType extends UnlockableContent{
                 dpsEstimate /= 25f;
             }
         }
-        
+
         return dpsEstimate;
     }
 

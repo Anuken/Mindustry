@@ -150,11 +150,11 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
             @Override
             public void zoom(InputEvent event, float initialDistance, float distance){
-               if(lastZoom < 0){
-                   lastZoom = zoom;
-               }
+                if(lastZoom < 0){
+                    lastZoom = zoom;
+                }
 
-               zoom = (Mathf.clamp(initialDistance / distance * lastZoom, state.planet.minZoom, 2f));
+                zoom = (Mathf.clamp(initialDistance / distance * lastZoom, state.planet.minZoom, 2f));
             }
 
             @Override
@@ -184,7 +184,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                         b.add(planet.localizedName).color(Pal.accent).style(Styles.outlineLabel);
                         b.row();
                         b.image(new TextureRegionDrawable(tex)).grow().scaling(Scaling.fit);
-                    }, Styles.togglet, () -> selected[0] = planet).size(Core.app.isMobile() ? 220f : 320f).group(group);
+                    }, Styles.togglet, () -> selected[0] = planet).size(mobile ? 220f : 320f).group(group);
                     i ++;
                 }
 
@@ -606,29 +606,42 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             t.label(() -> mode == select ? "@sectors.select" : "").style(Styles.outlineLabel).color(Pal.accent);
         }),
         buttons,
-        //planet selection
+
+        // planet selection
         new Table(t -> {
             t.top().left();
-            if(content.planets().count(this::selectable) > 1){
-                t.table(Tex.pane, pt -> {
-                    pt.margin(4f);
-                    for(int i = 0; i < content.planets().size; i++){
-                        Planet planet = content.planets().get(i);
-                        if(selectable(planet)){
-                            pt.button(planet.localizedName, Icon.icons.get(planet.icon + "Small", Icon.icons.get(planet.icon, Icon.commandRallySmall)), Styles.flatTogglet, () -> {
-                                selected = null;
-                                launchSector = null;
-                                if(state.planet != planet){
-                                    newPresets.clear();
-                                    state.planet = planet;
-                                    rebuildExpand();
-                                }
-                                settings.put("lastplanet", planet.name);
-                            }).width(190).height(40).growX().update(bb -> bb.setChecked(state.planet == planet)).with(w -> w.marginLeft(10f)).get().getChildren().get(1).setColor(planet.iconColor);
-                            pt.row();
-                        }
+            ScrollPane pane = new ScrollPane(null, Styles.smallPane);
+            t.add(pane).colspan(2).row();
+            Table starsTable = new Table(Styles.black);
+            pane.setWidget(starsTable);
+            pane.setScrollingDisabled(true, false);
+
+            int starCount = 0;
+            for(Planet star : content.planets()){
+                if(star.solarSystem != star || !content.planets().contains(p -> p.solarSystem == star && selectable(p))) continue;
+
+                starCount++;
+                if(starCount > 1) starsTable.add(star.localizedName).padLeft(10f).padBottom(10f).padTop(10f).left().width(190f).row();
+                Table planetTable = new Table();
+                planetTable.margin(4f); //less padding
+                starsTable.add(planetTable).left().row();
+                for(Planet planet : content.planets()){
+                    if(planet.solarSystem == star && selectable(planet)){
+                        Button planetButton = planetTable.button(planet.localizedName, Icon.icons.get(planet.icon + "Small", Icon.icons.get(planet.icon, Icon.commandRallySmall)), Styles.flatTogglet, () -> {
+                            selected = null;
+                            launchSector = null;
+                            if(state.planet != planet){
+                                newPresets.clear();
+                                state.planet = planet;
+                                rebuildExpand();
+                            }
+                            settings.put("lastplanet", planet.name);
+                        }).width(200).height(40).update(bb -> bb.setChecked(state.planet == planet)).with(w -> w.marginLeft(10f)).get();
+                        planetButton.getChildren().get(1).setColor(planet.iconColor);
+                        planetButton.setColor(planet.iconColor);
+                        planetTable.background(Tex.pane).row();
                     }
-                });
+                }
             }
         }),
 
@@ -785,7 +798,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             hoverLabel.touchable = Touchable.disabled;
             hoverLabel.color.a = state.uiAlpha;
 
-            Vec3 pos = planets.cam.project(Tmp.v31.set(hovered.tile.v).setLength(PlanetRenderer.outlineRad).rotate(Vec3.Y, -state.planet.getRotation()).add(state.planet.position));
+            Vec3 pos = planets.cam.project(Tmp.v31.set(hovered.tile.v).setLength(PlanetRenderer.outlineRad * state.planet.radius).rotate(Vec3.Y, -state.planet.getRotation()).add(state.planet.position));
             hoverLabel.setPosition(pos.x - Core.scene.marginLeft, pos.y - Core.scene.marginBottom, Align.center);
 
             hoverLabel.getText().setLength(0);
@@ -831,7 +844,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         }
 
         if(state.planet.hasGrid()){
-            hovered = Core.scene.getDialog() == this ? state.planet.getSector(planets.cam.getMouseRay(), PlanetRenderer.outlineRad) : null;
+            hovered = Core.scene.getDialog() == this ? state.planet.getSector(planets.cam.getMouseRay(), PlanetRenderer.outlineRad * state.planet.radius) : null;
         }else if(state.planet.isLandable()){
             boolean wasNull = selected == null;
             //always have the first sector selected.

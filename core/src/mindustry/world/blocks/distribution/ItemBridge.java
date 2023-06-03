@@ -36,6 +36,7 @@ public class ItemBridge extends Block{
     public boolean pulse = false;
     public float arrowSpacing = 4f, arrowOffset = 2f, arrowPeriod = 0.4f;
     public float arrowTimeScl = 6.2f;
+    public float bridgeWidth = 6.5f;
 
     //for autolink
     public @Nullable ItemBridgeBuild lastBuild;
@@ -81,7 +82,7 @@ public class ItemBridge extends Block{
         if(Mathf.zero(Renderer.bridgeOpacity)) return;
         Draw.alpha(Renderer.bridgeOpacity);
 
-        Lines.stroke(8f);
+        Lines.stroke(bridgeWidth);
 
         Tmp.v1.set(ox, oy).sub(req.drawx(), req.drawy()).setLength(tilesize/2f);
 
@@ -372,7 +373,7 @@ public class ItemBridge extends Block{
             Draw.rect(endRegion, x, y, i * 90 + 90);
             Draw.rect(endRegion, other.drawx(), other.drawy(), i * 90 + 270);
 
-            Lines.stroke(8f);
+            Lines.stroke(bridgeWidth);
 
             Tmp.v1.set(x, y).sub(other.worldx(), other.worldy()).setLength(tilesize/2f).scl(-1f);
 
@@ -422,7 +423,8 @@ public class ItemBridge extends Block{
 
             if(linkValid(tile, other)){
                 int rel = relativeTo(other);
-                int rel2 = relativeTo(Edges.getFacingEdge(source, this));
+                var facing = Edges.getFacingEdge(source, this);
+                int rel2 = facing == null ? -1 : relativeTo(facing);
 
                 return rel != rel2;
             }

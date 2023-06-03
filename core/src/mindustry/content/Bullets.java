@@ -2,8 +2,6 @@ package mindustry.content;
 
 import arc.graphics.*;
 import mindustry.entities.bullet.*;
-import mindustry.entities.effect.*;
-import mindustry.graphics.*;
 
 /**
  * Class for holding special internal bullets.

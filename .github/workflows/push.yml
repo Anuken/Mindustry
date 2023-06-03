@@ -40,6 +40,8 @@ jobs:
     - name: Update JITpack repo
       if: ${{ github.repository == 'Anuken/Mindustry' }}
       run: |
+        git config --global user.name "Github Actions"
+        git config --global user.email "cli@github.com"
         cd ../
         cp -r ./Mindustry ./MindustryJitpack
         cd MindustryJitpack

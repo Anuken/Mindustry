@@ -46,6 +46,9 @@ public class ConsoleFragment extends Table{
                 }
                 if(shown){
                     chatfield.requestKeyboard();
+                }else if(scene.getKeyboardFocus() == chatfield){
+                    scene.setKeyboardFocus(null);
+                    scene.setScrollFocus(null);
                 }
                 clearChatInput();
             }
@@ -70,7 +73,7 @@ public class ConsoleFragment extends Table{
                 }
             }
 
-            scrollPos = (int)Mathf.clamp(scrollPos + input.axis(Binding.chat_scroll), 0, Math.max(0, messages.size - messagesShown));
+            scrollPos = (int)Mathf.clamp(scrollPos + input.axis(Binding.chat_scroll), 0, Math.max(0, messages.size));
         });
 
         history.insert(0, "");

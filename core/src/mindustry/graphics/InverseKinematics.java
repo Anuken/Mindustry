@@ -12,6 +12,19 @@ public class InverseKinematics{
         return solve(lengthA, lengthB, end, at1, result);
     }
 
+    /**
+     inputs:
+
+     @param lengthA first line segment length
+     @param lengthB second line segment length
+     @param end length of the endpoint you want to reach
+     @param attractor direction you want the result to be closer to (since there are usually 2 solutions)
+
+     output:
+
+     @param result a point in-between (0, 0) and (end) such that (0, 0).dst(result) == lengthA and result.dst(end) == lengthB - or in basic terms, the position of a joint between (0, 0) and end where the two lengths of segments are lengthA and lengthB
+     @return whether IK succeeded (this can fail if end is too far, for example)
+     */
     public static boolean solve(float lengthA, float lengthB, Vec2 end, Vec2 attractor, Vec2 result){
         Vec2 axis = mat2[0].set(end).nor();
         mat2[1].set(attractor).sub(temp2.set(axis).scl(attractor.dot(axis))).nor();

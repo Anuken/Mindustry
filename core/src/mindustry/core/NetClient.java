@@ -201,10 +201,12 @@ public class NetClient implements ApplicationListener{
             Sounds.chatMessage.play();
         }
 
-        //display raw unformatted text above player head
         if(playersender != null && unformatted != null){
+            //display raw unformatted text above player head
             playersender.lastText(unformatted);
             playersender.textFadeTime(1f);
+
+            Events.fire(new PlayerChatEvent(playersender, unformatted));
         }
     }
 
@@ -230,6 +232,8 @@ public class NetClient implements ApplicationListener{
             netServer.admins.blacklistDos(player.con.address);
             return;
         }
+
+        if(message == null) return;
 
         if(message.length() > maxTextLength){
             throw new ValidateException(player, "Player has sent a message above the text limit.");
@@ -435,8 +439,9 @@ public class NetClient implements ApplicationListener{
             for(int j = 0; j < amount; j++){
                 readSyncEntity(input, Reads.get(input));
             }
-        }catch(IOException e){
-            throw new RuntimeException(e);
+        }catch(Exception e){
+            //don't disconnect, just log it
+            Log.err("Error reading entity snapshot", e);
         }
     }
 

@@ -31,6 +31,8 @@ public class Rules{
     public boolean waves;
     /** Whether the game objective is PvP. Note that this enables automatic hosting. */
     public boolean pvp;
+    /** Whether is waiting for players enabled in PvP. */
+    public boolean pvpAutoPause = true;
     /** Whether to pause the wave timer until all enemies are destroyed. */
     public boolean waitEnemies = false;
     /** Determines if gamemode is attack mode. */
@@ -65,8 +67,12 @@ public class Rules{
     public float unitBuildSpeedMultiplier = 1f;
     /** Multiplier of resources that units take to build. */
     public float unitCostMultiplier = 1f;
-    /** How much damage any other units deal. */
+    /** How much damage units deal. */
     public float unitDamageMultiplier = 1f;
+    /** How much health units start with. */
+    public float unitHealthMultiplier = 1f;
+    /** How much damage unit crash damage deals. (Compounds with unitDamageMultiplier) */
+    public float unitCrashDamageMultiplier = 1f;
     /** If true, ghost blocks will appear upon destruction, letting builder blocks/units rebuild them. */
     public boolean ghostBlocks = true;
     /** Whether to allow units to build with logic. */
@@ -107,7 +113,7 @@ public class Rules{
     public float waveSpacing = 2 * Time.toMinutes;
     /** Starting wave spacing; if <=0, uses waveSpacing * 2. */
     public float initialWaveSpacing = 0f;
-    /** Wave after which the player 'wins'. Used in sectors. Use a value <= 0 to disable. */
+    /** Wave after which the player 'wins'. Use a value <= 0 to disable. */
     public int winWave = 0;
     /** Base unit cap. Can still be increased by blocks. */
     public int unitCap = 0;
@@ -185,6 +191,8 @@ public class Rules{
     public float backgroundOffsetX = 0.1f, backgroundOffsetY = 0.1f;
     /** Parameters for planet rendered in the background. Cannot be changed once a map is loaded. */
     public @Nullable PlanetParams planetBackground;
+    /** Rules from this planet are applied. If it's {@code sun}, mixed tech is enabled. */
+    public Planet planet = Planets.serpulo;
 
     /** Copies this ruleset exactly. Not efficient at all, do not use often. */
     public Rules copy(){
@@ -222,10 +230,18 @@ public class Rules{
         return unitDamageMultiplier * teams.get(team).unitDamageMultiplier;
     }
 
+    public float unitHealth(Team team){
+        //a 0 here would be a very bad idea.
+        return Math.max(unitHealthMultiplier * teams.get(team).unitHealthMultiplier, 0.000001f);
+    }
+
+    public float unitCrashDamage(Team team){
+        return unitDamage(team) * unitCrashDamageMultiplier * teams.get(team).unitCrashDamageMultiplier;
+    }
+
     public float blockHealth(Team team){
         return blockHealthMultiplier * teams.get(team).blockHealthMultiplier;
     }
-
     public float blockDamage(Team team){
         return blockDamageMultiplier * teams.get(team).blockDamageMultiplier;
     }
@@ -253,6 +269,11 @@ public class Rules{
         /** If true, this team has infinite unit ammo. */
         public boolean infiniteAmmo;
 
+        /** AI that builds random schematics. */
+        public boolean buildAi;
+        /** Tier of builder AI. [0, 1] */
+        public float buildAiTier = 1f;
+
         /** Enables "RTS" unit AI. */
         public boolean rtsAi;
         /** Minimum size of attack squads. */
@@ -264,10 +285,14 @@ public class Rules{
 
         /** How fast unit factories build units. */
         public float unitBuildSpeedMultiplier = 1f;
-        /** How much damage any other units deal. */
+        /** How much damage units deal. */
         public float unitDamageMultiplier = 1f;
+        /** How much damage unit crash damage deals. (Compounds with unitDamageMultiplier) */
+        public float unitCrashDamageMultiplier = 1f;
         /** Multiplier of resources that units take to build. */
         public float unitCostMultiplier = 1f;
+        /** How much health units start with. */
+        public float unitHealthMultiplier = 1f;
         /** How much health blocks start with. */
         public float blockHealthMultiplier = 1f;
         /** How much damage blocks (turrets) deal. */

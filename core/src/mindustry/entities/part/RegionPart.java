@@ -29,13 +29,15 @@ public class RegionPart extends DrawPart{
     public boolean heatLight = false;
     /** Progress function for determining position/rotation. */
     public PartProgress progress = PartProgress.warmup;
+    /** Progress function for scaling. */
+    public PartProgress growProgress = PartProgress.warmup;
     /** Progress function for heat alpha. */
     public PartProgress heatProgress = PartProgress.heat;
     public Blending blending = Blending.normal;
     public float layer = -1, layerOffset = 0f, heatLayerOffset = 1f, turretHeatLayer = Layer.turretHeat;
     public float outlineLayerOffset = -0.001f;
-    public float x, y, rotation;
-    public float moveX, moveY, moveRot;
+    public float x, y, xScl = 1f, yScl = 1f, rotation;
+    public float moveX, moveY, growX, growY, moveRot;
     public float heatLightOpacity = 0.3f;
     public @Nullable Color color, colorTo, mixColor, mixColorTo;
     public Color heatColor = Pal.turretHeat.cpy();
@@ -65,8 +67,9 @@ public class RegionPart extends DrawPart{
         Draw.z(Draw.z() + layerOffset);
 
         float prevZ = Draw.z();
-        float prog = progress.getClamp(params);
-        float mx = moveX * prog, my = moveY * prog, mr = moveRot * prog + rotation;
+        float prog = progress.getClamp(params), sclProg = growProgress.getClamp(params);
+        float mx = moveX * prog, my = moveY * prog, mr = moveRot * prog + rotation,
+            gx = growX * sclProg, gy = growY * sclProg;
 
         if(moves.size > 0){
             for(int i = 0; i < moves.size; i++){
@@ -75,10 +78,15 @@ public class RegionPart extends DrawPart{
                 mx += move.x * p;
                 my += move.y * p;
                 mr += move.rot * p;
+                gx += move.gx * p;
+                gy += move.gy * p;
             }
         }
 
         int len = mirror && params.sideOverride == -1 ? 2 : 1;
+        float preXscl = Draw.xscl, preYscl = Draw.yscl;
+        Draw.xscl *= xScl + gx;
+        Draw.yscl *= yScl + gy;
 
         for(int s = 0; s < len; s++){
             //use specific side if necessary
@@ -87,7 +95,7 @@ public class RegionPart extends DrawPart{
             //can be null
             var region = drawRegion ? regions[Math.min(i, regions.length - 1)] : null;
             float sign = (i == 0 ? 1 : -1) * params.sideMultiplier;
-            Tmp.v1.set((x + mx) * sign * Draw.xscl, (y + my) * Draw.yscl).rotateRadExact((params.rotation - 90) * Mathf.degRad);
+            Tmp.v1.set((x + mx) * sign, y + my).rotateRadExact((params.rotation - 90) * Mathf.degRad);
 
             float
                 rx = params.x + Tmp.v1.x,
@@ -153,6 +161,8 @@ public class RegionPart extends DrawPart{
                 }
             }
         }
+
+        Draw.scl(preXscl, preYscl);
     }
 
     @Override

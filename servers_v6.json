@@ -1,9 +1,5 @@
 [
   {
-    "name": "Sectorized",
-    "address": ["sectorized.ddns.net"]
-  },
-  {
     "name": "{AA}",
     "address": ["recessive.net"]
   },
@@ -11,29 +7,9 @@
     "name": "EasyPlay",
     "address": ["easyplay.su"]
   },
-    {
-    "name": "Tendhost",
-    "address": ["tendhost.ddns.net", "smokeofanarchy.ru:7576"]
-  },
-  {
-    "name": "SMokeOfAnarchy",
-    "address": ["smokeofanarchy.ru:6566", "2.smokeofanarchy.ru:7656"]
-  },
-  {
-    "name": "Atanner Gaming",
-    "address": ["mindustry.atannergaming.com:6567", "mindustry.atannergaming.com:6700", "mindustry.atannergaming.com:9000"]
-  },
-  {
-    "name": "C.A.M.S.",
-    "address": ["0.baseduser.eu.org:42000", "nikochio.ddns.net"]
-  },
-  {
-    "name": "ECAN",
-    "address": ["mindustry.ecansol.com:6597", "mindustry.ecansol.com:6499", "mindustry.ecansol.com:6599"]
-  },
   {
     "name": "Chaotic Neutral",
-    "address": ["c-n.ddns.net:1111", "c-n.ddns.net:2222", "c-n.ddns.net:3333", "c-n.ddns.net:4444"]
+    "address": ["c-n.ddns.net:1111", "c-n.ddns.net:2222", "c-n.ddns.net:3333"]
   },
   {
     "name": "Ranked",
@@ -54,73 +30,5 @@
   {
     "name": "ALEX",
     "address": ["alexmindustryhub.ddns.net:6568", "dogemindustry.ddns.net:25586", "alexmindustry.ddns.net:25587", "alexmindustryattac.ddns.net:25800","alexmindustryturbo.ddns.net:25581","alexmindustryhex.ddns.net:25583"]
-  },
-  {
-    "name": "Minty [subzero]",
-    "address": ["minty-server.ddns.net"]
-  },
-  {
-    "name": "Korea",
-    "address": ["mindustry.initd.kr","mindustry.kr:7100"]
-  },
-  {
-    "name": "Obvilion Network",
-    "address": ["obvilion.ru", "obvilion.ru:7001", "obvilion.ru:7002", "obvilion.ru:7003"]
-  },
-  {
-    "name": "Nydus",
-    "address": ["v6.mindustry.nydus.app:6566"]
-  },
-  {
-    "name": "Mindustry.Party",
-    "address": ["game.mindustry.party"]
-  },
-  {
-    "name": "TSR", 
-    "address": ["uk01.optik.host:26175", "uk01.optik.host:26164"]
-  },
-  {
-    "name": "Sakura", 
-    "address": ["160.16.207.141", "160.16.207.141:21527", "160.16.207.141:31587", "160.16.207.141:26810", "160.16.207.141:4848"]
-  },
-  {
-    "name": "MeowLand",
-    "address": ["34.134.111.15"]
-  },
-  {
-    "name": "M-DE",
-    "address": ["mindustry.inc.li", "mindustry.inc.li:6568"]
-  },
-  {
-    "name": "Hungarian",
-    "address": ["play.hudustry.tk"]
-  },
-  {
-    "name": "Xpdustry",
-    "address": ["n2.xpdustry.fr:6000", "n2.xpdustry.fr:6002"]
-  },
-  {
-    "name": "CxZx",
-    "address": ["usfr2.forcehost.net:25578"]
-  },
-  {
-    "name": "CreateDustry",
-    "address": ["129.151.64.81:26032"]
-  },
-  {
-    "name": "NukeDustry",
-    "address": ["nukedustry.tk:7777", "nukedustry.tk:8888"]
-  },
-  {
-    "name": "MindustryBR",
-    "address": ["mindustryptbr.ddns.net:25579"]
-  },
-  {
-    "name": "Shard",
-    "address": ["59.12.120.171"]
-  },
-  {
-    "name": "New Campaign Like",
-    "address": ["n5.yeet.ml:6568"]
   }
 ]
