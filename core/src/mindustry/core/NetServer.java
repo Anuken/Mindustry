@@ -397,7 +397,7 @@ public class NetServer implements ApplicationListener{
         //current kick sessions
         VoteSession[] currentlyKicking = {null};
 
-        clientCommands.<Player>register("votekick", "[player...] [reason]", "Vote to kick a player with a valid reason.", (args, player) -> {
+        clientCommands.<Player>register("votekick", "[player] [reason...]", "Vote to kick a player with a valid reason.", (args, player) -> {
             if(!Config.enableVotekick.bool()){
                 player.sendMessage("[scarlet]Vote-kick is disabled on this server.");
                 return;
