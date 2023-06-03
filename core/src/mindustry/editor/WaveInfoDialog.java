@@ -435,7 +435,7 @@ public class WaveInfoDialog extends BaseDialog{
                 }).margin(12f);
                 if(++i % 3 == 0) p.row();
             }
-        }).scrollX(false);
+        }).growX().scrollX(false);
         dialog.addCloseButton();
         dialog.show();
     }
@@ -467,7 +467,7 @@ public class WaveInfoDialog extends BaseDialog{
                 }).margin(12f);
                 if(++i % 3 == 0) p.row();
             }
-        }).scrollX(false);
+        }).growX().scrollX(false);
         dialog.addCloseButton();
         dialog.show();
     }
