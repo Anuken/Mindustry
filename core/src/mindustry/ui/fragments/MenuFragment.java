@@ -100,6 +100,9 @@ public class MenuFragment{
 
             float fx = (int)(width / 2f);
             float fy = (int)(height - 6 - logoh) + logoh / 2 - (Core.graphics.isPortrait() ? Scl.scl(30f) : 0f);
+            if(Core.settings.getBool("macnotch") ){
+                fy -= Scl.scl(32f);
+            }
 
             Draw.color();
             Draw.rect(logo, fx, fy, logow, logoh);
