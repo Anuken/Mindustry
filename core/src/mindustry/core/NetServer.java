@@ -138,7 +138,7 @@ public class NetServer implements ApplicationListener{
 
             String uuid = packet.uuid;
 
-            if(admins.isIPBanned(con.address) || admins.isSubnetBanned(con.address) || con.kicked) return;
+            if(admins.isIPBanned(con.address) || admins.isSubnetBanned(con.address) || con.kicked || !con.isConnected()) return;
 
             if(con.hasBegunConnecting){
                 con.kick(KickReason.idInUse);

@@ -104,6 +104,8 @@ public enum EditorTool{
             if(!Structs.inBounds(x, y, editor.width(), editor.height())) return;
             Tile tile = editor.tile(x, y);
 
+            if(tile == null) return;
+
             if(editor.drawBlock.isMultiblock()){
                 //don't fill multiblocks, thanks
                 pencil.touched(x, y);
