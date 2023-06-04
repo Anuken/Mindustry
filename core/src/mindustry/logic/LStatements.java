@@ -1817,8 +1817,8 @@ public class LStatements{
             
             table.button(b -> {
                 b.label(() -> effect).grow().wrap().labelAlign(Align.center).center();
-                b.clicked(() -> showSelect(b, statusNames, effect, o -> {
-                    effect = o;
+                b.clicked(() -> showSelect(b, weatherNames, weather, w -> {
+                    weather = w;
                 }, 2, c -> c.size(120f, 38f)));
             }, Styles.logict, () -> {}).size(120f, 40f).pad(4f).color(table.color);
             
