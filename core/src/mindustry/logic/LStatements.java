@@ -1844,7 +1844,7 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new ApplyEffectI(weather, builder.var(intensity), builder.var(duration), builder.var(windX), builder.var(windY));
+            return new ApplyWeatherI(weather, builder.var(intensity), builder.var(duration), builder.var(windX), builder.var(windY));
         }
 
         @Override
