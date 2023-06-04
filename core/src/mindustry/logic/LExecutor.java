@@ -1749,7 +1749,7 @@ public class LExecutor{
             if(weather == null || weather.isActive()) return;
             boolean useRandX = exec.numf(windX) == 0;
             boolean useRandY = exec.numf(windY) == 0;
-            Tmp.v1.setRandomDirection();
+            Tmp.v1.setToRandomDirection();
             Call.createWeather(weather, exec.numf(intensity), exec.numf(duration) * 60f, useRandX ? Tmp.v1.getX() : exec.numf(windX), useRandY ? Tmp.v1.getY() : exec.numf(windY));
         }
     }

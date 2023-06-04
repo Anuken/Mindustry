@@ -1836,5 +1836,20 @@ public class LStatements{
             
             fields(table, "windY", windY, str -> str = windY);
         }
+        
+        @Override
+        public boolean privileged(){
+            return true;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new ApplyEffectI(weather, builder.var(intensity), builder.var(duration), builder.var(windX), builder.var(windY));
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.world;
+        }
     }
 }
