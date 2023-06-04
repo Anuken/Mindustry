@@ -63,6 +63,8 @@ public class Rules{
     public boolean showSpawns = false;
     /** Multiplies power output of solar panels. */
     public float solarMultiplier = 1f;
+    /** How fast units move. */
+    public float speedMultiplier = 1f;
     /** How fast unit factories build units. */
     public float unitBuildSpeedMultiplier = 1f;
     /** Multiplier of resources that units take to build. */
