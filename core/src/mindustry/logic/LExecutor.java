@@ -1727,6 +1727,32 @@ public class LExecutor{
             }
         }
     }
-
+    
+    public static class ApplyWeatherI implements LInstruction{
+        public String weather;
+        public int intensity, duration, windX, windY;
+        
+        public ApplyWeatherI(String Weather, int intensity, int duration, int windX, int windY){
+            this.weather = weather;
+            this.intensity = intensity;
+            this.duration = duration;
+            this.windX = windX;
+            this.windY = windY;
+        }
+        
+        public ApplyWeatherI(){
+        }
+        
+        @Override
+        public void run(LExecutor exec){
+            Weather weather = content.weather(this.weather);
+            if(weather == null || weather.isActive()) return;
+            boolean useRandX = exec.numf(windX) == 0;
+            boolean useRandY = exec.numf(windY) == 0;
+            Tmp.v1.setRandomDirection();
+            Call.createWeather(weather, exec.numf(intensity), exec.numf(duration) * 60f, useRandX ? Tmp.v1.getX() : exec.numf(windX), useRandY ? Tmp.v1.getY() : exec.numf(windY));
+        }
+    }
+    
     //endregion
 }

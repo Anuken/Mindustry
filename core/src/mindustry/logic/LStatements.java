@@ -1796,4 +1796,45 @@ public class LStatements{
             return LCategory.world;
         }
     }
+    
+    @RegisterStatement("weather")
+    public static class ApplyWeatherStatement extends LStatement{
+        public String weather = "rain", intensity = "1", duration = "60", windX = "0", windY = "0";
+        
+        private static @Nullable String[] weatherNames;
+        
+        @Override
+        public void build(Table table){
+            rebuild(table);
+        }
+        
+        void rebuild(Table table){
+            table.clearChildren();
+            
+            if(weatherNames == null){
+                weatherNames = content.weathers().select(w -> !w.hidden).map(w -> w.name).toArray(String.class);
+            }
+            
+            table.button(b -> {
+                b.label(() -> effect).grow().wrap().labelAlign(Align.center).center();
+                b.clicked(() -> showSelect(b, statusNames, effect, o -> {
+                    effect = o;
+                }, 2, c -> c.size(120f, 38f)));
+            }, Styles.logict, () -> {}).size(120f, 40f).pad(4f).color(table.color);
+            
+            fields(table, "intensity", intensity, str -> str = intensity);
+            
+            row(table);
+            
+            fields(table, "duration", duration, str -> str = duration);
+            
+            row(table);
+            
+            fields(table, "windX", windX, str -> str = windX);
+            
+            row(table);
+            
+            fields(table, "windY", windY, str -> str = windY);
+        }
+    }
 }
