@@ -1816,7 +1816,7 @@ public class LStatements{
             }
             
             table.button(b -> {
-                b.label(() -> effect).grow().wrap().labelAlign(Align.center).center();
+                b.label(() -> weather).grow().wrap().labelAlign(Align.center).center();
                 b.clicked(() -> showSelect(b, weatherNames, weather, w -> {
                     weather = w;
                 }, 2, c -> c.size(120f, 38f)));
