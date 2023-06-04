@@ -295,7 +295,7 @@ public class HudFragment{
             t.top();
 
             if(Core.settings.getBool("macnotch") ){
-                t.margin(32);
+                t.margin(macNotchHeight);
             }
 
             t.visible(() -> shown);

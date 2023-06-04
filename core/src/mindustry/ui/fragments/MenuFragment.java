@@ -101,7 +101,7 @@ public class MenuFragment{
             float fx = (int)(width / 2f);
             float fy = (int)(height - 6 - logoh) + logoh / 2 - (Core.graphics.isPortrait() ? Scl.scl(30f) : 0f);
             if(Core.settings.getBool("macnotch") ){
-                fy -= Scl.scl(32f);
+                fy -= Scl.scl(macNotchHeight);
             }
 
             Draw.color();
@@ -280,7 +280,7 @@ public class MenuFragment{
         addButton(text, Styles.none, callback);
     }
 
-    /** 
+    /**
      * Adds a custom button to the menu.
      * If {@link MenuButton#submenu} is null or the player is on mobile, {@link MenuButton#runnable} is invoked on click.
      * Otherwise, {@link MenuButton#submenu} is shown.
