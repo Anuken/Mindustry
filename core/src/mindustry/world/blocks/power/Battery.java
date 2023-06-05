@@ -8,6 +8,7 @@ import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
@@ -40,7 +41,7 @@ public class Battery extends PowerDistributor{
         checkDrawDefault();
     }
 
-    void checkDrawDefault(){
+    protected void checkDrawDefault(){
         if(drawer == null){
             drawer = new DrawMulti(new DrawDefault(), new DrawPower(){{
                 emptyLightColor = Battery.this.emptyLightColor;
@@ -70,6 +71,12 @@ public class Battery extends PowerDistributor{
     @Override
     public void getRegionsToOutline(Seq<TextureRegion> out){
         drawer.getRegionsToOutline(this, out);
+    }
+
+    @Override
+    public void createIcons(MultiPacker packer){
+        super.createIcons(packer);
+        drawer.createIcons(this, packer);
     }
 
     public class BatteryBuild extends Building{

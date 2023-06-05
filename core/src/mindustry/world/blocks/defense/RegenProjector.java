@@ -78,6 +78,12 @@ public class RegenProjector extends Block{
     }
 
     @Override
+    public void createIcons(MultiPacker packer){
+        super.createIcons(packer);
+        drawer.createIcons(this, packer);
+    }
+
+    @Override
     public void load(){
         super.load();
         drawer.load(this);

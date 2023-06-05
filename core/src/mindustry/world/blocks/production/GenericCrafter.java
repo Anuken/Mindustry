@@ -10,6 +10,7 @@ import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -140,6 +141,12 @@ public class GenericCrafter extends Block{
     @Override
     public void getRegionsToOutline(Seq<TextureRegion> out){
         drawer.getRegionsToOutline(this, out);
+    }
+
+    @Override
+    public void createIcons(MultiPacker packer){
+        super.createIcons(packer);
+        drawer.createIcons(this, packer);
     }
 
     @Override
