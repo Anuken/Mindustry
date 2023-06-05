@@ -195,19 +195,15 @@ public class Mods implements Loadable{
         float textureScale = mod.meta.texturescale;
 
         for(Fi file : sprites){
-            String name = file.nameWithoutExtension();
+            String
+            baseName = file.nameWithoutExtension(),
+            regionName = baseName.contains(".") ? baseName.substring(0, baseName.indexOf(".")) : baseName;
 
-            if(!prefix && !Core.atlas.has(name)){
-                Log.warn("Sprite '@' in mod '@' attempts to override a non-existent sprite. Ignoring.", name, mod.name);
+            if(!prefix && !Core.atlas.has(regionName)){
+                Log.warn("Sprite '@' in mod '@' attempts to override a non-existent sprite. Ignoring.", regionName, mod.name);
                 continue;
 
                 //(horrible code below)
-            }else if(prefix && !mod.meta.keepOutlines && name.endsWith("-outline") && file.path().contains("units") && !file.path().contains("blocks")){
-                Log.warn("Sprite '@' in mod '@' is likely to be an unnecessary unit outline. These should not be separate sprites. Ignoring.", name, mod.name);
-                //TODO !!! document this on the wiki !!!
-                //do not allow packing standard outline sprites for now, they are no longer necessary and waste space!
-                //TODO also full regions are bad:  || name.endsWith("-full")
-                continue;
             }
 
             //read and bleed pixmaps in parallel
@@ -221,7 +217,7 @@ public class Mods implements Loadable{
                     }
                     //this returns a *runnable* which actually packs the resulting pixmap; this has to be done synchronously outside the method
                     return () -> {
-                        String fullName = (prefix ? mod.name + "-" : "") + name;
+                        String fullName = (prefix ? mod.name + "-" : "") + baseName;
                         packer.add(getPage(file), fullName, new PixmapRegion(pix));
                         if(textureScale != 1.0f){
                             textureResize.put(fullName, textureScale);
@@ -1023,8 +1019,6 @@ public class Mods implements Loadable{
         public Seq<LoadedMod> dependencies = new Seq<>();
         /** All missing dependencies of this mod as strings. */
         public Seq<String> missingDependencies = new Seq<>();
-        /** Script files to run. */
-        public Seq<Fi> scripts = new Seq<>();
         /** Content with initialization code. */
         public ObjectSet<Content> erroredContent = new ObjectSet<>();
         /** Current state of this mod. */

@@ -2548,7 +2548,6 @@ public class Blocks{
             researchCostMultiplier = 0.4f;
         }};
 
-        //TODO stats
         fluxReactor = new VariableReactor("flux-reactor"){{
             requirements(Category.power, with(Items.graphite, 300, Items.carbide, 200, Items.oxide, 100, Items.silicon, 600, Items.surgeAlloy, 300));
             powerProduction = 120f;
@@ -2585,7 +2584,6 @@ public class Blocks{
             );
         }};
 
-        //TODO stats
         neoplasiaReactor = new HeaterGenerator("neoplasia-reactor"){{
             requirements(Category.power, with(Items.tungsten, 1000, Items.carbide, 300, Items.oxide, 150, Items.silicon, 500, Items.phaseFabric, 300, Items.surgeAlloy, 200));
 
@@ -2609,7 +2607,6 @@ public class Blocks{
             explodeSound = Sounds.largeExplosion;
 
             powerProduction = 140f;
-            rebuildable = false;
 
             ambientSound = Sounds.bioLoop;
             ambientSoundVolume = 0.2f;
@@ -3126,8 +3123,8 @@ public class Blocks{
             drawer = new DrawTurret(){{
                 parts.add(new RegionPart("-mid"){{
                     progress = PartProgress.recoil;
-                    under = true;
-                    moveY = -1f;
+                    under = false;
+                    moveY = -1.25f;
                 }});
             }};
 
@@ -3187,6 +3184,7 @@ public class Blocks{
             reload = 6f;
             coolantMultiplier = 1.5f;
             range = 60f;
+            shootY = 3;
             shootCone = 50f;
             targetAir = false;
             ammoUseEffect = Fx.none;
@@ -3416,15 +3414,18 @@ public class Blocks{
                     lightningLength = 10;
                 }}
             );
-
-            shoot = new ShootAlternate(){{
+            
+            shoot = new ShootBarrel(){{
+                barrels = new float[]{
+                    -4, -1.25f, 0,
+                    0, 0, 0,
+                    4, -1.25f, 0
+                };
                 shots = 4;
-                barrels = 3;
-                spread = 3.5f;
                 shotDelay = 5f;
             }};
 
-            shootY = 7f;
+            shootY = 4.5f;
             reload = 30f;
             inaccuracy = 10f;
             range = 240f;
@@ -3489,11 +3490,16 @@ public class Blocks{
             );
 
             drawer = new DrawTurret(){{
-                parts.add(new RegionPart("-barrel"){{
-                    progress = PartProgress.recoil.delay(0.5f); //Since recoil is 1-0, cut from the start instead of the end.
-                    under = true;
-                    turretHeatLayer = Layer.turret - 0.0001f;
-                    moveY = -1.5f;
+                parts.add(new RegionPart("-side"){{
+                    progress = PartProgress.warmup;
+                    moveX = 0.6f;
+                    moveRot = -15f;
+                    mirror = true;
+                    layerOffset = 0.001f;
+                    moves.add(new PartMove(PartProgress.recoil, 0.5f, -0.5f, -8f));
+                }}, new RegionPart("-barrel"){{
+                    progress = PartProgress.recoil;
+                    moveY = -2.5f;
                 }});
             }};
 
@@ -3502,7 +3508,7 @@ public class Blocks{
             reload = 31f;
             consumeAmmoOnce = false;
             ammoEjectBack = 3f;
-            recoil = 2f;
+            recoil = 0f;
             shake = 1f;
             shoot.shots = 4;
             shoot.shotDelay = 3f;
@@ -4658,7 +4664,7 @@ public class Blocks{
 
             recoil = 0.5f;
 
-            fogRadiusMultiuplier = 0.4f;
+            fogRadiusMultiplier = 0.4f;
             coolantMultiplier = 6f;
             shootSound = Sounds.missileLaunch;
 
@@ -5814,7 +5820,7 @@ public class Blocks{
         }};
 
         interplanetaryAccelerator = new Accelerator("interplanetary-accelerator"){{
-            requirements(Category.effect, BuildVisibility.campaignOnly, with(Items.copper, 16000, Items.silicon, 11000, Items.thorium, 13000, Items.titanium, 12000, Items.surgeAlloy, 6000, Items.phaseFabric, 5000));
+            requirements(Category.effect, BuildVisibility.hidden, with(Items.copper, 16000, Items.silicon, 11000, Items.thorium, 13000, Items.titanium, 12000, Items.surgeAlloy, 6000, Items.phaseFabric, 5000));
             researchCostMultiplier = 0.1f;
             size = 7;
             hasPower = true;

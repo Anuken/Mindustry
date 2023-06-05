@@ -85,6 +85,8 @@ public class Turret extends ReloadTurret{
     public boolean targetUnderBlocks = true;
     /** If true, the turret will always shoot when it has ammo, regardless of targets in range or any control. */
     public boolean alwaysShooting = false;
+    /** Whether this turret predicts unit movement. */
+    public boolean predictTarget = true;
     /** Function for choosing which unit to target. */
     public Sortf unitSort = UnitSorts.closest;
     /** Filter for types of units to attack. */
@@ -332,11 +334,15 @@ public class Turret extends ReloadTurret{
             var offset = Tmp.v1.setZero();
 
             //when delay is accurate, assume unit has moved by chargeTime already
-            if(accurateDelay && pos instanceof Hitboxc h){
+            if(accurateDelay && !moveWhileCharging && pos instanceof Hitboxc h){
                 offset.set(h.deltaX(), h.deltaY()).scl(shoot.firstShotDelay / Time.delta);
             }
 
-            targetPos.set(Predict.intercept(this, pos, offset.x, offset.y, bullet.speed <= 0.01f ? 99999999f : bullet.speed));
+            if(predictTarget){
+                targetPos.set(Predict.intercept(this, pos, offset.x, offset.y, bullet.speed <= 0.01f ? 99999999f : bullet.speed));
+            }else{
+                targetPos.set(pos);
+            }
 
             if(targetPos.isZero()){
                 targetPos.set(pos);

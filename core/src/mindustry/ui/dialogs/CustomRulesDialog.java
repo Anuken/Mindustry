@@ -249,15 +249,14 @@ public class CustomRulesDialog extends BaseDialog{
 
             t.defaults().size(140f, 50f);
 
-            //TODO dynamic selection of planets
-            for(Planet planet : new Planet[]{Planets.serpulo, Planets.erekir}){
+            for(Planet planet : content.planets().select(p -> p.accessible && p.visible && p.isLandable())){
                 t.button(planet.localizedName, style, () -> {
-                    rules.env = planet.defaultEnv;
-                    rules.attributes.clear();
-                    rules.attributes.add(planet.defaultAttributes);
-                    rules.hiddenBuildItems.clear();
-                    rules.hiddenBuildItems.addAll(planet.hiddenItems);
-                }).group(group).checked(b -> rules.env == planet.defaultEnv);
+                    planet.applyRules(rules);
+                }).group(group).checked(b -> rules.planet == planet);
+
+                if(t.getChildren().size % 3 == 0){
+                    t.row();
+                }
             }
 
             t.button("@rules.anyenv", style, () -> {
@@ -267,8 +266,9 @@ public class CustomRulesDialog extends BaseDialog{
                 }else{
                     rules.env = Vars.defaultEnv;
                     rules.hiddenBuildItems.clear();
+                    rules.planet = Planets.sun;
                 }
-            }).group(group).checked(b -> rules.hiddenBuildItems.size == 0);
+            }).group(group).checked(b -> rules.planet == Planets.sun);
         }).left().fill(false).expand(false, false).row();
 
         title("@rules.title.teams");
@@ -299,6 +299,10 @@ public class CustomRulesDialog extends BaseDialog{
                 numberi("@rules.rtsminsquadsize", f -> teams.rtsMinSquad = f, () -> teams.rtsMinSquad, () -> teams.rtsAi, 0, 100);
                 numberi("@rules.rtsmaxsquadsize", f -> teams.rtsMaxSquad = f, () -> teams.rtsMaxSquad, () -> teams.rtsAi, 1, 1000);
                 number("@rules.rtsminattackweight", f -> teams.rtsMinWeight = f, () -> teams.rtsMinWeight, () -> teams.rtsAi);
+
+                check("@rules.buildai", b -> teams.buildAi = b, () -> teams.buildAi, () -> team != rules.defaultTeam && rules.env != Planets.erekir.defaultEnv && !rules.pvp);
+                //disallow on Erekir (this is broken for mods I'm sure, but whatever)
+                number("@rules.buildaitier", false, f -> teams.buildAiTier = f, () -> teams.buildAiTier, () -> teams.buildAi && rules.env != Planets.erekir.defaultEnv && !rules.pvp, 0, 1);
 
                 check("@rules.infiniteresources", b -> teams.infiniteResources = b, () -> teams.infiniteResources);
                 number("@rules.buildspeedmultiplier", f -> teams.buildSpeedMultiplier = f, () -> teams.buildSpeedMultiplier, 0.001f, 50f);

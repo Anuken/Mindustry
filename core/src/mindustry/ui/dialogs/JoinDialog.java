@@ -45,6 +45,8 @@ public class JoinDialog extends BaseDialog{
     public JoinDialog(){
         super("@joingame");
 
+        makeButtonOverlay();
+
         style = new TextButtonStyle(){{
             over = Styles.flatOver;
             font = Fonts.def;
@@ -56,13 +58,21 @@ public class JoinDialog extends BaseDialog{
 
         loadServers();
 
-        if(!steam) buttons.add().width(60f);
+        //mobile players don't get information >:(
+        boolean infoButton = !steam && !mobile;
+
+        if(infoButton) buttons.add().width(60f);
         buttons.add().growX().width(-1);
 
-        addCloseButton();
+        addCloseButton(mobile ? 190f : 210f);
+
+        buttons.button("@server.add", Icon.add, () -> {
+            renaming = null;
+            add.show();
+        });
 
         buttons.add().growX().width(-1);
-        if(!steam) buttons.button("?", () -> ui.showInfo("@join.info")).size(60f, 64f);
+        if(infoButton) buttons.button("?", () -> ui.showInfo("@join.info")).size(60f, 64f);
 
         add = new BaseDialog("@joingame.title");
         add.cont.add("@joingame.ip").padRight(5f).left();
@@ -314,6 +324,8 @@ public class JoinDialog extends BaseDialog{
         float w = targetWidth();
 
         hosts.clear();
+        //since the buttons are an overlay, make room for that
+        hosts.marginBottom(70f);
 
         section(steam ? "@servers.local.steam" : "@servers.local", local, false);
         section("@servers.remote", remote, false);
@@ -344,25 +356,6 @@ public class JoinDialog extends BaseDialog{
         cont.row();
         cont.add(pane).width((w + 5) * columns() + 33).pad(0);
         cont.row();
-        cont.buttonCenter("@server.add", Icon.add, () -> {
-            renaming = null;
-            add.show();
-        }).marginLeft(10).width(w).height(80f).update(button -> {
-            float pw = w;
-            float pad = 0f;
-            if(pane.getChildren().first().getPrefHeight() > pane.getHeight()){
-                pw = w + 30;
-                pad = 6;
-            }
-
-            var cell = ((Table)pane.parent).getCell(button);
-
-            if(!Mathf.equal(cell.minWidth(), pw)){
-                cell.width(pw);
-                cell.padLeft(pad);
-                pane.parent.invalidateHierarchy();
-            }
-        });
     }
 
     void section(String label, Table servers, boolean eye){

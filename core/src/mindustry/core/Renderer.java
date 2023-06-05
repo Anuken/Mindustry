@@ -342,7 +342,7 @@ public class Renderer implements ApplicationListener{
 
         if(bloom != null){
             bloom.resize(graphics.getWidth(), graphics.getHeight());
-            bloom.setBloomIntesity(settings.getInt("bloomintensity", 6) / 4f + 1f);
+            bloom.setBloomIntensity(settings.getInt("bloomintensity", 6) / 4f + 1f);
             bloom.blurPasses = settings.getInt("bloomblur", 1);
             Draw.draw(Layer.bullet - 0.02f, bloom::capture);
             Draw.draw(Layer.effect + 0.02f, bloom::render);

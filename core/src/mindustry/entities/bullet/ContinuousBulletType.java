@@ -74,6 +74,8 @@ public class ContinuousBulletType extends BulletType{
         if(shake > 0){
             Effect.shake(shake, shake, b);
         }
+
+        updateBulletInterval(b);
     }
 
     public void applyDamage(Bullet b){

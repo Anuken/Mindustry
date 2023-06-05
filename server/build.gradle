@@ -39,11 +39,13 @@ task dist(type: Jar, dependsOn: configurations.runtimeClasspath){
     exclude("music/**")
     exclude("sounds/**")
     exclude("fonts/**")
-    exclude("icons/**")
     exclude("bundles/**")
     exclude("cubemaps/**")
     exclude("cursors/**")
     exclude("shaders/**")
+    exclude("icons/icon.icns")
+    exclude("icons/icon.ico")
+    exclude("icons/icon_64.png")
 
     manifest{
         attributes 'Main-Class': project.mainClassName

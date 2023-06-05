@@ -11,6 +11,7 @@ import mindustry.mod.*;
 import mindustry.mod.Mods.*;
 import mindustry.net.Net;
 import mindustry.net.*;
+import mindustry.ui.*;
 
 import java.time.*;
 
@@ -45,10 +46,15 @@ public class ServerLauncher implements ApplicationListener{
 
         Vars.loadSettings();
         Vars.init();
+        
+        UI.loadColors();
+        Fonts.loadContentIconsHeadless();
+        
         content.createBaseContent();
         mods.loadScripts();
         content.createModContent();
         content.init();
+        
         if(mods.hasContentErrors()){
             err("Error occurred loading mod content:");
             for(LoadedMod mod : mods.list()){

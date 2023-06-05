@@ -121,6 +121,8 @@ public class Team implements Comparable<Team>{
         return isAI() && !rules().rtsAi;
     }
 
+    /** @deprecated There is absolutely no reason to use this. */
+    @Deprecated
     public boolean isEnemy(Team other){
         return this != other;
     }
