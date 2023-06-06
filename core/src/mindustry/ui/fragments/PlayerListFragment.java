@@ -199,8 +199,8 @@ public class PlayerListFragment{
                 button.add().growY();
 
                 button.button(Icon.hammer, ustyle,
-                    () -> ui.showConfirm("@confirm", Core.bundle.format("confirmvotekick",  user.name()),
-                    () -> Call.sendChatMessage("/votekick #" + user.id)))
+                    () -> ui.showTextInput("@votekick.reason", Core.bundle.format("votekick.reason.message", user.name()), "",
+                    reason -> Call.sendChatMessage("/votekick #" + user.id + " " + reason)))
                 .size(h);
             }
 
