@@ -106,7 +106,7 @@
   },
   {
     "name": "The Devil",
-    "address": ["xem8k5.mindustry.top:8169", "test.xem8k5.top:8920", "other.xem8k5.top:10936", "n2.akiracloud.net:10404"]
+    "address": ["xem8k5.mindustry.top:8169", "test.xem8k5.top:8920", "other.xem8k5.top:10936"]
   },
   {
     "name": "Eradicationdustry",
@@ -129,8 +129,8 @@
     "address": ["sectorized.freeddns.org"]
   },
   {
-    "name": "{AA}",
-    "address": ["recessive.net"]
+    "name": "Apricot Alliance",
+    "address": ["apricotalliance.org"]
   },
   {
     "name": "Sakura", 
