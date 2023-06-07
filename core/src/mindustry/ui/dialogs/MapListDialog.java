@@ -114,9 +114,9 @@ public abstract class MapListDialog extends BaseDialog{
                     invalid |= !mode.valid(map);
                 }
                 if(invalid || (searchString != null
-                    && !Strings.stripColors(map.name()).toLowerCase().contains(searchString)
-                    && (!searchAuthor || !Strings.stripColors(map.author()).toLowerCase().contains(searchString))
-                    && (!searchDescription || !Strings.stripColors(map.description()).toLowerCase().contains(searchString)))){
+                    && !map.plainName().toLowerCase().contains(searchString)
+                    && (!searchAuthor || !map.plainAuthor().toLowerCase().contains(searchString))
+                    && (!searchDescription || !map.plainDescription().toLowerCase().contains(searchString)))){
                     continue;
                 }
 
