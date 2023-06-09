@@ -87,6 +87,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     transient float optionalEfficiency;
     /** The efficiency this block *would* have if shouldConsume() returned true. */
     transient float potentialEfficiency;
+    /** Whether to take damage */
+    transient boolean invincible = false;
 
     transient float healSuppressionTime = -1f;
     transient float lastHealTime = -120f * 10f;
@@ -1851,7 +1853,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     @Replace
     @Override
     public void damage(float damage){
-        if(dead()) return;
+        if(invincible || dead()) return;
 
         float dm = state.rules.blockHealth(team);
         lastDamageTime = Time.time;
