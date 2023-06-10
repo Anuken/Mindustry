@@ -456,7 +456,7 @@ public class LoadRenderer implements Disposable{
                 float skew = bsize/2f;
 
                 float v = w / 2 + cx * dir - width / 2f;
-                Fill.rects(v + dir*skew, h/2f - bsize/2f + bsize/2f, width, bsize/2f, -dir*skew);
+                Fill.rects(v + dir*skew, h/2f, width, bsize/2f, -dir*skew);
                 Fill.rects(v, h/2f - bsize/2f, width, bsize/2f, dir*skew);
             }
 

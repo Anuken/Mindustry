@@ -68,26 +68,26 @@ public class MinimapRenderer{
         });
 
         Events.on(BuildTeamChangeEvent.class, event -> update(event.build.tile));
+    }
 
-        Events.run(Trigger.update, () -> {
-            //updates are batched to occur every 2 frames
-            if((updateCounter += Time.delta) >= updateInterval){
-                updateCounter %= updateInterval;
+    public void update(){
+        //updates are batched to occur every 2 frames
+        if((updateCounter += Time.delta) >= updateInterval){
+            updateCounter %= updateInterval;
 
-                updates.each(pos -> {
-                    Tile tile = world.tile(pos);
-                    if(tile == null) return;
+            updates.each(pos -> {
+                Tile tile = world.tile(pos);
+                if(tile == null) return;
 
-                    int color = colorFor(tile);
-                    pixmap.set(tile.x, pixmap.height - 1 - tile.y, color);
+                int color = colorFor(tile);
+                pixmap.set(tile.x, pixmap.height - 1 - tile.y, color);
 
-                    //yes, this calls glTexSubImage2D every time, with a 1x1 region
-                    Pixmaps.drawPixel(texture, tile.x, pixmap.height - 1 - tile.y, color);
-                });
+                //yes, this calls glTexSubImage2D every time, with a 1x1 region
+                Pixmaps.drawPixel(texture, tile.x, pixmap.height - 1 - tile.y, color);
+            });
 
-                updates.clear();
-            }
-        });
+            updates.clear();
+        }
     }
 
     public Pixmap getPixmap(){

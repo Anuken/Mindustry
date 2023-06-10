@@ -276,6 +276,7 @@ public class UI implements ApplicationListener, Loadable{
                 this.numeric = numbers;
                 this.maxLength = textLength;
                 this.accepted = confirmed;
+                this.canceled = closed;
                 this.allowEmpty = false;
             }});
         }else{

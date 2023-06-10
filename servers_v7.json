@@ -12,10 +12,6 @@
     "address": ["tendhost.ddns.net:7576"]
   },
   {
-    "name": "generic mindustry",
-    "address": ["212.192.29.92:25554", "212.192.29.24:25298"]
-  },
-  {
     "name": "ECAN",
     "address": ["mindustry.ecansol.com:6597", "mindustry.ecansol.com:6499", "mindustry.ecansol.com:6599"]
   },
@@ -129,8 +125,8 @@
     "address": ["sectorized.freeddns.org"]
   },
   {
-    "name": "{AA}",
-    "address": ["recessive.net"]
+    "name": "Apricot Alliance",
+    "address": ["apricotalliance.org"]
   },
   {
     "name": "Sakura", 
