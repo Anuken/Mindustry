@@ -40,7 +40,7 @@ public class SaveIO{
         boolean exists = file.exists();
         if(exists) file.moveTo(backupFileFor(file));
         try{
-            write(file, state.map == null ? null : state.map.tags);
+            write(file);
         }catch(Throwable e){
             if(exists) backupFileFor(file).moveTo(file);
             throw new RuntimeException(e);
@@ -111,7 +111,7 @@ public class SaveIO{
     }
 
     public static void write(Fi file){
-        write(file, null);
+        write(file, state.map == null ? null : state.map.tags);
     }
 
     public static void write(OutputStream os, StringMap tags){
