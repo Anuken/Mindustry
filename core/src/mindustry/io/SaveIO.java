@@ -40,7 +40,7 @@ public class SaveIO{
         boolean exists = file.exists();
         if(exists) file.moveTo(backupFileFor(file));
         try{
-            write(file);
+            write(file, state.map == null ? null : state.map.tags);
         }catch(Throwable e){
             if(exists) backupFileFor(file).moveTo(file);
             throw new RuntimeException(e);
