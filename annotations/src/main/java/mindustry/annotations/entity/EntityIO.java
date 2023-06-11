@@ -125,6 +125,9 @@ public class EntityIO{
         if(write){
             //write uses most recent revision
             for(RevisionField field : revisions.peek().fields){
+                Svar var = allFields.find(s -> s.name().equals(field.name));
+                if(var == null || var.has(NoSync.class)) continue;
+
                 io(field.type, "this." + field.name, true);
             }
         }else{
