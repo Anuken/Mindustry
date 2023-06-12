@@ -570,13 +570,12 @@ public class LogicBlock extends Block{
         }
 
         @Override
-        public void buildConfiguration(Table table){
-            if(!accessible()){
-                //go away
-                deselect();
-                return;
-            }
+        public boolean shouldShowConfigure(Player player){
+            return accessible();
+        }
 
+        @Override
+        public void buildConfiguration(Table table){
             table.button(Icon.pencil, Styles.cleari, () -> {
                 ui.logic.show(code, executor, privileged, code -> configure(compress(code, relativeConnections())));
             }).size(40);
