@@ -136,7 +136,7 @@ public class Team implements Comparable<Team>{
     }
     
     public String coloredName(){
-        return emoji + "[#" + color + "]" + name + "[]";
+        return emoji + "[#" + color + "]" + localized() + "[]";
     }
 
     @Override
