@@ -12,10 +12,6 @@
     "address": ["tendhost.ddns.net:7576"]
   },
   {
-    "name": "generic mindustry",
-    "address": ["212.192.29.92:25554", "212.192.29.24:25298"]
-  },
-  {
     "name": "ECAN",
     "address": ["mindustry.ecansol.com:6597", "mindustry.ecansol.com:6499", "mindustry.ecansol.com:6599"]
   },
@@ -93,7 +89,7 @@
   },
   {
     "name": "Tinylake",
-    "address": ["mindustry.top", "cn.mindustry.top", "g.mindustry.top"]
+    "address": ["cn.mindustry.top", "g.mindustry.top", "cn.mindustry.top:40003", "cn.mindustry.top:40500"]
   },
   {
     "name": "Fish",
