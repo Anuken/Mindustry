@@ -280,7 +280,7 @@ public class CustomRulesDialog extends BaseDialog{
             boolean[] shown = {false};
             Table wasMain = main;
 
-            main.button("[#" + team.color +  "]" + team.localized() + (team.emoji.isEmpty() ? "" : "[] " + team.emoji), Icon.downOpen, Styles.togglet, () -> {
+            main.button(team.localized(), Icon.downOpen, Styles.togglet, () -> {
                 shown[0] = !shown[0];
             }).marginLeft(14f).width(260f).height(55f).update(t -> {
                 ((Image)t.getChildren().get(1)).setDrawable(shown[0] ? Icon.upOpen : Icon.downOpen);
@@ -300,8 +300,8 @@ public class CustomRulesDialog extends BaseDialog{
                 numberi("@rules.rtsmaxsquadsize", f -> teams.rtsMaxSquad = f, () -> teams.rtsMaxSquad, () -> teams.rtsAi, 1, 1000);
                 number("@rules.rtsminattackweight", f -> teams.rtsMinWeight = f, () -> teams.rtsMinWeight, () -> teams.rtsAi);
 
-                check("@rules.buildai", b -> teams.buildAi = b, () -> teams.buildAi, () -> team != rules.defaultTeam && rules.env != Planets.erekir.defaultEnv && !rules.pvp);
                 //disallow on Erekir (this is broken for mods I'm sure, but whatever)
+                check("@rules.buildai", b -> teams.buildAi = b, () -> teams.buildAi, () -> team != rules.defaultTeam && rules.env != Planets.erekir.defaultEnv && !rules.pvp);
                 number("@rules.buildaitier", false, f -> teams.buildAiTier = f, () -> teams.buildAiTier, () -> teams.buildAi && rules.env != Planets.erekir.defaultEnv && !rules.pvp, 0, 1);
 
                 check("@rules.infiniteresources", b -> teams.infiniteResources = b, () -> teams.infiniteResources);
@@ -312,7 +312,6 @@ public class CustomRulesDialog extends BaseDialog{
                 number("@rules.unitbuildspeedmultiplier", f -> teams.unitBuildSpeedMultiplier = f, () -> teams.unitBuildSpeedMultiplier, 0.001f, 50f);
                 number("@rules.unitcostmultiplier", f -> teams.unitCostMultiplier = f, () -> teams.unitCostMultiplier);
                 number("@rules.unithealthmultiplier", f -> teams.unitHealthMultiplier = f, () -> teams.unitHealthMultiplier);
-
 
                 main = wasMain;
             }, () -> shown[0]).growX().row();
