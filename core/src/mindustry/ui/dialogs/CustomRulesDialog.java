@@ -201,7 +201,6 @@ public class CustomRulesDialog extends BaseDialog{
         number("@rules.unitcostmultiplier", f -> rules.unitCostMultiplier = f, () -> rules.unitCostMultiplier);
         number("@rules.unithealthmultiplier", f -> rules.unitHealthMultiplier = f, () -> rules.unitHealthMultiplier);
 
-
         main.button("@bannedunits", () -> showBanned("@bannedunits", ContentType.unit, rules.bannedUnits, u -> !u.isHidden())).left().width(300f).row();
         check("@bannedunits.whitelist", b -> rules.unitWhitelist = b, () -> rules.unitWhitelist);
 
@@ -280,7 +279,7 @@ public class CustomRulesDialog extends BaseDialog{
             boolean[] shown = {false};
             Table wasMain = main;
 
-            main.button(team.localized(), Icon.downOpen, Styles.togglet, () -> {
+            main.button(team.coloredName(), Icon.downOpen, Styles.togglet, () -> {
                 shown[0] = !shown[0];
             }).marginLeft(14f).width(260f).height(55f).update(t -> {
                 ((Image)t.getChildren().get(1)).setDrawable(shown[0] ? Icon.upOpen : Icon.downOpen);
@@ -326,7 +325,7 @@ public class CustomRulesDialog extends BaseDialog{
             for(Team team : Team.baseTeams){
                 t.button(Tex.whiteui, Styles.squareTogglei, 38f, () -> {
                     cons.get(team);
-                }).pad(1f).checked(b -> prov.get() == team).size(60f).tooltip(team.localized()).with(i -> i.getStyle().imageUpColor = team.color);
+                }).pad(1f).checked(b -> prov.get() == team).size(60f).tooltip(team.coloredName()).with(i -> i.getStyle().imageUpColor = team.color);
             }
         }).padTop(0).row();
     }
