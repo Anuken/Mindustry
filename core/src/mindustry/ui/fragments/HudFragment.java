@@ -228,7 +228,7 @@ public class HudFragment{
                 //table with button to skip wave
                 s.button(Icon.play, rightStyle, 30f, () -> {
                     if(net.client() && player.admin){
-                        Call.adminRequest(player, AdminAction.wave);
+                        Call.adminRequest(player, AdminAction.wave, null);
                     }else{
                         logic.skipWave();
                     }

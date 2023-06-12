@@ -39,14 +39,22 @@ public class TraceDialog extends BaseDialog{
             c.add(Core.bundle.format("trace.id", info.uuid)).row();
         }).row();
 
-        table.add(Core.bundle.format("trace.modclient", info.modded));
-        table.row();
-        table.add(Core.bundle.format("trace.mobile", info.mobile));
-        table.row();
-        table.add(Core.bundle.format("trace.times.joined", info.timesJoined));
-        table.row();
-        table.add(Core.bundle.format("trace.times.kicked", info.timesKicked));
-        table.row();
+        table.add(Core.bundle.format("trace.modclient", info.modded)).row();
+        table.add(Core.bundle.format("trace.mobile", info.mobile)).row();
+        table.add(Core.bundle.format("trace.times.joined", info.timesJoined)).row();
+        table.add(Core.bundle.format("trace.times.kicked", info.timesKicked)).row();
+
+        for(int i = 0; i < 2; i++){
+            table.add(i == 0 ? "@trace.ips" : "@trace.names").row();
+            String[] list = i == 0 ? info.ips : info.names;
+
+            table.pane(t -> {
+                t.left();
+                for(String val : list){
+                    t.add("[lightgray]" + val).left().row();
+                }
+            }).padLeft(20f).fill().left().row();
+        }
 
         table.add().pad(5);
         table.row();
