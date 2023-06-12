@@ -65,7 +65,26 @@ public class ChatFragment extends Table{
 
             if(shown){
                 if(input.keyTap(Binding.chat_history_prev) && historyPos < history.size - 1){
-                    if(historyPos == 0) history.set(0, chatfield.getText());
+                    if(historyPos == 0) {
+                        String message = chatfield.getText();
+                        if(mode.prefix.isEmpty()){
+                            if(!message.trim().isEmpty()){
+                                history.insert(0, message);
+                            }
+                        }else{
+                            if(message.startsWith(mode.normalizedPrefix())){
+                                message = message.substring(mode.normalizedPrefix().length());
+                                if(!message.trim().isEmpty()){
+                                    history.insert(0, message);
+                                }
+                            }else if(message.startsWith(mode.prefix)){
+                                message = message.substring(mode.prefix.length());
+                                if(!message.trim().isEmpty()){
+                                    history.insert(0, message);
+                                }
+                            }
+                        }
+                    }
                     historyPos++;
                     updateChat();
                 }
@@ -192,20 +211,22 @@ public class ChatFragment extends Table{
     }
 
     private void sendMessage(){
-        String message = chatfield.getText().trim();
+        String message = chatfield.getText();
         clearChatInput();
 
-        //avoid sending prefix-empty messages
-        if(message.isEmpty() || (message.startsWith(mode.prefix) && message.substring(mode.prefix.length()).isEmpty())) return;
-
-        if(!mode.prefix.isEmpty() && message.length() > mode.normalizedPrefix().length()){
-            history.insert(1, message.substring(mode.normalizedPrefix().length()));
-        }else{
-            history.insert(1, message);
+        if(message.startsWith(mode.prefix)){
+            message = message.substring(mode.prefix.length());
         }
+        message = message.trim();
+
+        //avoid sending empty messages
+        if(message.isEmpty()) return;
+
+        history.insert(1, message);
+
+        message = mode.normalizedPrefix() + message;
 
         Events.fire(new ClientChatEvent(message));
-
         Call.sendChatMessage(message);
     }
 
