@@ -65,7 +65,7 @@ public class ChatFragment extends Table{
 
             if(shown){
                 if(input.keyTap(Binding.chat_history_prev) && historyPos < history.size - 1){
-                    if(historyPos == 0) {
+                    if(historyPos == 0){
                         String message = chatfield.getText();
                         if(mode.prefix.isEmpty()){
                             if(!message.trim().isEmpty()){
