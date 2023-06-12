@@ -134,6 +134,10 @@ public class Team implements Comparable<Team>{
     public String localized(){
         return Core.bundle.get("team." + name + ".name", name);
     }
+    
+    public String coloredName(){
+        return emoji + "[#" + color + "]" + name + "[]";
+    }
 
     @Override
     public int compareTo(Team team){
