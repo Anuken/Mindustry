@@ -158,8 +158,7 @@ public class PlayerListFragment{
                 imageOverColor = Color.lightGray;
             }};
 
-            //TODO for testing only
-            if((net.server() || player.admin || true) && (!user.admin || net.server() || user == player)){
+            if(net.server() || (player.admin && (!user.admin || user == player))){
                 button.add().growY();
 
                 button.button(Icon.menu, ustyle, () -> {
