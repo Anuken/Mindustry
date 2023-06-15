@@ -41,9 +41,8 @@ public class ContinuousLaserBulletType extends ContinuousBulletType{
 
     @Override
     public void draw(Bullet b){
-        float realLength = Damage.findLaserLength(b, length);
         float fout = Mathf.clamp(b.time > b.lifetime - fadeTime ? 1f - (b.time - (lifetime - fadeTime)) / fadeTime : 1f);
-        float baseLen = realLength * fout;
+        float realLength = Damage.findLength(b, length * fout, laserAbsorb, pierceCap);
         float rot = b.rotation();
 
         for(int i = 0; i < colors.length; i++){
@@ -55,17 +54,17 @@ public class ContinuousLaserBulletType extends ContinuousBulletType{
             float ellipseLenScl = Mathf.lerp(1 - i / (float)(colors.length), 1f, pointyScaling);
 
             Lines.stroke(stroke);
-            Lines.lineAngle(b.x, b.y, rot, baseLen - frontLength, false);
+            Lines.lineAngle(b.x, b.y, rot, realLength - frontLength, false);
 
             //back ellipse
             Drawf.flameFront(b.x, b.y, divisions, rot + 180f, backLength, stroke / 2f);
 
             //front ellipse
-            Tmp.v1.trnsExact(rot, baseLen - frontLength);
+            Tmp.v1.trnsExact(rot, realLength - frontLength);
             Drawf.flameFront(b.x + Tmp.v1.x, b.y + Tmp.v1.y, divisions, rot, frontLength * ellipseLenScl, stroke / 2f);
         }
 
-        Tmp.v1.trns(b.rotation(), baseLen * 1.1f);
+        Tmp.v1.trns(b.rotation(), realLength * 1.1f);
 
         Drawf.light(b.x, b.y, b.x + Tmp.v1.x, b.y + Tmp.v1.y, lightStroke, lightColor, 0.7f);
         Draw.reset();
@@ -76,4 +75,9 @@ public class ContinuousLaserBulletType extends ContinuousBulletType{
         //no light drawn here
     }
 
+    @Override
+    public float currentLength(Bullet b){
+        float fout = Mathf.clamp(b.time > b.lifetime - fadeTime ? 1f - (b.time - (lifetime - fadeTime)) / fadeTime : 1f);
+        return length * fout;
+    }
 }
