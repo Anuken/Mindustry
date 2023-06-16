@@ -178,17 +178,18 @@ public class DesktopInput extends InputHandler{
                 }
                 linePlans.each(this::drawOverPlan);
             }else if(isPlacing()){
+                int rot = block.planRotation(rotation);
                 if(block.rotate && block.drawArrow){
-                    drawArrow(block, cursorX, cursorY, rotation);
+                    drawArrow(block, cursorX, cursorY, rot);
                 }
                 Draw.color();
-                boolean valid = validPlace(cursorX, cursorY, block, rotation);
-                drawPlan(cursorX, cursorY, block, rotation);
-                block.drawPlace(cursorX, cursorY, rotation, valid);
+                boolean valid = validPlace(cursorX, cursorY, block, rot);
+                drawPlan(cursorX, cursorY, block, rot);
+                block.drawPlace(cursorX, cursorY, rot, valid);
 
                 if(block.saveConfig){
                     Draw.mixcol(!valid ? Pal.breakInvalid : Color.white, (!valid ? 0.4f : 0.24f) + Mathf.absin(Time.globalTime, 6f, 0.28f));
-                    bplan.set(cursorX, cursorY, rotation, block);
+                    bplan.set(cursorX, cursorY, rot, block);
                     bplan.config = block.lastConfig;
                     block.drawPlanConfig(bplan, allPlans());
                     bplan.config = null;

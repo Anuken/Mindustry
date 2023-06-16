@@ -415,9 +415,10 @@ public class MobileInput extends InputHandler implements GestureListener{
 
             //draw last placed plan
             if(!plan.breaking && plan == lastPlaced && plan.block != null){
-                boolean valid = validPlace(tile.x, tile.y, plan.block, rotation);
+                int rot = block.planRotation(rotation);
+                boolean valid = validPlace(tile.x, tile.y, plan.block, rot);
                 Draw.mixcol();
-                plan.block.drawPlace(tile.x, tile.y, rotation, valid);
+                plan.block.drawPlace(tile.x, tile.y, rot, valid);
 
                 drawOverlapCheck(plan.block, tile.x, tile.y, valid);
             }
