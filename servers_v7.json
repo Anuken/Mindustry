@@ -133,7 +133,7 @@
   },
   {
     "name": "|RussianServers|[]",
-    "address": ["2p2g.ml:6567", "2p2g.ml:6568", "2p2g.ml:6569", "2p2g.ml:6570", "2p2g.ml:6571", "2p2g.ml:6572", "2p2g.ml:6573"]
+    "address": ["tyancraft.ru:6567", "tyancraft.ru:6568", "tyancraft.ru:6569", "tyancraft.ru:6570", "tyancraft.ru:6571", "tyancraft.ru:6572", "tyancraft.ru:6573"]
   },
   {
     "name": "Hungarian",
@@ -173,6 +173,6 @@
   },
   {
     "name": "CreateDustry",
-    "address": ["116.202.83.83:25689"]
+    "address": ["95.216.68.161:55639"]
   }
 ]
