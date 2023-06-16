@@ -20,8 +20,7 @@ public class BaseDialog extends Dialog{
         setFillParent(true);
         this.title.setAlignment(Align.center);
         titleTable.row();
-        titleTable.image(Tex.whiteui, Pal.accent)
-        .growX().height(3f).pad(4f);
+        titleTable.image(Tex.whiteui, Pal.accent).growX().height(3f).pad(4f);
 
         hidden(() -> {
             if(shouldPause && state.isGame() && !net.active() && !wasPaused){

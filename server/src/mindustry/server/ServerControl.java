@@ -175,9 +175,9 @@ public class ServerControl implements ApplicationListener{
         Events.on(GameOverEvent.class, event -> {
             if(inGameOverWait) return;
             if(state.rules.waves){
-                info("Game over! Reached wave @ with @ players online on map @.", state.wave, Groups.player.size(), Strings.capitalize(Strings.stripColors(state.map.name())));
+                info("Game over! Reached wave @ with @ players online on map @.", state.wave, Groups.player.size(), Strings.capitalize(state.map.plainName()));
             }else{
-                info("Game over! Team @ is victorious with @ players online on map @.", event.winner.name, Groups.player.size(), Strings.capitalize(Strings.stripColors(state.map.name())));
+                info("Game over! Team @ is victorious with @ players online on map @.", event.winner.name, Groups.player.size(), Strings.capitalize(state.map.plainName()));
             }
 
             //set next map to be played
@@ -185,15 +185,15 @@ public class ServerControl implements ApplicationListener{
             nextMapOverride = null;
             if(map != null){
                 Call.infoMessage((state.rules.pvp
-                ? "[accent]The " + event.winner.name + " team is victorious![]\n" : "[scarlet]Game over![]\n")
-                + "\nNext selected map:[accent] " + Strings.stripColors(map.name()) + "[]"
-                + (map.tags.containsKey("author") && !map.tags.get("author").trim().isEmpty() ? " by[accent] " + map.author() + "[white]" : "") + "." +
+                ? "[accent]The " + event.winner.coloredName() + " team is victorious![]\n" : "[scarlet]Game over![]\n")
+                + "\nNext selected map: [accent]" + map.name() + "[white]"
+                + (map.hasTag("author") ? " by[accent] " + map.author() + "[white]" : "") + "." +
                 "\nNew game begins in " + roundExtraTime + " seconds.");
 
                 state.gameOver = true;
                 Call.updateGameOver(event.winner);
 
-                info("Selected next map to be @.", Strings.stripColors(map.name()));
+                info("Selected next map to be @.", map.plainName());
 
                 play(true, () -> world.loadMap(map, map.applyRules(lastMode)));
             }else{
@@ -362,7 +362,7 @@ public class ServerControl implements ApplicationListener{
 
             Map result;
             if(arg.length > 0){
-                result = maps.all().find(map -> Strings.stripColors(map.name().replace('_', ' ')).equalsIgnoreCase(Strings.stripColors(arg[0]).replace('_', ' ')));
+                result = maps.all().find(map -> map.plainName().replace('_', ' ').equalsIgnoreCase(Strings.stripColors(arg[0]).replace('_', ' ')));
 
                 if(result == null){
                     err("No map with name '@' found.", arg[0]);
@@ -370,7 +370,7 @@ public class ServerControl implements ApplicationListener{
                 }
             }else{
                 result = maps.getShuffleMode().next(preset, state.map);
-                info("Randomized next map to be @.", result.name());
+                info("Randomized next map to be @.", result.plainName());
             }
 
             info("Loading map...");
@@ -392,7 +392,7 @@ public class ServerControl implements ApplicationListener{
                     autoPaused = true;
                 }
             }catch(MapException e){
-                err(e.map.name() + ": " + e.getMessage());
+                err(e.map.plainName() + ": " + e.getMessage());
             }
         });
 
@@ -412,7 +412,7 @@ public class ServerControl implements ApplicationListener{
                     info("Maps:");
 
                     for(Map map : all){
-                        String mapName = Strings.stripColors(map.name()).replace(' ', '_');
+                        String mapName = map.plainName().replace(' ', '_');
                         if(map.custom){
                             info("  @ (@): &fiCustom / @x@", mapName, map.file.name(), map.width, map.height);
                         }else{
@@ -443,7 +443,7 @@ public class ServerControl implements ApplicationListener{
                 info("Status: &rserver closed");
             }else{
                 info("Status:");
-                info("  Playing on map &fi@ / Wave @", Strings.capitalize(Strings.stripColors(state.map.name())), state.wave);
+                info("  Playing on map &fi@ / Wave @", Strings.capitalize(state.map.plainName()), state.wave);
 
                 if(state.rules.waves){
                     info("  @ seconds until next wave.", (int)(state.wavetime / 60));
@@ -733,10 +733,10 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("nextmap", "<mapname...>", "Set the next map to be played after a game-over. Overrides shuffling.", arg -> {
-            Map res = maps.all().find(map -> Strings.stripColors(map.name().replace('_', ' ')).equalsIgnoreCase(Strings.stripColors(arg[0]).replace('_', ' ')));
+            Map res = maps.all().find(map -> map.plainName().replace('_', ' ').equalsIgnoreCase(Strings.stripColors(arg[0]).replace('_', ' ')));
             if(res != null){
                 nextMapOverride = res;
-                info("Next map set to '@'.", Strings.stripColors(res.name()));
+                info("Next map set to '@'.", res.plainName());
             }else{
                 err("No map '@' found.", arg[0]);
             }
@@ -1075,7 +1075,7 @@ public class ServerControl implements ApplicationListener{
                     try{
                         r.run();
                     }catch(MapException e){
-                        err(e.map.name() + ": " + e.getMessage());
+                        err(e.map.plainName() + ": " + e.getMessage());
                         net.closeServer();
                     }
                 }

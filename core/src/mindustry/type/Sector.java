@@ -121,7 +121,7 @@ public class Sector{
         return save != null && (info.waves || info.attack) && info.hasCore;
     }
 
-    /** @return whether the player has a base here. */
+    /** @return whether the player has a base (active save with a core) here. */
     public boolean hasBase(){
         return save != null && info.hasCore && !(Vars.state.isGame() && Vars.state.rules.sector == this && state.gameOver);
     }

@@ -10,12 +10,14 @@ import arc.scene.ui.ImageButton.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
 import mindustry.net.*;
 import mindustry.net.Packets.*;
 import mindustry.ui.*;
+import mindustry.ui.dialogs.*;
 
 import static mindustry.Vars.*;
 
@@ -156,51 +158,104 @@ public class PlayerListFragment{
                 imageOverColor = Color.lightGray;
             }};
 
-            if((net.server() || player.admin) && !user.isLocal() && (!user.admin || net.server())){
+            if(net.server() || (player.admin && (!user.admin || user == player))){
                 button.add().growY();
 
-                float bs = (h) / 2f;
+                button.button(Icon.menu, ustyle, () -> {
+                    var dialog = new BaseDialog(user.coloredName());
 
-                button.table(t -> {
-                    t.defaults().size(bs);
+                    dialog.title.setColor(Color.white);
+                    dialog.titleTable.remove();
 
-                    t.button(Icon.hammerSmall, ustyle,
-                    () -> ui.showConfirm("@confirm", Core.bundle.format("confirmban",  user.name()), () -> Call.adminRequest(user, AdminAction.ban)));
-                    t.button(Icon.cancelSmall, ustyle,
-                    () -> ui.showConfirm("@confirm", Core.bundle.format("confirmkick",  user.name()), () -> Call.adminRequest(user, AdminAction.kick)));
+                    dialog.closeOnBack();
 
-                    t.row();
+                    var bstyle = Styles.defaultt;
 
-                    t.button(Icon.adminSmall, style, () -> {
-                        if(net.client()) return;
+                    dialog.cont.add(user.coloredName()).row();
+                    dialog.cont.image(Tex.whiteui, Pal.accent).fillX().height(3f).pad(4f).row();
 
-                        String id = user.uuid();
+                    dialog.cont.pane(t -> {
+                        t.defaults().size(220f, 55f).pad(3f);
 
-                        if(user.admin){
-                            ui.showConfirm("@confirm", Core.bundle.format("confirmunadmin",  user.name()), () -> {
-                                netServer.admins.unAdminPlayer(id);
-                                user.admin = false;
-                            });
-                        }else{
-                            ui.showConfirm("@confirm", Core.bundle.format("confirmadmin",  user.name()), () -> {
-                                netServer.admins.adminPlayer(id, user.usid());
-                                user.admin = true;
-                            });
+                        if(user != player){
+                            t.button("@player.ban", Icon.hammer, bstyle, () -> {
+                                ui.showConfirm("@confirm", Core.bundle.format("confirmban",  user.name()), () -> Call.adminRequest(user, AdminAction.ban, null));
+                                dialog.hide();
+                            }).row();
+
+                            t.button("@player.kick", Icon.cancel, bstyle, () -> {
+                                ui.showConfirm("@confirm", Core.bundle.format("confirmkick",  user.name()), () -> Call.adminRequest(user, AdminAction.kick, null));
+                                dialog.hide();
+                            }).row();
                         }
-                    }).update(b -> b.setChecked(user.admin))
-                        .disabled(b -> net.client())
-                        .touchable(() -> net.client() ? Touchable.disabled : Touchable.enabled)
-                        .checked(user.admin);
 
-                    t.button(Icon.zoomSmall, ustyle, () -> Call.adminRequest(user, AdminAction.trace));
+                        if(!user.isLocal()){
+                            t.button("@player.trace", Icon.zoom, bstyle, () -> {
+                                Call.adminRequest(user, AdminAction.trace, null);
+                                dialog.hide();
+                            }).row();
+                        }
 
-                }).padRight(12).size(bs + 10f, bs);
+                        t.button("@player.team", Icon.redo, bstyle, () -> {
+                            var teamSelect = new BaseDialog(Core.bundle.get("player.team") + ": " + user.name);
+                            teamSelect.setFillParent(false);
+
+                            var group = new ButtonGroup<>();
+
+                            int i = 0;
+
+                            for(Team team : Team.baseTeams){
+                                var b = new ImageButton(Tex.whiteui, Styles.clearNoneTogglei);
+                                b.margin(4f);
+                                b.getImageCell().grow();
+                                b.getStyle().imageUpColor = team.color;
+                                b.clicked(() -> {
+                                    Call.adminRequest(user, AdminAction.switchTeam, team);
+                                    teamSelect.hide();
+                                });
+                                teamSelect.cont.add(b).size(50f).checked(a -> user.team() == team).group(group);
+
+                                if(i++ % 3 == 2) teamSelect.cont.row();
+                            }
+
+                            teamSelect.addCloseButton();
+                            teamSelect.show();
+
+                            dialog.hide();
+                        }).row();
+
+                        if(!net.client() && !user.isLocal()){
+                            t.button("@player.admin", Icon.admin, Styles.togglet, () -> {
+                                dialog.hide();
+                                String id = user.uuid();
+
+                                if(user.admin){
+                                    ui.showConfirm("@confirm", Core.bundle.format("confirmunadmin",  user.name()), () -> {
+                                        netServer.admins.unAdminPlayer(id);
+                                        user.admin = false;
+                                    });
+                                }else{
+                                    ui.showConfirm("@confirm", Core.bundle.format("confirmadmin",  user.name()), () -> {
+                                        netServer.admins.adminPlayer(id, user.usid());
+                                        user.admin = true;
+                                    });
+                                }
+                            }).checked(b -> user.admin).row();
+                        }
+                    }).row();
+
+                    dialog.cont.button("@back", Icon.left, dialog::hide).padTop(-1f).size(220f, 55f);
+
+                    dialog.show();
+
+
+                }).size(h);
             }else if(!user.isLocal() && !user.admin && net.client() && Groups.player.size() >= 3 && player.team() == user.team()){ //votekick
                 button.add().growY();
 
                 button.button(Icon.hammer, ustyle,
-                    () -> ui.showConfirm("@confirm", Core.bundle.format("confirmvotekick",  user.name()),
-                    () -> Call.sendChatMessage("/votekick #" + user.id)))
+                    () -> ui.showTextInput("@votekick.reason", Core.bundle.format("votekick.reason.message", user.name()), "",
+                    reason -> Call.sendChatMessage("/votekick #" + user.id + " " + reason)))
                 .size(h);
             }
 

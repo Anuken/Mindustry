@@ -355,6 +355,12 @@ public class NetClient implements ApplicationListener{
         state.rules.objectives = executor;
     }
 
+    @Remote(called = Loc.server)
+    public static void objectiveCompleted(String[] flagsRemoved, String[] flagsAdded){
+        state.rules.objectiveFlags.removeAll(flagsRemoved);
+        state.rules.objectiveFlags.addAll(flagsAdded);
+    }
+
     @Remote(variants = Variant.both)
     public static void worldDataBegin(){
         Groups.clear();

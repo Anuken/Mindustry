@@ -320,6 +320,7 @@ public class World{
 
         state.rules.cloudColor = sector.planet.landCloudColor;
         state.rules.env = sector.planet.defaultEnv;
+        state.rules.planet = sector.planet;
         state.rules.hiddenBuildItems.clear();
         state.rules.hiddenBuildItems.addAll(sector.planet.hiddenItems);
         sector.planet.applyRules(state.rules);
@@ -365,8 +366,8 @@ public class World{
 
         if(!headless){
             if(state.teams.cores(checkRules.defaultTeam).size == 0 && !checkRules.pvp){
-                ui.showErrorMessage(Core.bundle.format("map.nospawn", checkRules.defaultTeam.color, checkRules.defaultTeam.localized()));
                 invalidMap = true;
+                ui.showErrorMessage(Core.bundle.format("map.nospawn", checkRules.defaultTeam.coloredName()));
             }else if(checkRules.pvp){ //pvp maps need two cores to be valid
                 if(state.teams.getActive().count(TeamData::hasCore) < 2){
                     invalidMap = true;
@@ -375,7 +376,7 @@ public class World{
             }else if(checkRules.attackMode){ //attack maps need two cores to be valid
                 invalidMap = state.rules.waveTeam.data().noCores();
                 if(invalidMap){
-                    ui.showErrorMessage(Core.bundle.format("map.nospawn.attack", checkRules.waveTeam.color, checkRules.waveTeam.localized()));
+                    ui.showErrorMessage(Core.bundle.format("map.nospawn.attack", checkRules.waveTeam.coloredName()));
                 }
             }
         }else{

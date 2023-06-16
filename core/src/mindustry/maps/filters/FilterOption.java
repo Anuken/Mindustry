@@ -10,7 +10,6 @@ import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
-import mindustry.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.ui.*;
@@ -108,9 +107,8 @@ public abstract class FilterOption{
                 .setRegion(supplier.get() == Blocks.air ? Icon.none.getRegion() : supplier.get().uiIcon)).size(iconSmall), () -> {
                 BaseDialog dialog = new BaseDialog("@filter.option." + name);
                 dialog.cont.pane(t -> {
-                    t.margin(14f);
                     int i = 0;
-                    for(Block block : Vars.content.blocks()){
+                    for(Block block : content.blocks()){
                         if(!filter.get(block)) continue;
 
                         t.image(block == Blocks.air ? Icon.none.getRegion() : block.uiIcon).size(iconMed).pad(3).tooltip(block == Blocks.air ? "@none" : block.localizedName).get().clicked(() -> {

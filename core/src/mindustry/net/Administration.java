@@ -624,14 +624,17 @@ public class Administration{
         public String ip, uuid;
         public boolean modded, mobile;
         public int timesJoined, timesKicked;
+        public String[] ips, names;
 
-        public TraceInfo(String ip, String uuid, boolean modded, boolean mobile, int timesJoined, int timesKicked){
+        public TraceInfo(String ip, String uuid, boolean modded, boolean mobile, int timesJoined, int timesKicked, String[] ips, String[] names){
             this.ip = ip;
             this.uuid = uuid;
             this.modded = modded;
             this.mobile = mobile;
             this.timesJoined = timesJoined;
             this.timesKicked = timesKicked;
+            this.names = names;
+            this.ips = ips;
         }
     }
 

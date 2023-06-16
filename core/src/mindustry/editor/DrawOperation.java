@@ -56,7 +56,9 @@ public class DrawOperation{
     void setTile(Tile tile, byte type, short to){
         editor.load(() -> {
             if(type == OpType.floor.ordinal()){
-                tile.setFloor((Floor)content.block(to));
+                if(content.block(to) instanceof Floor floor){
+                    tile.setFloor(floor);
+                }
             }else if(type == OpType.block.ordinal()){
                 tile.getLinkedTiles(t -> editor.renderer.updatePoint(t.x, t.y));
 
