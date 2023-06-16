@@ -37,7 +37,7 @@ public class BuildPlan implements Position, QuadTreeObject{
     public BuildPlan(int x, int y, int rotation, Block block){
         this.x = x;
         this.y = y;
-        this.rotation = rotation;
+        this.rotation = block.planRotation(rotation);
         this.block = block;
         this.breaking = false;
     }
@@ -46,7 +46,7 @@ public class BuildPlan implements Position, QuadTreeObject{
     public BuildPlan(int x, int y, int rotation, Block block, Object config){
         this.x = x;
         this.y = y;
-        this.rotation = rotation;
+        this.rotation = block.planRotation(rotation);
         this.block = block;
         this.breaking = false;
         this.config = config;
@@ -138,7 +138,7 @@ public class BuildPlan implements Position, QuadTreeObject{
     public BuildPlan set(int x, int y, int rotation, Block block){
         this.x = x;
         this.y = y;
-        this.rotation = rotation;
+        this.rotation = block.planRotation(rotation);
         this.block = block;
         this.breaking = false;
         return this;

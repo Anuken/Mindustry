@@ -1343,9 +1343,14 @@ public class Block extends UnlockableContent implements Senseable{
         packer.add(PageType.editor, name + "-icon-editor", editorBase);
     }
 
+    public int planRotation(int rot){
+        if(!rotate) return 0;
+        return rot;
+    }
+
     public void flipRotation(BuildPlan req, boolean x){
         if((x == (req.rotation % 2 == 0)) != invertFlip){
-            req.rotation = Mathf.mod(req.rotation + 2, 4);
+            req.rotation = planRotation(Mathf.mod(req.rotation + 2, 4));
         }
     }
 
