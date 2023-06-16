@@ -106,8 +106,6 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean underBullets;
     /** whether this is rotatable */
     public boolean rotate;
-    /** if rotate is false and this is true, building rotation is set to 0 regardless of player input */
-    public boolean lockRotation;
     /** if rotate is true and this is false, the region won't rotate when drawing */
     public boolean rotateDraw = true;
     /** if true, schematic flips with this block are inverted. */
@@ -1344,7 +1342,7 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     public int planRotation(int rot){
-        if(!rotate && lockRotation) return 0;
+        if(!rotate) return 0;
         return rot;
     }
 
