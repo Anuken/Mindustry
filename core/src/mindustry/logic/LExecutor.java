@@ -322,7 +322,14 @@ public class LExecutor{
                         cache.found = false;
                         exec.setnum(outFound, 0);
                     }
-                    exec.setobj(outBuild, res != null && res.build != null && res.build.team == exec.team ? cache.build = res.build : null);
+                    
+                    if(res != null && res.build != null && 
+                        (unit.within(res.build.x, res.build.y, Math.max(unit.range(), buildingRange)) || res.build.team == exec.team)){
+                        cache.build = res.build;
+                        exec.setobj(outBuild, res.build);
+                    }else{
+                        exec.setobj(outBuild, null);
+                    }
                 }else{
                     exec.setobj(outBuild, cache.build);
                     exec.setbool(outFound, cache.found);
