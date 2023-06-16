@@ -201,7 +201,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         //rotate button
         table.button(Icon.right, Styles.clearNoneTogglei, () -> {
-            if(block != null && block.rotate){
+            if(block != null && block.rotate && block.quickRotate){
                 rotation = Mathf.mod(rotation + 1, 4);
             }else{
                 schematicMode = !schematicMode;
@@ -359,7 +359,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 //draw placing
                 for(int i = 0; i < linePlans.size; i++){
                     BuildPlan plan = linePlans.get(i);
-                    if(i == linePlans.size - 1 && plan.block.rotate){
+                    if(i == linePlans.size - 1 && plan.block.rotate && plan.block.drawArrow){
                         drawArrow(block, plan.x, plan.y, plan.rotation);
                     }
                     plan.block.drawPlan(plan, allPlans(), validPlace(plan.x, plan.y, plan.block, plan.rotation) && getPlan(plan.x, plan.y, plan.block.size, null) == null);

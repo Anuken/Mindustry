@@ -132,7 +132,7 @@ public class DesktopInput extends InputHandler{
         //draw plan being moved
         if(splan != null){
             boolean valid = validPlace(splan.x, splan.y, splan.block, splan.rotation, splan);
-            if(splan.block.rotate){
+            if(splan.block.rotate && splan.block.drawArrow){
                 drawArrow(splan.block, splan.x, splan.y, splan.rotation, valid);
             }
 
@@ -171,7 +171,7 @@ public class DesktopInput extends InputHandler{
             if(mode == placing && block != null){
                 for(int i = 0; i < linePlans.size; i++){
                     var plan = linePlans.get(i);
-                    if(i == linePlans.size - 1 && plan.block.rotate){
+                    if(i == linePlans.size - 1 && plan.block.rotate && plan.block.drawArrow){
                         drawArrow(block, plan.x, plan.y, plan.rotation);
                     }
                     drawPlan(linePlans.get(i));
