@@ -593,11 +593,6 @@ public class CoreBlock extends StorageBlock{
 
             state.teams.unregisterCore(this);
 
-            int max = itemCapacity * state.teams.cores(team).size;
-            for(Item item : content.items()){
-                items.set(item, Math.min(items.get(item), max));
-            }
-
             for(CoreBuild other : state.teams.cores(team)){
                 other.onProximityUpdate();
             }

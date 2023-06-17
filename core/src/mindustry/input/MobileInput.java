@@ -201,7 +201,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         //rotate button
         table.button(Icon.right, Styles.clearNoneTogglei, () -> {
-            if(block != null && block.rotate){
+            if(block != null && block.rotate && block.quickRotate){
                 rotation = Mathf.mod(rotation + 1, 4);
             }else{
                 schematicMode = !schematicMode;
@@ -359,7 +359,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 //draw placing
                 for(int i = 0; i < linePlans.size; i++){
                     BuildPlan plan = linePlans.get(i);
-                    if(i == linePlans.size - 1 && plan.block.rotate){
+                    if(i == linePlans.size - 1 && plan.block.rotate && plan.block.drawArrow){
                         drawArrow(block, plan.x, plan.y, plan.rotation);
                     }
                     plan.block.drawPlan(plan, allPlans(), validPlace(plan.x, plan.y, plan.block, plan.rotation) && getPlan(plan.x, plan.y, plan.block.size, null) == null);
@@ -415,9 +415,10 @@ public class MobileInput extends InputHandler implements GestureListener{
 
             //draw last placed plan
             if(!plan.breaking && plan == lastPlaced && plan.block != null){
-                boolean valid = validPlace(tile.x, tile.y, plan.block, rotation);
+                int rot = block.planRotation(rotation);
+                boolean valid = validPlace(tile.x, tile.y, plan.block, rot);
                 Draw.mixcol();
-                plan.block.drawPlace(tile.x, tile.y, rotation, valid);
+                plan.block.drawPlace(tile.x, tile.y, rot, valid);
 
                 drawOverlapCheck(plan.block, tile.x, tile.y, valid);
             }

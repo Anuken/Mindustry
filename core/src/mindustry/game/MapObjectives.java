@@ -193,8 +193,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         /** Called once after {@link #update()} returns true, before this objective is removed. */
         public void done(){
             changed();
-            state.rules.objectiveFlags.removeAll(flagsRemoved);
-            state.rules.objectiveFlags.addAll(flagsAdded);
+            Call.objectiveCompleted(flagsRemoved, flagsAdded);
         }
 
         /** Notifies the executor that map rules should be synced. */
@@ -206,12 +205,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public final boolean dependencyFinished(){
             if(depFinished) return true;
 
-            boolean f = true;
             for(var parent : parents){
                 if(!parent.isCompleted()) return false;
             }
 
-            return f && (depFinished = true);
+            return depFinished = true;
         }
 
         /** @return True if this objective is done (practically, has been removed from the executor). */

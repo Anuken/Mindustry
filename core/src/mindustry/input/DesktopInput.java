@@ -132,7 +132,7 @@ public class DesktopInput extends InputHandler{
         //draw plan being moved
         if(splan != null){
             boolean valid = validPlace(splan.x, splan.y, splan.block, splan.rotation, splan);
-            if(splan.block.rotate){
+            if(splan.block.rotate && splan.block.drawArrow){
                 drawArrow(splan.block, splan.x, splan.y, splan.rotation, valid);
             }
 
@@ -171,24 +171,25 @@ public class DesktopInput extends InputHandler{
             if(mode == placing && block != null){
                 for(int i = 0; i < linePlans.size; i++){
                     var plan = linePlans.get(i);
-                    if(i == linePlans.size - 1 && plan.block.rotate){
+                    if(i == linePlans.size - 1 && plan.block.rotate && plan.block.drawArrow){
                         drawArrow(block, plan.x, plan.y, plan.rotation);
                     }
                     drawPlan(linePlans.get(i));
                 }
                 linePlans.each(this::drawOverPlan);
             }else if(isPlacing()){
+                int rot = block.planRotation(rotation);
                 if(block.rotate && block.drawArrow){
-                    drawArrow(block, cursorX, cursorY, rotation);
+                    drawArrow(block, cursorX, cursorY, rot);
                 }
                 Draw.color();
-                boolean valid = validPlace(cursorX, cursorY, block, rotation);
-                drawPlan(cursorX, cursorY, block, rotation);
-                block.drawPlace(cursorX, cursorY, rotation, valid);
+                boolean valid = validPlace(cursorX, cursorY, block, rot);
+                drawPlan(cursorX, cursorY, block, rot);
+                block.drawPlace(cursorX, cursorY, rot, valid);
 
                 if(block.saveConfig){
                     Draw.mixcol(!valid ? Pal.breakInvalid : Color.white, (!valid ? 0.4f : 0.24f) + Mathf.absin(Time.globalTime, 6f, 0.28f));
-                    bplan.set(cursorX, cursorY, rotation, block);
+                    bplan.set(cursorX, cursorY, rot, block);
                     bplan.config = block.lastConfig;
                     block.drawPlanConfig(bplan, allPlans());
                     bplan.config = null;

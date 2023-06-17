@@ -790,7 +790,7 @@ public class SchematicsDialog extends BaseDialog{
             }
 
             buttons.clearChildren();
-            buttons.defaults().size(210f, 64f);
+            buttons.defaults().size(Core.graphics.isPortrait() ? 150f : 210f, 64f);
             buttons.button("@back", Icon.left, this::hide);
             buttons.button("@editor.export", Icon.upload, () -> showExport(schem));
             buttons.button("@schematic.edit", Icon.edit, () -> showEdit(schem));

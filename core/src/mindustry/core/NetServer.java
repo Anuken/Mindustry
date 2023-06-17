@@ -784,7 +784,7 @@ public class NetServer implements ApplicationListener{
     }
 
     @Remote(targets = Loc.client, called = Loc.server)
-    public static void adminRequest(Player player, Player other, AdminAction action){
+    public static void adminRequest(Player player, Player other, AdminAction action, Object params){
         if(!player.admin && !player.isLocal()){
             warn("ACCESS DENIED: Player @ / @ attempted to perform admin action '@' on '@' without proper security access.",
             player.plainName(), player.con == null ? "null" : player.con.address, action.name(), other == null ? null : other.plainName());
@@ -798,28 +798,38 @@ public class NetServer implements ApplicationListener{
 
         Events.fire(new EventType.AdminRequestEvent(player, other, action));
 
-        if(action == AdminAction.wave){
-            //no verification is done, so admins can hypothetically spam waves
-            //not a real issue, because server owners may want to do just that
-            logic.skipWave();
-            info("&lc@ &fi&lk[&lb@&fi&lk]&fb has skipped the wave.", player.plainName(), player.uuid());
-        }else if(action == AdminAction.ban){
-            netServer.admins.banPlayerID(other.con.uuid);
-            netServer.admins.banPlayerIP(other.con.address);
-            other.kick(KickReason.banned);
-            info("&lc@ &fi&lk[&lb@&fi&lk]&fb has banned @ &fi&lk[&lb@&fi&lk]&fb.", player.plainName(), player.uuid(), other.plainName(), other.uuid());
-        }else if(action == AdminAction.kick){
-            other.kick(KickReason.kick);
-            info("&lc@ &fi&lk[&lb@&fi&lk]&fb has kicked @ &fi&lk[&lb@&fi&lk]&fb.", player.plainName(), player.uuid(), other.plainName(), other.uuid());
-        }else if(action == AdminAction.trace){
-            PlayerInfo stats = netServer.admins.getInfo(other.uuid());
-            TraceInfo info = new TraceInfo(other.con.address, other.uuid(), other.con.modclient, other.con.mobile, stats.timesJoined, stats.timesKicked);
-            if(player.con != null){
-                Call.traceInfo(player.con, other, info);
-            }else{
-                NetClient.traceInfo(other, info);
+        switch(action){
+            case wave -> {
+                //no verification is done, so admins can hypothetically spam waves
+                //not a real issue, because server owners may want to do just that
+                logic.skipWave();
+                info("&lc@ &fi&lk[&lb@&fi&lk]&fb has skipped the wave.", player.plainName(), player.uuid());
             }
-            info("&lc@ &fi&lk[&lb@&fi&lk]&fb has requested trace info of @ &fi&lk[&lb@&fi&lk]&fb.", player.plainName(), player.uuid(), other.plainName(), other.uuid());
+            case ban -> {
+                netServer.admins.banPlayerID(other.con.uuid);
+                netServer.admins.banPlayerIP(other.con.address);
+                other.kick(KickReason.banned);
+                info("&lc@ &fi&lk[&lb@&fi&lk]&fb has banned @ &fi&lk[&lb@&fi&lk]&fb.", player.plainName(), player.uuid(), other.plainName(), other.uuid());
+            }
+            case kick -> {
+                other.kick(KickReason.kick);
+                info("&lc@ &fi&lk[&lb@&fi&lk]&fb has kicked @ &fi&lk[&lb@&fi&lk]&fb.", player.plainName(), player.uuid(), other.plainName(), other.uuid());
+            }
+            case trace -> {
+                PlayerInfo stats = netServer.admins.getInfo(other.uuid());
+                TraceInfo info = new TraceInfo(other.con.address, other.uuid(), other.con.modclient, other.con.mobile, stats.timesJoined, stats.timesKicked, stats.ips.toArray(String.class), stats.names.toArray(String.class));
+                if(player.con != null){
+                    Call.traceInfo(player.con, other, info);
+                }else{
+                    NetClient.traceInfo(other, info);
+                }
+                info("&lc@ &fi&lk[&lb@&fi&lk]&fb has requested trace info of @ &fi&lk[&lb@&fi&lk]&fb.", player.plainName(), player.uuid(), other.plainName(), other.uuid());
+            }
+            case switchTeam -> {
+                if(params instanceof Team team){
+                    other.team(team);
+                }
+            }
         }
     }
 
