@@ -128,6 +128,9 @@ public class TypeIO{
             for(Object obj : objs){
                 writeObject(write, obj);
             }
+        }else if(object instanceof UnitCommand command){
+            write.b(23);
+            write.s(command.id);
         }else{
             throw new IllegalArgumentException("Unknown object type: " + object.getClass());
         }
@@ -200,6 +203,7 @@ public class TypeIO{
                 for(int i = 0; i < objlen; i++) objs[i] = readObjectBoxed(read, box);
                 yield objs;
             }
+            case 23 -> UnitCommand.all.get(read.us());
             default -> throw new IllegalArgumentException("Unknown object type: " + type);
         };
     }

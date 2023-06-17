@@ -890,6 +890,11 @@ public class Block extends UnlockableContent implements Senseable{
 
     }
 
+    /** Called when building of this block begins. */
+    public void placeBegan(Tile tile, Block previous, @Nullable Unit builder){
+        placeBegan(tile, previous);
+    }
+
     /** Called right before building of this block begins. */
     public void beforePlaceBegan(Tile tile, Block previous){
 
