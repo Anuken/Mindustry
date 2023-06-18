@@ -415,7 +415,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
             //draw last placed plan
             if(!plan.breaking && plan == lastPlaced && plan.block != null){
-                int rot = block == null ? rotation : block.planRotation(rotation);
+                int rot = plan.block.planRotation(rotation);
                 boolean valid = validPlace(tile.x, tile.y, plan.block, rot);
                 Draw.mixcol();
                 plan.block.drawPlace(tile.x, tile.y, rot, valid);
