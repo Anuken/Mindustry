@@ -5,12 +5,12 @@ import arc.*;
 public class ServerGroup{
     public String name;
     public String[] addresses;
-    public boolean priority = false;
+    public boolean prioritized = false;
 
-    public ServerGroup(String name, String[] addresses, boolean priority){
+    public ServerGroup(String name, String[] addresses, boolean prioritized){
         this.name = name;
         this.addresses = addresses;
-        this.priority = priority;
+        this.prioritized = prioritized;
     }
 
     public ServerGroup(String name, String[] addresses){
@@ -29,6 +29,6 @@ public class ServerGroup{
     }
 
     String key(){
-        return "server-" + (priority ? "priority-" : "") + (name.isEmpty() ? addresses.length == 0 ? "" : addresses[0] : name);
+        return "server-" + (name.isEmpty() ? addresses.length == 0 ? "" : addresses[0] : name);
     }
 }
