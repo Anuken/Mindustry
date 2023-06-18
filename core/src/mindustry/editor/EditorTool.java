@@ -106,7 +106,7 @@ public enum EditorTool{
 
             if(tile == null) return;
 
-            if(editor.drawBlock.isMultiblock()){
+            if(editor.drawBlock.isMultiblock() && (mode == 0 || mode == -1)){
                 //don't fill multiblocks, thanks
                 pencil.touched(x, y);
                 return;
