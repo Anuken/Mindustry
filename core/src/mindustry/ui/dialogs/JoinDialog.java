@@ -417,6 +417,9 @@ public class JoinDialog extends BaseDialog{
 
             Table[] groupTable = {null, null};
 
+            if(group.priority){
+                addHeader(groupTable, group, hidden);
+            }
             //table containing all groups
             for(String address : group.addresses){
                 String resaddress = address.contains(":") ? address.split(":")[0] : address;
@@ -432,27 +435,7 @@ public class JoinDialog extends BaseDialog{
 
                     //add header
                     if(groupTable[0] == null){
-                        global.table(t -> groupTable[0] = t).fillX().left().row();
-
-                        groupTable[0].table(head -> {
-                            if(!group.name.isEmpty()){
-                                head.add(group.name).color(Color.lightGray).padRight(4);
-                            }
-                            head.image().height(3f).growX().color(Color.lightGray);
-
-                            //button for showing/hiding servers
-                            ImageButton[] image = {null};
-                            image[0] = head.button(hidden ? Icon.eyeOffSmall : Icon.eyeSmall, Styles.grayi, () -> {
-                               group.setHidden(!group.hidden());
-                               image[0].getStyle().imageUp = group.hidden() ? Icon.eyeOffSmall : Icon.eyeSmall;
-                               if(group.hidden() && !showHidden){
-                                   groupTable[0].remove();
-                               }
-                            }).size(40f).get();
-                            image[0].addListener(new Tooltip(t -> t.background(Styles.black6).margin(4).label(() -> !group.hidden() ? "@server.shown" : "@server.hidden")));
-                        }).width(targetWidth() * columns()).padBottom(-2).row();
-
-                        groupTable[1] = groupTable[0].row().table().top().left().grow().get();
+                        addHeader(groupTable, group, hidden);
                     }
 
                     addCommunityHost(res, groupTable[1]);
@@ -462,6 +445,31 @@ public class JoinDialog extends BaseDialog{
                 }, e -> {});
             }
         }
+    }
+
+    void addHeader(Table[] groupTable, ServerGroup group, boolean hidden){ // outlined separately
+        global.table(t -> groupTable[0] = t).fillX().left().row();
+
+        groupTable[0].table(head -> {
+            Color col = group.priority ? Pal.accent : Color.lightGray;
+            if(!group.name.isEmpty()){
+                head.add(group.name).color(col).padRight(4);
+            }
+            head.image().height(3f).growX().color(col);
+
+            //button for showing/hiding servers
+            ImageButton[] image = {null};
+            image[0] = head.button(hidden ? Icon.eyeOffSmall : Icon.eyeSmall, Styles.grayi, () -> {
+               group.setHidden(!group.hidden());
+               image[0].getStyle().imageUp = group.hidden() ? Icon.eyeOffSmall : Icon.eyeSmall;
+               if(group.hidden() && !showHidden){
+                   groupTable[0].remove();
+               }
+            }).size(40f).get();
+            image[0].addListener(new Tooltip(t -> t.background(Styles.black6).margin(4).label(() -> !group.hidden() ? "@server.shown" : "@server.hidden")));
+        }).width(targetWidth() * columns()).padBottom(-2).row();
+
+        groupTable[1] = groupTable[0].row().table().top().left().grow().get();
     }
 
     int columns(){
@@ -604,13 +612,14 @@ public class JoinDialog extends BaseDialog{
             Seq<ServerGroup> servers = new Seq<>();
             val.asArray().each(child -> {
                 String name = child.getString("name", "");
+                String priority = child.getString("priority", "false");
                 String[] addresses;
                 if(child.has("addresses") || (child.has("address") && child.get("address").isArray())){
                     addresses = (child.has("addresses") ? child.get("addresses") : child.get("address")).asArray().map(Jval::asString).toArray(String.class);
                 }else{
                     addresses = new String[]{child.getString("address", "<invalid>")};
                 }
-                servers.add(new ServerGroup(name, addresses));
+                servers.add(new ServerGroup(name, addresses, priority.equals("true")));
             });
             //modify default servers on main thread
             Core.app.post(() -> {
