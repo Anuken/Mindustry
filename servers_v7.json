@@ -174,5 +174,9 @@
   {
     "name": "CreateDustry",
     "address": ["95.216.68.161:55639"]
+  },
+  {
+    "name": "Official Mindustry Events",
+    "address": ["event.baseduser.eu.org"]
   }
 ]
