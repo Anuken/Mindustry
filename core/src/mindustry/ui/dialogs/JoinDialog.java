@@ -417,7 +417,7 @@ public class JoinDialog extends BaseDialog{
 
             Table[] groupTable = {null, null};
 
-            if(group.priority){
+            if(group.prioritized){
                 addHeader(groupTable, group, hidden);
             }
             //table containing all groups
@@ -451,7 +451,7 @@ public class JoinDialog extends BaseDialog{
         global.table(t -> groupTable[0] = t).fillX().left().row();
 
         groupTable[0].table(head -> {
-            Color col = group.priority ? Pal.accent : Color.lightGray;
+            Color col = group.prioritized ? Pal.accent : Color.lightGray;
             if(!group.name.isEmpty()){
                 head.add(group.name).color(col).padRight(4);
             }
@@ -612,14 +612,14 @@ public class JoinDialog extends BaseDialog{
             Seq<ServerGroup> servers = new Seq<>();
             val.asArray().each(child -> {
                 String name = child.getString("name", "");
-                String priority = child.getString("priority", "false");
+                boolean prioritized = child.getBool("prioritized", false);
                 String[] addresses;
                 if(child.has("addresses") || (child.has("address") && child.get("address").isArray())){
                     addresses = (child.has("addresses") ? child.get("addresses") : child.get("address")).asArray().map(Jval::asString).toArray(String.class);
                 }else{
                     addresses = new String[]{child.getString("address", "<invalid>")};
                 }
-                servers.add(new ServerGroup(name, addresses, priority.equals("true")));
+                servers.add(new ServerGroup(name, addresses, prioritized));
             });
             //modify default servers on main thread
             Core.app.post(() -> {

@@ -178,6 +178,6 @@
   {
     "name": "Official Mindustry Events",
     "address": ["event.baseduser.eu.org"],
-    "priority": "true"
+    "prioritized": "true"
   }
 ]
