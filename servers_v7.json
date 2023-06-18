@@ -177,6 +177,7 @@
   },
   {
     "name": "Official Mindustry Events",
-    "address": ["event.baseduser.eu.org"]
+    "address": ["event.baseduser.eu.org"],
+    "priority": "true"
   }
 ]
