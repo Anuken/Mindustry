@@ -178,7 +178,7 @@ public class DesktopInput extends InputHandler{
                 }
                 linePlans.each(this::drawOverPlan);
             }else if(isPlacing()){
-                int rot = block.planRotation(rotation);
+                int rot = block == null ? rotation : block.planRotation(rotation);
                 if(block.rotate && block.drawArrow){
                     drawArrow(block, cursorX, cursorY, rot);
                 }
