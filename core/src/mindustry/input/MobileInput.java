@@ -1036,7 +1036,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                     }
 
                     if(allowHealing && target == null){
-                        target = Geometry.findClosest(unit.x, unit.y, indexer.getDamaged(Team.sharded));
+                        target = Geometry.findClosest(unit.x, unit.y, indexer.getDamaged(player.team()));
                         if(target != null && !unit.within(target, range)){
                             target = null;
                         }
