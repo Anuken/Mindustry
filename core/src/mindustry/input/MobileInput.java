@@ -201,7 +201,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         //rotate button
         table.button(Icon.right, Styles.clearNoneTogglei, () -> {
-            if(block != null && block.rotate && block.quickRotate){
+            if(block != null && block.rotate){
                 rotation = Mathf.mod(rotation + 1, 4);
             }else{
                 schematicMode = !schematicMode;

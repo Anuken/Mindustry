@@ -7,7 +7,6 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -286,9 +285,6 @@ public class ControlPathfinder{
                         float angleToDest = unit.angleTo(tile);
                         //force recalculate when the unit moves backwards
                         if(Angles.angleDist(angleToNext, angleToDest) > 80f && !unit.within(tile, 1f)){
-                            if(showDebug){
-                                Fx.placeBlock.at(unit, 1f);
-                            }
                             req.forceRecalculate();
                         }
                     }
