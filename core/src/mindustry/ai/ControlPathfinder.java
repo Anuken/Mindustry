@@ -50,7 +50,8 @@ public class ControlPathfinder{
 
     costLegs = (team, tile) ->
     PathTile.legSolid(tile) ? impassable : 1 +
-    (PathTile.deep(tile) ? 6000 : 0),
+    (PathTile.deep(tile) ? 6000 : 0) +
+    (PathTile.solid(tile) ? 2 : 0),
 
     costNaval = (team, tile) ->
     //impassable same-team neutral block, or non-liquid
