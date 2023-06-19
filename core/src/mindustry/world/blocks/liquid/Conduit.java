@@ -188,7 +188,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
             int gas = liquids.current().gas ? 1 : 0;
             float ox = 0f, oy = 0f;
             int wrapRot = (rotation + offset) % 4;
-            TextureRegion liquidr = bits == 1 ? rotateRegions[wrapRot][gas][frame] : renderer.fluidFrames[gas][frame];
+            TextureRegion liquidr = bits == 1 && padCorners ? rotateRegions[wrapRot][gas][frame] : renderer.fluidFrames[gas][frame];
 
             if(bits == 1 && padCorners){
                 ox = rotateOffsets[wrapRot][0];
