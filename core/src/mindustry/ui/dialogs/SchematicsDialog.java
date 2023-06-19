@@ -422,7 +422,7 @@ public class SchematicsDialog extends BaseDialog{
                     }
 
                     for(ContentType ctype : defaultContentIcons){
-                        var all = content.getBy(ctype).<UnlockableContent>as().filter(u -> !u.isHidden() && u.unlockedNow() && u.hasEmoji());
+                        var all = content.getBy(ctype).<UnlockableContent>as().select(u -> !u.isHidden() && u.unlockedNow() && u.hasEmoji());
 
                         t.row();
                         if(all.count(u -> !tags.contains(u.emoji())) > 0) t.image().colspan(cols).growX().width(Float.NEGATIVE_INFINITY).height(3f).color(Pal.accent);
