@@ -7,6 +7,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -51,7 +52,7 @@ public class ControlPathfinder{
     costLegs = (team, tile) ->
     PathTile.legSolid(tile) ? impassable : 1 +
     (PathTile.deep(tile) ? 6000 : 0) +
-    (PathTile.solid(tile) ? 2 : 0),
+    (PathTile.nearLegSolid(tile) ? 3 : 0),
 
     costNaval = (team, tile) ->
     //impassable same-team neutral block, or non-liquid
@@ -232,11 +233,11 @@ public class ControlPathfinder{
             req.curId = pathId;
 
             //check for the unit getting stuck every N seconds
-            if((req.stuckTimer += Time.delta) >= 60f * 2.5f){
+            if((req.stuckTimer += Time.delta) >= 60f * 1.5f){
                 req.stuckTimer = 0f;
                 //force recalculate
                 if(req.lastPos.within(unit, 1.5f)){
-                    req.lastWorldUpdate = -1;
+                    req.forceRecalculate();
                 }
                 req.lastPos.set(unit);
             }
@@ -279,6 +280,18 @@ public class ControlPathfinder{
                 if(req.rayPathIndex < len && req.rayPathIndex >= 0){
                     Tile tile = tile(items[req.rayPathIndex]);
                     out.set(tile);
+
+                    if(req.rayPathIndex > 0){
+                        float angleToNext = tile(items[req.rayPathIndex - 1]).angleTo(tile);
+                        float angleToDest = unit.angleTo(tile);
+                        //force recalculate when the unit moves backwards
+                        if(Angles.angleDist(angleToNext, angleToDest) > 80f && !unit.within(tile, 1f)){
+                            if(showDebug){
+                                Fx.placeBlock.at(unit, 1f);
+                            }
+                            req.forceRecalculate();
+                        }
+                    }
 
                     if(unit.within(tile, range)){
                         req.pathIndex = req.rayPathIndex = Math.max(req.pathIndex, req.rayPathIndex + 1);
@@ -482,6 +495,7 @@ public class ControlPathfinder{
         volatile PathCost cost;
         volatile int team;
         volatile int lastWorldUpdate;
+        volatile boolean forcedRecalc;
 
         final Vec2 lastPos = new Vec2();
         float stuckTimer = 0f;
@@ -506,11 +520,19 @@ public class ControlPathfinder{
 
         long lastUpdateId;
         long lastTime;
+        long forceRecalcTime;
 
         volatile int lastId, curId;
 
         public PathRequest(PathfindThread thread){
             this.thread = thread;
+        }
+
+        public void forceRecalculate(){
+            //keep it at 3 times/sec
+            if(Time.timeSinceMillis(forceRecalcTime) < 1000 / 3) return;
+            forcedRecalc = true;
+            forceRecalcTime = Time.millis();
         }
 
         void update(long maxUpdateNs){
@@ -520,9 +542,10 @@ public class ControlPathfinder{
             lastId = curId;
 
             //re-do everything when world updates, but keep the old path around
-            if(Time.timeSinceMillis(lastTime) > 1000 * 3 && (worldUpdateId != lastWorldUpdate || !destination.epsilonEquals(lastDestination, 2f))){
+            if(forcedRecalc || (Time.timeSinceMillis(lastTime) > 1000 * 3 && (worldUpdateId != lastWorldUpdate || !destination.epsilonEquals(lastDestination, 2f)))){
                 lastTime = Time.millis();
                 lastWorldUpdate = worldUpdateId;
+                forcedRecalc = false;
                 clear(false);
             }
 

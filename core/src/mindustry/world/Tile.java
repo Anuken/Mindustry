@@ -547,6 +547,11 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         return block.solid && block.fillsTile && !block.synthetic() ? data : 0;
     }
 
+    /** @return whether this tile is solid for legged units */
+    public boolean legSolid(){
+        return staticDarkness() >= 2 || (floor.solid && block == Blocks.air);
+    }
+
     /** @return true if these tiles are right next to each other. */
     public boolean adjacentTo(Tile tile){
         return relativeTo(tile) != -1;
