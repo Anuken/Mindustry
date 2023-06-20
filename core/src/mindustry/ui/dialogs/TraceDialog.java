@@ -14,7 +14,6 @@ public class TraceDialog extends BaseDialog{
         super("@trace");
 
         addCloseButton();
-        setFillParent(false);
     }
 
     public void show(Player player, TraceInfo info){

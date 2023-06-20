@@ -256,7 +256,7 @@ public class UnitTypes{
             hitSize = 26f;
             rotateSpeed = 1.65f;
             health = 24000;
-            armor = 14f;
+            armor = 18f;
             mechStepParticles = true;
             stepShake = 0.75f;
             drownTimeMultiplier = 6f;
