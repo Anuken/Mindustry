@@ -50,7 +50,7 @@ body:
     id: save-file
     attributes:
       label: Save file
-      description: The (zipped) save file you were playing on when the bug happened.
+      description: The (zipped) save file you were playing on when the bug happened. If this happened in the campaign, specify the sector, and attach the file you get from Settings -> Game Data -> Export Data. For custom games, attach the .msav file exported from the save dialog, zipped.
       placeholder: THIS IS REQUIRED FOR ANY ISSUE HAPPENING IN-GAME OR IN MULTIPLAYER, REGARDLESS OF WHETHER YOU THINK IT HAPPENS EVERYWHERE. DO NOT OMIT THIS LINE UNLESS YOU ARE SURE THAT THE ISSUE DOES NOT HAPPEN IN-GAME. IF YOU DO NOT HAVE A SAVE, DON'T WASTE TIME OPENING THIS ISSUE.
     validations:
       required: false
