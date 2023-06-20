@@ -1,0 +1,74 @@
+name: Bug report
+description: The type of device you were playing on
+labels: ["bug"]
+
+body:
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platforms
+      description: On what platforms do you know the bug happens?
+      multiple: false
+      options:
+        - Android
+        - iOS
+        - Mac
+        - Windows
+        - Linux
+    validations:
+      required: true
+  - type: input
+    id: build
+    attributes:
+      label: Build
+      description: The build number under the title in the main menu.
+      placeholder: LATEST IS NOT A VERSION, I NEED THE EXACT BUILD NUMBER OF YOUR GAME.
+    validations:
+      required: true
+  - type: textarea
+    id: issue
+    attributes:
+      label: Issue
+      description: Explain your issue in detail.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: How you happened across the issue, and what exactly you did to make the bug happen.
+    validations:
+      required: true
+  - type: textarea
+    id: mods
+    attributes:
+      label: Mods used
+      description: The mod repositories or zip files that are related to the issue, if applicable.
+    validations:
+      required: false
+  - type: textarea
+    id: save-file
+    attributes:
+      label: Save file
+      description: The (zipped) save file you were playing on when the bug happened. If this happened in the campaign, specify the sector, and attach the file you get from Settings -> Game Data -> Export Data. For custom games, attach the .msav file exported from the save dialog, zipped.
+      placeholder: THIS IS REQUIRED FOR ANY ISSUE HAPPENING IN-GAME OR IN MULTIPLAYER, REGARDLESS OF WHETHER YOU THINK IT HAPPENS EVERYWHERE. DO NOT OMIT THIS LINE UNLESS YOU ARE SURE THAT THE ISSUE DOES NOT HAPPEN IN-GAME. IF YOU DO NOT HAVE A SAVE, DON'T WASTE TIME OPENING THIS ISSUE.
+    validations:
+      required: false
+  - type: textarea
+    id: logs
+    attributes:
+      label: (Crash) logs
+      description: Either crash reports from the crash folder, or the file you get when you go into Settings -> Game Data -> Export Crash logs.
+      placeholder: REQUIRED if you are reporting a crash.
+    validations:
+      required: false
+  - type: checkboxes
+    id: agreement
+    attributes:
+      label: Submission
+      description: Check the boxes to confirm that you have read the lines below.
+      options:
+        - label: I have updated to the latest release (https://github.com/Anuken/Mindustry/releases) to make sure my issue has not been fixed.
+          required: true
+        - label: I have searched the closed and open issues to make sure that this problem has not already been reported.
+          required: true
