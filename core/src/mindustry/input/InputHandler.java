@@ -471,7 +471,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         
         if (build.rotation != previous) {
             Fx.rotateBlock.at(build.x, build.y, build.block.size);
-            Events.fire(new BuildRotateEvent(build, player == null ? null : player.unit(), previous));
+            Events.fire(new BuildRotateEvent(build, player == null ? null : player.unit(), build.rotation, previous));
         }
     }
 
@@ -496,7 +496,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         build.configured(player == null || player.dead() ? null : player.unit(), value);
 
         if (build.config() != previous) {
-            Events.fire(new ConfigEvent(build, player, build.config()));
+            Events.fire(new ConfigEvent(build, player, build.config(), previous));
         }
     }
 
