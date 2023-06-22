@@ -252,7 +252,7 @@ public class UnitTypes{
         }};
 
         reign = new UnitType("reign"){{
-            speed = 0.35f;
+            speed = 0.4f;
             hitSize = 26f;
             rotateSpeed = 1.65f;
             health = 24000;

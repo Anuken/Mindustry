@@ -71,7 +71,10 @@ public class StatusEffects{
 
             init(() -> {
                 affinity(shocked, (unit, result, time) -> {
-                    unit.damagePierce(transitionDamage);
+                    float pierceFraction = 0.3f;
+
+                    unit.damagePierce(transitionDamage * pierceFraction);
+                    unit.damage(transitionDamage * (1f - pierceFraction));
                     if(unit.team == state.rules.waveTeam){
                         Events.fire(Trigger.shock);
                     }
