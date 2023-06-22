@@ -468,8 +468,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         build.rotation = Mathf.mod(build.rotation + Mathf.sign(direction), 4);
         build.updateProximity();
         build.noSleep();
-        Fx.rotateBlock.at(build.x, build.y, build.block.size);
-        Events.fire(new BuildRotateEvent(build, player == null ? null : player.unit(), previous));
+        
+        if (build.rotation != previous) {
+            Fx.rotateBlock.at(build.x, build.y, build.block.size);
+            Events.fire(new BuildRotateEvent(build, player == null ? null : player.unit(), previous));
+        }
     }
 
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
@@ -488,8 +491,13 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
             throw new ValidateException(player, "Player cannot configure a tile.");
         }
+
+        var previous = build.config();
         build.configured(player == null || player.dead() ? null : player.unit(), value);
-        Core.app.post(() -> Events.fire(new ConfigEvent(build, player, value)));
+
+        if (build.config() != previous) {
+            Events.fire(new ConfigEvent(build, player, build.config()));
+        }
     }
 
     //only useful for servers or local mods, and is not replicated across clients
@@ -1044,7 +1052,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
             plan.x = World.toTile(wx - plan.block.offset) + ox;
             plan.y = World.toTile(wy - plan.block.offset) + oy;
-            plan.rotation = plan.block.planRotation(Mathf.mod(plan.rotation + direction, 4));
+            plan.rotation = Mathf.mod(plan.rotation + direction, 4);
         });
     }
 
