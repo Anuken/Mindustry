@@ -1052,7 +1052,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
             plan.x = World.toTile(wx - plan.block.offset) + ox;
             plan.y = World.toTile(wy - plan.block.offset) + oy;
-            plan.rotation = Mathf.mod(plan.rotation + direction, 4);
+            plan.rotation = plan.block.planRotation(Mathf.mod(plan.rotation + direction, 4));
         });
     }
 
