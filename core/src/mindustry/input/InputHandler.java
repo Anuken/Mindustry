@@ -857,7 +857,16 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                     Events.fire(Trigger.unitCommandAttack);
                 }
 
-                Call.commandUnits(player, ids, attack instanceof Building b ? b : null, attack instanceof Unit u ? u : null, target);
+                int maxChunkSize = 200;
+
+                if(ids.length > maxChunkSize){
+                    for(int i = 0; i < ids.length; i += maxChunkSize){
+                        int[] data = Arrays.copyOfRange(ids, i, Math.min(i + maxChunkSize, ids.length));
+                        Call.commandUnits(player, data, attack instanceof Building b ? b : null, attack instanceof Unit u ? u : null, target);
+                    }
+                }else{
+                    Call.commandUnits(player, ids, attack instanceof Building b ? b : null, attack instanceof Unit u ? u : null, target);
+                }
             }
 
             if(commandBuildings.size > 0){
