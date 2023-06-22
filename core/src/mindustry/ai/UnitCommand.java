@@ -65,6 +65,10 @@ public class UnitCommand{
         return Icon.icons.get(icon, Icon.cancel);
     }
 
+    public char getEmoji() {
+        return (char) Iconc.codes.get(icon, Iconc.cancel);
+    }
+
     @Override
     public String toString(){
         return "UnitCommand:" + name;
