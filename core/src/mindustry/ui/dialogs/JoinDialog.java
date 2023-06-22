@@ -433,7 +433,11 @@ public class JoinDialog extends BaseDialog{
                         || res.mapname.toLowerCase().contains(serverSearch)
                         || (res.modeName != null && res.modeName.toLowerCase().contains(serverSearch)))) return;
 
-                    addHeader(groupTable, group, hidden, true);
+                    if(groupTable[0] == null){
+                        addHeader(groupTable, group, hidden, true);
+                    }else if(!groupTable[0].visible){
+                        addHeader(groupTable, group, hidden, true);
+                    }
 
                     addCommunityHost(res, groupTable[1]);
 
@@ -452,6 +456,7 @@ public class JoinDialog extends BaseDialog{
         if(!doInit){
             return;
         }
+
         groupTable[0].table(head -> {
             Color col = group.prioritized ? Pal.accent : Color.lightGray;
             if(!group.name.isEmpty()){
