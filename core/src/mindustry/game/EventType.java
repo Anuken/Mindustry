@@ -261,12 +261,13 @@ public class EventType{
     public static class ConfigEvent{
         public final Building tile;
         public final @Nullable Player player;
-        public final Object value;
+        public final Object value, previous;
 
-        public ConfigEvent(Building tile, @Nullable Player player, Object value){
+        public ConfigEvent(Building tile, @Nullable Player player, Object value, Object previous){
             this.tile = tile;
             this.player = player;
             this.value = value;
+            this.previous = previous;
         }
     }
 
@@ -476,11 +477,12 @@ public class EventType{
     public static class BuildRotateEvent{
         public final Building build;
         public final @Nullable Unit unit;
-        public final int previous;
+        public final int rotation, previous;
 
-        public BuildRotateEvent(Building build, @Nullable Unit unit, int previous){
+        public BuildRotateEvent(Building build, @Nullable Unit unit, int rotation, int previous){
             this.build = build;
             this.unit = unit;
+            this.rotation = rotation;
             this.previous = previous;
         }
     }
