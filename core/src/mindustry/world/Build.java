@@ -175,7 +175,7 @@ public class Build{
             return false;
         }
 
-        if(!type.canPlaceOn(tile, team, rotation)){
+        if(!type.canPlaceOn(tile, team, rotation = Mathf.mod(rotation, 4))){
             return false;
         }
 
