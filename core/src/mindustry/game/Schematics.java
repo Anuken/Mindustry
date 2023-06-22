@@ -36,6 +36,8 @@ import mindustry.world.blocks.storage.CoreBlock.*;
 import mindustry.world.meta.*;
 
 import java.io.*;
+import java.nio.charset.*;
+import java.util.*;
 import java.util.zip.*;
 
 import static mindustry.Vars.*;
@@ -136,6 +138,10 @@ public class Schematics implements Loadable{
 
         try{
             Schematic s = read(file);
+            String expectedFilename = Base64.getUrlEncoder().encodeToString(s.name().getBytes(StandardCharsets.UTF_8));
+            if(!file.file().getName().split("_")[0].equals(expectedFilename)){//check if filename is compliant
+                file.moveTo(findFile(expectedFilename));
+            }
             all.add(s);
             checkLoadout(s, true);
 
