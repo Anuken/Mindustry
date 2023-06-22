@@ -418,7 +418,7 @@ public class JoinDialog extends BaseDialog{
             Table[] groupTable = {null, null};
 
             if(group.prioritized){
-                addHeader(groupTable, group, hidden);
+                addHeader(groupTable, group, hidden, false);
             }
             //table containing all groups
             for(String address : group.addresses){
@@ -433,10 +433,7 @@ public class JoinDialog extends BaseDialog{
                         || res.mapname.toLowerCase().contains(serverSearch)
                         || (res.modeName != null && res.modeName.toLowerCase().contains(serverSearch)))) return;
 
-                    //add header
-                    if(groupTable[0] == null){
-                        addHeader(groupTable, group, hidden);
-                    }
+                    addHeader(groupTable, group, hidden, true);
 
                     addCommunityHost(res, groupTable[1]);
 
@@ -447,9 +444,14 @@ public class JoinDialog extends BaseDialog{
         }
     }
 
-    void addHeader(Table[] groupTable, ServerGroup group, boolean hidden){ // outlined separately
-        global.table(t -> groupTable[0] = t).fillX().left().row();
-
+    void addHeader(Table[] groupTable, ServerGroup group, boolean hidden, boolean doInit){ // outlined separately
+        if(groupTable[0] == null){
+            global.table(t -> groupTable[0] = t).fillX().left().row();
+        }
+        groupTable[0].visible(() -> doInit);
+        if(!doInit){
+            return;
+        }
         groupTable[0].table(head -> {
             Color col = group.prioritized ? Pal.accent : Color.lightGray;
             if(!group.name.isEmpty()){
