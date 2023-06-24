@@ -621,7 +621,9 @@ public class ModsDialog extends BaseDialog{
             long len = result.getContentLength();
             Floatc cons = len <= 0 ? f -> {} : p -> modImportProgress = p;
 
-            Streams.copyProgress(result.getResultAsStream(), file.write(false), len, 4096, cons);
+            try(var stream = file.write(false)){
+                Streams.copyProgress(result.getResultAsStream(), stream, len, 4096, cons);
+            }
 
             var mod = mods.importMod(file);
             mod.setRepo(repo);
