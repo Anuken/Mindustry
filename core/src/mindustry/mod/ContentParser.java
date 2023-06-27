@@ -601,7 +601,7 @@ public class ContentParser{
 
             if(value.has("mesh")){
                 var mesh = value.get("mesh");
-                if(!mesh.isObject()) throw new RuntimeException("Meshes must be objects.");
+                if(!mesh.isObject() && !mesh.isArray()) throw new RuntimeException("Meshes must be objects.");
                 value.remove("mesh");
                 planet.meshLoader = () -> {
                     //don't crash, just log an error
@@ -616,7 +616,7 @@ public class ContentParser{
 
             if(value.has("cloudMesh")){
                 var mesh = value.get("cloudMesh");
-                if(!mesh.isObject()) throw new RuntimeException("Meshes must be objects.");
+                if(!mesh.isObject() && !mesh.isArray()) throw new RuntimeException("Meshes must be objects.");
                 value.remove("cloudMesh");
                 planet.cloudMeshLoader = () -> {
                     //don't crash, just log an error
