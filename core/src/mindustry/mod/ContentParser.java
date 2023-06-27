@@ -855,6 +855,10 @@ public class ContentParser{
     }
 
     private GenericMesh parseMesh(Planet planet, JsonValue data){
+        if(data.isArray()){
+            return new MultiMesh(parser.readValue(GenericMesh[].class, data));
+        }
+
         String tname = Strings.capitalize(data.getString("type", "NoiseMesh"));
 
         return switch(tname){

@@ -669,7 +669,8 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     public boolean configSenseable(){
-        return configurations.containsKey(Item.class) || configurations.containsKey(Liquid.class);
+        return configurations.containsKey(Item.class) || configurations.containsKey(Liquid.class) || configurations.containsKey(UnlockableContent.class) ||
+               configurations.containsKey(Block.class) || configurations.containsKey(UnitType.class);
     }
 
     public Object nextConfig(){
