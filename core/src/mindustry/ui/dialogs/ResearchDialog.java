@@ -415,6 +415,8 @@ public class ResearchDialog extends BaseDialog{
 
             for(TechTreeNode node : nodes){
                 ImageButton button = new ImageButton(node.node.content.uiIcon, Styles.nodei);
+                button.resizeImage(32f);
+                button.getImage().setScaling(Scaling.fit);
                 button.visible(() -> node.visible);
                 button.clicked(() -> {
                     if(moved) return;
@@ -463,7 +465,6 @@ public class ResearchDialog extends BaseDialog{
 
                     ((TextureRegionDrawable)button.getStyle().imageUp).setRegion(node.selectable ? node.node.content.uiIcon : Icon.lock.getRegion());
                     button.getImage().setColor(!locked(node.node) ? Color.white : node.selectable ? Color.gray : Pal.gray);
-                    button.getImage().setScaling(Scaling.bounded);
                 });
                 addChild(button);
             }
