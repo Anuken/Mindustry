@@ -854,9 +854,18 @@ public class ContentParser{
         return null;
     }
 
+    private GenericMesh[] parseMeshes(Planet planet, JsonValue array){
+        var res = new GenericMesh[array.size];
+        for(int i = 0; i < array.size; i++){
+            //yes get is O(n) but it's practically irrelevant here
+            res[i] = parseMesh(planet, array.get(i));
+        }
+        return res;
+    }
+
     private GenericMesh parseMesh(Planet planet, JsonValue data){
         if(data.isArray()){
-            return new MultiMesh(parser.readValue(GenericMesh[].class, data));
+            return new MultiMesh(parseMeshes(planet, data));
         }
 
         String tname = Strings.capitalize(data.getString("type", "NoiseMesh"));
@@ -874,8 +883,8 @@ public class ContentParser{
             data.getInt("seed", 0), data.getFloat("speed", 0), data.getFloat("radius", 1f),
             data.getInt("divisions", 3), Color.valueOf(data.getString("color", "ffffff")), data.getInt("octaves", 1),
             data.getFloat("persistence", 0.5f), data.getFloat("scale", 1f), data.getFloat("thresh", 0.5f));
-            case "MultiMesh" -> new MultiMesh(parser.readValue(GenericMesh[].class, data.get("meshes")));
-            case "MatMesh" -> new MatMesh(parser.readValue(GenericMesh.class, data.get("mesh")), parser.readValue(Mat3D.class, data.get("mat")));
+            case "MultiMesh" -> new MultiMesh(parseMeshes(planet, data.get("meshes")));
+            case "MatMesh" -> new MatMesh(parseMesh(planet, data.get("mesh")), parser.readValue(Mat3D.class, data.get("mat")));
             default -> throw new RuntimeException("Unknown mesh type: " + tname);
         };
     }
