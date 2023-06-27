@@ -325,7 +325,7 @@ public class UnitFactory extends UnitBlock{
 
         @Override
         public int getMaximumAccepted(Item item){
-            return capacities[item.id];
+            return Mathf.round(capacities[item.id] * state.rules.unitCost(team));
         }
 
         @Override
