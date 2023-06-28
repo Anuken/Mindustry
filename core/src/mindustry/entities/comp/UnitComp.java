@@ -265,7 +265,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         if(content instanceof Block b){
             return ((Object)this) instanceof Payloadc pay ?
                     (pay.payloads().isEmpty() ? 0 :
-                            pay.payloads().count(p -> p instanceof BuildPayload bp && bp.build.block == b)) : 0;
+                    pay.payloads().count(p -> p instanceof BuildPayload bp && bp.build.block == b)) : 0;
         }
         return Float.NaN;
     }
