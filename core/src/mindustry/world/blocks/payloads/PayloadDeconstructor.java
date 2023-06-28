@@ -5,6 +5,7 @@ import arc.math.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.content.*;
+import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
@@ -188,6 +189,13 @@ public class PayloadDeconstructor extends PayloadBlock{
                 payload = null;
                 progress = 0f;
             }
+        }
+
+        @Override
+        public double sense(Content content){
+            if(deconstructing instanceof UnitPayload up) return up.unit.type == content ? 1 : 0;
+            if(deconstructing instanceof BuildPayload bp) return bp.build.block == content ? 1 : 0;
+            return super.sense(content);
         }
 
         @Override

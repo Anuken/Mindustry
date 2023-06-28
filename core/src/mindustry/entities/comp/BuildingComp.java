@@ -1931,6 +1931,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public double sense(Content content){
         if(content instanceof Item i && items != null) return items.get(i);
         if(content instanceof Liquid l && liquids != null) return liquids.get(l);
+        if(getPayloads() != null){
+            if(content instanceof UnitType u) return getPayloads().get(u);
+            if(content instanceof Block b) return getPayloads().get(b);
+        }
         return Float.NaN; //invalid sense
     }
 

@@ -6,6 +6,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
@@ -233,6 +234,13 @@ public class PayloadBlock extends Block{
                 Draw.z(Layer.blockOver);
                 payload.draw();
             }
+        }
+
+        @Override
+        public double sense(Content content){
+            if(payload instanceof UnitPayload up) return up.unit.type == content ? 1 : 0;
+            if(payload instanceof BuildPayload bp) return bp.build.block == content ? 1 : 0;
+            return super.sense(content);
         }
 
         @Override
