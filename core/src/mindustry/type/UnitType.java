@@ -684,8 +684,8 @@ public class UnitType extends UnlockableContent{
 
         if(pathCost == null){
             pathCost =
-                example instanceof WaterMovec ? ControlPathfinder.costNaval :
-                allowLegStep ? ControlPathfinder.costLegs :
+                naval ? ControlPathfinder.costNaval :
+                allowLegStep || example instanceof Crawlc ? ControlPathfinder.costLegs :
                 hovering ? ControlPathfinder.costHover :
                 ControlPathfinder.costGround;
         }
