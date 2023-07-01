@@ -179,5 +179,9 @@
     "name": "Official Mindustry Events",
     "address": ["event.baseduser.eu.org"],
     "prioritized": true
+  },
+  {
+    "name": "Four Family",
+    "address": ["118.127.8.162:25503"]
   }
 ]
