@@ -40,7 +40,7 @@ public class HoverPart extends DrawPart{
                 rx = params.x + Tmp.v1.x,
                 ry = params.y + Tmp.v1.y;
 
-                Lines.poly(rx, ry, sides, radius * fin, params.rotation - 45f);
+                Lines.poly(rx, ry, sides, radius * fin, params.rotation);
             }
         }
 
