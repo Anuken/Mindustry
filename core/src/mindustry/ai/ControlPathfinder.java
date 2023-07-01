@@ -193,7 +193,7 @@ public class ControlPathfinder{
         }
 
         //destination is impassable, can't go there.
-        if(solid(team, costType, world.packArray(World.toTile(destination.x), World.toTile(destination.y)))){
+        if(solid(team, costType, world.packArray(World.toTile(destination.x), World.toTile(destination.y)), false)){
             return false;
         }
 
@@ -380,7 +380,7 @@ public class ControlPathfinder{
         int err = dx - dy;
 
         while(x >= 0 && y >= 0 && x < ww && y < wh){
-            if(solid(team, type, x + y * wwidth)) return true;
+            if(solid(team, type, x + y * wwidth, true)) return true;
             if(x == x2 && y == y2) return false;
 
             //no diagonals
@@ -429,9 +429,9 @@ public class ControlPathfinder{
         return cost == impassable || cost >= 2;
     }
 
-    private static boolean solid(int team, PathCost type, int tilePos){
+    private static boolean solid(int team, PathCost type, int tilePos, boolean checkWall){
         int cost = cost(team, type, tilePos);
-        return cost == impassable || cost >= 6000;
+        return cost == impassable || (checkWall && cost >= 6000);
     }
 
     private static float tileCost(int team, PathCost type, int a, int b){
