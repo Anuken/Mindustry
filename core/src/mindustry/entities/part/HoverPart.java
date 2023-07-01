@@ -7,7 +7,7 @@ import arc.util.*;
 public class HoverPart extends DrawPart{
     public float radius = 4f;
     public float x, y, rotation, phase = 50f, stroke = 3f, minStroke = 0.12f;
-    public int circles = 2;
+    public int circles = 2, sides = 4;
     public Color color = Color.white;
     public boolean mirror = false;
     public float layer = -1f, layerOffset = 0f;
@@ -40,7 +40,7 @@ public class HoverPart extends DrawPart{
                 rx = params.x + Tmp.v1.x,
                 ry = params.y + Tmp.v1.y;
 
-                Lines.square(rx, ry, radius * fin, params.rotation - 45f);
+                Lines.poly(rx, ry, sides, radius * fin, params.rotation);
             }
         }
 
