@@ -359,7 +359,13 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public void changeTeam(Team next){
+            if(this.team == next) return;
+
+            state.teams.unregisterCore(this);
+
             super.changeTeam(next);
+
+            state.teams.registerCore(this);
 
             Events.fire(new CoreChangeEvent(this));
         }

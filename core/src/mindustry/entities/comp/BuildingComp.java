@@ -1956,6 +1956,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             case health -> {
                 health = (float)Mathf.clamp(value, 0, maxHealth);
                 healthChanged();
+                if(health <= 0f && !dead()){
+                    Call.buildDestroyed(self());
+                }
             }
             case team -> {
                 Team team = Team.get((int)value);
