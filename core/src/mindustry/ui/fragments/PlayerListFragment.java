@@ -196,33 +196,36 @@ public class PlayerListFragment{
                             }).row();
                         }
 
-                        t.button("@player.team", Icon.redo, bstyle, () -> {
-                            var teamSelect = new BaseDialog(Core.bundle.get("player.team") + ": " + user.name);
-                            teamSelect.setFillParent(false);
+                        //there's generally no reason to team switch outside PvP or sandbox, and it's basically an easy way to cheat
+                        if(state.rules.pvp || state.rules.infiniteResources){
+                            t.button("@player.team", Icon.redo, bstyle, () -> {
+                                var teamSelect = new BaseDialog(Core.bundle.get("player.team") + ": " + user.name);
+                                teamSelect.setFillParent(false);
 
-                            var group = new ButtonGroup<>();
+                                var group = new ButtonGroup<>();
 
-                            int i = 0;
+                                int i = 0;
 
-                            for(Team team : Team.baseTeams){
-                                var b = new ImageButton(Tex.whiteui, Styles.clearNoneTogglei);
-                                b.margin(4f);
-                                b.getImageCell().grow();
-                                b.getStyle().imageUpColor = team.color;
-                                b.clicked(() -> {
-                                    Call.adminRequest(user, AdminAction.switchTeam, team);
-                                    teamSelect.hide();
-                                });
-                                teamSelect.cont.add(b).size(50f).checked(a -> user.team() == team).group(group);
+                                for(Team team : Team.baseTeams){
+                                    var b = new ImageButton(Tex.whiteui, Styles.clearNoneTogglei);
+                                    b.margin(4f);
+                                    b.getImageCell().grow();
+                                    b.getStyle().imageUpColor = team.color;
+                                    b.clicked(() -> {
+                                        Call.adminRequest(user, AdminAction.switchTeam, team);
+                                        teamSelect.hide();
+                                    });
+                                    teamSelect.cont.add(b).size(50f).checked(a -> user.team() == team).group(group);
 
-                                if(i++ % 3 == 2) teamSelect.cont.row();
-                            }
+                                    if(i++ % 3 == 2) teamSelect.cont.row();
+                                }
 
-                            teamSelect.addCloseButton();
-                            teamSelect.show();
+                                teamSelect.addCloseButton();
+                                teamSelect.show();
 
-                            dialog.hide();
-                        }).row();
+                                dialog.hide();
+                            }).row();
+                        }
 
                         if(!net.client() && !user.isLocal()){
                             t.button("@player.admin", Icon.admin, Styles.togglet, () -> {
