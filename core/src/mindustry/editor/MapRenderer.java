@@ -100,6 +100,7 @@ public class MapRenderer implements Disposable{
 
     private void render(int wx, int wy){
         int x = wx / chunkSize, y = wy / chunkSize;
+        if(x >= chunks.length || y >= chunks[0].length) return;
         IndexedRenderer mesh = chunks[x][y];
         Tile tile = editor.tiles().getn(wx, wy);
 

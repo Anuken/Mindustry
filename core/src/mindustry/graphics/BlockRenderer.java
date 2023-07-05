@@ -266,7 +266,7 @@ public class BlockRenderer{
     public void drawDestroyed(){
         if(!Core.settings.getBool("destroyedblocks")) return;
 
-        if(control.input.isPlacing() || control.input.isBreaking() || control.input.isRebuildSelecting()){
+        if(control.input.isPlacing() || control.input.isBreaking() || (control.input.isRebuildSelecting() && !scene.hasKeyboard())){
             brokenFade = Mathf.lerpDelta(brokenFade, 1f, 0.1f);
         }else{
             brokenFade = Mathf.lerpDelta(brokenFade, 0f, 0.1f);

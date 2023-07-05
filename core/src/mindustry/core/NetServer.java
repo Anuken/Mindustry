@@ -138,7 +138,7 @@ public class NetServer implements ApplicationListener{
 
             String uuid = packet.uuid;
 
-            if(admins.isIPBanned(con.address) || admins.isSubnetBanned(con.address)) return;
+            if(admins.isIPBanned(con.address) || admins.isSubnetBanned(con.address) || con.kicked || !con.isConnected()) return;
 
             if(con.hasBegunConnecting){
                 con.kick(KickReason.idInUse);
@@ -349,7 +349,7 @@ public class NetServer implements ApplicationListener{
 
         class VoteSession{
             Player target;
-            ObjectSet<String> voted = new ObjectSet<>();
+            ObjectIntMap<String> voted = new ObjectIntMap<>();
             VoteSession[] map;
             Timer.Task task;
             int votes;
@@ -367,8 +367,12 @@ public class NetServer implements ApplicationListener{
             }
 
             void vote(Player player, int d){
+                int lastVote = voted.get(player.uuid(), 0) | voted.get(admins.getInfo(player.uuid()).lastIP, 0);
+                votes -= lastVote;
+
                 votes += d;
-                voted.addAll(player.uuid(), admins.getInfo(player.uuid()).lastIP);
+                voted.put(player.uuid(), d);
+                voted.put(admins.getInfo(player.uuid()).lastIP, d);
 
                 Call.sendMessage(Strings.format("[lightgray]@[lightgray] has voted on kicking[orange] @[lightgray].[accent] (@/@)\n[lightgray]Type[orange] /vote <y/n>[] to agree.",
                     player.name, target.name, votes, votesRequired()));
@@ -393,7 +397,7 @@ public class NetServer implements ApplicationListener{
         //current kick sessions
         VoteSession[] currentlyKicking = {null};
 
-        clientCommands.<Player>register("votekick", "[player...]", "Vote to kick a player.", (args, player) -> {
+        clientCommands.<Player>register("votekick", "[player] [reason...]", "Vote to kick a player with a valid reason.", (args, player) -> {
             if(!Config.enableVotekick.bool()){
                 player.sendMessage("[scarlet]Vote-kick is disabled on this server.");
                 return;
@@ -422,6 +426,8 @@ public class NetServer implements ApplicationListener{
                     builder.append("[lightgray] ").append(p.name).append("[accent] (#").append(p.id()).append(")\n");
                 });
                 player.sendMessage(builder.toString());
+            }else if(args.length == 1){
+                player.sendMessage("[orange]You need a valid reason to kick the player. Add a reason after the player name.");
             }else{
                 Player found;
                 if(args[0].length() > 1 && args[0].startsWith("#") && Strings.canParseInt(args[0].substring(1))){
@@ -450,6 +456,7 @@ public class NetServer implements ApplicationListener{
 
                         VoteSession session = new VoteSession(currentlyKicking, found);
                         session.vote(player, 1);
+                        Call.sendMessage(Strings.format("[lightgray]Reason:[orange] @[lightgray].", args[1]));
                         vtime.reset();
                         currentlyKicking[0] = session;
                     }
@@ -459,18 +466,31 @@ public class NetServer implements ApplicationListener{
             }
         });
 
-        clientCommands.<Player>register("vote", "<y/n>", "Vote to kick the current player.", (arg, player) -> {
+        clientCommands.<Player>register("vote", "<y/n/c>", "Vote to kick the current player. Admin can cancel the voting with 'c'.", (arg, player) -> {
             if(currentlyKicking[0] == null){
                 player.sendMessage("[scarlet]Nobody is being voted on.");
             }else{
+                if(player.admin && arg[0].equalsIgnoreCase("c")){
+                    Call.sendMessage(Strings.format("[lightgray]Vote canceled by admin[orange] @[lightgray].", player.name));
+                    currentlyKicking[0].task.cancel();
+                    currentlyKicking[0] = null;
+                    return;
+                }
+
                 if(player.isLocal()){
                     player.sendMessage("[scarlet]Local players can't vote. Kick the player yourself instead.");
                     return;
                 }
 
+                int sign = switch(arg[0].toLowerCase()){
+                    case "y", "yes" -> 1;
+                    case "n", "no" -> -1;
+                    default -> 0;
+                };
+
                 //hosts can vote all they want
-                if((currentlyKicking[0].voted.contains(player.uuid()) || currentlyKicking[0].voted.contains(admins.getInfo(player.uuid()).lastIP))){
-                    player.sendMessage("[scarlet]You've already voted. Sit down.");
+                if((currentlyKicking[0].voted.get(player.uuid(), 2) == sign || currentlyKicking[0].voted.get(admins.getInfo(player.uuid()).lastIP, 2) == sign)){
+                    player.sendMessage(Strings.format("[scarlet]You've already voted @. Sit down.", arg[0].toLowerCase()));
                     return;
                 }
 
@@ -483,12 +503,6 @@ public class NetServer implements ApplicationListener{
                     player.sendMessage("[scarlet]You can't vote for other teams.");
                     return;
                 }
-
-                int sign = switch(arg[0].toLowerCase()){
-                    case "y", "yes" -> 1;
-                    case "n", "no" -> -1;
-                    default -> 0;
-                };
 
                 if(sign == 0){
                     player.sendMessage("[scarlet]Vote either 'y' (yes) or 'n' (no).");
@@ -770,7 +784,7 @@ public class NetServer implements ApplicationListener{
     }
 
     @Remote(targets = Loc.client, called = Loc.server)
-    public static void adminRequest(Player player, Player other, AdminAction action){
+    public static void adminRequest(Player player, Player other, AdminAction action, Object params){
         if(!player.admin && !player.isLocal()){
             warn("ACCESS DENIED: Player @ / @ attempted to perform admin action '@' on '@' without proper security access.",
             player.plainName(), player.con == null ? "null" : player.con.address, action.name(), other == null ? null : other.plainName());
@@ -784,28 +798,38 @@ public class NetServer implements ApplicationListener{
 
         Events.fire(new EventType.AdminRequestEvent(player, other, action));
 
-        if(action == AdminAction.wave){
-            //no verification is done, so admins can hypothetically spam waves
-            //not a real issue, because server owners may want to do just that
-            logic.skipWave();
-            info("&lc@ &fi&lk[&lb@&fi&lk]&fb has skipped the wave.", player.plainName(), player.uuid());
-        }else if(action == AdminAction.ban){
-            netServer.admins.banPlayerID(other.con.uuid);
-            netServer.admins.banPlayerIP(other.con.address);
-            other.kick(KickReason.banned);
-            info("&lc@ &fi&lk[&lb@&fi&lk]&fb has banned @ &fi&lk[&lb@&fi&lk]&fb.", player.plainName(), player.uuid(), other.plainName(), other.uuid());
-        }else if(action == AdminAction.kick){
-            other.kick(KickReason.kick);
-            info("&lc@ &fi&lk[&lb@&fi&lk]&fb has kicked @ &fi&lk[&lb@&fi&lk]&fb.", player.plainName(), player.uuid(), other.plainName(), other.uuid());
-        }else if(action == AdminAction.trace){
-            PlayerInfo stats = netServer.admins.getInfo(other.uuid());
-            TraceInfo info = new TraceInfo(other.con.address, other.uuid(), other.con.modclient, other.con.mobile, stats.timesJoined, stats.timesKicked);
-            if(player.con != null){
-                Call.traceInfo(player.con, other, info);
-            }else{
-                NetClient.traceInfo(other, info);
+        switch(action){
+            case wave -> {
+                //no verification is done, so admins can hypothetically spam waves
+                //not a real issue, because server owners may want to do just that
+                logic.skipWave();
+                info("&lc@ &fi&lk[&lb@&fi&lk]&fb has skipped the wave.", player.plainName(), player.uuid());
             }
-            info("&lc@ &fi&lk[&lb@&fi&lk]&fb has requested trace info of @ &fi&lk[&lb@&fi&lk]&fb.", player.plainName(), player.uuid(), other.plainName(), other.uuid());
+            case ban -> {
+                netServer.admins.banPlayerID(other.con.uuid);
+                netServer.admins.banPlayerIP(other.con.address);
+                other.kick(KickReason.banned);
+                info("&lc@ &fi&lk[&lb@&fi&lk]&fb has banned @ &fi&lk[&lb@&fi&lk]&fb.", player.plainName(), player.uuid(), other.plainName(), other.uuid());
+            }
+            case kick -> {
+                other.kick(KickReason.kick);
+                info("&lc@ &fi&lk[&lb@&fi&lk]&fb has kicked @ &fi&lk[&lb@&fi&lk]&fb.", player.plainName(), player.uuid(), other.plainName(), other.uuid());
+            }
+            case trace -> {
+                PlayerInfo stats = netServer.admins.getInfo(other.uuid());
+                TraceInfo info = new TraceInfo(other.con.address, other.uuid(), other.con.modclient, other.con.mobile, stats.timesJoined, stats.timesKicked, stats.ips.toArray(String.class), stats.names.toArray(String.class));
+                if(player.con != null){
+                    Call.traceInfo(player.con, other, info);
+                }else{
+                    NetClient.traceInfo(other, info);
+                }
+                info("&lc@ &fi&lk[&lb@&fi&lk]&fb has requested trace info of @ &fi&lk[&lb@&fi&lk]&fb.", player.plainName(), player.uuid(), other.plainName(), other.uuid());
+            }
+            case switchTeam -> {
+                if(params instanceof Team team){
+                    other.team(team);
+                }
+            }
         }
     }
 

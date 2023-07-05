@@ -2,6 +2,7 @@ package mindustry.ai;
 
 import arc.*;
 import arc.func.*;
+import arc.scene.style.*;
 import arc.struct.*;
 import mindustry.ai.types.*;
 import mindustry.entities.units.*;
@@ -58,6 +59,14 @@ public class UnitCommand{
 
     public String localized(){
         return Core.bundle.get("command." + name);
+    }
+
+    public TextureRegionDrawable getIcon(){
+        return Icon.icons.get(icon, Icon.cancel);
+    }
+
+    public char getEmoji() {
+        return (char) Iconc.codes.get(icon, Iconc.cancel);
     }
 
     @Override

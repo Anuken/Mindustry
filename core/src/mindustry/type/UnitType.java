@@ -504,7 +504,7 @@ public class UnitType extends UnlockableContent{
         table.table(t -> {
             t.left();
             t.add(new Image(uiIcon)).size(iconMed).scaling(Scaling.fit);
-            t.labelWrap(localizedName).left().width(190f).padLeft(5);
+            t.labelWrap(unit.isPlayer() ? unit.getPlayer().coloredName() + "\n[lightgray]" + localizedName : localizedName).left().width(190f).padLeft(5);
         }).growX().left();
         table.row();
 
@@ -684,8 +684,8 @@ public class UnitType extends UnlockableContent{
 
         if(pathCost == null){
             pathCost =
-                example instanceof WaterMovec ? ControlPathfinder.costNaval :
-                allowLegStep ? ControlPathfinder.costLegs :
+                naval ? ControlPathfinder.costNaval :
+                allowLegStep || example instanceof Crawlc ? ControlPathfinder.costLegs :
                 hovering ? ControlPathfinder.costHover :
                 ControlPathfinder.costGround;
         }
@@ -711,10 +711,14 @@ public class UnitType extends UnlockableContent{
         //assume slight range margin
         float margin = 4f;
 
+        boolean skipWeapons = !weapons.contains(w -> !w.useAttackRange);
+
         //set up default range
         if(range < 0){
             range = Float.MAX_VALUE;
             for(Weapon weapon : weapons){
+                if(!weapon.useAttackRange && skipWeapons) continue;
+
                 range = Math.min(range, weapon.range() - margin);
                 maxRange = Math.max(maxRange, weapon.range() - margin);
             }
@@ -724,6 +728,8 @@ public class UnitType extends UnlockableContent{
             maxRange = Math.max(0f, range);
 
             for(Weapon weapon : weapons){
+                if(!weapon.useAttackRange && skipWeapons) continue;
+
                 maxRange = Math.max(maxRange, weapon.range() - margin);
             }
         }

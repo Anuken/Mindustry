@@ -775,7 +775,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         for(int i = 0; i < proximity.size; i++){
             Building other = proximity.get((i + dump) % proximity.size);
 
-            if(other.team == team && other.acceptPayload(self(), todump)){
+            if(other.acceptPayload(self(), todump)){
                 other.handlePayload(self(), todump);
                 incrementDump(proximity.size);
                 return true;
@@ -828,7 +828,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
             other = other.getLiquidDestination(self(), liquid);
 
-            if(other != null && other.team == team && other.block.hasLiquids && canDumpLiquid(other, liquid) && other.liquids != null){
+            if(other != null && other.block.hasLiquids && canDumpLiquid(other, liquid) && other.liquids != null){
                 float ofract = other.liquids.get(liquid) / other.block.liquidCapacity;
                 float fract = liquids.get(liquid) / block.liquidCapacity;
 
@@ -935,7 +935,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         for(int i = 0; i < proximity.size; i++){
             incrementDump(proximity.size);
             Building other = proximity.get((i + dump) % proximity.size);
-            if(other.team == team && other.acceptItem(self(), item) && canDump(other, item)){
+            if(other.acceptItem(self(), item) && canDump(other, item)){
                 other.handleItem(self(), item);
                 return;
             }
@@ -953,7 +953,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         for(int i = 0; i < proximity.size; i++){
             incrementDump(proximity.size);
             Building other = proximity.get((i + dump) % proximity.size);
-            if(other.team == team && other.acceptItem(self(), item) && canDump(other, item)){
+            if(other.acceptItem(self(), item) && canDump(other, item)){
                 other.handleItem(self(), item);
                 return true;
             }
@@ -1000,21 +1000,23 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
      * @param todump Item to dump. Can be null to dump anything.
      */
     public boolean dump(Item todump){
-        if(!block.hasItems || items.total() == 0 || (todump != null && !items.has(todump))) return false;
+        if(!block.hasItems || items.total() == 0 || proximity.size == 0 || (todump != null && !items.has(todump))) return false;
 
         int dump = this.cdump;
-
-        if(proximity.size == 0) return false;
+        var allItems = content.items();
+        int itemSize = allItems.size;
+        Object[] itemArray = allItems.items;
 
         for(int i = 0; i < proximity.size; i++){
             Building other = proximity.get((i + dump) % proximity.size);
 
             if(todump == null){
 
-                for(int ii = 0; ii < content.items().size; ii++){
-                    Item item = content.item(ii);
+                for(int ii = 0; ii < itemSize; ii++){
+                    if(!items.has(ii)) continue;
+                    Item item = (Item)itemArray[ii];
 
-                    if(other.team == team && items.has(item) && other.acceptItem(self(), item) && canDump(other, item)){
+                    if(other.acceptItem(self(), item) && canDump(other, item)){
                         other.handleItem(self(), item);
                         items.remove(item, 1);
                         incrementDump(proximity.size);
@@ -1022,7 +1024,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                     }
                 }
             }else{
-                if(other.team == team && other.acceptItem(self(), todump) && canDump(other, todump)){
+                if(other.acceptItem(self(), todump) && canDump(other, todump)){
                     other.handleItem(self(), todump);
                     items.remove(todump, 1);
                     incrementDump(proximity.size);
@@ -1689,7 +1691,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         for(Point2 point : nearby){
             Building other = world.build(tile.x + point.x, tile.y + point.y);
 
-            if(other == null || !(other.tile.interactable(team))) continue;
+            if(other == null || other.team != team) continue;
 
             other.proximity.addUnique(self());
 
@@ -1708,8 +1710,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             other.onProximityUpdate();
         }
     }
-
-    //TODO probably should not have a shouldConsume() check? should you even *use* consValid?
 
     public void consume(){
         for(Consume cons : block.consumers){
@@ -1758,8 +1758,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             return;
         }
 
-        //TODO why check for old state?
-        boolean prevValid = efficiency > 0, update = shouldConsume() && productionValid();
+        boolean update = shouldConsume() && productionValid();
 
         float minEfficiency = 1f;
 
@@ -1791,7 +1790,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         updateEfficiencyMultiplier();
 
         //second pass: update every consumer based on efficiency
-        if(update && prevValid && efficiency > 0){
+        if(update && efficiency > 0){
             for(var cons : block.updateConsumers){
                 cons.update(self());
             }
@@ -1957,6 +1956,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             case health -> {
                 health = (float)Mathf.clamp(value, 0, maxHealth);
                 healthChanged();
+                if(health <= 0f && !dead()){
+                    Call.buildDestroyed(self());
+                }
             }
             case team -> {
                 Team team = Team.get((int)value);

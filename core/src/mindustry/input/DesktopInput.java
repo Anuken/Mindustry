@@ -12,19 +12,14 @@ import arc.scene.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.*;
-import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
-import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.input.Placement.*;
 import mindustry.ui.*;
 import mindustry.world.*;
-
-import java.util.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
@@ -119,19 +114,7 @@ public class DesktopInput extends InputHandler{
             if(Core.input.keyDown(Binding.schematic_select)){
                 drawSelection(schemX, schemY, cursorX, cursorY, Vars.maxSchematicSize);
             }else if(Core.input.keyDown(Binding.rebuild_select)){
-                //TODO color?
-                drawSelection(schemX, schemY, cursorX, cursorY, 0, Pal.sapBulletBack, Pal.sapBullet);
-
-                NormalizeDrawResult result = Placement.normalizeDrawArea(Blocks.air, schemX, schemY, cursorX, cursorY, false, 0, 1f);
-
-                Tmp.r1.set(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
-
-                for(BlockPlan plan : player.team().data().plans){
-                    Block block = content.block(plan.block);
-                    if(block.bounds(plan.x, plan.y, Tmp.r2).overlaps(Tmp.r1)){
-                        drawSelected(plan.x, plan.y, content.block(plan.block), Pal.sapBullet);
-                    }
-                }
+                drawRebuildSelection(schemX, schemY, cursorX, cursorY);
             }
         }
 
@@ -149,7 +132,7 @@ public class DesktopInput extends InputHandler{
         //draw plan being moved
         if(splan != null){
             boolean valid = validPlace(splan.x, splan.y, splan.block, splan.rotation, splan);
-            if(splan.block.rotate){
+            if(splan.block.rotate && splan.block.drawArrow){
                 drawArrow(splan.block, splan.x, splan.y, splan.rotation, valid);
             }
 
@@ -188,24 +171,25 @@ public class DesktopInput extends InputHandler{
             if(mode == placing && block != null){
                 for(int i = 0; i < linePlans.size; i++){
                     var plan = linePlans.get(i);
-                    if(i == linePlans.size - 1 && plan.block.rotate){
+                    if(i == linePlans.size - 1 && plan.block.rotate && plan.block.drawArrow){
                         drawArrow(block, plan.x, plan.y, plan.rotation);
                     }
                     drawPlan(linePlans.get(i));
                 }
                 linePlans.each(this::drawOverPlan);
             }else if(isPlacing()){
+                int rot = block == null ? rotation : block.planRotation(rotation);
                 if(block.rotate && block.drawArrow){
-                    drawArrow(block, cursorX, cursorY, rotation);
+                    drawArrow(block, cursorX, cursorY, rot);
                 }
                 Draw.color();
-                boolean valid = validPlace(cursorX, cursorY, block, rotation);
-                drawPlan(cursorX, cursorY, block, rotation);
-                block.drawPlace(cursorX, cursorY, rotation, valid);
+                boolean valid = validPlace(cursorX, cursorY, block, rot);
+                drawPlan(cursorX, cursorY, block, rot);
+                block.drawPlace(cursorX, cursorY, rot, valid);
 
                 if(block.saveConfig){
                     Draw.mixcol(!valid ? Pal.breakInvalid : Color.white, (!valid ? 0.4f : 0.24f) + Mathf.absin(Time.globalTime, 6f, 0.28f));
-                    bplan.set(cursorX, cursorY, rotation, block);
+                    bplan.set(cursorX, cursorY, rot, block);
                     bplan.config = block.lastConfig;
                     block.drawPlanConfig(bplan, allPlans());
                     bplan.config = null;
@@ -529,20 +513,8 @@ public class DesktopInput extends InputHandler{
                 schemX = -1;
                 schemY = -1;
             }else if(input.keyRelease(Binding.rebuild_select)){
-                //TODO rebuild!!!
 
-                NormalizeResult result = Placement.normalizeArea(schemX, schemY, rawCursorX, rawCursorY, rotation, false, 999999999);
-                Tmp.r1.set(result.x * tilesize, result.y * tilesize, (result.x2 - result.x) * tilesize, (result.y2 - result.y) * tilesize);
-
-                Iterator<BlockPlan> broken = player.team().data().plans.iterator();
-                while(broken.hasNext()){
-                    BlockPlan plan = broken.next();
-                    Block block = content.block(plan.block);
-                    if(block.bounds(plan.x, plan.y, Tmp.r2).overlaps(Tmp.r1)){
-                        player.unit().addBuild(new BuildPlan(plan.x, plan.y, plan.rotation, content.block(plan.block), plan.config));
-                    }
-                }
-
+                rebuildArea(schemX, schemY, rawCursorX, rawCursorY);
                 schemX = -1;
                 schemY = -1;
             }

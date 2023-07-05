@@ -20,6 +20,7 @@ import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 import mindustry.world.modules.*;
 
@@ -72,7 +73,15 @@ public class ConstructBlock extends Block{
         float healthf = tile.build == null ? 1f : tile.build.healthf();
         Seq<Building> prev = tile.build instanceof ConstructBuild co ? co.prevBuild : null;
 
-        tile.setBlock(block, team, rotation);
+        if(block instanceof OverlayFloor overlay){
+            tile.setOverlay(overlay);
+            tile.setBlock(Blocks.air);
+        }else if(block instanceof Floor floor){
+            tile.setFloorUnder(floor);
+            tile.setBlock(Blocks.air);
+        }else{
+            tile.setBlock(block, team, rotation);
+        }
 
         if(tile.build != null){
             tile.build.health = block.health * healthf;

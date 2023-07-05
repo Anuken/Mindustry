@@ -261,7 +261,12 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     @Override
     public void setProp(LAccess prop, double value){
         switch(prop){
-            case health -> health = (float)Mathf.clamp(value, 0, maxHealth);
+            case health -> {
+                health = (float)Mathf.clamp(value, 0, maxHealth);
+                if(health <= 0f && !dead){
+                    kill();
+                }
+            }
             case x -> x = World.unconv((float)value);
             case y -> y = World.unconv((float)value);
             case rotation -> rotation = (float)value;

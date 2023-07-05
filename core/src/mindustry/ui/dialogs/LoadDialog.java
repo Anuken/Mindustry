@@ -24,7 +24,7 @@ import static mindustry.Vars.*;
 public class LoadDialog extends BaseDialog{
     Table slots;
     String searchString;
-    Seq<Gamemode> filteredModes;
+    Seq<Gamemode> hidden;
     TextField searchField;
     ScrollPane pane;
 
@@ -50,7 +50,7 @@ public class LoadDialog extends BaseDialog{
         cont.clear();
 
         slots = new Table();
-        filteredModes = new Seq<>();
+        hidden = new Seq<>();
         pane = new ScrollPane(slots);
 
         rebuild();
@@ -67,9 +67,9 @@ public class LoadDialog extends BaseDialog{
             boolean sandbox = mode == Gamemode.sandbox;
             if(Core.atlas.isFound(icon.getRegion()) || sandbox){
                 search.button(sandbox ? Icon.terrain : icon, Styles.emptyTogglei, () -> {
-                    if(!filteredModes.addUnique(mode)) filteredModes.remove(mode);
+                    if(!hidden.addUnique(mode)) hidden.remove(mode);
                     rebuild();
-                }).size(60f).padLeft(-8f).checked(b -> !filteredModes.contains(mode)).tooltip("@mode." + mode.name() + ".name");
+                }).size(60f).padLeft(-12f).checked(b -> !hidden.contains(mode)).tooltip("@mode." + mode.name() + ".name");
             }
         }
 
@@ -98,7 +98,7 @@ public class LoadDialog extends BaseDialog{
         for(SaveSlot slot : array){
             if(slot.isHidden()
             || (searchString != null && !Strings.stripColors(slot.getName()).toLowerCase().contains(searchString))
-            || (!filteredModes.isEmpty() && filteredModes.contains(slot.mode()))){
+            || (!hidden.isEmpty() && hidden.contains(slot.mode()))){
                 continue;
             }
 

@@ -233,6 +233,8 @@ public class NetClient implements ApplicationListener{
             return;
         }
 
+        if(message == null) return;
+
         if(message.length() > maxTextLength){
             throw new ValidateException(player, "Player has sent a message above the text limit.");
         }
@@ -351,6 +353,12 @@ public class NetClient implements ApplicationListener{
         }
 
         state.rules.objectives = executor;
+    }
+
+    @Remote(called = Loc.server)
+    public static void objectiveCompleted(String[] flagsRemoved, String[] flagsAdded){
+        state.rules.objectiveFlags.removeAll(flagsRemoved);
+        state.rules.objectiveFlags.addAll(flagsAdded);
     }
 
     @Remote(variants = Variant.both)

@@ -195,6 +195,9 @@ public class JsonIO{
 
             @Override
             public Planet read(Json json, JsonValue jsonData, Class type){
+                if(jsonData.asString() == null){
+                    return null;
+                }
                 Planet block = Vars.content.getByName(ContentType.planet, jsonData.asString());
                 return block == null ? Planets.serpulo : block;
             }

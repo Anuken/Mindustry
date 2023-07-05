@@ -189,7 +189,7 @@ public class GameService{
             }
         });
 
-        Events.on(BlockBuildBeginEvent.class, e -> {
+        Events.on(BlockBuildEndEvent.class, e -> {
             if(campaign() && state.rules.sector == SectorPresets.groundZero.sector && e.tile.block() == Blocks.coreNucleus){
                 nucleusGroundZero.complete();
             }

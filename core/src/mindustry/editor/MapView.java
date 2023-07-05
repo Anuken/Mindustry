@@ -184,12 +184,12 @@ public class MapView extends Element implements GestureListener{
             offsety -= ay * 15 * Time.delta / zoom;
         }
 
-        if(Core.input.keyTap(KeyCode.shiftLeft)){
+        if(Core.input.keyTap(KeyCode.shiftLeft) || Core.input.keyTap(KeyCode.altLeft)){
             lastTool = tool;
             tool = EditorTool.pick;
         }
 
-        if(Core.input.keyRelease(KeyCode.shiftLeft) && lastTool != null){
+        if((Core.input.keyRelease(KeyCode.shiftLeft) || Core.input.keyRelease(KeyCode.altLeft)) && lastTool != null){
             tool = lastTool;
             lastTool = null;
         }

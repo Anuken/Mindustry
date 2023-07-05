@@ -168,7 +168,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(called = Loc.server, unreliable = true)
     public static void transferItemTo(@Nullable Unit unit, Item item, int amount, float x, float y, Building build){
-        if(build == null || build.items == null) return;
+        if(build == null || build.items == null || item == null) return;
 
         if(unit != null && unit.item() == item) unit.stack.amount = Math.max(unit.stack.amount - amount, 0);
 
@@ -464,10 +464,12 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         if(player != null) build.lastAccessed = player.name;
+        int previous = build.rotation;
         build.rotation = Mathf.mod(build.rotation + Mathf.sign(direction), 4);
         build.updateProximity();
         build.noSleep();
         Fx.rotateBlock.at(build.x, build.y, build.block.size);
+        Events.fire(new BuildRotateEvent(build, player == null ? null : player.unit(), previous));
     }
 
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
@@ -475,11 +477,15 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(build == null) return;
         if(net.server() && (!Units.canInteract(player, build) ||
             !netServer.admins.allowAction(player, ActionType.configure, build.tile, action -> action.config = value))){
-            var packet = new TileConfigCallPacket(); //undo the config on the client
-            packet.player = player;
-            packet.build = build;
-            packet.value = build.config();
-            player.con.send(packet, true);
+
+            if(player.con != null){
+                var packet = new TileConfigCallPacket(); //undo the config on the client
+                packet.player = player;
+                packet.build = build;
+                packet.value = build.config();
+                player.con.send(packet, true);
+            }
+
             throw new ValidateException(player, "Player cannot configure a tile.");
         }
         build.configured(player == null || player.dead() ? null : player.unit(), value);
@@ -851,7 +857,16 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                     Events.fire(Trigger.unitCommandAttack);
                 }
 
-                Call.commandUnits(player, ids, attack instanceof Building b ? b : null, attack instanceof Unit u ? u : null, target);
+                int maxChunkSize = 200;
+
+                if(ids.length > maxChunkSize){
+                    for(int i = 0; i < ids.length; i += maxChunkSize){
+                        int[] data = Arrays.copyOfRange(ids, i, Math.min(i + maxChunkSize, ids.length));
+                        Call.commandUnits(player, data, attack instanceof Building b ? b : null, attack instanceof Unit u ? u : null, target);
+                    }
+                }else{
+                    Call.commandUnits(player, ids, attack instanceof Building b ? b : null, attack instanceof Unit u ? u : null, target);
+                }
             }
 
             if(commandBuildings.size > 0){
@@ -1038,7 +1053,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
             plan.x = World.toTile(wx - plan.block.offset) + ox;
             plan.y = World.toTile(wy - plan.block.offset) + oy;
-            plan.rotation = Mathf.mod(plan.rotation + direction, 4);
+            plan.rotation = plan.block.planRotation(Mathf.mod(plan.rotation + direction, 4));
         });
     }
 
@@ -1162,6 +1177,21 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Lines.rect(result.x, result.y - 1, result.x2 - result.x, result.y2 - result.y);
         Draw.color(Pal.remove);
         Lines.rect(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
+    }
+
+    protected void drawRebuildSelection(int x, int y, int x2, int y2){
+        drawSelection(x, y, x2, y2, 0, Pal.sapBulletBack, Pal.sapBullet);
+
+        NormalizeDrawResult result = Placement.normalizeDrawArea(Blocks.air, x, y, x2, y2, false, 0, 1f);
+
+        Tmp.r1.set(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
+
+        for(BlockPlan plan : player.team().data().plans){
+            Block block = content.block(plan.block);
+            if(block.bounds(plan.x, plan.y, Tmp.r2).overlaps(Tmp.r1)){
+                drawSelected(plan.x, plan.y, content.block(plan.block), Pal.sapBullet);
+            }
+        }
     }
 
     protected void drawBreakSelection(int x1, int y1, int x2, int y2){
@@ -1648,6 +1678,20 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
         }else{
             Call.dropItem(player.angleTo(x, y));
+        }
+    }
+
+    public void rebuildArea(int x, int y, int x2, int y2){
+        NormalizeResult result = Placement.normalizeArea(x, y, x2, y2, rotation, false, 999999999);
+        Tmp.r1.set(result.x * tilesize, result.y * tilesize, (result.x2 - result.x) * tilesize, (result.y2 - result.y) * tilesize);
+
+        Iterator<BlockPlan> broken = player.team().data().plans.iterator();
+        while(broken.hasNext()){
+            BlockPlan plan = broken.next();
+            Block block = content.block(plan.block);
+            if(block.bounds(plan.x, plan.y, Tmp.r2).overlaps(Tmp.r1)){
+                player.unit().addBuild(new BuildPlan(plan.x, plan.y, plan.rotation, content.block(plan.block), plan.config));
+            }
         }
     }
 

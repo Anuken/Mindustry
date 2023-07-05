@@ -408,7 +408,7 @@ public class Units{
         if(team != null){
             team.data().tree().intersect(x, y, width, height, cons);
         }else{
-            for(var other : state.teams.getActive()){
+            for(var other : state.teams.present){
                 other.tree().intersect(x, y, width, height, cons);
             }
         }

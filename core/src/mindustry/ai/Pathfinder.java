@@ -6,7 +6,6 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
-import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -58,7 +57,8 @@ public class Pathfinder implements Runnable{
 
         //water
         (team, tile) ->
-            (PathTile.solid(tile) || !PathTile.liquid(tile) ? 6000 : 1) +
+            (!PathTile.liquid(tile) ? 6000 : 1) +
+            PathTile.health(tile) * 5 +
             (PathTile.nearGround(tile) || PathTile.nearSolid(tile) ? 14 : 0) +
             (PathTile.deep(tile) ? 0 : 1) +
             (PathTile.damages(tile) ? 35 : 0)
@@ -152,7 +152,7 @@ public class Pathfinder implements Runnable{
 
     /** Packs a tile into its internal representation. */
     public int packTile(Tile tile){
-        boolean nearLiquid = false, nearSolid = false, nearGround = false, solid = tile.solid(), allDeep = tile.floor().isDeep();
+        boolean nearLiquid = false, nearSolid = false, nearLegSolid = false, nearGround = false, solid = tile.solid(), allDeep = tile.floor().isDeep();
 
         for(int i = 0; i < 4; i++){
             Tile other = tile.nearby(i);
@@ -164,6 +164,7 @@ public class Pathfinder implements Runnable{
                 if(osolid && !other.block().teamPassable) nearSolid = true;
                 if(!floor.isLiquid) nearGround = true;
                 if(!floor.isDeep()) allDeep = false;
+                if(other.legSolid()) nearLegSolid = true;
 
                 //other tile is now near solid
                 if(solid && !tile.block().teamPassable){
@@ -179,10 +180,11 @@ public class Pathfinder implements Runnable{
             tid == 0 && tile.build != null && state.rules.coreCapture ? 255 : tid, //use teamid = 255 when core capture is enabled to mark out derelict structures
             solid,
             tile.floor().isLiquid,
-            tile.staticDarkness() >= 2 || (tile.floor().solid && tile.block() == Blocks.air),
+            tile.legSolid(),
             nearLiquid,
             nearGround,
             nearSolid,
+            nearLegSolid,
             tile.floor().isDeep(),
             tile.floor().damageTaken > 0.00001f,
             allDeep,
@@ -521,13 +523,19 @@ public class Pathfinder implements Runnable{
             this.initialized = true;
         }
 
+        public boolean hasCompleteWeights(){
+            return hasComplete && completeWeights != null;
+        }
+
         public void updateTargetPositions(){
             targets.clear();
             getPositions(targets);
         }
 
         protected boolean passable(int pos){
-            return cost.getCost(team.id, pathfinder.tiles[pos]) != impassable;
+            int amount = cost.getCost(team.id, pathfinder.tiles[pos]);
+            //edge case: naval reports costs of 6000+ for non-liquids, even though they are not technically passable
+            return amount != impassable && !(cost == costTypes.get(costNaval) && amount >= 6000);
         }
 
         /** Gets targets to pathfind towards. This must run on the main thread. */
@@ -557,6 +565,8 @@ public class Pathfinder implements Runnable{
         boolean nearGround;
         //whether this block is near a solid object
         boolean nearSolid;
+        //whether this block is near a block that is solid for legged units
+        boolean nearLegSolid;
         //whether this block is deep / drownable
         boolean deep;
         //whether the floor damages

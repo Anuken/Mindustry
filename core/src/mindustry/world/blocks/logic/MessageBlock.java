@@ -97,12 +97,12 @@ public class MessageBlock extends Block{
         }
 
         @Override
-        public void buildConfiguration(Table table){
-            if(!accessible()){
-                deselect();
-                return;
-            }
+        public boolean shouldShowConfigure(Player player){
+            return accessible();
+        }
 
+        @Override
+        public void buildConfiguration(Table table){
             table.button(Icon.pencil, Styles.cleari, () -> {
                 if(mobile){
                     Core.input.getTextInput(new TextInput(){{

@@ -52,10 +52,9 @@ public class DatabaseDialog extends BaseDialog{
         for(int j = 0; j < allContent.length; j++){
             ContentType type = ContentType.all[j];
 
-            Seq<Content> array = allContent[j]
-                .select(c -> c instanceof UnlockableContent u &&
-                    (!u.isHidden() || u.techNode != null) &&
-                    (text.isEmpty() || u.localizedName.toLowerCase().contains(text.toLowerCase())));
+            Seq<UnlockableContent> array = allContent[j]
+                .select(c -> c instanceof UnlockableContent u && !u.isHidden()  &&
+                    (text.isEmpty() || u.localizedName.toLowerCase().contains(text.toLowerCase()))).as();
             if(array.size == 0) continue;
 
             all.add("@content." + type.name() + ".name").growX().left().color(Pal.accent);
@@ -69,7 +68,7 @@ public class DatabaseDialog extends BaseDialog{
                 int count = 0;
 
                 for(int i = 0; i < array.size; i++){
-                    UnlockableContent unlock = (UnlockableContent)array.get(i);
+                    UnlockableContent unlock = array.get(i);
 
                     Image image = unlocked(unlock) ? new Image(unlock.uiIcon).setScaling(Scaling.fit) : new Image(Icon.lock, Pal.gray);
 

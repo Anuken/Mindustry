@@ -75,7 +75,9 @@ public class PointLaserBulletType extends BulletType{
 
     @Override
     public void update(Bullet b){
-        super.update(b);
+        updateTrail(b);
+        updateTrailEffects(b);
+        updateBulletInterval(b);
 
         if(b.timer.get(0, damageInterval)){
             Damage.collidePoint(b, b.team, hitEffect, b.aimX, b.aimY);
@@ -113,6 +115,15 @@ public class PointLaserBulletType extends BulletType{
             }
             b.trail.length = trailLength;
             b.trail.update(b.aimX, b.aimY, b.fslope() * (1f - (trailSinMag > 0 ? Mathf.absin(Time.time, trailSinScl, trailSinMag) : 0f)));
+        }
+    }
+
+    public void updateBulletInterval(Bullet b){
+        if(intervalBullet != null && b.time >= intervalDelay && b.timer.get(2, bulletInterval)){
+            float ang = b.rotation();
+            for(int i = 0; i < intervalBullets; i++){
+                intervalBullet.create(b, b.aimX, b.aimY, ang + Mathf.range(intervalRandomSpread) + intervalAngle + ((i - (intervalBullets - 1f)/2f) * intervalSpread));
+            }
         }
     }
 }

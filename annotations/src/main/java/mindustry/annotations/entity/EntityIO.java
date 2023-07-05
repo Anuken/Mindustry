@@ -118,13 +118,16 @@ public class EntityIO{
         }
     }
 
-    void writeSync(MethodSpec.Builder method, boolean write, Seq<Svar> syncFields, Seq<Svar> allFields) throws Exception{
+    void writeSync(MethodSpec.Builder method, boolean write, Seq<Svar> allFields) throws Exception{
         this.method = method;
         this.write = write;
 
         if(write){
             //write uses most recent revision
             for(RevisionField field : revisions.peek().fields){
+                Svar var = allFields.find(s -> s.name().equals(field.name));
+                if(var == null || var.has(NoSync.class)) continue;
+
                 io(field.type, "this." + field.name, true);
             }
         }else{
@@ -138,6 +141,7 @@ public class EntityIO{
             //add code for reading revision
             for(RevisionField field : rev.fields){
                 Svar var = allFields.find(s -> s.name().equals(field.name));
+                if(var == null || var.has(NoSync.class)) continue;
                 boolean sf = var.has(SyncField.class), sl = var.has(SyncLocal.class);
 
                 if(sl) cont("if(!islocal)");

@@ -224,6 +224,8 @@ public class BulletType extends Content implements Cloneable{
 
     /** Use a negative value to disable splash damage. */
     public float splashDamageRadius = -1f;
+    /** If true, splash damage pierces through tiles. */
+    public boolean splashDamagePierce = false;
 
     /** Amount of fires attempted around bullet. */
     public int incendAmount = 0;
@@ -457,7 +459,7 @@ public class BulletType extends Content implements Cloneable{
 
     public void createSplashDamage(Bullet b, float x, float y){
         if(splashDamageRadius > 0 && !b.absorbed){
-            Damage.damage(b.team, x, y, splashDamageRadius, splashDamage * b.damageMultiplier(), false, collidesAir, collidesGround, scaledSplashDamage, b);
+            Damage.damage(b.team, x, y, splashDamageRadius, splashDamage * b.damageMultiplier(), splashDamagePierce, collidesAir, collidesGround, scaledSplashDamage, b);
 
             if(status != StatusEffects.none){
                 Damage.status(b.team, x, y, splashDamageRadius, status, statusDuration, collidesAir, collidesGround);
@@ -552,7 +554,7 @@ public class BulletType extends Content implements Cloneable{
 
     public void init(Bullet b){
 
-        if(killShooter && b.owner() instanceof Healthc h){
+        if(killShooter && b.owner() instanceof Healthc h && !h.dead()){
             h.kill();
         }
 
@@ -724,6 +726,10 @@ public class BulletType extends Content implements Cloneable{
     }
 
     public @Nullable Bullet create(@Nullable Entityc owner, Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl, Object data, @Nullable Mover mover, float aimX, float aimY){
+        return create(owner, owner, team, x, y, angle, damage, velocityScl, lifetimeScl, data, mover, aimX, aimY);
+    }
+
+    public @Nullable Bullet create(@Nullable Entityc owner, @Nullable Entityc shooter, Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl, Object data, @Nullable Mover mover, float aimX, float aimY){
         if(spawnUnit != null){
             //don't spawn units clientside!
             if(!net.client()){
@@ -736,17 +742,19 @@ public class BulletType extends Content implements Cloneable{
                 }
                 //assign unit owner
                 if(spawned.controller() instanceof MissileAI ai){
-                    if(owner instanceof Unit unit){
+                    if(shooter instanceof Unit unit){
                         ai.shooter = unit;
                     }
 
-                    if(owner instanceof ControlBlock control){
+                    if(shooter instanceof ControlBlock control){
                         ai.shooter = control.unit();
                     }
 
                 }
                 spawned.add();
             }
+            //Since bullet init is never called, handle killing shooter here
+            if(killShooter && owner instanceof Healthc h && !h.dead()) h.kill();
 
             //no bullet returned
             return null;

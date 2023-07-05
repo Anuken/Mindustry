@@ -52,7 +52,7 @@ public class HudFragment{
         //warn about guardian/boss waves
         Events.on(WaveEvent.class, e -> {
             int max = 10;
-            int winWave = state.isCampaign() && state.rules.winWave > 0 ? state.rules.winWave : Integer.MAX_VALUE;
+            int winWave = state.rules.winWave > 0 ? state.rules.winWave : Integer.MAX_VALUE;
             outer:
             for(int i = state.wave - 1; i <= Math.min(state.wave + max, winWave - 2); i++){
                 for(SpawnGroup group : state.rules.spawns){
@@ -228,7 +228,7 @@ public class HudFragment{
                 //table with button to skip wave
                 s.button(Icon.play, rightStyle, 30f, () -> {
                     if(net.client() && player.admin){
-                        Call.adminRequest(player, AdminAction.wave);
+                        Call.adminRequest(player, AdminAction.wave, null);
                     }else{
                         logic.skipWave();
                     }
@@ -293,6 +293,11 @@ public class HudFragment{
         //core info
         parent.fill(t -> {
             t.top();
+
+            if(Core.settings.getBool("macnotch") ){
+                t.margin(macNotchHeight);
+            }
+
             t.visible(() -> shown);
 
             t.name = "coreinfo";
@@ -822,7 +827,7 @@ public class HudFragment{
                 return builder;
             }
 
-            if(state.rules.winWave > 1 && state.rules.winWave >= state.wave && state.isCampaign()){
+            if(state.rules.winWave > 1 && state.rules.winWave >= state.wave){
                 builder.append(wavefc.get(state.wave, state.rules.winWave));
             }else{
                 builder.append(wavef.get(state.wave));

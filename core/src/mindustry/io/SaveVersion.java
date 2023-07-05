@@ -16,6 +16,7 @@ import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.maps.Map;
 import mindustry.world.*;
+import mindustry.world.meta.*;
 
 import java.io.*;
 import java.util.*;
@@ -159,6 +160,11 @@ public abstract class SaveVersion extends SaveFileReader{
             if(state.rules.sector != null){
                 state.rules.sector.planet.applyRules(state.rules);
             }
+        }
+
+        //replace the default serpulo env with erekir
+        if(state.rules.planet == Planets.serpulo && state.rules.hasEnv(Env.scorching)){
+            state.rules.planet = Planets.erekir;
         }
 
         if(!headless){

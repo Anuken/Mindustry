@@ -10,6 +10,7 @@ import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.audio.*;
 import mindustry.content.*;
@@ -63,6 +64,8 @@ public class Weapon implements Cloneable{
     public boolean autoTarget = false;
     /** whether to perform target trajectory prediction */
     public boolean predictTarget = true;
+    /** if true, this weapon is used for attack range calculations */
+    public boolean useAttackRange = true;
     /** ticks to wait in-between targets */
     public float targetInterval = 40f, targetSwitchInterval = 70f;
     /** rotation speed of weapon when rotation is enabled, in degrees/t*/
@@ -248,6 +251,8 @@ public class Weapon implements Cloneable{
             Draw.blend();
             Draw.color();
         }
+
+        Draw.xscl = 1f;
 
         if(parts.size > 0){
             //TODO does it need an outline?
@@ -454,7 +459,8 @@ public class Weapon implements Cloneable{
         lifeScl = bullet.scaleLife ? Mathf.clamp(Mathf.dst(bulletX, bulletY, mount.aimX, mount.aimY) / bullet.range) : 1f,
         angle = angleOffset + shootAngle + Mathf.range(inaccuracy + bullet.inaccuracy);
 
-        mount.bullet = bullet.create(unit, unit.team, bulletX, bulletY, angle, -1f, (1f - velocityRnd) + Mathf.random(velocityRnd), lifeScl, null, mover, mount.aimX, mount.aimY);
+        Entityc shooter = unit.controller() instanceof MissileAI ai ? ai.shooter : unit; //Pass the missile's shooter down to its bullets
+        mount.bullet = bullet.create(unit, shooter, unit.team, bulletX, bulletY, angle, -1f, (1f - velocityRnd) + Mathf.random(velocityRnd), lifeScl, null, mover, mount.aimX, mount.aimY);
         handleBullet(unit, mount, mount.bullet);
 
         if(!continuous){

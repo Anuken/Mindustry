@@ -38,6 +38,8 @@ public class Conduit extends LiquidBlock implements Autotiler{
     /** indices: [rotation] [fluid type] [frame] */
     public TextureRegion[][][] rotateRegions;
 
+    /** If true, the liquid region is padded at corners, so it doesn't stick out. */
+    public boolean padCorners = true;
     public boolean leaks = true;
     public @Nullable Block junctionReplacement, bridgeReplacement, rotBridgeReplacement;
 
@@ -118,7 +120,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
     public Block getReplacement(BuildPlan req, Seq<BuildPlan> plans){
         if(junctionReplacement == null) return this;
 
-        Boolf<Point2> cont = p -> plans.contains(o -> o.x == req.x + p.x && o.y == req.y + p.y && o.rotation == req.rotation && (req.block instanceof Conduit || req.block instanceof LiquidJunction));
+        Boolf<Point2> cont = p -> plans.contains(o -> o.x == req.x + p.x && o.y == req.y + p.y && (req.block instanceof Conduit || req.block instanceof LiquidJunction));
         return cont.get(Geometry.d4(req.rotation)) &&
             cont.get(Geometry.d4(req.rotation - 2)) &&
             req.tile() != null &&
@@ -186,9 +188,9 @@ public class Conduit extends LiquidBlock implements Autotiler{
             int gas = liquids.current().gas ? 1 : 0;
             float ox = 0f, oy = 0f;
             int wrapRot = (rotation + offset) % 4;
-            TextureRegion liquidr = bits == 1 ? rotateRegions[wrapRot][gas][frame] : renderer.fluidFrames[gas][frame];
+            TextureRegion liquidr = bits == 1 && padCorners ? rotateRegions[wrapRot][gas][frame] : renderer.fluidFrames[gas][frame];
 
-            if(bits == 1){
+            if(bits == 1 && padCorners){
                 ox = rotateOffsets[wrapRot][0];
                 oy = rotateOffsets[wrapRot][1];
             }
@@ -221,7 +223,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
         public boolean acceptLiquid(Building source, Liquid liquid){
             noSleep();
             return (liquids.current() == liquid || liquids.currentAmount() < 0.2f)
-                && (tile == null || (source.relativeTo(tile.x, tile.y) + 2) % 4 != rotation);
+                && (tile == null || source == this || (source.relativeTo(tile.x, tile.y) + 2) % 4 != rotation);
         }
 
         @Override

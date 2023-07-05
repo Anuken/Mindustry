@@ -14,7 +14,7 @@ public class MissileAI extends AIController{
 
         float time = unit instanceof TimedKillc t ? t.time() : 1000000f;
 
-        if(time >= unit.type.homingDelay && shooter != null){
+        if(time >= unit.type.homingDelay && shooter != null && !shooter.dead()){
             unit.lookAt(shooter.aimX, shooter.aimY);
         }
 

@@ -72,6 +72,8 @@ public class Renderer implements ApplicationListener{
     landPTimer,
     //intensity for screen shake
     shakeIntensity,
+    //reduction rate of screen shake
+    shakeReduction,
     //current duration of screen shake
     shakeTime;
     //for landTime > 0: if true, core is currently *launching*, otherwise landing.
@@ -83,14 +85,15 @@ public class Renderer implements ApplicationListener{
         Shaders.init();
 
         Events.on(ResetEvent.class, e -> {
-            shakeTime = shakeIntensity = 0f;
+            shakeTime = shakeIntensity = shakeReduction = 0f;
             camShakeOffset.setZero();
         });
     }
 
     public void shake(float intensity, float duration){
-        shakeIntensity = Math.max(shakeIntensity, intensity);
+        shakeIntensity = Math.max(shakeIntensity, Mathf.clamp(intensity, 0, 100));
         shakeTime = Math.max(shakeTime, duration);
+        shakeReduction = shakeIntensity / shakeTime;
     }
 
     public void addEnvRenderer(int mask, Runnable render){
@@ -206,11 +209,13 @@ public class Renderer implements ApplicationListener{
             landTime = 0f;
             graphics.clear(Color.black);
         }else{
+            minimap.update();
+
             if(shakeTime > 0){
                 float intensity = shakeIntensity * (settings.getInt("screenshake", 4) / 4f) * 0.75f;
                 camShakeOffset.setToRandomDirection().scl(Mathf.random(intensity));
                 camera.position.add(camShakeOffset);
-                shakeIntensity -= 0.25f * Time.delta;
+                shakeIntensity -= shakeReduction * Time.delta;
                 shakeTime -= Time.delta;
                 shakeIntensity = Mathf.clamp(shakeIntensity, 0f, 100f);
             }else{
@@ -339,7 +344,7 @@ public class Renderer implements ApplicationListener{
 
         if(bloom != null){
             bloom.resize(graphics.getWidth(), graphics.getHeight());
-            bloom.setBloomIntesity(settings.getInt("bloomintensity", 6) / 4f + 1f);
+            bloom.setBloomIntensity(settings.getInt("bloomintensity", 6) / 4f + 1f);
             bloom.blurPasses = settings.getInt("bloomblur", 1);
             Draw.draw(Layer.bullet - 0.02f, bloom::capture);
             Draw.draw(Layer.effect + 0.02f, bloom::render);
