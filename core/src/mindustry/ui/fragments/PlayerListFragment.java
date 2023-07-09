@@ -197,7 +197,7 @@ public class PlayerListFragment{
                         }
 
                         //there's generally no reason to team switch outside PvP or sandbox, and it's basically an easy way to cheat
-                        if(state.rules.pvp || state.rules.infiniteResources){
+                        if(!state.isCampaign() && (state.rules.pvp || state.rules.infiniteResources)){
                             t.button("@player.team", Icon.redo, bstyle, () -> {
                                 var teamSelect = new BaseDialog(Core.bundle.get("player.team") + ": " + user.name);
                                 teamSelect.setFillParent(false);
