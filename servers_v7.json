@@ -183,5 +183,9 @@
   {
     "name": "Four Family",
     "address": ["118.127.8.162:25503"]
+  },
+  { 
+    "name": "3MIDustry",
+    "address:" ["3midustry.xyz:6567", "3midustry.xyz:90"]
   }
 ]
