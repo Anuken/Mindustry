@@ -40,6 +40,7 @@ public class Team implements Comparable<Team>{
 
     static{
         Mathf.rand.setSeed(8);
+        Mathf.random();Mathf.random();Mathf.random();
         //create the whole 256 placeholder teams
         for(int i = 7; i < all.length; i++){
             new Team(i, "team#" + i, Color.HSVtoRGB(360f * Mathf.random(), 100f * Mathf.random(0.4f, 1f), 100f * Mathf.random(0.6f, 1f), 1f));
