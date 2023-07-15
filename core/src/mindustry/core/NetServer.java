@@ -98,6 +98,8 @@ public class NetServer implements ApplicationListener{
     private boolean closing = false, pvpAutoPaused = true;
     private Interval timer = new Interval(10);
     private IntSet buildHealthChanged = new IntSet();
+    /** Current kick sessions. */
+    public VoteSession[] currentlyKicking = {null};
 
     private ReusableByteOutStream writeBuffer = new ReusableByteOutStream(127);
     private Writes outputBuffer = new Writes(new DataOutputStream(writeBuffer));
@@ -394,8 +396,6 @@ public class NetServer implements ApplicationListener{
 
         //cooldowns per player
         ObjectMap<String, Timekeeper> cooldowns = new ObjectMap<>();
-        //current kick sessions
-        VoteSession[] currentlyKicking = {null};
 
         clientCommands.<Player>register("votekick", "[player] [reason...]", "Vote to kick a player with a valid reason.", (args, player) -> {
             if(!Config.enableVotekick.bool()){
