@@ -28,7 +28,6 @@ import mindustry.mod.*;
 import mindustry.mod.Mods.*;
 import mindustry.ui.*;
 
-import java.io.*;
 import java.text.*;
 import java.util.*;
 
@@ -174,7 +173,7 @@ public class ModsDialog extends BaseDialog{
                             try{
                                 mods.importMod(file);
                                 setup();
-                            }catch(IOException e){
+                            }catch(Exception e){
                                 ui.showException(e);
                                 Log.err(e);
                             }
