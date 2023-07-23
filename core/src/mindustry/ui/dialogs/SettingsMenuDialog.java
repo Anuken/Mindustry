@@ -524,7 +524,9 @@ public class SettingsMenuDialog extends BaseDialog{
                 path = path.startsWith("/") ? path.substring(1) : path;
                 zos.putNextEntry(new ZipEntry(path));
                 if(!add.isDirectory()){
-                    Streams.copy(add.read(), zos);
+                    try(var stream = add.read()){
+                        Streams.copy(stream, zos);
+                    }
                 }
                 zos.closeEntry();
             }
