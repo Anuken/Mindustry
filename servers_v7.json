@@ -181,6 +181,10 @@
     "prioritized": true
   },
   {
+    "name": "Cyandustry",
+    "address": ["91.218.66.162:6568"],
+  },
+  {
     "name": "Four Family",
     "address": ["118.127.8.162:25503"]
   }
