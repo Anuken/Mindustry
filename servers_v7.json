@@ -37,7 +37,7 @@
   },
   {
     "name": "thedimas",
-    "address": ["91.209.226.11", "91.209.226.11:6503","91.209.226.11:6505", "91.209.226.11:6506", "91.209.226.11:6507", "91.209.226.11:6508", "91.209.226.11:6509", "91.209.226.11:6510", "91.209.226.11:6511", "91.209.226.11:6512", "91.209.226.11:6513"]
+    "address": ["167.86.69.235", "167.86.69.235:6503","167.86.69.235:6505", "167.86.69.235:6506", "167.86.69.235:6507", "167.86.69.235:6508", "167.86.69.235:6509", "167.86.69.235:6510", "167.86.69.235:6511", "167.86.69.235:6512", "167.86.69.235:6513"]
   },
   {
     "name": "HexPvP Network",
@@ -57,7 +57,7 @@
   },
   {
     "name": "Darkdustry",
-    "address": ["128.140.88.66:3000", "128.140.88.66:3001", "128.140.88.66:3002", "128.140.88.66:3003", "128.140.88.66:3004", "128.140.88.66:3005", "128.140.88.66:3006", "128.140.88.66:3007", "128.140.88.66:3008", "128.140.88.66:3009", "128.140.88.66:3010"] 
+    "address": ["130.61.78.82:3000", "130.61.78.82:3001", "130.61.78.82:3002", "130.61.78.82:3003", "130.61.78.82:3004", "130.61.78.82:3005", "130.61.78.82:3006", "130.61.78.82:3007", "130.61.78.82:3008", "130.61.78.82:3009", "130.61.78.82:3010"] 
   },
   {
     "name": "Chaotic Neutral",
@@ -97,15 +97,15 @@
   },
   {
     "name": "OMNIDUSTRY",
-    "address": ["80.90.179.146", "80.90.179.146:6568", "80.90.179.146:6569", "80.90.179.146:6570", "80.90.179.146:6571", "80.90.179.146:6572", "80.90.179.146:6573", "80.90.179.146:6574"]
+    "address": ["109.94.209.233", "109.94.209.233:6568", "109.94.209.233:6569", "109.94.209.233:6570", "109.94.209.233:6571", "109.94.209.233:6572", "109.94.209.233:6573", "109.94.209.233:6574"]
   },
   {
     "name": "The Devil",
     "address": ["xem8k5.mindustry.top:8169", "test.xem8k5.top:8920", "other.xem8k5.top:10936", "n2.akiracloud.net:10404"]
   },
   {
-    "name": "Eradicationdustry",
-    "address": ["eradicationmindustry.mindustry.me:6569", "eradicationmindustry.mindustry.me:9547", "eradicationmindustry.mindustry.me:6572", "eradicationmindustry.yeet.ml:6570", "eradicationmindustry.mindustry.me:6571", "eradicationmindustry.mindustry.me:6574", "eradicationmindustry.mindustry.me:6573", "eradicationmindustry2.mindustry.me:6567", "eradicationmindustry.mindustry.me:6568", "eradicationmindustry.mindustry.me:6677", "eradicationmindustry.mindustry.me:6678"]
+    "name": "Eradication Mindustry",
+    "address": ["eradicationmindustry.mindustry.me:6569", "eradicationmindustry.mindustry.me:9547", "eradicationmindustry.mindustry.me:6572", "eradicationmindustry.mindustry.me:6570", "eradicationmindustry.mindustry.me:6571", "eradicationmindustry.mindustry.me:6574", "eradicationmindustry.mindustry.me:6573", "eradicationmindustry.mindustry.me:6568", "eradicationmindustry.mindustry.me:6677", "eradicationmindustry.mindustry.me:6678", "eradicationmindustry.mindustry.me:6675"]
   },
   {
     "name": "Conservatory",
@@ -179,5 +179,9 @@
     "name": "Official Mindustry Events",
     "address": ["event.baseduser.eu.org"],
     "prioritized": true
+  },
+  {
+    "name": "Four Family",
+    "address": ["118.127.8.162:25503"]
   }
 ]
