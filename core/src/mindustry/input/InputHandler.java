@@ -489,7 +489,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             throw new ValidateException(player, "Player cannot configure a tile.");
         }
         build.configured(player == null || player.dead() ? null : player.unit(), value);
-        Core.app.post(() -> Events.fire(new ConfigEvent(build, player, value)));
+        Events.fire(new ConfigEvent(build, player, value));
     }
 
     //only useful for servers or local mods, and is not replicated across clients

@@ -1315,6 +1315,7 @@ public class Blocks{
 
             researchCostMultiplier = 10f;
 
+            group = BlockGroup.heat;
             size = 3;
             drawer = new DrawMulti(new DrawDefault(), new DrawHeatOutput(), new DrawHeatInput("-heat"));
             regionRotated1 = 1;
@@ -1325,6 +1326,7 @@ public class Blocks{
 
             researchCostMultiplier = 10f;
 
+            group = BlockGroup.heat;
             size = 3;
             drawer = new DrawMulti(new DrawDefault(), new DrawHeatOutput(-1, false), new DrawHeatOutput(), new DrawHeatOutput(1, false), new DrawHeatInput("-heat"));
             regionRotated1 = 1;
