@@ -2458,6 +2458,7 @@ public class Blocks{
             consumesPower = outputsPower = true;
             range = 23;
             scaledHealth = 90;
+            fogRadius = 2;
 
             consumePowerBuffered(40000f);
         }};
