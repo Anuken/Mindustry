@@ -170,6 +170,8 @@ public class Block extends UnlockableContent implements Senseable{
     public float baseExplosiveness = 0f;
     /** bullet that this block spawns when destroyed */
     public @Nullable BulletType destroyBullet = null;
+    /** if true, destroyBullet is spawned on the block's team instead of Derelict team */
+    public boolean destroyBulletSameTeam = false;
     /** liquid used for lighting */
     public @Nullable Liquid lightLiquid;
     /** whether cracks are drawn when this block is damaged */

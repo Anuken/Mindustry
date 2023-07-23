@@ -73,7 +73,7 @@
   },
   {
     "name": "Phoenix Network",
-    "address": ["phoenix-network.dev", "phoenix-network.dev:6464"]
+    "address": ["phoenix-network.dev", "phoenix-network.dev:6464", "phoenix-network.dev:2023"]
   },
   {
     "name": "Xpdustry",
@@ -181,7 +181,15 @@
     "prioritized": true
   },
   {
+    "name": "Cyandustry",
+    "address": ["91.218.66.162:6568"],
+  },
+  {
     "name": "Four Family",
     "address": ["118.127.8.162:25503"]
+  },
+  {
+    "name": "ToxoFlame",
+    "address": ["193.233.133.223", "193.233.133.223:6568"]
   }
 ]
