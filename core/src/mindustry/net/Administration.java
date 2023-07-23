@@ -11,6 +11,7 @@ import mindustry.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.payloads.*;
 
 import static mindustry.Vars.*;
 import static mindustry.game.EventType.*;
@@ -659,6 +660,9 @@ public class Administration{
         /** valid for unit-type events only, and even in that case may be null. */
         public @Nullable Unit unit;
 
+        /** valid only for payload events */
+        public @Nullable Payload payload;
+
         /** valid only for removePlanned events only; contains packed positions. */
         public @Nullable int[] plans;
 
@@ -697,7 +701,7 @@ public class Administration{
     }
 
     public enum ActionType{
-        breakBlock, placeBlock, rotate, configure, withdrawItem, depositItem, control, buildSelect, command, removePlanned, commandUnits, commandBuilding, respawn
+        breakBlock, placeBlock, rotate, configure, withdrawItem, depositItem, control, buildSelect, command, removePlanned, commandUnits, commandBuilding, respawn, pickupBlock, dropPayload
     }
 
 }
