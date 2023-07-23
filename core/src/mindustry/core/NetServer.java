@@ -102,11 +102,11 @@ public class NetServer implements ApplicationListener{
     /** Current kick sessions. */
     public VoteSession[] currentlyKicking = {null};
     /** Duration of a kick in seconds. */
-    public static final int kickDuration = 60 * 60;
+    public static int kickDuration = 60 * 60;
     /** Voting round duration in seconds. */
-    public static final float voteDuration = 0.5f * 60;
+    public static float voteDuration = 0.5f * 60;
     /** Cooldown between votes in seconds. */
-    public static final int voteCooldown = 60 * 5;
+    public static int voteCooldown = 60 * 5;
 
     private ReusableByteOutStream writeBuffer = new ReusableByteOutStream(127);
     private Writes outputBuffer = new Writes(new DataOutputStream(writeBuffer));
