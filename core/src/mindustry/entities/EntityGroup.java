@@ -84,6 +84,10 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
         }
     }
 
+    public Seq<T> copy(){
+        return copy(new Seq<>());
+    }
+
     public Seq<T> copy(Seq<T> arr){
         arr.addAll(array);
         return arr;
