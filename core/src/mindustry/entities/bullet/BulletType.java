@@ -767,9 +767,12 @@ public class BulletType extends Content implements Cloneable{
         bullet.time = 0f;
         bullet.originX = x;
         bullet.originY = y;
-        bullet.aimTile = world.tileWorld(aimX, aimY);
+        if(!(aimX == -1f && aimY == -1f)){
+            bullet.aimTile = world.tileWorld(aimX, aimY);
+        }
         bullet.aimX = aimX;
         bullet.aimY = aimY;
+
         bullet.initVel(angle, speed * velocityScl);
         if(backMove){
             bullet.set(x - bullet.vel.x * Time.delta, y - bullet.vel.y * Time.delta);
