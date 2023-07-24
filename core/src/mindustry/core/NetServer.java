@@ -99,8 +99,8 @@ public class NetServer implements ApplicationListener{
     private Interval timer = new Interval(10);
     private IntSet buildHealthChanged = new IntSet();
     
-    /** Current kick sessions. */
-    public VoteSession[] currentlyKicking = {null};
+    /** Current kick session. */
+    public @Nullable VoteSession currentlyKicking = null;
     /** Duration of a kick in seconds. */
     public static int kickDuration = 60 * 60;
     /** Voting round duration in seconds. */
@@ -368,7 +368,7 @@ public class NetServer implements ApplicationListener{
                 return;
             }
 
-            if(currentlyKicking[0] != null){
+            if(currentlyKicking != null){
                 player.sendMessage("[scarlet]A vote is already in progress.");
                 return;
             }
@@ -409,11 +409,11 @@ public class NetServer implements ApplicationListener{
                             return;
                         }
 
-                        VoteSession session = new VoteSession(currentlyKicking, found);
+                        VoteSession session = new VoteSession(found);
                         session.vote(player, 1);
                         Call.sendMessage(Strings.format("[lightgray]Reason:[orange] @[lightgray].", args[1]));
                         vtime.reset();
-                        currentlyKicking[0] = session;
+                        currentlyKicking = session;
                     }
                 }else{
                     player.sendMessage("[scarlet]No player [orange]'" + args[0] + "'[scarlet] found.");
@@ -422,13 +422,13 @@ public class NetServer implements ApplicationListener{
         });
 
         clientCommands.<Player>register("vote", "<y/n/c>", "Vote to kick the current player. Admin can cancel the voting with 'c'.", (arg, player) -> {
-            if(currentlyKicking[0] == null){
+            if(currentlyKicking == null){
                 player.sendMessage("[scarlet]Nobody is being voted on.");
             }else{
                 if(player.admin && arg[0].equalsIgnoreCase("c")){
                     Call.sendMessage(Strings.format("[lightgray]Vote canceled by admin[orange] @[lightgray].", player.name));
-                    currentlyKicking[0].task.cancel();
-                    currentlyKicking[0] = null;
+                    currentlyKicking.task.cancel();
+                    currentlyKicking = null;
                     return;
                 }
 
@@ -444,17 +444,17 @@ public class NetServer implements ApplicationListener{
                 };
 
                 //hosts can vote all they want
-                if((currentlyKicking[0].voted.get(player.uuid(), 2) == sign || currentlyKicking[0].voted.get(admins.getInfo(player.uuid()).lastIP, 2) == sign)){
+                if((currentlyKicking.voted.get(player.uuid(), 2) == sign || currentlyKicking.voted.get(admins.getInfo(player.uuid()).lastIP, 2) == sign)){
                     player.sendMessage(Strings.format("[scarlet]You've already voted @. Sit down.", arg[0].toLowerCase()));
                     return;
                 }
 
-                if(currentlyKicking[0].target == player){
+                if(currentlyKicking.target == player){
                     player.sendMessage("[scarlet]You can't vote on your own trial.");
                     return;
                 }
 
-                if(currentlyKicking[0].target.team() != player.team()){
+                if(currentlyKicking.target.team() != player.team()){
                     player.sendMessage("[scarlet]You can't vote for other teams.");
                     return;
                 }
@@ -464,7 +464,7 @@ public class NetServer implements ApplicationListener{
                     return;
                 }
 
-                currentlyKicking[0].vote(player, sign);
+                currentlyKicking.vote(player, sign);
             }
         });
 
@@ -1083,17 +1083,15 @@ public class NetServer implements ApplicationListener{
     public class VoteSession{
         Player target;
         ObjectIntMap<String> voted = new ObjectIntMap<>();
-        VoteSession[] map;
         Timer.Task task;
         int votes;
 
-        public VoteSession(VoteSession[] map, Player target){
+        public VoteSession(Player target){
             this.target = target;
-            this.map = map;
             this.task = Timer.schedule(() -> {
                 if(!checkPass()){
                     Call.sendMessage(Strings.format("[lightgray]Vote failed. Not enough votes to kick[orange] @[lightgray].", target.name));
-                    map[0] = null;
+                    currentlyKicking = null;
                     task.cancel();
                 }
             }, voteDuration);
@@ -1117,7 +1115,7 @@ public class NetServer implements ApplicationListener{
             if(votes >= votesRequired()){
                 Call.sendMessage(Strings.format("[orange]Vote passed.[scarlet] @[orange] will be banned from the server for @ minutes.", target.name, (kickDuration / 60)));
                 Groups.player.each(p -> p.uuid().equals(target.uuid()), p -> p.kick(KickReason.vote, kickDuration * 1000));
-                map[0] = null;
+                currentlyKicking = null;
                 task.cancel();
                 return true;
             }
