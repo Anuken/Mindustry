@@ -655,7 +655,7 @@ public class NetClient implements ApplicationListener{
             ip = ip.substring(ip.indexOf("/") + 1);
         }
 
-        int colonIndex = address.lastIndexOf(":");
+        int colonIndex = ip.lastIndexOf(":");
         if (colonIndex != -1) {
             ip = ip.substring(0, colonIndex);
         }
