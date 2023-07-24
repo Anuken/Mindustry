@@ -655,6 +655,11 @@ public class NetClient implements ApplicationListener{
             ip = ip.substring(ip.indexOf("/") + 1);
         }
 
+        int colonIndex = address.lastIndexOf(":");
+        if (colonIndex != -1) {
+            ip = ip.substring(0, colonIndex)
+        }
+
         if(Core.settings.getString("usid-" + ip, null) != null){
             return Core.settings.getString("usid-" + ip, null);
         }else{
