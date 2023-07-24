@@ -657,7 +657,7 @@ public class NetClient implements ApplicationListener{
 
         int colonIndex = address.lastIndexOf(":");
         if (colonIndex != -1) {
-            ip = ip.substring(0, colonIndex)
+            ip = ip.substring(0, colonIndex);
         }
 
         if(Core.settings.getString("usid-" + ip, null) != null){
