@@ -191,5 +191,9 @@
   {
     "name": "ToxoFlame",
     "address": ["193.233.133.223", "193.233.133.223:6568"]
+  },
+  {
+    "name": "Meow Island",
+    "address": ["n1.mindustry.me:6590", "n1.mindustry.me:6592", "n1.mindustry.me:6595"]
   }
 ]
