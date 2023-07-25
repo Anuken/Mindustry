@@ -1325,7 +1325,9 @@ public class LExecutor{
                         if((b instanceof OverlayFloor || b == Blocks.air) && tile.overlay() != b) tile.setOverlayNet(b);
                     }
                     case floor -> {
-                        if(b instanceof Floor f && tile.floor() != f && !f.isOverlay()) tile.setFloorNet(f);
+                        if(b instanceof Floor f && tile.floor() != f && !f.isOverlay() && !f.isAir()){
+                            tile.setFloorNet(f);
+                        }
                     }
                     case block -> {
                         if(!b.isFloor() || b == Blocks.air){
