@@ -5,7 +5,7 @@ public class ConsumeCoolant extends ConsumeLiquidFilter{
     public float maxTemp = 0.5f, maxFlammability = 0.1f;
 
     public ConsumeCoolant(float amount){
-        this.filter = liquid -> liquid.coolant && !liquid.gas && liquid.temperature <= maxTemp && liquid.flammability < maxFlammability;
+        this.filter = liquid -> liquid.coolant && liquid.temperature <= maxTemp && liquid.flammability < maxFlammability;
         this.amount = amount;
     }
 
