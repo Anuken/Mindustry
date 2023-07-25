@@ -74,6 +74,7 @@ public class Liquids{
         }};
 
         ozone = new Liquid("ozone", Color.valueOf("fc81dd")){{
+            coolant = false;
             gas = true;
             barColor = Color.valueOf("d699f0");
             explosiveness = 1f;
@@ -81,15 +82,18 @@ public class Liquids{
         }};
 
         hydrogen = new Liquid("hydrogen", Color.valueOf("9eabf7")){{
+            coolant = false;
             gas = true;
             flammability = 1f;
         }};
 
         nitrogen = new Liquid("nitrogen", Color.valueOf("efe3ff")){{
+            coolant = false;
             gas = true;
         }};
 
         cyanogen = new Liquid("cyanogen", Color.valueOf("89e8b6")){{
+            coolant = false;
             gas = true;
             flammability = 2f;
         }};
