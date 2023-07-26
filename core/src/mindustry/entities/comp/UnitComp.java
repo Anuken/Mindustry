@@ -302,7 +302,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
                         Unit unit = ut.create(team());
                         if(pay.canPickup(unit)) pay.addPayload(new UnitPayload(unit));
                     }else if(value == null && pay.payloads().size > 0){
-                        pay.dropLastPayload();
+                        pay.payloads().pop();
                     }
                 }
             }
