@@ -997,6 +997,10 @@ public class Block extends UnlockableContent implements Senseable{
         return consume(new ConsumeCoolant(amount));
     }
 
+    public ConsumeCoolant consumeCoolant(float amount, boolean allowLiquid, boolean allowGas){
+        return consume(new ConsumeCoolant(amount, allowLiquid, allowGas));
+    }
+
     public <T extends Consume> T consume(T consume){
         if(consume instanceof ConsumePower){
             //there can only be one power consumer
