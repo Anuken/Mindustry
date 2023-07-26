@@ -12,6 +12,7 @@ import mindustry.game.*;
 import mindustry.logic.LExecutor.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.legacy.*;
 
 import java.io.*;
 
@@ -75,7 +76,7 @@ public class GlobalVars{
 
         for(Block block : Vars.content.blocks()){
             //only register blocks that have no item equivalent (this skips sand)
-            if(content.item(block.name) == null){
+            if(content.item(block.name) == null & !(block instanceof LegacyBlock)){
                 put("@" + block.name, block);
             }
         }
