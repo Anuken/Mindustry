@@ -189,7 +189,7 @@ public class Weapon implements Cloneable{
         float
         rotation = unit.rotation - 90,
         realRecoil = Mathf.pow(mount.recoil, recoilPow) * recoil,
-        weaponRotation  = rotation + (rotate ? mount.rotation : 0),
+        weaponRotation  = rotation + (rotate ? mount.rotation : baseRotation),
         wx = unit.x + Angles.trnsx(rotation, x, y) + Angles.trnsx(weaponRotation, 0, -realRecoil),
         wy = unit.y + Angles.trnsy(rotation, x, y) + Angles.trnsy(weaponRotation, 0, -realRecoil);
 
