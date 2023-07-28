@@ -123,6 +123,14 @@ public class ResearchDialog extends BaseDialog{
         keyDown(key -> {
             if(key == Core.keybinds.get(Binding.research).key){
                 Core.app.post(this::hide);
+            }else if (key==KeyCode.a) {
+            	pan(1,0);
+            }else if (key==KeyCode.d) {
+            	pan(-1,0);
+            }else if (key==KeyCode.w) {
+            	pan(0,-1);
+            }else if (key==KeyCode.s) {
+            	pan(0,1);
             }
         });
 
@@ -177,7 +185,14 @@ public class ResearchDialog extends BaseDialog{
         });
     }
 
-    @Override
+    private void pan(int x, int y) {
+    	view.panX += x*100 / view.scaleX;
+        view.panY += y*100 / view.scaleY;
+        view.moved = true;
+        view.clamp();
+	}
+
+	@Override
     public Dialog show(){
         if(net.client()){
             ui.showInfo("@research.multiplayer");
