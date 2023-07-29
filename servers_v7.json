@@ -181,6 +181,10 @@
     "prioritized": true
   },
   {
+    "name": "LifeTime",
+    "address": ["srv3.godlike.club:28561"]
+  },
+  {
     "name": "Cyandustry",
     "address": ["91.218.66.162:6568"],
   },
