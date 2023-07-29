@@ -194,10 +194,14 @@ public class BulletType extends Content implements Cloneable{
     public @Nullable UnitType spawnUnit;
     /** Unit spawned when this bullet hits something or despawns due to it hitting the end of its lifetime. */
     public @Nullable UnitType despawnUnit;
+    /** The chance for despawn units to spawn. */
+    public float despawnUnitChance = 1;
     /** Amount of units spawned when this bullet despawns. */
     public int despawnUnitCount = 1;
     /** Random offset distance from the original bullet despawn/hit coordinate. */
     public float despawnUnitRadius = 0.1f;
+    /** If true, units spawned when this bullet despawns face away from the bullet instead of the same direction as the bullet. */
+    public boolean faceOutwards = false;
     /** Extra visual parts for this bullet. */
     public Seq<DrawPart> parts = new Seq<>();
 
@@ -489,9 +493,11 @@ public class BulletType extends Content implements Cloneable{
     }
 
     public void createUnits(Bullet b, float x, float y){
-        if(despawnUnit != null){
+        if(despawnUnit != null && Mathf.chance(despawnUnitChance)){
             for(int i = 0; i < despawnUnitCount; i++){
-                despawnUnit.spawn(b.team, x + Mathf.range(despawnUnitRadius), y + Mathf.range(despawnUnitRadius));
+                Tmp.v1.rnd(Mathf.random(despawnUnitRadius));
+                var u = despawnUnit.spawn(b.team, x + Tmp.v1.x, y + Tmp.v1.y);
+                u.rotation = faceOutwards ? Tmp.v1.angle() : b.rotation();
             }
         }
     }
