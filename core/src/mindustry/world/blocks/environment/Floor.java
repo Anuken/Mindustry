@@ -255,7 +255,7 @@ public class Floor extends Block{
             Point2 point = Geometry.d8[i];
             Tile other = tile.nearby(point);
 
-            if(other != null && doEdge(tile, other, other.floor()) && other.floor().cacheLayer == realCache && other.floor().edges() != null){
+            if(other != null && doEdge(tile, other, other.floor()) && other.floor().cacheLayer == realCache && other.floor().edges() != null && other.floor() != Blocks.empty){
 
                 if(!blended.getAndSet(other.floor().id)){
                     blenders.add(other.floor());
