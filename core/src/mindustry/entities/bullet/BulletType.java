@@ -125,6 +125,10 @@ public class BulletType extends Content implements Cloneable{
     /** Whether to move the bullet back depending on delta to fix some delta-time related issues.
      * Do not change unless you know what you're doing. */
     public boolean backMove = true;
+    /** If true, the angle param in create is ignored. */
+    public boolean ignoreSpawnAngle = false;
+    /** Chance for this bullet to be created. */
+    public float createChance = 1;
     /** Bullet range positive override. */
     public float maxRange = -1f;
     /** When > 0, overrides range even if smaller than base range. */
@@ -736,6 +740,8 @@ public class BulletType extends Content implements Cloneable{
     }
 
     public @Nullable Bullet create(@Nullable Entityc owner, @Nullable Entityc shooter, Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl, Object data, @Nullable Mover mover, float aimX, float aimY){
+        if(!Mathf.chance(createChance)) return null;
+        if(ignoreSpawnAngle) angle = 0;
         if(spawnUnit != null){
             //don't spawn units clientside!
             if(!net.client()){
