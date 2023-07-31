@@ -520,7 +520,7 @@ public class Mods implements Loadable{
             //only enabled mods participate; this state is resolved in load()
             Seq<LoadedMod> enabled = mods.select(LoadedMod::enabled);
 
-            var mapping = enabled.asMap(m -> m.meta.name);
+            var mapping = enabled.asMap(m -> m.meta.internalName);
             lastOrderedMods = resolveDependencies(enabled.map(m -> m.meta)).orderedKeys().map(mapping::get);
         }
         return lastOrderedMods;
@@ -798,8 +798,7 @@ public class Mods implements Loadable{
     }
 
     /** Tries to find the config file of a mod/plugin. */
-    @Nullable
-    public ModMeta findMeta(Fi file){
+    public @Nullable ModMeta findMeta(Fi file){
         Fi metaFile = null;
         for(String name : metaFiles){
             if((metaFile = file.child(name)).exists()){
@@ -828,11 +827,11 @@ public class Mods implements Loadable{
             for(var dependency : meta.softDependencies){
                 dependencies.add(new ModDependency(dependency, false));
             }
-            context.dependencies.put(meta.name, dependencies);
+            context.dependencies.put(meta.internalName, dependencies);
         }
 
         for(var key : context.dependencies.keys()){
-            if (context.ordered.contains(key)) {
+            if(context.ordered.contains(key)){
                 continue;
             }
             resolve(key, context);
@@ -1167,7 +1166,12 @@ public class Mods implements Loadable{
 
     /** Mod metadata information.*/
     public static class ModMeta{
-        public String name, minGameVersion = "0";
+        /** Name as defined in mod.json. Stripped of colors, but may contain spaces. */
+        public String name;
+        /** Name without spaces in all lower case. */
+        public String internalName;
+        /** Minimum game version that this mod requires, e.g. "140.1" */
+        public String minGameVersion = "0";
         public @Nullable String displayName, author, description, subtitle, version, main, repo;
         public Seq<String> dependencies = Seq.with();
         public Seq<String> softDependencies = Seq.with();
@@ -1183,7 +1187,8 @@ public class Mods implements Loadable{
         public boolean pregenerated;
 
         public String displayName(){
-            return displayName == null ? name : displayName;
+            //useless, kept for legacy reasons
+            return displayName;
         }
 
         public String shortDescription(){
@@ -1194,9 +1199,11 @@ public class Mods implements Loadable{
         public void cleanup(){
             if(name != null) name = Strings.stripColors(name);
             if(displayName != null) displayName = Strings.stripColors(displayName);
+            if(displayName == null) displayName = name;
             if(author != null) author = Strings.stripColors(author);
             if(description != null) description = Strings.stripColors(description);
             if(subtitle != null) subtitle = Strings.stripColors(subtitle).replace("\n", "");
+            if(name != null) internalName = name.toLowerCase(Locale.ROOT).replace(" ", "-");
         }
 
         public int getMinMajor(){

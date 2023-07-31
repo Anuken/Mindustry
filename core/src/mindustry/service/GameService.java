@@ -115,6 +115,12 @@ public class GameService{
             installMod.complete();
         }
 
+        Events.on(ClientLoadEvent.class, e -> {
+            if(mods.list().size > 0){
+                installMod.complete();
+            }
+        });
+
         if(Core.bundle.get("yes").equals("router")){
             routerLanguage.complete();
         }

@@ -181,8 +181,12 @@
     "prioritized": true
   },
   {
+    "name": "LifeTime",
+    "address": ["srv3.godlike.club:28561", "srv3.godlike.club:26508"]
+  },
+  {
     "name": "Cyandustry",
-    "address": ["91.218.66.162:6568"],
+    "address": ["91.218.66.162:6568"]
   },
   {
     "name": "Four Family",
@@ -190,7 +194,7 @@
   },
   {
     "name": "ToxoFlame",
-    "address": ["193.233.133.223", "193.233.133.223:6568"]
+    "address": ["193.233.133.223", "193.233.133.223:6568", "193.233.133.223:6569"]
   },
   {
     "name": "Meow Island",
@@ -198,6 +202,10 @@
   },
   {
     "name": "3MIDustry",
-    "address": ["3midustry.xyz:10", "3midustry.xyz:20", "3midustry.xyz:30", "3midustry.xyz:40"]
+    "address": ["3midustry.xyz:10", "3midustry.xyz:20", "3midustry.xyz:30", "3midustry.xyz:40", "3midustry.xyz:50"]
+  },
+  {
+    "name": "ABCXYZ Community",
+    "address": ["118.127.8.162:25617", "78.108.218.117:25640"]
   }
 ]
