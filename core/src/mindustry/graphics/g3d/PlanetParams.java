@@ -20,8 +20,6 @@ public class PlanetParams{
     public Vec3 camDir = new Vec3(0, 0, -1);
     /** Planet being looked at. */
     public Planet planet = Planets.serpulo;
-    /** The sun/main planet of the solar system from which everything is rendered. */
-    public Planet solarSystem() {return planet.solarSystem;}
     /** Zoom relative to planet. */
     public float zoom = 1f;
     /** Alpha of orbit rings and other UI elements. */
