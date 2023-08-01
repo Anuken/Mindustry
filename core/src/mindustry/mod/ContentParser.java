@@ -870,6 +870,15 @@ public class ContentParser{
 
         String tname = Strings.capitalize(data.getString("type", "NoiseMesh"));
 
+        Color[] colors = new Color[0];
+        if(tname.equals("SunMesh")){
+            var cvals = data.get("colors").asStringArray();
+            colors = new Color[cvals.length];
+            for(int i=0; i<cvals.length; i++){
+                colors[i] = Color.valueOf(cvals[i]);
+            }
+        }
+
         return switch(tname){
             //TODO NoiseMesh is bad
             case "NoiseMesh" -> new NoiseMesh(planet,
@@ -881,7 +890,7 @@ public class ContentParser{
             data.getFloat("colorThreshold", 0.5f));
             case "SunMesh" -> new SunMesh(planet, data.getInt("divisions", 1), data.getInt("octaves", 1), data.getFloat("persistence", 0.5f),
             data.getFloat("scl", 1f), data.getFloat("pow", 1f), data.getFloat("mag", 0.5f),
-            data.getFloat("colorScale", 1f), Color.valueOf(data.get("color").asString()));
+            data.getFloat("colorScale", 1f), colors);
             case "HexSkyMesh" -> new HexSkyMesh(planet,
             data.getInt("seed", 0), data.getFloat("speed", 0), data.getFloat("radius", 1f),
             data.getInt("divisions", 3), Color.valueOf(data.getString("color", "ffffff")), data.getInt("octaves", 1),
