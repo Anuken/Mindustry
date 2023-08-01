@@ -879,6 +879,9 @@ public class ContentParser{
             Color.valueOf(data.getString("color2", data.getString("color", "ffffff"))),
             data.getInt("colorOct", 1), data.getFloat("colorPersistence", 0.5f), data.getFloat("colorScale", 1f),
             data.getFloat("colorThreshold", 0.5f));
+            case "SunMesh" -> new SunMesh(planet, data.getInt("divisions", 1), data.getInt("octaves", 1), data.getFloat("persistence", 0.5f),
+            data.getFloat("scl", 1f), data.getFloat("pow", 1f), data.getFloat("mag", 0.5f),
+            data.getFloat("colorScale", 1f), Color.valueOf(data.get("color").asString()));
             case "HexSkyMesh" -> new HexSkyMesh(planet,
             data.getInt("seed", 0), data.getFloat("speed", 0), data.getFloat("radius", 1f),
             data.getInt("divisions", 3), Color.valueOf(data.getString("color", "ffffff")), data.getInt("octaves", 1),
