@@ -633,6 +633,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                             if(state.planet != planet){
                                 newPresets.clear();
                                 state.planet = planet;
+
                                 rebuildExpand();
                             }
                             settings.put("lastplanet", planet.name);
@@ -643,7 +644,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                     }
                 }
             }
-        }),
+        }).visible(() -> mode != select),
 
         new Table(c -> {
             expandTable = c;
