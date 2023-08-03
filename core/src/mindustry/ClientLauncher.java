@@ -204,6 +204,8 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
 
         if(limitFps){
             nextFrame += (1000 * 1000000) / targetfps;
+        }else{
+            nextFrame = Time.nanos();
         }
 
         if(!finished){

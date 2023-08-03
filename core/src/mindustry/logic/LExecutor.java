@@ -16,6 +16,7 @@ import mindustry.entities.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
+import mindustry.logic.LogicFx.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
@@ -122,6 +123,11 @@ public class LExecutor{
         return index < 0 ? logicVars.get(-index) : vars[index];
     }
 
+    /** @return a Var from this processor, never a global constant. May be null if out of bounds. */
+    public @Nullable Var optionalVar(int index){
+        return index < 0 || index >= vars.length ? null : vars[index];
+    }
+
     public @Nullable Building building(int index){
         Object o = var(index).objval;
         return var(index).isobj && o instanceof Building building ? building : null;
@@ -202,6 +208,9 @@ public class LExecutor{
 
         public Object objval;
         public double numval;
+
+        //ms timestamp for when this was last synced; used in the sync instruction
+        public long syncTime;
 
         public Var(String name){
             this.name = name;
@@ -1557,6 +1566,35 @@ public class LExecutor{
         }
     }
 
+    public static class EffectI implements LInstruction{
+        public EffectEntry type;
+        public int x, y, rotation, color, data;
+
+        public EffectI(EffectEntry type, int x, int y, int rotation, int color, int data){
+            this.type = type;
+            this.x = x;
+            this.y = y;
+            this.rotation = rotation;
+            this.color = color;
+            this.data = data;
+        }
+
+        public EffectI(){
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            if(type != null){
+                double col = exec.num(color);
+                //limit size so people don't create lag with ridiculous numbers (some explosions scale with size)
+                float rot = type.rotate ? exec.numf(rotation) :
+                    Math.min(exec.numf(rotation), 1000f);
+
+                type.effect.at(World.unconv(exec.numf(x)), World.unconv(exec.numf(y)), rot, Tmp.c1.fromDouble(col), exec.obj(data));
+            }
+        }
+    }
+
     public static class ExplosionI implements LInstruction{
         public int team, x, y, radius, damage, air, ground, pierce;
 
@@ -1617,6 +1655,47 @@ public class LExecutor{
         }
     }
 
+    @Remote(unreliable = true)
+    public static void syncVariable(Building building, int variable, Object value){
+        if(building instanceof LogicBuild build){
+            Var v = build.executor.optionalVar(variable);
+            if(v != null && !v.constant){
+                if(value instanceof Double d){
+                    v.isobj = false;
+                    v.numval = d;
+                }else{
+                    v.isobj = true;
+                    v.objval =value;
+                }
+            }
+        }
+    }
+
+    public static class SyncI implements LInstruction{
+        //10 syncs per second
+        static final long syncInterval = 1000 / 10;
+
+        public int variable;
+
+        public SyncI(int variable){
+            this.variable = variable;
+        }
+
+        public SyncI(){
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            if(exec.build != null && exec.build.block.privileged){
+                Var v = exec.var(variable);
+                if(!v.constant && Time.timeSinceMillis(v.syncTime) > syncInterval){
+                    v.syncTime = Time.millis();
+                    Call.syncVariable(exec.build, variable, v.isobj ? v.objval : v.numval);
+                }
+            }
+        }
+    }
+
     public static class GetFlagI implements LInstruction{
         public int result, flag;
 
@@ -1638,6 +1717,15 @@ public class LExecutor{
         }
     }
 
+    @Remote(called = Loc.server)
+    public static void setFlag(String flag, boolean add){
+        if(add){
+            state.rules.objectiveFlags.add(flag);
+        }else{
+            state.rules.objectiveFlags.remove(flag);
+        }
+    }
+
     public static class SetFlagI implements LInstruction{
         public int flag, value;
 
@@ -1651,12 +1739,9 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            if(exec.obj(flag) instanceof String str){
-                if(!exec.bool(value)){
-                    state.rules.objectiveFlags.remove(str);
-                }else{
-                    state.rules.objectiveFlags.add(str);
-                }
+            //don't invoke unless the flag state actually changes
+            if(exec.obj(flag) instanceof String str && state.rules.objectiveFlags.contains(str) != exec.bool(value)){
+                Call.setFlag(str, exec.bool(value));
             }
         }
     }

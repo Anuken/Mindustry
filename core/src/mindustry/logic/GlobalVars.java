@@ -2,6 +2,7 @@ package mindustry.logic;
 
 import arc.*;
 import arc.files.*;
+import arc.graphics.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
@@ -79,6 +80,13 @@ public class GlobalVars{
             if(content.item(block.name) == null & !(block instanceof LegacyBlock)){
                 put("@" + block.name, block);
             }
+        }
+
+        for(var entry : Colors.getColors().entries()){
+            //ignore uppercase variants, they are duplicates
+            if(Character.isUpperCase(entry.key.charAt(0))) continue;
+
+            put("@color" + Strings.capitalize(entry.key), entry.value.toDoubleBits());
         }
 
         //used as a special value for any environmental solid block

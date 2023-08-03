@@ -71,6 +71,7 @@ public class UI implements ApplicationListener, Loadable{
     public SchematicsDialog schematics;
     public ModsDialog mods;
     public ColorPicker picker;
+    public EffectsDialog effects;
     public LogicDialog logic;
     public FullTextDialog fullText;
     public CampaignCompleteDialog campaignComplete;
@@ -183,6 +184,7 @@ public class UI implements ApplicationListener, Loadable{
         consolefrag = new ConsoleFragment();
 
         picker = new ColorPicker();
+        effects = new EffectsDialog();
         editor = new MapEditorDialog();
         controls = new KeybindDialog();
         restart = new GameOverDialog();

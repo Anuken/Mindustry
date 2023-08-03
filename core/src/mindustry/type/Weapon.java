@@ -38,7 +38,7 @@ public class Weapon implements Cloneable{
     public boolean useAmmo = true;
     /** whether to create a flipped copy of this weapon upon initialization. default: true */
     public boolean mirror = true;
-    /** whether to flip the weapon's sprite when rendering */
+    /** whether to flip the weapon's sprite when rendering. internal use only - do not set! */
     public boolean flipSprite = false;
     /** whether to shoot the weapons in different arms one after another, rather than all at once; only valid when mirror = true */
     public boolean alternate = true;
