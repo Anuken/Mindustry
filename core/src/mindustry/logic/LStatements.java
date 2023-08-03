@@ -1703,7 +1703,7 @@ public class LStatements{
     }
 
     //TODO: test this first
-    //@RegisterStatement("sync")
+    @RegisterStatement("sync")
     public static class SyncStatement extends LStatement{
         public String variable = "var";
 

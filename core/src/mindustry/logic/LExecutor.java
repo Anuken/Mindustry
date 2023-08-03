@@ -1665,7 +1665,7 @@ public class LExecutor{
                     v.numval = d;
                 }else{
                     v.isobj = true;
-                    v.objval =value;
+                    v.objval = value;
                 }
             }
         }
