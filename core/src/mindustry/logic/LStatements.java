@@ -1207,7 +1207,7 @@ public class LStatements{
             fields(table, result, str -> result = str);
 
             table.add(" = spawn ");
-            field(table, type, str -> type = str);
+            field(table, type, str -> type = str).colspan(!LCanvas.useRows() ? 1 : 2);
 
             row(table);
 
@@ -1219,7 +1219,9 @@ public class LStatements{
 
             table.row();
 
-            table.add();
+            if(!LCanvas.useRows()){
+                table.add();
+            }
 
             table.add("team ");
             field(table, team, str -> team = str);
@@ -1869,13 +1871,17 @@ public class LStatements{
                 }));
             }, Styles.logict, () -> {}).size(40f).padLeft(-1).color(table.color);
 
+            row(table);
+
             table.add(" of ").self(this::param);
 
-            field(table, of, str -> of = str);
+            field(table, of, str -> of = str).colspan(2);
+
+            row(table);
 
             table.add(" to ");
 
-            field(table, value, str -> value = str);
+            field(table, value, str -> value = str).colspan(2);
         }
 
         private void stype(String text){
