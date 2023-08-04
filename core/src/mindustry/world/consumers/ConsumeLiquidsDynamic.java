@@ -8,7 +8,6 @@ import mindustry.type.LiquidStack;
 import mindustry.ui.ReqImage;
 import mindustry.world.Block;
 
-//Requires setting your block's liquidFilter at init.
 public class ConsumeLiquidsDynamic extends Consume{
     public final Func<Building, LiquidStack[]> liquids;
 
