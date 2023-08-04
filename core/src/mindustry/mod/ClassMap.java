@@ -441,6 +441,7 @@ public class ClassMap{
         classes.put("ConsumeLiquidFilter", mindustry.world.consumers.ConsumeLiquidFilter.class);
         classes.put("ConsumeLiquidFlammable", mindustry.world.consumers.ConsumeLiquidFlammable.class);
         classes.put("ConsumeLiquids", mindustry.world.consumers.ConsumeLiquids.class);
+        classes.put("ConsumeLiquidsDynamic", mindustry.world.consumers.ConsumeLiquidsDynamic.class);
         classes.put("ConsumePayloadDynamic", mindustry.world.consumers.ConsumePayloadDynamic.class);
         classes.put("ConsumePayloadFilter", mindustry.world.consumers.ConsumePayloadFilter.class);
         classes.put("ConsumePayloads", mindustry.world.consumers.ConsumePayloads.class);
