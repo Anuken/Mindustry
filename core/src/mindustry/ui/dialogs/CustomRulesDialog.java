@@ -185,13 +185,6 @@ public class CustomRulesDialog extends BaseDialog{
         check("@rules.hidebannedblocks", b -> rules.hideBannedBlocks = b, () -> rules.hideBannedBlocks);
         check("@bannedblocks.whitelist", b -> rules.blockWhitelist = b, () -> rules.blockWhitelist);
 
-        //TODO objectives would be nice
-        if(experimental && false){
-            main.button("@objectives", () -> {
-
-            }).left().width(300f).row();
-        }
-
         title("@rules.title.unit");
         check("@rules.unitcapvariable", b -> rules.unitCapVariable = b, () -> rules.unitCapVariable);
         numberi("@rules.unitcap", f -> rules.unitCap = f, () -> rules.unitCap, -999, 999);
@@ -259,14 +252,9 @@ public class CustomRulesDialog extends BaseDialog{
             }
 
             t.button("@rules.anyenv", style, () -> {
-                if(!rules.infiniteResources){
-                    //unlocalized for now
-                    ui.showInfo("The 'any' environment can only be used in sandbox mode.");
-                }else{
-                    rules.env = Vars.defaultEnv;
-                    rules.hiddenBuildItems.clear();
-                    rules.planet = Planets.sun;
-                }
+                rules.env = Vars.defaultEnv;
+                rules.hiddenBuildItems.clear();
+                rules.planet = Planets.sun;
             }).group(group).checked(b -> rules.planet == Planets.sun);
         }).left().fill(false).expand(false, false).row();
 

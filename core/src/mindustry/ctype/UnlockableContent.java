@@ -69,7 +69,7 @@ public abstract class UnlockableContent extends MappableContent{
     }
 
     public String displayDescription(){
-        return minfo.mod == null ? description : description + "\n" + Core.bundle.format("mod.display", minfo.mod.meta.displayName());
+        return minfo.mod == null ? description : description + "\n" + Core.bundle.format("mod.display", minfo.mod.meta.displayName);
     }
 
     /** Checks stat initialization state. Call before displaying stats. */

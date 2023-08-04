@@ -98,6 +98,15 @@ public class NetServer implements ApplicationListener{
     private boolean closing = false, pvpAutoPaused = true;
     private Interval timer = new Interval(10);
     private IntSet buildHealthChanged = new IntSet();
+    
+    /** Current kick session. */
+    public @Nullable VoteSession currentlyKicking = null;
+    /** Duration of a kick in seconds. */
+    public static int kickDuration = 60 * 60;
+    /** Voting round duration in seconds. */
+    public static float voteDuration = 0.5f * 60;
+    /** Cooldown between votes in seconds. */
+    public static int voteCooldown = 60 * 5;
 
     private ReusableByteOutStream writeBuffer = new ReusableByteOutStream(127);
     private Writes outputBuffer = new Writes(new DataOutputStream(writeBuffer));
@@ -340,62 +349,8 @@ public class NetServer implements ApplicationListener{
             Groups.player.each(Player::admin, a -> a.sendMessage(raw, player, args[0]));
         });
 
-        //duration of a kick in seconds
-        int kickDuration = 60 * 60;
-        //voting round duration in seconds
-        float voteDuration = 0.5f * 60;
-        //cooldown between votes in seconds
-        int voteCooldown = 60 * 5;
-
-        class VoteSession{
-            Player target;
-            ObjectIntMap<String> voted = new ObjectIntMap<>();
-            VoteSession[] map;
-            Timer.Task task;
-            int votes;
-
-            public VoteSession(VoteSession[] map, Player target){
-                this.target = target;
-                this.map = map;
-                this.task = Timer.schedule(() -> {
-                    if(!checkPass()){
-                        Call.sendMessage(Strings.format("[lightgray]Vote failed. Not enough votes to kick[orange] @[lightgray].", target.name));
-                        map[0] = null;
-                        task.cancel();
-                    }
-                }, voteDuration);
-            }
-
-            void vote(Player player, int d){
-                int lastVote = voted.get(player.uuid(), 0) | voted.get(admins.getInfo(player.uuid()).lastIP, 0);
-                votes -= lastVote;
-
-                votes += d;
-                voted.put(player.uuid(), d);
-                voted.put(admins.getInfo(player.uuid()).lastIP, d);
-
-                Call.sendMessage(Strings.format("[lightgray]@[lightgray] has voted on kicking[orange] @[lightgray].[accent] (@/@)\n[lightgray]Type[orange] /vote <y/n>[] to agree.",
-                    player.name, target.name, votes, votesRequired()));
-
-                checkPass();
-            }
-
-            boolean checkPass(){
-                if(votes >= votesRequired()){
-                    Call.sendMessage(Strings.format("[orange]Vote passed.[scarlet] @[orange] will be banned from the server for @ minutes.", target.name, (kickDuration / 60)));
-                    Groups.player.each(p -> p.uuid().equals(target.uuid()), p -> p.kick(KickReason.vote, kickDuration * 1000));
-                    map[0] = null;
-                    task.cancel();
-                    return true;
-                }
-                return false;
-            }
-        }
-
         //cooldowns per player
         ObjectMap<String, Timekeeper> cooldowns = new ObjectMap<>();
-        //current kick sessions
-        VoteSession[] currentlyKicking = {null};
 
         clientCommands.<Player>register("votekick", "[player] [reason...]", "Vote to kick a player with a valid reason.", (args, player) -> {
             if(!Config.enableVotekick.bool()){
@@ -413,7 +368,7 @@ public class NetServer implements ApplicationListener{
                 return;
             }
 
-            if(currentlyKicking[0] != null){
+            if(currentlyKicking != null){
                 player.sendMessage("[scarlet]A vote is already in progress.");
                 return;
             }
@@ -454,11 +409,11 @@ public class NetServer implements ApplicationListener{
                             return;
                         }
 
-                        VoteSession session = new VoteSession(currentlyKicking, found);
+                        VoteSession session = new VoteSession(found);
                         session.vote(player, 1);
                         Call.sendMessage(Strings.format("[lightgray]Reason:[orange] @[lightgray].", args[1]));
                         vtime.reset();
-                        currentlyKicking[0] = session;
+                        currentlyKicking = session;
                     }
                 }else{
                     player.sendMessage("[scarlet]No player [orange]'" + args[0] + "'[scarlet] found.");
@@ -467,13 +422,13 @@ public class NetServer implements ApplicationListener{
         });
 
         clientCommands.<Player>register("vote", "<y/n/c>", "Vote to kick the current player. Admin can cancel the voting with 'c'.", (arg, player) -> {
-            if(currentlyKicking[0] == null){
+            if(currentlyKicking == null){
                 player.sendMessage("[scarlet]Nobody is being voted on.");
             }else{
                 if(player.admin && arg[0].equalsIgnoreCase("c")){
                     Call.sendMessage(Strings.format("[lightgray]Vote canceled by admin[orange] @[lightgray].", player.name));
-                    currentlyKicking[0].task.cancel();
-                    currentlyKicking[0] = null;
+                    currentlyKicking.task.cancel();
+                    currentlyKicking = null;
                     return;
                 }
 
@@ -489,17 +444,17 @@ public class NetServer implements ApplicationListener{
                 };
 
                 //hosts can vote all they want
-                if((currentlyKicking[0].voted.get(player.uuid(), 2) == sign || currentlyKicking[0].voted.get(admins.getInfo(player.uuid()).lastIP, 2) == sign)){
+                if((currentlyKicking.voted.get(player.uuid(), 2) == sign || currentlyKicking.voted.get(admins.getInfo(player.uuid()).lastIP, 2) == sign)){
                     player.sendMessage(Strings.format("[scarlet]You've already voted @. Sit down.", arg[0].toLowerCase()));
                     return;
                 }
 
-                if(currentlyKicking[0].target == player){
+                if(currentlyKicking.target == player){
                     player.sendMessage("[scarlet]You can't vote on your own trial.");
                     return;
                 }
 
-                if(currentlyKicking[0].target.team() != player.team()){
+                if(currentlyKicking.target.team() != player.team()){
                     player.sendMessage("[scarlet]You can't vote for other teams.");
                     return;
                 }
@@ -509,7 +464,7 @@ public class NetServer implements ApplicationListener{
                     return;
                 }
 
-                currentlyKicking[0].vote(player, sign);
+                currentlyKicking.vote(player, sign);
             }
         });
 
@@ -992,7 +947,7 @@ public class NetServer implements ApplicationListener{
 
             //write all entities now
             dataStream.writeInt(entity.id()); //write id
-            dataStream.writeByte(entity.classId()); //write type ID
+            dataStream.writeByte(entity.classId() & 0xFF); //write type ID
             entity.writeSync(Writes.get(dataStream)); //write entity
 
             sent++;
@@ -1122,6 +1077,49 @@ public class NetServer implements ApplicationListener{
             }
         }catch(IOException e){
             Log.err(e);
+        }
+    }
+
+    public class VoteSession{
+        Player target;
+        ObjectIntMap<String> voted = new ObjectIntMap<>();
+        Timer.Task task;
+        int votes;
+
+        public VoteSession(Player target){
+            this.target = target;
+            this.task = Timer.schedule(() -> {
+                if(!checkPass()){
+                    Call.sendMessage(Strings.format("[lightgray]Vote failed. Not enough votes to kick[orange] @[lightgray].", target.name));
+                    currentlyKicking = null;
+                    task.cancel();
+                }
+            }, voteDuration);
+        }
+
+        void vote(Player player, int d){
+            int lastVote = voted.get(player.uuid(), 0) | voted.get(admins.getInfo(player.uuid()).lastIP, 0);
+            votes -= lastVote;
+
+            votes += d;
+            voted.put(player.uuid(), d);
+            voted.put(admins.getInfo(player.uuid()).lastIP, d);
+
+            Call.sendMessage(Strings.format("[lightgray]@[lightgray] has voted on kicking[orange] @[lightgray].[accent] (@/@)\n[lightgray]Type[orange] /vote <y/n>[] to agree.",
+                player.name, target.name, votes, votesRequired()));
+
+            checkPass();
+        }
+
+        boolean checkPass(){
+            if(votes >= votesRequired()){
+                Call.sendMessage(Strings.format("[orange]Vote passed.[scarlet] @[orange] will be banned from the server for @ minutes.", target.name, (kickDuration / 60)));
+                Groups.player.each(p -> p.uuid().equals(target.uuid()), p -> p.kick(KickReason.vote, kickDuration * 1000));
+                currentlyKicking = null;
+                task.cancel();
+                return true;
+            }
+            return false;
         }
     }
 

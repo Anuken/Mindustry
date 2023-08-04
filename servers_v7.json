@@ -28,8 +28,8 @@
     "address": ["0nera.ru:7777"]
   },
   {
-    "name": "Voiddustry Network",
-    "address": ["45.144.66.250:6566", "45.144.66.250:6567" ,"45.144.66.250:6565", "45.144.66.250:6561"]
+    "name": "Untitled Mindustry Servers",
+    "address": ["45.144.66.250:6567", "45.144.66.250:6501"]
   },
   {
     "name": "C.A.M.S.",
@@ -73,7 +73,7 @@
   },
   {
     "name": "Phoenix Network",
-    "address": ["phoenix-network.dev", "phoenix-network.dev:6464"]
+    "address": ["phoenix-network.dev", "phoenix-network.dev:6464", "phoenix-network.dev:2023"]
   },
   {
     "name": "Xpdustry",
@@ -149,7 +149,7 @@
   },
   {
     "name": "Vndustry",
-    "address": ["vndustry.ddns.net", "vndustry.ddns.net:6568"]
+    "address": ["vndustry.ddns.net", "vndustry.ddns.net:6568", "45.8.22.128:26164"]
   },
   {
      "name": "Anana&ShenYv",
@@ -181,7 +181,35 @@
     "prioritized": true
   },
   {
+    "name": "LifeTime",
+    "address": ["srv3.godlike.club:28561", "srv3.godlike.club:26508"]
+  },
+  {
+    "name": "Cyandustry",
+    "address": ["91.218.66.162:6568"]
+  },
+  {
     "name": "Four Family",
     "address": ["118.127.8.162:25503"]
+  },
+  {
+    "name": "ToxoFlame",
+    "address": ["193.233.133.223", "193.233.133.223:6568", "193.233.133.223:6569"]
+  },
+  {
+    "name": "Meow Island",
+    "address": ["n1.mindustry.me:6590", "n1.mindustry.me:6592", "n1.mindustry.me:6595"]
+  },
+  {
+    "name": "3MIDustry",
+    "address": ["3midustry.xyz:10", "3midustry.xyz:20", "3midustry.xyz:30", "3midustry.xyz:40", "3midustry.xyz:50"]
+  },
+  {
+    "name": "ABCXYZ Community",
+    "address": ["118.127.8.162:25617", "78.108.218.117:25640"]
+  },
+  {
+    "name": "Vanilla CroCraft",
+    "address": ["130.61.175.47:6567"]
   }
 ]

@@ -38,7 +38,7 @@ public class Weapon implements Cloneable{
     public boolean useAmmo = true;
     /** whether to create a flipped copy of this weapon upon initialization. default: true */
     public boolean mirror = true;
-    /** whether to flip the weapon's sprite when rendering */
+    /** whether to flip the weapon's sprite when rendering. internal use only - do not set! */
     public boolean flipSprite = false;
     /** whether to shoot the weapons in different arms one after another, rather than all at once; only valid when mirror = true */
     public boolean alternate = true;
@@ -189,7 +189,7 @@ public class Weapon implements Cloneable{
         float
         rotation = unit.rotation - 90,
         realRecoil = Mathf.pow(mount.recoil, recoilPow) * recoil,
-        weaponRotation  = rotation + (rotate ? mount.rotation : 0),
+        weaponRotation  = rotation + (rotate ? mount.rotation : baseRotation),
         wx = unit.x + Angles.trnsx(rotation, x, y) + Angles.trnsx(weaponRotation, 0, -realRecoil),
         wy = unit.y + Angles.trnsy(rotation, x, y) + Angles.trnsy(weaponRotation, 0, -realRecoil);
 

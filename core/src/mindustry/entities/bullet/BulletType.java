@@ -125,6 +125,10 @@ public class BulletType extends Content implements Cloneable{
     /** Whether to move the bullet back depending on delta to fix some delta-time related issues.
      * Do not change unless you know what you're doing. */
     public boolean backMove = true;
+    /** If true, the angle param in create is ignored. */
+    public boolean ignoreSpawnAngle = false;
+    /** Chance for this bullet to be created. */
+    public float createChance = 1;
     /** Bullet range positive override. */
     public float maxRange = -1f;
     /** When > 0, overrides range even if smaller than base range. */
@@ -194,10 +198,14 @@ public class BulletType extends Content implements Cloneable{
     public @Nullable UnitType spawnUnit;
     /** Unit spawned when this bullet hits something or despawns due to it hitting the end of its lifetime. */
     public @Nullable UnitType despawnUnit;
+    /** The chance for despawn units to spawn. */
+    public float despawnUnitChance = 1;
     /** Amount of units spawned when this bullet despawns. */
     public int despawnUnitCount = 1;
     /** Random offset distance from the original bullet despawn/hit coordinate. */
     public float despawnUnitRadius = 0.1f;
+    /** If true, units spawned when this bullet despawns face away from the bullet instead of the same direction as the bullet. */
+    public boolean faceOutwards = false;
     /** Extra visual parts for this bullet. */
     public Seq<DrawPart> parts = new Seq<>();
 
@@ -489,9 +497,11 @@ public class BulletType extends Content implements Cloneable{
     }
 
     public void createUnits(Bullet b, float x, float y){
-        if(despawnUnit != null){
+        if(despawnUnit != null && Mathf.chance(despawnUnitChance)){
             for(int i = 0; i < despawnUnitCount; i++){
-                despawnUnit.spawn(b.team, x + Mathf.range(despawnUnitRadius), y + Mathf.range(despawnUnitRadius));
+                Tmp.v1.rnd(Mathf.random(despawnUnitRadius));
+                var u = despawnUnit.spawn(b.team, x + Tmp.v1.x, y + Tmp.v1.y);
+                u.rotation = faceOutwards ? Tmp.v1.angle() : b.rotation();
             }
         }
     }
@@ -730,6 +740,8 @@ public class BulletType extends Content implements Cloneable{
     }
 
     public @Nullable Bullet create(@Nullable Entityc owner, @Nullable Entityc shooter, Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl, Object data, @Nullable Mover mover, float aimX, float aimY){
+        if(!Mathf.chance(createChance)) return null;
+        if(ignoreSpawnAngle) angle = 0;
         if(spawnUnit != null){
             //don't spawn units clientside!
             if(!net.client()){
@@ -767,9 +779,12 @@ public class BulletType extends Content implements Cloneable{
         bullet.time = 0f;
         bullet.originX = x;
         bullet.originY = y;
-        bullet.aimTile = world.tileWorld(aimX, aimY);
+        if(!(aimX == -1f && aimY == -1f)){
+            bullet.aimTile = world.tileWorld(aimX, aimY);
+        }
         bullet.aimX = aimX;
         bullet.aimY = aimY;
+
         bullet.initVel(angle, speed * velocityScl);
         if(backMove){
             bullet.set(x - bullet.vel.x * Time.delta, y - bullet.vel.y * Time.delta);

@@ -170,6 +170,8 @@ public class Block extends UnlockableContent implements Senseable{
     public float baseExplosiveness = 0f;
     /** bullet that this block spawns when destroyed */
     public @Nullable BulletType destroyBullet = null;
+    /** if true, destroyBullet is spawned on the block's team instead of Derelict team */
+    public boolean destroyBulletSameTeam = false;
     /** liquid used for lighting */
     public @Nullable Liquid lightLiquid;
     /** whether cracks are drawn when this block is damaged */
@@ -995,6 +997,10 @@ public class Block extends UnlockableContent implements Senseable{
         return consume(new ConsumeCoolant(amount));
     }
 
+    public ConsumeCoolant consumeCoolant(float amount, boolean allowLiquid, boolean allowGas){
+        return consume(new ConsumeCoolant(amount, allowLiquid, allowGas));
+    }
+
     public <T extends Consume> T consume(T consume){
         if(consume instanceof ConsumePower){
             //there can only be one power consumer
@@ -1364,7 +1370,7 @@ public class Block extends UnlockableContent implements Senseable{
         return switch(sensor){
             case color -> mapColor.toDoubleBits();
             case health, maxHealth -> health;
-            case size -> size * tilesize;
+            case size -> size;
             case itemCapacity -> itemCapacity;
             case liquidCapacity -> liquidCapacity;
             case powerCapacity -> consPower != null && consPower.buffered ? consPower.capacity : 0f;

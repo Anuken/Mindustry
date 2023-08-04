@@ -936,6 +936,8 @@ public class UnitType extends UnlockableContent{
     public void createIcons(MultiPacker packer){
         super.createIcons(packer);
 
+        if(constructor == null) throw new IllegalArgumentException("No constructor set up for unit '" + name + "'. Make sure you assign a valid value to `constructor`, e.g. `constructor = UnitEntity::new`");
+
         sample = constructor.get();
 
         var toOutline = new Seq<TextureRegion>();

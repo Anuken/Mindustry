@@ -1315,6 +1315,7 @@ public class Blocks{
 
             researchCostMultiplier = 10f;
 
+            group = BlockGroup.heat;
             size = 3;
             drawer = new DrawMulti(new DrawDefault(), new DrawHeatOutput(), new DrawHeatInput("-heat"));
             regionRotated1 = 1;
@@ -1325,6 +1326,7 @@ public class Blocks{
 
             researchCostMultiplier = 10f;
 
+            group = BlockGroup.heat;
             size = 3;
             drawer = new DrawMulti(new DrawDefault(), new DrawHeatOutput(-1, false), new DrawHeatOutput(), new DrawHeatOutput(1, false), new DrawHeatInput("-heat"));
             regionRotated1 = 1;
@@ -2456,6 +2458,7 @@ public class Blocks{
             consumesPower = outputsPower = true;
             range = 23;
             scaledHealth = 90;
+            fogRadius = 2;
 
             consumePowerBuffered(40000f);
         }};
@@ -2934,6 +2937,7 @@ public class Blocks{
             armor = 5f;
             alwaysUnlocked = true;
             incinerateNonBuildable = true;
+            requiresCoreZone = true;
 
             //TODO should this be higher?
             buildCostMultiplier = 0.7f;
@@ -2953,6 +2957,7 @@ public class Blocks{
             armor = 10f;
             incinerateNonBuildable = true;
             buildCostMultiplier = 0.7f;
+            requiresCoreZone = true;
 
             unitCapModifier = 15;
             researchCostMultipliers.put(Items.silicon, 0.5f);
@@ -2970,6 +2975,7 @@ public class Blocks{
             armor = 15f;
             incinerateNonBuildable = true;
             buildCostMultiplier = 0.7f;
+            requiresCoreZone = true;
 
             unitCapModifier = 15;
             researchCostMultipliers.put(Items.silicon, 0.4f);
@@ -4568,7 +4574,7 @@ public class Blocks{
                         deathExplosionEffect = Fx.massiveExplosion;
                         shootOnDeath = true;
                         shake = 10f;
-                        bullet = new ExplosionBulletType(640f, 65f){{
+                        bullet = new ExplosionBulletType(700f, 65f){{
                             hitColor = Pal.redLight;
                             shootEffect = new MultiEffect(Fx.massiveExplosion, Fx.scatheExplosion, Fx.scatheLight, new WaveEffect(){{
                                 lifetime = 10f;

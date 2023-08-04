@@ -84,6 +84,10 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
         }
     }
 
+    public Seq<T> copy(){
+        return copy(new Seq<>());
+    }
+
     public Seq<T> copy(Seq<T> arr){
         arr.addAll(array);
         return arr;
@@ -224,6 +228,12 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
         if(clearing) return;
         if(type == null) throw new RuntimeException("Cannot remove a null entity!");
         if(position != -1 && position < array.size){
+
+            //rarely the entity index is wrong; fallback to slow implementation
+            if(array.items[position] != type){
+                remove(type);
+                return;
+            }
 
             //swap head with current
             if(array.size > 1){

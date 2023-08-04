@@ -11,8 +11,10 @@ import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.ctype.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.logic.LCanvas.*;
 import mindustry.logic.LExecutor.*;
+import mindustry.logic.LogicFx.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.meta.*;
@@ -1506,6 +1508,80 @@ public class LStatements{
         }
     }
 
+    @RegisterStatement("effect")
+    public static class EffectStatement extends LStatement{
+        public String type = "warn", x = "0", y = "0", sizerot = "2", color = "%ffaaff", data = "";
+
+        @Override
+        public void build(Table table){
+            table.clearChildren();
+
+            table.button(b -> {
+                b.label(() -> type).growX().wrap().labelAlign(Align.center);
+                b.clicked(() -> ui.effects.show(entry -> {
+                    type = entry.name;
+                    build(table);
+                }));
+            }, Styles.logict, () -> {}).size(150f, 40f).margin(5f).pad(4f).color(table.color).colspan(2);
+
+            EffectEntry entry = LogicFx.get(type);
+
+            row(table);
+
+            fields(table, "x", x, str -> x = str);
+            fields(table, "y", y, str -> y = str);
+            row(table);
+
+            if(entry != null){
+                if(entry.color){
+                    fields(table, "color", color, str -> color = str).width(120f);
+
+                    table.button(b -> {
+                        b.image(Icon.pencilSmall);
+                        b.clicked(() -> {
+                            Color current = Pal.accent.cpy();
+                            if(color.startsWith("%")){
+                                try{
+                                    current = Color.valueOf(color.substring(1));
+                                }catch(Exception ignored){}
+                            }
+
+                            ui.picker.show(current, result -> {
+                                color = "%" + result.toString().substring(0, result.a >= 1f ? 6 : 8);
+                                build(table);
+                            });
+                        });
+                    }, Styles.logict, () -> {}).size(40f).padLeft(-11).color(table.color);
+                }
+
+                row(table);
+
+                if(entry.size || entry.rotate){
+                    fields(table, entry.size ? "size" : "rotation", sizerot, str -> sizerot = str);
+                }
+
+                if(entry.data != null){
+                    fields(table, "data", data, str -> data = str);
+                }
+            }
+        }
+
+        @Override
+        public boolean privileged(){
+            return true;
+        }
+
+        @Override
+        public LInstruction build(LAssembler b){
+            return new EffectI(LogicFx.get(type), b.var(x), b.var(y), b.var(sizerot), b.var(color), b.var(data));
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.world;
+        }
+    }
+
     @RegisterStatement("explosion")
     public static class ExplosionStatement extends LStatement{
         public String team = "@crux", x = "0", y = "0", radius = "5", damage = "50", air = "true", ground = "true", pierce = "false";
@@ -1618,6 +1694,32 @@ public class LStatements{
         @Override
         public LInstruction build(LAssembler builder){
             return new FetchI(type, builder.var(result), builder.var(team), builder.var(extra), builder.var(index));
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.world;
+        }
+    }
+
+    //TODO: test this first
+    @RegisterStatement("sync")
+    public static class SyncStatement extends LStatement{
+        public String variable = "var";
+
+        @Override
+        public void build(Table table){
+            fields(table, variable, str -> variable = str).width(190f);
+        }
+
+        @Override
+        public boolean privileged(){
+            return true;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new SyncI(builder.var(variable));
         }
 
         @Override

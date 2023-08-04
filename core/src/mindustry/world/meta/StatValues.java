@@ -273,7 +273,7 @@ public class StatValues{
                         b.image(liquid.uiIcon).size(40).pad(10f).left().scaling(Scaling.fit);
                         b.table(info -> {
                             info.add(liquid.localizedName).left().row();
-                            info.add(Strings.autoFixed(maxUsed * 60f, 1) + StatUnit.perSecond.localized()).left().color(Color.lightGray);
+                            info.add(Strings.autoFixed(maxUsed * 60f, 2) + StatUnit.perSecond.localized()).left().color(Color.lightGray);
                         });
 
                         b.table(bt -> {
@@ -282,7 +282,7 @@ public class StatValues{
                             float reloadRate = (baseReload ? 1f : 0f) + maxUsed * multiplier * liquid.heatCapacity;
                             float standardReload = baseReload ? reload : reload / (maxUsed * multiplier * 0.4f);
                             float result = standardReload / (reload / reloadRate);
-                            bt.add(Core.bundle.format("bullet.reload", Strings.autoFixed(result * 100, 1))).pad(5);
+                            bt.add(Core.bundle.format("bullet.reload", Strings.autoFixed(result * 100, 2))).pad(5);
                         }).right().grow().pad(10f).padRight(15f);
                     }).growX().pad(5).row();
                 }
@@ -302,7 +302,7 @@ public class StatValues{
                         b.image(liquid.uiIcon).size(40).pad(10f).left().scaling(Scaling.fit);
                         b.table(info -> {
                             info.add(liquid.localizedName).left().row();
-                            info.add(Strings.autoFixed(amount * 60f, 1) + StatUnit.perSecond.localized()).left().color(Color.lightGray);
+                            info.add(Strings.autoFixed(amount * 60f, 2) + StatUnit.perSecond.localized()).left().color(Color.lightGray);
                         });
 
                         b.table(bt -> {
