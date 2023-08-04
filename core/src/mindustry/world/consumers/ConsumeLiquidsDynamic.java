@@ -5,10 +5,8 @@ import arc.scene.ui.layout.Table;
 import mindustry.Vars;
 import mindustry.gen.Building;
 import mindustry.type.LiquidStack;
-import mindustry.ui.ItemImage;
 import mindustry.ui.ReqImage;
 import mindustry.world.Block;
-import mindustry.world.meta.Stats;
 
 //Requires setting your block's liquidFilter yourself.
 public class ConsumeLiquidsDynamic extends Consume{
