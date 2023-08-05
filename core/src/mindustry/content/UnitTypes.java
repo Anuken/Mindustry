@@ -2617,6 +2617,9 @@ public class UnitTypes{
                     splashDamageRadius = 20f;
                     splashDamage = 50f;
 
+                    shoot = new ShootSpread(3, 15f);
+
+
                     trailEffect = Fx.hitSquaresColor;
                     trailRotation = true;
                     trailInterval = 3f;
