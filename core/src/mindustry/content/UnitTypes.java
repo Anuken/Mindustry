@@ -2159,7 +2159,7 @@ public class UnitTypes{
                 weapons.add(new PointDefenseWeapon("point-defense-mount"){{
                     x = 12.5f;
                     y = mountY;
-                    reload = 6f;
+                    reload = 4f;
                     targetInterval = 8f;
                     targetSwitchInterval = 8f;
 
@@ -2167,7 +2167,7 @@ public class UnitTypes{
                         shootEffect = Fx.sparkShoot;
                         hitEffect = Fx.pointHit;
                         maxRange = 180f;
-                        damage = 25f;
+                        damage = 30f;
                     }};
                 }});
             }
