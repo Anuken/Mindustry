@@ -146,7 +146,7 @@ public class SoundControl{
         if(state.isMenu()){
             silenced = false;
             if(ui.planet.isShown()){
-                play(Musics.launch);
+                play(ui.planet.state.planet.launchMusic);
             }else if(ui.editor.isShown()){
                 play(Musics.editor);
             }else{
