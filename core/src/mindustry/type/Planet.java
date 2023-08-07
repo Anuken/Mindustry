@@ -1,6 +1,7 @@
 package mindustry.type;
 
 import arc.*;
+import arc.audio.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g3d.*;
@@ -15,6 +16,7 @@ import mindustry.content.TechTree.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.game.EventType.ContentInitEvent;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
@@ -128,6 +130,8 @@ public class Planet extends UnlockableContent{
     public boolean allowLaunchToNumbered = true;
     /** Icon as displayed in the planet selection dialog. This is a string, as drawables are null at load time. */
     public String icon = "planet";
+    /** Music used in the planet dialog when this planet is selected. */
+    public Music launchMusic = Musics.launch;
     /** Default core block for launching. */
     public Block defaultCore = Blocks.coreShard;
     /** Sets up rules on game load for any sector on this planet. */
