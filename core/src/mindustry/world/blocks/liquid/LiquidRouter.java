@@ -29,6 +29,11 @@ public class LiquidRouter extends LiquidBlock{
         }
 
         @Override
+        public boolean canPickup(){
+            return false;
+        }
+        
+        @Override
         public void draw(){
             Draw.rect(bottomRegion, x, y);
 
