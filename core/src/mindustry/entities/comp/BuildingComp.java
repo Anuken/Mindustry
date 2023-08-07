@@ -1999,7 +1999,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         }else if(content instanceof Liquid liquid && liquids != null){
             float amount = Mathf.clamp((float)value, 0f, block.liquidCapacity);
             //decreasing amount is always allowed
-            if(amount < liquids.get(liquid) || (acceptLiquid(self(), liquid) && (liquids.current() == liquid || liquids.currentAmount() <= 0.1f))){
+            if(amount < liquids.get(liquid) || (acceptLiquid(self(), liquid) && (liquids.current() == liquid || liquids.currentAmount() <= 0.1f || block.consumesLiquid(liquid)))){
                 liquids.set(liquid, amount);
             }
         }
