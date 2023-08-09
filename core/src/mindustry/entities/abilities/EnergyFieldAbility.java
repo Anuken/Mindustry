@@ -29,6 +29,8 @@ public class EnergyFieldAbility extends Ability{
     public boolean targetGround = true, targetAir = true, hitBuildings = true, hitUnits = true;
     public int maxTargets = 25;
     public float healPercent = 3f;
+    /** Multiplies healing to units of the same type by this amount. */
+    public float sameTypeHealMult = 1f;
 
     public float layer = Layer.bullet - 0.001f, blinkScl = 20f, blinkSize = 0.1f;
     public float effectRadius = 5f, sectorRad = 0.14f, rotateSpeed = 0.5f;
@@ -129,7 +131,8 @@ public class EnergyFieldAbility extends Ability{
                 if(((Teamc)other).team() == unit.team){
                     if(other.damaged()){
                         anyNearby = true;
-                        other.heal(healPercent / 100f * other.maxHealth());
+                        float healMult = (other instanceof Unit u && u.type == unit.type) ? sameTypeHealMult : 1f;
+                        other.heal(healPercent / 100f * other.maxHealth() * healMult);
                         healEffect.at(other);
                         damageEffect.at(rx, ry, 0f, color, other);
                         hitEffect.at(rx, ry, unit.angleTo(other), color);
