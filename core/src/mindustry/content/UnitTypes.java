@@ -2153,13 +2153,15 @@ public class UnitTypes{
             abilities.add(new EnergyFieldAbility(40f, 65f, 180f){{
                 statusDuration = 60f * 6f;
                 maxTargets = 25;
+                healPercent = 1.5f;
+                sameTypeHealMult = 0.5f;
             }});
 
             for(float mountY : new float[]{-18f, 14}){
                 weapons.add(new PointDefenseWeapon("point-defense-mount"){{
                     x = 12.5f;
                     y = mountY;
-                    reload = 6f;
+                    reload = 4f;
                     targetInterval = 8f;
                     targetSwitchInterval = 8f;
 
@@ -2167,7 +2169,7 @@ public class UnitTypes{
                         shootEffect = Fx.sparkShoot;
                         hitEffect = Fx.pointHit;
                         maxRange = 180f;
-                        damage = 25f;
+                        damage = 30f;
                     }};
                 }});
             }
