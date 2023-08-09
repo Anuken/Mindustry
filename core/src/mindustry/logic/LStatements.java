@@ -220,6 +220,14 @@ public class LStatements{
                         row(s);
                         fields(s, "rotation", p3, v -> p3 = v);
                     }
+                    //TODO
+                    /*
+                    case character -> {
+                        fields(s, "x", x, v -> x = v);
+                        fields(s, "y", y, v -> y = v);
+                        row(s);
+                        fields(s, "char", p1, v -> p1 = v);
+                    }*/
                 }
             }).expand().left();
         }

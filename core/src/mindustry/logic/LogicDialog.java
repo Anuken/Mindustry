@@ -228,20 +228,11 @@ public class LogicDialog extends BaseDialog{
     }
 
     public void show(String code, LExecutor executor, boolean privileged, Cons<String> modified){
-        show(code, executor, privileged, null, modified);
-    }
-
-    public void show(String code, LExecutor executor, boolean privileged, @Nullable Building build, Cons<String> modified){
         this.executor = executor;
         this.privileged = privileged;
         canvas.statements.clearChildren();
         canvas.rebuild();
         canvas.privileged = privileged;
-        update(() -> {
-            if(build != null && (!build.isValid() || !state.isGame())){
-                hide();
-            }
-        });
         try{
             canvas.load(code);
         }catch(Throwable t){

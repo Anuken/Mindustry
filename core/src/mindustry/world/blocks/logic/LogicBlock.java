@@ -577,7 +577,7 @@ public class LogicBlock extends Block{
         @Override
         public void buildConfiguration(Table table){
             table.button(Icon.pencil, Styles.cleari, () -> {
-                ui.logic.show(code, executor, privileged, this, code -> configure(compress(code, relativeConnections())));
+                ui.logic.show(code, executor, privileged, code -> configure(compress(code, relativeConnections())));
             }).size(40);
         }
 
