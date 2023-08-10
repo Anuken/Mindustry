@@ -211,5 +211,9 @@
   {
     "name": "Vanilla CroCraft",
     "address": ["130.61.175.47:6567"]
+  },
+  {
+    "name": "fish",
+    "address": ["xyz.simpfun.cn:59901"]
   }
 ]
