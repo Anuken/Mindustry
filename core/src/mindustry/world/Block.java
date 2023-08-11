@@ -1374,6 +1374,7 @@ public class Block extends UnlockableContent implements Senseable{
             case itemCapacity -> itemCapacity;
             case liquidCapacity -> liquidCapacity;
             case powerCapacity -> consPower != null && consPower.buffered ? consPower.capacity : 0f;
+            case id -> getLogicId();
             default -> Double.NaN;
         };
     }

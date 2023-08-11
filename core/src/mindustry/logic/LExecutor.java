@@ -1143,7 +1143,6 @@ public class LExecutor{
         }
     }
 
-    //TODO inverse lookup
     public static class LookupI implements LInstruction{
         public int dest;
         public int from;
