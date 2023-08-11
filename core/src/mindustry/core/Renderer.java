@@ -18,6 +18,7 @@ import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
+import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.world.blocks.storage.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
@@ -288,6 +289,7 @@ public class Renderer implements ApplicationListener{
 
     public void draw(){
         Events.fire(Trigger.preDraw);
+        MapPreviewLoader.checkPreviews();
 
         camera.update();
 
@@ -311,6 +313,7 @@ public class Renderer implements ApplicationListener{
         Draw.sort(true);
 
         Events.fire(Trigger.draw);
+        MapPreviewLoader.checkPreviews();
 
         if(pixelator.enabled()){
             pixelator.register();
