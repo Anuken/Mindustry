@@ -2243,7 +2243,13 @@ public class UnitTypes{
                     }});
                 }
             }
-
+            abilities.add(new SuppressionFieldAbility(){{
+                orbRadius = 5;
+                particleSize = 3;
+                y = -10f;
+                particles = 10;
+                color = particleColor = suppressColor = Pal.heal;
+            }});
             weapons.add(new Weapon("emp-cannon-mount"){{
                 rotate = true;
 
