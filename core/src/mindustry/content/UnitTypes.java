@@ -2248,7 +2248,7 @@ public class UnitTypes{
                 particleSize = 3;
                 y = -10f;
                 particles = 10;
-                color = particleColor = suppressColor = Pal.heal;
+                color = particleColor = effectColor = Pal.heal;
             }});
             weapons.add(new Weapon("emp-cannon-mount"){{
                 rotate = true;
