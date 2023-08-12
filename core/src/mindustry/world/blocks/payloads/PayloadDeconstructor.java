@@ -144,7 +144,7 @@ public class PayloadDeconstructor extends PayloadBlock{
                     time += edelta();
 
                     for(int i = 0; i < reqs.length; i++){
-                        accum[i] += reqs[i].amount * (payload instanceof BuildPayload ? state.rules.buildCostMultiplier : state.rules.unitCost(team)) * realShift;
+                        accum[i] += reqs[i].amount * (deconstructing instanceof BuildPayload ? state.rules.buildCostMultiplier : state.rules.unitCost(team)) * realShift;
                     }
                 }
 
