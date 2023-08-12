@@ -132,12 +132,6 @@ public class Planet extends UnlockableContent{
     public String icon = "planet";
     /** Plays in the planet dialog when this planet is selected. */
     public Music launchMusic = Musics.launch;
-    /** Plays at any time in this planet. */
-    public Seq<Music> ambientMusic = Seq.with(Musics.game1, Musics.game3, Musics.game6, Musics.game8, Musics.game9, Musics.fine);
-    /** Plays in times of conflict in this planet. */
-    public Seq<Music> darkMusic = Seq.with(Musics.game2, Musics.game5, Musics.game7, Musics.game4);
-    /** Plays after a boss spawns in this planet. */
-    public Seq<Music> bossMusic = Seq.with(Musics.boss1, Musics.boss2, Musics.game2, Musics.game5);
     /** Default core block for launching. */
     public Block defaultCore = Blocks.coreShard;
     /** Sets up rules on game load for any sector on this planet. */
