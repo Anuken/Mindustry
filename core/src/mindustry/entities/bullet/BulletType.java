@@ -255,6 +255,8 @@ public class BulletType extends Content implements Cloneable{
     public float suppressionDuration = 60f * 8f;
     /** Chance of suppression effect occurring on block, scaled down by number of blocks. */
     public float suppressionEffectChance = 50f;
+    /** Color used for the regenSuppressSeek effect. */
+    public Color suppressColor = Pal.sapBullet;
 
     /** Color of lightning created by bullet. */
     public Color lightningColor = Pal.surge;
@@ -440,7 +442,7 @@ public class BulletType extends Content implements Cloneable{
 
         if(suppressionRange > 0){
             //bullets are pooled, require separate Vec2 instance
-            Damage.applySuppression(b.team, b.x, b.y, suppressionRange, suppressionDuration, 0f, suppressionEffectChance, new Vec2(b.x, b.y));
+            Damage.applySuppression(b.team, b.x, b.y, suppressionRange, suppressionDuration, 0f, suppressionEffectChance, new Vec2(b.x, b.y), suppressColor);
         }
 
         createSplashDamage(b, x, y);
