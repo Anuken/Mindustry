@@ -396,6 +396,7 @@ public class Weapon implements Cloneable{
         //shoot if applicable
         if(mount.shoot && //must be shooting
         can && //must be able to shoot
+        !(bullet.killShooter && mount.totalShots > 0) && //if the bullet kills the shooter, you should only ever be able to shoot once
         (!useAmmo || unit.ammo > 0 || !state.rules.unitAmmo || unit.team.rules().infiniteAmmo) && //check ammo
         (!alternate || wasFlipped == flipSprite) &&
         mount.warmup >= minWarmup && //must be warmed up
@@ -436,6 +437,9 @@ public class Weapon implements Cloneable{
         }
 
         shoot.shoot(mount.barrelCounter, (xOffset, yOffset, angle, delay, mover) -> {
+            //this is incremented immediately, as it is used for total bullet creation amount detection
+            mount.totalShots ++;
+
             if(delay > 0f){
                 Time.run(delay, () -> bullet(unit, mount, xOffset, yOffset, angle, mover));
             }else{
@@ -478,7 +482,6 @@ public class Weapon implements Cloneable{
             mount.recoils[mount.barrelCounter % recoils] = 1f;
         }
         mount.heat = 1f;
-        mount.totalShots++;
     }
 
     //override to do special things to a bullet after spawning
