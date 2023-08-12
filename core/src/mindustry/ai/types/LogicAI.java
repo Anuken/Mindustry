@@ -40,6 +40,12 @@ public class LogicAI extends AIController{
     private float lastMoveX, lastMoveY;
     private int lastPathId = 0;
 
+    // LogicAI state should not be reset after reading.
+    @Override
+    public boolean keepState(){
+        return true;
+    }
+
     @Override
     public void updateMovement(){
         if(control == LUnitControl.pathfind){
