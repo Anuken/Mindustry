@@ -48,7 +48,7 @@ public class SoundControl{
             boolean boss = state.rules.spawns.contains(group -> group.getSpawned(state.wave - 2) > 0 && group.effect == StatusEffects.boss);
 
             if(boss){
-                playOnce(state.rules.sector != null ? state.rules.sector.planet.bossMusic.random(lastRandomPlayed) : bossMusic.random(lastRandomPlayed));
+                playOnce(bossMusic.random(lastRandomPlayed));
             }else if(Mathf.chance(musicWaveChance)){
                 playRandom();
             }
@@ -208,9 +208,9 @@ public class SoundControl{
     /** Plays a random track.*/
     public void playRandom(){
         if(isDark()){
-            playOnce(state.rules.sector != null ? state.rules.sector.planet.darkMusic.random(lastRandomPlayed) : darkMusic.random(lastRandomPlayed));
+            playOnce(darkMusic.random(lastRandomPlayed));
         }else{
-            playOnce(state.rules.sector != null ? state.rules.sector.planet.ambientMusic.random(lastRandomPlayed) : ambientMusic.random(lastRandomPlayed));
+            playOnce(ambientMusic.random(lastRandomPlayed));
         }
     }
 
