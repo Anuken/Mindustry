@@ -214,6 +214,10 @@
   },
   {
     "name": "Extra Utilities",
-    "address": ["xyz.simpfun.cn:59901", "xyz.simpfun.cn:59290"]
+    "address": ["xyz.simpfun.cn:59901"]
+  },
+  {
+    "name": "xsgc",
+    "address": ["xyz.simpfun.cn:59290"]
   }
 ]
