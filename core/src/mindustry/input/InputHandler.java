@@ -285,7 +285,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(called = Loc.server, targets = Loc.both, forward = true)
     public static void commandBuilding(Player player, int[] buildings, Vec2 target){
-        if(player == null  || target == null) return;
+        if(player == null || target == null) return;
 
         if(net.server() && !netServer.admins.allowAction(player, ActionType.commandBuilding, event -> {
             event.buildingPositions = buildings;
@@ -299,6 +299,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             if(build == null || build.team() != player.team() || !build.block.commandable) continue;
 
             build.onCommand(target);
+            build.lastAccessed = player.name;
+
             if(!state.isPaused() && player == Vars.player){
                 Fx.moveCommand.at(target);
             }

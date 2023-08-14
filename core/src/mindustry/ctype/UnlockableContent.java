@@ -68,6 +68,10 @@ public abstract class UnlockableContent extends MappableContent{
         uiIcon = Core.atlas.find(getContentType().name() + "-" + name + "-ui", fullIcon);
     }
 
+    public int getLogicId(){
+        return logicVars.lookupLogicId(this);
+    }
+
     public String displayDescription(){
         return minfo.mod == null ? description : description + "\n" + Core.bundle.format("mod.display", minfo.mod.meta.displayName);
     }

@@ -29,7 +29,7 @@
   },
   {
     "name": "Untitled Mindustry Servers",
-    "address": ["45.144.66.250:6567", "45.144.66.250:6501"]
+    "address": ["45.144.66.250:6567", "45.144.66.250:6601", "45.144.66.250:6611"]
   },
   {
     "name": "C.A.M.S.",
@@ -149,7 +149,7 @@
   },
   {
     "name": "Vndustry",
-    "address": ["vndustry.ddns.net", "vndustry.ddns.net:6568", "45.8.22.128:26164"]
+    "address": ["vndustry.ddns.net", "vndustry.ddns.net:6568", "27.50.72.82:25334"]
   },
   {
      "name": "Anana&ShenYv",
@@ -186,7 +186,7 @@
   },
   {
     "name": "Cyandustry",
-    "address": ["91.218.66.162:6568"]
+    "address": ["n1.mindustry.me:7000","n1.mindustry.me:7500"]
   },
   {
     "name": "Four Family",
@@ -211,5 +211,9 @@
   {
     "name": "Vanilla CroCraft",
     "address": ["130.61.175.47:6567"]
+  },
+  {
+    "name": "Extra Utilities",
+    "address": ["xyz.simpfun.cn:59901", "xyz.simpfun.cn:59290"]
   }
 ]

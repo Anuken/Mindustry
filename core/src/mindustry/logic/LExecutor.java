@@ -407,7 +407,7 @@ public class LExecutor{
                 float x1 = World.unconv(exec.numf(p1)), y1 = World.unconv(exec.numf(p2)), d1 = World.unconv(exec.numf(p3));
 
                 switch(type){
-                    case idle -> {
+                    case idle, autoPathfind -> {
                         ai.control = type;
                     }
                     case move, stop, approach, pathfind -> {
@@ -1143,7 +1143,6 @@ public class LExecutor{
         }
     }
 
-    //TODO inverse lookup
     public static class LookupI implements LInstruction{
         public int dest;
         public int from;
@@ -1433,15 +1432,15 @@ public class LExecutor{
         public void run(LExecutor exec){
             switch(rule){
                 case waveTimer -> state.rules.waveTimer = exec.bool(value);
-                case wave -> state.wave = exec.numi(value);
-                case currentWaveTime -> state.wavetime = exec.numf(value) * 60f;
+                case wave -> state.wave = Math.max(exec.numi(value), 1);
+                case currentWaveTime -> state.wavetime = Math.max(exec.numf(value) * 60f, 0f);
                 case waves -> state.rules.waves = exec.bool(value);
                 case waveSending -> state.rules.waveSending = exec.bool(value);
                 case attackMode -> state.rules.attackMode = exec.bool(value);
                 case waveSpacing -> state.rules.waveSpacing = exec.numf(value) * 60f;
                 case enemyCoreBuildRadius -> state.rules.enemyCoreBuildRadius = exec.numf(value) * 8f;
                 case dropZoneRadius -> state.rules.dropZoneRadius = exec.numf(value) * 8f;
-                case unitCap -> state.rules.unitCap = exec.numi(value);
+                case unitCap -> state.rules.unitCap = Math.max(exec.numi(value), 0);
                 case lighting -> state.rules.lighting = exec.bool(value);
                 case mapArea -> {
                     int x = exec.numi(p1), y = exec.numi(p2), w = exec.numi(p3), h = exec.numi(p4);
@@ -1450,7 +1449,7 @@ public class LExecutor{
                     }
                 }
                 case ambientLight -> state.rules.ambientLight.fromDouble(exec.num(value));
-                case solarMultiplier -> state.rules.solarMultiplier = exec.numf(value);
+                case solarMultiplier -> state.rules.solarMultiplier = Math.max(exec.numf(value), 0f);
                 case unitHealth, unitBuildSpeed, unitCost, unitDamage, blockHealth, blockDamage, buildSpeed, rtsMinSquad, rtsMinWeight -> {
                     Team team = exec.team(p1);
                     if(team != null){
@@ -1673,7 +1672,7 @@ public class LExecutor{
 
     public static class SyncI implements LInstruction{
         //66 syncs per second
-        static final long syncInterval = 15;
+        public static long syncInterval = 15;
 
         public int variable;
 

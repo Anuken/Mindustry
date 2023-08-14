@@ -233,7 +233,7 @@ public class ControlPathfinder{
             req.curId = pathId;
 
             //check for the unit getting stuck every N seconds
-            if((req.stuckTimer += Time.delta) >= 60f * 1.5f){
+            if(req.done && (req.stuckTimer += Time.delta) >= 60f * 1.5f){
                 req.stuckTimer = 0f;
                 //force recalculate
                 if(req.lastPos.within(unit, 1.5f)){

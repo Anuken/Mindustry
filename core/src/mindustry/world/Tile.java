@@ -398,6 +398,9 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         this.overlay = (Floor)block;
 
         recache();
+        if(!world.isGenerating() && build != null){
+            build.onProximityUpdate();
+        }
     }
 
     /** Sets the overlay without a recache. */
