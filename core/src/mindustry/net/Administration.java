@@ -514,7 +514,7 @@ public class Administration{
         debug = new Config("debug", "Enable debug logging.", false, () -> Log.level = debug() ? LogLevel.debug : LogLevel.info),
         snapshotInterval = new Config("snapshotInterval", "Client entity snapshot interval in ms.", 200),
         autoPause = new Config("autoPause", "Whether the game should pause when nobody is online.", false),
-        roundExtraTime = new Config("roundExtraTime", "Time before loading a new map after the gameover.", 12),
+        roundExtraTime = new Config("roundExtraTime", "Time before loading a new map after the gameover, in seconds.", 12),
         maxLogLength = new Config("maxLogLength", "The Maximum log file size, in bytes.", 1024 * 1024 * 5);
 
         public final Object defaultValue;
