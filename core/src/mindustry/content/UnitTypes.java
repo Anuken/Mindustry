@@ -2619,9 +2619,6 @@ public class UnitTypes{
                     splashDamageRadius = 20f;
                     splashDamage = 50f;
 
-                    shoot = new ShootSpread(3, 15f);
-
-
                     trailEffect = Fx.hitSquaresColor;
                     trailRotation = true;
                     trailInterval = 3f;
@@ -2633,7 +2630,10 @@ public class UnitTypes{
                         width = 5f;
                         height = 7f;
                         lifetime = 15f;
-                        hitSize = 4f;
+                        hitSize = 4f;    
+                        pierceCap = 3;
+                        pierce = true;
+                        pierceBuilding = true;
                         hitColor = backColor = trailColor = Color.valueOf("feb380");
                         frontColor = Color.white;
                         trailWidth = 1.7f;
