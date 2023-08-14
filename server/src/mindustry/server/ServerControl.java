@@ -10,6 +10,7 @@ import arc.util.CommandHandler.*;
 import arc.util.Timer.*;
 import arc.util.serialization.*;
 import arc.util.serialization.JsonValue.*;
+import mindustry.Vars;
 import mindustry.core.GameState.*;
 import mindustry.core.*;
 import mindustry.game.EventType.*;
@@ -62,12 +63,10 @@ public class ServerControl implements ApplicationListener{
     /** Whether the server is currently waiting for the next map to be loaded. */
     public boolean inGameOverWait;
 
-    /** The current timer for loading the next map. */
-    public Task lastTask;
-
     /** The last gamemode loaded on this server. */
     public Gamemode lastMode;
 
+    private Task lastTask;
     private Thread socketThread;
     private ServerSocket serverSocket;
     private PrintWriter socketOutput;
@@ -207,8 +206,9 @@ public class ServerControl implements ApplicationListener{
         }
 
         Events.on(GameOverEvent.class, event -> {
-            if(!inGameOverWait && gameOverListener != null)
+            if(!inGameOverWait && gameOverListener != null){
                 gameOverListener.get(event);
+            }
         });
 
         //reset autosave on world load
@@ -287,7 +287,7 @@ public class ServerControl implements ApplicationListener{
         toggleSocket(Config.socketInput.bool());
 
         Events.on(ServerLoadEvent.class, e -> {
-            if (serverInput != null) {
+            if(serverInput != null){
                 Thread thread = new Thread(serverInput, "Server Controls");
                 thread.setDaemon(true);
                 thread.start();
@@ -400,7 +400,7 @@ public class ServerControl implements ApplicationListener{
                     autoPaused = true;
                 }
             }catch(MapException e){
-                err(e.map.plainName() + ": " + e.getMessage());
+                err("@: @", e.map.plainName(), e.getMessage());
             }
         });
 
@@ -1056,15 +1056,29 @@ public class ServerControl implements ApplicationListener{
         }
     }
 
+    
+    /**
+     * @deprecated 
+     * Use {@link Maps#setNextMapOverride(Map)} instead.
+     */
     @Deprecated
     public void setNextMap(Map map){
         maps.setNextMapOverride(map);
     }
 
+    /**
+     * Resets the world state, starts a new game.
+     * @param run What task to run to load a new world.
+     */
     public void play(Runnable run){
         play(true, run);
     }
 
+    /**
+     * Resets the world state, starts a new game.
+     * @param wait Whether to wait for {@link Config#roundExtraTime} seconds before starting a new game.
+     * @param run What task to run to load a new world.
+     */
     public void play(boolean wait, Runnable run){
         inGameOverWait = true;
         Runnable r = () -> {
@@ -1088,7 +1102,7 @@ public class ServerControl implements ApplicationListener{
                     try{
                         r.run();
                     }catch(MapException e){
-                        err(e.map.plainName() + ": " + e.getMessage());
+                        err("@: @", e.map.plainName(), e.getMessage());
                         net.closeServer();
                     }
                 }
