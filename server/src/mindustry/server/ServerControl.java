@@ -896,8 +896,7 @@ public class ServerControl implements ApplicationListener{
             }else{
                 info("Players: @", Groups.player.size());
                 for(Player user : Groups.player){
-                    PlayerInfo userInfo = user.getInfo();
-                    info(" @&lm @ / ID: @ / IP: @", userInfo.admin ? "&r[A]&c" : "&b[P]&c", userInfo.plainLastName(), userInfo.id, userInfo.lastIP, userInfo.admin);
+                    info(" @&lm @ / ID: @ / IP: @", user.admin ? "&r[A]&c" : "&b[P]&c", user.plainName(), user.uuid(), user.ip());
                 }
             }
         });
@@ -1055,9 +1054,8 @@ public class ServerControl implements ApplicationListener{
         }
     }
 
-    
     /**
-     * @deprecated 
+     * @deprecated
      * Use {@link Maps#setNextMapOverride(Map)} instead.
      */
     @Deprecated
@@ -1080,6 +1078,8 @@ public class ServerControl implements ApplicationListener{
      */
     public void play(boolean wait, Runnable run){
         inGameOverWait = true;
+        if(lastTask != null) lastTask.cancel();
+        
         Runnable r = () -> {
             WorldReloader reloader = new WorldReloader();
 
