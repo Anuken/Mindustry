@@ -44,7 +44,9 @@ public class Maps{
     /** All maps stored in an ordered array. */
     private Seq<Map> maps = new Seq<>();
     private ShuffleMode shuffleMode = ShuffleMode.all;
+
     private @Nullable MapProvider shuffler;
+    private @Nullable Map nextMapOverride;
 
     private ObjectSet<Map> previewList = new ObjectSet<>();
 
@@ -61,8 +63,19 @@ public class Maps{
         this.shuffler = provider;
     }
 
+    /** Set the map that will override the next selected map. */
+    public void setNextMapOverride(Map nextMapOverride){
+        this.nextMapOverride = nextMapOverride;
+    }
+
     /** @return the next map to shuffle to. May be null, in which case the server should be stopped. */
     public @Nullable Map getNextMap(Gamemode mode, @Nullable Map previous){
+        if(nextMapOverride != null){
+            Map next = nextMapOverride;
+            nextMapOverride = null;
+            return next;
+        }
+
         if(shuffler != null) return shuffler.next(mode, previous);
         return shuffleMode.next(mode, previous);
     }
