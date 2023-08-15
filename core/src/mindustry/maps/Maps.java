@@ -64,13 +64,13 @@ public class Maps{
     }
 
     /** Set the map that will override the next selected map. */
-    public void setNextMapOverride(Map nextMapOverride) {
+    public void setNextMapOverride(Map nextMapOverride){
         this.nextMapOverride = nextMapOverride;
     }
 
     /** @return the next map to shuffle to. May be null, in which case the server should be stopped. */
     public @Nullable Map getNextMap(Gamemode mode, @Nullable Map previous){
-        if (nextMapOverride != null) {
+        if(nextMapOverride != null){
             Map next = nextMapOverride;
             nextMapOverride = null;
             return next;
