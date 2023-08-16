@@ -187,9 +187,7 @@ public class PlayerListFragment{
                                 ui.showConfirm("@confirm", Core.bundle.format("confirmkick",  user.name()), () -> Call.adminRequest(user, AdminAction.kick, null));
                                 dialog.hide();
                             }).row();
-                        }
 
-                        if(!user.isLocal()){
                             t.button("@player.trace", Icon.zoom, bstyle, () -> {
                                 Call.adminRequest(user, AdminAction.trace, null);
                                 dialog.hide();
