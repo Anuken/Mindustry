@@ -20,6 +20,7 @@ public class HeatConductor extends Block{
     public HeatConductor(String name){
         super(name);
         update = solid = rotate = true;
+        underBullets = true;
         rotateDraw = false;
         size = 3;
     }
