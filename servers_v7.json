@@ -17,7 +17,7 @@
   },
   {
     "name": "SMoke of Anarchy",
-    "address": ["smokeofanarchy.ru", "backup.smokeofanarchy.ru"]
+    "address": ["86.102.97.27"]
   },
   {
     "name": "Mindustry.pl",
@@ -206,7 +206,7 @@
   },
   {
     "name": "ABCXYZ Community",
-    "address": ["118.127.8.162:25617", "78.108.218.117:25640"]
+    "address": ["118.127.8.162:25617", "78.108.218.117:25640", "srv3.godlike.club:27246"]
   },
   {
     "name": "Vanilla CroCraft",
