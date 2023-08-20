@@ -166,7 +166,8 @@ public class DirectionBridge extends Block{
     }
 
     public class DirectionBridgeBuild extends Building{
-        public Building[] occupied = new Building[4];
+        public DirectionBridgeBuild[] occupied = new DirectionBridgeBuild[4];
+        public @Nullable DirectionBridgeBuild lastLink;
 
         @Override
         public void draw(){
