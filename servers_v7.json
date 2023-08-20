@@ -215,5 +215,9 @@
   {
     "name": "Extra Utilities",
     "address": ["222.186.59.147:8888", "222.186.59.147:8889"]
+  },
+  {
+    "name": "Alex Multiverse",
+    "address": ["alexmindustryv7.servegame.com:25588", "alexmindustryv7.servegame.com:41962", "alexmindustrypvp.ddns.net:6767", "alexmindustrypvp.ddns.net:6768"]
   }
 ]
