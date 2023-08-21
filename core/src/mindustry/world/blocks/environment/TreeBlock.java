@@ -9,6 +9,7 @@ import mindustry.world.*;
 
 public class TreeBlock extends Block{
     public float shadowOffset = -4f;
+    public @Load("@-shadow") TextureRegion shadow;
 
     public TreeBlock(String name){
         super(name);
