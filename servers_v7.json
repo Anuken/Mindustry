@@ -101,7 +101,7 @@
   },
   {
     "name": "The Devil",
-    "address": ["xem8k5.mindustry.top:8169", "test.xem8k5.top:8920", "other.xem8k5.top:10936", "n2.akiracloud.net:10404"]
+    "address": ["xem8k5.mindustry.top:8169", "test.xem8k5.top:8920", "other.xem8k5.top:10936", "n2.akiracloud.net:10404", "new.xem8k5.top"]
   },
   {
     "name": "Eradication Mindustry",
@@ -169,7 +169,7 @@
   },
   {
     "name": "Realm of Serene Lime",
-    "address": ["43.248.185.167:8517","n2.akiracloud.net:10686"]
+    "address": ["43.248.185.167:8517","n2.akiracloud.net:10686","n2.akiracloud.net:10486"]
   },
   {
     "name": "CreateDustry",
@@ -215,5 +215,9 @@
   {
     "name": "Extra Utilities",
     "address": ["222.186.59.147:8888", "222.186.59.147:8889"]
+  },
+  {
+    "name": "Alex Multiverse",
+    "address": ["alexmindustryv7.servegame.com:25588", "alexmindustryv7.servegame.com:41962", "alexmindustrypvp.ddns.net:6767", "alexmindustrypvp.ddns.net:6768"]
   }
 ]
