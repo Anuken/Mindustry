@@ -23,6 +23,10 @@ public class MinerAI extends AIController{
             unit.mineTile(null);
         }
 
+        if(ore != null && !unit.validMine(ore)){
+            ore = null;
+        }
+
         if(mining){
             if(timer.get(timerTarget2, 60 * 4) || targetItem == null){
                 targetItem = unit.type.mineItems.min(i -> indexer.hasOre(i) && unit.canMine(i), i -> core.items.get(i));
