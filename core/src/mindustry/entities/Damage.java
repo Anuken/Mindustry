@@ -94,7 +94,7 @@ public class Damage{
             }
 
             int waves = explosiveness <= 2 ? 0 : Mathf.clamp((int)(explosiveness / 11), 1, 25);
-            float damagePerWave = Mathf.pow(explosiveness / 2f, 0.8f);
+            float damagePerWave = explosiveness / 2f;
 
             for(int i = 0; i < waves; i++){
                 int f = i;
