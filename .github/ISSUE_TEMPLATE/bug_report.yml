@@ -1,5 +1,5 @@
 name: Bug report
-description: The type of device you were playing on
+description: Create a report to help fix an issue
 labels: ["bug"]
 
 body:
@@ -22,7 +22,7 @@ body:
     attributes:
       label: Build
       description: The build number under the title in the main menu.
-      placeholder: LATEST IS NOT A VERSION, I NEED THE EXACT BUILD NUMBER OF YOUR GAME.
+      placeholder: Latest is not a version! I need the exact build number!
     validations:
       required: true
   - type: textarea
@@ -43,7 +43,8 @@ body:
     id: mods
     attributes:
       label: Mods used
-      description: The mod repositories or zip files that are related to the issue, if applicable.
+      description: The mod repositories or zip files that are related to the issue.
+      placeholder: Leave empty if you did not use any mods.
     validations:
       required: false
   - type: textarea
@@ -51,22 +52,22 @@ body:
     attributes:
       label: Save file
       description: The (zipped) save file you were playing on when the bug happened. If this happened in the campaign, specify the sector, and attach the file you get from Settings -> Game Data -> Export Data. For custom games, attach the .msav file exported from the save dialog, zipped.
-      placeholder: THIS IS REQUIRED FOR ANY ISSUE HAPPENING IN-GAME OR IN MULTIPLAYER, REGARDLESS OF WHETHER YOU THINK IT HAPPENS EVERYWHERE. DO NOT OMIT THIS LINE UNLESS YOU ARE SURE THAT THE ISSUE DOES NOT HAPPEN IN-GAME. IF YOU DO NOT HAVE A SAVE, DON'T WASTE TIME OPENING THIS ISSUE.
+      placeholder: IMPORTANT: Write "Not in-game related" if you are sure that the issue has 100% nothing to do with anything in-game. If you think it happens everywhere, attach it anyways. If you don't have a save, don't wast time opening this issue.
     validations:
-      required: false
+      required: true
   - type: textarea
     id: logs
     attributes:
       label: (Crash) logs
       description: Either crash reports from the crash folder, or the file you get when you go into Settings -> Game Data -> Export Crash logs.
-      placeholder: REQUIRED if you are reporting a crash.
+      placeholder: Leave empty if the game didn't crash while the issue happened
     validations:
       required: false
   - type: checkboxes
     id: agreement
     attributes:
       label: Submission
-      description: Check the boxes to confirm that you have read the lines below.
+      description: Check the boxes to confirm that you have read the lines.
       options:
         - label: I have updated to the latest release (https://github.com/Anuken/Mindustry/releases) to make sure my issue has not been fixed.
           required: true
