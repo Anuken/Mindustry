@@ -52,7 +52,7 @@ body:
     attributes:
       label: Save file
       description: The (zipped) save file you were playing on when the bug happened. If this happened in the campaign, specify the sector, and attach the file you get from Settings -> Game Data -> Export Data. For custom games, attach the .msav file exported from the save dialog, zipped.
-      placeholder: IMPORTANT: Write "Not in-game related" if you are sure that the issue has 100% nothing to do with anything in-game. If you think it happens everywhere, attach it anyways. If you don't have a save, don't wast time opening this issue.
+      placeholder: IMPORTANT! Write "Not in-game related" if you are sure that the issue has 100% nothing to do with anything in-game. If you think it happens everywhere, attach it anyways. If you don't have a save, don't wast time opening this issue.
     validations:
       required: true
   - type: textarea
