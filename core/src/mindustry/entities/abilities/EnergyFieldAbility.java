@@ -5,6 +5,7 @@ import arc.audio.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.scene.ui.layout.Table;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
@@ -14,6 +15,8 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.world.meta.Stat;
+import mindustry.world.meta.StatUnit;
 
 import static mindustry.Vars.*;
 
@@ -22,7 +25,7 @@ public class EnergyFieldAbility extends Ability{
 
     public float damage = 1, reload = 100, range = 60;
     public Effect healEffect = Fx.heal, hitEffect = Fx.hitLaserBlast, damageEffect = Fx.chainLightning;
-    public StatusEffect status = StatusEffects.electrified;
+    public StatusEffect status = StatusEffects.electrified; //
     public Sound shootSound = Sounds.spark;
     public float statusDuration = 60f * 6f;
     public float x, y;
@@ -31,6 +34,7 @@ public class EnergyFieldAbility extends Ability{
     public float healPercent = 3f;
     /** Multiplies healing to units of the same type by this amount. */
     public float sameTypeHealMult = 1f;
+    public boolean displayHeal = true;
 
     public float layer = Layer.bullet - 0.001f, blinkScl = 20f, blinkSize = 0.1f;
     public float effectRadius = 5f, sectorRad = 0.14f, rotateSpeed = 0.5f;
@@ -50,8 +54,25 @@ public class EnergyFieldAbility extends Ability{
     }
 
     @Override
-    public String localized(){
-        return Core.bundle.format("ability.energyfield", damage, range / Vars.tilesize, maxTargets);
+    public void addStats(Table t){
+        t.add(Core.bundle.format("bullet.damage", damage));
+        t.row();
+        t.add("[lightgray]" + Stat.reload.localized() + ": [white]" + Strings.autoFixed(60f / reload, 2) + " " + StatUnit.perSecond.localized());
+        t.row();
+        t.add("[lightgray]" + Stat.shootRange.localized() + ": [white]" +  Strings.autoFixed(range / tilesize, 2) + " " + StatUnit.blocks.localized());
+        t.row();
+        t.add(Core.bundle.format("ability.energyfield.maxtargets", maxTargets));
+
+        if(displayHeal){
+            t.row();
+            t.add(Core.bundle.format("bullet.healpercent", Strings.autoFixed(healPercent, 2)));
+            t.row();
+            t.add(Core.bundle.format("ability.energyfield.sametypehealmultiplier", Math.round(sameTypeHealMult * 100f)));
+        }
+        if(status != StatusEffects.none){
+            t.row();
+            t.add(status.emoji() + " " + status.localizedName);
+        }
     }
 
     @Override

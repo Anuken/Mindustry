@@ -15,6 +15,8 @@ public abstract class Ability implements Cloneable{
     public void draw(Unit unit){}
     public void death(Unit unit){}
     public void init(UnitType type){}
+    public void displayBars(Unit unit, Table bars){}
+    public void addStats(Table t){}
 
     public Ability copy(){
         try{
@@ -23,10 +25,6 @@ public abstract class Ability implements Cloneable{
             //I am disgusted
             throw new RuntimeException("java sucks", e);
         }
-    }
-
-    public void displayBars(Unit unit, Table bars){
-
     }
 
     /** @return localized ability name; mods should override this. */

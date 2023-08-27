@@ -12,6 +12,10 @@ import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
+import mindustry.world.meta.Stat;
+import mindustry.world.meta.StatUnit;
+
+import static mindustry.Vars.tilesize;
 
 public class ForceFieldAbility extends Ability{
     /** Shield radius. */
@@ -67,6 +71,18 @@ public class ForceFieldAbility extends Ability{
     }
 
     ForceFieldAbility(){}
+
+    @Override
+    public void addStats(Table t){
+        t.add("[lightgray]" + Stat.health.localized() + ": [white]" + Math.round(max));
+        t.row();
+        t.add("[lightgray]" + Stat.shootRange.localized() + ": [white]" +  Strings.autoFixed(radius / tilesize, 2) + " " + StatUnit.blocks.localized());
+        t.row();
+        t.add("[lightgray]" + Stat.repairSpeed.localized() + ": [white]" + Strings.autoFixed(regen * 60f, 2) + StatUnit.perSecond.localized());
+        t.row();
+        t.add("[lightgray]" + Stat.cooldownTime.localized() + ": [white]" + Strings.autoFixed(cooldown / 60f, 2) + " " + StatUnit.seconds.localized());
+        t.row();
+    }
 
     @Override
     public void update(Unit unit){
