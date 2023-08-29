@@ -25,6 +25,7 @@ public class MinerAI extends AIController{
 
         if(ore != null && !unit.validMine(ore)){
             ore = null;
+            unit.mineTile = null;
         }
 
         if(mining){

@@ -105,8 +105,9 @@ public class Mods implements Loadable{
 
         Fi dest = modDirectory.child(finalName + ".zip");
 
-        file.copyTo(dest);
         try{
+            file.copyTo(dest);
+
             var loaded = loadMod(dest, true, true);
             mods.add(loaded);
             //invalidate ordered mods cache
