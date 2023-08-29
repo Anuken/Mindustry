@@ -41,9 +41,9 @@ public class DrawRegion extends DrawBlock{
         float z = Draw.z();
         if(layer > 0) Draw.z(layer);
         if(spinSprite){
-            Drawf.spinSprite(region, build.x + x, build.y + y, build.totalProgress() * rotateSpeed + rotation + buildingRotate ? build.rotdeg() : 0);
+            Drawf.spinSprite(region, build.x + x, build.y + y, build.totalProgress() * rotateSpeed + rotation + (buildingRotate ? build.rotdeg() : 0));
         }else{
-            Draw.rect(region, build.x + x, build.y + y, build.totalProgress() * rotateSpeed + rotation + buildingRotate ? build.rotdeg() : 0);
+            Draw.rect(region, build.x + x, build.y + y, build.totalProgress() * rotateSpeed + rotation + (buildingRotate ? build.rotdeg() : 0));
         }
         Draw.z(z);
     }
