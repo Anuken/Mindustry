@@ -51,7 +51,7 @@ public class DrawRegion extends DrawBlock{
     @Override
     public void drawPlan(Block block, BuildPlan plan, Eachable<BuildPlan> list){
         if(!drawPlan) return;
-        Draw.rect(region, plan.drawx(), plan.drawy(),  buildingRotate ? plan.rotation * 90f : 0);
+        Draw.rect(region, plan.drawx(), plan.drawy(), (buildingRotate ? plan.rotation * 90f : 0));
     }
 
     @Override
