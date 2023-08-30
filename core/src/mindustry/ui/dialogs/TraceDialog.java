@@ -27,6 +27,8 @@ public class TraceDialog extends BaseDialog{
 
         var style = Styles.emptyi;
         float s = 28f;
+        
+        var language = LanguageDialog.displayNames.get(player.locale, player.locale);
 
         table.table(c -> {
             c.left().defaults().left();
@@ -36,6 +38,8 @@ public class TraceDialog extends BaseDialog{
             c.add(Core.bundle.format("trace.ip", info.ip)).row();
             c.button(Icon.copySmall, style, () -> copy(info.uuid)).size(s).padRight(4f);
             c.add(Core.bundle.format("trace.id", info.uuid)).row();
+            c.button(Icon.copySmall, style, () -> copy(language)).size(s).padRight(4f);
+            c.add(Core.bundle.format("trace.language", language)).row();
         }).row();
 
         table.add(Core.bundle.format("trace.modclient", info.modded)).row();
