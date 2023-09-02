@@ -8,15 +8,13 @@ import arc.math.*;
 import arc.scene.ui.layout.Table;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
-import mindustry.world.meta.Stat;
-import mindustry.world.meta.StatUnit;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -25,7 +23,7 @@ public class EnergyFieldAbility extends Ability{
 
     public float damage = 1, reload = 100, range = 60;
     public Effect healEffect = Fx.heal, hitEffect = Fx.hitLaserBlast, damageEffect = Fx.chainLightning;
-    public StatusEffect status = StatusEffects.electrified; //
+    public StatusEffect status = StatusEffects.electrified;
     public Sound shootSound = Sounds.spark;
     public float statusDuration = 60f * 6f;
     public float x, y;
