@@ -1,13 +1,11 @@
 package mindustry.entities.abilities;
 
 import arc.math.*;
-import arc.scene.ui.layout.Table;
+import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.gen.*;
 import mindustry.type.*;
-import mindustry.world.meta.Stat;
-import mindustry.world.meta.StatUnit;
 
 /** Spawns a certain amount of units upon death. */
 public class SpawnDeathAbility extends Ability{

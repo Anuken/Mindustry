@@ -1,13 +1,12 @@
 package mindustry.entities.abilities;
 
 import arc.Core;
-import arc.scene.ui.layout.Table;
+import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
-import mindustry.world.meta.Stat;
-import mindustry.world.meta.StatUnit;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.tilesize;
 
