@@ -12,6 +12,7 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
+import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.maps.*;
@@ -348,7 +349,7 @@ public class StatValues{
     public static StatValue weapons(UnitType unit, Seq<Weapon> weapons){
         return table -> {
             table.row();
-            for(int i = 0; i < weapons.size;i ++){
+            for(int i = 0; i < weapons.size; i++){
                 Weapon weapon = weapons.get(i);
 
                 if(weapon.flipSprite || !weapon.hasStats(unit)){
@@ -367,6 +368,23 @@ public class StatValues{
                 }).growX().pad(5).margin(10);
                 table.row();
             }
+        };
+    }
+
+    public static StatValue abilities(Seq<Ability> abilities){
+        return table -> {
+            table.row();
+            table.table(t -> abilities.each(ability -> {
+                if(ability.display){
+                    t.row();
+                    t.table(Styles.grayPanel, a -> {
+                        a.add("[accent]" + ability.localized()).padBottom(4);
+                        a.row();
+                        a.left().top().defaults().left();
+                        ability.addStats(a);
+                    }).pad(5).margin(10).growX();
+                }
+            }));
         };
     }
 

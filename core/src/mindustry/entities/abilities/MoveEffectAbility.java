@@ -30,6 +30,7 @@ public class MoveEffectAbility extends Ability{
     }
 
     public MoveEffectAbility(){
+        display = false;
     }
 
     @Override
