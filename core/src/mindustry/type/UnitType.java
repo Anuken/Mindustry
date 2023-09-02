@@ -603,13 +603,7 @@ public class UnitType extends UnlockableContent implements Senseable{
         stats.add(Stat.range, (int)(maxRange / tilesize), StatUnit.blocks);
 
         if(abilities.any()){
-            var unique = new ObjectSet<String>();
-
-            for(Ability a : abilities){
-                if(a.display && unique.add(a.localized())){
-                    stats.add(Stat.abilities, a.localized());
-                }
-            }
+            stats.add(Stat.abilities, StatValues.abilities(abilities));
         }
 
         stats.add(Stat.flying, flying);
