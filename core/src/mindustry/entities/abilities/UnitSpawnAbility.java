@@ -3,6 +3,7 @@ package mindustry.entities.abilities;
 import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
@@ -11,6 +12,7 @@ import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -30,6 +32,13 @@ public class UnitSpawnAbility extends Ability{
     }
 
     public UnitSpawnAbility(){
+    }
+
+    @Override
+    public void addStats(Table t){
+        t.add("[lightgray]" + Stat.buildTime.localized() + ": [white]" + Strings.autoFixed(spawnTime / 60f, 2) + " " + StatUnit.seconds.localized());
+        t.row();
+        t.add(unit.emoji() + " " + unit.localizedName);
     }
 
     @Override

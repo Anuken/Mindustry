@@ -94,11 +94,12 @@ public class Damage{
             }
 
             int waves = explosiveness <= 2 ? 0 : Mathf.clamp((int)(explosiveness / 11), 1, 25);
+            float damagePerWave = explosiveness / 2f;
 
             for(int i = 0; i < waves; i++){
                 int f = i;
                 Time.run(i * 2f, () -> {
-                    damage(ignoreTeam, x, y, Mathf.clamp(radius + explosiveness, 0, 50f) * ((f + 1f) / waves), explosiveness / 2f, false);
+                    damage(ignoreTeam, x, y, Mathf.clamp(radius + explosiveness, 0, 50f) * ((f + 1f) / waves), damagePerWave, false);
                     Fx.blockExplosionSmoke.at(x + Mathf.range(radius), y + Mathf.range(radius));
                 });
             }
