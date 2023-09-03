@@ -7,7 +7,7 @@ buildscript{
     }
 
     dependencies{
-        classpath 'com.android.tools.build:gradle:7.2.1'
+        classpath 'com.android.tools.build:gradle:8.1.0'
     }
 }
 
@@ -29,8 +29,10 @@ task deploy(type: Copy){
 }
 
 android{
+    namespace "io.anuke.mindustry"
     buildToolsVersion '33.0.2'
     compileSdkVersion 33
+
     sourceSets{
         main{
             manifest.srcFile 'AndroidManifest.xml'
