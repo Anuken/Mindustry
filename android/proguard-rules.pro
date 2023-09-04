@@ -8,8 +8,4 @@
 -keep class rhino.** { *; }
 -keep class com.android.dex.** { *; }
 
--dontwarn javax.naming.NamingException
--dontwarn javax.naming.directory.DirContext
--dontwarn javax.naming.directory.InitialDirContext
-
 #-printusage out.txt

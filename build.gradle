@@ -22,8 +22,8 @@ buildscript{
 }
 
 plugins{
-    id "org.jetbrains.kotlin.jvm" version "1.8.20"
-    id "org.jetbrains.kotlin.kapt" version "1.8.20"
+    id "org.jetbrains.kotlin.jvm" version "1.6.0"
+    id "org.jetbrains.kotlin.kapt" version "1.6.0"
 }
 
 allprojects{
@@ -365,6 +365,7 @@ project(":core"){
         //these are completely unnecessary
         tasks.kaptGenerateStubsKotlin.onlyIf{ false }
         tasks.compileKotlin.onlyIf{ false }
+        tasks.inspectClassesForKotlinIC.onlyIf{ false }
     }
 
     //comp** classes are only used for code generation
