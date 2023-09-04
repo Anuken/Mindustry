@@ -27,7 +27,7 @@ public class GlobalVars{
     public static final Rand rand = new Rand();
 
     //non-constants that depend on state
-    private static int varTime, varTick, varSecond, varMinute, varWave, varWaveTime, varMaster;
+    private static int varTime, varTick, varSecond, varMinute, varWave, varWaveTime, varServer;
 
     private ObjectIntMap<String> namesToIds = new ObjectIntMap<>();
     private Seq<Var> vars = new Seq<>(Var.class);
@@ -56,7 +56,7 @@ public class GlobalVars{
         varWave = put("@waveNumber", 0);
         varWaveTime = put("@waveTime", 0);
 
-        varMaster = put("@master", 0);
+        varMaster = put("@server", 0);
 
         //special enums
         put("@ctrlProcessor", ctrlProcessor);
@@ -151,7 +151,7 @@ public class GlobalVars{
         vars.items[varWaveTime].numval = state.wavetime / 60f;
 
         //network
-        vars.items[varMaster].numval = (net.server() || !net.active()) ? 1 : 0;
+        vars.items[varServer].numval = (net.server() || !net.active()) ? 1 : 0;
     }
 
     /** @return a piece of content based on its logic ID. This is not equivalent to content ID. */
