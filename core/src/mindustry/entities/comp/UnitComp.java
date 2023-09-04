@@ -297,8 +297,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
                 //only serverside
                 if(((Object)this) instanceof Payloadc pay && !net.client()){
                     if(value instanceof Block b){
-                        Building build = b.newBuilding().create(b, team());
-                        if(pay.canPickup(build)) pay.addPayload(new BuildPayload(build));
+                        if(b.synthetic()){
+                            Building build = b.newBuilding().create(b, team());
+                            if(pay.canPickup(build)) pay.addPayload(new BuildPayload(build));
+                        }
                     }else if(value instanceof UnitType ut){
                         Unit unit = ut.create(team());
                         if(pay.canPickup(unit)) pay.addPayload(new UnitPayload(unit));
