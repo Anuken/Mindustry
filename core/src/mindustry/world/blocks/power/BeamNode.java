@@ -190,7 +190,7 @@ public class BeamNode extends PowerBlock{
 
                 if(next != prev){
                     //unlinked, disconnect and reflow
-                    if(prev != null){
+                    if(prev != null && prev.isAdded()){
                         prev.power.links.removeValue(pos());
                         power.links.removeValue(prev.pos());
 
