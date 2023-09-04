@@ -151,7 +151,7 @@ public class GlobalVars{
         vars.items[varWaveTime].numval = state.wavetime / 60f;
 
         //network
-        vars.items[varMaster].numval = (Vars.net.server() || !Vars.net.active()) ? 1 : 0;
+        vars.items[varMaster].numval = (net.server() || !net.active()) ? 1 : 0;
     }
 
     /** @return a piece of content based on its logic ID. This is not equivalent to content ID. */
