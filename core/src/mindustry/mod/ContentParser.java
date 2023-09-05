@@ -596,7 +596,7 @@ public class ContentParser{
         ContentType.planet, (TypeParser<Planet>)(mod, name, value) -> {
             if(value.isString()) return locate(ContentType.planet, name);
 
-            Planet parent = locate(ContentType.planet, value.getString("parent"));
+            Planet parent = locate(ContentType.planet, value.getString("parent", ""));
             Planet planet = new Planet(mod + "-" + name, parent, value.getFloat("radius", 1f), value.getInt("sectorSize", 0));
 
             if(value.has("mesh")){

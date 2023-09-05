@@ -268,6 +268,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
                     kill();
                 }
             }
+            case shield -> shield = Math.max((float)value, 0f);
             case x -> x = World.unconv((float)value);
             case y -> y = World.unconv((float)value);
             case rotation -> rotation = (float)value;
