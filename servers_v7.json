@@ -223,5 +223,9 @@
   {
     "name": "Alex Multiverse",
     "address": ["alexmindustryv7.servegame.com:25588", "alexmindustryv7.servegame.com:41962", "alexmindustrypvp.ddns.net:6767", "alexmindustrypvp.ddns.net:6768"]
+  },
+  {
+    "name": "Open PVP",
+    "address": ["185.104.114.140:6567"]
   }
 ]
