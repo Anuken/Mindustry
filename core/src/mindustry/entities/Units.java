@@ -112,7 +112,7 @@ public class Units{
 
     /** @return whether this player can interact with a specific tile. if either of these are null, returns true.*/
     public static boolean canInteract(Player player, Building tile){
-        return player == null || tile == null || tile.interactable(player.team());
+        return player == null || tile == null || tile.interactable(player.team()) || state.rules.editor;
     }
 
     /**
