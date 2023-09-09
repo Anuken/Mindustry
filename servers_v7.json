@@ -4,6 +4,10 @@
     "address": ["213.165.76.25:6567", "213.165.76.25:30104"]
   },
   {
+    "name": "Crux's Federation",
+    "address": ["de-free-01.hosts.optikservers.com:32538", "de-free-01.hosts.optikservers.com:31421", "fsn1.bbn.one:37019"]
+  },
+  {
     "name": "RCM",
     "address": ["rcrms.ru:6567"]
   },
