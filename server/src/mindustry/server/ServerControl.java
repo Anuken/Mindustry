@@ -343,7 +343,7 @@ public class ServerControl implements ApplicationListener{
 
         handler.register("stop", "Stop hosting the server.", arg -> {
             net.closeServer();
-            if(lastTask != null) lastTask.cancel();
+            cancelPlayTask();
             state.set(State.menu);
             info("Stopped server.");
         });
@@ -354,7 +354,7 @@ public class ServerControl implements ApplicationListener{
                 return;
             }
 
-            if(lastTask != null) lastTask.cancel();
+            cancelPlayTask();
 
             Gamemode preset = Gamemode.survival;
 
@@ -1064,6 +1064,13 @@ public class ServerControl implements ApplicationListener{
     }
 
     /**
+     * Cancels the world load timer task, if it is scheduled. Can be useful for stopping a server or hosting a new game.
+     */
+    public void cancelPlayTask() {
+        if(lastTask != null) lastTask.cancel();
+    }
+
+    /**
      * Resets the world state, starts a new game.
      * @param run What task to run to load a new world.
      */
@@ -1078,38 +1085,30 @@ public class ServerControl implements ApplicationListener{
      */
     public void play(boolean wait, Runnable run){
         inGameOverWait = true;
-        if(lastTask != null) lastTask.cancel();
+        cancelPlayTask();
         
-        Runnable r = () -> {
-            WorldReloader reloader = new WorldReloader();
+        Runnable reload = () -> {
+            try{
+                WorldReloader reloader = new WorldReloader();
+                reloader.begin();
 
-            reloader.begin();
+                run.run();
 
-            run.run();
+                state.rules = state.map.applyRules(lastMode);
+                logic.play();
 
-            state.rules = state.map.applyRules(lastMode);
-            logic.play();
-
-            reloader.end();
-            inGameOverWait = false;
+                reloader.end();
+                inGameOverWait = false;
+            }catch(MapException e){
+                err("@: @", e.map.plainName(), e.getMessage());
+                net.closeServer();
+            }
         };
 
         if(wait){
-            lastTask = new Task(){
-                @Override
-                public void run(){
-                    try{
-                        r.run();
-                    }catch(MapException e){
-                        err("@: @", e.map.plainName(), e.getMessage());
-                        net.closeServer();
-                    }
-                }
-            };
-
-            Timer.schedule(lastTask, Config.roundExtraTime.num());
+            lastTask = Timer.schedule(reload, Config.roundExtraTime.num());
         }else{
-            r.run();
+            reload.run();
         }
     }
 
