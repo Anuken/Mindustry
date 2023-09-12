@@ -1710,7 +1710,7 @@ public class Fx{
     }),
 
     regenSuppressParticle = new Effect(35f, e -> {
-        color(Pal.sapBullet, e.color, e.fin());
+        color(e.color, Color.white, e.fin());
         stroke(e.fout() * 1.4f + 0.5f);
 
         randLenVectors(e.id, 4, 17f * e.fin(), (x, y) -> {
@@ -1729,7 +1729,7 @@ public class Fx{
 
         Tmp.bz2.valueAt(Tmp.v4, e.fout());
 
-        color(Pal.sapBullet);
+        color(e.color);
         Fill.circle(Tmp.v4.x, Tmp.v4.y, e.fslope() * 2f + 0.1f);
     }).followParent(false).rotWithParent(false),
 
