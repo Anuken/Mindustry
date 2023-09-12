@@ -1450,6 +1450,22 @@ public class LExecutor{
                 }
                 case ambientLight -> state.rules.ambientLight.fromDouble(exec.num(value));
                 case solarMultiplier -> state.rules.solarMultiplier = Math.max(exec.numf(value), 0f);
+                case ban -> {
+                    Object cont = exec.obj(value);
+                    if(cont instanceof Block b){
+                        state.rules.bannedBlocks.add(b);
+                    }else if(cont instanceof UnitType u){
+                        state.rules.bannedUnits.add(u);
+                    }
+                }
+                case unban -> {
+                    Object cont = exec.obj(value);
+                    if(cont instanceof Block b){
+                        state.rules.bannedBlocks.remove(b);
+                    }else if(cont instanceof UnitType u){
+                        state.rules.bannedUnits.remove(u);
+                    }
+                }
                 case unitHealth, unitBuildSpeed, unitCost, unitDamage, blockHealth, blockDamage, buildSpeed, rtsMinSquad, rtsMinWeight -> {
                     Team team = exec.team(p1);
                     if(team != null){
