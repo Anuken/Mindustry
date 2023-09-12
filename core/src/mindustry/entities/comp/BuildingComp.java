@@ -377,13 +377,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         float heat = 0f;
 
-        for(var edge : block.getEdges()){
-            Building build = nearby(edge.x, edge.y);
+        for(var build : proximity){
             if(build != null && build.team == team && build instanceof HeatBlock heater){
-                //massive hack but I don't really care anymore
-                if(heater instanceof HeatConductorBuild cond){
-                    cond.updateHeat();
-                }
+
 
                 boolean split = build.block instanceof HeatConductor cond && cond.splitHeat;
                 // non-routers must face us, routers must face away - next to a redirector, they're forced to face away due to cycles anyway
@@ -391,8 +387,13 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
                     //if there's a cycle, ignore its heat
                     if(!(build instanceof HeatConductorBuild hc && hc.cameFrom.contains(id()))){
+                        //x/y coordinate difference across point of contact
+                        int diff = Math.min(Math.abs(build.tileX() - tileX()), Math.abs(build.tileY() - tileY()));
+                        //number of points that this block had contact with
+                        int contactPoints = Math.min(Math.max(build.block.size, block.size) - diff, Math.min(build.block.size, block.size));
+
                         //heat is distributed across building size
-                        float add = heater.heat() / build.block.size;
+                        float add = heater.heat() / build.block.size * contactPoints;
                         if(split){
                             //heat routers split heat across 3 surfaces
                             add /= 3f;
@@ -408,6 +409,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                         if(build instanceof HeatConductorBuild hc){
                             cameFrom.addAll(hc.cameFrom);
                         }
+                    }
+
+                    //massive hack but I don't really care anymore
+                    if(heater instanceof HeatConductorBuild cond){
+                        cond.updateHeat();
                     }
                 }
             }
