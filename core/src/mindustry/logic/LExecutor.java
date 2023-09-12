@@ -1451,7 +1451,7 @@ public class LExecutor{
                 case ambientLight -> state.rules.ambientLight.fromDouble(exec.num(value));
                 case solarMultiplier -> state.rules.solarMultiplier = Math.max(exec.numf(value), 0f);
                 case ban -> {
-                    Object cont = exec.obj(p1);
+                    Object cont = exec.obj(value);
                     if(cont instanceof Block b){
                         state.rules.bannedBlocks.add(b);
                     }else if(cont instanceof UnitType u){
@@ -1459,7 +1459,7 @@ public class LExecutor{
                     }
                 }
                 case unban -> {
-                    Object cont = exec.obj(p1);
+                    Object cont = exec.obj(value);
                     if(cont instanceof Block b){
                         state.rules.bannedBlocks.remove(b);
                     }else if(cont instanceof UnitType u){
