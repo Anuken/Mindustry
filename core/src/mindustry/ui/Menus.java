@@ -70,6 +70,17 @@ public class Menus{
         });
     }
 
+    @Remote(variants = Variant.both)
+    public static void textInput(int textInputId, String title, String message, int textLength, String def, boolean numeric, boolean allowEmpty){
+        if(title == null) title = "";
+
+        ui.showTextInput(title, message, textLength, def, numeric, allowEmpty, (text) -> {
+            Call.textInputResult(player, textInputId, text);
+        }, () -> {
+            Call.textInputResult(player, textInputId, null);
+        });
+    }
+
     @Remote(targets = Loc.both, called = Loc.both)
     public static void textInputResult(@Nullable Player player, int textInputId, @Nullable String text){
         if(player != null){
