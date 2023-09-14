@@ -1392,6 +1392,11 @@ public class LStatements{
                     row(table);
                     field(table, value, s -> value = s);
                 }
+                case ban, unban -> {
+                    table.add(" block/unit ");
+                    
+                    field(table, value, s -> value = s);
+                }
                 default -> {
                     table.add(" = ");
 
