@@ -1,5 +1,9 @@
 [
   {
+    "name:": "ShardDustry",
+    "address": ["65.109.65.23:5552", "uk-prem-01.hosts.optikservers.com:26076", "uk-prem-01.hosts.optikservers.com:25798"]
+  },
+  {
     "name": "Tamazia",
     "address": ["213.165.76.25:6567", "213.165.76.25:30104"]
   },
