@@ -51,7 +51,12 @@ public class CustomRulesDialog extends BaseDialog{
 
                 t.button("@waves.copy", Icon.copy, style, () -> {
                     ui.showInfoFade("@waves.copied");
+
+                    //hack: don't write the spawns, they just waste space
+                    var spawns = rules.spawns;
+                    rules.spawns = new Seq<>();
                     Core.app.setClipboardText(JsonIO.write(rules));
+                    rules.spawns = spawns;
                     dialog.hide();
                 }).marginLeft(12f).row();
 
