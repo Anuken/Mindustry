@@ -2243,7 +2243,13 @@ public class UnitTypes{
                     }});
                 }
             }
-
+            abilities.add(new SuppressionFieldAbility(){{
+                orbRadius = 5;
+                particleSize = 3;
+                y = -10f;
+                particles = 10;
+                color = particleColor = effectColor = Pal.heal;
+            }});
             weapons.add(new Weapon("emp-cannon-mount"){{
                 rotate = true;
 
@@ -2345,6 +2351,7 @@ public class UnitTypes{
             speed = 3f;
             rotateSpeed = 15f;
             accel = 0.1f;
+            fogRadius = 0f;
             itemCapacity = 30;
             health = 150f;
             engineOffset = 6f;
@@ -2381,6 +2388,7 @@ public class UnitTypes{
             speed = 3.3f;
             rotateSpeed = 17f;
             accel = 0.1f;
+            fogRadius = 0f;
             itemCapacity = 50;
             health = 170f;
             engineOffset = 6f;
@@ -2422,6 +2430,7 @@ public class UnitTypes{
             speed = 3.55f;
             rotateSpeed = 19f;
             accel = 0.11f;
+            fogRadius = 0f;
             itemCapacity = 70;
             health = 220f;
             engineOffset = 6f;

@@ -427,7 +427,6 @@ public class LExecutor{
                     case unbind -> {
                         //TODO is this a good idea? will allocate
                         unit.resetController();
-                        exec.setobj(varUnit, null);
                     }
                     case within -> {
                         exec.setnum(p4, unit.within(x1, y1, d1) ? 1 : 0);
@@ -1451,6 +1450,22 @@ public class LExecutor{
                 }
                 case ambientLight -> state.rules.ambientLight.fromDouble(exec.num(value));
                 case solarMultiplier -> state.rules.solarMultiplier = Math.max(exec.numf(value), 0f);
+                case ban -> {
+                    Object cont = exec.obj(value);
+                    if(cont instanceof Block b){
+                        state.rules.bannedBlocks.add(b);
+                    }else if(cont instanceof UnitType u){
+                        state.rules.bannedUnits.add(u);
+                    }
+                }
+                case unban -> {
+                    Object cont = exec.obj(value);
+                    if(cont instanceof Block b){
+                        state.rules.bannedBlocks.remove(b);
+                    }else if(cont instanceof UnitType u){
+                        state.rules.bannedUnits.remove(u);
+                    }
+                }
                 case unitHealth, unitBuildSpeed, unitCost, unitDamage, blockHealth, blockDamage, buildSpeed, rtsMinSquad, rtsMinWeight -> {
                     Team team = exec.team(p1);
                     if(team != null){

@@ -105,8 +105,9 @@ public class Mods implements Loadable{
 
         Fi dest = modDirectory.child(finalName + ".zip");
 
-        file.copyTo(dest);
         try{
+            file.copyTo(dest);
+
             var loaded = loadMod(dest, true, true);
             mods.add(loaded);
             //invalidate ordered mods cache
@@ -450,7 +451,7 @@ public class Mods implements Loadable{
 
             if(meta == null || meta.name == null) continue;
             metas.add(meta);
-            mapping.put(meta.name, file);
+            mapping.put(meta.internalName, file);
         }
 
         var resolved = resolveDependencies(metas);

@@ -1,7 +1,11 @@
 [
   {
     "name": "Tamazia",
-    "address": ["83.150.217.98:25573", "83.150.217.98:25566", "83.150.217.98:25568"]
+    "address": ["213.165.76.25:6567", "213.165.76.25:30104"]
+  },
+  {
+    "name": "Crux's Federation",
+    "address": ["de-free-01.hosts.optikservers.com:32538", "de-free-01.hosts.optikservers.com:31421", "fsn1.bbn.one:37019"]
   },
   {
     "name": "RCM",
@@ -42,6 +46,10 @@
   {
     "name": "HexPvP Network",
     "address": ["hexpvp.ddns.net", "kycb42148.ddns.net:6614"]
+  },
+  {
+    "name": "Unidustry",
+    "address": ["51.81.57.217:33703"]
   },
   {
     "name": "Omega Hub",
@@ -149,7 +157,7 @@
   },
   {
     "name": "Vndustry",
-    "address": ["vndustry.ddns.net", "vndustry.ddns.net:6568", "27.50.72.82:25334"]
+    "address": ["185.128.227.11", "27.50.72.82:25334"]
   },
   {
      "name": "Anana&ShenYv",
@@ -218,6 +226,10 @@
   },
   {
     "name": "Alex Multiverse",
-    "address": ["alexmindustryv7.servegame.com:25588", "alexmindustryv7.servegame.com:41962", "alexmindustrypvp.ddns.net:6767", "alexmindustrypvp.ddns.net:6768"]
+    "address": ["alexmindustryv7.servegame.com:25588", "173.255.208.38:41962", "alexmindustrypvp.ddns.net:6767", "172.104.188.197:6768"]
+  },
+  {
+    "name": "Open PVP",
+    "address": ["185.104.114.140:6567"]
   }
 ]

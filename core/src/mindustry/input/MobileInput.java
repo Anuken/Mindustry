@@ -923,6 +923,8 @@ public class MobileInput extends InputHandler implements GestureListener{
             Core.camera.position.y -= deltaY;
         }
 
+        camera.position.clamp(-camera.width/4f, -camera.height/4f, world.unitWidth() + camera.width/4f, world.unitHeight() + camera.height/4f);
+
         return false;
     }
 
