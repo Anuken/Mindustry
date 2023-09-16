@@ -1,5 +1,9 @@
 [
   {
+    "name": "ShardDustry",
+    "address": ["srv3.godlike.club:30561", "65.109.65.23:5552"]
+  },
+  {
     "name": "Tamazia",
     "address": ["213.165.76.25:6567", "213.165.76.25:30104"]
   },
