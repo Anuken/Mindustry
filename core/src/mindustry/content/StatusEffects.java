@@ -25,10 +25,10 @@ public class StatusEffects{
 
             init(() -> {
                 opposite(wet, freezing);
-                affinity(tarred, (unit, result, time) -> {
-                    unit.damagePierce(transitionDamage);
+                affinity(tarred, (unit, result, time, level) -> {
+                    unit.damagePierce(transitionDamage * (result.level + level) / 2);
                     Fx.burning.at(unit.x + Mathf.range(unit.bounds() / 2f), unit.y + Mathf.range(unit.bounds() / 2f));
-                    result.set(burning, Math.min(time + result.time, 300f));
+                    result.set(burning, Math.min(time + result.time, 300f), Math.max(result.level, level));
                 });
             });
         }};
@@ -43,8 +43,8 @@ public class StatusEffects{
             init(() -> {
                 opposite(melting, burning);
 
-                affinity(blasted, (unit, result, time) -> {
-                    unit.damagePierce(transitionDamage);
+                affinity(blasted, (unit, result, time, level) -> {
+                    unit.damagePierce(transitionDamage * (result.level + level) / 2);
                     if(unit.team == state.rules.waveTeam){
                         Events.fire(Trigger.blastFreeze);
                     }
@@ -79,11 +79,11 @@ public class StatusEffects{
             transitionDamage = 14;
 
             init(() -> {
-                affinity(shocked, (unit, result, time) -> {
+                affinity(shocked, (unit, result, time, level) -> {
                     float pierceFraction = 0.3f;
 
-                    unit.damagePierce(transitionDamage * pierceFraction);
-                    unit.damage(transitionDamage * (1f - pierceFraction));
+                    unit.damagePierce(transitionDamage * (result.level + level) / 2 * pierceFraction);
+                    unit.damage(transitionDamage * (result.level + level) / 2 * (1f - pierceFraction));
                     if(unit.team == state.rules.waveTeam){
                         Events.fire(Trigger.shock);
                     }
@@ -109,10 +109,10 @@ public class StatusEffects{
 
             init(() -> {
                 opposite(wet, freezing);
-                affinity(tarred, (unit, result, time) -> {
-                    unit.damagePierce(8f);
+                affinity(tarred, (unit, result, time, level) -> {
+                    unit.damagePierce(8f * (result.level + level) / 2);
                     Fx.burning.at(unit.x + Mathf.range(unit.bounds() / 2f), unit.y + Mathf.range(unit.bounds() / 2f));
-                    result.set(melting, Math.min(time + result.time, 200f));
+                    result.set(melting, Math.min(time + result.time, 200f), Math.max(result.level, level));
                 });
             });
         }};
@@ -146,8 +146,8 @@ public class StatusEffects{
             effect = Fx.oily;
 
             init(() -> {
-                affinity(melting, (unit, result, time) -> result.set(melting, result.time + time));
-                affinity(burning, (unit, result, time) -> result.set(burning, result.time + time));
+                affinity(melting, (unit, result, time, level) -> result.set(melting, result.time + time, Math.max(result.level, level)));
+                affinity(burning, (unit, result, time, level) -> result.set(burning, result.time + time, Math.max(result.level, level)));
             });
         }};
 

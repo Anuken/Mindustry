@@ -32,6 +32,11 @@ abstract class StatusComp implements Posc, Flyingc{
 
     /** Adds a status effect to this unit. */
     void apply(StatusEffect effect, float duration){
+        apply(effect, duration, 1);
+    }
+
+    /** Adds a status effect to this unit. */
+    void apply(StatusEffect effect, float duration, int level){
         if(effect == StatusEffects.none || effect == null || isImmune(effect)) return; //don't apply empty or immune effects
 
         //unlock status effects regardless of whether they were applied to friendly units
@@ -45,10 +50,12 @@ abstract class StatusComp implements Posc, Flyingc{
                 StatusEntry entry = statuses.get(i);
                 //extend effect
                 if(entry.effect == effect){
+                    if(entry.level > level) return;
                     entry.time = Math.max(entry.time, duration);
+                    entry.level = level;
                     effect.applied(self(), entry.time, true);
                     return;
-                }else if(entry.effect.applyTransition(self(), effect, entry, duration)){ //find reaction
+                }else if(entry.effect.applyTransition(self(), effect, entry, duration, level)){ //find reaction
                     //TODO effect may react with multiple other effects
                     //stop looking when one is found
                     return;
@@ -59,7 +66,7 @@ abstract class StatusComp implements Posc, Flyingc{
         if(!effect.reactive){
             //otherwise, no opposites found, add direct effect
             StatusEntry entry = Pools.obtain(StatusEntry.class, StatusEntry::new);
-            entry.set(effect, duration);
+            entry.set(effect, duration, level);
             statuses.add(entry);
             effect.applied(self(), duration, false);
         }
@@ -136,16 +143,16 @@ abstract class StatusComp implements Posc, Flyingc{
             }else{
                 applied.set(entry.effect.id);
 
-                speedMultiplier *= entry.effect.speedMultiplier;
-                healthMultiplier *= entry.effect.healthMultiplier;
-                damageMultiplier *= entry.effect.damageMultiplier;
-                reloadMultiplier *= entry.effect.reloadMultiplier;
-                buildSpeedMultiplier *= entry.effect.buildSpeedMultiplier;
-                dragMultiplier *= entry.effect.dragMultiplier;
+                speedMultiplier *= entry.effect.speedMultiplier * entry.level;
+                healthMultiplier *= entry.effect.healthMultiplier * entry.level;
+                damageMultiplier *= entry.effect.damageMultiplier * entry.level;
+                reloadMultiplier *= entry.effect.reloadMultiplier * entry.level;
+                buildSpeedMultiplier *= entry.effect.buildSpeedMultiplier * entry.level;
+                dragMultiplier *= entry.effect.dragMultiplier * entry.level;
 
                 disarmed |= entry.effect.disarm;
 
-                entry.effect.update(self(), entry.time);
+                entry.effect.update(self(), entry.time, entry.level);
             }
         }
     }
@@ -156,7 +163,7 @@ abstract class StatusComp implements Posc, Flyingc{
 
     public void draw(){
         for(StatusEntry e : statuses){
-            e.effect.draw(self(), e.time);
+            e.effect.draw(self(), e.time, e.level);
         }
     }
 

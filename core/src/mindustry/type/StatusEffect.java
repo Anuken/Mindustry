@@ -60,7 +60,7 @@ public class StatusEffect extends UnlockableContent{
     /** Set to false to disable outline generation. */
     public boolean outline = true;
     /** Transition handler map. */
-    protected ObjectMap<StatusEffect, TransitionHandler> transitions = new ObjectMap<>();
+    protected ObjectMap<StatusEffect, TransitionHandlerWithLevel> transitions = new ObjectMap<>();
     /** Called on init. */
     protected Runnable initblock = () -> {};
 
@@ -128,10 +128,13 @@ public class StatusEffect extends UnlockableContent{
 
     /** Runs every tick on the affected unit while time is greater than 0. */
     public void update(Unit unit, float time){
+        update(unit, time, 1);
+    }
+    public void update(Unit unit, float time, int level){
         if(damage > 0){
-            unit.damageContinuousPierce(damage);
+            unit.damageContinuousPierce(damage * level);
         }else if(damage < 0){ //heal unit
-            unit.heal(-1f * damage * Time.delta);
+            unit.heal(-1f * damage * level * Time.delta);
         }
 
         if(effect != Fx.none && Mathf.chanceDelta(effectChance)){
@@ -139,12 +142,21 @@ public class StatusEffect extends UnlockableContent{
             effect.at(unit.x + Tmp.v1.x, unit.y + Tmp.v1.y, 0, color, parentizeEffect ? unit : null);
         }
     }
-
+    @Deprecated
     protected void trans(StatusEffect effect, TransitionHandler handler){
+        transitions.put(effect, (unit, current, time, level) -> handler.handle(unit, current, time));
+    }
+    protected void trans(StatusEffect effect, TransitionHandlerWithLevel handler){
         transitions.put(effect, handler);
     }
-
+    @Deprecated
     protected void affinity(StatusEffect effect, TransitionHandler handler){
+        affinities.add(effect);
+        effect.affinities.add(this);
+        trans(effect, handler);
+    }
+
+    protected void affinity(StatusEffect effect, TransitionHandlerWithLevel handler){
         affinities.add(effect);
         effect.affinities.add(this);
         trans(effect, handler);
@@ -168,6 +180,9 @@ public class StatusEffect extends UnlockableContent{
         });
     }
 
+    public void draw(Unit unit, float time, int level){
+        draw(unit, time); //Backwards compatibility
+    }
     public void draw(Unit unit, float time){
         draw(unit); //Backwards compatibility
     }
@@ -186,10 +201,10 @@ public class StatusEffect extends UnlockableContent{
      * @param time The applies status effect time
      * @return whether a reaction occurred
      */
-    public boolean applyTransition(Unit unit, StatusEffect to, StatusEntry entry, float time){
+    public boolean applyTransition(Unit unit, StatusEffect to, StatusEntry entry, float time, int level){
         var trans = transitions.get(to);
         if(trans != null){
-            trans.handle(unit, entry, time);
+            trans.handle(unit, entry, time, level);
             return true;
         }
         return false;
@@ -218,7 +233,11 @@ public class StatusEffect extends UnlockableContent{
         return ContentType.status;
     }
 
+    @Deprecated
     public interface TransitionHandler{
         void handle(Unit unit, StatusEntry current, float time);
+    }
+    public interface TransitionHandlerWithLevel{
+        void handle(Unit unit, StatusEntry current, float time, int level);
     }
 }
