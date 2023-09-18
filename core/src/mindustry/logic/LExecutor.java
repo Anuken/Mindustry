@@ -1549,18 +1549,7 @@ public class LExecutor{
         @Override
         public void run(LExecutor exec){
             if(headless && type != MessageType.mission) return;
-
-            //skip back to self until possible
-            //TODO this is guaranteed desync on servers - I don't see a good solution
-            if(
-                type == MessageType.announce && ui.hasAnnouncement() ||
-                type == MessageType.notify && ui.hudfrag.hasToast() ||
-                type == MessageType.toast && ui.hasAnnouncement()
-            ){
-                exec.var(varCounter).numval --;
-                return;
-            }
-
+            
             String text = exec.textBuffer.toString();
             if(text.startsWith("@")){
                 String substr = text.substring(1);
