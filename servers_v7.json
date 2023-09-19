@@ -235,5 +235,9 @@
   {
     "name": "Open PVP",
     "address": ["185.104.114.140:6567"]
+  },
+  {
+    "name": "Mindustry.lol",
+    "address": ["v7.mindustry.lol"]
   }
 ]
