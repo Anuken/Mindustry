@@ -1,5 +1,9 @@
 [
   {
+    "name": "ShardDustry",
+    "address": ["srv3.godlike.club:30561", "65.109.65.23:5552"]
+  },
+  {
     "name": "Tamazia",
     "address": ["213.165.76.25:6567", "213.165.76.25:30104"]
   },
@@ -194,7 +198,7 @@
   },
   {
     "name": "Cyandustry",
-    "address": ["n1.mindustry.me:7000","n1.mindustry.me:7500", "n1.mindustry.me:7600"]
+    "address": ["91.218.66.162:8000","91.218.66.162:7000", "91.218.66.162:7500", "91.218.66.162:7600"]
   },
   {
     "name": "Four Family",
