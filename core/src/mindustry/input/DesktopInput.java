@@ -387,8 +387,19 @@ public class DesktopInput extends InputHandler{
                 cursorType = ui.drillCursor;
             }
 
-            if(commandMode && selectedUnits.any() && ((cursor.build != null && !cursor.build.inFogTo(player.team()) && cursor.build.team != player.team()) || (selectedEnemyUnit(input.mouseWorldX(), input.mouseWorldY()) != null))){
-                cursorType = ui.targetCursor;
+            if(commandMode && selectedUnits.any()){
+                boolean canAttack = (cursor.build != null && !cursor.build.inFogTo(player.team()) && cursor.build.team != player.team());
+
+                if(!canAttack){
+                    var unit = selectedEnemyUnit(input.mouseWorldX(), input.mouseWorldY());
+                    if(unit != null){
+                        canAttack = selectedUnits.contains(u -> u.canTarget(unit));
+                    }
+                }
+
+                if(canAttack){
+                    cursorType = ui.targetCursor;
+                }
             }
 
             if(getPlan(cursor.x, cursor.y) != null && mode == none){

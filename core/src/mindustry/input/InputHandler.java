@@ -225,6 +225,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         Teamc teamTarget = buildTarget == null ? unitTarget : buildTarget;
+        boolean anyCommandedTarget = false;
 
         for(int id : unitIds){
             Unit unit = Groups.unit.getByID(id);
@@ -235,12 +236,15 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                     ai.command(UnitCommand.moveCommand);
                 }
 
-                if(teamTarget != null && teamTarget.team() != player.team()){
-                    ai.commandTarget(teamTarget);
+                if(teamTarget != null && teamTarget.team() != player.team() &&
+                    !(teamTarget instanceof Unit u && !unit.canTarget(u)) && !(teamTarget instanceof Building && !unit.type.targetGround)){
 
+                    anyCommandedTarget = true;
+                    ai.commandTarget(teamTarget);
                 }else if(posTarget != null){
                     ai.commandPosition(posTarget);
                 }
+
                 unit.lastCommanded = player.coloredName();
                 
                 //remove when other player command
@@ -251,7 +255,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         if(unitIds.length > 0 && player == Vars.player && !state.isPaused()){
-            if(teamTarget != null){
+            if(anyCommandedTarget){
                 Fx.attackCommand.at(teamTarget);
             }else{
                 Fx.moveCommand.at(posTarget);

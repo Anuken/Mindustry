@@ -409,6 +409,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         return controller instanceof CommandAI;
     }
 
+    public boolean canTarget(Unit other){
+        return other != null && other.checkTarget(type.targetAir, type.targetGround);
+    }
+
     public CommandAI command(){
         if(controller instanceof CommandAI ai){
             return ai;
