@@ -13,10 +13,12 @@ import mindustry.gen.*;
 import mindustry.world.*;
 
 public class CommandAI extends AIController{
+    protected static final int maxCommandQueueSize = 64;
     protected static final float localInterval = 40f;
     protected static final Vec2 vecOut = new Vec2(), flockVec = new Vec2(), separation = new Vec2(), cohesion = new Vec2(), massCenter = new Vec2();
     protected static final boolean[] noFound = {false};
 
+    public Seq<Position> commandQueue = new Seq<>(5);
     public @Nullable Vec2 targetPos;
     public @Nullable Teamc attackTarget;
     /** All encountered unreachable buildings of this AI. Why a sequence? Because contains() is very rarely called on it. */
@@ -60,6 +62,11 @@ public class CommandAI extends AIController{
 
     @Override
     public void updateUnit(){
+
+        //remove invalid targets
+        if(commandQueue.any()){
+            commandQueue.removeAll(e -> e instanceof Healthc h && !h.isValid());
+        }
 
         //assign defaults
         if(command == null && unit.type.commands.length > 0){
@@ -114,6 +121,11 @@ public class CommandAI extends AIController{
             targetPos = null;
         }
 
+        //move on to the next target
+        if(attackTarget == null && targetPos == null){
+            finishPath();
+        }
+
         if(targetPos != null){
             if(timer.get(timerTarget3, localInterval) || !flocked){
                 if(!flocked){
@@ -160,7 +172,7 @@ public class CommandAI extends AIController{
                         unreachableBuildings.addUnique(build.pos());
                     }
                     attackTarget = null;
-                    targetPos = null;
+                    finishPath();
                     return;
                 }
             }
@@ -193,7 +205,7 @@ public class CommandAI extends AIController{
 
             if(attackTarget == null){
                 if(unit.within(targetPos, Math.max(5f, unit.hitSize / 2f))){
-                    targetPos = null;
+                    finishPath();
                 }else if(local.size > 1){
                     int count = 0;
                     for(var near : local){
@@ -205,18 +217,42 @@ public class CommandAI extends AIController{
 
                     //others have arrived at destination, so this one will too
                     if(count >= Math.max(3, local.size / 2)){
-                        targetPos = null;
+                        finishPath();
                     }
                 }
             }
 
             if(stopWhenInRange && targetPos != null && unit.within(targetPos, engageRange * 0.9f)){
-                targetPos = null;
+                finishPath();
                 stopWhenInRange = false;
             }
 
         }else if(target != null){
             faceTarget();
+        }
+    }
+
+    void finishPath(){
+        targetPos = null;
+        if(commandQueue.size > 0){
+            var next = commandQueue.remove(0);
+            if(next instanceof Teamc target){
+                commandTarget(target, this.stopAtTarget);
+            }else if(next instanceof Vec2 position){
+                commandPosition(position);
+            }
+        }
+    }
+
+    public void commandQueue(Position location){
+        if(targetPos == null && attackTarget == null){
+            if(location instanceof Teamc target){
+                commandTarget(target, this.stopAtTarget);
+            }else if(location instanceof Vec2 position){
+                commandPosition(position);
+            }
+        }else if(commandQueue.size < maxCommandQueueSize && !commandQueue.contains(location)){
+            commandQueue.add(location);
         }
     }
 

@@ -13,6 +13,7 @@ public enum Binding implements KeyBind{
 
     boost(KeyCode.shiftLeft),
     command_mode(KeyCode.shiftLeft),
+    command_queue(KeyCode.mouseMiddle),
     control(KeyCode.controlLeft),
     respawn(KeyCode.v),
     select(KeyCode.mouseLeft),

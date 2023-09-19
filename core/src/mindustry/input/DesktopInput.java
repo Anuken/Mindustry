@@ -6,6 +6,7 @@ import arc.Graphics.Cursor.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.input.*;
+import arc.input.KeyCode.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.*;
@@ -400,6 +401,10 @@ public class DesktopInput extends InputHandler{
                 if(canAttack){
                     cursorType = ui.targetCursor;
                 }
+
+                if(input.keyTap(Binding.command_queue) && keybinds.get(Binding.command_mode).key.type != KeyType.mouse){
+                    commandTap(input.mouseX(), input.mouseY(), true);
+                }
             }
 
             if(getPlan(cursor.x, cursor.y) != null && mode == none){
@@ -719,6 +724,10 @@ public class DesktopInput extends InputHandler{
 
         if(button == KeyCode.mouseRight){
             commandTap(x, y);
+        }
+
+        if(button == keybinds.get(Binding.command_queue).key){
+            commandTap(x, y, true);
         }
 
         return super.touchDown(x, y, pointer, button);

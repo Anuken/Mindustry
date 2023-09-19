@@ -212,7 +212,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     @Remote(called = Loc.server, targets = Loc.both, forward = true)
-    public static void commandUnits(Player player, int[] unitIds, @Nullable Building buildTarget, @Nullable Unit unitTarget, @Nullable Vec2 posTarget){
+    public static void commandUnits(Player player, int[] unitIds, @Nullable Building buildTarget, @Nullable Unit unitTarget, @Nullable Vec2 posTarget, boolean queueCommand){
         if(player == null || unitIds == null) return;
 
         //why did I ever think this was a good idea
@@ -240,9 +240,19 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                     !(teamTarget instanceof Unit u && !unit.canTarget(u)) && !(teamTarget instanceof Building && !unit.type.targetGround)){
 
                     anyCommandedTarget = true;
-                    ai.commandTarget(teamTarget);
+                    if(queueCommand){
+                        ai.commandQueue(teamTarget);
+                    }else{
+                        ai.commandQueue.clear();
+                        ai.commandTarget(teamTarget);
+                    }
                 }else if(posTarget != null){
-                    ai.commandPosition(posTarget);
+                    if(queueCommand){
+                        ai.commandQueue(posTarget);
+                    }else{
+                        ai.commandQueue.clear();
+                        ai.commandPosition(posTarget);
+                    }
                 }
 
                 unit.lastCommanded = player.coloredName();
@@ -854,6 +864,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void commandTap(float screenX, float screenY){
+        commandTap(screenX, screenY, false);
+    }
+
+    public void commandTap(float screenX, float screenY, boolean queue){
         if(commandMode){
             //right click: move to position
 
@@ -882,10 +896,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 if(ids.length > maxChunkSize){
                     for(int i = 0; i < ids.length; i += maxChunkSize){
                         int[] data = Arrays.copyOfRange(ids, i, Math.min(i + maxChunkSize, ids.length));
-                        Call.commandUnits(player, data, attack instanceof Building b ? b : null, attack instanceof Unit u ? u : null, target);
+                        Call.commandUnits(player, data, attack instanceof Building b ? b : null, attack instanceof Unit u ? u : null, target, queue);
                     }
                 }else{
-                    Call.commandUnits(player, ids, attack instanceof Building b ? b : null, attack instanceof Unit u ? u : null, target);
+                    Call.commandUnits(player, ids, attack instanceof Building b ? b : null, attack instanceof Unit u ? u : null, target, queue);
                 }
             }
 
@@ -907,6 +921,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             //draw command overlay UI
             for(Unit unit : selectedUnits){
                 CommandAI ai = unit.command();
+                Position lastPos = ai.attackTarget != null ? ai.attackTarget : ai.targetPos;
+
                 //draw target line
                 if(ai.targetPos != null && ai.currentCommand().drawTarget){
                     Position lineDest = ai.attackTarget != null ? ai.attackTarget : ai.targetPos;
@@ -921,6 +937,24 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
                 if(ai.attackTarget != null && ai.currentCommand().drawTarget){
                     Drawf.target(ai.attackTarget.getX(), ai.attackTarget.getY(), 6f, Pal.remove);
+                }
+
+                if(lastPos == null){
+                    lastPos = unit;
+                }
+
+                //draw command queue
+                if(ai.currentCommand().drawTarget && ai.commandQueue.size > 0){
+                    for(var next : ai.commandQueue){
+                        Drawf.limitLine(lastPos, next, 3.5f, 3.5f);
+                        lastPos = next;
+
+                        if(next instanceof Vec2 vec){
+                            Drawf.square(vec.x, vec.y, 3.5f);
+                        }else{
+                            Drawf.target(next.getX(), next.getY(), 6f, Pal.remove);
+                        }
+                    }
                 }
             }
 
