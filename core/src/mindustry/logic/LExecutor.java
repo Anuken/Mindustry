@@ -858,8 +858,10 @@ public class LExecutor{
 
             if(!v.constant){
                 if(f.isobj){
-                    v.objval = f.objval;
-                    v.isobj = true;
+                    if(to != varCounter){
+                        v.objval = f.objval;
+                        v.isobj = true;
+                    }
                 }else{
                     v.numval = invalid(f.numval) ? 0 : f.numval;
                     v.isobj = false;
