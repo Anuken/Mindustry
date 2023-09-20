@@ -611,7 +611,9 @@ public class PlacementFragment{
 
                 rebuildCategory.run();
                 frame.update(() -> {
-                    if(gridUpdate(control.input)) rebuildCategory.run();
+                    if(!control.input.commandMode && gridUpdate(control.input)){
+                        rebuildCategory.run();
+                    }
                 });
             });
         });

@@ -53,6 +53,18 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     final static int maxLength = 100;
     final static Rect r1 = new Rect(), r2 = new Rect();
     final static Seq<Unit> tmpUnits = new Seq<>(false);
+    final static Binding[] controlGroupBindings = {
+    Binding.block_select_01,
+    Binding.block_select_02,
+    Binding.block_select_03,
+    Binding.block_select_04,
+    Binding.block_select_05,
+    Binding.block_select_06,
+    Binding.block_select_07,
+    Binding.block_select_08,
+    Binding.block_select_09,
+    Binding.block_select_10
+    };
 
     /** If true, there is a cutscene currently occurring in logic. */
     public boolean logicCutscene;
@@ -87,6 +99,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public boolean commandRect = false;
     public boolean tappedOne = false;
     public float commandRectX, commandRectY;
+    /** Groups of units saved to different hotkeys */
+    public IntSeq[] controlGroups = new IntSeq[controlGroupBindings.length];
 
     private Seq<BuildPlan> plansOut = new Seq<>(BuildPlan.class);
     private QuadTree<BuildPlan> playerPlanTree = new QuadTree<>(new Rect());
@@ -124,6 +138,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         Events.on(ResetEvent.class, e -> {
             logicCutscene = false;
+            Arrays.fill(controlGroups, null);
         });
     }
 

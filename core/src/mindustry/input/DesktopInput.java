@@ -11,6 +11,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.core.*;
@@ -22,6 +23,7 @@ import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 
+import static arc.Core.camera;
 import static arc.Core.*;
 import static mindustry.Vars.*;
 import static mindustry.input.PlaceMode.*;
@@ -48,6 +50,11 @@ public class DesktopInput extends InputHandler{
     public long selectMillis = 0;
     /** Previously selected tile. */
     public Tile prevSelected;
+
+    /** Most recently selected control group by index */
+    public int lastCtrlGroup;
+    /** Time of most recent control group selection */
+    public long lastCtrlGroupSelectMillis;
 
     boolean showHint(){
         return ui.hudfrag.shown && Core.settings.getBool("hints") && selectPlans.isEmpty() &&
@@ -262,22 +269,86 @@ public class DesktopInput extends InputHandler{
         //validate commanding units
         selectedUnits.removeAll(u -> !u.isCommandable() || !u.isValid());
 
-        if(commandMode && input.keyTap(Binding.select_all_units) && !scene.hasField() && !scene.hasDialog()){
-            selectedUnits.clear();
-            commandBuildings.clear();
-            for(var unit : player.team().data().units){
-                if(unit.isCommandable()){
-                    selectedUnits.add(unit);
+        if(commandMode && !scene.hasField() && !scene.hasDialog()){
+            if(input.keyTap(Binding.select_all_units)){
+                selectedUnits.clear();
+                commandBuildings.clear();
+                for(var unit : player.team().data().units){
+                    if(unit.isCommandable()){
+                        selectedUnits.add(unit);
+                    }
                 }
             }
-        }
 
-        if(commandMode && input.keyTap(Binding.select_all_unit_factories) && !scene.hasField() && !scene.hasDialog()){
-            selectedUnits.clear();
-            commandBuildings.clear();
-            for(var build : player.team().data().buildings){
-                if(build.block.commandable){
-                    commandBuildings.add(build);
+            if(input.keyTap(Binding.select_all_unit_factories)){
+                selectedUnits.clear();
+                commandBuildings.clear();
+                for(var build : player.team().data().buildings){
+                    if(build.block.commandable){
+                        commandBuildings.add(build);
+                    }
+                }
+            }
+
+            for(int i = 0; i < controlGroupBindings.length; i++){
+                if(input.keyTap(controlGroupBindings[i])){
+
+                    //create control group if it doesn't exist yet
+                    if(controlGroups[i] == null) controlGroups[i] = new IntSeq();
+
+                    IntSeq group = controlGroups[i];
+                    boolean creating = input.keyDown(Binding.create_control_group);
+
+                    //clear existing if making a new control group
+                    //if any of the control group edit buttons are pressed take the current selection
+                    if(creating){
+                        group.clear();
+
+                        IntSeq selectedUnitIds = selectedUnits.mapInt(u -> u.id);
+                        if(Core.settings.getBool("distinctcontrolgroups", true)){
+                            for(IntSeq cg : controlGroups){
+                                if(cg != null){
+                                    cg.removeAll(selectedUnitIds);
+                                }
+                            }
+                        }
+                        group.addAll(selectedUnitIds);
+                    }
+
+                    //remove invalid units
+                    for(int j = 0; j < group.size; j++){
+                        Unit u = Groups.unit.getByID(group.get(j));
+                        if(u == null || !u.isCommandable() || !u.isValid()){
+                            group.removeIndex(j);
+                            j --;
+                        }
+                    }
+
+                    //replace the selected units with the current control group
+                    if(!group.isEmpty() && !creating){
+                        selectedUnits.clear();
+                        commandBuildings.clear();
+
+                        group.each(id -> {
+                            var unit = Groups.unit.getByID(id);
+                            if(unit != null){
+                                selectedUnits.addAll(unit);
+                            }
+                        });
+
+                        //double tap to center camera
+                        if(lastCtrlGroup == i && Time.timeSinceMillis(lastCtrlGroupSelectMillis) < 400){
+                            float totalX = 0, totalY = 0;
+                            for(Unit unit : selectedUnits){
+                                totalX += unit.x;
+                                totalY += unit.y;
+                            }
+                            panning = true;
+                            Core.camera.position.set(totalX / selectedUnits.size, totalY / selectedUnits.size);
+                        }
+                        lastCtrlGroup = i;
+                        lastCtrlGroupSelectMillis = Time.millis();
+                    }
                 }
             }
         }
