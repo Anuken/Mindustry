@@ -1285,6 +1285,7 @@ public class UnitTypes{
             lowAltitude = true;
 
             ammoType = new PowerAmmoType(900);
+            stances = new UnitStance[]{UnitStance.stopStance, UnitStance.shootStance, UnitStance.holdFireStance};
 
             mineTier = 2;
             mineSpeed = 3.5f;
@@ -1344,6 +1345,7 @@ public class UnitTypes{
             isEnemy = false;
 
             ammoType = new PowerAmmoType(1100);
+            stances = new UnitStance[]{UnitStance.stopStance, UnitStance.shootStance, UnitStance.holdFireStance};
 
             weapons.add(
             new Weapon("heal-weapon-mount"){{

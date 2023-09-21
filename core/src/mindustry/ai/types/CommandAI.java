@@ -67,6 +67,10 @@ public class CommandAI extends AIController{
         //this should not be possible
         if(stance == UnitStance.stopStance) stance = UnitStance.shootStance;
 
+        if(stance == UnitStance.pursueTarget && target != null && attackTarget == null && targetPos == null){
+            commandTarget(target, false);
+        }
+
         //remove invalid targets
         if(commandQueue.any()){
             commandQueue.removeAll(e -> e instanceof Healthc h && !h.isValid());
@@ -194,11 +198,13 @@ public class CommandAI extends AIController{
                     target = attackTarget;
                     circleAttack(80f);
                 }else{
+                    boolean isFinalPoint = targetPos.epsilonEquals(vecOut, 4.1f) && commandQueue.size == 0;
+
                     moveTo(vecOut,
                     attackTarget != null && unit.within(attackTarget, engageRange) ? engageRange :
                     unit.isGrounded() ? 0f :
                     attackTarget != null ? engageRange :
-                    0f, unit.isFlying() ? 40f : 100f, false, null, targetPos.epsilonEquals(vecOut, 4.1f));
+                    0f, unit.isFlying() ? 40f : 100f, false, null, isFinalPoint);
                 }
             }
 
@@ -243,6 +249,7 @@ public class CommandAI extends AIController{
     }
 
     void finishPath(){
+        Vec2 prev = targetPos;
         targetPos = null;
         if(commandQueue.size > 0){
             var next = commandQueue.remove(0);
@@ -250,6 +257,10 @@ public class CommandAI extends AIController{
                 commandTarget(target, this.stopAtTarget);
             }else if(next instanceof Vec2 position){
                 commandPosition(position);
+            }
+
+            if(prev != null && stance == UnitStance.patrol){
+                commandQueue.add(prev.cpy());
             }
         }
     }

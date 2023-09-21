@@ -524,12 +524,15 @@ public class PlacementFragment{
                                 }
 
                                 //list stances
-                                if(stances.size > 0){
+                                if(stances.size > 1){
                                     u.row();
 
                                     u.table(coms -> {
                                         coms.left();
                                         for(var stance : stances){
+                                            //TODO: patrolling is pointless on mobile since you can't queue commands
+                                            if(stance == UnitStance.patrol && mobile) continue;
+
                                             coms.button(Icon.icons.get(stance.icon, Icon.cancel), Styles.clearNoneTogglei, () -> {
                                                 IntSeq ids = new IntSeq();
                                                 for(var unit : units){
