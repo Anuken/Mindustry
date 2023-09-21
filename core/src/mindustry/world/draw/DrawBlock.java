@@ -55,7 +55,8 @@ public abstract class DrawBlock{
             }
             return out;
         }
-        return icons(block);
+        TextureRegion[] icons = icons(block);
+        return icons.length == 0 ? new TextureRegion[]{Core.atlas.find("error")} : icons;
     }
 
     public GenericCrafter expectCrafter(Block block){
