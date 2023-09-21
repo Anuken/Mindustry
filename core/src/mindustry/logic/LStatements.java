@@ -1599,7 +1599,7 @@ public class LStatements{
 
     @RegisterStatement("explosion")
     public static class ExplosionStatement extends LStatement{
-        public String team = "@crux", x = "0", y = "0", radius = "5", damage = "50", air = "true", ground = "true", pierce = "false";
+        public String team = "@crux", x = "0", y = "0", radius = "5", damage = "50", air = "true", ground = "true", pierce = "false", effect = "true";
 
         @Override
         public void build(Table table){
@@ -1614,6 +1614,8 @@ public class LStatements{
             row(table);
             fields(table, "ground", ground, str -> ground = str);
             fields(table, "pierce", pierce, str -> pierce = str);
+            table.row();
+            fields(table, "effect", effect, str -> effect = str);
         }
 
         @Override
@@ -1623,7 +1625,7 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler b){
-            return new ExplosionI(b.var(team), b.var(x), b.var(y), b.var(radius), b.var(damage), b.var(air), b.var(ground), b.var(pierce));
+            return new ExplosionI(b.var(team), b.var(x), b.var(y), b.var(radius), b.var(damage), b.var(air), b.var(ground), b.var(pierce), b.var(effect));
         }
 
         @Override

@@ -1613,9 +1613,9 @@ public class LExecutor{
     }
 
     public static class ExplosionI implements LInstruction{
-        public int team, x, y, radius, damage, air, ground, pierce;
+        public int team, x, y, radius, damage, air, ground, pierce, effect;
 
-        public ExplosionI(int team, int x, int y, int radius, int damage, int air, int ground, int pierce){
+        public ExplosionI(int team, int x, int y, int radius, int damage, int air, int ground, int pierce, int effect){
             this.team = team;
             this.x = x;
             this.y = y;
@@ -1635,19 +1635,21 @@ public class LExecutor{
 
             Team t = exec.team(team);
             //note that there is a radius cap
-            Call.logicExplosion(t, World.unconv(exec.numf(x)), World.unconv(exec.numf(y)), World.unconv(Math.min(exec.numf(radius), 100)), exec.numf(damage), exec.bool(air), exec.bool(ground), exec.bool(pierce));
+            Call.logicExplosion(t, World.unconv(exec.numf(x)), World.unconv(exec.numf(y)), World.unconv(Math.min(exec.numf(radius), 100)), exec.numf(damage), exec.bool(air), exec.bool(ground), exec.bool(pierce), exec.bool(effect));
         }
     }
 
     @Remote(called = Loc.server, unreliable = true)
-    public static void logicExplosion(Team team, float x, float y, float radius, float damage, boolean air, boolean ground, boolean pierce){
+    public static void logicExplosion(Team team, float x, float y, float radius, float damage, boolean air, boolean ground, boolean pierce, boolean effect){
         if(damage < 0f) return;
 
         Damage.damage(team, x, y, radius, damage, pierce, air, ground);
-        if(pierce){
-            Fx.spawnShockwave.at(x, y, World.conv(radius));
-        }else{
-            Fx.dynamicExplosion.at(x, y, World.conv(radius) / 8f);
+        if(effect){
+            if(pierce){
+                Fx.spawnShockwave.at(x, y, World.conv(radius));
+            }else{
+                Fx.dynamicExplosion.at(x, y, World.conv(radius) / 8f);
+            }
         }
     }
 
