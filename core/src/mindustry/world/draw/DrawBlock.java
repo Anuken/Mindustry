@@ -44,7 +44,7 @@ public abstract class DrawBlock{
 
     /** @return the generated icons to be used for this block. */
     public TextureRegion[] icons(Block block){
-        return new TextureRegion[]{block.region};
+        return new TextureRegion[]{};
     }
 
     public final TextureRegion[] finalIcons(Block block){
