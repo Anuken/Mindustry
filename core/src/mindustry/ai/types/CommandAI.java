@@ -165,7 +165,7 @@ public class CommandAI extends AIController{
             }
             targetPos.set(attackTarget);
 
-            if(unit.isGrounded() && attackTarget instanceof Building build && build.tile.solid() && unit.pathType() != Pathfinder.costLegs){
+            if(unit.isGrounded() && attackTarget instanceof Building build && build.tile.solid() && unit.pathType() != Pathfinder.costLegs && stance != UnitStance.ram){
                 Tile best = build.findClosestEdge(unit, Tile::solid);
                 if(best != null){
                     targetPos.set(best);
@@ -177,7 +177,7 @@ public class CommandAI extends AIController{
             boolean move = true;
             vecOut.set(targetPos);
 
-            if(unit.isGrounded()){
+            if(unit.isGrounded() && stance != UnitStance.ram){
                 move = Vars.controlPath.getPathPosition(unit, pathId, targetPos, vecOut, noFound);
 
                 //if the path is invalid, stop trying and record the end as unreachable
@@ -201,9 +201,9 @@ public class CommandAI extends AIController{
                     boolean isFinalPoint = targetPos.epsilonEquals(vecOut, 4.1f) && commandQueue.size == 0;
 
                     moveTo(vecOut,
-                    attackTarget != null && unit.within(attackTarget, engageRange) ? engageRange :
+                    attackTarget != null && unit.within(attackTarget, engageRange) && stance != UnitStance.ram ? engageRange :
                     unit.isGrounded() ? 0f :
-                    attackTarget != null ? engageRange :
+                    attackTarget != null && stance != UnitStance.ram ? engageRange :
                     0f, unit.isFlying() ? 40f : 100f, false, null, isFinalPoint);
                 }
             }

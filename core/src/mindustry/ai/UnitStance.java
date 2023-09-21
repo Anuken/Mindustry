@@ -15,7 +15,8 @@ public class UnitStance{
     shootStance = new UnitStance("shoot", "commandAttack"),
     holdFireStance = new UnitStance("holdfire", "none"),
     pursueTarget = new UnitStance("pursuetarget", "right"),
-    patrol = new UnitStance("patrol", "refresh");
+    patrol = new UnitStance("patrol", "refresh"),
+    ram = new UnitStance("ram", "rightOpen");
 
     /** Unique ID number. */
     public final int id;

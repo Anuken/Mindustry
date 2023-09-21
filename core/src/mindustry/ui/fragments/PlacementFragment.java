@@ -510,6 +510,7 @@ public class PlacementFragment{
 
                                     u.table(coms -> {
                                         coms.left();
+                                        int scol = 0;
                                         for(var command : commands){
                                             coms.button(Icon.icons.get(command.icon, Icon.cancel), Styles.clearNoneTogglei, () -> {
                                                 IntSeq ids = new IntSeq();
@@ -519,7 +520,10 @@ public class PlacementFragment{
 
                                                 Call.setUnitCommand(Vars.player, ids.toArray(), command);
                                             }).checked(i -> currentCommand[0] == command).size(50f).tooltip(command.localized());
+
+                                            if(++scol % 6 == 0) coms.row();
                                         }
+
                                     }).fillX().padTop(4f).left();
                                 }
 
@@ -529,9 +533,8 @@ public class PlacementFragment{
 
                                     u.table(coms -> {
                                         coms.left();
+                                        int scol = 0;
                                         for(var stance : stances){
-                                            //TODO: patrolling is pointless on mobile since you can't queue commands
-                                            if(stance == UnitStance.patrol && mobile) continue;
 
                                             coms.button(Icon.icons.get(stance.icon, Icon.cancel), Styles.clearNoneTogglei, () -> {
                                                 IntSeq ids = new IntSeq();
@@ -541,6 +544,8 @@ public class PlacementFragment{
 
                                                 Call.setUnitStance(Vars.player, ids.toArray(), stance);
                                             }).checked(i -> currentStance[0] == stance).size(50f).tooltip(stance.localized());
+
+                                            if(++scol % 6 == 0) coms.row();
                                         }
                                     }).fillX().padTop(4f).left();
                                 }

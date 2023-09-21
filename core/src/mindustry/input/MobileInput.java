@@ -54,8 +54,8 @@ public class MobileInput extends InputHandler implements GestureListener{
     public Seq<BuildPlan> removals = new Seq<>();
     /** Whether the player is currently shifting all placed tiles. */
     public boolean selecting;
-    /** Whether the player is currently in line-place mode. */
-    public boolean lineMode, schematicMode, rebuildMode;
+    /** Various modes that aren't enums for some reason. This should be cleaned up. */
+    public boolean lineMode, schematicMode, rebuildMode, queueCommandMode;
     /** Current place mode. */
     public PlaceMode mode = none;
     /** Whether no recipe was available when switching to break mode. */
@@ -287,16 +287,24 @@ public class MobileInput extends InputHandler implements GestureListener{
         group.fill(t -> {
             t.visible(() -> !showCancel() && block == null && !hasSchem());
             t.bottom().left();
-            t.button("@command", Icon.units, Styles.squareTogglet, () -> {
+
+            t.button("@command", Icon.units, Styles.clearTogglet, () -> {
                 commandMode = !commandMode;
-            }).width(155f).height(50f).margin(12f).checked(b -> commandMode).row();
+            }).width(155f).height(56f).margin(12f).checked(b -> {
+                b.setText(queueCommandMode ? bundle.get("command") + "\n" + bundle.get("command.queue") : bundle.get("command"));
+                return commandMode;
+            });
+
+            t.button(Icon.rightOpen, Styles.clearTogglei, () -> {
+                queueCommandMode = !queueCommandMode;
+            }).size(56f).margin(12f).checked(b -> queueCommandMode).visible(() -> commandMode).row();
 
             //for better looking insets
             t.rect((x, y, w, h) -> {
                 if(Core.scene.marginBottom > 0){
                     Tex.paneRight.draw(x, 0, w, y);
                 }
-            }).fillX().row();
+            }).fillX().colspan(2).row();
         });
 
         group.fill(t -> {
@@ -681,7 +689,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             selectPlans.add(new BuildPlan(linked.x, linked.y));
         }else if((commandMode && selectedUnits.size > 0) || commandBuildings.size > 0){
             //handle selecting units with command mode
-            commandTap(x, y);
+            commandTap(x, y, queueCommandMode);
         }else if(commandMode){
             tapCommandUnit();
         }else{
@@ -733,6 +741,10 @@ public class MobileInput extends InputHandler implements GestureListener{
         super.update();
 
         boolean locked = locked();
+
+        if(!commandMode){
+            queueCommandMode = false;
+        }
 
         if(player.dead()){
             mode = none;
