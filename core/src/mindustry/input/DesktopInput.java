@@ -473,7 +473,7 @@ public class DesktopInput extends InputHandler{
                     cursorType = ui.targetCursor;
                 }
 
-                if(input.keyTap(Binding.command_queue) && keybinds.get(Binding.command_mode).key.type != KeyType.mouse){
+                if(input.keyTap(Binding.command_queue) && keybinds.get(Binding.command_queue).key.type != KeyType.mouse){
                     commandTap(input.mouseX(), input.mouseY(), true);
                 }
             }

@@ -296,6 +296,8 @@ public class UnitType extends UnlockableContent implements Senseable{
     public UnitCommand[] commands = {};
     /** Command to assign to this unit upon creation. Null indicates the first command in the array. */
     public @Nullable UnitCommand defaultCommand;
+    /** Stances this unit can have.  An empty array means stances will be assigned based on unit capabilities in init(). */
+    public UnitStance[] stances = {};
 
     /** color for outline generated around sprites */
     public Color outlineColor = Pal.darkerMetal;
@@ -696,7 +698,9 @@ public class UnitType extends UnlockableContent implements Senseable{
         }
 
         //if a status effects slows a unit when firing, don't shoot while moving.
-        autoFindTarget = !weapons.contains(w -> w.shootStatus.speedMultiplier < 0.99f) || alwaysShootWhenMoving;
+        if(autoFindTarget){
+            autoFindTarget = !weapons.contains(w -> w.shootStatus.speedMultiplier < 0.99f) || alwaysShootWhenMoving;
+        }
 
         clipSize = Math.max(clipSize, lightRadius * 1.1f);
         singleTarget = weapons.size <= 1 && !forceMultiTarget;
@@ -828,6 +832,14 @@ public class UnitType extends UnlockableContent implements Senseable{
             }
 
             commands = cmds.toArray();
+        }
+
+        if(stances.length == 0){
+            if(canAttack){
+                stances = new UnitStance[]{UnitStance.stopStance, UnitStance.shootStance, UnitStance.holdFireStance};
+            }else{
+                stances = new UnitStance[]{UnitStance.stopStance, UnitStance.shootStance};
+            }
         }
 
         //dynamically create ammo capacity based on firing rate

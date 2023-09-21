@@ -182,7 +182,12 @@ public class AIController implements UnitController{
                 mount.aimY = to.y;
             }
 
-            unit.isShooting |= (mount.shoot = mount.rotate = shoot);
+            mount.shoot = mount.rotate = shoot;
+            if(!shouldFire()){
+                mount.shoot = false;
+            }
+
+            unit.isShooting |= mount.shoot;
 
             if(mount.target == null && !shoot && !Angles.within(mount.rotation, mount.weapon.baseRotation, 0.01f) && noTargetTime >= rotateBackTimer){
                 mount.rotate = true;
@@ -200,6 +205,11 @@ public class AIController implements UnitController{
 
     public boolean checkTarget(Teamc target, float x, float y, float range){
         return Units.invalidateTarget(target, unit.team, x, y, range);
+    }
+
+    /** @return whether the unit should actually fire bullets (as opposed to just targeting something) */
+    public boolean shouldFire(){
+        return true;
     }
 
     public boolean shouldShoot(){

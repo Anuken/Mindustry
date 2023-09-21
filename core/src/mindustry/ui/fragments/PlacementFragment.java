@@ -441,6 +441,9 @@ public class PlacementFragment{
                         UnitCommand[] currentCommand = {null};
                         var commands = new Seq<UnitCommand>();
 
+                        UnitStance[] currentStance = {null};
+                        var stances = new Seq<UnitStance>();
+
                         rebuildCommand = () -> {
                             u.clearChildren();
                             var units = control.input.selectedUnits;
@@ -450,7 +453,8 @@ public class PlacementFragment{
                                     counts[unit.type.id] ++;
                                 }
                                 commands.clear();
-                                boolean firstCommand = false;
+                                stances.clear();
+                                boolean firstCommand = false, firstStance = false;
                                 Table unitlist = u.table().growX().left().get();
                                 unitlist.left();
 
@@ -489,13 +493,23 @@ public class PlacementFragment{
                                             //remove commands that this next unit type doesn't have
                                             commands.removeAll(com -> !Structs.contains(type.commands, com));
                                         }
+
+                                        if(!firstStance){
+                                            stances.add(type.stances);
+                                            firstStance = true;
+                                        }else{
+                                            //remove commands that this next unit type doesn't have
+                                            stances.removeAll(st -> !Structs.contains(type.stances, st));
+                                        }
                                     }
                                 }
 
+                                //list commands
                                 if(commands.size > 1){
                                     u.row();
 
                                     u.table(coms -> {
+                                        coms.left();
                                         for(var command : commands){
                                             coms.button(Icon.icons.get(command.icon, Icon.cancel), Styles.clearNoneTogglei, () -> {
                                                 IntSeq ids = new IntSeq();
@@ -508,37 +522,71 @@ public class PlacementFragment{
                                         }
                                     }).fillX().padTop(4f).left();
                                 }
+
+                                //list stances
+                                if(stances.size > 0){
+                                    u.row();
+
+                                    u.table(coms -> {
+                                        coms.left();
+                                        for(var stance : stances){
+                                            coms.button(Icon.icons.get(stance.icon, Icon.cancel), Styles.clearNoneTogglei, () -> {
+                                                IntSeq ids = new IntSeq();
+                                                for(var unit : units){
+                                                    ids.add(unit.id);
+                                                }
+
+                                                Call.setUnitStance(Vars.player, ids.toArray(), stance);
+                                            }).checked(i -> currentStance[0] == stance).size(50f).tooltip(stance.localized());
+                                        }
+                                    }).fillX().padTop(4f).left();
+                                }
                             }else{
                                 u.add(Core.bundle.get("commandmode.nounits")).color(Color.lightGray).growX().center().labelAlign(Align.center).pad(6);
                             }
                         };
 
                         u.update(() -> {
-                            boolean hadCommand = false;
-                            UnitCommand shareCommand = null;
+                            {
+                                boolean hadCommand = false, hadStance = false;
+                                UnitCommand shareCommand = null;
+                                UnitStance shareStance = null;
 
-                            //find the command that all units have, or null if they do not share one
-                            for(var unit : control.input.selectedUnits){
-                                if(unit.isCommandable()){
-                                    var nextCommand = unit.command().command;
+                                //find the command that all units have, or null if they do not share one
+                                for(var unit : control.input.selectedUnits){
+                                    if(unit.isCommandable()){
+                                        var nextCommand = unit.command().command;
 
-                                    if(hadCommand){
-                                        if(shareCommand != nextCommand){
-                                            shareCommand = null;
+                                        if(hadCommand){
+                                            if(shareCommand != nextCommand){
+                                                shareCommand = null;
+                                            }
+                                        }else{
+                                            shareCommand = nextCommand;
+                                            hadCommand = true;
                                         }
-                                    }else{
-                                        shareCommand = nextCommand;
-                                        hadCommand = true;
+
+                                        var nextStance = unit.command().stance;
+
+                                        if(hadStance){
+                                            if(shareStance != nextStance){
+                                                shareStance = null;
+                                            }
+                                        }else{
+                                            shareStance = nextStance;
+                                            hadStance = true;
+                                        }
                                     }
                                 }
-                            }
 
-                            currentCommand[0] = shareCommand;
+                                currentCommand[0] = shareCommand;
+                                currentStance[0] = shareStance;
 
-                            int size = control.input.selectedUnits.size;
-                            if(curCount[0] != size){
-                                curCount[0] = size;
-                                rebuildCommand.run();
+                                int size = control.input.selectedUnits.size;
+                                if(curCount[0] != size){
+                                    curCount[0] = size;
+                                    rebuildCommand.run();
+                                }
                             }
                         });
                         rebuildCommand.run();

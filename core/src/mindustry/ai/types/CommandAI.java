@@ -30,6 +30,8 @@ public class CommandAI extends AIController{
     protected Seq<Unit> local = new Seq<>(false);
     protected boolean flocked;
 
+    /** Stance, usually related to firing mode. */
+    public UnitStance stance = UnitStance.shootStance;
     /** Current command this unit is following. */
     public @Nullable UnitCommand command;
     /** Current controller instance based on command. */
@@ -62,6 +64,8 @@ public class CommandAI extends AIController{
 
     @Override
     public void updateUnit(){
+        //this should not be possible
+        if(stance == UnitStance.stopStance) stance = UnitStance.shootStance;
 
         //remove invalid targets
         if(commandQueue.any()){
@@ -89,6 +93,12 @@ public class CommandAI extends AIController{
             //boosting control is not supported, so just don't.
             unit.updateBoosting(false);
         }
+    }
+
+    public void clearCommands(){
+        commandQueue.clear();
+        targetPos = null;
+        attackTarget = null;
     }
 
     public void defaultBehavior(){
@@ -254,6 +264,11 @@ public class CommandAI extends AIController{
         }else if(commandQueue.size < maxCommandQueueSize && !commandQueue.contains(location)){
             commandQueue.add(location);
         }
+    }
+
+    @Override
+    public boolean shouldFire(){
+        return stance != UnitStance.holdFireStance;
     }
 
     @Override
