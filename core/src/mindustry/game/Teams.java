@@ -309,7 +309,7 @@ public class Teams{
             for(var b : builds){
                 if(b instanceof CoreBuild){
                     b.kill();
-                }else{
+                }else if(!b.block.privileged){
                     scheduleDerelict(b);
                 }
             }
@@ -331,7 +331,7 @@ public class Teams{
             }
 
             for(var build : builds){
-                if(build.within(x, y, range)){
+                if(build.within(x, y, range) && !build.block.privileged){
                     scheduleDerelict(build);
                 }
             }
