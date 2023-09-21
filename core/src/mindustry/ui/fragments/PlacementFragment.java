@@ -11,7 +11,6 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.*;
 import mindustry.ai.*;
 import mindustry.content.*;
 import mindustry.core.*;
@@ -67,6 +66,15 @@ public class PlacementFragment{
         Binding.block_select_right,
         Binding.block_select_up,
         Binding.block_select_down
+    };
+
+    Binding[] stanceBindings = {
+        Binding.cancel_orders,
+        Binding.unit_stance_1,
+        Binding.unit_stance_2,
+        Binding.unit_stance_3,
+        Binding.unit_stance_4,
+        Binding.unit_stance_5,
     };
 
     public PlacementFragment(){
@@ -513,12 +521,7 @@ public class PlacementFragment{
                                         int scol = 0;
                                         for(var command : commands){
                                             coms.button(Icon.icons.get(command.icon, Icon.cancel), Styles.clearNoneTogglei, () -> {
-                                                IntSeq ids = new IntSeq();
-                                                for(var unit : units){
-                                                    ids.add(unit.id);
-                                                }
-
-                                                Call.setUnitCommand(Vars.player, ids.toArray(), command);
+                                                Call.setUnitCommand(player, units.mapInt(un -> un.id).toArray(), command);
                                             }).checked(i -> currentCommand[0] == command).size(50f).tooltip(command.localized());
 
                                             if(++scol % 6 == 0) coms.row();
@@ -537,12 +540,7 @@ public class PlacementFragment{
                                         for(var stance : stances){
 
                                             coms.button(Icon.icons.get(stance.icon, Icon.cancel), Styles.clearNoneTogglei, () -> {
-                                                IntSeq ids = new IntSeq();
-                                                for(var unit : units){
-                                                    ids.add(unit.id);
-                                                }
-
-                                                Call.setUnitStance(Vars.player, ids.toArray(), stance);
+                                                Call.setUnitStance(player, units.mapInt(un -> un.id).toArray(), stance);
                                             }).checked(i -> currentStance[0] == stance).size(50f).tooltip(stance.localized());
 
                                             if(++scol % 6 == 0) coms.row();
@@ -594,6 +592,14 @@ public class PlacementFragment{
                                 if(curCount[0] != size){
                                     curCount[0] = size;
                                     rebuildCommand.run();
+                                }
+
+                                //not a huge fan of running input logic here, but it's convenient as the stance arrays are all here...
+                                for(int i = 0; i < Math.min(stanceBindings.length, stances.size); i++){
+                                    //first stance must always be the stop stance
+                                    if(Core.input.keyTap(stanceBindings[i]) && (i != 0 || stances.get(0) == UnitStance.stopStance)){
+                                        Call.setUnitStance(player, control.input.selectedUnits.mapInt(un -> un.id).toArray(), stances.get(i));
+                                    }
                                 }
                             }
                         });

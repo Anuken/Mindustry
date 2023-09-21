@@ -333,7 +333,7 @@ public class Teams{
             }
 
             for(var build : builds){
-                if(build.within(x, y, range)){
+                if(build.within(x, y, range) && !build.block.privileged){
                     scheduleDerelict(build);
                 }
             }
