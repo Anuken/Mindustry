@@ -13,7 +13,7 @@ import mindustry.gen.*;
 import mindustry.world.*;
 
 public class CommandAI extends AIController{
-    protected static final int maxCommandQueueSize = 64;
+    protected static final int maxCommandQueueSize = 50;
     protected static final float localInterval = 40f;
     protected static final Vec2 vecOut = new Vec2(), flockVec = new Vec2(), separation = new Vec2(), cohesion = new Vec2(), massCenter = new Vec2();
     protected static final boolean[] noFound = {false};
