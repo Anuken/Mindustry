@@ -16,10 +16,7 @@ public class UnitStance{
     holdFire = new UnitStance("holdfire", "none"),
     pursueTarget = new UnitStance("pursuetarget", "right"),
     patrol = new UnitStance("patrol", "refresh"),
-    ram = new UnitStance("ram", "rightOpen"),
-    loadPayload = new UnitStance("loadPayload", "download"),
-    loadBlocks = new UnitStance("loadBlocks", "down"),
-    unloadPayload = new UnitStance("unloadPayload", "upload");
+    ram = new UnitStance("ram", "rightOpen");
 
     /** Unique ID number. */
     public final int id;

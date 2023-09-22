@@ -829,6 +829,9 @@ public class UnitType extends UnlockableContent implements Senseable{
                 if(mineTier > 0){
                     cmds.add(UnitCommand.mineCommand);
                 }
+                if(example instanceof Payloadc){
+                    cmds.addAll(UnitCommand.loadUnitsCommand, UnitCommand.loadBlocksCommand, UnitCommand.unloadPayloadCommand);
+                }
             }
 
             commands = cmds.toArray();
@@ -839,9 +842,6 @@ public class UnitType extends UnlockableContent implements Senseable{
                 Seq<UnitStance> seq = Seq.with(UnitStance.stop, UnitStance.shoot, UnitStance.holdFire, UnitStance.pursueTarget, UnitStance.patrol);
                 if(crushDamage > 0){
                     seq.add(UnitStance.ram);
-                }
-                if(example instanceof Payloadc){
-                    seq.addAll(UnitStance.loadPayload, UnitStance.loadBlocks, UnitStance.unloadPayload);
                 }
                 stances = seq.toArray(UnitStance.class);
             }else{

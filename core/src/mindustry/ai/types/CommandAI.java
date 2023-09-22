@@ -114,12 +114,12 @@ public class CommandAI extends AIController{
 
         if(!net.client() && unit instanceof Payloadc pay){
             //auto-drop everything
-            if(stance == UnitStance.unloadPayload && pay.hasPayload()){
+            if(command == UnitCommand.unloadPayloadCommand && pay.hasPayload()){
                 Call.payloadDropped(unit, unit.x, unit.y);
             }
 
             //try to pick up what's under it
-            if(stance == UnitStance.loadPayload){
+            if(command == UnitCommand.loadUnitsCommand){
                 Unit target = Units.closest(unit.team, unit.x, unit.y, unit.type.hitSize * 2f, u -> u.isAI() && u != unit && u.isGrounded() && pay.canPickup(u) && u.within(unit, u.hitSize + unit.hitSize));
                 if(target != null){
                     Call.pickedUnitPayload(unit, target);
@@ -127,7 +127,7 @@ public class CommandAI extends AIController{
             }
 
             //try to pick up a block
-            if(stance == UnitStance.loadBlocks && (targetPos == null || unit.within(targetPos, 1f))){
+            if(command == UnitCommand.loadBlocksCommand && (targetPos == null || unit.within(targetPos, 1f))){
                 Building build = world.buildWorld(unit.x, unit.y);
 
                 if(build != null && state.teams.canInteract(unit.team, build.team)){

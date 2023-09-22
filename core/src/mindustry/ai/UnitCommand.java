@@ -15,7 +15,7 @@ public class UnitCommand{
 
     public static final UnitCommand
 
-    moveCommand = new UnitCommand("move", "right", u -> null){{
+    moveCommand = new UnitCommand("move", "right", null){{
         drawTarget = true;
         resetTarget = false;
     }},
@@ -28,6 +28,21 @@ public class UnitCommand{
     }),
     mineCommand = new UnitCommand("mine", "production", u -> new MinerAI()),
     boostCommand = new UnitCommand("boost", "up", u -> new BoostAI()){{
+        switchToMove = false;
+        drawTarget = true;
+        resetTarget = false;
+    }},
+    loadUnitsCommand = new UnitCommand("loadUnits", "download", null){{
+        switchToMove = false;
+        drawTarget = true;
+        resetTarget = false;
+    }},
+    loadBlocksCommand = new UnitCommand("loadBlocks", "down", null){{
+        switchToMove = false;
+        drawTarget = true;
+        resetTarget = false;
+    }},
+    unloadPayloadCommand = new UnitCommand("unloadPayload", "upload", null){{
         switchToMove = false;
         drawTarget = true;
         resetTarget = false;
@@ -51,7 +66,7 @@ public class UnitCommand{
     public UnitCommand(String name, String icon, Func<Unit, AIController> controller){
         this.name = name;
         this.icon = icon;
-        this.controller = controller;
+        this.controller = controller == null ? u -> null : controller;
 
         id = all.size;
         all.add(this);
