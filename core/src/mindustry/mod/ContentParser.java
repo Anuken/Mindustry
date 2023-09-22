@@ -122,6 +122,18 @@ public class ContentParser{
                 throw new IllegalArgumentException("Unit commands must be strings.");
             }
         });
+        put(UnitStance.class, (type, data) -> {
+            if(data.isString()){
+                var cmd = UnitStance.all.find(u -> u.name.equals(data.asString()));
+                if(cmd != null){
+                    return cmd;
+                }else{
+                    throw new IllegalArgumentException("Unknown unit stance name: " + data.asString());
+                }
+            }else{
+                throw new IllegalArgumentException("Unit stances must be strings.");
+            }
+        });
         put(BulletType.class, (type, data) -> {
             if(data.isString()){
                 return field(Bullets.class, data);
