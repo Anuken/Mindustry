@@ -4565,7 +4565,7 @@ public class Blocks{
 
                     fogRadius = 6f;
 
-                    health = 210;
+                    health = 300;
 
                     weapons.add(new Weapon(){{
                         shootCone = 360f;
@@ -4574,7 +4574,7 @@ public class Blocks{
                         deathExplosionEffect = Fx.massiveExplosion;
                         shootOnDeath = true;
                         shake = 10f;
-                        bullet = new ExplosionBulletType(1500f, 65f){{
+                        bullet = new ExplosionBulletType(1550f, 65f){{
                             hitColor = Pal.redLight;
                             shootEffect = new MultiEffect(Fx.massiveExplosion, Fx.scatheExplosion, Fx.scatheLight, new WaveEffect(){{
                                 lifetime = 10f;
