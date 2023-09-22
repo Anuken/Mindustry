@@ -522,7 +522,7 @@ public class PlacementFragment{
                                         for(var command : commands){
                                             coms.button(Icon.icons.get(command.icon, Icon.cancel), Styles.clearNoneTogglei, () -> {
                                                 Call.setUnitCommand(player, units.mapInt(un -> un.id).toArray(), command);
-                                            }).checked(i -> currentCommand[0] == command).size(50f).tooltip(command.localized());
+                                            }).checked(i -> currentCommand[0] == command).size(50f).tooltip(command.localized(), true);
 
                                             if(++scol % 6 == 0) coms.row();
                                         }
@@ -541,7 +541,7 @@ public class PlacementFragment{
 
                                             coms.button(Icon.icons.get(stance.icon, Icon.cancel), Styles.clearNoneTogglei, () -> {
                                                 Call.setUnitStance(player, units.mapInt(un -> un.id).toArray(), stance);
-                                            }).checked(i -> currentStance[0] == stance).size(50f).tooltip(stance.localized());
+                                            }).checked(i -> currentStance[0] == stance).size(50f).tooltip(stance.localized(), true);
 
                                             if(++scol % 6 == 0) coms.row();
                                         }
@@ -597,7 +597,7 @@ public class PlacementFragment{
                                 //not a huge fan of running input logic here, but it's convenient as the stance arrays are all here...
                                 for(int i = 0; i < Math.min(stanceBindings.length, stances.size); i++){
                                     //first stance must always be the stop stance
-                                    if(Core.input.keyTap(stanceBindings[i]) && (i != 0 || stances.get(0) == UnitStance.stopStance)){
+                                    if(Core.input.keyTap(stanceBindings[i]) && (i != 0 || stances.get(0) == UnitStance.stop)){
                                         Call.setUnitStance(player, control.input.selectedUnits.mapInt(un -> un.id).toArray(), stances.get(i));
                                     }
                                 }

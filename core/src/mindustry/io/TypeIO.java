@@ -321,7 +321,7 @@ public class TypeIO{
     public static UnitStance readStance(Reads read){
         int val = read.ub();
         //never returns null
-        return val == 255 ? UnitStance.shootStance : UnitStance.all.get(val);
+        return val == 255 ? UnitStance.shoot : UnitStance.all.get(val);
     }
 
     public static void writeEntity(Writes write, Entityc entity){

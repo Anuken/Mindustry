@@ -288,23 +288,20 @@ public class MobileInput extends InputHandler implements GestureListener{
             t.visible(() -> !showCancel() && block == null && !hasSchem());
             t.bottom().left();
 
+            t.button("@command.queue", Icon.rightOpen, Styles.clearTogglet, () -> {
+                queueCommandMode = !queueCommandMode;
+            }).width(155f).height(48f).margin(12f).checked(b -> queueCommandMode).visible(() -> commandMode).row();
+
             t.button("@command", Icon.units, Styles.clearTogglet, () -> {
                 commandMode = !commandMode;
-            }).width(155f).height(56f).margin(12f).checked(b -> {
-                b.setText(queueCommandMode ? bundle.get("command") + "\n" + bundle.get("command.queue") : bundle.get("command"));
-                return commandMode;
-            });
-
-            t.button(Icon.rightOpen, Styles.clearTogglei, () -> {
-                queueCommandMode = !queueCommandMode;
-            }).size(56f).margin(12f).checked(b -> queueCommandMode).visible(() -> commandMode).row();
+            }).width(155f).height(48f).margin(12f).checked(b -> commandMode);
 
             //for better looking insets
             t.rect((x, y, w, h) -> {
                 if(Core.scene.marginBottom > 0){
                     Tex.paneRight.draw(x, 0, w, y);
                 }
-            }).fillX().colspan(2).row();
+            }).fillX().row();
         });
 
         group.fill(t -> {

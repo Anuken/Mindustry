@@ -11,9 +11,9 @@ public class UnitStance{
 
     public static final UnitStance
 
-    stopStance = new UnitStance("stop", "cancel"), //not a real stance, cannot be selected, just cancels ordewrs
-    shootStance = new UnitStance("shoot", "commandAttack"),
-    holdFireStance = new UnitStance("holdfire", "none"),
+    stop = new UnitStance("stop", "cancel"), //not a real stance, cannot be selected, just cancels ordewrs
+    shoot = new UnitStance("shoot", "commandAttack"),
+    holdFire = new UnitStance("holdfire", "none"),
     pursueTarget = new UnitStance("pursuetarget", "right"),
     patrol = new UnitStance("patrol", "refresh"),
     ram = new UnitStance("ram", "rightOpen");

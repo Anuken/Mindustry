@@ -325,7 +325,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         for(int id : unitIds){
             Unit unit = Groups.unit.getByID(id);
             if(unit != null && unit.team == player.team() && unit.controller() instanceof CommandAI ai){
-                if(stance == UnitStance.stopStance){ //not a real stance, just cancels orders
+                if(stance == UnitStance.stop){ //not a real stance, just cancels orders
                     ai.clearCommands();
                 }else{
                     ai.stance = stance;

@@ -31,7 +31,7 @@ public class CommandAI extends AIController{
     protected boolean flocked;
 
     /** Stance, usually related to firing mode. */
-    public UnitStance stance = UnitStance.shootStance;
+    public UnitStance stance = UnitStance.shoot;
     /** Current command this unit is following. */
     public @Nullable UnitCommand command;
     /** Current controller instance based on command. */
@@ -65,7 +65,7 @@ public class CommandAI extends AIController{
     @Override
     public void updateUnit(){
         //this should not be possible
-        if(stance == UnitStance.stopStance) stance = UnitStance.shootStance;
+        if(stance == UnitStance.stop) stance = UnitStance.shoot;
 
         if(stance == UnitStance.pursueTarget && target != null && attackTarget == null && targetPos == null){
             commandTarget(target, false);
@@ -279,7 +279,7 @@ public class CommandAI extends AIController{
 
     @Override
     public boolean shouldFire(){
-        return stance != UnitStance.holdFireStance;
+        return stance != UnitStance.holdFire;
     }
 
     @Override
