@@ -61,7 +61,8 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             ShapeTextMarker::new,
             MinimapMarker::new,
             ShapeMarker::new,
-            TextMarker::new
+            TextMarker::new,
+            LineMarker::new
         );
     }
 
@@ -797,7 +798,6 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                 case setPos -> pos.set((int)values[0], (int)values[1]);
                 case setRadius -> radius = values[0];
                 case setStroke -> stroke = values[0];
-                case setColor -> color.set(Tmp.c1.fromDouble(values[0]));
                 default -> super.control(type, values);
             }
         }
@@ -868,7 +868,6 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                     fill = (values[1] != 0.0);
                     outline = (values[2] != 0.0);
                 }
-                case setColor -> color.set(Tmp.c1.fromDouble(values[0]));
                 default -> super.control(type, values);
             }
         }
@@ -950,6 +949,60 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             }else{
                 fetchedText = this.text;
             }
+        }
+    }
+
+    /** Displays a line from pos1 to pos2. */
+    public static class LineMarker extends ObjectiveMarker{
+        public @TilePos Vec2 pos1 = new Vec2(), pos2 = new Vec2();
+        public float stroke = 1f;
+        public boolean outline = true;
+        public Color color = Color.valueOf("ffd37f");
+
+        public LineMarker(String text, float x1, float y1, float x2, float y2, float stroke){
+            this.stroke = stroke;
+            this.pos1.set(x1, y1);
+            this.pos2.set(x2, y2);
+        }
+
+        public LineMarker(String text, float x1, float y1, float x2, float y2){
+            this.pos1.set(x1, y1);
+            this.pos2.set(x2, y2);
+        }
+
+        public LineMarker(){}
+
+        @Override
+        public void control(LMarkerControl type, float... values){
+            switch(type){
+                case setX -> pos1.x = values[0] * tilesize;
+                case setY -> pos1.y = values[0] * tilesize;
+                case setPos -> pos1.set(values[0] * tilesize, values[1] * tilesize);
+                case setEndX -> pos2.x = values[0] * tilesize;
+                case setEndY -> pos2.y = values[0] * tilesize;
+                case setEndPos -> pos2.set(values[0] * tilesize, values[1] * tilesize);
+                case setStroke -> stroke = values[0];
+                case setShapeOutline -> outline = (values[0] != 0.0);
+                default -> super.control(type, values);
+            }
+        }
+
+        @Override
+        public void draw(){
+            if(hidden) return;
+
+            if(outline){
+                Lines.stroke(stroke + 2f, Pal.gray);
+                Lines.line(pos1.x, pos1.y, pos2.x, pos2.y);
+            }
+
+            Lines.stroke(stroke, color);
+            Lines.line(pos1.x, pos1.y, pos2.x, pos2.y);
+        }
+
+        @Override
+        public void setColor(double value){
+            color.set(Tmp.c1.fromDouble(value));
         }
     }
 
