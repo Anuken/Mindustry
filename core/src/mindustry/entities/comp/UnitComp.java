@@ -269,8 +269,14 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
                 }
             }
             case shield -> shield = Math.max((float)value, 0f);
-            case x -> x = World.unconv((float)value);
-            case y -> y = World.unconv((float)value);
+            case x -> {
+                x = World.unconv((float)value);
+                if(!isLocal()) snapInterpolation();
+            }
+            case y -> {
+                y = World.unconv((float)value);
+                if(!isLocal()) snapInterpolation();
+            }
             case rotation -> rotation = (float)value;
             case team -> {
                 if(!net.client()){
@@ -407,6 +413,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     public boolean isCommandable(){
         return controller instanceof CommandAI;
+    }
+
+    public boolean canTarget(Unit other){
+        return other != null && other.checkTarget(type.targetAir, type.targetGround);
     }
 
     public CommandAI command(){

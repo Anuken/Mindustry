@@ -12,15 +12,11 @@ public enum Binding implements KeyBind{
     pan(KeyCode.mouseForward),
 
     boost(KeyCode.shiftLeft),
-    command_mode(KeyCode.shiftLeft),
-    control(KeyCode.controlLeft),
     respawn(KeyCode.v),
+    control(KeyCode.controlLeft),
     select(KeyCode.mouseLeft),
     deselect(KeyCode.mouseRight),
     break_block(KeyCode.mouseRight),
-
-    select_all_units(KeyCode.g),
-    select_all_unit_factories(KeyCode.h),
 
     pickupCargo(KeyCode.leftBracket),
     dropCargo(KeyCode.rightBracket),
@@ -37,6 +33,22 @@ public enum Binding implements KeyBind{
     schematic_flip_x(KeyCode.z),
     schematic_flip_y(KeyCode.x),
     schematic_menu(KeyCode.t),
+
+
+    command_mode(KeyCode.shiftLeft, "command"),
+    command_queue(KeyCode.mouseMiddle),
+    create_control_group(KeyCode.controlLeft),
+
+    select_all_units(KeyCode.g),
+    select_all_unit_factories(KeyCode.h),
+
+    cancel_orders(KeyCode.unset),
+
+    unit_stance_1(KeyCode.unset),
+    unit_stance_2(KeyCode.unset),
+    unit_stance_3(KeyCode.unset),
+    unit_stance_4(KeyCode.unset),
+    unit_stance_5(KeyCode.unset),
 
     category_prev(KeyCode.comma, "blocks"),
     category_next(KeyCode.period),

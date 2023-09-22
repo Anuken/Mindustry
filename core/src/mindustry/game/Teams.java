@@ -307,6 +307,8 @@ public class Teams{
 
             //convert all team tiles to neutral, randomly killing them
             for(var b : builds){
+                if(b.block.privileged) continue;
+
                 if(b instanceof CoreBuild){
                     b.kill();
                 }else{
@@ -331,7 +333,7 @@ public class Teams{
             }
 
             for(var build : builds){
-                if(build.within(x, y, range)){
+                if(build.within(x, y, range) && !build.block.privileged){
                     scheduleDerelict(build);
                 }
             }

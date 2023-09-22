@@ -17,4 +17,9 @@ public class DrawDefault extends DrawBlock{
     public void drawPlan(Block block, BuildPlan plan, Eachable<BuildPlan> list){
         block.drawDefaultPlanRegion(plan, list);
     }
+
+    @Override
+    public TextureRegion[] icons(Block block){
+        return new TextureRegion[]{block.region};
+    }
 }

@@ -314,6 +314,16 @@ public class TypeIO{
         return val == 255 ? null : UnitCommand.all.get(val);
     }
 
+    public static void writeStance(Writes write, @Nullable UnitStance stance){
+        write.b(stance == null ? 255 : stance.id);
+    }
+
+    public static UnitStance readStance(Reads read){
+        int val = read.ub();
+        //never returns null
+        return val == 255 ? UnitStance.shoot : UnitStance.all.get(val);
+    }
+
     public static void writeEntity(Writes write, Entityc entity){
         write.i(entity == null ? -1 : entity.id());
     }
@@ -472,7 +482,7 @@ public class TypeIO{
             write.b(3);
             write.i(logic.controller.pos());
         }else if(control instanceof CommandAI ai){
-            write.b(6);
+            write.b(8);
             write.bool(ai.attackTarget != null);
             write.bool(ai.targetPos != null);
 
@@ -489,6 +499,26 @@ public class TypeIO{
                 }
             }
             write.b(ai.command == null ? -1 : ai.command.id);
+
+            write.b(ai.commandQueue.size);
+            for(var pos : ai.commandQueue){
+                if(pos instanceof Building b){
+                    write.b(0);
+                    write.i(b.pos());
+                }else if(pos instanceof Unit u){
+                    write.b(1);
+                    write.i(u.id);
+                }else if(pos instanceof Vec2 v){
+                    write.b(2);
+                    write.f(v.x);
+                    write.f(v.y);
+                }else{
+                    //who put garbage in the command queue??
+                    write.b(3);
+                }
+            }
+
+            writeStance(write, ai.stance);
         }else if(control instanceof AssemblerAI){  //hate
             write.b(5);
         }else{
@@ -520,8 +550,8 @@ public class TypeIO{
                 out.controller = world.build(pos);
                 return out;
             }
-            //type 4 is the old CommandAI with no commandIndex, type 6 is the new one with the index as a single byte.
-        }else if(type == 4 || type == 6){
+            //type 4 is the old CommandAI with no commandIndex, type 6 is the new one with the index as a single byte, type 7 is the one with the command queue, 8 adds a stance
+        }else if(type == 4 || type == 6 || type == 7 || type == 8){
             CommandAI ai = prev instanceof CommandAI pai ? pai : new CommandAI();
 
             boolean hasAttack = read.bool(), hasPos = read.bool();
@@ -544,9 +574,36 @@ public class TypeIO{
                 ai.attackTarget = null;
             }
 
-            if(type == 6){
+            if(type == 6 || type == 7 || type == 8){
                 byte id = read.b();
                 ai.command = id < 0 ? null : UnitCommand.all.get(id);
+            }
+
+            //command queue only in type 7
+            if(type == 7 || type == 8){
+                ai.commandQueue.clear();
+                int length = read.ub();
+                for(int i = 0; i < length; i++){
+                    int commandType = read.b();
+                    switch(commandType){
+                        case 0 -> {
+                            var build = world.build(read.i());
+                            if(build != null) ai.commandQueue.add(build);
+                        }
+                        case 1 -> {
+                            var unit = Groups.unit.getByID(read.i());
+                            if(unit != null) ai.commandQueue.add(unit);
+                        }
+                        case 2 -> {
+                            ai.commandQueue.add(new Vec2(read.f(), read.f()));
+                        }
+                        //otherwise disregard
+                    }
+                }
+            }
+
+            if(type == 8){
+                ai.stance = readStance(read);
             }
 
             return ai;

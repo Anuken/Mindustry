@@ -13,10 +13,12 @@ import mindustry.gen.*;
 import mindustry.world.*;
 
 public class CommandAI extends AIController{
+    protected static final int maxCommandQueueSize = 50;
     protected static final float localInterval = 40f;
     protected static final Vec2 vecOut = new Vec2(), flockVec = new Vec2(), separation = new Vec2(), cohesion = new Vec2(), massCenter = new Vec2();
     protected static final boolean[] noFound = {false};
 
+    public Seq<Position> commandQueue = new Seq<>(5);
     public @Nullable Vec2 targetPos;
     public @Nullable Teamc attackTarget;
     /** All encountered unreachable buildings of this AI. Why a sequence? Because contains() is very rarely called on it. */
@@ -28,6 +30,8 @@ public class CommandAI extends AIController{
     protected Seq<Unit> local = new Seq<>(false);
     protected boolean flocked;
 
+    /** Stance, usually related to firing mode. */
+    public UnitStance stance = UnitStance.shoot;
     /** Current command this unit is following. */
     public @Nullable UnitCommand command;
     /** Current controller instance based on command. */
@@ -60,6 +64,17 @@ public class CommandAI extends AIController{
 
     @Override
     public void updateUnit(){
+        //this should not be possible
+        if(stance == UnitStance.stop) stance = UnitStance.shoot;
+
+        if(stance == UnitStance.pursueTarget && target != null && attackTarget == null && targetPos == null){
+            commandTarget(target, false);
+        }
+
+        //remove invalid targets
+        if(commandQueue.any()){
+            commandQueue.removeAll(e -> e instanceof Healthc h && !h.isValid());
+        }
 
         //assign defaults
         if(command == null && unit.type.commands.length > 0){
@@ -82,6 +97,12 @@ public class CommandAI extends AIController{
             //boosting control is not supported, so just don't.
             unit.updateBoosting(false);
         }
+    }
+
+    public void clearCommands(){
+        commandQueue.clear();
+        targetPos = null;
+        attackTarget = null;
     }
 
     public void defaultBehavior(){
@@ -114,6 +135,11 @@ public class CommandAI extends AIController{
             targetPos = null;
         }
 
+        //move on to the next target
+        if(attackTarget == null && targetPos == null){
+            finishPath();
+        }
+
         if(targetPos != null){
             if(timer.get(timerTarget3, localInterval) || !flocked){
                 if(!flocked){
@@ -139,7 +165,7 @@ public class CommandAI extends AIController{
             }
             targetPos.set(attackTarget);
 
-            if(unit.isGrounded() && attackTarget instanceof Building build && build.tile.solid() && unit.pathType() != Pathfinder.costLegs){
+            if(unit.isGrounded() && attackTarget instanceof Building build && build.tile.solid() && unit.pathType() != Pathfinder.costLegs && stance != UnitStance.ram){
                 Tile best = build.findClosestEdge(unit, Tile::solid);
                 if(best != null){
                     targetPos.set(best);
@@ -151,7 +177,7 @@ public class CommandAI extends AIController{
             boolean move = true;
             vecOut.set(targetPos);
 
-            if(unit.isGrounded()){
+            if(unit.isGrounded() && stance != UnitStance.ram){
                 move = Vars.controlPath.getPathPosition(unit, pathId, targetPos, vecOut, noFound);
 
                 //if the path is invalid, stop trying and record the end as unreachable
@@ -160,7 +186,7 @@ public class CommandAI extends AIController{
                         unreachableBuildings.addUnique(build.pos());
                     }
                     attackTarget = null;
-                    targetPos = null;
+                    finishPath();
                     return;
                 }
             }
@@ -172,11 +198,13 @@ public class CommandAI extends AIController{
                     target = attackTarget;
                     circleAttack(80f);
                 }else{
+                    boolean isFinalPoint = targetPos.epsilonEquals(vecOut, 4.1f) && commandQueue.size == 0;
+
                     moveTo(vecOut,
-                    attackTarget != null && unit.within(attackTarget, engageRange) ? engageRange :
+                    attackTarget != null && unit.within(attackTarget, engageRange) && stance != UnitStance.ram ? engageRange :
                     unit.isGrounded() ? 0f :
-                    attackTarget != null ? engageRange :
-                    0f, unit.isFlying() ? 40f : 100f, false, null, targetPos.epsilonEquals(vecOut, 4.1f));
+                    attackTarget != null && stance != UnitStance.ram ? engageRange :
+                    0f, unit.isFlying() ? 40f : 100f, false, null, isFinalPoint);
                 }
             }
 
@@ -193,7 +221,7 @@ public class CommandAI extends AIController{
 
             if(attackTarget == null){
                 if(unit.within(targetPos, Math.max(5f, unit.hitSize / 2f))){
-                    targetPos = null;
+                    finishPath();
                 }else if(local.size > 1){
                     int count = 0;
                     for(var near : local){
@@ -205,19 +233,53 @@ public class CommandAI extends AIController{
 
                     //others have arrived at destination, so this one will too
                     if(count >= Math.max(3, local.size / 2)){
-                        targetPos = null;
+                        finishPath();
                     }
                 }
             }
 
             if(stopWhenInRange && targetPos != null && unit.within(targetPos, engageRange * 0.9f)){
-                targetPos = null;
+                finishPath();
                 stopWhenInRange = false;
             }
 
         }else if(target != null){
             faceTarget();
         }
+    }
+
+    void finishPath(){
+        Vec2 prev = targetPos;
+        targetPos = null;
+        if(commandQueue.size > 0){
+            var next = commandQueue.remove(0);
+            if(next instanceof Teamc target){
+                commandTarget(target, this.stopAtTarget);
+            }else if(next instanceof Vec2 position){
+                commandPosition(position);
+            }
+
+            if(prev != null && stance == UnitStance.patrol){
+                commandQueue.add(prev.cpy());
+            }
+        }
+    }
+
+    public void commandQueue(Position location){
+        if(targetPos == null && attackTarget == null){
+            if(location instanceof Teamc target){
+                commandTarget(target, this.stopAtTarget);
+            }else if(location instanceof Vec2 position){
+                commandPosition(position);
+            }
+        }else if(commandQueue.size < maxCommandQueueSize && !commandQueue.contains(location)){
+            commandQueue.add(location);
+        }
+    }
+
+    @Override
+    public boolean shouldFire(){
+        return stance != UnitStance.holdFire;
     }
 
     @Override

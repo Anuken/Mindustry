@@ -124,7 +124,10 @@ public abstract class SaveVersion extends SaveFileReader{
             node.save();
         }
 
-        writeStringMap(stream, StringMap.of(
+        StringMap result = new StringMap();
+        result.putAll(tags);
+
+        writeStringMap(stream, result.merge(StringMap.of(
             "saved", Time.millis(),
             "playtime", headless ? 0 : control.saves.getTotalPlaytime(),
             "build", Version.build,
@@ -135,13 +138,14 @@ public abstract class SaveVersion extends SaveFileReader{
             "stats", JsonIO.write(state.stats),
             "rules", JsonIO.write(state.rules),
             "mods", JsonIO.write(mods.getModStrings().toArray(String.class)),
+            "controlGroups", headless || control == null ? "null" : JsonIO.write(control.input.controlGroups),
             "width", world.width(),
             "height", world.height(),
             "viewpos", Tmp.v1.set(player == null ? Vec2.ZERO : player).toString(),
             "controlledType", headless || control.input.controlledType == null ? "null" : control.input.controlledType.name,
             "nocores", state.rules.defaultTeam.cores().isEmpty(),
             "playerteam", player == null ? state.rules.defaultTeam.id : player.team().id
-        ).merge(tags));
+        )));
     }
 
     public void readMeta(DataInput stream, WorldContext context) throws IOException{
@@ -176,6 +180,11 @@ public abstract class SaveVersion extends SaveFileReader{
             Team team = Team.get(map.getInt("playerteam", state.rules.defaultTeam.id));
             if(!net.client() && team != Team.derelict){
                 player.team(team);
+            }
+
+            var groups = JsonIO.read(IntSeq[].class, map.get("controlGroups", "null"));
+            if(groups != null && groups.length == control.input.controlGroups.length){
+                control.input.controlGroups = groups;
             }
         }
 
