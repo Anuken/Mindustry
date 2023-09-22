@@ -333,7 +333,7 @@ public class Units{
         cdist = 0f;
 
         nearby(team, x, y, range, e -> {
-            if(!predicate.get(e)) return;
+            if(!e.isValid() || !predicate.get(e)) return;
 
             float dist = e.dst2(x, y);
             if(result == null || dist < cdist){
@@ -351,7 +351,7 @@ public class Units{
         cdist = 0f;
 
         nearby(team, x, y, range, e -> {
-            if(!predicate.get(e)) return;
+            if(!e.isValid() || !predicate.get(e)) return;
 
             float dist = sort.cost(e, x, y);
             if(result == null || dist < cdist){
@@ -370,7 +370,7 @@ public class Units{
         cdist = 0f;
 
         nearby(team, x - range, y - range, range*2f, range*2f, e -> {
-            if(!predicate.get(e)) return;
+            if(!e.isValid() || !predicate.get(e)) return;
 
             float dist = e.dst2(x, y);
             if(result == null || dist < cdist){

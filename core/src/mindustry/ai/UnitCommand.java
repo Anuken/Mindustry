@@ -31,14 +31,6 @@ public class UnitCommand{
         switchToMove = false;
         drawTarget = true;
         resetTarget = false;
-    }},
-    loadPayloadCommand = new UnitCommand("loadPayload", "download", u -> null){{
-        switchToMove = false;
-        drawTarget = true;
-    }},
-    unloadPayloadCommand = new UnitCommand("unloadPayload", "upload", u -> null){{
-        switchToMove = false;
-        drawTarget = true;
     }};
 
     /** Unique ID number. */

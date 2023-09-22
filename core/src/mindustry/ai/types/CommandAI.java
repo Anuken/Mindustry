@@ -11,6 +11,10 @@ import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.world.*;
+import mindustry.world.blocks.payloads.*;
+import mindustry.world.meta.*;
+
+import static mindustry.Vars.*;
 
 public class CommandAI extends AIController{
     protected static final int maxCommandQueueSize = 50;
@@ -67,6 +71,7 @@ public class CommandAI extends AIController{
         //this should not be possible
         if(stance == UnitStance.stop) stance = UnitStance.shoot;
 
+        //pursue the target if relevant
         if(stance == UnitStance.pursueTarget && target != null && attackTarget == null && targetPos == null){
             commandTarget(target, false);
         }
@@ -106,6 +111,37 @@ public class CommandAI extends AIController{
     }
 
     public void defaultBehavior(){
+
+        if(!net.client() && unit instanceof Payloadc pay){
+            //auto-drop everything
+            if(stance == UnitStance.unloadPayload && pay.hasPayload()){
+                Call.payloadDropped(unit, unit.x, unit.y);
+            }
+
+            //try to pick up what's under it
+            if(stance == UnitStance.loadPayload){
+                Unit target = Units.closest(unit.team, unit.x, unit.y, unit.type.hitSize * 2f, u -> u.isAI() && u != unit && u.isGrounded() && pay.canPickup(u) && u.within(unit, u.hitSize + unit.hitSize));
+                if(target != null){
+                    Call.pickedUnitPayload(unit, target);
+                }
+            }
+
+            //try to pick up a block
+            if(stance == UnitStance.loadBlocks && (targetPos == null || unit.within(targetPos, 1f))){
+                Building build = world.buildWorld(unit.x, unit.y);
+
+                if(build != null && state.teams.canInteract(unit.team, build.team)){
+                    //pick up block's payload
+                    Payload current = build.getPayload();
+                    if(current != null && pay.canPickupPayload(current)){
+                        Call.pickedBuildPayload(unit, build, false);
+                        //pick up whole building directly
+                    }else if(build.block.buildVisibility != BuildVisibility.hidden && build.canPickup() && pay.canPickup(build)){
+                        Call.pickedBuildPayload(unit, build, true);
+                    }
+                }
+            }
+        }
 
         //acquiring naval targets isn't supported yet, so use the fallback dumb AI
         if(unit.team.isAI() && unit.team.rules().rtsAi && unit.type.naval){

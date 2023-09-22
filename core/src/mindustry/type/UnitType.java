@@ -840,6 +840,9 @@ public class UnitType extends UnlockableContent implements Senseable{
                 if(crushDamage > 0){
                     seq.add(UnitStance.ram);
                 }
+                if(example instanceof Payloadc){
+                    seq.addAll(UnitStance.loadPayload, UnitStance.loadBlocks, UnitStance.unloadPayload);
+                }
                 stances = seq.toArray(UnitStance.class);
             }else{
                 stances = new UnitStance[]{UnitStance.stop};
