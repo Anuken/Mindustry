@@ -16,6 +16,7 @@ import mindustry.game.MapObjectives.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.io.*;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
@@ -603,6 +604,8 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
     public static abstract class ObjectiveMarker{
         /** Makes sure markers are only added once. */
         public transient boolean wasAdded;
+        //** Hides the marker, used by world processors */
+        public boolean hidden = false;
 
         /** Called in the overlay draw layer.*/
         public void draw(){}
@@ -612,6 +615,17 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public void added(){}
         /** Remove any UI elements, if necessary. */
         public void removed(){}
+        /** Control marker with world processor code*/
+        public void control(LMarkerControl type, float... values){
+            switch(type){
+                case hide -> hidden = true;
+                case show -> hidden = false;
+                case toggleVisibility -> hidden = !hidden;
+                case setVisibility -> hidden = (values[0] == 0);
+            }
+        }
+        public void setText(String text, boolean fetch){}
+        public void setColor(double value){}
 
         /** @return The localized type-name of this objective, defaulting to the class simple name without the "Marker" prefix. */
         public String typeName(){
@@ -673,6 +687,8 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public void draw(){
+            if(hidden) return;
+
             Lines.stroke(3f, Pal.gray);
             Lines.poly(pos.x, pos.y, sides, radius + 1f, rotation);
             Lines.stroke(1f, color);
@@ -684,6 +700,54 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             }
 
             WorldLabel.drawAt(fetchedText, pos.x, pos.y + radius + textHeight, Draw.z(), flags, fontSize);
+        }
+
+        @Override
+        public void control(LMarkerControl type, float... values){
+            switch(type){
+                case setX -> pos.x = values[0] * tilesize;
+                case setY -> pos.y = values[0] * tilesize;
+                case setPos -> pos.set(values[0] * tilesize, values[1]  * tilesize);
+                case setFontSize -> fontSize = values[0];
+                case setTextHeight -> textHeight = values[0];
+                case setLabelBackground -> {
+                    if(values[0] != 0.0){
+                        flags |= WorldLabel.flagBackground;
+                    }else{
+                        flags &= ~WorldLabel.flagBackground;
+                    }
+                }
+                case setLabelOutline -> {
+                    if(values[0] != 0.0){
+                        flags |= WorldLabel.flagOutline;
+                    }else{
+                        flags &= ~WorldLabel.flagOutline;
+                    }
+                }
+                case setLabelFlags -> {
+                    flags = (values[0] != 0.0 ? WorldLabel.flagBackground : 0);
+                    if(values[1] != 0.0) flags |= WorldLabel.flagOutline;
+                }
+                case setRadius -> radius = values[0];
+                case setRotation -> rotation = values[0];
+                case setShapeSides -> sides = Math.min((int)values[0], 200);
+                default -> super.control(type, values);
+            }
+        }
+
+        @Override
+        public void setText(String text, boolean fetch){
+            this.text = text;
+            if(fetch){
+                fetchedText = fetchText(this.text);
+            }else{
+                fetchedText = this.text;
+            }
+        }
+
+        @Override
+        public void setColor(double value){
+            color.set(Tmp.c1.fromDouble(value));
         }
     }
 
@@ -713,6 +777,8 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public void drawMinimap(MinimapRenderer minimap){
+            if(hidden) return;
+
             minimap.transform(Tmp.v1.set(pos.x * tilesize, pos.y * tilesize));
 
             float rad = minimap.scale(radius * tilesize);
@@ -721,6 +787,24 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             Lines.stroke(Scl.scl((1f - fin) * stroke + 0.1f), color);
             Lines.circle(Tmp.v1.x, Tmp.v1.y, rad * fin);
             Draw.reset();
+        }
+
+        @Override
+        public void control(LMarkerControl type, float... values){
+            switch(type){
+                case setX -> pos.x = (int)values[0];
+                case setY -> pos.y = (int)values[0];
+                case setPos -> pos.set((int)values[0], (int)values[1]);
+                case setRadius -> radius = values[0];
+                case setStroke -> stroke = values[0];
+                case setColor -> color.set(Tmp.c1.fromDouble(values[0]));
+                default -> super.control(type, values);
+            }
+        }
+
+        @Override
+        public void setColor(double value){
+            color.set(Tmp.c1.fromDouble(value));
         }
     }
 
@@ -746,6 +830,8 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public void draw(){
+            if(hidden) return;
+
             //in case some idiot decides to make 9999999 sides and freeze the game
             int sides = Math.min(this.sides, 200);
 
@@ -763,6 +849,33 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             }
 
             Draw.reset();
+        }
+
+        @Override
+        public void control(LMarkerControl type, float... values){
+            switch(type){
+                case setX -> pos.x = values[0] * tilesize;
+                case setY -> pos.y = values[0] * tilesize;
+                case setPos -> pos.set(values[0] * tilesize, values[1] * tilesize);
+                case setRadius -> radius = values[0];
+                case setRotation -> rotation = values[0];
+                case setStroke -> stroke = values[0];
+                case setShapeSides -> sides = Math.min((int)values[0], 200);
+                case setShapeFill -> fill = (values[0] != 0.0);
+                case setShapeOutline -> outline = (values[0] != 0.0);
+                case setShape -> {
+                    sides = Math.min((int)values[0], 200);
+                    fill = (values[1] != 0.0);
+                    outline = (values[2] != 0.0);
+                }
+                case setColor -> color.set(Tmp.c1.fromDouble(values[0]));
+                default -> super.control(type, values);
+            }
+        }
+
+        @Override
+        public void setColor(double value){
+            color.set(Tmp.c1.fromDouble(value));
         }
     }
 
@@ -791,11 +904,52 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public void draw(){
+            if(hidden) return;
+
             if(fetchedText == null){
                 fetchedText = fetchText(text);
             }
 
             WorldLabel.drawAt(fetchedText, pos.x, pos.y, Draw.z(), flags, fontSize);
+        }
+
+        @Override
+        public void control(LMarkerControl type, float... values){
+            switch(type){
+                case setX -> pos.x = values[0] * tilesize;
+                case setY -> pos.y = values[0] * tilesize;
+                case setPos -> pos.set(values[0] * tilesize, values[1] * tilesize);
+                case setFontSize -> fontSize = values[0];
+                case setLabelBackground -> {
+                    if(values[0] != 0.0){
+                        flags |= WorldLabel.flagBackground;
+                    }else{
+                        flags &= ~WorldLabel.flagBackground;
+                    }
+                }
+                case setLabelOutline -> {
+                    if(values[0] != 0.0){
+                        flags |= WorldLabel.flagOutline;
+                    }else{
+                        flags &= ~WorldLabel.flagOutline;
+                    }
+                }
+                case setLabelFlags -> {
+                    flags = (values[0] != 0.0 ? WorldLabel.flagBackground : 0);
+                    if(values[1] != 0.0) flags |= WorldLabel.flagOutline;
+                }
+                default -> super.control(type, values);
+            }
+        }
+
+        @Override
+        public void setText(String text, boolean fetch){
+            this.text = text;
+            if(fetch){
+                fetchedText = fetchText(this.text);
+            }else{
+                fetchedText = this.text;
+            }
         }
     }
 

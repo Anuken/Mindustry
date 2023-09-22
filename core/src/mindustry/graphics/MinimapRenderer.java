@@ -258,6 +258,10 @@ public class MinimapRenderer{
                 marker.drawMinimap(this);
             }
         });
+
+        for(var marker : state.rules.markers.values()){
+            marker.drawMinimap(this);
+        }
     }
 
     public void drawSpawns(float x, float y, float w, float h, float scaling){

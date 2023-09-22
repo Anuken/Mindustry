@@ -10,6 +10,7 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.ctype.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.LCanvas.*;
@@ -148,7 +149,8 @@ public class LStatements{
                     }
                     rebuild(table);
                 }, 2, cell -> cell.size(100, 50)));
-            }, Styles.logict, () -> {}).size(90, 40).color(table.color).left().padLeft(2);
+            }, Styles.logict, () -> {
+            }).size(90, 40).color(table.color).left().padLeft(2);
 
             if(type != GraphicsType.stroke){
                 row(table);
@@ -361,7 +363,8 @@ public class LStatements{
                     type = t;
                     rebuild(table);
                 }, 2, cell -> cell.size(100, 50)));
-            }, Styles.logict, () -> {}).size(90, 40).color(table.color).left().padLeft(2);
+            }, Styles.logict, () -> {
+            }).size(90, 40).color(table.color).left().padLeft(2);
 
             table.add(" of ").self(this::param);
 
@@ -418,9 +421,12 @@ public class LStatements{
                 table.button(b -> {
                     b.label(() -> get.get().name());
                     b.clicked(() -> showSelect(b, RadarTarget.all, get.get(), t -> {
-                        if(fi == 0) target1 = t; else if(fi == 1) target2 = t; else target3 = t;
+                        if(fi == 0) target1 = t;
+                        else if(fi == 1) target2 = t;
+                        else target3 = t;
                     }, 2, cell -> cell.size(100, 50)));
-                }, Styles.logict, () -> {}).size(90, 40).color(table.color).left().padLeft(2);
+                }, Styles.logict, () -> {
+                }).size(90, 40).color(table.color).left().padLeft(2);
 
                 if(i == 1){
                     row(table);
@@ -440,7 +446,8 @@ public class LStatements{
                 b.clicked(() -> showSelect(b, RadarSort.all, sort, t -> {
                     sort = t;
                 }, 2, cell -> cell.size(100, 50)));
-            }, Styles.logict, () -> {}).size(90, 40).color(table.color).left().padLeft(2);
+            }, Styles.logict, () -> {
+            }).size(90, 40).color(table.color).left().padLeft(2);
 
             table.add(" output ").self(this::param);
 
@@ -485,43 +492,43 @@ public class LStatements{
                 //240
                 b.clicked(() -> showSelectTable(b, (t, hide) -> {
                     Table[] tables = {
-                        //items
-                        new Table(i -> {
-                            i.left();
-                            int c = 0;
-                            for(Item item : Vars.content.items()){
-                                if(!item.unlockedNow() || item.hidden) continue;
-                                i.button(new TextureRegionDrawable(item.uiIcon), Styles.flati, iconSmall, () -> {
-                                    stype("@" + item.name);
-                                    hide.run();
-                                }).size(40f);
+                    //items
+                    new Table(i -> {
+                        i.left();
+                        int c = 0;
+                        for(Item item : Vars.content.items()){
+                            if(!item.unlockedNow() || item.hidden) continue;
+                            i.button(new TextureRegionDrawable(item.uiIcon), Styles.flati, iconSmall, () -> {
+                                stype("@" + item.name);
+                                hide.run();
+                            }).size(40f);
 
-                                if(++c % 6 == 0) i.row();
-                            }
-                        }),
-                        //liquids
-                        new Table(i -> {
-                            i.left();
-                            int c = 0;
-                            for(Liquid item : Vars.content.liquids()){
-                                if(!item.unlockedNow() || item.hidden) continue;
-                                i.button(new TextureRegionDrawable(item.uiIcon), Styles.flati, iconSmall, () -> {
-                                    stype("@" + item.name);
-                                    hide.run();
-                                }).size(40f);
+                            if(++c % 6 == 0) i.row();
+                        }
+                    }),
+                    //liquids
+                    new Table(i -> {
+                        i.left();
+                        int c = 0;
+                        for(Liquid item : Vars.content.liquids()){
+                            if(!item.unlockedNow() || item.hidden) continue;
+                            i.button(new TextureRegionDrawable(item.uiIcon), Styles.flati, iconSmall, () -> {
+                                stype("@" + item.name);
+                                hide.run();
+                            }).size(40f);
 
-                                if(++c % 6 == 0) i.row();
-                            }
-                        }),
-                        //sensors
-                        new Table(i -> {
-                            for(LAccess sensor : LAccess.senseable){
-                                i.button(sensor.name(), Styles.flatt, () -> {
-                                    stype("@" + sensor.name());
-                                    hide.run();
-                                }).size(240f, 40f).self(c -> tooltip(c, sensor)).row();
-                            }
-                        })
+                            if(++c % 6 == 0) i.row();
+                        }
+                    }),
+                    //sensors
+                    new Table(i -> {
+                        for(LAccess sensor : LAccess.senseable){
+                            i.button(sensor.name(), Styles.flatt, () -> {
+                                stype("@" + sensor.name());
+                                hide.run();
+                            }).size(240f, 40f).self(c -> tooltip(c, sensor)).row();
+                        }
+                    })
                     };
 
                     Drawable[] icons = {Icon.box, Icon.liquid, Icon.tree};
@@ -544,7 +551,8 @@ public class LStatements{
                     t.row();
                     t.add(stack).colspan(3).width(240f).left();
                 }));
-            }, Styles.logict, () -> {}).size(40f).padLeft(-1).color(table.color);
+            }, Styles.logict, () -> {
+            }).size(40f).padLeft(-1).color(table.color);
 
             table.add(" in ").self(this::param);
 
@@ -654,12 +662,13 @@ public class LStatements{
                     op = o;
                     rebuild(parent);
                 }, 4, c -> c.width(64f)));
-            }, Styles.logict, () -> {}).size(64f, 40f).pad(4f).color(table.color);
+            }, Styles.logict, () -> {
+            }).size(64f, 40f).pad(4f).color(table.color);
         }
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new OpI(op,builder.var(a), builder.var(b), builder.var(dest));
+            return new OpI(op, builder.var(a), builder.var(b), builder.var(dest));
         }
 
         @Override
@@ -725,7 +734,8 @@ public class LStatements{
                 b.clicked(() -> showSelect(b, GlobalVars.lookableContent, type, o -> {
                     type = o;
                 }));
-            }, Styles.logict, () -> {}).size(64f, 40f).pad(4f).color(table.color);
+            }, Styles.logict, () -> {
+            }).size(64f, 40f).pad(4f).color(table.color);
 
             table.add(" # ");
 
@@ -838,7 +848,8 @@ public class LStatements{
                     op = o;
                     rebuild(table);
                 }));
-            }, Styles.logict, () -> {}).size(op == ConditionOp.always ? 80f : 48f, 40f).pad(4f).color(table.color);
+            }, Styles.logict, () -> {
+            }).size(op == ConditionOp.always ? 80f : 48f, 40f).pad(4f).color(table.color);
 
             if(op != ConditionOp.always) field(table, compare, str -> compare = str);
         }
@@ -898,7 +909,8 @@ public class LStatements{
                         }
                     }).colspan(3).width(240f).left();
                 }));
-            }, Styles.logict, () -> {}).size(40f).padLeft(-2).color(table.color);
+            }, Styles.logict, () -> {
+            }).size(40f).padLeft(-2).color(table.color);
         }
 
         @Override
@@ -939,7 +951,8 @@ public class LStatements{
                     }
                     rebuild(table);
                 }, 2, cell -> cell.size(120, 50)));
-            }, Styles.logict, () -> {}).size(120, 40).color(table.color).left().padLeft(2);
+            }, Styles.logict, () -> {
+            }).size(120, 40).color(table.color).left().padLeft(2);
 
             row(table);
 
@@ -1016,7 +1029,8 @@ public class LStatements{
                     locate = t;
                     rebuild(table);
                 }, 2, cell -> cell.size(110, 50)));
-            }, Styles.logict, () -> {}).size(110, 40).color(table.color).left().padLeft(2);
+            }, Styles.logict, () -> {
+            }).size(110, 40).color(table.color).left().padLeft(2);
 
             switch(locate){
                 case building -> {
@@ -1025,7 +1039,8 @@ public class LStatements{
                     table.button(b -> {
                         b.label(() -> flag.name());
                         b.clicked(() -> showSelect(b, BlockFlag.allLogic, flag, t -> flag = t, 2, cell -> cell.size(110, 50)));
-                    }, Styles.logict, () -> {}).size(110, 40).color(table.color).left().padLeft(2);
+                    }, Styles.logict, () -> {
+                    }).size(110, 40).color(table.color).left().padLeft(2);
                     row(table);
 
                     table.add(" enemy ").left().self(this::param);
@@ -1061,7 +1076,8 @@ public class LStatements{
                                     }
                                 }).colspan(3).width(240f).left();
                             }));
-                        }, Styles.logict, () -> {}).size(40f).padLeft(-2).color(table.color);
+                        }, Styles.logict, () -> {
+                        }).size(40f).padLeft(-2).color(table.color);
                     });
 
 
@@ -1118,7 +1134,8 @@ public class LStatements{
             table.button(b -> {
                 b.label(() -> layer.name());
                 b.clicked(() -> showSelect(b, TileLayer.all, layer, o -> layer = o));
-            }, Styles.logict, () -> {}).size(64f, 40f).pad(4f).color(table.color);
+            }, Styles.logict, () -> {
+            }).size(64f, 40f).pad(4f).color(table.color);
 
             table.add(" at ");
 
@@ -1163,7 +1180,8 @@ public class LStatements{
                     layer = o;
                     rebuild(table);
                 }));
-            }, Styles.logict, () -> {}).size(64f, 40f).pad(4f).color(table.color);
+            }, Styles.logict, () -> {
+            }).size(64f, 40f).pad(4f).color(table.color);
 
             row(table);
 
@@ -1283,7 +1301,8 @@ public class LStatements{
                 b.clicked(() -> showSelect(b, statusNames, effect, o -> {
                     effect = o;
                 }, 2, c -> c.size(120f, 38f)));
-            }, Styles.logict, () -> {}).size(120f, 40f).pad(4f).color(table.color);
+            }, Styles.logict, () -> {
+            }).size(120f, 40f).pad(4f).color(table.color);
 
             //TODO effect select
 
@@ -1370,7 +1389,8 @@ public class LStatements{
                     rule = o;
                     rebuild(table);
                 }, 2, c -> c.width(150f)));
-            }, Styles.logict, () -> {}).size(160f, 40f).margin(5f).pad(4f).color(table.color);
+            }, Styles.logict, () -> {
+            }).size(160f, 40f).margin(5f).pad(4f).color(table.color);
 
             switch(rule){
                 case mapArea -> {
@@ -1394,7 +1414,7 @@ public class LStatements{
                 }
                 case ban, unban -> {
                     table.add(" block/unit ");
-                    
+
                     field(table, value, s -> value = s);
                 }
                 default -> {
@@ -1440,7 +1460,8 @@ public class LStatements{
                     type = o;
                     rebuild(table);
                 }, 2, c -> c.width(150f)));
-            }, Styles.logict, () -> {}).size(160f, 40f).padLeft(2).color(table.color);
+            }, Styles.logict, () -> {
+            }).size(160f, 40f).padLeft(2).color(table.color);
 
             switch(type){
                 case announce, toast -> {
@@ -1486,7 +1507,8 @@ public class LStatements{
                     action = o;
                     rebuild(table);
                 }));
-            }, Styles.logict, () -> {}).size(90f, 40f).padLeft(2).color(table.color);
+            }, Styles.logict, () -> {
+            }).size(90f, 40f).padLeft(2).color(table.color);
 
             switch(action){
                 case pan -> {
@@ -1537,7 +1559,8 @@ public class LStatements{
                     type = entry.name;
                     build(table);
                 }));
-            }, Styles.logict, () -> {}).size(150f, 40f).margin(5f).pad(4f).color(table.color).colspan(2);
+            }, Styles.logict, () -> {
+            }).size(150f, 40f).margin(5f).pad(4f).color(table.color).colspan(2);
 
             EffectEntry entry = LogicFx.get(type);
 
@@ -1558,7 +1581,8 @@ public class LStatements{
                             if(color.startsWith("%")){
                                 try{
                                     current = Color.valueOf(color.substring(1));
-                                }catch(Exception ignored){}
+                                }catch(Exception ignored){
+                                }
                             }
 
                             ui.picker.show(current, result -> {
@@ -1566,7 +1590,8 @@ public class LStatements{
                                 build(table);
                             });
                         });
-                    }, Styles.logict, () -> {}).size(40f).padLeft(-11).color(table.color);
+                    }, Styles.logict, () -> {
+                    }).size(40f).padLeft(-11).color(table.color);
                 }
 
                 row(table);
@@ -1680,7 +1705,8 @@ public class LStatements{
                     type = o;
                     rebuild(table);
                 }, 2, c -> c.width(150f)));
-            }, Styles.logict, () -> {}).size(160f, 40f).margin(5f).pad(4f).color(table.color);
+            }, Styles.logict, () -> {
+            }).size(160f, 40f).margin(5f).pad(4f).color(table.color);
 
             row(table);
 
@@ -1882,7 +1908,8 @@ public class LStatements{
                     t.row();
                     t.add(stack).colspan(3).width(240f).left();
                 }));
-            }, Styles.logict, () -> {}).size(40f).padLeft(-1).color(table.color);
+            }, Styles.logict, () -> {
+            }).size(40f).padLeft(-1).color(table.color);
 
             row(table);
 
@@ -1910,6 +1937,90 @@ public class LStatements{
         @Override
         public LInstruction build(LAssembler builder){
             return new SetPropI(builder.var(type), builder.var(of), builder.var(value));
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.world;
+        }
+    }
+
+    @RegisterStatement("marker")
+    public static class MarkerStatement extends LStatement{
+        public LMarkerControl type = LMarkerControl.create;
+        public String id = "0", p1 = "0", p2 = "0", p3 = "0";
+
+        @Override
+        public void build(Table table){
+            rebuild(table);
+        }
+
+        void rebuild(Table table){
+            table.clearChildren();
+
+            table.button(b -> {
+                b.label(() -> type.name());
+                b.clicked(() -> showSelect(b, LMarkerControl.all, type, t -> {
+                    type = t;
+                    rebuild(table);
+                }, 2, cell -> cell.size(140, 50)));
+            }, Styles.logict, () -> {
+            }).size(220, 40).color(table.color).left().padLeft(2);
+
+            table.add(" marker# ");
+
+            fields(table, id, str -> id = str);
+
+            if(type == LMarkerControl.create){
+                fields(table, type.params[0], p1, v -> p1 = v).padRight(0f).left();
+                table.button(b -> {
+                    b.image(Icon.pencilSmall);
+                    b.clicked(() -> showSelectTable(b, (t, hide) -> {
+                        t.row();
+                        t.table(i -> {
+                            i.left();
+                            int c = 0;
+                            for(var gen : MapObjectives.allMarkerTypes){
+                                var marker = gen.get();
+                                i.button(marker.typeName(), Styles.flatt, () -> {
+                                    p1 = Integer.toString(MapObjectives.allMarkerTypes.indexOf(gen));
+                                    rebuild(table);
+                                    hide.run();
+                                }).size(140, 40);
+
+                                if(++c % 2 == 0) i.row();
+                            }
+                        }).colspan(3).width(280f).left();
+                    }));
+                }, Styles.logict, () -> {
+                }).size(40f).padLeft(-2).color(table.color);
+                fields(table, type.params[1], p2, v -> p2 = v);
+                fields(table, type.params[2], p3, v -> p3 = v);
+            }else{
+                //Q: why don't you just use arrays for this?
+                //A: arrays aren't as easy to serialize so the code generator doesn't handle them
+                int c = 0;
+                for(int i = 0; i < type.params.length; i++){
+
+                    fields(table, type.params[i], i == 0 ? p1 : i == 1 ? p2 : p3, i == 0 ? v -> p1 = v : i == 1 ? v -> p2 = v : v -> p3 = v).width(100f);
+
+                    if(++c % 2 == 0) row(table);
+
+                    if(i == 3){
+                        table.row();
+                    }
+                }
+            }
+        }
+
+        @Override
+        public boolean privileged(){
+            return true;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new MarkerI(type, builder.var(id), builder.var(p1), builder.var(p2), builder.var(p3));
         }
 
         @Override

@@ -118,6 +118,10 @@ public class OverlayRenderer{
             for(var marker : obj.markers) marker.draw();
         });
 
+        for(var marker : state.rules.markers.values()){
+            marker.draw();
+        }
+
         if(player.dead()) return; //dead players don't draw
 
         InputHandler input = control.input;

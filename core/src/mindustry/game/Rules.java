@@ -7,6 +7,7 @@ import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
 import mindustry.*;
 import mindustry.content.*;
+import mindustry.game.MapObjectives.*;
 import mindustry.graphics.g3d.*;
 import mindustry.io.*;
 import mindustry.type.*;
@@ -145,6 +146,8 @@ public class Rules{
     public MapObjectives objectives = new MapObjectives();
     /** Flags set by objectives. Used in world processors. */
     public ObjectSet<String> objectiveFlags = new ObjectSet<>();
+    /** Markers not linked to objectives. Controlled by world processors. */
+    public IntMap<ObjectiveMarker> markers = new IntMap<>();
     /** If true, fog of war is enabled. Enemy units and buildings are hidden unless in radar view. */
     public boolean fog = false;
     /** If fog = true, this is whether static (black) fog is enabled. */
