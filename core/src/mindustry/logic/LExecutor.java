@@ -48,6 +48,7 @@ public class LExecutor{
     public Var[] vars = {};
     public Var counter;
     public int[] binds;
+    public boolean yield;
 
     public int iptIndex = -1;
     public LongSeq graphicsBuffer = new LongSeq();
@@ -1126,6 +1127,7 @@ public class LExecutor{
             }else{
                 //skip back to self.
                 exec.var(varCounter).numval --;
+                exec.yield = true;
             }
 
             if(state.updateId != frameId){
@@ -1141,6 +1143,7 @@ public class LExecutor{
         public void run(LExecutor exec){
             //skip back to self.
             exec.var(varCounter).numval --;
+            exec.yield = true;
         }
     }
 
@@ -1543,6 +1546,7 @@ public class LExecutor{
                 type == MessageType.toast && ui.hasAnnouncement()
             ){
                 exec.var(varCounter).numval --;
+                exec.yield = true;
                 return;
             }
 
