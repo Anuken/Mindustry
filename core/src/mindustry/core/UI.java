@@ -128,6 +128,9 @@ public class UI implements ApplicationListener, Loadable{
 
         Tooltips.getInstance().animations = false;
         Tooltips.getInstance().textProvider = text -> new Tooltip(t -> t.background(Styles.black6).margin(4f).add(text));
+        if(mobile){
+            Tooltips.getInstance().offsetY += Scl.scl(60f);
+        }
 
         Core.settings.setErrorHandler(e -> {
             Log.err(e);

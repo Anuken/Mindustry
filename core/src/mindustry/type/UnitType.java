@@ -829,6 +829,9 @@ public class UnitType extends UnlockableContent implements Senseable{
                 if(mineTier > 0){
                     cmds.add(UnitCommand.mineCommand);
                 }
+                if(example instanceof Payloadc){
+                    cmds.addAll(UnitCommand.loadUnitsCommand, UnitCommand.loadBlocksCommand, UnitCommand.unloadPayloadCommand);
+                }
             }
 
             commands = cmds.toArray();
