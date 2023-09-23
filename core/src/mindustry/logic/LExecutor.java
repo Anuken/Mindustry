@@ -1524,9 +1524,9 @@ public class LExecutor{
 
     public static class FlushMessageI implements LInstruction{
         public MessageType type = MessageType.announce;
-        public int duration;
+        public int duration, outSuccess, x, y;
 
-        public FlushMessageI(MessageType type, int duration){
+        public FlushMessageI(MessageType type, int duration, int outSuccess, int x, int y){
             this.type = type;
             this.duration = duration;
         }
@@ -1536,17 +1536,20 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            if(headless && type != MessageType.mission) return;
+            //set default to succes
+            exec.setnum(outSuccess, 1);
+            if(headless && type != MessageType.mission) {
+                exec.textBuffer.setLength(0);
+                return;
+            }
 
-            //skip back to self until possible
-            //TODO this is guaranteed desync on servers - I don't see a good solution
             if(
                 type == MessageType.announce && ui.hasAnnouncement() ||
                 type == MessageType.notify && ui.hudfrag.hasToast() ||
                 type == MessageType.toast && ui.hasAnnouncement()
             ){
-                exec.var(varCounter).numval --;
-                exec.yield = true;
+                //set outSuccess=false to let user retry.
+                exec.setnum(outSuccess, 0);
                 return;
             }
 
@@ -1562,6 +1565,7 @@ public class LExecutor{
                 case notify -> ui.hudfrag.showToast(Icon.info, text);
                 case announce -> ui.announce(text, exec.numf(duration));
                 case toast -> ui.showInfoToast(text, exec.numf(duration));
+                case label -> ui.showLabel(text, exec.numf(duration), World.unconv(exec.numf(x)), World.unconv(exec.numf(y)));
                 //TODO desync?
                 case mission -> state.rules.mission = text;
             }
