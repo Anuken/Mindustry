@@ -1859,39 +1859,40 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            switch(type){
-                case create -> {
-                    int type = exec.numi(p1);
-                    if(0 <= type && type < MapObjectives.allMarkerTypes.size){
-                        ObjectiveMarker marker = MapObjectives.allMarkerTypes.get(type).get();
-                        if(marker != null){
-                            state.rules.markers.put(exec.numi(id), marker);
-                            marker.control(LMarkerControl.setPos, exec.numf(p2), exec.numf(p3));
-                        }
+            ObjectiveMarker marker = null;
+
+            if(type == LMarkerControl.create){
+                int type = exec.numi(p1);
+                if(0 <= type && type < MapObjectives.allMarkerTypes.size){
+                    marker = MapObjectives.allMarkerTypes.get(type).get();
+                    if(marker != null){
+                        state.rules.markers.put(exec.numi(id), marker);
+                        marker.control(LMarkerControl.pos, exec.numf(p2), exec.numf(p3), 0);
                     }
                 }
-                case remove -> state.rules.markers.remove(exec.numi(id));
-                case setColor -> state.rules.markers.get(exec.numi(id)).setColor(exec.num(p1));
-                default -> {
-                    ObjectiveMarker marker = state.rules.markers.get(exec.numi(id));
-                    if(marker != null){
-                        Var var = exec.var(p1);
+                return;
+            }else if(type == LMarkerControl.remove){
+                state.rules.markers.remove(exec.numi(id));
+            }else{
+                marker = state.rules.markers.get(exec.numi(id));
+            }
 
-                        if(!var.isobj){
-                            marker.control(type, exec.numf(p1), exec.numf(p2), exec.numf(p3));
-                        }else{
-                            if(type == LMarkerControl.setText){
-                                marker.setText((exec.obj(p1) != null ? exec.obj(p1).toString() : "null"), true);
-                            }else if(type == LMarkerControl.flushText){
-                                marker.setText(exec.textBuffer.toString(), false);
-                                exec.textBuffer.setLength(0);
-                            }
-                        }
-                    }
+            if(marker == null) return;
+
+            Var var = exec.var(p1);
+            if(!var.isobj){
+                if(type == LMarkerControl.color) marker.setColor(exec.num(p1));
+                else marker.control(type, exec.numf(p1), exec.numf(p2), exec.numf(p3));
+            }else{
+                if(type == LMarkerControl.text){
+                    marker.setText((exec.obj(p1) != null ? exec.obj(p1).toString() : "null"), true);
+                }else if(type == LMarkerControl.flushText){
+                    marker.setText(exec.textBuffer.toString(), false);
+                    exec.textBuffer.setLength(0);
                 }
             }
 
-            Call.setMarker(exec.numi(id), state.rules.markers.get(exec.numi(id)));
+            Call.setMarker(exec.numi(id), marker);
         }
     }
 

@@ -617,12 +617,12 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         /** Remove any UI elements, if necessary. */
         public void removed(){}
         /** Control marker with world processor code*/
-        public void control(LMarkerControl type, float... values){
+        public void control(LMarkerControl type, float p1, float p2, float p3){
             switch(type){
                 case hide -> hidden = true;
                 case show -> hidden = false;
                 case toggleVisibility -> hidden = !hidden;
-                case setVisibility -> hidden = (values[0] == 0);
+                case setVisibility -> hidden = (p1 == 0);
             }
         }
         public void setText(String text, boolean fetch){}
@@ -707,35 +707,35 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         }
 
         @Override
-        public void control(LMarkerControl type, float... values){
+        public void control(LMarkerControl type, float p1, float p2, float p3){
             switch(type){
-                case setX -> pos.x = values[0] * tilesize;
-                case setY -> pos.y = values[0] * tilesize;
-                case setPos -> pos.set(values[0] * tilesize, values[1]  * tilesize);
-                case setFontSize -> fontSize = values[0];
-                case setTextHeight -> textHeight = values[0];
-                case setLabelBackground -> {
-                    if(values[0] != 0.0){
+                case x -> pos.x = p1 * tilesize;
+                case y -> pos.y = p1 * tilesize;
+                case pos -> pos.set(p1 * tilesize, p2  * tilesize);
+                case fontSize -> fontSize = p1;
+                case textHeight -> textHeight = p1;
+                case labelBackground -> {
+                    if(p1 != 0.0){
                         flags |= WorldLabel.flagBackground;
                     }else{
                         flags &= ~WorldLabel.flagBackground;
                     }
                 }
-                case setLabelOutline -> {
-                    if(values[0] != 0.0){
+                case labelOutline -> {
+                    if(p1 != 0.0){
                         flags |= WorldLabel.flagOutline;
                     }else{
                         flags &= ~WorldLabel.flagOutline;
                     }
                 }
-                case setLabelFlags -> {
-                    flags = (values[0] != 0.0 ? WorldLabel.flagBackground : 0);
-                    if(values[1] != 0.0) flags |= WorldLabel.flagOutline;
+                case labelFlags -> {
+                    flags = (p1 != 0.0 ? WorldLabel.flagBackground : 0);
+                    if(p2 != 0.0) flags |= WorldLabel.flagOutline;
                 }
-                case setRadius -> radius = values[0];
-                case setRotation -> rotation = values[0];
-                case setShapeSides -> sides = (int)values[0];
-                default -> super.control(type, values);
+                case radius -> radius = p1;
+                case rotation -> rotation = p1;
+                case shapeSides -> sides = (int)p1;
+                default -> super.control(type, p1, p2, p3);
             }
         }
 
@@ -794,14 +794,14 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         }
 
         @Override
-        public void control(LMarkerControl type, float... values){
+        public void control(LMarkerControl type, float p1, float p2, float p3){
             switch(type){
-                case setX -> pos.x = (int)values[0];
-                case setY -> pos.y = (int)values[0];
-                case setPos -> pos.set((int)values[0], (int)values[1]);
-                case setRadius -> radius = values[0];
-                case setStroke -> stroke = values[0];
-                default -> super.control(type, values);
+                case x -> pos.x = (int)p1;
+                case y -> pos.y = (int)p1;
+                case pos -> pos.set((int)p1, (int)p2);
+                case radius -> radius = p1;
+                case stroke -> stroke = p1;
+                default -> super.control(type, p1, p2, p3);
             }
         }
 
@@ -855,23 +855,23 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         }
 
         @Override
-        public void control(LMarkerControl type, float... values){
+        public void control(LMarkerControl type, float p1, float p2, float p3){
             switch(type){
-                case setX -> pos.x = values[0] * tilesize;
-                case setY -> pos.y = values[0] * tilesize;
-                case setPos -> pos.set(values[0] * tilesize, values[1] * tilesize);
-                case setRadius -> radius = values[0];
-                case setRotation -> rotation = values[0];
-                case setStroke -> stroke = values[0];
-                case setShapeSides -> sides = (int)values[0];
-                case setShapeFill -> fill = (values[0] != 0.0);
-                case setShapeOutline -> outline = (values[0] != 0.0);
+                case x -> pos.x = p1 * tilesize;
+                case y -> pos.y = p1 * tilesize;
+                case pos -> pos.set(p1 * tilesize, p2 * tilesize);
+                case radius -> radius = p1;
+                case rotation -> rotation = p1;
+                case stroke -> stroke = p1;
+                case shapeSides -> sides = (int)p1;
+                case shapeFill -> fill = (p1 != 0.0);
+                case shapeOutline -> outline = (p1 != 0.0);
                 case setShape -> {
-                    sides = (int)values[0];
-                    fill = (values[1] != 0.0);
-                    outline = (values[2] != 0.0);
+                    sides = (int)p1;
+                    fill = (p2 != 0.0);
+                    outline = (p3 != 0.0);
                 }
-                default -> super.control(type, values);
+                default -> super.control(type, p1, p2, p3);
             }
         }
 
@@ -916,31 +916,31 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         }
 
         @Override
-        public void control(LMarkerControl type, float... values){
+        public void control(LMarkerControl type, float p1, float p2, float p3){
             switch(type){
-                case setX -> pos.x = values[0] * tilesize;
-                case setY -> pos.y = values[0] * tilesize;
-                case setPos -> pos.set(values[0] * tilesize, values[1] * tilesize);
-                case setFontSize -> fontSize = values[0];
-                case setLabelBackground -> {
-                    if(values[0] != 0.0){
+                case x -> pos.x = p1 * tilesize;
+                case y -> pos.y = p1 * tilesize;
+                case pos -> pos.set(p1 * tilesize, p2 * tilesize);
+                case fontSize -> fontSize = p1;
+                case labelBackground -> {
+                    if(p1 != 0.0){
                         flags |= WorldLabel.flagBackground;
                     }else{
                         flags &= ~WorldLabel.flagBackground;
                     }
                 }
-                case setLabelOutline -> {
-                    if(values[0] != 0.0){
+                case labelOutline -> {
+                    if(p1 != 0.0){
                         flags |= WorldLabel.flagOutline;
                     }else{
                         flags &= ~WorldLabel.flagOutline;
                     }
                 }
-                case setLabelFlags -> {
-                    flags = (values[0] != 0.0 ? WorldLabel.flagBackground : 0);
-                    if(values[1] != 0.0) flags |= WorldLabel.flagOutline;
+                case labelFlags -> {
+                    flags = (p1 != 0.0 ? WorldLabel.flagBackground : 0);
+                    if(p2 != 0.0) flags |= WorldLabel.flagOutline;
                 }
-                default -> super.control(type, values);
+                default -> super.control(type, p1, p2, p3);
             }
         }
 
@@ -976,17 +976,17 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public LineMarker(){}
 
         @Override
-        public void control(LMarkerControl type, float... values){
+        public void control(LMarkerControl type, float p1, float p2, float p3){
             switch(type){
-                case setX -> pos1.x = values[0] * tilesize;
-                case setY -> pos1.y = values[0] * tilesize;
-                case setPos -> pos1.set(values[0] * tilesize, values[1] * tilesize);
-                case setEndX -> pos2.x = values[0] * tilesize;
-                case setEndY -> pos2.y = values[0] * tilesize;
-                case setEndPos -> pos2.set(values[0] * tilesize, values[1] * tilesize);
-                case setStroke -> stroke = values[0];
-                case setShapeOutline -> outline = (values[0] != 0.0);
-                default -> super.control(type, values);
+                case x -> pos1.x = p1 * tilesize;
+                case y -> pos1.y = p1 * tilesize;
+                case pos -> pos1.set(p1 * tilesize, p2 * tilesize);
+                case endX -> pos2.x = p1 * tilesize;
+                case endY -> pos2.y = p1 * tilesize;
+                case endPos -> pos2.set(p1 * tilesize, p2 * tilesize);
+                case stroke -> stroke = p1;
+                case shapeOutline -> outline = (p1 != 0.0);
+                default -> super.control(type, p1, p2, p3);
             }
         }
 

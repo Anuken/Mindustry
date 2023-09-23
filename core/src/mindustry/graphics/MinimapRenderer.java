@@ -260,7 +260,7 @@ public class MinimapRenderer{
         });
 
         for(var marker : state.rules.markers.values()){
-            marker.drawMinimap(this);
+            if(marker != null)marker.draw();
         }
     }
 

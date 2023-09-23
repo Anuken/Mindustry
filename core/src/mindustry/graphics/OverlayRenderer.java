@@ -119,7 +119,7 @@ public class OverlayRenderer{
         });
 
         for(var marker : state.rules.markers.values()){
-            marker.draw();
+            if(marker != null)marker.draw();
         }
 
         if(player.dead()) return; //dead players don't draw
