@@ -690,6 +690,9 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public void draw(){
             if(hidden) return;
 
+            //in case some idiot decides to make 9999999 sides and freeze the game
+            int sides = Math.min(this.sides, 200);
+
             Lines.stroke(3f, Pal.gray);
             Lines.poly(pos.x, pos.y, sides, radius + 1f, rotation);
             Lines.stroke(1f, color);
@@ -731,7 +734,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                 }
                 case setRadius -> radius = values[0];
                 case setRotation -> rotation = values[0];
-                case setShapeSides -> sides = Math.min((int)values[0], 200);
+                case setShapeSides -> sides = (int)values[0];
                 default -> super.control(type, values);
             }
         }
@@ -860,11 +863,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                 case setRadius -> radius = values[0];
                 case setRotation -> rotation = values[0];
                 case setStroke -> stroke = values[0];
-                case setShapeSides -> sides = Math.min((int)values[0], 200);
+                case setShapeSides -> sides = (int)values[0];
                 case setShapeFill -> fill = (values[0] != 0.0);
                 case setShapeOutline -> outline = (values[0] != 0.0);
                 case setShape -> {
-                    sides = Math.min((int)values[0], 200);
+                    sides = (int)values[0];
                     fill = (values[1] != 0.0);
                     outline = (values[2] != 0.0);
                 }
