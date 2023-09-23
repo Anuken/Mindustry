@@ -311,7 +311,7 @@ public class TypeIO{
 
     public static @Nullable UnitCommand readCommand(Reads read){
         int val = read.ub();
-        return val == 255 ? null : UnitCommand.all.get(val);
+        return val == 255 || val >= UnitCommand.all.size ? null : UnitCommand.all.get(val);
     }
 
     public static void writeStance(Writes write, @Nullable UnitStance stance){
@@ -321,7 +321,7 @@ public class TypeIO{
     public static UnitStance readStance(Reads read){
         int val = read.ub();
         //never returns null
-        return val == 255 ? UnitStance.shoot : UnitStance.all.get(val);
+        return val == 255 || val >= UnitStance.all.size ? UnitStance.shoot : UnitStance.all.get(val);
     }
 
     public static void writeEntity(Writes write, Entityc entity){

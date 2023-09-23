@@ -15,7 +15,7 @@ public class UnitCommand{
 
     public static final UnitCommand
 
-    moveCommand = new UnitCommand("move", "right", u -> null){{
+    moveCommand = new UnitCommand("move", "right", null){{
         drawTarget = true;
         resetTarget = false;
     }},
@@ -32,13 +32,20 @@ public class UnitCommand{
         drawTarget = true;
         resetTarget = false;
     }},
-    loadPayloadCommand = new UnitCommand("loadPayload", "download", u -> null){{
+    loadUnitsCommand = new UnitCommand("loadUnits", "download", null){{
         switchToMove = false;
         drawTarget = true;
+        resetTarget = false;
     }},
-    unloadPayloadCommand = new UnitCommand("unloadPayload", "upload", u -> null){{
+    loadBlocksCommand = new UnitCommand("loadBlocks", "down", null){{
         switchToMove = false;
         drawTarget = true;
+        resetTarget = false;
+    }},
+    unloadPayloadCommand = new UnitCommand("unloadPayload", "upload", null){{
+        switchToMove = false;
+        drawTarget = true;
+        resetTarget = false;
     }};
 
     /** Unique ID number. */
@@ -59,7 +66,7 @@ public class UnitCommand{
     public UnitCommand(String name, String icon, Func<Unit, AIController> controller){
         this.name = name;
         this.icon = icon;
-        this.controller = controller;
+        this.controller = controller == null ? u -> null : controller;
 
         id = all.size;
         all.add(this);
