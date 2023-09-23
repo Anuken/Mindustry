@@ -1882,7 +1882,7 @@ public class LExecutor{
                         }else{
                             if(type == LMarkerControl.setText){
                                 marker.setText((exec.obj(p1) != null ? exec.obj(p1).toString() : "null"), true);
-                            }else if (type == LMarkerControl.flushText){
+                            }else if(type == LMarkerControl.flushText){
                                 marker.setText(exec.textBuffer.toString(), false);
                                 exec.textBuffer.setLength(0);
                             }
@@ -1890,7 +1890,14 @@ public class LExecutor{
                     }
                 }
             }
+
+            Call.setMarker(exec.numi(id), state.rules.markers.get(exec.numi(id)));
         }
+    }
+
+    @Remote(called = Loc.server, variants = Variant.both, unreliable = true)
+    public static void setMarker(int id, ObjectiveMarker marker){
+        state.rules.markers.put(id, marker);
     }
 
     //endregion
