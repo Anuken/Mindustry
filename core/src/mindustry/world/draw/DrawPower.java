@@ -13,6 +13,8 @@ import static mindustry.Vars.*;
 public class DrawPower extends DrawBlock{
     public TextureRegion emptyRegion, fullRegion;
     public String suffix = "-power";
+    /** Whether textures should be rotated with the building. */
+    public boolean rotate = false;
 
     public boolean drawPlan = true;
     /** If false, fades between emptyRegion and fullRegion instead of mixcol between empty and full colors. */
@@ -37,14 +39,14 @@ public class DrawPower extends DrawBlock{
         if(mixcol){
             Draw.color(emptyLightColor, fullLightColor, build.power.status);
             if(emptyRegion.found()){
-                Draw.rect(emptyRegion, build.x, build.y);
+                Draw.rect(emptyRegion, build.x, build.y, rotate ? build.rotdeg() : 0);
             }else{
                 Fill.square(build.x, build.y, (tilesize * build.block.size / 2f - 1) * Draw.xscl);
             }
         }else{
-            Draw.rect(emptyRegion, build.x, build.y);
+            Draw.rect(emptyRegion, build.x, build.y, rotate ? build.rotdeg() : 0);
             Draw.alpha(build.power.status);
-            Draw.rect(fullRegion, build.x, build.y);
+            Draw.rect(fullRegion, build.x, build.y, rotate ? build.rotdeg() : 0);
         }
         Draw.color();
         Draw.z(z);

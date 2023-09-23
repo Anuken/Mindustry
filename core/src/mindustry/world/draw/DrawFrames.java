@@ -11,8 +11,10 @@ public class DrawFrames extends DrawBlock{
     public int frames = 3;
     /** Ticks between frames. */
     public float interval = 5f;
-    /** If true, frames wil alternate back and forth in a sine wave. */
+    /** If true, frames will alternate back and forth in a sine wave. */
     public boolean sine = true;
+    /** Whether frames should be rotated with the building. */
+    public boolean rotate = false;
     public TextureRegion[] regions;
 
     @Override
@@ -21,7 +23,7 @@ public class DrawFrames extends DrawBlock{
             sine ?
                 regions[(int)Mathf.absin(build.totalProgress(), interval, frames - 0.001f)] :
                 regions[(int)((build.totalProgress() / interval) % frames)],
-            build.x, build.y);
+            build.x, build.y, rotate ? build.rotdeg() : 0);
     }
 
     @Override

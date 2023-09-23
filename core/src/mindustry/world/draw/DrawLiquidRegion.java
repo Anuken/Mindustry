@@ -12,6 +12,7 @@ public class DrawLiquidRegion extends DrawBlock{
     public TextureRegion liquid;
     public String suffix = "-liquid";
     public float alpha = 1f;
+    public boolean rotate = false;
 
     public DrawLiquidRegion(Liquid drawLiquid){
         this.drawLiquid = drawLiquid;
@@ -25,7 +26,8 @@ public class DrawLiquidRegion extends DrawBlock{
         Liquid drawn = drawLiquid != null ? drawLiquid : build.liquids.current();
         Drawf.liquid(liquid, build.x, build.y,
             build.liquids.get(drawn) / build.block.liquidCapacity * alpha,
-            drawn.color
+            drawn.color,
+            rotate ? build.rotdeg() : 0
         );
     }
 
