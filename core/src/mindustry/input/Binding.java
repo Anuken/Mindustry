@@ -50,6 +50,16 @@ public enum Binding implements KeyBind{
     unit_stance_4(KeyCode.unset),
     unit_stance_5(KeyCode.unset),
 
+    unit_command_1(KeyCode.unset),
+    unit_command_2(KeyCode.unset),
+    unit_command_3(KeyCode.unset),
+    unit_command_4(KeyCode.unset),
+    unit_command_5(KeyCode.unset),
+    unit_command_6(KeyCode.unset),
+    unit_command_7(KeyCode.unset),
+    unit_command_8(KeyCode.unset),
+    unit_command_9(KeyCode.unset),
+
     category_prev(KeyCode.comma, "blocks"),
     category_next(KeyCode.period),
 
