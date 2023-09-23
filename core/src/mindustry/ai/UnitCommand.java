@@ -4,9 +4,11 @@ import arc.*;
 import arc.func.*;
 import arc.scene.style.*;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.ai.types.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
+import mindustry.input.*;
 
 /** Defines a pattern of behavior that an RTS-controlled unit should follow. Shows up in the command UI. */
 public class UnitCommand{
@@ -15,34 +17,34 @@ public class UnitCommand{
 
     public static final UnitCommand
 
-    moveCommand = new UnitCommand("move", "right", null){{
+    moveCommand = new UnitCommand("move", "right", Binding.unit_command_move, null){{
         drawTarget = true;
         resetTarget = false;
     }},
-    repairCommand = new UnitCommand("repair", "modeSurvival", u -> new RepairAI()),
-    rebuildCommand = new UnitCommand("rebuild", "hammer", u -> new BuilderAI()),
-    assistCommand = new UnitCommand("assist", "players", u -> {
+    repairCommand = new UnitCommand("repair", "modeSurvival", Binding.unit_command_repair, u -> new RepairAI()),
+    rebuildCommand = new UnitCommand("rebuild", "hammer", Binding.unit_command_rebuild, u -> new BuilderAI()),
+    assistCommand = new UnitCommand("assist", "players", Binding.unit_command_assist, u -> {
         var ai = new BuilderAI();
         ai.onlyAssist = true;
         return ai;
     }),
-    mineCommand = new UnitCommand("mine", "production", u -> new MinerAI()),
-    boostCommand = new UnitCommand("boost", "up", u -> new BoostAI()){{
+    mineCommand = new UnitCommand("mine", "production", Binding.unit_command_mine, u -> new MinerAI()),
+    boostCommand = new UnitCommand("boost", "up", Binding.unit_command_boost, u -> new BoostAI()){{
         switchToMove = false;
         drawTarget = true;
         resetTarget = false;
     }},
-    loadUnitsCommand = new UnitCommand("loadUnits", "download", null){{
+    loadUnitsCommand = new UnitCommand("loadUnits", "download", Binding.unit_command_load_units, null){{
         switchToMove = false;
         drawTarget = true;
         resetTarget = false;
     }},
-    loadBlocksCommand = new UnitCommand("loadBlocks", "down", null){{
+    loadBlocksCommand = new UnitCommand("loadBlocks", "down", Binding.unit_command_load_blocks, null){{
         switchToMove = false;
         drawTarget = true;
         resetTarget = false;
     }},
-    unloadPayloadCommand = new UnitCommand("unloadPayload", "upload", null){{
+    unloadPayloadCommand = new UnitCommand("unloadPayload", "upload", Binding.unit_command_unload_payload, null){{
         switchToMove = false;
         drawTarget = true;
         resetTarget = false;
@@ -62,6 +64,8 @@ public class UnitCommand{
     public boolean drawTarget = false;
     /** Whether to reset targets when switching to or from this command. */
     public boolean resetTarget = true;
+    /** Key to press for this command. */
+    public @Nullable Binding keybind = null;
 
     public UnitCommand(String name, String icon, Func<Unit, AIController> controller){
         this.name = name;
@@ -70,6 +74,11 @@ public class UnitCommand{
 
         id = all.size;
         all.add(this);
+    }
+
+    public UnitCommand(String name, String icon, Binding keybind, Func<Unit, AIController> controller){
+        this(name, icon, controller);
+        this.keybind = keybind;
     }
 
     public String localized(){

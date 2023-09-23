@@ -68,27 +68,6 @@ public class PlacementFragment{
         Binding.block_select_down
     };
 
-    Binding[] stanceBindings = {
-        Binding.cancel_orders,
-        Binding.unit_stance_1,
-        Binding.unit_stance_2,
-        Binding.unit_stance_3,
-        Binding.unit_stance_4,
-        Binding.unit_stance_5,
-    };
-
-    Binding[] commandBindings = {
-        Binding.unit_command_1,
-        Binding.unit_command_2,
-        Binding.unit_command_3,
-        Binding.unit_command_4,
-        Binding.unit_command_5,
-        Binding.unit_command_6,
-        Binding.unit_command_7,
-        Binding.unit_command_8,
-        Binding.unit_command_9,
-    };
-
     public PlacementFragment(){
         Events.on(WorldLoadEvent.class, event -> {
             Core.app.post(() -> {
@@ -607,17 +586,17 @@ public class PlacementFragment{
                                 }
 
                                 //not a huge fan of running input logic here, but it's convenient as the stance arrays are all here...
-                                for(int i = 0; i < Math.min(stanceBindings.length, stances.size); i++){
+                                for(UnitStance stance : stances){
                                     //first stance must always be the stop stance
-                                    if(Core.input.keyTap(stanceBindings[i]) && (i != 0 || stances.get(0) == UnitStance.stop)){
-                                        Call.setUnitStance(player, control.input.selectedUnits.mapInt(un -> un.id).toArray(), stances.get(i));
+                                    if(stance.keybind != null && Core.input.keyTap(stance.keybind)){
+                                        Call.setUnitStance(player, control.input.selectedUnits.mapInt(un -> un.id).toArray(), stance);
                                     }
                                 }
 
-                                for(int i = 0; i < Math.min(commandBindings.length, commands.size); i++){
+                                for(UnitCommand command : commands){
                                     //first stance must always be the stop stance
-                                    if(Core.input.keyTap(commandBindings[i])){
-                                        Call.setUnitCommand(player, control.input.selectedUnits.mapInt(un -> un.id).toArray(), commands.get(i));
+                                    if(command.keybind != null && Core.input.keyTap(command.keybind)){
+                                        Call.setUnitCommand(player, control.input.selectedUnits.mapInt(un -> un.id).toArray(), command);
                                     }
                                 }
                             }
