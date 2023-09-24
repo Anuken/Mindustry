@@ -3,10 +3,8 @@ package mindustry.logic;
 public enum LMarkerControl{
     create("type", "x", "y"),
     remove,
-    hide,
-    show,
-    toggleVisibility,
     setVisibility("true/false"),
+    toggleVisibility,
     text("text"),
     flushText,
     x("x"),
