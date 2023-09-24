@@ -299,7 +299,7 @@ public class CommandAI extends AIController{
 
     @Override
     public float prefSpeed(){
-        return group == null ? super.prefSpeed() : group.minSpeed;
+        return group == null ? super.prefSpeed() : Math.min(group.minSpeed, unit.speed());
     }
 
     @Override

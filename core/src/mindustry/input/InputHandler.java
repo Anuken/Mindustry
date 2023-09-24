@@ -309,10 +309,18 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 }
             }
 
+            float minSpeed = 100000000f;
             for(int i = 0; i < groups.length; i ++){
                 var group = groups[i];
                 if(group != null && group.units.size > 0){
                     group.calculateFormation(targetAsVec, i);
+                    minSpeed = Math.min(group.minSpeed, minSpeed);
+                }
+            }
+
+            for(var group : groups){
+                if(group != null){
+                    group.minSpeed = minSpeed;
                 }
             }
         }

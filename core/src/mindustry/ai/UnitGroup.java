@@ -12,6 +12,7 @@ import mindustry.async.*;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.gen.*;
+import mindustry.world.blocks.environment.*;
 
 public class UnitGroup{
     public Seq<Unit> units = new Seq<>();
@@ -36,8 +37,13 @@ public class UnitGroup{
             positions[i * 2] = unit.x - cx;
             positions[i * 2 + 1] = unit.y - cy;
             unit.command().groupIndex = i;
-            minSpeed = Math.min(unit.speed(), minSpeed);
+
+            //don't factor in the floor speed multiplier
+            Floor on = unit.isFlying() ? Blocks.air.asFloor() : unit.floorOn();
+            minSpeed = Math.min(unit.speed() / on.speedMultiplier, minSpeed);
         }
+
+        if(Float.isInfinite(minSpeed) || Float.isNaN(minSpeed)) minSpeed = 999999f;
 
         //run on new thread to prevent stutter
         Vars.mainExecutor.submit(() -> {
