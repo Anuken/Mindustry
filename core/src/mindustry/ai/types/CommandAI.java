@@ -213,6 +213,11 @@ public class CommandAI extends AIController{
             boolean move = true;
             vecOut.set(targetPos);
 
+            //TODO: should the unit stop when it finds a target?
+            if(stance == UnitStance.patrol && target != null && unit.within(target, unit.type.range - 2f)){
+                move = false;
+            }
+
             if(unit.isGrounded() && stance != UnitStance.ram){
                 move = Vars.controlPath.getPathPosition(unit, pathId, targetPos, vecOut, noFound);
 

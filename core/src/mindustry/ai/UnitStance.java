@@ -3,33 +3,28 @@ package mindustry.ai;
 import arc.*;
 import arc.scene.style.*;
 import arc.struct.*;
+import arc.util.*;
+import mindustry.ctype.*;
 import mindustry.gen.*;
+import mindustry.input.*;
 
-public class UnitStance{
-    /** List of all stances by ID. */
+public class UnitStance extends MappableContent{
+    /** @deprecated now a content type, use the methods in Vars.content instead */
+    @Deprecated
     public static final Seq<UnitStance> all = new Seq<>();
 
-    public static final UnitStance
+    public static UnitStance stop, shoot, holdFire, pursueTarget, patrol, ram;
 
-    stop = new UnitStance("stop", "cancel"), //not a real stance, cannot be selected, just cancels ordewrs
-    shoot = new UnitStance("shoot", "commandAttack"),
-    holdFire = new UnitStance("holdfire", "none"),
-    pursueTarget = new UnitStance("pursuetarget", "right"),
-    patrol = new UnitStance("patrol", "refresh"),
-    ram = new UnitStance("ram", "rightOpen");
-
-    /** Unique ID number. */
-    public final int id;
-    /** Named used for tooltip/description. */
-    public final String name;
     /** Name of UI icon (from Icon class). */
     public final String icon;
+    /** Key to press for this stance. */
+    public @Nullable Binding keybind = null;
 
-    public UnitStance(String name, String icon){
-        this.name = name;
+    public UnitStance(String name, String icon, Binding keybind){
+        super(name);
         this.icon = icon;
+        this.keybind = keybind;
 
-        id = all.size;
         all.add(this);
     }
 
@@ -46,7 +41,21 @@ public class UnitStance{
     }
 
     @Override
+    public ContentType getContentType(){
+        return ContentType.unitStance;
+    }
+
+    @Override
     public String toString(){
         return "UnitStance:" + name;
+    }
+
+    public static void loadAll(){
+        stop = new UnitStance("stop", "cancel", Binding.cancel_orders);
+        shoot = new UnitStance("shoot", "commandAttack", Binding.unit_stance_shoot);
+        holdFire = new UnitStance("holdfire", "none", Binding.unit_stance_hold_fire);
+        pursueTarget = new UnitStance("pursuetarget", "right", Binding.unit_stance_pursue_target);
+        patrol = new UnitStance("patrol", "refresh", Binding.unit_stance_patrol);
+        ram = new UnitStance("ram", "rightOpen", Binding.unit_stance_ram);
     }
 }

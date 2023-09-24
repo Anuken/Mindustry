@@ -112,7 +112,7 @@ public class ContentParser{
         });
         put(UnitCommand.class, (type, data) -> {
             if(data.isString()){
-               var cmd = UnitCommand.all.find(u -> u.name.equals(data.asString()));
+               var cmd = content.unitCommand(data.asString());
                if(cmd != null){
                    return cmd;
                }else{
@@ -124,7 +124,7 @@ public class ContentParser{
         });
         put(UnitStance.class, (type, data) -> {
             if(data.isString()){
-                var cmd = UnitStance.all.find(u -> u.name.equals(data.asString()));
+                var cmd = content.unitStance(data.asString());
                 if(cmd != null){
                     return cmd;
                 }else{

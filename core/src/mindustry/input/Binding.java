@@ -1,9 +1,9 @@
 package mindustry.input;
 
-import arc.*;
 import arc.KeyBinds.*;
 import arc.input.InputDevice.*;
 import arc.input.*;
+import mindustry.*;
 
 public enum Binding implements KeyBind{
     move_x(new Axis(KeyCode.a, KeyCode.d), "general"),
@@ -44,11 +44,21 @@ public enum Binding implements KeyBind{
 
     cancel_orders(KeyCode.unset),
 
-    unit_stance_1(KeyCode.unset),
-    unit_stance_2(KeyCode.unset),
-    unit_stance_3(KeyCode.unset),
-    unit_stance_4(KeyCode.unset),
-    unit_stance_5(KeyCode.unset),
+    unit_stance_shoot(KeyCode.unset),
+    unit_stance_hold_fire(KeyCode.unset),
+    unit_stance_pursue_target(KeyCode.unset),
+    unit_stance_patrol(KeyCode.unset),
+    unit_stance_ram(KeyCode.unset),
+
+    unit_command_move(KeyCode.unset),
+    unit_command_repair(KeyCode.unset),
+    unit_command_rebuild(KeyCode.unset),
+    unit_command_assist(KeyCode.unset),
+    unit_command_mine(KeyCode.unset),
+    unit_command_boost(KeyCode.unset),
+    unit_command_load_units(KeyCode.unset),
+    unit_command_load_blocks(KeyCode.unset),
+    unit_command_unload_payload(KeyCode.unset),
 
     category_prev(KeyCode.comma, "blocks"),
     category_next(KeyCode.period),
@@ -69,7 +79,7 @@ public enum Binding implements KeyBind{
     block_select_10(KeyCode.num0),
 
     zoom(new Axis(KeyCode.scroll), "view"),
-    menu(Core.app.isAndroid() ? KeyCode.back : KeyCode.escape),
+    menu(Vars.android ? KeyCode.back : KeyCode.escape),
     fullscreen(KeyCode.f11),
     pause(KeyCode.space),
     minimap(KeyCode.m),
