@@ -16,6 +16,7 @@ import mindustry.gen.*;
 public class UnitGroup{
     public Seq<Unit> units = new Seq<>();
     public float[] positions;
+    public float minSpeed = 999999f;
     public volatile boolean valid;
     
     public void calculateFormation(Vec2 dest, int collisionLayer){
@@ -35,6 +36,7 @@ public class UnitGroup{
             positions[i * 2] = unit.x - cx;
             positions[i * 2 + 1] = unit.y - cy;
             unit.command().groupIndex = i;
+            minSpeed = Math.min(unit.speed(), minSpeed);
         }
 
         //run on new thread to prevent stutter

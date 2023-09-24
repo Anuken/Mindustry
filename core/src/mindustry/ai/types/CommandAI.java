@@ -298,6 +298,11 @@ public class CommandAI extends AIController{
     }
 
     @Override
+    public float prefSpeed(){
+        return group == null ? super.prefSpeed() : group.minSpeed;
+    }
+
+    @Override
     public boolean shouldFire(){
         return stance != UnitStance.holdFire;
     }
