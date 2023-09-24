@@ -10,6 +10,7 @@ import arc.util.*;
 import mindustry.ai.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.async.*;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
@@ -388,6 +389,11 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             setType(def);
         }
         controller(controller);
+    }
+
+    /** @return the collision layer to use for unit physics. Returning anything outside of PhysicsProcess contents will crash the game. */
+    public int collisionLayer(){
+        return type.allowLegStep && type.legPhysicsLayer ? PhysicsProcess.layerLegs : isGrounded() ? PhysicsProcess.layerGround : PhysicsProcess.layerFlying;
     }
 
     /** @return pathfinder path type for calculating costs */

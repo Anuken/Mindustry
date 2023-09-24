@@ -397,6 +397,30 @@ public class ControlPathfinder{
         return true;
     }
 
+    /** @return 0 if nothing was hit, otherwise the packed coordinates. This is an internal function and will likely be moved - do not use!*/
+    public static int raycastFast(int team, PathCost type, int x1, int y1, int x2, int y2){
+        int ww = world.width(), wh = world.height();
+        int x = x1, dx = Math.abs(x2 - x), sx = x < x2 ? 1 : -1;
+        int y = y1, dy = Math.abs(y2 - y), sy = y < y2 ? 1 : -1;
+        int err = dx - dy;
+
+        while(x >= 0 && y >= 0 && x < ww && y < wh){
+            if(solid(team, type, x + y * wwidth, true)) return Point2.pack(x, y);
+            if(x == x2 && y == y2) return 0;
+
+            //no diagonals
+            if(2 * err + dy > dx - 2 * err){
+                err -= dy;
+                x += sx;
+            }else{
+                err += dx;
+                y += sy;
+            }
+        }
+
+        return 0;
+    }
+
     static boolean cast(int team, PathCost cost, int from, int to){
         return raycast(team, cost, from % wwidth, from / wwidth, to % wwidth, to / wwidth);
     }

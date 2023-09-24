@@ -55,7 +55,7 @@ public class UnitCommand extends MappableContent{
     }
 
     public char getEmoji() {
-        return (char) Iconc.codes.get(icon, Iconc.cancel);
+        return (char)Iconc.codes.get(icon, Iconc.cancel);
     }
 
     @Override
