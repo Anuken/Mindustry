@@ -971,6 +971,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                 case endPos -> pos2.set((float)p1 * tilesize, (float)p2 * tilesize);
                 case stroke -> stroke = (float)p1;
                 case shapeOutline -> outline = ((Math.abs(p1) >= 1e-5));
+                case color -> color.set(Tmp.c1.fromDouble(p1));
                 default -> super.control(type, p1, p2, p3);
             }
         }
