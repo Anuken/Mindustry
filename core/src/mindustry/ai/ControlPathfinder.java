@@ -257,6 +257,10 @@ public class ControlPathfinder{
                     float dst = unit.dst2(tile);
                     //TODO maybe put this on a timer since raycasts can be expensive?
                     if(dst < minDst && !permissiveRaycast(team, costType, tileX, tileY, tile.x, tile.y)){
+                        if(avoid(req.team, req.cost, items[i + 1])){
+                            range = 0.5f;
+                        }
+
                         req.pathIndex = Math.max(dst <= range * range ? i + 1 : i, req.pathIndex);
                         minDst = Math.min(dst, minDst);
                     }
@@ -288,6 +292,10 @@ public class ControlPathfinder{
                         if(Angles.angleDist(angleToNext, angleToDest) > 80f && !unit.within(tile, 1f)){
                             req.forceRecalculate();
                         }
+                    }
+
+                    if(avoid(req.team, req.cost, items[req.rayPathIndex])){
+                        range = 0.5f;
                     }
 
                     if(unit.within(tile, range)){
@@ -337,7 +345,7 @@ public class ControlPathfinder{
     }
 
     private static boolean raycast(int team, PathCost type, int x1, int y1, int x2, int y2){
-        int ww = world.width(), wh = world.height();
+        int ww = wwidth, wh = wheight;
         int x = x1, dx = Math.abs(x2 - x), sx = x < x2 ? 1 : -1;
         int y = y1, dy = Math.abs(y2 - y), sy = y < y2 ? 1 : -1;
         int e2, err = dx - dy;
@@ -375,7 +383,7 @@ public class ControlPathfinder{
     }
 
     private static boolean permissiveRaycast(int team, PathCost type, int x1, int y1, int x2, int y2){
-        int ww = world.width(), wh = world.height();
+        int ww = wwidth, wh = wheight;
         int x = x1, dx = Math.abs(x2 - x), sx = x < x2 ? 1 : -1;
         int y = y1, dy = Math.abs(y2 - y), sy = y < y2 ? 1 : -1;
         int err = dx - dy;
