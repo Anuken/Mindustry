@@ -620,7 +620,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public void control(LMarkerControl type, double p1, double p2, double p3){
             switch(type){
                 case toggleVisibility -> hidden = !hidden;
-                case setVisibility -> hidden = (p1 == 0);
+                case setVisibility -> hidden = ((Math.abs(p1) < 1e-5));
             }
         }
         public void setText(String text, boolean fetch){}
@@ -712,22 +712,22 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                 case fontSize -> fontSize = (float)p1;
                 case textHeight -> textHeight = (float)p1;
                 case labelBackground -> {
-                    if(p1 != 0.0){
+                    if((Math.abs(p1) >= 1e-5)){
                         flags |= WorldLabel.flagBackground;
                     }else{
                         flags &= ~WorldLabel.flagBackground;
                     }
                 }
                 case labelOutline -> {
-                    if(p1 != 0.0){
+                    if((Math.abs(p1) >= 1e-5)){
                         flags |= WorldLabel.flagOutline;
                     }else{
                         flags &= ~WorldLabel.flagOutline;
                     }
                 }
                 case labelFlags -> {
-                    flags = (p1 != 0.0 ? WorldLabel.flagBackground : 0);
-                    if(p2 != 0.0) flags |= WorldLabel.flagOutline;
+                    flags = ((Math.abs(p1) >= 1e-5) ? WorldLabel.flagBackground : 0);
+                    if((Math.abs(p2) >= 1e-5)) flags |= WorldLabel.flagOutline;
                 }
                 case radius -> radius = (float)p1;
                 case rotation -> rotation = (float)p1;
@@ -853,12 +853,12 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                 case rotation -> rotation = (float)p1;
                 case stroke -> stroke = (float)p1;
                 case shapeSides -> sides = (int)p1;
-                case shapeFill -> fill = (p1 != 0.0);
-                case shapeOutline -> outline = (p1 != 0.0);
+                case shapeFill -> fill = (Math.abs(p1) >= 1e-5);
+                case shapeOutline -> outline = (Math.abs(p1) >= 1e-5);
                 case setShape -> {
                     sides = (int)p1;
-                    fill = (p2 != 0.0);
-                    outline = (p3 != 0.0);
+                    fill = (Math.abs(p2) >= 1e-5);
+                    outline = (Math.abs(p3) >= 1e-5);
                 }
                 case color -> color.set(Tmp.c1.fromDouble(p1));
                 default -> super.control(type, p1, p2, p3);
@@ -908,22 +908,22 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                 case pos -> pos.set((float)p1 * tilesize, (float)p2 * tilesize);
                 case fontSize -> fontSize = (float)p1;
                 case labelBackground -> {
-                    if(p1 != 0.0){
+                    if((Math.abs(p1) >= 1e-5)){
                         flags |= WorldLabel.flagBackground;
                     }else{
                         flags &= ~WorldLabel.flagBackground;
                     }
                 }
                 case labelOutline -> {
-                    if(p1 != 0.0){
+                    if((Math.abs(p1) >= 1e-5)){
                         flags |= WorldLabel.flagOutline;
                     }else{
                         flags &= ~WorldLabel.flagOutline;
                     }
                 }
                 case labelFlags -> {
-                    flags = (p1 != 0.0 ? WorldLabel.flagBackground : 0);
-                    if(p2 != 0.0) flags |= WorldLabel.flagOutline;
+                    flags = ((Math.abs(p1) >= 1e-5) ? WorldLabel.flagBackground : 0);
+                    if((Math.abs(p2) >= 1e-5)) flags |= WorldLabel.flagOutline;
                 }
                 default -> super.control(type, p1, p2, p3);
             }
@@ -970,7 +970,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                 case endY -> pos2.y = (float)p1 * tilesize;
                 case endPos -> pos2.set((float)p1 * tilesize, (float)p2 * tilesize);
                 case stroke -> stroke = (float)p1;
-                case shapeOutline -> outline = (p1 != 0.0);
+                case shapeOutline -> outline = ((Math.abs(p1) >= 1e-5));
                 default -> super.control(type, p1, p2, p3);
             }
         }

@@ -16,7 +16,6 @@ import mindustry.core.GameState.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
-import mindustry.game.MapObjectives.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.logic.*;
