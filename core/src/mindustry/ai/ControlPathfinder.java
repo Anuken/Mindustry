@@ -344,6 +344,10 @@ public class ControlPathfinder{
         requests.clear();
     }
 
+    public static boolean isNearObstacle(Unit unit, int x1, int y1, int x2, int y2){
+        return raycast(unit.team().id, unit.type.pathCost, x1, y1, x2, y2);
+    }
+
     private static boolean raycast(int team, PathCost type, int x1, int y1, int x2, int y2){
         int ww = wwidth, wh = wheight;
         int x = x1, dx = Math.abs(x2 - x), sx = x < x2 ? 1 : -1;

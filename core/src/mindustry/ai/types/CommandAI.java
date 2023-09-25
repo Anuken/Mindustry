@@ -1,5 +1,6 @@
 package mindustry.ai.types;
 
+import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
@@ -16,7 +17,7 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class CommandAI extends AIController{
-    protected static final int maxCommandQueueSize = 50;
+    protected static final int maxCommandQueueSize = 50, avoidInterval = 5;
     protected static final Vec2 vecOut = new Vec2(), vecMovePos = new Vec2();
     protected static final boolean[] noFound = {false};
 
@@ -32,6 +33,8 @@ public class CommandAI extends AIController{
     protected boolean stopAtTarget, stopWhenInRange;
     protected Vec2 lastTargetPos;
     protected int pathId = -1;
+    protected boolean blockingUnit;
+    protected float timeSpentBlocked;
 
     /** Stance, usually related to firing mode. */
     public UnitStance stance = UnitStance.shoot;
@@ -205,12 +208,34 @@ public class CommandAI extends AIController{
             }
 
             if(unit.isGrounded() && stance != UnitStance.ram){
-                move = Vars.controlPath.getPathPosition(unit, pathId, vecMovePos, vecOut, noFound);
+                if(timer.get(timerTarget3, avoidInterval)){
+                    Vec2 dstPos = Tmp.v1.trns(unit.rotation, unit.hitSize/2f);
+                    float max = unit.hitSize/2f;
+                    float radius = Math.max(7f, max);
+                    float margin = 4f;
+                    blockingUnit = Units.nearbyCheck(unit.x + dstPos.x - radius/2f, unit.y + dstPos.y - radius/2f, radius, radius,
+                        u -> u != unit && u.within(unit, u.hitSize/2f + unit.hitSize/2f + margin) && u.controller() instanceof CommandAI ai && ai.targetPos != null &&
+                        //stop for other unit only if it's closer to the target
+                        (ai.targetPos.equals(targetPos) && u.dst2(targetPos) < unit.dst2(targetPos)) &&
+                        //don't stop if they're facing the same way
+                        !Angles.within(unit.rotation, u.rotation, 15f) &&
+                        //must be near an obstacle, stopping in open ground is pointless
+                        ControlPathfinder.isNearObstacle(unit, unit.tileX(), unit.tileY(), u.tileX(), u.tileY()));
+                }
+
+                if(blockingUnit){
+                    timeSpentBlocked += Time.delta;
+                }else{
+                    timeSpentBlocked = 0f;
+                }
+
+                //if you've spent 3 seconds stuck, something is wrong, move regardless
+                move = Vars.controlPath.getPathPosition(unit, pathId, vecMovePos, vecOut, noFound) && (!blockingUnit || timeSpentBlocked > 60f * 3f);
                 //we've reached the final point if the returned coordinate is equal to the supplied input
                 isFinalPoint &= vecMovePos.epsilonEquals(vecOut, 4.1f);
 
                 //if the path is invalid, stop trying and record the end as unreachable
-                if(unit.team.isAI() && (noFound[0] || unit.isPathImpassable(World.toTile(vecMovePos.x), World.toTile(vecMovePos.y)) )){
+                if(unit.team.isAI() && (noFound[0] || unit.isPathImpassable(World.toTile(vecMovePos.x), World.toTile(vecMovePos.y)))){
                     if(attackTarget instanceof Building build){
                         unreachableBuildings.addUnique(build.pos());
                     }
@@ -277,6 +302,11 @@ public class CommandAI extends AIController{
 
             if(prev != null && stance == UnitStance.patrol){
                 commandQueue.add(prev.cpy());
+            }
+
+            //make sure spot in formation is reachable
+            if(group != null){
+                group.updateRaycast(groupIndex, next instanceof Vec2 position ? position : Tmp.v3.set(next));
             }
         }else{
             if(group != null){
