@@ -1867,7 +1867,7 @@ public class LExecutor{
                     marker = MapObjectives.allMarkerTypes.get(type).get();
                     if(marker != null){
                         state.rules.markers.put(exec.numi(id), marker);
-                        marker.control(LMarkerControl.pos, exec.numf(p2), exec.numf(p3), 0);
+                        marker.control(LMarkerControl.pos, exec.num(p2), exec.num(p3), 0);
                     }
                 }
                 return;
@@ -1881,8 +1881,7 @@ public class LExecutor{
 
             Var var = exec.var(p1);
             if(!var.isobj){
-                if(type == LMarkerControl.color) marker.setColor(exec.num(p1));
-                else marker.control(type, exec.numf(p1), exec.numf(p2), exec.numf(p3));
+                marker.control(type, exec.num(p1), exec.num(p2), exec.num(p3));
             }else{
                 if(type == LMarkerControl.text){
                     marker.setText((exec.obj(p1) != null ? exec.obj(p1).toString() : "null"), true);

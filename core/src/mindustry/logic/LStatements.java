@@ -1940,7 +1940,7 @@ public class LStatements{
                     type = t;
                     rebuild(table);
                 }, 2, cell -> cell.size(140, 50)));
-            }, Styles.logict, () -> {}).size(210, 40).color(table.color).left().padLeft(2);
+            }, Styles.logict, () -> {}).size(190, 40).color(table.color).left().padLeft(2);
 
             table.add(" marker# ");
 
