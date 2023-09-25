@@ -273,7 +273,7 @@ public class CommandAI extends AIController{
                 attackTarget = null;
             }
 
-            if(unit.isFlying()){
+            if(unit.isFlying() && move){
                 unit.lookAt(vecMovePos);
             }else{
                 faceTarget();
