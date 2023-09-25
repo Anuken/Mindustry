@@ -17,7 +17,7 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class CommandAI extends AIController{
-    protected static final int maxCommandQueueSize = 50, avoidInterval = 5;
+    protected static final int maxCommandQueueSize = 50, avoidInterval = 10;
     protected static final Vec2 vecOut = new Vec2(), vecMovePos = new Vec2();
     protected static final boolean[] noFound = {false};
 
@@ -223,14 +223,20 @@ public class CommandAI extends AIController{
                         ControlPathfinder.isNearObstacle(unit, unit.tileX(), unit.tileY(), u.tileX(), u.tileY()));
                 }
 
+                float maxBlockTime = 60f * 5f;
+
                 if(blockingUnit){
                     timeSpentBlocked += Time.delta;
+
+                    if(timeSpentBlocked >= maxBlockTime*2f){
+                        timeSpentBlocked = 0f;
+                    }
                 }else{
                     timeSpentBlocked = 0f;
                 }
 
                 //if you've spent 3 seconds stuck, something is wrong, move regardless
-                move = Vars.controlPath.getPathPosition(unit, pathId, vecMovePos, vecOut, noFound) && (!blockingUnit || timeSpentBlocked > 60f * 3f);
+                move = Vars.controlPath.getPathPosition(unit, pathId, vecMovePos, vecOut, noFound) && (!blockingUnit || timeSpentBlocked > maxBlockTime);
                 //we've reached the final point if the returned coordinate is equal to the supplied input
                 isFinalPoint &= vecMovePos.epsilonEquals(vecOut, 4.1f);
 

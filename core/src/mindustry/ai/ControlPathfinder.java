@@ -263,6 +263,8 @@ public class ControlPathfinder{
 
                         req.pathIndex = Math.max(dst <= range * range ? i + 1 : i, req.pathIndex);
                         minDst = Math.min(dst, minDst);
+                    }else if(dst <= 1f){
+                        req.pathIndex = Math.min(Math.max(i + 1, req.pathIndex), len - 1);
                     }
                 }
 
