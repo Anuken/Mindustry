@@ -2558,5 +2558,23 @@ public class Fx{
 
         stroke(data.region.height * scl);
         line(data.region, data.a.x + ox, data.a.y + oy, data.b.x + ox, data.b.y + oy, false);
-    }).layer(Layer.groundUnit + 5f);
+    }).layer(Layer.groundUnit + 5f),
+
+    debugLine = new Effect(90f, 1000000000000f, e -> {
+       if(!(e.data instanceof Vec2[] vec)) return;
+
+       Draw.color(e.color);
+       Lines.stroke(1f);
+
+       if(vec.length == 2){
+           Lines.line(vec[0].x, vec[0].y, vec[1].x, vec[1].y);
+       }else{
+           Lines.beginLine();
+           for(Vec2 v : vec)
+               Lines.linePoint(v.x, v.y);
+           Lines.endLine();
+       }
+
+       Draw.reset();
+    });
 }

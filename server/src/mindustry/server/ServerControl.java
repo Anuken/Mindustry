@@ -349,7 +349,7 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("host", "[mapname] [mode]", "Open the server. Will default to survival and a random map if not specified.", arg -> {
-            if(state.is(State.playing)){
+            if(state.isGame()){
                 err("Already hosting. Type 'stop' to stop hosting first.");
                 return;
             }
@@ -501,7 +501,7 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("say", "<message...>", "Send a message to all players.", arg -> {
-            if(!state.is(State.playing)){
+            if(!state.isGame()){
                 err("Not hosting. Host a game first.");
                 return;
             }
@@ -575,7 +575,7 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("fillitems", "[team]", "Fill the core with items.", arg -> {
-            if(!state.is(State.playing)){
+            if(!state.isGame()){
                 err("Not playing. Host first.");
                 return;
             }
@@ -750,7 +750,7 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("kick", "<username...>", "Kick a person by name.", arg -> {
-            if(!state.is(State.playing)){
+            if(!state.isGame()){
                 err("Not hosting a game yet. Calm down.");
                 return;
             }
@@ -843,7 +843,7 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("admin", "<add/remove> <username/ID...>", "Make an online user admin", arg -> {
-            if(!state.is(State.playing)){
+            if(!state.isGame()){
                 err("Open the server first.");
                 return;
             }
@@ -902,7 +902,7 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("runwave", "Trigger the next wave.", arg -> {
-            if(!state.is(State.playing)){
+            if(!state.isGame()){
                 err("Not hosting. Host a game first.");
             }else{
                 logic.runWave();
@@ -911,7 +911,7 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("load", "<slot>", "Load a save from a slot.", arg -> {
-            if(state.is(State.playing)){
+            if(state.isGame()){
                 err("Already hosting. Type 'stop' to stop hosting first.");
                 return;
             }
@@ -937,7 +937,7 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("save", "<slot>", "Save game state to a slot.", arg -> {
-            if(!state.is(State.playing)){
+            if(!state.isGame()){
                 err("Not hosting. Host a game first.");
                 return;
             }
