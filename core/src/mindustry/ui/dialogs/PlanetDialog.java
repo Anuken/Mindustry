@@ -634,6 +634,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                                 newPresets.clear();
                                 state.planet = planet;
 
+                                selected = null;
+                                updateSelected();
                                 rebuildExpand();
                             }
                             settings.put("lastplanet", planet.name);
