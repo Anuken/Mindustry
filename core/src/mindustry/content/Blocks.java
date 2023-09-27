@@ -1510,6 +1510,7 @@ public class Blocks{
         copperWall = new Wall("copper-wall"){{
             requirements(Category.defense, with(Items.copper, 6));
             health = 80 * wallHealthMultiplier;
+            armor = 2f;
             researchCostMultiplier = 0.1f;
             envDisabled |= Env.scorching;
         }};
@@ -1517,6 +1518,7 @@ public class Blocks{
         copperWallLarge = new Wall("copper-wall-large"){{
             requirements(Category.defense, ItemStack.mult(copperWall.requirements, 4));
             health = 80 * 4 * wallHealthMultiplier;
+            armor = 2f;
             size = 2;
             envDisabled |= Env.scorching;
         }};
@@ -1524,6 +1526,7 @@ public class Blocks{
         titaniumWall = new Wall("titanium-wall"){{
             requirements(Category.defense, with(Items.titanium, 6));
             health = 110 * wallHealthMultiplier;
+            armor = 5f;
             envDisabled |= Env.scorching;
         }};
 
@@ -1531,12 +1534,14 @@ public class Blocks{
             requirements(Category.defense, ItemStack.mult(titaniumWall.requirements, 4));
             health = 110 * wallHealthMultiplier * 4;
             size = 2;
+            armor = 5f;
             envDisabled |= Env.scorching;
         }};
 
         plastaniumWall = new Wall("plastanium-wall"){{
             requirements(Category.defense, with(Items.plastanium, 5, Items.metaglass, 2));
             health = 125 * wallHealthMultiplier;
+            armor = 8f;
             insulated = true;
             absorbLasers = true;
             schematicPriority = 10;
@@ -1547,6 +1552,7 @@ public class Blocks{
             requirements(Category.defense, ItemStack.mult(plastaniumWall.requirements, 4));
             health = 125 * wallHealthMultiplier * 4;
             size = 2;
+            armor = 8f;
             insulated = true;
             absorbLasers = true;
             schematicPriority = 10;
@@ -1556,6 +1562,7 @@ public class Blocks{
         thoriumWall = new Wall("thorium-wall"){{
             requirements(Category.defense, with(Items.thorium, 6));
             health = 200 * wallHealthMultiplier;
+            armor = 11f;
             envDisabled |= Env.scorching;
         }};
 
@@ -1563,12 +1570,14 @@ public class Blocks{
             requirements(Category.defense, ItemStack.mult(thoriumWall.requirements, 4));
             health = 200 * wallHealthMultiplier * 4;
             size = 2;
+            armor = 11f;
             envDisabled |= Env.scorching;
         }};
 
         phaseWall = new Wall("phase-wall"){{
             requirements(Category.defense, with(Items.phaseFabric, 6));
             health = 150 * wallHealthMultiplier;
+            armor = 10f;
             chanceDeflect = 10f;
             flashHit = true;
             envDisabled |= Env.scorching;
@@ -1578,6 +1587,7 @@ public class Blocks{
             requirements(Category.defense, ItemStack.mult(phaseWall.requirements, 4));
             health = 150 * 4 * wallHealthMultiplier;
             size = 2;
+            armor = 10f;
             chanceDeflect = 10f;
             flashHit = true;
             envDisabled |= Env.scorching;
@@ -1586,6 +1596,7 @@ public class Blocks{
         surgeWall = new Wall("surge-wall"){{
             requirements(Category.defense, with(Items.surgeAlloy, 6));
             health = 230 * wallHealthMultiplier;
+            armor = 16f;
             lightningChance = 0.05f;
             envDisabled |= Env.scorching;
         }};
@@ -1593,6 +1604,7 @@ public class Blocks{
         surgeWallLarge = new Wall("surge-wall-large"){{
             requirements(Category.defense, ItemStack.mult(surgeWall.requirements, 4));
             health = 230 * 4 * wallHealthMultiplier;
+            armor = 16f;
             size = 2;
             lightningChance = 0.05f;
             envDisabled |= Env.scorching;
@@ -1601,6 +1613,7 @@ public class Blocks{
         door = new Door("door"){{
             requirements(Category.defense, with(Items.titanium, 6, Items.silicon, 4));
             health = 100 * wallHealthMultiplier;
+            armor = 4f;
             envDisabled |= Env.scorching;
         }};
 
@@ -1609,6 +1622,7 @@ public class Blocks{
             openfx = Fx.dooropenlarge;
             closefx = Fx.doorcloselarge;
             health = 100 * 4 * wallHealthMultiplier;
+            armor = 4f;
             size = 2;
             envDisabled |= Env.scorching;
         }};
@@ -2906,6 +2920,7 @@ public class Blocks{
             itemCapacity = 9000;
             size = 4;
             thrusterLength = 34/4f;
+            armor = 4f;
 
             unitCapModifier = 16;
             researchCostMultiplier = 0.07f;
@@ -2919,6 +2934,7 @@ public class Blocks{
             itemCapacity = 13000;
             size = 5;
             thrusterLength = 40/4f;
+            armor = 11f;
 
             unitCapModifier = 24;
             researchCostMultiplier = 0.11f;
