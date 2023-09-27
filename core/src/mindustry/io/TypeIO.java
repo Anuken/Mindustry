@@ -6,6 +6,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
+import arc.util.serialization.*;
 import mindustry.ai.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
@@ -16,6 +17,7 @@ import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
+import mindustry.game.MapObjectives.*;
 import mindustry.gen.*;
 import mindustry.logic.*;
 import mindustry.net.Administration.*;
@@ -653,6 +655,19 @@ public class TypeIO{
         int length = read.i();
         String string = new String(read.b(new byte[length]), charset);
         return JsonIO.read(MapObjectives.class, string);
+    }
+
+    public static void writeObjectiveMarker(Writes write, ObjectiveMarker marker){
+        String string = JsonIO.json.toJson(marker, MapObjectives.ObjectiveMarker.class);
+        byte[] bytes = string.getBytes(charset);
+        write.i(bytes.length);
+        write.b(bytes);
+    }
+
+    public static ObjectiveMarker readObjectiveMarker(Reads read){
+        int length = read.i();
+        String string = new String(read.b(new byte[length]), charset);
+        return JsonIO.read(MapObjectives.ObjectiveMarker.class, string);
     }
 
     public static void writeVecNullable(Writes write, @Nullable Vec2 v){

@@ -10,6 +10,7 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.ctype.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.LCanvas.*;
@@ -1394,7 +1395,7 @@ public class LStatements{
                 }
                 case ban, unban -> {
                     table.add(" block/unit ");
-                    
+
                     field(table, value, s -> value = s);
                 }
                 default -> {
@@ -1912,6 +1913,88 @@ public class LStatements{
         @Override
         public LInstruction build(LAssembler builder){
             return new SetPropI(builder.var(type), builder.var(of), builder.var(value));
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.world;
+        }
+    }
+
+    @RegisterStatement("marker")
+    public static class MarkerStatement extends LStatement{
+        public LMarkerControl type = LMarkerControl.create;
+        public String id = "0", p1 = "0", p2 = "0", p3 = "0";
+
+        @Override
+        public void build(Table table){
+            rebuild(table);
+        }
+
+        void rebuild(Table table){
+            table.clearChildren();
+
+            table.button(b -> {
+                b.label(() -> type.name());
+                b.clicked(() -> showSelect(b, LMarkerControl.all, type, t -> {
+                    type = t;
+                    rebuild(table);
+                }, 2, cell -> cell.size(140, 50)));
+            }, Styles.logict, () -> {}).size(190, 40).color(table.color).left().padLeft(2);
+
+            table.add(" marker# ");
+
+            fields(table, id, str -> id = str);
+
+            if(type == LMarkerControl.create){
+                fields(table, type.params[0], p1, v -> p1 = v).padRight(0f).left();
+                table.button(b -> {
+                    b.image(Icon.pencilSmall);
+                    b.clicked(() -> showSelectTable(b, (t, hide) -> {
+                        t.row();
+                        t.table(i -> {
+                            i.left();
+                            int c = 0;
+                            for(var gen : MapObjectives.allMarkerTypes){
+                                var marker = gen.get();
+                                i.button(marker.typeName(), Styles.flatt, () -> {
+                                    p1 = Integer.toString(MapObjectives.allMarkerTypes.indexOf(gen));
+                                    rebuild(table);
+                                    hide.run();
+                                }).size(140, 40);
+
+                                if(++c % 2 == 0) i.row();
+                            }
+                        }).colspan(3).width(280f).left();
+                    }));
+                }, Styles.logict, () -> {}).size(40f).padLeft(-2).color(table.color);
+                fields(table, type.params[1], p2, v -> p2 = v);
+                fields(table, type.params[2], p3, v -> p3 = v);
+            }else{
+                //Q: why don't you just use arrays for this?
+                //A: arrays aren't as easy to serialize so the code generator doesn't handle them
+                int c = 0;
+                for(int i = 0; i < type.params.length; i++){
+
+                    fields(table, type.params[i], i == 0 ? p1 : i == 1 ? p2 : p3, i == 0 ? v -> p1 = v : i == 1 ? v -> p2 = v : v -> p3 = v).width(100f);
+
+                    if(++c % 2 == 0) row(table);
+
+                    if(i == 3){
+                        table.row();
+                    }
+                }
+            }
+        }
+
+        @Override
+        public boolean privileged(){
+            return true;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new MarkerI(type, builder.var(id), builder.var(p1), builder.var(p2), builder.var(p3));
         }
 
         @Override

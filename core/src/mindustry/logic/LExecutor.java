@@ -14,6 +14,7 @@ import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.game.*;
+import mindustry.game.MapObjectives.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.logic.LogicFx.*;
@@ -1839,6 +1840,64 @@ public class LExecutor{
                 }
             }
         }
+    }
+
+    public static class MarkerI implements LInstruction{
+        public LMarkerControl type = LMarkerControl.create;
+        public int id, p1, p2, p3;
+
+        public MarkerI(LMarkerControl type, int id, int p1, int p2, int p3){
+            this.type = type;
+            this.id = id;
+            this.p1 = p1;
+            this.p2 = p2;
+            this.p3 = p3;
+        }
+
+        public MarkerI(){
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            ObjectiveMarker marker = null;
+
+            if(type == LMarkerControl.create){
+                int type = exec.numi(p1);
+                if(0 <= type && type < MapObjectives.allMarkerTypes.size){
+                    marker = MapObjectives.allMarkerTypes.get(type).get();
+                    if(marker != null){
+                        state.rules.markers.put(exec.numi(id), marker);
+                        marker.control(LMarkerControl.pos, exec.num(p2), exec.num(p3), 0);
+                    }
+                }
+                return;
+            }else if(type == LMarkerControl.remove){
+                state.rules.markers.remove(exec.numi(id));
+            }else{
+                marker = state.rules.markers.get(exec.numi(id));
+            }
+
+            if(marker == null) return;
+
+            Var var = exec.var(p1);
+            if(!var.isobj){
+                marker.control(type, exec.num(p1), exec.num(p2), exec.num(p3));
+            }else{
+                if(type == LMarkerControl.text){
+                    marker.setText((exec.obj(p1) != null ? exec.obj(p1).toString() : "null"), true);
+                }else if(type == LMarkerControl.flushText){
+                    marker.setText(exec.textBuffer.toString(), false);
+                    exec.textBuffer.setLength(0);
+                }
+            }
+
+            Call.setMarker(exec.numi(id), marker);
+        }
+    }
+
+    @Remote(called = Loc.server, variants = Variant.both, unreliable = true)
+    public static void setMarker(int id, ObjectiveMarker marker){
+        state.rules.markers.put(id, marker);
     }
 
     //endregion

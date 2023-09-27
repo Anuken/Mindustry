@@ -16,6 +16,7 @@ import mindustry.game.MapObjectives.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.io.*;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
@@ -60,7 +61,8 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             ShapeTextMarker::new,
             MinimapMarker::new,
             ShapeMarker::new,
-            TextMarker::new
+            TextMarker::new,
+            LineMarker::new
         );
     }
 
@@ -603,6 +605,8 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
     public static abstract class ObjectiveMarker{
         /** Makes sure markers are only added once. */
         public transient boolean wasAdded;
+        //** Hides the marker, used by world processors */
+        public boolean hidden = false;
 
         /** Called in the overlay draw layer.*/
         public void draw(){}
@@ -612,6 +616,14 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public void added(){}
         /** Remove any UI elements, if necessary. */
         public void removed(){}
+        /** Control marker with world processor code*/
+        public void control(LMarkerControl type, double p1, double p2, double p3){
+            switch(type){
+                case toggleVisibility -> hidden = !hidden;
+                case setVisibility -> hidden = ((Math.abs(p1) < 1e-5));
+            }
+        }
+        public void setText(String text, boolean fetch){}
 
         /** @return The localized type-name of this objective, defaulting to the class simple name without the "Marker" prefix. */
         public String typeName(){
@@ -673,6 +685,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public void draw(){
+            if(hidden) return;
+
+            //in case some idiot decides to make 9999999 sides and freeze the game
+            int sides = Math.min(this.sides, 200);
+
             Lines.stroke(3f, Pal.gray);
             Lines.poly(pos.x, pos.y, sides, radius + 1f, rotation);
             Lines.stroke(1f, color);
@@ -684,6 +701,50 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             }
 
             WorldLabel.drawAt(fetchedText, pos.x, pos.y + radius + textHeight, Draw.z(), flags, fontSize);
+        }
+
+        @Override
+        public void control(LMarkerControl type, double p1, double p2, double p3){
+            switch(type){
+                case x -> pos.x = (float)p1 * tilesize;
+                case y -> pos.y = (float)p1 * tilesize;
+                case pos -> pos.set((float)p1 * tilesize, (float)p2  * tilesize);
+                case fontSize -> fontSize = (float)p1;
+                case textHeight -> textHeight = (float)p1;
+                case labelBackground -> {
+                    if((Math.abs(p1) >= 1e-5)){
+                        flags |= WorldLabel.flagBackground;
+                    }else{
+                        flags &= ~WorldLabel.flagBackground;
+                    }
+                }
+                case labelOutline -> {
+                    if((Math.abs(p1) >= 1e-5)){
+                        flags |= WorldLabel.flagOutline;
+                    }else{
+                        flags &= ~WorldLabel.flagOutline;
+                    }
+                }
+                case labelFlags -> {
+                    flags = ((Math.abs(p1) >= 1e-5) ? WorldLabel.flagBackground : 0);
+                    if((Math.abs(p2) >= 1e-5)) flags |= WorldLabel.flagOutline;
+                }
+                case radius -> radius = (float)p1;
+                case rotation -> rotation = (float)p1;
+                case shapeSides -> sides = (int)p1;
+                case color -> color.set(Tmp.c1.fromDouble(p1));
+                default -> super.control(type, p1, p2, p3);
+            }
+        }
+
+        @Override
+        public void setText(String text, boolean fetch){
+            this.text = text;
+            if(fetch){
+                fetchedText = fetchText(this.text);
+            }else{
+                fetchedText = this.text;
+            }
         }
     }
 
@@ -713,6 +774,8 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public void drawMinimap(MinimapRenderer minimap){
+            if(hidden) return;
+
             minimap.transform(Tmp.v1.set(pos.x * tilesize, pos.y * tilesize));
 
             float rad = minimap.scale(radius * tilesize);
@@ -721,6 +784,19 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             Lines.stroke(Scl.scl((1f - fin) * stroke + 0.1f), color);
             Lines.circle(Tmp.v1.x, Tmp.v1.y, rad * fin);
             Draw.reset();
+        }
+
+        @Override
+        public void control(LMarkerControl type, double p1, double p2, double p3){
+            switch(type){
+                case x -> pos.x = (int)p1;
+                case y -> pos.y = (int)p1;
+                case pos -> pos.set((int)p1, (int)p2);
+                case radius -> radius = (float)p1;
+                case stroke -> stroke = (float)p1;
+                case color -> color.set(Tmp.c1.fromDouble(p1));
+                default -> super.control(type, p1, p2, p3);
+            }
         }
     }
 
@@ -746,6 +822,8 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public void draw(){
+            if(hidden) return;
+
             //in case some idiot decides to make 9999999 sides and freeze the game
             int sides = Math.min(this.sides, 200);
 
@@ -763,6 +841,28 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             }
 
             Draw.reset();
+        }
+
+        @Override
+        public void control(LMarkerControl type, double p1, double p2, double p3){
+            switch(type){
+                case x -> pos.x = (float)p1 * tilesize;
+                case y -> pos.y = (float)p1 * tilesize;
+                case pos -> pos.set((float)p1 * tilesize, (float)p2 * tilesize);
+                case radius -> radius = (float)p1;
+                case rotation -> rotation = (float)p1;
+                case stroke -> stroke = (float)p1;
+                case shapeSides -> sides = (int)p1;
+                case shapeFill -> fill = (Math.abs(p1) >= 1e-5);
+                case shapeOutline -> outline = (Math.abs(p1) >= 1e-5);
+                case setShape -> {
+                    sides = (int)p1;
+                    fill = (Math.abs(p2) >= 1e-5);
+                    outline = (Math.abs(p3) >= 1e-5);
+                }
+                case color -> color.set(Tmp.c1.fromDouble(p1));
+                default -> super.control(type, p1, p2, p3);
+            }
         }
     }
 
@@ -791,11 +891,102 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public void draw(){
+            if(hidden) return;
+
             if(fetchedText == null){
                 fetchedText = fetchText(text);
             }
 
             WorldLabel.drawAt(fetchedText, pos.x, pos.y, Draw.z(), flags, fontSize);
+        }
+
+        @Override
+        public void control(LMarkerControl type, double p1, double p2, double p3){
+            switch(type){
+                case x -> pos.x = (float)p1 * tilesize;
+                case y -> pos.y = (float)p1 * tilesize;
+                case pos -> pos.set((float)p1 * tilesize, (float)p2 * tilesize);
+                case fontSize -> fontSize = (float)p1;
+                case labelBackground -> {
+                    if((Math.abs(p1) >= 1e-5)){
+                        flags |= WorldLabel.flagBackground;
+                    }else{
+                        flags &= ~WorldLabel.flagBackground;
+                    }
+                }
+                case labelOutline -> {
+                    if((Math.abs(p1) >= 1e-5)){
+                        flags |= WorldLabel.flagOutline;
+                    }else{
+                        flags &= ~WorldLabel.flagOutline;
+                    }
+                }
+                case labelFlags -> {
+                    flags = ((Math.abs(p1) >= 1e-5) ? WorldLabel.flagBackground : 0);
+                    if((Math.abs(p2) >= 1e-5)) flags |= WorldLabel.flagOutline;
+                }
+                default -> super.control(type, p1, p2, p3);
+            }
+        }
+
+        @Override
+        public void setText(String text, boolean fetch){
+            this.text = text;
+            if(fetch){
+                fetchedText = fetchText(this.text);
+            }else{
+                fetchedText = this.text;
+            }
+        }
+    }
+
+    /** Displays a line from pos1 to pos2. */
+    public static class LineMarker extends ObjectiveMarker{
+        public @TilePos Vec2 pos1 = new Vec2(), pos2 = new Vec2();
+        public float stroke = 1f;
+        public boolean outline = true;
+        public Color color = Color.valueOf("ffd37f");
+
+        public LineMarker(String text, float x1, float y1, float x2, float y2, float stroke){
+            this.stroke = stroke;
+            this.pos1.set(x1, y1);
+            this.pos2.set(x2, y2);
+        }
+
+        public LineMarker(String text, float x1, float y1, float x2, float y2){
+            this.pos1.set(x1, y1);
+            this.pos2.set(x2, y2);
+        }
+
+        public LineMarker(){}
+
+        @Override
+        public void control(LMarkerControl type, double p1, double p2, double p3){
+            switch(type){
+                case x -> pos1.x = (float)p1 * tilesize;
+                case y -> pos1.y = (float)p1 * tilesize;
+                case pos -> pos1.set((float)p1 * tilesize, (float)p2 * tilesize);
+                case endX -> pos2.x = (float)p1 * tilesize;
+                case endY -> pos2.y = (float)p1 * tilesize;
+                case endPos -> pos2.set((float)p1 * tilesize, (float)p2 * tilesize);
+                case stroke -> stroke = (float)p1;
+                case shapeOutline -> outline = ((Math.abs(p1) >= 1e-5));
+                case color -> color.set(Tmp.c1.fromDouble(p1));
+                default -> super.control(type, p1, p2, p3);
+            }
+        }
+
+        @Override
+        public void draw(){
+            if(hidden) return;
+
+            if(outline){
+                Lines.stroke(stroke + 2f, Pal.gray);
+                Lines.line(pos1.x, pos1.y, pos2.x, pos2.y);
+            }
+
+            Lines.stroke(stroke, color);
+            Lines.line(pos1.x, pos1.y, pos2.x, pos2.y);
         }
     }
 
