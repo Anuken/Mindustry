@@ -2445,24 +2445,22 @@ public class Fx{
         Lines.poly(e.x, e.y, 6, e.rotation + e.fin());
     }).followParent(true),
 
-    arcShieldBreak = new Effect(40, e -> {
+    new Effect(40, e -> {
         Lines.stroke(3 * e.fout(), e.color);
         if(e.data instanceof Unit){
             Unit u = (Unit) e.data;
-            ShieldArcAbility ab = (ShieldArcAbility) Structs.find(u.abilities, a -> a instanceof ShieldArcAbility);
+            PcShieldArcAbility ab = (PcShieldArcAbility) Structs.find(u.abilities, a -> a instanceof PcShieldArcAbility);
             if(ab != null){
                 Vec2 pos = Tmp.v1.set(ab.x, ab.y).rotate(u.rotation - 90f).add(u);
                 Lines.arc(pos.x, pos.y, ab.radius + ab.width/2, ab.angle / 360f, u.rotation + ab.angleOffset - ab.angle / 2f);
                 Lines.arc(pos.x, pos.y, ab.radius - ab.width/2, ab.angle / 360f, u.rotation + ab.angleOffset - ab.angle / 2f);
                 for(int i : new int[]{1, -1}){
-                    Seq<Float> lp = new Seq<>();
-                    for(int z : new int[]{1, -1}) {
-                        float
-                                px = pos.x + Angles.trnsx(u.rotation + ab.angleOffset - ab.angle / 2f * i, ab.radius + ab.width / 2 * z),
-                                py = pos.y + Angles.trnsy(u.rotation + ab.angleOffset - ab.angle / 2f * i, ab.radius + ab.width / 2 * z);
-                        lp.addAll(px, py);
-                    }
-                    Lines.line(lp.get(0), lp.get(1), lp.get(2), lp.get(3));
+                    float
+                            px = pos.x + Angles.trnsx(u.rotation + ab.angleOffset - ab.angle / 2f * i, ab.radius + ab.width / 2),
+                            py = pos.y + Angles.trnsy(u.rotation + ab.angleOffset - ab.angle / 2f * i, ab.radius + ab.width / 2),
+                            px1 = pos.x + Angles.trnsx(u.rotation + ab.angleOffset - ab.angle / 2f * i, ab.radius - ab.width / 2),
+                            py1 = pos.y + Angles.trnsy(u.rotation + ab.angleOffset - ab.angle / 2f * i, ab.radius - ab.width / 2);
+                    Lines.line(px, py, px1, py1);
                 }
             }
         }
