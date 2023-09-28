@@ -222,6 +222,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case range -> range() / tilesize;
             case shootX -> World.conv(aimX());
             case shootY -> World.conv(aimY());
+            case cameraX -> controller instanceof Player player ? World.conv(player.con == null ? Core.camera.position.x : player.con.viewX) : 0;
+            case cameraY -> controller instanceof Player player ? World.conv(player.con == null ? Core.camera.position.y : player.con.viewY) : 0;
+            case cameraWidth -> controller instanceof Player player ? World.conv(player.con == null ? Core.camera.width : player.con.viewWidth) : 0;
+            case cameraHeight -> controller instanceof Player player ? World.conv(player.con == null ? Core.camera.height : player.con.viewHeight) : 0;
             case mining -> mining() ? 1 : 0;
             case mineX -> mining() ? mineTile.x : -1;
             case mineY -> mining() ? mineTile.y : -1;
