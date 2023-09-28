@@ -2447,14 +2447,13 @@ public class Fx{
 
     arcShieldBreak = new Effect(40, e -> {
         Lines.stroke(3 * e.fout(), e.color);
-        if(e.data instanceof Unit){
-            Unit u = (Unit) e.data;
+        if(e.data instanceof Unit u){
             ShieldArcAbility ab = (ShieldArcAbility) Structs.find(u.abilities, a -> a instanceof ShieldArcAbility);
             if(ab != null){
                 Vec2 pos = Tmp.v1.set(ab.x, ab.y).rotate(u.rotation - 90f).add(u);
                 Lines.arc(pos.x, pos.y, ab.radius + ab.width/2, ab.angle / 360f, u.rotation + ab.angleOffset - ab.angle / 2f);
                 Lines.arc(pos.x, pos.y, ab.radius - ab.width/2, ab.angle / 360f, u.rotation + ab.angleOffset - ab.angle / 2f);
-                for(int i : new int[]{1, -1}){
+                for(int i : Mathf.signs){
                     float
                             px = pos.x + Angles.trnsx(u.rotation + ab.angleOffset - ab.angle / 2f * i, ab.radius + ab.width / 2),
                             py = pos.y + Angles.trnsy(u.rotation + ab.angleOffset - ab.angle / 2f * i, ab.radius + ab.width / 2),
