@@ -63,12 +63,9 @@ public class ShieldArcAbility extends Ability{
     public @Nullable String region;
     /** If true, sprite position will be influenced by x/y. */
     public boolean offsetRegion = false;
-    /** Can the shield be instantly restored */
-    public boolean instanceFull = false;
 
     /** State. */
     protected float widthScale, alpha;
-    protected boolean broken;
 
     @Override
     public void addStats(Table t){
@@ -82,13 +79,6 @@ public class ShieldArcAbility extends Ability{
 
     @Override
     public void update(Unit unit){
-        if(instanceFull) {
-            if (data < 0 && !broken) broken = true;
-            if (data > 0 && broken) {
-                data = max;
-                broken = false;
-            }
-        }
         
         if(data < max){
             data += Time.delta * regen;
@@ -116,15 +106,6 @@ public class ShieldArcAbility extends Ability{
 
     @Override
     public void draw(Unit unit){
-        //Display overload progress when reloading the shield
-        Vec2 t = Tmp.v1.set(x, y).rotate(unit.rotation - 90f).add(unit);
-        if(data < 0) {
-            Draw.z(Layer.flyingUnitLow);
-            Lines.stroke(6, unit.team.color);
-            Lines.arc(t.x, t.y, radius, ((1 - (-data / (cooldown * regen))) * angle) / 360f, unit.rotation - angle / 2f);
-            return;
-        }
-
         if(widthScale > 0.001f){
             Draw.z(Layer.shields);
 
