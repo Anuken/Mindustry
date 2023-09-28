@@ -33,8 +33,7 @@ public class ShieldArcAbility extends Ability{
             if(paramField.data <= b.damage()){
                 paramField.data -= paramField.cooldown * paramField.regen;
 
-                //TODO fx
-                
+                Fx.arcShieldBreak.at(paramPos.x, paramPos.y, 0, paramUnit.team.color, paramUnit);
             }
 
             paramField.data -= b.damage();
