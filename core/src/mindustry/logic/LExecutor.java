@@ -1862,7 +1862,8 @@ public class LExecutor{
             if(type == LMarkerControl.remove){
                 state.markers.remove(exec.numi(id));
             }else{
-                if(!state.markers.containsKey(exec.numi(id))) return;
+                var marker = state.markers.get(id);
+                if(marker == null) return;
 
                 if(type == LMarkerControl.text){
                     Call.updateMarkerText(exec.numi(id), type, (exec.obj(p1) != null ? exec.obj(p1).toString() : "null"));
@@ -1870,6 +1871,7 @@ public class LExecutor{
                     Call.updateMarkerText(exec.numi(id), type, exec.textBuffer.toString());
                     exec.textBuffer.setLength(0);
                 }else{
+                    //TODO this aggressively spams packets to everyone
                     Call.updateMarker(exec.numi(id), type, exec.num(p1), exec.num(p2), exec.num(p3));
                 }
             }

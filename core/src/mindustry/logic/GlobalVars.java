@@ -57,7 +57,7 @@ public class GlobalVars{
         varWaveTime = put("@waveTime", 0);
 
         varServer = put("@server", 0);
-        varClient = put("@server", 0);
+        varClient = put("@client", 0);
 
         //special enums
         put("@ctrlProcessor", ctrlProcessor);
