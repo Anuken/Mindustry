@@ -243,5 +243,9 @@
   {
     "name": "XuwenHost",
     "address": ["106.14.14.210:6567"]
+  },
+  {
+    "name": "MineCore",
+    "address": ["194.247.42.11:27792"]
   }
 ]
