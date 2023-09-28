@@ -2445,7 +2445,7 @@ public class Fx{
         Lines.poly(e.x, e.y, 6, e.rotation + e.fin());
     }).followParent(true),
 
-    new Effect(40, e -> {
+    arcShieldBreak = new Effect(40, e -> {
         Lines.stroke(3 * e.fout(), e.color);
         if(e.data instanceof Unit){
             Unit u = (Unit) e.data;
