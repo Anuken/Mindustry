@@ -153,7 +153,7 @@ public class GlobalVars{
 
         //network
         vars.items[varServer].numval = (net.server() || !net.active()) ? 1 : 0;
-        vars.items[varServer].numval = net.client() ? 1 : 0;
+        vars.items[varClient].numval = net.client() ? 1 : 0;
     }
 
     /** @return a piece of content based on its logic ID. This is not equivalent to content ID. */
