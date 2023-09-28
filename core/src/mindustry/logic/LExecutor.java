@@ -1862,7 +1862,7 @@ public class LExecutor{
             if(type == LMarkerControl.remove){
                 state.markers.remove(exec.numi(id));
             }else{
-                var marker = state.markers.get(id);
+                var marker = state.markers.get(exec.numi(id));
                 if(marker == null) return;
 
                 if(type == LMarkerControl.text){
