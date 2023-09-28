@@ -19,7 +19,6 @@ public class ShieldArcAbility extends Ability{
     private static Unit paramUnit;
     private static ShieldArcAbility paramField;
     private static Vec2 paramPos = new Vec2();
-    private static Effect paramBreak;
     private static final Cons<Bullet> shieldConsumer = b -> {
         if(b.team != paramUnit.team && b.type.absorbable && paramField.data > 0 &&
             !b.within(paramPos, paramField.radius - paramField.width/2f) &&
