@@ -1921,9 +1921,9 @@ public class LStatements{
         }
     }
 
-    @RegisterStatement("marker")
-    public static class MarkerStatement extends LStatement{
-        public LMarkerControl type = LMarkerControl.create;
+    @RegisterStatement("setmarker")
+    public static class SetMarkerStatement extends LStatement{
+        public LMarkerControl type = LMarkerControl.x;
         public String id = "0", p1 = "0", p2 = "0", p3 = "0";
 
         @Override
@@ -1934,6 +1934,8 @@ public class LStatements{
         void rebuild(Table table){
             table.clearChildren();
 
+            table.add("set");
+
             table.button(b -> {
                 b.label(() -> type.name());
                 b.clicked(() -> showSelect(b, LMarkerControl.all, type, t -> {
@@ -1942,48 +1944,23 @@ public class LStatements{
                 }, 2, cell -> cell.size(140, 50)));
             }, Styles.logict, () -> {}).size(190, 40).color(table.color).left().padLeft(2);
 
-            table.add(" marker# ");
+            row(table);
 
-            fields(table, id, str -> id = str);
+            fieldst(table, "of id#", id, str -> id = str);
 
-            if(type == LMarkerControl.create){
-                fields(table, type.params[0], p1, v -> p1 = v).padRight(0f).left();
-                table.button(b -> {
-                    b.image(Icon.pencilSmall);
-                    b.clicked(() -> showSelectTable(b, (t, hide) -> {
-                        t.row();
-                        t.table(i -> {
-                            i.left();
-                            int c = 0;
-                            for(var gen : MapObjectives.allMarkerTypes){
-                                var marker = gen.get();
-                                i.button(marker.typeName(), Styles.flatt, () -> {
-                                    p1 = Integer.toString(MapObjectives.allMarkerTypes.indexOf(gen));
-                                    rebuild(table);
-                                    hide.run();
-                                }).size(140, 40);
+            //Q: why don't you just use arrays for this?
+            //A: arrays aren't as easy to serialize so the code generator doesn't handle them
+            for(int f = 0; f < type.params.length; f++){
+                int i = f;
 
-                                if(++c % 2 == 0) i.row();
-                            }
-                        }).colspan(3).width(280f).left();
-                    }));
-                }, Styles.logict, () -> {}).size(40f).padLeft(-2).color(table.color);
-                fields(table, type.params[1], p2, v -> p2 = v);
-                fields(table, type.params[2], p3, v -> p3 = v);
-            }else{
-                //Q: why don't you just use arrays for this?
-                //A: arrays aren't as easy to serialize so the code generator doesn't handle them
-                int c = 0;
-                for(int i = 0; i < type.params.length; i++){
+                table.table(t -> {
+                    t.setColor(table.color);
 
-                    fields(table, type.params[i], i == 0 ? p1 : i == 1 ? p2 : p3, i == 0 ? v -> p1 = v : i == 1 ? v -> p2 = v : v -> p3 = v).width(100f);
+                    fields(t, type.params[i], i == 0 ? p1 : i == 1 ? p2 : p3, i == 0 ? v -> p1 = v : i == 1 ? v -> p2 = v : v -> p3 = v).width(100f);
+                });
 
-                    if(++c % 2 == 0) row(table);
-
-                    if(i == 3){
-                        table.row();
-                    }
-                }
+                if(i == 0) row(table);
+                if(i == 2) table.row();
             }
         }
 
@@ -1994,7 +1971,49 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new MarkerI(type, builder.var(id), builder.var(p1), builder.var(p2), builder.var(p3));
+            return new SetMarkerI(type, builder.var(id), builder.var(p1), builder.var(p2), builder.var(p3));
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.world;
+        }
+    }
+
+    @RegisterStatement("makemarker")
+    public static class MakeMarkerStatement extends LStatement{
+        public String id = "0", type = "Shape", x = "0", y = "0";
+
+        @Override
+        public void build(Table table){
+            table.clearChildren();
+
+            table.button(b -> {
+                b.label(() -> type);
+
+                b.clicked(() -> showSelect(b, MapObjectives.allMarkerTypeNanes.toArray(String.class), type, t -> {
+                    type = t;
+                    build(table);
+                }, 2, cell -> cell.size(160, 50)));
+            }, Styles.logict, () -> {}).size(190, 40).color(table.color).left().padLeft(2);
+
+            fieldst(table, "id", id, str -> id = str);
+
+            row(table);
+
+            fieldst(table, "x", x, v -> x = v);
+
+            fieldst(table, "y", y, v -> y = v);
+        }
+
+        @Override
+        public boolean privileged(){
+            return true;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new MakeMarkerI(type, builder.var(id), builder.var(x), builder.var(y));
         }
 
         @Override

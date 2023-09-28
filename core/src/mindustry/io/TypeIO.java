@@ -6,7 +6,6 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
-import arc.util.serialization.*;
 import mindustry.ai.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
@@ -629,6 +628,14 @@ public class TypeIO{
 
     public static KickReason readKick(Reads read){
         return KickReason.values()[read.b()];
+    }
+
+    public static void writeMarkerControl(Writes write, LMarkerControl reason){
+        write.b((byte)reason.ordinal());
+    }
+
+    public static LMarkerControl readMarkerControl(Reads read){
+        return LMarkerControl.all[read.ub()];
     }
 
     public static void writeRules(Writes write, Rules rules){

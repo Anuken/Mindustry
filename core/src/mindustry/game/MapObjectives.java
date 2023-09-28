@@ -31,6 +31,8 @@ import static mindustry.Vars.*;
 public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObjective>{
     public static final Seq<Prov<? extends MapObjective>> allObjectiveTypes = new Seq<>();
     public static final Seq<Prov<? extends ObjectiveMarker>> allMarkerTypes = new Seq<>();
+    public static final ObjectMap<String, Prov<? extends ObjectiveMarker>> markerNameToType = new ObjectMap<>();
+    public static final Seq<String> allMarkerTypeNanes = new Seq<>();
 
     /**
      * All objectives the executor contains. Do not modify directly, ever!
@@ -72,8 +74,9 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             allObjectiveTypes.add(prov);
 
             Class<? extends MapObjective> type = prov.get().getClass();
-            JsonIO.classTag(Strings.camelize(type.getSimpleName().replace("Objective", "")), type);
-            JsonIO.classTag(type.getSimpleName().replace("Objective", ""), type);
+            String name = type.getSimpleName().replace("Objective", "");
+            JsonIO.classTag(Strings.camelize(name), type);
+            JsonIO.classTag(name, type);
         }
     }
 
@@ -83,8 +86,12 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             allMarkerTypes.add(prov);
 
             Class<? extends ObjectiveMarker> type = prov.get().getClass();
-            JsonIO.classTag(Strings.camelize(type.getSimpleName().replace("Marker", "")), type);
-            JsonIO.classTag(type.getSimpleName().replace("Marker", ""), type);
+            String name = type.getSimpleName().replace("Marker", "");
+            allMarkerTypeNanes.add(Strings.camelize(name));
+            markerNameToType.put(name, prov);
+            markerNameToType.put(Strings.camelize(name), prov);
+            JsonIO.classTag(Strings.camelize(name), type);
+            JsonIO.classTag(name, type);
         }
     }
 

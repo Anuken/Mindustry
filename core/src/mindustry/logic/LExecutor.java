@@ -1842,11 +1842,11 @@ public class LExecutor{
         }
     }
 
-    public static class MarkerI implements LInstruction{
-        public LMarkerControl type = LMarkerControl.create;
+    public static class SetMarkerI implements LInstruction{
+        public LMarkerControl type = LMarkerControl.x;
         public int id, p1, p2, p3;
 
-        public MarkerI(LMarkerControl type, int id, int p1, int p2, int p3){
+        public SetMarkerI(LMarkerControl type, int id, int p1, int p2, int p3){
             this.type = type;
             this.id = id;
             this.p1 = p1;
@@ -1854,50 +1854,82 @@ public class LExecutor{
             this.p3 = p3;
         }
 
-        public MarkerI(){
+        public SetMarkerI(){
         }
 
         @Override
         public void run(LExecutor exec){
-            ObjectiveMarker marker = null;
-
-            if(type == LMarkerControl.create){
-                int type = exec.numi(p1);
-                if(0 <= type && type < MapObjectives.allMarkerTypes.size){
-                    marker = MapObjectives.allMarkerTypes.get(type).get();
-                    if(marker != null){
-                        state.rules.markers.put(exec.numi(id), marker);
-                        marker.control(LMarkerControl.pos, exec.num(p2), exec.num(p3), 0);
-                    }
-                }
-                return;
-            }else if(type == LMarkerControl.remove){
-                state.rules.markers.remove(exec.numi(id));
+            if(type == LMarkerControl.remove){
+                state.markers.remove(exec.numi(id));
             }else{
-                marker = state.rules.markers.get(exec.numi(id));
-            }
+                if(!state.markers.containsKey(exec.numi(id))) return;
 
-            if(marker == null) return;
-
-            Var var = exec.var(p1);
-            if(!var.isobj){
-                marker.control(type, exec.num(p1), exec.num(p2), exec.num(p3));
-            }else{
                 if(type == LMarkerControl.text){
-                    marker.setText((exec.obj(p1) != null ? exec.obj(p1).toString() : "null"), true);
+                    Call.updateMarkerText(exec.numi(id), type, (exec.obj(p1) != null ? exec.obj(p1).toString() : "null"));
                 }else if(type == LMarkerControl.flushText){
-                    marker.setText(exec.textBuffer.toString(), false);
+                    Call.updateMarkerText(exec.numi(id), type, exec.textBuffer.toString());
                     exec.textBuffer.setLength(0);
+                }else{
+                    Call.updateMarker(exec.numi(id), type, exec.num(p1), exec.num(p2), exec.num(p3));
                 }
             }
+        }
+    }
 
-            Call.setMarker(exec.numi(id), marker);
+    public static class MakeMarkerI implements LInstruction{
+        //TODO arbitrary number
+        public static final int maxMarkers = 20000;
+
+        public String type = "shape";
+        public int id, x, y;
+
+        public MakeMarkerI(String type, int id, int x, int y){
+            this.type = type;
+            this.id = id;
+            this.x = x;
+            this.y = y;
+        }
+
+        public MakeMarkerI(){
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            var cons = MapObjectives.markerNameToType.get(type);
+
+            if(cons != null && !net.client() && state.markers.size < maxMarkers){
+                //TODO max markers...
+                var marker = cons.get();
+                marker.control(LMarkerControl.pos, exec.num(x), exec.num(y), 0);
+
+                Call.createMarker(exec.numi(id), marker);
+            }
         }
     }
 
     @Remote(called = Loc.server, variants = Variant.both, unreliable = true)
-    public static void setMarker(int id, ObjectiveMarker marker){
-        state.rules.markers.put(id, marker);
+    public static void createMarker(int id, ObjectiveMarker marker){
+        state.markers.put(id, marker);
+    }
+
+    @Remote(called = Loc.server, variants = Variant.both, unreliable = true)
+    public static void updateMarker(int id, LMarkerControl control, double p1, double p2, double p3){
+        var marker = state.markers.get(id);
+        if(marker != null){
+            marker.control(control, p1, p2, p3);
+        }
+    }
+
+    @Remote(called = Loc.server, variants = Variant.both, unreliable = true)
+    public static void updateMarkerText(int id, LMarkerControl type, String text){
+        var marker = state.markers.get(id);
+        if(marker != null){
+            if(type == LMarkerControl.text){
+                marker.setText(text, true);
+            }else if(type == LMarkerControl.flushText){
+                marker.setText(text, false);
+            }
+        }
     }
 
     //endregion
