@@ -1866,13 +1866,12 @@ public class LExecutor{
                 if(marker == null) return;
 
                 if(type == LMarkerControl.text){
-                    Call.updateMarkerText(exec.numi(id), type, (exec.obj(p1) != null ? exec.obj(p1).toString() : "null"));
+                    marker.setText((exec.obj(p1) != null ? exec.obj(p1).toString() : "null"), false);
                 }else if(type == LMarkerControl.flushText){
-                    Call.updateMarkerText(exec.numi(id), type, exec.textBuffer.toString());
+                    marker.setText(exec.textBuffer.toString(), true);
                     exec.textBuffer.setLength(0);
                 }else{
-                    //TODO this aggressively spams packets to everyone
-                    Call.updateMarker(exec.numi(id), type, exec.num(p1), exec.num(p2), exec.num(p3));
+                    marker.control(type, exec.num(p1), exec.num(p2), exec.num(p3));
                 }
             }
         }
@@ -1899,12 +1898,10 @@ public class LExecutor{
         public void run(LExecutor exec){
             var cons = MapObjectives.markerNameToType.get(type);
 
-            if(cons != null && !net.client() && state.markers.size < maxMarkers){
-                //TODO max markers...
+            if(cons != null && state.markers.size < maxMarkers){
                 var marker = cons.get();
                 marker.control(LMarkerControl.pos, exec.num(x), exec.num(y), 0);
-
-                Call.createMarker(exec.numi(id), marker);
+                state.markers.put(exec.numi(id), marker);
             }
         }
     }
