@@ -1,5 +1,9 @@
 [
   {
+        "name": "meiqiuMDT",
+        "address": ["mdt.m-ftpserver.xyz"]
+  },
+  {
     "name": "CMS",
     "address": ["195.2.84.144"]
   },
