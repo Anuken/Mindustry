@@ -144,7 +144,7 @@ public abstract class LStatement{
                     if(p instanceof Enum e){
                         tooltip(c, e);
                     }
-                }).checked(current == p).group(group));
+                }).checked(current.equals(p)).group(group));
 
                 if(++i % cols == 0) t.row();
             }

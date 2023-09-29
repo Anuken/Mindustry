@@ -1982,7 +1982,7 @@ public class LStatements{
 
     @RegisterStatement("makemarker")
     public static class MakeMarkerStatement extends LStatement{
-        public String id = "0", type = "Shape", x = "0", y = "0";
+        public String id = "0", type = "shape", x = "0", y = "0";
 
         @Override
         public void build(Table table){
@@ -1991,7 +1991,7 @@ public class LStatements{
             table.button(b -> {
                 b.label(() -> type);
 
-                b.clicked(() -> showSelect(b, MapObjectives.allMarkerTypeNanes.toArray(String.class), type, t -> {
+                b.clicked(() -> showSelect(b, MapObjectives.allMarkerTypeNames.toArray(String.class), type, t -> {
                     type = t;
                     build(table);
                 }, 2, cell -> cell.size(160, 50)));

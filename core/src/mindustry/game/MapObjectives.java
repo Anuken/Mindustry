@@ -32,7 +32,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
     public static final Seq<Prov<? extends MapObjective>> allObjectiveTypes = new Seq<>();
     public static final Seq<Prov<? extends ObjectiveMarker>> allMarkerTypes = new Seq<>();
     public static final ObjectMap<String, Prov<? extends ObjectiveMarker>> markerNameToType = new ObjectMap<>();
-    public static final Seq<String> allMarkerTypeNanes = new Seq<>();
+    public static final Seq<String> allMarkerTypeNames = new Seq<>();
 
     /**
      * All objectives the executor contains. Do not modify directly, ever!
@@ -87,7 +87,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
             Class<? extends ObjectiveMarker> type = prov.get().getClass();
             String name = type.getSimpleName().replace("Marker", "");
-            allMarkerTypeNanes.add(Strings.camelize(name));
+            allMarkerTypeNames.add(Strings.camelize(name));
             markerNameToType.put(name, prov);
             markerNameToType.put(Strings.camelize(name), prov);
             JsonIO.classTag(Strings.camelize(name), type);
@@ -707,6 +707,9 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                 fetchedText = fetchText(text);
             }
 
+            // font size cannot be 0
+            if(Math.abs(fontSize) < 1e-5) return;
+
             WorldLabel.drawAt(fetchedText, pos.x, pos.y + radius + textHeight, Draw.z(), flags, fontSize);
         }
 
@@ -898,7 +901,8 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public void draw(){
-            if(hidden) return;
+            // font size cannot be 0
+            if(hidden || Math.abs(fontSize) < 1e-5) return;
 
             if(fetchedText == null){
                 fetchedText = fetchText(text);
