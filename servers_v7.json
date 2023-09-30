@@ -246,6 +246,6 @@
   },
   {
     "name": "XuwenHost",
-    "address": ["v7.mindustru.lol:6567", "pi.xiyuchao.love:5500","mdt.xuwenblock.cn:6567"]
+    "address": ["pi.xiyuchao.love:6567","mdt.xuwenblock.cn:6567"]
   }
 ]
