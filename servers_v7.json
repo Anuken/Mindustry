@@ -1,5 +1,9 @@
 [
   {
+    "name": "OmniCorp Classic",
+    "address": ["omnidustry.ddns.net:6567","omnidustry.ddns.net:6568","omnidustry.ddns.net:6569","omnidustry.ddns.net:6570","omnidustry.ddns.net:6571","omnidustry.ddns.net:6572","omnidustry.ddns.net:6573","omnidustry.ddns.net:6574"]
+  },
+  {
     "name": "meiqiuMDT",
     "address": ["43.248.103.156:11023"]
   },
@@ -246,6 +250,6 @@
   },
   {
     "name": "XuwenHost",
-    "address": ["v7.mindustru.lol:6567", "pi.xiyuchao.love:5500","mdt.xuwenblock.cn:6567"]
+    "address": ["pi.xiyuchao.love:6567","mdt.xuwenblock.cn:6567"]
   }
 ]
