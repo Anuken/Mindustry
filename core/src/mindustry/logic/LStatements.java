@@ -1982,7 +1982,7 @@ public class LStatements{
 
     @RegisterStatement("makemarker")
     public static class MakeMarkerStatement extends LStatement{
-        public String id = "0", type = "shape", x = "0", y = "0";
+        public String id = "0", type = "shape", x = "0", y = "0", replace = "true";
 
         @Override
         public void build(Table table){
@@ -2004,6 +2004,10 @@ public class LStatements{
             fieldst(table, "x", x, v -> x = v);
 
             fieldst(table, "y", y, v -> y = v);
+
+            row(table);
+
+            fieldst(table, "replace", replace, v -> replace = v);
         }
 
         @Override
@@ -2013,7 +2017,7 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new MakeMarkerI(type, builder.var(id), builder.var(x), builder.var(y));
+            return new MakeMarkerI(type, builder.var(id), builder.var(x), builder.var(y), builder.var(replace));
         }
 
         @Override
