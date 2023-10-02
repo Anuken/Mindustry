@@ -1419,7 +1419,7 @@ public class LStatements{
     @RegisterStatement("message")
     public static class FlushMessageStatement extends LStatement{
         public MessageType type = MessageType.announce;
-        public String duration = "3", outSuccess = "success", x = "100", y = "100";
+        public String duration = "3", outSuccess = "success";
 
         @Override
         public void build(Table table){
@@ -1438,15 +1438,6 @@ public class LStatements{
             }, Styles.logict, () -> {}).size(160f, 40f).padLeft(2).color(table.color);
 
             switch(type){
-                case label -> {
-                    table.add(" x ");
-                    fields(table, x, str -> x = str);
-                    table.add(" y ");
-                    fields(table, y, str -> y = str);
-                    table.add(" for ");
-                    fields(table, duration, str -> duration = str);
-                    table.add(" secs ");
-                }
                 case announce, toast  -> {
                     table.add(" for ");
                     fields(table, duration, str -> duration = str);
@@ -1464,7 +1455,7 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new FlushMessageI(type, builder.var(duration), builder.var(outSuccess), builder.var(x), builder.var(y));
+            return new FlushMessageI(type, builder.var(duration), outSuccess.isEmpty()?-1:builder.var(outSuccess));
         }
 
         @Override

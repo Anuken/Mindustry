@@ -4,8 +4,7 @@ public enum MessageType{
     notify,
     announce,
     toast,
-    mission,
-    label;
+    mission;
 
     public static final MessageType[] all = values();
 }

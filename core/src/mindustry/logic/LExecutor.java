@@ -1524,9 +1524,9 @@ public class LExecutor{
 
     public static class FlushMessageI implements LInstruction{
         public MessageType type = MessageType.announce;
-        public int duration, outSuccess, x, y;
+        public int duration, outSuccess;
 
-        public FlushMessageI(MessageType type, int duration, int outSuccess, int x, int y){
+        public FlushMessageI(MessageType type, int duration, int outSuccess){
             this.type = type;
             this.duration = duration;
         }
@@ -1565,7 +1565,6 @@ public class LExecutor{
                 case notify -> ui.hudfrag.showToast(Icon.info, text);
                 case announce -> ui.announce(text, exec.numf(duration));
                 case toast -> ui.showInfoToast(text, exec.numf(duration));
-                case label -> ui.showLabel(text, exec.numf(duration), World.unconv(exec.numf(x)), World.unconv(exec.numf(y)));
                 //TODO desync?
                 case mission -> state.rules.mission = text;
             }
