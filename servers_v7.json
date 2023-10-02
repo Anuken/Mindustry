@@ -5,7 +5,7 @@
   },
   {
     "name": "meiqiuMDT",
-    "address": ["43.248.103.156:11023"]
+    "address": ["43.248.103.156:11023","bj-1.lcf.icu:10240"]
   },
   {
     "name": "CMS",
@@ -13,7 +13,7 @@
   },
   {
     "name": "ShardDustry",
-    "address": ["88.99.56.222:35689", "65.109.65.23:5552","45.158.9.198:30529"]
+    "address": ["88.99.56.222:35689", "78.46.39.20:5552","45.158.9.198:30529"]
   },
   {
     "name": "Tamazia",
@@ -234,7 +234,7 @@
   },
   {
     "name": "Vanilla CroCraft",
-    "address": ["130.61.175.47:6567"]
+    "address": ["130.61.175.47:6567", "41.216.188.223:5001"]
   },
   {
     "name": "Extra Utilities",
@@ -251,5 +251,9 @@
   {
     "name": "XuwenHost",
     "address": ["pi.xiyuchao.love:6567","mdt.xuwenblock.cn:6567"]
+  },
+  {
+    "name": "MineCore",
+    "address": ["194.247.42.11:27792"]
   }
 ]
