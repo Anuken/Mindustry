@@ -1625,6 +1625,7 @@ public class LExecutor{
             this.air = air;
             this.ground = ground;
             this.pierce = pierce;
+            this.effect = effect;
         }
 
         public ExplosionI(){
