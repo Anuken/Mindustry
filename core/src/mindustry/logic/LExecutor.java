@@ -1529,6 +1529,7 @@ public class LExecutor{
         public FlushMessageI(MessageType type, int duration, int outSuccess){
             this.type = type;
             this.duration = duration;
+            this.outSuccess = outSuccess;
         }
 
         public FlushMessageI(){
