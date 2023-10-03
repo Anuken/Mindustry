@@ -1883,13 +1883,14 @@ public class LExecutor{
         public static final int maxMarkers = 20000;
 
         public String type = "shape";
-        public int id, x, y;
+        public int id, x, y, replace;
 
-        public MakeMarkerI(String type, int id, int x, int y){
+        public MakeMarkerI(String type, int id, int x, int y, int replace){
             this.type = type;
             this.id = id;
             this.x = x;
             this.y = y;
+            this.replace = replace;
         }
 
         public MakeMarkerI(){
@@ -1900,9 +1901,12 @@ public class LExecutor{
             var cons = MapObjectives.markerNameToType.get(type);
 
             if(cons != null && state.markers.size < maxMarkers){
-                var marker = cons.get();
-                marker.control(LMarkerControl.pos, exec.num(x), exec.num(y), 0);
-                state.markers.put(exec.numi(id), marker);
+                int mid = exec.numi(id);
+                if(exec.bool(replace) || !state.markers.containsKey(mid)){
+                    var marker = cons.get();
+                    marker.control(LMarkerControl.pos, exec.num(x), exec.num(y), 0);
+                    state.markers.put(mid, marker);
+                }
             }
         }
     }
