@@ -10,6 +10,7 @@ import arc.graphics.gl.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
+import io.github.pixee.security.ZipSecurity;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.io.*;
@@ -140,7 +141,7 @@ public class ScriptMainGenerator{
         if(!directory.exists()) return classes;
 
         if(directory.getName().endsWith(".jar")){
-            ZipInputStream zip = new ZipInputStream(new FileInputStream(directory));
+            ZipInputStream zip = ZipSecurity.createHardenedInputStream(new FileInputStream(directory));
             for(ZipEntry entry = zip.getNextEntry(); entry != null; entry = zip.getNextEntry()){
                 if(!entry.isDirectory() && entry.getName().endsWith(".class")){
                     String className = entry.getName().replace('/', '.');

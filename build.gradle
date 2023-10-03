@@ -415,6 +415,8 @@ project(":tools"){
         implementation arcModule("natives:natives-desktop")
         implementation arcModule("natives:natives-freetype-desktop")
         implementation arcModule("backends:backend-headless")
+
+        implementation("io.github.pixee:java-security-toolkit:1.0.7")
     }
 }
 
