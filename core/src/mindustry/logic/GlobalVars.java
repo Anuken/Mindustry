@@ -61,12 +61,10 @@ public class GlobalVars{
         varClient = put("@client", 0);
 
         //privileged desynced client variables
-        if(!net.server()){
-            put("@clientLocale", Core.bundle.getLocale().toLanguageTag(), true);
-            varClientUnit = put("@clientUnit", null, true);
-            varClientName = put("@clientName", null, true);
-            varClientTeam = put("@clientTeam", 0, true);
-        }
+        put("@clientLocale", (net.server() ? null : Core.bundle.getLocale().toLanguageTag()), true);
+        varClientUnit = put("@clientUnit", null, true);
+        varClientName = put("@clientName", null, true);
+        varClientTeam = put("@clientTeam", 0, true);
 
         //special enums
         put("@ctrlProcessor", ctrlProcessor);
@@ -165,7 +163,7 @@ public class GlobalVars{
         vars.items[varClient].numval = net.client() ? 1 : 0;
 
         //client
-        if(!net.server()){
+        if(!net.server() && player != null){
             vars.items[varClientUnit].objval = player.unit();
             vars.items[varClientName].objval = player.name();
             vars.items[varClientTeam].numval = player.team().id;
