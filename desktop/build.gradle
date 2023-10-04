@@ -39,6 +39,8 @@ task run(dependsOn: classes, type: JavaExec){
 }
 
 task dist(type: Jar, dependsOn: configurations.runtimeClasspath){
+    dependsOn ":desktop:processResources"
+
     from files(sourceSets.main.output.classesDirs)
     from files(sourceSets.main.output.resourcesDir)
     from {configurations.runtimeClasspath.collect{ it.isDirectory() ? it : zipTree(it) }}

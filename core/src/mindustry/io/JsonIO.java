@@ -44,6 +44,15 @@ public class JsonIO{
         }
     };
 
+    public static void writeBytes(Object value, Class<?> elementType, DataOutputStream output){
+        json.setWriter(new UBJsonWriter(output));
+        json.writeValue(value, value == null ? null : value.getClass(), elementType);
+    }
+
+    public static <T> T readBytes(Class<T> type, Class<?> elementType, DataInputStream input) throws IOException{
+        return json.readValue(type, elementType, new UBJsonReader().parseWihoutClosing(input));
+    }
+
     public static String write(Object object){
         return json.toJson(object, object.getClass());
     }
@@ -195,6 +204,9 @@ public class JsonIO{
 
             @Override
             public Planet read(Json json, JsonValue jsonData, Class type){
+                if(jsonData.asString() == null){
+                    return null;
+                }
                 Planet block = Vars.content.getByName(ContentType.planet, jsonData.asString());
                 return block == null ? Planets.serpulo : block;
             }

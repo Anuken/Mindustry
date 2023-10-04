@@ -154,7 +154,7 @@ public class SchematicsDialog extends BaseDialog{
                             }else{
                                 buttons.button(Icon.trash, style, () -> {
                                     if(s.mod != null){
-                                        ui.showInfo(Core.bundle.format("mod.item.remove", s.mod.meta.displayName()));
+                                        ui.showInfo(Core.bundle.format("mod.item.remove", s.mod.meta.displayName));
                                     }else{
                                         ui.showConfirm("@confirm", "@schematic.delete.confirm", () -> {
                                             schematics.remove(s);
@@ -422,7 +422,7 @@ public class SchematicsDialog extends BaseDialog{
                     }
 
                     for(ContentType ctype : defaultContentIcons){
-                        var all = content.getBy(ctype).<UnlockableContent>as().filter(u -> !u.isHidden() && u.unlockedNow() && u.hasEmoji());
+                        var all = content.getBy(ctype).<UnlockableContent>as().select(u -> !u.isHidden() && u.unlockedNow() && u.hasEmoji());
 
                         t.row();
                         if(all.count(u -> !tags.contains(u.emoji())) > 0) t.image().colspan(cols).growX().width(Float.NEGATIVE_INFINITY).height(3f).color(Pal.accent);
@@ -793,7 +793,7 @@ public class SchematicsDialog extends BaseDialog{
             buttons.defaults().size(Core.graphics.isPortrait() ? 150f : 210f, 64f);
             buttons.button("@back", Icon.left, this::hide);
             buttons.button("@editor.export", Icon.upload, () -> showExport(schem));
-            buttons.button("@schematic.edit", Icon.edit, () -> showEdit(schem));
+            buttons.button("@edit", Icon.edit, () -> showEdit(schem));
 
             show();
         }

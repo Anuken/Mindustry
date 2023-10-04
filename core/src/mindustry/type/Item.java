@@ -153,8 +153,9 @@ public class Item extends UnlockableContent implements Senseable{
 
     @Override
     public double sense(LAccess sensor){
-        if(sensor == LAccess.color) return color.toFloatBits();
-        return 0;
+        if(sensor == LAccess.color) return color.toDoubleBits();
+        if(sensor == LAccess.id) return getLogicId();
+        return Float.NaN;
     }
 
     @Override

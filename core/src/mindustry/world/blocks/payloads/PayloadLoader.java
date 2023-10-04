@@ -11,6 +11,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
+import mindustry.world.blocks.payloads.PayloadUnloader.*;
 
 import static mindustry.Vars.*;
 
@@ -106,12 +107,12 @@ public class PayloadLoader extends PayloadBlock{
 
         @Override
         public boolean acceptItem(Building source, Item item){
-            return items.total() < itemCapacity;
+            return items.total() < itemCapacity && !(source instanceof PayloadUnloaderBuild);
         }
 
         @Override
         public boolean acceptLiquid(Building source, Liquid liquid){
-            return liquids.current() == liquid || liquids.currentAmount() < 0.2f;
+            return (liquids.current() == liquid || liquids.currentAmount() < 0.2f) && !(source instanceof PayloadUnloaderBuild);
         }
 
         @Override

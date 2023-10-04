@@ -252,11 +252,11 @@ public class UnitTypes{
         }};
 
         reign = new UnitType("reign"){{
-            speed = 0.35f;
+            speed = 0.4f;
             hitSize = 26f;
             rotateSpeed = 1.65f;
             health = 24000;
-            armor = 14f;
+            armor = 18f;
             mechStepParticles = true;
             stepShake = 0.75f;
             drownTimeMultiplier = 6f;
@@ -1285,7 +1285,6 @@ public class UnitTypes{
             lowAltitude = true;
 
             ammoType = new PowerAmmoType(900);
-
             mineTier = 2;
             mineSpeed = 3.5f;
 
@@ -2153,13 +2152,15 @@ public class UnitTypes{
             abilities.add(new EnergyFieldAbility(40f, 65f, 180f){{
                 statusDuration = 60f * 6f;
                 maxTargets = 25;
+                healPercent = 1.5f;
+                sameTypeHealMult = 0.5f;
             }});
 
             for(float mountY : new float[]{-18f, 14}){
                 weapons.add(new PointDefenseWeapon("point-defense-mount"){{
                     x = 12.5f;
                     y = mountY;
-                    reload = 6f;
+                    reload = 4f;
                     targetInterval = 8f;
                     targetSwitchInterval = 8f;
 
@@ -2167,7 +2168,7 @@ public class UnitTypes{
                         shootEffect = Fx.sparkShoot;
                         hitEffect = Fx.pointHit;
                         maxRange = 180f;
-                        damage = 25f;
+                        damage = 30f;
                     }};
                 }});
             }
@@ -2241,7 +2242,13 @@ public class UnitTypes{
                     }});
                 }
             }
-
+            abilities.add(new SuppressionFieldAbility(){{
+                orbRadius = 5;
+                particleSize = 3;
+                y = -10f;
+                particles = 10;
+                color = particleColor = effectColor = Pal.heal;
+            }});
             weapons.add(new Weapon("emp-cannon-mount"){{
                 rotate = true;
 
@@ -2343,6 +2350,7 @@ public class UnitTypes{
             speed = 3f;
             rotateSpeed = 15f;
             accel = 0.1f;
+            fogRadius = 0f;
             itemCapacity = 30;
             health = 150f;
             engineOffset = 6f;
@@ -2379,6 +2387,7 @@ public class UnitTypes{
             speed = 3.3f;
             rotateSpeed = 17f;
             accel = 0.1f;
+            fogRadius = 0f;
             itemCapacity = 50;
             health = 170f;
             engineOffset = 6f;
@@ -2420,6 +2429,7 @@ public class UnitTypes{
             speed = 3.55f;
             rotateSpeed = 19f;
             accel = 0.11f;
+            fogRadius = 0f;
             itemCapacity = 70;
             health = 220f;
             engineOffset = 6f;
@@ -2628,7 +2638,10 @@ public class UnitTypes{
                         width = 5f;
                         height = 7f;
                         lifetime = 15f;
-                        hitSize = 4f;
+                        hitSize = 4f;    
+                        pierceCap = 3;
+                        pierce = true;
+                        pierceBuilding = true;
                         hitColor = backColor = trailColor = Color.valueOf("feb380");
                         frontColor = Color.white;
                         trailWidth = 1.7f;

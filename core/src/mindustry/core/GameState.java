@@ -1,9 +1,11 @@
 package mindustry.core;
 
 import arc.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
+import mindustry.game.MapObjectives.*;
 import mindustry.gen.*;
 import mindustry.maps.*;
 import mindustry.type.*;
@@ -32,6 +34,8 @@ public class GameState{
     public Rules rules = new Rules();
     /** Statistics for this save/game. Displayed after game over. */
     public GameStats stats = new GameStats();
+    /** Markers not linked to objectives. Controlled by world processors. */
+    public IntMap<ObjectiveMarker> markers = new IntMap<>();
     /** Global attributes of the environment, calculated by weather. */
     public Attributes envAttrs = new Attributes();
     /** Team data. Gets reset every new game. */

@@ -38,7 +38,7 @@ public class Weapon implements Cloneable{
     public boolean useAmmo = true;
     /** whether to create a flipped copy of this weapon upon initialization. default: true */
     public boolean mirror = true;
-    /** whether to flip the weapon's sprite when rendering */
+    /** whether to flip the weapon's sprite when rendering. internal use only - do not set! */
     public boolean flipSprite = false;
     /** whether to shoot the weapons in different arms one after another, rather than all at once; only valid when mirror = true */
     public boolean alternate = true;
@@ -189,7 +189,7 @@ public class Weapon implements Cloneable{
         float
         rotation = unit.rotation - 90,
         realRecoil = Mathf.pow(mount.recoil, recoilPow) * recoil,
-        weaponRotation  = rotation + (rotate ? mount.rotation : 0),
+        weaponRotation  = rotation + (rotate ? mount.rotation : baseRotation),
         wx = unit.x + Angles.trnsx(rotation, x, y) + Angles.trnsx(weaponRotation, 0, -realRecoil),
         wy = unit.y + Angles.trnsy(rotation, x, y) + Angles.trnsy(weaponRotation, 0, -realRecoil);
 
@@ -396,6 +396,7 @@ public class Weapon implements Cloneable{
         //shoot if applicable
         if(mount.shoot && //must be shooting
         can && //must be able to shoot
+        !(bullet.killShooter && mount.totalShots > 0) && //if the bullet kills the shooter, you should only ever be able to shoot once
         (!useAmmo || unit.ammo > 0 || !state.rules.unitAmmo || unit.team.rules().infiniteAmmo) && //check ammo
         (!alternate || wasFlipped == flipSprite) &&
         mount.warmup >= minWarmup && //must be warmed up
@@ -436,8 +437,18 @@ public class Weapon implements Cloneable{
         }
 
         shoot.shoot(mount.barrelCounter, (xOffset, yOffset, angle, delay, mover) -> {
+            //this is incremented immediately, as it is used for total bullet creation amount detection
+            mount.totalShots ++;
+            int barrel = mount.barrelCounter;
+
             if(delay > 0f){
-                Time.run(delay, () -> bullet(unit, mount, xOffset, yOffset, angle, mover));
+                Time.run(delay, () -> {
+                    //hack: make sure the barrel is the same as what it was when the bullet was queued to fire
+                    int prev = mount.barrelCounter;
+                    mount.barrelCounter = barrel;
+                    bullet(unit, mount, xOffset, yOffset, angle, mover);
+                    mount.barrelCounter = prev;
+                });
             }else{
                 bullet(unit, mount, xOffset, yOffset, angle, mover);
             }
@@ -478,7 +489,6 @@ public class Weapon implements Cloneable{
             mount.recoils[mount.barrelCounter % recoils] = 1f;
         }
         mount.heat = 1f;
-        mount.totalShots++;
     }
 
     //override to do special things to a bullet after spawning

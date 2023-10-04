@@ -14,7 +14,6 @@ public class TraceDialog extends BaseDialog{
         super("@trace");
 
         addCloseButton();
-        setFillParent(false);
     }
 
     public void show(Player player, TraceInfo info){
@@ -28,7 +27,7 @@ public class TraceDialog extends BaseDialog{
 
         var style = Styles.emptyi;
         float s = 28f;
-
+        
         table.table(c -> {
             c.left().defaults().left();
             c.button(Icon.copySmall, style, () -> copy(player.name)).size(s).padRight(4f);
@@ -37,6 +36,8 @@ public class TraceDialog extends BaseDialog{
             c.add(Core.bundle.format("trace.ip", info.ip)).row();
             c.button(Icon.copySmall, style, () -> copy(info.uuid)).size(s).padRight(4f);
             c.add(Core.bundle.format("trace.id", info.uuid)).row();
+            c.button(Icon.copySmall, style, () -> copy(player.locale)).size(s).padRight(4f);
+            c.add(Core.bundle.format("trace.language", player.locale)).row();
         }).row();
 
         table.add(Core.bundle.format("trace.modclient", info.modded)).row();

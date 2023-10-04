@@ -50,11 +50,13 @@ public class ControlPathfinder{
 
     costLegs = (team, tile) ->
     PathTile.legSolid(tile) ? impassable : 1 +
-    (PathTile.deep(tile) ? 6000 : 0),
+    (PathTile.deep(tile) ? 6000 : 0) +
+    (PathTile.nearLegSolid(tile) ? 3 : 0),
 
     costNaval = (team, tile) ->
     //impassable same-team neutral block, or non-liquid
-    ((PathTile.solid(tile) && ((PathTile.team(tile) == team && !PathTile.teamPassable(tile)) || PathTile.team(tile) == 0)) || !PathTile.liquid(tile) ? impassable : 1) +
+    (PathTile.solid(tile) && ((PathTile.team(tile) == team && !PathTile.teamPassable(tile)) || PathTile.team(tile) == 0)) || !PathTile.liquid(tile) ? impassable :
+    1 +
     //impassable synthetic enemy block
     ((PathTile.team(tile) != team && PathTile.team(tile) != 0) && PathTile.solid(tile) ? wallImpassableCap : 0) +
     (PathTile.nearGround(tile) || PathTile.nearSolid(tile) ? 6 : 0);
@@ -192,7 +194,7 @@ public class ControlPathfinder{
         }
 
         //destination is impassable, can't go there.
-        if(solid(team, costType, world.packArray(World.toTile(destination.x), World.toTile(destination.y)))){
+        if(solid(team, costType, world.packArray(World.toTile(destination.x), World.toTile(destination.y)), false)){
             return false;
         }
 
@@ -231,11 +233,11 @@ public class ControlPathfinder{
             req.curId = pathId;
 
             //check for the unit getting stuck every N seconds
-            if((req.stuckTimer += Time.delta) >= 60f * 2.5f){
+            if(req.done && (req.stuckTimer += Time.delta) >= 60f * 1.5f){
                 req.stuckTimer = 0f;
                 //force recalculate
                 if(req.lastPos.within(unit, 1.5f)){
-                    req.lastWorldUpdate = -1;
+                    req.forceRecalculate();
                 }
                 req.lastPos.set(unit);
             }
@@ -255,8 +257,14 @@ public class ControlPathfinder{
                     float dst = unit.dst2(tile);
                     //TODO maybe put this on a timer since raycasts can be expensive?
                     if(dst < minDst && !permissiveRaycast(team, costType, tileX, tileY, tile.x, tile.y)){
+                        if(avoid(req.team, req.cost, items[i + 1])){
+                            range = 0.5f;
+                        }
+
                         req.pathIndex = Math.max(dst <= range * range ? i + 1 : i, req.pathIndex);
                         minDst = Math.min(dst, minDst);
+                    }else if(dst <= 1f){
+                        req.pathIndex = Math.min(Math.max(i + 1, req.pathIndex), len - 1);
                     }
                 }
 
@@ -278,6 +286,19 @@ public class ControlPathfinder{
                 if(req.rayPathIndex < len && req.rayPathIndex >= 0){
                     Tile tile = tile(items[req.rayPathIndex]);
                     out.set(tile);
+
+                    if(req.rayPathIndex > 0){
+                        float angleToNext = tile(items[req.rayPathIndex - 1]).angleTo(tile);
+                        float angleToDest = unit.angleTo(tile);
+                        //force recalculate when the unit moves backwards
+                        if(Angles.angleDist(angleToNext, angleToDest) > 80f && !unit.within(tile, 1f)){
+                            req.forceRecalculate();
+                        }
+                    }
+
+                    if(avoid(req.team, req.cost, items[req.rayPathIndex])){
+                        range = 0.5f;
+                    }
 
                     if(unit.within(tile, range)){
                         req.pathIndex = req.rayPathIndex = Math.max(req.pathIndex, req.rayPathIndex + 1);
@@ -325,8 +346,12 @@ public class ControlPathfinder{
         requests.clear();
     }
 
+    public static boolean isNearObstacle(Unit unit, int x1, int y1, int x2, int y2){
+        return raycast(unit.team().id, unit.type.pathCost, x1, y1, x2, y2);
+    }
+
     private static boolean raycast(int team, PathCost type, int x1, int y1, int x2, int y2){
-        int ww = world.width(), wh = world.height();
+        int ww = wwidth, wh = wheight;
         int x = x1, dx = Math.abs(x2 - x), sx = x < x2 ? 1 : -1;
         int y = y1, dy = Math.abs(y2 - y), sy = y < y2 ? 1 : -1;
         int e2, err = dx - dy;
@@ -364,13 +389,13 @@ public class ControlPathfinder{
     }
 
     private static boolean permissiveRaycast(int team, PathCost type, int x1, int y1, int x2, int y2){
-        int ww = world.width(), wh = world.height();
+        int ww = wwidth, wh = wheight;
         int x = x1, dx = Math.abs(x2 - x), sx = x < x2 ? 1 : -1;
         int y = y1, dy = Math.abs(y2 - y), sy = y < y2 ? 1 : -1;
         int err = dx - dy;
 
         while(x >= 0 && y >= 0 && x < ww && y < wh){
-            if(solid(team, type, x + y * wwidth)) return true;
+            if(solid(team, type, x + y * wwidth, true)) return true;
             if(x == x2 && y == y2) return false;
 
             //no diagonals
@@ -384,6 +409,30 @@ public class ControlPathfinder{
         }
 
         return true;
+    }
+
+    /** @return 0 if nothing was hit, otherwise the packed coordinates. This is an internal function and will likely be moved - do not use!*/
+    public static int raycastFast(int team, PathCost type, int x1, int y1, int x2, int y2){
+        int ww = world.width(), wh = world.height();
+        int x = x1, dx = Math.abs(x2 - x), sx = x < x2 ? 1 : -1;
+        int y = y1, dy = Math.abs(y2 - y), sy = y < y2 ? 1 : -1;
+        int err = dx - dy;
+
+        while(x >= 0 && y >= 0 && x < ww && y < wh){
+            if(solid(team, type, x + y * wwidth, true)) return Point2.pack(x, y);
+            if(x == x2 && y == y2) return 0;
+
+            //no diagonals
+            if(2 * err + dy > dx - 2 * err){
+                err -= dy;
+                x += sx;
+            }else{
+                err += dx;
+                y += sy;
+            }
+        }
+
+        return 0;
     }
 
     static boolean cast(int team, PathCost cost, int from, int to){
@@ -419,9 +468,9 @@ public class ControlPathfinder{
         return cost == impassable || cost >= 2;
     }
 
-    private static boolean solid(int team, PathCost type, int tilePos){
+    private static boolean solid(int team, PathCost type, int tilePos, boolean checkWall){
         int cost = cost(team, type, tilePos);
-        return cost == impassable || cost >= 6000;
+        return cost == impassable || (checkWall && cost >= 6000);
     }
 
     private static float tileCost(int team, PathCost type, int a, int b){
@@ -481,6 +530,7 @@ public class ControlPathfinder{
         volatile PathCost cost;
         volatile int team;
         volatile int lastWorldUpdate;
+        volatile boolean forcedRecalc;
 
         final Vec2 lastPos = new Vec2();
         float stuckTimer = 0f;
@@ -505,11 +555,19 @@ public class ControlPathfinder{
 
         long lastUpdateId;
         long lastTime;
+        long forceRecalcTime;
 
         volatile int lastId, curId;
 
         public PathRequest(PathfindThread thread){
             this.thread = thread;
+        }
+
+        public void forceRecalculate(){
+            //keep it at 3 times/sec
+            if(Time.timeSinceMillis(forceRecalcTime) < 1000 / 3) return;
+            forcedRecalc = true;
+            forceRecalcTime = Time.millis();
         }
 
         void update(long maxUpdateNs){
@@ -519,9 +577,10 @@ public class ControlPathfinder{
             lastId = curId;
 
             //re-do everything when world updates, but keep the old path around
-            if(Time.timeSinceMillis(lastTime) > 1000 * 3 && (worldUpdateId != lastWorldUpdate || !destination.epsilonEquals(lastDestination, 2f))){
+            if(forcedRecalc || (Time.timeSinceMillis(lastTime) > 1000 * 3 && (worldUpdateId != lastWorldUpdate || !destination.epsilonEquals(lastDestination, 2f)))){
                 lastTime = Time.millis();
                 lastWorldUpdate = worldUpdateId;
+                forcedRecalc = false;
                 clear(false);
             }
 

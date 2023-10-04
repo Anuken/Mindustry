@@ -115,9 +115,9 @@ public class Build{
         build.prevBuild = prevBuild;
         if(unit != null && unit.getControllerName() != null) build.lastAccessed = unit.getControllerName();
 
-        result.placeBegan(tile, previous);
-
         Events.fire(new BlockBuildBeginEvent(tile, team, unit, false));
+
+        result.placeBegan(tile, previous, unit);
     }
 
     /** Returns whether a tile can be placed at this location by this team. */

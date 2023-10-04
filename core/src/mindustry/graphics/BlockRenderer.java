@@ -352,7 +352,7 @@ public class BlockRenderer{
         var bounds = camera.bounds(Tmp.r3).grow(tilesize * 2f);
 
         //draw floor lights
-        floorTree.intersect(bounds, tile -> lightview.add(tile));
+        floorTree.intersect(bounds, lightview::add);
 
         blockTree.intersect(bounds, tile -> {
             if(tile.build == null || procLinks.add(tile.build.id)){

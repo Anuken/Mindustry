@@ -38,6 +38,8 @@ public class Conduit extends LiquidBlock implements Autotiler{
     /** indices: [rotation] [fluid type] [frame] */
     public TextureRegion[][][] rotateRegions;
 
+    /** If true, the liquid region is padded at corners, so it doesn't stick out. */
+    public boolean padCorners = true;
     public boolean leaks = true;
     public @Nullable Block junctionReplacement, bridgeReplacement, rotBridgeReplacement;
 
@@ -186,9 +188,9 @@ public class Conduit extends LiquidBlock implements Autotiler{
             int gas = liquids.current().gas ? 1 : 0;
             float ox = 0f, oy = 0f;
             int wrapRot = (rotation + offset) % 4;
-            TextureRegion liquidr = bits == 1 ? rotateRegions[wrapRot][gas][frame] : renderer.fluidFrames[gas][frame];
+            TextureRegion liquidr = bits == 1 && padCorners ? rotateRegions[wrapRot][gas][frame] : renderer.fluidFrames[gas][frame];
 
-            if(bits == 1){
+            if(bits == 1 && padCorners){
                 ox = rotateOffsets[wrapRot][0];
                 oy = rotateOffsets[wrapRot][1];
             }

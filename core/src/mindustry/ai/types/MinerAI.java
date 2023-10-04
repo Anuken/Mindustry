@@ -19,7 +19,7 @@ public class MinerAI extends AIController{
 
         if(!(unit.canMine()) || core == null) return;
 
-        if(unit.mineTile != null && !unit.mineTile.within(unit, unit.type.mineRange)){
+        if(!unit.validMine(unit.mineTile)){
             unit.mineTile(null);
         }
 

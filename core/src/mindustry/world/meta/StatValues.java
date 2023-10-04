@@ -12,6 +12,7 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
+import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.maps.*;
@@ -273,7 +274,7 @@ public class StatValues{
                         b.image(liquid.uiIcon).size(40).pad(10f).left().scaling(Scaling.fit);
                         b.table(info -> {
                             info.add(liquid.localizedName).left().row();
-                            info.add(Strings.autoFixed(maxUsed * 60f, 1) + StatUnit.perSecond.localized()).left().color(Color.lightGray);
+                            info.add(Strings.autoFixed(maxUsed * 60f, 2) + StatUnit.perSecond.localized()).left().color(Color.lightGray);
                         });
 
                         b.table(bt -> {
@@ -282,7 +283,7 @@ public class StatValues{
                             float reloadRate = (baseReload ? 1f : 0f) + maxUsed * multiplier * liquid.heatCapacity;
                             float standardReload = baseReload ? reload : reload / (maxUsed * multiplier * 0.4f);
                             float result = standardReload / (reload / reloadRate);
-                            bt.add(Core.bundle.format("bullet.reload", Strings.autoFixed(result * 100, 1))).pad(5);
+                            bt.add(Core.bundle.format("bullet.reload", Strings.autoFixed(result * 100, 2))).pad(5);
                         }).right().grow().pad(10f).padRight(15f);
                     }).growX().pad(5).row();
                 }
@@ -302,7 +303,7 @@ public class StatValues{
                         b.image(liquid.uiIcon).size(40).pad(10f).left().scaling(Scaling.fit);
                         b.table(info -> {
                             info.add(liquid.localizedName).left().row();
-                            info.add(Strings.autoFixed(amount * 60f, 1) + StatUnit.perSecond.localized()).left().color(Color.lightGray);
+                            info.add(Strings.autoFixed(amount * 60f, 2) + StatUnit.perSecond.localized()).left().color(Color.lightGray);
                         });
 
                         b.table(bt -> {
@@ -348,7 +349,7 @@ public class StatValues{
     public static StatValue weapons(UnitType unit, Seq<Weapon> weapons){
         return table -> {
             table.row();
-            for(int i = 0; i < weapons.size;i ++){
+            for(int i = 0; i < weapons.size; i++){
                 Weapon weapon = weapons.get(i);
 
                 if(weapon.flipSprite || !weapon.hasStats(unit)){
@@ -367,6 +368,23 @@ public class StatValues{
                 }).growX().pad(5).margin(10);
                 table.row();
             }
+        };
+    }
+
+    public static StatValue abilities(Seq<Ability> abilities){
+        return table -> {
+            table.row();
+            table.table(t -> abilities.each(ability -> {
+                if(ability.display){
+                    t.row();
+                    t.table(Styles.grayPanel, a -> {
+                        a.add("[accent]" + ability.localized()).padBottom(4);
+                        a.row();
+                        a.left().top().defaults().left();
+                        ability.addStats(a);
+                    }).pad(5).margin(10).growX();
+                }
+            }));
         };
     }
 
