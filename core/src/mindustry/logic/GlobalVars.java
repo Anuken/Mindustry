@@ -27,10 +27,11 @@ public class GlobalVars{
     public static final Rand rand = new Rand();
 
     //non-constants that depend on state
-    private static int varTime, varTick, varSecond, varMinute, varWave, varWaveTime, varServer, varClient;
+    private static int varTime, varTick, varSecond, varMinute, varWave, varWaveTime, varServer, varClient, varClientUnit, varClientName, varClientTeam;
 
     private ObjectIntMap<String> namesToIds = new ObjectIntMap<>();
     private Seq<Var> vars = new Seq<>(Var.class);
+    private IntSet privilegedIds = new IntSet();
     private UnlockableContent[][] logicIdToContent;
     private int[][] contentIdToLogicId;
 
@@ -58,6 +59,14 @@ public class GlobalVars{
 
         varServer = put("@server", 0);
         varClient = put("@client", 0);
+
+        //privileged desynced client variables
+        if(!net.server()){
+            put("@clientLocale", Core.bundle.getLocale().toLanguageTag(), true);
+            varClientUnit = put("@clientUnit", null, true);
+            varClientName = put("@clientName", null, true);
+            varClientTeam = put("@clientTeam", 0, true);
+        }
 
         //special enums
         put("@ctrlProcessor", ctrlProcessor);
@@ -154,6 +163,13 @@ public class GlobalVars{
         //network
         vars.items[varServer].numval = (net.server() || !net.active()) ? 1 : 0;
         vars.items[varClient].numval = net.client() ? 1 : 0;
+
+        //client
+        if(!net.server()){
+            vars.items[varClientUnit].objval = player.unit();
+            vars.items[varClientName].objval = player.name();
+            vars.items[varClientTeam].numval = player.team().id;
+        }
     }
 
     /** @return a piece of content based on its logic ID. This is not equivalent to content ID. */
@@ -168,23 +184,26 @@ public class GlobalVars{
         return arr != null && content.id >= 0 && content.id < arr.length ? arr[content.id] : -1;
     }
 
-    /** @return a constant ID > 0 if there is a constant with this name, otherwise -1. */
+    /** @return a constant ID > 0 if there is a constant with this name, otherwise -1.
+     * Attempt to get privileged variable id from non-privileged logic executor returns null constant id. */
     public int get(String name){
         return namesToIds.get(name, -1);
     }
 
-    /** @return a constant variable by ID. ID is not bound checked and must be positive. */
-    public Var get(int id){
+    /** @return a constant variable by ID. ID is not bound checked and must be positive.
+     * Attempt to get privileged variable from non-privileged logic executor returns null constant */
+    public Var get(int id, boolean privileged){
+        if(!privileged && privilegedIds.contains(id)) return vars.get(namesToIds.get("null"));
         return vars.items[id];
     }
 
     /** Sets a global variable by an ID returned from put(). */
     public void set(int id, double value){
-        get(id).numval = value;
+        get(id, true).numval = value;
     }
 
     /** Adds a constant value by name. */
-    public int put(String name, Object value){
+    public int put(String name, Object value, boolean privileged){
         int existingIdx = namesToIds.get(name, -1);
         if(existingIdx != -1){ //don't overwrite existing vars (see #6910)
             Log.debug("Failed to add global logic variable '@', as it already exists.", name);
@@ -202,7 +221,12 @@ public class GlobalVars{
 
         int index = vars.size;
         namesToIds.put(name, index);
+        if(privileged) privilegedIds.add(index);
         vars.add(var);
         return index;
+    }
+
+    public int put(String name, Object value){
+        return put(name, value, false);
     }
 }
