@@ -15,6 +15,7 @@ public class LAssembler{
     private static final int invalidNum = Integer.MIN_VALUE;
 
     private int lastVar;
+    private boolean privileged;
     /** Maps names to variable IDs. */
     public ObjectMap<String, BVar> vars = new ObjectMap<>();
     /** All instructions to be executed. */
@@ -35,6 +36,7 @@ public class LAssembler{
         Seq<LStatement> st = read(data, privileged);
 
         asm.instructions = st.map(l -> l.build(asm)).retainAll(l -> l != null).toArray(LInstruction.class);
+        asm.privileged = privileged;
         return asm;
     }
 

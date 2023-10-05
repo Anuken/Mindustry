@@ -121,7 +121,7 @@ public class LExecutor{
 
     public Var var(int index){
         //global constants have variable IDs < 0, and they are fetched from the global constants object after being negated
-        return index < 0 ? logicVars.get(-index) : vars[index];
+        return index < 0 ? logicVars.get(-index, privileged) : vars[index];
     }
 
     /** @return a Var from this processor, never a global constant. May be null if out of bounds. */
