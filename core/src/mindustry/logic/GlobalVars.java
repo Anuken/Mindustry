@@ -27,7 +27,7 @@ public class GlobalVars{
     public static final Rand rand = new Rand();
 
     //non-constants that depend on state
-    private static int varTime, varTick, varSecond, varMinute, varWave, varWaveTime, varServer, varClient, varClientUnit, varClientName, varClientTeam;
+    private static int varTime, varTick, varSecond, varMinute, varWave, varWaveTime, varServer, varClient, varClientLocale, varClientUnit, varClientName, varClientTeam;
 
     private ObjectIntMap<String> namesToIds = new ObjectIntMap<>();
     private Seq<Var> vars = new Seq<>(Var.class);
@@ -57,11 +57,11 @@ public class GlobalVars{
         varWave = put("@waveNumber", 0);
         varWaveTime = put("@waveTime", 0);
 
-        varServer = put("@server", 0);
-        varClient = put("@client", 0);
+        varServer = put("@server", 0, true);
+        varClient = put("@client", 0, true);
 
         //privileged desynced client variables
-        put("@clientLocale", (net.server() ? null : Core.bundle.getLocale().toLanguageTag()), true);
+        varClientLocale = put("@clientLocale", null, true);
         varClientUnit = put("@clientUnit", null, true);
         varClientName = put("@clientName", null, true);
         varClientTeam = put("@clientTeam", 0, true);
@@ -164,6 +164,7 @@ public class GlobalVars{
 
         //client
         if(!net.server() && player != null){
+            vars.items[varClientLocale].objval = player.locale();
             vars.items[varClientUnit].objval = player.unit();
             vars.items[varClientName].objval = player.name();
             vars.items[varClientTeam].numval = player.team().id;
