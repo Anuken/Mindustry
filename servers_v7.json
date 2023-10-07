@@ -5,7 +5,7 @@
   },
   {
     "name": "meiqiuMDT",
-    "address": ["43.248.103.156:11023","bj-1.lcf.icu:10240"]
+    "address": ["43.248.103.156:11023","211.101.236.94:10000","bj-1.lcf.icu:10240"]
   },
   {
     "name": "CMS",
@@ -85,7 +85,7 @@
   },
   {
     "name": "Chaotic Neutral",
-    "address": ["c-n.ddns.net:7012", "c-n.ddns.net:7013", "c-n.ddns.net:7014", "c-n.ddns.net:7015", "c-n.ddns.net:7016", "c-n.ddns.net:7017"]
+    "address": ["c-n.ddns.net:7012", "c-n.ddns.net:7013", "c-n.ddns.net:7014", "c-n.ddns.net:7015", "c-n.ddns.net:7016", "c-n.ddns.net:7017", "37.187.73.180:7021"]
   },
   {
     "name": "io",
@@ -221,7 +221,7 @@
     "address": ["193.233.133.223", "193.233.133.223:6568", "193.233.133.223:6569"]
   },
   {
-    "name": "Meow Island",
+    "name": "MeowIsland",
     "address": ["n1.mindustry.me:6590", "n1.mindustry.me:6592", "n1.mindustry.me:6595"]
   },
   {
