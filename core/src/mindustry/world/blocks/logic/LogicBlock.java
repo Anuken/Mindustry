@@ -514,6 +514,10 @@ public class LogicBlock extends Block{
                 for(int i = 0; i < (int)accumulator; i++){
                     executor.runOnce();
                     accumulator --;
+                    if(executor.yield){
+                        executor.yield = false;
+                        break;
+                    }
                 }
             }
         }
