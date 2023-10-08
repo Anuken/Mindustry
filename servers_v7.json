@@ -1,5 +1,9 @@
 [
   {
+    "name": "SpaceMan",
+    "address": ["45.91.8.55:6569","45.91.8.55:6560","45.91.8.55:6568"]
+  },
+  {
     "name": "OmniCorp Classic",
     "address": ["omnidustry.ddns.net:6567","omnidustry.ddns.net:6568","omnidustry.ddns.net:6569","omnidustry.ddns.net:6570","omnidustry.ddns.net:6571","omnidustry.ddns.net:6572","omnidustry.ddns.net:6573","omnidustry.ddns.net:6574"]
   },
