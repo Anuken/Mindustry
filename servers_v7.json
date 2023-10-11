@@ -255,5 +255,9 @@
   {
     "name": "MineCore",
     "address": ["194.247.42.11:27792"]
+  },
+  {
+    "name": "Atomic",
+    "address": ["atomic-lab.ddns.net"]
   }
 ]
