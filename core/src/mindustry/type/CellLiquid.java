@@ -19,7 +19,7 @@ import static mindustry.entities.Puddles.*;
 /** Liquid that draws cells in its puddle. */
 public class CellLiquid extends Liquid{
     public Color colorFrom = Color.white.cpy(), colorTo = Color.white.cpy();
-    public int cells = 8;
+    public int cells = 6;
 
     public @Nullable Liquid spreadTarget;
     public float maxSpread = 0.75f, spreadConversion = 1.2f, spreadDamage = 0.11f, removeScaling = 0.25f;
@@ -122,7 +122,7 @@ public class CellLiquid extends Liquid{
             Fill.circle(
             vx + Mathf.sin(Time.time + i * 532, sscl, smag),
             vy + Mathf.sin(Time.time + i * 53, sscl, smag),
-            f * 3.8f * rand.random(0.2f, 1f) * Mathf.absin(Time.time + ((i + id) % 60) * 54, 75f * rand.random(1f, 2f), 1f));
+            f * 3.8f * rand.random(0.35f, 1f) * Mathf.absin(Time.time + ((i + id) % 60) * 54, 75f * rand.random(1f, 2f), 1f));
         }
 
         Draw.color();

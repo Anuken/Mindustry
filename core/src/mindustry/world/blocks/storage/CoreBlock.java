@@ -361,11 +361,11 @@ public class CoreBlock extends StorageBlock{
         public void changeTeam(Team next){
             if(this.team == next) return;
 
-            state.teams.unregisterCore(this);
+            onRemoved();
 
             super.changeTeam(next);
 
-            state.teams.registerCore(this);
+            onProximityUpdate();
 
             Events.fire(new CoreChangeEvent(this));
         }

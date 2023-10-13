@@ -17,6 +17,7 @@ import mindustry.*;
 import mindustry.ai.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.async.*;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.entities.*;
@@ -46,6 +47,9 @@ import static arc.Core.*;
 import static mindustry.Vars.*;
 
 public abstract class InputHandler implements InputProcessor, GestureListener{
+    //not sure where else to put this - maps unique commands based on position to a list of units that will be turned into a unit group
+    static ObjectMap<Vec2, Seq<Unit>> queuedCommands = new ObjectMap<>();
+
     /** Used for dropping items. */
     final static float playerSelectRange = mobile ? 17f : 11f;
     final static IntSeq removed = new IntSeq();
@@ -53,6 +57,18 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     final static int maxLength = 100;
     final static Rect r1 = new Rect(), r2 = new Rect();
     final static Seq<Unit> tmpUnits = new Seq<>(false);
+    final static Binding[] controlGroupBindings = {
+    Binding.block_select_01,
+    Binding.block_select_02,
+    Binding.block_select_03,
+    Binding.block_select_04,
+    Binding.block_select_05,
+    Binding.block_select_06,
+    Binding.block_select_07,
+    Binding.block_select_08,
+    Binding.block_select_09,
+    Binding.block_select_10
+    };
 
     /** If true, there is a cutscene currently occurring in logic. */
     public boolean logicCutscene;
@@ -87,6 +103,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public boolean commandRect = false;
     public boolean tappedOne = false;
     public float commandRectX, commandRectY;
+    /** Groups of units saved to different hotkeys */
+    public IntSeq[] controlGroups = new IntSeq[controlGroupBindings.length];
 
     private Seq<BuildPlan> plansOut = new Seq<>(BuildPlan.class);
     private QuadTree<BuildPlan> playerPlanTree = new QuadTree<>(new Rect());
@@ -124,6 +142,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         Events.on(ResetEvent.class, e -> {
             logicCutscene = false;
+            Arrays.fill(controlGroups, null);
         });
     }
 
@@ -212,7 +231,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     @Remote(called = Loc.server, targets = Loc.both, forward = true)
-    public static void commandUnits(Player player, int[] unitIds, @Nullable Building buildTarget, @Nullable Unit unitTarget, @Nullable Vec2 posTarget){
+    public static void commandUnits(Player player, int[] unitIds, @Nullable Building buildTarget, @Nullable Unit unitTarget, @Nullable Vec2 posTarget, boolean queueCommand, boolean finalBatch){
         if(player == null || unitIds == null) return;
 
         //why did I ever think this was a good idea
@@ -225,6 +244,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         Teamc teamTarget = buildTarget == null ? unitTarget : buildTarget;
+        Vec2 targetAsVec = new Vec2().set(teamTarget != null ? teamTarget : posTarget);
+        Seq<Unit> toAdd = queuedCommands.get(targetAsVec, Seq::new);
+        boolean anyCommandedTarget = false;
 
         for(int id : unitIds){
             Unit unit = Groups.unit.getByID(id);
@@ -235,23 +257,78 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                     ai.command(UnitCommand.moveCommand);
                 }
 
-                if(teamTarget != null && teamTarget.team() != player.team()){
-                    ai.commandTarget(teamTarget);
+                if(teamTarget != null && teamTarget.team() != player.team() &&
+                    !(teamTarget instanceof Unit u && !unit.canTarget(u)) && !(teamTarget instanceof Building && !unit.type.targetGround)){
 
+                    anyCommandedTarget = true;
+                    if(queueCommand){
+                        ai.commandQueue(teamTarget);
+                    }else{
+                        ai.commandQueue.clear();
+                        ai.commandTarget(teamTarget);
+                    }
                 }else if(posTarget != null){
-                    ai.commandPosition(posTarget);
+                    if(queueCommand){
+                        ai.commandQueue(posTarget);
+                    }else{
+                        ai.commandQueue.clear();
+                        ai.commandPosition(posTarget);
+                    }
                 }
+
                 unit.lastCommanded = player.coloredName();
+                if(ai.commandQueue.size <= 0){
+                    ai.group = null;
+                }
                 
                 //remove when other player command
                 if(!headless && player != Vars.player){
                     control.input.selectedUnits.remove(unit);
                 }
+
+                toAdd.add(unit);
+            }
+        }
+
+        //in the "final batch" of commands, assign formations based on EVERYTHING that was commanded.
+        if(finalBatch){
+            //each physics layer has its own group
+            UnitGroup[] groups = new UnitGroup[PhysicsProcess.layers];
+            var units = queuedCommands.remove(targetAsVec);
+
+            for(Unit unit : units){
+                if(unit.controller() instanceof CommandAI ai){
+                    //only assign a group when this is not a queued command
+                    if(ai.commandQueue.size == 0 && unitIds.length > 1){
+                        int layer = unit.collisionLayer();
+                        if(groups[layer] == null){
+                            groups[layer] = new UnitGroup();
+                        }
+
+                        groups[layer].units.add(unit);
+                        ai.group = groups[layer];
+                    }
+                }
+            }
+
+            float minSpeed = 100000000f;
+            for(int i = 0; i < groups.length; i ++){
+                var group = groups[i];
+                if(group != null && group.units.size > 0){
+                    group.calculateFormation(targetAsVec, i);
+                    minSpeed = Math.min(group.minSpeed, minSpeed);
+                }
+            }
+
+            for(var group : groups){
+                if(group != null){
+                    group.minSpeed = minSpeed;
+                }
             }
         }
 
         if(unitIds.length > 0 && player == Vars.player && !state.isPaused()){
-            if(teamTarget != null){
+            if(anyCommandedTarget){
                 Fx.attackCommand.at(teamTarget);
             }else{
                 Fx.moveCommand.at(posTarget);
@@ -277,6 +354,29 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 if(reset){
                     ai.targetPos = null;
                     ai.attackTarget = null;
+                }
+                unit.lastCommanded = player.coloredName();
+            }
+        }
+    }
+
+    @Remote(called = Loc.server, targets = Loc.both, forward = true)
+    public static void setUnitStance(Player player, int[] unitIds, UnitStance stance){
+        if(player == null || unitIds == null || stance == null) return;
+
+        if(net.server() && !netServer.admins.allowAction(player, ActionType.commandUnits, event -> {
+            event.unitIDs = unitIds;
+        })){
+            throw new ValidateException(player, "Player cannot command units.");
+        }
+
+        for(int id : unitIds){
+            Unit unit = Groups.unit.getByID(id);
+            if(unit != null && unit.team == player.team() && unit.controller() instanceof CommandAI ai){
+                if(stance == UnitStance.stop){ //not a real stance, just cancels orders
+                    ai.clearCommands();
+                }else{
+                    ai.stance = stance;
                 }
                 unit.lastCommanded = player.coloredName();
             }
@@ -850,6 +950,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void commandTap(float screenX, float screenY){
+        commandTap(screenX, screenY, false);
+    }
+
+    public void commandTap(float screenX, float screenY, boolean queue){
         if(commandMode){
             //right click: move to position
 
@@ -878,10 +982,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 if(ids.length > maxChunkSize){
                     for(int i = 0; i < ids.length; i += maxChunkSize){
                         int[] data = Arrays.copyOfRange(ids, i, Math.min(i + maxChunkSize, ids.length));
-                        Call.commandUnits(player, data, attack instanceof Building b ? b : null, attack instanceof Unit u ? u : null, target);
+                        Call.commandUnits(player, data, attack instanceof Building b ? b : null, attack instanceof Unit u ? u : null, target, queue, i + maxChunkSize >= ids.length);
                     }
                 }else{
-                    Call.commandUnits(player, ids, attack instanceof Building b ? b : null, attack instanceof Unit u ? u : null, target);
+                    Call.commandUnits(player, ids, attack instanceof Building b ? b : null, attack instanceof Unit u ? u : null, target, queue, true);
                 }
             }
 
@@ -903,6 +1007,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             //draw command overlay UI
             for(Unit unit : selectedUnits){
                 CommandAI ai = unit.command();
+                Position lastPos = ai.attackTarget != null ? ai.attackTarget : ai.targetPos;
+
                 //draw target line
                 if(ai.targetPos != null && ai.currentCommand().drawTarget){
                     Position lineDest = ai.attackTarget != null ? ai.attackTarget : ai.targetPos;
@@ -917,6 +1023,24 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
                 if(ai.attackTarget != null && ai.currentCommand().drawTarget){
                     Drawf.target(ai.attackTarget.getX(), ai.attackTarget.getY(), 6f, Pal.remove);
+                }
+
+                if(lastPos == null){
+                    lastPos = unit;
+                }
+
+                //draw command queue
+                if(ai.currentCommand().drawTarget && ai.commandQueue.size > 0){
+                    for(var next : ai.commandQueue){
+                        Drawf.limitLine(lastPos, next, 3.5f, 3.5f);
+                        lastPos = next;
+
+                        if(next instanceof Vec2 vec){
+                            Drawf.square(vec.x, vec.y, 3.5f);
+                        }else{
+                            Drawf.target(next.getX(), next.getY(), 6f, Pal.remove);
+                        }
+                    }
                 }
             }
 

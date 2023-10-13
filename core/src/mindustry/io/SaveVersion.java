@@ -6,12 +6,14 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.game.*;
+import mindustry.game.MapObjectives.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.maps.Map;
@@ -74,6 +76,7 @@ public abstract class SaveVersion extends SaveFileReader{
         try{
             region("map", stream, counter, in -> readMap(in, context));
             region("entities", stream, counter, this::readEntities);
+            if(version >= 8) region("markers", stream, counter, this::readMarkers);
             region("custom", stream, counter, this::readCustomChunks);
         }finally{
             content.setTemporaryMapper(null);
@@ -85,6 +88,7 @@ public abstract class SaveVersion extends SaveFileReader{
         region("content", stream, this::writeContentHeader);
         region("map", stream, this::writeMap);
         region("entities", stream, this::writeEntities);
+        region("markers", stream, this::writeMarkers);
         region("custom", stream, s -> writeCustomChunks(s, false));
     }
 
@@ -124,7 +128,10 @@ public abstract class SaveVersion extends SaveFileReader{
             node.save();
         }
 
-        writeStringMap(stream, StringMap.of(
+        StringMap result = new StringMap();
+        result.putAll(tags);
+
+        writeStringMap(stream, result.merge(StringMap.of(
             "saved", Time.millis(),
             "playtime", headless ? 0 : control.saves.getTotalPlaytime(),
             "build", Version.build,
@@ -135,13 +142,14 @@ public abstract class SaveVersion extends SaveFileReader{
             "stats", JsonIO.write(state.stats),
             "rules", JsonIO.write(state.rules),
             "mods", JsonIO.write(mods.getModStrings().toArray(String.class)),
+            "controlGroups", headless || control == null ? "null" : JsonIO.write(control.input.controlGroups),
             "width", world.width(),
             "height", world.height(),
             "viewpos", Tmp.v1.set(player == null ? Vec2.ZERO : player).toString(),
             "controlledType", headless || control.input.controlledType == null ? "null" : control.input.controlledType.name,
             "nocores", state.rules.defaultTeam.cores().isEmpty(),
             "playerteam", player == null ? state.rules.defaultTeam.id : player.team().id
-        ).merge(tags));
+        )));
     }
 
     public void readMeta(DataInput stream, WorldContext context) throws IOException{
@@ -176,6 +184,11 @@ public abstract class SaveVersion extends SaveFileReader{
             Team team = Team.get(map.getInt("playerteam", state.rules.defaultTeam.id));
             if(!net.client() && team != Team.derelict){
                 player.team(team);
+            }
+
+            var groups = JsonIO.read(IntSeq[].class, map.get("controlGroups", "null"));
+            if(groups != null && groups.length == control.input.controlGroups.length){
+                control.input.controlGroups = groups;
             }
         }
 
@@ -384,6 +397,14 @@ public abstract class SaveVersion extends SaveFileReader{
         writeEntityMapping(stream);
         writeTeamBlocks(stream);
         writeWorldEntities(stream);
+    }
+
+    public void writeMarkers(DataOutput stream) throws IOException{
+        JsonIO.writeBytes(Vars.state.markers, ObjectiveMarker.class, (DataOutputStream)stream);
+    }
+
+    public void readMarkers(DataInput stream) throws IOException{
+        Vars.state.markers = JsonIO.readBytes(IntMap.class, ObjectiveMarker.class, (DataInputStream)stream);
     }
 
     public void readTeamBlocks(DataInput stream) throws IOException{
