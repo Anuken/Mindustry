@@ -483,6 +483,14 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                 timeString.append(s);
 
                 if(text.startsWith("@")){
+                    if(state.mapLocales.containsProperty(text.substring(1))){
+                        try{
+                            return state.mapLocales.getFormatted(text.substring(1), timeString.toString());
+                        }catch(IllegalArgumentException e){
+                            //illegal text.
+                            text = "";
+                        }
+                    }
                     return Core.bundle.format(text.substring(1), timeString.toString());
                 }else{
                     try{
@@ -591,7 +599,12 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public String text(){
-            return text != null && text.startsWith("@") ? Core.bundle.get(text.substring(1)) : text;
+            if(text.startsWith("@")){
+                if(state.mapLocales.containsProperty(text.substring(1))) return state.mapLocales.getProperty(text.substring(1));
+                return Core.bundle.get(text.substring(1));
+            }else{
+                return text;
+            }
         }
     }
 
