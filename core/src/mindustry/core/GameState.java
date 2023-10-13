@@ -36,6 +36,8 @@ public class GameState{
     public GameStats stats = new GameStats();
     /** Markers not linked to objectives. Controlled by world processors. */
     public IntMap<ObjectiveMarker> markers = new IntMap<>();
+    /** Locale-specific string bundle of current map */
+    public StringMap mapLocale = new StringMap();
     /** Global attributes of the environment, calculated by weather. */
     public Attributes envAttrs = new Attributes();
     /** Team data. Gets reset every new game. */

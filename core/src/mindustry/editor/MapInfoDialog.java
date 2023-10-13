@@ -7,6 +7,7 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.io.*;
 import mindustry.maps.filters.*;
+import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 
@@ -17,6 +18,7 @@ public class MapInfoDialog extends BaseDialog{
     private final MapGenerateDialog generate;
     private final CustomRulesDialog ruleInfo = new CustomRulesDialog();
     private final MapObjectivesDialog objectives = new MapObjectivesDialog();
+    private final MapLocalesDialog locales = new MapLocalesDialog();
 
     public MapInfoDialog(){
         super("@editor.mapinfo");
@@ -94,6 +96,21 @@ public class MapInfoDialog extends BaseDialog{
                     });
                     hide();
                 }).marginLeft(10f);
+
+                r.row();
+
+                r.button("@editor.locales", Icon.fileText, style, () -> {
+                    try{
+                        MapLocales res = JsonIO.read(MapLocales.class, editor.tags.get("locales", "{}"));
+                        locales.show(res);
+                        hide();
+                    }catch(Throwable e){
+                        ui.showException(e);
+                        locales.show(new MapLocales());
+                        hide();
+                    }
+                    hide();
+                }).marginLeft(10f).width(0f).colspan(2).center().growX();
             }).colspan(2).center();
 
             name.change();
