@@ -71,6 +71,7 @@ public class UI implements ApplicationListener, Loadable{
     public SchematicsDialog schematics;
     public ModsDialog mods;
     public ColorPicker picker;
+    public EffectsDialog effects;
     public LogicDialog logic;
     public FullTextDialog fullText;
     public CampaignCompleteDialog campaignComplete;
@@ -127,6 +128,9 @@ public class UI implements ApplicationListener, Loadable{
 
         Tooltips.getInstance().animations = false;
         Tooltips.getInstance().textProvider = text -> new Tooltip(t -> t.background(Styles.black6).margin(4f).add(text));
+        if(mobile){
+            Tooltips.getInstance().offsetY += Scl.scl(60f);
+        }
 
         Core.settings.setErrorHandler(e -> {
             Log.err(e);
@@ -183,6 +187,7 @@ public class UI implements ApplicationListener, Loadable{
         consolefrag = new ConsoleFragment();
 
         picker = new ColorPicker();
+        effects = new EffectsDialog();
         editor = new MapEditorDialog();
         controls = new KeybindDialog();
         restart = new GameOverDialog();
@@ -268,8 +273,15 @@ public class UI implements ApplicationListener, Loadable{
         });
     }
 
-    public void showTextInput(String titleText, String text, int textLength, String def, boolean numbers, Cons<String> confirmed, Runnable closed){
+
+    public void showTextInput(String titleText, String text, int textLength, String def, boolean numbers, Cons<String> confirmed, Runnable closed) {
+        showTextInput(titleText, text, textLength, def, numbers, false, confirmed, closed);
+    }
+
+    public void showTextInput(String titleText, String text, int textLength, String def, boolean numbers, boolean allowEmpty, Cons<String> confirmed, Runnable closed){
         if(mobile){
+            var description = text;
+            var empty = allowEmpty;
             Core.input.getTextInput(new TextInput(){{
                 this.title = (titleText.startsWith("@") ? Core.bundle.get(titleText.substring(1)) : titleText);
                 this.text = def;
@@ -277,7 +289,8 @@ public class UI implements ApplicationListener, Loadable{
                 this.maxLength = textLength;
                 this.accepted = confirmed;
                 this.canceled = closed;
-                this.allowEmpty = false;
+                this.allowEmpty = empty;
+                this.message = description;
             }});
         }else{
             new Dialog(titleText){{
@@ -294,11 +307,11 @@ public class UI implements ApplicationListener, Loadable{
                 buttons.button("@ok", () -> {
                     confirmed.get(field.getText());
                     hide();
-                }).disabled(b -> field.getText().isEmpty());
+                }).disabled(b -> !allowEmpty && field.getText().isEmpty());
 
                 keyDown(KeyCode.enter, () -> {
                     String text = field.getText();
-                    if(!text.isEmpty()){
+                    if(allowEmpty || !text.isEmpty()){
                         confirmed.get(text);
                         hide();
                     }

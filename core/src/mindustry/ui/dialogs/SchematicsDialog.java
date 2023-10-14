@@ -154,7 +154,7 @@ public class SchematicsDialog extends BaseDialog{
                             }else{
                                 buttons.button(Icon.trash, style, () -> {
                                     if(s.mod != null){
-                                        ui.showInfo(Core.bundle.format("mod.item.remove", s.mod.meta.displayName()));
+                                        ui.showInfo(Core.bundle.format("mod.item.remove", s.mod.meta.displayName));
                                     }else{
                                         ui.showConfirm("@confirm", "@schematic.delete.confirm", () -> {
                                             schematics.remove(s);

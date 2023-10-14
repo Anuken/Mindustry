@@ -14,8 +14,10 @@ import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.game.*;
+import mindustry.game.MapObjectives.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
+import mindustry.logic.LogicFx.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
@@ -47,6 +49,7 @@ public class LExecutor{
     public Var[] vars = {};
     public Var counter;
     public int[] binds;
+    public boolean yield;
 
     public int iptIndex = -1;
     public LongSeq graphicsBuffer = new LongSeq();
@@ -119,7 +122,12 @@ public class LExecutor{
 
     public Var var(int index){
         //global constants have variable IDs < 0, and they are fetched from the global constants object after being negated
-        return index < 0 ? logicVars.get(-index) : vars[index];
+        return index < 0 ? logicVars.get(-index, privileged) : vars[index];
+    }
+
+    /** @return a Var from this processor, never a global constant. May be null if out of bounds. */
+    public @Nullable Var optionalVar(int index){
+        return index < 0 || index >= vars.length ? null : vars[index];
     }
 
     public @Nullable Building building(int index){
@@ -202,6 +210,9 @@ public class LExecutor{
 
         public Object objval;
         public double numval;
+
+        //ms timestamp for when this was last synced; used in the sync instruction
+        public long syncTime;
 
         public Var(String name){
             this.name = name;
@@ -398,7 +409,7 @@ public class LExecutor{
                 float x1 = World.unconv(exec.numf(p1)), y1 = World.unconv(exec.numf(p2)), d1 = World.unconv(exec.numf(p3));
 
                 switch(type){
-                    case idle -> {
+                    case idle, autoPathfind -> {
                         ai.control = type;
                     }
                     case move, stop, approach, pathfind -> {
@@ -849,8 +860,10 @@ public class LExecutor{
 
             if(!v.constant){
                 if(f.isobj){
-                    v.objval = f.objval;
-                    v.isobj = true;
+                    if(to != varCounter){
+                        v.objval = f.objval;
+                        v.isobj = true;
+                    }
                 }else{
                     v.numval = invalid(f.numval) ? 0 : f.numval;
                     v.isobj = false;
@@ -1116,6 +1129,7 @@ public class LExecutor{
             }else{
                 //skip back to self.
                 exec.var(varCounter).numval --;
+                exec.yield = true;
             }
 
             if(state.updateId != frameId){
@@ -1131,10 +1145,10 @@ public class LExecutor{
         public void run(LExecutor exec){
             //skip back to self.
             exec.var(varCounter).numval --;
+            exec.yield = true;
         }
     }
 
-    //TODO inverse lookup
     public static class LookupI implements LInstruction{
         public int dest;
         public int from;
@@ -1325,7 +1339,9 @@ public class LExecutor{
                         if((b instanceof OverlayFloor || b == Blocks.air) && tile.overlay() != b) tile.setOverlayNet(b);
                     }
                     case floor -> {
-                        if(b instanceof Floor f && tile.floor() != f && !f.isOverlay()) tile.setFloorNet(f);
+                        if(b instanceof Floor f && tile.floor() != f && !f.isOverlay() && !f.isAir()){
+                            tile.setFloorNet(f);
+                        }
                     }
                     case block -> {
                         if(!b.isFloor() || b == Blocks.air){
@@ -1422,15 +1438,15 @@ public class LExecutor{
         public void run(LExecutor exec){
             switch(rule){
                 case waveTimer -> state.rules.waveTimer = exec.bool(value);
-                case wave -> state.wave = exec.numi(value);
-                case currentWaveTime -> state.wavetime = exec.numf(value) * 60f;
+                case wave -> state.wave = Math.max(exec.numi(value), 1);
+                case currentWaveTime -> state.wavetime = Math.max(exec.numf(value) * 60f, 0f);
                 case waves -> state.rules.waves = exec.bool(value);
                 case waveSending -> state.rules.waveSending = exec.bool(value);
                 case attackMode -> state.rules.attackMode = exec.bool(value);
                 case waveSpacing -> state.rules.waveSpacing = exec.numf(value) * 60f;
                 case enemyCoreBuildRadius -> state.rules.enemyCoreBuildRadius = exec.numf(value) * 8f;
                 case dropZoneRadius -> state.rules.dropZoneRadius = exec.numf(value) * 8f;
-                case unitCap -> state.rules.unitCap = exec.numi(value);
+                case unitCap -> state.rules.unitCap = Math.max(exec.numi(value), 0);
                 case lighting -> state.rules.lighting = exec.bool(value);
                 case mapArea -> {
                     int x = exec.numi(p1), y = exec.numi(p2), w = exec.numi(p3), h = exec.numi(p4);
@@ -1439,7 +1455,23 @@ public class LExecutor{
                     }
                 }
                 case ambientLight -> state.rules.ambientLight.fromDouble(exec.num(value));
-                case solarMultiplier -> state.rules.solarMultiplier = exec.numf(value);
+                case solarMultiplier -> state.rules.solarMultiplier = Math.max(exec.numf(value), 0f);
+                case ban -> {
+                    Object cont = exec.obj(value);
+                    if(cont instanceof Block b){
+                        state.rules.bannedBlocks.add(b);
+                    }else if(cont instanceof UnitType u){
+                        state.rules.bannedUnits.add(u);
+                    }
+                }
+                case unban -> {
+                    Object cont = exec.obj(value);
+                    if(cont instanceof Block b){
+                        state.rules.bannedBlocks.remove(b);
+                    }else if(cont instanceof UnitType u){
+                        state.rules.bannedUnits.remove(u);
+                    }
+                }
                 case unitHealth, unitBuildSpeed, unitCost, unitDamage, blockHealth, blockDamage, buildSpeed, rtsMinSquad, rtsMinWeight -> {
                     Team team = exec.team(p1);
                     if(team != null){
@@ -1510,11 +1542,12 @@ public class LExecutor{
 
     public static class FlushMessageI implements LInstruction{
         public MessageType type = MessageType.announce;
-        public int duration;
+        public int duration, outSuccess;
 
-        public FlushMessageI(MessageType type, int duration){
+        public FlushMessageI(MessageType type, int duration, int outSuccess){
             this.type = type;
             this.duration = duration;
+            this.outSuccess = outSuccess;
         }
 
         public FlushMessageI(){
@@ -1522,16 +1555,20 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            if(headless && type != MessageType.mission) return;
+            //set default to succes
+            exec.setnum(outSuccess, 1);
+            if(headless && type != MessageType.mission) {
+                exec.textBuffer.setLength(0);
+                return;
+            }
 
-            //skip back to self until possible
-            //TODO this is guaranteed desync on servers - I don't see a good solution
             if(
                 type == MessageType.announce && ui.hasAnnouncement() ||
                 type == MessageType.notify && ui.hudfrag.hasToast() ||
                 type == MessageType.toast && ui.hasAnnouncement()
             ){
-                exec.var(varCounter).numval --;
+                //set outSuccess=false to let user retry.
+                exec.setnum(outSuccess, 0);
                 return;
             }
 
@@ -1555,10 +1592,39 @@ public class LExecutor{
         }
     }
 
-    public static class ExplosionI implements LInstruction{
-        public int team, x, y, radius, damage, air, ground, pierce;
+    public static class EffectI implements LInstruction{
+        public EffectEntry type;
+        public int x, y, rotation, color, data;
 
-        public ExplosionI(int team, int x, int y, int radius, int damage, int air, int ground, int pierce){
+        public EffectI(EffectEntry type, int x, int y, int rotation, int color, int data){
+            this.type = type;
+            this.x = x;
+            this.y = y;
+            this.rotation = rotation;
+            this.color = color;
+            this.data = data;
+        }
+
+        public EffectI(){
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            if(type != null){
+                double col = exec.num(color);
+                //limit size so people don't create lag with ridiculous numbers (some explosions scale with size)
+                float rot = type.rotate ? exec.numf(rotation) :
+                    Math.min(exec.numf(rotation), 1000f);
+
+                type.effect.at(World.unconv(exec.numf(x)), World.unconv(exec.numf(y)), rot, Tmp.c1.fromDouble(col), exec.obj(data));
+            }
+        }
+    }
+
+    public static class ExplosionI implements LInstruction{
+        public int team, x, y, radius, damage, air, ground, pierce, effect;
+
+        public ExplosionI(int team, int x, int y, int radius, int damage, int air, int ground, int pierce, int effect){
             this.team = team;
             this.x = x;
             this.y = y;
@@ -1567,6 +1633,7 @@ public class LExecutor{
             this.air = air;
             this.ground = ground;
             this.pierce = pierce;
+            this.effect = effect;
         }
 
         public ExplosionI(){
@@ -1578,19 +1645,21 @@ public class LExecutor{
 
             Team t = exec.team(team);
             //note that there is a radius cap
-            Call.logicExplosion(t, World.unconv(exec.numf(x)), World.unconv(exec.numf(y)), World.unconv(Math.min(exec.numf(radius), 100)), exec.numf(damage), exec.bool(air), exec.bool(ground), exec.bool(pierce));
+            Call.logicExplosion(t, World.unconv(exec.numf(x)), World.unconv(exec.numf(y)), World.unconv(Math.min(exec.numf(radius), 100)), exec.numf(damage), exec.bool(air), exec.bool(ground), exec.bool(pierce), exec.bool(effect));
         }
     }
 
     @Remote(called = Loc.server, unreliable = true)
-    public static void logicExplosion(Team team, float x, float y, float radius, float damage, boolean air, boolean ground, boolean pierce){
+    public static void logicExplosion(Team team, float x, float y, float radius, float damage, boolean air, boolean ground, boolean pierce, boolean effect){
         if(damage < 0f) return;
 
         Damage.damage(team, x, y, radius, damage, pierce, air, ground);
-        if(pierce){
-            Fx.spawnShockwave.at(x, y, World.conv(radius));
-        }else{
-            Fx.dynamicExplosion.at(x, y, World.conv(radius) / 8f);
+        if(effect){
+            if(pierce){
+                Fx.spawnShockwave.at(x, y, World.conv(radius));
+            }else{
+                Fx.dynamicExplosion.at(x, y, World.conv(radius) / 8f);
+            }
         }
     }
 
@@ -1610,6 +1679,47 @@ public class LExecutor{
                 exec.build.ipt = Mathf.clamp(exec.numi(amount), 1, ((LogicBlock)exec.build.block).maxInstructionsPerTick);
                 if(exec.iptIndex >= 0 && exec.vars.length > exec.iptIndex){
                     exec.vars[exec.iptIndex].numval = exec.build.ipt;
+                }
+            }
+        }
+    }
+
+    @Remote(unreliable = true)
+    public static void syncVariable(Building building, int variable, Object value){
+        if(building instanceof LogicBuild build){
+            Var v = build.executor.optionalVar(variable);
+            if(v != null && !v.constant){
+                if(value instanceof Double d){
+                    v.isobj = false;
+                    v.numval = d;
+                }else{
+                    v.isobj = true;
+                    v.objval = value;
+                }
+            }
+        }
+    }
+
+    public static class SyncI implements LInstruction{
+        //20 syncs per second
+        public static long syncInterval = 1000 / 20;
+
+        public int variable;
+
+        public SyncI(int variable){
+            this.variable = variable;
+        }
+
+        public SyncI(){
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            if(exec.build != null && exec.build.block.privileged){
+                Var v = exec.var(variable);
+                if(!v.constant && Time.timeSinceMillis(v.syncTime) > syncInterval){
+                    v.syncTime = Time.millis();
+                    Call.syncVariable(exec.build, variable, v.isobj ? v.objval : v.numval);
                 }
             }
         }
@@ -1636,6 +1746,15 @@ public class LExecutor{
         }
     }
 
+    @Remote(called = Loc.server)
+    public static void setFlag(String flag, boolean add){
+        if(add){
+            state.rules.objectiveFlags.add(flag);
+        }else{
+            state.rules.objectiveFlags.remove(flag);
+        }
+    }
+
     public static class SetFlagI implements LInstruction{
         public int flag, value;
 
@@ -1649,12 +1768,9 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            if(exec.obj(flag) instanceof String str){
-                if(!exec.bool(value)){
-                    state.rules.objectiveFlags.remove(str);
-                }else{
-                    state.rules.objectiveFlags.add(str);
-                }
+            //don't invoke unless the flag state actually changes
+            if(exec.obj(flag) instanceof String str && state.rules.objectiveFlags.contains(str) != exec.bool(value)){
+                Call.setFlag(str, exec.bool(value));
             }
         }
     }
@@ -1731,6 +1847,99 @@ public class LExecutor{
                 }else if(key instanceof UnlockableContent content){
                     sp.setProp(content, exec.num(value));
                 }
+            }
+        }
+    }
+
+    public static class SetMarkerI implements LInstruction{
+        public LMarkerControl type = LMarkerControl.x;
+        public int id, p1, p2, p3;
+
+        public SetMarkerI(LMarkerControl type, int id, int p1, int p2, int p3){
+            this.type = type;
+            this.id = id;
+            this.p1 = p1;
+            this.p2 = p2;
+            this.p3 = p3;
+        }
+
+        public SetMarkerI(){
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            if(type == LMarkerControl.remove){
+                state.markers.remove(exec.numi(id));
+            }else{
+                var marker = state.markers.get(exec.numi(id));
+                if(marker == null) return;
+
+                if(type == LMarkerControl.text){
+                    marker.setText((exec.obj(p1) != null ? exec.obj(p1).toString() : "null"), false);
+                }else if(type == LMarkerControl.flushText){
+                    marker.setText(exec.textBuffer.toString(), true);
+                    exec.textBuffer.setLength(0);
+                }else{
+                    marker.control(type, exec.num(p1), exec.num(p2), exec.num(p3));
+                }
+            }
+        }
+    }
+
+    public static class MakeMarkerI implements LInstruction{
+        //TODO arbitrary number
+        public static final int maxMarkers = 20000;
+
+        public String type = "shape";
+        public int id, x, y, replace;
+
+        public MakeMarkerI(String type, int id, int x, int y, int replace){
+            this.type = type;
+            this.id = id;
+            this.x = x;
+            this.y = y;
+            this.replace = replace;
+        }
+
+        public MakeMarkerI(){
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            var cons = MapObjectives.markerNameToType.get(type);
+
+            if(cons != null && state.markers.size < maxMarkers){
+                int mid = exec.numi(id);
+                if(exec.bool(replace) || !state.markers.containsKey(mid)){
+                    var marker = cons.get();
+                    marker.control(LMarkerControl.pos, exec.num(x), exec.num(y), 0);
+                    state.markers.put(mid, marker);
+                }
+            }
+        }
+    }
+
+    @Remote(called = Loc.server, variants = Variant.both, unreliable = true)
+    public static void createMarker(int id, ObjectiveMarker marker){
+        state.markers.put(id, marker);
+    }
+
+    @Remote(called = Loc.server, variants = Variant.both, unreliable = true)
+    public static void updateMarker(int id, LMarkerControl control, double p1, double p2, double p3){
+        var marker = state.markers.get(id);
+        if(marker != null){
+            marker.control(control, p1, p2, p3);
+        }
+    }
+
+    @Remote(called = Loc.server, variants = Variant.both, unreliable = true)
+    public static void updateMarkerText(int id, LMarkerControl type, String text){
+        var marker = state.markers.get(id);
+        if(marker != null){
+            if(type == LMarkerControl.text){
+                marker.setText(text, true);
+            }else if(type == LMarkerControl.flushText){
+                marker.setText(text, false);
             }
         }
     }

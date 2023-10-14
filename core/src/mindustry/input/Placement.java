@@ -113,7 +113,7 @@ public class Placement{
     }
 
     public static void calculateBridges(Seq<BuildPlan> plans, ItemBridge bridge){
-        if(isSidePlace(plans)) return;
+        if(isSidePlace(plans) || plans.size == 0) return;
 
         //check for orthogonal placement + unlocked state
         if(!(plans.first().x == plans.peek().x || plans.first().y == plans.peek().y) || !bridge.unlockedNow()){
@@ -176,7 +176,7 @@ public class Placement{
     }
 
     public static void calculateBridges(Seq<BuildPlan> plans, DirectionBridge bridge, boolean hasJunction, Boolf<Block> same){
-        if(isSidePlace(plans)) return;
+        if(isSidePlace(plans) || plans.size == 0) return;
 
         //check for orthogonal placement + unlocked state
         if(!(plans.first().x == plans.peek().x || plans.first().y == plans.peek().y) || !bridge.unlockedNow()){

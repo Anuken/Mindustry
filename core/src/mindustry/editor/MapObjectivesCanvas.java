@@ -98,6 +98,8 @@ public class MapObjectivesCanvas extends WidgetGroup{
     public void clearObjectives(){
         stopQuery();
         tilemap.clearTiles();
+        tilemap.x = 0f;
+        tilemap.y = 0f;
     }
 
     protected void stopQuery(){

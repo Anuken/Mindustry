@@ -56,6 +56,8 @@ import static mindustry.Vars.*;
 @SuppressWarnings("unchecked")
 public class ContentParser{
     private static final boolean ignoreUnknownFields = true;
+    private static final ContentType[] typesToSearch = {ContentType.block, ContentType.item, ContentType.unit, ContentType.liquid, ContentType.planet};
+
     ObjectMap<Class<?>, ContentType> contentTypes = new ObjectMap<>();
     ObjectSet<Class<?>> implicitNullable = ObjectSet.with(TextureRegion.class, TextureRegion[].class, TextureRegion[][].class, TextureRegion[][][].class);
     ObjectMap<String, AssetDescriptor<?>> sounds = new ObjectMap<>();
@@ -112,7 +114,7 @@ public class ContentParser{
         });
         put(UnitCommand.class, (type, data) -> {
             if(data.isString()){
-               var cmd = UnitCommand.all.find(u -> u.name.equals(data.asString()));
+               var cmd = content.unitCommand(data.asString());
                if(cmd != null){
                    return cmd;
                }else{
@@ -120,6 +122,18 @@ public class ContentParser{
                }
             }else{
                 throw new IllegalArgumentException("Unit commands must be strings.");
+            }
+        });
+        put(UnitStance.class, (type, data) -> {
+            if(data.isString()){
+                var cmd = content.unitStance(data.asString());
+                if(cmd != null){
+                    return cmd;
+                }else{
+                    throw new IllegalArgumentException("Unknown unit stance name: " + data.asString());
+                }
+            }else{
+                throw new IllegalArgumentException("Unit stances must be strings.");
             }
         });
         put(BulletType.class, (type, data) -> {
@@ -385,6 +399,17 @@ public class ContentParser{
                     return (T)new Rect(jsonData.get(0).asFloat(), jsonData.get(1).asFloat(), jsonData.get(2).asFloat(), jsonData.get(3).asFloat());
                 }
 
+                //search across different content types to find one by name
+                if(type == UnlockableContent.class){
+                    for(ContentType c : typesToSearch){
+                        T found = (T)locate(c, jsonData.asString());
+                        if(found != null){
+                            return found;
+                        }
+                    }
+                    throw new IllegalArgumentException("\"" + jsonData.name + "\": No content found with name '" + jsonData.asString() + "'.");
+                }
+
                 if(Content.class.isAssignableFrom(type)){
                     ContentType ctype = contentTypes.getThrow(type, () -> new IllegalArgumentException("No content type for class: " + type.getSimpleName()));
                     String prefix = currentMod != null ? currentMod.name + "-" : "";
@@ -596,12 +621,12 @@ public class ContentParser{
         ContentType.planet, (TypeParser<Planet>)(mod, name, value) -> {
             if(value.isString()) return locate(ContentType.planet, name);
 
-            Planet parent = locate(ContentType.planet, value.getString("parent"));
+            Planet parent = locate(ContentType.planet, value.getString("parent", ""));
             Planet planet = new Planet(mod + "-" + name, parent, value.getFloat("radius", 1f), value.getInt("sectorSize", 0));
 
             if(value.has("mesh")){
                 var mesh = value.get("mesh");
-                if(!mesh.isObject()) throw new RuntimeException("Meshes must be objects.");
+                if(!mesh.isObject() && !mesh.isArray()) throw new RuntimeException("Meshes must be objects.");
                 value.remove("mesh");
                 planet.meshLoader = () -> {
                     //don't crash, just log an error
@@ -616,7 +641,7 @@ public class ContentParser{
 
             if(value.has("cloudMesh")){
                 var mesh = value.get("cloudMesh");
-                if(!mesh.isObject()) throw new RuntimeException("Meshes must be objects.");
+                if(!mesh.isObject() && !mesh.isArray()) throw new RuntimeException("Meshes must be objects.");
                 value.remove("cloudMesh");
                 planet.cloudMeshLoader = () -> {
                     //don't crash, just log an error
@@ -854,7 +879,20 @@ public class ContentParser{
         return null;
     }
 
+    private GenericMesh[] parseMeshes(Planet planet, JsonValue array){
+        var res = new GenericMesh[array.size];
+        for(int i = 0; i < array.size; i++){
+            //yes get is O(n) but it's practically irrelevant here
+            res[i] = parseMesh(planet, array.get(i));
+        }
+        return res;
+    }
+
     private GenericMesh parseMesh(Planet planet, JsonValue data){
+        if(data.isArray()){
+            return new MultiMesh(parseMeshes(planet, data));
+        }
+
         String tname = Strings.capitalize(data.getString("type", "NoiseMesh"));
 
         return switch(tname){
@@ -866,12 +904,23 @@ public class ContentParser{
             Color.valueOf(data.getString("color2", data.getString("color", "ffffff"))),
             data.getInt("colorOct", 1), data.getFloat("colorPersistence", 0.5f), data.getFloat("colorScale", 1f),
             data.getFloat("colorThreshold", 0.5f));
+            case "SunMesh" -> {
+                var cvals = data.get("colors").asStringArray();
+                var colors = new Color[cvals.length];
+                for(int i=0; i<cvals.length; i++){
+                    colors[i] = Color.valueOf(cvals[i]);
+                }
+
+                yield new SunMesh(planet, data.getInt("divisions", 1), data.getInt("octaves", 1), data.getFloat("persistence", 0.5f),
+                data.getFloat("scl", 1f), data.getFloat("pow", 1f), data.getFloat("mag", 0.5f),
+                data.getFloat("colorScale", 1f), colors);
+            }
             case "HexSkyMesh" -> new HexSkyMesh(planet,
             data.getInt("seed", 0), data.getFloat("speed", 0), data.getFloat("radius", 1f),
             data.getInt("divisions", 3), Color.valueOf(data.getString("color", "ffffff")), data.getInt("octaves", 1),
             data.getFloat("persistence", 0.5f), data.getFloat("scale", 1f), data.getFloat("thresh", 0.5f));
-            case "MultiMesh" -> new MultiMesh(parser.readValue(GenericMesh[].class, data.get("meshes")));
-            case "MatMesh" -> new MatMesh(parser.readValue(GenericMesh.class, data.get("mesh")), parser.readValue(Mat3D.class, data.get("mat")));
+            case "MultiMesh" -> new MultiMesh(parseMeshes(planet, data.get("meshes")));
+            case "MatMesh" -> new MatMesh(parseMesh(planet, data.get("mesh")), parser.readValue(Mat3D.class, data.get("mat")));
             default -> throw new RuntimeException("Unknown mesh type: " + tname);
         };
     }

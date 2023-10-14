@@ -594,7 +594,7 @@ public class UnitAssembler extends PayloadBlock{
         public boolean acceptPayload(Building source, Payload payload){
             var plan = plan();
             return (this.payload == null || source instanceof UnitAssemblerModuleBuild) &&
-                    plan.requirements.contains(b -> b.item == payload.content() && blocks.get(payload.content()) < Mathf.round(b.amount * team.rules().unitCostMultiplier));
+                    plan.requirements.contains(b -> b.item == payload.content() && blocks.get(payload.content()) < Mathf.round(b.amount * state.rules.unitCost(team)));
         }
 
         @Override

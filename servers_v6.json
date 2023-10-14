@@ -8,10 +8,6 @@
     "address": ["easyplay.su"]
   },
   {
-    "name": "Chaotic Neutral",
-    "address": ["c-n.ddns.net:1111", "c-n.ddns.net:2222", "c-n.ddns.net:3333"]
-  },
-  {
     "name": "Ranked",
     "address": ["mindustryranked.ddns.net:16567", "mindustryranked.ddns.net:16568", "mindustryranked.ddns.net:16569"]
   },
@@ -26,9 +22,5 @@
   {
     "name": "Surrealment v6",
     "address": ["md.surrealment.com:6566"]
-  },
-  {
-    "name": "ALEX",
-    "address": ["alexmindustryhub.ddns.net:6568", "dogemindustry.ddns.net:25586", "alexmindustry.ddns.net:25587", "alexmindustryattac.ddns.net:25800","alexmindustryturbo.ddns.net:25581","alexmindustryhex.ddns.net:25583"]
   }
 ]

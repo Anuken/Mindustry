@@ -115,7 +115,7 @@ public class ConsumeGenerator extends PowerGenerator{
                 liquids.add(outputLiquid.liquid, added);
                 dumpLiquid(outputLiquid.liquid);
 
-                if(explodeOnFull && liquids.get(outputLiquid.liquid) >= liquidCapacity - 0.0001f){
+                if(explodeOnFull && liquids.get(outputLiquid.liquid) >= liquidCapacity - 0.01f){
                     kill();
                     Events.fire(new GeneratorPressureExplodeEvent(this));
                 }

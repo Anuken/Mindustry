@@ -11,6 +11,7 @@ import mindustry.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.payloads.*;
 
 import static mindustry.Vars.*;
 import static mindustry.game.EventType.*;
@@ -68,7 +69,7 @@ public class Administration{
             if(action.type != ActionType.breakBlock &&
                 action.type != ActionType.placeBlock &&
                 action.type != ActionType.commandUnits &&
-                Config.antiSpam.bool()){
+                Config.antiSpam.bool() && !action.player.isLocal()){
 
                 Ratekeeper rate = action.player.getInfo().rate;
                 if(rate.allow(Config.interactRateWindow.num() * 1000L, Config.interactRateLimit.num())){
@@ -512,7 +513,9 @@ public class Administration{
         autosaveSpacing = new Config("autosaveSpacing", "Spacing between autosaves in seconds.", 60 * 5),
         debug = new Config("debug", "Enable debug logging.", false, () -> Log.level = debug() ? LogLevel.debug : LogLevel.info),
         snapshotInterval = new Config("snapshotInterval", "Client entity snapshot interval in ms.", 200),
-        autoPause = new Config("autoPause", "Whether the game should pause when nobody is online.", false);
+        autoPause = new Config("autoPause", "Whether the game should pause when nobody is online.", false),
+        roundExtraTime = new Config("roundExtraTime", "Time before loading a new map after the gameover, in seconds.", 12),
+        maxLogLength = new Config("maxLogLength", "The Maximum log file size, in bytes.", 1024 * 1024 * 5);
 
         public final Object defaultValue;
         public final String name, key, description;
@@ -659,6 +662,9 @@ public class Administration{
         /** valid for unit-type events only, and even in that case may be null. */
         public @Nullable Unit unit;
 
+        /** valid only for payload events */
+        public @Nullable Payload payload;
+
         /** valid only for removePlanned events only; contains packed positions. */
         public @Nullable int[] plans;
 
@@ -697,7 +703,7 @@ public class Administration{
     }
 
     public enum ActionType{
-        breakBlock, placeBlock, rotate, configure, withdrawItem, depositItem, control, buildSelect, command, removePlanned, commandUnits, commandBuilding, respawn
+        breakBlock, placeBlock, rotate, configure, withdrawItem, depositItem, control, buildSelect, command, removePlanned, commandUnits, commandBuilding, respawn, pickupBlock, dropPayload
     }
 
 }

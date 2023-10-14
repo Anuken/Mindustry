@@ -13,6 +13,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
+import mindustry.world.meta.*;
 
 public class ShieldArcAbility extends Ability{
     private static Unit paramUnit;
@@ -20,7 +21,7 @@ public class ShieldArcAbility extends Ability{
     private static Vec2 paramPos = new Vec2();
     private static final Cons<Bullet> shieldConsumer = b -> {
         if(b.team != paramUnit.team && b.type.absorbable && paramField.data > 0 &&
-            !paramPos.within(b, paramField.radius + paramField.width/2f) &&
+            !b.within(paramPos, paramField.radius - paramField.width/2f) &&
             Tmp.v1.set(b).add(b.vel).within(paramPos, paramField.radius + paramField.width/2f) &&
             Angles.within(paramPos.angleTo(b), paramUnit.rotation + paramField.angleOffset, paramField.angle / 2f)){
 
@@ -31,7 +32,7 @@ public class ShieldArcAbility extends Ability{
             if(paramField.data <= b.damage()){
                 paramField.data -= paramField.cooldown * paramField.regen;
 
-                //TODO fx
+                Fx.arcShieldBreak.at(paramPos.x, paramPos.y, 0, paramUnit.team.color, paramUnit);
             }
 
             paramField.data -= b.damage();
@@ -67,7 +68,18 @@ public class ShieldArcAbility extends Ability{
     protected float widthScale, alpha;
 
     @Override
+    public void addStats(Table t){
+        t.add("[lightgray]" + Stat.health.localized() + ": [white]" + Math.round(max));
+        t.row();
+        t.add("[lightgray]" + Stat.repairSpeed.localized() + ": [white]" + Strings.autoFixed(regen * 60f, 2) + StatUnit.perSecond.localized());
+        t.row();
+        t.add("[lightgray]" + Stat.cooldownTime.localized() + ": [white]" + Strings.autoFixed(cooldown / 60f, 2) + " " + StatUnit.seconds.localized());
+        t.row();
+    }
+
+    @Override
     public void update(Unit unit){
+        
         if(data < max){
             data += Time.delta * regen;
         }
@@ -94,7 +106,6 @@ public class ShieldArcAbility extends Ability{
 
     @Override
     public void draw(Unit unit){
-
         if(widthScale > 0.001f){
             Draw.z(Layer.shields);
 

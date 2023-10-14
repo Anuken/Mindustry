@@ -102,8 +102,9 @@ public class PlanetRenderer implements Disposable{
 
         Events.fire(Trigger.universeDraw);
 
-        renderPlanet(params.solarSystem, params);
-        renderTransparent(params.solarSystem, params);
+        Planet solarSystem = params.planet.solarSystem;
+        renderPlanet(solarSystem, params);
+        renderTransparent(solarSystem, params);
 
         bloom.render();
 

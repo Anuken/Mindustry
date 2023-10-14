@@ -2,6 +2,7 @@ package mindustry.entities;
 
 import arc.*;
 import arc.func.*;
+import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
@@ -38,10 +39,13 @@ public class Damage{
     private static Unit tmpUnit;
 
     public static void applySuppression(Team team, float x, float y, float range, float reload, float maxDelay, float applyParticleChance, @Nullable Position source){
+        applySuppression(team, x, y, range, reload, maxDelay, applyParticleChance, source, Pal.sapBullet);
+    }
+    public static void applySuppression(Team team, float x, float y, float range, float reload, float maxDelay, float applyParticleChance, @Nullable Position source, Color effectColor){
         builds.clear();
         indexer.eachBlock(null, x, y, range, build -> build.team != team, build -> {
             float prev = build.healSuppressionTime;
-            build.applyHealSuppression(reload + 1f);
+            build.applyHealSuppression(reload + 1f, effectColor);
 
             //TODO maybe should be block field instead of instanceof check
             if(build.wasRecentlyHealed(60f * 12f) || build.block.suppressable){
@@ -58,7 +62,7 @@ public class Damage{
         for(var build : builds){
             if(Mathf.chance(scaledChance)){
                 Time.run(Mathf.random(maxDelay), () -> {
-                    Fx.regenSuppressSeek.at(build.x + Mathf.range(build.block.size * tilesize / 2f), build.y + Mathf.range(build.block.size * tilesize / 2f), 0f, source);
+                    Fx.regenSuppressSeek.at(build.x + Mathf.range(build.block.size * tilesize / 2f), build.y + Mathf.range(build.block.size * tilesize / 2f), 0f, effectColor, source);
                 });
             }
         }
@@ -94,11 +98,12 @@ public class Damage{
             }
 
             int waves = explosiveness <= 2 ? 0 : Mathf.clamp((int)(explosiveness / 11), 1, 25);
+            float damagePerWave = explosiveness / 2f;
 
             for(int i = 0; i < waves; i++){
                 int f = i;
                 Time.run(i * 2f, () -> {
-                    damage(ignoreTeam, x, y, Mathf.clamp(radius + explosiveness, 0, 50f) * ((f + 1f) / waves), explosiveness / 2f, false);
+                    damage(ignoreTeam, x, y, Mathf.clamp(radius + explosiveness, 0, 50f) * ((f + 1f) / waves), damagePerWave, false);
                     Fx.blockExplosionSmoke.at(x + Mathf.range(radius), y + Mathf.range(radius));
                 });
             }

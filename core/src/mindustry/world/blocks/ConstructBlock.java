@@ -340,6 +340,7 @@ public class ConstructBlock extends Block{
 
         private float checkRequired(ItemModule inventory, float amount, boolean remove){
             float maxProgress = amount;
+            boolean infinite = team.rules().infiniteResources || state.rules.infiniteResources;
 
             for(int i = 0; i < current.requirements.length; i++){
                 int sclamount = Math.round(state.rules.buildCostMultiplier * current.requirements[i].amount);
@@ -359,7 +360,7 @@ public class ConstructBlock extends Block{
                     accumulator[i] -= maxUse;
 
                     //remove stuff that is actually used
-                    if(remove){
+                    if(remove && !infinite){
                         inventory.remove(current.requirements[i].item, maxUse);
                     }
                 }

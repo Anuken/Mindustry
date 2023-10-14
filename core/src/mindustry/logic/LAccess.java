@@ -20,6 +20,7 @@ public enum LAccess{
     health,
     maxHealth,
     heat,
+    shield,
     efficiency,
     progress,
     timescale,
@@ -28,6 +29,10 @@ public enum LAccess{
     y,
     shootX,
     shootY,
+    cameraX,
+    cameraY,
+    cameraWidth,
+    cameraHeight,
     size,
     dead,
     range, 
@@ -45,6 +50,7 @@ public enum LAccess{
     name,
     payloadCount,
     payloadType,
+    id,
 
     //values with parameters are considered controllable
     enabled("to"), //"to" is standard for single parameter access
