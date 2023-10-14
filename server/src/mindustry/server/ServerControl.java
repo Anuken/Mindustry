@@ -910,6 +910,40 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
+        handler.register("loadautosave", "Loads the last auto-save.", arg -> {
+            if(state.isGame()){
+                err("Already hosting. Type 'stop' to stop hosting first.");
+                return;
+            }
+
+            Seq<Fi> autosaves = saveDirectory.findAll(f -> f.name().startsWith("auto_"));
+            autosaves.sort(f -> -f.lastModified());
+
+            if(autosaves.isEmpty()){
+                err("No autosaves found. Type `config autosaves true` to enable autosaves.");
+                return;
+            }
+
+            Fi file = autosaves.get(0);
+
+            if(!SaveIO.isSaveValid(file)){
+                err("No (valid) save data found for slot.");
+                return;
+            }
+
+            Core.app.post(() -> {
+                try{
+                    SaveIO.load(file);
+                    state.rules.sector = null;
+                    info("Save loaded.");
+                    state.set(State.playing);
+                    netServer.openServer();
+                }catch(Throwable t){
+                    err("Failed to load save. Outdated or corrupt file.");
+                }
+            });
+        });
+
         handler.register("load", "<slot>", "Load a save from a slot.", arg -> {
             if(state.isGame()){
                 err("Already hosting. Type 'stop' to stop hosting first.");
