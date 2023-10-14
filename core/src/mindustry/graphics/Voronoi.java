@@ -2,6 +2,7 @@ package mindustry.graphics;
 
 import arc.math.geom.*;
 import arc.struct.*;
+import arc.util.Nullable;
 
 import java.util.*;
 
@@ -10,41 +11,24 @@ public class Voronoi{
     private final static int LE = 0;
     private final static int RE = 1;
 
-    //TODO make local
-    int siteidx;
-    Site[] sites;
-    int nsites;
-    float borderMinX, borderMaxX, borderMinY, borderMaxY;
-    float ymin;
-    float deltay;
-    int nvertices = 0;
-    int nedges;
-    Site bottomsite;
-    int PQcount;
-    int PQmin;
-    int PQhashsize;
-    Halfedge[] PQhash;
-    int ELhashsize;
-    Halfedge[] ELhash;
-    Seq<GraphEdge> allEdges;
-    float minDistanceBetweenSites = 1f;
+    private final static float minDistanceBetweenSites = 1F;
 
     public static Seq<GraphEdge> generate(Vec2[] values, float minX, float maxX, float minY, float maxY){
         return new Voronoi().generateVoronoi(values, minX, maxX, minY, maxY);
     }
 
     Seq<GraphEdge> generateVoronoi(Vec2[] values, float minX, float maxX, float minY, float maxY){
-        allEdges = new Seq<>();
+        Seq<GraphEdge> allEdges = new Seq<>();
 
-        nsites = values.length;
+        int nsites = values.length;
 
         float sn = (float)nsites + 4;
         int rtsites = (int)Math.sqrt(sn);
 
-        sites = new Site[nsites];
+        Site[] sites = new Site[nsites];
         Vec2 first = values[0];
         float xmin = first.x;
-        ymin = first.y;
+        float ymin = first.y;
         float xmax = first.x;
         float ymax = first.y;
         for(int i = 0; i < nsites; i++){
@@ -76,7 +60,7 @@ public class Voronoi{
             return Float.compare(s1.x, s2.x);
         });
 
-        deltay = ymax - ymin;
+        float deltay = ymax - ymin;
         float deltax = xmax - xmin;
 
         // Check bounding box inputs - if mins are bigger than maxes, swap them
@@ -91,24 +75,14 @@ public class Voronoi{
             minY = maxY;
             maxY = temp;
         }
-        borderMinX = minX;
-        borderMinY = minY;
-        borderMaxX = maxX;
-        borderMaxY = maxY;
+        BorderBounds borderBounds = new BorderBounds(minX, maxX, minY, maxY);
 
-        siteidx = 0;
+        int siteidx = 0;
 
-        PQcount = 0;
-        PQmin = 0;
-        PQhashsize = 4 * rtsites;
-        PQhash = new Halfedge[PQhashsize];
-
-        for(int i2 = 0; i2 < PQhashsize; i2 += 1){
-            PQhash[i2] = new Halfedge();
-        }
+        int PQhashsize = 4 * rtsites;
         int i1;
-        ELhashsize = 2 * rtsites;
-        ELhash = new Halfedge[ELhashsize];
+        int ELhashsize = 2 * rtsites;
+        Halfedge[] ELhash = new Halfedge[ELhashsize];
 
         for(i1 = 0; i1 < ELhashsize; i1 += 1){
             ELhash[i1] = null;
@@ -122,21 +96,18 @@ public class Voronoi{
         ELhash[0] = ELleftend;
         ELhash[ELhashsize - 1] = ELrightend;
 
-        bottomsite = next();
-        Site newsite = next();
+        Site bottomsite = sites[siteidx ++];
+        Site newsite = siteidx < nsites ? sites[siteidx ++] : null;
         Halfedge lbnd;
         Vec2 newintstar = null;
         Edge e;
+        int nvertices = 0;
+        EdgesCount edgesCount = new EdgesCount();
+        PqHolder pqHolder = new PqHolder(ymin, deltay, PQhashsize);
         while(true){
-            if(PQcount != 0){
-                Vec2 answer = new Vec2();
-
-                while(PQhash[PQmin].PQnext == null){
-                    PQmin += 1;
-                }
-                answer.x = PQhash[PQmin].PQnext.vertex.coord.x;
-                answer.y = PQhash[PQmin].PQnext.ystar;
-                newintstar = (answer);
+            Vec2 tempIntStar = pqHolder.createNewIntStar();
+            if (tempIntStar != null){
+                newintstar = tempIntStar;
             }
 
             Halfedge rbnd;
@@ -144,7 +115,7 @@ public class Voronoi{
             Site p;
             Site bot;
 
-            if(newsite != null && (PQcount == 0 || newsite.coord.y < newintstar.y || (newsite.coord.y == newintstar.y && newsite.coord.x < newintstar.x))){
+            if(newsite != null && (pqHolder.PQcount == 0 || newsite.coord.y < newintstar.y || (newsite.coord.y == newintstar.y && newsite.coord.x < newintstar.x))){
                 int bucket = (int)(((newsite.coord).x - xmin) / deltax * ELhashsize);
 
                 if(bucket < 0){
@@ -154,13 +125,13 @@ public class Voronoi{
                     bucket = ELhashsize - 1;
                 }
 
-                Halfedge he = getHash(bucket);
+                Halfedge he = getHash(ELhash, bucket);
                 if(he == null){
                     for(int i = 1; i < ELhashsize; i += 1){
-                        if((he = getHash(bucket - i)) != null){
+                        if((he = getHash(ELhash, bucket - i)) != null){
                             break;
                         }
-                        if((he = getHash(bucket + i)) != null){
+                        if((he = getHash(ELhash, bucket + i)) != null){
                             break;
                         }
                     }
@@ -182,44 +153,50 @@ public class Voronoi{
                 lbnd = he;
                 rbnd = lbnd.ELright;
 
-                bot = rightreg(lbnd);
-                e = bisect(bot, newsite);
+                bot = lbnd.ELedge == null ? bottomsite : rightreg(lbnd);
+                e = bisect(bot, newsite, edgesCount);
 
                 bisector = newHe(e, LE);
                 insert(lbnd, bisector);
 
                 if((p = intersect(lbnd, bisector)) != null){
-                    pqdelete(lbnd);
-                    pqinsert(lbnd, p, p.coord.dst(newsite.coord));
+                    pqdelete(lbnd, pqHolder);
+                    pqinsert(lbnd, p, p.coord.dst(newsite.coord), pqHolder);
                 }
                 lbnd = bisector;
                 bisector = newHe(e, RE);
                 insert(lbnd, bisector);
 
                 if((p = intersect(bisector, rbnd)) != null){
-                    pqinsert(bisector, p, p.coord.dst(newsite.coord));
+                    pqinsert(bisector, p, p.coord.dst(newsite.coord), pqHolder);
                 }
-                newsite = next();
-            }else if(!(PQcount == 0)){
+                newsite = siteidx < nsites ? sites[siteidx ++] : null;
+            }else if(!(pqHolder.PQcount == 0)){
                 Halfedge curr;
 
-                curr = PQhash[PQmin].PQnext;
-                PQhash[PQmin].PQnext = curr.PQnext;
-                PQcount -= 1;
+                curr = pqHolder.PQhash[pqHolder.PQmin].PQnext;
+                pqHolder.PQhash[pqHolder.PQmin].PQnext = curr.PQnext;
+                pqHolder.PQcount -= 1;
                 lbnd = (curr);
                 Halfedge llbnd = lbnd.ELleft;
                 rbnd = lbnd.ELright;
                 Halfedge rrbnd = (rbnd.ELright);
-                bot = leftReg(lbnd);
-                Site top = rightreg(rbnd);
+                bot = lbnd.ELedge == null ? bottomsite : leftReg(lbnd);
+                Site top = rbnd.ELedge == null ? bottomsite : rightreg(rbnd);
 
                 Site v = lbnd.vertex;
                 v.sitenbr = nvertices;
                 nvertices += 1;
-                endpoint(lbnd.ELedge, lbnd.ELpm, v);
-                endpoint(rbnd.ELedge, rbnd.ELpm, v);
+                GraphEdge lEdge = endpoint(lbnd.ELedge, borderBounds, lbnd.ELpm, v);
+                if (lEdge != null) {
+                    allEdges.add(lEdge);
+                }
+                GraphEdge rEdge = endpoint(rbnd.ELedge, borderBounds, rbnd.ELpm, v);
+                if (rEdge != null) {
+                    allEdges.add(rEdge);
+                }
                 delete(lbnd);
-                pqdelete(rbnd);
+                pqdelete(rbnd, pqHolder);
                 delete(rbnd);
                 int pm = LE;
 
@@ -230,18 +207,21 @@ public class Voronoi{
                     pm = RE;
                 }
 
-                e = bisect(bot, top);
+                e = bisect(bot, top, edgesCount);
                 bisector = newHe(e, pm);
                 insert(llbnd, bisector);
-                endpoint(e, RE - pm, v);
+                GraphEdge reEdge = endpoint(e, borderBounds, RE - pm, v);
+                if (reEdge != null) {
+                    allEdges.add(reEdge);
+                }
 
                 if((p = intersect(llbnd, bisector)) != null){
-                    pqdelete(llbnd);
-                    pqinsert(llbnd, p, p.coord.dst(bot.coord));
+                    pqdelete(llbnd, pqHolder);
+                    pqinsert(llbnd, p, p.coord.dst(bot.coord), pqHolder);
                 }
 
                 if((p = intersect(bisector, rrbnd)) != null){
-                    pqinsert(bisector, p, p.coord.dst(bot.coord));
+                    pqinsert(bisector, p, p.coord.dst(bot.coord), pqHolder);
                 }
             }else{
                 break;
@@ -250,17 +230,16 @@ public class Voronoi{
 
         for(lbnd = (ELleftend.ELright); lbnd != ELrightend; lbnd = (lbnd.ELright)){
             e = lbnd.ELedge;
-            clipLine(e);
+            GraphEdge clippedEdge = clipLine(e, borderBounds);
+            if (clippedEdge != null) {
+                allEdges.add(clippedEdge);
+            }
         }
 
         return allEdges;
     }
 
-    private Site next(){
-        return siteidx < nsites ? sites[siteidx ++] : null;
-    }
-
-    private Edge bisect(Site s1, Site s2){
+    private Edge bisect(Site s1, Site s2, EdgesCount edgesCount){
         Edge newedge = new Edge();
 
         // store the sites that this edge is bisecting
@@ -289,56 +268,56 @@ public class Voronoi{
             newedge.c /= dy;// set formula of line, with y fixed to 1
         }
 
-        newedge.edgenbr = nedges;
+        newedge.edgenbr = edgesCount.amt;
 
-        nedges += 1;
+        edgesCount.amt += 1;
         return newedge;
     }
 
-    private int pqbucket(Halfedge he){
+    private int pqbucket(Halfedge he, PqHolder pqHolder){
         int bucket;
 
-        bucket = (int)((he.ystar - ymin) / deltay * PQhashsize);
+        bucket = (int)((he.ystar - pqHolder.ymin) / pqHolder.deltay * pqHolder.PQhashsize);
         if(bucket < 0){
             bucket = 0;
         }
-        if(bucket >= PQhashsize){
-            bucket = PQhashsize - 1;
+        if(bucket >= pqHolder.PQhashsize){
+            bucket = pqHolder.PQhashsize - 1;
         }
-        if(bucket < PQmin){
-            PQmin = bucket;
+        if(bucket < pqHolder.PQmin){
+            pqHolder.PQmin = bucket;
         }
         return bucket;
     }
 
     // push the HalfEdge into the ordered linked list of vertices
-    private void pqinsert(Halfedge he, Site v, float offset){
+    private void pqinsert(Halfedge he, Site v, float offset, PqHolder pqHolder){
         Halfedge last, next;
 
         he.vertex = v;
         he.ystar = v.coord.y + offset;
-        last = PQhash[pqbucket(he)];
+        last = pqHolder.PQhash[pqbucket(he, pqHolder)];
         while((next = last.PQnext) != null
         && (he.ystar > next.ystar || (he.ystar == next.ystar && v.coord.x > next.vertex.coord.x))){
             last = next;
         }
         he.PQnext = last.PQnext;
         last.PQnext = he;
-        PQcount += 1;
+        pqHolder.PQcount += 1;
     }
 
     // remove the HalfEdge from the list of vertices
-    private void pqdelete(Halfedge he){
+    private void pqdelete(Halfedge he, PqHolder pqHolder){
         Halfedge last;
 
         if(he.vertex != null){
-            last = PQhash[pqbucket(he)];
+            last = pqHolder.PQhash[pqbucket(he, pqHolder)];
             while(last.PQnext != he){
                 last = last.PQnext;
             }
 
             last.PQnext = he.PQnext;
-            PQcount -= 1;
+            pqHolder.PQcount -= 1;
             he.vertex = null;
         }
     }
@@ -353,9 +332,6 @@ public class Voronoi{
     }
 
     private Site leftReg(Halfedge he){
-        if(he.ELedge == null){
-            return bottomsite;
-        }
         return he.ELpm == LE ? he.ELedge.reg[LE] : he.ELedge.reg[RE];
     }
 
@@ -377,10 +353,10 @@ public class Voronoi{
     }
 
     /* Get entry from hash table, pruning any deleted nodes */
-    private Halfedge getHash(int b){
+    private Halfedge getHash(Halfedge[] ELhash, int b){
         Halfedge he;
 
-        if(b < 0 || b >= ELhashsize){
+        if(b < 0 || b >= ELhash.length){
             return (null);
         }
         he = ELhash[b];
@@ -393,7 +369,7 @@ public class Voronoi{
         return (null);
     }
 
-    private void clipLine(Edge e){
+    private @Nullable GraphEdge clipLine(Edge e, BorderBounds borderBounds){
         float pxmin, pxmax, pymin, pymax;
         Site s1, s2;
         float x1, x2, y1, y2;
@@ -406,12 +382,12 @@ public class Voronoi{
         // if the distance between the two points this line was created from is
         // less than the square root of 2, then ignore it
         if(Math.sqrt(((x2 - x1) * (x2 - x1)) + ((y2 - y1) * (y2 - y1))) < minDistanceBetweenSites){
-            return;
+            return null;
         }
-        pxmin = borderMinX;
-        pxmax = borderMaxX;
-        pymin = borderMinY;
-        pymax = borderMaxY;
+        pxmin = borderBounds.minX;
+        pxmax = borderBounds.maxX;
+        pymin = borderBounds.minY;
+        pymax = borderBounds.maxY;
 
         if(e.a == 1.0 && e.b >= 0.0){
             s1 = e.ep[1];
@@ -440,7 +416,7 @@ public class Voronoi{
             }
             x2 = (e.c) - (e.b) * y2;
             if(((x1 > pxmax) & (x2 > pxmax)) | ((x1 < pxmin) & (x2 < pxmin))){
-                return;
+                return null;
             }
             if(x1 > pxmax){
                 x1 = pxmax;
@@ -476,7 +452,7 @@ public class Voronoi{
             }
             y2 = e.c - e.a * x2;
             if(((y1 > pymax) & (y2 > pymax)) | ((y1 < pymin) & (y2 < pymin))){
-                return;
+                return null;
             }
             if(y1 > pymax){
                 y1 = pymax;
@@ -497,7 +473,6 @@ public class Voronoi{
         }
 
         GraphEdge newEdge = new GraphEdge();
-        allEdges.add(newEdge);
         newEdge.x1 = x1;
         newEdge.y1 = y1;
         newEdge.x2 = x2;
@@ -505,14 +480,15 @@ public class Voronoi{
 
         newEdge.site1 = e.reg[0].sitenbr;
         newEdge.site2 = e.reg[1].sitenbr;
+        return newEdge;
     }
 
-    private void endpoint(Edge e, int lr, Site s){
+    private @Nullable GraphEdge endpoint(Edge e, BorderBounds borderBounds, int lr, Site s){
         e.ep[lr] = s;
         if(e.ep[RE - lr] == null){
-            return;
+            return null;
         }
-        clipLine(e);
+        return clipLine(e, borderBounds);
     }
 
     private boolean right(Halfedge el, Vec2 p){
@@ -562,8 +538,6 @@ public class Voronoi{
     }
 
     private Site rightreg(Halfedge he){
-        if(he.ELedge == null) return bottomsite;
-
         return (he.ELpm == LE ? he.ELedge.reg[RE] : he.ELedge.reg[LE]);
     }
 
@@ -639,5 +613,55 @@ public class Voronoi{
         Site[] ep = new Site[2];
         Site[] reg = new Site[2];
         int edgenbr;
+    }
+
+    static class PqHolder{
+        final float ymin;
+        final float deltay;
+        final int PQhashsize;
+        final Halfedge[] PQhash;
+        int PQmin = 0;
+        int PQcount = 0;
+
+        public PqHolder(float ymin, float deltay, int PQhashsize){
+            this.ymin = ymin;
+            this.deltay = deltay;
+            this.PQhashsize = PQhashsize;
+            this.PQhash = new Halfedge[PQhashsize];
+            for(int i = 0; i < PQhashsize; i++){
+                PQhash[i] = new Halfedge();
+            }
+        }
+
+        protected Vec2 createNewIntStar(){
+            if(PQcount != 0){
+                while(PQhash[PQmin].PQnext == null){
+                    PQmin += 1;
+                }
+                return new Vec2(
+                        PQhash[PQmin].PQnext.vertex.coord.x,
+                        PQhash[PQmin].PQnext.ystar
+                );
+            }
+            return null;
+        }
+    }
+
+    static class BorderBounds{
+        final float minX;
+        final float maxX;
+        final float minY;
+        final float maxY;
+
+        public BorderBounds(float minX, float maxX, float minY, float maxY){
+            this.minX = minX;
+            this.maxX = maxX;
+            this.minY = minY;
+            this.maxY = maxY;
+        }
+    }
+
+    static class EdgesCount{
+        int amt;
     }
 }
