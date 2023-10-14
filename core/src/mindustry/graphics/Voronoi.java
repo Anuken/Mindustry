@@ -6,7 +6,6 @@ import arc.util.Nullable;
 
 import java.util.*;
 
-//TODO in dire need of cleanup
 public class Voronoi{
     private final static int LE = 0;
     private final static int RE = 1;
@@ -14,10 +13,6 @@ public class Voronoi{
     private final static float minDistanceBetweenSites = 1F;
 
     public static Seq<GraphEdge> generate(Vec2[] values, float minX, float maxX, float minY, float maxY){
-        return new Voronoi().generateVoronoi(values, minX, maxX, minY, maxY);
-    }
-
-    Seq<GraphEdge> generateVoronoi(Vec2[] values, float minX, float maxX, float minY, float maxY){
         Seq<GraphEdge> allEdges = new Seq<>();
 
         int nsites = values.length;
@@ -239,7 +234,7 @@ public class Voronoi{
         return allEdges;
     }
 
-    private Edge bisect(Site s1, Site s2, EdgesCount edgesCount){
+    private static Edge bisect(Site s1, Site s2, EdgesCount edgesCount){
         Edge newedge = new Edge();
 
         // store the sites that this edge is bisecting
@@ -274,7 +269,7 @@ public class Voronoi{
         return newedge;
     }
 
-    private int pqbucket(Halfedge he, PqHolder pqHolder){
+    private static int pqbucket(Halfedge he, PqHolder pqHolder){
         int bucket;
 
         bucket = (int)((he.ystar - pqHolder.ymin) / pqHolder.deltay * pqHolder.PQhashsize);
@@ -291,7 +286,7 @@ public class Voronoi{
     }
 
     // push the HalfEdge into the ordered linked list of vertices
-    private void pqinsert(Halfedge he, Site v, float offset, PqHolder pqHolder){
+    private static void pqinsert(Halfedge he, Site v, float offset, PqHolder pqHolder){
         Halfedge last, next;
 
         he.vertex = v;
@@ -307,7 +302,7 @@ public class Voronoi{
     }
 
     // remove the HalfEdge from the list of vertices
-    private void pqdelete(Halfedge he, PqHolder pqHolder){
+    private static void pqdelete(Halfedge he, PqHolder pqHolder){
         Halfedge last;
 
         if(he.vertex != null){
@@ -322,7 +317,7 @@ public class Voronoi{
         }
     }
 
-    private Halfedge newHe(Edge e, int pm){
+    private static Halfedge newHe(Edge e, int pm){
         Halfedge answer = new Halfedge();
         answer.ELedge = e;
         answer.ELpm = pm;
@@ -331,11 +326,11 @@ public class Voronoi{
         return answer;
     }
 
-    private Site leftReg(Halfedge he){
+    private static Site leftReg(Halfedge he){
         return he.ELpm == LE ? he.ELedge.reg[LE] : he.ELedge.reg[RE];
     }
 
-    private void insert(Halfedge lb, Halfedge newHe){
+    private static void insert(Halfedge lb, Halfedge newHe){
         newHe.ELleft = lb;
         newHe.ELright = lb.ELright;
         lb.ELright.ELleft = newHe;
@@ -346,14 +341,14 @@ public class Voronoi{
      * This delete routine can't reclaim node, since pointers from hash table
      * may be present.
      */
-    private void delete(Halfedge he){
+    private static void delete(Halfedge he){
         he.ELleft.ELright = he.ELright;
         he.ELright.ELleft = he.ELleft;
         he.deleted = true;
     }
 
     /* Get entry from hash table, pruning any deleted nodes */
-    private Halfedge getHash(Halfedge[] ELhash, int b){
+    private static Halfedge getHash(Halfedge[] ELhash, int b){
         Halfedge he;
 
         if(b < 0 || b >= ELhash.length){
@@ -369,7 +364,7 @@ public class Voronoi{
         return (null);
     }
 
-    private @Nullable GraphEdge clipLine(Edge e, BorderBounds borderBounds){
+    private static @Nullable GraphEdge clipLine(Edge e, BorderBounds borderBounds){
         float pxmin, pxmax, pymin, pymax;
         Site s1, s2;
         float x1, x2, y1, y2;
@@ -483,7 +478,7 @@ public class Voronoi{
         return newEdge;
     }
 
-    private @Nullable GraphEdge endpoint(Edge e, BorderBounds borderBounds, int lr, Site s){
+    private static @Nullable GraphEdge endpoint(Edge e, BorderBounds borderBounds, int lr, Site s){
         e.ep[lr] = s;
         if(e.ep[RE - lr] == null){
             return null;
@@ -491,7 +486,7 @@ public class Voronoi{
         return clipLine(e, borderBounds);
     }
 
-    private boolean right(Halfedge el, Vec2 p){
+    private static boolean right(Halfedge el, Vec2 p){
         Edge e = el.ELedge;
         Site topsite = e.reg[1];
         boolean rightOf = p.x > topsite.coord.x;
@@ -537,11 +532,11 @@ public class Voronoi{
         return ((el.ELpm == LE) == above);
     }
 
-    private Site rightreg(Halfedge he){
+    private static Site rightreg(Halfedge he){
         return (he.ELpm == LE ? he.ELedge.reg[RE] : he.ELedge.reg[LE]);
     }
 
-    private Site intersect(Halfedge el1, Halfedge el2){
+    private static Site intersect(Halfedge el1, Halfedge el2){
         Edge e1, e2, e;
         Halfedge el;
         float d, xint, yint;
