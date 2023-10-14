@@ -920,11 +920,11 @@ public class ServerControl implements ApplicationListener{
             autosaves.sort(f -> -f.lastModified());
 
             if(autosaves.isEmpty()){
-                err("No autosaves found. Type `config autosaves true` to enable autosaves.");
+                err("No autosaves found. Type `config autosave true` to enable autosaves.");
                 return;
             }
 
-            Fi file = autosaves.get(0);
+            Fi file = autosaves.first();
 
             if(!SaveIO.isSaveValid(file)){
                 err("No (valid) save data found for slot.");
