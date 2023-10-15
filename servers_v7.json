@@ -89,7 +89,7 @@
   },
   {
     "name": "Chaotic Neutral",
-    "address": ["c-n.ddns.net:7012", "c-n.ddns.net:7013", "c-n.ddns.net:7014", "c-n.ddns.net:7015", "c-n.ddns.net:7016", "c-n.ddns.net:7017", "37.187.73.180:7021"]
+    "address": ["c-n.ddns.net:7012", "c-n.ddns.net:7013", "c-n.ddns.net:7014", "c-n.ddns.net:7015", "c-n.ddns.net:7016", "c-n.ddns.net:7017", "c-n.ddns.net:7003", "37.187.73.180:7021"]
   },
   {
     "name": "io",
@@ -121,7 +121,7 @@
   },
   {
     "name": "Fish",
-    "address": ["162.248.101.95", "162.248.100.98", "162.248.100.133", "162.248.102.204"]
+    "address": ["162.248.101.95", "162.248.100.98", "162.248.100.133", "162.248.102.204", "c-n.ddns.net:7003"]
   },
   {
     "name": "The Devil",
