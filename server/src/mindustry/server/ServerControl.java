@@ -916,24 +916,22 @@ public class ServerControl implements ApplicationListener{
                 return;
             }
 
-            Seq<Fi> autosaves = saveDirectory.findAll(f -> f.name().startsWith("auto_"));
-            autosaves.sort(f -> -f.lastModified());
+            Fi newestSave = saveDirectory.findAll(f -> f.name().startsWith("auto_")).min(Fi::lastModified);
 
-            if(autosaves.isEmpty()){
-                err("No autosaves found. Type `config autosave true` to enable autosaves.");
+            if(newestSave == null){
+                err("No auto-saves found! Type `config autosave true` to enable auto-saves.");
                 return;
             }
+            Log.debug(newestSave.name());
 
-            Fi file = autosaves.first();
-
-            if(!SaveIO.isSaveValid(file)){
+            if(!SaveIO.isSaveValid(newestSave)){
                 err("No (valid) save data found for slot.");
                 return;
             }
 
             Core.app.post(() -> {
                 try{
-                    SaveIO.load(file);
+                    SaveIO.load(newestSave);
                     state.rules.sector = null;
                     info("Save loaded.");
                     state.set(State.playing);
