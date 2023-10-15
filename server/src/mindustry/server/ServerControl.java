@@ -922,7 +922,6 @@ public class ServerControl implements ApplicationListener{
                 err("No auto-saves found! Type `config autosave true` to enable auto-saves.");
                 return;
             }
-            Log.debug(newestSave.name());
 
             if(!SaveIO.isSaveValid(newestSave)){
                 err("No (valid) save data found for slot.");
