@@ -160,7 +160,7 @@ public class Blocks{
     //logic
     message, switchBlock, microProcessor, logicProcessor, hyperProcessor, largeLogicDisplay, logicDisplay, memoryCell, memoryBank,
     canvas, reinforcedMessage,
-    worldProcessor, worldCell, worldMessage,
+    worldProcessor, worldCell, worldMessage, worldSwitch,
 
     //campaign
     launchPad, interplanetaryAccelerator
@@ -5940,6 +5940,13 @@ public class Blocks{
         worldMessage = new MessageBlock("world-message"){{
             requirements(Category.logic, BuildVisibility.editorOnly, with());
             
+            targetable = false;
+            privileged = true;
+        }};
+
+        worldSwitch = new SwitchBlock("world-switch"){{
+            requirements(Category.logic, BuildVisibility.editorOnly, with());
+
             targetable = false;
             privileged = true;
         }};
