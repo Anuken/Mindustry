@@ -33,17 +33,21 @@ public class MapLocalesDialog extends BaseDialog{
         main = new Table();
 
         buttons.add().growX().width(-1);
+
         buttons.button("@back", Icon.left, () -> {
-            if(!saved){
-                ui.showConfirm("@editor.locales", "@editor.savechanges", () -> editor.tags.put("locales", JsonIO.write(locales)));
-            }
+            if(!saved) ui.showConfirm("@editor.locales", "@editor.savechanges", () -> editor.tags.put("locales", JsonIO.write(locales)));
             hide();
         }).size(210f, 64f);
+        closeOnBack(() -> {
+            if(!saved) ui.showConfirm("@editor.locales", "@editor.savechanges", () -> editor.tags.put("locales", JsonIO.write(locales)));
+        });
+
         buttons.button("@editor.apply", Icon.ok, () -> {
             editor.tags.put("locales", JsonIO.write(locales));
             saved = true;
         }).size(210f, 64f).disabled(b -> saved);
         buttons.add().growX().width(-1);
+
         buttons.button("?", () -> ui.showInfo("@locales.info")).size(60f, 64f);
 
         shown(this::setup);
