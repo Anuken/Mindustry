@@ -6,14 +6,13 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 
 /** Plays a sound effect when created and simultaneously renders an effect. */
 public class SoundEffect extends Effect{
-    private static final Seq<Runnable> loadQueue = new Seq<>();
-
     public Sound sound = Sounds.none;
     public float minPitch = 0.8f;
     public float maxPitch = 1.2f;
@@ -21,23 +20,11 @@ public class SoundEffect extends Effect{
     public float maxVolume = 1f;
     public Effect effect;
 
-    static{
-        Events.on(FileTreeInitEvent.class, e -> {
-            loadQueue.each(Runnable::run);
-            loadQueue.clear();
-        });
-    }
-
     public SoundEffect(){
     }
 
     public SoundEffect(Sound sound, Effect effect){
         this.sound = sound;
-        this.effect = effect;
-    }
-
-    public SoundEffect(Prov<Sound> soundLoader, Effect effect){
-        loadQueue.add(() -> this.sound = soundLoader.get());
         this.effect = effect;
     }
 
