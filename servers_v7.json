@@ -233,8 +233,8 @@
     "address": ["118.127.8.162:25617", "78.108.218.117:25640", "srv3.godlike.club:27246"]
   },
   {
-    "name": "Vanilla CroCraft",
-    "address": ["130.61.175.47:6567", "41.216.188.223:5001"]
+    "name": "CroCraft Network",
+    "address": ["193.122.53.98:6567", "41.216.188.223:5001"]
   },
   {
     "name": "Extra Utilities",
