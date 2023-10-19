@@ -32,7 +32,7 @@ public class SoundEffect extends Effect{
     public void create(float x, float y, float rotation, Color color, Object data){
         if(!shouldCreate()) return;
 
-        sound.at(x, y, Mathf.range(minPitch, maxPitch), Mathf.range(minVolume, maxVolume));
+        sound.at(x, y, Mathf.random(minPitch, maxPitch), Mathf.random(minVolume, maxVolume));
         effect.create(x, y, rotation, color, data);
     }
 }
