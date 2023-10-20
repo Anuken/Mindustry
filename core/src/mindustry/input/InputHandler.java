@@ -557,6 +557,31 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
     }
 
+    @Remote(called = Loc.server)
+    public static void unitEnteredPayload(Unit unit, Building build){
+        if(unit == null || build == null || unit.team != build.team) return;
+
+        unit.remove();
+
+        //reset the enter command
+        if(unit.controller() instanceof CommandAI ai && ai.command == UnitCommand.enterPayloadCommand){
+            ai.clearCommands();
+            ai.command = UnitCommand.moveCommand;
+        }
+
+        //clear removed state of unit so it can be synced
+        if(Vars.net.client()){
+            Vars.netClient.clearRemovedEntity(unit.id);
+        }
+
+        UnitPayload unitPay = new UnitPayload(unit);
+
+        if(build.acceptPayload(build, unitPay)){
+            Fx.unitDrop.at(build);
+            build.handlePayload(build, unitPay);
+        }
+    }
+
     @Remote(targets = Loc.client, called = Loc.server)
     public static void dropItem(Player player, float angle){
         if(player == null) return;

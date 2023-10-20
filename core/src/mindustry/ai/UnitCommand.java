@@ -17,7 +17,7 @@ public class UnitCommand extends MappableContent{
     @Deprecated
     public static final Seq<UnitCommand> all = new Seq<>();
 
-    public static UnitCommand moveCommand, repairCommand, rebuildCommand, assistCommand, mineCommand, boostCommand, loadUnitsCommand, loadBlocksCommand, unloadPayloadCommand;
+    public static UnitCommand moveCommand, repairCommand, rebuildCommand, assistCommand, mineCommand, boostCommand, enterPayloadCommand, loadUnitsCommand, loadBlocksCommand, unloadPayloadCommand;
 
     /** Name of UI icon (from Icon class). */
     public final String icon;
@@ -83,6 +83,11 @@ public class UnitCommand extends MappableContent{
         });
         mineCommand = new UnitCommand("mine", "production", Binding.unit_command_mine, u -> new MinerAI());
         boostCommand = new UnitCommand("boost", "up", Binding.unit_command_boost, u -> new BoostAI()){{
+            switchToMove = false;
+            drawTarget = true;
+            resetTarget = false;
+        }};
+        enterPayloadCommand = new UnitCommand("enterPayload", "downOpen", Binding.unit_command_enter_payload, null){{
             switchToMove = false;
             drawTarget = true;
             resetTarget = false;
