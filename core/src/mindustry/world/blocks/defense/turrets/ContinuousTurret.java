@@ -51,7 +51,6 @@ public class ContinuousTurret extends Turret{
 
         @Override
         public boolean hasAmmo(){
-            //TODO update ammo in unit so it corresponds to liquids
             return canConsume();
         }
 
@@ -112,7 +111,7 @@ public class ContinuousTurret extends Turret{
             entry.bullet.aimY = Tmp.v1.y;
 
             if(isShooting() && hasAmmo()){
-                entry.bullet.time = entry.bullet.lifetime * entry.bullet.type.optimalLifeFract * shootWarmup;
+                entry.bullet.time = entry.bullet.lifetime * entry.bullet.type.optimalLifeFract * Math.min(shootWarmup, efficiency);
                 entry.bullet.keepAlive = true;
             }
         }

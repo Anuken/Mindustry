@@ -48,6 +48,8 @@ public class Styles{
     togglet,
     /** Partially transparent square button. */
     cleart,
+    /** Clear, square, orange border, toggleable. */
+    clearTogglet,
     /** Similar to flatToggle, but without a darker border. */
     fullTogglet,
     /** Toggle-able version of flatBorder. */
@@ -217,6 +219,16 @@ public class Styles{
             up = button;
             over = buttonOver;
             disabled = buttonDisabled;
+            disabledFontColor = Color.gray;
+        }};
+        clearTogglet = new TextButtonStyle(){{
+            font = Fonts.def;
+            fontColor = Color.white;
+            down = flatDown;
+            checked = flatDown;
+            up = black6;
+            over = flatOver;
+            disabled = black;
             disabledFontColor = Color.gray;
         }};
         fullTogglet = new TextButtonStyle(){{

@@ -160,7 +160,7 @@ public class Blocks{
     //logic
     message, switchBlock, microProcessor, logicProcessor, hyperProcessor, largeLogicDisplay, logicDisplay, memoryCell, memoryBank,
     canvas, reinforcedMessage,
-    worldProcessor, worldCell, worldMessage,
+    worldProcessor, worldCell, worldMessage, worldSwitch,
 
     //campaign
     launchPad, interplanetaryAccelerator
@@ -4574,7 +4574,7 @@ public class Blocks{
                         deathExplosionEffect = Fx.massiveExplosion;
                         shootOnDeath = true;
                         shake = 10f;
-                        bullet = new ExplosionBulletType(700f, 65f){{
+                        bullet = new ExplosionBulletType(1500f, 65f){{
                             hitColor = Pal.redLight;
                             shootEffect = new MultiEffect(Fx.massiveExplosion, Fx.scatheExplosion, Fx.scatheLight, new WaveEffect(){{
                                 lifetime = 10f;
@@ -4583,7 +4583,7 @@ public class Blocks{
                             }});
 
                             collidesAir = false;
-                            buildingDamageMultiplier = 0.3f;
+                            buildingDamageMultiplier = 0.25f;
 
                             ammoMultiplier = 1f;
                             fragLifeMin = 0.1f;
@@ -4598,7 +4598,7 @@ public class Blocks{
                                 width = height = 18f;
                                 collidesTiles = false;
                                 splashDamageRadius = 40f;
-                                splashDamage = 80f;
+                                splashDamage = 160f;
                                 backColor = trailColor = hitColor = Pal.redLight;
                                 frontColor = Color.white;
                                 smokeEffect = Fx.shootBigSmoke2;
@@ -5924,7 +5924,7 @@ public class Blocks{
             forceDark = true;
             privileged = true;
             size = 1;
-            maxInstructionsPerTick = 500;
+            maxInstructionsPerTick = 1000;
             range = Float.MAX_VALUE;
         }};
 
@@ -5940,6 +5940,13 @@ public class Blocks{
         worldMessage = new MessageBlock("world-message"){{
             requirements(Category.logic, BuildVisibility.editorOnly, with());
             
+            targetable = false;
+            privileged = true;
+        }};
+
+        worldSwitch = new SwitchBlock("world-switch"){{
+            requirements(Category.logic, BuildVisibility.editorOnly, with());
+
             targetable = false;
             privileged = true;
         }};

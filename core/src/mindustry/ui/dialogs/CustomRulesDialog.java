@@ -16,6 +16,7 @@ import mindustry.game.*;
 import mindustry.game.Rules.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.type.*;
 import mindustry.type.Weather.*;
 import mindustry.ui.*;
@@ -38,6 +39,56 @@ public class CustomRulesDialog extends BaseDialog{
         setFillParent(true);
         shown(this::setup);
         addCloseButton();
+
+        buttons.button("@edit", Icon.pencil, () -> {
+            BaseDialog dialog = new BaseDialog("@waves.edit");
+            dialog.addCloseButton();
+            dialog.setFillParent(false);
+
+            dialog.cont.table(Tex.button, t -> {
+                var style = Styles.cleart;
+                t.defaults().size(280f, 64f).pad(2f);
+
+                t.button("@waves.copy", Icon.copy, style, () -> {
+                    ui.showInfoFade("@waves.copied");
+
+                    //hack: don't write the spawns, they just waste space
+                    var spawns = rules.spawns;
+                    rules.spawns = new Seq<>();
+                    Core.app.setClipboardText(JsonIO.write(rules));
+                    rules.spawns = spawns;
+                    dialog.hide();
+                }).marginLeft(12f).row();
+
+                t.button("@waves.load", Icon.download, style, () -> {
+                    try{
+                        Rules newRules = JsonIO.read(Rules.class, Core.app.getClipboardText());
+                        //objectives and spawns are considered to be map-specific; don't use them
+                        newRules.spawns = rules.spawns;
+                        newRules.objectives = rules.objectives;
+                        rules = newRules;
+                        refresh();
+                    }catch(Throwable e){
+                        Log.err(e);
+                        ui.showErrorMessage("@rules.invaliddata");
+                    }
+                    dialog.hide();
+                }).disabled(Core.app.getClipboardText() == null || !Core.app.getClipboardText().startsWith("{")).marginLeft(12f).row();
+
+                t.button("@settings.reset", Icon.refresh, style, () -> {
+                    rules = resetter.get();
+                    refresh();
+                }).marginLeft(12f);
+            });
+
+            dialog.show();
+        });
+    }
+
+    void refresh(){
+        setup();
+        requestKeyboard();
+        requestScroll();
     }
 
     private <T extends UnlockableContent> void showBanned(String title, ContentType type, ObjectSet<T> set, Boolf<T> pred){
@@ -128,12 +179,6 @@ public class CustomRulesDialog extends BaseDialog{
         cont.clear();
         cont.pane(m -> main = m).scrollX(false);
         main.margin(10f);
-        main.button("@settings.reset", () -> {
-            rules = resetter.get();
-            setup();
-            requestKeyboard();
-            requestScroll();
-        }).size(300f, 50f);
         main.left().defaults().fillX().left().pad(5);
         main.row();
 

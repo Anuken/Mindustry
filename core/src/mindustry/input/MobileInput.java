@@ -54,8 +54,8 @@ public class MobileInput extends InputHandler implements GestureListener{
     public Seq<BuildPlan> removals = new Seq<>();
     /** Whether the player is currently shifting all placed tiles. */
     public boolean selecting;
-    /** Whether the player is currently in line-place mode. */
-    public boolean lineMode, schematicMode, rebuildMode;
+    /** Various modes that aren't enums for some reason. This should be cleaned up. */
+    public boolean lineMode, schematicMode, rebuildMode, queueCommandMode;
     /** Current place mode. */
     public PlaceMode mode = none;
     /** Whether no recipe was available when switching to break mode. */
@@ -287,9 +287,14 @@ public class MobileInput extends InputHandler implements GestureListener{
         group.fill(t -> {
             t.visible(() -> !showCancel() && block == null && !hasSchem());
             t.bottom().left();
-            t.button("@command", Icon.units, Styles.squareTogglet, () -> {
+
+            t.button("@command.queue", Icon.rightOpen, Styles.clearTogglet, () -> {
+                queueCommandMode = !queueCommandMode;
+            }).width(155f).height(48f).margin(12f).checked(b -> queueCommandMode).visible(() -> commandMode).row();
+
+            t.button("@command", Icon.units, Styles.clearTogglet, () -> {
                 commandMode = !commandMode;
-            }).width(155f).height(50f).margin(12f).checked(b -> commandMode).row();
+            }).width(155f).height(48f).margin(12f).checked(b -> commandMode);
 
             //for better looking insets
             t.rect((x, y, w, h) -> {
@@ -681,7 +686,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             selectPlans.add(new BuildPlan(linked.x, linked.y));
         }else if((commandMode && selectedUnits.size > 0) || commandBuildings.size > 0){
             //handle selecting units with command mode
-            commandTap(x, y);
+            commandTap(x, y, queueCommandMode);
         }else if(commandMode){
             tapCommandUnit();
         }else{
@@ -733,6 +738,10 @@ public class MobileInput extends InputHandler implements GestureListener{
         super.update();
 
         boolean locked = locked();
+
+        if(!commandMode){
+            queueCommandMode = false;
+        }
 
         if(player.dead()){
             mode = none;
@@ -922,6 +931,8 @@ public class MobileInput extends InputHandler implements GestureListener{
             Core.camera.position.x -= deltaX;
             Core.camera.position.y -= deltaY;
         }
+
+        camera.position.clamp(-camera.width/4f, -camera.height/4f, world.unitWidth() + camera.width/4f, world.unitHeight() + camera.height/4f);
 
         return false;
     }

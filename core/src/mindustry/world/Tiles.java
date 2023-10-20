@@ -4,6 +4,7 @@ import arc.func.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
+import mindustry.gen.*;
 
 import java.util.*;
 
@@ -12,11 +13,21 @@ public class Tiles implements Iterable<Tile>{
     public final int width, height;
 
     final Tile[] array;
+    final Puddle[] puddles;
 
     public Tiles(int width, int height){
         this.array = new Tile[width * height];
         this.width = width;
         this.height = height;
+        this.puddles = new Puddle[width * height];
+    }
+
+    public Puddle puddle(int pos){
+        return puddles[pos];
+    }
+
+    public void setPuddle(int pos, Puddle p){
+        puddles[pos] = p;
     }
 
     public void each(Intc2 cons){

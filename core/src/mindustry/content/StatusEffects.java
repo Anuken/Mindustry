@@ -64,12 +64,12 @@ public class StatusEffects{
 	    init(() -> opposite(fast));
         }};
 
-	fast = new StatusEffect("fast"){{
-            color = Pal.boostTo;
-            speedMultiplier = 1.6f;
+        fast = new StatusEffect("fast"){{
+                color = Pal.boostTo;
+                speedMultiplier = 1.6f;
 
-	    init(() -> opposite(slow));
-	}};
+            init(() -> opposite(slow));
+        }};
 
         wet = new StatusEffect("wet"){{
             color = Color.royal;
@@ -80,10 +80,8 @@ public class StatusEffects{
 
             init(() -> {
                 affinity(shocked, (unit, result, time) -> {
-                    float pierceFraction = 0.3f;
+                    unit.damage(transitionDamage);
 
-                    unit.damagePierce(transitionDamage * pierceFraction);
-                    unit.damage(transitionDamage * (1f - pierceFraction));
                     if(unit.team == state.rules.waveTeam){
                         Events.fire(Trigger.shock);
                     }
