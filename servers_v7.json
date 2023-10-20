@@ -193,7 +193,7 @@
   },
   {
     "name": "Realm of Serene Lime",
-    "address": ["43.248.185.167:8517","n2.akiracloud.net:10686","n2.akiracloud.net:10486", "p12.simpfun.cn:8654"]
+    "address": ["43.248.116.142:10627","n2.akiracloud.net:10686","n2.akiracloud.net:10486", "p12.simpfun.cn:8654"]
   },
   {
     "name": "CreateDustry",
@@ -233,8 +233,8 @@
     "address": ["118.127.8.162:25617", "78.108.218.117:25640", "srv3.godlike.club:27246"]
   },
   {
-    "name": "Vanilla CroCraft",
-    "address": ["130.61.175.47:6567", "41.216.188.223:5001"]
+    "name": "CroCraft Network",
+    "address": ["193.122.53.98:6567", "41.216.188.223:5001"]
   },
   {
     "name": "Extra Utilities",
@@ -258,6 +258,6 @@
   },
   {
     "name": "Atomic",
-    "address": ["129.146.33.189:25709", "atomic-lab.ddns.net:30315"]
+    "address": ["atomic-lab.ddns.net:25709", "atomic-lab.ddns.net:25907", "atomic-de.ddns.net:35845"]
   }
 ]
