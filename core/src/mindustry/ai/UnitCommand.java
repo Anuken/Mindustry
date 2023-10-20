@@ -87,17 +87,17 @@ public class UnitCommand extends MappableContent{
             drawTarget = true;
             resetTarget = false;
         }};
-        loadUnitsCommand = new UnitCommand("loadUnits", "download", Binding.unit_command_load_units, null){{
+        loadUnitsCommand = new UnitCommand("loadUnits", "upload", Binding.unit_command_load_units, null){{
             switchToMove = false;
             drawTarget = true;
             resetTarget = false;
         }};
-        loadBlocksCommand = new UnitCommand("loadBlocks", "down", Binding.unit_command_load_blocks, null){{
+        loadBlocksCommand = new UnitCommand("loadBlocks", "up", Binding.unit_command_load_blocks, null){{
             switchToMove = false;
             drawTarget = true;
             resetTarget = false;
         }};
-        unloadPayloadCommand = new UnitCommand("unloadPayload", "upload", Binding.unit_command_unload_payload, null){{
+        unloadPayloadCommand = new UnitCommand("unloadPayload", "download", Binding.unit_command_unload_payload, null){{
             switchToMove = false;
             drawTarget = true;
             resetTarget = false;
