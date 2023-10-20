@@ -696,7 +696,6 @@ public class NetServer implements ApplicationListener{
                 vector.limit(maxMove);
 
                 float prevx = unit.x, prevy = unit.y;
-                //unit.set(con.lastPosition);
                 if(!unit.isFlying()){
                     unit.move(vector.x, vector.y);
                 }else{

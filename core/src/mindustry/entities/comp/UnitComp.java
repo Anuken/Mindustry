@@ -10,6 +10,7 @@ import arc.util.*;
 import mindustry.ai.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.async.*;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
@@ -221,6 +222,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case range -> range() / tilesize;
             case shootX -> World.conv(aimX());
             case shootY -> World.conv(aimY());
+            case cameraX -> controller instanceof Player player ? World.conv(player.con == null ? Core.camera.position.x : player.con.viewX) : 0;
+            case cameraY -> controller instanceof Player player ? World.conv(player.con == null ? Core.camera.position.y : player.con.viewY) : 0;
+            case cameraWidth -> controller instanceof Player player ? World.conv(player.con == null ? Core.camera.width : player.con.viewWidth) : 0;
+            case cameraHeight -> controller instanceof Player player ? World.conv(player.con == null ? Core.camera.height : player.con.viewHeight) : 0;
             case mining -> mining() ? 1 : 0;
             case mineX -> mining() ? mineTile.x : -1;
             case mineY -> mining() ? mineTile.y : -1;
@@ -268,8 +273,15 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
                     kill();
                 }
             }
-            case x -> x = World.unconv((float)value);
-            case y -> y = World.unconv((float)value);
+            case shield -> shield = Math.max((float)value, 0f);
+            case x -> {
+                x = World.unconv((float)value);
+                if(!isLocal()) snapInterpolation();
+            }
+            case y -> {
+                y = World.unconv((float)value);
+                if(!isLocal()) snapInterpolation();
+            }
             case rotation -> rotation = (float)value;
             case team -> {
                 if(!net.client()){
@@ -297,8 +309,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
                 //only serverside
                 if(((Object)this) instanceof Payloadc pay && !net.client()){
                     if(value instanceof Block b){
-                        Building build = b.newBuilding().create(b, team());
-                        if(pay.canPickup(build)) pay.addPayload(new BuildPayload(build));
+                        if(b.synthetic()){
+                            Building build = b.newBuilding().create(b, team());
+                            if(pay.canPickup(build)) pay.addPayload(new BuildPayload(build));
+                        }
                     }else if(value instanceof UnitType ut){
                         Unit unit = ut.create(team());
                         if(pay.canPickup(unit)) pay.addPayload(new UnitPayload(unit));
@@ -381,6 +395,11 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         controller(controller);
     }
 
+    /** @return the collision layer to use for unit physics. Returning anything outside of PhysicsProcess contents will crash the game. */
+    public int collisionLayer(){
+        return type.allowLegStep && type.legPhysicsLayer ? PhysicsProcess.layerLegs : isGrounded() ? PhysicsProcess.layerGround : PhysicsProcess.layerFlying;
+    }
+
     /** @return pathfinder path type for calculating costs */
     public int pathType(){
         return Pathfinder.costGround;
@@ -404,6 +423,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     public boolean isCommandable(){
         return controller instanceof CommandAI;
+    }
+
+    public boolean canTarget(Unit other){
+        return other != null && other.checkTarget(type.targetAir, type.targetGround);
     }
 
     public CommandAI command(){

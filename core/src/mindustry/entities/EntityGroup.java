@@ -145,6 +145,12 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
         tree.intersect(x, y, width, height, out);
     }
 
+    public boolean intersect(float x, float y, float width, float height, Boolf<? super T> out){
+        //don't waste time for empty groups
+        if(isEmpty()) return false;
+        return tree.intersect(x, y, width, height, out);
+    }
+
     public Seq<T> intersect(float x, float y, float width, float height){
         intersectArray.clear();
         //don't waste time for empty groups

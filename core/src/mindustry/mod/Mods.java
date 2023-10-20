@@ -451,7 +451,7 @@ public class Mods implements Loadable{
 
             if(meta == null || meta.name == null) continue;
             metas.add(meta);
-            mapping.put(meta.name, file);
+            mapping.put(meta.internalName, file);
         }
 
         var resolved = resolveDependencies(metas);

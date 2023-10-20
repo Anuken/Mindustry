@@ -1,1 +1,0 @@
-Un tower defense incentrato sulla gestione delle risorse.

@@ -20,22 +20,18 @@ public class Units{
     private static final Rect hitrect = new Rect();
     private static Unit result;
     private static float cdist, cpriority;
-    private static boolean boolResult;
     private static int intResult;
     private static Building buildResult;
 
     //prevents allocations in anyEntities
     private static boolean anyEntityGround;
     private static float aeX, aeY, aeW, aeH;
-    private static final Cons<Unit> anyEntityLambda = unit -> {
-        if(boolResult) return;
+    private static final Boolf<Unit> anyEntityLambda = unit -> {
         if((unit.isGrounded() && !unit.type.allowLegStep) == anyEntityGround){
             unit.hitboxTile(hitrect);
-
-            if(hitrect.overlaps(aeX, aeY, aeW, aeH)){
-                boolResult = true;
-            }
+            return hitrect.overlaps(aeX, aeY, aeW, aeH);
         }
+        return false;
     };
 
     @Remote(called = Loc.server)
@@ -112,7 +108,7 @@ public class Units{
 
     /** @return whether this player can interact with a specific tile. if either of these are null, returns true.*/
     public static boolean canInteract(Player player, Building tile){
-        return player == null || tile == null || tile.interactable(player.team());
+        return player == null || tile == null || tile.interactable(player.team()) || state.rules.editor;
     }
 
     /**
@@ -162,31 +158,26 @@ public class Units{
     }
 
     public static boolean anyEntities(float x, float y, float width, float height, boolean ground){
-        boolResult = false;
         anyEntityGround = ground;
         aeX = x;
         aeY = y;
         aeW = width;
         aeH = height;
 
-        nearby(x, y, width, height, anyEntityLambda);
-        return boolResult;
+        return nearbyCheck(x, y, width, height, anyEntityLambda);
     }
 
+    /** Note that this checks the tile hitbox, not the standard hitbox. */
     public static boolean anyEntities(float x, float y, float width, float height, Boolf<Unit> check){
-        boolResult = false;
 
-        nearby(x, y, width, height, unit -> {
-            if(boolResult) return;
+        return nearbyCheck(x, y, width, height, unit -> {
             if(check.get(unit)){
                 unit.hitboxTile(hitrect);
 
-                if(hitrect.overlaps(x, y, width, height)){
-                    boolResult = true;
-                }
+                return hitrect.overlaps(x, y, width, height);
             }
+            return false;
         });
-        return boolResult;
     }
 
     /** Returns the nearest damaged tile. */
@@ -333,7 +324,7 @@ public class Units{
         cdist = 0f;
 
         nearby(team, x, y, range, e -> {
-            if(!predicate.get(e)) return;
+            if(!e.isValid() || !predicate.get(e)) return;
 
             float dist = e.dst2(x, y);
             if(result == null || dist < cdist){
@@ -351,7 +342,7 @@ public class Units{
         cdist = 0f;
 
         nearby(team, x, y, range, e -> {
-            if(!predicate.get(e)) return;
+            if(!e.isValid() || !predicate.get(e)) return;
 
             float dist = sort.cost(e, x, y);
             if(result == null || dist < cdist){
@@ -370,7 +361,7 @@ public class Units{
         cdist = 0f;
 
         nearby(team, x - range, y - range, range*2f, range*2f, e -> {
-            if(!predicate.get(e)) return;
+            if(!e.isValid() || !predicate.get(e)) return;
 
             float dist = e.dst2(x, y);
             if(result == null || dist < cdist){
@@ -426,6 +417,14 @@ public class Units{
     /** Iterates over all units in a rectangle. */
     public static void nearby(float x, float y, float width, float height, Cons<Unit> cons){
         Groups.unit.intersect(x, y, width, height, cons);
+    }
+
+    /**
+     * Iterates over all units in a rectangle.
+     * @return whether a unit was found.
+     * */
+    public static boolean nearbyCheck(float x, float y, float width, float height, Boolf<Unit> cons){
+        return Groups.unit.intersect(x, y, width, height, cons);
     }
 
     /** Iterates over all units in a rectangle. */

@@ -35,6 +35,7 @@ public class PointDefenseWeapon extends Weapon{
         rotate = true;
         useAmmo = false;
         useAttackRange = false;
+        targetInterval = 10f;
     }
 
     @Override
