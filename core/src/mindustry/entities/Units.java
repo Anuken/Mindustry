@@ -89,7 +89,7 @@ public class Units{
 
     /** @return whether a new instance of a unit of this team can be created. */
     public static boolean canCreate(Team team, UnitType type){
-        return team.data().countType(type) < getCap(team) && !type.isBanned();
+        return !type.useUnitCap || (team.data().countType(type) < getCap(team) && !type.isBanned());
     }
 
     public static int getCap(Team team){
