@@ -29,6 +29,8 @@ public class UnitCommand extends MappableContent{
     public boolean drawTarget = false;
     /** Whether to reset targets when switching to or from this command. */
     public boolean resetTarget = true;
+    /** */
+    public boolean exactArrival = false;
     /** Key to press for this command. */
     public @Nullable Binding keybind = null;
 
@@ -101,6 +103,7 @@ public class UnitCommand extends MappableContent{
             switchToMove = false;
             drawTarget = true;
             resetTarget = false;
+            exactArrival = true;
         }};
         unloadPayloadCommand = new UnitCommand("unloadPayload", "download", Binding.unit_command_unload_payload, null){{
             switchToMove = false;

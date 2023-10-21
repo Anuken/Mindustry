@@ -40,7 +40,7 @@ public class CommandAI extends AIController{
     /** Stance, usually related to firing mode. */
     public UnitStance stance = UnitStance.shoot;
     /** Current command this unit is following. */
-    public @Nullable UnitCommand command;
+    public UnitCommand command = UnitCommand.moveCommand;
     /** Current controller instance based on command. */
     protected @Nullable AIController commandController;
     /** Last command type assigned. Used for detecting command changes. */
@@ -291,7 +291,7 @@ public class CommandAI extends AIController{
             }
 
             //reached destination, end pathfinding
-            if(attackTarget == null && unit.within(vecMovePos, Math.max(5f, unit.hitSize / 2f))){
+            if(attackTarget == null && unit.within(vecMovePos, command.exactArrival && commandQueue.size == 0 ? 1f : Math.max(5f, unit.hitSize / 2f))){
                 finishPath();
             }
 
