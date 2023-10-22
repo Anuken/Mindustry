@@ -845,7 +845,7 @@ public class UnitType extends UnlockableContent implements Senseable{
                 }
                 stances = seq.toArray(UnitStance.class);
             }else{
-                stances = new UnitStance[]{UnitStance.stop};
+                stances = new UnitStance[]{UnitStance.stop, UnitStance.patrol};
             }
         }
 
