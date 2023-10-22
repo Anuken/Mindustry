@@ -69,7 +69,7 @@ public class Reconstructor extends UnitBlock{
                 Core.bundle.format("bar.unitcap",
                     Fonts.getUnicodeStr(e.unit().name),
                     e.team.data().countType(e.unit()),
-                    e.unit().useUnitCap ? Units.getStringCap(e.team) : "∞"
+                    e.unit() == null ? 0f : (e.unit().useUnitCap ? Units.getStringCap(e.team) : "∞")
                 ),
             () -> Pal.power,
             () -> e.unit() == null ? 0f : (e.unit().useUnitCap ? (float)e.team.data().countType(e.unit()) / Units.getCap(e.team) : 1f)
