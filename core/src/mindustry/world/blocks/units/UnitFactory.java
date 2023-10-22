@@ -95,7 +95,7 @@ public class UnitFactory extends UnitBlock{
                     e.unit().useUnitCap ? Units.getStringCap(e.team) : "∞"
                 ),
             () -> Pal.power,
-            () -> e.unit() == null ? 0 : (e.unit().useUnitCap ? (float)e.team.data().countType(e.unit()) / Units.getCap(e.team) : 1f)
+            () -> e.unit() == null ? 0f : (e.unit().useUnitCap ? (float)e.team.data().countType(e.unit()) / Units.getCap(e.team) : 1f)
         ));
     }
 
