@@ -99,10 +99,10 @@ public class UnitAssembler extends PayloadBlock{
             Core.bundle.format("bar.unitcap",
                 Fonts.getUnicodeStr(e.unit().name),
                 e.team.data().countType(e.unit()),
-                Units.getStringCap(e.team)
+                e.unit().useUnitCap ? Units.getStringCap(e.team) : "∞"
             ),
             () -> Pal.power,
-            () -> (float)e.team.data().countType(e.unit()) / Units.getCap(e.team)
+            () -> e.unit().useUnitCap ? ((float)e.team.data().countType(e.unit()) / Units.getCap(e.team)) : 1f
         ));
     }
 
