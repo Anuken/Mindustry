@@ -258,6 +258,6 @@
   },
   {
     "name": "Atomic",
-    "address": ["atomic-lab.ddns.net:25709", "atomic-lab.ddns.net:25907", "atomic-de.ddns.net:35845"]
+    "address": ["atomic-de.ddns.net:35199", "atomic-de.ddns.net:35176", "atomic-de.ddns.net:35845"]
   }
 ]
