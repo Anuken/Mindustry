@@ -1641,6 +1641,14 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         return false;
     }
 
+    boolean tryRepairDerelict(Tile selected){
+        if(selected != null && selected.build != null && selected.build.block.unlockedNow() && selected.build.team == Team.derelict && Build.validPlace(selected.block(), player.team(), selected.build.tileX(), selected.build.tileY(), selected.build.rotation)){
+            player.unit().addBuild(new BuildPlan(selected.build.tileX(), selected.build.tileY(), selected.build.rotation, selected.block(), selected.build.config()));
+            return true;
+        }
+        return false;
+    }
+
     boolean canMine(Tile tile){
         return !Core.scene.hasMouse()
             && player.unit().validMine(tile)

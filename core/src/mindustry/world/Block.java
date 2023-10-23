@@ -336,6 +336,8 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean instantTransfer = false;
     /** Whether you can rotate this block after it is placed. */
     public boolean quickRotate = true;
+    /** If true, this derelict block can be repair by clicking it. */
+    public boolean allowDerelictRepair = true;
     /** Main subclass. Non-anonymous. */
     public @Nullable Class<?> subclass;
     /** Scroll position for certain blocks. */
