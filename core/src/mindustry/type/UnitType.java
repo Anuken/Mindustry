@@ -810,7 +810,7 @@ public class UnitType extends UnlockableContent implements Senseable{
         if(commands.length == 0){
             Seq<UnitCommand> cmds = new Seq<>(UnitCommand.class);
 
-            cmds.add(UnitCommand.moveCommand);
+            cmds.add(UnitCommand.moveCommand, UnitCommand.enterPayloadCommand);
 
             if(canBoost){
                 cmds.add(UnitCommand.boostCommand);
@@ -845,7 +845,7 @@ public class UnitType extends UnlockableContent implements Senseable{
                 }
                 stances = seq.toArray(UnitStance.class);
             }else{
-                stances = new UnitStance[]{UnitStance.stop};
+                stances = new UnitStance[]{UnitStance.stop, UnitStance.patrol};
             }
         }
 

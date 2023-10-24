@@ -1,11 +1,7 @@
 [
   {
-    "name": "OmniCorp Classic",
-    "address": ["omnidustry.ddns.net:6567","omnidustry.ddns.net:6568","omnidustry.ddns.net:6569","omnidustry.ddns.net:6570","omnidustry.ddns.net:6571","omnidustry.ddns.net:6572","omnidustry.ddns.net:6573","omnidustry.ddns.net:6574"]
-  },
-  {
     "name": "meiqiuMDT",
-    "address": ["43.248.103.156:11023","211.101.236.94:10000","bj-1.lcf.icu:10240"]
+    "address": ["43.248.103.156:14740","211.101.236.94:10000","bj-1.lcf.icu:10240"]
   },
   {
     "name": "CMS",
@@ -89,7 +85,7 @@
   },
   {
     "name": "Chaotic Neutral",
-    "address": ["c-n.ddns.net:7012", "c-n.ddns.net:7013", "c-n.ddns.net:7014", "c-n.ddns.net:7015", "c-n.ddns.net:7016", "c-n.ddns.net:7017", "37.187.73.180:7021"]
+    "address": ["c-n.ddns.net:7012", "c-n.ddns.net:7013", "c-n.ddns.net:7014", "c-n.ddns.net:7015", "c-n.ddns.net:7016", "c-n.ddns.net:7017", "c-n.ddns.net:7003", "37.187.73.180:7021"]
   },
   {
     "name": "io",
@@ -121,11 +117,11 @@
   },
   {
     "name": "Fish",
-    "address": ["162.248.101.95", "162.248.100.98", "162.248.100.133", "162.248.102.204"]
+    "address": ["162.248.101.95", "162.248.100.98", "162.248.100.133", "162.248.102.204", "c-n.ddns.net:7003"]
   },
   {
-    "name": "OMNIDUSTRY",
-    "address": ["109.94.209.233", "109.94.209.233:6568", "109.94.209.233:6569", "109.94.209.233:6570", "109.94.209.233:6571", "109.94.209.233:6572", "109.94.209.233:6573", "109.94.209.233:6574"]
+    "name": "OmniCorp Classic",
+    "address": ["omnidustry.ru:6567", "omnidustry.ru:6568", "omnidustry.ru:6569", "omnidustry.ru:6570", "omnidustry.ru:6571", "omnidustry.ru:6572", "omnidustry.ru:6573", "omnidustry.ru:6574"]
   },
   {
     "name": "The Devil",
@@ -197,7 +193,7 @@
   },
   {
     "name": "Realm of Serene Lime",
-    "address": ["43.248.185.167:8517","n2.akiracloud.net:10686","n2.akiracloud.net:10486", "p12.simpfun.cn:8654"]
+    "address": ["43.248.116.142:10627","n2.akiracloud.net:10686","n2.akiracloud.net:10486", "p12.simpfun.cn:8654"]
   },
   {
     "name": "CreateDustry",
@@ -214,7 +210,7 @@
   },
   {
     "name": "Cyandustry",
-    "address": ["91.218.66.162:8000","91.218.66.162:7000", "91.218.66.162:7500", "91.218.66.162:7600"]
+    "address": ["136.243.14.186:7000","136.243.14.186:7001", "136.243.14.186:7002", "136.243.14.186:7003", "136.243.14.186:7004", "136.243.14.186:7005", "136.243.14.186:7006"]
   },
   {
     "name": "Four Family",
@@ -237,8 +233,8 @@
     "address": ["118.127.8.162:25617", "78.108.218.117:25640", "srv3.godlike.club:27246"]
   },
   {
-    "name": "Vanilla CroCraft",
-    "address": ["130.61.175.47:6567", "41.216.188.223:5001"]
+    "name": "CroCraft Network",
+    "address": ["193.122.53.98:6567", "41.216.188.223:5001"]
   },
   {
     "name": "Extra Utilities",
@@ -250,7 +246,7 @@
   },
   {
     "name": "Open PVP",
-    "address": ["185.250.44.200:6567"]
+    "address": ["162.55.42.21:5555"]
   },
   {
     "name": "XuwenHost",
@@ -259,5 +255,9 @@
   {
     "name": "MineCore",
     "address": ["194.247.42.11:27792"]
+  },
+  {
+    "name": "Atomic",
+    "address": ["atomic-de.ddns.net:35199", "atomic-de.ddns.net:35176", "atomic-de.ddns.net:35845"]
   }
 ]

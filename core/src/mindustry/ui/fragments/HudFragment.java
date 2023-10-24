@@ -917,6 +917,8 @@ public class HudFragment{
                     }
 
                     statuses.set(applied);
+                }else{
+                    statuses.clear();
                 }
             }
         }).left();
