@@ -1062,12 +1062,17 @@ public class LExecutor{
             if(exec.textBuffer.length() >= maxTextBuffer) return;
 
             int placeholderIndex = -1;
+            int placeholderNumber = 10;
 
             for(int i = 0; i < exec.textBuffer.length(); i++){
                 if(exec.textBuffer.charAt(i) == '{' && exec.textBuffer.length() - i > 2){
-                    if(exec.textBuffer.charAt(i + 1) >= '0' && exec.textBuffer.charAt(i + 1) <= '9' && exec.textBuffer.charAt(i + 2) == '}'){
-                        placeholderIndex = i;
-                        break;
+                    char numChar = exec.textBuffer.charAt(i + 1);
+
+                    if(numChar >= '0' && numChar <= '9' && exec.textBuffer.charAt(i + 2) == '}'){
+                        if(numChar - '0' < placeholderNumber){
+                            placeholderNumber = numChar - '0';
+                            placeholderIndex = i;
+                        }
                     }
                 }
             }

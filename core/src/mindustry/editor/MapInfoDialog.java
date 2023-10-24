@@ -103,11 +103,9 @@ public class MapInfoDialog extends BaseDialog{
                     try{
                         MapLocales res = JsonIO.read(MapLocales.class, editor.tags.get("locales", "{}"));
                         locales.show(res);
-                        hide();
                     }catch(Throwable e){
-                        ui.showException(e);
                         locales.show(new MapLocales());
-                        hide();
+                        ui.showException(e);
                     }
                     hide();
                 }).marginLeft(10f).width(0f).colspan(2).center().growX();

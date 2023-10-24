@@ -26,6 +26,19 @@ public class MapLocales extends ObjectMap<String, StringMap> implements JsonSeri
         }
     }
 
+    @Override
+    public MapLocales copy(){
+        MapLocales out = new MapLocales();
+
+        for(var entry : this.entries()){
+            StringMap map = new StringMap();
+            map.putAll(entry.value);
+            out.put(entry.key, map);
+        }
+
+        return out;
+    }
+
     public String getProperty(String key){
         if(!containsProperty(key)){
             if(containsProperty("en", key)){
