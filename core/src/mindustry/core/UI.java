@@ -78,7 +78,7 @@ public class UI implements ApplicationListener, Loadable{
 
     public IntMap<Dialog> followUpMenus;
 
-    public Cursor drillCursor, unloadCursor, targetCursor;
+    public Cursor drillCursor, unloadCursor, targetCursor, repairCursor;
 
     private @Nullable Element lastAnnouncement;
 
@@ -142,6 +142,7 @@ public class UI implements ApplicationListener, Loadable{
         drillCursor = Core.graphics.newCursor("drill", Fonts.cursorScale());
         unloadCursor = Core.graphics.newCursor("unload", Fonts.cursorScale());
         targetCursor = Core.graphics.newCursor("target", Fonts.cursorScale());
+        repairCursor = Core.graphics.newCursor("repair", Fonts.cursorScale());
     }
 
     @Override

@@ -56,6 +56,8 @@ import static mindustry.Vars.*;
 @SuppressWarnings("unchecked")
 public class ContentParser{
     private static final boolean ignoreUnknownFields = true;
+    private static final ContentType[] typesToSearch = {ContentType.block, ContentType.item, ContentType.unit, ContentType.liquid, ContentType.planet};
+
     ObjectMap<Class<?>, ContentType> contentTypes = new ObjectMap<>();
     ObjectSet<Class<?>> implicitNullable = ObjectSet.with(TextureRegion.class, TextureRegion[].class, TextureRegion[][].class, TextureRegion[][][].class);
     ObjectMap<String, AssetDescriptor<?>> sounds = new ObjectMap<>();
@@ -395,6 +397,17 @@ public class ContentParser{
                 //try to parse Rect as array
                 if(type == Rect.class && jsonData.isArray() && jsonData.size == 4){
                     return (T)new Rect(jsonData.get(0).asFloat(), jsonData.get(1).asFloat(), jsonData.get(2).asFloat(), jsonData.get(3).asFloat());
+                }
+
+                //search across different content types to find one by name
+                if(type == UnlockableContent.class){
+                    for(ContentType c : typesToSearch){
+                        T found = (T)locate(c, jsonData.asString());
+                        if(found != null){
+                            return found;
+                        }
+                    }
+                    throw new IllegalArgumentException("\"" + jsonData.name + "\": No content found with name '" + jsonData.asString() + "'.");
                 }
 
                 if(Content.class.isAssignableFrom(type)){

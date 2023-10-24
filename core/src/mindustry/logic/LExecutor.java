@@ -49,6 +49,7 @@ public class LExecutor{
     public Var[] vars = {};
     public Var counter;
     public int[] binds;
+    public boolean yield;
 
     public int iptIndex = -1;
     public LongSeq graphicsBuffer = new LongSeq();
@@ -1177,6 +1178,7 @@ public class LExecutor{
             }else{
                 //skip back to self.
                 exec.var(varCounter).numval --;
+                exec.yield = true;
             }
 
             if(state.updateId != frameId){
@@ -1192,6 +1194,7 @@ public class LExecutor{
         public void run(LExecutor exec){
             //skip back to self.
             exec.var(varCounter).numval --;
+            exec.yield = true;
         }
     }
 
@@ -1588,11 +1591,12 @@ public class LExecutor{
 
     public static class FlushMessageI implements LInstruction{
         public MessageType type = MessageType.announce;
-        public int duration;
+        public int duration, outSuccess;
 
-        public FlushMessageI(MessageType type, int duration){
+        public FlushMessageI(MessageType type, int duration, int outSuccess){
             this.type = type;
             this.duration = duration;
+            this.outSuccess = outSuccess;
         }
 
         public FlushMessageI(){
@@ -1600,16 +1604,20 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            if(headless && type != MessageType.mission) return;
+            //set default to succes
+            exec.setnum(outSuccess, 1);
+            if(headless && type != MessageType.mission) {
+                exec.textBuffer.setLength(0);
+                return;
+            }
 
-            //skip back to self until possible
-            //TODO this is guaranteed desync on servers - I don't see a good solution
             if(
                 type == MessageType.announce && ui.hasAnnouncement() ||
                 type == MessageType.notify && ui.hudfrag.hasToast() ||
                 type == MessageType.toast && ui.hasAnnouncement()
             ){
-                exec.var(varCounter).numval --;
+                //set outSuccess=false to let user retry.
+                exec.setnum(outSuccess, 0);
                 return;
             }
 

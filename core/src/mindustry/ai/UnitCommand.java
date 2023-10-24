@@ -17,7 +17,7 @@ public class UnitCommand extends MappableContent{
     @Deprecated
     public static final Seq<UnitCommand> all = new Seq<>();
 
-    public static UnitCommand moveCommand, repairCommand, rebuildCommand, assistCommand, mineCommand, boostCommand, loadUnitsCommand, loadBlocksCommand, unloadPayloadCommand;
+    public static UnitCommand moveCommand, repairCommand, rebuildCommand, assistCommand, mineCommand, boostCommand, enterPayloadCommand, loadUnitsCommand, loadBlocksCommand, unloadPayloadCommand;
 
     /** Name of UI icon (from Icon class). */
     public final String icon;
@@ -29,6 +29,8 @@ public class UnitCommand extends MappableContent{
     public boolean drawTarget = false;
     /** Whether to reset targets when switching to or from this command. */
     public boolean resetTarget = true;
+    /** */
+    public boolean exactArrival = false;
     /** Key to press for this command. */
     public @Nullable Binding keybind = null;
 
@@ -87,17 +89,23 @@ public class UnitCommand extends MappableContent{
             drawTarget = true;
             resetTarget = false;
         }};
-        loadUnitsCommand = new UnitCommand("loadUnits", "download", Binding.unit_command_load_units, null){{
+        enterPayloadCommand = new UnitCommand("enterPayload", "downOpen", Binding.unit_command_enter_payload, null){{
             switchToMove = false;
             drawTarget = true;
             resetTarget = false;
         }};
-        loadBlocksCommand = new UnitCommand("loadBlocks", "down", Binding.unit_command_load_blocks, null){{
+        loadUnitsCommand = new UnitCommand("loadUnits", "upload", Binding.unit_command_load_units, null){{
             switchToMove = false;
             drawTarget = true;
             resetTarget = false;
         }};
-        unloadPayloadCommand = new UnitCommand("unloadPayload", "upload", Binding.unit_command_unload_payload, null){{
+        loadBlocksCommand = new UnitCommand("loadBlocks", "up", Binding.unit_command_load_blocks, null){{
+            switchToMove = false;
+            drawTarget = true;
+            resetTarget = false;
+            exactArrival = true;
+        }};
+        unloadPayloadCommand = new UnitCommand("unloadPayload", "download", Binding.unit_command_unload_payload, null){{
             switchToMove = false;
             drawTarget = true;
             resetTarget = false;
