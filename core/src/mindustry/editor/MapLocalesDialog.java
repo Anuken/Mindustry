@@ -42,27 +42,29 @@ public class MapLocalesDialog extends BaseDialog{
         langs = new Table(Tex.button);
         main = new Table();
 
-        buttons.add().growX().width(-1);
+        buttons.add("").uniform();
 
-        buttons.button("@back", Icon.left, () -> {
-            if(!saved) ui.showConfirm("@editor.locales", "@editor.savechanges", () -> editor.tags.put("locales", JsonIO.write(locales)));
-            hide();
-        }).size(210f, 64f);
-        closeOnBack(() -> {
-            if(!saved) ui.showConfirm("@editor.locales", "@editor.savechanges", () -> editor.tags.put("locales", JsonIO.write(locales)));
-        });
+        buttons.table(t -> {
+            t.defaults().pad(3).center();
 
-        buttons.button("@editor.apply", Icon.ok, () -> {
-            editor.tags.put("locales", JsonIO.write(locales));
-            lastSaved = locales.copy();
-            saved = true;
-        }).size(210f, 64f).disabled(b -> saved);
+            t.button("@back", Icon.left, () -> {
+                if(!saved) ui.showConfirm("@editor.locales", "@editor.savechanges", () -> editor.tags.put("locales", JsonIO.write(locales)));
+                hide();
+            }).size(210f, 64f);
+            closeOnBack(() -> {
+                if(!saved) ui.showConfirm("@editor.locales", "@editor.savechanges", () -> editor.tags.put("locales", JsonIO.write(locales)));
+            });
 
-        buttons.button("@edit", Icon.edit, this::editDialog).size(210f, 64f);
+            t.button("@editor.apply", Icon.ok, () -> {
+                editor.tags.put("locales", JsonIO.write(locales));
+                lastSaved = locales.copy();
+                saved = true;
+            }).size(210f, 64f).disabled(b -> saved);
 
-        buttons.add().growX().width(-1);
+            t.button("@edit", Icon.edit, this::editDialog).size(210f, 64f);
+        }).growX();
 
-        buttons.button("?", () -> ui.showInfo("@locales.info")).size(60f, 64f);
+        buttons.button("?", () -> ui.showInfo("@locales.info")).size(60f, 64f).uniform();
 
         shown(this::setup);
     }
@@ -434,8 +436,7 @@ public class MapLocalesDialog extends BaseDialog{
         t.button("@locales.showcorrect", Icon.ok, Styles.nonet, () -> showCorrect = !showCorrect).update(b -> {
             ((Image)b.getChildren().get(1)).setDrawable(showCorrect ? Icon.ok : Icon.cancel);
             b.setChecked(showCorrect);
-        }).grow()).size(450f, 100f).color(Pal.gray).padTop(50f)
-        .getTable().getCells().get(1).padRight(10f); // image cell pad
+        }).grow().pad(15f)).size(450f, 100f).color(Pal.gray).padTop(50f);
 
         dialog.cont.row();
 
@@ -443,8 +444,7 @@ public class MapLocalesDialog extends BaseDialog{
             t.button("@locales.showmissing", Icon.ok, Styles.nonet, () -> showMissing = !showMissing).update(b -> {
                 ((Image)b.getChildren().get(1)).setDrawable(showMissing ? Icon.ok : Icon.cancel);
                 b.setChecked(showMissing);
-        }).grow()).size(450f, 100f).color(Pal.accent).padTop(20f)
-        .getTable().getCells().get(1).padRight(10f);
+        }).grow().pad(15f)).size(450f, 100f).color(Pal.accent).padTop(50f);
 
         dialog.cont.row();
 
@@ -452,8 +452,7 @@ public class MapLocalesDialog extends BaseDialog{
             t.button("@locales.showsame", Icon.ok, Styles.nonet, () -> showSame = !showSame).update(b -> {
                 ((Image)b.getChildren().get(1)).setDrawable(showSame ? Icon.ok : Icon.cancel);
                 b.setChecked(showSame);
-        }).grow()).size(450f, 100f).color(Pal.techBlue).padTop(20f)
-        .getTable().getCells().get(1).padRight(10f);
+        }).grow().pad(15f)).size(450f, 100f).color(Pal.techBlue).padTop(50f);
 
         dialog.buttons.button("@back", Icon.left, () -> {
             buildMain();
