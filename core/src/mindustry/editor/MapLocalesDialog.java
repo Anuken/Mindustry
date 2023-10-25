@@ -497,7 +497,7 @@ public class MapLocalesDialog extends BaseDialog{
             }else{
                 int sepIndex = line.indexOf(" = ");
                 if(sepIndex != -1 && !currentLocale.isEmpty()){
-                    bundles.get(currentLocale).put(line.substring(0, sepIndex), line.substring(sepIndex + 2));
+                    bundles.get(currentLocale).put(line.substring(0, sepIndex), line.substring(sepIndex + 3));
                 }
             }
         }
@@ -511,7 +511,7 @@ public class MapLocalesDialog extends BaseDialog{
         for(var line : data.split("\\r?\\n|\\r")){
             int sepIndex = line.indexOf(" = ");
             if(sepIndex != -1){
-                map.put(line.substring(0, sepIndex), line.substring(sepIndex + 2));
+                map.put(line.substring(0, sepIndex), line.substring(sepIndex + 3));
             }
         }
 

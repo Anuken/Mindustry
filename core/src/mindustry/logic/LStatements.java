@@ -2049,7 +2049,7 @@ public class LStatements{
         }
     }
 
-    @RegisterStatement("printlocale")
+    @RegisterStatement("localeprint")
     public static class LocalePrintStatement extends LStatement{
         public String value = "\"name\"";
 
