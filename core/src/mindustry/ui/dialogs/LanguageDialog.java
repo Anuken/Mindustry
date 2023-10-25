@@ -80,7 +80,6 @@ public class LanguageDialog extends BaseDialog{
                 Core.settings.put("locale", loc.toString());
                 Log.info("Setting locale: @", loc.toString());
                 player.locale = loc.toString();
-                MapLocales.currentLocale = loc.toString();
                 ui.showInfo("@language.restart");
             });
             langs.add(button).group(group).update(t -> t.setChecked(loc.equals(getLocale()))).size(400f, 50f).row();

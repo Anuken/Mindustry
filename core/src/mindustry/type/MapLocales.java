@@ -10,7 +10,6 @@ import static arc.Core.*;
 /** Class for storing map-specific locale bundles */
 public class MapLocales extends ObjectMap<String, StringMap> implements JsonSerializable{
     private static TextFormatter formatter = new TextFormatter(null, false);
-    public static String currentLocale = settings.getString("locale");
 
     @Override
     public void write(Json json){
@@ -46,7 +45,7 @@ public class MapLocales extends ObjectMap<String, StringMap> implements JsonSeri
             }
             return "???" + key + "???";
         }
-        return get(currentLocale).get(key);
+        return get(settings.getString("locale")).get(key);
     }
 
     private String getProperty(String locale, String key){
@@ -55,7 +54,7 @@ public class MapLocales extends ObjectMap<String, StringMap> implements JsonSeri
     }
 
     public boolean containsProperty(String key){
-        return containsProperty(currentLocale, key);
+        return containsProperty(settings.getString("locale"), key);
     }
 
     private boolean containsProperty(String locale, String key){
