@@ -652,12 +652,21 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         }
 
         public static String fetchText(String text){
-            return text.startsWith("@") ?
-                //on mobile, try ${text}.mobile first for mobile-specific hints.
-                mobile ? Core.bundle.get(text.substring(1) + ".mobile", Core.bundle.get(text.substring(1))) :
-                Core.bundle.get(text.substring(1)) :
-                text;
+            if(text.startsWith("@")){
+                String key = text.substring(1);
 
+                if(mobile){
+                    return state.mapLocales.containsProperty(key + ".mobile") ?
+                    state.mapLocales.getProperty(key + ".mobile") :
+                    Core.bundle.get(key + ".mobile", Core.bundle.get(key));
+                }else{
+                    return state.mapLocales.containsProperty(key) ?
+                    state.mapLocales.getProperty(key) :
+                    Core.bundle.get(key);
+                }
+            }else{
+                return text;
+            }
         }
     }
 

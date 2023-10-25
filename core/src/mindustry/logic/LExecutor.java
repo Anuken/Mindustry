@@ -2010,7 +2010,17 @@ public class LExecutor{
             //this should avoid any garbage allocation
             Var v = exec.var(name);
             if(v.isobj){
-                String strValue = state.mapLocales.getProperty(PrintI.toString(v.objval));
+                String name = PrintI.toString(v.objval);
+
+                String strValue;
+
+                if(mobile){
+                    strValue = state.mapLocales.containsProperty(name + ".mobile") ?
+                    state.mapLocales.getProperty(name + ".mobile") :
+                    state.mapLocales.getProperty(name);
+                }else{
+                    strValue = state.mapLocales.getProperty(name);
+                }
 
                 exec.textBuffer.append(strValue);
             }

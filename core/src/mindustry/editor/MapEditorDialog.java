@@ -24,6 +24,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.io.*;
 import mindustry.maps.*;
+import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
