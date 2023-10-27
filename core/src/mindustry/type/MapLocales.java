@@ -39,22 +39,23 @@ public class MapLocales extends ObjectMap<String, StringMap> implements JsonSeri
     }
 
     public String getProperty(String key){
-        if(!containsProperty(key)){
-            if(containsProperty("en", key)){
-                return get("en").get(key);
-            }
+        if(!containsProperty(settings.getString("locale"), key)){
+            if(containsProperty("en", key)) return get("en").get(key);
             return "???" + key + "???";
         }
         return get(settings.getString("locale")).get(key);
     }
 
     private String getProperty(String locale, String key){
-        if(!containsProperty(locale, key)) return "???" + key + "???";
+        if(!containsProperty(locale, key)){
+            if(containsProperty("en", key)) return get("en").get(key);
+            return "???" + key + "???";
+        }
         return get(locale).get(key);
     }
 
     public boolean containsProperty(String key){
-        return containsProperty(settings.getString("locale"), key);
+        return containsProperty(settings.getString("locale"), key) || containsProperty("en", key);
     }
 
     private boolean containsProperty(String locale, String key){
@@ -63,10 +64,8 @@ public class MapLocales extends ObjectMap<String, StringMap> implements JsonSeri
     }
 
     public String getFormatted(String key, Object... args){
-        if(!containsProperty(key)){
-            if(containsProperty("en", key)){
-                return formatter.format(getProperty("en", key), args);
-            }
+        if(!containsProperty(settings.getString("locale"), key)){
+            if(containsProperty("en", key)) return formatter.format(getProperty("en", key), args);
             return "???" + key + "???";
         }
         return formatter.format(getProperty(key), args);
