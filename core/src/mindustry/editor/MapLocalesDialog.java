@@ -24,6 +24,7 @@ public class MapLocalesDialog extends BaseDialog{
     private boolean saved = true;
     private Table langs;
     private Table main;
+    private Table propView;
     private String selectedLocale;
 
     private boolean applytoall = true;
@@ -41,6 +42,7 @@ public class MapLocalesDialog extends BaseDialog{
 
         langs = new Table(Tex.button);
         main = new Table();
+        propView = new Table();
 
         buttons.add("").uniform();
 
@@ -101,22 +103,23 @@ public class MapLocalesDialog extends BaseDialog{
                     b.setChecked(collapsed);
                 }).size(35f);
 
-                a.field("", v -> {
+                a.button(Icon.filter, Styles.emptyi, () -> filterDialog(this::buildMain)).padLeft(10f).size(35f);
+
+                var field = a.field("", v -> {
                     searchString = v;
                     buildMain();
-                }).update(f -> f.setText(searchString)).maxTextLength(64).padLeft(10f).width(250f).update(f -> f.setMessageText(searchByValue ? "@locales.searchvalue": "@locales.searchname"));
+                }).update(f -> f.setText(searchString)).maxTextLength(64).padLeft(10f).width(250f).update(f -> f.setMessageText(searchByValue ? "@locales.searchvalue": "@locales.searchname")).get();
 
                 a.button(Icon.cancel, Styles.emptyi, () -> {
                     searchString = "";
+                    field.setText("");
                     buildMain();
                 }).padLeft(10f).size(35f);
-
-                a.button(Icon.filter, Styles.emptyi, this::filterDialog).padLeft(10f).size(35f);;
             }).row();
 
             t.check("@locales.applytoall", applytoall, b -> applytoall = b).pad(10f).row();
 
-            t.add(main).padLeft(20f).center().grow().row();
+            t.add(main).center().grow().row();
         }).pad(10f).grow();
 
         // property addition
@@ -207,7 +210,7 @@ public class MapLocalesDialog extends BaseDialog{
                 var comparsionString = (searchByValue ? props.get(key).toLowerCase() : key.toLowerCase());
                 if(!searchString.isEmpty() && !comparsionString.contains(searchString.toLowerCase())) continue;
 
-                PropertyStatus status = getPropertyStatus(key, props.get(key));
+                PropertyStatus status = getPropertyStatus(key, props.get(key), selectedLocale, false);
                 if(status == PropertyStatus.correct && !showCorrect) continue;
                 if(status == PropertyStatus.missing && !showMissing) continue;
                 if(status == PropertyStatus.same && !showSame) continue;
@@ -266,9 +269,7 @@ public class MapLocalesDialog extends BaseDialog{
                     }).size(35f);
 
                     // more actions
-                    t.button(Icon.edit, Styles.emptyi, () -> {
-                        propEditDialog(t, propKey[0], propValue[0]);
-                    }).size(35f).row();
+                    t.button(Icon.edit, Styles.emptyi, () -> propEditDialog(t, propKey[0], propValue[0])).size(35f).row();
 
                     // property value area
                     t.collapser(c -> c.area(propValue[0], v -> {
@@ -293,21 +294,29 @@ public class MapLocalesDialog extends BaseDialog{
     }
 
     private void updateCard(Table table, String propKey, String propValue){
-        switch(getPropertyStatus(propKey, propValue)){
+        updateCard(table, propKey, propValue, selectedLocale, false);
+    }
+
+    private void updateCard(Table table, String propKey, String propValue, String locale, boolean viewCard){
+        switch(getPropertyStatus(propKey, propValue, locale, viewCard)){
             case missing -> table.setColor(Pal.accent);
             case same -> table.setColor(Pal.techBlue);
             case correct -> table.setColor(Pal.gray);
         }
     }
 
-    private PropertyStatus getPropertyStatus(String propKey, String propValue){
+    // Property statuses for main dialog and property view dialog are a bit different
+    private PropertyStatus getPropertyStatus(String propKey, String propValue, String locale, boolean forView){
+        if(forView && propValue == null) return PropertyStatus.missing;
+
         for(var bundle : locales.entries()){
-            if(bundle.key.equals(selectedLocale)) continue;
+            if(!forView && bundle.key.equals(selectedLocale)) continue;
+            if(forView && bundle.key.equals(locale)) continue;
 
             StringMap props = bundle.value;
 
             if(!props.containsKey(propKey)){
-                return PropertyStatus.missing;
+                if(!forView) return PropertyStatus.missing;
             }else{
                 if(props.get(propKey).equals(propValue)){
                     return PropertyStatus.same;
@@ -350,7 +359,7 @@ public class MapLocalesDialog extends BaseDialog{
         dialog.cont.pane(p -> {
             p.margin(10f);
             p.table(Tex.button, t -> {
-                t.defaults().size(350f, 60f).left();
+                t.defaults().size(450f, 60f).left();
 
                 t.button("@locales.addtoother", Icon.add, Styles.flatt, () -> {
                     for(var bundle : locales.values()){
@@ -362,6 +371,21 @@ public class MapLocalesDialog extends BaseDialog{
                     saved = false;
                     updateCard(card, key, value);
                     dialog.hide();
+                }).marginLeft(12f).row();
+
+                t.button("@locales.viewproperty", Icon.zoom, Styles.flatt, () -> {
+                    viewPropertyDialog(key);
+                    dialog.hide();
+                }).marginLeft(12f).row();
+
+                t.button("@locales.rollback", Icon.undo, Styles.flatt, () -> {
+                    locales.get(selectedLocale).put(key, lastSaved.get(selectedLocale).get(key));
+                    buildTables();
+                    dialog.hide();
+                }).disabled(b -> {
+                    if(!lastSaved.containsKey(selectedLocale)) return true;
+                    StringMap savedMap = lastSaved.get(selectedLocale);
+                    return !savedMap.containsKey(key) || savedMap.get(key).equals(locales.get(selectedLocale).get(key));
                 }).marginLeft(12f).row();
             });
         });
@@ -420,7 +444,7 @@ public class MapLocalesDialog extends BaseDialog{
                     saved = true;
                     buildTables();
                     dialog.hide();
-                }).marginLeft(12f).row();
+                }).disabled(b -> saved).marginLeft(12f).row();
             });
         });
 
@@ -428,7 +452,103 @@ public class MapLocalesDialog extends BaseDialog{
         dialog.show();
     }
 
-    private void filterDialog(){
+    private void viewPropertyDialog(String key){
+        BaseDialog dialog = new BaseDialog(Core.bundle.format("locales.viewing", key));
+
+        dialog.cont.table(t -> {
+            t.button(Icon.filter, Styles.emptyi, () -> filterDialog(() -> buildPropView(key))).size(35f);
+
+            var field = t.field(searchString, v -> {
+                searchString = v;
+                buildPropView(key);
+            }).update(f -> f.setText(searchString)).maxTextLength(64).padLeft(10f).width(250f).update(f -> f.setMessageText(searchByValue ? "@locales.searchvalue" : "@locales.searchlocale")).get();
+
+            t.button(Icon.cancel, Styles.emptyi, () -> {
+                searchString = "";
+                field.setText("");
+                buildPropView(key);
+            }).padLeft(10f).size(35f);
+        }).row();
+
+        buildPropView(key);
+        dialog.cont.add(propView).grow().center().row();
+
+        dialog.addCloseButton();
+        dialog.closeOnBack();
+
+        dialog.show();
+    }
+
+    private void buildPropView(String key){
+        propView.clear();
+
+        propView.image().color(Pal.gray).height(3f).fillX().top().row();
+        propView.pane(p -> {
+            int cols = (Core.graphics.getWidth() - 100) / ((int)cardWidth + 10);
+            if(cols == 0){
+                propView.add("@empty").center().row();
+                return;
+            }
+            p.defaults().top();
+
+            Table[] colTables = new Table[cols];
+            for(var i = 0; i < cols; i++){
+                colTables[i] = new Table();
+            }
+            int i = 0;
+
+            for(var loc : Vars.locales){
+                String name = loc.toString();
+                if(!locales.containsKey(name)) continue;
+
+                PropertyStatus status = getPropertyStatus(key, locales.get(name).get(key), name, true);
+                if(status == PropertyStatus.correct && !showCorrect) continue;
+                if(status == PropertyStatus.missing && !showMissing) continue;
+                if(status == PropertyStatus.same && !showSame) continue;
+
+                if(status != PropertyStatus.missing){
+                    var comparsionString = (searchByValue ? locales.get(name).get(key).toLowerCase() : loc.getDisplayName().toLowerCase());
+                    if(!searchString.isEmpty() && !comparsionString.contains(searchString.toLowerCase())) continue;
+                }
+
+                colTables[i].table(Tex.whitePane, t -> {
+                    t.add(loc.getDisplayName()).left().color(Pal.accent).row();
+                    t.image().color(Pal.accent).fillX().row();
+
+                    if(status == PropertyStatus.missing){
+                        t.table(b ->
+                        b.button("@add", Icon.add, () -> {
+                            locales.get(name).put(key, "moai");
+
+                            t.getCells().get(2).clearElement();
+                            t.getCells().remove(2);
+
+                            t.area(locales.get(name).get(key), v -> {
+                                locales.get(name).put(key, v);
+                                saved = false;
+                            }).maxTextLength(1000).height(140f).growX().row();
+                        }).size(160f, 50f)).height(140f).growX().row();
+                    }else{
+                        t.area(locales.get(name).get(key), v -> {
+                            locales.get(name).put(key, v);
+                            saved = false;
+                        }).maxTextLength(1000).height(140f).growX().row();
+                    }
+                }).update(t -> updateCard(t, key, locales.get(name).get(key), name, true)).top().width(cardWidth).pad(5f).row();
+
+                i = ++i % cols;
+            }
+
+            if(!colTables[0].hasChildren()){
+                propView.add("@empty").center().row();
+            }else{
+                p.add(colTables);
+            }
+        }).grow().row();
+        propView.image().color(Pal.gray).height(3f).fillX().bottom().row();
+    }
+
+    private void filterDialog(Runnable hidden){
         BaseDialog dialog = new BaseDialog("@locales.filter");
 
         dialog.cont.table(t -> {
@@ -462,10 +582,10 @@ public class MapLocalesDialog extends BaseDialog{
         }).grow().pad(15f)).size(450f, 100f).color(Pal.techBlue).padTop(50f);
 
         dialog.buttons.button("@back", Icon.left, () -> {
-            buildMain();
+            hidden.run();
             dialog.hide();
         }).size(210f, 64f);
-        dialog.closeOnBack(this::buildMain);
+        dialog.closeOnBack(hidden);
 
         dialog.show();
     }
