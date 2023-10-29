@@ -389,9 +389,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                     //if there's a cycle, ignore its heat
                     if(!(build instanceof HeatConductorBuild hc && hc.cameFrom.contains(id()))){
                         //x/y coordinate difference across point of contact
-                        int diff = Math.min(Math.abs(build.tileX() - tileX()), Math.abs(build.tileY() - tileY()));
+                        float diff = (Math.min(Math.abs(build.x - x), Math.abs(build.y - y)) / tilesize);
                         //number of points that this block had contact with
-                        int contactPoints = Math.min(Math.max(build.block.size, block.size) - diff, Math.min(build.block.size, block.size));
+                        int contactPoints = Math.min((int)(block.size/2f + build.block.size/2f - diff), Math.min(build.block.size, block.size));
 
                         //heat is distributed across building size
                         float add = heater.heat() / build.block.size * contactPoints;

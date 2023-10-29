@@ -712,7 +712,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             buildingTapped = selectedControlBuild();
 
             //prevent mining if placing/breaking blocks
-            if(!tryStopMine() && !canTapPlayer(worldx, worldy) && !checkConfigTap() && !tileTapped(linked.build) && mode == none && !Core.settings.getBool("doubletapmine")){
+            if(!tryRepairDerelict(cursor) && !tryStopMine() && !canTapPlayer(worldx, worldy) && !checkConfigTap() && !tileTapped(linked.build) && mode == none && !Core.settings.getBool("doubletapmine")){
                 tryBeginMine(cursor);
             }
         }

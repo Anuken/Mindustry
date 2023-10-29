@@ -86,6 +86,31 @@ public class Build{
             return;
         }
 
+        //repair derelict tile
+        if(tile.team() == Team.derelict && tile.block == result && tile.build != null && tile.block.allowDerelictRepair){
+            float healthf = tile.build.healthf();
+            var config = tile.build.config();
+
+            tile.setBlock(result, team, rotation);
+
+            if(unit != null && unit.getControllerName() != null) tile.build.lastAccessed = unit.getControllerName();
+
+            if(config != null){
+                tile.build.configured(unit, config);
+            }
+            //keep health
+            tile.build.health = result.health * healthf;
+
+            if(fogControl.isVisibleTile(team, tile.x, tile.y)){
+                result.placeEffect.at(tile.drawx(), tile.drawy(), result.size);
+                Fx.rotateBlock.at(tile.build.x, tile.build.y, tile.build.block.size);
+                //doesn't play a sound
+            }
+
+            Events.fire(new BlockBuildEndEvent(tile, unit, team, false, config));
+            return;
+        }
+
         //break all props in the way
         tile.getLinkedTilesAs(result, out -> {
             if(out.block != Blocks.air && out.block.alwaysReplace){
@@ -193,11 +218,11 @@ public class Build{
                 (type.size == 2 && world.getDarkness(wx, wy) >= 3) ||
                 (state.rules.staticFog && state.rules.fog && !fogControl.isDiscovered(team, wx, wy)) ||
                 (check.floor().isDeep() && !type.floating && !type.requiresWater && !type.placeableLiquid) || //deep water
-                (type == check.block() && check.build != null && rotation == check.build.rotation && type.rotate) || //same block, same rotation
+                (type == check.block() && check.build != null && rotation == check.build.rotation && type.rotate && !((type == check.block && check.team() == Team.derelict))) || //same block, same rotation
                 !check.interactable(team) || //cannot interact
                 !check.floor().placeableOn || //solid wall
                 (!checkVisible && !check.block().alwaysReplace) || //replacing a block that should be replaced (e.g. payload placement)
-                    !((type.canReplace(check.block()) || //can replace type
+                    !(((type.canReplace(check.block()) || (type == check.block && check.team() == Team.derelict)) || //can replace type OR can replace derelict block of same type
                         (check.build instanceof ConstructBuild build && build.current == type && check.centerX() == tile.x && check.centerY() == tile.y)) && //same type in construction
                     type.bounds(tile.x, tile.y, Tmp.r1).grow(0.01f).contains(check.block.bounds(check.centerX(), check.centerY(), Tmp.r2))) || //no replacement
                 (type.requiresWater && check.floor().liquidDrop != Liquids.water) //requires water but none found
