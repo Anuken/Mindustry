@@ -38,7 +38,7 @@ public class Mods implements Loadable{
     private @Nullable Scripts scripts;
     private ContentParser parser = new ContentParser();
     private ObjectMap<String, Seq<Fi>> bundles = new ObjectMap<>();
-    private ObjectSet<String> specialFolders = ObjectSet.with("bundles", "sprites", "sprites-override");
+    private ObjectSet<String> specialFolders = ObjectSet.with("bundles", "sprites", "sprites-override", ".git");
 
     private int totalSprites;
     private ObjectFloatMap<String> textureResize = new ObjectFloatMap<>();
