@@ -209,17 +209,21 @@ public class PlacementFragment{
         }
 
         if(Core.input.keyTap(Binding.category_prev)){
+            int i = 0;
             do{
                 currentCategory = currentCategory.prev();
-            }while(categoryEmpty[currentCategory.ordinal()]);
+                i ++;
+            }while(categoryEmpty[currentCategory.ordinal()] && i < categoryEmpty.length);
             input.block = getSelectedBlock(currentCategory);
             return true;
         }
 
         if(Core.input.keyTap(Binding.category_next)){
+            int i = 0;
             do{
                 currentCategory = currentCategory.next();
-            }while(categoryEmpty[currentCategory.ordinal()]);
+                i ++;
+            }while(categoryEmpty[currentCategory.ordinal()] && i < categoryEmpty.length);
             input.block = getSelectedBlock(currentCategory);
             return true;
         }
