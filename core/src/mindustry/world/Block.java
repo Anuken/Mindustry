@@ -650,7 +650,7 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean canReplace(Block other){
         if(other.alwaysReplace) return true;
         if(other.privileged) return false;
-        return other.replaceable && (other != this || (rotate && quickRotate)) && this.group != BlockGroup.none && other.group == this.group &&
+        return other.replaceable && (other != this || (rotate && quickRotate)) && ((this.group != BlockGroup.none && other.group == this.group) || other == this) &&
             (size == other.size || (size >= other.size && ((subclass != null && subclass == other.subclass) || group.anyReplace)));
     }
 

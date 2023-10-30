@@ -193,7 +193,7 @@ public class MinimapRenderer{
             Tmp.tr1.set(dynamicTex);
             Tmp.tr1.set(region.u, 1f - region.v, region.u2, 1f - region.v2);
 
-            Draw.color(state.rules.dynamicColor);
+            Draw.color(state.rules.dynamicColor, 0.5f);
             Draw.rect(Tmp.tr1, x + w/2f, y + h/2f, w, h);
 
             if(state.rules.staticFog){
@@ -201,7 +201,7 @@ public class MinimapRenderer{
 
                 Tmp.tr1.texture = staticTex;
                 //must be black to fit with borders
-                Draw.color(0f, 0f, 0f, state.rules.staticColor.a);
+                Draw.color(0f, 0f, 0f, 1f);
                 Draw.rect(Tmp.tr1, x + w/2f, y + h/2f, w, h);
             }
 

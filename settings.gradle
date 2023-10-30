@@ -33,39 +33,15 @@ if(hasSdk){
     println("No Android SDK found. Skipping Android module.")
 }
 
-if(!hasProperty("release")){
-    if(new File(settingsDir, '../Arc').exists()){
-        use(
-        ':Arc',
-        ':Arc:arc-core',
-        ':Arc:extensions',
-        ':Arc:extensions:freetype',
-        ':Arc:extensions:recorder',
-        ':Arc:extensions:arcnet',
-        ':Arc:extensions:packer',
-        ':Arc:extensions:g3d',
-        ':Arc:extensions:fx',
-        ':Arc:extensions:flabel',
-        ':Arc:extensions:discord',
-        ':Arc:extensions:profiling',
-        ':Arc:natives',
-        ':Arc:natives:natives-desktop',
-        ':Arc:natives:natives-android',
-        ':Arc:natives:natives-ios',
-        ':Arc:natives:natives-freetype-desktop',
-        ':Arc:natives:natives-freetype-android',
-        ':Arc:natives:natives-freetype-ios',
-        ':Arc:backends',
-        ':Arc:backends:backend-sdl',
-        ':Arc:backends:backend-android',
-        ':Arc:backends:backend-robovm',
-        ':Arc:backends:backend-headless'
-        )
+if(!hasProperty("release") && !hasProperty("noLocalArc")){
+    if(new File(rootDir.parent, 'Arc').exists()){
+        println("Compiling with localArc")
+        includeBuild("../Arc")
     }
 
-    if(new File(settingsDir, '../Mindustry-Debug').exists()){
+    if(new File(rootDir.parent, 'Mindustry-Debug').exists()){
         include(":debug")
-        project(":debug").projectDir = new File(settingsDir, "../Mindustry-Debug")
+        project(":debug").projectDir = new File(rootDir.parent, "Mindustry-Debug")
     }
 }else{
     println("Not including local repositories.")

@@ -1,7 +1,7 @@
 [
   {
     "name": "meiqiuMDT",
-    "address": ["43.248.103.156:14740","211.101.236.94:10000","bj-1.lcf.icu:10240"]
+    "address": ["cn1.plush.run:10001","211.101.236.94:10000","bj-1.lcf.icu:10240","play.simpfun.cn:14523"]
   },
   {
     "name": "CMS",
@@ -157,7 +157,7 @@
   },
   {
     "name": "|RussianServers|[]",
-    "address": ["tyancraft.ru:6567", "tyancraft.ru:6568", "tyancraft.ru:6569", "tyancraft.ru:6570", "tyancraft.ru:6571", "tyancraft.ru:6572", "tyancraft.ru:6573"]
+    "address": ["02calm.ru:6567", "02calm.ru:6568", "02calm.ru:6569", "02calm.ru:6570", "02calm.ru:6571", "02calm.ru:6572", "02calm.ru:6573"]
   },
   {
     "name": "Hungarian",
@@ -169,7 +169,7 @@
   },
   {
     "name": "Router Pi",
-    "address": ["a55c81b7c4d6e6d604651a93f8af5cd83.asuscomm.com"]
+    "address": ["a55c81b7c4d6e6d604651a93f8af5cd83.asuscomm.com", "a55c81b7c4d6e6d604651a93f8af5cd83.asuscomm.com:6568", "a55c81b7c4d6e6d604651a93f8af5cd83.asuscomm.com:6569", "a55c81b7c4d6e6d604651a93f8af5cd83.asuscomm.com:6570", "a55c81b7c4d6e6d604651a93f8af5cd83.asuscomm.com:6571", "a55c81b7c4d6e6d604651a93f8af5cd83.asuscomm.com:6572", "a55c81b7c4d6e6d604651a93f8af5cd83.asuscomm.com:6573", "a55c81b7c4d6e6d604651a93f8af5cd83.asuscomm.com:6574"]
   },
   {
     "name": "Vndustry",
@@ -193,7 +193,7 @@
   },
   {
     "name": "Realm of Serene Lime",
-    "address": ["43.248.116.142:10627","n2.akiracloud.net:10686","n2.akiracloud.net:10486", "p12.simpfun.cn:8654"]
+    "address": ["43.248.116.142:10627","n2.akiracloud.net:10686","n2.akiracloud.net:10486", "p12.simpfun.cn:8654", "n2.akiracloud.net:10385"]
   },
   {
     "name": "CreateDustry",
@@ -210,7 +210,7 @@
   },
   {
     "name": "Cyandustry",
-    "address": ["136.243.14.186:7000","136.243.14.186:7001", "136.243.14.186:7002", "136.243.14.186:7003", "136.243.14.186:7004", "136.243.14.186:7005", "136.243.14.186:7006"]
+    "address": ["88.99.95.188:7000","88.99.95.188:7001", "88.99.95.188:7002", "88.99.95.188:7003", "88.99.95.188:7004", "88.99.95.188:7005", "88.99.95.188:7006"]
   },
   {
     "name": "Four Family",
