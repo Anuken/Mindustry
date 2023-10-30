@@ -1,11 +1,17 @@
 package mindustry.editor;
 
 import arc.Core;
+import arc.func.*;
 import arc.graphics.*;
+import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
+import arc.scene.utils.*;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.*;
+import mindustry.ctype.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.io.*;
@@ -16,8 +22,10 @@ import mindustry.ui.dialogs.*;
 import static mindustry.Vars.*;
 
 public class MapLocalesDialog extends BaseDialog{
-    /** Width of UI property card */
+    /** Width of UI property card. */
     private static final float cardWidth = 400f;
+    /** Icons for use in map locales dialog. */
+    private static final ContentType[] contentIcons = {ContentType.item, ContentType.block, ContentType.liquid, ContentType.status, ContentType.unit};
 
     private MapLocales locales;
     private MapLocales lastSaved;
@@ -124,11 +132,9 @@ public class MapLocalesDialog extends BaseDialog{
 
         // property addition
         cont.table(Tex.button, t -> {
-            TextField name = t.field("name", s -> {
-            }).maxTextLength(64).fillX().padTop(10f).get();
+            TextField name = t.field("name", s -> {}).maxTextLength(64).fillX().padTop(10f).get();
             t.row();
-            TextField value = t.area("text", s -> {
-            }).maxTextLength(1000).fillX().height(140f).get();
+            TextField value = t.area("text", s -> {}).maxTextLength(1000).fillX().height(140f).get();
             t.row();
 
             t.button("@add", Icon.add, () -> {
@@ -276,7 +282,10 @@ public class MapLocalesDialog extends BaseDialog{
                         props.put(propKey[0], v);
                         updateCard(t, propKey[0], v);
                         saved = false;
-                    }).maxTextLength(1000).height(140f).growX(), () -> shown[0]).colspan(4).growX();
+                    }).maxTextLength(1000).height(140f).update(a -> {
+                        propValue[0] = props.get(propKey[0]);
+                        a.setText(props.get(propKey[0]));
+                    }).growX(), () -> shown[0]).colspan(4).growX();
 
                     updateCard(t, propKey[0], propValue[0]);
                 }).top().width(cardWidth).pad(5f).row();
@@ -378,6 +387,14 @@ public class MapLocalesDialog extends BaseDialog{
                     dialog.hide();
                 }).marginLeft(12f).row();
 
+                t.button("@locales.addicon", Icon.image, Styles.flatt, () -> {
+                    addIconDialog(res -> {
+                        locales.get(selectedLocale).put(key, value + res);
+                        saved = false;
+                    });
+                    dialog.hide();
+                }).marginLeft(12f).row();
+
                 t.button("@locales.rollback", Icon.undo, Styles.flatt, () -> {
                     locales.get(selectedLocale).put(key, lastSaved.get(selectedLocale).get(key));
                     buildTables();
@@ -475,6 +492,7 @@ public class MapLocalesDialog extends BaseDialog{
 
         dialog.addCloseButton();
         dialog.closeOnBack();
+        dialog.hidden(this::buildMain);
 
         dialog.show();
     }
@@ -574,7 +592,6 @@ public class MapLocalesDialog extends BaseDialog{
         }).grow().pad(15f)).size(450f, 100f).color(Pal.accent).padTop(50f);
 
         dialog.cont.row();
-
         dialog.cont.table(Tex.whitePane, t ->
             t.button("@locales.showsame", Icon.ok, Styles.nonet, () -> showSame = !showSame).update(b -> {
                 ((Image)b.getChildren().get(1)).setDrawable(showSame ? Icon.ok : Icon.cancel);
@@ -588,6 +605,95 @@ public class MapLocalesDialog extends BaseDialog{
         dialog.closeOnBack(hidden);
 
         dialog.show();
+    }
+
+    private void addIconDialog(Cons<String> cons){
+        BaseDialog dialog = new BaseDialog("@locales.addicon");
+
+        Table icons = new Table();
+        TextField search = Elem.newField("", v -> iconsTable(icons, v.replace(" ", "").toLowerCase(), dialog, cons));
+        search.setMessageText("@search");
+
+        dialog.cont.table(t -> {
+            t.add(search).maxTextLength(64).padLeft(10f).width(250f);
+
+            t.button(Icon.cancel, Styles.emptyi, () -> {
+                search.setText("");
+                iconsTable(icons, "", dialog, cons);
+            }).padLeft(10f).size(35f);
+        }).row();
+
+        dialog.cont.pane(icons).scrollX(false);
+        dialog.resized(true, () -> iconsTable(icons, search.getText().replace(" ", "").toLowerCase(), dialog, cons));
+
+        dialog.addCloseButton();
+        dialog.closeOnBack();
+        dialog.setFillParent(true);
+        dialog.show();
+    }
+
+    private void iconsTable(Table table, String search, Dialog dialog, Cons<String> cons){
+        table.clear();
+
+        table.marginRight(19f).marginLeft(12f);
+        table.defaults().size(48f);
+
+        int cols = (int)Math.min(20, Core.graphics.getWidth() / Scl.scl(52f));
+
+        int i = 0;
+
+        var codes = new ObjectIntMap<>(Iconc.codes);
+
+        for(var name : codes.keys()){
+            if(!name.toLowerCase().contains(search)) codes.remove(name);
+        }
+
+        if(codes.size > 0) table.image().colspan(cols).growX().width(-1f).height(3f).color(Pal.accent).row();
+
+        for(var icon : codes){
+            String res = (char)icon.value + "";
+
+            table.button(Icon.icons.get(icon.key), Styles.flati, iconMed, () -> {
+                cons.get(res);
+                dialog.hide();
+            }).tooltip(icon.key);
+
+            if(++i % cols == 0) table.row();
+        }
+
+        for(ContentType ctype : contentIcons){
+            var all = content.getBy(ctype).<UnlockableContent>as().select(u -> u.localizedName.replace(" ", "").toLowerCase().contains(search) && u.uiIcon.found());
+
+            table.row();
+            if(all.size > 0) table.image().colspan(cols).growX().width(-1f).height(3f).color(Pal.accent).row();
+
+            i = 0;
+            for(UnlockableContent u : all){
+                table.button(new TextureRegionDrawable(u.uiIcon), Styles.flati, iconMed, () -> {
+                    cons.get(u.emoji() + "");
+                    dialog.hide();
+                }).tooltip(u.localizedName);
+
+                if(++i % cols == 0) table.row();
+            }
+        }
+
+        var teams = new Seq<>(Team.baseTeams);
+        teams = teams.select(u -> u.localized().toLowerCase().contains(search) && Core.atlas.has("team-" + u.name));
+
+        table.row();
+        if(teams.size > 0) table.image().colspan(cols).growX().width(-1f).height(3f).color(Pal.accent).row();
+
+        for(Team team : teams){
+            var region = Core.atlas.find("team-" + team.name);
+
+            table.button(new TextureRegionDrawable(region), Styles.flati, iconMed, () -> {
+                cons.get(team.emoji);
+                dialog.hide();
+            }).tooltip(team.localized());
+
+            if(++i % cols == 0) table.row();
+        }
     }
 
     private String writeBundles(){
