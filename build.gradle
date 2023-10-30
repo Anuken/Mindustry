@@ -1,10 +1,6 @@
 buildscript{
     ext{
-        getArcHash = {
-            return new Properties().with{ p -> p.load(file('gradle.properties').newReader()); return p }["archash"]
-        }
-
-        arcHash = getArcHash()
+        arcHash = property("archash")
 
         localArc = !project.hasProperty("release") && new File(rootDir.parent, 'Arc').exists() && !project.hasProperty("noLocalArc")
 
