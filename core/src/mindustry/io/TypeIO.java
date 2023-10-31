@@ -711,6 +711,7 @@ public class TypeIO{
     }
 
     public static void writeStatus(Writes write, StatusEntry entry){
+        //dynamic effects have the high bit of ID set to 1
         write.s(entry.effect.id | (entry.effect.dynamic ? 1 << 15 : 0));
         write.f(entry.time);
 
@@ -724,7 +725,7 @@ public class TypeIO{
             (entry.reloadMultiplier != 1f ?     (1 << 3) : 0) |
             (entry.buildSpeedMultiplier != 1f ? (1 << 4) : 0) |
             (entry.dragMultiplier != 1f ?       (1 << 5) : 0) |
-            (entry.armorOverride >= 0f ?      (1 << 6) : 0)
+            (entry.armorOverride >= 0f ?        (1 << 6) : 0)
             );
 
             if(entry.damageMultiplier != 1f) write.f(entry.damageMultiplier);
@@ -743,6 +744,7 @@ public class TypeIO{
 
         StatusEntry result = new StatusEntry();
 
+        //check if it's dynamic (high bit set to 1), remove it, read multipliers
         if((id & (1 << 15)) != 0){
             //it's a dynamic effect
             id ^= (1 << 15);
