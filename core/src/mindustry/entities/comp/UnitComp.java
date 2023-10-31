@@ -292,7 +292,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
                     this.team = team;
                 }
             }
-            case speed -> baseSpeed = value / 60f * tilesize
+            case speed -> baseSpeed = value / 60f * tilesize;
             case flag -> flag = value;
         }
     }
