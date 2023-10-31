@@ -42,13 +42,13 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     @Import Vec2 vel;
     @Import WeaponMount[] mounts;
     @Import ItemStack stack;
-
+    transient float baseSpeed;
     private UnitController controller;
     Ability[] abilities = {};
     UnitType type = UnitTypes.alpha;
     boolean spawnedByCore;
     double flag;
-
+    
     transient @Nullable Trail trail;
     //TODO could be better represented as a unit
     transient @Nullable UnitType dockedType;
@@ -133,7 +133,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     public float speed(){
         float strafePenalty = isGrounded() || !isPlayer() ? 1f : Mathf.lerp(1f, type.strafePenalty, Angles.angleDist(vel().angle(), rotation) / 180f);
         float boost = Mathf.lerp(1f, type.canBoost ? type.boostMultiplier : 1f, elevation);
-        return type.speed * strafePenalty * boost * floorSpeedMultiplier();
+        return baseSpeed * strafePenalty * boost * floorSpeedMultiplier();
     }
 
     /** @return where the unit wants to look at. */
@@ -230,7 +230,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case mineX -> mining() ? mineTile.x : -1;
             case mineY -> mining() ? mineTile.y : -1;
             case flag -> flag;
-            case speed -> type.speed * 60f / tilesize;
+            case speed -> baseSpeed * 60f / tilesize;
             case controlled -> !isValid() ? 0 :
                     controller instanceof LogicAI ? ctrlProcessor :
                     controller instanceof Player ? ctrlPlayer :
@@ -292,6 +292,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
                     this.team = team;
                 }
             }
+            case speed -> baseSpeed=value/60f*tilesize
             case flag -> flag = value;
         }
     }
@@ -452,7 +453,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         this.armor = type.armor;
         this.hitSize = type.hitSize;
         this.hovering = type.hovering;
-
+        this.baseSpeed=type.speed;
         if(controller == null) controller(type.createController(self()));
         if(mounts().length != type.weapons.size) setupWeapons(type);
         if(abilities.length != type.abilities.size){
