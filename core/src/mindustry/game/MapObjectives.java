@@ -597,8 +597,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             return state.rules.objectiveFlags.contains(flag);
         }
 
+        @Nullable
         @Override
         public String text(){
+            if(text == null) return null;
+
             if(text.startsWith("@")){
                 if(state.mapLocales.containsProperty(text.substring(1))) return state.mapLocales.getProperty(text.substring(1));
                 return Core.bundle.get(text.substring(1));
@@ -652,6 +655,8 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         }
 
         public static String fetchText(String text){
+            if(text == null) return "";
+
             if(text.startsWith("@")){
                 String key = text.substring(1);
 
