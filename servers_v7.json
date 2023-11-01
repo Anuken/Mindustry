@@ -1,7 +1,7 @@
 [
   {
     "name": "meiqiuMDT",
-    "address": ["43.248.103.156:14740","211.101.236.94:10000","bj-1.lcf.icu:10240"]
+    "address": ["cn1.plush.run:10001","211.101.236.94:10000","bj-1.lcf.icu:10240","play.simpfun.cn:14523"]
   },
   {
     "name": "CMS",
@@ -13,7 +13,7 @@
   },
   {
     "name": "ShardDustry",
-    "address": ["88.99.56.222:35689", "78.46.39.20:5552","45.158.9.198:30529"]
+    "address": ["94.130.132.149:35689", "78.46.39.20:5552","45.158.9.198:30529"]
   },
   {
     "name": "Tamazia",
@@ -69,7 +69,7 @@
   },
   {
     "name": "Omega Hub",
-    "address": ["n1.mindustry.me:6608", "n7.mindustry.me:6767", "n7.mindustry.me:6768", "n1.mindustry.me:6568", "n1.mindustry.me:6671", "n1.mindustry.me:6570", "n1.mindustry.me:6573", "n1.mindustry.me:6610", "n1.mindustry.me:6567", "n1.mindustry.me:6599", "n1.mindustry.me:6774", "n1.mindustry.me:6571", "n1.mindustry.me:6589"]
+    "address": ["130.61.214.19:6608", "130.61.78.82:3050", "130.61.78.82:6768", "130.61.214.19:6568", "130.61.214.19:6671", "130.61.214.19:6570", "130.61.214.19:6573", "130.61.214.19:6610", "130.61.214.19:6567", "130.61.214.19:6599", "130.61.214.19:6774", "130.61.214.19:6571", "130.61.214.19:6589"]
   },
   {
     "name": "KMWStudios",
@@ -89,7 +89,7 @@
   },
   {
     "name": "io",
-    "address": ["mindustry.io.community", "mindustry.io.community:1000", "mindustry.io.community:2000", "mindustry.io.community:3000", "mindustry.io.community:4000", "labs.io.community"]
+    "address": ["159.69.7.83", "159.69.7.83:1000", "159.69.7.83:2000", "159.69.7.83:3000", "159.69.7.83:4000"]
   },
   {
     "name": "Korea",
@@ -193,7 +193,7 @@
   },
   {
     "name": "Realm of Serene Lime",
-    "address": ["43.248.116.142:10627","n2.akiracloud.net:10686","n2.akiracloud.net:10486", "p12.simpfun.cn:8654"]
+    "address": ["43.248.116.142:10627","n2.akiracloud.net:10686","n2.akiracloud.net:10486", "p12.simpfun.cn:8654", "n2.akiracloud.net:10385"]
   },
   {
     "name": "CreateDustry",
@@ -210,7 +210,7 @@
   },
   {
     "name": "Cyandustry",
-    "address": ["136.243.14.186:7000","136.243.14.186:7001", "136.243.14.186:7002", "136.243.14.186:7003", "136.243.14.186:7004", "136.243.14.186:7005", "136.243.14.186:7006"]
+    "address": ["88.99.95.188:7000","88.99.95.188:7001", "88.99.95.188:7002", "88.99.95.188:7003", "88.99.95.188:7004", "88.99.95.188:7005", "88.99.95.188:7006"]
   },
   {
     "name": "Four Family",
