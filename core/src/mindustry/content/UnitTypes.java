@@ -197,6 +197,8 @@ public class UnitTypes{
             singleTarget = true;
             drownTimeMultiplier = 4f;
 
+            abilities.add(new ShieldRegenFieldAbility(25f, 500f, 60f * 1, 60f));
+
             BulletType smallBullet = new BasicBulletType(3f, 10){{
                 width = 7f;
                 height = 9f;
@@ -219,10 +221,10 @@ public class UnitTypes{
                 shoot.shots = 3;
                 shoot.shotDelay = 4f;
 
-                bullet = new BasicBulletType(7f, 50){{
+                bullet = new BasicBulletType(8f, 80){{
                     width = 11f;
                     height = 20f;
-                    lifetime = 25f;
+                    lifetime = 27f;
                     shootEffect = Fx.shootBig;
                     lightning = 2;
                     lightningLength = 6;
