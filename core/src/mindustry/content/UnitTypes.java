@@ -216,7 +216,7 @@ public class UnitTypes{
                 shake = 2f;
                 ejectEffect = Fx.casing3;
                 shootSound = Sounds.bang;
-                inaccuracy = 3f;
+                inaccuracy = 2f;
 
                 shoot.shots = 3;
                 shoot.shotDelay = 4f;
