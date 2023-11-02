@@ -48,6 +48,8 @@ public class BulletType extends Content implements Cloneable{
     public int pierceCap = -1;
     /** Multiplier of damage decreased per health pierced. */
     public float pierceDamageFactor = 0f;
+    /** If positive, limits non-splash damage dealt to a fraction of the target's maximum health. */
+    public float maxDamageFraction = -1f;
     /** If false, this bullet isn't removed after pierceCap is exceeded. Expert usage only. */
     public boolean removeAfterPierce = true;
     /** For piercing lasers, setting this to true makes it get absorbed by plastanium walls. */
@@ -382,10 +384,16 @@ public class BulletType extends Content implements Cloneable{
         boolean wasDead = entity instanceof Unit u && u.dead;
 
         if(entity instanceof Healthc h){
+            float damage = b.damage;
+            if(maxDamageFraction > 0){
+                damage = Math.min(damage, h.maxHealth() * maxDamageFraction);
+                //cap health to effective health for handlePierce to handle it properly
+                health = Math.min(health, h.maxHealth() * maxDamageFraction);
+            }
             if(pierceArmor){
-                h.damagePierce(b.damage);
+                h.damagePierce(damage);
             }else{
-                h.damage(b.damage);
+                h.damage(damage);
             }
         }
 
