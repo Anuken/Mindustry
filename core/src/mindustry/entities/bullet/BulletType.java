@@ -386,9 +386,13 @@ public class BulletType extends Content implements Cloneable{
         if(entity instanceof Healthc h){
             float damage = b.damage;
             if(maxDamageFraction > 0){
-                damage = Math.min(damage, h.maxHealth() * maxDamageFraction);
+                float cap = h.maxHealth() * maxDamageFraction;
+                if(entity instanceof Shieldc s){
+                    cap += Math.max(s.shield(), 0f);
+                }
+                damage = Math.min(damage, cap);
                 //cap health to effective health for handlePierce to handle it properly
-                health = Math.min(health, h.maxHealth() * maxDamageFraction);
+                health = Math.min(health, cap);
             }
             if(pierceArmor){
                 h.damagePierce(damage);
