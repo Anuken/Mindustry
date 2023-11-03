@@ -114,7 +114,7 @@ public class DesktopInput extends InputHandler{
 
         //draw break selection
         if(mode == breaking){
-            drawBreakSelection(selectX, selectY, cursorX, cursorY, !Core.input.keyDown(Binding.schematic_select) ? maxLength : Vars.maxSchematicSize);
+            drawBreakSelection(selectX, selectY, cursorX, cursorY, !Core.input.keyDown(Binding.schematic_select) ? maxLength : Vars.maxSchematicSize, false);
         }
 
         if(!Core.scene.hasKeyboard() && mode != breaking){
