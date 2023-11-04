@@ -7,9 +7,11 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 
 import static mindustry.Vars.*;
@@ -56,8 +58,8 @@ public class HierarchyPathFinder{
             cwidth = Mathf.ceil((float)world.width() / clusterSize);
             cheight = Mathf.ceil((float)world.height() / clusterSize);
 
-            for(int cx = 0; cx < cwidth; cx++){
-                for(int cy = 0; cy < cheight; cy++){
+            for(int cy = 0; cy < cwidth; cy++){
+                for(int cx = 0; cx < cheight; cx++){
                     createCluster(Team.sharded.id, costGround, cx, cy);
                 }
             }
@@ -84,29 +86,47 @@ public class HierarchyPathFinder{
                                 Draw.color(Color.green);
 
                                 Lines.rect(cx * clusterSize * tilesize - tilesize/2f, cy * clusterSize * tilesize - tilesize/2f, clusterSize * tilesize, clusterSize * tilesize);
-                                Draw.color(Color.red);
+
 
                                 for(int d = 0; d < 4; d++){
                                     IntSeq portals = cluster.portals[d];
                                     if(portals != null){
-                                        int addX = moveDirs[d * 2], addY = moveDirs[d * 2 + 1];
 
                                         for(int i = 0; i < portals.size; i++){
                                             int pos = portals.items[i];
                                             int from = Point2.x(pos), to = Point2.y(pos);
                                             float width = tilesize * (Math.abs(from - to) + 1), height = tilesize;
 
-                                            float average = (from + to) / 2f;
+                                            portalToVec(cluster, cx, cy, d, i, Tmp.v1);
 
-                                            float
-                                            x = (addX * average + cx * clusterSize + offsets[d * 2] * (clusterSize - 1) + nextOffsets[d * 2] / 2f) * tilesize,
-                                            y = (addY * average + cy * clusterSize + offsets[d * 2 + 1] * (clusterSize - 1) + nextOffsets[d * 2 + 1]/2f) * tilesize;
+                                            Draw.color(Color.red);
+                                            Lines.ellipse(30, Tmp.v1.x, Tmp.v1.y, width / 2f, height / 2f, d * 90f - 90f);
 
-                                            Lines.ellipse(30, x, y, width / 2f, height / 2f, d * 90f - 90f);
+                                            LongSeq connections = cluster.portalConnections[d] == null ? null : cluster.portalConnections[d][i];
+
+                                            if(connections != null){
+                                                Draw.color(Color.magenta);
+                                                for(int coni = 0; coni < connections.size; coni ++){
+                                                    long con = connections.items[coni];
+
+                                                    portalToVec(cluster, cx, cy, IntraEdge.dir(con), IntraEdge.portal(con), Tmp.v2);
+
+                                                    float
+                                                    x1 = Tmp.v1.x, y1 = Tmp.v1.y,
+                                                    x2 = Tmp.v2.x, y2 = Tmp.v2.y,
+                                                    mx = (cx * clusterSize + clusterSize / 2f) * tilesize, my = (cy * clusterSize + clusterSize / 2f) * tilesize;
+                                                    //Lines.curve(x1, y1, mx, my, mx, my, x2, y2, 20);
+                                                    Lines.line(x1, y1, x2, y2);
+
+                                                }
+                                            }
                                         }
                                     }
                                 }
 
+                                //TODO draw connections.
+
+                                /*
                                 Draw.color(Color.magenta);
                                 for(var con : cluster.cons){
                                     float
@@ -115,7 +135,7 @@ public class HierarchyPathFinder{
                                     mx = (cx * clusterSize + clusterSize/2f) * tilesize, my = (cy * clusterSize + clusterSize/2f) * tilesize;
                                     //Lines.curve(x1, y1, mx, my, mx, my, x2, y2, 20);
                                     Lines.line(x1, y1, x2, y2);
-                                }
+                                }*/
                             }
                         }
                     }
@@ -123,6 +143,20 @@ public class HierarchyPathFinder{
                 });
             });
         }
+    }
+
+    void portalToVec(Cluster cluster, int cx, int cy, int d, int i, Vec2 out){
+        int pos = cluster.portals[d].items[i];
+        int from = Point2.x(pos), to = Point2.y(pos);
+        int addX = moveDirs[d * 2], addY = moveDirs[d * 2 + 1];
+        float width = tilesize * (Math.abs(from - to) + 1), height = tilesize;
+        float average = (from + to) / 2f;
+
+        float
+        x = (addX * average + cx * clusterSize + offsets[d * 2] * (clusterSize - 1) + nextOffsets[d * 2] / 2f) * tilesize,
+        y = (addY * average + cy * clusterSize + offsets[d * 2 + 1] * (clusterSize - 1) + nextOffsets[d * 2 + 1] / 2f) * tilesize;
+
+        out.set(x, y);
     }
 
     void createCluster(int team, int pathCost, int cx, int cy){
@@ -135,8 +169,10 @@ public class HierarchyPathFinder{
             for(var p : cluster.portals){
                 p.clear();
             }
-            cluster.innerEdges.clear();
         }
+
+        //clear all connections, since portals changed, they need to be recomputed.
+        cluster.portalConnections = new LongSeq[4][];
 
         //TODO: other cluster inner edges should be recomputed if changed.
 
@@ -159,6 +195,9 @@ public class HierarchyPathFinder{
             }else{
                 //share portals with the other cluster
                 portals = cluster.portals[direction] = other.portals[(direction + 2) % 4];
+
+                //clear the portals, they're being recalculated now
+                portals.clear();
             }
 
             int addX = moveDirs[direction * 2], addY = moveDirs[direction * 2 + 1];
@@ -206,17 +245,18 @@ public class HierarchyPathFinder{
     static PathfindQueue frontier = new PathfindQueue();
     //node index -> total cost
     static IntFloatMap costs = new IntFloatMap();
-    
+    //
     static IntSet usedEdges = new IntSet();
 
     void connectInnerEdges(int cx, int cy, int team, PathCost cost, Cluster cluster){
         int minX = cx * clusterSize, minY = cy * clusterSize, maxX = Math.min(minX + clusterSize - 1, wwidth - 1), maxY = Math.min(minY + clusterSize - 1, wheight - 1);
         
         usedEdges.clear();
-        cluster.cons.clear();
 
         //TODO: how the hell to identify a vertex?
         //cluster (i16) | direction (i2) | index (i14)
+
+        //TODO: clear portal connections. also share them?
 
         for(int direction = 0; direction < 4; direction++){
             var portals = cluster.portals[direction];
@@ -236,6 +276,7 @@ public class HierarchyPathFinder{
 
                 for(int otherDir = 0; otherDir < 4; otherDir++){
                     var otherPortals = cluster.portals[otherDir];
+                    if(otherPortals == null) continue;
 
                     for(int j = 0; j < otherPortals.size; j++){
 
@@ -251,15 +292,12 @@ public class HierarchyPathFinder{
                             otherX = (moveDirs[otherDir * 2] * otherAverage + ox),
                             otherY = (moveDirs[otherDir * 2 + 1] * otherAverage + oy);
 
-                            //HOW
+                            //HOW (redundant nodes?)
                             if(Point2.pack(x, y) == Point2.pack(otherX, otherY)){
-                                if(true) continue;
-
-                                Log.infoList("self ", direction, " ", i, " | ", otherDir, " ", j);
-                                System.exit(1);
+                                continue;
                             }
 
-                            float connectionCost = astar(
+                            float connectionCost = innerAstar(
                             team, cost,
                             minX, minY, maxX, maxY,
                             x + y * wwidth,
@@ -273,10 +311,16 @@ public class HierarchyPathFinder{
                             );
 
                             if(connectionCost != -1f){
-                                cluster.cons.add(new Con(Point2.pack(x, y), Point2.pack(otherX, otherY), connectionCost));
+                                if(cluster.portalConnections[direction] == null) cluster.portalConnections[direction] = new LongSeq[cluster.portals[direction].size];
+                                if(cluster.portalConnections[otherDir] == null) cluster.portalConnections[otherDir] = new LongSeq[cluster.portals[otherDir].size];
+                                if(cluster.portalConnections[direction][i] == null) cluster.portalConnections[direction][i] = new LongSeq(8);
+                                if(cluster.portalConnections[otherDir][j] == null) cluster.portalConnections[otherDir][j] = new LongSeq(8);
 
-                                Fx.debugLine.at(x* tilesize, y * tilesize, 0f, Color.purple,
-                                new Vec2[]{new Vec2(x, y).scl(tilesize), new Vec2(otherX, otherY).scl(tilesize)});
+                                //TODO: can there be duplicate edges??
+                                cluster.portalConnections[direction][i].add(IntraEdge.get(otherDir, j, connectionCost));
+                                cluster.portalConnections[otherDir][j].add(IntraEdge.get(direction, i, connectionCost));
+
+                                //Fx.debugLine.at(x* tilesize, y * tilesize, 0f, Color.purple, new Vec2[]{new Vec2(x, y).scl(tilesize), new Vec2(otherX, otherY).scl(tilesize)});
                             }
                         }
                     }
@@ -301,7 +345,7 @@ public class HierarchyPathFinder{
     }
 
     /** @return -1 if no path was found */
-    float astar(int team, PathCost cost, int minX, int minY, int maxX, int maxY, int startPos, int goalPos, int goalX1, int goalY1, int goalX2, int goalY2){
+    float innerAstar(int team, PathCost cost, int minX, int minY, int maxX, int maxY, int startPos, int goalPos, int goalX1, int goalY1, int goalX2, int goalY2){
         frontier.clear();
         costs.clear();
 
@@ -377,19 +421,17 @@ public class HierarchyPathFinder{
 
     static class Cluster{
         IntSeq[] portals = new IntSeq[4];
-        IntSeq innerEdges = new IntSeq();
-        Seq<Con> cons = new Seq<>();
+        //maps rotation + index of portal to list of IntraEdge objects
+        LongSeq[][] portalConnections = new LongSeq[4][];
     }
 
-    //TODO for debugging only
-    static class Con{
-        int posFrom, posTo;
-        float cost;
+    @Struct
+    static class IntraEdgeStruct{
+        @StructField(8)
+        int dir;
+        @StructField(8)
+        int portal;
 
-        public Con(int posFrom, int posTo, float cost){
-            this.posFrom = posFrom;
-            this.posTo = posTo;
-            this.cost = cost;
-        }
+        float cost;
     }
 }
