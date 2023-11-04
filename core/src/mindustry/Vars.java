@@ -313,8 +313,8 @@ public class Vars implements Loadable{
         spawner = new WaveSpawner();
         indexer = new BlockIndexer();
         pathfinder = new Pathfinder();
-        hpath = new HierarchyPathFinder();
         controlPath = new ControlPathfinder();
+        hpath = new HierarchyPathFinder();
         fogControl = new FogControl();
         bases = new BaseRegistry();
         logicVars = new GlobalVars();
