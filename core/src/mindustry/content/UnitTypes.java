@@ -197,7 +197,7 @@ public class UnitTypes{
             singleTarget = true;
             drownTimeMultiplier = 4f;
 
-            abilities.add(new ShieldRegenFieldAbility(25f, 500f, 60f * 1, 60f));
+            abilities.add(new ShieldRegenFieldAbility(25f, 250f, 60f * 1, 60f));
 
             BulletType smallBullet = new BasicBulletType(3f, 10){{
                 width = 7f;
