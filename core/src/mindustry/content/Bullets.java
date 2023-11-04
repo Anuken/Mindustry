@@ -1,29 +1,34 @@
 package mindustry.content;
 
-import arc.graphics.*;
+import arc.graphics.Color;
 import mindustry.entities.bullet.*;
 
 /**
  * Class for holding special internal bullets.
- * Formerly used to define preset bullets for turrets; as of v7, these have been inlined at the source.
- * */
-public class Bullets{
-    public static BulletType
+ * This class defines various bullet types for in-game use.
+ */
+public class Bullets {
+    // Define bullet types
+    public static BulletType placeholder;
+    public static BulletType spaceLiquid;
+    public static BulletType damageLightning;
+    public static BulletType damageLightningGround;
+    public static BulletType fireball;
 
-    placeholder, spaceLiquid, damageLightning, damageLightningGround, fireball;
-
-    public static void load(){
-
-        //not allowed in weapons - used only to prevent NullPointerExceptions
-        placeholder = new BasicBulletType(2.5f, 9, "ohno"){{
+    /**
+     * Load and initialize the predefined bullet types.
+     */
+    public static void load() {
+        // Define placeholder bullet (used to prevent NullPointerExceptions)
+        placeholder = new BasicBulletType(2.5f, 9, "ohno") {{
             width = 7f;
             height = 9f;
             lifetime = 60f;
             ammoMultiplier = 2;
         }};
 
-        //lightning bullets need to be initialized first.
-        damageLightning = new BulletType(0.0001f, 0f){{
+        // Define lightning damage bullet
+        damageLightning = new BulletType(0.0001f, 0f) {{
             lifetime = Fx.lightning.lifetime;
             hitEffect = Fx.hitLancer;
             despawnEffect = Fx.none;
@@ -33,13 +38,15 @@ public class Bullets{
             lightColor = Color.white;
         }};
 
-        //this is just a copy of the damage lightning bullet that doesn't damage air units
+        // Define a ground version of the damage lightning bullet (doesn't damage air units)
         damageLightningGround = damageLightning.copy();
         damageLightningGround.collidesAir = false;
 
+        // Define fireball bullet
         fireball = new FireBulletType(1f, 4);
 
-        spaceLiquid = new SpaceLiquidBulletType(){{
+        // Define space liquid bullet
+        spaceLiquid = new SpaceLiquidBulletType() {{
             knockback = 0.7f;
             drag = 0.01f;
         }};
