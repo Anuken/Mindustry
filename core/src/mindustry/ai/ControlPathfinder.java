@@ -17,6 +17,7 @@ import mindustry.world.*;
 import static mindustry.Vars.*;
 import static mindustry.ai.Pathfinder.*;
 
+//TODO remove/replace
 public class ControlPathfinder{
     //TODO this FPS-based update system could be flawed.
     private static final long maxUpdate = Time.millisToNanos(30);

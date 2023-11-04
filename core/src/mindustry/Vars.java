@@ -240,6 +240,7 @@ public class Vars implements Loadable{
     public static WaveSpawner spawner;
     public static BlockIndexer indexer;
     public static Pathfinder pathfinder;
+    public static HierarchyPathFinder hpath;
     public static ControlPathfinder controlPath;
     public static FogControl fogControl;
 
@@ -312,6 +313,7 @@ public class Vars implements Loadable{
         spawner = new WaveSpawner();
         indexer = new BlockIndexer();
         pathfinder = new Pathfinder();
+        hpath = new HierarchyPathFinder();
         controlPath = new ControlPathfinder();
         fogControl = new FogControl();
         bases = new BaseRegistry();
