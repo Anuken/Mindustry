@@ -570,7 +570,7 @@ public class Blocks{
         snowWall = new StaticWall("snow-wall");
 
         duneWall = new StaticWall("dune-wall"){{
-            basalt.asFloor().wall = darksandWater.asFloor().wall = darksandTaintedWater.asFloor().wall = this;
+            hotrock.asFloor().wall = magmarock.asFloor().wall = basalt.asFloor().wall = darksandWater.asFloor().wall = darksandTaintedWater.asFloor().wall = this;
             attributes.set(Attribute.sand, 2f);
         }};
 
