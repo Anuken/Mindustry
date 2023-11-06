@@ -405,8 +405,8 @@ public class CommandAI extends AIController{
     }
 
     public void commandPosition(Vec2 pos, boolean stopWhenInRange){
-        targetPos = pos;
-        lastTargetPos = pos;
+        //this is an allocation, but it's relatively rarely called anyway, and outside mutations must be prevented
+        targetPos = lastTargetPos = pos.cpy();
         attackTarget = null;
         pathId = Vars.controlPath.nextTargetId();
         this.stopWhenInRange = stopWhenInRange;
