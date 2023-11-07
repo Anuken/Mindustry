@@ -247,7 +247,7 @@ public class CommandAI extends AIController{
                 }
 
                 //if you've spent 3 seconds stuck, something is wrong, move regardless
-                move = Vars.controlPath.getPathPosition(unit, pathId, vecMovePos, vecOut, noFound) && (!blockingUnit || timeSpentBlocked > maxBlockTime);
+                move = hpath.getPathPosition(unit, pathId, vecMovePos, vecOut, noFound) && (!blockingUnit || timeSpentBlocked > maxBlockTime);
                 //we've reached the final point if the returned coordinate is equal to the supplied input
                 isFinalPoint &= vecMovePos.epsilonEquals(vecOut, 4.1f);
 
