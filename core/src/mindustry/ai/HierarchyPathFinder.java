@@ -49,6 +49,17 @@ public class HierarchyPathFinder{
 
     int cwidth, cheight;
 
+    static PathfindQueue frontier = new PathfindQueue();
+    //node index -> total cost
+    static IntFloatMap costs = new IntFloatMap();
+    //
+    static IntSet usedEdges = new IntSet();
+
+    static LongSeq tmpEdges = new LongSeq();
+
+    //node index (NodeIndex struct) -> node it came from
+    static IntIntMap cameFrom = new IntIntMap();
+
     public HierarchyPathFinder(){
 
         Events.on(WorldLoadEvent.class, event -> {
@@ -149,7 +160,6 @@ public class HierarchyPathFinder{
         int pos = cluster.portals[d].items[i];
         int from = Point2.x(pos), to = Point2.y(pos);
         int addX = moveDirs[d * 2], addY = moveDirs[d * 2 + 1];
-        float width = tilesize * (Math.abs(from - to) + 1), height = tilesize;
         float average = (from + to) / 2f;
 
         float
@@ -242,12 +252,6 @@ public class HierarchyPathFinder{
         connectInnerEdges(cx, cy, team, cost, cluster);
     }
 
-    static PathfindQueue frontier = new PathfindQueue();
-    //node index -> total cost
-    static IntFloatMap costs = new IntFloatMap();
-    //
-    static IntSet usedEdges = new IntSet();
-
     void connectInnerEdges(int cx, int cy, int team, PathCost cost, Cluster cluster){
         int minX = cx * clusterSize, minY = cy * clusterSize, maxX = Math.min(minX + clusterSize - 1, wwidth - 1), maxY = Math.min(minY + clusterSize - 1, wheight - 1);
         
@@ -298,16 +302,14 @@ public class HierarchyPathFinder{
                             }
 
                             float connectionCost = innerAstar(
-                            team, cost,
-                            minX, minY, maxX, maxY,
-                            x + y * wwidth,
-                            otherX + otherY * wwidth,
-
-                            (moveDirs[otherDir * 2] * otherFrom + ox),
-                            (moveDirs[otherDir * 2 + 1] * otherFrom + oy),
-                            (moveDirs[otherDir * 2] * otherTo + ox),
-                            (moveDirs[otherDir * 2 + 1] * otherTo + oy)
-
+                                team, cost,
+                                minX, minY, maxX, maxY,
+                                x + y * wwidth,
+                                otherX + otherY * wwidth,
+                                (moveDirs[otherDir * 2] * otherFrom + ox),
+                                (moveDirs[otherDir * 2 + 1] * otherFrom + oy),
+                                (moveDirs[otherDir * 2] * otherTo + ox),
+                                (moveDirs[otherDir * 2 + 1] * otherTo + oy)
                             );
 
                             if(connectionCost != -1f){
@@ -378,22 +380,141 @@ public class HierarchyPathFinder{
                 if(tcost(team, cost, next) == impassable) continue;
 
                 float add = tileCost(team, cost, current, next);
-                float currentCost = costs.get(current);
 
                 if(add < 0) continue;
 
-                float newCost = currentCost + add;
+                float newCost = costs.get(current) + add;
 
                 //a cost of 0 means "not set"
-                if(!costs.containsKey(next) || newCost < costs.get(next)){
+                if(newCost < costs.get(next, Float.POSITIVE_INFINITY)){
                     costs.put(next, newCost);
                     float priority = newCost + heuristic(next, goalPos);
                     frontier.add(next, priority);
+
+                    //cameFrom.put(next, current);
                 }
             }
         }
 
         return -1f;
+    }
+
+    int makeNodeIndex(int cx, int cy, int dir, int portal){
+        //to make sure there's only one way to refer to each node, the direction must be 0 or 1 (referring to portals on the top or right edge)
+
+        //direction can only be 2 if cluster X is 0 (left edge of map)
+        if(dir == 2 && cx != 0){
+            dir = 0;
+            cx --;
+        }
+
+        //direction can only be 3 if cluster Y is 0 (bottom edge of map)
+        if(dir == 3 && cy != 0){
+            dir = 1;
+            cy --;
+        }
+        return NodeIndex.get(cx + cy * cwidth, dir, portal);
+    }
+
+    //distance heuristic: manhattan
+    private float clusterNodeHeuristic(int pathCost, int nodeA, int nodeB){
+        int
+        clusterA = NodeIndex.cluster(nodeA),
+        dirA = NodeIndex.dir(nodeA),
+        portalA = NodeIndex.portal(nodeA),
+        clusterB = NodeIndex.cluster(nodeB),
+        dirB = NodeIndex.dir(nodeB),
+        portalB = NodeIndex.portal(nodeB);
+
+        int rangeA = clusters[pathCost][clusterA].portals[dirA].items[portalA];
+        int rangeB = clusters[pathCost][clusterB].portals[dirB].items[portalB];
+
+        float
+        averageA = (Point2.x(rangeA) + Point2.y(rangeA)) / 2f,
+        x1 = (moveDirs[dirA * 2] * averageA + (clusterA % cwidth) * clusterSize + offsets[dirA * 2] * (clusterSize - 1) + nextOffsets[dirA * 2] / 2f),
+        y1 = (moveDirs[dirA * 2 + 1] * averageA + (clusterA / cwidth) * clusterSize + offsets[dirA * 2 + 1] * (clusterSize - 1) + nextOffsets[dirA * 2 + 1] / 2f),
+
+        averageB = (Point2.x(rangeB) + Point2.y(rangeB)) / 2f,
+        x2 = (moveDirs[dirB * 2] * averageB + (clusterB % cwidth) * clusterSize + offsets[dirB * 2] * (clusterSize - 1) + nextOffsets[dirB * 2] / 2f),
+        y2 = (moveDirs[dirB * 2 + 1] * averageB + (clusterB / cwidth) * clusterSize + offsets[dirB * 2 + 1] * (clusterSize - 1) + nextOffsets[dirB * 2 + 1] / 2f);
+
+        return Math.abs(x1 - x2) + Math.abs(y1 - y2);
+    }
+
+    @Nullable IntSeq clusterAstar(int pathCost, int startNodeIndex, int endNodeIndex){
+        frontier.clear();
+        costs.clear();
+
+        costs.put(startNodeIndex, 0);
+        frontier.add(endNodeIndex, 0);
+        cameFrom.clear();
+
+        boolean foundEnd = false;
+
+        while(frontier.size > 0){
+            int current = frontier.poll();
+
+            if(current == endNodeIndex){
+                foundEnd = true;
+                break;
+            }
+
+            //tmpEdges holds intra edges
+            tmpEdges.clear();
+
+            int cluster = NodeIndex.cluster(current), dir = NodeIndex.dir(current), portal = NodeIndex.portal(current);
+            int cx = cluster % wwidth, cy = cluster / wwidth;
+            Cluster clust = clusters[pathCost][cluster];
+            LongSeq innerCons = clust.portalConnections[dir][portal];
+
+            //edges for the cluster the node is 'in'
+            if(innerCons != null){
+                checkEdges(pathCost, current, cx, cy, innerCons);
+            }
+
+            int nextCx = cx + Geometry.d4[dir].x, nextCy = cy + Geometry.d4[dir].y;
+            if(nextCx >= 0 && nextCy >= 0 && nextCx < cwidth && nextCy < cheight){
+                int nextClusteri = nextCx + nextCy * cwidth;
+                Cluster nextCluster = clusters[pathCost][nextClusteri];
+                int relativeDir = (dir + 2) % 4;
+                LongSeq outerCons = nextCluster.portalConnections[relativeDir] == null ? null : nextCluster.portalConnections[relativeDir][portal];
+                if(outerCons != null){
+                    checkEdges(pathCost, current, nextCx, nextCy, outerCons);
+                }
+            }
+        }
+
+        if(foundEnd){
+            IntSeq result = new IntSeq();
+
+            int cur = endNodeIndex;
+            while(cur != startNodeIndex){
+                result.add(cur);
+                cur = cameFrom.get(cur);
+            }
+
+            result.reverse();
+
+            return result;
+        }
+        return null;
+    }
+
+    void checkEdges(int pathCost, int current, int cx, int cy, LongSeq connections){
+        for(int i = 0; i < connections.size; i++){
+            long con = connections.items[i];
+            float cost = IntraEdge.cost(con);
+            int otherDir = IntraEdge.dir(con), otherPortal = IntraEdge.portal(con);
+            int next = makeNodeIndex(cx, cy, otherDir, otherPortal);
+
+            float newCost = costs.get(current) + cost;
+
+            if(newCost < costs.get(next, Float.POSITIVE_INFINITY)){
+                costs.put(next, newCost);
+                frontier.add(next, newCost + clusterNodeHeuristic(pathCost, current, next));
+                cameFrom.put(next, current);
+            }
+        }
     }
 
     Cluster cluster(int pathCost, int cx, int cy){
@@ -433,5 +554,15 @@ public class HierarchyPathFinder{
         int portal;
 
         float cost;
+    }
+
+    @Struct
+    static class NodeIndexStruct{
+        @StructField(22)
+        int cluster;
+        @StructField(2)
+        int dir;
+        @StructField(8)
+        int portal;
     }
 }
