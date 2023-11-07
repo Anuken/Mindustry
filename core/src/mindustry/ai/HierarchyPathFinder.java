@@ -570,7 +570,7 @@ public class HierarchyPathFinder{
 
             //edges for the cluster the node is 'in'
             if(innerCons != null){
-                checkEdges(pathCost, current, cx, cy, innerCons);
+                checkEdges(pathCost, current, endNodeIndex, cx, cy, innerCons);
             }
 
             //edges that this node 'faces' from the other side
@@ -581,7 +581,7 @@ public class HierarchyPathFinder{
                 int relativeDir = (dir + 2) % 4;
                 LongSeq outerCons = nextCluster.portalConnections[relativeDir] == null ? null : nextCluster.portalConnections[relativeDir][portal];
                 if(outerCons != null){
-                    checkEdges(pathCost, current, nextCx, nextCy, outerCons);
+                    checkEdges(pathCost, current, endNodeIndex, nextCx, nextCy, outerCons);
                 }
             }
         }
@@ -606,7 +606,7 @@ public class HierarchyPathFinder{
         Fx.debugLine.at(a.x, a.y, 0f, Color.blue.cpy().a(0.1f), new Vec2[]{a.cpy(), b.cpy()});
     }
 
-    void checkEdges(int pathCost, int current, int cx, int cy, LongSeq connections){
+    void checkEdges(int pathCost, int current, int goal, int cx, int cy, LongSeq connections){
         for(int i = 0; i < connections.size; i++){
             long con = connections.items[i];
             float cost = IntraEdge.cost(con);
@@ -618,7 +618,7 @@ public class HierarchyPathFinder{
             if(newCost < costs.get(next, Float.POSITIVE_INFINITY)){
                 costs.put(next, newCost);
 
-                frontier.add(next, newCost + clusterNodeHeuristic(pathCost, current, next));
+                frontier.add(next, newCost + clusterNodeHeuristic(pathCost, next, goal));
                 cameFrom.put(next, current);
 
                 //TODO debug
