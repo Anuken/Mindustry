@@ -163,11 +163,35 @@ public class HierarchyPathFinder{
                         var result = clusterAstar(0, node, dest);
                         if(result != null){
                             for(int i = -1; i < result.size - 1; i++){
+                                int endCluster = NodeIndex.cluster(result.items[i + 1]);
+                                int cx = endCluster % cwidth, cy = endCluster / cwidth;
+                                int[] field = flowField(0, cx, cy, 0, dest);
+
+                                for(int y = 0; y < clusterSize; y++){
+                                    for(int x = 0; x < clusterSize; x++){
+                                        int value = field[x + y *clusterSize];
+                                        Tmp.c1.a = 1f;
+                                        Lines.stroke(0.8f, Tmp.c1.fromHsv(value * 3f, 1f, 1f));
+                                        Draw.alpha(0.5f);
+                                        Lines.rect((x + cx * clusterSize) * tilesize - tilesize/2f, (y + cy * clusterSize) * tilesize - tilesize/2f, tilesize, tilesize);
+                                    }
+                                }
+                            }
+
+                            Lines.stroke(3f);
+                            Draw.color(Color.orange);
+
+                            for(int i = -1; i < result.size - 1; i++){
                                 int current = i == -1 ? node : result.items[i], next = result.items[i + 1];
                                 portalToVec(0, NodeIndex.cluster(current), NodeIndex.dir(current), NodeIndex.portal(current), Tmp.v1);
                                 portalToVec(0, NodeIndex.cluster(next), NodeIndex.dir(next), NodeIndex.portal(next), Tmp.v2);
                                 Lines.line(Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y);
                             }
+
+
+
+
+                            //flowField(0, )
                         }
 
                         nodeToVec(dest, Tmp.v1);
@@ -446,7 +470,7 @@ public class HierarchyPathFinder{
         return NodeIndex.get(cx + cy * cwidth, dir, portal);
     }
 
-    //uses BFS to find the closest node index to specified coordinates
+    //uses A* to find the closest node index to specified coordinates
     //this node is used in cluster A*
     /** @return MAX_VALUE if no node is found */
     private int findClosestNode(int team, int pathCost, int tileX, int tileY){
@@ -488,6 +512,7 @@ public class HierarchyPathFinder{
                     minX, minY, maxX, maxY,
                     tileX + tileY * wwidth,
                     otherX + otherY * wwidth,
+                    //TODO these are wrong and never actually trigger
                     (moveDirs[dir * 2] * otherFrom + ox),
                     (moveDirs[dir * 2 + 1] * otherFrom + oy),
                     (moveDirs[dir * 2] * otherTo + ox),
@@ -627,8 +652,70 @@ public class HierarchyPathFinder{
         }
     }
 
-    Cluster cluster(int pathCost, int cx, int cy){
-        return clusters[pathCost][cx + cwidth * cy];
+    //both nodes must be inside the same flow field (cx, cy)
+    int[] flowField(int pathCost, int cx, int cy, int nodeFrom, int nodeTo){
+
+        Cluster cluster = clusters[pathCost][cx  + cy * cwidth];
+
+        int[] weights = new int[clusterSize * clusterSize];
+        byte[] searches = new byte[clusterSize * clusterSize];
+        PathCost pcost = ControlPathfinder.costGround;
+        int team = Team.sharded.id;
+
+        IntQueue frontier = new IntQueue();
+        int search = 1;
+
+        //TODO actually set up the frontier and destinations (where are you going?)
+        {
+            int
+            dir = NodeIndex.dir(nodeTo),
+            other = cluster.portals[dir].items[NodeIndex.portal(nodeTo)],
+            otherFrom = Point2.x(other), otherTo = Point2.y(other),
+            ox = cx * clusterSize + offsets[dir * 2] * (clusterSize - 1),
+            oy = cy * clusterSize + offsets[dir * 2 + 1] * (clusterSize - 1),
+
+            maxX = (moveDirs[dir * 2] * otherFrom + ox),
+            maxY = (moveDirs[dir * 2 + 1] * otherFrom + oy),
+            minX = (moveDirs[dir * 2] * otherTo + ox),
+            minY = (moveDirs[dir * 2 + 1] * otherTo + oy)
+
+            ;
+
+            //TODO: being zero INSIDE the cluster means that the unit will stop at the edge and not move between clusters - bad!
+            for(int x = minX; x <= maxX; x++){
+                for(int y = minY; y <= maxY; y++){
+                    frontier.addFirst(x + y * wwidth);
+                }
+            }
+        }
+
+        int minX = cx * clusterSize, minY = cy * clusterSize, maxX = Math.min(minX + clusterSize - 1, wwidth - 1), maxY = Math.min(minY + clusterSize - 1, wheight - 1);
+        //TODO spread this out across many frames
+        while(frontier.size > 0){
+            int tile = frontier.removeLast();
+            int baseX = tile % wwidth, baseY = tile / wwidth;
+            int cost = weights[(baseX - minX) + (baseY - minY) * clusterSize];
+
+            if(cost != impassable){
+                for(Point2 point : Geometry.d4){
+
+                    int dx = baseX + point.x, dy = baseY + point.y;
+
+                    if(dx < minX || dy < minY || dx > maxX || dy > maxY) continue;
+
+                    int newPos = tile + point.x + point.y * wwidth;
+                    int newPosArray = (dx - minX) + (dy - minY) * clusterSize;
+                    int otherCost = pcost.getCost(team, pathfinder.tiles[newPos]);
+
+                    if((weights[newPosArray] > cost + otherCost || searches[newPosArray] < search) && otherCost != impassable){
+                        frontier.addFirst(newPos);
+                        weights[newPosArray] = cost + otherCost;
+                        searches[newPosArray] = (byte)search;
+                    }
+                }
+            }
+        }
+        return weights;
     }
 
     private static boolean solid(int team, PathCost type, int x, int y){
