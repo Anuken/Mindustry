@@ -447,11 +447,11 @@ public class ErekirTechTree{
 
                                 //nodeProduce(Liquids.gallium, () -> {});
                             });
+                        });
 
-                            nodeProduce(Items.surgeAlloy, () -> {
-                                nodeProduce(Items.phaseFabric, () -> {
+                        nodeProduce(Items.surgeAlloy, () -> {
+                            nodeProduce(Items.phaseFabric, () -> {
 
-                                });
                             });
                         });
                     });
