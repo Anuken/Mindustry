@@ -9,10 +9,12 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.ui.*;
 
 import static mindustry.Vars.*;
 import static mindustry.ai.Pathfinder.*;
@@ -49,14 +51,14 @@ public class HierarchyPathFinder{
 
     int cwidth, cheight;
 
+    //TODO: make thread-local (they are dereferenced rarely anyway)
     static PathfindQueue frontier = new PathfindQueue();
     //node index -> total cost
     static IntFloatMap costs = new IntFloatMap();
     //
     static IntSet usedEdges = new IntSet();
-
+    static IntSeq bfsQueue = new IntSeq();
     static LongSeq tmpEdges = new LongSeq();
-
     //node index (NodeIndex struct) -> node it came from
     static IntIntMap cameFrom = new IntIntMap();
 
@@ -94,7 +96,9 @@ public class HierarchyPathFinder{
                         for(int cy = 0; cy < cheight; cy++){
                             var cluster = clusters[cost][cy * cwidth + cx];
                             if(cluster != null){
-                                Draw.color(Color.green);
+                                Lines.stroke(0.5f);
+                                Draw.color(Color.gray);
+                                Lines.stroke(1f);
 
                                 Lines.rect(cx * clusterSize * tilesize - tilesize/2f, cy * clusterSize * tilesize - tilesize/2f, clusterSize * tilesize, clusterSize * tilesize);
 
@@ -110,13 +114,13 @@ public class HierarchyPathFinder{
 
                                             portalToVec(cluster, cx, cy, d, i, Tmp.v1);
 
-                                            Draw.color(Color.red);
+                                            Draw.color(Color.brown);
                                             Lines.ellipse(30, Tmp.v1.x, Tmp.v1.y, width / 2f, height / 2f, d * 90f - 90f);
 
                                             LongSeq connections = cluster.portalConnections[d] == null ? null : cluster.portalConnections[d][i];
 
                                             if(connections != null){
-                                                Draw.color(Color.magenta);
+                                                Draw.color(Color.forest);
                                                 for(int coni = 0; coni < connections.size; coni ++){
                                                     long con = connections.items[coni];
 
@@ -150,21 +154,50 @@ public class HierarchyPathFinder{
                             }
                         }
                     }
+
+                    Lines.stroke(3f);
+                    Draw.color(Color.orange);
+                    int node = findClosestNode(Team.sharded.id, 0, player.tileX(), player.tileY());
+                    int dest = findClosestNode(Team.sharded.id, 0, World.toTile(Core.input.mouseWorldX()), World.toTile(Core.input.mouseWorldY()));
+                    if(node != Integer.MAX_VALUE && dest != Integer.MAX_VALUE){
+                        var result = clusterAstar(0, node, dest);
+                        if(result != null){
+                            for(int i = -1; i < result.size - 1; i++){
+                                int current = i == -1 ? node : result.items[i], next = result.items[i + 1];
+                                portalToVec(0, NodeIndex.cluster(current), NodeIndex.dir(current), NodeIndex.portal(current), Tmp.v1);
+                                portalToVec(0, NodeIndex.cluster(next), NodeIndex.dir(next), NodeIndex.portal(next), Tmp.v2);
+                                Lines.line(Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y);
+                            }
+                        }
+
+                        nodeToVec(dest, Tmp.v1);
+                        Fonts.outline.draw(clusterNodeHeuristic(0, node, dest) + "", Tmp.v1.x, Tmp.v1.y);
+                    }
+
                     Draw.reset();
                 });
             });
         }
     }
 
-    void portalToVec(Cluster cluster, int cx, int cy, int d, int i, Vec2 out){
-        int pos = cluster.portals[d].items[i];
+    Vec2 nodeToVec(int current, Vec2 out){
+        portalToVec(0, NodeIndex.cluster(current), NodeIndex.dir(current), NodeIndex.portal(current), out);
+        return out;
+    }
+
+    void portalToVec(int pathCost, int cluster, int direction, int portalIndex, Vec2 out){
+        portalToVec(clusters[pathCost][cluster], cluster % cwidth, cluster / cwidth, direction, portalIndex, out);
+    }
+
+    void portalToVec(Cluster cluster, int cx, int cy, int direction, int portalIndex, Vec2 out){
+        int pos = cluster.portals[direction].items[portalIndex];
         int from = Point2.x(pos), to = Point2.y(pos);
-        int addX = moveDirs[d * 2], addY = moveDirs[d * 2 + 1];
+        int addX = moveDirs[direction * 2], addY = moveDirs[direction * 2 + 1];
         float average = (from + to) / 2f;
 
         float
-        x = (addX * average + cx * clusterSize + offsets[d * 2] * (clusterSize - 1) + nextOffsets[d * 2] / 2f) * tilesize,
-        y = (addY * average + cy * clusterSize + offsets[d * 2 + 1] * (clusterSize - 1) + nextOffsets[d * 2 + 1] / 2f) * tilesize;
+        x = (addX * average + cx * clusterSize + offsets[direction * 2] * (clusterSize - 1) + nextOffsets[direction * 2] / 2f) * tilesize,
+        y = (addY * average + cy * clusterSize + offsets[direction * 2 + 1] * (clusterSize - 1) + nextOffsets[direction * 2 + 1] / 2f) * tilesize;
 
         out.set(x, y);
     }
@@ -260,7 +293,7 @@ public class HierarchyPathFinder{
         //TODO: how the hell to identify a vertex?
         //cluster (i16) | direction (i2) | index (i14)
 
-        //TODO: clear portal connections. also share them?
+        //TODO: clear portal connections
 
         for(int direction = 0; direction < 4; direction++){
             var portals = cluster.portals[direction];
@@ -296,7 +329,7 @@ public class HierarchyPathFinder{
                             otherX = (moveDirs[otherDir * 2] * otherAverage + ox),
                             otherY = (moveDirs[otherDir * 2 + 1] * otherAverage + oy);
 
-                            //HOW (redundant nodes?)
+                            //duplicate portal; should never happen.
                             if(Point2.pack(x, y) == Point2.pack(otherX, otherY)){
                                 continue;
                             }
@@ -321,8 +354,6 @@ public class HierarchyPathFinder{
                                 //TODO: can there be duplicate edges??
                                 cluster.portalConnections[direction][i].add(IntraEdge.get(otherDir, j, connectionCost));
                                 cluster.portalConnections[otherDir][j].add(IntraEdge.get(direction, i, connectionCost));
-
-                                //Fx.debugLine.at(x* tilesize, y * tilesize, 0f, Color.purple, new Vec2[]{new Vec2(x, y).scl(tilesize), new Vec2(otherX, otherY).scl(tilesize)});
                             }
                         }
                     }
@@ -351,6 +382,7 @@ public class HierarchyPathFinder{
         frontier.clear();
         costs.clear();
 
+        //TODO: this can be faster and more memory efficient by making costs a NxN array... probably?
         costs.put(startPos, 0);
         frontier.add(startPos, 0);
 
@@ -385,13 +417,10 @@ public class HierarchyPathFinder{
 
                 float newCost = costs.get(current) + add;
 
-                //a cost of 0 means "not set"
                 if(newCost < costs.get(next, Float.POSITIVE_INFINITY)){
                     costs.put(next, newCost);
                     float priority = newCost + heuristic(next, goalPos);
                     frontier.add(next, priority);
-
-                    //cameFrom.put(next, current);
                 }
             }
         }
@@ -413,7 +442,72 @@ public class HierarchyPathFinder{
             dir = 1;
             cy --;
         }
+
         return NodeIndex.get(cx + cy * cwidth, dir, portal);
+    }
+
+    //uses BFS to find the closest node index to specified coordinates
+    //this node is used in cluster A*
+    /** @return MAX_VALUE if no node is found */
+    private int findClosestNode(int team, int pathCost, int tileX, int tileY){
+        int cx = tileX / clusterSize, cy = tileY / clusterSize;
+
+        if(cx < 0 || cy < 0 || cx >= cwidth || cy >= cheight){
+            return Integer.MAX_VALUE;
+        }
+
+        //TODO
+        PathCost cost = ControlPathfinder.costGround;
+
+        Cluster cluster = clusters[pathCost][cx + cy * cwidth];
+        int minX = cx * clusterSize, minY = cy * clusterSize, maxX = Math.min(minX + clusterSize - 1, wwidth - 1), maxY = Math.min(minY + clusterSize - 1, wheight - 1);
+
+        int bestPortalPair = Integer.MAX_VALUE;
+        float bestCost = Float.MAX_VALUE;
+
+        if(cluster != null){ //TODO create on demand??
+
+            //A* to every node, find the best one (I know there's a better algorithm for this, probably dijkstra)
+            for(int dir = 0; dir < 4; dir++){
+                var portals = cluster.portals[dir];
+                if(portals == null) continue;
+
+                for(int j = 0; j < portals.size; j++){
+
+                    int
+                    other = portals.items[j],
+                    otherFrom = Point2.x(other), otherTo = Point2.y(other),
+                    otherAverage = (otherFrom + otherTo) / 2,
+                    ox = cx * clusterSize + offsets[dir * 2] * (clusterSize - 1),
+                    oy = cy * clusterSize + offsets[dir * 2 + 1] * (clusterSize - 1),
+                    otherX = (moveDirs[dir * 2] * otherAverage + ox),
+                    otherY = (moveDirs[dir * 2 + 1] * otherAverage + oy);
+
+                    float connectionCost = innerAstar(
+                    team, cost,
+                    minX, minY, maxX, maxY,
+                    tileX + tileY * wwidth,
+                    otherX + otherY * wwidth,
+                    (moveDirs[dir * 2] * otherFrom + ox),
+                    (moveDirs[dir * 2 + 1] * otherFrom + oy),
+                    (moveDirs[dir * 2] * otherTo + ox),
+                    (moveDirs[dir * 2 + 1] * otherTo + oy)
+                    );
+
+                    //better cost found, update and return
+                    if(connectionCost != -1f && connectionCost < bestCost){
+                        bestPortalPair = Point2.pack(dir, j);
+                        bestCost = connectionCost;
+                    }
+                }
+            }
+
+            if(bestPortalPair != Integer.MAX_VALUE){
+                return makeNodeIndex(cx, cy, Point2.x(bestPortalPair), Point2.y(bestPortalPair));
+            }
+        }
+
+        return Integer.MAX_VALUE;
     }
 
     //distance heuristic: manhattan
@@ -424,10 +518,9 @@ public class HierarchyPathFinder{
         portalA = NodeIndex.portal(nodeA),
         clusterB = NodeIndex.cluster(nodeB),
         dirB = NodeIndex.dir(nodeB),
-        portalB = NodeIndex.portal(nodeB);
-
-        int rangeA = clusters[pathCost][clusterA].portals[dirA].items[portalA];
-        int rangeB = clusters[pathCost][clusterB].portals[dirB].items[portalB];
+        portalB = NodeIndex.portal(nodeB),
+        rangeA = clusters[pathCost][clusterA].portals[dirA].items[portalA],
+        rangeB = clusters[pathCost][clusterB].portals[dirB].items[portalB];
 
         float
         averageA = (Point2.x(rangeA) + Point2.y(rangeA)) / 2f,
@@ -442,12 +535,23 @@ public class HierarchyPathFinder{
     }
 
     @Nullable IntSeq clusterAstar(int pathCost, int startNodeIndex, int endNodeIndex){
+        var v1 = nodeToVec(startNodeIndex, Tmp.v1);
+        var v2 = nodeToVec(endNodeIndex, Tmp.v2);
+        Fx.placeBlock.at(v1.x, v1.y, 1);
+        Fx.placeBlock.at(v2.x, v2.y, 1);
+
+        if(startNodeIndex == endNodeIndex){
+            //TODO alloc
+            return IntSeq.with(startNodeIndex);
+        }
+
         frontier.clear();
         costs.clear();
-
-        costs.put(startNodeIndex, 0);
-        frontier.add(endNodeIndex, 0);
         cameFrom.clear();
+
+        cameFrom.put(startNodeIndex, startNodeIndex);
+        costs.put(startNodeIndex, 0);
+        frontier.add(startNodeIndex, 0);
 
         boolean foundEnd = false;
 
@@ -459,19 +563,17 @@ public class HierarchyPathFinder{
                 break;
             }
 
-            //tmpEdges holds intra edges
-            tmpEdges.clear();
-
             int cluster = NodeIndex.cluster(current), dir = NodeIndex.dir(current), portal = NodeIndex.portal(current);
-            int cx = cluster % wwidth, cy = cluster / wwidth;
+            int cx = cluster % cwidth, cy = cluster / cwidth;
             Cluster clust = clusters[pathCost][cluster];
-            LongSeq innerCons = clust.portalConnections[dir][portal];
+            LongSeq innerCons = clust.portalConnections[dir] == null || portal >= clust.portalConnections[dir].length ? null : clust.portalConnections[dir][portal];
 
             //edges for the cluster the node is 'in'
             if(innerCons != null){
                 checkEdges(pathCost, current, cx, cy, innerCons);
             }
 
+            //edges that this node 'faces' from the other side
             int nextCx = cx + Geometry.d4[dir].x, nextCy = cy + Geometry.d4[dir].y;
             if(nextCx >= 0 && nextCy >= 0 && nextCx < cwidth && nextCy < cheight){
                 int nextClusteri = nextCx + nextCy * cwidth;
@@ -500,6 +602,10 @@ public class HierarchyPathFinder{
         return null;
     }
 
+    static void line(Vec2 a, Vec2 b){
+        Fx.debugLine.at(a.x, a.y, 0f, Color.blue.cpy().a(0.1f), new Vec2[]{a.cpy(), b.cpy()});
+    }
+
     void checkEdges(int pathCost, int current, int cx, int cy, LongSeq connections){
         for(int i = 0; i < connections.size; i++){
             long con = connections.items[i];
@@ -511,8 +617,12 @@ public class HierarchyPathFinder{
 
             if(newCost < costs.get(next, Float.POSITIVE_INFINITY)){
                 costs.put(next, newCost);
+
                 frontier.add(next, newCost + clusterNodeHeuristic(pathCost, current, next));
                 cameFrom.put(next, current);
+
+                //TODO debug
+                line(nodeToVec(current, Tmp.v1), nodeToVec(next, Tmp.v2));
             }
         }
     }
