@@ -69,7 +69,7 @@
   },
   {
     "name": "KMWStudios",
-    "address": ["46.151.26.232:1024", "46.151.26.232:2000", "46.151.26.232:3000", "46.151.26.232:4000", "46.151.26.232:6000", "46.151.26.232:7000", "46.151.26.232:8000"]
+    "address": ["x.kmwstuios.xyz:9000", "x.kmwstuios.xyz:9002", "x.kmwstuios.xyz:9003", "x.kmwstuios.xyz:9004", "x.kmwstuios.xyz:9005", "x.kmwstuios.xyz:9006", "x.kmwstuios.xyz:9007"]
   },
   {
     "name": "XCore",
