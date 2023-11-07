@@ -1943,7 +1943,7 @@ public class LStatements{
                 b.clicked(() -> showSelect(b, LMarkerControl.all, type, t -> {
                     type = t;
                     rebuild(table);
-                }, 2, cell -> cell.size(140, 50)));
+                }, 3, cell -> cell.size(140, 50)));
             }, Styles.logict, () -> {}).size(190, 40).color(table.color).left().padLeft(2);
 
             row(table);

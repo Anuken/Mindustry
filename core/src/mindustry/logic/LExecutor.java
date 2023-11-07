@@ -1555,7 +1555,7 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            //set default to succes
+            //set default to success
             exec.setnum(outSuccess, 1);
             if(headless && type != MessageType.mission) {
                 exec.textBuffer.setLength(0);
@@ -1879,6 +1879,13 @@ public class LExecutor{
                 }else if(type == LMarkerControl.flushText){
                     marker.setText(exec.textBuffer.toString(), true);
                     exec.textBuffer.setLength(0);
+                }else if(type == LMarkerControl.texture){
+                    if(exec.obj(p1) != null){
+                        StringBuilder res = new StringBuilder(exec.obj(p1).toString());
+                        if(exec.obj(p2) != null) res.append("-").append(exec.obj(p2).toString());
+                        if(exec.obj(p3) != null) res.append("-").append(exec.obj(p3).toString());
+                        marker.setTexture(res.toString());
+                    }
                 }else{
                     marker.control(type, exec.num(p1), exec.num(p2), exec.num(p3));
                 }
@@ -1941,6 +1948,14 @@ public class LExecutor{
             }else if(type == LMarkerControl.flushText){
                 marker.setText(text, false);
             }
+        }
+    }
+
+    @Remote(called = Loc.server, variants = Variant.both, unreliable = true)
+    public static void updateMarkerTexture(int id, String textureName){
+        var marker = state.markers.get(id);
+        if(marker != null){
+            marker.setTexture(textureName);
         }
     }
 

@@ -24,7 +24,10 @@ public enum LMarkerControl{
     shapeFill("true/false"),
     shapeOutline("true/false"),
     setShape("sides", "fill", "outline"),
-    color("color");
+    color("color"),
+    texture("name", "-", "-"),
+    textureWidth("width"),
+    textureHeight("height");
 
     public final String[] params;
 

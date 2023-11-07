@@ -64,7 +64,8 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             MinimapMarker::new,
             ShapeMarker::new,
             TextMarker::new,
-            LineMarker::new
+            LineMarker::new,
+            TextureMarker::new
         );
     }
 
@@ -612,7 +613,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
     public static abstract class ObjectiveMarker{
         /** Makes sure markers are only added once. */
         public transient boolean wasAdded;
-        //** Hides the marker, used by world processors */
+        /** Hides the marker, used by world processors */
         public boolean hidden = false;
 
         /** Called in the overlay draw layer.*/
@@ -631,6 +632,8 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             }
         }
         public void setText(String text, boolean fetch){}
+
+        public void setTexture(String textureName){}
 
         /** @return The localized type-name of this objective, defaulting to the class simple name without the "Marker" prefix. */
         public String typeName(){
@@ -998,6 +1001,65 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
             Lines.stroke(stroke, color);
             Lines.line(pos1.x, pos1.y, pos2.x, pos2.y);
+        }
+    }
+
+    /** Displays a texture with specified name. */
+    public static class TextureMarker extends ObjectiveMarker{
+        public @TilePos Vec2 pos = new Vec2();
+        public float rotation = 0f, width = 0f, height = 0f; // Zero width/height scales marker to original texture's size
+        public String textureName = "";
+        public Color color = Color.white.cpy();
+
+        private transient TextureRegion fetchedRegion;
+
+        public TextureMarker(String textureName, float x, float y){
+            this.textureName = textureName;
+            this.pos.set(x, y);
+        }
+
+        public TextureMarker(){}
+
+        @Override
+        public void control(LMarkerControl type, double p1, double p2, double p3){
+            switch(type){
+                case x -> pos.x = (float)p1 * tilesize;
+                case y -> pos.y = (float)p1 * tilesize;
+                case pos -> pos.set((float)p1 * tilesize, (float)p2 * tilesize);
+                case rotation -> rotation = (float)p1;
+                case textureWidth -> width = (float)p1 * tilesize;
+                case textureHeight -> height = (float)p1 * tilesize;
+                case color -> {
+                    Log.info("test");
+                    color.set(Tmp.c1.fromDouble(p1));
+                }
+                default -> super.control(type, p1, p2, p3);
+            }
+        }
+
+        @Override
+        public void draw(){
+            if(hidden || textureName.isEmpty()) return;
+
+            if(fetchedRegion == null) fetchedRegion = Core.atlas.find(textureName);
+
+            // Zero width/height scales marker to original texture's size
+            if(width < 1e-5) width = fetchedRegion.width * fetchedRegion.scl() * Draw.xscl;
+            if(height < 1e-5) height = fetchedRegion.height * fetchedRegion.scl() * Draw.yscl;
+
+            if(fetchedRegion.found()){
+                Draw.color(color);
+                Draw.rect(fetchedRegion, pos.x, pos.y, width, height, rotation);
+            }else{
+                Draw.color(Color.white);
+                Draw.rect("error", pos.x, pos.y, width, height, rotation);
+            }
+        }
+
+        @Override
+        public void setTexture(String textureName){
+            this.textureName = textureName;
+            fetchedRegion = Core.atlas.find(textureName);
         }
     }
 
