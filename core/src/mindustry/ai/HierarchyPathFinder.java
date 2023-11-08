@@ -53,15 +53,13 @@ public class HierarchyPathFinder{
     int cwidth, cheight;
 
     //TODO: make thread-local (they are dereferenced rarely anyway)
-    static PathfindQueue frontier = new PathfindQueue();
+    PathfindQueue frontier = new PathfindQueue();
     //node index -> total cost
-    static IntFloatMap costs = new IntFloatMap();
-    //
-    static IntSet usedEdges = new IntSet();
-    static IntSeq bfsQueue = new IntSeq();
-    static LongSeq tmpEdges = new LongSeq();
+    IntFloatMap costs = new IntFloatMap();
+    IntSet usedEdges = new IntSet();
     //node index (NodeIndex struct) -> node it came from
-    static IntIntMap cameFrom = new IntIntMap();
+    IntIntMap cameFrom = new IntIntMap();
+    IntMap<int[]> fields;
 
     public HierarchyPathFinder(){
 
@@ -164,21 +162,6 @@ public class HierarchyPathFinder{
                         if(node != Integer.MAX_VALUE && dest != Integer.MAX_VALUE){
                             var result = clusterAstar(0, node, dest);
                             if(result != null){
-                                for(int i = -1; i < result.size - 1; i++){
-                                    int endCluster = NodeIndex.cluster(result.items[i + 1]);
-                                    int cx = endCluster % cwidth, cy = endCluster / cwidth;
-                                    int[] field = flowField(0, cx, cy, 0, dest, World.toTile(Core.input.mouseWorldX()), World.toTile(Core.input.mouseWorldY()));
-
-                                    for(int y = 0; y < clusterSize; y++){
-                                        for(int x = 0; x < clusterSize; x++){
-                                            int value = field[x + y *clusterSize];
-                                            Tmp.c1.a = 1f;
-                                            Lines.stroke(0.8f, Tmp.c1.fromHsv(value * 3f, 1f, 1f));
-                                            Draw.alpha(0.5f);
-                                            Lines.rect((x + cx * clusterSize) * tilesize - tilesize/2f, (y + cy * clusterSize) * tilesize - tilesize/2f, tilesize, tilesize);
-                                        }
-                                    }
-                                }
 
                                 Lines.stroke(3f);
                                 Draw.color(Color.orange);
@@ -189,11 +172,6 @@ public class HierarchyPathFinder{
                                     portalToVec(0, NodeIndex.cluster(next), NodeIndex.dir(next), NodeIndex.portal(next), Tmp.v2);
                                     Lines.line(Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y);
                                 }
-
-
-
-
-                                //flowField(0, )
                             }
 
                             nodeToVec(dest, Tmp.v1);
@@ -201,6 +179,21 @@ public class HierarchyPathFinder{
                         }
 
                         Draw.reset();
+                    }
+
+                    if(fields != null){
+                        for(var entry : fields){
+                            int cx = entry.key % cwidth, cy = entry.key / cwidth;
+                            for(int y = 0; y < clusterSize; y++){
+                                for(int x = 0; x < clusterSize; x++){
+                                    int value = entry.value[x + y * clusterSize];
+                                    Tmp.c1.a = 1f;
+                                    Lines.stroke(0.8f, Tmp.c1.fromHsv(value * 3f, 1f, 1f));
+                                    Draw.alpha(0.5f);
+                                    Fill.square((x + cx * clusterSize) * tilesize, (y + cy * clusterSize) * tilesize, tilesize/2f);
+                                }
+                            }
+                        }
                     }
 
 
@@ -415,11 +408,6 @@ public class HierarchyPathFinder{
         costs.put(startPos, 0);
         frontier.add(startPos, 0);
 
-        if(debug && false){
-            Fx.debugLine.at(Point2.x(startPos) * tilesize, Point2.y(startPos) * tilesize, 0f, Color.purple,
-            new Vec2[]{new Vec2(Point2.x(startPos), Point2.y(startPos)).scl(tilesize), new Vec2(Point2.x(goalPos), Point2.y(goalPos)).scl(tilesize)});
-        }
-
         while(frontier.size > 0){
             int current = frontier.poll();
 
@@ -567,8 +555,6 @@ public class HierarchyPathFinder{
     @Nullable IntSeq clusterAstar(int pathCost, int startNodeIndex, int endNodeIndex){
         var v1 = nodeToVec(startNodeIndex, Tmp.v1);
         var v2 = nodeToVec(endNodeIndex, Tmp.v2);
-        Fx.placeBlock.at(v1.x, v1.y, 1);
-        Fx.placeBlock.at(v2.x, v2.y, 1);
 
         if(startNodeIndex == endNodeIndex){
             //TODO alloc
@@ -661,145 +647,164 @@ public class HierarchyPathFinder{
         }
     }
 
-    //both nodes must be inside the same flow field (cx, cy)
-    int[] flowField(int pathCost, int cx, int cy, int nodeFrom, int nodeTo, int goalX, int goalY){
+    public boolean getPathPosition(Unit unit, int pathId, Vec2 destination, Vec2 out, boolean[] noResultFound){
+        int costId = 0;
 
-        Cluster cluster = clusters[pathCost][cx  + cy * cwidth];
+        int node = findClosestNode(unit.team.id, costId, unit.tileX(), unit.tileY());
+        int dest = findClosestNode(unit.team.id, costId, World.toTile(destination.x), World.toTile(destination.y));
 
-        int realSize = clusterSize + 2;
+        fields = new IntMap<>();
 
-        int[] weights = new int[realSize * realSize];
-        byte[] searches = new byte[realSize * realSize];
         PathCost pcost = ControlPathfinder.costGround;
         int team = Team.sharded.id;
+        int goalPos = (World.toTile(destination.x) + World.toTile(destination.y) * wwidth);
 
         IntQueue frontier = new IntQueue();
-        int search = 1;
+        frontier.addFirst(goalPos);
 
-        int
-        minX = cx * clusterSize - 1,
-        minY = cy * clusterSize - 1,
-        maxX = Math.min(minX + clusterSize + 1, wwidth - 1),
-        maxY = Math.min(minY + clusterSize + 1, wheight - 1),
-        toCluster = NodeIndex.cluster(nodeTo),
-        tocx = toCluster % cwidth,
-        tocy = toCluster / cwidth;
+        Tile tileOn = unit.tileOn();
 
-        //you're at the cluster with the goal node
-        if(goalX / clusterSize == cx && goalY / clusterSize == cy){
-            frontier.addFirst(goalX + goalY * wwidth);
-        }else{
-            int
-            dir = NodeIndex.dir(nodeTo),
-            other = cluster.portals[dir].items[NodeIndex.portal(nodeTo)],
-            otherFrom = Point2.x(other), otherTo = Point2.y(other),
-            ox = tocx * clusterSize + offsets[dir * 2] * (clusterSize - 1),
-            oy = tocy * clusterSize + offsets[dir * 2 + 1] * (clusterSize - 1),
+        var result = clusterAstar(costId, node, dest);
+        if(result != null && tileOn != null){
 
-            px2 = Mathf.clamp((moveDirs[dir * 2] * otherFrom + ox), minX, maxX),
-            py2 = Mathf.clamp((moveDirs[dir * 2 + 1] * otherFrom + oy), minY, maxY),
-            px1 = Mathf.clamp((moveDirs[dir * 2] * otherTo + ox), minX, maxX),
-            py1 = Mathf.clamp((moveDirs[dir * 2 + 1] * otherTo + oy), minY, maxY);
+            int fsize = clusterSize * clusterSize;
+            int cx = unit.tileX() / clusterSize, cy = unit.tileY() / clusterSize;
 
-            if(px1 >= cx * clusterSize && px2 < cx * clusterSize + clusterSize && py1 >= cy * clusterSize && py2 < cy * clusterSize){
-                Log.info("inside the box"); //TODO broken
-            }
+            fields.put(cx + cy * cwidth, new int[fsize]);
 
-            //TODO: being zero INSIDE the cluster means that the unit will stop at the edge and not move between clusters - bad!
-            for(int x = px1; x <= px2; x++){
-                for(int y = py1; y <= py2; y++){
-                    frontier.addFirst(x + y * wwidth);
-                    Fx.lightBlock.at(x * tilesize, y * tilesize, 1f, Color.orange);
+            for(int i = -1; i < result.size; i++){
+                int
+                current = i == -1 ? node : result.items[i],
+                cluster = NodeIndex.cluster(current),
+                dir = NodeIndex.dir(current),
+                dx = Geometry.d4[dir].x,
+                dy = Geometry.d4[dir].y,
+                ox = cluster % cwidth + dx,
+                oy = cluster / cwidth + dy;
+
+                //store current cluster in the path list
+                if(!fields.containsKey(cluster)){
+                    fields.put(cluster, new int[fsize]);
                 }
-            }
-        }
 
-        //TODO spread this out across many frames
-        while(frontier.size > 0){
-            int tile = frontier.removeLast();
-            int baseX = tile % wwidth, baseY = tile / wwidth;
-            int cost = weights[(baseX - minX) + (baseY - minY) * realSize];
+                //store directionals TODO out of bounds
+                for(Point2 p : Geometry.d4){
+                    int other = cluster + p.x + p.y * cwidth;
+                    if(!fields.containsKey(other)){
+                        fields.put(other, new int[fsize]);
+                    }
+                }
 
-            if(cost != impassable){
-                for(Point2 point : Geometry.d4){
+                //store directional/flipped version of cluster
+                if(ox >= 0 && oy >= 0 && ox < cwidth && oy < cheight){
+                    int other = ox + oy * cwidth;
+                    if(!fields.containsKey(other)){
+                        fields.put(other, new int[fsize]);
+                    }
 
-                    int dx = baseX + point.x, dy = baseY + point.y;
-
-                    if(dx < minX || dy < minY || dx > maxX || dy > maxY) continue;
-
-                    int newPos = tile + point.x + point.y * wwidth;
-                    int newPosArray = (dx - minX) + (dy - minY) * realSize;
-                    int otherCost = pcost.getCost(team, pathfinder.tiles[newPos]);
-
-                    if((weights[newPosArray] > cost + otherCost || searches[newPosArray] < search) && otherCost != impassable){
-                        frontier.addFirst(newPos);
-                        weights[newPosArray] = cost + otherCost;
-                        searches[newPosArray] = (byte)search;
+                    //store directionals again
+                    for(Point2 p : Geometry.d4){
+                        int other2 = other + p.x + p.y * cwidth;
+                        if(!fields.containsKey(other2)){
+                            fields.put(other2, new int[fsize]);
+                        }
                     }
                 }
             }
-        }
-        return weights;
-    }
 
-    public boolean getPathPosition(Unit unit, int pathId, Vec2 destination, Vec2 out, boolean[] noResultFound){
-        int cost = 0;
-
-        int node = findClosestNode(unit.team.id, cost, unit.tileX(), unit.tileY());
-        int dest = findClosestNode(unit.team.id, cost, World.toTile(destination.x), World.toTile(destination.y));
-
-        var result = clusterAstar(cost, node, dest);
-        Tile tile = unit.tileOn();
-        if(result != null){
             for(int i = -1; i < result.size - 1; i++){
                 int current = i == -1 ? node : result.items[i], next = result.items[i + 1];
+
                 portalToVec(0, NodeIndex.cluster(current), NodeIndex.dir(current), NodeIndex.portal(current), Tmp.v1);
                 portalToVec(0, NodeIndex.cluster(next), NodeIndex.dir(next), NodeIndex.portal(next), Tmp.v2);
                 line(Tmp.v1, Tmp.v2, Color.orange);
             }
 
-            int cx = unit.tileX() / clusterSize, cy = unit.tileY() / clusterSize,
-            ox = cx * clusterSize - 1, oy = cy * clusterSize - 1;
+            //actually do the flow field part
+            //TODO spread this out across many frames
+            while(frontier.size > 0){
+                int tile = frontier.removeLast();
+                int baseX = tile % wwidth, baseY = tile / wwidth;
+                int curWeightIndex = (baseX / clusterSize) + (baseY / clusterSize) * cwidth;
+                int[] curWeights = fields.get(curWeightIndex);
 
-            int nextNode = result.items[0];
+                int cost = curWeights[baseX % clusterSize + ((baseY % clusterSize) * clusterSize)];
 
-            int[] field = flowField(cost, cx, cy, node, nextNode, World.toTile(destination.x), World.toTile(destination.y));
+                if(cost != impassable){
+                    for(Point2 point : Geometry.d4){
 
-            if(field != null && tile != null){
-                int value = field[(tile.x - ox) + (tile.y - oy) * (clusterSize + 2)];
+                        int
+                        dx = baseX + point.x, dy = baseY + point.y,
+                        clx = dx / clusterSize, cly = dy / clusterSize;
 
-                Tile current = null;
-                int tl = 0;
-                for(Point2 point : Geometry.d8){
-                    int dx = tile.x + point.x, dy = tile.y + point.y;
+                        if(clx < 0 || cly < 0 || dx >= wwidth || dy >= wheight) continue;
 
-                    Tile other = world.tile(dx, dy);
+                        int nextWeightIndex = clx + cly * cwidth;
 
+                        int[] weights = nextWeightIndex == curWeightIndex ? curWeights : fields.get(nextWeightIndex);
 
-                    if(other == null || dx < ox || dy < oy || dx >= ox + clusterSize + 2 || dy >= oy + clusterSize + 2) continue;
+                        //out of bounds; not allowed to move this way because no weights were registered here
+                        if(weights == null) continue;
 
-                    int local = (dx - ox) + (dy - oy) * (clusterSize + 2);
-                    int packed = world.packArray(dx, dy);
-                    int otherCost = field[local];
+                        int newPos = tile + point.x + point.y * wwidth;
 
-                    if(otherCost < value && (current == null || otherCost < tl) && passable(ControlPathfinder.costGround, unit.team.id, packed) &&
-                    !(point.x != 0 && point.y != 0 && (!passable(ControlPathfinder.costGround, unit.team.id, world.packArray(tile.x + point.x, tile.y)) ||
-                        (!passable(ControlPathfinder.costGround, unit.team.id, world.packArray(tile.x, tile.y + point.y)))))){ //diagonal corner trap
+                        //can't move back to the goal
+                        if(newPos == goalPos) continue;
 
-                        current = other;
-                        tl = field[local];
+                        int newPosArray = (dx - clx * clusterSize) + (dy - cly * clusterSize) * clusterSize;
+                        int otherCost = pcost.getCost(team, pathfinder.tiles[newPos]);
+                        int oldCost = weights[newPosArray];
+
+                        //a cost of 0 means uninitialized, OR it means we're at the goal position, but that's handled above
+                        if((oldCost == 0 || oldCost > cost + otherCost) && otherCost != impassable){
+                            frontier.addFirst(newPos);
+                            weights[newPosArray] = cost + otherCost;
+                        }
                     }
                 }
+            }
 
-                if(!(current == null || tl == impassable || (cost == costGround && current.dangerous() && !tile.dangerous()))){
-                    out.set(current);
-                    return true;
+
+            int value = getCost(fields, tileOn.x, tileOn.y);
+
+            Tile current = null;
+            int tl = 0;
+            //TODO: use raycasting and iterate on this for N steps
+            for(Point2 point : Geometry.d8){
+                int dx = tileOn.x + point.x, dy = tileOn.y + point.y;
+
+                Tile other = world.tile(dx, dy);
+
+                if(other == null) continue;
+
+                int packed = world.packArray(dx, dy);
+                int otherCost = getCost(fields, dx, dy);
+
+                if(otherCost < value && (current == null || otherCost < tl) && passable(ControlPathfinder.costGround, unit.team.id, packed) &&
+                !(point.x != 0 && point.y != 0 && (!passable(ControlPathfinder.costGround, unit.team.id, world.packArray(tileOn.x + point.x, tileOn.y)) ||
+                    (!passable(ControlPathfinder.costGround, unit.team.id, world.packArray(tileOn.x, tileOn.y + point.y)))))){ //diagonal corner trap
+
+                    current = other;
+                    tl = otherCost;
                 }
+            }
+
+            if(!(current == null || tl == impassable || (costId == costGround && current.dangerous() && !tileOn.dangerous()))){
+                out.set(current);
+                return true;
             }
         }
 
         noResultFound[0] = true;
         return false;
+    }
+
+    private int getCost(IntMap<int[]> fields, int x, int y){
+        int[] field = fields.get(x / clusterSize + (y / clusterSize) * cwidth);
+        if(field == null){
+            return -1;
+        }
+        return field[(x % clusterSize) + (y % clusterSize) * clusterSize];
     }
 
     private static boolean passable(PathCost cost, int team, int pos){

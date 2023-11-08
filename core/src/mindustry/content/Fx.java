@@ -2596,5 +2596,15 @@ public class Fx{
        }
 
        Draw.reset();
+    }),
+    debugRect = new Effect(90f, 1000000000000f, e -> {
+        if(!(e.data instanceof Rect rect)) return;
+
+        Draw.color(e.color);
+        Lines.stroke(2f);
+
+        Lines.rect(rect);
+
+        Draw.reset();
     });
 }
