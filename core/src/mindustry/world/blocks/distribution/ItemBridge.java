@@ -426,12 +426,14 @@ public class ItemBridge extends Block{
                 var facing = Edges.getFacingEdge(source, this);
                 int rel2 = facing == null ? -1 : relativeTo(facing);
 
+                //this is a bug, but it is kept for compatibility, see: https://github.com/Anuken/Mindustry/issues/9257#issuecomment-1801998747
+                /*
                 for(int j = 0; j < incoming.size; j++){
                     int v = incoming.items[j];
                     if(relativeTo(Point2.x(v), Point2.y(v)) == rel2){
                         return false;
                     }
-                }
+                }*/
 
                 return rel != rel2;
             }
