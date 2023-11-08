@@ -23,6 +23,8 @@ import static mindustry.ai.Pathfinder.*;
 //https://webdocs.cs.ualberta.ca/~mmueller/ps/hpastar.pdf
 //https://www.gameaipro.com/GameAIPro/GameAIPro_Chapter23_Crowd_Pathfinding_and_Steering_Using_Flow_Field_Tiles.pdf
 public class HierarchyPathFinder{
+    static final int clusterSize = 12;
+
     static final boolean debug = true;
 
     static final int[] offsets = {
@@ -48,7 +50,6 @@ public class HierarchyPathFinder{
 
     //maps pathCost -> flattened array of clusters in 2D
     Cluster[][] clusters;
-    int clusterSize = 12;
 
     int cwidth, cheight;
 
@@ -56,17 +57,45 @@ public class HierarchyPathFinder{
     PathfindQueue frontier = new PathfindQueue();
     //node index -> total cost
     IntFloatMap costs = new IntFloatMap();
+    //temporarily used for resolving connections for intra-edges
     IntSet usedEdges = new IntSet();
     //node index (NodeIndex struct) -> node it came from
     IntIntMap cameFrom = new IntIntMap();
     IntMap<int[]> fields;
+
+    //tasks to run on pathfinding thread
+    TaskQueue tasks = new TaskQueue();
+    //individual requests based on unit
+    ObjectMap<Unit, PathRequest> unitRequests = new ObjectMap<>();
+    //maps position in world in (x + y * width format) to a cache of flow fields
+    IntMap<FieldCache> requests = new IntMap<>();
+
+    //path requests are per-unit
+    //these contain
+    static class PathRequest{
+        int destination;
+        //node index -> total cost
+        IntFloatMap costs = new IntFloatMap();
+        //node index (NodeIndex struct) -> node it came from TODO merge them
+        IntIntMap cameFrom = new IntIntMap();
+    }
+
+    static class FieldCache{
+        int destination;
+        //frontier for flow fields
+        PathfindQueue frontier = new PathfindQueue();
+        //maps cluster index to field weights; 0 means uninitialized
+        IntMap<int[]> fields = new IntMap<>();
+
+        //TODO: node map for merging
+        //TODO: how to extend flowfields?
+    }
 
     public HierarchyPathFinder(){
 
         Events.on(WorldLoadEvent.class, event -> {
             //TODO 5 path costs, arbitrary number
             clusters = new Cluster[5][];
-            clusterSize = 12; //TODO arbitrary
             cwidth = Mathf.ceil((float)world.width() / clusterSize);
             cheight = Mathf.ceil((float)world.height() / clusterSize);
 
