@@ -22,7 +22,11 @@ import static mindustry.ai.Pathfinder.*;
 
 //https://webdocs.cs.ualberta.ca/~mmueller/ps/hpastar.pdf
 //https://www.gameaipro.com/GameAIPro/GameAIPro_Chapter23_Crowd_Pathfinding_and_Steering_Using_Flow_Field_Tiles.pdf
-public class HierarchyPathFinder{
+public class HierarchyPathFinder implements Runnable{
+    private static final long maxUpdate = Time.millisToNanos(12);
+    private static final int updateFPS = 30;
+    private static final int updateInterval = 1000 / updateFPS;
+
     static final int clusterSize = 12;
 
     static final boolean debug = true;
@@ -53,37 +57,35 @@ public class HierarchyPathFinder{
 
     int cwidth, cheight;
 
-    //TODO: make thread-local (they are dereferenced rarely anyway)
-    PathfindQueue frontier = new PathfindQueue();
-    //node index -> total cost
-    IntFloatMap costs = new IntFloatMap();
     //temporarily used for resolving connections for intra-edges
     IntSet usedEdges = new IntSet();
-    //node index (NodeIndex struct) -> node it came from
-    IntIntMap cameFrom = new IntIntMap();
-    IntMap<int[]> fields;
-
     //tasks to run on pathfinding thread
-    TaskQueue tasks = new TaskQueue();
+    TaskQueue queue = new TaskQueue();
     //individual requests based on unit
     ObjectMap<Unit, PathRequest> unitRequests = new ObjectMap<>();
     //maps position in world in (x + y * width format) to a cache of flow fields
     IntMap<FieldCache> requests = new IntMap<>();
+    /** Current pathfinding thread */
+    @Nullable Thread thread;
 
     //path requests are per-unit
     //these contain
     static class PathRequest{
         int destination;
+        //resulting path of nodes
+        IntSeq resultPath = new IntSeq();
         //node index -> total cost
         IntFloatMap costs = new IntFloatMap();
         //node index (NodeIndex struct) -> node it came from TODO merge them
         IntIntMap cameFrom = new IntIntMap();
+        //frontier for A*
+        PathfindQueue frontier = new PathfindQueue();
     }
 
     static class FieldCache{
         int destination;
         //frontier for flow fields
-        PathfindQueue frontier = new PathfindQueue();
+        IntQueue frontier = new IntQueue();
         //maps cluster index to field weights; 0 means uninitialized
         IntMap<int[]> fields = new IntMap<>();
 
@@ -93,17 +95,17 @@ public class HierarchyPathFinder{
 
     public HierarchyPathFinder(){
 
+        Events.on(ResetEvent.class, event -> stop());
+
         Events.on(WorldLoadEvent.class, event -> {
+            stop();
+
             //TODO 5 path costs, arbitrary number
             clusters = new Cluster[5][];
             cwidth = Mathf.ceil((float)world.width() / clusterSize);
             cheight = Mathf.ceil((float)world.height() / clusterSize);
 
-            for(int cy = 0; cy < cwidth; cy++){
-                for(int cx = 0; cx < cheight; cx++){
-                    createCluster(Team.sharded.id, costGround, cx, cy);
-                }
-            }
+            start();
         });
 
         //TODO very inefficient, this is only for debugging
@@ -183,33 +185,7 @@ public class HierarchyPathFinder{
                         }
                     }
 
-                    if(false){
-                        Lines.stroke(3f);
-                        Draw.color(Color.orange);
-                        int node = findClosestNode(Team.sharded.id, 0, player.tileX(), player.tileY());
-                        int dest = findClosestNode(Team.sharded.id, 0, World.toTile(Core.input.mouseWorldX()), World.toTile(Core.input.mouseWorldY()));
-                        if(node != Integer.MAX_VALUE && dest != Integer.MAX_VALUE){
-                            var result = clusterAstar(0, node, dest);
-                            if(result != null){
-
-                                Lines.stroke(3f);
-                                Draw.color(Color.orange);
-
-                                for(int i = -1; i < result.size - 1; i++){
-                                    int current = i == -1 ? node : result.items[i], next = result.items[i + 1];
-                                    portalToVec(0, NodeIndex.cluster(current), NodeIndex.dir(current), NodeIndex.portal(current), Tmp.v1);
-                                    portalToVec(0, NodeIndex.cluster(next), NodeIndex.dir(next), NodeIndex.portal(next), Tmp.v2);
-                                    Lines.line(Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y);
-                                }
-                            }
-
-                            nodeToVec(dest, Tmp.v1);
-                            Fonts.outline.draw(clusterNodeHeuristic(0, node, dest) + "", Tmp.v1.x, Tmp.v1.y);
-                        }
-
-                        Draw.reset();
-                    }
-
+                    /*
                     if(fields != null){
                         for(var entry : fields){
                             int cx = entry.key % cwidth, cy = entry.key / cwidth;
@@ -224,10 +200,55 @@ public class HierarchyPathFinder{
                             }
                         }
                     }
+                    */
 
 
                 });
             });
+        }
+    }
+
+    /** Starts or restarts the pathfinding thread. */
+    private void start(){
+        stop();
+        if(net.client()) return;
+
+        thread = new Thread(this, "Control Pathfinder");
+        thread.setPriority(Thread.MIN_PRIORITY);
+        thread.setDaemon(true);
+        thread.start();
+    }
+
+    /** Stops the pathfinding thread. */
+    private void stop(){
+        if(thread != null){
+            thread.interrupt();
+            thread = null;
+        }
+        queue.clear();
+    }
+
+    @Override
+    public void run(){
+        while(true){
+            if(net.client()) return;
+            try{
+
+                if(state.isPlaying()){
+                    queue.run();
+
+                    //TODO: update everything
+                }
+
+                try{
+                    Thread.sleep(updateInterval);
+                }catch(InterruptedException e){
+                    //stop looping when interrupted externally
+                    return;
+                }
+            }catch(Throwable e){
+                e.printStackTrace();
+            }
         }
     }
 
@@ -581,14 +602,19 @@ public class HierarchyPathFinder{
         return Math.abs(x1 - x2) + Math.abs(y1 - y2);
     }
 
-    @Nullable IntSeq clusterAstar(int pathCost, int startNodeIndex, int endNodeIndex){
-        var v1 = nodeToVec(startNodeIndex, Tmp.v1);
-        var v2 = nodeToVec(endNodeIndex, Tmp.v2);
+    @Nullable IntSeq clusterAstar(PathRequest request, int pathCost, int startNodeIndex, int endNodeIndex){
+        var result = request.resultPath;
 
         if(startNodeIndex == endNodeIndex){
+            result.clear();
+            result.add(startNodeIndex);
             //TODO alloc
-            return IntSeq.with(startNodeIndex);
+            return result;
         }
+
+        var costs = request.costs;
+        var cameFrom = request.cameFrom;
+        var frontier = request.frontier;
 
         frontier.clear();
         costs.clear();
@@ -615,7 +641,7 @@ public class HierarchyPathFinder{
 
             //edges for the cluster the node is 'in'
             if(innerCons != null){
-                checkEdges(pathCost, current, endNodeIndex, cx, cy, innerCons);
+                checkEdges(request, pathCost, current, endNodeIndex, cx, cy, innerCons);
             }
 
             //edges that this node 'faces' from the other side
@@ -626,13 +652,13 @@ public class HierarchyPathFinder{
                 int relativeDir = (dir + 2) % 4;
                 LongSeq outerCons = nextCluster.portalConnections[relativeDir] == null ? null : nextCluster.portalConnections[relativeDir][portal];
                 if(outerCons != null){
-                    checkEdges(pathCost, current, endNodeIndex, nextCx, nextCy, outerCons);
+                    checkEdges(request, pathCost, current, endNodeIndex, nextCx, nextCy, outerCons);
                 }
             }
         }
 
         if(foundEnd){
-            IntSeq result = new IntSeq();
+            result.clear();
 
             int cur = endNodeIndex;
             while(cur != startNodeIndex){
@@ -655,20 +681,20 @@ public class HierarchyPathFinder{
         Fx.debugLine.at(a.x, a.y, 0f, color, new Vec2[]{a.cpy(), b.cpy()});
     }
 
-    void checkEdges(int pathCost, int current, int goal, int cx, int cy, LongSeq connections){
+    void checkEdges(PathRequest request, int pathCost, int current, int goal, int cx, int cy, LongSeq connections){
         for(int i = 0; i < connections.size; i++){
             long con = connections.items[i];
             float cost = IntraEdge.cost(con);
             int otherDir = IntraEdge.dir(con), otherPortal = IntraEdge.portal(con);
             int next = makeNodeIndex(cx, cy, otherDir, otherPortal);
 
-            float newCost = costs.get(current) + cost;
+            float newCost = request.costs.get(current) + cost;
 
-            if(newCost < costs.get(next, Float.POSITIVE_INFINITY)){
-                costs.put(next, newCost);
+            if(newCost < request.costs.get(next, Float.POSITIVE_INFINITY)){
+                request.costs.put(next, newCost);
 
-                frontier.add(next, newCost + clusterNodeHeuristic(pathCost, next, goal));
-                cameFrom.put(next, current);
+                request.frontier.add(next, newCost + clusterNodeHeuristic(pathCost, next, goal));
+                request.cameFrom.put(next, current);
 
                 //TODO debug
                 line(nodeToVec(current, Tmp.v1), nodeToVec(next, Tmp.v2));
