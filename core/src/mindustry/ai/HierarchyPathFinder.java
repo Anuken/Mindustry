@@ -14,7 +14,6 @@ import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.ui.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
@@ -53,6 +52,7 @@ public class HierarchyPathFinder implements Runnable{
     };
 
     //maps pathCost -> flattened array of clusters in 2D
+    //(what about teams? different path costs?)
     Cluster[][] clusters;
 
     int cwidth, cheight;
@@ -64,12 +64,16 @@ public class HierarchyPathFinder implements Runnable{
     //individual requests based on unit
     ObjectMap<Unit, PathRequest> unitRequests = new ObjectMap<>();
     //maps position in world in (x + y * width format) to a cache of flow fields
-    IntMap<FieldCache> requests = new IntMap<>();
+    IntMap<FieldCache> fields = new IntMap<>();
 
 
     //these are for inner edge A*
     IntFloatMap innerCosts = new IntFloatMap();
     PathfindQueue innerFrontier = new PathfindQueue();
+
+    //ONLY modify on pathfinding thread.
+    IntSet clustersToUpdate = new IntSet();
+    IntSet clustersToInnerUpdate = new IntSet();
 
     /** Current pathfinding thread */
     @Nullable Thread thread;
@@ -77,29 +81,34 @@ public class HierarchyPathFinder implements Runnable{
     //path requests are per-unit
     //these contain
     static class PathRequest{
-        int destination;
+        final Unit unit;
+        final int destination;
         //resulting path of nodes
-        IntSeq resultPath = new IntSeq();
+        final IntSeq resultPath = new IntSeq();
         //node index -> total cost
-        IntFloatMap costs = new IntFloatMap();
+        final IntFloatMap costs = new IntFloatMap();
         //node index (NodeIndex struct) -> node it came from TODO merge them
-        IntIntMap cameFrom = new IntIntMap();
+        final IntIntMap cameFrom = new IntIntMap();
         //frontier for A*
-        PathfindQueue frontier = new PathfindQueue();
+        final PathfindQueue frontier = new PathfindQueue();
 
-        public PathRequest(int destination){
+        //main thread only!
+        long lastUpdateId;
+
+        public PathRequest(Unit unit, int destination){
+            this.unit = unit;
             this.destination = destination;
         }
     }
 
     static class FieldCache{
-        PathCost cost;
-        int team;
-        int goalPos;
+        final PathCost cost;
+        final int team;
+        final int goalPos;
         //frontier for flow fields
-        IntQueue frontier = new IntQueue();
+        final IntQueue frontier = new IntQueue();
         //maps cluster index to field weights; 0 means uninitialized
-        IntMap<int[]> fields = new IntMap<>();
+        final IntMap<int[]> fields = new IntMap<>();
 
         //TODO: node map for merging
         //TODO: how to extend flowfields?
@@ -129,7 +138,35 @@ public class HierarchyPathFinder implements Runnable{
 
         //TODO very inefficient, this is only for debugging
         Events.on(TileChangeEvent.class, e -> {
-            createCluster(Team.sharded.id, costGround, e.tile.x / clusterSize, e.tile.y / clusterSize);
+
+            e.tile.getLinkedTiles(t -> {
+                int x = t.x, y = t.y, mx = x % clusterSize, my = y % clusterSize, cx = x / clusterSize, cy = y / clusterSize, cluster = cx + cy * cwidth;
+
+                //is at the edge of a cluster; this means the portals may have changed.
+                if(mx == 0 || my == 0 || mx == clusterSize - 1 || my == clusterSize - 1){
+                    queue.post(() -> clustersToUpdate.add(cluster));
+                }else{
+                    //there is no need to recompute portals for block updates that are not on the edge.
+                    queue.post(() -> clustersToInnerUpdate.add(cluster));
+                }
+            });
+
+            //TODO: if near center of cluster:
+            //- re-do inner A* only
+            //- otherwise, re-do everything
+
+            //TODO: recalculate affected flow fields? or just all of them?
+        });
+
+        //invalidate paths
+        Events.run(Trigger.update, () -> {
+            for(var req : unitRequests.values()){
+                //skipped N update -> drop it
+                if(req.lastUpdateId <= state.updateId - 10){
+                    //concurrent modification!
+                    Core.app.post(() -> unitRequests.remove(req.unit));
+                }
+            }
         });
 
         if(debug){
@@ -269,6 +306,7 @@ public class HierarchyPathFinder implements Runnable{
         out.set(x, y);
     }
 
+    //TODO: this is never called yet. should be invoked during pathfinding
     void createCluster(int team, int pathCost, int cx, int cy){
         if(clusters[pathCost] == null) clusters[pathCost] = new Cluster[cwidth * cheight];
         Cluster cluster = clusters[pathCost][cy * cwidth + cx];
@@ -524,6 +562,7 @@ public class HierarchyPathFinder implements Runnable{
         //TODO
         PathCost cost = ControlPathfinder.costGround;
 
+        //TODO: cluster can be null!!
         Cluster cluster = clusters[pathCost][cx + cy * cwidth];
         int minX = cx * clusterSize, minY = cy * clusterSize, maxX = Math.min(minX + clusterSize - 1, wwidth - 1), maxY = Math.min(minY + clusterSize - 1, wheight - 1);
 
@@ -763,23 +802,19 @@ public class HierarchyPathFinder implements Runnable{
         }
     }
 
-    public void createPathRequest(Unit unit, int goalX, int goalY){
+    public void initializePathRequest(PathRequest request, int team, int unitX, int unitY, int goalX, int goalY){
         int costId = 0;
         PathCost pcost = ControlPathfinder.costGround;
-        int team = unit.team.id;
 
         int goalPos = (goalX + goalY * wwidth);
 
-        int node = findClosestNode(team, costId, unit.tileX(), unit.tileY());
+        int node = findClosestNode(team, costId, unitX, unitY);
         int dest = findClosestNode(team, costId, goalX, goalY);
-
-        //TODO: not new?
-        PathRequest request = new PathRequest(dest);
 
         var nodePath = clusterAstar(request, costId, node, dest);
 
         //TODO: how to reuse
-        FieldCache cache = this.requests.get(goalPos, () -> new FieldCache(pcost, team, goalPos));
+        FieldCache cache = this.fields.get(goalPos, () -> new FieldCache(pcost, team, goalPos));
 
         if(cache.frontier.isEmpty()){
             cache.frontier.addFirst(goalPos);
@@ -788,7 +823,7 @@ public class HierarchyPathFinder implements Runnable{
         if(nodePath != null){
 
             int fsize = clusterSize * clusterSize;
-            int cx = unit.tileX() / clusterSize, cy = unit.tileY() / clusterSize;
+            int cx = unitX / clusterSize, cy = unitY / clusterSize;
 
             var fields = cache.fields;
 
@@ -840,37 +875,63 @@ public class HierarchyPathFinder implements Runnable{
     public boolean getPathPosition(Unit unit, int pathId, Vec2 destination, Vec2 out, boolean[] noResultFound){
         int costId = 0;
 
-        Tile tileOn = unit.tileOn();
+        PathRequest request = unitRequests.get(unit);
+        int
+        destX = World.toTile(destination.x),
+        destY = World.toTile(destination.y) * wwidth,
+        destPos = destX + destY * wwidth;
 
-        if(tileOn != null){
-            int value = getCost(fields, tileOn.x, tileOn.y);
+        //TODO: collect old requests that have not been accessed in a while. not sure where.
+        request.lastUpdateId = state.updateId;
 
-            Tile current = null;
-            int tl = 0;
-            //TODO: use raycasting and iterate on this for N steps
-            for(Point2 point : Geometry.d8){
-                int dx = tileOn.x + point.x, dy = tileOn.y + point.y;
+        //use existing request if it exists.
+        if(request != null && request.destination == destPos){
 
-                Tile other = world.tile(dx, dy);
+            Tile tileOn = unit.tileOn();
+            //TODO: should fields be accessible from this thread?
+            FieldCache fieldCache = fields.get(destPos);
 
-                if(other == null) continue;
+            if(tileOn != null && fieldCache != null){
+                int value = getCost(fieldCache.fields, tileOn.x, tileOn.y);
 
-                int packed = world.packArray(dx, dy);
-                int otherCost = getCost(fields, dx, dy);
+                Tile current = null;
+                int tl = 0;
+                //TODO: use raycasting and iterate on this for N steps
+                for(Point2 point : Geometry.d8){
+                    int dx = tileOn.x + point.x, dy = tileOn.y + point.y;
 
-                if(otherCost < value && (current == null || otherCost < tl) && passable(ControlPathfinder.costGround, unit.team.id, packed) &&
-                !(point.x != 0 && point.y != 0 && (!passable(ControlPathfinder.costGround, unit.team.id, world.packArray(tileOn.x + point.x, tileOn.y)) ||
+                    Tile other = world.tile(dx, dy);
+
+                    if(other == null) continue;
+
+                    int packed = world.packArray(dx, dy);
+                    int otherCost = getCost(fieldCache.fields, dx, dy);
+
+                    if(otherCost < value && (current == null || otherCost < tl) && passable(ControlPathfinder.costGround, unit.team.id, packed) &&
+                    !(point.x != 0 && point.y != 0 && (!passable(ControlPathfinder.costGround, unit.team.id, world.packArray(tileOn.x + point.x, tileOn.y)) ||
                     (!passable(ControlPathfinder.costGround, unit.team.id, world.packArray(tileOn.x, tileOn.y + point.y)))))){ //diagonal corner trap
 
-                    current = other;
-                    tl = otherCost;
+                        current = other;
+                        tl = otherCost;
+                    }
+                }
+
+                if(!(current == null || tl == impassable || (costId == costGround && current.dangerous() && !tileOn.dangerous()))){
+                    out.set(current);
+                    return true;
                 }
             }
 
-            if(!(current == null || tl == impassable || (costId == costGround && current.dangerous() && !tileOn.dangerous()))){
-                out.set(current);
-                return true;
-            }
+        }else{
+            //queue new request.
+            unitRequests.put(unit, request = new PathRequest(unit, destPos));
+
+            PathRequest f = request;
+
+            //on the pathfinding thread: initialize the request, meaning
+            queue.post(() -> {
+                initializePathRequest(f, unit.team.id, unit.tileX(), unit.tileY(),  destX, destY);
+            });
         }
 
         noResultFound[0] = true;
@@ -919,10 +980,24 @@ public class HierarchyPathFinder implements Runnable{
                 if(state.isPlaying()){
                     queue.run();
 
+                    clustersToUpdate.each(cluster -> {
+
+                        //just in case: don't redundantly update inner clusters after you've recalculated it entirely
+                        clustersToInnerUpdate.remove(cluster);
+                    });
+
+                    clustersToInnerUpdate.each(cluster -> {
+
+                        //only recompute the inner links
+                    });
+
+                    clustersToInnerUpdate.clear();
+                    clustersToUpdate.clear();
+
                     //TODO: update everything else too
 
                     //each update time (not total!) no longer than maxUpdate
-                    for(FieldCache cache : requests.values()){
+                    for(FieldCache cache : fields.values()){
                         updateFields(cache, maxUpdate);
                     }
                 }
