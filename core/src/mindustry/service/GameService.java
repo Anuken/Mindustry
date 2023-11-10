@@ -111,15 +111,9 @@ public class GameService{
             completeSerpulo.complete();
         }
 
-        if(mods.list().size > 0){
+        if(mods != null && mods.list().size > 0){
             installMod.complete();
         }
-
-        Events.on(ClientLoadEvent.class, e -> {
-            if(mods.list().size > 0){
-                installMod.complete();
-            }
-        });
 
         if(Core.bundle.get("yes").equals("router")){
             routerLanguage.complete();
@@ -459,7 +453,8 @@ public class GameService{
         //check unlocked stuff on load as well
         Events.on(ResearchEvent.class, e -> checkUnlocks.run());
         Events.on(UnlockEvent.class, e -> checkUnlocks.run());
-        Events.on(ClientLoadEvent.class, e -> checkUnlocks.run());
+
+        checkUnlocks.run();
 
         Events.on(WinEvent.class, e -> {
             if(state.rules.pvp){
