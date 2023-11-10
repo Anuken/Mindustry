@@ -5473,7 +5473,7 @@ public class Blocks{
         }};
 
         mechFabricator = new UnitFactory("mech-fabricator"){{
-            requirements(Category.units, with(Items.silicon, 200, Items.graphite, 300, Items.tungsten, 60));
+            requirements(Category.units, with(Items.silicon, 200, Items.graphite, 300));
             size = 3;
             configurable = false;
             plans.add(new UnitPlan(UnitTypes.merui, 60f * 40f, with(Items.beryllium, 50, Items.silicon, 70)));
