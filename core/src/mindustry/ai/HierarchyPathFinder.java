@@ -65,6 +65,12 @@ public class HierarchyPathFinder implements Runnable{
     ObjectMap<Unit, PathRequest> unitRequests = new ObjectMap<>();
     //maps position in world in (x + y * width format) to a cache of flow fields
     IntMap<FieldCache> requests = new IntMap<>();
+
+
+    //these are for inner edge A*
+    IntFloatMap innerCosts = new IntFloatMap();
+    PathfindQueue innerFrontier = new PathfindQueue();
+
     /** Current pathfinding thread */
     @Nullable Thread thread;
 
@@ -80,10 +86,16 @@ public class HierarchyPathFinder implements Runnable{
         IntIntMap cameFrom = new IntIntMap();
         //frontier for A*
         PathfindQueue frontier = new PathfindQueue();
+
+        public PathRequest(int destination){
+            this.destination = destination;
+        }
     }
 
     static class FieldCache{
-        int destination;
+        PathCost cost;
+        int team;
+        int goalPos;
         //frontier for flow fields
         IntQueue frontier = new IntQueue();
         //maps cluster index to field weights; 0 means uninitialized
@@ -91,6 +103,13 @@ public class HierarchyPathFinder implements Runnable{
 
         //TODO: node map for merging
         //TODO: how to extend flowfields?
+
+
+        public FieldCache(PathCost cost, int team, int goalPos){
+            this.cost = cost;
+            this.team = team;
+            this.goalPos = goalPos;
+        }
     }
 
     public HierarchyPathFinder(){
@@ -226,30 +245,6 @@ public class HierarchyPathFinder implements Runnable{
             thread = null;
         }
         queue.clear();
-    }
-
-    @Override
-    public void run(){
-        while(true){
-            if(net.client()) return;
-            try{
-
-                if(state.isPlaying()){
-                    queue.run();
-
-                    //TODO: update everything
-                }
-
-                try{
-                    Thread.sleep(updateInterval);
-                }catch(InterruptedException e){
-                    //stop looping when interrupted externally
-                    return;
-                }
-            }catch(Throwable e){
-                e.printStackTrace();
-            }
-        }
     }
 
     Vec2 nodeToVec(int current, Vec2 out){
@@ -451,6 +446,9 @@ public class HierarchyPathFinder implements Runnable{
 
     /** @return -1 if no path was found */
     float innerAstar(int team, PathCost cost, int minX, int minY, int maxX, int maxY, int startPos, int goalPos, int goalX1, int goalY1, int goalX2, int goalY2){
+        var frontier = innerFrontier;
+        var costs = innerCosts;
+
         frontier.clear();
         costs.clear();
 
@@ -702,34 +700,103 @@ public class HierarchyPathFinder implements Runnable{
         }
     }
 
-    public boolean getPathPosition(Unit unit, int pathId, Vec2 destination, Vec2 out, boolean[] noResultFound){
+    private void updateFields(FieldCache cache, long nsToRun){
+        var frontier = cache.frontier;
+        var fields = cache.fields;
+        var goalPos = cache.goalPos;
+        var pcost = cache.cost;
+        var team = cache.team;
+
+        long start = Time.nanos();
+        int counter = 0;
+
+        //actually do the flow field part
+        //TODO spread this out across many frames
+        while(frontier.size > 0){
+            int tile = frontier.removeLast();
+            int baseX = tile % wwidth, baseY = tile / wwidth;
+            int curWeightIndex = (baseX / clusterSize) + (baseY / clusterSize) * cwidth;
+            int[] curWeights = fields.get(curWeightIndex);
+
+            int cost = curWeights[baseX % clusterSize + ((baseY % clusterSize) * clusterSize)];
+
+            if(cost != impassable){
+                for(Point2 point : Geometry.d4){
+
+                    int
+                    dx = baseX + point.x, dy = baseY + point.y,
+                    clx = dx / clusterSize, cly = dy / clusterSize;
+
+                    if(clx < 0 || cly < 0 || dx >= wwidth || dy >= wheight) continue;
+
+                    int nextWeightIndex = clx + cly * cwidth;
+
+                    int[] weights = nextWeightIndex == curWeightIndex ? curWeights : fields.get(nextWeightIndex);
+
+                    //out of bounds; not allowed to move this way because no weights were registered here
+                    if(weights == null) continue;
+
+                    int newPos = tile + point.x + point.y * wwidth;
+
+                    //can't move back to the goal
+                    if(newPos == goalPos) continue;
+
+                    int newPosArray = (dx - clx * clusterSize) + (dy - cly * clusterSize) * clusterSize;
+                    int otherCost = pcost.getCost(team, pathfinder.tiles[newPos]);
+                    int oldCost = weights[newPosArray];
+
+                    //a cost of 0 means uninitialized, OR it means we're at the goal position, but that's handled above
+                    if((oldCost == 0 || oldCost > cost + otherCost) && otherCost != impassable){
+                        frontier.addFirst(newPos);
+                        weights[newPosArray] = cost + otherCost;
+                    }
+                }
+            }
+
+            //every N iterations, check the time spent - this prevents extra calls to nano time, which itself is slow
+            if(nsToRun >= 0 && (counter++) >= 200){
+                counter = 0;
+                if(Time.timeSinceNanos(start) >= nsToRun){
+                    return;
+                }
+            }
+        }
+    }
+
+    public void createPathRequest(Unit unit, int goalX, int goalY){
         int costId = 0;
-
-        int node = findClosestNode(unit.team.id, costId, unit.tileX(), unit.tileY());
-        int dest = findClosestNode(unit.team.id, costId, World.toTile(destination.x), World.toTile(destination.y));
-
-        fields = new IntMap<>();
-
         PathCost pcost = ControlPathfinder.costGround;
-        int team = Team.sharded.id;
-        int goalPos = (World.toTile(destination.x) + World.toTile(destination.y) * wwidth);
+        int team = unit.team.id;
 
-        IntQueue frontier = new IntQueue();
-        frontier.addFirst(goalPos);
+        int goalPos = (goalX + goalY * wwidth);
 
-        Tile tileOn = unit.tileOn();
+        int node = findClosestNode(team, costId, unit.tileX(), unit.tileY());
+        int dest = findClosestNode(team, costId, goalX, goalY);
 
-        var result = clusterAstar(costId, node, dest);
-        if(result != null && tileOn != null){
+        //TODO: not new?
+        PathRequest request = new PathRequest(dest);
+
+        var nodePath = clusterAstar(request, costId, node, dest);
+
+        //TODO: how to reuse
+        FieldCache cache = this.requests.get(goalPos, () -> new FieldCache(pcost, team, goalPos));
+
+        if(cache.frontier.isEmpty()){
+            cache.frontier.addFirst(goalPos);
+        }
+
+        if(nodePath != null){
 
             int fsize = clusterSize * clusterSize;
             int cx = unit.tileX() / clusterSize, cy = unit.tileY() / clusterSize;
 
+            var fields = cache.fields;
+
             fields.put(cx + cy * cwidth, new int[fsize]);
 
-            for(int i = -1; i < result.size; i++){
+            for(int i = -1; i < nodePath.size; i++){
                 int
-                current = i == -1 ? node : result.items[i],
+                current = i == -1 ? node : nodePath.items[i],
                 cluster = NodeIndex.cluster(current),
                 dir = NodeIndex.dir(current),
                 dx = Geometry.d4[dir].x,
@@ -766,60 +833,16 @@ public class HierarchyPathFinder implements Runnable{
                     }
                 }
             }
+        }
 
-            for(int i = -1; i < result.size - 1; i++){
-                int current = i == -1 ? node : result.items[i], next = result.items[i + 1];
+    }
 
-                portalToVec(0, NodeIndex.cluster(current), NodeIndex.dir(current), NodeIndex.portal(current), Tmp.v1);
-                portalToVec(0, NodeIndex.cluster(next), NodeIndex.dir(next), NodeIndex.portal(next), Tmp.v2);
-                line(Tmp.v1, Tmp.v2, Color.orange);
-            }
+    public boolean getPathPosition(Unit unit, int pathId, Vec2 destination, Vec2 out, boolean[] noResultFound){
+        int costId = 0;
 
-            //actually do the flow field part
-            //TODO spread this out across many frames
-            while(frontier.size > 0){
-                int tile = frontier.removeLast();
-                int baseX = tile % wwidth, baseY = tile / wwidth;
-                int curWeightIndex = (baseX / clusterSize) + (baseY / clusterSize) * cwidth;
-                int[] curWeights = fields.get(curWeightIndex);
+        Tile tileOn = unit.tileOn();
 
-                int cost = curWeights[baseX % clusterSize + ((baseY % clusterSize) * clusterSize)];
-
-                if(cost != impassable){
-                    for(Point2 point : Geometry.d4){
-
-                        int
-                        dx = baseX + point.x, dy = baseY + point.y,
-                        clx = dx / clusterSize, cly = dy / clusterSize;
-
-                        if(clx < 0 || cly < 0 || dx >= wwidth || dy >= wheight) continue;
-
-                        int nextWeightIndex = clx + cly * cwidth;
-
-                        int[] weights = nextWeightIndex == curWeightIndex ? curWeights : fields.get(nextWeightIndex);
-
-                        //out of bounds; not allowed to move this way because no weights were registered here
-                        if(weights == null) continue;
-
-                        int newPos = tile + point.x + point.y * wwidth;
-
-                        //can't move back to the goal
-                        if(newPos == goalPos) continue;
-
-                        int newPosArray = (dx - clx * clusterSize) + (dy - cly * clusterSize) * clusterSize;
-                        int otherCost = pcost.getCost(team, pathfinder.tiles[newPos]);
-                        int oldCost = weights[newPosArray];
-
-                        //a cost of 0 means uninitialized, OR it means we're at the goal position, but that's handled above
-                        if((oldCost == 0 || oldCost > cost + otherCost) && otherCost != impassable){
-                            frontier.addFirst(newPos);
-                            weights[newPosArray] = cost + otherCost;
-                        }
-                    }
-                }
-            }
-
-
+        if(tileOn != null){
             int value = getCost(fields, tileOn.x, tileOn.y);
 
             Tile current = null;
@@ -885,6 +908,35 @@ public class HierarchyPathFinder implements Runnable{
             }
         }
         return cost.getCost(team, pathfinder.tiles[tilePos]);
+    }
+
+    @Override
+    public void run(){
+        while(true){
+            if(net.client()) return;
+            try{
+
+                if(state.isPlaying()){
+                    queue.run();
+
+                    //TODO: update everything else too
+
+                    //each update time (not total!) no longer than maxUpdate
+                    for(FieldCache cache : requests.values()){
+                        updateFields(cache, maxUpdate);
+                    }
+                }
+
+                try{
+                    Thread.sleep(updateInterval);
+                }catch(InterruptedException e){
+                    //stop looping when interrupted externally
+                    return;
+                }
+            }catch(Throwable e){
+                e.printStackTrace();
+            }
+        }
     }
 
     static class Cluster{
