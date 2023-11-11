@@ -1062,19 +1062,15 @@ public class LExecutor{
 
             if(exec.textBuffer.length() >= maxTextBuffer) return;
 
-            int placeholderIndex = -1;
-            int placeholderNumber = 10;
+            int placeholderIndex = exec.textBuffer.indexOf("@");
 
-            for(int i = 0; i < exec.textBuffer.length(); i++){
-                if(exec.textBuffer.charAt(i) == '{' && exec.textBuffer.length() - i > 2){
-                    char numChar = exec.textBuffer.charAt(i + 1);
+            if(placeholderIndex - 1 >= 0){
+                // Skip when escape character is met
+                while(exec.textBuffer.charAt(placeholderIndex - 1) == '\\'){
+                    placeholderIndex = exec.textBuffer.indexOf("@", placeholderIndex + 1);
 
-                    if(numChar >= '0' && numChar <= '9' && exec.textBuffer.charAt(i + 2) == '}'){
-                        if(numChar - '0' < placeholderNumber){
-                            placeholderNumber = numChar - '0';
-                            placeholderIndex = i;
-                        }
-                    }
+                    // No placeholders left
+                    if(placeholderIndex == -1) return;
                 }
             }
 
@@ -1085,13 +1081,13 @@ public class LExecutor{
             if(v.isobj && value != 0){
                 String strValue = PrintI.toString(v.objval);
 
-                exec.textBuffer.replace(placeholderIndex, placeholderIndex + 3, strValue);
+                exec.textBuffer.replace(placeholderIndex, placeholderIndex + 1, strValue);
             }else{
                 //display integer version when possible
                 if(Math.abs(v.numval - (long)v.numval) < 0.00001){
-                    exec.textBuffer.replace(placeholderIndex, placeholderIndex + 3, (long)v.numval + "");
+                    exec.textBuffer.replace(placeholderIndex, placeholderIndex + 1, (long)v.numval + "");
                 }else{
-                    exec.textBuffer.replace(placeholderIndex, placeholderIndex + 3, v.numval + "");
+                    exec.textBuffer.replace(placeholderIndex, placeholderIndex + 1, v.numval + "");
                 }
             }
         }
@@ -1113,7 +1109,9 @@ public class LExecutor{
             if(exec.building(target) instanceof MessageBuild d && (d.team == exec.team || exec.privileged)){
 
                 d.message.setLength(0);
-                d.message.append(exec.textBuffer, 0, Math.min(exec.textBuffer.length(), maxTextBuffer));
+                // Backslash is an escape character for format instruction placeholders
+                String result = exec.textBuffer.toString().replace("\\@", "@");
+                d.message.append(result, 0, Math.min(result.length(), maxTextBuffer));
 
             }
             exec.textBuffer.setLength(0);

@@ -8,7 +8,6 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.scene.utils.*;
 import arc.struct.*;
-import arc.util.*;
 import mindustry.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
@@ -46,7 +45,7 @@ public class MapLocalesDialog extends BaseDialog{
     public MapLocalesDialog(){
         super("@editor.locales");
 
-        selectedLocale = Core.settings.getString("locale");
+        selectedLocale = MapLocales.currentLocale();
 
         langs = new Table(Tex.button);
         main = new Table();
@@ -419,7 +418,7 @@ public class MapLocalesDialog extends BaseDialog{
             p.table(Tex.button, t -> {
                 t.defaults().size(350f, 60f).left();
 
-                t.button("@waves.copy", Icon.add, Styles.flatt, () -> {
+                t.button("@waves.copy", Icon.copy, Styles.flatt, () -> {
                     Core.app.setClipboardText(writeLocale(locale));
                     ui.showInfoFade("@copied");
                     dialog.hide();
@@ -445,7 +444,7 @@ public class MapLocalesDialog extends BaseDialog{
             p.table(Tex.button, t -> {
                 t.defaults().size(450f, 60f).left();
 
-                t.button("@waves.copy", Icon.add, Styles.flatt, () -> {
+                t.button("@waves.copy", Icon.copy, Styles.flatt, () -> {
                     Core.app.setClipboardText(writeBundles());
                     ui.showInfoFade("@copied");
                     dialog.hide();

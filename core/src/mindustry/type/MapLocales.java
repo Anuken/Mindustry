@@ -1,15 +1,15 @@
 package mindustry.type;
 
 import arc.struct.*;
-import arc.util.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
+
+import java.util.*;
 
 import static arc.Core.*;
 
 /** Class for storing map-specific locale bundles */
 public class MapLocales extends ObjectMap<String, StringMap> implements JsonSerializable{
-    private static TextFormatter formatter = new TextFormatter(null, false);
 
     @Override
     public void write(Json json){
@@ -39,11 +39,11 @@ public class MapLocales extends ObjectMap<String, StringMap> implements JsonSeri
     }
 
     public String getProperty(String key){
-        if(!containsProperty(settings.getString("locale"), key)){
+        if(!containsProperty(currentLocale(), key)){
             if(containsProperty("en", key)) return get("en").get(key);
             return "???" + key + "???";
         }
-        return get(settings.getString("locale")).get(key);
+        return get(currentLocale()).get(key);
     }
 
     private String getProperty(String locale, String key){
@@ -55,7 +55,7 @@ public class MapLocales extends ObjectMap<String, StringMap> implements JsonSeri
     }
 
     public boolean containsProperty(String key){
-        return containsProperty(settings.getString("locale"), key) || containsProperty("en", key);
+        return containsProperty(currentLocale(), key) || containsProperty("en", key);
     }
 
     private boolean containsProperty(String locale, String key){
@@ -64,10 +64,45 @@ public class MapLocales extends ObjectMap<String, StringMap> implements JsonSeri
     }
 
     public String getFormatted(String key, Object... args){
-        if(!containsProperty(settings.getString("locale"), key)){
-            if(containsProperty("en", key)) return formatter.format(getProperty("en", key), args);
-            return "???" + key + "???";
+        StringBuilder result = new StringBuilder();
+        if(!containsProperty(currentLocale(), key)){
+            if(containsProperty("en", key)){
+                result.append(getProperty("en", key));
+            }else{
+                return "???" + key + "???";
+            }
+        }else{
+            result.append(getProperty(currentLocale(), key));
         }
-        return formatter.format(getProperty(key), args);
+
+        loop:
+        for(var arg : args){
+            int placeholderIndex = result.indexOf("@");
+
+            if(placeholderIndex - 1 >= 0){
+                // Skip when escape character is met
+                while(result.charAt(placeholderIndex - 1) == '\\'){
+                    placeholderIndex = result.indexOf("@", placeholderIndex + 1);
+
+                    // No placeholders left
+                    if(placeholderIndex == -1) break loop;
+                }
+            }
+
+            if(placeholderIndex == -1) break;
+
+            result.replace(placeholderIndex, placeholderIndex + 1, arg.toString());
+        }
+
+        return result.toString().replace("\\@", "@");
+    }
+
+    // To handle default locale properly
+    public static String currentLocale(){
+        String locale = settings.getString("locale");
+        if(locale.equals("default")){
+            locale = Locale.getDefault().getLanguage();
+        }
+        return locale;
     }
 }
