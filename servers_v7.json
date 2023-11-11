@@ -250,7 +250,7 @@
   },
   {
     "name": "XuwenHost",
-    "address": ["pi.xiyuchao.love:6567","mdt.xuwenblock.cn:6567"]
+    "address": ["mdt.xuwenblock.cn:6568","mdt.xuwenblock.cn:6567"]
   },
   {
     "name": "MineCore",
