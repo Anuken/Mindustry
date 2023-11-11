@@ -62,6 +62,19 @@ public class ControlPathfinder{
     ((PathTile.team(tile) != team && PathTile.team(tile) != 0) && PathTile.solid(tile) ? wallImpassableCap : 0) +
     (PathTile.nearGround(tile) || PathTile.nearSolid(tile) ? 6 : 0);
 
+    public static final int
+    costIdGround = 0,
+    costIdHover = 1,
+    costIdLegs = 2,
+    costIdNaval = 3;
+
+    public static final Seq<PathCost> costTypes = Seq.with(
+    costGround,
+    costHover,
+    costLegs,
+    costNaval
+    );
+
     public static boolean showDebug = false;
 
     //static access probably faster than object access
