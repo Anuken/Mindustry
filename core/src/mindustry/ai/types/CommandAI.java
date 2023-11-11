@@ -219,7 +219,8 @@ public class CommandAI extends AIController{
             }
 
             if(unit.isGrounded() && stance != UnitStance.ram){
-                if(timer.get(timerTarget3, avoidInterval)){
+                //TODO no blocking.
+                if(timer.get(timerTarget3, avoidInterval) && false){
                     Vec2 dstPos = Tmp.v1.trns(unit.rotation, unit.hitSize/2f);
                     float max = unit.hitSize/2f;
                     float radius = Math.max(7f, max);
@@ -247,7 +248,7 @@ public class CommandAI extends AIController{
                 }
 
                 //if you've spent 3 seconds stuck, something is wrong, move regardless
-                move = hpath.getPathPosition(unit, pathId, vecMovePos, vecOut, noFound) && (!blockingUnit || timeSpentBlocked > maxBlockTime);
+                move = hpath.getPathPosition(unit, pathId, vecMovePos, targetPos, vecOut, noFound) && (!blockingUnit || timeSpentBlocked > maxBlockTime);
                 //we've reached the final point if the returned coordinate is equal to the supplied input
                 isFinalPoint &= vecMovePos.epsilonEquals(vecOut, 4.1f);
 

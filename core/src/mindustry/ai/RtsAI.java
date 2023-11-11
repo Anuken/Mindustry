@@ -77,6 +77,8 @@ public class RtsAI{
     }
 
     public void update(){
+        if(true) return;
+
         if(timer.get(timeUpdate, 60f * 2f)){
             assignSquads();
             checkBuilding();

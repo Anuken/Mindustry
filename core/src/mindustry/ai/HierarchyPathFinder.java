@@ -22,7 +22,7 @@ import static mindustry.ai.Pathfinder.*;
 //https://webdocs.cs.ualberta.ca/~mmueller/ps/hpastar.pdf
 //https://www.gameaipro.com/GameAIPro/GameAIPro_Chapter23_Crowd_Pathfinding_and_Steering_Using_Flow_Field_Tiles.pdf
 public class HierarchyPathFinder implements Runnable{
-    private static final long maxUpdate = Time.millisToNanos(12);
+    private static final long maxUpdate = 100;//Time.millisToNanos(12);
     private static final int updateFPS = 30;
     private static final int updateInterval = 1000 / updateFPS;
 
@@ -70,9 +70,10 @@ public class HierarchyPathFinder implements Runnable{
     //TODO - it is written to on the pathfinding thread
     //maps position in world in (x + y * width format) to a cache of flow fields
     IntMap<FieldCache> fields = new IntMap<>();
+    //MAIN THREAD ONLY
+    Seq<FieldCache> fieldList = new Seq<>(false);
 
-
-    //these are for inner edge A*
+    //these are for inner edge A* (temporary!)
     IntFloatMap innerCosts = new IntFloatMap();
     PathfindQueue innerFrontier = new PathfindQueue();
 
@@ -98,6 +99,10 @@ public class HierarchyPathFinder implements Runnable{
 
         //main thread only!
         long lastUpdateId = state.updateId;
+        volatile boolean notFound = false;
+
+        int lastTile; //TODO only re-raycast when unit moves a tile.
+        @Nullable Tile lastTargetTile;
 
         public PathRequest(Unit unit, int team, int destination){
             this.unit = unit;
@@ -135,9 +140,14 @@ public class HierarchyPathFinder implements Runnable{
             stop();
 
             //TODO: can the pathfinding thread even see these?
+            unitRequests = new ObjectMap<>();
+            fields = new IntMap<>();
+            fieldList = new Seq<>(false);
+
             clusters = new Cluster[256][][];
             cwidth = Mathf.ceil((float)world.width() / clusterSize);
             cheight = Mathf.ceil((float)world.height() / clusterSize);
+
 
             start();
         });
@@ -165,7 +175,7 @@ public class HierarchyPathFinder implements Runnable{
                 }
             });
 
-            //TODO: recalculate affected flow fields? or just all of them?
+            //TODO: recalculate affected flow fields? or just all of them? how to reflow?
         });
 
         //invalidate paths
@@ -178,74 +188,74 @@ public class HierarchyPathFinder implements Runnable{
                 }
             }
 
-            for(var field : fields.values()){
+            for(var field : fieldList){
                 //skipped N update -> drop it
                 if(field.lastUpdateId <= state.updateId - 20){
                     //make sure it's only modified on the main thread...? but what about calling get() on this thread??
                     queue.post(() -> fields.remove(field.goalPos));
+                    Core.app.post(() -> fieldList.remove(field));
                 }
             }
         });
 
         if(debug){
             Events.run(Trigger.draw, () -> {
-                int team = Team.sharded.id;
+                int team = player.team().id;
                 int cost = costGround;
-
-                if(clusters == null || clusters[cost] == null) return;
 
                 Draw.draw(Layer.overlayUI, () -> {
                     Lines.stroke(1f);
-                    for(int cx = 0; cx < cwidth; cx++){
-                        for(int cy = 0; cy < cheight; cy++){
-                            if(clusters[Team.sharded.id] == null || clusters[team][cost] == null) continue;
 
-                            var cluster = clusters[team][cost][cy * cwidth + cx];
-                            if(cluster != null){
-                                Lines.stroke(0.5f);
-                                Draw.color(Color.gray);
-                                Lines.stroke(1f);
+                    if(clusters[team] != null && clusters[team][cost] != null){
+                        for(int cx = 0; cx < cwidth; cx++){
+                            for(int cy = 0; cy < cheight; cy++){
 
-                                Lines.rect(cx * clusterSize * tilesize - tilesize/2f, cy * clusterSize * tilesize - tilesize/2f, clusterSize * tilesize, clusterSize * tilesize);
+                                var cluster = clusters[team][cost][cy * cwidth + cx];
+                                if(cluster != null){
+                                    Lines.stroke(0.5f);
+                                    Draw.color(Color.gray);
+                                    Lines.stroke(1f);
+
+                                    Lines.rect(cx * clusterSize * tilesize - tilesize/2f, cy * clusterSize * tilesize - tilesize/2f, clusterSize * tilesize, clusterSize * tilesize);
 
 
-                                for(int d = 0; d < 4; d++){
-                                    IntSeq portals = cluster.portals[d];
-                                    if(portals != null){
+                                    for(int d = 0; d < 4; d++){
+                                        IntSeq portals = cluster.portals[d];
+                                        if(portals != null){
 
-                                        for(int i = 0; i < portals.size; i++){
-                                            int pos = portals.items[i];
-                                            int from = Point2.x(pos), to = Point2.y(pos);
-                                            float width = tilesize * (Math.abs(from - to) + 1), height = tilesize;
+                                            for(int i = 0; i < portals.size; i++){
+                                                int pos = portals.items[i];
+                                                int from = Point2.x(pos), to = Point2.y(pos);
+                                                float width = tilesize * (Math.abs(from - to) + 1), height = tilesize;
 
-                                            portalToVec(cluster, cx, cy, d, i, Tmp.v1);
+                                                portalToVec(cluster, cx, cy, d, i, Tmp.v1);
 
-                                            Draw.color(Color.brown);
-                                            Lines.ellipse(30, Tmp.v1.x, Tmp.v1.y, width / 2f, height / 2f, d * 90f - 90f);
+                                                Draw.color(Color.brown);
+                                                Lines.ellipse(30, Tmp.v1.x, Tmp.v1.y, width / 2f, height / 2f, d * 90f - 90f);
 
-                                            LongSeq connections = cluster.portalConnections[d] == null ? null : cluster.portalConnections[d][i];
+                                                LongSeq connections = cluster.portalConnections[d] == null ? null : cluster.portalConnections[d][i];
 
-                                            if(connections != null){
-                                                Draw.color(Color.forest);
-                                                for(int coni = 0; coni < connections.size; coni ++){
-                                                    long con = connections.items[coni];
+                                                if(connections != null){
+                                                    Draw.color(Color.forest);
+                                                    for(int coni = 0; coni < connections.size; coni ++){
+                                                        long con = connections.items[coni];
 
-                                                    portalToVec(cluster, cx, cy, IntraEdge.dir(con), IntraEdge.portal(con), Tmp.v2);
+                                                        portalToVec(cluster, cx, cy, IntraEdge.dir(con), IntraEdge.portal(con), Tmp.v2);
 
-                                                    float
-                                                    x1 = Tmp.v1.x, y1 = Tmp.v1.y,
-                                                    x2 = Tmp.v2.x, y2 = Tmp.v2.y,
-                                                    mx = (cx * clusterSize + clusterSize / 2f) * tilesize, my = (cy * clusterSize + clusterSize / 2f) * tilesize;
-                                                    //Lines.curve(x1, y1, mx, my, mx, my, x2, y2, 20);
-                                                    Lines.line(x1, y1, x2, y2);
+                                                        float
+                                                        x1 = Tmp.v1.x, y1 = Tmp.v1.y,
+                                                        x2 = Tmp.v2.x, y2 = Tmp.v2.y,
+                                                        mx = (cx * clusterSize + clusterSize / 2f) * tilesize, my = (cy * clusterSize + clusterSize / 2f) * tilesize;
+                                                        //Lines.curve(x1, y1, mx, my, mx, my, x2, y2, 20);
+                                                        Lines.line(x1, y1, x2, y2);
 
+                                                    }
                                                 }
                                             }
                                         }
                                     }
-                                }
 
-                                //TODO draw connections.
+                                    //TODO draw connections.
 
                                 /*
                                 Draw.color(Color.magenta);
@@ -257,28 +267,27 @@ public class HierarchyPathFinder implements Runnable{
                                     //Lines.curve(x1, y1, mx, my, mx, my, x2, y2, 20);
                                     Lines.line(x1, y1, x2, y2);
                                 }*/
-                            }
-                        }
-                    }
-
-                    /*
-                    if(fields != null){
-                        for(var entry : fields){
-                            int cx = entry.key % cwidth, cy = entry.key / cwidth;
-                            for(int y = 0; y < clusterSize; y++){
-                                for(int x = 0; x < clusterSize; x++){
-                                    int value = entry.value[x + y * clusterSize];
-                                    Tmp.c1.a = 1f;
-                                    Lines.stroke(0.8f, Tmp.c1.fromHsv(value * 3f, 1f, 1f));
-                                    Draw.alpha(0.5f);
-                                    Fill.square((x + cx * clusterSize) * tilesize, (y + cy * clusterSize) * tilesize, tilesize/2f);
                                 }
                             }
                         }
                     }
-                    */
 
-
+                    for(var fields : fieldList){
+                        try{
+                            for(var entry : fields.fields){
+                                int cx = entry.key % cwidth, cy = entry.key / cwidth;
+                                for(int y = 0; y < clusterSize; y++){
+                                    for(int x = 0; x < clusterSize; x++){
+                                        int value = entry.value[x + y * clusterSize];
+                                        Tmp.c1.a = 1f;
+                                        Lines.stroke(0.8f, Tmp.c1.fromHsv(value * 3f, 1f, 1f));
+                                        Draw.alpha(0.5f);
+                                        Fill.square((x + cx * clusterSize) * tilesize, (y + cy * clusterSize) * tilesize, tilesize / 2f);
+                                    }
+                                }
+                            }
+                        }catch(Exception ignored){} //probably has some concurrency issues when iterating but I don't care, this is for debugging
+                    }
                 });
             });
         }
@@ -816,7 +825,10 @@ public class HierarchyPathFinder implements Runnable{
             int tile = frontier.removeLast();
             int baseX = tile % wwidth, baseY = tile / wwidth;
             int curWeightIndex = (baseX / clusterSize) + (baseY / clusterSize) * cwidth;
+
+            //TODO: how can this be null??? serious problem!
             int[] curWeights = fields.get(curWeightIndex);
+            if(curWeights == null) continue;
 
             int cost = curWeights[baseX % clusterSize + ((baseY % clusterSize) * clusterSize)];
 
@@ -921,6 +933,12 @@ public class HierarchyPathFinder implements Runnable{
         int node = findClosestNode(team, costId, unitX, unitY);
         int dest = findClosestNode(team, costId, goalX, goalY);
 
+        if(dest == Integer.MAX_VALUE){
+            request.notFound = true;
+            //no node found (TODO: invalid state??)
+            return;
+        }
+
         var nodePath = clusterAstar(request, costId, node, dest);
 
         //TODO: how to reuse properly. what if the flowfields don't go through this position (the fields are finished?) how to incrementally extend the flowfield?
@@ -931,6 +949,9 @@ public class HierarchyPathFinder implements Runnable{
         //create the cache if it doesn't exist, and initialize it
         if(cache == null){
             fields.put(goalPos, cache = new FieldCache(pcost, team, goalPos));
+            FieldCache fcache = cache;
+            //register field in main thread for iteration
+            Core.app.post(() -> fieldList.add(fcache));
             cache.frontier.addFirst(goalPos);
             addingFrontier = false; //when it's a new field, there is no need to add to the frontier to merge the flowfield
         }
@@ -938,6 +959,7 @@ public class HierarchyPathFinder implements Runnable{
         if(nodePath != null){
             int cx = unitX / clusterSize, cy = unitY / clusterSize;
 
+            //TODO: instead of adding a bunch of clusters nobody cares about, dynamically add them later when needed
             addFlowCluster(cache, cx, cy, addingFrontier);
 
             for(int i = -1; i < nodePath.size; i++){
@@ -976,15 +998,34 @@ public class HierarchyPathFinder implements Runnable{
         return ControlPathfinder.costTypes.get(costId);
     }
 
-    public boolean getPathPosition(Unit unit, int pathId, Vec2 destination, Vec2 out, boolean[] noResultFound){
+    public boolean getPathPosition(Unit unit, int pathId, Vec2 destination, Vec2 mainDestination, Vec2 out, boolean[] noResultFound){
         int costId = 0;
         PathCost cost = idToCost(costId);
 
-        PathRequest request = unitRequests.get(unit);
         int
-        destX = World.toTile(destination.x),
-        destY = World.toTile(destination.y) * wwidth,
+        team = unit.team.id,
+        tileX = unit.tileX(),
+        tileY = unit.tileY(),
+        destX = World.toTile(mainDestination.x),
+        destY = World.toTile(mainDestination.y),
+        actualDestX = World.toTile(destination.x),
+        actualDestY = World.toTile(destination.y),
         destPos = destX + destY * wwidth;
+
+        PathRequest request = unitRequests.get(unit);
+
+        //if the destination can be trivially reached in a straight line, do that.
+        if(!raycast(team, cost, tileX, tileY, actualDestX, actualDestY)){
+            out.set(destination);
+            return true;
+        }
+
+        //TODO: the destination should not be the exact key. units have slightly different destinations based on offset from formation!
+
+        //TODO raycast both diagonal edges to make sure it's reachable near corners
+        //var test = Geometry.raycastRect(unit.x, unit.y, current.worldx(), current.worldy(), Tmp.r1.setCentered(1f, 1f, tilesize).grow(7.8f)) != null;
+
+        boolean any = false;
 
         //use existing request if it exists.
         if(request != null && request.destination == destPos){
@@ -994,52 +1035,126 @@ public class HierarchyPathFinder implements Runnable{
             //TODO: should fields be accessible from this thread?
             FieldCache fieldCache = fields.get(destPos);
 
-            if(tileOn != null && fieldCache != null){
-                int value = getCost(fieldCache.fields, tileOn.x, tileOn.y);
+            if(fieldCache != null && tileOn != null){
+                fieldCache.lastUpdateId = state.updateId;
+                int maxIterations = 30; //TODO higher/lower number?
+                int i = 0;
 
-                Tile current = null;
-                int tl = 0;
-                //TODO: use raycasting and iterate on this for N steps
-                for(Point2 point : Geometry.d8){
-                    int dx = tileOn.x + point.x, dy = tileOn.y + point.y;
+                if(tileOn.pos() != request.lastTile || request.lastTargetTile == null){
+                    //TODO tanks have weird behavior near edges of walls, as they try to avoid them
 
-                    Tile other = world.tile(dx, dy);
+                    while(i ++ < maxIterations && (!any || !raycast(team, cost, tileX, tileY, tileOn.x, tileOn.y))){
+                        //TODO: if there's no flowfield at this position, add it.
+                        int value = getCost(fieldCache.fields, tileOn.x, tileOn.y);
 
-                    if(other == null) continue;
+                        Tile current = null;
+                        int minCost = 0;
+                        //TODO: use raycasting and iterate on this for N steps
+                        for(Point2 point : Geometry.d8){
+                            int dx = tileOn.x + point.x, dy = tileOn.y + point.y;
 
-                    int packed = world.packArray(dx, dy);
-                    int otherCost = getCost(fieldCache.fields, dx, dy);
+                            Tile other = world.tile(dx, dy);
 
-                    if(otherCost < value && (current == null || otherCost < tl) && passable(cost, unit.team.id, packed) &&
-                    !(point.x != 0 && point.y != 0 && (!passable(cost, unit.team.id, world.packArray(tileOn.x + point.x, tileOn.y)) ||
-                    (!passable(cost, unit.team.id, world.packArray(tileOn.x, tileOn.y + point.y)))))){ //diagonal corner trap
+                            if(other == null) continue;
 
-                        current = other;
-                        tl = otherCost;
+                            int packed = world.packArray(dx, dy);
+                            int otherCost = getCost(fieldCache.fields, dx, dy);
+
+                            //TODO: issue with hugging corners (you should not be able to move diagonally when there is a wall in the way)
+
+                            if(otherCost < value && (current == null || otherCost < minCost) && passable(cost, unit.team.id, packed) &&
+                            //diagonal corner trap
+                            !(
+                            (!passable(cost, team, world.packArray(tileOn.x + point.x, tileOn.y)) ||
+                            (!passable(cost, team, world.packArray(tileOn.x, tileOn.y + point.y))))
+                            )
+                            ){
+
+                                current = other;
+                                minCost = otherCost;
+                            }
+                        }
+
+                        if(!(current == null || minCost == impassable || (costId == costGround && current.dangerous() && !tileOn.dangerous()))){
+                            tileOn = current;
+                            any = true;
+                        }else{
+                            break;
+                        }
                     }
+
+                    request.lastTargetTile = any ? tileOn : null;
                 }
 
-                if(!(current == null || tl == impassable || (costId == costGround && current.dangerous() && !tileOn.dangerous()))){
-                    out.set(current);
+                if(request.lastTargetTile != null){
+                    out.set(request.lastTargetTile);
                     return true;
                 }
             }
-
-        }else{
+        }else if(request == null){
 
             //queue new request.
-            unitRequests.put(unit, request = new PathRequest(unit, unit.team.id, destPos));
+            unitRequests.put(unit, request = new PathRequest(unit, team, destPos));
 
             PathRequest f = request;
 
-            //on the pathfinding thread: initialize the request, meaning
+            //on the pathfinding thread: initialize the request
             queue.post(() -> {
-                initializePathRequest(f, unit.team.id, costId, unit.tileX(), unit.tileY(),  destX, destY);
+                initializePathRequest(f, unit.team.id, costId, unit.tileX(), unit.tileY(), destX, destY);
             });
+
+            out.set(destination);
+
+            return true;
         }
 
-        noResultFound[0] = true;
+        if(request != null){
+            noResultFound[0] = request.notFound;
+        }
         return false;
+    }
+
+    private static boolean raycast(int team, PathCost type, int x1, int y1, int x2, int y2){
+        int ww = wwidth, wh = wheight;
+        int x = x1, dx = Math.abs(x2 - x), sx = x < x2 ? 1 : -1;
+        int y = y1, dy = Math.abs(y2 - y), sy = y < y2 ? 1 : -1;
+        int e2, err = dx - dy;
+
+        while(x >= 0 && y >= 0 && x < ww && y < wh){
+            if(avoid(team, type, x + y * wwidth)) return true;
+            if(x == x2 && y == y2) return false;
+
+            //TODO no diagonals???? is this a good idea?
+            /*
+            //no diagonal ver
+            if(2 * err + dy > dx - 2 * err){
+                err -= dy;
+                x += sx;
+            }else{
+                err += dx;
+                y += sy;
+            }*/
+
+            //diagonal ver
+            e2 = 2 * err;
+            if(e2 > -dy){
+                err -= dy;
+                x += sx;
+            }
+
+            if(e2 < dx){
+                err += dx;
+                y += sy;
+            }
+
+        }
+
+        return true;
+    }
+
+    private static boolean avoid(int team, PathCost type, int tilePos){
+        int cost = cost(team, type, tilePos);
+        return cost == impassable || cost >= 2;
     }
 
     private int getCost(IntMap<int[]> fields, int x, int y){
