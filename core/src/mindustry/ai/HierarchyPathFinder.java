@@ -114,7 +114,6 @@ public class HierarchyPathFinder implements Runnable{
         //TODO: node map for merging
         //TODO: how to extend flowfields?
 
-
         public FieldCache(PathCost cost, int team, int goalPos){
             this.cost = cost;
             this.team = team;
@@ -350,14 +349,13 @@ public class HierarchyPathFinder implements Runnable{
     Cluster getCreateCluster(int team, int pathCost, int clusterIndex){
         Cluster result = getCluster(team, pathCost, clusterIndex);
         if(result == null){
-            return createCluster(team, pathCost, clusterIndex % cwidth, clusterIndex / cwidth);
+            return updateCluster(team, pathCost, clusterIndex % cwidth, clusterIndex / cwidth);
         }else{
             return result;
         }
     }
 
-    //TODO: this is never called yet. should be invoked during pathfinding
-    Cluster createCluster(int team, int pathCost, int cx, int cy){
+    Cluster updateCluster(int team, int pathCost, int cx, int cy){
         Cluster[][] dim1 = clusters[team];
 
         if(dim1 == null){
@@ -380,13 +378,7 @@ public class HierarchyPathFinder implements Runnable{
             }
         }
 
-        //clear all connections, since portals changed, they need to be recomputed.
-        cluster.portalConnections = new LongSeq[4][];
-
-        //TODO: other cluster inner edges should be recomputed if changed.
-
-        //TODO look it up based on number.
-        PathCost cost = ControlPathfinder.costGround;
+        PathCost cost = ControlPathfinder.costTypes.get(pathCost);
 
         for(int direction = 0; direction < 4; direction++){
             int otherX = cx + Geometry.d4x(direction), otherY = cy + Geometry.d4y(direction);
@@ -448,20 +440,22 @@ public class HierarchyPathFinder implements Runnable{
             }
         }
 
-        connectInnerEdges(cx, cy, team, cost, cluster);
+        updateInnerEdges(team, cost, cx, cy, cluster);
 
         return cluster;
     }
 
-    void connectInnerEdges(int cx, int cy, int team, PathCost cost, Cluster cluster){
+    void updateInnerEdges(int team, int cost, int cx, int cy, Cluster cluster){
+        updateInnerEdges(team, ControlPathfinder.costTypes.get(cost), cx, cy, cluster);
+    }
+
+    void updateInnerEdges(int team, PathCost cost, int cx, int cy, Cluster cluster){
         int minX = cx * clusterSize, minY = cy * clusterSize, maxX = Math.min(minX + clusterSize - 1, wwidth - 1), maxY = Math.min(minY + clusterSize - 1, wheight - 1);
         
         usedEdges.clear();
 
-        //TODO: how the hell to identify a vertex?
-        //cluster (i16) | direction (i2) | index (i14)
-
-        //TODO: clear portal connections
+        //clear all connections, since portals changed, they need to be recomputed.
+        cluster.portalConnections = new LongSeq[4][];
 
         for(int direction = 0; direction < 4; direction++){
             var portals = cluster.portals[direction];
@@ -485,7 +479,6 @@ public class HierarchyPathFinder implements Runnable{
 
                     for(int j = 0; j < otherPortals.size; j++){
 
-                        //TODO redundant calculations?
                         if(!usedEdges.contains(Point2.pack(otherDir, j))){
 
                             int
@@ -1034,6 +1027,40 @@ public class HierarchyPathFinder implements Runnable{
         return cost.getCost(team, pathfinder.tiles[tilePos]);
     }
 
+    private void updateClustersComplete(int clusterIndex){
+        for(int team = 0; team < clusters.length; team++){
+            var dim1 = clusters[team];
+            if(dim1 != null){
+                for(int pathCost = 0; pathCost < dim1.length; pathCost++){
+                    var dim2 = dim1[pathCost];
+                    if(dim2 != null){
+                        var cluster = dim2[clusterIndex];
+                        if(cluster != null){
+                            updateCluster(team, pathCost, clusterIndex % cwidth, clusterIndex / cwidth);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void updateClustersInner(int clusterIndex){
+        for(int team = 0; team < clusters.length; team++){
+            var dim1 = clusters[team];
+            if(dim1 != null){
+                for(int pathCost = 0; pathCost < dim1.length; pathCost++){
+                    var dim2 = dim1[pathCost];
+                    if(dim2 != null){
+                        var cluster = dim2[clusterIndex];
+                        if(cluster != null){
+                            updateInnerEdges(team, pathCost, clusterIndex % cwidth, clusterIndex / cwidth, cluster);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     @Override
     public void run(){
         while(true){
@@ -1043,17 +1070,16 @@ public class HierarchyPathFinder implements Runnable{
                 if(state.isPlaying()){
                     queue.run();
 
-                    //TODO: WHICH clusters need to update here? do I iterate through 256 teams every time? ugh
                     clustersToUpdate.each(cluster -> {
-
+                        updateClustersComplete(cluster);
 
                         //just in case: don't redundantly update inner clusters after you've recalculated it entirely
                         clustersToInnerUpdate.remove(cluster);
                     });
 
                     clustersToInnerUpdate.each(cluster -> {
-
                         //only recompute the inner links
+                        updateClustersInner(cluster);
                     });
 
                     clustersToInnerUpdate.clear();
