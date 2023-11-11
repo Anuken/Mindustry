@@ -570,7 +570,7 @@ public class Blocks{
         snowWall = new StaticWall("snow-wall");
 
         duneWall = new StaticWall("dune-wall"){{
-            basalt.asFloor().wall = darksandWater.asFloor().wall = darksandTaintedWater.asFloor().wall = this;
+            hotrock.asFloor().wall = magmarock.asFloor().wall = basalt.asFloor().wall = darksandWater.asFloor().wall = darksandTaintedWater.asFloor().wall = this;
             attributes.set(Attribute.sand, 2f);
         }};
 
@@ -3849,16 +3849,19 @@ public class Blocks{
 
             requirements(Category.turret, with(Items.copper, 1000, Items.metaglass, 600, Items.surgeAlloy, 300, Items.plastanium, 200, Items.silicon, 600));
             ammo(
-                Items.surgeAlloy, new PointBulletType(){{
+                Items.surgeAlloy, new RailBulletType(){{
                     shootEffect = Fx.instShoot;
                     hitEffect = Fx.instHit;
+                    pierceEffect = Fx.railHit;
                     smokeEffect = Fx.smokeCloud;
-                    trailEffect = Fx.instTrail;
+                    pointEffect = Fx.instTrail;
                     despawnEffect = Fx.instBomb;
-                    trailSpacing = 20f;
+                    pointEffectSpace = 20f;
                     damage = 1350;
                     buildingDamageMultiplier = 0.2f;
-                    speed = brange;
+                    maxDamageFraction = 0.6f;
+                    pierceDamageFactor = 1f;
+                    length = brange;
                     hitShake = 6f;
                     ammoMultiplier = 1f;
                 }}
@@ -3965,6 +3968,7 @@ public class Blocks{
                 hitColor = Pal.meltdownHit;
                 status = StatusEffects.melting;
                 drawSize = 420f;
+                timescaleDamage = true;
 
                 incendChance = 0.4f;
                 incendSpread = 5f;

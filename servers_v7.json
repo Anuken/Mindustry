@@ -4,6 +4,10 @@
     "address": ["cn1.plush.run:10001","211.101.236.94:10000","bj-1.lcf.icu:10240","play.simpfun.cn:14523"]
   },
   {
+    "name": "Crux's Revelations",
+    "Address": ["fsn1.bbn.one:52397","fsn1.bbn.one:58375","de-free-01.hosts.optikservers.com:32212","fsn1.bbn.one:49840","de-free-01.hosts.optikservers.com:30449"]
+  },
+  {
     "name": "CMS",
     "address": ["195.2.84.144"]
   },
@@ -68,12 +72,8 @@
     "address": ["51.81.57.217:33703"]
   },
   {
-    "name": "Omega Hub",
-    "address": ["n1.mindustry.me:6608", "n7.mindustry.me:6767", "n7.mindustry.me:6768", "n1.mindustry.me:6568", "n1.mindustry.me:6671", "n1.mindustry.me:6570", "n1.mindustry.me:6573", "n1.mindustry.me:6610", "n1.mindustry.me:6567", "n1.mindustry.me:6599", "n1.mindustry.me:6774", "n1.mindustry.me:6571", "n1.mindustry.me:6589"]
-  },
-  {
     "name": "KMWStudios",
-    "address": ["46.151.26.232:1024", "46.151.26.232:2000", "46.151.26.232:3000", "46.151.26.232:4000", "46.151.26.232:6000", "46.151.26.232:7000", "46.151.26.232:8000"]
+    "address": ["x.kmwstudios.xyz:9000", "x.kmwstudios.xyz:9002", "x.kmwstudios.xyz:9003", "x.kmwstudios.xyz:9004", "x.kmwstudios.xyz:9005", "x.kmwstudios.xyz:9006", "x.kmwstudios.xyz:9007"]
   },
   {
     "name": "XCore",
@@ -89,7 +89,7 @@
   },
   {
     "name": "io",
-    "address": ["mindustry.io.community", "mindustry.io.community:1000", "mindustry.io.community:2000", "mindustry.io.community:3000", "mindustry.io.community:4000", "labs.io.community"]
+    "address": ["159.69.7.83", "159.69.7.83:1000", "159.69.7.83:2000", "159.69.7.83:3000", "159.69.7.83:4000"]
   },
   {
     "name": "Korea",
@@ -222,7 +222,7 @@
   },
   {
     "name": "MeowIsland",
-    "address": ["n1.mindustry.me:6590", "n1.mindustry.me:6592", "n1.mindustry.me:6595"]
+    "address": ["nexus.minecraft.rent:25598", "nexus.minecraft.rent:25596", "jupiter.minecraft.rent:25651"]
   },
   {
     "name": "3MIDustry",
@@ -250,7 +250,7 @@
   },
   {
     "name": "XuwenHost",
-    "address": ["pi.xiyuchao.love:6567","mdt.xuwenblock.cn:6567"]
+    "address": ["mdt.xuwenblock.cn:6568","mdt.xuwenblock.cn:6567"]
   },
   {
     "name": "MineCore",
