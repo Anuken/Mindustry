@@ -557,6 +557,31 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
     }
 
+    @Remote(called = Loc.server)
+    public static void unitEnteredPayload(Unit unit, Building build){
+        if(unit == null || build == null || unit.team != build.team) return;
+
+        unit.remove();
+
+        //reset the enter command
+        if(unit.controller() instanceof CommandAI ai && ai.command == UnitCommand.enterPayloadCommand){
+            ai.clearCommands();
+            ai.command = UnitCommand.moveCommand;
+        }
+
+        //clear removed state of unit so it can be synced
+        if(Vars.net.client()){
+            Vars.netClient.clearRemovedEntity(unit.id);
+        }
+
+        UnitPayload unitPay = new UnitPayload(unit);
+
+        if(build.acceptPayload(build, unitPay)){
+            Fx.unitDrop.at(build);
+            build.handlePayload(build, unitPay);
+        }
+    }
+
     @Remote(targets = Loc.client, called = Loc.server)
     public static void dropItem(Player player, float angle){
         if(player == null) return;
@@ -1273,6 +1298,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     protected void drawBreakSelection(int x1, int y1, int x2, int y2, int maxLength){
+        drawBreakSelection(x1, y1, x2, y2, maxLength, true);
+    }
+
+    protected void drawBreakSelection(int x1, int y1, int x2, int y2, int maxLength, boolean useSelectPlans){
         NormalizeDrawResult result = Placement.normalizeDrawArea(Blocks.air, x1, y1, x2, y2, false, maxLength, 1f);
         NormalizeResult dresult = Placement.normalizeArea(x1, y1, x2, y2, rotation, false, maxLength);
 
@@ -1291,16 +1320,16 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Lines.stroke(1f);
 
         for(var plan : player.unit().plans()){
-            if(plan.breaking) continue;
-            if(plan.bounds(Tmp.r2).overlaps(Tmp.r1)){
+            if(!plan.breaking && plan.bounds(Tmp.r2).overlaps(Tmp.r1)){
                 drawBreaking(plan);
             }
         }
 
-        for(var plan : selectPlans){
-            if(plan.breaking) continue;
-            if(plan.bounds(Tmp.r2).overlaps(Tmp.r1)){
-                drawBreaking(plan);
+        if(useSelectPlans){
+            for(var plan : selectPlans){
+                if(!plan.breaking && plan.bounds(Tmp.r2).overlaps(Tmp.r1)){
+                    drawBreaking(plan);
+                }
             }
         }
 
@@ -1462,11 +1491,14 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
         }
 
-        it = selectPlans.iterator();
-        while(it.hasNext()){
-            var plan = it.next();
-            if(!plan.breaking && plan.bounds(Tmp.r2).overlaps(Tmp.r1)){
-                it.remove();
+        //don't remove plans on desktop, where flushing is false
+        if(flush){
+            it = selectPlans.iterator();
+            while(it.hasNext()){
+                var plan = it.next();
+                if(!plan.breaking && plan.bounds(Tmp.r2).overlaps(Tmp.r1)){
+                    it.remove();
+                }
             }
         }
 
@@ -1611,6 +1643,14 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     boolean tryStopMine(Tile tile){
         if(player.unit().mineTile == tile){
             player.unit().mineTile = null;
+            return true;
+        }
+        return false;
+    }
+
+    boolean tryRepairDerelict(Tile selected){
+        if(selected != null && selected.build != null && selected.build.block.unlockedNow() && selected.build.team == Team.derelict && Build.validPlace(selected.block(), player.team(), selected.build.tileX(), selected.build.tileY(), selected.build.rotation)){
+            player.unit().addBuild(new BuildPlan(selected.build.tileX(), selected.build.tileY(), selected.build.rotation, selected.block(), selected.build.config()));
             return true;
         }
         return false;

@@ -185,7 +185,9 @@ public class Renderer implements ApplicationListener{
         if(landTime > 0){
             if(!state.isPaused()){
                 CoreBuild build = landCore == null ? player.bestCore() : landCore;
-                build.updateLandParticles();
+                if(build != null){
+                    build.updateLandParticles();
+                }
             }
 
             if(!state.isPaused()){
