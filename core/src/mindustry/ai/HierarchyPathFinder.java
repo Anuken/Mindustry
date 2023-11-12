@@ -28,7 +28,7 @@ public class HierarchyPathFinder implements Runnable{
 
     static final int clusterSize = 12;
 
-    static final boolean debug = false;
+    static final boolean debug = true;
 
     static final int[] offsets = {
     1, 0, //right: bottom to top
@@ -104,7 +104,7 @@ public class HierarchyPathFinder implements Runnable{
         int lastTile; //TODO only re-raycast when unit moves a tile.
         @Nullable Tile lastTargetTile;
 
-        public PathRequest(Unit unit, int team, int destination){
+        PathRequest(Unit unit, int team, int destination){
             this.unit = unit;
             this.team = team;
             this.destination = destination;
@@ -125,7 +125,7 @@ public class HierarchyPathFinder implements Runnable{
 
         //TODO: how are the nodes merged? CAN they be merged?
 
-        public FieldCache(PathCost cost, int team, int goalPos){
+        FieldCache(PathCost cost, int team, int goalPos){
             this.cost = cost;
             this.team = team;
             this.goalPos = goalPos;
@@ -851,7 +851,10 @@ public class HierarchyPathFinder implements Runnable{
                     //can't move back to the goal
                     if(newPos == goalPos) continue;
 
+                    if(dx - clx * clusterSize < 0 || dy - cly * clusterSize < 0) continue;
+
                     int newPosArray = (dx - clx * clusterSize) + (dy - cly * clusterSize) * clusterSize;
+
                     int otherCost = pcost.getCost(team, pathfinder.tiles[newPos]);
                     int oldCost = weights[newPosArray];
 
@@ -961,7 +964,6 @@ public class HierarchyPathFinder implements Runnable{
         if(nodePath != null){
             int cx = unitX / clusterSize, cy = unitY / clusterSize;
 
-            //TODO: instead of adding a bunch of clusters nobody cares about, dynamically add them later when needed
             addFlowCluster(cache, cx, cy, addingFrontier);
 
             for(int i = -1; i < nodePath.size; i++){
@@ -976,21 +978,11 @@ public class HierarchyPathFinder implements Runnable{
 
                 addFlowCluster(cache, cluster, addingFrontier);
 
-                //store directionals TODO can be out of bounds
-                for(Point2 p : Geometry.d4){
-                    //addFlowCluster(cache, cluster + p.x + p.y * cwidth, addingFrontier);
-                }
-
                 //store directional/flipped version of cluster
                 if(ox >= 0 && oy >= 0 && ox < cwidth && oy < cheight){
                     int other = ox + oy * cwidth;
 
                     addFlowCluster(cache, other, addingFrontier);
-
-                    //store directionals again
-                    for(Point2 p : Geometry.d4){
-                        //addFlowCluster(cache, other + p.x + p.y * cwidth, addingFrontier);
-                    }
                 }
             }
         }
@@ -1000,7 +992,7 @@ public class HierarchyPathFinder implements Runnable{
         return ControlPathfinder.costTypes.get(costId);
     }
 
-    public boolean getPathPosition(Unit unit, int pathId, Vec2 destination, Vec2 mainDestination, Vec2 out, boolean[] noResultFound){
+    public boolean getPathPosition(Unit unit, int pathId, Vec2 destination, Vec2 mainDestination, Vec2 out, @Nullable boolean[] noResultFound){
         int costId = 0;
         PathCost cost = idToCost(costId);
 
@@ -1021,11 +1013,6 @@ public class HierarchyPathFinder implements Runnable{
             out.set(destination);
             return true;
         }
-
-        //TODO: the destination should not be the exact key. units have slightly different destinations based on offset from formation!
-
-        //TODO raycast both diagonal edges to make sure it's reachable near corners
-        //
 
         boolean any = false;
 
@@ -1103,8 +1090,10 @@ public class HierarchyPathFinder implements Runnable{
                         }
                     }
 
+                    //TODO: there are some serious issues with tileOn and the raycast position...
+                    //TODO intense vibration
                     request.lastTargetTile = any ? tileOn : null;
-                    if(debug && tileOn != null){
+                    if(debug && tileOn != null && false){
                         Fx.placeBlock.at(tileOn.worldx(), tileOn.worldy(), 1);
                     }
                 }
@@ -1131,7 +1120,9 @@ public class HierarchyPathFinder implements Runnable{
             return true;
         }
 
-        noResultFound[0] = request.notFound;
+        if(noResultFound != null){
+            noResultFound[0] = request.notFound;
+        }
         return false;
     }
 
@@ -1231,6 +1222,13 @@ public class HierarchyPathFinder implements Runnable{
         return cost.getCost(team, pathfinder.tiles[tilePos]);
     }
 
+    private void clusterChanged(int team, int pathCost, int cx, int cy){
+        //TODO very important: invalidate paths!
+        //reset all flowfields that contain this cluster
+        //remove all paths that contain this cluster
+        //VERY important: don't replace all the data.
+    }
+
     private void updateClustersComplete(int clusterIndex){
         for(int team = 0; team < clusters.length; team++){
             var dim1 = clusters[team];
@@ -1241,6 +1239,7 @@ public class HierarchyPathFinder implements Runnable{
                         var cluster = dim2[clusterIndex];
                         if(cluster != null){
                             updateCluster(team, pathCost, clusterIndex % cwidth, clusterIndex / cwidth);
+                            clusterChanged(team, pathCost, clusterIndex % cwidth, clusterIndex / cwidth);
                         }
                     }
                 }
@@ -1258,6 +1257,7 @@ public class HierarchyPathFinder implements Runnable{
                         var cluster = dim2[clusterIndex];
                         if(cluster != null){
                             updateInnerEdges(team, pathCost, clusterIndex % cwidth, clusterIndex / cwidth, cluster);
+                            clusterChanged(team, pathCost, clusterIndex % cwidth, clusterIndex / cwidth);
                         }
                     }
                 }
