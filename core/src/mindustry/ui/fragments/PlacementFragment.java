@@ -113,7 +113,7 @@ public class PlacementFragment{
         return hover;
     }
 
-    void rebuild(){
+    public void rebuild(){
         //category does not change on rebuild anymore, only on new world load
         Group group = toggler.parent;
         int index = toggler.getZIndex();
