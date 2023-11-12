@@ -33,7 +33,7 @@ public class Wall extends Block{
         solid = true;
         destructible = true;
         group = BlockGroup.walls;
-        buildCostMultiplier = 3f;
+        buildCostMultiplier = 6f;
         canOverdrive = false;
         drawDisabled = false;
         crushDamageMultiplier = 5f;

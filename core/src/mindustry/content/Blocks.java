@@ -1511,6 +1511,7 @@ public class Blocks{
             requirements(Category.defense, with(Items.copper, 15));
             health = 80 * wallHealthMultiplier;
             researchCostMultiplier = 0.1f;
+            buildCostMultiplier = 3f;
             envDisabled |= Env.scorching;
         }};
 
@@ -1518,12 +1519,14 @@ public class Blocks{
             requirements(Category.defense, ItemStack.mult(copperWall.requirements, 4));
             health = 80 * 4 * wallHealthMultiplier;
             size = 2;
+            buildCostMultiplier = 3f;
             envDisabled |= Env.scorching;
         }};
 
         titaniumWall = new Wall("titanium-wall"){{
             requirements(Category.defense, with(Items.titanium, 15));
             health = 110 * wallHealthMultiplier;
+            buildCostMultiplier = 3f;
             envDisabled |= Env.scorching;
         }};
 
@@ -1531,6 +1534,7 @@ public class Blocks{
             requirements(Category.defense, ItemStack.mult(titaniumWall.requirements, 4));
             health = 110 * wallHealthMultiplier * 4;
             size = 2;
+            buildCostMultiplier = 3f;
             envDisabled |= Env.scorching;
         }};
 
@@ -1540,6 +1544,7 @@ public class Blocks{
             insulated = true;
             absorbLasers = true;
             schematicPriority = 10;
+            buildCostMultiplier = 3f;
             envDisabled |= Env.scorching;
         }};
 
@@ -1550,12 +1555,14 @@ public class Blocks{
             insulated = true;
             absorbLasers = true;
             schematicPriority = 10;
+            buildCostMultiplier = 3f;
             envDisabled |= Env.scorching;
         }};
 
         thoriumWall = new Wall("thorium-wall"){{
             requirements(Category.defense, with(Items.thorium, 15));
             health = 200 * wallHealthMultiplier;
+            buildCostMultiplier = 3f;
             envDisabled |= Env.scorching;
         }};
 
@@ -1563,6 +1570,7 @@ public class Blocks{
             requirements(Category.defense, ItemStack.mult(thoriumWall.requirements, 4));
             health = 200 * wallHealthMultiplier * 4;
             size = 2;
+            buildCostMultiplier = 3f;
             envDisabled |= Env.scorching;
         }};
 
@@ -1571,6 +1579,7 @@ public class Blocks{
             health = 150 * wallHealthMultiplier;
             chanceDeflect = 10f;
             flashHit = true;
+            buildCostMultiplier = 3f;
             envDisabled |= Env.scorching;
         }};
 
@@ -1580,6 +1589,7 @@ public class Blocks{
             size = 2;
             chanceDeflect = 10f;
             flashHit = true;
+            buildCostMultiplier = 3f;
             envDisabled |= Env.scorching;
         }};
 
@@ -1587,6 +1597,7 @@ public class Blocks{
             requirements(Category.defense, with(Items.surgeAlloy, 15));
             health = 230 * wallHealthMultiplier;
             lightningChance = 0.05f;
+            buildCostMultiplier = 3f;
             envDisabled |= Env.scorching;
         }};
 
@@ -1595,12 +1606,14 @@ public class Blocks{
             health = 230 * 4 * wallHealthMultiplier;
             size = 2;
             lightningChance = 0.05f;
+            buildCostMultiplier = 3f;
             envDisabled |= Env.scorching;
         }};
 
         door = new Door("door"){{
             requirements(Category.defense, with(Items.titanium, 10, Items.silicon, 6));
             health = 100 * wallHealthMultiplier;
+            buildCostMultiplier = 3f;
             envDisabled |= Env.scorching;
         }};
 
@@ -1610,6 +1623,7 @@ public class Blocks{
             closefx = Fx.doorcloselarge;
             health = 100 * 4 * wallHealthMultiplier;
             size = 2;
+            buildCostMultiplier = 3f;
             envDisabled |= Env.scorching;
         }};
 
@@ -1617,6 +1631,7 @@ public class Blocks{
             requirements(Category.defense, BuildVisibility.sandboxOnly, with(Items.scrap, 15));
             health = 60 * wallHealthMultiplier;
             variants = 5;
+            buildCostMultiplier = 3f;
             envDisabled |= Env.scorching;
         }};
 
@@ -1625,6 +1640,7 @@ public class Blocks{
             health = 60 * 4 * wallHealthMultiplier;
             size = 2;
             variants = 4;
+            buildCostMultiplier = 3f;
             envDisabled |= Env.scorching;
         }};
 
@@ -1633,6 +1649,7 @@ public class Blocks{
             health = 60 * 9 * wallHealthMultiplier;
             size = 3;
             variants = 3;
+            buildCostMultiplier = 3f;
             envDisabled |= Env.scorching;
         }};
 
@@ -1640,6 +1657,7 @@ public class Blocks{
             requirements(Category.defense, BuildVisibility.sandboxOnly, ItemStack.mult(scrapWall.requirements, 16));
             health = 60 * 16 * wallHealthMultiplier;
             size = 4;
+            buildCostMultiplier = 3f;
             envDisabled |= Env.scorching;
         }};
 
@@ -1651,32 +1669,32 @@ public class Blocks{
         }};
 
         berylliumWall = new Wall("beryllium-wall"){{
-            requirements(Category.defense, with(Items.beryllium, 15));
+            requirements(Category.defense, with(Items.beryllium, 6));
             health = 130 * wallHealthMultiplier;
             armor = 2f;
-            buildCostMultiplier = 4f;
+            buildCostMultiplier = 8f;
         }};
 
         berylliumWallLarge = new Wall("beryllium-wall-large"){{
             requirements(Category.defense, ItemStack.mult(berylliumWall.requirements, 4));
             health = 130 * wallHealthMultiplier * 4;
             armor = 2f;
-            buildCostMultiplier = 2f;
+            buildCostMultiplier = 5f;
             size = 2;
         }};
 
         tungstenWall = new Wall("tungsten-wall"){{
-            requirements(Category.defense, with(Items.tungsten, 15));
+            requirements(Category.defense, with(Items.tungsten, 6));
             health = 180 * wallHealthMultiplier;
             armor = 14f;
-            buildCostMultiplier = 4f;
+            buildCostMultiplier = 8f;
         }};
 
         tungstenWallLarge = new Wall("tungsten-wall-large"){{
             requirements(Category.defense, ItemStack.mult(tungstenWall.requirements, 4));
             health = 180 * wallHealthMultiplier * 4;
             armor = 14f;
-            buildCostMultiplier = 2f;
+            buildCostMultiplier = 5f;
             size = 2;
         }};
 
@@ -1688,7 +1706,7 @@ public class Blocks{
         }};
 
         reinforcedSurgeWall = new Wall("reinforced-surge-wall"){{
-            requirements(Category.defense, with(Items.surgeAlloy, 8, Items.tungsten, 4));
+            requirements(Category.defense, with(Items.surgeAlloy, 6, Items.tungsten, 4));
             health = 250 * wallHealthMultiplier;
             lightningChance = 0.05f;
             lightningDamage = 30f;
@@ -1707,7 +1725,7 @@ public class Blocks{
         }};
 
         carbideWall = new Wall("carbide-wall"){{
-            requirements(Category.defense, with(Items.thorium, 12, Items.carbide, 12));
+            requirements(Category.defense, with(Items.thorium, 6, Items.carbide, 6));
             health = 270 * wallHealthMultiplier;
             armor = 16f;
         }};
@@ -1720,7 +1738,7 @@ public class Blocks{
         }};
 
         shieldedWall = new ShieldWall("shielded-wall"){{
-            requirements(Category.defense, ItemStack.with(Items.phaseFabric, 25, Items.surgeAlloy, 16, Items.beryllium, 16));
+            requirements(Category.defense, ItemStack.with(Items.phaseFabric, 20, Items.surgeAlloy, 12, Items.beryllium, 12));
             consumePower(3f / 60f);
 
             outputsPower = false;
