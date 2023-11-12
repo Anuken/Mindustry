@@ -1,1 +1,1 @@
-A factory-based sandbox tower defense game.
+An open-ended factory management game with RTS and tower defense elements

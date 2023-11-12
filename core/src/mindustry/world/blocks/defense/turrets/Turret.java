@@ -561,8 +561,16 @@ public class Turret extends ReloadTurret{
 
             shoot.shoot(barrelCounter, (xOffset, yOffset, angle, delay, mover) -> {
                 queuedBullets++;
+                int barrel = barrelCounter;
+
                 if(delay > 0f){
-                    Time.run(delay, () -> bullet(type, xOffset, yOffset, angle, mover));
+                    Time.run(delay, () -> {
+                        //hack: make sure the barrel is the same as what it was when the bullet was queued to fire
+                        int prev = barrelCounter;
+                        barrelCounter = barrel;
+                        bullet(type, xOffset, yOffset, angle, mover);
+                        barrelCounter = prev;
+                    });
                 }else{
                     bullet(type, xOffset, yOffset, angle, mover);
                 }

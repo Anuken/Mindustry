@@ -10,6 +10,7 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.ctype.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.LCanvas.*;
@@ -1392,6 +1393,11 @@ public class LStatements{
                     row(table);
                     field(table, value, s -> value = s);
                 }
+                case ban, unban -> {
+                    table.add(" block/unit ");
+
+                    field(table, value, s -> value = s);
+                }
                 default -> {
                     table.add(" = ");
 
@@ -1419,7 +1425,7 @@ public class LStatements{
     @RegisterStatement("message")
     public static class FlushMessageStatement extends LStatement{
         public MessageType type = MessageType.announce;
-        public String duration = "3";
+        public String duration = "3", outSuccess = "success";
 
         @Override
         public void build(Table table){
@@ -1438,12 +1444,14 @@ public class LStatements{
             }, Styles.logict, () -> {}).size(160f, 40f).padLeft(2).color(table.color);
 
             switch(type){
-                case announce, toast -> {
+                case announce, toast  -> {
                     table.add(" for ");
                     fields(table, duration, str -> duration = str);
                     table.add(" secs ");
                 }
             }
+            table.add(" success ");
+            fields(table, outSuccess, str -> outSuccess = str);
         }
 
         @Override
@@ -1453,7 +1461,7 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new FlushMessageI(type, builder.var(duration));
+            return new FlushMessageI(type, builder.var(duration), builder.var(outSuccess));
         }
 
         @Override
@@ -1594,7 +1602,7 @@ public class LStatements{
 
     @RegisterStatement("explosion")
     public static class ExplosionStatement extends LStatement{
-        public String team = "@crux", x = "0", y = "0", radius = "5", damage = "50", air = "true", ground = "true", pierce = "false";
+        public String team = "@crux", x = "0", y = "0", radius = "5", damage = "50", air = "true", ground = "true", pierce = "false", effect = "true";
 
         @Override
         public void build(Table table){
@@ -1609,6 +1617,8 @@ public class LStatements{
             row(table);
             fields(table, "ground", ground, str -> ground = str);
             fields(table, "pierce", pierce, str -> pierce = str);
+            table.row();
+            fields(table, "effect", effect, str -> effect = str);
         }
 
         @Override
@@ -1618,7 +1628,7 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler b){
-            return new ExplosionI(b.var(team), b.var(x), b.var(y), b.var(radius), b.var(damage), b.var(air), b.var(ground), b.var(pierce));
+            return new ExplosionI(b.var(team), b.var(x), b.var(y), b.var(radius), b.var(damage), b.var(air), b.var(ground), b.var(pierce), b.var(effect));
         }
 
         @Override
@@ -1905,6 +1915,111 @@ public class LStatements{
         @Override
         public LInstruction build(LAssembler builder){
             return new SetPropI(builder.var(type), builder.var(of), builder.var(value));
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.world;
+        }
+    }
+
+    @RegisterStatement("setmarker")
+    public static class SetMarkerStatement extends LStatement{
+        public LMarkerControl type = LMarkerControl.x;
+        public String id = "0", p1 = "0", p2 = "0", p3 = "0";
+
+        @Override
+        public void build(Table table){
+            rebuild(table);
+        }
+
+        void rebuild(Table table){
+            table.clearChildren();
+
+            table.add("set");
+
+            table.button(b -> {
+                b.label(() -> type.name());
+                b.clicked(() -> showSelect(b, LMarkerControl.all, type, t -> {
+                    type = t;
+                    rebuild(table);
+                }, 2, cell -> cell.size(140, 50)));
+            }, Styles.logict, () -> {}).size(190, 40).color(table.color).left().padLeft(2);
+
+            row(table);
+
+            fieldst(table, "of id#", id, str -> id = str);
+
+            //Q: why don't you just use arrays for this?
+            //A: arrays aren't as easy to serialize so the code generator doesn't handle them
+            for(int f = 0; f < type.params.length; f++){
+                int i = f;
+
+                table.table(t -> {
+                    t.setColor(table.color);
+
+                    fields(t, type.params[i], i == 0 ? p1 : i == 1 ? p2 : p3, i == 0 ? v -> p1 = v : i == 1 ? v -> p2 = v : v -> p3 = v).width(100f);
+                });
+
+                if(i == 0) row(table);
+                if(i == 2) table.row();
+            }
+        }
+
+        @Override
+        public boolean privileged(){
+            return true;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new SetMarkerI(type, builder.var(id), builder.var(p1), builder.var(p2), builder.var(p3));
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.world;
+        }
+    }
+
+    @RegisterStatement("makemarker")
+    public static class MakeMarkerStatement extends LStatement{
+        public String id = "0", type = "shape", x = "0", y = "0", replace = "true";
+
+        @Override
+        public void build(Table table){
+            table.clearChildren();
+
+            table.button(b -> {
+                b.label(() -> type);
+
+                b.clicked(() -> showSelect(b, MapObjectives.allMarkerTypeNames.toArray(String.class), type, t -> {
+                    type = t;
+                    build(table);
+                }, 2, cell -> cell.size(160, 50)));
+            }, Styles.logict, () -> {}).size(190, 40).color(table.color).left().padLeft(2);
+
+            fieldst(table, "id", id, str -> id = str);
+
+            row(table);
+
+            fieldst(table, "x", x, v -> x = v);
+
+            fieldst(table, "y", y, v -> y = v);
+
+            row(table);
+
+            fieldst(table, "replace", replace, v -> replace = v);
+        }
+
+        @Override
+        public boolean privileged(){
+            return true;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new MakeMarkerI(type, builder.var(id), builder.var(x), builder.var(y), builder.var(replace));
         }
 
         @Override
