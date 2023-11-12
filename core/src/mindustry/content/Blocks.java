@@ -1508,7 +1508,7 @@ public class Blocks{
         int wallHealthMultiplier = 4;
 
         copperWall = new Wall("copper-wall"){{
-            requirements(Category.defense, with(Items.copper, 6));
+            requirements(Category.defense, with(Items.copper, 15));
             health = 80 * wallHealthMultiplier;
             researchCostMultiplier = 0.1f;
             envDisabled |= Env.scorching;
@@ -1522,7 +1522,7 @@ public class Blocks{
         }};
 
         titaniumWall = new Wall("titanium-wall"){{
-            requirements(Category.defense, with(Items.titanium, 6));
+            requirements(Category.defense, with(Items.titanium, 15));
             health = 110 * wallHealthMultiplier;
             envDisabled |= Env.scorching;
         }};
@@ -1535,7 +1535,7 @@ public class Blocks{
         }};
 
         plastaniumWall = new Wall("plastanium-wall"){{
-            requirements(Category.defense, with(Items.plastanium, 5, Items.metaglass, 2));
+            requirements(Category.defense, with(Items.plastanium, 10, Items.metaglass, 6));
             health = 125 * wallHealthMultiplier;
             insulated = true;
             absorbLasers = true;
@@ -1554,7 +1554,7 @@ public class Blocks{
         }};
 
         thoriumWall = new Wall("thorium-wall"){{
-            requirements(Category.defense, with(Items.thorium, 6));
+            requirements(Category.defense, with(Items.thorium, 15));
             health = 200 * wallHealthMultiplier;
             envDisabled |= Env.scorching;
         }};
@@ -1567,7 +1567,7 @@ public class Blocks{
         }};
 
         phaseWall = new Wall("phase-wall"){{
-            requirements(Category.defense, with(Items.phaseFabric, 6));
+            requirements(Category.defense, with(Items.phaseFabric, 15));
             health = 150 * wallHealthMultiplier;
             chanceDeflect = 10f;
             flashHit = true;
@@ -1584,7 +1584,7 @@ public class Blocks{
         }};
 
         surgeWall = new Wall("surge-wall"){{
-            requirements(Category.defense, with(Items.surgeAlloy, 6));
+            requirements(Category.defense, with(Items.surgeAlloy, 15));
             health = 230 * wallHealthMultiplier;
             lightningChance = 0.05f;
             envDisabled |= Env.scorching;
@@ -1599,7 +1599,7 @@ public class Blocks{
         }};
 
         door = new Door("door"){{
-            requirements(Category.defense, with(Items.titanium, 6, Items.silicon, 4));
+            requirements(Category.defense, with(Items.titanium, 10, Items.silicon, 6));
             health = 100 * wallHealthMultiplier;
             envDisabled |= Env.scorching;
         }};
@@ -1614,7 +1614,7 @@ public class Blocks{
         }};
 
         scrapWall = new Wall("scrap-wall"){{
-            requirements(Category.defense, BuildVisibility.sandboxOnly, with(Items.scrap, 6));
+            requirements(Category.defense, BuildVisibility.sandboxOnly, with(Items.scrap, 15));
             health = 60 * wallHealthMultiplier;
             variants = 5;
             envDisabled |= Env.scorching;
@@ -1644,39 +1644,39 @@ public class Blocks{
         }};
 
         thruster = new Thruster("thruster"){{
-            requirements(Category.defense, BuildVisibility.sandboxOnly, with(Items.scrap, 96));
+            requirements(Category.defense, BuildVisibility.sandboxOnly, with(Items.scrap, 240));
             health = 55 * 16 * wallHealthMultiplier;
             size = 4;
             envDisabled |= Env.scorching;
         }};
 
         berylliumWall = new Wall("beryllium-wall"){{
-            requirements(Category.defense, with(Items.beryllium, 6));
+            requirements(Category.defense, with(Items.beryllium, 15));
             health = 130 * wallHealthMultiplier;
             armor = 2f;
-            buildCostMultiplier = 8f;
+            buildCostMultiplier = 4f;
         }};
 
         berylliumWallLarge = new Wall("beryllium-wall-large"){{
             requirements(Category.defense, ItemStack.mult(berylliumWall.requirements, 4));
             health = 130 * wallHealthMultiplier * 4;
             armor = 2f;
-            buildCostMultiplier = 5f;
+            buildCostMultiplier = 2f;
             size = 2;
         }};
 
         tungstenWall = new Wall("tungsten-wall"){{
-            requirements(Category.defense, with(Items.tungsten, 6));
+            requirements(Category.defense, with(Items.tungsten, 15));
             health = 180 * wallHealthMultiplier;
             armor = 14f;
-            buildCostMultiplier = 8f;
+            buildCostMultiplier = 4f;
         }};
 
         tungstenWallLarge = new Wall("tungsten-wall-large"){{
             requirements(Category.defense, ItemStack.mult(tungstenWall.requirements, 4));
             health = 180 * wallHealthMultiplier * 4;
             armor = 14f;
-            buildCostMultiplier = 5f;
+            buildCostMultiplier = 2f;
             size = 2;
         }};
 
@@ -1688,7 +1688,7 @@ public class Blocks{
         }};
 
         reinforcedSurgeWall = new Wall("reinforced-surge-wall"){{
-            requirements(Category.defense, with(Items.surgeAlloy, 6, Items.tungsten, 2));
+            requirements(Category.defense, with(Items.surgeAlloy, 8, Items.tungsten, 4));
             health = 250 * wallHealthMultiplier;
             lightningChance = 0.05f;
             lightningDamage = 30f;
@@ -1707,7 +1707,7 @@ public class Blocks{
         }};
 
         carbideWall = new Wall("carbide-wall"){{
-            requirements(Category.defense, with(Items.thorium, 6, Items.carbide, 6));
+            requirements(Category.defense, with(Items.thorium, 12, Items.carbide, 12));
             health = 270 * wallHealthMultiplier;
             armor = 16f;
         }};
@@ -1720,7 +1720,7 @@ public class Blocks{
         }};
 
         shieldedWall = new ShieldWall("shielded-wall"){{
-            requirements(Category.defense, ItemStack.with(Items.phaseFabric, 20, Items.surgeAlloy, 12, Items.beryllium, 12));
+            requirements(Category.defense, ItemStack.with(Items.phaseFabric, 25, Items.surgeAlloy, 16, Items.beryllium, 16));
             consumePower(3f / 60f);
 
             outputsPower = false;
