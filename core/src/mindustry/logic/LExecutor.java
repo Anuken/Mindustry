@@ -1064,16 +1064,6 @@ public class LExecutor{
 
             int placeholderIndex = exec.textBuffer.indexOf("@");
 
-            if(placeholderIndex - 1 >= 0){
-                // Skip when escape character is met
-                while(exec.textBuffer.charAt(placeholderIndex - 1) == '\\'){
-                    placeholderIndex = exec.textBuffer.indexOf("@", placeholderIndex + 1);
-
-                    // No placeholders left
-                    if(placeholderIndex == -1) return;
-                }
-            }
-
             if(placeholderIndex == -1) return;
 
             //this should avoid any garbage allocation
@@ -1109,9 +1099,7 @@ public class LExecutor{
             if(exec.building(target) instanceof MessageBuild d && (d.team == exec.team || exec.privileged)){
 
                 d.message.setLength(0);
-                // Backslash is an escape character for format instruction placeholders
-                String result = exec.textBuffer.toString().replace("\\@", "@");
-                d.message.append(result, 0, Math.min(result.length(), maxTextBuffer));
+                d.message.append(exec.textBuffer, 0, Math.min(exec.textBuffer.length(), maxTextBuffer));
 
             }
             exec.textBuffer.setLength(0);

@@ -75,26 +75,15 @@ public class MapLocales extends ObjectMap<String, StringMap> implements JsonSeri
             result.append(getProperty(currentLocale(), key));
         }
 
-        loop:
         for(var arg : args){
             int placeholderIndex = result.indexOf("@");
-
-            if(placeholderIndex - 1 >= 0){
-                // Skip when escape character is met
-                while(result.charAt(placeholderIndex - 1) == '\\'){
-                    placeholderIndex = result.indexOf("@", placeholderIndex + 1);
-
-                    // No placeholders left
-                    if(placeholderIndex == -1) break loop;
-                }
-            }
 
             if(placeholderIndex == -1) break;
 
             result.replace(placeholderIndex, placeholderIndex + 1, arg.toString());
         }
 
-        return result.toString().replace("\\@", "@");
+        return result.toString();
     }
 
     // To handle default locale properly
