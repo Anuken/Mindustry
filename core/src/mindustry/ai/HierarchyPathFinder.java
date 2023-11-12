@@ -28,7 +28,7 @@ public class HierarchyPathFinder implements Runnable{
 
     static final int clusterSize = 12;
 
-    static final boolean debug = true;
+    static final boolean debug = false;
 
     static final int[] offsets = {
     1, 0, //right: bottom to top
@@ -160,12 +160,10 @@ public class HierarchyPathFinder implements Runnable{
                 //is at the edge of a cluster; this means the portals may have changed.
                 if(mx == 0 || my == 0 || mx == clusterSize - 1 || my == clusterSize - 1){
 
-
                     if(mx == 0) queueClusterUpdate(cx - 1, cy); //left
                     if(my == 0) queueClusterUpdate(cx, cy - 1); //bottom
                     if(mx == clusterSize - 1) queueClusterUpdate(cx + 1, cy); //right
                     if(my == clusterSize - 1) queueClusterUpdate(cx, cy + 1); //top
-
 
                     queueClusterUpdate(cx, cy);
                     //TODO: recompute edge clusters too.
@@ -190,7 +188,7 @@ public class HierarchyPathFinder implements Runnable{
 
             for(var field : fieldList){
                 //skipped N update -> drop it
-                if(field.lastUpdateId <= state.updateId - 20){
+                if(field.lastUpdateId <= state.updateId - 30){
                     //make sure it's only modified on the main thread...? but what about calling get() on this thread??
                     queue.post(() -> fields.remove(field.goalPos));
                     Core.app.post(() -> fieldList.remove(field));
@@ -893,7 +891,7 @@ public class HierarchyPathFinder implements Runnable{
             if(addingFrontier){
 
                 for(int dir = 0; dir < 4; dir++){
-                    int ox = cx + moveDirs[dir * 2], oy = cy + moveDirs[dir * 2 + 1];
+                    int ox = cx + nextOffsets[dir * 2], oy = cy + nextOffsets[dir * 2 + 1];
 
                     if(ox < 0 || oy < 0 || ox >= cwidth || ox >= cheight) continue;
 
@@ -913,11 +911,15 @@ public class HierarchyPathFinder implements Runnable{
                         int x = otherx1 + movex * i, y = othery1 + movey * i;
 
                         //check to make sure it's not 0 (uninitialized flowfield data)
-                        if(otherField[x + y * clusterSize] != 0){
+                        if(otherField[x + y * clusterSize] > 0){
                             int worldX = x + ox * clusterSize, worldY = y + oy * clusterSize;
 
                             //add the world-relative position to the frontier, so it recalculates
                             cache.frontier.addFirst(worldX + worldY * wwidth);
+
+                            if(debug){
+                                Core.app.post(() -> Fx.placeBlock.at(worldX *tilesize, worldY * tilesize, 1f));
+                            }
                         }
                     }
                 }
@@ -976,7 +978,7 @@ public class HierarchyPathFinder implements Runnable{
 
                 //store directionals TODO can be out of bounds
                 for(Point2 p : Geometry.d4){
-                    addFlowCluster(cache, cluster + p.x + p.y * cwidth, addingFrontier);
+                    //addFlowCluster(cache, cluster + p.x + p.y * cwidth, addingFrontier);
                 }
 
                 //store directional/flipped version of cluster
@@ -987,7 +989,7 @@ public class HierarchyPathFinder implements Runnable{
 
                     //store directionals again
                     for(Point2 p : Geometry.d4){
-                        addFlowCluster(cache, other + p.x + p.y * cwidth, addingFrontier);
+                        //addFlowCluster(cache, other + p.x + p.y * cwidth, addingFrontier);
                     }
                 }
             }
@@ -1023,7 +1025,7 @@ public class HierarchyPathFinder implements Runnable{
         //TODO: the destination should not be the exact key. units have slightly different destinations based on offset from formation!
 
         //TODO raycast both diagonal edges to make sure it's reachable near corners
-        //var test = Geometry.raycastRect(unit.x, unit.y, current.worldx(), current.worldy(), Tmp.r1.setCentered(1f, 1f, tilesize).grow(7.8f)) != null;
+        //
 
         boolean any = false;
 
@@ -1039,18 +1041,20 @@ public class HierarchyPathFinder implements Runnable{
                 fieldCache.lastUpdateId = state.updateId;
                 int maxIterations = 30; //TODO higher/lower number?
                 int i = 0;
+                //TODO: tanks do not reach max speed when near a tile they are flowing to.
 
                 if(tileOn.pos() != request.lastTile || request.lastTargetTile == null){
                     //TODO tanks have weird behavior near edges of walls, as they try to avoid them
+                    boolean anyNearSolid = false;
 
-                    while(i ++ < maxIterations && (!any || !raycast(team, cost, tileX, tileY, tileOn.x, tileOn.y))){
-                        //TODO: if there's no flowfield at this position, add it.
-                        int value = getCost(fieldCache.fields, tileOn.x, tileOn.y);
+                    //find the next tile until one near a solid block is discovered
+                    while(i ++ < maxIterations && !anyNearSolid){
+                        int value = getCost(fieldCache, tileOn.x, tileOn.y);
 
                         Tile current = null;
                         int minCost = 0;
-                        //TODO: use raycasting and iterate on this for N steps
-                        for(Point2 point : Geometry.d8){
+                        for(int dir = 0; dir < 8; dir ++){
+                            Point2 point = Geometry.d8[dir];
                             int dx = tileOn.x + point.x, dy = tileOn.y + point.y;
 
                             Tile other = world.tile(dx, dy);
@@ -1058,32 +1062,51 @@ public class HierarchyPathFinder implements Runnable{
                             if(other == null) continue;
 
                             int packed = world.packArray(dx, dy);
-                            int otherCost = getCost(fieldCache.fields, dx, dy);
+                            int otherCost = getCost(fieldCache, dx, dy), relCost = otherCost - value;
 
-                            //TODO: issue with hugging corners (you should not be able to move diagonally when there is a wall in the way)
+                            if(relCost > 2 || otherCost <= 0){
+                                anyNearSolid = true;
+                            }
 
-                            if(otherCost < value && (current == null || otherCost < minCost) && passable(cost, unit.team.id, packed) &&
+                            if(relCost == 7 || relCost == 8) otherCost = value + 1;
+
+                            //check for corner preventing movement
+                            if((checkCorner(unit, tileOn, other, dir - 1) || checkCorner(unit, tileOn, other, dir + 1)) &&
+                                (checkSolid(unit, tileOn, dir - 2) || checkSolid(unit, tileOn, dir + 2))){ //there must be a tile to the left or right to keep the unit from going back and forth forever
+
+                                //keep moving even if it's blocked
+                                any = true;
+                                continue;
+                            }
+
+                            if(otherCost < value && otherCost != impassable && (otherCost != 0 || packed == destPos) && (current == null || otherCost < minCost) && passable(cost, unit.team.id, packed) &&
                             //diagonal corner trap
                             !(
                             (!passable(cost, team, world.packArray(tileOn.x + point.x, tileOn.y)) ||
                             (!passable(cost, team, world.packArray(tileOn.x, tileOn.y + point.y))))
                             )
                             ){
-
                                 current = other;
                                 minCost = otherCost;
                             }
                         }
 
-                        if(!(current == null || minCost == impassable || (costId == costGround && current.dangerous() && !tileOn.dangerous()))){
+                        if(!(current == null || (costId == costGround && current.dangerous() && !tileOn.dangerous()))){
                             tileOn = current;
                             any = true;
+
+                            if(current.array() == destPos){
+                                break;
+                            }
                         }else{
                             break;
                         }
                     }
 
                     request.lastTargetTile = any ? tileOn : null;
+                    if(debug && tileOn != null){
+                        Fx.placeBlock.at(tileOn.worldx(), tileOn.worldy(), 1);
+                    }
                 }
 
                 if(request.lastTargetTile != null){
@@ -1108,10 +1131,36 @@ public class HierarchyPathFinder implements Runnable{
             return true;
         }
 
-        if(request != null){
-            noResultFound[0] = request.notFound;
-        }
+        noResultFound[0] = request.notFound;
         return false;
+    }
+
+    private boolean checkSolid(Unit unit, Tile tile, int dir){
+        var p = Geometry.d8[Mathf.mod(dir, 8)];
+        return !unit.canPass(tile.x + p.x, tile.y + p.y);
+    }
+
+    private boolean checkCorner(Unit unit, Tile tile, Tile next, int dir){
+        Tile other = tile.nearby(Geometry.d8[Mathf.mod(dir, 8)]);
+        if(other == null){
+            return true;
+        }
+
+        if(!unit.canPass(other.x, other.y)){
+            return Geometry.raycastRect(unit.x, unit.y, next.worldx(), next.worldy(), Tmp.r1.setCentered(other.worldx(), other.worldy(), tilesize).grow(Math.min(unit.hitSize * 0.66f, 7.6f))) != null;
+        }
+
+        return false;
+    }
+
+    private int getCost(FieldCache cache, int x, int y){
+        int[] field = cache.fields.get(x / clusterSize + (y / clusterSize) * cwidth);
+        if(field == null){
+            //request a new flow cluster if one wasn't found; this may be a spammed a bit, but the function will return early once it's created the first time
+            queue.post(() -> addFlowCluster(cache, x / clusterSize, y / clusterSize, true));
+            return -1;
+        }
+        return field[(x % clusterSize) + (y % clusterSize) * clusterSize];
     }
 
     private static boolean raycast(int team, PathCost type, int x1, int y1, int x2, int y2){
@@ -1155,14 +1204,6 @@ public class HierarchyPathFinder implements Runnable{
     private static boolean avoid(int team, PathCost type, int tilePos){
         int cost = cost(team, type, tilePos);
         return cost == impassable || cost >= 2;
-    }
-
-    private int getCost(IntMap<int[]> fields, int x, int y){
-        int[] field = fields.get(x / clusterSize + (y / clusterSize) * cwidth);
-        if(field == null){
-            return -1;
-        }
-        return field[(x % clusterSize) + (y % clusterSize) * clusterSize];
     }
 
     private static boolean passable(PathCost cost, int team, int pos){
