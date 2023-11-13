@@ -174,6 +174,10 @@ public class LStatements{
                     }
                     case col -> {
                         fields(s, "color", x, v -> x = v).width(144f);
+                        col(s, x, res -> {
+                            x = "%" + res.toString().substring(0, res.a >= 1f ? 6 : 8);
+                            build(table);
+                        });
                     }
                     case stroke -> {
                         s.add().width(4);
@@ -1554,22 +1558,10 @@ public class LStatements{
                 if(entry.color){
                     fields(table, "color", color, str -> color = str).width(120f);
 
-                    table.button(b -> {
-                        b.image(Icon.pencilSmall);
-                        b.clicked(() -> {
-                            Color current = Pal.accent.cpy();
-                            if(color.startsWith("%")){
-                                try{
-                                    current = Color.valueOf(color.substring(1));
-                                }catch(Exception ignored){}
-                            }
-
-                            ui.picker.show(current, result -> {
-                                color = "%" + result.toString().substring(0, result.a >= 1f ? 6 : 8);
-                                build(table);
-                            });
-                        });
-                    }, Styles.logict, () -> {}).size(40f).padLeft(-11).color(table.color);
+                    col(table, color, res -> {
+                        color = "%" + res.toString().substring(0, res.a >= 1f ? 6 : 8);
+                        build(table);
+                    });
                 }
 
                 row(table);
@@ -1959,6 +1951,30 @@ public class LStatements{
                     t.setColor(table.color);
 
                     fields(t, type.params[i], i == 0 ? p1 : i == 1 ? p2 : p3, i == 0 ? v -> p1 = v : i == 1 ? v -> p2 = v : v -> p3 = v).width(100f);
+                    if(type == LMarkerControl.color){
+                        col(t, p1, res -> {
+                            p1 = "%" + res.toString().substring(0, res.a >= 1f ? 6 : 8);
+                            build(table);
+                        });
+                    }else if(type == LMarkerControl.drawLayer){
+                        t.button(b -> {
+                            b.image(Icon.pencilSmall);
+                            b.clicked(() -> showSelectTable(b, (o, hide) -> {
+                                o.row();
+                                o.table(s -> {
+                                    s.left();
+                                    for(var layer : Layer.class.getFields()){
+                                        float value = Reflect.get(Layer.class, layer.getName());
+                                        s.button(layer.getName() + " = " + value, Styles.logicTogglet, () -> {
+                                            p1 = Float.toString(value);
+                                            rebuild(table);
+                                            hide.run();
+                                        }).size(240f, 40f).row();
+                                    }
+                                }).width(240f).left();
+                            }));
+                        }, Styles.logict, () -> {}).size(40f).padLeft(-2).color(table.color);
+                    }
                 });
 
                 if(i == 0) row(table);

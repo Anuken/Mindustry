@@ -609,12 +609,14 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         }
     }
 
-    /** Marker used for drawing UI to indicate something along with an objective. */
+    /** Marker used for drawing various content to indicate something along with an objective. Mostly used as UI overlay.  */
     public static abstract class ObjectiveMarker{
         /** Makes sure markers are only added once. */
         public transient boolean wasAdded;
-        /** Hides the marker, used by world processors */
-        public boolean hidden = false;
+        /** Hides the marker, used by world processors. */
+        protected boolean hidden = false;
+        /** On which z-sorting layer is marker drawn. */
+        protected float drawLayer = Layer.overlayUI;
 
         /** Called in the overlay draw layer.*/
         public void draw(){}
@@ -628,7 +630,8 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public void control(LMarkerControl type, double p1, double p2, double p3){
             switch(type){
                 case toggleVisibility -> hidden = !hidden;
-                case setVisibility -> hidden = ((Math.abs(p1) < 1e-5));
+                case visibility -> hidden = ((Math.abs(p1) < 1e-5));
+                case drawLayer -> drawLayer = (float)p1;
             }
         }
         public void setText(String text, boolean fetch){}
@@ -700,10 +703,12 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             //in case some idiot decides to make 9999999 sides and freeze the game
             int sides = Math.min(this.sides, 200);
 
+            Draw.z(drawLayer);
             Lines.stroke(3f, Pal.gray);
             Lines.poly(pos.x, pos.y, sides, radius + 1f, rotation);
             Lines.stroke(1f, color);
             Lines.poly(pos.x, pos.y, sides, radius + 1f, rotation);
+            Draw.z(Layer.overlayUI);
             Draw.reset();
 
             if(fetchedText == null){
@@ -713,7 +718,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             // font size cannot be 0
             if(Math.abs(fontSize) < 1e-5) return;
 
-            WorldLabel.drawAt(fetchedText, pos.x, pos.y + radius + textHeight, Draw.z(), flags, fontSize);
+            WorldLabel.drawAt(fetchedText, pos.x, pos.y + radius + textHeight, drawLayer, flags, fontSize);
         }
 
         @Override
@@ -794,8 +799,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             float rad = minimap.scale(radius * tilesize);
             float fin = Interp.pow2Out.apply((Time.globalTime / 100f) % 1f);
 
+            Draw.z(drawLayer);
             Lines.stroke(Scl.scl((1f - fin) * stroke + 0.1f), color);
             Lines.circle(Tmp.v1.x, Tmp.v1.y, rad * fin);
+
+            Draw.z(Layer.overlayUI);
             Draw.reset();
         }
 
@@ -840,6 +848,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             //in case some idiot decides to make 9999999 sides and freeze the game
             int sides = Math.min(this.sides, 200);
 
+            Draw.z(drawLayer);
             if(!fill){
                 if(outline){
                     Lines.stroke(stroke + 2f, Pal.gray);
@@ -853,6 +862,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                 Fill.poly(pos.x, pos.y, sides, radius, rotation);
             }
 
+            Draw.z(Layer.overlayUI);
             Draw.reset();
         }
 
@@ -868,7 +878,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                 case shapeSides -> sides = (int)p1;
                 case shapeFill -> fill = (Math.abs(p1) >= 1e-5);
                 case shapeOutline -> outline = (Math.abs(p1) >= 1e-5);
-                case setShape -> {
+                case shape -> {
                     sides = (int)p1;
                     fill = (Math.abs(p2) >= 1e-5);
                     outline = (Math.abs(p3) >= 1e-5);
@@ -911,7 +921,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                 fetchedText = fetchText(text);
             }
 
-            WorldLabel.drawAt(fetchedText, pos.x, pos.y, Draw.z(), flags, fontSize);
+            WorldLabel.drawAt(fetchedText, pos.x, pos.y, drawLayer, flags, fontSize);
         }
 
         @Override
@@ -994,6 +1004,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public void draw(){
             if(hidden) return;
 
+            Draw.z(drawLayer);
             if(outline){
                 Lines.stroke(stroke + 2f, Pal.gray);
                 Lines.line(pos1.x, pos1.y, pos2.x, pos2.y);
@@ -1047,6 +1058,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             if(width < 1e-5) width = fetchedRegion.width * fetchedRegion.scl() * Draw.xscl;
             if(height < 1e-5) height = fetchedRegion.height * fetchedRegion.scl() * Draw.yscl;
 
+            Draw.z(drawLayer);
             if(fetchedRegion.found()){
                 Draw.color(color);
                 Draw.rect(fetchedRegion, pos.x, pos.y, width, height, rotation);
@@ -1054,6 +1066,8 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                 Draw.color(Color.white);
                 Draw.rect("error", pos.x, pos.y, width, height, rotation);
             }
+
+            Draw.z(Layer.overlayUI);
         }
 
         @Override
