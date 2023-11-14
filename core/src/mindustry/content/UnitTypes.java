@@ -1281,7 +1281,7 @@ public class UnitTypes{
             accel = 0.1f;
             range = 130f;
             health = 400;
-            buildSpeed = 0.6f;
+            buildSpeed = 0.5f;
             engineOffset = 6.5f;
             hitSize = 9f;
             lowAltitude = true;
@@ -1341,7 +1341,7 @@ public class UnitTypes{
             hitSize = 16.05f;
             engineSize = 3f;
             payloadCapacity = (2 * 2) * tilePayload;
-            buildSpeed = 1.6f;
+            buildSpeed = 2f;
             isEnemy = false;
 
             ammoType = new PowerAmmoType(1100);
