@@ -22,8 +22,8 @@ import static mindustry.ai.Pathfinder.*;
 //https://webdocs.cs.ualberta.ca/~mmueller/ps/hpastar.pdf
 //https://www.gameaipro.com/GameAIPro/GameAIPro_Chapter23_Crowd_Pathfinding_and_Steering_Using_Flow_Field_Tiles.pdf
 public class HierarchyPathFinder implements Runnable{
-    private static final long maxUpdate = 100;//Time.millisToNanos(12);
-    private static final int updateStepInterval = 20;//200;
+    private static final long maxUpdate = Time.millisToNanos(12);
+    private static final int updateStepInterval = 200;
     private static final int updateFPS = 30;
     private static final int updateInterval = 1000 / updateFPS, invalidateCheckInterval = 1000;
 
