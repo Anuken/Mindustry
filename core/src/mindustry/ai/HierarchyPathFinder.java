@@ -992,8 +992,8 @@ public class HierarchyPathFinder implements Runnable{
         return ControlPathfinder.costTypes.get(costId);
     }
 
-    public boolean getPathPosition(Unit unit, int pathId, Vec2 destination, Vec2 mainDestination, Vec2 out, @Nullable boolean[] noResultFound){
-        int costId = 0;
+    public boolean getPathPosition(Unit unit, Vec2 destination, Vec2 mainDestination, Vec2 out, @Nullable boolean[] noResultFound){
+        int costId = unit.type.pathCostId;
         PathCost cost = idToCost(costId);
 
         int
@@ -1006,6 +1006,7 @@ public class HierarchyPathFinder implements Runnable{
         actualDestY = World.toTile(destination.y),
         destPos = destX + destY * wwidth;
 
+        //TODO: what if the destination is different...?
         PathRequest request = unitRequests.get(unit);
 
         //if the destination can be trivially reached in a straight line, do that.

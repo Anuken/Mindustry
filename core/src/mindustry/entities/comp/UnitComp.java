@@ -403,7 +403,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         return type.allowLegStep && type.legPhysicsLayer ? PhysicsProcess.layerLegs : isGrounded() ? PhysicsProcess.layerGround : PhysicsProcess.layerFlying;
     }
 
-    /** @return pathfinder path type for calculating costs */
+    /** @return pathfinder path type for calculating costs. This is used for wave AI only. (TODO: remove) */
     public int pathType(){
         return Pathfinder.costGround;
     }
