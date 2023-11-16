@@ -23,8 +23,9 @@ import static mindustry.ai.Pathfinder.*;
 //https://www.gameaipro.com/GameAIPro/GameAIPro_Chapter23_Crowd_Pathfinding_and_Steering_Using_Flow_Field_Tiles.pdf
 public class HierarchyPathFinder implements Runnable{
     private static final long maxUpdate = 100;//Time.millisToNanos(12);
+    private static final int updateStepInterval = 20;//200;
     private static final int updateFPS = 30;
-    private static final int updateInterval = 1000 / updateFPS;
+    private static final int updateInterval = 1000 / updateFPS, invalidateCheckInterval = 1000;
 
     static final int clusterSize = 12;
 
@@ -65,6 +66,8 @@ public class HierarchyPathFinder implements Runnable{
     //individual requests based on unit - MAIN THREAD ONLY
     ObjectMap<Unit, PathRequest> unitRequests = new ObjectMap<>();
 
+    Seq<PathRequest> threadPathRequests = new Seq<>(false);
+
     //TODO: very dangerous usage;
     //TODO - it is accessed from the main thread
     //TODO - it is written to on the pathfinding thread
@@ -81,10 +84,7 @@ public class HierarchyPathFinder implements Runnable{
     IntSet clustersToUpdate = new IntSet();
     IntSet clustersToInnerUpdate = new IntSet();
 
-    //invalid request implies invalid field as well.
-    //there should be a list of temporary evicted fields...
-    //TODO path requests should not be actually invalidated until the paths they refer to have completed processing.
-    // - also, only do this every couple of seconds at least.
+    //PATHFINDING THREAD - requests that should be recomputed
     ObjectSet<PathRequest> invalidRequests = new ObjectSet<>();
 
     /** Current pathfinding thread */
@@ -93,16 +93,16 @@ public class HierarchyPathFinder implements Runnable{
     //path requests are per-unit
     static class PathRequest{
         final Unit unit;
-        final int destination, team;
+        final int destination, team, costId;
         //resulting path of nodes
         final IntSeq resultPath = new IntSeq();
 
         //node index -> total cost
-        IntFloatMap costs = new IntFloatMap();
+        @Nullable IntFloatMap costs = new IntFloatMap();
         //node index (NodeIndex struct) -> node it came from TODO merge them, make properties of FieldCache?
-        IntIntMap cameFrom = new IntIntMap();
+        @Nullable IntIntMap cameFrom = new IntIntMap();
         //frontier for A*
-        PathfindQueue frontier = new PathfindQueue();
+        @Nullable PathfindQueue frontier = new PathfindQueue();
 
         //main thread only!
         long lastUpdateId = state.updateId;
@@ -110,12 +110,15 @@ public class HierarchyPathFinder implements Runnable{
         //both threads
         volatile boolean notFound = false;
         volatile boolean invalidated = false;
+        //old field assigned before everything was recomputed
+        @Nullable volatile FieldCache oldCache;
 
         int lastTile;
         @Nullable Tile lastTargetTile;
 
-        PathRequest(Unit unit, int team, int destination){
+        PathRequest(Unit unit, int team, int costId, int destination){
             this.unit = unit;
+            this.costId = costId;
             this.team = team;
             this.destination = destination;
         }
@@ -193,6 +196,7 @@ public class HierarchyPathFinder implements Runnable{
                 if(req.lastUpdateId <= state.updateId - 10){
                     req.invalidated = true;
                     //concurrent modification!
+                    queue.post(() -> threadPathRequests.remove(req));
                     Core.app.post(() -> unitRequests.remove(req.unit));
                 }
             }
@@ -887,7 +891,7 @@ public class HierarchyPathFinder implements Runnable{
             }
 
             //every N iterations, check the time spent - this prevents extra calls to nano time, which itself is slow
-            if(nsToRun >= 0 && (counter++) >= 200){
+            if(nsToRun >= 0 && (counter++) >= updateStepInterval){
                 counter = 0;
                 if(Time.timeSinceNanos(start) >= nsToRun){
                     return;
@@ -1045,6 +1049,12 @@ public class HierarchyPathFinder implements Runnable{
             FieldCache fieldCache = fields.get(destPos);
 
             if(fieldCache != null && tileOn != null){
+                FieldCache old = request.oldCache;
+                //nullify the old field to be GCed, as it cannot be relevant anymore (this path is complete)
+                if(fieldCache.frontier.isEmpty() && old != null){
+                    request.oldCache = null;
+                }
+
                 fieldCache.lastUpdateId = state.updateId;
                 int maxIterations = 30; //TODO higher/lower number?
                 int i = 0;
@@ -1055,7 +1065,7 @@ public class HierarchyPathFinder implements Runnable{
 
                     //find the next tile until one near a solid block is discovered
                     while(i ++ < maxIterations && !anyNearSolid){
-                        int value = getCost(fieldCache, tileOn.x, tileOn.y);
+                        int value = getCost(fieldCache, old, tileOn.x, tileOn.y);
 
                         Tile current = null;
                         int minCost = 0;
@@ -1068,7 +1078,7 @@ public class HierarchyPathFinder implements Runnable{
                             if(other == null) continue;
 
                             int packed = world.packArray(dx, dy);
-                            int otherCost = getCost(fieldCache, dx, dy), relCost = otherCost - value;
+                            int otherCost = getCost(fieldCache, old, dx, dy), relCost = otherCost - value;
 
                             if(relCost > 2 || otherCost <= 0){
                                 anyNearSolid = true;
@@ -1124,13 +1134,14 @@ public class HierarchyPathFinder implements Runnable{
         }else if(request == null){
 
             //queue new request.
-            unitRequests.put(unit, request = new PathRequest(unit, team, destPos));
+            unitRequests.put(unit, request = new PathRequest(unit, team, costId, destPos));
 
             PathRequest f = request;
 
             //on the pathfinding thread: initialize the request
             queue.post(() -> {
-                initializePathRequest(f, unit.team.id, costId, unit.tileX(), unit.tileY(), destX, destY);
+                threadPathRequests.add(f);
+                recalculatePath(f);
             });
 
             out.set(destination);
@@ -1142,6 +1153,10 @@ public class HierarchyPathFinder implements Runnable{
             noResultFound[0] = request.notFound;
         }
         return false;
+    }
+
+    private void recalculatePath(PathRequest request){
+        initializePathRequest(request, request.team, request.costId, request.unit.tileX(), request.unit.tileY(), request.destination % wwidth, request.destination / wwidth);
     }
 
     private boolean checkSolid(Unit unit, Tile tile, int dir){
@@ -1162,12 +1177,21 @@ public class HierarchyPathFinder implements Runnable{
         return false;
     }
 
-    private int getCost(FieldCache cache, int x, int y){
+    private int getCost(FieldCache cache, FieldCache old, int x, int y){
+        //fall back to the old flowfield when possible - it's best not to use partial results from the base cache
+        if(old != null){
+            return getCost(old, x, y, false);
+        }
+        return getCost(cache, x, y, true);
+    }
+
+    private int getCost(FieldCache cache, int x, int y, boolean requeue){
         int[] field = cache.fields.get(x / clusterSize + (y / clusterSize) * cwidth);
         if(field == null){
+            if(!requeue) return 0;
             //request a new flow cluster if one wasn't found; this may be a spammed a bit, but the function will return early once it's created the first time
             queue.post(() -> addFlowCluster(cache, x / clusterSize, y / clusterSize, true));
-            return -1;
+            return 0;
         }
         return field[(x % clusterSize) + (y % clusterSize) * clusterSize];
     }
@@ -1250,9 +1274,16 @@ public class HierarchyPathFinder implements Runnable{
 
         //TODO go through each path request:
         // - if it contains this cluster in its field:
-        //   - mark for it to be recomputed next frame in a Set (so it doesn't happen twice!)
-        //   - recomputing should invalidate the flowfield
-        //   - invalidations should be batched every few seconds (let's say, 2)
+        //   - DONE mark for it to be recomputed next frame in a Set (so it doesn't happen twice!)
+        //   - DONE recomputing should invalidate the flowfield
+        //   - recomputing should save the old flowfield Somewhere
+        //   - DONE invalidations should be batched every few seconds (let's say, 2)
+        for(var req : threadPathRequests){
+            var field = fields.get(req.destination);
+            if(field != null && field.fields.containsKey(index)){
+                invalidRequests.add(req);
+            }
+        }
 
     }
 
@@ -1294,9 +1325,12 @@ public class HierarchyPathFinder implements Runnable{
 
     @Override
     public void run(){
+        long lastInvalidCheck = Time.millis() + invalidateCheckInterval;
+
         while(true){
             if(net.client()) return;
             try{
+
 
                 if(state.isPlaying()){
                     queue.run();
@@ -1315,6 +1349,49 @@ public class HierarchyPathFinder implements Runnable{
 
                     clustersToInnerUpdate.clear();
                     clustersToUpdate.clear();
+
+                    //periodically check for invalidated paths
+                    if(Time.timeSinceMillis(lastInvalidCheck) > invalidateCheckInterval){
+                        lastInvalidCheck = Time.millis();
+
+                        var it = invalidRequests.iterator();
+                        while(it.hasNext()){
+                            var request = it.next();
+
+                            //invalid request, ignore it
+                            if(request.invalidated){
+                                it.remove();
+                                continue;
+                            }
+
+                            var field = fields.get(request.destination);
+
+                            if(field != null){
+                                //it's only worth recalculating a path when the current frontier has finished; otherwise the unit will be following something incomplete.
+                                if(field.frontier.isEmpty()){
+
+                                    //remove the field, to be recalculated next update one recalculatePath is processed
+                                    fields.remove(field.goalPos);
+                                    Core.app.post(() -> fieldList.remove(field));
+
+                                    //once the field is invalidated, make sure that all the requests that have it stored in their 'old' field, so units don't stutter during recalculations
+                                    for(var otherRequest : threadPathRequests){
+                                        if(otherRequest.destination == request.destination){
+                                            otherRequest.oldCache = field;
+                                        }
+                                    }
+
+                                    //the recalculation is done next update, so multiple path requests in the same batch don't end up removing and recalculating the field multiple times.
+                                    queue.post(() -> recalculatePath(request));
+                                    //it has been processed.
+                                    it.remove();
+                                }
+                            }else{ //there's no field, presumably because a previous request already invalidated it.
+                                queue.post(() -> recalculatePath(request));
+                                it.remove();
+                            }
+                        }
+                    }
 
                     //each update time (not total!) no longer than maxUpdate
                     for(FieldCache cache : fields.values()){
