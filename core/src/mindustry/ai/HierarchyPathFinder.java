@@ -29,7 +29,7 @@ public class HierarchyPathFinder implements Runnable{
 
     static final int clusterSize = 12;
 
-    static final boolean debug = true;
+    static final boolean debug = OS.hasProp("mindustry.debug");
 
     static final int[] offsets = {
     1, 0, //right: bottom to top
