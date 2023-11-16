@@ -81,6 +81,12 @@ public class HierarchyPathFinder implements Runnable{
     IntSet clustersToUpdate = new IntSet();
     IntSet clustersToInnerUpdate = new IntSet();
 
+    //invalid request implies invalid field as well.
+    //there should be a list of temporary evicted fields...
+    //TODO path requests should not be actually invalidated until the paths they refer to have completed processing.
+    // - also, only do this every couple of seconds at least.
+    ObjectSet<PathRequest> invalidRequests = new ObjectSet<>();
+
     /** Current pathfinding thread */
     @Nullable Thread thread;
 
@@ -90,18 +96,22 @@ public class HierarchyPathFinder implements Runnable{
         final int destination, team;
         //resulting path of nodes
         final IntSeq resultPath = new IntSeq();
+
         //node index -> total cost
-        final IntFloatMap costs = new IntFloatMap();
-        //node index (NodeIndex struct) -> node it came from TODO merge them
-        final IntIntMap cameFrom = new IntIntMap();
+        IntFloatMap costs = new IntFloatMap();
+        //node index (NodeIndex struct) -> node it came from TODO merge them, make properties of FieldCache?
+        IntIntMap cameFrom = new IntIntMap();
         //frontier for A*
-        final PathfindQueue frontier = new PathfindQueue();
+        PathfindQueue frontier = new PathfindQueue();
 
         //main thread only!
         long lastUpdateId = state.updateId;
-        volatile boolean notFound = false;
 
-        int lastTile; //TODO only re-raycast when unit moves a tile.
+        //both threads
+        volatile boolean notFound = false;
+        volatile boolean invalidated = false;
+
+        int lastTile;
         @Nullable Tile lastTargetTile;
 
         PathRequest(Unit unit, int team, int destination){
@@ -181,6 +191,7 @@ public class HierarchyPathFinder implements Runnable{
             for(var req : unitRequests.values()){
                 //skipped N update -> drop it
                 if(req.lastUpdateId <= state.updateId - 10){
+                    req.invalidated = true;
                     //concurrent modification!
                     Core.app.post(() -> unitRequests.remove(req.unit));
                 }
@@ -729,14 +740,17 @@ public class HierarchyPathFinder implements Runnable{
             return result;
         }
 
+        var team = request.team;
+
+        if(request.costs == null) request.costs = new IntFloatMap();
+        if(request.cameFrom == null) request.cameFrom = new IntIntMap();
+        if(request.frontier == null) request.frontier = new PathfindQueue();
+
+        //note: these are NOT cleared, it is assumed that this function cleans up after itself at the end
+        //is this a good idea? don't know, might hammer the GC with unnecessary objects too
         var costs = request.costs;
         var cameFrom = request.cameFrom;
         var frontier = request.frontier;
-        var team = request.team;
-
-        frontier.clear();
-        costs.clear();
-        cameFrom.clear();
 
         cameFrom.put(startNodeIndex, startNodeIndex);
         costs.put(startNodeIndex, 0);
@@ -773,6 +787,12 @@ public class HierarchyPathFinder implements Runnable{
                 }
             }
         }
+
+        //null them out, so they get GC'ed later
+        //there's no reason to keep them around and waste memory, since this path may never be recalculated
+        request.costs = null;
+        request.cameFrom = null;
+        request.frontier = null;
 
         if(foundEnd){
             result.clear();
@@ -1006,7 +1026,6 @@ public class HierarchyPathFinder implements Runnable{
         actualDestY = World.toTile(destination.y),
         destPos = destX + destY * wwidth;
 
-        //TODO: what if the destination is different...?
         PathRequest request = unitRequests.get(unit);
 
         //if the destination can be trivially reached in a straight line, do that.
@@ -1029,7 +1048,6 @@ public class HierarchyPathFinder implements Runnable{
                 fieldCache.lastUpdateId = state.updateId;
                 int maxIterations = 30; //TODO higher/lower number?
                 int i = 0;
-                //TODO: tanks do not reach max speed when near a tile they are flowing to.
 
                 if(tileOn.pos() != request.lastTile || request.lastTargetTile == null){
                     //TODO tanks have weird behavior near edges of walls, as they try to avoid them
@@ -1091,8 +1109,7 @@ public class HierarchyPathFinder implements Runnable{
                         }
                     }
 
-                    //TODO: there are some serious issues with tileOn and the raycast position...
-                    //TODO intense vibration
+                    //TODO: there are some serious issues with tileOn and the raycast position, intense vibration
                     request.lastTargetTile = any ? tileOn : null;
                     if(debug && tileOn != null && false){
                         Fx.placeBlock.at(tileOn.worldx(), tileOn.worldy(), 1);
@@ -1228,6 +1245,15 @@ public class HierarchyPathFinder implements Runnable{
         //reset all flowfields that contain this cluster
         //remove all paths that contain this cluster
         //VERY important: don't replace all the data.
+
+        int index = cx + cy * cwidth;
+
+        //TODO go through each path request:
+        // - if it contains this cluster in its field:
+        //   - mark for it to be recomputed next frame in a Set (so it doesn't happen twice!)
+        //   - recomputing should invalidate the flowfield
+        //   - invalidations should be batched every few seconds (let's say, 2)
+
     }
 
     private void updateClustersComplete(int clusterIndex){
