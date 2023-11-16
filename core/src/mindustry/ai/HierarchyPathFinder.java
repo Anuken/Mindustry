@@ -29,7 +29,7 @@ public class HierarchyPathFinder implements Runnable{
 
     static final int clusterSize = 12;
 
-    static final boolean debug = OS.hasProp("mindustry.debug");
+    static final boolean debug = false;//OS.hasProp("mindustry.debug");
 
     static final int[] offsets = {
     1, 0, //right: bottom to top
@@ -145,6 +145,12 @@ public class HierarchyPathFinder implements Runnable{
         }
     }
 
+    static class Cluster{
+        IntSeq[] portals = new IntSeq[4];
+        //maps rotation + index of portal to list of IntraEdge objects
+        LongSeq[][] portalConnections = new LongSeq[4][];
+    }
+
     public HierarchyPathFinder(){
 
         Events.on(ResetEvent.class, event -> stop());
@@ -257,9 +263,7 @@ public class HierarchyPathFinder implements Runnable{
 
                                                         float
                                                         x1 = Tmp.v1.x, y1 = Tmp.v1.y,
-                                                        x2 = Tmp.v2.x, y2 = Tmp.v2.y,
-                                                        mx = (cx * clusterSize + clusterSize / 2f) * tilesize, my = (cy * clusterSize + clusterSize / 2f) * tilesize;
-                                                        //Lines.curve(x1, y1, mx, my, mx, my, x2, y2, 20);
+                                                        x2 = Tmp.v2.x, y2 = Tmp.v2.y;
                                                         Lines.line(x1, y1, x2, y2);
 
                                                     }
@@ -267,19 +271,6 @@ public class HierarchyPathFinder implements Runnable{
                                             }
                                         }
                                     }
-
-                                    //TODO draw connections.
-
-                                /*
-                                Draw.color(Color.magenta);
-                                for(var con : cluster.cons){
-                                    float
-                                    x1 = Point2.x(con.posFrom) * tilesize, y1 = Point2.y(con.posFrom) * tilesize,
-                                    x2 = Point2.x(con.posTo) * tilesize, y2 = Point2.y(con.posTo) * tilesize,
-                                    mx = (cx * clusterSize + clusterSize/2f) * tilesize, my = (cy * clusterSize + clusterSize/2f) * tilesize;
-                                    //Lines.curve(x1, y1, mx, my, mx, my, x2, y2, 20);
-                                    Lines.line(x1, y1, x2, y2);
-                                }*/
                                 }
                             }
                         }
@@ -312,24 +303,7 @@ public class HierarchyPathFinder implements Runnable{
         }
     }
 
-    static void line(Vec2 a, Vec2 b){
-        Fx.debugLine.at(a.x, a.y, 0f, Color.blue.cpy().a(0.1f), new Vec2[]{a.cpy(), b.cpy()});
-    }
-
-    static void line(Vec2 a, Vec2 b, Color color){
-        Fx.debugLine.at(a.x, a.y, 0f, color, new Vec2[]{a.cpy(), b.cpy()});
-    }
-
-    //DEBUGGING ONLY
-    Vec2 nodeToVec(int current, Vec2 out){
-        portalToVec(0, NodeIndex.cluster(current), NodeIndex.dir(current), NodeIndex.portal(current), out);
-        return out;
-    }
-
-    void portalToVec(int pathCost, int cluster, int direction, int portalIndex, Vec2 out){
-        portalToVec(clusters[Team.sharded.id][pathCost][cluster], cluster % cwidth, cluster / cwidth, direction, portalIndex, out);
-    }
-
+    //debugging only!
     void portalToVec(Cluster cluster, int cx, int cy, int direction, int portalIndex, Vec2 out){
         int pos = cluster.portals[direction].items[portalIndex];
         int from = Point2.x(pos), to = Point2.y(pos);
@@ -595,13 +569,24 @@ public class HierarchyPathFinder implements Runnable{
         costs.put(startPos, 0);
         frontier.add(startPos, 0);
 
+        if(goalX2 < goalX1){
+            int tmp = goalX1;
+            goalX1 = goalX2;
+            goalX2 = tmp;
+        }
+
+        if(goalY2 < goalY1){
+            int tmp = goalY1;
+            goalY1 = goalY2;
+            goalY2 = tmp;
+        }
+
         while(frontier.size > 0){
             int current = frontier.poll();
 
             int cx = current % wwidth, cy = current / wwidth;
 
             //found the goal (it's in the portal rectangle)
-            //TODO portal rectangle approach does not work, making this slower than it should be
             if((cx >= goalX1 && cy >= goalY1 && cx <= goalX2 && cy <= goalY2) || current == goalPos){
                 return costs.get(current);
             }
@@ -610,10 +595,7 @@ public class HierarchyPathFinder implements Runnable{
                 int newx = cx + point.x, newy = cy + point.y;
                 int next = newx + wwidth * newy;
 
-                if(newx > maxX || newy > maxY || newx < minX || newy < minY) continue;
-
-                //TODO fallback mode for enemy walls or whatever
-                if(tcost(team, cost, next) == impassable) continue;
+                if(newx > maxX || newy > maxY || newx < minX || newy < minY || tcost(team, cost, next) == impassable) continue;
 
                 float add = tileCost(team, cost, current, next);
 
@@ -688,7 +670,6 @@ public class HierarchyPathFinder implements Runnable{
                 minX, minY, maxX, maxY,
                 tileX + tileY * wwidth,
                 otherX + otherY * wwidth,
-                //TODO these are wrong and never actually trigger
                 (moveDirs[dir * 2] * otherFrom + ox),
                 (moveDirs[dir * 2 + 1] * otherFrom + oy),
                 (moveDirs[dir * 2] * otherTo + ox),
@@ -914,9 +895,7 @@ public class HierarchyPathFinder implements Runnable{
         if(!fields.containsKey(key)){
             fields.put(key, new int[clusterSize * clusterSize]);
 
-            //TODO: now, scan d4 for nearby clusters.
             if(addingFrontier){
-
                 for(int dir = 0; dir < 4; dir++){
                     int ox = cx + nextOffsets[dir * 2], oy = cy + nextOffsets[dir * 2 + 1];
 
@@ -970,7 +949,6 @@ public class HierarchyPathFinder implements Runnable{
 
         var nodePath = clusterAstar(request, costId, node, dest);
 
-        //TODO: how to reuse properly. what if the flowfields don't go through this position (the fields are finished?) how to incrementally extend the flowfield?
         FieldCache cache = fields.get(goalPos);
         //if true, extra values are added on the sides of existing field cells that face new cells.
         boolean addingFrontier = true;
@@ -1033,7 +1011,8 @@ public class HierarchyPathFinder implements Runnable{
         PathRequest request = unitRequests.get(unit);
 
         //if the destination can be trivially reached in a straight line, do that.
-        if(!raycast(team, cost, tileX, tileY, actualDestX, actualDestY)){
+        //near the destination, standard raycasting tends to break down, so use the more permissive 'near' variant that doesn't take into account edges of walls
+        if(unit.within(destination, tilesize * 2.5f) ? !raycastNear(team, cost, tileX, tileY, actualDestX, actualDestY) : !raycast(team, cost, tileX, tileY, actualDestX, actualDestY)){
             out.set(destination);
             return true;
         }
@@ -1056,6 +1035,7 @@ public class HierarchyPathFinder implements Runnable{
                 }
 
                 fieldCache.lastUpdateId = state.updateId;
+                //TODO: 30 iterations every frame is incredibly slow and terrible and drops the FPS on mobile devices significantly.
                 int maxIterations = 30; //TODO higher/lower number?
                 int i = 0;
 
@@ -1084,9 +1064,9 @@ public class HierarchyPathFinder implements Runnable{
                                 anyNearSolid = true;
                             }
 
-                            if(relCost == 7 || relCost == 8) otherCost = value + 1;
+                            if(relCost == 7) otherCost = value;
 
-                            //check for corner preventing movement
+                            //check for corner preventing movement TODO will break with the new last tile pos stuff
                             if((checkCorner(unit, tileOn, other, dir - 1) || checkCorner(unit, tileOn, other, dir + 1)) &&
                                 (checkSolid(unit, tileOn, dir - 2) || checkSolid(unit, tileOn, dir + 2))){ //there must be a tile to the left or right to keep the unit from going back and forth forever
 
@@ -1095,11 +1075,11 @@ public class HierarchyPathFinder implements Runnable{
                                 continue;
                             }
 
-                            if(otherCost < value && otherCost != impassable && (otherCost != 0 || packed == destPos) && (current == null || otherCost < minCost) && passable(cost, unit.team.id, packed) &&
+                            if(otherCost < value && otherCost != impassable && (otherCost != 0 || packed == destPos) && (current == null || otherCost < minCost) && passable(unit.team.id, cost, packed) &&
                             //diagonal corner trap
                             !(
-                            (!passable(cost, team, world.packArray(tileOn.x + point.x, tileOn.y)) ||
-                            (!passable(cost, team, world.packArray(tileOn.x, tileOn.y + point.y))))
+                            (!passable(team, cost, world.packArray(tileOn.x + point.x, tileOn.y)) ||
+                            (!passable(team, cost, world.packArray(tileOn.x, tileOn.y + point.y))))
                             )
                             ){
                                 current = other;
@@ -1119,7 +1099,6 @@ public class HierarchyPathFinder implements Runnable{
                         }
                     }
 
-                    //TODO: there are some serious issues with tileOn and the raycast position, intense vibration
                     request.lastTargetTile = any ? tileOn : null;
                     if(debug && tileOn != null && false){
                         Fx.placeBlock.at(tileOn.worldx(), tileOn.worldy(), 1);
@@ -1128,6 +1107,8 @@ public class HierarchyPathFinder implements Runnable{
 
                 if(request.lastTargetTile != null){
                     out.set(request.lastTargetTile);
+                    //TODO: broken
+                    //request.lastTile = tileOn.pos();
                     return true;
                 }
             }
@@ -1206,17 +1187,6 @@ public class HierarchyPathFinder implements Runnable{
             if(avoid(team, type, x + y * wwidth)) return true;
             if(x == x2 && y == y2) return false;
 
-            //TODO no diagonals???? is this a good idea?
-            /*
-            //no diagonal ver
-            if(2 * err + dy > dx - 2 * err){
-                err -= dy;
-                x += sx;
-            }else{
-                err += dx;
-                y += sy;
-            }*/
-
             //diagonal ver
             e2 = 2 * err;
             if(e2 > -dy){
@@ -1225,6 +1195,29 @@ public class HierarchyPathFinder implements Runnable{
             }
 
             if(e2 < dx){
+                err += dx;
+                y += sy;
+            }
+        }
+
+        return true;
+    }
+
+    private static boolean raycastNear(int team, PathCost type, int x1, int y1, int x2, int y2){
+        int ww = wwidth, wh = wheight;
+        int x = x1, dx = Math.abs(x2 - x), sx = x < x2 ? 1 : -1;
+        int y = y1, dy = Math.abs(y2 - y), sy = y < y2 ? 1 : -1;
+        int e2, err = dx - dy;
+
+        while(x >= 0 && y >= 0 && x < ww && y < wh){
+            if(!passable(team, type, x + y * wwidth)) return true;
+            if(x == x2 && y == y2) return false;
+
+            //no diagonal ver
+            if(2 * err + dy > dx - 2 * err){
+                err -= dy;
+                x += sx;
+            }else{
                 err += dx;
                 y += sy;
             }
@@ -1239,7 +1232,7 @@ public class HierarchyPathFinder implements Runnable{
         return cost == impassable || cost >= 2;
     }
 
-    private static boolean passable(PathCost cost, int team, int pos){
+    private static boolean passable(int team, PathCost cost, int pos){
         int amount = cost.getCost(team, pathfinder.tiles[pos]);
         //edge case: naval reports costs of 6000+ for non-liquids, even though they are not technically passable
         return amount != impassable && !(cost == costTypes.get(costNaval) && amount >= 6000);
@@ -1280,7 +1273,7 @@ public class HierarchyPathFinder implements Runnable{
         //   - DONE invalidations should be batched every few seconds (let's say, 2)
         for(var req : threadPathRequests){
             var field = fields.get(req.destination);
-            if(field != null && field.fields.containsKey(index)){
+            if((field != null && field.fields.containsKey(index)) || req.notFound){
                 invalidRequests.add(req);
             }
         }
@@ -1409,12 +1402,6 @@ public class HierarchyPathFinder implements Runnable{
                 e.printStackTrace();
             }
         }
-    }
-
-    static class Cluster{
-        IntSeq[] portals = new IntSeq[4];
-        //maps rotation + index of portal to list of IntraEdge objects
-        LongSeq[][] portalConnections = new LongSeq[4][];
     }
 
     @Struct

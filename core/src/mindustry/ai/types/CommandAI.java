@@ -219,7 +219,7 @@ public class CommandAI extends AIController{
             }
 
             if(unit.isGrounded() && stance != UnitStance.ram){
-                //TODO no blocking.
+                //TODO: blocking is disabled, doesn't work well
                 if(timer.get(timerTarget3, avoidInterval) && false){
                     Vec2 dstPos = Tmp.v1.trns(unit.rotation, unit.hitSize/2f);
                     float max = unit.hitSize/2f;
