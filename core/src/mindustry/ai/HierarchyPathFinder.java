@@ -113,6 +113,8 @@ public class HierarchyPathFinder implements Runnable{
         //old field assigned before everything was recomputed
         @Nullable volatile FieldCache oldCache;
 
+        boolean lastRaycastResult = false;
+        int lastRaycastTile, lastWorldUpdate;
         int lastTile;
         @Nullable Tile lastTargetTile;
 
@@ -1002,6 +1004,7 @@ public class HierarchyPathFinder implements Runnable{
         team = unit.team.id,
         tileX = unit.tileX(),
         tileY = unit.tileY(),
+        packedPos = world.packArray(tileX, tileY),
         destX = World.toTile(mainDestination.x),
         destY = World.toTile(mainDestination.y),
         actualDestX = World.toTile(destination.x),
@@ -1010,9 +1013,23 @@ public class HierarchyPathFinder implements Runnable{
 
         PathRequest request = unitRequests.get(unit);
 
+        int lastRaycastTile = request == null || world.tileChanges != request.lastWorldUpdate ? -1 : request.lastRaycastTile;
+        boolean raycastResult = request != null && request.lastRaycastResult;
+
+        //cache raycast results to run every time the world updates, and every tile the unit crosses
+        if(lastRaycastTile != packedPos){
+            //near the destination, standard raycasting tends to break down, so use the more permissive 'near' variant that doesn't take into account edges of walls
+            raycastResult = unit.within(destination, tilesize * 2.5f) ? !raycastNear(team, cost, tileX, tileY, actualDestX, actualDestY) : !raycast(team, cost, tileX, tileY, actualDestX, actualDestY);
+
+            if(request != null){
+                request.lastRaycastTile = packedPos;
+                request.lastRaycastResult = raycastResult;
+                request.lastWorldUpdate = world.tileChanges;
+            }
+        }
+
         //if the destination can be trivially reached in a straight line, do that.
-        //near the destination, standard raycasting tends to break down, so use the more permissive 'near' variant that doesn't take into account edges of walls
-        if(unit.within(destination, tilesize * 2.5f) ? !raycastNear(team, cost, tileX, tileY, actualDestX, actualDestY) : !raycast(team, cost, tileX, tileY, actualDestX, actualDestY)){
+        if(raycastResult){
             out.set(destination);
             return true;
         }
@@ -1023,7 +1040,7 @@ public class HierarchyPathFinder implements Runnable{
         if(request != null && request.destination == destPos){
             request.lastUpdateId = state.updateId;
 
-            Tile tileOn = unit.tileOn();
+            Tile tileOn = unit.tileOn(), initialTileOn = tileOn;
             //TODO: should fields be accessible from this thread?
             FieldCache fieldCache = fields.get(destPos);
 
@@ -1038,8 +1055,10 @@ public class HierarchyPathFinder implements Runnable{
                 //TODO: 30 iterations every frame is incredibly slow and terrible and drops the FPS on mobile devices significantly.
                 int maxIterations = 30; //TODO higher/lower number?
                 int i = 0;
+                boolean recalc = false;
 
-                if(tileOn.pos() != request.lastTile || request.lastTargetTile == null){
+                //TODO last pos can change if the flowfield changes.
+                if(initialTileOn.pos() != request.lastTile || request.lastTargetTile == null){
                     //TODO tanks have weird behavior near edges of walls, as they try to avoid them
                     boolean anyNearSolid = false;
 
@@ -1064,12 +1083,11 @@ public class HierarchyPathFinder implements Runnable{
                                 anyNearSolid = true;
                             }
 
-                            if(relCost == 7) otherCost = value;
-
-                            //check for corner preventing movement TODO will break with the new last tile pos stuff
+                            //check for corner preventing movement
                             if((checkCorner(unit, tileOn, other, dir - 1) || checkCorner(unit, tileOn, other, dir + 1)) &&
                                 (checkSolid(unit, tileOn, dir - 2) || checkSolid(unit, tileOn, dir + 2))){ //there must be a tile to the left or right to keep the unit from going back and forth forever
 
+                                recalc = true;
                                 //keep moving even if it's blocked
                                 any = true;
                                 continue;
@@ -1100,15 +1118,14 @@ public class HierarchyPathFinder implements Runnable{
                     }
 
                     request.lastTargetTile = any ? tileOn : null;
-                    if(debug && tileOn != null && false){
+                    if(true && tileOn != null){
                         Fx.placeBlock.at(tileOn.worldx(), tileOn.worldy(), 1);
                     }
                 }
 
                 if(request.lastTargetTile != null){
                     out.set(request.lastTargetTile);
-                    //TODO: broken
-                    //request.lastTile = tileOn.pos();
+                    request.lastTile = recalc ? -1 : initialTileOn.pos();
                     return true;
                 }
             }
@@ -1207,7 +1224,8 @@ public class HierarchyPathFinder implements Runnable{
         int ww = wwidth, wh = wheight;
         int x = x1, dx = Math.abs(x2 - x), sx = x < x2 ? 1 : -1;
         int y = y1, dy = Math.abs(y2 - y), sy = y < y2 ? 1 : -1;
-        int e2, err = dx - dy;
+        int err = dx - dy;
+
 
         while(x >= 0 && y >= 0 && x < ww && y < wh){
             if(!passable(team, type, x + y * wwidth)) return true;
