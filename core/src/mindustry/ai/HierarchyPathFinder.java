@@ -1052,8 +1052,7 @@ public class HierarchyPathFinder implements Runnable{
                 }
 
                 fieldCache.lastUpdateId = state.updateId;
-                //TODO: 30 iterations every frame is incredibly slow and terrible and drops the FPS on mobile devices significantly.
-                int maxIterations = 30; //TODO higher/lower number?
+                int maxIterations = 30; //TODO higher/lower number? is this still too slow?
                 int i = 0;
                 boolean recalc = false;
 
@@ -1118,7 +1117,7 @@ public class HierarchyPathFinder implements Runnable{
                     }
 
                     request.lastTargetTile = any ? tileOn : null;
-                    if(true && tileOn != null){
+                    if(debug && tileOn != null){
                         Fx.placeBlock.at(tileOn.worldx(), tileOn.worldy(), 1);
                     }
                 }
