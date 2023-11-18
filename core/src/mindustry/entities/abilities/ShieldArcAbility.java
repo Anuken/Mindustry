@@ -94,7 +94,7 @@ public class ShieldArcAbility extends Ability{
             paramPos.set(x, y).rotate(unit.rotation - 90f).add(unit);
 
             float reach = radius + width / 2f;
-            Groups.bullet.intersect(unit.x - reach, unit.y - reach, reach * 2f, reach * 2f, shieldConsumer);
+            Groups.bullet.intersect(paramPos.x - reach, paramPos.y - reach, reach * 2f, reach * 2f, shieldConsumer);
         }else{
             widthScale = Mathf.lerpDelta(widthScale, 0f, 0.11f);
         }
