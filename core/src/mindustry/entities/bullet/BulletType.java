@@ -160,6 +160,8 @@ public class BulletType extends Content implements Cloneable{
 
     /** Bullet type that is created when this bullet expires. */
     public @Nullable BulletType fragBullet = null;
+    /** If true, frag bullets are delayed to the next frame. Fixes obscure bugs with piercing bullet types spawning frags immediately and screwing up the Damage temporary variables. */
+    public boolean delayFrags = false;
     /** Degree spread range of fragmentation bullets. */
     public float fragRandomSpread = 360f;
     /** Uniform spread between each frag bullet in degrees. */
@@ -446,7 +448,11 @@ public class BulletType extends Content implements Cloneable{
         Effect.shake(hitShake, hitShake, b);
 
         if(fragOnHit){
-            createFrags(b, x, y);
+            if(delayFrags && fragBullet != null && fragBullet.delayFrags){
+                Core.app.post(() -> createFrags(b, x, y));
+            }else{
+                createFrags(b, x, y);
+            }
         }
         createPuddles(b, x, y);
         createIncend(b, x, y);
