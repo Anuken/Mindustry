@@ -246,7 +246,7 @@
   },
   {
     "name": "XuwenHost",
-    "address": ["mdt.xuwenblock.cn:6568","mdt.xuwenblock.cn:6567"]
+    "address": ["mdt.xuwenblock.cn:6568","mdt.xuwenblock.cn:6567","106.14.14.210"]
   },
   {
     "name": "MineCore",
