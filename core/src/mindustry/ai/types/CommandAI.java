@@ -398,6 +398,8 @@ public class CommandAI extends AIController{
 
     @Override
     public void commandPosition(Vec2 pos){
+        if(pos == null) return;
+
         commandPosition(pos, false);
         if(commandController != null){
             commandController.commandPosition(pos);
@@ -405,6 +407,8 @@ public class CommandAI extends AIController{
     }
 
     public void commandPosition(Vec2 pos, boolean stopWhenInRange){
+        if(pos == null) return;
+
         //this is an allocation, but it's relatively rarely called anyway, and outside mutations must be prevented
         targetPos = lastTargetPos = pos.cpy();
         attackTarget = null;
