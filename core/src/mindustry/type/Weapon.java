@@ -439,9 +439,16 @@ public class Weapon implements Cloneable{
         shoot.shoot(mount.barrelCounter, (xOffset, yOffset, angle, delay, mover) -> {
             //this is incremented immediately, as it is used for total bullet creation amount detection
             mount.totalShots ++;
+            int barrel = mount.barrelCounter;
 
             if(delay > 0f){
-                Time.run(delay, () -> bullet(unit, mount, xOffset, yOffset, angle, mover));
+                Time.run(delay, () -> {
+                    //hack: make sure the barrel is the same as what it was when the bullet was queued to fire
+                    int prev = mount.barrelCounter;
+                    mount.barrelCounter = barrel;
+                    bullet(unit, mount, xOffset, yOffset, angle, mover);
+                    mount.barrelCounter = prev;
+                });
             }else{
                 bullet(unit, mount, xOffset, yOffset, angle, mover);
             }

@@ -152,7 +152,7 @@ public class RegionPart extends DrawPart{
                 float sign = (i == 1 ? -1 : 1) * params.sideMultiplier;
                 Tmp.v1.set((x + mx) * sign, y + my).rotateRadExact((params.rotation - 90) * Mathf.degRad);
 
-                childParam.set(params.warmup, params.reload, params.smoothReload, params.heat, params.recoil, params.charge, params.x + Tmp.v1.x, params.y + Tmp.v1.y, i * sign + mr * sign + params.rotation);
+                childParam.set(params.warmup, params.reload, params.smoothReload, params.heat, params.recoil, params.charge, params.x + Tmp.v1.x, params.y + Tmp.v1.y, mr * sign + params.rotation);
                 childParam.sideMultiplier = params.sideMultiplier;
                 childParam.life = params.life;
                 childParam.sideOverride = i;

@@ -41,6 +41,8 @@ public class StatusEffect extends UnlockableContent{
     public boolean permanent;
     /** If true, this effect will only react with other effects and cannot be applied. */
     public boolean reactive;
+    /** Special flag for the dynamic effect type with custom stats - do not use. */
+    public boolean dynamic = false;
     /** Whether to show this effect in the database. */
     public boolean show = true;
     /** Tint color of effect. */

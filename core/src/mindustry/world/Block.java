@@ -57,6 +57,8 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean conductivePower = false;
     /** If true, this block can output payloads; affects blending. */
     public boolean outputsPayload = false;
+    /** If true, this block can input payloads; affects unit payload enter behavior. */
+    public boolean acceptsPayloads = false;
     /** If true, payloads will attempt to move into this block. */
     public boolean acceptsPayload = false;
     /** Visual flag use for blending of certain transportation blocks. */
@@ -152,6 +154,8 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean updateInUnits = true;
     /** if true, this block updates in payloads in units regardless of the experimental game rule */
     public boolean alwaysUpdateInUnits = false;
+    /** if false, only incinerable liquids are dropped when deconstructing; otherwise, all liquids are dropped. */
+    public boolean deconstructDropAllLiquid = false;
     /** Whether to use this block's color in the minimap. Only used for overlays. */
     public boolean useColor = true;
     /** item that drops from this block, used for drills */
@@ -334,6 +338,8 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean instantTransfer = false;
     /** Whether you can rotate this block after it is placed. */
     public boolean quickRotate = true;
+    /** If true, this derelict block can be repair by clicking it. */
+    public boolean allowDerelictRepair = true;
     /** Main subclass. Non-anonymous. */
     public @Nullable Class<?> subclass;
     /** Scroll position for certain blocks. */
@@ -646,7 +652,7 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean canReplace(Block other){
         if(other.alwaysReplace) return true;
         if(other.privileged) return false;
-        return other.replaceable && (other != this || (rotate && quickRotate)) && this.group != BlockGroup.none && other.group == this.group &&
+        return other.replaceable && (other != this || (rotate && quickRotate)) && ((this.group != BlockGroup.none && other.group == this.group) || other == this) &&
             (size == other.size || (size >= other.size && ((subclass != null && subclass == other.subclass) || group.anyReplace)));
     }
 
