@@ -1569,7 +1569,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             consumed = true;
             if((!config.isShown() && build.shouldShowConfigure(player)) //if the config fragment is hidden, show
             //alternatively, the current selected block can 'agree' to switch config tiles
-            || (config.isShown() && config.getSelected().onConfigureBuildTapped(build))){
+            || (config.isShown() && config.getSelected().onConfigureBuildTapped(build) && build.shouldShowConfigure(player))){
                 Sounds.click.at(build);
                 config.showConfig(build);
             }

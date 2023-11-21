@@ -5,6 +5,7 @@ import arc.math.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.content.*;
+import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
@@ -139,6 +140,16 @@ public class PayloadDeconstructor extends PayloadBlock{
                 if(canProgress){
                     float shift = edelta() * deconstructSpeed / deconstructing.buildTime();
                     float realShift = Math.min(shift, 1f - progress);
+
+                    //if began deconstruction...
+                    if(progress == 0f && shift > 0f && deconstructing instanceof BuildPayload pay){
+                        var build = pay.build;
+                        //dump liquid on floor (does not respect block configuration with respect to dumping liquids on floor)
+                        if(build.liquids != null && build.liquids.currentAmount() > 0){
+                            float perCell = build.liquids.currentAmount() / (block.size * block.size) * 2f;
+                            tile.getLinkedTiles(other -> Puddles.deposit(other, build.liquids.current(), perCell));
+                        }
+                    }
 
                     progress += shift;
                     time += edelta();
