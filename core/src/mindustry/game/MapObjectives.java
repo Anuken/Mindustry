@@ -629,7 +629,6 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         /** Control marker with world processor code*/
         public void control(LMarkerControl type, double p1, double p2, double p3){
             switch(type){
-                case toggleVisibility -> hidden = !hidden;
                 case visibility -> hidden = ((Math.abs(p1) < 1e-5));
                 case drawLayer -> drawLayer = (float)p1;
             }

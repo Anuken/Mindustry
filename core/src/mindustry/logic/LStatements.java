@@ -2000,7 +2000,7 @@ public class LStatements{
 
     @RegisterStatement("makemarker")
     public static class MakeMarkerStatement extends LStatement{
-        public String id = "0", type = "shape", x = "0", y = "0", replace = "true";
+        public String type = "shape", id = "0", x = "0", y = "0", replace = "true";
 
         @Override
         public void build(Table table){
