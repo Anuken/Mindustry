@@ -253,11 +253,11 @@
     "address": ["mdt.xuwenblock.cn:6568","mdt.xuwenblock.cn:6567","106.14.14.210"]
   },
   {
-    "name": "MineCore",
-    "address": ["194.247.42.11:27792"]
-  },
-  {
     "name": "Atomic",
     "address": ["atomic-de.ddns.net:35199", "atomic-de.ddns.net:35176", "atomic-de.ddns.net:35845"]
+  },
+  {
+    "name": "MineCore",
+    "address": ["194.247.42.11:27792", "194.247.42.11:27977", "194.247.42.61:27989", "194.247.42.181:28514"]
   }
 ]
