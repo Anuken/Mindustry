@@ -30,14 +30,11 @@ import static mindustry.Vars.*;
 import static mindustry.input.PlaceMode.*;
 
 public class MobileInput extends InputHandler implements GestureListener{
-    /** Maximum speed the player can pan. */
-    private static final float maxPanSpeed = 1.3f;
     /** Distance to edge of screen to start panning. */
     public final float edgePan = Scl.scl(60f);
 
     //gesture data
     public Vec2 vector = new Vec2(), movement = new Vec2(), targetPos = new Vec2();
-    public float lastZoom = -1;
 
     /** Position where the player started dragging a line. */
     public int lineStartX, lineStartY, lastLineX, lastLineY;

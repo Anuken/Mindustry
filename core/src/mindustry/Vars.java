@@ -38,6 +38,11 @@ import java.util.concurrent.*;
 import static arc.Core.*;
 
 public class Vars implements Loadable{
+    /** Maximum speed the player can pan. */
+    public static final float maxPanSpeed = 1.3f;
+    /** Maximum zoom. */
+    public static float lastZoom = -1;
+
     /** Whether the game failed to launch last time. */
     public static boolean failedToLaunch = false;
     /** Whether to load locales.*/
