@@ -233,7 +233,9 @@ public class World{
     }
 
     public Rect getQuadBounds(Rect in){
-        return in.set(-finalWorldBounds, -finalWorldBounds, width() * tilesize + finalWorldBounds * 2, height() * tilesize + finalWorldBounds * 2);
+        float width = width() * tilesize + finalWorldBounds * 2;
+        float height = height() * tilesize + finalWorldBounds * 2;
+        return in.set(-finalWorldBounds, -finalWorldBounds, width, height);
     }
 
     public void setGenerating(boolean gen){
