@@ -327,11 +327,11 @@ public class Net{
     }
 
     /** Sets a connection filter by IP address. If the filter returns {@code false}, the connection will be closed. Server only. */
-    public void setConnectFilter(ServerConnectFilter filter){
+    public void setConnectFilter(@Nullable ServerConnectFilter filter){
         provider.setConnectFilter(filter);
     }
 
-    public ServerConnectFilter getConnectFilter(){
+    public @Nullable ServerConnectFilter getConnectFilter(){
         return provider.getConnectFilter();
     }
 
@@ -412,7 +412,7 @@ public class Net{
         /** Sets a connection filter by IP address. If the filter returns {@code false}, the connection will be closed. */
         default void setConnectFilter(Server.ServerConnectFilter connectFilter){}
 
-        default ServerConnectFilter getConnectFilter(){
+        default @Nullable ServerConnectFilter getConnectFilter(){
             return null;
         }
     }

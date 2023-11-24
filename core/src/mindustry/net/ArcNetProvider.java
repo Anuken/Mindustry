@@ -163,7 +163,7 @@ public class ArcNetProvider implements NetProvider{
     }
 
     @Override
-    public ServerConnectFilter getConnectFilter(){
+    public @Nullable ServerConnectFilter getConnectFilter(){
         return server.getConnectFilter();
     }
 
