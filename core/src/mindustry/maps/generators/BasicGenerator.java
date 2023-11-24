@@ -15,7 +15,7 @@ import mindustry.world.blocks.environment.*;
 
 import static mindustry.Vars.*;
 
-public abstract class BasicGenerator implements WorldGenerator{
+public abstract class BasicGenerator extends mindustry.CliffSc implements WorldGenerator{
     protected static final ShortSeq ints1 = new ShortSeq(), ints2 = new ShortSeq();
 
     protected Rand rand = new Rand();
@@ -150,32 +150,6 @@ public abstract class BasicGenerator implements WorldGenerator{
                 }
             }
         });
-    }
-
-    public void cliffs(){
-        for(Tile tile : tiles){
-            if(!tile.block().isStatic() || tile.block() == Blocks.cliff) continue;
-
-            int rotation = 0;
-            for(int i = 0; i < 8; i++){
-                Tile other = world.tiles.get(tile.x + Geometry.d8[i].x, tile.y + Geometry.d8[i].y);
-                if(other != null && !other.block().isStatic()){
-                    rotation |= (1 << i);
-                }
-            }
-
-            if(rotation != 0){
-                tile.setBlock(Blocks.cliff);
-            }
-
-            tile.data = (byte)rotation;
-        }
-
-        for(Tile tile : tiles){
-            if(tile.block() != Blocks.cliff && tile.block().isStatic()){
-                tile.setBlock(Blocks.air);
-            }
-        }
     }
 
     public void terrain(Block dst, float scl, float mag, float cmag){

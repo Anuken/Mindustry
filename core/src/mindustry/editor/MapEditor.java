@@ -17,7 +17,7 @@ import mindustry.world.*;
 
 import static mindustry.Vars.*;
 
-public class MapEditor{
+public class MapEditor extends mindustry.CliffSc {
     public static final float[] brushSizes = {1, 1.5f, 2, 3, 4, 5, 9, 15, 20};
 
     public StringMap tags = new StringMap();
@@ -204,32 +204,6 @@ public class MapEditor{
         }
 
         return false;
-    }
-
-    public void addCliffs(){
-        for(Tile tile : world.tiles){
-            if(!tile.block().isStatic() || tile.block() == Blocks.cliff) continue;
-
-            int rotation = 0;
-            for(int i = 0; i < 8; i++){
-                Tile other = world.tiles.get(tile.x + Geometry.d8[i].x, tile.y + Geometry.d8[i].y);
-                if(other != null && !other.block().isStatic()){
-                    rotation |= (1 << i);
-                }
-            }
-
-            if(rotation != 0){
-                tile.setBlock(Blocks.cliff);
-            }
-
-            tile.data = (byte)rotation;
-        }
-
-        for(Tile tile : world.tiles){
-            if(tile.block() != Blocks.cliff && tile.block().isStatic()){
-                tile.setBlock(Blocks.air);
-            }
-        }
     }
 
     public void addFloorCliffs(){

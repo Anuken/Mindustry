@@ -649,7 +649,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 mid.row();
 
                 mid.table(t -> {
-                    t.button("@editor.cliffs", Icon.terrain, Styles.flatt, editor::addCliffs).growX().margin(9f);
+                    t.button("@editor.cliffs", Icon.terrain, Styles.flatt, editor::add).growX().margin(9f);
                 }).growX().top();
             }).margin(0).left().growY();
 
