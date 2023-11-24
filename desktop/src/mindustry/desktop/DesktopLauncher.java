@@ -7,7 +7,6 @@ import arc.backend.sdl.jni.*;
 import arc.discord.*;
 import arc.discord.DiscordRPC.*;
 import arc.files.*;
-import arc.func.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
@@ -29,9 +28,9 @@ import java.io.*;
 import static mindustry.Vars.*;
 
 public class DesktopLauncher extends ClientLauncher{
-    public final static long discordID = 610508934456934412L;
-    boolean useDiscord = !OS.hasProp("nodiscord"), loadError = false;
-    Throwable steamError;
+    private final static long discordID = 610508934456934412L;
+    private boolean useDiscord = !OS.hasProp("nodiscord"), loadError = false;
+    private Throwable steamError;
 
     public static void main(String[] arg){
         try{
@@ -61,7 +60,7 @@ public class DesktopLauncher extends ClientLauncher{
                 setWindowIcon(FileType.internal, "icons/icon_64.png");
             }});
         }catch(Throwable e){
-            handleCrash(e);
+            CrashHandler.handleGameCrash(e);
         }
     }
 
@@ -218,32 +217,6 @@ public class DesktopLauncher extends ClientLauncher{
         }));
     }
 
-    static void handleCrash(Throwable e){
-        Cons<Runnable> dialog = Runnable::run;
-        boolean badGPU = false;
-        String finalMessage = Strings.getFinalMessage(e);
-        String total = Strings.getCauses(e).toString();
-
-        if(total.contains("Couldn't create window") || total.contains("OpenGL 2.0 or higher") || total.toLowerCase().contains("pixel format") || total.contains("GLEW")|| total.contains("unsupported combination of formats")){
-
-            dialog.get(() -> message(
-                total.contains("Couldn't create window") ? "A graphics initialization error has occured! Try to update your graphics drivers:\n" + finalMessage :
-                            "Your graphics card does not support the right OpenGL features.\n" +
-                                    "Try to update your graphics drivers. If this doesn't work, your computer may not support Mindustry.\n\n" +
-                                    "Full message: " + finalMessage));
-            badGPU = true;
-        }
-
-        boolean fbgp = badGPU;
-
-        CrashSender.send(e, file -> {
-            Throwable fc = Strings.getFinalCause(e);
-            if(!fbgp){
-                dialog.get(() -> message("A crash has occured. It has been saved in:\n" + file.getAbsolutePath() + "\n" + fc.getClass().getSimpleName().replace("Exception", "") + (fc.getMessage() == null ? "" : ":\n" + fc.getMessage())));
-            }
-        });
-    }
-
     @Override
     public Seq<Fi> getWorkshopContent(Class<? extends Publishable> type){
         return !steam ? super.getWorkshopContent(type) : SVars.workshop.getWorkshopFiles(type);
@@ -365,7 +338,7 @@ public class DesktopLauncher extends ClientLauncher{
         return super.getUUID();
     }
 
-    private static void message(String message){
+    protected static void message(String message){
         SDL.SDL_ShowSimpleMessageBox(SDL.SDL_MESSAGEBOX_ERROR, "oh no", message);
     }
 }
