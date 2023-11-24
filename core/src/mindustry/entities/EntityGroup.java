@@ -28,6 +28,7 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
     private int index;
 
     public static int nextId(){
+        if(lastId >= Integer.MAX_VALUE - 2) lastId = 0;
         return lastId++;
     }
 

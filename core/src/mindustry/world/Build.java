@@ -47,7 +47,10 @@ public class Build{
         Block sub = ConstructBlock.get(previous.size);
 
         Seq<Building> prevBuild = new Seq<>(1);
-        if(tile.build != null) prevBuild.add(tile.build);
+        if(tile.build != null){
+            prevBuild.add(tile.build);
+            tile.build.onDeconstructed(unit);
+        }
 
         tile.setBlock(sub, team, rotation);
         var build = (ConstructBuild)tile.build;
@@ -87,7 +90,7 @@ public class Build{
         }
 
         //repair derelict tile
-        if(tile.team() == Team.derelict && tile.block == result && tile.build != null && tile.block.allowDerelictRepair){
+        if(tile.team() == Team.derelict && tile.block == result && tile.build != null && tile.block.allowDerelictRepair && state.rules.derelictRepair){
             float healthf = tile.build.healthf();
             var config = tile.build.config();
 
@@ -222,7 +225,7 @@ public class Build{
                 !check.interactable(team) || //cannot interact
                 !check.floor().placeableOn || //solid wall
                 (!checkVisible && !check.block().alwaysReplace) || //replacing a block that should be replaced (e.g. payload placement)
-                    !(((type.canReplace(check.block()) || (type == check.block && check.team() == Team.derelict)) || //can replace type OR can replace derelict block of same type
+                    !(((type.canReplace(check.block()) || (type == check.block && state.rules.derelictRepair && check.team() == Team.derelict)) || //can replace type OR can replace derelict block of same type
                         (check.build instanceof ConstructBuild build && build.current == type && check.centerX() == tile.x && check.centerY() == tile.y)) && //same type in construction
                     type.bounds(tile.x, tile.y, Tmp.r1).grow(0.01f).contains(check.block.bounds(check.centerX(), check.centerY(), Tmp.r2))) || //no replacement
                 (type.requiresWater && check.floor().liquidDrop != Liquids.water) //requires water but none found
