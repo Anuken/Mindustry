@@ -2401,12 +2401,12 @@ public class Blocks{
         }};
 
         solarPanel = new SolarGenerator("solar-panel"){{
-            requirements(Category.power, with(Items.lead, 10, Items.silicon, 15));
-            powerProduction = 0.1f;
+            requirements(Category.power, with(Items.lead, 6, Items.silicon, 6));
+            powerProduction = 0.12f;
         }};
 
         largeSolarPanel = new SolarGenerator("solar-panel-large"){{
-            requirements(Category.power, with(Items.lead, 80, Items.silicon, 110, Items.phaseFabric, 15));
+            requirements(Category.power, with(Items.lead, 60, Items.silicon, 70, Items.phaseFabric, 10));
             size = 3;
             powerProduction = 1.6f;
         }};
