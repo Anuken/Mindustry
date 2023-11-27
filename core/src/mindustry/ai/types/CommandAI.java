@@ -214,7 +214,7 @@ public class CommandAI extends AIController{
             }
 
             //TODO: should the unit stop when it finds a target?
-            if(stance == UnitStance.patrol && target != null && unit.within(target, unit.type.range - 2f)){
+            if(stance == UnitStance.patrol && target != null && unit.within(target, unit.type.range - 2f) && !unit.type.circleTarget){
                 move = false;
             }
 
