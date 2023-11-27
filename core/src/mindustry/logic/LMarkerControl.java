@@ -3,6 +3,8 @@ package mindustry.logic;
 public enum LMarkerControl{
     remove,
     visibility("true/false"),
+    minimap("true/false"),
+    minimapAutoscale("true/false"),
     x("x"),
     y("y"),
     pos("x", "y"),
@@ -27,7 +29,8 @@ public enum LMarkerControl{
     labelFlags("background", "outline"),
     texture("name", "-", "-"),
     textureWidth("width"),
-    textureHeight("height");
+    textureHeight("height"),
+    textureSize("width", "height");
 
     public final String[] params;
 

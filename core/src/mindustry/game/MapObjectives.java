@@ -613,6 +613,10 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
     public static abstract class ObjectiveMarker{
         /** Makes sure markers are only added once. */
         public transient boolean wasAdded;
+        /** Whether to display marker on minimap instead of world. {@link MinimapMarker} ignores this value. */
+        public boolean minimap = false;
+        /** Whether to scale marker in minimap mode corresponding to player's zoom level. {@link MinimapMarker} ignores this value. */
+        public boolean minimapAutoscale = false;
         /** Hides the marker, used by world processors. */
         protected boolean hidden = false;
         /** On which z-sorting layer is marker drawn. */
@@ -629,8 +633,10 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         /** Control marker with world processor code*/
         public void control(LMarkerControl type, double p1, double p2, double p3){
             switch(type){
-                case visibility -> hidden = ((Math.abs(p1) < 1e-5));
+                case visibility -> hidden = (Math.abs(p1) < 1e-5);
                 case drawLayer -> drawLayer = (float)p1;
+                case minimap -> minimap = (Math.abs(p1) >= 1e-5);
+                case minimapAutoscale -> minimapAutoscale = (Math.abs(p1) >= 1e-5);
             }
         }
         public void setText(String text, boolean fetch){}
@@ -697,7 +703,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public void draw(){
-            if(hidden) return;
+            if(hidden || minimap) return;
 
             //in case some idiot decides to make 9999999 sides and freeze the game
             int sides = Math.min(this.sides, 200);
@@ -707,7 +713,6 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             Lines.poly(pos.x, pos.y, sides, radius + 1f, rotation);
             Lines.stroke(1f, color);
             Lines.poly(pos.x, pos.y, sides, radius + 1f, rotation);
-            Draw.z(Layer.overlayUI);
             Draw.reset();
 
             if(fetchedText == null){
@@ -718,6 +723,34 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             if(Math.abs(fontSize) < 1e-5) return;
 
             WorldLabel.drawAt(fetchedText, pos.x, pos.y + radius + textHeight, drawLayer, flags, fontSize);
+        }
+
+        @Override
+        public void drawMinimap(MinimapRenderer minimap){
+            if(hidden || !this.minimap) return;
+
+            //in case some idiot decides to make 9999999 sides and freeze the game
+            int sides = Math.min(this.sides, 200);
+
+            minimap.transform(Tmp.v1.set(pos.x + 4f, pos.y + 4f));
+
+            float rad = minimap.scale(radius, minimapAutoscale);
+
+            Draw.z(drawLayer);
+            Lines.stroke(minimap.scale(3f, minimapAutoscale), Pal.gray);
+            Lines.poly(Tmp.v1.x, Tmp.v1.y, sides, rad + 1f, rotation);
+            Lines.stroke(minimap.scale(1f, minimapAutoscale), color);
+            Lines.poly(Tmp.v1.x, Tmp.v1.y, sides, rad + 1f, rotation);
+            Draw.reset();
+
+            if(fetchedText == null){
+                fetchedText = fetchText(text);
+            }
+
+            // font size cannot be 0
+            if(Math.abs(fontSize) < 1e-5) return;
+
+            WorldLabel.drawAt(fetchedText, Tmp.v1.x, Tmp.v1.y + rad + minimap.scale(textHeight, minimapAutoscale), drawLayer, flags, minimap.scale(fontSize, minimapAutoscale));
         }
 
         @Override
@@ -802,7 +835,6 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             Lines.stroke(Scl.scl((1f - fin) * stroke + 0.1f), color);
             Lines.circle(Tmp.v1.x, Tmp.v1.y, rad * fin);
 
-            Draw.z(Layer.overlayUI);
             Draw.reset();
         }
 
@@ -842,7 +874,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public void draw(){
-            if(hidden) return;
+            if(hidden || minimap) return;
 
             //in case some idiot decides to make 9999999 sides and freeze the game
             int sides = Math.min(this.sides, 200);
@@ -861,7 +893,34 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                 Fill.poly(pos.x, pos.y, sides, radius, rotation);
             }
 
-            Draw.z(Layer.overlayUI);
+            Draw.reset();
+        }
+
+        @Override
+        public void drawMinimap(MinimapRenderer minimap){
+            if(hidden || !this.minimap) return;
+
+            //in case some idiot decides to make 9999999 sides and freeze the game
+            int sides = Math.min(this.sides, 200);
+
+            minimap.transform(Tmp.v1.set(pos.x + 4f, pos.y + 4f));
+
+            float rad = minimap.scale(radius, minimapAutoscale);
+
+            Draw.z(drawLayer);
+            if(!fill){
+                if(outline){
+                    Lines.stroke(minimap.scale(stroke + 2f, minimapAutoscale), Pal.gray);
+                    Lines.poly(Tmp.v1.x, Tmp.v1.y, sides, minimap.scale(radius + 1f, minimapAutoscale), rotation);
+                }
+
+                Lines.stroke(stroke, color);
+                Lines.poly(Tmp.v1.x, Tmp.v1.y, sides, minimap.scale(radius + 1f, minimapAutoscale), rotation);
+            }else{
+                Draw.color(color);
+                Fill.poly(Tmp.v1.x, Tmp.v1.y, sides, minimap.scale(radius, minimapAutoscale), rotation);
+            }
+
             Draw.reset();
         }
 
@@ -914,13 +973,31 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         @Override
         public void draw(){
             // font size cannot be 0
-            if(hidden || Math.abs(fontSize) < 1e-5) return;
+            if(hidden || Math.abs(fontSize) < 1e-5 || minimap) return;
 
             if(fetchedText == null){
                 fetchedText = fetchText(text);
             }
 
             WorldLabel.drawAt(fetchedText, pos.x, pos.y, drawLayer, flags, fontSize);
+        }
+
+        @Override
+        public void drawMinimap(MinimapRenderer minimap){
+            if(hidden || !this.minimap) return;
+
+            float size = minimap.scale(fontSize, minimapAutoscale);
+
+            // font size cannot be 0
+            if(Math.abs(fontSize) < 1e-5) return;
+
+            minimap.transform(Tmp.v1.set(pos.x + 4f, pos.y + 4f));
+
+            if(fetchedText == null){
+                fetchedText = fetchText(text);
+            }
+
+            WorldLabel.drawAt(fetchedText, Tmp.v1.x, Tmp.v1.y, drawLayer, flags, size);
         }
 
         @Override
@@ -1001,7 +1078,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public void draw(){
-            if(hidden) return;
+            if(hidden || minimap) return;
 
             Draw.z(drawLayer);
             if(outline){
@@ -1011,6 +1088,23 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
             Lines.stroke(stroke, color);
             Lines.line(pos1.x, pos1.y, pos2.x, pos2.y);
+        }
+
+        @Override
+        public void drawMinimap(MinimapRenderer minimap){
+            if(hidden || !this.minimap) return;
+
+            minimap.transform(Tmp.v1.set(pos1.x + 4f, pos1.y + 4f));
+            minimap.transform(Tmp.v2.set(pos2.x + 4f, pos2.y + 4f));
+
+            Draw.z(drawLayer);
+            if(outline){
+                Lines.stroke(minimap.scale(stroke + 2f, minimapAutoscale), Pal.gray);
+                Lines.line(Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y);
+            }
+
+            Lines.stroke(minimap.scale(stroke, minimapAutoscale), color);
+            Lines.line(Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y);
         }
     }
 
@@ -1039,17 +1133,18 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                 case rotation -> rotation = (float)p1;
                 case textureWidth -> width = (float)p1 * tilesize;
                 case textureHeight -> height = (float)p1 * tilesize;
-                case color -> {
-                    Log.info("test");
-                    color.set(Tmp.c1.fromDouble(p1));
+                case textureSize -> {
+                    width = (float)p1 * tilesize;
+                    height = (float)p2 * tilesize;
                 }
+                case color -> color.set(Tmp.c1.fromDouble(p1));
                 default -> super.control(type, p1, p2, p3);
             }
         }
 
         @Override
         public void draw(){
-            if(hidden || textureName.isEmpty()) return;
+            if(hidden || textureName.isEmpty() || minimap) return;
 
             if(fetchedRegion == null) fetchedRegion = Core.atlas.find(textureName);
 
@@ -1065,8 +1160,28 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                 Draw.color(Color.white);
                 Draw.rect("error", pos.x, pos.y, width, height, rotation);
             }
+        }
 
-            Draw.z(Layer.overlayUI);
+        @Override
+        public void drawMinimap(MinimapRenderer minimap){
+            if(hidden || textureName.isEmpty() || !this.minimap) return;
+
+            if(fetchedRegion == null) fetchedRegion = Core.atlas.find(textureName);
+
+            // Zero width/height scales marker to original texture's size
+            if(width < 1e-5) width = fetchedRegion.width * fetchedRegion.scl() * Draw.xscl;
+            if(height < 1e-5) height = fetchedRegion.height * fetchedRegion.scl() * Draw.yscl;
+
+            minimap.transform(Tmp.v1.set(pos.x + 4f, pos.y + 4f));
+
+            Draw.z(drawLayer);
+            if(fetchedRegion.found()){
+                Draw.color(color);
+                Draw.rect(fetchedRegion, Tmp.v1.x, Tmp.v1.y, minimap.scale(width, minimapAutoscale), minimap.scale(height, minimapAutoscale), rotation);
+            }else{
+                Draw.color(Color.white);
+                Draw.rect("error", Tmp.v1.x, Tmp.v1.y, minimap.scale(width, minimapAutoscale), minimap.scale(height, minimapAutoscale), rotation);
+            }
         }
 
         @Override
