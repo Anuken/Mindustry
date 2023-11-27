@@ -1275,19 +1275,8 @@ public class HierarchyPathFinder implements Runnable{
     }
 
     private void clusterChanged(int team, int pathCost, int cx, int cy){
-        //TODO very important: invalidate paths!
-        //reset all flowfields that contain this cluster
-        //remove all paths that contain this cluster
-        //VERY important: don't replace all the data.
-
         int index = cx + cy * cwidth;
 
-        //TODO go through each path request:
-        // - if it contains this cluster in its field:
-        //   - DONE mark for it to be recomputed next frame in a Set (so it doesn't happen twice!)
-        //   - DONE recomputing should invalidate the flowfield
-        //   - recomputing should save the old flowfield Somewhere
-        //   - DONE invalidations should be batched every few seconds (let's say, 2)
         for(var req : threadPathRequests){
             var field = fields.get(req.destination);
             if((field != null && field.fields.containsKey(index)) || req.notFound){
