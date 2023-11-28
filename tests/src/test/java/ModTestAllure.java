@@ -13,17 +13,14 @@ import static org.junit.jupiter.api.Assertions.*;
 //- it is probably the mod with the most json, and as such covers a lot of classes
 //- it is popular enough in the mod browser
 //- I am somewhat familiar with its files & the type of content it adds
-public class ModTestExotic extends GenericModTest{
+public class ModTestAllure extends GenericModTest{
 
     @Test
     public void begin(){
-        //TODO broken as of 136+
-        if(true) return;
+        grabMod("https://github.com/BlueWolf3682/Allure/archive/4150f74db1ea6058dc090959cf0fe5dc9d239e37.zip");
+        checkExistence("allure");
 
-        grabMod("https://github.com/BlueWolf3682/Exotic-Mod/archive/08c861398ac9c3d1292132f9a110e17e06294a90.zip");
-        checkExistence("exotic-mod");
-
-        UnitType type = Vars.content.units().find(u -> u.name.equals("exotic-mod-luminance"));
+        UnitType type = Vars.content.unit("allure-0b11-exodus");
         assertNotNull(type, "A mod unit must be loaded.");
         assertTrue(type.weapons.size > 0, "A mod unit must have a weapon.");
 

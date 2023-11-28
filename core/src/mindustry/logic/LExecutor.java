@@ -19,6 +19,7 @@ import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.logic.LogicFx.*;
 import mindustry.type.*;
+import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.logic.*;
@@ -945,12 +946,6 @@ public class LExecutor{
             //graphics on headless servers are useless.
             if(Vars.headless || exec.graphicsBuffer.size >= maxGraphicsBuffer) return;
 
-            int num1 = exec.numi(p1);
-
-            if(type == LogicDisplay.commandImage){
-                num1 = exec.obj(p1) instanceof UnlockableContent u ? u.iconId : 0;
-            }
-
             //explicitly unpack colorPack, it's pre-processed here
             if(type == LogicDisplay.commandColorPack){
                 double packed = exec.num(x);
@@ -962,7 +957,63 @@ public class LExecutor{
                 a = ((value & 0x000000ff));
 
                 exec.graphicsBuffer.add(DisplayCmd.get(LogicDisplay.commandColor, pack(r), pack(g), pack(b), pack(a), 0, 0));
+            }else if(type == LogicDisplay.commandPrint){
+                CharSequence str = exec.textBuffer;
+
+                if(str.length() > 0){
+                    var data = Fonts.logic.getData();
+                    int advance = (int)data.spaceXadvance, lineHeight = (int)data.lineHeight;
+
+                    int xOffset, yOffset;
+                    int align = p1; //p1 is not a variable, it's a raw align value. what a massive hack
+
+                    int maxWidth = 0, lines = 1, lineWidth = 0;
+                    for(int i = 0; i < str.length(); i++){
+                        char next = str.charAt(i);
+                        if(next == '\n'){
+                            maxWidth = Math.max(maxWidth, lineWidth);
+                            lineWidth = 0;
+                            lines ++;
+                        }else{
+                            lineWidth ++;
+                        }
+                    }
+                    maxWidth = Math.max(maxWidth, lineWidth);
+
+                    float
+                    width = maxWidth * advance,
+                    height = lines * lineHeight,
+                    ha = ((Align.isLeft(align) ? -1f : 0f) + 1f + (Align.isRight(align) ? 1f : 0f))/2f,
+                    va = ((Align.isBottom(align) ? -1f : 0f) + 1f + (Align.isTop(align) ? 1f : 0f))/2f;
+
+                    xOffset = -(int)(width * ha);
+                    yOffset = -(int)(height * va) + (lines - 1) * lineHeight;
+
+
+                    int curX = exec.numi(x), curY = exec.numi(y);
+                    for(int i = 0; i < str.length(); i++){
+                        char next = str.charAt(i);
+                        if(next == '\n'){
+                            //move Y down when newline is encountered
+                            curY -= lineHeight;
+                            curX = exec.numi(x); //reset
+                            continue;
+                        }
+                        if(Fonts.logic.getData().hasGlyph(next)){
+                            exec.graphicsBuffer.add(DisplayCmd.get(LogicDisplay.commandPrint, packSign(curX + xOffset), packSign(curY + yOffset), next, 0, 0, 0));
+                        }
+                        curX += advance;
+                    }
+
+                    exec.textBuffer.setLength(0);
+                }
             }else{
+                int num1 = exec.numi(p1);
+
+                if(type == LogicDisplay.commandImage){
+                    num1 = exec.obj(p1) instanceof UnlockableContent u ? u.iconId : 0;
+                }
+
                 //add graphics calls, cap graphics buffer size
                 exec.graphicsBuffer.add(DisplayCmd.get(type, packSign(exec.numi(x)), packSign(exec.numi(y)), packSign(num1), packSign(exec.numi(p2)), packSign(exec.numi(p3)), packSign(exec.numi(p4))));
             }
@@ -1459,7 +1510,8 @@ public class LExecutor{
                 case ban -> {
                     Object cont = exec.obj(value);
                     if(cont instanceof Block b){
-                        state.rules.bannedBlocks.add(b);
+                        // Rebuild PlacementFragment if anything has changed
+                        if(state.rules.bannedBlocks.add(b) && !headless) ui.hudfrag.blockfrag.rebuild();
                     }else if(cont instanceof UnitType u){
                         state.rules.bannedUnits.add(u);
                     }
@@ -1467,7 +1519,7 @@ public class LExecutor{
                 case unban -> {
                     Object cont = exec.obj(value);
                     if(cont instanceof Block b){
-                        state.rules.bannedBlocks.remove(b);
+                        if(state.rules.bannedBlocks.remove(b) && !headless) ui.hudfrag.blockfrag.rebuild();
                     }else if(cont instanceof UnitType u){
                         state.rules.bannedUnits.remove(u);
                     }

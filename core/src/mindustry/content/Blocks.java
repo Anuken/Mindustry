@@ -570,7 +570,7 @@ public class Blocks{
         snowWall = new StaticWall("snow-wall");
 
         duneWall = new StaticWall("dune-wall"){{
-            basalt.asFloor().wall = darksandWater.asFloor().wall = darksandTaintedWater.asFloor().wall = this;
+            hotrock.asFloor().wall = magmarock.asFloor().wall = basalt.asFloor().wall = darksandWater.asFloor().wall = darksandTaintedWater.asFloor().wall = this;
             attributes.set(Attribute.sand, 2f);
         }};
 
@@ -2408,7 +2408,7 @@ public class Blocks{
         largeSolarPanel = new SolarGenerator("solar-panel-large"){{
             requirements(Category.power, with(Items.lead, 80, Items.silicon, 110, Items.phaseFabric, 15));
             size = 3;
-            powerProduction = 1.3f;
+            powerProduction = 1.6f;
         }};
 
         thoriumReactor = new NuclearReactor("thorium-reactor"){{

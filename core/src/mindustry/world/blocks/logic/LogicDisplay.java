@@ -28,7 +28,8 @@ public class LogicDisplay extends Block{
         commandLinePoly = 8,
         commandTriangle = 9,
         commandImage = 10,
-        commandCharacter = 11;
+        //note that this command actually only draws 1 character, unpacked in instruction
+        commandPrint = 11;
 
     public int maxSides = 25;
 
@@ -103,8 +104,14 @@ public class LogicDisplay extends Block{
                                 var icon = Fonts.logicIcon(p1);
                                 Draw.rect(Fonts.logicIcon(p1), x, y, p2, p2 / icon.ratio(), p3);
                             }
-                            case commandCharacter -> {
-                                //TODO
+                            case commandPrint -> {
+                                var glyph = Fonts.logic.getData().getGlyph((char)p1);
+                                if(glyph != null){
+                                    Tmp.tr1.set(Fonts.logic.getRegion().texture);
+                                    Tmp.tr1.set(glyph.u, glyph.v2, glyph.u2, glyph.v);
+
+                                    Draw.rect(Tmp.tr1, x + Tmp.tr1.width/2f + glyph.xoffset, y + Tmp.tr1.height/2f + glyph.yoffset + Fonts.logic.getData().capHeight + Fonts.logic.getData().ascent, Tmp.tr1.width, Tmp.tr1.height);
+                                }
                             }
                         }
                     }
@@ -151,7 +158,8 @@ public class LogicDisplay extends Block{
         linePoly,
         triangle,
         image,
-        ;//character;
+        //note that this command actually only draws 1 character, unpacked in instruction
+        print;
 
         public static final GraphicsType[] all = values();
     }

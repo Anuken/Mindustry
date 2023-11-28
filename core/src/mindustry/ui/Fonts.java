@@ -35,7 +35,7 @@ public class Fonts{
     private static TextureRegion[] iconTable;
     private static int lastCid;
 
-    public static Font def, outline, icon, iconLarge, tech;
+    public static Font def, outline, icon, iconLarge, tech, logic;
 
     public static TextureRegion logicIcon(int id){
         return iconTable[id];
@@ -71,11 +71,13 @@ public class Fonts{
         FreeTypeFontParameter param = fontParameter();
 
         Core.assets.load("default", Font.class, new FreeTypeFontLoaderParameter(mainFont, param)).loaded = f -> Fonts.def = f;
+
         Core.assets.load("icon", Font.class, new FreeTypeFontLoaderParameter("fonts/icon.ttf", new FreeTypeFontParameter(){{
             size = 30;
             incremental = true;
             characters = "\0";
         }})).loaded = f -> Fonts.icon = f;
+
         Core.assets.load("iconLarge", Font.class, new FreeTypeFontLoaderParameter("fonts/icon.ttf", new FreeTypeFontParameter(){{
             size = 48;
             incremental = false;
@@ -83,6 +85,14 @@ public class Fonts{
             borderWidth = 5f;
             borderColor = Color.darkGray;
         }})).loaded = f -> Fonts.iconLarge = f;
+
+        Core.assets.load("logic", Font.class, new FreeTypeFontLoaderParameter("fonts/logic.ttf", new FreeTypeFontParameter(){{
+            size = 16;
+            //generated all at once, it's fast enough anyway
+            incremental = false;
+            //ASCII only
+            characters = "\0ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890\"!`?'.,;:()[]{}<>|/@\\^$€-%+=#_&~*";
+        }})).loaded = f -> Fonts.logic = f;
     }
 
     public static TextureRegion getLargeIcon(String name){

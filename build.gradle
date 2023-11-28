@@ -413,7 +413,7 @@ project(":annotations"){
 
     dependencies{
         implementation 'com.squareup:javapoet:1.12.1'
-        implementation "com.github.Anuken.Arc:arc-core:$arcHash"
+        implementation arcModule("arc-core")
     }
 }
 
