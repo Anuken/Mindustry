@@ -380,6 +380,8 @@ public class Renderer implements ApplicationListener{
             if(marker != null) marker.draw();
         }
 
+        Draw.reset();
+
         Draw.draw(Layer.overlayUI, overlays::drawTop);
         if(state.rules.fog) Draw.draw(Layer.fogOfWar, fog::drawFog);
         Draw.draw(Layer.space, this::drawLanding);
