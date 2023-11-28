@@ -164,7 +164,7 @@ public class LStatements{
                     }
 
                     if(type == GraphicsType.print){
-                        p2 = "bottomLeft";
+                        p1 = "bottomLeft";
                     }
 
                     rebuild(table);
