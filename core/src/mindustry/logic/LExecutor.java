@@ -1005,7 +1005,9 @@ public class LExecutor{
                             curX = exec.numi(x); //reset
                             continue;
                         }
-                        exec.graphicsBuffer.add(DisplayCmd.get(LogicDisplay.commandPrint, packSign(curX + xOffset), packSign(curY + yOffset), next, 0, 0, 0));
+                        if(Fonts.logic.getData().hasGlyph(next)){
+                            exec.graphicsBuffer.add(DisplayCmd.get(LogicDisplay.commandPrint, packSign(curX + xOffset), packSign(curY + yOffset), next, 0, 0, 0));
+                        }
                         curX += advance;
                     }
 
