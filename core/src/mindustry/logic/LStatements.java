@@ -2001,7 +2001,7 @@ public class LStatements{
                                     }
                                 }).width(240f).left();
                             }));
-                        }, Styles.logict, () -> {}).size(40f).padLeft(-2).color(table.color);
+                        }, Styles.logict, () -> {}).size(40f).padLeft(-11).color(table.color);
                     }
                 });
 
