@@ -6,6 +6,7 @@ import arc.graphics.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
@@ -121,6 +122,20 @@ public class LStatements{
 
     @RegisterStatement("draw")
     public static class DrawStatement extends LStatement{
+        static final String[] aligns = {"center", "top", "bottom", "left", "right", "topLeft", "topRight", "bottomLeft", "bottomRight"};
+        //yes, boxing Integer is gross but this is easier to construct and Integers <128 don't allocate anyway
+        static final ObjectMap<String, Integer> nameToAlign = ObjectMap.of(
+        "center", Align.center,
+        "top", Align.top,
+        "bottom", Align.bottom,
+        "left", Align.left,
+        "right", Align.right,
+        "topLeft", Align.topLeft,
+        "topRight", Align.topRight,
+        "bottomLeft", Align.bottomLeft,
+        "bottomRight", Align.bottomRight
+        );
+
         public GraphicsType type = GraphicsType.clear;
         public String x = "0", y = "0", p1 = "0", p2 = "0", p3 = "0", p4 = "0";
 
@@ -147,6 +162,11 @@ public class LStatements{
                         p2 = "32";
                         p3 = "0";
                     }
+
+                    if(type == GraphicsType.print){
+                        p2 = "bottomLeft";
+                    }
+
                     rebuild(table);
                 }, 2, cell -> cell.size(100, 50)));
             }, Styles.logict, () -> {}).size(90, 40).color(table.color).left().padLeft(2);
@@ -221,14 +241,21 @@ public class LStatements{
                         row(s);
                         fields(s, "rotation", p3, v -> p3 = v);
                     }
-                    //TODO
-                    /*
-                    case character -> {
+                    case print -> {
                         fields(s, "x", x, v -> x = v);
                         fields(s, "y", y, v -> y = v);
+
                         row(s);
-                        fields(s, "char", p1, v -> p1 = v);
-                    }*/
+
+                        s.add("align ");
+
+                        s.button(b -> {
+                            b.label(() -> nameToAlign.containsKey(p1) ? p1 : "bottomLeft");
+                            b.clicked(() -> showSelect(b, aligns, p1, t -> {
+                                p1 = t;
+                            }, 2, cell -> cell.size(165, 50)));
+                        }, Styles.logict, () -> {}).size(165, 40).color(s.color).left().padLeft(2);
+                    }
                 }
             }).expand().left();
         }
@@ -243,7 +270,8 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new DrawI((byte)type.ordinal(), 0, builder.var(x), builder.var(y), builder.var(p1), builder.var(p2), builder.var(p3), builder.var(p4));
+            return new DrawI((byte)type.ordinal(), 0, builder.var(x), builder.var(y),
+                type == GraphicsType.print ? nameToAlign.get(p1, Align.bottomLeft) : builder.var(p1), builder.var(p2), builder.var(p3), builder.var(p4));
         }
 
         @Override

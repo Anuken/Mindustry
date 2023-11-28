@@ -1,15 +1,19 @@
 [
   {
+    "name": "Vndustry",
+    "address": ["140.238.246.78:7000"]
+  },
+  {
     "name": "meiqiuMDT",
     "address": ["cn1.plush.run:10001","211.101.236.94:10000","bj-1.lcf.icu:10240","play.simpfun.cn:14523"]
   },
   {
     "name": "Crux's Revelations",
-    "address": ["fsn1.bbn.one:52397","fsn1.bbn.one:58375","de-free-01.hosts.optikservers.com:32212","fsn1.bbn.one:49840","de-free-01.hosts.optikservers.com:30449"]
+    "address": ["de-free-01.hosts.optikservers.com:31528","de-prem-01.hosts.optikservers.com:35160"]
   },
   {
     "name": "CMS",
-    "address": ["195.2.84.144"]
+    "address": ["195.2.84.144","23.88.73.88:25617"]
   },
   {
     "name": "ShardDustry Eventos",
@@ -77,7 +81,7 @@
   },
   {
     "name": "XCore",
-    "address": ["130.61.52.25", "130.61.52.25:6568", "130.61.52.25:6569", "130.61.52.25:6570", "130.61.52.25:6571", "130.61.52.25:6572", "130.61.52.25:6573", "130.61.52.25:6888"]
+    "address": ["128.140.88.66", "128.140.88.66:6568", "128.140.88.66:6569", "128.140.88.66:6570", "128.140.88.66:6571", "128.140.88.66:6572", "128.140.88.66:6573", "128.140.88.66:6574", "128.140.88.66:6575"]
   },
   {
     "name": "Chaotic Neutral",
@@ -125,7 +129,7 @@
   },
   {
     "name": "Eradication Mindustry",
-    "address": ["eradicationmindustry.mindustry.me:6569", "eradicationmindustry.mindustry.me:9547", "eradicationmindustry.mindustry.me:6572", "eradicationmindustry.mindustry.me:6570", "eradicationmindustry.mindustry.me:6571", "eradicationmindustry.mindustry.me:6574", "eradicationmindustry.mindustry.me:6573", "eradicationmindustry.mindustry.me:6568", "eradicationmindustry.mindustry.me:6677", "eradicationmindustry.mindustry.me:6678", "eradicationmindustry.mindustry.me:6675"]
+    "address": ["140.238.246.78:6569", "140.238.246.78:9547", "140.238.246.78:6572", "140.238.246.78:6570", "140.238.246.78:6571", "140.238.246.78:6574", "140.238.246.78:6573", "140.238.246.78:6568", "140.238.246.78:6677", "140.238.246.78:6678", "140.238.246.78:6675", "130.61.22.183:6573", "130.61.22.183:6599", "130.61.22.183:6774", "130.61.22.183:6777"]
   },
   {
     "name": "Conservatory",
@@ -222,11 +226,11 @@
   },
   {
     "name": "ABCXYZ Community",
-    "address": ["23.88.73.88:23591", "23.88.73.88:23539", "144.76.57.59:14996", "144.76.57.59:16881", "144.76.57.59:13885", "5.9.8.124:17775"]
+    "address": ["23.88.73.88:23591", "23.88.73.88:23539", "144.76.57.59:14996", "144.76.57.59:16881", "144.76.57.59:13885", "23.88.73.88:32113", "144.76.57.59:9269"]
   },
   {
     "name": "CroCraft Network",
-    "address": ["193.122.53.98:6567", "41.216.188.223:5001"]
+    "address": ["193.122.53.98:6567", "193.122.53.98:20130"]
   },
   {
     "name": "Extra Utilities",
@@ -234,7 +238,7 @@
   },
   {
     "name": "Alex Multiverse",
-    "address": ["alexmindustryv7.servegame.com:25588", "173.255.208.38:41962", "alexmindustrypvp.ddns.net:6767", "172.104.188.197:6768"]
+    "address": ["alexmindustryv7.servegame.com:25588", "173.255.208.38:41962", "alexmindustrypvp.ddns.net:6767", "172.104.188.197:6768", "172.234.80.96:6768", "139.162.41.78:6767"]
   },
   {
     "name": "Open PVP",

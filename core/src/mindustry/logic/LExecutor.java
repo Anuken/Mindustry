@@ -19,6 +19,7 @@ import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.logic.LogicFx.*;
 import mindustry.type.*;
+import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.logic.*;
@@ -962,6 +963,56 @@ public class LExecutor{
                 a = ((value & 0x000000ff));
 
                 exec.graphicsBuffer.add(DisplayCmd.get(LogicDisplay.commandColor, pack(r), pack(g), pack(b), pack(a), 0, 0));
+            }else if(type == LogicDisplay.commandPrint){
+                CharSequence str = exec.textBuffer;
+
+                if(str.length() > 0){
+                    var data = Fonts.logic.getData();
+                    int advance = (int)data.spaceXadvance, lineHeight = (int)data.lineHeight;
+
+                    int xOffset, yOffset;
+                    int align = p1; //p1 is not a variable, it's a raw align value. what a massive hack
+
+                    int maxWidth = 0, lines = 1, lineWidth = 0;
+                    for(int i = 0; i < str.length(); i++){
+                        char next = str.charAt(i);
+                        if(next == '\n'){
+                            maxWidth = Math.max(maxWidth, lineWidth);
+                            lineWidth = 0;
+                            lines ++;
+                        }else{
+                            lineWidth ++;
+                        }
+                    }
+                    maxWidth = Math.max(maxWidth, lineWidth);
+
+                    float
+                    width = maxWidth * advance,
+                    height = lines * lineHeight,
+                    ha = ((Align.isLeft(align) ? -1f : 0f) + 1f + (Align.isRight(align) ? 1f : 0f))/2f,
+                    va = ((Align.isBottom(align) ? -1f : 0f) + 1f + (Align.isTop(align) ? 1f : 0f))/2f;
+
+                    xOffset = -(int)(width * ha);
+                    yOffset = -(int)(height * va) + (lines - 1) * lineHeight;
+
+
+                    int curX = exec.numi(x), curY = exec.numi(y);
+                    for(int i = 0; i < str.length(); i++){
+                        char next = str.charAt(i);
+                        if(next == '\n'){
+                            //move Y down when newline is encountered
+                            curY -= lineHeight;
+                            curX = exec.numi(x); //reset
+                            continue;
+                        }
+                        if(Fonts.logic.getData().hasGlyph(next)){
+                            exec.graphicsBuffer.add(DisplayCmd.get(LogicDisplay.commandPrint, packSign(curX + xOffset), packSign(curY + yOffset), next, 0, 0, 0));
+                        }
+                        curX += advance;
+                    }
+
+                    exec.textBuffer.setLength(0);
+                }
             }else{
                 //add graphics calls, cap graphics buffer size
                 exec.graphicsBuffer.add(DisplayCmd.get(type, packSign(exec.numi(x)), packSign(exec.numi(y)), packSign(num1), packSign(exec.numi(p2)), packSign(exec.numi(p3)), packSign(exec.numi(p4))));
