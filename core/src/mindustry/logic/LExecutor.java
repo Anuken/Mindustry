@@ -946,12 +946,6 @@ public class LExecutor{
             //graphics on headless servers are useless.
             if(Vars.headless || exec.graphicsBuffer.size >= maxGraphicsBuffer) return;
 
-            int num1 = exec.numi(p1);
-
-            if(type == LogicDisplay.commandImage){
-                num1 = exec.obj(p1) instanceof UnlockableContent u ? u.iconId : 0;
-            }
-
             //explicitly unpack colorPack, it's pre-processed here
             if(type == LogicDisplay.commandColorPack){
                 double packed = exec.num(x);
@@ -1014,6 +1008,12 @@ public class LExecutor{
                     exec.textBuffer.setLength(0);
                 }
             }else{
+                int num1 = exec.numi(p1);
+
+                if(type == LogicDisplay.commandImage){
+                    num1 = exec.obj(p1) instanceof UnlockableContent u ? u.iconId : 0;
+                }
+
                 //add graphics calls, cap graphics buffer size
                 exec.graphicsBuffer.add(DisplayCmd.get(type, packSign(exec.numi(x)), packSign(exec.numi(y)), packSign(num1), packSign(exec.numi(p2)), packSign(exec.numi(p3)), packSign(exec.numi(p4))));
             }
