@@ -969,7 +969,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                 fetchedText = fetchText(text);
             }
 
-            float scl = autoscale ? 4f / renderer.getScale() : 1f;
+            float scl = autoscale ? 4f / renderer.getDisplayScale() : 1f;
 
             WorldLabel.drawAt(fetchedText, pos.x, pos.y, drawLayer, flags, fontSize * scl);
         }
