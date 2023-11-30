@@ -373,13 +373,13 @@ public class Weapon implements Cloneable{
                 }
 
                 //target length of laser
-                float shootLength = Math.min(Mathf.dst(bulletX, bulletY, mount.target.getX(), mount.target.getY()), range());
+                float shootLength = Math.min(Mathf.dst(bulletX, bulletY, mount.aimX, mount.aimY), range());
                 //current length of laser
-                float curLength = Mathf.dst(mount.bullet.aimX, mount.bullet.aimY);
+                float curLength = Mathf.dst(bulletX, bulletY, mount.bullet.aimX, mount.bullet.aimY);
                 //resulting length of the bullet (smoothed)
                 float resultLength = Mathf.approachDelta(curLength, shootLength, aimChangeSpeed);
                 //actual aim end point based on length
-                Tmp.v1.trns(weaponRotation, mount.lastLength = resultLength).add(x, y);
+                Tmp.v1.trns(shootAngle, mount.lastLength = resultLength).add(bulletX, bulletY);
 
                 mount.bullet.aimX = Tmp.v1.x;
                 mount.bullet.aimY = Tmp.v1.y;
@@ -515,7 +515,7 @@ public class Weapon implements Cloneable{
                 bulletX = mountX + Angles.trnsx(weaponRotation, this.shootX, this.shootY),
                 bulletY = mountY + Angles.trnsy(weaponRotation, this.shootX, this.shootY);
             //make sure the length updates to the last set value
-            Tmp.v1.trns(weaponRotation, shootY + mount.lastLength).add(bulletX, bulletY);
+            Tmp.v1.trns(bulletRotation(unit, mount, bulletX, bulletY), shootY + mount.lastLength).add(bulletX, bulletY);
             bullet.aimX = Tmp.v1.x;
             bullet.aimY = Tmp.v1.y;
         }
