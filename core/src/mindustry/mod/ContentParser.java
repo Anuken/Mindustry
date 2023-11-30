@@ -2,6 +2,7 @@ package mindustry.mod;
 
 import arc.*;
 import arc.assets.*;
+import arc.assets.loaders.MusicLoader.*;
 import arc.assets.loaders.SoundLoader.*;
 import arc.audio.*;
 import arc.files.*;
@@ -61,6 +62,7 @@ public class ContentParser{
     ObjectMap<Class<?>, ContentType> contentTypes = new ObjectMap<>();
     ObjectSet<Class<?>> implicitNullable = ObjectSet.with(TextureRegion.class, TextureRegion[].class, TextureRegion[][].class, TextureRegion[][][].class);
     ObjectMap<String, AssetDescriptor<?>> sounds = new ObjectMap<>();
+    ObjectMap<String, AssetDescriptor<?>> musics = new ObjectMap<>();
     Seq<ParseListener> listeners = new Seq<>();
 
     ObjectMap<Class<?>, FieldParser> classParsers = new ObjectMap<>(){{
@@ -283,6 +285,20 @@ public class ContentParser{
             desc.errored = Throwable::printStackTrace;
             sounds.put(path, desc);
             return sound;
+        });
+        put(Music.class, (type, data) -> {
+            if(fieldOpt(Musics.class, data) != null) return fieldOpt(Musics.class, data);
+            if(Vars.headless) return new Music();
+            
+            String name = "music/" + data.asString();
+            String path = Vars.tree.get(name + ".ogg").exists() ? name + ".ogg" : name + ".mp3";
+            
+            if(musics.containsKey(path)) return ((MusicParameter)musics.get(path).params).music;
+            var music = new Music();
+            AssetDescriptor<?> desc = Core.assets.load(path, Music.class, new MusicParameter(music));
+            desc.errored = Throwable::printStackTrace;
+            musics.put(path, desc);
+            return music;
         });
         put(Objectives.Objective.class, (type, data) -> {
             if(data.isString()){
