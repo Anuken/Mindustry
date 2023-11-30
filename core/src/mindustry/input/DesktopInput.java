@@ -56,6 +56,8 @@ public class DesktopInput extends InputHandler{
     /** Time of most recent control group selection */
     public long lastCtrlGroupSelectMillis;
 
+    private final Vec2 buildPlanMouseOffsetPX = new Vec2();
+
     boolean showHint(){
         return ui.hudfrag.shown && Core.settings.getBool("hints") && selectPlans.isEmpty() &&
             (!isBuilding && !Core.settings.getBool("buildautopause") || player.unit().isBuilding() || !player.dead() && !player.unit().spawnedByCore());
@@ -622,11 +624,10 @@ public class DesktopInput extends InputHandler{
         }
 
         if(splan != null){
-            float offset = ((splan.block.size + 2) % 2) * tilesize / 2f;
-            float x = Core.input.mouseWorld().x + offset;
-            float y = Core.input.mouseWorld().y + offset;
-            splan.x = (int)(x / tilesize);
-            splan.y = (int)(y / tilesize);
+            float x = Core.input.mouseWorld().x + buildPlanMouseOffsetPX.x;
+            float y = Core.input.mouseWorld().y + buildPlanMouseOffsetPX.y;
+            splan.x = Math.round(x / tilesize);
+            splan.y = Math.round(y / tilesize);
         }
 
         if(block == null || mode != placing){
@@ -670,6 +671,8 @@ public class DesktopInput extends InputHandler{
                 updateLine(selectX, selectY);
             }else if(plan != null && !plan.breaking && mode == none && !plan.initialized){
                 splan = plan;
+                buildPlanMouseOffsetPX.x = splan.x * tilesize - Core.input.mouseWorld().x;
+                buildPlanMouseOffsetPX.y = splan.y * tilesize - Core.input.mouseWorld().y;
             }else if(plan != null && plan.breaking){
                 deleting = true;
             }else if(commandMode){
