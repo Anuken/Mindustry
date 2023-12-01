@@ -255,5 +255,9 @@
   {
     "name": "Atomic",
     "address": ["atomic-de.ddns.net:35199", "atomic-de.ddns.net:35176", "atomic-de.ddns.net:35845"]
+  },
+  {
+    "name": "SkyPlex",
+    "address": ["mc-skyplex.net"]
   }
 ]
