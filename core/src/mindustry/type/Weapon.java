@@ -54,6 +54,8 @@ public class Weapon implements Cloneable{
     public boolean continuous;
     /** whether this weapon uses continuous fire without reloading; implies continuous = true */
     public boolean alwaysContinuous;
+    /** Speed at which the turret can change its bullet "aim" distance. This is only used for point laser bullets. */
+    public float aimChangeSpeed = Float.POSITIVE_INFINITY;
     /** whether this weapon can be aimed manually by players */
     public boolean controllable = true;
     /** whether this weapon can be automatically aimed by the unit */
@@ -370,6 +372,18 @@ public class Weapon implements Cloneable{
                     mount.sound.update(bulletX, bulletY, true);
                 }
 
+                //target length of laser
+                float shootLength = Math.min(Mathf.dst(bulletX, bulletY, mount.aimX, mount.aimY), range());
+                //current length of laser
+                float curLength = Mathf.dst(bulletX, bulletY, mount.bullet.aimX, mount.bullet.aimY);
+                //resulting length of the bullet (smoothed)
+                float resultLength = Mathf.approachDelta(curLength, shootLength, aimChangeSpeed);
+                //actual aim end point based on length
+                Tmp.v1.trns(shootAngle, mount.lastLength = resultLength).add(bulletX, bulletY);
+
+                mount.bullet.aimX = Tmp.v1.x;
+                mount.bullet.aimY = Tmp.v1.y;
+
                 if(alwaysContinuous && mount.shoot){
                     mount.bullet.time = mount.bullet.lifetime * mount.bullet.type.optimalLifeFract * mount.warmup;
                     mount.bullet.keepAlive = true;
@@ -493,7 +507,18 @@ public class Weapon implements Cloneable{
 
     //override to do special things to a bullet after spawning
     protected void handleBullet(Unit unit, WeaponMount mount, Bullet bullet){
-
+        if(continuous){
+            float
+                weaponRotation = unit.rotation - 90 + (rotate ? mount.rotation : baseRotation),
+                mountX = unit.x + Angles.trnsx(unit.rotation - 90, x, y),
+                mountY = unit.y + Angles.trnsy(unit.rotation - 90, x, y),
+                bulletX = mountX + Angles.trnsx(weaponRotation, this.shootX, this.shootY),
+                bulletY = mountY + Angles.trnsy(weaponRotation, this.shootX, this.shootY);
+            //make sure the length updates to the last set value
+            Tmp.v1.trns(bulletRotation(unit, mount, bulletX, bulletY), shootY + mount.lastLength).add(bulletX, bulletY);
+            bullet.aimX = Tmp.v1.x;
+            bullet.aimY = Tmp.v1.y;
+        }
     }
 
     public void flip(){
