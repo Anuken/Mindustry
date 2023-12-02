@@ -1099,6 +1099,41 @@ public class LExecutor{
         }
     }
 
+    public static class FormatI implements LInstruction{
+        public int value;
+
+        public FormatI(int value){
+            this.value = value;
+        }
+
+        FormatI(){}
+
+        @Override
+        public void run(LExecutor exec){
+
+            if(exec.textBuffer.length() >= maxTextBuffer) return;
+
+            int placeholderIndex = exec.textBuffer.indexOf("@");
+
+            if(placeholderIndex == -1) return;
+
+            //this should avoid any garbage allocation
+            Var v = exec.var(value);
+            if(v.isobj && value != 0){
+                String strValue = PrintI.toString(v.objval);
+
+                exec.textBuffer.replace(placeholderIndex, placeholderIndex + 1, strValue);
+            }else{
+                //display integer version when possible
+                if(Math.abs(v.numval - (long)v.numval) < 0.00001){
+                    exec.textBuffer.replace(placeholderIndex, placeholderIndex + 1, (long)v.numval + "");
+                }else{
+                    exec.textBuffer.replace(placeholderIndex, placeholderIndex + 1, v.numval + "");
+                }
+            }
+        }
+    }
+
     public static class PrintFlushI implements LInstruction{
         public int target;
 
@@ -1992,6 +2027,40 @@ public class LExecutor{
                 marker.setText(text, true);
             }else if(type == LMarkerControl.flushText){
                 marker.setText(text, false);
+            }
+        }
+    }
+
+    public static class LocalePrintI implements LInstruction{
+        public int name;
+
+        public LocalePrintI(int name){
+            this.name = name;
+        }
+
+        public LocalePrintI(){
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            if(exec.textBuffer.length() >= maxTextBuffer) return;
+
+            //this should avoid any garbage allocation
+            Var v = exec.var(name);
+            if(v.isobj){
+                String name = PrintI.toString(v.objval);
+
+                String strValue;
+
+                if(mobile){
+                    strValue = state.mapLocales.containsProperty(name + ".mobile") ?
+                    state.mapLocales.getProperty(name + ".mobile") :
+                    state.mapLocales.getProperty(name);
+                }else{
+                    strValue = state.mapLocales.getProperty(name);
+                }
+
+                exec.textBuffer.append(strValue);
             }
         }
     }

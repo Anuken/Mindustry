@@ -483,6 +483,14 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                 timeString.append(s);
 
                 if(text.startsWith("@")){
+                    if(state.mapLocales.containsProperty(text.substring(1))){
+                        try{
+                            return state.mapLocales.getFormatted(text.substring(1), timeString.toString());
+                        }catch(IllegalArgumentException e){
+                            //illegal text.
+                            text = "";
+                        }
+                    }
                     return Core.bundle.format(text.substring(1), timeString.toString());
                 }else{
                     try{
@@ -589,9 +597,17 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             return state.rules.objectiveFlags.contains(flag);
         }
 
+        @Nullable
         @Override
         public String text(){
-            return text != null && text.startsWith("@") ? Core.bundle.get(text.substring(1)) : text;
+            if(text == null) return null;
+
+            if(text.startsWith("@")){
+                if(state.mapLocales.containsProperty(text.substring(1))) return state.mapLocales.getProperty(text.substring(1));
+                return Core.bundle.get(text.substring(1));
+            }else{
+                return text;
+            }
         }
     }
 
@@ -639,12 +655,23 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         }
 
         public static String fetchText(String text){
-            return text.startsWith("@") ?
-                //on mobile, try ${text}.mobile first for mobile-specific hints.
-                mobile ? Core.bundle.get(text.substring(1) + ".mobile", Core.bundle.get(text.substring(1))) :
-                Core.bundle.get(text.substring(1)) :
-                text;
+            if(text == null) return "";
 
+            if(text.startsWith("@")){
+                String key = text.substring(1);
+
+                if(mobile){
+                    return state.mapLocales.containsProperty(key + ".mobile") ?
+                    state.mapLocales.getProperty(key + ".mobile") :
+                    Core.bundle.get(key + ".mobile", Core.bundle.get(key));
+                }else{
+                    return state.mapLocales.containsProperty(key) ?
+                    state.mapLocales.getProperty(key) :
+                    Core.bundle.get(key);
+                }
+            }else{
+                return text;
+            }
         }
     }
 
