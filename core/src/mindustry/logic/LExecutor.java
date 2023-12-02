@@ -1113,7 +1113,21 @@ public class LExecutor{
 
             if(exec.textBuffer.length() >= maxTextBuffer) return;
 
-            int placeholderIndex = exec.textBuffer.indexOf("@");
+            int placeholderIndex = -1;
+            int placeholderNumber = 10;
+
+            for(int i = 0; i < exec.textBuffer.length(); i++){
+                if(exec.textBuffer.charAt(i) == '{' && exec.textBuffer.length() - i > 2){
+                    char numChar = exec.textBuffer.charAt(i + 1);
+
+                    if(numChar >= '0' && numChar <= '9' && exec.textBuffer.charAt(i + 2) == '}'){
+                        if(numChar - '0' < placeholderNumber){
+                            placeholderNumber = numChar - '0';
+                            placeholderIndex = i;
+                        }
+                    }
+                }
+            }
 
             if(placeholderIndex == -1) return;
 
@@ -1122,13 +1136,13 @@ public class LExecutor{
             if(v.isobj && value != 0){
                 String strValue = PrintI.toString(v.objval);
 
-                exec.textBuffer.replace(placeholderIndex, placeholderIndex + 1, strValue);
+                exec.textBuffer.replace(placeholderIndex, placeholderIndex + 3, strValue);
             }else{
                 //display integer version when possible
                 if(Math.abs(v.numval - (long)v.numval) < 0.00001){
-                    exec.textBuffer.replace(placeholderIndex, placeholderIndex + 1, (long)v.numval + "");
+                    exec.textBuffer.replace(placeholderIndex, placeholderIndex + 3, (long)v.numval + "");
                 }else{
-                    exec.textBuffer.replace(placeholderIndex, placeholderIndex + 1, v.numval + "");
+                    exec.textBuffer.replace(placeholderIndex, placeholderIndex + 3, v.numval + "");
                 }
             }
         }
