@@ -1945,7 +1945,7 @@ public class LStatements{
 
     @RegisterStatement("setmarker")
     public static class SetMarkerStatement extends LStatement{
-        public LMarkerControl type = LMarkerControl.x;
+        public LMarkerControl type = LMarkerControl.pos;
         public String id = "0", p1 = "0", p2 = "0", p3 = "0";
 
         @Override
