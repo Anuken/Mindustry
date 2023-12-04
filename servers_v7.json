@@ -9,7 +9,7 @@
   },
   {
     "name": "Crux's Revelations",
-    "address": ["de-free-01.hosts.optikservers.com:31528","de-prem-01.hosts.optikservers.com:35160"]
+    "address": ["de-free-01.hosts.optikservers.com:31528","de-prem-01.hosts.optikservers.com:35160", "de-prem-01.hosts.optikservers.com:35116", "de-prem-01.hosts.optikservers.com:35922"]
   },
   {
     "name": "CMS",
