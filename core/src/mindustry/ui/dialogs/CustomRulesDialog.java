@@ -50,7 +50,7 @@ public class CustomRulesDialog extends BaseDialog{
                 t.defaults().size(280f, 64f).pad(2f);
 
                 t.button("@waves.copy", Icon.copy, style, () -> {
-                    ui.showInfoFade("@waves.copied");
+                    ui.showInfoFade("@copied");
 
                     //hack: don't write the spawns, they just waste space
                     var spawns = rules.spawns;

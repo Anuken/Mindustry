@@ -17,6 +17,7 @@ import mindustry.game.MapObjectives.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.maps.Map;
+import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
@@ -141,6 +142,7 @@ public abstract class SaveVersion extends SaveFileReader{
             "wavetime", state.wavetime,
             "stats", JsonIO.write(state.stats),
             "rules", JsonIO.write(state.rules),
+            "locales", JsonIO.write(state.mapLocales),
             "mods", JsonIO.write(mods.getModStrings().toArray(String.class)),
             "controlGroups", headless || control == null ? "null" : JsonIO.write(control.input.controlGroups),
             "width", world.width(),
@@ -160,6 +162,7 @@ public abstract class SaveVersion extends SaveFileReader{
         state.tick = map.getFloat("tick");
         state.stats = JsonIO.read(GameStats.class, map.get("stats", "{}"));
         state.rules = JsonIO.read(Rules.class, map.get("rules", "{}"));
+        state.mapLocales = JsonIO.read(MapLocales.class, map.get("locales", "{}"));
         if(state.rules.spawns.isEmpty()) state.rules.spawns = waves.get();
         lastReadBuild = map.getInt("build", -1);
 

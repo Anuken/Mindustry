@@ -164,7 +164,7 @@ public class LStatements{
                     }
 
                     if(type == GraphicsType.print){
-                        p2 = "bottomLeft";
+                        p1 = "bottomLeft";
                     }
 
                     rebuild(table);
@@ -296,6 +296,27 @@ public class LStatements{
         @Override
         public LInstruction build(LAssembler builder){
             return new PrintI(builder.var(value));
+        }
+
+
+        @Override
+        public LCategory category(){
+            return LCategory.io;
+        }
+    }
+
+    @RegisterStatement("format")
+    public static class FormatStatement extends LStatement{
+        public String value = "\"frog\"";
+
+        @Override
+        public void build(Table table){
+            field(table, value, str -> value = str).width(0f).growX().padRight(3);
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new FormatI(builder.var(value));
         }
 
 
@@ -2064,6 +2085,31 @@ public class LStatements{
         @Override
         public LInstruction build(LAssembler builder){
             return new MakeMarkerI(type, builder.var(id), builder.var(x), builder.var(y), builder.var(replace));
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.world;
+        }
+    }
+
+    @RegisterStatement("localeprint")
+    public static class LocalePrintStatement extends LStatement{
+        public String value = "\"name\"";
+
+        @Override
+        public void build(Table table){
+            field(table, value, str -> value = str).width(0f).growX().padRight(3);
+        }
+
+        @Override
+        public boolean privileged(){
+            return true;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new LocalePrintI(builder.var(value));
         }
 
         @Override

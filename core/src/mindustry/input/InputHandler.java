@@ -654,7 +654,13 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         if(player.team() == build.team && build.canControlSelect(player.unit())){
+            var before = player.unit();
+
             build.onControlSelect(player.unit());
+
+            if(!before.dead && before.spawnedByCore && !before.isPlayer()){
+                Call.unitDespawn(before);
+            }
         }
     }
 
@@ -698,6 +704,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 }else if(before.dockedType != null && before.dockedType.coreUnitDock){
                     //direct dock transfer???
                     unit.dockedType = before.dockedType;
+                }
+
+                if(before.spawnedByCore && !before.isPlayer()){
+                    Call.unitDespawn(before);
                 }
             }
 

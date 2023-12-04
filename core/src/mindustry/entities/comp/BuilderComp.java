@@ -109,8 +109,8 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
 
             var core = core();
 
-            //nothing to build.
-            if(buildPlan() == null) return;
+            //nothing to build, or core doesn't exist
+            if(buildPlan() == null || (core == null && !infinite)) return;
 
             //find the next build plan
             if(plans.size > 1){
@@ -163,7 +163,7 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
             }
 
             //if there is no core to build with or no build entity, stop building!
-            if((core == null && !infinite) || !(tile.build instanceof ConstructBuild entity)){
+            if(!(tile.build instanceof ConstructBuild entity)){
                 continue;
             }
 
