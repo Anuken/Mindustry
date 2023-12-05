@@ -405,7 +405,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
         final SteamID sid;
 
         public SteamConnection(SteamID sid){
-            super(sid.getAccountID() + "");
+            super("steam:" + sid.getAccountID());
             this.sid = sid;
             Log.info("Created STEAM connection: @", sid.getAccountID());
         }
@@ -440,7 +440,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
         @Override
         protected void kickDisconnect(){
             //delay the close so the kick packet can be sent on steam
-            Core.app.post(() -> Core.app.post(this::close));
+            Time.runTask(10f, this::close);
         }
 
         @Override
