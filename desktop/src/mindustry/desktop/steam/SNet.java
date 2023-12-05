@@ -263,7 +263,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
         //check version
         if(version != Version.build){
             ui.loadfrag.hide();
-            ui.showInfo("[scarlet]" + (version > Version.build ? KickReason.clientOutdated : KickReason.serverOutdated).toString() + "\n[]" +
+            ui.showInfo("[scarlet]" + (version > Version.build ? KickReason.clientOutdated : KickReason.serverOutdated) + "\n[]" +
                 Core.bundle.format("server.versions", Version.build, version));
             smat.leaveLobby(steamIDLobby);
             return;
@@ -435,6 +435,12 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
             //TODO ???
             //snet.getP2PSessionState(sid, state);
             return true;//state.isConnectionActive();
+        }
+
+        @Override
+        protected void kickDisconnect(){
+            //delay the close so the kick packet can be sent on steam
+            Core.app.post(() -> Core.app.post(this::close));
         }
 
         @Override
