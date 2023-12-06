@@ -250,9 +250,10 @@ public class JoinDialog extends BaseDialog{
         buildServer(host, server.content, false);
     }
 
-    void buildServer(Host host, Table content, boolean inner){
+    void buildServer(Host host, Table content, boolean local){
         content.top().left();
-        String versionString = getVersionString(host);
+        boolean isBanned = local && Vars.steam && host.description != null && host.description.equals("[banned]");
+        String versionString = getVersionString(host) + (isBanned ? "[red] [banned]" : "");
 
         float twidth = targetWidth() - 40f;
 
@@ -260,7 +261,7 @@ public class JoinDialog extends BaseDialog{
 
         Color color = Pal.gray;
 
-        if(inner){
+        if(local){
             content.table(Tex.whiteui, t -> {
                 t.left();
                 t.setColor(color);
@@ -274,7 +275,7 @@ public class JoinDialog extends BaseDialog{
             t.setColor(color);
             t.left();
 
-            if(!host.description.isEmpty()){
+            if(!host.description.isEmpty() && !isBanned){
                 //limit newlines.
                 int count = 0;
                 StringBuilder result = new StringBuilder(host.description.length());
