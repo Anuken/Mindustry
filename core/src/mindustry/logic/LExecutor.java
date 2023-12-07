@@ -19,7 +19,6 @@ import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.logic.LogicFx.*;
 import mindustry.type.*;
-import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.logic.*;
@@ -157,29 +156,30 @@ public class LExecutor{
         return v.isobj ? v.objval != null : Math.abs(v.numval) >= 0.00001;
     }
 
-    @Nullable
-    public double num(int index, boolean nullToNan){
-        Var v = var(index);
-        return v.isobj ? v.objval != null ? 1 : nullToNan ? Double.NaN : 0: invalid(v.numval) ? 0 : v.numval;
-    }
-
     public double num(int index){
-        return num(index, false);
+        Var v = var(index);
+        return v.isobj ? v.objval != null ? 1 : 0 : invalid(v.numval) ? 0 : v.numval;
     }
 
-    @Nullable
-    public float numf(int index, boolean nullToNan){
+    /** Get num value from variable, convert null to NaN to handle it differently in some instructions */
+    public double numOrNan(int index){
         Var v = var(index);
-        return v.isobj ? v.objval != null ? 1 : nullToNan ? Float.NaN : 0: invalid(v.numval) ? 0 : (float)v.numval;
+        return v.isobj ? v.objval != null ? 1 : Double.NaN : invalid(v.numval) ? 0 : v.numval;
     }
 
     public float numf(int index){
-        return numf(index, false);
+        Var v = var(index);
+        return v.isobj ? v.objval != null ? 1 : 0 : invalid(v.numval) ? 0 : (float)v.numval;
     }
 
-    @Nullable
+    /** Get float value from variable, convert null to NaN to handle it differently in some instructions */
+    public float numfOrNan(int index){
+        Var v = var(index);
+        return v.isobj ? v.objval != null ? 1 : Float.NaN : invalid(v.numval) ? 0 : (float)v.numval;
+    }
+
     public int numi(int index){
-        return (int)num(index, true);
+        return (int)num(index);
     }
 
     public void setbool(int index, boolean value){
@@ -265,7 +265,7 @@ public class LExecutor{
                         //bind to the next unit
                         exec.setconst(varUnit, seq.get(exec.binds[type.id]));
                     }
-                    exec.binds[type.id]++;
+                    exec.binds[type.id] ++;
                 }else{
                     //no units of this type found
                     exec.setconst(varUnit, null);
@@ -512,7 +512,7 @@ public class LExecutor{
                     }
                     case build -> {
                         if((state.rules.logicUnitBuild || exec.privileged) && unit.canBuild() && exec.obj(p3) instanceof Block block && block.canBeBuilt() && (block.unlockedNow() || unit.team.isAI())){
-                            int x = World.toTile(x1 - block.offset / tilesize), y = World.toTile(y1 - block.offset / tilesize);
+                            int x = World.toTile(x1 - block.offset/tilesize), y = World.toTile(y1 - block.offset/tilesize);
                             int rot = Mathf.mod(exec.numi(p4), 4);
 
                             //reset state of last request when necessary
@@ -570,7 +570,7 @@ public class LExecutor{
                         }else{
                             Building build = exec.building(p1);
                             int dropped = Math.min(unit.stack.amount, exec.numi(p2));
-                            if(build != null && build.team == unit.team && build.isValid() && dropped > 0 && unit.within(build, logicItemTransferRange + build.block.size * tilesize / 2f)){
+                            if(build != null && build.team == unit.team && build.isValid() && dropped > 0 && unit.within(build, logicItemTransferRange + build.block.size * tilesize/2f)){
                                 int accepted = build.acceptStack(unit.item(), dropped, unit);
                                 if(accepted > 0){
                                     Call.transferItemTo(unit, unit.item(), accepted, unit.x, unit.y, build);
@@ -586,7 +586,7 @@ public class LExecutor{
                         int amount = exec.numi(p3);
 
                         if(build != null && build.team == unit.team && build.isValid() && build.items != null &&
-                        exec.obj(p2) instanceof Item item && unit.within(build, logicItemTransferRange + build.block.size * tilesize / 2f)){
+                        exec.obj(p2) instanceof Item item && unit.within(build, logicItemTransferRange + build.block.size * tilesize/2f)){
                             int taken = Math.min(build.items.get(item), Math.min(amount, unit.maxAccepted(item)));
 
                             if(taken > 0){
@@ -595,8 +595,7 @@ public class LExecutor{
                             }
                         }
                     }
-                    default -> {
-                    }
+                    default -> {}
                 }
             }
         }
@@ -617,8 +616,7 @@ public class LExecutor{
             this.p4 = p4;
         }
 
-        ControlI(){
-        }
+        ControlI(){}
 
         @Override
         public void run(LExecutor exec){
@@ -865,8 +863,7 @@ public class LExecutor{
             this.to = to;
         }
 
-        SetI(){
-        }
+        SetI(){}
 
         @Override
         public void run(LExecutor exec){
@@ -898,8 +895,7 @@ public class LExecutor{
             this.dest = dest;
         }
 
-        OpI(){
-        }
+        OpI(){}
 
         @Override
         public void run(LExecutor exec){
@@ -934,8 +930,7 @@ public class LExecutor{
 
     public static class NoopI implements LInstruction{
         @Override
-        public void run(LExecutor exec){
-        }
+        public void run(LExecutor exec){}
     }
 
     public static class DrawI implements LInstruction{
@@ -962,6 +957,12 @@ public class LExecutor{
             //graphics on headless servers are useless.
             if(Vars.headless || exec.graphicsBuffer.size >= maxGraphicsBuffer) return;
 
+            int num1 = exec.numi(p1);
+
+            if(type == LogicDisplay.commandImage){
+                num1 = exec.obj(p1) instanceof UnlockableContent u ? u.iconId : 0;
+            }
+
             //explicitly unpack colorPack, it's pre-processed here
             if(type == LogicDisplay.commandColorPack){
                 double packed = exec.num(x);
@@ -973,63 +974,7 @@ public class LExecutor{
                 a = ((value & 0x000000ff));
 
                 exec.graphicsBuffer.add(DisplayCmd.get(LogicDisplay.commandColor, pack(r), pack(g), pack(b), pack(a), 0, 0));
-            }else if(type == LogicDisplay.commandPrint){
-                CharSequence str = exec.textBuffer;
-
-                if(str.length() > 0){
-                    var data = Fonts.logic.getData();
-                    int advance = (int)data.spaceXadvance, lineHeight = (int)data.lineHeight;
-
-                    int xOffset, yOffset;
-                    int align = p1; //p1 is not a variable, it's a raw align value. what a massive hack
-
-                    int maxWidth = 0, lines = 1, lineWidth = 0;
-                    for(int i = 0; i < str.length(); i++){
-                        char next = str.charAt(i);
-                        if(next == '\n'){
-                            maxWidth = Math.max(maxWidth, lineWidth);
-                            lineWidth = 0;
-                            lines++;
-                        }else{
-                            lineWidth++;
-                        }
-                    }
-                    maxWidth = Math.max(maxWidth, lineWidth);
-
-                    float
-                    width = maxWidth * advance,
-                    height = lines * lineHeight,
-                    ha = ((Align.isLeft(align) ? -1f : 0f) + 1f + (Align.isRight(align) ? 1f : 0f)) / 2f,
-                    va = ((Align.isBottom(align) ? -1f : 0f) + 1f + (Align.isTop(align) ? 1f : 0f)) / 2f;
-
-                    xOffset = -(int)(width * ha);
-                    yOffset = -(int)(height * va) + (lines - 1) * lineHeight;
-
-
-                    int curX = exec.numi(x), curY = exec.numi(y);
-                    for(int i = 0; i < str.length(); i++){
-                        char next = str.charAt(i);
-                        if(next == '\n'){
-                            //move Y down when newline is encountered
-                            curY -= lineHeight;
-                            curX = exec.numi(x); //reset
-                            continue;
-                        }
-                        if(Fonts.logic.getData().hasGlyph(next)){
-                            exec.graphicsBuffer.add(DisplayCmd.get(LogicDisplay.commandPrint, packSign(curX + xOffset), packSign(curY + yOffset), next, 0, 0, 0));
-                        }
-                        curX += advance;
-                    }
-
-                    exec.textBuffer.setLength(0);
-                }
             }else{
-                int num1 = exec.numi(p1);
-
-                if(type == LogicDisplay.commandImage){
-                    num1 = exec.obj(p1) instanceof UnlockableContent u ? u.iconId : 0;
-                }
-
                 //add graphics calls, cap graphics buffer size
                 exec.graphicsBuffer.add(DisplayCmd.get(type, packSign(exec.numi(x)), packSign(exec.numi(y)), packSign(num1), packSign(exec.numi(p2)), packSign(exec.numi(p3)), packSign(exec.numi(p4))));
             }
@@ -1077,8 +1022,7 @@ public class LExecutor{
             this.value = value;
         }
 
-        PrintI(){
-        }
+        PrintI(){}
 
         @Override
         public void run(LExecutor exec){
@@ -1245,7 +1189,7 @@ public class LExecutor{
                 curTime = 0f;
             }else{
                 //skip back to self.
-                exec.var(varCounter).numval--;
+                exec.var(varCounter).numval --;
                 exec.yield = true;
             }
 
@@ -1261,7 +1205,7 @@ public class LExecutor{
         @Override
         public void run(LExecutor exec){
             //skip back to self.
-            exec.var(varCounter).numval--;
+            exec.var(varCounter).numval --;
             exec.yield = true;
         }
     }
@@ -1673,9 +1617,9 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            //set default to success
+            //set default to succes
             exec.setnum(outSuccess, 1);
-            if(headless && type != MessageType.mission){
+            if(headless && type != MessageType.mission) {
                 exec.textBuffer.setLength(0);
                 return;
             }
@@ -2005,7 +1949,7 @@ public class LExecutor{
                         marker.setTexture(res.toString());
                     }
                 }else{
-                    marker.control(type, exec.num(p1, true), exec.num(p2, true), exec.num(p3, true));
+                    marker.control(type, exec.numOrNan(p1), exec.numOrNan(p2), exec.numOrNan(p3));
                 }
             }
         }
@@ -2037,7 +1981,7 @@ public class LExecutor{
                 int mid = exec.numi(id);
                 if(exec.bool(replace) || !state.markers.containsKey(mid)){
                     var marker = cons.get();
-                    marker.control(LMarkerControl.pos, exec.num(x, true), exec.num(y, true), 0);
+                    marker.control(LMarkerControl.pos, exec.num(x), exec.num(y), 0);
                     state.markers.put(mid, marker);
                 }
             }
