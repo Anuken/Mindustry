@@ -347,7 +347,7 @@ public class LExecutor{
                     }
 
                     if(res != null && res.build != null &&
-                    (unit.within(res.build.x, res.build.y, Math.max(unit.range(), buildingRange)) || res.build.team == exec.team)){
+                        (unit.within(res.build.x, res.build.y, Math.max(unit.range(), buildingRange)) || res.build.team == exec.team)){
                         cache.build = res.build;
                         exec.setobj(outBuild, res.build);
                     }else{
@@ -586,7 +586,7 @@ public class LExecutor{
                         int amount = exec.numi(p3);
 
                         if(build != null && build.team == unit.team && build.isValid() && build.items != null &&
-                        exec.obj(p2) instanceof Item item && unit.within(build, logicItemTransferRange + build.block.size * tilesize/2f)){
+                            exec.obj(p2) instanceof Item item && unit.within(build, logicItemTransferRange + build.block.size * tilesize/2f)){
                             int taken = Math.min(build.items.get(item), Math.min(amount, unit.maxAccepted(item)));
 
                             if(taken > 0){
@@ -784,7 +784,7 @@ public class LExecutor{
             LogicAI ai = null;
 
             if(base instanceof Ranged r && (exec.privileged || r.team() == exec.team) &&
-            (base instanceof Building || (ai = UnitControlI.checkLogicAI(exec, base)) != null)){ //must be a building or a controllable unit
+                (base instanceof Building || (ai = UnitControlI.checkLogicAI(exec, base)) != null)){ //must be a building or a controllable unit
                 float range = r.range();
 
                 Healthc targeted;
@@ -840,9 +840,9 @@ public class LExecutor{
                 if(!u.within(b, range) || !u.targetable(team) || b == u) return;
 
                 boolean valid =
-                target1.func.get(b.team(), u) &&
-                target2.func.get(b.team(), u) &&
-                target3.func.get(b.team(), u);
+                    target1.func.get(b.team(), u) &&
+                    target2.func.get(b.team(), u) &&
+                    target3.func.get(b.team(), u);
 
                 if(!valid) return;
 
@@ -1047,16 +1047,16 @@ public class LExecutor{
 
         public static String toString(Object obj){
             return
-            obj == null ? "null" :
-            obj instanceof String s ? s :
-            obj == Blocks.stoneWall ? "solid" : //special alias
-            obj instanceof MappableContent content ? content.name :
-            obj instanceof Content ? "[content]" :
-            obj instanceof Building build ? build.block.name :
-            obj instanceof Unit unit ? unit.type.name :
-            obj instanceof Enum<?> e ? e.name() :
-            obj instanceof Team team ? team.name :
-            "[object]";
+                obj == null ? "null" :
+                obj instanceof String s ? s :
+                obj == Blocks.stoneWall ? "solid" : //special alias
+                obj instanceof MappableContent content ? content.name :
+                obj instanceof Content ? "[content]" :
+                obj instanceof Building build ? build.block.name :
+                obj instanceof Unit unit ? unit.type.name :
+                obj instanceof Enum<?> e ? e.name() :
+                obj instanceof Team team ? team.name :
+                "[object]";
         }
     }
 
@@ -1520,8 +1520,7 @@ public class LExecutor{
                 case ban -> {
                     Object cont = exec.obj(value);
                     if(cont instanceof Block b){
-                        // Rebuild PlacementFragment if anything has changed
-                        if(state.rules.bannedBlocks.add(b) && !headless) ui.hudfrag.blockfrag.rebuild();
+                        state.rules.bannedBlocks.add(b);
                     }else if(cont instanceof UnitType u){
                         state.rules.bannedUnits.add(u);
                     }
@@ -1529,7 +1528,7 @@ public class LExecutor{
                 case unban -> {
                     Object cont = exec.obj(value);
                     if(cont instanceof Block b){
-                        if(state.rules.bannedBlocks.remove(b) && !headless) ui.hudfrag.blockfrag.rebuild();
+                        state.rules.bannedBlocks.remove(b);
                     }else if(cont instanceof UnitType u){
                         state.rules.bannedUnits.remove(u);
                     }
@@ -1604,12 +1603,11 @@ public class LExecutor{
 
     public static class FlushMessageI implements LInstruction{
         public MessageType type = MessageType.announce;
-        public int duration, outSuccess;
+        public int duration;
 
-        public FlushMessageI(MessageType type, int duration, int outSuccess){
+        public FlushMessageI(MessageType type, int duration){
             this.type = type;
             this.duration = duration;
-            this.outSuccess = outSuccess;
         }
 
         public FlushMessageI(){
@@ -1617,20 +1615,16 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            //set default to succes
-            exec.setnum(outSuccess, 1);
-            if(headless && type != MessageType.mission) {
-                exec.textBuffer.setLength(0);
-                return;
-            }
+            if(headless && type != MessageType.mission) return;
 
+            //skip back to self until possible
+            //TODO this is guaranteed desync on servers - I don't see a good solution
             if(
-            type == MessageType.announce && ui.hasAnnouncement() ||
-            type == MessageType.notify && ui.hudfrag.hasToast() ||
-            type == MessageType.toast && ui.hasAnnouncement()
+                type == MessageType.announce && ui.hasAnnouncement() ||
+                type == MessageType.notify && ui.hudfrag.hasToast() ||
+                type == MessageType.toast && ui.hasAnnouncement()
             ){
-                //set outSuccess=false to let user retry.
-                exec.setnum(outSuccess, 0);
+                exec.var(varCounter).numval --;
                 return;
             }
 
@@ -1676,7 +1670,7 @@ public class LExecutor{
                 double col = exec.num(color);
                 //limit size so people don't create lag with ridiculous numbers (some explosions scale with size)
                 float rot = type.rotate ? exec.numf(rotation) :
-                Math.min(exec.numf(rotation), 1000f);
+                    Math.min(exec.numf(rotation), 1000f);
 
                 type.effect.at(World.unconv(exec.numf(x)), World.unconv(exec.numf(y)), rot, Tmp.c1.fromDouble(col), exec.obj(data));
             }
@@ -1860,8 +1854,8 @@ public class LExecutor{
             }
 
             float
-            spawnX = World.unconv(exec.numf(x)),
-            spawnY = World.unconv(exec.numf(y));
+                spawnX = World.unconv(exec.numf(x)),
+                spawnY = World.unconv(exec.numf(y));
             int packed = Point2.pack(exec.numi(x), exec.numi(y));
 
             for(SpawnGroup group : state.rules.spawns){
@@ -1949,7 +1943,7 @@ public class LExecutor{
                         marker.setTexture(res.toString());
                     }
                 }else{
-                    marker.control(type, exec.numOrNan(p1), exec.numOrNan(p2), exec.numOrNan(p3));
+                    marker.control(type, exec.num(p1), exec.num(p2), exec.num(p3));
                 }
             }
         }
