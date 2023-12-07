@@ -952,7 +952,7 @@ public class UnitType extends UnlockableContent implements Senseable{
     public void createIcons(MultiPacker packer){
         super.createIcons(packer);
 
-        if(constructor == null) throw new IllegalArgumentException("No constructor set up for unit '" + name + "'. Make sure you assign a valid value to `constructor`, e.g. `constructor = UnitEntity::new`");
+        if(constructor == null) throw new IllegalArgumentException("No constructor set up for unit '" + name + "', add this argument to your units field: `constructor = UnitEntity::create`");
 
         sample = constructor.get();
 
