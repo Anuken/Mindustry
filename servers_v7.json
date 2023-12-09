@@ -259,5 +259,9 @@
   {
     "name": "SkyPlex",
     "address": ["mc-skyplex.net"]
+  },
+  {
+    "name": "Gadgetroch's Server",
+    "address": ["mindustry.gadgetroch.com", "mindustry.gadgetroch.com:6568"]
   }
 ]
