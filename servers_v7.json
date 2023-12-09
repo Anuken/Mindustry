@@ -1,11 +1,11 @@
 [
   {
-    "name": "Vndustry",
-    "address": ["140.238.246.78:7000"]
+    "name": "STP",
+    "address": ["23.88.73.88:25617"]
   },
   {
     "name": "meiqiuMDT",
-    "address": ["cn1.plush.run:10001","211.101.236.94:10000","bj-1.lcf.icu:10240","play.simpfun.cn:14523"]
+    "address": ["cn1.meiqiumdy.top:7000","cn1.meiqiumdt.top:7002","cn1.meiqiumdt.top:7006","bj-1.lcf.icu:10240"]
   },
   {
     "name": "Crux's Revelations",
@@ -81,7 +81,7 @@
   },
   {
     "name": "MinDurka",
-    "address": ["81.30.157.68", "81.30.157.68:3001", "81.30.157.68:3002", "81.30.157.68:3003", "81.30.157.68:3004", "81.30.157.68:3005", "81.30.157.68:3006", "81.30.157.68:3007", "81.30.157.68:3008", "81.30.157.68:3009", "81.30.157.68:3010"]
+    "address": ["95.181.151.210", "95.181.151.210:3001", "95.181.151.210:3002", "95.181.151.210:3003", "95.181.151.210:3004", "95.181.151.210:3005", "95.181.151.210:3006", "95.181.151.210:3007", "95.181.151.210:3008", "95.181.151.210:3009", "95.181.151.210:3010"]
   },
   {
     "name": "Chaotic Neutral",
@@ -137,7 +137,7 @@
   },
   {
     "name": "mindustry.ddns.net",
-    "address": ["mindustry.ddns.net", "mindustry.ddns.net:1000", "mindustry.ddns.net:2000", "mindustry.ddns.net:3000", "mindustry.ddns.net:4000"]
+    "address": ["mindustry.ddns.net", "mindustry.ddns.net:1000", "mindustry.ddns.net:2000", "mindustry.ddns.net:3000", "mindustry.ddns.net:4000", "mindustry.ddns.net:5000"]
   },
   {
     "name": "EasyPlay.su",
@@ -222,11 +222,11 @@
   },
   {
     "name": "3MIDustry",
-    "address": ["3midustry.xyz:10", "3midustry.xyz:20", "3midustry.xyz:30", "3midustry.xyz:40", "3midustry.xyz:50", "3midustry.xyz:60", "3midustry.xyz:6567"]
+    "address": ["play.3midustry.xyz:6001", "play.3midustry.xyz:6002", "play.3midustry.xyz:6003", "play.3midustry.xyz:6004", "play.3midustry.xyz:6005", "play.3midustry.xyz:6006", "play.3midustry.xyz:6007", "play.3midustry.xyz:6008", "play.3midustry.xyz:6009", "play.3midustry.xyz:6010"]
   },
   {
     "name": "ABCXYZ Community",
-    "address": ["23.88.73.88:23591", "23.88.73.88:23539", "144.76.57.59:14996", "144.76.57.59:16881", "144.76.57.59:13885", "23.88.73.88:32113", "144.76.57.59:9269", "144.76.57.59:24235", "144.76.57.59:24133"]
+    "address": ["23.88.73.88:23591", "23.88.73.88:23539", "144.76.57.59:14996", "144.76.57.59:16881", "144.76.57.59:13885", "23.88.73.88:32113", "144.76.57.59:9269", "144.76.57.59:24235", "144.76.57.59:24133", "140.238.246.78:7000"]
   },
   {
     "name": "CroCraft Network",
