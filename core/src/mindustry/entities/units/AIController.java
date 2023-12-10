@@ -56,6 +56,11 @@ public class AIController implements UnitController{
     }
 
     @Override
+    public void afterRead(Unit unit){
+
+    }
+
+    @Override
     public boolean isLogicControllable(){
         return true;
     }

@@ -437,6 +437,8 @@ public abstract class SaveVersion extends SaveFileReader{
         //entityMapping is null in older save versions, so use the default
         var mapping = this.entityMapping == null ? EntityMapping.idMap : this.entityMapping;
 
+        Seq<Entityc> entities = new Seq<>();
+
         int amount = stream.readInt();
         for(int j = 0; j < amount; j++){
             readChunk(stream, true, in -> {
@@ -449,11 +451,16 @@ public abstract class SaveVersion extends SaveFileReader{
                 int id = in.readInt();
 
                 Entityc entity = (Entityc)mapping[typeid].get();
+                entities.add(entity);
                 EntityGroup.checkNextId(id);
                 entity.id(id);
                 entity.read(Reads.get(in));
                 entity.add();
             });
+        }
+
+        for(var e : entities){
+            e.afterAllRead();
         }
     }
 
