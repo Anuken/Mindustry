@@ -13,12 +13,11 @@ public enum LMarkerControl{
     stroke("stroke"),
     rotation("rotation"),
     shape("sides", "fill", "outline"),
-    text("text"),
-    flushText,
+    text("printFlush", "text", "fetch"),
     fontSize("size"),
     textHeight("height"),
     labelFlags("background", "outline"),
-    texture("name", "-", "-"),
+    texture("printFlush", "name"),
     textureSize("width", "height");
 
     public final String[] params;

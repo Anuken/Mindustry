@@ -638,14 +638,18 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         /** On which z-sorting layer is marker drawn. */
         protected float drawLayer = Layer.overlayUI;
 
-        /** Called in the overlay draw layer.*/
-        public void draw(){}
+        /** Called in the main renderer */
+        public void drawWorld(){}
         /** Called in the small and large map. */
         public void drawMinimap(MinimapRenderer minimap){}
         /** Add any UI elements necessary. */
         public void added(){}
         /** Remove any UI elements, if necessary. */
         public void removed(){}
+        /** Whether the marker is hidden */
+        public boolean isHidden(){
+            return hidden;
+        }
         /** Control marker with world processor code. Ignores NaN (null) values. */
         public void control(LMarkerControl type, double p1, double p2, double p3){
             if(Double.isNaN(p1)) return;
@@ -730,7 +734,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public ShapeTextMarker(){}
 
         @Override
-        public void draw(){
+        public void drawWorld(){
             if(hidden || minimap) return;
 
             //in case some idiot decides to make 9999999 sides and freeze the game
@@ -844,6 +848,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public MinimapMarker(int x, int y, Color color){
             this.pos.set(x, y);
             this.color = color;
+            minimap = true;
         }
 
         public MinimapMarker(int x, int y, float radius, float stroke, Color color){
@@ -851,9 +856,15 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             this.stroke = stroke;
             this.radius = radius;
             this.color = color;
+            minimap = true;
         }
 
         public MinimapMarker(){}
+
+        @Override
+        public void drawWorld(){
+            minimap = true;
+        }
 
         @Override
         public void drawMinimap(MinimapRenderer minimap){
@@ -879,6 +890,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                     case radius -> radius = (float)p1;
                     case stroke -> stroke = (float)p1;
                     case color -> color.set(Tmp.c1.fromDouble(p1));
+                    case minimap -> minimap = true;
                     default -> super.control(type, p1, p2, p3);
                 }
             }
@@ -914,7 +926,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public ShapeMarker(){}
 
         @Override
-        public void draw(){
+        public void drawWorld(){
             if(hidden || minimap) return;
 
             //in case some idiot decides to make 9999999 sides and freeze the game
@@ -1023,7 +1035,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public TextMarker(){}
 
         @Override
-        public void draw(){
+        public void drawWorld(){
             // font size cannot be 0
             if(hidden || Mathf.equal(fontSize, 0f) || minimap) return;
 
@@ -1118,7 +1130,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public LineMarker(){}
 
         @Override
-        public void draw(){
+        public void drawWorld(){
             if(hidden || minimap) return;
 
             float scl = autoscale ? 4f / renderer.getDisplayScale() : 1f;
@@ -1210,7 +1222,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         }
 
         @Override
-        public void draw(){
+        public void drawWorld(){
             if(hidden || textureName.isEmpty() || minimap) return;
 
             if(fetchedRegion == null) fetchedRegion = Core.atlas.find(textureName);

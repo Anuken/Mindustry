@@ -255,12 +255,14 @@ public class MinimapRenderer{
 
         state.rules.objectives.eachRunning(obj -> {
             for(var marker : obj.markers){
-                marker.drawMinimap(this);
+                if(marker.minimap) marker.drawMinimap(this);
             }
         });
 
         for(var marker : state.markers.values()){
-            if(marker != null) marker.drawMinimap(this);
+            if(marker != null){
+                if(!marker.isHidden() && marker.minimap) marker.drawMinimap(this);
+            }
         }
     }
 

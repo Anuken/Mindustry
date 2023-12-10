@@ -1988,16 +1988,18 @@ public class LExecutor{
                 if(marker == null) return;
 
                 if(type == LMarkerControl.text){
-                    marker.setText((exec.obj(p1) != null ? exec.obj(p1).toString() : "null"), false);
-                }else if(type == LMarkerControl.flushText){
-                    marker.setText(exec.textBuffer.toString(), true);
-                    exec.textBuffer.setLength(0);
+                    if(exec.bool(p1)){
+                        marker.setText(exec.textBuffer.toString(), exec.bool(p3));
+                        exec.textBuffer.setLength(0);
+                    }else{
+                        marker.setText((exec.obj(p2) != null ? exec.obj(p2).toString() : "null"), exec.bool(p3));
+                    }
                 }else if(type == LMarkerControl.texture){
-                    if(exec.obj(p1) != null){
-                        StringBuilder res = new StringBuilder(exec.obj(p1).toString());
-                        if(exec.obj(p2) != null) res.append("-").append(exec.obj(p2).toString());
-                        if(exec.obj(p3) != null) res.append("-").append(exec.obj(p3).toString());
-                        marker.setTexture(res.toString());
+                    if(exec.bool(p1)){
+                        marker.setTexture(exec.textBuffer.toString());
+                        exec.textBuffer.setLength(0);
+                    }else{
+                        marker.setTexture((exec.obj(p2) != null ? exec.obj(p2).toString() : "null"));
                     }
                 }else{
                     marker.control(type, exec.numOrNan(p1), exec.numOrNan(p2), exec.numOrNan(p3));
@@ -2053,13 +2055,11 @@ public class LExecutor{
     }
 
     @Remote(called = Loc.server, variants = Variant.both, unreliable = true)
-    public static void updateMarkerText(int id, LMarkerControl type, String text){
+    public static void updateMarkerText(int id, LMarkerControl type, boolean fetch, String text){
         var marker = state.markers.get(id);
         if(marker != null){
             if(type == LMarkerControl.text){
-                marker.setText(text, true);
-            }else if(type == LMarkerControl.flushText){
-                marker.setText(text, false);
+                marker.setText(text, fetch);
             }
         }
     }
