@@ -214,7 +214,10 @@ public class Units{
             }
         });
 
-        return buildResult;
+        var result = buildResult;
+        buildResult = null;
+
+        return result;
     }
 
     /** Iterates through all buildings in a range. */
