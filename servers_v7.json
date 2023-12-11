@@ -263,5 +263,9 @@
   {
     "name": "Gadgetroch's Server",
     "address": ["mindustry.gadgetroch.com", "mindustry.gadgetroch.com:6568"]
+  },
+  {
+    "name": "Tuantian Vietnam"
+    "address": ["51.81.166.66:20390"]
   }
 ]
