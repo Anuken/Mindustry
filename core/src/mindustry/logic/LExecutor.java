@@ -1987,13 +1987,9 @@ public class LExecutor{
                 var marker = state.markers.get(exec.numi(id));
                 if(marker == null) return;
 
-                if(type == LMarkerControl.text){
-                    if(exec.bool(p1)){
-                        marker.setText(exec.textBuffer.toString(), exec.bool(p3));
-                        exec.textBuffer.setLength(0);
-                    }else{
-                        marker.setText((exec.obj(p2) != null ? exec.obj(p2).toString() : "null"), exec.bool(p3));
-                    }
+                if(type == LMarkerControl.flushText){
+                    marker.setText(exec.textBuffer.toString(), exec.bool(p1));
+                    exec.textBuffer.setLength(0);
                 }else if(type == LMarkerControl.texture){
                     if(exec.bool(p1)){
                         marker.setTexture(exec.textBuffer.toString());
@@ -2058,7 +2054,7 @@ public class LExecutor{
     public static void updateMarkerText(int id, LMarkerControl type, boolean fetch, String text){
         var marker = state.markers.get(id);
         if(marker != null){
-            if(type == LMarkerControl.text){
+            if(type == LMarkerControl.flushText){
                 marker.setText(text, fetch);
             }
         }

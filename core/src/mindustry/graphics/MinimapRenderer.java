@@ -302,13 +302,14 @@ public class MinimapRenderer{
     }
 
     public float scale(float radius){
-        return scale(radius, false);
+        return worldSpace ? (radius / (baseSize / 2f)) * 5f * lastScl : lastW / rect.width * radius;
     }
-    public float scale(float radius, boolean zoomAutoScale){
+
+    public float getScaleFactor(boolean zoomAutoScale){
         if(!zoomAutoScale){
-            return worldSpace ? (radius / (baseSize / 2f)) * 5f * lastScl : lastW / rect.width * radius;
+            return worldSpace ? (1 / (baseSize / 2f)) * 5f * lastScl : lastW / rect.width;
         }else{
-            return worldSpace ? (radius / (baseSize / 2f)) * 5f : lastW / 256f * radius;
+            return worldSpace ? (1 / (baseSize / 2f)) * 5f : lastW / 256f;
         }
     }
 

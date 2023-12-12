@@ -13,7 +13,7 @@ public enum LMarkerControl{
     stroke("stroke"),
     rotation("rotation"),
     shape("sides", "fill", "outline"),
-    text("printFlush", "text", "fetch"),
+    flushText("fetch"),
     fontSize("size"),
     textHeight("height"),
     labelFlags("background", "outline"),

@@ -2000,6 +2000,7 @@ public class LStatements{
                     t.setColor(table.color);
 
                     fields(t, type.params[i], i == 0 ? p1 : i == 1 ? p2 : p3, i == 0 ? v -> p1 = v : i == 1 ? v -> p2 = v : v -> p3 = v).width(100f);
+
                     if(type == LMarkerControl.color){
                         col(t, p1, res -> {
                             p1 = "%" + res.toString().substring(0, res.a >= 1f ? 6 : 8);
