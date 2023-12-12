@@ -36,10 +36,6 @@
     "address": ["rcrms.ru:6567"]
   },
   {
-    "name": "Tendhost",
-    "address": ["tendhost.ddns.net:7576"]
-  },
-  {
     "name": "ECAN",
     "address": ["mindustry.ecansol.com:6597", "mindustry.ecansol.com:6499", "mindustry.ecansol.com:6599"]
   },
