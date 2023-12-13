@@ -1995,7 +1995,7 @@ public class LExecutor{
                         marker.setTexture(exec.textBuffer.toString());
                         exec.textBuffer.setLength(0);
                     }else{
-                        marker.setTexture((exec.obj(p2) != null ? exec.obj(p2).toString() : "null"));
+                        marker.setTexture(PrintI.toString(exec.obj(p2)));
                     }
                 }else{
                     marker.control(type, exec.numOrNan(p1), exec.numOrNan(p2), exec.numOrNan(p3));
