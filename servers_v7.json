@@ -4,6 +4,10 @@
     "address": ["23.88.73.88:25617"]
   },
   {
+    "name" : "LesGarsCools",
+    "address": ["est1.be"]
+  },
+  {
     "name": "meiqiuMDT",
     "address": ["cn1.meiqiumdy.top:7000","cn1.meiqiumdt.top:7002","cn1.meiqiumdt.top:7006","bj-1.lcf.icu:10240"]
   },
@@ -234,7 +238,7 @@
   },
   {
     "name": "Extra Utilities",
-    "address": ["222.186.59.147:15142", "222.186.59.147:15143"]
+    "address": ["222.186.59.147:15142", "222.186.59.147:15143", "p1.i9mr.com:44922", "p1.i9mr.com:44834"]
   },
   {
     "name": "Alex Multiverse",
@@ -259,5 +263,9 @@
   {
     "name": "SkyPlex",
     "address": ["mc-skyplex.net"]
+  },
+  {
+    "name": "Gadgetroch's Server",
+    "address": ["mindustry.gadgetroch.com", "mindustry.gadgetroch.com:6568"]
   }
 ]

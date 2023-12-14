@@ -1360,13 +1360,20 @@ public class LExecutor{
                         exec.setobj(result, i < 0 || i >= builds.size ? null : builds.get(i));
                     }
                 }
-                case unitCount -> exec.setnum(result, data.units.size);
+                case unitCount -> {
+                    UnitType type = exec.obj(extra) instanceof UnitType u ? u : null;
+                    if(type == null){
+                        exec.setnum(result, data.units.size);
+                    }else{
+                        exec.setnum(result, data.unitsByType[type.id].size);
+                    }
+                }
                 case coreCount -> exec.setnum(result, data.cores.size);
                 case playerCount -> exec.setnum(result, data.players.size);
                 case buildCount -> {
                     Block block = exec.obj(extra) instanceof Block b ? b : null;
                     if(block == null){
-                        exec.setobj(result, null);
+                        exec.setnum(result, data.buildings.size);
                     }else{
                         exec.setnum(result, data.getBuildings(block).size);
                     }

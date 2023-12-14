@@ -1748,7 +1748,7 @@ public class LStatements{
                 fields(table, index, i -> index = i);
             }
 
-            if(type == FetchType.buildCount || type == FetchType.build){
+            if(type == FetchType.buildCount || type == FetchType.build || type == FetchType.unitCount){
                 row(table);
 
                 fields(table, "block", extra, i -> extra = i);
