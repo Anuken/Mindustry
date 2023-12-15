@@ -627,6 +627,8 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
     /** Marker used for drawing various content to indicate something along with an objective. Mostly used as UI overlay.  */
     public static abstract class ObjectiveMarker{
+        /** Position of marker, in world coordinates */
+        public @TilePos Vec2 pos = new Vec2();
         /** Makes sure markers are only added once. */
         public transient boolean wasAdded;
         /** Whether to display marker on minimap instead of world. {@link MinimapMarker} ignores this value. */
@@ -640,9 +642,14 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         /** Draws the marker. Actual marker position and scale are calculated in {@link #drawWorld()} and {@link #drawMinimap(MinimapRenderer)}. */
         public void baseDraw(float x, float y, float scaleFactor){}
         /** Called in the main renderer. */
-        public void drawWorld(){}
+        public void drawWorld(){
+            baseDraw(pos.x, pos.y, autoscale ? 4f / renderer.getDisplayScale() : 1f);
+        }
         /** Called in the small and large map. */
-        public void drawMinimap(MinimapRenderer minimap){}
+        public void drawMinimap(MinimapRenderer minimap){
+            minimap.transform(Tmp.v1.set(pos.x + 4f, pos.y + 4f));
+            baseDraw(Tmp.v1.x, Tmp.v1.y, minimap.getScaleFactor(autoscale));
+        }
         /** Add any UI elements necessary. */
         public void added(){}
         /** Remove any UI elements, if necessary. */
@@ -695,7 +702,6 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
     /** Displays text above a shape. */
     public static class ShapeTextMarker extends ObjectiveMarker{
         public @Multiline String text = "frog";
-        public @TilePos Vec2 pos = new Vec2();
         public float fontSize = 1f, textHeight = 7f;
         public @LabelFlag byte flags = WorldLabel.flagBackground | WorldLabel.flagOutline;
 
@@ -754,17 +760,6 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             if(Mathf.equal(fontSize, 0f)) return;
 
             WorldLabel.drawAt(fetchedText, x, y + radius * scaleFactor + textHeight * scaleFactor, drawLayer, flags, fontSize * scaleFactor);
-        }
-
-        @Override
-        public void drawWorld(){
-            baseDraw(pos.x, pos.y, autoscale ? 4f / renderer.getDisplayScale() : 1f);
-        }
-
-        @Override
-        public void drawMinimap(MinimapRenderer minimap){
-            minimap.transform(Tmp.v1.set(pos.x + 4f, pos.y + 4f));
-            baseDraw(Tmp.v1.x, Tmp.v1.y, minimap.getScaleFactor(autoscale));
         }
 
         @Override
@@ -889,7 +884,6 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
     /** Displays a shape with an outline and color. */
     public static class ShapeMarker extends ObjectiveMarker{
-        public @TilePos Vec2 pos = new Vec2();
         public float radius = 8f, rotation = 0f, stroke = 1f;
         public boolean fill = false, outline = true;
         public int sides = 4;
@@ -930,17 +924,6 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         }
 
         @Override
-        public void drawWorld(){
-            baseDraw(pos.x, pos.y, autoscale ? 4f / renderer.getDisplayScale() : 1f);
-        }
-
-        @Override
-        public void drawMinimap(MinimapRenderer minimap){
-            minimap.transform(Tmp.v1.set(pos.x + 4f, pos.y + 4f));
-            baseDraw(Tmp.v1.x, Tmp.v1.y, minimap.getScaleFactor(autoscale));
-        }
-
-        @Override
         public void control(LMarkerControl type, double p1, double p2, double p3){
             if(!Double.isNaN(p1)){
                 switch(type){
@@ -975,7 +958,6 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
     /** Displays text at a location. */
     public static class TextMarker extends ObjectiveMarker{
         public @Multiline String text = "uwu";
-        public @TilePos Vec2 pos = new Vec2();
         public float fontSize = 1f;
         public @LabelFlag byte flags = WorldLabel.flagBackground | WorldLabel.flagOutline;
         // Cached localized text.
@@ -1005,17 +987,6 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             }
 
             WorldLabel.drawAt(fetchedText, x, y, drawLayer, flags, fontSize * scaleFactor);
-        }
-
-        @Override
-        public void drawWorld(){
-            baseDraw(pos.x, pos.y, autoscale ? 4f / renderer.getDisplayScale() : 1f);
-        }
-
-        @Override
-        public void drawMinimap(MinimapRenderer minimap){
-            minimap.transform(Tmp.v1.set(pos.x + 4f, pos.y + 4f));
-            baseDraw(Tmp.v1.x, Tmp.v1.y, minimap.getScaleFactor(autoscale));
         }
 
         @Override
@@ -1063,20 +1034,20 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
     /** Displays a line from pos1 to pos2. */
     public static class LineMarker extends ObjectiveMarker{
-        public @TilePos Vec2 pos1 = new Vec2(), pos2 = new Vec2();
+        public @TilePos Vec2 pos = new Vec2(), endPos = new Vec2();
         public float stroke = 1f;
         public boolean outline = true;
         public Color color = Color.valueOf("ffd37f");
 
-        public LineMarker(String text, float x1, float y1, float x2, float y2, float stroke){
+        public LineMarker(float x1, float y1, float x2, float y2, float stroke){
             this.stroke = stroke;
-            this.pos1.set(x1, y1);
-            this.pos2.set(x2, y2);
+            this.pos.set(x1, y1);
+            this.endPos.set(x2, y2);
         }
 
-        public LineMarker(String text, float x1, float y1, float x2, float y2){
-            this.pos1.set(x1, y1);
-            this.pos2.set(x2, y2);
+        public LineMarker(float x1, float y1, float x2, float y2){
+            this.pos.set(x1, y1);
+            this.endPos.set(x2, y2);
         }
 
         public LineMarker(){}
@@ -1094,13 +1065,13 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public void drawWorld(){
-            baseLineDraw(pos1.x, pos1.y, pos1.x, pos2.y, autoscale ? 4f / renderer.getDisplayScale() : 1f);
+            baseLineDraw(pos.x, pos.y, endPos.x, endPos.y, autoscale ? 4f / renderer.getDisplayScale() : 1f);
         }
 
         @Override
         public void drawMinimap(MinimapRenderer minimap){
-            minimap.transform(Tmp.v1.set(pos1.x + 4f, pos1.y + 4f));
-            minimap.transform(Tmp.v2.set(pos2.x + 4f, pos2.y + 4f));
+            minimap.transform(Tmp.v1.set(pos.x + 4f, pos.y + 4f));
+            minimap.transform(Tmp.v2.set(endPos.x + 4f, endPos.y + 4f));
             baseLineDraw(Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y, minimap.getScaleFactor(autoscale));
         }
 
@@ -1108,8 +1079,8 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public void control(LMarkerControl type, double p1, double p2, double p3){
             if(!Double.isNaN(p1)){
                 switch(type){
-                    case pos -> pos1.x = (float)p1 * tilesize;
-                    case endPos -> pos2.x = (float)p1 * tilesize;
+                    case pos -> pos.x = (float)p1 * tilesize;
+                    case endPos -> endPos.x = (float)p1 * tilesize;
                     case stroke -> stroke = (float)p1;
                     case color -> color.set(Tmp.c1.fromDouble(p1));
                     default -> super.control(type, p1, p2, p3);
@@ -1118,8 +1089,8 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
             if(!Double.isNaN(p2)){
                 switch(type){
-                    case pos -> pos1.y = (float)p2 * tilesize;
-                    case endPos -> pos2.y = (float)p2 * tilesize;
+                    case pos -> pos.y = (float)p2 * tilesize;
+                    case endPos -> endPos.y = (float)p2 * tilesize;
                     default -> super.control(type, p1, p2, p3);
                 }
             }
@@ -1128,12 +1099,18 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
     /** Displays a texture with specified name. */
     public static class TextureMarker extends ObjectiveMarker{
-        public @TilePos Vec2 pos = new Vec2();
         public float rotation = 0f, width = 0f, height = 0f; // Zero width/height scales marker to original texture's size
         public String textureName = "";
         public Color color = Color.white.cpy();
 
         private transient TextureRegion fetchedRegion;
+
+        public TextureMarker(String textureName, float x, float y, float width, float height){
+            this.textureName = textureName;
+            this.pos.set(x, y);
+            this.width = width;
+            this.height = height;
+        }
 
         public TextureMarker(String textureName, float x, float y){
             this.textureName = textureName;
@@ -1181,17 +1158,6 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                 Draw.color(Color.white);
                 Draw.rect("error", x, y, width * scaleFactor, height * scaleFactor, rotation);
             }
-        }
-
-        @Override
-        public void drawWorld(){
-            baseDraw(pos.x, pos.y, autoscale ? 4f / renderer.getDisplayScale() : 1f);
-        }
-
-        @Override
-        public void drawMinimap(MinimapRenderer minimap){
-            minimap.transform(Tmp.v1.set(pos.x + 4f, pos.y + 4f));
-            baseDraw(Tmp.v1.x, Tmp.v1.y, minimap.getScaleFactor(autoscale));
         }
 
         @Override
