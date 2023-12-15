@@ -14,21 +14,32 @@ public class Tiles implements Iterable<Tile>{
 
     final Tile[] array;
     final Puddle[] puddles;
+    final Fire[] fires;
 
     public Tiles(int width, int height){
         this.array = new Tile[width * height];
         this.width = width;
         this.height = height;
         this.puddles = new Puddle[width * height];
+        this.fires = new Fire[width * height];
     }
 
-    public Puddle puddle(int pos){
+    public Puddle getPuddle(int pos){
         return puddles[pos];
     }
 
     public void setPuddle(int pos, Puddle p){
         puddles[pos] = p;
     }
+
+    public Fire getFire(int pos){
+        return fires[pos];
+    }
+
+    public void setFire(int pos, Fire f){
+        fires[pos] = f;
+    }
+
 
     public void each(Intc2 cons){
         for(int x = 0; x < width; x++){

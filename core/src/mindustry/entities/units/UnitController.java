@@ -27,6 +27,10 @@ public interface UnitController{
 
     }
 
+    default void afterRead(Unit unit){
+
+    }
+
     default boolean isBeingControlled(Unit player){
         return false;
     }
