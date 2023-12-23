@@ -777,7 +777,9 @@ public class NetServer implements ApplicationListener{
                 }else{
                     NetClient.traceInfo(other, info);
                 }
-                info("&lc@ &fi&lk[&lb@&fi&lk]&fb has requested trace info of @ &fi&lk[&lb@&fi&lk]&fb.", player.plainName(), player.uuid(), other.plainName(), other.uuid());
+                if(Config.logTraceRequests.bool()){
+                    info("&lc@ &fi&lk[&lb@&fi&lk]&fb has requested trace info of @ &fi&lk[&lb@&fi&lk]&fb.", player.plainName(), player.uuid(), other.plainName(), other.uuid());
+                }
             }
             case switchTeam -> {
                 if(params instanceof Team team){
