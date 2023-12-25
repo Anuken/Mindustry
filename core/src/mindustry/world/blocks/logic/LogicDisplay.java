@@ -1,6 +1,5 @@
 package mindustry.world.blocks.logic;
 
-import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
@@ -91,7 +90,12 @@ public class LogicDisplay extends Block{
                         p1 = unpackSign(DisplayCmd.p1(c)), p2 = unpackSign(DisplayCmd.p2(c)), p3 = unpackSign(DisplayCmd.p3(c)), p4 = unpackSign(DisplayCmd.p4(c));
 
                         switch(type){
-                            case commandClear -> Core.graphics.clear(x / 255f, y / 255f, p1 / 255f, 1f);
+                            case commandClear -> {
+                                //calling glClear appears to be unreliable and leads to flickering
+                                Draw.color(x / 255f, y / 255f, p1 / 255f, 1f);
+                                Fill.crect(0f, 0f, displaySize, displaySize);
+                                Draw.color(color);
+                            }
                             case commandLine -> Lines.line(x, y, p1, p2);
                             case commandRect -> Fill.crect(x, y, p1, p2);
                             case commandLineRect -> Lines.rect(x, y, p1, p2);
