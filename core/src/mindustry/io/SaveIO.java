@@ -56,8 +56,13 @@ public class SaveIO{
     }
 
     public static boolean isSaveValid(Fi file){
+        return isSaveFileValid(file) || isSaveFileValid(backupFileFor(file));
+    }
+
+    private static boolean isSaveFileValid(Fi file){
         try(DataInputStream stream = new DataInputStream(new InflaterInputStream(file.read(bufferSize)))){
-            return isSaveValid(stream);
+            getMeta(stream);
+            return true;
         }catch(Throwable e){
             return false;
         }

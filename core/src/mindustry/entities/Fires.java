@@ -1,8 +1,6 @@
 package mindustry.entities;
 
 import arc.*;
-import arc.math.geom.*;
-import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.game.EventType.*;
@@ -14,13 +12,12 @@ import static mindustry.Vars.*;
 
 public class Fires{
     private static final float baseLifetime = 1000f;
-    private static final IntMap<Fire> map = new IntMap<>();
 
     /** Start a fire on the tile. If there already is a fire there, refreshes its lifetime. */
     public static void create(Tile tile){
         if(net.client() || tile == null || !state.rules.fire || !state.rules.hasEnv(Env.oxygen)) return; //not clientside.
 
-        Fire fire = map.get(tile.pos());
+        Fire fire = get(tile);
 
         if(fire == null){
             fire = Fire.create();
@@ -28,48 +25,58 @@ public class Fires{
             fire.lifetime = baseLifetime;
             fire.set(tile.worldx(), tile.worldy());
             fire.add();
-            map.put(tile.pos(), fire);
+            set(tile, fire);
         }else{
             fire.lifetime = baseLifetime;
             fire.time = 0f;
         }
     }
 
-    public static Fire get(int x, int y){
-        return map.get(Point2.pack(x, y));
+    public static @Nullable Fire get(Tile tile){
+        return world.tiles.getFire(tile.array());
+    }
+
+    public static @Nullable Fire get(int x, int y){
+        return world.tiles.getFire(world.packArray(x, y));
+    }
+
+    private static void set(Tile tile, Fire fire){
+        world.tiles.setFire(tile.array(), fire);
     }
 
     public static boolean has(int x, int y){
-        if(!Structs.inBounds(x, y, world.width(), world.height()) || !map.containsKey(Point2.pack(x, y))){
+        if(!Structs.inBounds(x, y, world.width(), world.height())){
             return false;
         }
-        Fire fire = map.get(Point2.pack(x, y));
-        return fire.isAdded() && fire.fin() < 1f && fire.tile() != null && fire.tile().x == x && fire.tile().y == y;
+        Fire fire = get(x, y);
+        return fire != null && fire.isAdded() && fire.fin() < 1f && fire.tile != null && fire.tile.x == x && fire.tile.y == y;
     }
 
     /**
      * Attempts to extinguish a fire by shortening its life. If there is no fire here, does nothing.
      */
     public static void extinguish(Tile tile, float intensity){
-        if(tile != null && map.containsKey(tile.pos())){
-            Fire fire = map.get(tile.pos());
-            fire.time(fire.time + intensity * Time.delta);
-            Fx.steam.at(fire);
-            if(fire.time >= fire.lifetime){
-                Events.fire(Trigger.fireExtinguish);
+        if(tile != null){
+            Fire fire = get(tile);
+            if(fire != null){
+                fire.time(fire.time + intensity * Time.delta);
+                Fx.steam.at(fire);
+                if(fire.time >= fire.lifetime){
+                    Events.fire(Trigger.fireExtinguish);
+                }
             }
         }
     }
 
     public static void remove(Tile tile){
         if(tile != null){
-            map.remove(tile.pos());
+            set(tile, null);
         }
     }
 
     public static void register(Fire fire){
         if(fire.tile != null){
-            map.put(fire.tile.pos(), fire);
+            set(fire.tile, fire);
         }
     }
 }

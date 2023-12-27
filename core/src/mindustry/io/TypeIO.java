@@ -563,13 +563,14 @@ public class TypeIO{
                 ai.targetPos = null;
             }
             ai.setupLastPos();
+            ai.readAttackTarget = -1;
 
             if(hasAttack){
                 byte entityType = read.b();
                 if(entityType == 1){
                     ai.attackTarget = world.build(read.i());
                 }else{
-                    ai.attackTarget = Groups.unit.getByID(read.i());
+                    ai.attackTarget = Groups.unit.getByID(ai.readAttackTarget = read.i());
                 }
             }else{
                 ai.attackTarget = null;

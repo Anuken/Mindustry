@@ -491,6 +491,11 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     }
 
     @Override
+    public void afterAllRead(){
+        controller.afterRead(self());
+    }
+
+    @Override
     public void add(){
         team.data().updateCount(type, 1);
 

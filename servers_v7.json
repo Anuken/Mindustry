@@ -1,19 +1,23 @@
 [
   {
-    "name": "Vndustry",
-    "address": ["140.238.246.78:7000"]
+    "name": "STP",
+    "address": ["23.88.73.88:25617"]
+  },
+  {
+    "name" : "LesGarsCools",
+    "address": ["est1.be"]
   },
   {
     "name": "meiqiuMDT",
-    "address": ["cn1.plush.run:10001","211.101.236.94:10000","bj-1.lcf.icu:10240","play.simpfun.cn:14523"]
+    "address": ["cn1.meiqiumdy.top:7000","cn1.meiqiumdt.top:7002","cn1.meiqiumdt.top:7006","bj-1.lcf.icu:10240"]
   },
   {
     "name": "Crux's Revelations",
-    "address": ["de-free-01.hosts.optikservers.com:31528","de-prem-01.hosts.optikservers.com:35160"]
+    "address": ["de-free-01.hosts.optikservers.com:31528","de-prem-01.hosts.optikservers.com:35160", "de-prem-01.hosts.optikservers.com:35116", "de-prem-01.hosts.optikservers.com:35922"]
   },
   {
     "name": "CMS",
-    "address": ["195.2.84.144","23.88.73.88:25617"]
+    "address": ["195.2.84.144","65.108.224.31:26165"]
   },
   {
     "name": "ShardDustry Eventos",
@@ -25,7 +29,7 @@
   },
   {
     "name": "Tamazia",
-    "address": ["213.165.76.25:6567", "213.165.76.25:30104"]
+    "address": ["5.250.178.221:6567","node1.adky.net:3215"]
   },
   {
     "name": "Crux's Federation",
@@ -49,7 +53,7 @@
   },
   {
     "name": "Mindustry.pl",
-    "address": ["78.46.100.178", "0.baseduser.eu.org:6966", "0.baseduser.eu.org:6666", "0.baseduser.eu.org:6000", "1.baseduser.eu.org:6966", "1.baseduser.eu.org:6666", "1.baseduser.eu.org:6000"]
+    "address": ["1.baseduser.eu.org:6966", "1.baseduser.eu.org:6666", "1.baseduser.eu.org:6000"]
   },
   {
     "name": "SynapseOS",
@@ -58,10 +62,6 @@
   {
     "name": "Untitled Mindustry Servers",
     "address": ["45.144.66.250:6567", "45.144.66.250:6601", "45.144.66.250:6611"]
-  },
-  {
-    "name": "C.A.M.S.",
-    "address": ["0.baseduser.eu.org:42001", "0.baseduser.eu.org:42002"]
   },
   {
     "name": "thedimas",
@@ -82,6 +82,10 @@
   {
     "name": "XCore",
     "address": ["128.140.88.66", "128.140.88.66:6568", "128.140.88.66:6569", "128.140.88.66:6570", "128.140.88.66:6571", "128.140.88.66:6572", "128.140.88.66:6573", "128.140.88.66:6574", "128.140.88.66:6575"]
+  },
+  {
+    "name": "MinDurka",
+    "address": ["95.181.151.210", "95.181.151.210:3001", "95.181.151.210:3002", "95.181.151.210:3003", "95.181.151.210:3004", "95.181.151.210:3005", "95.181.151.210:3006", "95.181.151.210:3007", "95.181.151.210:3008", "95.181.151.210:3009", "95.181.151.210:3010"]
   },
   {
     "name": "Chaotic Neutral",
@@ -129,7 +133,7 @@
   },
   {
     "name": "Eradication Mindustry",
-    "address": ["140.238.246.78:6569", "140.238.246.78:9547", "140.238.246.78:6572", "140.238.246.78:6570", "140.238.246.78:6571", "140.238.246.78:6574", "140.238.246.78:6573", "140.238.246.78:6568", "140.238.246.78:6677", "140.238.246.78:6678", "140.238.246.78:6675", "130.61.22.183:6573", "130.61.22.183:6599", "130.61.22.183:6774", "130.61.22.183:6777"]
+    "address": ["140.238.246.78:7000", "140.238.246.78:7001", "140.238.246.78:7002", "140.238.246.78:7003", "140.238.246.78:7004", "140.238.246.78:7005", "130.61.22.183:7000", "130.61.22.183:7001", "130.61.22.183:7002", "130.61.22.183:7003", "130.61.22.183:7004", "130.61.22.183:7005", "77.99.254.211:7000", "77.99.254.211:7001", "77.99.254.211:7002", "141.148.196.135:7000"]
   },
   {
     "name": "Conservatory",
@@ -137,7 +141,7 @@
   },
   {
     "name": "mindustry.ddns.net",
-    "address": ["mindustry.ddns.net", "mindustry.ddns.net:1000", "mindustry.ddns.net:2000", "mindustry.ddns.net:3000", "mindustry.ddns.net:4000"]
+    "address": ["mindustry.ddns.net", "mindustry.ddns.net:1000", "mindustry.ddns.net:2000", "mindustry.ddns.net:3000", "mindustry.ddns.net:4000", "mindustry.ddns.net:5000"]
   },
   {
     "name": "EasyPlay.su",
@@ -206,7 +210,7 @@
   },
   {
     "name": "Cyandustry",
-    "address": ["88.99.95.188:7000","88.99.95.188:7001", "88.99.95.188:7002", "88.99.95.188:7003", "88.99.95.188:7004", "88.99.95.188:7005", "88.99.95.188:7006"]
+    "address": ["94.130.89.220:7000","94.130.89.220:7001", "94.130.89.220:7002", "94.130.89.220:7003", "94.130.89.220:7004", "94.130.89.220:7005", "94.130.89.220:7006"]
   },
   {
     "name": "Four Family",
@@ -222,11 +226,11 @@
   },
   {
     "name": "3MIDustry",
-    "address": ["3midustry.xyz:10", "3midustry.xyz:20", "3midustry.xyz:30", "3midustry.xyz:40", "3midustry.xyz:50", "3midustry.xyz:60", "3midustry.xyz:6567"]
+    "address": ["play.3midustry.xyz:6001", "play.3midustry.xyz:6002", "play.3midustry.xyz:6003", "play.3midustry.xyz:6004", "play.3midustry.xyz:6005", "play.3midustry.xyz:6006", "play.3midustry.xyz:6007", "play.3midustry.xyz:6008", "play.3midustry.xyz:6009", "play.3midustry.xyz:6010"]
   },
   {
     "name": "ABCXYZ Community",
-    "address": ["23.88.73.88:23591", "23.88.73.88:23539", "144.76.57.59:14996", "144.76.57.59:16881", "144.76.57.59:13885", "23.88.73.88:32113", "144.76.57.59:9269"]
+    "address": ["23.88.73.88:23591", "23.88.73.88:23539", "144.76.57.59:14996", "144.76.57.59:16881", "144.76.57.59:13885", "23.88.73.88:32113", "144.76.57.59:9269", "144.76.57.59:24235", "144.76.57.59:24133", "140.238.246.78:7000"]
   },
   {
     "name": "CroCraft Network",
@@ -234,11 +238,11 @@
   },
   {
     "name": "Extra Utilities",
-    "address": ["222.186.59.147:15142", "222.186.59.147:15143"]
+    "address": ["p1.i9mr.com:44922", "p1.i9mr.com:44834"]
   },
   {
     "name": "Alex Multiverse",
-    "address": ["alexmindustryv7.servegame.com:25588", "173.255.208.38:41962", "alexmindustrypvp.ddns.net:6767", "172.104.188.197:6768", "172.234.80.96:6768", "139.162.41.78:6767"]
+    "address": ["alexmindustryv7.servegame.com:25588", "172.234.80.96:6768", "139.162.41.78:6767", "172.245.187.143:6868", "172.245.187.143:6869" ]
   },
   {
     "name": "Open PVP",
@@ -254,6 +258,14 @@
   },
   {
     "name": "Atomic",
-    "address": ["atomic-de.ddns.net:35199", "atomic-de.ddns.net:35176", "atomic-de.ddns.net:35845"]
+    "address": ["atomic-de.ddns.net:35199", "atomic-de.ddns.net:35176", "atomic-de.ddns.net:35845", "atomic-de.ddns.net:35313"]
+  },
+  {
+    "name": "SkyPlex",
+    "address": ["mc-skyplex.net"]
+  },
+  {
+    "name": "Gadgetroch's Server",
+    "address": ["mindustry.gadgetroch.com", "mindustry.gadgetroch.com:6568"]
   }
 ]

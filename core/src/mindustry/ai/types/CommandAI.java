@@ -30,6 +30,8 @@ public class CommandAI extends AIController{
     public int groupIndex = 0;
     /** All encountered unreachable buildings of this AI. Why a sequence? Because contains() is very rarely called on it. */
     public IntSeq unreachableBuildings = new IntSeq(8);
+    /** ID of unit read as target. This is set up after reading. Do not access! */
+    public int readAttackTarget = -1;
 
     protected boolean stopAtTarget, stopWhenInRange;
     protected Vec2 lastTargetPos;
@@ -284,7 +286,7 @@ public class CommandAI extends AIController{
                 attackTarget = null;
             }
 
-            if(unit.isFlying() && move){
+            if(unit.isFlying() && move && (attackTarget == null || !unit.within(attackTarget, unit.type.range))){
                 unit.lookAt(vecMovePos);
             }else{
                 faceTarget();
@@ -346,6 +348,14 @@ public class CommandAI extends AIController{
             }
         }else if(commandQueue.size < maxCommandQueueSize && !commandQueue.contains(location)){
             commandQueue.add(location);
+        }
+    }
+
+    @Override
+    public void afterRead(Unit unit){
+        if(readAttackTarget != -1){
+            attackTarget = Groups.unit.getByID(readAttackTarget);
+            readAttackTarget = -1;
         }
     }
 

@@ -946,12 +946,6 @@ public class LExecutor{
             //graphics on headless servers are useless.
             if(Vars.headless || exec.graphicsBuffer.size >= maxGraphicsBuffer) return;
 
-            int num1 = exec.numi(p1);
-
-            if(type == LogicDisplay.commandImage){
-                num1 = exec.obj(p1) instanceof UnlockableContent u ? u.iconId : 0;
-            }
-
             //explicitly unpack colorPack, it's pre-processed here
             if(type == LogicDisplay.commandColorPack){
                 double packed = exec.num(x);
@@ -1014,6 +1008,12 @@ public class LExecutor{
                     exec.textBuffer.setLength(0);
                 }
             }else{
+                int num1 = exec.numi(p1);
+
+                if(type == LogicDisplay.commandImage){
+                    num1 = exec.obj(p1) instanceof UnlockableContent u ? u.iconId : 0;
+                }
+
                 //add graphics calls, cap graphics buffer size
                 exec.graphicsBuffer.add(DisplayCmd.get(type, packSign(exec.numi(x)), packSign(exec.numi(y)), packSign(num1), packSign(exec.numi(p2)), packSign(exec.numi(p3)), packSign(exec.numi(p4))));
             }
@@ -1096,6 +1096,55 @@ public class LExecutor{
                 obj instanceof Enum<?> e ? e.name() :
                 obj instanceof Team team ? team.name :
                 "[object]";
+        }
+    }
+
+    public static class FormatI implements LInstruction{
+        public int value;
+
+        public FormatI(int value){
+            this.value = value;
+        }
+
+        FormatI(){}
+
+        @Override
+        public void run(LExecutor exec){
+
+            if(exec.textBuffer.length() >= maxTextBuffer) return;
+
+            int placeholderIndex = -1;
+            int placeholderNumber = 10;
+
+            for(int i = 0; i < exec.textBuffer.length(); i++){
+                if(exec.textBuffer.charAt(i) == '{' && exec.textBuffer.length() - i > 2){
+                    char numChar = exec.textBuffer.charAt(i + 1);
+
+                    if(numChar >= '0' && numChar <= '9' && exec.textBuffer.charAt(i + 2) == '}'){
+                        if(numChar - '0' < placeholderNumber){
+                            placeholderNumber = numChar - '0';
+                            placeholderIndex = i;
+                        }
+                    }
+                }
+            }
+
+            if(placeholderIndex == -1) return;
+
+            //this should avoid any garbage allocation
+            Var v = exec.var(value);
+            if(v.isobj && value != 0){
+                String strValue = PrintI.toString(v.objval);
+
+                exec.textBuffer.replace(placeholderIndex, placeholderIndex + 3, strValue);
+            }else{
+                //display integer version when possible
+                if(Math.abs(v.numval - (long)v.numval) < 0.00001){
+                    exec.textBuffer.replace(placeholderIndex, placeholderIndex + 3, (long)v.numval + "");
+                }else{
+                    exec.textBuffer.replace(placeholderIndex, placeholderIndex + 3, v.numval + "");
+                }
+            }
         }
     }
 
@@ -1311,13 +1360,20 @@ public class LExecutor{
                         exec.setobj(result, i < 0 || i >= builds.size ? null : builds.get(i));
                     }
                 }
-                case unitCount -> exec.setnum(result, data.units.size);
+                case unitCount -> {
+                    UnitType type = exec.obj(extra) instanceof UnitType u ? u : null;
+                    if(type == null){
+                        exec.setnum(result, data.units.size);
+                    }else{
+                        exec.setnum(result, data.unitsByType[type.id].size);
+                    }
+                }
                 case coreCount -> exec.setnum(result, data.cores.size);
                 case playerCount -> exec.setnum(result, data.players.size);
                 case buildCount -> {
                     Block block = exec.obj(extra) instanceof Block b ? b : null;
                     if(block == null){
-                        exec.setobj(result, null);
+                        exec.setnum(result, data.buildings.size);
                     }else{
                         exec.setnum(result, data.getBuildings(block).size);
                     }
@@ -1992,6 +2048,40 @@ public class LExecutor{
                 marker.setText(text, true);
             }else if(type == LMarkerControl.flushText){
                 marker.setText(text, false);
+            }
+        }
+    }
+
+    public static class LocalePrintI implements LInstruction{
+        public int name;
+
+        public LocalePrintI(int name){
+            this.name = name;
+        }
+
+        public LocalePrintI(){
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            if(exec.textBuffer.length() >= maxTextBuffer) return;
+
+            //this should avoid any garbage allocation
+            Var v = exec.var(name);
+            if(v.isobj){
+                String name = PrintI.toString(v.objval);
+
+                String strValue;
+
+                if(mobile){
+                    strValue = state.mapLocales.containsProperty(name + ".mobile") ?
+                    state.mapLocales.getProperty(name + ".mobile") :
+                    state.mapLocales.getProperty(name);
+                }else{
+                    strValue = state.mapLocales.getProperty(name);
+                }
+
+                exec.textBuffer.append(strValue);
             }
         }
     }

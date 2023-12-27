@@ -326,7 +326,7 @@ project(":core"){
 
         annotationProcessor 'com.github.Anuken:jabel:0.9.0'
         compileOnly project(":annotations")
-        kapt project(":annotations")
+        if(!project.hasProperty("noKapt")) kapt project(":annotations")
     }
 
     afterEvaluate{
@@ -381,6 +381,7 @@ project(":tests"){
         testImplementation "org.junit.jupiter:junit-jupiter-params:5.7.1"
         testImplementation "org.junit.jupiter:junit-jupiter-api:5.7.1"
         testImplementation arcModule("backends:backend-headless")
+        testImplementation "org.json:json:20230618"
         testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.7.1"
     }
 
