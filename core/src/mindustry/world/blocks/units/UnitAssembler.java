@@ -95,7 +95,6 @@ public class UnitAssembler extends PayloadBlock{
         super.setBars();
 
         boolean planLiquids = false;
-
         for(int i = 0; i < plans.size; i++){
             var req = plans.get(i).liquidReq;
             if(req != null && req.length > 0){
@@ -105,7 +104,7 @@ public class UnitAssembler extends PayloadBlock{
                 planLiquids = true;
             }
         }
-        //set up liquid bars for liquid outputs
+
         if(planLiquids){
             removeBar("liquid");
         }
