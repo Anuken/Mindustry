@@ -44,6 +44,7 @@ public class UnitAssembler extends PayloadBlock{
     public Seq<AssemblerUnitPlan> plans = new Seq<>(4);
 
     protected @Nullable ConsumePayloadDynamic consPayload;
+    protected @Nullable ConsumeItemDynamic consItem;
 
     public UnitAssembler(String name){
         super(name);
@@ -140,7 +141,7 @@ public class UnitAssembler extends PayloadBlock{
         updateClipRadius(areaSize * tilesize);
 
         consume(consPayload = new ConsumePayloadDynamic((UnitAssemblerBuild build) -> build.plan().requirements));
-        consume(new ConsumeItemDynamic((UnitAssemblerBuild build) -> build.plan().itemReq != null ? build.plan().itemReq : ItemStack.empty));
+        consume(consItem = new ConsumeItemDynamic((UnitAssemblerBuild build) -> build.plan().itemReq != null ? build.plan().itemReq : ItemStack.empty));
         consume(new ConsumeLiquidsDynamic((UnitAssemblerBuild build) -> build.plan().liquidReq != null ? build.plan().liquidReq : LiquidStack.empty));
 
         consumeBuilder.each(c -> c.multiplier = b -> state.rules.unitCost(b.team));
@@ -354,7 +355,7 @@ public class UnitAssembler extends PayloadBlock{
         @Override
         public boolean shouldConsume(){
             //liquid is only consumed when building is being done
-            return enabled && !wasOccupied && Units.canCreate(team, plan().unit) && consPayload.efficiency(this) > 0;
+            return enabled && !wasOccupied && Units.canCreate(team, plan().unit) && consPayload.efficiency(this) > 0 && consItem.efficiency(this) > 0;
         }
 
         @Override
