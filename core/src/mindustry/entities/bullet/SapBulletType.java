@@ -15,6 +15,18 @@ public class SapBulletType extends BulletType{
     public float sapStrength = 0.5f;
     public Color color = Color.white.cpy();
     public float width = 0.4f;
+    public String sprite = "laser";
+
+    public TextureRegion laserRegion;
+    public TextureRegion laserEndRegion;
+
+    @Override
+    public void load(){
+        super.load();
+
+        laserRegion = Core.atlas.find(sprite);
+        laserEndRegion = Core.atlas.find(sprite + "-end");
+    }
 
     public SapBulletType(){
         speed = 0f;
@@ -37,7 +49,7 @@ public class SapBulletType extends BulletType{
             Tmp.v1.set(data).lerp(b, b.fin());
 
             Draw.color(color);
-            Drawf.laser(Core.atlas.find("laser"), Core.atlas.find("laser-end"),
+            Drawf.laser(laserRegion, laserEndRegion,
                 b.x, b.y, Tmp.v1.x, Tmp.v1.y, width * b.fout());
 
             Draw.reset();
