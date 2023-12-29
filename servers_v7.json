@@ -267,5 +267,9 @@
   {
     "name": "Gadgetroch's Server",
     "address": ["mindustry.gadgetroch.com", "mindustry.gadgetroch.com:6568"]
+  },
+  {
+    "name": "Duel.Server"
+    "address":["160.251.41.148:6568","160.251.41.148:6569"]
   }
 ]
