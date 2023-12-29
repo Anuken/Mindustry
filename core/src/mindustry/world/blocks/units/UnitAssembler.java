@@ -241,9 +241,9 @@ public class UnitAssembler extends PayloadBlock{
 
     public static class AssemblerUnitPlan{
         public UnitType unit;
-        public Seq<PayloadStack> requirements;
-        public ItemStack[] itemReq;
-        public LiquidStack[] liquidReq;
+        @Nullable public Seq<PayloadStack> requirements;
+        @Nullable public ItemStack[] itemReq;
+        @Nullable public LiquidStack[] liquidReq;
         public float time;
 
         public AssemblerUnitPlan(UnitType unit, float time, Seq<PayloadStack> requirements){
