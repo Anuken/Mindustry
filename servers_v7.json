@@ -267,5 +267,9 @@
   {
     "name": "Gadgetroch's Server",
     "address": ["mindustry.gadgetroch.com", "mindustry.gadgetroch.com:6568"]
+  },
+  {
+    "name": "AZDustry",
+    "address": ["118.127.8.162:25628"]
   }
 ]
