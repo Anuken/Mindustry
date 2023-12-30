@@ -333,7 +333,7 @@ public class ArcNetProvider implements NetProvider{
 
         @Override
         public void sendStream(Streamable stream){
-            connection.addListener(new InputStreamSender(stream.stream, 512){
+            connection.addListener(new InputStreamSender(stream.stream, 1024){
                 int id;
 
                 @Override
