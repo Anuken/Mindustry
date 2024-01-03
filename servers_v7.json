@@ -13,7 +13,7 @@
   },
   {
     "name": "Crux's Revelations",
-    "address": ["de-free-01.hosts.optikservers.com:31528","de-prem-01.hosts.optikservers.com:35160", "de-prem-01.hosts.optikservers.com:35116", "de-prem-01.hosts.optikservers.com:35922"]
+    "address": ["de-free-01.hosts.optikservers.com:31528","de-prem-01.hosts.optikservers.com:35922"]
   },
   {
     "name": "CMS",
@@ -25,7 +25,7 @@
   },
   {
     "name": "ShardDustry ES",
-    "address": ["94.130.132.149:35689","94.130.132.149:35438","45.158.9.198:31290","45.158.9.198:30529"]
+    "address": ["94.130.132.149:35689","94.130.132.149:35438","45.158.9.198:31290","45.158.9.198:30529","94.130.132.149:35116","94.130.132.149:35160"]
   },
   {
     "name": "Tamazia",
