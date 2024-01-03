@@ -113,6 +113,10 @@ public class Placement{
     }
 
     public static void calculateBridges(Seq<BuildPlan> plans, ItemBridge bridge){
+        calculateBridges(plans, bridge, t -> false);
+    }
+
+    public static void calculateBridges(Seq<BuildPlan> plans, ItemBridge bridge, Boolf<Block> avoid){
         if(isSidePlace(plans) || plans.size == 0) return;
 
         //check for orthogonal placement + unlocked state
@@ -120,11 +124,11 @@ public class Placement{
             return;
         }
 
-        Boolf<BuildPlan> placeable = plan -> (plan.placeable(player.team())) ||
-            (plan.tile() != null && plan.tile().block() == plan.block); //don't count the same block as inaccessible
+        Boolf<BuildPlan> placeable = plan ->
+            (plan.placeable(player.team()) || (plan.tile() != null && plan.tile().block() == plan.block)) &&  //don't count the same block as inaccessible
+           !(plan.build() != null && plan.build().rotation != plan.rotation && avoid.get(plan.tile().block()));
 
         var result = plans1.clear();
-        var team = player.team();
         var rotated = plans.first().tile() != null && plans.first().tile().absoluteRelativeTo(plans.peek().x, plans.peek().y) == Mathf.mod(plans.first().rotation + 2, 4);
 
         outer:
@@ -134,6 +138,7 @@ public class Placement{
 
             //gap found
             if(i < plans.size - 1 && placeable.get(cur) && !placeable.get(plans.get(i + 1))){
+                boolean wereSame = true;
 
                 //find the closest valid position within range
                 for(int j = i + 1; j < plans.size; j++){
@@ -147,18 +152,29 @@ public class Placement{
                         }
                         i = j;
                         continue outer;
-                    }else if(other.placeable(team)){
-                        //found a link, assign bridges
-                        cur.block = bridge;
-                        other.block = bridge;
-                        if(rotated){
-                            other.config = new Point2(cur.x - other.x,  cur.y - other.y);
-                        }else{
-                            cur.config = new Point2(other.x - cur.x, other.y - cur.y);
-                        }
+                    }else if(placeable.get(other)){
 
-                        i = j;
-                        continue outer;
+                        if(wereSame){
+                            //the gap is fake, it's just conveyors that can be replaced with junctions
+                            i ++;
+                            continue outer;
+                        }else{
+                            //found a link, assign bridges
+                            cur.block = bridge;
+                            other.block = bridge;
+                            if(rotated){
+                                other.config = new Point2(cur.x - other.x,  cur.y - other.y);
+                            }else{
+                                cur.config = new Point2(other.x - cur.x, other.y - cur.y);
+                            }
+
+                            i = j;
+                            continue outer;
+                        }
+                    }
+
+                    if(other.tile() != null && !avoid.get(other.tile().block())){
+                        wereSame = false;
                     }
                 }
 
@@ -175,7 +191,7 @@ public class Placement{
         plans.set(result);
     }
 
-    public static void calculateBridges(Seq<BuildPlan> plans, DirectionBridge bridge, boolean hasJunction, Boolf<Block> same){
+    public static void calculateBridges(Seq<BuildPlan> plans, DirectionBridge bridge, boolean hasJunction, Boolf<Block> avoid){
         if(isSidePlace(plans) || plans.size == 0) return;
 
         //check for orthogonal placement + unlocked state
@@ -183,13 +199,9 @@ public class Placement{
             return;
         }
 
-        Boolf<BuildPlan> rotated = plan -> plan.build() != null && same.get(plan.build().block) && plan.rotation != plan.build().rotation;
-
-        //TODO for chains of ducts, do not count consecutives in a different rotation as 'placeable'
         Boolf<BuildPlan> placeable = plan ->
-            !(!hasJunction && rotated.get(plan)) &&
-            (plan.placeable(player.team()) ||
-            (plan.tile() != null && same.get(plan.tile().block()))); //don't count the same block as inaccessible
+            (plan.placeable(player.team()) || (plan.tile() != null && plan.tile().block() == plan.block)) &&  //don't count the same block as inaccessible
+            !(plan.build() != null && plan.build().rotation != plan.rotation && avoid.get(plan.tile().block()));
 
         var result = plans1.clear();
 
@@ -199,10 +211,11 @@ public class Placement{
             result.add(cur);
 
             //gap found
-            if(i < plans.size - 1 && placeable.get(cur) && (!placeable.get(plans.get(i + 1)) || (hasJunction && rotated.get(plans.get(i + 1)) && i < plans.size - 2 && !placeable.get(plans.get(i + 2))))){
+            if(i < plans.size - 1 && placeable.get(cur) && !placeable.get(plans.get(i + 1))){
+                boolean wereSame = true;
 
                 //find the closest valid position within range
-                for(int j = i + 2; j < plans.size; j++){
+                for(int j = i + 1; j < plans.size; j++){
                     var other = plans.get(j);
 
                     //out of range now, set to current position and keep scanning forward for next occurrence
@@ -214,12 +227,22 @@ public class Placement{
                         i = j;
                         continue outer;
                     }else if(placeable.get(other)){
-                        //found a link, assign bridges
-                        cur.block = bridge;
-                        other.block = bridge;
 
-                        i = j;
-                        continue outer;
+                        if(wereSame && hasJunction){
+                            //the gap is fake, it's just conveyors that can be replaced with junctions
+                            i ++;
+                            continue outer;
+                        }else{
+                            //found a link, assign bridges
+                            cur.block = bridge;
+                            other.block = bridge;
+                            i = j;
+                            continue outer;
+                        }
+                    }
+
+                    if(other.tile() != null && !avoid.get(other.tile().block())){
+                        wereSame = false;
                     }
                 }
 

@@ -295,6 +295,15 @@ public class ServerControl implements ApplicationListener{
             info("Server loaded. Type @ for help.", "'help'");
         });
 
+        Events.on(SaveLoadEvent.class, e -> {
+            Core.app.post(() -> {
+                if(Config.autoPause.bool() && Groups.player.size() == 0){
+                    state.set(State.paused);
+                    autoPaused = true;
+                }
+            });
+        });
+
         Events.on(PlayerJoin.class, e -> {
             if(state.isPaused() && autoPaused && Config.autoPause.bool()){
                 state.set(State.playing);
