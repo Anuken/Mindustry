@@ -30,6 +30,8 @@ public class CommandAI extends AIController{
     public int groupIndex = 0;
     /** All encountered unreachable buildings of this AI. Why a sequence? Because contains() is very rarely called on it. */
     public IntSeq unreachableBuildings = new IntSeq(8);
+    /** ID of unit read as target. This is set up after reading. Do not access! */
+    public int readAttackTarget = -1;
 
     protected boolean stopAtTarget, stopWhenInRange;
     protected Vec2 lastTargetPos;
@@ -214,7 +216,7 @@ public class CommandAI extends AIController{
             }
 
             //TODO: should the unit stop when it finds a target?
-            if(stance == UnitStance.patrol && target != null && unit.within(target, unit.type.range - 2f)){
+            if(stance == UnitStance.patrol && target != null && unit.within(target, unit.type.range - 2f) && !unit.type.circleTarget){
                 move = false;
             }
 
@@ -284,7 +286,7 @@ public class CommandAI extends AIController{
                 attackTarget = null;
             }
 
-            if(unit.isFlying() && move){
+            if(unit.isFlying() && move && (attackTarget == null || !unit.within(attackTarget, unit.type.range))){
                 unit.lookAt(vecMovePos);
             }else{
                 faceTarget();
@@ -350,6 +352,14 @@ public class CommandAI extends AIController{
     }
 
     @Override
+    public void afterRead(Unit unit){
+        if(readAttackTarget != -1){
+            attackTarget = Groups.unit.getByID(readAttackTarget);
+            readAttackTarget = -1;
+        }
+    }
+
+    @Override
     public float prefSpeed(){
         return group == null ? super.prefSpeed() : Math.min(group.minSpeed, unit.speed());
     }
@@ -398,6 +408,8 @@ public class CommandAI extends AIController{
 
     @Override
     public void commandPosition(Vec2 pos){
+        if(pos == null) return;
+
         commandPosition(pos, false);
         if(commandController != null){
             commandController.commandPosition(pos);
@@ -405,8 +417,10 @@ public class CommandAI extends AIController{
     }
 
     public void commandPosition(Vec2 pos, boolean stopWhenInRange){
-        targetPos = pos;
-        lastTargetPos = pos;
+        if(pos == null) return;
+
+        //this is an allocation, but it's relatively rarely called anyway, and outside mutations must be prevented
+        targetPos = lastTargetPos = pos.cpy();
         attackTarget = null;
         pathId = Vars.controlPath.nextTargetId();
         this.stopWhenInRange = stopWhenInRange;

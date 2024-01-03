@@ -27,7 +27,7 @@ public class GlobalVars{
     public static final Rand rand = new Rand();
 
     //non-constants that depend on state
-    private static int varTime, varTick, varSecond, varMinute, varWave, varWaveTime, varServer, varClient, varClientLocale, varClientUnit, varClientName, varClientTeam;
+    private static int varTime, varTick, varSecond, varMinute, varWave, varWaveTime, varServer, varClient, varClientLocale, varClientUnit, varClientName, varClientTeam, varClientMobile;
 
     private ObjectIntMap<String> namesToIds = new ObjectIntMap<>();
     private Seq<Var> vars = new Seq<>(Var.class);
@@ -65,6 +65,7 @@ public class GlobalVars{
         varClientUnit = put("@clientUnit", null, true);
         varClientName = put("@clientName", null, true);
         varClientTeam = put("@clientTeam", 0, true);
+        varClientMobile = put("@clientMobile", 0, true);
 
         //special enums
         put("@ctrlProcessor", ctrlProcessor);
@@ -168,6 +169,7 @@ public class GlobalVars{
             vars.items[varClientUnit].objval = player.unit();
             vars.items[varClientName].objval = player.name();
             vars.items[varClientTeam].numval = player.team().id;
+            vars.items[varClientMobile].numval = mobile ? 1 : 0;
         }
     }
 
@@ -183,14 +185,18 @@ public class GlobalVars{
         return arr != null && content.id >= 0 && content.id < arr.length ? arr[content.id] : -1;
     }
 
-    /** @return a constant ID > 0 if there is a constant with this name, otherwise -1.
-     * Attempt to get privileged variable id from non-privileged logic executor returns null constant id. */
+    /**
+     * @return a constant ID > 0 if there is a constant with this name, otherwise -1.
+     * Attempt to get privileged variable id from non-privileged logic executor returns null constant id.
+     */
     public int get(String name){
         return namesToIds.get(name, -1);
     }
 
-    /** @return a constant variable by ID. ID is not bound checked and must be positive.
-     * Attempt to get privileged variable from non-privileged logic executor returns null constant */
+    /**
+     * @return a constant variable by ID. ID is not bound checked and must be positive.
+     * Attempt to get privileged variable from non-privileged logic executor returns null constant
+     */
     public Var get(int id, boolean privileged){
         if(!privileged && privilegedIds.contains(id)) return vars.get(namesToIds.get("null"));
         return vars.items[id];

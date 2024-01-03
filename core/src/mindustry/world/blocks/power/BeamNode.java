@@ -122,9 +122,10 @@ public class BeamNode extends PowerBlock{
 
         @Override
         public BlockStatus status(){
-            if(Mathf.equal(power.status, 0f, 0.001f)) return BlockStatus.noInput;
-            if(Mathf.equal(power.status, 1f, 0.001f)) return BlockStatus.active;
-            return BlockStatus.noOutput;
+            float balance = power.graph.getPowerBalance();
+            if(balance > 0f) return BlockStatus.active;
+            if(balance < 0f && power.graph.getLastPowerStored() > 0) return BlockStatus.noOutput;
+            return BlockStatus.noInput;
         }
 
         @Override
