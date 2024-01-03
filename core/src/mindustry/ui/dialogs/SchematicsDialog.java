@@ -464,9 +464,11 @@ public class SchematicsDialog extends BaseDialog{
 
                 for(var tag : tags){
 
-                    var next = new Table(n -> {
-                        n.table(Tex.pane, move -> {
-                            move.margin(2);
+                    var next = new Table(Tex.whiteui, n -> {
+                        n.setColor(Pal.gray);
+                        n.margin(5f);
+
+                        n.table(move -> {
 
                             //move up
                             move.button(Icon.upOpen, Styles.emptyi, () -> {
@@ -486,10 +488,9 @@ public class SchematicsDialog extends BaseDialog{
                                     rebuild[0].run();
                                 }
                             }).tooltip("@editor.movedown");
-                        }).fillY().margin(6f);
+                        }).fillY();
 
-                        n.table(Tex.whiteui, t -> {
-                            t.setColor(Pal.gray);
+                        n.table(t -> {
                             t.add(tag).left().row();
                             t.add(Core.bundle.format("schematic.tagged", schematics.all().count(s -> s.labels.contains(tag)))).left()
                             .update(b -> b.setColor(b.hasMouse() ? Pal.accent : Color.lightGray)).get().clicked(() -> {
@@ -498,9 +499,9 @@ public class SchematicsDialog extends BaseDialog{
                                 rebuildTags.run();
                                 rebuildPane.run();
                             });
-                        }).growX().fillY().margin(8f);
+                        }).growX().fillY();
 
-                        n.table(Tex.pane, b -> {
+                        n.table(b -> {
                             b.margin(2);
 
                             //rename tag
@@ -541,13 +542,13 @@ public class SchematicsDialog extends BaseDialog{
                                     rebuild[0].run();
                                 });
                             }).tooltip("@save.delete");
-                        }).fillY().margin(6f);
+                        }).fillY();
                     });
 
                     next.pack();
-                    float w = next.getPrefWidth() + Scl.scl(6f);
+                    float w = next.getWidth() + Scl.scl(6f);
 
-                    if(w + sum >= Core.graphics.getWidth() * (Core.graphics.isPortrait() ? 1f : 0.8f)){
+                    if(w*2f + sum >= Core.graphics.getWidth() * 0.8f){
                         p.add(current).row();
                         current = new Table();
                         current.left();
