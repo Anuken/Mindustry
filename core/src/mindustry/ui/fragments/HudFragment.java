@@ -71,7 +71,11 @@ public class HudFragment{
         });
 
         Events.on(SectorCaptureEvent.class, e -> {
-            showToast(Core.bundle.format("sector.captured", e.sector.isBeingPlayed() ? "" : e.sector.name() + " "));
+            if(e.sector.isBeingPlayed()){
+                ui.announce(Core.bundle.format("sector.capture", ""), 5f);
+            }else{
+                showToast(Core.bundle.format("sector.capture", e.sector.name() + " "));
+            }
         });
 
         Events.on(SectorLoseEvent.class, e -> {
