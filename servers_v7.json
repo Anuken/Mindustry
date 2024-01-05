@@ -16,8 +16,8 @@
     "address": ["de-free-01.hosts.optikservers.com:31528","de-prem-01.hosts.optikservers.com:35922"]
   },
   {
-    "name": "CMS",
-    "address": ["195.2.84.144","65.108.224.31:26165"]
+    "name": "CMS Empire",
+    "address": ["195.2.84.144","178.20.45.250"]
   },
   {
     "name": "ShardDustry Eventos",
