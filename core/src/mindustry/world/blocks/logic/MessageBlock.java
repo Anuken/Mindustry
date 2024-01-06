@@ -71,7 +71,7 @@ public class MessageBlock extends Block{
 
         @Override
         public void drawSelect(){
-            if(renderer.pixelator.enabled()) return;
+            if(renderer.pixelate) return;
 
             Font font = Fonts.outline;
             GlyphLayout l = Pools.obtain(GlyphLayout.class, GlyphLayout::new);

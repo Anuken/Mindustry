@@ -440,7 +440,7 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     public float drawPlaceText(String text, int x, int y, boolean valid){
-        if(renderer.pixelator.enabled()) return 0;
+        if(renderer.pixelate) return 0;
 
         Color color = valid ? Pal.accent : Pal.remove;
         Font font = Fonts.outline;

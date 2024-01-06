@@ -1361,7 +1361,7 @@ public class UnitType extends UnlockableContent implements Senseable{
             unit.y + Angles.trnsy(unit.rotation + 180f, itemOffsetY),
             size, size);
 
-            if(unit.isLocal() && !renderer.pixelator.enabled()){
+            if(unit.isLocal() && !renderer.pixelate){
                 Fonts.outline.draw(unit.stack.amount + "",
                 unit.x + Angles.trnsx(unit.rotation + 180f, itemOffsetY),
                 unit.y + Angles.trnsy(unit.rotation + 180f, itemOffsetY) - 3,
