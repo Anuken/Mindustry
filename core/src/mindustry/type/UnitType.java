@@ -1344,16 +1344,17 @@ public class UnitType extends UnlockableContent implements Senseable{
 
         //draw back items
         if(unit.item() != null && unit.itemTime > 0.01f){
-            float size = (itemSize + Mathf.absin(Time.time, 5f, 1f)) * unit.itemTime;
+            float sin = Mathf.absin(Time.time, 5f, 1f);
+            float size = (itemSize + sin) * unit.itemTime;
 
-            Draw.mixcol(Pal.accent, Mathf.absin(Time.time, 5f, 0.1f));
+            Draw.mixcol(Pal.accent, sin * 0.1f);
             Draw.rect(unit.item().fullIcon,
             unit.x + Angles.trnsx(unit.rotation + 180f, itemOffsetY),
             unit.y + Angles.trnsy(unit.rotation + 180f, itemOffsetY),
             size, size, unit.rotation);
             Draw.mixcol();
 
-            size = ((3f + Mathf.absin(Time.time, 5f, 1f)) * unit.itemTime + 0.5f) * 2;
+            size = ((3f + sin) * unit.itemTime + 0.5f) * 2;
             Draw.color(Pal.accent);
             Draw.rect(itemCircleRegion,
             unit.x + Angles.trnsx(unit.rotation + 180f, itemOffsetY),

@@ -110,7 +110,6 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         return !type.flying && world.tiles.in(tileX, tileY) && type.pathCost.getCost(team.id, pathfinder.get(tileX, tileY)) == -1;
     }
 
-
     /** @return approx. square size of the physical hitbox for physics */
     public float physicSize(){
         return hitSize * 0.7f;
