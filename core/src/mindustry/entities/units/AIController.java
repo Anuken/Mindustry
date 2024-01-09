@@ -277,7 +277,7 @@ public class AIController implements UnitController{
 
         vec.setLength(prefSpeed());
 
-        unit.moveAt(vec);
+        unit.movePref(vec);
     }
 
     public void circle(Position target, float circleLength){
@@ -295,7 +295,7 @@ public class AIController implements UnitController{
 
         vec.setLength(speed);
 
-        unit.moveAt(vec);
+        unit.movePref(vec);
     }
 
     public void moveTo(Position target, float circleLength){
