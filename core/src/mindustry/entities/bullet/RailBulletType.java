@@ -7,10 +7,6 @@ import mindustry.entities.*;
 import mindustry.gen.*;
 
 public class RailBulletType extends BulletType{
-    //for calculating the furthest point
-    static float furthest = 0;
-    static boolean any = false;
-
     public Effect pierceEffect = Fx.hitBulletSmall, pointEffect = Fx.none, lineEffect = Fx.none;
     public Effect endEffect = Fx.none;
 
@@ -28,6 +24,7 @@ public class RailBulletType extends BulletType{
         collides = false;
         keepVelocity = false;
         lifetime = 1f;
+        delayFrags = true;
     }
 
     @Override
@@ -55,10 +52,8 @@ public class RailBulletType extends BulletType{
 
         //bullet was stopped, decrease furthest distance
         if(b.damage <= 0f){
-            furthest = Math.min(furthest, b.dst(x, y));
+            b.fdata = Math.min(b.fdata, b.dst(x, y));
         }
-
-        any = true;
     }
 
     @Override
@@ -66,10 +61,8 @@ public class RailBulletType extends BulletType{
         super.init(b);
 
         b.fdata = length;
-        furthest = length;
-        any = false;
-        Damage.collideLine(b, b.team, b.type.hitEffect, b.x, b.y, b.rotation(), length, false, false);
-        float resultLen = furthest;
+        Damage.collideLine(b, b.team, b.type.hitEffect, b.x, b.y, b.rotation(), length, false, false, pierceCap);
+        float resultLen = b.fdata;
 
         Vec2 nor = Tmp.v1.trns(b.rotation(), 1f).nor();
         if(pointEffect != Fx.none){
@@ -77,6 +70,8 @@ public class RailBulletType extends BulletType{
                 pointEffect.at(b.x + nor.x * i, b.y + nor.y * i, b.rotation(), trailColor);
             }
         }
+
+        boolean any = b.collided.size > 0;
 
         if(!any && endEffect != Fx.none){
             endEffect.at(b.x + nor.x * resultLen, b.y + nor.y * resultLen, b.rotation(), hitColor);

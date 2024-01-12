@@ -5,6 +5,7 @@ import arc.func.*;
 import arc.math.*;
 import arc.net.*;
 import arc.net.FrameworkMessage.*;
+import arc.net.Server.*;
 import arc.net.dns.*;
 import arc.struct.*;
 import arc.util.*;
@@ -159,6 +160,11 @@ public class ArcNetProvider implements NetProvider{
     @Override
     public void setConnectFilter(Server.ServerConnectFilter connectFilter){
         server.setConnectFilter(connectFilter);
+    }
+
+    @Override
+    public @Nullable ServerConnectFilter getConnectFilter(){
+        return server.getConnectFilter();
     }
 
     private static boolean isLocal(InetAddress addr){
@@ -327,7 +333,7 @@ public class ArcNetProvider implements NetProvider{
 
         @Override
         public void sendStream(Streamable stream){
-            connection.addListener(new InputStreamSender(stream.stream, 512){
+            connection.addListener(new InputStreamSender(stream.stream, 1024){
                 int id;
 
                 @Override
@@ -446,7 +452,7 @@ public class ArcNetProvider implements NetProvider{
                 byteBuffer.put((byte)-2); //code for framework message
                 writeFramework(byteBuffer, msg);
             }else{
-                if(!(o instanceof Packet pack)) throw new RuntimeException("All sent objects must implement be Packets! Class: " + o.getClass());
+                if(!(o instanceof Packet pack)) throw new RuntimeException("All sent objects must extend Packet! Class: " + o.getClass());
                 byte id = Net.getPacketId(pack);
                 byteBuffer.put(id);
 

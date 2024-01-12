@@ -69,7 +69,7 @@ public class Administration{
             if(action.type != ActionType.breakBlock &&
                 action.type != ActionType.placeBlock &&
                 action.type != ActionType.commandUnits &&
-                Config.antiSpam.bool() && !player.isLocal()){
+                Config.antiSpam.bool() && !action.player.isLocal()){
 
                 Ratekeeper rate = action.player.getInfo().rate;
                 if(rate.allow(Config.interactRateWindow.num() * 1000L, Config.interactRateLimit.num())){

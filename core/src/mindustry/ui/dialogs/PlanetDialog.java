@@ -509,7 +509,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                     sec.isAttacked() ? Fonts.getLargeIcon("warning") :
                     !sec.hasBase() && sec.preset != null && sec.preset.unlocked() && preficon == null ?
                     Fonts.getLargeIcon("terrain") :
-                    sec.preset != null && sec.preset.locked() && sec.preset.techNode != null && !sec.preset.techNode.parent.content.locked() ? Fonts.getLargeIcon("lock") :
+                    sec.preset != null && sec.preset.locked() && sec.preset.techNode != null && (sec.preset.techNode.parent == null || !sec.preset.techNode.parent.content.locked()) ? Fonts.getLargeIcon("lock") :
                     preficon;
                 var color = sec.preset != null && !sec.hasBase() ? Team.derelict.color : Team.sharded.color;
 
@@ -634,6 +634,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                                 newPresets.clear();
                                 state.planet = planet;
 
+                                selected = null;
+                                updateSelected();
                                 rebuildExpand();
                             }
                             settings.put("lastplanet", planet.name);

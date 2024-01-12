@@ -42,7 +42,7 @@ public class LogicFx{
         "smokePuff", new EffectEntry(Fx.smokePuff).color(),
         "sparkExplosion", new EffectEntry(Fx.titanExplosion).color(),
         "crossExplosion", new EffectEntry(Fx.dynamicSpikes).size().color(),
-        "wave", new EffectEntry(Fx.dynamicWave).size(),
+        "wave", new EffectEntry(Fx.dynamicWave).size().color(),
         "bubble", new EffectEntry(Fx.airBubble)
         );
 

@@ -183,6 +183,9 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         if(!unit.isNull()){
             clearUnit();
         }
+
+        lastReadUnit = Nulls.unit;
+        justSwitchTo = justSwitchFrom = null;
     }
 
     public void team(Team team){

@@ -30,6 +30,7 @@ public abstract class BlockProducer extends PayloadBlock{
         hasItems = true;
         solid = true;
         hasPower = true;
+        acceptsPayloads = false;
         rotate = true;
         regionRotated1 = 1;
 

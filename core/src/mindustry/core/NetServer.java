@@ -696,7 +696,6 @@ public class NetServer implements ApplicationListener{
                 vector.limit(maxMove);
 
                 float prevx = unit.x, prevy = unit.y;
-                //unit.set(con.lastPosition);
                 if(!unit.isFlying()){
                     unit.move(vector.x, vector.y);
                 }else{
@@ -778,7 +777,6 @@ public class NetServer implements ApplicationListener{
                 }else{
                     NetClient.traceInfo(other, info);
                 }
-                info("&lc@ &fi&lk[&lb@&fi&lk]&fb has requested trace info of @ &fi&lk[&lb@&fi&lk]&fb.", player.plainName(), player.uuid(), other.plainName(), other.uuid());
             }
             case switchTeam -> {
                 if(params instanceof Team team){

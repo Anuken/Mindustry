@@ -38,7 +38,7 @@ public class Mods implements Loadable{
     private @Nullable Scripts scripts;
     private ContentParser parser = new ContentParser();
     private ObjectMap<String, Seq<Fi>> bundles = new ObjectMap<>();
-    private ObjectSet<String> specialFolders = ObjectSet.with("bundles", "sprites", "sprites-override");
+    private ObjectSet<String> specialFolders = ObjectSet.with("bundles", "sprites", "sprites-override", ".git");
 
     private int totalSprites;
     private ObjectFloatMap<String> textureResize = new ObjectFloatMap<>();
@@ -451,7 +451,7 @@ public class Mods implements Loadable{
 
             if(meta == null || meta.name == null) continue;
             metas.add(meta);
-            mapping.put(meta.name, file);
+            mapping.put(meta.internalName, file);
         }
 
         var resolved = resolveDependencies(metas);
@@ -1180,8 +1180,6 @@ public class Mods implements Loadable{
         public boolean hidden;
         /** If true, this mod should be loaded as a Java class mod. This is technically optional, but highly recommended. */
         public boolean java;
-        /** If true, -outline regions for units are kept when packing. Only use if you know exactly what you are doing. */
-        public boolean keepOutlines;
         /** To rescale textures with a different size. Represents the size in pixels of the sprite of a 1x1 block. */
         public float texturescale = 1.0f;
         /** If true, bleeding is skipped and no content icons are generated. */
@@ -1229,7 +1227,6 @@ public class Mods implements Loadable{
             ", softDependencies=" + softDependencies +
             ", hidden=" + hidden +
             ", java=" + java +
-            ", keepOutlines=" + keepOutlines +
             ", texturescale=" + texturescale +
             ", pregenerated=" + pregenerated +
             '}';

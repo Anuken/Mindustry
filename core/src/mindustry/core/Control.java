@@ -53,7 +53,7 @@ public class Control implements ApplicationListener, Loadable{
 
     private Interval timer = new Interval(2);
     private boolean hiscore = false;
-    private boolean wasPaused = false;
+    private boolean wasPaused = false, backgroundPaused = false;
     private Seq<Building> toBePlaced = new Seq<>(false);
 
     public Control(){
@@ -332,6 +332,13 @@ public class Control implements ApplicationListener, Loadable{
     void createPlayer(){
         player = Player.create();
         player.name = Core.settings.getString("name");
+
+        String locale = Core.settings.getString("locale");
+        if(locale.equals("default")){
+            locale = Locale.getDefault().toString();
+        }
+        player.locale = locale;
+
         player.color.set(Core.settings.getInt("color-0"));
 
         if(mobile){
@@ -551,6 +558,7 @@ public class Control implements ApplicationListener, Loadable{
     @Override
     public void pause(){
         if(settings.getBool("backgroundpause", true) && !net.active()){
+            backgroundPaused = true;
             wasPaused = state.is(State.paused);
             if(state.is(State.playing)) state.set(State.paused);
         }
@@ -561,6 +569,7 @@ public class Control implements ApplicationListener, Loadable{
         if(state.is(State.paused) && !wasPaused && settings.getBool("backgroundpause", true) && !net.active()){
             state.set(State.playing);
         }
+        backgroundPaused = false;
     }
 
     @Override
@@ -650,6 +659,10 @@ public class Control implements ApplicationListener, Loadable{
             var core = state.rules.defaultTeam.core();
             if(!net.client() && core != null && state.isCampaign()){
                 core.items.each((i, a) -> i.unlock());
+            }
+
+            if(backgroundPaused && settings.getBool("backgroundpause") && !net.active()){
+                state.set(State.paused);
             }
 
             //cannot launch while paused

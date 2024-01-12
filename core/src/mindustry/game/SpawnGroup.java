@@ -128,7 +128,7 @@ public class SpawnGroup implements JsonSerializable, Cloneable{
         String tname = data.getString("type", "dagger");
 
         type = content.unit(LegacyIO.unitMap.get(tname, tname));
-        if(type == null) type = UnitTypes.dagger;
+        if(type == null || type.internal) type = UnitTypes.dagger;
         begin = data.getInt("begin", 0);
         end = data.getInt("end", never);
         spacing = data.getInt("spacing", 1);
