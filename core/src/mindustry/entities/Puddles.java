@@ -27,7 +27,7 @@ public class Puddles{
 
     /** Returns the Puddle on the specified tile. May return null. */
     public static @Nullable Puddle get(Tile tile){
-        return world.tiles.getPuddle(tile.array());
+        return tile == null ? null : world.tiles.getPuddle(tile.array());
     }
 
     public static void deposit(Tile tile, Tile source, Liquid liquid, float amount, boolean initial){
