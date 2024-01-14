@@ -182,7 +182,7 @@ public class OverlayRenderer{
 
                 Draw.color();
             }else{
-                state.teams.eachEnemyCore(player.team(), core -> {
+                state.teams.eachRadiusCore(player.team(), core -> {
                     //it must be clear that there is a core here.
                     if(/*core.wasVisible && */Core.camera.bounds(Tmp.r1).overlaps(Tmp.r2.setCentered(core.x, core.y, state.rules.enemyCoreBuildRadius * 2f))){
                         Draw.color(Color.darkGray);

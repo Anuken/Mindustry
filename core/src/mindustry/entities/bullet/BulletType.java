@@ -362,7 +362,7 @@ public class BulletType extends Content implements Cloneable{
     }
 
     public boolean testCollision(Bullet bullet, Building tile){
-        return !heals() || bullet.team.canDamage(bullet.team) || tile.healthf() < 1f;
+        return !heals() || bullet.team.canDamage(tile.team) || tile.healthf() < 1f;
     }
 
     /** If direct is false, this is an indirect hit and the tile was already damaged.

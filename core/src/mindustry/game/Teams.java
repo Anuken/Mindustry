@@ -55,6 +55,7 @@ public class Teams{
         return Geometry.findClosest(x, y, get(team).cores);
     }
 
+    //possibly deprecate: formerly only used in Build
     public boolean anyEnemyCoresWithin(Team team, float x, float y, float radius){
         for(TeamData data : active){
             if(team.isEnemy(data.team)){
@@ -68,9 +69,33 @@ public class Teams{
         return false;
     }
 
+    public boolean anyRadiusCoresWithin(Team team, float x, float y, float radius){
+        for(TeamData data : active){
+            if(!team.ignoresBuildRadius(data.team)){
+                for(CoreBuild tile : data.cores){
+                    if(tile.within(x, y, radius)){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    //possibly deprecate: formerly only used in OverlayRenderer
     public void eachEnemyCore(Team team, Cons<Building> ret){
         for(TeamData data : active){
             if(team.isEnemy(data.team)){
+                for(Building tile : data.cores){
+                    ret.get(tile);
+                }
+            }
+        }
+    }
+
+    public void eachRadiusCore(Team team, Cons<Building> ret){
+        for(TeamData data : active){
+            if(team.ignoresBuildRadius(data.team)){
                 for(Building tile : data.cores){
                     ret.get(tile);
                 }

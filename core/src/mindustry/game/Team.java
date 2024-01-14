@@ -50,6 +50,11 @@ public class Team implements Comparable<Team>{
             new Team(i, "team#" + i, Color.HSVtoRGB(360f * Mathf.random(), 100f * Mathf.random(0.4f, 1f), 100f * Mathf.random(0.6f, 1f), 1f));
         }
         Mathf.rand.setSeed(new Rand().nextLong());
+        //weakly initialize team flags
+        for(int i = 0; i < 256; i++){
+            all[i].flags[0] = TeamFlags.derelictTarget;
+            all[i].flags[i] = TeamFlags.genericSelf;
+        }
     }
 
     public static Team get(int id){
@@ -126,13 +131,23 @@ public class Team implements Comparable<Team>{
         return isAI() && !rules().rtsAi;
     }
 
-    /** flag bindings */
+    /** Reset all flags to their default values. **/
+    public void initializeFlags(){
+        for(int i = 0; i < 256; i++){
+            for(int j = 1; j < 256; j++){
+                all[i].flags[j] = TeamFlags.genericEnemy;
+            }
+            all[i].flags[0] = TeamFlags.derelictTarget;
+            all[i].flags[i] = TeamFlags.genericSelf;
+        }
+    }
+
+    /** Flag binding methods. */
     public boolean isEnemy(Team other){
         if(other == null) return false;
         return (this.flags[other.id] & TeamFlags.isNeutral) == 0;
     }
 
-    /** used for rendering */
     public boolean isAlly(Team other){
         if(other == null) return false;
         return (this.flags[other.id] & TeamFlags.allyCheck) == TeamFlags.allyCheck;
