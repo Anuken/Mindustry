@@ -64,7 +64,8 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             MinimapMarker::new,
             ShapeMarker::new,
             TextMarker::new,
-            LineMarker::new
+            LineMarker::new,
+            TextureMarker::new
         );
     }
 
@@ -624,29 +625,52 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         }
     }
 
-    /** Marker used for drawing UI to indicate something along with an objective. */
+    /** Marker used for drawing various content to indicate something along with an objective. Mostly used as UI overlay.  */
     public static abstract class ObjectiveMarker{
+        /** Position of marker, in world coordinates */
+        public @TilePos Vec2 pos = new Vec2();
         /** Makes sure markers are only added once. */
         public transient boolean wasAdded;
-        //** Hides the marker, used by world processors */
-        public boolean hidden = false;
-
-        /** Called in the overlay draw layer.*/
-        public void draw(){}
+        /** Whether to display marker on minimap instead of world. {@link MinimapMarker} ignores this value. */
+        public boolean minimap = false;
+        /** Whether to scale marker corresponding to player's zoom level. {@link MinimapMarker} ignores this value. */
+        public boolean autoscale = false;
+        /** Hides the marker, used by world processors. */
+        protected boolean hidden = false;
+        /** On which z-sorting layer is marker drawn. */
+        protected float drawLayer = Layer.overlayUI;
+        /** Draws the marker. Actual marker position and scale are calculated in {@link #drawWorld()} and {@link #drawMinimap(MinimapRenderer)}. */
+        public void baseDraw(float x, float y, float scaleFactor){}
+        /** Called in the main renderer. */
+        public void drawWorld(){
+            baseDraw(pos.x, pos.y, autoscale ? 4f / renderer.getDisplayScale() : 1f);
+        }
         /** Called in the small and large map. */
-        public void drawMinimap(MinimapRenderer minimap){}
+        public void drawMinimap(MinimapRenderer minimap){
+            minimap.transform(Tmp.v1.set(pos.x + 4f, pos.y + 4f));
+            baseDraw(Tmp.v1.x, Tmp.v1.y, minimap.getScaleFactor(autoscale));
+        }
         /** Add any UI elements necessary. */
         public void added(){}
         /** Remove any UI elements, if necessary. */
         public void removed(){}
-        /** Control marker with world processor code*/
+        /** Whether the marker is hidden */
+        public boolean isHidden(){
+            return hidden;
+        }
+        /** Control marker with world processor code. Ignores NaN (null) values. */
         public void control(LMarkerControl type, double p1, double p2, double p3){
+            if(Double.isNaN(p1)) return;
             switch(type){
-                case toggleVisibility -> hidden = !hidden;
-                case setVisibility -> hidden = ((Math.abs(p1) < 1e-5));
+                case visibility -> hidden = Mathf.equal((float)p1, 0f);
+                case drawLayer -> drawLayer = (float)p1;
+                case minimap -> minimap = !Mathf.equal((float)p1, 0f);
+                case autoscale -> autoscale = !Mathf.equal((float)p1, 0f);
             }
         }
         public void setText(String text, boolean fetch){}
+
+        public void setTexture(String textureName){}
 
         /** @return The localized type-name of this objective, defaulting to the class simple name without the "Marker" prefix. */
         public String typeName(){
@@ -678,7 +702,6 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
     /** Displays text above a shape. */
     public static class ShapeTextMarker extends ObjectiveMarker{
         public @Multiline String text = "frog";
-        public @TilePos Vec2 pos = new Vec2();
         public float fontSize = 1f, textHeight = 7f;
         public @LabelFlag byte flags = WorldLabel.flagBackground | WorldLabel.flagOutline;
 
@@ -718,16 +741,15 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public ShapeTextMarker(){}
 
         @Override
-        public void draw(){
-            if(hidden) return;
-
+        public void baseDraw(float x, float y, float scaleFactor){
             //in case some idiot decides to make 9999999 sides and freeze the game
             int sides = Math.min(this.sides, 200);
 
-            Lines.stroke(3f, Pal.gray);
-            Lines.poly(pos.x, pos.y, sides, radius + 1f, rotation);
-            Lines.stroke(1f, color);
-            Lines.poly(pos.x, pos.y, sides, radius + 1f, rotation);
+            Draw.z(drawLayer);
+            Lines.stroke(3f * scaleFactor, Pal.gray);
+            Lines.poly(x, y, sides, (radius + 1f) * scaleFactor, rotation);
+            Lines.stroke(scaleFactor, color);
+            Lines.poly(x, y, sides, (radius + 1f) * scaleFactor, rotation);
             Draw.reset();
 
             if(fetchedText == null){
@@ -735,42 +757,45 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             }
 
             // font size cannot be 0
-            if(Math.abs(fontSize) < 1e-5) return;
+            if(Mathf.equal(fontSize, 0f)) return;
 
-            WorldLabel.drawAt(fetchedText, pos.x, pos.y + radius + textHeight, Draw.z(), flags, fontSize);
+            WorldLabel.drawAt(fetchedText, x, y + radius * scaleFactor + textHeight * scaleFactor, drawLayer, flags, fontSize * scaleFactor);
         }
 
         @Override
         public void control(LMarkerControl type, double p1, double p2, double p3){
-            switch(type){
-                case x -> pos.x = (float)p1 * tilesize;
-                case y -> pos.y = (float)p1 * tilesize;
-                case pos -> pos.set((float)p1 * tilesize, (float)p2  * tilesize);
-                case fontSize -> fontSize = (float)p1;
-                case textHeight -> textHeight = (float)p1;
-                case labelBackground -> {
-                    if((Math.abs(p1) >= 1e-5)){
-                        flags |= WorldLabel.flagBackground;
-                    }else{
-                        flags &= ~WorldLabel.flagBackground;
+            if(!Double.isNaN(p1)){
+                switch(type){
+                    case pos -> pos.x = (float)p1 * tilesize;
+                    case fontSize -> fontSize = (float)p1;
+                    case textHeight -> textHeight = (float)p1;
+                    case labelFlags -> {
+                        if(!Mathf.equal((float)p1, 0f)){
+                            flags |= WorldLabel.flagBackground;
+                        }else{
+                            flags &= ~WorldLabel.flagBackground;
+                        }
                     }
+                    case radius -> radius = (float)p1;
+                    case rotation -> rotation = (float)p1;
+                    case color -> color.set(Tmp.c1.fromDouble(p1));
+                    case shape -> sides = (int)p1;
+                    default -> super.control(type, p1, p2, p3);
                 }
-                case labelOutline -> {
-                    if((Math.abs(p1) >= 1e-5)){
-                        flags |= WorldLabel.flagOutline;
-                    }else{
-                        flags &= ~WorldLabel.flagOutline;
+            }
+
+            if(!Double.isNaN(p2)){
+                switch(type){
+                    case pos -> pos.y = (float)p2 * tilesize;
+                    case labelFlags -> {
+                        if(!Mathf.equal((float)p2, 0f)){
+                            flags |= WorldLabel.flagOutline;
+                        }else{
+                            flags &= ~WorldLabel.flagOutline;
+                        }
                     }
+                    default -> super.control(type, p1, p2, p3);
                 }
-                case labelFlags -> {
-                    flags = ((Math.abs(p1) >= 1e-5) ? WorldLabel.flagBackground : 0);
-                    if((Math.abs(p2) >= 1e-5)) flags |= WorldLabel.flagOutline;
-                }
-                case radius -> radius = (float)p1;
-                case rotation -> rotation = (float)p1;
-                case shapeSides -> sides = (int)p1;
-                case color -> color.set(Tmp.c1.fromDouble(p1));
-                default -> super.control(type, p1, p2, p3);
             }
         }
 
@@ -798,6 +823,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public MinimapMarker(int x, int y, Color color){
             this.pos.set(x, y);
             this.color = color;
+            minimap = true;
         }
 
         public MinimapMarker(int x, int y, float radius, float stroke, Color color){
@@ -805,41 +831,59 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             this.stroke = stroke;
             this.radius = radius;
             this.color = color;
+            minimap = true;
         }
 
         public MinimapMarker(){}
 
         @Override
-        public void drawMinimap(MinimapRenderer minimap){
-            if(hidden) return;
-
-            minimap.transform(Tmp.v1.set(pos.x * tilesize, pos.y * tilesize));
-
-            float rad = minimap.scale(radius * tilesize);
+        public void baseDraw(float x, float y, float scaleFactor){
+            float rad = radius * tilesize * scaleFactor;
             float fin = Interp.pow2Out.apply((Time.globalTime / 100f) % 1f);
 
+            Draw.z(drawLayer);
             Lines.stroke(Scl.scl((1f - fin) * stroke + 0.1f), color);
-            Lines.circle(Tmp.v1.x, Tmp.v1.y, rad * fin);
+            Lines.circle(x, y, rad * fin);
+
             Draw.reset();
         }
 
         @Override
+        public void drawWorld(){
+            minimap = true;
+        }
+
+        @Override
+        public void drawMinimap(MinimapRenderer minimap){
+            minimap.transform(Tmp.v1.set(pos.x * tilesize, pos.y * tilesize));
+            baseDraw(Tmp.v1.x, Tmp.v1.y, minimap.getScaleFactor(autoscale));
+        }
+
+        @Override
         public void control(LMarkerControl type, double p1, double p2, double p3){
-            switch(type){
-                case x -> pos.x = (int)p1;
-                case y -> pos.y = (int)p1;
-                case pos -> pos.set((int)p1, (int)p2);
-                case radius -> radius = (float)p1;
-                case stroke -> stroke = (float)p1;
-                case color -> color.set(Tmp.c1.fromDouble(p1));
-                default -> super.control(type, p1, p2, p3);
+            if(!Double.isNaN(p1)){
+                switch(type){
+                    case pos -> pos.x = (int)p1;
+                    case radius -> radius = (float)p1;
+                    case stroke -> stroke = (float)p1;
+                    case color -> color.set(Tmp.c1.fromDouble(p1));
+                    case minimap -> minimap = true;
+                    default -> super.control(type, p1, p2, p3);
+                }
+            }
+
+            if(!Double.isNaN(p2)){
+                if(type == LMarkerControl.pos){
+                    pos.y = (int)p2;
+                }else{
+                    super.control(type, p1, p2, p3);
+                }
             }
         }
     }
 
     /** Displays a shape with an outline and color. */
     public static class ShapeMarker extends ObjectiveMarker{
-        public @TilePos Vec2 pos = new Vec2();
         public float radius = 8f, rotation = 0f, stroke = 1f;
         public boolean fill = false, outline = true;
         public int sides = 4;
@@ -858,23 +902,22 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public ShapeMarker(){}
 
         @Override
-        public void draw(){
-            if(hidden) return;
-
+        public void baseDraw(float x, float y, float scaleFactor){
             //in case some idiot decides to make 9999999 sides and freeze the game
             int sides = Math.min(this.sides, 200);
 
+            Draw.z(drawLayer);
             if(!fill){
                 if(outline){
-                    Lines.stroke(stroke + 2f, Pal.gray);
-                    Lines.poly(pos.x, pos.y, sides, radius + 1f, rotation);
+                    Lines.stroke((stroke + 2f) * scaleFactor, Pal.gray);
+                    Lines.poly(x, y, sides, (radius + 1f) * scaleFactor, rotation);
                 }
 
-                Lines.stroke(stroke, color);
-                Lines.poly(pos.x, pos.y, sides, radius + 1f, rotation);
+                Lines.stroke(stroke * scaleFactor, color);
+                Lines.poly(x, y, sides, (radius + 1f) * scaleFactor, rotation);
             }else{
                 Draw.color(color);
-                Fill.poly(pos.x, pos.y, sides, radius, rotation);
+                Fill.poly(x, y, sides, radius * scaleFactor, rotation);
             }
 
             Draw.reset();
@@ -882,23 +925,32 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public void control(LMarkerControl type, double p1, double p2, double p3){
-            switch(type){
-                case x -> pos.x = (float)p1 * tilesize;
-                case y -> pos.y = (float)p1 * tilesize;
-                case pos -> pos.set((float)p1 * tilesize, (float)p2 * tilesize);
-                case radius -> radius = (float)p1;
-                case rotation -> rotation = (float)p1;
-                case stroke -> stroke = (float)p1;
-                case shapeSides -> sides = (int)p1;
-                case shapeFill -> fill = (Math.abs(p1) >= 1e-5);
-                case shapeOutline -> outline = (Math.abs(p1) >= 1e-5);
-                case setShape -> {
-                    sides = (int)p1;
-                    fill = (Math.abs(p2) >= 1e-5);
-                    outline = (Math.abs(p3) >= 1e-5);
+            if(!Double.isNaN(p1)){
+                switch(type){
+                    case pos -> pos.x = (float)p1 * tilesize;
+                    case radius -> radius = (float)p1;
+                    case stroke -> stroke = (float)p1;
+                    case rotation -> rotation = (float)p1;
+                    case color -> color.set(Tmp.c1.fromDouble(p1));
+                    case shape -> sides = (int)p1;
+                    default -> super.control(type, p1, p2, p3);
                 }
-                case color -> color.set(Tmp.c1.fromDouble(p1));
-                default -> super.control(type, p1, p2, p3);
+            }
+
+            if(!Double.isNaN(p2)){
+                switch(type){
+                    case pos -> pos.y = (float)p2 * tilesize;
+                    case shape -> fill = !Mathf.equal((float)p2, 0f);
+                    default -> super.control(type, p1, p2, p3);
+                }
+            }
+
+            if(!Double.isNaN(p3)){
+                if(type == LMarkerControl.shape){
+                    outline = !Mathf.equal((float)p3, 0f);
+                }else{
+                    super.control(type, p1, p2, p3);
+                }
             }
         }
     }
@@ -906,7 +958,6 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
     /** Displays text at a location. */
     public static class TextMarker extends ObjectiveMarker{
         public @Multiline String text = "uwu";
-        public @TilePos Vec2 pos = new Vec2();
         public float fontSize = 1f;
         public @LabelFlag byte flags = WorldLabel.flagBackground | WorldLabel.flagOutline;
         // Cached localized text.
@@ -927,43 +978,46 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public TextMarker(){}
 
         @Override
-        public void draw(){
+        public void baseDraw(float x, float y, float scaleFactor){
             // font size cannot be 0
-            if(hidden || Math.abs(fontSize) < 1e-5) return;
+            if(Mathf.equal(fontSize, 0f)) return;
 
             if(fetchedText == null){
                 fetchedText = fetchText(text);
             }
 
-            WorldLabel.drawAt(fetchedText, pos.x, pos.y, Draw.z(), flags, fontSize);
+            WorldLabel.drawAt(fetchedText, x, y, drawLayer, flags, fontSize * scaleFactor);
         }
 
         @Override
         public void control(LMarkerControl type, double p1, double p2, double p3){
-            switch(type){
-                case x -> pos.x = (float)p1 * tilesize;
-                case y -> pos.y = (float)p1 * tilesize;
-                case pos -> pos.set((float)p1 * tilesize, (float)p2 * tilesize);
-                case fontSize -> fontSize = (float)p1;
-                case labelBackground -> {
-                    if((Math.abs(p1) >= 1e-5)){
-                        flags |= WorldLabel.flagBackground;
-                    }else{
-                        flags &= ~WorldLabel.flagBackground;
+            if(!Double.isNaN(p1)){
+                switch(type){
+                    case pos -> pos.x = (float)p1 * tilesize;
+                    case fontSize -> fontSize = (float)p1;
+                    case labelFlags -> {
+                        if(!Mathf.equal((float)p1, 0f)){
+                            flags |= WorldLabel.flagBackground;
+                        }else{
+                            flags &= ~WorldLabel.flagBackground;
+                        }
                     }
+                    default -> super.control(type, p1, p2, p3);
                 }
-                case labelOutline -> {
-                    if((Math.abs(p1) >= 1e-5)){
-                        flags |= WorldLabel.flagOutline;
-                    }else{
-                        flags &= ~WorldLabel.flagOutline;
+            }
+
+            if(!Double.isNaN(p2)){
+                switch(type){
+                    case pos -> pos.y = (float)p2 * tilesize;
+                    case labelFlags -> {
+                        if(!Mathf.equal((float)p2, 0f)){
+                            flags |= WorldLabel.flagOutline;
+                        }else{
+                            flags &= ~WorldLabel.flagOutline;
+                        }
                     }
+                    default -> super.control(type, p1, p2, p3);
                 }
-                case labelFlags -> {
-                    flags = ((Math.abs(p1) >= 1e-5) ? WorldLabel.flagBackground : 0);
-                    if((Math.abs(p2) >= 1e-5)) flags |= WorldLabel.flagOutline;
-                }
-                default -> super.control(type, p1, p2, p3);
             }
         }
 
@@ -980,51 +1034,136 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
     /** Displays a line from pos1 to pos2. */
     public static class LineMarker extends ObjectiveMarker{
-        public @TilePos Vec2 pos1 = new Vec2(), pos2 = new Vec2();
+        public @TilePos Vec2 pos = new Vec2(), endPos = new Vec2();
         public float stroke = 1f;
         public boolean outline = true;
         public Color color = Color.valueOf("ffd37f");
 
-        public LineMarker(String text, float x1, float y1, float x2, float y2, float stroke){
+        public LineMarker(float x1, float y1, float x2, float y2, float stroke){
             this.stroke = stroke;
-            this.pos1.set(x1, y1);
-            this.pos2.set(x2, y2);
+            this.pos.set(x1, y1);
+            this.endPos.set(x2, y2);
         }
 
-        public LineMarker(String text, float x1, float y1, float x2, float y2){
-            this.pos1.set(x1, y1);
-            this.pos2.set(x2, y2);
+        public LineMarker(float x1, float y1, float x2, float y2){
+            this.pos.set(x1, y1);
+            this.endPos.set(x2, y2);
         }
 
         public LineMarker(){}
 
+        public void baseLineDraw(float x1, float y1, float x2, float y2, float scaleFactor){
+            Draw.z(drawLayer);
+            if(outline){
+                Lines.stroke((stroke + 2f) * scaleFactor, Pal.gray);
+                Lines.line(x1, y1, x2, y2);
+            }
+
+            Lines.stroke(stroke * scaleFactor, color);
+            Lines.line(x1, y1, x2, y2);
+        }
+
+        @Override
+        public void drawWorld(){
+            baseLineDraw(pos.x, pos.y, endPos.x, endPos.y, autoscale ? 4f / renderer.getDisplayScale() : 1f);
+        }
+
+        @Override
+        public void drawMinimap(MinimapRenderer minimap){
+            minimap.transform(Tmp.v1.set(pos.x + 4f, pos.y + 4f));
+            minimap.transform(Tmp.v2.set(endPos.x + 4f, endPos.y + 4f));
+            baseLineDraw(Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y, minimap.getScaleFactor(autoscale));
+        }
+
         @Override
         public void control(LMarkerControl type, double p1, double p2, double p3){
-            switch(type){
-                case x -> pos1.x = (float)p1 * tilesize;
-                case y -> pos1.y = (float)p1 * tilesize;
-                case pos -> pos1.set((float)p1 * tilesize, (float)p2 * tilesize);
-                case endX -> pos2.x = (float)p1 * tilesize;
-                case endY -> pos2.y = (float)p1 * tilesize;
-                case endPos -> pos2.set((float)p1 * tilesize, (float)p2 * tilesize);
-                case stroke -> stroke = (float)p1;
-                case shapeOutline -> outline = ((Math.abs(p1) >= 1e-5));
-                case color -> color.set(Tmp.c1.fromDouble(p1));
-                default -> super.control(type, p1, p2, p3);
+            if(!Double.isNaN(p1)){
+                switch(type){
+                    case pos -> pos.x = (float)p1 * tilesize;
+                    case endPos -> endPos.x = (float)p1 * tilesize;
+                    case stroke -> stroke = (float)p1;
+                    case color -> color.set(Tmp.c1.fromDouble(p1));
+                    default -> super.control(type, p1, p2, p3);
+                }
+            }
+
+            if(!Double.isNaN(p2)){
+                switch(type){
+                    case pos -> pos.y = (float)p2 * tilesize;
+                    case endPos -> endPos.y = (float)p2 * tilesize;
+                    default -> super.control(type, p1, p2, p3);
+                }
+            }
+        }
+    }
+
+    /** Displays a texture with specified name. */
+    public static class TextureMarker extends ObjectiveMarker{
+        public float rotation = 0f, width = 0f, height = 0f; // Zero width/height scales marker to original texture's size
+        public String textureName = "";
+        public Color color = Color.white.cpy();
+
+        private transient TextureRegion fetchedRegion;
+
+        public TextureMarker(String textureName, float x, float y, float width, float height){
+            this.textureName = textureName;
+            this.pos.set(x, y);
+            this.width = width;
+            this.height = height;
+        }
+
+        public TextureMarker(String textureName, float x, float y){
+            this.textureName = textureName;
+            this.pos.set(x, y);
+        }
+
+        public TextureMarker(){}
+
+        @Override
+        public void control(LMarkerControl type, double p1, double p2, double p3){
+            if(!Double.isNaN(p1)){
+                switch(type){
+                    case pos -> pos.x = (float)p1 * tilesize;
+                    case rotation -> rotation = (float)p1;
+                    case textureSize -> width = (float)p1 * tilesize;
+                    case color -> color.set(Tmp.c1.fromDouble(p1));
+                    default -> super.control(type, p1, p2, p3);
+                }
+            }
+
+            if(!Double.isNaN(p2)){
+                switch(type){
+                    case pos -> pos.y = (float)p2 * tilesize;
+                    case textureSize -> height = (float)p2 * tilesize;
+                    default -> super.control(type, p1, p2, p3);
+                }
             }
         }
 
         @Override
-        public void draw(){
-            if(hidden) return;
+        public void baseDraw(float x, float y, float scaleFactor){
+            if(textureName.isEmpty()) return;
 
-            if(outline){
-                Lines.stroke(stroke + 2f, Pal.gray);
-                Lines.line(pos1.x, pos1.y, pos2.x, pos2.y);
+            if(fetchedRegion == null) fetchedRegion = Core.atlas.find(textureName);
+
+            // Zero width/height scales marker to original texture's size
+            if(Mathf.equal(width, 0f)) width = fetchedRegion.width * fetchedRegion.scl() * Draw.xscl;
+            if(Mathf.equal(height, 0f)) height = fetchedRegion.height * fetchedRegion.scl() * Draw.yscl;
+
+            Draw.z(drawLayer);
+            if(fetchedRegion.found()){
+                Draw.color(color);
+                Draw.rect(fetchedRegion, x, y, width * scaleFactor, height * scaleFactor, rotation);
+            }else{
+                Draw.color(Color.white);
+                Draw.rect("error", x, y, width * scaleFactor, height * scaleFactor, rotation);
             }
+        }
 
-            Lines.stroke(stroke, color);
-            Lines.line(pos1.x, pos1.y, pos2.x, pos2.y);
+        @Override
+        public void setTexture(String textureName){
+            this.textureName = textureName;
+            fetchedRegion = Core.atlas.find(textureName);
         }
     }
 
