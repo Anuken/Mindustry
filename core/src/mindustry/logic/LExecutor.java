@@ -2033,12 +2033,12 @@ public class LExecutor{
         public void run(LExecutor exec){
             var cons = MapObjectives.markerNameToType.get(type);
 
-            if(cons != null && state.markers.size < maxMarkers){
+            if(cons != null && state.markers.size() < maxMarkers){
                 int mid = exec.numi(id);
-                if(exec.bool(replace) || !state.markers.containsKey(mid)){
+                if(exec.bool(replace) || !state.markers.has(mid)){
                     var marker = cons.get();
                     marker.control(LMarkerControl.pos, exec.num(x), exec.num(y), 0);
-                    state.markers.put(mid, marker);
+                    state.markers.add(mid, marker);
                 }
             }
         }
@@ -2046,7 +2046,7 @@ public class LExecutor{
 
     @Remote(called = Loc.server, variants = Variant.both, unreliable = true)
     public static void createMarker(int id, ObjectiveMarker marker){
-        state.markers.put(id, marker);
+        state.markers.add(id, marker);
     }
 
     @Remote(called = Loc.server, variants = Variant.both, unreliable = true)

@@ -627,10 +627,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
     /** Marker used for drawing various content to indicate something along with an objective. Mostly used as UI overlay.  */
     public static abstract class ObjectiveMarker{
-        /** Position of marker, in world coordinates */
-        public @TilePos Vec2 pos = new Vec2();
         /** Makes sure markers are only added once. */
         public transient boolean wasAdded;
+        /** Internal use only! Do not access. */
+        public transient int arrayIndex;
+
         /** Whether to display marker on minimap instead of world. {@link MinimapMarker} ignores this value. */
         public boolean minimap = false;
         /** Whether to scale marker corresponding to player's zoom level. {@link MinimapMarker} ignores this value. */
@@ -639,28 +640,31 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         protected boolean hidden = false;
         /** On which z-sorting layer is marker drawn. */
         protected float drawLayer = Layer.overlayUI;
+
         /** Draws the marker. Actual marker position and scale are calculated in {@link #drawWorld()} and {@link #drawMinimap(MinimapRenderer)}. */
         public void baseDraw(float x, float y, float scaleFactor){}
+
         /** Called in the main renderer. */
-        public void drawWorld(){
-            baseDraw(pos.x, pos.y, autoscale ? 4f / renderer.getDisplayScale() : 1f);
-        }
+        public void drawWorld(){}
+
         /** Called in the small and large map. */
-        public void drawMinimap(MinimapRenderer minimap){
-            minimap.transform(Tmp.v1.set(pos.x + 4f, pos.y + 4f));
-            baseDraw(Tmp.v1.x, Tmp.v1.y, minimap.getScaleFactor(autoscale));
-        }
+        public void drawMinimap(MinimapRenderer minimap){}
+
         /** Add any UI elements necessary. */
         public void added(){}
+
         /** Remove any UI elements, if necessary. */
         public void removed(){}
+
         /** Whether the marker is hidden */
         public boolean isHidden(){
             return hidden;
         }
+
         /** Control marker with world processor code. Ignores NaN (null) values. */
         public void control(LMarkerControl type, double p1, double p2, double p3){
             if(Double.isNaN(p1)) return;
+
             switch(type){
                 case visibility -> hidden = Mathf.equal((float)p1, 0f);
                 case drawLayer -> drawLayer = (float)p1;
@@ -668,6 +672,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                 case autoscale -> autoscale = !Mathf.equal((float)p1, 0f);
             }
         }
+
         public void setText(String text, boolean fetch){}
 
         public void setTexture(String textureName){}
@@ -699,8 +704,46 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         }
     }
 
+    /** A marker that has a position in the world in world coordinates. */
+    public static abstract class PosMarker extends ObjectiveMarker{
+        /** Position of marker, in world coordinates */
+        public @TilePos Vec2 pos = new Vec2();
+
+        /** Called in the main renderer. */
+        @Override
+        public void drawWorld(){
+            baseDraw(pos.x, pos.y, autoscale ? 4f / renderer.getDisplayScale() : 1f);
+        }
+
+        /** Called in the small and large map. */
+        @Override
+        public void drawMinimap(MinimapRenderer minimap){
+            minimap.transform(Tmp.v1.set(pos.x + 4f, pos.y + 4f));
+            baseDraw(Tmp.v1.x, Tmp.v1.y, minimap.getScaleFactor(autoscale));
+        }
+
+        @Override
+        public void control(LMarkerControl type, double p1, double p2, double p3){
+            if(!Double.isNaN(p1)){
+                if(type == LMarkerControl.pos){
+                    pos.x = (float)p1 * tilesize;
+                }else{
+                    super.control(type, p1, p2, p3);
+                }
+            }
+
+            if(!Double.isNaN(p2)){
+                if(type == LMarkerControl.pos){
+                    pos.y = (float)p2 * tilesize;
+                }else{
+                    super.control(type, p1, p2, p3);
+                }
+            }
+        }
+    }
+
     /** Displays text above a shape. */
-    public static class ShapeTextMarker extends ObjectiveMarker{
+    public static class ShapeTextMarker extends PosMarker{
         public @Multiline String text = "frog";
         public float fontSize = 1f, textHeight = 7f;
         public @LabelFlag byte flags = WorldLabel.flagBackground | WorldLabel.flagOutline;
@@ -743,7 +786,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         @Override
         public void baseDraw(float x, float y, float scaleFactor){
             //in case some idiot decides to make 9999999 sides and freeze the game
-            int sides = Math.min(this.sides, 200);
+            int sides = Math.min(this.sides, 300);
 
             Draw.z(drawLayer);
             Lines.stroke(3f * scaleFactor, Pal.gray);
@@ -766,7 +809,6 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public void control(LMarkerControl type, double p1, double p2, double p3){
             if(!Double.isNaN(p1)){
                 switch(type){
-                    case pos -> pos.x = (float)p1 * tilesize;
                     case fontSize -> fontSize = (float)p1;
                     case textHeight -> textHeight = (float)p1;
                     case labelFlags -> {
@@ -786,7 +828,6 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
             if(!Double.isNaN(p2)){
                 switch(type){
-                    case pos -> pos.y = (float)p2 * tilesize;
                     case labelFlags -> {
                         if(!Mathf.equal((float)p2, 0f)){
                             flags |= WorldLabel.flagOutline;
@@ -883,7 +924,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
     }
 
     /** Displays a shape with an outline and color. */
-    public static class ShapeMarker extends ObjectiveMarker{
+    public static class ShapeMarker extends PosMarker{
         public float radius = 8f, rotation = 0f, stroke = 1f;
         public boolean fill = false, outline = true;
         public int sides = 4;
@@ -927,7 +968,6 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public void control(LMarkerControl type, double p1, double p2, double p3){
             if(!Double.isNaN(p1)){
                 switch(type){
-                    case pos -> pos.x = (float)p1 * tilesize;
                     case radius -> radius = (float)p1;
                     case stroke -> stroke = (float)p1;
                     case rotation -> rotation = (float)p1;
@@ -939,7 +979,6 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
             if(!Double.isNaN(p2)){
                 switch(type){
-                    case pos -> pos.y = (float)p2 * tilesize;
                     case shape -> fill = !Mathf.equal((float)p2, 0f);
                     default -> super.control(type, p1, p2, p3);
                 }
@@ -956,7 +995,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
     }
 
     /** Displays text at a location. */
-    public static class TextMarker extends ObjectiveMarker{
+    public static class TextMarker extends PosMarker{
         public @Multiline String text = "uwu";
         public float fontSize = 1f;
         public @LabelFlag byte flags = WorldLabel.flagBackground | WorldLabel.flagOutline;
@@ -993,7 +1032,6 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public void control(LMarkerControl type, double p1, double p2, double p3){
             if(!Double.isNaN(p1)){
                 switch(type){
-                    case pos -> pos.x = (float)p1 * tilesize;
                     case fontSize -> fontSize = (float)p1;
                     case labelFlags -> {
                         if(!Mathf.equal((float)p1, 0f)){
@@ -1008,7 +1046,6 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
             if(!Double.isNaN(p2)){
                 switch(type){
-                    case pos -> pos.y = (float)p2 * tilesize;
                     case labelFlags -> {
                         if(!Mathf.equal((float)p2, 0f)){
                             flags |= WorldLabel.flagOutline;
@@ -1033,8 +1070,8 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
     }
 
     /** Displays a line from pos1 to pos2. */
-    public static class LineMarker extends ObjectiveMarker{
-        public @TilePos Vec2 pos = new Vec2(), endPos = new Vec2();
+    public static class LineMarker extends PosMarker{
+        public @TilePos Vec2 endPos = new Vec2();
         public float stroke = 1f;
         public boolean outline = true;
         public Color color = Color.valueOf("ffd37f");
@@ -1079,7 +1116,6 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public void control(LMarkerControl type, double p1, double p2, double p3){
             if(!Double.isNaN(p1)){
                 switch(type){
-                    case pos -> pos.x = (float)p1 * tilesize;
                     case endPos -> endPos.x = (float)p1 * tilesize;
                     case stroke -> stroke = (float)p1;
                     case color -> color.set(Tmp.c1.fromDouble(p1));
@@ -1089,7 +1125,6 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
             if(!Double.isNaN(p2)){
                 switch(type){
-                    case pos -> pos.y = (float)p2 * tilesize;
                     case endPos -> endPos.y = (float)p2 * tilesize;
                     default -> super.control(type, p1, p2, p3);
                 }
@@ -1098,7 +1133,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
     }
 
     /** Displays a texture with specified name. */
-    public static class TextureMarker extends ObjectiveMarker{
+    public static class TextureMarker extends PosMarker{
         public float rotation = 0f, width = 0f, height = 0f; // Zero width/height scales marker to original texture's size
         public String textureName = "";
         public Color color = Color.white.cpy();
@@ -1123,7 +1158,6 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public void control(LMarkerControl type, double p1, double p2, double p3){
             if(!Double.isNaN(p1)){
                 switch(type){
-                    case pos -> pos.x = (float)p1 * tilesize;
                     case rotation -> rotation = (float)p1;
                     case textureSize -> width = (float)p1 * tilesize;
                     case color -> color.set(Tmp.c1.fromDouble(p1));
@@ -1133,7 +1167,6 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
             if(!Double.isNaN(p2)){
                 switch(type){
-                    case pos -> pos.y = (float)p2 * tilesize;
                     case textureSize -> height = (float)p2 * tilesize;
                     default -> super.control(type, p1, p2, p3);
                 }
