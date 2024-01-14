@@ -36,7 +36,7 @@ public class OverflowGate extends Block{
         public boolean acceptItem(Building source, Item item){
             Building to = getTileTarget(item, source, false);
 
-            return to != null && to.acceptItem(this, item) && to.team == team;
+            return to != null && to.acceptItem(this, item) && team.canGiveItems(to.team);
         }
 
         @Override
@@ -52,14 +52,14 @@ public class OverflowGate extends Block{
             Building to = nearby((from + 2) % 4);
             boolean
                 fromInst = src.block.instantTransfer,
-                canForward = to != null && to.team == team && !(fromInst && to.block.instantTransfer) && to.acceptItem(this, item),
+                canForward = to != null && team.canGiveItems(to.team) && !(fromInst && to.block.instantTransfer) && to.acceptItem(this, item),
                 inv = invert == enabled;
 
             if(!canForward || inv){
                 Building a = nearby(Mathf.mod(from - 1, 4));
                 Building b = nearby(Mathf.mod(from + 1, 4));
-                boolean ac = a != null && !(fromInst && a.block.instantTransfer) && a.team == team && a.acceptItem(this, item);
-                boolean bc = b != null && !(fromInst && b.block.instantTransfer) && b.team == team && b.acceptItem(this, item);
+                boolean ac = a != null && !(fromInst && a.block.instantTransfer) && team.canGiveItems(a.team) && a.acceptItem(this, item);
+                boolean bc = b != null && !(fromInst && b.block.instantTransfer) && team.canGiveItems(b.team) && b.acceptItem(this, item);
 
                 if(!ac && !bc){
                     return inv && canForward ? to : null;

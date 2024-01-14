@@ -148,6 +148,8 @@ public class CoreBlock extends StorageBlock{
         if(tile == null) return false;
         //in the editor, you can place them anywhere for convenience
         if(state.isEditor()) return true;
+        //prevent allies from wiping each others' cores out
+        if(tile.team() != team) return false;
 
         CoreBuild core = team.core();
 

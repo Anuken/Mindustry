@@ -362,20 +362,20 @@ public class BulletType extends Content implements Cloneable{
     }
 
     public boolean testCollision(Bullet bullet, Building tile){
-        return !heals() || tile.team != bullet.team || tile.healthf() < 1f;
+        return !heals() || bullet.team.canDamage(bullet.team) || tile.healthf() < 1f;
     }
 
     /** If direct is false, this is an indirect hit and the tile was already damaged.
      * TODO this is a mess. */
     public void hitTile(Bullet b, Building build, float x, float y, float initialHealth, boolean direct){
-        if(makeFire && build.team != b.team){
+        if(makeFire && b.team.canDamage(build.team)){
             Fires.create(build.tile);
         }
 
-        if(heals() && build.team == b.team && !(build.block instanceof ConstructBlock)){
+        if(heals() && !b.team.isEnemy(build.team) && !(build.block instanceof ConstructBlock)){
             healEffect.at(build.x, build.y, 0f, healColor, build.block);
             build.heal(healPercent / 100f * build.maxHealth + healAmount);
-        }else if(build.team != b.team && direct){
+        }else if(b.team.canDamage(build.team) && direct){
             hit(b);
         }
 
@@ -494,14 +494,14 @@ public class BulletType extends Content implements Cloneable{
             }
 
             if(heals()){
-                indexer.eachBlock(b.team, x, y, splashDamageRadius, Building::damaged, other -> {
+                indexer.eachBlock(b.team, x, y, splashDamageRadius, other -> !b.team.isEnemy(other.team) && other.damaged(), other -> {
                     healEffect.at(other.x, other.y, 0f, healColor, other.block);
                     other.heal(healPercent / 100f * other.maxHealth() + healAmount);
                 });
             }
 
             if(makeFire){
-                indexer.eachBlock(null, x, y, splashDamageRadius, other -> other.team != b.team, other -> Fires.create(other.tile));
+                indexer.eachBlock(null, x, y, splashDamageRadius, other -> b.team.isEnemy(other.team), other -> Fires.create(other.tile));
             }
         }
     }
@@ -625,15 +625,15 @@ public class BulletType extends Content implements Cloneable{
             //home in on allies if possible
             if(heals()){
                 target = Units.closestTarget(null, realAimX, realAimY, homingRange,
-                e -> e.checkTarget(collidesAir, collidesGround) && e.team != b.team && !b.hasCollided(e.id),
+                e -> e.checkTarget(collidesAir, collidesGround) && !b.team.canDamage(e.team) && !b.hasCollided(e.id),
                 t -> collidesGround && (t.team != b.team || t.damaged()) && !b.hasCollided(t.id)
                 );
             }else{
-                if(b.aimTile != null && b.aimTile.build != null && b.aimTile.build.team != b.team && collidesGround && !b.hasCollided(b.aimTile.build.id)){
+                if(b.aimTile != null && b.aimTile.build != null && b.team.isEnemy(b.aimTile.build.team) && collidesGround && !b.hasCollided(b.aimTile.build.id)){
                     target = b.aimTile.build;
                 }else{
                     target = Units.closestTarget(b.team, realAimX, realAimY, homingRange,
-                        e -> e != null && e.checkTarget(collidesAir, collidesGround) && !b.hasCollided(e.id),
+                        e -> e != null && e.checkTarget(collidesAir, collidesGround) && !b.hasCollided(e.id) && !b.team.isEnemy(e.team),
                         t -> t != null && collidesGround && !b.hasCollided(t.id));
                 }
             }

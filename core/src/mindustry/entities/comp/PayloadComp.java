@@ -65,11 +65,11 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
     }
 
     boolean canPickup(Unit unit){
-        return type.pickupUnits && payloadUsed() + unit.hitSize * unit.hitSize <= type.payloadCapacity + 0.001f && unit.team == team() && unit.isAI();
+        return type.pickupUnits && payloadUsed() + unit.hitSize * unit.hitSize <= type.payloadCapacity + 0.001f && team.canTakeItems(unit.team()) && unit.isAI();
     }
 
     boolean canPickup(Building build){
-        return payloadUsed() + build.block.size * build.block.size * Vars.tilesize * Vars.tilesize <= type.payloadCapacity + 0.001f && build.canPickup() && build.team == team;
+        return payloadUsed() + build.block.size * build.block.size * Vars.tilesize * Vars.tilesize <= type.payloadCapacity + 0.001f && build.canPickup() && team.canTakeItems(build.team);
     }
 
     boolean canPickupPayload(Payload pay){

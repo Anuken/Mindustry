@@ -23,7 +23,7 @@ public class BaseShield extends Block{
     protected static BaseShieldBuild paramBuild;
     //protected static Effect paramEffect;
     protected static final Cons<Bullet> bulletConsumer = bullet -> {
-        if(bullet.team != paramBuild.team && bullet.type.absorbable && bullet.within(paramBuild, paramBuild.radius())){
+        if(bullet.team.canDamage(paramBuild.team) && bullet.type.absorbable && bullet.within(paramBuild, paramBuild.radius())){
             bullet.absorb();
             //paramEffect.at(bullet);
 

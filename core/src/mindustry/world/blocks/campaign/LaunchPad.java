@@ -147,7 +147,7 @@ public class LaunchPad extends Block{
         public void display(Table table){
             super.display(table);
 
-            if(!state.isCampaign() || net.client() || team != player.team()) return;
+            if(!state.isCampaign() || net.client() || !player.team().canInteract(team)) return;
 
             table.row();
             table.label(() -> {

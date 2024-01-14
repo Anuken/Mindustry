@@ -257,7 +257,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                     ai.command(UnitCommand.moveCommand);
                 }
 
-                if(teamTarget != null && teamTarget.team() != player.team() &&
+                if(teamTarget != null && player.team().isEnemy(teamTarget.team()) &&
                     !(teamTarget instanceof Unit u && !unit.canTarget(u)) && !(teamTarget instanceof Building && !unit.type.targetGround)){
 
                     anyCommandedTarget = true;
@@ -280,7 +280,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 if(ai.commandQueue.size <= 0){
                     ai.group = null;
                 }
-                
+
                 //remove when other player command
                 if(!headless && player != Vars.player){
                     control.input.selectedUnits.remove(unit);
@@ -478,7 +478,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             throw new ValidateException(player, "Player cannot pick up a block.");
         }
 
-        if(state.teams.canInteract(unit.team, build.team)){
+        if(unit.team.canTakeItems(build.team)){
             //pick up block's payload
             Payload current = build.getPayload();
             if(current != null && pay.canPickupPayload(current)){
@@ -559,7 +559,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(called = Loc.server)
     public static void unitEnteredPayload(Unit unit, Building build){
-        if(unit == null || build == null || unit.team != build.team) return;
+        if(unit == null || build == null || !unit.team.canGiveItems(build.team)) return;
 
         unit.remove();
 
@@ -871,7 +871,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }else{
             Building build = world.buildWorld(pay.x(), pay.y());
 
-            if(build != null && state.teams.canInteract(unit.team, build.team)){
+            if(build != null && unit.team.canTakeItems(build.team)){
                 Call.requestBuildPayload(player, build);
             }
         }
@@ -991,7 +991,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
                 Teamc attack = world.buildWorld(target.x, target.y);
 
-                if(attack == null || attack.team() == player.team()){
+                if(attack == null || !player.team().canDamage(attack.team())){
                     attack = selectedEnemyUnit(target.x, target.y);
                 }
 
@@ -1651,7 +1651,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     boolean tryRepairDerelict(Tile selected){
-        if(selected != null && selected.build != null && selected.build.block.unlockedNow() && selected.build.team == Team.derelict && Build.validPlace(selected.block(), player.team(), selected.build.tileX(), selected.build.tileY(), selected.build.rotation)){
+        if(selected != null && selected.build != null && selected.build.block.unlockedNow() && selected.build.team == Team.derelict && Build.validPlace(selected.block(), player.team(), selected.build.tileX(), selected.build.tileY(), selected.build.rotation) && player.team().canDeconstruct(Team.derelict)){
             player.unit().addBuild(new BuildPlan(selected.build.tileX(), selected.build.tileY(), selected.build.rotation, selected.block(), selected.build.config()));
             return true;
         }
@@ -1761,7 +1761,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         Seq<TeamData> data = state.teams.present;
         for(int i = 0; i < data.size; i++){
-            if(data.items[i].team != player.team()){
+            if(player.team().canDamage(data.items[i].team)){
                 data.items[i].tree().intersect(x - rad / 2f, y - rad / 2f, rad, rad, tmpUnits);
             }
         }
@@ -1853,8 +1853,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         ItemStack stack = player.unit().stack;
 
-        if(build != null && build.acceptStack(stack.item, stack.amount, player.unit()) > 0 && build.interactable(player.team()) &&
-                build.block.hasItems && player.unit().stack().amount > 0 && build.interactable(player.team())){
+        if(build != null && build.acceptStack(stack.item, stack.amount, player.unit()) > 0 && player.team().canGiveItems(build.team) &&
+                build.block.hasItems && player.unit().stack().amount > 0 && build.interactable(build.team)){
             if(!(state.rules.onlyDepositCore && !(build instanceof CoreBuild))){
                 Call.transferInventory(player, build);
             }

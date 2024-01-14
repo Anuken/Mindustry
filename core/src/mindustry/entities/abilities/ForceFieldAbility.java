@@ -37,7 +37,7 @@ public class ForceFieldAbility extends Ability{
     private static Unit paramUnit;
     private static ForceFieldAbility paramField;
     private static final Cons<Bullet> shieldConsumer = trait -> {
-        if(trait.team != paramUnit.team && trait.type.absorbable && Intersector.isInRegularPolygon(paramField.sides, paramUnit.x, paramUnit.y, realRad, paramField.rotation, trait.x(), trait.y()) && paramUnit.shield > 0){
+        if(trait.team.canDamage(paramUnit.team) && trait.type.absorbable && Intersector.isInRegularPolygon(paramField.sides, paramUnit.x, paramUnit.y, realRad, paramField.rotation, trait.x(), trait.y()) && paramUnit.shield > 0){
             trait.absorb();
             Fx.absorb.at(trait);
 

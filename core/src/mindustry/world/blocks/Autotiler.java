@@ -184,7 +184,7 @@ public interface Autotiler{
     // TODO docs -- use for direction?
     default boolean blends(Tile tile, int rotation, int direction){
         Building other = tile.nearbyBuild(Mathf.mod(rotation - direction, 4));
-        return other != null && other.team == tile.team() && blends(tile, rotation, other.tileX(), other.tileY(), other.rotation, other.block);
+        return other != null && (tile.team().canAttach(other.team) || other.team.canAttach(tile.team())) && blends(tile, rotation, other.tileX(), other.tileY(), other.rotation, other.block);
     }
 
     default boolean blendsArmored(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){

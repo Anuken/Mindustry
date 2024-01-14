@@ -153,11 +153,16 @@ public final class FogControl implements CustomChunk{
         synchronized(staticEvents){
             for(var build : Groups.build){
                 if(build.block.flags.contains(BlockFlag.hasFogRadius)){
-                    if(fog[build.team.id] == null){
-                        fog[build.team.id] = new FogData();
-                    }
+                    //TODO glacially slow?
+                    for(var td : state.teams.active){
+                        if(!td.team.canSeeExplored(build.team)) continue;
 
-                    pushEvent(FogEvent.get(build.tile.x, build.tile.y, Mathf.round(build.fogRadius()), build.team.id), initial);
+                        if(fog[build.team.id] == null){
+                            fog[build.team.id] = new FogData();
+                        }
+
+                        pushEvent(FogEvent.get(build.tile.x, build.tile.y, Mathf.round(build.fogRadius()), td.team.id), initial);
+                    }
                 }
             }
         }
@@ -179,7 +184,11 @@ public final class FogControl implements CustomChunk{
 
             if(state.rules.staticFog){
                 synchronized(staticEvents){
-                    pushEvent(FogEvent.get(build.tile.x, build.tile.y, Mathf.round(build.fogRadius()), build.team.id), false);
+                    for(var td : state.teams.active){
+                        if(!td.team.canSeeExplored(build.team)) continue;
+
+                        pushEvent(FogEvent.get(build.tile.x, build.tile.y, Mathf.round(build.fogRadius()), td.team.id), false);
+                    }
                 }
             }
         }

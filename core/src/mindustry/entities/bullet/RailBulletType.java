@@ -84,7 +84,7 @@ public class RailBulletType extends BulletType{
 
     @Override
     public boolean testCollision(Bullet bullet, Building tile){
-        return bullet.team != tile.team;
+        return bullet.team.canDamage(tile.team);
     }
 
     @Override

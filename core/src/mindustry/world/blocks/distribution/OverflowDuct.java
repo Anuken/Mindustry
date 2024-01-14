@@ -98,8 +98,8 @@ public class OverflowDuct extends Block{
 
             if(invert){ //Lots of extra code. Make separate UnderflowDuct class?
                 Building l = left(), r = right();
-                boolean lc = l != null && l.team == team && l.acceptItem(this, current),
-                    rc = r != null && r.team == team && r.acceptItem(this, current);
+                boolean lc = l != null && team.canGiveItems(l.team) && l.acceptItem(this, current),
+                    rc = r != null && team.canGiveItems(r.team) && r.acceptItem(this, current);
 
                 if(lc && !rc){
                     return l;
@@ -111,7 +111,7 @@ public class OverflowDuct extends Block{
             }
 
             Building front = front();
-            if(front != null && front.team == team && front.acceptItem(this, current)){
+            if(front != null && team.canGiveItems(front.team) && front.acceptItem(this, current)){
                 return front;
             }
 
@@ -121,7 +121,7 @@ public class OverflowDuct extends Block{
                 int dir = Mathf.mod(rotation + (((i + cdump + 1) % 3) - 1), 4);
                 if(dir == rotation) continue;
                 Building other = nearby(dir);
-                if(other != null && other.team == team && other.acceptItem(this, current)){
+                if(other != null && team.canGiveItems(other.team) && other.acceptItem(this, current)){
                     return other;
                 }
             }

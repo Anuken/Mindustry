@@ -213,7 +213,7 @@ public class OverlayRenderer{
             Vec2 vec = Core.input.mouseWorld(input.getMouseX(), input.getMouseY());
             Building build = world.buildWorld(vec.x, vec.y);
 
-            if(build != null && build.team == player.team()){
+            if(build != null && player.team().canInteract(build.team)){
                 build.drawSelect();
                 if(!build.enabled && build.block.drawDisabled){
                    build.drawDisabled();

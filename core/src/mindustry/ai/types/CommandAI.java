@@ -133,7 +133,7 @@ public class CommandAI extends AIController{
             if(command == UnitCommand.loadBlocksCommand && (targetPos == null || unit.within(targetPos, 1f))){
                 Building build = world.buildWorld(unit.x, unit.y);
 
-                if(build != null && state.teams.canInteract(unit.team, build.team)){
+                if(build != null && unit.team.canTakeItems(build.team)){
                     //pick up block's payload
                     Payload current = build.getPayload();
                     if(current != null && pay.canPickupPayload(current)){
@@ -149,7 +149,7 @@ public class CommandAI extends AIController{
         if(!net.client() && command == UnitCommand.enterPayloadCommand && unit.buildOn() != null && (targetPos == null || (world.buildWorld(targetPos.x, targetPos.y) != null && world.buildWorld(targetPos.x, targetPos.y) == unit.buildOn()))){
             var build = unit.buildOn();
             tmpPayload.unit = unit;
-            if(build.team == unit.team && build.acceptPayload(build, tmpPayload)){
+            if(unit.team.canGiveItems(build.team) && build.acceptPayload(build, tmpPayload)){
                 Call.unitEnteredPayload(unit, build);
                 return; //no use updating after this, the unit is gone!
             }
@@ -361,7 +361,7 @@ public class CommandAI extends AIController{
 
     @Override
     public void hit(Bullet bullet){
-        if(unit.team.isAI() && bullet.owner instanceof Teamc teamc && teamc.team() != unit.team && attackTarget == null &&
+        if(unit.team.isAI() && bullet.owner instanceof Teamc teamc && unit.team.canDamage(teamc.team()) && attackTarget == null &&
             //can only counter-attack every few seconds to prevent rapidly changing targets
             !(teamc instanceof Unit u && !u.checkTarget(unit.type.targetAir, unit.type.targetGround)) && timer.get(timerTarget4, 60f * 10f)){
             commandTarget(teamc, true);

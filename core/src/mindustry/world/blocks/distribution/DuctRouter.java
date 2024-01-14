@@ -127,7 +127,7 @@ public class DuctRouter extends Block{
                 Building other = proximity.get((i + dump) % proximity.size);
                 int rel = relativeTo(other);
 
-                if(!(sortItem != null && (current == sortItem) != (rel == rotation)) && !(rel == (rotation + 2) % 4) && other.team == team && other.acceptItem(this, current)){
+                if(!(sortItem != null && (current == sortItem) != (rel == rotation)) && !(rel == (rotation + 2) % 4) && team.canGiveItems(other.team) && other.acceptItem(this, current)){
                     incrementDump(proximity.size);
                     return other;
                 }

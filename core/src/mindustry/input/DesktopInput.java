@@ -451,7 +451,7 @@ public class DesktopInput extends InputHandler{
                 cursorType = cursor.build.getCursor();
             }
 
-            if(cursor.build != null && cursor.build.team == Team.derelict && Build.validPlace(cursor.block(), player.team(), cursor.build.tileX(), cursor.build.tileY(), cursor.build.rotation)){
+            if(cursor.build != null && cursor.build.team == Team.derelict && Build.validPlace(cursor.block(), player.team(), cursor.build.tileX(), cursor.build.tileY(), cursor.build.rotation) && player.team().canDeconstruct(cursor.build.team)){
                 cursorType = ui.repairCursor;
             }
 
@@ -464,7 +464,7 @@ public class DesktopInput extends InputHandler{
             }
 
             if(commandMode && selectedUnits.any()){
-                boolean canAttack = (cursor.build != null && !cursor.build.inFogTo(player.team()) && cursor.build.team != player.team());
+                boolean canAttack = (cursor.build != null && !cursor.build.inFogTo(player.team()) && player.team().canDamage(cursor.build.team));
 
                 if(!canAttack){
                     var unit = selectedEnemyUnit(input.mouseWorldX(), input.mouseWorldY());

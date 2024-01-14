@@ -53,7 +53,7 @@ public class SuicideAI extends GroundAI{
                     for(Point2 p : Geometry.d4c){
                         Tile tile = Vars.world.tile(x + p.x, y + p.y);
                         if(tile != null && tile.build == target) return false;
-                        if(tile != null && tile.build != null && tile.build.team != unit.team()){
+                        if(tile != null && tile.build != null && unit.team().isEnemy(tile.build.team)){
                             blockedByBlock = true;
                             return true;
                         }else{

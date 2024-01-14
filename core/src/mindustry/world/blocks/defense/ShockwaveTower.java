@@ -72,7 +72,7 @@ public class ShockwaveTower extends Block{
             if(potentialEfficiency > 0 && (reloadCounter += Time.delta) >= reload && timer(timerCheck, checkInterval)){
                 targets.clear();
                 Groups.bullet.intersect(x - range, y - range, range * 2, range * 2, b -> {
-                    if(b.team != team && b.type.hittable){
+                    if(team.isEnemy(b.team) && b.type.hittable){
                         targets.add(b);
                     }
                 });

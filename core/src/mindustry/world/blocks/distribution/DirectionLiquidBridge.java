@@ -83,7 +83,7 @@ public class DirectionLiquidBridge extends DirectionBridge{
             int rel = this.relativeToEdge(source.tile);
 
             return
-                hasLiquids && team == source.team &&
+                hasLiquids && source.team.canGiveItems(team) &&
                 (liquids.current() == liquid || liquids.get(liquids.current()) < 0.2f) && rel != rotation &&
                 (occupied[(rel + 2) % 4] == null || occupied[(rel + 2) % 4] == source);
         }

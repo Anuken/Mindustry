@@ -114,7 +114,7 @@ public class Units{
     /**
      * Validates a target.
      * @param target The target to validate
-     * @param team The team of the thing doing tha targeting
+     * @param team The team of the thing doing the targeting
      * @param x The X position of the thing doing the targeting
      * @param y The Y position of the thing doing the targeting
      * @param range The maximum distance from the target X/Y the targeter can be for it to be valid
@@ -123,7 +123,7 @@ public class Units{
     public static boolean invalidateTarget(Posc target, Team team, float x, float y, float range){
         return target == null ||
             (range != Float.MAX_VALUE && !target.within(x, y, range + (target instanceof Sized hb ? hb.hitSize()/2f : 0f))) ||
-            (target instanceof Teamc t && t.team() == team) ||
+            (target instanceof Teamc t && !team.canDamage(t.team())) ||
             (target instanceof Healthc h && !h.isValid()) ||
             (target instanceof Unit u && !u.targetable(team));
     }
@@ -224,7 +224,7 @@ public class Units{
 
     /** Returns the closest target enemy. First, units are checked, then tile entities. */
     public static Teamc closestTarget(Team team, float x, float y, float range){
-        return closestTarget(team, x, y, range, Unit::isValid);
+        return closestTarget(team, x, y, range, unit -> team.isEnemy(unit.team) && unit.isValid());
     }
 
     /** Returns the closest target enemy. First, units are checked, then tile entities. */
@@ -265,7 +265,7 @@ public class Units{
         cpriority = -99999f;
 
         nearbyEnemies(team, x - range, y - range, range*2f, range*2f, e -> {
-            if(e.dead() || !predicate.get(e) || e.team == Team.derelict || !e.targetable(team) || e.inFogTo(team)) return;
+            if(e.dead() || !predicate.get(e) || e.team == Team.derelict || !e.targetable(team) || !(team == null || team.isEnemy(e.team)) || e.inFogTo(team)) return;
 
             float dst2 = e.dst2(x, y) - (e.hitSize * e.hitSize);
             if(dst2 < range*range && (result == null || dst2 < cdist || e.type.targetPriority > cpriority) && e.type.targetPriority >= cpriority){
@@ -287,7 +287,7 @@ public class Units{
         cpriority = -99999f;
 
         nearbyEnemies(team, x - range, y - range, range*2f, range*2f, e -> {
-            if(e.dead() || !predicate.get(e) || e.team == Team.derelict || !e.within(x, y, range + e.hitSize/2f) || !e.targetable(team) || e.inFogTo(team)) return;
+            if(e.dead() || !predicate.get(e) || e.team == Team.derelict || !e.within(x, y, range + e.hitSize/2f) || !e.targetable(team) || !(team == null || team.isEnemy(e.team)) || e.inFogTo(team)) return;
 
             float cost = sort.cost(e, x, y);
             if((result == null || cost < cdist || e.type.targetPriority > cpriority) && e.type.targetPriority >= cpriority){
@@ -302,11 +302,12 @@ public class Units{
 
     /** Returns the closest ally of this team. Filter by predicate. No range. */
     public static Unit closest(Team team, float x, float y, Boolf<Unit> predicate){
+        if(team == null) return null;
         result = null;
         cdist = 0f;
 
         for(Unit e : Groups.unit){
-            if(!predicate.get(e) || e.team() != team) continue;
+            if(!predicate.get(e) || team.canDamage(e.team())) continue;
 
             float dist = e.dst2(x, y);
             if(result == null || dist < cdist){
@@ -320,6 +321,7 @@ public class Units{
 
     /** Returns the closest ally of this team in a range. Filter by predicate. */
     public static Unit closest(Team team, float x, float y, float range, Boolf<Unit> predicate){
+        if(team == null) return null;
         result = null;
         cdist = 0f;
 
@@ -338,6 +340,7 @@ public class Units{
 
     /** Returns the closest ally of this team in a range. Filter by predicate. */
     public static Unit closest(Team team, float x, float y, float range, Boolf<Unit> predicate, Sortf sort){
+        if(team == null) return null;
         result = null;
         cdist = 0f;
 
@@ -357,6 +360,7 @@ public class Units{
     /** Returns the closest ally of this team. Filter by predicate.
      * Unlike the closest() function, this only guarantees that unit hitboxes overlap the range. */
     public static Unit closestOverlap(Team team, float x, float y, float range, Boolf<Unit> predicate){
+        if(team == null) return null;
         result = null;
         cdist = 0f;
 
@@ -436,7 +440,7 @@ public class Units{
     public static void nearbyEnemies(Team team, float x, float y, float width, float height, Cons<Unit> cons){
         Seq<TeamData> data = state.teams.present;
         for(int i = 0; i < data.size; i++){
-            if(data.items[i].team != team){
+            if(team == null || team.isEnemy(data.items[i].team)){
                 nearby(data.items[i].team, x, y, width, height, cons);
             }
         }
@@ -461,7 +465,7 @@ public class Units{
         Seq<TeamData> data = state.teams.present;
         for(int i = 0; i < data.size; i++){
             var other = data.items[i];
-            if(other.team != team){
+            if(team.isEnemy(other.team)){
                 if(other.tree().any(x, y, width, height)){
                     return true;
                 }

@@ -136,7 +136,7 @@ public class ItemBridge extends Block{
         if(other == null || tile == null || !positionsValid(tile.x, tile.y, other.x, other.y)) return false;
 
         return ((other.block() == tile.block() && tile.block() == this) || (!(tile.block() instanceof ItemBridge) && other.block() == this))
-            && (other.team() == tile.team() || tile.block() != this)
+            && ((tile.team().canAttach(other.team()) && tile.team().canGiveItems(other.team())) || tile.block() != this)
             && (!checkDouble || ((ItemBridgeBuild)other.build).link != tile.pos());
     }
 
@@ -402,7 +402,7 @@ public class ItemBridge extends Block{
 
         @Override
         public boolean acceptItem(Building source, Item item){
-            return hasItems && team == source.team && items.total() < itemCapacity && checkAccept(source, world.tile(link));
+            return hasItems && source.team.canGiveItems(team) && items.total() < itemCapacity && checkAccept(source, world.tile(link));
         }
 
         @Override
@@ -413,7 +413,7 @@ public class ItemBridge extends Block{
         @Override
         public boolean acceptLiquid(Building source, Liquid liquid){
             return
-                hasLiquids && team == source.team &&
+                hasLiquids && source.team.canGiveItems(team) &&
                 (liquids.current() == liquid || liquids.get(liquids.current()) < 0.2f) &&
                 checkAccept(source, world.tile(link));
         }

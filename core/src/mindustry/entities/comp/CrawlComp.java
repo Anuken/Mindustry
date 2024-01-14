@@ -87,7 +87,7 @@ abstract class CrawlComp implements Posc, Rotc, Hitboxc, Unitc{
                             }
 
                             //TODO area damage to units
-                            if(t.build != null && t.build.team != team){
+                            if(t.build != null && team.canDamage(t.build.team)){
                                 t.build.damage(team, type.crushDamage * Time.delta * state.rules.unitDamage(team));
                             }
 

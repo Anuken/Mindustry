@@ -86,7 +86,7 @@ public class DirectionalUnloader extends Block{
             if((unloadTimer += edelta()) >= speed){
                 Building front = front(), back = back();
 
-                if(front != null && back != null && back.items != null && front.team == team && back.team == team && back.canUnload() && (allowCoreUnload || !(back instanceof CoreBuild || (back instanceof StorageBuild sb && sb.linkedCore != null)))){
+                if(front != null && back != null && back.items != null && team.canGiveItems(front.team) && team.canTakeItems(back.team) && back.canUnload() && (allowCoreUnload || !(back instanceof CoreBuild || (back instanceof StorageBuild sb && sb.linkedCore != null)))){
                     if(unloadItem == null){
                         var itemseq = content.items();
                         int itemc = itemseq.size;

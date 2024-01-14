@@ -62,7 +62,7 @@ public class Control implements ApplicationListener, Loadable{
         indicators = new AttackIndicators();
 
         Events.on(BuildDamageEvent.class, e -> {
-            if(e.build.team == Vars.player.team()){
+            if(Vars.player.team().isAlly(e.build.team)){
                 indicators.add(e.build.tileX(), e.build.tileY());
             }
         });

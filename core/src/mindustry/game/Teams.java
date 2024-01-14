@@ -57,7 +57,7 @@ public class Teams{
 
     public boolean anyEnemyCoresWithin(Team team, float x, float y, float radius){
         for(TeamData data : active){
-            if(team != data.team){
+            if(team.isEnemy(data.team)){
                 for(CoreBuild tile : data.cores){
                     if(tile.within(x, y, radius)){
                         return true;
@@ -70,7 +70,7 @@ public class Teams{
 
     public void eachEnemyCore(Team team, Cons<Building> ret){
         for(TeamData data : active){
-            if(team != data.team){
+            if(team.isEnemy(data.team)){
                 for(Building tile : data.cores){
                     ret.get(tile);
                 }
@@ -102,8 +102,10 @@ public class Teams{
         return get(team).active();
     }
 
+    //maybe deprecate
     public boolean canInteract(Team team, Team other){
-        return team == other || other == Team.derelict;
+        return team.canInteract(other);
+        //return team == other || other == Team.derelict;
     }
 
     /** Do not modify. */
@@ -229,7 +231,7 @@ public class Teams{
             Seq<Team> enemies = new Seq<>();
 
             for(TeamData other : active){
-                if(data.team != other.team){
+                if(data.team.isEnemy(other.team)){
                     enemies.add(other.team);
                 }
             }

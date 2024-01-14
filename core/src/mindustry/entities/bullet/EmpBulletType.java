@@ -19,7 +19,7 @@ public class EmpBulletType extends BasicBulletType{
 
         if(!b.absorbed){
             Vars.indexer.allBuildings(x, y, radius, other -> {
-                if(other.team == b.team){
+                if(b.team.isAlly(other.team)){
                     if(other.block.hasPower && other.block.canOverdrive && other.timeScale() < timeIncrease){
                         other.applyBoost(timeIncrease, timeDuration);
                         chainEffect.at(x, y, 0, hitColor, other);
@@ -48,7 +48,7 @@ public class EmpBulletType extends BasicBulletType{
 
             if(hitUnits){
                 Units.nearbyEnemies(b.team, x, y, radius, other -> {
-                    if(other.team != b.team && other.hittable()){
+                    if(b.team.canDamage(other.team) && other.hittable()){
                         var absorber = Damage.findAbsorber(b.team, x, y, other.x, other.y);
                         if(absorber != null){
                             return;

@@ -20,7 +20,7 @@ abstract class BoundedComp implements Velc, Posc, Healthc, Flyingc{
     @Override
     public void update(){
         if(!type.bounded) return;
-        
+
         float bot = 0f, left = 0f, top = world.unitHeight(), right = world.unitWidth();
 
         //TODO hidden map rules only apply to player teams? should they?

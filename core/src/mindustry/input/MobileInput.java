@@ -96,7 +96,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }else{
             Building tile = world.buildWorld(x, y);
 
-            if((tile != null && player.team() != tile.team && (tile.team != Team.derelict || state.rules.coreCapture)) || (tile != null && player.unit().type.canHeal && tile.team == player.team() && tile.damaged())){
+            if((tile != null && player.team().canDamage(tile.team) && (tile.team != Team.derelict || state.rules.coreCapture)) || (tile != null && player.unit().type.canHeal && !player.team().isEnemy(tile.team) && tile.damaged())){
                 player.unit().mineTile = null;
                 target = tile;
             }
@@ -613,7 +613,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                     }else{
                         Building build = world.buildWorld(pos.x, pos.y);
 
-                        if(build != null && build.team == player.team() && (pay.canPickup(build) || build.getPayload() != null && pay.canPickupPayload(build.getPayload()))){
+                        if(build != null && player.team().canGiveItems(build.team) && (pay.canPickup(build) || build.getPayload() != null && pay.canPickupPayload(build.getPayload()))){
                             payloadTarget = build;
                         }else if(pay.hasPayload()){
                             //drop off at position
@@ -965,7 +965,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         boolean omni = unit.type.omniMovement;
         boolean allowHealing = type.canHeal;
-        boolean validHealTarget = allowHealing && target instanceof Building b && b.isValid() && target.team() == unit.team && b.damaged() && target.within(unit, type.range);
+        boolean validHealTarget = allowHealing && target instanceof Building b && b.isValid() && !unit.team.canDamage(target.team()) && b.damaged() && target.within(unit, type.range);
         boolean boosted = (unit instanceof Mechc && unit.isFlying());
 
         //reset target if:
@@ -1003,7 +1003,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 if(payloadTarget instanceof Vec2 && pay.hasPayload()){
                     //vec -> dropping something
                     tryDropPayload();
-                }else if(payloadTarget instanceof Building build && build.team == unit.team){
+                }else if(payloadTarget instanceof Building build && unit.team.canTakeItems(build.team)){
                     //building -> picking building up
                     Call.requestBuildPayload(player, build);
                 }else if(payloadTarget instanceof Unit other && pay.canPickup(other)){

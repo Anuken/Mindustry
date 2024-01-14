@@ -570,7 +570,7 @@ public class LogicBlock extends Block{
         }
 
         public boolean validLink(Building other){
-            return other != null && other.isValid() && (privileged || (!other.block.privileged && other.team == team && other.within(this, range + other.block.size*tilesize/2f))) && !(other instanceof ConstructBuild);
+            return other != null && other.isValid() && (privileged || (!other.block.privileged && team.canAttach(other.team) && other.within(this, range + other.block.size*tilesize/2f))) && !(other instanceof ConstructBuild);
         }
 
         @Override

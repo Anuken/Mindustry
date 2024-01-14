@@ -43,7 +43,7 @@ public class Damage{
     }
     public static void applySuppression(Team team, float x, float y, float range, float reload, float maxDelay, float applyParticleChance, @Nullable Position source, Color effectColor){
         builds.clear();
-        indexer.eachBlock(null, x, y, range, build -> build.team != team, build -> {
+        indexer.eachBlock(null, x, y, range, build -> team.canDamage(build.team), build -> {
             float prev = build.healSuppressionTime;
             build.applyHealSuppression(reload + 1f, effectColor);
 
@@ -137,7 +137,7 @@ public class Damage{
         tmpBuilding = null;
 
         boolean found = World.raycast(World.toTile(x1), World.toTile(y1), World.toTile(x2), World.toTile(y2),
-        (x, y) -> (tmpBuilding = world.build(x, y)) != null && tmpBuilding.team != team && tmpBuilding.block.absorbLasers);
+        (x, y) -> (tmpBuilding = world.build(x, y)) != null && team.canDamage(tmpBuilding.team) && tmpBuilding.block.absorbLasers);
 
         return found ? tmpBuilding : null;
     }
@@ -158,7 +158,7 @@ public class Damage{
         furthest = null;
 
         boolean found = World.raycast(b.tileX(), b.tileY(), World.toTile(b.x + vec.x), World.toTile(b.y + vec.y),
-        (x, y) -> (furthest = world.tile(x, y)) != null && furthest.team() != b.team && (furthest.build != null && furthest.build.absorbLasers()));
+        (x, y) -> (furthest = world.tile(x, y)) != null && b.team.canDamage(furthest.team()) && (furthest.build != null && furthest.build.absorbLasers()));
 
         return found && furthest != null ? Math.max(6f, b.dst(furthest.worldx(), furthest.worldy())) : length;
     }
@@ -179,7 +179,7 @@ public class Damage{
             //add distance to list so it can be processed
             var build = world.build(x, y);
 
-            if(build != null && build.team != b.team && build.collide(b) && b.checkUnderBuild(build, x * tilesize, y * tilesize)){
+            if(build != null && b.team.canDamage(build.team) && build.collide(b) && b.checkUnderBuild(build, x * tilesize, y * tilesize)){
                 distances.add(b.dst(build));
 
                 if(laser && build.absorbLasers()){
@@ -253,7 +253,7 @@ public class Damage{
             World.raycastEachWorld(x, y, seg2.x, seg2.y, (cx, cy) -> {
                 Building tile = world.build(cx, cy);
                 boolean collide = tile != null && tile.collide(hitter) && hitter.checkUnderBuild(tile, cx * tilesize, cy * tilesize)
-                    && ((tile.team != team && tile.collide(hitter)) || hitter.type.testCollision(hitter, tile)) && collidedBlocks.add(tile.pos());
+                    && ((team.canDamage(tile.team) && tile.collide(hitter)) || hitter.type.testCollision(hitter, tile)) && collidedBlocks.add(tile.pos());
                 if(collide){
                     collided.add(collidePool.obtain().set(cx * tilesize, cy * tilesize, tile));
 
@@ -300,7 +300,7 @@ public class Damage{
                 }else if(c.target instanceof Building tile){
                     float health = tile.health;
 
-                    if(tile.team != team && tile.collide(hitter)){
+                    if(team.canDamage(tile.team) && tile.collide(hitter)){
                         tile.collision(hitter);
                         hitter.type.hit(hitter, c.x, c.y);
                         collideCount[0]++;
@@ -330,7 +330,7 @@ public class Damage{
             if(build != null && hitter.damage > 0){
                 float health = build.health;
 
-                if(build.team != team && build.collide(hitter)){
+                if(team.canDamage(build.team) && build.collide(hitter)){
                     build.collision(hitter);
                     hitter.type.hit(hitter, x, y);
                 }
@@ -363,7 +363,7 @@ public class Damage{
         if(hitter.type.collidesGround){
             World.raycastEachWorld(x, y, x + vec.x, y + vec.y, (cx, cy) -> {
                 Building tile = world.build(cx, cy);
-                if(tile != null && tile.team != hitter.team){
+                if(tile != null && hitter.team.canDamage(tile.team)){
                     tmpBuilding = tile;
                     return true;
                 }
@@ -460,7 +460,7 @@ public class Damage{
     /** Applies a status effect to all enemy units in a range. */
     public static void status(Team team, float x, float y, float radius, StatusEffect effect, float duration, boolean air, boolean ground){
         Cons<Unit> cons = entity -> {
-            if(entity.team == team || !entity.checkTarget(air, ground) || !entity.hittable() || !entity.within(x, y, radius)){
+            if(!(team == null || team.isEnemy(entity.team)) || !entity.checkTarget(air, ground) || !entity.hittable() || !entity.within(x, y, radius)){
                 return;
             }
 
@@ -488,7 +488,7 @@ public class Damage{
     /** Damages all entities and blocks in a radius that are enemies of the team. */
     public static void damage(Team team, float x, float y, float radius, float damage, boolean complete, boolean air, boolean ground, boolean scaled, @Nullable Bullet source){
         Cons<Unit> cons = unit -> {
-            if(unit.team == team  || !unit.checkTarget(air, ground) || !unit.hittable() || !unit.within(x, y, radius + (scaled ? unit.hitSize / 2f : 0f))){
+            if(!(team == null || !team.canDamage(unit.team)) || !unit.checkTarget(air, ground) || !unit.hittable() || !unit.within(x, y, radius + (scaled ? unit.hitSize / 2f : 0f))){
                 return;
             }
 
@@ -540,7 +540,7 @@ public class Damage{
             //spawned inside a multiblock. this means that damage needs to be dealt directly.
             //why? because otherwise the building would absorb everything in one cell, which means much less damage than a nearby explosion.
             //this needs to be compensated
-            if(in != null && in.team != team && in.block.size > 1 && in.health > damage){
+            if(in != null && (team == null || team.canDamage(in.team)) && in.block.size > 1 && in.health > damage){
                 //deal the damage of an entire side, to be equivalent with maximum 'standard' damage
                 in.damage(team, damage * Math.min((in.block.size), baseRadius * 0.4f));
                 //no need to continue with the explosion
@@ -568,7 +568,7 @@ public class Damage{
 
                 while(startX != endX || startY != endY){
                     var build = world.build(startX, startY);
-                    if(build != null && build.team != team){
+                    if(build != null && (team == null || team.canDamage(build.team))){
                         //damage dealt at circle edge
                         float edgeScale = 0.6f;
                         float mult = (1f-(Mathf.dst2(startX, startY, x, y) / rad2) + edgeScale) / (1f + edgeScale);
@@ -615,7 +615,7 @@ public class Damage{
         for(int dx = -trad; dx <= trad; dx++){
             for(int dy = -trad; dy <= trad; dy++){
                 Tile tile = world.tile(Math.round(x / tilesize) + dx, Math.round(y / tilesize) + dy);
-                if(tile != null && tile.build != null && (team == null || team != tile.team()) && dx*dx + dy*dy <= trad*trad){
+                if(tile != null && tile.build != null && (team == null || team.canDamage(tile.team())) && dx*dx + dy*dy <= trad*trad){
                     tile.build.damage(team, damage);
                 }
             }
@@ -643,7 +643,7 @@ public class Damage{
             this.target = target;
             return this;
         }
-        
+
         @Override
         public void reset(){
             target = null;

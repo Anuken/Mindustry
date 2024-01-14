@@ -75,7 +75,7 @@ public class Router extends Block{
 
         @Override
         public boolean acceptItem(Building source, Item item){
-            return team == source.team && lastItem == null && items.total() == 0;
+            return source.team.canGiveItems(team) && lastItem == null && items.total() == 0;
         }
 
         @Override

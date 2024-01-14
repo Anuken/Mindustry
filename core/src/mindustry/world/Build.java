@@ -78,7 +78,7 @@ public class Build{
         if(tile == null) return;
 
         //auto-rotate the block to the correct orientation and bail out
-        if(tile.team() == team && tile.block == result && tile.build != null && tile.block.quickRotate){
+        if(team.canPlaceOver(tile.team()) && tile.block == result && tile.build != null && tile.block.quickRotate){
             if(unit != null && unit.getControllerName() != null) tile.build.lastAccessed = unit.getControllerName();
             int previous = tile.build.rotation;
             tile.build.rotation = Mathf.mod(rotation, 4);
@@ -130,7 +130,7 @@ public class Build{
         tmp.clear();
 
         tile.getLinkedTilesAs(result, t -> {
-            if(t.build != null && t.build.team == team && tmp.add(t.build.id)){
+            if(t.build != null && team.canPlaceOver(t.build.team) && tmp.add(t.build.id)){
                 prevBuild.add(t.build);
             }
         });
@@ -178,7 +178,7 @@ public class Build{
                         }
                     }
                 }
-                if(closest != null && closest.team != team){
+                if(closest != null && !team.ignoresBuildRadius(closest.team)){
                     return false;
                 }
             }else if(state.teams.anyEnemyCoresWithin(team, x * tilesize + type.offset, y * tilesize + type.offset, state.rules.enemyCoreBuildRadius + tilesize)){
@@ -284,6 +284,6 @@ public class Build{
     /** Returns whether the tile at this position is breakable by this team */
     public static boolean validBreak(Team team, int x, int y){
         Tile tile = world.tile(x, y);
-        return tile != null && tile.block().canBreak(tile) && tile.breakable() && tile.interactable(team);
+        return tile != null && tile.block().canBreak(tile) && tile.breakable() && team.canDeconstruct(tile.team());
     }
 }

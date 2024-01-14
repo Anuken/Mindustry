@@ -59,7 +59,7 @@ public class PointBulletType extends BulletType{
             b.collision(result, px, py);
         }else if(collidesTiles){
             Building build = Vars.world.buildWorld(px, py);
-            if(build != null && build.team != b.team){
+            if(build != null && b.team.canDamage(build.team)){
                 build.collision(b);
                  hit(b, px, py);
             }

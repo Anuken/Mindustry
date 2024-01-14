@@ -152,7 +152,7 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
                     plans.removeFirst();
                     continue;
                 }
-            }else if((tile.team() != team && tile.team() != Team.derelict) || (!current.breaking && (cb.current != current.block || cb.tile != current.tile()))){
+            }else if(!team.canAssistBuilding(tile.team()) || (!current.breaking && (cb.current != current.block || cb.tile != current.tile()))){
                 plans.removeFirst();
                 continue;
             }

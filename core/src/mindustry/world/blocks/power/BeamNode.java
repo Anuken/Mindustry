@@ -78,7 +78,7 @@ public class BeamNode extends PowerBlock{
                     break;
                 }
 
-                if(other != null && other.block.hasPower && other.team == Vars.player.team() && !(other.block instanceof PowerNode)){
+                if(other != null && other.block.hasPower && Vars.player.team().canAttach(other.team) && !(other.block instanceof PowerNode)){
                     maxLen = j;
                     dest = other;
                     break;
@@ -180,7 +180,7 @@ public class BeamNode extends PowerBlock{
                     }
 
                     //power nodes do NOT play nice with beam nodes, do not touch them as that forcefully modifies their links
-                    if(other != null && other.block.hasPower && other.block.connectedPower && other.team == team && !(other.block instanceof PowerNode)){
+                    if(other != null && other.block.hasPower && other.block.connectedPower && team.canAttach(other.team) && !(other.block instanceof PowerNode)){
                         links[i] = other;
                         dests[i] = world.tile(tile.x + j * dir.x, tile.y + j * dir.y);
                         break;

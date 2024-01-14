@@ -259,7 +259,7 @@ public class LExecutor{
                     //no units of this type found
                     exec.setconst(varUnit, null);
                 }
-            }else if(exec.obj(type) instanceof Unit u && (u.team == exec.team || exec.privileged) && u.type.logicControllable){
+            }else if(exec.obj(type) instanceof Unit u && (exec.team.canLogicUnits(u.team) || exec.privileged) && u.type.logicControllable){
                 //bind to specific unit object
                 exec.setconst(varUnit, u);
             }else{
@@ -334,9 +334,9 @@ public class LExecutor{
                         cache.found = false;
                         exec.setnum(outFound, 0);
                     }
-                    
-                    if(res != null && res.build != null && 
-                        (unit.within(res.build.x, res.build.y, Math.max(unit.range(), buildingRange)) || res.build.team == exec.team)){
+
+                    if(res != null && res.build != null &&
+                        (unit.within(res.build.x, res.build.y, Math.max(unit.range(), buildingRange)) || exec.team.canInteract(res.build.team))){
                         cache.build = res.build;
                         exec.setobj(outBuild, res.build);
                     }else{
@@ -380,7 +380,7 @@ public class LExecutor{
         /** Checks is a unit is valid for logic AI control, and returns the controller. */
         @Nullable
         public static LogicAI checkLogicAI(LExecutor exec, Object unitObj){
-            if(unitObj instanceof Unit unit && unit.isValid() && exec.obj(varUnit) == unit && (unit.team == exec.team || exec.privileged) && unit.controller().isLogicControllable()){
+            if(unitObj instanceof Unit unit && unit.isValid() && exec.obj(varUnit) == unit && (exec.team.canLogicUnits(unit.team) || exec.privileged) && unit.controller().isLogicControllable()){
                 if(unit.controller() instanceof LogicAI la){
                     la.controller = exec.building(varThis);
                     return la;
@@ -480,7 +480,7 @@ public class LExecutor{
                                 Building build = world.buildWorld(unit.x, unit.y);
 
                                 //TODO copy pasted code
-                                if(build != null && build.team == unit.team){
+                                if(build != null && unit.team.canTakeItems(build.team)){
                                     Payload current = build.getPayload();
                                     if(current != null && pay.canPickupPayload(current)){
                                         Call.pickedBuildPayload(unit, build, false);
@@ -495,7 +495,7 @@ public class LExecutor{
                     }
                     case payEnter -> {
                         Building build = world.buildWorld(unit.x, unit.y);
-                        if(build != null && unit.team() == build.team && build.canControlSelect(unit)){
+                        if(build != null && unit.team().canGiveItems(build.team) && build.canControlSelect(unit)){
                             Call.unitBuildingControlSelect(unit, build);
                         }
                     }
@@ -559,7 +559,7 @@ public class LExecutor{
                         }else{
                             Building build = exec.building(p1);
                             int dropped = Math.min(unit.stack.amount, exec.numi(p2));
-                            if(build != null && build.team == unit.team && build.isValid() && dropped > 0 && unit.within(build, logicItemTransferRange + build.block.size * tilesize/2f)){
+                            if(build != null && unit.team.canGiveItems(build.team) && build.isValid() && dropped > 0 && unit.within(build, logicItemTransferRange + build.block.size * tilesize/2f)){
                                 int accepted = build.acceptStack(unit.item(), dropped, unit);
                                 if(accepted > 0){
                                     Call.transferItemTo(unit, unit.item(), accepted, unit.x, unit.y, build);
@@ -574,7 +574,7 @@ public class LExecutor{
                         Building build = exec.building(p1);
                         int amount = exec.numi(p3);
 
-                        if(build != null && build.team == unit.team && build.isValid() && build.items != null &&
+                        if(build != null && unit.team.canTakeItems(build.team) && build.isValid() && build.items != null &&
                             exec.obj(p2) instanceof Item item && unit.within(build, logicItemTransferRange + build.block.size * tilesize/2f)){
                             int taken = Math.min(build.items.get(item), Math.min(amount, unit.maxAccepted(item)));
 
@@ -610,7 +610,7 @@ public class LExecutor{
         @Override
         public void run(LExecutor exec){
             Object obj = exec.obj(target);
-            if(obj instanceof Building b && (exec.privileged || (b.team == exec.team && exec.linkIds.contains(b.id)))){
+            if(obj instanceof Building b && (exec.privileged || (exec.team.canLogicBlocks(b.team) && exec.linkIds.contains(b.id)))){
 
                 if(type == LAccess.enabled && !exec.bool(p1)){
                     b.lastDisabler = exec.build;
@@ -665,7 +665,7 @@ public class LExecutor{
             int address = exec.numi(position);
             Building from = exec.building(target);
 
-            if(from instanceof MemoryBuild mem && (exec.privileged || from.team == exec.team)){
+            if(from instanceof MemoryBuild mem && (exec.privileged || exec.team.canInteract(from.team))){
 
                 exec.setnum(output, address < 0 || address >= mem.memory.length ? 0 : mem.memory[address]);
             }
@@ -689,7 +689,7 @@ public class LExecutor{
             int address = exec.numi(position);
             Building from = exec.building(target);
 
-            if(from instanceof MemoryBuild mem && (exec.privileged || from.team == exec.team) && address >= 0 && address < mem.memory.length){
+            if(from instanceof MemoryBuild mem && (exec.privileged || exec.team.canInteract(from.team)) && address >= 0 && address < mem.memory.length){
                 mem.memory[address] = exec.num(value);
             }
         }
@@ -772,7 +772,7 @@ public class LExecutor{
             int sortDir = exec.bool(sortOrder) ? 1 : -1;
             LogicAI ai = null;
 
-            if(base instanceof Ranged r && (exec.privileged || r.team() == exec.team) &&
+            if(base instanceof Ranged r && (exec.privileged || exec.team.canInteract(r.team())) &&
                 (base instanceof Building || (ai = UnitControlI.checkLogicAI(exec, base)) != null)){ //must be a building or a controllable unit
                 float range = r.range();
 
@@ -791,7 +791,7 @@ public class LExecutor{
                     if(enemies){
                         Seq<TeamData> data = state.teams.present;
                         for(int i = 0; i < data.size; i++){
-                            if(data.items[i].team != r.team()){
+                            if(r.team().isEnemy(data.items[i].team)){
                                 find(r, range, sortDir, data.items[i].team);
                             }
                         }
@@ -801,7 +801,12 @@ public class LExecutor{
                             find(r, range, sortDir, data.items[i].team);
                         }
                     }else{
-                        find(r, range, sortDir, r.team());
+                        Seq<TeamData> data = state.teams.present;
+                        for(int i = 0; i < data.size; i++){
+                            if(r.team().isAlly(data.items[i].team)){
+                                find(r, range, sortDir, data.items[i].team);
+                            }
+                        }
                     }
 
                     if(ai != null){
@@ -1043,7 +1048,7 @@ public class LExecutor{
             //graphics on headless servers are useless.
             if(Vars.headless) return;
 
-            if(exec.building(target) instanceof LogicDisplayBuild d && (d.team == exec.team || exec.privileged)){
+            if(exec.building(target) instanceof LogicDisplayBuild d && (exec.team.canInteract(d.team) || exec.privileged)){
                 if(d.commands.size + exec.graphicsBuffer.size < maxDisplayBuffer){
                     for(int i = 0; i < exec.graphicsBuffer.size; i++){
                         d.commands.addLast(exec.graphicsBuffer.items[i]);
@@ -1112,7 +1117,7 @@ public class LExecutor{
         @Override
         public void run(LExecutor exec){
 
-            if(exec.building(target) instanceof MessageBuild d && (d.team == exec.team || exec.privileged)){
+            if(exec.building(target) instanceof MessageBuild d && (exec.team.canInteract(d.team) || exec.privileged)){
 
                 d.message.setLength(0);
                 d.message.append(exec.textBuffer, 0, Math.min(exec.textBuffer.length(), maxTextBuffer));

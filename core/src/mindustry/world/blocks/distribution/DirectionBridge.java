@@ -94,7 +94,7 @@ public class DirectionBridge extends Block{
         for(int i = 1; i <= range; i++){
             Tile other = world.tile(x + dx * i, y + dy * i);
 
-            if(other != null && other.build instanceof DirectionBridgeBuild build && build.block == this && build.team == player.team()){
+            if(other != null && other.build instanceof DirectionBridgeBuild build && build.block == this && player.team().canGiveItems(build.team)){
                 length = i;
                 found = other.build;
                 break;
@@ -208,7 +208,7 @@ public class DirectionBridge extends Block{
         public DirectionBridgeBuild findLink(){
             for(int i = 1; i <= range; i++){
                 Tile other = tile.nearby(Geometry.d4x(rotation) * i, Geometry.d4y(rotation) * i);
-                if(other != null && other.build instanceof DirectionBridgeBuild build && build.block == DirectionBridge.this && build.team == team){
+                if(other != null && other.build instanceof DirectionBridgeBuild build && build.block == DirectionBridge.this && team.canGiveItems(build.team)){
                     return build;
                 }
             }

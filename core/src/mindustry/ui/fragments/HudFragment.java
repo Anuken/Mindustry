@@ -814,7 +814,7 @@ public class HudFragment{
             }
 
             if(!state.rules.waves && state.rules.attackMode){
-                int sum = Math.max(state.teams.present.sum(t -> t.team != player.team() ? t.cores.size : 0), 1);
+                int sum = Math.max(state.teams.present.sum(t -> player.team().isEnemy(t.team) ? t.cores.size : 0), 1);
                 builder.append(sum > 1 ? enemycsf.get(sum) : enemycf.get(sum));
                 return builder;
             }

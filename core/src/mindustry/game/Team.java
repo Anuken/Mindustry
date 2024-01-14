@@ -21,6 +21,7 @@ public class Team implements Comparable<Team>{
     public String emoji = "";
     public boolean hasPalette;
     public String name;
+    public int[] flags = new int[256];
 
     /** All 256 registered teams. */
     public static final Team[] all = new Team[256];
@@ -125,10 +126,76 @@ public class Team implements Comparable<Team>{
         return isAI() && !rules().rtsAi;
     }
 
-    /** @deprecated There is absolutely no reason to use this. */
-    @Deprecated
+    /** flag bindings */
     public boolean isEnemy(Team other){
-        return this != other;
+        if(other == null) return false;
+        return (this.flags[other.id] & TeamFlags.isNeutral) == 0;
+    }
+
+    /** used for rendering */
+    public boolean isAlly(Team other){
+        if(other == null) return false;
+        return (this.flags[other.id] & TeamFlags.allyCheck) == TeamFlags.allyCheck;
+    }
+
+    public boolean canDamage(Team other){
+        if(other == null) return false;
+        return (this.flags[other.id] & TeamFlags.cannotDamage) == 0;
+    }
+
+    public boolean canPlaceOver(Team other){
+        if(other == null) return false;
+        return (this.flags[other.id] & TeamFlags.canPlaceOver) != 0;
+    }
+
+    public boolean canDeconstruct(Team other){
+        if(other == null) return false;
+        return (this.flags[other.id] & TeamFlags.canDeconstruct) != 0;
+    }
+
+    public boolean canAssistBuilding(Team other){
+        if(other == null) return false;
+        return (this.flags[other.id] & TeamFlags.canAssistBuilding) != 0;
+    }
+
+    public boolean canAttach(Team other){
+        if(other == null) return false;
+        return (this.flags[other.id] & TeamFlags.canAttach) != 0;
+    }
+
+    public boolean canInteract(Team other){
+        if(other == null) return false;
+        return (this.flags[other.id] & TeamFlags.canInteract) != 0;
+    }
+
+    public boolean ignoresBuildRadius(Team other){
+        if(other == null) return false;
+        return (this.flags[other.id] & TeamFlags.ignoresBuildRadius) != 0;
+    }
+
+    public boolean canLogicBlocks(Team other){
+        if(other == null) return false;
+        return (this.flags[other.id] & TeamFlags.canLogicBlocks) != 0;
+    }
+
+    public boolean canLogicUnits(Team other){
+        if(other == null) return false;
+        return (this.flags[other.id] & TeamFlags.canLogicUnits) != 0;
+    }
+
+    public boolean canGiveItems(Team other){
+        if(other == null) return false;
+        return (this.flags[other.id] & TeamFlags.canGiveItems) != 0;
+    }
+
+    public boolean canTakeItems(Team other){
+        if(other == null) return false;
+        return (this.flags[other.id] & TeamFlags.canTakeItems) != 0;
+    }
+
+    //TODO might be easier to just OR-bitmask in fog code?
+    public boolean canSeeExplored(Team other){
+        return (this.flags[other.id] & TeamFlags.canSeeExplored) != 0;
     }
 
     public Seq<CoreBuild> cores(){

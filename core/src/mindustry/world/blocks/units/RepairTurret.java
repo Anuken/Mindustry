@@ -200,7 +200,11 @@ public class RepairTurret extends Block{
 
             if(timer(timerTarget, 20)){
                 rect.setSize(repairRadius * 2).setCenter(x, y);
-                target = Units.closest(team, x, y, repairRadius, Unit::damaged);
+                for(var td : state.teams.active){
+                    if(!team.isAlly(td.team)) continue;
+                    target = Units.closest(team, x, y, repairRadius, Unit::damaged);
+                    if(target != null) break;
+                }
             }
         }
 

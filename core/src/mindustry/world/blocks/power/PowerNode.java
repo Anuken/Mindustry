@@ -78,7 +78,7 @@ public class PowerNode extends PowerBlock{
 
                 power.links.addUnique(other.pos());
 
-                if(other.team == entity.team){
+                if(entity.team.canAttach(other.team)){
                     other.power.links.addUnique(entity.pos());
                 }
 
@@ -212,7 +212,7 @@ public class PowerNode extends PowerBlock{
 
         Boolf<Building> valid = other -> other != null && other.tile() != tile && other.block.connectedPower && other.power != null &&
             (other.block.outputsPower || other.block.consumesPower || other.block instanceof PowerNode) &&
-            overlaps(tile.x * tilesize + offset, tile.y * tilesize + offset, other.tile(), laserRange * tilesize) && other.team == team &&
+            overlaps(tile.x * tilesize + offset, tile.y * tilesize + offset, other.tile(), laserRange * tilesize) && team.isAlly(other.team) && team.canAttach(other.team) &&
             !graphs.contains(other.power.graph) &&
             !PowerNode.insulated(tile, other.tile) &&
             !(other instanceof PowerNodeBuild obuild && obuild.power.links.size >= ((PowerNode)obuild.block).maxNodes) &&
@@ -227,7 +227,7 @@ public class PowerNode extends PowerBlock{
         //add conducting graphs to prevent double link
         for(var p : Edges.getEdges(size)){
             Tile other = tile.nearby(p);
-            if(other != null && other.team() == team && other.build != null && other.build.power != null){
+            if(other != null && team.canAttach(other.team()) && other.build != null && other.build.power != null){
                 graphs.add(other.build.power.graph);
             }
         }
@@ -268,7 +268,7 @@ public class PowerNode extends PowerBlock{
         Boolf<Building> valid = other -> other != null && other.tile() != tile && other.block instanceof PowerNode node &&
         node.autolink &&
         other.power.links.size < node.maxNodes &&
-        node.overlaps(other.x, other.y, tile, block, node.laserRange * tilesize) && other.team == team
+        node.overlaps(other.x, other.y, tile, block, node.laserRange * tilesize) && team.canAttach(other.team)
         && !graphs.contains(other.power.graph) &&
         !PowerNode.insulated(tile, other.tile) &&
         !Structs.contains(Edges.getEdges(block.size), p -> { //do not link to adjacent buildings
@@ -282,7 +282,7 @@ public class PowerNode extends PowerBlock{
         //add conducting graphs to prevent double link
         for(var p : Edges.getEdges(block.size)){
             Tile other = tile.nearby(p);
-            if(other != null && other.team() == team && other.build != null && other.build.power != null
+            if(other != null && team.canAttach(other.team()) && other.build != null && other.build.power != null
                 && !(block.consumesPower && other.block().consumesPower && !block.outputsPower && !other.block().outputsPower)){
                 graphs.add(other.build.power.graph);
             }
@@ -342,7 +342,7 @@ public class PowerNode extends PowerBlock{
     }
 
     public boolean linkValid(Building tile, Building link, boolean checkMaxNodes){
-        if(tile == link || link == null || !link.block.hasPower || !link.block.connectedPower || tile.team != link.team) return false;
+        if(tile == link || link == null || !link.block.hasPower || !link.block.connectedPower || !(tile.team.canAttach(link.team) || link.team.canAttach(tile.team))) return false;
 
         if(overlaps(tile, link, laserRange * tilesize) || (link.block instanceof PowerNode node && overlaps(link, tile, node.laserRange * tilesize))){
             if(checkMaxNodes && link.block instanceof PowerNode node){

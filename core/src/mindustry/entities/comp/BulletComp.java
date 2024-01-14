@@ -50,7 +50,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     public void getCollisions(Cons<QuadTree> consumer){
         Seq<TeamData> data = state.teams.present;
         for(int i = 0; i < data.size; i++){
-            if(data.items[i].team != team){
+            if(team.canDamage(data.items[i].team)){
                 consumer.get(data.items[i].tree());
             }
         }
@@ -103,7 +103,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     @Replace
     @Override
     public boolean collides(Hitboxc other){
-        return type.collides && (other instanceof Teamc t && t.team() != team)
+        return type.collides && (other instanceof Teamc t && team.canDamage(t.team()))
             && !(other instanceof Flyingc f && !f.checkTarget(type.collidesAir, type.collidesGround))
             && !(type.pierce && hasCollided(other.id())); //prevent multiple collisions
     }
@@ -164,7 +164,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
             //direct hit on correct tile
             (aimTile != null && aimTile.build == build) ||
             //same team has no 'under build' mechanics
-            (build.team == team) ||
+            (team.isAlly(build.team)) ||
             //a piercing bullet overshot the aim tile, it's fine to hit things now
             (type.pierce && aimTile != null && Mathf.dst(x, y, originX, originY) > aimTile.dst(originX, originY) + 2f) ||
             //there was nothing to aim at
@@ -197,12 +197,12 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
             if(build != null && isAdded()
                 && checkUnderBuild(build, x * tilesize, y * tilesize)
                 && build.collide(self()) && type.testCollision(self(), build)
-                && !build.dead() && (type.collidesTeam || build.team != team) && !(type.pierceBuilding && hasCollided(build.id))){
+                && !build.dead() && (type.collidesTeam || team.canDamage(build.team)) && !(type.pierceBuilding && hasCollided(build.id))){
 
                 boolean remove = false;
                 float health = build.health;
 
-                if(build.team != team){
+                if(team.canDamage(build.team)){
                     remove = build.collision(self());
                 }
 

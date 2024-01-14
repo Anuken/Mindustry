@@ -56,7 +56,8 @@ public class PowerDiode extends Block{
         public void updateTile(){
             super.updateTile();
 
-            if(tile == null || front() == null || back() == null || !back().block.hasPower || !front().block.hasPower || back().team != team || front().team != team) return;
+            // maybe discard diode usage if back team doesn't match at all?
+            if(tile == null || front() == null || back() == null || !back().block.hasPower || !front().block.hasPower || !(team.canTakeItems(back().team) && team.canAttach(back().team)) || !team.canAttach(front().team)) return;
 
             PowerGraph backGraph = back().power.graph;
             PowerGraph frontGraph = front().power.graph;

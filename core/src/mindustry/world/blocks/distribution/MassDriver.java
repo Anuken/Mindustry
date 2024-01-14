@@ -260,7 +260,7 @@ public class MassDriver extends Block{
             if(link == other.pos()){
                 configure(-1);
                 return false;
-            }else if(other.block == block && other.dst(tile) <= range && other.team == team){
+            }else if(other.block == block && other.dst(tile) <= range && team.canAttach(other.team)){
                 configure(other.pos());
                 return false;
             }
@@ -299,7 +299,7 @@ public class MassDriver extends Block{
             smokeEffect.at(x + Angles.trnsx(angle, translation), y + Angles.trnsy(angle, translation), angle);
 
             Effect.shake(shake, shake, this);
-            
+
             shootSound.at(tile, Mathf.random(0.9f, 1.1f));
         }
 
@@ -331,7 +331,7 @@ public class MassDriver extends Block{
 
         protected boolean linkValid(){
             if(link == -1) return false;
-            return world.build(this.link) instanceof MassDriverBuild other && other.block == block && other.team == team && within(other, range);
+            return world.build(this.link) instanceof MassDriverBuild other && other.block == block && team.canAttach(other.team) && within(other, range);
         }
 
         @Override

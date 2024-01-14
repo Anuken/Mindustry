@@ -56,7 +56,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     static final BuildTeamChangeEvent teamChangeEvent = new BuildTeamChangeEvent();
     static final BuildDamageEvent bulletDamageEvent = new BuildDamageEvent();
     static int sleepingEntities = 0;
-    
+
     @Import float x, y, health, maxHealth;
     @Import Team team;
 
@@ -379,7 +379,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         float heat = 0f;
 
         for(var build : proximity){
-            if(build != null && build.team == team && build instanceof HeatBlock heater){
+            if(build != null && build.team.canGiveItems(team) && build instanceof HeatBlock heater){
 
 
                 boolean split = build.block instanceof HeatConductor cond && cond.splitHeat;
@@ -546,7 +546,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public boolean interactable(Team team){
-        return state.teams.canInteract(team, team());
+        return team.canInteract(team());
     }
 
     public float timeScale(){
@@ -716,7 +716,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     /** Returns the amount of items this block can accept. */
     public int acceptStack(Item item, int amount, Teamc source){
-        if(acceptItem(self(), item) && block.hasItems && (source == null || source.team() == team)){
+        if(acceptItem(self(), item) && block.hasItems && (source == null || source.team().canGiveItems(team))){
             return Math.min(getMaximumAccepted(item) - items.get(item), amount);
         }else{
             return 0;
@@ -765,7 +765,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         int trns = block.size/2 + 1;
         Tile next = tile.nearby(Geometry.d4(rotation).x * trns, Geometry.d4(rotation).y * trns);
 
-        if(next != null && next.build != null && next.build.team == team && next.build.acceptPayload(self(), todump)){
+        if(next != null && next.build != null && team.canGiveItems(next.build.team) && next.build.acceptPayload(self(), todump)){
             next.build.handlePayload(self(), todump);
             return true;
         }
@@ -881,7 +881,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         next = next.getLiquidDestination(self(), liquid);
 
-        if(next.team == team && next.block.hasLiquids && liquids.get(liquid) > 0f){
+        if(team.canGiveItems(next.team) && next.block.hasLiquids && liquids.get(liquid) > 0f){
             float ofract = next.liquids.get(liquid) / next.block.liquidCapacity;
             float fract = liquids.get(liquid) / block.liquidCapacity * block.liquidPressure;
             float flow = Math.min(Mathf.clamp((fract - ofract)) * (block.liquidCapacity), liquids.get(liquid));
@@ -1061,7 +1061,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     /** Try offloading an item to a nearby container in its facing direction. Returns true if success. */
     public boolean moveForward(Item item){
         Building other = front();
-        if(other != null && other.team == team && other.acceptItem(self(), item)){
+        if(other != null && team.canGiveItems(other.team) && other.acceptItem(self(), item)){
             other.handleItem(self(), item);
             return true;
         }
@@ -1118,7 +1118,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         for(Building other : proximity){
             if(other != null && other.power != null
-            && other.team == team
+            && team.canAttach(other.team)
             && !(block.consumesPower && other.block.consumesPower && !block.outputsPower && !other.block.outputsPower && !block.conductivePower && !other.block.conductivePower)
             && conductsTo(other) && other.conductsTo(self()) && !power.links.contains(other.pos())){
                 out.add(other);
@@ -1127,7 +1127,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         for(int i = 0; i < power.links.size; i++){
             Tile link = world.tile(power.links.get(i));
-            if(link != null && link.build != null && link.build.power != null && link.build.team == team) out.add(link.build);
+            if(link != null && link.build != null && link.build.power != null && team.canAttach(link.build.team)) out.add(link.build);
         }
         return out;
     }
@@ -1429,7 +1429,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         table.row();
 
         //only display everything else if the team is the same
-        if(team == player.team()){
+        if(player.team().canInteract(team)){
             table.table(bars -> {
                 bars.defaults().growX().height(18f).pad(4);
 
@@ -1712,7 +1712,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         for(Point2 point : nearby){
             Building other = world.build(tile.x + point.x, tile.y + point.y);
 
-            if(other == null || other.team != team) continue;
+            if(other == null || !team.canGiveItems(other.team)) continue;
 
             other.proximity.addUnique(self());
 

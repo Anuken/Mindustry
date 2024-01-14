@@ -26,7 +26,7 @@ public class DirectionalForceProjector extends Block{
     protected static DirectionalForceProjectorBuild paramEntity;
     protected static Effect paramEffect;
     protected static final Cons<Bullet> dirShieldConsumer = b -> {
-        if(b.team != paramEntity.team && b.type.absorbable){
+        if(b.team.canDamage(paramEntity.team) && b.type.absorbable){
             //just in case
             float deltaAdd = 1.1f;
 

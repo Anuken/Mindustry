@@ -93,7 +93,7 @@ public class RepairBeamWeapon extends Weapon{
 
     @Override
     protected boolean checkTarget(Unit unit, Teamc target, float x, float y, float range){
-        return !(target.within(unit, range + unit.hitSize/2f) && target.team() == unit.team && target instanceof Healthc u && u.damaged() && u.isValid());
+        return !(target.within(unit, range + unit.hitSize/2f) && !unit.team.isEnemy(target.team()) && target instanceof Healthc u && u.damaged() && u.isValid());
     }
 
     @Override
@@ -130,7 +130,7 @@ public class RepairBeamWeapon extends Weapon{
                 //snap to closest building
                 World.raycastEachWorld(wx, wy, heal.lastEnd.x, heal.lastEnd.y, (x, y) -> {
                     var build = Vars.world.build(x, y);
-                    if(build != null && build.team == unit.team && build.damaged()){
+                    if(build != null && !unit.team.isEnemy(build.team) && build.damaged()){
                         heal.target = build;
                         heal.lastEnd.set(x * tilesize, y * tilesize);
                         return true;

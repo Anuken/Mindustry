@@ -64,13 +64,15 @@ public final class FogRenderer{
             ScissorStack.push(rect.set(1, 1, staticFog.getWidth() - 2, staticFog.getHeight() - 2));
 
             Team team = player.team();
+            for(var td : state.teams.active){
+                if(!team.canSeeExplored(td.team)) continue;
+                for(var build : indexer.getFlagged(team, BlockFlag.hasFogRadius)){
+                    poly(build.x, build.y, build.fogRadius() * tilesize);
+                }
 
-            for(var build : indexer.getFlagged(team, BlockFlag.hasFogRadius)){
-                poly(build.x, build.y, build.fogRadius() * tilesize);
-            }
-
-            for(var unit : team.data().units){
-                poly(unit.x, unit.y, unit.type.fogRadius * tilesize);
+                for(var unit : team.data().units){
+                    poly(unit.x, unit.y, unit.type.fogRadius * tilesize);
+                }
             }
 
             dynamicFog.end();

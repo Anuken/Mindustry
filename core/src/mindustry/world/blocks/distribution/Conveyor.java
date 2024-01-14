@@ -216,7 +216,7 @@ public class Conveyor extends Block implements Autotiler{
             blending = bits[4];
 
             next = front();
-            nextc = next instanceof ConveyorBuild && next.team == team ? (ConveyorBuild)next : null;
+            nextc = next instanceof ConveyorBuild && team.canGiveItems(next.team) ? (ConveyorBuild)next : null;
             aligned = nextc != null && rotation == next.rotation;
         }
 
@@ -295,7 +295,7 @@ public class Conveyor extends Block implements Autotiler{
         }
 
         public boolean pass(Item item){
-            if(item != null && next != null && next.team == team && next.acceptItem(this, item)){
+            if(item != null && next != null && team.canGiveItems(next.team) && next.acceptItem(this, item)){
                 next.handleItem(this, item);
                 return true;
             }

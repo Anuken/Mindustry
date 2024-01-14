@@ -442,7 +442,7 @@ public class PayloadMassDriver extends PayloadBlock{
             if(link == other.pos()){
                 configure(-1);
                 return false;
-            }else if(other.block instanceof PayloadMassDriver && other.dst(tile) <= range && other.team == team){
+            }else if(other.block instanceof PayloadMassDriver && other.dst(tile) <= range && team.canAttach(other.team)){
                 configure(other.pos());
                 return false;
             }
@@ -456,7 +456,7 @@ public class PayloadMassDriver extends PayloadBlock{
         }
 
         protected boolean linkValid(){
-            return link != -1 && world.build(this.link) instanceof PayloadDriverBuild other && other.block == block && other.team == team && within(other, range);
+            return link != -1 && world.build(this.link) instanceof PayloadDriverBuild other && other.block == block && team.canAttach(other.team) && within(other, range);
         }
 
         @Override

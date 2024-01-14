@@ -72,7 +72,7 @@ public class BuildPlan implements Position, QuadTreeObject{
     public boolean isRotation(Team team){
         if(breaking) return false;
         Tile tile = tile();
-        return tile != null && tile.team() == team && tile.block() == block && tile.build != null && tile.build.rotation != rotation;
+        return tile != null && team.canPlaceOver(tile.team()) && tile.block() == block && tile.build != null && tile.build.rotation != rotation;
     }
 
     public boolean samePos(BuildPlan other){

@@ -215,8 +215,8 @@ public class Conduit extends LiquidBlock implements Autotiler{
             blending = bits[4];
 
             Building next = front(), prev = back();
-            capped = next == null || next.team != team || !next.block.hasLiquids;
-            backCapped = blendbits == 0 && (prev == null || prev.team != team || !prev.block.hasLiquids);
+            capped = next == null || !team.canGiveItems(next.team) || !next.block.hasLiquids;
+            backCapped = blendbits == 0 && (prev == null || !prev.team.canGiveItems(team) || !prev.block.hasLiquids);
         }
 
         @Override
