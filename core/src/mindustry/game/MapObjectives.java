@@ -112,23 +112,10 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
     /** Updates all objectives this executor contains. */
     public void update(){
         eachRunning(obj -> {
-            for(var marker : obj.markers){
-                if(!marker.wasAdded){
-                    marker.wasAdded = true;
-                    marker.added();
-                }
-            }
-
             //objectives cannot get completed on the client, but they do try to update for timers and such
             if(obj.update() && !net.client()){
                 obj.completed = true;
                 obj.done();
-                for(var marker : obj.markers){
-                    if(marker.wasAdded){
-                        marker.removed();
-                        marker.wasAdded = false;
-                    }
-                }
             }
 
             changed |= obj.changed;
@@ -627,8 +614,6 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
     /** Marker used for drawing various content to indicate something along with an objective. Mostly used as UI overlay.  */
     public static abstract class ObjectiveMarker{
-        /** Makes sure markers are only added once. */
-        public transient boolean wasAdded;
         /** Internal use only! Do not access. */
         public transient int arrayIndex;
 
@@ -649,12 +634,6 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         /** Called in the small and large map. */
         public void drawMinimap(MinimapRenderer minimap){}
-
-        /** Add any UI elements necessary. */
-        public void added(){}
-
-        /** Remove any UI elements, if necessary. */
-        public void removed(){}
 
         /** Whether the marker is hidden */
         public boolean isHidden(){
