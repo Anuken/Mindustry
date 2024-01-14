@@ -6,14 +6,12 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
-import mindustry.*;
 import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.game.*;
-import mindustry.game.MapObjectives.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.maps.Map;
@@ -403,11 +401,11 @@ public abstract class SaveVersion extends SaveFileReader{
     }
 
     public void writeMarkers(DataOutput stream) throws IOException{
-        JsonIO.writeBytes(Vars.state.markers, ObjectiveMarker.class, (DataOutputStream)stream);
+        state.markers.write(stream);
     }
 
     public void readMarkers(DataInput stream) throws IOException{
-        Vars.state.markers = JsonIO.readBytes(IntMap.class, ObjectiveMarker.class, (DataInputStream)stream);
+        state.markers.read(stream);
     }
 
     public void readTeamBlocks(DataInput stream) throws IOException{

@@ -372,6 +372,23 @@ public class Renderer implements ApplicationListener{
             });
         }
 
+        //draw objective markers
+        state.rules.objectives.eachRunning(obj -> {
+            for(var marker : obj.markers){
+                if(!marker.minimap){
+                    marker.drawWorld();
+                }
+            }
+        });
+
+        for(var marker : state.markers){
+            if(!marker.isHidden() && !marker.minimap){
+                marker.drawWorld();
+            }
+        }
+
+        Draw.reset();
+
         Draw.draw(Layer.overlayUI, overlays::drawTop);
         if(state.rules.fog) Draw.draw(Layer.fogOfWar, fog::drawFog);
         Draw.draw(Layer.space, this::drawLanding);

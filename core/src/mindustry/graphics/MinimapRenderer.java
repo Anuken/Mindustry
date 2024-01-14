@@ -255,12 +255,16 @@ public class MinimapRenderer{
 
         state.rules.objectives.eachRunning(obj -> {
             for(var marker : obj.markers){
-                marker.drawMinimap(this);
+                if(marker.minimap){
+                    marker.drawMinimap(this);
+                }
             }
         });
 
-        for(var marker : state.markers.values()){
-            if(marker != null) marker.drawMinimap(this);
+        for(var marker : state.markers){
+            if(!marker.isHidden() && marker.minimap){
+                marker.drawMinimap(this);
+            }
         }
     }
 
@@ -301,6 +305,14 @@ public class MinimapRenderer{
 
     public float scale(float radius){
         return worldSpace ? (radius / (baseSize / 2f)) * 5f * lastScl : lastW / rect.width * radius;
+    }
+
+    public float getScaleFactor(boolean zoomAutoScale){
+        if(!zoomAutoScale){
+            return worldSpace ? (1 / (baseSize / 2f)) * 5f * lastScl : lastW / rect.width;
+        }else{
+            return worldSpace ? (1 / (baseSize / 2f)) * 5f : lastW / 256f;
+        }
     }
 
     public @Nullable TextureRegion getRegion(){

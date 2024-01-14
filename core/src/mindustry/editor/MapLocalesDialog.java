@@ -5,6 +5,8 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
+import arc.scene.ui.Button.*;
+import arc.scene.ui.TextButton.*;
 import arc.scene.ui.layout.*;
 import arc.scene.utils.*;
 import arc.struct.*;
@@ -23,6 +25,15 @@ import static mindustry.Vars.*;
 public class MapLocalesDialog extends BaseDialog{
     /** Width of UI property card. */
     private static final float cardWidth = 400f;
+    /** Style for filter options buttons */
+    private static final TextButtonStyle filterStyle = new TextButtonStyle(){{
+        up = down = checked = over = Tex.whitePane;
+        font = Fonts.outline;
+        fontColor = Color.lightGray;
+        overFontColor = Pal.accent;
+        disabledFontColor = Color.gray;
+        disabled = Styles.black;
+    }};
     /** Icons for use in map locales dialog. */
     private static final ContentType[] contentIcons = {ContentType.item, ContentType.block, ContentType.liquid, ContentType.status, ContentType.unit};
 
@@ -168,7 +179,7 @@ public class MapLocalesDialog extends BaseDialog{
                 String name = loc.toString();
 
                 if(locales.containsKey(name)){
-                    p.button(loc.getDisplayName(), Styles.flatTogglet, () -> {
+                    p.button(loc.getDisplayName(Core.bundle.getLocale()), Styles.flatTogglet, () -> {
                         if(name.equals(selectedLocale)) return;
 
                         selectedLocale = name;
@@ -195,8 +206,8 @@ public class MapLocalesDialog extends BaseDialog{
 
         main.image().color(Pal.gray).height(3f).growX().expandY().top().row();
         main.pane(p -> {
-            int cols = (Core.graphics.getWidth() - 380) / ((int)cardWidth + 10);
-            if(props.size == 0 || cols == 0){
+            int cols = Math.max(1, (Core.graphics.getWidth() - 630) / ((int)cardWidth + 10));
+            if(props.size == 0){
                 main.add("@empty").center().row();
                 return;
             }
@@ -343,7 +354,7 @@ public class MapLocalesDialog extends BaseDialog{
                 String name = loc.toString();
 
                 if(!locales.containsKey(name)){
-                    t.button(loc.getDisplayName(), Styles.flatTogglet, () -> {
+                    t.button(loc.getDisplayName(Core.bundle.getLocale()), Styles.flatTogglet, () -> {
                         if(name.equals(selectedLocale)) return;
 
                         locales.put(name, new StringMap());
@@ -524,12 +535,12 @@ public class MapLocalesDialog extends BaseDialog{
                 if(status == PropertyStatus.same && !showSame) continue;
 
                 if(status != PropertyStatus.missing){
-                    var comparsionString = (searchByValue ? locales.get(name).get(key).toLowerCase() : loc.getDisplayName().toLowerCase());
+                    var comparsionString = (searchByValue ? locales.get(name).get(key).toLowerCase() : loc.getDisplayName(Core.bundle.getLocale()).toLowerCase());
                     if(!searchString.isEmpty() && !comparsionString.contains(searchString.toLowerCase())) continue;
                 }
 
                 colTables[i].table(Tex.whitePane, t -> {
-                    t.add(loc.getDisplayName()).left().color(Pal.accent).row();
+                    t.add(loc.getDisplayName(Core.bundle.getLocale())).left().color(Pal.accent).row();
                     t.image().color(Pal.accent).fillX().row();
 
                     if(status == PropertyStatus.missing){
@@ -576,26 +587,24 @@ public class MapLocalesDialog extends BaseDialog{
             }).padTop(5f);
         }).row();
 
-        dialog.cont.table(Tex.whitePane, t ->
-        t.button("@locales.showcorrect", Icon.ok, Styles.nonet, () -> showCorrect = !showCorrect).update(b -> {
+        dialog.cont.button("@locales.showcorrect", Icon.ok, filterStyle, () -> showCorrect = !showCorrect).update(b -> {
             ((Image)b.getChildren().get(1)).setDrawable(showCorrect ? Icon.ok : Icon.cancel);
             b.setChecked(showCorrect);
-        }).grow().pad(15f)).size(450f, 100f).color(Pal.gray).padTop(50f);
+        }).size(450f, 100f).color(Pal.gray).padTop(65f);
 
         dialog.cont.row();
 
-        dialog.cont.table(Tex.whitePane, t ->
-            t.button("@locales.showmissing", Icon.ok, Styles.nonet, () -> showMissing = !showMissing).update(b -> {
-                ((Image)b.getChildren().get(1)).setDrawable(showMissing ? Icon.ok : Icon.cancel);
-                b.setChecked(showMissing);
-        }).grow().pad(15f)).size(450f, 100f).color(Pal.accent).padTop(50f);
+        dialog.cont.button("@locales.showmissing", Icon.ok, filterStyle, () -> showMissing = !showMissing).update(b -> {
+            ((Image)b.getChildren().get(1)).setDrawable(showMissing ? Icon.ok : Icon.cancel);
+            b.setChecked(showMissing);
+        }).size(450f, 100f).color(Pal.accent).padTop(65f);
 
         dialog.cont.row();
-        dialog.cont.table(Tex.whitePane, t ->
-            t.button("@locales.showsame", Icon.ok, Styles.nonet, () -> showSame = !showSame).update(b -> {
-                ((Image)b.getChildren().get(1)).setDrawable(showSame ? Icon.ok : Icon.cancel);
-                b.setChecked(showSame);
-        }).grow().pad(15f)).size(450f, 100f).color(Pal.techBlue).padTop(50f);
+
+        dialog.cont.button("@locales.showsame", Icon.ok, filterStyle, () -> showSame = !showSame).update(b -> {
+            ((Image)b.getChildren().get(1)).setDrawable(showSame ? Icon.ok : Icon.cancel);
+            b.setChecked(showSame);
+        }).size(450f, 100f).color(Pal.techBlue).padTop(65f);
 
         dialog.buttons.button("@back", Icon.left, () -> {
             hidden.run();
