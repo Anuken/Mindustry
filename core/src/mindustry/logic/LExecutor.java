@@ -62,7 +62,7 @@ public class LExecutor{
     public boolean privileged = false;
 
     //yes, this is a minor memory leak, but it's probably not significant enough to matter
-    protected IntFloatMap unitTimeouts = new IntFloatMap();
+    protected static IntFloatMap unitTimeouts = new IntFloatMap();
 
     boolean timeoutDone(Unit unit, float delay){
         return Time.time >= unitTimeouts.get(unit.id) + delay;
