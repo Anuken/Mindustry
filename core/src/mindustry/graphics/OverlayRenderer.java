@@ -173,7 +173,7 @@ public class OverlayRenderer{
                     float offset = (i == 0 ? -2f : 0f);
                     for(CoreEdge edge : cedges){
                         Team displayed = edge.displayed();
-                        if(displayed != null){
+                        if(displayed != null && !player.team().ignoresBuildRadius(displayed)){
                             Draw.color(i == 0 ? Color.darkGray : Tmp.c1.set(displayed.color).lerp(Pal.accent, Mathf.absin(Time.time, 10f, 0.2f)));
                             Lines.line(edge.x1, edge.y1 + offset, edge.x2, edge.y2 + offset);
                         }

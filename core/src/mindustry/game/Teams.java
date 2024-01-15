@@ -95,7 +95,7 @@ public class Teams{
 
     public void eachRadiusCore(Team team, Cons<Building> ret){
         for(TeamData data : active){
-            if(team.ignoresBuildRadius(data.team)){
+            if(!team.ignoresBuildRadius(data.team)){
                 for(Building tile : data.cores){
                     ret.get(tile);
                 }
