@@ -1156,27 +1156,35 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public void baseDraw(float x, float y, float scaleFactor){
             if(textureName.isEmpty()) return;
 
-            if(fetchedRegion == null) fetchedRegion = Core.atlas.find(textureName);
+            if(fetchedRegion == null) setTexture(textureName);
 
             // Zero width/height scales marker to original texture's size
             if(Mathf.equal(width, 0f)) width = fetchedRegion.width * fetchedRegion.scl() * Draw.xscl;
             if(Mathf.equal(height, 0f)) height = fetchedRegion.height * fetchedRegion.scl() * Draw.yscl;
 
             Draw.z(drawLayer);
-            if(fetchedRegion.found()){
-                Draw.color(color);
-                Draw.rect(fetchedRegion, x, y, width * scaleFactor, height * scaleFactor, rotation);
-            }else{
-                Draw.color(Color.white);
-                Draw.rect("error", x, y, width * scaleFactor, height * scaleFactor, rotation);
-            }
+            Draw.color(color);
+            Draw.rect(fetchedRegion, x, y, width * scaleFactor, height * scaleFactor, rotation);
         }
 
         @Override
         public void setTexture(String textureName){
             this.textureName = textureName;
-            fetchedRegion = Core.atlas.find(textureName);
+
+            if(fetchedRegion == null) fetchedRegion = new TextureRegion();
+
+            TextureRegion region = Core.atlas.find(textureName);
+            if(region.found()){
+               fetchedRegion.set(region);
+            }else{
+                if(Core.assets.isLoaded(textureName, Texture.class)){
+                    fetchedRegion.set(Core.assets.get(textureName, Texture.class));
+                }else{
+                    fetchedRegion.set(Core.atlas.find("error"));
+                }
+            }
         }
+
     }
 
     /** For arrays or {@link Seq}s; does not create element rearrangement buttons. */
