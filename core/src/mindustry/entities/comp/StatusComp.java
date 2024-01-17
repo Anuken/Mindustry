@@ -130,7 +130,7 @@ abstract class StatusComp implements Posc, Flyingc{
     /** Uses a dynamic status effect to override speed. */
     public void statusSpeed(float speed){
         //type.speed should never be 0
-        applyDynamicStatus().speedMultiplier = speed / type.speed;
+        applyDynamicStatus().speedMultiplier = speed / (type.speed * 60f / 8f);
     }
 
     /** Uses a dynamic status effect to change damage. */

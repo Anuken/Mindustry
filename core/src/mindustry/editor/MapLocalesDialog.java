@@ -720,7 +720,7 @@ public class MapLocalesDialog extends BaseDialog{
         if(!locales.containsKey(key)) return "";
 
         for(var prop : locales.get(key).entries()){
-            data.append(prop.key).append(" = ").append(prop.value).append("\n");
+            data.append(prop.key).append(" = ").append(prop.value.replace("\n", "\\n")).append("\n");
         }
 
         return data.toString();
@@ -738,7 +738,7 @@ public class MapLocalesDialog extends BaseDialog{
             }else{
                 int sepIndex = line.indexOf(" = ");
                 if(sepIndex != -1 && !currentLocale.isEmpty()){
-                    bundles.get(currentLocale).put(line.substring(0, sepIndex), line.substring(sepIndex + 3));
+                    bundles.get(currentLocale).put(line.substring(0, sepIndex), line.substring(sepIndex + 3).replace("\\n", "\n"));
                 }
             }
         }
@@ -752,7 +752,7 @@ public class MapLocalesDialog extends BaseDialog{
         for(var line : data.split("\\r?\\n|\\r")){
             int sepIndex = line.indexOf(" = ");
             if(sepIndex != -1){
-                map.put(line.substring(0, sepIndex), line.substring(sepIndex + 3));
+                map.put(line.substring(0, sepIndex), line.substring(sepIndex + 3).replace("\\n", "\n"));
             }
         }
 
