@@ -39,6 +39,8 @@ public class Rules{
     public boolean attackMode = false;
     /** Whether this is the editor gamemode. */
     public boolean editor = false;
+    /** Whether blocks can be repaired by clicking them. */
+    public boolean derelictRepair = true;
     /** Whether a gameover can happen at all. Set this to false to implement custom gameover conditions. */
     public boolean canGameOver = true;
     /** Whether cores change teams when they are destroyed. */

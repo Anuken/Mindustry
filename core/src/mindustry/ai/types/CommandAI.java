@@ -20,6 +20,7 @@ public class CommandAI extends AIController{
     protected static final int maxCommandQueueSize = 50, avoidInterval = 10;
     protected static final Vec2 vecOut = new Vec2(), vecMovePos = new Vec2();
     protected static final boolean[] noFound = {false};
+    protected static final UnitPayload tmpPayload = new UnitPayload(null);
 
     public Seq<Position> commandQueue = new Seq<>(5);
     public @Nullable Vec2 targetPos;
@@ -29,6 +30,8 @@ public class CommandAI extends AIController{
     public int groupIndex = 0;
     /** All encountered unreachable buildings of this AI. Why a sequence? Because contains() is very rarely called on it. */
     public IntSeq unreachableBuildings = new IntSeq(8);
+    /** ID of unit read as target. This is set up after reading. Do not access! */
+    public int readAttackTarget = -1;
 
     protected boolean stopAtTarget, stopWhenInRange;
     protected Vec2 lastTargetPos;
@@ -39,7 +42,7 @@ public class CommandAI extends AIController{
     /** Stance, usually related to firing mode. */
     public UnitStance stance = UnitStance.shoot;
     /** Current command this unit is following. */
-    public @Nullable UnitCommand command;
+    public UnitCommand command = UnitCommand.moveCommand;
     /** Current controller instance based on command. */
     protected @Nullable AIController commandController;
     /** Last command type assigned. Used for detecting command changes. */
@@ -145,6 +148,15 @@ public class CommandAI extends AIController{
             }
         }
 
+        if(!net.client() && command == UnitCommand.enterPayloadCommand && unit.buildOn() != null && (targetPos == null || (world.buildWorld(targetPos.x, targetPos.y) != null && world.buildWorld(targetPos.x, targetPos.y) == unit.buildOn()))){
+            var build = unit.buildOn();
+            tmpPayload.unit = unit;
+            if(build.team == unit.team && build.acceptPayload(build, tmpPayload)){
+                Call.unitEnteredPayload(unit, build);
+                return; //no use updating after this, the unit is gone!
+            }
+        }
+
         //acquiring naval targets isn't supported yet, so use the fallback dumb AI
         if(unit.team.isAI() && unit.team.rules().rtsAi && unit.type.naval){
             if(fallback == null) fallback = new GroundAI();
@@ -198,12 +210,13 @@ public class CommandAI extends AIController{
             vecOut.set(targetPos);
             vecMovePos.set(targetPos);
 
-            if(group != null && group.valid && groupIndex < group.units.size){
+            //the enter payload command requires an exact position
+            if(group != null && group.valid && groupIndex < group.units.size && command != UnitCommand.enterPayloadCommand){
                 vecMovePos.add(group.positions[groupIndex * 2], group.positions[groupIndex * 2 + 1]);
             }
 
             //TODO: should the unit stop when it finds a target?
-            if(stance == UnitStance.patrol && target != null && unit.within(target, unit.type.range - 2f)){
+            if(stance == UnitStance.patrol && target != null && unit.within(target, unit.type.range - 2f) && !unit.type.circleTarget){
                 move = false;
             }
 
@@ -273,14 +286,14 @@ public class CommandAI extends AIController{
                 attackTarget = null;
             }
 
-            if(unit.isFlying() && move){
+            if(unit.isFlying() && move && (attackTarget == null || !unit.within(attackTarget, unit.type.range))){
                 unit.lookAt(vecMovePos);
             }else{
                 faceTarget();
             }
 
             //reached destination, end pathfinding
-            if(attackTarget == null && unit.within(vecMovePos, Math.max(5f, unit.hitSize / 2f))){
+            if(attackTarget == null && unit.within(vecMovePos, command.exactArrival && commandQueue.size == 0 ? 1f : Math.max(5f, unit.hitSize / 2f))){
                 finishPath();
             }
 
@@ -295,6 +308,11 @@ public class CommandAI extends AIController{
     }
 
     void finishPath(){
+        //the enter payload command never finishes until they are actually accepted
+        if(command == UnitCommand.enterPayloadCommand && commandQueue.size == 0 && targetPos != null && world.buildWorld(targetPos.x, targetPos.y) != null && world.buildWorld(targetPos.x, targetPos.y).block.acceptsPayloads){
+            return;
+        }
+
         Vec2 prev = targetPos;
         targetPos = null;
 
@@ -330,6 +348,14 @@ public class CommandAI extends AIController{
             }
         }else if(commandQueue.size < maxCommandQueueSize && !commandQueue.contains(location)){
             commandQueue.add(location);
+        }
+    }
+
+    @Override
+    public void afterRead(Unit unit){
+        if(readAttackTarget != -1){
+            attackTarget = Groups.unit.getByID(readAttackTarget);
+            readAttackTarget = -1;
         }
     }
 
@@ -382,6 +408,8 @@ public class CommandAI extends AIController{
 
     @Override
     public void commandPosition(Vec2 pos){
+        if(pos == null) return;
+
         commandPosition(pos, false);
         if(commandController != null){
             commandController.commandPosition(pos);
@@ -389,8 +417,10 @@ public class CommandAI extends AIController{
     }
 
     public void commandPosition(Vec2 pos, boolean stopWhenInRange){
-        targetPos = pos;
-        lastTargetPos = pos;
+        if(pos == null) return;
+
+        //this is an allocation, but it's relatively rarely called anyway, and outside mutations must be prevented
+        targetPos = lastTargetPos = pos.cpy();
         attackTarget = null;
         pathId = Vars.controlPath.nextTargetId();
         this.stopWhenInRange = stopWhenInRange;

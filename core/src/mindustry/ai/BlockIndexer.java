@@ -158,12 +158,13 @@ public class BlockIndexer{
             int pos = tile.pos();
             var seq = ores[drop.id][qx][qy];
 
-            //when the drop can be mined, record the ore position
-            if(tile.block() == Blocks.air && !seq.contains(pos)){
-                seq.add(pos);
-                allOres.increment(drop);
-            }else{
-                //otherwise, it likely became blocked, remove it (even if it wasn't there)
+            if(tile.block() == Blocks.air){
+                //add the index if it is a valid new spot to mine at
+                if(!seq.contains(pos)){
+                    seq.add(pos);
+                    allOres.increment(drop);
+                }
+            }else if(seq.contains(pos)){ //otherwise, it likely became blocked, remove it
                 seq.removeValue(pos);
                 allOres.increment(drop, -1);
             }

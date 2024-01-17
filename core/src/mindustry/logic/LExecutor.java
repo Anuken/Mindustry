@@ -14,11 +14,13 @@ import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.game.*;
+import mindustry.game.EventType.*;
 import mindustry.game.MapObjectives.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.logic.LogicFx.*;
 import mindustry.type.*;
+import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.logic.*;
@@ -49,6 +51,7 @@ public class LExecutor{
     public Var[] vars = {};
     public Var counter;
     public int[] binds;
+    public boolean yield;
 
     public int iptIndex = -1;
     public LongSeq graphicsBuffer = new LongSeq();
@@ -60,7 +63,11 @@ public class LExecutor{
     public boolean privileged = false;
 
     //yes, this is a minor memory leak, but it's probably not significant enough to matter
-    protected IntFloatMap unitTimeouts = new IntFloatMap();
+    protected static IntFloatMap unitTimeouts = new IntFloatMap();
+
+    static{
+        Events.on(ResetEvent.class, e -> unitTimeouts.clear());
+    }
 
     boolean timeoutDone(Unit unit, float delay){
         return Time.time >= unitTimeouts.get(unit.id) + delay;
@@ -121,7 +128,7 @@ public class LExecutor{
 
     public Var var(int index){
         //global constants have variable IDs < 0, and they are fetched from the global constants object after being negated
-        return index < 0 ? logicVars.get(-index) : vars[index];
+        return index < 0 ? logicVars.get(-index, privileged) : vars[index];
     }
 
     /** @return a Var from this processor, never a global constant. May be null if out of bounds. */
@@ -160,9 +167,21 @@ public class LExecutor{
         return v.isobj ? v.objval != null ? 1 : 0 : invalid(v.numval) ? 0 : v.numval;
     }
 
+    /** Get num value from variable, convert null to NaN to handle it differently in some instructions */
+    public double numOrNan(int index){
+        Var v = var(index);
+        return v.isobj ? v.objval != null ? 1 : Double.NaN : invalid(v.numval) ? 0 : v.numval;
+    }
+
     public float numf(int index){
         Var v = var(index);
         return v.isobj ? v.objval != null ? 1 : 0 : invalid(v.numval) ? 0 : (float)v.numval;
+    }
+
+    /** Get float value from variable, convert null to NaN to handle it differently in some instructions */
+    public float numfOrNan(int index){
+        Var v = var(index);
+        return v.isobj ? v.objval != null ? 1 : Float.NaN : invalid(v.numval) ? 0 : (float)v.numval;
     }
 
     public int numi(int index){
@@ -944,12 +963,6 @@ public class LExecutor{
             //graphics on headless servers are useless.
             if(Vars.headless || exec.graphicsBuffer.size >= maxGraphicsBuffer) return;
 
-            int num1 = exec.numi(p1);
-
-            if(type == LogicDisplay.commandImage){
-                num1 = exec.obj(p1) instanceof UnlockableContent u ? u.iconId : 0;
-            }
-
             //explicitly unpack colorPack, it's pre-processed here
             if(type == LogicDisplay.commandColorPack){
                 double packed = exec.num(x);
@@ -961,7 +974,63 @@ public class LExecutor{
                 a = ((value & 0x000000ff));
 
                 exec.graphicsBuffer.add(DisplayCmd.get(LogicDisplay.commandColor, pack(r), pack(g), pack(b), pack(a), 0, 0));
+            }else if(type == LogicDisplay.commandPrint){
+                CharSequence str = exec.textBuffer;
+
+                if(str.length() > 0){
+                    var data = Fonts.logic.getData();
+                    int advance = (int)data.spaceXadvance, lineHeight = (int)data.lineHeight;
+
+                    int xOffset, yOffset;
+                    int align = p1; //p1 is not a variable, it's a raw align value. what a massive hack
+
+                    int maxWidth = 0, lines = 1, lineWidth = 0;
+                    for(int i = 0; i < str.length(); i++){
+                        char next = str.charAt(i);
+                        if(next == '\n'){
+                            maxWidth = Math.max(maxWidth, lineWidth);
+                            lineWidth = 0;
+                            lines ++;
+                        }else{
+                            lineWidth ++;
+                        }
+                    }
+                    maxWidth = Math.max(maxWidth, lineWidth);
+
+                    float
+                    width = maxWidth * advance,
+                    height = lines * lineHeight,
+                    ha = ((Align.isLeft(align) ? -1f : 0f) + 1f + (Align.isRight(align) ? 1f : 0f))/2f,
+                    va = ((Align.isBottom(align) ? -1f : 0f) + 1f + (Align.isTop(align) ? 1f : 0f))/2f;
+
+                    xOffset = -(int)(width * ha);
+                    yOffset = -(int)(height * va) + (lines - 1) * lineHeight;
+
+
+                    int curX = exec.numi(x), curY = exec.numi(y);
+                    for(int i = 0; i < str.length(); i++){
+                        char next = str.charAt(i);
+                        if(next == '\n'){
+                            //move Y down when newline is encountered
+                            curY -= lineHeight;
+                            curX = exec.numi(x); //reset
+                            continue;
+                        }
+                        if(Fonts.logic.getData().hasGlyph(next)){
+                            exec.graphicsBuffer.add(DisplayCmd.get(LogicDisplay.commandPrint, packSign(curX + xOffset), packSign(curY + yOffset), next, 0, 0, 0));
+                        }
+                        curX += advance;
+                    }
+
+                    exec.textBuffer.setLength(0);
+                }
             }else{
+                int num1 = exec.numi(p1);
+
+                if(type == LogicDisplay.commandImage){
+                    num1 = exec.obj(p1) instanceof UnlockableContent u ? u.iconId : 0;
+                }
+
                 //add graphics calls, cap graphics buffer size
                 exec.graphicsBuffer.add(DisplayCmd.get(type, packSign(exec.numi(x)), packSign(exec.numi(y)), packSign(num1), packSign(exec.numi(p2)), packSign(exec.numi(p3)), packSign(exec.numi(p4))));
             }
@@ -1047,6 +1116,55 @@ public class LExecutor{
         }
     }
 
+    public static class FormatI implements LInstruction{
+        public int value;
+
+        public FormatI(int value){
+            this.value = value;
+        }
+
+        FormatI(){}
+
+        @Override
+        public void run(LExecutor exec){
+
+            if(exec.textBuffer.length() >= maxTextBuffer) return;
+
+            int placeholderIndex = -1;
+            int placeholderNumber = 10;
+
+            for(int i = 0; i < exec.textBuffer.length(); i++){
+                if(exec.textBuffer.charAt(i) == '{' && exec.textBuffer.length() - i > 2){
+                    char numChar = exec.textBuffer.charAt(i + 1);
+
+                    if(numChar >= '0' && numChar <= '9' && exec.textBuffer.charAt(i + 2) == '}'){
+                        if(numChar - '0' < placeholderNumber){
+                            placeholderNumber = numChar - '0';
+                            placeholderIndex = i;
+                        }
+                    }
+                }
+            }
+
+            if(placeholderIndex == -1) return;
+
+            //this should avoid any garbage allocation
+            Var v = exec.var(value);
+            if(v.isobj && value != 0){
+                String strValue = PrintI.toString(v.objval);
+
+                exec.textBuffer.replace(placeholderIndex, placeholderIndex + 3, strValue);
+            }else{
+                //display integer version when possible
+                if(Math.abs(v.numval - (long)v.numval) < 0.00001){
+                    exec.textBuffer.replace(placeholderIndex, placeholderIndex + 3, (long)v.numval + "");
+                }else{
+                    exec.textBuffer.replace(placeholderIndex, placeholderIndex + 3, v.numval + "");
+                }
+            }
+        }
+    }
+
     public static class PrintFlushI implements LInstruction{
         public int target;
 
@@ -1128,6 +1246,7 @@ public class LExecutor{
             }else{
                 //skip back to self.
                 exec.var(varCounter).numval --;
+                exec.yield = true;
             }
 
             if(state.updateId != frameId){
@@ -1143,6 +1262,7 @@ public class LExecutor{
         public void run(LExecutor exec){
             //skip back to self.
             exec.var(varCounter).numval --;
+            exec.yield = true;
         }
     }
 
@@ -1257,13 +1377,20 @@ public class LExecutor{
                         exec.setobj(result, i < 0 || i >= builds.size ? null : builds.get(i));
                     }
                 }
-                case unitCount -> exec.setnum(result, data.units.size);
+                case unitCount -> {
+                    UnitType type = exec.obj(extra) instanceof UnitType u ? u : null;
+                    if(type == null){
+                        exec.setnum(result, data.units.size);
+                    }else{
+                        exec.setnum(result, data.unitsByType[type.id].size);
+                    }
+                }
                 case coreCount -> exec.setnum(result, data.cores.size);
                 case playerCount -> exec.setnum(result, data.players.size);
                 case buildCount -> {
                     Block block = exec.obj(extra) instanceof Block b ? b : null;
                     if(block == null){
-                        exec.setobj(result, null);
+                        exec.setnum(result, data.buildings.size);
                     }else{
                         exec.setnum(result, data.getBuildings(block).size);
                     }
@@ -1456,7 +1583,8 @@ public class LExecutor{
                 case ban -> {
                     Object cont = exec.obj(value);
                     if(cont instanceof Block b){
-                        state.rules.bannedBlocks.add(b);
+                        // Rebuild PlacementFragment if anything has changed
+                        if(state.rules.bannedBlocks.add(b) && !headless) ui.hudfrag.blockfrag.rebuild();
                     }else if(cont instanceof UnitType u){
                         state.rules.bannedUnits.add(u);
                     }
@@ -1464,7 +1592,7 @@ public class LExecutor{
                 case unban -> {
                     Object cont = exec.obj(value);
                     if(cont instanceof Block b){
-                        state.rules.bannedBlocks.remove(b);
+                        if(state.rules.bannedBlocks.remove(b) && !headless) ui.hudfrag.blockfrag.rebuild();
                     }else if(cont instanceof UnitType u){
                         state.rules.bannedUnits.remove(u);
                     }
@@ -1539,11 +1667,12 @@ public class LExecutor{
 
     public static class FlushMessageI implements LInstruction{
         public MessageType type = MessageType.announce;
-        public int duration;
+        public int duration, outSuccess;
 
-        public FlushMessageI(MessageType type, int duration){
+        public FlushMessageI(MessageType type, int duration, int outSuccess){
             this.type = type;
             this.duration = duration;
+            this.outSuccess = outSuccess;
         }
 
         public FlushMessageI(){
@@ -1551,16 +1680,20 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            if(headless && type != MessageType.mission) return;
+            //set default to success
+            exec.setnum(outSuccess, 1);
+            if(headless && type != MessageType.mission) {
+                exec.textBuffer.setLength(0);
+                return;
+            }
 
-            //skip back to self until possible
-            //TODO this is guaranteed desync on servers - I don't see a good solution
             if(
                 type == MessageType.announce && ui.hasAnnouncement() ||
                 type == MessageType.notify && ui.hudfrag.hasToast() ||
                 type == MessageType.toast && ui.hasAnnouncement()
             ){
-                exec.var(varCounter).numval --;
+                //set outSuccess=false to let user retry.
+                exec.setnum(outSuccess, 0);
                 return;
             }
 
@@ -1844,7 +1977,7 @@ public class LExecutor{
     }
 
     public static class SetMarkerI implements LInstruction{
-        public LMarkerControl type = LMarkerControl.x;
+        public LMarkerControl type = LMarkerControl.pos;
         public int id, p1, p2, p3;
 
         public SetMarkerI(LMarkerControl type, int id, int p1, int p2, int p3){
@@ -1866,13 +1999,18 @@ public class LExecutor{
                 var marker = state.markers.get(exec.numi(id));
                 if(marker == null) return;
 
-                if(type == LMarkerControl.text){
-                    marker.setText((exec.obj(p1) != null ? exec.obj(p1).toString() : "null"), false);
-                }else if(type == LMarkerControl.flushText){
-                    marker.setText(exec.textBuffer.toString(), true);
+                if(type == LMarkerControl.flushText){
+                    marker.setText(exec.textBuffer.toString(), exec.bool(p1));
                     exec.textBuffer.setLength(0);
+                }else if(type == LMarkerControl.texture){
+                    if(exec.bool(p1)){
+                        marker.setTexture(exec.textBuffer.toString());
+                        exec.textBuffer.setLength(0);
+                    }else{
+                        marker.setTexture(PrintI.toString(exec.obj(p2)));
+                    }
                 }else{
-                    marker.control(type, exec.num(p1), exec.num(p2), exec.num(p3));
+                    marker.control(type, exec.numOrNan(p1), exec.numOrNan(p2), exec.numOrNan(p3));
                 }
             }
         }
@@ -1883,13 +2021,14 @@ public class LExecutor{
         public static final int maxMarkers = 20000;
 
         public String type = "shape";
-        public int id, x, y;
+        public int id, x, y, replace;
 
-        public MakeMarkerI(String type, int id, int x, int y){
+        public MakeMarkerI(String type, int id, int x, int y, int replace){
             this.type = type;
             this.id = id;
             this.x = x;
             this.y = y;
+            this.replace = replace;
         }
 
         public MakeMarkerI(){
@@ -1899,17 +2038,20 @@ public class LExecutor{
         public void run(LExecutor exec){
             var cons = MapObjectives.markerNameToType.get(type);
 
-            if(cons != null && state.markers.size < maxMarkers){
-                var marker = cons.get();
-                marker.control(LMarkerControl.pos, exec.num(x), exec.num(y), 0);
-                state.markers.put(exec.numi(id), marker);
+            if(cons != null && state.markers.size() < maxMarkers){
+                int mid = exec.numi(id);
+                if(exec.bool(replace) || !state.markers.has(mid)){
+                    var marker = cons.get();
+                    marker.control(LMarkerControl.pos, exec.num(x), exec.num(y), 0);
+                    state.markers.add(mid, marker);
+                }
             }
         }
     }
 
     @Remote(called = Loc.server, variants = Variant.both, unreliable = true)
     public static void createMarker(int id, ObjectiveMarker marker){
-        state.markers.put(id, marker);
+        state.markers.add(id, marker);
     }
 
     @Remote(called = Loc.server, variants = Variant.both, unreliable = true)
@@ -1921,13 +2063,53 @@ public class LExecutor{
     }
 
     @Remote(called = Loc.server, variants = Variant.both, unreliable = true)
-    public static void updateMarkerText(int id, LMarkerControl type, String text){
+    public static void updateMarkerText(int id, LMarkerControl type, boolean fetch, String text){
         var marker = state.markers.get(id);
         if(marker != null){
-            if(type == LMarkerControl.text){
-                marker.setText(text, true);
-            }else if(type == LMarkerControl.flushText){
-                marker.setText(text, false);
+            if(type == LMarkerControl.flushText){
+                marker.setText(text, fetch);
+            }
+        }
+    }
+
+    @Remote(called = Loc.server, variants = Variant.both, unreliable = true)
+    public static void updateMarkerTexture(int id, String textureName){
+        var marker = state.markers.get(id);
+        if(marker != null){
+            marker.setTexture(textureName);
+        }
+    }
+
+    public static class LocalePrintI implements LInstruction{
+        public int name;
+
+        public LocalePrintI(int name){
+            this.name = name;
+        }
+
+        public LocalePrintI(){
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            if(exec.textBuffer.length() >= maxTextBuffer) return;
+
+            //this should avoid any garbage allocation
+            Var v = exec.var(name);
+            if(v.isobj){
+                String name = PrintI.toString(v.objval);
+
+                String strValue;
+
+                if(mobile){
+                    strValue = state.mapLocales.containsProperty(name + ".mobile") ?
+                    state.mapLocales.getProperty(name + ".mobile") :
+                    state.mapLocales.getProperty(name);
+                }else{
+                    strValue = state.mapLocales.getProperty(name);
+                }
+
+                exec.textBuffer.append(strValue);
             }
         }
     }

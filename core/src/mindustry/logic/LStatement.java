@@ -2,6 +2,7 @@ package mindustry.logic;
 
 import arc.*;
 import arc.func.*;
+import arc.graphics.*;
 import arc.math.*;
 import arc.scene.*;
 import arc.scene.actions.*;
@@ -10,10 +11,12 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.logic.LCanvas.*;
 import mindustry.logic.LExecutor.*;
 import mindustry.ui.*;
 
+import static mindustry.Vars.ui;
 import static mindustry.logic.LCanvas.*;
 
 /**
@@ -118,6 +121,23 @@ public abstract class LStatement{
         });
 
         return result[0];
+    }
+
+    /** Adds color edit button */
+    protected Cell<Button> col(Table table, String value, Cons<Color> setter){
+        return table.button(b -> {
+            b.image(Icon.pencilSmall);
+            b.clicked(() -> {
+                Color current = Pal.accent.cpy();
+                if(value.startsWith("%")){
+                    try{
+                        current = Color.valueOf(value.substring(1));
+                    }catch(Exception ignored){}
+                }
+
+                ui.picker.show(current, setter);
+            });
+        }, Styles.logict, () -> {}).size(40f).padLeft(-11).color(table.color);
     }
 
     protected Cell<TextField> fields(Table table, String value, Cons<String> setter){

@@ -295,6 +295,15 @@ public class ServerControl implements ApplicationListener{
             info("Server loaded. Type @ for help.", "'help'");
         });
 
+        Events.on(SaveLoadEvent.class, e -> {
+            Core.app.post(() -> {
+                if(Config.autoPause.bool() && Groups.player.size() == 0){
+                    state.set(State.paused);
+                    autoPaused = true;
+                }
+            });
+        });
+
         Events.on(PlayerJoin.class, e -> {
             if(state.isPaused() && autoPaused && Config.autoPause.bool()){
                 state.set(State.playing);
@@ -908,6 +917,37 @@ public class ServerControl implements ApplicationListener{
                 logic.runWave();
                 info("Wave spawned.");
             }
+        });
+
+        handler.register("loadautosave", "Loads the last auto-save.", arg -> {
+            if(state.isGame()){
+                err("Already hosting. Type 'stop' to stop hosting first.");
+                return;
+            }
+
+            Fi newestSave = saveDirectory.findAll(f -> f.name().startsWith("auto_")).min(Fi::lastModified);
+
+            if(newestSave == null){
+                err("No auto-saves found! Type `config autosave true` to enable auto-saves.");
+                return;
+            }
+
+            if(!SaveIO.isSaveValid(newestSave)){
+                err("No (valid) save data found for slot.");
+                return;
+            }
+
+            Core.app.post(() -> {
+                try{
+                    SaveIO.load(newestSave);
+                    state.rules.sector = null;
+                    info("Save loaded.");
+                    state.set(State.playing);
+                    netServer.openServer();
+                }catch(Throwable t){
+                    err("Failed to load save. Outdated or corrupt file.");
+                }
+            });
         });
 
         handler.register("load", "<slot>", "Load a save from a slot.", arg -> {

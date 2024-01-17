@@ -29,6 +29,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
 
     private long nextFrame;
     private long beginTime;
+    private long lastTargetFps = -1;
     private boolean finished = false;
     private LoadRenderer loader;
 
@@ -200,9 +201,12 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
     @Override
     public void update(){
         int targetfps = Core.settings.getInt("fpscap", 120);
+        boolean changed = lastTargetFps != targetfps && lastTargetFps != -1;
         boolean limitFps = targetfps > 0 && targetfps <= 240;
 
-        if(limitFps){
+        lastTargetFps = targetfps;
+
+        if(limitFps && !changed){
             nextFrame += (1000 * 1000000) / targetfps;
         }else{
             nextFrame = Time.nanos();

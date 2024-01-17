@@ -389,9 +389,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                     //if there's a cycle, ignore its heat
                     if(!(build instanceof HeatConductorBuild hc && hc.cameFrom.contains(id()))){
                         //x/y coordinate difference across point of contact
-                        int diff = Math.min(Math.abs(build.tileX() - tileX()), Math.abs(build.tileY() - tileY()));
+                        float diff = (Math.min(Math.abs(build.x - x), Math.abs(build.y - y)) / tilesize);
                         //number of points that this block had contact with
-                        int contactPoints = Math.min(Math.max(build.block.size, block.size) - diff, Math.min(build.block.size, block.size));
+                        int contactPoints = Math.min((int)(block.size/2f + build.block.size/2f - diff), Math.min(build.block.size, block.size));
 
                         //heat is distributed across building size
                         float add = heater.heat() / build.block.size * contactPoints;
@@ -1342,6 +1342,15 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     /** @return the cap for item amount calculations, used when this block explodes. */
     public int explosionItemCap(){
         return block.itemCapacity;
+    }
+
+    /** Called when a block begins (not finishes!) deconstruction. The building is still present at this point. */
+    public void onDeconstructed(@Nullable Unit builder){
+        //deposit non-incinerable liquid on ground
+        if(liquids != null && liquids.currentAmount() > 0 && (!liquids.current().incinerable || block.deconstructDropAllLiquid)){
+            float perCell = liquids.currentAmount() / (block.size * block.size) * 2f;
+            tile.getLinkedTiles(other -> Puddles.deposit(other, liquids.current(), perCell));
+        }
     }
 
     /** Called when the block is destroyed. The tile is still intact at this stage. */

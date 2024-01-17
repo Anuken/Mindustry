@@ -119,8 +119,8 @@ dependencies{
     implementation arcModule("backends:backend-android")
     implementation 'com.jakewharton.android.repackaged:dalvik-dx:9.0.0_r3'
 
-    natives "com.github.Anuken.Arc:natives-android:${getArcHash()}"
-    natives "com.github.Anuken.Arc:natives-freetype-android:${getArcHash()}"
+    natives "com.github.Anuken.Arc:natives-android:$arcHash"
+    natives "com.github.Anuken.Arc:natives-freetype-android:$arcHash"
 
     def version;
     def highestVersion;

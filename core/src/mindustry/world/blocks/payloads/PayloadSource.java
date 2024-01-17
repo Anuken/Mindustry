@@ -37,6 +37,7 @@ public class PayloadSource extends PayloadBlock{
         noUpdateDisabled = true;
         clearOnDoubleTap = true;
         regionRotated1 = 1;
+        acceptsPayloads = false;
         commandable = true;
 
         config(Block.class, (PayloadSourceBuild build, Block block) -> {

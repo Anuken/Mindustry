@@ -33,6 +33,7 @@ jobs:
         ./gradlew updateBundles
 
         if [ -n "$(git status --porcelain)" ]; then
+          git config --global user.name "Github Actions"
           git add core/assets/bundles/*
           git commit -m "Automatic bundle update"
           git push
@@ -52,7 +53,7 @@ jobs:
         rm -rf .github
         rm README.md
         git add .
-        git commit --allow-empty -m "${GITHUB_SHA}"
+        git commit --allow-empty -m "Updating"
         git push https://Anuken:${{ secrets.API_TOKEN_GITHUB }}@github.com/Anuken/MindustryJitpack
         cd ../Mindustry
     - name: Run unit tests
