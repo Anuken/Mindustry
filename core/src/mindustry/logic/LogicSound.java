@@ -85,7 +85,7 @@ public enum LogicSound{
     respawnLoop(Sounds.respawning),
     shieldLoop(Sounds.shield),
     smelterLoop(Sounds.smelter),
-    spellLoop(Sounds.spell),
+    spellLoop(Sounds.spellLoop),
     sprayLoop(Sounds.spray),
     steamLoop(Sounds.steam),
     techLoop(Sounds.techloop),
