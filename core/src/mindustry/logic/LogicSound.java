@@ -80,7 +80,7 @@ public enum LogicSound{
     humElectricLoop(Sounds.electricHum),
     laserBeamLoop(Sounds.laserbeam),
     machineLoop(Sounds.machine),
-    mineBeam(Sounds.minebeam),
+    mineBeamLoop(Sounds.minebeam),
     missileTrailLoop(Sounds.missileTrail),
     pulseLoop(Sounds.pulse),
     rainLoop(Sounds.rain),
