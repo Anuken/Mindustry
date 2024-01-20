@@ -1,5 +1,6 @@
 package mindustry.logic;
 
+import arc.audio.*;
 import mindustry.gen.*;
 
 public enum LogicSound{
@@ -32,7 +33,6 @@ public enum LogicSound{
     laserShoot(Sounds.lasershoot),
     malignShoot(Sounds.malignShoot),
     mineDeploy(Sounds.mineDeploy),
-    mineBeam(Sounds.mineBeam),
     missile(Sounds.missile),
     missileLarge(Sounds.missileLarge),
     missileLaunch(Sounds.missileLaunch),
@@ -80,6 +80,7 @@ public enum LogicSound{
     humElectricLoop(Sounds.electricHum),
     laserBeamLoop(Sounds.laserbeam),
     machineLoop(Sounds.machine),
+    mineBeam(Sounds.minebeam),
     missileTrailLoop(Sounds.missileTrail),
     pulseLoop(Sounds.pulse),
     rainLoop(Sounds.rain),
