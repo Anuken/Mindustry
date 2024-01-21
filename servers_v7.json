@@ -17,7 +17,7 @@
   },
   {
     "name": "CMS Empire",
-    "address": ["195.2.84.144","178.20.45.250"]
+    "address": ["195.2.84.144","95.84.198.97"]
   },
   {
     "name": "ShardDustry Eventos",
@@ -242,7 +242,7 @@
   },
   {
     "name": "Alex Multiverse",
-    "address": ["alexmindustryv7.servegame.com:25588", "172.234.80.96:6768", "139.162.41.78:6767", "172.245.187.143:6868", "172.245.187.143:6869" ]
+    "address": ["alexmindustryv7.servegame.com:25588", "172.234.80.96:6768", "139.162.41.78:6767", "172.245.187.143:6868", "172.245.187.143:6869", "92.119.127.171:6888" ]
   },
   {
     "name": "Open PVP",
@@ -266,14 +266,18 @@
   },
   {
     "name": "Gadgetroch's Server",
-    "address": ["mindustry.gadgetroch.com", "mindustry.gadgetroch.com:6568"]
+    "address": ["mindustry.gadgetroch.com", "mindustry.gadgetroch.com:6568", "mindustry.gadgetroch.com:6569"]
   },
   {
     "name": "Duel.Server",
-    "address":["160.251.41.148:6568","160.251.41.148:6569"]
+    "address":["160.251.41.148:6567","160.251.41.148:6568","160.251.41.148:6569","160.251.41.148:6570"]
   },
   {
     "name": "AZDustry",
     "address": ["118.127.8.162:25628"]
+  },
+  {
+    "name": "Erepulo",
+    "address": ["95.84.198.97:5401", "95.84.198.97:5402", "95.84.198.97:5403"]
   }
 ]
