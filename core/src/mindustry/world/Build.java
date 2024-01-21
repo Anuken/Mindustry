@@ -281,9 +281,9 @@ public class Build{
         return false;
     }
 
-    /** Returns whether the tile at this position is breakable by this team */
+    /** @return whether the tile at this position is breakable by this team */
     public static boolean validBreak(Team team, int x, int y){
         Tile tile = world.tile(x, y);
-        return tile != null && tile.block().canBreak(tile) && tile.breakable() && tile.interactable(team);
+        return tile != null && tile.block() != Blocks.air && (tile.block().canBreak(tile) && (tile.breakable() || state.rules.allowEnvironmentDeconstruct)) && tile.interactable(team);
     }
 }
