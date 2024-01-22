@@ -960,7 +960,7 @@ public class UnitType extends UnlockableContent implements Senseable{
         getRegionsToOutline(toOutline);
 
         for(var region : toOutline){
-            if(region instanceof AtlasRegion atlas){
+            if(region instanceof AtlasRegion atlas && !Core.atlas.has(atlas.name + "-outline")){
                 String regionName = atlas.name;
                 Pixmap outlined = Pixmaps.outline(Core.atlas.getPixmap(region), outlineColor, outlineRadius);
 
