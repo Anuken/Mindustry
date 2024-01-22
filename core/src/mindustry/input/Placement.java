@@ -58,6 +58,22 @@ public class Placement{
         return points;
     }
 
+    /** Normalize two points into a rectangle. */
+    public static Seq<Point2> normalizeRectangle(int startX, int startY, int endX, int endY, int blockSize){
+        Pools.freeAll(points);
+        points.clear();
+
+        int minX = Math.min(startX, endX), minY = Math.min(startY, endY), maxX = Math.max(startX, endX), maxY = Math.max(startY, endY);
+
+        for(int y = minY; y <= maxY; y += blockSize){
+            for(int x = minX; x <= maxX; x += blockSize){
+                points.add(Pools.obtain(Point2.class, Point2::new).set(x, y));
+            }
+        }
+
+        return points;
+    }
+
     public static Seq<Point2> upgradeLine(int startX, int startY, int endX, int endY){
         closed.clear();
         Pools.freeAll(points);

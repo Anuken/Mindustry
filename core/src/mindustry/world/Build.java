@@ -122,6 +122,14 @@ public class Build{
             }
         });
 
+        //complete it immediately
+        if(result.instantBuild){
+            Events.fire(new BlockBuildBeginEvent(tile, team, unit, false));
+            result.placeBegan(tile, tile.block, unit);
+            ConstructBlock.constructFinish(tile, result, unit, (byte)rotation, team, null);
+            return;
+        }
+
         Block previous = tile.block();
         Block sub = ConstructBlock.get(result.size);
         var prevBuild = new Seq<Building>(9);

@@ -90,6 +90,8 @@ public class Floor extends Block{
         super(name);
         this.variants = variants;
         placeableLiquid = true;
+        allowRectanglePlacement = true;
+        instantBuild = true;
     }
 
     @Override
