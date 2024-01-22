@@ -83,13 +83,13 @@ public class Floor extends Block{
     protected TextureRegion edgeRegion;
 
     public Floor(String name){
-        super(name);
-        variants = 3;
+        this(name, 3);
     }
 
     public Floor(String name, int variants){
         super(name);
         this.variants = variants;
+        placeableLiquid = true;
     }
 
     @Override
