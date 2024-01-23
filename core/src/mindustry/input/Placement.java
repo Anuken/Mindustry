@@ -65,9 +65,9 @@ public class Placement{
 
         int minX = Math.min(startX, endX), minY = Math.min(startY, endY), maxX = Math.max(startX, endX), maxY = Math.max(startY, endY);
 
-        for(int y = minY; y <= maxY; y += blockSize){
-            for(int x = minX; x <= maxX; x += blockSize){
-                points.add(Pools.obtain(Point2.class, Point2::new).set(x, y));
+        for(int y = 0; y <= maxY - minY; y += blockSize){
+            for(int x = 0; x <= maxX - minX; x += blockSize){
+                points.add(Pools.obtain(Point2.class, Point2::new).set(startX + x * Mathf.sign(endX - startX), startY + y * Mathf.sign(endY - startY)));
             }
         }
 

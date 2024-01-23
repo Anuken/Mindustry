@@ -245,7 +245,7 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean allowDiagonal = true;
     /** Whether to swap the diagonal placement modes. */
     public boolean swapDiagonalPlacement;
-    /** Whether to allow rectangular placement, as opposed to a line. Only supported for 1x1 blocks currently! */
+    /** Whether to allow rectangular placement, as opposed to a line. */
     public boolean allowRectanglePlacement = false;
     /** Build queue priority in schematics. */
     public int schematicPriority = 0;
