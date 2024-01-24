@@ -2050,6 +2050,11 @@ public class LExecutor{
     }
 
     @Remote(called = Loc.server, variants = Variant.both, unreliable = true)
+    public static void removeMarker(int id){
+        state.markers.remove(id);
+    }
+
+    @Remote(called = Loc.server, variants = Variant.both, unreliable = true)
     public static void updateMarker(int id, LMarkerControl control, double p1, double p2, double p3){
         var marker = state.markers.get(id);
         if(marker != null){
