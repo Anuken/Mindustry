@@ -100,9 +100,9 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
         buildCounter = Math.min(buildCounter, 10f);
 
         //random attempt to fix a freeze that only occurs on Android
-        int maxPerFrame = 10, count = 0;
+        int maxPerFrame = state.rules.instantBuild ? plans.size : 10, count = 0;
 
-        while(buildCounter >= 1 && count++ < maxPerFrame){
+        while((buildCounter >= 1 || state.rules.instantBuild) && count++ < maxPerFrame){
             buildCounter -= 1f;
 
             validatePlans();

@@ -92,6 +92,7 @@ public class Floor extends Block{
         placeableLiquid = true;
         allowRectanglePlacement = true;
         instantBuild = true;
+        placeEffect = Fx.rotateBlock;
     }
 
     @Override
