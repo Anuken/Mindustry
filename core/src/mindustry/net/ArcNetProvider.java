@@ -162,7 +162,7 @@ public class ArcNetProvider implements NetProvider{
     }
 
     @Override
-    public @Nullable ServerConnectFilter getConnectFilter(){
+    public @Nullable Server.ServerConnectFilter getConnectFilter(){
         return server.getConnectFilter();
     }
 
