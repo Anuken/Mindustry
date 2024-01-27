@@ -48,6 +48,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     UnitType type = UnitTypes.alpha;
     boolean spawnedByCore;
     double flag;
+    int wave = -1;
 
     transient @Nullable Trail trail;
     //TODO could be better represented as a unit
@@ -230,6 +231,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case mineY -> mining() ? mineTile.y : -1;
             case armor -> armorOverride >= 0f ? armorOverride : armor;
             case flag -> flag;
+            case waveNum -> wave;
             case speed -> type.speed * 60f / tilesize * speedMultiplier;
             case controlled -> !isValid() ? 0 :
                     controller instanceof LogicAI ? ctrlProcessor :

@@ -82,6 +82,8 @@ public class SpawnGroup implements JsonSerializable, Cloneable{
     public Unit createUnit(Team team, int wave){
         Unit unit = type.create(team);
 
+        unit.wave = wave + 1;
+
         if(effect != null){
             unit.apply(effect, 999999f);
         }

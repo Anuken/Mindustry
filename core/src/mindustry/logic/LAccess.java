@@ -46,6 +46,7 @@ public enum LAccess{
     team,
     type,
     flag,
+    waveNum,
     controlled,
     controller,
     name,
