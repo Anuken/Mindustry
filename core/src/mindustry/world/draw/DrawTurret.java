@@ -37,7 +37,7 @@ public class DrawTurret extends DrawBlock{
             part.getOutlines(out);
         }
 
-        if(block.region.found() && !(block.outlinedIcon > 0 && block.getGeneratedIcons()[block.outlinedIcon].equals(block.region))){
+        if(block.region.found() && !(block.outlinedIcon > 0 && block.outlinedIcon < block.getGeneratedIcons().length && block.getGeneratedIcons()[block.outlinedIcon].equals(block.region))){
             out.add(block.region);
         }
 

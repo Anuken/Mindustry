@@ -29,11 +29,11 @@ public class Fx{
 
     none = new Effect(0, 0f, e -> {}),
     
-    blockCrash = new Effect(100f, e -> {
+    blockCrash = new Effect(90f, e -> {
         if(!(e.data instanceof Block block)) return;
 
         alpha(e.fin() + 0.5f);
-        float offset = Mathf.lerp(0f, 200f, e.fout());
+        float offset = Mathf.lerp(0f, 180f, e.fout());
         color(0f, 0f, 0f, 0.44f);
         rect(block.fullIcon, e.x - offset * 4f, e.y, (float)block.size * 8f, (float)block.size * 8f);
         color(Color.white);
@@ -417,6 +417,20 @@ public class Fx{
         Lines.spikes(e.x, e.y, 1f + e.fin() * 6f, e.fout() * 4f, 6);
     }),
 
+    sparkExplosion = new Effect(30f, 160f, e -> {
+        color(e.color);
+        stroke(e.fout() * 3f);
+        float circleRad = 6f + e.finpow() * e.rotation;
+        Lines.circle(e.x, e.y, circleRad);
+
+        rand.setSeed(e.id);
+        for(int i = 0; i < 16; i++){
+            float angle = rand.random(360f);
+            float lenRand = rand.random(0.5f, 1f);
+            Lines.lineAngle(e.x, e.y, angle, e.foutpow() * e.rotation * 0.8f * rand.random(1f, 0.6f) + 2f, e.finpow() * e.rotation * 1.2f * lenRand + 6f);
+        }
+    }),
+
     titanExplosion = new Effect(30f, 160f, e -> {
         color(e.color);
         stroke(e.fout() * 3f);
@@ -607,6 +621,12 @@ public class Fx{
         color(Pal.heal);
         stroke(e.fout() * 2f);
         Lines.circle(e.x, e.y, 2f + e.finpow() * 7f);
+    }),
+
+    dynamicWave = new Effect(22, e -> {
+        color(e.color, 0.7f);
+        stroke(e.fout() * 2f);
+        Lines.circle(e.x, e.y, 4f + e.finpow() * e.rotation);
     }),
 
     shieldWave = new Effect(22, e -> {
@@ -1517,6 +1537,15 @@ public class Fx{
         });
     }),
 
+    smokePuff = new Effect(30, e -> {
+        color(e.color);
+
+        randLenVectors(e.id, 6, 4f + 30f * e.finpow(), (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, e.fout() * 3f);
+            Fill.circle(e.x + x / 2f, e.y + y / 2f, e.fout());
+        });
+    }),
+
     shootSmall = new Effect(8, e -> {
         color(Pal.lighterOrange, Pal.lightOrange, e.fin());
         float w = 1f + 5 * e.fout();
@@ -1681,7 +1710,7 @@ public class Fx{
     }),
 
     regenSuppressParticle = new Effect(35f, e -> {
-        color(Pal.sapBullet, e.color, e.fin());
+        color(e.color, Color.white, e.fin());
         stroke(e.fout() * 1.4f + 0.5f);
 
         randLenVectors(e.id, 4, 17f * e.fin(), (x, y) -> {
@@ -1700,7 +1729,7 @@ public class Fx{
 
         Tmp.bz2.valueAt(Tmp.v4, e.fout());
 
-        color(Pal.sapBullet);
+        color(e.color);
         Fill.circle(Tmp.v4.x, Tmp.v4.y, e.fslope() * 2f + 0.1f);
     }).followParent(false).rotWithParent(false),
 
@@ -2416,6 +2445,26 @@ public class Fx{
         Lines.poly(e.x, e.y, 6, e.rotation + e.fin());
     }).followParent(true),
 
+    arcShieldBreak = new Effect(40, e -> {
+        Lines.stroke(3 * e.fout(), e.color);
+        if(e.data instanceof Unit u){
+            ShieldArcAbility ab = (ShieldArcAbility) Structs.find(u.abilities, a -> a instanceof ShieldArcAbility);
+            if(ab != null){
+                Vec2 pos = Tmp.v1.set(ab.x, ab.y).rotate(u.rotation - 90f).add(u);
+                Lines.arc(pos.x, pos.y, ab.radius + ab.width/2, ab.angle / 360f, u.rotation + ab.angleOffset - ab.angle / 2f);
+                Lines.arc(pos.x, pos.y, ab.radius - ab.width/2, ab.angle / 360f, u.rotation + ab.angleOffset - ab.angle / 2f);
+                for(int i : Mathf.signs){
+                    float
+                            px = pos.x + Angles.trnsx(u.rotation + ab.angleOffset - ab.angle / 2f * i, ab.radius + ab.width / 2),
+                            py = pos.y + Angles.trnsy(u.rotation + ab.angleOffset - ab.angle / 2f * i, ab.radius + ab.width / 2),
+                            px1 = pos.x + Angles.trnsx(u.rotation + ab.angleOffset - ab.angle / 2f * i, ab.radius - ab.width / 2),
+                            py1 = pos.y + Angles.trnsy(u.rotation + ab.angleOffset - ab.angle / 2f * i, ab.radius - ab.width / 2);
+                    Lines.line(px, py, px1, py1);
+                }
+            }
+        }
+    }).followParent(true),
+
     coreLandDust = new Effect(100f, e -> {
         color(e.color, e.fout(0.1f));
         rand.setSeed(e.id);
@@ -2529,5 +2578,23 @@ public class Fx{
 
         stroke(data.region.height * scl);
         line(data.region, data.a.x + ox, data.a.y + oy, data.b.x + ox, data.b.y + oy, false);
-    }).layer(Layer.groundUnit + 5f);
+    }).layer(Layer.groundUnit + 5f),
+
+    debugLine = new Effect(90f, 1000000000000f, e -> {
+       if(!(e.data instanceof Vec2[] vec)) return;
+
+       Draw.color(e.color);
+       Lines.stroke(1f);
+
+       if(vec.length == 2){
+           Lines.line(vec[0].x, vec[0].y, vec[1].x, vec[1].y);
+       }else{
+           Lines.beginLine();
+           for(Vec2 v : vec)
+               Lines.linePoint(v.x, v.y);
+           Lines.endLine();
+       }
+
+       Draw.reset();
+    });
 }

@@ -223,7 +223,7 @@ public class Drawf{
     /** Sets Draw.z to the text layer, and returns the previous layer. */
     public static float text(){
         float z = Draw.z();
-        if(renderer.pixelator.enabled()){
+        if(renderer.pixelate){
             Draw.z(Layer.endPixeled);
         }
 

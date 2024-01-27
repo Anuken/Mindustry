@@ -16,6 +16,7 @@ import mindustry.game.*;
 import mindustry.game.Rules.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.type.*;
 import mindustry.type.Weather.*;
 import mindustry.ui.*;
@@ -38,6 +39,56 @@ public class CustomRulesDialog extends BaseDialog{
         setFillParent(true);
         shown(this::setup);
         addCloseButton();
+
+        buttons.button("@edit", Icon.pencil, () -> {
+            BaseDialog dialog = new BaseDialog("@waves.edit");
+            dialog.addCloseButton();
+            dialog.setFillParent(false);
+
+            dialog.cont.table(Tex.button, t -> {
+                var style = Styles.cleart;
+                t.defaults().size(280f, 64f).pad(2f);
+
+                t.button("@waves.copy", Icon.copy, style, () -> {
+                    ui.showInfoFade("@copied");
+
+                    //hack: don't write the spawns, they just waste space
+                    var spawns = rules.spawns;
+                    rules.spawns = new Seq<>();
+                    Core.app.setClipboardText(JsonIO.write(rules));
+                    rules.spawns = spawns;
+                    dialog.hide();
+                }).marginLeft(12f).row();
+
+                t.button("@waves.load", Icon.download, style, () -> {
+                    try{
+                        Rules newRules = JsonIO.read(Rules.class, Core.app.getClipboardText());
+                        //objectives and spawns are considered to be map-specific; don't use them
+                        newRules.spawns = rules.spawns;
+                        newRules.objectives = rules.objectives;
+                        rules = newRules;
+                        refresh();
+                    }catch(Throwable e){
+                        Log.err(e);
+                        ui.showErrorMessage("@rules.invaliddata");
+                    }
+                    dialog.hide();
+                }).disabled(Core.app.getClipboardText() == null || !Core.app.getClipboardText().startsWith("{")).marginLeft(12f).row();
+
+                t.button("@settings.reset", Icon.refresh, style, () -> {
+                    rules = resetter.get();
+                    refresh();
+                }).marginLeft(12f);
+            });
+
+            dialog.show();
+        });
+    }
+
+    void refresh(){
+        setup();
+        requestKeyboard();
+        requestScroll();
     }
 
     private <T extends UnlockableContent> void showBanned(String title, ContentType type, ObjectSet<T> set, Boolf<T> pred){
@@ -128,12 +179,6 @@ public class CustomRulesDialog extends BaseDialog{
         cont.clear();
         cont.pane(m -> main = m).scrollX(false);
         main.margin(10f);
-        main.button("@settings.reset", () -> {
-            rules = resetter.get();
-            setup();
-            requestKeyboard();
-            requestScroll();
-        }).size(300f, 50f);
         main.left().defaults().fillX().left().pad(5);
         main.row();
 
@@ -163,6 +208,7 @@ public class CustomRulesDialog extends BaseDialog{
             }
         }, () -> rules.infiniteResources);
         check("@rules.onlydepositcore", b -> rules.onlyDepositCore = b, () -> rules.onlyDepositCore);
+        check("@rules.derelictrepair", b -> rules.derelictRepair = b, () -> rules.derelictRepair);
         check("@rules.reactorexplosions", b -> rules.reactorExplosions = b, () -> rules.reactorExplosions);
         check("@rules.schematic", b -> rules.schematicsAllowed = b, () -> rules.schematicsAllowed);
         check("@rules.coreincinerates", b -> rules.coreIncinerates = b, () -> rules.coreIncinerates);
@@ -185,13 +231,6 @@ public class CustomRulesDialog extends BaseDialog{
         check("@rules.hidebannedblocks", b -> rules.hideBannedBlocks = b, () -> rules.hideBannedBlocks);
         check("@bannedblocks.whitelist", b -> rules.blockWhitelist = b, () -> rules.blockWhitelist);
 
-        //TODO objectives would be nice
-        if(experimental && false){
-            main.button("@objectives", () -> {
-
-            }).left().width(300f).row();
-        }
-
         title("@rules.title.unit");
         check("@rules.unitcapvariable", b -> rules.unitCapVariable = b, () -> rules.unitCapVariable);
         numberi("@rules.unitcap", f -> rules.unitCap = f, () -> rules.unitCap, -999, 999);
@@ -200,7 +239,6 @@ public class CustomRulesDialog extends BaseDialog{
         number("@rules.unitbuildspeedmultiplier", f -> rules.unitBuildSpeedMultiplier = f, () -> rules.unitBuildSpeedMultiplier, 0f, 50f);
         number("@rules.unitcostmultiplier", f -> rules.unitCostMultiplier = f, () -> rules.unitCostMultiplier);
         number("@rules.unithealthmultiplier", f -> rules.unitHealthMultiplier = f, () -> rules.unitHealthMultiplier);
-
 
         main.button("@bannedunits", () -> showBanned("@bannedunits", ContentType.unit, rules.bannedUnits, u -> !u.isHidden())).left().width(300f).row();
         check("@bannedunits.whitelist", b -> rules.unitWhitelist = b, () -> rules.unitWhitelist);
@@ -249,26 +287,21 @@ public class CustomRulesDialog extends BaseDialog{
 
             t.defaults().size(140f, 50f);
 
-            //TODO dynamic selection of planets
-            for(Planet planet : new Planet[]{Planets.serpulo, Planets.erekir}){
+            for(Planet planet : content.planets().select(p -> p.accessible && p.visible && p.isLandable())){
                 t.button(planet.localizedName, style, () -> {
-                    rules.env = planet.defaultEnv;
-                    rules.attributes.clear();
-                    rules.attributes.add(planet.defaultAttributes);
-                    rules.hiddenBuildItems.clear();
-                    rules.hiddenBuildItems.addAll(planet.hiddenItems);
-                }).group(group).checked(b -> rules.env == planet.defaultEnv);
+                    planet.applyRules(rules);
+                }).group(group).checked(b -> rules.planet == planet);
+
+                if(t.getChildren().size % 3 == 0){
+                    t.row();
+                }
             }
 
             t.button("@rules.anyenv", style, () -> {
-                if(!rules.infiniteResources){
-                    //unlocalized for now
-                    ui.showInfo("The 'any' environment can only be used in sandbox mode.");
-                }else{
-                    rules.env = Vars.defaultEnv;
-                    rules.hiddenBuildItems.clear();
-                }
-            }).group(group).checked(b -> rules.hiddenBuildItems.size == 0);
+                rules.env = Vars.defaultEnv;
+                rules.hiddenBuildItems.clear();
+                rules.planet = Planets.sun;
+            }).group(group).checked(b -> rules.planet == Planets.sun);
         }).left().fill(false).expand(false, false).row();
 
         title("@rules.title.teams");
@@ -280,7 +313,7 @@ public class CustomRulesDialog extends BaseDialog{
             boolean[] shown = {false};
             Table wasMain = main;
 
-            main.button("[#" + team.color +  "]" + team.localized() + (team.emoji.isEmpty() ? "" : "[] " + team.emoji), Icon.downOpen, Styles.togglet, () -> {
+            main.button(team.coloredName(), Icon.downOpen, Styles.togglet, () -> {
                 shown[0] = !shown[0];
             }).marginLeft(14f).width(260f).height(55f).update(t -> {
                 ((Image)t.getChildren().get(1)).setDrawable(shown[0] ? Icon.upOpen : Icon.downOpen);
@@ -300,6 +333,10 @@ public class CustomRulesDialog extends BaseDialog{
                 numberi("@rules.rtsmaxsquadsize", f -> teams.rtsMaxSquad = f, () -> teams.rtsMaxSquad, () -> teams.rtsAi, 1, 1000);
                 number("@rules.rtsminattackweight", f -> teams.rtsMinWeight = f, () -> teams.rtsMinWeight, () -> teams.rtsAi);
 
+                //disallow on Erekir (this is broken for mods I'm sure, but whatever)
+                check("@rules.buildai", b -> teams.buildAi = b, () -> teams.buildAi, () -> team != rules.defaultTeam && rules.env != Planets.erekir.defaultEnv && !rules.pvp);
+                number("@rules.buildaitier", false, f -> teams.buildAiTier = f, () -> teams.buildAiTier, () -> teams.buildAi && rules.env != Planets.erekir.defaultEnv && !rules.pvp, 0, 1);
+
                 check("@rules.infiniteresources", b -> teams.infiniteResources = b, () -> teams.infiniteResources);
                 number("@rules.buildspeedmultiplier", f -> teams.buildSpeedMultiplier = f, () -> teams.buildSpeedMultiplier, 0.001f, 50f);
 
@@ -308,7 +345,6 @@ public class CustomRulesDialog extends BaseDialog{
                 number("@rules.unitbuildspeedmultiplier", f -> teams.unitBuildSpeedMultiplier = f, () -> teams.unitBuildSpeedMultiplier, 0.001f, 50f);
                 number("@rules.unitcostmultiplier", f -> teams.unitCostMultiplier = f, () -> teams.unitCostMultiplier);
                 number("@rules.unithealthmultiplier", f -> teams.unitHealthMultiplier = f, () -> teams.unitHealthMultiplier);
-
 
                 main = wasMain;
             }, () -> shown[0]).growX().row();
@@ -323,7 +359,7 @@ public class CustomRulesDialog extends BaseDialog{
             for(Team team : Team.baseTeams){
                 t.button(Tex.whiteui, Styles.squareTogglei, 38f, () -> {
                     cons.get(team);
-                }).pad(1f).checked(b -> prov.get() == team).size(60f).tooltip(team.localized()).with(i -> i.getStyle().imageUpColor = team.color);
+                }).pad(1f).checked(b -> prov.get() == team).size(60f).tooltip(team.coloredName()).with(i -> i.getStyle().imageUpColor = team.color);
             }
         }).padTop(0).row();
     }

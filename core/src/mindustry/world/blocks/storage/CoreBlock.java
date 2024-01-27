@@ -37,6 +37,8 @@ public class CoreBlock extends StorageBlock{
     public @Load(value = "@-thruster2", fallback = "clear-effect") TextureRegion thruster2; //bot left
     public float thrusterLength = 14f/4f;
     public boolean isFirstTier;
+    /** If true, this core type requires a core zone to upgrade. */
+    public boolean requiresCoreZone;
     public boolean incinerateNonBuildable = false;
 
     public UnitType unitType = UnitTypes.alpha;
@@ -60,8 +62,6 @@ public class CoreBlock extends StorageBlock{
 
         //support everything
         replaceable = false;
-        //TODO should AI ever rebuild this?
-        //rebuildable = false;
     }
 
     @Remote(called = Loc.server)
@@ -160,11 +160,11 @@ public class CoreBlock extends StorageBlock{
         //must have all requirements
         if(core == null || (!state.rules.infiniteResources && !core.items.has(requirements, state.rules.buildCostMultiplier))) return false;
 
-        return tile.block() instanceof CoreBlock && size > tile.block().size;
+        return tile.block() instanceof CoreBlock && size > tile.block().size && (!requiresCoreZone || tempTiles.allMatch(o -> o.floor().allowCorePlacement));
     }
 
     @Override
-    public void placeBegan(Tile tile, Block previous){
+    public void placeBegan(Tile tile, Block previous, Unit builder){
         //finish placement immediately when a block is replaced.
         if(previous instanceof CoreBlock){
             tile.setBlock(this, tile.team());
@@ -181,6 +181,8 @@ public class CoreBlock extends StorageBlock{
 
                 nextItems = null;
             }
+
+            Events.fire(new BlockBuildEndEvent(tile, builder, tile.team(), false, null));
         }
     }
 
@@ -357,7 +359,13 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public void changeTeam(Team next){
+            if(this.team == next) return;
+
+            onRemoved();
+
             super.changeTeam(next);
+
+            onProximityUpdate();
 
             Events.fire(new CoreChangeEvent(this));
         }
@@ -492,12 +500,6 @@ public class CoreBlock extends StorageBlock{
 
             storageCapacity = itemCapacity + proximity().sum(e -> owns(e) ? e.block.itemCapacity : 0);
             proximity.each(this::owns, t -> {
-                //add inventory if there is something in it from a payload
-                if(t.items != items){
-                    items.add(t.items);
-                    t.items.clear();
-                }
-
                 t.items = items;
                 ((StorageBuild)t).linkedCore = this;
             });
@@ -598,11 +600,6 @@ public class CoreBlock extends StorageBlock{
             });
 
             state.teams.unregisterCore(this);
-
-            int max = itemCapacity * state.teams.cores(team).size;
-            for(Item item : content.items()){
-                items.set(item, Math.min(items.get(item), max));
-            }
 
             for(CoreBuild other : state.teams.cores(team)){
                 other.onProximityUpdate();

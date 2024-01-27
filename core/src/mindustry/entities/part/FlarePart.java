@@ -9,7 +9,7 @@ import mindustry.graphics.*;
 public class FlarePart extends DrawPart{
     public int sides = 4;
     public float radius = 100f, radiusTo = -1f, stroke = 6f, innerScl = 0.5f, innerRadScl = 0.33f;
-    public float x, y, rotation, rotMove;
+    public float x, y, rotation, rotMove, spinSpeed;
     public boolean followRotation;
     public Color color1 = Pal.techBlue, color2 = Color.white;
     public PartProgress progress = PartProgress.warmup;
@@ -29,7 +29,7 @@ public class FlarePart extends DrawPart{
         float
         rx = params.x + Tmp.v1.x,
         ry = params.y + Tmp.v1.y,
-        rot = (followRotation ? params.rotation : 0f) + rotMove * prog + rotation,
+        rot = (followRotation ? params.rotation : 0f) + rotMove * prog + rotation + Time.time * spinSpeed,
         rad = radiusTo < 0 ? radius : Mathf.lerp(radius, radiusTo, prog);
 
         Draw.color(color1);

@@ -66,4 +66,9 @@ abstract class EntityComp{
     void afterRead(){
 
     }
+
+    /** Called after *all* entities are read. */
+    void afterAllRead(){
+
+    }
 }

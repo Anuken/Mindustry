@@ -445,6 +445,12 @@ public class Logic implements ApplicationListener{
                     updateWeather();
 
                     for(TeamData data : state.teams.getActive()){
+                        //does not work on PvP so built-in attack maps can have it on by default without issues
+                        if(data.team.rules().buildAi && !state.rules.pvp){
+                            if(data.buildAi == null) data.buildAi = new BaseBuilderAI(data);
+                            data.buildAi.update();
+                        }
+
                         if(data.team.rules().rtsAi){
                             if(data.rtsAi == null) data.rtsAi = new RtsAI(data);
                             data.rtsAi.update();
@@ -452,7 +458,6 @@ public class Logic implements ApplicationListener{
                     }
                 }
 
-                //TODO objectives clientside???
                 if(!state.isEditor()){
                     state.rules.objectives.update();
                     if(state.rules.objectives.checkChanged() && net.server()){

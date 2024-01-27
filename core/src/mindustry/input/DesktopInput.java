@@ -6,26 +6,24 @@ import arc.Graphics.Cursor.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.input.*;
+import arc.input.KeyCode.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
-import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
-import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.input.Placement.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 
-import java.util.*;
-
+import static arc.Core.camera;
 import static arc.Core.*;
 import static mindustry.Vars.*;
 import static mindustry.input.PlaceMode.*;
@@ -52,6 +50,11 @@ public class DesktopInput extends InputHandler{
     public long selectMillis = 0;
     /** Previously selected tile. */
     public Tile prevSelected;
+
+    /** Most recently selected control group by index */
+    public int lastCtrlGroup;
+    /** Time of most recent control group selection */
+    public long lastCtrlGroupSelectMillis;
 
     boolean showHint(){
         return ui.hudfrag.shown && Core.settings.getBool("hints") && selectPlans.isEmpty() &&
@@ -111,7 +114,7 @@ public class DesktopInput extends InputHandler{
 
         //draw break selection
         if(mode == breaking){
-            drawBreakSelection(selectX, selectY, cursorX, cursorY, !Core.input.keyDown(Binding.schematic_select) ? maxLength : Vars.maxSchematicSize);
+            drawBreakSelection(selectX, selectY, cursorX, cursorY, !Core.input.keyDown(Binding.schematic_select) ? maxLength : Vars.maxSchematicSize, false);
         }
 
         if(!Core.scene.hasKeyboard() && mode != breaking){
@@ -119,19 +122,7 @@ public class DesktopInput extends InputHandler{
             if(Core.input.keyDown(Binding.schematic_select)){
                 drawSelection(schemX, schemY, cursorX, cursorY, Vars.maxSchematicSize);
             }else if(Core.input.keyDown(Binding.rebuild_select)){
-                //TODO color?
-                drawSelection(schemX, schemY, cursorX, cursorY, 0, Pal.sapBulletBack, Pal.sapBullet);
-
-                NormalizeDrawResult result = Placement.normalizeDrawArea(Blocks.air, schemX, schemY, cursorX, cursorY, false, 0, 1f);
-
-                Tmp.r1.set(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
-
-                for(BlockPlan plan : player.team().data().plans){
-                    Block block = content.block(plan.block);
-                    if(block.bounds(plan.x, plan.y, Tmp.r2).overlaps(Tmp.r1)){
-                        drawSelected(plan.x, plan.y, content.block(plan.block), Pal.sapBullet);
-                    }
-                }
+                drawRebuildSelection(schemX, schemY, cursorX, cursorY);
             }
         }
 
@@ -149,7 +140,7 @@ public class DesktopInput extends InputHandler{
         //draw plan being moved
         if(splan != null){
             boolean valid = validPlace(splan.x, splan.y, splan.block, splan.rotation, splan);
-            if(splan.block.rotate){
+            if(splan.block.rotate && splan.block.drawArrow){
                 drawArrow(splan.block, splan.x, splan.y, splan.rotation, valid);
             }
 
@@ -188,24 +179,25 @@ public class DesktopInput extends InputHandler{
             if(mode == placing && block != null){
                 for(int i = 0; i < linePlans.size; i++){
                     var plan = linePlans.get(i);
-                    if(i == linePlans.size - 1 && plan.block.rotate){
+                    if(i == linePlans.size - 1 && plan.block.rotate && plan.block.drawArrow){
                         drawArrow(block, plan.x, plan.y, plan.rotation);
                     }
                     drawPlan(linePlans.get(i));
                 }
                 linePlans.each(this::drawOverPlan);
             }else if(isPlacing()){
+                int rot = block == null ? rotation : block.planRotation(rotation);
                 if(block.rotate && block.drawArrow){
-                    drawArrow(block, cursorX, cursorY, rotation);
+                    drawArrow(block, cursorX, cursorY, rot);
                 }
                 Draw.color();
-                boolean valid = validPlace(cursorX, cursorY, block, rotation);
-                drawPlan(cursorX, cursorY, block, rotation);
-                block.drawPlace(cursorX, cursorY, rotation, valid);
+                boolean valid = validPlace(cursorX, cursorY, block, rot);
+                drawPlan(cursorX, cursorY, block, rot);
+                block.drawPlace(cursorX, cursorY, rot, valid);
 
                 if(block.saveConfig){
                     Draw.mixcol(!valid ? Pal.breakInvalid : Color.white, (!valid ? 0.4f : 0.24f) + Mathf.absin(Time.globalTime, 6f, 0.28f));
-                    bplan.set(cursorX, cursorY, rotation, block);
+                    bplan.set(cursorX, cursorY, rot, block);
                     bplan.config = block.lastConfig;
                     block.drawPlanConfig(bplan, allPlans());
                     bplan.config = null;
@@ -277,22 +269,86 @@ public class DesktopInput extends InputHandler{
         //validate commanding units
         selectedUnits.removeAll(u -> !u.isCommandable() || !u.isValid());
 
-        if(commandMode && input.keyTap(Binding.select_all_units) && !scene.hasField() && !scene.hasDialog()){
-            selectedUnits.clear();
-            commandBuildings.clear();
-            for(var unit : player.team().data().units){
-                if(unit.isCommandable()){
-                    selectedUnits.add(unit);
+        if(commandMode && !scene.hasField() && !scene.hasDialog()){
+            if(input.keyTap(Binding.select_all_units)){
+                selectedUnits.clear();
+                commandBuildings.clear();
+                for(var unit : player.team().data().units){
+                    if(unit.isCommandable()){
+                        selectedUnits.add(unit);
+                    }
                 }
             }
-        }
 
-        if(commandMode && input.keyTap(Binding.select_all_unit_factories) && !scene.hasField() && !scene.hasDialog()){
-            selectedUnits.clear();
-            commandBuildings.clear();
-            for(var build : player.team().data().buildings){
-                if(build.block.commandable){
-                    commandBuildings.add(build);
+            if(input.keyTap(Binding.select_all_unit_factories)){
+                selectedUnits.clear();
+                commandBuildings.clear();
+                for(var build : player.team().data().buildings){
+                    if(build.block.commandable){
+                        commandBuildings.add(build);
+                    }
+                }
+            }
+
+            for(int i = 0; i < controlGroupBindings.length; i++){
+                if(input.keyTap(controlGroupBindings[i])){
+
+                    //create control group if it doesn't exist yet
+                    if(controlGroups[i] == null) controlGroups[i] = new IntSeq();
+
+                    IntSeq group = controlGroups[i];
+                    boolean creating = input.keyDown(Binding.create_control_group);
+
+                    //clear existing if making a new control group
+                    //if any of the control group edit buttons are pressed take the current selection
+                    if(creating){
+                        group.clear();
+
+                        IntSeq selectedUnitIds = selectedUnits.mapInt(u -> u.id);
+                        if(Core.settings.getBool("distinctcontrolgroups", true)){
+                            for(IntSeq cg : controlGroups){
+                                if(cg != null){
+                                    cg.removeAll(selectedUnitIds);
+                                }
+                            }
+                        }
+                        group.addAll(selectedUnitIds);
+                    }
+
+                    //remove invalid units
+                    for(int j = 0; j < group.size; j++){
+                        Unit u = Groups.unit.getByID(group.get(j));
+                        if(u == null || !u.isCommandable() || !u.isValid()){
+                            group.removeIndex(j);
+                            j --;
+                        }
+                    }
+
+                    //replace the selected units with the current control group
+                    if(!group.isEmpty() && !creating){
+                        selectedUnits.clear();
+                        commandBuildings.clear();
+
+                        group.each(id -> {
+                            var unit = Groups.unit.getByID(id);
+                            if(unit != null){
+                                selectedUnits.addAll(unit);
+                            }
+                        });
+
+                        //double tap to center camera
+                        if(lastCtrlGroup == i && Time.timeSinceMillis(lastCtrlGroupSelectMillis) < 400){
+                            float totalX = 0, totalY = 0;
+                            for(Unit unit : selectedUnits){
+                                totalX += unit.x;
+                                totalY += unit.y;
+                            }
+                            panning = true;
+                            Core.camera.position.set(totalX / selectedUnits.size, totalY / selectedUnits.size);
+                        }
+                        lastCtrlGroup = i;
+                        lastCtrlGroupSelectMillis = Time.millis();
+                    }
                 }
             }
         }
@@ -391,8 +447,12 @@ public class DesktopInput extends InputHandler{
         Tile cursor = tileAt(Core.input.mouseX(), Core.input.mouseY());
 
         if(cursor != null){
-            if(cursor.build != null){
+            if(cursor.build != null && cursor.build.interactable(player.team())){
                 cursorType = cursor.build.getCursor();
+            }
+
+            if(cursor.build != null && cursor.build.team == Team.derelict && Build.validPlace(cursor.block(), player.team(), cursor.build.tileX(), cursor.build.tileY(), cursor.build.rotation)){
+                cursorType = ui.repairCursor;
             }
 
             if((isPlacing() && player.isBuilder()) || !selectPlans.isEmpty()){
@@ -403,8 +463,23 @@ public class DesktopInput extends InputHandler{
                 cursorType = ui.drillCursor;
             }
 
-            if(commandMode && selectedUnits.any() && ((cursor.build != null && !cursor.build.inFogTo(player.team()) && cursor.build.team != player.team()) || (selectedEnemyUnit(input.mouseWorldX(), input.mouseWorldY()) != null))){
-                cursorType = ui.targetCursor;
+            if(commandMode && selectedUnits.any()){
+                boolean canAttack = (cursor.build != null && !cursor.build.inFogTo(player.team()) && cursor.build.team != player.team());
+
+                if(!canAttack){
+                    var unit = selectedEnemyUnit(input.mouseWorldX(), input.mouseWorldY());
+                    if(unit != null){
+                        canAttack = selectedUnits.contains(u -> u.canTarget(unit));
+                    }
+                }
+
+                if(canAttack){
+                    cursorType = ui.targetCursor;
+                }
+
+                if(input.keyTap(Binding.command_queue) && keybinds.get(Binding.command_queue).key.type != KeyType.mouse){
+                    commandTap(input.mouseX(), input.mouseY(), true);
+                }
             }
 
             if(getPlan(cursor.x, cursor.y) != null && mode == none){
@@ -493,7 +568,7 @@ public class DesktopInput extends InputHandler{
             schematicY += shiftY;
         }
 
-        if(Core.input.keyTap(Binding.deselect) && !isPlacing() && !commandMode){
+        if(Core.input.keyTap(Binding.deselect) && !isPlacing() && player.unit().plans.isEmpty() && !commandMode){
             player.unit().mineTile = null;
         }
 
@@ -529,20 +604,8 @@ public class DesktopInput extends InputHandler{
                 schemX = -1;
                 schemY = -1;
             }else if(input.keyRelease(Binding.rebuild_select)){
-                //TODO rebuild!!!
 
-                NormalizeResult result = Placement.normalizeArea(schemX, schemY, rawCursorX, rawCursorY, rotation, false, 999999999);
-                Tmp.r1.set(result.x * tilesize, result.y * tilesize, (result.x2 - result.x) * tilesize, (result.y2 - result.y) * tilesize);
-
-                Iterator<BlockPlan> broken = player.team().data().plans.iterator();
-                while(broken.hasNext()){
-                    BlockPlan plan = broken.next();
-                    Block block = content.block(plan.block);
-                    if(block.bounds(plan.x, plan.y, Tmp.r2).overlaps(Tmp.r1)){
-                        player.unit().addBuild(new BuildPlan(plan.x, plan.y, plan.rotation, content.block(plan.block), plan.config));
-                    }
-                }
-
+                rebuildArea(schemX, schemY, rawCursorX, rawCursorY);
                 schemX = -1;
                 schemY = -1;
             }
@@ -613,7 +676,7 @@ public class DesktopInput extends InputHandler{
                 commandRect = true;
                 commandRectX = input.mouseWorldX();
                 commandRectY = input.mouseWorldY();
-            }else if(!checkConfigTap() && selected != null){
+            }else if(!checkConfigTap() && selected != null && !tryRepairDerelict(selected)){
                 //only begin shooting if there's no cursor event
                 if(!tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && !tileTapped(selected.build) && !player.unit().activelyBuilding() && !droppingItem
                     && !(tryStopMine(selected) || (!settings.getBool("doubletapmine") || selected == prevSelected && Time.timeSinceMillis(selectMillis) < 500) && tryBeginMine(selected)) && !Core.scene.hasKeyboard()){
@@ -736,6 +799,10 @@ public class DesktopInput extends InputHandler{
 
         if(button == KeyCode.mouseRight){
             commandTap(x, y);
+        }
+
+        if(button == keybinds.get(Binding.command_queue).key){
+            commandTap(x, y, true);
         }
 
         return super.touchDown(x, y, pointer, button);

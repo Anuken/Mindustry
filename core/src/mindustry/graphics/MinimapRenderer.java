@@ -68,26 +68,26 @@ public class MinimapRenderer{
         });
 
         Events.on(BuildTeamChangeEvent.class, event -> update(event.build.tile));
+    }
 
-        Events.run(Trigger.update, () -> {
-            //updates are batched to occur every 2 frames
-            if((updateCounter += Time.delta) >= updateInterval){
-                updateCounter %= updateInterval;
+    public void update(){
+        //updates are batched to occur every 2 frames
+        if((updateCounter += Time.delta) >= updateInterval){
+            updateCounter %= updateInterval;
 
-                updates.each(pos -> {
-                    Tile tile = world.tile(pos);
-                    if(tile == null) return;
+            updates.each(pos -> {
+                Tile tile = world.tile(pos);
+                if(tile == null) return;
 
-                    int color = colorFor(tile);
-                    pixmap.set(tile.x, pixmap.height - 1 - tile.y, color);
+                int color = colorFor(tile);
+                pixmap.set(tile.x, pixmap.height - 1 - tile.y, color);
 
-                    //yes, this calls glTexSubImage2D every time, with a 1x1 region
-                    Pixmaps.drawPixel(texture, tile.x, pixmap.height - 1 - tile.y, color);
-                });
+                //yes, this calls glTexSubImage2D every time, with a 1x1 region
+                Pixmaps.drawPixel(texture, tile.x, pixmap.height - 1 - tile.y, color);
+            });
 
-                updates.clear();
-            }
-        });
+            updates.clear();
+        }
     }
 
     public Pixmap getPixmap(){
@@ -193,7 +193,7 @@ public class MinimapRenderer{
             Tmp.tr1.set(dynamicTex);
             Tmp.tr1.set(region.u, 1f - region.v, region.u2, 1f - region.v2);
 
-            Draw.color(state.rules.dynamicColor);
+            Draw.color(state.rules.dynamicColor, 0.5f);
             Draw.rect(Tmp.tr1, x + w/2f, y + h/2f, w, h);
 
             if(state.rules.staticFog){
@@ -201,7 +201,7 @@ public class MinimapRenderer{
 
                 Tmp.tr1.texture = staticTex;
                 //must be black to fit with borders
-                Draw.color(0f, 0f, 0f, state.rules.staticColor.a);
+                Draw.color(0f, 0f, 0f, 1f);
                 Draw.rect(Tmp.tr1, x + w/2f, y + h/2f, w, h);
             }
 
@@ -255,9 +255,17 @@ public class MinimapRenderer{
 
         state.rules.objectives.eachRunning(obj -> {
             for(var marker : obj.markers){
-                marker.drawMinimap(this);
+                if(marker.minimap){
+                    marker.drawMinimap(this);
+                }
             }
         });
+
+        for(var marker : state.markers){
+            if(!marker.isHidden() && marker.minimap){
+                marker.drawMinimap(this);
+            }
+        }
     }
 
     public void drawSpawns(float x, float y, float w, float h, float scaling){
@@ -297,6 +305,14 @@ public class MinimapRenderer{
 
     public float scale(float radius){
         return worldSpace ? (radius / (baseSize / 2f)) * 5f * lastScl : lastW / rect.width * radius;
+    }
+
+    public float getScaleFactor(boolean zoomAutoScale){
+        if(!zoomAutoScale){
+            return worldSpace ? (1 / (baseSize / 2f)) * 5f * lastScl : lastW / rect.width;
+        }else{
+            return worldSpace ? (1 / (baseSize / 2f)) * 5f : lastW / 256f;
+        }
     }
 
     public @Nullable TextureRegion getRegion(){

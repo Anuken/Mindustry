@@ -39,6 +39,8 @@ public class Rules{
     public boolean attackMode = false;
     /** Whether this is the editor gamemode. */
     public boolean editor = false;
+    /** Whether blocks can be repaired by clicking them. */
+    public boolean derelictRepair = true;
     /** Whether a gameover can happen at all. Set this to false to implement custom gameover conditions. */
     public boolean canGameOver = true;
     /** Whether cores change teams when they are destroyed. */
@@ -103,6 +105,10 @@ public class Rules{
     public boolean coreDestroyClear = false;
     /** If true, banned blocks are hidden from the build menu. */
     public boolean hideBannedBlocks = false;
+    /** If true, most blocks (including environmental walls) can be deconstructed. This is only meant to be used internally in sandbox/test maps. */
+    public boolean allowEnvironmentDeconstruct = false;
+    /** If true, buildings will be constructed instantly, with no limit on blocks placed per second. This is highly experimental and may cause lag! */
+    public boolean instantBuild = false;
     /** If true, bannedBlocks becomes a whitelist. */
     public boolean blockWhitelist = false;
     /** If true, bannedUnits becomes a whitelist. */
@@ -191,6 +197,8 @@ public class Rules{
     public float backgroundOffsetX = 0.1f, backgroundOffsetY = 0.1f;
     /** Parameters for planet rendered in the background. Cannot be changed once a map is loaded. */
     public @Nullable PlanetParams planetBackground;
+    /** Rules from this planet are applied. If it's {@code sun}, mixed tech is enabled. */
+    public Planet planet = Planets.serpulo;
 
     /** Copies this ruleset exactly. Not efficient at all, do not use often. */
     public Rules copy(){
@@ -266,6 +274,11 @@ public class Rules{
         public boolean infiniteResources;
         /** If true, this team has infinite unit ammo. */
         public boolean infiniteAmmo;
+
+        /** AI that builds random schematics. */
+        public boolean buildAi;
+        /** Tier of builder AI. [0, 1] */
+        public float buildAiTier = 1f;
 
         /** Enables "RTS" unit AI. */
         public boolean rtsAi;

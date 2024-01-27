@@ -28,6 +28,7 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
+import mindustry.logic.*;
 import mindustry.type.ammo.*;
 import mindustry.ui.*;
 import mindustry.world.*;
@@ -40,7 +41,7 @@ import mindustry.world.meta.*;
 import static arc.graphics.g2d.Draw.*;
 import static mindustry.Vars.*;
 
-public class UnitType extends UnlockableContent{
+public class UnitType extends UnlockableContent implements Senseable{
     public static final float shadowTX = -12, shadowTY = -13;
     private static final Vec2 legOffset = new Vec2();
 
@@ -295,6 +296,8 @@ public class UnitType extends UnlockableContent{
     public UnitCommand[] commands = {};
     /** Command to assign to this unit upon creation. Null indicates the first command in the array. */
     public @Nullable UnitCommand defaultCommand;
+    /** Stances this unit can have.  An empty array means stances will be assigned based on unit capabilities in init(). */
+    public UnitStance[] stances = {};
 
     /** color for outline generated around sprites */
     public Color outlineColor = Pal.darkerMetal;
@@ -504,7 +507,7 @@ public class UnitType extends UnlockableContent{
         table.table(t -> {
             t.left();
             t.add(new Image(uiIcon)).size(iconMed).scaling(Scaling.fit);
-            t.labelWrap(localizedName).left().width(190f).padLeft(5);
+            t.labelWrap(unit.isPlayer() ? unit.getPlayer().coloredName() + "\n[lightgray]" + localizedName : localizedName).left().width(190f).padLeft(5);
         }).growX().left();
         table.row();
 
@@ -600,15 +603,11 @@ public class UnitType extends UnlockableContent{
         stats.add(Stat.size, StatValues.squared(hitSize / tilesize, StatUnit.blocks));
         stats.add(Stat.itemCapacity, itemCapacity);
         stats.add(Stat.range, (int)(maxRange / tilesize), StatUnit.blocks);
+        stats.add(Stat.targetsAir, targetAir);
+        stats.add(Stat.targetsGround, targetGround);
 
         if(abilities.any()){
-            var unique = new ObjectSet<String>();
-
-            for(Ability a : abilities){
-                if(a.display && unique.add(a.localized())){
-                    stats.add(Stat.abilities, a.localized());
-                }
-            }
+            stats.add(Stat.abilities, StatValues.abilities(abilities));
         }
 
         stats.add(Stat.flying, flying);
@@ -684,8 +683,8 @@ public class UnitType extends UnlockableContent{
 
         if(pathCost == null){
             pathCost =
-                example instanceof WaterMovec ? ControlPathfinder.costNaval :
-                allowLegStep ? ControlPathfinder.costLegs :
+                naval ? ControlPathfinder.costNaval :
+                allowLegStep || example instanceof Crawlc ? ControlPathfinder.costLegs :
                 hovering ? ControlPathfinder.costHover :
                 ControlPathfinder.costGround;
         }
@@ -699,7 +698,9 @@ public class UnitType extends UnlockableContent{
         }
 
         //if a status effects slows a unit when firing, don't shoot while moving.
-        autoFindTarget = !weapons.contains(w -> w.shootStatus.speedMultiplier < 0.99f) || alwaysShootWhenMoving;
+        if(autoFindTarget){
+            autoFindTarget = !weapons.contains(w -> w.shootStatus.speedMultiplier < 0.99f) || alwaysShootWhenMoving;
+        }
 
         clipSize = Math.max(clipSize, lightRadius * 1.1f);
         singleTarget = weapons.size <= 1 && !forceMultiTarget;
@@ -809,7 +810,7 @@ public class UnitType extends UnlockableContent{
         if(commands.length == 0){
             Seq<UnitCommand> cmds = new Seq<>(UnitCommand.class);
 
-            cmds.add(UnitCommand.moveCommand);
+            cmds.add(UnitCommand.moveCommand, UnitCommand.enterPayloadCommand);
 
             if(canBoost){
                 cmds.add(UnitCommand.boostCommand);
@@ -828,9 +829,24 @@ public class UnitType extends UnlockableContent{
                 if(mineTier > 0){
                     cmds.add(UnitCommand.mineCommand);
                 }
+                if(example instanceof Payloadc){
+                    cmds.addAll(UnitCommand.loadUnitsCommand, UnitCommand.loadBlocksCommand, UnitCommand.unloadPayloadCommand);
+                }
             }
 
             commands = cmds.toArray();
+        }
+
+        if(stances.length == 0){
+            if(canAttack){
+                Seq<UnitStance> seq = Seq.with(UnitStance.stop, UnitStance.shoot, UnitStance.holdFire, UnitStance.pursueTarget, UnitStance.patrol);
+                if(crushDamage > 0){
+                    seq.add(UnitStance.ram);
+                }
+                stances = seq.toArray(UnitStance.class);
+            }else{
+                stances = new UnitStance[]{UnitStance.stop, UnitStance.patrol};
+            }
         }
 
         //dynamically create ammo capacity based on firing rate
@@ -936,13 +952,15 @@ public class UnitType extends UnlockableContent{
     public void createIcons(MultiPacker packer){
         super.createIcons(packer);
 
+        if(constructor == null) throw new IllegalArgumentException("No constructor set up for unit '" + name + "', add this argument to your units field: `constructor = UnitEntity::create`");
+
         sample = constructor.get();
 
         var toOutline = new Seq<TextureRegion>();
         getRegionsToOutline(toOutline);
 
         for(var region : toOutline){
-            if(region instanceof AtlasRegion atlas){
+            if(region instanceof AtlasRegion atlas && !Core.atlas.has(atlas.name + "-outline")){
                 String regionName = atlas.name;
                 Pixmap outlined = Pixmaps.outline(Core.atlas.getPixmap(region), outlineColor, outlineRadius);
 
@@ -1120,6 +1138,24 @@ public class UnitType extends UnlockableContent{
         }
 
         return super.researchRequirements();
+    }
+
+    @Override
+    public double sense(LAccess sensor){
+        return switch(sensor){
+            case health, maxHealth -> health;
+            case size -> hitSize / tilesize;
+            case itemCapacity -> itemCapacity;
+            case speed -> speed * 60f / tilesize;
+            case id -> getLogicId();
+            default -> Double.NaN;
+        };
+    }
+
+    @Override
+    public Object senseObject(LAccess sensor){
+        if(sensor == LAccess.name) return name;
+        return noSensed;
     }
 
     @Override
@@ -1308,23 +1344,24 @@ public class UnitType extends UnlockableContent{
 
         //draw back items
         if(unit.item() != null && unit.itemTime > 0.01f){
-            float size = (itemSize + Mathf.absin(Time.time, 5f, 1f)) * unit.itemTime;
+            float sin = Mathf.absin(Time.time, 5f, 1f);
+            float size = (itemSize + sin) * unit.itemTime;
 
-            Draw.mixcol(Pal.accent, Mathf.absin(Time.time, 5f, 0.1f));
+            Draw.mixcol(Pal.accent, sin * 0.1f);
             Draw.rect(unit.item().fullIcon,
             unit.x + Angles.trnsx(unit.rotation + 180f, itemOffsetY),
             unit.y + Angles.trnsy(unit.rotation + 180f, itemOffsetY),
             size, size, unit.rotation);
             Draw.mixcol();
 
-            size = ((3f + Mathf.absin(Time.time, 5f, 1f)) * unit.itemTime + 0.5f) * 2;
+            size = ((3f + sin) * unit.itemTime + 0.5f) * 2;
             Draw.color(Pal.accent);
             Draw.rect(itemCircleRegion,
             unit.x + Angles.trnsx(unit.rotation + 180f, itemOffsetY),
             unit.y + Angles.trnsy(unit.rotation + 180f, itemOffsetY),
             size, size);
 
-            if(unit.isLocal() && !renderer.pixelator.enabled()){
+            if(unit.isLocal() && !renderer.pixelate){
                 Fonts.outline.draw(unit.stack.amount + "",
                 unit.x + Angles.trnsx(unit.rotation + 180f, itemOffsetY),
                 unit.y + Angles.trnsy(unit.rotation + 180f, itemOffsetY) - 3,

@@ -83,13 +83,16 @@ public class Floor extends Block{
     protected TextureRegion edgeRegion;
 
     public Floor(String name){
-        super(name);
-        variants = 3;
+        this(name, 3);
     }
 
     public Floor(String name, int variants){
         super(name);
         this.variants = variants;
+        placeableLiquid = true;
+        allowRectanglePlacement = true;
+        instantBuild = true;
+        placeEffect = Fx.rotateBlock;
     }
 
     @Override
@@ -233,7 +236,8 @@ public class Floor extends Block{
         for(int i = 0; i < 8; i++){
             Point2 point = Geometry.d8[i];
             Tile other = tile.nearby(point);
-            if(other != null && other.floor().cacheLayer == layer && other.floor().edges() != null){
+            //special case: empty is, well, empty, so never draw emptyness on top, as that would just be an incorrect black texture
+            if(other != null && other.floor().cacheLayer == layer && other.floor().edges() != null && other.floor() != Blocks.empty){
                 if(!blended.getAndSet(other.floor().id)){
                     blenders.add(other.floor());
                     dirs[i] = other.floorID();
@@ -254,7 +258,7 @@ public class Floor extends Block{
             Point2 point = Geometry.d8[i];
             Tile other = tile.nearby(point);
 
-            if(other != null && doEdge(tile, other, other.floor()) && other.floor().cacheLayer == realCache && other.floor().edges() != null){
+            if(other != null && doEdge(tile, other, other.floor()) && other.floor().cacheLayer == realCache && other.floor().edges() != null && other.floor() != Blocks.empty){
 
                 if(!blended.getAndSet(other.floor().id)){
                     blenders.add(other.floor());
@@ -305,8 +309,9 @@ public class Floor extends Block{
         return ((Floor)blendGroup).edges;
     }
 
+    /** @return whether the edges from {@param other} should be drawn onto this tile **/
     protected boolean doEdge(Tile tile, Tile otherTile, Floor other){
-        return other.realBlendId(otherTile) > realBlendId(tile) || edges() == null;
+        return (other.realBlendId(otherTile) > realBlendId(tile) || edges() == null);
     }
 
     TextureRegion edge(Floor block, int x, int y){

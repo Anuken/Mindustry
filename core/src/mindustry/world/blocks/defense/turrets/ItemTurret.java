@@ -28,7 +28,7 @@ public class ItemTurret extends Turret{
 
     /** Initializes accepted ammo map. Format: [item1, bullet1, item2, bullet2...] */
     public void ammo(Object... objects){
-        ammoTypes = ObjectMap.of(objects);
+        ammoTypes = OrderedMap.of(objects);
     }
 
     /** Limits bullet range to this turret's range value. */

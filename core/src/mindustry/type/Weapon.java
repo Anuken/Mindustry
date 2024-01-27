@@ -10,6 +10,7 @@ import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.audio.*;
 import mindustry.content.*;
@@ -37,7 +38,7 @@ public class Weapon implements Cloneable{
     public boolean useAmmo = true;
     /** whether to create a flipped copy of this weapon upon initialization. default: true */
     public boolean mirror = true;
-    /** whether to flip the weapon's sprite when rendering */
+    /** whether to flip the weapon's sprite when rendering. internal use only - do not set! */
     public boolean flipSprite = false;
     /** whether to shoot the weapons in different arms one after another, rather than all at once; only valid when mirror = true */
     public boolean alternate = true;
@@ -53,6 +54,8 @@ public class Weapon implements Cloneable{
     public boolean continuous;
     /** whether this weapon uses continuous fire without reloading; implies continuous = true */
     public boolean alwaysContinuous;
+    /** Speed at which the turret can change its bullet "aim" distance. This is only used for point laser bullets. */
+    public float aimChangeSpeed = Float.POSITIVE_INFINITY;
     /** whether this weapon can be aimed manually by players */
     public boolean controllable = true;
     /** whether this weapon can be automatically aimed by the unit */
@@ -188,7 +191,7 @@ public class Weapon implements Cloneable{
         float
         rotation = unit.rotation - 90,
         realRecoil = Mathf.pow(mount.recoil, recoilPow) * recoil,
-        weaponRotation  = rotation + (rotate ? mount.rotation : 0),
+        weaponRotation  = rotation + (rotate ? mount.rotation : baseRotation),
         wx = unit.x + Angles.trnsx(rotation, x, y) + Angles.trnsx(weaponRotation, 0, -realRecoil),
         wy = unit.y + Angles.trnsy(rotation, x, y) + Angles.trnsy(weaponRotation, 0, -realRecoil);
 
@@ -250,6 +253,8 @@ public class Weapon implements Cloneable{
             Draw.blend();
             Draw.color();
         }
+
+        Draw.xscl = 1f;
 
         if(parts.size > 0){
             //TODO does it need an outline?
@@ -361,11 +366,23 @@ public class Weapon implements Cloneable{
                 mount.bullet.set(bulletX, bulletY);
                 mount.reload = reload;
                 mount.recoil = 1f;
-                unit.vel.add(Tmp.v1.trns(unit.rotation + 180f, mount.bullet.type.recoil * Time.delta));
+                unit.vel.add(Tmp.v1.trns(mount.bullet.rotation() + 180f, mount.bullet.type.recoil * Time.delta));
                 if(shootSound != Sounds.none && !headless){
                     if(mount.sound == null) mount.sound = new SoundLoop(shootSound, 1f);
                     mount.sound.update(bulletX, bulletY, true);
                 }
+
+                //target length of laser
+                float shootLength = Math.min(Mathf.dst(bulletX, bulletY, mount.aimX, mount.aimY), range());
+                //current length of laser
+                float curLength = Mathf.dst(bulletX, bulletY, mount.bullet.aimX, mount.bullet.aimY);
+                //resulting length of the bullet (smoothed)
+                float resultLength = Mathf.approachDelta(curLength, shootLength, aimChangeSpeed);
+                //actual aim end point based on length
+                Tmp.v1.trns(shootAngle, mount.lastLength = resultLength).add(bulletX, bulletY);
+
+                mount.bullet.aimX = Tmp.v1.x;
+                mount.bullet.aimY = Tmp.v1.y;
 
                 if(alwaysContinuous && mount.shoot){
                     mount.bullet.time = mount.bullet.lifetime * mount.bullet.type.optimalLifeFract * mount.warmup;
@@ -393,6 +410,7 @@ public class Weapon implements Cloneable{
         //shoot if applicable
         if(mount.shoot && //must be shooting
         can && //must be able to shoot
+        !(bullet.killShooter && mount.totalShots > 0) && //if the bullet kills the shooter, you should only ever be able to shoot once
         (!useAmmo || unit.ammo > 0 || !state.rules.unitAmmo || unit.team.rules().infiniteAmmo) && //check ammo
         (!alternate || wasFlipped == flipSprite) &&
         mount.warmup >= minWarmup && //must be warmed up
@@ -433,8 +451,18 @@ public class Weapon implements Cloneable{
         }
 
         shoot.shoot(mount.barrelCounter, (xOffset, yOffset, angle, delay, mover) -> {
+            //this is incremented immediately, as it is used for total bullet creation amount detection
+            mount.totalShots ++;
+            int barrel = mount.barrelCounter;
+
             if(delay > 0f){
-                Time.run(delay, () -> bullet(unit, mount, xOffset, yOffset, angle, mover));
+                Time.run(delay, () -> {
+                    //hack: make sure the barrel is the same as what it was when the bullet was queued to fire
+                    int prev = mount.barrelCounter;
+                    mount.barrelCounter = barrel;
+                    bullet(unit, mount, xOffset, yOffset, angle, mover);
+                    mount.barrelCounter = prev;
+                });
             }else{
                 bullet(unit, mount, xOffset, yOffset, angle, mover);
             }
@@ -454,9 +482,10 @@ public class Weapon implements Cloneable{
         bulletY = mountY + Angles.trnsy(weaponRotation, this.shootX + xOffset + xSpread, this.shootY + yOffset),
         shootAngle = bulletRotation(unit, mount, bulletX, bulletY) + angleOffset,
         lifeScl = bullet.scaleLife ? Mathf.clamp(Mathf.dst(bulletX, bulletY, mount.aimX, mount.aimY) / bullet.range) : 1f,
-        angle = angleOffset + shootAngle + Mathf.range(inaccuracy + bullet.inaccuracy);
+        angle = shootAngle + Mathf.range(inaccuracy + bullet.inaccuracy);
 
-        mount.bullet = bullet.create(unit, unit.team, bulletX, bulletY, angle, -1f, (1f - velocityRnd) + Mathf.random(velocityRnd), lifeScl, null, mover, mount.aimX, mount.aimY);
+        Entityc shooter = unit.controller() instanceof MissileAI ai ? ai.shooter : unit; //Pass the missile's shooter down to its bullets
+        mount.bullet = bullet.create(unit, shooter, unit.team, bulletX, bulletY, angle, -1f, (1f - velocityRnd) + Mathf.random(velocityRnd), lifeScl, null, mover, mount.aimX, mount.aimY);
         handleBullet(unit, mount, mount.bullet);
 
         if(!continuous){
@@ -474,12 +503,22 @@ public class Weapon implements Cloneable{
             mount.recoils[mount.barrelCounter % recoils] = 1f;
         }
         mount.heat = 1f;
-        mount.totalShots++;
     }
 
     //override to do special things to a bullet after spawning
     protected void handleBullet(Unit unit, WeaponMount mount, Bullet bullet){
-
+        if(continuous){
+            float
+                weaponRotation = unit.rotation - 90 + (rotate ? mount.rotation : baseRotation),
+                mountX = unit.x + Angles.trnsx(unit.rotation - 90, x, y),
+                mountY = unit.y + Angles.trnsy(unit.rotation - 90, x, y),
+                bulletX = mountX + Angles.trnsx(weaponRotation, this.shootX, this.shootY),
+                bulletY = mountY + Angles.trnsy(weaponRotation, this.shootX, this.shootY);
+            //make sure the length updates to the last set value
+            Tmp.v1.trns(bulletRotation(unit, mount, bulletX, bulletY), shootY + mount.lastLength).add(bulletX, bulletY);
+            bullet.aimX = Tmp.v1.x;
+            bullet.aimY = Tmp.v1.y;
+        }
     }
 
     public void flip(){

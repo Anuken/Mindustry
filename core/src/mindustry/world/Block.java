@@ -57,6 +57,8 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean conductivePower = false;
     /** If true, this block can output payloads; affects blending. */
     public boolean outputsPayload = false;
+    /** If true, this block can input payloads; affects unit payload enter behavior. */
+    public boolean acceptsPayloads = false;
     /** If true, payloads will attempt to move into this block. */
     public boolean acceptsPayload = false;
     /** Visual flag use for blending of certain transportation blocks. */
@@ -108,6 +110,8 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean rotate;
     /** if rotate is true and this is false, the region won't rotate when drawing */
     public boolean rotateDraw = true;
+    /** if rotate = false and this is true, rotation will be locked at 0 when placing (default); advanced use only */
+    public boolean lockRotation = true;
     /** if true, schematic flips with this block are inverted. */
     public boolean invertFlip = false;
     /** number of different variant regions to use */
@@ -150,6 +154,8 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean updateInUnits = true;
     /** if true, this block updates in payloads in units regardless of the experimental game rule */
     public boolean alwaysUpdateInUnits = false;
+    /** if false, only incinerable liquids are dropped when deconstructing; otherwise, all liquids are dropped. */
+    public boolean deconstructDropAllLiquid = false;
     /** Whether to use this block's color in the minimap. Only used for overlays. */
     public boolean useColor = true;
     /** item that drops from this block, used for drills */
@@ -168,6 +174,8 @@ public class Block extends UnlockableContent implements Senseable{
     public float baseExplosiveness = 0f;
     /** bullet that this block spawns when destroyed */
     public @Nullable BulletType destroyBullet = null;
+    /** if true, destroyBullet is spawned on the block's team instead of Derelict team */
+    public boolean destroyBulletSameTeam = false;
     /** liquid used for lighting */
     public @Nullable Liquid lightLiquid;
     /** whether cracks are drawn when this block is damaged */
@@ -237,6 +245,8 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean allowDiagonal = true;
     /** Whether to swap the diagonal placement modes. */
     public boolean swapDiagonalPlacement;
+    /** Whether to allow rectangular placement, as opposed to a line. */
+    public boolean allowRectanglePlacement = false;
     /** Build queue priority in schematics. */
     public int schematicPriority = 0;
     /**
@@ -314,6 +324,8 @@ public class Block extends UnlockableContent implements Senseable{
     public float deconstructThreshold = 0f;
     /** If true, this block deconstructs immediately. Instant deconstruction implies no resource refund. */
     public boolean instantDeconstruct = false;
+    /** If true, this block constructs immediately. This implies no resource requirement, and ignores configs - do not use, this is for performance only! */
+    public boolean instantBuild = false;
     /** Effect for placing the block. Passes size as rotation. */
     public Effect placeEffect = Fx.placeBlock;
     /** Effect for breaking the block. Passes size as rotation. */
@@ -330,6 +342,8 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean instantTransfer = false;
     /** Whether you can rotate this block after it is placed. */
     public boolean quickRotate = true;
+    /** If true, this derelict block can be repair by clicking it. */
+    public boolean allowDerelictRepair = true;
     /** Main subclass. Non-anonymous. */
     public @Nullable Class<?> subclass;
     /** Scroll position for certain blocks. */
@@ -368,7 +382,7 @@ public class Block extends UnlockableContent implements Senseable{
     /** Dump timer ID.*/
     protected final int timerDump = timers++;
     /** How often to try dumping items in ticks, e.g. 5 = 12 times/sec*/
-    protected final int dumpTime = 5;
+    public int dumpTime = 5;
 
     public Block(String name){
         super(name);
@@ -430,7 +444,7 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     public float drawPlaceText(String text, int x, int y, boolean valid){
-        if(renderer.pixelator.enabled()) return 0;
+        if(renderer.pixelate) return 0;
 
         Color color = valid ? Pal.accent : Pal.remove;
         Font font = Fonts.outline;
@@ -642,7 +656,7 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean canReplace(Block other){
         if(other.alwaysReplace) return true;
         if(other.privileged) return false;
-        return other.replaceable && (other != this || (rotate && quickRotate)) && this.group != BlockGroup.none && other.group == this.group &&
+        return other.replaceable && (other != this || (rotate && quickRotate)) && ((this.group != BlockGroup.none && other.group == this.group) || other == this) &&
             (size == other.size || (size >= other.size && ((subclass != null && subclass == other.subclass) || group.anyReplace)));
     }
 
@@ -667,7 +681,8 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     public boolean configSenseable(){
-        return configurations.containsKey(Item.class) || configurations.containsKey(Liquid.class);
+        return configurations.containsKey(Item.class) || configurations.containsKey(Liquid.class) || configurations.containsKey(UnlockableContent.class) ||
+               configurations.containsKey(Block.class) || configurations.containsKey(UnitType.class);
     }
 
     public Object nextConfig(){
@@ -888,6 +903,11 @@ public class Block extends UnlockableContent implements Senseable{
 
     }
 
+    /** Called when building of this block begins. */
+    public void placeBegan(Tile tile, Block previous, @Nullable Unit builder){
+        placeBegan(tile, previous);
+    }
+
     /** Called right before building of this block begins. */
     public void beforePlaceBegan(Tile tile, Block previous){
 
@@ -985,6 +1005,10 @@ public class Block extends UnlockableContent implements Senseable{
 
     public ConsumeCoolant consumeCoolant(float amount){
         return consume(new ConsumeCoolant(amount));
+    }
+
+    public ConsumeCoolant consumeCoolant(float amount, boolean allowLiquid, boolean allowGas){
+        return consume(new ConsumeCoolant(amount, allowLiquid, allowGas));
     }
 
     public <T extends Consume> T consume(T consume){
@@ -1341,9 +1365,13 @@ public class Block extends UnlockableContent implements Senseable{
         packer.add(PageType.editor, name + "-icon-editor", editorBase);
     }
 
+    public int planRotation(int rot){
+        return !rotate && lockRotation ? 0 : rot;
+    }
+
     public void flipRotation(BuildPlan req, boolean x){
         if((x == (req.rotation % 2 == 0)) != invertFlip){
-            req.rotation = Mathf.mod(req.rotation + 2, 4);
+            req.rotation = planRotation(Mathf.mod(req.rotation + 2, 4));
         }
     }
 
@@ -1352,10 +1380,11 @@ public class Block extends UnlockableContent implements Senseable{
         return switch(sensor){
             case color -> mapColor.toDoubleBits();
             case health, maxHealth -> health;
-            case size -> size * tilesize;
+            case size -> size;
             case itemCapacity -> itemCapacity;
             case liquidCapacity -> liquidCapacity;
             case powerCapacity -> consPower != null && consPower.buffered ? consPower.capacity : 0f;
+            case id -> getLogicId();
             default -> Double.NaN;
         };
     }

@@ -87,9 +87,9 @@ public class ItemSelection{
         if(rowCount > rows * 1.5f){
             main.table(s -> {
                 s.image(Icon.zoom).padLeft(4f);
-                search = s.field(null, text -> rebuild.run()).width(40 * columns).padBottom(4).left().growX().get();
+                search = s.field(null, text -> rebuild.run()).padBottom(4).left().growX().get();
                 search.setMessageText("@players.search");
-            }).row();
+            }).fillX().row();
         }
 
         ScrollPane pane = new ScrollPane(cont, Styles.smallPane);
@@ -103,7 +103,7 @@ public class ItemSelection{
         }
 
         pane.setOverscroll(false, false);
-        main.add(pane).growX().maxHeight(40 * rows);
+        main.add(pane).maxHeight(40 * rows);
         table.top().add(main);
     }
 }

@@ -20,6 +20,8 @@ public enum LAccess{
     health,
     maxHealth,
     heat,
+    shield,
+    armor,
     efficiency,
     progress,
     timescale,
@@ -28,6 +30,10 @@ public enum LAccess{
     y,
     shootX,
     shootY,
+    cameraX,
+    cameraY,
+    cameraWidth,
+    cameraHeight,
     size,
     dead,
     range, 
@@ -45,6 +51,7 @@ public enum LAccess{
     name,
     payloadCount,
     payloadType,
+    id,
 
     //values with parameters are considered controllable
     enabled("to"), //"to" is standard for single parameter access
@@ -60,7 +67,7 @@ public enum LAccess{
         all = values(),
         senseable = Seq.select(all, t -> t.params.length <= 1).toArray(LAccess.class),
         controls = Seq.select(all, t -> t.params.length > 0).toArray(LAccess.class),
-        settable = {x, y, rotation, team, flag, health, totalPower, payloadType};
+        settable = {x, y, rotation, speed, armor, health, team, flag, totalPower, payloadType};
 
     LAccess(String... params){
         this.params = params;

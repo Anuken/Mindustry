@@ -18,6 +18,7 @@ import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
+import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.world.blocks.storage.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
@@ -45,7 +46,7 @@ public class Renderer implements ApplicationListener{
     public @Nullable Bloom bloom;
     public @Nullable FrameBuffer backgroundBuffer;
     public FrameBuffer effectBuffer = new FrameBuffer();
-    public boolean animateShields, drawWeather = true, drawStatus, enableEffects, drawDisplays = true;
+    public boolean animateShields, drawWeather = true, drawStatus, enableEffects, drawDisplays = true, drawLight = true, pixelate = false;
     public float weatherAlpha;
     /** minZoom = zooming out, maxZoom = zooming in */
     public float minZoom = 1.5f, maxZoom = 6f;
@@ -179,11 +180,15 @@ public class Renderer implements ApplicationListener{
         drawStatus = settings.getBool("blockstatus");
         enableEffects = settings.getBool("effects");
         drawDisplays = !settings.getBool("hidedisplays");
+        drawLight = settings.getBool("drawlight", true);
+        pixelate = Core.settings.getBool("pixelate");
 
         if(landTime > 0){
             if(!state.isPaused()){
                 CoreBuild build = landCore == null ? player.bestCore() : landCore;
-                build.updateLandParticles();
+                if(build != null){
+                    build.updateLandParticles();
+                }
             }
 
             if(!state.isPaused()){
@@ -209,6 +214,8 @@ public class Renderer implements ApplicationListener{
             landTime = 0f;
             graphics.clear(Color.black);
         }else{
+            minimap.update();
+
             if(shakeTime > 0){
                 float intensity = shakeIntensity * (settings.getInt("screenshake", 4) / 4f) * 0.75f;
                 camShakeOffset.setToRandomDirection().scl(Mathf.random(intensity));
@@ -221,7 +228,7 @@ public class Renderer implements ApplicationListener{
                 shakeIntensity = 0f;
             }
 
-            if(pixelator.enabled()){
+            if(renderer.pixelate){
                 pixelator.drawPixelate();
             }else{
                 draw();
@@ -286,6 +293,7 @@ public class Renderer implements ApplicationListener{
 
     public void draw(){
         Events.fire(Trigger.preDraw);
+        MapPreviewLoader.checkPreviews();
 
         camera.update();
 
@@ -309,8 +317,9 @@ public class Renderer implements ApplicationListener{
         Draw.sort(true);
 
         Events.fire(Trigger.draw);
+        MapPreviewLoader.checkPreviews();
 
-        if(pixelator.enabled()){
+        if(renderer.pixelate){
             pixelator.register();
         }
 
@@ -332,7 +341,7 @@ public class Renderer implements ApplicationListener{
             }
         }
 
-        if(state.rules.lighting){
+        if(state.rules.lighting && drawLight){
             Draw.draw(Layer.light, lights::draw);
         }
 
@@ -342,7 +351,7 @@ public class Renderer implements ApplicationListener{
 
         if(bloom != null){
             bloom.resize(graphics.getWidth(), graphics.getHeight());
-            bloom.setBloomIntesity(settings.getInt("bloomintensity", 6) / 4f + 1f);
+            bloom.setBloomIntensity(settings.getInt("bloomintensity", 6) / 4f + 1f);
             bloom.blurPasses = settings.getInt("bloomblur", 1);
             Draw.draw(Layer.bullet - 0.02f, bloom::capture);
             Draw.draw(Layer.effect + 0.02f, bloom::render);
@@ -362,6 +371,23 @@ public class Renderer implements ApplicationListener{
                 effectBuffer.blit(Shaders.buildBeam);
             });
         }
+
+        //draw objective markers
+        state.rules.objectives.eachRunning(obj -> {
+            for(var marker : obj.markers){
+                if(!marker.minimap){
+                    marker.drawWorld();
+                }
+            }
+        });
+
+        for(var marker : state.markers){
+            if(!marker.isHidden() && !marker.minimap){
+                marker.drawWorld();
+            }
+        }
+
+        Draw.reset();
 
         Draw.draw(Layer.overlayUI, overlays::drawTop);
         if(state.rules.fog) Draw.draw(Layer.fogOfWar, fog::drawFog);

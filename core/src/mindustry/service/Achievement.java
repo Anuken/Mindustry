@@ -135,7 +135,6 @@ public enum Achievement{
 
             service.completeAchievement(name());
             service.storeStats();
-            completed = true;
         }
     }
 

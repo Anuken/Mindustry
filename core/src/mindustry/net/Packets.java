@@ -38,7 +38,7 @@ public class Packets{
     }
 
     public enum AdminAction{
-        kick, ban, trace, wave
+        kick, ban, trace, wave, switchTeam
     }
 
     /** Generic client connection event. */

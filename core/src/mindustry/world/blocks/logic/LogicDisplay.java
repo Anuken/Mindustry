@@ -27,7 +27,9 @@ public class LogicDisplay extends Block{
         commandPoly = 7,
         commandLinePoly = 8,
         commandTriangle = 9,
-        commandImage = 10;
+        commandImage = 10,
+        //note that this command actually only draws 1 character, unpacked in instruction
+        commandPrint = 11;
 
     public int maxSides = 25;
 
@@ -89,7 +91,11 @@ public class LogicDisplay extends Block{
                         p1 = unpackSign(DisplayCmd.p1(c)), p2 = unpackSign(DisplayCmd.p2(c)), p3 = unpackSign(DisplayCmd.p3(c)), p4 = unpackSign(DisplayCmd.p4(c));
 
                         switch(type){
-                            case commandClear -> Core.graphics.clear(x / 255f, y / 255f, p1 / 255f, 1f);
+                            case commandClear -> {
+                                //discard any pending batched sprites, so they don't get drawn over the cleared screen later
+                                Draw.discard();
+                                Core.graphics.clear(x / 255f, y / 255f, p1 / 255f, 1f);
+                            }
                             case commandLine -> Lines.line(x, y, p1, p2);
                             case commandRect -> Fill.crect(x, y, p1, p2);
                             case commandLineRect -> Lines.rect(x, y, p1, p2);
@@ -98,7 +104,19 @@ public class LogicDisplay extends Block{
                             case commandTriangle -> Fill.tri(x, y, p1, p2, p3, p4);
                             case commandColor -> Draw.color(this.color = Color.toFloatBits(x, y, p1, p2));
                             case commandStroke -> Lines.stroke(this.stroke = x);
-                            case commandImage -> Draw.rect(Fonts.logicIcon(p1), x, y, p2, p2, p3);
+                            case commandImage -> {
+                                var icon = Fonts.logicIcon(p1);
+                                Draw.rect(Fonts.logicIcon(p1), x, y, p2, p2 / icon.ratio(), p3);
+                            }
+                            case commandPrint -> {
+                                var glyph = Fonts.logic.getData().getGlyph((char)p1);
+                                if(glyph != null){
+                                    Tmp.tr1.set(Fonts.logic.getRegion().texture);
+                                    Tmp.tr1.set(glyph.u, glyph.v2, glyph.u2, glyph.v);
+
+                                    Draw.rect(Tmp.tr1, x + Tmp.tr1.width/2f + glyph.xoffset, y + Tmp.tr1.height/2f + glyph.yoffset + Fonts.logic.getData().capHeight + Fonts.logic.getData().ascent, Tmp.tr1.width, Tmp.tr1.height);
+                                }
+                            }
                         }
                     }
 
@@ -143,7 +161,9 @@ public class LogicDisplay extends Block{
         poly,
         linePoly,
         triangle,
-        image,;
+        image,
+        //note that this command actually only draws 1 character, unpacked in instruction
+        print;
 
         public static final GraphicsType[] all = values();
     }
