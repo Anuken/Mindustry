@@ -50,7 +50,8 @@ public class AsyncUdp{
                                     var channel = (DatagramChannel)key.channel();
                                     var buffer = ByteBuffer.allocate(request.bufferSize);
                                     channel.receive(buffer);
-                                    buffer.flip();
+                                    buffer.position(0);
+                                    buffer.limit(buffer.capacity());
 
                                     request.received.get(buffer);
                                     request.close();

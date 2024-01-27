@@ -39,13 +39,11 @@ public class Dns{
         }, error);
     }
 
-    /*
-       TODO: SRV record support
-
-       resolve(srvRecord, domain, bytes -> {
+    static void resolveSrv(String domain, Cons<Seq<SRVRecord>> result, Cons<Exception> error){
+        resolve(srvRecord, domain, bytes -> {
             int priority = bytes.getShort() & 0xFFFF;
-            int weight =  bytes.getShort() & 0xFFFF;
-            int port =  bytes.getShort() & 0xFFFF;
+            int weight = bytes.getShort() & 0xFFFF;
+            int port = bytes.getShort() & 0xFFFF;
 
             int len;
             StringBuilder builder = new StringBuilder();
@@ -55,15 +53,17 @@ public class Dns{
             }
             builder.delete(builder.length() - 1, builder.length());
 
-            return "SRV Record: " + builder + " " + priority + " " + weight + " port=" +port;
+            return new SRVRecord(0, priority, weight, port, builder.toString());
         }, records -> {
             if(records.size > 0){
-                Log.info("@ has SRV records: @", domain, records);
+                result.get(records);
+            }else{
+                //no SRV records, just call it an error
+                error.get(new UnknownHostException());
             }
-        }, e -> {});
-     */
+        }, error);
+    }
 
-    //TODO no SRV record support
     static void resolveAddress(String domain, Cons<InetAddress> result, Cons<Exception> error){
 
         //since parsing the address may be slow, check the cache first.
@@ -149,6 +149,7 @@ public class Dns{
         buffer.flip();
 
         AsyncUdp.send(addresses.get(index), 2000, 512, buffer, result -> {
+
             short responseId = result.getShort();
             if(responseId != id) {
                 throw new ArcRuntimeException("Invalid response ID");
