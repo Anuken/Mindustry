@@ -9,11 +9,10 @@ import arc.util.*;
 import java.net.*;
 import java.nio.*;
 import java.nio.channels.*;
-import java.nio.charset.*;
 import java.util.concurrent.*;
 
 public class Dns{
-    private static final int aRecord = 1, srvRecord = 33;
+    private static final int aRecord = 1, aaaaRecord = 28, srvRecord = 33;
     private static IntMap<ObjectMap<String, Seq<?>>> cache = new IntMap<>(); //TODO remove this cache?
     private static ConcurrentHashMap<String, InetAddress> domainToIp = new ConcurrentHashMap<>();
 
@@ -40,7 +39,31 @@ public class Dns{
         }, error);
     }
 
-    //TODO no SRV or AAAA record support
+    /*
+       TODO: SRV record support
+
+       resolve(srvRecord, domain, bytes -> {
+            int priority = bytes.getShort() & 0xFFFF;
+            int weight =  bytes.getShort() & 0xFFFF;
+            int port =  bytes.getShort() & 0xFFFF;
+
+            int len;
+            StringBuilder builder = new StringBuilder();
+            while((len = bytes.get()) != 0){
+                for(int j = 0; j < len; j++) builder.append((char)bytes.get());
+                builder.append('.');
+            }
+            builder.delete(builder.length() - 1, builder.length());
+
+            return "SRV Record: " + builder + " " + priority + " " + weight + " port=" +port;
+        }, records -> {
+            if(records.size > 0){
+                Log.info("@ has SRV records: @", domain, records);
+            }
+        }, e -> {});
+     */
+
+    //TODO no SRV record support
     static void resolveAddress(String domain, Cons<InetAddress> result, Cons<Exception> error){
 
         //since parsing the address may be slow, check the cache first.
@@ -76,8 +99,24 @@ public class Dns{
                 if(addresses.size > 0){
                     result.get(InetAddress.getByAddress(addresses.get(0)));
                 }else{
-                    //there are no records found
-                    error.get(new UnresolvedAddressException());
+                    //there are no records found - try AAAA instead.
+                    resolve(aaaaRecord, domain, bytes -> {
+                        byte[] address = new byte[16];
+                        bytes.get(address);
+                        return address;
+                    }, addresses2 -> {
+
+                        try{
+                            if(addresses2.size > 0){
+                                result.get(InetAddress.getByAddress(addresses2.get(0)));
+                            }else{
+                                //there are no records found
+                                error.get(new UnresolvedAddressException());
+                            }
+                        }catch(UnknownHostException unknown){
+                            error.get(unknown);
+                        }
+                    }, error);
                 }
             }catch(UnknownHostException unknown){
                 error.get(unknown);
@@ -98,9 +137,9 @@ public class Dns{
         buffer.putShort((short) 0);      // Additional
 
         // Domain
-        for(String part : domain.split("\\.")) {
+        for(String part : domain.split("\\.")){
             buffer.put((byte) part.length());
-            buffer.put(part.getBytes(StandardCharsets.UTF_8));
+            buffer.put(part.getBytes(Strings.utf8));
         }
         buffer.put((byte) 0);
 
