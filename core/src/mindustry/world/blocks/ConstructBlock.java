@@ -75,10 +75,8 @@ public class ConstructBlock extends Block{
 
         if(block instanceof OverlayFloor overlay){
             tile.setOverlay(overlay);
-            tile.setBlock(Blocks.air);
         }else if(block instanceof Floor floor){
             tile.setFloorUnder(floor);
-            tile.setBlock(Blocks.air);
         }else{
             tile.setBlock(block, team, rotation);
         }
