@@ -97,7 +97,9 @@ public class Dns{
         }, addresses -> {
             try{
                 if(addresses.size > 0){
-                    result.get(InetAddress.getByAddress(addresses.get(0)));
+                    var address = InetAddress.getByAddress(addresses.get(0));
+                    domainToIp.put(domain, address);
+                    result.get(address);
                 }else{
                     //there are no records found - try AAAA instead.
                     resolve(aaaaRecord, domain, bytes -> {
@@ -108,7 +110,9 @@ public class Dns{
 
                         try{
                             if(addresses2.size > 0){
-                                result.get(InetAddress.getByAddress(addresses2.get(0)));
+                                var address = InetAddress.getByAddress(addresses2.get(0));
+                                domainToIp.put(domain, address);
+                                result.get(address);
                             }else{
                                 //there are no records found
                                 error.get(new UnresolvedAddressException());
