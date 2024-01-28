@@ -85,8 +85,10 @@ public abstract class DrawPart{
         /** Weapon heat, 1 when just fired, 0, when it has cooled down (duration depends on weapon) */
         heat = p -> p.heat,
         /** Lifetime fraction, 0 to 1. Only for missiles. */
-        life = p -> p.life;
-
+        life = p -> p.life,
+        /** Current unscaled value of Time.time. */
+        time = p -> Time.time;
+        
         float get(PartParams p);
 
         static PartProgress constant(float value){
@@ -166,6 +168,10 @@ public abstract class DrawPart{
 
         default PartProgress absin(float scl, float mag){
             return p -> get(p) + Mathf.absin(scl, mag);
+        }
+        
+        default PartProgress mod(float time){
+            return p -> Mathf.mod(get(p), time);
         }
 
         default PartProgress apply(PartProgress other, PartFunc func){
