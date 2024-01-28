@@ -170,8 +170,12 @@ public abstract class DrawPart{
             return p -> get(p) + Mathf.absin(scl, mag);
         }
         
-        default PartProgress mod(float time){
-            return p -> Mathf.mod(get(p), time);
+        default PartProgress mod(float amount){
+            return p -> Mathf.mod(get(p), amount);
+        }
+        
+        default PartProgress loop(float time){
+            return p -> Mathf.mod(get(p)/time, 1);
         }
 
         default PartProgress apply(PartProgress other, PartFunc func){
