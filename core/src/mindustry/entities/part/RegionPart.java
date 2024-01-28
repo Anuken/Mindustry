@@ -146,7 +146,7 @@ public class RegionPart extends DrawPart{
                 childParam.sideMultiplier = params.sideMultiplier;
                 childParam.life = params.life;
                 childParam.sideOverride = i;
-                params.draw(children, null, params.warmup, params.reload, params.smoothReload, params.heat, params.recoil, params.charge, params.x + v1.x, params.y + v1.y, v31.z * sign + params.rotation);
+                DrawPart.params.draw(children, null, params.warmup, params.reload, params.smoothReload, params.heat, params.recoil, params.charge, params.x + v1.x, params.y + v1.y, v31.z * sign + params.rotation);
             }
         }
 
@@ -168,7 +168,7 @@ public class RegionPart extends DrawPart{
             childParam.sideOverride = i;
 
             v1.set(v31.x * sign, v31.y).rotateRadExact((params.rotation - 90) * Mathf.degRad);
-            params.update(children, null, params.warmup, params.reload, params.smoothReload, params.heat, params.recoil, params.charge, params.x + v1.x, params.y + v1.y, v31.z * sign + params.rotation);
+            DrawPart.params.update(children, null, params.warmup, params.reload, params.smoothReload, params.heat, params.recoil, params.charge, params.x + v1.x, params.y + v1.y, v31.z * sign + params.rotation);
         }
     }
 
