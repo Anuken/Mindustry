@@ -224,21 +224,22 @@ public class ArcNetProvider implements NetProvider{
 
     @Override
     public void pingHost(String address, int port, Cons<Host> valid, Cons<Exception> invalid){
-        mainExecutor.submit(() -> {
+        //TODO: main executor or not?
+        //mainExecutor.submit(() -> {
 
-            pingHostImpl(address, port, host -> Core.app.post(() -> valid.get(host)), e -> {
-                //raw IP addresses can't have SRV records, so don't bother checking
-                if(port == Vars.port && Addresses.getAddress(address) == null){
-                    Dns.resolveSrv("_mindustry._tcp." + address, records -> {
-                        records.sort();
-                        pingRecords(records, 0, host1 -> Core.app.post(() -> valid.get(host1)), srvError -> Core.app.post(() -> invalid.get(e)));
-                    }, srvError -> Core.app.post(() -> invalid.get(e)));
-                }else{
-                    Core.app.post(() -> invalid.get(e));
-                }
-            });
-
+        pingHostImpl(address, port, host -> Core.app.post(() -> valid.get(host)), e -> {
+            //raw IP addresses can't have SRV records, so don't bother checking
+            if(port == Vars.port && Addresses.getAddress(address) == null){
+                Dns.resolveSrv("_mindustry._tcp." + address, records -> {
+                    records.sort();
+                    pingRecords(records, 0, host1 -> Core.app.post(() -> valid.get(host1)), srvError -> Core.app.post(() -> invalid.get(e)));
+                }, srvError -> Core.app.post(() -> invalid.get(e)));
+            }else{
+                Core.app.post(() -> invalid.get(e));
+            }
         });
+
+        //});
     }
 
     private void pingRecords(Seq<SRVRecord> records, int index, Cons<Host> valid, Cons<Exception> invalid){
