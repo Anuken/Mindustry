@@ -32,6 +32,11 @@ public abstract class DrawBlock{
 
     }
 
+    /** Use to do something not directly related to drawing.*/
+    public void update(Building build){
+
+    }
+
     /** Draws the planned version of this block. */
     public void drawPlan(Block block, BuildPlan plan, Eachable<BuildPlan> list){
 

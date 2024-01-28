@@ -27,26 +27,32 @@ public class EffectSpawnerPart extends DrawPart{
     public boolean debugDraw = false;
 
     @Override
-    public void draw(PartParams params){
+    public void update(PartParams params){
         for(int i = 0; i < (mirror ? 2 : 1); i++){
-            float sign = (i == 0 ? 1f : -1f), rot = params.rotation + (rotation * sign);
-
-            v1.set(x * sign, y).rotate(params.rotation - 90).add(params.x, params.y);
-
-            if(debugDraw){
-                float z = Draw.z();
-                Draw.z(Layer.buildBeam);
-                Draw.color(Color.red);
-                Draw.rect("error", v1.x, v1.y, width, height, rot - 90f);
-                Draw.color();
-                Draw.z(z);
-            }
-
             if(!Vars.state.isPaused() && Mathf.chanceDelta(effectChance * (useProgress ? progress.getClamp(params) : 1f))){
+                float sign = (i == 0 ? 1f : -1f), rot = params.rotation + (rotation * sign);
+                v1.set(x * sign, y).rotate(params.rotation - 90).add(params.x, params.y);
                 v1.add(v2.set(random(-height * 0.5f, height * 0.5f), random(-width * 0.5f, width * 0.5f)).rotate(rot));
 
                 effect.at(v1.x, v1.y, rot + (effectRot * sign) + random(-effectRandRot, effectRandRot), effectColor);
             }
+        }
+    }
+
+    @Override
+    public void draw(PartParams params){
+        if(!debugDraw) return;
+
+        for(int i = 0; i < (mirror ? 2 : 1); i++){
+            float sign = (i == 0 ? 1f : -1f), rot = params.rotation + (rotation * sign);
+            v1.set(x * sign, y).rotate(params.rotation - 90).add(params.x, params.y);
+
+            float z = Draw.z();
+            Draw.z(Layer.buildBeam);
+            Draw.color(Color.red);
+            Draw.rect("error", v1.x, v1.y, width, height, rot - 90f);
+            Draw.color();
+            Draw.z(z);
         }
     }
 

@@ -45,6 +45,12 @@ public class DrawTurret extends DrawBlock{
     }
 
     @Override
+    public void update(Building build){
+        TurretBuild tb = (TurretBuild)build;
+        DrawPart.params.update(parts, tb.curRecoils, build.warmup(), 1f - build.progress(), 1f - build.progress(), tb.heat, tb.curRecoil, tb.charge, tb.x + tb.recoilOffset.x, tb.y + tb.recoilOffset.y, tb.rotation);
+    }
+
+    @Override
     public void draw(Building build){
         Turret turret = (Turret)build.block;
         TurretBuild tb = (TurretBuild)build;
@@ -69,15 +75,8 @@ public class DrawTurret extends DrawBlock{
                 Draw.z(Layer.turret);
             }
 
-            float progress = tb.progress();
-
             //TODO no smooth reload
-            var params = DrawPart.params.set(build.warmup(), 1f - progress, 1f - progress, tb.heat, tb.curRecoil, tb.charge, tb.x + tb.recoilOffset.x, tb.y + tb.recoilOffset.y, tb.rotation);
-
-            for(var part : parts){
-                params.setRecoil(part.recoilIndex >= 0 && tb.curRecoils != null ? tb.curRecoils[part.recoilIndex] : tb.curRecoil);
-                part.draw(params);
-            }
+            DrawPart.params.draw(parts, tb.curRecoils, build.warmup(), 1f - build.progress(), 1f - build.progress(), tb.heat, tb.curRecoil, tb.charge, tb.x + tb.recoilOffset.x, tb.y + tb.recoilOffset.y, tb.rotation);
         }
     }
 

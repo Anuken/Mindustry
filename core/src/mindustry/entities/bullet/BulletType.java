@@ -567,14 +567,8 @@ public class BulletType extends Content implements Cloneable{
     }
 
     public void drawParts(Bullet b){
-        if(parts.size > 0){
-            DrawPart.params.set(b.fin(), 0f, 0f, 0f, 0f, 0f, b.x, b.y, b.rotation());
-            DrawPart.params.life = b.fin();
-
-            for(int i = 0; i < parts.size; i++){
-                parts.get(i).draw(DrawPart.params);
-            }
-        }
+        DrawPart.params.life = b.fin();
+        DrawPart.params.draw(parts, null, b.fin(), 0f, 0f, 0f, 0f, 0f, b.x, b.y, b.rotation());
     }
 
     public void drawLight(Bullet b){
@@ -605,6 +599,9 @@ public class BulletType extends Content implements Cloneable{
         updateWeaving(b);
         updateTrailEffects(b);
         updateBulletInterval(b);
+
+        DrawPart.params.life = b.fin();
+        DrawPart.params.update(parts, null, b.fin(), 0f, 0f, 0f, 0f, 0f, b.x, b.y, b.rotation());
     }
 
     public void updateBulletInterval(Bullet b){

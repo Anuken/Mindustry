@@ -492,7 +492,24 @@ public class UnitType extends UnlockableContent implements Senseable{
     }
 
     public void update(Unit unit){
+        if(parts.size > 0){
+            for(int i = 0; i < parts.size; i++){
+                var part = parts.get(i);
 
+                WeaponMount first = unit.mounts.length > part.weaponIndex ? unit.mounts[part.weaponIndex] : null;
+                if(first != null){
+                    DrawPart.params.set(first.warmup, first.reload / weapons.first().reload, first.smoothReload, first.heat, first.recoil, first.charge, unit.x, unit.y, unit.rotation);
+                }else{
+                    DrawPart.params.set(0f, 0f, 0f, 0f, 0f, 0f, unit.x, unit.y, unit.rotation);
+                }
+
+                if(unit instanceof Scaled s){
+                    DrawPart.params.life = s.fin();
+                }
+
+                part.update(DrawPart.params);
+            }
+        }
     }
 
     public void updatePayload(Unit unit, @Nullable Unit unitHolder, @Nullable Building buildingHolder){

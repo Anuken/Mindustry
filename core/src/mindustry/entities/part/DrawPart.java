@@ -19,6 +19,7 @@ public abstract class DrawPart{
 
     public abstract void draw(PartParams params);
     public abstract void load(String name);
+    public void update(PartParams params){}
     public void getOutlines(Seq<TextureRegion> out){}
 
     /** Parameters for drawing a part in draw(). */
@@ -27,6 +28,26 @@ public abstract class DrawPart{
         public float warmup, reload, smoothReload, heat, recoil, life, charge;
         public float x, y, rotation;
         public int sideOverride = -1, sideMultiplier = 1;
+
+        public void draw(Seq<DrawPart> parts, float[] recoils, float warmup, float reload, float smoothReload, float heat, float recoil, float charge, float x, float y, float rotation){
+            if(parts == null || parts.size == 0) return;
+
+            set(warmup, reload, smoothReload, heat, recoil, charge, x, y, rotation);
+            for(var part : parts){
+                setRecoil(part.recoilIndex >= 0 && recoils != null ? recoils[part.recoilIndex] : recoil);
+                part.update(this);
+            }
+        }
+
+        public void update(Seq<DrawPart> parts, float[] recoils, float warmup, float reload, float smoothReload, float heat, float recoil, float charge, float x, float y, float rotation){
+            if(parts == null || parts.size == 0) return;
+
+            set(warmup, reload, smoothReload, heat, recoil, charge, x, y, rotation);
+            for(var part : parts){
+                setRecoil(part.recoilIndex >= 0 && recoils != null ? recoils[part.recoilIndex] : recoil);
+                part.update(this);
+            }
+        }
 
         public PartParams set(float warmup, float reload, float smoothReload, float heat, float recoil, float charge, float x, float y, float rotation){
             this.warmup = warmup;

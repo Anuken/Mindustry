@@ -224,8 +224,7 @@ public class Weapon implements Cloneable{
             DrawPart.params.set(mount.warmup, mount.reload / reload, mount.smoothReload, mount.heat, mount.recoil, mount.charge, wx, wy, weaponRotation + 90);
             DrawPart.params.sideMultiplier = flipSprite ? -1 : 1;
 
-            for(int i = 0; i < parts.size; i++){
-                var part = parts.get(i);
+            for(DrawPart part : parts){
                 DrawPart.params.setRecoil(part.recoilIndex >= 0 && mount.recoils != null ? mount.recoils[part.recoilIndex] : mount.recoil);
                 if(part.under){
                     part.draw(DrawPart.params);
@@ -258,8 +257,7 @@ public class Weapon implements Cloneable{
 
         if(parts.size > 0){
             //TODO does it need an outline?
-            for(int i = 0; i < parts.size; i++){
-                var part = parts.get(i);
+            for(DrawPart part : parts){
                 DrawPart.params.setRecoil(part.recoilIndex >= 0 && mount.recoils != null ? mount.recoils[part.recoilIndex] : mount.recoil);
                 if(!part.under){
                     part.draw(DrawPart.params);
@@ -426,6 +424,15 @@ public class Weapon implements Cloneable{
                 unit.ammo--;
                 if(unit.ammo < 0) unit.ammo = 0;
             }
+        }
+
+        if(parts.size > 0){
+            float
+            realRecoil = Mathf.pow(mount.recoil, recoilPow) * recoil,
+            wx = mountX + Angles.trnsx(weaponRotation, 0, -realRecoil),
+            wy = mountY + Angles.trnsy(weaponRotation, 0, -realRecoil);
+
+            DrawPart.params.update(parts, mount.recoils, mount.warmup, mount.reload / reload, mount.smoothReload, mount.heat, mount.recoil, mount.charge, wx, wy, weaponRotation + 90);
         }
     }
 
