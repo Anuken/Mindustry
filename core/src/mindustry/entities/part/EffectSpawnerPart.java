@@ -14,7 +14,7 @@ import static arc.util.Tmp.*;
 /**Spawns effects in a rectangle centered on x and y.*/
 public class EffectSpawnerPart extends DrawPart{
     public float x, y, width, height, rotation;
-    public boolean mirror = true;
+    public boolean mirror = false;
 
     public float effectChance = 0.1f, effectRot, effectRandRot;
     public Effect effect = Fx.sparkShoot;

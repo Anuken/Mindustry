@@ -448,6 +448,8 @@ public class Turret extends ReloadTurret{
             if(coolant != null){
                 updateCooling();
             }
+
+            drawer.update(this);
         }
 
         @Override

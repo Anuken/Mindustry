@@ -35,7 +35,7 @@ public abstract class DrawPart{
             set(warmup, reload, smoothReload, heat, recoil, charge, x, y, rotation);
             for(var part : parts){
                 setRecoil(part.recoilIndex >= 0 && recoils != null ? recoils[part.recoilIndex] : recoil);
-                part.update(this);
+                part.draw(this);
             }
         }
 
