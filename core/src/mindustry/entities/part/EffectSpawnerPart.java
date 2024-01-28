@@ -16,7 +16,7 @@ public class EffectSpawnerPart extends DrawPart{
     public float x, y, width, height, rotation;
     public boolean mirror = true;
 
-    public float effectChance = 0.1f, effectRot, effectRandRot = -1f;
+    public float effectChance = 0.1f, effectRot, effectRandRot;
     public Effect effect = Fx.sparkShoot;
     public Color effectColor = Color.white;
 
