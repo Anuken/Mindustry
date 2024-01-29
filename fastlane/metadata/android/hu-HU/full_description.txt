@@ -21,7 +21,7 @@ A Mindustry egy gyárépítő játék Toronyvédő és RTS elemekkel. Készíts 
 - Fedezz fel új blokkokat a fejlődés elősegítése érdekében
 - Hívd meg barátaidat, hogy együtt teljesítsék a küldetéseket
 - 250+ technológiai blokk használatának elsajátítása
-- 50+ különböző típusú drónok, mech-ek és hajók
+- 50+ különböző típusú drón, mech és hajó
 
 
 <h2>Egyéni és Platformokon Átívelő Többjátékos Módok</h2>
