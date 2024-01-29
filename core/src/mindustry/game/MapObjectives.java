@@ -703,19 +703,17 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public void control(LMarkerControl type, double p1, double p2, double p3){
+            super.control(type, p1, p2, p3);
+
             if(!Double.isNaN(p1)){
                 if(type == LMarkerControl.pos){
                     pos.x = (float)p1 * tilesize;
-                }else{
-                    super.control(type, p1, p2, p3);
                 }
             }
 
             if(!Double.isNaN(p2)){
                 if(type == LMarkerControl.pos){
                     pos.y = (float)p2 * tilesize;
-                }else{
-                    super.control(type, p1, p2, p3);
                 }
             }
         }
@@ -786,6 +784,8 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public void control(LMarkerControl type, double p1, double p2, double p3){
+            super.control(type, p1, p2, p3);
+
             if(!Double.isNaN(p1)){
                 switch(type){
                     case fontSize -> fontSize = (float)p1;
@@ -801,7 +801,6 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                     case rotation -> rotation = (float)p1;
                     case color -> color.set(Tmp.c1.fromDouble(p1));
                     case shape -> sides = (int)p1;
-                    default -> super.control(type, p1, p2, p3);
                 }
             }
 
@@ -814,7 +813,6 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                             flags &= ~WorldLabel.flagOutline;
                         }
                     }
-                    default -> super.control(type, p1, p2, p3);
                 }
             }
         }
@@ -881,6 +879,8 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public void control(LMarkerControl type, double p1, double p2, double p3){
+            super.control(type, p1, p2, p3);
+
             if(!Double.isNaN(p1)){
                 switch(type){
                     case pos -> pos.x = (int)p1;
@@ -888,15 +888,12 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                     case stroke -> stroke = (float)p1;
                     case color -> color.set(Tmp.c1.fromDouble(p1));
                     case minimap -> minimap = true;
-                    default -> super.control(type, p1, p2, p3);
                 }
             }
 
             if(!Double.isNaN(p2)){
                 if(type == LMarkerControl.pos){
                     pos.y = (int)p2;
-                }else{
-                    super.control(type, p1, p2, p3);
                 }
             }
         }
@@ -945,6 +942,8 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public void control(LMarkerControl type, double p1, double p2, double p3){
+            super.control(type, p1, p2, p3);
+
             if(!Double.isNaN(p1)){
                 switch(type){
                     case radius -> radius = (float)p1;
@@ -952,22 +951,18 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                     case rotation -> rotation = (float)p1;
                     case color -> color.set(Tmp.c1.fromDouble(p1));
                     case shape -> sides = (int)p1;
-                    default -> super.control(type, p1, p2, p3);
                 }
             }
 
             if(!Double.isNaN(p2)){
                 switch(type){
                     case shape -> fill = !Mathf.equal((float)p2, 0f);
-                    default -> super.control(type, p1, p2, p3);
                 }
             }
 
             if(!Double.isNaN(p3)){
                 if(type == LMarkerControl.shape){
                     outline = !Mathf.equal((float)p3, 0f);
-                }else{
-                    super.control(type, p1, p2, p3);
                 }
             }
         }
@@ -1009,6 +1004,8 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public void control(LMarkerControl type, double p1, double p2, double p3){
+            super.control(type, p1, p2, p3);
+
             if(!Double.isNaN(p1)){
                 switch(type){
                     case fontSize -> fontSize = (float)p1;
@@ -1019,7 +1016,6 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                             flags &= ~WorldLabel.flagBackground;
                         }
                     }
-                    default -> super.control(type, p1, p2, p3);
                 }
             }
 
@@ -1032,7 +1028,6 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                             flags &= ~WorldLabel.flagOutline;
                         }
                     }
-                    default -> super.control(type, p1, p2, p3);
                 }
             }
         }
@@ -1093,19 +1088,19 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public void control(LMarkerControl type, double p1, double p2, double p3){
+            super.control(type, p1, p2, p3);
+
             if(!Double.isNaN(p1)){
                 switch(type){
                     case endPos -> endPos.x = (float)p1 * tilesize;
                     case stroke -> stroke = (float)p1;
                     case color -> color.set(Tmp.c1.fromDouble(p1));
-                    default -> super.control(type, p1, p2, p3);
                 }
             }
 
             if(!Double.isNaN(p2)){
                 switch(type){
                     case endPos -> endPos.y = (float)p2 * tilesize;
-                    default -> super.control(type, p1, p2, p3);
                 }
             }
         }
@@ -1135,19 +1130,19 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public void control(LMarkerControl type, double p1, double p2, double p3){
+            super.control(type, p1, p2, p3);
+
             if(!Double.isNaN(p1)){
                 switch(type){
                     case rotation -> rotation = (float)p1;
                     case textureSize -> width = (float)p1 * tilesize;
                     case color -> color.set(Tmp.c1.fromDouble(p1));
-                    default -> super.control(type, p1, p2, p3);
                 }
             }
 
             if(!Double.isNaN(p2)){
                 switch(type){
                     case textureSize -> height = (float)p2 * tilesize;
-                    default -> super.control(type, p1, p2, p3);
                 }
             }
         }
