@@ -30,7 +30,7 @@ Játszd végig a kampányt egyedül, vagy vállvetve a barátaiddal a platformok
 [list]
 [*] Állíts fel összeszerelősorokat a gépesített egységek hadainak előállításához
 [*] Használd az egységeidet a hatékonyan felszerelt ellenséges bázisok ellen
-[*] foglalj el több területet, hogy több magot helyezhess el, és további erőforrásokhoz férhess hozzá a terjeszkedéshez
+[*] Foglalj el minél több területet, hogy még több magot helyezhess el, és további erőforrásokhoz férhess hozzá a terjeszkedéshez
 [/list]
 
 [h2]Kampány[/h2]
@@ -43,8 +43,8 @@ Játszd végig a kampányt egyedül, vagy vállvetve a barátaiddal a platformok
 [*] Koordináld az erőforrások elosztását a szektorok között az indítóállások felhasználásával
 [*] Fedezz fel új blokkokat a fejlődés elősegítése érdekében
 [*] Hívd meg barátaidat, hogy együtt teljesítsék a küldetéseket
-[*] 250+ technológiai blokk elsajátítása
-[*] 50+ különböző típusú drónok, mech-ek és hajók
+[*] 250+ technológiai blokk használatának elsajátítása
+[*] 50+ különböző típusú drón, mech és hajó
 [*] 80+ teljesítendő feladat
 [/list]
 
