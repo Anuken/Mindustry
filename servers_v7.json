@@ -283,5 +283,9 @@
   { 
     "name": "hubVn",
     "address": ["de-free-01.hosts.optikservers.com:32362"]
+  },
+  { 
+    "name": "StarLegends",
+    "address": ["p7.simpfun.cn:8840"]
   }
 ]
