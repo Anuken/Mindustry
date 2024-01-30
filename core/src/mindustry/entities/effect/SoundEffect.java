@@ -42,7 +42,7 @@ public class SoundEffect extends Effect{
         if(!shouldCreate()) return;
 
         if(startDelay > 0){
-            Time.run(startDelay, () -> sound.at(x, y, Mathf.random(minPitch, maxPitch), Mathf.random(minVolume, maxVolume));
+            Time.run(startDelay, () -> sound.at(x, y, Mathf.random(minPitch, maxPitch), Mathf.random(minVolume, maxVolume)));
         }else{
             sound.at(x, y, Mathf.random(minPitch, maxPitch), Mathf.random(minVolume, maxVolume));
         }
