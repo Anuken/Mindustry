@@ -418,7 +418,7 @@ public class JoinDialog extends BaseDialog{
                     //don't recache the texture for a while
                     if(fontIgnoreDirtyTask == null){
                         FreeTypeFontData.ignoreDirty = true;
-                        fontIgnoreDirtyTask = Time.runTask(60f, () -> {
+                        fontIgnoreDirtyTask = Time.runTask(0.6f * 60f, () -> {
                             FreeTypeFontData.ignoreDirty = false;
                             fontIgnoreDirtyTask = null;
                         });
