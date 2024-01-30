@@ -262,7 +262,7 @@ public class MinimapRenderer{
         });
 
         for(var marker : state.markers){
-            if(!marker.isHidden() && marker.minimap){
+            if(marker.minimap){
                 marker.drawMinimap(this);
             }
         }

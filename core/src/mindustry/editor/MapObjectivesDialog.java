@@ -290,10 +290,12 @@ public class MapObjectivesDialog extends BaseDialog{
                     t.button(Icon.downOpen, Styles.emptyi, () -> indexer.get(false)).fill().padRight(4f);
                 }
 
-                t.button(Icon.add, Styles.emptyi, () -> getProvider(type.element.raw).get(type.element, res -> {
-                    arr.add(res);
-                    rebuild[0].run();
-                })).fill();
+                if(!field.isAnnotationPresent(Immutable.class)) {
+                    t.button(Icon.add, Styles.emptyi, () -> getProvider(type.element.raw).get(type.element, res -> {
+                        arr.add(res);
+                        rebuild[0].run();
+                    })).fill();
+                }
             }).growX().height(46f).pad(0f, -10f, 0f, -10f).get();
 
             main.row().table(Tex.button, t -> rebuild[0] = () -> {
@@ -312,10 +314,10 @@ public class MapObjectivesDialog extends BaseDialog{
 
                     getInterpreter((Class<Object>)arr.get(index).getClass()).build(
                         t, "", new TypeInfo(arr.get(index).getClass()),
-                        field, () -> {
+                        field, field == null || !field.isAnnotationPresent(Immutable.class) ? () -> {
                             arr.remove(index);
                             rebuild[0].run();
-                        }, field == null || !field.isAnnotationPresent(Unordered.class) ? in -> {
+                        } : null, field == null || !field.isAnnotationPresent(Unordered.class) ? in -> {
                             if(in && index > 0){
                                 arr.swap(index, index - 1);
                                 rebuild[0].run();

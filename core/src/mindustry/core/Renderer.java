@@ -375,14 +375,14 @@ public class Renderer implements ApplicationListener{
         //draw objective markers
         state.rules.objectives.eachRunning(obj -> {
             for(var marker : obj.markers){
-                if(!marker.minimap){
+                if(marker.world){
                     marker.drawWorld();
                 }
             }
         });
 
         for(var marker : state.markers){
-            if(!marker.isHidden() && !marker.minimap){
+            if(marker.world){
                 marker.drawWorld();
             }
         }

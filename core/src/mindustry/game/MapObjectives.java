@@ -61,12 +61,15 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         registerMarker(
             ShapeTextMarker::new,
-            MinimapMarker::new,
+            PointMarker::new,
             ShapeMarker::new,
             TextMarker::new,
             LineMarker::new,
-            TextureMarker::new
+            TextureMarker::new,
+            QuadMarker::new
         );
+
+        registerLegacyMarker("Minimap", PointMarker::new);
     }
 
     @SafeVarargs
@@ -94,6 +97,15 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             JsonIO.classTag(Strings.camelize(name), type);
             JsonIO.classTag(name, type);
         }
+    }
+
+    public static void registerLegacyMarker(String name, Prov<? extends ObjectiveMarker> prov) {
+        Class<?> type = prov.get().getClass();
+
+        markerNameToType.put(name, prov);
+        markerNameToType.put(Strings.camelize(name), prov);
+        JsonIO.classTag(Strings.camelize(name), type);
+        JsonIO.classTag(name, type);
     }
 
     /** Adds all given objectives to the executor as root objectives. */
@@ -617,12 +629,12 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         /** Internal use only! Do not access. */
         public transient int arrayIndex;
 
-        /** Whether to display marker on minimap instead of world. {@link MinimapMarker} ignores this value. */
+        /** Whether to display marker in the world. */
+        public boolean world = true;
+        /** Whether to display marker on minimap. */
         public boolean minimap = false;
-        /** Whether to scale marker corresponding to player's zoom level. {@link MinimapMarker} ignores this value. */
+        /** Whether to scale marker corresponding to player's zoom level. */
         public boolean autoscale = false;
-        /** Hides the marker, used by world processors. */
-        protected boolean hidden = false;
         /** On which z-sorting layer is marker drawn. */
         protected float drawLayer = Layer.overlayUI;
 
@@ -635,20 +647,15 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         /** Called in the small and large map. */
         public void drawMinimap(MinimapRenderer minimap){}
 
-        /** Whether the marker is hidden */
-        public boolean isHidden(){
-            return hidden;
-        }
-
         /** Control marker with world processor code. Ignores NaN (null) values. */
         public void control(LMarkerControl type, double p1, double p2, double p3){
             if(Double.isNaN(p1)) return;
 
             switch(type){
-                case visibility -> hidden = Mathf.equal((float)p1, 0f);
-                case drawLayer -> drawLayer = (float)p1;
+                case world -> world = !Mathf.equal((float)p1, 0f);
                 case minimap -> minimap = !Mathf.equal((float)p1, 0f);
                 case autoscale -> autoscale = !Mathf.equal((float)p1, 0f);
+                case drawLayer -> drawLayer = (float)p1;
             }
         }
 
@@ -799,7 +806,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                     }
                     case radius -> radius = (float)p1;
                     case rotation -> rotation = (float)p1;
-                    case color -> color.set(Tmp.c1.fromDouble(p1));
+                    case color -> color.fromDouble(p1);
                     case shape -> sides = (int)p1;
                 }
             }
@@ -828,31 +835,28 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         }
     }
 
-    /** Displays a circle on the minimap. */
-    public static class MinimapMarker extends ObjectiveMarker{
-        public Point2 pos = new Point2();
+    /** Displays a circle in the world. */
+    public static class PointMarker extends PosMarker{
         public float radius = 5f, stroke = 11f;
         public Color color = Color.valueOf("f25555");
 
-        public MinimapMarker(int x, int y){
+        public PointMarker(int x, int y){
             this.pos.set(x, y);
         }
 
-        public MinimapMarker(int x, int y, Color color){
+        public PointMarker(int x, int y, Color color){
             this.pos.set(x, y);
             this.color = color;
-            minimap = true;
         }
 
-        public MinimapMarker(int x, int y, float radius, float stroke, Color color){
+        public PointMarker(int x, int y, float radius, float stroke, Color color){
             this.pos.set(x, y);
             this.stroke = stroke;
             this.radius = radius;
             this.color = color;
-            minimap = true;
         }
 
-        public MinimapMarker(){}
+        public PointMarker(){}
 
         @Override
         public void baseDraw(float x, float y, float scaleFactor){
@@ -867,33 +871,14 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         }
 
         @Override
-        public void drawWorld(){
-            minimap = true;
-        }
-
-        @Override
-        public void drawMinimap(MinimapRenderer minimap){
-            minimap.transform(Tmp.v1.set(pos.x * tilesize, pos.y * tilesize));
-            baseDraw(Tmp.v1.x, Tmp.v1.y, minimap.getScaleFactor(autoscale));
-        }
-
-        @Override
         public void control(LMarkerControl type, double p1, double p2, double p3){
             super.control(type, p1, p2, p3);
 
             if(!Double.isNaN(p1)){
                 switch(type){
-                    case pos -> pos.x = (int)p1;
                     case radius -> radius = (float)p1;
                     case stroke -> stroke = (float)p1;
-                    case color -> color.set(Tmp.c1.fromDouble(p1));
-                    case minimap -> minimap = true;
-                }
-            }
-
-            if(!Double.isNaN(p2)){
-                if(type == LMarkerControl.pos){
-                    pos.y = (int)p2;
+                    case color -> color.fromDouble(p1);
                 }
             }
         }
@@ -949,7 +934,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                     case radius -> radius = (float)p1;
                     case stroke -> stroke = (float)p1;
                     case rotation -> rotation = (float)p1;
-                    case color -> color.set(Tmp.c1.fromDouble(p1));
+                    case color -> color.fromDouble(p1);
                     case shape -> sides = (int)p1;
                 }
             }
@@ -1048,7 +1033,8 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public @TilePos Vec2 endPos = new Vec2();
         public float stroke = 1f;
         public boolean outline = true;
-        public Color color = Color.valueOf("ffd37f");
+        public Color color1 = Color.valueOf("ffd37f");
+        public Color color2 = Color.valueOf("ffd37f");
 
         public LineMarker(float x1, float y1, float x2, float y2, float stroke){
             this.stroke = stroke;
@@ -1070,8 +1056,8 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                 Lines.line(x1, y1, x2, y2);
             }
 
-            Lines.stroke(stroke * scaleFactor, color);
-            Lines.line(x1, y1, x2, y2);
+            Lines.stroke(stroke * scaleFactor, Color.white);
+            Lines.line(x1, y1, color1, x2, y2, color2);
         }
 
         @Override
@@ -1094,13 +1080,26 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                 switch(type){
                     case endPos -> endPos.x = (float)p1 * tilesize;
                     case stroke -> stroke = (float)p1;
-                    case color -> color.set(Tmp.c1.fromDouble(p1));
+                    case color -> color1.set(color2.fromDouble(p1));
                 }
             }
 
             if(!Double.isNaN(p2)){
                 switch(type){
                     case endPos -> endPos.y = (float)p2 * tilesize;
+                }
+            }
+
+            if(!Double.isNaN(p1) && !Double.isNaN(p2)){
+                switch (type){
+                    case posi -> ((int)p1 == 0 ? pos : (int)p1 == 1 ? endPos : Tmp.v1).x = (float)p2 * tilesize;
+                    case colori -> ((int)p1 == 0 ? color1 : (int)p1 == 1 ? color2 : Tmp.c1).fromDouble(p2);
+                }
+            }
+
+            if(!Double.isNaN(p1) && !Double.isNaN(p3)){
+                switch(type){
+                    case posi -> ((int)p1 == 0 ? pos : (int)p1 == 1 ? endPos : Tmp.v1).y = (float)p3 * tilesize;
                 }
             }
         }
@@ -1136,7 +1135,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                 switch(type){
                     case rotation -> rotation = (float)p1;
                     case textureSize -> width = (float)p1 * tilesize;
-                    case color -> color.set(Tmp.c1.fromDouble(p1));
+                    case color -> color.fromDouble(p1);
                 }
             }
 
@@ -1167,25 +1166,138 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             this.textureName = textureName;
 
             if(fetchedRegion == null) fetchedRegion = new TextureRegion();
+            lookupRegion(textureName, fetchedRegion);
+        }
 
-            TextureRegion region = Core.atlas.find(textureName);
-            if(region.found()){
-               fetchedRegion.set(region);
-            }else{
-                if(Core.assets.isLoaded(textureName, Texture.class)){
-                    fetchedRegion.set(Core.assets.get(textureName, Texture.class));
-                }else{
-                    fetchedRegion.set(Core.atlas.find("error"));
+    }
+
+    public static class QuadMarker extends ObjectiveMarker{
+        public String textureName = "white";
+
+        public @Immutable @TilePos Vec2[] pos = {new Vec2(), new Vec2(), new Vec2(), new Vec2()};
+        public @Immutable Vec2[] uv = {new Vec2(), new Vec2(), new Vec2(), new Vec2()};
+        public @Immutable Color[] color = {Color.white.cpy(), Color.white.cpy(), Color.white.cpy(), Color.white.cpy()};
+
+        private transient TextureRegion fetchedRegion;
+
+        @Override
+        public void drawWorld(){
+            drawQuad(pos[0], pos[1], pos[2], pos[3]);
+        }
+
+        @Override
+        public void drawMinimap(MinimapRenderer minimap){
+            Vec2 pos0 = minimap.transform(Tmp.v1.set(pos[0]));
+            Vec2 pos1 = minimap.transform(Tmp.v2.set(pos[1]));
+            Vec2 pos2 = minimap.transform(Tmp.v3.set(pos[2]));
+            Vec2 pos3 = minimap.transform(Tmp.v4.set(pos[3]));
+            drawQuad(pos0, pos1, pos2, pos3);
+        }
+
+        private void drawQuad(Vec2 pos0, Vec2 pos1, Vec2 pos2, Vec2 pos3){
+            if(fetchedRegion == null){
+                setTexture(textureName);
+            }
+
+            Draw.z(drawLayer);
+            Fill.quad(fetchedRegion.texture,
+            pos0.x, pos0.y, color[0].toFloatBits(), uv[0].x, uv[0].y,
+            pos1.x, pos1.y, color[1].toFloatBits(), uv[1].x, uv[1].y,
+            pos2.x, pos2.y, color[2].toFloatBits(), uv[2].x, uv[2].y,
+            pos3.x, pos3.y, color[3].toFloatBits(), uv[3].x, uv[3].y);
+        }
+
+        @Override
+        public void control(LMarkerControl type, double p1, double p2, double p3){
+            super.control(type, p1, p2, p3);
+
+            if(!Double.isNaN(p1)){
+                switch(type){
+                    case color -> {
+                        for(int i = 0; i < 4; i++) color[i].fromDouble(p1);
+                    }
+                    case pos -> pos[0].x = (float)p1 * tilesize;
+                    case posi -> setPos((int)p1, p2, p3);
+                    case uvi -> setUv((int)p1, p2, p3);
+                }
+            }
+
+            if(!Double.isNaN(p2)){
+                switch(type){
+                    case pos -> pos[0].y = (float)p1 * tilesize;
+                }
+            }
+
+            if(!Double.isNaN(p1) && !Double.isNaN(p2)){
+                switch(type){
+                    case colori -> setColor((int)p1, p2);
                 }
             }
         }
 
+        @Override
+        public void setTexture(String textureName){
+            this.textureName = textureName;
+
+            boolean updateUv = fetchedRegion != null;
+
+            if(fetchedRegion == null) fetchedRegion = new TextureRegion();
+            Tmp.tr1.set(fetchedRegion);
+
+            lookupRegion(textureName, fetchedRegion);
+
+            if(updateUv){
+                for(Vec2 v : uv){
+                    v.x = Mathf.map(v.x, Tmp.tr1.u, Tmp.tr1.u2, fetchedRegion.u, fetchedRegion.u2);
+                    v.y = Mathf.map(v.y, Tmp.tr1.v, Tmp.tr1.v2, fetchedRegion.v, fetchedRegion.v2);
+                }
+            }
+        }
+
+        private void setPos(int i, double x, double y){
+            if(i >= 0 && i < 4){
+                if(!Double.isNaN(x)) pos[i].x = (float)x * tilesize;
+                if(!Double.isNaN(y)) pos[i].y = (float)y * tilesize;
+            }
+        }
+
+        private void setColor(int i, double c){
+            if(i >= 0 && i < 4){
+                color[i].fromDouble(c);
+            }
+        }
+
+        private void setUv(int i, double u, double v){
+            if(i >= 0 && i < 4){
+                if(!Double.isNaN(u)) uv[i].x = Mathf.map(Mathf.clamp((float)u), fetchedRegion.u, fetchedRegion.u2);
+                if(!Double.isNaN(v)) uv[i].y = Mathf.map(Mathf.clamp((float)v), fetchedRegion.v, fetchedRegion.v2);
+            }
+        }
+
+    }
+
+    private static void lookupRegion(String name, TextureRegion out){
+        TextureRegion region = Core.atlas.find(name);
+        if(region.found()){
+            out.set(region);
+        }else{
+            if(Core.assets.isLoaded(name, Texture.class)){
+                out.set(Core.assets.get(name, Texture.class));
+            }else{
+                out.set(Core.atlas.find("error"));
+            }
+        }
     }
 
     /** For arrays or {@link Seq}s; does not create element rearrangement buttons. */
     @Target(FIELD)
     @Retention(RUNTIME)
     public @interface Unordered{}
+
+    /** For arrays or {@link Seq}s; does not add the new and delete buttons */
+    @Target(FIELD)
+    @Retention(RUNTIME)
+    public @interface Immutable{}
 
     /** For {@code byte}; treats it as a world label flag. */
     @Target(FIELD)
