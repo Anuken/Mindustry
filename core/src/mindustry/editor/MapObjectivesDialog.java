@@ -246,6 +246,38 @@ public class MapObjectivesDialog extends BaseDialog{
             show();
         }});
 
+        setInterpreter(Vertices.class, float[].class, (cont, name, type, field, remover, indexer, get, set) -> cont.table(main -> {
+            float[] data = get.get();
+
+            name(cont, name, remover, indexer);
+            cont.table(t -> {
+                t.left().defaults().left();
+
+                String[] names = {"x", "y", "color", "u", "v"};
+                int stride = 6;
+                int vertices = data.length / stride;
+
+                for(int i = 0; i < vertices; i++){
+                    int offset = i * stride;
+
+                    t.table(row -> {
+                        for(int j = 0; j < names.length; j++){
+                            int index = offset + j;
+
+                            if("color".equals(names[j])) {
+                                getInterpreter(Color.class).build(row, names[j], new TypeInfo(Color.class), null, null, null, () -> new Color().abgr8888(data[index]), value -> data[index] = value.toFloatBits());
+                            }else{
+                                float scale = j <= 1 ? tilesize : 1;
+                                getInterpreter(float.class).build(row, names[j], new TypeInfo(float.class), null, null, null, () -> data[index] / scale, value -> data[index] = value * scale);
+                            }
+
+                            row.add().pad(4);
+                        }
+                    }).row();
+                }
+            });
+        }));
+
         // Types that use the default interpreter. It would be nice if all types could use it, but I don't know how to reliably prevent classes like [? extends Content] from using it.
         for(var obj : MapObjectives.allObjectiveTypes) setInterpreter(obj.get().getClass(), defaultInterpreter());
         for(var mark : MapObjectives.allMarkerTypes) setInterpreter(mark.get().getClass(), defaultInterpreter());
