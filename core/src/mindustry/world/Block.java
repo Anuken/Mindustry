@@ -956,6 +956,14 @@ public class Block extends UnlockableContent implements Senseable{
         consumeBuilder.remove(cons);
     }
 
+    public void removeConsumers(Boolf<Consume> b){
+        consumeBuilder.removeAll(b);
+        //the power was removed, unassign it
+        if(!consumeBuilder.contains(c -> c instanceof ConsumePower)){
+            consPower = null;
+        }
+    }
+
     public ConsumeLiquid consumeLiquid(Liquid liquid, float amount){
         return consume(new ConsumeLiquid(liquid, amount));
     }

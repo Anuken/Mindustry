@@ -445,6 +445,17 @@ public class ContentParser{
                 if(value.has("consumes") && value.get("consumes").isObject()){
                     for(JsonValue child : value.get("consumes")){
                         switch(child.name){
+                            case "remove" -> {
+                                String[] values = child.isString() ? new String[]{child.asString()} : child.asStringArray();
+                                for(String type : values){
+                                    Class<?> consumeType = resolve("Consume" + Strings.capitalize(type), Consume.class);
+                                    if(consumeType != Consume.class){
+                                        block.removeConsumers(b -> consumeType.isAssignableFrom(b.getClass()));
+                                    }else{
+                                        Log.warn("Unknown consumer type '@' in consume: remove.", type);
+                                    }
+                                }
+                            }
                             case "item" -> block.consumeItem(find(ContentType.item, child.asString()));
                             case "itemCharged" -> block.consume((Consume)parser.readValue(ConsumeItemCharged.class, child));
                             case "itemFlammable" -> block.consume((Consume)parser.readValue(ConsumeItemFlammable.class, child));
