@@ -57,6 +57,12 @@ public class LogicFx{
         return map.get(name);
     }
 
+    /** Adds to the effect entry map. Format: [name1, entry1, name2, entry2...] */
+    public static void add(Object... objects){
+        map.putAll(objects);
+        map.each((n, e) -> e.name = n);
+    }
+
     public static String[] all(){
         return map.orderedKeys().toArray(String.class);
     }
