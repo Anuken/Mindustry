@@ -452,7 +452,7 @@ public class ContentParser{
                                     if(consumeType != Consume.class){
                                         block.removeConsumers(b -> consumeType.isAssignableFrom(b.getClass()));
                                     }else{
-                                        Log.warn("Unknown consumer type '@' in consume: remove.", type);
+                                        Log.warn("Unknown consumer type '@' (Class: @) in consume: remove.", type, "Consume" + Strings.capitalize(type));
                                     }
                                 }
                             }
