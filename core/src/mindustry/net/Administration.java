@@ -578,7 +578,7 @@ public class Administration{
         }
 
         public boolean isDefault(){
-            return get() == defaultValue;
+            return Structs.eq(get(), defaultValue);
         }
 
         private static boolean debug(){
