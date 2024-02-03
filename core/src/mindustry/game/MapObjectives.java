@@ -1143,6 +1143,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
     public static class QuadMarker extends ObjectiveMarker{
         public String textureName = "white";
         public @Vertices float[] vertices = new float[24];
+        private boolean mapRegion = true;
 
         private transient TextureRegion fetchedRegion;
 
@@ -1201,11 +1202,15 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
             lookupRegion(textureName, fetchedRegion);
 
-            if(firstUpdate) {
-                // possibly from the editor, we need to clamp the values
-                for(int i = 0; i < 4; i++){
-                    vertices[i * 6 + 3] = Mathf.map(Mathf.clamp(vertices[i * 6 + 3]), fetchedRegion.u, fetchedRegion.u2);
-                    vertices[i * 6 + 4] = Mathf.map(1 - Mathf.clamp(vertices[i * 6 + 4]), fetchedRegion.v, fetchedRegion.v2);
+            if(firstUpdate){
+                if(mapRegion){
+                    mapRegion = false;
+
+                    // possibly from the editor, we need to clamp the values
+                    for(int i = 0; i < 4; i++){
+                        vertices[i * 6 + 3] = Mathf.map(Mathf.clamp(vertices[i * 6 + 3]), fetchedRegion.u, fetchedRegion.u2);
+                        vertices[i * 6 + 4] = Mathf.map(1 - Mathf.clamp(vertices[i * 6 + 4]), fetchedRegion.v, fetchedRegion.v2);
+                    }
                 }
             }else{
                 for(int i = 0; i < 4; i++){
@@ -1230,6 +1235,8 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         private void setUv(int i, double u, double v){
             if(i >= 0 && i < 4){
+                if(fetchedRegion == null) setTexture(textureName);
+
                 if(!Double.isNaN(u)) vertices[i * 6 + 3] = Mathf.map(Mathf.clamp((float)u), fetchedRegion.u, fetchedRegion.u2);
                 if(!Double.isNaN(v)) vertices[i * 6 + 4] = Mathf.map(1 - Mathf.clamp((float)v), fetchedRegion.v, fetchedRegion.v2);
             }
