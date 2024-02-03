@@ -1,6 +1,7 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
+import arc.freetype.FreeTypeFontGenerator.*;
 import arc.graphics.*;
 import arc.input.*;
 import arc.math.*;
@@ -35,6 +36,7 @@ public class JoinDialog extends BaseDialog{
     int refreshes;
     boolean showHidden;
     TextButtonStyle style;
+    Task fontIgnoreDirtyTask;
 
     String lastIp;
     int lastPort, lastColumns = -1;
@@ -412,6 +414,15 @@ public class JoinDialog extends BaseDialog{
                 int resport = address.contains(":") ? Strings.parseInt(address.split(":")[1]) : port;
                 net.pingHost(resaddress, resport, res -> {
                     if(refreshes != cur) return;
+
+                    //don't recache the texture for a while
+                    if(fontIgnoreDirtyTask == null){
+                        FreeTypeFontData.ignoreDirty = true;
+                        fontIgnoreDirtyTask = Time.runTask(0.6f * 60f, () -> {
+                            FreeTypeFontData.ignoreDirty = false;
+                            fontIgnoreDirtyTask = null;
+                        });
+                    }
 
                     if(!serverSearch.isEmpty() && !(group.name.toLowerCase().contains(serverSearch)
                         || res.name.toLowerCase().contains(serverSearch)

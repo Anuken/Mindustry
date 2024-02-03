@@ -1999,11 +1999,14 @@ public class LStatements{
                 table.table(t -> {
                     t.setColor(table.color);
 
-                    fields(t, type.params[i], i == 0 ? p1 : i == 1 ? p2 : p3, i == 0 ? v -> p1 = v : i == 1 ? v -> p2 = v : v -> p3 = v).width(100f);
+                    String value = i == 0 ? p1 : i == 1 ? p2 : p3;
+                    Cons<String> setter = i == 0 ? v -> p1 = v : i == 1 ? v -> p2 = v : v -> p3 = v;
 
-                    if(type == LMarkerControl.color){
-                        col(t, p1, res -> {
-                            p1 = "%" + res.toString().substring(0, res.a >= 1f ? 6 : 8);
+                    fields(t, type.params[i], value, setter).width(100f);
+
+                    if(type == LMarkerControl.color || (type == LMarkerControl.colori && i == 1)){
+                        col(t, value, res -> {
+                            setter.get("%" + res.toString().substring(0, res.a >= 1f ? 6 : 8));
                             build(table);
                         });
                     }else if(type == LMarkerControl.drawLayer){
@@ -2013,10 +2016,10 @@ public class LStatements{
                                 o.row();
                                 o.table(s -> {
                                     s.left();
-                                    for(var layer : Layer.class.getFields()){
-                                        float value = Reflect.get(Layer.class, layer.getName());
-                                        s.button(layer.getName() + " = " + value, Styles.logicTogglet, () -> {
-                                            p1 = Float.toString(value);
+                                    for(var field : Layer.class.getFields()){
+                                        float layer = Reflect.get(field);
+                                        s.button(field.getName() + " = " + layer, Styles.logicTogglet, () -> {
+                                            p1 = Float.toString(layer);
                                             rebuild(table);
                                             hide.run();
                                         }).size(240f, 40f).row();

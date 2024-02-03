@@ -1230,7 +1230,6 @@ public class LExecutor{
         public int value;
 
         public float curTime;
-        public long frameId;
 
         public WaitI(int value){
             this.value = value;
@@ -1247,11 +1246,7 @@ public class LExecutor{
                 //skip back to self.
                 exec.var(varCounter).numval --;
                 exec.yield = true;
-            }
-
-            if(state.updateId != frameId){
                 curTime += Time.delta / 60f;
-                frameId = state.updateId;
             }
         }
     }
@@ -2052,6 +2047,11 @@ public class LExecutor{
     @Remote(called = Loc.server, variants = Variant.both, unreliable = true)
     public static void createMarker(int id, ObjectiveMarker marker){
         state.markers.add(id, marker);
+    }
+
+    @Remote(called = Loc.server, variants = Variant.both, unreliable = true)
+    public static void removeMarker(int id){
+        state.markers.remove(id);
     }
 
     @Remote(called = Loc.server, variants = Variant.both, unreliable = true)

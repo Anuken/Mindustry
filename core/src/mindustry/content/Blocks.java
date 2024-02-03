@@ -2433,6 +2433,7 @@ public class Blocks{
             itemDuration = 140f;
             ambientSound = Sounds.pulse;
             ambientSoundVolume = 0.07f;
+            liquidCapacity = 60f;
 
             consumePower(25f);
             consumeItem(Items.blastCompound);

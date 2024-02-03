@@ -105,6 +105,10 @@ public class Rules{
     public boolean coreDestroyClear = false;
     /** If true, banned blocks are hidden from the build menu. */
     public boolean hideBannedBlocks = false;
+    /** If true, most blocks (including environmental walls) can be deconstructed. This is only meant to be used internally in sandbox/test maps. */
+    public boolean allowEnvironmentDeconstruct = false;
+    /** If true, buildings will be constructed instantly, with no limit on blocks placed per second. This is highly experimental and may cause lag! */
+    public boolean instantBuild = false;
     /** If true, bannedBlocks becomes a whitelist. */
     public boolean blockWhitelist = false;
     /** If true, bannedUnits becomes a whitelist. */

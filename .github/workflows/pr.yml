@@ -17,8 +17,10 @@ jobs:
         java-version: 17
     - name: Setup Gradle
       uses: gradle/gradle-build-action@v2
+    - name: Run unit tests
+      run: ./gradlew clean cleanTest test --stacktrace
     - name: Run unit tests and build JAR
-      run: ./gradlew test desktop:dist
+      run: ./gradlew desktop:dist
     - name: Upload desktop JAR for testing
       uses: actions/upload-artifact@v2
       with:
