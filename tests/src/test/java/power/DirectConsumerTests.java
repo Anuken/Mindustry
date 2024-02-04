@@ -34,9 +34,14 @@ public class DirectConsumerTests extends PowerTestFixture{
     private static Stream<Arguments> noPNoItemsParameters()
     {
         return Stream.of(
-                arguments(0, 0, 0.08f, 0.08f, 1f),
-                arguments(0, 0, 0.08f, 0.08f, 1f),
-                arguments(0, 0, 0.08f, 0.08f, 1f)
+                arguments(-9999, -10, -2f, -1f, 1f), //extreme negative outlier
+                arguments(-1, -1, -0.8f, -0.8f, 1f),
+                arguments(30, 0, 0.8f, 0.8f, 1f),
+                arguments(60, 30, 0.16f, 0.16f, 1f),
+                arguments(90, 60, 0.24f, 0.24f, 1f),
+                arguments(120, 90, 0.32f, 0.32f, 1f),
+                arguments(12000, 0, 2f, 1f, 1f) //extreme positive outlier
+
         );
     }
 
