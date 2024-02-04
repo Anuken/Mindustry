@@ -40,7 +40,6 @@ public class BurstDrill extends Drill{
 
         //does not drill in the traditional sense, so this is not even used
         hardnessDrillMultiplier = 0f;
-        liquidBoostIntensity = 1f;
         //generally at center
         drillEffectRnd = 0f;
         drillEffect = Fx.shockwave;
@@ -60,10 +59,7 @@ public class BurstDrill extends Drill{
 
     @Override
     public void setStats(){
-        stats.add(Stat.drillTier, StatValues.drillables(drillTime, hardnessDrillMultiplier, size * size, drillMultipliers, b -> b instanceof Floor f && !f.wallOre && f.itemDrop != null &&
-            f.itemDrop.hardness <= tier && f.itemDrop != blockedItem && (indexer.isBlockPresent(f) || state.isMenu())));
-
-        stats.add(Stat.drillSpeed, 60f / drillTime * size * size, StatUnit.itemsSecond);
+        super.setStats();
 
         if(liquidBoostIntensity != 1 && findConsumer(f -> f instanceof ConsumeLiquidBase && f.booster) instanceof ConsumeLiquidBase consBase){
             stats.remove(Stat.booster);
