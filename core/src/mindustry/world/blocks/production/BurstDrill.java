@@ -27,8 +27,6 @@ public class BurstDrill extends Drill{
     public @Load("@-arrow-blur") TextureRegion arrowBlurRegion;
 
     public float invertedTime = 200f;
-    /** How many times faster the drill will progress when boosted by an optional consumer. */
-    public float optionalBoostIntensity = 1.5f;
     public float arrowSpacing = 4f, arrowOffset = 0f;
     public int arrows = 3;
     public Color arrowColor = Color.valueOf("feb380"), baseArrowColor = Color.valueOf("6e7080");
@@ -67,11 +65,11 @@ public class BurstDrill extends Drill{
 
         stats.add(Stat.drillSpeed, 60f / drillTime * size * size, StatUnit.itemsSecond);
 
-        if(optionalBoostIntensity != 1 && findConsumer(f -> f instanceof ConsumeLiquidBase && f.booster) instanceof ConsumeLiquidBase consBase){
+        if(liquidBoostIntensity != 1 && findConsumer(f -> f instanceof ConsumeLiquidBase && f.booster) instanceof ConsumeLiquidBase consBase){
             stats.remove(Stat.booster);
             stats.add(Stat.booster,
                 StatValues.speedBoosters("{0}" + StatUnit.timesSpeed.localized(),
-                consBase.amount, optionalBoostIntensity, false,
+                consBase.amount, liquidBoostIntensity, false,
                 l -> (consumesLiquid(l) && (findConsumer(f -> f instanceof ConsumeLiquid).booster || ((ConsumeLiquid)findConsumer(f -> f instanceof ConsumeLiquid)).liquid != l)))
             );
         }
@@ -93,16 +91,15 @@ public class BurstDrill extends Drill{
             if(timer(timerDump, dumpTime)){
                 dump(items.has(dominantItem) ? dominantItem : null);
             }
-
-            float multiplier = Mathf.lerp(1f, optionalBoostIntensity, optionalEfficiency);
-            float drillTime = getDrillTime(dominantItem) / multiplier;
+            
+            float drillTime = getDrillTime(dominantItem);
 
             smoothProgress = Mathf.lerpDelta(smoothProgress, progress / (drillTime - 20f), 0.1f);
 
             if(items.total() <= itemCapacity - dominantItems && dominantItems > 0 && efficiency > 0){
                 warmup = Mathf.approachDelta(warmup, progress / drillTime, 0.01f);
 
-                float speed = efficiency;
+                float speed = Mathf.lerp(1f, liquidBoostIntensity, optionalEfficiency) * efficiency;
 
                 timeDrilled += speedCurve.apply(progress / drillTime) * speed;
 
