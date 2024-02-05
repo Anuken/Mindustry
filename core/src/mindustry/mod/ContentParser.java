@@ -271,8 +271,9 @@ public class ContentParser{
             return new Vec3(data.getFloat("x", 0f), data.getFloat("y", 0f), data.getFloat("z", 0f));
         });
         put(Sound.class, (type, data) -> {
-            var field = fieldOpt(Sounds.class, data);
+            if(data.isArray()) return new RandomSound(parser.readValue(Sound[].class, data));
 
+            var field = fieldOpt(Sounds.class, data);
             return field != null ? field : Vars.tree.loadSound(data.asString());
         });
         put(Music.class, (type, data) -> {
