@@ -372,18 +372,20 @@ public class Renderer implements ApplicationListener{
             });
         }
 
+        float scaleFactor = 4f / renderer.getDisplayScale();
+
         //draw objective markers
         state.rules.objectives.eachRunning(obj -> {
             for(var marker : obj.markers){
-                if(!marker.minimap){
-                    marker.drawWorld();
+                if(marker.world){
+                    marker.draw(marker.autoscale ? scaleFactor : 1);
                 }
             }
         });
 
         for(var marker : state.markers){
-            if(!marker.isHidden() && !marker.minimap){
-                marker.drawWorld();
+            if(marker.world){
+                marker.draw(marker.autoscale ? scaleFactor : 1);
             }
         }
 
