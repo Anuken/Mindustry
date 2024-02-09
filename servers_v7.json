@@ -238,7 +238,7 @@
   },
   {
     "name": "Extra Utilities",
-    "address": ["p1.i9mr.com:44922", "p1.i9mr.com:44834"]
+    "address": ["p1.i9mr.com:44922", "p1.i9mr.com:44834", "p1.i9mr.com:43189"]
   },
   {
     "name": "Alex Multiverse",
@@ -255,6 +255,10 @@
   {
     "name": "Atomic",
     "address": ["atomic-de.ddns.net:35199", "atomic-de.ddns.net:35176", "atomic-de.ddns.net:35845", "atomic-de.ddns.net:35313"]
+  },
+  {
+    "name": "SkyPlex",
+    "address": ["mc-skyplex.net"]
   },
   {
     "name": "Gadgetroch's Server",
