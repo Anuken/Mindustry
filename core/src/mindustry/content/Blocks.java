@@ -2847,8 +2847,8 @@ public class Blocks{
             blockedItem = Items.thorium;
             researchCostMultiplier = 0.5f;
 
-            drillMultipliers.put(Items.beryllium, 2f);
-            liquidBoostIntensity = 2.5f;
+            drillMultipliers.put(Items.beryllium, 1.3f);
+            liquidBoostIntensity = 2.25f;
 
             fogRadius = 4;
 
@@ -2859,7 +2859,7 @@ public class Blocks{
 
         eruptionDrill = new BurstDrill("eruption-drill"){{
             requirements(Category.production, with(Items.silicon, 200, Items.oxide, 20, Items.tungsten, 200, Items.thorium, 120));
-            drillTime = 60f * 5.5f;
+            drillTime = 320f;
             size = 5;
             hasPower = true;
             tier = 7;
@@ -2879,12 +2879,12 @@ public class Blocks{
             fogRadius = 5;
 
             drillMultipliers.put(Items.beryllium, 1.5f);
-            liquidBoostIntensity = 2.1f;
+            liquidBoostIntensity = 2f;
             
             //TODO different requirements
             consumePower(6f);
             consumeLiquid(Liquids.hydrogen, 4f / 60f);
-            consumeLiquid(Liquids.cyanogen, 0.64f / 60f).boost();
+            consumeLiquid(Liquids.cyanogen, 1.5f / 60f).boost();
         }};
 
         //endregion
