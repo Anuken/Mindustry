@@ -2847,7 +2847,7 @@ public class Blocks{
             blockedItem = Items.thorium;
             researchCostMultiplier = 0.5f;
 
-            drillMultipliers.put(Items.beryllium, 1.3f);
+            drillMultipliers.put(Items.beryllium, 1.5f);
             liquidBoostIntensity = 2.25f;
 
             fogRadius = 4;
