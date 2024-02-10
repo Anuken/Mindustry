@@ -52,7 +52,7 @@ public class HudFragment{
         //warn about guardian/boss waves
         Events.on(WaveEvent.class, e -> {
             int max = 10;
-            int winWave = state.isCampaign() && state.rules.winWave > 0 ? state.rules.winWave : Integer.MAX_VALUE;
+            int winWave = state.rules.winWave > 0 ? state.rules.winWave : Integer.MAX_VALUE;
             outer:
             for(int i = state.wave - 1; i <= Math.min(state.wave + max, winWave - 2); i++){
                 for(SpawnGroup group : state.rules.spawns){
@@ -71,7 +71,11 @@ public class HudFragment{
         });
 
         Events.on(SectorCaptureEvent.class, e -> {
-            showToast(Core.bundle.format("sector.captured", e.sector.isBeingPlayed() ? "" : e.sector.name() + " "));
+            if(e.sector.isBeingPlayed()){
+                ui.announce(Core.bundle.format("sector.capture", ""), 5f);
+            }else{
+                showToast(Core.bundle.format("sector.capture", e.sector.name() + " "));
+            }
         });
 
         Events.on(SectorLoseEvent.class, e -> {
@@ -228,7 +232,7 @@ public class HudFragment{
                 //table with button to skip wave
                 s.button(Icon.play, rightStyle, 30f, () -> {
                     if(net.client() && player.admin){
-                        Call.adminRequest(player, AdminAction.wave);
+                        Call.adminRequest(player, AdminAction.wave, null);
                     }else{
                         logic.skipWave();
                     }
@@ -293,6 +297,11 @@ public class HudFragment{
         //core info
         parent.fill(t -> {
             t.top();
+
+            if(Core.settings.getBool("macnotch") ){
+                t.margin(macNotchHeight);
+            }
+
             t.visible(() -> shown);
 
             t.name = "coreinfo";
@@ -781,6 +790,12 @@ public class HudFragment{
 
             builder.setLength(0);
 
+            //mission overrides everything
+            if(state.rules.mission != null && state.rules.mission.length() > 0){
+                builder.append(state.rules.mission);
+                return builder;
+            }
+
             //objectives override mission?
             if(state.rules.objectives.any()){
                 boolean first = true;
@@ -788,7 +803,7 @@ public class HudFragment{
                     if(!obj.qualified()) continue;
 
                     String text = obj.text();
-                    if(text != null){
+                    if(text != null && !text.isEmpty()){
                         if(!first) builder.append("\n[white]");
                         builder.append(text);
 
@@ -796,13 +811,10 @@ public class HudFragment{
                     }
                 }
 
-                return builder;
-            }
-
-            //mission overrides everything
-            if(state.rules.mission != null){
-                builder.append(state.rules.mission);
-                return builder;
+                //TODO: display standard status when empty objective?
+                if(builder.length() > 0){
+                    return builder;
+                }
             }
 
             if(!state.rules.waves && state.rules.attackMode){
@@ -819,7 +831,7 @@ public class HudFragment{
                 return builder;
             }
 
-            if(state.rules.winWave > 1 && state.rules.winWave >= state.wave && state.isCampaign()){
+            if(state.rules.winWave > 1 && state.rules.winWave >= state.wave){
                 builder.append(wavefc.get(state.wave, state.rules.winWave));
             }else{
                 builder.append(wavef.get(state.wave));
@@ -909,6 +921,8 @@ public class HudFragment{
                     }
 
                     statuses.set(applied);
+                }else{
+                    statuses.clear();
                 }
             }
         }).left();

@@ -6,6 +6,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g2d.TextureAtlas.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.TechTree.*;
@@ -44,6 +45,8 @@ public abstract class UnlockableContent extends MappableContent{
     public TextureRegion fullIcon;
     /** The tech tree node for this content, if applicable. Null if not part of a tech tree. */
     public @Nullable TechNode techNode;
+    /** Tech nodes for all trees that this content is part of. */
+    public Seq<TechNode> techNodes = new Seq<>();
     /** Unlock state. Loaded from settings. Do not modify outside of the constructor. */
     protected boolean unlocked;
 
@@ -68,8 +71,12 @@ public abstract class UnlockableContent extends MappableContent{
         uiIcon = Core.atlas.find(getContentType().name() + "-" + name + "-ui", fullIcon);
     }
 
+    public int getLogicId(){
+        return logicVars.lookupLogicId(this);
+    }
+
     public String displayDescription(){
-        return minfo.mod == null ? description : description + "\n" + Core.bundle.format("mod.display", minfo.mod.meta.displayName());
+        return minfo.mod == null ? description : description + "\n" + Core.bundle.format("mod.display", minfo.mod.meta.displayName);
     }
 
     /** Checks stat initialization state. Call before displaying stats. */

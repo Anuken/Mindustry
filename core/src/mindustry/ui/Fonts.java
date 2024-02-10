@@ -35,7 +35,7 @@ public class Fonts{
     private static TextureRegion[] iconTable;
     private static int lastCid;
 
-    public static Font def, outline, icon, iconLarge, tech;
+    public static Font def, outline, icon, iconLarge, tech, logic;
 
     public static TextureRegion logicIcon(int id){
         return iconTable[id];
@@ -71,11 +71,13 @@ public class Fonts{
         FreeTypeFontParameter param = fontParameter();
 
         Core.assets.load("default", Font.class, new FreeTypeFontLoaderParameter(mainFont, param)).loaded = f -> Fonts.def = f;
+
         Core.assets.load("icon", Font.class, new FreeTypeFontLoaderParameter("fonts/icon.ttf", new FreeTypeFontParameter(){{
             size = 30;
             incremental = true;
             characters = "\0";
         }})).loaded = f -> Fonts.icon = f;
+
         Core.assets.load("iconLarge", Font.class, new FreeTypeFontLoaderParameter("fonts/icon.ttf", new FreeTypeFontParameter(){{
             size = 48;
             incremental = false;
@@ -83,6 +85,14 @@ public class Fonts{
             borderWidth = 5f;
             borderColor = Color.darkGray;
         }})).loaded = f -> Fonts.iconLarge = f;
+
+        Core.assets.load("logic", Font.class, new FreeTypeFontLoaderParameter("fonts/logic.ttf", new FreeTypeFontParameter(){{
+            size = 16;
+            //generated all at once, it's fast enough anyway
+            incremental = false;
+            //ASCII only
+            characters = "\0ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890\"!`?'.,;:()[]{}<>|/@\\^$€-%+=#_&~*";
+        }})).loaded = f -> Fonts.logic = f;
     }
 
     public static TextureRegion getLargeIcon(String name){
@@ -156,9 +166,28 @@ public class Fonts{
         });
 
         for(Team team : Team.baseTeams){
-            if(Core.atlas.has("team-" + team.name)){
-                team.emoji = stringIcons.get(team.name, "");
+            team.emoji = stringIcons.get(team.name, "");
+        }
+    }
+    
+    public static void loadContentIconsHeadless(){
+        try(Scanner scan = new Scanner(Core.files.internal("icons/icons.properties").read(512))){
+            while(scan.hasNextLine()){
+                String line = scan.nextLine();
+                String[] split = line.split("=");
+                String[] nametex = split[1].split("\\|");
+                String character = split[0];
+                int ch = Integer.parseInt(character);
+
+                unicodeIcons.put(nametex[0], ch);
+                stringIcons.put(nametex[0], ((char)ch) + "");
             }
+        }
+
+        stringIcons.put("alphachan", stringIcons.get("alphaaaa"));
+
+        for(Team team : Team.baseTeams){
+            team.emoji = stringIcons.get(team.name, "");
         }
     }
 
@@ -269,7 +298,7 @@ public class Fonts{
                 cy = (int)cy;
                 originX = g.width/2f;
                 originY = g.height/2f;
-                Draw.rect(region, cx + g.width/2f, cy + g.height/2f, g.width, g.height, originX, originY, rotation);
+                Draw.rect(region, cx + g.width/2f, cy + g.height/2f, g.width * scaleX, g.height * scaleY, originX, originY, rotation);
             }
 
             @Override

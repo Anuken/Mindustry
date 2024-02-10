@@ -12,6 +12,9 @@ import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
+import mindustry.world.meta.*;
+
+import static mindustry.Vars.*;
 
 public class ForceFieldAbility extends Ability{
     /** Shield radius. */
@@ -69,6 +72,18 @@ public class ForceFieldAbility extends Ability{
     ForceFieldAbility(){}
 
     @Override
+    public void addStats(Table t){
+        t.add("[lightgray]" + Stat.health.localized() + ": [white]" + Math.round(max));
+        t.row();
+        t.add("[lightgray]" + Stat.shootRange.localized() + ": [white]" +  Strings.autoFixed(radius / tilesize, 2) + " " + StatUnit.blocks.localized());
+        t.row();
+        t.add("[lightgray]" + Stat.repairSpeed.localized() + ": [white]" + Strings.autoFixed(regen * 60f, 2) + StatUnit.perSecond.localized());
+        t.row();
+        t.add("[lightgray]" + Stat.cooldownTime.localized() + ": [white]" + Strings.autoFixed(cooldown / 60f, 2) + " " + StatUnit.seconds.localized());
+        t.row();
+    }
+
+    @Override
     public void update(Unit unit){
         if(unit.shield < max){
             unit.shield += Time.delta * regen;
@@ -93,13 +108,13 @@ public class ForceFieldAbility extends Ability{
         checkRadius(unit);
 
         if(unit.shield > 0){
-            Draw.z(Layer.shields);
-
             Draw.color(unit.team.color, Color.white, Mathf.clamp(alpha));
 
             if(Vars.renderer.animateShields){
+                Draw.z(Layer.shields + 0.001f * alpha);
                 Fill.poly(unit.x, unit.y, sides, realRad, rotation);
             }else{
+                Draw.z(Layer.shields);
                 Lines.stroke(1.5f);
                 Draw.alpha(0.09f);
                 Fill.poly(unit.x, unit.y, sides, radius, rotation);

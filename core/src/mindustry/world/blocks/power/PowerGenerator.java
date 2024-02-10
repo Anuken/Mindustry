@@ -110,8 +110,12 @@ public class PowerGenerator extends PowerDistributor{
             }
         }
 
+        public boolean shouldExplode(){
+            return warmup() >= explosionMinWarmup;
+        }
+
         public void createExplosion(){
-            if(warmup() >= explosionMinWarmup){
+            if(shouldExplode()){
                 if(explosionDamage > 0){
                     Damage.damage(x, y, explosionRadius * tilesize, explosionDamage);
                 }

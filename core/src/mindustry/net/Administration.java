@@ -11,6 +11,7 @@ import mindustry.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.payloads.*;
 
 import static mindustry.Vars.*;
 import static mindustry.game.EventType.*;
@@ -24,8 +25,10 @@ public class Administration{
     public ObjectSet<String> dosBlacklist = new ObjectSet<>();
     public ObjectMap<String, Long> kickedIPs = new ObjectMap<>();
 
-    /** All player info. Maps UUIDs to info. This persists throughout restarts. Do not access directly. */
-    private ObjectMap<String, PlayerInfo> playerInfo = new ObjectMap<>();
+
+    private boolean modified, loaded;
+    /** All player info. Maps UUIDs to info. This persists throughout restarts. Do not modify directly. */
+    public ObjectMap<String, PlayerInfo> playerInfo = new ObjectMap<>();
 
     public Administration(){
         load();
@@ -66,7 +69,7 @@ public class Administration{
             if(action.type != ActionType.breakBlock &&
                 action.type != ActionType.placeBlock &&
                 action.type != ActionType.commandUnits &&
-                Config.antiSpam.bool()){
+                Config.antiSpam.bool() && !action.player.isLocal()){
 
                 Ratekeeper rate = action.player.getInfo().rate;
                 if(rate.allow(Config.interactRateWindow.num() * 1000L, Config.interactRateLimit.num())){
@@ -448,15 +451,23 @@ public class Administration{
     }
 
     public void save(){
-        Core.settings.putJson("player-data", playerInfo);
-        Core.settings.putJson("ip-kicks", kickedIPs);
-        Core.settings.putJson("ip-bans", String.class, bannedIPs);
-        Core.settings.putJson("whitelist-ids", String.class, whitelist);
-        Core.settings.putJson("banned-subnets", String.class, subnetBans);
+        modified = true;
+    }
+
+    public void forceSave(){
+        if(modified && loaded){
+            Core.settings.putJson("player-data", playerInfo);
+            Core.settings.putJson("ip-kicks", kickedIPs);
+            Core.settings.putJson("ip-bans", String.class, bannedIPs);
+            Core.settings.putJson("whitelist-ids", String.class, whitelist);
+            Core.settings.putJson("banned-subnets", String.class, subnetBans);
+            modified = false;
+        }
     }
 
     @SuppressWarnings("unchecked")
     private void load(){
+        loaded = true;
         //load default data
         playerInfo = Core.settings.getJson("player-data", ObjectMap.class, ObjectMap::new);
         kickedIPs = Core.settings.getJson("ip-kicks", ObjectMap.class, ObjectMap::new);
@@ -502,7 +513,9 @@ public class Administration{
         autosaveSpacing = new Config("autosaveSpacing", "Spacing between autosaves in seconds.", 60 * 5),
         debug = new Config("debug", "Enable debug logging.", false, () -> Log.level = debug() ? LogLevel.debug : LogLevel.info),
         snapshotInterval = new Config("snapshotInterval", "Client entity snapshot interval in ms.", 200),
-        autoPause = new Config("autoPause", "Whether the game should pause when nobody is online.", false);
+        autoPause = new Config("autoPause", "Whether the game should pause when nobody is online.", false),
+        roundExtraTime = new Config("roundExtraTime", "Time before loading a new map after the gameover, in seconds.", 12),
+        maxLogLength = new Config("maxLogLength", "The Maximum log file size, in bytes.", 1024 * 1024 * 5);
 
         public final Object defaultValue;
         public final String name, key, description;
@@ -564,6 +577,10 @@ public class Administration{
             changed.run();
         }
 
+        public boolean isDefault(){
+            return Structs.eq(get(), defaultValue);
+        }
+
         private static boolean debug(){
             return Config.debug.bool();
         }
@@ -614,14 +631,17 @@ public class Administration{
         public String ip, uuid;
         public boolean modded, mobile;
         public int timesJoined, timesKicked;
+        public String[] ips, names;
 
-        public TraceInfo(String ip, String uuid, boolean modded, boolean mobile, int timesJoined, int timesKicked){
+        public TraceInfo(String ip, String uuid, boolean modded, boolean mobile, int timesJoined, int timesKicked, String[] ips, String[] names){
             this.ip = ip;
             this.uuid = uuid;
             this.modded = modded;
             this.mobile = mobile;
             this.timesJoined = timesJoined;
             this.timesKicked = timesKicked;
+            this.names = names;
+            this.ips = ips;
         }
     }
 
@@ -645,6 +665,9 @@ public class Administration{
 
         /** valid for unit-type events only, and even in that case may be null. */
         public @Nullable Unit unit;
+
+        /** valid only for payload events */
+        public @Nullable Payload payload;
 
         /** valid only for removePlanned events only; contains packed positions. */
         public @Nullable int[] plans;
@@ -684,7 +707,7 @@ public class Administration{
     }
 
     public enum ActionType{
-        breakBlock, placeBlock, rotate, configure, withdrawItem, depositItem, control, buildSelect, command, removePlanned, commandUnits, commandBuilding, respawn
+        breakBlock, placeBlock, rotate, configure, withdrawItem, depositItem, control, buildSelect, command, removePlanned, commandUnits, commandBuilding, respawn, pickupBlock, dropPayload
     }
 
 }

@@ -26,6 +26,7 @@ public class LogicDialog extends BaseDialog{
     Cons<String> consumer = s -> {};
     boolean privileged;
     @Nullable LExecutor executor;
+    GlobalVarsDialog globalsDialog = new GlobalVarsDialog();
 
     public LogicDialog(){
         super("logic");
@@ -51,7 +52,7 @@ public class LogicDialog extends BaseDialog{
         add(buttons).growX().name("canvas");
     }
 
-    private Color typeColor(Var s, Color color){
+    public static Color typeColor(Var s, Color color){
         return color.set(
             !s.isobj ? Pal.place :
             s.objval == null ? Color.darkGray :
@@ -65,7 +66,7 @@ public class LogicDialog extends BaseDialog{
         );
     }
 
-    private String typeName(Var s){
+    public static String typeName(Var s){
         return
             !s.isobj ? "number" :
             s.objval == null ? "null" :
@@ -178,6 +179,8 @@ public class LogicDialog extends BaseDialog{
             });
 
             dialog.addCloseButton();
+            dialog.buttons.button("@logic.globals", Icon.list, () -> globalsDialog.show()).size(210f, 64f);
+
             dialog.show();
         }).name("variables").disabled(b -> executor == null || executor.vars.length == 0);
 

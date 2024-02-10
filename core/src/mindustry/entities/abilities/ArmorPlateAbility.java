@@ -4,9 +4,11 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.scene.ui.layout.Table;
 import arc.util.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.world.meta.*;
 
 public class ArmorPlateAbility extends Ability{
     public TextureRegion plateRegion;
@@ -23,6 +25,11 @@ public class ArmorPlateAbility extends Ability{
 
         warmup = Mathf.lerpDelta(warmup, unit.isShooting() ? 1f : 0f, 0.1f);
         unit.healthMultiplier += warmup * healthMultiplier;
+    }
+
+    @Override
+    public void addStats(Table t){
+        t.add("[lightgray]" + Stat.healthMultiplier.localized() + ": [white]" + Math.round(healthMultiplier * 100f) + 100 + "%");
     }
 
     @Override

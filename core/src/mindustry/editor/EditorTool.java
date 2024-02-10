@@ -9,6 +9,7 @@ import arc.util.*;
 import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.world.*;
+
 import static mindustry.Vars.*;
 
 public enum EditorTool{
@@ -91,7 +92,7 @@ public enum EditorTool{
             });
         }
     },
-    fill(KeyCode.g, "replaceall", "fillteams"){
+    fill(KeyCode.g, "replaceall", "fillteams", "fillerase"){
         {
             edit = true;
         }
@@ -103,13 +104,15 @@ public enum EditorTool{
             if(!Structs.inBounds(x, y, editor.width(), editor.height())) return;
             Tile tile = editor.tile(x, y);
 
-            if(editor.drawBlock.isMultiblock()){
+            if(tile == null) return;
+
+            if(editor.drawBlock.isMultiblock() && (mode == 0 || mode == -1)){
                 //don't fill multiblocks, thanks
                 pencil.touched(x, y);
                 return;
             }
 
-            //mode 0 or 1, fill everything with the floor/tile or replace it
+            //mode 0 or standard, fill everything with the floor/tile or replace it
             if(mode == 0 || mode == -1){
                 //can't fill parts or multiblocks
                 if(tile.block().isMultiblock()){
@@ -145,6 +148,27 @@ public enum EditorTool{
                     Team dest = tile.team();
                     if(dest == editor.drawTeam) return;
                     fill(x, y, true, t -> t.getTeamID() == dest.id && t.synthetic(), t -> t.setTeam(editor.drawTeam));
+                }
+            }else if(mode == 2){ //erase mode
+                Boolf<Tile> tester;
+                Cons<Tile> setter;
+
+                if(tile.block() != Blocks.air){
+                    Block dest = tile.block();
+                    tester = t -> t.block() == dest;
+                    setter = t -> t.setBlock(Blocks.air);
+                }else if(tile.overlay() != Blocks.air){
+                    Block dest = tile.overlay();
+                    tester = t -> t.overlay() == dest;
+                    setter = t -> t.setOverlay(Blocks.air);
+                }else{
+                    //trying to erase floor (no)
+                    tester = null;
+                    setter = null;
+                }
+
+                if(setter != null){
+                    fill(x, y, false, tester, setter);
                 }
             }
         }

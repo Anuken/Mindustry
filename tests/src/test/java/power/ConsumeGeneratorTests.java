@@ -91,12 +91,6 @@ public class ConsumeGeneratorTests extends PowerTestFixture{
         assertTrue(build.acceptLiquid(null, liquid), inputType + " | " + parameterDescription + ": Liquids which will be declined by the generator don't need to be tested - The code won't be called for those cases.");
 
         build.liquids.add(liquid, availableLiquidAmount);
-        //Placed:
-        //frame 0: run generator code, multiplier is set but nothing is valid so this is used
-        //- consumption code runs and consumes
-        //frame 1: efficiency is now 1, but the liquid filter consumer isn't valid anymore.
-
-        build.updateConsumption();
 
         // Perform an update on the generator once - This should use up any resource up to the maximum liquid usage
         build.update();

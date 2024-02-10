@@ -165,14 +165,14 @@ public class NetClient implements ApplicationListener{
     public static void sound(Sound sound, float volume, float pitch, float pan){
         if(sound == null || headless) return;
 
-        sound.play(Mathf.clamp(volume, 0, 8f) * Core.settings.getInt("sfxvol") / 100f, pitch, pan, false, false);
+        sound.play(Mathf.clamp(volume, 0, 8f) * Core.settings.getInt("sfxvol") / 100f, Mathf.clamp(pitch, 0f, 20f), pan, false, false);
     }
 
     @Remote(variants = Variant.both, unreliable = true, called = Loc.server)
     public static void soundAt(Sound sound, float x, float y, float volume, float pitch){
         if(sound == null || headless) return;
 
-        sound.at(x, y, pitch, Mathf.clamp(volume, 0, 4f));
+        sound.at(x, y, Mathf.clamp(pitch, 0f, 20f), Mathf.clamp(volume, 0, 4f));
     }
 
     @Remote(variants = Variant.both, unreliable = true)
@@ -201,10 +201,12 @@ public class NetClient implements ApplicationListener{
             Sounds.chatMessage.play();
         }
 
-        //display raw unformatted text above player head
         if(playersender != null && unformatted != null){
+            //display raw unformatted text above player head
             playersender.lastText(unformatted);
             playersender.textFadeTime(1f);
+
+            Events.fire(new PlayerChatEvent(playersender, unformatted));
         }
     }
 
@@ -230,6 +232,8 @@ public class NetClient implements ApplicationListener{
             netServer.admins.blacklistDos(player.con.address);
             return;
         }
+
+        if(message == null) return;
 
         if(message.length() > maxTextLength){
             throw new ValidateException(player, "Player has sent a message above the text limit.");
@@ -338,17 +342,13 @@ public class NetClient implements ApplicationListener{
 
     @Remote(variants = Variant.both)
     public static void setObjectives(MapObjectives executor){
-        //clear old markers
-        for(var objective : state.rules.objectives){
-            for(var marker : objective.markers){
-                if(marker.wasAdded){
-                    marker.removed();
-                    marker.wasAdded = false;
-                }
-            }
-        }
-
         state.rules.objectives = executor;
+    }
+
+    @Remote(called = Loc.server)
+    public static void objectiveCompleted(String[] flagsRemoved, String[] flagsAdded){
+        state.rules.objectiveFlags.removeAll(flagsRemoved);
+        state.rules.objectiveFlags.addAll(flagsAdded);
     }
 
     @Remote(variants = Variant.both)
@@ -404,7 +404,7 @@ public class NetClient implements ApplicationListener{
 
         //entity must not be added yet, so create it
         if(entity == null){
-            entity = (Syncc)EntityMapping.map(typeID).get();
+            entity = (Syncc)EntityMapping.map(typeID & 0xFF).get();
             entity.id(id);
             if(!netClient.isEntityUsed(entity.id())){
                 add = true;
@@ -435,8 +435,9 @@ public class NetClient implements ApplicationListener{
             for(int j = 0; j < amount; j++){
                 readSyncEntity(input, Reads.get(input));
             }
-        }catch(IOException e){
-            throw new RuntimeException(e);
+        }catch(Exception e){
+            //don't disconnect, just log it
+            Log.err("Error reading entity snapshot", e);
         }
     }
 

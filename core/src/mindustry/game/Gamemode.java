@@ -35,6 +35,7 @@ public enum Gamemode{
     }, map -> map.teams.size > 1),
     editor(true, rules -> {
         rules.infiniteResources = true;
+        rules.instantBuild = true;
         rules.editor = true;
         rules.waves = false;
         rules.waveTimer = false;

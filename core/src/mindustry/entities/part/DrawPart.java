@@ -14,6 +14,8 @@ public abstract class DrawPart{
     public boolean under = false;
     /** For units, this is the index of the weapon this part gets its progress for. */
     public int weaponIndex = 0;
+    /** Which recoil counter to use. < 0 to use base recoil.  */
+    public int recoilIndex = -1;
 
     public abstract void draw(PartParams params);
     public abstract void load(String name);
@@ -39,6 +41,11 @@ public abstract class DrawPart{
             this.sideOverride = -1;
             this.life = 0f;
             this.sideMultiplier = 1;
+            return this;
+        }
+
+        public PartParams setRecoil(float recoils){
+            this.recoil = recoils;
             return this;
         }
     }
@@ -78,8 +85,10 @@ public abstract class DrawPart{
         /** Weapon heat, 1 when just fired, 0, when it has cooled down (duration depends on weapon) */
         heat = p -> p.heat,
         /** Lifetime fraction, 0 to 1. Only for missiles. */
-        life = p -> p.life;
-
+        life = p -> p.life,
+        /** Current unscaled value of Time.time. */
+        time = p -> Time.time;
+        
         float get(PartParams p);
 
         static PartProgress constant(float value){
@@ -159,6 +168,14 @@ public abstract class DrawPart{
 
         default PartProgress absin(float scl, float mag){
             return p -> get(p) + Mathf.absin(scl, mag);
+        }
+        
+        default PartProgress mod(float amount){
+            return p -> Mathf.mod(get(p), amount);
+        }
+        
+        default PartProgress loop(float time){
+            return p -> Mathf.mod(get(p)/time, 1);
         }
 
         default PartProgress apply(PartProgress other, PartFunc func){

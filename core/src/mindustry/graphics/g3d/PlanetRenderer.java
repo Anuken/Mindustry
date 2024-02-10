@@ -4,14 +4,11 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g3d.*;
-import arc.graphics.gl.*;
 import arc.math.*;
 import arc.math.geom.*;
-import arc.struct.*;
 import arc.util.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
-import mindustry.graphics.g3d.PlanetGrid.*;
 import mindustry.type.*;
 
 public class PlanetRenderer implements Disposable{
@@ -22,17 +19,13 @@ public class PlanetRenderer implements Disposable{
     borderColor = Pal.accent.cpy().a(0.3f),
     shadowColor = new Color(0, 0, 0, 0.7f);
 
-    private static final Seq<Vec3> points = new Seq<>();
-
     /** Camera used for rendering. */
     public final Camera3D cam = new Camera3D();
     /** Raw vertex batch. */
     public final VertexBatch3D batch = new VertexBatch3D(20000, false, true, 0);
 
-    private final Mesh[] outlines = new Mesh[10];
     public final PlaneBatch3D projector = new PlaneBatch3D();
     public final Mat3D mat = new Mat3D();
-    public final FrameBuffer buffer = new FrameBuffer(2, 2, true);
 
     public final Bloom bloom = new Bloom(Core.graphics.getWidth()/4, Core.graphics.getHeight()/4, true, false){{
         setThreshold(0.8f);
@@ -109,8 +102,9 @@ public class PlanetRenderer implements Disposable{
 
         Events.fire(Trigger.universeDraw);
 
-        renderPlanet(params.solarSystem, params);
-        renderTransparent(params.solarSystem, params);
+        Planet solarSystem = params.planet.solarSystem;
+        renderPlanet(solarSystem, params);
+        renderTransparent(solarSystem, params);
 
         bloom.render();
 
@@ -179,25 +173,7 @@ public class PlanetRenderer implements Disposable{
 
     public void renderSectors(Planet planet, PlanetParams params){
         if(params.uiAlpha <= 0.02f) return;
-
-        //apply transformed position
-        batch.proj().mul(planet.getTransform(mat));
-
-        if(params.renderer != null){
-            params.renderer.renderSectors(planet);
-        }
-
-        //render sector grid
-        Mesh mesh = outline(planet.grid.size);
-        Shader shader = Shaders.planetGrid;
-        Vec3 tile = planet.intersect(cam.getMouseRay(), outlineRad);
-        Shaders.planetGrid.mouse.lerp(tile == null ? Vec3.Zero : tile.sub(planet.position).rotate(Vec3.Y, planet.getRotation()), 0.2f);
-
-        shader.bind();
-        shader.setUniformMatrix4("u_proj", cam.combined.val);
-        shader.setUniformMatrix4("u_trans", planet.getTransform(mat).val);
-        shader.apply();
-        mesh.render(shader, Gl.lines);
+        planet.renderSectors(batch, cam, params);
     }
 
     public void drawArc(Planet planet, Vec3 a, Vec3 b){
@@ -209,47 +185,11 @@ public class PlanetRenderer implements Disposable{
     }
 
     public void drawArc(Planet planet, Vec3 a, Vec3 b, Color from, Color to, float length, float timeScale, int pointCount){
-        //increase curve height when on opposite side of planet, so it doesn't tunnel through
-        float dot = 1f - (Tmp.v32.set(a).nor().dot(Tmp.v33.set(b).nor()) + 1f)/2f;
-
-        Vec3 avg = Tmp.v31.set(b).add(a).scl(0.5f);
-        avg.setLength(planet.radius*(1f+length) + dot * 1.35f);
-
-        points.clear();
-        points.addAll(Tmp.v33.set(b).setLength(outlineRad), Tmp.v31, Tmp.v34.set(a).setLength(outlineRad));
-        Tmp.bz3.set(points);
-
-        for(int i = 0; i < pointCount + 1; i++){
-            float f = i / (float)pointCount;
-            Tmp.c1.set(from).lerp(to, (f+ Time.globalTime /timeScale)%1f);
-            batch.color(Tmp.c1);
-            batch.vertex(Tmp.bz3.valueAt(Tmp.v32, f));
-        }
-        batch.flush(Gl.lineStrip);
+        planet.drawArc(batch, a, b, from, to, length, timeScale, pointCount);
     }
 
     public void drawBorders(Sector sector, Color base, float alpha){
-        Color color = Tmp.c1.set(base).a((base.a + 0.3f + Mathf.absin(Time.globalTime, 5f, 0.3f)) * alpha);
-
-        float r1 = 1f;
-        float r2 = outlineRad + 0.001f;
-
-        for(int i = 0; i < sector.tile.corners.length; i++){
-            Corner c = sector.tile.corners[i], next = sector.tile.corners[(i+1) % sector.tile.corners.length];
-
-            Tmp.v31.set(c.v).setLength(r2);
-            Tmp.v32.set(next.v).setLength(r2);
-            Tmp.v33.set(c.v).setLength(r1);
-
-            batch.tri2(Tmp.v31, Tmp.v32, Tmp.v33, color);
-
-            Tmp.v31.set(next.v).setLength(r2);
-            Tmp.v32.set(next.v).setLength(r1);
-            Tmp.v33.set(c.v).setLength(r1);
-
-            batch.tri2(Tmp.v31, Tmp.v32, Tmp.v33, color);
-        }
-
+        sector.planet.drawBorders(batch, sector, base, alpha);
         if(batch.getNumVertices() >= batch.getMaxVertices() - 6 * 6){
             batch.flush(Gl.triangles);
         }
@@ -268,20 +208,16 @@ public class PlanetRenderer implements Disposable{
 
         projector.setPlane(
         //origin on sector position
-        Tmp.v33.set(sector.tile.v).setLength(outlineRad + length).rotate(Vec3.Y, rotation).add(sector.planet.position),
+        Tmp.v33.set(sector.tile.v).setLength((outlineRad + length) * sector.planet.radius).rotate(Vec3.Y, rotation).add(sector.planet.position),
         //face up
-        sector.plane.project(Tmp.v32.set(sector.tile.v).add(Vec3.Y)).sub(sector.tile.v).rotate(Vec3.Y, rotation).nor(),
+        sector.plane.project(Tmp.v32.set(sector.tile.v).add(Vec3.Y)).sub(sector.tile.v, sector.planet.radius).rotate(Vec3.Y, rotation).nor(),
         //right vector
         Tmp.v31.set(Tmp.v32).rotate(Vec3.Y, -rotation).add(sector.tile.v).rotate(sector.tile.v, 90).sub(sector.tile.v).rotate(Vec3.Y, rotation).nor()
         );
     }
 
     public void fill(Sector sector, Color color, float offset){
-        float rr = outlineRad + offset;
-        for(int i = 0; i < sector.tile.corners.length; i++){
-            Corner c = sector.tile.corners[i], next = sector.tile.corners[(i+1) % sector.tile.corners.length];
-            batch.tri(Tmp.v31.set(c.v).setLength(rr), Tmp.v32.set(next.v).setLength(rr), Tmp.v33.set(sector.tile.v).setLength(rr), color);
-        }
+        sector.planet.fill(batch, sector, color, offset);
     }
 
     public void drawSelection(Sector sector, float alpha){
@@ -289,43 +225,7 @@ public class PlanetRenderer implements Disposable{
     }
 
     public void drawSelection(Sector sector, Color color, float stroke, float length){
-        float arad = outlineRad + length;
-
-        for(int i = 0; i < sector.tile.corners.length; i++){
-            Corner next = sector.tile.corners[(i + 1) % sector.tile.corners.length];
-            Corner curr = sector.tile.corners[i];
-
-            next.v.scl(arad);
-            curr.v.scl(arad);
-            sector.tile.v.scl(arad);
-
-            Tmp.v31.set(curr.v).sub(sector.tile.v).setLength(curr.v.dst(sector.tile.v) - stroke).add(sector.tile.v);
-            Tmp.v32.set(next.v).sub(sector.tile.v).setLength(next.v.dst(sector.tile.v) - stroke).add(sector.tile.v);
-
-            batch.tri(curr.v, next.v, Tmp.v31, color);
-            batch.tri(Tmp.v31, next.v, Tmp.v32, color);
-
-            sector.tile.v.scl(1f / arad);
-            next.v.scl(1f / arad);
-            curr.v.scl(1f /arad);
-        }
-    }
-
-    public Mesh outline(int size){
-        if(outlines[size] == null){
-            outlines[size] = MeshBuilder.buildHex(new HexMesher(){
-                @Override
-                public float getHeight(Vec3 position){
-                    return 0;
-                }
-
-                @Override
-                public Color getColor(Vec3 position){
-                    return outlineColor;
-                }
-            }, size, true, outlineRad, 0.2f);
-        }
-        return outlines[size];
+        sector.planet.drawSelection(batch, sector, color, stroke, length);
     }
 
     @Override
@@ -334,13 +234,7 @@ public class PlanetRenderer implements Disposable{
         batch.dispose();
         projector.dispose();
         atmosphere.dispose();
-        buffer.dispose();
         bloom.dispose();
-        for(Mesh m : outlines){
-            if(m != null){
-                m.dispose();
-            }
-        }
     }
 
     public interface PlanetInterfaceRenderer{

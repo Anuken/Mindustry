@@ -30,9 +30,11 @@ public class PayloadConveyor extends Block{
         update = true;
         outputsPayload = true;
         noUpdateDisabled = true;
+        acceptsPayloads = true;
         priority = TargetPriority.transport;
         envEnabled |= Env.space | Env.underwater;
         sync = true;
+        underBullets = true;
     }
 
     @Override
@@ -249,6 +251,8 @@ public class PayloadConveyor extends Block{
 
         @Override
         public void unitOn(Unit unit){
+            if(!enabled) return;
+
             //calculate derivative of units moved last frame
             float delta = (curInterp - lastInterp) * size * tilesize;
             Tmp.v1.trns(rotdeg(), delta * moveForce).scl(1f / Math.max(unit.mass(), 201f));

@@ -8,6 +8,8 @@ import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
+import static mindustry.Vars.state;
+
 public class SwitchBlock extends Block{
     public Sound clickSound = Sounds.click;
 
@@ -25,7 +27,26 @@ public class SwitchBlock extends Block{
         config(Boolean.class, (SwitchBuild entity, Boolean b) -> entity.enabled = b);
     }
 
+    public boolean accessible(){
+        return !privileged || state.rules.editor;
+    }
+
+    @Override
+    public boolean canBreak(Tile tile){
+        return accessible();
+    }
+
     public class SwitchBuild extends Building{
+        @Override
+        public void damage(float damage){
+            if(privileged) return;
+            super.damage(damage);
+        }
+
+        @Override
+        public boolean collide(Bullet other){
+            return !privileged;
+        }
 
         @Override
         public boolean configTapped(){

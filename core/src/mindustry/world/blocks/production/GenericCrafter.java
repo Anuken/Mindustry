@@ -241,6 +241,10 @@ public class GenericCrafter extends Block{
 
         @Override
         public float getProgressIncrease(float baseTime){
+            if(ignoreLiquidFullness){
+                return super.getProgressIncrease(baseTime);
+            }
+
             //limit progress increase by maximum amount of liquid it can produce
             float scaling = 1f, max = 1f;
             if(outputLiquids != null){

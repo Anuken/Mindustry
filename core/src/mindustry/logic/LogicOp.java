@@ -32,6 +32,7 @@ public enum LogicOp{
     max("max", true, Math::max),
     min("min", true, Math::min),
     angle("angle", true, (x, y) -> Angles.angle((float)x, (float)y)),
+    angleDiff("anglediff", true, (x, y) -> Angles.angleDist((float)x, (float)y)),
     len("len", true, (x, y) -> Mathf.dst((float)x, (float)y)),
     noise("noise", true, (x, y) -> Simplex.raw2d(0, x, y)),
     abs("abs", a -> Math.abs(a)), //not a method reference because it fails to compile for some reason

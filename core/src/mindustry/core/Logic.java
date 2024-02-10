@@ -310,6 +310,9 @@ public class Logic implements ApplicationListener{
                     Events.fire(new GameOverEvent(left == null ? Team.derelict : left.team));
                     state.gameOver = true;
                 }
+            }else if(!state.gameOver && state.rules.waves && (state.enemies == 0 && state.rules.winWave > 0 && state.wave >= state.rules.winWave && !spawner.isSpawning())){
+                state.gameOver = true;
+                Events.fire(new GameOverEvent(state.rules.defaultTeam));
             }
         }
     }
@@ -383,7 +386,7 @@ public class Logic implements ApplicationListener{
     public static void researched(Content content){
         if(!(content instanceof UnlockableContent u)) return;
 
-        boolean was = !u.unlockedNow();
+        boolean was = u.unlockedNow();
         state.rules.researched.add(u.name);
 
         if(!was){
@@ -394,6 +397,7 @@ public class Logic implements ApplicationListener{
     @Override
     public void dispose(){
         //save the settings before quitting
+        netServer.admins.forceSave();
         Core.settings.manualSave();
     }
 
@@ -403,6 +407,7 @@ public class Logic implements ApplicationListener{
         universe.updateGlobal();
 
         if(Core.settings.modified() && !state.isPlaying()){
+            netServer.admins.forceSave();
             Core.settings.forceSave();
         }
 
@@ -440,6 +445,12 @@ public class Logic implements ApplicationListener{
                     updateWeather();
 
                     for(TeamData data : state.teams.getActive()){
+                        //does not work on PvP so built-in attack maps can have it on by default without issues
+                        if(data.team.rules().buildAi && !state.rules.pvp){
+                            if(data.buildAi == null) data.buildAi = new BaseBuilderAI(data);
+                            data.buildAi.update();
+                        }
+
                         if(data.team.rules().rtsAi){
                             if(data.rtsAi == null) data.rtsAi = new RtsAI(data);
                             data.rtsAi.update();
@@ -447,7 +458,6 @@ public class Logic implements ApplicationListener{
                     }
                 }
 
-                //TODO objectives clientside???
                 if(!state.isEditor()){
                     state.rules.objectives.update();
                     if(state.rules.objectives.checkChanged() && net.server()){

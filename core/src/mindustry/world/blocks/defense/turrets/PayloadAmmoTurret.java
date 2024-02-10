@@ -170,7 +170,7 @@ public class PayloadAmmoTurret extends Turret{
         public void read(Reads read, byte revision){
             super.read(read, revision);
             payloads.read(read);
-            //TODO remove invalid ammo
+            payloads.removeAll(u -> !ammoTypes.containsKey(u));
         }
     }
 }

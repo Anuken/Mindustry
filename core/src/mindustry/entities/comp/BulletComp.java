@@ -195,7 +195,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
             }
 
             if(build != null && isAdded()
-                && checkUnderBuild(build, x, y)
+                && checkUnderBuild(build, x * tilesize, y * tilesize)
                 && build.collide(self()) && type.testCollision(self(), build)
                 && !build.dead() && (type.collidesTeam || build.team != team) && !(type.pierceBuilding && hasCollided(build.id))){
 

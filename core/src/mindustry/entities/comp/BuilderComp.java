@@ -47,13 +47,27 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
         updateBuildLogic();
     }
 
+    @Override
+    public void afterRead(){
+        //why would this happen?
+        if(plans == null){
+            plans = new Queue<>(1);
+        }
+    }
+
     public void validatePlans(){
         if(plans.size > 0){
             Iterator<BuildPlan> it = plans.iterator();
             while(it.hasNext()){
                 BuildPlan plan = it.next();
                 Tile tile = world.tile(plan.x, plan.y);
-                if(tile == null || (plan.breaking && tile.block() == Blocks.air) || (!plan.breaking && ((tile.build != null && tile.build.rotation == plan.rotation) || !plan.block.rotate) && tile.block() == plan.block)){
+                boolean isSameDerelict = (tile != null && tile.build != null && tile.block() == plan.block && tile.build.tileX() == plan.x && tile.build.tileY() == plan.y && tile.team() == Team.derelict);
+                if(tile == null || (plan.breaking && tile.block() == Blocks.air) || (!plan.breaking && ((tile.build != null && tile.build.rotation == plan.rotation && !isSameDerelict) || !plan.block.rotate) &&
+                    //th block must be the same, but not derelict and the same
+                    ((tile.block() == plan.block && !isSameDerelict) ||
+                        //same floor or overlay
+                        (plan.block != null && (plan.block.isOverlay() && plan.block == tile.overlay() || (plan.block.isFloor() && plan.block == tile.floor())))))){
+
                     it.remove();
                 }
             }
@@ -72,9 +86,9 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
             buildAlpha = Mathf.lerpDelta(buildAlpha, activelyBuilding() ? 1f : 0f, 0.15f);
         }
 
-        //validate regardless of whether building is enabled.
+        validatePlans();
+
         if(!updateBuilding || !canBuild()){
-            validatePlans();
             return;
         }
 
@@ -85,18 +99,17 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
         if(Float.isNaN(buildCounter) || Float.isInfinite(buildCounter)) buildCounter = 0f;
         buildCounter = Math.min(buildCounter, 10f);
 
+        boolean instant = state.rules.instantBuild && state.rules.infiniteResources;
+
         //random attempt to fix a freeze that only occurs on Android
-        int maxPerFrame = 10, count = 0;
+        int maxPerFrame = instant ? plans.size : 10, count = 0;
 
-        while(buildCounter >= 1 && count++ < maxPerFrame){
+        var core = core();
+
+        if((core == null && !infinite)) return;
+
+        while((buildCounter >= 1 || instant) && count++ < maxPerFrame && plans.size > 0){
             buildCounter -= 1f;
-
-            validatePlans();
-
-            var core = core();
-
-            //nothing to build.
-            if(buildPlan() == null) return;
 
             //find the next build plan
             if(plans.size > 1){
@@ -120,7 +133,7 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
             if(!within(tile, finalPlaceDst)) continue;
 
             if(!headless){
-                Vars.control.sound.loop(Sounds.build, tile, 0.51f);
+                Vars.control.sound.loop(Sounds.build, tile, 0.15f);
             }
 
             if(!(tile.build instanceof ConstructBuild cb)){
@@ -144,12 +157,12 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
             }
 
             if(tile.build instanceof ConstructBuild && !current.initialized){
-                Core.app.post(() -> Events.fire(new BuildSelectEvent(tile, team, self(), current.breaking)));
+                Events.fire(new BuildSelectEvent(tile, team, self(), current.breaking));
                 current.initialized = true;
             }
 
             //if there is no core to build with or no build entity, stop building!
-            if((core == null && !infinite) || !(tile.build instanceof ConstructBuild entity)){
+            if(!(tile.build instanceof ConstructBuild entity)){
                 continue;
             }
 

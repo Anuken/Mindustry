@@ -32,6 +32,10 @@ public class GameState{
     public Rules rules = new Rules();
     /** Statistics for this save/game. Displayed after game over. */
     public GameStats stats = new GameStats();
+    /** Markers not linked to objectives. Controlled by world processors. */
+    public MapMarkers markers = new MapMarkers();
+    /** Locale-specific string bundles of current map */
+    public MapLocales mapLocales = new MapLocales();
     /** Global attributes of the environment, calculated by weather. */
     public Attributes envAttrs = new Attributes();
     /** Team data. Gets reset every new game. */
