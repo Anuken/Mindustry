@@ -22,7 +22,7 @@ public class GlobalVarsDialog extends BaseDialog{
     }
 
     void setup(){
-        float prefWidth = Math.min(Core.graphics.getWidth() * 0.9f / Scl.scl(1f) - 220f, 600f);
+        float prefWidth = Math.min(Core.graphics.getWidth() * 0.9f / Scl.scl(1f) - 240f, 600f);
         cont.clearChildren();
 
         cont.pane(t -> {

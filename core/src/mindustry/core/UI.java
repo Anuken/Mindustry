@@ -101,8 +101,6 @@ public class UI implements ApplicationListener, Loadable{
 
     @Override
     public void loadSync(){
-        loadColors();
-
         Fonts.outline.getData().markupEnabled = true;
         Fonts.def.getData().markupEnabled = true;
         Fonts.def.setOwnsTexture(false);
