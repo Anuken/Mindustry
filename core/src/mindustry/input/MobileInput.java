@@ -743,6 +743,11 @@ public class MobileInput extends InputHandler implements GestureListener{
             queueCommandMode = false;
         }
 
+        //cannot rebuild and place at the same time
+        if(block != null){
+            rebuildMode = false;
+        }
+
         if(player.dead()){
             mode = none;
             manualShooting = false;
