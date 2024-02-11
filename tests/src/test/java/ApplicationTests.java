@@ -40,6 +40,7 @@ import static org.junit.jupiter.api.DynamicTest.*;
 
 public class ApplicationTests{
     static Map testMap;
+    static Map winMap;
     static boolean initialized;
     //core/assets
     static final Fi testDataFolder = new Fi("../../tests/build/test_data");
@@ -106,7 +107,7 @@ public class ApplicationTests{
                 public void init(){
                     super.init();
                     begins[0] = true;
-                    testMap = maps.loadInternalMap("groundZero");
+                    testMap = maps.loadInternalMap("domain"); //was groundZero
                     Thread.currentThread().interrupt();
                 }
             };
@@ -265,6 +266,68 @@ public class ApplicationTests{
         Time.update();
         Groups.unit.update();
         assertFalse(Groups.unit.isEmpty(), "No enemies spawned.");
+    }
+
+    /**
+     * Start wave and check if we have enemies and we are no longer in prep phase
+     */
+    @Test
+    void WavesActiveStateTest(){
+        world.loadMap(testMap);
+        //increments the wave number
+        logic.runWave();
+        //try and access SectorInfo
+        //SectorInfo infoTemp = state.rules.sector.info;
+        //state.rules.winWave = 0;
+
+        //Time.setDeltaProvider(() -> 1000f);
+        //Time.update();
+        //Time.update();
+        Groups.unit.update();
+        //enemies present and spawned. No longer in prep phase. Wave has started.
+        assertFalse(!Groups.unit.isEmpty(), "Enemies spawned.");
+    }
+
+    /**
+     * Checking for Wavecountdown state (aka our wavetimer before the wave starts)
+     *
+     */
+    @Test
+    void WaveCountdownStateTest(){
+        world.loadMap(testMap);
+        assertTrue(spawner.countSpawns() > 0, "No spawns present.");
+        logic.runWave();
+        //force trigger delayed spawns
+        Time.setDeltaProvider(() -> 1000f);
+        Time.update();
+        Time.update();
+        Groups.unit.update();
+        //check if we dont have any enemies spawning and we have a Wave Timer active
+        assertFalse(Groups.unit.isEmpty() && !state.rules.waveTimer, "Wave Countdown Active.");
+    }
+
+    /**
+     * Start wave and check if we have enemies and we are no longer in prep phase
+     */
+    @Test
+    void WavesActiveTest(){
+        world.loadMap(testMap);
+        //increments the wave number
+        logic.runWave();
+        //try and access SectorInfo
+        //SectorInfo infoTemp = state.rules.sector.info;
+        //state.rules.winWave = 0;
+
+        //Time.setDeltaProvider(() -> 1000f);
+        //Time.update();
+        //Time.update();
+        Groups.unit.update();
+        //enemies present and spawned. No longer in prep phase. Wave has started.
+        assertFalse(!Groups.unit.isEmpty(), "Enemies spawned.");
+
+        //waveTimer (if true we have a wavetime aka (int)(state.wavetime/60)
+        //if we die or loose, state.gameOver = true
+        //boss waves
     }
 
     @Test
