@@ -269,6 +269,33 @@ public class ApplicationTests{
     }
 
     /**
+     * run waves until boss wave is reached to make sure we get there. the boss wave will be run
+     * before exiting loop.
+     */
+    @Test
+    void runBossWave(){
+        int wave_count = 0;
+        testMap = maps.loadInternalMap("nuclearComplex");
+        world.loadMap(testMap);
+        //assertTrue(spawner.countSpawns() > 0, "No spawns present.");
+        while (true)
+        {
+            logic.runWave();
+            boolean boss = state.rules.spawns.contains(group -> group.getSpawned(state.wave - 2) > 0 && group.effect == StatusEffects.boss);
+            if (boss)
+            {
+                System.out.println("BOSS ROUND"); //nuclear complex round 50 eclipse boss spawns.
+            }
+            System.out.println("BOSS ROUND IS " + boss);
+            Groups.unit.update();
+            wave_count++;
+        }
+        //force trigger delayed spawns
+        //Time.setDeltaProvider(() -> 1000f);
+        //assertFalse(Groups.unit.isEmpty(), "No enemies spawned.");
+    }
+
+    /**
      * Start wave and check if we have enemies and we are no longer in prep phase
      */
     @Test
