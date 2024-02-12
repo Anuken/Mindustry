@@ -26,6 +26,7 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.storage.*;
+import mindustry.world.blocks.storage.CoreBlock.CoreBuild;
 import org.json.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.*;
@@ -334,27 +335,30 @@ public class ApplicationTests{
     }
 
     /**
-     * Start wave and check if we have enemies and we are no longer in prep phase
+     * Start wave and kill player's core.
      */
     @Test
-    void WavesActiveTest(){
+    void Test(){
         world.loadMap(testMap);
         //increments the wave number
         logic.runWave();
-        //try and access SectorInfo
-        //SectorInfo infoTemp = state.rules.sector.info;
-        //state.rules.winWave = 0;
-
-        //Time.setDeltaProvider(() -> 1000f);
-        //Time.update();
-        //Time.update();
         Groups.unit.update();
-        //enemies present and spawned. No longer in prep phase. Wave has started.
-        assertFalse(!Groups.unit.isEmpty(), "Enemies spawned.");
+
+        //get our player core and kill it
+        for (CoreBuild core :  state.teams.playerCores())
+        {
+            core.kill();
+        }
+        //need to set state to is playing to see if we are in fact dead, otherwise we are inside a menu
+        state.set(State.playing);
+        logic.update();
 
         //waveTimer (if true we have a wavetime aka (int)(state.wavetime/60)
         //if we die or loose, state.gameOver = true
         //boss waves
+
+        //enemies present and spawned. No longer in prep phase. Wave has started.
+        assertFalse(!state.gameOver, "Game Over status reached.");
     }
 
     @Test
