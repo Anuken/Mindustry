@@ -331,14 +331,16 @@ public class ApplicationTests{
         Time.update();
         Groups.unit.update();
         //check if we dont have any enemies spawning and we have a Wave Timer active
+        //waveTimer (if true we have a wavetime aka (int)(state.wavetime/60)
         assertFalse(Groups.unit.isEmpty() && !state.rules.waveTimer, "Wave Countdown Active.");
     }
 
     /**
      * Start wave and kill player's core.
+     *
      */
     @Test
-    void Test(){
+    void GameOverStateTest(){
         world.loadMap(testMap);
         //increments the wave number
         logic.runWave();
@@ -353,10 +355,8 @@ public class ApplicationTests{
         state.set(State.playing);
         logic.update();
 
-        //waveTimer (if true we have a wavetime aka (int)(state.wavetime/60)
-        //if we die or loose, state.gameOver = true
-        //boss waves
 
+        //if we die or loose, state.gameOver = true
         //enemies present and spawned. No longer in prep phase. Wave has started.
         assertFalse(!state.gameOver, "Game Over status reached.");
     }
