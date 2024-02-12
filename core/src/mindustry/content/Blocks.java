@@ -3738,6 +3738,15 @@ public class Blocks{
 
             scaledHealth = 130;
             shootSound = Sounds.artillery;
+            drawer = new DrawTurret(){{
+                parts.add(new RegionPart("-side"){{
+                    progress = PartProgress.warmup;
+                    moveX = 2f;
+                    moveY = 1f;
+                    moveRot = -10f;
+                    mirror = true;
+                }});
+            }};
         }};
 
         cyclone = new ItemTurret("cyclone"){{
