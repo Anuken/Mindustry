@@ -3977,7 +3977,9 @@ public class Blocks{
             loopSound = Sounds.beam;
             loopSoundVolume = 2f;
             envEnabled |= Env.space;
-
+            scaledHealth = 200;
+            coolant = consumeCoolant(0.5f);
+            consumePower(17f);
             shootType = new ContinuousLaserBulletType(78){{
                 length = 200f;
                 hitEffect = Fx.hitMeltdown;
@@ -3985,7 +3987,6 @@ public class Blocks{
                 status = StatusEffects.melting;
                 drawSize = 420f;
                 timescaleDamage = true;
-
                 incendChance = 0.4f;
                 incendSpread = 5f;
                 incendAmount = 1;
@@ -4007,9 +4008,6 @@ public class Blocks{
                 }});
             }};
             }};
-            scaledHealth = 200;
-            coolant = consumeCoolant(0.5f);
-            consumePower(17f);
         }};
 
         breach = new ItemTurret("breach"){{
