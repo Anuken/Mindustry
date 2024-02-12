@@ -451,12 +451,21 @@ public class ApplicationTests{
         world.endMapLoad();
     }
 
+    /**
+     * Creates a map (8 by 8 tileset) and assigns a new coreShard building to cordinates 4,4
+     * Verifies block is created successfully
+     * Default team for single player is automatically team sharded
+     *
+     * Runs through each coordinate starting at 4,4 to verify they are core shard
+     */
     @Test
     void multiblock(){
         createMap();
         int bx = 4;
         int by = 4;
+        //create a coreShard block at this tile location of cordinate (4,4)
         world.tile(bx, by).setBlock(Blocks.coreShard, Team.sharded, 0);
+        //check if created block we just made is created properly
         assertEquals(world.tile(bx, by).team(), Team.sharded);
         for(int x = bx - 1; x <= bx + 1; x++){
             for(int y = by - 1; y <= by + 1; y++){
@@ -466,10 +475,15 @@ public class ApplicationTests{
         }
     }
 
+    /**
+     * Gives/Removes a specific tile resources and verify the resources were properly assigned
+     */
     @Test
     void blockInventories(){
         multiblock();
+        //grab tile of our world at coordinate 4,4
         Tile tile = world.tile(4, 4);
+
         tile.build.items.add(Items.coal, 5);
         tile.build.items.add(Items.titanium, 50);
         assertEquals(tile.build.items.total(), 55);
@@ -1140,6 +1154,12 @@ public class ApplicationTests{
         assertEquals(core.build, Team.sharded.data().core());
     }
 
+    /**
+     * Test aimed at depositing item into given block. Gets run in test factories.
+     *
+     * @param block
+     * @param item
+     */
     void depositTest(Block block, Item item){
         Unit unit = UnitTypes.mono.create(Team.sharded);
         Tile tile = new Tile(0, 0, Blocks.air, Blocks.air, block);
