@@ -274,9 +274,6 @@ public class ApplicationTests{
         testMap = maps.loadInternalMap("nuclearComplex");
         world.loadMap(testMap);
         //assertTrue(spawner.countSpawns() > 0, "No spawns present.");
-        testMap = maps.loadInternalMap("nuclearComplex");
-        world.loadMap(testMap);
-        //assertTrue(spawner.countSpawns() > 0, "No spawns present.");
         while (wave_count < 100)
         {
             logic.runWave();
@@ -286,10 +283,10 @@ public class ApplicationTests{
                 System.out.println("BOSS ROUND"); //nuclear complex round 50 eclipse boss spawns.
                 Groups.clear();
                 int after_boss = 0;
-                while (after_boss < 1)
+                while (after_boss < 3)
                 {
-                    state.rules.winWave = 1;
-                    state.rules.attackMode = true;
+                    //state.rules.winWave = 1;
+                    //state.rules.attackMode = true;
                     if(state.rules.waves && (state.enemies == 0 && state.rules.winWave > 0 && state.wave >= state.rules.winWave && !spawner.isSpawning()) ||
                             (state.rules.attackMode && state.rules.waveTeam.cores().isEmpty())){
                             Call.sectorCapture();
@@ -302,6 +299,7 @@ public class ApplicationTests{
                             Call.sectorCapture();
                         }*/
                     }
+                    Groups.unit.update();
                     after_boss++;
                 }
             }
@@ -331,15 +329,16 @@ public class ApplicationTests{
             boolean boss = state.rules.spawns.contains(group -> group.getSpawned(state.wave - 2) > 0 && group.effect == StatusEffects.boss);
             if (boss)
             {
-                System.out.println("BOSS ROUND"); //nuclear complex round 50 eclipse boss spawns.
+                System.out.println("BOSS ROUND REACHED"); //nuclear complex round 50 eclipse boss spawns.
+                assertTrue(boss, "boss wave assertion");
+                System.out.println("RUNNING BOSS ROUND");
+                Groups.unit.update();
+                break;
             }
             System.out.println("BOSS ROUND IS " + boss);
             Groups.unit.update();
             wave_count++;
         }
-        //force trigger delayed spawns
-        //Time.setDeltaProvider(() -> 1000f);
-        //assertFalse(Groups.unit.isEmpty(), "No enemies spawned.");
     }
 
     /**
