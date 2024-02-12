@@ -436,8 +436,11 @@ public class ApplicationTests{
             wave_count++;
         }
         System.out.println("temp");
-        //logic.runWave();
+        //when killing all the enemies, the wave is over therefore we must reset for the next wave.
         Groups.clear();
+        //reset for next wave
+        spawner.reset();
+
         state.set(State.playing);
         logic.update();
 
