@@ -3738,8 +3738,23 @@ public class Blocks{
 
             scaledHealth = 130;
             shootSound = Sounds.artillery;
+            drawer = new DrawTurret(){{
+                parts.add(new RegionPart("-side"){{
+                    progress = PartProgress.warmup;
+                    moveX = -1.5f;
+		    x = .5f;
+                    moveY = -1f;
+                    mirror = true;
+                }}, new RegionPart("-barrel"){{
+                    progress = PartProgress.recoil;
+                    moveY = -1f;
+		            y = -.25f;
+		            heatProgress = PartProgress.reload;
+		            moveY = -1f;
+		            moveX = 3.25f;
+                }});
+            }};
         }};
-
         cyclone = new ItemTurret("cyclone"){{
             requirements(Category.turret, with(Items.copper, 200, Items.titanium, 125, Items.plastanium, 80));
             ammo(
