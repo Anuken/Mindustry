@@ -268,7 +268,53 @@ public class ApplicationTests{
         Groups.unit.update();
         assertFalse(Groups.unit.isEmpty(), "No enemies spawned.");
     }
-
+    @Test
+    void runSectorCaptured(){
+        int wave_count = 0;
+        testMap = maps.loadInternalMap("nuclearComplex");
+        world.loadMap(testMap);
+        //assertTrue(spawner.countSpawns() > 0, "No spawns present.");
+        testMap = maps.loadInternalMap("nuclearComplex");
+        world.loadMap(testMap);
+        //assertTrue(spawner.countSpawns() > 0, "No spawns present.");
+        while (wave_count < 100)
+        {
+            logic.runWave();
+            boolean boss = state.rules.spawns.contains(group -> group.getSpawned(state.wave - 2) > 0 && group.effect == StatusEffects.boss);
+            if (boss)
+            {
+                System.out.println("BOSS ROUND"); //nuclear complex round 50 eclipse boss spawns.
+                Groups.clear();
+                int after_boss = 0;
+                while (after_boss < 1)
+                {
+                    state.rules.winWave = 1;
+                    state.rules.attackMode = true;
+                    if(state.rules.waves && (state.enemies == 0 && state.rules.winWave > 0 && state.wave >= state.rules.winWave && !spawner.isSpawning()) ||
+                            (state.rules.attackMode && state.rules.waveTeam.cores().isEmpty())){
+                            Call.sectorCapture();
+                        /*if(state.rules.sector.preset != null && state.rules.sector.preset.attackAfterWaves && !state.rules.attackMode){
+                            //activate attack mode to destroy cores after waves are done.
+                            state.rules.attackMode = true;
+                            state.rules.waves = false;
+                            Call.setRules(state.rules);
+                        }else{
+                            Call.sectorCapture();
+                        }*/
+                    }
+                    after_boss++;
+                }
+            }
+            Groups.unit.update();
+            Groups.clear();
+            wave_count++;
+        }
+        Call.sectorCapture();
+        System.out.println("GG");
+        //force trigger delayed spawns
+        //Time.setDeltaProvider(() -> 1000f);
+        //assertFalse(Groups.unit.isEmpty(), "No enemies spawned.");
+    }
     /**
      * run waves until boss wave is reached to make sure we get there. the boss wave will be run
      * before exiting loop.
