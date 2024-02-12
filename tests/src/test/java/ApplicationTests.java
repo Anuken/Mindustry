@@ -358,7 +358,7 @@ public class ApplicationTests{
 
         //if we die or loose, state.gameOver = true
         //enemies present and spawned. No longer in prep phase. Wave has started.
-        assertFalse(!state.gameOver, "Game Over status reached.");
+        assertTrue(state.gameOver, "Game Over status reached.");
     }
 
     @Test
