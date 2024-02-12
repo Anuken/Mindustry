@@ -440,10 +440,9 @@ public class ApplicationTests{
         Groups.clear();
         //reset for next wave
         spawner.reset();
-
         state.set(State.playing);
         logic.update();
-
+        assertTrue(state.rules.sector.info.wasCaptured, "GG");
     }
 
     @Test
