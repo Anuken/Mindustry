@@ -15,6 +15,7 @@ import mindustry.ctype.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.graphics.g3d.PlanetGrid;
 import mindustry.io.*;
 import mindustry.io.SaveIO.*;
 import mindustry.maps.*;
@@ -273,7 +274,6 @@ public class ApplicationTests{
         int wave_count = 0;
         testMap = maps.loadInternalMap("nuclearComplex");
         world.loadMap(testMap);
-        //assertTrue(spawner.countSpawns() > 0, "No spawns present.");
         while (wave_count < 100)
         {
             logic.runWave();
@@ -281,7 +281,7 @@ public class ApplicationTests{
             if (boss)
             {
                 System.out.println("BOSS ROUND"); //nuclear complex round 50 eclipse boss spawns.
-                Groups.clear();
+
                 int after_boss = 0;
                 while (after_boss < 3)
                 {
@@ -404,6 +404,43 @@ public class ApplicationTests{
         //if we die or loose, state.gameOver = true
         //enemies present and spawned. No longer in prep phase. Wave has started.
         assertTrue(state.gameOver, "Game Over status reached.");
+    }
+
+    /**
+     * Checks if we reach captured sector status
+     *
+     */
+    @Test
+    void SectorCapturedStateTest() {
+        int wave_count = 0;
+        //nuclear complex round 50 eclipse boss spawns.
+        testMap = maps.loadInternalMap("nuclearComplex");
+
+        world.loadMap(testMap);
+        //need to add a sector to our rules so we know this is a campaign mission
+        state.rules.sector = new Sector(state.rules.planet, PlanetGrid.Ptile.empty);
+        state.rules.winWave = 50;
+        boolean boss = false;
+        //assertTrue(spawner.countSpawns() > 0, "No spawns present.");
+        while (!boss)
+        {
+            logic.runWave();
+            boss = state.rules.spawns.contains(group -> group.getSpawned(state.wave - 2) > 0 && group.effect == StatusEffects.boss);
+            if (boss)
+            {
+               // System.out.println("BOSS ROUND");
+                //nuclear complex round 50 eclipse boss spawns.
+            }
+            //System.out.println("BOSS ROUND IS " + boss);
+            Groups.unit.update();
+            wave_count++;
+        }
+        System.out.println("temp");
+        //logic.runWave();
+        Groups.clear();
+        state.set(State.playing);
+        logic.update();
+
     }
 
     @Test
