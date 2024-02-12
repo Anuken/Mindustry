@@ -3990,8 +3990,23 @@ public class Blocks{
                 incendSpread = 5f;
                 incendAmount = 1;
                 ammoMultiplier = 1f;
+            drawer = new DrawTurret(){{
+                parts.add(new RegionPart("-side"){{
+                    progress = PartProgress.warmup;
+                    moveX = -1.5f;
+		    x = .5f;
+                    moveY = -1f;
+                    mirror = true;
+                }}, new RegionPart("-barrel"){{
+                    progress = PartProgress.recoil;
+                    moveY = -1f;
+		    y = -.25f;
+		    heatProgress = PartProgress.reload;
+		    moveY = -1f;
+		    moveX = 3.25f;
+                }});
             }};
-
+            }};
             scaledHealth = 200;
             coolant = consumeCoolant(0.5f);
             consumePower(17f);
