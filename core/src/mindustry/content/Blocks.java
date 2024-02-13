@@ -3950,7 +3950,7 @@ public class Blocks{
 	    requirements(Category.turret, with(Items.copper, 1200, Items.lead, 350, Items.graphite, 300, Items.surgeAlloy, 325, Items.silicon, 325));
 	    shootEffect = Fx.shootBigSmoke2;
 	    shootCone = 40f;
-	    recoil = 4f;
+	    recoil = 6f;
 	    size = 4;
 	    shootY = 0.2f;
 	    shake = 2f;
@@ -3989,7 +3989,7 @@ public class Blocks{
 	                moveY = -1f;
 	                y = -.25f;
 			mirror = true;
-	                heatProgress = PartProgress.reload;
+	                heatProgress = PartProgress.recoil;
 	                moveY = -1f;
 	                moveX = 3.25f;
 	            }});
