@@ -4008,7 +4008,7 @@ public class Blocks{
                 }});
             }};
         }};
-
+        }};
         breach = new ItemTurret("breach"){{
             requirements(Category.turret, with(Items.beryllium, 150, Items.silicon, 150, Items.graphite, 250));
 
