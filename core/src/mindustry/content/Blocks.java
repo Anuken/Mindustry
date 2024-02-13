@@ -3962,53 +3962,53 @@ public class Blocks{
             limitRange();
         }};
 
-        meltdown = new LaserTurret("meltdown"){{
-            requirements(Category.turret, with(Items.copper, 1200, Items.lead, 350, Items.graphite, 300, Items.surgeAlloy, 325, Items.silicon, 325));
-            shootEffect = Fx.shootBigSmoke2;
-            shootCone = 40f;
-            recoil = 4f;
-            size = 4;
-            shake = 2f;
-            range = 195f;
-            reload = 90f;
-            firingMoveFract = 0.5f;
-            shootDuration = 230f;
-            shootSound = Sounds.laserbig;
-            loopSound = Sounds.beam;
-            loopSoundVolume = 2f;
-            envEnabled |= Env.space;
-            scaledHealth = 200;
-            coolant = consumeCoolant(0.5f);
-            consumePower(17f);
-            shootType = new ContinuousLaserBulletType(78){{
-                length = 200f;
-                hitEffect = Fx.hitMeltdown;
-                hitColor = Pal.meltdownHit;
-                status = StatusEffects.melting;
-                drawSize = 420f;
-                timescaleDamage = true;
-                incendChance = 0.4f;
-                incendSpread = 5f;
-                incendAmount = 1;
-                ammoMultiplier = 1f;
-            drawer = new DrawTurret(){{
-                parts.add(new RegionPart("-side"){{
-                    progress = PartProgress.warmup;
-                    moveX = -1.5f;
-		    x = .5f;
-                    moveY = -1f;
-                    mirror = true;
-                }}, new RegionPart("-barrel"){{
-                    progress = PartProgress.recoil;
-                    moveY = -1f;
-		    y = -.25f;
-		    heatProgress = PartProgress.reload;
-		    moveY = -1f;
-		    moveX = 3.25f;
-                }});
-            }};
-        }};
-        }};
+	meltdown = new LaserTurret("meltdown"){{
+	    requirements(Category.turret, with(Items.copper, 1200, Items.lead, 350, Items.graphite, 300, Items.surgeAlloy, 325, Items.silicon, 325));
+	    shootEffect = Fx.shootBigSmoke2;
+	    shootCone = 40f;
+	    recoil = 4f;
+	    size = 4;
+	    shake = 2f;
+	    range = 195f;
+	    reload = 90f;
+	    firingMoveFract = 0.5f;
+	    shootDuration = 230f;
+	    shootSound = Sounds.laserbig;
+	    loopSound = Sounds.beam;
+	    loopSoundVolume = 2f;
+   	    envEnabled |= Env.space;
+	    scaledHealth = 200;
+	    coolant = consumeCoolant(0.5f);
+	    consumePower(17f);
+	    shootType = new ContinuousLaserBulletType(78){{
+	        length = 200f;
+	        hitEffect = Fx.hitMeltdown;
+	        hitColor = Pal.meltdownHit;
+	        status = StatusEffects.melting;
+	        drawSize = 420f;
+	        timescaleDamage = true;
+	        incendChance = 0.4f;
+	        incendSpread = 5f;
+	        incendAmount = 1;
+	        ammoMultiplier = 1f;
+	        drawer = new DrawTurret(){{
+	            parts.add(new RegionPart("-side"){{
+	                progress = PartProgress.warmup;
+	                moveX = -1.5f;
+	                x = .5f;
+	                moveY = -1f;
+	                mirror = true;
+	            }}, new RegionPart("-barrel"){{
+	                progress = PartProgress.recoil;
+	                moveY = -1f;
+	                y = -.25f;
+	                heatProgress = PartProgress.reload;
+	                moveY = -1f;
+	                moveX = 3.25f;
+	            }});
+	        }};
+	    }};
+	}};
         breach = new ItemTurret("breach"){{
             requirements(Category.turret, with(Items.beryllium, 150, Items.silicon, 150, Items.graphite, 250));
 
