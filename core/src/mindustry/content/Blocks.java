@@ -4007,7 +4007,6 @@ public class Blocks{
 		    moveX = 3.25f;
                 }});
             }};
-            }};
         }};
 
         breach = new ItemTurret("breach"){{
