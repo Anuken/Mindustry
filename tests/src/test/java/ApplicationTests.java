@@ -1,4 +1,5 @@
 import arc.*;
+import arc.assets.AssetManager;
 import arc.backend.headless.*;
 import arc.files.*;
 import arc.math.geom.*;
@@ -36,7 +37,9 @@ import org.junit.jupiter.params.provider.*;
 import java.io.*;
 import java.nio.*;
 
+import static arc.Core.assets;
 import static mindustry.Vars.*;
+import static mindustry.content.Planets.erekir;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.DynamicTest.*;
 
@@ -88,6 +91,9 @@ public class ApplicationTests{
 
                     add(logic = new Logic());
                     add(netServer = new NetServer());
+
+                    //remove me if fail
+                    //add(control = new Control());
 
                     content.init();
 
@@ -316,6 +322,7 @@ public class ApplicationTests{
     /**
      * run waves until boss wave is reached to make sure we get there. the boss wave will be run
      * before exiting loop.
+     * Campaign single player
      */
     @Test
     void runBossWave(){
@@ -343,6 +350,7 @@ public class ApplicationTests{
 
     /**
      * Start wave and check if we have enemies and we are no longer in prep phase
+     * Campaign single player
      */
     @Test
     void WavesActiveStateTest()
@@ -358,7 +366,7 @@ public class ApplicationTests{
 
     /**
      * Checking for Wavecountdown state (aka our wavetimer before the wave starts)
-     *
+     * Campaign single player
      */
     @Test
     void WaveCountdownStateTest()
@@ -378,12 +386,17 @@ public class ApplicationTests{
 
     /**
      * Start wave and kill player's core.
-     *
+     * Campaign single player
      */
     @Test
     void GameOverStateTest()
     {
         world.loadMap(testMap);
+
+        //to make this a campaign map we need a sector - make a dummy sector
+        state.rules.sector = new Sector(state.rules.planet, PlanetGrid.Ptile.empty);
+        state.rules.winWave = 50;
+
         //increments the wave number
         logic.runWave();
         Groups.unit.update();
@@ -405,7 +418,7 @@ public class ApplicationTests{
 
     /**
      * Checks if we reach captured sector status
-     *
+     * Campaign single player
      */
     @Test
     void SectorCapturedStateTest() {
@@ -441,6 +454,93 @@ public class ApplicationTests{
         logic.update();
         assertTrue(state.rules.sector.info.wasCaptured, "GG");
     }
+
+    //===========================================
+    // Structural Tests - Logic Update method
+    //===========================================
+
+    /**
+     * Idea is to update fog of war and verify it is functioning or active in game
+     *
+     * set planet to erekir which has fog of war active (needs constant static planet erekir)
+     * Can set it to be a specific sector, onset for example is on erekir
+     */
+    @Test
+    void FogOfWarUpdateTest()
+    {
+
+        state.set(State.playing);
+        testMap = maps.loadInternalMap("onset");
+        world.loadMap(testMap);
+        //set rule to have fog of war to true
+        state.rules.fog = true;
+        state.rules.sector = new Sector(state.rules.planet, PlanetGrid.Ptile.empty);
+        state.rules.planet = Planets.erekir;
+
+
+        //run an update and verify our state.rules.fog = true
+        logic.update();
+        //as of right now state.rules.fog = false
+        //state.rules.fog = true;
+        assertTrue(state.rules.fog, "Fog of war active");
+    }
+
+    /**
+     * Trying to see if we can add weather
+     */
+    @Test
+    void WheatherTest()
+    {
+
+        createMap();
+        world.tile(5, 5).setBlock(Blocks.blastDrill, Team.derelict, 0);
+
+    }
+
+    //make building, damage building and compare health to see it went through
+    @Test
+    void BuildingDamageTest()
+    {
+        initBuilding();
+
+        Builderc d1 = UnitTypes.poly.create(Team.sharded);
+        d1.set(10f, 20f);
+        d1.addBuild(new BuildPlan(0, 0, 0, Blocks.copperWallLarge));
+
+        Time.setDeltaProvider(() -> 3f);
+        d1.update();
+        Time.setDeltaProvider(() -> 1f);
+
+
+        assertEquals(content.getByName(ContentType.block, "build2"), world.tile(0, 0).block());
+
+        Time.setDeltaProvider(() -> 9999f);
+
+        //prevents range issues
+        state.rules.infiniteResources = true;
+        d1.update();
+        assertEquals(Blocks.copperWallLarge, world.tile(0, 0).block());
+
+
+        assertEquals(Blocks.air, world.tile(0, 0).block());
+    }
+
+    //can we pause and check status of game being paused?
+//    @Test
+//    void PauseMenuTest() {
+//        control = new Control();
+//        assets = new AssetManager();
+//        //start state as playing
+//        world.loadMap(testMap);
+//        state.set(State.playing);
+//        //skip to next wave
+//        logic.runWave();
+//
+//        control.pause();
+//        logic.update();
+//
+//        assertEquals(state.isPaused(), true);
+//    }
 
     @Test
     void createMap(){
@@ -490,6 +590,34 @@ public class ApplicationTests{
         tile.build.items.remove(Items.phaseFabric, 10);
         tile.build.items.remove(Items.titanium, 10);
         assertEquals(tile.build.items.total(), 45);
+    }
+
+    /**
+     * Gives/Removes a specific tile resources and verify the resources were properly assigned
+     *
+     * Test other remove methods and add methods
+     *
+     * Adding contents of one tile to another (our total)
+     */
+    @Test
+    void blockInventories2(){
+        multiblock();
+        //grab tile of our world at coordinate 4,4
+        Tile tile = world.tile(4, 4);
+
+        //set up a tile 2 as well
+        Tile tile2 = world.tile(0, 0);
+        world.tile(0, 0).setBlock(Blocks.coreShard, Team.sharded, 0);
+        tile2.build.items.add(Items.titanium, 50);
+
+        //sanity check to ensure we havent created the same tile twice
+        assertEquals(tile == tile2, false);
+
+        tile.build.items.add(Items.coal, 5);
+        //add our tile2 items to tile1
+        //adds an extra 55 (50 in one and 5 in the other) to our total (remember between both tiles its shared)
+        tile.build.items.add(tile2.build.items);
+        assertEquals(tile.build.items.total(), 110);
     }
 
     @Test
@@ -1142,6 +1270,9 @@ public class ApplicationTests{
         return out.toArray(DynamicTest.class);
     }
 
+    /**
+     * Create a building
+     */
     void initBuilding(){
         createMap();
 
