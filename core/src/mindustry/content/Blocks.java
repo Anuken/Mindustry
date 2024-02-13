@@ -3952,6 +3952,7 @@ public class Blocks{
 	    shootCone = 40f;
 	    recoil = 4f;
 	    size = 4;
+	    shootY = 0.2f;
 	    shake = 2f;
 	    range = 195f;
 	    reload = 90f;
@@ -3965,7 +3966,7 @@ public class Blocks{
 	    coolant = consumeCoolant(0.5f);
 	    consumePower(17f);
 	    shootType = new ContinuousLaserBulletType(78){{
-	        length = 200f;
+	        length = 215f;
 	        hitEffect = Fx.hitMeltdown;
 	        hitColor = Pal.meltdownHit;
 	        status = StatusEffects.melting;
