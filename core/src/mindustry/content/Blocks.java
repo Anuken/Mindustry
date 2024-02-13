@@ -3889,7 +3889,7 @@ public class Blocks{
             consumePower(10f);
             drawer = new DrawTurret(){{
                 parts.add(new RegionPart("-bar"){{
-                    progress = PartProgress.warmup;
+                    progress = PartProgress.recoil;
                     moveY = -5f;
                     mirror = true;
                 }}, new RegionPart("-side"){{
