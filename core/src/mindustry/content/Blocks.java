@@ -3895,7 +3895,7 @@ public class Blocks{
                 }}, new RegionPart("-side"){{
                     progress = PartProgress.recoil;
 		    moveY = -3f;
-                    mirror: true;
+                    mirror = true;
                 }}, new RegionPart("-panel"){{
                     progress = PartProgress.recoil;
                     moveY = -1.5f;
