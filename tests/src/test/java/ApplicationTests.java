@@ -620,6 +620,39 @@ public class ApplicationTests{
         assertEquals(tile.build.items.total(), 110);
     }
 
+    /**
+     * Add an item and test its ID to ensure proper assignment
+     */
+    @Test
+    void TestItemModuleID()
+    {
+
+    }
+
+    /**
+     * Add an item and use different method of removing
+     *
+     * Remove items by itemstack (passing this as a parameter in remove)
+     */
+    @Test
+    void TestItemModuleRemove1()
+    {
+        ItemStack stack = new ItemStack();
+    }
+
+    /**
+     * Add an item and use different method of removing
+     *
+     * Remove items by ItemSeq (passing this as a parameter in remove)
+     */
+    @Test
+    void TestItemModuleRemove2()
+    {
+        ItemSeq stacks = new ItemSeq();
+    }
+
+
+
     @Test
     void timers(){
         boolean[] ran = {false};
@@ -780,6 +813,7 @@ public class ApplicationTests{
         world.loadMap(testMap);
         state.set(State.playing);
         state.rules.limitMapArea = false;
+        //declaring a bunmch of different objects/buildings/tiles/etc
         Tile source1 = world.rawTile(4, 0), source2 = world.rawTile(6, 0), s1conveyor = world.rawTile(4, 1),
         s2conveyor = world.rawTile(6, 1), s1s2conveyor = world.rawTile(5, 1), sorter = world.rawTile(5, 2),
         leftconveyor = world.rawTile(4, 2), rightconveyor = world.rawTile(6, 2), sortedconveyor = world.rawTile(5, 3),
