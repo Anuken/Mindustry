@@ -3904,7 +3904,6 @@ public class Blocks{
                 }});
             }};
         }};
-        }};
 
         spectre = new ItemTurret("spectre"){{
             requirements(Category.turret, with(Items.copper, 900, Items.graphite, 300, Items.surgeAlloy, 250, Items.plastanium, 175, Items.thorium, 250));
