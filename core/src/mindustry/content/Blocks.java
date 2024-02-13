@@ -3738,15 +3738,6 @@ public class Blocks{
 
             scaledHealth = 130;
             shootSound = Sounds.artillery;
-            drawer = new DrawTurret(){{
-                parts.add(new RegionPart("-side"){{
-                    progress = PartProgress.warmup;
-                    moveX = 2f;
-                    moveY = 1f;
-                    moveRot = -10f;
-                    mirror = true;
-                }});
-            }};
         }};
 
         cyclone = new ItemTurret("cyclone"){{
@@ -3896,6 +3887,24 @@ public class Blocks{
 
             coolant = consumeCoolant(1f);
             consumePower(10f);
+            drawer = new DrawTurret(){{
+                parts.add(new RegionPart("-bar"){{
+                    progress = PartProgress.warmup;
+                    moveY = -5f;
+                    mirror = true;
+                }}, new RegionPart("-side"){{
+                    progress = PartProgress.recoil;
+		            moveY = -3f;
+                    mirror: true;
+                }}, new RegionPart("-panel"){{
+                    progress = PartProgress.recoil;
+                    moveY = -1f;
+	         	    x = .25f;
+                    y = -.25f;
+                    mirror: true;
+                }});
+            }};
+        }};
         }};
 
         spectre = new ItemTurret("spectre"){{
