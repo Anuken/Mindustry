@@ -3900,7 +3900,7 @@ public class Blocks{
                     progress = PartProgress.recoil;
                     moveY = -1.5f;
                     y = -.25f;
-                    mirror: true;
+                    mirror = true;
                 }});
             }};
         }};
