@@ -3991,6 +3991,7 @@ public class Blocks{
 	        incendSpread = 5f;
 	        incendAmount = 1;
 	        ammoMultiplier = 1f;
+		    	    }};
 	        drawer = new DrawTurret(){{
 	            parts.add(new RegionPart("-side"){{
 	                progress = PartProgress.warmup;
@@ -4007,7 +4008,6 @@ public class Blocks{
 	                moveX = 3.25f;
 	            }});
 	        }};
-	    }};
 	}};
         breach = new ItemTurret("breach"){{
             requirements(Category.turret, with(Items.beryllium, 150, Items.silicon, 150, Items.graphite, 250));
