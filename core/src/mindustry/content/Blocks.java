@@ -3951,6 +3951,7 @@ public class Blocks{
 	    shootEffect = Fx.shootBigSmoke2;
 	    shootCone = 40f;
 	    recoil = 6f;
+            cooldownTime = reload;
 	    size = 4;
 	    shootY = 0.2f;
 	    shake = 2f;
@@ -3989,7 +3990,6 @@ public class Blocks{
 	                moveY = -1f;
 	                y = -.25f;
 			mirror = true;
-	                heatProgress = PartProgress.recoil;
 	                moveY = -1f;
 	                moveX = 3.25f;
 	            }});
