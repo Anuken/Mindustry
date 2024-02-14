@@ -97,6 +97,7 @@ public class LExecutor{
 
     /** Loads with a specified assembler. Resets all variables. */
     public void load(LAssembler builder){
+        nameMap = null;
         vars = new Var[builder.vars.size];
         instructions = builder.instructions;
         iptIndex = -1;
