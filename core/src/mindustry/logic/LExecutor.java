@@ -154,7 +154,7 @@ public class LExecutor{
         return var(index).isobj && o instanceof Building building ? building : null;
     }
 
-    public @Nullable Building accissibleBuilding(int index){
+    public @Nullable Building accessibleBuilding(int index){
         Building res = building(index);
         if(res == null || privileged) return res;
         if(res.block.privileged || res.team != team) return null;
@@ -699,7 +699,7 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            Building from = exec.accissibleBuilding(target);
+            Building from = exec.accessibleBuilding(target);
             if(from instanceof MemoryBuild mem){
                 int address = exec.numi(position);
                 exec.setnum(output, address < 0 || address >= mem.memory.length ? 0 : mem.memory[address]);
@@ -729,7 +729,7 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            Building from = exec.accissibleBuilding(target);
+            Building from = exec.accessibleBuilding(target);
             if(from instanceof MemoryBuild mem){
                 int address = exec.numi(position);
                 if(address >= 0 && address < mem.memory.length){
@@ -1095,7 +1095,7 @@ public class LExecutor{
             //graphics on headless servers are useless.
             if(Vars.headless) return;
 
-            if(exec.accissibleBuilding(target) instanceof LogicDisplayBuild d){
+            if(exec.accessibleBuilding(target) instanceof LogicDisplayBuild d){
                 if(d.commands.size + exec.graphicsBuffer.size < maxDisplayBuffer){
                     for(int i = 0; i < exec.graphicsBuffer.size; i++){
                         d.commands.addLast(exec.graphicsBuffer.items[i]);
@@ -1213,7 +1213,7 @@ public class LExecutor{
         @Override
         public void run(LExecutor exec){
 
-            if(exec.accissibleBuilding(target) instanceof MessageBuild d){
+            if(exec.accessibleBuilding(target) instanceof MessageBuild d){
 
                 d.message.setLength(0);
                 d.message.append(exec.textBuffer, 0, Math.min(exec.textBuffer.length(), maxTextBuffer));
