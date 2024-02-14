@@ -2,6 +2,7 @@ package mindustry.mod;
 
 import arc.*;
 import arc.assets.*;
+import arc.assets.loaders.MusicLoader.*;
 import arc.assets.loaders.SoundLoader.*;
 import arc.audio.*;
 import arc.files.*;
@@ -56,9 +57,10 @@ import static mindustry.Vars.*;
 @SuppressWarnings("unchecked")
 public class ContentParser{
     private static final boolean ignoreUnknownFields = true;
+    private static final ContentType[] typesToSearch = {ContentType.block, ContentType.item, ContentType.unit, ContentType.liquid, ContentType.planet};
+
     ObjectMap<Class<?>, ContentType> contentTypes = new ObjectMap<>();
     ObjectSet<Class<?>> implicitNullable = ObjectSet.with(TextureRegion.class, TextureRegion[].class, TextureRegion[][].class, TextureRegion[][][].class);
-    ObjectMap<String, AssetDescriptor<?>> sounds = new ObjectMap<>();
     Seq<ParseListener> listeners = new Seq<>();
 
     ObjectMap<Class<?>, FieldParser> classParsers = new ObjectMap<>(){{
@@ -112,7 +114,7 @@ public class ContentParser{
         });
         put(UnitCommand.class, (type, data) -> {
             if(data.isString()){
-               var cmd = UnitCommand.all.find(u -> u.name.equals(data.asString()));
+               var cmd = content.unitCommand(data.asString());
                if(cmd != null){
                    return cmd;
                }else{
@@ -120,6 +122,18 @@ public class ContentParser{
                }
             }else{
                 throw new IllegalArgumentException("Unit commands must be strings.");
+            }
+        });
+        put(UnitStance.class, (type, data) -> {
+            if(data.isString()){
+                var cmd = content.unitStance(data.asString());
+                if(cmd != null){
+                    return cmd;
+                }else{
+                    throw new IllegalArgumentException("Unknown unit stance name: " + data.asString());
+                }
+            }else{
+                throw new IllegalArgumentException("Unit stances must be strings.");
             }
         });
         put(BulletType.class, (type, data) -> {
@@ -257,18 +271,15 @@ public class ContentParser{
             return new Vec3(data.getFloat("x", 0f), data.getFloat("y", 0f), data.getFloat("z", 0f));
         });
         put(Sound.class, (type, data) -> {
-            if(fieldOpt(Sounds.class, data) != null) return fieldOpt(Sounds.class, data);
-            if(Vars.headless) return new Sound();
+            if(data.isArray()) return new RandomSound(parser.readValue(Sound[].class, data));
 
-            String name = "sounds/" + data.asString();
-            String path = Vars.tree.get(name + ".ogg").exists() ? name + ".ogg" : name + ".mp3";
+            var field = fieldOpt(Sounds.class, data);
+            return field != null ? field : Vars.tree.loadSound(data.asString());
+        });
+        put(Music.class, (type, data) -> {
+            var field = fieldOpt(Musics.class, data);
 
-            if(sounds.containsKey(path)) return ((SoundParameter)sounds.get(path).params).sound;
-            var sound = new Sound();
-            AssetDescriptor<?> desc = Core.assets.load(path, Sound.class, new SoundParameter(sound));
-            desc.errored = Throwable::printStackTrace;
-            sounds.put(path, desc);
-            return sound;
+            return field != null ? field : Vars.tree.loadMusic(data.asString());
         });
         put(Objectives.Objective.class, (type, data) -> {
             if(data.isString()){
@@ -385,6 +396,17 @@ public class ContentParser{
                     return (T)new Rect(jsonData.get(0).asFloat(), jsonData.get(1).asFloat(), jsonData.get(2).asFloat(), jsonData.get(3).asFloat());
                 }
 
+                //search across different content types to find one by name
+                if(type == UnlockableContent.class){
+                    for(ContentType c : typesToSearch){
+                        T found = (T)locate(c, jsonData.asString());
+                        if(found != null){
+                            return found;
+                        }
+                    }
+                    throw new IllegalArgumentException("\"" + jsonData.name + "\": No content found with name '" + jsonData.asString() + "'.");
+                }
+
                 if(Content.class.isAssignableFrom(type)){
                     ContentType ctype = contentTypes.getThrow(type, () -> new IllegalArgumentException("No content type for class: " + type.getSimpleName()));
                     String prefix = currentMod != null ? currentMod.name + "-" : "";
@@ -424,6 +446,17 @@ public class ContentParser{
                 if(value.has("consumes") && value.get("consumes").isObject()){
                     for(JsonValue child : value.get("consumes")){
                         switch(child.name){
+                            case "remove" -> {
+                                String[] values = child.isString() ? new String[]{child.asString()} : child.asStringArray();
+                                for(String type : values){
+                                    Class<?> consumeType = resolve("Consume" + Strings.capitalize(type), Consume.class);
+                                    if(consumeType != Consume.class){
+                                        block.removeConsumers(b -> consumeType.isAssignableFrom(b.getClass()));
+                                    }else{
+                                        Log.warn("Unknown consumer type '@' (Class: @) in consume: remove.", type, "Consume" + Strings.capitalize(type));
+                                    }
+                                }
+                            }
                             case "item" -> block.consumeItem(find(ContentType.item, child.asString()));
                             case "itemCharged" -> block.consume((Consume)parser.readValue(ConsumeItemCharged.class, child));
                             case "itemFlammable" -> block.consume((Consume)parser.readValue(ConsumeItemFlammable.class, child));
@@ -596,7 +629,7 @@ public class ContentParser{
         ContentType.planet, (TypeParser<Planet>)(mod, name, value) -> {
             if(value.isString()) return locate(ContentType.planet, name);
 
-            Planet parent = locate(ContentType.planet, value.getString("parent"));
+            Planet parent = locate(ContentType.planet, value.getString("parent", ""));
             Planet planet = new Planet(mod + "-" + name, parent, value.getFloat("radius", 1f), value.getInt("sectorSize", 0));
 
             if(value.has("mesh")){
@@ -970,7 +1003,6 @@ public class ContentParser{
             throw new RuntimeException(e);
         }
     }
-
     Object fieldOpt(Class<?> type, JsonValue value){
         try{
             return type.getField(value.asString()).get(null);

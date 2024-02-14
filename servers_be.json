@@ -11,7 +11,8 @@
     "address": "v7.mindurka.tk:9999"
   },
   {
-    "address": "c-n.ddns.net:6567"
+    "name": "Chaotic Neutral",
+    "address": ["37.187.73.180:7022"]
   },
   {
     "address": "n1.yeet.ml:6574"

@@ -63,7 +63,7 @@ abstract class CrawlComp implements Posc, Rotc, Hitboxc, Unitc{
     @Override
     public void update(){
         if(moving()){
-            segmentRot = Angles.moveToward(segmentRot, rotation, type.segmentRotSpeed);
+            segmentRot = Angles.moveToward(segmentRot, rotation, type.segmentRotSpeed * Time.delta);
 
             int radius = (int)Math.max(0, hitSize / tilesize * 2f);
             int count = 0, solids = 0, deeps = 0;
@@ -106,10 +106,10 @@ abstract class CrawlComp implements Posc, Rotc, Hitboxc, Unitc{
                 lastDeepFloor = null;
             }
 
-            lastCrawlSlowdown = Mathf.lerp(1f, type.crawlSlowdown, Mathf.clamp((float)solids / count / type.crawlSlowdownFrac));
+            lastCrawlSlowdown = Mathf.lerpDelta(1f, type.crawlSlowdown, Mathf.clamp((float)solids / count / type.crawlSlowdownFrac));
         }
         segmentRot = Angles.clampRange(segmentRot, rotation, type.segmentMaxRot);
 
-        crawlTime += vel.len();
+        crawlTime += vel.len() * Time.delta;
     }
 }

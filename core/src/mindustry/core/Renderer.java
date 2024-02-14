@@ -46,7 +46,7 @@ public class Renderer implements ApplicationListener{
     public @Nullable Bloom bloom;
     public @Nullable FrameBuffer backgroundBuffer;
     public FrameBuffer effectBuffer = new FrameBuffer();
-    public boolean animateShields, drawWeather = true, drawStatus, enableEffects, drawDisplays = true, drawLight = true;
+    public boolean animateShields, drawWeather = true, drawStatus, enableEffects, drawDisplays = true, drawLight = true, pixelate = false;
     public float weatherAlpha;
     /** minZoom = zooming out, maxZoom = zooming in */
     public float minZoom = 1.5f, maxZoom = 6f;
@@ -181,11 +181,14 @@ public class Renderer implements ApplicationListener{
         enableEffects = settings.getBool("effects");
         drawDisplays = !settings.getBool("hidedisplays");
         drawLight = settings.getBool("drawlight", true);
+        pixelate = Core.settings.getBool("pixelate");
 
         if(landTime > 0){
             if(!state.isPaused()){
                 CoreBuild build = landCore == null ? player.bestCore() : landCore;
-                build.updateLandParticles();
+                if(build != null){
+                    build.updateLandParticles();
+                }
             }
 
             if(!state.isPaused()){
@@ -225,7 +228,7 @@ public class Renderer implements ApplicationListener{
                 shakeIntensity = 0f;
             }
 
-            if(pixelator.enabled()){
+            if(renderer.pixelate){
                 pixelator.drawPixelate();
             }else{
                 draw();
@@ -316,7 +319,7 @@ public class Renderer implements ApplicationListener{
         Events.fire(Trigger.draw);
         MapPreviewLoader.checkPreviews();
 
-        if(pixelator.enabled()){
+        if(renderer.pixelate){
             pixelator.register();
         }
 
@@ -368,6 +371,25 @@ public class Renderer implements ApplicationListener{
                 effectBuffer.blit(Shaders.buildBeam);
             });
         }
+
+        float scaleFactor = 4f / renderer.getDisplayScale();
+
+        //draw objective markers
+        state.rules.objectives.eachRunning(obj -> {
+            for(var marker : obj.markers){
+                if(marker.world){
+                    marker.draw(marker.autoscale ? scaleFactor : 1);
+                }
+            }
+        });
+
+        for(var marker : state.markers){
+            if(marker.world){
+                marker.draw(marker.autoscale ? scaleFactor : 1);
+            }
+        }
+
+        Draw.reset();
 
         Draw.draw(Layer.overlayUI, overlays::drawTop);
         if(state.rules.fog) Draw.draw(Layer.fogOfWar, fog::drawFog);
