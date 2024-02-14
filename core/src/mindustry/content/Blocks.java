@@ -3979,7 +3979,7 @@ public class Blocks{
 	    recoil = 6f;
             cooldownTime = reload;
 	    size = 4;
-	    shootY = 0.2f;
+	    shootY = -1f;
 	    shake = 2f;
 	    range = 195f;
 	    reload = 90f;
