@@ -483,6 +483,7 @@ public class ApplicationTests{
 
     //make building, damage building and compare health to see it went through
     //Test
+    @Test
     void BuildingDamageTest()
     {
         initBuilding();
@@ -505,6 +506,9 @@ public class ApplicationTests{
         d1.update();
         assertEquals(Blocks.copperWallLarge, world.tile(0, 0).block());
 
+        d1.addBuild(new BuildPlan(0, 0));
+        d1.damage(10000); //attack and destroy the building
+        d1.update();
 
         assertEquals(Blocks.air, world.tile(0, 0).block());
     }
