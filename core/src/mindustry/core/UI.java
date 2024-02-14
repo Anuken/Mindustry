@@ -279,7 +279,7 @@ public class UI implements ApplicationListener, Loadable{
 
     public void showTextInput(String titleText, String text, int textLength, String def, boolean numbers, boolean allowEmpty, Cons<String> confirmed, Runnable closed){
         if(mobile){
-            var description = text;
+            var description = (text.startsWith("@") ? Core.bundle.get(text.substring(1)) : text);
             var empty = allowEmpty;
             Core.input.getTextInput(new TextInput(){{
                 this.title = (titleText.startsWith("@") ? Core.bundle.get(titleText.substring(1)) : titleText);
