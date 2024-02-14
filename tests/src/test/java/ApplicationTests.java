@@ -605,9 +605,9 @@ public class ApplicationTests{
     }
 
     /**
-     * Add an item and test its ID to ensure proper assignment
+     * Add an item and test if the item lookup returns true to ensure proper assignment
      *
-     * Check if coal ID is properly read
+     * Check if coal item is properly read
      */
     @Test
     void TestItemModuleByItem_Coal()
@@ -627,14 +627,13 @@ public class ApplicationTests{
      * Remove items by itemstack (passing this as a parameter in remove)
      */
     @Test
-    void TestItemModuleItemStack_RemoveandVerifyCheck()
+    void TestItemModuleItemStack_RemoveAndVerifyCheck()
     {
         multiblock();
         Tile tile = world.tile(1, 1);
         world.tile(1, 1).setBlock(Blocks.coreShard, Team.sharded, 0);
 
         //make a new ItemStack[]
-        //ItemStack stack = new ItemStack(Items.copper, 100);
         //stack of 5 copper stacks each of 100
         ItemStack[] stacks = new ItemStack[]{
                 new ItemStack(Items.copper, 100), new ItemStack(Items.copper, 100),
