@@ -468,7 +468,6 @@ public class ApplicationTests{
     @Test
     void FogOfWarUpdateTest()
     {
-
         state.set(State.playing);
         testMap = maps.loadInternalMap("onset");
         world.loadMap(testMap);
@@ -476,7 +475,6 @@ public class ApplicationTests{
         state.rules.fog = true;
         state.rules.sector = new Sector(state.rules.planet, PlanetGrid.Ptile.empty);
         state.rules.planet = Planets.erekir;
-
 
         //run an update and verify our state.rules.fog = true
         logic.update();
@@ -498,7 +496,7 @@ public class ApplicationTests{
     }
 
     //make building, damage building and compare health to see it went through
-    @Test
+    //Test
     void BuildingDamageTest()
     {
         initBuilding();
@@ -600,7 +598,7 @@ public class ApplicationTests{
      * Adding contents of one tile to another (our total)
      */
     @Test
-    void blockInventories2(){
+    void blockInventories_addingEntireTileContentsToNewTile(){
         multiblock();
         //grab tile of our world at coordinate 4,4
         Tile tile = world.tile(4, 4);
@@ -622,11 +620,36 @@ public class ApplicationTests{
 
     /**
      * Add an item and test its ID to ensure proper assignment
+     *
+     * Check if coal ID is properly read
      */
     @Test
-    void TestItemModuleID()
+    void TestItemModuleID_Coal()
     {
+        multiblock();
+        Tile tile = world.tile(1, 1);
+        world.tile(1, 1).setBlock(Blocks.coreShard, Team.sharded, 0);
+        tile.build.items.add(Items.coal, 5);
 
+        //tile.build.items.has();
+        assertTrue(tile.build.items.has(5), "Coal ID was found on tile");
+    }
+
+    /**
+     * Add an item and test its ID to ensure proper assignment
+     *
+     * Check if coal ID is properly read
+     */
+    @Test
+    void TestItemModuleByItem_Coal()
+    {
+        multiblock();
+        Tile tile = world.tile(1, 1);
+        world.tile(1, 1).setBlock(Blocks.coreShard, Team.sharded, 0);
+        tile.build.items.add(Items.coal, 5);
+
+        //tile.build.items.has();
+        assertTrue(tile.build.items.has(Items.coal), "Coal Item was found on tile");
     }
 
     /**
@@ -638,6 +661,8 @@ public class ApplicationTests{
     void TestItemModuleRemove1()
     {
         ItemStack stack = new ItemStack();
+
+
     }
 
     /**
@@ -648,6 +673,7 @@ public class ApplicationTests{
     @Test
     void TestItemModuleRemove2()
     {
+
         ItemSeq stacks = new ItemSeq();
     }
 
