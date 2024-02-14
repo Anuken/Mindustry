@@ -478,21 +478,7 @@ public class ApplicationTests{
 
         //run an update and verify our state.rules.fog = true
         logic.update();
-        //as of right now state.rules.fog = false
-        //state.rules.fog = true;
         assertTrue(state.rules.fog, "Fog of war active");
-    }
-
-    /**
-     * Trying to see if we can add weather
-     */
-    @Test
-    void WheatherTest()
-    {
-
-        createMap();
-        world.tile(5, 5).setBlock(Blocks.blastDrill, Team.derelict, 0);
-
     }
 
     //make building, damage building and compare health to see it went through
@@ -522,23 +508,6 @@ public class ApplicationTests{
 
         assertEquals(Blocks.air, world.tile(0, 0).block());
     }
-
-    //can we pause and check status of game being paused?
-//    @Test
-//    void PauseMenuTest() {
-//        control = new Control();
-//        assets = new AssetManager();
-//        //start state as playing
-//        world.loadMap(testMap);
-//        state.set(State.playing);
-//        //skip to next wave
-//        logic.runWave();
-//
-//        control.pause();
-//        logic.update();
-//
-//        assertEquals(state.isPaused(), true);
-//    }
 
     @Test
     void createMap(){
@@ -658,11 +627,26 @@ public class ApplicationTests{
      * Remove items by itemstack (passing this as a parameter in remove)
      */
     @Test
-    void TestItemModuleRemove1()
+    void TestItemModuleItemStack_RemoveandVerifyCheck()
     {
-        ItemStack stack = new ItemStack();
+        multiblock();
+        Tile tile = world.tile(1, 1);
+        world.tile(1, 1).setBlock(Blocks.coreShard, Team.sharded, 0);
 
+        //make a new ItemStack[]
+        //ItemStack stack = new ItemStack(Items.copper, 100);
+        //stack of 5 copper stacks each of 100
+        ItemStack[] stacks = new ItemStack[]{
+                new ItemStack(Items.copper, 100), new ItemStack(Items.copper, 100),
+                new ItemStack(Items.copper, 100), new ItemStack(Items.copper, 100),
+                new ItemStack(Items.copper, 100)
+        };
 
+        tile.build.items.add(Items.copper, 600);
+        //remove one stack of 100
+        tile.build.items.remove(new ItemStack(Items.copper, 100));
+        //check if we still have a stack of 500
+        assertTrue(tile.build.items.has(stacks), "Coal Item was found on tile");
     }
 
     /**
@@ -675,6 +659,12 @@ public class ApplicationTests{
     {
 
         ItemSeq stacks = new ItemSeq();
+
+        //tiles.each(t -> {
+       //     for(ItemStack stack : t.block.requirements){
+        //        requirements.add(stack.item, stack.amount);
+        //    }
+        //});
     }
 
 
