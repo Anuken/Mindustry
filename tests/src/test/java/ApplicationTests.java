@@ -480,6 +480,7 @@ public class ApplicationTests{
         logic.update();
         assertTrue(state.rules.fog, "Fog of war active");
     }
+    
 
     //make building, damage building and compare health to see it went through
     //Test
@@ -512,7 +513,17 @@ public class ApplicationTests{
 
         assertEquals(Blocks.air, world.tile(0, 0).block());
     }
+    @Test
+    void verifyWorldCreation(){
+        Tiles tiles = world.resize(8, 8);
+        world.beginMapLoad();
+        tiles.fill();
+        world.endMapLoad();
 
+        for(Tile tile : world.tiles){
+            assertEquals(tile.data, 0);
+        }
+    }
     @Test
     void createMap(){
         Tiles tiles = world.resize(8, 8);
