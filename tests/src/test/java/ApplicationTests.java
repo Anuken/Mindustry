@@ -29,7 +29,7 @@ import mindustry.world.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.storage.*;
 import mindustry.world.blocks.defense.turrets.*;  // Added by WS
-import mindustry.world.blocks.production.Drill;  // Added by WS
+import mindustry.world.blocks.environment.Floor; // Added by WS
 import mindustry.world.blocks.storage.CoreBlock.CoreBuild;
 import org.json.*;
 import org.junit.jupiter.api.*;
@@ -712,54 +712,163 @@ public class ApplicationTests{
     }
 
     /**
-     * Create 2x2 ore resource tiles
-     * Create drill on top of resource tiles
-     * Check that drill is mining items
+     * Create sand resource tiles
+     * Create 2 different types of drills on top of resource tiles with adjacent storage containers
+     * Check that drills are mining items
+     * Check that pneumatic drill mined more items than mechanical drill
      */
     @Test
     void testDrill() {
-        world.loadMap(testMap);
+        createMap();
         state.set(State.playing);
-        state.rules.limitMapArea = false;
 
-        // Create 2x2 copper ore resource tiles
-        // ---Not sure if this is right, setting overlay to oreCopper
-        Tile tile00 = new Tile(0,0,Blocks.basalt,Blocks.oreCopper,Blocks.air);
-        Tile tile01 = new Tile(0,0,Blocks.basalt,Blocks.oreCopper,Blocks.air);
-        Tile tile10 = new Tile(0,0,Blocks.basalt,Blocks.oreCopper,Blocks.air);
-        Tile tile11 = new Tile(0,0,Blocks.basalt,Blocks.oreCopper,Blocks.air);
+        // Create sand resource tiles
+        Tile tile00 = world.rawTile(0,0);
+        Tile tile01 = world.rawTile(0,1);
+        Tile tile10 = world.rawTile(1,0);
+        Tile tile11 = world.rawTile(1,1);
+        Tile tile20 = world.rawTile(2,0);
+        Tile tile21 = world.rawTile(2,1);
+        Tile tile30 = world.rawTile(3,0);
+        Tile tile31 = world.rawTile(3,1);
+        tile00.setFloor((Floor)Blocks.sand);
+        tile01.setFloor((Floor)Blocks.sand);
+        tile10.setFloor((Floor)Blocks.sand);
+        tile11.setFloor((Floor)Blocks.sand);
+        tile20.setFloor((Floor)Blocks.sand);
+        tile21.setFloor((Floor)Blocks.sand);
+        tile30.setFloor((Floor)Blocks.sand);
+        tile31.setFloor((Floor)Blocks.sand);
 
         // Create mechanical drill at 0,0
         tile00.setBlock(Blocks.mechanicalDrill, Team.sharded);
-        // ---Need to get the mechanical drill built on top of copper ore - not sure how to do this properly.
 
-        updateBlocks(20);
+        // Create pneumatic drill at 2,0
+        tile20.setBlock(Blocks.pneumaticDrill, Team.sharded);
 
-        // Test that drill successfully mined items
-        assertTrue(tile00.build.items.has(Items.copper),"Drill is not storing any items");
+        // Create storage containers
+        Tile container1 = world.rawTile(0,2);
+        Tile container2 = world.rawTile(2,2);
+        container1.setBlock(Blocks.container, Team.sharded);
+        container2.setBlock(Blocks.container, Team.sharded);
+
+        updateBlocks(2000);
+
+        // Test that drills successfully mined items
+        assertTrue(container1.build.items.has(Items.sand),"Mechanical drill did not mine any items");
+        assertTrue(container2.build.items.has(Items.sand),"Pneumatic drill did not mine any items");
+
+        // Test that pneumatic drill has mined more items than mechanical drill
+        assertTrue(container2.build.items.total() > container1.build.items.total(),"Pneumatic drill did not mine more items than mechanical drill.");
+    }
+
+    /**
+     * Create 2 drills of the same type, one with a water source and one without a water source.
+     * The drill with the water source should mine faster than the drill without water.
+     */
+    @Test
+    void testDrillWithWater() {
+        createMap();
+        state.set(State.playing);
+
+        // Create sand resource tiles
+        Tile tile00 = world.rawTile(0,0);
+        Tile tile01 = world.rawTile(0,1);
+        Tile tile10 = world.rawTile(1,0);
+        Tile tile11 = world.rawTile(1,1);
+        Tile tile20 = world.rawTile(2,0);
+        Tile tile21 = world.rawTile(2,1);
+        Tile tile30 = world.rawTile(3,0);
+        Tile tile31 = world.rawTile(3,1);
+        tile00.setFloor((Floor)Blocks.sand);
+        tile01.setFloor((Floor)Blocks.sand);
+        tile10.setFloor((Floor)Blocks.sand);
+        tile11.setFloor((Floor)Blocks.sand);
+        tile20.setFloor((Floor)Blocks.sand);
+        tile21.setFloor((Floor)Blocks.sand);
+        tile30.setFloor((Floor)Blocks.sand);
+        tile31.setFloor((Floor)Blocks.sand);
+
+        // Create mechanical drill at 0,0
+        tile00.setBlock(Blocks.mechanicalDrill, Team.sharded);
+
+        // Create mechanical drill at 2,0
+        tile20.setBlock(Blocks.mechanicalDrill, Team.sharded);
+
+        // Create storage containers
+        Tile container1 = world.rawTile(0,2);
+        Tile container2 = world.rawTile(2,2);
+        container1.setBlock(Blocks.container, Team.sharded);
+        container2.setBlock(Blocks.container, Team.sharded);
+
+        // Create water source
+        Tile waterSource = world.rawTile(4,0);
+        waterSource.setBlock(Blocks.liquidSource, Team.sharded);
+        waterSource.build.configureAny(Liquids.water);
+
+        updateBlocks(2000);
+
+        // Test that drill with water has mined more items than drill without water
+        assertTrue(container2.build.items.total() > container1.build.items.total(),"Drill with water did not mine more items than drill without water.");
     }
 
     /**
      * Create a distributor with a coal source adjacent
-     * Create 2 combustion generators adjacent to distributor
-     * Check that both combustion generators have coal
+     * Create 7 conveyor belts leading to 7 containers from the distributor
+     * Check that all 7 containers have coal
      */
     @Test
     void testDistributor() {
-        world.loadMap(testMap);
+        createMap();
         state.set(State.playing);
-        state.rules.limitMapArea = false;
 
-        world.tile(0,0).setBlock(Blocks.itemSource, Team.sharded);
-        world.tile(0, 0).build.configureAny(Items.coal);
-        world.tile(1,0).setBlock(Blocks.distributor, Team.sharded);
-        world.tile(1,2).setBlock(Blocks.combustionGenerator, Team.sharded);
-        world.tile(2,2).setBlock(Blocks.combustionGenerator, Team.sharded);
+        // Create tiles
+        Tile source = world.rawTile(3, 2);
+        Tile distributor = world.rawTile(3,3);
+        Tile belt1 = world.rawTile(2,3);
+        Tile belt2 = world.rawTile(2,4);
+        Tile belt3 = world.rawTile(3,5);
+        Tile belt4 = world.rawTile(4,5);
+        Tile belt5 = world.rawTile(5,4);
+        Tile belt6 = world.rawTile(5,3);
+        Tile belt7 = world.rawTile(4,2);
+        Tile container1 = world.rawTile(0,2);
+        Tile container2 = world.rawTile(0,4);
+        Tile container3 = world.rawTile(2,6);
+        Tile container4 = world.rawTile(4,6);
+        Tile container5 = world.rawTile(6,4);
+        Tile container6 = world.rawTile(6,2);
+        Tile container7 = world.rawTile(4,0);
+
+        // Create buildings
+        source.setBlock(Blocks.itemSource, Team.sharded);
+        source.build.configureAny(Items.coal);
+        distributor.setBlock(Blocks.distributor, Team.sharded);
+        belt1.setBlock(Blocks.titaniumConveyor, Team.sharded, 2);
+        belt2.setBlock(Blocks.titaniumConveyor, Team.sharded, 2);
+        belt3.setBlock(Blocks.titaniumConveyor, Team.sharded, 1);
+        belt4.setBlock(Blocks.titaniumConveyor, Team.sharded, 1);
+        belt5.setBlock(Blocks.titaniumConveyor, Team.sharded, 0);
+        belt6.setBlock(Blocks.titaniumConveyor, Team.sharded, 0);
+        belt7.setBlock(Blocks.titaniumConveyor, Team.sharded, 3);
+        container1.setBlock(Blocks.container, Team.sharded);
+        container2.setBlock(Blocks.container, Team.sharded);
+        container3.setBlock(Blocks.container, Team.sharded);
+        container4.setBlock(Blocks.container, Team.sharded);
+        container5.setBlock(Blocks.container, Team.sharded);
+        container6.setBlock(Blocks.container, Team.sharded);
+        container7.setBlock(Blocks.container, Team.sharded);
 
         updateBlocks(200);
 
-        assertTrue(world.tile(1,2).build.items.has(Items.coal),"Combustion generator is empty");
-        assertTrue(world.tile(2,2).build.items.has(Items.coal),"Combustion generator is empty");
+        assertTrue(container1.build.items.has(Items.coal) &&
+                        container2.build.items.has(Items.coal) &&
+                        container3.build.items.has(Items.coal) &&
+                        container4.build.items.has(Items.coal) &&
+                        container5.build.items.has(Items.coal) &&
+                        container6.build.items.has(Items.coal) &&
+                        container7.build.items.has(Items.coal),
+                "Not all containers have items.");
     }
 
     /**
@@ -769,10 +878,10 @@ public class ApplicationTests{
      */
     @Test
     void testUnloader() {
-        world.loadMap(testMap);
+        createMap();
         state.set(State.playing);
-        state.rules.limitMapArea = false;
 
+        // Create tiles and buildings
         world.tile(0,0).setBlock(Blocks.itemSource, Team.sharded);
         world.tile(0,0).build.configureAny(Items.copper);
         world.tile(1,0).setBlock(Blocks.container, Team.sharded);
@@ -793,10 +902,10 @@ public class ApplicationTests{
      */
     @Test
     void testOverflowGate() {
-        world.loadMap(testMap);
+        createMap();
         state.set(State.playing);
-        state.rules.limitMapArea = false;
 
+        // Create tiles and buildings
         world.tile(0,0).setBlock(Blocks.itemSource, Team.sharded);
         world.tile(0,0).build.configureAny(Items.copper);
         world.tile(0,1).setBlock(Blocks.titaniumConveyor, Team.sharded, 1);
@@ -807,11 +916,11 @@ public class ApplicationTests{
         world.tile(2,2).setBlock(Blocks.container, Team.sharded);
 
         updateBlocks(20);
-
+        // Check 2nd container doesn't have copper yet
         assertFalse(world.tile(2,2).build.items.has(Items.copper),"2nd container has copper prematurely");
 
         updateBlocks(200);
-
+        // Check 2nd container has copper
         assertTrue(world.tile(2,2).build.items.has(Items.copper),"2nd container is empty");
     }
 
