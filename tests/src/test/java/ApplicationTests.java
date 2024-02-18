@@ -712,13 +712,12 @@ public class ApplicationTests{
     }
 
     /**
-     * Create sand resource tiles
-     * Create 2 different types of drills on top of resource tiles with adjacent storage containers
-     * Check that drills are mining items
+     * Create 2 different types of drills on top of sand resource tiles with adjacent storage containers
+     * Check that both drills are mining items
      * Check that pneumatic drill mined more items than mechanical drill
      */
     @Test
-    void testDrill() {
+    void testDrillTypes() {
         createMap();
         state.set(State.playing);
 
