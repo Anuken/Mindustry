@@ -696,18 +696,18 @@ public class ApplicationTests{
         Tile tileDuo = world.rawTile(0, 1);
         tileDuo.setBlock(Blocks.duo, Team.sharded);
         ItemTurret gunDuo = (ItemTurret) tileDuo.block();
-        ItemTurret.ItemTurretBuild gunDuoBuild = gunDuo.new ItemTurretBuild();
+        ItemTurret compareTo = new ItemTurret("test");
 
         // Create copper source at 0,0
         Tile source = world.rawTile(0,0);
         source.setBlock(Blocks.itemSource, Team.sharded);
         source.build.configureAny(Items.copper);
-
+        Building test = tileDuo.build;
         // Allow turrets to load from ammo sources
         updateBlocks(100);
-
+        
         // Check ammo amount
-        assertEquals(gunDuo.maxAmmo, gunDuoBuild.totalAmmo, "Duo is not fully loaded");
+        assertEquals(((ItemTurret.ItemTurretBuild) test).totalAmmo, compareTo.maxAmmo, "Duo is not fully loaded");
         // ---gunDuoBuild.totalAmmo is not updating, stays 0
     }
 
