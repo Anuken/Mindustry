@@ -703,6 +703,7 @@ public class ApplicationTests{
         source.setBlock(Blocks.itemSource, Team.sharded);
         source.build.configureAny(Items.copper);
         Building test = tileDuo.build;
+        assertEquals(((ItemTurret.ItemTurretBuild) test).totalAmmo, 0, "newly built turret should have 0 ammo");
         // Allow turrets to load from ammo sources
         updateBlocks(100);
         
