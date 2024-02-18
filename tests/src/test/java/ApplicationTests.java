@@ -28,6 +28,8 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.storage.*;
+import mindustry.world.blocks.defense.turrets.*;  // Added by WS
+import mindustry.world.blocks.production.Drill;  // Added by WS
 import mindustry.world.blocks.storage.CoreBlock.CoreBuild;
 import org.json.*;
 import org.junit.jupiter.api.*;
@@ -681,7 +683,137 @@ public class ApplicationTests{
         //});
     }
 
+    /**
+     * Create some turrets, load them, check that loading caps at max ammo
+     */
+    @Test
+    void testAmmoLoading() {
+        world.loadMap(testMap);
+        state.set(State.playing);
+        state.rules.limitMapArea = false;
 
+        // Create duo block at 0,1
+        Tile tileDuo = world.rawTile(0, 1);
+        tileDuo.setBlock(Blocks.duo, Team.sharded);
+        ItemTurret gunDuo = (ItemTurret) tileDuo.block();
+        ItemTurret.ItemTurretBuild gunDuoBuild = gunDuo.new ItemTurretBuild();
+
+        // Create copper source at 0,0
+        Tile source = world.rawTile(0,0);
+        source.setBlock(Blocks.itemSource, Team.sharded);
+        source.build.configureAny(Items.copper);
+
+        // Allow turrets to load from ammo sources
+        updateBlocks(100);
+
+        // Check ammo amount
+        assertEquals(gunDuo.maxAmmo, gunDuoBuild.totalAmmo, "Duo is not fully loaded");
+        // ---gunDuoBuild.totalAmmo is not updating, stays 0
+    }
+
+    /**
+     * Create 2x2 ore resource tiles
+     * Create drill on top of resource tiles
+     * Check that drill is mining items
+     */
+    @Test
+    void testDrill() {
+        world.loadMap(testMap);
+        state.set(State.playing);
+        state.rules.limitMapArea = false;
+
+        // Create 2x2 copper ore resource tiles
+        // ---Not sure if this is right, setting overlay to oreCopper
+        Tile tile00 = new Tile(0,0,Blocks.basalt,Blocks.oreCopper,Blocks.air);
+        Tile tile01 = new Tile(0,0,Blocks.basalt,Blocks.oreCopper,Blocks.air);
+        Tile tile10 = new Tile(0,0,Blocks.basalt,Blocks.oreCopper,Blocks.air);
+        Tile tile11 = new Tile(0,0,Blocks.basalt,Blocks.oreCopper,Blocks.air);
+
+        // Create mechanical drill at 0,0
+        tile00.setBlock(Blocks.mechanicalDrill, Team.sharded);
+        // ---Need to get the mechanical drill built on top of copper ore - not sure how to do this properly.
+
+        updateBlocks(20);
+
+        // Test that drill successfully mined items
+        assertTrue(tile00.build.items.has(Items.copper),"Drill is not storing any items");
+    }
+
+    /**
+     * Create a distributor with a coal source adjacent
+     * Create 2 combustion generators adjacent to distributor
+     * Check that both combustion generators have coal
+     */
+    @Test
+    void testDistributor() {
+        world.loadMap(testMap);
+        state.set(State.playing);
+        state.rules.limitMapArea = false;
+
+        world.tile(0,0).setBlock(Blocks.itemSource, Team.sharded);
+        world.tile(0, 0).build.configureAny(Items.coal);
+        world.tile(1,0).setBlock(Blocks.distributor, Team.sharded);
+        world.tile(1,2).setBlock(Blocks.combustionGenerator, Team.sharded);
+        world.tile(2,2).setBlock(Blocks.combustionGenerator, Team.sharded);
+
+        updateBlocks(200);
+
+        assertTrue(world.tile(1,2).build.items.has(Items.coal),"Combustion generator is empty");
+        assertTrue(world.tile(2,2).build.items.has(Items.coal),"Combustion generator is empty");
+    }
+
+    /**
+     * Create a container with an adjacent copper source
+     * Create an unloader adjacent to the 1st container, with a conveyor leading to a 2nd container
+     * Check that the 2nd container gets loaded
+     */
+    @Test
+    void testUnloader() {
+        world.loadMap(testMap);
+        state.set(State.playing);
+        state.rules.limitMapArea = false;
+
+        world.tile(0,0).setBlock(Blocks.itemSource, Team.sharded);
+        world.tile(0,0).build.configureAny(Items.copper);
+        world.tile(1,0).setBlock(Blocks.container, Team.sharded);
+        world.tile(3,0).setBlock(Blocks.unloader, Team.sharded);
+        world.tile(4,0).setBlock(Blocks.conveyor, Team.sharded, 0);
+        world.tile(5,0).setBlock(Blocks.container, Team.sharded);
+
+        updateBlocks(200);
+
+        assertTrue(world.tile(5,0).build.items.has(Items.copper),"2nd container is empty");
+    }
+
+    /**
+     * Create an item source leading to a duo turret with an overflow gate in between.
+     * Create a container to the right of the overflow gate.
+     * Once the duo is full and the items back up, the overflow gate should route items to the container.
+     * Check that the container gets loaded.
+     */
+    @Test
+    void testOverflowGate() {
+        world.loadMap(testMap);
+        state.set(State.playing);
+        state.rules.limitMapArea = false;
+
+        world.tile(0,0).setBlock(Blocks.itemSource, Team.sharded);
+        world.tile(0,0).build.configureAny(Items.copper);
+        world.tile(0,1).setBlock(Blocks.titaniumConveyor, Team.sharded, 1);
+        world.tile(0,2).setBlock(Blocks.overflowGate, Team.sharded);
+        world.tile(0,3).setBlock(Blocks.titaniumConveyor, Team.sharded, 1);
+        world.tile(0,4).setBlock(Blocks.duo, Team.sharded);
+        world.tile(1,2).setBlock(Blocks.titaniumConveyor, Team.sharded, 0);
+        world.tile(2,2).setBlock(Blocks.container, Team.sharded);
+
+        updateBlocks(20);
+
+        assertFalse(world.tile(2,2).build.items.has(Items.copper),"2nd container has copper prematurely");
+
+        updateBlocks(200);
+
+        assertTrue(world.tile(2,2).build.items.has(Items.copper),"2nd container is empty");
+    }
 
     @Test
     void timers(){
