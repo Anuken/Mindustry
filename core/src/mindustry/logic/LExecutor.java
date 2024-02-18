@@ -736,6 +736,8 @@ public class LExecutor{
                     mem.memory[address] = exec.num(value);
                 }
             }else if(from instanceof LogicBuild logic && exec.obj(position) instanceof String name){
+                Var writable = logic.executor.optionalVar("@writable");
+                if(writable == null || (writable.isobj ? writable.objval == null : Math.abs(writable.numval) < 0.00001)) return;
                 Var toVar = logic.executor.optionalVar(name);
                 Var fromVar = exec.var(value);
                 if(toVar != null && !toVar.constant){
