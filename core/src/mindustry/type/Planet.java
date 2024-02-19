@@ -536,4 +536,26 @@ public class Planet extends UnlockableContent{
         }
         batch.flush(Gl.lineStrip);
     }
+
+    public Vec3 lookAt(Sector sector, Vec3 out){
+        return out.set(sector.tile.v).rotate(Vec3.Y, -getRotation());
+    }
+
+    public Vec3 project(Sector sector, Camera3D cam, Vec3 out){
+        return cam.project(out.set(sector.tile.v).setLength(outlineRad * radius).rotate(Vec3.Y, -getRotation()).add(position));
+    }
+
+    public void setPlane(Sector sector, PlaneBatch3D projector){
+        float rotation = -getRotation();
+        float length = 0.01f;
+
+        projector.setPlane(
+            //origin on sector position
+            Tmp.v33.set(sector.tile.v).setLength((outlineRad + length) * radius).rotate(Vec3.Y, rotation).add(position),
+            //face up
+            sector.plane.project(Tmp.v32.set(sector.tile.v).add(Vec3.Y)).sub(sector.tile.v, radius).rotate(Vec3.Y, rotation).nor(),
+            //right vector
+            Tmp.v31.set(Tmp.v32).rotate(Vec3.Y, -rotation).add(sector.tile.v).rotate(sector.tile.v, 90).sub(sector.tile.v).rotate(Vec3.Y, rotation).nor()
+        );
+    }
 }
