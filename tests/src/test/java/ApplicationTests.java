@@ -684,32 +684,36 @@ public class ApplicationTests{
     }
 
     /**
-     * Create some turrets, load them, check that loading caps at max ammo
+     * Create a turret, load it, check that loading caps at max ammo
      */
     @Test
-    void testAmmoLoading() {
-        world.loadMap(testMap);
+    void testAmmoLoadingCap() {
+        createMap();
         state.set(State.playing);
-        state.rules.limitMapArea = false;
 
-        // Create duo block at 0,1
+        // Create duo turret block at 0,1
         Tile tileDuo = world.rawTile(0, 1);
         tileDuo.setBlock(Blocks.duo, Team.sharded);
-        ItemTurret gunDuo = (ItemTurret) tileDuo.block();
-        ItemTurret compareTo = new ItemTurret("test");
 
         // Create copper source at 0,0
         Tile source = world.rawTile(0,0);
         source.setBlock(Blocks.itemSource, Team.sharded);
         source.build.configureAny(Items.copper);
-        Building test = tileDuo.build;
-        assertEquals(((ItemTurret.ItemTurretBuild) test).totalAmmo, 0, "newly built turret should have 0 ammo");
-        // Allow turrets to load from ammo sources
+
+        // Check that ammo is initially 0
+        assertEquals(0, ((ItemTurret.ItemTurretBuild) tileDuo.build).totalAmmo, "Newly built turret ammo is not 0");
+
+        // Allow turret to load from ammo sources
         updateBlocks(100);
         
-        // Check ammo amount
-        assertEquals(((ItemTurret.ItemTurretBuild) test).totalAmmo, compareTo.maxAmmo, "Duo is not fully loaded");
-        // ---gunDuoBuild.totalAmmo is not updating, stays 0
+        // Check ammo amount is capped at maxAmmo
+        assertEquals(((ItemTurret) tileDuo.block()).maxAmmo, ((ItemTurret.ItemTurretBuild) tileDuo.build).totalAmmo, "Duo is not fully loaded");
+
+        // Allow more loading time
+        updateBlocks(100);
+
+        // Check ammo amount is still capped at maxAmmo
+        assertEquals(((ItemTurret) tileDuo.block()).maxAmmo, ((ItemTurret.ItemTurretBuild) tileDuo.build).totalAmmo, "Duo ammo did not stay at cap");
     }
 
     /**
@@ -810,6 +814,59 @@ public class ApplicationTests{
 
         // Test that drill with water has mined more items than drill without water
         assertTrue(container2.build.items.total() > container1.build.items.total(),"Drill with water did not mine more items than drill without water.");
+    }
+
+    /**
+     * Create 2 drills of the same type on top of different numbers of resource tiles with adjacent storage containers
+     * Check that both drills are mining items
+     * Check that the drill sitting on 4 resource tiles mined more than the drill on 2 resource tiles
+     */
+    @Test
+    void testDrillOres() {
+        createMap();
+        state.set(State.playing);
+
+        // Create resource tiles
+        Tile tile00 = world.rawTile(0,0);
+        Tile tile01 = world.rawTile(0,1);
+        Tile tile10 = world.rawTile(1,0);
+        Tile tile11 = world.rawTile(1,1);
+        Tile tile20 = world.rawTile(2,0);
+        Tile tile21 = world.rawTile(2,1);
+        Tile tile30 = world.rawTile(3,0);
+        Tile tile31 = world.rawTile(3,1);
+        tile00.setFloor((Floor)Blocks.dirt);
+        tile01.setFloor((Floor)Blocks.dirt);
+        tile10.setFloor((Floor)Blocks.dirt);
+        tile11.setFloor((Floor)Blocks.dirt);
+        tile20.setFloor((Floor)Blocks.dirt);
+        tile21.setFloor((Floor)Blocks.dirt);
+        tile30.setFloor((Floor)Blocks.dirt);
+        tile31.setFloor((Floor)Blocks.dirt);
+        tile00.setOverlay(Blocks.oreCopper);
+        tile01.setOverlay(Blocks.oreCopper);
+        tile20.setOverlay(Blocks.oreCopper);
+        tile21.setOverlay(Blocks.oreCopper);
+        tile30.setOverlay(Blocks.oreCopper);
+        tile31.setOverlay(Blocks.oreCopper);
+
+        // Create pneumatic drills
+        tile00.setBlock(Blocks.pneumaticDrill, Team.sharded);
+        tile20.setBlock(Blocks.pneumaticDrill, Team.sharded);
+
+        // Create storage containers
+        Tile container1 = world.rawTile(0,2);
+        Tile container2 = world.rawTile(2,2);
+        container1.setBlock(Blocks.container, Team.sharded);
+        container2.setBlock(Blocks.container, Team.sharded);
+
+        updateBlocks(2000);
+
+        // Test that drills successfully mined items
+        assertTrue(container1.build.items.has(Items.copper) && container2.build.items.has(Items.copper),"Drill(s) did not mine any items");
+
+        // Test that drill on 4 copper tiles has mined more items than drill on 2 copper tiles
+        assertTrue(container2.build.items.total() > container1.build.items.total(),"Pneumatic drill did not mine more items than mechanical drill.");
     }
 
     /**
