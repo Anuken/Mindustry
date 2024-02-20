@@ -284,4 +284,9 @@
     "name": "hubVn",
     "address": ["de-free-01.hosts.optikservers.com:32362"]
   }
+  { 
+    "name": "HubMindusVN",
+    "address": ["de2.ateex.cloud:30756"]
+  }
 ]
+
