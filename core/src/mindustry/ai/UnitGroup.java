@@ -26,6 +26,7 @@ public class UnitGroup{
         if(lastSpeedUpdate == Vars.state.updateId) return;
 
         lastSpeedUpdate = Vars.state.updateId;
+        minSpeed = 999999f;
 
         for(Unit unit : units){
             //don't factor in the floor speed multiplier

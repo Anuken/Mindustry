@@ -50,6 +50,7 @@ public class Build{
         if(tile.build != null){
             prevBuild.add(tile.build);
             tile.build.onDeconstructed(unit);
+            tile.build.dead = true;
         }
 
         tile.setBlock(sub, team, rotation);
