@@ -14,7 +14,7 @@ public class ArmorPlateAbility extends Ability{
     public TextureRegion plateRegion;
     public TextureRegion shineRegion;
     public String plateSuffix = "-armor";
-    public String shineSuffix = "-armor";
+    public String shineSuffix = "-shine";
     /** Color of the shine. If null, uses team color. */
     public @Nullable Color color = null;
     public float shineSpeed = 1f;
@@ -49,7 +49,7 @@ public class ArmorPlateAbility extends Ability{
         if(warmup > 0.001f){
             if(plateRegion == null){
                 plateRegion = Core.atlas.find(unit.type.name + plateSuffix, unit.type.region);
-                shineRegion = Core.atlas.find(unit.type.name + shineSuffix, unit.type.region);
+                shineRegion = Core.atlas.find(unit.type.name + shineSuffix, plateRegion);
             }
 
             if(drawShine){
