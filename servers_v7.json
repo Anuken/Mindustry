@@ -283,5 +283,9 @@
   { 
     "name": "Sever.VN",
     "address": ["srv24.godlike.club:26189"]
+  },
+  {
+    "name": "Crimson Star",
+    "address": ["185.103.101.121:25528"]
   }
 ]
