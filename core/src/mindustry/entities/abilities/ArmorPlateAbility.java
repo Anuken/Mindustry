@@ -52,17 +52,20 @@ public class ArmorPlateAbility extends Ability{
                 shineRegion = Core.atlas.find(unit.type.name + shineSuffix, plateRegion);
             }
 
+            float pz = Draw.z();
+            if(z > 0) Draw.z(z);
+
+            if(drawPlate){
+                Draw.alpha(warmup);
+                Draw.rect(plateRegion, unit.x, unit.y, unit.rotation - 90f);
+                Draw.alpha(1f);
+            }
+
             if(drawShine){
-                Draw.draw(z <= 0 ? Draw.z() : z, () -> {
+                Draw.draw(Draw.z(), () -> {
                     Shaders.armor.region = shineRegion;
                     Shaders.armor.progress = warmup;
                     Shaders.armor.time = -Time.time / 20f * shineSpeed;
-
-                    if(drawPlate){
-                        Draw.alpha(warmup);
-                        Draw.rect(plateRegion, unit.x, unit.y, unit.rotation - 90f);
-                        Draw.alpha(1f);
-                    }
 
                     Draw.color(color == null ? unit.team.color : color);
                     Draw.shader(Shaders.armor);
@@ -71,11 +74,9 @@ public class ArmorPlateAbility extends Ability{
 
                     Draw.reset();
                 });
-            }else{
-                Draw.alpha(warmup);
-                Draw.rect(plateRegion, unit.x, unit.y, unit.rotation - 90f);
-                Draw.alpha(1f);
             }
+
+            Draw.z(pz);
         }
     }
 }
