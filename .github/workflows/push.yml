@@ -13,14 +13,14 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Trigger BE build
-      if: ${{ github.repository == 'The4codeblocks/Mindustry' }}
+      if: ${{ github.repository == 'Anuken/Mindustry' }}
       run: |
-        git clone --depth=1 --branch=master https://github.com/The4codeblocks/MindustryBuilds ../MindustryBuilds
+        git clone --depth=1 --branch=master https://github.com/Anuken/MindustryBuilds ../MindustryBuilds
         cd ../MindustryBuilds
         BNUM=$(($GITHUB_RUN_NUMBER + 20000))
         git tag ${BNUM}
         git config --global user.name "Github Actions"
-        git push https://The4codeblocks:${{ secrets.API_TOKEN_GITHUB }}@github.com/The4codeblocks/MindustryBuilds ${BNUM}
+        git push https://Anuken:${{ secrets.API_TOKEN_GITHUB }}@github.com/Anuken/MindustryBuilds ${BNUM}
     - name: Set up JDK 17
       uses: actions/setup-java@v1
       with:
@@ -58,3 +58,10 @@ jobs:
         cd ../Mindustry
     - name: Run unit tests
       run: ./gradlew tests:test --rerun --stacktrace
+    - name: Build
+      run: ./gradlew deploy
+    - name: Upload
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ github.event.repository.name }}
+        path: build/libs/${{ github.event.repository.name }}.jar
