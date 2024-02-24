@@ -365,7 +365,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 for(int i = 0; i < linePlans.size; i++){
                     BuildPlan plan = linePlans.get(i);
                     if(i == linePlans.size - 1 && plan.block.rotate && plan.block.drawArrow){
-                        drawArrow(block, plan.x, plan.y, plan.rotation);
+                        drawArrow(block, plan.x, plan.y, plan.rotation + (plan.block.diagonalSymmetryAxis ? 0.5 : 0));
                     }
                     plan.block.drawPlan(plan, allPlans(), validPlace(plan.x, plan.y, plan.block, plan.rotation) && getPlan(plan.x, plan.y, plan.block.size, null) == null);
                     drawSelected(plan.x, plan.y, plan.block, Pal.accent);
@@ -409,7 +409,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
             if(!plan.breaking && plan == lastPlaced && plan.block != null){
                 Draw.mixcol();
-                if(plan.block.rotate && plan.block.drawArrow) drawArrow(plan.block, tile.x, tile.y, plan.rotation);
+                if(plan.block.rotate && plan.block.drawArrow) drawArrow(plan.block, tile.x, tile.y, plan.rotation + (plan.block.diagonalSymmetryAxis ? 0.5 : 0));
             }
 
             Draw.reset();
