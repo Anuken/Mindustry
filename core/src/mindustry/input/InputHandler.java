@@ -1927,11 +1927,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         player.unit().addBuild(new BuildPlan(tile.x, tile.y));
     }
 
-    public void drawArrow(Block block, int x, int y, int rotation){
+    public void drawArrow(Block block, int x, int y, float rotation){
         drawArrow(block, x, y, rotation, validPlace(x, y, block, rotation));
     }
 
-    public void drawArrow(Block block, int x, int y, int rotation, boolean valid){
+    public void drawArrow(Block block, int x, int y, float rotation, boolean valid){
         float trns = (block.size / 2) * tilesize;
         int dx = Geometry.d4(rotation).x, dy = Geometry.d4(rotation).y;
         float offsetx = x * tilesize + block.offset + dx*trns;
