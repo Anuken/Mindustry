@@ -141,7 +141,7 @@ public class DesktopInput extends InputHandler{
         if(splan != null){
             boolean valid = validPlace(splan.x, splan.y, splan.block, splan.rotation, splan);
             if(splan.block.rotate && splan.block.drawArrow){
-                drawArrow(splan.block, splan.x, splan.y, splan.rotation + (splan.diagonalSymmtryAxis ? 0.5 : 0), valid);
+                drawArrow(splan.block, splan.x, splan.y, splan.rotation, valid);
             }
 
             splan.block.drawPlan(splan, allPlans(), valid);
@@ -180,7 +180,7 @@ public class DesktopInput extends InputHandler{
                 for(int i = 0; i < linePlans.size; i++){
                     var plan = linePlans.get(i);
                     if(i == linePlans.size - 1 && plan.block.rotate && plan.block.drawArrow){
-                        drawArrow(block, plan.x, plan.y, plan.rotation + (plan.block.diagonalSymmetryAxis ? 0.5 : 0));
+                        drawArrow(block, plan.x, plan.y, plan.rotation);
                     }
                     drawPlan(linePlans.get(i));
                 }
@@ -188,7 +188,7 @@ public class DesktopInput extends InputHandler{
             }else if(isPlacing()){
                 int rot = block == null ? rotation : block.planRotation(rotation);
                 if(block.rotate && block.drawArrow){
-                    drawArrow(block, cursorX, cursorY, rot + (block.diagonalSymmetryAxis ? 0.5 : 0));
+                    drawArrow(block, cursorX, cursorY, rot);
                 }
                 Draw.color();
                 boolean valid = validPlace(cursorX, cursorY, block, rot);
