@@ -114,6 +114,8 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean lockRotation = true;
     /** if true, schematic flips with this block are inverted. */
     public boolean invertFlip = false;
+    /** if true, schematic flips with this block are based on diagonal symmetry instead of axial symmetry. */
+	public boolean diagonalSymmetryAxis = false;
     /** number of different variant regions to use */
     public int variants = 0;
     /** whether to draw a rotation arrow - this does not apply to lines of blocks */
@@ -1380,11 +1382,13 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     public void flipRotation(BuildPlan req, boolean x){
-        if((x == (req.rotation % 2 == 0)) != invertFlip){
-            req.rotation = planRotation(Mathf.mod(req.rotation + 2, 4));
+		if (diagonalSymmetryAxis) {
+        	req.rotation = planRotation(req.rotation ^ ((x ^ invertFlip) ? 3 : 1));
+		} else if ((x == ((req.rotation & 1) == 0)) != invertFlip) {
+            req.rotation = planRotation(req.rotation ^ 2);
         }
     }
-
+    
     @Override
     public double sense(LAccess sensor){
         return switch(sensor){
