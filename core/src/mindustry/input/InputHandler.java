@@ -1927,11 +1927,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         player.unit().addBuild(new BuildPlan(tile.x, tile.y));
     }
 
-    public void drawArrow(Block block, int x, int y, int rotation){
-        drawArrow(block, x, y, rotation, validPlace(x, y, block, rotation));
+    public void drawArrow(Block block, int x, int y, int rotation, boolean diagonalSymmetry){
+        drawArrow(block, x, y, rotation, validPlace(x, y, block, rotation), diagonalSymmetry);
     }
 
-    public void drawArrow(Block block, int x, int y, int rotation, boolean valid){
+    public void drawArrow(Block block, int x, int y, int rotation, boolean valid, boolean diagonalSymmetry){
         float trns = (block.size / 2) * tilesize;
         int dx = Geometry.d4(rotation).x, dy = Geometry.d4(rotation).y;
         float offsetx = x * tilesize + block.offset + dx*trns;
@@ -1945,7 +1945,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         offsety - 1,
         regionArrow.width * regionArrow.scl(),
         regionArrow.height * regionArrow.scl(),
-        rotation * 90 - 90);
+        rotation * 90 - (diagonalSymmetry ? 45 : 90));
 
         Draw.color(!valid ? Pal.remove : Pal.accent);
         Draw.rect(regionArrow,

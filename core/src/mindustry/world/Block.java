@@ -115,7 +115,7 @@ public class Block extends UnlockableContent implements Senseable{
     /** if true, schematic flips with this block are inverted. */
     public boolean invertFlip = false;
     /** if true, schematic flips with this block are based on diagonal symmetry instead of axial symmetry. */
-    public boolean diagonalSymmetryAxis = false;
+    public boolean diagonalSymmetry = false;
     /** number of different variant regions to use */
     public int variants = 0;
     /** whether to draw a rotation arrow - this does not apply to lines of blocks */
