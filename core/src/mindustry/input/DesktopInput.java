@@ -141,7 +141,7 @@ public class DesktopInput extends InputHandler{
         if(splan != null){
             boolean valid = validPlace(splan.x, splan.y, splan.block, splan.rotation, splan);
             if(splan.block.rotate && splan.block.drawArrow){
-                drawArrow(splan.block, splan.x, splan.y, splan.rotation, valid, splan.diagonalSymmetry);
+                drawArrow(splan.block, splan.x, splan.y, splan.rotation, valid, splan.block.diagonalSymmetry);
             }
 
             splan.block.drawPlan(splan, allPlans(), valid);

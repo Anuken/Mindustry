@@ -1382,7 +1382,7 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     public void flipRotation(BuildPlan req, boolean x){
-		if (diagonalSymmetryAxis) {
+		if (diagonalSymmetry) {
         	req.rotation = planRotation(req.rotation ^ ((x ^ invertFlip) ? 3 : 1));
 		} else if ((x == ((req.rotation & 1) == 0)) != invertFlip) {
             req.rotation = planRotation(req.rotation ^ 2);
