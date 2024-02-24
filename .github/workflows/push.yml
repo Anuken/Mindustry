@@ -58,3 +58,10 @@ jobs:
         cd ../Mindustry
     - name: Run unit tests
       run: ./gradlew tests:test --rerun --stacktrace
+    - name: Build
+      run: ./gradlew deploy
+    - name: Upload
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ github.event.repository.name }}
+        path: build/libs/${{ github.event.repository.name }}.jar
