@@ -57,4 +57,4 @@ jobs:
         git push https://Anuken:${{ secrets.API_TOKEN_GITHUB }}@github.com/Anuken/MindustryJitpack
         cd ../Mindustry
     - name: Run unit tests
-      run: ./gradlew clean cleanTest test --stacktrace
+      run: ./gradlew tests:test --rerun --stacktrace
