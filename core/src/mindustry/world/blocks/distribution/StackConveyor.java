@@ -29,6 +29,7 @@ public class StackConveyor extends Block implements Autotiler{
     public @Load("@-stack") TextureRegion stackRegion;
     /** requires power to work properly */
     public @Load(value = "@-glow") TextureRegion glowRegion;
+    public @Load(value = "@-edge-glow", fallback = "@-glow") TextureRegion edgeGlowRegion;
 
     public float glowAlpha = 1f;
     public Color glowColor = Pal.redLight;
@@ -154,7 +155,7 @@ public class StackConveyor extends Block implements Autotiler{
                 Draw.z(Layer.blockAdditive);
                 Draw.color(glowColor, glowAlpha * power.status);
                 Draw.blend(Blending.additive);
-                Draw.rect(glowRegion, x, y, rotation * 90);
+                Draw.rect(state == stateLoad ? edgeGlowRegion : glowRegion, x, y, rotation * 90);
                 Draw.blend();
                 Draw.color();
                 Draw.z(Layer.block - 0.1f);
