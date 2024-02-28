@@ -317,10 +317,8 @@ public class ApplicationTests{
         }
         Call.sectorCapture();
         System.out.println("GG");
-        //force trigger delayed spawns
-        //Time.setDeltaProvider(() -> 1000f);
-        //assertFalse(Groups.unit.isEmpty(), "No enemies spawned.");
     }
+    
     /**
      * run waves until boss wave is reached to make sure we get there. the boss wave will be run
      * before exiting loop.
@@ -663,24 +661,6 @@ public class ApplicationTests{
         tile.build.items.remove(new ItemStack(Items.copper, 100));
         //check if we still have a stack of 500
         assertTrue(tile.build.items.has(stacks), "Coal Item was found on tile");
-    }
-
-    /**
-     * Add an item and use different method of removing
-     *
-     * Remove items by ItemSeq (passing this as a parameter in remove)
-     */
-    @Test
-    void TestItemModuleRemove2()
-    {
-
-        ItemSeq stacks = new ItemSeq();
-
-        //tiles.each(t -> {
-       //     for(ItemStack stack : t.block.requirements){
-        //        requirements.add(stack.item, stack.amount);
-        //    }
-        //});
     }
 
     /**
