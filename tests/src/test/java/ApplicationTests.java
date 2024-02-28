@@ -44,6 +44,7 @@ import static mindustry.Vars.*;
 import static mindustry.content.Planets.erekir;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.DynamicTest.*;
+import static org.mockito.Mockito.*;
 
 public class ApplicationTests{
     static Map testMap;
