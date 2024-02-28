@@ -463,8 +463,19 @@ public class Turret extends ReloadTurret{
             return !Units.invalidateTarget(target, canHeal() ? Team.derelict : team, x, y) || isControlled() || logicControlled();
         }
 
+
+        public boolean canHealDummy()
+        {
+            return canHeal();
+        }
+
         protected boolean canHeal(){
             return targetHealing && hasAmmo() && peekAmmo().collidesTeam && peekAmmo().heals();
+        }
+
+        public void findTargetDummy()
+        {
+            findTarget();
         }
 
         protected void findTarget(){
