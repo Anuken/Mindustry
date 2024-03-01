@@ -1931,6 +1931,14 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         drawArrow(block, x, y, rotation, validPlace(x, y, block, rotation), diagonalSymmetry);
     }
 
+    public void drawArrow(Block block, int x, int y, int rotation){
+        drawArrow(block, x, y, rotation, validPlace(x, y, block, rotation), false);
+    }
+
+    public void drawArrow(Block block, int x, int y, int rotation, boolean valid){
+        drawArrow(block, x, y, rotation, valid, false)
+    }
+
     public void drawArrow(Block block, int x, int y, int rotation, boolean valid, boolean diagonalSymmetry){
         float trns = (block.size / 2) * tilesize;
         float[] d4xf = {0.707106781f,0.707106781f,-0.707106781f,-0.707106781f};
