@@ -1926,11 +1926,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(tile != null && tile.build != null) tile = tile.build.tile;
         player.unit().addBuild(new BuildPlan(tile.x, tile.y));
     }
-
-    public void drawArrow(Block block, int x, int y, int rotation, boolean diagonalSymmetry){
-        drawArrow(block, x, y, rotation, validPlace(x, y, block, rotation), diagonalSymmetry);
-    }
-
+    
     public void drawArrow(Block block, int x, int y, int rotation){
         drawArrow(block, x, y, rotation, validPlace(x, y, block, rotation), false);
     }
