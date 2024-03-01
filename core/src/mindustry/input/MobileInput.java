@@ -409,7 +409,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
             if(!plan.breaking && plan == lastPlaced && plan.block != null){
                 Draw.mixcol();
-                if(plan.block.rotate && plan.block.drawArrow) drawArrow(plan.block, tile.x, tile.y, plan.rotation, plan.block.diagonalSymmetry);
+                if(plan.block.rotate && plan.block.drawArrow) drawArrow(plan.block, tile.x, tile.y, plan.rotation, validPlace(plan.x, plan.y, block, plan.rotation), plan.block.diagonalSymmetry);
             }
 
             Draw.reset();
