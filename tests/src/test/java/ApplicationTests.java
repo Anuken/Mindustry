@@ -13,6 +13,7 @@ import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.core.GameState.*;
 import mindustry.ctype.*;
+import mindustry.entities.bullet.BulletType;
 import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -967,15 +968,24 @@ public class ApplicationTests{
     // Testablility Tests - Logic Update method
     //===========================================
 
+    /**
+     * As of right now the game does not make the base Block.java class easy to test because it
+     * is implemented by so many other classes and not directly used.
+     * In order to better test this Block.java class
+     * We created a BlockStub.java to directly test methods inside Block.java. percentSolid is
+     * a function that was previously uncovered in our test suite. However, due to our BlockStub
+     * class, we are now able to access it directly and get the result for a tile made on 1,1 on
+     * the game map.
+     */
+
     @Test
-    void SectorInfoStubTest()
+    void BlockStubTest()
     {
-        SectorInfoStub stub = new SectorInfoStub();
-        Item dummy = new Item("water");
-        stub.prepare();
-        stub.handleCoreItem(dummy, 100);
-        assertEquals(stub.getExport(dummy), 0);
+        BlockStub stub = new BlockStub("coal");
+        Tile tile = new Tile(1,1);
+        assertEquals(stub.percentSolid(1,1), 0);
     }
+
     @Test
     void timers(){
         boolean[] ran = {false};
