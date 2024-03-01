@@ -309,7 +309,6 @@ public class Floor extends Block{
     }
 
     /** Returns the edge array that should be used to draw at the specified tile position. */
-    @SuppressWarnings("unused")
     protected TextureRegion[][] edges(int x, int y){
         return blendGroup.asFloor().edges;
     }
