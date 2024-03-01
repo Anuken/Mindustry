@@ -1941,8 +1941,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public void drawArrow(Block block, int x, int y, int rotation, boolean valid, boolean diagonalSymmetry){
         float trns = (block.size / 2) * tilesize;
-        float[] d4xf = {0.707106781f,0.707106781f,-0.707106781f,-0.707106781f};
-        float[] d4yf = {-0.707106781f,0.707106781f,0.707106781f,-0.707106781f};
+        float[] d4xf = {0.707106781f,-0.707106781f,-0.707106781f,0.707106781f};
+        float[] d4yf = {0.707106781f,0.707106781f,-0.707106781f,-0.707106781f};
         float dxf = d4xf[rotation];
         float dyf = d4yf[rotation];
         int dx = Geometry.d4(rotation).x, dy = Geometry.d4(rotation).y;
@@ -1957,7 +1957,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         offsety - 1,
         regionArrow.width * regionArrow.scl(),
         regionArrow.height * regionArrow.scl(),
-        rotation * 90 - (diagonalSymmetry ? 135 : 90));
+        rotation * 90 - (diagonalSymmetry ? 45 : 90));
 
         Draw.color(!valid ? Pal.remove : Pal.accent);
         Draw.rect(regionArrow,
@@ -1965,7 +1965,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         offsety,
         regionArrow.width * regionArrow.scl(),
         regionArrow.height * regionArrow.scl(),
-        rotation * 90 - (diagonalSymmetry ? 135 : 90));
+        rotation * 90 - (diagonalSymmetry ? 45 : 90));
     }
 
     void iterateLine(int startX, int startY, int endX, int endY, Cons<PlaceLine> cons){

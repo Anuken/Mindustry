@@ -1381,10 +1381,10 @@ public class Block extends UnlockableContent implements Senseable{
         return !rotate && lockRotation ? 0 : rot;
     }
 
-    public void flipRotation(BuildPlan req, boolean x){
+    public void flipRotation(BuildPlan req, boolean flipHorizontally){
 		if (diagonalSymmetry) {
-        	req.rotation = planRotation(req.rotation ^ ((x ^ invertFlip) ? 3 : 1));
-		} else if ((x == ((req.rotation & 1) == 0)) != invertFlip) {
+        	req.rotation = planRotation(req.rotation ^ ((flipHorizontally ^ invertFlip) ? 1 : 3));
+		} else if ((flipHorizontally ^ invertFlip) == ((req.rotation & 1) == 0)) {
             req.rotation = planRotation(req.rotation ^ 2);
         }
     }
