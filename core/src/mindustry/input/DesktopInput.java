@@ -180,7 +180,7 @@ public class DesktopInput extends InputHandler{
                 for(int i = 0; i < linePlans.size; i++){
                     var plan = linePlans.get(i);
                     if(i == linePlans.size - 1 && plan.block.rotate && plan.block.drawArrow){
-                        drawArrow(block, plan.x, plan.y, plan.rotation, plan.block.diagonalSymmetry);
+                        drawArrow(block, plan.x, plan.y, plan.rotation, validPlace(plan.x, plan.y, block, plan.rotation), plan.block.diagonalSymmetry);
                     }
                     drawPlan(linePlans.get(i));
                 }
@@ -188,7 +188,7 @@ public class DesktopInput extends InputHandler{
             }else if(isPlacing()){
                 int rot = block == null ? rotation : block.planRotation(rotation);
                 if(block.rotate && block.drawArrow){
-                    drawArrow(block, cursorX, cursorY, rot, block.diagonalSymmetry);
+                    drawArrow(block, cursorX, cursorY, rot, validPlace(cursorX, cursorY, block, rot), block.diagonalSymmetry);
                 }
                 Draw.color();
                 boolean valid = validPlace(cursorX, cursorY, block, rot);
