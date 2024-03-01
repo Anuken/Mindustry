@@ -962,6 +962,19 @@ public class ApplicationTests{
         assertTrue(world.tile(2,2).build.items.has(Items.copper),"2nd container is empty");
     }
 
+    //===========================================
+    // Testablility Tests - Logic Update method
+    //===========================================
+
+    //use our logic stub and make sure it fails because of improper constructor setup
+    @Test
+    void LogicStubTest()
+    {
+
+    }
+
+
+
     @Test
     void timers(){
         boolean[] ran = {false};
