@@ -9,7 +9,7 @@
   },
   {
     "name": "meiqiuMDT",
-    "address": ["cn1.meiqiumdy.top:7000","cn1.meiqiumdt.top:7002","cn1.meiqiumdt.top:7006","cn1.meiqiumdt.top:7013"]
+    "address": ["cn1.meiqiumdy.top","cn1.meiqiumdt.top:7000","cn1.meiqiumdt.top:8000","cn1.meiqiumdt.top:7013"]
   },
   {
     "name": "Crux's Revelations",
@@ -283,9 +283,5 @@
   { 
     "name": "Sever.VN",
     "address": ["srv24.godlike.club:26189"]
-  },
-  {
-    "name": "Crimson Star",
-    "address": ["185.103.101.121:25528", "81.94.159.193"]
   }
 ]
