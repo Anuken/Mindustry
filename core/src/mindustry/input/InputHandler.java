@@ -1936,7 +1936,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void drawArrow(Block block, int x, int y, int rotation, boolean valid){
-        drawArrow(block, x, y, rotation, valid, false)
+        drawArrow(block, x, y, rotation, valid, false);
     }
 
     public void drawArrow(Block block, int x, int y, int rotation, boolean valid, boolean diagonalSymmetry){
