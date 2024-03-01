@@ -106,12 +106,12 @@ allprojects{
         generateLocales = {
             def output = 'en\n'
             def bundles = new File(project(':core').projectDir, 'assets/bundles/')
-            bundles.listFiles().each{ other ->
-                if(other.name == "bundle.properties") return
-                output += other.name.substring("bundle".length() + 1, other.name.lastIndexOf('.')) + "\n"
+            bundles.list().sort().each{ name ->
+                if(name == "bundle.properties") return
+                output += name.substring("bundle".length() + 1, name.lastIndexOf('.')) + "\n"
             }
             new File(project(':core').projectDir, 'assets/locales').text = output
-            new File(project(':core').projectDir, 'assets/basepartnames').text = new File(project(':core').projectDir, 'assets/baseparts/').list().join("\n")
+            new File(project(':core').projectDir, 'assets/basepartnames').text = new File(project(':core').projectDir, 'assets/baseparts/').list().sort().join("\n")
         }
 
         writeVersion = {
@@ -185,7 +185,7 @@ allprojects{
 
     tasks.withType(JavaCompile){
         targetCompatibility = 8
-        sourceCompatibility = JavaVersion.VERSION_16
+        sourceCompatibility = JavaVersion.VERSION_17
         options.encoding = "UTF-8"
         options.compilerArgs += ["-Xlint:deprecation"]
         dependsOn clearCache

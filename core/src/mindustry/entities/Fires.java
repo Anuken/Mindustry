@@ -33,11 +33,11 @@ public class Fires{
     }
 
     public static @Nullable Fire get(Tile tile){
-        return world.tiles.getFire(tile.array());
+        return tile == null ? null : world.tiles.getFire(tile.array());
     }
 
     public static @Nullable Fire get(int x, int y){
-        return world.tiles.getFire(world.packArray(x, y));
+        return Structs.inBounds(x, y, world.width(), world.height()) ? world.tiles.getFire(world.packArray(x, y)) : null;
     }
 
     private static void set(Tile tile, Fire fire){

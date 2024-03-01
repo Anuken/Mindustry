@@ -19,7 +19,23 @@ public class UnitGroup{
     public int collisionLayer;
     public volatile float[] positions, originalPositions;
     public volatile boolean valid;
+    public long lastSpeedUpdate = -1;
     public float minSpeed = 999999f;
+
+    public void updateMinSpeed(){
+        if(lastSpeedUpdate == Vars.state.updateId) return;
+
+        lastSpeedUpdate = Vars.state.updateId;
+        minSpeed = 999999f;
+
+        for(Unit unit : units){
+            //don't factor in the floor speed multiplier
+            Floor on = unit.isFlying() ? Blocks.air.asFloor() : unit.floorOn();
+            minSpeed = Math.min(unit.speed() / on.speedMultiplier, minSpeed);
+        }
+
+        if(Float.isInfinite(minSpeed) || Float.isNaN(minSpeed)) minSpeed = 999999f;
+    }
     
     public void calculateFormation(Vec2 dest, int collisionLayer){
         this.collisionLayer = collisionLayer;
@@ -33,19 +49,16 @@ public class UnitGroup{
         cy /= units.size;
         positions = new float[units.size * 2];
 
+
         //all positions are relative to the center
         for(int i = 0; i < units.size; i ++){
             Unit unit = units.get(i);
             positions[i * 2] = unit.x - cx;
             positions[i * 2 + 1] = unit.y - cy;
             unit.command().groupIndex = i;
-
-            //don't factor in the floor speed multiplier
-            Floor on = unit.isFlying() ? Blocks.air.asFloor() : unit.floorOn();
-            minSpeed = Math.min(unit.speed() / on.speedMultiplier, minSpeed);
         }
 
-        if(Float.isInfinite(minSpeed) || Float.isNaN(minSpeed)) minSpeed = 999999f;
+        updateMinSpeed();
 
         //run on new thread to prevent stutter
         Vars.mainExecutor.submit(() -> {

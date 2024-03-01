@@ -577,6 +577,10 @@ public class Administration{
             changed.run();
         }
 
+        public boolean isDefault(){
+            return Structs.eq(get(), defaultValue);
+        }
+
         private static boolean debug(){
             return Config.debug.bool();
         }

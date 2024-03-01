@@ -174,6 +174,8 @@ public class BulletType extends Content implements Cloneable{
     public float fragVelocityMin = 0.2f, fragVelocityMax = 1f;
     /** Random range of frag lifetime as a multiplier. */
     public float fragLifeMin = 1f, fragLifeMax = 1f;
+    /** Random offset of frag bullets from the parent bullet. */
+    public float fragOffsetMin = 1f, fragOffsetMax = 7f;
 
     /** Bullet that is created at a fixed interval. */
     public @Nullable BulletType intervalBullet;
@@ -387,14 +389,14 @@ public class BulletType extends Content implements Cloneable{
 
         if(entity instanceof Healthc h){
             float damage = b.damage;
+            float shield = entity instanceof Shieldc s ? Math.max(s.shield(), 0f) : 0f;
             if(maxDamageFraction > 0){
-                float cap = h.maxHealth() * maxDamageFraction;
-                if(entity instanceof Shieldc s){
-                    cap += Math.max(s.shield(), 0f);
-                }
+                float cap = h.maxHealth() * maxDamageFraction + shield;
                 damage = Math.min(damage, cap);
                 //cap health to effective health for handlePierce to handle it properly
                 health = Math.min(health, cap);
+            }else{
+                health += shield;
             }
             if(pierceArmor){
                 h.damagePierce(damage);
@@ -509,7 +511,7 @@ public class BulletType extends Content implements Cloneable{
     public void createFrags(Bullet b, float x, float y){
         if(fragBullet != null && (fragOnAbsorb || !b.absorbed)){
             for(int i = 0; i < fragBullets; i++){
-                float len = Mathf.random(1f, 7f);
+                float len = Mathf.random(fragOffsetMin, fragOffsetMax);
                 float a = b.rotation() + Mathf.range(fragRandomSpread / 2) + fragAngle + ((i - fragBullets/2) * fragSpread);
                 fragBullet.create(b, x + Angles.trnsx(a, len), y + Angles.trnsy(a, len), a, Mathf.random(fragVelocityMin, fragVelocityMax), Mathf.random(fragLifeMin, fragLifeMax));
             }

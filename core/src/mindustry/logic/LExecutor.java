@@ -14,6 +14,7 @@ import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.game.*;
+import mindustry.game.EventType.*;
 import mindustry.game.MapObjectives.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
@@ -62,7 +63,11 @@ public class LExecutor{
     public boolean privileged = false;
 
     //yes, this is a minor memory leak, but it's probably not significant enough to matter
-    protected IntFloatMap unitTimeouts = new IntFloatMap();
+    protected static IntFloatMap unitTimeouts = new IntFloatMap();
+
+    static{
+        Events.on(ResetEvent.class, e -> unitTimeouts.clear());
+    }
 
     boolean timeoutDone(Unit unit, float delay){
         return Time.time >= unitTimeouts.get(unit.id) + delay;
@@ -162,9 +167,21 @@ public class LExecutor{
         return v.isobj ? v.objval != null ? 1 : 0 : invalid(v.numval) ? 0 : v.numval;
     }
 
+    /** Get num value from variable, convert null to NaN to handle it differently in some instructions */
+    public double numOrNan(int index){
+        Var v = var(index);
+        return v.isobj ? v.objval != null ? 1 : Double.NaN : invalid(v.numval) ? 0 : v.numval;
+    }
+
     public float numf(int index){
         Var v = var(index);
         return v.isobj ? v.objval != null ? 1 : 0 : invalid(v.numval) ? 0 : (float)v.numval;
+    }
+
+    /** Get float value from variable, convert null to NaN to handle it differently in some instructions */
+    public float numfOrNan(int index){
+        Var v = var(index);
+        return v.isobj ? v.objval != null ? 1 : Float.NaN : invalid(v.numval) ? 0 : (float)v.numval;
     }
 
     public int numi(int index){
@@ -689,7 +706,7 @@ public class LExecutor{
             int address = exec.numi(position);
             Building from = exec.building(target);
 
-            if(from instanceof MemoryBuild mem && (exec.privileged || from.team == exec.team) && address >= 0 && address < mem.memory.length){
+            if(from instanceof MemoryBuild mem && (exec.privileged || (from.team == exec.team && !mem.block.privileged)) && address >= 0 && address < mem.memory.length){
                 mem.memory[address] = exec.num(value);
             }
         }
@@ -1008,14 +1025,17 @@ public class LExecutor{
                     exec.textBuffer.setLength(0);
                 }
             }else{
-                int num1 = exec.numi(p1);
+                int num1 = exec.numi(p1), xval = packSign(exec.numi(x)), yval = packSign(exec.numi(y));
 
                 if(type == LogicDisplay.commandImage){
                     num1 = exec.obj(p1) instanceof UnlockableContent u ? u.iconId : 0;
+                }else if(type == LogicDisplay.commandScale){
+                    xval = packSign((int)(exec.numf(x) / LogicDisplay.scaleStep));
+                    yval = packSign((int)(exec.numf(y) / LogicDisplay.scaleStep));
                 }
 
                 //add graphics calls, cap graphics buffer size
-                exec.graphicsBuffer.add(DisplayCmd.get(type, packSign(exec.numi(x)), packSign(exec.numi(y)), packSign(num1), packSign(exec.numi(p2)), packSign(exec.numi(p3)), packSign(exec.numi(p4))));
+                exec.graphicsBuffer.add(DisplayCmd.get(type, xval, yval, packSign(num1), packSign(exec.numi(p2)), packSign(exec.numi(p3)), packSign(exec.numi(p4))));
             }
         }
 
@@ -1213,7 +1233,6 @@ public class LExecutor{
         public int value;
 
         public float curTime;
-        public long frameId;
 
         public WaitI(int value){
             this.value = value;
@@ -1230,11 +1249,7 @@ public class LExecutor{
                 //skip back to self.
                 exec.var(varCounter).numval --;
                 exec.yield = true;
-            }
-
-            if(state.updateId != frameId){
                 curTime += Time.delta / 60f;
-                frameId = state.updateId;
             }
         }
     }
@@ -1663,7 +1678,7 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            //set default to succes
+            //set default to success
             exec.setnum(outSuccess, 1);
             if(headless && type != MessageType.mission) {
                 exec.textBuffer.setLength(0);
@@ -1960,7 +1975,7 @@ public class LExecutor{
     }
 
     public static class SetMarkerI implements LInstruction{
-        public LMarkerControl type = LMarkerControl.x;
+        public LMarkerControl type = LMarkerControl.pos;
         public int id, p1, p2, p3;
 
         public SetMarkerI(LMarkerControl type, int id, int p1, int p2, int p3){
@@ -1982,13 +1997,18 @@ public class LExecutor{
                 var marker = state.markers.get(exec.numi(id));
                 if(marker == null) return;
 
-                if(type == LMarkerControl.text){
-                    marker.setText((exec.obj(p1) != null ? exec.obj(p1).toString() : "null"), false);
-                }else if(type == LMarkerControl.flushText){
-                    marker.setText(exec.textBuffer.toString(), true);
+                if(type == LMarkerControl.flushText){
+                    marker.setText(exec.textBuffer.toString(), exec.bool(p1));
                     exec.textBuffer.setLength(0);
+                }else if(type == LMarkerControl.texture){
+                    if(exec.bool(p1)){
+                        marker.setTexture(exec.textBuffer.toString());
+                        exec.textBuffer.setLength(0);
+                    }else{
+                        marker.setTexture(PrintI.toString(exec.obj(p2)));
+                    }
                 }else{
-                    marker.control(type, exec.num(p1), exec.num(p2), exec.num(p3));
+                    marker.control(type, exec.numOrNan(p1), exec.numOrNan(p2), exec.numOrNan(p3));
                 }
             }
         }
@@ -2016,12 +2036,12 @@ public class LExecutor{
         public void run(LExecutor exec){
             var cons = MapObjectives.markerNameToType.get(type);
 
-            if(cons != null && state.markers.size < maxMarkers){
+            if(cons != null && state.markers.size() < maxMarkers){
                 int mid = exec.numi(id);
-                if(exec.bool(replace) || !state.markers.containsKey(mid)){
+                if(exec.bool(replace) || !state.markers.has(mid)){
                     var marker = cons.get();
                     marker.control(LMarkerControl.pos, exec.num(x), exec.num(y), 0);
-                    state.markers.put(mid, marker);
+                    state.markers.add(mid, marker);
                 }
             }
         }
@@ -2029,7 +2049,12 @@ public class LExecutor{
 
     @Remote(called = Loc.server, variants = Variant.both, unreliable = true)
     public static void createMarker(int id, ObjectiveMarker marker){
-        state.markers.put(id, marker);
+        state.markers.add(id, marker);
+    }
+
+    @Remote(called = Loc.server, variants = Variant.both, unreliable = true)
+    public static void removeMarker(int id){
+        state.markers.remove(id);
     }
 
     @Remote(called = Loc.server, variants = Variant.both, unreliable = true)
@@ -2041,14 +2066,20 @@ public class LExecutor{
     }
 
     @Remote(called = Loc.server, variants = Variant.both, unreliable = true)
-    public static void updateMarkerText(int id, LMarkerControl type, String text){
+    public static void updateMarkerText(int id, LMarkerControl type, boolean fetch, String text){
         var marker = state.markers.get(id);
         if(marker != null){
-            if(type == LMarkerControl.text){
-                marker.setText(text, true);
-            }else if(type == LMarkerControl.flushText){
-                marker.setText(text, false);
+            if(type == LMarkerControl.flushText){
+                marker.setText(text, fetch);
             }
+        }
+    }
+
+    @Remote(called = Loc.server, variants = Variant.both, unreliable = true)
+    public static void updateMarkerTexture(int id, String textureName){
+        var marker = state.markers.get(id);
+        if(marker != null){
+            marker.setTexture(textureName);
         }
     }
 

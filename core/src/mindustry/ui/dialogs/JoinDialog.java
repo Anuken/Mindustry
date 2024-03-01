@@ -1,6 +1,7 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
+import arc.freetype.FreeTypeFontGenerator.*;
 import arc.graphics.*;
 import arc.input.*;
 import arc.math.*;
@@ -35,6 +36,7 @@ public class JoinDialog extends BaseDialog{
     int refreshes;
     boolean showHidden;
     TextButtonStyle style;
+    Task fontIgnoreDirtyTask;
 
     String lastIp;
     int lastPort, lastColumns = -1;
@@ -247,10 +249,10 @@ public class JoinDialog extends BaseDialog{
     void setupServer(Server server, Host host){
         server.lastHost = host;
         server.content.clear();
-        buildServer(host, server.content, false);
+        buildServer(host, server.content, false, true);
     }
 
-    void buildServer(Host host, Table content, boolean local){
+    void buildServer(Host host, Table content, boolean local, boolean addName){
         content.top().left();
         boolean isBanned = local && Vars.steam && host.description != null && host.description.equals("[banned]");
         String versionString = getVersionString(host) + (isBanned ? "[red] [banned]" : "");
@@ -261,7 +263,7 @@ public class JoinDialog extends BaseDialog{
 
         Color color = Pal.gray;
 
-        if(local){
+        if(addName){
             content.table(Tex.whiteui, t -> {
                 t.left();
                 t.setColor(color);
@@ -413,6 +415,15 @@ public class JoinDialog extends BaseDialog{
                 net.pingHost(resaddress, resport, res -> {
                     if(refreshes != cur) return;
 
+                    //don't recache the texture for a while
+                    if(fontIgnoreDirtyTask == null){
+                        FreeTypeFontData.ignoreDirty = true;
+                        fontIgnoreDirtyTask = Time.runTask(0.6f * 60f, () -> {
+                            FreeTypeFontData.ignoreDirty = false;
+                            fontIgnoreDirtyTask = null;
+                        });
+                    }
+
                     if(!serverSearch.isEmpty() && !(group.name.toLowerCase().contains(serverSearch)
                         || res.name.toLowerCase().contains(serverSearch)
                         || res.description.toLowerCase().contains(serverSearch)
@@ -513,7 +524,7 @@ public class JoinDialog extends BaseDialog{
 
         button[0].row();
 
-        buildServer(host, button[0].table(t -> {}).grow().get(), false);
+        buildServer(host, button[0].table(t -> {}).grow().get(), false, false);
 
         if((container.getChildren().size) % columns() == 0){
             container.row();
@@ -544,7 +555,7 @@ public class JoinDialog extends BaseDialog{
             local.row();
         }
 
-        local.button(b -> buildServer(host, b, true), style, () -> {
+        local.button(b -> buildServer(host, b, true, true), style, () -> {
             Events.fire(new ClientPreConnectEvent(host));
             safeConnect(host.address, host.port, host.version);
         }).width(w).top().left().growY();

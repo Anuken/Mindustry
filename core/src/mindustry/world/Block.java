@@ -219,6 +219,8 @@ public class Block extends UnlockableContent implements Senseable{
     public int unitCapModifier = 0;
     /** Whether the block can be tapped and selected to configure. */
     public boolean configurable;
+    /** If true, this block does not have pointConfig with a transform called on map resize. */
+    public boolean ignoreResizeConfig;
     /** If true, this building can be selected like a unit when commanding. */
     public boolean commandable;
     /** If true, the building inventory can be shown with the config. */
@@ -245,6 +247,8 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean allowDiagonal = true;
     /** Whether to swap the diagonal placement modes. */
     public boolean swapDiagonalPlacement;
+    /** Whether to allow rectangular placement, as opposed to a line. */
+    public boolean allowRectanglePlacement = false;
     /** Build queue priority in schematics. */
     public int schematicPriority = 0;
     /**
@@ -322,6 +326,8 @@ public class Block extends UnlockableContent implements Senseable{
     public float deconstructThreshold = 0f;
     /** If true, this block deconstructs immediately. Instant deconstruction implies no resource refund. */
     public boolean instantDeconstruct = false;
+    /** If true, this block constructs immediately. This implies no resource requirement, and ignores configs - do not use, this is for performance only! */
+    public boolean instantBuild = false;
     /** Effect for placing the block. Passes size as rotation. */
     public Effect placeEffect = Fx.placeBlock;
     /** Effect for breaking the block. Passes size as rotation. */
@@ -378,7 +384,7 @@ public class Block extends UnlockableContent implements Senseable{
     /** Dump timer ID.*/
     protected final int timerDump = timers++;
     /** How often to try dumping items in ticks, e.g. 5 = 12 times/sec*/
-    protected final int dumpTime = 5;
+    public int dumpTime = 5;
 
     public Block(String name){
         super(name);
@@ -440,7 +446,7 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     public float drawPlaceText(String text, int x, int y, boolean valid){
-        if(renderer.pixelator.enabled()) return 0;
+        if(renderer.pixelate) return 0;
 
         Color color = valid ? Pal.accent : Pal.remove;
         Font font = Fonts.outline;
@@ -950,6 +956,14 @@ public class Block extends UnlockableContent implements Senseable{
             throw new IllegalStateException("You can only remove consumers before init(). After init(), all consumers have already been initialized.");
         }
         consumeBuilder.remove(cons);
+    }
+
+    public void removeConsumers(Boolf<Consume> b){
+        consumeBuilder.removeAll(b);
+        //the power was removed, unassign it
+        if(!consumeBuilder.contains(c -> c instanceof ConsumePower)){
+            consPower = null;
+        }
     }
 
     public ConsumeLiquid consumeLiquid(Liquid liquid, float amount){

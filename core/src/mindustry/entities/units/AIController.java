@@ -227,7 +227,7 @@ public class AIController implements UnitController{
     }
 
     public Teamc target(float x, float y, float range, boolean air, boolean ground){
-        return Units.closestTarget(unit.team, x, y, range, u -> u.checkTarget(air, ground), t -> ground);
+        return Units.closestTarget(unit.team, x, y, range, u -> u.checkTarget(air, ground), t -> ground && (unit.type.targetUnderBlocks || !t.block.underBullets));
     }
 
     public boolean retarget(){
@@ -277,7 +277,7 @@ public class AIController implements UnitController{
 
         vec.setLength(prefSpeed());
 
-        unit.moveAt(vec);
+        unit.movePref(vec);
     }
 
     public void circle(Position target, float circleLength){
@@ -295,7 +295,7 @@ public class AIController implements UnitController{
 
         vec.setLength(speed);
 
-        unit.moveAt(vec);
+        unit.movePref(vec);
     }
 
     public void moveTo(Position target, float circleLength){

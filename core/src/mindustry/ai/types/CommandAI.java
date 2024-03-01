@@ -148,6 +148,10 @@ public class CommandAI extends AIController{
             }
         }
 
+        if(group != null){
+            group.updateMinSpeed();
+        }
+
         if(!net.client() && command == UnitCommand.enterPayloadCommand && unit.buildOn() != null && (targetPos == null || (world.buildWorld(targetPos.x, targetPos.y) != null && world.buildWorld(targetPos.x, targetPos.y) == unit.buildOn()))){
             var build = unit.buildOn();
             tmpPayload.unit = unit;

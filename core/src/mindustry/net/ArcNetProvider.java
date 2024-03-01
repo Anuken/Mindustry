@@ -94,7 +94,9 @@ public class ArcNetProvider implements NetProvider{
         server.setMulticast(multicastGroup, multicastPort);
         server.setDiscoveryHandler((address, handler) -> {
             ByteBuffer buffer = NetworkIO.writeServerData();
+            int length = buffer.position();
             buffer.position(0);
+            buffer.limit(length);
             handler.respond(buffer);
         });
 
@@ -333,7 +335,7 @@ public class ArcNetProvider implements NetProvider{
 
         @Override
         public void sendStream(Streamable stream){
-            connection.addListener(new InputStreamSender(stream.stream, 512){
+            connection.addListener(new InputStreamSender(stream.stream, 1024){
                 int id;
 
                 @Override
@@ -452,7 +454,7 @@ public class ArcNetProvider implements NetProvider{
                 byteBuffer.put((byte)-2); //code for framework message
                 writeFramework(byteBuffer, msg);
             }else{
-                if(!(o instanceof Packet pack)) throw new RuntimeException("All sent objects must implement be Packets! Class: " + o.getClass());
+                if(!(o instanceof Packet pack)) throw new RuntimeException("All sent objects must extend Packet! Class: " + o.getClass());
                 byte id = Net.getPacketId(pack);
                 byteBuffer.put(id);
 
