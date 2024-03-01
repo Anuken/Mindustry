@@ -17,6 +17,7 @@ import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.g3d.PlanetGrid;
+import mindustry.input.InputHandler;
 import mindustry.io.*;
 import mindustry.io.SaveIO.*;
 import mindustry.maps.*;
@@ -966,15 +967,15 @@ public class ApplicationTests{
     // Testablility Tests - Logic Update method
     //===========================================
 
-    //use our logic stub and make sure it fails because of improper constructor setup
     @Test
-    void LogicStubTest()
+    void SectorInfoStubTest()
     {
-
+        SectorInfoStub stub = new SectorInfoStub();
+        Item dummy = new Item("water");
+        stub.prepare();
+        stub.handleCoreItem(dummy, 100);
+        assertEquals(stub.getExport(dummy), 0);
     }
-
-
-
     @Test
     void timers(){
         boolean[] ran = {false};
