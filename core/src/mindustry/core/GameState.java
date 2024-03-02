@@ -91,7 +91,7 @@ public class GameState{
 
     /** @return whether there is an unpaused game in progress. */
     public boolean isPlaying(){
-        return state == State.playing
+        return state == State.playing;
     }
 
     /** @return whether the current state is *not* the menu. */
