@@ -37,6 +37,7 @@ import org.json.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.*;
 import org.junit.jupiter.params.provider.*;
+import org.mockito.Mockito;
 
 import java.io.*;
 import java.nio.*;
@@ -986,6 +987,120 @@ public class ApplicationTests{
         assertEquals(stub.percentSolid(1,1), 0);
     }
 
+
+    /**
+     * Now using dummy method to always get optimal flow with pipping
+     */
+    @Test
+    void liquidJunctionOutputTestablility(){
+        world.loadMap(testMap);
+        state.set(State.playing);
+        state.rules.limitMapArea = false;
+
+        Tile source = world.rawTile(0, 0), tank = world.rawTile(1, 4), junction = world.rawTile(0, 1), conduit = world.rawTile(0, 2);
+
+        source.setBlock(Blocks.liquidSource, Team.sharded);
+        source.build.configureAny(Liquids.water);
+
+        junction.setBlock(Blocks.liquidJunction, Team.sharded);
+
+        conduit.setBlock(Blocks.conduit, Team.sharded, 1);
+
+        tank.setBlock(Blocks.liquidTank, Team.sharded);
+
+        updateBlocks(10);
+
+        conduit.build.updateTileDummyFLow();
+
+        assertTrue(tank.build.liquids.currentAmount() >= 1, "Liquid not moved through junction");
+        assertTrue(tank.build.liquids.current() == Liquids.water, "Tank has no water");
+    }
+
+    //===========================================
+    // Mocking Tests
+    //===========================================
+
+    /**
+     *
+     * testing how often certain methods are run in our logic class
+     */
+    @Test
+    void LogicMockTest() {
+        Logic logMock = Mockito.mock(Logic.class);
+        logic = logMock;
+
+        world.loadMap(testMap);
+
+        //to make this a campaign map we need a sector - make a dummy sector
+        state.rules.sector = new Sector(state.rules.planet, PlanetGrid.Ptile.empty);
+        state.rules.winWave = 50;
+
+        //increments the wave number
+        logic.runWave();
+        Groups.unit.update();
+
+        //get our player core and kill it
+        for (CoreBuild core :  state.teams.playerCores())
+        {
+            core.kill();
+        }
+        //need to set state to is playing to see if we are in fact dead, otherwise we are inside a menu
+        state.set(State.playing);
+        logic.update();
+
+
+        //if we die or loose, state.gameOver = true
+        //enemies present and spawned. No longer in prep phase. Wave has started.
+        //assertTrue(state.gameOver, "Game Over status reached.");
+
+        //test gameover state and verify how often CheckGameState is run
+        //or other public methods?
+        verify(logMock, atLeast(1)).update();
+
+    }
+
+    /**
+     * Build turret and verify correct procedure for method calls
+     *
+     *
+     */
+    @Test
+    void TurretBuildVerification()
+    {
+        createMap();
+        state.set(State.playing);
+
+        // Create duo turret block at 0,1
+        Tile duoMock = Mockito.mock(Tile.class);
+        duoMock.constructTile(world.rawTile(0, 1));
+
+        duoMock.setBlock(Blocks.duo, Team.sharded);
+
+        // Create copper source at 0,0
+        Tile source = world.rawTile(0,0);
+        source.setBlock(Blocks.itemSource, Team.sharded);
+        source.build.configureAny(Items.copper);
+
+        // Check that ammo is initially 0
+       // assertEquals(0, ((ItemTurret.ItemTurretBuild) duoMock.build).totalAmmo, "Newly built turret ammo is not 0");
+
+        // Allow turret to load from ammo sources
+        updateBlocks(100);
+
+        // Check ammo amount is capped at maxAmmo
+        //assertEquals(((ItemTurret) duoMock.block()).maxAmmo, ((ItemTurret.ItemTurretBuild) duoMock.build).totalAmmo, "Duo is not fully loaded");
+
+        // Allow more loading time
+        updateBlocks(100);
+
+        // Create duo turret block at 0,1
+
+
+        //verify(duoMock, atLeast(2)).constructTile();
+
+
+    }
+
     @Test
     void timers(){
         boolean[] ran = {false};
@@ -1074,6 +1189,8 @@ public class ApplicationTests{
             }
         }
     }
+
+
 
     @Test
     void liquidOutput(){

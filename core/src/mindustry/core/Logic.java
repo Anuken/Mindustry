@@ -450,6 +450,8 @@ public class Logic implements ApplicationListener{
         Events.fire(new WaveEvent());
     }
 
+
+
     private void checkGameState(){
         //campaign maps do not have a 'win' state!
         if(state.isCampaign()){
