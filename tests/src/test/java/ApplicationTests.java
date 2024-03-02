@@ -1068,12 +1068,7 @@ public class ApplicationTests{
         state.set(State.playing);
         logic.update();
 
-
-        //if we die or loose, state.gameOver = true
-        //enemies present and spawned. No longer in prep phase. Wave has started.
-        //assertTrue(state.gameOver, "Game Over status reached.");
-
-        //test gameover state and verify how often CheckGameState is run
+        //test game over state and verify how often CheckGameState is run
         //or other public methods?
         verify(logMock, atLeast(1)).update();
 
@@ -1082,10 +1077,10 @@ public class ApplicationTests{
     /**
      * Build turret and verify correct procedure for method calls
      *
-     *
+     * Should be corresponding setBlock call for Turrent building
      */
     @Test
-    void TurretBuildVerification()
+    void TurretBuildVerification_Mocking()
     {
         createMap();
         state.set(State.playing);
@@ -1101,24 +1096,8 @@ public class ApplicationTests{
         source.setBlock(Blocks.itemSource, Team.sharded);
         source.build.configureAny(Items.copper);
 
-        // Check that ammo is initially 0
-       // assertEquals(0, ((ItemTurret.ItemTurretBuild) duoMock.build).totalAmmo, "Newly built turret ammo is not 0");
-
-        // Allow turret to load from ammo sources
-        updateBlocks(100);
-
-        // Check ammo amount is capped at maxAmmo
-        //assertEquals(((ItemTurret) duoMock.block()).maxAmmo, ((ItemTurret.ItemTurretBuild) duoMock.build).totalAmmo, "Duo is not fully loaded");
-
-        // Allow more loading time
-        updateBlocks(100);
-
-        // Create duo turret block at 0,1
-
-
-        //verify(duoMock, atLeast(2)).constructTile();
-
-
+        //verify the duo Building uses proper setBlock
+        verify(duoMock, atLeast(1)).setBlock(Blocks.duo, Team.sharded);
     }
 
     @Test
