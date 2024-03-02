@@ -2859,7 +2859,7 @@ public class Blocks{
 
         eruptionDrill = new BurstDrill("eruption-drill"){{
             requirements(Category.production, with(Items.silicon, 200, Items.oxide, 20, Items.tungsten, 200, Items.thorium, 120));
-            drillTime = 3000f / 11f;
+            drillTime = 281.25f;
             size = 5;
             hasPower = true;
             tier = 7;
