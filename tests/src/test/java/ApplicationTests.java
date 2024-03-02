@@ -28,6 +28,7 @@ import mindustry.net.*;
 import mindustry.net.Packets.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.liquid.Conduit;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.storage.*;
 import mindustry.world.blocks.defense.turrets.*;  // Added by WS
@@ -1008,9 +1009,28 @@ public class ApplicationTests{
 
         tank.setBlock(Blocks.liquidTank, Team.sharded);
 
-        updateBlocks(10);
+        //updateBlocks(10);  // Original tile updates
 
-        conduit.build.updateTileDummyFLow();
+        // New tile updates
+        for(Tile tile : world.tiles){
+            if(tile.build != null && tile.isCenter()){
+                tile.build.updateProximity();
+            }
+        }
+        for(int i = 0; i < 20; i++){
+            Time.update();
+            for(Tile tile : world.tiles){
+                if (tile.build instanceof Conduit.ConduitBuild) {
+                    ((Conduit.ConduitBuild) conduit.build).updateTileDummyFlow();
+                } else {
+                    if (tile.build != null && tile.isCenter()) {
+                        tile.build.update();
+                    }
+                }
+            }
+        }
+
+        System.out.println(tank.build.liquids.currentAmount());
 
         assertTrue(tank.build.liquids.currentAmount() >= 1, "Liquid not moved through junction");
         assertTrue(tank.build.liquids.current() == Liquids.water, "Tank has no water");
