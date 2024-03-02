@@ -1,6 +1,6 @@
 A Mindustry egy gyárépítő játék Toronyvédő és RTS elemekkel. Készíts bonyolult ellátási láncokat, hogy lőszert juttass a lövegtornyokba, termelj az építkezéshez használható nyersanyagokat, és állíts elő egységeket. Irányítsd az egységeket, hogy elfoglald az ellenséges bázisokat, és bővítsd a termelésedet. Védd meg a magodat a hullámokban támadó ellenségtől.
 
-<h2>A Játékmenet Szolgáltatásai</h2>
+<h2>A játékmenet szolgáltatásai</h2>
  
 - Használd a gyártó-blokkokat a legkülönfélébb fejlett nyersanyagok létrehozásához
 - Védd meg építményeidet a hullámokban támadó ellenségektől
@@ -12,7 +12,7 @@ A Mindustry egy gyárépítő játék Toronyvédő és RTS elemekkel. Készíts 
 - Használd az egységeidet a hatékonyan felszerelt ellenséges bázisok ellen
 
 
-<h2>Kampány</h2>
+<h2>Hadjárat</h2>
 
 - Hódítsd meg a Serpulo és az Erekir bolygót, miközben 35 kézzel készített pályán és 250+ procedurálisan generált szektoron keresztül haladsz
 - Foglalj el területeket és építs gyárakat, hogy nyersanyagokat termelhess, miközben más szektorokban játszol
@@ -24,11 +24,11 @@ A Mindustry egy gyárépítő játék Toronyvédő és RTS elemekkel. Készíts 
 - 50+ különböző típusú drón, mech és hajó
 
 
-<h2>Egyéni és Platformokon Átívelő Többjátékos Módok</h2>
+<h2>Egyéni és platformokon átívelő többjátékos módok</h2>
 
-- 16+ beépített pálya az egyéni játékokhoz a két teljes kampány mellett
-- Játssz kooperatív, PvP vagy homokozóban
+- 16+ beépített pálya az egyéni játékokhoz, a két teljes értékű hadjárat mellett
+- Játssz kooperatív, PvP, vagy homokozóban
 - Hozz létre nyilvános dedikált szervert, vagy hívd meg a barátaidat a saját privát munkamenetedre
-- Testre szabható játékszabályok: Változtasd meg a blokk költségeket, az ellenséges statisztikákat, a kezdő elemeket, a hullámok időzítését és így tovább
-- Teljes funkcionalitású térképszerkesztő szkript támogatással
+- Testre szabható játékszabályok: Változtasd meg az épület költségeket, az ellenséges statisztikákat, a kezdő elemeket, a hullámok időzítését és így tovább
+- Teljes funkcionalitású térképszerkesztő, parancsfájl támogatással
 - Beépített mod böngésző és mod támogatás
