@@ -41,9 +41,9 @@ Játszd végig a hadjáratokat egyedül, vagy vállvetve a barátaiddal a platfo
 [*] Foglalj el területeket és építs gyárakat, hogy nyersanyagokat termelhess, miközben más szektorokban játszol
 [*] Védd meg a szektorokat az időszakos invázióktól
 [*] Koordináld az erőforrások elosztását a szektorok között az indítóállások felhasználásával
-[*] Fedezz fel új blokkokat a fejlődés elősegítése érdekében
+[*] Fedezz fel új épületeket, gyárakat a fejlődés elősegítése érdekében
 [*] Hívd meg barátaidat, hogy együtt teljesítsék a küldetéseket
-[*] 250+ technológiai blokk használatának elsajátítása
+[*] 250+ technológiai épület használatának elsajátítása
 [*] 50+ különböző típusú drón, mech és hajó
 [*] 80+ teljesítendő feladat
 [/list]
