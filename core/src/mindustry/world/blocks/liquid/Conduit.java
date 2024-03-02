@@ -238,6 +238,18 @@ public class Conduit extends LiquidBlock implements Autotiler{
             }
         }
 
+        public void updateTileDummyFlow()
+        {
+            smoothLiquid = Mathf.lerpDelta(smoothLiquid, liquids.currentAmount() / liquidCapacity, 0.05f);
+
+            if(liquids.currentAmount() > 0.0001f && timer(timerFlow, 1)){
+                moveLiquidForwardDummy(liquids.current());
+                noSleep();
+            }else{
+                sleep();
+            }
+        }
+
         @Nullable
         @Override
         public Building next(){

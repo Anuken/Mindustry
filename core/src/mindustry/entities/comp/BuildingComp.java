@@ -861,6 +861,30 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         }
     }
 
+    /**
+     * Keep optimal flow with no leaks
+     * @param liquid
+     * @return
+     */
+    public float moveLiquidForwardDummy(Liquid liquid)
+    {
+        Tile next = tile.nearby(rotation);
+        Building nextB;
+        if(next == null) return 0;
+
+        nextB = next.build.getLiquidDestination(self(), liquid);
+        float flow = 10.0F;
+
+
+        if(nextB.acceptLiquid(self(), liquid))
+        {
+            nextB.handleLiquid(self(), liquid, flow);
+            liquids.remove(liquid, flow);
+        }
+
+        return flow;
+    }
+
     public float moveLiquidForward(boolean leaks, Liquid liquid){
         Tile next = tile.nearby(rotation);
 
@@ -886,7 +910,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             float fract = liquids.get(liquid) / block.liquidCapacity * block.liquidPressure;
             float flow = Math.min(Mathf.clamp((fract - ofract)) * (block.liquidCapacity), liquids.get(liquid));
             flow = Math.min(flow, next.block.liquidCapacity - next.liquids.get(liquid));
-
+            System.out.println(flow);
             if(flow > 0f && ofract <= fract && next.acceptLiquid(self(), liquid)){
                 next.handleLiquid(self(), liquid, flow);
                 liquids.remove(liquid, flow);
