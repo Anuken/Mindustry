@@ -218,7 +218,10 @@ public class Mods implements Loadable{
                     }
                     //this returns a *runnable* which actually packs the resulting pixmap; this has to be done synchronously outside the method
                     return () -> {
-                        String fullName = (prefix ? mod.name + "-" : "") + baseName;
+                        //don't prefix with mod name if it's already prefixed by a category, e.g. `block-modname-content-full`.
+                        int hyphen = baseName.indexOf('-');
+                        String fullName = ((prefix && !(hyphen != -1 && baseName.substring(hyphen + 1).startsWith(mod.name + "-"))) ? mod.name + "-" : "") + baseName;
+
                         packer.add(getPage(file), fullName, new PixmapRegion(pix));
                         if(textureScale != 1.0f){
                             textureResize.put(fullName, textureScale);
