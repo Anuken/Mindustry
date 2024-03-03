@@ -993,12 +993,13 @@ public class ApplicationTests{
      * Now using dummy method to always get optimal flow with pipping
      */
     @Test
-    void liquidJunctionOutputTestablility(){
+    void liquidJunctionOutputTestability(){
         world.loadMap(testMap);
         state.set(State.playing);
         state.rules.limitMapArea = false;
 
-        Tile source = world.rawTile(0, 0), tank = world.rawTile(1, 4), junction = world.rawTile(0, 1), conduit = world.rawTile(0, 2);
+        Tile source = world.rawTile(0, 0), tank = world.rawTile(1, 4),
+                junction = world.rawTile(0, 1), conduit = world.rawTile(0, 2);
 
         source.setBlock(Blocks.liquidSource, Team.sharded);
         source.build.configureAny(Liquids.water);
@@ -1030,7 +1031,7 @@ public class ApplicationTests{
             }
         }
 
-        System.out.println(tank.build.liquids.currentAmount());
+        // System.out.println(tank.build.liquids.currentAmount());  // Print amount of water in the tank
 
         assertTrue(tank.build.liquids.currentAmount() >= 1, "Liquid not moved through junction");
         assertTrue(tank.build.liquids.current() == Liquids.water, "Tank has no water");
