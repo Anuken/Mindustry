@@ -969,6 +969,7 @@ public class UnitType extends UnlockableContent implements Senseable{
                 Drawf.checkBleed(outlined);
 
                 packer.add(PageType.main, regionName + "-outline", outlined);
+                outlined.dispose();
             }
         }
 
@@ -1021,7 +1022,9 @@ public class UnitType extends UnlockableContent implements Senseable{
                     }
 
                     packer.add(PageType.main, name + "-treads" + r + "-" + i, frame);
+                    frame.dispose();
                 }
+                slice.dispose();
             }
         }
     }

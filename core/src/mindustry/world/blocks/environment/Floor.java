@@ -177,6 +177,7 @@ public class Floor extends Block{
         }
 
         packer.add(PageType.environment, name + "-edge", result);
+        result.dispose();
     }
 
     @Override
