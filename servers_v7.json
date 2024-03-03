@@ -9,7 +9,7 @@
   },
   {
     "name": "meiqiuMDT",
-    "address": ["cn1.meiqiumdy.top:7000","cn1.meiqiumdt.top:7002","cn1.meiqiumdt.top:7006","cn1.meiqiumdt.top:7013"]
+    "address": ["cn1.meiqiumdy.top","cn1.meiqiumdt.top:7000","cn1.meiqiumdt.top:8000","cn1.meiqiumdt.top:7013"]
   },
   {
     "name": "Crux's Revelations",
@@ -25,7 +25,7 @@
   },
   {
     "name": "ShardDustry ES",
-    "address": ["94.130.132.149:35689","94.130.132.149:35438","45.158.9.198:31290","45.158.9.198:30529","94.130.132.149:35116","94.130.132.149:35160"]
+    "address": ["45.158.9.198:32389"]
   },
   {
     "name": "Tamazia",
@@ -254,7 +254,7 @@
   },
   {
     "name": "Atomic",
-    "address": ["atomic-uk.ddns.net:25595", "atomic-uk.ddns.net:25587", "atomic-uk.ddns.net:25584", "atomic-uk.ddns.net:25590"]
+    "address": ["atomic-de.ddns.net:35876", "atomic-de.ddns.net:35663", "atomic-de.ddns.net:35724", "atomic-de.ddns.net:35847"]
   },
   {
     "name": "SkyPlex",
@@ -283,9 +283,5 @@
   { 
     "name": "Sever.VN",
     "address": ["srv24.godlike.club:26189"]
-  },
-  {
-    "name": "Crimson Star",
-    "address": ["185.103.101.121:25528", "81.94.159.193"]
   }
 ]

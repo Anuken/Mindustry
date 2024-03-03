@@ -1025,14 +1025,17 @@ public class LExecutor{
                     exec.textBuffer.setLength(0);
                 }
             }else{
-                int num1 = exec.numi(p1);
+                int num1 = exec.numi(p1), xval = packSign(exec.numi(x)), yval = packSign(exec.numi(y));
 
                 if(type == LogicDisplay.commandImage){
                     num1 = exec.obj(p1) instanceof UnlockableContent u ? u.iconId : 0;
+                }else if(type == LogicDisplay.commandScale){
+                    xval = packSign((int)(exec.numf(x) / LogicDisplay.scaleStep));
+                    yval = packSign((int)(exec.numf(y) / LogicDisplay.scaleStep));
                 }
 
                 //add graphics calls, cap graphics buffer size
-                exec.graphicsBuffer.add(DisplayCmd.get(type, packSign(exec.numi(x)), packSign(exec.numi(y)), packSign(num1), packSign(exec.numi(p2)), packSign(exec.numi(p3)), packSign(exec.numi(p4))));
+                exec.graphicsBuffer.add(DisplayCmd.get(type, xval, yval, packSign(num1), packSign(exec.numi(p2)), packSign(exec.numi(p3)), packSign(exec.numi(p4))));
             }
         }
 

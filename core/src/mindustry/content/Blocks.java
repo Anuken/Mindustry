@@ -5502,23 +5502,6 @@ public class Blocks{
             );
         }};
 
-        mechRefabricator = new Reconstructor("mech-refabricator"){{
-            requirements(Category.units, with(Items.beryllium, 250, Items.tungsten, 120, Items.silicon, 150));
-            regionSuffix = "-dark";
-
-            size = 3;
-            consumePower(2.5f);
-            consumeLiquid(Liquids.hydrogen, 3f / 60f);
-            consumeItems(with(Items.silicon, 50, Items.tungsten, 40));
-
-            constructTime = 60f * 45f;
-            researchCostMultiplier = 0.75f;
-
-            upgrades.addAll(
-            new UnitType[]{UnitTypes.merui, UnitTypes.cleroi}
-            );
-        }};
-
         shipRefabricator = new Reconstructor("ship-refabricator"){{
             requirements(Category.units, with(Items.beryllium, 200, Items.tungsten, 100, Items.silicon, 150, Items.oxide, 40));
             regionSuffix = "-dark";
@@ -5535,6 +5518,23 @@ public class Blocks{
             );
 
             researchCost = with(Items.beryllium, 500, Items.tungsten, 200, Items.silicon, 300, Items.oxide, 80);
+        }};
+
+        mechRefabricator = new Reconstructor("mech-refabricator"){{
+            requirements(Category.units, with(Items.beryllium, 250, Items.tungsten, 120, Items.silicon, 150));
+            regionSuffix = "-dark";
+
+            size = 3;
+            consumePower(2.5f);
+            consumeLiquid(Liquids.hydrogen, 3f / 60f);
+            consumeItems(with(Items.silicon, 50, Items.tungsten, 40));
+
+            constructTime = 60f * 45f;
+            researchCostMultiplier = 0.75f;
+
+            upgrades.addAll(
+            new UnitType[]{UnitTypes.merui, UnitTypes.cleroi}
+            );
         }};
 
         //yes very silly name

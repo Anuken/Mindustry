@@ -260,6 +260,13 @@ public class LStatements{
                             }, 2, cell -> cell.size(165, 50)));
                         }, Styles.logict, () -> {}).size(165, 40).color(s.color).left().padLeft(2);
                     }
+                    case translate, scale -> {
+                        fields(s, "x", x, v -> x = v);
+                        fields(s, "y", y, v -> y = v);
+                    }
+                    case rotate -> {
+                        fields(s, "degrees", p1, v -> p1 = v);
+                    }
                 }
             }).expand().left();
         }
