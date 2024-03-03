@@ -340,15 +340,23 @@ public class NetClient implements ApplicationListener{
         state.rules = rules;
     }
 
+    //NOTE: avoid using this, runs into packet/buffer size limitations
     @Remote(variants = Variant.both)
     public static void setObjectives(MapObjectives executor){
         state.rules.objectives = executor;
     }
 
-    @Remote(called = Loc.server)
-    public static void objectiveCompleted(String[] flagsRemoved, String[] flagsAdded){
-        state.rules.objectiveFlags.removeAll(flagsRemoved);
-        state.rules.objectiveFlags.addAll(flagsAdded);
+    @Remote(variants = Variant.both, called = Loc.server)
+    public static void clearObjectives(){
+        state.rules.objectives.clear();
+    }
+
+    @Remote(variants = Variant.both, called = Loc.server)
+    public static void completeObjective(int index){
+        var obj = state.rules.objectives.get(index);
+        if(obj != null){
+            obj.done();
+        }
     }
 
     @Remote(variants = Variant.both)

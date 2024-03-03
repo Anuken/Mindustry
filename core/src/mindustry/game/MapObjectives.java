@@ -39,8 +39,6 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
      * @see #eachRunning(Cons)
      */
     public Seq<MapObjective> all = new Seq<>(4);
-    /** @see #checkChanged() */
-    protected transient boolean changed;
 
     static{
         registerObjective(
@@ -126,21 +124,13 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         eachRunning(obj -> {
             //objectives cannot get completed on the client, but they do try to update for timers and such
             if(obj.update() && !net.client()){
-                obj.completed = true;
-                obj.done();
+                Call.completeObjective(all.indexOf(obj));
             }
-
-            changed |= obj.changed;
-            obj.changed = false;
         });
     }
 
-    /** @return True if map rules should be synced. Reserved for {@link Vars#logic}; do not invoke directly! */
-    public boolean checkChanged(){
-        boolean has = changed;
-        changed = false;
-
-        return has;
+    public @Nullable MapObjective get(int index){
+        return index < 0 || index >= all.size ? null : all.get(index);
     }
 
     /** @return Whether there are any qualified objectives at all. */
@@ -149,7 +139,6 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
     }
 
     public void clear(){
-        if(all.size > 0) changed = true;
         all.clear();
     }
 
@@ -191,7 +180,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         /** Whether this objective has been done yet. This is internally set. */
         private boolean completed;
         /** Internal value. Do not modify! */
-        private transient boolean depFinished, changed;
+        private transient boolean depFinished;
 
         /** @return True if this objective is done and should be removed from the executor. */
         public abstract boolean update();
@@ -201,13 +190,9 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         /** Called once after {@link #update()} returns true, before this objective is removed. */
         public void done(){
-            changed();
-            Call.objectiveCompleted(flagsRemoved, flagsAdded);
-        }
-
-        /** Notifies the executor that map rules should be synced. */
-        protected void changed(){
-            changed = true;
+            state.rules.objectiveFlags.removeAll(flagsRemoved);
+            state.rules.objectiveFlags.addAll(flagsAdded);
+            completed = true;
         }
 
         /** @return True if all {@link #parents} are completed, rendering this objective able to execute. */
