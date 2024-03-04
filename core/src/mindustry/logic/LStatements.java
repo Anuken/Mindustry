@@ -1443,7 +1443,7 @@ public class LStatements{
 
         @Override
         public void build(Table table){
-            table.add("set weather ");
+            table.add(" set weather ");
 
             tfield = field(table, weather, str -> weather = str).padRight(0f).get();
 
