@@ -13,8 +13,8 @@ import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
-import mindustry.game.*;
 import mindustry.game.EventType.*;
+import mindustry.game.*;
 import mindustry.game.MapObjectives.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
@@ -1512,18 +1512,16 @@ public class LExecutor{
     }
 
     public static class SenseWeatherI implements LInstruction{
-        public int type, state, to;
+        public int type, to;
 
-        public SenseWeatherI(int type, int state, int to){
+        public SenseWeatherI(int type, int to){
             this.type = type;
-            this.state = state;
             this.to = to;
         }
 
         @Override
         public void run(LExecutor exec){
-            boolean active = exec.obj(type) instanceof Weather weather && weather.isActive();
-            exec.setbool(to, active == exec.bool(state));
+            exec.setbool(to, exec.obj(type) instanceof Weather weather && weather.isActive());
         }
     }
 

@@ -1383,7 +1383,7 @@ public class LStatements{
     @RegisterStatement("weathersensor")
     public static class WeatherSenseStatement extends LStatement{
         public String to = "result";
-        public String weather = "@rain", state = "true";
+        public String weather = "@rain";
 
         private transient TextField tfield;
 
@@ -1391,7 +1391,7 @@ public class LStatements{
         public void build(Table table){
             field(table, to, str -> to = str);
 
-            table.add(" = ");
+            table.add(" = weather ");
 
             row(table);
 
@@ -1417,10 +1417,6 @@ public class LStatements{
                     }).left();
                 }));
             }, Styles.logict, () -> {}).size(40f).padLeft(-1).color(table.color);
-
-            table.add(" state ").self(this::param);
-
-            fields(table, state, str -> state = str);
         }
 
         @Override
@@ -1430,7 +1426,7 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new SenseWeatherI(builder.var(weather), builder.var(state), builder.var(to));
+            return new SenseWeatherI(builder.var(weather), builder.var(to));
         }
 
         @Override
@@ -1447,7 +1443,7 @@ public class LStatements{
 
         @Override
         public void build(Table table){
-            table.add("set ");
+            table.add("set weather ");
 
             tfield = field(table, weather, str -> weather = str).padRight(0f).get();
 
@@ -1472,7 +1468,7 @@ public class LStatements{
                 }));
             }, Styles.logict, () -> {}).size(40f).padLeft(-1).color(table.color);
 
-            table.add(" state ").self(this::param);
+            table.add(" state ");
 
             fields(table, state, str -> state = str);
         }
