@@ -1511,6 +1511,22 @@ public class LExecutor{
         }
     }
 
+    public static class SenseWeatherI implements LInstruction{
+        public int type, state, to;
+
+        public SenseWeatherI(int type, int state, int to){
+            this.type = type;
+            this.state = state;
+            this.to = to;
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            boolean active = exec.obj(type) instanceof Weather weather && weather.isActive();
+            exec.setbool(to, active == exec.bool(state));
+        }
+    }
+
     public static class ApplyEffectI implements LInstruction{
         public boolean clear;
         public String effect;
