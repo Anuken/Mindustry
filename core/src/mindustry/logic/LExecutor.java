@@ -1527,6 +1527,33 @@ public class LExecutor{
         }
     }
 
+    public static class SetWeatherI implements LInstruction{
+        public int type, state;
+
+        public SetWeatherI(int type, int state){
+            this.type = type;
+            this.state = state;
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            if(exec.obj(type) instanceof Weather weather){
+                if(exec.bool(state)){
+                    if(!weather.isActive()){ //Create is not already active
+                        Tmp.v1.setToRandomDirection();
+                        Call.createWeather(weather, 1f, Float.POSITIVE_INFINITY, Tmp.v1.x, Tmp.v1.y);
+                    }else{
+                        weather.instance().life(Float.POSITIVE_INFINITY);
+                    }
+                }else{
+                    if(weather.isActive() && weather.instance().life > WeatherState.fadeTime){
+                        weather.instance().life(WeatherState.fadeTime);
+                    }
+                }
+            }
+        }
+    }
+
     public static class ApplyEffectI implements LInstruction{
         public boolean clear;
         public String effect;
