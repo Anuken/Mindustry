@@ -1410,7 +1410,7 @@ public class LStatements{
                                 weather = "@" + w.name;
                                 tfield.setText(weather);
                                 hide.run();
-                            }).height(40f).uniformX().wrapLabel(false);
+                            }).height(40f).uniformX().wrapLabel(false).growX();
 
                             if(++c % 2 == 0) i.row();
                         }
@@ -1464,7 +1464,7 @@ public class LStatements{
                                 weather = "@" + w.name;
                                 tfield.setText(weather);
                                 hide.run();
-                            }).height(40f).uniformX().wrapLabel(false);
+                            }).height(40f).uniformX().wrapLabel(false).growX();
 
                             if(++c % 2 == 0) i.row();
                         }

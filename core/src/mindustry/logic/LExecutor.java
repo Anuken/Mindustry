@@ -1541,9 +1541,9 @@ public class LExecutor{
                 if(exec.bool(state)){
                     if(!weather.isActive()){ //Create is not already active
                         Tmp.v1.setToRandomDirection();
-                        Call.createWeather(weather, 1f, Float.POSITIVE_INFINITY, Tmp.v1.x, Tmp.v1.y);
+                        Call.createWeather(weather, 1f, WeatherState.fadeTime, Tmp.v1.x, Tmp.v1.y);
                     }else{
-                        weather.instance().life(Float.POSITIVE_INFINITY);
+                        weather.instance().life(WeatherState.fadeTime);
                     }
                 }else{
                     if(weather.isActive() && weather.instance().life > WeatherState.fadeTime){
