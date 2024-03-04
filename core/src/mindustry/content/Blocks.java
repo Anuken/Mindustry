@@ -2884,7 +2884,7 @@ public class Blocks{
             //TODO different requirements
             consumePower(6f);
             consumeLiquid(Liquids.hydrogen, 4f / 60f);
-            consumeLiquid(Liquids.cyanogen, 1.5f / 60f).boost();
+            consumeLiquid(Liquids.cyanogen, 3f / 60f).boost();
         }};
 
         //endregion
