@@ -1093,7 +1093,7 @@ public class ApplicationTests{
         // must be reset properly and that requires reset to run. Involves calling an event to clear timers, stats and
         // other info that needs to be updated
         verify(logMock, atLeast(1)).reset();
-
+        //ensure we return our original logic class to avoid failures in rest of test suite
         logic = oldLogic;
     }
 
