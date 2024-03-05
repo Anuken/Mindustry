@@ -1141,7 +1141,6 @@ public class ApplicationTests{
     @Test
     void TurretBuildVerification_Mocking()
     {
-        Logic oldLogic = logic;
 
         createMap();
         state.set(State.playing);
@@ -1167,7 +1166,6 @@ public class ApplicationTests{
         verify(duoMock, atLeast(0)).recache();
         verify(duoMock, atLeast(0)).recacheWall();
 
-        logic = oldLogic;
     }
 
     @Test
