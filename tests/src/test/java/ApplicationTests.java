@@ -1137,7 +1137,7 @@ public class ApplicationTests{
         duoMock.setBlock(Blocks.duo, Team.sharded);
 
         // Create copper source at 0,0
-        //this source tile creation shouldn't impact the creation of our current, should consistently
+        //this source tile creation shouldn't impact the creation of our turrent, should consistently
         //only require one call of setblocks for our turret
         Tile source = world.rawTile(0,0);
         source.setBlock(Blocks.itemSource, Team.sharded);
@@ -1147,7 +1147,9 @@ public class ApplicationTests{
 
         //verify the duo Building uses proper setBlock
         verify(duoMock, atLeast(1)).setBlock(Blocks.duo, Team.sharded);
-        //verify(duoMock, atLeast(1)).recache();
+        //verify that tile is not static we create (if static then we have to recache for renderer)
+        verify(duoMock, atLeast(0)).recache();
+        verify(duoMock, atLeast(0)).recacheWall();
     }
 
     @Test
