@@ -1054,6 +1054,8 @@ public class ApplicationTests{
     @Test
     void MockVerifyLogicGameStateResetTest(){
         //make mock of logic
+        Logic oldLogic = logic;
+
         Logic logMock = Mockito.mock(Logic.class);
         logic = logMock;
 
@@ -1090,6 +1092,8 @@ public class ApplicationTests{
         // must be reset properly and that requires reset to run. Involves calling an event to clear timers, stats and
         // other info that needs to be updated
         verify(logMock, atLeast(1)).reset();
+
+        logic = oldLogic;
     }
 
     /**
@@ -1097,6 +1101,8 @@ public class ApplicationTests{
      */
     @Test
     void LogicMockTest() {
+        Logic oldLogic = logic;
+
         Logic logMock = Mockito.mock(Logic.class);
         logic = logMock;
 
@@ -1122,16 +1128,19 @@ public class ApplicationTests{
         //test game over state and verify how often CheckGameState is run
         verify(logMock, atLeast(1)).update();
 
+        logic = oldLogic;
     }
 
     /**
      * Build turret and verify correct procedure for method calls
      *
-     * Should be corresponding setBlock call for Turrent building
+     * Should be corresponding setBlock call for Turent building
      */
     @Test
     void TurretBuildVerification_Mocking()
     {
+        Logic oldLogic = logic;
+
         createMap();
         state.set(State.playing);
 
@@ -1155,6 +1164,8 @@ public class ApplicationTests{
         //verify that tile is not static we create (if static then we have to recache for renderer)
         verify(duoMock, atLeast(0)).recache();
         verify(duoMock, atLeast(0)).recacheWall();
+
+        logic = oldLogic;
     }
 
     @Test
