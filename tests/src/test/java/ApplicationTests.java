@@ -346,9 +346,9 @@ public class ApplicationTests{
             boolean boss = state.rules.spawns.contains(group -> group.getSpawned(state.wave - 2) > 0 && group.effect == StatusEffects.boss);
             if (boss)
             {
-                System.out.println("BOSS ROUND REACHED"); //nuclear complex round 50 eclipse boss spawns.
+                //System.out.println("BOSS ROUND REACHED"); //nuclear complex round 50 eclipse boss spawns.
                 assertTrue(boss, "boss wave assertion");
-                System.out.println("RUNNING BOSS ROUND");
+                //System.out.println("RUNNING BOSS ROUND");
                 Groups.unit.update();
                 break;
             }
@@ -1039,7 +1039,6 @@ public class ApplicationTests{
         }
 
         // System.out.println(tank.build.liquids.currentAmount());  // Print amount of water in the tank
-
         assertTrue(tank.build.liquids.currentAmount() >= 1, "Liquid not moved through junction");
         assertTrue(tank.build.liquids.current() == Liquids.water, "Tank has no water");
     }
@@ -1141,7 +1140,6 @@ public class ApplicationTests{
     @Test
     void TurretBuildVerification_Mocking()
     {
-
         createMap();
         state.set(State.playing);
 
@@ -1165,7 +1163,6 @@ public class ApplicationTests{
         //verify that tile is not static we create (if static then we have to recache for renderer)
         verify(duoMock, atLeast(0)).recache();
         verify(duoMock, atLeast(0)).recacheWall();
-
     }
 
     @Test
