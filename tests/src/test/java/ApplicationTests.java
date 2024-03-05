@@ -294,7 +294,7 @@ public class ApplicationTests{
             if (boss)
             {
                 System.out.println("BOSS ROUND"); //nuclear complex round 50 eclipse boss spawns.
-
+                assertTrue(state.rules.waves); // there are still more waves of enemies. game not finished yet
                 int after_boss = 0;
                 while (after_boss < 3)
                 {
@@ -302,7 +302,7 @@ public class ApplicationTests{
                     //state.rules.attackMode = true;
                     if(state.rules.waves && (state.enemies == 0 && state.rules.winWave > 0 && state.wave >= state.rules.winWave && !spawner.isSpawning()) ||
                             (state.rules.attackMode && state.rules.waveTeam.cores().isEmpty())){
-                            Call.sectorCapture();
+                        Call.sectorCapture();
                         /*if(state.rules.sector.preset != null && state.rules.sector.preset.attackAfterWaves && !state.rules.attackMode){
                             //activate attack mode to destroy cores after waves are done.
                             state.rules.attackMode = true;
@@ -321,7 +321,12 @@ public class ApplicationTests{
             wave_count++;
         }
         Call.sectorCapture();
-        System.out.println("GG");
+        assertFalse(state.rules.waves); //state.rules.waves now being false means sector has been captured and game is over
+        System.out.println("gg");
+        //no more waves = no more enemies = gg
+        //force trigger delayed spawns
+        //Time.setDeltaProvider(() -> 1000f);
+        //assertFalse(Groups.unit.isEmpty(), "No enemies spawned.");
     }
     
     /**
@@ -347,7 +352,7 @@ public class ApplicationTests{
                 Groups.unit.update();
                 break;
             }
-            System.out.println("BOSS ROUND IS " + boss);
+            //System.out.println("BOSS ROUND IS " + boss);
             Groups.unit.update();
             wave_count++;
         }
