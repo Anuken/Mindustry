@@ -1042,8 +1042,53 @@ public class ApplicationTests{
     //===========================================
 
     /**
-     *
-     * testing how often certain methods are run in our logic class
+     * Make sure reset to make sure game state is properly updated and reset
+     * Any time game state is updated, it must be reset properly and that requires reset to run
+     * Involves calling an event to clear timers, stats and other info that needs to be updated
+     */
+    @Test
+    void MockVerifyLogicGameStateResetTest(){
+        //make mock of logic
+        Logic logMock = Mockito.mock(Logic.class);
+        logic = logMock;
+
+        int wave_count = 0;
+        testMap = maps.loadInternalMap("nuclearComplex");
+        world.loadMap(testMap);
+        //trigger and surpass boss wave so we can meet parameters of a sector capture status
+        while (wave_count < 100)
+        {
+            logic.runWave();
+            boolean boss = state.rules.spawns.contains(group -> group.getSpawned(state.wave - 2) > 0 &&
+                    group.effect == StatusEffects.boss);
+            if (boss)
+            {
+                int after_boss = 0;
+                while (after_boss < 3)
+                {
+                    if(state.rules.waves && (state.enemies == 0 && state.rules.winWave > 0 && state.wave >=
+                            state.rules.winWave && !spawner.isSpawning()) || (state.rules.attackMode &&
+                            state.rules.waveTeam.cores().isEmpty())){
+                        Call.sectorCapture();
+                    }
+                    Groups.unit.update();
+                    after_boss++;
+                }
+            }
+            Groups.unit.update();
+            Groups.clear();
+            wave_count++;
+        }
+        Call.sectorCapture();
+
+        //make sure reset to make sure game state is properly updated and reset. any time game state is updated, it
+        // must be reset properly and that requires reset to run. Involves calling an event to clear timers, stats and
+        // other info that needs to be updated
+        verify(logMock, atLeast(1)).reset();
+    }
+
+    /**
+     * Testing how often certain methods are run in our logic class
      */
     @Test
     void LogicMockTest() {
@@ -1070,7 +1115,6 @@ public class ApplicationTests{
         logic.update();
 
         //test game over state and verify how often CheckGameState is run
-        //or other public methods?
         verify(logMock, atLeast(1)).update();
 
     }
@@ -1093,14 +1137,17 @@ public class ApplicationTests{
         duoMock.setBlock(Blocks.duo, Team.sharded);
 
         // Create copper source at 0,0
-        //this source tile creation shouldn't impact the creation of our turrent, should consistently
+        //this source tile creation shouldn't impact the creation of our current, should consistently
         //only require one call of setblocks for our turret
         Tile source = world.rawTile(0,0);
         source.setBlock(Blocks.itemSource, Team.sharded);
         source.build.configureAny(Items.copper);
 
+        updateBlocks(100);
+
         //verify the duo Building uses proper setBlock
         verify(duoMock, atLeast(1)).setBlock(Blocks.duo, Team.sharded);
+        //verify(duoMock, atLeast(1)).recache();
     }
 
     @Test
