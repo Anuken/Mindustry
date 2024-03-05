@@ -983,9 +983,11 @@ public class ApplicationTests{
      * a function that was previously uncovered in our test suite. However, due to our BlockStub
      * class, we are now able to access it directly and get the result for a tile made on 1,1 on
      * the game map.
+     *
+     * No LONGER IN USE
      */
 
-    @Test
+    //@Test
     void BlockStubTest()
     {
         BlockStub stub = new BlockStub("coal");
