@@ -377,6 +377,10 @@ public class PowerGraph{
         if(entity != null) entity.remove();
     }
 
+    public int getId(){
+        return graphID;
+    }
+
     @Deprecated
     private boolean otherConsumersAreValid(Building build, Consume consumePower){
         if(!build.enabled) return false;

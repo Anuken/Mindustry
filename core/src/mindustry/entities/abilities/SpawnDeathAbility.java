@@ -1,6 +1,7 @@
 package mindustry.entities.abilities;
 
 import arc.math.*;
+import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.gen.*;
@@ -22,6 +23,11 @@ public class SpawnDeathAbility extends Ability{
     }
 
     public SpawnDeathAbility(){
+    }
+
+    @Override
+    public void addStats(Table t){
+        t.add((randAmount > 0 ? amount + "-" + (amount + randAmount) : amount) + " " + unit.emoji() + " " + unit.localizedName);
     }
 
     @Override

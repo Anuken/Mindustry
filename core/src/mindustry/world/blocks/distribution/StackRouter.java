@@ -61,6 +61,11 @@ public class StackRouter extends DuctRouter{
             if((current == null || items.get(current) == 0) && items.total() > 0){
                 current = items.first();
             }
+
+            if(items.empty()){
+                unloading = false;
+                current = null;
+            }
         }
 
         @Override

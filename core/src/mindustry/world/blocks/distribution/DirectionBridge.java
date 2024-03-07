@@ -40,6 +40,7 @@ public class DirectionBridge extends Block{
         priority = TargetPriority.transport;
         envEnabled = Env.space | Env.terrestrial | Env.underwater;
         drawArrow = false;
+        allowDiagonal = false;
         regionRotated1 = 1;
     }
 

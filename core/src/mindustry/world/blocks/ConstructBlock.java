@@ -75,15 +75,13 @@ public class ConstructBlock extends Block{
 
         if(block instanceof OverlayFloor overlay){
             tile.setOverlay(overlay);
-            tile.setBlock(Blocks.air);
         }else if(block instanceof Floor floor){
             tile.setFloorUnder(floor);
-            tile.setBlock(Blocks.air);
         }else{
             tile.setBlock(block, team, rotation);
         }
 
-        if(tile.build != null){
+        if(tile.build != null && tile.build.block == block){
             tile.build.health = block.health * healthf;
 
             if(config != null){
@@ -100,11 +98,11 @@ public class ConstructBlock extends Block{
 
             //make sure block indexer knows it's damaged
             indexer.notifyHealthChanged(tile.build);
-        }
 
-        //last builder was this local client player, call placed()
-        if(tile.build != null && !headless && builder == player.unit()){
-            tile.build.playerPlaced(config);
+            //last builder was this local client player, call placed()
+            if(!headless && builder == player.unit()){
+                tile.build.playerPlaced(config);
+            }
         }
 
         if(fogControl.isVisibleTile(team, tile.x, tile.y)){

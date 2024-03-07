@@ -32,6 +32,10 @@ public class GameState{
     public Rules rules = new Rules();
     /** Statistics for this save/game. Displayed after game over. */
     public GameStats stats = new GameStats();
+    /** Markers not linked to objectives. Controlled by world processors. */
+    public MapMarkers markers = new MapMarkers();
+    /** Locale-specific string bundles of current map */
+    public MapLocales mapLocales = new MapLocales();
     /** Global attributes of the environment, calculated by weather. */
     public Attributes envAttrs = new Attributes();
     /** Team data. Gets reset every new game. */
@@ -82,11 +86,12 @@ public class GameState{
     }
 
     public boolean isPaused(){
-        return is(State.paused);
+        return state == State.paused;
     }
 
+    /** @return whether there is an unpaused game in progress. */
     public boolean isPlaying(){
-        return (state == State.playing) || (state == State.paused && !isPaused());
+        return state == State.playing;
     }
 
     /** @return whether the current state is *not* the menu. */

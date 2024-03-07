@@ -3,6 +3,7 @@ package mindustry.net;
 import arc.*;
 import arc.func.*;
 import arc.net.*;
+import arc.net.Server.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.game.EventType.*;
@@ -325,6 +326,15 @@ public class Net{
         }
     }
 
+    /** Sets a connection filter by IP address. If the filter returns {@code false}, the connection will be closed. Server only. */
+    public void setConnectFilter(@Nullable ServerConnectFilter filter){
+        provider.setConnectFilter(filter);
+    }
+
+    public @Nullable ServerConnectFilter getConnectFilter(){
+        return provider.getConnectFilter();
+    }
+
     /**
      * Pings a host in a pooled thread. If an error occurred, failed() should be called with the exception.
      * If the port is the default mindustry port, SRV records are checked too.
@@ -401,5 +411,9 @@ public class Net{
 
         /** Sets a connection filter by IP address. If the filter returns {@code false}, the connection will be closed. */
         default void setConnectFilter(Server.ServerConnectFilter connectFilter){}
+
+        default @Nullable ServerConnectFilter getConnectFilter(){
+            return null;
+        }
     }
 }

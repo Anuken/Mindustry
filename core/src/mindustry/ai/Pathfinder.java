@@ -159,7 +159,7 @@ public class Pathfinder implements Runnable{
             if(other != null){
                 Floor floor = other.floor();
                 boolean osolid = other.solid();
-                if(floor.isLiquid) nearLiquid = true;
+                if(floor.isLiquid && floor.isDeep()) nearLiquid = true;
                 //TODO potentially strange behavior when teamPassable is false for other teams?
                 if(osolid && !other.block().teamPassable) nearSolid = true;
                 if(!floor.isLiquid) nearGround = true;

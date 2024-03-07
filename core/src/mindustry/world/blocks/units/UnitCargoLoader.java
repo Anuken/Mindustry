@@ -54,10 +54,10 @@ public class UnitCargoLoader extends Block{
             Core.bundle.format("bar.unitcap",
                 Fonts.getUnicodeStr(unitType.name),
                 e.team.data().countType(unitType),
-                Units.getStringCap(e.team)
+                unitType.useUnitCap ? Units.getStringCap(e.team) : "∞"
             ),
             () -> Pal.power,
-            () -> (float)e.team.data().countType(unitType) / Units.getCap(e.team)
+            () -> unitType.useUnitCap ? (float)e.team.data().countType(unitType) / Units.getCap(e.team) : 1f
         ));
     }
 

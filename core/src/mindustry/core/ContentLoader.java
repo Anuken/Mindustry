@@ -6,6 +6,7 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.ai.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.entities.bullet.*;
@@ -40,6 +41,8 @@ public class ContentLoader{
 
     /** Creates all base types. */
     public void createBaseContent(){
+        UnitCommand.loadAll();
+        UnitStance.loadAll();
         TeamEntries.load();
         Items.load();
         StatusEffects.load();
@@ -309,5 +312,29 @@ public class ContentLoader{
 
     public Planet planet(String name){
         return getByName(ContentType.planet, name);
+    }
+
+    public Seq<UnitStance> unitStances(){
+        return getBy(ContentType.unitStance);
+    }
+
+    public UnitStance unitStance(int id){
+        return getByID(ContentType.unitStance, id);
+    }
+
+    public UnitStance unitStance(String name){
+        return getByName(ContentType.unitStance, name);
+    }
+
+    public Seq<UnitCommand> unitCommands(){
+        return getBy(ContentType.unitCommand);
+    }
+
+    public UnitCommand unitCommand(int id){
+        return getByID(ContentType.unitCommand, id);
+    }
+
+    public UnitCommand unitCommand(String name){
+        return getByName(ContentType.unitCommand, name);
     }
 }

@@ -1,10 +1,14 @@
 buildscript{
     ext{
-        getArcHash = {
-            return new Properties().with{ p -> p.load(file('gradle.properties').newReader()); return p }["archash"]
-        }
+        arcHash = property("archash")
 
-        arcHash = getArcHash()
+        localArc = !project.hasProperty("release") && new File(rootDir.parent, 'Arc').exists() && !project.hasProperty("noLocalArc")
+
+        arcModule = { String name ->
+            //skip to last submodule
+            name = name.substring(name.lastIndexOf(':') + 1)
+            return "com.github.Anuken${localArc ? "" : ".Arc"}:$name:$arcHash"
+        }
     }
     
     repositories{
@@ -16,8 +20,8 @@ buildscript{
     }
 
     dependencies{
-        classpath "com.github.Anuken.Arc:packer:$arcHash"
-        classpath "com.github.Anuken.Arc:arc-core:$arcHash"
+        classpath arcModule(":extensions:packer")
+        classpath arcModule(":arc-core")
     }
 }
 
@@ -46,20 +50,6 @@ allprojects{
 
         debugged = {
             return new File(projectDir.parent, '../Mindustry-Debug').exists() && !project.hasProperty("release") && project.hasProperty("args")
-        }
-
-        localArc = {
-            return !project.hasProperty("release") && !project.hasProperty("noLocalArc") && new File(projectDir.parent, '../Arc').exists()
-        }
-
-        arcModule = { String name ->
-            if(localArc()){
-                return project(":Arc:$name")
-            }else{
-                //skip to last submodule
-                if(name.contains(':')) name = name.split(':').last()
-                return "com.github.Anuken.Arc:$name:${getArcHash()}"
-            }
         }
 
         generateDeployName = { String platform ->
@@ -116,12 +106,12 @@ allprojects{
         generateLocales = {
             def output = 'en\n'
             def bundles = new File(project(':core').projectDir, 'assets/bundles/')
-            bundles.listFiles().each{ other ->
-                if(other.name == "bundle.properties") return
-                output += other.name.substring("bundle".length() + 1, other.name.lastIndexOf('.')) + "\n"
+            bundles.list().sort().each{ name ->
+                if(name == "bundle.properties") return
+                output += name.substring("bundle".length() + 1, name.lastIndexOf('.')) + "\n"
             }
             new File(project(':core').projectDir, 'assets/locales').text = output
-            new File(project(':core').projectDir, 'assets/basepartnames').text = new File(project(':core').projectDir, 'assets/baseparts/').list().join("\n")
+            new File(project(':core').projectDir, 'assets/basepartnames').text = new File(project(':core').projectDir, 'assets/baseparts/').list().sort().join("\n")
         }
 
         writeVersion = {
@@ -195,7 +185,7 @@ allprojects{
 
     tasks.withType(JavaCompile){
         targetCompatibility = 8
-        sourceCompatibility = JavaVersion.VERSION_16
+        sourceCompatibility = JavaVersion.VERSION_17
         options.encoding = "UTF-8"
         options.compilerArgs += ["-Xlint:deprecation"]
         dependsOn clearCache
@@ -331,12 +321,12 @@ project(":core"){
         api arcModule("extensions:fx")
         api arcModule("extensions:arcnet")
         api "com.github.Anuken:rhino:$rhinoVersion"
-        if(localArc() && debugged()) api arcModule("extensions:recorder")
-        if(localArc()) api arcModule(":extensions:packer")
+        if(localArc && debugged()) api arcModule("extensions:recorder")
+        if(localArc) api arcModule(":extensions:packer")
 
         annotationProcessor 'com.github.Anuken:jabel:0.9.0'
         compileOnly project(":annotations")
-        kapt project(":annotations")
+        if(!project.hasProperty("noKapt")) kapt project(":annotations")
     }
 
     afterEvaluate{
@@ -391,6 +381,7 @@ project(":tests"){
         testImplementation "org.junit.jupiter:junit-jupiter-params:5.7.1"
         testImplementation "org.junit.jupiter:junit-jupiter-api:5.7.1"
         testImplementation arcModule("backends:backend-headless")
+        testImplementation "org.json:json:20230618"
         testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.7.1"
     }
 
@@ -423,7 +414,7 @@ project(":annotations"){
 
     dependencies{
         implementation 'com.squareup:javapoet:1.12.1'
-        implementation "com.github.Anuken.Arc:arc-core:$arcHash"
+        implementation arcModule("arc-core")
     }
 }
 
