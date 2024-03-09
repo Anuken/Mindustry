@@ -1,5 +1,9 @@
 [
   {
+    "name": "gods field",
+    "address": ["n2.akiracloud.net:10225"]
+  },
+  {
     "name": "STP",
     "address": ["23.88.73.88:25617"]
   },
