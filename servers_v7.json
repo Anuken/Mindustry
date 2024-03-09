@@ -292,5 +292,9 @@
   { 
     "name": "Sever.VN",
     "address": ["srv24.godlike.club:26189"]
+  },
+  {
+    "name": "NPTS",
+    "address": ["81.94.159.242"]
   }
 ]
