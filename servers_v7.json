@@ -1,5 +1,9 @@
 [
   {
+    "name": "gods field",
+    "address": ["n2.akiracloud.net:10225"]
+  },
+  {
     "name": "STP",
     "address": ["23.88.73.88:25617"]
   },
@@ -284,5 +288,9 @@
   { 
     "name": "Sever.VN",
     "address": ["srv24.godlike.club:26189"]
+  },
+  {
+    "name": "NPTS",
+    "address": ["81.94.159.242"]
   }
 ]
