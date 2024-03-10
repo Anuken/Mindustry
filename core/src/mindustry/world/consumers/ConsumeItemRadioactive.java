@@ -1,6 +1,7 @@
 package mindustry.world.consumers;
 
 import mindustry.gen.*;
+import mindustry.world.meta.*;
 
 public class ConsumeItemRadioactive extends ConsumeItemFilter{
     public float minRadioactivity;
@@ -18,5 +19,10 @@ public class ConsumeItemRadioactive extends ConsumeItemFilter{
     public float efficiencyMultiplier(Building build){
         var item = getConsumed(build);
         return item == null ? 0f : item.radioactivity;
+    }
+
+    @Override
+    public void display(Stats stats){
+        stats.add(booster ? Stat.booster : Stat.input, StatValues.itemEffMultiplier(i -> i.radioactivity, filter));
     }
 }

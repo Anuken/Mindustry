@@ -1,6 +1,7 @@
 package mindustry.world.consumers;
 
 import mindustry.gen.*;
+import mindustry.world.meta.*;
 
 /** For mods. I don't use this (yet). */
 public class ConsumeItemCharged extends ConsumeItemFilter{
@@ -19,5 +20,10 @@ public class ConsumeItemCharged extends ConsumeItemFilter{
     public float efficiencyMultiplier(Building build){
         var item = getConsumed(build);
         return item == null ? 0f : item.charge;
+    }
+
+    @Override
+    public void display(Stats stats){
+        stats.add(booster ? Stat.booster : Stat.input, StatValues.itemEffMultiplier(i -> i.charge, filter));
     }
 }

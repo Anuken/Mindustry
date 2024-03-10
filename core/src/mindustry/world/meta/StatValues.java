@@ -292,6 +292,42 @@ public class StatValues{
         };
     }
 
+    public static StatValue itemEffMultiplier(Floatf<Item> efficiency, Boolf<Item> filter){
+        return table -> {
+            table.row();
+            table.table(c -> {
+                for(Item item : content.items()){
+                    if(!filter.get(item)) continue;
+
+                    c.table(Styles.grayPanel, b -> {
+                        b.image(item.uiIcon).size(40).pad(10f).left().scaling(Scaling.fit);
+                        b.add(item.localizedName).left().grow();
+                        b.add(Core.bundle.format("stat.efficiency", fixValue(efficiency.get(item) * 100f))).right().pad(10f).padRight(15f);
+                    }).growX().pad(5).row();
+                }
+            }).growX().colspan(table.getColumns());
+            table.row();
+        };
+    }
+
+    public static StatValue liquidEffMultiplier(Floatf<Liquid> efficiency, Boolf<Liquid> filter){
+        return table -> {
+            table.row();
+            table.table(c -> {
+                for(Liquid liquid : content.liquids()){
+                    if(!filter.get(liquid)) continue;
+
+                    c.table(Styles.grayPanel, b -> {
+                        b.image(liquid.uiIcon).size(40).pad(10f).left().scaling(Scaling.fit);
+                        b.add(liquid.localizedName).left().grow();
+                        b.add(Core.bundle.format("stat.efficiency", fixValue(efficiency.get(liquid) * 100f))).right().pad(10f).padRight(15f);
+                    }).growX().pad(5).row();
+                }
+            }).growX().colspan(table.getColumns());
+            table.row();
+        };
+    }
+
     public static StatValue speedBoosters(String unit, float amount, float speed, boolean strength, Boolf<Liquid> filter){
         return table -> {
             table.row();
