@@ -69,6 +69,8 @@ public class OreBlock extends OverlayFloor{
                 packer.add(PageType.editor, "editor-block-" + name + "-full", image);
                 packer.add(PageType.main, "block-" + name + "-full", image);
             }
+
+            image.dispose();
         }
     }
 

@@ -357,7 +357,8 @@ public class Logic implements ApplicationListener{
 
         //map is over, no more world processor objective stuff
         state.rules.disableWorldProcessors = true;
-        state.rules.objectives.clear();
+
+        Call.clearObjectives();
 
         //save, just in case
         if(!headless && !net.client()){
@@ -460,9 +461,6 @@ public class Logic implements ApplicationListener{
 
                 if(!state.isEditor()){
                     state.rules.objectives.update();
-                    if(state.rules.objectives.checkChanged() && net.server()){
-                        Call.setObjectives(state.rules.objectives);
-                    }
                 }
 
                 if(state.rules.waves && state.rules.waveTimer && !state.gameOver){
