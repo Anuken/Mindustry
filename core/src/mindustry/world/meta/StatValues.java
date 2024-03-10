@@ -296,9 +296,7 @@ public class StatValues{
         return table -> {
             table.row();
             table.table(c -> {
-                for(Item item : content.items()){
-                    if(!filter.get(item)) continue;
-
+                for(Item item : content.items().select(i -> filter.get(i) && i.unlockedNow() && !i.isHidden())){
                     c.table(Styles.grayPanel, b -> {
                         b.image(item.uiIcon).size(40).pad(10f).left().scaling(Scaling.fit);
                         b.add(item.localizedName).left().grow();
@@ -314,9 +312,7 @@ public class StatValues{
         return table -> {
             table.row();
             table.table(c -> {
-                for(Liquid liquid : content.liquids()){
-                    if(!filter.get(liquid)) continue;
-
+                for(Liquid liquid : content.liquids().select(l -> filter.get(l) && l.unlockedNow() && !l.isHidden())){
                     c.table(Styles.grayPanel, b -> {
                         b.image(liquid.uiIcon).size(40).pad(10f).left().scaling(Scaling.fit);
                         b.add(liquid.localizedName).left().grow();
