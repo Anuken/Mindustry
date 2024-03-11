@@ -203,17 +203,7 @@ public class PlanetRenderer implements Disposable{
     }
 
     public void setPlane(Sector sector){
-        float rotation = -sector.planet.getRotation();
-        float length = 0.01f;
-
-        projector.setPlane(
-        //origin on sector position
-        Tmp.v33.set(sector.tile.v).setLength((outlineRad + length) * sector.planet.radius).rotate(Vec3.Y, rotation).add(sector.planet.position),
-        //face up
-        sector.plane.project(Tmp.v32.set(sector.tile.v).add(Vec3.Y)).sub(sector.tile.v, sector.planet.radius).rotate(Vec3.Y, rotation).nor(),
-        //right vector
-        Tmp.v31.set(Tmp.v32).rotate(Vec3.Y, -rotation).add(sector.tile.v).rotate(sector.tile.v, 90).sub(sector.tile.v).rotate(Vec3.Y, rotation).nor()
-        );
+        sector.planet.setPlane(sector, projector);
     }
 
     public void fill(Sector sector, Color color, float offset){

@@ -236,7 +236,7 @@ public class Sector{
 
     /** Projects this sector onto a 4-corner square for use in map gen.
      * Allocates a new object. Do not call in the main loop. */
-    private SectorRect makeRect(){
+    protected SectorRect makeRect(){
         Vec3[] corners = new Vec3[tile.corners.length];
         for(int i = 0; i < corners.length; i++){
             corners[i] = tile.corners[i].v.cpy().setLength(planet.radius);

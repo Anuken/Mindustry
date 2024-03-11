@@ -115,6 +115,7 @@ public abstract class UnlockableContent extends MappableContent{
                     var result = Pixmaps.outline(base, outlineColor, outlineRadius);
                     Drawf.checkBleed(result);
                     packer.add(page, regName, result);
+                    result.dispose();
                 }
             }
         }
@@ -126,6 +127,7 @@ public abstract class UnlockableContent extends MappableContent{
             var result = Pixmaps.outline(base, outlineColor, outlineRadius);
             Drawf.checkBleed(result);
             packer.add(PageType.main, name, result);
+            result.dispose();
         }
     }
 

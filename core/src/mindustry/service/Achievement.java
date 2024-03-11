@@ -39,7 +39,7 @@ public enum Achievement{
     issueAttackCommand,
     active100Units(SStat.maxUnitActive, 100),
     build1000Units(SStat.unitsBuilt, 1000),
-    buildAllUnits(SStat.unitTypesBuilt, 30),
+    buildAllUnits(SStat.unitTypesBuilt, 50),
     buildT5,
     pickupT5,
     active10Polys,
