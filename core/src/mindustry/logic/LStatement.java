@@ -16,7 +16,7 @@ import mindustry.logic.LCanvas.*;
 import mindustry.logic.LExecutor.*;
 import mindustry.ui.*;
 
-import static mindustry.Vars.ui;
+import static mindustry.Vars.*;
 import static mindustry.logic.LCanvas.*;
 
 /**
