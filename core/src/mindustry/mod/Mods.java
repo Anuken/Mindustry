@@ -856,7 +856,7 @@ public class Mods implements Loadable{
                 return false;
                 // If dependency present, resolve it, or if it's not required, ignore it
             }else if(context.dependencies.containsKey(dependency.name)){
-                if(!context.ordered.contains(dependency.name) && !resolve(dependency.name, context) && dependency.required){
+                if(((!context.ordered.contains(dependency.name) && !resolve(dependency.name, context)) || !Core.settings.getBool("mod-" + dependency.name + "-enabled", true)) && dependency.required){
                     context.invalid.put(element, ModState.incompleteDependencies);
                     return false;
                 }
