@@ -125,6 +125,10 @@ public class GlobalVars{
             put("@" + type.name, type);
         }
 
+        for(Weather weather : Vars.content.weathers()){
+            put("@" + weather.name, weather);
+        }
+
         //store sensor constants
         for(LAccess sensor : LAccess.all){
             put("@" + sensor.name(), sensor);
