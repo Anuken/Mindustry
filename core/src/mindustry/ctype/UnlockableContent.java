@@ -43,6 +43,8 @@ public abstract class UnlockableContent extends MappableContent{
     public TextureRegion uiIcon;
     /** Icon of the full content. Unscaled.*/
     public TextureRegion fullIcon;
+    /** Override for the full icon. Useful for mod content with duplicate icons. Overrides any other full icon.*/
+    public String fullOverride = "";
     /** The tech tree node for this content, if applicable. Null if not part of a tech tree. */
     public @Nullable TechNode techNode;
     /** Tech nodes for all trees that this content is part of. */
@@ -62,11 +64,12 @@ public abstract class UnlockableContent extends MappableContent{
     @Override
     public void loadIcon(){
         fullIcon =
+            Core.atlas.find(fullOverride,
             Core.atlas.find(getContentType().name() + "-" + name + "-full",
             Core.atlas.find(name + "-full",
             Core.atlas.find(name,
             Core.atlas.find(getContentType().name() + "-" + name,
-            Core.atlas.find(name + "1")))));
+            Core.atlas.find(name + "1"))))));
 
         uiIcon = Core.atlas.find(getContentType().name() + "-" + name + "-ui", fullIcon);
     }
