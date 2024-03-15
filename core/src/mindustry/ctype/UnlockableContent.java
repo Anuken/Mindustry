@@ -44,7 +44,7 @@ public abstract class UnlockableContent extends MappableContent{
     /** Icon of the full content. Unscaled.*/
     public TextureRegion fullIcon;
     /** Override for the full icon. Useful for mod content with duplicate icons. Overrides any other full icon.*/
-    public String fullOverride = "error";
+    public String fullOverride = "";
     /** The tech tree node for this content, if applicable. Null if not part of a tech tree. */
     public @Nullable TechNode techNode;
     /** Tech nodes for all trees that this content is part of. */
