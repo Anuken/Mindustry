@@ -13,8 +13,8 @@ import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
-import mindustry.game.*;
 import mindustry.game.EventType.*;
+import mindustry.game.*;
 import mindustry.game.MapObjectives.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
@@ -1507,6 +1507,47 @@ public class LExecutor{
                 var unit = type.spawn(t, World.unconv(exec.numf(x)) + Mathf.range(0.01f), World.unconv(exec.numf(y)) + Mathf.range(0.01f));
                 spawner.spawnEffect(unit, exec.numf(rotation));
                 exec.setobj(result, unit);
+            }
+        }
+    }
+
+    public static class SenseWeatherI implements LInstruction{
+        public int type, to;
+
+        public SenseWeatherI(int type, int to){
+            this.type = type;
+            this.to = to;
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            exec.setbool(to, exec.obj(type) instanceof Weather weather && weather.isActive());
+        }
+    }
+
+    public static class SetWeatherI implements LInstruction{
+        public int type, state;
+
+        public SetWeatherI(int type, int state){
+            this.type = type;
+            this.state = state;
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            if(exec.obj(type) instanceof Weather weather){
+                if(exec.bool(state)){
+                    if(!weather.isActive()){ //Create is not already active
+                        Tmp.v1.setToRandomDirection();
+                        Call.createWeather(weather, 1f, WeatherState.fadeTime, Tmp.v1.x, Tmp.v1.y);
+                    }else{
+                        weather.instance().life(WeatherState.fadeTime);
+                    }
+                }else{
+                    if(weather.isActive() && weather.instance().life > WeatherState.fadeTime){
+                        weather.instance().life(WeatherState.fadeTime);
+                    }
+                }
             }
         }
     }
