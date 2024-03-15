@@ -292,7 +292,7 @@ public class StatValues{
         };
     }
 
-    public static StatValue itemEffMultiplier(Floatf<Item> efficiency, Boolf<Item> filter){
+    public static StatValue itemEffMultiplier(Floatf<Item> efficiency, Boolf<Item> filter, Boolf<Item> explosive){
         return table -> {
             table.row();
             table.table(c -> {
@@ -300,12 +300,23 @@ public class StatValues{
                     c.table(Styles.grayPanel, b -> {
                         b.image(item.uiIcon).size(40).pad(10f).left().scaling(Scaling.fit);
                         b.add(item.localizedName).left().grow();
-                        b.add(Core.bundle.format("stat.efficiency", fixValue(efficiency.get(item) * 100f))).right().pad(10f).padRight(15f);
+                        b.table(e -> {
+                            e.add(Core.bundle.format("stat.efficiency", fixValue(efficiency.get(item) * 100f))).right().labelAlign(Align.right);
+                            if(explosive.get(item)){
+                                e.row();
+                                e.add(Core.bundle.get("stat.explosive")).right().labelAlign(Align.right);
+                            }
+                        }).right().pad(10f).padRight(15f);
+
                     }).growX().pad(5).row();
                 }
             }).growX().colspan(table.getColumns());
             table.row();
         };
+    }
+
+    public static StatValue itemEffMultiplier(Floatf<Item> efficiency, Boolf<Item> filter){
+        return itemEffMultiplier(efficiency, filter, i -> false);
     }
 
     public static StatValue liquidEffMultiplier(Floatf<Liquid> efficiency, Boolf<Liquid> filter){
