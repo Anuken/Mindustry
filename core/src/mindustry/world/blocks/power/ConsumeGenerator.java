@@ -73,14 +73,6 @@ public class ConsumeGenerator extends PowerGenerator{
         if(outputLiquid != null){
             stats.add(Stat.output, StatValues.liquid(outputLiquid.liquid, outputLiquid.amount * 60f, true));
         }
-
-        if(filterItem != null){
-            ConsumeItemExplode explode = findConsumer(c -> c instanceof ConsumeItemExplode);
-            if(explode != null){
-                stats.remove(Stat.input);
-                stats.add(Stat.input, StatValues.itemEffMultiplier(i -> filterItem.itemEfficiencyMultiplier(i), filterItem.filter, explode.filter));
-            }
-        }
     }
 
     public class ConsumeGeneratorBuild extends GeneratorBuild{
