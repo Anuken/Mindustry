@@ -32,7 +32,7 @@ public class LiquidDisplay extends Table{
                 add(t);
             }
         }}).height(size).left();
-        add(liquid.localizedName).padLeft(6f).left();
+        add(liquid.localizedName).left().style(Styles.outlineLabel);
     }
 
     public LiquidDisplay(Liquid liquid, float amount, boolean perSecond){
