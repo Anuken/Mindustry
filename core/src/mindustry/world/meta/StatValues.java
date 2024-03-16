@@ -314,16 +314,7 @@ public class StatValues{
             table.table(c -> {
                 for(Liquid liquid : content.liquids().select(l -> filter.get(l) && l.unlockedNow() && !l.isHidden())){
                     c.table(Styles.grayPanel, b -> {
-                        b.add(new Stack(){{
-                            Image i = new Image(liquid.uiIcon).setScaling(Scaling.fit);
-                            i.setAlign(Align.left);
-                            add(i);
-
-                            Table t = new Table().left().bottom();
-                            t.add(Strings.autoFixed(amount, 2) + StatUnit.perSecond.localized()).style(Styles.outlineLabel);
-                            add(t);
-                        }}).height(40).pad(10f).padRight(0).left();
-                        b.add(liquid.localizedName).left().padLeft(6f).grow();
+                        b.add(new LiquidDisplay(liquid, 40f, amount, true)).pad(10f).left().grow();
                         b.add(Core.bundle.format("stat.efficiency", fixValue(efficiency.get(liquid) * 100f))).right().pad(10f).padRight(15f);
                     }).growX().pad(5).row();
                 }
