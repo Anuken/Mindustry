@@ -28,6 +28,6 @@ public class ConsumeLiquidFlammable extends ConsumeLiquidFilter{
 
     @Override
     public void display(Stats stats){
-        stats.add(booster ? Stat.booster : Stat.input, StatValues.liquidEffMultiplier(l -> l.flammability, filter));
+        stats.add(booster ? Stat.booster : Stat.input, StatValues.liquidEffMultiplier(l -> l.flammability, amount * 60f, filter));
     }
 }
