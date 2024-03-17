@@ -39,10 +39,8 @@ public class SectorPreset extends UnlockableContent{
     /** Internal use only! */
     public SectorPreset(String name, LoadedMod mod){
         super(name);
-        if(mod != null){
-            this.minfo.mod = mod;
-        }
-        this.generator = new FileMapGenerator(this.name, this);
+        this.minfo.mod = mod;
+        this.generator = new FileMapGenerator(name, this);
     }
 
     /** Internal use only! */
