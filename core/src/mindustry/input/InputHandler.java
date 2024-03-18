@@ -1012,6 +1012,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
                 if(attack != null){
                     Events.fire(Trigger.unitCommandAttack);
+                }else{
+                    Events.fire(Trigger.unitCommandPosition);
                 }
 
                 int maxChunkSize = 200;
