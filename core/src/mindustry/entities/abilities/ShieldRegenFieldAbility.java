@@ -30,7 +30,7 @@ public class ShieldRegenFieldAbility extends Ability{
 
     @Override
     public void addStats(Table t){
-        t.add("[lightgray]" + Core.bundle.get("waves.shields") + ": [white]" + Math.round(max)); //extremely stupid usage
+        t.add("[lightgray]" + Core.bundle.get("waves.shields") + ": [white]" + Strings.autoFixed(max, 2)); //extremely stupid usage
         t.row();
         t.add("[lightgray]" + Stat.shootRange.localized() + ": [white]" +  Strings.autoFixed(range / tilesize, 2) + " " + StatUnit.blocks.localized());
         t.row();

@@ -69,7 +69,7 @@ public class ShieldArcAbility extends Ability{
 
     @Override
     public void addStats(Table t){
-        t.add("[lightgray]" + Stat.health.localized() + ": [white]" + Math.round(max));
+        t.add("[lightgray]" + Stat.health.localized() + ": [white]" + Strings.autoFixed(max, 2));
         t.row();
         t.add("[lightgray]" + Stat.repairSpeed.localized() + ": [white]" + Strings.autoFixed(regen * 60f, 2) + StatUnit.perSecond.localized());
         t.row();

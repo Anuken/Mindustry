@@ -73,7 +73,7 @@ public class ForceFieldAbility extends Ability{
 
     @Override
     public void addStats(Table t){
-        t.add("[lightgray]" + Stat.health.localized() + ": [white]" + Math.round(max));
+        t.add("[lightgray]" + Stat.health.localized() + ": [white]" + Strings.autoFixed(max, 2));
         t.row();
         t.add("[lightgray]" + Stat.shootRange.localized() + ": [white]" +  Strings.autoFixed(radius / tilesize, 2) + " " + StatUnit.blocks.localized());
         t.row();
