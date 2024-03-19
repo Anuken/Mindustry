@@ -5,11 +5,15 @@ import arc.audio.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
+import mindustry.world.meta.*;
+
+import static mindustry.Vars.*;
 
 public class MoveLightningAbility extends Ability{
     /** Lightning damage */
@@ -63,7 +67,14 @@ public class MoveLightningAbility extends Ability{
         this.maxSpeed = maxSpeed;
         this.color = color;
     }
-    
+
+    @Override
+    public void addStats(Table t){
+        t.add("[lightgray]" + Core.bundle.get("ability.movelightning.minspeed") + ": [white]" + Strings.autoFixed(minSpeed * 60f / tilesize, 2) + " " + StatUnit.tilesSecond.localized());
+        t.row();
+        t.add("[lightgray]" + Stat.damage.localized() + ": [white]" + damage);
+    }
+
     @Override
     public void update(Unit unit){
         float scl = Mathf.clamp((unit.vel().len() - minSpeed) / (maxSpeed - minSpeed));
