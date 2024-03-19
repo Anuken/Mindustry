@@ -6,9 +6,8 @@ import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
-import mindustry.world.meta.*;
 
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 public class RepairFieldAbility extends Ability{
     public float amount = 1, reload = 100, range = 60;

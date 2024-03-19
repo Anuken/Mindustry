@@ -1,14 +1,13 @@
 package mindustry.entities.abilities;
 
-import arc.Core;
+import arc.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
-import mindustry.world.meta.*;
 
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 public class ShieldRegenFieldAbility extends Ability{
     public float amount = 1, max = 100f, reload = 100, range = 60;

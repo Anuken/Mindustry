@@ -13,7 +13,6 @@ import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
-import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 

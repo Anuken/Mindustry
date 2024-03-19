@@ -2,15 +2,14 @@ package mindustry.entities.abilities;
 
 import arc.*;
 import arc.math.*;
-import arc.scene.ui.layout.Table;
+import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.type.*;
-import mindustry.world.meta.*;
 
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 public class StatusFieldAbility extends Ability{
     public StatusEffect effect;
