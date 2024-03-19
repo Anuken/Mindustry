@@ -1,12 +1,18 @@
 package mindustry.entities.abilities;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.type.*;
+import mindustry.world.meta.*;
+
+import static mindustry.Vars.tilesize;
 
 public class SuppressionFieldAbility extends Ability{
     protected static Rand rand = new Rand();
@@ -32,6 +38,18 @@ public class SuppressionFieldAbility extends Ability{
     public float applyParticleChance = 13f;
 
     protected float timer;
+
+    @Override
+    public void init(UnitType type){
+        if(!active) display = false;
+    }
+
+    @Override
+    public void addStats(Table t){
+        t.add("[lightgray]" + Stat.shootRange.localized() + ": [white]" + Strings.autoFixed(range / tilesize, 2) + " " + StatUnit.blocks.localized());
+        t.row();
+        t.add("[lightgray]" + Core.bundle.get("rules.weather.duration") + " [white]" + Strings.autoFixed(reload / 60f, 2) + " " + StatUnit.seconds.localized()); //Maybe shouldn't grab bundle from elsewhere?
+    }
 
     @Override
     public void update(Unit unit){
