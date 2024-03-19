@@ -16,7 +16,12 @@ public abstract class Ability implements Cloneable{
     public void death(Unit unit){}
     public void init(UnitType type){}
     public void displayBars(Unit unit, Table bars){}
-    public void addStats(Table t){}
+    public void addStats(Table t){
+        if(Core.bundle.has(getBundle() + ".description")){
+            t.add(Core.bundle.get(getBundle() + ".description")).wrap().width(300f);
+            t.row();
+        }
+    }
 
     public String abilityStat(String stat, Object... values){
         return Core.bundle.format("ability.stat." + stat, values);
@@ -33,7 +38,11 @@ public abstract class Ability implements Cloneable{
 
     /** @return localized ability name; mods should override this. */
     public String localized(){
+        return Core.bundle.get(getBundle());
+    }
+
+    public String getBundle(){
         var type = getClass();
-        return Core.bundle.get("ability." + (type.isAnonymousClass() ? type.getSuperclass() : type).getSimpleName().replace("Ability", "").toLowerCase());
+        return "ability." + (type.isAnonymousClass() ? type.getSuperclass() : type).getSimpleName().replace("Ability", "").toLowerCase();
     }
 }

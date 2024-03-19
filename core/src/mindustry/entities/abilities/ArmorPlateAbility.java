@@ -38,6 +38,7 @@ public class ArmorPlateAbility extends Ability{
 
     @Override
     public void addStats(Table t){
+        super.addStats(t);
         t.add(abilityStat("damagereduction", Strings.autoFixed(-healthMultiplier * 100f, 1)));
     }
 

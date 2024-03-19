@@ -19,6 +19,7 @@ public class LiquidExplodeAbility extends Ability{
 
     @Override
     public void addStats(Table t){
+        super.addStats(t);
         t.add((liquid.hasEmoji() ? liquid.emoji() : "") + "[stat]" + liquid.localizedName);
     }
 

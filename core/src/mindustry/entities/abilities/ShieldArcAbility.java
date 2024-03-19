@@ -68,6 +68,7 @@ public class ShieldArcAbility extends Ability{
 
     @Override
     public void addStats(Table t){
+        super.addStats(t);
         t.add(abilityStat("shield", Strings.autoFixed(max, 2)));
         t.row();
         t.add(abilityStat("repairspeed", Strings.autoFixed(regen * 60f, 2)));

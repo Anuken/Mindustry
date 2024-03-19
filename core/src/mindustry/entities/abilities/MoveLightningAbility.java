@@ -69,6 +69,7 @@ public class MoveLightningAbility extends Ability{
 
     @Override
     public void addStats(Table t){
+        super.addStats(t);
         t.add(abilityStat("minspeed", Strings.autoFixed(minSpeed * 60f / tilesize, 2)));
         t.row();
         t.add(Core.bundle.format("bullet.damage", damage));

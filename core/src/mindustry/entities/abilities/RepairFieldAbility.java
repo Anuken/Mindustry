@@ -28,6 +28,7 @@ public class RepairFieldAbility extends Ability{
 
     @Override
     public void addStats(Table t){
+        super.addStats(t);
         t.add(Core.bundle.format("bullet.range", Strings.autoFixed(range / tilesize, 2)));
         t.row();
         t.add(abilityStat("repairspeed", Strings.autoFixed(amount * 60f / reload, 2)));

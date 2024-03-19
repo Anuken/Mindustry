@@ -73,6 +73,7 @@ public class ForceFieldAbility extends Ability{
 
     @Override
     public void addStats(Table t){
+        super.addStats(t);
         t.add(Core.bundle.format("bullet.range", Strings.autoFixed(radius / tilesize, 2)));
         t.row();
         t.add(abilityStat("shield", Strings.autoFixed(max, 2)));

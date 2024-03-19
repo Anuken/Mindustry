@@ -12,6 +12,8 @@ public class RegenAbility extends Ability{
 
     @Override
     public void addStats(Table t){
+        super.addStats(t);
+
         boolean flat = amount >= 0.001f;
         boolean percent = percentAmount >= 0.001f;
 
