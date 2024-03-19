@@ -38,7 +38,7 @@ public class StatusFieldAbility extends Ability{
         t.row();
         t.add(abilityStat("firingrate", Strings.autoFixed(60f / reload, 2)));
         t.row();
-        t.add(effect.emoji() + "[stat]" + effect.localizedName);
+        t.add((effect.hasEmoji() ? effect.emoji() : "") + "[stat]" + effect.localizedName);
     }
 
     @Override
