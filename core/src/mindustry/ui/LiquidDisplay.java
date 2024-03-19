@@ -26,13 +26,13 @@ public class LiquidDisplay extends Table{
             i.setAlign(Align.left);
             add(i);
 
-            if(amount != 0){
+            if(!perSecond && amount != 0){
                 Table t = new Table().left().bottom();
-                t.add(Strings.autoFixed(amount, 2) + (perSecond ? StatUnit.perSecond.localized() : "")).style(Styles.outlineLabel);
+                t.add(Strings.autoFixed(amount, 2)).style(Styles.outlineLabel);
                 add(t);
             }
         }}).height(size).left();
-        add(liquid.localizedName).left().style(Styles.outlineLabel);
+        add(liquid.localizedName + (perSecond && amount != 0 ? "\n[lightgray]" + Strings.autoFixed(amount, 2) + StatUnit.perSecond.localized() : "[]")).left().style(Styles.outlineLabel);
     }
 
     public LiquidDisplay(Liquid liquid, float amount, boolean perSecond){
