@@ -11,11 +11,8 @@ import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
-import mindustry.world.blocks.environment.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
-
-import static mindustry.Vars.*;
 
 public class BurstDrill extends Drill{
     public float shake = 2f;
@@ -87,7 +84,7 @@ public class BurstDrill extends Drill{
             if(timer(timerDump, dumpTime)){
                 dump(items.has(dominantItem) ? dominantItem : null);
             }
-            
+
             float drillTime = getDrillTime(dominantItem);
 
             smoothProgress = Mathf.lerpDelta(smoothProgress, progress / (drillTime - 20f), 0.1f);
