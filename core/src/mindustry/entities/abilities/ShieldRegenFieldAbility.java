@@ -30,11 +30,11 @@ public class ShieldRegenFieldAbility extends Ability{
 
     @Override
     public void addStats(Table t){
-        t.add(abilityStat("shield", Strings.autoFixed(max, 2)));
-        t.row();
         t.add(Core.bundle.format("bullet.range", Strings.autoFixed(range / tilesize, 2)));
         t.row();
         t.add(abilityStat("firingrate", Strings.autoFixed(60f / reload, 2)));
+        t.row();
+        t.add(abilityStat("shield", Strings.autoFixed(max, 2)));
     }
 
     @Override

@@ -74,9 +74,9 @@ public class ForceFieldAbility extends Ability{
 
     @Override
     public void addStats(Table t){
-        t.add(abilityStat("shield", Strings.autoFixed(max, 2)));
-        t.row();
         t.add(Core.bundle.format("bullet.range", Strings.autoFixed(radius / tilesize, 2)));
+        t.row();
+        t.add(abilityStat("shield", Strings.autoFixed(max, 2)));
         t.row();
         t.add(abilityStat("repairspeed", Strings.autoFixed(regen * 60f, 2)));
         t.row();
