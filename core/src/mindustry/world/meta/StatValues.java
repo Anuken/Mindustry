@@ -378,7 +378,7 @@ public class StatValues{
                 if(ability.display){
                     t.row();
                     t.table(Styles.grayPanel, a -> {
-                        a.add("[accent]" + ability.localized()).padBottom(4);
+                        a.add("[accent]" + ability.localized()).padBottom(4).center().top().expandX();
                         a.row();
                         a.left().top().defaults().left();
                         ability.addStats(a);
