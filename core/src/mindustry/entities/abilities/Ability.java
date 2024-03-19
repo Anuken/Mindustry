@@ -6,6 +6,7 @@ import mindustry.gen.*;
 import mindustry.type.*;
 
 public abstract class Ability implements Cloneable{
+    protected static final float descriptionWidth = 350f;
     /** If false, this ability does not show in unit stats. */
     public boolean display = true;
     //the one and only data variable that is synced.
@@ -18,7 +19,7 @@ public abstract class Ability implements Cloneable{
     public void displayBars(Unit unit, Table bars){}
     public void addStats(Table t){
         if(Core.bundle.has(getBundle() + ".description")){
-            t.add(Core.bundle.get(getBundle() + ".description")).wrap().width(300f);
+            t.add(Core.bundle.get(getBundle() + ".description")).wrap().width(descriptionWidth);
             t.row();
         }
     }

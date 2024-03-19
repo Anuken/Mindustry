@@ -52,7 +52,13 @@ public class EnergyFieldAbility extends Ability{
 
     @Override
     public void addStats(Table t){
-        super.addStats(t);
+        if(displayHeal){
+            t.add(Core.bundle.get(getBundle() + ".healdescription")).wrap().width(descriptionWidth);
+        }else{
+            t.add(Core.bundle.get(getBundle() + ".description")).wrap().width(descriptionWidth);
+        }
+        t.row();
+
         t.add(Core.bundle.format("bullet.range", Strings.autoFixed(range / tilesize, 2)));
         t.row();
         t.add(abilityStat("firingrate", Strings.autoFixed(60f / reload, 2)));
@@ -60,16 +66,15 @@ public class EnergyFieldAbility extends Ability{
         t.add(abilityStat("maxtargets", maxTargets));
         t.row();
         t.add(Core.bundle.format("bullet.damage", damage));
-
+        if(status != StatusEffects.none){
+            t.row();
+            t.add((status.hasEmoji() ? status.emoji() : "") + "[stat]" + status.localizedName);
+        }
         if(displayHeal){
             t.row();
             t.add(Core.bundle.format("bullet.healpercent", Strings.autoFixed(healPercent, 2)));
             t.row();
             t.add(abilityStat("sametypehealmultiplier", (sameTypeHealMult < 1f ? "[negstat]" : "") + Strings.autoFixed(sameTypeHealMult * 100f, 2)));
-        }
-        if(status != StatusEffects.none){
-            t.row();
-            t.add((status.hasEmoji() ? status.emoji() : "") + "[stat]" + status.localizedName);
         }
     }
 
