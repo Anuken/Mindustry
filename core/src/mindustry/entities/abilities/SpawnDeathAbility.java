@@ -27,7 +27,7 @@ public class SpawnDeathAbility extends Ability{
 
     @Override
     public void addStats(Table t){
-        t.add((randAmount > 0 ? amount + "x-" + (amount + randAmount) : amount) + "x " + (unit.hasEmoji() ? unit.emoji() : "") + " " + unit.localizedName);
+        t.add("[stat]" + (randAmount > 0 ? amount + "x-" + (amount + randAmount) : amount) + "x[] " + (unit.hasEmoji() ? unit.emoji() : "") + "[stat]" + unit.localizedName);
     }
 
     @Override

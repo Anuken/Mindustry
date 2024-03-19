@@ -38,7 +38,7 @@ public class UnitSpawnAbility extends Ability{
     public void addStats(Table t){
         t.add("[lightgray]" + Stat.buildTime.localized() + ": [white]" + Strings.autoFixed(spawnTime / 60f, 2) + " " + StatUnit.seconds.localized());
         t.row();
-        t.add(unit.emoji() + " " + unit.localizedName);
+        t.add((unit.hasEmoji() ? unit.emoji() : "") + "[stat]" + unit.localizedName);
     }
 
     @Override

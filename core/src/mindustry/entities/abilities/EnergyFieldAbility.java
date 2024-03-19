@@ -69,7 +69,7 @@ public class EnergyFieldAbility extends Ability{
         }
         if(status != StatusEffects.none){
             t.row();
-            t.add(status.emoji() + " " + status.localizedName);
+            t.add((status.hasEmoji() ? status.emoji() : "") + "[stat]" + status.localizedName);
         }
     }
 
