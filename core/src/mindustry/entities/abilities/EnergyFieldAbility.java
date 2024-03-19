@@ -55,17 +55,17 @@ public class EnergyFieldAbility extends Ability{
     public void addStats(Table t){
         t.add(Core.bundle.format("bullet.damage", damage));
         t.row();
-        t.add("[lightgray]" + Stat.reload.localized() + ": [white]" + Strings.autoFixed(60f / reload, 2) + " " + StatUnit.perSecond.localized());
+        t.add(abilityStat("firingrate", Strings.autoFixed(60f / reload, 2)));
         t.row();
-        t.add("[lightgray]" + Stat.shootRange.localized() + ": [white]" +  Strings.autoFixed(range / tilesize, 2) + " " + StatUnit.blocks.localized());
+        t.add(Core.bundle.format("bullet.range", Strings.autoFixed(range / tilesize, 2)));
         t.row();
-        t.add(Core.bundle.format("ability.energyfield.maxtargets", maxTargets));
+        t.add(abilityStat("maxtargets", maxTargets));
 
         if(displayHeal){
             t.row();
             t.add(Core.bundle.format("bullet.healpercent", Strings.autoFixed(healPercent, 2)));
             t.row();
-            t.add(Core.bundle.format("ability.energyfield.sametypehealmultiplier", Strings.autoFixed(sameTypeHealMult * 100f, 2)));
+            t.add(abilityStat("sametypehealmultiplier", (sameTypeHealMult < 1f ? "[negstat]" : "") + Strings.autoFixed(sameTypeHealMult * 100f, 2)));
         }
         if(status != StatusEffects.none){
             t.row();

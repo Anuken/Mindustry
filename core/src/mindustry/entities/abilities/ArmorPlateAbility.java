@@ -8,7 +8,6 @@ import arc.scene.ui.layout.Table;
 import arc.util.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.world.meta.*;
 
 public class ArmorPlateAbility extends Ability{
     public TextureRegion plateRegion;
@@ -39,7 +38,7 @@ public class ArmorPlateAbility extends Ability{
 
     @Override
     public void addStats(Table t){
-        t.add("[lightgray]" + Stat.healthMultiplier.localized() + ": [white]" + Strings.autoFixed(healthMultiplier * 100f + 100, 2) + "%");
+        t.add(abilityStat("damagereduction", Strings.autoFixed(-healthMultiplier * 100f, 1)));
     }
 
     @Override

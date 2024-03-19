@@ -18,6 +18,10 @@ public abstract class Ability implements Cloneable{
     public void displayBars(Unit unit, Table bars){}
     public void addStats(Table t){}
 
+    public String abilityStat(String stat, Object... values){
+        return Core.bundle.format("ability.stat." + stat, values);
+    }
+
     public Ability copy(){
         try{
             return (Ability)clone();

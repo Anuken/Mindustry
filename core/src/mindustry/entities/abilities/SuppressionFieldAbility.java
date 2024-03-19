@@ -46,9 +46,9 @@ public class SuppressionFieldAbility extends Ability{
 
     @Override
     public void addStats(Table t){
-        t.add("[lightgray]" + Stat.shootRange.localized() + ": [white]" + Strings.autoFixed(range / tilesize, 2) + " " + StatUnit.blocks.localized());
+        t.add(Core.bundle.format("bullet.range", Strings.autoFixed(range / tilesize, 2)));
         t.row();
-        t.add("[lightgray]" + Core.bundle.get("rules.weather.duration") + " [white]" + Strings.autoFixed(reload / 60f, 2) + " " + StatUnit.seconds.localized()); //Maybe shouldn't grab bundle from elsewhere?
+        t.add(abilityStat("duration", Strings.autoFixed(reload / 60f, 2)));
     }
 
     @Override

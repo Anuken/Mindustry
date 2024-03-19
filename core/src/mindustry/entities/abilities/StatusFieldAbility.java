@@ -1,5 +1,6 @@
 package mindustry.entities.abilities;
 
+import arc.*;
 import arc.math.*;
 import arc.scene.ui.layout.Table;
 import arc.util.*;
@@ -33,11 +34,11 @@ public class StatusFieldAbility extends Ability{
 
     @Override
     public void addStats(Table t){
-        t.add("[lightgray]" + Stat.reload.localized() + ": [white]" + Strings.autoFixed(60f / reload, 2) + " " + StatUnit.perSecond.localized());
+        t.add(abilityStat("firingrate", Strings.autoFixed(60f / reload, 2)));
         t.row();
-        t.add("[lightgray]" + Stat.shootRange.localized() + ": [white]" +  Strings.autoFixed(range / tilesize, 2) + " " + StatUnit.blocks.localized());
+        t.add(Core.bundle.format("bullet.range", Strings.autoFixed(range / tilesize, 2)));
         t.row();
-        t.add(effect.emoji() + " " + effect.localizedName);
+        t.add(effect.emoji() + "[stat]" + effect.localizedName);
     }
 
     @Override

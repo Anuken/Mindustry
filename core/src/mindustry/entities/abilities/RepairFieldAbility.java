@@ -1,5 +1,6 @@
 package mindustry.entities.abilities;
 
+import arc.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.content.*;
@@ -28,9 +29,9 @@ public class RepairFieldAbility extends Ability{
 
     @Override
     public void addStats(Table t){
-        t.add("[lightgray]" + Stat.repairSpeed.localized() + ": [white]" + Strings.autoFixed(amount * 60f / reload, 2) + StatUnit.perSecond.localized());
+        t.add(abilityStat("repairspeed", Strings.autoFixed(amount * 60f / reload, 2)));
         t.row();
-        t.add("[lightgray]" + Stat.shootRange.localized() + ": [white]" +  Strings.autoFixed(range / tilesize, 2) + " " + StatUnit.blocks.localized());
+        t.add(Core.bundle.format("bullet.range", Strings.autoFixed(range / tilesize, 2)));
     }
 
     @Override

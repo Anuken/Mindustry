@@ -11,7 +11,6 @@ import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
-import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -70,9 +69,9 @@ public class MoveLightningAbility extends Ability{
 
     @Override
     public void addStats(Table t){
-        t.add("[lightgray]" + Core.bundle.get("ability.movelightning.minspeed") + ": [white]" + Strings.autoFixed(minSpeed * 60f / tilesize, 2) + " " + StatUnit.tilesSecond.localized());
+        t.add(Core.bundle.format("bullet.damage", damage));
         t.row();
-        t.add("[lightgray]" + Stat.damage.localized() + ": [white]" + damage);
+        t.add(abilityStat("minspeed", Strings.autoFixed(minSpeed * 60f / tilesize, 2)));
     }
 
     @Override

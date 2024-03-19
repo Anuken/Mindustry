@@ -30,12 +30,11 @@ public class ShieldRegenFieldAbility extends Ability{
 
     @Override
     public void addStats(Table t){
-        t.add("[lightgray]" + Core.bundle.get("waves.shields") + ": [white]" + Strings.autoFixed(max, 2)); //extremely stupid usage
+        t.add(abilityStat("shield", Strings.autoFixed(max, 2)));
         t.row();
-        t.add("[lightgray]" + Stat.shootRange.localized() + ": [white]" +  Strings.autoFixed(range / tilesize, 2) + " " + StatUnit.blocks.localized());
+        t.add(Core.bundle.format("bullet.range", Strings.autoFixed(range / tilesize, 2)));
         t.row();
-        t.add("[lightgray]" + Stat.reload.localized() + ": [white]" + Strings.autoFixed(60f / reload, 2) + " " + StatUnit.perSecond.localized());
-        t.row();
+        t.add(abilityStat("firingrate", Strings.autoFixed(60f / reload, 2)));
     }
 
     @Override
