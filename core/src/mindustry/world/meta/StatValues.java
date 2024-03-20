@@ -295,9 +295,7 @@ public class StatValues{
     public static StatValue itemEffMultiplier(Floatf<Item> efficiency, Boolf<Item> filter){
         return table -> {
             table.row();
-            table.add().size(0);
             table.table(c -> {
-                c.left();
                 for(Item item : content.items().select(i -> filter.get(i) && i.unlockedNow() && !i.isHidden())){
                     c.table(Styles.grayPanel, b -> {
                         b.image(item.uiIcon).size(40).pad(10f).left().scaling(Scaling.fit);
@@ -305,23 +303,21 @@ public class StatValues{
                         b.add(Core.bundle.format("stat.efficiency", fixValue(efficiency.get(item) * 100f))).right().pad(10f).padRight(15f);
                     }).growX().pad(5).row();
                 }
-            }).growX().colspan(table.getColumns() - 2).row();
+            }).growX().colspan(table.getColumns()).row();
         };
     }
 
     public static StatValue liquidEffMultiplier(Floatf<Liquid> efficiency, float amount, Boolf<Liquid> filter){
         return table -> {
             table.row();
-            table.add().size(0);
             table.table(c -> {
-                c.left();
                 for(Liquid liquid : content.liquids().select(l -> filter.get(l) && l.unlockedNow() && !l.isHidden())){
                     c.table(Styles.grayPanel, b -> {
                         b.add(new LiquidDisplay(liquid, 40f, amount, true)).pad(10f).left().grow();
                         b.add(Core.bundle.format("stat.efficiency", fixValue(efficiency.get(liquid) * 100f))).right().pad(10f).padRight(15f);
                     }).growX().pad(5).row();
                 }
-            }).growX().colspan(table.getColumns() - 2).row();
+            }).growX().colspan(table.getColumns()).row();
         };
     }
 
