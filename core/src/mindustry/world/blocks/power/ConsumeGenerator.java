@@ -30,7 +30,7 @@ public class ConsumeGenerator extends PowerGenerator{
     public @Nullable ConsumeItemFilter filterItem;
     public @Nullable ConsumeLiquidFilter filterLiquid;
     /** Multiplies the itemDuration for a given item. */
-    public ObjectFloatMap<Item> itemDurationMultipliers = new ObjectFloatMap<>();
+    public @Nullable ObjectFloatMap<Item> itemDurationMultipliers = new ObjectFloatMap<>();
 
     public ConsumeGenerator(String name){
         super(name);
@@ -79,7 +79,8 @@ public class ConsumeGenerator extends PowerGenerator{
     }
 
     public class ConsumeGeneratorBuild extends GeneratorBuild{
-        public float warmup, totalTime, efficiencyMultiplier, itemDurationMultiplier = 1f;
+        public float warmup, totalTime, efficiencyMultiplier = 1f;
+        public float itemDurationMultiplier = 1;
 
         @Override
         public void updateEfficiencyMultiplier(){
@@ -107,7 +108,9 @@ public class ConsumeGenerator extends PowerGenerator{
             }
 
             //make sure the multiplier doesn't change when there is nothing to consume while it's still running
-            itemDurationMultiplier = (hasItems && valid && filterItem.getConsumed(this) == null)? itemDurationMultiplier : itemDurationMultipliers.get(filterItem.getConsumed(this), 1);
+            if(hasItems && filterItem != null && itemDurationMultipliers != null){
+                itemDurationMultiplier = (valid && filterItem.getConsumed(this) == null)? itemDurationMultiplier : itemDurationMultipliers.get(filterItem.getConsumed(this), 1);
+            }
 
             //take in items periodically
             if(hasItems && valid && generateTime <= 0f){
