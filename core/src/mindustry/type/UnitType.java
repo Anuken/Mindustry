@@ -215,6 +215,8 @@ public class UnitType extends UnlockableContent implements Senseable{
     naval = false,
     /** if false, RTS AI controlled units do not automatically attack things while moving. This is automatically assigned. */
     autoFindTarget = true,
+    /** If false, 'under' blocks like conveyors are not targeted. */
+    targetUnderBlocks = true,
     /** if true, this unit will always shoot while moving regardless of slowdown */
     alwaysShootWhenMoving = false,
 
@@ -967,6 +969,7 @@ public class UnitType extends UnlockableContent implements Senseable{
                 Drawf.checkBleed(outlined);
 
                 packer.add(PageType.main, regionName + "-outline", outlined);
+                outlined.dispose();
             }
         }
 
@@ -1019,7 +1022,9 @@ public class UnitType extends UnlockableContent implements Senseable{
                     }
 
                     packer.add(PageType.main, name + "-treads" + r + "-" + i, frame);
+                    frame.dispose();
                 }
+                slice.dispose();
             }
         }
     }

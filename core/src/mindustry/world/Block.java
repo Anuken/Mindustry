@@ -219,6 +219,8 @@ public class Block extends UnlockableContent implements Senseable{
     public int unitCapModifier = 0;
     /** Whether the block can be tapped and selected to configure. */
     public boolean configurable;
+    /** If true, this block does not have pointConfig with a transform called on map resize. */
+    public boolean ignoreResizeConfig;
     /** If true, this building can be selected like a unit when commanding. */
     public boolean commandable;
     /** If true, the building inventory can be shown with the config. */
@@ -956,6 +958,14 @@ public class Block extends UnlockableContent implements Senseable{
         consumeBuilder.remove(cons);
     }
 
+    public void removeConsumers(Boolf<Consume> b){
+        consumeBuilder.removeAll(b);
+        //the power was removed, unassign it
+        if(!consumeBuilder.contains(c -> c instanceof ConsumePower)){
+            consPower = null;
+        }
+    }
+
     public ConsumeLiquid consumeLiquid(Liquid liquid, float amount){
         return consume(new ConsumeLiquid(liquid, amount));
     }
@@ -1284,6 +1294,8 @@ public class Block extends UnlockableContent implements Senseable{
             }
         }
 
+        Seq<Pixmap> toDispose = new Seq<>();
+
         //generate paletted team regions
         if(teamRegion != null && teamRegion.found()){
             for(Team team : Team.all){
@@ -1308,6 +1320,7 @@ public class Block extends UnlockableContent implements Senseable{
                     Drawf.checkBleed(out);
 
                     packer.add(PageType.main, name + "-team-" + team.name, out);
+                    toDispose.add(out);
                 }
             }
 
@@ -1327,6 +1340,7 @@ public class Block extends UnlockableContent implements Senseable{
             Pixmap out = last = Pixmaps.outline(region, outlineColor, outlineRadius);
             Drawf.checkBleed(out);
             packer.add(PageType.main, atlasRegion.name, out);
+            toDispose.add(out);
         }
 
         var toOutline = new Seq<TextureRegion>();
@@ -1340,6 +1354,7 @@ public class Block extends UnlockableContent implements Senseable{
                 Drawf.checkBleed(outlined);
 
                 packer.add(PageType.main, regionName + "-outline", outlined);
+                toDispose.add(outlined);
             }
         }
 
@@ -1357,12 +1372,15 @@ public class Block extends UnlockableContent implements Senseable{
             packer.add(PageType.main, "block-" + name + "-full", base);
 
             editorBase = new PixmapRegion(base);
+            toDispose.add(base);
         }else{
             if(gen[0] != null) packer.add(PageType.main, "block-" + name + "-full", Core.atlas.getPixmap(gen[0]));
             editorBase = gen[0] == null ? Core.atlas.getPixmap(fullIcon) : Core.atlas.getPixmap(gen[0]);
         }
 
         packer.add(PageType.editor, name + "-icon-editor", editorBase);
+
+        toDispose.each(Pixmap::dispose);
     }
 
     public int planRotation(int rot){

@@ -13,8 +13,8 @@ import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
-import mindustry.game.*;
 import mindustry.game.EventType.*;
+import mindustry.game.*;
 import mindustry.game.MapObjectives.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
@@ -706,7 +706,7 @@ public class LExecutor{
             int address = exec.numi(position);
             Building from = exec.building(target);
 
-            if(from instanceof MemoryBuild mem && (exec.privileged || from.team == exec.team) && address >= 0 && address < mem.memory.length){
+            if(from instanceof MemoryBuild mem && (exec.privileged || (from.team == exec.team && !mem.block.privileged)) && address >= 0 && address < mem.memory.length){
                 mem.memory[address] = exec.num(value);
             }
         }
@@ -1025,14 +1025,17 @@ public class LExecutor{
                     exec.textBuffer.setLength(0);
                 }
             }else{
-                int num1 = exec.numi(p1);
+                int num1 = exec.numi(p1), xval = packSign(exec.numi(x)), yval = packSign(exec.numi(y));
 
                 if(type == LogicDisplay.commandImage){
                     num1 = exec.obj(p1) instanceof UnlockableContent u ? u.iconId : 0;
+                }else if(type == LogicDisplay.commandScale){
+                    xval = packSign((int)(exec.numf(x) / LogicDisplay.scaleStep));
+                    yval = packSign((int)(exec.numf(y) / LogicDisplay.scaleStep));
                 }
 
                 //add graphics calls, cap graphics buffer size
-                exec.graphicsBuffer.add(DisplayCmd.get(type, packSign(exec.numi(x)), packSign(exec.numi(y)), packSign(num1), packSign(exec.numi(p2)), packSign(exec.numi(p3)), packSign(exec.numi(p4))));
+                exec.graphicsBuffer.add(DisplayCmd.get(type, xval, yval, packSign(num1), packSign(exec.numi(p2)), packSign(exec.numi(p3)), packSign(exec.numi(p4))));
             }
         }
 
@@ -1504,6 +1507,47 @@ public class LExecutor{
                 var unit = type.spawn(t, World.unconv(exec.numf(x)) + Mathf.range(0.01f), World.unconv(exec.numf(y)) + Mathf.range(0.01f));
                 spawner.spawnEffect(unit, exec.numf(rotation));
                 exec.setobj(result, unit);
+            }
+        }
+    }
+
+    public static class SenseWeatherI implements LInstruction{
+        public int type, to;
+
+        public SenseWeatherI(int type, int to){
+            this.type = type;
+            this.to = to;
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            exec.setbool(to, exec.obj(type) instanceof Weather weather && weather.isActive());
+        }
+    }
+
+    public static class SetWeatherI implements LInstruction{
+        public int type, state;
+
+        public SetWeatherI(int type, int state){
+            this.type = type;
+            this.state = state;
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            if(exec.obj(type) instanceof Weather weather){
+                if(exec.bool(state)){
+                    if(!weather.isActive()){ //Create is not already active
+                        Tmp.v1.setToRandomDirection();
+                        Call.createWeather(weather, 1f, WeatherState.fadeTime, Tmp.v1.x, Tmp.v1.y);
+                    }else{
+                        weather.instance().life(WeatherState.fadeTime);
+                    }
+                }else{
+                    if(weather.isActive() && weather.instance().life > WeatherState.fadeTime){
+                        weather.instance().life(WeatherState.fadeTime);
+                    }
+                }
             }
         }
     }

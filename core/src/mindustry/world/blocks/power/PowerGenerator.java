@@ -46,6 +46,10 @@ public class PowerGenerator extends PowerDistributor{
         flags = EnumSet.of(BlockFlag.generator);
     }
 
+    public float getDisplayedPowerProduction(){
+        return powerProduction;
+    }
+
     @Override
     public TextureRegion[] icons(){
         return drawer.finalIcons(this);

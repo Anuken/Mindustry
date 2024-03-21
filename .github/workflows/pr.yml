@@ -18,7 +18,7 @@ jobs:
     - name: Setup Gradle
       uses: gradle/gradle-build-action@v2
     - name: Run unit tests
-      run: ./gradlew clean cleanTest test --stacktrace
+      run: ./gradlew tests:test --stacktrace --rerun
     - name: Run unit tests and build JAR
       run: ./gradlew desktop:dist
     - name: Upload desktop JAR for testing

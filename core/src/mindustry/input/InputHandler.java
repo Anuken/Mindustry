@@ -1012,6 +1012,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
                 if(attack != null){
                     Events.fire(Trigger.unitCommandAttack);
+                }else{
+                    Events.fire(Trigger.unitCommandPosition);
                 }
 
                 int maxChunkSize = 200;
@@ -1179,7 +1181,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         var last = lastSchematic;
 
-        ui.showTextInput("@schematic.add", "@name", "", text -> {
+        ui.showTextInput("@schematic.add", "@name", 1000, "", text -> {
             Schematic replacement = schematics.all().find(s -> s.name().equals(text));
             if(replacement != null){
                 ui.showConfirm("@confirm", "@schematic.replace", () -> {
@@ -1661,7 +1663,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     boolean tryRepairDerelict(Tile selected){
-        if(selected != null && selected.build != null && selected.build.block.unlockedNow() && selected.build.team == Team.derelict && Build.validPlace(selected.block(), player.team(), selected.build.tileX(), selected.build.tileY(), selected.build.rotation)){
+        if(selected != null && player.team() != Team.derelict && selected.build != null && selected.build.block.unlockedNow() && selected.build.team == Team.derelict && Build.validPlace(selected.block(), player.team(), selected.build.tileX(), selected.build.tileY(), selected.build.rotation)){
             player.unit().addBuild(new BuildPlan(selected.build.tileX(), selected.build.tileY(), selected.build.rotation, selected.block(), selected.build.config()));
             return true;
         }

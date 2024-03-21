@@ -84,8 +84,6 @@ public class Liquid extends UnlockableContent implements Senseable{
         super.init();
 
         if(gas){
-            //gases can't be coolants
-            coolant = false;
             //always "boils", it's a gas
             boilPoint = -1;
             //ensure no accidental global mutation

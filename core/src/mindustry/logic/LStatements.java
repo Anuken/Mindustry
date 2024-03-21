@@ -260,6 +260,13 @@ public class LStatements{
                             }, 2, cell -> cell.size(165, 50)));
                         }, Styles.logict, () -> {}).size(165, 40).color(s.color).left().padLeft(2);
                     }
+                    case translate, scale -> {
+                        fields(s, "x", x, v -> x = v);
+                        fields(s, "y", y, v -> y = v);
+                    }
+                    case rotate -> {
+                        fields(s, "degrees", p1, v -> p1 = v);
+                    }
                 }
             }).expand().left();
         }
@@ -1373,6 +1380,115 @@ public class LStatements{
         }
     }
 
+    @RegisterStatement("weathersensor")
+    public static class WeatherSenseStatement extends LStatement{
+        public String to = "result";
+        public String weather = "@rain";
+
+        private transient TextField tfield;
+
+        @Override
+        public void build(Table table){
+            field(table, to, str -> to = str);
+
+            table.add(" = weather ");
+
+            row(table);
+
+            tfield = field(table, weather, str -> weather = str).padRight(0f).get();
+
+            table.button(b -> {
+                b.image(Icon.pencilSmall);
+
+                b.clicked(() -> showSelectTable(b, (t, hide) -> {
+                    t.row();
+                    t.table(i -> {
+                        i.left();
+                        int c = 0;
+                        for(Weather w : Vars.content.weathers()){
+                            i.button(w.name, Styles.flatt, () -> {
+                                weather = "@" + w.name;
+                                tfield.setText(weather);
+                                hide.run();
+                            }).height(40f).uniformX().wrapLabel(false).growX();
+
+                            if(++c % 2 == 0) i.row();
+                        }
+                    }).left();
+                }));
+            }, Styles.logict, () -> {}).size(40f).padLeft(-1).color(table.color);
+        }
+
+        @Override
+        public boolean privileged(){
+            return true;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new SenseWeatherI(builder.var(weather), builder.var(to));
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.world;
+        }
+    }
+
+    @RegisterStatement("weatherset")
+    public static class WeatherSetStatement extends LStatement{
+        public String weather = "@rain", state = "true";
+
+        private transient TextField tfield;
+
+        @Override
+        public void build(Table table){
+            table.add(" set weather ");
+
+            tfield = field(table, weather, str -> weather = str).padRight(0f).get();
+
+            table.button(b -> {
+                b.image(Icon.pencilSmall);
+
+                b.clicked(() -> showSelectTable(b, (t, hide) -> {
+                    t.row();
+                    t.table(i -> {
+                        i.left();
+                        int c = 0;
+                        for(Weather w : Vars.content.weathers()){
+                            i.button(w.name, Styles.flatt, () -> {
+                                weather = "@" + w.name;
+                                tfield.setText(weather);
+                                hide.run();
+                            }).height(40f).uniformX().wrapLabel(false).growX();
+
+                            if(++c % 2 == 0) i.row();
+                        }
+                    }).left();
+                }));
+            }, Styles.logict, () -> {}).size(40f).padLeft(-1).color(table.color);
+
+            table.add(" state ");
+
+            fields(table, state, str -> state = str);
+        }
+
+        @Override
+        public boolean privileged(){
+            return true;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new SetWeatherI(builder.var(weather), builder.var(state));
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.world;
+        }
+    }
+
     @RegisterStatement("spawnwave")
     public static class SpawnWaveStatement extends LStatement{
         public String x = "10", y = "10", natural = "false";
@@ -1999,11 +2115,14 @@ public class LStatements{
                 table.table(t -> {
                     t.setColor(table.color);
 
-                    fields(t, type.params[i], i == 0 ? p1 : i == 1 ? p2 : p3, i == 0 ? v -> p1 = v : i == 1 ? v -> p2 = v : v -> p3 = v).width(100f);
+                    String value = i == 0 ? p1 : i == 1 ? p2 : p3;
+                    Cons<String> setter = i == 0 ? v -> p1 = v : i == 1 ? v -> p2 = v : v -> p3 = v;
 
-                    if(type == LMarkerControl.color){
-                        col(t, p1, res -> {
-                            p1 = "%" + res.toString().substring(0, res.a >= 1f ? 6 : 8);
+                    fields(t, type.params[i], value, setter).width(100f);
+
+                    if(type == LMarkerControl.color || (type == LMarkerControl.colori && i == 1)){
+                        col(t, value, res -> {
+                            setter.get("%" + res.toString().substring(0, res.a >= 1f ? 6 : 8));
                             build(table);
                         });
                     }else if(type == LMarkerControl.drawLayer){
@@ -2013,10 +2132,10 @@ public class LStatements{
                                 o.row();
                                 o.table(s -> {
                                     s.left();
-                                    for(var layer : Layer.class.getFields()){
-                                        float value = Reflect.get(Layer.class, layer.getName());
-                                        s.button(layer.getName() + " = " + value, Styles.logicTogglet, () -> {
-                                            p1 = Float.toString(value);
+                                    for(var field : Layer.class.getFields()){
+                                        float layer = Reflect.get(field);
+                                        s.button(field.getName() + " = " + layer, Styles.logicTogglet, () -> {
+                                            p1 = Float.toString(layer);
                                             rebuild(table);
                                             hide.run();
                                         }).size(240f, 40f).row();
