@@ -568,7 +568,7 @@ public class DesktopInput extends InputHandler{
             schematicY += shiftY;
         }
 
-        if(Core.input.keyTap(Binding.deselect) && !isPlacing() && player.unit().plans.isEmpty() && !commandMode){
+        if(Core.input.keyTap(Binding.deselect) && !ui.minimapfrag.shown() && !isPlacing() && player.unit().plans.isEmpty() && !commandMode){
             player.unit().mineTile = null;
         }
 
