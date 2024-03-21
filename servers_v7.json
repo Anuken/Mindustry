@@ -295,7 +295,7 @@
   },
   { 
     "name": "Sever.VN",
-    "address": ["srv24.godlike.club:26189"]
+    "address": ["192.168.1.2:6567"]
   },
   {
     "name": "NPTS",
