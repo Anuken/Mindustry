@@ -3,6 +3,7 @@ package mindustry.world.blocks.power;
 import arc.*;
 import arc.graphics.*;
 import arc.math.*;
+import arc.struct.ObjectFloatMap;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -28,6 +29,8 @@ public class ConsumeGenerator extends PowerGenerator{
 
     public @Nullable ConsumeItemFilter filterItem;
     public @Nullable ConsumeLiquidFilter filterLiquid;
+    /** Multiplies the itemDuration for a given item*/
+    public ObjectFloatMap<Item> itemDurationMultipliers = new ObjectFloatMap<>();
 
     public ConsumeGenerator(String name){
         super(name);
@@ -122,7 +125,7 @@ public class ConsumeGenerator extends PowerGenerator{
             }
 
             //generation time always goes down, but only at the end so consumeTriggerValid doesn't assume fake items
-            generateTime -= delta() / itemDuration;
+            generateTime -= delta() / (itemDuration * itemDurationMultipliers.get(filterItem.getConsumed(this), 1));
         }
 
         @Override
