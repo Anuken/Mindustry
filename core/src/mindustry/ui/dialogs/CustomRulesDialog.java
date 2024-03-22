@@ -29,12 +29,14 @@ import static mindustry.Vars.*;
 public class CustomRulesDialog extends BaseDialog{
     Rules rules;
     private Table main;
-    private Table current;
-    private String currentName = "";
-    private ObjectMap<String, Table> categories = new ObjectMap<>();
     private Prov<Rules> resetter;
     private LoadoutDialog loadoutDialog;
-    private String ruleSearch = "";
+    public Seq<Table> categories;
+    public Table current;
+    public Seq<String> categoryNames;
+    public String currentName;
+    public String ruleSearch = "";
+    public Seq<Runnable> additionalSetup; // for modding to easily add new rules
 
     public CustomRulesDialog(){
         super("@mode.custom");
@@ -44,6 +46,12 @@ public class CustomRulesDialog extends BaseDialog{
         setFillParent(true);
         shown(this::setup);
         addCloseButton();
+
+        additionalSetup = new Seq<>();
+        categories = new Seq<>();
+        categoryNames = new Seq<>();
+        currentName = "";
+        ruleSearch = "";
 
         buttons.button("@edit", Icon.pencil, () -> {
             BaseDialog dialog = new BaseDialog("@waves.edit");
@@ -212,7 +220,6 @@ public class CustomRulesDialog extends BaseDialog{
             number("@rules.initialwavespacing", false, f -> rules.initialWaveSpacing = f * 60f, () -> rules.initialWaveSpacing / 60f, () -> rules.waves && rules.waveTimer, 0, Float.MAX_VALUE);
         }
         number("@rules.dropzoneradius", false, f -> rules.dropZoneRadius = f * tilesize, () -> rules.dropZoneRadius / tilesize, () -> rules.waves);
-        categoryEnd();
 
 
         category("resourcesbuilding");
@@ -227,7 +234,7 @@ public class CustomRulesDialog extends BaseDialog{
                 setup();
             }
         }, () -> rules.infiniteResources);
-        check("@rules.onlydepositcore", b -> rules.onlyDepositCore = b, () -> rules.onlyDepositCore);
+        withInfo("@rules.onlydepositcore.info", () -> check("@rules.onlydepositcore", b -> rules.onlyDepositCore = b, () -> rules.onlyDepositCore));
         check("@rules.derelictrepair", b -> rules.derelictRepair = b, () -> rules.derelictRepair);
         check("@rules.reactorexplosions", b -> rules.reactorExplosions = b, () -> rules.reactorExplosions);
         check("@rules.schematic", b -> rules.schematicsAllowed = b, () -> rules.schematicsAllowed);
@@ -240,7 +247,7 @@ public class CustomRulesDialog extends BaseDialog{
         number("@rules.blockhealthmultiplier", f -> rules.blockHealthMultiplier = f, () -> rules.blockHealthMultiplier);
         number("@rules.blockdamagemultiplier", f -> rules.blockDamageMultiplier = f, () -> rules.blockDamageMultiplier);
 
-        if(Core.bundle.get("configure").contains(ruleSearch)){
+        if(Core.bundle.get("configure").toLowerCase().contains(ruleSearch)){
             current.button("@configure",
                 () -> loadoutDialog.show(999999, rules.loadout,
                     i -> true,
@@ -249,12 +256,11 @@ public class CustomRulesDialog extends BaseDialog{
             )).left().width(300f).row();
         }
 
-        if(Core.bundle.get("bannedblocks").contains(ruleSearch)){
+        if(Core.bundle.get("bannedblocks").toLowerCase().contains(ruleSearch)){
             current.button("@bannedblocks", () -> showBanned("@bannedblocks", ContentType.block, rules.bannedBlocks, Block::canBeBuilt)).left().width(300f).row();
         }
         check("@rules.hidebannedblocks", b -> rules.hideBannedBlocks = b, () -> rules.hideBannedBlocks);
         check("@bannedblocks.whitelist", b -> rules.blockWhitelist = b, () -> rules.blockWhitelist);
-        categoryEnd();
 
 
         category("unit");
@@ -266,20 +272,18 @@ public class CustomRulesDialog extends BaseDialog{
         number("@rules.unitcostmultiplier", f -> rules.unitCostMultiplier = f, () -> rules.unitCostMultiplier);
         number("@rules.unithealthmultiplier", f -> rules.unitHealthMultiplier = f, () -> rules.unitHealthMultiplier);
 
-        if(Core.bundle.get("bannedunits").contains(ruleSearch)){
+        if(Core.bundle.get("bannedunits").toLowerCase().contains(ruleSearch)){
             current.button("@bannedunits", () -> showBanned("@bannedunits", ContentType.unit, rules.bannedUnits, u -> !u.isHidden())).left().width(300f).row();
         }
         check("@bannedunits.whitelist", b -> rules.unitWhitelist = b, () -> rules.unitWhitelist);
-        categoryEnd();
 
 
         category("enemy");
         check("@rules.attack", b -> rules.attackMode = b, () -> rules.attackMode);
         check("@rules.corecapture", b -> rules.coreCapture = b, () -> rules.coreCapture);
-        check("@rules.placerangecheck", b -> rules.placeRangeCheck = b, () -> rules.placeRangeCheck);
+        withInfo("@rules.placerangecheck.info",() -> check("@rules.placerangecheck", b -> rules.placeRangeCheck = b, () -> rules.placeRangeCheck));
         check("@rules.polygoncoreprotection", b -> rules.polygonCoreProtection = b, () -> rules.polygonCoreProtection);
         number("@rules.enemycorebuildradius", f -> rules.enemyCoreBuildRadius = f * tilesize, () -> Math.min(rules.enemyCoreBuildRadius / tilesize, 200), () -> !rules.polygonCoreProtection);
-        categoryEnd();
 
 
         category("environment");
@@ -298,7 +302,7 @@ public class CustomRulesDialog extends BaseDialog{
 
         number("@rules.solarmultiplier", f -> rules.solarMultiplier = f, () -> rules.solarMultiplier);
 
-        if(Core.bundle.get("rules.ambientlight").contains(ruleSearch)){
+        if(Core.bundle.get("rules.ambientlight").toLowerCase().contains(ruleSearch)){
             current.button(b -> {
                 b.left();
                 b.table(Tex.pane, in -> {
@@ -310,14 +314,13 @@ public class CustomRulesDialog extends BaseDialog{
             }, () -> ui.picker.show(rules.ambientLight, rules.ambientLight::set)).left().width(250f).row();
         }
 
-        if(Core.bundle.get("rules.weather").contains(ruleSearch)){
+        if(Core.bundle.get("rules.weather").toLowerCase().contains(ruleSearch)){
             current.button("@rules.weather", this::weatherDialog).width(250f).left().row();
         }
-        categoryEnd();
 
 
         category("planet");
-        if(Core.bundle.get("rules.title.planet").contains(ruleSearch)){
+        if(Core.bundle.get("rules.title.planet").toLowerCase().contains(ruleSearch)){
             current.table(Tex.button, t -> {
                 t.margin(10f);
                 var group = new ButtonGroup<>();
@@ -342,7 +345,6 @@ public class CustomRulesDialog extends BaseDialog{
                 }).group(group).checked(b -> rules.planet == Planets.sun);
             }).left().fill(false).expand(false, false).row();
         }
-        categoryEnd();
 
 
         category("teams");
@@ -350,21 +352,20 @@ public class CustomRulesDialog extends BaseDialog{
         team("@rules.enemyteam", t -> rules.waveTeam = t, () -> rules.waveTeam);
 
         for(Team team : Team.baseTeams){
-            if(!team.localized().contains(ruleSearch)) continue;
-
             boolean[] shown = {false};
             Table wasCurrent = current;
 
-            current.button(team.coloredName(), Icon.downOpen, Styles.togglet, () -> {
+            Table teamRules = new Table(); // just button and collapser in one table
+            teamRules.button(team.coloredName(), Icon.downOpen, Styles.togglet, () -> {
                 shown[0] = !shown[0];
             }).marginLeft(14f).width(260f).height(55f).update(t -> {
                 ((Image)t.getChildren().get(1)).setDrawable(shown[0] ? Icon.upOpen : Icon.downOpen);
                 t.setChecked(shown[0]);
-            }).row();
+            }).left().padBottom(2f).row();
 
-            current.collapser(t -> {
-                t.left().defaults().fillX().left().pad(5);
-                current = t;
+            teamRules.collapser(c -> {
+                c.left().defaults().fillX().left().pad(5);
+                current = c;
                 TeamRule teams = rules.teams.get(team);
 
                 number("@rules.blockhealthmultiplier", f -> teams.blockHealthMultiplier = f, () -> teams.blockHealthMultiplier);
@@ -388,29 +389,41 @@ public class CustomRulesDialog extends BaseDialog{
                 number("@rules.unitcostmultiplier", f -> teams.unitCostMultiplier = f, () -> teams.unitCostMultiplier);
                 number("@rules.unithealthmultiplier", f -> teams.unitHealthMultiplier = f, () -> teams.unitHealthMultiplier);
 
+                if(!current.hasChildren()){
+                    teamRules.clear();
+                }else{
+                    wasCurrent.add(teamRules).row();
+                }
+
                 current = wasCurrent;
-            }, () -> shown[0]).growX().row();
+            }, () -> shown[0]).left().growX().row();
         }
-        categoryEnd();
+
+        additionalSetup.each(Runnable::run);
+
+        for(var i = 0; i < categories.size; i++){
+            addToMain(categories.get(i), Core.bundle.get("rules.title." + categoryNames.get(i)));
+        }
     }
 
-    void category(String name){
+    public void category(String name){
         current = new Table();
         current.left().defaults().fillX().left().pad(5);
         currentName = name;
-        categories.put(name, current);
+        categories.add(current);
+        categoryNames.add(currentName);
     }
 
-    void categoryEnd(){
-        if(current.hasChildren()){
-            main.add(Core.bundle.get("rules.title." + currentName)).color(Pal.accent).padTop(20).padRight(100f).padBottom(-3).fillX().left().pad(5).row();
+    void addToMain(Table category, String title){
+        if(category.hasChildren()){
+            main.add(title).color(Pal.accent).padTop(20).padRight(100f).padBottom(-3).fillX().left().pad(5).row();
             main.image().color(Pal.accent).height(3f).padRight(100f).padBottom(20).fillX().left().pad(5).row();
-            main.add(current).row();
+            main.add(category).row();
         }
     }
 
-    void team(String text, Cons<Team> cons, Prov<Team> prov){
-        if(!text.contains(ruleSearch)) return;
+    public void team(String text, Cons<Team> cons, Prov<Team> prov){
+        if(!Core.bundle.get(text.substring(1)).toLowerCase().contains(ruleSearch)) return;
         current.table(t -> {
             t.left();
             t.add(text).left().padRight(5);
@@ -423,28 +436,28 @@ public class CustomRulesDialog extends BaseDialog{
         }).padTop(0).row();
     }
 
-    void number(String text, Floatc cons, Floatp prov){
+    public void number(String text, Floatc cons, Floatp prov){
         number(text, false, cons, prov, () -> true, 0, Float.MAX_VALUE);
     }
 
-    void number(String text, Floatc cons, Floatp prov, float min, float max){
+    public void number(String text, Floatc cons, Floatp prov, float min, float max){
         number(text, false, cons, prov, () -> true, min, max);
     }
 
-    void number(String text, boolean integer, Floatc cons, Floatp prov, Boolp condition){
+    public void number(String text, boolean integer, Floatc cons, Floatp prov, Boolp condition){
         number(text, integer, cons, prov, condition, 0, Float.MAX_VALUE);
     }
 
-    void number(String text, Floatc cons, Floatp prov, Boolp condition){
+    public void number(String text, Floatc cons, Floatp prov, Boolp condition){
         number(text, false, cons, prov, condition, 0, Float.MAX_VALUE);
     }
 
-    void numberi(String text, Intc cons, Intp prov, int min, int max){
+    public void numberi(String text, Intc cons, Intp prov, int min, int max){
         numberi(text, cons, prov, () -> true, min, max);
     }
 
-    void numberi(String text, Intc cons, Intp prov, Boolp condition, int min, int max){
-        if(!text.contains(ruleSearch)) return;
+    public void numberi(String text, Intc cons, Intp prov, Boolp condition, int min, int max){
+        if(!Core.bundle.get(text.substring(1)).toLowerCase().contains(ruleSearch)) return;
         current.table(t -> {
             t.left();
             t.add(text).left().padRight(5)
@@ -456,8 +469,8 @@ public class CustomRulesDialog extends BaseDialog{
         }).padTop(0).row();
     }
 
-    void number(String text, boolean integer, Floatc cons, Floatp prov, Boolp condition, float min, float max){
-        if(!text.contains(ruleSearch)) return;
+    public void number(String text, boolean integer, Floatc cons, Floatp prov, Boolp condition, float min, float max){
+        if(!Core.bundle.get(text.substring(1)).toLowerCase().contains(ruleSearch)) return;
         current.table(t -> {
             t.left();
             t.add(text).left().padRight(5)
@@ -470,14 +483,31 @@ public class CustomRulesDialog extends BaseDialog{
         current.row();
     }
 
-    void check(String text, Boolc cons, Boolp prov){
+    public void check(String text, Boolc cons, Boolp prov){
         check(text, cons, prov, () -> true);
     }
 
-    void check(String text, Boolc cons, Boolp prov, Boolp condition){
-        if(!text.contains(ruleSearch)) return;
+    public void check(String text, Boolc cons, Boolp prov, Boolp condition){
+        if(!Core.bundle.get(text.substring(1)).toLowerCase().contains(ruleSearch)) return;
         current.check(text, cons).checked(prov.get()).update(a -> a.setDisabled(!condition.get())).padRight(100f).get().left();
         current.row();
+    }
+
+    public void withInfo(String info, Runnable add){
+        Table wasCurrent = current;
+        current = new Table();
+        current.left().defaults().fillX().left();
+
+        current.button(Icon.infoSmall, () -> ui.showInfo(info)).size(32f).padRight(10f);
+        add.run();
+
+        // rule does not match search pattern (runnable returned without adding anything)
+        if(current.getCells().size < 2){
+            current.clear();
+        }else{
+            wasCurrent.add(current).row();
+        }
+        current = wasCurrent;
     }
 
     Cell<TextField> field(Table table, float value, Floatc setter){
