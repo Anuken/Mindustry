@@ -76,7 +76,7 @@ public class PayloadLoader extends PayloadBlock{
     public void init(){
         if(loadPowerDynamic){
             basePowerUse = consPower != null ? consPower.usage : 0f;
-            consumePowerDynamic((PayloadLoaderBuild loader) -> loader.hasBattery() && !loader.exporting ? maxPowerConsumption + basePowerUse : basePowerUse);
+            consumePowerDynamic((PayloadLoaderBuild loader) -> loader.shouldConsume() ? (loader.hasBattery() && !loader.exporting ? maxPowerConsumption + basePowerUse : basePowerUse) : 0f);
         }
 
         super.init();
