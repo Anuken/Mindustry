@@ -295,7 +295,7 @@
   },
   { 
     "name": "Sever.VN",
-    "address": ["192.168.1.2:6567", sg.avianserver.com:25790"]
+    "address": ["192.168.1.2:6567", "sg.avianserver.com:25790"]
   },
   {
     "name": "NPTS",
