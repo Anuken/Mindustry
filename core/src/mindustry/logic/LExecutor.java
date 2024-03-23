@@ -1368,7 +1368,7 @@ public class LExecutor{
                     if(type == null){
                         exec.setobj(result, data.units.get(i));
                     }else{
-                        exec.setnum(result, data.unitsByType[type.id].get(1));
+                        exec.setobj(result, data.unitsByType[type.id].get(1));
                     }
                 }
                 case player -> exec.setobj(result, i < 0 || i >= data.players.size || data.players.get(i).unit().isNull() ? null : data.players.get(i).unit());
