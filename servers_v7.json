@@ -29,12 +29,8 @@
     "address": ["de-free-01.hosts.optikservers.com:31528","de-prem-01.hosts.optikservers.com:35922"]
   },
   {
-    "name": "Chilldustry",
-    "address": ["trelesco.xyz"]
-  },
-  {
     "name": "CMS Empire",
-    "address": ["94.250.250.252","95.84.198.97"]
+    "address": ["trelesco.xyz","94.250.250.252","95.84.198.97"]
   },
   {
     "name": "ShardDustry Eventos",
