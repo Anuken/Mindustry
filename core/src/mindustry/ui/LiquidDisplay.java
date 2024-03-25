@@ -31,7 +31,7 @@ public class LiquidDisplay extends Table{
                 t.add(Strings.autoFixed(amount, 2)).style(Styles.outlineLabel);
                 add(t);
             }
-        }}).height(size).left();
+        }}).height(size).minWidth(size).left();
         add(liquid.localizedName + (perSecond && amount != 0 ? "\n[lightgray]" + Strings.autoFixed(amount, 2) + StatUnit.perSecond.localized() : "[]")).left().style(Styles.outlineLabel);
     }
 
