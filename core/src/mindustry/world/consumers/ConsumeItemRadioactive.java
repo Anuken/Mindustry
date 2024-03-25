@@ -18,7 +18,7 @@ public class ConsumeItemRadioactive extends ConsumeItemFilter{
 
     @Override
     public void display(Stats stats){
-        stats.add(booster ? Stat.booster : Stat.input, StatValues.itemEffMultiplier(i -> i.radioactivity, filter));
+        stats.add(booster ? Stat.booster : Stat.input, StatValues.itemEffMultiplier(i -> i.radioactivity, stats.timePeriod, filter));
     }
 
     @Override

@@ -292,7 +292,7 @@ public class StatValues{
         };
     }
 
-    public static StatValue itemEffMultiplier(Floatf<Item> efficiency, Boolf<Item> filter){
+    public static StatValue itemEffMultiplier(Floatf<Item> efficiency, float timePeriod, Boolf<Item> filter){
         return table -> {
             table.getCells().peek().growX(); //Expand the spacer on the row above to push everything to the left
             table.row();
@@ -300,7 +300,7 @@ public class StatValues{
                 for(Item item : content.items().select(i -> filter.get(i) && i.unlockedNow() && !i.isHidden())){
                     c.table(Styles.grayPanel, b -> {
                         b.image(item.uiIcon).size(40).pad(10f).left().scaling(Scaling.fit);
-                        b.add(item.localizedName).left().grow();
+                        b.add(item.localizedName + (timePeriod > 0 ? "\n[lightgray]" + Strings.autoFixed(1f / (timePeriod / 60f), 2) + StatUnit.perSecond.localized() : "")).left().grow();
                         b.add(Core.bundle.format("stat.efficiency", fixValue(efficiency.get(item) * 100f))).right().pad(10f).padRight(15f);
                     }).growX().pad(5).row();
                 }

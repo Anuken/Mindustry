@@ -18,7 +18,7 @@ public class ConsumeItemFlammable extends ConsumeItemFilter{
 
     @Override
     public void display(Stats stats){
-        stats.add(booster ? Stat.booster : Stat.input, StatValues.itemEffMultiplier(i -> i.flammability, filter));
+        stats.add(booster ? Stat.booster : Stat.input, StatValues.itemEffMultiplier(i -> i.flammability, stats.timePeriod, filter));
     }
 
     @Override

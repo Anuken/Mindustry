@@ -18,7 +18,7 @@ public class ConsumeItemExplosive extends ConsumeItemFilter{
 
     @Override
     public void display(Stats stats){
-        stats.add(booster ? Stat.booster : Stat.input, StatValues.itemEffMultiplier(i -> i.explosiveness, filter));
+        stats.add(booster ? Stat.booster : Stat.input, StatValues.itemEffMultiplier(i -> i.explosiveness, stats.timePeriod, filter));
     }
 
     @Override

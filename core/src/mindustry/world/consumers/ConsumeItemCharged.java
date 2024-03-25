@@ -19,7 +19,7 @@ public class ConsumeItemCharged extends ConsumeItemFilter{
 
     @Override
     public void display(Stats stats){
-        stats.add(booster ? Stat.booster : Stat.input, StatValues.itemEffMultiplier(i -> i.charge, filter));
+        stats.add(booster ? Stat.booster : Stat.input, StatValues.itemEffMultiplier(i -> i.charge, stats.timePeriod, filter));
     }
 
     @Override
