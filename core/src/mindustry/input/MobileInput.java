@@ -712,7 +712,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             buildingTapped = selectedControlBuild();
 
             //prevent mining if placing/breaking blocks
-            if(!tryStopMine() && !canTapPlayer(worldx, worldy) && !checkConfigTap() && !tileTapped(linked.build) && mode == none && !Core.settings.getBool("doubletapmine")){
+            if(!tryRepairDerelict(cursor) && !tryStopMine() && !canTapPlayer(worldx, worldy) && !checkConfigTap() && !tileTapped(linked.build) && mode == none && !Core.settings.getBool("doubletapmine")){
                 tryBeginMine(cursor);
             }
         }
@@ -743,6 +743,11 @@ public class MobileInput extends InputHandler implements GestureListener{
             queueCommandMode = false;
         }
 
+        //cannot rebuild and place at the same time
+        if(block != null){
+            rebuildMode = false;
+        }
+
         if(player.dead()){
             mode = none;
             manualShooting = false;
@@ -766,7 +771,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             renderer.scaleCamera(Core.input.axisTap(Binding.zoom));
         }
 
-        if(!Core.settings.getBool("keyboard") && !locked){
+        if(!Core.settings.getBool("keyboard") && !locked && !scene.hasKeyboard()){
             //move camera around
             float camSpeed = 6f;
             Core.camera.position.add(Tmp.v1.setZero().add(Core.input.axis(Binding.move_x), Core.input.axis(Binding.move_y)).nor().scl(Time.delta * camSpeed));
@@ -967,7 +972,6 @@ public class MobileInput extends InputHandler implements GestureListener{
         boolean allowHealing = type.canHeal;
         boolean validHealTarget = allowHealing && target instanceof Building b && b.isValid() && target.team() == unit.team && b.damaged() && target.within(unit, type.range);
         boolean boosted = (unit instanceof Mechc && unit.isFlying());
-
         //reset target if:
         // - in the editor, or...
         // - it's both an invalid standard target and an invalid heal target

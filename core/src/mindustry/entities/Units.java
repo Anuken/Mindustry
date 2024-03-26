@@ -89,7 +89,7 @@ public class Units{
 
     /** @return whether a new instance of a unit of this team can be created. */
     public static boolean canCreate(Team team, UnitType type){
-        return team.data().countType(type) < getCap(team) && !type.isBanned();
+        return !type.useUnitCap || (team.data().countType(type) < getCap(team) && !type.isBanned());
     }
 
     public static int getCap(Team team){
@@ -192,7 +192,17 @@ public class Units{
 
     /** Returns the nearest enemy tile in a range. */
     public static Building findEnemyTile(Team team, float x, float y, float range, Boolf<Building> pred){
+        return findEnemyTile(team, x, y, range, false, pred);
+    }
+
+    /** Returns the nearest enemy tile in a range. */
+    public static Building findEnemyTile(Team team, float x, float y, float range, boolean checkUnder, Boolf<Building> pred){
         if(team == Team.derelict) return null;
+
+        if(checkUnder){
+            Building target = indexer.findEnemyTile(team, x, y, range, build -> !build.block.underBullets && pred.get(build));
+            if(target != null) return target;
+        }
 
         return indexer.findEnemyTile(team, x, y, range, pred);
     }
@@ -214,7 +224,10 @@ public class Units{
             }
         });
 
-        return buildResult;
+        var result = buildResult;
+        buildResult = null;
+
+        return result;
     }
 
     /** Iterates through all buildings in a range. */
@@ -240,7 +253,7 @@ public class Units{
         if(unit != null){
             return unit;
         }else{
-            return findEnemyTile(team, x, y, range, tilePred);
+            return findEnemyTile(team, x, y, range, true, tilePred);
         }
     }
 
@@ -252,7 +265,7 @@ public class Units{
         if(unit != null){
             return unit;
         }else{
-            return findEnemyTile(team, x, y, range, tilePred);
+            return findEnemyTile(team, x, y, range, true, tilePred);
         }
     }
 

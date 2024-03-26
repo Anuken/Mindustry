@@ -78,7 +78,7 @@ public class UI implements ApplicationListener, Loadable{
 
     public IntMap<Dialog> followUpMenus;
 
-    public Cursor drillCursor, unloadCursor, targetCursor;
+    public Cursor drillCursor, unloadCursor, targetCursor, repairCursor;
 
     private @Nullable Element lastAnnouncement;
 
@@ -101,8 +101,6 @@ public class UI implements ApplicationListener, Loadable{
 
     @Override
     public void loadSync(){
-        loadColors();
-
         Fonts.outline.getData().markupEnabled = true;
         Fonts.def.getData().markupEnabled = true;
         Fonts.def.setOwnsTexture(false);
@@ -142,6 +140,7 @@ public class UI implements ApplicationListener, Loadable{
         drillCursor = Core.graphics.newCursor("drill", Fonts.cursorScale());
         unloadCursor = Core.graphics.newCursor("unload", Fonts.cursorScale());
         targetCursor = Core.graphics.newCursor("target", Fonts.cursorScale());
+        repairCursor = Core.graphics.newCursor("repair", Fonts.cursorScale());
     }
 
     @Override
@@ -280,7 +279,7 @@ public class UI implements ApplicationListener, Loadable{
 
     public void showTextInput(String titleText, String text, int textLength, String def, boolean numbers, boolean allowEmpty, Cons<String> confirmed, Runnable closed){
         if(mobile){
-            var description = text;
+            var description = (text.startsWith("@") ? Core.bundle.get(text.substring(1)) : text);
             var empty = allowEmpty;
             Core.input.getTextInput(new TextInput(){{
                 this.title = (titleText.startsWith("@") ? Core.bundle.get(titleText.substring(1)) : titleText);

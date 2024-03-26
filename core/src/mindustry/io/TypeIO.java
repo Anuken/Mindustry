@@ -16,6 +16,7 @@ import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
+import mindustry.game.MapObjectives.*;
 import mindustry.gen.*;
 import mindustry.logic.*;
 import mindustry.net.Administration.*;
@@ -562,13 +563,14 @@ public class TypeIO{
                 ai.targetPos = null;
             }
             ai.setupLastPos();
+            ai.readAttackTarget = -1;
 
             if(hasAttack){
                 byte entityType = read.b();
                 if(entityType == 1){
                     ai.attackTarget = world.build(read.i());
                 }else{
-                    ai.attackTarget = Groups.unit.getByID(read.i());
+                    ai.attackTarget = Groups.unit.getByID(ai.readAttackTarget = read.i());
                 }
             }else{
                 ai.attackTarget = null;
@@ -629,6 +631,14 @@ public class TypeIO{
         return KickReason.values()[read.b()];
     }
 
+    public static void writeMarkerControl(Writes write, LMarkerControl reason){
+        write.b((byte)reason.ordinal());
+    }
+
+    public static LMarkerControl readMarkerControl(Reads read){
+        return LMarkerControl.all[read.ub()];
+    }
+
     public static void writeRules(Writes write, Rules rules){
         String string = JsonIO.write(rules);
         byte[] bytes = string.getBytes(charset);
@@ -653,6 +663,19 @@ public class TypeIO{
         int length = read.i();
         String string = new String(read.b(new byte[length]), charset);
         return JsonIO.read(MapObjectives.class, string);
+    }
+
+    public static void writeObjectiveMarker(Writes write, ObjectiveMarker marker){
+        String string = JsonIO.json.toJson(marker, MapObjectives.ObjectiveMarker.class);
+        byte[] bytes = string.getBytes(charset);
+        write.i(bytes.length);
+        write.b(bytes);
+    }
+
+    public static ObjectiveMarker readObjectiveMarker(Reads read){
+        int length = read.i();
+        String string = new String(read.b(new byte[length]), charset);
+        return JsonIO.read(MapObjectives.ObjectiveMarker.class, string);
     }
 
     public static void writeVecNullable(Writes write, @Nullable Vec2 v){
@@ -691,10 +714,50 @@ public class TypeIO{
     public static void writeStatus(Writes write, StatusEntry entry){
         write.s(entry.effect.id);
         write.f(entry.time);
+
+        //write dynamic fields
+        if(entry.effect.dynamic){
+            //write a byte with bits set based on which field is actually used
+            write.b(
+            (entry.damageMultiplier != 1f ?     (1 << 0) : 0) |
+            (entry.healthMultiplier != 1f ?     (1 << 1) : 0) |
+            (entry.speedMultiplier != 1f ?      (1 << 2) : 0) |
+            (entry.reloadMultiplier != 1f ?     (1 << 3) : 0) |
+            (entry.buildSpeedMultiplier != 1f ? (1 << 4) : 0) |
+            (entry.dragMultiplier != 1f ?       (1 << 5) : 0) |
+            (entry.armorOverride >= 0f ?        (1 << 6) : 0)
+            );
+
+            if(entry.damageMultiplier != 1f) write.f(entry.damageMultiplier);
+            if(entry.healthMultiplier != 1f) write.f(entry.healthMultiplier);
+            if(entry.speedMultiplier != 1f) write.f(entry.speedMultiplier);
+            if(entry.reloadMultiplier != 1f) write.f(entry.reloadMultiplier);
+            if(entry.buildSpeedMultiplier != 1f) write.f(entry.buildSpeedMultiplier);
+            if(entry.dragMultiplier != 1f) write.f(entry.dragMultiplier);
+            if(entry.armorOverride >= 0f) write.f(entry.armorOverride);
+        }
     }
 
     public static StatusEntry readStatus(Reads read){
-        return new StatusEntry().set(content.getByID(ContentType.status, read.s()), read.f());
+        short id = read.s();
+        float time = read.f();
+
+        StatusEntry result = new StatusEntry().set(content.getByID(ContentType.status, id), time);
+
+        if(result.effect.dynamic){
+            //read flags that store which fields are set
+            int flags = read.ub();
+
+            if((flags & (1 << 0)) != 0) result.damageMultiplier = read.f();
+            if((flags & (1 << 1)) != 0) result.healthMultiplier = read.f();
+            if((flags & (1 << 2)) != 0) result.speedMultiplier = read.f();
+            if((flags & (1 << 3)) != 0) result.reloadMultiplier = read.f();
+            if((flags & (1 << 4)) != 0) result.buildSpeedMultiplier = read.f();
+            if((flags & (1 << 5)) != 0) result.dragMultiplier = read.f();
+            if((flags & (1 << 6)) != 0) result.armorOverride = read.f();
+        }
+
+        return result;
     }
 
     public static void writeItems(Writes write, ItemStack stack){

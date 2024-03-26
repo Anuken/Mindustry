@@ -487,6 +487,10 @@ public class StatValues{
                         sep(bt, "@bullet.armorpierce");
                     }
 
+                    if(type.maxDamageFraction > 0){
+                        sep(bt, Core.bundle.format("bullet.maxdamagefraction", (int)(type.maxDamageFraction * 100))); 
+                    }
+
                     if(type.suppressionRange > 0){
                         sep(bt, Core.bundle.format("bullet.suppression", Strings.autoFixed(type.suppressionDuration / 60f, 2), Strings.fixed(type.suppressionRange / tilesize, 1)));
                     }

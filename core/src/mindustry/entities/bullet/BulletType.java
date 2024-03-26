@@ -48,6 +48,8 @@ public class BulletType extends Content implements Cloneable{
     public int pierceCap = -1;
     /** Multiplier of damage decreased per health pierced. */
     public float pierceDamageFactor = 0f;
+    /** If positive, limits non-splash damage dealt to a fraction of the target's maximum health. */
+    public float maxDamageFraction = -1f;
     /** If false, this bullet isn't removed after pierceCap is exceeded. Expert usage only. */
     public boolean removeAfterPierce = true;
     /** For piercing lasers, setting this to true makes it get absorbed by plastanium walls. */
@@ -158,6 +160,8 @@ public class BulletType extends Content implements Cloneable{
 
     /** Bullet type that is created when this bullet expires. */
     public @Nullable BulletType fragBullet = null;
+    /** If true, frag bullets are delayed to the next frame. Fixes obscure bugs with piercing bullet types spawning frags immediately and screwing up the Damage temporary variables. */
+    public boolean delayFrags = false;
     /** Degree spread range of fragmentation bullets. */
     public float fragRandomSpread = 360f;
     /** Uniform spread between each frag bullet in degrees. */
@@ -170,6 +174,8 @@ public class BulletType extends Content implements Cloneable{
     public float fragVelocityMin = 0.2f, fragVelocityMax = 1f;
     /** Random range of frag lifetime as a multiplier. */
     public float fragLifeMin = 1f, fragLifeMax = 1f;
+    /** Random offset of frag bullets from the parent bullet. */
+    public float fragOffsetMin = 1f, fragOffsetMax = 7f;
 
     /** Bullet that is created at a fixed interval. */
     public @Nullable BulletType intervalBullet;
@@ -382,10 +388,20 @@ public class BulletType extends Content implements Cloneable{
         boolean wasDead = entity instanceof Unit u && u.dead;
 
         if(entity instanceof Healthc h){
-            if(pierceArmor){
-                h.damagePierce(b.damage);
+            float damage = b.damage;
+            float shield = entity instanceof Shieldc s ? Math.max(s.shield(), 0f) : 0f;
+            if(maxDamageFraction > 0){
+                float cap = h.maxHealth() * maxDamageFraction + shield;
+                damage = Math.min(damage, cap);
+                //cap health to effective health for handlePierce to handle it properly
+                health = Math.min(health, cap);
             }else{
-                h.damage(b.damage);
+                health += shield;
+            }
+            if(pierceArmor){
+                h.damagePierce(damage);
+            }else{
+                h.damage(damage);
             }
         }
 
@@ -434,7 +450,11 @@ public class BulletType extends Content implements Cloneable{
         Effect.shake(hitShake, hitShake, b);
 
         if(fragOnHit){
-            createFrags(b, x, y);
+            if(delayFrags && fragBullet != null && fragBullet.delayFrags){
+                Core.app.post(() -> createFrags(b, x, y));
+            }else{
+                createFrags(b, x, y);
+            }
         }
         createPuddles(b, x, y);
         createIncend(b, x, y);
@@ -491,7 +511,7 @@ public class BulletType extends Content implements Cloneable{
     public void createFrags(Bullet b, float x, float y){
         if(fragBullet != null && (fragOnAbsorb || !b.absorbed)){
             for(int i = 0; i < fragBullets; i++){
-                float len = Mathf.random(1f, 7f);
+                float len = Mathf.random(fragOffsetMin, fragOffsetMax);
                 float a = b.rotation() + Mathf.range(fragRandomSpread / 2) + fragAngle + ((i - fragBullets/2) * fragSpread);
                 fragBullet.create(b, x + Angles.trnsx(a, len), y + Angles.trnsy(a, len), a, Mathf.random(fragVelocityMin, fragVelocityMax), Mathf.random(fragLifeMin, fragLifeMax));
             }

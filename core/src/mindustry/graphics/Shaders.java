@@ -242,10 +242,17 @@ public class Shaders{
         @Override
         public void apply(){
             setUniformf("u_progress", progress);
-            setUniformf("u_uv", region.u, region.v);
-            setUniformf("u_uv2", region.u2, region.v2);
             setUniformf("u_time", time);
-            setUniformf("u_texsize", region.texture.width, region.texture.height);
+
+            if(region.texture == null){
+                setUniformf("u_uv", 0f, 0f);
+                setUniformf("u_uv2", 1f, 1f);
+                setUniformf("u_texsize", 1, 1);
+            }else{
+                setUniformf("u_uv", region.u, region.v);
+                setUniformf("u_uv2", region.u2, region.v2);
+                setUniformf("u_texsize", region.texture.width, region.texture.height);
+            }
         }
     }
 
@@ -467,6 +474,6 @@ public class Shaders{
     }
 
     public static Fi getShaderFi(String file){
-        return Core.files.internal("shaders/" + file);
+        return tree.get("shaders/" + file);
     }
 }

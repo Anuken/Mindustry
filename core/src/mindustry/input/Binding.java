@@ -56,6 +56,7 @@ public enum Binding implements KeyBind{
     unit_command_assist(KeyCode.unset),
     unit_command_mine(KeyCode.unset),
     unit_command_boost(KeyCode.unset),
+    unit_command_enter_payload(KeyCode.unset),
     unit_command_load_units(KeyCode.unset),
     unit_command_load_blocks(KeyCode.unset),
     unit_command_unload_payload(KeyCode.unset),

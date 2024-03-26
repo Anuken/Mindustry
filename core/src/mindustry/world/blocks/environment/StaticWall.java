@@ -20,6 +20,8 @@ public class StaticWall extends Prop{
         solid = true;
         variants = 2;
         cacheLayer = CacheLayer.walls;
+        allowRectanglePlacement = true;
+        instantBuild = true;
     }
 
     @Override

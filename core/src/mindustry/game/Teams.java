@@ -347,7 +347,7 @@ public class Teams{
             }
 
             for(var build : builds){
-                if(build.within(x, y, range) && !cores.contains(c -> c.within(x, y, range))){
+                if(build.within(x, y, range) && !cores.contains(c -> c.within(build, range))){
                     //TODO GPU driver bugs?
                     build.kill();
                     //Time.run(Mathf.random(0f, 60f * 6f), build::kill);
