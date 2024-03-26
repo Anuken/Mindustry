@@ -29,6 +29,10 @@
     "address": ["cn1.meiqiumdt.top","cn1.meiqiumdt.top:7000","cn1.meiqiumdt.top:8000","cn1.meiqiumdt.top:7013","cn1.meiqiumdt.top:9000"]
   },
   {
+    "name": "Cyandustry",
+    "address": ["45.88.109.9:7000","45.88.109.9:7001","45.88.109.9:7003","45.88.109.9:7004","45.88.109.9:7005","45.88.109.9:7006","45.88.109.9:7007","45.88.109.9:7008"]
+  },  
+  {
     "name": "Crux's Revelations",
     "address": ["de-free-01.hosts.optikservers.com:31528","de-prem-01.hosts.optikservers.com:35922"]
   },
