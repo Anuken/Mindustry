@@ -61,7 +61,7 @@ abstract class ShieldComp implements Healthc, Posc{
             }
 
             if(hadShields && shield <= 0.0001f){
-                Fx.unitShieldBreak.at(x, y, 0, team.color, this);
+                Fx.unitShieldBreak.at(x, y, 0, type.shieldColor(self()), this);
             }
         }
     }

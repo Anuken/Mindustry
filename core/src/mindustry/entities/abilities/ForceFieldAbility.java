@@ -45,7 +45,7 @@ public class ForceFieldAbility extends Ability{
             if(paramUnit.shield <= trait.damage()){
                 paramUnit.shield -= paramField.cooldown * paramField.regen;
 
-                Fx.shieldBreak.at(paramUnit.x, paramUnit.y, paramField.radius, paramUnit.team.color, paramUnit);
+                Fx.shieldBreak.at(paramUnit.x, paramUnit.y, paramField.radius, paramUnit.type.shieldColor(paramUnit), paramUnit);
             }
 
             paramUnit.shield -= trait.damage();
@@ -108,7 +108,7 @@ public class ForceFieldAbility extends Ability{
         checkRadius(unit);
 
         if(unit.shield > 0){
-            Draw.color(unit.team.color, Color.white, Mathf.clamp(alpha));
+            Draw.color(unit.type.shieldColor(unit), Color.white, Mathf.clamp(alpha));
 
             if(Vars.renderer.animateShields){
                 Draw.z(Layer.shields + 0.001f * alpha);
