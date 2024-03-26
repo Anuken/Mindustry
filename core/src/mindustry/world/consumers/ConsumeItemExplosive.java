@@ -1,6 +1,5 @@
 package mindustry.world.consumers;
 
-import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.meta.*;
 
