@@ -64,6 +64,8 @@ public class LExecutor{
 
     //yes, this is a minor memory leak, but it's probably not significant enough to matter
     protected static IntFloatMap unitTimeouts = new IntFloatMap();
+    //lookup variable by name, lazy init.
+    protected ObjectIntMap<String> nameMap;
 
     static{
         Events.on(ResetEvent.class, e -> unitTimeouts.clear());
@@ -95,6 +97,7 @@ public class LExecutor{
 
     /** Loads with a specified assembler. Resets all variables. */
     public void load(LAssembler builder){
+        nameMap = null;
         vars = new Var[builder.vars.size];
         instructions = builder.instructions;
         iptIndex = -1;
@@ -131,6 +134,16 @@ public class LExecutor{
         return index < 0 ? logicVars.get(-index, privileged) : vars[index];
     }
 
+    public @Nullable Var optionalVar(String name){
+        if(nameMap == null){
+            nameMap = new ObjectIntMap<>();
+            for(int i = 0; i < vars.length; i++){
+                nameMap.put(vars[i].name, i);
+            }
+        }
+        return optionalVar(nameMap.get(name, -1));
+    }
+
     /** @return a Var from this processor, never a global constant. May be null if out of bounds. */
     public @Nullable Var optionalVar(int index){
         return index < 0 || index >= vars.length ? null : vars[index];
@@ -139,6 +152,13 @@ public class LExecutor{
     public @Nullable Building building(int index){
         Object o = var(index).objval;
         return var(index).isobj && o instanceof Building building ? building : null;
+    }
+
+    public @Nullable Building accessibleBuilding(int index){
+        Building res = building(index);
+        if(res == null || privileged) return res;
+        if(res.block.privileged || res.team != team) return null;
+        return res;
     }
 
     public @Nullable Object obj(int index){
@@ -351,8 +371,8 @@ public class LExecutor{
                         cache.found = false;
                         exec.setnum(outFound, 0);
                     }
-                    
-                    if(res != null && res.build != null && 
+
+                    if(res != null && res.build != null &&
                         (unit.within(res.build.x, res.build.y, Math.max(unit.range(), buildingRange)) || res.build.team == exec.team)){
                         cache.build = res.build;
                         exec.setobj(outBuild, res.build);
@@ -679,12 +699,18 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            int address = exec.numi(position);
-            Building from = exec.building(target);
-
-            if(from instanceof MemoryBuild mem && (exec.privileged || from.team == exec.team)){
-
+            Building from = exec.accessibleBuilding(target);
+            if(from instanceof MemoryBuild mem){
+                int address = exec.numi(position);
                 exec.setnum(output, address < 0 || address >= mem.memory.length ? 0 : mem.memory[address]);
+            }else if(from instanceof LogicBuild logic && exec.obj(position) instanceof String name){
+                Var fromVar = logic.executor.optionalVar(name);
+                Var toVar = exec.var(output);
+                if(fromVar != null && !toVar.constant){
+                    toVar.objval = fromVar.objval;
+                    toVar.numval = fromVar.numval;
+                    toVar.isobj = fromVar.isobj;
+                }
             }
         }
     }
@@ -703,11 +729,22 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            int address = exec.numi(position);
-            Building from = exec.building(target);
-
-            if(from instanceof MemoryBuild mem && (exec.privileged || (from.team == exec.team && !mem.block.privileged)) && address >= 0 && address < mem.memory.length){
-                mem.memory[address] = exec.num(value);
+            Building from = exec.accessibleBuilding(target);
+            if(from instanceof MemoryBuild mem){
+                int address = exec.numi(position);
+                if(address >= 0 && address < mem.memory.length){
+                    mem.memory[address] = exec.num(value);
+                }
+            }else if(from instanceof LogicBuild logic && exec.obj(position) instanceof String name){
+                Var writable = logic.executor.optionalVar("@writable");
+                if(writable == null || (writable.isobj ? writable.objval == null : Math.abs(writable.numval) < 0.00001)) return;
+                Var toVar = logic.executor.optionalVar(name);
+                Var fromVar = exec.var(value);
+                if(toVar != null && !toVar.constant){
+                    toVar.objval = fromVar.objval;
+                    toVar.numval = fromVar.numval;
+                    toVar.isobj = fromVar.isobj;
+                }
             }
         }
     }
@@ -1063,7 +1100,7 @@ public class LExecutor{
             //graphics on headless servers are useless.
             if(Vars.headless) return;
 
-            if(exec.building(target) instanceof LogicDisplayBuild d && (d.team == exec.team || exec.privileged)){
+            if(exec.accessibleBuilding(target) instanceof LogicDisplayBuild d){
                 if(d.commands.size + exec.graphicsBuffer.size < maxDisplayBuffer){
                     for(int i = 0; i < exec.graphicsBuffer.size; i++){
                         d.commands.addLast(exec.graphicsBuffer.items[i]);
@@ -1181,7 +1218,7 @@ public class LExecutor{
         @Override
         public void run(LExecutor exec){
 
-            if(exec.building(target) instanceof MessageBuild d && (d.team == exec.team || exec.privileged)){
+            if(exec.accessibleBuilding(target) instanceof MessageBuild d){
 
                 d.message.setLength(0);
                 d.message.append(exec.textBuffer, 0, Math.min(exec.textBuffer.length(), maxTextBuffer));
