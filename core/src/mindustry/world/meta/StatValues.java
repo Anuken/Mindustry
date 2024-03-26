@@ -374,17 +374,23 @@ public class StatValues{
     public static StatValue abilities(Seq<Ability> abilities){
         return table -> {
             table.row();
-            table.table(t -> abilities.each(ability -> {
-                if(ability.display){
-                    t.row();
-                    t.table(Styles.grayPanel, a -> {
-                        a.add("[accent]" + ability.localized()).padBottom(4);
-                        a.row();
-                        a.left().top().defaults().left();
-                        ability.addStats(a);
-                    }).pad(5).margin(10).growX();
-                }
-            }));
+            table.table(t -> {
+                int count = 0;
+                for(Ability ability : abilities){
+                    if(ability.display){
+                        t.table(Styles.grayPanel, a -> {
+                            a.add("[accent]" + ability.localized()).padBottom(4).center().top().expandX();
+                            a.row();
+                            a.left().top().defaults().left();
+                            ability.addStats(a);
+                        }).pad(5).margin(10).growX().top().uniformX();
+                        if((++count) == 2){
+                            count = 0;
+                            t.row();
+                        }
+                    }
+                };
+            });
         };
     }
 
@@ -496,7 +502,7 @@ public class StatValues{
                     }
 
                     if(type.status != StatusEffects.none){
-                        sep(bt, (type.status.minfo.mod == null ? type.status.emoji() : "") + "[stat]" + type.status.localizedName + (type.status.reactive ? "" : "[lightgray] ~ [stat]" + ((int)(type.statusDuration / 60f)) + "[lightgray] " + Core.bundle.get("unit.seconds")));
+                        sep(bt, (type.status.hasEmoji() ? type.status.emoji() : "") + "[stat]" + type.status.localizedName + (type.status.reactive ? "" : "[lightgray] ~ [stat]" + ((int)(type.statusDuration / 60f)) + "[lightgray] " + Core.bundle.get("unit.seconds")));
                     }
 
                     if(type.intervalBullet != null){

@@ -12,7 +12,6 @@ import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
-import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -36,9 +35,10 @@ public class UnitSpawnAbility extends Ability{
 
     @Override
     public void addStats(Table t){
-        t.add("[lightgray]" + Stat.buildTime.localized() + ": [white]" + Strings.autoFixed(spawnTime / 60f, 2) + " " + StatUnit.seconds.localized());
+        super.addStats(t);
+        t.add(abilityStat("buildtime", Strings.autoFixed(spawnTime / 60f, 2)));
         t.row();
-        t.add(unit.emoji() + " " + unit.localizedName);
+        t.add((unit.hasEmoji() ? unit.emoji() : "") + "[stat]" + unit.localizedName);
     }
 
     @Override
