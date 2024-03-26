@@ -228,6 +228,7 @@ public class Weapon implements Cloneable{
                 var part = parts.get(i);
                 DrawPart.params.setRecoil(part.recoilIndex >= 0 && mount.recoils != null ? mount.recoils[part.recoilIndex] : mount.recoil);
                 if(part.under){
+                    unit.type.applyColor(unit);
                     part.draw(DrawPart.params);
                 }
             }
@@ -262,6 +263,7 @@ public class Weapon implements Cloneable{
                 var part = parts.get(i);
                 DrawPart.params.setRecoil(part.recoilIndex >= 0 && mount.recoils != null ? mount.recoils[part.recoilIndex] : mount.recoil);
                 if(!part.under){
+                    unit.type.applyColor(unit);
                     part.draw(DrawPart.params);
                 }
             }
