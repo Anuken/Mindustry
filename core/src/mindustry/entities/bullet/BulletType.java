@@ -48,6 +48,8 @@ public class BulletType extends Content implements Cloneable{
     public int pierceCap = -1;
     /** Multiplier of damage decreased per health pierced. */
     public float pierceDamageFactor = 0f;
+    /** Use a negative value to disable pierce delay. */
+    public float pierceDelay = -1f;
     /** If positive, limits non-splash damage dealt to a fraction of the target's maximum health. */
     public float maxDamageFraction = -1f;
     /** If false, this bullet isn't removed after pierceCap is exceeded. Expert usage only. */
@@ -221,6 +223,8 @@ public class BulletType extends Content implements Cloneable{
     public float trailChance = -0.0001f;
     /** Uniform interval in which trail effect is spawned. */
     public float trailInterval = 0f;
+    /** Use a negative value to disable trail delay. */
+    public float trailDelay = -1f;
     /** Trail effect that is spawned. */
     public Effect trailEffect = Fx.missileTrail;
     /** Rotation/size parameter that is passed to trail. Usually, this controls size. */
@@ -285,6 +289,8 @@ public class BulletType extends Content implements Cloneable{
     public float weaveScale = 1f;
     /** Intensity of bullet weaving. Note that this may make bullets inaccurate. */
     public float weaveMag = 0f;
+    /** Use a negative value to disable weave delay. */
+    public float weaveDelay = -1f;
     /** If true, the bullet weave will randomly switch directions on spawn. */
     public boolean weaveRandom = true;
 
@@ -422,13 +428,15 @@ public class BulletType extends Content implements Cloneable{
     }
 
     public void handlePierce(Bullet b, float initialHealth, float x, float y){
-        float sub = Mathf.zero(pierceDamageFactor) ? 0f : Math.max(initialHealth * pierceDamageFactor, 0);
-        //subtract health from each consecutive pierce
-        b.damage -= Float.isNaN(sub) ? b.damage : Math.min(b.damage, sub);
+        if(b.time >= pierceDelay){
+            float sub = Mathf.zero(pierceDamageFactor) ? 0f : Math.max(initialHealth * pierceDamageFactor, 0);
+            //subtract health from each consecutive pierce
+            b.damage -= Float.isNaN(sub) ? b.damage : Math.min(b.damage, sub);
 
-        if(removeAfterPierce && b.damage <= 0){
-            b.hit = true;
-            b.remove();
+            if(removeAfterPierce && b.damage <= 0){
+                b.hit = true;
+                b.remove();
+            }
         }
     }
 
@@ -559,7 +567,7 @@ public class BulletType extends Content implements Cloneable{
     }
 
     public void drawTrail(Bullet b){
-        if(trailLength > 0 && b.trail != null){
+        if(trailLength > 0 && b.trail != null && b.time >= trailDelay){
             //draw below bullets? TODO
             float z = Draw.z();
             Draw.z(z - 0.0001f);
@@ -647,27 +655,29 @@ public class BulletType extends Content implements Cloneable{
     }
 
     public void updateWeaving(Bullet b){
-        if(weaveMag != 0){
+        if(weaveMag != 0 && b.time >= weaveDelay){
             b.vel.rotateRadExact((float)Math.sin((b.time + Math.PI * weaveScale/2f) / weaveScale) * weaveMag * (weaveRandom ? (Mathf.randomSeed(b.id, 0, 1) == 1 ? -1 : 1) : 1f) * Time.delta * Mathf.degRad);
         }
     }
 
     public void updateTrailEffects(Bullet b){
-        if(trailChance > 0){
-            if(Mathf.chanceDelta(trailChance)){
-                trailEffect.at(b.x, b.y, trailRotation ? b.rotation() : trailParam, trailColor);
+        if(b.time >= trailDelay){
+            if(trailChance > 0){
+                if(Mathf.chanceDelta(trailChance)){
+                    trailEffect.at(b.x, b.y, trailRotation ? b.rotation() : trailParam, trailColor);
+                }
             }
-        }
 
-        if(trailInterval > 0f){
-            if(b.timer(0, trailInterval)){
-                trailEffect.at(b.x, b.y, trailRotation ? b.rotation() : trailParam, trailColor);
+            if(trailInterval > 0f){
+                if(b.timer(0, trailInterval)){
+                    trailEffect.at(b.x, b.y, trailRotation ? b.rotation() : trailParam, trailColor);
+                }
             }
         }
     }
     
     public void updateTrail(Bullet b){
-        if(!headless && trailLength > 0){
+        if(!headless && trailLength > 0 && b.time >= trailDelay)){
             if(b.trail == null){
                 b.trail = new Trail(trailLength);
             }
