@@ -52,6 +52,11 @@ public class BuildPayload implements Payload{
     }
 
     @Override
+    public void destroyed(){
+        build.onDestroyed();
+    }
+
+    @Override
     public ItemStack[] requirements(){
         return build.block.requirements;
     }

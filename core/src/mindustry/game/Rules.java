@@ -59,6 +59,8 @@ public class Rules{
     public boolean unitAmmo = false;
     /** EXPERIMENTAL! If true, blocks will update in units and share power. */
     public boolean unitPayloadUpdate = false;
+    /** If true, units' payloads are destroy()ed when the unit is destroyed. */
+    public boolean unitPayloadsExplode = false;
     /** Whether cores add to unit limit */
     public boolean unitCapVariable = true;
     /** If true, unit spawn points are shown. */

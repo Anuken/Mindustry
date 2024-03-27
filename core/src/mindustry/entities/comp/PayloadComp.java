@@ -60,6 +60,11 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         }
     }
 
+    @Override
+    public void destroy(){
+        if(Vars.state.rules.unitPayloadsExplode) payloads.each(Payload::destroyed);
+    }
+
     float payloadUsed(){
         return payloads.sumf(p -> p.size() * p.size());
     }
