@@ -182,18 +182,16 @@ public class Annotations{
 
     /** A set of two booleans, one specifying server and one specifying client. */
     public enum Loc{
-        /** Method can only be invoked on the client from the server. */
+        /** Server only. */
         server(true, false),
-        /** Method can only be invoked on the server from the client. */
+        /** Client only. */
         client(false, true),
-        /** Method can be invoked from anywhere */
+        /** Both server and client. */
         both(true, true),
         /** Neither server nor client. */
         none(false, false);
 
-        /** If true, this method can be invoked ON clients FROM servers. */
         public final boolean isServer;
-        /** If true, this method can be invoked ON servers FROM clients. */
         public final boolean isClient;
 
         Loc(boolean server, boolean client){
@@ -222,16 +220,16 @@ public class Annotations{
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.SOURCE)
     public @interface Remote{
-        /** Specifies the locations from which this method can be invoked. */
+        /** Specifies the locations from which this method can cause remote invocations (This -> Remote) [Default: Server -> Client]. */
         Loc targets() default Loc.server;
 
-        /** Specifies which methods are generated. Only affects server-to-client methods. */
+        /** Specifies which methods are generated. Only affects server-to-client methods (Server -> Client(s)) [Default: Server -> Client & Server -> All Clients]. */
         Variant variants() default Variant.all;
 
-        /** The local locations where this method is called locally, when invoked. */
+        /** The locations where this method is called locally, when invoked locally (This -> This) [Default: No local invocations]. */
         Loc called() default Loc.none;
 
-        /** Whether to forward this packet to all other clients upon receival. Client only. */
+        /** Whether the server should forward this packet to all other clients upon receival from a client (Client -> Server -> Other Clients). [Default: Don't Forward Client Invocations] */
         boolean forward() default false;
 
         /**
