@@ -650,7 +650,14 @@ public class NetClient implements ApplicationListener{
     String getUsid(String ip){
         //consistently use the latter part of an IP, if possible
         if(ip.contains("/")){
-            ip = ip.substring(ip.indexOf("/") + 1);
+            String domain = ip.substring(0, ip.indexOf("/"));
+            String group = serverUsidGroups.find(domain::endsWith);
+
+            if(group == null){
+                ip = ip.substring(ip.indexOf("/") + 1);
+            } else {
+                ip = group;
+            }
         }
 
         if(Core.settings.getString("usid-" + ip, null) != null){
