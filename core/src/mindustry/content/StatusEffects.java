@@ -76,7 +76,7 @@ public class StatusEffects{
             speedMultiplier = 0.94f;
             effect = Fx.wet;
             effectChance = 0.09f;
-            transitionDamage = 14;
+            transitionDamage = 10;
 
             init(() -> {
                 affinity(shocked, (unit, result, time) -> {
