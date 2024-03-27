@@ -20,7 +20,7 @@ public class Universe{
     private int netSeconds;
     private float secondCounter;
     private int turn;
-    private float turnCounter;
+    private static float turnCounter;
 
     private @Nullable Schematic lastLoadout;
     private ItemSeq lastLaunchResources = new ItemSeq();
@@ -140,6 +140,10 @@ public class Universe{
         Schematic schem = all.find(s -> s.file != null && s.file.nameWithoutExtension().equals(file));
 
         return schem == null ? all.any() ? all.first() : null : schem;
+    }
+
+    public static float getTurnCounter(){
+        return turnCounter;
     }
 
     /** Runs possible events. Resets event counter. */

@@ -566,6 +566,16 @@ public class CoreBlock extends StorageBlock{
                 outline.get(core);
                 core.proximity.each(storage -> storage.items == items, outline);
             });
+
+            if(state.isCampaign()){
+                Draw.z(Layer.blockOver);
+                float t = turnDuration - Universe.getTurnCounter();
+                String min = Strings.fixed(Mathf.floor(t / 60f / 60f), 0);
+                float s = Mathf.floor(t / 60f % 60f);
+                String sec = (s < 10f ? "0" : "") + Strings.fixed(s, 0);
+                drawPlaceText(Core.bundle.format("launch.import", min, sec), tileX(), tileY(), true);
+            }
+
             Draw.reset();
         }
 
