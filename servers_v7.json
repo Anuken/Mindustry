@@ -301,4 +301,8 @@
     "name": "Skywar.VN",
     "address": ["nur-de-01.blued.host:25736"]
   }
+  {
+    "name": "Vietnamse"
+    "address": ["147.185.221.224:22568", "147.185.221.224:22572"]
+  }
 ]
