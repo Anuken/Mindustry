@@ -1366,9 +1366,10 @@ public class LExecutor{
                 case unit -> {
                     UnitType type = exec.obj(extra) instanceof UnitType u ? u : null;
                     if(type == null){
-                        exec.setobj(result, data.units.get(i));
+                        exec.setobj(result, i < 0 || i >= data.units.size ? null : data.units.get(i));
                     }else{
-                        exec.setobj(result, data.unitCache(type).get(1));
+                        var units == data.unitCache(type);
+                        exec.setobj(result, i < 0 || i >= units.size ? null : units.get(i));
                     }
                 }
                 case player -> exec.setobj(result, i < 0 || i >= data.players.size || data.players.get(i).unit().isNull() ? null : data.players.get(i).unit());
@@ -1376,7 +1377,7 @@ public class LExecutor{
                 case build -> {
                     Block block = exec.obj(extra) instanceof Block b ? b : null;
                     if(block == null){
-                        exec.setobj(result, data.buildings.get(i));
+                        exec.setobj(result, i < 0 || i >= data.buildings.size ? null : data.buildings.get(i));
                     }else{
                         var builds = data.getBuildings(block);
                         exec.setobj(result, i < 0 || i >= builds.size ? null : builds.get(i));
