@@ -428,15 +428,13 @@ public class BulletType extends Content implements Cloneable{
     }
 
     public void handlePierce(Bullet b, float initialHealth, float x, float y){
-        if(b.time >= pierceDelay){
-            float sub = Mathf.zero(pierceDamageFactor) ? 0f : Math.max(initialHealth * pierceDamageFactor, 0);
-            //subtract health from each consecutive pierce
-            b.damage -= Float.isNaN(sub) ? b.damage : Math.min(b.damage, sub);
+        float sub = Mathf.zero(pierceDamageFactor) ? 0f : Math.max(initialHealth * pierceDamageFactor, 0);
+        //subtract health from each consecutive pierce
+        b.damage -= Float.isNaN(sub) ? b.damage : Math.min(b.damage, sub);
 
-            if(removeAfterPierce && b.damage <= 0){
-                b.hit = true;
-                b.remove();
-            }
+        if(removeAfterPierce && b.damage <= 0 || b.time <= pierceDelay){
+            b.hit = true;
+            b.remove();
         }
     }
 
@@ -677,7 +675,7 @@ public class BulletType extends Content implements Cloneable{
     }
     
     public void updateTrail(Bullet b){
-        if(!headless && trailLength > 0 && b.time >= trailDelay)){
+        if(!headless && trailLength > 0 && b.time >= trailDelay){
             if(b.trail == null){
                 b.trail = new Trail(trailLength);
             }
