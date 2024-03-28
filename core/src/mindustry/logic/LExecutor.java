@@ -1368,7 +1368,7 @@ public class LExecutor{
                     if(type == null){
                         exec.setobj(result, i < 0 || i >= data.units.size ? null : data.units.get(i));
                     }else{
-                        var units == data.unitCache(type);
+                        var units = data.unitCache(type);
                         exec.setobj(result, i < 0 || i >= units.size ? null : units.get(i));
                     }
                 }
