@@ -40,6 +40,7 @@ public class DirectionBridge extends Block{
         priority = TargetPriority.transport;
         envEnabled = Env.space | Env.terrestrial | Env.underwater;
         drawArrow = false;
+        allowDiagonal = false;
         regionRotated1 = 1;
     }
 
@@ -166,7 +167,8 @@ public class DirectionBridge extends Block{
     }
 
     public class DirectionBridgeBuild extends Building{
-        public Building[] occupied = new Building[4];
+        public DirectionBridgeBuild[] occupied = new DirectionBridgeBuild[4];
+        public @Nullable DirectionBridgeBuild lastLink;
 
         @Override
         public void draw(){

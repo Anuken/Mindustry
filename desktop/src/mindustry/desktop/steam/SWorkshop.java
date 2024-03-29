@@ -164,7 +164,10 @@ public class SWorkshop implements SteamUGCCallback{
             tags.add(p.steamTag());
 
             ugc.setItemTags(h, tags.toArray(String.class));
-            ugc.setItemPreview(h, p.createSteamPreview(sid).absolutePath());
+            String path = p.createSteamPreview(sid).absolutePath();
+
+            Log.info("PREVIEW @ @ @",  ugc.setItemPreview(h, path), path, Fi.get(path).exists());
+
             ugc.setItemContent(h, p.createSteamFolder(sid).absolutePath());
             if(changelog == null){
                 ugc.setItemVisibility(h, PublishedFileVisibility.Private);

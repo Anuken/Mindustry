@@ -27,6 +27,7 @@ public class SuppressionFieldAbility extends Ability{
     public boolean active = true;
     public Interp particleInterp = f -> Interp.circleOut.apply(Interp.slope.apply(f));
     public Color particleColor = Pal.sap.cpy();
+    public Color effectColor = Pal.sapBullet;
 
     public float applyParticleChance = 13f;
 
@@ -38,7 +39,7 @@ public class SuppressionFieldAbility extends Ability{
 
         if((timer += Time.delta) >= reload){
             Tmp.v1.set(x, y).rotate(unit.rotation - 90f).add(unit);
-            Damage.applySuppression(unit.team, Tmp.v1.x, Tmp.v1.y, range, reload, reload, applyParticleChance, unit);
+            Damage.applySuppression(unit.team, Tmp.v1.x, Tmp.v1.y, range, reload, reload, applyParticleChance, unit, effectColor);
             timer = 0f;
         }
     }

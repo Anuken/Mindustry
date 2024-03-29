@@ -33,7 +33,10 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
 
         stats.remove(Stat.ammo);
         //TODO looks bad
-        stats.add(Stat.ammo, StatValues.number(liquidConsumed * 60f, StatUnit.perSecond, true));
+        stats.add(Stat.ammo, table -> {
+            table.row();
+            StatValues.number(liquidConsumed * 60f, StatUnit.perSecond, true).display(table);
+        });
         stats.add(Stat.ammo, StatValues.ammo(ammoTypes));
     }
 
@@ -92,7 +95,7 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
 
         @Override
         public boolean hasAmmo(){
-            return hasCorrectAmmo() && ammoTypes.get(liquids.current()) != null && liquids.currentAmount() >= 1f / ammoTypes.get(liquids.current()).ammoMultiplier;
+            return hasCorrectAmmo() && ammoTypes.get(liquids.current()) != null && liquids.currentAmount() > 0f;
         }
 
         public boolean hasCorrectAmmo(){

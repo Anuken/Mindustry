@@ -127,6 +127,7 @@ public class TechTree{
             });
 
             content.techNode = this;
+            content.techNodes.add(this);
             all.add(this);
         }
 

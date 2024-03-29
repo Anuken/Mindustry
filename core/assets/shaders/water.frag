@@ -19,7 +19,8 @@ void main(){
 
 	float stime = u_time / 5.0;
 
-    vec3 color = texture2D(u_texture, c + vec2(sin(stime/3.0 + coords.y/0.75) * v.x, 0.0)).rgb * vec3(0.9, 0.9, 1);
+    vec4 sampled = texture2D(u_texture, c + vec2(sin(stime/3.0 + coords.y/0.75) * v.x, 0.0));
+    vec3 color = sampled.rgb * vec3(0.9, 0.9, 1);
 
     float tester = mod((coords.x + coords.y*1.1 + sin(stime / 8.0 + coords.x/5.0 - coords.y/100.0)*2.0) +
                            sin(stime / 20.0 + coords.y/3.0) * 1.0 +
@@ -32,5 +33,5 @@ void main(){
         color *= 1.2;
     }
 
-	gl_FragColor = vec4(color.rgb, 1.0);
+	gl_FragColor = vec4(color.rgb, min(sampled.a * 100.0, 1.0));
 }

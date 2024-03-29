@@ -28,6 +28,7 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
     private int index;
 
     public static int nextId(){
+        if(lastId >= Integer.MAX_VALUE - 2) lastId = 0;
         return lastId++;
     }
 
@@ -82,6 +83,10 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
         for(index = 0; index < array.size; index++){
             array.items[index].update();
         }
+    }
+
+    public Seq<T> copy(){
+        return copy(new Seq<>());
     }
 
     public Seq<T> copy(Seq<T> arr){
@@ -139,6 +144,12 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
         //don't waste time for empty groups
         if(isEmpty()) return;
         tree.intersect(x, y, width, height, out);
+    }
+
+    public boolean intersect(float x, float y, float width, float height, Boolf<? super T> out){
+        //don't waste time for empty groups
+        if(isEmpty()) return false;
+        return tree.intersect(x, y, width, height, out);
     }
 
     public Seq<T> intersect(float x, float y, float width, float height){
@@ -224,6 +235,12 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
         if(clearing) return;
         if(type == null) throw new RuntimeException("Cannot remove a null entity!");
         if(position != -1 && position < array.size){
+
+            //rarely the entity index is wrong; fallback to slow implementation
+            if(array.items[position] != type){
+                remove(type);
+                return;
+            }
 
             //swap head with current
             if(array.size > 1){

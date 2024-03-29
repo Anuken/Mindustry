@@ -14,6 +14,7 @@ import mindustry.type.*;
 import mindustry.ui.dialogs.*;
 import rhino.*;
 
+import java.io.*;
 import java.net.*;
 
 import static mindustry.Vars.*;
@@ -140,6 +141,67 @@ public interface Platform{
      * @param title The title of the native dialog
      */
     default void showFileChooser(boolean open, String title, String extension, Cons<Fi> cons){
+        if(OS.isLinux && !OS.isAndroid){
+            showZenity(open, title, new String[]{extension}, cons, () -> defaultFileDialog(open, title, extension, cons));
+        }else{
+            defaultFileDialog(open, title, extension, cons);
+        }
+    }
+
+    /** attempt to use the native file picker with zenity, or runs the fallback Runnable if the operation fails */
+    static void showZenity(boolean open, String title, String[] extensions, Cons<Fi> cons, Runnable fallback){
+        Threads.daemon(() -> {
+            try{
+                String formatted = (title.startsWith("@") ? Core.bundle.get(title.substring(1)) : title).replaceAll("\"", "'");
+
+                String last = FileChooser.getLastDirectory().absolutePath();
+                if(!last.endsWith("/")) last += "/";
+
+                //zenity doesn't support filtering by extension
+                Seq<String> args = Seq.with("zenity",
+                    "--file-selection",
+                    "--title=" + formatted,
+                    "--filename=" + last,
+                    "--confirm-overwrite",
+                    "--file-filter=" + Seq.with(extensions).toString(" ", s -> "*." + s),
+                    "--file-filter=All files | *" //allow anything if the user wants
+                );
+
+                if(!open){
+                    args.add("--save");
+                }
+
+                String result = OS.exec(args.toArray(String.class));
+                //first line.
+                if(result.length() > 1 && result.contains("\n")){
+                    result = result.split("\n")[0];
+                }
+
+                //cancelled selection, ignore result
+                if(result.isEmpty() || result.equals("\n")) return;
+
+                if(result.endsWith("\n")) result = result.substring(0, result.length() - 1);
+                if(result.contains("\n")) throw new IOException("invalid input: \"" + result + "\"");
+
+                Fi file = Core.files.absolute(result);
+                Core.app.post(() -> {
+                    FileChooser.setLastDirectory(file.isDirectory() ? file : file.parent());
+
+                    if(!open){
+                        cons.get(file.parent().child(file.nameWithoutExtension() + "." + extensions[0]));
+                    }else{
+                        cons.get(file);
+                    }
+                });
+            }catch(Exception e){
+                Log.err(e);
+                Log.warn("zenity not found, using non-native file dialog. Consider installing `zenity` for native file dialogs.");
+                Core.app.post(fallback);
+            }
+        });
+    }
+
+    static void defaultFileDialog(boolean open, String title, String extension, Cons<Fi> cons){
         new FileChooser(title, file -> file.extEquals(extension), open, file -> {
             if(!open){
                 cons.get(file.parent().child(file.nameWithoutExtension() + "." + extension));
@@ -161,9 +223,15 @@ public interface Platform{
     default void showMultiFileChooser(Cons<Fi> cons, String... extensions){
         if(mobile){
             showFileChooser(true, extensions[0], cons);
+        }else if(OS.isLinux && !OS.isAndroid){
+            showZenity(true, "@open", extensions, cons, () -> defaultMultiFileChooser(cons, extensions));
         }else{
-            new FileChooser("@open", file -> Structs.contains(extensions, file.extension().toLowerCase()), true, cons).show();
+            defaultMultiFileChooser(cons, extensions);
         }
+    }
+
+    static void defaultMultiFileChooser(Cons<Fi> cons, String... extensions){
+        new FileChooser("@open", file -> Structs.contains(extensions, file.extension().toLowerCase()), true, cons).show();
     }
 
     /** Hide the app. Android only. */

@@ -99,10 +99,10 @@ public class UnitAssembler extends PayloadBlock{
             Core.bundle.format("bar.unitcap",
                 Fonts.getUnicodeStr(e.unit().name),
                 e.team.data().countType(e.unit()),
-                Units.getStringCap(e.team)
+                e.unit().useUnitCap ? Units.getStringCap(e.team) : "∞"
             ),
             () -> Pal.power,
-            () -> (float)e.team.data().countType(e.unit()) / Units.getCap(e.team)
+            () -> e.unit().useUnitCap ? ((float)e.team.data().countType(e.unit()) / Units.getCap(e.team)) : 1f
         ));
     }
 
@@ -241,8 +241,8 @@ public class UnitAssembler extends PayloadBlock{
 
         public boolean moduleFits(Block other, float ox, float oy, int rotation){
             float
-            dx = ox + Geometry.d4x(rotation) * (other.size/2 + 1) * tilesize,
-            dy = oy + Geometry.d4y(rotation) * (other.size/2 + 1) * tilesize;
+            dx = ox + Geometry.d4x(rotation) * (other.size/2f + 0.5f) * tilesize,
+            dy = oy + Geometry.d4y(rotation) * (other.size/2f + 0.5f) * tilesize;
 
             Vec2 spawn = getUnitSpawn();
 
@@ -444,7 +444,7 @@ public class UnitAssembler extends PayloadBlock{
 
             if(!net.client()){
                 var unit = plan.unit.create(team);
-                if(unit != null && unit.isCommandable()){
+                if(unit != null && unit.isCommandable() && commandPos != null){
                     unit.command().commandPosition(commandPos);
                 }
                 unit.set(spawn.x + Mathf.range(0.001f), spawn.y + Mathf.range(0.001f));
@@ -594,7 +594,7 @@ public class UnitAssembler extends PayloadBlock{
         public boolean acceptPayload(Building source, Payload payload){
             var plan = plan();
             return (this.payload == null || source instanceof UnitAssemblerModuleBuild) &&
-                    plan.requirements.contains(b -> b.item == payload.content() && blocks.get(payload.content()) < b.amount);
+                    plan.requirements.contains(b -> b.item == payload.content() && blocks.get(payload.content()) < Mathf.round(b.amount * state.rules.unitCost(team)));
         }
 
         @Override

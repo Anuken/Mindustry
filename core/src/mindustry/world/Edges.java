@@ -50,11 +50,13 @@ public class Edges{
     }
 
     public static Tile getFacingEdge(Building tile, Building other){
-        return getFacingEdge(tile.block, tile.tileX(), tile.tileY(), other.tile());
+        Tile res = getFacingEdge(tile.block, tile.tileX(), tile.tileY(), other.tile());
+        return res == null ? tile.tile : res;
     }
 
     public static Tile getFacingEdge(Tile tile, Tile other){
-        return getFacingEdge(tile.block, tile.x, tile.y, other);
+        Tile res = getFacingEdge(tile.block, tile.x, tile.y, other);
+        return res == null ? tile : res;
     }
 
     public static Tile getFacingEdge(Block block, int tilex, int tiley, Tile other){

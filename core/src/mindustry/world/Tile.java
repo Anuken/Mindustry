@@ -11,8 +11,8 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
-import mindustry.game.*;
 import mindustry.game.EventType.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -134,7 +134,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         }else if(build != null){
             float result = 0f;
 
-            if(block.hasItems){
+            if(block.hasItems && build.items.total() > 0){
                 result += build.items.sum((item, amount) -> item.flammability * amount) / Math.max(block.itemCapacity, 1) * Mathf.clamp(block.itemCapacity / 2.4f, 1f, 3f);
             }
 
@@ -303,7 +303,9 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     public void setFloorUnder(Floor floor){
         Block overlay = this.overlay;
         setFloor(floor);
-        setOverlay(overlay);
+        if(this.overlay != overlay){
+            setOverlay(overlay);
+        }
     }
 
     /** Sets the block to air. */
@@ -396,6 +398,9 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         this.overlay = (Floor)block;
 
         recache();
+        if(!world.isGenerating() && build != null){
+            build.onProximityUpdate();
+        }
     }
 
     /** Sets the overlay without a recache. */
@@ -543,6 +548,11 @@ public class Tile implements Position, QuadTreeObject, Displayable{
 
     public int staticDarkness(){
         return block.solid && block.fillsTile && !block.synthetic() ? data : 0;
+    }
+
+    /** @return whether this tile is solid for legged units */
+    public boolean legSolid(){
+        return staticDarkness() >= 2 || (floor.solid && block == Blocks.air);
     }
 
     /** @return true if these tiles are right next to each other. */

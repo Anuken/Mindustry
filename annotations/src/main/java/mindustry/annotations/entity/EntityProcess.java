@@ -490,7 +490,7 @@ public class EntityProcess extends BaseProcessor{
 
                         //SPECIAL CASE: sync I/O code
                         if((first.name().equals("readSync") || first.name().equals("writeSync"))){
-                            io.writeSync(mbuilder, first.name().equals("writeSync"), syncedFields, allFields);
+                            io.writeSync(mbuilder, first.name().equals("writeSync"), allFields);
                         }
 
                         //SPECIAL CASE: sync I/O code for writing to/from a manual buffer

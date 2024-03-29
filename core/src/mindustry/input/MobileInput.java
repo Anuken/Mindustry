@@ -54,8 +54,8 @@ public class MobileInput extends InputHandler implements GestureListener{
     public Seq<BuildPlan> removals = new Seq<>();
     /** Whether the player is currently shifting all placed tiles. */
     public boolean selecting;
-    /** Whether the player is currently in line-place mode. */
-    public boolean lineMode, schematicMode;
+    /** Various modes that aren't enums for some reason. This should be cleaned up. */
+    public boolean lineMode, schematicMode, rebuildMode, queueCommandMode;
     /** Current place mode. */
     public PlaceMode mode = none;
     /** Whether no recipe was available when switching to break mode. */
@@ -96,7 +96,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }else{
             Building tile = world.buildWorld(x, y);
 
-            if((tile != null && player.team().isEnemy(tile.team) && (tile.team != Team.derelict || state.rules.coreCapture)) || (tile != null && player.unit().type.canHeal && tile.team == player.team() && tile.damaged())){
+            if((tile != null && player.team() != tile.team && (tile.team != Team.derelict || state.rules.coreCapture)) || (tile != null && player.unit().type.canHeal && tile.team == player.team() && tile.damaged())){
                 player.unit().mineTile = null;
                 target = tile;
             }
@@ -208,6 +208,8 @@ public class MobileInput extends InputHandler implements GestureListener{
                 if(schematicMode){
                     block = null;
                     mode = none;
+                }else{
+                    rebuildMode = false;
                 }
             }
         }).update(i -> {
@@ -219,37 +221,45 @@ public class MobileInput extends InputHandler implements GestureListener{
         });
 
         //confirm button
-        table.button(Icon.ok, Styles.clearNonei, () -> {
-            for(BuildPlan plan : selectPlans){
-                Tile tile = plan.tile();
+        table.button(Icon.ok, Styles.clearNoneTogglei, () -> {
+            if(schematicMode){
+                rebuildMode = !rebuildMode;
+            }else{
+                for(BuildPlan plan : selectPlans){
+                    Tile tile = plan.tile();
 
-                //actually place/break all selected blocks
-                if(tile != null){
-                    if(!plan.breaking){
-                        if(validPlace(plan.x, plan.y, plan.block, plan.rotation)){
-                            BuildPlan other = getPlan(plan.x, plan.y, plan.block.size, null);
-                            BuildPlan copy = plan.copy();
+                    //actually place/break all selected blocks
+                    if(tile != null){
+                        if(!plan.breaking){
+                            if(validPlace(plan.x, plan.y, plan.block, plan.rotation)){
+                                BuildPlan other = getPlan(plan.x, plan.y, plan.block.size, null);
+                                BuildPlan copy = plan.copy();
 
-                            if(other == null){
-                                player.unit().addBuild(copy);
-                            }else if(!other.breaking && other.x == plan.x && other.y == plan.y && other.block.size == plan.block.size){
-                                player.unit().plans().remove(other);
-                                player.unit().addBuild(copy);
+                                if(other == null){
+                                    player.unit().addBuild(copy);
+                                }else if(!other.breaking && other.x == plan.x && other.y == plan.y && other.block.size == plan.block.size){
+                                    player.unit().plans().remove(other);
+                                    player.unit().addBuild(copy);
+                                }
                             }
-                        }
 
-                        rotation = plan.rotation;
-                    }else{
-                        tryBreakBlock(tile.x, tile.y);
+                            rotation = plan.rotation;
+                        }else{
+                            tryBreakBlock(tile.x, tile.y);
+                        }
                     }
                 }
-            }
 
-            //move all current plans to removal array so they fade out
-            removals.addAll(selectPlans.select(r -> !r.breaking));
-            selectPlans.clear();
-            selecting = false;
-        }).visible(() -> !selectPlans.isEmpty()).name("confirmplace");
+                //move all current plans to removal array so they fade out
+                removals.addAll(selectPlans.select(r -> !r.breaking));
+                selectPlans.clear();
+                selecting = false;
+            }
+        }).visible(() -> !selectPlans.isEmpty() || schematicMode || rebuildMode).update(i -> {
+            i.getStyle().imageUp = schematicMode || rebuildMode ? Icon.wrench : Icon.ok;
+            i.setChecked(rebuildMode);
+
+        }).name("confirmplace");
     }
 
     boolean showCancel(){
@@ -277,9 +287,14 @@ public class MobileInput extends InputHandler implements GestureListener{
         group.fill(t -> {
             t.visible(() -> !showCancel() && block == null && !hasSchem());
             t.bottom().left();
-            t.button("@command", Icon.units, Styles.squareTogglet, () -> {
+
+            t.button("@command.queue", Icon.rightOpen, Styles.clearTogglet, () -> {
+                queueCommandMode = !queueCommandMode;
+            }).width(155f).height(48f).margin(12f).checked(b -> queueCommandMode).visible(() -> commandMode).row();
+
+            t.button("@command", Icon.units, Styles.clearTogglet, () -> {
                 commandMode = !commandMode;
-            }).width(155f).height(50f).margin(12f).checked(b -> commandMode).row();
+            }).width(155f).height(48f).margin(12f).checked(b -> commandMode);
 
             //for better looking insets
             t.rect((x, y, w, h) -> {
@@ -349,7 +364,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 //draw placing
                 for(int i = 0; i < linePlans.size; i++){
                     BuildPlan plan = linePlans.get(i);
-                    if(i == linePlans.size - 1 && plan.block.rotate){
+                    if(i == linePlans.size - 1 && plan.block.rotate && plan.block.drawArrow){
                         drawArrow(block, plan.x, plan.y, plan.rotation);
                     }
                     plan.block.drawPlan(plan, allPlans(), validPlace(plan.x, plan.y, plan.block, plan.rotation) && getPlan(plan.x, plan.y, plan.block.size, null) == null);
@@ -366,9 +381,10 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public void drawTop(){
-        //draw schematic selection
         if(mode == schematicSelect){
             drawSelection(lineStartX, lineStartY, lastLineX, lastLineY, Vars.maxSchematicSize);
+        }else if(mode == rebuildSelect){
+            drawRebuildSelection(lineStartX, lineStartY, lastLineX, lastLineY);
         }
 
         drawCommanded();
@@ -393,7 +409,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
             if(!plan.breaking && plan == lastPlaced && plan.block != null){
                 Draw.mixcol();
-                if(plan.block.rotate) drawArrow(plan.block, tile.x, tile.y, plan.rotation);
+                if(plan.block.rotate && plan.block.drawArrow) drawArrow(plan.block, tile.x, tile.y, plan.rotation);
             }
 
             Draw.reset();
@@ -403,13 +419,13 @@ public class MobileInput extends InputHandler implements GestureListener{
             }
 
             //draw last placed plan
-            if(!plan.breaking && plan == lastPlaced && plan.block != null && plan.block.drawArrow){
-                boolean valid = validPlace(tile.x, tile.y, plan.block, rotation);
+            if(!plan.breaking && plan == lastPlaced && plan.block != null){
+                int rot = plan.block.planRotation(plan.rotation);
+                boolean valid = validPlace(tile.x, tile.y, plan.block, rot);
                 Draw.mixcol();
-                plan.block.drawPlace(tile.x, tile.y, rotation, valid);
+                plan.block.drawPlace(tile.x, tile.y, rot, valid);
 
                 drawOverlapCheck(plan.block, tile.x, tile.y, valid);
-
             }
         }
 
@@ -443,6 +459,11 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     //endregion
     //region input events, overrides
+
+    @Override
+    public boolean isRebuildSelecting(){
+        return rebuildMode;
+    }
 
     @Override
     protected int schemOriginX(){
@@ -497,7 +518,8 @@ public class MobileInput extends InputHandler implements GestureListener{
         //call tap events
         if(pointer == 0 && !selecting){
             if(schematicMode && block == null){
-                mode = schematicSelect;
+                mode = rebuildMode ? rebuildSelect : schematicSelect;
+
                 //engage schematic selection mode
                 int tileX = tileX(screenX);
                 int tileY = tileY(screenY);
@@ -546,6 +568,9 @@ public class MobileInput extends InputHandler implements GestureListener{
                 lastSchematic = null;
             }
             schematicMode = false;
+            mode = none;
+        }else if(mode == rebuildSelect){
+            rebuildArea(lineStartX, lineStartY, lastLineX, lastLineY);
             mode = none;
         }else{
             Tile tile = tileAt(screenX, screenY);
@@ -661,7 +686,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             selectPlans.add(new BuildPlan(linked.x, linked.y));
         }else if((commandMode && selectedUnits.size > 0) || commandBuildings.size > 0){
             //handle selecting units with command mode
-            commandTap(x, y);
+            commandTap(x, y, queueCommandMode);
         }else if(commandMode){
             tapCommandUnit();
         }else{
@@ -687,7 +712,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             buildingTapped = selectedControlBuild();
 
             //prevent mining if placing/breaking blocks
-            if(!tryStopMine() && !canTapPlayer(worldx, worldy) && !checkConfigTap() && !tileTapped(linked.build) && mode == none && !Core.settings.getBool("doubletapmine")){
+            if(!tryRepairDerelict(cursor) && !tryStopMine() && !canTapPlayer(worldx, worldy) && !checkConfigTap() && !tileTapped(linked.build) && mode == none && !Core.settings.getBool("doubletapmine")){
                 tryBeginMine(cursor);
             }
         }
@@ -714,6 +739,15 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         boolean locked = locked();
 
+        if(!commandMode){
+            queueCommandMode = false;
+        }
+
+        //cannot rebuild and place at the same time
+        if(block != null){
+            rebuildMode = false;
+        }
+
         if(player.dead()){
             mode = none;
             manualShooting = false;
@@ -737,7 +771,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             renderer.scaleCamera(Core.input.axisTap(Binding.zoom));
         }
 
-        if(!Core.settings.getBool("keyboard") && !locked){
+        if(!Core.settings.getBool("keyboard") && !locked && !scene.hasKeyboard()){
             //move camera around
             float camSpeed = 6f;
             Core.camera.position.add(Tmp.v1.setZero().add(Core.input.axis(Binding.move_x), Core.input.axis(Binding.move_y)).nor().scl(Time.delta * camSpeed));
@@ -781,11 +815,15 @@ public class MobileInput extends InputHandler implements GestureListener{
         }
 
         //stop select when not in schematic mode
-        if(!schematicMode && mode == schematicSelect){
+        if(!schematicMode && (mode == schematicSelect || mode == rebuildSelect)){
             mode = none;
         }
 
-        if(mode == schematicSelect){
+        if(!rebuildMode && mode == rebuildSelect){
+            mode = none;
+        }
+
+        if(mode == schematicSelect || mode == rebuildSelect){
             lastLineX = rawTileX();
             lastLineY = rawTileY();
             autoPan();
@@ -899,6 +937,8 @@ public class MobileInput extends InputHandler implements GestureListener{
             Core.camera.position.y -= deltaY;
         }
 
+        camera.position.clamp(-camera.width/4f, -camera.height/4f, world.unitWidth() + camera.width/4f, world.unitHeight() + camera.height/4f);
+
         return false;
     }
 
@@ -932,7 +972,6 @@ public class MobileInput extends InputHandler implements GestureListener{
         boolean allowHealing = type.canHeal;
         boolean validHealTarget = allowHealing && target instanceof Building b && b.isValid() && target.team() == unit.team && b.damaged() && target.within(unit, type.range);
         boolean boosted = (unit instanceof Mechc && unit.isFlying());
-
         //reset target if:
         // - in the editor, or...
         // - it's both an invalid standard target and an invalid heal target
@@ -1012,7 +1051,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                     }
 
                     if(allowHealing && target == null){
-                        target = Geometry.findClosest(unit.x, unit.y, indexer.getDamaged(Team.sharded));
+                        target = Geometry.findClosest(unit.x, unit.y, indexer.getDamaged(player.team()));
                         if(target != null && !unit.within(target, range)){
                             target = null;
                         }

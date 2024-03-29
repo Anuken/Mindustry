@@ -6,7 +6,6 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.Texture.*;
 import arc.input.*;
-import arc.math.geom.*;
 import arc.scene.*;
 import arc.scene.event.*;
 import arc.scene.style.*;
@@ -181,6 +180,8 @@ public class SettingsMenuDialog extends BaseDialog{
             t.button("@data.import", Icon.download, style, () -> ui.showConfirm("@confirm", "@data.import.confirm", () -> platform.showFileChooser(true, "zip", file -> {
                 try{
                     importData(file);
+                    control.saves.resetSave();
+                    state = new GameState();
                     Core.app.exit();
                 }catch(IllegalArgumentException e){
                     ui.showErrorMessage("@data.invalid");
@@ -260,7 +261,7 @@ public class SettingsMenuDialog extends BaseDialog{
     public void addCategory(String name, Cons<SettingsTable> builder){
         addCategory(name, (Drawable)null, builder);
     }
-    
+
     public Seq<SettingsCategory> getCategories(){
         return categories;
     }
@@ -340,11 +341,12 @@ public class SettingsMenuDialog extends BaseDialog{
         if(!mobile){
             game.checkPref("backgroundpause", true);
             game.checkPref("buildautopause", false);
+            game.checkPref("distinctcontrolgroups", true);
         }
 
         game.checkPref("doubletapmine", false);
         game.checkPref("commandmodehold", true);
-      
+
         if(!ios){
             game.checkPref("modcrashdisable", true);
         }
@@ -356,7 +358,7 @@ public class SettingsMenuDialog extends BaseDialog{
             });
 
             if(!Version.modifier.contains("beta")){
-                game.checkPref("publichost", false, i -> {
+                game.checkPref("steampublichost", false, i -> {
                     platform.updateLobby();
                 });
             }
@@ -368,7 +370,7 @@ public class SettingsMenuDialog extends BaseDialog{
 
         int[] lastUiScale = {settings.getInt("uiscale", 100)};
 
-        graphics.sliderPref("uiscale", 100, 25, 300, 25, s -> {
+        graphics.sliderPref("uiscale", 100, 25, 300, 5, s -> {
             //if the user changed their UI scale, but then put it back, don't consider it 'changed'
             Core.settings.put("uiscalechanged", s != lastUiScale[0]);
             return s + "%";
@@ -439,6 +441,7 @@ public class SettingsMenuDialog extends BaseDialog{
 
         graphics.checkPref("effects", true);
         graphics.checkPref("atmosphere", !mobile);
+        graphics.checkPref("drawlight", true);
         graphics.checkPref("destroyedblocks", true);
         graphics.checkPref("blockstatus", false);
         graphics.checkPref("playerchat", true);
@@ -491,6 +494,10 @@ public class SettingsMenuDialog extends BaseDialog{
         graphics.checkPref("skipcoreanimation", false);
         graphics.checkPref("hidedisplays", false);
 
+        if(OS.isMac){
+            graphics.checkPref("macnotch", false);
+        }
+
         if(!mobile){
             Core.settings.put("swapdiagonal", false);
         }
@@ -521,7 +528,9 @@ public class SettingsMenuDialog extends BaseDialog{
                 path = path.startsWith("/") ? path.substring(1) : path;
                 zos.putNextEntry(new ZipEntry(path));
                 if(!add.isDirectory()){
-                    Streams.copy(add.read(), zos);
+                    try(var stream = add.read()){
+                        Streams.copy(stream, zos);
+                    }
                 }
                 zos.closeEntry();
             }
@@ -707,21 +716,7 @@ public class SettingsMenuDialog extends BaseDialog{
             public abstract void add(SettingsTable table);
 
             public void addDesc(Element elem){
-                if(description == null) return;
-
-                elem.addListener(new Tooltip(t -> t.background(Styles.black8).margin(4f).add(description).color(Color.lightGray)){
-                    {
-                        allowMobile = true;
-                    }
-                    @Override
-                    protected void setContainerPosition(Element element, float x, float y){
-                        this.targetActor = element;
-                        Vec2 pos = element.localToStageCoordinates(Tmp.v1.set(0, 0));
-                        container.pack();
-                        container.setPosition(pos.x, pos.y, Align.topLeft);
-                        container.setOrigin(0, element.getHeight());
-                    }
-                });
+                ui.addDescTooltip(elem, description);
             }
         }
 
@@ -791,7 +786,7 @@ public class SettingsMenuDialog extends BaseDialog{
                 table.row();
             }
         }
-        
+
         public static class TextSetting extends Setting{
             String def;
             Cons<String> changed;

@@ -66,6 +66,13 @@ public class BuildTurret extends BaseTurret{
     }
 
     @Override
+    public void setStats(){
+        super.setStats();
+
+        stats.addPercent(Stat.buildSpeed, buildSpeed);
+    }
+
+    @Override
     public TextureRegion[] icons(){
         return new TextureRegion[]{baseRegion, region};
     }

@@ -1,6 +1,8 @@
 package mindustry.type;
 
+import arc.func.*;
 import arc.struct.*;
+import arc.struct.ObjectIntMap.*;
 import arc.util.io.*;
 import mindustry.*;
 import mindustry.ctype.*;
@@ -26,6 +28,7 @@ public class PayloadSeq{
     }
 
     public void add(UnlockableContent block, int amount){
+        if(block == null) return;
         payloads.increment(block, amount);
         total += amount;
     }
@@ -40,6 +43,19 @@ public class PayloadSeq{
 
     public void remove(Seq<PayloadStack> stacks){
         stacks.each(b -> remove(b.item, b.amount));
+    }
+
+    /** @return this object */
+    public PayloadSeq removeAll(Boolf<UnlockableContent> pred){
+        Entries<UnlockableContent> iter = payloads.iterator();
+        while(iter.hasNext()){
+            Entry<UnlockableContent> e = iter.next();
+            if(pred.get(e.key)){
+                iter.remove();
+                total -= e.value;
+            }
+        }
+        return this;
     }
 
     public void clear(){
@@ -90,7 +106,7 @@ public class PayloadSeq{
         }else{
             //new format
             for(int i = 0; i < -amount; i++){
-                add((UnlockableContent)Vars.content.getBy(ContentType.all[read.ub()]).get(read.s()), read.i());
+                add(Vars.content.getByID(ContentType.all[read.ub()], read.s()), read.i());
             }
         }
 
