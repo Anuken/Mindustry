@@ -1102,8 +1102,8 @@ public class ContentParser{
                 }
 
                 //all items have a produce requirement unless already specified
-                if(object instanceof Item i && !node.objectives.contains(o -> o instanceof Produce p && p.content == i)){
-                    node.objectives.add(new Produce(i));
+                if((unlock instanceof Item || unlock instanceof Liquid) && !node.objectives.contains(o -> o instanceof Produce p && p.content == unlock)){
+                    node.objectives.add(new Produce(unlock));
                 }
 
                 //remove old node from parent

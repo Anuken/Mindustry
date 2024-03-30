@@ -361,7 +361,24 @@ public class Mods implements Loadable{
             Log.debug("Time to generate icons: @", Time.elapsed());
 
             //dispose old atlas data
-            Core.atlas = packer.flush(filter, new TextureAtlas());
+            Core.atlas = packer.flush(filter, new TextureAtlas(){
+                PixmapRegion fake = new PixmapRegion(new Pixmap(1, 1));
+                boolean didWarn = false;
+
+                @Override
+                public PixmapRegion getPixmap(AtlasRegion region){
+                    var other = super.getPixmap(region);
+                    if(other.pixmap.isDisposed()){
+                        if(!didWarn){
+                            Log.err(new RuntimeException("Calling getPixmap outside of createIcons is not supported! This will be a crash in the future."));
+                            didWarn = true;
+                        }
+                        return fake;
+                    }
+
+                    return other;
+                }
+            });
 
             textureResize.each(e -> Core.atlas.find(e.key).scale = e.value);
 

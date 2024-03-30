@@ -176,10 +176,7 @@ public class MinimapRenderer{
         if(fullView && net.active()){
             for(Player player : Groups.player){
                 if(!player.dead()){
-                    float rx = player.x / (world.width() * tilesize) * w;
-                    float ry = player.y / (world.height() * tilesize) * h;
-
-                    drawLabel(x + rx, y + ry, player.name, player.color);
+                    drawLabel(player.x, player.y, player.name, player.color);
                 }
             }
         }

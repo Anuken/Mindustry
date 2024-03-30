@@ -311,18 +311,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 }
             }
 
-            float minSpeed = 100000000f;
             for(int i = 0; i < groups.length; i ++){
                 var group = groups[i];
                 if(group != null && group.units.size > 0){
                     group.calculateFormation(targetAsVec, i);
-                    minSpeed = Math.min(group.minSpeed, minSpeed);
-                }
-            }
-
-            for(var group : groups){
-                if(group != null){
-                    group.minSpeed = minSpeed;
                 }
             }
         }
@@ -1012,6 +1004,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
                 if(attack != null){
                     Events.fire(Trigger.unitCommandAttack);
+                }else{
+                    Events.fire(Trigger.unitCommandPosition);
                 }
 
                 int maxChunkSize = 200;
@@ -1661,7 +1655,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     boolean tryRepairDerelict(Tile selected){
-        if(selected != null && selected.build != null && selected.build.block.unlockedNow() && selected.build.team == Team.derelict && Build.validPlace(selected.block(), player.team(), selected.build.tileX(), selected.build.tileY(), selected.build.rotation)){
+        if(selected != null && player.team() != Team.derelict && selected.build != null && selected.build.block.unlockedNow() && selected.build.team == Team.derelict && Build.validPlace(selected.block(), player.team(), selected.build.tileX(), selected.build.tileY(), selected.build.rotation)){
             player.unit().addBuild(new BuildPlan(selected.build.tileX(), selected.build.tileY(), selected.build.rotation, selected.block(), selected.build.config()));
             return true;
         }

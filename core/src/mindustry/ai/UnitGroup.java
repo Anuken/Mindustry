@@ -12,30 +12,12 @@ import mindustry.async.*;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.gen.*;
-import mindustry.world.blocks.environment.*;
 
 public class UnitGroup{
     public Seq<Unit> units = new Seq<>();
     public int collisionLayer;
     public volatile float[] positions, originalPositions;
     public volatile boolean valid;
-    public long lastSpeedUpdate = -1;
-    public float minSpeed = 999999f;
-
-    public void updateMinSpeed(){
-        if(lastSpeedUpdate == Vars.state.updateId) return;
-
-        lastSpeedUpdate = Vars.state.updateId;
-        minSpeed = 999999f;
-
-        for(Unit unit : units){
-            //don't factor in the floor speed multiplier
-            Floor on = unit.isFlying() ? Blocks.air.asFloor() : unit.floorOn();
-            minSpeed = Math.min(unit.speed() / on.speedMultiplier, minSpeed);
-        }
-
-        if(Float.isInfinite(minSpeed) || Float.isNaN(minSpeed)) minSpeed = 999999f;
-    }
     
     public void calculateFormation(Vec2 dest, int collisionLayer){
         this.collisionLayer = collisionLayer;
@@ -57,8 +39,6 @@ public class UnitGroup{
             positions[i * 2 + 1] = unit.y - cy;
             unit.command().groupIndex = i;
         }
-
-        updateMinSpeed();
 
         //run on new thread to prevent stutter
         Vars.mainExecutor.submit(() -> {
