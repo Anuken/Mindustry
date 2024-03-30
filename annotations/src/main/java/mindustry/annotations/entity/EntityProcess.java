@@ -42,6 +42,7 @@ public class EntityProcess extends BaseProcessor{
     Seq<Selement> allDefs = new Seq<>();
     Seq<Stype> allInterfaces = new Seq<>();
     Seq<TypeSpec.Builder> baseClasses = new Seq<>();
+    ObjectSet<TypeSpec.Builder> baseClassIndexers = new ObjectSet<>();
     ClassSerializer serializer;
 
     {
@@ -232,9 +233,15 @@ public class EntityProcess extends BaseProcessor{
                 Stype repr = types.first();
                 String groupType = repr.annotation(Component.class).base() ? baseName(repr) : interfaceName(repr);
 
+                String name = group.name().startsWith("g") ? group.name().substring(1) : group.name();
+
                 boolean collides = an.collide();
-                groupDefs.add(new GroupDefinition(group.name().startsWith("g") ? group.name().substring(1) : group.name(),
+                groupDefs.add(new GroupDefinition(name,
                     ClassName.bestGuess(packageName + "." + groupType), types, an.spatial(), an.mapping(), collides));
+
+                TypeSpec.Builder accessor = TypeSpec.interfaceBuilder("IndexableEntity__" + name);
+                accessor.addMethod(MethodSpec.methodBuilder("setIndex__" + name).addModifiers(Modifier.ABSTRACT, Modifier.PUBLIC).addParameter(int.class, "index").returns(void.class).build());
+                write(accessor);
             }
 
             ObjectMap<String, Selement> usedNames = new ObjectMap<>();
@@ -260,6 +267,8 @@ public class EntityProcess extends BaseProcessor{
                 //get base class type name for extension
                 Stype baseClassType = baseClasses.any() ? baseClasses.first() : null;
                 @Nullable TypeName baseClass = baseClasses.any() ? tname(packageName + "." + baseName(baseClassType)) : null;
+                @Nullable TypeSpec.Builder baseClassBuilder = baseClassType == null ? null : this.baseClasses.find(b -> Reflect.<String>get(b, "name").equals(baseName(baseClassType)));
+                boolean addIndexToBase = baseClassBuilder != null && baseClassIndexers.add(baseClassBuilder);
                 //whether the main class is the base itself
                 boolean typeIsBase = baseClassType != null && type.has(Component.class) && type.annotation(Component.class).base();
 
@@ -381,16 +390,29 @@ public class EntityProcess extends BaseProcessor{
 
                 syncedFields.sortComparing(Selement::name);
 
-                //override toString method
-                builder.addMethod(MethodSpec.methodBuilder("toString")
+                if(!methods.containsKey("toString()")){
+                    //override toString method
+                    builder.addMethod(MethodSpec.methodBuilder("toString")
                     .addAnnotation(Override.class)
                     .returns(String.class)
                     .addModifiers(Modifier.PUBLIC)
                     .addStatement("return $S + $L", name + "#", "id").build());
+                }
 
                 EntityIO io = new EntityIO(type.name(), builder, allFieldSpecs, serializer, rootDirectory.child("annotations/src/main/resources/revisions").child(type.name()));
                 //entities with no sync comp and no serialization gen no code
                 boolean hasIO = ann.genio() && (components.contains(s -> s.name().contains("Sync")) || ann.serialize());
+
+                TypeSpec.Builder indexBuilder = baseClassBuilder == null ? builder : baseClassBuilder;
+
+                if(baseClassBuilder == null || addIndexToBase){
+                    //implement indexable interfaces.
+                    for(GroupDefinition def : groups){
+                        indexBuilder.addSuperinterface(tname(packageName + ".IndexableEntity__" + def.name));
+                        indexBuilder.addMethod(MethodSpec.methodBuilder("setIndex__" + def.name).addParameter(int.class, "index").addModifiers(Modifier.PUBLIC).addAnnotation(Override.class)
+                        .addCode("index__$L = index;", def.name).build());
+                    }
+                }
 
                 //add all methods from components
                 for(ObjectMap.Entry<String, Seq<Smethod>> entry : methods){
@@ -444,8 +466,15 @@ public class EntityProcess extends BaseProcessor{
                         mbuilder.addStatement("if(added == $L) return", first.name().equals("add"));
 
                         for(GroupDefinition def : groups){
-                            //remove/add from each group, assume imported
-                            mbuilder.addStatement("Groups.$L.$L(this)", def.name, first.name());
+                            if(first.name().equals("add")){
+                                //remove/add from each group, assume imported
+                                mbuilder.addStatement("index__$L = Groups.$L.addIndex(this)", def.name, def.name);
+                            }else{
+                                //remove/add from each group, assume imported
+                                mbuilder.addStatement("Groups.$L.removeIndex(this, index__$L);", def.name, def.name);
+
+                                mbuilder.addStatement("index__$L = -1", def.name);
+                            }
                         }
                     }
 
@@ -461,7 +490,7 @@ public class EntityProcess extends BaseProcessor{
 
                         //SPECIAL CASE: sync I/O code
                         if((first.name().equals("readSync") || first.name().equals("writeSync"))){
-                            io.writeSync(mbuilder, first.name().equals("writeSync"), syncedFields, allFields);
+                            io.writeSync(mbuilder, first.name().equals("writeSync"), allFields);
                         }
 
                         //SPECIAL CASE: sync I/O code for writing to/from a manual buffer
@@ -575,6 +604,16 @@ public class EntityProcess extends BaseProcessor{
 
                 skipDeprecated(builder);
 
+                if(!legacy){
+                    TypeSpec.Builder fieldBuilder = baseClassBuilder != null ? baseClassBuilder : builder;
+                    if(addIndexToBase || baseClassBuilder == null){
+                        //add group index int variables
+                        for(GroupDefinition def : groups){
+                            fieldBuilder.addField(FieldSpec.builder(int.class, "index__" + def.name, Modifier.PROTECTED, Modifier.TRANSIENT).initializer("-1").build());
+                        }
+                    }
+                }
+
                 definitions.add(new EntityDefinition(packageName + "." + name, builder, type, typeIsBase ? null : baseClass, components, groups, allFieldSpecs, legacy));
             }
 
@@ -590,7 +629,7 @@ public class EntityProcess extends BaseProcessor{
                 groupsBuilder.addField(ParameterizedTypeName.get(
                     ClassName.bestGuess("mindustry.entities.EntityGroup"), itype), group.name, Modifier.PUBLIC, Modifier.STATIC);
 
-                groupInit.addStatement("$L = new $T<>($L.class, $L, $L)", group.name, groupc, itype, group.spatial, group.mapping);
+                groupInit.addStatement("$L = new $T<>($L.class, $L, $L, (e, pos) -> { if(e instanceof $L.IndexableEntity__$L ix) ix.setIndex__$L(pos); })", group.name, groupc, itype, group.spatial, group.mapping, packageName, group.name, group.name);
             }
 
             //write the groups
@@ -853,7 +892,7 @@ public class EntityProcess extends BaseProcessor{
 
                 for(Smethod method : methods){
                     String signature = method.toString();
-                    if(signatures.contains(signature)) continue;
+                    if(!signatures.add(signature)) continue;
 
                     Stype compType = interfaceToComp(method.type());
                     MethodSpec.Builder builder = MethodSpec.overriding(method.e).addModifiers(Modifier.PUBLIC, Modifier.FINAL);
@@ -864,25 +903,29 @@ public class EntityProcess extends BaseProcessor{
                     builder.addAnnotation(OverrideCallSuper.class); //just in case
 
                     if(!method.isVoid()){
-                        if(method.name().equals("isNull")){
-                            builder.addStatement("return true");
-                        }else if(method.name().equals("id")){
+                        String methodName = method.name();
+                        switch(methodName){
+                            case "isNull":
+                                builder.addStatement("return true");
+                                break;
+                            case "id":
                                 builder.addStatement("return -1");
-                        }else{
-                            Svar variable = compType == null || method.params().size > 0 ? null : compType.fields().find(v -> v.name().equals(method.name()));
-                            String desc = variable == null ? null : variable.descString();
-                            if(variable == null || !varInitializers.containsKey(desc)){
-                                builder.addStatement("return " + getDefault(method.ret().toString()));
-                            }else{
-                                String init = varInitializers.get(desc);
-                                builder.addStatement("return " + (init.equals("{}") ? "new " + variable.mirror().toString() : "") + init);
-                            }
+                                break;
+                            case "toString":
+                                builder.addStatement("return $S", className);
+                                break;
+                            default:
+                                Svar variable = compType == null || method.params().size > 0 ? null : compType.fields().find(v -> v.name().equals(methodName));
+                                String desc = variable == null ? null : variable.descString();
+                                if(variable == null || !varInitializers.containsKey(desc)){
+                                    builder.addStatement("return " + getDefault(method.ret().toString()));
+                                }else{
+                                    String init = varInitializers.get(desc);
+                                    builder.addStatement("return " + (init.equals("{}") ? "new " + variable.mirror().toString() : "") + init);
+                                }
                         }
                     }
-
                     nullBuilder.addMethod(builder.build());
-
-                    signatures.add(signature);
                 }
 
                 nullsBuilder.addField(FieldSpec.builder(type, Strings.camelize(baseName)).initializer("new " + className + "()").addModifiers(Modifier.FINAL, Modifier.STATIC, Modifier.PUBLIC).build());

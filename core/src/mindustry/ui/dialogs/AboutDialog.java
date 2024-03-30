@@ -35,7 +35,7 @@ public class AboutDialog extends BaseDialog{
         buttons.clear();
 
         float h = Core.graphics.isPortrait() ? 90f : 80f;
-        float w = Core.graphics.isPortrait() ? 330f : 600f;
+        float w = Core.graphics.isPortrait() ? 400f : 600f;
 
         Table in = new Table();
         ScrollPane pane = new ScrollPane(in);
@@ -61,7 +61,7 @@ public class AboutDialog extends BaseDialog{
             table.table(inset -> {
                 inset.add("[accent]" + link.title).growX().left();
                 inset.row();
-                inset.labelWrap(link.description).width(w - 100f).color(Color.lightGray).growX();
+                inset.labelWrap(link.description).width(w - 100f - h).color(Color.lightGray).growX();
             }).padLeft(8);
 
             table.button(Icon.link, Styles.clearNoneTogglei, () -> {
@@ -71,7 +71,7 @@ public class AboutDialog extends BaseDialog{
                     ui.showErrorMessage("@linkfail");
                     Core.app.setClipboardText(link.link);
                 }
-            }).size(h - 5, h).padRight(100);
+            }).size(h - 5, h);
 
             in.add(table).size(w, h).padTop(5).row();
         }
@@ -83,12 +83,6 @@ public class AboutDialog extends BaseDialog{
         addCloseButton();
 
         buttons.button("@credits", this::showCredits).size(200f, 64f);
-
-        if(Core.graphics.isPortrait()){
-            for(Cell<?> cell : buttons.getCells()){
-                cell.width(140f);
-            }
-        }
 
     }
 

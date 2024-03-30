@@ -14,11 +14,20 @@ public interface UnitController{
         return true;
     }
 
+    /** @return whether logic AI can take over */
+    default boolean isLogicControllable(){
+        return false;
+    }
+
     default void updateUnit(){
 
     }
 
     default void removed(Unit unit){
+
+    }
+
+    default void afterRead(Unit unit){
 
     }
 

@@ -5,6 +5,7 @@ import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.maps.generators.*;
+import mindustry.mod.Mods.*;
 
 public class SectorPreset extends UnlockableContent{
     public FileMapGenerator generator;
@@ -18,6 +19,8 @@ public class SectorPreset extends UnlockableContent{
     public float startWaveTimeMultiplier = 2f;
     public boolean addStartingItems = false;
     public boolean noLighting = false;
+    /** If true, this is the last sector in its planetary campaign. */
+    public boolean isLastSector;
     public boolean showSectorLandInfo = true;
     /** If true, uses this sector's launch fields instead */
     public boolean overrideLaunchDefaults = false;
@@ -34,9 +37,17 @@ public class SectorPreset extends UnlockableContent{
     }
 
     /** Internal use only! */
-    public SectorPreset(String name){
+    public SectorPreset(String name, LoadedMod mod){
         super(name);
-        this.generator = new FileMapGenerator(name, this);
+        if(mod != null){
+            this.minfo.mod = mod;
+        }
+        this.generator = new FileMapGenerator(this.name, this);
+    }
+
+    /** Internal use only! */
+    public SectorPreset(String name){
+       this(name, null);
     }
 
     public void initialize(Planet planet, int sector){

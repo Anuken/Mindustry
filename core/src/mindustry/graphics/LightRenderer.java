@@ -42,15 +42,22 @@ public class LightRenderer{
 
         circleIndex ++;
     }
-
+    
     public void add(float x, float y, TextureRegion region, Color color, float opacity){
+        add(x, y, region, 0f, color, opacity);
+    }
+
+    public void add(float x, float y, TextureRegion region, float rotation, Color color, float opacity){
         if(!enabled()) return;
 
         float res = color.toFloatBits();
+        float xscl = Draw.xscl, yscl = Draw.yscl;
         add(() -> {
             Draw.color(res);
             Draw.alpha(opacity);
-            Draw.rect(region, x, y);
+            Draw.scl(xscl, yscl);
+            Draw.rect(region, x, y, rotation);
+            Draw.scl();
         });
     }
 
@@ -175,7 +182,7 @@ public class LightRenderer{
     }
 
     public boolean enabled(){
-        return state.rules.lighting && state.rules.ambientLight.a > 0.0001f;
+        return state.rules.lighting && state.rules.ambientLight.a > 0.0001f && renderer.drawLight;
     }
 
     public void draw(){

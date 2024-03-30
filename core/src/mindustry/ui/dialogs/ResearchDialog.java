@@ -93,21 +93,11 @@ public class ResearchDialog extends BaseDialog{
 
         shouldPause = true;
 
-        Runnable checkMargin = () -> {
-            if(Core.graphics.isPortrait() && showTechSelect){
-                itemDisplay.marginTop(60f);
-            }else{
-                itemDisplay.marginTop(0f);
-            }
-            itemDisplay.invalidate();
-            itemDisplay.layout();
-        };
-
-        onResize(checkMargin);
+        onResize(this::checkMargin);
 
         shown(() -> {
-            checkMargin.run();
-            Core.app.post(checkMargin);
+            checkMargin();
+            Core.app.post(this::checkMargin);
 
             Planet currPlanet = ui.planet.isShown() ?
                 ui.planet.state.planet :
@@ -185,6 +175,25 @@ public class ResearchDialog extends BaseDialog{
                 view.clamp();
             }
         });
+    }
+
+    @Override
+    public Dialog show(){
+        if(net.client()){
+            ui.showInfo("@research.multiplayer");
+            return this;
+        }
+        return show(Core.scene);
+    }
+
+    void checkMargin(){
+        if(Core.graphics.isPortrait() && showTechSelect){
+            itemDisplay.marginTop(60f);
+        }else{
+            itemDisplay.marginTop(0f);
+        }
+        itemDisplay.invalidate();
+        itemDisplay.layout();
     }
 
     public void rebuildItems(){
@@ -406,6 +415,8 @@ public class ResearchDialog extends BaseDialog{
 
             for(TechTreeNode node : nodes){
                 ImageButton button = new ImageButton(node.node.content.uiIcon, Styles.nodei);
+                button.resizeImage(32f);
+                button.getImage().setScaling(Scaling.fit);
                 button.visible(() -> node.visible);
                 button.clicked(() -> {
                     if(moved) return;
@@ -454,7 +465,7 @@ public class ResearchDialog extends BaseDialog{
 
                     ((TextureRegionDrawable)button.getStyle().imageUp).setRegion(node.selectable ? node.node.content.uiIcon : Icon.lock.getRegion());
                     button.getImage().setColor(!locked(node.node) ? Color.white : node.selectable ? Color.gray : Pal.gray);
-                    button.getImage().setScaling(Scaling.bounded);
+                    button.getImage().layout();
                 });
                 addChild(button);
             }
@@ -698,6 +709,10 @@ public class ResearchDialog extends BaseDialog{
             }
 
             addChild(infoTable);
+
+            checkMargin();
+            Core.app.post(() -> checkMargin());
+
             infoTable.pack();
             infoTable.act(Core.graphics.getDeltaTime());
         }

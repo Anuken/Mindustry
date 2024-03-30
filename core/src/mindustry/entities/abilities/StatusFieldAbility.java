@@ -2,15 +2,18 @@ package mindustry.entities.abilities;
 
 import arc.*;
 import arc.math.*;
+import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 
+import static mindustry.Vars.*;
+
 public class StatusFieldAbility extends Ability{
     public StatusEffect effect;
-    public float duration = 60, reload = 100, range = 20;
+    public float duration = 60, reload = 100, range = 20; //
     public boolean onShoot = false;
     public Effect applyEffect = Fx.none;
     public Effect activeEffect = Fx.overdriveWave;
@@ -29,8 +32,13 @@ public class StatusFieldAbility extends Ability{
     }
 
     @Override
-    public String localized(){
-        return Core.bundle.format("ability.statusfield", effect.emoji());
+    public void addStats(Table t){
+        super.addStats(t);
+        t.add(Core.bundle.format("bullet.range", Strings.autoFixed(range / tilesize, 2)));
+        t.row();
+        t.add(abilityStat("firingrate", Strings.autoFixed(60f / reload, 2)));
+        t.row();
+        t.add((effect.hasEmoji() ? effect.emoji() : "") + "[stat]" + effect.localizedName);
     }
 
     @Override

@@ -12,14 +12,14 @@ import mindustry.world.blocks.ConstructBlock.*;
 import static mindustry.Vars.*;
 
 public class BuilderAI extends AIController{
-    public static float buildRadius = 1500, retreatDst = 110f, retreatDelay = Time.toSeconds * 2f;
+    public static float buildRadius = 1500, retreatDst = 110f, retreatDelay = Time.toSeconds * 2f, defaultRebuildPeriod = 60f * 2f;
 
     public @Nullable Unit assistFollowing;
     public @Nullable Unit following;
     public @Nullable Teamc enemy;
     public @Nullable BlockPlan lastPlan;
 
-    public float fleeRange = 370f;
+    public float fleeRange = 370f, rebuildPeriod = defaultRebuildPeriod;
     public boolean alwaysFlee;
     public boolean onlyAssist;
 
@@ -32,6 +32,14 @@ public class BuilderAI extends AIController{
     }
 
     public BuilderAI(){
+    }
+
+    @Override
+    public void init(){
+        //rebuild much faster with buildAI; there are usually few builder units so this is fine
+        if(rebuildPeriod == defaultRebuildPeriod && unit.team.rules().buildAi){
+            rebuildPeriod = 10f;
+        }
     }
 
     @Override
@@ -119,7 +127,7 @@ public class BuilderAI extends AIController{
             }
 
             //follow someone and help them build
-            if(timer.get(timerTarget2, 60f)){
+            if(timer.get(timerTarget2, 20f)){
                 found = false;
 
                 Units.nearby(unit.team, unit.x, unit.y, buildRadius, u -> {
@@ -145,7 +153,7 @@ public class BuilderAI extends AIController{
                     float minDst = Float.MAX_VALUE;
                     Player closest = null;
                     for(var player : Groups.player){
-                        if(player.unit().canBuild() && !player.dead()){
+                        if(player.unit().canBuild() && !player.dead() && player.team() == unit.team){
                             float dst = player.dst2(unit);
                             if(dst < minDst){
                                 closest = player;
@@ -158,11 +166,8 @@ public class BuilderAI extends AIController{
                 }
             }
 
-            //TODO this is bad, rebuild time should not depend on AI here
-            float rebuildTime = (unit.team.rules().rtsAi ? 12f : 2f) * 60f;
-
             //find new plan
-            if(!onlyAssist && !unit.team.data().plans.isEmpty() && following == null && timer.get(timerTarget3, rebuildTime)){
+            if(!onlyAssist && !unit.team.data().plans.isEmpty() && following == null && timer.get(timerTarget3, rebuildPeriod)){
                 Queue<BlockPlan> blocks = unit.team.data().plans;
                 BlockPlan block = blocks.first();
 

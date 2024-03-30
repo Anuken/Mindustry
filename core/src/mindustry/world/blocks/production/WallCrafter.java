@@ -5,6 +5,7 @@ import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -48,6 +49,7 @@ public class WallCrafter extends Block{
         regionRotated1 = 1;
 
         envEnabled |= Env.space;
+        flags = EnumSet.of(BlockFlag.drill);
     }
 
     @Override

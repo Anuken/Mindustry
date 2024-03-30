@@ -165,14 +165,14 @@ public class NetClient implements ApplicationListener{
     public static void sound(Sound sound, float volume, float pitch, float pan){
         if(sound == null || headless) return;
 
-        sound.play(Mathf.clamp(volume, 0, 8f) * Core.settings.getInt("sfxvol") / 100f, pitch, pan, false, false);
+        sound.play(Mathf.clamp(volume, 0, 8f) * Core.settings.getInt("sfxvol") / 100f, Mathf.clamp(pitch, 0f, 20f), pan, false, false);
     }
 
     @Remote(variants = Variant.both, unreliable = true, called = Loc.server)
     public static void soundAt(Sound sound, float x, float y, float volume, float pitch){
         if(sound == null || headless) return;
 
-        sound.at(x, y, pitch, Mathf.clamp(volume, 0, 4f));
+        sound.at(x, y, Mathf.clamp(pitch, 0f, 20f), Mathf.clamp(volume, 0, 4f));
     }
 
     @Remote(variants = Variant.both, unreliable = true)
@@ -201,10 +201,12 @@ public class NetClient implements ApplicationListener{
             Sounds.chatMessage.play();
         }
 
-        //display raw unformatted text above player head
         if(playersender != null && unformatted != null){
+            //display raw unformatted text above player head
             playersender.lastText(unformatted);
             playersender.textFadeTime(1f);
+
+            Events.fire(new PlayerChatEvent(playersender, unformatted));
         }
     }
 
@@ -223,6 +225,15 @@ public class NetClient implements ApplicationListener{
 
         //do not receive chat messages from clients that are too young or not registered
         if(net.server() && player != null && player.con != null && (Time.timeSinceMillis(player.con.connectTime) < 500 || !player.con.hasConnected || !player.isAdded())) return;
+
+        //detect and kick for foul play
+        if(player != null && player.con != null && !player.con.chatRate.allow(2000, Config.chatSpamLimit.num())){
+            player.con.kick(KickReason.kick);
+            netServer.admins.blacklistDos(player.con.address);
+            return;
+        }
+
+        if(message == null) return;
 
         if(message.length() > maxTextLength){
             throw new ValidateException(player, "Player has sent a message above the text limit.");
@@ -329,19 +340,23 @@ public class NetClient implements ApplicationListener{
         state.rules = rules;
     }
 
+    //NOTE: avoid using this, runs into packet/buffer size limitations
     @Remote(variants = Variant.both)
     public static void setObjectives(MapObjectives executor){
-        //clear old markers
-        for(var objective : state.rules.objectives){
-            for(var marker : objective.markers){
-                if(marker.wasAdded){
-                    marker.removed();
-                    marker.wasAdded = false;
-                }
-            }
-        }
-
         state.rules.objectives = executor;
+    }
+
+    @Remote(variants = Variant.both, called = Loc.server)
+    public static void clearObjectives(){
+        state.rules.objectives.clear();
+    }
+
+    @Remote(variants = Variant.both, called = Loc.server)
+    public static void completeObjective(int index){
+        var obj = state.rules.objectives.get(index);
+        if(obj != null){
+            obj.done();
+        }
     }
 
     @Remote(variants = Variant.both)
@@ -397,7 +412,7 @@ public class NetClient implements ApplicationListener{
 
         //entity must not be added yet, so create it
         if(entity == null){
-            entity = (Syncc)EntityMapping.map(typeID).get();
+            entity = (Syncc)EntityMapping.map(typeID & 0xFF).get();
             entity.id(id);
             if(!netClient.isEntityUsed(entity.id())){
                 add = true;
@@ -428,8 +443,9 @@ public class NetClient implements ApplicationListener{
             for(int j = 0; j < amount; j++){
                 readSyncEntity(input, Reads.get(input));
             }
-        }catch(IOException e){
-            throw new RuntimeException(e);
+        }catch(Exception e){
+            //don't disconnect, just log it
+            Log.err("Error reading entity snapshot", e);
         }
     }
 
@@ -481,7 +497,9 @@ public class NetClient implements ApplicationListener{
             state.wavetime = waveTime;
             state.wave = wave;
             state.enemies = enemies;
-            state.serverPaused = paused;
+            if(!state.isMenu()){
+                state.set(paused ? State.paused : State.playing);
+            }
             state.serverTps = tps & 0xff;
 
             //note that this is far from a guarantee that random state is synced - tiny changes in delta and ping can throw everything off again.

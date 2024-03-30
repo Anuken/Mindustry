@@ -29,6 +29,7 @@ public class StackConveyor extends Block implements Autotiler{
     public @Load("@-stack") TextureRegion stackRegion;
     /** requires power to work properly */
     public @Load(value = "@-glow") TextureRegion glowRegion;
+    public @Load(value = "@-edge-glow", fallback = "@-glow") TextureRegion edgeGlowRegion;
 
     public float glowAlpha = 1f;
     public Color glowColor = Pal.redLight;
@@ -154,7 +155,7 @@ public class StackConveyor extends Block implements Autotiler{
                 Draw.z(Layer.blockAdditive);
                 Draw.color(glowColor, glowAlpha * power.status);
                 Draw.blend(Blending.additive);
-                Draw.rect(glowRegion, x, y, rotation * 90);
+                Draw.rect(state == stateLoad ? edgeGlowRegion : glowRegion, x, y, rotation * 90);
                 Draw.blend();
                 Draw.color();
                 Draw.z(Layer.block - 0.1f);
@@ -208,7 +209,7 @@ public class StackConveyor extends Block implements Autotiler{
             state = stateMove;
 
             int[] bits = buildBlending(tile, rotation, null, true);
-            if(bits[0] == 0 &&  blends(tile, rotation, 0) && !blends(tile, rotation, 2)) state = stateLoad;  // a 0 that faces into a conveyor with none behind it
+            if(bits[0] == 0 && blends(tile, rotation, 0) && (!blends(tile, rotation, 2) || back() instanceof StackConveyorBuild b && b.state == stateUnload)) state = stateLoad;  // a 0 that faces into a conveyor with none behind it
             if(outputRouter && bits[0] == 0 && !blends(tile, rotation, 0) && blends(tile, rotation, 2)) state = stateUnload; // a 0 that faces into none with a conveyor behind it
             if(!outputRouter && !(front() instanceof StackConveyorBuild)) state = stateUnload; // a 0 that faces into none with a conveyor behind it
 

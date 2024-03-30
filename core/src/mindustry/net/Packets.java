@@ -9,9 +9,7 @@ import mindustry.io.*;
 
 import java.util.zip.*;
 
-/**
- * Class for storing all packets.
- */
+/** Class for storing all packets. */
 public class Packets{
 
     public enum KickReason{
@@ -40,7 +38,7 @@ public class Packets{
     }
 
     public enum AdminAction{
-        kick, ban, trace, wave
+        kick, ban, trace, wave, switchTeam
     }
 
     /** Generic client connection event. */

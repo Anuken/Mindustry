@@ -28,12 +28,21 @@ public abstract class NetConnection{
     public long lastReceivedClientTime;
     /** Build requests that have been recently rejected. This is cleared every snapshot. */
     public Seq<BuildPlan> rejectedRequests = new Seq<>();
+    /** Handles chat spam rate limits. */
+    public Ratekeeper chatRate = new Ratekeeper();
+    /** Handles packet spam rate limits. */
+    public Ratekeeper packetRate = new Ratekeeper();
 
     public boolean hasConnected, hasBegunConnecting, hasDisconnected;
     public float viewWidth, viewHeight, viewX, viewY;
 
     public NetConnection(String address){
         this.address = address;
+    }
+
+    /** Kick with the standard kick reason. */
+    public void kick(){
+        kick(KickReason.kick);
     }
 
     /** Kick with a special, localized reason. Use this if possible. */
@@ -72,10 +81,14 @@ public abstract class NetConnection{
             Call.kick(this, reason);
         }
 
-        close();
+        kickDisconnect();
 
         netServer.admins.save();
         kicked = true;
+    }
+
+    protected void kickDisconnect(){
+        close();
     }
 
     public boolean isConnected(){

@@ -20,6 +20,8 @@ public enum BlockFlag{
     reactor,
     /** Blocks that extinguishes fires. */
     extinguisher,
+    /** Is a drill. */
+    drill,
 
     //special, internal identifiers
     launchPad,

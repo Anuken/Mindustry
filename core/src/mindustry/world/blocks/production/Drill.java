@@ -19,6 +19,7 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
+import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -59,6 +60,9 @@ public class Drill extends Block{
     /** Chance the update effect will appear. */
     public float updateEffectChance = 0.02f;
 
+    /** Multipliers of drill speed for each item. Defaults to 1. */
+    public ObjectFloatMap<Item> drillMultipliers = new ObjectFloatMap<>();
+
     public boolean drawRim = false;
     public boolean drawSpinSprite = true;
     public Color heatColor = Color.valueOf("ff5512");
@@ -79,6 +83,7 @@ public class Drill extends Block{
         ambientSoundVolume = 0.018f;
         //drills work in space I guess
         envEnabled |= Env.space;
+        flags = EnumSet.of(BlockFlag.drill);
     }
 
     @Override
@@ -159,19 +164,25 @@ public class Drill extends Block{
     }
 
     public float getDrillTime(Item item){
-        return drillTime + hardnessDrillMultiplier * item.hardness;
+        return (drillTime + hardnessDrillMultiplier * item.hardness) / drillMultipliers.get(item, 1f);
     }
 
     @Override
     public void setStats(){
         super.setStats();
 
-        stats.add(Stat.drillTier, StatValues.blocks(b -> b instanceof Floor f && !f.wallOre && f.itemDrop != null &&
+        stats.add(Stat.drillTier, StatValues.drillables(drillTime, hardnessDrillMultiplier, size * size, drillMultipliers, b -> b instanceof Floor f && !f.wallOre && f.itemDrop != null &&
             f.itemDrop.hardness <= tier && f.itemDrop != blockedItem && (indexer.isBlockPresent(f) || state.isMenu())));
 
         stats.add(Stat.drillSpeed, 60f / drillTime * size * size, StatUnit.itemsSecond);
-        if(liquidBoostIntensity != 1){
-            stats.add(Stat.boostEffect, liquidBoostIntensity * liquidBoostIntensity, StatUnit.timesSpeed);
+
+        if(liquidBoostIntensity != 1 && findConsumer(f -> f instanceof ConsumeLiquidBase) instanceof ConsumeLiquidBase consBase){
+            stats.remove(Stat.booster);
+            stats.add(Stat.booster,
+                StatValues.speedBoosters("{0}" + StatUnit.timesSpeed.localized(),
+                consBase.amount,
+                liquidBoostIntensity * liquidBoostIntensity, false, this::consumesLiquid)
+            );
         }
     }
 

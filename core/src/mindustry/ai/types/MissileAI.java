@@ -2,6 +2,8 @@ package mindustry.ai.types;
 
 import arc.math.*;
 import arc.util.*;
+import mindustry.*;
+import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 
@@ -14,7 +16,7 @@ public class MissileAI extends AIController{
 
         float time = unit instanceof TimedKillc t ? t.time() : 1000000f;
 
-        if(time >= unit.type.homingDelay && shooter != null){
+        if(time >= unit.type.homingDelay && shooter != null && !shooter.dead()){
             unit.lookAt(shooter.aimX, shooter.aimY);
         }
 
@@ -27,6 +29,11 @@ public class MissileAI extends AIController{
         if(build != null && build.team != unit.team && (build == target || !build.block.underBullets)){
             unit.kill();
         }
+    }
+
+    @Override
+    public Teamc target(float x, float y, float range, boolean air, boolean ground){
+        return Units.closestTarget(unit.team, x, y, range, u -> u.checkTarget(air, ground), t -> ground && (!t.block.underBullets || (shooter != null && t == Vars.world.buildWorld(shooter.aimX, shooter.aimY))));
     }
 
     @Override

@@ -12,6 +12,7 @@ import arc.scene.ui.TextField.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.game.EventType.*;
 import mindustry.input.*;
 import mindustry.ui.*;
 
@@ -45,6 +46,9 @@ public class ConsoleFragment extends Table{
                 }
                 if(shown){
                     chatfield.requestKeyboard();
+                }else if(scene.getKeyboardFocus() == chatfield){
+                    scene.setKeyboardFocus(null);
+                    scene.setScrollFocus(null);
                 }
                 clearChatInput();
             }
@@ -69,7 +73,7 @@ public class ConsoleFragment extends Table{
                 }
             }
 
-            scrollPos = (int)Mathf.clamp(scrollPos + input.axis(Binding.chat_scroll), 0, Math.max(0, messages.size - messagesShown));
+            scrollPos = (int)Mathf.clamp(scrollPos + input.axis(Binding.chat_scroll), 0, Math.max(0, messages.size));
         });
 
         history.insert(0, "");
@@ -175,6 +179,7 @@ public class ConsoleFragment extends Table{
     public void toggle(){
 
         if(!open){
+            Events.fire(Trigger.openConsole);
             scene.setKeyboardFocus(chatfield);
             open = !open;
             if(mobile){

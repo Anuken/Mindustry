@@ -66,6 +66,13 @@ public class BuildTurret extends BaseTurret{
     }
 
     @Override
+    public void setStats(){
+        super.setStats();
+
+        stats.addPercent(Stat.buildSpeed, buildSpeed);
+    }
+
+    @Override
     public TextureRegion[] icons(){
         return new TextureRegion[]{baseRegion, region};
     }
@@ -105,7 +112,9 @@ public class BuildTurret extends BaseTurret{
                 unit.lookAt(angleTo(unit.buildPlan()));
             }
 
-            checkSuppression();
+            if(checkSuppression()){
+                efficiency = potentialEfficiency = 0f;
+            }
 
             unit.buildSpeedMultiplier(potentialEfficiency * timeScale);
             unit.speedMultiplier(potentialEfficiency * timeScale);

@@ -47,6 +47,11 @@ public class Attribute{
         return map.getThrow(name, () -> new IllegalArgumentException("Unknown Attribute type: " + name));
     }
 
+    /** @return Whether an attribute exists. */
+    public static boolean exists(String name){
+        return map.containsKey(name);
+    }
+
     /** Automatically registers this attribute for use. Do not call after mod init. */
     public static Attribute add(String name){
         Attribute a = new Attribute(all.length, name);

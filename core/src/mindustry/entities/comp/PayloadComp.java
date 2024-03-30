@@ -60,6 +60,11 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         }
     }
 
+    @Override
+    public void destroy(){
+        if(Vars.state.rules.unitPayloadsExplode) payloads.each(Payload::destroyed);
+    }
+
     float payloadUsed(){
         return payloads.sumf(p -> p.size() * p.size());
     }
@@ -171,8 +176,7 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         int tx = World.toTile(x - tile.block.offset), ty = World.toTile(y - tile.block.offset);
         Tile on = Vars.world.tile(tx, ty);
         if(on != null && Build.validPlace(tile.block, tile.team, tx, ty, tile.rotation, false)){
-            int rot = (int)((rotation + 45f) / 90f) % 4;
-            payload.place(on, rot);
+            payload.place(on, tile.rotation);
             Events.fire(new PayloadDropEvent(self(), tile));
 
             if(getControllerName() != null){
@@ -180,7 +184,7 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
             }
 
             Fx.unitDrop.at(tile);
-            Fx.placeBlock.at(on.drawx(), on.drawy(), on.block().size);
+            on.block().placeEffect.at(on.drawx(), on.drawy(), on.block().size);
             return true;
         }
 

@@ -1,6 +1,7 @@
 package mindustry.ctype;
 
 import arc.util.*;
+import mindustry.ai.*;
 import mindustry.entities.bullet.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -22,7 +23,9 @@ public enum ContentType{
     error(null),
     planet(Planet.class),
     ammo_UNUSED(null),
-    team(TeamEntry.class);
+    team(TeamEntry.class),
+    unitCommand(UnitCommand.class),
+    unitStance(UnitStance.class);
 
     public static final ContentType[] all = values();
 

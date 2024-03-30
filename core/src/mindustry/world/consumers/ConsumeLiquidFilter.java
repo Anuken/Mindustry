@@ -33,8 +33,7 @@ public class ConsumeLiquidFilter extends ConsumeLiquidBase{
     public void build(Building build, Table table){
         Seq<Liquid> list = content.liquids().select(l -> !l.isHidden() && filter.get(l));
         MultiReqImage image = new MultiReqImage();
-        list.each(liquid -> image.add(new ReqImage(liquid.uiIcon, () ->
-            build.liquids != null && build.liquids.get(liquid) > 0)));
+        list.each(liquid -> image.add(new ReqImage(liquid.uiIcon, () -> getConsumed(build) == liquid)));
 
         table.add(image).size(8 * 4);
     }
