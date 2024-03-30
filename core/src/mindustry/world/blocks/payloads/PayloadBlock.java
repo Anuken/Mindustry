@@ -151,6 +151,12 @@ public class PayloadBlock extends Block{
             }
         }
 
+        @Override
+        public void onDestroyed(){
+            if(payload != null) payload.destroyed();
+            super.onDestroyed();
+        }
+
         public boolean blends(int direction){
             return PayloadBlock.blends(this, direction);
         }
