@@ -540,7 +540,6 @@ public class CoreBlock extends StorageBlock{
             float in = renderer.getLandTimeIn() * landDuration();
             float tsize = Mathf.sample(thrusterSizes, (in + 35f) / landDuration());
 
-            //TODO should use timer.get(tsize) instead
             renderer.setLandPTimer(renderer.getLandPTimer() + tsize * Time.delta);
             if(renderer.getLandTime() >= 1f){
                 tile.getLinkedTiles(t -> {
