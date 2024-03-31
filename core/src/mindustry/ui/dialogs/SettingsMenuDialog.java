@@ -182,7 +182,9 @@ public class SettingsMenuDialog extends BaseDialog{
                     importData(file);
                     control.saves.resetSave();
                     state = new GameState();
-                    Core.app.exit();
+                    ui.showInfoOnHidden("@data.import.exit", () -> {
+                        Core.app.exit();
+                    });
                 }catch(IllegalArgumentException e){
                     ui.showErrorMessage("@data.invalid");
                 }catch(Exception e){
