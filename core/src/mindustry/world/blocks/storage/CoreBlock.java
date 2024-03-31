@@ -51,7 +51,9 @@ public class CoreBlock extends StorageBlock{
     public UnitType unitType = UnitTypes.alpha;
     public float landDuration = 160f;
     public Music landMusic = Musics.land;
-    public float minZoomScale = Scl.scl(0.02f);
+
+    public Interp landZoomInterp = Interp.pow3;
+    public float landZoomFrom = 0.02f, landZoomTo = 4f;
 
     public float captureInvicibility = 60f * 15f;
 
@@ -321,7 +323,7 @@ public class CoreBlock extends StorageBlock{
 
         protected float cloudSeed;
 
-        //utility methods for less Block-to-Core casts
+        //utility methods for less Block-to-CoreBlock casts. also allows for more customization
         public float landDuration(){
             return landDuration;
         }
@@ -375,7 +377,6 @@ public class CoreBlock extends StorageBlock{
                     });
                     Core.scene.add(image);
                 }else{
-                    //TODO app.post()? the old code used app.post() for this...
                     Image image = new Image();
                     image.color.a = 1f;
                     image.touchable = Touchable.disabled;
@@ -528,7 +529,7 @@ public class CoreBlock extends StorageBlock{
         /** @return Camera zoom while landing or launching. May optionally do other things such as setting camera position to itself. */
         public float zoomLaunching(){
             Core.camera.position.set(this);
-            return Interp.pow3.apply(minZoomScale, Scl.scl(4f), renderer.getLandTimeIn());
+            return landZoomInterp.apply(Scl.scl(landZoomFrom), Scl.scl(landZoomTo), renderer.getLandTimeIn());
         }
 
         public void updateLaunching(){
