@@ -527,7 +527,7 @@ public class ServerControl implements ApplicationListener{
             }
             boolean pause = arg[0].equals("on");
             autoPaused = false;
-            state.set(state.isPaused() ? State.playing : State.paused);
+            state.set(pause ? State.paused : State.playing);
             info(pause ? "Game paused." : "Game unpaused.");
         });
 
