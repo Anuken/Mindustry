@@ -1,11 +1,15 @@
 package mindustry.world.blocks.storage;
 
 import arc.*;
+import arc.audio.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.scene.actions.*;
+import arc.scene.event.*;
+import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
@@ -29,6 +33,9 @@ import mindustry.world.modules.*;
 import static mindustry.Vars.*;
 
 public class CoreBlock extends StorageBlock{
+    protected static final float cloudScaling = 1700f, cfinScl = -2f, cfinOffset = 0.3f, calphaFinOffset = 0.25f, cloudAlpha = 0.81f;
+    protected static final float[] cloudAlphas = {0, 0.5f, 1f, 0.1f, 0, 0f};
+
     //hacky way to pass item modules between methods
     private static ItemModule nextItems;
     protected static final float[] thrusterSizes = {0f, 0f, 0f, 0f, 0.3f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 0f};
@@ -42,6 +49,9 @@ public class CoreBlock extends StorageBlock{
     public boolean incinerateNonBuildable = false;
 
     public UnitType unitType = UnitTypes.alpha;
+    public float landDuration = 160f;
+    public Music landMusic = Musics.land;
+    public float minZoomScale = Scl.scl(0.02f);
 
     public float captureInvicibility = 60f * 15f;
 
@@ -217,11 +227,8 @@ public class CoreBlock extends StorageBlock{
     }
 
     public void drawLanding(CoreBuild build, float x, float y){
-        float fout = renderer.getLandTime() / coreLandDuration;
-
-        if(renderer.isLaunching()) fout = 1f - fout;
-
-        float fin = 1f - fout;
+        float fin = renderer.getLandTimeIn();
+        float fout = 1f - fin;
 
         float scl = Scl.scl(4f) / renderer.getDisplayScale();
         float shake = 0f;
@@ -312,6 +319,18 @@ public class CoreBlock extends StorageBlock{
         public float iframes = -1f;
         public float thrusterTime = 0f;
 
+        //TODO enter/exit
+        protected float cloudSeed;
+
+        //utility methods for less Block-to-Core casts
+        public float landDuration(){
+            return landDuration;
+        }
+
+        public Music landMusic(){
+            return landMusic;
+        }
+
         @Override
         public void draw(){
             //draw thrusters when just landed
@@ -328,6 +347,105 @@ public class CoreBlock extends StorageBlock{
                 drawTeamTop();
             }else{
                 super.draw();
+            }
+        }
+
+        // `launchType` is null if it's landing instead of launching.
+        public void beginLaunch(@Nullable CoreBlock launchType){
+            cloudSeed = Mathf.random(1f);
+            if(launchType != null){
+                Fx.coreLaunchConstruct.at(x, y, launchType.size);
+            }
+
+            if(!headless){
+                // Add fade-in and fade-out foreground when landing or launching.
+                if(renderer.isLaunching()){
+                    float margin = 30f;
+
+                    Image image = new Image();
+                    image.color.a = 0f;
+                    image.touchable = Touchable.disabled;
+                    image.setFillParent(true);
+                    image.actions(Actions.delay((landDuration() - margin) / 60f), Actions.fadeIn(margin / 60f, Interp.pow2In), Actions.delay(6f / 60f), Actions.remove());
+                    image.update(() -> {
+                        image.toFront();
+                        ui.loadfrag.toFront();
+                        if(state.isMenu()){
+                            image.remove();
+                        }
+                    });
+                    Core.scene.add(image);
+                }else{
+                    //TODO app.post()? the old code used app.post() for this...
+                    Image image = new Image();
+                    image.color.a = 1f;
+                    image.touchable = Touchable.disabled;
+                    image.setFillParent(true);
+                    image.actions(Actions.fadeOut(35f / 60f), Actions.remove());
+                    image.update(() -> {
+                        image.toFront();
+                        ui.loadfrag.toFront();
+                        if(state.isMenu()){
+                            image.remove();
+                        }
+                    });
+                    Core.scene.add(image);
+                }
+            }
+        }
+
+        public void endLaunch(){}
+
+        // `fin` here is always 0-1
+        public void drawLanding(CoreBlock block){
+            var clouds = Core.assets.get("sprites/clouds.png", Texture.class);
+
+            float fin = renderer.getLandTimeIn();
+            float cameraScl = renderer.getDisplayScale();
+
+            float fout = 1f - fin;
+            float scl = Scl.scl(4f) / cameraScl;
+            float pfin = Interp.pow3Out.apply(fin), pf = Interp.pow2In.apply(fout);
+
+            //draw particles
+            Draw.color(Pal.lightTrail);
+            Angles.randLenVectors(1, pfin, 100, 800f * scl * pfin, (ax, ay, ffin, ffout) -> {
+                Lines.stroke(scl * ffin * pf * 3f);
+                Lines.lineAngle(x + ax, y + ay, Mathf.angle(ax, ay), (ffin * 20 + 1f) * scl);
+            });
+            Draw.color();
+
+            block.drawLanding(this, x, y);
+
+            Draw.color();
+            Draw.mixcol(Color.white, Interp.pow5In.apply(fout));
+
+            //accent tint indicating that the core was just constructed
+            if(renderer.isLaunching()){
+                float f = Mathf.clamp(1f - fout * 12f);
+                if(f > 0.001f){
+                    Draw.mixcol(Pal.accent, f);
+                }
+            }
+
+            //draw clouds
+            if(state.rules.cloudColor.a > 0.0001f){
+                float scaling = cloudScaling;
+                float sscl = Math.max(1f + Mathf.clamp(fin + cfinOffset) * cfinScl, 0f) * cameraScl;
+
+                Tmp.tr1.set(clouds);
+                Tmp.tr1.set(
+                    (Core.camera.position.x - Core.camera.width/2f * sscl) / scaling,
+                    (Core.camera.position.y - Core.camera.height/2f * sscl) / scaling,
+                    (Core.camera.position.x + Core.camera.width/2f * sscl) / scaling,
+                    (Core.camera.position.y + Core.camera.height/2f * sscl) / scaling);
+
+                Tmp.tr1.scroll(10f * cloudSeed, 10f * cloudSeed);
+
+                Draw.alpha(Mathf.sample(cloudAlphas, fin + calphaFinOffset) * cloudAlpha);
+                Draw.mixcol(state.rules.cloudColor, state.rules.cloudColor.a);
+                Draw.rect(Tmp.tr1, Core.camera.position.x, Core.camera.position.y, Core.camera.width, Core.camera.height);
+                Draw.reset();
             }
         }
 
@@ -409,10 +527,21 @@ public class CoreBlock extends StorageBlock{
             thrusterTime -= Time.delta/90f;
         }
 
-        public void updateLandParticles(){
-            float time = renderer.isLaunching() ? coreLandDuration - renderer.getLandTime() : renderer.getLandTime();
-            float tsize = Mathf.sample(thrusterSizes, (time + 35f) / coreLandDuration);
+        /** @return Camera zoom while landing or launching. May optionally do other things such as setting camera position to itself. */
+        public float zoomLaunching(){
+            Core.camera.position.set(this);
+            return Interp.pow3.apply(minZoomScale, Scl.scl(4f), renderer.getLandTimeIn());
+        }
 
+        public void updateLaunching(){
+            updateLandParticles();
+        }
+
+        public void updateLandParticles(){
+            float in = renderer.getLandTimeIn() * landDuration();
+            float tsize = Mathf.sample(thrusterSizes, (in + 35f) / landDuration());
+
+            //TODO should use timer.get(tsize) instead
             renderer.setLandPTimer(renderer.getLandPTimer() + tsize * Time.delta);
             if(renderer.getLandTime() >= 1f){
                 tile.getLinkedTiles(t -> {

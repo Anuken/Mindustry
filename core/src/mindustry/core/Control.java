@@ -30,6 +30,7 @@ import mindustry.net.*;
 import mindustry.type.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
+import mindustry.world.blocks.storage.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
 import java.io.*;
@@ -191,29 +192,27 @@ public class Control implements ApplicationListener, Loadable{
 
         Events.run(Trigger.newGame, () -> {
             var core = player.bestCore();
-
             if(core == null) return;
 
             camera.position.set(core);
             player.set(core);
 
             float coreDelay = 0f;
-
             if(!settings.getBool("skipcoreanimation") && !state.rules.pvp){
-                coreDelay = coreLandDuration;
+                coreDelay = core.landDuration();
                 //delay player respawn so animation can play.
-                player.deathTimer = Player.deathDelay - coreLandDuration;
+                player.deathTimer = Player.deathDelay - core.landDuration();
                 //TODO this sounds pretty bad due to conflict
                 if(settings.getInt("musicvol") > 0){
-                    Musics.land.stop();
-                    Musics.land.play();
-                    Musics.land.setVolume(settings.getInt("musicvol") / 100f);
+                    //TODO what to do if another core with different music is already playing?
+                    Music music = core.landMusic();
+                    music.stop();
+                    music.play();
+                    music.setVolume(settings.getInt("musicvol") / 100f);
                 }
 
-                app.post(() -> ui.hudfrag.showLand());
-                renderer.showLanding();
-
-                Time.run(coreLandDuration, () -> {
+                renderer.showLanding(core);
+                Time.run(core.landDuration(), () -> {
                     Fx.launch.at(core);
                     Effect.shake(5f, 5f, core);
                     core.thrusterTime = 1f;
@@ -227,7 +226,6 @@ public class Control implements ApplicationListener, Loadable{
             }
 
             if(state.isCampaign()){
-
                 //don't run when hosting, that doesn't really work.
                 if(state.rules.sector.planet.prebuildBase){
                     toBePlaced.clear();
