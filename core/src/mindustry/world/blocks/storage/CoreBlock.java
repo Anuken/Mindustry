@@ -319,7 +319,6 @@ public class CoreBlock extends StorageBlock{
         public float iframes = -1f;
         public float thrusterTime = 0f;
 
-        //TODO enter/exit
         protected float cloudSeed;
 
         //utility methods for less Block-to-Core casts
@@ -396,7 +395,6 @@ public class CoreBlock extends StorageBlock{
 
         public void endLaunch(){}
 
-        // `fin` here is always 0-1
         public void drawLanding(CoreBlock block){
             var clouds = Core.assets.get("sprites/clouds.png", Texture.class);
 

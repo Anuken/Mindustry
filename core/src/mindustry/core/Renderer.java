@@ -524,25 +524,37 @@ public class Renderer implements ApplicationListener{
         this.landPTimer = landPTimer;
     }
 
-    public void showLanding(CoreBuild landingCore){
-        this.landCore = landingCore;
-        launching = false;
-        landTime = landingCore.landDuration();
-
-        landingCore.beginLaunch(null);
-        camerascale = landingCore.zoomLaunching();
+    @Deprecated
+    public void showLanding(){
+        var core = player.bestCore();
+        if(core != null) showLanding(core);
     }
 
-    public void showLaunch(CoreBuild landingCore, CoreBlock coreType){
+    public void showLanding(CoreBuild landCore){
+        this.landCore = landCore;
+        launching = false;
+        landTime = landCore.landDuration();
+
+        landCore.beginLaunch(null);
+        camerascale = landCore.zoomLaunching();
+    }
+
+    @Deprecated
+    public void showLaunch(CoreBlock coreType){
+        var core = player.team().core();
+        if(core != null) showLaunch(core, coreType);
+    }
+
+    public void showLaunch(CoreBuild landCore, CoreBlock coreType){
         control.input.config.hideConfig();
         control.input.inv.hide();
 
-        this.landCore = landingCore;
+        this.landCore = landCore;
         launching = true;
-        landTime = landingCore.landDuration();
+        landTime = landCore.landDuration();
         launchCoreType = coreType;
 
-        landingCore.beginLaunch(coreType);
+        landCore.beginLaunch(coreType);
     }
 
     public void takeMapScreenshot(){
