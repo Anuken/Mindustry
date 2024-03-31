@@ -17,7 +17,7 @@ public class Weathers{
     suspendParticles;
 
     public static void load(){
-        snow = new ParticleWeather("snowing"){{
+        snow = new ParticleWeather("snow"){{
             particleRegion = "particle";
             sizeMax = 13f;
             sizeMin = 2.6f;
