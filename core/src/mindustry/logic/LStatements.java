@@ -1380,7 +1380,7 @@ public class LStatements{
         }
     }
 
-    @RegisterStatement("weathersensor")
+    @RegisterStatement("weathersense")
     public static class WeatherSenseStatement extends LStatement{
         public String to = "result";
         public String weather = "@rain";

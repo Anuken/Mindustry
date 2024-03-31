@@ -148,10 +148,6 @@ public class CommandAI extends AIController{
             }
         }
 
-        if(group != null){
-            group.updateMinSpeed();
-        }
-
         if(!net.client() && command == UnitCommand.enterPayloadCommand && unit.buildOn() != null && (targetPos == null || (world.buildWorld(targetPos.x, targetPos.y) != null && world.buildWorld(targetPos.x, targetPos.y) == unit.buildOn()))){
             var build = unit.buildOn();
             tmpPayload.unit = unit;
@@ -361,11 +357,6 @@ public class CommandAI extends AIController{
             attackTarget = Groups.unit.getByID(readAttackTarget);
             readAttackTarget = -1;
         }
-    }
-
-    @Override
-    public float prefSpeed(){
-        return group == null ? super.prefSpeed() : Math.min(group.minSpeed, unit.speed());
     }
 
     @Override
