@@ -1369,7 +1369,7 @@ public class LExecutor{
                         exec.setobj(result, i < 0 || i >= data.units.size ? null : data.units.get(i));
                     }else{
                         var units = data.unitCache(type);
-                        exec.setobj(result, units.isNull() || i < 0 || i >= units.size ? null : units.get(i));
+                        exec.setobj(result, units.get(i).isNull() || i < 0 || i >= units.size ? null : units.get(i));
                     }
                 }
                 case player -> exec.setobj(result, i < 0 || i >= data.players.size || data.players.get(i).unit().isNull() ? null : data.players.get(i).unit());
