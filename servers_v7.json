@@ -242,8 +242,8 @@
     "address": ["play.3midustry.xyz:6001", "play.3midustry.xyz:6002", "play.3midustry.xyz:6003", "play.3midustry.xyz:6004", "play.3midustry.xyz:6005", "play.3midustry.xyz:6006", "play.3midustry.xyz:6007", "play.3midustry.xyz:6008", "play.3midustry.xyz:6009", "play.3midustry.xyz:6010"]
   },
   {
-    "name": "ABCXYZ Community",
-    "address": ["23.88.73.88:23591", "23.88.73.88:23539", "144.76.57.59:14996", "144.76.57.59:16881", "144.76.57.59:13885", "23.88.73.88:32113", "144.76.57.59:9269", "144.76.57.59:24235", "144.76.57.59:24133", "51.81.57.217:24902"]
+    "name": "Siege Siege",
+    "address": ["157.90.4.54:25421"]
   },
   {
     "name": "CroCraft Network",
@@ -295,7 +295,7 @@
   },
   {
     "name": "NPTS",
-    "address": ["77.87.215.102:26863"]
+    "address": ["94.198.54.132:26863"]
   },
   {
     "name": "Skywar.VN",
