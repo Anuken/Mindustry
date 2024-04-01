@@ -51,6 +51,7 @@ public class CoreBlock extends StorageBlock{
     public UnitType unitType = UnitTypes.alpha;
     public float landDuration = 160f;
     public Music landMusic = Musics.land;
+    public Effect launchEffect = Fx.launch;
 
     public Interp landZoomInterp = Interp.pow3;
     public float landZoomFrom = 0.02f, landZoomTo = 4f;
@@ -390,6 +391,18 @@ public class CoreBlock extends StorageBlock{
                         }
                     });
                     Core.scene.add(image);
+
+                    Time.run(landDuration(), () -> {
+                        launchEffect.at(this);
+                        Effect.shake(5f, 5f, this);
+                        thrusterTime = 1f;
+
+                        if(state.isCampaign() && Vars.showSectorLandInfo && (state.rules.sector.preset == null || state.rules.sector.preset.showSectorLandInfo)){
+                            ui.announce("[accent]" + state.rules.sector.name() + "\n" +
+                                (state.rules.sector.info.resources.any() ? "[lightgray]" + Core.bundle.get("sectors.resources") + "[white] " +
+                                    state.rules.sector.info.resources.toString(" ", UnlockableContent::emoji) : ""), 5);
+                        }
+                    });
                 }
             }
         }
