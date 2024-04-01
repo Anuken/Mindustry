@@ -35,6 +35,7 @@ import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.storage.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
@@ -1244,7 +1245,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
                     Events.fire(new SectorLaunchLoadoutEvent(sector, from, loadout));
 
-                    if(settings.getBool("skipcoreanimation")){
+                    CoreBuild core = player.team().core();
+                    if(core == null || settings.getBool("skipcoreanimation")){
                         //just... go there
                         control.playSector(from, sector);
                         //hide only after load screen is shown
@@ -1256,9 +1258,9 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                         //allow planet dialog to finish hiding before actually launching
                         Time.runTask(5f, () -> {
                             Runnable doLaunch = () -> {
-                                renderer.showLaunch(schemCore);
+                                renderer.showLaunch(core, schemCore);
                                 //run with less delay, as the loading animation is delayed by several frames
-                                Time.runTask(coreLandDuration - 8f, () -> control.playSector(from, sector));
+                                Time.runTask(core.landDuration() - 8f, () -> control.playSector(from, sector));
                             };
 
                             //load launchFrom sector right before launching so animation is correct
@@ -1276,7 +1278,6 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         }else if(mode == select){
             listener.get(sector);
         }else if(mode == planetLaunch){ //TODO make sure it doesn't have a base already.
-
             //TODO animation
             //schematic selection and cost handled by listener
             listener.get(sector);
