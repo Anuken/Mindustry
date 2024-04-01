@@ -2713,7 +2713,7 @@ public class Blocks{
         waterExtractor = new SolidPump("water-extractor"){{
             requirements(Category.production, with(Items.metaglass, 30, Items.graphite, 30, Items.lead, 30, Items.copper, 30));
             result = Liquids.water;
-            pumpAmount = 0.11f;
+            pumpAmount = 0.105f;
             size = 2;
             liquidCapacity = 30f;
             rotateSpeed = 1.4f;
