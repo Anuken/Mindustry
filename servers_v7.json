@@ -270,10 +270,6 @@
     "address": ["atomic-de.ddns.net:35876", "atomic-de.ddns.net:35663", "atomic-de.ddns.net:35724", "atomic-de.ddns.net:35847"]
   },
   {
-    "name": "SkyPlex",
-    "address": ["mc-skyplex.net"]
-  },
-  {
     "name": "Gadgetroch's Server",
     "address": ["mindustry.gadgetroch.com", "mindustry.gadgetroch.com:6568", "mindustry.gadgetroch.com:6569"]
   },
