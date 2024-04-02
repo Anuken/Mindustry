@@ -1363,13 +1363,21 @@ public class LExecutor{
             TeamData data = t.data();
 
             switch(type){
-                case unit -> exec.setobj(result, i < 0 || i >= data.units.size ? null : data.units.get(i));
+                case unit -> {
+                    UnitType type = exec.obj(extra) instanceof UnitType u ? u : null;
+                    if(type == null){
+                        exec.setobj(result, i < 0 || i >= data.units.size ? null : data.units.get(i));
+                    }else{
+                        var units = data.unitCache(type);
+                        exec.setobj(result, units == null || i < 0 || i >= units.size ? null : units.get(i));
+                    }
+                }
                 case player -> exec.setobj(result, i < 0 || i >= data.players.size || data.players.get(i).unit().isNull() ? null : data.players.get(i).unit());
                 case core -> exec.setobj(result, i < 0 || i >= data.cores.size ? null : data.cores.get(i));
                 case build -> {
                     Block block = exec.obj(extra) instanceof Block b ? b : null;
                     if(block == null){
-                        exec.setobj(result, null);
+                        exec.setobj(result, i < 0 || i >= data.buildings.size ? null : data.buildings.get(i));
                     }else{
                         var builds = data.getBuildings(block);
                         exec.setobj(result, i < 0 || i >= builds.size ? null : builds.get(i));
@@ -1380,7 +1388,7 @@ public class LExecutor{
                     if(type == null){
                         exec.setnum(result, data.units.size);
                     }else{
-                        exec.setnum(result, data.unitsByType[type.id].size);
+                        exec.setnum(result, data.unitCache(type) == null ? 0 : data.unitCache(type).size);
                     }
                 }
                 case coreCount -> exec.setnum(result, data.cores.size);
