@@ -1388,7 +1388,7 @@ public class LExecutor{
                     if(type == null){
                         exec.setnum(result, data.units.size);
                     }else{
-                        exec.setnum(result, data.unitCache(type) == null ? null : data.data.unitCache(type).size);
+                        exec.setnum(result, data.unitCache(type) == null ? null : data.unitCache(type).size);
                     }
                 }
                 case coreCount -> exec.setnum(result, data.cores.size);
