@@ -46,7 +46,7 @@ public class EntityProcess extends BaseProcessor{
     ClassSerializer serializer;
 
     {
-        rounds = 3;
+        maxProcessingRounds = 3;
     }
 
     @Override

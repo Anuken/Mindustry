@@ -45,7 +45,7 @@ public class Saves{
         });
     }
 
-    public void load(){
+    public String load(){
         saves.clear();
 
         //read saves in parallel
@@ -90,6 +90,7 @@ public class Saves{
                 slot.getSector().save = slot;
             }
         }
+        return null;
     }
 
     public @Nullable SaveSlot getLastSector(){

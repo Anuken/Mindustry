@@ -196,6 +196,20 @@ public class BaseBuilderAI{
         return null;
     }
 
+    private boolean isPayload(PayloadConveyor block) {
+        return true;
+    }
+
+    private boolean isPayload(PayloadBlock block) {
+        return true;
+
+    }
+
+    private boolean isPayload(Object block) {
+        return false;
+    }
+
+
     private boolean tryPlace(BasePart part, int x, int y){
         int rotation = Mathf.range(2);
         axis.set((int)(part.schematic.width / 2f), (int)(part.schematic.height / 2f));
@@ -214,7 +228,7 @@ public class BaseBuilderAI{
             }
             Tile wtile = world.tile(realX, realY);
 
-            if(tile.block instanceof PayloadConveyor || tile.block instanceof PayloadBlock){
+            if(isPayload(tile.block)){
                 //near a building
                 for(Point2 point : Edges.getEdges(tile.block.size)){
                     var t = world.build(tile.x + point.x, tile.y + point.y);

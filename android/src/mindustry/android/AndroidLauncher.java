@@ -26,6 +26,8 @@ import java.lang.Thread.*;
 import java.util.*;
 
 import static mindustry.Vars.*;
+import mindustry.android.AndroidConfigurationHandler;
+
 
 public class AndroidLauncher extends AndroidApplication{
     public static final int PERMISSION_REQUEST_CODE = 1;
@@ -35,22 +37,12 @@ public class AndroidLauncher extends AndroidApplication{
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
-        UncaughtExceptionHandler handler = Thread.getDefaultUncaughtExceptionHandler();
-
-        Thread.setDefaultUncaughtExceptionHandler((thread, error) -> {
-            CrashSender.log(error);
-
-            //try to forward exception to system handler
-            if(handler != null){
-                handler.uncaughtException(thread, error);
-            }else{
-                Log.err(error);
-                System.exit(1);
-            }
-        });
 
         super.onCreate(savedInstanceState);
-        if(doubleScaleTablets && isTablet(this)){
+        AndroidApplicationConfiguration config = AndroidConfigurationHandler.configure();
+
+
+        if(doubleScaleTablets && AndroidConfigurationHandler.isTablet(this)){
             Scl.setAddition(0.5f);
         }
 
@@ -136,8 +128,7 @@ public class AndroidLauncher extends AndroidApplication{
                                 })));
                             }
                         });
-                    }else if(VERSION.SDK_INT >= VERSION_CODES.M && !(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
-                    checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)){
+                    }else if(isPermissionsNotGranted()){
                         chooser = new FileChooser(title, file -> Structs.contains(extensions, file.extension().toLowerCase()), open, file -> {
                             if(!open){
                                 cons.get(file.parent().child(file.nameWithoutExtension() + "." + extension));
@@ -164,6 +155,13 @@ public class AndroidLauncher extends AndroidApplication{
                 }catch(Throwable error){
                     Core.app.post(() -> Vars.ui.showException(error));
                 }
+            }
+
+
+            private boolean isPermissionsNotGranted() {
+                return VERSION.SDK_INT >= VERSION_CODES.M &&
+                        !(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
+                                checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
             }
 
             @Override
@@ -244,59 +242,72 @@ public class AndroidLauncher extends AndroidApplication{
         }
     }
 
-    private void checkFiles(Intent intent){
-        try{
+    private void checkFiles(Intent intent) {
+        try {
             Uri uri = intent.getData();
-            if(uri != null){
-                File myFile = null;
-                String scheme = uri.getScheme();
-                if(scheme.equals("file")){
-                    String fileName = uri.getEncodedPath();
-                    myFile = new File(fileName);
-                }else if(!scheme.equals("content")){
-                    //error
-                    return;
+            if (uri != null) {
+                File myFile = getFileFromUri(uri);
+                if (myFile != null) {
+                    handleFile(myFile, uri);
                 }
-                boolean save = uri.getPath().endsWith(saveExtension);
-                boolean map = uri.getPath().endsWith(mapExtension);
-                InputStream inStream;
-                if(myFile != null) inStream = new FileInputStream(myFile);
-                else inStream = getContentResolver().openInputStream(uri);
-                Core.app.post(() -> Core.app.post(() -> {
-                    if(save){ //open save
-                        System.out.println("Opening save.");
-                        Fi file = Core.files.local("temp-save." + saveExtension);
-                        file.write(inStream, false);
-                        if(SaveIO.isSaveValid(file)){
-                            try{
-                                SaveSlot slot = control.saves.importSave(file);
-                                ui.load.runLoadSave(slot);
-                            }catch(IOException e){
-                                ui.showException("@save.import.fail", e);
-                            }
-                        }else{
-                            ui.showErrorMessage("@save.import.invalid");
-                        }
-                    }else if(map){ //open map
-                        Fi file = Core.files.local("temp-map." + mapExtension);
-                        file.write(inStream, false);
-                        Core.app.post(() -> {
-                            System.out.println("Opening map.");
-                            if(!ui.editor.isShown()){
-                                ui.editor.show();
-                            }
-                            ui.editor.beginEditMap(file);
-                        });
-                    }
-                }));
             }
-        }catch(IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private boolean isTablet(Context context){
-        TelephonyManager manager = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
-        return manager != null && manager.getPhoneType() == TelephonyManager.PHONE_TYPE_NONE;
+    private File getFileFromUri(Uri uri) {
+        String scheme = uri.getScheme();
+        if (scheme.equals("file")) {
+            String fileName = uri.getEncodedPath();
+            return new File(fileName);
+        } else if (!scheme.equals("content")) {
+            return null;
+        }
+        return null;
     }
+
+    private void handleFile(File file, Uri uri) throws IOException {
+        boolean save = uri.getPath().endsWith(saveExtension);
+        boolean map = uri.getPath().endsWith(mapExtension);
+        InputStream inStream = (file != null) ? new FileInputStream(file) : getContentResolver().openInputStream(uri);
+        Core.app.post(() -> Core.app.post(() -> {
+            if (save) {
+                handleOpenSave(file, inStream);
+            } else if (map) {
+                handleOpenMap(file, inStream);
+            }
+        }));
+    }
+
+    private void handleOpenSave(File file, InputStream inStream) {
+        System.out.println("Opening save.");
+        Fi saveFile = Core.files.local("temp-save." + saveExtension);
+        saveFile.write(inStream, false);
+        if (SaveIO.isSaveValid(saveFile)) {
+            try {
+                SaveSlot slot = control.saves.importSave(saveFile);
+                ui.load.runLoadSave(slot);
+            } catch (IOException e) {
+                ui.showException("@save.import.fail", e);
+            }
+        } else {
+            ui.showErrorMessage("@save.import.invalid");
+        }
+    }
+
+    private void handleOpenMap(File file, InputStream inStream) {
+        Fi mapFile = Core.files.local("temp-map." + mapExtension);
+        mapFile.write(inStream, false);
+        Core.app.post(() -> {
+            System.out.println("Opening map.");
+            if (!ui.editor.isShown()) {
+                ui.editor.show();
+            }
+            ui.editor.beginEditMap(mapFile);
+        });
+    }
+
+
+
 }

@@ -31,7 +31,7 @@ public abstract class BaseProcessor extends AbstractProcessor{
     public static Trees trees;
 
     protected int round;
-    protected int rounds = 1;
+    protected int maxProcessingRounds = 1;
     protected RoundEnvironment env;
     protected Fi rootDirectory;
 
@@ -208,7 +208,7 @@ public abstract class BaseProcessor extends AbstractProcessor{
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv){
-        if(round++ >= rounds) return false; //only process 1 round
+        if(round++ >= maxProcessingRounds ) return false; //only process 1 round
         if(rootDirectory == null){
             try{
                 String path = Fi.get(filer.getResource(StandardLocation.CLASS_OUTPUT, "no", "no")
