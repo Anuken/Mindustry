@@ -27,6 +27,8 @@ import mindustry.input.*;
 import mindustry.net.Packets.*;
 import mindustry.type.*;
 import mindustry.ui.*;
+import mindustry.world.blocks.storage.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
 
 import static mindustry.Vars.*;
 import static mindustry.gen.Tex.*;
@@ -584,6 +586,8 @@ public class HudFragment{
         }
     }
 
+    /** @deprecated see {@link CoreBuild#beginLaunch(CoreBlock)} */
+    @Deprecated
     public void showLaunch(){
         float margin = 30f;
 
@@ -602,6 +606,8 @@ public class HudFragment{
         Core.scene.add(image);
     }
 
+    /** @deprecated see {@link CoreBuild#beginLaunch(CoreBlock)} */
+    @Deprecated
     public void showLand(){
         Image image = new Image();
         image.color.a = 1f;
