@@ -3369,7 +3369,7 @@ public class Blocks{
             size = 2;
             force = 16f;
             scaledForce = 9f;
-            range = 360f;
+            range = 300f;
             damage = 0.5f;
             scaledHealth = 160;
             rotateSpeed = 12;
