@@ -65,6 +65,12 @@ public class Trail{
                 x2 = items[i + 3];
                 y2 = items[i + 4];
                 w2 = items[i + 5];
+
+                if(i == 0){
+                    x1 = Mathf.lerp(x1, x2, counter);
+                    y1 = Mathf.lerp(y1, y2, counter);
+                    w1 = Mathf.lerp(w1, w2, counter);
+                }
             }else{
                 x2 = lastX;
                 y2 = lastY;
