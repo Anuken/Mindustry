@@ -106,7 +106,7 @@ public class Trail{
         int count = (int)(counter += Time.delta);
         counter -= count;
 
-        if(points.size + ((count - 1) * 3) > length * 3){
+        if(points.size + ((count - 1) * 3) > length * 3 && points.size > 0){
             points.removeRange(0, Math.min(3 * count - 1, points.size - 1));
         }
     }
@@ -123,7 +123,7 @@ public class Trail{
 
         if(count > 0){
             int toRemove = points.size + (count - 1 - length) * 3;
-            if(toRemove > 0){
+            if(toRemove > 0 && points.size > 0){
                 points.removeRange(0, Math.min(toRemove - 1, points.size - 1));
             }
 
