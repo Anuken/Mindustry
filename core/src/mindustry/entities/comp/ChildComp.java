@@ -4,6 +4,7 @@ import arc.math.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
+import mindustry.world.blocks.defense.turrets.BaseTurret.*;
 
 @Component
 abstract class ChildComp implements Posc, Rotc{
@@ -18,9 +19,14 @@ abstract class ChildComp implements Posc, Rotc{
         if(parent != null){
             offsetX = x - parent.getX();
             offsetY = y - parent.getY();
-            if(rotWithParent && parent instanceof Rotc r){
-                offsetPos = -r.rotation();
-                offsetRot = rotation - r.rotation();
+            if(rotWithParent){
+                if(parent instanceof Rotc r){
+                    offsetPos = -r.rotation();
+                    offsetRot = rotation - r.rotation();
+                }else if(parent instanceof BaseTurretBuild build){
+                    offsetPos = -build.rotation;
+                    offsetRot = rotation - build.rotation;
+                }
             }
         }
     }
@@ -28,10 +34,16 @@ abstract class ChildComp implements Posc, Rotc{
     @Override
     public void update(){
         if(parent != null){
-            if(rotWithParent && parent instanceof Rotc r){
-                x = parent.getX() + Angles.trnsx(r.rotation() + offsetPos, offsetX, offsetY);
-                y = parent.getY() + Angles.trnsy(r.rotation() + offsetPos, offsetX, offsetY);
-                rotation = r.rotation() + offsetRot;
+            if(rotWithParent){
+                if(parent instanceof Rotc r){
+                    x = parent.getX() + Angles.trnsx(r.rotation() + offsetPos, offsetX, offsetY);
+                    y = parent.getY() + Angles.trnsy(r.rotation() + offsetPos, offsetX, offsetY);
+                    rotation = r.rotation() + offsetRot;
+                }else if(parent instanceof BaseTurretBuild build){
+                    x = parent.getX() + Angles.trnsx(build.rotation + offsetPos, offsetX, offsetY);
+                    y = parent.getY() + Angles.trnsy(build.rotation + offsetPos, offsetX, offsetY);
+                    rotation = build.rotation + offsetRot;
+                }
             }else{
                 x = parent.getX() + offsetX;
                 y = parent.getY() + offsetY;
