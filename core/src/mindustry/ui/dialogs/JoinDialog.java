@@ -407,6 +407,8 @@ public class JoinDialog extends BaseDialog{
 
             if(group.prioritized){
                 addHeader(groupTable, group, hidden, false);
+            } else if (group.favorite()) {
+                addHeader(groupTable, group, hidden, true);
             }
             //table containing all groups
             for(String address : group.addresses){
