@@ -462,10 +462,21 @@ public class JoinDialog extends BaseDialog{
             head.image().height(3f).growX().color(col);
 
             //button for showing/hiding servers
-            ImageButton[] image = {null};
-            image[0] = head.button(hidden ? Icon.eyeOffSmall : Icon.eyeSmall, Styles.grayi, () -> {
+            ImageButton[] image = {null, null};
+            image[0] = head.button(Icon.star, new ImageButton.ImageButtonStyle(){{
+                imageUpColor = group.favorite() ? Pal.accent : Color.lightGray;
+                imageDownColor = Color.white;
+            }}, () -> {
+                group.setFavorite(!group.favorite());
+                image[0].getStyle().imageUpColor = group.favorite() ? Pal.accent : Pal.lightishGray;
+            }).size(40f).get();
+            image[0].getStyle().imageUpColor = group.favorite() ? Pal.accent : Pal.lightishGray;
+            image[0].addListener(new Tooltip(t -> t.background(Styles.black6).margin(4).label(() -> !group.hidden() ? "@server.shown" : "@server.hidden")));
+
+            //button for showing/hiding servers
+            image[1] = head.button(hidden ? Icon.eyeOffSmall : Icon.eyeSmall, Styles.grayi, () -> {
                group.setHidden(!group.hidden());
-               image[0].getStyle().imageUp = group.hidden() ? Icon.eyeOffSmall : Icon.eyeSmall;
+               image[1].getStyle().imageUp = group.hidden() ? Icon.eyeOffSmall : Icon.eyeSmall;
                if(group.hidden() && !showHidden){
                    groupTable[0].remove();
                }
