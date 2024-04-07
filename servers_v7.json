@@ -296,5 +296,9 @@
   {
     "name": "Skywar.VN",
     "address": ["nur-de-01.blued.host:25736"]
+  },
+  {
+    "name": "Vndustry",
+    "address": ["vndustry.ddns.net"]
   }
 ]
