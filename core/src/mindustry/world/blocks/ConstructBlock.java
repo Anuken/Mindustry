@@ -164,9 +164,9 @@ public class ConstructBlock extends Block{
         public boolean wasConstructing, activeDeconstruct;
         public float constructColor;
 
-        private float[] accumulator;
-        private float[] totalAccumulator;
-        private int[] itemsLeft;
+        private @Nullable float[] accumulator;
+        private @Nullable float[] totalAccumulator;
+        private @Nullable int[] itemsLeft;
 
         @Override
         public String getDisplayName(){
@@ -480,6 +480,7 @@ public class ConstructBlock extends Block{
             if(acsize != -1){
                 accumulator = new float[acsize];
                 totalAccumulator = new float[acsize];
+                itemsLeft = new int[acsize];
                 for(int i = 0; i < acsize; i++){
                     accumulator[i] = read.f();
                     totalAccumulator[i] = read.f();

@@ -66,7 +66,7 @@ public class Trail{
                 y2 = items[i + 4];
                 w2 = items[i + 5];
 
-                if(i == 0){
+                if(i == 0 && points.size >= (length - 1) * 3){
                     x1 = Mathf.lerp(x1, x2, counter);
                     y1 = Mathf.lerp(y1, y2, counter);
                     w1 = Mathf.lerp(w1, w2, counter);
