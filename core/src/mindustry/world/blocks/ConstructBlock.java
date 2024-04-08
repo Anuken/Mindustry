@@ -341,7 +341,7 @@ public class ConstructBlock extends Block{
                         int accepting = Math.min(accumulated, core.storageCapacity - core.items.get(requirements[i].item));
                         //transfer items directly, as this is not production.
                         core.items.add(requirements[i].item, accepting);
-                        itemsLeft[i] -= accepting;
+                        itemsLeft[i] += accepting;
                         accumulator[i] -= accepting;
                     }else{
                         accumulator[i] -= accumulated;
@@ -355,8 +355,11 @@ public class ConstructBlock extends Block{
                 //add any leftover items that weren't obtained due to rounding errors
                 if(core != null){
                     for(int i = 0; i < itemsLeft.length; i++){
-                        core.items.add(current.requirements[i].item, Mathf.clamp(itemsLeft[i], 0, core.storageCapacity - core.items.get(current.requirements[i].item)));
-                        itemsLeft[i] = 0;
+                        int target = Mathf.round(requirements[i].amount * state.rules.buildCostMultiplier * state.rules.deconstructRefundMultiplier);
+                        int remaining = target - itemsLeft[i];
+
+                        core.items.add(current.requirements[i].item, Mathf.clamp(remaining, 0, core.storageCapacity - core.items.get(current.requirements[i].item)));
+                        itemsLeft[i] = target;
                     }
                 }
 
@@ -439,12 +442,12 @@ public class ConstructBlock extends Block{
             this.itemsLeft = new int[previous.requirements.length];
             this.accumulator = new float[previous.requirements.length];
             this.totalAccumulator = new float[previous.requirements.length];
-
-            ItemStack[] requirements = current.requirements;
-            for(int i = 0; i < requirements.length; i++){
-                this.itemsLeft[i] = Mathf.round(requirements[i].amount * state.rules.buildCostMultiplier * state.rules.deconstructRefundMultiplier);
-            }
             pathfinder.updateTile(tile);
+        }
+
+        @Override
+        public byte version(){
+            return 1;
         }
 
         @Override
@@ -461,6 +464,7 @@ public class ConstructBlock extends Block{
                 for(int i = 0; i < accumulator.length; i++){
                     write.f(accumulator[i]);
                     write.f(totalAccumulator[i]);
+                    write.i(itemsLeft[i]);
                 }
             }
         }
@@ -479,6 +483,9 @@ public class ConstructBlock extends Block{
                 for(int i = 0; i < acsize; i++){
                     accumulator[i] = read.f();
                     totalAccumulator[i] = read.f();
+                    if(revision >= 1){
+                        itemsLeft[i] = read.i();
+                    }
                 }
             }
 
