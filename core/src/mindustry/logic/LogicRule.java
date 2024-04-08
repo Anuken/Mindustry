@@ -15,9 +15,12 @@ public enum LogicRule{
     lighting,
     ambientLight,
     solarMultiplier,
+    ban,
+    unban,
 
     //team specific
     buildSpeed,
+    unitHealth,
     unitBuildSpeed,
     unitCost,
     unitDamage,

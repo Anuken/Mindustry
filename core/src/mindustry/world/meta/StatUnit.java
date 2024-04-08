@@ -1,6 +1,8 @@
 package mindustry.world.meta;
 
 import arc.*;
+import arc.util.*;
+import mindustry.gen.*;
 
 import java.util.*;
 
@@ -13,12 +15,12 @@ public class StatUnit{
     blocks = new StatUnit("blocks"),
     blocksSquared = new StatUnit("blocksSquared"),
     tilesSecond = new StatUnit("tilesSecond"),
-    powerSecond = new StatUnit("powerSecond"),
-    liquidSecond = new StatUnit("liquidSecond"),
+    powerSecond = new StatUnit("powerSecond", "[accent]" + Iconc.power + "[]"),
+    liquidSecond = new StatUnit("liquidSecond", "[sky]" + Iconc.liquid + "[]"),
     itemsSecond = new StatUnit("itemsSecond"),
-    liquidUnits = new StatUnit("liquidUnits"),
-    powerUnits = new StatUnit("powerUnits"),
-    heatUnits = new StatUnit("heatUnits"),
+    liquidUnits = new StatUnit("liquidUnits", "[sky]" + Iconc.liquid + "[]"),
+    powerUnits = new StatUnit("powerUnits", "[accent]" + Iconc.power + "[]"),
+    heatUnits = new StatUnit("heatUnits", "[red]" + Iconc.waves + "[]"),
     degrees = new StatUnit("degrees"),
     seconds = new StatUnit("seconds"),
     minutes = new StatUnit("minutes"),
@@ -33,6 +35,7 @@ public class StatUnit{
 
     public final boolean space;
     public final String name;
+    public @Nullable String icon;
 
     public StatUnit(String name, boolean space){
         this.name = name;
@@ -41,6 +44,11 @@ public class StatUnit{
 
     public StatUnit(String name){
         this(name, true);
+    }
+
+    public StatUnit(String name, String icon){
+        this(name, true);
+        this.icon = icon;
     }
 
     public String localized(){

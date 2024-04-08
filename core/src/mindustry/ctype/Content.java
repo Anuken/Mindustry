@@ -44,6 +44,11 @@ public abstract class Content implements Comparable<Content>{
         return minfo.mod == null;
     }
 
+    /** @return whether this content is from a mod. */
+    public boolean isModded(){
+        return !isVanilla();
+    }
+
     @Override
     public int compareTo(Content c){
         return Integer.compare(id, c.id);

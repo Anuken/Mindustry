@@ -70,6 +70,12 @@ public class MenuFragment{
                 fontColor = Color.white;
                 up = infoBanner;
             }}, ui.about::show).size(84, 45).name("info"));
+
+            parent.fill((x, y, w, h) -> {
+                if(Core.scene.marginBottom > 0){
+                    Tex.paneTop.draw(0, 0, Core.graphics.getWidth(), Core.scene.marginBottom);
+                }
+            });
         }else if(becontrol.active()){
             parent.fill(c -> c.bottom().right().button("@be.check", Icon.refresh, () -> {
                 ui.loadfrag.show();
@@ -94,6 +100,9 @@ public class MenuFragment{
 
             float fx = (int)(width / 2f);
             float fy = (int)(height - 6 - logoh) + logoh / 2 - (Core.graphics.isPortrait() ? Scl.scl(30f) : 0f);
+            if(Core.settings.getBool("macnotch") ){
+                fy -= Scl.scl(macNotchHeight);
+            }
 
             Draw.color();
             Draw.rect(logo, fx, fy, logow, logoh);
@@ -119,7 +128,8 @@ public class MenuFragment{
             editor = new MobileButton(Icon.terrain, "@editor", () -> checkPlay(ui.maps::show)),
             tools = new MobileButton(Icon.settings, "@settings", ui.settings::show),
             mods = new MobileButton(Icon.book, "@mods", ui.mods::show),
-            exit = new MobileButton(Icon.exit, "@quit", () -> Core.app.exit());
+            exit = new MobileButton(Icon.exit, "@quit", () -> Core.app.exit()),
+            about = new MobileButton(Icon.info, "@about.button", ui.about::show);
 
         Seq<MobileButton> customs = customButtons.map(b -> new MobileButton(b.icon, b.text, b.runnable == null ? () -> {} : b.runnable));
 
@@ -142,7 +152,7 @@ public class MenuFragment{
             for(int i = 0; i < customs.size; i += 2){
                 container.add(customs.get(i));
             }
-            if(!ios) container.add(exit);
+            container.add(ios ? about : exit);
         }else{
             container.marginTop(0f);
             container.add(play);
@@ -160,7 +170,7 @@ public class MenuFragment{
                 container.add(customs.get(i));
                 if(i % 2 == 0) container.row();
             }
-            if(!ios) container.add(exit);
+            container.add(ios ? about : exit);
         }
     }
 
@@ -270,7 +280,7 @@ public class MenuFragment{
         addButton(text, Styles.none, callback);
     }
 
-    /** 
+    /**
      * Adds a custom button to the menu.
      * If {@link MenuButton#submenu} is null or the player is on mobile, {@link MenuButton#runnable} is invoked on click.
      * Otherwise, {@link MenuButton#submenu} is shown.

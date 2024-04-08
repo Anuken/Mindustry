@@ -10,6 +10,8 @@ import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 
+import static mindustry.Vars.*;
+
 /** A continuous bullet type that only damages in a point. */
 public class PointLaserBulletType extends BulletType{
     public String sprite = "point-laser";
@@ -29,7 +31,6 @@ public class PointLaserBulletType extends BulletType{
         removeAfterPierce = false;
         speed = 0f;
         despawnEffect = Fx.none;
-        shootEffect = Fx.none;
         lifetime = 20f;
         impact = true;
         keepVelocity = false;
@@ -38,9 +39,15 @@ public class PointLaserBulletType extends BulletType{
         hittable = false;
         absorbable = false;
         optimalLifeFract = 0.5f;
+        shootEffect = smokeEffect = Fx.none;
 
         //just make it massive, users of this bullet can adjust as necessary
         drawSize = 1000f;
+    }
+
+    @Override
+    public float continuousDamage(){
+        return damage / damageInterval * 60f;
     }
 
     @Override
@@ -68,7 +75,9 @@ public class PointLaserBulletType extends BulletType{
 
     @Override
     public void update(Bullet b){
-        super.update(b);
+        updateTrail(b);
+        updateTrailEffects(b);
+        updateBulletInterval(b);
 
         if(b.timer.get(0, damageInterval)){
             Damage.collidePoint(b, b.team, hitEffect, b.aimX, b.aimY);
@@ -80,6 +89,41 @@ public class PointLaserBulletType extends BulletType{
 
         if(shake > 0){
             Effect.shake(shake, shake, b);
+        }
+    }
+
+    @Override
+    public void updateTrailEffects(Bullet b){
+        if(trailChance > 0){
+            if(Mathf.chanceDelta(trailChance)){
+                trailEffect.at(b.aimX, b.aimY, trailRotation ? b.angleTo(b.aimX, b.aimY) : (trailParam * b.fslope()), trailColor);
+            }
+        }
+
+        if(trailInterval > 0f){
+            if(b.timer(0, trailInterval)){
+                trailEffect.at(b.aimX, b.aimY, trailRotation ? b.angleTo(b.aimX, b.aimY) : (trailParam * b.fslope()), trailColor);
+            }
+        }
+    }
+
+    @Override
+    public void updateTrail(Bullet b){
+        if(!headless && trailLength > 0){
+            if(b.trail == null){
+                b.trail = new Trail(trailLength);
+            }
+            b.trail.length = trailLength;
+            b.trail.update(b.aimX, b.aimY, b.fslope() * (1f - (trailSinMag > 0 ? Mathf.absin(Time.time, trailSinScl, trailSinMag) : 0f)));
+        }
+    }
+
+    public void updateBulletInterval(Bullet b){
+        if(intervalBullet != null && b.time >= intervalDelay && b.timer.get(2, bulletInterval)){
+            float ang = b.rotation();
+            for(int i = 0; i < intervalBullets; i++){
+                intervalBullet.create(b, b.aimX, b.aimY, ang + Mathf.range(intervalRandomSpread) + intervalAngle + ((i - (intervalBullets - 1f)/2f) * intervalSpread));
+            }
         }
     }
 }

@@ -23,6 +23,8 @@ import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
+import mindustry.world.blocks.ConstructBlock.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.units.UnitAssemblerModule.*;
 import mindustry.world.consumers.*;
@@ -85,7 +87,9 @@ public class UnitAssembler extends PayloadBlock{
     public boolean canPlaceOn(Tile tile, Team team, int rotation){
         //overlapping construction areas not allowed; grow by a tiny amount so edges can't overlap either.
         Rect rect = getRect(Tmp.r1, tile.worldx() + offset, tile.worldy() + offset, rotation).grow(0.1f);
-        return !indexer.getFlagged(team, BlockFlag.unitAssembler).contains(b -> getRect(Tmp.r2, b.x, b.y, b.rotation).overlaps(rect));
+        return
+            !indexer.getFlagged(team, BlockFlag.unitAssembler).contains(b -> getRect(Tmp.r2, b.x, b.y, b.rotation).overlaps(rect)) &&
+            !team.data().getBuildings(ConstructBlock.get(size)).contains(b -> ((ConstructBuild)b).current instanceof UnitAssembler && getRect(Tmp.r2, b.x, b.y, b.rotation).overlaps(rect));
     }
 
     @Override
@@ -99,10 +103,10 @@ public class UnitAssembler extends PayloadBlock{
             Core.bundle.format("bar.unitcap",
                 Fonts.getUnicodeStr(e.unit().name),
                 e.team.data().countType(e.unit()),
-                Units.getStringCap(e.team)
+                e.unit().useUnitCap ? Units.getStringCap(e.team) : "∞"
             ),
             () -> Pal.power,
-            () -> (float)e.team.data().countType(e.unit()) / Units.getCap(e.team)
+            () -> e.unit().useUnitCap ? ((float)e.team.data().countType(e.unit()) / Units.getCap(e.team)) : 1f
         ));
     }
 
@@ -241,8 +245,8 @@ public class UnitAssembler extends PayloadBlock{
 
         public boolean moduleFits(Block other, float ox, float oy, int rotation){
             float
-            dx = ox + Geometry.d4x(rotation) * (other.size/2 + 1) * tilesize,
-            dy = oy + Geometry.d4y(rotation) * (other.size/2 + 1) * tilesize;
+            dx = ox + Geometry.d4x(rotation) * (other.size/2f + 0.5f) * tilesize,
+            dy = oy + Geometry.d4y(rotation) * (other.size/2f + 0.5f) * tilesize;
 
             Vec2 spawn = getUnitSpawn();
 
@@ -444,7 +448,7 @@ public class UnitAssembler extends PayloadBlock{
 
             if(!net.client()){
                 var unit = plan.unit.create(team);
-                if(unit != null && unit.isCommandable()){
+                if(unit != null && unit.isCommandable() && commandPos != null){
                     unit.command().commandPosition(commandPos);
                 }
                 unit.set(spawn.x + Mathf.range(0.001f), spawn.y + Mathf.range(0.001f));
@@ -478,6 +482,8 @@ public class UnitAssembler extends PayloadBlock{
             Draw.z(Layer.blockOver + 0.1f);
 
             Draw.rect(topRegion, x, y);
+
+            if(isPayload()) return;
 
             //draw drone construction
             if(droneWarmup > 0.001f){
@@ -592,7 +598,7 @@ public class UnitAssembler extends PayloadBlock{
         public boolean acceptPayload(Building source, Payload payload){
             var plan = plan();
             return (this.payload == null || source instanceof UnitAssemblerModuleBuild) &&
-                    plan.requirements.contains(b -> b.item == payload.content() && blocks.get(payload.content()) < b.amount);
+                    plan.requirements.contains(b -> b.item == payload.content() && blocks.get(payload.content()) < Mathf.round(b.amount * state.rules.unitCost(team)));
         }
 
         @Override

@@ -323,6 +323,11 @@ public class SectorDamage{
                 if(Structs.find(unit.abilities, a -> a instanceof RepairFieldAbility) instanceof RepairFieldAbility h){
                     sumRps += h.amount / h.reload * 60f;
                 }
+                sumRps += unit.type.weapons.sumf(w -> w.shotsPerSec() * (w.bullet.healPercent * 60f + w.bullet.healAmount));
+                if(unit.canBuild()){
+                    //assume it rebuilds 1 block with 'standard' build cost (20) and health (50) every 2 seconds
+                    sumRps += unit.type.buildSpeed * (60f / 20f) * (1f / 2f) * 50f;
+                }
             }else{
                 float bossMult = unit.isBoss() ? 3f : 1f;
                 curEnemyDps += unit.type.dpsEstimate * unit.damageMultiplier() * bossMult;

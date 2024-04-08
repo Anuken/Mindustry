@@ -33,10 +33,15 @@ public class LiquidBlock extends Block{
     }
 
     public static void drawTiledFrames(int size, float x, float y, float padding, Liquid liquid, float alpha){
+        drawTiledFrames(size, x, y, padding, padding, padding, padding, liquid, alpha);
+    }
+
+    public static void drawTiledFrames(int size, float x, float y, float padLeft, float padRight, float padTop, float padBottom, Liquid liquid, float alpha){
         TextureRegion region = renderer.fluidFrames[liquid.gas ? 1 : 0][liquid.getAnimationFrame()];
         TextureRegion toDraw = Tmp.tr1;
 
-        float bounds = size/2f * tilesize - padding;
+        float leftBounds = size/2f * tilesize - padRight;
+        float bottomBounds = size/2f * tilesize - padTop;
         Color color = Tmp.c1.set(liquid.color).a(1f);
 
         for(int sx = 0; sx < size; sx++){
@@ -46,8 +51,8 @@ public class LiquidBlock extends Block{
                 toDraw.set(region);
 
                 //truncate region if at border
-                float rightBorder = relx*tilesize + padding, topBorder = rely*tilesize + padding;
-                float squishX = rightBorder + tilesize/2f - bounds, squishY = topBorder + tilesize/2f - bounds;
+                float rightBorder = relx*tilesize + padLeft, topBorder = rely*tilesize + padBottom;
+                float squishX = rightBorder + tilesize/2f - leftBounds, squishY = topBorder + tilesize/2f - bottomBounds;
                 float ox = 0f, oy = 0f;
 
                 if(squishX >= 8 || squishY >= 8) continue;

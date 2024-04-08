@@ -66,7 +66,7 @@ abstract class TankComp implements Posc, Flyingc, Hitboxc, Unitc, ElevationMovec
                     //damage radius is 1 tile smaller to prevent it from just touching walls as it passes
                     && Math.max(Math.abs(dx), Math.abs(dy)) <= r - 1){
 
-                    t.build.damage(team, type.crushDamage * Time.delta * t.block().crushDamageMultiplier);
+                    t.build.damage(team, type.crushDamage * Time.delta * t.block().crushDamageMultiplier * state.rules.unitDamage(team));
                 }
             }
         }

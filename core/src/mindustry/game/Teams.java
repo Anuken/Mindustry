@@ -37,7 +37,7 @@ public class Teams{
     public CoreBuild closestEnemyCore(float x, float y, Team team){
         CoreBuild closest = null;
         float closestDst = Float.MAX_VALUE;
-        
+
         for(Team enemy : team.data().coreEnemies){
             for(CoreBuild core : enemy.cores()){
                 float dst = Mathf.dst2(x, y, core.getX(), core.getY());
@@ -241,6 +241,8 @@ public class Teams{
     public static class TeamData{
         public final Team team;
 
+        /** Handles building ""bases"". */
+        public @Nullable BaseBuilderAI buildAi;
         /** Handles RTS unit control. */
         public @Nullable RtsAI rtsAi;
 
@@ -305,6 +307,8 @@ public class Teams{
 
             //convert all team tiles to neutral, randomly killing them
             for(var b : builds){
+                if(b.block.privileged) continue;
+
                 if(b instanceof CoreBuild){
                     b.kill();
                 }else{
@@ -329,7 +333,7 @@ public class Teams{
             }
 
             for(var build : builds){
-                if(build.within(x, y, range)){
+                if(build.within(x, y, range) && !build.block.privileged){
                     scheduleDerelict(build);
                 }
             }
@@ -343,7 +347,7 @@ public class Teams{
             }
 
             for(var build : builds){
-                if(build.within(x, y, range) && !cores.contains(c -> c.within(x, y, range))){
+                if(build.within(x, y, range) && !cores.contains(c -> c.within(build, range))){
                     //TODO GPU driver bugs?
                     build.kill();
                     //Time.run(Mathf.random(0f, 60f * 6f), build::kill);
@@ -409,7 +413,7 @@ public class Teams{
 
         /** @return whether this team is controlled by the AI and builds bases. */
         public boolean hasAI(){
-            return team.rules().rtsAi;
+            return team.rules().rtsAi || team.rules().buildAi;
         }
 
         @Override

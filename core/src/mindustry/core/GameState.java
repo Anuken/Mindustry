@@ -24,8 +24,6 @@ public class GameState{
     public boolean gameOver = false;
     /** Whether the player's team won the match. */
     public boolean won = false;
-    /** If true, the server has been put into the paused state on multiplayer. This is synced. */
-    public boolean serverPaused = false;
     /** Server ticks/second. Only valid in multiplayer. */
     public int serverTps = -1;
     /** Map that is currently being played on. */
@@ -34,6 +32,10 @@ public class GameState{
     public Rules rules = new Rules();
     /** Statistics for this save/game. Displayed after game over. */
     public GameStats stats = new GameStats();
+    /** Markers not linked to objectives. Controlled by world processors. */
+    public MapMarkers markers = new MapMarkers();
+    /** Locale-specific string bundles of current map */
+    public MapLocales mapLocales = new MapLocales();
     /** Global attributes of the environment, calculated by weather. */
     public Attributes envAttrs = new Attributes();
     /** Team data. Gets reset every new game. */
@@ -51,8 +53,8 @@ public class GameState{
     }
 
     public void set(State astate){
-        //cannot pause when in multiplayer
-        if(astate == State.paused && net.active()) return;
+        //nothing to change.
+        if(state == astate) return;
 
         Events.fire(new StateChangeEvent(state, astate));
         state = astate;
@@ -84,11 +86,12 @@ public class GameState{
     }
 
     public boolean isPaused(){
-        return (is(State.paused) && !net.active()) || (serverPaused && !isMenu());
+        return state == State.paused;
     }
 
+    /** @return whether there is an unpaused game in progress. */
     public boolean isPlaying(){
-        return (state == State.playing) || (state == State.paused && !isPaused());
+        return state == State.playing;
     }
 
     /** @return whether the current state is *not* the menu. */

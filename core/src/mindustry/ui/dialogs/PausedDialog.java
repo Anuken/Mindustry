@@ -53,11 +53,7 @@ public class PausedDialog extends BaseDialog{
                 if(net.server() && steam){
                     platform.inviteFriends();
                 }else{
-                    if(steam){
-                        ui.host.runHost();
-                    }else{
-                        ui.host.show();
-                    }
+                    ui.host.show();
                 }
             }).disabled(b -> !((steam && net.server()) || !net.active())).colspan(2).width(dw * 2 + 10f).update(e -> e.setText(net.server() && steam ? "@invitefriends" : "@hostserver"));
 

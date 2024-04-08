@@ -98,6 +98,8 @@ public class MapObjectivesCanvas extends WidgetGroup{
     public void clearObjectives(){
         stopQuery();
         tilemap.clearTiles();
+        tilemap.x = 0f;
+        tilemap.y = 0f;
     }
 
     protected void stopQuery(){
@@ -202,6 +204,8 @@ public class MapObjectivesCanvas extends WidgetGroup{
             for(var tile : tiles){
                 for(var parent : tile.obj.parents){
                     var parentTile = tiles.find(t -> t.obj == parent);
+
+                    if(parentTile == null) continue;
 
                     Connector
                         conFrom = parentTile.conChildren,

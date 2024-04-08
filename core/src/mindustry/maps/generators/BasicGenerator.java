@@ -335,7 +335,7 @@ public abstract class BasicGenerator implements WorldGenerator{
             ore = tile.overlay();
             r.get(tile.x, tile.y);
             tile.setFloor(floor.asFloor());
-            tile.setBlock(block);
+            if(block != tile.block()) tile.setBlock(block);
             tile.setOverlay(ore);
         }
     }

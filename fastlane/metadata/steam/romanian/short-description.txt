@@ -1,1 +1,0 @@
-An open-ended tower-defense game with a focus on resource management.

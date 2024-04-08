@@ -39,6 +39,8 @@ task run(dependsOn: classes, type: JavaExec){
 }
 
 task dist(type: Jar, dependsOn: configurations.runtimeClasspath){
+    dependsOn ":desktop:processResources"
+
     from files(sourceSets.main.output.classesDirs)
     from files(sourceSets.main.output.resourcesDir)
     from {configurations.runtimeClasspath.collect{ it.isDirectory() ? it : zipTree(it) }}
@@ -69,7 +71,9 @@ task steamtest(dependsOn: dist){
     doLast{
         copy{
             from "build/libs/Mindustry.jar"
-            if(System.properties["os.name"].contains("Mac")){
+            if(project.hasProperty("destination")){
+                into project.property("destination")
+            }else if(System.properties["os.name"].contains("Mac")){
                 into "/Users/anuke/Library/Application Support/Steam/steamapps/common/Mindustry/Mindustry.app/Contents/Resources"
             }else{
                 into "/home/anuke/.steam/steam/steamapps/common/Mindustry/jre"

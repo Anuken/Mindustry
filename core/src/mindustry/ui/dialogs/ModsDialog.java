@@ -1,7 +1,6 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
-import arc.util.Http.*;
 import arc.files.*;
 import arc.func.*;
 import arc.graphics.*;
@@ -14,6 +13,7 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.Http.*;
 import arc.util.io.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Jval.*;
@@ -28,7 +28,6 @@ import mindustry.mod.*;
 import mindustry.mod.Mods.*;
 import mindustry.ui.*;
 
-import java.io.*;
 import java.text.*;
 import java.util.*;
 
@@ -174,7 +173,7 @@ public class ModsDialog extends BaseDialog{
                             try{
                                 mods.importMod(file);
                                 setup();
-                            }catch(IOException e){
+                            }catch(Exception e){
                                 ui.showException(e);
                                 Log.err(e);
                             }
@@ -216,7 +215,7 @@ public class ModsDialog extends BaseDialog{
                 pane[0].clear();
                 boolean any = false;
                 for(LoadedMod item : mods.list()){
-                    if(Strings.matches(query, item.meta.displayName())){
+                    if(Strings.matches(query, item.meta.displayName)){
                         any = true;
                         if(!item.enabled() && !anyDisabled[0] && mods.list().size > 0){
                             anyDisabled[0] = true;
@@ -250,7 +249,7 @@ public class ModsDialog extends BaseDialog{
                                     boolean hideDisabled = !item.isSupported() || item.hasUnmetDependencies() || item.hasContentErrors();
                                     String shortDesc = item.meta.shortDescription();
 
-                                    text.add("[accent]" + Strings.stripColors(item.meta.displayName()) + "\n" +
+                                    text.add("[accent]" + Strings.stripColors(item.meta.displayName) + "\n" +
                                         (shortDesc.length() > 0 ? "[lightgray]" + shortDesc + "\n" : "")
                                         //so does anybody care about version?
                                         //+ "[gray]v" + Strings.stripColors(trimText(item.meta.version)) + "\n"
@@ -329,6 +328,10 @@ public class ModsDialog extends BaseDialog{
             return "@mod.blacklisted";
         }else if(!item.isSupported()){
             return "@mod.incompatiblegame";
+        }else if(item.state == ModState.circularDependencies){
+            return "@mod.circulardependencies";
+        }else if(item.state == ModState.incompleteDependencies){
+            return "@mod.incompletedependencies";
         }else if(item.hasUnmetDependencies()){
             return "@mod.unmetdependencies";
         }else if(item.hasContentErrors()){
@@ -346,6 +349,10 @@ public class ModsDialog extends BaseDialog{
             return "@mod.blacklisted.details";
         }else if(!item.isSupported()){
             return Core.bundle.format("mod.requiresversion.details", item.meta.minGameVersion);
+        }else if(item.state == ModState.circularDependencies){
+            return "@mod.circulardependencies.details";
+        }else if(item.state == ModState.incompleteDependencies){
+            return Core.bundle.format("mod.incompletedependencies.details", item.missingDependencies.toString(", "));
         }else if(item.hasUnmetDependencies()){
             return Core.bundle.format("mod.missingdependencies.details", item.missingDependencies.toString(", "));
         }else if(item.hasContentErrors()){
@@ -362,7 +369,7 @@ public class ModsDialog extends BaseDialog{
     }
 
     private void showMod(LoadedMod mod){
-        BaseDialog dialog = new BaseDialog(mod.meta.displayName());
+        BaseDialog dialog = new BaseDialog(mod.meta.displayName);
 
         dialog.addCloseButton();
 
@@ -383,7 +390,7 @@ public class ModsDialog extends BaseDialog{
 
             desc.add("@editor.name").padRight(10).color(Color.gray).padTop(0);
             desc.row();
-            desc.add(mod.meta.displayName()).growX().wrap().padTop(2);
+            desc.add(mod.meta.displayName).growX().wrap().padTop(2);
             desc.row();
             if(mod.meta.author != null){
                 desc.add("@editor.author").padRight(10).color(Color.gray);
@@ -407,11 +414,11 @@ public class ModsDialog extends BaseDialog{
 
         }).width(400f);
 
-        Seq<UnlockableContent> all = Seq.with(content.getContentMap()).<Content>flatten().select(c -> c.minfo.mod == mod && c instanceof UnlockableContent).as();
+        Seq<UnlockableContent> all = Seq.with(content.getContentMap()).<Content>flatten().select(c -> c.minfo.mod == mod && c instanceof UnlockableContent u && !u.isHidden()).as();
         if(all.any()){
             dialog.cont.row();
             dialog.cont.button("@mods.viewcontent", Icon.book, () -> {
-                BaseDialog d = new BaseDialog(mod.meta.displayName());
+                BaseDialog d = new BaseDialog(mod.meta.displayName);
                 d.cont.pane(cs -> {
                     int i = 0;
                     for(UnlockableContent c : all){
@@ -613,7 +620,9 @@ public class ModsDialog extends BaseDialog{
             long len = result.getContentLength();
             Floatc cons = len <= 0 ? f -> {} : p -> modImportProgress = p;
 
-            Streams.copyProgress(result.getResultAsStream(), file.write(false), len, 4096, cons);
+            try(var stream = file.write(false)){
+                Streams.copyProgress(result.getResultAsStream(), stream, len, 4096, cons);
+            }
 
             var mod = mods.importMod(file);
             mod.setRepo(repo);
@@ -636,7 +645,11 @@ public class ModsDialog extends BaseDialog{
         Core.app.post(() -> modError(t));
     }
 
-    private void githubImportMod(String repo, boolean isJava, @Nullable String release){
+    public void githubImportMod(String repo, boolean isJava){
+        githubImportMod(repo, isJava, null);
+    }
+
+    public void githubImportMod(String repo, boolean isJava, @Nullable String release){
         modImportProgress = 0f;
         ui.loadfrag.show("@downloading");
         ui.loadfrag.setProgress(() -> modImportProgress);
