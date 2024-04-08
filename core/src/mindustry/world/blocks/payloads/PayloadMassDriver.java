@@ -14,6 +14,7 @@ import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
+import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -126,7 +127,7 @@ public class PayloadMassDriver extends PayloadBlock{
         return new TextureRegion[]{leftRegion, rightRegion, capRegion};
     }
 
-    public class PayloadDriverBuild extends PayloadBlockBuild<Payload>{
+    public class PayloadDriverBuild extends PayloadBlockBuild<Payload> implements RotBlock{
         public int link = -1;
         public float turretRotation = 90;
         public float reloadCounter = 0f, charge = 0f;
@@ -141,6 +142,11 @@ public class PayloadMassDriver extends PayloadBlock{
 
         public Building currentShooter(){
             return waitingShooters.isEmpty() ? null : waitingShooters.first();
+        }
+
+        @Override
+        public float buildRotation(){
+            return rotation;
         }
 
         @Override

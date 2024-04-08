@@ -16,6 +16,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
@@ -147,10 +148,15 @@ public class RepairTurret extends Block{
         }
     }
 
-    public class RepairPointBuild extends Building implements Ranged{
+    public class RepairPointBuild extends Building implements Ranged, RotBlock{
         public Unit target;
         public Vec2 offset = new Vec2(), lastEnd = new Vec2();
         public float strength, rotation = 90;
+
+        @Override
+        public float buildRotation(){
+            return rotation;
+        }
 
         @Override
         public void draw(){
