@@ -4,7 +4,7 @@ import arc.math.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
-import mindustry.world.blocks.defense.turrets.BaseTurret.*;
+import mindustry.world.blocks.*;
 
 @Component
 abstract class ChildComp implements Posc, Rotc{
@@ -23,9 +23,9 @@ abstract class ChildComp implements Posc, Rotc{
                 if(parent instanceof Rotc r){
                     offsetPos = -r.rotation();
                     offsetRot = rotation - r.rotation();
-                }else if(parent instanceof BaseTurretBuild build){
-                    offsetPos = -build.rotation;
-                    offsetRot = rotation - build.rotation;
+                }else if(parent instanceof RotBlock rot){
+                    offsetPos = -rot.buildRotation();
+                    offsetRot = rotation - rot.buildRotation();
                 }
             }
         }
@@ -39,10 +39,10 @@ abstract class ChildComp implements Posc, Rotc{
                     x = parent.getX() + Angles.trnsx(r.rotation() + offsetPos, offsetX, offsetY);
                     y = parent.getY() + Angles.trnsy(r.rotation() + offsetPos, offsetX, offsetY);
                     rotation = r.rotation() + offsetRot;
-                }else if(parent instanceof BaseTurretBuild build){
-                    x = parent.getX() + Angles.trnsx(build.rotation + offsetPos, offsetX, offsetY);
-                    y = parent.getY() + Angles.trnsy(build.rotation + offsetPos, offsetX, offsetY);
-                    rotation = build.rotation + offsetRot;
+                }else if(parent instanceof RotBlock rot){
+                    x = parent.getX() + Angles.trnsx(rot.buildRotation() + offsetPos, offsetX, offsetY);
+                    y = parent.getY() + Angles.trnsy(rot.buildRotation() + offsetPos, offsetX, offsetY);
+                    rotation = rot.buildRotation() + offsetRot;
                 }
             }else{
                 x = parent.getX() + offsetX;
