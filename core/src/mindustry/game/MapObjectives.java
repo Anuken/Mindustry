@@ -851,7 +851,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
     /** Displays a shape with an outline and color. */
     public static class ShapeMarker extends PosMarker{
-        public float radius = 8f, rotation = 0f, stroke = 1f;
+        public float radius = 8f, rotation = 0f, stroke = 1f, startAngle = 0f, endAngle = 360f;
         public boolean fill = false, outline = true;
         public int sides = 4;
         public Color color = Color.valueOf("ffd37f");
@@ -877,14 +877,18 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             if(!fill){
                 if(outline){
                     Lines.stroke((stroke + 2f) * scaleFactor, Pal.gray);
-                    Lines.poly(pos.x, pos.y, sides, (radius + 1f) * scaleFactor, rotation);
+                    Lines.poly(pos.x, pos.y, sides, (radius + 1f) * scaleFactor, rotation + startAngle, rotation + endAngle);
                 }
 
                 Lines.stroke(stroke * scaleFactor, color);
-                Lines.poly(pos.x, pos.y, sides, (radius + 1f) * scaleFactor, rotation);
+                Lines.poly(pos.x, pos.y, sides, (radius + 1f) * scaleFactor, rotation + startAngle, rotation + endAngle);
             }else{
                 Draw.color(color);
-                Fill.poly(pos.x, pos.y, sides, radius * scaleFactor, rotation);
+                if (startAngle < endAngle){
+                    Fill.arc(pos.x, pos.y, radius * scaleFactor, (endAngle - startAngle) / 360f, rotation + startAngle, sides);
+                }else{
+                    Fill.arc(pos.x, pos.y, radius * scaleFactor, (startAngle - endAngle) / 360f, rotation + endAngle, sides);
+                }
             }
 
             Draw.reset();
@@ -901,12 +905,14 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                     case rotation -> rotation = (float)p1;
                     case color -> color.fromDouble(p1);
                     case shape -> sides = (int)p1;
+                    case arc -> startAngle = (float)p1;
                 }
             }
 
             if(!Double.isNaN(p2)){
                 switch(type){
                     case shape -> fill = !Mathf.equal((float)p2, 0f);
+                    case arc -> endAngle = (float)p2;
                 }
             }
 
