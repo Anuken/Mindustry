@@ -1270,6 +1270,7 @@ public class UnitType extends UnlockableContent implements Senseable{
                     DrawPart.params.life = s.fin();
                 }
 
+                applyColor(unit);
                 part.draw(DrawPart.params);
             }
         }
