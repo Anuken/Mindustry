@@ -190,6 +190,13 @@ public class StackConveyor extends Block implements Autotiler{
         }
 
         @Override
+        public void dropped(){
+            super.dropped();
+            var prev = Geometry.d4[(rotation + 2) % 4];
+            link = Point2.pack(tile.x + prev.x, tile.y + prev.y);
+        }
+
+        @Override
         public void drawCracks(){
             Draw.z(Layer.block - 0.15f);
             super.drawCracks();
