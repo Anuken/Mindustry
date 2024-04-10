@@ -5793,7 +5793,7 @@ public class Blocks{
             warmupRate = 1000f;
             regionRotated1 = 1;
             itemCapacity = 0;
-            alwaysUnlocked = false;
+            alwaysUnlocked = true;
             ambientSound = Sounds.none;
         }};
 
