@@ -1181,6 +1181,7 @@ public class Blocks{
             rotate = true;
             invertFlip = true;
             group = BlockGroup.liquids;
+            itemCapacity = 0;
 
             liquidCapacity = 50f;
 
@@ -1231,6 +1232,7 @@ public class Blocks{
             }});
 
             researchCostMultiplier = 1.1f;
+            itemCapacity = 0;
             liquidCapacity = 40f;
             consumePower(2f);
             ambientSound = Sounds.extractLoop;
