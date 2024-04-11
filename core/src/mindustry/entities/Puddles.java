@@ -74,7 +74,7 @@ public class Puddles{
                 Puddle puddle = Puddle.create();
                 puddle.tile = tile;
                 puddle.liquid = liquid;
-                puddle.amount = amount;
+                puddle.amount = Math.min(amount, maxLiquid);
                 puddle.set(ax, ay);
                 register(puddle);
                 puddle.add();

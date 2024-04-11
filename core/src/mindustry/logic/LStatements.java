@@ -1380,7 +1380,7 @@ public class LStatements{
         }
     }
 
-    @RegisterStatement("weathersensor")
+    @RegisterStatement("weathersense")
     public static class WeatherSenseStatement extends LStatement{
         public String to = "result";
         public String weather = "@rain";
@@ -1856,10 +1856,16 @@ public class LStatements{
                 fields(table, index, i -> index = i);
             }
 
-            if(type == FetchType.buildCount || type == FetchType.build || type == FetchType.unitCount){
+            if(type == FetchType.buildCount || type == FetchType.build){
                 row(table);
 
                 fields(table, "block", extra, i -> extra = i);
+            }
+
+            if(type == FetchType.unitCount || type == FetchType.unit){
+                row(table);
+
+                fields(table, "unit", extra, i -> extra = i);
             }
         }
 

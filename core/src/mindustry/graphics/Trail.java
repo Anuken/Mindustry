@@ -65,6 +65,12 @@ public class Trail{
                 x2 = items[i + 3];
                 y2 = items[i + 4];
                 w2 = items[i + 5];
+
+                if(i == 0 && points.size >= (length - 1) * 3){
+                    x1 = Mathf.lerp(x1, x2, counter);
+                    y1 = Mathf.lerp(y1, y2, counter);
+                    w1 = Mathf.lerp(w1, w2, counter);
+                }
             }else{
                 x2 = lastX;
                 y2 = lastY;
@@ -97,12 +103,11 @@ public class Trail{
 
     /** Removes the last point from the trail at intervals. */
     public void shorten(){
-        if((counter += Time.delta) >= 1f){
-            if(points.size >= 3){
-                points.removeRange(0, 2);
-            }
+        int count = (int)(counter += Time.delta);
+        counter -= count;
 
-            counter %= 1f;
+        if(points.size + ((count - 1) * 3) > length * 3 && points.size > 0){
+            points.removeRange(0, Math.min(3 * count - 1, points.size - 1));
         }
     }
 
@@ -113,18 +118,27 @@ public class Trail{
 
     /** Adds a new point to the trail at intervals. */
     public void update(float x, float y, float width){
-        //TODO fix longer trails at low FPS
-        if((counter += Time.delta) >= 1f){
-            if(points.size > length*3){
-                points.removeRange(0, 2);
+        int count = (int)(counter += Time.delta);
+        counter -= count;
+
+        if(count > 0){
+            int toRemove = points.size + (count - 1 - length) * 3;
+            if(toRemove > 0 && points.size > 0){
+                points.removeRange(0, Math.min(toRemove - 1, points.size - 1));
             }
 
-            points.add(x, y, width);
-
-            counter %= 1f;
+            //if lastX is -1, this trail has never updated, so only add one point - there is nothing to interpolate with
+            if(count == 1 || lastX == -1f){
+                points.add(x, y, width);
+            }else{
+                for(int i = 0; i < count; i++){
+                    float f = (i + 1f) / count;
+                    points.add(Mathf.lerp(lastX, x, f), Mathf.lerp(lastY, y, f), Mathf.lerp(lastW, width, f));
+                }
+            }
         }
 
-        //update last position regardless, so it joins
+        //update last position regardless, so it joins at the origin
         lastAngle = -Angles.angleRad(x, y, lastX, lastY);
         lastX = x;
         lastY = y;

@@ -993,6 +993,11 @@ public class Block extends UnlockableContent implements Senseable{
         return consume(new ConsumePowerDynamic((Floatf<Building>)usage));
     }
 
+    /** Creates a consumer that consumes a dynamic amount of power. */
+    public <T extends Building> ConsumePower consumePowerDynamic(float displayed, Floatf<T> usage){
+        return consume(new ConsumePowerDynamic(displayed, (Floatf<Building>)usage));
+    }
+
     /**
      * Creates a consumer which stores power.
      * @param powerCapacity The maximum capacity in power units.

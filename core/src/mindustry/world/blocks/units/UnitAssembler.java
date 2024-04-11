@@ -23,6 +23,8 @@ import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
+import mindustry.world.blocks.ConstructBlock.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.units.UnitAssemblerModule.*;
 import mindustry.world.consumers.*;
@@ -85,7 +87,9 @@ public class UnitAssembler extends PayloadBlock{
     public boolean canPlaceOn(Tile tile, Team team, int rotation){
         //overlapping construction areas not allowed; grow by a tiny amount so edges can't overlap either.
         Rect rect = getRect(Tmp.r1, tile.worldx() + offset, tile.worldy() + offset, rotation).grow(0.1f);
-        return !indexer.getFlagged(team, BlockFlag.unitAssembler).contains(b -> getRect(Tmp.r2, b.x, b.y, b.rotation).overlaps(rect));
+        return
+            !indexer.getFlagged(team, BlockFlag.unitAssembler).contains(b -> getRect(Tmp.r2, b.x, b.y, b.rotation).overlaps(rect)) &&
+            !team.data().getBuildings(ConstructBlock.get(size)).contains(b -> ((ConstructBuild)b).current instanceof UnitAssembler && getRect(Tmp.r2, b.x, b.y, b.rotation).overlaps(rect));
     }
 
     @Override
