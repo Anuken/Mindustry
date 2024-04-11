@@ -618,6 +618,8 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public boolean world = true;
         /** Whether to display marker on minimap. */
         public boolean minimap = false;
+        /** Whether the marker should act as a light source. */
+        public boolean light = false;
         /** Whether to scale marker corresponding to player's zoom level. */
         public boolean autoscale = false;
         /** On which z-sorting layer is marker drawn. */
@@ -632,6 +634,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             switch(type){
                 case world -> world = !Mathf.equal((float)p1, 0f);
                 case minimap -> minimap = !Mathf.equal((float)p1, 0f);
+                case light -> light = !Mathf.equal((float)p1, 0f);
                 case autoscale -> autoscale = !Mathf.equal((float)p1, 0f);
                 case drawLayer -> drawLayer = (float)p1;
             }
