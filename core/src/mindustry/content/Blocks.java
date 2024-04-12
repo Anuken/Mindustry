@@ -4049,7 +4049,7 @@ public class Blocks{
             researchCostMultiplier = 0.05f;
 
             coolant = consume(new ConsumeLiquid(Liquids.water, 15f / 60f));
-            limitRange();
+            limitRange(12f);
         }};
 
         diffuse = new ItemTurret("diffuse"){{
@@ -4108,7 +4108,7 @@ public class Blocks{
             rotateSpeed = 3f;
 
             coolant = consume(new ConsumeLiquid(Liquids.water, 15f / 60f));
-            limitRange();
+            limitRange(16f);
         }};
 
         sublimate = new ContinuousLiquidTurret("sublimate"){{
@@ -4358,7 +4358,7 @@ public class Blocks{
             coolant = consume(new ConsumeLiquid(Liquids.water, 20f / 60f));
             coolantMultiplier = 2.5f;
 
-            limitRange(-5f);
+            limitRange(5f);
         }};
 
         afflict = new PowerTurret("afflict"){{
