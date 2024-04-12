@@ -104,6 +104,8 @@ public enum LogicSound{
     unlockUi(Sounds.unlock);
     
     public final Sound sound;
+
+    public static final LMarkerControl[] all = values();
     
     LogicSound(Sound sound){
         this.sound = sound;
