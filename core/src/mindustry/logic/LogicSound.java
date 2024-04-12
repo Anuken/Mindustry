@@ -105,7 +105,7 @@ public enum LogicSound{
     
     public final Sound sound;
 
-    public static final LMarkerControl[] all = values();
+    public static final LogicSound[] all = values();
     
     LogicSound(Sound sound){
         this.sound = sound;
