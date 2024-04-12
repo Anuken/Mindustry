@@ -2094,7 +2094,7 @@ public class LStatements{
         
         @Override
         public void build(Table table){
-            rebuid(table);
+            rebuild(table);
         }
         
         void rebuild(Table table){
