@@ -1060,6 +1060,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             if(!Double.isNaN(p1) && !Double.isNaN(p3)){
                 switch(type){
                     case posi -> ((int)p1 == 0 ? pos : (int)p1 == 1 ? endPos : Tmp.v1).y = (float)p3 * tilesize;
+                    case shape -> outline = !Mathf.equal((float)p3, 0f);
                 }
             }
         }
@@ -1131,16 +1132,20 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
     }
 
-    public static class QuadMarker extends ObjectiveMarker{
+    public static class QuadMarker extends PosMarker{
         public String textureName = "white";
-        public @Vertices float[] vertices = new float[24];
+        public @Vertices float[] vertices = new float[24]; // x/y coordinates are relative to marker position
         private boolean mapRegion = true;
 
         private transient TextureRegion fetchedRegion;
 
         public QuadMarker() {
             for(int i = 0; i < 4; i++){
+                vertices[i * 6] = Geometry.d8edge(i).x * tilesize;
+                vertices[i * 6 + 1] = Geometry.d8edge(i).y * tilesize;
                 vertices[i * 6 + 2] = Color.white.toFloatBits();
+                vertices[i * 6 + 3] = Geometry.d8edge(i).x * tilesize;
+                vertices[i * 6 + 4] = Geometry.d8edge(i).y * tilesize;
                 vertices[i * 6 + 5] = Color.clearFloatBits;
             }
         }
@@ -1150,7 +1155,16 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             if(fetchedRegion == null) setTexture(textureName);
 
             Draw.z(drawLayer);
+
+            for(int i = 0; i < 4; i++){
+                vertices[i * 6] += pos.x;
+                vertices[i * 6 + 1] += pos.y;
+            }
             Draw.vert(fetchedRegion.texture, vertices, 0, vertices.length);
+            for(int i = 0; i < 4; i++){
+                vertices[i * 6] -= pos.x;
+                vertices[i * 6 + 1] -= pos.y;
+            }
         }
 
         @Override
@@ -1163,15 +1177,8 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                         float col = Tmp.c1.fromDouble(p1).toFloatBits();
                         for(int i = 0; i < 4; i++) vertices[i * 6 + 2] = col;
                     }
-                    case pos -> vertices[0] = (float)p1 * tilesize;
                     case posi -> setPos((int)p1, p2, p3);
                     case uvi -> setUv((int)p1, p2, p3);
-                }
-            }
-
-            if(!Double.isNaN(p2)){
-                switch(type){
-                    case pos -> vertices[1] = (float)p1 * tilesize;
                 }
             }
 
