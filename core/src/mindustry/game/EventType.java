@@ -328,6 +328,17 @@ public class EventType{
         }
     }
 
+    /** Called when a some player send command to unit **/
+    public static class UnitCommandEvent{
+        public final Player player;
+        public final @Nullable Unit unit;
+
+        public UnitCommandEvent(Player player, @Nullable Unit unit){
+            this.player = player;
+            this.unit = unit;
+        }
+    }
+
     public static class BuildingCommandEvent{
         public final Player player;
         public final Building building;
