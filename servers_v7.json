@@ -1,5 +1,13 @@
 [
   {
+    "name": "TSR Network",
+    "address": ["de-prem-01.hosts.optikservers.com:35526", "de-prem-01.hosts.optikservers.com:35915", "de-prem-01.hosts.optikservers.com:35250"]
+  },
+  {
+    "name": "Toast Mindustry",
+    "address": ["192.3.139.5:6567", "192.3.139.5:6568", "192.3.139.5:6569", "104.168.64.154:6567", "104.168.64.154:6568", "104.168.64.154:6569"]
+  },
+  {
     "name": "gods field",
     "address": ["n2.akiracloud.net:10225"]
   },
@@ -18,15 +26,15 @@
   },
   {
     "name": "meiqiuMDT",
-    "address": ["cn1.meiqiumdy.top","cn1.meiqiumdt.top:7000","cn1.meiqiumdt.top:8000","cn1.meiqiumdt.top:7013"]
+    "address": ["cn1.meiqiumdt.top","cn1.meiqiumdt.top:7000","cn1.meiqiumdt.top:8000","cn1.meiqiumdt.top:7013","cn1.meiqiumdt.top:9000"]
   },
   {
-    "name": "Crux's Revelations",
-    "address": ["de-free-01.hosts.optikservers.com:31528","de-prem-01.hosts.optikservers.com:35922"]
+    "name": "Crux's Citadel",
+    "address": ["45.158.9.198:32865","45.158.9.198:30055","45.158.9.198:32175","45.158.9.198:30252","176.9.150.40:35899","129.154.47.57:26645","176.9.150.40:35930","129.154.47.57:27993","129.154.47.57:26881","176.9.150.40:35168","176.9.150.40:35900","176.9.150.40:35031","176.9.150.40:35154"]
   },
   {
-    "name": "CMS Empire",
-    "address": ["94.250.250.252","95.84.198.97"]
+    "name": "Chilldustry",
+    "address": ["trelesco.xyz", "95.84.198.97"]
   },
   {
     "name": "ShardDustry Eventos",
@@ -138,7 +146,7 @@
   },
   {
     "name": "Eradication Mindustry",
-    "address": ["140.238.246.78:7000", "140.238.246.78:7001", "140.238.246.78:7002", "140.238.246.78:7003", "140.238.246.78:7004", "130.61.22.183:7000", "130.61.22.183:7001", "130.61.22.183:7002", "130.61.22.183:7003", "130.61.22.183:7004", "77.100.100.249:7000", "77.100.100.249:7001", "130.61.220.99:7000", "130.61.220.99:7001", "130.61.220.99:7002", "130.61.220.99:7003", "130.61.220.99:7004"]
+    "address": ["140.238.246.78:7000", "140.238.246.78:7001", "140.238.246.78:7002", "140.238.246.78:7003", "140.238.246.78:7004", "130.61.22.183:7000", "130.61.22.183:7001", "130.61.22.183:7002", "130.61.22.183:7003", "130.61.22.183:7004", "130.61.22.183:7005", "130.61.22.183:7006", "130.61.22.183:7007", "130.61.22.183:7008", "130.61.22.183:7009"]
   },
   {
     "name": "Conservatory",
@@ -181,7 +189,7 @@
     "address": ["a55c81b7c4d6e6d604651a93f8af5cd83.asuscomm.com", "a55c81b7c4d6e6d604651a93f8af5cd83.asuscomm.com:6568", "a55c81b7c4d6e6d604651a93f8af5cd83.asuscomm.com:6569", "a55c81b7c4d6e6d604651a93f8af5cd83.asuscomm.com:6570", "a55c81b7c4d6e6d604651a93f8af5cd83.asuscomm.com:6571", "a55c81b7c4d6e6d604651a93f8af5cd83.asuscomm.com:6572", "a55c81b7c4d6e6d604651a93f8af5cd83.asuscomm.com:6573", "a55c81b7c4d6e6d604651a93f8af5cd83.asuscomm.com:6574"]
   },
   {
-     "name": "Anana&ShenYv",
+     "name": "Anana",
      "address": ["mdtleague.top"]
   },
   {
@@ -234,8 +242,8 @@
     "address": ["play.3midustry.xyz:6001", "play.3midustry.xyz:6002", "play.3midustry.xyz:6003", "play.3midustry.xyz:6004", "play.3midustry.xyz:6005", "play.3midustry.xyz:6006", "play.3midustry.xyz:6007", "play.3midustry.xyz:6008", "play.3midustry.xyz:6009", "play.3midustry.xyz:6010"]
   },
   {
-    "name": "ABCXYZ Community",
-    "address": ["23.88.73.88:23591", "23.88.73.88:23539", "144.76.57.59:14996", "144.76.57.59:16881", "144.76.57.59:13885", "23.88.73.88:32113", "144.76.57.59:9269", "144.76.57.59:24235", "144.76.57.59:24133", "5.9.8.124:28848", "srv1.godlike.club:28466"]
+    "name": "Siege Siege",
+    "address": ["157.90.4.54:25421"]
   },
   {
     "name": "CroCraft Network",
@@ -262,10 +270,6 @@
     "address": ["atomic-de.ddns.net:35876", "atomic-de.ddns.net:35663", "atomic-de.ddns.net:35724", "atomic-de.ddns.net:35847"]
   },
   {
-    "name": "SkyPlex",
-    "address": ["mc-skyplex.net"]
-  },
-  {
     "name": "Gadgetroch's Server",
     "address": ["mindustry.gadgetroch.com", "mindustry.gadgetroch.com:6568", "mindustry.gadgetroch.com:6569"]
   },
@@ -275,7 +279,7 @@
   },
   {
     "name": "AZDustry",
-    "address": ["118.127.8.162:25628"]
+    "address": ["23.175.144.70:25845"]
   },
   {
     "name": "Erepulo",
@@ -285,12 +289,12 @@
     "name": "MineCore",
     "address": ["194.247.42.11:27792", "194.247.42.11:27977", "194.247.42.61:27989", "194.247.42.181:28514"]
   },
-  { 
-    "name": "Sever.VN",
-    "address": ["srv24.godlike.club:26189"]
-  },
   {
     "name": "NPTS",
-    "address": ["81.94.159.242"]
+    "address": ["81.94.156.54"]
+  },
+  {
+    "name": "Skywar.VN",
+    "address": ["nur-de-01.blued.host:25736"]
   }
 ]

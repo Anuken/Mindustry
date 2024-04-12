@@ -1054,7 +1054,21 @@ public class ContentParser{
             }
             Field field = metadata.field;
             try{
-                field.set(object, parser.readValue(field.getType(), metadata.elementType, child, metadata.keyType));
+                boolean mergeMap = ObjectMap.class.isAssignableFrom(field.getType()) && child.has("add") && child.get("add").isBoolean() && child.getBoolean("add", false);
+
+                if(mergeMap){
+                    child.remove("add");
+                }
+
+                Object readField = parser.readValue(field.getType(), metadata.elementType, child, metadata.keyType);
+
+                //if a map has add: true, add its contents to the map instead
+                if(mergeMap && field.get(object) instanceof ObjectMap<?,?> baseMap){
+                    baseMap.putAll((ObjectMap)readField);
+                }else{
+                    field.set(object, readField);
+                }
+
             }catch(IllegalAccessException ex){
                 throw new SerializationException("Error accessing field: " + field.getName() + " (" + type.getName() + ")", ex);
             }catch(SerializationException ex){
@@ -1102,8 +1116,8 @@ public class ContentParser{
                 }
 
                 //all items have a produce requirement unless already specified
-                if(object instanceof Item i && !node.objectives.contains(o -> o instanceof Produce p && p.content == i)){
-                    node.objectives.add(new Produce(i));
+                if((unlock instanceof Item || unlock instanceof Liquid) && !node.objectives.contains(o -> o instanceof Produce p && p.content == unlock)){
+                    node.objectives.add(new Produce(unlock));
                 }
 
                 //remove old node from parent

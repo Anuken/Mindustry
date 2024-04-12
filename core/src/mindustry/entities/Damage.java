@@ -293,7 +293,6 @@ public class Damage{
         collided.each(c -> {
             if(hitter.damage > 0 && (pierceCap <= 0 || collideCount[0] < pierceCap)){
                 if(c.target instanceof Unit u){
-                    effect.at(c.x, c.y);
                     u.collision(hitter, c.x, c.y);
                     hitter.collision(u, c.x, c.y);
                     collideCount[0]++;
@@ -344,7 +343,6 @@ public class Damage{
 
         Units.nearbyEnemies(team, rect.setCentered(x, y, 1f), u -> {
             if(u.checkTarget(hitter.type.collidesAir, hitter.type.collidesGround) && u.hittable()){
-                effect.at(x, y);
                 u.collision(hitter, x, y);
                 hitter.collision(u, x, y);
             }

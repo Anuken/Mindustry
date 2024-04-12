@@ -1380,6 +1380,115 @@ public class LStatements{
         }
     }
 
+    @RegisterStatement("weathersense")
+    public static class WeatherSenseStatement extends LStatement{
+        public String to = "result";
+        public String weather = "@rain";
+
+        private transient TextField tfield;
+
+        @Override
+        public void build(Table table){
+            field(table, to, str -> to = str);
+
+            table.add(" = weather ");
+
+            row(table);
+
+            tfield = field(table, weather, str -> weather = str).padRight(0f).get();
+
+            table.button(b -> {
+                b.image(Icon.pencilSmall);
+
+                b.clicked(() -> showSelectTable(b, (t, hide) -> {
+                    t.row();
+                    t.table(i -> {
+                        i.left();
+                        int c = 0;
+                        for(Weather w : Vars.content.weathers()){
+                            i.button(w.name, Styles.flatt, () -> {
+                                weather = "@" + w.name;
+                                tfield.setText(weather);
+                                hide.run();
+                            }).height(40f).uniformX().wrapLabel(false).growX();
+
+                            if(++c % 2 == 0) i.row();
+                        }
+                    }).left();
+                }));
+            }, Styles.logict, () -> {}).size(40f).padLeft(-1).color(table.color);
+        }
+
+        @Override
+        public boolean privileged(){
+            return true;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new SenseWeatherI(builder.var(weather), builder.var(to));
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.world;
+        }
+    }
+
+    @RegisterStatement("weatherset")
+    public static class WeatherSetStatement extends LStatement{
+        public String weather = "@rain", state = "true";
+
+        private transient TextField tfield;
+
+        @Override
+        public void build(Table table){
+            table.add(" set weather ");
+
+            tfield = field(table, weather, str -> weather = str).padRight(0f).get();
+
+            table.button(b -> {
+                b.image(Icon.pencilSmall);
+
+                b.clicked(() -> showSelectTable(b, (t, hide) -> {
+                    t.row();
+                    t.table(i -> {
+                        i.left();
+                        int c = 0;
+                        for(Weather w : Vars.content.weathers()){
+                            i.button(w.name, Styles.flatt, () -> {
+                                weather = "@" + w.name;
+                                tfield.setText(weather);
+                                hide.run();
+                            }).height(40f).uniformX().wrapLabel(false).growX();
+
+                            if(++c % 2 == 0) i.row();
+                        }
+                    }).left();
+                }));
+            }, Styles.logict, () -> {}).size(40f).padLeft(-1).color(table.color);
+
+            table.add(" state ");
+
+            fields(table, state, str -> state = str);
+        }
+
+        @Override
+        public boolean privileged(){
+            return true;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new SetWeatherI(builder.var(weather), builder.var(state));
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.world;
+        }
+    }
+
     @RegisterStatement("spawnwave")
     public static class SpawnWaveStatement extends LStatement{
         public String x = "10", y = "10", natural = "false";
@@ -1747,10 +1856,16 @@ public class LStatements{
                 fields(table, index, i -> index = i);
             }
 
-            if(type == FetchType.buildCount || type == FetchType.build || type == FetchType.unitCount){
+            if(type == FetchType.buildCount || type == FetchType.build){
                 row(table);
 
                 fields(table, "block", extra, i -> extra = i);
+            }
+
+            if(type == FetchType.unitCount || type == FetchType.unit){
+                row(table);
+
+                fields(table, "unit", extra, i -> extra = i);
             }
         }
 

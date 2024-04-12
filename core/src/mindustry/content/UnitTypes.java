@@ -1318,6 +1318,7 @@ public class UnitTypes{
 
                     healPercent = 5.5f;
                     collidesTeam = true;
+                    reflectable = false;
                     backColor = Pal.heal;
                     trailColor = Pal.heal;
                 }};
@@ -3894,7 +3895,7 @@ public class UnitTypes{
                     x = 43f * i / 4f;
                     particles = parts;
                     //visual only, the middle one does the actual suppressing
-                    display = active = false;
+                    active = false;
                 }});
             }
 

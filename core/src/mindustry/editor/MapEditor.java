@@ -74,7 +74,7 @@ public class MapEditor{
         for(int i = 0; i < tiles.width * tiles.height; i++){
             Tile tile = tiles.geti(i);
             var build = tile.build;
-            if(build != null){
+            if(build != null && tile.isCenter()){
                 builds.add(build);
             }
             tiles.seti(i, new EditorTile(tile.x, tile.y, tile.floorID(), tile.overlayID(), build == null ? tile.blockID() : 0));

@@ -13,8 +13,8 @@ import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
-import mindustry.game.*;
 import mindustry.game.EventType.*;
+import mindustry.game.*;
 import mindustry.game.MapObjectives.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
@@ -1363,13 +1363,21 @@ public class LExecutor{
             TeamData data = t.data();
 
             switch(type){
-                case unit -> exec.setobj(result, i < 0 || i >= data.units.size ? null : data.units.get(i));
+                case unit -> {
+                    UnitType type = exec.obj(extra) instanceof UnitType u ? u : null;
+                    if(type == null){
+                        exec.setobj(result, i < 0 || i >= data.units.size ? null : data.units.get(i));
+                    }else{
+                        var units = data.unitCache(type);
+                        exec.setobj(result, units == null || i < 0 || i >= units.size ? null : units.get(i));
+                    }
+                }
                 case player -> exec.setobj(result, i < 0 || i >= data.players.size || data.players.get(i).unit().isNull() ? null : data.players.get(i).unit());
                 case core -> exec.setobj(result, i < 0 || i >= data.cores.size ? null : data.cores.get(i));
                 case build -> {
                     Block block = exec.obj(extra) instanceof Block b ? b : null;
                     if(block == null){
-                        exec.setobj(result, null);
+                        exec.setobj(result, i < 0 || i >= data.buildings.size ? null : data.buildings.get(i));
                     }else{
                         var builds = data.getBuildings(block);
                         exec.setobj(result, i < 0 || i >= builds.size ? null : builds.get(i));
@@ -1380,7 +1388,7 @@ public class LExecutor{
                     if(type == null){
                         exec.setnum(result, data.units.size);
                     }else{
-                        exec.setnum(result, data.unitsByType[type.id].size);
+                        exec.setnum(result, data.unitCache(type) == null ? 0 : data.unitCache(type).size);
                     }
                 }
                 case coreCount -> exec.setnum(result, data.cores.size);
@@ -1507,6 +1515,47 @@ public class LExecutor{
                 var unit = type.spawn(t, World.unconv(exec.numf(x)) + Mathf.range(0.01f), World.unconv(exec.numf(y)) + Mathf.range(0.01f));
                 spawner.spawnEffect(unit, exec.numf(rotation));
                 exec.setobj(result, unit);
+            }
+        }
+    }
+
+    public static class SenseWeatherI implements LInstruction{
+        public int type, to;
+
+        public SenseWeatherI(int type, int to){
+            this.type = type;
+            this.to = to;
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            exec.setbool(to, exec.obj(type) instanceof Weather weather && weather.isActive());
+        }
+    }
+
+    public static class SetWeatherI implements LInstruction{
+        public int type, state;
+
+        public SetWeatherI(int type, int state){
+            this.type = type;
+            this.state = state;
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            if(exec.obj(type) instanceof Weather weather){
+                if(exec.bool(state)){
+                    if(!weather.isActive()){ //Create is not already active
+                        Tmp.v1.setToRandomDirection();
+                        Call.createWeather(weather, 1f, WeatherState.fadeTime, Tmp.v1.x, Tmp.v1.y);
+                    }else{
+                        weather.instance().life(WeatherState.fadeTime);
+                    }
+                }else{
+                    if(weather.isActive() && weather.instance().life > WeatherState.fadeTime){
+                        weather.instance().life(WeatherState.fadeTime);
+                    }
+                }
             }
         }
     }
