@@ -2085,6 +2085,73 @@ public class LStatements{
             return LCategory.world;
         }
     }
+    
+    @RegisterStatement("playsound")
+    public static class PlaySoundStatement extends LStatement{
+        public boolean positional;
+        public LogicSound sound = LogicSound.pew;
+        public String volume = "1", pitch = "1", pan = "0", x = "@thisx", y = "@thisy";
+        
+        @Override
+        public void build(Table table){
+            rebuid(table);
+        }
+        
+        void rebuild(Table table){
+            table.clearChildren();
+            
+            table.button(positional ? "positional" : "global", Styles.logict, () -> {
+                positional = !positional;
+                rebuild(table);
+            }).size(160f, 40f).pad(4f).color(table.color);
+            
+            row(table);
+            
+            table.add("play");
+            
+            table.button(b -> {
+                b.label(() -> sound.name());
+                b.clicked(() -> showSelect(b, LogicSound.all, sound, s -> {
+                    sound = s;
+                    rebuild(table);
+                }, 3, cell -> cell.size(150, 50)));
+            }, Styles.logict, () -> {}).size(190, 40).color(table.color).left().padLeft(2);
+            
+            row(table);
+            
+            fieldst(table, "volume", volume, str -> volume = str);
+            fieldst(table, "pitch", pitch, str -> pitch = str);
+            
+            row(table);
+            
+            if(positional){
+                table.add("at ");
+                
+                fields(table, x, str -> x = str);
+                
+                table.add(", ");
+                
+                fields(table, y, str -> y = str);
+            }else{
+                fieldst(table, "pan", pan, str -> pan = str);
+            }
+        }
+        
+        @Override
+        public boolean privileged(){
+            return true;
+        }
+        
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new PlaySoundI(positional, sound, builder.var(volume), builder.var(pitch), builder.var(pan), builder.var(x), builder.var(y));
+        }
+        
+        @Override
+        public LCategory category(){
+            return LCategory.world;
+        }
+    }
 
     @RegisterStatement("setmarker")
     public static class SetMarkerStatement extends LStatement{
