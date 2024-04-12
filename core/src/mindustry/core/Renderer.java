@@ -327,7 +327,23 @@ public class Renderer implements ApplicationListener{
         //draw objective markers
         float scaleFactor = 4f / renderer.getDisplayScale();
         drawMarkers(scaleFactor, marker -> marker.world);
-        lights.add(() -> drawMarkers(scaleFactor, marker -> marker.light));
+        lights.add(() -> {
+            state.rules.objectives.eachRunning(obj -> {
+                for(var marker : obj.markers){
+                    if(marker.light){
+                        marker.drawLight(marker.autoscale ? scaleFactor : 1);
+                    }
+                }
+            });
+
+            for(var marker : state.markers){
+                if(marker.light){
+                    marker.drawLight(marker.autoscale ? scaleFactor : 1);
+                }
+            }
+
+            Draw.reset();
+        });
 
         if(state.rules.lighting && drawLight){
             Draw.draw(Layer.light, lights::draw);
@@ -471,6 +487,8 @@ public class Renderer implements ApplicationListener{
                 marker.draw(marker.autoscale ? scaleFactor : 1);
             }
         }
+
+        Draw.reset();
     }
 
     public void scaleCamera(float amount){
