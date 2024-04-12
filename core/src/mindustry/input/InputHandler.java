@@ -287,6 +287,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 }
 
                 toAdd.add(unit);
+                Events.fire(new UnitCommandEvent(player, unit));
             }
         }
 
