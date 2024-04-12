@@ -10,8 +10,7 @@ public enum LogicSound{
     blaster(Sounds.blaster),
     bolt(Sounds.bolt),
     boom(Sounds.boom),
-    /* break(Sounds.break),
-    one hell of a problem */
+    breakBlock(Sounds.breaks),
     buttonClick(Sounds.buttonClick),
     cannon(Sounds.cannon),
     cannonLarge(Sounds.largeCannon),
