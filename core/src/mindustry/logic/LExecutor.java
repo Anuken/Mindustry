@@ -2023,6 +2023,34 @@ public class LExecutor{
         }
     }
 
+    public static class PlaySoundI implements LInstruction{
+        public boolean positional;
+        public LogicSound sound;
+        public int volume, pitch, pan, x, y;
+
+        public PlaySoundI(){
+        }
+
+        public PlaySoundI(boolean positional, LogicSound sound, int volume, int pitch, int pan, int x, int y){
+            this.positional = positional;
+            this.sound = sound;
+            this.volume = volume;
+            this.pitch = pitch;
+            this.pan = pan;
+            this.x = x;
+            this.y = y;
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            if(positional){
+                sound.sound.at(World.unconv(exec.numf(x)), World.unconv(exec.numf(y)), exec.numf(pitch), exec.numf(volume));
+            }else{
+                sound.sound.play(exec.numf(volume), exec.numf(pitch), exec.numf(pan));
+            }
+        }
+    }
+
     public static class SetMarkerI implements LInstruction{
         public LMarkerControl type = LMarkerControl.pos;
         public int id, p1, p2, p3;
