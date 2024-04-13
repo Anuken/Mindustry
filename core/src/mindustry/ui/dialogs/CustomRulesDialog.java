@@ -3,7 +3,6 @@ package mindustry.ui.dialogs;
 import arc.*;
 import arc.func.*;
 import arc.graphics.*;
-import arc.input.KeyCode;
 import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.ImageButton.*;
@@ -193,9 +192,12 @@ public class CustomRulesDialog extends BaseDialog{
         cont.clear();
         cont.table(t -> {
             t.add("@search").padRight(10);
-            t.field(ruleSearch, text ->
-                ruleSearch = text.trim().replaceAll(" +", " ").toLowerCase()
-            ).grow().pad(8).get().keyDown(KeyCode.enter, this::setup);
+            var field = t.field(ruleSearch, text -> {
+                ruleSearch = text.trim().replaceAll(" +", " ").toLowerCase();
+                setup();
+            }).grow().pad(8).get();
+            field.setCursorPosition(ruleSearch.length());
+            Core.scene.setKeyboardFocus(field);
             t.button(Icon.cancel, Styles.emptyi, () -> {
                 ruleSearch = "";
                 setup();
@@ -234,7 +236,7 @@ public class CustomRulesDialog extends BaseDialog{
                 setup();
             }
         }, () -> rules.infiniteResources);
-        withInfo("@rules.onlydepositcore.info", () -> check("@rules.onlydepositcore", b -> rules.onlyDepositCore = b, () -> rules.onlyDepositCore));
+        check("@rules.onlydepositcore", b -> rules.onlyDepositCore = b, () -> rules.onlyDepositCore);
         check("@rules.derelictrepair", b -> rules.derelictRepair = b, () -> rules.derelictRepair);
         check("@rules.reactorexplosions", b -> rules.reactorExplosions = b, () -> rules.reactorExplosions);
         check("@rules.schematic", b -> rules.schematicsAllowed = b, () -> rules.schematicsAllowed);
@@ -282,7 +284,7 @@ public class CustomRulesDialog extends BaseDialog{
         category("enemy");
         check("@rules.attack", b -> rules.attackMode = b, () -> rules.attackMode);
         check("@rules.corecapture", b -> rules.coreCapture = b, () -> rules.coreCapture);
-        withInfo("@rules.placerangecheck.info",() -> check("@rules.placerangecheck", b -> rules.placeRangeCheck = b, () -> rules.placeRangeCheck));
+        check("@rules.placerangecheck", b -> rules.placeRangeCheck = b, () -> rules.placeRangeCheck);
         check("@rules.polygoncoreprotection", b -> rules.polygonCoreProtection = b, () -> rules.polygonCoreProtection);
         number("@rules.enemycorebuildradius", f -> rules.enemyCoreBuildRadius = f * tilesize, () -> Math.min(rules.enemyCoreBuildRadius / tilesize, 200), () -> !rules.polygonCoreProtection);
 
@@ -490,25 +492,13 @@ public class CustomRulesDialog extends BaseDialog{
 
     public void check(String text, Boolc cons, Boolp prov, Boolp condition){
         if(!Core.bundle.get(text.substring(1)).toLowerCase().contains(ruleSearch)) return;
-        current.check(text, cons).checked(prov.get()).update(a -> a.setDisabled(!condition.get())).padRight(100f).get().left();
-        current.row();
-    }
-
-    public void withInfo(String info, Runnable add){
-        Table wasCurrent = current;
-        current = new Table();
-        current.left().defaults().fillX().left();
-
-        current.button(Icon.infoSmall, () -> ui.showInfo(info)).size(32f).padRight(10f);
-        add.run();
-
-        // rule does not match search pattern (runnable returned without adding anything)
-        if(current.getCells().size < 2){
-            current.clear();
-        }else{
-            wasCurrent.add(current).row();
+        String infoText = text.substring(1) + ".info";
+        var cell = current.check(text, cons).checked(prov.get()).update(a -> a.setDisabled(!condition.get())).padRight(100f);
+        if(Core.bundle.has(infoText)){
+            cell.tooltip(text + ".info");
         }
-        current = wasCurrent;
+        cell.get().left();
+        current.row();
     }
 
     Cell<TextField> field(Table table, float value, Floatc setter){
