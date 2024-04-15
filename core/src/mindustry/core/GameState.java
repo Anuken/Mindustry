@@ -1,11 +1,9 @@
 package mindustry.core;
 
 import arc.*;
-import arc.struct.*;
 import arc.util.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
-import mindustry.game.MapObjectives.*;
 import mindustry.gen.*;
 import mindustry.maps.*;
 import mindustry.type.*;
@@ -35,7 +33,9 @@ public class GameState{
     /** Statistics for this save/game. Displayed after game over. */
     public GameStats stats = new GameStats();
     /** Markers not linked to objectives. Controlled by world processors. */
-    public IntMap<ObjectiveMarker> markers = new IntMap<>();
+    public MapMarkers markers = new MapMarkers();
+    /** Locale-specific string bundles of current map */
+    public MapLocales mapLocales = new MapLocales();
     /** Global attributes of the environment, calculated by weather. */
     public Attributes envAttrs = new Attributes();
     /** Team data. Gets reset every new game. */
@@ -86,11 +86,12 @@ public class GameState{
     }
 
     public boolean isPaused(){
-        return is(State.paused);
+        return state == State.paused;
     }
 
+    /** @return whether there is an unpaused game in progress. */
     public boolean isPlaying(){
-        return (state == State.playing) || (state == State.paused && !isPaused());
+        return state == State.playing;
     }
 
     /** @return whether the current state is *not* the menu. */

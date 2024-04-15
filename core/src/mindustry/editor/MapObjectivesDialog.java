@@ -246,6 +246,38 @@ public class MapObjectivesDialog extends BaseDialog{
             show();
         }});
 
+        setInterpreter(Vertices.class, float[].class, (cont, name, type, field, remover, indexer, get, set) -> cont.table(main -> {
+            float[] data = get.get();
+
+            name(cont, name, remover, indexer);
+            cont.table(t -> {
+                t.left().defaults().left();
+
+                String[] names = {"x", "y", "color", "u", "v"};
+                int stride = 6;
+                int vertices = data.length / stride;
+
+                for(int i = 0; i < vertices; i++){
+                    int offset = i * stride;
+
+                    t.table(row -> {
+                        for(int j = 0; j < names.length; j++){
+                            int index = offset + j;
+
+                            if("color".equals(names[j])) {
+                                getInterpreter(Color.class).build(row, names[j], new TypeInfo(Color.class), null, null, null, () -> new Color().abgr8888(data[index]), value -> data[index] = value.toFloatBits());
+                            }else{
+                                float scale = j <= 1 ? tilesize : 1;
+                                getInterpreter(float.class).build(row, names[j], new TypeInfo(float.class), null, null, null, () -> data[index] / scale, value -> data[index] = value * scale);
+                            }
+
+                            row.add().pad(4);
+                        }
+                    }).row();
+                }
+            });
+        }));
+
         // Types that use the default interpreter. It would be nice if all types could use it, but I don't know how to reliably prevent classes like [? extends Content] from using it.
         for(var obj : MapObjectives.allObjectiveTypes) setInterpreter(obj.get().getClass(), defaultInterpreter());
         for(var mark : MapObjectives.allMarkerTypes) setInterpreter(mark.get().getClass(), defaultInterpreter());
@@ -290,10 +322,12 @@ public class MapObjectivesDialog extends BaseDialog{
                     t.button(Icon.downOpen, Styles.emptyi, () -> indexer.get(false)).fill().padRight(4f);
                 }
 
-                t.button(Icon.add, Styles.emptyi, () -> getProvider(type.element.raw).get(type.element, res -> {
-                    arr.add(res);
-                    rebuild[0].run();
-                })).fill();
+                if(!field.isAnnotationPresent(Immutable.class)) {
+                    t.button(Icon.add, Styles.emptyi, () -> getProvider(type.element.raw).get(type.element, res -> {
+                        arr.add(res);
+                        rebuild[0].run();
+                    })).fill();
+                }
             }).growX().height(46f).pad(0f, -10f, 0f, -10f).get();
 
             main.row().table(Tex.button, t -> rebuild[0] = () -> {
@@ -312,10 +346,10 @@ public class MapObjectivesDialog extends BaseDialog{
 
                     getInterpreter((Class<Object>)arr.get(index).getClass()).build(
                         t, "", new TypeInfo(arr.get(index).getClass()),
-                        field, () -> {
+                        field, field == null || !field.isAnnotationPresent(Immutable.class) ? () -> {
                             arr.remove(index);
                             rebuild[0].run();
-                        }, field == null || !field.isAnnotationPresent(Unordered.class) ? in -> {
+                        } : null, field == null || !field.isAnnotationPresent(Unordered.class) ? in -> {
                             if(in && index > 0){
                                 arr.swap(index, index - 1);
                                 rebuild[0].run();

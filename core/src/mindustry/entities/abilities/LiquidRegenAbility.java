@@ -1,6 +1,7 @@
 package mindustry.entities.abilities;
 
 import arc.math.*;
+import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -16,6 +17,14 @@ public class LiquidRegenAbility extends Ability{
     public float regenPerSlurp = 2.9f;
     public float slurpEffectChance = 0.4f;
     public Effect slurpEffect = Fx.heal;
+
+    @Override
+    public void addStats(Table t){
+        super.addStats(t);
+        t.add((liquid.hasEmoji() ? liquid.emoji() : "") + "[stat]" + liquid.localizedName);
+        t.row();
+        t.add(abilityStat("slurpheal", Strings.autoFixed(regenPerSlurp, 2)));
+    }
 
     @Override
     public void update(Unit unit){

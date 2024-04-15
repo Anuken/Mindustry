@@ -1310,7 +1310,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if(value instanceof UnitType) type = UnitType.class;
         
         if(builder != null && builder.isPlayer()){
-            lastAccessed = builder.getPlayer().coloredName();
+            updateLastAccess(builder.getPlayer());
         }
 
         if(block.configurations.containsKey(type)){
@@ -1322,6 +1322,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                 configured(builder, conf);
             }
         }
+    }
+
+    public void updateLastAccess(Player player){
+        lastAccessed = player.coloredName();
     }
 
     /** Called when the block is tapped by the local player. */
@@ -1342,6 +1346,15 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     /** @return the cap for item amount calculations, used when this block explodes. */
     public int explosionItemCap(){
         return block.itemCapacity;
+    }
+
+    /** Called when a block begins (not finishes!) deconstruction. The building is still present at this point. */
+    public void onDeconstructed(@Nullable Unit builder){
+        //deposit non-incinerable liquid on ground
+        if(liquids != null && liquids.currentAmount() > 0 && (!liquids.current().incinerable || block.deconstructDropAllLiquid)){
+            float perCell = liquids.currentAmount() / (block.size * block.size) * 2f;
+            tile.getLinkedTiles(other -> Puddles.deposit(other, liquids.current(), perCell));
+        }
     }
 
     /** Called when the block is destroyed. The tile is still intact at this stage. */

@@ -21,18 +21,32 @@ public class SoundEffect extends Effect{
     public Effect effect;
 
     public SoundEffect(){
+        startDelay = -1;
     }
 
     public SoundEffect(Sound sound, Effect effect){
+        this();
         this.sound = sound;
         this.effect = effect;
+    }
+
+    @Override
+    public void init(){
+        if(startDelay < 0){
+            startDelay = effect.startDelay;
+        }
     }
 
     @Override
     public void create(float x, float y, float rotation, Color color, Object data){
         if(!shouldCreate()) return;
 
-        sound.at(x, y, Mathf.random(minPitch, maxPitch), Mathf.random(minVolume, maxVolume));
+        if(startDelay > 0){
+            Time.run(startDelay, () -> sound.at(x, y, Mathf.random(minPitch, maxPitch), Mathf.random(minVolume, maxVolume)));
+        }else{
+            sound.at(x, y, Mathf.random(minPitch, maxPitch), Mathf.random(minVolume, maxVolume));
+        }
+        
         effect.create(x, y, rotation, color, data);
     }
 }

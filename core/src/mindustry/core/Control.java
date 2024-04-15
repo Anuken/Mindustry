@@ -30,6 +30,7 @@ import mindustry.net.*;
 import mindustry.type.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
+import mindustry.world.blocks.storage.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
 import java.io.*;
@@ -53,7 +54,7 @@ public class Control implements ApplicationListener, Loadable{
 
     private Interval timer = new Interval(2);
     private boolean hiscore = false;
-    private boolean wasPaused = false;
+    private boolean wasPaused = false, backgroundPaused = false;
     private Seq<Building> toBePlaced = new Seq<>(false);
 
     public Control(){
@@ -191,43 +192,29 @@ public class Control implements ApplicationListener, Loadable{
 
         Events.run(Trigger.newGame, () -> {
             var core = player.bestCore();
-
             if(core == null) return;
 
             camera.position.set(core);
             player.set(core);
 
             float coreDelay = 0f;
-
             if(!settings.getBool("skipcoreanimation") && !state.rules.pvp){
-                coreDelay = coreLandDuration;
+                coreDelay = core.landDuration();
                 //delay player respawn so animation can play.
-                player.deathTimer = Player.deathDelay - coreLandDuration;
+                player.deathTimer = Player.deathDelay - core.landDuration();
                 //TODO this sounds pretty bad due to conflict
                 if(settings.getInt("musicvol") > 0){
-                    Musics.land.stop();
-                    Musics.land.play();
-                    Musics.land.setVolume(settings.getInt("musicvol") / 100f);
+                    //TODO what to do if another core with different music is already playing?
+                    Music music = core.landMusic();
+                    music.stop();
+                    music.play();
+                    music.setVolume(settings.getInt("musicvol") / 100f);
                 }
 
-                app.post(() -> ui.hudfrag.showLand());
-                renderer.showLanding();
-
-                Time.run(coreLandDuration, () -> {
-                    Fx.launch.at(core);
-                    Effect.shake(5f, 5f, core);
-                    core.thrusterTime = 1f;
-
-                    if(state.isCampaign() && Vars.showSectorLandInfo && (state.rules.sector.preset == null || state.rules.sector.preset.showSectorLandInfo)){
-                        ui.announce("[accent]" + state.rules.sector.name() + "\n" +
-                        (state.rules.sector.info.resources.any() ? "[lightgray]" + bundle.get("sectors.resources") + "[white] " +
-                        state.rules.sector.info.resources.toString(" ", u -> u.emoji()) : ""), 5);
-                    }
-                });
+                renderer.showLanding(core);
             }
 
             if(state.isCampaign()){
-
                 //don't run when hosting, that doesn't really work.
                 if(state.rules.sector.planet.prebuildBase){
                     toBePlaced.clear();
@@ -332,6 +319,13 @@ public class Control implements ApplicationListener, Loadable{
     void createPlayer(){
         player = Player.create();
         player.name = Core.settings.getString("name");
+
+        String locale = Core.settings.getString("locale");
+        if(locale.equals("default")){
+            locale = Locale.getDefault().toString();
+        }
+        player.locale = locale;
+
         player.color.set(Core.settings.getInt("color-0"));
 
         if(mobile){
@@ -551,6 +545,7 @@ public class Control implements ApplicationListener, Loadable{
     @Override
     public void pause(){
         if(settings.getBool("backgroundpause", true) && !net.active()){
+            backgroundPaused = true;
             wasPaused = state.is(State.paused);
             if(state.is(State.playing)) state.set(State.paused);
         }
@@ -561,6 +556,7 @@ public class Control implements ApplicationListener, Loadable{
         if(state.is(State.paused) && !wasPaused && settings.getBool("backgroundpause", true) && !net.active()){
             state.set(State.playing);
         }
+        backgroundPaused = false;
     }
 
     @Override
@@ -650,6 +646,10 @@ public class Control implements ApplicationListener, Loadable{
             var core = state.rules.defaultTeam.core();
             if(!net.client() && core != null && state.isCampaign()){
                 core.items.each((i, a) -> i.unlock());
+            }
+
+            if(backgroundPaused && settings.getBool("backgroundpause") && !net.active()){
+                state.set(State.paused);
             }
 
             //cannot launch while paused

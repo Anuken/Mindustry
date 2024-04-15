@@ -2,6 +2,7 @@ package mindustry.mod;
 
 import arc.*;
 import arc.assets.*;
+import arc.assets.loaders.MusicLoader.*;
 import arc.assets.loaders.SoundLoader.*;
 import arc.audio.*;
 import arc.files.*;
@@ -60,7 +61,6 @@ public class ContentParser{
 
     ObjectMap<Class<?>, ContentType> contentTypes = new ObjectMap<>();
     ObjectSet<Class<?>> implicitNullable = ObjectSet.with(TextureRegion.class, TextureRegion[].class, TextureRegion[][].class, TextureRegion[][][].class);
-    ObjectMap<String, AssetDescriptor<?>> sounds = new ObjectMap<>();
     Seq<ParseListener> listeners = new Seq<>();
 
     ObjectMap<Class<?>, FieldParser> classParsers = new ObjectMap<>(){{
@@ -271,18 +271,15 @@ public class ContentParser{
             return new Vec3(data.getFloat("x", 0f), data.getFloat("y", 0f), data.getFloat("z", 0f));
         });
         put(Sound.class, (type, data) -> {
-            if(fieldOpt(Sounds.class, data) != null) return fieldOpt(Sounds.class, data);
-            if(Vars.headless) return new Sound();
+            if(data.isArray()) return new RandomSound(parser.readValue(Sound[].class, data));
 
-            String name = "sounds/" + data.asString();
-            String path = Vars.tree.get(name + ".ogg").exists() ? name + ".ogg" : name + ".mp3";
+            var field = fieldOpt(Sounds.class, data);
+            return field != null ? field : Vars.tree.loadSound(data.asString());
+        });
+        put(Music.class, (type, data) -> {
+            var field = fieldOpt(Musics.class, data);
 
-            if(sounds.containsKey(path)) return ((SoundParameter)sounds.get(path).params).sound;
-            var sound = new Sound();
-            AssetDescriptor<?> desc = Core.assets.load(path, Sound.class, new SoundParameter(sound));
-            desc.errored = Throwable::printStackTrace;
-            sounds.put(path, desc);
-            return sound;
+            return field != null ? field : Vars.tree.loadMusic(data.asString());
         });
         put(Objectives.Objective.class, (type, data) -> {
             if(data.isString()){
@@ -449,6 +446,17 @@ public class ContentParser{
                 if(value.has("consumes") && value.get("consumes").isObject()){
                     for(JsonValue child : value.get("consumes")){
                         switch(child.name){
+                            case "remove" -> {
+                                String[] values = child.isString() ? new String[]{child.asString()} : child.asStringArray();
+                                for(String type : values){
+                                    Class<?> consumeType = resolve("Consume" + Strings.capitalize(type), Consume.class);
+                                    if(consumeType != Consume.class){
+                                        block.removeConsumers(b -> consumeType.isAssignableFrom(b.getClass()));
+                                    }else{
+                                        Log.warn("Unknown consumer type '@' (Class: @) in consume: remove.", type, "Consume" + Strings.capitalize(type));
+                                    }
+                                }
+                            }
                             case "item" -> block.consumeItem(find(ContentType.item, child.asString()));
                             case "itemCharged" -> block.consume((Consume)parser.readValue(ConsumeItemCharged.class, child));
                             case "itemFlammable" -> block.consume((Consume)parser.readValue(ConsumeItemFlammable.class, child));
@@ -995,7 +1003,6 @@ public class ContentParser{
             throw new RuntimeException(e);
         }
     }
-
     Object fieldOpt(Class<?> type, JsonValue value){
         try{
             return type.getField(value.asString()).get(null);
@@ -1047,7 +1054,21 @@ public class ContentParser{
             }
             Field field = metadata.field;
             try{
-                field.set(object, parser.readValue(field.getType(), metadata.elementType, child, metadata.keyType));
+                boolean mergeMap = ObjectMap.class.isAssignableFrom(field.getType()) && child.has("add") && child.get("add").isBoolean() && child.getBoolean("add", false);
+
+                if(mergeMap){
+                    child.remove("add");
+                }
+
+                Object readField = parser.readValue(field.getType(), metadata.elementType, child, metadata.keyType);
+
+                //if a map has add: true, add its contents to the map instead
+                if(mergeMap && field.get(object) instanceof ObjectMap<?,?> baseMap){
+                    baseMap.putAll((ObjectMap)readField);
+                }else{
+                    field.set(object, readField);
+                }
+
             }catch(IllegalAccessException ex){
                 throw new SerializationException("Error accessing field: " + field.getName() + " (" + type.getName() + ")", ex);
             }catch(SerializationException ex){
@@ -1095,8 +1116,8 @@ public class ContentParser{
                 }
 
                 //all items have a produce requirement unless already specified
-                if(object instanceof Item i && !node.objectives.contains(o -> o instanceof Produce p && p.content == i)){
-                    node.objectives.add(new Produce(i));
+                if((unlock instanceof Item || unlock instanceof Liquid) && !node.objectives.contains(o -> o instanceof Produce p && p.content == unlock)){
+                    node.objectives.add(new Produce(unlock));
                 }
 
                 //remove old node from parent

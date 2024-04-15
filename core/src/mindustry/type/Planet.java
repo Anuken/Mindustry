@@ -1,6 +1,7 @@
 package mindustry.type;
 
 import arc.*;
+import arc.audio.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g3d.*;
@@ -15,6 +16,7 @@ import mindustry.content.TechTree.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.game.EventType.ContentInitEvent;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
@@ -128,6 +130,8 @@ public class Planet extends UnlockableContent{
     public boolean allowLaunchToNumbered = true;
     /** Icon as displayed in the planet selection dialog. This is a string, as drawables are null at load time. */
     public String icon = "planet";
+    /** Plays in the planet dialog when this planet is selected. */
+    public Music launchMusic = Musics.launch;
     /** Default core block for launching. */
     public Block defaultCore = Blocks.coreShard;
     /** Sets up rules on game load for any sector on this planet. */
@@ -531,5 +535,27 @@ public class Planet extends UnlockableContent{
             batch.vertex(Tmp.bz3.valueAt(Tmp.v32, f));
         }
         batch.flush(Gl.lineStrip);
+    }
+
+    public Vec3 lookAt(Sector sector, Vec3 out){
+        return out.set(sector.tile.v).rotate(Vec3.Y, -getRotation());
+    }
+
+    public Vec3 project(Sector sector, Camera3D cam, Vec3 out){
+        return cam.project(out.set(sector.tile.v).setLength(outlineRad * radius).rotate(Vec3.Y, -getRotation()).add(position));
+    }
+
+    public void setPlane(Sector sector, PlaneBatch3D projector){
+        float rotation = -getRotation();
+        float length = 0.01f;
+
+        projector.setPlane(
+            //origin on sector position
+            Tmp.v33.set(sector.tile.v).setLength((outlineRad + length) * radius).rotate(Vec3.Y, rotation).add(position),
+            //face up
+            sector.plane.project(Tmp.v32.set(sector.tile.v).add(Vec3.Y)).sub(sector.tile.v, radius).rotate(Vec3.Y, rotation).nor(),
+            //right vector
+            Tmp.v31.set(Tmp.v32).rotate(Vec3.Y, -rotation).add(sector.tile.v).rotate(sector.tile.v, 90).sub(sector.tile.v).rotate(Vec3.Y, rotation).nor()
+        );
     }
 }

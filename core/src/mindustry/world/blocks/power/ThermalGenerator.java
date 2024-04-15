@@ -27,6 +27,11 @@ public class ThermalGenerator extends PowerGenerator{
     }
 
     @Override
+    public float getDisplayedPowerProduction(){
+        return powerProduction / displayEfficiencyScale;
+    }
+
+    @Override
     public void init(){
         if(outputLiquid != null){
             outputsLiquid = true;
