@@ -62,12 +62,18 @@ public class Mods implements Loadable{
         return mainLoader;
     }
 
-    /** Returns a file named 'config.json' in a special folder for the specified plugin.
+    /** @return the folder where configuration files for this mod should go. The folder may not exist yet; call mkdirs() before writing to it.
      * Call this in init(). */
-    public Fi getConfig(Mod mod){
+    public Fi getConfigFolder(Mod mod){
         ModMeta load = metas.get(mod.getClass());
         if(load == null) throw new IllegalArgumentException("Mod is not loaded yet (or missing)!");
-        return modDirectory.child(load.name).child("config.json");
+        return modDirectory.child(load.name);
+    }
+
+    /** @return a file named 'config.json' in the config folder for the specified mod.
+     * Call this in init(). */
+    public Fi getConfig(Mod mod){
+        return getConfigFolder(mod).child("config.json");
     }
 
     /** Returns a list of files per mod subdirectory. */
