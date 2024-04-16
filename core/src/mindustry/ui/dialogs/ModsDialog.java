@@ -673,6 +673,14 @@ public class ModsDialog extends BaseDialog{
         }
     }
 
+    public void importDependencies(Seq<String> dependencies){
+        getModList(listings -> {
+            listings.each(l -> dependencies.contains(l.modName), l -> {
+                githubImportMod(l.repo, l.hasJava);
+            });
+        });
+    }
+
     private void githubImportJavaMod(String repo, @Nullable String release){
         //grab latest release
         Http.get(ghApi + "/repos/" + repo + "/releases/" + (release == null ? "latest" : release), res -> {

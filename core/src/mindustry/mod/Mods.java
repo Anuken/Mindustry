@@ -609,7 +609,6 @@ public class Mods implements Loadable{
         if(mods.contains(LoadedMod::hasContentErrors)){
             ui.loadfrag.hide();
             new Dialog(""){{
-
                 setFillParent(true);
                 cont.margin(15);
                 cont.add("@error.title");
@@ -645,6 +644,46 @@ public class Mods implements Loadable{
 
                 cont.row();
                 cont.button("@ok", this::hide).size(300, 50);
+            }}.show();
+        }
+
+        //show list of missing dependencies
+        if(mods.contains(LoadedMod::hasUnmetDependencies)){
+            ui.loadfrag.hide();
+            new Dialog(""){{
+                setFillParent(true);
+                cont.margin(15);
+                cont.add("@mod.dependencies.error");
+                cont.row();
+                cont.image().width(300f).pad(2).colspan(2).height(4f).color(Color.scarlet);
+                cont.row();
+                cont.pane(p -> {
+                    mods.each(LoadedMod::hasUnmetDependencies, mod -> {
+                        p.add(mod.name).wrap().growX().left().get().setAlignment(Align.left);
+                        p.row();
+                        p.table(d -> {
+                            mod.missingDependencies.each(dep -> {
+                                d.add(" - " + dep).wrap().growX().left().get().setAlignment(Align.left);
+                                d.row();
+                            });
+                        }).growX();
+                        p.row();
+                    });
+                }).fillX();
+
+                cont.row();
+
+                cont.table(b -> {
+                    b.button("@ok", this::hide).size(150, 50);
+                    b.button("@mod.dependencies.download", () -> {
+                        hide();
+                        Seq<String> missingDeps = new Seq<>();
+                        mods.each(m -> m.enabled() && m.hasUnmetDependencies(), mod -> {
+                            mod.missingDependencies.each(missingDeps::addUnique);
+                        });
+                        ui.mods.importDependencies(missingDeps);
+                    }).size(150, 50);
+                });
             }}.show();
         }
     }
