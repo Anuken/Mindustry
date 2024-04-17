@@ -681,21 +681,41 @@ public class Mods implements Loadable{
                         mods.each(LoadedMod::hasUnmetDependencies, mod -> {
                             mod.missingDependencies.each(missingDeps::addUnique);
                         });
-                        int amount = missingDeps.size;
+                        int toImport = missingDeps.size;
                         ui.mods.importDependencies(missingDeps);
-                        if(missingDeps.size < amount) requiresReload = true;
 
                         if(missingDeps.isEmpty()){
-                            ui.showInfo("@mod.dependencies.success");
+                            ui.showInfoOnHidden(Core.bundle.get("mod.dependencies.success") + "\n\n" + Core.bundle.get("mods.reloadexit"), () -> {
+                                Log.info("Exiting to reload mods.");
+                                Core.app.exit();
+                            });
                         }else{
                             String[] fail = {Core.bundle.get("mod.dependencies.failure")};
                             missingDeps.each(d -> fail[0] += "\n    " + d);
-                            ui.showStartupInfo(fail[0]);
+
+                            boolean imported = missingDeps.size < toImport; //Mods were loaded
+                            if(imported){
+                                fail[0] += "\n\n" + Core.bundle.get("mods.reloadexit");
+                            }
+
+                            ui.showInfoOnHidden(fail[0], Align.left, () -> {
+                                if(imported){
+                                    Log.info("Exiting to reload mods.");
+                                    Core.app.exit();
+                                }
+                            });
                         }
                     }).size(150, 50);
                 });
             }}.show();
         }
+    }
+
+    private void reload(){
+        ui.showInfoOnHidden("@mods.reloadexit", () -> {
+            Log.info("Exiting to reload mods.");
+            Core.app.exit();
+        });
     }
 
     public boolean hasContentErrors(){

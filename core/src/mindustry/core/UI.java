@@ -429,9 +429,13 @@ public class UI implements ApplicationListener, Loadable{
     }
 
     public void showInfoOnHidden(String info, Runnable listener){
+        showInfoOnHidden(info, Align.center, listener);
+    }
+
+    public void showInfoOnHidden(String info, int align, Runnable listener){
         new Dialog(""){{
             getCell(cont).growX();
-            cont.margin(15).add(info).width(400f).wrap().get().setAlignment(Align.center, Align.center);
+            cont.margin(15).add(info).width(400f).wrap().get().setAlignment(align, align);
             buttons.button("@ok", this::hide).size(110, 50).pad(4);
             hidden(listener);
             closeOnBack();
