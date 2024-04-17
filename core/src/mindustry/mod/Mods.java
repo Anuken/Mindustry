@@ -659,7 +659,7 @@ public class Mods implements Loadable{
                 cont.row();
                 cont.pane(p -> {
                     mods.each(LoadedMod::hasUnmetDependencies, mod -> {
-                        p.add(mod.name).wrap().growX().left().labelAlign(Align.left);
+                        p.add(mod.meta.displayName).wrap().growX().left().labelAlign(Align.left);
                         p.row();
                         p.table(d -> {
                             mod.missingDependencies.each(dep -> {
