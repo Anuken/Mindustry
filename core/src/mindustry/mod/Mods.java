@@ -725,16 +725,21 @@ public class Mods implements Loadable{
                     }).growX().padBottom(8f).padLeft(12f);
                 }
             }).fillX();
+            cont.row();
 
             if(success.any()){
                 cont.image().width(300f).pad(2).height(4f).color(Color.lightGray);
                 cont.row();
                 cont.add("@mods.reloadexit").center();
+                cont.row();
+
                 hidden(() -> {
                     Log.info("Exiting to reload mods after dependency auto-import.");
                     Core.app.exit();
                 });
             }
+
+            cont.button("@ok", this::hide).size(300, 50);
         }}.show();
     }
 
