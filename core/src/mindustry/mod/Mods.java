@@ -663,10 +663,10 @@ public class Mods implements Loadable{
                         p.row();
                         p.table(d -> {
                             mod.missingDependencies.each(dep -> {
-                                d.add(" - " + dep).wrap().growX().left().get().setAlignment(Align.left);
+                                d.add("    " + dep).wrap().growX().left().get().setAlignment(Align.left);
                                 d.row();
                             });
-                        }).growX();
+                        }).growX().padBottom(8f);
                         p.row();
                     });
                 }).fillX();
@@ -678,10 +678,20 @@ public class Mods implements Loadable{
                     b.button("@mod.dependencies.download", () -> {
                         hide();
                         Seq<String> missingDeps = new Seq<>();
-                        mods.each(m -> m.enabled() && m.hasUnmetDependencies(), mod -> {
+                        mods.each(LoadedMod::hasUnmetDependencies, mod -> {
                             mod.missingDependencies.each(missingDeps::addUnique);
                         });
+                        int amount = missingDeps.size;
                         ui.mods.importDependencies(missingDeps);
+                        if(missingDeps.size < amount) requiresReload = true;
+
+                        if(missingDeps.isEmpty()){
+                            ui.showInfo("@mod.dependencies.success");
+                        }else{
+                            String[] fail = {Core.bundle.get("mod.dependencies.failure")};
+                            missingDeps.each(d -> fail[0] += "\n    " + d);
+                            ui.showStartupInfo(fail[0]);
+                        }
                     }).size(150, 50);
                 });
             }}.show();

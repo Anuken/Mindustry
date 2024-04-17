@@ -677,6 +677,7 @@ public class ModsDialog extends BaseDialog{
         getModList(listings -> {
             listings.each(l -> dependencies.contains(l.internalName), l -> {
                 githubImportMod(l.repo, l.hasJava);
+                dependencies.remove(l.internalName);
             });
         });
     }
