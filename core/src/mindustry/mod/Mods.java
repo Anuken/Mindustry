@@ -653,9 +653,9 @@ public class Mods implements Loadable{
             new Dialog(""){{
                 setFillParent(true);
                 cont.margin(15);
-                cont.add("@mod.dependencies.error");
+                cont.add("@mod.dependencies.error").colspan(2);
                 cont.row();
-                cont.image().width(300f).pad(2).height(4f).color(Color.scarlet);
+                cont.image().width(300f).colspan(2).pad(2).height(4f).color(Color.scarlet);
                 cont.row();
                 cont.pane(p -> {
                     mods.each(LoadedMod::hasUnmetDependencies, mod -> {
@@ -669,24 +669,22 @@ public class Mods implements Loadable{
                         }).growX().padBottom(8f).padLeft(12f);
                         p.row();
                     });
-                }).fillX();
+                }).fillX().colspan(2);
 
                 cont.row();
 
-                cont.table(b -> {
-                    b.button("@ok", this::hide).size(150, 50);
-                    b.button("@mod.dependencies.download", () -> {
-                        hide();
-                        Seq<String> toImport = new Seq<>();
-                        mods.each(LoadedMod::hasUnmetDependencies, mod -> {
-                            mod.missingDependencies.each(toImport::addUnique);
-                        });
-                        Seq<String> remaining = toImport.copy();
-                        ui.mods.importDependencies(remaining);
-                        toImport.removeAll(remaining);
-                        displayDependencyImportStatus(remaining, toImport);
-                    }).size(150, 50);
-                });
+                cont.button("@ok", this::hide).size(150, 50);
+                cont.button("@mod.dependencies.download", () -> {
+                    hide();
+                    Seq<String> toImport = new Seq<>();
+                    mods.each(LoadedMod::hasUnmetDependencies, mod -> {
+                        mod.missingDependencies.each(toImport::addUnique);
+                    });
+                    Seq<String> remaining = toImport.copy();
+                    ui.mods.importDependencies(remaining);
+                    toImport.removeAll(remaining);
+                    displayDependencyImportStatus(remaining, toImport);
+                }).size(150, 50);
             }}.show();
         }
     }
