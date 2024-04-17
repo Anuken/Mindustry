@@ -615,7 +615,7 @@ public class Mods implements Loadable{
                 cont.row();
                 cont.image().width(300f).pad(2).colspan(2).height(4f).color(Color.scarlet);
                 cont.row();
-                cont.add("@mod.errors").wrap().growX().center().get().setAlignment(Align.center);
+                cont.add("@mod.errors").wrap().growX().center().labelAlign(Align.center);
                 cont.row();
                 cont.pane(p -> {
                     mods.each(m -> m.enabled() && m.hasContentErrors(), m -> {
@@ -655,18 +655,18 @@ public class Mods implements Loadable{
                 cont.margin(15);
                 cont.add("@mod.dependencies.error");
                 cont.row();
-                cont.image().width(300f).pad(2).colspan(2).height(4f).color(Color.scarlet);
+                cont.image().width(300f).pad(2).height(4f).color(Color.scarlet);
                 cont.row();
                 cont.pane(p -> {
                     mods.each(LoadedMod::hasUnmetDependencies, mod -> {
-                        p.add(mod.name).wrap().growX().left().get().setAlignment(Align.left);
+                        p.add(mod.name).wrap().growX().left().labelAlign(Align.left);
                         p.row();
                         p.table(d -> {
                             mod.missingDependencies.each(dep -> {
-                                d.add("    " + dep).wrap().growX().left().get().setAlignment(Align.left);
+                                d.add(dep).wrap().growX().left().labelAlign(Align.left);
                                 d.row();
                             });
-                        }).growX().padBottom(8f);
+                        }).growX().padBottom(8f).padLeft(12f);
                         p.row();
                     });
                 }).fillX();
@@ -677,38 +677,65 @@ public class Mods implements Loadable{
                     b.button("@ok", this::hide).size(150, 50);
                     b.button("@mod.dependencies.download", () -> {
                         hide();
-                        Seq<String> missingDeps = new Seq<>();
+                        Seq<String> toImport = new Seq<>();
                         mods.each(LoadedMod::hasUnmetDependencies, mod -> {
-                            mod.missingDependencies.each(missingDeps::addUnique);
+                            mod.missingDependencies.each(toImport::addUnique);
                         });
-                        int toImport = missingDeps.size;
-                        ui.mods.importDependencies(missingDeps);
-
-                        if(missingDeps.isEmpty()){
-                            ui.showInfoOnHidden(Core.bundle.get("mod.dependencies.success") + "\n\n" + Core.bundle.get("mods.reloadexit"), () -> {
-                                Log.info("Exiting to reload mods.");
-                                Core.app.exit();
-                            });
-                        }else{
-                            String[] fail = {Core.bundle.get("mod.dependencies.failure")};
-                            missingDeps.each(d -> fail[0] += "\n    " + d);
-
-                            boolean imported = missingDeps.size < toImport; //Mods were loaded
-                            if(imported){
-                                fail[0] += "\n\n" + Core.bundle.get("mods.reloadexit");
-                            }
-
-                            ui.showInfoOnHidden(fail[0], Align.left, () -> {
-                                if(imported){
-                                    Log.info("Exiting to reload mods.");
-                                    Core.app.exit();
-                                }
-                            });
-                        }
+                        Seq<String> remaining = toImport.copy();
+                        ui.mods.importDependencies(remaining);
+                        toImport.removeAll(remaining);
+                        displayDependencyImportStatus(remaining, toImport);
                     }).size(150, 50);
                 });
             }}.show();
         }
+    }
+
+    private void displayDependencyImportStatus(Seq<String> failed, Seq<String> success){
+        new Dialog(""){{
+            setFillParent(true);
+            cont.margin(15);
+
+            cont.add("@mod.dependencies.status").center();
+            cont.row();
+            cont.image().width(300f).pad(2).height(4f).color(Color.lightGray);
+            cont.row();
+
+            cont.pane(p -> {
+                if(success.any()){
+                    p.add("@mod.dependencies.success").wrap().fillX().left().labelAlign(Align.left);
+                    p.row();
+                    p.table(t -> {
+                        success.each(d -> {
+                            t.add(d).wrap().growX().left().labelAlign(Align.left);
+                            t.row();
+                        });
+                    }).growX().padBottom(8f).padLeft(12f);
+                    p.row();
+                }
+
+                if(failed.any()){
+                    p.add("@mod.dependencies.failure").wrap().fillX().left().labelAlign(Align.left);
+                    p.row();
+                    p.table(t -> {
+                        failed.each(d -> {
+                            t.add(d).wrap().growX().left().labelAlign(Align.left);
+                            t.row();
+                        });
+                    }).growX().padBottom(8f).padLeft(12f);
+                }
+            }).fillX();
+
+            if(success.any()){
+                cont.image().width(300f).pad(2).height(4f).color(Color.lightGray);
+                cont.row();
+                cont.add("@mods.reloadexit").center();
+                hidden(() -> {
+                    Log.info("Exiting to reload mods after dependency auto-import.");
+                    Core.app.exit();
+                });
+            }
+        }}.show();
     }
 
     private void reload(){
