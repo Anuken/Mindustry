@@ -1086,16 +1086,6 @@ public class HierarchyPathFinder implements Runnable{
                                 anyNearSolid = true;
                             }
 
-                            //check for corner preventing movement
-                            //if((checkCorner(unit, tileOn, other, dir - 1) || checkCorner(unit, tileOn, other, dir + 1)) &&
-                            //    (checkSolid(unit, tileOn, dir - 2) || checkSolid(unit, tileOn, dir + 2))){ //there must be a tile to the left or right to keep the unit from going back and forth forever
-
-                                //recalc = true;
-                                //keep moving even if it's blocked
-                                //any = true;
-                            //    continue;
-                            //}
-
                             if((value == 0 || otherCost < value) && otherCost != impassable && (otherCost != 0 || packed == destPos) && (current == null || otherCost < minCost) && passable(unit.team.id, cost, packed) &&
                             //diagonal corner trap
                             !(
@@ -1109,6 +1099,7 @@ public class HierarchyPathFinder implements Runnable{
                         }
 
                         //TODO raycast spam = extremely slow
+                        //...flowfield integration spam is also really slow.
                         if(!(current == null || (costId == costGround && current.dangerous() && !tileOn.dangerous()))){
 
                             //when anyNearSolid is false, no solid tiles have been encountered anywhere so far, so raycasting is a waste of time
