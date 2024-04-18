@@ -431,6 +431,8 @@ public class UnitType extends UnlockableContent implements Senseable{
     public TextureRegion[] wreckRegions, segmentRegions, segmentOutlineRegions;
     public TextureRegion[][] treadRegions;
 
+    //INTERNAL REQUIREMENTS
+
     protected float buildTime = -1f;
     protected @Nullable ItemStack[] totalRequirements, cachedRequirements, firstRequirements;
 
@@ -1183,6 +1185,8 @@ public class UnitType extends UnlockableContent implements Senseable{
 
     //region drawing
 
+
+    /** Set up drawing state before calling! e.g. drawingPayload */
     public void draw(Unit unit){
         if(unit.inFogTo(Vars.player.team())) return;
 
