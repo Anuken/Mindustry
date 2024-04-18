@@ -223,8 +223,8 @@ public class CommandAI extends AIController{
             }
 
             if(unit.isGrounded() && stance != UnitStance.ram){
-                //TODO: blocking is disabled, doesn't work well
-                if(timer.get(timerTarget3, avoidInterval) && false){
+                //TODO: blocking enable or disable?
+                if(timer.get(timerTarget3, avoidInterval)){
                     Vec2 dstPos = Tmp.v1.trns(unit.rotation, unit.hitSize/2f);
                     float max = unit.hitSize/2f;
                     float radius = Math.max(7f, max);
@@ -251,7 +251,6 @@ public class CommandAI extends AIController{
                     timeSpentBlocked = 0f;
                 }
 
-                //if you've spent 3 seconds stuck, something is wrong, move regardless
                 move = hpath.getPathPosition(unit, vecMovePos, targetPos, vecOut, noFound) && (!blockingUnit || timeSpentBlocked > maxBlockTime);
                 //rare case where unit must be perfectly aligned (happens with 1-tile gaps)
                 alwaysArrive = vecOut.epsilonEquals(unit.tileX() * tilesize, unit.tileY() * tilesize);

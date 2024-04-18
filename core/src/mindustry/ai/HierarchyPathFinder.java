@@ -1021,13 +1021,17 @@ public class HierarchyPathFinder implements Runnable{
 
         PathRequest request = unitRequests.get(unit);
 
+        unit.hitboxTile(Tmp.r3);
+        //tile rect size has tile size factored in, since the ray cannot have thickness
+        float tileRectSize = tilesize + Tmp.r3.height;
+
         int lastRaycastTile = request == null || world.tileChanges != request.lastWorldUpdate ? -1 : request.lastRaycastTile;
         boolean raycastResult = request != null && request.lastRaycastResult;
 
         //cache raycast results to run every time the world updates, and every tile the unit crosses
         if(lastRaycastTile != packedPos){
             //near the destination, standard raycasting tends to break down, so use the more permissive 'near' variant that doesn't take into account edges of walls
-            raycastResult = unit.within(destination, tilesize * 2.5f) ? !raycastNear(team, cost, tileX, tileY, actualDestX, actualDestY) : !raycast(team, cost, tileX, tileY, actualDestX, actualDestY);
+            raycastResult = unit.within(destination, tilesize * 2.5f) ? !raycastRect(unit.x, unit.y, destination.x, destination.y, team, cost, tileX, tileY, actualDestX, actualDestY, tileRectSize) : !raycast(team, cost, tileX, tileY, actualDestX, actualDestY);
 
             if(request != null){
                 request.lastRaycastTile = packedPos;
@@ -1065,9 +1069,6 @@ public class HierarchyPathFinder implements Runnable{
                 int maxIterations = 30; //TODO higher/lower number? is this still too slow?
                 int i = 0;
                 boolean recalc = false;
-                unit.hitboxTile(Tmp.r3);
-                //tile rect size has tile size factored in, since the ray cannot have thickness
-                float tileRectSize = tilesize + Tmp.r3.height;
 
                 //TODO last pos can change if the flowfield changes.
                 if(initialTileOn.pos() != request.lastTile || request.lastTargetTile == null){
@@ -1079,8 +1080,8 @@ public class HierarchyPathFinder implements Runnable{
 
                         Tile current = null;
                         int minCost = 0;
-                        for(int dir = 0; dir < 8; dir ++){
-                            Point2 point = Geometry.d8[dir];
+                        for(int dir = 0; dir < 4; dir ++){
+                            Point2 point = Geometry.d4[dir];
                             int dx = tileOn.x + point.x, dy = tileOn.y + point.y;
 
                             Tile other = world.tile(dx, dy);
@@ -1094,13 +1095,7 @@ public class HierarchyPathFinder implements Runnable{
                                 anyNearSolid = true;
                             }
 
-                            if((value == 0 || otherCost < value) && otherCost != impassable && (otherCost != 0 || packed == destPos) && (current == null || otherCost < minCost) && passable(unit.team.id, cost, packed) &&
-                            //diagonal corner trap
-                            !(
-                            (!passable(team, cost, world.packArray(tileOn.x + point.x, tileOn.y)) ||
-                            (!passable(team, cost, world.packArray(tileOn.x, tileOn.y + point.y))))
-                            )
-                            ){
+                            if((value == 0 || otherCost < value) && otherCost != impassable && (otherCost != 0 || packed == destPos) && (current == null || otherCost < minCost) && passable(unit.team.id, cost, packed)){
                                 current = other;
                                 minCost = otherCost;
                             }
