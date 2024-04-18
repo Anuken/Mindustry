@@ -71,8 +71,9 @@ public class HierarchyPathFinder implements Runnable{
     //TODO: very dangerous usage;
     //TODO - it is accessed from the main thread
     //TODO - it is written to on the pathfinding thread
-    //maps position in world in (x + y * width format) to a cache of flow fields
-    IntMap<FieldCache> fields = new IntMap<>();
+    //TODO - it does not include
+    //maps position in world in (x + y * width format) | type (bitpacked to long) to a cache of flow fields
+    LongMap<FieldCache> fields = new LongMap<>();
     //MAIN THREAD ONLY
     Seq<FieldCache> fieldList = new Seq<>(false);
 
@@ -128,22 +129,26 @@ public class HierarchyPathFinder implements Runnable{
 
     static class FieldCache{
         final PathCost cost;
+        final int costId;
         final int team;
         final int goalPos;
         //frontier for flow fields
         final IntQueue frontier = new IntQueue();
         //maps cluster index to field weights; 0 means uninitialized
         final IntMap<int[]> fields = new IntMap<>();
+        final long mapKey;
 
         //main thread only!
         long lastUpdateId = state.updateId;
 
         //TODO: how are the nodes merged? CAN they be merged?
 
-        FieldCache(PathCost cost, int team, int goalPos){
+        FieldCache(PathCost cost, int costId, int team, int goalPos){
             this.cost = cost;
             this.team = team;
             this.goalPos = goalPos;
+            this.costId = costId;
+            this.mapKey = Pack.longInt(goalPos, costId);
         }
     }
 
@@ -162,7 +167,7 @@ public class HierarchyPathFinder implements Runnable{
 
             //TODO: can the pathfinding thread even see these?
             unitRequests = new ObjectMap<>();
-            fields = new IntMap<>();
+            fields = new LongMap<>();
             fieldList = new Seq<>(false);
 
             clusters = new Cluster[256][][];
@@ -213,7 +218,7 @@ public class HierarchyPathFinder implements Runnable{
                 //skipped N update -> drop it
                 if(field.lastUpdateId <= state.updateId - 30){
                     //make sure it's only modified on the main thread...? but what about calling get() on this thread??
-                    queue.post(() -> fields.remove(field.goalPos));
+                    queue.post(() -> fields.remove(field.mapKey));
                     Core.app.post(() -> fieldList.remove(field));
                 }
             }
@@ -222,7 +227,7 @@ public class HierarchyPathFinder implements Runnable{
         if(debug){
             Events.run(Trigger.draw, () -> {
                 int team = player.team().id;
-                int cost = costGround;
+                int cost = 0;
 
                 Draw.draw(Layer.overlayUI, () -> {
                     Lines.stroke(1f);
@@ -953,13 +958,14 @@ public class HierarchyPathFinder implements Runnable{
 
         var nodePath = clusterAstar(request, costId, node, dest);
 
-        FieldCache cache = fields.get(goalPos);
+        FieldCache cache = fields.get(Pack.longInt(goalPos, costId));
         //if true, extra values are added on the sides of existing field cells that face new cells.
         boolean addingFrontier = true;
 
         //create the cache if it doesn't exist, and initialize it
         if(cache == null){
-            fields.put(goalPos, cache = new FieldCache(pcost, team, goalPos));
+            cache = new FieldCache(pcost, costId, team, goalPos);
+            fields.put(cache.mapKey, cache);
             FieldCache fcache = cache;
             //register field in main thread for iteration
             Core.app.post(() -> fieldList.add(fcache));
@@ -1038,13 +1044,15 @@ public class HierarchyPathFinder implements Runnable{
 
         boolean any = false;
 
+        long fieldKey = Pack.longInt(destPos, costId);
+
         //use existing request if it exists.
         if(request != null && request.destination == destPos){
             request.lastUpdateId = state.updateId;
 
             Tile tileOn = unit.tileOn(), initialTileOn = tileOn;
             //TODO: should fields be accessible from this thread?
-            FieldCache fieldCache = fields.get(destPos);
+            FieldCache fieldCache = fields.get(fieldKey);
 
             if(fieldCache != null && tileOn != null){
                 FieldCache old = request.oldCache;
@@ -1059,7 +1067,7 @@ public class HierarchyPathFinder implements Runnable{
                 boolean recalc = false;
                 unit.hitboxTile(Tmp.r3);
                 //tile rect size has tile size factored in, since the ray cannot have thickness
-                float tileRectSize = tilesize + Tmp.r3.height - 0.1f;
+                float tileRectSize = tilesize + Tmp.r3.height;
 
                 //TODO last pos can change if the flowfield changes.
                 if(initialTileOn.pos() != request.lastTile || request.lastTargetTile == null){
@@ -1311,7 +1319,8 @@ public class HierarchyPathFinder implements Runnable{
         int index = cx + cy * cwidth;
 
         for(var req : threadPathRequests){
-            var field = fields.get(req.destination);
+            long mapKey = Pack.longInt(req.destination, pathCost);
+            var field = fields.get(mapKey);
             if((field != null && field.fields.containsKey(index)) || req.notFound){
                 invalidRequests.add(req);
             }
@@ -1396,14 +1405,16 @@ public class HierarchyPathFinder implements Runnable{
                                 continue;
                             }
 
-                            var field = fields.get(request.destination);
+                            long mapKey = Pack.longInt(request.destination, request.costId);
+
+                            var field = fields.get(mapKey);
 
                             if(field != null){
                                 //it's only worth recalculating a path when the current frontier has finished; otherwise the unit will be following something incomplete.
                                 if(field.frontier.isEmpty()){
 
                                     //remove the field, to be recalculated next update one recalculatePath is processed
-                                    fields.remove(field.goalPos);
+                                    fields.remove(field.mapKey);
                                     Core.app.post(() -> fieldList.remove(field));
 
                                     //once the field is invalidated, make sure that all the requests that have it stored in their 'old' field, so units don't stutter during recalculations
