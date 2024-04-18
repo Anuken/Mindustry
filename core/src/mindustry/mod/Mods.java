@@ -658,7 +658,7 @@ public class Mods implements Loadable{
                 cont.image().width(300f).colspan(2).pad(2).height(4f).color(Color.scarlet);
                 cont.row();
                 cont.pane(p -> {
-                    mods.each(LoadedMod::hasUnmetDependencies, mod -> {
+                    mods.each(mod -> mod.shouldBeEnabled() && mod.hasUnmetDependencies(), mod -> {
                         p.add(mod.meta.displayName).wrap().growX().left().labelAlign(Align.left);
                         p.row();
                         p.table(d -> {
@@ -677,7 +677,7 @@ public class Mods implements Loadable{
                 cont.button("@mod.dependencies.download", () -> {
                     hide();
                     Seq<String> toImport = new Seq<>();
-                    mods.each(LoadedMod::hasUnmetDependencies, mod -> {
+                    mods.each(mod -> mod.shouldBeEnabled() && mod.hasUnmetDependencies(), mod -> {
                         mod.missingDependencies.each(toImport::addUnique);
                     });
                     Seq<String> remaining = toImport.copy();
