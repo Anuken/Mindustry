@@ -295,6 +295,8 @@ public class HierarchyPathFinder implements Runnable{
                         }catch(Exception ignored){} //probably has some concurrency issues when iterating but I don't care, this is for debugging
                     }
                 });
+
+                Draw.reset();
             });
         }
     }
@@ -1055,14 +1057,16 @@ public class HierarchyPathFinder implements Runnable{
                 int maxIterations = 30; //TODO higher/lower number? is this still too slow?
                 int i = 0;
                 boolean recalc = false;
+                unit.hitboxTile(Tmp.r3);
+                //tile rect size has tile size factored in, since the ray cannot have thickness
+                float tileRectSize = tilesize + Tmp.r3.height;
 
                 //TODO last pos can change if the flowfield changes.
                 if(initialTileOn.pos() != request.lastTile || request.lastTargetTile == null){
-                    //TODO tanks have weird behavior near edges of walls, as they try to avoid them
                     boolean anyNearSolid = false;
 
                     //find the next tile until one near a solid block is discovered
-                    while(i ++ < maxIterations && !anyNearSolid){
+                    while(i ++ < maxIterations){
                         int value = getCost(fieldCache, old, tileOn.x, tileOn.y);
 
                         Tile current = null;
@@ -1083,16 +1087,16 @@ public class HierarchyPathFinder implements Runnable{
                             }
 
                             //check for corner preventing movement
-                            if((checkCorner(unit, tileOn, other, dir - 1) || checkCorner(unit, tileOn, other, dir + 1)) &&
-                                (checkSolid(unit, tileOn, dir - 2) || checkSolid(unit, tileOn, dir + 2))){ //there must be a tile to the left or right to keep the unit from going back and forth forever
+                            //if((checkCorner(unit, tileOn, other, dir - 1) || checkCorner(unit, tileOn, other, dir + 1)) &&
+                            //    (checkSolid(unit, tileOn, dir - 2) || checkSolid(unit, tileOn, dir + 2))){ //there must be a tile to the left or right to keep the unit from going back and forth forever
 
-                                recalc = true;
+                                //recalc = true;
                                 //keep moving even if it's blocked
-                                any = true;
-                                continue;
-                            }
+                                //any = true;
+                            //    continue;
+                            //}
 
-                            if(otherCost < value && otherCost != impassable && (otherCost != 0 || packed == destPos) && (current == null || otherCost < minCost) && passable(unit.team.id, cost, packed) &&
+                            if((value == 0 || otherCost < value) && otherCost != impassable && (otherCost != 0 || packed == destPos) && (current == null || otherCost < minCost) && passable(unit.team.id, cost, packed) &&
                             //diagonal corner trap
                             !(
                             (!passable(team, cost, world.packArray(tileOn.x + point.x, tileOn.y)) ||
@@ -1104,13 +1108,28 @@ public class HierarchyPathFinder implements Runnable{
                             }
                         }
 
+                        //TODO raycast spam = extremely slow
                         if(!(current == null || (costId == costGround && current.dangerous() && !tileOn.dangerous()))){
-                            tileOn = current;
-                            any = true;
 
-                            if(current.array() == destPos){
+                            //when anyNearSolid is false, no solid tiles have been encountered anywhere so far, so raycasting is a waste of time
+                            if(anyNearSolid && !tileOn.dangerous() && raycastRect(unit.x, unit.y, current.x * tilesize, current.y * tilesize, team, cost, initialTileOn.x, initialTileOn.y, current.x, current.y, tileRectSize)){
+
+                                //TODO this may be a mistake
+                                if(tileOn == initialTileOn){
+                                    recalc = true;
+                                    any = true;
+                                }
+
                                 break;
+                            }else{
+                                tileOn = current;
+                                any = true;
+
+                                if(current.array() == destPos){
+                                    break;
+                                }
                             }
+
                         }else{
                             break;
                         }
@@ -1154,24 +1173,6 @@ public class HierarchyPathFinder implements Runnable{
 
     private void recalculatePath(PathRequest request){
         initializePathRequest(request, request.team, request.costId, request.unit.tileX(), request.unit.tileY(), request.destination % wwidth, request.destination / wwidth);
-    }
-
-    private boolean checkSolid(Unit unit, Tile tile, int dir){
-        var p = Geometry.d8[Mathf.mod(dir, 8)];
-        return !unit.canPass(tile.x + p.x, tile.y + p.y);
-    }
-
-    private boolean checkCorner(Unit unit, Tile tile, Tile next, int dir){
-        Tile other = tile.nearby(Geometry.d8[Mathf.mod(dir, 8)]);
-        if(other == null){
-            return true;
-        }
-
-        if(!unit.canPass(other.x, other.y)){
-            return Geometry.raycastRect(unit.x, unit.y, next.worldx(), next.worldy(), Tmp.r1.setCentered(other.worldx(), other.worldy(), tilesize).grow(Math.min(unit.hitSize * 0.66f, 7.6f))) != null;
-        }
-
-        return false;
     }
 
     private int getCost(FieldCache cache, FieldCache old, int x, int y){
@@ -1239,6 +1240,47 @@ public class HierarchyPathFinder implements Runnable{
                 y += sy;
             }
 
+        }
+
+        return true;
+    }
+
+    private static boolean overlap(int team, PathCost type, int x, int y, float startX, float startY, float endX, float endY, float rectSize){
+        if(x < 0 || y < 0 || x >= wwidth || y >= wheight) return false;
+        if(!passable(team, type, x + y * wwidth)){
+            return Intersector.intersectSegmentRectangleFast(startX, startY, endX, endY, x * tilesize - rectSize/2f, y * tilesize - rectSize/2f, rectSize, rectSize);
+        }
+        return false;
+    }
+
+    private static boolean raycastRect(float startX, float startY, float endX, float endY, int team, PathCost type, int x1, int y1, int x2, int y2, float rectSize){
+        int ww = wwidth, wh = wheight;
+        int x = x1, dx = Math.abs(x2 - x), sx = x < x2 ? 1 : -1;
+        int y = y1, dy = Math.abs(y2 - y), sy = y < y2 ? 1 : -1;
+        int e2, err = dx - dy;
+
+        while(x >= 0 && y >= 0 && x < ww && y < wh){
+            if(
+            !passable(team, type, x + y * wwidth) ||
+            overlap(team, type, x + 1, y, startX, startY, endX, endY, rectSize) ||
+            overlap(team, type, x - 1, y, startX, startY, endX, endY, rectSize) ||
+            overlap(team, type, x, y + 1, startX, startY, endX, endY, rectSize) ||
+            overlap(team, type, x, y - 1, startX, startY, endX, endY, rectSize)
+            ) return true;
+
+            if(x == x2 && y == y2) return false;
+
+            //diagonal ver
+            e2 = 2 * err;
+            if(e2 > -dy){
+                err -= dy;
+                x += sx;
+            }
+
+            if(e2 < dx){
+                err += dx;
+                y += sy;
+            }
         }
 
         return true;
