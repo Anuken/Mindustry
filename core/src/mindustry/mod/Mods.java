@@ -681,9 +681,10 @@ public class Mods implements Loadable{
                         mod.missingDependencies.each(toImport::addUnique);
                     });
                     Seq<String> remaining = toImport.copy();
-                    ui.mods.importDependencies(remaining);
-                    toImport.removeAll(remaining);
-                    displayDependencyImportStatus(remaining, toImport);
+                    ui.mods.importDependencies(remaining, () -> {
+                        toImport.removeAll(remaining);
+                        displayDependencyImportStatus(remaining, toImport);
+                    });
                 }).size(150, 50);
             }}.show();
         }

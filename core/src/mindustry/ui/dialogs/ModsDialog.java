@@ -673,12 +673,13 @@ public class ModsDialog extends BaseDialog{
         }
     }
 
-    public void importDependencies(Seq<String> dependencies){
+    public void importDependencies(Seq<String> dependencies, Runnable done){
         getModList(listings -> {
             listings.each(l -> dependencies.contains(l.internalName), l -> {
-                githubImportMod(l.repo, l.hasJava);
                 dependencies.remove(l.internalName);
+                githubImportMod(l.repo, l.hasJava);
             });
+            done.run();
         });
     }
 
