@@ -1059,7 +1059,7 @@ public class HierarchyPathFinder implements Runnable{
                 boolean recalc = false;
                 unit.hitboxTile(Tmp.r3);
                 //tile rect size has tile size factored in, since the ray cannot have thickness
-                float tileRectSize = tilesize + Tmp.r3.height;
+                float tileRectSize = tilesize + Tmp.r3.height - 0.1f;
 
                 //TODO last pos can change if the flowfield changes.
                 if(initialTileOn.pos() != request.lastTile || request.lastTargetTile == null){
