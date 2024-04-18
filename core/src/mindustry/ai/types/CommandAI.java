@@ -4,7 +4,6 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.*;
 import mindustry.ai.*;
 import mindustry.core.*;
 import mindustry.entities.*;
@@ -35,7 +34,6 @@ public class CommandAI extends AIController{
 
     protected boolean stopAtTarget, stopWhenInRange;
     protected Vec2 lastTargetPos;
-    protected int pathId = -1;
     protected boolean blockingUnit;
     protected float timeSpentBlocked;
 
@@ -251,7 +249,7 @@ public class CommandAI extends AIController{
                     timeSpentBlocked = 0f;
                 }
 
-                move = hpath.getPathPosition(unit, vecMovePos, targetPos, vecOut, noFound) && (!blockingUnit || timeSpentBlocked > maxBlockTime);
+                move = controlPath.getPathPosition(unit, vecMovePos, targetPos, vecOut, noFound) && (!blockingUnit || timeSpentBlocked > maxBlockTime);
                 //rare case where unit must be perfectly aligned (happens with 1-tile gaps)
                 alwaysArrive = vecOut.epsilonEquals(unit.tileX() * tilesize, unit.tileY() * tilesize);
                 //we've reached the final point if the returned coordinate is equal to the supplied input
@@ -421,7 +419,6 @@ public class CommandAI extends AIController{
         //this is an allocation, but it's relatively rarely called anyway, and outside mutations must be prevented
         targetPos = lastTargetPos = pos.cpy();
         attackTarget = null;
-        pathId = Vars.controlPath.nextTargetId();
         this.stopWhenInRange = stopWhenInRange;
     }
 
@@ -436,7 +433,6 @@ public class CommandAI extends AIController{
     public void commandTarget(Teamc moveTo, boolean stopAtTarget){
         attackTarget = moveTo;
         this.stopAtTarget = stopAtTarget;
-        pathId = Vars.controlPath.nextTargetId();
     }
 
     /*
