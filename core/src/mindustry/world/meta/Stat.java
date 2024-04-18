@@ -51,6 +51,7 @@ public class Stat implements Comparable<Stat>{
     itemsMoved = new Stat("itemsMoved", StatCat.items),
     launchTime = new Stat("launchTime", StatCat.items),
     maxConsecutive = new Stat("maxConsecutive", StatCat.items),
+    maxAmmo = new Stat("maxAmmo", StatCat.items),
 
     liquidCapacity = new Stat("liquidCapacity", StatCat.liquids),
 
