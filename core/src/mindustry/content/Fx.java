@@ -2584,7 +2584,7 @@ public class Fx{
        if(!(e.data instanceof Vec2[] vec)) return;
 
        Draw.color(e.color);
-       Lines.stroke(1f);
+       Lines.stroke(2f);
 
        if(vec.length == 2){
            Lines.line(vec[0].x, vec[0].y, vec[1].x, vec[1].y);
@@ -2596,5 +2596,15 @@ public class Fx{
        }
 
        Draw.reset();
+    }),
+    debugRect = new Effect(90f, 1000000000000f, e -> {
+        if(!(e.data instanceof Rect rect)) return;
+
+        Draw.color(e.color);
+        Lines.stroke(2f);
+
+        Lines.rect(rect);
+
+        Draw.reset();
     });
 }

@@ -68,7 +68,7 @@ abstract class HitboxComp implements Posc, Sized, QuadTreeObject{
 
     public void hitboxTile(Rect rect){
         //tile hitboxes are never bigger than a tile, otherwise units get stuck
-        float size = Math.min(hitSize * 0.66f, 7.9f);
+        float size = Math.min(hitSize * 0.66f, 7.8f);
         //TODO: better / more accurate version is
         //float size = hitSize * 0.85f;
         //- for tanks?

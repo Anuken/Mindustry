@@ -4,7 +4,6 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.*;
 import mindustry.ai.*;
 import mindustry.core.*;
 import mindustry.entities.*;
@@ -35,7 +34,6 @@ public class CommandAI extends AIController{
 
     protected boolean stopAtTarget, stopWhenInRange;
     protected Vec2 lastTargetPos;
-    protected int pathId = -1;
     protected boolean blockingUnit;
     protected float timeSpentBlocked;
 
@@ -205,6 +203,8 @@ public class CommandAI extends AIController{
             }
         }
 
+        boolean alwaysArrive = false;
+
         if(targetPos != null){
             boolean move = true, isFinalPoint = commandQueue.size == 0;
             vecOut.set(targetPos);
@@ -221,6 +221,7 @@ public class CommandAI extends AIController{
             }
 
             if(unit.isGrounded() && stance != UnitStance.ram){
+                //TODO: blocking enable or disable?
                 if(timer.get(timerTarget3, avoidInterval)){
                     Vec2 dstPos = Tmp.v1.trns(unit.rotation, unit.hitSize/2f);
                     float max = unit.hitSize/2f;
@@ -248,8 +249,9 @@ public class CommandAI extends AIController{
                     timeSpentBlocked = 0f;
                 }
 
-                //if you've spent 3 seconds stuck, something is wrong, move regardless
-                move = Vars.controlPath.getPathPosition(unit, pathId, vecMovePos, vecOut, noFound) && (!blockingUnit || timeSpentBlocked > maxBlockTime);
+                move = controlPath.getPathPosition(unit, vecMovePos, targetPos, vecOut, noFound) && (!blockingUnit || timeSpentBlocked > maxBlockTime);
+                //rare case where unit must be perfectly aligned (happens with 1-tile gaps)
+                alwaysArrive = vecOut.epsilonEquals(unit.tileX() * tilesize, unit.tileY() * tilesize);
                 //we've reached the final point if the returned coordinate is equal to the supplied input
                 isFinalPoint &= vecMovePos.epsilonEquals(vecOut, 4.1f);
 
@@ -277,7 +279,7 @@ public class CommandAI extends AIController{
                     attackTarget != null && unit.within(attackTarget, engageRange) && stance != UnitStance.ram ? engageRange :
                     unit.isGrounded() ? 0f :
                     attackTarget != null && stance != UnitStance.ram ? engageRange :
-                    0f, unit.isFlying() ? 40f : 100f, false, null, isFinalPoint);
+                    0f, unit.isFlying() ? 40f : 100f, false, null, isFinalPoint || alwaysArrive);
                 }
             }
 
@@ -417,7 +419,6 @@ public class CommandAI extends AIController{
         //this is an allocation, but it's relatively rarely called anyway, and outside mutations must be prevented
         targetPos = lastTargetPos = pos.cpy();
         attackTarget = null;
-        pathId = Vars.controlPath.nextTargetId();
         this.stopWhenInRange = stopWhenInRange;
     }
 
@@ -432,7 +433,6 @@ public class CommandAI extends AIController{
     public void commandTarget(Teamc moveTo, boolean stopAtTarget){
         attackTarget = moveTo;
         this.stopAtTarget = stopAtTarget;
-        pathId = Vars.controlPath.nextTargetId();
     }
 
     /*
