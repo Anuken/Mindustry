@@ -1101,7 +1101,9 @@ public class ControlPathfinder implements Runnable{
         //cache raycast results to run every time the world updates, and every tile the unit crosses
         if(lastRaycastTile != packedPos){
             //near the destination, standard raycasting tends to break down, so use the more permissive 'near' variant that doesn't take into account edges of walls
-            raycastResult = unit.within(destination, tilesize * 2.5f) ? !raycastRect(unit.x, unit.y, destination.x, destination.y, team, cost, tileX, tileY, actualDestX, actualDestY, tileRectSize) : !raycast(team, cost, tileX, tileY, actualDestX, actualDestY);
+            raycastResult = unit.within(destination, tilesize * 2.5f) ?
+                !raycastRect(unit.x, unit.y, destination.x, destination.y, team, cost, tileX, tileY, actualDestX, actualDestY, tileRectSize) :
+                !raycast(team, cost, tileX, tileY, actualDestX, actualDestY);
 
             if(request != null){
                 request.lastRaycastTile = packedPos;
@@ -1141,7 +1143,7 @@ public class ControlPathfinder implements Runnable{
                 boolean recalc = false;
 
                 //TODO last pos can change if the flowfield changes.
-                if(initialTileOn.pos() != request.lastTile || request.lastTargetTile == null){
+                if(initialTileOn.pos() != request.lastTile || request.lastTargetTile == null || true){
                     boolean anyNearSolid = false;
 
                     //find the next tile until one near a solid block is discovered
@@ -1176,7 +1178,7 @@ public class ControlPathfinder implements Runnable{
                         if(!(current == null || (costId == costIdGround && current.dangerous() && !tileOn.dangerous()))){
 
                             //when anyNearSolid is false, no solid tiles have been encountered anywhere so far, so raycasting is a waste of time
-                            if(anyNearSolid && !tileOn.dangerous() && raycastRect(unit.x, unit.y, current.x * tilesize, current.y * tilesize, team, cost, initialTileOn.x, initialTileOn.y, current.x, current.y, tileRectSize)){
+                            if(anyNearSolid && !(tileOn.dangerous() && costId == costIdGround) && raycastRect(unit.x, unit.y, current.x * tilesize, current.y * tilesize, team, cost, initialTileOn.x, initialTileOn.y, current.x, current.y, tileRectSize)){
 
                                 //TODO this may be a mistake
                                 if(tileOn == initialTileOn){
@@ -1206,6 +1208,7 @@ public class ControlPathfinder implements Runnable{
                 }
 
                 if(request.lastTargetTile != null){
+                    Fx.breakBlock.at(request.lastTargetTile.worldx(), request.lastTargetTile.worldy(), 1);
                     out.set(request.lastTargetTile);
                     request.lastTile = recalc ? -1 : initialTileOn.pos();
                     return true;

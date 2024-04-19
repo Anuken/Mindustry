@@ -205,6 +205,9 @@ public class CommandAI extends AIController{
 
         boolean alwaysArrive = false;
 
+        float engageRange = unit.type.range - 10f;
+        boolean withinAttackRange = attackTarget != null && unit.within(attackTarget, engageRange) && stance != UnitStance.ram;
+
         if(targetPos != null){
             boolean move = true, isFinalPoint = commandQueue.size == 0;
             vecOut.set(targetPos);
@@ -249,7 +252,16 @@ public class CommandAI extends AIController{
                     timeSpentBlocked = 0f;
                 }
 
-                move = controlPath.getPathPosition(unit, vecMovePos, targetPos, vecOut, noFound) && (!blockingUnit || timeSpentBlocked > maxBlockTime);
+                //if the unit is next to the target, stop asking the pathfinder how to get there, it's a waste of CPU
+                //TODO maybe stop moving too?
+                if(withinAttackRange){
+                    move = true;
+                    noFound[0] = false;
+                    vecOut.set(vecMovePos);
+                }else{
+                    move = controlPath.getPathPosition(unit, vecMovePos, targetPos, vecOut, noFound) && (!blockingUnit || timeSpentBlocked > maxBlockTime);
+                }
+
                 //rare case where unit must be perfectly aligned (happens with 1-tile gaps)
                 alwaysArrive = vecOut.epsilonEquals(unit.tileX() * tilesize, unit.tileY() * tilesize);
                 //we've reached the final point if the returned coordinate is equal to the supplied input
@@ -268,18 +280,16 @@ public class CommandAI extends AIController{
                 vecOut.set(vecMovePos);
             }
 
-            float engageRange = unit.type.range - 10f;
-
             if(move){
                 if(unit.type.circleTarget && attackTarget != null){
                     target = attackTarget;
                     circleAttack(80f);
                 }else{
                     moveTo(vecOut,
-                    attackTarget != null && unit.within(attackTarget, engageRange) && stance != UnitStance.ram ? engageRange :
+                    withinAttackRange ? engageRange :
                     unit.isGrounded() ? 0f :
-                    attackTarget != null && stance != UnitStance.ram ? engageRange :
-                    0f, unit.isFlying() ? 40f : 100f, false, null, isFinalPoint || alwaysArrive);
+                    attackTarget != null && stance != UnitStance.ram ? engageRange : 0f,
+                    unit.isFlying() ? 40f : 100f, false, null, isFinalPoint || alwaysArrive);
                 }
             }
 
