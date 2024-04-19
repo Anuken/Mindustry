@@ -1208,7 +1208,9 @@ public class ControlPathfinder implements Runnable{
                 }
 
                 if(request.lastTargetTile != null){
-                    Fx.breakBlock.at(request.lastTargetTile.worldx(), request.lastTargetTile.worldy(), 1);
+                    if(showDebug){
+                        Fx.breakBlock.at(request.lastTargetTile.worldx(), request.lastTargetTile.worldy(), 1);
+                    }
                     out.set(request.lastTargetTile);
                     request.lastTile = recalc ? -1 : initialTileOn.pos();
                     return true;
