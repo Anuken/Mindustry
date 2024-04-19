@@ -24,6 +24,7 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
     @Import float x, y, rotation, speedMultiplier;
     @Import UnitType type;
     @Import Team team;
+    @Import boolean disarmed;
 
     transient Leg[] legs = {};
     transient float totalLength;
