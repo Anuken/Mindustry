@@ -291,7 +291,7 @@ public class GameService{
         });
 
         Events.on(SectorLaunchLoadoutEvent.class, e -> {
-            if(!schematics.isDefaultLoadout(e.loadout)){
+            if(e.sector.planet == Planets.serpulo && !schematics.isDefaultLoadout(e.loadout)){
                 launchCoreSchematic.complete();
             }
         });
