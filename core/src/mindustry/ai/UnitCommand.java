@@ -22,7 +22,7 @@ public class UnitCommand extends MappableContent{
     /** Name of UI icon (from Icon class). */
     public final String icon;
     /** Controller that this unit will use when this command is used. Return null for "default" behavior. */
-    public final Func<Unit, AIController> controller;
+    public Func<Unit, AIController> controller;
     /** If true, this unit will automatically switch away to the move command when given a position. */
     public boolean switchToMove = true;
     /** Whether to draw the movement/attack target. */
