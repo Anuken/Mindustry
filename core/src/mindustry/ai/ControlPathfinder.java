@@ -1143,7 +1143,7 @@ public class ControlPathfinder implements Runnable{
                 boolean recalc = false;
 
                 //TODO last pos can change if the flowfield changes.
-                if(initialTileOn.pos() != request.lastTile || request.lastTargetTile == null || true){
+                if(initialTileOn.pos() != request.lastTile || request.lastTargetTile == null){
                     boolean anyNearSolid = false;
 
                     //find the next tile until one near a solid block is discovered
@@ -1361,8 +1361,7 @@ public class ControlPathfinder implements Runnable{
 
     private static boolean passable(int team, PathCost cost, int pos){
         int amount = cost.getCost(team, pathfinder.tiles[pos]);
-        //edge case: naval reports costs of 6000+ for non-liquids, even though they are not technically passable
-        return amount != impassable && !(cost == costNaval && amount >= 6000);
+        return amount < 50;
     }
 
     private static boolean solid(int team, PathCost type, int x, int y){
@@ -1371,7 +1370,7 @@ public class ControlPathfinder implements Runnable{
 
     private static boolean solid(int team, PathCost type, int tilePos, boolean checkWall){
         int cost = cost(team, type, tilePos);
-        return cost == impassable || (checkWall && cost >= 6000);
+        return cost >= 50;
     }
 
     private static int cost(int team, PathCost cost, int tilePos){
