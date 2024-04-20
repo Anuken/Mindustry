@@ -31,7 +31,6 @@ public class ReloadTurret extends BaseTurret{
                         (c instanceof ConsumeLiquids cl2 && Structs.contains(cl2.liquids, s -> s.liquid == l)) ||
                         (c instanceof ConsumeLiquidFilter clf && clf.filter.get(l)))){
 
-                        Log.infoList(this, c, l);
                         return true;
                     }
                 }
