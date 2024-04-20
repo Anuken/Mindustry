@@ -1361,7 +1361,7 @@ public class ControlPathfinder implements Runnable{
 
     private static boolean passable(int team, PathCost cost, int pos){
         int amount = cost.getCost(team, pathfinder.tiles[pos]);
-        return amount < 50;
+        return amount != impassable && amount < 50;
     }
 
     private static boolean solid(int team, PathCost type, int x, int y){
@@ -1370,7 +1370,7 @@ public class ControlPathfinder implements Runnable{
 
     private static boolean solid(int team, PathCost type, int tilePos, boolean checkWall){
         int cost = cost(team, type, tilePos);
-        return cost >= 50;
+        return cost == impassable || cost >= 50;
     }
 
     private static int cost(int team, PathCost cost, int tilePos){
