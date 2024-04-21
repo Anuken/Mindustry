@@ -23,6 +23,7 @@ import static mindustry.ai.Pathfinder.*;
 //https://www.gameaipro.com/GameAIPro/GameAIPro_Chapter23_Crowd_Pathfinding_and_Steering_Using_Flow_Field_Tiles.pdf
 public class ControlPathfinder implements Runnable{
     private static final int wallImpassableCap = 1_000_000;
+    private static final int solidCap = 7000;
 
     public static boolean showDebug;
 
@@ -1315,7 +1316,7 @@ public class ControlPathfinder implements Runnable{
 
     private static boolean overlap(int team, PathCost type, int x, int y, float startX, float startY, float endX, float endY, float rectSize){
         if(x < 0 || y < 0 || x >= wwidth || y >= wheight) return false;
-        if(!passable(team, type, x + y * wwidth)){
+        if(!nearPassable(team, type, x + y * wwidth)){
             return Intersector.intersectSegmentRectangleFast(startX, startY, endX, endY, x * tilesize - rectSize/2f, y * tilesize - rectSize/2f, rectSize, rectSize);
         }
         return false;
@@ -1329,7 +1330,7 @@ public class ControlPathfinder implements Runnable{
 
         while(x >= 0 && y >= 0 && x < ww && y < wh){
             if(
-            !passable(team, type, x + y * wwidth) ||
+            !nearPassable(team, type, x + y * wwidth) ||
             overlap(team, type, x + 1, y, startX, startY, endX, endY, rectSize) ||
             overlap(team, type, x - 1, y, startX, startY, endX, endY, rectSize) ||
             overlap(team, type, x, y + 1, startX, startY, endX, endY, rectSize) ||
@@ -1361,6 +1362,11 @@ public class ControlPathfinder implements Runnable{
 
     private static boolean passable(int team, PathCost cost, int pos){
         int amount = cost.getCost(team, pathfinder.tiles[pos]);
+        return amount != impassable && amount < solidCap;
+    }
+
+    private static boolean nearPassable(int team, PathCost cost, int pos){
+        int amount = cost.getCost(team, pathfinder.tiles[pos]);
         return amount != impassable && amount < 50;
     }
 
@@ -1370,7 +1376,7 @@ public class ControlPathfinder implements Runnable{
 
     private static boolean solid(int team, PathCost type, int tilePos, boolean checkWall){
         int cost = cost(team, type, tilePos);
-        return cost == impassable || cost >= 50;
+        return cost == impassable || cost >= solidCap;
     }
 
     private static int cost(int team, PathCost cost, int tilePos){
