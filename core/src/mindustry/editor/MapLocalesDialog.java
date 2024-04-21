@@ -5,7 +5,6 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
-import arc.scene.ui.Button.*;
 import arc.scene.ui.TextButton.*;
 import arc.scene.ui.layout.*;
 import arc.scene.utils.*;
@@ -91,6 +90,8 @@ public class MapLocalesDialog extends BaseDialog{
             t.button("@edit", Icon.edit, this::editDialog).size(210f, 64f);
         }).growX();
 
+        resized(this::buildMain);
+
         buttons.button("?", () -> ui.showInfo("@locales.info")).size(60f, 64f).uniform();
 
         shown(this::setup);
@@ -158,7 +159,7 @@ public class MapLocalesDialog extends BaseDialog{
 
                 saved = false;
                 buildMain();
-            }).padTop(10f).size(400f, 50f).fillX().row();
+            }).padTop(10f).size(cardWidth, 50f).fillX().row();
         }).right();
     }
 
@@ -184,7 +185,7 @@ public class MapLocalesDialog extends BaseDialog{
 
                         selectedLocale = name;
                         buildTables();
-                    }).update(b -> b.setChecked(selectedLocale.equals(name))).size(300f, 50f);
+                    }).update(b -> b.setChecked(selectedLocale.equals(name))).width(200f).minHeight(50f);
                     p.button(Icon.edit, Styles.flati, () -> localeEditDialog(name)).size(50f);
                     p.button(Icon.trash, Styles.flati, () -> ui.showConfirm("@confirm", "@locales.deletelocale", () -> {
                         locales.remove(name);
@@ -196,7 +197,7 @@ public class MapLocalesDialog extends BaseDialog{
                 }
             }
         }).row();
-        langs.button("@add", Icon.add, this::addLocaleDialog).padTop(10f).width(400f);
+        langs.button("@add", Icon.add, this::addLocaleDialog).padTop(10f).width(250f);
     }
 
     private void buildMain(){
@@ -206,7 +207,7 @@ public class MapLocalesDialog extends BaseDialog{
 
         main.image().color(Pal.gray).height(3f).growX().expandY().top().row();
         main.pane(p -> {
-            int cols = Math.max(1, (Core.graphics.getWidth() - 630) / ((int)cardWidth + 10));
+            int cols = Math.max(1, (int)((Core.graphics.getWidth() / Scl.scl() - 410f) / cardWidth) - 1);
             if(props.size == 0){
                 main.add("@empty").center().row();
                 return;
@@ -512,7 +513,7 @@ public class MapLocalesDialog extends BaseDialog{
 
         propView.image().color(Pal.gray).height(3f).fillX().top().row();
         propView.pane(p -> {
-            int cols = (Core.graphics.getWidth() - 100) / ((int)cardWidth + 10);
+            int cols = Math.max(1, (int)((Core.graphics.getWidth() / Scl.scl() - 100f) / cardWidth));
             if(cols == 0){
                 propView.add("@empty").center().row();
                 return;
@@ -720,7 +721,9 @@ public class MapLocalesDialog extends BaseDialog{
         if(!locales.containsKey(key)) return "";
 
         for(var prop : locales.get(key).entries()){
-            data.append(prop.key).append(" = ").append(prop.value).append("\n");
+            // Convert \n in plain text to \\n, then convert newlines to \n
+            data.append(prop.key).append(" = ").append(prop.value
+            .replace("\\n", "\\\\n").replace("\n", "\\n")).append("\n");
         }
 
         return data.toString();
@@ -738,7 +741,9 @@ public class MapLocalesDialog extends BaseDialog{
             }else{
                 int sepIndex = line.indexOf(" = ");
                 if(sepIndex != -1 && !currentLocale.isEmpty()){
-                    bundles.get(currentLocale).put(line.substring(0, sepIndex), line.substring(sepIndex + 3));
+                    // Convert \n in file to newlines in text, then revert newlines with escape characters
+                    bundles.get(currentLocale).put(line.substring(0, sepIndex), line.substring(sepIndex + 3)
+                    .replace("\\n", "\n").replace("\\\n", "\\n"));
                 }
             }
         }
@@ -752,7 +757,9 @@ public class MapLocalesDialog extends BaseDialog{
         for(var line : data.split("\\r?\\n|\\r")){
             int sepIndex = line.indexOf(" = ");
             if(sepIndex != -1){
-                map.put(line.substring(0, sepIndex), line.substring(sepIndex + 3));
+                // Convert \n in file to newlines in text, then revert newlines with escape characters
+                map.put(line.substring(0, sepIndex), line.substring(sepIndex + 3)
+                .replace("\\n", "\n").replace("\\\n", "\\n"));
             }
         }
 

@@ -227,7 +227,7 @@ public class AIController implements UnitController{
     }
 
     public Teamc target(float x, float y, float range, boolean air, boolean ground){
-        return Units.closestTarget(unit.team, x, y, range, u -> u.checkTarget(air, ground), t -> ground);
+        return Units.closestTarget(unit.team, x, y, range, u -> u.checkTarget(air, ground), t -> ground && (unit.type.targetUnderBlocks || !t.block.underBullets));
     }
 
     public boolean retarget(){
@@ -341,7 +341,7 @@ public class AIController implements UnitController{
             vec.setLength(speed * length);
         }
 
-        //do not move when infinite vectors are used or if its zero.
+        //ignore invalid movement values
         if(vec.isNaN() || vec.isInfinite() || vec.isZero()) return;
 
         if(!unit.type.omniMovement && unit.type.rotateMoveFirst){

@@ -451,7 +451,7 @@ public class DesktopInput extends InputHandler{
                 cursorType = cursor.build.getCursor();
             }
 
-            if(cursor.build != null && cursor.build.team == Team.derelict && Build.validPlace(cursor.block(), player.team(), cursor.build.tileX(), cursor.build.tileY(), cursor.build.rotation)){
+            if(cursor.build != null && player.team() != Team.derelict && cursor.build.team == Team.derelict && Build.validPlace(cursor.block(), player.team(), cursor.build.tileX(), cursor.build.tileY(), cursor.build.rotation)){
                 cursorType = ui.repairCursor;
             }
 
@@ -568,7 +568,7 @@ public class DesktopInput extends InputHandler{
             schematicY += shiftY;
         }
 
-        if(Core.input.keyTap(Binding.deselect) && !isPlacing() && player.unit().plans.isEmpty() && !commandMode){
+        if(Core.input.keyTap(Binding.deselect) && !ui.minimapfrag.shown() && !isPlacing() && player.unit().plans.isEmpty() && !commandMode){
             player.unit().mineTile = null;
         }
 

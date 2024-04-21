@@ -402,7 +402,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         return type.allowLegStep && type.legPhysicsLayer ? PhysicsProcess.layerLegs : isGrounded() ? PhysicsProcess.layerGround : PhysicsProcess.layerFlying;
     }
 
-    /** @return pathfinder path type for calculating costs */
+    /** @return pathfinder path type for calculating costs. This is used for wave AI only. (TODO: remove) */
     public int pathType(){
         return Pathfinder.costGround;
     }
@@ -671,6 +671,11 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         return type.fullIcon;
     }
 
+    /** @return a preview UI icon for this unit. */
+    public TextureRegion uiIcon(){
+        return type.uiIcon;
+    }
+
     /** Actually destroys the unit, removing it and creating explosions. **/
     public void destroy(){
         if(!isAdded() || !type.killable) return;
@@ -734,7 +739,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     /** @return name of direct or indirect player controller. */
     @Override
     public @Nullable String getControllerName(){
-        if(isPlayer()) return getPlayer().name;
+        if(isPlayer()) return getPlayer().coloredName();
         if(controller instanceof LogicAI ai && ai.controller != null) return ai.controller.lastAccessed;
         return null;
     }

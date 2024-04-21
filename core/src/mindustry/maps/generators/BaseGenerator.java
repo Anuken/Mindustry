@@ -47,20 +47,20 @@ public class BaseGenerator{
         if(bases.cores.isEmpty()) return;
 
         Mathf.rand.setSeed(sector.id);
+        Mathf.rand.nextDouble();
 
         float bracketRange = 0.17f;
         float baseChance = Mathf.lerp(0.7f, 2.1f, difficulty);
         int wallAngle = 70; //180 for full coverage
         double resourceChance = 0.5 * baseChance;
         double nonResourceChance = 0.002 * baseChance;
-        BasePart coreschem = bases.cores.getFrac(difficulty);
         int passes = difficulty < 0.4 ? 1 : difficulty < 0.8 ? 3 : 5;
 
         Block wall = getDifficultyWall(1, difficulty), wallLarge = getDifficultyWall(2, difficulty);
 
         for(Tile tile : cores){
             tile.clearOverlay();
-            Schematics.placeLoadout(coreschem.schematic, tile.x, tile.y, team, false);
+            Schematics.placeLoadout(bases.cores.getFrac((difficulty + Mathf.rand.range(0.4f)) / 1.4f).schematic, tile.x, tile.y, team, false);
 
             //fill core with every type of item (even non-material)
             Building entity = tile.build;
@@ -81,7 +81,7 @@ public class BaseGenerator{
                         tryPlace(parts.getFrac(difficulty + Mathf.range(bracketRange)), tile.x, tile.y, team);
                     }
                 }else if(Mathf.chance(nonResourceChance)){
-                    tryPlace(bases.parts.getFrac(Mathf.random(1f)), tile.x, tile.y, team);
+                    tryPlace(bases.parts.getFrac(Mathf.rand.random(1f)), tile.x, tile.y, team);
                 }
             });
         }
@@ -235,7 +235,7 @@ public class BaseGenerator{
                             set(placed, item);
                         }
 
-                        Tile rand = world.tiles.getc(ex + Mathf.range(1), ey + Mathf.range(1));
+                        Tile rand = world.tiles.getc(ex + Mathf.rand.range(1), ey + Mathf.rand.range(1));
                         if(rand.floor().hasSurface()){
                             //random ores nearby to make it look more natural
                             set(rand, item);

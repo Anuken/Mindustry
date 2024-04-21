@@ -1181,6 +1181,7 @@ public class Blocks{
             rotate = true;
             invertFlip = true;
             group = BlockGroup.liquids;
+            itemCapacity = 0;
 
             liquidCapacity = 50f;
 
@@ -1231,6 +1232,7 @@ public class Blocks{
             }});
 
             researchCostMultiplier = 1.1f;
+            itemCapacity = 0;
             liquidCapacity = 40f;
             consumePower(2f);
             ambientSound = Sounds.extractLoop;
@@ -2782,6 +2784,7 @@ public class Blocks{
             ambientSoundVolume = 0.06f;
             hasLiquids = true;
             boostScale = 1f / 9f;
+            itemCapacity = 0;
             outputLiquid = new LiquidStack(Liquids.water, 30f / 60f);
             consumePower(0.5f);
             liquidCapacity = 60f;
@@ -4046,7 +4049,7 @@ public class Blocks{
             researchCostMultiplier = 0.05f;
 
             coolant = consume(new ConsumeLiquid(Liquids.water, 15f / 60f));
-            limitRange();
+            limitRange(12f);
         }};
 
         diffuse = new ItemTurret("diffuse"){{
@@ -4105,7 +4108,7 @@ public class Blocks{
             rotateSpeed = 3f;
 
             coolant = consume(new ConsumeLiquid(Liquids.water, 15f / 60f));
-            limitRange();
+            limitRange(16f);
         }};
 
         sublimate = new ContinuousLiquidTurret("sublimate"){{
@@ -4355,7 +4358,7 @@ public class Blocks{
             coolant = consume(new ConsumeLiquid(Liquids.water, 20f / 60f));
             coolantMultiplier = 2.5f;
 
-            limitRange(-5f);
+            limitRange(5f);
         }};
 
         afflict = new PowerTurret("afflict"){{
@@ -4567,6 +4570,7 @@ public class Blocks{
                     loopSoundVolume = 0.6f;
                     deathSound = Sounds.largeExplosion;
                     targetAir = false;
+                    targetUnderBlocks = false;
 
                     fogRadius = 6f;
 
@@ -5501,23 +5505,6 @@ public class Blocks{
             );
         }};
 
-        mechRefabricator = new Reconstructor("mech-refabricator"){{
-            requirements(Category.units, with(Items.beryllium, 250, Items.tungsten, 120, Items.silicon, 150));
-            regionSuffix = "-dark";
-
-            size = 3;
-            consumePower(2.5f);
-            consumeLiquid(Liquids.hydrogen, 3f / 60f);
-            consumeItems(with(Items.silicon, 50, Items.tungsten, 40));
-
-            constructTime = 60f * 45f;
-            researchCostMultiplier = 0.75f;
-
-            upgrades.addAll(
-            new UnitType[]{UnitTypes.merui, UnitTypes.cleroi}
-            );
-        }};
-
         shipRefabricator = new Reconstructor("ship-refabricator"){{
             requirements(Category.units, with(Items.beryllium, 200, Items.tungsten, 100, Items.silicon, 150, Items.oxide, 40));
             regionSuffix = "-dark";
@@ -5534,6 +5521,23 @@ public class Blocks{
             );
 
             researchCost = with(Items.beryllium, 500, Items.tungsten, 200, Items.silicon, 300, Items.oxide, 80);
+        }};
+
+        mechRefabricator = new Reconstructor("mech-refabricator"){{
+            requirements(Category.units, with(Items.beryllium, 250, Items.tungsten, 120, Items.silicon, 150));
+            regionSuffix = "-dark";
+
+            size = 3;
+            consumePower(2.5f);
+            consumeLiquid(Liquids.hydrogen, 3f / 60f);
+            consumeItems(with(Items.silicon, 50, Items.tungsten, 40));
+
+            constructTime = 60f * 45f;
+            researchCostMultiplier = 0.75f;
+
+            upgrades.addAll(
+            new UnitType[]{UnitTypes.merui, UnitTypes.cleroi}
+            );
         }};
 
         //yes very silly name
@@ -5790,6 +5794,8 @@ public class Blocks{
             heatOutput = 1000f;
             warmupRate = 1000f;
             regionRotated1 = 1;
+            itemCapacity = 0;
+            alwaysUnlocked = true;
             ambientSound = Sounds.none;
         }};
 

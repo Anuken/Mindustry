@@ -50,6 +50,7 @@ public class Build{
         if(tile.build != null){
             prevBuild.add(tile.build);
             tile.build.onDeconstructed(unit);
+            tile.build.dead = true;
         }
 
         tile.setBlock(sub, team, rotation);
@@ -122,6 +123,14 @@ public class Build{
             }
         });
 
+        //complete it immediately
+        if(result.instantBuild){
+            Events.fire(new BlockBuildBeginEvent(tile, team, unit, false));
+            result.placeBegan(tile, tile.block, unit);
+            ConstructBlock.constructFinish(tile, result, unit, (byte)rotation, team, null);
+            return;
+        }
+
         Block previous = tile.block();
         Block sub = ConstructBlock.get(result.size);
         var prevBuild = new Seq<Building>(9);
@@ -190,16 +199,17 @@ public class Build{
 
         if(tile == null) return false;
 
+        //floors have different checks
+        if(type.isFloor()){
+            return type.isOverlay() ? tile.overlay() != type : tile.floor() != type;
+        }
+
         //campaign darkness check
         if(world.getDarkness(x, y) >= 3){
             return false;
         }
 
         if(!type.requiresWater && !contactsShallows(tile.x, tile.y, type) && !type.placeableLiquid){
-            return false;
-        }
-
-        if((type.isFloor() && tile.floor() == type) || (type.isOverlay() && tile.overlay() == type)){
             return false;
         }
 
@@ -223,7 +233,7 @@ public class Build{
                 (check.floor().isDeep() && !type.floating && !type.requiresWater && !type.placeableLiquid) || //deep water
                 (type == check.block() && check.build != null && rotation == check.build.rotation && type.rotate && !((type == check.block && check.team() == Team.derelict))) || //same block, same rotation
                 !check.interactable(team) || //cannot interact
-                !check.floor().placeableOn || //solid wall
+                !check.floor().placeableOn  || //solid floor
                 (!checkVisible && !check.block().alwaysReplace) || //replacing a block that should be replaced (e.g. payload placement)
                     !(((type.canReplace(check.block()) || (type == check.block && state.rules.derelictRepair && check.team() == Team.derelict)) || //can replace type OR can replace derelict block of same type
                         (check.build instanceof ConstructBuild build && build.current == type && check.centerX() == tile.x && check.centerY() == tile.y)) && //same type in construction

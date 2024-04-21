@@ -42,6 +42,11 @@ public class SwitchBlock extends Block{
             if(privileged) return;
             super.damage(damage);
         }
+        
+        @Override
+        public boolean canPickup(){
+            return !privileged;
+        }
 
         @Override
         public boolean collide(Bullet other){
