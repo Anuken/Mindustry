@@ -1367,7 +1367,9 @@ public class ControlPathfinder implements Runnable{
 
     private static boolean nearPassable(int team, PathCost cost, int pos){
         int amount = cost.getCost(team, pathfinder.tiles[pos]);
-        return amount != impassable && amount < 50;
+        //for standard units: never consider deep water (cost = 6000) passable
+        //for leg units: consider it passable
+        return amount != impassable && amount < (cost == costLegs ? solidCap : 50);
     }
 
     private static boolean solid(int team, PathCost type, int x, int y){
