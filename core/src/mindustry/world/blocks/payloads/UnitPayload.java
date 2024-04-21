@@ -14,6 +14,7 @@ import mindustry.entities.EntityCollisions.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.type.*;
 
 import static mindustry.Vars.*;
@@ -153,6 +154,8 @@ public class UnitPayload implements Payload{
 
         //draw warning
         if(overlayTime > 0){
+            float z = Draw.z();
+            Draw.z(Layer.groundUnit + 1f);
             var region = overlayRegion == null ? Icon.warning.getRegion() : overlayRegion;
             Draw.color(Color.scarlet);
             Draw.alpha(0.8f * Interp.exp5Out.apply(overlayTime));
@@ -163,6 +166,7 @@ public class UnitPayload implements Payload{
             Draw.reset();
 
             overlayTime = Math.max(overlayTime - Time.delta/overlayDuration, 0f);
+            Draw.z(z);
         }
     }
 
