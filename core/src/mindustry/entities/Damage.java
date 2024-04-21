@@ -175,21 +175,23 @@ public class Damage{
 
         distances.clear();
 
-        World.raycast(b.tileX(), b.tileY(), World.toTile(b.x + vec.x), World.toTile(b.y + vec.y), (x, y) -> {
-            //add distance to list so it can be processed
-            var build = world.build(x, y);
+        if(b.type.collidesGround && b.type.collidesTiles){
+            World.raycast(b.tileX(), b.tileY(), World.toTile(b.x + vec.x), World.toTile(b.y + vec.y), (x, y) -> {
+                //add distance to list so it can be processed
+                var build = world.build(x, y);
 
-            if(build != null && build.team != b.team && build.collide(b) && b.checkUnderBuild(build, x * tilesize, y * tilesize)){
-                distances.add(b.dst(build));
+                if(build != null && build.team != b.team && build.collide(b) && b.checkUnderBuild(build, x * tilesize, y * tilesize)){
+                    distances.add(b.dst(build));
 
-                if(laser && build.absorbLasers()){
-                    maxDst = Math.min(maxDst, b.dst(build));
-                    return true;
+                    if(laser && build.absorbLasers()){
+                        maxDst = Math.min(maxDst, b.dst(build));
+                        return true;
+                    }
                 }
-            }
 
-            return false;
-        });
+                return false;
+            });
+        }
 
         Units.nearbyEnemies(b.team, rect, u -> {
             u.hitbox(hitrect);
@@ -247,7 +249,7 @@ public class Damage{
         collidedBlocks.clear();
         vec.trnsExact(angle, length);
 
-        if(hitter.type.collidesGround){
+        if(hitter.type.collidesGround && hitter.type.collidesTiles){
             seg1.set(x, y);
             seg2.set(seg1).add(vec);
             World.raycastEachWorld(x, y, seg2.x, seg2.y, (cx, cy) -> {
