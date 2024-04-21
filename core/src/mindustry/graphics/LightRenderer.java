@@ -199,7 +199,7 @@ public class LightRenderer{
         Draw.color();
         buffer.begin(Color.clear);
         Draw.sort(false);
-        Gl.blendEquationSeparate(Gl.funcAdd, Gl.max);
+        Gl.blendEquationSeparate(Gl.funcAdd, Gl.funcAdd);
         //apparently necessary
         Blending.normal.apply();
 
