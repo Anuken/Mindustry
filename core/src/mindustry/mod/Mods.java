@@ -533,11 +533,18 @@ public class Mods implements Loadable{
     private void updateDependencies(LoadedMod mod){
         mod.dependencies.clear();
         mod.missingDependencies.clear();
+        mod.missingSoftDependencies.clear();
         mod.dependencies = mod.meta.dependencies.map(this::locateMod);
+        mod.softDependencies = mod.meta.softDependencies.map(this::locateMod);
 
         for(int i = 0; i < mod.dependencies.size; i++){
             if(mod.dependencies.get(i) == null){
                 mod.missingDependencies.add(mod.meta.dependencies.get(i));
+            }
+        }
+        for(int i = 0; i < mod.softDependencies.size; i++){
+            if(mod.softDependencies.get(i) == null){
+                mod.missingSoftDependencies.add(mod.meta.softDependencies.get(i));
             }
         }
     }
@@ -653,12 +660,12 @@ public class Mods implements Loadable{
         Seq<LoadedMod> toCheck = mods.select(mod -> mod.shouldBeEnabled() && mod.hasUnmetDependencies());
         if(!toCheck.isEmpty()){
             ui.loadfrag.hide();
-            checkDependencies(toCheck);
+            checkDependencies(toCheck, false);
         }
     }
 
     /** Assume mods in toCheck are missing dependencies. */
-    private void checkDependencies(Seq<LoadedMod> toCheck){
+    private void checkDependencies(Seq<LoadedMod> toCheck, boolean soft){
         new Dialog(""){{
             setFillParent(true);
             cont.margin(15);
@@ -675,6 +682,12 @@ public class Mods implements Loadable{
                             d.add(dep).wrap().growX().left().labelAlign(Align.left);
                             d.row();
                         });
+                        if(soft){
+                            mod.missingSoftDependencies.each(dep -> {
+                                d.add(dep + " " + Core.bundle.get("mod.dependencies.soft")).wrap().growX().left().labelAlign(Align.left);
+                                d.row();
+                            });
+                        }
                     }).growX().padBottom(8f).padLeft(12f);
                     p.row();
                 });
@@ -682,13 +695,22 @@ public class Mods implements Loadable{
 
             cont.row();
 
-            cont.button("@ok", this::hide).size(150, 50);
-            cont.button("@mod.dependencies.download", () -> {
+            cont.button("@cancel", this::hide).size(soft ? 100 : 150, 50);
+            cont.button(soft ? "@mod.dependencies.downloadall" : "@mod.dependencies.download", () -> {
                 hide();
                 Seq<String> toImport = new Seq<>();
                 toCheck.each(mod -> mod.missingDependencies.each(toImport::addUnique));
                 downloadDependencies(toImport);
-            }).size(150, 50);
+            }).size(soft ? 100 : 150, 50);
+            if(soft){
+                cont.button("@mod.dependencies.downloadall", () -> {
+                    hide();
+                    Seq<String> toImport = new Seq<>();
+                    toCheck.each(mod -> mod.missingDependencies.each(toImport::addUnique));
+                    toCheck.each(mod -> mod.missingSoftDependencies.each(toImport::addUnique));
+                    downloadDependencies(toImport);
+                }).size(100, 50);
+            }
         }}.show();
     }
 
@@ -755,7 +777,7 @@ public class Mods implements Loadable{
 
     public void reload(){
         if(newImports.any()){
-            checkDependencies(newImports);
+            checkDependencies(newImports, true);
         }else{
             ui.showInfoOnHidden("@mods.reloadexit", () -> {
                 Log.info("Exiting to reload mods.");
@@ -990,12 +1012,10 @@ public class Mods implements Loadable{
 
     /** Checks if a newly imported mod's dependencies are already added. */
     public void loadImportDependencies(LoadedMod mod){
-        if(mod.meta.dependencies.isEmpty()) return;
-        Seq<String> missing = mod.meta.dependencies.select(m -> getMod(m) == null);
-        if(missing.isEmpty()) return;
-
-        mod.missingDependencies = missing;
-        newImports.add(mod);
+        updateDependencies(mod);
+        if(mod.missingDependencies.any() || mod.missingSoftDependencies.any()){
+            newImports.add(mod);
+        }
     }
 
     private boolean resolve(String element, ModResolutionContext context){
@@ -1168,8 +1188,12 @@ public class Mods implements Loadable{
         public final ModMeta meta;
         /** This mod's dependencies as already-loaded mods. */
         public Seq<LoadedMod> dependencies = new Seq<>();
-        /** All missing dependencies of this mod as strings. */
+        /** This mod's soft dependencies as already-loaded mods. */
+        public Seq<LoadedMod> softDependencies = new Seq<>();
+        /** All missing required dependencies of this mod as strings. */
         public Seq<String> missingDependencies = new Seq<>();
+        /** All missing soft dependencies of this mod as strings. */
+        public Seq<String> missingSoftDependencies = new Seq<>();
         /** Content with initialization code. */
         public ObjectSet<Content> erroredContent = new ObjectSet<>();
         /** Current state of this mod. */
