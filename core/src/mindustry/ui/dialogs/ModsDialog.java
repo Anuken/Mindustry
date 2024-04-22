@@ -362,10 +362,7 @@ public class ModsDialog extends BaseDialog{
     }
 
     private void reload(){
-        ui.showInfoOnHidden("@mods.reloadexit", () -> {
-            Log.info("Exiting to reload mods.");
-            Core.app.exit();
-        });
+        ui.showInfoOnHidden("@mods.reloadexit", () -> mods.reload());
     }
 
     private void showMod(LoadedMod mod){
@@ -626,7 +623,7 @@ public class ModsDialog extends BaseDialog{
 
             var mod = mods.importMod(file);
             mod.setRepo(repo);
-            mods.checkImportDependencies(mod);
+            mods.loadImportDependencies(mod);
             file.delete();
             Core.app.post(() -> {
 

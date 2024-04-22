@@ -50,6 +50,7 @@ public class Mods implements Loadable{
     private ModClassLoader mainLoader = new ModClassLoader(getClass().getClassLoader());
 
     Seq<LoadedMod> mods = new Seq<>();
+    private Seq<LoadedMod> newImports = new Seq<>();
     private ObjectMap<Class<?>, ModMeta> metas = new ObjectMap<>();
     private boolean requiresReload;
 
@@ -422,6 +423,7 @@ public class Mods implements Loadable{
             return;
         }
         mods.remove(mod);
+        newImports.remove(mod);
         mod.dispose();
         requiresReload = true;
     }
@@ -648,53 +650,57 @@ public class Mods implements Loadable{
         }
 
         //show list of missing dependencies
-        if(mods.contains(mod -> mod.shouldBeEnabled() && mod.hasUnmetDependencies())){
+        Seq<LoadedMod> toCheck = mods.select(mod -> mod.shouldBeEnabled() && mod.hasUnmetDependencies());
+        if(!toCheck.isEmpty()){
             ui.loadfrag.hide();
-            new Dialog(""){{
-                setFillParent(true);
-                cont.margin(15);
-                cont.add("@mod.dependencies.error").colspan(2);
-                cont.row();
-                cont.image().width(300f).colspan(2).pad(2).height(4f).color(Color.scarlet);
-                cont.row();
-                cont.pane(p -> {
-                    mods.each(mod -> mod.shouldBeEnabled() && mod.hasUnmetDependencies(), mod -> {
-                        p.add(mod.meta.displayName).wrap().growX().left().labelAlign(Align.left);
-                        p.row();
-                        p.table(d -> {
-                            mod.missingDependencies.each(dep -> {
-                                d.add(dep).wrap().growX().left().labelAlign(Align.left);
-                                d.row();
-                            });
-                        }).growX().padBottom(8f).padLeft(12f);
-                        p.row();
-                    });
-                }).fillX().colspan(2);
-
-                cont.row();
-
-                cont.button("@ok", this::hide).size(150, 50);
-                cont.button("@mod.dependencies.download", () -> {
-                    hide();
-                    Seq<String> toImport = new Seq<>();
-                    mods.each(mod -> mod.shouldBeEnabled() && mod.hasUnmetDependencies(), mod -> {
-                        mod.missingDependencies.each(toImport::addUnique);
-                    });
-                    downloadDependencies(toImport, true);
-                }).size(150, 50);
-            }}.show();
+            checkDependencies(toCheck);
         }
     }
 
-    private void downloadDependencies(Seq<String> toImport, boolean startup){
+    private void checkDependencies(Seq<LoadedMod> toCheck){
+        new Dialog(""){{
+            setFillParent(true);
+            cont.margin(15);
+            cont.add("@mod.dependencies.error").colspan(2);
+            cont.row();
+            cont.image().width(300f).colspan(2).pad(2).height(4f).color(Color.scarlet);
+            cont.row();
+            cont.pane(p -> {
+                toCheck.each(mod -> {
+                    p.add(mod.meta.displayName).wrap().growX().left().labelAlign(Align.left);
+                    p.row();
+                    p.table(d -> {
+                        mod.missingDependencies.each(dep -> {
+                            d.add(dep).wrap().growX().left().labelAlign(Align.left);
+                            d.row();
+                        });
+                    }).growX().padBottom(8f).padLeft(12f);
+                    p.row();
+                });
+            }).fillX().colspan(2);
+
+            cont.row();
+
+            cont.button("@ok", this::hide).size(150, 50);
+            cont.button("@mod.dependencies.download", () -> {
+                hide();
+                Seq<String> toImport = new Seq<>();
+                toCheck.each(mod -> mod.missingDependencies.each(toImport::addUnique));
+                downloadDependencies(toImport);
+            }).size(150, 50);
+        }}.show();
+    }
+
+    private void downloadDependencies(Seq<String> toImport){
         Seq<String> remaining = toImport.copy();
         ui.mods.importDependencies(remaining, () -> {
             toImport.removeAll(remaining);
-            displayDependencyImportStatus(remaining, toImport, startup);
+            if(toImport.any()) requiresReload = true;
+            displayDependencyImportStatus(remaining, toImport);
         });
     }
 
-    private void displayDependencyImportStatus(Seq<String> failed, Seq<String> success, boolean startup){
+    private void displayDependencyImportStatus(Seq<String> failed, Seq<String> success){
         new Dialog(""){{
             setFillParent(true);
             cont.margin(15);
@@ -730,7 +736,7 @@ public class Mods implements Loadable{
             }).fillX();
             cont.row();
 
-            if(startup && success.any()){
+            if(success.any()){
                 cont.image().width(300f).pad(2).height(4f).color(Color.lightGray);
                 cont.row();
                 cont.add("@mods.reloadexit").center();
@@ -746,11 +752,13 @@ public class Mods implements Loadable{
         }}.show();
     }
 
-    private void reload(){
-        ui.showInfoOnHidden("@mods.reloadexit", () -> {
+    public void reload(){
+        if(newImports.any()){
+            checkDependencies(newImports);
+        }else{
             Log.info("Exiting to reload mods.");
             Core.app.exit();
-        });
+        }
     }
 
     public boolean hasContentErrors(){
@@ -978,19 +986,13 @@ public class Mods implements Loadable{
     }
 
     /** Checks if a newly imported mod's dependencies are already added. */
-    public void checkImportDependencies(LoadedMod mod){
+    public void loadImportDependencies(LoadedMod mod){
         if(mod.meta.dependencies.isEmpty()) return;
         Seq<String> missing = mod.meta.dependencies.select(m -> getMod(m) == null);
         if(missing.isEmpty()) return;
-        StringBuilder list = new StringBuilder();
-        for(int i = 0; i < missing.size; i++){
-            if(i > 0) list.append("\n");
-            list.append(missing.get(i));
-        }
 
-        ui.showConfirm("@mod.dependencies.imported", list.toString(), () -> {
-            downloadDependencies(missing, false);
-        });
+        mod.missingDependencies = missing;
+        newImports.add(mod);
     }
 
     private boolean resolve(String element, ModResolutionContext context){
