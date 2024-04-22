@@ -166,7 +166,7 @@ public class MinimapRenderer{
             if(unit.inFogTo(player.team()) || !unit.type.drawMinimap) continue;
 
             float scale = Scl.scl(1f) * tilesize * 3;
-            var region = unit.uiIcon();
+            var region = unit.icon();
 
             Draw.mixcol(unit.team.color, 1f);
             Draw.rect(region, unit.x, unit.y, scale, scale * (float)region.height / region.width, unit.rotation() - 90);

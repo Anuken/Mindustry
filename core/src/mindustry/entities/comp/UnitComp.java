@@ -666,13 +666,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         }
     }
 
-    /** @return a preview icon for this unit. */
-    public TextureRegion icon(){
-        return type.fullIcon;
-    }
-
     /** @return a preview UI icon for this unit. */
-    public TextureRegion uiIcon(){
+    public TextureRegion icon(){
         return type.uiIcon;
     }
 

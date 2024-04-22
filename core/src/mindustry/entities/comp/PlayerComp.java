@@ -74,7 +74,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         //display default icon for dead players
         if(dead()) return core() == null ? UnitTypes.alpha.uiIcon : ((CoreBlock)bestCore().block).unitType.uiIcon;
 
-        return unit.uiIcon();
+        return unit.icon();
     }
 
     public boolean displayAmmo(){
