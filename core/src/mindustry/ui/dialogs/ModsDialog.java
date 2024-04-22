@@ -619,7 +619,6 @@ public class ModsDialog extends BaseDialog{
 
             var mod = mods.importMod(file);
             mod.setRepo(repo);
-            mods.loadImportDependencies(mod);
             file.delete();
             Core.app.post(() -> {
 

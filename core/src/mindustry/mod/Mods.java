@@ -117,6 +117,7 @@ public class Mods implements Loadable{
 
             var loaded = loadMod(dest, true, true);
             mods.add(loaded);
+            newImports.add(loaded);
             //invalidate ordered mods cache
             lastOrderedMods = null;
             requiresReload = true;
@@ -772,10 +773,14 @@ public class Mods implements Loadable{
             }
 
             cont.button("@ok", this::hide).size(300, 50);
+            closeOnBack();
         }}.show();
     }
 
     public void reload(){
+        newImports.each(this::updateDependencies);
+        newImports.remove(m -> m.missingDependencies.isEmpty() && m.softDependencies.isEmpty());
+
         if(newImports.any()){
             checkDependencies(newImports, true);
         }else{
@@ -1008,14 +1013,6 @@ public class Mods implements Loadable{
         }
         result.putAll(context.invalid);
         return result;
-    }
-
-    /** Checks if a newly imported mod's dependencies are already added. */
-    public void loadImportDependencies(LoadedMod mod){
-        updateDependencies(mod);
-        if(mod.missingDependencies.any() || mod.missingSoftDependencies.any()){
-            newImports.add(mod);
-        }
     }
 
     private boolean resolve(String element, ModResolutionContext context){
