@@ -648,7 +648,7 @@ public class Mods implements Loadable{
         }
 
         //show list of missing dependencies
-        if(mods.contains(LoadedMod::hasUnmetDependencies)){
+        if(mods.contains(mod -> mod.shouldBeEnabled() && mod.hasUnmetDependencies())){
             ui.loadfrag.hide();
             new Dialog(""){{
                 setFillParent(true);
