@@ -783,7 +783,7 @@ public class Mods implements Loadable{
         newImports.remove(m -> m.missingDependencies.isEmpty() && m.softDependencies.isEmpty());
 
         if(newImports.any()){
-            checkDependencies(newImports, true);
+            checkDependencies(newImports, newImports.contains(m -> m.softDependencies.any()));
         }else{
             ui.showInfoOnHidden("@mods.reloadexit", () -> {
                 Log.info("Exiting to reload mods.");
