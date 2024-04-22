@@ -680,17 +680,21 @@ public class Mods implements Loadable{
                     mods.each(mod -> mod.shouldBeEnabled() && mod.hasUnmetDependencies(), mod -> {
                         mod.missingDependencies.each(toImport::addUnique);
                     });
-                    Seq<String> remaining = toImport.copy();
-                    ui.mods.importDependencies(remaining, () -> {
-                        toImport.removeAll(remaining);
-                        displayDependencyImportStatus(remaining, toImport);
-                    });
+                    downloadDependencies(toImport, true);
                 }).size(150, 50);
             }}.show();
         }
     }
 
-    private void displayDependencyImportStatus(Seq<String> failed, Seq<String> success){
+    private void downloadDependencies(Seq<String> toImport, boolean startup){
+        Seq<String> remaining = toImport.copy();
+        ui.mods.importDependencies(remaining, () -> {
+            toImport.removeAll(remaining);
+            displayDependencyImportStatus(remaining, toImport, startup);
+        });
+    }
+
+    private void displayDependencyImportStatus(Seq<String> failed, Seq<String> success, boolean startup){
         new Dialog(""){{
             setFillParent(true);
             cont.margin(15);
@@ -726,7 +730,7 @@ public class Mods implements Loadable{
             }).fillX();
             cont.row();
 
-            if(success.any()){
+            if(startup && success.any()){
                 cont.image().width(300f).pad(2).height(4f).color(Color.lightGray);
                 cont.row();
                 cont.add("@mods.reloadexit").center();
@@ -971,6 +975,22 @@ public class Mods implements Loadable{
         }
         result.putAll(context.invalid);
         return result;
+    }
+
+    /** Checks if a newly imported mod's dependencies are already added. */
+    public void checkImportDependencies(LoadedMod mod){
+        if(mod.meta.dependencies.isEmpty()) return;
+        Seq<String> missing = mod.meta.dependencies.select(m -> getMod(m) == null);
+        if(missing.isEmpty()) return;
+        StringBuilder list = new StringBuilder();
+        for(int i = 0; i < missing.size; i++){
+            if(i > 0) list.append("\n");
+            list.append(missing.get(i));
+        }
+
+        ui.showConfirm("@mod.dependencies.imported", list.toString(), () -> {
+            downloadDependencies(missing, false);
+        });
     }
 
     private boolean resolve(String element, ModResolutionContext context){
