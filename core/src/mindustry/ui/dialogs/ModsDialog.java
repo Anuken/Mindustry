@@ -93,7 +93,7 @@ public class ModsDialog extends BaseDialog{
 
         hidden(() -> {
             if(mods.requiresReload()){
-                reload();
+                mods.reload();
             }
         });
 
@@ -359,10 +359,6 @@ public class ModsDialog extends BaseDialog{
             return "@mod.erroredcontent.details";
         }
         return null;
-    }
-
-    private void reload(){
-        ui.showInfoOnHidden("@mods.reloadexit", () -> mods.reload());
     }
 
     private void showMod(LoadedMod mod){

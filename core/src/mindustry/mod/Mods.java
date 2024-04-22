@@ -657,6 +657,7 @@ public class Mods implements Loadable{
         }
     }
 
+    /** Assume mods in toCheck are missing dependencies. */
     private void checkDependencies(Seq<LoadedMod> toCheck){
         new Dialog(""){{
             setFillParent(true);
@@ -756,8 +757,10 @@ public class Mods implements Loadable{
         if(newImports.any()){
             checkDependencies(newImports);
         }else{
-            Log.info("Exiting to reload mods.");
-            Core.app.exit();
+            ui.showInfoOnHidden("@mods.reloadexit", () -> {
+                Log.info("Exiting to reload mods.");
+                Core.app.exit();
+            });
         }
     }
 
