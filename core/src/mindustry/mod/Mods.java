@@ -670,9 +670,10 @@ public class Mods implements Loadable{
         new Dialog(""){{
             setFillParent(true);
             cont.margin(15);
-            cont.add("@mod.dependencies.error").colspan(2);
+            int span = soft ? 3 : 2;
+            cont.add("@mod.dependencies.error").colspan(span);
             cont.row();
-            cont.image().width(300f).colspan(2).pad(2).height(4f).color(Color.scarlet);
+            cont.image().width(300f).colspan(span).pad(2).height(4f).color(Color.scarlet);
             cont.row();
             cont.pane(p -> {
                 toCheck.each(mod -> {
@@ -692,17 +693,17 @@ public class Mods implements Loadable{
                     }).growX().padBottom(8f).padLeft(12f);
                     p.row();
                 });
-            }).fillX().colspan(2);
+            }).fillX().colspan(span);
 
             cont.row();
 
-            cont.button("@cancel", this::hide).size(soft ? 100 : 150, 50);
-            cont.button(soft ? "@mod.dependencies.downloadall" : "@mod.dependencies.download", () -> {
+            cont.button("@cancel", this::hide).size(150, 50);
+            cont.button(soft ? "@mod.dependencies.downloadreq" : "@mod.dependencies.download", () -> {
                 hide();
                 Seq<String> toImport = new Seq<>();
                 toCheck.each(mod -> mod.missingDependencies.each(toImport::addUnique));
                 downloadDependencies(toImport);
-            }).size(soft ? 100 : 150, 50);
+            }).size(150, 50);
             if(soft){
                 cont.button("@mod.dependencies.downloadall", () -> {
                     hide();
@@ -710,7 +711,7 @@ public class Mods implements Loadable{
                     toCheck.each(mod -> mod.missingDependencies.each(toImport::addUnique));
                     toCheck.each(mod -> mod.missingSoftDependencies.each(toImport::addUnique));
                     downloadDependencies(toImport);
-                }).size(100, 50);
+                }).size(150, 50);
             }
         }}.show();
     }
