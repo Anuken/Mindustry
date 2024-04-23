@@ -1193,6 +1193,8 @@ public class UnitType extends UnlockableContent implements Senseable{
     public void draw(Unit unit){
         if(unit.inFogTo(Vars.player.team())) return;
 
+        unit.drawBuilding();
+
         boolean isPayload = !unit.isAdded();
 
         Mechc mech = unit instanceof Mechc ? (Mechc)unit : null;

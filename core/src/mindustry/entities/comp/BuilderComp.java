@@ -290,10 +290,6 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
         return plans.size == 0 ? null : plans.first();
     }
 
-    public void draw(){
-        drawBuilding();
-    }
-
     public void drawBuilding(){
         //TODO make this more generic so it works with builder "weapons"
         boolean active = activelyBuilding();
