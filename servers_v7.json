@@ -296,5 +296,9 @@
   {
     "name": "Mindus•VN",
     "address": ["alpha.ateex.cloud:19172"]
+  },
+  {
+    "name": "alphaVN",
+    "address": ["alpha.ateex.cloud:19172"]
   }
 ]
