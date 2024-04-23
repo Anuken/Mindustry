@@ -4108,7 +4108,7 @@ public class Blocks{
             rotateSpeed = 3f;
 
             coolant = consume(new ConsumeLiquid(Liquids.water, 15f / 60f));
-            limitRange(16f);
+            limitRange(25f);
         }};
 
         sublimate = new ContinuousLiquidTurret("sublimate"){{
