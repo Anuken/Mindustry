@@ -39,10 +39,13 @@ Server builds are bundled with each released build (in Releases). If you'd rathe
 ### Android
 
 1. Install the Android SDK [here.](https://developer.android.com/studio#command-tools) Make sure you're downloading the "Command line tools only", as Android Studio is not required.
-2. Set the `ANDROID_HOME` environment variable to point to your unzipped Android SDK directory.
-3. Run `gradlew android:assembleDebug` (or `./gradlew` if on linux/mac). This will create an unsigned APK in `android/build/outputs/apk`.
+2. In the unzipped Android SDK folder, find the cmdline-tools directory. Then create a folder inside of it called `latest` and put all of its contents into the newly created folder.
+3. In the same directory run the command `sdkmanager --licenses` (or `./sdkmanager --licenses` if on linux/mac)
+4. Set the `ANDROID_HOME` environment variable to point to your unzipped Android SDK directory.
+5. Enable developer mode on your device/emulator. If you are on testing on a phone you can follow [these instructions](https://developer.android.com/studio/command-line/adb#Enabling), otherwise you need to google how to enable your emulator's developer mode specifically.
+6. Run `gradlew android:assembleDebug` (or `./gradlew` if on linux/mac). This will create an unsigned APK in `android/build/outputs/apk`.
 
-To debug the application on a connected phone, run `gradlew android:installDebug android:run`.
+To debug the application on a connected device/emulator, run `gradlew android:installDebug android:run`.
 
 ### Troubleshooting
 

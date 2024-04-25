@@ -11,6 +11,7 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.ai.*;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.entities.*;
@@ -46,6 +47,7 @@ public class PlacementFragment{
     Table blockTable, toggler, topTable, blockCatTable, commandTable;
     Stack mainStack;
     ScrollPane blockPane;
+    Runnable rebuildCommand;
     boolean blockSelectEnd, wasCommandMode;
     int blockSelectSeq;
     long blockSelectSeqMillis;
@@ -73,6 +75,12 @@ public class PlacementFragment{
                 control.input.block = null;
                 rebuild();
             });
+        });
+
+        Events.run(Trigger.unitCommandChange, () -> {
+            if(rebuildCommand != null){
+                rebuildCommand.run();
+            }
         });
 
         Events.on(UnlockEvent.class, event -> {
@@ -105,7 +113,7 @@ public class PlacementFragment{
         return hover;
     }
 
-    void rebuild(){
+    public void rebuild(){
         //category does not change on rebuild anymore, only on new world load
         Group group = toggler.parent;
         int index = toggler.getZIndex();
@@ -201,17 +209,21 @@ public class PlacementFragment{
         }
 
         if(Core.input.keyTap(Binding.category_prev)){
+            int i = 0;
             do{
                 currentCategory = currentCategory.prev();
-            }while(categoryEmpty[currentCategory.ordinal()]);
+                i ++;
+            }while(categoryEmpty[currentCategory.ordinal()] && i < categoryEmpty.length);
             input.block = getSelectedBlock(currentCategory);
             return true;
         }
 
         if(Core.input.keyTap(Binding.category_next)){
+            int i = 0;
             do{
                 currentCategory = currentCategory.next();
-            }while(categoryEmpty[currentCategory.ordinal()]);
+                i ++;
+            }while(categoryEmpty[currentCategory.ordinal()] && i < categoryEmpty.length);
             input.block = getSelectedBlock(currentCategory);
             return true;
         }
@@ -361,10 +373,10 @@ public class PlacementFragment{
                                         line.add(stack.item.localizedName).maxWidth(140f).fillX().color(Color.lightGray).padLeft(2).left().get().setEllipsis(true);
                                         line.labelWrap(() -> {
                                             Building core = player.core();
-                                            if(core == null || state.rules.infiniteResources) return "*/*";
+                                            int stackamount = Math.round(stack.amount * state.rules.buildCostMultiplier);
+                                            if(core == null || state.rules.infiniteResources) return "*/" + stackamount;
 
                                             int amount = core.items.get(stack.item);
-                                            int stackamount = Math.round(stack.amount * state.rules.buildCostMultiplier);
                                             String color = (amount < stackamount / 2f ? "[scarlet]" : amount < stackamount ? "[accent]" : "[white]");
 
                                             return color + UI.formatAmount(amount) + "[white]/" + stackamount;
@@ -399,13 +411,11 @@ public class PlacementFragment{
                 mainStack.update(() -> {
                     if(control.input.commandMode != wasCommandMode){
                         mainStack.clearChildren();
-                        if(!mobile || !control.input.commandMode){
-                            mainStack.addChild(control.input.commandMode ? commandTable : blockCatTable);
+                        mainStack.addChild(control.input.commandMode ? commandTable : blockCatTable);
 
-                            //hacky, but forces command table to be same width as blocks
-                            if(control.input.commandMode){
-                                commandTable.getCells().peek().width(blockCatTable.getWidth());
-                            }
+                        //hacky, but forces command table to be same width as blocks
+                        if(control.input.commandMode){
+                            commandTable.getCells().peek().width(blockCatTable.getWidth() / Scl.scl(1f));
                         }
 
                         wasCommandMode = control.input.commandMode;
@@ -414,16 +424,30 @@ public class PlacementFragment{
 
                 frame.add(mainStack).colspan(3).fill();
 
+                frame.row();
+
+                //for better inset visuals at the bottom
+                frame.rect((x, y, w, h) -> {
+                    if(Core.scene.marginBottom > 0){
+                        Tex.paneLeft.draw(x, 0, w, y);
+                    }
+                }).colspan(3).fillX().row();
+
                 //commandTable: commanded units
                 {
                     commandTable.touchable = Touchable.enabled;
-                    commandTable.add("[accent]Command Mode").fill().center().labelAlign(Align.center).row();
+                    commandTable.add(Core.bundle.get("commandmode.name")).fill().center().labelAlign(Align.center).row();
                     commandTable.image().color(Pal.accent).growX().pad(20f).padTop(0f).padBottom(4f).row();
                     commandTable.table(u -> {
                         u.left();
                         int[] curCount = {0};
+                        UnitCommand[] currentCommand = {null};
+                        var commands = new Seq<UnitCommand>();
 
-                        Runnable rebuildCommand = () -> {
+                        UnitStance[] currentStance = {null};
+                        var stances = new Seq<UnitStance>();
+
+                        rebuildCommand = () -> {
                             u.clearChildren();
                             var units = control.input.selectedUnits;
                             if(units.size > 0){
@@ -431,17 +455,29 @@ public class PlacementFragment{
                                 for(var unit : units){
                                     counts[unit.type.id] ++;
                                 }
+                                commands.clear();
+                                stances.clear();
+                                boolean firstCommand = false, firstStance = false;
+                                Table unitlist = u.table().growX().left().get();
+                                unitlist.left();
+
                                 int col = 0;
                                 for(int i = 0; i < counts.length; i++){
                                     if(counts[i] > 0){
                                         var type = content.unit(i);
-                                        u.add(new ItemImage(type.uiIcon, counts[i])).tooltip(type.localizedName).pad(4).with(b -> {
-                                            ClickListener listener = new ClickListener();
+                                        unitlist.add(new ItemImage(type.uiIcon, counts[i])).tooltip(type.localizedName).pad(4).with(b -> {
+                                            var listener = new ClickListener();
 
                                             //left click -> select
-                                            b.clicked(KeyCode.mouseLeft, () -> control.input.selectedUnits.removeAll(unit -> unit.type != type));
+                                            b.clicked(KeyCode.mouseLeft, () -> {
+                                                control.input.selectedUnits.removeAll(unit -> unit.type != type);
+                                                Events.fire(Trigger.unitCommandChange);
+                                            });
                                             //right click -> remove
-                                            b.clicked(KeyCode.mouseRight, () -> control.input.selectedUnits.removeAll(unit -> unit.type == type));
+                                            b.clicked(KeyCode.mouseRight, () -> {
+                                                control.input.selectedUnits.removeAll(unit -> unit.type == type);
+                                                Events.fire(Trigger.unitCommandChange);
+                                            });
 
                                             b.addListener(listener);
                                             b.addListener(new HandCursorListener());
@@ -450,20 +486,123 @@ public class PlacementFragment{
                                         });
 
                                         if(++col % 7 == 0){
-                                            u.row();
+                                            unitlist.row();
+                                        }
+
+                                        if(!firstCommand){
+                                            commands.add(type.commands);
+                                            firstCommand = true;
+                                        }else{
+                                            //remove commands that this next unit type doesn't have
+                                            commands.removeAll(com -> !Structs.contains(type.commands, com));
+                                        }
+
+                                        if(!firstStance){
+                                            stances.add(type.stances);
+                                            firstStance = true;
+                                        }else{
+                                            //remove commands that this next unit type doesn't have
+                                            stances.removeAll(st -> !Structs.contains(type.stances, st));
                                         }
                                     }
                                 }
+
+                                //list commands
+                                if(commands.size > 1){
+                                    u.row();
+
+                                    u.table(coms -> {
+                                        coms.left();
+                                        int scol = 0;
+                                        for(var command : commands){
+                                            coms.button(Icon.icons.get(command.icon, Icon.cancel), Styles.clearNoneTogglei, () -> {
+                                                Call.setUnitCommand(player, units.mapInt(un -> un.id).toArray(), command);
+                                            }).checked(i -> currentCommand[0] == command).size(50f).tooltip(command.localized(), true);
+
+                                            if(++scol % 6 == 0) coms.row();
+                                        }
+
+                                    }).fillX().padTop(4f).left();
+                                }
+
+                                //list stances
+                                if(stances.size > 1){
+                                    u.row();
+
+                                    u.table(coms -> {
+                                        coms.left();
+                                        int scol = 0;
+                                        for(var stance : stances){
+
+                                            coms.button(Icon.icons.get(stance.icon, Icon.cancel), Styles.clearNoneTogglei, () -> {
+                                                Call.setUnitStance(player, units.mapInt(un -> un.id).toArray(), stance);
+                                            }).checked(i -> currentStance[0] == stance).size(50f).tooltip(stance.localized(), true);
+
+                                            if(++scol % 6 == 0) coms.row();
+                                        }
+                                    }).fillX().padTop(4f).left();
+                                }
                             }else{
-                                u.add("[no units]").color(Color.lightGray).growX().center().labelAlign(Align.center).pad(6);
+                                u.add(Core.bundle.get("commandmode.nounits")).color(Color.lightGray).growX().center().labelAlign(Align.center).pad(6);
                             }
                         };
 
                         u.update(() -> {
-                            int size = control.input.selectedUnits.size;
-                            if(curCount[0] != size){
-                                curCount[0] = size;
-                                rebuildCommand.run();
+                            {
+                                boolean hadCommand = false, hadStance = false;
+                                UnitCommand shareCommand = null;
+                                UnitStance shareStance = null;
+
+                                //find the command that all units have, or null if they do not share one
+                                for(var unit : control.input.selectedUnits){
+                                    if(unit.isCommandable()){
+                                        var nextCommand = unit.command().command;
+
+                                        if(hadCommand){
+                                            if(shareCommand != nextCommand){
+                                                shareCommand = null;
+                                            }
+                                        }else{
+                                            shareCommand = nextCommand;
+                                            hadCommand = true;
+                                        }
+
+                                        var nextStance = unit.command().stance;
+
+                                        if(hadStance){
+                                            if(shareStance != nextStance){
+                                                shareStance = null;
+                                            }
+                                        }else{
+                                            shareStance = nextStance;
+                                            hadStance = true;
+                                        }
+                                    }
+                                }
+
+                                currentCommand[0] = shareCommand;
+                                currentStance[0] = shareStance;
+
+                                int size = control.input.selectedUnits.size;
+                                if(curCount[0] != size){
+                                    curCount[0] = size;
+                                    rebuildCommand.run();
+                                }
+
+                                //not a huge fan of running input logic here, but it's convenient as the stance arrays are all here...
+                                for(UnitStance stance : stances){
+                                    //first stance must always be the stop stance
+                                    if(stance.keybind != null && Core.input.keyTap(stance.keybind)){
+                                        Call.setUnitStance(player, control.input.selectedUnits.mapInt(un -> un.id).toArray(), stance);
+                                    }
+                                }
+
+                                for(UnitCommand command : commands){
+                                    //first stance must always be the stop stance
+                                    if(command.keybind != null && Core.input.keyTap(command.keybind)){
+                                        Call.setUnitCommand(player, control.input.selectedUnits.mapInt(un -> un.id).toArray(), command);
+                                    }
+                                }
                             }
                         });
                         rebuildCommand.run();
@@ -536,7 +675,9 @@ public class PlacementFragment{
 
                 rebuildCategory.run();
                 frame.update(() -> {
-                    if(gridUpdate(control.input)) rebuildCategory.run();
+                    if(!control.input.commandMode && gridUpdate(control.input)){
+                        rebuildCategory.run();
+                    }
                 });
             });
         });

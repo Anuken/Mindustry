@@ -24,7 +24,7 @@ import static mindustry.gen.Tex.*;
 @StyleDefaults
 public class Styles{
     //TODO all these names are inconsistent and not descriptive
-    public static Drawable black, black9, black8, black6, black3, black5, none, flatDown, flatOver, accentDrawable;
+    public static Drawable black, black9, black8, black6, black3, black5, grayPanel, none, flatDown, flatOver, accentDrawable;
 
     public static ButtonStyle defaultb, underlineb;
 
@@ -32,6 +32,8 @@ public class Styles{
     public static TextButtonStyle defaultt,
     /** Flat, square, opaque. */
     flatt,
+    /** Flat, square, opaque, gray. */
+    grayt,
     /** Flat, square, toggleable. */
     flatTogglet,
     /** Flat, square, gray border.*/
@@ -46,6 +48,8 @@ public class Styles{
     togglet,
     /** Partially transparent square button. */
     cleart,
+    /** Clear, square, orange border, toggleable. */
+    clearTogglet,
     /** Similar to flatToggle, but without a darker border. */
     fullTogglet,
     /** Toggle-able version of flatBorder. */
@@ -102,6 +106,7 @@ public class Styles{
         black5 = whiteui.tint(0f, 0f, 0f, 0.5f);
         black3 = whiteui.tint(0f, 0f, 0f, 0.3f);
         none = whiteui.tint(0f, 0f, 0f, 0f);
+        grayPanel = whiteui.tint(Pal.darkestGray);
         flatDown = createFlatDown();
         flatOver = whiteui.tint(Color.valueOf("454545"));
         accentDrawable = whiteui.tint(Pal.accent);
@@ -143,6 +148,14 @@ public class Styles{
             disabledFontColor = Color.gray;
             down = flatOver;
             up = black;
+        }};
+        grayt = new TextButtonStyle(){{
+            over = flatOver;
+            font = Fonts.def;
+            fontColor = Color.white;
+            disabledFontColor = Color.lightGray;
+            down = flatOver;
+            up = grayPanel;
         }};
         logict = new TextButtonStyle(){{
             over = flatOver;
@@ -206,6 +219,16 @@ public class Styles{
             up = button;
             over = buttonOver;
             disabled = buttonDisabled;
+            disabledFontColor = Color.gray;
+        }};
+        clearTogglet = new TextButtonStyle(){{
+            font = Fonts.def;
+            fontColor = Color.white;
+            down = flatDown;
+            checked = flatDown;
+            up = black6;
+            over = flatOver;
+            disabled = black;
             disabledFontColor = Color.gray;
         }};
         fullTogglet = new TextButtonStyle(){{

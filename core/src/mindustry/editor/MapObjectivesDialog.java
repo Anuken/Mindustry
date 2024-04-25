@@ -98,7 +98,7 @@ public class MapObjectivesDialog extends BaseDialog{
         setInterpreter(UnlockableContent.class, (cont, name, type, field, remover, indexer, get, set) -> {
             name(cont, name, remover, indexer);
             cont.table(t -> t.left().button(
-                b -> b.image().size(iconSmall).update(i -> i.setDrawable(get.get().uiIcon)),
+                b -> b.image().size(iconSmall).scaling(Scaling.fit).update(i -> i.setDrawable(get.get().uiIcon)),
                 () -> showContentSelect(null, set, b -> (field != null && !field.isAnnotationPresent(Researchable.class)) || b.techNode != null)
             ).fill().pad(4)).growX().fillY();
         });
@@ -246,6 +246,38 @@ public class MapObjectivesDialog extends BaseDialog{
             show();
         }});
 
+        setInterpreter(Vertices.class, float[].class, (cont, name, type, field, remover, indexer, get, set) -> cont.table(main -> {
+            float[] data = get.get();
+
+            name(cont, name, remover, indexer);
+            cont.table(t -> {
+                t.left().defaults().left();
+
+                String[] names = {"x", "y", "color", "u", "v"};
+                int stride = 6;
+                int vertices = data.length / stride;
+
+                for(int i = 0; i < vertices; i++){
+                    int offset = i * stride;
+
+                    t.table(row -> {
+                        for(int j = 0; j < names.length; j++){
+                            int index = offset + j;
+
+                            if("color".equals(names[j])) {
+                                getInterpreter(Color.class).build(row, names[j], new TypeInfo(Color.class), null, null, null, () -> new Color().abgr8888(data[index]), value -> data[index] = value.toFloatBits());
+                            }else{
+                                float scale = j <= 1 ? tilesize : 1;
+                                getInterpreter(float.class).build(row, names[j], new TypeInfo(float.class), null, null, null, () -> data[index] / scale, value -> data[index] = value * scale);
+                            }
+
+                            row.add().pad(4);
+                        }
+                    }).row();
+                }
+            });
+        }));
+
         // Types that use the default interpreter. It would be nice if all types could use it, but I don't know how to reliably prevent classes like [? extends Content] from using it.
         for(var obj : MapObjectives.allObjectiveTypes) setInterpreter(obj.get().getClass(), defaultInterpreter());
         for(var mark : MapObjectives.allMarkerTypes) setInterpreter(mark.get().getClass(), defaultInterpreter());
@@ -290,10 +322,12 @@ public class MapObjectivesDialog extends BaseDialog{
                     t.button(Icon.downOpen, Styles.emptyi, () -> indexer.get(false)).fill().padRight(4f);
                 }
 
-                t.button(Icon.add, Styles.emptyi, () -> getProvider(type.element.raw).get(type.element, res -> {
-                    arr.add(res);
-                    rebuild[0].run();
-                })).fill();
+                if(!field.isAnnotationPresent(Immutable.class)) {
+                    t.button(Icon.add, Styles.emptyi, () -> getProvider(type.element.raw).get(type.element, res -> {
+                        arr.add(res);
+                        rebuild[0].run();
+                    })).fill();
+                }
             }).growX().height(46f).pad(0f, -10f, 0f, -10f).get();
 
             main.row().table(Tex.button, t -> rebuild[0] = () -> {
@@ -312,10 +346,10 @@ public class MapObjectivesDialog extends BaseDialog{
 
                     getInterpreter((Class<Object>)arr.get(index).getClass()).build(
                         t, "", new TypeInfo(arr.get(index).getClass()),
-                        field, () -> {
+                        field, field == null || !field.isAnnotationPresent(Immutable.class) ? () -> {
                             arr.remove(index);
                             rebuild[0].run();
-                        }, field == null || !field.isAnnotationPresent(Unordered.class) ? in -> {
+                        } : null, field == null || !field.isAnnotationPresent(Unordered.class) ? in -> {
                             if(in && index > 0){
                                 arr.swap(index, index - 1);
                                 rebuild[0].run();
@@ -425,14 +459,14 @@ public class MapObjectivesDialog extends BaseDialog{
         margin(0f);
 
         stack(
+            new Image(Styles.black5),
             canvas = new MapObjectivesCanvas(),
             new Table(){{
-                buttons.defaults().size(170f, 64f).pad(2f);
+                buttons.defaults().size(160f, 64f).pad(2f);
                 buttons.button("@back", Icon.left, MapObjectivesDialog.this::hide);
                 buttons.button("@add", Icon.add, () -> getProvider(MapObjective.class).get(new TypeInfo(MapObjective.class), canvas::query));
 
                 if(mobile){
-                    buttons.row();
                     buttons.button("@cancel", Icon.cancel, canvas::stopQuery).disabled(b -> !canvas.isQuerying());
                     buttons.button("@ok", Icon.ok, canvas::placeQuery).disabled(b -> !canvas.isQuerying());
                 }
@@ -482,7 +516,9 @@ public class MapObjectivesDialog extends BaseDialog{
             loop:
             for(int y = 0; y < rows; y++){
                 for(int x = 0; x < columns; x++){
-                    canvas.tilemap.createTile(x * w, bounds - 1 - y * 2, objectives.get(i++));
+                    if(canvas.tilemap.createTile(x * w, y, objectives.get(i))){
+                        i++;
+                    }
                     if(i >= objectives.size) break loop;
                 }
             }
@@ -503,7 +539,7 @@ public class MapObjectivesDialog extends BaseDialog{
                 content.getBy(type).<UnlockableContent>as()
             )){
                 if(content.isHidden() || !check.get((T)content)) continue;
-                t.image(content == Blocks.air ? Icon.none.getRegion() : content.uiIcon).size(iconMed).pad(3)
+                t.image(content == Blocks.air ? Icon.none.getRegion() : content.uiIcon).size(iconMed).pad(3).scaling(Scaling.fit)
                     .with(b -> b.addListener(new HandCursorListener()))
                     .tooltip(content.localizedName).get().clicked(() -> {
                         cons.get((T)content);

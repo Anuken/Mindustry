@@ -33,7 +33,7 @@ public class DrawPlasma extends DrawFlame{
     public void draw(Building build){
         Draw.blend(Blending.additive);
         for(int i = 0; i < regions.length; i++){
-            float r = ((float)regions[i].width * Draw.scl - 3f + Mathf.absin(Time.time, 2f + i * 1f, 5f - i * 0.5f));
+            float r = ((float)regions[i].width * regions[i].scl() - 3f + Mathf.absin(Time.time, 2f + i * 1f, 5f - i * 0.5f));
 
             Draw.color(plasma1, plasma2, (float)i / regions.length);
             Draw.alpha((0.3f + Mathf.absin(Time.time, 2f + i * 2f, 0.3f + i * 0.05f)) * build.warmup());

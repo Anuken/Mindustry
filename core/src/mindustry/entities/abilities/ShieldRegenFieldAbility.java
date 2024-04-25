@@ -1,9 +1,13 @@
 package mindustry.entities.abilities;
 
+import arc.*;
+import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
+
+import static mindustry.Vars.*;
 
 public class ShieldRegenFieldAbility extends Ability{
     public float amount = 1, max = 100f, reload = 100, range = 60;
@@ -21,6 +25,16 @@ public class ShieldRegenFieldAbility extends Ability{
         this.max = max;
         this.reload = reload;
         this.range = range;
+    }
+
+    @Override
+    public void addStats(Table t){
+        super.addStats(t);
+        t.add(Core.bundle.format("bullet.range", Strings.autoFixed(range / tilesize, 2)));
+        t.row();
+        t.add(abilityStat("firingrate", Strings.autoFixed(60f / reload, 2)));
+        t.row();
+        t.add(abilityStat("shield", Strings.autoFixed(max, 2)));
     }
 
     @Override

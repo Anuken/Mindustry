@@ -1,17 +1,16 @@
 package mindustry.world.blocks.production;
 
-import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import arc.util.io.*;
-import mindustry.annotations.Annotations.*;
+import mindustry.entities.units.*;
 import mindustry.gen.*;
-import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
+import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
 /**
@@ -23,9 +22,7 @@ public class Separator extends Block{
     public ItemStack[] results;
     public float craftTime;
 
-    public @Load("@-liquid") TextureRegion liquidRegion;
-    public @Load("@-spinner") TextureRegion spinnerRegion;
-    public float spinnerSpeed = 3f;
+    public DrawBlock drawer = new DrawDefault();
 
     public Separator(String name){
         super(name);
@@ -49,6 +46,23 @@ public class Separator extends Block{
     public void init(){
         super.init();
         consItems = findConsumer(c -> c instanceof ConsumeItems);
+    }
+
+    @Override
+    public void load(){
+        super.load();
+
+        drawer.load(this);
+    }
+
+    @Override
+    public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
+        drawer.drawPlan(this, plan, list);
+    }
+
+    @Override
+    public TextureRegion[] icons(){
+        return drawer.finalIcons(this);
     }
 
     public class SeparatorBuild extends Building{
@@ -81,13 +95,28 @@ public class Separator extends Block{
 
         @Override
         public void draw(){
-            super.draw();
+            drawer.draw(this);
+        }
 
-            Drawf.liquid(liquidRegion, x, y, liquids.currentAmount() / liquidCapacity, liquids.current().color);
+        @Override
+        public void drawLight(){
+            super.drawLight();
+            drawer.drawLight(this);
+        }
 
-            if(Core.atlas.isFound(spinnerRegion)){
-                Draw.rect(spinnerRegion, x, y, totalProgress * spinnerSpeed);
-            }
+        @Override
+        public float warmup(){
+            return warmup;
+        }
+
+        @Override
+        public float progress(){
+            return progress;
+        }
+
+        @Override
+        public float totalProgress(){
+            return totalProgress;
         }
 
         @Override

@@ -25,6 +25,8 @@ import mindustry.world.blocks.payloads.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
+import static mindustry.Vars.*;
+
 public class UnitFactory extends UnitBlock{
     public int[] capacities = {};
 
@@ -42,6 +44,7 @@ public class UnitFactory extends UnitBlock{
         rotate = true;
         regionRotated1 = 1;
         commandable = true;
+        ambientSound = Sounds.respawning;
 
         config(Integer.class, (UnitFactoryBuild tile, Integer i) -> {
             if(!configurable) return;
@@ -73,6 +76,8 @@ public class UnitFactory extends UnitBlock{
             }
         }
 
+        consumeBuilder.each(c -> c.multiplier = b -> state.rules.unitCost(b.team));
+
         super.init();
     }
 
@@ -87,10 +92,10 @@ public class UnitFactory extends UnitBlock{
                 Core.bundle.format("bar.unitcap",
                     Fonts.getUnicodeStr(e.unit().name),
                     e.team.data().countType(e.unit()),
-                    Units.getStringCap(e.team)
+                    e.unit() == null ? Units.getStringCap(e.team) : (e.unit().useUnitCap ? Units.getStringCap(e.team) : "∞")
                 ),
             () -> Pal.power,
-            () -> e.unit() == null ? 0f : (float)e.team.data().countType(e.unit()) / Units.getCap(e.team)
+            () -> e.unit() == null ? 0f : (e.unit().useUnitCap ? (float)e.team.data().countType(e.unit()) / Units.getCap(e.team) : 1f)
         ));
     }
 
@@ -109,9 +114,7 @@ public class UnitFactory extends UnitBlock{
             table.row();
 
             for(var plan : plans){
-                table.table(t -> {
-                    t.setBackground(Tex.whiteui);
-                    t.setColor(Pal.darkestGray);
+                table.table(Styles.grayPanel, t -> {
 
                     if(plan.unit.isBanned()){
                         t.image(Icon.cancel).color(Pal.remove).size(40);
@@ -119,7 +122,7 @@ public class UnitFactory extends UnitBlock{
                     }
 
                     if(plan.unit.unlockedNow()){
-                        t.image(plan.unit.uiIcon).size(40).pad(10f).left();
+                        t.image(plan.unit.uiIcon).size(40).pad(10f).left().scaling(Scaling.fit);
                         t.table(info -> {
                             info.add(plan.unit.localizedName).left();
                             info.row();
@@ -134,7 +137,7 @@ public class UnitFactory extends UnitBlock{
                                 }
 
                                 ItemStack stack = plan.requirements[i];
-                                req.add(new ItemDisplay(stack.item, stack.amount, false)).pad(5);
+                                req.add(new ItemDisplay(stack.item, stack.amount, plan.time, true)).pad(5);
                             }
                         }).right().grow().pad(10f);
                     }else{
@@ -197,17 +200,23 @@ public class UnitFactory extends UnitBlock{
         }
 
         @Override
+        public boolean shouldActiveSound(){
+            return shouldConsume();
+        }
+
+        @Override
         public double sense(LAccess sensor){
             if(sensor == LAccess.progress) return Mathf.clamp(fraction());
+            if(sensor == LAccess.itemCapacity) return Mathf.round(itemCapacity * state.rules.unitCost(team));
             return super.sense(sensor);
         }
 
         @Override
         public void buildConfiguration(Table table){
-            Seq<UnitType> units = Seq.with(plans).map(u -> u.unit).filter(u -> u.unlockedNow() && !u.isBanned());
+            Seq<UnitType> units = Seq.with(plans).map(u -> u.unit).retainAll(u -> u.unlockedNow() && !u.isBanned());
 
             if(units.any()){
-                ItemSelection.buildTable(UnitFactory.this, table, units, () -> currentPlan == -1 ? null : plans.get(currentPlan).unit, unit -> configure(plans.indexOf(u -> u.unit == unit)));
+                ItemSelection.buildTable(UnitFactory.this, table, units, () -> currentPlan == -1 ? null : plans.get(currentPlan).unit, unit -> configure(plans.indexOf(u -> u.unit == unit)), selectionRows, selectionColumns);
             }else{
                 table.table(Styles.black3, t -> t.add("@none").color(Color.lightGray));
             }
@@ -317,7 +326,7 @@ public class UnitFactory extends UnitBlock{
 
         @Override
         public int getMaximumAccepted(Item item){
-            return capacities[item.id];
+            return Mathf.round(capacities[item.id] * state.rules.unitCost(team));
         }
 
         @Override

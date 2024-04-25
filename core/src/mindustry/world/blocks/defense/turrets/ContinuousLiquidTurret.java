@@ -33,7 +33,10 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
 
         stats.remove(Stat.ammo);
         //TODO looks bad
-        stats.add(Stat.ammo, StatValues.number(liquidConsumed * 60f, StatUnit.perSecond, true));
+        stats.add(Stat.ammo, table -> {
+            table.row();
+            StatValues.number(liquidConsumed * 60f, StatUnit.perSecond, true).display(table);
+        });
         stats.add(Stat.ammo, StatValues.ammo(ammoTypes));
     }
 
@@ -55,6 +58,8 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
             //}
         });
 
+        ammoTypes.each((item, type) -> placeOverlapRange = Math.max(placeOverlapRange, range + type.rangeChange + placeOverlapMargin));
+
         super.init();
     }
 
@@ -73,6 +78,11 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
         }
 
         @Override
+        public boolean canConsume(){
+            return hasCorrectAmmo() && super.canConsume();
+        }
+
+        @Override
         public BulletType useAmmo(){
             //does not consume ammo upon firing
             return peekAmmo();
@@ -85,7 +95,11 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
 
         @Override
         public boolean hasAmmo(){
-            return ammoTypes.get(liquids.current()) != null && liquids.currentAmount() >= 1f / ammoTypes.get(liquids.current()).ammoMultiplier;
+            return hasCorrectAmmo() && ammoTypes.get(liquids.current()) != null && liquids.currentAmount() > 0f;
+        }
+
+        public boolean hasCorrectAmmo(){
+            return !bullets.any() || bullets.first().bullet.type == peekAmmo();
         }
 
         @Override

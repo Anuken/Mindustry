@@ -44,6 +44,15 @@ public class JsonIO{
         }
     };
 
+    public static void writeBytes(Object value, Class<?> elementType, DataOutputStream output){
+        json.setWriter(new UBJsonWriter(output));
+        json.writeValue(value, value == null ? null : value.getClass(), elementType);
+    }
+
+    public static <T> T readBytes(Class<T> type, Class<?> elementType, DataInputStream input) throws IOException{
+        return json.readValue(type, elementType, new UBJsonReader().parseWihoutClosing(input));
+    }
+
     public static String write(Object object){
         return json.toJson(object, object.getClass());
     }
@@ -182,6 +191,7 @@ public class JsonIO{
             @Override
             public Block read(Json json, JsonValue jsonData, Class type){
                 Block block = Vars.content.getByName(ContentType.block, jsonData.asString());
+                if(block == null) block = Vars.content.getByName(ContentType.block, SaveVersion.fallback.get(jsonData.asString(), ""));
                 return block == null ? Blocks.air : block;
             }
         });
@@ -194,6 +204,9 @@ public class JsonIO{
 
             @Override
             public Planet read(Json json, JsonValue jsonData, Class type){
+                if(jsonData.asString() == null){
+                    return null;
+                }
                 Planet block = Vars.content.getByName(ContentType.planet, jsonData.asString());
                 return block == null ? Planets.serpulo : block;
             }
@@ -308,15 +321,16 @@ public class JsonIO{
                 int i = 0;
                 for(var value = data.child; value != null; value = value.next, i++){
                     for(var parent = value.get("parents").child; parent != null; parent = parent.next){
-                        exec.all.get(i).parents.add(exec.all.get(parent.asInt()));
+                        int val = parent.asInt();
+                        if(val >= 0 && val < exec.all.size){
+                            exec.all.get(i).parents.add(exec.all.get(val));
+                        }
                     }
                 }
 
                 return exec;
             }
         });
-
-        
 
         //use short names for all filter types
         for(var filter : Maps.allFilterTypes){

@@ -38,8 +38,10 @@ public class Universe{
 
     /** Update regardless of whether the player is in the campaign. */
     public void updateGlobal(){
-        //currently only updates one solar system
-        updatePlanet(Planets.sun);
+        for(Planet planet : content.planets()){
+            //update all parentless planets (solar system root), regardless of which one the player is in
+            if(planet.parent == null) updatePlanet(planet);
+        }
     }
 
     public int turn(){
@@ -82,7 +84,7 @@ public class Universe{
             }
         }
 
-        if(state.hasSector() && state.getSector().planet.updateLighting){
+        if(state.hasSector() && state.getSector().planet.updateLighting && !(state.getSector().preset != null && state.getSector().preset.noLighting)){
             var planet = state.getSector().planet;
             //update sector light
             float light = state.getSector().getLight();
@@ -120,7 +122,7 @@ public class Universe{
     }
 
     public Schematic getLastLoadout(){
-        if(lastLoadout == null) lastLoadout = state.rules.sector == null || state.rules.sector.planet.generator == null ? Loadouts.basicShard : state.rules.sector.planet.generator.getDefaultLoadout();
+        if(lastLoadout == null) lastLoadout = state.rules.sector == null || state.rules.sector.planet.generator == null ? Loadouts.basicShard : state.rules.sector.planet.generator.defaultLoadout;
         return lastLoadout;
     }
 
@@ -145,9 +147,15 @@ public class Universe{
         turn++;
 
         int newSecondsPassed = (int)(turnDuration / 60);
+        Planet current = state.getPlanet();
 
         //update relevant sectors
         for(Planet planet : content.planets()){
+
+            //planets with different wave simulation status are not updated
+            if(current != null && current.allowWaveSimulation != planet.allowWaveSimulation){
+                continue;
+            }
 
             //first pass: clear import stats
             for(Sector sector : planet.sectors){
@@ -218,10 +226,11 @@ public class Universe{
                         }else if(attacked && wavesPassed > 0 && sector.info.winWave > 1 && sector.info.wave + wavesPassed >= sector.info.winWave && !sector.hasEnemyBase()){
                             //autocapture the sector
                             sector.info.waves = false;
+                            boolean was = sector.info.wasCaptured;
                             sector.info.wasCaptured = true;
 
                             //fire the event
-                            Events.fire(new SectorCaptureEvent(sector));
+                            Events.fire(new SectorCaptureEvent(sector, !was));
                         }
 
                         float scl = sector.getProductionScale();
@@ -244,7 +253,7 @@ public class Universe{
 
                     //queue random invasions
                     if(!sector.isAttacked() && sector.planet.allowSectorInvasion && sector.info.minutesCaptured > invasionGracePeriod && sector.info.hasSpawns){
-                        int count = sector.near().count(Sector::hasEnemyBase);
+                        int count = sector.near().count(s -> s.hasEnemyBase() && !s.hasBase());
 
                         //invasion chance depends on # of nearby bases
                         if(count > 0 && Mathf.chance(baseInvasionChance * (0.8f + (count - 1) * 0.3f))){
@@ -276,21 +285,6 @@ public class Universe{
         Events.fire(new TurnEvent());
 
         save();
-    }
-
-    /** This method is expensive to call; only do so sparingly. */
-    public ItemSeq getGlobalResources(){
-        ItemSeq count = new ItemSeq();
-
-        for(Planet planet : content.planets()){
-            for(Sector sector : planet.sectors){
-                if(sector.hasSave()){
-                    count.add(sector.items());
-                }
-            }
-        }
-
-        return count;
     }
 
     public void updateNetSeconds(int value){

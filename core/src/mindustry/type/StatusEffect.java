@@ -35,18 +35,28 @@ public class StatusEffect extends UnlockableContent{
     public float damage;
     /** Chance of effect appearing. */
     public float effectChance = 0.15f;
-    /** Should the effect be given a parent */
+    /** Should the effect be given a parent. */
     public boolean parentizeEffect;
     /** If true, the effect never disappears. */
     public boolean permanent;
     /** If true, this effect will only react with other effects and cannot be applied. */
     public boolean reactive;
+    /** Special flag for the dynamic effect type with custom stats - do not use. */
+    public boolean dynamic = false;
     /** Whether to show this effect in the database. */
     public boolean show = true;
     /** Tint color of effect. */
     public Color color = Color.white.cpy();
     /** Effect that happens randomly on top of the affected unit. */
     public Effect effect = Fx.none;
+    /** Effect that is displayed once when applied to a unit. */
+    public Effect applyEffect = Fx.none;
+    /** Whether the apply effect should display even if effect is already on the unit. */
+    public boolean applyExtend;
+    /** Tint color of apply effect. */
+    public Color applyColor = Color.white.cpy();
+    /** Should the apply effect be given a parent. */
+    public boolean parentizeApplyEffect;
     /** Affinity & opposite values for stat displays. */
     public ObjectSet<StatusEffect> affinities = new ObjectSet<>(), opposites = new ObjectSet<>();
     /** Set to false to disable outline generation. */
@@ -185,6 +195,10 @@ public class StatusEffect extends UnlockableContent{
             return true;
         }
         return false;
+    }
+
+    public void applied(Unit unit, float time, boolean extend){
+        if(!extend || applyExtend) applyEffect.at(unit.x, unit.y, 0, applyColor, parentizeApplyEffect ? unit : null);
     }
 
     @Override

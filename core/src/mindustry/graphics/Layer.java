@@ -35,6 +35,9 @@ public class Layer{
     //informal layer used for additive blending overlay, grouped together to reduce draw calls
     blockAdditive = 31,
 
+    //props such as boulders
+    blockProp = 32,
+
     //things drawn over blocks (intermediate layer)
     blockOver = 35,
 
@@ -83,7 +86,7 @@ public class Layer{
     //shield effects
     shields = 125,
 
-    //weather effects, e.g. rain and snow TODO draw before overlay UI?
+    //weather effects, e.g. rain and snow
     weather = 130,
 
     //light rendering *shaders used*

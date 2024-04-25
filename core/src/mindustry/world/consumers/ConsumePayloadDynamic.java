@@ -18,12 +18,21 @@ public class ConsumePayloadDynamic extends Consume{
 
     @Override
     public float efficiency(Building build){
-        return build.getPayloads().contains(payloads.get(build)) ? 1f : 0f;
+        float mult = multiplier.get(build);
+        for(PayloadStack stack : payloads.get(build)){
+            if(!build.getPayloads().contains(stack.item, Math.round(stack.amount * mult))){
+                return 0f;
+            }
+        }
+        return 1f;
     }
 
     @Override
     public void trigger(Building build){
-        build.getPayloads().remove(payloads.get(build));
+        float mult = multiplier.get(build);
+        for(PayloadStack stack : payloads.get(build)){
+            build.getPayloads().remove(stack.item, Math.round(stack.amount * mult));
+        }
     }
 
     @Override
@@ -54,8 +63,8 @@ public class ConsumePayloadDynamic extends Consume{
         table.table(c -> {
             int i = 0;
             for(var stack : pay){
-                c.add(new ReqImage(new ItemImage(stack.item.uiIcon, stack.amount),
-                () -> inv.contains(stack.item, stack.amount))).padRight(8);
+                c.add(new ReqImage(new ItemImage(stack.item.uiIcon, Math.round(stack.amount * multiplier.get(build))),
+                () -> inv.contains(stack.item, Math.round(stack.amount * multiplier.get(build))))).padRight(8);
                 if(++i % 4 == 0) c.row();
             }
         }).left();

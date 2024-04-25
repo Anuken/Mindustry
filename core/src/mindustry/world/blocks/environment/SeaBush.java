@@ -28,7 +28,7 @@ public class SeaBush extends Prop{
         int lobes = rand.random(lobesMin, lobesMax);
         for(int i = 0; i < lobes; i++){
             float ba =  i / (float)lobes * 360f + offset + rand.range(spread), angle = ba + Mathf.sin(Time.time + rand.random(0, timeRange), rand.random(sclMin, sclMax), rand.random(magMin, magMax));
-            float w = region.width * Draw.scl, h = region.height * Draw.scl;
+            float w = region.width * region.scl(), h = region.height * region.scl();
             var region = Angles.angleDist(ba, 225f) <= botAngle ? botRegion : this.region;
 
             Draw.rect(region,

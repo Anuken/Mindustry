@@ -17,7 +17,6 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.distribution.Conveyor.*;
-import mindustry.world.blocks.distribution.Duct.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -30,6 +29,7 @@ public class StackConveyor extends Block implements Autotiler{
     public @Load("@-stack") TextureRegion stackRegion;
     /** requires power to work properly */
     public @Load(value = "@-glow") TextureRegion glowRegion;
+    public @Load(value = "@-edge-glow", fallback = "@-glow") TextureRegion edgeGlowRegion;
 
     public float glowAlpha = 1f;
     public Color glowColor = Pal.redLight;
@@ -51,7 +51,6 @@ public class StackConveyor extends Block implements Autotiler{
         hasItems = true;
         itemCapacity = 10;
         conveyorPlacement = true;
-        highUnloadPriority = true;
         underBullets = true;
         priority = TargetPriority.transport;
 
@@ -134,14 +133,15 @@ public class StackConveyor extends Block implements Autotiler{
             //draw inputs
             if(state == stateLoad){
                 for(int i = 0; i < 4; i++){
-                    if((blendprox & (1 << i)) != 0 && i != 0){
-                        int dir = rotation - i;
+                    int dir = rotation - i;
+                    var near = nearby(dir);
+                    if((blendprox & (1 << i)) != 0 && i != 0 && near != null && !near.block.squareSprite){
                         Draw.rect(sliced(regions[0], SliceMode.bottom), x + Geometry.d4x(dir) * tilesize*0.75f, y + Geometry.d4y(dir) * tilesize*0.75f, (float)(dir*90));
                     }
                 }
             }else if(state == stateUnload){ //front unload
                 //TOOD hacky front check
-                if((blendprox & (1)) != 0 && !(front() instanceof DuctBuild)){
+                if((blendprox & (1)) != 0 && !front().block.squareSprite){
                     Draw.rect(sliced(regions[0], SliceMode.top), x + Geometry.d4x(rotation) * tilesize*0.75f, y + Geometry.d4y(rotation) * tilesize*0.75f, rotation * 90f);
                 }
             }
@@ -155,7 +155,7 @@ public class StackConveyor extends Block implements Autotiler{
                 Draw.z(Layer.blockAdditive);
                 Draw.color(glowColor, glowAlpha * power.status);
                 Draw.blend(Blending.additive);
-                Draw.rect(glowRegion, x, y, rotation * 90);
+                Draw.rect(state == stateLoad ? edgeGlowRegion : glowRegion, x, y, rotation * 90);
                 Draw.blend();
                 Draw.color();
                 Draw.z(Layer.block - 0.1f);
@@ -190,6 +190,13 @@ public class StackConveyor extends Block implements Autotiler{
         }
 
         @Override
+        public void dropped(){
+            super.dropped();
+            var prev = Geometry.d4[(rotation + 2) % 4];
+            link = Point2.pack(tile.x + prev.x, tile.y + prev.y);
+        }
+
+        @Override
         public void drawCracks(){
             Draw.z(Layer.block - 0.15f);
             super.drawCracks();
@@ -209,7 +216,7 @@ public class StackConveyor extends Block implements Autotiler{
             state = stateMove;
 
             int[] bits = buildBlending(tile, rotation, null, true);
-            if(bits[0] == 0 &&  blends(tile, rotation, 0) && !blends(tile, rotation, 2)) state = stateLoad;  // a 0 that faces into a conveyor with none behind it
+            if(bits[0] == 0 && blends(tile, rotation, 0) && (!blends(tile, rotation, 2) || back() instanceof StackConveyorBuild b && b.state == stateUnload)) state = stateLoad;  // a 0 that faces into a conveyor with none behind it
             if(outputRouter && bits[0] == 0 && !blends(tile, rotation, 0) && blends(tile, rotation, 2)) state = stateUnload; // a 0 that faces into none with a conveyor behind it
             if(!outputRouter && !(front() instanceof StackConveyorBuild)) state = stateUnload; // a 0 that faces into none with a conveyor behind it
 

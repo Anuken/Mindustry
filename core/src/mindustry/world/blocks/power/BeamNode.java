@@ -22,8 +22,8 @@ import static mindustry.Vars.*;
 public class BeamNode extends PowerBlock{
     public int range = 5;
 
-    public @Load("power-beam") TextureRegion laser;
-    public @Load("power-beam-end") TextureRegion laserEnd;
+    public @Load(value = "@-beam", fallback = "power-beam") TextureRegion laser;
+    public @Load(value = "@-beam-end", fallback = "power-beam-end") TextureRegion laserEnd;
 
     public Color laserColor1 = Color.white;
     public Color laserColor2 = Color.valueOf("ffd9c2");
@@ -122,9 +122,10 @@ public class BeamNode extends PowerBlock{
 
         @Override
         public BlockStatus status(){
-            if(Mathf.equal(power.status, 0f, 0.001f)) return BlockStatus.noInput;
-            if(Mathf.equal(power.status, 1f, 0.001f)) return BlockStatus.active;
-            return BlockStatus.noOutput;
+            float balance = power.graph.getPowerBalance();
+            if(balance > 0f) return BlockStatus.active;
+            if(balance < 0f && power.graph.getLastPowerStored() > 0) return BlockStatus.noOutput;
+            return BlockStatus.noInput;
         }
 
         @Override
@@ -139,7 +140,7 @@ public class BeamNode extends PowerBlock{
             float w = laserWidth + Mathf.absin(pulseScl, pulseMag);
 
             for(int i = 0; i < 4; i ++){
-                if(dests[i] != null && (!(links[i].block instanceof BeamNode node) ||
+                if(dests[i] != null && links[i].wasVisible && (!(links[i].block instanceof BeamNode node) ||
                     (links[i].tileX() != tileX() && links[i].tileY() != tileY()) ||
                     (links[i].id > id && range >= node.range) || range > node.range)){
 
@@ -179,7 +180,7 @@ public class BeamNode extends PowerBlock{
                     }
 
                     //power nodes do NOT play nice with beam nodes, do not touch them as that forcefully modifies their links
-                    if(other != null && other.block.hasPower && other.team == team && !(other.block instanceof PowerNode)){
+                    if(other != null && other.block.hasPower && other.block.connectedPower && other.team == team && !(other.block instanceof PowerNode)){
                         links[i] = other;
                         dests[i] = world.tile(tile.x + j * dir.x, tile.y + j * dir.y);
                         break;
@@ -190,7 +191,7 @@ public class BeamNode extends PowerBlock{
 
                 if(next != prev){
                     //unlinked, disconnect and reflow
-                    if(prev != null){
+                    if(prev != null && prev.isAdded()){
                         prev.power.links.removeValue(pos());
                         power.links.removeValue(prev.pos());
 

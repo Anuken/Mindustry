@@ -66,6 +66,8 @@ public class Turret extends ReloadTurret{
     public boolean accurateDelay = true;
     /** If false, this turret can't move while charging. */
     public boolean moveWhileCharging = true;
+    /** How long warmup is maintained even if this turret isn't shooting. */
+    public float warmupMaintainTime = 0f;
     /** pattern used for bullets */
     public ShootPattern shoot = new ShootPattern();
 
@@ -79,12 +81,18 @@ public class Turret extends ReloadTurret{
     public boolean playerControllable = true;
     /** If true, this block will display ammo multipliers in its stats (irrelevant for certain types of turrets). */
     public boolean displayAmmoMultiplier = true;
+    /** If false, 'under' blocks like conveyors are not targeted. */
+    public boolean targetUnderBlocks = true;
+    /** If true, the turret will always shoot when it has ammo, regardless of targets in range or any control. */
+    public boolean alwaysShooting = false;
+    /** Whether this turret predicts unit movement. */
+    public boolean predictTarget = true;
     /** Function for choosing which unit to target. */
     public Sortf unitSort = UnitSorts.closest;
     /** Filter for types of units to attack. */
     public Boolf<Unit> unitFilter = u -> true;
     /** Filter for types of buildings to attack. */
-    public Boolf<Building> buildingFilter = b -> !b.block.underBullets;
+    public Boolf<Building> buildingFilter = b -> targetUnderBlocks || !b.block.underBullets;
 
     /** Color of heat region drawn on top (if found) */
     public Color heatColor = Pal.turretHeat;
@@ -108,6 +116,8 @@ public class Turret extends ReloadTurret{
     public boolean linearWarmup = false;
     /** Visual amount by which the turret recoils back per shot. */
     public float recoil = 1f;
+    /** Number of additional counters for recoil. */
+    public int recoils = -1;
     /** ticks taken for turret to return to starting position in ticks. uses reload time by default  */
     public float recoilTime = -1f;
     /** power curve applied to visual recoil */
@@ -206,8 +216,9 @@ public class Turret extends ReloadTurret{
         public Seq<AmmoEntry> ammo = new Seq<>();
         public int totalAmmo;
         public float curRecoil, heat, logicControlTime = -1;
-        public float shootWarmup, charge;
-        public int totalShots;
+        public @Nullable float[] curRecoils;
+        public float shootWarmup, charge, warmupHold = 0f;
+        public int totalShots, barrelCounter;
         public boolean logicShooting = false;
         public @Nullable Posc target;
         public Vec2 targetPos = new Vec2();
@@ -297,7 +308,7 @@ public class Turret extends ReloadTurret{
         }
 
         public boolean isShooting(){
-            return (isControlled() ? unit.isShooting() : logicControlled() ? logicShooting : target != null);
+            return alwaysShooting || (isControlled() ? unit.isShooting() : logicControlled() ? logicShooting : target != null);
         }
 
         @Override
@@ -323,11 +334,15 @@ public class Turret extends ReloadTurret{
             var offset = Tmp.v1.setZero();
 
             //when delay is accurate, assume unit has moved by chargeTime already
-            if(accurateDelay && pos instanceof Hitboxc h){
+            if(accurateDelay && !moveWhileCharging && pos instanceof Hitboxc h){
                 offset.set(h.deltaX(), h.deltaY()).scl(shoot.firstShotDelay / Time.delta);
             }
 
-            targetPos.set(Predict.intercept(this, pos, offset.x, offset.y, bullet.speed <= 0.01f ? 99999999f : bullet.speed));
+            if(predictTarget){
+                targetPos.set(Predict.intercept(this, pos, offset.x, offset.y, bullet.speed <= 0.01f ? 99999999f : bullet.speed));
+            }else{
+                targetPos.set(pos);
+            }
 
             if(targetPos.isZero()){
                 targetPos.set(pos);
@@ -343,7 +358,15 @@ public class Turret extends ReloadTurret{
         public void updateTile(){
             if(!validateTarget()) target = null;
 
-            float warmupTarget = isShooting() && canConsume() ? 1f : 0f;
+            float warmupTarget = (isShooting() && canConsume()) || charging() ? 1f : 0f;
+            if(warmupTarget > 0 && shootWarmup >= minWarmup && !isControlled()){
+                warmupHold = 1f;
+            }
+            if(warmupHold > 0f){
+                warmupHold -= Time.delta / warmupMaintainTime;
+                warmupTarget = 1f;
+            }
+
             if(linearWarmup){
                 shootWarmup = Mathf.approachDelta(shootWarmup, warmupTarget, shootWarmupSpeed * (warmupTarget > 0 ? efficiency : 1f));
             }else{
@@ -353,6 +376,12 @@ public class Turret extends ReloadTurret{
             wasShooting = false;
 
             curRecoil = Mathf.approachDelta(curRecoil, 0, 1 / recoilTime);
+            if(recoils > 0){
+                if(curRecoils == null) curRecoils = new float[recoils];
+                for(int i = 0; i < recoils; i++){
+                    curRecoils[i] = Mathf.approachDelta(curRecoils[i], 0, 1 / recoilTime);
+                }
+            }
             heat = Mathf.approachDelta(heat, 0, 1 / cooldownTime);
             charge = charging() ? Mathf.approachDelta(charge, 1, 1 / shoot.firstShotDelay) : 0;
 
@@ -404,10 +433,15 @@ public class Turret extends ReloadTurret{
                         turnToTarget(targetRot);
                     }
 
-                    if(Angles.angleDist(rotation, targetRot) < shootCone && canShoot){
+                    if(!alwaysShooting && Angles.angleDist(rotation, targetRot) < shootCone && canShoot){
                         wasShooting = true;
                         updateShooting();
                     }
+                }
+
+                if(alwaysShooting){
+                    wasShooting = true;
+                    updateShooting();
                 }
             }
 
@@ -440,10 +474,10 @@ public class Turret extends ReloadTurret{
                 target = Units.bestEnemy(team, x, y, range, e -> !e.dead() && !e.isGrounded() && unitFilter.get(e), unitSort);
             }else{
                 target = Units.bestTarget(team, x, y, range, e -> !e.dead() && unitFilter.get(e) && (e.isGrounded() || targetAir) && (!e.isGrounded() || targetGround), b -> targetGround && buildingFilter.get(b), unitSort);
+            }
 
-                if(target == null && canHeal()){
-                    target = Units.findAllyTile(team, x, y, range, b -> b.damaged() && b != this);
-                }
+            if(target == null && canHeal()){
+                target = Units.findAllyTile(team, x, y, range, b -> b.damaged() && b != this);
             }
         }
 
@@ -458,7 +492,7 @@ public class Turret extends ReloadTurret{
         @Override
         public void updateEfficiencyMultiplier(){
             if(heatRequirement > 0){
-                efficiency *= Math.min(heatReq / heatRequirement, maxHeatEfficiency);
+                efficiency *= Math.min(Math.max(heatReq / heatRequirement, cheating() ? 1f : 0f), maxHeatEfficiency);
             }
         }
 
@@ -488,7 +522,8 @@ public class Turret extends ReloadTurret{
             if(ammo.size >= 2 && ammo.peek().amount < ammoPerShot && ammo.get(ammo.size - 2).amount >= ammoPerShot){
                 ammo.swap(ammo.size - 1, ammo.size - 2);
             }
-            return ammo.size > 0 && ammo.peek().amount >= ammoPerShot;
+
+            return ammo.size > 0 && (ammo.peek().amount >= ammoPerShot || cheating());
         }
 
         public boolean charging(){
@@ -524,15 +559,22 @@ public class Turret extends ReloadTurret{
                 type.chargeEffect.at(bulletX, bulletY, rotation);
             }
 
-            shoot.shoot(totalShots, (xOffset, yOffset, angle, delay, mover) -> {
-                queuedBullets ++;
+            shoot.shoot(barrelCounter, (xOffset, yOffset, angle, delay, mover) -> {
+                queuedBullets++;
+                int barrel = barrelCounter;
+
                 if(delay > 0f){
-                    Time.run(delay, () -> bullet(type, xOffset, yOffset, angle, mover));
+                    Time.run(delay, () -> {
+                        //hack: make sure the barrel is the same as what it was when the bullet was queued to fire
+                        int prev = barrelCounter;
+                        barrelCounter = barrel;
+                        bullet(type, xOffset, yOffset, angle, mover);
+                        barrelCounter = prev;
+                    });
                 }else{
                     bullet(type, xOffset, yOffset, angle, mover);
                 }
-                totalShots ++;
-            });
+            }, () -> barrelCounter++);
 
             if(consumeAmmoOnce){
                 useAmmo();
@@ -548,7 +590,7 @@ public class Turret extends ReloadTurret{
             xSpread = Mathf.range(xRand),
             bulletX = x + Angles.trnsx(rotation - 90, shootX + xOffset + xSpread, shootY + yOffset),
             bulletY = y + Angles.trnsy(rotation - 90, shootX + xOffset + xSpread, shootY + yOffset),
-            shootAngle = rotation + angleOffset + Mathf.range(inaccuracy);
+            shootAngle = rotation + angleOffset + Mathf.range(inaccuracy + type.inaccuracy);
 
             float lifeScl = type.scaleLife ? Mathf.clamp(Mathf.dst(bulletX, bulletY, targetPos.x, targetPos.y) / type.range, minRange / type.range, range() / type.range) : 1f;
 
@@ -570,7 +612,11 @@ public class Turret extends ReloadTurret{
             }
 
             curRecoil = 1f;
+            if(recoils > 0){
+                curRecoils[barrelCounter % recoils] = 1f;
+            }
             heat = 1f;
+            totalShots++;
 
             if(!consumeAmmoOnce){
                 useAmmo();
@@ -579,6 +625,16 @@ public class Turret extends ReloadTurret{
 
         protected void handleBullet(@Nullable Bullet bullet, float offsetX, float offsetY, float angleOffset){
 
+        }
+
+        @Override
+        public float activeSoundVolume(){
+            return shootWarmup;
+        }
+
+        @Override
+        public boolean shouldActiveSound(){
+            return shootWarmup > 0.01f && loopSound != Sounds.none;
         }
 
         @Override

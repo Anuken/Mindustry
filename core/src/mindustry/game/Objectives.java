@@ -25,7 +25,8 @@ public class Objectives{
         @Override
         public String display(){
             return Core.bundle.format("requirement.research",
-                (content.techNode == null || content.techNode.parent == null || content.techNode.parent.content.unlocked()) && !(content instanceof Item) ?
+                //TODO broken for multi tech nodes.
+                (content.techNode == null || content.techNode.parent == null || content.techNode.parent.content.unlocked()) ?
                     (content.emoji() + " " + content.localizedName) : "???");
         }
     }

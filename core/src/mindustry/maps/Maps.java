@@ -19,6 +19,7 @@ import mindustry.game.*;
 import mindustry.io.*;
 import mindustry.maps.MapPreviewLoader.*;
 import mindustry.maps.filters.*;
+import mindustry.service.*;
 import mindustry.world.*;
 import mindustry.world.blocks.storage.*;
 
@@ -36,14 +37,16 @@ public class Maps{
     };
 
     /** List of all built-in maps. Filenames only. */
-    private static String[] defaultMapNames = {"maze", "fortress", "labyrinth", "islands", "tendrils", "caldera", "wasteland", "shattered", "fork", "triad", "mudFlats", "moltenLake", "archipelago", "debrisField", "erekirwavemap", "veins", "glacier", "passage"};
+    private static String[] defaultMapNames = {"maze", "fortress", "labyrinth", "islands", "tendrils", "caldera", "wasteland", "shattered", "fork", "triad", "mudFlats", "moltenLake", "archipelago", "debrisField", "domain", "veins", "glacier", "passage"};
     /** Maps tagged as PvP */
     private static String[] pvpMaps = {"veins", "glacier", "passage"};
 
     /** All maps stored in an ordered array. */
     private Seq<Map> maps = new Seq<>();
     private ShuffleMode shuffleMode = ShuffleMode.all;
+
     private @Nullable MapProvider shuffler;
+    private @Nullable Map nextMapOverride;
 
     private ObjectSet<Map> previewList = new ObjectSet<>();
 
@@ -60,8 +63,19 @@ public class Maps{
         this.shuffler = provider;
     }
 
+    /** Set the map that will override the next selected map. */
+    public void setNextMapOverride(Map nextMapOverride){
+        this.nextMapOverride = nextMapOverride;
+    }
+
     /** @return the next map to shuffle to. May be null, in which case the server should be stopped. */
     public @Nullable Map getNextMap(Gamemode mode, @Nullable Map previous){
+        if(nextMapOverride != null){
+            Map next = nextMapOverride;
+            nextMapOverride = null;
+            return next;
+        }
+
         if(shuffler != null) return shuffler.next(mode, previous);
         return shuffleMode.next(mode, previous);
     }
@@ -134,6 +148,8 @@ public class Maps{
         //workshop
         for(Fi file : platform.getWorkshopContent(Map.class)){
             try{
+                //HACK this achievement isn't completing for some reason
+                Achievement.downloadMapWorkshop.complete();
                 Map map = loadMap(file, false);
                 map.workshop = true;
                 map.tags.put("steamid", file.parent().name());
@@ -190,7 +206,7 @@ public class Maps{
                 maps.remove(other);
                 file = other.file;
             }else{
-                file = findFile();
+                file = findFile(name);
             }
 
             //create map, write it, etc etc etc
@@ -239,7 +255,7 @@ public class Maps{
 
     /** Import a map, then save it. This updates all values and stored data necessary. */
     public void importMap(Fi file) throws IOException{
-        Fi dest = findFile();
+        Fi dest = findFile(file.name());
         file.copyTo(dest);
 
         Map map = loadMap(dest, true);
@@ -429,13 +445,19 @@ public class Maps{
     }
 
     /** Find a new filename to put a map to. */
-    private Fi findFile(){
-        //find a map name that isn't used.
-        int i = maps.size;
-        while(customMapDirectory.child("map_" + i + "." + mapExtension).exists()){
-            i++;
+    private Fi findFile(String unsanitizedName){
+        String name = Strings.sanitizeFilename(unsanitizedName);
+        if(name.isEmpty()) name = "blank";
+
+        Fi result = null;
+        int index = 0;
+
+        while(result == null || result.exists()){
+            result = customMapDirectory.child(name + (index == 0 ? "" : "_" + index) + "." + mapExtension);
+            index ++;
         }
-        return customMapDirectory.child("map_" + i + "." + mapExtension);
+
+        return result;
     }
 
     private Map loadMap(Fi file, boolean custom) throws IOException{

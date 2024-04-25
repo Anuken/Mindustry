@@ -60,8 +60,8 @@ public class CargoAI extends AIController{
                 }
             }else{
 
-                //what if some prankster reconfigures the source while the unit is moving? we can't have that!
-                if(unloadTarget.item != itemTarget){
+                //what if some prankster reconfigures or picks up the target while the unit is moving? we can't have that!
+                if(unloadTarget.item != itemTarget || unloadTarget.isPayload()){
                     unloadTarget = null;
                     return;
                 }
@@ -120,6 +120,7 @@ public class CargoAI extends AIController{
                     lastStale = target;
                 }else{
                     unloadTarget = target;
+                    targets.clear();
                     return i;
                 }
             }
@@ -133,6 +134,7 @@ public class CargoAI extends AIController{
             unloadTarget = lastStale;
         }
 
+        targets.clear();
         return -1;
     }
 
@@ -179,6 +181,8 @@ public class CargoAI extends AIController{
         if(unloadTarget == null && lastStale != null){
             unloadTarget = lastStale;
         }
+
+        targets.clear();
     }
 
     //unused, might change later

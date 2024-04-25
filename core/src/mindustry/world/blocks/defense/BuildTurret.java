@@ -66,11 +66,18 @@ public class BuildTurret extends BaseTurret{
     }
 
     @Override
+    public void setStats(){
+        super.setStats();
+
+        stats.addPercent(Stat.buildSpeed, buildSpeed);
+    }
+
+    @Override
     public TextureRegion[] icons(){
         return new TextureRegion[]{baseRegion, region};
     }
 
-    public class BuildTurretBuild extends BaseTurretBuild implements ControlBlock{
+    public class BuildTurretBuild extends BaseTurretBuild implements ControlBlock, RotBlock{
         public BlockUnitc unit = (BlockUnitc)unitType.create(team);
         public @Nullable Unit following;
         public @Nullable BlockPlan lastPlan;
@@ -83,6 +90,11 @@ public class BuildTurret extends BaseTurret{
         @Override
         public boolean canControl(){
             return true;
+        }
+
+        @Override
+        public float buildRotation(){
+            return unit.rotation();
         }
 
         @Override
@@ -105,7 +117,9 @@ public class BuildTurret extends BaseTurret{
                 unit.lookAt(angleTo(unit.buildPlan()));
             }
 
-            checkSuppression();
+            if(checkSuppression()){
+                efficiency = potentialEfficiency = 0f;
+            }
 
             unit.buildSpeedMultiplier(potentialEfficiency * timeScale);
             unit.speedMultiplier(potentialEfficiency * timeScale);

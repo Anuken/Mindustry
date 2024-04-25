@@ -30,7 +30,7 @@ import java.util.zip.*;
 import static mindustry.Vars.*;
 
 public class LogicBlock extends Block{
-    private static final int maxByteLen = 1024 * 500;
+    private static final int maxByteLen = 1024 * 100;
 
     public int maxInstructionScale = 5;
     public int instructionsPerTick = 1;
@@ -45,6 +45,7 @@ public class LogicBlock extends Block{
         configurable = true;
         group = BlockGroup.logic;
         schematicPriority = 5;
+        ignoreResizeConfig = true;
 
         //universal, no real requirements
         envEnabled = Env.any;
@@ -73,6 +74,10 @@ public class LogicBlock extends Block{
                     link.name = "";
                     link.name = entity.findLinkName(lbuild.block);
                 }
+                //disable when unlinking
+                if(!link.active && lbuild.block.autoResetEnabled && lbuild.lastDisabler == entity){
+                    lbuild.enabled = true;
+                }
             }else{
                 entity.links.remove(l -> world.build(l.x, l.y) == lbuild);
                 entity.links.add(new LogicLink(x, y, entity.findLinkName(lbuild.block), true));
@@ -80,6 +85,11 @@ public class LogicBlock extends Block{
 
             entity.updateCode(entity.code, true, null);
         });
+    }
+
+    @Override
+    public boolean checkForceDark(Tile tile){
+        return !accessible();
     }
 
     public boolean accessible(){
@@ -167,7 +177,7 @@ public class LogicBlock extends Block{
 
                 int bytelen = stream.readInt();
 
-                if(bytelen > maxByteLen) throw new RuntimeException("Malformed logic data! Length: " + bytelen);
+                if(bytelen > maxByteLen) throw new RuntimeException("Logic data too long or malformed! Length: " + bytelen);
 
                 byte[] bytes = new byte[bytelen];
                 stream.readFully(bytes);
@@ -345,8 +355,6 @@ public class LogicBlock extends Block{
                         }
                     }
 
-                    asm.putConst("@mapw", world.width());
-                    asm.putConst("@maph", world.height());
                     asm.putConst("@links", executor.links.length);
                     asm.putConst("@ipt", instructionsPerTick);
 
@@ -498,13 +506,17 @@ public class LogicBlock extends Block{
             if(state.rules.disableWorldProcessors && privileged) return;
 
             if(enabled && executor.initialized()){
-                accumulator += edelta() * ipt * efficiency;
+                accumulator += edelta() * ipt;
 
                 if(accumulator > maxInstructionScale * ipt) accumulator = maxInstructionScale * ipt;
 
                 for(int i = 0; i < (int)accumulator; i++){
                     executor.runOnce();
                     accumulator --;
+                    if(executor.yield){
+                        executor.yield = false;
+                        break;
+                    }
                 }
             }
         }
@@ -561,13 +573,12 @@ public class LogicBlock extends Block{
         }
 
         @Override
-        public void buildConfiguration(Table table){
-            if(!accessible()){
-                //go away
-                deselect();
-                return;
-            }
+        public boolean shouldShowConfigure(Player player){
+            return accessible();
+        }
 
+        @Override
+        public void buildConfiguration(Table table){
             table.button(Icon.pencil, Styles.cleari, () -> {
                 ui.logic.show(code, executor, privileged, code -> configure(compress(code, relativeConnections())));
             }).size(40);

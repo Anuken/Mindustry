@@ -1,10 +1,12 @@
 package mindustry.world.blocks.distribution;
 
+import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -15,6 +17,7 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class Sorter extends Block{
+    public @Load(value = "@-cross", fallback = "cross-full") TextureRegion cross;
     public boolean invert;
 
     public Sorter(String name){
@@ -49,6 +52,11 @@ public class Sorter extends Block{
         return build == null || build.sortItem == null ? 0 : build.sortItem.color.rgba();
     }
 
+    @Override
+    protected TextureRegion[] icons(){
+        return new TextureRegion[]{Core.atlas.find("source-bottom"), region};
+    }
+
     public class SorterBuild extends Building{
         public @Nullable Item sortItem;
 
@@ -63,15 +71,16 @@ public class Sorter extends Block{
 
         @Override
         public void draw(){
-            super.draw();
 
             if(sortItem == null){
-                Draw.rect("cross", x, y);
+                Draw.rect(cross, x, y);
             }else{
                 Draw.color(sortItem.color);
-                Draw.rect("center", x, y);
+                Fill.square(x, y, tilesize/2f - 0.00001f);
                 Draw.color();
             }
+
+            super.draw();
         }
 
         @Override
@@ -126,7 +135,7 @@ public class Sorter extends Block{
 
         @Override
         public void buildConfiguration(Table table){
-            ItemSelection.buildTable(Sorter.this, table, content.items(), () -> sortItem, this::configure);
+            ItemSelection.buildTable(Sorter.this, table, content.items(), () -> sortItem, this::configure, selectionRows, selectionColumns);
         }
 
         @Override
