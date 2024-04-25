@@ -748,21 +748,19 @@ public class Mods implements Loadable{
                 }
             }
 
-            Seq<String> added = new Seq<>();
+            Seq<String> left = currentRun.keys().toSeq();
             if(contentOrder != null){
                 for (String contentName : contentOrder){
                     LoadRun run = currentRun.get(contentName);
                     if(run != null){
                         runs.add(run);
-                        added.add(contentName);
+                        left.remove(contentName);
                     }else{
                         Log.warn("Cannot find content defined in contentOrder: @", contentName);
                     }
                 }
             }
 
-            Seq<String> left = currentRun.keys().toSeq();
-            left.removeAll(added);
             runs.addAll(left.map(name -> currentRun.get(name)).sort());
         }
 
