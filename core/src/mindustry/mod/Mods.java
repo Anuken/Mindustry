@@ -755,9 +755,9 @@ public class Mods implements Loadable{
                         Log.warn("Cannot find content defined in contentOrder: @", contentName);
                     }
                 }
-                runs.addAll(left.map(name -> currentRun.get(name)).sort());
+                runs.addAll(left.map(name -> currentRun.get(name)));
             }else{
-                runs.addAll(currentRun.values().toSeq().sort());
+                runs.addAll(currentRun.values().toSeq());
             }
         }
 
