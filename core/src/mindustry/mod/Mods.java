@@ -738,14 +738,18 @@ public class Mods implements Loadable{
                     Fi folder = contentRoot.child(lower + (lower.endsWith("s") ? "" : "s"));
                     if(folder.exists()){
                         for(Fi file : folder.findAll(f -> f.extension().equals("json") || f.extension().equals("hjson"))){
-                            currentRun.put(file.nameWithoutExtension(), new LoadRun(type, file, mod));
+                            if(contentOrder == null){
+                                runs.add(new LoadRun(type, file, mod));
+                            }else{
+                                currentRun.put(file.nameWithoutExtension(), new LoadRun(type, file, mod));
+                            }
                         }
                     }
                 }
             }
 
+            Seq<String> left = currentRun.keys().toSeq();
             if(contentOrder != null){
-                Seq<String> left = currentRun.keys().toSeq();
                 for (String contentName : contentOrder){
                     LoadRun run = currentRun.get(contentName);
                     if(run != null){
@@ -755,10 +759,9 @@ public class Mods implements Loadable{
                         Log.warn("Cannot find content defined in contentOrder: @", contentName);
                     }
                 }
-                runs.addAll(left.map(name -> currentRun.get(name)));
-            }else{
-                runs.addAll(currentRun.values().toSeq());
             }
+
+            runs.addAll(left.map(name -> currentRun.get(name)).sort());
         }
 
         for(LoadRun l : runs){
