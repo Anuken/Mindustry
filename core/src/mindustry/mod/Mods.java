@@ -744,8 +744,8 @@ public class Mods implements Loadable{
                 }
             }
 
-            Seq<String> left = currentRun.keys().toSeq();
             if(contentOrder != null){
+                Seq<String> left = currentRun.keys().toSeq();
                 for (String contentName : contentOrder){
                     LoadRun run = currentRun.get(contentName);
                     if(run != null){
@@ -755,9 +755,10 @@ public class Mods implements Loadable{
                         Log.warn("Cannot find content defined in contentOrder: @", contentName);
                     }
                 }
+                runs.addAll(left.map(name -> currentRun.get(name)).sort());
+            }else{
+                runs.addAll(currentRun.values().toSeq().sort());
             }
-
-            runs.addAll(left.map(name -> currentRun.get(name)).sort());
         }
 
         for(LoadRun l : runs){
