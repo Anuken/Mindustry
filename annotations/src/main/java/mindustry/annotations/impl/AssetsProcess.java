@@ -46,7 +46,7 @@ public class AssetsProcess extends BaseProcessor{
         texIcons.each((key, val) -> {
             String[] split = val.split("\\|");
             String name = Strings.kebabToCamel(split[1]).replace("Medium", "").replace("Icon", "").replace("Ui", "");
-            if(SourceVersion.isKeyword(name) || name.equals("char")) name += "i";
+            if(SourceVersion.isKeyword(name) || "char".equals(name)) name += "i";
 
             ichtype.addField(FieldSpec.builder(char.class, name, Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL).addJavadoc(String.format("\\u%04x", Integer.parseInt(key))).initializer("'" + ((char)Integer.parseInt(key)) + "'").build());
         });
@@ -177,7 +177,7 @@ public class AssetsProcess extends BaseProcessor{
             type.addStaticBlock(staticb.build());
         }
 
-        if(classname.equals("Sounds")){
+        if("Sounds".equals(classname)){
             type.addField(FieldSpec.builder(ClassName.bestGuess(rtype), "none", Modifier.STATIC, Modifier.PUBLIC).initializer("new " + rtype + "()").build());
         }
 

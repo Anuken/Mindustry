@@ -178,7 +178,7 @@ public interface Platform{
                 }
 
                 //cancelled selection, ignore result
-                if(result.isEmpty() || result.equals("\n")) return;
+                if(result.isEmpty() || "\n".equals(result)) return;
 
                 if(result.endsWith("\n")) result = result.substring(0, result.length() - 1);
                 if(result.contains("\n")) throw new IOException("invalid input: \"" + result + "\"");

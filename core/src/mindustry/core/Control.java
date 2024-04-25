@@ -334,7 +334,7 @@ public class Control implements ApplicationListener, Loadable{
         player.name = Core.settings.getString("name");
 
         String locale = Core.settings.getString("locale");
-        if(locale.equals("default")){
+        if("default".equals(locale)){
             locale = Locale.getDefault().toString();
         }
         player.locale = locale;

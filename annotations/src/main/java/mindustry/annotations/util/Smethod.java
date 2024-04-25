@@ -50,7 +50,7 @@ public class Smethod extends Selement<ExecutableElement>{
     }
 
     public boolean isVoid(){
-        return ret().toString().equals("void");
+        return "void".equals(ret().toString());
     }
 
     public TypeMirror ret(){

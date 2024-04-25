@@ -102,7 +102,7 @@ public class LExecutor{
         builder.vars.each((name, var) -> {
             Var dest = new Var(name);
             vars[var.id] = dest;
-            if(dest.name.equals("@ipt")){
+            if("@ipt".equals(dest.name)){
                 iptIndex = var.id;
             }
 

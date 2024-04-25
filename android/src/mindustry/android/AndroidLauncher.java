@@ -246,10 +246,10 @@ public class AndroidLauncher extends AndroidApplication{
             if(uri != null){
                 File myFile = null;
                 String scheme = uri.getScheme();
-                if(scheme.equals("file")){
+                if("file".equals(scheme)){
                     String fileName = uri.getEncodedPath();
                     myFile = new File(fileName);
-                }else if(!scheme.equals("content")){
+                }else if(!"content".equals(scheme)){
                     //error
                     return;
                 }

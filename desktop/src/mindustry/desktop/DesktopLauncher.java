@@ -193,7 +193,7 @@ public class DesktopLauncher extends ClientLauncher{
             });
 
             Core.app.post(() -> {
-                if(args.length >= 2 && args[0].equals("+connect_lobby")){
+                if(args.length >= 2 && "+connect_lobby".equals(args[0])){
                     try{
                         long id = Long.parseLong(args[1]);
                         ui.join.connect("steam:" + id, port);

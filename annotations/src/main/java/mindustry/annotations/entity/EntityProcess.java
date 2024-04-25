@@ -130,7 +130,7 @@ public class EntityProcess extends BaseProcessor{
                     .addJavadoc(method.doc() == null ? "" : method.doc())
                     .addExceptions(method.thrownt())
                     .addTypeVariables(method.typeVariables().map(TypeVariableName::get))
-                    .returns(method.ret().toString().equals("void") ? TypeName.VOID : method.retn())
+                    .returns("void".equals(method.ret().toString()) ? TypeName.VOID : method.retn())
                     .addParameters(method.params().map(v -> ParameterSpec.builder(v.tname(), v.name())
                     .build())).addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT).build());
                 }
@@ -455,18 +455,18 @@ public class EntityProcess extends BaseProcessor{
                     }
 
                     //only write the block if it's a void method with several entries
-                    boolean writeBlock = first.ret().toString().equals("void") && entry.value.size > 1;
+                    boolean writeBlock = "void".equals(first.ret().toString()) && entry.value.size > 1;
 
                     if((entry.value.first().is(Modifier.ABSTRACT) || entry.value.first().is(Modifier.NATIVE)) && entry.value.size == 1 && !entry.value.first().has(InternalImpl.class)){
                         err(entry.value.first().up().getSimpleName() + "#" + entry.value.first() + " is an abstract method and must be implemented in some component", type);
                     }
 
                     //SPECIAL CASE: inject group add/remove code
-                    if(first.name().equals("add") || first.name().equals("remove")){
-                        mbuilder.addStatement("if(added == $L) return", first.name().equals("add"));
+                    if("add".equals(first.name()) || "remove".equals(first.name())){
+                        mbuilder.addStatement("if(added == $L) return", "add".equals(first.name()));
 
                         for(GroupDefinition def : groups){
-                            if(first.name().equals("add")){
+                            if("add".equals(first.name())){
                                 //remove/add from each group, assume imported
                                 mbuilder.addStatement("index__$L = Groups.$L.addIndex(this)", def.name, def.name);
                             }else{
@@ -483,28 +483,28 @@ public class EntityProcess extends BaseProcessor{
                     if(hasIO){
                         //SPECIAL CASE: I/O code
                         //note that serialization is generated even for non-serializing entities for manual usage
-                        if((first.name().equals("read") || first.name().equals("write"))){
-                            io.write(mbuilder, first.name().equals("write"));
+                        if(("read".equals(first.name()) || "write".equals(first.name()))){
+                            io.write(mbuilder, "write".equals(first.name()));
                             specialIO = true;
                         }
 
                         //SPECIAL CASE: sync I/O code
-                        if((first.name().equals("readSync") || first.name().equals("writeSync"))){
-                            io.writeSync(mbuilder, first.name().equals("writeSync"), allFields);
+                        if(("readSync".equals(first.name()) || "writeSync".equals(first.name()))){
+                            io.writeSync(mbuilder, "writeSync".equals(first.name()), allFields);
                         }
 
                         //SPECIAL CASE: sync I/O code for writing to/from a manual buffer
-                        if((first.name().equals("readSyncManual") || first.name().equals("writeSyncManual"))){
-                            io.writeSyncManual(mbuilder, first.name().equals("writeSyncManual"), syncedFields);
+                        if(("readSyncManual".equals(first.name()) || "writeSyncManual".equals(first.name()))){
+                            io.writeSyncManual(mbuilder, "writeSyncManual".equals(first.name()), syncedFields);
                         }
 
                         //SPECIAL CASE: interpolate method implementation
-                        if(first.name().equals("interpolate")){
+                        if("interpolate".equals(first.name())){
                             io.writeInterpolate(mbuilder, syncedFields);
                         }
 
                         //SPECIAL CASE: method to snap to target position after being read for the first time
-                        if(first.name().equals("snapSync")){
+                        if("snapSync".equals(first.name())){
                             mbuilder.addStatement("updateSpacing = 16");
                             mbuilder.addStatement("lastUpdated = $T.millis()", Time.class);
                             for(Svar field : syncedFields){
@@ -515,7 +515,7 @@ public class EntityProcess extends BaseProcessor{
                         }
 
                         //SPECIAL CASE: method to snap to current position so interpolation doesn't go wild
-                        if(first.name().equals("snapInterpolation")){
+                        if("snapInterpolation".equals(first.name())){
                             mbuilder.addStatement("updateSpacing = 16");
                             mbuilder.addStatement("lastUpdated = $T.millis()", Time.class);
                             for(Svar field : syncedFields){
@@ -560,7 +560,7 @@ public class EntityProcess extends BaseProcessor{
 
                     //add free code to remove methods - always at the end
                     //this only gets called next frame.
-                    if(first.name().equals("remove") && ann.pooled()){
+                    if("remove".equals(first.name()) && ann.pooled()){
                         mbuilder.addStatement("mindustry.gen.Groups.queueFree(($T)this)", Poolable.class);
                     }
 
@@ -921,7 +921,7 @@ public class EntityProcess extends BaseProcessor{
                                     builder.addStatement("return " + getDefault(method.ret().toString()));
                                 }else{
                                     String init = varInitializers.get(desc);
-                                    builder.addStatement("return " + (init.equals("{}") ? "new " + variable.mirror().toString() : "") + init);
+                                    builder.addStatement("return " + ("{}".equals(init) ? "new " + variable.mirror().toString() : "") + init);
                                 }
                         }
                     }

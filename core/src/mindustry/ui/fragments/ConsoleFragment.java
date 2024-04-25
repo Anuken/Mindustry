@@ -165,7 +165,7 @@ public class ConsoleFragment extends Table{
         if(message.replace(" ", "").isEmpty()) return;
 
         //special case for 'clear' command
-        if(message.equals("clear")){
+        if("clear".equals(message)){
             clearMessages();
             return;
         }

@@ -80,7 +80,7 @@ public class LogicStatementProcessor extends BaseProcessor{
                 reader.addStatement("if(length > $L) result.$L = $L(tokens[$L])",
                 index + 1,
                 field.name(),
-                field.mirror().toString().equals("java.lang.String") ?
+                "java.lang.String".equals(field.mirror().toString()) ?
                 "" : (field.tname().isPrimitive() ? field.tname().box().toString() :
                 field.mirror().toString()) + ".valueOf", //if it's not a string, it must have a valueOf method
                 index + 1

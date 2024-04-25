@@ -40,8 +40,8 @@ public abstract class BaseProcessor extends AbstractProcessor{
     }
 
     public static boolean isPrimitive(String type){
-        return type.equals("boolean") || type.equals("byte") || type.equals("short") || type.equals("int")
-        || type.equals("long") || type.equals("float") || type.equals("double") || type.equals("char");
+        return "boolean".equals(type) || "byte".equals(type) || "short".equals(type) || "int".equals(type)
+        || "long".equals(type) || "float".equals(type) || "double".equals(type) || "char".equals(type);
     }
 
     public static boolean instanceOf(String type, String other){

@@ -363,7 +363,7 @@ public class Maps{
     }
 
     public Seq<SpawnGroup> readWaves(String str){
-        return str == null ? null : str.equals("[]") ? new Seq<>() : Seq.with(JsonIO.json.fromJson(SpawnGroup[].class, str));
+        return str == null ? null : "[]".equals(str) ? new Seq<>() : Seq.with(JsonIO.json.fromJson(SpawnGroup[].class, str));
     }
 
     public void loadPreviews(){

@@ -226,8 +226,8 @@ public class EntityIO{
         type = replacements.get(type, type);
 
         if(BaseProcessor.isPrimitive(type)){
-            s(type.equals("boolean") ? "bool" : type.charAt(0) + "", field);
-        }else if(instanceOf(type, "mindustry.ctype.Content") && !type.equals("mindustry.ai.UnitStance") && !type.equals("mindustry.ai.UnitCommand")){
+            s("boolean".equals(type) ? "bool" : type.charAt(0) + "", field);
+        }else if(instanceOf(type, "mindustry.ctype.Content") && !"mindustry.ai.UnitStance".equals(type) && !"mindustry.ai.UnitCommand".equals(type)){
             if(write){
                 s("s", field + ".id");
             }else{
@@ -262,7 +262,7 @@ public class EntityIO{
             String struct = type.substring(0, type.indexOf("<"));
             String generic = type.substring(type.indexOf("<") + 1, type.indexOf(">"));
 
-            if(struct.equals("arc.struct.Queue") || struct.equals("arc.struct.Seq")){
+            if("arc.struct.Queue".equals(struct) || "arc.struct.Seq".equals(struct)){
                 if(write){
                     s("i", field + ".size");
                     cont("for(int INDEX = 0; INDEX < $L.size; INDEX ++)", field);

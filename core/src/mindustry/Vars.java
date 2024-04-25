@@ -460,7 +460,7 @@ public class Vars implements Loadable{
             Fi handle = Core.files.internal("bundles/bundle");
             Locale locale;
             String loc = settings.getString("locale");
-            if(loc.equals("default")){
+            if("default".equals(loc)){
                 locale = Locale.getDefault();
             }else{
                 Locale lastLocale;
@@ -478,7 +478,7 @@ public class Vars implements Loadable{
             Core.bundle = I18NBundle.createBundle(handle, locale);
 
             //router
-            if(locale.toString().equals("router")){
+            if("router".equals(locale.toString())){
                 bundle.debug("router");
             }
         }

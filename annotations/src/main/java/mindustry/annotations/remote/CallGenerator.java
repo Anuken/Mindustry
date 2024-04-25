@@ -123,7 +123,7 @@ public class CallGenerator{
             }
 
             if(BaseProcessor.isPrimitive(typeName)){ //check if it's a primitive, and if so write it
-                builder.addStatement("WRITE.$L($L)", typeName.equals("boolean") ? "bool" : typeName.charAt(0) + "", varName);
+                builder.addStatement("WRITE.$L($L)", "boolean".equals(typeName) ? "bool" : typeName.charAt(0) + "", varName);
             }else{
                 //else, try and find a serializer
                 String ser = serializer.getNetWriter(typeName.replace("mindustry.gen.", ""), SerializerResolver.locate(ent.element.e, var.mirror(), true));
@@ -186,7 +186,7 @@ public class CallGenerator{
             //name of parameter
             String varName = var.name();
             //capitalized version of type name for reading primitives
-            String pname = typeName.equals("boolean") ? "bool" : typeName.charAt(0) + "";
+            String pname = "boolean".equals(typeName) ? "bool" : typeName.charAt(0) + "";
 
             //write primitives automatically
             if(BaseProcessor.isPrimitive(typeName)){

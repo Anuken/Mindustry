@@ -83,7 +83,7 @@ public class NetClient implements ApplicationListener{
             });
 
             String locale = Core.settings.getString("locale");
-            if(locale.equals("default")){
+            if("default".equals(locale)){
                 locale = Locale.getDefault().toString();
             }
 

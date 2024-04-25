@@ -961,7 +961,7 @@ public class Mods implements Loadable{
                 Class<?> main = Class.forName(mainClass, true, loader);
 
                 //detect mods that incorrectly package mindustry in the jar
-                if((main.getSuperclass().getName().equals("mindustry.mod.Plugin") || main.getSuperclass().getName().equals("mindustry.mod.Mod")) &&
+                if(("mindustry.mod.Plugin".equals(main.getSuperclass().getName()) || "mindustry.mod.Mod".equals(main.getSuperclass().getName())) &&
                     main.getSuperclass().getClassLoader() != Mod.class.getClassLoader()){
                     throw new ModLoadException(
                         "This mod/plugin has loaded Mindustry dependencies from its own class loader. " +

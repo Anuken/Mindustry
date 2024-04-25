@@ -91,7 +91,7 @@ public class LanguageDialog extends BaseDialog{
     public Locale getLocale(){
         String loc = Core.settings.getString("locale");
 
-        if(loc.equals("default")){
+        if("default".equals(loc)){
             findClosestLocale();
         }
 

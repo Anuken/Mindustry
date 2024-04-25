@@ -66,7 +66,7 @@ public class LParser{
 
     /** Apply changes after reading a list of tokens. */
     void checkRead(){
-        if(tokens[0].equals("op")){
+        if("op".equals(tokens[0])){
             //legacy name change
             tokens[1] = opNameChanges.get(tokens[1], tokens[1]);
         }
@@ -118,14 +118,14 @@ public class LParser{
                 boolean wasJump;
                 String jumpLoc = null;
                 //clean up jump position before parsing
-                if(wasJump = (tokens[0].equals("jump") && tok > 1 && !Strings.canParseInt(tokens[1]))){
+                if(wasJump = ("jump".equals(tokens[0]) && tok > 1 && !Strings.canParseInt(tokens[1]))){
                     jumpLoc = tokens[1];
                     tokens[1] = "-1";
                 }
 
                 for(int i = 1; i < tok; i++){
-                    if(tokens[i].equals("@configure")) tokens[i] = "@config";
-                    if(tokens[i].equals("configure")) tokens[i] = "config";
+                    if("@configure".equals(tokens[i])) tokens[i] = "@config";
+                    if("configure".equals(tokens[i])) tokens[i] = "config";
                 }
 
                 LStatement st;

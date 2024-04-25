@@ -89,7 +89,7 @@ public class MapLocales extends ObjectMap<String, StringMap> implements JsonSeri
     // To handle default locale properly
     public static String currentLocale(){
         String locale = settings.getString("locale");
-        if(locale.equals("default")){
+        if("default".equals(locale)){
             locale = Locale.getDefault().getLanguage();
         }
         return locale;

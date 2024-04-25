@@ -106,7 +106,7 @@ public class LogicBlock extends Block{
         if(name.contains("-")){
             String[] split = name.split("-");
             //filter out 'large' at the end of block names
-            if(split.length >= 2 && (split[split.length - 1].equals("large") || Strings.canParseFloat(split[split.length - 1]))){
+            if(split.length >= 2 && ("large".equals(split[split.length - 1]) || Strings.canParseFloat(split[split.length - 1]))){
                 name = split[split.length - 2];
             }else{
                 name = split[split.length - 1];
