@@ -14,7 +14,6 @@ public class LogicFilter extends GenerateFilter{
     public static int maxInstructionsExecution = 500 * 500 * 25;
     public String code;
     public boolean loop;
-    LExecutor executor;
 
     @Override
     public FilterOption[] options(){
@@ -39,7 +38,7 @@ public class LogicFilter extends GenerateFilter{
 
     @Override
     public void apply(Tiles tiles, GenerateInput in){
-        executor = new LExecutor();
+        LExecutor executor = new LExecutor();
         executor.privileged = true;
 
         try{
@@ -54,8 +53,7 @@ public class LogicFilter extends GenerateFilter{
         logicVars.update();
 
         //NOTE: all tile operations will call setNet for tiles, but that should have no overhead during world loading
-
-        //limited run
+        //executions are limited to prevent infinite generation
         for(int i = 1; i < maxInstructionsExecution; i++){
             if(!loop && (executor.counter.numval >= executor.instructions.length || executor.counter.numval < 0)) break;
             executor.runOnce();
