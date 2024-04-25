@@ -1,6 +1,7 @@
 package mindustry.maps.filters;
 
 import arc.scene.ui.layout.*;
+import mindustry.*;
 import mindustry.gen.*;
 import mindustry.logic.*;
 import mindustry.maps.filters.FilterOption.*;
@@ -40,8 +41,19 @@ public class LogicFilter extends GenerateFilter{
     public void apply(Tiles tiles, GenerateInput in){
         executor = new LExecutor();
         executor.privileged = true;
-        executor.isFilter = true;
-        configure(code);
+
+        try{
+            //assembler has no variables, all the standard ones are null
+            executor.load(LAssembler.assemble(code, true));
+        }catch(Throwable ignored){
+            //if loading code
+            return;
+        }
+
+        //this updates map width/height global variables
+        logicVars.update();
+
+        //NOTE: all tile operations will call setNet for tiles, but that should have no overhead during world loading
 
         //limited run
         for(int i = 1; i < maxInstructionsExecution; i++){
@@ -58,25 +70,5 @@ public class LogicFilter extends GenerateFilter{
     @Override
     public boolean isPost(){
         return true;
-    }
-
-    void configure(String code){
-        try{
-            //create assembler to store extra variables
-            LAssembler asm = LAssembler.assemble(code, true);
-
-            asm.putConst("@mapw", world.width());
-            asm.putConst("@maph", world.height());
-            asm.putConst("@links", executor.links.length);
-            asm.putConst("@ipt", 1);
-
-            asm.putConst("@thisx", 0);
-            asm.putConst("@thisy", 0);
-
-            executor.load(asm);
-        }catch(Exception e){
-            //handle malformed code and replace it with nothing
-            executor.load(LAssembler.assemble(code = "", true));
-        }
     }
 }

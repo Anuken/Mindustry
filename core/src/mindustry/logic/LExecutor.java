@@ -60,7 +60,7 @@ public class LExecutor{
     public @Nullable LogicBuild build;
     public IntSet linkIds = new IntSet();
     public Team team = Team.derelict;
-    public boolean privileged = false, isFilter = false;
+    public boolean privileged = false;
 
     //yes, this is a minor memory leak, but it's probably not significant enough to matter
     protected static IntFloatMap unitTimeouts = new IntFloatMap();
