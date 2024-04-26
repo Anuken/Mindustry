@@ -1303,7 +1303,7 @@ public class Block extends UnlockableContent implements Senseable{
 
         //generate paletted team regions
         if(teamRegion != null && teamRegion.found()){
-            teamRegions = colorTeams(packer, teamRegion, "-team");
+            teamRegions = colorTeamRegions(packer, teamRegion, "-team");
         }
 
         Pixmap last = null;
@@ -1363,7 +1363,7 @@ public class Block extends UnlockableContent implements Senseable{
         return !rotate && lockRotation ? 0 : rot;
     }
 
-    public TextureRegion[] colorTeams(MultiPacker packer, TextureRegion baseRegion, String suffix){
+    public TextureRegion[] colorTeamRegions(MultiPacker packer, TextureRegion baseRegion, String suffix){
         Seq<Pixmap> toDispose = new Seq<>();
         for(Team team : Team.all){
             //if there's an override, don't generate anything

@@ -65,7 +65,7 @@ public class DrawTeam extends DrawBlock{
         if(suffix.equals("-team")){ //Already handled by block
             regions = block.teamRegions;
         }else{
-            regions = block.colorTeams(packer, region, suffix);
+            regions = block.colorTeamRegions(packer, region, suffix);
         }
     }
 
