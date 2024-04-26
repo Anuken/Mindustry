@@ -46,6 +46,10 @@ public class PowerGenerator extends PowerDistributor{
         flags = EnumSet.of(BlockFlag.generator);
     }
 
+    public float getDisplayedPowerProduction(){
+        return powerProduction;
+    }
+
     @Override
     public TextureRegion[] icons(){
         return drawer.finalIcons(this);
@@ -104,7 +108,7 @@ public class PowerGenerator extends PowerDistributor{
 
         @Override
         public float warmup(){
-            return productionEfficiency;
+            return enabled ? productionEfficiency : 0f;
         }
 
         @Override
@@ -116,8 +120,12 @@ public class PowerGenerator extends PowerDistributor{
             }
         }
 
+        public boolean shouldExplode(){
+            return warmup() >= explosionMinWarmup;
+        }
+
         public void createExplosion(){
-            if(warmup() >= explosionMinWarmup){
+            if(shouldExplode()){
                 if(explosionDamage > 0){
                     Damage.damage(x, y, explosionRadius * tilesize, explosionDamage);
                 }
@@ -152,7 +160,7 @@ public class PowerGenerator extends PowerDistributor{
 
         @Override
         public float getPowerProduction(){
-            return powerProduction * productionEfficiency;
+            return enabled ? powerProduction * productionEfficiency : 0f;
         }
 
         @Override

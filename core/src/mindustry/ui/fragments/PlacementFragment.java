@@ -11,7 +11,6 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.*;
 import mindustry.ai.*;
 import mindustry.content.*;
 import mindustry.core.*;
@@ -114,7 +113,7 @@ public class PlacementFragment{
         return hover;
     }
 
-    void rebuild(){
+    public void rebuild(){
         //category does not change on rebuild anymore, only on new world load
         Group group = toggler.parent;
         int index = toggler.getZIndex();
@@ -210,17 +209,21 @@ public class PlacementFragment{
         }
 
         if(Core.input.keyTap(Binding.category_prev)){
+            int i = 0;
             do{
                 currentCategory = currentCategory.prev();
-            }while(categoryEmpty[currentCategory.ordinal()]);
+                i ++;
+            }while(categoryEmpty[currentCategory.ordinal()] && i < categoryEmpty.length);
             input.block = getSelectedBlock(currentCategory);
             return true;
         }
 
         if(Core.input.keyTap(Binding.category_next)){
+            int i = 0;
             do{
                 currentCategory = currentCategory.next();
-            }while(categoryEmpty[currentCategory.ordinal()]);
+                i ++;
+            }while(categoryEmpty[currentCategory.ordinal()] && i < categoryEmpty.length);
             input.block = getSelectedBlock(currentCategory);
             return true;
         }
@@ -441,6 +444,9 @@ public class PlacementFragment{
                         UnitCommand[] currentCommand = {null};
                         var commands = new Seq<UnitCommand>();
 
+                        UnitStance[] currentStance = {null};
+                        var stances = new Seq<UnitStance>();
+
                         rebuildCommand = () -> {
                             u.clearChildren();
                             var units = control.input.selectedUnits;
@@ -450,7 +456,8 @@ public class PlacementFragment{
                                     counts[unit.type.id] ++;
                                 }
                                 commands.clear();
-                                boolean firstCommand = false;
+                                stances.clear();
+                                boolean firstCommand = false, firstStance = false;
                                 Table unitlist = u.table().growX().left().get();
                                 unitlist.left();
 
@@ -489,22 +496,49 @@ public class PlacementFragment{
                                             //remove commands that this next unit type doesn't have
                                             commands.removeAll(com -> !Structs.contains(type.commands, com));
                                         }
+
+                                        if(!firstStance){
+                                            stances.add(type.stances);
+                                            firstStance = true;
+                                        }else{
+                                            //remove commands that this next unit type doesn't have
+                                            stances.removeAll(st -> !Structs.contains(type.stances, st));
+                                        }
                                     }
                                 }
 
+                                //list commands
                                 if(commands.size > 1){
                                     u.row();
 
                                     u.table(coms -> {
+                                        coms.left();
+                                        int scol = 0;
                                         for(var command : commands){
                                             coms.button(Icon.icons.get(command.icon, Icon.cancel), Styles.clearNoneTogglei, () -> {
-                                                IntSeq ids = new IntSeq();
-                                                for(var unit : units){
-                                                    ids.add(unit.id);
-                                                }
+                                                Call.setUnitCommand(player, units.mapInt(un -> un.id).toArray(), command);
+                                            }).checked(i -> currentCommand[0] == command).size(50f).tooltip(command.localized(), true);
 
-                                                Call.setUnitCommand(Vars.player, ids.toArray(), command);
-                                            }).checked(i -> currentCommand[0] == command).size(50f).tooltip(command.localized());
+                                            if(++scol % 6 == 0) coms.row();
+                                        }
+
+                                    }).fillX().padTop(4f).left();
+                                }
+
+                                //list stances
+                                if(stances.size > 1){
+                                    u.row();
+
+                                    u.table(coms -> {
+                                        coms.left();
+                                        int scol = 0;
+                                        for(var stance : stances){
+
+                                            coms.button(Icon.icons.get(stance.icon, Icon.cancel), Styles.clearNoneTogglei, () -> {
+                                                Call.setUnitStance(player, units.mapInt(un -> un.id).toArray(), stance);
+                                            }).checked(i -> currentStance[0] == stance).size(50f).tooltip(stance.localized(), true);
+
+                                            if(++scol % 6 == 0) coms.row();
                                         }
                                     }).fillX().padTop(4f).left();
                                 }
@@ -514,31 +548,61 @@ public class PlacementFragment{
                         };
 
                         u.update(() -> {
-                            boolean hadCommand = false;
-                            UnitCommand shareCommand = null;
+                            {
+                                boolean hadCommand = false, hadStance = false;
+                                UnitCommand shareCommand = null;
+                                UnitStance shareStance = null;
 
-                            //find the command that all units have, or null if they do not share one
-                            for(var unit : control.input.selectedUnits){
-                                if(unit.isCommandable()){
-                                    var nextCommand = unit.command().command;
+                                //find the command that all units have, or null if they do not share one
+                                for(var unit : control.input.selectedUnits){
+                                    if(unit.isCommandable()){
+                                        var nextCommand = unit.command().command;
 
-                                    if(hadCommand){
-                                        if(shareCommand != nextCommand){
-                                            shareCommand = null;
+                                        if(hadCommand){
+                                            if(shareCommand != nextCommand){
+                                                shareCommand = null;
+                                            }
+                                        }else{
+                                            shareCommand = nextCommand;
+                                            hadCommand = true;
                                         }
-                                    }else{
-                                        shareCommand = nextCommand;
-                                        hadCommand = true;
+
+                                        var nextStance = unit.command().stance;
+
+                                        if(hadStance){
+                                            if(shareStance != nextStance){
+                                                shareStance = null;
+                                            }
+                                        }else{
+                                            shareStance = nextStance;
+                                            hadStance = true;
+                                        }
                                     }
                                 }
-                            }
 
-                            currentCommand[0] = shareCommand;
+                                currentCommand[0] = shareCommand;
+                                currentStance[0] = shareStance;
 
-                            int size = control.input.selectedUnits.size;
-                            if(curCount[0] != size){
-                                curCount[0] = size;
-                                rebuildCommand.run();
+                                int size = control.input.selectedUnits.size;
+                                if(curCount[0] != size){
+                                    curCount[0] = size;
+                                    rebuildCommand.run();
+                                }
+
+                                //not a huge fan of running input logic here, but it's convenient as the stance arrays are all here...
+                                for(UnitStance stance : stances){
+                                    //first stance must always be the stop stance
+                                    if(stance.keybind != null && Core.input.keyTap(stance.keybind)){
+                                        Call.setUnitStance(player, control.input.selectedUnits.mapInt(un -> un.id).toArray(), stance);
+                                    }
+                                }
+
+                                for(UnitCommand command : commands){
+                                    //first stance must always be the stop stance
+                                    if(command.keybind != null && Core.input.keyTap(command.keybind)){
+                                        Call.setUnitCommand(player, control.input.selectedUnits.mapInt(un -> un.id).toArray(), command);
+                                    }
+                                }
                             }
                         });
                         rebuildCommand.run();
@@ -611,7 +675,9 @@ public class PlacementFragment{
 
                 rebuildCategory.run();
                 frame.update(() -> {
-                    if(gridUpdate(control.input)) rebuildCategory.run();
+                    if(!control.input.commandMode && gridUpdate(control.input)){
+                        rebuildCategory.run();
+                    }
                 });
             });
         });

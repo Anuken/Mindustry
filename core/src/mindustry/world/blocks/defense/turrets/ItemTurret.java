@@ -28,7 +28,7 @@ public class ItemTurret extends Turret{
 
     /** Initializes accepted ammo map. Format: [item1, bullet1, item2, bullet2...] */
     public void ammo(Object... objects){
-        ammoTypes = ObjectMap.of(objects);
+        ammoTypes = OrderedMap.of(objects);
     }
 
     /** Limits bullet range to this turret's range value. */
@@ -79,8 +79,8 @@ public class ItemTurret extends Turret{
 
             @Override
             public float efficiency(Building build){
-                //valid when there's any ammo in the turret
-                return build instanceof ItemTurretBuild it && !it.ammo.isEmpty() ? 1f : 0f;
+                //valid when it can shoot
+                return build instanceof ItemTurretBuild it && it.ammo.size > 0 && (it.ammo.peek().amount >= ammoPerShot || it.cheating()) ? 1f : 0f;
             }
 
             @Override

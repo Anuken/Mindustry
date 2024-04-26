@@ -51,7 +51,7 @@ public class UI implements ApplicationListener, Loadable{
     public AboutDialog about;
     public GameOverDialog restart;
     public CustomGameDialog custom;
-    public MapsDialog maps;
+    public EditorMapsDialog maps;
     public LoadDialog load;
     public DiscordDialog discord;
     public JoinDialog join;
@@ -71,18 +71,27 @@ public class UI implements ApplicationListener, Loadable{
     public SchematicsDialog schematics;
     public ModsDialog mods;
     public ColorPicker picker;
+    public EffectsDialog effects;
     public LogicDialog logic;
     public FullTextDialog fullText;
     public CampaignCompleteDialog campaignComplete;
 
     public IntMap<Dialog> followUpMenus;
 
-    public Cursor drillCursor, unloadCursor, targetCursor;
+    public Cursor drillCursor, unloadCursor, targetCursor, repairCursor;
 
     private @Nullable Element lastAnnouncement;
 
     public UI(){
         Fonts.loadFonts();
+    }
+
+    public static void loadColors(){
+        Colors.put("accent", Pal.accent);
+        Colors.put("unlaunched", Color.valueOf("8982ed"));
+        Colors.put("highlight", Pal.accent.cpy().lerp(Color.white, 0.3f));
+        Colors.put("stat", Pal.stat);
+        Colors.put("negstat", Pal.negativeStat);
     }
 
     @Override
@@ -117,6 +126,9 @@ public class UI implements ApplicationListener, Loadable{
 
         Tooltips.getInstance().animations = false;
         Tooltips.getInstance().textProvider = text -> new Tooltip(t -> t.background(Styles.black6).margin(4f).add(text));
+        if(mobile){
+            Tooltips.getInstance().offsetY += Scl.scl(60f);
+        }
 
         Core.settings.setErrorHandler(e -> {
             Log.err(e);
@@ -125,15 +137,10 @@ public class UI implements ApplicationListener, Loadable{
 
         ClickListener.clicked = () -> Sounds.press.play();
 
-        Colors.put("accent", Pal.accent);
-        Colors.put("unlaunched", Color.valueOf("8982ed"));
-        Colors.put("highlight", Pal.accent.cpy().lerp(Color.white, 0.3f));
-        Colors.put("stat", Pal.stat);
-        Colors.put("negstat", Pal.negativeStat);
-
         drillCursor = Core.graphics.newCursor("drill", Fonts.cursorScale());
         unloadCursor = Core.graphics.newCursor("unload", Fonts.cursorScale());
         targetCursor = Core.graphics.newCursor("target", Fonts.cursorScale());
+        repairCursor = Core.graphics.newCursor("repair", Fonts.cursorScale());
     }
 
     @Override
@@ -179,6 +186,7 @@ public class UI implements ApplicationListener, Loadable{
         consolefrag = new ConsoleFragment();
 
         picker = new ColorPicker();
+        effects = new EffectsDialog();
         editor = new MapEditorDialog();
         controls = new KeybindDialog();
         restart = new GameOverDialog();
@@ -195,7 +203,7 @@ public class UI implements ApplicationListener, Loadable{
         bans = new BansDialog();
         admins = new AdminsDialog();
         traces = new TraceDialog();
-        maps = new MapsDialog();
+        maps = new EditorMapsDialog();
         content = new ContentInfoDialog();
         planet = new PlanetDialog();
         research = new ResearchDialog();
@@ -264,22 +272,32 @@ public class UI implements ApplicationListener, Loadable{
         });
     }
 
-    public void showTextInput(String titleText, String text, int textLength, String def, boolean numbers, Cons<String> confirmed, Runnable closed){
+
+    public void showTextInput(String titleText, String text, int textLength, String def, boolean numbers, Cons<String> confirmed, Runnable closed) {
+        showTextInput(titleText, text, textLength, def, numbers, false, confirmed, closed);
+    }
+
+    public void showTextInput(String titleText, String text, int textLength, String def, boolean numbers, boolean allowEmpty, Cons<String> confirmed, Runnable closed){
         if(mobile){
+            var description = (text.startsWith("@") ? Core.bundle.get(text.substring(1)) : text);
+            var empty = allowEmpty;
             Core.input.getTextInput(new TextInput(){{
                 this.title = (titleText.startsWith("@") ? Core.bundle.get(titleText.substring(1)) : titleText);
                 this.text = def;
                 this.numeric = numbers;
                 this.maxLength = textLength;
                 this.accepted = confirmed;
-                this.allowEmpty = false;
+                this.canceled = closed;
+                this.allowEmpty = empty;
+                this.message = description;
             }});
         }else{
             new Dialog(titleText){{
                 cont.margin(30).add(text).padRight(6f);
                 TextFieldFilter filter = numbers ? TextFieldFilter.digitsOnly : (f, c) -> true;
                 TextField field = cont.field(def, t -> {}).size(330f, 50f).get();
-                field.setFilter((f, c) -> field.getText().length() < textLength && filter.acceptChar(f, c));
+                field.setMaxLength(textLength);
+                field.setFilter(filter);
                 buttons.defaults().size(120, 54).pad(4);
                 buttons.button("@cancel", () -> {
                     closed.run();
@@ -288,11 +306,11 @@ public class UI implements ApplicationListener, Loadable{
                 buttons.button("@ok", () -> {
                     confirmed.get(field.getText());
                     hide();
-                }).disabled(b -> field.getText().isEmpty());
+                }).disabled(b -> !allowEmpty && field.getText().isEmpty());
 
                 keyDown(KeyCode.enter, () -> {
                     String text = field.getText();
-                    if(!text.isEmpty()){
+                    if(allowEmpty || !text.isEmpty()){
                         confirmed.get(text);
                         hide();
                     }

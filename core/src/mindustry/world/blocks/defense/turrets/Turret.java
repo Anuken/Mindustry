@@ -83,6 +83,10 @@ public class Turret extends ReloadTurret{
     public boolean displayAmmoMultiplier = true;
     /** If false, 'under' blocks like conveyors are not targeted. */
     public boolean targetUnderBlocks = true;
+    /** If true, the turret will always shoot when it has ammo, regardless of targets in range or any control. */
+    public boolean alwaysShooting = false;
+    /** Whether this turret predicts unit movement. */
+    public boolean predictTarget = true;
     /** Function for choosing which unit to target. */
     public Sortf unitSort = UnitSorts.closest;
     /** Filter for types of units to attack. */
@@ -310,7 +314,7 @@ public class Turret extends ReloadTurret{
         }
 
         public boolean isShooting(){
-            return (isControlled() ? unit.isShooting() : logicControlled() ? logicShooting : target != null);
+            return alwaysShooting || (isControlled() ? unit.isShooting() : logicControlled() ? logicShooting : target != null);
         }
 
         @Override
@@ -336,11 +340,15 @@ public class Turret extends ReloadTurret{
             var offset = Tmp.v1.setZero();
 
             //when delay is accurate, assume unit has moved by chargeTime already
-            if(accurateDelay && pos instanceof Hitboxc h){
+            if(accurateDelay && !moveWhileCharging && pos instanceof Hitboxc h){
                 offset.set(h.deltaX(), h.deltaY()).scl(shoot.firstShotDelay / Time.delta);
             }
 
-            targetPos.set(Predict.intercept(this, pos, offset.x, offset.y, bullet.speed <= 0.01f ? 99999999f : bullet.speed));
+            if(predictTarget){
+                targetPos.set(Predict.intercept(this, pos, offset.x, offset.y, bullet.speed <= 0.01f ? 99999999f : bullet.speed));
+            }else{
+                targetPos.set(pos);
+            }
 
             if(targetPos.isZero()){
                 targetPos.set(pos);
@@ -431,10 +439,15 @@ public class Turret extends ReloadTurret{
                         turnToTarget(targetRot);
                     }
 
-                    if(Angles.angleDist(rotation, targetRot) < shootCone && canShoot){
+                    if(!alwaysShooting && Angles.angleDist(rotation, targetRot) < shootCone && canShoot){
                         wasShooting = true;
                         updateShooting();
                     }
+                }
+
+                if(alwaysShooting){
+                    wasShooting = true;
+                    updateShooting();
                 }
             }
 
@@ -467,10 +480,10 @@ public class Turret extends ReloadTurret{
                 target = Units.bestEnemy(team, x, y, range, e -> !e.dead() && !e.isGrounded() && unitFilter.get(e), unitSort);
             }else{
                 target = Units.bestTarget(team, x, y, range, e -> !e.dead() && unitFilter.get(e) && (e.isGrounded() || targetAir) && (!e.isGrounded() || targetGround), b -> targetGround && buildingFilter.get(b), unitSort);
+            }
 
-                if(target == null && canHeal()){
-                    target = Units.findAllyTile(team, x, y, range, b -> b.damaged() && b != this);
-                }
+            if(target == null && canHeal()){
+                target = Units.findAllyTile(team, x, y, range, b -> b.damaged() && b != this);
             }
         }
 
@@ -554,8 +567,16 @@ public class Turret extends ReloadTurret{
 
             shoot.shoot(barrelCounter, (xOffset, yOffset, angle, delay, mover) -> {
                 queuedBullets++;
+                int barrel = barrelCounter;
+
                 if(delay > 0f){
-                    Time.run(delay, () -> bullet(type, xOffset, yOffset, angle, mover));
+                    Time.run(delay, () -> {
+                        //hack: make sure the barrel is the same as what it was when the bullet was queued to fire
+                        int prev = barrelCounter;
+                        barrelCounter = barrel;
+                        bullet(type, xOffset, yOffset, angle, mover);
+                        barrelCounter = prev;
+                    });
                 }else{
                     bullet(type, xOffset, yOffset, angle, mover);
                 }

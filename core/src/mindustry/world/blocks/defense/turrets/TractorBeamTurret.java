@@ -117,7 +117,7 @@ public class TractorBeamTurret extends BaseTurret{
                 //shoot when possible
                 if(Angles.within(rotation, dest, shootCone)){
                     if(damage > 0){
-                        target.damageContinuous(damage * eff);
+                        target.damageContinuous(damage * eff * state.rules.blockDamage(team));
                     }
 
                     if(status != StatusEffects.none){

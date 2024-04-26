@@ -78,8 +78,8 @@ public class RegionPart extends DrawPart{
                 mx += move.x * p;
                 my += move.y * p;
                 mr += move.rot * p;
-                gx += move.gx;
-                gy += move.gy;
+                gx += move.gx * p;
+                gy += move.gy * p;
             }
         }
 
@@ -95,7 +95,7 @@ public class RegionPart extends DrawPart{
             //can be null
             var region = drawRegion ? regions[Math.min(i, regions.length - 1)] : null;
             float sign = (i == 0 ? 1 : -1) * params.sideMultiplier;
-            Tmp.v1.set((x + mx) * sign * Draw.xscl, (y + my) * Draw.yscl).rotateRadExact((params.rotation - 90) * Mathf.degRad);
+            Tmp.v1.set((x + mx) * sign, y + my).rotateRadExact((params.rotation - 90) * Mathf.degRad);
 
             float
                 rx = params.x + Tmp.v1.x,
@@ -152,7 +152,7 @@ public class RegionPart extends DrawPart{
                 float sign = (i == 1 ? -1 : 1) * params.sideMultiplier;
                 Tmp.v1.set((x + mx) * sign, y + my).rotateRadExact((params.rotation - 90) * Mathf.degRad);
 
-                childParam.set(params.warmup, params.reload, params.smoothReload, params.heat, params.recoil, params.charge, params.x + Tmp.v1.x, params.y + Tmp.v1.y, i * sign + mr * sign + params.rotation);
+                childParam.set(params.warmup, params.reload, params.smoothReload, params.heat, params.recoil, params.charge, params.x + Tmp.v1.x, params.y + Tmp.v1.y, mr * sign + params.rotation);
                 childParam.sideMultiplier = params.sideMultiplier;
                 childParam.life = params.life;
                 childParam.sideOverride = i;

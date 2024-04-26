@@ -27,8 +27,9 @@ import static mindustry.Vars.*;
 public abstract class ClientLauncher extends ApplicationCore implements Platform{
     private static final int loadingFPS = 20;
 
-    private long lastTime;
+    private long nextFrame;
     private long beginTime;
+    private long lastTargetFps = -1;
     private boolean finished = false;
     private LoadRenderer loader;
 
@@ -68,6 +69,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
             return (Float.isNaN(result) || Float.isInfinite(result)) ? 1f : Mathf.clamp(result, 0.0001f, 60f / 10f);
         });
 
+        UI.loadColors();
         batch = new SortedSpriteBatch();
         assets = new AssetManager();
         assets.setLoader(Texture.class, "." + mapExtension, new MapPreviewLoader());
@@ -199,6 +201,18 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
 
     @Override
     public void update(){
+        int targetfps = Core.settings.getInt("fpscap", 120);
+        boolean changed = lastTargetFps != targetfps && lastTargetFps != -1;
+        boolean limitFps = targetfps > 0 && targetfps <= 240;
+
+        lastTargetFps = targetfps;
+
+        if(limitFps && !changed){
+            nextFrame += (1000 * 1000000) / targetfps;
+        }else{
+            nextFrame = Time.nanos();
+        }
+
         if(!finished){
             if(loader != null){
                 loader.draw();
@@ -230,17 +244,13 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
             asyncCore.end();
         }
 
-        int targetfps = Core.settings.getInt("fpscap", 120);
-
-        if(targetfps > 0 && targetfps <= 240){
-            long target = (1000 * 1000000) / targetfps; //target in nanos
-            long elapsed = Time.timeSinceNanos(lastTime);
-            if(elapsed < target){
-                Threads.sleep((target - elapsed) / 1000000, (int)((target - elapsed) % 1000000));
+        if(limitFps){
+            long current = Time.nanos();
+            if(nextFrame > current){
+                long toSleep = nextFrame - current;
+                Threads.sleep(toSleep / 1000000, (int)(toSleep % 1000000));
             }
         }
-
-        lastTime = Time.nanos();
     }
 
     @Override
@@ -251,6 +261,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
 
     @Override
     public void init(){
+        nextFrame = Time.nanos();
         setup();
     }
 

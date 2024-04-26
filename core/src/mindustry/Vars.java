@@ -28,6 +28,7 @@ import mindustry.net.*;
 import mindustry.service.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
+import mindustry.world.blocks.storage.*;
 import mindustry.world.meta.*;
 
 import java.io.*;
@@ -105,14 +106,16 @@ public class Vars implements Loadable{
     public static final float invasionGracePeriod = 20;
     /** min armor fraction damage; e.g. 0.05 = at least 5% damage */
     public static final float minArmorDamage = 0.1f;
-    /** land/launch animation duration */
-    public static final float coreLandDuration = 160f;
+    /** @deprecated see {@link CoreBlock#landDuration} instead! */
+    public static final @Deprecated float coreLandDuration = 160f;
     /** size of tiles in units */
     public static final int tilesize = 8;
     /** size of one tile payload (^2) */
     public static final float tilePayload = tilesize * tilesize;
     /** icon sizes for UI */
     public static final float iconXLarge = 8*6f, iconLarge = 8*5f, iconMed = 8*4f, iconSmall = 8*3f;
+    /** macbook screen notch height */
+    public static float macNotchHeight = 32f;
     /** for map generator dialog */
     public static boolean updateEditorOnChange = false;
     /** all choosable player colors in join/host dialog */
@@ -149,7 +152,7 @@ public class Vars implements Loadable{
     /** max GL texture size */
     public static int maxTextureSize = 2048;
     /** Maximum schematic size.*/
-    public static int maxSchematicSize = 32;
+    public static int maxSchematicSize = 64;
     /** Whether to show sector info upon landing. */
     public static boolean showSectorLandInfo = true;
     /** Whether to check for memory use before taking screenshots. */

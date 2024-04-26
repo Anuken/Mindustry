@@ -66,6 +66,7 @@ public class ClassMap{
         classes.put("ParticleEffect", mindustry.entities.effect.ParticleEffect.class);
         classes.put("RadialEffect", mindustry.entities.effect.RadialEffect.class);
         classes.put("SeqEffect", mindustry.entities.effect.SeqEffect.class);
+        classes.put("SoundEffect", mindustry.entities.effect.SoundEffect.class);
         classes.put("WaveEffect", mindustry.entities.effect.WaveEffect.class);
         classes.put("WrapEffect", mindustry.entities.effect.WrapEffect.class);
         classes.put("DrawPart", mindustry.entities.part.DrawPart.class);
@@ -441,6 +442,7 @@ public class ClassMap{
         classes.put("ConsumeLiquidFilter", mindustry.world.consumers.ConsumeLiquidFilter.class);
         classes.put("ConsumeLiquidFlammable", mindustry.world.consumers.ConsumeLiquidFlammable.class);
         classes.put("ConsumeLiquids", mindustry.world.consumers.ConsumeLiquids.class);
+        classes.put("ConsumeLiquidsDynamic", mindustry.world.consumers.ConsumeLiquidsDynamic.class);
         classes.put("ConsumePayloadDynamic", mindustry.world.consumers.ConsumePayloadDynamic.class);
         classes.put("ConsumePayloadFilter", mindustry.world.consumers.ConsumePayloadFilter.class);
         classes.put("ConsumePayloads", mindustry.world.consumers.ConsumePayloads.class);

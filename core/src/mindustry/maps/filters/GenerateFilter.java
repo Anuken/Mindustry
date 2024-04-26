@@ -98,22 +98,22 @@ public abstract class GenerateFilter implements Cloneable{
         return false;
     }
 
-    //utility generation functions
+    //utility generation functions; + 10 is added as noise has similar values at 0,0
 
     protected float noise(int seedOffset, GenerateInput in, float scl, float mag){
-        return Simplex.noise2d(seedOffset + seed, 1f, 0f, 1f / scl, in.x, in.y) * mag;
+        return Simplex.noise2d(seedOffset + seed, 1f, 0f, 1f / scl, in.x + 10, in.y + 10) * mag;
     }
 
     protected float noise(GenerateInput in, float scl, float mag){
-        return Simplex.noise2d(seed, 1f, 0f, 1f / scl, in.x, in.y) * mag;
+        return Simplex.noise2d(seed, 1f, 0f, 1f / scl, in.x + 10, in.y + 10) * mag;
     }
 
     protected float noise(GenerateInput in, float scl, float mag, float octaves, float persistence){
-        return Simplex.noise2d(seed, octaves, persistence, 1f / scl, in.x, in.y) * mag;
+        return Simplex.noise2d(seed, octaves, persistence, 1f / scl, in.x + 10, in.y + 10) * mag;
     }
 
     protected float noise(float x, float y, float scl, float mag, float octaves, float persistence){
-        return Simplex.noise2d(seed, octaves, persistence, 1f / scl, x, y) * mag;
+        return Simplex.noise2d(seed, octaves, persistence, 1f / scl, x + 10, y + 10) * mag;
     }
 
     protected float rnoise(float x, float y, float scl, float mag){

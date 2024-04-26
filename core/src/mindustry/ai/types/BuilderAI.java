@@ -12,14 +12,14 @@ import mindustry.world.blocks.ConstructBlock.*;
 import static mindustry.Vars.*;
 
 public class BuilderAI extends AIController{
-    public static float buildRadius = 1500, retreatDst = 110f, retreatDelay = Time.toSeconds * 2f;
+    public static float buildRadius = 1500, retreatDst = 110f, retreatDelay = Time.toSeconds * 2f, defaultRebuildPeriod = 60f * 2f;
 
     public @Nullable Unit assistFollowing;
     public @Nullable Unit following;
     public @Nullable Teamc enemy;
     public @Nullable BlockPlan lastPlan;
 
-    public float fleeRange = 370f, rebuildPeriod = 60f * 2f;
+    public float fleeRange = 370f, rebuildPeriod = defaultRebuildPeriod;
     public boolean alwaysFlee;
     public boolean onlyAssist;
 
@@ -32,6 +32,14 @@ public class BuilderAI extends AIController{
     }
 
     public BuilderAI(){
+    }
+
+    @Override
+    public void init(){
+        //rebuild much faster with buildAI; there are usually few builder units so this is fine
+        if(rebuildPeriod == defaultRebuildPeriod && unit.team.rules().buildAi){
+            rebuildPeriod = 10f;
+        }
     }
 
     @Override

@@ -1,5 +1,6 @@
 package mindustry.entities.abilities;
 
+import arc.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -12,6 +13,8 @@ import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
+
+import static mindustry.Vars.*;
 
 public class ForceFieldAbility extends Ability{
     /** Shield radius. */
@@ -67,6 +70,18 @@ public class ForceFieldAbility extends Ability{
     }
 
     ForceFieldAbility(){}
+
+    @Override
+    public void addStats(Table t){
+        super.addStats(t);
+        t.add(Core.bundle.format("bullet.range", Strings.autoFixed(radius / tilesize, 2)));
+        t.row();
+        t.add(abilityStat("shield", Strings.autoFixed(max, 2)));
+        t.row();
+        t.add(abilityStat("repairspeed", Strings.autoFixed(regen * 60f, 2)));
+        t.row();
+        t.add(abilityStat("cooldown", Strings.autoFixed(cooldown / 60f, 2)));
+    }
 
     @Override
     public void update(Unit unit){

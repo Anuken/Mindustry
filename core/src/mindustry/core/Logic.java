@@ -310,6 +310,9 @@ public class Logic implements ApplicationListener{
                     Events.fire(new GameOverEvent(left == null ? Team.derelict : left.team));
                     state.gameOver = true;
                 }
+            }else if(!state.gameOver && state.rules.waves && (state.enemies == 0 && state.rules.winWave > 0 && state.wave >= state.rules.winWave && !spawner.isSpawning())){
+                state.gameOver = true;
+                Events.fire(new GameOverEvent(state.rules.defaultTeam));
             }
         }
     }
@@ -354,7 +357,8 @@ public class Logic implements ApplicationListener{
 
         //map is over, no more world processor objective stuff
         state.rules.disableWorldProcessors = true;
-        state.rules.objectives.clear();
+
+        Call.clearObjectives();
 
         //save, just in case
         if(!headless && !net.client()){
@@ -442,6 +446,12 @@ public class Logic implements ApplicationListener{
                     updateWeather();
 
                     for(TeamData data : state.teams.getActive()){
+                        //does not work on PvP so built-in attack maps can have it on by default without issues
+                        if(data.team.rules().buildAi && !state.rules.pvp){
+                            if(data.buildAi == null) data.buildAi = new BaseBuilderAI(data);
+                            data.buildAi.update();
+                        }
+
                         if(data.team.rules().rtsAi){
                             if(data.rtsAi == null) data.rtsAi = new RtsAI(data);
                             data.rtsAi.update();
@@ -449,12 +459,8 @@ public class Logic implements ApplicationListener{
                     }
                 }
 
-                //TODO objectives clientside???
                 if(!state.isEditor()){
                     state.rules.objectives.update();
-                    if(state.rules.objectives.checkChanged() && net.server()){
-                        Call.setObjectives(state.rules.objectives);
-                    }
                 }
 
                 if(state.rules.waves && state.rules.waveTimer && !state.gameOver){
