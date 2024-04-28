@@ -3,6 +3,7 @@ package mindustry.ui.dialogs;
 import arc.*;
 import arc.func.*;
 import arc.graphics.*;
+import arc.scene.Element;
 import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.ImageButton.*;
@@ -461,7 +462,7 @@ public class CustomRulesDialog extends BaseDialog{
 
     public void numberi(String text, Intc cons, Intp prov, Boolp condition, int min, int max){
         if(!Core.bundle.get(text.substring(1)).toLowerCase().contains(ruleSearch)) return;
-        current.table(t -> {
+        var cell = current.table(t -> {
             t.left();
             t.add(text).left().padRight(5)
                 .update(a -> a.setColor(condition.get() ? Color.white : Color.gray));
@@ -469,12 +470,14 @@ public class CustomRulesDialog extends BaseDialog{
                 .update(a -> a.setDisabled(!condition.get()))
                 .padRight(100f)
                 .valid(f -> Strings.parseInt(f) >= min && Strings.parseInt(f) <= max).width(120f).left();
-        }).padTop(0).row();
+        }).padTop(0);
+        ruleInfo(cell, text);
+        current.row();
     }
 
     public void number(String text, boolean integer, Floatc cons, Floatp prov, Boolp condition, float min, float max){
         if(!Core.bundle.get(text.substring(1)).toLowerCase().contains(ruleSearch)) return;
-        current.table(t -> {
+        var cell = current.table(t -> {
             t.left();
             t.add(text).left().padRight(5)
             .update(a -> a.setColor(condition.get() ? Color.white : Color.gray));
@@ -483,6 +486,7 @@ public class CustomRulesDialog extends BaseDialog{
             .update(a -> a.setDisabled(!condition.get()))
             .valid(f -> Strings.canParsePositiveFloat(f) && Strings.parseFloat(f) >= min && Strings.parseFloat(f) <= max).width(120f).left();
         }).padTop(0);
+        ruleInfo(cell, text);
         current.row();
     }
 
@@ -492,13 +496,24 @@ public class CustomRulesDialog extends BaseDialog{
 
     public void check(String text, Boolc cons, Boolp prov, Boolp condition){
         if(!Core.bundle.get(text.substring(1)).toLowerCase().contains(ruleSearch)) return;
-        String infoText = text.substring(1) + ".info";
-        var cell = current.check(text, cons).checked(prov.get()).update(a -> a.setDisabled(!condition.get())).padRight(100f);
-        if(Core.bundle.has(infoText)){
-            cell.tooltip(text + ".info");
-        }
+        var cell = current.check(text, cons).checked(prov.get()).update(a -> a.setDisabled(!condition.get()));
         cell.get().left();
+        ruleInfo(cell, text);
         current.row();
+    }
+
+    public void ruleInfo(Cell<?> cell, String text){
+        if(Core.bundle.has(text.substring(1) + ".info")){
+            if(mobile){
+                Table table = new Table();
+                table.add(cell.get()).left().expandX().fillX();
+                cell.clearElement();
+                table.button(Icon.infoSmall, () -> ui.showInfo(text + ".info")).size(32f).padRight(24f).right();
+                cell.setElement(table).left().expandX().fillX();
+            }else{
+                cell.tooltip(text + ".info");
+            }
+        }
     }
 
     Cell<TextField> field(Table table, float value, Floatc setter){
