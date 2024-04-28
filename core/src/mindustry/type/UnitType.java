@@ -330,7 +330,7 @@ public class UnitType extends UnlockableContent implements Senseable{
     /** volume of mining sound. */
     public float mineSoundVolume = 0.6f;
     /** Target items to mine. Used in MinerAI */
-    public Seq<Item> mineItems = Seq.with(Items.copper, Items.lead, Items.titanium, Items.thorium);
+    public Seq<Item> mineItems = Seq.with(Items.copper, Items.lead, Items.titanium, Items.thorium, Items.coal, Items.sand);
 
     //LEG UNITS
 
