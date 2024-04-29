@@ -850,7 +850,7 @@ public class UnitType extends UnlockableContent implements Senseable{
         if(stances.length == 0){
             if(canAttack){
                 Seq<UnitStance> seq = Seq.with(UnitStance.stop, UnitStance.shoot, UnitStance.holdFire, UnitStance.pursueTarget, UnitStance.patrol);
-                if(crushDamage > 0){
+                if(!flying){
                     seq.add(UnitStance.ram);
                 }
                 stances = seq.toArray(UnitStance.class);
