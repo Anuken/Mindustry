@@ -94,7 +94,7 @@
   },
   {
     "name": "KMWStudios",
-    "address": ["mind.kmwstudios.xyz:28101", "mind.kmwstudios.xyz:28102", "mind.kmwstudios.xyz:28103", "mind.kmwstudios.xyz:28104", "mind.kmwstudios.xyz:28105", "mind.kmwstudios.xyz:28106", "mind.kmwstudios.xyz:28107"]
+    "address": ["kislota.kmwstudios.org:28101", "kislota.kmwstudios.org:28102", "kislota.kmwstudios.org:28103", "kislota.kmwstudios.org:28104", "kislota.kmwstudios.org:28105", "kislota.kmwstudios.org:28106", "kislota.kmwstudios.org:28107"]
   },
   {
     "name": "XCore",
@@ -134,7 +134,7 @@
   },
   {
     "name": "Fish",
-    "address": ["162.248.101.95", "162.248.100.98", "162.248.100.133", "162.248.102.204", "37.187.73.180:7012"]
+    "address": ["162.248.101.95", "162.248.100.98", "162.248.100.133", "162.248.102.204", "162.248.101.53", "37.187.73.180:7012"]
   },
   {
     "name": "OmniCorp Classic",
@@ -190,7 +190,7 @@
   },
   {
      "name": "Anana",
-     "address": ["mdt.mdtleague.top"]
+     "address": ["mdt.mdtleague.top","mdt2.mdtleague.top"]
   },
   {
     "name": "Vortex",
@@ -288,10 +288,6 @@
   {
     "name": "MineCore",
     "address": ["194.247.42.11:27792", "194.247.42.11:27977", "194.247.42.61:27989", "194.247.42.181:28514"]
-  },
-  {
-    "name": "NPTS",
-    "address": ["81.94.150.170"]
   },
   {
     "name": "Mindus•VN",
