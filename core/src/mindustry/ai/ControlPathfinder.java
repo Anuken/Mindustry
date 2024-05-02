@@ -413,6 +413,7 @@ public class ControlPathfinder implements Runnable{
 
         Cluster[] dim2 = dim1[pathCost];
 
+        //TODO: how can index out of bounds happen? || clusterIndex >= dim2.length
         if(dim2 == null) return null;
 
         return dim2[clusterIndex];
@@ -827,7 +828,7 @@ public class ControlPathfinder implements Runnable{
             if(nextCx >= 0 && nextCy >= 0 && nextCx < cwidth && nextCy < cheight){
                 Cluster nextCluster = getCreateCluster(team, pathCost, nextCx, nextCy);
                 int relativeDir = (dir + 2) % 4;
-                LongSeq outerCons = nextCluster.portalConnections[relativeDir] == null ? null : nextCluster.portalConnections[relativeDir][portal];
+                LongSeq outerCons = nextCluster.portalConnections[relativeDir] == null || nextCluster.portalConnections[relativeDir].length <= portal ? null : nextCluster.portalConnections[relativeDir][portal];
                 if(outerCons != null){
                     checkEdges(request, team, pathCost, current, endNodeIndex, nextCx, nextCy, outerCons);
                 }
@@ -1072,6 +1073,10 @@ public class ControlPathfinder implements Runnable{
 
     @Deprecated
     public boolean getPathPosition(Unit unit, int pathId, Vec2 destination, Vec2 out, @Nullable boolean[] noResultFound){
+        return getPathPosition(unit, destination, destination, out, noResultFound);
+    }
+
+    public boolean getPathPosition(Unit unit, Vec2 destination, Vec2 out, @Nullable boolean[] noResultFound){
         return getPathPosition(unit, destination, destination, out, noResultFound);
     }
 
