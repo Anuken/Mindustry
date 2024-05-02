@@ -127,7 +127,7 @@ public class StatusEffect extends UnlockableContent{
     public boolean showUnlock(){
         return false;
     }
-    
+
     /** Runs every tick on the affected unit while time is greater than 0. */
     public void update(Unit unit, float time){
         if(damage > 0){
