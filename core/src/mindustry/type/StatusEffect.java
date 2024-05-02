@@ -127,7 +127,7 @@ public class StatusEffect extends UnlockableContent{
     public boolean showUnlock(){
         return false;
     }
-
+    
     /** Runs every tick on the affected unit while time is greater than 0. */
     public void update(Unit unit, float time){
         if(damage > 0){
@@ -140,6 +140,11 @@ public class StatusEffect extends UnlockableContent{
             Tmp.v1.rnd(Mathf.range(unit.type.hitSize/2f));
             effect.at(unit.x + Tmp.v1.x, unit.y + Tmp.v1.y, 0, color, parentizeEffect ? unit : null);
         }
+    }
+
+    /** Called when status effect is removed. */
+    public void onRemoved(Unit unit){
+
     }
 
     protected void trans(StatusEffect effect, TransitionHandler handler){
