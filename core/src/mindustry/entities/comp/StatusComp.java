@@ -189,7 +189,7 @@ abstract class StatusComp implements Posc, Flyingc{
             StatusEntry entry = statuses.get(index++);
 
             entry.time = Math.max(entry.time - Time.delta, 0);
-            
+
             if(entry.effect == null || (entry.time <= 0 && !entry.effect.permanent)){
                 if(entry.effect != null){
                     entry.effect.onRemoved(self());
