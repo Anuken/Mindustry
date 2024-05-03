@@ -51,6 +51,7 @@ public class CoreBlock extends StorageBlock{
     public UnitType unitType = UnitTypes.alpha;
     public float landDuration = 160f;
     public Music landMusic = Musics.land;
+    public Music launchMusic = Musics.coreLaunch;
     public Effect launchEffect = Fx.launch;
 
     public Interp landZoomInterp = Interp.pow3;
@@ -331,6 +332,10 @@ public class CoreBlock extends StorageBlock{
 
         public Music landMusic(){
             return landMusic;
+        }
+
+        public Music launchMusic(){
+            return launchMusic;
         }
 
         @Override

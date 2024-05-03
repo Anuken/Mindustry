@@ -142,6 +142,11 @@ public class StatusEffect extends UnlockableContent{
         }
     }
 
+    /** Called when status effect is removed. */
+    public void onRemoved(Unit unit){
+
+    }
+
     protected void trans(StatusEffect effect, TransitionHandler handler){
         transitions.put(effect, handler);
     }
