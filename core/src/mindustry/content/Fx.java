@@ -2434,12 +2434,9 @@ public class Fx{
     shieldBreak = new Effect(40, e -> {
         color(e.color);
         stroke(3f * e.fout());
-        if(e.data instanceof Unit u){
-            var ab = (ForceFieldAbility)Structs.find(u.abilities, a -> a instanceof ForceFieldAbility);
-            if(ab != null){
-                Lines.poly(e.x, e.y, ab.sides, e.rotation + e.fin(), ab.rotation);
-                return;
-            }
+        if(e.data instanceof ForceFieldAbility ab){
+            Lines.poly(e.x, e.y, ab.sides, e.rotation + e.fin(), ab.rotation);
+            return;
         }
 
         Lines.poly(e.x, e.y, 6, e.rotation + e.fin());
