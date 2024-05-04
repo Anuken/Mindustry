@@ -2858,7 +2858,7 @@ public class Blocks{
         }};
 
         eruptionDrill = new BurstDrill("eruption-drill"){{
-            requirements(Category.production, with(Items.silicon, 200, Items.oxide, 20, Items.tungsten, 200, Items.thorium, 120));
+            requirements(Category.production, with(Items.silicon, 300, Items.oxide, 20, Items.tungsten, 250, Items.thorium, 150));
             drillTime = 281.25f;
             size = 5;
             hasPower = true;
