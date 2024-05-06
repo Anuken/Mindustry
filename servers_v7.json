@@ -1,7 +1,7 @@
 [
   {
     "name": "TSR Network",
-    "address": ["de-prem-01.hosts.optikservers.com:35526", "de-prem-01.hosts.optikservers.com:35915", "de-prem-01.hosts.optikservers.com:35250", "de-prem-01.hosts.optikservers.com:27526", "de-prem-01.hosts.optikservers.com:35376"]
+    "address": ["de-prem-01.hosts.optikservers.com:35526", "de-prem-01.hosts.optikservers.com:35915", "de-prem-01.hosts.optikservers.com:35250", "de-prem-01.hosts.optikservers.com:27526", "de-prem-01.hosts.optikservers.com:35376", "de-prem-01.hosts.optikservers.com:35895"]
   },
   {
     "name": "Toast Mindustry",
@@ -292,5 +292,9 @@
   {
     "name": "Mindus•VN",
     "address": ["alpha.ateex.cloud:19172"]
+  },
+  {
+    "name": "Impact",
+    "address": ["impactmindustry.ddns.net"]
   }
 ]
