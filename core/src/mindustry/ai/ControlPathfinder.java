@@ -817,6 +817,10 @@ public class ControlPathfinder implements Runnable{
 
             int cluster = NodeIndex.cluster(current), dir = NodeIndex.dir(current), portal = NodeIndex.portal(current);
             int cx = cluster % cwidth, cy = cluster / cwidth;
+
+            //invalid cluster index (TODO: how?)
+            if(cx >= cwidth || cy >= cheight || cx < 0 || cy < 0) continue;
+
             Cluster clust = getCreateCluster(team, pathCost, cluster);
             LongSeq innerCons = clust.portalConnections[dir] == null || portal >= clust.portalConnections[dir].length ? null : clust.portalConnections[dir][portal];
 
