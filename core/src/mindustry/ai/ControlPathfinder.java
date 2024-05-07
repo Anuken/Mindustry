@@ -455,7 +455,9 @@ public class ControlPathfinder implements Runnable{
         }else{
             //reset data
             for(var p : cluster.portals){
-                p.clear();
+                if(p != null){
+                    p.clear();
+                }
             }
         }
 
