@@ -963,9 +963,9 @@ public class ControlPathfinder implements Runnable{
                 for(int dir = 0; dir < 4; dir++){
                     int ox = cx + nextOffsets[dir * 2], oy = cy + nextOffsets[dir * 2 + 1];
 
-                    if(ox < 0 || oy < 0 || ox >= cwidth || ox >= cheight) continue;
+                    if(ox < 0 || oy < 0 || ox >= cwidth || oy >= cheight) continue;
 
-                    var otherField = cache.fields.get(ox + oy * cwidth);
+                    var otherField = fields.get(ox + oy * cwidth);
 
                     if(otherField == null) continue;
 
@@ -1140,6 +1140,8 @@ public class ControlPathfinder implements Runnable{
 
             if(fieldCache != null && tileOn != null){
                 FieldCache old = request.oldCache;
+                FieldCache targetCache = old != null ? old : fieldCache;
+                boolean requeue = old == null;
                 //nullify the old field to be GCed, as it cannot be relevant anymore (this path is complete)
                 if(fieldCache.frontier.isEmpty() && old != null){
                     request.oldCache = null;
@@ -1156,7 +1158,7 @@ public class ControlPathfinder implements Runnable{
 
                     //find the next tile until one near a solid block is discovered
                     while(i ++ < maxIterations){
-                        int value = getCost(fieldCache, old, tileOn.x, tileOn.y);
+                        int value = getCost(targetCache, tileOn.x, tileOn.y, requeue);
 
                         Tile current = null;
                         int minCost = 0;
@@ -1169,7 +1171,7 @@ public class ControlPathfinder implements Runnable{
                             if(other == null) continue;
 
                             int packed = world.packArray(dx, dy);
-                            int otherCost = getCost(fieldCache, old, dx, dy), relCost = otherCost - value;
+                            int otherCost = getCost(targetCache, dx, dy, requeue), relCost = otherCost - value;
 
                             if(relCost > 2 || otherCost <= 0){
                                 anyNearSolid = true;
@@ -1252,23 +1254,21 @@ public class ControlPathfinder implements Runnable{
         initializePathRequest(request, request.team, request.costId, request.unit.tileX(), request.unit.tileY(), request.destination % wwidth, request.destination / wwidth);
     }
 
-    private int getCost(FieldCache cache, FieldCache old, int x, int y){
-        //fall back to the old flowfield when possible - it's best not to use partial results from the base cache
-        if(old != null){
-            return getCost(old, x, y, false);
-        }
-        return getCost(cache, x, y, true);
-    }
-
     private int getCost(FieldCache cache, int x, int y, boolean requeue){
-        int[] field = cache.fields.get(x / clusterSize + (y / clusterSize) * cwidth);
-        if(field == null){
-            if(!requeue) return 0;
-            //request a new flow cluster if one wasn't found; this may be a spammed a bit, but the function will return early once it's created the first time
-            queue.post(() -> addFlowCluster(cache, x / clusterSize, y / clusterSize, true));
+        try{
+            int[] field = cache.fields.get(x / clusterSize + (y / clusterSize) * cwidth);
+            if(field == null){
+                if(!requeue) return 0;
+                //request a new flow cluster if one wasn't found; this may be a spammed a bit, but the function will return early once it's created the first time
+                queue.post(() -> addFlowCluster(cache, x / clusterSize, y / clusterSize, true));
+                return 0;
+            }
+            return field[(x % clusterSize) + (y % clusterSize) * clusterSize];
+        }catch(ArrayIndexOutOfBoundsException e){
+            //TODO: this crashes because the fields are being added while they're accessed. really bad. needs a long-term solution and some way to cache the map lookup results.
+            //using an array instead of a map would be nice, but that can mean something like 2500 entries in a sparse array, which is pretty terrible...
             return 0;
         }
-        return field[(x % clusterSize) + (y % clusterSize) * clusterSize];
     }
 
     private static boolean raycast(int team, PathCost type, int x1, int y1, int x2, int y2){
