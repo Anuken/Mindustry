@@ -2329,7 +2329,7 @@ public class Blocks{
             consume(new ConsumeItemFlammable());
             consume(new ConsumeItemExplode());
 
-            drawer = new DrawMulti(new DrawDefault(), new DrawWarmupRegion());
+            drawer = new DrawMulti(new DrawDefault(), new DrawWarmupRegion(), new DrawGlowRegion());
         }};
 
         thermalGenerator = new ThermalGenerator("thermal-generator"){{
