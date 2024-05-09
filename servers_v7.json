@@ -299,5 +299,9 @@
   {
     "name": "Impact",
     "address": ["impactmindustry.ddns.net"]
+  },
+  {
+    "name": "Icy Survival",
+    "address": ["194.247.42.61:26948"]
   }
 ]
