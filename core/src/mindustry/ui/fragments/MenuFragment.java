@@ -28,6 +28,7 @@ public class MenuFragment{
     private Button currentMenu;
     private MenuRenderer renderer;
     private Seq<MenuButton> customButtons = new Seq<>();
+    public MenuButton[] desktopButtons;
 
     public void build(Group parent){
         renderer = new MenuRenderer();
@@ -48,6 +49,22 @@ public class MenuFragment{
 
                 if(!mobile){
                     c.left();
+                    desktopButtons = new MenuButton[]{
+                        new MenuButton("@play", Icon.play,
+                            new MenuButton("@campaign", Icon.play, () -> checkPlay(ui.planet::show)),
+                            new MenuButton("@joingame", Icon.add, () -> checkPlay(ui.join::show)),
+                            new MenuButton("@customgame", Icon.terrain, () -> checkPlay(ui.custom::show)),
+                            new MenuButton("@loadgame", Icon.download, () -> checkPlay(ui.load::show))
+                        ),
+                        new MenuButton("@database.button", Icon.menu,
+                            new MenuButton("@schematics", Icon.paste, ui.schematics::show),
+                            new MenuButton("@database", Icon.book, ui.database::show),
+                            new MenuButton("@about.button", Icon.info, ui.about::show)
+                        ),
+                        new MenuButton("@editor", Icon.terrain, () -> checkPlay(ui.maps::show)), steam ? new MenuButton("@workshop", Icon.steam, platform::openWorkshop) : null,
+                        new MenuButton("@mods", Icon.book, ui.mods::show),
+                        new MenuButton("@settings", Icon.settings, ui.settings::show)
+                    };
                     buildDesktop();
                     Events.on(ResizeEvent.class, event -> buildDesktop());
                 }else{
@@ -187,22 +204,7 @@ public class MenuFragment{
             t.defaults().width(width).height(70f);
             t.name = "buttons";
 
-            buttons(t,
-                new MenuButton("@play", Icon.play,
-                    new MenuButton("@campaign", Icon.play, () -> checkPlay(ui.planet::show)),
-                    new MenuButton("@joingame", Icon.add, () -> checkPlay(ui.join::show)),
-                    new MenuButton("@customgame", Icon.terrain, () -> checkPlay(ui.custom::show)),
-                    new MenuButton("@loadgame", Icon.download, () -> checkPlay(ui.load::show))
-                ),
-                new MenuButton("@database.button", Icon.menu,
-                    new MenuButton("@schematics", Icon.paste, ui.schematics::show),
-                    new MenuButton("@database", Icon.book, ui.database::show),
-                    new MenuButton("@about.button", Icon.info, ui.about::show)
-                ),
-                new MenuButton("@editor", Icon.terrain, () -> checkPlay(ui.maps::show)), steam ? new MenuButton("@workshop", Icon.steam, platform::openWorkshop) : null,
-                new MenuButton("@mods", Icon.book, ui.mods::show),
-                new MenuButton("@settings", Icon.settings, ui.settings::show)
-            );
+            buttons(t, desktopButtons);
             buttons(t, customButtons.toArray(MenuButton.class));
             buttons(t, new MenuButton("@quit", Icon.exit, Core.app::exit));
         }).width(width).growY();
@@ -257,7 +259,7 @@ public class MenuFragment{
                         //correctly offset the button
                         submenu.add().height((Core.graphics.getHeight() - Core.scene.marginTop - Core.scene.marginBottom - out[0].getY(Align.topLeft)) / Scl.scl(1f));
                         submenu.row();
-                        buttons(submenu, b.submenu);
+                        buttons(submenu, b.submenu.toArray());
                     }else{
                         currentMenu = null;
                         fadeOutMenu();
@@ -296,7 +298,7 @@ public class MenuFragment{
         /** Runnable ran when the button is clicked. Ignored on desktop if {@link #submenu} is not null. */
         public final Runnable runnable;
         /** Submenu shown when this button is clicked. Used instead of {@link #runnable} on desktop. */
-        public final @Nullable MenuButton[] submenu;
+        public final @Nullable Seq<MenuButton> submenu;
 
         /** Constructs a simple menu button, which behaves the same way on desktop and mobile. */
         public MenuButton(String text, Drawable icon, Runnable runnable){
@@ -311,7 +313,7 @@ public class MenuFragment{
             this.icon = icon;
             this.text = text;
             this.runnable = runnable;
-            this.submenu = submenu;
+            this.submenu = Seq.with(submenu);
         }
 
         /** Comstructs a desktop-only button; used internally. */
@@ -319,7 +321,7 @@ public class MenuFragment{
             this.icon = icon;
             this.text = text;
             this.runnable = () -> {};
-            this.submenu = submenu;
+            this.submenu = Seq.with(submenu);
         }
     }
 }
