@@ -298,6 +298,10 @@
   },
   {
     "name": "Impact",
-    "address": ["81.94.159.120"]
+    "address": ["impactmindustry.ddns.net"]
+  },
+  {
+    "name": "NPTS",
+    "address": ["178.20.45.59"]
   }
 ]
