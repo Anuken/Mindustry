@@ -30,6 +30,29 @@ public class MenuFragment{
     private Seq<MenuButton> customButtons = new Seq<>();
     public MenuButton[] desktopButtons;
 
+    public MenuFragment(){
+        if(!mobile){
+            desktopButtons = new MenuButton[]{
+                new MenuButton("@play", Icon.play,
+                    new MenuButton("@campaign", Icon.play, () -> checkPlay(ui.planet::show)),
+                    new MenuButton("@joingame", Icon.add, () -> checkPlay(ui.join::show)),
+                    new MenuButton("@customgame", Icon.terrain, () -> checkPlay(ui.custom::show)),
+                    new MenuButton("@loadgame", Icon.download, () -> checkPlay(ui.load::show))
+                ),
+                new MenuButton("@database.button", Icon.menu,
+                    new MenuButton("@schematics", Icon.paste, ui.schematics::show),
+                    new MenuButton("@database", Icon.book, ui.database::show),
+                    new MenuButton("@about.button", Icon.info, ui.about::show)
+                ),
+                new MenuButton("@editor", Icon.terrain, () -> checkPlay(ui.maps::show)), steam ? new MenuButton("@workshop", Icon.steam, platform::openWorkshop) : null,
+                new MenuButton("@mods", Icon.book, ui.mods::show),
+                new MenuButton("@settings", Icon.settings, ui.settings::show)
+            };
+        }else{
+            desktopButtons = null;
+        }
+    }
+
     public void build(Group parent){
         renderer = new MenuRenderer();
 
@@ -49,22 +72,6 @@ public class MenuFragment{
 
                 if(!mobile){
                     c.left();
-                    desktopButtons = new MenuButton[]{
-                        new MenuButton("@play", Icon.play,
-                            new MenuButton("@campaign", Icon.play, () -> checkPlay(ui.planet::show)),
-                            new MenuButton("@joingame", Icon.add, () -> checkPlay(ui.join::show)),
-                            new MenuButton("@customgame", Icon.terrain, () -> checkPlay(ui.custom::show)),
-                            new MenuButton("@loadgame", Icon.download, () -> checkPlay(ui.load::show))
-                        ),
-                        new MenuButton("@database.button", Icon.menu,
-                            new MenuButton("@schematics", Icon.paste, ui.schematics::show),
-                            new MenuButton("@database", Icon.book, ui.database::show),
-                            new MenuButton("@about.button", Icon.info, ui.about::show)
-                        ),
-                        new MenuButton("@editor", Icon.terrain, () -> checkPlay(ui.maps::show)), steam ? new MenuButton("@workshop", Icon.steam, platform::openWorkshop) : null,
-                        new MenuButton("@mods", Icon.book, ui.mods::show),
-                        new MenuButton("@settings", Icon.settings, ui.settings::show)
-                    };
                     buildDesktop();
                     Events.on(ResizeEvent.class, event -> buildDesktop());
                 }else{
