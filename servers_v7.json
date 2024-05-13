@@ -120,10 +120,6 @@
     "address": ["mindustry.kr"]
   },
   {
-    "name": "Phoenix Network",
-    "address": ["phoenix-network.dev", "phoenix-network.dev:6464", "phoenix-network.dev:2023"]
-  },
-  {
     "name": "LatamDustry",
     "address": ["45.158.9.23:5532", "45.158.9.23:5422", "45.158.9.23:5463", "45.158.9.23:5520"]
   },
