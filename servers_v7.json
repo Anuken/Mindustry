@@ -299,5 +299,9 @@
   {
     "name": "Impact",
     "address": ["impactmindustry.ddns.net"]
+  },
+  {
+    "name": "Kiktors hexed",
+    "address": ["f1.aurorix.net:37495"]
   }
 ]
