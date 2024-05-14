@@ -998,6 +998,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 sector.save = null;
             }
             updateSelected();
+            rebuildList();
         });
     }
 
