@@ -295,9 +295,9 @@
   {
     "name": "Impact",
     "address": ["impactmindustry.ddns.net"]
-  }
+  },
   {
     "name": "2D2R",
     "address": ["51.89.173.50:1284", "45.140.142.231:1045"]
-  },
+  }
 ]
