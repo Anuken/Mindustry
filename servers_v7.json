@@ -295,5 +295,9 @@
   {
     "name": "Impact",
     "address": ["impactmindustry.ddns.net"]
+  },
+  {
+    "name": "NPTS",
+    "address": ["178.20.45.59"]
   }
 ]
