@@ -192,6 +192,10 @@
      "address": ["mdt.mdtleague.top","mdt2.mdtleague.top"]
   },
   {
+     "name": "Cragent",
+     "address": ["www.cragent.top"]
+  },
+  {
     "name": "Vortex",
     "address": ["vortex.org.ru", "vortex.org.ru:6568", "vortex.org.ru:6569", "vortex.org.ru:6570", "vortex.org.ru:6571"]
   },
