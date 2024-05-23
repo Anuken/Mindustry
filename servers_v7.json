@@ -29,7 +29,7 @@
   },
   {
     "name": "DontVin",
-    "address": ["alpha.embotic.xyz:1316","alpha.embotic.xyz:1355","alpha.embotic.xyz:1384","alpha.embotic.xyz:1383","be.phoenix-network.dev:4200","be.phoenix-network.dev:6942","alpha.embotic.xyz:1327","alpha.embotic.xyz:1310","alpha.embotic.xyz:1382","alpha.embotic.xyz:1387","alpha.embotic.xyz:1386","alpha.embotic.xyz:1385"]
+    "address": ["51.89.173.50:1316","51.89.173.50:1355","51.89.173.50:1384","51.89.173.50:1383","be.phoenix-network.dev:4200","be.phoenix-network.dev:6942","51.89.173.50:1327","51.89.173.50:1310","51.89.173.50:1382","51.89.173.50:1387","51.89.173.50:1386","51.89.173.50:1385"]
   },
   {
     "name": "Crux's Citadel",
@@ -105,7 +105,7 @@
   },
   {
     "name": "MinDurka",
-    "address": ["45.87.104.124", "45.87.104.124:3001", "45.87.104.124:3002", "45.87.104.124:3003", "45.87.104.124:3004", "45.87.104.124:3005", "45.87.104.124:3006", "45.87.104.124:3007", "45.87.104.124:3008", "45.87.104.124:3009", "45.87.104.124:3010"]
+    "address": ["mindurka.fun", "mindurka.fun:3001", "mindurka.fun:3002", "mindurka.fun:3003", "mindurka.fun:3004", "mindurka.fun:3005", "mindurka.fun:3006", "mindurka.fun:3007", "mindurka.fun:3008", "mindurka.fun:3009", "mindurka.fun:3010", "mindurka.fun:3011"]
   },
   {
     "name": "Chaotic Neutral",
@@ -118,10 +118,6 @@
   {
     "name": "Korea",
     "address": ["mindustry.kr"]
-  },
-  {
-    "name": "Phoenix Network",
-    "address": ["phoenix-network.dev", "phoenix-network.dev:6464", "phoenix-network.dev:2023"]
   },
   {
     "name": "LatamDustry",
@@ -246,7 +242,7 @@
   },
   {
     "name": "abcxyz remaster",
-    "address": ["157.90.4.54:25421", "144.76.57.59:21722", "51.81.166.66:29985", "144.76.57.59:24669", "23.88.73.88:15067", "23.88.73.88:15223", "144.76.57.59:25865", "23.88.73.88:15209"]
+    "address": ["144.76.57.59:30302"]
   },
   {
     "name": "CroCraft Network",
@@ -299,5 +295,9 @@
   {
     "name": "Impact",
     "address": ["impactmindustry.ddns.net"]
+  },
+  {
+    "name": "2D2R",
+    "address": ["51.89.173.50:1284", "45.140.142.231:1045", "51.89.173.50:1432", "45.140.142.231:1052", "45.140.142.231:1040"]
   }
 ]
