@@ -137,6 +137,13 @@ public class Vars implements Loadable{
         Color.valueOf("4b5ef1"),
         Color.valueOf("2cabfe"),
     };
+    /** Icons available to the user for customization in certain dialogs. */
+    public static final String[] accessibleIcons = {
+    "effect", "power", "logic", "units", "liquid", "production", "defense", "turret", "distribution", "crafting",
+    "settings", "cancel", "zoom", "ok", "star", "home", "pencil", "up", "down", "left", "right",
+    "hammer", "warning", "tree", "admin", "map", "modePvp", "terrain",
+    "modeSurvival", "commandRally", "commandAttack",
+    };
     /** maximum TCP packet size */
     public static final int maxTcpSize = 900;
     /** default server port */
