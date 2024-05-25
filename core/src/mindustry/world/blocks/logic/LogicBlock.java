@@ -60,12 +60,18 @@ public class LogicBlock extends Block{
             build.readCompressed(data, true);
         });
 
-        config(String.class,(LogicBuild build, String data) -> {
+        config(String.class, (LogicBuild build, String data) -> {
             if(!accessible() || !privileged) return;
 
             if(data != null && data.length() < maxNameLength){
                 build.tag = data;
             }
+        });
+
+        config(Character.class, (LogicBuild build, Character data) -> {
+            if(!accessible() || !privileged) return;
+
+            build.iconTag = data;
         });
 
         config(Integer.class, (LogicBuild entity, Integer pos) -> {
@@ -634,7 +640,17 @@ public class LogicBlock extends Block{
         }
 
         public void showEditDialog(){
-            ui.logic.show(code, executor, privileged, code -> configure(compress(code, relativeConnections())));
+            showEditDialog(false);
+        }
+
+        public void showEditDialog(boolean forceEditor){
+            ui.logic.show(code, executor, privileged, code -> {
+                boolean prev = state.rules.editor;
+                //this is a hack to allow configuration to work correctly in the editor for privileged processors
+                if(forceEditor) state.rules.editor = true;
+                configure(compress(code, relativeConnections()));
+                state.rules.editor = prev;
+            });
         }
 
         @Override

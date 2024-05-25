@@ -92,7 +92,7 @@ public class MapProcessorsDialog extends BaseDialog{
 
                     t.button((log.tag == null ? "<no name>\n" : "[accent]" + log.tag + "\n") + "[lightgray][[" + log.tile.x + ", " + log.tile.y + "]", Styles.grayt, () -> {
                         //TODO: bug: if you edit name inside of the edit dialog, it won't show up in the list properly
-                        log.showEditDialog();
+                        log.showEditDialog(true);
                     }).size(Vars.mobile ? 390f : 450f, h).margin(10f).with(b -> {
                         b.getLabel().setAlignment(Align.left, Align.left);
                     });

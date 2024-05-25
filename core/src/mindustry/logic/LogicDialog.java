@@ -93,7 +93,7 @@ public class LogicDialog extends BaseDialog{
                     TextButtonStyle style = Styles.flatt;
                     t.defaults().size(280f, 60f).left();
 
-                    if(privileged && executor != null && executor.build != null){// && !ui.editor.isShown()
+                    if(privileged && executor != null && executor.build != null && !ui.editor.isShown()){
                         t.button("@editor.worldprocessors.editname", Icon.edit, style, () -> {
                             ui.showTextInput("", "@editor.name", LogicBlock.maxNameLength, executor.build.tag == null ? "" : executor.build.tag, tag -> {
                                 if(privileged && executor != null && executor.build != null){
