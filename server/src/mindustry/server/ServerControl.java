@@ -148,7 +148,7 @@ public class ServerControl implements ApplicationListener{
             return useColors ? addColors(text) : removeColors(text);
         };
 
-        Time.setDeltaProvider(() -> Math.min(Core.graphics.getDeltaTime() * 60f, 10f));
+        Time.setDeltaProvider(() -> Math.min(Core.graphics.getDeltaTime() * 60f, maxDeltaServer));
 
         registerCommands();
 
