@@ -1,6 +1,7 @@
 package mindustry.logic;
 
 import arc.*;
+import arc.audio.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -2025,15 +2026,14 @@ public class LExecutor{
 
     public static class PlaySoundI implements LInstruction{
         public boolean positional;
-        public LogicSound sound;
-        public int volume, pitch, pan, x, y;
+        public int id, volume, pitch, pan, x, y;
 
         public PlaySoundI(){
         }
 
-        public PlaySoundI(boolean positional, LogicSound sound, int volume, int pitch, int pan, int x, int y){
+        public PlaySoundI(boolean positional, int id, int volume, int pitch, int pan, int x, int y){
             this.positional = positional;
-            this.sound = sound;
+            this.id = id;
             this.volume = volume;
             this.pitch = pitch;
             this.pan = pan;
@@ -2043,10 +2043,13 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
+            Sound sound = Sounds.getSound(exec.numi(id));
+            if(sound == Sounds.none || sound == Sounds.swish) sound = Sounds.pew; //no.
+            
             if(positional){
-                sound.sound.at(World.unconv(exec.numf(x)), World.unconv(exec.numf(y)), exec.numf(pitch), exec.numf(volume));
+                sound.at(World.unconv(exec.numf(x)), World.unconv(exec.numf(y)), exec.numf(pitch), exec.numf(volume));
             }else{
-                sound.sound.play(exec.numf(volume) * (Core.settings.getInt("sfxvol") / 100f), exec.numf(pitch), exec.numf(pan));
+                sound.play(exec.numf(volume) * (Core.settings.getInt("sfxvol") / 100f), exec.numf(pitch), exec.numf(pan));
             }
         }
     }
