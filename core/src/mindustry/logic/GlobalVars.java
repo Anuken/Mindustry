@@ -1,6 +1,7 @@
 package mindustry.logic;
 
 import arc.*;
+import arc.audio.*;
 import arc.files.*;
 import arc.graphics.*;
 import arc.math.*;
@@ -9,6 +10,7 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
+import mindustry.gen.*;
 import mindustry.game.*;
 import mindustry.logic.LExecutor.*;
 import mindustry.type.*;
@@ -35,7 +37,9 @@ public class GlobalVars{
     private IntSet privilegedIds = new IntSet();
     private UnlockableContent[][] logicIdToContent;
     private int[][] contentIdToLogicId;
-
+    
+    public static final Seq<String> soundNames = new Seq<>();
+    
     public void init(){
         putEntryOnly("sectionProcessor");
 
@@ -89,6 +93,16 @@ public class GlobalVars{
         put("@ctrlProcessor", ctrlProcessor);
         put("@ctrlPlayer", ctrlPlayer);
         put("@ctrlCommand", ctrlCommand);
+        
+        //sounds
+        for(Sound sound : Core.assets.getAll(Sound.class, new Seq<>(Sound.class))){
+            if(sound != Sounds.none && sound != Sounds.swish){
+                String name = sound.toString();
+                name = name.substring(20, name.length - 4);
+                soundNames.put(name);
+                put("@sfx-" + name, Sounds.getSoundId(sound));
+            }
+        }
 
         //store base content
 

@@ -1,6 +1,7 @@
 package mindustry.logic;
 
 import arc.*;
+import arc.audio.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.scene.style.*;
@@ -2089,8 +2090,9 @@ public class LStatements{
     @RegisterStatement("playsound")
     public static class PlaySoundStatement extends LStatement{
         public boolean positional;
-        public LogicSound sound = LogicSound.pew;
-        public String volume = "1", pitch = "1", pan = "0", x = "@thisx", y = "@thisy";
+        public String id = "@sfx-pew", volume = "1", pitch = "1", pan = "0", x = "@thisx", y = "@thisy";
+        
+        private transient TextField tfield;
         
         @Override
         public void build(Table table){
@@ -2107,15 +2109,18 @@ public class LStatements{
             
             row(table);
             
-            table.add("play");
+            table.add("play ");
+            
+            tfield = field(table, id, str -> id = str).padRight(0f).get();
             
             table.button(b -> {
-                b.label(() -> sound.name());
-                b.clicked(() -> showSelect(b, LogicSound.all, sound, s -> {
-                    sound = s;
+                b.image(Icon.pencilSmall);
+                
+                b.clicked(() -> showSelect(b, GlobalVars.soundNames.toArray(String.class), id, t -> {
+                    sid("@sfx-" + t);
                     rebuild(table);
-                }, 3, cell -> cell.size(150, 50)));
-            }, Styles.logict, () -> {}).size(190, 40).color(table.color).left().padLeft(2);
+                }, 4, cell -> cell.size(160, 50)));
+            }, Styles.logict, () -> {}).size(40).color(table.color).left().padLeft(-1);
             
             row(table);
             
@@ -2137,6 +2142,11 @@ public class LStatements{
             }
         }
         
+        private void sid(String text){
+            tfield.setText(text);
+            id = text;
+        }
+        
         @Override
         public boolean privileged(){
             return true;
@@ -2144,7 +2154,7 @@ public class LStatements{
         
         @Override
         public LInstruction build(LAssembler builder){
-            return new PlaySoundI(positional, sound, builder.var(volume), builder.var(pitch), builder.var(pan), builder.var(x), builder.var(y));
+            return new PlaySoundI(positional, builder.var(id), builder.var(volume), builder.var(pitch), builder.var(pan), builder.var(x), builder.var(y));
         }
         
         @Override
