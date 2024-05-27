@@ -41,6 +41,9 @@ public class DesktopLauncher extends ClientLauncher{
                 maximized = true;
                 width = 900;
                 height = 700;
+                //request 3.1, which has instancing
+                gl30Minor = 1;
+                gl30 = true;
                 for(int i = 0; i < arg.length; i++){
                     if(arg[i].charAt(0) == '-'){
                         String name = arg[i].substring(1);
@@ -49,6 +52,7 @@ public class DesktopLauncher extends ClientLauncher{
                                 case "width": width = Integer.parseInt(arg[i + 1]); break;
                                 case "height": height = Integer.parseInt(arg[i + 1]); break;
                                 case "gl3": gl30 = true; break;
+                                case "gl2": gl30 = false; break;
                                 case "antialias": samples = 16; break;
                                 case "debug": Log.level = LogLevel.debug; break;
                                 case "maximized": maximized = Boolean.parseBoolean(arg[i + 1]); break;

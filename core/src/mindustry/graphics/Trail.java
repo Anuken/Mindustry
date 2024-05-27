@@ -106,9 +106,9 @@ public class Trail{
         int count = (int)(counter += Time.delta);
         counter -= count;
 
-        if(points.size + ((count - 1) * 3) > length * 3 && points.size > 0){
-            points.removeRange(0, Math.min(3 * count - 1, points.size - 1));
-        }
+       if(count > 0 && points.size > 0){
+           points.removeRange(0, Math.min(count * 3 - 1, points.size - 1));
+       }
     }
 
     /** Adds a new point to the trail at intervals. */

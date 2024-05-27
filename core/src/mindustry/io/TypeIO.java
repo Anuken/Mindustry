@@ -628,7 +628,7 @@ public class TypeIO{
     }
 
     public static KickReason readKick(Reads read){
-        return KickReason.values()[read.b()];
+        return KickReason.all[read.b()];
     }
 
     public static void writeMarkerControl(Writes write, LMarkerControl reason){
@@ -786,7 +786,7 @@ public class TypeIO{
     }
 
     public static AdminAction readAction(Reads read){
-        return AdminAction.values()[read.b()];
+        return AdminAction.all[read.b()];
     }
 
     public static void writeUnitType(Writes write, UnitType effect){

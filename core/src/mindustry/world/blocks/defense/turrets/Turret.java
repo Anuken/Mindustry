@@ -137,6 +137,7 @@ public class Turret extends ReloadTurret{
         liquidCapacity = 20f;
         quickRotate = false;
         outlinedIcon = 1;
+        drawLiquidLight = false;
     }
 
     @Override
