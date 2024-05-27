@@ -2109,17 +2109,17 @@ public class LStatements{
             
             row(table);
             
-            table.add("play ");
+            table.add(" play ");
             
             tfield = field(table, id, str -> id = str).padRight(0f).get();
             
             table.button(b -> {
                 b.image(Icon.pencilSmall);
                 
-                b.clicked(() -> showSelect(b, GlobalVars.soundNames.toArray(String.class), id, t -> {
+                b.clicked(() -> showSelect(b, GlobalVars.soundNames.toArray(String.class), id.substring(4), t -> {
                     sid("@sfx-" + t);
                     rebuild(table);
-                }, 4, cell -> cell.size(160, 50)));
+                }, 2, cell -> cell.size(160, 50)));
             }, Styles.logict, () -> {}).size(40).color(table.color).left().padLeft(-1);
             
             row(table);
