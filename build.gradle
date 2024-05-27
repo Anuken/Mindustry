@@ -234,6 +234,8 @@ project(":desktop"){
     dependencies{
         implementation project(":core")
         implementation arcModule("extensions:discord")
+        implementation arcModule("extensions:filedialogs")
+        implementation arcModule("natives:natives-filedialogs")
         implementation arcModule("natives:natives-desktop")
         implementation arcModule("natives:natives-freetype-desktop")
 
