@@ -155,7 +155,7 @@ public interface Platform{
                     if(open){
                         result = FileDialogs.openFileDialog(formatted, FileChooser.getLastDirectory().absolutePath(), new String[]{"*." + extension}, "." + extension + " files", false);
                     }else{
-                        result = FileDialogs.saveFileDialog(formatted, FileChooser.getLastDirectory().absolutePath(), new String[]{"*." + extension}, "." + extension + " files");
+                        result = FileDialogs.saveFileDialog(formatted, FileChooser.getLastDirectory().child("file." + extension).absolutePath(), new String[]{"*." + extension}, "." + extension + " files");
                     }
 
                     if(result == null) return;
