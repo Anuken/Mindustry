@@ -151,11 +151,13 @@ public interface Platform{
                     FileDialogs.loadNatives();
 
                     String result;
+                    //on MacOS, .msav is not properly recognized until I put garbage into the array?
+                    String[] extensions = OS.isMac && open ? new String[]{"", "*." + extension} : new String[]{"*." + extension};
 
                     if(open){
-                        result = FileDialogs.openFileDialog(formatted, FileChooser.getLastDirectory().absolutePath(), new String[]{"*." + extension}, "." + extension + " files", false);
+                        result = FileDialogs.openFileDialog(formatted, FileChooser.getLastDirectory().absolutePath(), extensions, "." + extension + " files", false);
                     }else{
-                        result = FileDialogs.saveFileDialog(formatted, FileChooser.getLastDirectory().child("file." + extension).absolutePath(), new String[]{"*." + extension}, "." + extension + " files");
+                        result = FileDialogs.saveFileDialog(formatted, FileChooser.getLastDirectory().child("file." + extension).absolutePath(), extensions, "." + extension + " files");
                     }
 
                     if(result == null) return;
