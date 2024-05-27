@@ -97,11 +97,7 @@ public class GlobalVars{
         //sounds
         for(Sound sound : Core.assets.getAll(Sound.class, new Seq<>(Sound.class))){
             if(sound != Sounds.none && sound != Sounds.swish){
-                String name = sound.toString();
-                int startIndex = name.indexOf("sounds/") + 7;
-                int endIndex = name.indexOf(".ogg");
-                if(endIndex == -1) endIndex = name.indexOf(".mp3");
-                name = name.substring(startIndex, endIndex);
+                String name = sound.file.nameWithoutExtension();
                 soundNames.put(name);
                 put("@sfx-" + name, Sounds.getSoundId(sound));
             }
