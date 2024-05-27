@@ -16,7 +16,7 @@ public class EntityCollisions{
 
     //tile collisions
     private Vec2 vector = new Vec2(), l1 = new Vec2();
-    private Rect r1 = new Rect(), r2 = new Rect(), r3 = new Rect(), r4 = new Rect(), tmp = new Rect();
+    private Rect r1 = new Rect(), r2 = new Rect(), tmp = new Rect();
 
     //entity collisions
     private Seq<Hitboxc> arrOut = new Seq<>(Hitboxc.class);
@@ -218,12 +218,12 @@ public class EntityCollisions{
     }
 
     private void updateCollision(Hitboxc solid){
-        solid.hitbox(r3);
-        r3.x += (solid.lastX() - solid.getX());
-        r3.y += (solid.lastY() - solid.getY());
+        solid.hitbox(r1);
+        r1.x += (solid.lastX() - solid.getX());
+        r1.y += (solid.lastY() - solid.getY());
 
-        solid.hitbox(r4);
-        r4.merge(r3);
+        solid.hitbox(r2);
+        r2.merge(r1);
 
         arrOut.clear();
 
@@ -235,8 +235,8 @@ public class EntityCollisions{
 
         for(int i = 0; i < size; i++){
             Hitboxc sc = items[i];
-            sc.hitbox(r3);
-            if(r4.overlaps(r3)){
+            sc.hitbox(r1);
+            if(r2.overlaps(r1)){
                 checkCollide(solid, sc);
                 //break out of loop when this object hits something
                 if(!solid.isAdded()) return;

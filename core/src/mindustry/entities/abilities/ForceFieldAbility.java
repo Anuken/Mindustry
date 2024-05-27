@@ -32,7 +32,7 @@ public class ForceFieldAbility extends Ability{
 
     /** State. */
     protected float radiusScale, alpha;
-    protected boolean wasBroken;
+    protected boolean wasBroken = true;
 
     private static float realRad;
     private static Unit paramUnit;
