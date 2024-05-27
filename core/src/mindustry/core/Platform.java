@@ -143,6 +143,8 @@ public interface Platform{
      */
     default void showFileChooser(boolean open, String title, String extension, Cons<Fi> cons){
         if(OS.isWindows || OS.isMac){
+            String formatted = (title.startsWith("@") ? Core.bundle.get(title.substring(1)) : title).replaceAll("\"", "'");
+
             //native file dialog
             Threads.daemon(() -> {
                 try{
@@ -151,9 +153,9 @@ public interface Platform{
                     String result;
 
                     if(open){
-                        result = FileDialogs.openFileDialog(title, FileChooser.getLastDirectory().absolutePath(), new String[]{"*." + extension}, "." + extension + " files", false);
+                        result = FileDialogs.openFileDialog(formatted, FileChooser.getLastDirectory().absolutePath(), new String[]{"*." + extension}, "." + extension + " files", false);
                     }else{
-                        result = FileDialogs.saveFileDialog(title, FileChooser.getLastDirectory().absolutePath(), new String[]{"*." + extension}, "." + extension + " files");
+                        result = FileDialogs.saveFileDialog(formatted, FileChooser.getLastDirectory().absolutePath(), new String[]{"*." + extension}, "." + extension + " files");
                     }
 
                     if(result == null) return;
