@@ -408,7 +408,7 @@ public class Turret extends ReloadTurret{
             if(hasAmmo()){
                 if(Float.isNaN(reloadCounter)) reloadCounter = 0;
 
-                if(timer(timerTarget, target == null ? newTargetInterval : targetInterval)){
+                if(timer(timerTarget, target != null ? newTargetInterval : targetInterval)){
                     findTarget();
                 }
 
