@@ -1,6 +1,7 @@
 package mindustry.core;
 
 import arc.*;
+import arc.filedialogs.*;
 import arc.files.*;
 import arc.func.*;
 import arc.math.*;
@@ -141,7 +142,47 @@ public interface Platform{
      * @param title The title of the native dialog
      */
     default void showFileChooser(boolean open, String title, String extension, Cons<Fi> cons){
-        if(OS.isLinux && !OS.isAndroid){
+        if(OS.isWindows || OS.isMac){
+            //native file dialog
+            Threads.daemon(() -> {
+                try{
+                    FileDialogs.loadNatives();
+
+                    String result;
+
+                    if(open){
+                        result = FileDialogs.openFileDialog(title, FileChooser.getLastDirectory().absolutePath(), new String[]{"*." + extension}, "." + extension + " files", false);
+                    }else{
+                        result = FileDialogs.saveFileDialog(title, FileChooser.getLastDirectory().absolutePath(), new String[]{"*." + extension}, "." + extension + " files");
+                    }
+
+                    if(result == null) return;
+
+                    if(result.length() > 1 && result.contains("\n")){
+                        result = result.split("\n")[0];
+                    }
+
+                    //cancelled selection, ignore result
+                    if(result.isEmpty() || result.equals("\n")) return;
+                    if(result.endsWith("\n")) result = result.substring(0, result.length() - 1);
+                    if(result.contains("\n")) throw new IOException("invalid input: \"" + result + "\"");
+
+                    Fi file = Core.files.absolute(result);
+                    Core.app.post(() -> {
+                        FileChooser.setLastDirectory(file.isDirectory() ? file : file.parent());
+
+                        if(!open){
+                            cons.get(file.parent().child(file.nameWithoutExtension() + "." + extension));
+                        }else{
+                            cons.get(file);
+                        }
+                    });
+                }catch(Throwable error){
+                    Log.err("Failure to execute native file chooser", error);
+                    Core.app.post(() -> defaultFileDialog(open, title, extension, cons));
+                }
+            });
+        }else if(OS.isLinux && !OS.isAndroid){
             showZenity(open, title, new String[]{extension}, cons, () -> defaultFileDialog(open, title, extension, cons));
         }else{
             defaultFileDialog(open, title, extension, cons);
