@@ -130,13 +130,13 @@ public class BlockIndexer{
                 data.turretTree.remove(build);
             }
 
-            //is no longer registered
-            build.wasDamaged = false;
-
             //unregister damaged buildings
-            if(build.damaged() && damagedTiles[team.id] != null){
+            if(build.wasDamaged && damagedTiles[team.id] != null){
                 damagedTiles[team.id].remove(build);
             }
+
+            //is no longer registered
+            build.wasDamaged = false;
         }
     }
 

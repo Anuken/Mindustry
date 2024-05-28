@@ -36,6 +36,8 @@ public class Turret extends ReloadTurret{
     public final int timerTarget = timers++;
     /** Ticks between attempt at finding a target. */
     public float targetInterval = 20;
+    /** Target interval for when this turret already has a valid target. -1 = targetInterval */
+    public float newTargetInterval = -1f;
 
     /** Maximum ammo units stored. */
     public int maxAmmo = 30;
@@ -137,6 +139,7 @@ public class Turret extends ReloadTurret{
         liquidCapacity = 20f;
         quickRotate = false;
         outlinedIcon = 1;
+        drawLiquidLight = false;
     }
 
     @Override
@@ -175,6 +178,7 @@ public class Turret extends ReloadTurret{
         if(elevation < 0) elevation = size / 2f;
         if(recoilTime < 0f) recoilTime = reload;
         if(cooldownTime < 0f) cooldownTime = reload;
+        if(newTargetInterval <= 0f) newTargetInterval = targetInterval;
 
         super.init();
     }
@@ -404,7 +408,7 @@ public class Turret extends ReloadTurret{
             if(hasAmmo()){
                 if(Float.isNaN(reloadCounter)) reloadCounter = 0;
 
-                if(timer(timerTarget, targetInterval)){
+                if(timer(timerTarget, target != null ? newTargetInterval : targetInterval)){
                     findTarget();
                 }
 
@@ -437,6 +441,8 @@ public class Turret extends ReloadTurret{
                         wasShooting = true;
                         updateShooting();
                     }
+                }else{
+                    target = null;
                 }
 
                 if(alwaysShooting){

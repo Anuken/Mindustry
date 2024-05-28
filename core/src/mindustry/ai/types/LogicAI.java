@@ -40,8 +40,6 @@ public class LogicAI extends AIController{
     public PosTeam posTarget = PosTeam.create();
 
     private ObjectSet<Object> radars = new ObjectSet<>();
-    private float lastMoveX, lastMoveY;
-    private int lastPathId = 0;
 
     // LogicAI state should not be reset after reading.
     @Override
@@ -51,14 +49,6 @@ public class LogicAI extends AIController{
 
     @Override
     public void updateMovement(){
-        if(control == LUnitControl.pathfind){
-            if(!Mathf.equal(moveX, lastMoveX, 0.1f) || !Mathf.equal(moveY, lastMoveY, 0.1f)){
-                lastPathId ++;
-                lastMoveX = moveX;
-                lastMoveY = moveY;
-            }
-        }
-
         if(targetTimer > 0f){
             targetTimer -= Time.delta;
         }else{

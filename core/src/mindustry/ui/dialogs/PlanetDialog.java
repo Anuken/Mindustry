@@ -43,13 +43,6 @@ import static mindustry.graphics.g3d.PlanetRenderer.*;
 import static mindustry.ui.dialogs.PlanetDialog.Mode.*;
 
 public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
-    static final String[] defaultIcons = {
-    "effect", "power", "logic", "units", "liquid", "production", "defense", "turret", "distribution", "crafting",
-    "settings", "cancel", "zoom", "ok", "star", "home", "pencil", "up", "down", "left", "right",
-    "hammer", "warning", "tree", "admin", "map", "modePvp", "terrain",
-    "modeSurvival", "commandRally", "commandAttack",
-    };
-
     //if true, enables launching anywhere for testing
     public static boolean debugSelect = false;
     public static float sectorShowDuration = 60f * 2.4f;
@@ -998,6 +991,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 sector.save = null;
             }
             updateSelected();
+            rebuildList();
         });
     }
 
@@ -1053,6 +1047,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 Icon.icons.get(sector.info.icon + "Small");
 
             title.button(icon == null ? Icon.noneSmall : icon, Styles.clearNonei, iconSmall, () -> {
+                //TODO use IconSelectDialog
                 new Dialog(""){{
                     closeOnBack();
                     setFillParent(true);
@@ -1079,7 +1074,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                             int cols = (int)Math.min(20, Core.graphics.getWidth() / Scl.scl(52f));
 
                             int i = 1;
-                            for(var key : defaultIcons){
+                            for(var key : accessibleIcons){
                                 var value = Icon.icons.get(key);
 
                                 t.button(value, Styles.squareTogglei, () -> {
