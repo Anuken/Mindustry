@@ -769,15 +769,22 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         //update lerp
         if(state.otherCamPos != null){
             state.otherCamAlpha = Mathf.lerpDelta(state.otherCamAlpha, 1f, 0.05f);
-            state.camPos.set(0f, camLength, 0.1f);
+            // TODO: figure out where to put the camera
+            // if (state.otherCamAlpha < 0.75){
+            //   state.camPos.slerp(Tmp.v32.set(state.otherCamPos).sub(state.planet.position).setLength(camLength), 2/3.f * state.otherCamAlpha);
+            // }
+            // state.camPos.set(0f, camLength, 0.1f);
 
-            if(Mathf.equal(state.otherCamAlpha, 1f, 0.01f)){
+            if(Mathf.equal(state.otherCamAlpha, 1f, 0.0001f)){
                 //TODO change zoom too
                 state.camPos.set(Tmp.v31.set(state.otherCamPos).lerp(state.planet.position, state.otherCamAlpha).add(state.camPos).sub(state.planet.position));
 
                 state.otherCamPos = null;
+
                 //announce new sector
-                newPresets.add(state.planet.sectors.get(state.planet.startSector));
+                if (state.planet.sectors.isEmpty()) {
+                    newPresets.add(state.planet.sectors.get(state.planet.startSector));
+                }
 
             }
         }
@@ -1314,6 +1321,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         selected = null;
         launchSector = null;
         if(state.planet != planet){
+            state.otherCamPos = state.planet.position;
+            state.otherCamAlpha = 0;
             newPresets.clear();
             state.planet = planet;
 
