@@ -833,13 +833,24 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             }
         }
 
+        // do not hover over things indefinitely
+        hoverPlanet = null;
+        // get nearest planet (DO NOT SELECT THROUGH selected planet)
+        float nearest = Float.POSITIVE_INFINITY;
+
         for (Planet planet: content.planets()) {
             Ray r = planets.cam.getMouseRay();
 
-            if (planet.intersect(r, outlineRad * planet.radius) != null && selectable(planet)) {
+            // get planet we're hovering over
+            Vec3 intersect = planet.intersect(r, outlineRad * planet.radius);
+
+            if (intersect != null && selectable(planet) && intersect.dst(r.origin) < nearest) {
+                nearest = intersect.dst(r.origin);
                 hoverPlanet = planet;
             }
         }
+        // no need to hover the current planet, we're already herei
+        if (hoverPlanet == state.planet) hoverPlanet = null;
 
         if(state.planet.hasGrid()){
             hovered = Core.scene.getDialog() == this ? state.planet.getSector(planets.cam.getMouseRay(), PlanetRenderer.outlineRad * state.planet.radius) : null;
