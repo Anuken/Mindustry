@@ -36,7 +36,6 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.storage.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
-
 import static arc.Core.*;
 import static mindustry.Vars.*;
 import static mindustry.graphics.g3d.PlanetRenderer.*;
@@ -54,6 +53,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     public PlanetParams state = new PlanetParams();
     public float zoom = 1f;
     public @Nullable Sector selected, hovered, launchSector;
+    public @Nullable Planet hoverPlanet;
     public Mode mode = look;
     public boolean launching;
     public Cons<Sector> listener = s -> {};
@@ -266,6 +266,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         if(state.planet.getLastSector() != null){
             lookAt(state.planet.getLastSector());
         }
+
+        Log.info("Showing all things");
 
         return super.show();
     }
@@ -581,6 +583,10 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                         if(selected != null){
                             updateSelected();
                         }
+
+                        if (hoverPlanet != null) {
+                            gotoPlanet(hoverPlanet);
+                        }
                     }
                 });
             }
@@ -628,17 +634,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 for(Planet planet : content.planets()){
                     if(planet.solarSystem == star && selectable(planet)){
                         Button planetButton = planetTable.button(planet.localizedName, Icon.icons.get(planet.icon + "Small", Icon.icons.get(planet.icon, Icon.commandRallySmall)), Styles.flatTogglet, () -> {
-                            selected = null;
-                            launchSector = null;
-                            if(state.planet != planet){
-                                newPresets.clear();
-                                state.planet = planet;
-
-                                selected = null;
-                                updateSelected();
-                                rebuildExpand();
-                            }
-                            settings.put("lastplanet", planet.name);
+                            gotoPlanet(planet);
                         }).width(200).height(40).update(bb -> bb.setChecked(state.planet == planet)).with(w -> w.marginLeft(10f)).get();
                         planetButton.getChildren().get(1).setColor(planet.iconColor);
                         planetButton.setColor(planet.iconColor);
@@ -835,6 +831,14 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 newPresets.pop();
                 showed = false;
                 presetShow = 0f;
+            }
+        }
+
+        for (Planet planet: content.planets()) {
+            Ray r = planets.cam.getMouseRay();
+
+            if (planet.intersect(r, outlineRad * planet.radius) != null && selectable(planet)) {
+                hoverPlanet = planet;
             }
         }
 
@@ -1294,5 +1298,19 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         select,
         /** Launch between planets. */
         planetLaunch
+    }
+
+    private void gotoPlanet(Planet planet) {
+        selected = null;
+        launchSector = null;
+        if(state.planet != planet){
+            newPresets.clear();
+            state.planet = planet;
+
+            selected = null;
+            updateSelected();
+            rebuildExpand();
+        }
+        settings.put("lastplanet", planet.name);
     }
 }
