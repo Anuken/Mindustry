@@ -311,5 +311,9 @@
   {
     "name": "ArmyOFUkraine",
     "address": ["194.247.42.131:27715"]
+  },
+  {
+    "name": "Natrition",
+    "address": ["94.103.90.138"]
   }
 ]
