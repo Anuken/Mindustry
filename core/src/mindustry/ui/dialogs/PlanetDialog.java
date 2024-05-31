@@ -267,8 +267,6 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             lookAt(state.planet.getLastSector());
         }
 
-        Log.info("Showing all things");
-
         return super.show();
     }
 
