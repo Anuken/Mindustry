@@ -42,7 +42,7 @@ public class PayloadBlock extends Block{
         TextureRegion region = Core.atlas.find(name + suffix);
 
         if(!region.found() && minfo.mod != null) region = Core.atlas.find(minfo.mod.name + "-factory" + suffix + "-" + size + regionSuffix);
-        if(!region.found()) region = Core.atlas.find("factory" + suffix + size + regionSuffix);
+        if(!region.found()) region = Core.atlas.find("factory" + suffix + "-" + size + regionSuffix);
 
         return region;
     }
