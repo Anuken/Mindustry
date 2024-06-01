@@ -266,7 +266,7 @@
   },
   {
     "name": "XuwenHost",
-    "address": ["mdt.xuwenblock.cn:6568","mdt.xuwenblock.cn:6567","106.14.14.210"]
+    "address": ["mdt.xuwenblock.cn:6567","rack1.rainplay.cn:59196"]
   },
   {
     "name": "Atomic",
