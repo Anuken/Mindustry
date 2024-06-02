@@ -266,7 +266,7 @@
   },
   {
     "name": "XuwenHost",
-    "address": ["mdt.xuwenblock.cn:6568","mdt.xuwenblock.cn:6567","106.14.14.210"]
+    "address": ["mdt.xuwenblock.cn:6567","rack1.rainplay.cn:59196"]
   },
   {
     "name": "Atomic",
@@ -305,7 +305,15 @@
     "address": ["45.137.205.185:1045", "51.89.173.50:1432", "45.137.205.185:1052", "45.137.205.185:1040"]
   },
   {
+    "name": "TRFACT",
+    "address": ["213.142.156.83:25565"]
+  },
+  {
     "name": "ArmyOFUkraine",
     "address": ["194.247.42.131:27715"]
+  },
+  {
+    "name": "Natrition",
+    "address": ["94.103.90.138"]
   }
 ]
