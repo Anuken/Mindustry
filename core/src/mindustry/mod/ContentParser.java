@@ -146,6 +146,11 @@ public class ContentParser{
             readFields(result, data);
             return result;
         });
+        put(MassDriverBolt.class, (type, data) -> {
+            MassDriverBolt result = (MassDriverBolt)make(MassDriverBolt.class);
+            readFields(result, data);
+            return result;
+        });
         put(AmmoType.class, (type, data) -> {
             //string -> item
             //if liquid ammo support is added, this should scan for liquids as well
