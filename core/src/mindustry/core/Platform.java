@@ -290,7 +290,13 @@ public interface Platform{
                 });
             }catch(Throwable error){
                 Log.err("Failure to execute native file chooser", error);
-                Core.app.post(() -> defaultFileDialog(open, title, ext[0], cons));
+                Core.app.post(() -> {
+                    if(ext.length > 1){
+                        defaultMultiFileChooser(cons, ext);
+                    }else{
+                        defaultFileDialog(open, title, ext[0], cons);
+                    }
+                });
             }
         });
     }
