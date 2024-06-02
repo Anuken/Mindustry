@@ -315,5 +315,9 @@
   {
     "name": "Natrition",
     "address": ["94.103.90.138"]
+  },
+  {
+    "name": "Vndustry",
+    "address": ["vndustry.ddns.net"]
   }
 ]
