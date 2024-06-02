@@ -583,7 +583,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                             updateSelected();
                         }
 
-                        if (hoverPlanet != null) {
+                        if(hoverPlanet != null){
                             gotoPlanet(hoverPlanet);
                         }
                     }
@@ -782,7 +782,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 state.otherCamPos = null;
 
                 //announce new sector
-                if (state.planet.sectors.isEmpty()) {
+                if(state.planet.sectors.isEmpty()){
                     newPresets.add(state.planet.sectors.get(state.planet.startSector));
                 }
 
@@ -845,19 +845,19 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         // get nearest planet (DO NOT SELECT THROUGH selected planet)
         float nearest = Float.POSITIVE_INFINITY;
 
-        for (Planet planet: content.planets()) {
+        for(Planet planet : content.planets()){
             Ray r = planets.cam.getMouseRay();
 
             // get planet we're hovering over
             Vec3 intersect = planet.intersect(r, outlineRad * planet.radius);
 
-            if (intersect != null && selectable(planet) && intersect.dst(r.origin) < nearest) {
+            if(intersect != null && selectable(planet) && intersect.dst(r.origin) < nearest){
                 nearest = intersect.dst(r.origin);
                 hoverPlanet = planet;
             }
         }
         // no need to hover the current planet, we're already herei
-        if (hoverPlanet == state.planet) hoverPlanet = null;
+        if(hoverPlanet == state.planet) hoverPlanet = null;
 
         if(state.planet.hasGrid()){
             hovered = Core.scene.getDialog() == this ? state.planet.getSector(planets.cam.getMouseRay(), PlanetRenderer.outlineRad * state.planet.radius) : null;
@@ -1317,7 +1317,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         planetLaunch
     }
 
-    private void gotoPlanet(Planet planet) {
+    private void gotoPlanet(Planet planet){
         selected = null;
         launchSector = null;
         if(state.planet != planet){
