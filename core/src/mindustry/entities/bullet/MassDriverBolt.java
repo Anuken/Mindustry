@@ -19,6 +19,7 @@ public class MassDriverBolt extends BasicBulletType{
         width = 11f;
         height = 13f;
         shrinkY = 0f;
+        sprite = "shell";
         despawnEffect = Fx.smeltsmoke;
         hitEffect = Fx.hitBulletBig;
     }
