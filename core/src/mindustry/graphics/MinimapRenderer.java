@@ -146,26 +146,37 @@ public class MinimapRenderer{
 
         rect.set((dx - sz) * tilesize, (dy - sz) * tilesize, sz * 2 * tilesize, sz * 2 * tilesize);
 
+        Tmp.m2.set(Draw.trans());
+
+        float scaleFactor;
+        var trans = Tmp.m1.idt();
+        trans.translate(lastX, lastY);
+        if(!worldSpace){
+            trans.scl(Tmp.v1.set(scaleFactor = lastW / rect.width, lastH / rect.height));
+            trans.translate(-rect.x, -rect.y);
+        }else{
+            trans.scl(Tmp.v1.set(scaleFactor = lastW / world.unitWidth(), lastH / world.unitHeight()));
+        }
+        trans.translate(tilesize / 2f, tilesize / 2f);
+        Draw.trans(trans);
+
+        scaleFactor = 1f / scaleFactor;
+
         for(Unit unit : units){
             if(unit.inFogTo(player.team()) || !unit.type.drawMinimap) continue;
 
-            float rx = !fullView ? (unit.x - rect.x) / rect.width * w : unit.x / (world.width() * tilesize) * w;
-            float ry = !fullView ? (unit.y - rect.y) / rect.width * h : unit.y / (world.height() * tilesize) * h;
+            float scale = Scl.scl(1f) * tilesize * 3;
+            var region = unit.icon();
 
             Draw.mixcol(unit.team.color, 1f);
-            float scale = Scl.scl(1f) / 2f * scaling * 32f;
-            var region = unit.icon();
-            Draw.rect(region, x + rx, y + ry, scale, scale * (float)region.height / region.width, unit.rotation() - 90);
+            Draw.rect(region, unit.x, unit.y, scale, scale * (float)region.height / region.width, unit.rotation() - 90);
             Draw.reset();
         }
 
         if(fullView && net.active()){
             for(Player player : Groups.player){
                 if(!player.dead()){
-                    float rx = player.x / (world.width() * tilesize) * w;
-                    float ry = player.y / (world.height() * tilesize) * h;
-
-                    drawLabel(x + rx, y + ry, player.name, player.color);
+                    drawLabel(player.x, player.y, player.name, player.color);
                 }
             }
         }
@@ -186,15 +197,14 @@ public class MinimapRenderer{
             //crisp pixels
             dynamicTex.setFilter(TextureFilter.nearest);
 
-            if(worldSpace){
-                region.set(0f, 0f, 1f, 1f);
-            }
-
             Tmp.tr1.set(dynamicTex);
-            Tmp.tr1.set(region.u, 1f - region.v, region.u2, 1f - region.v2);
+            Tmp.tr1.set(0f, 1f, 1f, 0f);
+
+            float wf = world.width() * tilesize;
+            float hf = world.height() * tilesize;
 
             Draw.color(state.rules.dynamicColor, 0.5f);
-            Draw.rect(Tmp.tr1, x + w/2f, y + h/2f, w, h);
+            Draw.rect(Tmp.tr1, wf / 2, hf / 2, wf, hf);
 
             if(state.rules.staticFog){
                 staticTex.setFilter(TextureFilter.nearest);
@@ -202,7 +212,7 @@ public class MinimapRenderer{
                 Tmp.tr1.texture = staticTex;
                 //must be black to fit with borders
                 Draw.color(0f, 0f, 0f, 1f);
-                Draw.rect(Tmp.tr1, x + w/2f, y + h/2f, w, h);
+                Draw.rect(Tmp.tr1, wf / 2, hf / 2, wf, hf);
             }
 
             Draw.color();
@@ -211,23 +221,21 @@ public class MinimapRenderer{
 
         //TODO might be useful in the standard minimap too
         if(fullView){
-            drawSpawns(x, y, w, h, scaling);
+            drawSpawns();
 
             if(!mobile){
                 //draw bounds for camera - not drawn on mobile because you can't shift it by tapping anyway
                 Rect r = Core.camera.bounds(Tmp.r1);
-                Vec2 bot = transform(Tmp.v1.set(r.x, r.y));
-                Vec2 top = transform(Tmp.v2.set(r.x + r.width, r.y + r.height));
-                Lines.stroke(Scl.scl(3f));
+                Lines.stroke(Scl.scl(3f) * scaleFactor);
                 Draw.color(Pal.accent);
-                Lines.rect(bot.x,bot.y, top.x - bot.x, top.y - bot.y);
+                Lines.rect(r.x, r.y, r.width, r.height);
                 Draw.reset();
             }
         }
 
         LongSeq indicators = control.indicators.list();
         float fin = ((Time.globalTime / 30f) % 1f);
-        float rad = scale(fin * 5f + tilesize - 2f);
+        float rad = fin * 5f + tilesize - 2f;
         Lines.stroke(Scl.scl((1f - fin) * 4f + 0.5f));
 
         for(int i = 0; i < indicators.size; i++){
@@ -244,27 +252,32 @@ public class MinimapRenderer{
                 offset = build.block.offset / tilesize;
             }
 
-            Vec2 v = transform(Tmp.v1.set((ix + 0.5f + offset) * tilesize, (iy + 0.5f + offset) * tilesize));
-
             Draw.color(Color.orange, Color.scarlet, Mathf.clamp(time / 70f));
 
-            Lines.square(v.x, v.y, rad);
+            Lines.square((ix + 0.5f + offset) * tilesize, (iy + 0.5f + offset) * tilesize, rad);
         }
 
         Draw.reset();
 
+        //TODO autoscale markers
         state.rules.objectives.eachRunning(obj -> {
             for(var marker : obj.markers){
-                marker.drawMinimap(this);
+                if(marker.minimap){
+                    marker.draw(1);
+                }
             }
         });
 
-        for(var marker : state.markers.values()){
-            if(marker != null) marker.drawMinimap(this);
+        for(var marker : state.markers){
+            if(marker.minimap){
+                marker.draw(1);
+            }
         }
+
+        Draw.trans(Tmp.m2);
     }
 
-    public void drawSpawns(float x, float y, float w, float h, float scaling){
+    public void drawSpawns(){
         if(!state.rules.showSpawns || !state.hasSpawns() || !state.rules.waves) return;
 
         TextureRegion icon = Icon.units.getRegion();
@@ -273,34 +286,19 @@ public class MinimapRenderer{
 
         Draw.color(state.rules.waveTeam.color, Tmp.c2.set(state.rules.waveTeam.color).value(1.2f), Mathf.absin(Time.time, 16f, 1f));
 
-        float rad = scale(state.rules.dropZoneRadius);
+        float rad = state.rules.dropZoneRadius;
         float curve = Mathf.curve(Time.time % 240f, 120f, 240f);
 
         for(Tile tile : spawner.getSpawns()){
-            float tx = ((tile.x + 0.5f) / world.width()) * w;
-            float ty = ((tile.y + 0.5f) / world.height()) * h;
+            float tx = tile.worldx();
+            float ty = tile.worldy();
 
-            Draw.rect(icon, x + tx, y + ty, icon.width, icon.height);
-            Lines.circle(x + tx, y + ty, rad);
-            if(curve > 0f) Lines.circle(x + tx, y + ty, rad * Interp.pow3Out.apply(curve));
+            Draw.rect(icon, tx, ty, icon.width, icon.height);
+            Lines.circle(tx, ty, rad);
+            if(curve > 0f) Lines.circle(tx, ty, rad * Interp.pow3Out.apply(curve));
         }
 
         Draw.reset();
-    }
-
-    //TODO horrible code, everywhere.
-    public Vec2 transform(Vec2 position){
-        if(!worldSpace){
-            position.sub(rect.x, rect.y).scl(lastW / rect.width, lastH / rect.height);
-        }else{
-            position.scl(lastW / world.unitWidth(), lastH / world.unitHeight());
-        }
-
-        return position.add(lastX, lastY);
-    }
-
-    public float scale(float radius){
-        return worldSpace ? (radius / (baseSize / 2f)) * 5f * lastScl : lastW / rect.width * radius;
     }
 
     public @Nullable TextureRegion getRegion(){

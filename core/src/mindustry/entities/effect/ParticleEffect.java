@@ -88,7 +88,7 @@ public class ParticleEffect extends Effect{
                 rv.trns(realRotation + rand.range(cone), !randLength ? l : rand.random(l));
                 float x = rv.x, y = rv.y;
 
-                Draw.rect(tex, ox + x, oy + y, rad, rad, realRotation + offset + e.time * spin);
+                Draw.rect(tex, ox + x, oy + y, rad, rad / tex.ratio(), realRotation + offset + e.time * spin);
                 Drawf.light(ox + x, oy + y, rad * lightScl, lightColor, lightOpacity * Draw.getColor().a);
             }
         }

@@ -94,7 +94,9 @@ public class ArcNetProvider implements NetProvider{
         server.setMulticast(multicastGroup, multicastPort);
         server.setDiscoveryHandler((address, handler) -> {
             ByteBuffer buffer = NetworkIO.writeServerData();
+            int length = buffer.position();
             buffer.position(0);
+            buffer.limit(length);
             handler.respond(buffer);
         });
 

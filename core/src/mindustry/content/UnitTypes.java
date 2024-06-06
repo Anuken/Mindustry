@@ -1318,6 +1318,7 @@ public class UnitTypes{
 
                     healPercent = 5.5f;
                     collidesTeam = true;
+                    reflectable = false;
                     backColor = Pal.heal;
                     trailColor = Pal.heal;
                 }};
@@ -3894,7 +3895,7 @@ public class UnitTypes{
                     x = 43f * i / 4f;
                     particles = parts;
                     //visual only, the middle one does the actual suppressing
-                    display = active = false;
+                    active = false;
                 }});
             }
 
@@ -4063,6 +4064,8 @@ public class UnitTypes{
             isEnemy = false;
             envDisabled = 0;
 
+            range = 60f;
+            faceTarget = true;
             targetPriority = -2;
             lowAltitude = false;
             mineWalls = true;
@@ -4127,8 +4130,10 @@ public class UnitTypes{
             isEnemy = false;
             envDisabled = 0;
 
+            range = 60f;
             targetPriority = -2;
             lowAltitude = false;
+            faceTarget = true;
             mineWalls = true;
             mineFloor = false;
             mineHardnessScaling = false;
@@ -4204,6 +4209,8 @@ public class UnitTypes{
             isEnemy = false;
             envDisabled = 0;
 
+            range = 65f;
+            faceTarget = true;
             targetPriority = -2;
             lowAltitude = false;
             mineWalls = true;

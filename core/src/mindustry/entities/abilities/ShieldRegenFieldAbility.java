@@ -1,14 +1,13 @@
 package mindustry.entities.abilities;
 
-import arc.Core;
+import arc.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
-import mindustry.world.meta.*;
 
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 public class ShieldRegenFieldAbility extends Ability{
     public float amount = 1, max = 100f, reload = 100, range = 60;
@@ -30,12 +29,12 @@ public class ShieldRegenFieldAbility extends Ability{
 
     @Override
     public void addStats(Table t){
-        t.add("[lightgray]" + Core.bundle.get("waves.shields") + ": [white]" + Math.round(max)); //extremely stupid usage
+        super.addStats(t);
+        t.add(Core.bundle.format("bullet.range", Strings.autoFixed(range / tilesize, 2)));
         t.row();
-        t.add("[lightgray]" + Stat.shootRange.localized() + ": [white]" +  Strings.autoFixed(range / tilesize, 2) + " " + StatUnit.blocks.localized());
+        t.add(abilityStat("firingrate", Strings.autoFixed(60f / reload, 2)));
         t.row();
-        t.add("[lightgray]" + Stat.reload.localized() + ": [white]" + Strings.autoFixed(60f / reload, 2) + " " + StatUnit.perSecond.localized());
-        t.row();
+        t.add(abilityStat("shield", Strings.autoFixed(max, 2)));
     }
 
     @Override

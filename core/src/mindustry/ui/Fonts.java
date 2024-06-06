@@ -30,6 +30,7 @@ public class Fonts{
     private static final String mainFont = "fonts/font.woff";
     private static final ObjectSet<String> unscaled = ObjectSet.with("iconLarge");
     private static ObjectIntMap<String> unicodeIcons = new ObjectIntMap<>();
+    private static IntMap<String> unicodeToName = new IntMap<>();
     private static ObjectMap<String, String> stringIcons = new ObjectMap<>();
     private static ObjectMap<String, TextureRegion> largeIcons = new ObjectMap<>();
     private static TextureRegion[] iconTable;
@@ -95,12 +96,16 @@ public class Fonts{
         }})).loaded = f -> Fonts.logic = f;
     }
 
+    public static @Nullable String unicodeToName(int unicode){
+        return unicodeToName.get(unicode, () -> Iconc.codeToName.get(unicode));
+    }
+
     public static TextureRegion getLargeIcon(String name){
         return largeIcons.get(name, () -> {
             var region = new TextureRegion();
             int code = Iconc.codes.get(name, '\uF8D4');
             var glyph = iconLarge.getData().getGlyph((char)code);
-            if(glyph == null) return Core.atlas.find("error");
+            if(glyph == null) return Core.atlas.find(name);
             region.set(iconLarge.getRegion().texture);
             region.set(glyph.u, glyph.v2, glyph.u2, glyph.v);
             return region;
@@ -127,6 +132,7 @@ public class Fonts{
 
                 unicodeIcons.put(nametex[0], ch);
                 stringIcons.put(nametex[0], ((char)ch) + "");
+                unicodeToName.put(ch, texture);
 
                 Vec2 out = Scaling.fit.apply(region.width, region.height, size, size);
 

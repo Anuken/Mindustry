@@ -5,6 +5,7 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
+import arc.scene.ui.TextButton.*;
 import arc.scene.ui.layout.*;
 import arc.scene.utils.*;
 import arc.struct.*;
@@ -23,6 +24,15 @@ import static mindustry.Vars.*;
 public class MapLocalesDialog extends BaseDialog{
     /** Width of UI property card. */
     private static final float cardWidth = 400f;
+    /** Style for filter options buttons */
+    private static final TextButtonStyle filterStyle = new TextButtonStyle(){{
+        up = down = checked = over = Tex.whitePane;
+        font = Fonts.outline;
+        fontColor = Color.lightGray;
+        overFontColor = Pal.accent;
+        disabledFontColor = Color.gray;
+        disabled = Styles.black;
+    }};
     /** Icons for use in map locales dialog. */
     private static final ContentType[] contentIcons = {ContentType.item, ContentType.block, ContentType.liquid, ContentType.status, ContentType.unit};
 
@@ -79,6 +89,8 @@ public class MapLocalesDialog extends BaseDialog{
 
             t.button("@edit", Icon.edit, this::editDialog).size(210f, 64f);
         }).growX();
+
+        resized(this::buildMain);
 
         buttons.button("?", () -> ui.showInfo("@locales.info")).size(60f, 64f).uniform();
 
@@ -147,7 +159,7 @@ public class MapLocalesDialog extends BaseDialog{
 
                 saved = false;
                 buildMain();
-            }).padTop(10f).size(400f, 50f).fillX().row();
+            }).padTop(10f).size(cardWidth, 50f).fillX().row();
         }).right();
     }
 
@@ -168,12 +180,12 @@ public class MapLocalesDialog extends BaseDialog{
                 String name = loc.toString();
 
                 if(locales.containsKey(name)){
-                    p.button(loc.getDisplayName(), Styles.flatTogglet, () -> {
+                    p.button(loc.getDisplayName(Core.bundle.getLocale()), Styles.flatTogglet, () -> {
                         if(name.equals(selectedLocale)) return;
 
                         selectedLocale = name;
                         buildTables();
-                    }).update(b -> b.setChecked(selectedLocale.equals(name))).size(300f, 50f);
+                    }).update(b -> b.setChecked(selectedLocale.equals(name))).width(200f).minHeight(50f);
                     p.button(Icon.edit, Styles.flati, () -> localeEditDialog(name)).size(50f);
                     p.button(Icon.trash, Styles.flati, () -> ui.showConfirm("@confirm", "@locales.deletelocale", () -> {
                         locales.remove(name);
@@ -185,7 +197,7 @@ public class MapLocalesDialog extends BaseDialog{
                 }
             }
         }).row();
-        langs.button("@add", Icon.add, this::addLocaleDialog).padTop(10f).width(400f);
+        langs.button("@add", Icon.add, this::addLocaleDialog).padTop(10f).width(250f);
     }
 
     private void buildMain(){
@@ -195,8 +207,8 @@ public class MapLocalesDialog extends BaseDialog{
 
         main.image().color(Pal.gray).height(3f).growX().expandY().top().row();
         main.pane(p -> {
-            int cols = (Core.graphics.getWidth() - 380) / ((int)cardWidth + 10);
-            if(props.size == 0 || cols == 0){
+            int cols = Math.max(1, (int)((Core.graphics.getWidth() / Scl.scl() - 410f) / cardWidth) - 1);
+            if(props.size == 0){
                 main.add("@empty").center().row();
                 return;
             }
@@ -343,7 +355,7 @@ public class MapLocalesDialog extends BaseDialog{
                 String name = loc.toString();
 
                 if(!locales.containsKey(name)){
-                    t.button(loc.getDisplayName(), Styles.flatTogglet, () -> {
+                    t.button(loc.getDisplayName(Core.bundle.getLocale()), Styles.flatTogglet, () -> {
                         if(name.equals(selectedLocale)) return;
 
                         locales.put(name, new StringMap());
@@ -501,7 +513,7 @@ public class MapLocalesDialog extends BaseDialog{
 
         propView.image().color(Pal.gray).height(3f).fillX().top().row();
         propView.pane(p -> {
-            int cols = (Core.graphics.getWidth() - 100) / ((int)cardWidth + 10);
+            int cols = Math.max(1, (int)((Core.graphics.getWidth() / Scl.scl() - 100f) / cardWidth));
             if(cols == 0){
                 propView.add("@empty").center().row();
                 return;
@@ -524,12 +536,12 @@ public class MapLocalesDialog extends BaseDialog{
                 if(status == PropertyStatus.same && !showSame) continue;
 
                 if(status != PropertyStatus.missing){
-                    var comparsionString = (searchByValue ? locales.get(name).get(key).toLowerCase() : loc.getDisplayName().toLowerCase());
+                    var comparsionString = (searchByValue ? locales.get(name).get(key).toLowerCase() : loc.getDisplayName(Core.bundle.getLocale()).toLowerCase());
                     if(!searchString.isEmpty() && !comparsionString.contains(searchString.toLowerCase())) continue;
                 }
 
                 colTables[i].table(Tex.whitePane, t -> {
-                    t.add(loc.getDisplayName()).left().color(Pal.accent).row();
+                    t.add(loc.getDisplayName(Core.bundle.getLocale())).left().color(Pal.accent).row();
                     t.image().color(Pal.accent).fillX().row();
 
                     if(status == PropertyStatus.missing){
@@ -576,26 +588,24 @@ public class MapLocalesDialog extends BaseDialog{
             }).padTop(5f);
         }).row();
 
-        dialog.cont.table(Tex.whitePane, t ->
-        t.button("@locales.showcorrect", Icon.ok, Styles.nonet, () -> showCorrect = !showCorrect).update(b -> {
+        dialog.cont.button("@locales.showcorrect", Icon.ok, filterStyle, () -> showCorrect = !showCorrect).update(b -> {
             ((Image)b.getChildren().get(1)).setDrawable(showCorrect ? Icon.ok : Icon.cancel);
             b.setChecked(showCorrect);
-        }).grow().pad(15f)).size(450f, 100f).color(Pal.gray).padTop(50f);
+        }).size(450f, 100f).color(Pal.gray).padTop(65f);
 
         dialog.cont.row();
 
-        dialog.cont.table(Tex.whitePane, t ->
-            t.button("@locales.showmissing", Icon.ok, Styles.nonet, () -> showMissing = !showMissing).update(b -> {
-                ((Image)b.getChildren().get(1)).setDrawable(showMissing ? Icon.ok : Icon.cancel);
-                b.setChecked(showMissing);
-        }).grow().pad(15f)).size(450f, 100f).color(Pal.accent).padTop(50f);
+        dialog.cont.button("@locales.showmissing", Icon.ok, filterStyle, () -> showMissing = !showMissing).update(b -> {
+            ((Image)b.getChildren().get(1)).setDrawable(showMissing ? Icon.ok : Icon.cancel);
+            b.setChecked(showMissing);
+        }).size(450f, 100f).color(Pal.accent).padTop(65f);
 
         dialog.cont.row();
-        dialog.cont.table(Tex.whitePane, t ->
-            t.button("@locales.showsame", Icon.ok, Styles.nonet, () -> showSame = !showSame).update(b -> {
-                ((Image)b.getChildren().get(1)).setDrawable(showSame ? Icon.ok : Icon.cancel);
-                b.setChecked(showSame);
-        }).grow().pad(15f)).size(450f, 100f).color(Pal.techBlue).padTop(50f);
+
+        dialog.cont.button("@locales.showsame", Icon.ok, filterStyle, () -> showSame = !showSame).update(b -> {
+            ((Image)b.getChildren().get(1)).setDrawable(showSame ? Icon.ok : Icon.cancel);
+            b.setChecked(showSame);
+        }).size(450f, 100f).color(Pal.techBlue).padTop(65f);
 
         dialog.buttons.button("@back", Icon.left, () -> {
             hidden.run();
@@ -711,7 +721,9 @@ public class MapLocalesDialog extends BaseDialog{
         if(!locales.containsKey(key)) return "";
 
         for(var prop : locales.get(key).entries()){
-            data.append(prop.key).append(" = ").append(prop.value).append("\n");
+            // Convert \n in plain text to \\n, then convert newlines to \n
+            data.append(prop.key).append(" = ").append(prop.value
+            .replace("\\n", "\\\\n").replace("\n", "\\n")).append("\n");
         }
 
         return data.toString();
@@ -729,7 +741,9 @@ public class MapLocalesDialog extends BaseDialog{
             }else{
                 int sepIndex = line.indexOf(" = ");
                 if(sepIndex != -1 && !currentLocale.isEmpty()){
-                    bundles.get(currentLocale).put(line.substring(0, sepIndex), line.substring(sepIndex + 3));
+                    // Convert \n in file to newlines in text, then revert newlines with escape characters
+                    bundles.get(currentLocale).put(line.substring(0, sepIndex), line.substring(sepIndex + 3)
+                    .replace("\\n", "\n").replace("\\\n", "\\n"));
                 }
             }
         }
@@ -743,7 +757,9 @@ public class MapLocalesDialog extends BaseDialog{
         for(var line : data.split("\\r?\\n|\\r")){
             int sepIndex = line.indexOf(" = ");
             if(sepIndex != -1){
-                map.put(line.substring(0, sepIndex), line.substring(sepIndex + 3));
+                // Convert \n in file to newlines in text, then revert newlines with escape characters
+                map.put(line.substring(0, sepIndex), line.substring(sepIndex + 3)
+                .replace("\\n", "\n").replace("\\\n", "\\n"));
             }
         }
 

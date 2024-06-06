@@ -62,12 +62,18 @@ public class Mods implements Loadable{
         return mainLoader;
     }
 
-    /** Returns a file named 'config.json' in a special folder for the specified plugin.
+    /** @return the folder where configuration files for this mod should go. The folder may not exist yet; call mkdirs() before writing to it.
      * Call this in init(). */
-    public Fi getConfig(Mod mod){
+    public Fi getConfigFolder(Mod mod){
         ModMeta load = metas.get(mod.getClass());
         if(load == null) throw new IllegalArgumentException("Mod is not loaded yet (or missing)!");
-        return modDirectory.child(load.name).child("config.json");
+        return modDirectory.child(load.name);
+    }
+
+    /** @return a file named 'config.json' in the config folder for the specified mod.
+     * Call this in init(). */
+    public Fi getConfig(Mod mod){
+        return getConfigFolder(mod).child("config.json");
     }
 
     /** Returns a list of files per mod subdirectory. */
@@ -218,7 +224,10 @@ public class Mods implements Loadable{
                     }
                     //this returns a *runnable* which actually packs the resulting pixmap; this has to be done synchronously outside the method
                     return () -> {
-                        String fullName = (prefix ? mod.name + "-" : "") + baseName;
+                        //don't prefix with mod name if it's already prefixed by a category, e.g. `block-modname-content-full`.
+                        int hyphen = baseName.indexOf('-');
+                        String fullName = ((prefix && !(hyphen != -1 && baseName.substring(hyphen + 1).startsWith(mod.name + "-"))) ? mod.name + "-" : "") + baseName;
+
                         packer.add(getPage(file), fullName, new PixmapRegion(pix));
                         if(textureScale != 1.0f){
                             textureResize.put(fullName, textureScale);
@@ -358,7 +367,24 @@ public class Mods implements Loadable{
             Log.debug("Time to generate icons: @", Time.elapsed());
 
             //dispose old atlas data
-            Core.atlas = packer.flush(filter, new TextureAtlas());
+            Core.atlas = packer.flush(filter, new TextureAtlas(){
+                PixmapRegion fake = new PixmapRegion(new Pixmap(1, 1));
+                boolean didWarn = false;
+
+                @Override
+                public PixmapRegion getPixmap(AtlasRegion region){
+                    var other = super.getPixmap(region);
+                    if(other.pixmap.isDisposed()){
+                        if(!didWarn){
+                            Log.err(new RuntimeException("Calling getPixmap outside of createIcons is not supported! This will be a crash in the future."));
+                            didWarn = true;
+                        }
+                        return fake;
+                    }
+
+                    return other;
+                }
+            });
 
             textureResize.each(e -> Core.atlas.find(e.key).scale = e.value);
 
@@ -702,6 +728,11 @@ public class Mods implements Loadable{
         Seq<LoadRun> runs = new Seq<>();
 
         for(LoadedMod mod : orderedMods()){
+            Seq<LoadRun> unorderedContent = new Seq<>();
+            ObjectMap<String, LoadRun> orderedContent = new ObjectMap<>();
+            String[] contentOrder = mod.meta.contentOrder;
+            ObjectSet<String> orderSet = contentOrder == null ? null : ObjectSet.with(contentOrder);
+
             if(mod.root.child("content").exists()){
                 Fi contentRoot = mod.root.child("content");
                 for(ContentType type : ContentType.all){
@@ -709,15 +740,34 @@ public class Mods implements Loadable{
                     Fi folder = contentRoot.child(lower + (lower.endsWith("s") ? "" : "s"));
                     if(folder.exists()){
                         for(Fi file : folder.findAll(f -> f.extension().equals("json") || f.extension().equals("hjson"))){
-                            runs.add(new LoadRun(type, file, mod));
+
+                            //if this is part of the ordered content, put it aside to be dealt with later
+                            if(orderSet != null && orderSet.contains(file.nameWithoutExtension())){
+                                orderedContent.put(file.nameWithoutExtension(), new LoadRun(type, file, mod));
+                            }else{
+                                unorderedContent.add(new LoadRun(type, file, mod));
+                            }
                         }
                     }
                 }
             }
+
+            //ordered content will be loaded first, if it exists
+            if(contentOrder != null){
+                for(String contentName : contentOrder){
+                    LoadRun run = orderedContent.get(contentName);
+                    if(run != null){
+                        runs.add(run);
+                    }else{
+                        Log.warn("Cannot find content defined in contentOrder: @", contentName);
+                    }
+                }
+            }
+
+            //unordered content is sorted alphabetically per mod
+            runs.addAll(unorderedContent.sort());
         }
 
-        //make sure mod content is in proper order
-        runs.sort();
         for(LoadRun l : runs){
             Content current = content.getLastAdded();
             try{
@@ -856,7 +906,7 @@ public class Mods implements Loadable{
                 return false;
                 // If dependency present, resolve it, or if it's not required, ignore it
             }else if(context.dependencies.containsKey(dependency.name)){
-                if(!context.ordered.contains(dependency.name) && !resolve(dependency.name, context) && dependency.required){
+                if(((!context.ordered.contains(dependency.name) && !resolve(dependency.name, context)) || !Core.settings.getBool("mod-" + dependency.name + "-enabled", true)) && dependency.required){
                     context.invalid.put(element, ModState.incompleteDependencies);
                     return false;
                 }
@@ -1184,6 +1234,8 @@ public class Mods implements Loadable{
         public float texturescale = 1.0f;
         /** If true, bleeding is skipped and no content icons are generated. */
         public boolean pregenerated;
+        /** If set, load the mod content in this order by content names */
+        public String[] contentOrder;
 
         public String displayName(){
             //useless, kept for legacy reasons

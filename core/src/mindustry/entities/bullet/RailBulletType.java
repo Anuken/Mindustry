@@ -43,8 +43,6 @@ public class RailBulletType extends BulletType{
 
         if(b.damage > 0){
             pierceEffect.at(x, y, b.rotation());
-
-            hitEffect.at(x, y);
         }
 
         //subtract health from each consecutive pierce

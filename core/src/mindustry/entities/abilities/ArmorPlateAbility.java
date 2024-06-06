@@ -4,18 +4,27 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.scene.ui.layout.Table;
+import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.world.meta.*;
 
 public class ArmorPlateAbility extends Ability{
     public TextureRegion plateRegion;
-    public Color color = Color.valueOf("d1efff");
+    public TextureRegion shineRegion;
+    public String plateSuffix = "-armor";
+    public String shineSuffix = "-shine";
+    /** Color of the shine. If null, uses team color. */
+    public @Nullable Color color = null;
+    public float shineSpeed = 1f;
+    public float z = -1;
+
+    /** Whether to draw the plate region. */
+    public boolean drawPlate = true;
+    /** Whether to draw the shine over the plate region. */
+    public boolean drawShine = true;
 
     public float healthMultiplier = 0.2f;
-    public float z = Layer.effect;
 
     protected float warmup;
 
@@ -29,29 +38,45 @@ public class ArmorPlateAbility extends Ability{
 
     @Override
     public void addStats(Table t){
-        t.add("[lightgray]" + Stat.healthMultiplier.localized() + ": [white]" + Math.round(healthMultiplier * 100f) + 100 + "%");
+        super.addStats(t);
+        t.add(abilityStat("damagereduction", Strings.autoFixed(-healthMultiplier * 100f, 1)));
     }
 
     @Override
     public void draw(Unit unit){
+        if(!drawPlate && !drawShine) return;
+
         if(warmup > 0.001f){
             if(plateRegion == null){
-                plateRegion = Core.atlas.find(unit.type.name + "-armor", unit.type.region);
+                plateRegion = Core.atlas.find(unit.type.name + plateSuffix, unit.type.region);
+                shineRegion = Core.atlas.find(unit.type.name + shineSuffix, plateRegion);
             }
 
-            Draw.draw(z <= 0 ? Draw.z() : z, () -> {
-                Shaders.armor.region = plateRegion;
-                Shaders.armor.progress = warmup;
-                Shaders.armor.time = -Time.time / 20f;
+            float pz = Draw.z();
+            if(z > 0) Draw.z(z);
 
-                Draw.rect(Shaders.armor.region, unit.x, unit.y, unit.rotation - 90f);
-                Draw.color(color);
-                Draw.shader(Shaders.armor);
-                Draw.rect(Shaders.armor.region, unit.x, unit.y, unit.rotation - 90f);
-                Draw.shader();
+            if(drawPlate){
+                Draw.alpha(warmup);
+                Draw.rect(plateRegion, unit.x, unit.y, unit.rotation - 90f);
+                Draw.alpha(1f);
+            }
 
-                Draw.reset();
-            });
+            if(drawShine){
+                Draw.draw(Draw.z(), () -> {
+                    Shaders.armor.region = shineRegion;
+                    Shaders.armor.progress = warmup;
+                    Shaders.armor.time = -Time.time / 20f * shineSpeed;
+
+                    Draw.color(color == null ? unit.team.color : color);
+                    Draw.shader(Shaders.armor);
+                    Draw.rect(shineRegion, unit.x, unit.y, unit.rotation - 90f);
+                    Draw.shader();
+
+                    Draw.reset();
+                });
+            }
+
+            Draw.z(pz);
         }
     }
 }

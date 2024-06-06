@@ -32,7 +32,7 @@ public class Tiles implements Iterable<Tile>{
         puddles[pos] = p;
     }
 
-    public Fire getFire(int pos){
+    public @Nullable Fire getFire(int pos){
         return fires[pos];
     }
 
