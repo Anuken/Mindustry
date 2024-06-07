@@ -79,7 +79,7 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
         }
 
         @Override
-        public Object senseObject(LAccess sensor) {
+        public Object senseObject(LAccess sensor){
             return switch(sensor){
                 case currentAmmoType -> liquids.current();
                 default -> super.senseObject(sensor);

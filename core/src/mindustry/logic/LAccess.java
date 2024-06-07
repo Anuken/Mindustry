@@ -17,7 +17,7 @@ public enum LAccess{
     powerNetOut,
     ammo,
     ammoCapacity,
-    currentAmmoType(true),
+    currentAmmoType,
     health,
     maxHealth,
     heat,
@@ -29,8 +29,8 @@ public enum LAccess{
     rotation,
     x,
     y,
-    velocityX(true),
-    velocityY(true),
+    velocityX,
+    velocityY,
     shootX,
     shootY,
     cameraX,
@@ -64,30 +64,21 @@ public enum LAccess{
     color("to");
 
     public final String[] params;
-    public final boolean isObj, privileged;
+    public final boolean isObj;
 
     public static final LAccess[]
         all = values(),
-        senseable = Seq.select(all, t -> t.params.length <= 1 && !t.privileged).toArray(LAccess.class),
-        privilegeSenseable = Seq.select(all, t -> t.params.length <= 1 && t.privileged).toArray(LAccess.class),
+        senseable = Seq.select(all, t -> t.params.length <= 1).toArray(LAccess.class),
         controls = Seq.select(all, t -> t.params.length > 0).toArray(LAccess.class),
-        settable = {x, y, rotation, speed, armor, health, shield, team, flag, totalPower, payloadType};
+        settable = {x, y, velocityX, velocityY, rotation, speed, armor, health, shield, team, flag, totalPower, payloadType};
 
     LAccess(String... params){
         this.params = params;
         isObj = false;
-        this.privileged = false;
     }
 
     LAccess(boolean obj, String... params){
         this.params = params;
         isObj = obj;
-        this.privileged = false;
-    }
-
-    LAccess(boolean privileged){
-        this.params = new String[0];
-        isObj = false;
-        this.privileged = privileged;
     }
 }

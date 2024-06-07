@@ -284,6 +284,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
                 y = World.unconv((float)value);
                 if(!isLocal()) snapInterpolation();
             }
+            case velocityX -> vel.x = (float)value;
+            case velocityY -> vel.y = (float)value;
             case rotation -> rotation = (float)value;
             case team -> {
                 if(!net.client()){
