@@ -294,7 +294,7 @@ public class Turret extends ReloadTurret{
 
         @Override
         public double sense(LAccess sensor) {
-            return switch (sensor) {
+            return switch(sensor){
                 case ammo -> totalAmmo;
                 case ammoCapacity -> maxAmmo;
                 case rotation -> rotation;
