@@ -214,6 +214,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case ammoCapacity -> type.ammoCapacity;
             case x -> World.conv(x);
             case y -> World.conv(y);
+            case velocityX -> vel.x;
+            case velocityY -> vel.y;
             case dead -> dead || !isAdded() ? 1 : 0;
             case team -> team.id;
             case shooting -> isShooting() ? 1 : 0;

@@ -11,6 +11,7 @@ import mindustry.entities.bullet.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.LAccess;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.consumers.*;
@@ -105,6 +106,14 @@ public class ItemTurret extends Turret{
             if(!hasAmmo() && cheating() && ammoTypes.size > 0){
                 handleItem(this, ammoTypes.keys().next());
             }
+        }
+
+        @Override
+        public Object senseObject(LAccess sensor) {
+            return switch(sensor){
+                case currentAmmoType -> ammo.size > 0 ? ((ItemEntry)ammo.peek()).item : null;
+                default -> super.senseObject(sensor);
+            };
         }
 
         @Override

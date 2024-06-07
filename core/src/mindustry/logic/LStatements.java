@@ -2243,4 +2243,76 @@ public class LStatements{
             return LCategory.world;
         }
     }
+
+    @RegisterStatement("worldsensor")
+    public static class WorldSensorStatement extends LStatement{
+        public String to = "result";
+        public String from = "block1", type = "@currentAmmoType";
+
+        private transient TextField tfield;
+
+        @Override
+        public void build(Table table){
+            field(table, to, str -> to = str);
+
+            table.add(" = ");
+
+            row(table);
+
+            tfield = field(table, type, str -> type = str).padRight(0f).get();
+
+            table.button(b -> {
+                b.image(Icon.pencilSmall);
+                //240
+                b.clicked(() -> showSelectTable(b, (t, hide) -> {
+                    Table tab = new Table(i -> {
+                        for(LAccess sensor : LAccess.privilegeSenseable){
+                            i.button(sensor.name(), Styles.flatt, () -> {
+                                stype("@" + sensor.name());
+                                hide.run();
+                            }).size(240f, 40f).self(c -> tooltip(c, sensor)).row();
+                        }
+                    }); //sensors section only
+
+                    Stack stack = new Stack(tab);
+                    ButtonGroup<Button> group = new ButtonGroup<>();
+
+                    t.button(Icon.tree, Styles.squareTogglei, () -> {
+                        stack.clearChildren();
+                        stack.addChild(tab);
+
+                        t.parent.parent.pack();
+                        t.parent.parent.invalidateHierarchy();
+                    }).height(50f).growX().group(group);
+
+                    t.row();
+                    t.add(stack).colspan(3).width(240f).left();
+                }));
+            }, Styles.logict, () -> {}).size(40f).padLeft(-1).color(table.color);
+
+            table.add(" in ").self(this::param);
+
+            field(table, from, str -> from = str);
+        }
+
+        private void stype(String text){
+            tfield.setText(text);
+            this.type = text;
+        }
+
+        @Override
+        public boolean privileged() {
+            return true;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder) {
+            return new SenseI(builder.var(from), builder.var(to), builder.var(type));
+        }
+
+        @Override
+        public LCategory category() {
+            return LCategory.world;
+        }
+    }
 }
