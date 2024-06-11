@@ -1911,6 +1911,40 @@ public class LStatements{
         }
     }
 
+    @RegisterStatement("data")
+    public static class DataStatement extends LStatement{
+        public String channel = "\"foo\"", value = "\"bar\"";
+
+        @Override
+        public void build(Table table){
+            table.add("send ");
+            fields(table, value, str -> value = str);
+            table.add(" on ");
+            fields(table, channel, str -> channel = str);
+        }
+
+        @Override
+        public boolean hidden(){
+            return true;
+        }
+
+        @Override
+        public boolean privileged(){
+            return true;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            if(!state.rules.allowLogicData) return null;
+            return new DataI(builder.var(channel), builder.var(value));
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.world;
+        }
+    }
+
     @RegisterStatement("getflag")
     public static class GetFlagStatement extends LStatement{
         public String result = "result", flag = "\"flag\"";

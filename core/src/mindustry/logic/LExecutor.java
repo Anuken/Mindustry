@@ -1,6 +1,7 @@
 package mindustry.logic;
 
 import arc.*;
+import arc.func.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -46,6 +47,8 @@ public class LExecutor{
     maxGraphicsBuffer = 256,
     maxDisplayBuffer = 1024,
     maxTextBuffer = 400;
+
+    private static final ObjectMap<String, Seq<Cons2<Player, Object>>> customDataHandlers = new ObjectMap<>();
 
     public LInstruction[] instructions = {};
     public Var[] vars = {};
@@ -1893,6 +1896,40 @@ public class LExecutor{
                     v.syncTime = Time.millis();
                     Call.syncVariable(exec.build, variable, v.isobj ? v.objval : v.numval);
                 }
+            }
+        }
+    }
+
+    public static void addDataHandler(String type, Cons2<Player, Object> handler){
+        customDataHandlers.get(type, Seq::new).add(handler);
+    }
+
+    @Remote(targets = Loc.client, unreliable = true)
+    public static void sendData(Player player, String channel, Object value){
+        Seq<Cons2<Player, Object>> handlers = customDataHandlers.get(channel);
+        if(handlers != null){
+            for(Cons2<Player, Object> handler : handlers){
+                handler.get(player, value);
+            }
+        }
+    }
+
+    public static class DataI implements LInstruction{
+        public int channel, value;
+
+        public DataI(int channel, int value){
+            this.channel = channel;
+            this.value = value;
+        }
+
+        public DataI() {
+        }
+
+        @Override
+        public void run(LExecutor exec) {
+            if (exec.obj(channel) instanceof String c) {
+                Var v = exec.var(value);
+                Call.sendData(c, v.isobj ? v.objval : v.numval);
             }
         }
     }
