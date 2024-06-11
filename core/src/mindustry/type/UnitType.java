@@ -141,7 +141,7 @@ public class UnitType extends UnlockableContent implements Senseable{
 
     /** if true, this unit counts as an enemy in the wave counter (usually false for support-only units) */
     public boolean isEnemy = true,
-    /** if true, the unit is always at elevation 1. */
+    /** if true, the unit is always at elevation 1 */
     flying = false,
     /** whether this flying unit should wobble around */
     wobble = true,
