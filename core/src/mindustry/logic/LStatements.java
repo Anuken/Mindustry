@@ -281,8 +281,8 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new DrawI((byte)type.ordinal(), 0, builder.var(x), builder.var(y),
-                type == GraphicsType.print ? nameToAlign.get(p1, Align.bottomLeft) : builder.var(p1), builder.var(p2), builder.var(p3), builder.var(p4));
+            return new DrawI((byte)type.ordinal(), builder.var(x), builder.var(y),
+                type == GraphicsType.print ? new LVar(p1, nameToAlign.get(p1, Align.bottomLeft)) : builder.var(p1), builder.var(p2), builder.var(p3), builder.var(p4));
         }
 
         @Override
@@ -1045,7 +1045,7 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new RadarI(target1, target2, target3, sort, LExecutor.varUnit, builder.var(sortOrder), builder.var(output));
+            return new RadarI(target1, target2, target3, sort, builder.var("@unit"), builder.var(sortOrder), builder.var(output));
         }
 
         @Override

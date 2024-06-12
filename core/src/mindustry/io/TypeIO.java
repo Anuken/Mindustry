@@ -1038,14 +1038,19 @@ public class TypeIO{
         }
     }
 
+    public interface Boxed<T> {
+        T unbox();
+    }
+
     /** Represents a building that has not been resolved yet. */
-    public static class BuildingBox{
+    public static class BuildingBox implements Boxed<Building>{
         public int pos;
 
         public BuildingBox(int pos){
             this.pos = pos;
         }
 
+        @Override
         public Building unbox(){
             return world.build(pos);
         }
@@ -1059,13 +1064,14 @@ public class TypeIO{
     }
 
     /** Represents a unit that has not been resolved yet. TODO unimplemented / unused*/
-    public static class UnitBox{
+    public static class UnitBox implements Boxed<Unit>{
         public int id;
 
         public UnitBox(int id){
             this.id = id;
         }
 
+        @Override
         public Unit unbox(){
             return Groups.unit.getByID(id);
         }
