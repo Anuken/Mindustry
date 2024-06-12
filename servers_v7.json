@@ -80,6 +80,10 @@
     "address": ["1.baseduser.eu.org:6966", "1.baseduser.eu.org:6666", "1.baseduser.eu.org:6000"]
   },
   {
+    "name": "Tendhost",
+    "address": ["tendhost.ddns.net:7576", "smokeofanarchy.ru:7580"]
+  },
+  {
     "name": "SynapseOS",
     "address": ["0nera.ru:7777"]
   },
