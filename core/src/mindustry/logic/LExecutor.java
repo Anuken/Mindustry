@@ -42,6 +42,7 @@ public class LExecutor{
     maxTextBuffer = 400;
 
     public LInstruction[] instructions = {};
+    /** Non-constant variables used for network sync */
     public LVar[] vars = {};
     
     public LVar counter;

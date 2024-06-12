@@ -21,8 +21,13 @@ public class LVar{
     }
 
     public LVar(String name, int id){
+        this(name, id, false);
+    }
+
+    public LVar(String name, int id, boolean constant){
         this.name = name;
         this.id = id;
+        this.constant = constant;
     }
 
     public @Nullable Building building(){

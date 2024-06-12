@@ -216,15 +216,15 @@ public class GlobalVars{
 
     /**
      * @return a constant variable if there is a constant with this name, otherwise null.
-     * Attempt to get privileged variable id from non-privileged logic executor returns null constant id.
+     * Attempt to get privileged variable from non-privileged logic executor returns null constant.
      */
     public LVar get(String name){
         return vars.get(name);
     }
 
     /**
-     * @return a constant variable by ID. ID is not bound checked and must be positive.
-     * Attempt to get privileged variable from non-privileged logic executor returns null constant
+     * @return a constant variable by name
+     * Attempt to get privileged variable from non-privileged logic executor returns null constant.
      */
     public LVar get(String name, boolean privileged){
         if(!privileged && privilegedNames.contains(name)) return vars.get("null");
@@ -252,6 +252,7 @@ public class GlobalVars{
         LVar var = new LVar(name);
         var.constant = true;
         if(value instanceof Number num){
+            var.isobj = false;
             var.numval = num.doubleValue();
         }else{
             var.isobj = true;

@@ -282,7 +282,7 @@ public class LStatements{
         @Override
         public LInstruction build(LAssembler builder){
             return new DrawI((byte)type.ordinal(), builder.var(x), builder.var(y),
-                type == GraphicsType.print ? new LVar(p1, nameToAlign.get(p1, Align.bottomLeft)) : builder.var(p1), builder.var(p2), builder.var(p3), builder.var(p4));
+                type == GraphicsType.print ? new LVar(p1, nameToAlign.get(p1, Align.bottomLeft), true) : builder.var(p1), builder.var(p2), builder.var(p3), builder.var(p4));
         }
 
         @Override

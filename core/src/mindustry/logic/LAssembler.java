@@ -15,7 +15,7 @@ public class LAssembler{
     private static final int invalidNum = Integer.MIN_VALUE;
 
     private boolean privileged;
-    /** Maps names to variable IDs. */
+    /** Maps names to variable. */
     public OrderedMap<String, LVar> vars = new OrderedMap<>();
     /** All instructions to be executed. */
     public LInstruction[] instructions;
@@ -56,7 +56,7 @@ public class LAssembler{
         return new LParser(text, privileged).parse();
     }
 
-    /** @return a variable ID by name.
+    /** @return a variable by name.
      * This may be a constant variable referring to a number or object. */
     public LVar var(String symbol){
         LVar constVar = Vars.logicVars.get(symbol);
