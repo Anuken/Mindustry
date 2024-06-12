@@ -146,6 +146,11 @@ public class ContentParser{
             readFields(result, data);
             return result;
         });
+        put(MassDriverBolt.class, (type, data) -> {
+            MassDriverBolt result = (MassDriverBolt)make(MassDriverBolt.class);
+            readFields(result, data);
+            return result;
+        });
         put(AmmoType.class, (type, data) -> {
             //string -> item
             //if liquid ammo support is added, this should scan for liquids as well
@@ -949,6 +954,8 @@ public class ContentParser{
             case "min" -> base.min(parser.readValue(PartProgress.class, data.get("other")));
             case "sin" -> base.sin(data.has("offset") ? data.getFloat("offset") : 0f, data.getFloat("scl"), data.getFloat("mag"));
             case "absin" -> base.absin(data.getFloat("scl"), data.getFloat("mag"));
+            case "mod" -> base.mod(data.getFloat("amount"));
+            case "loop" -> base.loop(data.getFloat("time"));
             case "curve" -> data.has("interp") ? base.curve(parser.readValue(Interp.class, data.get("interp"))) : base.curve(data.getFloat("offset"), data.getFloat("duration"));
             default -> throw new RuntimeException("Unknown operation '" + op + "', check PartProgress class for a list of methods.");
         };
