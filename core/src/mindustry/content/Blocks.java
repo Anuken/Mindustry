@@ -5786,6 +5786,7 @@ public class Blocks{
             itemCapacity = 0;
             alwaysUnlocked = true;
             ambientSound = Sounds.none;
+            allDatabaseTabs = true;
         }};
 
         //TODO move
