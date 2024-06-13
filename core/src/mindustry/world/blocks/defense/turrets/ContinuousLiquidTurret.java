@@ -4,7 +4,7 @@ import arc.struct.*;
 import mindustry.content.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
-import mindustry.logic.LAccess;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
