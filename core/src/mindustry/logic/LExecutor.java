@@ -45,7 +45,7 @@ public class LExecutor{
     /** Non-constant variables used for network sync */
     public LVar[] vars = {};
     
-    public LVar counter;
+    public LVar counter, unit, thisv, ipt;
     public LVar unit;
     public LVar thisv;
     public LVar ipt;
