@@ -467,6 +467,7 @@ public class ContentParser{
                             case "itemFlammable" -> block.consume((Consume)parser.readValue(ConsumeItemFlammable.class, child));
                             case "itemRadioactive" -> block.consume((Consume)parser.readValue(ConsumeItemRadioactive.class, child));
                             case "itemExplosive" -> block.consume((Consume)parser.readValue(ConsumeItemExplosive.class, child));
+                            case "itemList" -> block.consume((Consume)parser.readValue(ConsumeItemList.class, child));
                             case "itemExplode" -> block.consume((Consume)parser.readValue(ConsumeItemExplode.class, child));
                             case "items" -> block.consume(child.isArray() ?
                                     new ConsumeItems(parser.readValue(ItemStack[].class, child)) :
