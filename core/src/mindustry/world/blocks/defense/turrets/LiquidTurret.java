@@ -6,7 +6,7 @@ import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
-import mindustry.logic.LAccess;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
