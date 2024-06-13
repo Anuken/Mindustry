@@ -99,7 +99,7 @@ public class StatusEffect extends UnlockableContent{
         boolean reacts = false;
 
         for(var e : opposites.toSeq().sort()){
-            stats.add(Stat.opposites, e.emoji() + "" + e);
+            stats.add(Stat.opposites, e.emoji() + e);
         }
 
         if(reactive){
