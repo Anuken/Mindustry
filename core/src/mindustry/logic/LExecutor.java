@@ -46,9 +46,6 @@ public class LExecutor{
     public LVar[] vars = {};
     
     public LVar counter, unit, thisv, ipt;
-    public LVar unit;
-    public LVar thisv;
-    public LVar ipt;
     
     public int[] binds;
     public boolean yield;
