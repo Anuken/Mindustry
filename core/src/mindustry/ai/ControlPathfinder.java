@@ -1099,6 +1099,7 @@ public class ControlPathfinder implements Runnable{
         destY = World.toTile(mainDestination.y),
         actualDestX = World.toTile(destination.x),
         actualDestY = World.toTile(destination.y),
+        actualDestPos = actualDestX + actualDestY * wwidth,
         destPos = destX + destY * wwidth;
 
         PathRequest request = unitRequests.get(unit);
@@ -1156,8 +1157,10 @@ public class ControlPathfinder implements Runnable{
                 int i = 0;
                 boolean recalc = false;
 
+                if(packedPos == actualDestPos){
+                    request.lastTargetTile = tileOn;
                 //TODO last pos can change if the flowfield changes.
-                if(initialTileOn.pos() != request.lastTile || request.lastTargetTile == null){
+                }else if(initialTileOn.pos() != request.lastTile || request.lastTargetTile == null){
                     boolean anyNearSolid = false;
 
                     //find the next tile until one near a solid block is discovered
@@ -1181,9 +1184,13 @@ public class ControlPathfinder implements Runnable{
                                 anyNearSolid = true;
                             }
 
-                            if((value == 0 || otherCost < value) && otherCost != impassable && (otherCost != 0 || packed == destPos) && (current == null || otherCost < minCost) && passable(unit.team.id, cost, packed)){
+                            if((value == 0 || otherCost < value) && otherCost != impassable && ((otherCost != 0 && (current == null || otherCost < minCost)) || packed == actualDestPos || packed == destPos) && passable(unit.team.id, cost, packed)){
                                 current = other;
                                 minCost = otherCost;
+                                //no need to keep searching.
+                                if(packed == destPos || packed == actualDestPos){
+                                    break;
+                                }
                             }
                         }
 
@@ -1205,7 +1212,9 @@ public class ControlPathfinder implements Runnable{
                                 tileOn = current;
                                 any = true;
 
-                                if(current.array() == destPos){
+                                int a = current.array();
+
+                                if(a == destPos || a == actualDestPos){
                                     break;
                                 }
                             }
@@ -1216,13 +1225,13 @@ public class ControlPathfinder implements Runnable{
                     }
 
                     request.lastTargetTile = any ? tileOn : null;
-                    if(showDebug && tileOn != null){
+                    if(showDebug && tileOn != null && Core.graphics.getFrameId() % 30 == 0){
                         Fx.placeBlock.at(tileOn.worldx(), tileOn.worldy(), 1);
                     }
                 }
 
                 if(request.lastTargetTile != null){
-                    if(showDebug){
+                    if(showDebug && Core.graphics.getFrameId() % 30 == 0){
                         Fx.breakBlock.at(request.lastTargetTile.worldx(), request.lastTargetTile.worldy(), 1);
                     }
                     out.set(request.lastTargetTile);
@@ -1310,6 +1319,30 @@ public class ControlPathfinder implements Runnable{
 
         while(x >= 0 && y >= 0 && x < ww && y < wh){
             if(solid(team, type, x + y * wwidth, true)) return Point2.pack(x, y);
+            if(x == x2 && y == y2) return 0;
+
+            //no diagonals
+            if(2 * err + dy > dx - 2 * err){
+                err -= dy;
+                x += sx;
+            }else{
+                err += dx;
+                y += sy;
+            }
+        }
+
+        return 0;
+    }
+
+    /** @return 0 if nothing was hit, otherwise the packed coordinates. This is an internal function and will likely be moved - do not use!*/
+    public static int raycastFastAvoid(int team, PathCost type, int x1, int y1, int x2, int y2){
+        int ww = world.width(), wh = world.height();
+        int x = x1, dx = Math.abs(x2 - x), sx = x < x2 ? 1 : -1;
+        int y = y1, dy = Math.abs(y2 - y), sy = y < y2 ? 1 : -1;
+        int err = dx - dy;
+
+        while(x >= 0 && y >= 0 && x < ww && y < wh){
+            if(avoid(team, type, x + y * wwidth)) return Point2.pack(x, y);
             if(x == x2 && y == y2) return 0;
 
             //no diagonals
