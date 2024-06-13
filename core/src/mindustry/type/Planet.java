@@ -338,6 +338,10 @@ public class Planet extends UnlockableContent{
             techTree = TechTree.roots.find(n -> n.planet == this);
         }
 
+        if(techTree != null){
+            techTree.addDatabaseTab(this);
+        }
+
         for(Sector sector : sectors){
             sector.loadInfo();
         }

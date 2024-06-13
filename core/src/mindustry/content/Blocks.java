@@ -5755,43 +5755,51 @@ public class Blocks{
             requirements(Category.power, BuildVisibility.sandboxOnly, with());
             powerProduction = 1000000f / 60f;
             alwaysUnlocked = true;
+            allDatabaseTabs = true;
         }};
 
         powerVoid = new PowerVoid("power-void"){{
             requirements(Category.power, BuildVisibility.sandboxOnly, with());
             alwaysUnlocked = true;
+            allDatabaseTabs = true;
         }};
 
         itemSource = new ItemSource("item-source"){{
             requirements(Category.distribution, BuildVisibility.sandboxOnly, with());
             alwaysUnlocked = true;
+            allDatabaseTabs = true;
         }};
 
         itemVoid = new ItemVoid("item-void"){{
             requirements(Category.distribution, BuildVisibility.sandboxOnly, with());
             alwaysUnlocked = true;
+            allDatabaseTabs = true;
         }};
 
         liquidSource = new LiquidSource("liquid-source"){{
             requirements(Category.liquid, BuildVisibility.sandboxOnly, with());
             alwaysUnlocked = true;
+            allDatabaseTabs = true;
         }};
 
         liquidVoid = new LiquidVoid("liquid-void"){{
             requirements(Category.liquid, BuildVisibility.sandboxOnly, with());
             alwaysUnlocked = true;
+            allDatabaseTabs = true;
         }};
 
         payloadSource = new PayloadSource("payload-source"){{
             requirements(Category.units, BuildVisibility.sandboxOnly, with());
             size = 5;
             alwaysUnlocked = true;
+            allDatabaseTabs = true;
         }};
 
         payloadVoid = new PayloadVoid("payload-void"){{
             requirements(Category.units, BuildVisibility.sandboxOnly, with());
             size = 5;
             alwaysUnlocked = true;
+            allDatabaseTabs = true;
         }};
 
         heatSource = new HeatProducer("heat-source"){{
@@ -5945,6 +5953,7 @@ public class Blocks{
             size = 1;
             maxInstructionsPerTick = 1000;
             range = Float.MAX_VALUE;
+            allDatabaseTabs = true;
         }};
 
         worldCell = new MemoryBlock("world-cell"){{
@@ -5954,6 +5963,7 @@ public class Blocks{
             privileged = true;
             memoryCapacity = 128;
             forceDark = true;
+            allDatabaseTabs = true;
         }};
 
         worldMessage = new MessageBlock("world-message"){{
@@ -5961,6 +5971,7 @@ public class Blocks{
             
             targetable = false;
             privileged = true;
+            allDatabaseTabs = true;
         }};
 
         worldSwitch = new SwitchBlock("world-switch"){{
@@ -5968,6 +5979,7 @@ public class Blocks{
 
             targetable = false;
             privileged = true;
+            allDatabaseTabs = true;
         }};
 
         //endregion

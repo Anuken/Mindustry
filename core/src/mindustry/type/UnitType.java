@@ -675,6 +675,8 @@ public class UnitType extends UnlockableContent implements Senseable{
     @CallSuper
     @Override
     public void init(){
+        super.init();
+
         if(constructor == null) throw new IllegalArgumentException("no constructor set up for unit '" + name + "'");
 
         Unit example = constructor.get();

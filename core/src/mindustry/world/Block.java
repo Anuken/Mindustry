@@ -1168,6 +1168,8 @@ public class Block extends UnlockableContent implements Senseable{
     @Override
     @CallSuper
     public void init(){
+        super.init();
+
         //disable standard shadow
         if(customShadow){
             hasShadow = false;

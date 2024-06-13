@@ -35,8 +35,6 @@ public abstract class UnlockableContent extends MappableContent{
     public boolean hideDetails = true;
     /** If false, all icon generation is disabled for this content; createIcons is not called. */
     public boolean generateIcons = true;
-    /** Special logic icon ID. */
-    public int iconId = 0;
     /** How big the content appears in certain selection menus */
     public float selectionSize = 24f;
     /** Icon of the content to use in UI. */
@@ -45,6 +43,10 @@ public abstract class UnlockableContent extends MappableContent{
     public TextureRegion fullIcon;
     /** Override for the full icon. Useful for mod content with duplicate icons. Overrides any other full icon.*/
     public String fullOverride = "";
+    /** If true, this content will appear in all database tabs. */
+    public boolean allDatabaseTabs = false;
+    /** Content - usually a planet - that dictates which database tab(s) this content will appear in. If nothing is defined, Serpulo is considered to be the "default" tab. */
+    public ObjectSet<UnlockableContent> databaseTabs = new ObjectSet<>();
     /** The tech tree node for this content, if applicable. Null if not part of a tech tree. */
     public @Nullable TechNode techNode;
     /** Tech nodes for all trees that this content is part of. */

@@ -139,6 +139,11 @@ public class TechTree{
             }
         }
 
+        /** Adds the specified tab to all the content in this tree. */
+        public void addDatabaseTab(UnlockableContent tab){
+            each(node -> node.content.databaseTabs.add(tab));
+        }
+
         public Drawable icon(){
             return icon == null ? new TextureRegionDrawable(content.uiIcon) : icon;
         }
