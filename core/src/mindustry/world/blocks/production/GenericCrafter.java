@@ -96,10 +96,8 @@ public class GenericCrafter extends Block{
         if(!(destination.build instanceof ConduitBuild)) return false;
 
         Building crafter = world.build(fromX, fromY);
-        Log.info(crafter);
         if(crafter == null) return false;
         int relative = Mathf.mod(crafter.relativeTo(destination) - crafter.rotation, 4);
-        Log.info(relative);
         for(int dir : liquidOutputDirections){
             if(dir == -1 || dir == relative) return false;
         }
