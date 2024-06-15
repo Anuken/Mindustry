@@ -2,6 +2,7 @@ package mindustry.entities;
 
 import arc.*;
 import arc.func.*;
+import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
@@ -24,7 +25,6 @@ public class Damage{
     private static final Rect rect = new Rect();
     private static final Rect hitrect = new Rect();
     private static final Vec2 vec = new Vec2(), seg1 = new Vec2(), seg2 = new Vec2();
-    private static final Seq<Unit> units = new Seq<>();
     private static final IntSet collidedBlocks = new IntSet();
     private static final IntFloatMap damages = new IntFloatMap();
     private static final Seq<Collided> collided = new Seq<>();
@@ -38,10 +38,14 @@ public class Damage{
     private static Unit tmpUnit;
 
     public static void applySuppression(Team team, float x, float y, float range, float reload, float maxDelay, float applyParticleChance, @Nullable Position source){
+        applySuppression(team, x, y, range, reload, maxDelay, applyParticleChance, source, Pal.sapBullet);
+    }
+
+    public static void applySuppression(Team team, float x, float y, float range, float reload, float maxDelay, float applyParticleChance, @Nullable Position source, Color effectColor){
         builds.clear();
         indexer.eachBlock(null, x, y, range, build -> build.team != team, build -> {
             float prev = build.healSuppressionTime;
-            build.applyHealSuppression(reload + 1f);
+            build.applyHealSuppression(reload + 1f, effectColor);
 
             //TODO maybe should be block field instead of instanceof check
             if(build.wasRecentlyHealed(60f * 12f) || build.block.suppressable){
@@ -58,7 +62,7 @@ public class Damage{
         for(var build : builds){
             if(Mathf.chance(scaledChance)){
                 Time.run(Mathf.random(maxDelay), () -> {
-                    Fx.regenSuppressSeek.at(build.x + Mathf.range(build.block.size * tilesize / 2f), build.y + Mathf.range(build.block.size * tilesize / 2f), 0f, source);
+                    Fx.regenSuppressSeek.at(build.x + Mathf.range(build.block.size * tilesize / 2f), build.y + Mathf.range(build.block.size * tilesize / 2f), 0f, effectColor, source);
                 });
             }
         }
@@ -171,21 +175,23 @@ public class Damage{
 
         distances.clear();
 
-        World.raycast(b.tileX(), b.tileY(), World.toTile(b.x + vec.x), World.toTile(b.y + vec.y), (x, y) -> {
-            //add distance to list so it can be processed
-            var build = world.build(x, y);
+        if(b.type.collidesGround && b.type.collidesTiles){
+            World.raycast(b.tileX(), b.tileY(), World.toTile(b.x + vec.x), World.toTile(b.y + vec.y), (x, y) -> {
+                //add distance to list so it can be processed
+                var build = world.build(x, y);
 
-            if(build != null && build.team != b.team && build.collide(b) && b.checkUnderBuild(build, x * tilesize, y * tilesize)){
-                distances.add(b.dst(build));
+                if(build != null && build.team != b.team && build.collide(b) && b.checkUnderBuild(build, x * tilesize, y * tilesize)){
+                    distances.add(b.dst(build));
 
-                if(laser && build.absorbLasers()){
-                    maxDst = Math.min(maxDst, b.dst(build));
-                    return true;
+                    if(laser && build.absorbLasers()){
+                        maxDst = Math.min(maxDst, b.dst(build));
+                        return true;
+                    }
                 }
-            }
 
-            return false;
-        });
+                return false;
+            });
+        }
 
         Units.nearbyEnemies(b.team, rect, u -> {
             u.hitbox(hitrect);
@@ -243,7 +249,7 @@ public class Damage{
         collidedBlocks.clear();
         vec.trnsExact(angle, length);
 
-        if(hitter.type.collidesGround){
+        if(hitter.type.collidesGround && hitter.type.collidesTiles){
             seg1.set(x, y);
             seg2.set(seg1).add(vec);
             World.raycastEachWorld(x, y, seg2.x, seg2.y, (cx, cy) -> {
@@ -289,7 +295,6 @@ public class Damage{
         collided.each(c -> {
             if(hitter.damage > 0 && (pierceCap <= 0 || collideCount[0] < pierceCap)){
                 if(c.target instanceof Unit u){
-                    effect.at(c.x, c.y);
                     u.collision(hitter, c.x, c.y);
                     hitter.collision(u, c.x, c.y);
                     collideCount[0]++;
@@ -340,7 +345,6 @@ public class Damage{
 
         Units.nearbyEnemies(team, rect.setCentered(x, y, 1f), u -> {
             if(u.checkTarget(hitter.type.collidesAir, hitter.type.collidesGround) && u.hittable()){
-                effect.at(x, y);
                 u.collision(hitter, x, y);
                 hitter.collision(u, x, y);
             }

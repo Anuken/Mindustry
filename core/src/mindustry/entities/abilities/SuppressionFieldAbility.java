@@ -1,12 +1,17 @@
 package mindustry.entities.abilities;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.type.*;
+
+import static mindustry.Vars.*;
 
 public class SuppressionFieldAbility extends Ability{
     protected static Rand rand = new Rand();
@@ -27,10 +32,24 @@ public class SuppressionFieldAbility extends Ability{
     public boolean active = true;
     public Interp particleInterp = f -> Interp.circleOut.apply(Interp.slope.apply(f));
     public Color particleColor = Pal.sap.cpy();
+    public Color effectColor = Pal.sapBullet;
 
     public float applyParticleChance = 13f;
 
     protected float timer;
+
+    @Override
+    public void init(UnitType type){
+        if(!active) display = false;
+    }
+
+    @Override
+    public void addStats(Table t){
+        super.addStats(t);
+        t.add(Core.bundle.format("bullet.range", Strings.autoFixed(range / tilesize, 2)));
+        t.row();
+        t.add(abilityStat("duration", Strings.autoFixed(reload / 60f, 2)));
+    }
 
     @Override
     public void update(Unit unit){
@@ -38,7 +57,7 @@ public class SuppressionFieldAbility extends Ability{
 
         if((timer += Time.delta) >= reload){
             Tmp.v1.set(x, y).rotate(unit.rotation - 90f).add(unit);
-            Damage.applySuppression(unit.team, Tmp.v1.x, Tmp.v1.y, range, reload, reload, applyParticleChance, unit);
+            Damage.applySuppression(unit.team, Tmp.v1.x, Tmp.v1.y, range, reload, reload, applyParticleChance, unit, effectColor);
             timer = 0f;
         }
     }

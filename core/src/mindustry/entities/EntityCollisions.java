@@ -81,8 +81,8 @@ public class EntityCollisions{
 
                     if(tmp.overlaps(r1)){
                         Vec2 v = Geometry.overlap(r1, tmp, x);
-                        if(x) r1.x += v.x;
-                        if(!x) r1.y += v.y;
+                        r1.x += v.x;
+                        r1.y += v.y;
                     }
                 }
             }

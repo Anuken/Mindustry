@@ -72,7 +72,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
     public TextureRegion icon(){
         //display default icon for dead players
-        if(dead()) return core() == null ? UnitTypes.alpha.fullIcon : ((CoreBlock)bestCore().block).unitType.fullIcon;
+        if(dead()) return core() == null ? UnitTypes.alpha.uiIcon : ((CoreBlock)bestCore().block).unitType.uiIcon;
 
         return unit.icon();
     }
@@ -183,6 +183,9 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         if(!unit.isNull()){
             clearUnit();
         }
+
+        lastReadUnit = Nulls.unit;
+        justSwitchTo = justSwitchFrom = null;
     }
 
     public void team(Team team){

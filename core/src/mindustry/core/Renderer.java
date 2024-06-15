@@ -2,6 +2,7 @@ package mindustry.core;
 
 import arc.*;
 import arc.assets.loaders.TextureLoader.*;
+import arc.audio.*;
 import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.Texture.*;
@@ -13,7 +14,6 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
-import mindustry.content.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -30,11 +30,6 @@ public class Renderer implements ApplicationListener{
     /** These are global variables, for headless access. Cached. */
     public static float laserOpacity = 0.5f, bridgeOpacity = 0.75f;
 
-    private static final float cloudScaling = 1700f, cfinScl = -2f, cfinOffset = 0.3f, calphaFinOffset = 0.25f;
-    private static final float[] cloudAlphas = {0, 0.5f, 1f, 0.1f, 0, 0f};
-    private static final float cloudAlpha = 0.81f;
-    private static final Interp landInterp = Interp.pow3;
-
     public final BlockRenderer blocks = new BlockRenderer();
     public final FogRenderer fog = new FogRenderer();
     public final MinimapRenderer minimap = new MinimapRenderer();
@@ -46,7 +41,7 @@ public class Renderer implements ApplicationListener{
     public @Nullable Bloom bloom;
     public @Nullable FrameBuffer backgroundBuffer;
     public FrameBuffer effectBuffer = new FrameBuffer();
-    public boolean animateShields, drawWeather = true, drawStatus, enableEffects, drawDisplays = true;
+    public boolean animateShields, drawWeather = true, drawStatus, enableEffects, drawDisplays = true, drawLight = true, pixelate = false;
     public float weatherAlpha;
     /** minZoom = zooming out, maxZoom = zooming in */
     public float minZoom = 1.5f, maxZoom = 6f;
@@ -55,18 +50,15 @@ public class Renderer implements ApplicationListener{
     public TextureRegion[] bubbles = new TextureRegion[16], splashes = new TextureRegion[12];
     public TextureRegion[][] fluidFrames;
 
+    //currently landing core, null if there are no cores or it has finished landing.
     private @Nullable CoreBuild landCore;
     private @Nullable CoreBlock launchCoreType;
     private Color clearColor = new Color(0f, 0f, 0f, 1f);
     private float
-    //seed for cloud visuals, 0-1
-    cloudSeed = 0f,
     //target camera scale that is lerp-ed to
     targetscale = Scl.scl(4),
     //current actual camera scale
     camerascale = targetscale,
-    //minimum camera zoom value for landing/launching; constant TODO make larger?
-    minZoomScl = Scl.scl(0.02f),
     //starts at coreLandDuration, ends at 0. if positive, core is landing.
     landTime,
     //timer for core landing particles
@@ -112,10 +104,6 @@ public class Renderer implements ApplicationListener{
         if(settings.getBool("bloom", !ios)){
             setupBloom();
         }
-
-        Events.run(Trigger.newGame, () -> {
-            landCore = player.bestCore();
-        });
 
         EnvRenderers.init();
         for(int i = 0; i < bubbles.length; i++) bubbles[i] = atlas.find("bubble-" + i);
@@ -180,27 +168,25 @@ public class Renderer implements ApplicationListener{
         drawStatus = settings.getBool("blockstatus");
         enableEffects = settings.getBool("effects");
         drawDisplays = !settings.getBool("hidedisplays");
+        drawLight = settings.getBool("drawlight", true);
+        pixelate = settings.getBool("pixelate");
 
+        //don't bother drawing landing animation if core is null
+        if(landCore == null) landTime = 0f;
         if(landTime > 0){
-            if(!state.isPaused()){
-                CoreBuild build = landCore == null ? player.bestCore() : landCore;
-                build.updateLandParticles();
-            }
+            if(!state.isPaused()) landCore.updateLaunching();
 
-            if(!state.isPaused()){
-                landTime -= Time.delta;
-            }
-            float fin = landTime / coreLandDuration;
-            if(!launching) fin = 1f - fin;
-            camerascale = landInterp.apply(minZoomScl, Scl.scl(4f), fin);
             weatherAlpha = 0f;
+            camerascale = landCore.zoomLaunching();
 
-            //snap camera to cutscene core regardless of player input
-            if(landCore != null){
-                camera.position.set(landCore);
-            }
+            if(!state.isPaused()) landTime -= Time.delta;
         }else{
             weatherAlpha = Mathf.lerpDelta(weatherAlpha, 1f, 0.08f);
+        }
+
+        if(landCore != null && landTime <= 0f){
+            landCore.endLaunch();
+            landCore = null;
         }
 
         camera.width = graphics.getWidth() / camerascale;
@@ -224,7 +210,7 @@ public class Renderer implements ApplicationListener{
                 shakeIntensity = 0f;
             }
 
-            if(pixelator.enabled()){
+            if(renderer.pixelate){
                 pixelator.drawPixelate();
             }else{
                 draw();
@@ -300,7 +286,7 @@ public class Renderer implements ApplicationListener{
         graphics.clear(clearColor);
         Draw.reset();
 
-        if(Core.settings.getBool("animatedwater") || animateShields){
+        if(settings.getBool("animatedwater") || animateShields){
             effectBuffer.resize(graphics.getWidth(), graphics.getHeight());
         }
 
@@ -315,7 +301,7 @@ public class Renderer implements ApplicationListener{
         Events.fire(Trigger.draw);
         MapPreviewLoader.checkPreviews();
 
-        if(pixelator.enabled()){
+        if(renderer.pixelate){
             pixelator.register();
         }
 
@@ -337,7 +323,7 @@ public class Renderer implements ApplicationListener{
             }
         }
 
-        if(state.rules.lighting){
+        if(state.rules.lighting && drawLight){
             Draw.draw(Layer.light, lights::draw);
         }
 
@@ -368,9 +354,31 @@ public class Renderer implements ApplicationListener{
             });
         }
 
+        float scaleFactor = 4f / renderer.getDisplayScale();
+
+        //draw objective markers
+        state.rules.objectives.eachRunning(obj -> {
+            for(var marker : obj.markers){
+                if(marker.world){
+                    marker.draw(marker.autoscale ? scaleFactor : 1);
+                }
+            }
+        });
+
+        for(var marker : state.markers){
+            if(marker.world){
+                marker.draw(marker.autoscale ? scaleFactor : 1);
+            }
+        }
+
+        Draw.reset();
+
         Draw.draw(Layer.overlayUI, overlays::drawTop);
         if(state.rules.fog) Draw.draw(Layer.fogOfWar, fog::drawFog);
-        Draw.draw(Layer.space, this::drawLanding);
+        Draw.draw(Layer.space, () -> {
+            if(landCore == null || landTime <= 0f) return;
+            landCore.drawLanding(launching && launchCoreType != null ? launchCoreType : (CoreBlock)landCore.block);
+        });
 
         Events.fire(Trigger.drawOver);
         blocks.drawBlocks();
@@ -458,61 +466,6 @@ public class Renderer implements ApplicationListener{
         if(state.rules.customBackgroundCallback != null && customBackgrounds.containsKey(state.rules.customBackgroundCallback)){
             customBackgrounds.get(state.rules.customBackgroundCallback).run();
         }
-
-    }
-
-    void drawLanding(){
-        CoreBuild build = landCore == null ? player.bestCore() : landCore;
-        var clouds = assets.get("sprites/clouds.png", Texture.class);
-        if(landTime > 0 && build != null){
-            float fout = landTime / coreLandDuration;
-            if(launching) fout = 1f - fout;
-            float fin = 1f - fout;
-            float scl = Scl.scl(4f) / camerascale;
-            float pfin = Interp.pow3Out.apply(fin), pf = Interp.pow2In.apply(fout);
-
-            //draw particles
-            Draw.color(Pal.lightTrail);
-            Angles.randLenVectors(1, pfin, 100, 800f * scl * pfin, (ax, ay, ffin, ffout) -> {
-                Lines.stroke(scl * ffin * pf * 3f);
-                Lines.lineAngle(build.x + ax, build.y + ay, Mathf.angle(ax, ay), (ffin * 20 + 1f) * scl);
-            });
-            Draw.color();
-
-            CoreBlock block = launching && launchCoreType != null ? launchCoreType : (CoreBlock)build.block;
-            block.drawLanding(build, build.x, build.y);
-
-            Draw.color();
-            Draw.mixcol(Color.white, Interp.pow5In.apply(fout));
-
-            //accent tint indicating that the core was just constructed
-            if(launching){
-                float f = Mathf.clamp(1f - fout * 12f);
-                if(f > 0.001f){
-                    Draw.mixcol(Pal.accent, f);
-                }
-            }
-
-            //draw clouds
-            if(state.rules.cloudColor.a > 0.0001f){
-                float scaling = cloudScaling;
-                float sscl = Math.max(1f + Mathf.clamp(fin + cfinOffset)* cfinScl, 0f) * camerascale;
-
-                Tmp.tr1.set(clouds);
-                Tmp.tr1.set(
-                (camera.position.x - camera.width/2f * sscl) / scaling,
-                (camera.position.y - camera.height/2f * sscl) / scaling,
-                (camera.position.x + camera.width/2f * sscl) / scaling,
-                (camera.position.y + camera.height/2f * sscl) / scaling);
-
-                Tmp.tr1.scroll(10f * cloudSeed, 10f * cloudSeed);
-
-                Draw.alpha(Mathf.sample(cloudAlphas, fin + calphaFinOffset) * cloudAlpha);
-                Draw.mixcol(state.rules.cloudColor, state.rules.cloudColor.a);
-                Draw.rect(Tmp.tr1, camera.position.x, camera.position.y, camera.width, camera.height);
-                Draw.reset();
-            }
-        }
     }
 
     public void scaleCamera(float amount){
@@ -557,6 +510,13 @@ public class Renderer implements ApplicationListener{
         return landTime;
     }
 
+    public float getLandTimeIn(){
+        if(landCore == null) return 0f;
+        float fin = landTime / landCore.landDuration();
+        if(!launching) fin = 1f - fin;
+        return fin;
+    }
+
     public float getLandPTimer(){
         return landPTimer;
     }
@@ -565,25 +525,42 @@ public class Renderer implements ApplicationListener{
         this.landPTimer = landPTimer;
     }
 
+    @Deprecated
     public void showLanding(){
-        launching = false;
-        camerascale = minZoomScl;
-        landTime = coreLandDuration;
-        cloudSeed = Mathf.random(1f);
+        var core = player.bestCore();
+        if(core != null) showLanding(core);
     }
 
+    public void showLanding(CoreBuild landCore){
+        this.landCore = landCore;
+        launching = false;
+        landTime = landCore.landDuration();
+
+        landCore.beginLaunch(null);
+        camerascale = landCore.zoomLaunching();
+    }
+
+    @Deprecated
     public void showLaunch(CoreBlock coreType){
-        Vars.ui.hudfrag.showLaunch();
-        Vars.control.input.config.hideConfig();
-        Vars.control.input.inv.hide();
-        launchCoreType = coreType;
+        var core = player.team().core();
+        if(core != null) showLaunch(core, coreType);
+    }
+
+    public void showLaunch(CoreBuild landCore, CoreBlock coreType){
+        control.input.config.hideConfig();
+        control.input.inv.hide();
+
+        this.landCore = landCore;
         launching = true;
-        landCore = player.team().core();
-        cloudSeed = Mathf.random(1f);
-        landTime = coreLandDuration;
-        if(landCore != null){
-            Fx.coreLaunchConstruct.at(landCore.x, landCore.y, coreType.size);
-        }
+        landTime = landCore.landDuration();
+        launchCoreType = coreType;
+
+        Music music = landCore.launchMusic();
+        music.stop();
+        music.play();
+        music.setVolume(settings.getInt("musicvol") / 100f);
+
+        landCore.beginLaunch(coreType);
     }
 
     public void takeMapScreenshot(){
@@ -625,7 +602,7 @@ public class Renderer implements ApplicationListener{
             Fi file = screenshotDirectory.child("screenshot-" + Time.millis() + ".png");
             PixmapIO.writePng(file, fullPixmap);
             fullPixmap.dispose();
-            app.post(() -> ui.showInfoFade(Core.bundle.format("screenshot", file.toString())));
+            app.post(() -> ui.showInfoFade(bundle.format("screenshot", file.toString())));
         });
     }
 

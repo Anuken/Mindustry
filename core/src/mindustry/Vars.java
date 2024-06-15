@@ -28,6 +28,7 @@ import mindustry.net.*;
 import mindustry.service.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
+import mindustry.world.blocks.storage.*;
 import mindustry.world.meta.*;
 
 import java.io.*;
@@ -105,8 +106,8 @@ public class Vars implements Loadable{
     public static final float invasionGracePeriod = 20;
     /** min armor fraction damage; e.g. 0.05 = at least 5% damage */
     public static final float minArmorDamage = 0.1f;
-    /** land/launch animation duration */
-    public static final float coreLandDuration = 160f;
+    /** @deprecated see {@link CoreBlock#landDuration} instead! */
+    public static final @Deprecated float coreLandDuration = 160f;
     /** size of tiles in units */
     public static final int tilesize = 8;
     /** size of one tile payload (^2) */
@@ -136,6 +137,13 @@ public class Vars implements Loadable{
         Color.valueOf("4b5ef1"),
         Color.valueOf("2cabfe"),
     };
+    /** Icons available to the user for customization in certain dialogs. */
+    public static final String[] accessibleIcons = {
+    "effect", "power", "logic", "units", "liquid", "production", "defense", "turret", "distribution", "crafting",
+    "settings", "cancel", "zoom", "ok", "star", "home", "pencil", "up", "down", "left", "right",
+    "hammer", "warning", "tree", "admin", "map", "modePvp", "terrain",
+    "modeSurvival", "commandRally", "commandAttack",
+    };
     /** maximum TCP packet size */
     public static final int maxTcpSize = 900;
     /** default server port */
@@ -146,6 +154,8 @@ public class Vars implements Loadable{
     public static final int maxModSubtitleLength = 40;
     /** multicast group for discovery.*/
     public static final String multicastGroup = "227.2.7.7";
+    /** Maximum delta time. If the actual delta time (*60) between frames is higher than this number, the game will start to slow down. */
+    public static float maxDeltaClient = 6f, maxDeltaServer = 10f;
     /** whether the graphical game client has loaded */
     public static boolean clientLoaded = false;
     /** max GL texture size */

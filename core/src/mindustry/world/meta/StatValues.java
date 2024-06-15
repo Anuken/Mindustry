@@ -12,6 +12,7 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
+import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.maps.*;
@@ -348,7 +349,7 @@ public class StatValues{
     public static StatValue weapons(UnitType unit, Seq<Weapon> weapons){
         return table -> {
             table.row();
-            for(int i = 0; i < weapons.size;i ++){
+            for(int i = 0; i < weapons.size; i++){
                 Weapon weapon = weapons.get(i);
 
                 if(weapon.flipSprite || !weapon.hasStats(unit)){
@@ -367,6 +368,29 @@ public class StatValues{
                 }).growX().pad(5).margin(10);
                 table.row();
             }
+        };
+    }
+
+    public static StatValue abilities(Seq<Ability> abilities){
+        return table -> {
+            table.row();
+            table.table(t -> {
+                int count = 0;
+                for(Ability ability : abilities){
+                    if(ability.display){
+                        t.table(Styles.grayPanel, a -> {
+                            a.add("[accent]" + ability.localized()).padBottom(4).center().top().expandX();
+                            a.row();
+                            a.left().top().defaults().left();
+                            ability.addStats(a);
+                        }).pad(5).margin(10).growX().top().uniformX();
+                        if((++count) == 2){
+                            count = 0;
+                            t.row();
+                        }
+                    }
+                };
+            });
         };
     }
 
@@ -469,12 +493,16 @@ public class StatValues{
                         sep(bt, "@bullet.armorpierce");
                     }
 
+                    if(type.maxDamageFraction > 0){
+                        sep(bt, Core.bundle.format("bullet.maxdamagefraction", (int)(type.maxDamageFraction * 100))); 
+                    }
+
                     if(type.suppressionRange > 0){
                         sep(bt, Core.bundle.format("bullet.suppression", Strings.autoFixed(type.suppressionDuration / 60f, 2), Strings.fixed(type.suppressionRange / tilesize, 1)));
                     }
 
                     if(type.status != StatusEffects.none){
-                        sep(bt, (type.status.minfo.mod == null ? type.status.emoji() : "") + "[stat]" + type.status.localizedName + (type.status.reactive ? "" : "[lightgray] ~ [stat]" + ((int)(type.statusDuration / 60f)) + "[lightgray] " + Core.bundle.get("unit.seconds")));
+                        sep(bt, (type.status.hasEmoji() ? type.status.emoji() : "") + "[stat]" + type.status.localizedName + (type.status.reactive ? "" : "[lightgray] ~ [stat]" + ((int)(type.statusDuration / 60f)) + "[lightgray] " + Core.bundle.get("unit.seconds")));
                     }
 
                     if(type.intervalBullet != null){

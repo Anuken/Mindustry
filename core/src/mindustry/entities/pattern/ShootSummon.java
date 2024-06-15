@@ -13,6 +13,9 @@ public class ShootSummon extends ShootPattern{
         this.spread = spread;
     }
 
+    public ShootSummon(){
+    }
+
     @Override
     public void shoot(int totalShots, BulletHandler handler, @Nullable Runnable barrelIncrementer){
         for(int i = 0; i < shots; i++){

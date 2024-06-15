@@ -23,6 +23,8 @@ import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
+import mindustry.world.blocks.ConstructBlock.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.units.UnitAssemblerModule.*;
 import mindustry.world.consumers.*;
@@ -85,7 +87,9 @@ public class UnitAssembler extends PayloadBlock{
     public boolean canPlaceOn(Tile tile, Team team, int rotation){
         //overlapping construction areas not allowed; grow by a tiny amount so edges can't overlap either.
         Rect rect = getRect(Tmp.r1, tile.worldx() + offset, tile.worldy() + offset, rotation).grow(0.1f);
-        return !indexer.getFlagged(team, BlockFlag.unitAssembler).contains(b -> getRect(Tmp.r2, b.x, b.y, b.rotation).overlaps(rect));
+        return
+            !indexer.getFlagged(team, BlockFlag.unitAssembler).contains(b -> getRect(Tmp.r2, b.x, b.y, b.rotation).overlaps(rect)) &&
+            !team.data().getBuildings(ConstructBlock.get(size)).contains(b -> ((ConstructBuild)b).current instanceof UnitAssembler && getRect(Tmp.r2, b.x, b.y, b.rotation).overlaps(rect));
     }
 
     @Override
@@ -99,10 +103,10 @@ public class UnitAssembler extends PayloadBlock{
             Core.bundle.format("bar.unitcap",
                 Fonts.getUnicodeStr(e.unit().name),
                 e.team.data().countType(e.unit()),
-                Units.getStringCap(e.team)
+                e.unit().useUnitCap ? Units.getStringCap(e.team) : "∞"
             ),
             () -> Pal.power,
-            () -> (float)e.team.data().countType(e.unit()) / Units.getCap(e.team)
+            () -> e.unit().useUnitCap ? ((float)e.team.data().countType(e.unit()) / Units.getCap(e.team)) : 1f
         ));
     }
 
@@ -369,12 +373,12 @@ public class UnitAssembler extends PayloadBlock{
                 units.clear();
             }
 
-            float powerStatus = power == null ? 1f : power.status;
+            float powerStatus = !enabled ? 0f : power == null ? 1f : power.status;
             powerWarmup = Mathf.lerpDelta(powerStatus, powerStatus > 0.0001f ? 1f : 0f, 0.1f);
             droneWarmup = Mathf.lerpDelta(droneWarmup, units.size < dronesCreated ? powerStatus : 0f, 0.1f);
             totalDroneProgress += droneWarmup * delta();
 
-            if(units.size < dronesCreated && (droneProgress += delta() * state.rules.unitBuildSpeed(team) * powerStatus / droneConstructTime) >= 1f){
+            if(units.size < dronesCreated && enabled && (droneProgress += delta() * state.rules.unitBuildSpeed(team) * powerStatus / droneConstructTime) >= 1f){
                 if(!net.client()){
                     var unit = droneType.create(team);
                     if(unit instanceof BuildingTetherc bt){
@@ -444,7 +448,7 @@ public class UnitAssembler extends PayloadBlock{
 
             if(!net.client()){
                 var unit = plan.unit.create(team);
-                if(unit != null && unit.isCommandable()){
+                if(unit != null && unit.isCommandable() && commandPos != null){
                     unit.command().commandPosition(commandPos);
                 }
                 unit.set(spawn.x + Mathf.range(0.001f), spawn.y + Mathf.range(0.001f));

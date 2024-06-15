@@ -30,6 +30,7 @@ public class PayloadConveyor extends Block{
         update = true;
         outputsPayload = true;
         noUpdateDisabled = true;
+        acceptsPayloads = true;
         priority = TargetPriority.transport;
         envEnabled |= Env.space | Env.underwater;
         sync = true;
@@ -187,6 +188,12 @@ public class PayloadConveyor extends Block{
 
         public void drawBottom(){
             super.draw();
+        }
+
+        @Override
+        public void onDestroyed(){
+            if(item != null) item.destroyed();
+            super.onDestroyed();
         }
 
         @Override

@@ -102,7 +102,7 @@ public class MapPlayDialog extends BaseDialog{
         ScrollPane pane = new ScrollPane(table);
         pane.setFadeScrollBars(false);
         table.row();
-        for(Gamemode mode : Gamemode.values()){
+        for(Gamemode mode : Gamemode.all){
             if(mode.hidden) continue;
             table.labelWrap("[accent]" + mode + ":[] [lightgray]" + mode.description()).width(400f);
             table.row();

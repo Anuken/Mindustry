@@ -42,7 +42,7 @@ public class LogicFx{
         "smokePuff", new EffectEntry(Fx.smokePuff).color(),
         "sparkExplosion", new EffectEntry(Fx.titanExplosion).color(),
         "crossExplosion", new EffectEntry(Fx.dynamicSpikes).size().color(),
-        "wave", new EffectEntry(Fx.dynamicWave).size(),
+        "wave", new EffectEntry(Fx.dynamicWave).size().color(),
         "bubble", new EffectEntry(Fx.airBubble)
         );
 
@@ -55,6 +55,12 @@ public class LogicFx{
 
     public static @Nullable EffectEntry get(String name){
         return map.get(name);
+    }
+
+    /** Adds an effect entry to the map. */
+    public static void add(String name, EffectEntry entry){
+        entry.name = name;
+        map.put(name, entry);
     }
 
     public static String[] all(){

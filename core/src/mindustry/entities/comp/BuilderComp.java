@@ -61,8 +61,12 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
             while(it.hasNext()){
                 BuildPlan plan = it.next();
                 Tile tile = world.tile(plan.x, plan.y);
-                if(tile == null || (plan.breaking && tile.block() == Blocks.air) || (!plan.breaking && ((tile.build != null && tile.build.rotation == plan.rotation) || !plan.block.rotate) &&
-                    (tile.block() == plan.block || (plan.block != null && (plan.block.isOverlay() && plan.block == tile.overlay() || (plan.block.isFloor() && plan.block == tile.floor())))))){
+                boolean isSameDerelict = (tile != null && tile.build != null && tile.block() == plan.block && tile.build.tileX() == plan.x && tile.build.tileY() == plan.y && tile.team() == Team.derelict);
+                if(tile == null || (plan.breaking && tile.block() == Blocks.air) || (!plan.breaking && ((tile.build != null && tile.build.rotation == plan.rotation && !isSameDerelict) || !plan.block.rotate) &&
+                    //th block must be the same, but not derelict and the same
+                    ((tile.block() == plan.block && !isSameDerelict) ||
+                        //same floor or overlay
+                        (plan.block != null && (plan.block.isOverlay() && plan.block == tile.overlay() || (plan.block.isFloor() && plan.block == tile.floor())))))){
 
                     it.remove();
                 }
@@ -82,9 +86,9 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
             buildAlpha = Mathf.lerpDelta(buildAlpha, activelyBuilding() ? 1f : 0f, 0.15f);
         }
 
-        //validate regardless of whether building is enabled.
+        validatePlans();
+
         if(!updateBuilding || !canBuild()){
-            validatePlans();
             return;
         }
 
@@ -95,18 +99,17 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
         if(Float.isNaN(buildCounter) || Float.isInfinite(buildCounter)) buildCounter = 0f;
         buildCounter = Math.min(buildCounter, 10f);
 
+        boolean instant = state.rules.instantBuild && state.rules.infiniteResources;
+
         //random attempt to fix a freeze that only occurs on Android
-        int maxPerFrame = 10, count = 0;
+        int maxPerFrame = instant ? plans.size : 10, count = 0;
 
-        while(buildCounter >= 1 && count++ < maxPerFrame){
+        var core = core();
+
+        if((core == null && !infinite)) return;
+
+        while((buildCounter >= 1 || instant) && count++ < maxPerFrame && plans.size > 0){
             buildCounter -= 1f;
-
-            validatePlans();
-
-            var core = core();
-
-            //nothing to build.
-            if(buildPlan() == null) return;
 
             //find the next build plan
             if(plans.size > 1){
@@ -135,7 +138,11 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
 
             if(!(tile.build instanceof ConstructBuild cb)){
                 if(!current.initialized && !current.breaking && Build.validPlace(current.block, team, current.x, current.y, current.rotation)){
-                    boolean hasAll = infinite || current.isRotation(team) || !Structs.contains(current.block.requirements, i -> core != null && !core.items.has(i.item, Math.min(Mathf.round(i.amount * state.rules.buildCostMultiplier), 1)));
+                    boolean hasAll = infinite || current.isRotation(team) ||
+                        //derelict repair
+                        (tile.team() == Team.derelict && tile.block() == current.block && tile.build != null && tile.block().allowDerelictRepair && state.rules.derelictRepair) ||
+                        //make sure there's at least 1 item of each type first
+                        !Structs.contains(current.block.requirements, i -> core != null && !core.items.has(i.item, Math.min(Mathf.round(i.amount * state.rules.buildCostMultiplier), 1)));
 
                     if(hasAll){
                         Call.beginPlace(self(), current.block, team, current.x, current.y, current.rotation);
@@ -159,7 +166,7 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
             }
 
             //if there is no core to build with or no build entity, stop building!
-            if((core == null && !infinite) || !(tile.build instanceof ConstructBuild entity)){
+            if(!(tile.build instanceof ConstructBuild entity)){
                 continue;
             }
 
@@ -285,10 +292,6 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
     /** @return  the build plan currently active, or the one at the top of the queue.*/
     @Nullable BuildPlan buildPlan(){
         return plans.size == 0 ? null : plans.first();
-    }
-
-    public void draw(){
-        drawBuilding();
     }
 
     public void drawBuilding(){

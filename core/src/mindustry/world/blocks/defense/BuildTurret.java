@@ -77,7 +77,7 @@ public class BuildTurret extends BaseTurret{
         return new TextureRegion[]{baseRegion, region};
     }
 
-    public class BuildTurretBuild extends BaseTurretBuild implements ControlBlock{
+    public class BuildTurretBuild extends BaseTurretBuild implements ControlBlock, RotBlock{
         public BlockUnitc unit = (BlockUnitc)unitType.create(team);
         public @Nullable Unit following;
         public @Nullable BlockPlan lastPlan;
@@ -90,6 +90,11 @@ public class BuildTurret extends BaseTurret{
         @Override
         public boolean canControl(){
             return true;
+        }
+
+        @Override
+        public float buildRotation(){
+            return unit.rotation();
         }
 
         @Override

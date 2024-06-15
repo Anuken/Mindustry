@@ -8,14 +8,12 @@ public class Annotations{
     /** Indicates that a method overrides other methods. */
     @Target({ElementType.METHOD})
     @Retention(RetentionPolicy.SOURCE)
-    public @interface Replace{
-    }
+    public @interface Replace{}
 
     /** Indicates that a method should be final in all implementing classes. */
     @Target({ElementType.METHOD})
     @Retention(RetentionPolicy.SOURCE)
-    public @interface Final{
-    }
+    public @interface Final{}
 
     /** Indicates that a field will be interpolated when synced. */
     @Target({ElementType.FIELD})
@@ -30,23 +28,18 @@ public class Annotations{
     /** Indicates that a field will not be read from the server when syncing the local player state. */
     @Target({ElementType.FIELD})
     @Retention(RetentionPolicy.SOURCE)
-    public @interface SyncLocal{
-
-    }
+    public @interface SyncLocal{}
 
     /** Indicates that a field should not be synced to clients (but may still be non-transient) */
     @Target({ElementType.FIELD})
     @Retention(RetentionPolicy.SOURCE)
-    public @interface NoSync{
-
-    }
+    public @interface NoSync{}
 
 
     /** Indicates that a component field is imported from other components. This means it doesn't actually exist. */
     @Target({ElementType.FIELD})
     @Retention(RetentionPolicy.SOURCE)
-    public @interface Import{
-    }
+    public @interface Import{}
 
     /** Indicates that a component field is read-only. */
     @Target({ElementType.FIELD, ElementType.METHOD})
@@ -113,8 +106,7 @@ public class Annotations{
     /** Indicates an internal interface for entity components. */
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.SOURCE)
-    public @interface EntityInterface{
-    }
+    public @interface EntityInterface{}
 
     //endregion
     //region misc. utility
@@ -153,15 +145,12 @@ public class Annotations{
     /** Indicates that a method should always call its super version. */
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.SOURCE)
-    public @interface CallSuper{
-
-    }
+    public @interface CallSuper{}
 
     /** Annotation that allows overriding CallSuper annotation. To be used on method that overrides method with CallSuper annotation from parent class. */
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.SOURCE)
-    public @interface OverrideCallSuper{
-    }
+    public @interface OverrideCallSuper{}
 
     //endregion
     //region struct
@@ -169,9 +158,7 @@ public class Annotations{
     /** Marks a class as a special value type struct. Class name must end in 'Struct'. */
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.SOURCE)
-    public @interface Struct{
-
-    }
+    public @interface Struct{}
 
     /** Marks a field of a struct. Optional. */
     @Target(ElementType.FIELD)
@@ -259,8 +246,7 @@ public class Annotations{
 
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.SOURCE)
-    public @interface TypeIOHandler{
-    }
+    public @interface TypeIOHandler{ }
 
     //endregion
 }

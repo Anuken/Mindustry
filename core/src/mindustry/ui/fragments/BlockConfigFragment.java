@@ -43,6 +43,7 @@ public class BlockConfigFragment{
 
             table.visible = true;
             table.clear();
+            table.background(null);
             tile.buildConfiguration(table);
             table.pack();
             table.setTransform(true);

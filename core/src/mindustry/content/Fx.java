@@ -1710,7 +1710,7 @@ public class Fx{
     }),
 
     regenSuppressParticle = new Effect(35f, e -> {
-        color(Pal.sapBullet, e.color, e.fin());
+        color(e.color, Color.white, e.fin());
         stroke(e.fout() * 1.4f + 0.5f);
 
         randLenVectors(e.id, 4, 17f * e.fin(), (x, y) -> {
@@ -1729,7 +1729,7 @@ public class Fx{
 
         Tmp.bz2.valueAt(Tmp.v4, e.fout());
 
-        color(Pal.sapBullet);
+        color(e.color);
         Fill.circle(Tmp.v4.x, Tmp.v4.y, e.fslope() * 2f + 0.1f);
     }).followParent(false).rotWithParent(false),
 
@@ -2434,15 +2434,32 @@ public class Fx{
     shieldBreak = new Effect(40, e -> {
         color(e.color);
         stroke(3f * e.fout());
-        if(e.data instanceof Unit u){
-            var ab = (ForceFieldAbility)Structs.find(u.abilities, a -> a instanceof ForceFieldAbility);
-            if(ab != null){
-                Lines.poly(e.x, e.y, ab.sides, e.rotation + e.fin(), ab.rotation);
-                return;
-            }
+        if(e.data instanceof ForceFieldAbility ab){
+            Lines.poly(e.x, e.y, ab.sides, e.rotation + e.fin(), ab.rotation);
+            return;
         }
 
         Lines.poly(e.x, e.y, 6, e.rotation + e.fin());
+    }).followParent(true),
+
+    arcShieldBreak = new Effect(40, e -> {
+        Lines.stroke(3 * e.fout(), e.color);
+        if(e.data instanceof Unit u){
+            ShieldArcAbility ab = (ShieldArcAbility) Structs.find(u.abilities, a -> a instanceof ShieldArcAbility);
+            if(ab != null){
+                Vec2 pos = Tmp.v1.set(ab.x, ab.y).rotate(u.rotation - 90f).add(u);
+                Lines.arc(pos.x, pos.y, ab.radius + ab.width/2, ab.angle / 360f, u.rotation + ab.angleOffset - ab.angle / 2f);
+                Lines.arc(pos.x, pos.y, ab.radius - ab.width/2, ab.angle / 360f, u.rotation + ab.angleOffset - ab.angle / 2f);
+                for(int i : Mathf.signs){
+                    float
+                            px = pos.x + Angles.trnsx(u.rotation + ab.angleOffset - ab.angle / 2f * i, ab.radius + ab.width / 2),
+                            py = pos.y + Angles.trnsy(u.rotation + ab.angleOffset - ab.angle / 2f * i, ab.radius + ab.width / 2),
+                            px1 = pos.x + Angles.trnsx(u.rotation + ab.angleOffset - ab.angle / 2f * i, ab.radius - ab.width / 2),
+                            py1 = pos.y + Angles.trnsy(u.rotation + ab.angleOffset - ab.angle / 2f * i, ab.radius - ab.width / 2);
+                    Lines.line(px, py, px1, py1);
+                }
+            }
+        }
     }).followParent(true),
 
     coreLandDust = new Effect(100f, e -> {
@@ -2558,5 +2575,33 @@ public class Fx{
 
         stroke(data.region.height * scl);
         line(data.region, data.a.x + ox, data.a.y + oy, data.b.x + ox, data.b.y + oy, false);
-    }).layer(Layer.groundUnit + 5f);
+    }).layer(Layer.groundUnit + 5f),
+
+    debugLine = new Effect(90f, 1000000000000f, e -> {
+       if(!(e.data instanceof Vec2[] vec)) return;
+
+       Draw.color(e.color);
+       Lines.stroke(2f);
+
+       if(vec.length == 2){
+           Lines.line(vec[0].x, vec[0].y, vec[1].x, vec[1].y);
+       }else{
+           Lines.beginLine();
+           for(Vec2 v : vec)
+               Lines.linePoint(v.x, v.y);
+           Lines.endLine();
+       }
+
+       Draw.reset();
+    }),
+    debugRect = new Effect(90f, 1000000000000f, e -> {
+        if(!(e.data instanceof Rect rect)) return;
+
+        Draw.color(e.color);
+        Lines.stroke(2f);
+
+        Lines.rect(rect);
+
+        Draw.reset();
+    });
 }

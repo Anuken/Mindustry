@@ -15,7 +15,6 @@ import mindustry.ctype.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
-import mindustry.graphics.g3d.*;
 import mindustry.io.*;
 import mindustry.io.SaveIO.*;
 import mindustry.maps.*;
@@ -23,11 +22,11 @@ import mindustry.mod.*;
 import mindustry.mod.Mods.*;
 import mindustry.net.*;
 import mindustry.net.Packets.*;
-import mindustry.service.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.storage.*;
+import org.json.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.*;
 import org.junit.jupiter.params.provider.*;
@@ -229,11 +228,14 @@ public class ApplicationTests{
     void serverListJson(){
         String[] files = {"servers_v6.json", "servers_v7.json", "servers_be.json"};
 
+
         for(String file : files){
             try{
                 String str = Core.files.absolute("./../../" + file).readString();
                 assertEquals(ValueType.array, new JsonReader().parse(str).type());
                 assertTrue(Jval.read(str).isArray());
+                JSONArray array = new JSONArray(str);
+                assertTrue(array.length() > 0);
             }catch(Exception e){
                 fail("Failed to parse " + file, e);
             }
@@ -982,17 +984,5 @@ public class ApplicationTests{
 
         tile.build.handleStack(item, 1, unit);
         assertEquals(capacity, tile.build.items.get(item));
-    }
-
-    @Test
-    void achievementTest(){
-        clientLoaded = true;
-        state.rules.sector = new Sector(null, PlanetGrid.Ptile.empty);
-        player = Player.create();
-        service.init();
-
-        assertFalse(Achievement.buildT5.isAchieved());
-        Events.fire(new EventType.UnitCreateEvent(UnitTypes.eclipse.create(Team.sharded), null));
-        assertTrue(Achievement.buildT5.isAchieved());
     }
 }

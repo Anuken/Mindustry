@@ -3,6 +3,8 @@ package mindustry.world.blocks.logic;
 import arc.Graphics.*;
 import arc.Graphics.Cursor.*;
 import arc.func.*;
+import arc.graphics.*;
+import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
@@ -10,6 +12,7 @@ import arc.struct.Bits;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
+import arc.util.pooling.*;
 import mindustry.ai.types.*;
 import mindustry.core.*;
 import mindustry.gen.*;
@@ -31,6 +34,7 @@ import static mindustry.Vars.*;
 
 public class LogicBlock extends Block{
     private static final int maxByteLen = 1024 * 100;
+    public static final int maxNameLength = 32;
 
     public int maxInstructionScale = 5;
     public int instructionsPerTick = 1;
@@ -45,6 +49,7 @@ public class LogicBlock extends Block{
         configurable = true;
         group = BlockGroup.logic;
         schematicPriority = 5;
+        ignoreResizeConfig = true;
 
         //universal, no real requirements
         envEnabled = Env.any;
@@ -53,6 +58,20 @@ public class LogicBlock extends Block{
             if(!accessible()) return;
 
             build.readCompressed(data, true);
+        });
+
+        config(String.class, (LogicBuild build, String data) -> {
+            if(!accessible() || !privileged) return;
+
+            if(data != null && data.length() < maxNameLength){
+                build.tag = data;
+            }
+        });
+
+        config(Character.class, (LogicBuild build, Character data) -> {
+            if(!accessible() || !privileged) return;
+
+            build.iconTag = data;
         });
 
         config(Integer.class, (LogicBuild entity, Integer pos) -> {
@@ -234,6 +253,9 @@ public class LogicBlock extends Block{
         public boolean checkedDuplicates = false;
         //dynamic only for privileged processors
         public int ipt = instructionsPerTick;
+        /** Display name, for convenience. This is currently only available for world processors. */
+        public @Nullable String tag;
+        public char iconTag;
 
         /** Block of code to run after load. */
         public @Nullable Runnable loadBlock;
@@ -354,8 +376,6 @@ public class LogicBlock extends Block{
                         }
                     }
 
-                    asm.putConst("@mapw", world.width());
-                    asm.putConst("@maph", world.height());
                     asm.putConst("@links", executor.links.length);
                     asm.putConst("@ipt", instructionsPerTick);
 
@@ -514,6 +534,10 @@ public class LogicBlock extends Block{
                 for(int i = 0; i < (int)accumulator; i++){
                     executor.runOnce();
                     accumulator --;
+                    if(executor.yield){
+                        executor.yield = false;
+                        break;
+                    }
                 }
             }
         }
@@ -560,9 +584,45 @@ public class LogicBlock extends Block{
 
         @Override
         public void drawSelect(){
+            if(!accessible()) return;
+
             Groups.unit.each(u -> u.controller() instanceof LogicAI ai && ai.controller == this, unit -> {
                 Drawf.square(unit.x, unit.y, unit.hitSize, unit.rotation + 45);
             });
+
+            //draw tag over processor (world processor only)
+            if(!(renderer.pixelate || !privileged || tag == null || tag.isEmpty())){
+                Font font = Fonts.outline;
+                GlyphLayout l = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
+                boolean ints = font.usesIntegerPositions();
+                font.getData().setScale(1 / 4f / Scl.scl(1f));
+                font.setUseIntegerPositions(false);
+
+                l.setText(font, tag, Color.white, 90f, Align.left, true);
+                float offset = 1f;
+
+                //Draw.color(0f, 0f, 0f, 0.1f);
+                //Fill.rect(x, y + tilesize/2f - l.height/2f - offset, l.width + offset*2f, l.height + offset*2f);
+                Draw.color();
+                font.setColor(1f, 1f, 1f, 0.5f);
+                font.draw(tag, x - l.width/2f, y + tilesize + 2f - offset, 90f, Align.left, true);
+                font.setUseIntegerPositions(ints);
+
+                font.getData().setScale(1f);
+
+                Pools.free(l);
+            }
+
+            if(iconTag != 0){
+                TextureRegion icon = Fonts.getLargeIcon(Fonts.unicodeToName(iconTag));
+                if(icon.found()){
+                    Draw.alpha(0.5f);
+
+                    Draw.rect(icon, x, y, tilesize, tilesize / icon.ratio());
+
+                    Draw.color();
+                }
+            }
         }
 
         public boolean validLink(Building other){
@@ -576,9 +636,21 @@ public class LogicBlock extends Block{
 
         @Override
         public void buildConfiguration(Table table){
-            table.button(Icon.pencil, Styles.cleari, () -> {
-                ui.logic.show(code, executor, privileged, code -> configure(compress(code, relativeConnections())));
-            }).size(40);
+            table.button(Icon.pencil, Styles.cleari, this::showEditDialog).size(40);
+        }
+
+        public void showEditDialog(){
+            showEditDialog(false);
+        }
+
+        public void showEditDialog(boolean forceEditor){
+            ui.logic.show(code, executor, privileged, code -> {
+                boolean prev = state.rules.editor;
+                //this is a hack to allow configuration to work correctly in the editor for privileged processors
+                if(forceEditor) state.rules.editor = true;
+                configure(compress(code, relativeConnections()));
+                state.rules.editor = prev;
+            });
         }
 
         @Override
@@ -598,7 +670,7 @@ public class LogicBlock extends Block{
 
         @Override
         public byte version(){
-            return 2;
+            return 3;
         }
 
         @Override
@@ -635,6 +707,9 @@ public class LogicBlock extends Block{
             if(privileged){
                 write.s(Mathf.clamp(ipt, 1, maxInstructionsPerTick));
             }
+
+            TypeIO.writeString(write, tag);
+            write.s(iconTag);
         }
 
         @Override
@@ -689,6 +764,11 @@ public class LogicBlock extends Block{
 
             if(privileged && revision >= 2){
                 ipt = Mathf.clamp(read.s(), 1, maxInstructionsPerTick);
+            }
+
+            if(revision >= 3){
+                tag = TypeIO.readString(read);
+                iconTag = (char)read.us();
             }
 
         }

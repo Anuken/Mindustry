@@ -41,6 +41,8 @@ public class StatusEffect extends UnlockableContent{
     public boolean permanent;
     /** If true, this effect will only react with other effects and cannot be applied. */
     public boolean reactive;
+    /** Special flag for the dynamic effect type with custom stats - do not use. */
+    public boolean dynamic = false;
     /** Whether to show this effect in the database. */
     public boolean show = true;
     /** Tint color of effect. */
@@ -138,6 +140,11 @@ public class StatusEffect extends UnlockableContent{
             Tmp.v1.rnd(Mathf.range(unit.type.hitSize/2f));
             effect.at(unit.x + Tmp.v1.x, unit.y + Tmp.v1.y, 0, color, parentizeEffect ? unit : null);
         }
+    }
+
+    /** Called when status effect is removed. */
+    public void onRemoved(Unit unit){
+
     }
 
     protected void trans(StatusEffect effect, TransitionHandler handler){
