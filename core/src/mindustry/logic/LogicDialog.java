@@ -53,7 +53,7 @@ public class LogicDialog extends BaseDialog{
         add(buttons).growX().name("canvas");
     }
 
-    public static Color typeColor(Var s, Color color){
+    public static Color typeColor(LVar s, Color color){
         return color.set(
             !s.isobj ? Pal.place :
             s.objval == null ? Color.darkGray :
@@ -67,7 +67,7 @@ public class LogicDialog extends BaseDialog{
         );
     }
 
-    public static String typeName(Var s){
+    public static String typeName(LVar s){
         return
             !s.isobj ? "number" :
             s.objval == null ? "null" :
