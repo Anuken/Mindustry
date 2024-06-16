@@ -7,10 +7,8 @@ import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
-import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
-import mindustry.logic.LExecutor.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.legacy.*;
@@ -27,12 +25,11 @@ public class GlobalVars{
     public static final Rand rand = new Rand();
 
     //non-constants that depend on state
-    private static int varTime, varTick, varSecond, varMinute, varWave, varWaveTime, varMapW, varMapH, varServer, varClient, varClientLocale, varClientUnit, varClientName, varClientTeam, varClientMobile;
+    private static LVar varTime, varTick, varSecond, varMinute, varWave, varWaveTime, varMapW, varMapH, varServer, varClient, varClientLocale, varClientUnit, varClientName, varClientTeam, varClientMobile;
 
-    private ObjectIntMap<String> namesToIds = new ObjectIntMap<>();
-    private Seq<Var> vars = new Seq<>(Var.class);
+    private ObjectMap<String, LVar> vars = new ObjectMap<>();
     private Seq<VarEntry> varEntries = new Seq<>();
-    private IntSet privilegedIds = new IntSet();
+    private ObjectSet<String> privilegedNames = new ObjectSet<>();
     private UnlockableContent[][] logicIdToContent;
     private int[][] contentIdToLogicId;
 
@@ -118,9 +115,6 @@ public class GlobalVars{
             put("@color" + Strings.capitalize(entry.key), entry.value.toDoubleBits());
         }
 
-        //used as a special value for any environmental solid block
-        put("@solid", Blocks.stoneWall);
-
         for(UnitType type : Vars.content.units()){
             put("@" + type.name, type);
         }
@@ -172,31 +166,31 @@ public class GlobalVars{
     public void update(){
         //set up time; note that @time is now only updated once every invocation and directly based off of @tick.
         //having time be based off of user system time was a very bad idea.
-        vars.items[varTime].numval = state.tick / 60.0 * 1000.0;
-        vars.items[varTick].numval = state.tick;
+        varTime.numval = state.tick / 60.0 * 1000.0;
+        varTick.numval = state.tick;
 
         //shorthands for seconds/minutes spent in save
-        vars.items[varSecond].numval = state.tick / 60f;
-        vars.items[varMinute].numval = state.tick / 60f / 60f;
+        varSecond.numval = state.tick / 60f;
+        varMinute.numval = state.tick / 60f / 60f;
 
         //wave state
-        vars.items[varWave].numval = state.wave;
-        vars.items[varWaveTime].numval = state.wavetime / 60f;
+        varWave.numval = state.wave;
+        varWaveTime.numval = state.wavetime / 60f;
 
-        vars.items[varMapW].numval = world.width();
-        vars.items[varMapH].numval = world.height();
+        varMapW.numval = world.width();
+        varMapH.numval = world.height();
 
         //network
-        vars.items[varServer].numval = (net.server() || !net.active()) ? 1 : 0;
-        vars.items[varClient].numval = net.client() ? 1 : 0;
+        varServer.numval = (net.server() || !net.active()) ? 1 : 0;
+        varClient.numval = net.client() ? 1 : 0;
 
         //client
         if(!net.server() && player != null){
-            vars.items[varClientLocale].objval = player.locale();
-            vars.items[varClientUnit].objval = player.unit();
-            vars.items[varClientName].objval = player.name();
-            vars.items[varClientTeam].numval = player.team().id;
-            vars.items[varClientMobile].numval = mobile ? 1 : 0;
+            varClientLocale.objval = player.locale();
+            varClientUnit.objval = player.unit();
+            varClientName.objval = player.name();
+            varClientTeam.numval = player.team().id;
+            varClientMobile.numval = mobile ? 1 : 0;
         }
     }
 
@@ -217,84 +211,81 @@ public class GlobalVars{
     }
 
     /**
-     * @return a constant ID > 0 if there is a constant with this name, otherwise -1.
-     * Attempt to get privileged variable id from non-privileged logic executor returns null constant id.
+     * @return a constant variable if there is a constant with this name, otherwise null.
+     * Attempt to get privileged variable from non-privileged logic executor returns null constant.
      */
-    public int get(String name){
-        return namesToIds.get(name, -1);
+    public LVar get(String name){
+        return vars.get(name);
     }
 
     /**
-     * @return a constant variable by ID. ID is not bound checked and must be positive.
-     * Attempt to get privileged variable from non-privileged logic executor returns null constant
+     * @return a constant variable by name
+     * Attempt to get privileged variable from non-privileged logic executor returns null constant.
      */
-    public Var get(int id, boolean privileged){
-        if(!privileged && privilegedIds.contains(id)) return vars.get(namesToIds.get("null"));
-        return vars.items[id];
+    public LVar get(String name, boolean privileged){
+        if(!privileged && privilegedNames.contains(name)) return vars.get("null");
+        return vars.get(name);
     }
 
-    /** Sets a global variable by an ID returned from put(). */
-    public void set(int id, double value){
-        get(id, true).numval = value;
+    /** Sets a global variable by name. */
+    public void set(String name, double value){
+        get(name, true).numval = value;
     }
 
     /** Adds a constant value by name. */
-    public int put(String name, Object value, boolean privileged){
+    public LVar put(String name, Object value, boolean privileged){
         return put(name, value, privileged, true);
     }
 
     /** Adds a constant value by name. */
-    public int put(String name, Object value, boolean privileged, boolean hidden){
-        int existingIdx = namesToIds.get(name, -1);
-        if(existingIdx != -1){ //don't overwrite existing vars (see #6910)
+    public LVar put(String name, Object value, boolean privileged, boolean hidden){
+        LVar existingVar = vars.get(name);
+        if(existingVar != null){ //don't overwrite existing vars (see #6910)
             Log.debug("Failed to add global logic variable '@', as it already exists.", name);
-            return existingIdx;
+            return existingVar;
         }
 
-        Var var = new Var(name);
+        LVar var = new LVar(name);
         var.constant = true;
         if(value instanceof Number num){
+            var.isobj = false;
             var.numval = num.doubleValue();
         }else{
             var.isobj = true;
             var.objval = value;
         }
 
-        int index = vars.size;
-        namesToIds.put(name, index);
-        if(privileged) privilegedIds.add(index);
-        vars.add(var);
+        vars.put(name, var);
+        if(privileged) privilegedNames.add(name);
 
         if(!hidden){
-            varEntries.add(new VarEntry(index, name, "", "", privileged));
+            varEntries.add(new VarEntry(name, "", "", privileged));
         }
-        return index;
+        return var;
     }
 
-    public int put(String name, Object value){
+    public LVar put(String name, Object value){
         return put(name, value, false);
     }
 
-    public int putEntry(String name, Object value){
+    public LVar putEntry(String name, Object value){
         return put(name, value, false, false);
     }
 
-    public int putEntry(String name, Object value, boolean privileged){
+    public LVar putEntry(String name, Object value, boolean privileged){
         return put(name, value, privileged, false);
     }
 
     public void putEntryOnly(String name){
-        varEntries.add(new VarEntry(0, name, "", "", false));
+        varEntries.add(new VarEntry(name, "", "", false));
     }
 
     /** An entry that describes a variable for documentation purposes. This is *only* used inside UI for global variables. */
     public static class VarEntry{
-        public int id;
         public String name, description, icon;
         public boolean privileged;
 
-        public VarEntry(int id, String name, String description, String icon, boolean privileged){
-            this.id = id;
+        public VarEntry(String name, String description, String icon, boolean privileged){
             this.name = name;
             this.description = description;
             this.icon = icon;

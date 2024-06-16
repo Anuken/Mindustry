@@ -20,8 +20,6 @@ import mindustry.graphics.*;
 import mindustry.io.*;
 import mindustry.io.TypeIO.*;
 import mindustry.logic.*;
-import mindustry.logic.LAssembler.*;
-import mindustry.logic.LExecutor.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.ConstructBlock.*;
@@ -381,12 +379,14 @@ public class LogicBlock extends Block{
 
                     if(keep){
                         //store any older variables
-                        for(Var var : executor.vars){
+                        for(LVar var : executor.vars){
                             boolean unit = var.name.equals("@unit");
                             if(!var.constant || unit){
-                                BVar dest = asm.getVar(var.name);
+                                LVar dest = asm.getVar(var.name);
                                 if(dest != null && (!dest.constant || unit)){
-                                    dest.value = var.isobj ? var.objval : var.numval;
+                                    dest.isobj = var.isobj;
+                                    dest.objval = var.objval;
+                                    dest.numval = var.numval;
                                 }
                             }
                         }
@@ -397,7 +397,7 @@ public class LogicBlock extends Block{
                         assemble.get(asm);
                     }
 
-                    asm.getVar("@this").value = this;
+                    asm.getVar("@this").setconst(this);
                     asm.putConst("@thisx", World.conv(x));
                     asm.putConst("@thisy", World.conv(y));
 
@@ -682,17 +682,17 @@ public class LogicBlock extends Block{
             write.b(compressed);
 
             //write only the non-constant variables
-            int count = Structs.count(executor.vars, v -> (!v.constant || v == executor.vars[LExecutor.varUnit]) && !(v.isobj && v.objval == null));
+            int count = Structs.count(executor.vars, v -> (!v.constant || v == executor.unit) && !(v.isobj && v.objval == null));
 
             write.i(count);
             for(int i = 0; i < executor.vars.length; i++){
-                Var v = executor.vars[i];
+                LVar v = executor.vars[i];
 
                 //null is the default variable value, so waste no time serializing that
                 if(v.isobj && v.objval == null) continue;
 
                 //skip constants
-                if(v.constant && i != LExecutor.varUnit) continue;
+                if(v.constant && v != executor.unit) continue;
 
                 //write the name and the object value
                 write.str(v.name);
@@ -751,13 +751,9 @@ public class LogicBlock extends Block{
             loadBlock = () -> updateCode(code, false, asm -> {
                 //load up the variables that were stored
                 for(int i = 0; i < varcount; i++){
-                    BVar dest = asm.getVar(names[i]);
-
-                    if(dest != null && (!dest.constant || dest.id == LExecutor.varUnit)){
-                        dest.value =
-                            values[i] instanceof BuildingBox box ? box.unbox() :
-                            values[i] instanceof UnitBox box ? box.unbox() :
-                            values[i];
+                    LVar var = asm.getVar(names[i]);
+                    if(var.objval instanceof Boxed<?> boxed){
+                        var.objval = boxed.unbox();
                     }
                 }
             });
