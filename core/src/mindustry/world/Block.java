@@ -519,6 +519,10 @@ public class Block extends UnlockableContent implements Senseable{
         return rotate;
     }
 
+    public boolean rotatedOutput(int fromX, int fromY, Tile destination){
+        return rotatedOutput(fromX, fromY);
+    }
+
     public boolean synthetic(){
         return update || destructible;
     }
