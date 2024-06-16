@@ -752,7 +752,7 @@ public class LogicBlock extends Block{
                 //load up the variables that were stored
                 for(int i = 0; i < varcount; i++){
                     LVar var = asm.getVar(names[i]);
-                    if (var.objval instanceof Boxed<?> boxed) {
+                    if(var.objval instanceof Boxed<?> boxed){
                         var.objval = boxed.unbox();
                     }
                 }
