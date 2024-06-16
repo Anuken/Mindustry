@@ -1911,15 +1911,17 @@ public class LStatements{
         }
     }
 
-    @RegisterStatement("data")
-    public static class DataStatement extends LStatement{
-        public String channel = "\"foo\"", value = "\"bar\"";
+    @RegisterStatement("clientdata")
+    public static class ClientDataStatement extends LStatement{
+        public String channel = "\"foo\"", value = "\"bar\"", reliable = "0";
 
         @Override
         public void build(Table table){
             table.add("send ");
             fields(table, value, str -> value = str);
             table.add(" on ");
+            fields(table, channel, str -> channel = str);
+            table.add(", reliable ");
             fields(table, channel, str -> channel = str);
         }
 
@@ -1936,7 +1938,7 @@ public class LStatements{
         @Override
         public LInstruction build(LAssembler builder){
             if(!state.rules.allowLogicData) return null;
-            return new DataI(builder.var(channel), builder.var(value));
+            return new ClientDataI(builder.var(channel), builder.var(value), builder.var(reliable));
         }
 
         @Override

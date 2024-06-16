@@ -1,7 +1,6 @@
 package mindustry.logic;
 
 import arc.*;
-import arc.func.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -42,7 +41,6 @@ public class LExecutor{
     maxDisplayBuffer = 1024,
     maxTextBuffer = 400;
 
-    private static final ObjectMap<String, Seq<Cons2<Player, Object>>> customDataHandlers = new ObjectMap<>();
 
     public LInstruction[] instructions = {};
     /** Non-constant variables used for network sync */
@@ -1766,36 +1764,27 @@ public class LExecutor{
         }
     }
 
-    public static void addDataHandler(String type, Cons2<Player, Object> handler){
-        customDataHandlers.get(type, Seq::new).add(handler);
-    }
+    public static class ClientDataI implements LInstruction{
+        public LVar channel, value, reliable;
 
-    @Remote(targets = Loc.client, unreliable = true)
-    public static void sendData(Player player, String channel, Object value){
-        Seq<Cons2<Player, Object>> handlers = customDataHandlers.get(channel);
-        if(handlers != null){
-            for(Cons2<Player, Object> handler : handlers){
-                handler.get(player, value);
-            }
-        }
-    }
-
-    public static class DataI implements LInstruction{
-        public int channel, value;
-
-        public DataI(int channel, int value){
+        public ClientDataI(LVar channel, LVar value, LVar reliable){
             this.channel = channel;
             this.value = value;
+            this.reliable = reliable;
         }
 
-        public DataI() {
+        public ClientDataI() {
         }
 
         @Override
         public void run(LExecutor exec) {
-            if (exec.obj(channel) instanceof String c) {
-                Var v = exec.var(value);
-                Call.sendData(c, v.isobj ? v.objval : v.numval);
+            if(channel.obj() instanceof String c){
+                Object v = value.isobj ? value.objval : value.numval;
+                if(reliable.bool()){
+                    Call.clientLogicDataReliable(c, v);
+                }else{
+                    Call.clientLogicDataUnreliable(c, v);
+                }
             }
         }
     }

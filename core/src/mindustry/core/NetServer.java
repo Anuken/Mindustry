@@ -117,6 +117,8 @@ public class NetServer implements ApplicationListener{
     private DataOutputStream dataStream = new DataOutputStream(syncStream);
     /** Packet handlers for custom types of messages. */
     private ObjectMap<String, Seq<Cons2<Player, String>>> customPacketHandlers = new ObjectMap<>();
+    /** Packet handlers for logic client data */
+    private ObjectMap<String, Seq<Cons2<Player, Object>>> logicClientDataHandlers = new ObjectMap<>();
 
     public NetServer(){
 
@@ -515,6 +517,10 @@ public class NetServer implements ApplicationListener{
         return customPacketHandlers.get(type, Seq::new);
     }
 
+    public void addLogicDataHandler(String type, Cons2<Player, Object> handler){
+        logicClientDataHandlers.get(type, Seq::new).add(handler);
+    }
+
     public static void onDisconnect(Player player, String reason){
         //singleplayer multiplayer weirdness
         if(player.con == null){
@@ -581,6 +587,21 @@ public class NetServer implements ApplicationListener{
     @Remote(targets = Loc.client, unreliable = true)
     public static void serverPacketUnreliable(Player player, String type, String contents){
         serverPacketReliable(player, type, contents);
+    }
+
+    @Remote(targets = Loc.client)
+    public static void clientLogicDataReliable(Player player, String channel, Object value){
+        Seq<Cons2<Player, Object>> handlers = netServer.logicClientDataHandlers.get(channel);
+        if(handlers != null){
+            for(Cons2<Player, Object> handler : handlers){
+                handler.get(player, value);
+            }
+        }
+    }
+
+    @Remote(targets = Loc.client, unreliable = true)
+    public static void clientLogicDataUnreliable(Player player, String channel, Object value){
+        clientLogicDataReliable(player, channel, value);
     }
 
     private static boolean invalid(float f){
