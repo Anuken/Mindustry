@@ -26,7 +26,7 @@ public class LCanvas extends Table{
 
     public DragLayout statements;
     public ScrollPane pane;
-    public Group jumps;
+    public Group jumps; // compatibility
 
     StatementElem dragging;
     StatementElem hovered;
@@ -106,14 +106,14 @@ public class LCanvas extends Table{
         clear();
 
         statements = new DragLayout();
-        jumps = new WidgetGroup();
+        jumps = statements.jumps;
 
         pane = pane(t -> {
             t.center();
             t.add(statements).pad(2f).center().width(targetWidth);
-            t.addChild(jumps);
+            t.addChild(statements.jumps);
 
-            jumps.cullable = false;
+            statements.jumps.cullable = false;
         }).grow().get();
         pane.setFlickScroll(false);
         pane.setScrollYForce(s);
@@ -141,7 +141,7 @@ public class LCanvas extends Table{
     }
 
     public void load(String asm){
-        jumps.clear();
+        statements.jumps.clear();
 
         Seq<LStatement> statements = LAssembler.read(asm, privileged);
         statements.truncate(LExecutor.maxInstructions);
@@ -158,7 +158,7 @@ public class LCanvas extends Table{
     }
 
     public void clearStatements(){
-        jumps.clear();
+        statements.jumps.clear();
         statements.clearChildren();
         statements.layout();
     }
@@ -195,6 +195,7 @@ public class LCanvas extends Table{
         Seq<Element> seq = new Seq<>();
         int insertPosition = 0;
         boolean invalidated;
+        public Group jumps = new WidgetGroup();
 
         {
             setTransform(true);
