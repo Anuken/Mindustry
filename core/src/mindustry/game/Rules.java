@@ -29,6 +29,8 @@ public class Rules{
     public boolean waveSending = true;
     /** Whether waves are spawnable at all. */
     public boolean waves;
+    /** Whether air units spawn at spawns instead of the edge of the map */
+    public boolean airUseSpawns = false;
     /** Whether the game objective is PvP. Note that this enables automatic hosting. */
     public boolean pvp;
     /** Whether is waiting for players enabled in PvP. */
