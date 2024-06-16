@@ -13,6 +13,7 @@ import mindustry.gen.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.liquid.Conduit.*;
 import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
@@ -91,8 +92,17 @@ public class GenericCrafter extends Block{
     }
 
     @Override
-    public boolean rotatedOutput(int x, int y){
-        return false;
+    public boolean rotatedOutput(int fromX, int fromY, Tile destination){
+        if(!(destination.build instanceof ConduitBuild)) return false;
+
+        Building crafter = world.build(fromX, fromY);
+        if(crafter == null) return false;
+        int relative = Mathf.mod(crafter.relativeTo(destination) - crafter.rotation, 4);
+        for(int dir : liquidOutputDirections){
+            if(dir == -1 || dir == relative) return false;
+        }
+
+        return true;
     }
 
     @Override
