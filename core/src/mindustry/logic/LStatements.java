@@ -1913,7 +1913,7 @@ public class LStatements{
 
     @RegisterStatement("clientdata")
     public static class ClientDataStatement extends LStatement{
-        public String channel = "\"foo\"", value = "\"bar\"", reliable = "0";
+        public String channel = "\"frog\"", value = "\"bar\"", reliable = "0";
 
         @Override
         public void build(Table table){
