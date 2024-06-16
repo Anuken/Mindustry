@@ -428,9 +428,7 @@ public class LExecutor{
                                 p4.setobj(null);
                                 p5.setobj(null);
                             }else{
-                                //any environmental solid block is returned as StoneWall, aka "@solid"
-                                Block block = !tile.synthetic() ? (tile.solid() ? Blocks.stoneWall : Blocks.air) : tile.block();
-                                p3.setobj(block);
+                                p3.setobj(tile.block());
                                 p4.setobj(tile.build != null ? tile.build : null);
                                 //Allows reading of ore tiles if they are present (overlay is not air) otherwise returns the floor
                                 p5.setobj(tile.overlay() == Blocks.air ? tile.floor() : tile.overlay());

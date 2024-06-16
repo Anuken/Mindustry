@@ -7,7 +7,6 @@ import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
-import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.type.*;
@@ -115,9 +114,6 @@ public class GlobalVars{
 
             put("@color" + Strings.capitalize(entry.key), entry.value.toDoubleBits());
         }
-
-        //used as a special value for any environmental solid block
-        put("@solid", Blocks.stoneWall);
 
         for(UnitType type : Vars.content.units()){
             put("@" + type.name, type);
