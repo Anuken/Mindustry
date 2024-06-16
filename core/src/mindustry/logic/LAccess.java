@@ -35,6 +35,7 @@ public enum LAccess{
     cameraWidth,
     cameraHeight,
     size,
+    solid,
     dead,
     range, 
     shooting,

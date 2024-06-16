@@ -1915,6 +1915,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             case y -> World.conv(y);
             case color -> Color.toDoubleBits(team.color.r, team.color.g, team.color.b, 1f);
             case dead -> !isValid() ? 1 : 0;
+            case solid -> block.solid || checkSolid() ? 1 : 0;
             case team -> team.id;
             case health -> health;
             case maxHealth -> maxHealth;
@@ -1981,9 +1982,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         switch(prop){
             case health -> {
                 health = (float)Mathf.clamp(value, 0, maxHealth);
-                healthChanged();
                 if(health <= 0f && !dead()){
                     Call.buildDestroyed(self());
+                }else{
+                    healthChanged();
                 }
             }
             case team -> {

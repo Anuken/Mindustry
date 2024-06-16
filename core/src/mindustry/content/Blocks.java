@@ -4192,6 +4192,7 @@ public class Blocks{
 
             liquidConsumed = 10f / 60f;
             targetInterval = 5f;
+            newTargetInterval = 30f;
             targetUnderBlocks = false;
 
             float r = range = 130f;
@@ -4282,6 +4283,8 @@ public class Blocks{
             shootY = 7f;
             rotateSpeed = 1.4f;
             minWarmup = 0.85f;
+
+            newTargetInterval = 40f;
             shootWarmupSpeed = 0.07f;
 
             coolant = consume(new ConsumeLiquid(Liquids.water, 30f / 60f));
@@ -4501,6 +4504,8 @@ public class Blocks{
             consumePower(5f);
             heatRequirement = 10f;
             maxHeatEfficiency = 2f;
+
+            newTargetInterval = 40f;
 
             inaccuracy = 1f;
             shake = 2f;
@@ -4724,6 +4729,8 @@ public class Blocks{
             shootSound = Sounds.missileLaunch;
 
             minWarmup = 0.94f;
+            newTargetInterval = 40f;
+            unitSort = UnitSorts.strongest;
             shootWarmupSpeed = 0.03f;
             targetAir = false;
             targetUnderBlocks = false;

@@ -1,11 +1,13 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
+import mindustry.editor.*;
 import mindustry.gen.*;
 
 import static mindustry.Vars.*;
 
 public class PausedDialog extends BaseDialog{
+    private MapProcessorsDialog processors = new MapProcessorsDialog();
     private SaveDialog save = new SaveDialog();
     private LoadDialog load = new LoadDialog();
     private boolean wasClient = false;
@@ -49,13 +51,22 @@ public class PausedDialog extends BaseDialog{
 
             cont.row();
 
-            cont.button("@hostserver", Icon.host, () -> {
+            //the button runs out of space when the editor button is added, so use the mobile text
+            cont.button(state.isEditor() ? "@hostserver.mobile" : "@hostserver", Icon.host, () -> {
                 if(net.server() && steam){
                     platform.inviteFriends();
                 }else{
                     ui.host.show();
                 }
-            }).disabled(b -> !((steam && net.server()) || !net.active())).colspan(2).width(dw * 2 + 10f).update(e -> e.setText(net.server() && steam ? "@invitefriends" : "@hostserver"));
+            }).disabled(b -> !((steam && net.server()) || !net.active())).colspan(state.isEditor() ? 1 : 2).width(state.isEditor() ? dw : dw * 2 + 10f)
+                .update(e -> e.setText(net.server() && steam ? "@invitefriends" : state.isEditor() ? "@hostserver.mobile" : "@hostserver"));
+
+            if(state.isEditor()){
+                cont.button("@editor.worldprocessors", Icon.logic, () -> {
+                    hide();
+                    processors.show();
+                });
+            }
 
             cont.row();
 
