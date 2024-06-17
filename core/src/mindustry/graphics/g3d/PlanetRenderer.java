@@ -46,7 +46,7 @@ public class PlanetRenderer implements Disposable{
 
     /** Render the entire planet scene to the screen. */
     public void render(PlanetParams params){
-        mainParams = params
+        mainParams = params;
         Draw.flush();
         Gl.clear(Gl.depthBufferBit);
         Gl.enable(Gl.depthTest);
