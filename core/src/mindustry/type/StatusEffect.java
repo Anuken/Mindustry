@@ -115,7 +115,7 @@ public class StatusEffect extends UnlockableContent{
         //don't list affinities *and* reactions, as that would be redundant
         if(!reacts){
             for(var e : affinities.toSeq().sort()){
-                stats.add(Stat.affinities, e.emoji() + "" + e);
+                stats.add(Stat.affinities, e.emoji() + e);
             }
 
             if(affinities.size > 0 && transitionDamage != 0){

@@ -5,12 +5,16 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.scene.*;
+import arc.scene.event.*;
 import arc.scene.ui.*;
+import arc.scene.ui.Tooltip.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
@@ -157,6 +161,73 @@ public class StatValues{
         return t;
     }
 
+    public static <T extends Element> T withTooltip(T element, UnlockableContent content, boolean tooltip){
+        if(content != null){
+            if(!mobile){
+                if(tooltip){
+                    element.addListener(Tooltips.getInstance().create(content.localizedName, mobile));
+                }
+                element.addListener(new HandCursorListener(() -> !content.isHidden(), true));
+            }
+            element.clicked(() -> {
+                if(!content.isHidden()){
+                    Vars.ui.content.show(content);
+                }
+            });
+        }
+        return element;
+    }
+
+    public static <T extends Element> T withTooltip(T element, UnlockableContent content){
+        return withTooltip(element, content, false);
+    }
+
+    /** Displays an item with a specified amount. */
+    private static Stack stack(TextureRegion region, int amount, @Nullable UnlockableContent content, boolean tooltip){
+        Stack stack = new Stack();
+
+        stack.add(new Table(o -> {
+            o.left();
+            o.add(new Image(region)).size(32f).scaling(Scaling.fit);
+        }));
+
+        if(amount != 0){
+            stack.add(new Table(t -> {
+                t.left().bottom();
+                t.add(amount >= 1000 ? UI.formatAmount(amount) : amount + "").style(Styles.outlineLabel);
+                t.pack();
+            }));
+        }
+
+        withTooltip(stack, content, tooltip);
+
+        return stack;
+    }
+
+    /** Displays an item with a specified amount. */
+    private static Stack stack(TextureRegion region, int amount, @Nullable UnlockableContent content){
+        return stack(region, amount, content, true);
+    }
+
+    public static Stack stack(ItemStack stack){
+        return stack(stack.item.uiIcon, stack.amount, stack.item);
+    }
+
+    public static Stack stack(UnlockableContent item, int amount){
+        return stack(item.uiIcon, amount, item);
+    }
+
+    public static Stack stack(UnlockableContent item, int amount, boolean tooltip){
+        return stack(item.uiIcon, amount, item, tooltip);
+    }
+
+    public static Stack stack(Item item){
+        return stack(item.uiIcon, 0, item);
+    }
+
+    public static Stack stack(PayloadStack stack){
+        return stack(stack.item.uiIcon, stack.amount, stack.item);
+    }
 
     public static Table displayItem(Item item){
         return displayItem(item, 0);
@@ -164,7 +235,7 @@ public class StatValues{
 
     public static Table displayItem(Item item, int amount, boolean showName){
         Table t = new Table();
-        t.add(new ItemImage(new ItemStack(item, amount)));
+        t.add(stack(item, amount, !showName));
         if(showName) t.add(item.localizedName).padLeft(4 + amount > 99 ? 4 : 0);
         return t;
     }
@@ -176,7 +247,7 @@ public class StatValues{
     /** Displays the item with a "/sec" qualifier based on the time period, in ticks. */
     public static Table displayItem(Item item, int amount, float timePeriod, boolean showName){
         Table t = new Table();
-        t.add(new ItemImage(item.uiIcon, amount));
+        t.add(stack(item, amount, !showName));
         t.add((showName ? item.localizedName + "\n" : "") + "[lightgray]" + Strings.autoFixed(amount / (timePeriod / 60f), 2) + StatUnit.perSecond.localized()).padLeft(2).padRight(5).style(Styles.outlineLabel);
         return t;
     }
@@ -184,7 +255,7 @@ public class StatValues{
     /** Displays the item with a "/sec" qualifier based on the time period, in ticks. */
     public static Table displayItemPercent(Item item, int percent, boolean showName){
         Table t = new Table();
-        t.add(new ItemImage(item.uiIcon, 0));
+        t.add(stack(item, 0, !showName));
         t.add((showName ? item.localizedName + "\n" : "") + "[lightgray]" +  percent + "%").padLeft(2).padRight(5).style(Styles.outlineLabel);
         return t;
     }
@@ -266,7 +337,7 @@ public class StatValues{
                 if(!check.get(item)) continue;
                 any = true;
 
-                if(item.uiIcon.found()) l.image(item.uiIcon).size(iconSmall).padRight(2).padLeft(2).padTop(3).padBottom(3);
+                if(item.uiIcon.found()) l.image(item.uiIcon).size(iconSmall).scaling(Scaling.fit).padRight(2).padLeft(2).padTop(3).padBottom(3).with(img -> withTooltip(img, item, false));
                 l.add(item.localizedName).left().padLeft(1).padRight(4).colspan(item.uiIcon.found() ? 1 : 2);
                 if(i % 5 == 4){
                     l.row();
@@ -304,7 +375,7 @@ public class StatValues{
                         b.table(info -> {
                             info.left();
                             info.add(block.localizedName).left().row();
-                            info.add(block.itemDrop.emoji()).left();
+                            info.add(block.itemDrop.emoji()).with(l -> withTooltip(l, block.itemDrop)).left();
                         }).grow();
                         if(multipliers != null){
                             b.add(Strings.autoFixed(60f / (Math.max(drillTime + drillMultiplier * block.itemDrop.hardness, drillTime) / multipliers.get(block.itemDrop, 1f)) * size, 2) + StatUnit.perSecond.localized())
@@ -325,7 +396,7 @@ public class StatValues{
                     if(!filter.get(liquid)) continue;
 
                     c.table(Styles.grayPanel, b -> {
-                        b.image(liquid.uiIcon).size(40).pad(10f).left().scaling(Scaling.fit);
+                        b.image(liquid.uiIcon).size(40).pad(10f).left().scaling(Scaling.fit).with(i -> withTooltip(i, liquid, false));;
                         b.table(info -> {
                             info.add(liquid.localizedName).left().row();
                             info.add(Strings.autoFixed(maxUsed * 60f, 2) + StatUnit.perSecond.localized()).left().color(Color.lightGray);
@@ -354,7 +425,7 @@ public class StatValues{
                     if(!filter.get(liquid)) continue;
 
                     c.table(Styles.grayPanel, b -> {
-                        b.image(liquid.uiIcon).size(40).pad(10f).left().scaling(Scaling.fit);
+                        b.image(liquid.uiIcon).size(40).pad(10f).left().scaling(Scaling.fit).with(i -> withTooltip(i, liquid, false));;
                         b.table(info -> {
                             info.add(liquid.localizedName).left().row();
                             info.add(Strings.autoFixed(amount * 60f, 2) + StatUnit.perSecond.localized()).left().color(Color.lightGray);
@@ -479,7 +550,7 @@ public class StatValues{
                     //no point in displaying unit icon twice
                     if(!compact && !(t instanceof Turret)){
                         bt.table(title -> {
-                            title.image(icon(t)).size(3 * 8).padRight(4).right().scaling(Scaling.fit).top();
+                            title.image(icon(t)).size(3 * 8).padRight(4).right().scaling(Scaling.fit).top().with(i -> withTooltip(i, t, false));
                             title.add(t.localizedName).padRight(10).left().top();
                         });
                         bt.row();
@@ -556,7 +627,8 @@ public class StatValues{
                     }
 
                     if(type.status != StatusEffects.none){
-                        sep(bt, (type.status.hasEmoji() ? type.status.emoji() : "") + "[stat]" + type.status.localizedName + (type.status.reactive ? "" : "[lightgray] ~ [stat]" + ((int)(type.statusDuration / 60f)) + "[lightgray] " + Core.bundle.get("unit.seconds")));
+                        sep(bt, (type.status.hasEmoji() ? type.status.emoji() : "") + "[stat]" + type.status.localizedName + (type.status.reactive ? "" : "[lightgray] ~ [stat]" +
+                            ((int)(type.statusDuration / 60f)) + "[lightgray] " + Core.bundle.get("unit.seconds"))).with(c -> withTooltip(c, type.status));
                     }
 
                     if(type.intervalBullet != null){
@@ -601,9 +673,9 @@ public class StatValues{
     }
 
     //for AmmoListValue
-    private static void sep(Table table, String text){
+    private static Cell<?> sep(Table table, String text){
         table.row();
-        table.add(text);
+        return table.add(text);
     }
 
     //for AmmoListValue

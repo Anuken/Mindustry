@@ -89,7 +89,7 @@ public class Reconstructor extends UnitBlock{
                     table.table(Styles.grayPanel, t -> {
                         t.left();
 
-                        t.image(upgrade[0].uiIcon).size(40).pad(10f).left().scaling(Scaling.fit);
+                        t.image(upgrade[0].uiIcon).size(40).pad(10f).left().scaling(Scaling.fit).with(i -> StatValues.withTooltip(i, upgrade[0]));
                         t.table(info -> {
                             info.add(upgrade[0].localizedName).left();
                             info.row();
@@ -104,7 +104,7 @@ public class Reconstructor extends UnitBlock{
                     table.table(Styles.grayPanel, t -> {
                         t.left();
 
-                        t.image(upgrade[1].uiIcon).size(40).pad(10f).right().scaling(Scaling.fit);
+                        t.image(upgrade[1].uiIcon).size(40).pad(10f).right().scaling(Scaling.fit).with(i -> StatValues.withTooltip(i, upgrade[1]));
                         t.table(info -> {
                             info.add(upgrade[1].localizedName).right();
                             info.row();

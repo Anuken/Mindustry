@@ -122,7 +122,7 @@ public class UnitFactory extends UnitBlock{
                     }
 
                     if(plan.unit.unlockedNow()){
-                        t.image(plan.unit.uiIcon).size(40).pad(10f).left().scaling(Scaling.fit);
+                        t.image(plan.unit.uiIcon).size(40).pad(10f).left().scaling(Scaling.fit).with(i -> StatValues.withTooltip(i, plan.unit));
                         t.table(info -> {
                             info.add(plan.unit.localizedName).left();
                             info.row();
