@@ -217,7 +217,7 @@ public class SoundControl{
             playOnce(darkMusic.random(lastRandomPlayed));
         }else if(state.boss() != null){
             playOnce(bossMusic.random(lastRandomPlayed));
-        }else {
+        }else{
             playOnce(ambientMusic.random(lastRandomPlayed));
         }
     }
