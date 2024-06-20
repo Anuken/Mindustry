@@ -13,6 +13,7 @@ public class DrawHeatRegion extends DrawBlock{
     public Color color = new Color(1f, 0.22f, 0.22f, 0.8f);
     public float pulse = 0.3f, pulseScl = 10f;
     public float layer = Layer.blockAdditive;
+    public boolean rotate = false;
 
     public TextureRegion heat;
     public String suffix = "-glow";
@@ -37,7 +38,7 @@ public class DrawHeatRegion extends DrawBlock{
             if(layer > 0) Draw.z(layer);
             Draw.blend(Blending.additive);
             Draw.color(color, Mathf.clamp(hc.heat / hc.heatRequirement()) * (color.a * (1f - pulse + Mathf.absin(pulseScl, pulse))));
-            Draw.rect(heat, build.x, build.y);
+            Draw.rect(heat, build.x, build.y, rotate ? build.rotdeg() : 0);
             Draw.blend();
             Draw.color();
             Draw.z(z);

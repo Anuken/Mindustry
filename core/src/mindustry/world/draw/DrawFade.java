@@ -10,11 +10,12 @@ public class DrawFade extends DrawBlock{
     public String suffix = "-top";
     public float alpha = 0.6f, scale = 3f;
     public TextureRegion region;
+    public boolean rotate = false;
 
     @Override
     public void draw(Building build){
         Draw.alpha(Mathf.absin(build.totalProgress(), scale, alpha) * build.warmup());
-        Draw.rect(region, build.x, build.y);
+        Draw.rect(region, build.x, build.y, rotate ? build.rotdeg() : 0);
         Draw.reset();
     }
 
