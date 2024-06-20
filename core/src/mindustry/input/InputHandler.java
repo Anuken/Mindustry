@@ -1088,6 +1088,20 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                         }
                     }
                 }
+
+                if(ai.targetPos != null && ai.currentCommand() == UnitCommand.loopPayloadCommand && unit instanceof Payloadc pay){
+                    Draw.color(Pal.accent, 0.4f + Mathf.absin(5f, 0.5f));
+                    TextureRegion region = pay.hasPayload() ? Icon.download.getRegion() : Icon.upload.getRegion();
+                    float offset = 11f;
+                    float size = 8f;
+                    Draw.rect(region, ai.targetPos.x, ai.targetPos.y + offset, size, size / region.ratio());
+
+                    if(ai.commandQueue.size > 0){
+                        region = !pay.hasPayload() ? Icon.download.getRegion() : Icon.upload.getRegion();
+                        Draw.rect(region, ai.commandQueue.first().getX(), ai.commandQueue.first().getY() + offset, size, size / region.ratio());
+                    }
+                    Draw.color();
+                }
             }
 
             for(var commandBuild : commandBuildings){
