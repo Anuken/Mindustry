@@ -82,7 +82,7 @@ public class ForceFieldAbility extends Ability{
         if(unit.shield <= 0f && !wasBroken){
             unit.shield -= cooldown * regen;
 
-            Fx.shieldBreak.at(unit.x, unit.y, radius, unit.team.color, this);
+            Fx.shieldBreak.at(unit.x, unit.y, radius, unit.type.shieldColor(unit), this);
         }
 
         wasBroken = unit.shield <= 0f;
@@ -110,7 +110,7 @@ public class ForceFieldAbility extends Ability{
         checkRadius(unit);
 
         if(unit.shield > 0){
-            Draw.color(unit.team.color, Color.white, Mathf.clamp(alpha));
+            Draw.color(unit.type.shieldColor(unit), Color.white, Mathf.clamp(alpha));
 
             if(Vars.renderer.animateShields){
                 Draw.z(Layer.shields + 0.001f * alpha);
