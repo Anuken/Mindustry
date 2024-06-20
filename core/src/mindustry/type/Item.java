@@ -146,6 +146,7 @@ public class Item extends UnlockableContent implements Senseable{
 
                     Pixmap res = Pixmaps.blend(pixmaps[i], pixmaps[(i + 1) % frames], f);
                     packer.add(PageType.main, name + "-t" + index, res);
+                    res.dispose();
                 }
             }
         }

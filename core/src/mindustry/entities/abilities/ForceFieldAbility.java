@@ -1,5 +1,6 @@
 package mindustry.entities.abilities;
 
+import arc.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -12,7 +13,6 @@ import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
-import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -32,6 +32,7 @@ public class ForceFieldAbility extends Ability{
 
     /** State. */
     protected float radiusScale, alpha;
+    protected boolean wasBroken = true;
 
     private static float realRad;
     private static Unit paramUnit;
@@ -40,13 +41,6 @@ public class ForceFieldAbility extends Ability{
         if(trait.team != paramUnit.team && trait.type.absorbable && Intersector.isInRegularPolygon(paramField.sides, paramUnit.x, paramUnit.y, realRad, paramField.rotation, trait.x(), trait.y()) && paramUnit.shield > 0){
             trait.absorb();
             Fx.absorb.at(trait);
-
-            //break shield
-            if(paramUnit.shield <= trait.damage()){
-                paramUnit.shield -= paramField.cooldown * paramField.regen;
-
-                Fx.shieldBreak.at(paramUnit.x, paramUnit.y, paramField.radius, paramUnit.type.shieldColor(paramUnit), paramUnit);
-            }
 
             paramUnit.shield -= trait.damage();
             paramField.alpha = 1f;
@@ -73,18 +67,26 @@ public class ForceFieldAbility extends Ability{
 
     @Override
     public void addStats(Table t){
-        t.add("[lightgray]" + Stat.health.localized() + ": [white]" + Math.round(max));
+        super.addStats(t);
+        t.add(Core.bundle.format("bullet.range", Strings.autoFixed(radius / tilesize, 2)));
         t.row();
-        t.add("[lightgray]" + Stat.shootRange.localized() + ": [white]" +  Strings.autoFixed(radius / tilesize, 2) + " " + StatUnit.blocks.localized());
+        t.add(abilityStat("shield", Strings.autoFixed(max, 2)));
         t.row();
-        t.add("[lightgray]" + Stat.repairSpeed.localized() + ": [white]" + Strings.autoFixed(regen * 60f, 2) + StatUnit.perSecond.localized());
+        t.add(abilityStat("repairspeed", Strings.autoFixed(regen * 60f, 2)));
         t.row();
-        t.add("[lightgray]" + Stat.cooldownTime.localized() + ": [white]" + Strings.autoFixed(cooldown / 60f, 2) + " " + StatUnit.seconds.localized());
-        t.row();
+        t.add(abilityStat("cooldown", Strings.autoFixed(cooldown / 60f, 2)));
     }
 
     @Override
     public void update(Unit unit){
+        if(unit.shield <= 0f && !wasBroken){
+            unit.shield -= cooldown * regen;
+
+            Fx.shieldBreak.at(unit.x, unit.y, radius, unit.type.shieldColor(unit), this);
+        }
+
+        wasBroken = unit.shield <= 0f;
+
         if(unit.shield < max){
             unit.shield += Time.delta * regen;
         }

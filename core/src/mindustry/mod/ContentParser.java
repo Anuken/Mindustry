@@ -146,6 +146,11 @@ public class ContentParser{
             readFields(result, data);
             return result;
         });
+        put(MassDriverBolt.class, (type, data) -> {
+            MassDriverBolt result = (MassDriverBolt)make(MassDriverBolt.class);
+            readFields(result, data);
+            return result;
+        });
         put(AmmoType.class, (type, data) -> {
             //string -> item
             //if liquid ammo support is added, this should scan for liquids as well
@@ -949,6 +954,8 @@ public class ContentParser{
             case "min" -> base.min(parser.readValue(PartProgress.class, data.get("other")));
             case "sin" -> base.sin(data.has("offset") ? data.getFloat("offset") : 0f, data.getFloat("scl"), data.getFloat("mag"));
             case "absin" -> base.absin(data.getFloat("scl"), data.getFloat("mag"));
+            case "mod" -> base.mod(data.getFloat("amount"));
+            case "loop" -> base.loop(data.getFloat("time"));
             case "curve" -> data.has("interp") ? base.curve(parser.readValue(Interp.class, data.get("interp"))) : base.curve(data.getFloat("offset"), data.getFloat("duration"));
             default -> throw new RuntimeException("Unknown operation '" + op + "', check PartProgress class for a list of methods.");
         };
@@ -1054,7 +1061,21 @@ public class ContentParser{
             }
             Field field = metadata.field;
             try{
-                field.set(object, parser.readValue(field.getType(), metadata.elementType, child, metadata.keyType));
+                boolean mergeMap = ObjectMap.class.isAssignableFrom(field.getType()) && child.has("add") && child.get("add").isBoolean() && child.getBoolean("add", false);
+
+                if(mergeMap){
+                    child.remove("add");
+                }
+
+                Object readField = parser.readValue(field.getType(), metadata.elementType, child, metadata.keyType);
+
+                //if a map has add: true, add its contents to the map instead
+                if(mergeMap && field.get(object) instanceof ObjectMap<?,?> baseMap){
+                    baseMap.putAll((ObjectMap)readField);
+                }else{
+                    field.set(object, readField);
+                }
+
             }catch(IllegalAccessException ex){
                 throw new SerializationException("Error accessing field: " + field.getName() + " (" + type.getName() + ")", ex);
             }catch(SerializationException ex){
@@ -1102,8 +1123,8 @@ public class ContentParser{
                 }
 
                 //all items have a produce requirement unless already specified
-                if(object instanceof Item i && !node.objectives.contains(o -> o instanceof Produce p && p.content == i)){
-                    node.objectives.add(new Produce(i));
+                if((unlock instanceof Item || unlock instanceof Liquid) && !node.objectives.contains(o -> o instanceof Produce p && p.content == unlock)){
+                    node.objectives.add(new Produce(unlock));
                 }
 
                 //remove old node from parent

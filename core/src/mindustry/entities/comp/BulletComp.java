@@ -45,6 +45,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     transient @Nullable Mover mover;
     transient boolean absorbed, hit;
     transient @Nullable Trail trail;
+    transient int frags;
 
     @Override
     public void getCollisions(Cons<QuadTree> consumer){

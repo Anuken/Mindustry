@@ -1,5 +1,6 @@
 package mindustry.ui.dialogs;
 
+import arc.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import mindustry.gen.*;
@@ -39,7 +40,7 @@ public class AdminsDialog extends BaseDialog{
             res.labelWrap("[lightgray]" + info.lastName).width(w - h - 24f);
             res.add().growX();
             res.button(Icon.cancel, () -> {
-                ui.showConfirm("@confirm", "@confirmunadmin", () -> {
+                ui.showConfirm("@confirm", Core.bundle.format("@confirmunadmin", info.lastName), () -> {
                     netServer.admins.unAdminPlayer(info.id);
                     Groups.player.each(player -> {
                         if(player != null && !player.isLocal() && player.uuid().equals(info.id)){
