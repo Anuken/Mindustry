@@ -213,10 +213,10 @@ public class SoundControl{
 
     /** Plays a random track.*/
     public void playRandom(){
-        if(isDark()){
-            playOnce(darkMusic.random(lastRandomPlayed));
-        }else if(state.boss() != null){
+        if(state.boss() != null){
             playOnce(bossMusic.random(lastRandomPlayed));
+        }else if(isDark()){
+            playOnce(darkMusic.random(lastRandomPlayed));
         }else{
             playOnce(ambientMusic.random(lastRandomPlayed));
         }
