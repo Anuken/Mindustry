@@ -5,21 +5,29 @@ import mindustry.gen.*;
 import mindustry.type.*;
 
 public class ConsumeItemList extends ConsumeItemFilter{
-    public Seq<Item> items = new Seq<>();
-    public ObjectFloatMap<Item> efficiencyMultipliers = new ObjectFloatMap<>();
+    public ObjectFloatMap<Item> itemMultipliers = new ObjectFloatMap<>();
 
     public ConsumeItemList(Item... items){
         this();
-        this.items = Seq.with(items);
+        for(Item i : items){
+            itemMultipliers.put(i, 1f);
+        }
     }
 
     public ConsumeItemList(){
-        filter = item -> this.items.contains(item);
+        filter = item -> itemMultipliers.containsKey(item);
+    }
+
+    /** Initializes item efficiency multiplier map. Format: [item1, mult1, item2, mult2...] */
+    public void setMultipliers(Object... objects){
+        for(int i = 0; i < objects.length; i += 2){
+            itemMultipliers.put((Item)objects[i], (Float)objects[i + 1]);
+        }
     }
 
     @Override
     public float efficiencyMultiplier(Building build){
         var item = getConsumed(build);
-        return efficiencyMultipliers.get(item, 1f);
+        return itemMultipliers.get(item, 1f);
     }
 }
