@@ -6,6 +6,7 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -63,6 +64,12 @@ public class Separator extends Block{
     @Override
     public TextureRegion[] icons(){
         return drawer.finalIcons(this);
+    }
+
+    @Override
+    public void createIcons(MultiPacker packer){
+        super.createIcons(packer);
+        drawer.createIcons(this, packer);
     }
 
     public class SeparatorBuild extends Building{
