@@ -320,4 +320,8 @@
     "name": "Vndustry",
     "address": ["vndustry.ddns.net"]
   }
+  {
+    "name": "Vietnamse"
+    "address": ["147.185.221.224:22568", "147.185.221.224:22572"]
+  }
 ]
