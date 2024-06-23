@@ -2,6 +2,7 @@ package mindustry.editor;
 
 import arc.func.*;
 import arc.graphics.*;
+import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.event.*;
 import arc.scene.ui.*;
@@ -246,7 +247,7 @@ public class MapObjectivesDialog extends BaseDialog{
             show();
         }});
 
-        setInterpreter(Vertices.class, float[].class, (cont, name, type, field, remover, indexer, get, set) -> cont.table(main -> {
+        setInterpreter(Vertices.class, float[].class, (cont, name, type, field, remover, indexer, get, set) -> {
             float[] data = get.get();
 
             name(cont, name, remover, indexer);
@@ -276,7 +277,27 @@ public class MapObjectivesDialog extends BaseDialog{
                     }).row();
                 }
             });
-        }));
+        });
+
+        setInterpreter(Transform.class, Mat.class, (cont, name, type, field, remover, indexer, get, set) -> {
+            Mat data = get.get();
+
+            name(cont, name, remover, indexer);
+            cont.table(t -> {
+                getInterpreter(float.class).build(t, "Rotation", new TypeInfo(float.class), null, null, null, data::getRotation, v -> {
+                    data.getTranslation(Tmp.v1);
+                    data.setToRotation(v);
+                    data.translate(Tmp.v1);
+                });
+
+                t.row();
+
+                getInterpreter(Vec2.class).build(t, "Translation", new TypeInfo(float.class), null, null, null, () -> data.getTranslation(new Vec2()).scl(1f / tilesize), v -> {
+                    data.val[Mat.M02] = v.x * tilesize;
+                    data.val[Mat.M12] = v.y * tilesize;
+                });
+            });
+        });
 
         // Types that use the default interpreter. It would be nice if all types could use it, but I don't know how to reliably prevent classes like [? extends Content] from using it.
         for(var obj : MapObjectives.allObjectiveTypes) setInterpreter(obj.get().getClass(), defaultInterpreter());
