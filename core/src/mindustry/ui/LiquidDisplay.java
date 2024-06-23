@@ -15,25 +15,27 @@ public class LiquidDisplay extends Table{
     public final float amount;
     public final boolean perSecond;
 
-    public LiquidDisplay(Liquid liquid, float amount, boolean perSecond){
+    public LiquidDisplay(Liquid liquid, float size, float amount, boolean perSecond){
         this.liquid = liquid;
         this.amount = amount;
         this.perSecond = perSecond;
 
+        left();
         add(new Stack(){{
-            add(new Image(liquid.uiIcon).setScaling(Scaling.fit));
+            Image i = new Image(liquid.uiIcon).setScaling(Scaling.fit);
+            i.setAlign(Align.left);
+            add(i);
 
-            if(amount != 0){
+            if(!perSecond && amount != 0){
                 Table t = new Table().left().bottom();
                 t.add(Strings.autoFixed(amount, 2)).style(Styles.outlineLabel);
                 add(t);
             }
-        }}).size(iconMed).padRight(3  + (amount != 0 && Strings.autoFixed(amount, 2).length() > 2 ? 8 : 0));
+        }}).height(size).minWidth(size).left();
+        add(liquid.localizedName + (perSecond && amount != 0 ? "\n[lightgray]" + Strings.autoFixed(amount, 2) + StatUnit.perSecond.localized() : "[]")).left().style(Styles.outlineLabel);
+    }
 
-        if(perSecond){
-            add(StatUnit.perSecond.localized()).padLeft(2).padRight(5).color(Color.lightGray).style(Styles.outlineLabel);
-        }
-
-        add(liquid.localizedName);
+    public LiquidDisplay(Liquid liquid, float amount, boolean perSecond){
+        this(liquid, iconMed, amount, perSecond);
     }
 }
