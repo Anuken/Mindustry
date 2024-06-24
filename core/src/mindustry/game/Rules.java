@@ -19,6 +19,8 @@ import mindustry.world.blocks.*;
  * Does not store game state, just configuration.
  */
 public class Rules{
+    /** Allows editing the rules in-game. Essentially a cheat mode toggle. */
+    public boolean allowEditRules = false;
     /** Sandbox mode: Enables infinite resources, build range and build speed. */
     public boolean infiniteResources;
     /** Team-specific rules. */
