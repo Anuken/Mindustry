@@ -123,8 +123,8 @@ public class PayloadMassDriver extends PayloadBlock{
     }
 
     @Override
-    public void getRegionsToOutline(Seq<TextureRegion> out){
-        out.add(leftRegion, rightRegion, capRegion);
+    public TextureRegion[] makeIconRegions(){
+        return new TextureRegion[]{leftRegion, rightRegion, capRegion};
     }
 
     public class PayloadDriverBuild extends PayloadBlockBuild<Payload> implements RotBlock{
