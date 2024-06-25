@@ -1497,6 +1497,7 @@ public class LExecutor{
                 }
                 case ambientLight -> state.rules.ambientLight.fromDouble(value.num());
                 case solarMultiplier -> state.rules.solarMultiplier = Math.max(value.numf(), 0f);
+                case dragMultiplier -> state.rules.dragMultiplier = Math.max(value.numf(), 0f);
                 case ban -> {
                     Object cont = value.obj();
                     if(cont instanceof Block b){
