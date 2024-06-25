@@ -328,7 +328,6 @@ public class CanvasBlock extends Block{
                 dialog.buttons.button("@ok", Icon.ok, () -> {
                     if(modified[0]){
                         configure(packPixmap(pix));
-                        pix.dispose();
                         texture.dispose();
                     }
                     dialog.hide();

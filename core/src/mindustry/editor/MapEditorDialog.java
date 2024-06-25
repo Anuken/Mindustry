@@ -211,11 +211,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         margin(0);
 
         update(() -> {
-            if(Core.scene.getKeyboardFocus() instanceof Dialog && Core.scene.getKeyboardFocus() != this){
-                return;
-            }
-
-            if(Core.scene != null && Core.scene.getKeyboardFocus() == this){
+            if(hasKeyboard()){
                 doInput();
             }
         });
@@ -803,7 +799,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         }
 
         if(i == 0){
-            blockSelection.add("@none.found").color(Color.lightGray).padLeft(54f).padTop(10f);
+            blockSelection.add("@none.found").padLeft(54f).padTop(10f);
         }
     }
 }

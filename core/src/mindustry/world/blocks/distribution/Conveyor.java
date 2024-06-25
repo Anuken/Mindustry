@@ -92,7 +92,7 @@ public class Conveyor extends Block implements Autotiler{
     public void handlePlacementLine(Seq<BuildPlan> plans){
         if(bridgeReplacement == null) return;
 
-        Placement.calculateBridges(plans, (ItemBridge)bridgeReplacement);
+        Placement.calculateBridges(plans, (ItemBridge)bridgeReplacement, b -> b instanceof Conveyor);
     }
 
     @Override
@@ -253,7 +253,7 @@ public class Conveyor extends Block implements Autotiler{
             mid = 0;
 
             //skip updates if possible
-            if(len == 0){
+            if(len == 0 && Mathf.equal(timeScale, 1f)){
                 clogHeat = 0f;
                 sleep();
                 return;

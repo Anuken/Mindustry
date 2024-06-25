@@ -11,7 +11,7 @@ import mindustry.type.*;
 
 @Component
 abstract class ShieldComp implements Healthc, Posc{
-    @Import float health, hitTime, x, y, healthMultiplier;
+    @Import float health, hitTime, x, y, healthMultiplier, armorOverride;
     @Import boolean dead;
     @Import Team team;
     @Import UnitType type;
@@ -27,7 +27,7 @@ abstract class ShieldComp implements Healthc, Posc{
     @Override
     public void damage(float amount){
         //apply armor and scaling effects
-        rawDamage(Damage.applyArmor(amount, armor) / healthMultiplier / Vars.state.rules.unitHealth(team));
+        rawDamage(Damage.applyArmor(amount, armorOverride >= 0f ? armorOverride : armor) / healthMultiplier / Vars.state.rules.unitHealth(team));
     }
 
     @Replace
@@ -61,7 +61,7 @@ abstract class ShieldComp implements Healthc, Posc{
             }
 
             if(hadShields && shield <= 0.0001f){
-                Fx.unitShieldBreak.at(x, y, 0, team.color, this);
+                Fx.unitShieldBreak.at(x, y, 0, type.shieldColor(self()), this);
             }
         }
     }

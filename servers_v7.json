@@ -1,7 +1,63 @@
 [
   {
+    "name": "Redundancy Dept",
+    "address": ["min7.include-once.org:8000", "min7.include-once.org:8001"]
+  },
+  {
+    "name": "TSR Network",
+    "address": ["de-prem-01.hosts.optikservers.com:35526", "de-prem-01.hosts.optikservers.com:35915", "de-prem-01.hosts.optikservers.com:35250", "de-prem-01.hosts.optikservers.com:27526", "de-prem-01.hosts.optikservers.com:35376", "de-prem-01.hosts.optikservers.com:35895"]
+  },
+  {
+    "name": "Toast Mindustry",
+    "address": ["192.3.139.5:6567", "192.3.139.5:6568", "192.3.139.5:6569", "104.168.64.154:6567", "104.168.64.154:6568", "104.168.64.154:6569"]
+  },
+  {
+    "name": "gods field",
+    "address": ["n2.akiracloud.net:10225"]
+  },
+  {
+    "name": "STP",
+    "address": ["23.88.73.88:25617"]
+  },
+  {
+    "name": "Meow Empire ≫ MEM PROJECT",
+    "address": ["a2.corenodes.host:25514"]
+  },
+  {
+    "name" : "LesGarsCools",
+    "address": ["est1.be"]
+  },
+  {
+    "name": "meiqiuMDT",
+    "address": ["cn1.meiqiumdt.top","cn1.meiqiumdt.top:7000","cn1.meiqiumdt.top:8000","cn1.meiqiumdt.top:7013","cn1.meiqiumdt.top:9000"]
+  },
+  {
+    "name": "DontVin",
+    "address": ["45.84.59.49:1342","45.137.205.185:1068","45.137.205.185:1190","45.137.205.185:1191","134.255.218.3:1142","45.137.205.185:1192","45.137.205.185:1193","45.137.205.185:1221","be.phoenix-network.dev","be.phoenix-network.dev:1111","be.phoenix-network.dev:2222","be.phoenix-network.dev:3333","be.phoenix-network.dev:4444","be.phoenix-network.dev:5555","be.phoenix-network.dev:6666","be.phoenix-network.dev:7777","be.phoenix-network.dev:8888","be.phoenix-network.dev:9999"]
+  },
+  {
+    "name": "Crux's Citadel",
+    "address": ["45.158.9.198:32865","45.158.9.198:30055","45.158.9.198:32175","45.158.9.198:30252","176.9.150.40:35899","129.154.47.57:26645","176.9.150.40:35930","129.154.47.57:27993","129.154.47.57:26881","176.9.150.40:35168","176.9.150.40:35900","176.9.150.40:35031","176.9.150.40:35154"]
+  },
+  {
+    "name": "Chilldustry",
+    "address": ["trelesco.xyz", "95.84.198.97"]
+  },
+  {
+    "name": "ShardDustry Eventos",
+    "address": ["45.158.9.198:31719"]
+  },
+  {
+    "name": "ShardDustry ES",
+    "address": ["45.158.9.198:32389"]
+  },
+  {
     "name": "Tamazia",
-    "address": ["83.150.217.98:25566", "83.150.217.98:25568"]
+    "address": ["5.250.178.221:6567","5.250.178.221:6677"]
+  },
+  {
+    "name": "Crux's Federation",
+    "address": ["de-free-01.hosts.optikservers.com:32538", "de-free-01.hosts.optikservers.com:31421", "fsn1.bbn.one:37019"]
   },
   {
     "name": "RCM",
@@ -12,76 +68,60 @@
     "address": ["tendhost.ddns.net:7576"]
   },
   {
-    "name": "generic mindustry",
-    "address": ["212.192.29.92:25554", "212.192.29.24:25298"]
-  },
-  {
     "name": "ECAN",
     "address": ["mindustry.ecansol.com:6597", "mindustry.ecansol.com:6499", "mindustry.ecansol.com:6599"]
   },
   {
     "name": "SMoke of Anarchy",
-    "address": ["smokeofanarchy.ru", "backup.smokeofanarchy.ru"]
+    "address": ["86.102.97.27"]
   },
   {
     "name": "Mindustry.pl",
-    "address": ["78.46.100.178", "0.baseduser.eu.org:6966", "0.baseduser.eu.org:6666", "0.baseduser.eu.org:6000", "1.baseduser.eu.org:6966", "1.baseduser.eu.org:6666", "1.baseduser.eu.org:6000"]
+    "address": ["1.baseduser.eu.org:6966", "1.baseduser.eu.org:6666", "1.baseduser.eu.org:6000"]
   },
   {
     "name": "SynapseOS",
     "address": ["0nera.ru:7777"]
   },
   {
-    "name": "Voiddustry Network",
-    "address": ["45.144.66.250:6566", "45.144.66.250:6567" ,"45.144.66.250:6565", "45.144.66.250:6561"]
-  },
-  {
-    "name": "C.A.M.S.",
-    "address": ["0.baseduser.eu.org:42001", "0.baseduser.eu.org:42002"]
+    "name": "Voiddustry Servers",
+    "address": ["45.144.66.250:6567", "185.189.14.201:6567"]
   },
   {
     "name": "thedimas",
-    "address": ["91.209.226.11", "91.209.226.11:6510", "91.209.226.11:6511", "91.209.226.11:6509", "91.209.226.11:6508", "91.209.226.11:6512", "91.209.226.11:6513"]
+    "address": ["130.162.212.232", "130.162.212.232:6503","130.162.212.232:6505", "130.162.212.232:6506", "130.162.212.232:6507", "130.162.212.232:6508", "130.162.212.232:6509", "130.162.212.232:6510", "130.162.212.232:6511", "130.162.212.232:6512", "130.162.212.232:6513"]
   },
   {
     "name": "HexPvP Network",
     "address": ["hexpvp.ddns.net", "kycb42148.ddns.net:6614"]
   },
   {
-    "name": "Omega Hub",
-    "address": ["n1.mindustry.me:6608", "n7.mindustry.me:6767", "n7.mindustry.me:6768", "n1.mindustry.me:6568", "n1.mindustry.me:6671", "n1.mindustry.me:6570", "n1.mindustry.me:6573", "n1.mindustry.me:6610", "n1.mindustry.me:6567", "n1.mindustry.me:6599", "n1.mindustry.me:6774", "n1.mindustry.me:6571", "n1.mindustry.me:6589"]
+    "name": "Unidustry",
+    "address": ["51.81.57.217:33703"]
   },
   {
     "name": "KMWStudios",
-    "address": ["46.151.26.232:1024", "46.151.26.232:2000", "46.151.26.232:3000", "46.151.26.232:4000", "46.151.26.232:6000", "46.151.26.232:7000", "46.151.26.232:8000"]
+    "address": ["kislota.kmwstudios.org:28101", "kislota.kmwstudios.org:28102", "kislota.kmwstudios.org:28103", "kislota.kmwstudios.org:28104", "kislota.kmwstudios.org:28105", "kislota.kmwstudios.org:28106", "kislota.kmwstudios.org:28107"]
   },
   {
     "name": "XCore",
-    "address": ["130.61.52.25", "130.61.52.25:6568", "130.61.52.25:6569", "130.61.52.25:6570", "130.61.52.25:6571", "130.61.52.25:6572", "130.61.52.25:6573"]
+    "address": ["128.140.88.66", "128.140.88.66:6568", "128.140.88.66:6569", "128.140.88.66:6570", "128.140.88.66:6571", "128.140.88.66:6572", "128.140.88.66:6573", "128.140.88.66:6574", "128.140.88.66:6575"]
   },
   {
-    "name": "Darkdustry",
-    "address": ["130.61.76.9", "130.61.76.9:1500", "130.61.76.9:2000", "130.61.76.9:3000", "130.61.76.9:4000", "130.61.76.9:5000", "130.61.76.9:6000", "130.61.76.9:7000", "130.61.76.9:8000", "130.61.76.9:9000", "130.61.76.9:10000"] 
+    "name": "MinDurka",
+    "address": ["mindurka.fun", "mindurka.fun:3001", "mindurka.fun:3002", "mindurka.fun:3003", "mindurka.fun:3004", "mindurka.fun:3005", "mindurka.fun:3006", "mindurka.fun:3007", "mindurka.fun:3008", "mindurka.fun:3009", "mindurka.fun:3010", "mindurka.fun:3011"]
   },
   {
     "name": "Chaotic Neutral",
-    "address": ["c-n.ddns.net:1111", "c-n.ddns.net:2222", "c-n.ddns.net:3333", "c-n.ddns.net:4444", "c-n.ddns.net:5555", "c-n.ddns.net:6666", "c-n.ddns.net:7777", "c-n.ddns.net:9999", "c-n.ddns.net:1000"]
+    "address": ["37.187.73.180:7011", "37.187.73.180:7012", "37.187.73.180:7013", "37.187.73.180:7014", "37.187.73.180:7015", "37.187.73.180:7016", "37.187.73.180:7017"]
   },
   {
     "name": "io",
-    "address": ["mindustry.io.community", "mindustry.io.community:1000", "mindustry.io.community:2000", "mindustry.io.community:3000", "mindustry.io.community:4000", "labs.io.community"]
+    "address": ["159.69.7.83", "159.69.7.83:1000", "159.69.7.83:2000", "159.69.7.83:3000", "159.69.7.83:4000"]
   },
   {
     "name": "Korea",
     "address": ["mindustry.kr"]
-  },
-  {
-    "name": "Phoenix Network",
-    "address": ["phoenix-network.dev", "phoenix-network.dev:6464"]
-  },
-  {
-    "name": "Xpdustry",
-    "address": ["37.187.73.180", "37.187.73.180:7000", "37.187.73.180:7001", "37.187.73.180:7002", "37.187.73.180:7003", "37.187.73.180:7004", "37.187.73.180:7005"]
   },
   {
     "name": "LatamDustry",
@@ -93,24 +133,23 @@
   },
   {
     "name": "Tinylake",
-    "address": ["mindustry.top", "cn.mindustry.top", "g.mindustry.top"]
+    "address": ["cn.mindustry.top", "g.mindustry.top", "cn.mindustry.top:40003", "cn.mindustry.top:40500"]
   },
   {
     "name": "Fish",
-    "address": ["170.187.144.235", "162.248.100.98", "162.248.100.133", "162.248.102.204"]
+    "address": ["162.248.101.95", "162.248.100.98", "162.248.100.133", "162.248.102.204", "162.248.101.53", "37.187.73.180:7012"]
   },
   {
-    "name": "OMNIDUSTRY",
-    "address": ["85.193.87.179", "85.193.87.179:6568", "85.193.87.179:6569", "85.193.87.179:6570", "85.193.87.179:6571", "85.193.87.179:6572", "85.193.87.179:6573", "85.193.87.179:6574"]
-
+    "name": "OmniCorp Classic",
+    "address": ["omnidustry.ru:6567", "omnidustry.ru:6568", "omnidustry.ru:6569", "omnidustry.ru:6570", "omnidustry.ru:6571", "omnidustry.ru:6572", "omnidustry.ru:6573", "omnidustry.ru:6574"]
   },
   {
     "name": "The Devil",
-    "address": ["xem8k5.mindustry.top:8169", "test.xem8k5.top:8920", "other.xem8k5.top:10936", "n2.akiracloud.net:10404"]
+    "address": ["xem8k5.mindustry.top:8169", "test.xem8k5.top:8920", "other.xem8k5.top:10936", "n2.akiracloud.net:10404", "new.xem8k5.top"]
   },
   {
-    "name": "Eradicationdustry",
-    "address": ["eradicationmindustry.mindustry.me:6569", "eradicationmindustry.mindustry.me:9547", "eradicationmindustry.mindustry.me:6572", "eradicationmindustry.yeet.ml:6570", "eradicationmindustry.mindustry.me:6571", "eradicationmindustry.mindustry.me:6574", "eradicationmindustry.mindustry.me:6573", "eradicationmindustry2.mindustry.me:6567", "eradicationmindustry.mindustry.me:6568", "eradicationmindustry.mindustry.me:6677", "eradicationmindustry.mindustry.me:6678"]
+    "name": "Eradication Mindustry",
+    "address": ["140.238.246.78:7000", "140.238.246.78:7001", "140.238.246.78:7002", "140.238.246.78:7003", "140.238.246.78:7004", "130.61.22.183:7000", "130.61.22.183:7001", "130.61.22.183:7002", "130.61.22.183:7003", "130.61.22.183:7004", "130.61.22.183:7005", "130.61.22.183:7006", "62.30.47.117:7000", "62.30.47.117:7001", "62.30.47.117:7002", "62.30.47.117:7003", "62.30.47.116:7000", "62.30.47.116:7001"]
   },
   {
     "name": "Conservatory",
@@ -118,7 +157,7 @@
   },
   {
     "name": "mindustry.ddns.net",
-    "address": ["mindustry.ddns.net", "mindustry.ddns.net:1000", "mindustry.ddns.net:2000", "mindustry.ddns.net:3000", "mindustry.ddns.net:4000"]
+    "address": ["mindustry.ddns.net", "mindustry.ddns.net:1000", "mindustry.ddns.net:2000", "mindustry.ddns.net:3000", "mindustry.ddns.net:4000", "mindustry.ddns.net:5000"]
   },
   {
     "name": "EasyPlay.su",
@@ -129,16 +168,16 @@
     "address": ["sectorized.freeddns.org"]
   },
   {
-    "name": "{AA}",
-    "address": ["recessive.net"]
+    "name": "Apricot Alliance",
+    "address": ["apricotalliance.org"]
   },
   {
     "name": "Sakura", 
-    "address": ["160.16.207.141:22527", "160.16.207.141:23527", "160.16.207.141:24527", "160.16.207.141:25527", "160.16.207.141:26527", "160.16.207.141:27527", "160.16.207.141:28527"]
+    "address": ["160.16.207.141:20527", "160.16.207.141:21527", "160.16.207.141:22527", "160.16.207.141:23527", "160.16.207.141:24527", "160.16.207.141:25527", "160.16.207.141:26527", "160.16.207.141:27527", "160.16.207.141:28527", "160.16.207.141:29527", "162.43.36.78:20527", "162.43.36.78:21527", "162.43.36.78:22527", "162.43.36.78:23527", "162.43.36.78:24527", "162.43.36.78:25527", "162.43.36.78:26527", "162.43.36.78:27527", "162.43.36.78:28527", "162.43.36.78:29527", "sakura-mindustry.jp:20527"]
   },
   {
     "name": "|RussianServers|[]",
-    "address": ["2p2g.ml:6568", "2p2g.ml:6569", "2p2g.ml:6570", "2p2g.ml:6571", "2p2g.ml:6572", "2p2g.ml:6573"]
+    "address": ["02calm.ru:6567", "02calm.ru:6568", "02calm.ru:6569", "02calm.ru:6570", "02calm.ru:6571", "02calm.ru:6572", "02calm.ru:6573"]
   },
   {
     "name": "Hungarian",
@@ -150,15 +189,11 @@
   },
   {
     "name": "Router Pi",
-    "address": ["a55c81b7c4d6e6d604651a93f8af5cd83.asuscomm.com"]
+    "address": ["a55c81b7c4d6e6d604651a93f8af5cd83.asuscomm.com", "a55c81b7c4d6e6d604651a93f8af5cd83.asuscomm.com:6568", "a55c81b7c4d6e6d604651a93f8af5cd83.asuscomm.com:6569", "a55c81b7c4d6e6d604651a93f8af5cd83.asuscomm.com:6570", "a55c81b7c4d6e6d604651a93f8af5cd83.asuscomm.com:6571", "a55c81b7c4d6e6d604651a93f8af5cd83.asuscomm.com:6572", "a55c81b7c4d6e6d604651a93f8af5cd83.asuscomm.com:6573", "a55c81b7c4d6e6d604651a93f8af5cd83.asuscomm.com:6574"]
   },
   {
-    "name": "Vndustry",
-    "address": ["vndustry.ddns.net", "vndustry.ddns.net:6568"]
-  },
-  {
-     "name": "Anana&ShenYv",
-     "address": ["mdtleague.top"]
+     "name": "Anana",
+     "address": ["mdt.mdtleague.top","mdt2.mdtleague.top"]
   },
   {
     "name": "Vortex",
@@ -174,6 +209,115 @@
   },
   {
     "name": "Realm of Serene Lime",
-    "address": ["43.248.185.167:8517","n2.akiracloud.net:10686"]
+    "address": ["mindustry.icu", "sx.mindustry.icu", "mod.mindustry.icu"]
+  },
+  {
+    "name": "CreateDustry",
+    "address": ["95.216.68.161:55639"]
+  },
+  {
+    "name": "Official Mindustry Events",
+    "address": ["event.baseduser.eu.org"],
+    "prioritized": true
+  },
+  {
+    "name": "LifeTime",
+    "address": ["srv3.godlike.club:28561", "srv3.godlike.club:26508"]
+  },
+  {
+    "name": "Cyandustry",
+    "address": ["45.88.109.9:7000","45.88.109.9:7001", "45.88.109.9:7002", "45.88.109.9:7003", "45.88.109.9:7004", "45.88.109.9:7005", "45.88.109.9:7006", "45.88.109.9:7007", "45.88.109.9:7008"]
+  },
+  {
+    "name": "Four Family",
+    "address": ["118.127.8.162:25503"]
+  },
+  {
+    "name": "ToxoFlame",
+    "address": ["193.233.133.223", "193.233.133.223:6568", "193.233.133.223:6569"]
+  },
+  {
+    "name": "MeowIsland",
+    "address": ["jupiter.minerent.net:25651", "nexus.minerent.net:25596", "nexus.minerent.net:25598", "pandora.minerent.net:25620"]
+  },
+  {
+    "name": "3MIDustry",
+    "address": ["play.3midustry.octane.lol:6001", "play.3midustry.octane.lol:6002", "play.3midustry.octane.lol:6003", "play.3midustry.octane.lol:6004", "play.3midustry.octane.lol:6005", "play.3midustry.octane.lol:6006", "play.3midustry.octane.lol:6007", "play.3midustry.octane.lol:6008", "play.3midustry.octane.lol:6009", "play.3midustry.octane.lol:6010"]
+  },
+  {
+    "name": "abcxyz remaster",
+    "address": ["144.76.57.59:30302", "srv24.godlike.club:27272"]
+  },
+  {
+    "name": "CroCraft Network",
+    "address": ["193.122.53.98:6567", "193.122.53.98:20130"]
+  },
+  {
+    "name": "Extra Utilities",
+    "address": ["p1.i9mr.com:44922", "p1.i9mr.com:44834", "p1.i9mr.com:43189"]
+  },
+  {
+    "name": "Alex Multiverse",
+    "address": ["alexmindustryv7.servegame.com:25588", "172.234.80.96:6768", "139.162.41.78:6767", "172.245.187.143:6868", "172.245.187.143:6869", "92.119.127.171:6888" ]
+  },
+  {
+    "name": "Open PVP",
+    "address": ["162.55.42.21:5555"]
+  },
+  {
+    "name": "XuwenHost",
+    "address": ["mdt.xuwenblock.cn:6567","rack1.rainplay.cn:59196"]
+  },
+  {
+    "name": "Atomic",
+    "address": ["atomic-de.ddns.net:35876", "atomic-de.ddns.net:35663", "atomic-de.ddns.net:35724", "atomic-de.ddns.net:35847"]
+  },
+  {
+    "name": "Gadgetroch's Server",
+    "address": ["mindustry.gadgetroch.com", "mindustry.gadgetroch.com:6568", "mindustry.gadgetroch.com:6569"]
+  },
+  {
+    "name": "Duel.Server",
+    "address":["160.251.41.148:6567","160.251.41.148:6568","160.251.41.148:6569","160.251.41.148:6570"]
+  },
+  {
+    "name": "AZDustry",
+    "address": ["8.245.23.28:25874"]
+  },
+  {
+    "name": "Erepulo",
+    "address": ["95.84.198.97:5401", "95.84.198.97:5402", "95.84.198.97:5403", "95.84.198.97:2357"]
+  },
+  {
+    "name": "MineCore",
+    "address": ["194.247.42.11:27792", "194.247.42.11:27977", "194.247.42.61:27989", "194.247.42.181:28514"]
+  },
+  {
+    "name": "Mindus•VN",
+    "address": ["167.71.199.155:25550"]
+  },
+  {
+    "name": "Impact",
+    "address": ["impactmindustry.ddns.net"]
+  },
+  {
+    "name": "2D2R",
+    "address": ["45.137.205.185:1045", "51.89.173.50:1432", "45.137.205.185:1052", "45.137.205.185:1040"]
+  },
+  {
+    "name": "TRFACT",
+    "address": ["213.142.156.83:25565"]
+  },
+  {
+    "name": "ArmyOFUkraine",
+    "address": ["194.247.42.131:27715", "194.247.42.131:26639"]
+  },
+  {
+    "name": "SandBox",
+    "address": ["185.9.145.8:25993"]
+  },
+  {
+    "name": "Vndustry",
+    "address": ["vndustry.ddns.net"]
   }
 ]

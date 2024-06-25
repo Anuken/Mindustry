@@ -10,7 +10,6 @@ import mindustry.game.SectorInfo.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
-import mindustry.world.blocks.defense.*;
 import mindustry.world.blocks.defense.Wall.*;
 import mindustry.world.blocks.defense.turrets.Turret.*;
 import mindustry.world.blocks.distribution.*;
@@ -111,7 +110,7 @@ public class GameService{
             completeSerpulo.complete();
         }
 
-        if(mods.list().size > 0){
+        if(mods != null && mods.list().size > 0){
             installMod.complete();
         }
 
@@ -189,7 +188,7 @@ public class GameService{
             }
         });
 
-        Events.on(BlockBuildBeginEvent.class, e -> {
+        Events.on(BlockBuildEndEvent.class, e -> {
             if(campaign() && state.rules.sector == SectorPresets.groundZero.sector && e.tile.block() == Blocks.coreNucleus){
                 nucleusGroundZero.complete();
             }
@@ -225,8 +224,8 @@ public class GameService{
                     }
                 }
 
-                if(e.tile.block() instanceof MendProjector || e.tile.block() instanceof RegenProjector) buildMendProjector.complete();
-                if(e.tile.block() instanceof OverdriveProjector) buildOverdriveProjector.complete();
+                if(e.tile.block() == Blocks.mendProjector) buildMendProjector.complete();
+                if(e.tile.block() == Blocks.overdriveProjector) buildOverdriveProjector.complete();
 
                 if(e.tile.block() == Blocks.waterExtractor){
                     if(e.tile.getLinkedTiles(tmpTiles).contains(t -> t.floor().liquidDrop == Liquids.water)){
@@ -292,7 +291,7 @@ public class GameService{
         });
 
         Events.on(SectorLaunchLoadoutEvent.class, e -> {
-            if(!schematics.isDefaultLoadout(e.loadout)){
+            if(e.sector.planet == Planets.serpulo && !schematics.isDefaultLoadout(e.loadout)){
                 launchCoreSchematic.complete();
             }
         });
@@ -453,7 +452,8 @@ public class GameService{
         //check unlocked stuff on load as well
         Events.on(ResearchEvent.class, e -> checkUnlocks.run());
         Events.on(UnlockEvent.class, e -> checkUnlocks.run());
-        Events.on(ClientLoadEvent.class, e -> checkUnlocks.run());
+
+        checkUnlocks.run();
 
         Events.on(WinEvent.class, e -> {
             if(state.rules.pvp){

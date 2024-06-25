@@ -398,6 +398,9 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         this.overlay = (Floor)block;
 
         recache();
+        if(!world.isGenerating() && build != null){
+            build.onProximityUpdate();
+        }
     }
 
     /** Sets the overlay without a recache. */
@@ -545,6 +548,11 @@ public class Tile implements Position, QuadTreeObject, Displayable{
 
     public int staticDarkness(){
         return block.solid && block.fillsTile && !block.synthetic() ? data : 0;
+    }
+
+    /** @return whether this tile is solid for legged units */
+    public boolean legSolid(){
+        return staticDarkness() >= 2 || (floor.solid && block == Blocks.air);
     }
 
     /** @return true if these tiles are right next to each other. */

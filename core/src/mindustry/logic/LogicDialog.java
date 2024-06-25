@@ -17,6 +17,7 @@ import mindustry.logic.LExecutor.*;
 import mindustry.logic.LStatements.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
+import mindustry.world.blocks.logic.*;
 
 import static mindustry.Vars.*;
 import static mindustry.logic.LCanvas.*;
@@ -26,6 +27,7 @@ public class LogicDialog extends BaseDialog{
     Cons<String> consumer = s -> {};
     boolean privileged;
     @Nullable LExecutor executor;
+    GlobalVarsDialog globalsDialog = new GlobalVarsDialog();
 
     public LogicDialog(){
         super("logic");
@@ -51,7 +53,7 @@ public class LogicDialog extends BaseDialog{
         add(buttons).growX().name("canvas");
     }
 
-    private Color typeColor(Var s, Color color){
+    public static Color typeColor(LVar s, Color color){
         return color.set(
             !s.isobj ? Pal.place :
             s.objval == null ? Color.darkGray :
@@ -65,7 +67,7 @@ public class LogicDialog extends BaseDialog{
         );
     }
 
-    private String typeName(Var s){
+    public static String typeName(LVar s){
         return
             !s.isobj ? "number" :
             s.objval == null ? "null" :
@@ -91,11 +93,29 @@ public class LogicDialog extends BaseDialog{
                     TextButtonStyle style = Styles.flatt;
                     t.defaults().size(280f, 60f).left();
 
+                    if(privileged && executor != null && executor.build != null && !ui.editor.isShown()){
+                        t.button("@editor.worldprocessors.editname", Icon.edit, style, () -> {
+                            ui.showTextInput("", "@editor.name", LogicBlock.maxNameLength, executor.build.tag == null ? "" : executor.build.tag, tag -> {
+                                if(privileged && executor != null && executor.build != null){
+                                    executor.build.configure(tag);
+                                    //just in case of privilege shenanigans...
+                                    executor.build.tag = tag;
+                                }
+                            });
+                            dialog.hide();
+                        }).marginLeft(12f).row();
+                    }
+
+                    t.button("@clear", Icon.cancel, style, () -> {
+                        ui.showConfirm("@logic.clear.confirm", () -> canvas.clearStatements());
+                        dialog.hide();
+                    }).marginLeft(12f).row();
+
                     t.button("@schematic.copy", Icon.copy, style, () -> {
                         dialog.hide();
                         Core.app.setClipboardText(canvas.save());
-                    }).marginLeft(12f);
-                    t.row();
+                    }).marginLeft(12f).row();
+
                     t.button("@schematic.copy.import", Icon.download, style, () -> {
                         dialog.hide();
                         try{
@@ -178,6 +198,8 @@ public class LogicDialog extends BaseDialog{
             });
 
             dialog.addCloseButton();
+            dialog.buttons.button("@logic.globals", Icon.list, () -> globalsDialog.show()).size(210f, 64f);
+
             dialog.show();
         }).name("variables").disabled(b -> executor == null || executor.vars.length == 0);
 

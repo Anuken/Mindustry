@@ -71,13 +71,14 @@ public class UI implements ApplicationListener, Loadable{
     public SchematicsDialog schematics;
     public ModsDialog mods;
     public ColorPicker picker;
+    public EffectsDialog effects;
     public LogicDialog logic;
     public FullTextDialog fullText;
     public CampaignCompleteDialog campaignComplete;
 
     public IntMap<Dialog> followUpMenus;
 
-    public Cursor drillCursor, unloadCursor, targetCursor;
+    public Cursor drillCursor, unloadCursor, targetCursor, repairCursor;
 
     private @Nullable Element lastAnnouncement;
 
@@ -100,8 +101,6 @@ public class UI implements ApplicationListener, Loadable{
 
     @Override
     public void loadSync(){
-        loadColors();
-
         Fonts.outline.getData().markupEnabled = true;
         Fonts.def.getData().markupEnabled = true;
         Fonts.def.setOwnsTexture(false);
@@ -127,6 +126,9 @@ public class UI implements ApplicationListener, Loadable{
 
         Tooltips.getInstance().animations = false;
         Tooltips.getInstance().textProvider = text -> new Tooltip(t -> t.background(Styles.black6).margin(4f).add(text));
+        if(mobile){
+            Tooltips.getInstance().offsetY += Scl.scl(60f);
+        }
 
         Core.settings.setErrorHandler(e -> {
             Log.err(e);
@@ -138,6 +140,7 @@ public class UI implements ApplicationListener, Loadable{
         drillCursor = Core.graphics.newCursor("drill", Fonts.cursorScale());
         unloadCursor = Core.graphics.newCursor("unload", Fonts.cursorScale());
         targetCursor = Core.graphics.newCursor("target", Fonts.cursorScale());
+        repairCursor = Core.graphics.newCursor("repair", Fonts.cursorScale());
     }
 
     @Override
@@ -183,6 +186,7 @@ public class UI implements ApplicationListener, Loadable{
         consolefrag = new ConsoleFragment();
 
         picker = new ColorPicker();
+        effects = new EffectsDialog();
         editor = new MapEditorDialog();
         controls = new KeybindDialog();
         restart = new GameOverDialog();
@@ -268,15 +272,24 @@ public class UI implements ApplicationListener, Loadable{
         });
     }
 
-    public void showTextInput(String titleText, String text, int textLength, String def, boolean numbers, Cons<String> confirmed, Runnable closed){
+
+    public void showTextInput(String titleText, String text, int textLength, String def, boolean numbers, Cons<String> confirmed, Runnable closed) {
+        showTextInput(titleText, text, textLength, def, numbers, false, confirmed, closed);
+    }
+
+    public void showTextInput(String titleText, String text, int textLength, String def, boolean numbers, boolean allowEmpty, Cons<String> confirmed, Runnable closed){
         if(mobile){
+            var description = (text.startsWith("@") ? Core.bundle.get(text.substring(1)) : text);
+            var empty = allowEmpty;
             Core.input.getTextInput(new TextInput(){{
                 this.title = (titleText.startsWith("@") ? Core.bundle.get(titleText.substring(1)) : titleText);
                 this.text = def;
                 this.numeric = numbers;
                 this.maxLength = textLength;
                 this.accepted = confirmed;
-                this.allowEmpty = false;
+                this.canceled = closed;
+                this.allowEmpty = empty;
+                this.message = description;
             }});
         }else{
             new Dialog(titleText){{
@@ -293,11 +306,11 @@ public class UI implements ApplicationListener, Loadable{
                 buttons.button("@ok", () -> {
                     confirmed.get(field.getText());
                     hide();
-                }).disabled(b -> field.getText().isEmpty());
+                }).disabled(b -> !allowEmpty && field.getText().isEmpty());
 
                 keyDown(KeyCode.enter, () -> {
                     String text = field.getText();
-                    if(!text.isEmpty()){
+                    if(allowEmpty || !text.isEmpty()){
                         confirmed.get(text);
                         hide();
                     }

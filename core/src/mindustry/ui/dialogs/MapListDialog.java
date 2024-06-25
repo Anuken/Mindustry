@@ -88,13 +88,13 @@ public abstract class MapListDialog extends BaseDialog{
 
         cont.add(search).growX();
         cont.row();
-        cont.add(pane).padLeft(36f).uniformX().growY();
+        cont.add(pane).padLeft(28f).uniformX().growY();
     }
 
     void rebuildMaps(){
         mapTable.clear();
 
-        mapTable.marginRight(18f);
+        mapTable.marginRight(12f);
 
         int maxwidth = Math.max((int)(Core.graphics.getWidth() / Scl.scl(230)), 1);
         float mapsize = 200f;
@@ -114,9 +114,9 @@ public abstract class MapListDialog extends BaseDialog{
                     invalid |= !mode.valid(map);
                 }
                 if(invalid || (searchString != null
-                    && !Strings.stripColors(map.name()).toLowerCase().contains(searchString)
-                    && (!searchAuthor || !Strings.stripColors(map.author()).toLowerCase().contains(searchString))
-                    && (!searchDescription || !Strings.stripColors(map.description()).toLowerCase().contains(searchString)))){
+                    && !map.plainName().toLowerCase().contains(searchString)
+                    && (!searchAuthor || !map.plainAuthor().toLowerCase().contains(searchString))
+                    && (!searchDescription || !map.plainDescription().toLowerCase().contains(searchString)))){
                     continue;
                 }
 
@@ -153,7 +153,7 @@ public abstract class MapListDialog extends BaseDialog{
 
                 if(displayType){
                     button.row();
-                    button.add(map.custom ? "@custom" : map.workshop ? "@workshop" : map.mod != null ? "[lightgray]" + map.mod.meta.displayName() : "@builtin").color(Color.gray).padTop(3);
+                    button.add(map.custom ? "@custom" : map.workshop ? "@workshop" : map.mod != null ? "[lightgray]" + map.mod.meta.displayName : "@builtin").color(Color.gray).padTop(3);
                 }
 
                 i++;

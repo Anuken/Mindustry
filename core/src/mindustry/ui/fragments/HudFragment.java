@@ -27,6 +27,8 @@ import mindustry.input.*;
 import mindustry.net.Packets.*;
 import mindustry.type.*;
 import mindustry.ui.*;
+import mindustry.world.blocks.storage.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
 
 import static mindustry.Vars.*;
 import static mindustry.gen.Tex.*;
@@ -71,7 +73,11 @@ public class HudFragment{
         });
 
         Events.on(SectorCaptureEvent.class, e -> {
-            showToast(Core.bundle.format("sector.captured", e.sector.isBeingPlayed() ? "" : e.sector.name() + " "));
+            if(e.sector.isBeingPlayed()){
+                ui.announce("@sector.capture.current", 5f);
+            }else{
+                showToast(Core.bundle.format("sector.capture", e.sector.name()));
+            }
         });
 
         Events.on(SectorLoseEvent.class, e -> {
@@ -228,7 +234,7 @@ public class HudFragment{
                 //table with button to skip wave
                 s.button(Icon.play, rightStyle, 30f, () -> {
                     if(net.client() && player.admin){
-                        Call.adminRequest(player, AdminAction.wave);
+                        Call.adminRequest(player, AdminAction.wave, null);
                     }else{
                         logic.skipWave();
                     }
@@ -293,6 +299,11 @@ public class HudFragment{
         //core info
         parent.fill(t -> {
             t.top();
+
+            if(Core.settings.getBool("macnotch") ){
+                t.margin(macNotchHeight);
+            }
+
             t.visible(() -> shown);
 
             t.name = "coreinfo";
@@ -575,6 +586,8 @@ public class HudFragment{
         }
     }
 
+    /** @deprecated see {@link CoreBuild#beginLaunch(CoreBlock)} */
+    @Deprecated
     public void showLaunch(){
         float margin = 30f;
 
@@ -593,6 +606,8 @@ public class HudFragment{
         Core.scene.add(image);
     }
 
+    /** @deprecated see {@link CoreBuild#beginLaunch(CoreBlock)} */
+    @Deprecated
     public void showLand(){
         Image image = new Image();
         image.color.a = 1f;
@@ -912,6 +927,8 @@ public class HudFragment{
                     }
 
                     statuses.set(applied);
+                }else{
+                    statuses.clear();
                 }
             }
         }).left();

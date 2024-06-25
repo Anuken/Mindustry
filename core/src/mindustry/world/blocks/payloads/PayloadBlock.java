@@ -25,6 +25,7 @@ public class PayloadBlock extends Block{
         update = true;
         sync = true;
         group = BlockGroup.payloads;
+        acceptsPayloads = true;
         envEnabled |= Env.space | Env.underwater;
     }
 
@@ -157,6 +158,12 @@ public class PayloadBlock extends Block{
             if(payload != null){
                 payload.update(null, this);
             }
+        }
+
+        @Override
+        public void onDestroyed(){
+            if(payload != null) payload.destroyed();
+            super.onDestroyed();
         }
 
         public boolean blends(int direction){

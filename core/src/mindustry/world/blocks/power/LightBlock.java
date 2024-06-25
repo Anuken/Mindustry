@@ -38,7 +38,8 @@ public class LightBlock extends Block{
 
     @Override
     public void init(){
-        lightRadius = radius*3f;
+        lightRadius = radius*2.5f;
+        clipSize = Math.max(clipSize, lightRadius * 3f);
         emitLight = true;
 
         super.init();

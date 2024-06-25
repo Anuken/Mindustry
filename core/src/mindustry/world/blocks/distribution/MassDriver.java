@@ -18,6 +18,7 @@ import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -104,13 +105,18 @@ public class MassDriver extends Block{
         }
     }
 
-    public class MassDriverBuild extends Building{
+    public class MassDriverBuild extends Building implements RotBlock{
         public int link = -1;
         public float rotation = 90;
         public float reloadCounter = 0f;
         public DriverState state = DriverState.idle;
         //TODO use queue? this array usually holds about 3 shooters max anyway
         public OrderedSet<Building> waitingShooters = new OrderedSet<>();
+
+        @Override
+        public float buildRotation(){
+            return rotation;
+        }
 
         public Building currentShooter(){
             return waitingShooters.isEmpty() ? null : waitingShooters.first();

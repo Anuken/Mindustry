@@ -146,6 +146,7 @@ public class Item extends UnlockableContent implements Senseable{
 
                     Pixmap res = Pixmaps.blend(pixmaps[i], pixmaps[(i + 1) % frames], f);
                     packer.add(PageType.main, name + "-t" + index, res);
+                    res.dispose();
                 }
             }
         }
@@ -153,8 +154,9 @@ public class Item extends UnlockableContent implements Senseable{
 
     @Override
     public double sense(LAccess sensor){
-        if(sensor == LAccess.color) return color.toFloatBits();
-        return 0;
+        if(sensor == LAccess.color) return color.toDoubleBits();
+        if(sensor == LAccess.id) return getLogicId();
+        return Float.NaN;
     }
 
     @Override

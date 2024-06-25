@@ -220,6 +220,7 @@ public class ForceProjector extends Block{
         @Override
         public double sense(LAccess sensor){
             if(sensor == LAccess.heat) return buildup;
+            if(sensor == LAccess.shield) return broken ? 0f : Math.max(shieldHealth + phaseShieldBoost * phaseHeat - buildup, 0);
             return super.sense(sensor);
         }
 
@@ -244,19 +245,21 @@ public class ForceProjector extends Block{
             if(!broken){
                 float radius = realRadius();
 
-                Draw.color(team.color, Color.white, Mathf.clamp(hit));
+                if(radius > 0.001f){
+                    Draw.color(team.color, Color.white, Mathf.clamp(hit));
 
-                if(renderer.animateShields){
-                    Draw.z(Layer.shields + 0.001f * hit);
-                    Fill.poly(x, y, sides, radius, shieldRotation);
-                }else{
-                    Draw.z(Layer.shields);
-                    Lines.stroke(1.5f);
-                    Draw.alpha(0.09f + Mathf.clamp(0.08f * hit));
-                    Fill.poly(x, y, sides, radius, shieldRotation);
-                    Draw.alpha(1f);
-                    Lines.poly(x, y, sides, radius, shieldRotation);
-                    Draw.reset();
+                    if(renderer.animateShields){
+                        Draw.z(Layer.shields + 0.001f * hit);
+                        Fill.poly(x, y, sides, radius, shieldRotation);
+                    }else{
+                        Draw.z(Layer.shields);
+                        Lines.stroke(1.5f);
+                        Draw.alpha(0.09f + Mathf.clamp(0.08f * hit));
+                        Fill.poly(x, y, sides, radius, shieldRotation);
+                        Draw.alpha(1f);
+                        Lines.poly(x, y, sides, radius, shieldRotation);
+                        Draw.reset();
+                    }
                 }
             }
 
